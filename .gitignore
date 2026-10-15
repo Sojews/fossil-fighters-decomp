@@ -1,0 +1,17 @@
+# Game data: never commit
+extract/*
+!extract/README.md
+*.nds
+*.sav
+arm7_bios.bin
+
+# Build output and downloaded tools
+build/
+build.ninja
+.ninja_*
+objdiff.json
+tools/bin/
+tools/mwccarm/
+__pycache__/
+*.d
+.DS_Store
