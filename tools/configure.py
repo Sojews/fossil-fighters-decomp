@@ -31,6 +31,10 @@ CC_FLAGS = " ".join([
     "-nolink",
     "-msgstyle gcc",
 ])
+# Extra flags for library code, by path prefix.
+LIB_CC_FLAGS = {
+    "libs/msl/": "-Cpp_exceptions off",   # MSL was built without exception tables
+}
 LD_FLAGS = " ".join([
     "-proc arm946e",
     "-dead",
@@ -78,7 +82,7 @@ w(f"rule extract\n  command = {DSD} rom extract --rom $in --output-path {extract
 w(f"rule delink\n  command = {DSD} delink --config-path {arm9_config}")
 w(f"rule lcf\n  command = {DSD} lcf -c {arm9_config}")
 # mwcc names outputs after the source and writes a Windows-style .d next to them.
-w(f"rule cc\n  command = {wine} {CC} {CC_FLAGS} -i include -MD -c $in -o $outdir && {PY} tools/fix_dep.py $outdir/$stem.d $out.d\n"
+w(f"rule cc\n  command = {wine} {CC} {CC_FLAGS} $extra_cflags -gccinc -i include -i libs/msl/include -MD -c $in -o $outdir && {PY} tools/fix_dep.py $outdir/$stem.d $out.d\n"
   "  depfile = $out.d\n  deps = gcc\n  description = CC $in")
 w(f"rule ld\n  command = {wine} {LD} {LD_FLAGS} @$objects $lcf -o $out\n  description = LINK $out")
 w(f"rule check\n  command = {DSD} check modules --config-path {arm9_config} --fail && touch $out")
@@ -105,7 +109,8 @@ for f in info["files"]:
     obj = f["object_to_link"]
     to_link.append(obj)
     if obj != f["delink_file"]:   # a matched source file: compile it
-        w(f"build {obj}: cc {f['name']}\n  outdir = {Path(obj).parent}\n  stem = {Path(obj).stem}")
+        extra = next((v for k, v in LIB_CC_FLAGS.items() if f["name"].startswith(k)), "")
+        w(f"build {obj}: cc {f['name']}\n  outdir = {Path(obj).parent}\n  stem = {Path(obj).stem}\n  extra_cflags = {extra}")
 
 elf = build_dir / "arm9.o"
 w(f"build {elf}: ld {' '.join(to_link)} | {lcf} {objects}\n  objects = {objects}\n  lcf = {lcf}")

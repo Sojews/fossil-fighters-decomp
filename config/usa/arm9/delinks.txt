@@ -10,3 +10,24 @@
 src/util/string_trim.c:
     complete
     .text       start:0x020213a0 end:0x0202140c
+
+libs/msl/src/file_io.c:
+    complete
+    .text       start:0x0207d758 end:0x0207d7e4
+
+libs/msl/src/mem_funcs.c:
+    complete
+    .text       start:0x0207d9b4 end:0x0207da28
+
+libs/msl/src/math/e_pow.c:
+    complete
+    .text       start:0x020828c8 end:0x02083484
+    .rodata     start:0x02092f7c end:0x02092fac
+
+libs/msl/src/math/s_frexp.c:
+    complete
+    .text       start:0x020834bc end:0x0208353c
+
+libs/msl/src/math/s_ldexp.c:
+    complete
+    .text       start:0x0208353c end:0x020836b4

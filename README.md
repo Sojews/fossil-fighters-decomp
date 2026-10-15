@@ -8,7 +8,8 @@
 |---|---|
 | Target | Fossil Fighters (USA), `YKHE`, SHA-1 `8148a65040b5085337b76e6051601da1b1fc28ef` |
 | Functions | 10,076 found across ARM9 main, ITCM and 8 overlays |
-| Matched | 2 (see `src/`) |
+| Matched | 7 functions, 3,864 bytes (0.35%) — game code in `src/`, C library in `libs/msl/` |
+| Named | 945 functions, incl. ~800 NitroSDK/NitroSystem/MSL functions found by `tools/sdk_names` |
 | Compiler | Metrowerks CodeWarrior for ARM 2.0 (`mwccarm`), NitroSDK 4.0 |
 
 ## Building
@@ -46,6 +47,8 @@ Every code module is checked independently by `dsd check modules`, so this doesn
 2. Pick a function, write C for it in a file under `src/`, and add the file's address range to `config/usa/arm9/delinks.txt` (see `src/util/string_trim.c` for an example).
 3. `ninja` must still finish with `build/ff_usa.nds: OK`.
 
+Library code (NitroSDK, NitroSystem, MSL) lives at about `0x0206d000`–`0x02088364` and 762 of its 1,021 functions are already named. The game's own code (below `0x0206d000`, plus the overlays) is the main job.
+
 Tips:
 - Most game code is Thumb; `-thumb` is the default. Wrap ARM functions in `#pragma thumb off`.
 - `char` is signed in this game.
@@ -57,6 +60,8 @@ Tips:
 - [ds-decomp](https://github.com/AetiasHax/ds-decomp) (`dsd`): extract, delink, linker script, ROM build and module checks
 - [objdiff](https://github.com/encounter/objdiff): function diffing and progress reports
 - [wibo](https://github.com/decompals/wibo): runs the Windows-only Metrowerks tools on macOS and Linux
+- [ntrtwl/NitroSDK](https://github.com/ntrtwl/NitroSDK), [ntrtwl/NitroSystem](https://github.com/ntrtwl/NitroSystem): reference builds for naming library functions (`tools/sdk_names`)
+- MSL sources and headers from the [Spirit Tracks decomp](https://github.com/zeldaret/st) (CC0)
 - Build structure adapted from the [Phantom Hourglass decomp](https://github.com/zeldaret/ph) (CC0)
 
 ## License

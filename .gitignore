@@ -15,3 +15,5 @@ tools/mwccarm/
 __pycache__/
 *.d
 .DS_Store
+tools/sdk_names/ref/
+tools/sdk_names/obj/
