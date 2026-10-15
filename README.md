@@ -59,4 +59,8 @@ Tips:
 - [wibo](https://github.com/decompals/wibo): runs the Windows-only Metrowerks tools on macOS and Linux
 - Build structure adapted from the [Phantom Hourglass decomp](https://github.com/zeldaret/ph) (CC0)
 
+## License
+
+The code and configs in this repository are released into the public domain under [CC0 1.0](LICENSE). This covers only what's in the repo; the game itself is not included and remains Nintendo's.
+
 Fan project, not affiliated with or endorsed by Nintendo, Red Entertainment or Spike. Fossil Fighters is a trademark of Nintendo.
