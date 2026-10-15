@@ -25,16 +25,15 @@ CC_FLAGS = " ".join([
     "-fp soft",         # Software floating point
     "-enum int",        # int-sized enums
     "-char signed",     # char is signed (ldrsb loads in the original code)
-    "-lang c",          # Game uses C++ in places (.exceptix present); C until a C++ file is matched
+    "-lang c",          # C until a C++ file is matched (overlays have C++ static initializers)
+    "-Cpp_exceptions off",  # No game code has exception table entries (only MSL does)
     "-w off",
     "-sym on",
     "-nolink",
     "-msgstyle gcc",
 ])
 # Extra flags for library code, by path prefix.
-LIB_CC_FLAGS = {
-    "libs/msl/": "-Cpp_exceptions off",   # MSL was built without exception tables
-}
+LIB_CC_FLAGS: dict[str, str] = {}
 LD_FLAGS = " ".join([
     "-proc arm946e",
     "-dead",

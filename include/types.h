@@ -1,0 +1,22 @@
+#ifndef TYPES_H
+#define TYPES_H
+
+typedef unsigned char u8;
+typedef unsigned short u16;
+typedef unsigned long u32;
+typedef signed char s8;
+typedef signed short s16;
+typedef signed long s32;
+
+typedef int BOOL;
+#define TRUE 1
+#define FALSE 0
+
+#ifndef NULL
+#define NULL 0
+#endif
+
+typedef s32 fx32;   // 20.12 fixed point
+#define FX32_SHIFT 12
+
+#endif

@@ -7,9 +7,11 @@
     .data       start:0x02093060 end:0x020c6220 kind:data align:32
     .bss        start:0x020c6220 end:0x021558a0 kind:bss align:32
 
-src/util/string_trim.c:
+src/util/text_parse.c:
     complete
-    .text       start:0x020213a0 end:0x0202140c
+    .text       start:0x020213a0 end:0x02021620
+    .rodata     start:0x0208ae30 end:0x0208af70
+    .bss        start:0x0214c080 end:0x0214c180
 
 libs/msl/src/file_io.c:
     complete

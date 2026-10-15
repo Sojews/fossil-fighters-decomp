@@ -2088,12 +2088,12 @@ func_02021254 kind:function(thumb,size=0xa4) addr:0x02021254
 func_020212f8 kind:function(thumb,size=0xa8) addr:0x020212f8
 SkipWhitespace kind:function(thumb,size=0x18) addr:0x020213a0
 TrimCopy kind:function(thumb,size=0x52) addr:0x020213b8
-func_0202140c kind:function(thumb,size=0x5c) addr:0x0202140c
-func_02021468 kind:function(thumb,size=0x7c) addr:0x02021468
-func_020214e4 kind:function(thumb,size=0x9c) addr:0x020214e4
-func_02021580 kind:function(thumb,size=0x58) addr:0x02021580
-func_020215d8 kind:function(thumb,size=0x2e) addr:0x020215d8
-func_02021608 kind:function(thumb,size=0x16) addr:0x02021608
+StripQuotes kind:function(thumb,size=0x5c) addr:0x0202140c
+ReadLine kind:function(thumb,size=0x7c) addr:0x02021468
+ParseFx32 kind:function(thumb,size=0x9c) addr:0x020214e4
+ParseInt kind:function(thumb,size=0x58) addr:0x02021580
+ReadField kind:function(thumb,size=0x2e) addr:0x020215d8
+SkipComma kind:function(thumb,size=0x16) addr:0x02021608
 func_02021620 kind:function(thumb,size=0x6c) addr:0x02021620
 func_0202168c kind:function(thumb,size=0x74) addr:0x0202168c
 func_02021700 kind:function(thumb,size=0x58) addr:0x02021700
@@ -7256,7 +7256,7 @@ data_0208ade8 kind:data(any) addr:0x0208ade8
 data_0208ae00 kind:data(any) addr:0x0208ae00
 data_0208ae10 kind:data(any) addr:0x0208ae10
 data_0208ae20 kind:data(any) addr:0x0208ae20
-data_0208ae30 kind:data(any) addr:0x0208ae30
+sFracTable kind:data(any) addr:0x0208ae30
 data_0208af70 kind:data(any) addr:0x0208af70
 data_0208af88 kind:data(any) addr:0x0208af88
 data_0208afc0 kind:data(any) addr:0x0208afc0
@@ -12878,7 +12878,7 @@ data_020f020e kind:bss addr:0x020f020e
 data_02110210 kind:bss addr:0x02110210
 data_021201be kind:bss addr:0x021201be
 data_02130212 kind:bss addr:0x02130212
-data_0214c080 kind:bss addr:0x0214c080
+sLineBuf kind:bss addr:0x0214c080
 data_0214c180 kind:bss addr:0x0214c180
 data_0214c18c kind:bss addr:0x0214c18c
 data_0214d0d4 kind:bss addr:0x0214d0d4

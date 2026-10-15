@@ -8,7 +8,7 @@
 |---|---|
 | Target | Fossil Fighters (USA), `YKHE`, SHA-1 `8148a65040b5085337b76e6051601da1b1fc28ef` |
 | Functions | 10,076 found across ARM9 main, ITCM and 8 overlays |
-| Matched | 7 functions, 3,864 bytes (0.35%) — game code in `src/`, C library in `libs/msl/` |
+| Matched | 13 functions, 4,392 bytes (0.39%) — game code in `src/`, C library in `libs/msl/` |
 | Named | 945 functions, incl. ~800 NitroSDK/NitroSystem/MSL functions found by `tools/sdk_names` |
 | Compiler | Metrowerks CodeWarrior for ARM 2.0 (`mwccarm`), NitroSDK 4.0 |
 
@@ -44,15 +44,19 @@ Every code module is checked independently by `dsd check modules`, so this doesn
 ## How to contribute
 
 1. Run `ninja objdiff.json`, then open the project in objdiff (or use the decomp.me scratch links it generates).
-2. Pick a function, write C for it in a file under `src/`, and add the file's address range to `config/usa/arm9/delinks.txt` (see `src/util/string_trim.c` for an example).
-3. `ninja` must still finish with `build/ff_usa.nds: OK`.
+2. Pick a function, write C for it in a file under `src/`, and add the file's address range to `config/usa/arm9/delinks.txt` (see `src/util/text_parse.c` for an example).
+3. Check it with `python3 tools/try_match.py src/your_file.c` (it compares every function in the file with the game and shows a side-by-side disassembly of mismatches; `pip install capstone` for the disassembly).
+4. `ninja` must still finish with `build/ff_usa.nds: OK`.
+
+For a first draft of a function, run [m2c](https://github.com/matt-kempster/m2c) with `-t arm-mwcc-c` on its assembly from `dsd dis` (in UAL syntax, `--ual`).
 
 Library code (NitroSDK, NitroSystem, MSL) lives at about `0x0206d000`–`0x02088364` and 762 of its 1,021 functions are already named. The game's own code (below `0x0206d000`, plus the overlays) is the main job.
 
 Tips:
 - Most game code is Thumb; `-thumb` is the default. Wrap ARM functions in `#pragma thumb off`.
 - `char` is signed in this game.
-- The game contains C++ exception tables (`.exceptix`), so parts were written in C++.
+- Parts of the game are C++ (the overlays have static initializers). Game code has no exception tables, so everything is built with `-Cpp_exceptions off`.
+- mwcc is picky about expression shape: `x *= 10; x += d;` and `x = x * 10 + d` compile differently, and indexing with `a[i++]` stops the loop being turned into pointer arithmetic.
 - Include any alignment padding after the last function in a file's `.text` range, or later code shifts.
 
 ## Tools
