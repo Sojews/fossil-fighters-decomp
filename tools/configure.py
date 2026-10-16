@@ -103,16 +103,23 @@ lcf, objects = info["arm9_lcf_file"], info["arm9_objects_file"]
 w(f"build {lcf} {objects}: lcf {' '.join(dsd_configs)} {rom_config}")
 
 to_link = []
+partial = []
 for f in info["files"]:
     obj = f["object_to_link"]
     to_link.append(obj)
-    if obj != f["delink_file"]:   # a matched source file: compile it
+    if obj == f["delink_file"] and Path(f["name"]).is_file():
+        # A source file that doesn't match completely yet: it links the original bytes, but is still compiled so
+        # objdiff can count the functions in it that do match.
+        obj = str(build_dir / Path(f["name"]).with_suffix(".o"))
+        partial.append(obj)
+    if obj != f["delink_file"]:   # a source file: compile it
         extra = next((v for k, v in LIB_CC_FLAGS.items() if f["name"].startswith(k)), "")
         # mwcc keeps the first -lang it sees, so the language is set per file rather than in CC_FLAGS.
         extra += " -lang c++ -RTTI on" if f["name"].endswith(".cpp") else " -lang c"
         w(f"build {obj}: cc {f['name']}\n  outdir = {Path(obj).parent}\n  stem = {Path(obj).stem}\n  extra_cflags = {extra}")
 
 elf = build_dir / "arm9.o"
+w(f"build partial: phony {' '.join(partial)}")
 w(f"build {elf}: ld {' '.join(to_link)} | {lcf} {objects}\n  objects = {objects}\n  lcf = {lcf}")
 w(f"build {build_dir}/check.ok: check {elf}")
 rom_cfg = build_dir / "build" / "rom_config.yaml"
@@ -122,7 +129,7 @@ w(f"build {build_dir}/sha1.ok: sha1 {built_rom}")
 w("build objdiff.json: objdiff_config " + " ".join(dsd_configs))
 w(f"build check: phony {build_dir}/check.ok")
 w(f"build rom: phony {build_dir}/sha1.ok")
-w("default rom")
+w("default rom partial")
 
 Path("build.ninja").write_text("\n".join(lines) + "\n")
 print(f"Wrote build.ninja for '{args.version}'. Run: ninja")

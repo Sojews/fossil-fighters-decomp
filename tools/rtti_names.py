@@ -3,7 +3,8 @@
 
 Usage: python3 tools/rtti_names.py [--apply]
 Prints one line per class (vtable, base class, destructors). With --apply, renames the destructors in
-symbols.txt to their mangled names. A vtable's first two entries are taken as the complete (D1) and
+symbols.txt to their mangled names and names the type-name strings (_ZTS), typeinfos (_ZTI) and vtables (_ZTV).
+A vtable symbol starts at its offset-to-top word, 8 bytes before the address the code loads, as mwcc emits it. A vtable's first two entries are taken as the complete (D1) and
 deleting (D0) destructors only if the D0 candidate calls operator delete and the D1 candidate doesn't.
 """
 import re
@@ -74,11 +75,16 @@ def main() -> None:
             base_of[name] = typeinfo[b]
 
     renames = {}
+    data_names = {}   # addr -> mangled name
+    for ti, name in typeinfo.items():
+        data_names[ti] = f"_ZTI{name}"
+        data_names[word(ti + 4)] = f"_ZTS{name}"
     for ti, name in sorted(typeinfo.items(), key=lambda kv: kv[1]):
         for ref in words.get(ti, []):
             vt = ref + 4
             if word(ref - 4) != 0:
                 continue
+            data_names[ref - 4] = f"_ZTV{name}"
             d1, d0 = word(vt) & ~1, word(vt + 4) & ~1
             if d1 not in funcs or d0 not in funcs:
                 continue
@@ -104,8 +110,55 @@ def main() -> None:
                 lines[i] = new + l[len(tok):]
                 seen.add(new)
                 n += 1
+        lines, m = apply_data_names(lines, data_names, seen)
         syms_path.write_text("\n".join(lines) + "\n")
-        print(f"# renamed {n}", file=sys.stderr)
+        print(f"# renamed {n} functions, named {m} data symbols", file=sys.stderr)
+
+
+def rewrite_vtable_relocs(entries: set[int]) -> None:
+    """Points relocations to a vtable's entries at the vtable symbol plus 8."""
+    for path in CFG.rglob("relocs.txt"):
+        text = path.read_text()
+        def sub(m):
+            to = int(m.group(1), 16)
+            return f"to:{to - 8:#010x} add:0x8 module:main" if to in entries else m.group(0)
+        new = re.sub(r"to:(0x[0-9a-f]+) module:main", sub, text)
+        if new != text:
+            path.write_text(new)
+
+
+def apply_data_names(lines: list[str], data_names: dict[int, str], seen: set[str]) -> tuple[list[str], int]:
+    """Names the RTTI data, adding symbols where there are none. The auto-generated symbol at a vtable's
+    entries (8 bytes into it) is dropped, so references to it become _ZTV...+8."""
+    by_addr = {}
+    for i, l in enumerate(lines):
+        m = re.search(r" kind:data\S* addr:(0x[0-9a-f]+)", l)
+        if m:
+            by_addr[int(m.group(1), 16)] = i
+    drop = set()
+    for addr, name in data_names.items():
+        if name.startswith("_ZTV"):
+            i = by_addr.get(addr + 8)
+            if i is not None and lines[i].startswith("data_"):
+                drop.add(i)
+    n = 0
+    for addr, name in sorted(data_names.items()):
+        if name in seen:
+            continue
+        i = by_addr.get(addr)
+        if i is not None:
+            tok = lines[i].split(" ", 1)[0]
+            if not tok.startswith("data_"):
+                continue
+            lines[i] = name + lines[i][len(tok):]
+        else:
+            lines.append(f"{name} kind:data(any) addr:{addr:#010x}")
+        seen.add(name)
+        n += 1
+    rewrite_vtable_relocs({int(re.search(r"addr:(0x[0-9a-f]+)", lines[i]).group(1), 16) for i in drop})
+    lines = [l for i, l in enumerate(lines) if i not in drop]
+    lines.sort(key=lambda l: int(re.search(r"addr:(0x[0-9a-f]+)", l).group(1), 16))
+    return lines, n
 
 
 if __name__ == "__main__":
