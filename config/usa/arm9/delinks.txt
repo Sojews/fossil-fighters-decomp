@@ -150,6 +150,9 @@ src/m/bg.cpp:
 src/m/picture.cpp:
     .text       start:0x02059abc end:0x0205acb8
 
+src/m/smart_text.cpp:
+    .text       start:0x0205acb8 end:0x0205b5b8
+
 src/m/window.cpp:
     .text       start:0x0205ccc4 end:0x0205d124
 
@@ -246,9 +249,6 @@ src/m/affine_screen.cpp:
 
 src/m/bitmap.cpp:
     .text       start:0x0205937c end:0x02059abc
-
-src/m/smart_text.cpp:
-    .text       start:0x0205b584 end:0x0205b5b8
 
 src/m/smart_oam.cpp:
     .text       start:0x0205b5b8 end:0x0205bc1c

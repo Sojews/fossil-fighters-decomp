@@ -105,3 +105,7 @@ void MRegion::Intersect(MRect rect) {
 bool MRegion::IsEmpty() const {
     return mRects.size_ == 0;
 }
+
+void MRegion::Clear() {
+    mRects.clear();
+}

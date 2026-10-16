@@ -239,32 +239,32 @@ namespace std {
     };
 
     template <class Iterator1, class Iterator2>
-    bool operator==(const reverse_iterator<Iterator1> &lhs, const reverse_iterator<Iterator2> &rhs) {
+    inline bool operator==(const reverse_iterator<Iterator1> &lhs, const reverse_iterator<Iterator2> &rhs) {
         return lhs.base() == rhs.base();
     }
 
     template <class Iterator1, class Iterator2>
-    bool operator<(const reverse_iterator<Iterator1> &lhs, const reverse_iterator<Iterator2> &rhs) {
+    inline bool operator<(const reverse_iterator<Iterator1> &lhs, const reverse_iterator<Iterator2> &rhs) {
         return lhs.base() < rhs.base();
     }
 
     template <class Iterator1, class Iterator2>
-    bool operator!=(const reverse_iterator<Iterator1> &lhs, const reverse_iterator<Iterator2> &rhs) {
+    inline bool operator!=(const reverse_iterator<Iterator1> &lhs, const reverse_iterator<Iterator2> &rhs) {
         return !(lhs.base() == rhs.base());
     }
 
     template <class Iterator1, class Iterator2>
-    bool operator>(const reverse_iterator<Iterator1> &lhs, const reverse_iterator<Iterator2> &rhs) {
+    inline bool operator>(const reverse_iterator<Iterator1> &lhs, const reverse_iterator<Iterator2> &rhs) {
         return rhs.base() < lhs.base();
     }
 
     template <class Iterator1, class Iterator2>
-    bool operator<=(const reverse_iterator<Iterator1> &lhs, const reverse_iterator<Iterator2> &rhs) {
+    inline bool operator<=(const reverse_iterator<Iterator1> &lhs, const reverse_iterator<Iterator2> &rhs) {
         return !(rhs.base() < lhs.base());
     }
 
     template <class Iterator1, class Iterator2>
-    bool operator>=(const reverse_iterator<Iterator1> &lhs, const reverse_iterator<Iterator2> &rhs) {
+    inline bool operator>=(const reverse_iterator<Iterator1> &lhs, const reverse_iterator<Iterator2> &rhs) {
         return !(lhs.base() < rhs.base());
     }
 
@@ -292,30 +292,30 @@ namespace std {
     template <class T, class CharT = char, class Traits = char_traits<CharT>, class Distance = ptrdiff_t>
     class istream_iterator : public iterator<input_iterator_tag, T, Distance, const T *, const T &> {};
     template <class Iterator1, class Iterator2>
-    bool operator==(const istream_iterator<Iterator1> &lhs, const istream_iterator<Iterator2> &rhs);
+    inline bool operator==(const istream_iterator<Iterator1> &lhs, const istream_iterator<Iterator2> &rhs);
     template <class Iterator1, class Iterator2>
-    bool operator!=(const istream_iterator<Iterator1> &lhs, const istream_iterator<Iterator2> &rhs);
+    inline bool operator!=(const istream_iterator<Iterator1> &lhs, const istream_iterator<Iterator2> &rhs);
 
     template <class T, class CharT = char, class Traits = char_traits<CharT> >
     class ostream_iterator : public iterator<output_iterator_tag, void, void, void, void> {};
     template <class Iterator1, class Iterator2>
-    bool operator==(const ostream_iterator<Iterator1> &lhs, const ostream_iterator<Iterator2> &rhs);
+    inline bool operator==(const ostream_iterator<Iterator1> &lhs, const ostream_iterator<Iterator2> &rhs);
     template <class Iterator1, class Iterator2>
-    bool operator!=(const ostream_iterator<Iterator1> &lhs, const ostream_iterator<Iterator2> &rhs);
+    inline bool operator!=(const ostream_iterator<Iterator1> &lhs, const ostream_iterator<Iterator2> &rhs);
 
     template <class CharT, class Traits /*= char_traits<CharT>*/ >
     class istreambuf_iterator : public iterator<input_iterator_tag, CharT, typename Traits::off_type, CharT *, CharT> {};
     template <class Iterator1, class Iterator2>
-    bool operator==(const istreambuf_iterator<Iterator1> &lhs, const istreambuf_iterator<Iterator2> &rhs);
+    inline bool operator==(const istreambuf_iterator<Iterator1> &lhs, const istreambuf_iterator<Iterator2> &rhs);
     template <class Iterator1, class Iterator2>
-    bool operator!=(const istreambuf_iterator<Iterator1> &lhs, const istreambuf_iterator<Iterator2> &rhs);
+    inline bool operator!=(const istreambuf_iterator<Iterator1> &lhs, const istreambuf_iterator<Iterator2> &rhs);
 
     template <class CharT, class Traits /*= char_traits<CharT>*/ >
     class ostreambuf_iterator : public iterator<output_iterator_tag, void, void, void, void> {};
     template <class Iterator1, class Iterator2>
-    bool operator==(const ostreambuf_iterator<Iterator1> &lhs, const ostreambuf_iterator<Iterator2> &rhs);
+    inline bool operator==(const ostreambuf_iterator<Iterator1> &lhs, const ostreambuf_iterator<Iterator2> &rhs);
     template <class Iterator1, class Iterator2>
-    bool operator!=(const ostreambuf_iterator<Iterator1> &lhs, const ostreambuf_iterator<Iterator2> &rhs);
+    inline bool operator!=(const ostreambuf_iterator<Iterator1> &lhs, const ostreambuf_iterator<Iterator2> &rhs);
 
     template <class Iterator, class Distance>
     void __advance(Iterator &it, Distance n, input_iterator_tag) {

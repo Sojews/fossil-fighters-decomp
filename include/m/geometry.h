@@ -59,6 +59,10 @@ struct MRect {
         return MRect(left > o.left ? left : o.left, top > o.top ? top : o.top, right < o.right ? right : o.right,
                      bottom < o.bottom ? bottom : o.bottom);
     }
+    bool operator==(const MRect &o) const {
+        return left == o.left && top == o.top && right == o.right && bottom == o.bottom;
+    }
+    bool Contains(MRect o) const { return left <= o.left && o.right <= right && top <= o.top && o.bottom <= bottom; }
     bool Contains(MPoint p) const {
         int x = p.x;
         int y = p.y;

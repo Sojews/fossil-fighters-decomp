@@ -21,6 +21,7 @@ public:
     void Subtract(const MRegion &other);
     void Intersect(MRect rect);
     bool IsEmpty() const;
+    void Clear();
 
     std::vector<MRect> mRects;  // 0x00
     std::vector<MRect> mTemp;   // 0x0C: the result while one is worked out
