@@ -7,6 +7,8 @@ typedef unsigned long u32;
 typedef signed char s8;
 typedef signed short s16;
 typedef signed long s32;
+typedef unsigned long long u64;
+typedef signed long long s64;
 
 typedef int BOOL;
 #define TRUE 1

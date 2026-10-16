@@ -37,6 +37,21 @@ namespace std {
         size_t cap;
     };
 
+    // A temporary vector's capacity, with a reference to the allocator of the vector it's for.
+    template <class Allocator> struct __vec_capacity<Allocator &> {
+        size_t &first() {
+            return cap;
+        }
+        const size_t &first() const {
+            return cap;
+        }
+        Allocator &second() const {
+            return *alloc;
+        }
+        size_t cap;
+        Allocator *alloc;
+    };
+
     template <typename T, class Allocator> class __vec_deleter {
     public:
         typedef const Allocator &allocator_param;
@@ -126,6 +141,11 @@ namespace std {
             return capacity_.second();
         }
 
+        // The allocator, which is folded into the capacity.
+        typename remove_reference<Allocator>::type &alloc_ref() {
+            return *(typename remove_reference<Allocator>::type *)&capacity_;
+        }
+
         iterator erase(iterator __first, iterator __last, UnkMSLStruct1);
         iterator erase(iterator pos, UnkMSLStruct1);
 
@@ -208,7 +228,7 @@ namespace std {
         void append_realloc(size_t n, const_reference x);
 
         size_t max_size() const {
-            return Allocator().max_size();
+            return typename remove_reference<Allocator>::type().max_size();
         }
 
         volatile size_t capacity() const {
@@ -288,7 +308,7 @@ namespace std {
     template <typename T, typename Allocator> __vec_deleter<T, Allocator>::~__vec_deleter() {
         if (data_ != nullptr) {
             clear();
-            Allocator().deallocate(data_, cap());
+            typename remove_reference<Allocator>::type().deallocate(data_, cap());
         }
     }
 
@@ -325,9 +345,9 @@ namespace std {
 
     // https://decomp.me/scratch/Yw4fn
     template <typename T, typename Allocator> void __vec_deleter<T, Allocator>::append_realloc(size_t n, const_reference x) {
-        __vec_deleter_helper<T, Allocator> tmp(alloc());
+        __vec_deleter_helper<T, typename remove_reference<Allocator>::type &> tmp(alloc_ref());
 
-        size_t max = tmp.grow_by((size_ + n) - cap());
+        size_t max = grow_by((size_ + n) - cap());
         tmp.allocate(size_ + n, max);
         tmp.start_ = size_;
         tmp.construct_at_end(n, x);
@@ -394,9 +414,11 @@ namespace std {
         typedef _Base::const_iterator const_iterator;
 
     public:
-        __vec_deleter_helper(allocator_param a) {
+        // Only made with a reference allocator (append_realloc's temporary).
+        __vec_deleter_helper(typename remove_reference<Allocator>::type &a) {
             this->init();
             start_ = 0;
+            this->capacity_.alloc = &a;
         }
 
         ~__vec_deleter_helper();
@@ -417,7 +439,7 @@ namespace std {
         }
 
         void move_construct_to_begin(pointer first, pointer last) {
-            move_construct_to_begin(first, last, Metrowerks::int2type<Metrowerks::has_trivial_copy_ctor<T>::value ? 2 : 0>());
+            move_construct_to_begin(first, last, Metrowerks::int2type<is_pointer<T>::value ? 2 : 0>());
         }
 
         void move_construct_to_begin(pointer first, pointer last, Metrowerks::int2type<TAG_UNK>) {
@@ -438,12 +460,14 @@ namespace std {
     };
 
     template <typename T, class Allocator> __vec_deleter_helper<T, Allocator>::~__vec_deleter_helper() {
-        T *start = _Base::data_ + start_;
-        T *end   = start + _Base::size_;
+        if (!Metrowerks::has_trivial_dtor<T>::value) {
+            T *start = _Base::data_ + start_;
+            T *end   = start + _Base::size_;
 
-        while (start < end) {
-            _Base::alloc().destroy(end);
-            end--;
+            while (start < end) {
+                _Base::alloc().destroy(end);
+                end--;
+            }
         }
 
         _Base::size_ = 0;
@@ -486,8 +510,21 @@ namespace std {
         // ~__vec_constructor() { }
 
     public:
+        // Unlike vector<void *>'s, the slow path's tag is made one call further in (it lands below the other
+        // temporary on the stack).
         void push_back(const_reference x) {
-            _Constructor::push_back(x);
+            UnkMSLStruct1 unk = UnkMSLStruct1();
+            if (this->size_ < this->cap()) {
+                if (Metrowerks::has_trivial_copy_ctor<T>::value && Metrowerks::has_trivial_assignment<T>::value) {
+                    this->size_++;
+                    this->back() = x;
+                } else {
+                    this->alloc().construct(this->end(), x);
+                    this->size_++;
+                }
+            } else {
+                this->sub_push_back(x);
+            }
         }
 
         reference operator[](size_t n) {

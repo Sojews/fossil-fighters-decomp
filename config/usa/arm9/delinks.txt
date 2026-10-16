@@ -123,6 +123,9 @@ src/m/memory.c:
 src/m/display.cpp:
     .text       start:0x0204b3a0 end:0x0204c258
 
+src/m/serializer.cpp:
+    .text       start:0x0204d164 end:0x0204d580
+
 src/m/looper.cpp:
     .text       start:0x02050e08 end:0x02051a4c
 
