@@ -31,9 +31,7 @@ void DinoHelpHook::Deactivate() {
     mActive = FALSE;
 }
 
-DinoHelpDriver::DinoHelpDriver(MTask *cursor) : MProcess(NULL) {
-    mCursor = cursor;
-    mEnableCount = 1;
+DinoHelpDriver::DinoHelpDriver(MTask *cursor) : MProcess(NULL), mCursor(cursor), mEnableCount(1) {
     sHelpDriver = this;
     MSingleInputHub *hub = new MSingleInputHub(1);
     hub->EnableTouch();
@@ -129,13 +127,13 @@ void DinoHelpDriver::NotifyClose() {
 
 void DinoHelpDriver::AddEntry(u32 a, u32 b, u32 c) {
     MScopedLock lock(&sHelpMutex, TRUE);
-    mEntries.insert(std::make_pair(a, std::make_pair(b, c)));
+    mEntries.insert(std::multimap<u32, std::pair<u32, u32> >::value_type(a, std::make_pair(b, c)));
 }
 
 void DinoHelpDriver::RemoveEntry(u32 a, u32 b) {
     OS_LockMutex(&sHelpMutex);
     for (std::multimap<u32, std::pair<u32, u32> >::iterator it = mEntries.begin(); it != mEntries.end(); ++it) {
-        if (it->first == a && b == it->second.first) {
+        if (a == it->first && b == it->second.first) {
             mEntries.erase(it);
             OS_UnlockMutex(&sHelpMutex);
             return;
