@@ -8,7 +8,7 @@
 |---|---|
 | Target | Fossil Fighters (USA), `YKHE`, SHA-1 `8148a65040b5085337b76e6051601da1b1fc28ef` |
 | Functions | 10,055 found across ARM9 main, ITCM and 8 overlays |
-| Matched | 3,136 functions, 101,388 bytes (9.1%): the ARM sound system, much of the `M` engine library (tasks, displays, BG layers, screens, sprites, fonts, text, menus, pictures, resources, animations, memory) and its message classes, the game's sound interface and fonts, plus C library bits |
+| Matched | 3,360 functions, 114,980 bytes (10.4%): the ARM sound system, much of the `M` engine library (tasks, interrupts, displays, BG layers, screens, sprites, fonts, text, menus, pictures, resources, animations, raster effects, background threads, sleep and soft reset, memory) and its message classes, the game's sound interface, fonts and data file registry, plus C and C++ library bits (`std::vector`, `std::list`) |
 | Named | 4,820 functions, incl. ~800 NitroSDK/NitroSystem/MSL functions found by `tools/sdk_names` and ~1,200 destructors named from the RTTI |
 | Compiler | Metrowerks CodeWarrior for ARM 2.0 (`mwccarm`), NitroSDK 4.0 |
 
