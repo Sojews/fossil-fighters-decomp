@@ -36,6 +36,10 @@ public:
             u32 screenSize : 2;
         } mBgCntBits;
         struct {
+            u32 : 7;
+            u32 colors256 : 1;      // text screens: 256-color tiles
+        } mTextCntBits;
+        struct {
             u32 : 2;
             u32 directColor : 1;    // with bitmap set: a direct color bitmap
             u32 : 4;

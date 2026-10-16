@@ -142,7 +142,7 @@ src/m/bg.cpp:
     .text       start:0x02055568 end:0x0205601c
 
 src/m/picture.cpp:
-    .text       start:0x02059abc end:0x0205a104
+    .text       start:0x02059abc end:0x0205acb8
 
 src/m/window.cpp:
     .text       start:0x0205ccc4 end:0x0205d124
