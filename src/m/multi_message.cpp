@@ -2,6 +2,10 @@
 
 #include <vector>
 #include "m/multi_message.h"
+#include <algorithm>
+#include "m/observer.h"
+
+
 
 MMessage *CreateMultiMessage(const void *data);
 
@@ -155,4 +159,76 @@ MMessage *CreateMultiMessage(const void *data) {
     }
     msg->Read(data);
     return msg;
+}
+
+MMessageObserver::~MMessageObserver() {
+    while (mSubjects.size() != 0) {
+        mSubjects[0]->RemoveObserver(this);
+    }
+    ClearQueue();
+}
+
+void MMessageObserver::Post(MMessage *msg) {
+    MScopedLock lock(&mMutex, TRUE);
+    msg->AddRef();
+    mQueue.push_back(msg);
+}
+
+// NONMATCHING: the loop pointer and this get each other's registers.
+void MMessageObserver::ClearQueue() {
+    MScopedLock lock(&mMutex, TRUE);
+    for (std::vector<MMessage *>::iterator it = mQueue.begin(); it != mQueue.end(); it++) {
+        (*it)->Release();
+    }
+    mQueue.clear();
+}
+
+void MMessageObserver::Dispatch() {
+    MScopedLock lock(&mMutex, TRUE);
+    for (std::vector<MMessage *>::iterator it = mQueue.begin(); it != mQueue.end(); it++) {
+        OnMessage(*it);
+    }
+    ClearQueue();
+}
+
+MTask *MMessageObserver::CreatePostTask(MMessage *msg) {
+    return new MMessageObserverSendMessageTask(this, msg);
+}
+
+MMessageSubject::~MMessageSubject() {
+    while (mObservers.size() != 0) {
+        RemoveObserver(mObservers[0]);
+    }
+}
+
+void MMessageSubject::AddObserver(MMessageObserver *observer) {
+    MScopedLock lock(&mMutex, TRUE);
+    mObservers.push_back(observer);
+    observer->mSubjects.push_back(this);
+}
+
+// NONMATCHING: the game's stack frame is 8 bytes bigger (unused space, as if for a lock object kept in a
+// register).
+void MMessageSubject::RemoveObserver(MMessageObserver *observer) {
+    OSMutex *mutex = &mMutex;
+    OS_LockMutex(mutex);
+    std::vector<MMessageObserver *>::iterator it = std::find(mObservers.begin(), mObservers.end(), observer);
+    mObservers.erase(it);
+    std::vector<MMessageSubject *>::iterator it2 =
+        std::find(observer->mSubjects.begin(), observer->mSubjects.end(), this);
+    observer->mSubjects.erase(it2);
+    OS_UnlockMutex(mutex);
+}
+
+void MMessageSubject::Notify(MMessage *msg) {
+    MScopedLock lock(&mMutex, TRUE);
+    msg->AddRef();
+    for (std::vector<MMessageObserver *>::iterator it = mObservers.begin(); it != mObservers.end(); it++) {
+        (*it)->Post(msg);
+    }
+    msg->Release();
+}
+
+void MMessageObserverSendMessageTask::Transfer() {
+    mObserver->Post(mMsg);
 }
