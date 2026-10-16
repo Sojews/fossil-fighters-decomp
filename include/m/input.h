@@ -38,6 +38,10 @@ class MInputHub : public MLooperVSyncTask {
 public:
     MInputHub(BOOL first);
     virtual ~MInputHub();
+    virtual u32 GetCount() = 0;
+    virtual MInput *GetInput(int i) = 0;
+    virtual int Unk28();
+    virtual int Unk2C();
 
     void EnableTouch();
     void DisableTouch();
@@ -55,9 +59,8 @@ public:
     MSingleInputHub(u32 count);
     virtual ~MSingleInputHub();
     virtual void OnVSync();
-
-    u32 GetCount();
-    MInput *GetInput(int i);
+    virtual u32 GetCount();
+    virtual MInput *GetInput(int i);
 
     MInput *mInputs;    // 0x1C
     u32 mCount;         // 0x20

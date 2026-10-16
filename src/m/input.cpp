@@ -128,6 +128,14 @@ static void ReadTouch(u8 *touched, MPoint *pos) {
     pos->y = sTouch.y;
 }
 
+int MInputHub::Unk28() {
+    return 0;
+}
+
+int MInputHub::Unk2C() {
+    return 0;
+}
+
 MInputHub::MInputHub(BOOL first) : MLooperVSyncTask(first, FALSE) {
     mTouchEnabled = FALSE;
 }

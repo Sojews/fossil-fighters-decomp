@@ -138,6 +138,9 @@ src/m/serializer.cpp:
 src/m/region.cpp:
     .text       start:0x0204fc68 end:0x020505a0
 
+src/m/soft_reset.cpp:
+    .text       start:0x020509a4 end:0x02050b44
+
 src/m/sleep.cpp:
     .text       start:0x02050b44 end:0x02050e28
 
