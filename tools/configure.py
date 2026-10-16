@@ -25,7 +25,6 @@ CC_FLAGS = " ".join([
     "-fp soft",         # Software floating point
     "-enum int",        # int-sized enums
     "-char signed",     # char is signed (ldrsb loads in the original code)
-    "-lang c",          # C until a C++ file is matched (overlays have C++ static initializers)
     "-Cpp_exceptions off",  # No game code has exception table entries (only MSL does)
     "-w off",
     "-sym on",
@@ -89,7 +88,7 @@ w(f"rule rom_config\n  command = {DSD} rom config --elf $in --config {arm9_confi
 w(f"rule rom_build\n  command = {DSD} rom build --config $in --rom $out && {PY} tools/fix_rom.py {base_rom} $out")
 w(f"rule sha1\n  command = shasum -c config/{args.version}/ff_{args.version}.sha1 && touch $out")
 w(f"rule objdiff_config\n  command = {DSD} objdiff --config-path {arm9_config} --output-path . --scratch "
-  f"--compiler {DECOMP_ME_COMPILER} --c-flags \"{CC_FLAGS}\" --custom-make ninja")
+  f"--compiler {DECOMP_ME_COMPILER} --c-flags \"{CC_FLAGS} -lang c\" --custom-make ninja")
 w("")
 
 dsd_configs = sorted(str(p) for p in config_dir.rglob("*.txt")) + [str(arm9_config)]
@@ -109,6 +108,8 @@ for f in info["files"]:
     to_link.append(obj)
     if obj != f["delink_file"]:   # a matched source file: compile it
         extra = next((v for k, v in LIB_CC_FLAGS.items() if f["name"].startswith(k)), "")
+        # mwcc keeps the first -lang it sees, so the language is set per file rather than in CC_FLAGS.
+        extra += " -lang c++ -RTTI off" if f["name"].endswith(".cpp") else " -lang c"
         w(f"build {obj}: cc {f['name']}\n  outdir = {Path(obj).parent}\n  stem = {Path(obj).stem}\n  extra_cflags = {extra}")
 
 elf = build_dir / "arm9.o"
