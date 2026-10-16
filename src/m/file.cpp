@@ -1,6 +1,40 @@
 // MFile. Not decompiled yet: the path-to-file-ID cache and path functions (std::string).
 
+#include <algorithm>
 #include "m/file.h"
+
+static u32 sMaxReadSize = 0xFFFFFFFF;
+FSArchive *gRomArchive;
+
+s32 MReadFile(FSFile *file, void *dest, u32 size) {
+    s32 total = 0;
+    u32 wanted = size;
+    while (size != 0) {
+        s32 chunk = std::min(sMaxReadSize, size);
+        s32 read = FS_ReadFile(file, dest, chunk);
+        total += read;
+        size -= read;
+        dest = (u8 *) dest + read;
+        if (read < chunk) {
+            break;
+        }
+    }
+    if (wanted != total) {
+        total = -1;
+    }
+    return total;
+}
+
+void MInitFile() {
+    FS_Init((u32) -1);
+    u32 size = FS_TryLoadTable(NULL, 0);
+    FS_TryLoadTable(new u8[size], size);
+    gRomArchive = FS_FindArchive("rom", 3);
+}
+
+void MSetMaxReadSize(u32 size) {
+    sMaxReadSize = size;
+}
 
 void MFile::Init() {
     FS_InitFile(&mFile);

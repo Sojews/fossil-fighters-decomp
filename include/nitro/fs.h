@@ -30,6 +30,9 @@ typedef enum {
     FS_SEEK_END
 } FSSeekFileMode;
 
+void FS_Init(u32 default_dma_no);
+u32 FS_TryLoadTable(void *mem, u32 size);
+FSArchive *FS_FindArchive(const char *name, int name_len);
 void FS_InitFile(FSFile *p_file);
 BOOL FS_ConvertPathToFileID(FSFileID *p_file_id, const char *path);
 BOOL FS_OpenFileFast(FSFile *p_file, FSFileID file_id);

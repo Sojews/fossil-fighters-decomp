@@ -3629,9 +3629,9 @@ func_0204e1e8 kind:function(thumb,size=0x2a) addr:0x0204e1e8
 func_0204e214 kind:function(thumb,size=0x2a) addr:0x0204e214
 func_0204e240 kind:function(thumb,size=0x3c) addr:0x0204e240
 func_0204e27c kind:function(thumb,size=0x22) addr:0x0204e27c
-_Z9MReadFileP6FSFilePvl kind:function(thumb,size=0x5c) addr:0x0204e2a0
+_Z9MReadFileP6FSFilePvm kind:function(thumb,size=0x5c) addr:0x0204e2a0
 _Z9MInitFilev kind:function(thumb,size=0x34) addr:0x0204e2fc
-func_0204e330 kind:function(thumb,size=0xc) addr:0x0204e330
+_Z15MSetMaxReadSizem kind:function(thumb,size=0xc) addr:0x0204e330
 func_0204e33c kind:function(thumb,size=0xb4) addr:0x0204e33c
 _Z10MGetFileIDSsP8FSFileID kind:function(thumb,size=0x180) addr:0x0204e3f0
 func_0204e570 kind:function(thumb,size=0x3a) addr:0x0204e570
@@ -5975,7 +5975,7 @@ FSi_RomArchiveProc kind:function(thumb,size=0x3c) addr:0x02077fc0
 FSi_ReadDummyCallback kind:function(thumb,size=0x4) addr:0x02077ffc
 FSi_EmptyArchiveProc kind:function(thumb,size=0x4) addr:0x02078000
 FSi_InitRom kind:function(thumb,size=0xdc) addr:0x02078004
-func_020780e0 kind:function(thumb,size=0x14) addr:0x020780e0
+FS_TryLoadTable kind:function(thumb,size=0x14) addr:0x020780e0
 func_020780f4 kind:function(thumb,size=0x14) addr:0x020780f4
 FS_ClearOverlayImage kind:function(thumb,size=0x26) addr:0x02078108
 FS_GetOverlayFileID kind:function(thumb,size=0x18) addr:0x02078130
@@ -11955,7 +11955,7 @@ data_020c09ec kind:data(any) addr:0x020c09ec
 data_020c09f0 kind:data(any) addr:0x020c09f0
 data_020c09f4 kind:data(any) addr:0x020c09f4
 data_020c0a10 kind:data(any) addr:0x020c0a10
-data_020c0a18 kind:data(any) addr:0x020c0a18
+sMaxReadSize kind:data(any) addr:0x020c0a18
 _ZTI5MFile kind:data(any) addr:0x020c0a1c
 _ZTI12MFileArchive kind:data(any) addr:0x020c0a24
 _ZTS5MFile kind:data(any) addr:0x020c0a2c
@@ -12975,7 +12975,7 @@ data_0214d23c kind:bss addr:0x0214d23c
 data_0214d248 kind:bss addr:0x0214d248
 data_0214d254 kind:bss addr:0x0214d254
 data_0214d260 kind:bss addr:0x0214d260
-data_0214d2c8 kind:bss addr:0x0214d2c8
+gRomArchive kind:bss addr:0x0214d2c8
 data_0214d2cc kind:bss addr:0x0214d2cc
 data_0214d2d8 kind:bss addr:0x0214d2d8
 data_0214d2dc kind:bss addr:0x0214d2dc

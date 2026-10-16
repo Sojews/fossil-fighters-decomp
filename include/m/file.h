@@ -6,7 +6,11 @@
 #include "nitro/fs.h"
 
 // Reads from a file in pieces no bigger than the largest read the file system is set to do at once.
-s32 MReadFile(FSFile *file, void *dest, s32 size);
+s32 MReadFile(FSFile *file, void *dest, u32 size);
+void MInitFile();
+void MSetMaxReadSize(u32 size);
+
+extern FSArchive *gRomArchive;
 
 class MFile {
 public:
