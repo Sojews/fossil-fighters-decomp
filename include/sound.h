@@ -111,15 +111,22 @@ public:
     void Reset();
 
     u8 done;
-    u8 unk1[0xB];
+    s32 unk4;
+    s32 unk8;
     s32 value;
     u32 unk10[2];
 };
 
+// A bit set stored in caller-provided memory.
 class Unk10 {
 public:
     Unk10();
     ~Unk10();
+    void Init(u16 *bits, int count);
+    void Set(int bit);
+    void Clear(int bit);
+    BOOL Test(int bit);
+    void SetAll(BOOL value);
     u32 unk0[0x10 / 4];
 };
 
@@ -129,17 +136,18 @@ public:
     Unk1A8();
     void Update();
     void Start(int trackMask);
-    void func_02002ba0(u16 trackMask, int frames, int mute);
+    void FadeTracks(u16 trackMask, int frames, int mute);
     void Reset();
-    int func_02002c90(int track);
+    int GetTrackVolume(int track);
     BOOL IsActive(int track);
-    int func_02002cb0(int track);
-    u8 unk0;
-    u16 unk2;
-    Unk10 unk4;
-    u16 unk14;
-    Unk10 unk18;
-    Unk18 unk28[16];
+    BOOL IsMuted(int track);
+
+    u8 active;
+    u16 activeBits;
+    Unk10 activeTracks;     // 0x04
+    u16 muteBits;
+    Unk10 mutedTracks;      // 0x18
+    Unk18 fades[16];        // 0x28
 };
 
 // Background-music player: a SeqPlayer with volume/pitch fades and per-track volume control.
@@ -169,11 +177,16 @@ public:
     u16 trackMask;      // 0x210
 };
 
+// BGM player that starts its sequence from a request made earlier in the frame.
 class Unk2FF4 : public Unk2BCC {
 public:
-    void func_02002cc0(int a, int b, int c);
+    void Request(int no, int index, int fadeFrames);
     void Update();
-    u8 unk214[0x10];
+
+    s32 reqNo;          // 0x214
+    s32 reqIndex;
+    s32 reqFadeFrames;
+    BOOL requested;
 };
 
 // Stream player.

@@ -299,7 +299,7 @@ void SoundManager::func_020012b4(int a, int b, int c) {
     if (!enabled) {
         return;
     }
-    unk2FF4.func_02002cc0(a, b, c);
+    unk2FF4.Request(a, b, c);
 }
 
 void SoundManager::InitStream() {

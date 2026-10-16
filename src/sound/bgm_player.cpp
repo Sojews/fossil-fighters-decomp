@@ -10,7 +10,7 @@ void NNS_SndPlayerSetVolume(NNSSndHandle *handle, int volume);
 void NNS_SndPlayerMoveVolume(NNSSndHandle *handle, int targetVolume, int frames);
 void NNS_SndPlayerSetTrackVolume(NNSSndHandle *handle, u16 trackBitMask, int volume);
 void NNS_SndPlayerSetTrackPitch(NNSSndHandle *handle, u16 trackBitMask, int pitch);
-void func_0206e234(NNSSndHandle *handle, u16 trackBitMask, int value);
+void NNS_SndPlayerSetTrackMute(NNSSndHandle *handle, u16 trackBitMask, BOOL mute);
 }
 
 void Unk2BCC::Update() {
@@ -31,7 +31,7 @@ void Unk2BCC::UpdateVolume() {
     volumeFade.Update();
     for (i = 0; i < 16; i++) {
         if (tracks.IsActive(i)) {
-            volume = tracks.func_02002c90(i);
+            volume = tracks.GetTrackVolume(i);
             if (volume != -1) {
                 SetTrackVolume(volume, 1 << i);
             }
@@ -39,7 +39,7 @@ void Unk2BCC::UpdateVolume() {
     }
     for (i = 0; i < 16; i++) {
         if (tracks.IsActive(i)) {
-            func_0206e234(&handle, 1 << i, tracks.func_02002cb0(i));
+            NNS_SndPlayerSetTrackMute(&handle, 1 << i, tracks.IsMuted(i));
         }
     }
     tracks.Update();
@@ -104,7 +104,7 @@ BOOL Unk2BCC::PlayTracks(int no, int idx, int fadeFrames, u16 mask, int trackFad
 }
 
 void Unk2BCC::SetTracks(u16 mask, int frames, int mute) {
-    tracks.func_02002ba0(mask, frames, mute);
+    tracks.FadeTracks(mask, frames, mute);
 }
 
 void Unk2BCC::ApplyVolume(int volume) {
