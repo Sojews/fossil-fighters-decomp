@@ -235,8 +235,8 @@ src/m/obj.cpp:
 src/m/chr16_fill.cpp:
     .text       start:0x0205c498 end:0x0205c73c
 
-src/m/chr16_bin_font_transfer.cpp:
-    .text       start:0x0205ea70 end:0x0205ea90
+src/m/font.cpp:
+    .text       start:0x0205d4f8 end:0x0205ea90
 
 src/m/view.cpp:
     .text       start:0x0205ea90 end:0x0205ef10
