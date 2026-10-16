@@ -138,6 +138,10 @@ src/m/serializer.cpp:
 src/m/region.cpp:
     .text       start:0x0204fc68 end:0x020505a0
 
+src/m/irq.cpp:
+    .text       start:0x020506fc end:0x020509a4
+    .itcm       start:0x01ff8db8 end:0x01ff8f20
+
 src/m/soft_reset.cpp:
     .text       start:0x020509a4 end:0x02050b44
 

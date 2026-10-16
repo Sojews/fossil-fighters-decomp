@@ -3739,11 +3739,11 @@ func_020505a0 kind:function(thumb,size=0xf0) addr:0x020505a0
 func_02050690 kind:function(thumb,size=0x10) addr:0x02050690
 func_020506a0 kind:function(thumb,size=0x34) addr:0x020506a0
 func_020506d4 kind:function(thumb,size=0x26) addr:0x020506d4
-func_020506fc kind:function(thumb,size=0x200) addr:0x020506fc
+_Z8MInitIrqv kind:function(thumb,size=0x200) addr:0x020506fc
 _Z12MAddIntrTaskiP5MTask kind:function(thumb,size=0x38) addr:0x020508fc
 _Z15MRemoveIntrTaskiP5MTask kind:function(thumb,size=0x38) addr:0x02050934
-func_0205096c kind:function(thumb,size=0x10) addr:0x0205096c
-func_0205097c kind:function(thumb,size=0x26) addr:0x0205097c
+_Z11MEnableIrqsv kind:function(thumb,size=0x10) addr:0x0205096c
+_Z11MEnableIntri kind:function(thumb,size=0x26) addr:0x0205097c
 _Z14MInitSoftResetv kind:function(thumb,size=0x44) addr:0x020509a4
 _Z18MGetResetParameterv kind:function(thumb,size=0xc) addr:0x020509e8
 _Z20MClearResetParameterv kind:function(thumb,size=0xc) addr:0x020509f4
@@ -12996,7 +12996,7 @@ data_0214d418 kind:bss addr:0x0214d418
 data_0214d41c kind:bss addr:0x0214d41c
 data_0214d424 kind:bss addr:0x0214d424
 data_0214d43c kind:bss addr:0x0214d43c
-data_0214d440 kind:bss addr:0x0214d440
+sIntrTaskSets kind:bss addr:0x0214d440
 sSoftResetEnableCount kind:bss addr:0x0214d478
 sFoldSleepHandler kind:bss addr:0x0214d484
 sSleepHooks kind:bss addr:0x0214d48c

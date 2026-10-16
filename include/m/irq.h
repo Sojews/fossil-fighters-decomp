@@ -24,6 +24,11 @@ public:
 
 class MTask;
 
+// Sets up a task set for each of the interrupts the game uses.
+void MInitIrq();
+void MEnableIrqs();
+// Enables an interrupt (by number), and the display's VBlank or HBlank interrupt for those.
+void MEnableIntr(int intr);
 // Adds a task to (or removes it from) the tasks run in one interrupt.
 void MAddIntrTask(int intr, MTask *task);
 void MRemoveIntrTask(int intr, MTask *task);

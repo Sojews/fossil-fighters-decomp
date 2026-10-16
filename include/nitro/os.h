@@ -62,6 +62,25 @@ void OS_WakeupThreadDirect(OSThread *thread);
 u32 OS_GetThreadPriority(const OSThread *thread);
 BOOL OS_SetThreadPriority(OSThread *thread, u32 prio);
 
+typedef void (*OSIrqFunction)(void);
+
+#define OS_IE_V_BLANK 0x1
+#define OS_IE_H_BLANK 0x2
+#define OS_IE_V_COUNT 0x4
+#define OS_IE_KEY 0x1000
+#define OS_IE_CARTRIDGE 0x2000
+
+extern u8 SDK_AUTOLOAD_DTCM_START[];
+
+// Tells OS_WaitIrq which interrupts have happened (the check flags at the end of DTCM).
+static inline void OS_SetIrqCheckFlag(u32 mask) {
+    *(volatile u32 *) ((u32) SDK_AUTOLOAD_DTCM_START + 0x3FF8) |= mask;
+}
+
+void OS_InitIrqTable(void);
+void OS_SetIrqFunction(u32 mask, OSIrqFunction func);
+u32 OS_EnableIrqMask(u32 mask);
+
 void OS_InitMutex(OSMutex *mutex);
 void OS_LockMutex(OSMutex *mutex);
 void OS_UnlockMutex(OSMutex *mutex);
