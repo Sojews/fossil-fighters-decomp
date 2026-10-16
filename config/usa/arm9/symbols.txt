@@ -3542,17 +3542,17 @@ _ZThn16_N4MLcdD0Ev kind:function(thumb,size=0x1c) addr:0x0204c204
 _ZThn16_N4MLcd7OnVSyncEv kind:function(thumb,size=0x1c) addr:0x0204c220
 _ZThn16_N4MLcdD1Ev kind:function(thumb,size=0x1c) addr:0x0204c23c
 _ZN10MExtAffine11GetVramSizeEi kind:function(thumb,size=0x24) addr:0x0204c258
-func_0204c27c kind:function(thumb,size=0x1c) addr:0x0204c27c
-func_0204c298 kind:function(thumb,size=0x18) addr:0x0204c298
+_ZN10MExtAffine8GetEntryEPtiii kind:function(thumb,size=0x1c) addr:0x0204c27c
+_ZN10MExtAffine13GetDimensionsEi kind:function(thumb,size=0x18) addr:0x0204c298
 _ZN10MExtAffineC1EP8MDisplaymmii kind:function(thumb,size=0x48) addr:0x0204c2b0
 _ZN10MExtAffine7GetSizeEv kind:function(thumb,size=0x4) addr:0x0204c2f8
 _ZN10MExtAffine10SetPaletteEP4MPal kind:function(thumb,size=0x4) addr:0x0204c2fc
 _ZN10MExtAffine10GetPaletteEv kind:function(thumb,size=0x4) addr:0x0204c300
-func_0204c304 kind:function(thumb,size=0xb8) addr:0x0204c304
-func_0204c3bc kind:function(thumb,size=0xa0) addr:0x0204c3bc
+_ZN10MExtAffine8TransferEPKt6MPointS2_iibb kind:function(thumb,size=0xb8) addr:0x0204c304
+_ZN10MExtAffine4FillE5MRectiibb kind:function(thumb,size=0xa0) addr:0x0204c3bc
 _ZN10MExtAffineD1Ev kind:function(thumb,size=0xc) addr:0x0204c45c
 _ZN10MExtAffineD0Ev kind:function(thumb,size=0x12) addr:0x0204c468
-func_0204c47c kind:function(thumb,size=0x174) addr:0x0204c47c
+_ZN18MExtAffineTransfer8TransferEv kind:function(thumb,size=0x174) addr:0x0204c47c
 func_0204c5f0 kind:function(thumb,size=0x8f8) addr:0x0204c5f0
 .L_0204cee4 kind:label(thumb) addr:0x0204cee4 local
 func_0204cee8 kind:function(thumb,size=0x25c) addr:0x0204cee8
@@ -11934,11 +11934,7 @@ _ZTI12MMemoryBlock kind:data(any) addr:0x020c0840
 _ZTI7MScreen kind:data(any) addr:0x020c0848
 _ZTI10MExtAffine kind:data(any) addr:0x020c0854
 _ZTI13MAffineScreen kind:data(any) addr:0x020c0860
-data_020c086c kind:data(any) addr:0x020c086c
-data_020c0870 kind:data(any) addr:0x020c0870
-data_020c0874 kind:data(any) addr:0x020c0874
-data_020c087c kind:data(any) addr:0x020c087c
-data_020c0884 kind:data(any) addr:0x020c0884
+sSizes kind:data(any) addr:0x020c086c
 _ZTS7MScreen kind:data(any) addr:0x020c088c
 _ZTS10MExtAffine kind:data(any) addr:0x020c0898
 _ZTS12MMemoryBlock kind:data(any) addr:0x020c08a8

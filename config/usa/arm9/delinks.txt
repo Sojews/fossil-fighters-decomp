@@ -126,6 +126,9 @@ src/m/memory.c:
 src/m/display.cpp:
     .text       start:0x0204b3a0 end:0x0204c258
 
+src/m/ext_affine.cpp:
+    .text       start:0x0204c258 end:0x0204d164
+
 src/m/serializer.cpp:
     .text       start:0x0204d164 end:0x0204d580
 
@@ -222,9 +225,6 @@ src/game/dino_main.cpp:
 
 src/game/multi_play_error_dialog.cpp:
     .text       start:0x02049310 end:0x02049388
-
-src/m/ext_affine_transfer.cpp:
-    .text       start:0x0204d144 end:0x0204d164
 
 src/m/screen.cpp:
     .text       start:0x0205601c end:0x0205622c
