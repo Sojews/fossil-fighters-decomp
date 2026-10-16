@@ -11,6 +11,7 @@ class MMessageSubject;
 
 class MMessageObserver {
 public:
+    MMessageObserver() { OS_InitMutex(&mMutex); }
     virtual void OnMessage(MMessage *msg) = 0;
     ~MMessageObserver();
 

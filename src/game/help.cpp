@@ -99,6 +99,31 @@ void DinoHelpItem::Select() {
     mBase->SetSelectedItem(this);
 }
 
+DinoHelpDummyItem::DinoHelpDummyItem(u32 id, MRect rect, std::string text)
+    : mHelpId(id), mRect(rect), mText(text) {
+    mTextPtr = mText.c_str();
+}
+
+u32 DinoHelpDummyItem::GetHelpId() {
+    return mHelpId;
+}
+
+MRect DinoHelpDummyItem::GetRect() {
+    return mRect;
+}
+
+void DinoHelpDummyItem::SetText(const std::string &text) {
+    mText = text;
+    mTextPtr = mText.c_str();
+}
+
+const char *DinoHelpDummyItem::GetText() {
+    return mTextPtr;
+}
+
+void DinoHelpDummyItem::Execute() {
+}
+
 DinoHelpDisabler::DinoHelpDisabler() {
     sHelpDriver->Disable();
 }

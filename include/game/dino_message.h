@@ -3,6 +3,7 @@
 #define GAME_DINO_MESSAGE_H
 
 #include "m/message.h"
+#include "m/observer.h"
 
 class DinoDummyMessage : public MMessage {
 public:
@@ -3211,6 +3212,32 @@ public:
     }
 
     u8 mUnk0C[0x84];
+};
+
+// A task that waits for a number of signals of one type, then posts a message to an observer and exits.
+class DinoSignalWait : public MTask, public MMessageObserver {
+public:
+    DinoSignalWait(u32 id, MMessageObserver *target, MMessage *msg, int count);
+    virtual ~DinoSignalWait() {
+        if (mMsg != NULL) {
+            mMsg->Release();
+        }
+    }
+    virtual void Execute() { Dispatch(); }
+    virtual void OnMessage(MMessage *msg) {
+        if (msg->mId == mId && --mCount <= 0) {
+            if (mTarget != NULL) {
+                mTarget->Post(mMsg);
+            }
+            Exit();
+        }
+    }
+
+    u32 mId;                    // 0x44: the signal waited for
+    int mCount;                 // 0x48: signals still to come
+    MMessageObserver *mTarget;  // 0x4C
+    MMessage *mMsg;             // 0x50: posted to the target at the end
+    u32 mSerial;                // 0x54
 };
 
 #endif

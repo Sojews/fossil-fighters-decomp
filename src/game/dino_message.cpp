@@ -1037,3 +1037,17 @@ DinoExchangeSenryuSignal::DinoExchangeSenryuSignal() : MMessage(0x100A9) {
 void RegisterDinoMessages() {
     AddMessageFactory(CreateDinoMessage);
 }
+
+static u32 sNextSignalWaitSerial;
+
+DinoSignalWait::DinoSignalWait(u32 id, MMessageObserver *target, MMessage *msg, int count) {
+    mId = id;
+    mCount = count;
+    mTarget = target;
+    mMsg = msg;
+    mSerial = sNextSignalWaitSerial;
+    sNextSignalWaitSerial++;
+    if (mMsg != NULL) {
+        mMsg->AddRef();
+    }
+}

@@ -81,13 +81,13 @@ src/game/dino_common_font.cpp:
     .text       start:0x020082b0 end:0x0200843c
 
 src/game/dino_message.cpp:
-    .text       start:0x0200a948 end:0x02011138
+    .text       start:0x0200a948 end:0x02011154
 
 src/m/bit_vector.cpp:
     .text       start:0x0201b4ac end:0x0201b51c
 
 src/game/help.cpp:
-    .text       start:0x0201ce48 end:0x0201fba0
+    .text       start:0x0201ce48 end:0x0201fc84
 
 src/util/text_parse.c:
     complete
