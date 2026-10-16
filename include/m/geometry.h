@@ -10,6 +10,11 @@ struct MPoint {
         y = y_;
     }
 
+    void Set(int x_, int y_) {
+        x = x_;
+        y = y_;
+    }
+
     int x;
     int y;
 };
@@ -31,6 +36,12 @@ struct MRect {
 
     int GetWidth() const { return right - left; }
     int GetHeight() const { return bottom - top; }
+    MPoint GetCenter() const { return MPoint((left + right) >> 1, (top + bottom) >> 1); }
+    bool Contains(MPoint p) const {
+        int x = p.x;
+        int y = p.y;
+        return left <= x && x < right && top <= y && y < bottom;
+    }
 
     int left;
     int top;
