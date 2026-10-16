@@ -31,6 +31,7 @@ struct OSMutex {
 void OS_InitMutex(OSMutex *mutex);
 void OS_LockMutex(OSMutex *mutex);
 void OS_UnlockMutex(OSMutex *mutex);
+void OS_Terminate(void);
 
 #ifdef __cplusplus
 }

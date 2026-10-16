@@ -6,6 +6,7 @@
 
 #include "types.h"
 #include "nitro/os.h"
+#include "nitro/section.h"
 
 // Locks a mutex for the rest of the scope, if asked to.
 class MScopedLock {
@@ -173,7 +174,6 @@ public:
 class MProcess : public MTask {
 public:
     MProcess(void *context);
-    virtual ~MProcess();
     virtual void Execute();
     virtual void Idle() = 0;
 

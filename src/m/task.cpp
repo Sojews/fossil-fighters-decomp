@@ -196,9 +196,6 @@ void MTaskRunTransfer::Transfer() {
     mTask->Run();
 }
 
-MProcess::~MProcess() {
-}
-
 void MTimer::Execute() {
     if (--mFrames < 0) {
         Exit();

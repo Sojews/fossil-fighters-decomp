@@ -8,6 +8,7 @@ extern "C" {
 extern int errno;
 
 #define ENOERR 0
+#define ENOMEM 12
 #define EDOM 33
 #define ERANGE 34
 #define ESIGPARM 36

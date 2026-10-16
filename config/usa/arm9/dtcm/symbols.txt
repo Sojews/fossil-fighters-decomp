@@ -1,10 +1,10 @@
 SDK_AUTOLOAD_DTCM_START kind:data(any) addr:0x027e0000
 data_027e0021 kind:data(any) addr:0x027e0021
-data_027e0060 kind:bss addr:0x027e0060
-data_027e0064 kind:bss addr:0x027e0064
-data_027e0068 kind:bss addr:0x027e0068
-data_027e006c kind:bss addr:0x027e006c
-data_027e0070 kind:bss addr:0x027e0070
-data_027e0074 kind:bss addr:0x027e0074
-data_027e008c kind:bss addr:0x027e008c
+sArenaEnd kind:bss addr:0x027e0060
+sArenaSize kind:bss addr:0x027e0064
+sArenaCur kind:bss addr:0x027e0068
+sMemDisableIrq kind:bss addr:0x027e006c
+sMemSavedIrq kind:bss addr:0x027e0070
+sMemMutex kind:bss addr:0x027e0074
+av_ kind:bss addr:0x027e008c
 data_027e0500 kind:bss addr:0x027e0500
