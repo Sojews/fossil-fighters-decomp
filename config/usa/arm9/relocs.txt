@@ -22351,7 +22351,7 @@ from:0x0207fdf0 kind:thumb_call to:0x020748c4 module:main
 from:0x0207fe24 kind:thumb_call to:0x0207480c module:main
 from:0x0207fe54 kind:thumb_call to:0x02074860 module:main
 from:0x0207fe6e kind:thumb_call to:0x0207d408 module:main
-from:0x0207fe7c kind:load to:0x02155530 module:main
+from:0x0207fe7c kind:load to:0x02155488 add:0xa8 module:main
 from:0x0207fe80 kind:load to:0x021518ec module:main
 from:0x0207fe84 kind:load to:0x02155440 module:main
 from:0x0207fe88 kind:load to:0x02155464 module:main
