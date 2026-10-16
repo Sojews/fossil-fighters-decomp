@@ -42,6 +42,11 @@ src/sound/sound_loader.cpp:
     complete
     .text       start:0x02002fac end:0x020031d0
 
+src/sound/sound_scenes.cpp:
+    complete
+    .text       start:0x02003f88 end:0x020049f4
+    .data       start:0x020b5764 end:0x020b5814
+
 src/util/text_parse.c:
     complete
     .text       start:0x020213a0 end:0x02021620

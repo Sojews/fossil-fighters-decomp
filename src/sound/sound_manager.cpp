@@ -605,7 +605,7 @@ void func_02001af4(int fadeFrames) {
 }
 
 // Loads the sound groups given as arguments, terminated by -1.
-void SoundLoadGroups(int group, ...) {
+int SoundLoadGroups(int group, ...) {
     int groups[128];
     int count;
     int next;
@@ -622,7 +622,7 @@ void SoundLoadGroups(int group, ...) {
         groups[count++] = next;
     }
     va_end(args);
-    gSoundManager.LoadGroups(count, groups);
+    return gSoundManager.LoadGroups(count, groups);
 }
 
 void SoundUnload(int level) {
