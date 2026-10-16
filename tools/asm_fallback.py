@@ -3,9 +3,10 @@
 
 Usage: python3 tools/asm_fallback.py <function name or 0xADDRESS>
 Reads build/asm (run `tools/bin/dsd dis -c config/usa/arm9/config.yaml -a build/asm --ual --main` first) and
-converts dsd's UAL syntax to the pre-UAL syntax mwcc's inline assembler accepts. Calls to C++ functions need an
-`extern "C"` declaration of the mangled name; the needed ones are printed as a comment. Functions with literal
-pools or Thumb code aren't supported.
+converts dsd's UAL syntax to the pre-UAL syntax mwcc's inline assembler accepts. Literal-pool loads become
+`ldr rX, =value` (mwcc puts the pool at the end of the function, like the originals). Calls to C++ functions and
+references to symbols need declarations in scope; mangled names need an `extern "C"` declaration. The names used
+are printed as a comment. Thumb code isn't supported.
 """
 import re
 import sys
@@ -31,7 +32,7 @@ def find(target: str) -> list[str]:
 
 
 def convert(line: str) -> str:
-    s = line.strip()
+    s = line.split(";")[0].strip()
     s = re.sub(r"\.L_", "L_", s)
     if re.match(r"^\w+:$", s):
         return s
@@ -50,20 +51,35 @@ def convert(line: str) -> str:
     m = re.match(rf"^(ldr|str)(sb|sh|b|h){COND} (.*)$", s)
     if m:
         return f"{m.group(1)}{m.group(3) or ''}{m.group(2)} {m.group(4)}"
-    m = re.match(r"^stm sp, (.*)$", s)
+    m = re.match(rf"^(stm|ldm){COND} (\w+!?), (.*)$", s)
     if m:
-        return f"stmia sp, {m.group(1)}"
+        return f"{m.group(1)}{m.group(2) or ''}ia {m.group(3)}, {m.group(4)}"
     return s
 
 
 def main() -> None:
-    body = [convert(l) for l in find(sys.argv[1]) if l.strip()]
-    calls = sorted({l.split()[1] for l in body if re.match(r"^blx? \w", l)})
+    raw = [l for l in find(sys.argv[1]) if l.strip()]
+    pool = {}
+    for l in raw:
+        m = re.match(r"^\.L_(\w+): \.word (\S+)$", l.strip())
+        if m:
+            pool[m.group(1)] = m.group(2)
+    lines = []
+    for l in raw:
+        if re.match(r"^\.L_\w+: \.word ", l.strip()):
+            continue
+        m = re.match(r"^(\s*ldr\w* \w+), \.L_(\w+)$", l)
+        if m and m.group(2) in pool:
+            l = f"{m.group(1)}, ={pool[m.group(2)]}"
+        lines.append(l)
+    body = [convert(l) for l in lines]
+    calls = sorted({l.split()[1] for l in body if re.match(r"^blx? \w", l)} | set(pool.values()))
     if calls:
-        print(f"// calls: {', '.join(calls)}")
+        print(f"// uses: {', '.join(calls)}")
     print("    nofralloc")
     for l in body:
-        print(l if l.endswith(":") else f"    {l}")
+        if l:
+            print(l if l.endswith(":") else f"    {l}")
 
 
 if __name__ == "__main__":

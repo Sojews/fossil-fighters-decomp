@@ -262,7 +262,19 @@ struct SoundCommand {
     s32 arg2;
 };
 
-extern int data_02093060;   // volume for players 2 and 3 when resuming
+struct SoundParams {
+    s32 volume;
+    s32 pitch;
+    s32 tempo;
+};
+
+struct SoundSettings {
+    s32 bgmVolume;      // players 0, 2 and 3
+    s32 seVolume;       // player 1
+    SoundParams defaults;
+};
+
+extern SoundSettings gSoundSettings;   // sound_api.cpp
 
 class SoundManager {
 public:
@@ -378,5 +390,61 @@ public:
     s32 cursor;
     SoundRequest nodes[SOUND_REQUEST_COUNT];
 };
+
+// Global sound functions over gSoundManager (sound_manager.cpp).
+int func_020016a8(int a, int b, int c);
+void func_020016d0(int a, int b, int c);
+void func_020016f0(int a, int b, int c);
+void func_02001718(int a);
+void func_02001730(int a);
+void func_02001748(int a);
+void func_02001760(int a);
+void func_02001778();
+int func_0200178c(int a, int b, int c, int d);
+void func_020017c4(int a, int b, int c);
+int func_020017e4(int a, int b, int c);
+void func_0200180c(int a, int b, int c);
+int func_0200182c(int a, int b, int c);
+int func_02001854(int a, int b, int c, u16 d, int e);
+void func_02001894(int a);
+void func_020018b8(int a, int b, int c);
+void func_020018d8(int a, int b);
+int func_020018f8();
+int func_0200190c(int a, int b, int c);
+void func_02001934(int a);
+void func_02001958(int a, int b);
+void func_02001978(int a, int b, int c);
+void func_020019a0(int a, int b, int c);
+void func_020019c8(int a);
+void func_020019e0();
+void func_020019f4();
+void func_02001a08(int a, int b, int c);
+void func_02001a30(int a);
+BOOL func_02001a48();
+void func_02001a5c(int a, int b, int c);
+void func_02001a84(int volume);
+void func_02001a9c(int volume);
+void SoundPause();
+void SoundResume();
+void func_02001adc(int fadeFrames);
+void func_02001af4(int fadeFrames);
+void func_02001624();
+void func_02001694();
+void SoundInit(void *heapMem, u32 heapSize, const char *arcPath);
+int SoundLoadGroups(int group, ...);
+void SoundUnload(int level);
+
+// Sound request queue (sound_request.cpp).
+void PushSoundRequest(int type, int delay, int arg0, int arg1, int arg2, int arg3);
+void RemoveSoundRequest(int node);
+void BeginSoundRequests();
+void TickSoundRequest();
+int GetSoundRequestDelay();
+BOOL AtSoundRequestsEnd();
+int GetSoundRequestCursor();
+SoundRequest *GetCurrentSoundRequest();
+void NextSoundRequest();
+
+int SetSoundScene(int scene);   // sound_scenes.cpp
 
 #endif

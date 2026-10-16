@@ -404,8 +404,8 @@ void SoundManager::Resume() {
     }
     NNS_SndPlayerPauseByPlayerNo(0, FALSE);
     NNS_SndPlayerPauseByPlayerNo(1, FALSE);
-    NNS_SndPlayerSetPlayerVolume(2, data_02093060);
-    NNS_SndPlayerSetPlayerVolume(3, data_02093060);
+    NNS_SndPlayerSetPlayerVolume(2, gSoundSettings.bgmVolume);
+    NNS_SndPlayerSetPlayerVolume(3, gSoundSettings.bgmVolume);
     NNS_SndPlayerPauseByPlayerNo(4, FALSE);
 }
 

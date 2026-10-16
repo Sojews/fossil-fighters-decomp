@@ -42,6 +42,14 @@ src/sound/sound_loader.cpp:
     complete
     .text       start:0x02002fac end:0x020031d0
 
+src/sound/sound_api.cpp:
+    complete
+    .text       start:0x020031d0 end:0x02003f88
+    .init       start:0x02088a0c end:0x02088a28
+    .ctor       start:0x02092fb0 end:0x02092fb4
+    .data       start:0x02093060 end:0x02093074
+    .bss        start:0x020c9950 end:0x020c9964
+
 src/sound/sound_scenes.cpp:
     complete
     .text       start:0x02003f88 end:0x020049f4
