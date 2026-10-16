@@ -36,9 +36,16 @@ public:
     u32 mUnk4;
 };
 
+// Walks a list of blocks.
+struct MHeapIterator {
+    MHeapIterator(MHeapBlock *b) : block(b) {}
+
+    MHeapBlock *block;
+};
+
 class MHeap : public MMemoryBlock {
 public:
-    MHeap(u32 base, u32 size, u32 unit);
+    MHeap(u32 base, u32 size, u32 blockSize);
     virtual ~MHeap();
 
     void SetUnk34(u8 value);
@@ -48,13 +55,14 @@ public:
     void Free(u32 addr, BOOL mustBeUsed);
     u32 AllocAddr(u32 size, BOOL fromEnd, u32 align, u32 boundary, u32 boundaryCount, u32 limit);
     void Free(MHeapBlock *block);
+    MHeapIterator GetUsedBlocks();
     BOOL Contains(MHeapBlock *block);
     void Walk();
 
     MHeapBlock *mFree;      // 0x0C: sorted by address
     MHeapBlock *mUsed;      // 0x10
     MHeapBlock *mFallback;  // 0x14: allocated from main memory because the range was full
-    u32 mUnit;              // 0x18
+    u32 mBlockSize;         // 0x18: the size of the block records (subclasses keep more in them)
     OSMutex mMutex;         // 0x1C
     u8 mUnk34;              // 0x34
 };

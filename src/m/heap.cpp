@@ -2,10 +2,10 @@
 
 #include "m/heap.h"
 
-MHeap::MHeap(u32 base, u32 size, u32 unit) : MMemoryBlock(base, size) {
+MHeap::MHeap(u32 base, u32 size, u32 blockSize) : MMemoryBlock(base, size) {
     mUsed = NULL;
     mFallback = NULL;
-    mUnit = unit;
+    mBlockSize = blockSize;
     OS_InitMutex(&mMutex);
     mUnk34 = FALSE;
     mFree = NewBlock();
@@ -44,7 +44,7 @@ BOOL MHeap::IsEmpty() {
 }
 
 MHeapBlock *MHeap::NewBlock() {
-    return (MHeapBlock *)operator new[](mUnit);
+    return (MHeapBlock *)operator new[](mBlockSize);
 }
 
 MHeapBlock *MHeap::Alloc(u32 size, BOOL fromEnd, u32 align, u32 boundary, u32 boundaryCount, u32 limit) {
@@ -209,6 +209,10 @@ u32 MHeap::AllocAddr(u32 size, BOOL fromEnd, u32 align, u32 boundary, u32 bounda
 
 void MHeap::Free(MHeapBlock *block) {
     Free(block->addr, FALSE);
+}
+
+MHeapIterator MHeap::GetUsedBlocks() {
+    return MHeapIterator(mUsed);
 }
 
 BOOL MHeap::Contains(MHeapBlock *block) {
