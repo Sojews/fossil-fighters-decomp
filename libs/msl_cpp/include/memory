@@ -4,6 +4,9 @@
 #include <new>
 #include <limits>
 
+extern "C" int printf(const char *, ...);
+extern "C" void abort(void);
+
 // from rb3 decomp
 
 namespace std {
@@ -31,7 +34,12 @@ namespace std {
         }
 
         pointer allocate(size_type count, const void *hint = 0) {
-            return reinterpret_cast<pointer>(::operator new(count * sizeof(T)));
+            pointer p = reinterpret_cast<pointer>(::operator new(count * sizeof(T)));
+            if (p == 0) {
+                printf("Memory allocation failure");
+                abort();
+            }
+            return p;
         }
 
         void deallocate(pointer p, size_type n) {

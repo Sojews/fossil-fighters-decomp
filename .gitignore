@@ -17,3 +17,4 @@ __pycache__/
 .DS_Store
 tools/sdk_names/ref/
 tools/sdk_names/obj/
+_static_order_tmp.*
