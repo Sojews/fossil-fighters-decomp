@@ -37,6 +37,9 @@ extern int __double_huge[];
 #define FP_SUBNORMAL 5
 
 int __fpclassifyd(double x);
+int __msl_count_bits32(unsigned long x);
+int __msl_count_leading_zero32(unsigned long x);
+int __msl_count_bits64(unsigned long long x);
 int __signbitd(double x);
 double fabs(double x);
 double nan(const char *x);

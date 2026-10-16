@@ -341,3 +341,19 @@ libs/msl/src/mem.c:
 libs/msl/src/wstring.c:
     complete
     .text       start:0x02082878 end:0x020828c8
+
+libs/msl/src/math/w_pow.c:
+    complete
+    .text       start:0x020836b4 end:0x020836bc
+
+libs/msl/src/ansi_fp.c:
+    .text       start:0x020836bc end:0x02083f84
+
+libs/msl/src/math_api.c:
+    complete
+    .text       start:0x02084368 end:0x02084494
+
+libs/msl/src/extras.c:
+    complete
+    .text       start:0x02084494 end:0x020844b0
+
