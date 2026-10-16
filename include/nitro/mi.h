@@ -20,6 +20,10 @@ void MI_DmaCopy32(u32 dmaNo, const void *src, void *dest, u32 size);
 void MI_DmaFill16(u32 dmaNo, void *dest, u16 data, u32 size);
 void MI_DmaFill32(u32 dmaNo, void *dest, u32 data, u32 size);
 
+void MI_StopDma(u32 dmaNo);
+void MI_HBlankDmaCopy32(u32 dmaNo, const void *src, void *dest, u32 size);
+void MI_HBlankDmaCopy16(u32 dmaNo, const void *src, void *dest, u32 size);
+
 void DC_FlushRange(const void *startAddr, u32 nBytes);
 
 #ifdef __cplusplus

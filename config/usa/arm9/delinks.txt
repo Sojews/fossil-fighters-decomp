@@ -308,8 +308,8 @@ src/m/menu.cpp:
 src/m/bg_task.cpp:
     .text       start:0x02067988 end:0x02067d40
 
-src/m/raster_trigger.cpp:
-    .text       start:0x02068fc0 end:0x02068fdc
+src/m/raster.cpp:
+    .text       start:0x02067d40 end:0x020690bc
 
 src/m/seed_generator.cpp:
     .text       start:0x020690bc end:0x020694dc
