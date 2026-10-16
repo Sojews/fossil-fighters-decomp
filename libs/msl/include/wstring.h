@@ -7,7 +7,9 @@
 extern "C" {
 #endif
 
+#ifdef __cplusplus
 struct mbstate_t {};
+#endif
 
 size_t wcslen(const wchar_t *str);
 wchar_t *wcscpy(wchar_t *dest, const wchar_t *src);

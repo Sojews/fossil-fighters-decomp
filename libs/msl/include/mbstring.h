@@ -10,7 +10,9 @@ extern "C" {
 int mbtowc(wchar_t *pwc, const char *s, int n);
 int __mbtowc_noconv(wchar_t *pwc, const char *str, int n);
 int __wctomb_noconv(char *s, wchar_t wchar);
+int wctomb(char *s, wchar_t wchar);
 size_t mbstowcs(wchar_t *pDest, const char *pSrc, size_t num);
+size_t wcstombs(char *pDest, const wchar_t *pSrc, size_t num);
 
 #ifdef __cplusplus
 }

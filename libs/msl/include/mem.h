@@ -11,6 +11,7 @@ void *memcpy(void *dst, const void *src, int n);
 void *memmove(void *dst, const void *src, size_t len);
 void *memset(void *dest, int val, int n);
 void *memchr(const void *src, int val, int n);
+void *__memrchr(const void *src, int val, int n);
 int memcmp(const void *src1, const void *src2, int n);
 
 #ifdef __cplusplus
