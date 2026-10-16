@@ -28,6 +28,7 @@ public:
 
     void reserve(size_type n);
     basic_string &operator+=(const basic_string &str);
+    basic_string &operator=(const basic_string &str);
 
     void clear() {
         if (!is_long()) {
@@ -73,6 +74,9 @@ public:
         } mShort;
     };
 };
+
+template <class C, class Traits, class Alloc>
+bool operator==(const basic_string<C, Traits, Alloc> &lhs, const basic_string<C, Traits, Alloc> &rhs);
 
 typedef basic_string<char> string;
 typedef basic_string<wchar_t> wstring;
