@@ -32,7 +32,7 @@ public:
             u32 charBase : 4;
             u32 : 2;
             u32 screenBase : 5;
-            u32 : 1;
+            u32 extPaletteSlot : 1;
             u32 screenSize : 2;
         } mBgCntBits;
     };

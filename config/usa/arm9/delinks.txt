@@ -211,8 +211,8 @@ src/m/ext_affine_transfer.cpp:
 src/m/screen.cpp:
     .text       start:0x0205601c end:0x0205622c
 
-src/m/text_transfer.cpp:
-    .text       start:0x02057334 end:0x02057354
+src/m/text.cpp:
+    .text       start:0x0205622c end:0x02057354
 
 src/m/3d_wait_transfer_complete_task.cpp:
     .text       start:0x02058a54 end:0x02058a64
