@@ -50,6 +50,7 @@ void OS_LockMutex(OSMutex *mutex);
 void OS_UnlockMutex(OSMutex *mutex);
 void OS_Terminate(void);
 void OS_InitTick(void);
+int OS_SPrintf(char *dst, const char *fmt, ...);
 void OS_GetLowEntropyData(u32 buffer[8]);
 
 #ifdef __cplusplus

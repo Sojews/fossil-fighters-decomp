@@ -72,5 +72,5 @@ u32 MFile::GetLength() {
 }
 
 s32 MFile::Read(void *dest, s32 size) {
-    return FS_ReadFile(&mFile, dest, size);
+    return MReadFile(&mFile, dest, size);
 }

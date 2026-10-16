@@ -29,6 +29,7 @@ public:
 
     void reserve(size_type n);
     basic_string &operator+=(const basic_string &str);
+    basic_string &operator+=(const C *s);
     basic_string &operator=(const basic_string &str);
 
     void clear() {

@@ -5,6 +5,9 @@
 #include <string>
 #include "nitro/fs.h"
 
+// Reads from a file in pieces no bigger than the largest read the file system is set to do at once.
+s32 MReadFile(FSFile *file, void *dest, s32 size);
+
 class MFile {
 public:
     MFile();

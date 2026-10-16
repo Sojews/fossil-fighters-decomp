@@ -120,7 +120,7 @@ libs/msl/src/math/s_ldexp.c:
     .text       start:0x0208353c end:0x020836b4
 
 src/game/dino_resource.cpp:
-    .text       start:0x0201197c end:0x02011a54
+    .text       start:0x02011154 end:0x020133e0
 
 src/m/memory.c:
     .text       start:0x0204b338 end:0x0204b3a0

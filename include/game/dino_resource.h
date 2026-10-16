@@ -8,6 +8,12 @@
 
 class MRandom;
 
+// The record at a position in a file of fixed-size records.
+struct DinoRegionCenter {
+    u32 unk00;
+    u32 unk04;
+};
+
 // A file of strings: an offset table at offset 8 (the format shared by most data files).
 struct DinoTextData {
     u32 unk00;
@@ -15,11 +21,75 @@ struct DinoTextData {
     u32 tableOffset;    // 0x08
 };
 
-struct DinoCreatureDefs;
-struct DinoAttackDefs;
+// The creature (vivosaur) definitions: an entry per creature, and the text IDs their strings start at.
+struct DinoCreatureDefs {
+    u32 unk00;
+    u32 nameText;       // 0x04
+    u32 text08;         // 0x08
+    u32 text0C;         // 0x0C
+    u32 unk10;
+    u32 count;          // 0x14
+    u32 tableOffset;    // 0x18
+    u32 text1C;         // 0x1C
+    u32 text20;         // 0x20
+    u32 text24;         // 0x24
+};
+
+struct DinoCreatureDef {
+    u8 unk00[0xD];
+    u8 unk0D;
+};
+
+struct DinoAttackDefs {
+    u32 unk00;
+    u32 nameText;       // 0x04
+    u32 text08;         // 0x08
+    u32 unk0C;
+    u32 tableOffset;    // 0x10
+};
+
+struct DinoAttackDef;
 struct DinoBattleAdjustDefs;
 struct DinoBattleBgDefs;
-struct DinoExcavateDefs;
+struct DinoExcavateRange {
+    u32 min;
+    u32 max;
+    u32 value;
+};
+
+struct DinoExcavateDefs {
+    u8 unk00[0x78];
+    u32 offset78;       // 0x78
+    u32 offset7C;       // 0x7C
+    u32 offset80;       // 0x80
+    u8 unk84[0x38];
+    u32 rangeCount;     // 0xBC
+    u32 rangeOffset;    // 0xC0: DinoExcavateRange entries
+};
+struct DinoMapMData;
+struct DinoMapData;
+struct DinoBattleData;
+struct DinoShopData;
+struct DinoDanceData;
+struct DinoCharaData;
+struct DinoMessageData;
+struct DinoEpisodeData;
+struct DinoKeyItemDefs;
+struct DinoHeadMaskDefs;
+struct DinoMuseumDefs;
+// The fossil (kaseki) definitions.
+struct DinoKasekiDefs {
+    u32 unk00;
+    u32 count;          // 0x04
+    u32 tableOffset;    // 0x08
+};
+
+struct DinoKasekiDef {
+    u8 unk00[0x28];
+    u32 nameText;       // 0x28
+};
+struct DinoSenryuDefs;
+struct DinoBattleAttackType;
 
 // A file holding one number: how many of something there are.
 struct DinoMaxId {
@@ -31,9 +101,69 @@ class DinoResource {
 public:
     DinoResource();
 
+    static void Create();
+
     MRandom *GetRandom();
     const char *GetText(u32 id);
     static const u16 *GetUnkTable();
+    u32 GetCreatureCount();
+    const DinoCreatureDef *GetCreatureDef(u32 id);
+    const DinoAttackDef *GetAttackDef(u32 id);
+    std::string GetBattleCreatureMotionPath(int id);
+    const DinoBattleAdjustDefs *GetBattleAdjustDefs();
+    const DinoBattleBgDefs *GetBattleBgDefs();
+    const char *GetAttackName(u32 id);
+    const char *GetCreatureText1C(u32 id);
+    const char *GetCreatureName(u32 id);
+    const char *GetCreatureText08(u32 id);
+    const char *GetCreatureText24(u32 id);
+    const char *GetCreatureText20(u32 id);
+    const char *GetCreatureText0C(u32 id);
+    const char *GetAttackText08(u32 id);
+    u32 GetFlagCount();
+    u32 GetKeyItemCount();
+    u32 GetHeadMaskCount();
+    u32 GetVarCount();
+    u32 GetEpisodeCount();
+    u32 GetEventCount();
+    u32 GetMapCount();
+    u32 GetRegionCount();
+    u32 GetCharaCount();
+    u32 GetKasekiRockCount();
+    u32 GetBattleCount();
+    MResource<DinoMapMData> LoadMapM(int id);
+    MResource<DinoMapData> LoadMapR(int id);
+    MResource<DinoMapData> LoadMapC(int id);
+    MResource<DinoMapData> LoadMapE(int id);
+    MResource<DinoMapData> LoadMapG(int id);
+    MResource<DinoBattleData> LoadBattle(int id);
+    MResource<DinoShopData> LoadShop(int id);
+    MResource<DinoDanceData> LoadDance(int id);
+    MResource<DinoCharaData> LoadChara(int id);
+    MResource<DinoMessageData> LoadMessage(int id);
+    MResource<DinoEpisodeData> LoadEpisode(int id);
+    MResource<DinoKeyItemDefs> LoadKeyItemDefs();
+    MResource<DinoHeadMaskDefs> LoadHeadMaskDefs();
+    MResource<DinoMuseumDefs> LoadMuseumDefs();
+    MResource<DinoKasekiDefs> LoadKasekiDefs();
+    MResource<DinoSenryuDefs> LoadSenryuDefs();
+    MResource<DinoExcavateDefs> GetExcavateDefs();
+    const void *GetExcavate78();
+    const void *GetExcavate7C();
+    const void *GetExcavate80();
+    u32 GetCreatureUnk0D(u32 id);
+    std::string GetKasekiName(u32 id);
+    std::string GetKasekiRockName(u32 id);
+    void SetUnk90(u32 a, u32 b);
+    void GetUnk90(u32 *a, u32 *b);
+    u32 FindExcavateRange(u32 value);
+    MResource<DinoBattleAttackType> LoadBattleAttackType();
+    DinoRegionCenter GetRegionCenter(u32 id);
+    u16 GetRegionMapMatch(u32 id);
+    u16 GetTalkMessageMatch(u32 id);
+    u16 GetMapExcavateMatch(u32 id);
+    u16 GetMapBgmMatch(u32 id);
+    u16 GetMapSceneMatch(u32 id);
     MFontSet *CreateFont24(int color, int shadow, int back);
     MFontSet *CreateFont16(int color, int shadow, int back);
     MFontSet *CreateFont12(int color, int shadow, int back);
