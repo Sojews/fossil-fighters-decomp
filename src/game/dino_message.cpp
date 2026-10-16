@@ -1033,3 +1033,7 @@ DinoExchangeDoneSignal::DinoExchangeDoneSignal() : MMessage(0x100AA) {
 
 DinoExchangeSenryuSignal::DinoExchangeSenryuSignal() : MMessage(0x100A9) {
 }
+
+void RegisterDinoMessages() {
+    AddMessageFactory(CreateDinoMessage);
+}

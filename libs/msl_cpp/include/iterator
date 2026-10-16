@@ -178,7 +178,7 @@ namespace std {
             current = other.current;
         }
 
-        Iter base() { return current; }
+        Iter base() const { return current; }
 
         reference operator*() const {
             Iter it = current;

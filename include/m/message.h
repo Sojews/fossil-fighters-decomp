@@ -4,6 +4,7 @@
 
 #include "types.h"
 #include "nitro/mi.h"
+#include "m/irq.h"
 
 // An object that can be written to and read from a byte buffer.
 class MSerializable {
@@ -15,11 +16,12 @@ public:
     virtual int Unk14() = 0;
 };
 
-// A message. Its serialized form starts with its type ID.
+// A message. Its serialized form starts with its type ID. Messages are reference counted, since one can be
+// delivered to several observers.
 class MMessage : public MSerializable {
 public:
     MMessage(u32 id) {
-        mUnk4 = 0;
+        mRefCount = 0;
         mId = id;
     }
     virtual u32 GetSize() { return 0; }
@@ -27,8 +29,17 @@ public:
     virtual void Read(const void *buf) {}
     virtual int Unk14() { return 0; }
 
-    u32 mUnk4;
+    void AddRef();
+    void Release();
+
+    int mRefCount;  // 0x04
     u32 mId;        // 0x08
 };
+
+// Creates a message from its serialized form, or returns NULL if the type is unknown.
+typedef MMessage *(*MMessageFactory)(const void *data);
+
+void AddMessageFactory(MMessageFactory factory);
+MMessage *CreateMessage(const void *data);
 
 #endif

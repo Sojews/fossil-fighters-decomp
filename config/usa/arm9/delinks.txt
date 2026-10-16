@@ -118,7 +118,7 @@ src/m/lcd.cpp:
     .text       start:0x0204bcc8 end:0x0204c1f4
 
 src/m/multi_message.cpp:
-    .text       start:0x02051a14 end:0x02052e28
+    .text       start:0x02051a4c end:0x02052e28
 
 src/m/transfer.cpp:
     .text       start:0x02052ee0 end:0x02053040

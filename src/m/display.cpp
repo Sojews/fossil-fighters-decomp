@@ -1,9 +1,14 @@
 // The 2D graphics engines.
 
+#include <algorithm>
 #include "m/display.h"
 
 void MDisplay::AddHook(MDisplayHook *hook) {
     mHooks.push_back(hook);
+}
+
+void MDisplay::RemoveHook(MDisplayHook *hook) {
+    mHooks.erase(std::find(mHooks.begin(), mHooks.end(), hook));
 }
 
 u32 MDisplay::GetRegs00() {

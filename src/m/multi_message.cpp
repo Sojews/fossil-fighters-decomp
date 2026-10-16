@@ -1,6 +1,50 @@
 // Message types for wireless play and download play, and the factory that creates them from received data.
 
+#include <vector>
 #include "m/multi_message.h"
+
+MMessage *CreateMultiMessage(const void *data);
+
+// NONMATCHING: in the game this vector comes before its destructor-chain entry in .bss, so the two functions
+// that use it load it at a different offset.
+std::vector<MMessageFactory> gMessageFactories;
+
+void RegisterMultiMessages() {
+    AddMessageFactory(CreateMultiMessage);
+}
+
+void AddMessageFactory(MMessageFactory factory) {
+    gMessageFactories.push_back(factory);
+}
+
+// Creates a message from its serialized form, trying the most recently added factories first.
+MMessage *CreateMessage(const void *data) {
+    for (std::vector<MMessageFactory>::reverse_iterator it = gMessageFactories.rbegin();
+         it != gMessageFactories.rend(); ++it) {
+        MMessage *msg = (*it)(data);
+        if (msg != NULL) {
+            return msg;
+        }
+    }
+    return NULL;
+}
+
+void MMessage::AddRef() {
+    MIrqLock lock;
+    mRefCount++;
+}
+
+void MMessage::Release() {
+    int count;
+
+    {
+        MIrqLock lock;
+        count = --mRefCount;
+    }
+    if (count <= 0) {
+        delete this;
+    }
+}
 
 // Creates a message from its serialized form.
 MMessage *CreateMultiMessage(const void *data) {

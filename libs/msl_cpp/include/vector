@@ -86,23 +86,15 @@ namespace std {
 
         void throw_length_error();
 
-#if DONT_INLINE_STD
         void clear() {
-            bool _b[4];
-            size_t size = size_;
-            _b[0]       = false;
-            erase_at_end(size, _b[0]);
+            erase_at_end(size_);
         }
-        void erase_at_end(size_t, bool &);
-#else
-        void erase_at_end(const size_t n) {
-            // erase_at_end(n, Metrowerks::int2type<true>());
+        void erase_at_end(size_t n) {
+            erase_at_end(n, Metrowerks::int2type<true>());
+        }
+        void erase_at_end(size_t n, Metrowerks::int2type<true>) {
             size_ -= n;
         }
-        void clear() {
-            erase_at_end(size());
-        }
-#endif
 
         // void erase_at_end(size_t n, Metrowerks::int2type<true>) DONT_INLINE_CLASS {
         //     T* e = end();
@@ -124,6 +116,7 @@ namespace std {
         }
 
         iterator erase(iterator __first, iterator __last, UnkMSLStruct1);
+        iterator erase(iterator pos, UnkMSLStruct1);
 
         void sub_push_back(const_reference x, Metrowerks::int2type<false>);
         void sub_push_back(const_reference x, Metrowerks::int2type<true>);
@@ -152,8 +145,19 @@ namespace std {
         }
 
         void push_back(const_reference x) {
-            push_back(x, Metrowerks::int2type<Metrowerks::has_trivial_copy_ctor<T>::value &&
-                                              Metrowerks::has_trivial_assignment<T>::value>());
+            UnkMSLStruct1 unk = UnkMSLStruct1();
+            if (size_ < cap()) {
+                if (Metrowerks::has_trivial_copy_ctor<T>::value && Metrowerks::has_trivial_assignment<T>::value) {
+                    size_++;
+                    back() = x;
+                } else {
+                    alloc().construct(end(), x);
+                    size_++;
+                }
+            } else {
+                sub_push_back(x, Metrowerks::int2type<Metrowerks::has_trivial_copy_ctor<T>::value &&
+                                                      Metrowerks::has_trivial_assignment<T>::value>());
+            }
         }
 
         void allocate(size_t min, size_t max) {
@@ -193,7 +197,7 @@ namespace std {
         void append_realloc(size_t n, const_reference x);
 
         size_t max_size() const {
-            return alloc().max_size();
+            return Allocator().max_size();
         }
 
         volatile size_t capacity() const {
@@ -269,11 +273,9 @@ namespace std {
     };
 
     template <typename T, typename Allocator> __vec_deleter<T, Allocator>::~__vec_deleter() {
-        UnkMSLStruct1 unk = UnkMSLStruct1(); // somehow needed
-
         if (data_ != nullptr) {
             clear();
-            alloc().deallocate(data_, cap());
+            Allocator().deallocate(data_, cap());
         }
     }
 
@@ -355,6 +357,13 @@ namespace std {
         }
 
         return __first;
+    }
+
+    template <typename T, typename Allocator>
+    __vec_deleter<T, Allocator>::iterator __vec_deleter<T, Allocator>::erase(iterator pos, UnkMSLStruct1) {
+        std::memmove(pos, pos + 1, (end() - pos - 1) * sizeof(value_type));
+        this->size_--;
+        return pos;
     }
 
     template <typename T, class Allocator> class __vec_deleter_helper : public __vec_deleter<T, Allocator> {
@@ -521,6 +530,82 @@ namespace std {
         }
     };
 
+
+    // Vectors of pointers share the vector<void *> code.
+    template <typename T, typename Allocator>
+    class vector<T *, Allocator> : public __vec_constructor<void *, allocator<void *>, true> {
+    protected:
+        typedef __vec_deleter<void *, allocator<void *> > _Base;
+
+    public:
+        // Iterators are small classes around a pointer.
+        class iterator {
+        public:
+            typedef random_access_iterator_tag iterator_category;
+            typedef T *value_type;
+            typedef ptrdiff_t difference_type;
+            typedef T **pointer;
+            typedef T *&reference;
+
+            iterator() {}
+            explicit iterator(T **p) : ptr_(p) {}
+            T *&operator*() const {
+                return *ptr_;
+            }
+            iterator &operator++() {
+                ++ptr_;
+                return *this;
+            }
+            iterator operator++(int) {
+                iterator tmp = *this;
+                ++ptr_;
+                return tmp;
+            }
+            iterator &operator--() {
+                --ptr_;
+                return *this;
+            }
+            bool operator==(const iterator &x) const {
+                return ptr_ == x.ptr_;
+            }
+            bool operator!=(const iterator &x) const {
+                return ptr_ != x.ptr_;
+            }
+            T **ptr_;
+        };
+        typedef T *const *const_iterator;
+        typedef std::reverse_iterator<iterator> reverse_iterator;
+
+        vector() {}
+        ~vector() {}
+        void push_back(T *const &x) {
+            _Base::push_back((void *const &) x);
+        }
+        void clear() {
+            _Base::clear();
+        }
+        T *&operator[](size_t n) {
+            return (T *&) _Base::operator[](n);
+        }
+        iterator begin() {
+            return iterator((T **) _Base::begin());
+        }
+        iterator end() {
+            return iterator((T **) _Base::end());
+        }
+        reverse_iterator rbegin() {
+            return reverse_iterator(end());
+        }
+        reverse_iterator rend() {
+            return reverse_iterator(begin());
+        }
+        iterator erase(iterator first, iterator last) {
+            return iterator((T **) _Base::erase((void **) first.ptr_, (void **) last.ptr_, UnkMSLStruct1()));
+        }
+        iterator erase(iterator pos) {
+            return iterator((T **) _Base::erase((void **) pos.ptr_, UnkMSLStruct1()));
+        }
+    };
 } // namespace std
 
 template <typename T> class CustomVector : public std::vector<T> {
