@@ -9,7 +9,10 @@
 
 src/sound/sound_manager.cpp:
     complete
-    .text       start:0x02000bc0 end:0x020014e0
+    .text       start:0x02000bc0 end:0x02001c34
+    .init       start:0x02088918 end:0x02088a0c
+    .ctor       start:0x02092fac end:0x02092fb0
+    .bss        start:0x020c6220 end:0x020c9950
 
 src/util/text_parse.c:
     complete

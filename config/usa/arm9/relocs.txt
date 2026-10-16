@@ -12,10 +12,6 @@ from:0x02000930 kind:load to:0x01ff94dc module:itcm
 from:0x02000934 kind:load to:0x02000ba1 module:main
 from:0x02000b3c kind:load to:0x027e0021 module:dtcm
 from:0x02000b44 kind:load to:0x027e0000 module:dtcm
-from:0x02000b64 kind:load to:0x020c8bc0 module:main
-from:0x02000b68 kind:load to:0x020c8bd8 module:main
-from:0x02000b6c kind:load to:0x020c6220 module:main
-from:0x02000b70 kind:load to:0x020c6220 module:main
 from:0x02000ba4 kind:thumb_call to:0x02052e38 module:main
 from:0x02000bac kind:thumb_call to:0x02048d9c module:main
 from:0x02000bb6 kind:thumb_call to:0x0205189c module:main

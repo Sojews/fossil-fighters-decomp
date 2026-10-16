@@ -8,7 +8,7 @@
 |---|---|
 | Target | Fossil Fighters (USA), `YKHE`, SHA-1 `8148a65040b5085337b76e6051601da1b1fc28ef` |
 | Functions | 10,076 found across ARM9 main, ITCM and 8 overlays |
-| Matched | 13 functions, 4,392 bytes (0.39%) — game code in `src/`, C library in `libs/msl/` |
+| Matched | 107 functions, 8,848 bytes (0.79%) — game code in `src/`, C library in `libs/msl/` |
 | Named | 945 functions, incl. ~800 NitroSDK/NitroSystem/MSL functions found by `tools/sdk_names` |
 | Compiler | Metrowerks CodeWarrior for ARM 2.0 (`mwccarm`), NitroSDK 4.0 |
 
@@ -56,6 +56,8 @@ Tips:
 - Most game code is Thumb; `-thumb` is the default. Wrap ARM functions in `#pragma thumb off`.
 - `char` is signed in this game.
 - Parts of the game are C++ (the overlays have static initializers). Game code has no exception tables, so everything is built with `-Cpp_exceptions off`.
+- C++ classes: mwcc 2.0 uses Itanium name mangling (`_ZN12SoundManager4InitEv`). Rename the game's symbols to the mangled names your code produces; base-class constructors/destructors are referenced as `C2`/`D2`, and if the game has one function for both variants, list both names at that address in `symbols.txt`. Pad unknown class members with `u32` arrays, not `u8`, so the class keeps its 4-byte alignment.
+- A file whose statics need construction also owns its `.init` (the `__sinit_<file>` function), its `.ctor` slot and its `.bss`; see `src/sound/sound_manager.cpp`.
 - mwcc is picky about expression shape: `x *= 10; x += d;` and `x = x * 10 + d` compile differently, and indexing with `a[i++]` stops the loop being turned into pointer arithmetic.
 - Include any alignment padding after the last function in a file's `.text` range, or later code shifts.
 
