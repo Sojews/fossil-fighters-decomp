@@ -7,6 +7,7 @@
 #include "m/blend.h"
 #include "m/bright.h"
 #include "m/obj.h"
+#include "m/bg.h"
 
 // NONMATCHING: this file's .bss holds more than these (0x28 bytes from 0x0214d1ac), and mwcc lays out
 // same-sized variables in an order that depends on how many there are, so the code that reaches these
@@ -17,11 +18,6 @@ static void *sPrevSwitchThreadCallback;
 static void *sThreadDisplays;
 static u32 sUnk;
 
-// The OBJ and BG controllers (not decompiled yet).
-class MBg {
-public:
-    void Update();
-};
 
 
 MDisplay::MDisplay(MLcd *lcd, MDisplayRegs *regs) : mLcd(lcd), mRegs(regs) {
