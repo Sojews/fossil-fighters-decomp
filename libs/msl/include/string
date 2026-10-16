@@ -3,10 +3,11 @@
 #ifndef MSL_STRING
 #define MSL_STRING
 
+#include <memory>
+
 namespace std {
 
 template <class T> struct char_traits {};
-template <class T> class allocator {};
 
 template <class C, class Traits = char_traits<C>, class Alloc = allocator<C> >
 class basic_string {

@@ -80,7 +80,7 @@ w(f"rule extract\n  command = {DSD} rom extract --rom $in --output-path {extract
 w(f"rule delink\n  command = {DSD} delink --config-path {arm9_config}")
 w(f"rule lcf\n  command = {DSD} lcf -c {arm9_config}")
 # mwcc names outputs after the source and writes a Windows-style .d next to them.
-w(f"rule cc\n  command = {wine} {CC} {CC_FLAGS} $extra_cflags -gccinc -i include -i libs/msl/include -MD -c $in -o $outdir && {PY} tools/fix_dep.py $outdir/$stem.d $out.d\n"
+w(f"rule cc\n  command = {wine} {CC} {CC_FLAGS} $extra_cflags -gccinc -i include -i libs/msl/include -i libs/msl_cpp/include -MD -c $in -o $outdir && {PY} tools/fix_dep.py $outdir/$stem.d $out.d\n"
   "  depfile = $out.d\n  deps = gcc\n  description = CC $in")
 w(f"rule ld\n  command = {wine} {LD} {LD_FLAGS} @$objects $lcf -o $out\n  description = LINK $out")
 w(f"rule check\n  command = {DSD} check modules --config-path {arm9_config} --fail && touch $out")

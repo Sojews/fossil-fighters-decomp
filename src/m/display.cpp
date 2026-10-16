@@ -2,6 +2,10 @@
 
 #include "m/display.h"
 
+void MDisplay::AddHook(MDisplayHook *hook) {
+    mHooks.push_back(hook);
+}
+
 u32 MDisplay::GetRegs00() {
     return mRegs->unk00;
 }

@@ -2,6 +2,7 @@
 #ifndef M_DISPLAY_H
 #define M_DISPLAY_H
 
+#include <vector>
 #include "types.h"
 
 // Where an engine's registers and VRAM areas are (one table per engine).
@@ -90,6 +91,7 @@ public:
     void *mUnk24;
     u32 mUnk28[(0xA4 - 0x28) / 4];
     u16 mBackdrop;          // 0xA4
+    std::vector<MDisplayHook *> mHooks; // 0xA8
 };
 
 class MDisplayHook {
