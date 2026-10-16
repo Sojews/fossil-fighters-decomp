@@ -3,9 +3,4 @@
 
 #include "m/anime.h"
 
-class MRectAnime : public MAnime {
-public:
-    virtual ~MRectAnime() {}
-};
-
 #endif

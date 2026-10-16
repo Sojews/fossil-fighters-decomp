@@ -3,9 +3,4 @@
 
 #include "m/anime.h"
 
-class MPointAnime : public MAnime {
-public:
-    virtual ~MPointAnime() {}
-};
-
 #endif

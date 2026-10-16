@@ -85,7 +85,7 @@ void MAnime::Execute() {
 MValueAnime::MValueAnime(int from, int to) {
     mFrom = from;
     mTo = to;
-    mSteps = abs(from - to) + 1;
+    mSteps = labs(from - to) + 1;
     mDir = from < to ? 1 : -1;
 }
 
@@ -96,8 +96,8 @@ void MValueAnime::Apply(int step) {
 MPointAnime::MPointAnime(MPoint from, MPoint to) {
     mFrom = from;
     mTo = to;
-    int dy = abs(from.y - to.y);
-    int dx = abs(from.x - to.x);
+    int dy = labs(from.y - to.y);
+    int dx = labs(from.x - to.x);
     mSteps = std::max(dx, dy) + 1;
     mDeltaX = ((to.x - from.x) << 16) / (mSteps - 1);
     mDeltaY = ((to.y - from.y) << 16) / (mSteps - 1);
