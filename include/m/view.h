@@ -19,8 +19,8 @@ public:
     virtual int GetPriority() = 0;
     virtual void Show() = 0;
     virtual void Hide() = 0;
-    virtual BOOL Unk30() = 0;
-    virtual BOOL Unk34() = 0;
+    virtual BOOL IsHidden() = 0;
+    virtual u32 GetPlaneMask() = 0;
 
     void SetPosition(int x, int y);
     int GetWidth();

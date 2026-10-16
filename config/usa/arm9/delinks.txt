@@ -232,6 +232,9 @@ src/m/smart_oam.cpp:
 src/m/obj.cpp:
     .text       start:0x0205bc1c end:0x0205c498
 
+src/m/canvas.cpp:
+    .text       start:0x020621a0 end:0x02062ac8
+
 src/m/chr16_fill.cpp:
     .text       start:0x0205c498 end:0x0205c73c
 

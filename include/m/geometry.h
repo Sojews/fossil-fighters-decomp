@@ -10,6 +10,8 @@ struct MPoint {
         y = y_;
     }
 
+    MPoint operator+(MPoint o) const { return MPoint(x + o.x, y + o.y); }
+
     void Set(int x_, int y_) {
         x = x_;
         y = y_;
@@ -32,6 +34,20 @@ struct MRect {
         top = topLeft.y;
         right = bottomRight.x;
         bottom = bottomRight.y;
+    }
+
+    void Offset(MPoint p) {
+        left += p.x;
+        top += p.y;
+        right += p.x;
+        bottom += p.y;
+    }
+
+    void MoveTo(MPoint p) {
+        right += p.x - left;
+        bottom += p.y - top;
+        left = p.x;
+        top = p.y;
     }
 
     int GetWidth() const { return right - left; }
