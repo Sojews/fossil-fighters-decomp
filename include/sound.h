@@ -70,14 +70,36 @@ public:
     u8 panSet;
 };
 
+// A list entry: a sequence that was played recently and how many more frames it blocks replays.
+struct SeqEntry {
+    s32 no;
+    s32 index;
+    s32 timer;
+    s32 prev;
+    s32 next;
+};
+
+#define SEQ_ENTRY_HEAD 0
+#define SEQ_ENTRY_TAIL 1
+#define SEQ_ENTRY_COUNT 18
+
+// A sequence player that won't restart a sequence while it's still in its recently-played list.
 class SeqPlayerEx {
 public:
     SeqPlayerEx();
-    int func_02002288(int a, int b, int c, int d);
     void Update();
+    BOOL PlayOnce(int no, int index, int duration, int fadeFrames);
+    void InitList();
+    int FindFreeEntry();
+    void InsertBefore(int at, int entry);
+    void RemoveEntry(int entry);
+    void InitEntry(int entry);
+    int FindEntry(int no, int index);
+    BOOL Contains(int no, int index);
+    BOOL AddEntry(int no, int index, int duration);
 
     SeqPlayer player;
-    u8 unk20[0x188 - 0x20];
+    SeqEntry entries[SEQ_ENTRY_COUNT];
 };
 
 class Unk18 {

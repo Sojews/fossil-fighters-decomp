@@ -158,7 +158,7 @@ int SoundManager::func_02000f68(int a, int b, int c, int d) {
     if (!enabled) {
         return 0;
     }
-    return player1.func_02002288(a, b, c, d);
+    return player1.PlayOnce(a, b, c, d);
 }
 
 void SoundManager::func_02000f94(int a, int b, int c) {
