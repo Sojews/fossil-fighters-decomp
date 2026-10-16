@@ -43,6 +43,7 @@ public:
 
     bool is_long() const { return mLong.isLong; }
     size_type size() const { return !is_long() ? mShort.size : mLong.size; }
+    bool empty() const { return size() == 0; }
     const C *data() const { return !is_long() ? mShort.buf : mLong.data; }
     const C *c_str() const { return data(); }
     const_iterator begin() const { return !is_long() ? mShort.buf : mLong.data; }
@@ -83,6 +84,9 @@ typedef basic_string<char> string;
 typedef basic_string<wchar_t> wstring;
 
 string operator+(const char *lhs, const string &rhs);
+
+template <class C, class Traits, class Alloc>
+basic_string<C, Traits, Alloc> operator+(const basic_string<C, Traits, Alloc> &lhs, const C *rhs);
 
 }  // namespace std
 

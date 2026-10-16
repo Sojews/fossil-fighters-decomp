@@ -6,6 +6,7 @@
 
 class MResource {
 public:
+    MResource() {}
     MResource(std::string path);
 
     MArchivePtr mArchive;   // 0x00

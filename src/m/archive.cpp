@@ -111,3 +111,18 @@ BOOL MArchivePtr::IsValid() {
     }
     return FALSE;
 }
+
+MArchiveFile MArchivePtr::GetFile(const char *path, u32 index) const {
+    return Open(path).GetFile(index);
+}
+
+MArchivePtr MArchivePtr::Open(const char *path) const {
+    if (path[0] == '\0') {
+        return *this;
+    }
+    if (mArchive->mDirectory.empty()) {
+        MFile file(mArchive->mId);
+        mArchive->mDirectory = file.GetDirectory();
+    }
+    return MArchivePtr(mArchive->mDirectory + path);
+}

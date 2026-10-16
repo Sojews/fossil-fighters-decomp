@@ -73,6 +73,17 @@ public:
             }
         }
     }
+    MArchiveFile(const MArchiveFile &other) {
+        archive = other.archive;
+        index = other.index;
+        locked = other.locked;
+        if (archive != NULL) {
+            archive->AddRef();
+            if (locked) {
+                archive->AddLock(index);
+            }
+        }
+    }
     ~MArchiveFile() {
         if (archive != NULL) {
             if (locked) {
@@ -126,6 +137,9 @@ public:
     MArchivePtr &operator=(const MArchivePtr &other);
     BOOL IsValid();
     MArchiveFile GetFile(u32 index) const;
+    // The archive at a path relative to this one's directory (this one, if the path is empty).
+    MArchivePtr Open(const char *path) const;
+    MArchiveFile GetFile(const char *path, u32 index) const;
 
     MArchive *mArchive;
 };
