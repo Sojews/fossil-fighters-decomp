@@ -4,3 +4,30 @@
     .ctor       start:0x021654a0 end:0x021654c4 kind:rodata align:4
     .data       start:0x021654e0 end:0x0216ca20 kind:data align:32
     .bss        start:0x0216ca20 end:0x0216ca20 kind:bss align:32
+
+src/ov005/dino_ui_license_card.cpp:
+    .text       start:0x02155f60 end:0x02155f94
+
+src/ov005/dino_ui3_parts_fraction.cpp:
+    .text       start:0x021571fc end:0x021572e4
+
+src/ov005/dino_ui_shop_sell.cpp:
+    .text       start:0x02158c98 end:0x02158ef0
+
+src/ov005/dino_ui_shop_buy.cpp:
+    .text       start:0x0215ac7c end:0x0215aed4
+
+src/ov005/dino_ui_cleaning_leave.cpp:
+    .text       start:0x0215d2fc end:0x0215d350
+
+src/ov005/dino_ui_container_drop_menu_page_inc_task.cpp:
+    .text       start:0x0215e8a4 end:0x0215eaa8
+
+src/ov005/dino_ui_mask_buy.cpp:
+    .text       start:0x0216084c end:0x02160a78
+
+src/ov005/dino_ui_mask_equip.cpp:
+    .text       start:0x021622f4 end:0x02162510
+
+src/ov005/dino_ui_canon_putin.cpp:
+    .text       start:0x02164a20 end:0x02164ac8

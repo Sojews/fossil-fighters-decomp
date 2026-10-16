@@ -4,3 +4,18 @@
     .ctor       start:0x02190f14 end:0x02190f94 kind:rodata align:4
     .data       start:0x02190fa0 end:0x021978c0 kind:data align:32
     .bss        start:0x021978c0 end:0x02197d60 kind:bss align:32
+
+src/ov000/set_live_event_check_task.cpp:
+    .text       start:0x02159754 end:0x02159840
+
+src/ov000/enable_root_select_task.cpp:
+    .text       start:0x0215bc20 end:0x0215bc30
+
+src/ov000/send_local_message_task.cpp:
+    .text       start:0x0215d728 end:0x0215d78c
+
+src/ov000/dino_battle_view_kaseki_point.cpp:
+    .text       start:0x0215e79c end:0x0215e854
+
+src/ov000/dino_battle_view_field_player_bg.cpp:
+    .text       start:0x0215eeb0 end:0x0215eee4

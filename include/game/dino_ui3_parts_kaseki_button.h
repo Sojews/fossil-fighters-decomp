@@ -1,0 +1,11 @@
+#ifndef GAME_DINO_UI3_PARTS_KASEKI_BUTTON_H
+#define GAME_DINO_UI3_PARTS_KASEKI_BUTTON_H
+
+#include "m/menu_item.h"
+
+class DinoUi3PartsKasekiButton : public MMenuItem {
+public:
+    virtual ~DinoUi3PartsKasekiButton();
+};
+
+#endif

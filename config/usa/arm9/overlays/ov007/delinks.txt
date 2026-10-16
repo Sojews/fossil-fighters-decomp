@@ -4,3 +4,6 @@
     .ctor       start:0x0218c928 end:0x0218c940 kind:rodata align:4
     .data       start:0x0218c960 end:0x02192640 kind:data align:32
     .bss        start:0x02192640 end:0x02192680 kind:bss align:32
+
+src/ov007/dino_ui_atm.cpp:
+    .text       start:0x02174874 end:0x02174970

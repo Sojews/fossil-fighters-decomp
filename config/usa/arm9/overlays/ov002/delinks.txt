@@ -4,3 +4,39 @@
     .ctor       start:0x02163e00 end:0x02163e48 kind:rodata align:4
     .data       start:0x02163e60 end:0x02165fa0 kind:data align:32
     .bss        start:0x02165fa0 end:0x02165fc0 kind:bss align:32
+
+src/ov002/dino_cleaning_talk_filter.cpp:
+    .text       start:0x02157e84 end:0x02158018
+
+src/ov002/dino_cleaning_paper.cpp:
+    .text       start:0x02158414 end:0x02158448
+
+src/ov002/dino_cleaning_new_dust.cpp:
+    .text       start:0x0215b0a0 end:0x0215b118
+
+src/ov002/dino_cleaning_status.cpp:
+    .text       start:0x0215b550 end:0x0215b584
+
+src/ov002/dino_cleaning_score.cpp:
+    .text       start:0x0215bc18 end:0x0215bc4c
+
+src/ov002/dino_cleaning_blower.cpp:
+    .text       start:0x0215c964 end:0x0215c998
+
+src/ov002/dino_cleaning_xray.cpp:
+    .text       start:0x0215ca78 end:0x0215caac
+
+src/ov002/dino_cleaning_hammer.cpp:
+    .text       start:0x0215d6cc end:0x0215d79c
+
+src/ov002/dino_cleaning_drill.cpp:
+    .text       start:0x0215e33c end:0x0215e370
+
+src/ov002/dino_cleaning_dummy_item.cpp:
+    .text       start:0x0215ed8c end:0x0215ee94
+
+src/ov002/dino_cleaning_rock.cpp:
+    .text       start:0x0215f1e4 end:0x0215f218
+
+src/ov002/dino_cleaning_kaseki_rock.cpp:
+    .text       start:0x021602bc end:0x02160324

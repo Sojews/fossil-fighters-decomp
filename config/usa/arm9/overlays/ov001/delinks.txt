@@ -4,3 +4,24 @@
     .ctor       start:0x02169344 end:0x02169358 kind:rodata align:4
     .data       start:0x02169360 end:0x0216ae60 kind:data align:32
     .bss        start:0x0216ae60 end:0x021994a0 kind:bss align:32
+
+src/ov001/dino_field_chara_angle_task.cpp:
+    .text       start:0x0215bc48 end:0x0215bcdc
+
+src/ov001/dino_field_kaseki_rock.cpp:
+    .text       start:0x0215c108 end:0x0215c13c
+
+src/ov001/dino_field_raster.cpp:
+    .text       start:0x0215c29c end:0x0215c2d0
+
+src/ov001/dino_field_chara_angle_anime.cpp:
+    .text       start:0x021633e4 end:0x02163454
+
+src/ov001/dino_field_town_map.cpp:
+    .text       start:0x021683a4 end:0x02168424
+
+src/ov001/dino_field_area_panel.cpp:
+    .text       start:0x02168930 end:0x02168964
+
+src/ov001/dino_field_battle_start_effect.cpp:
+    .text       start:0x02168bd4 end:0x02168c08

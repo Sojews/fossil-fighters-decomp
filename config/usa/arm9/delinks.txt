@@ -126,3 +126,132 @@ src/m/transfer.cpp:
 src/m/task.cpp:
     .text       start:0x02053040 end:0x020534fc
     .itcm       start:0x01ff8f20 end:0x01ff9258
+
+src/game/dino_common_tutorial_console_filter.cpp:
+    .text       start:0x02006fa0 end:0x02007014
+
+src/game/dino_talk_console_filter.cpp:
+    .text       start:0x0200a2a4 end:0x0200a34c
+
+src/game/dino_multi_play_icon.cpp:
+    .text       start:0x0200a4d4 end:0x0200a54c
+
+src/game/dino_help_sign.cpp:
+    .text       start:0x0201fac8 end:0x0201fb5c
+
+src/game/enable_help_task.cpp:
+    .text       start:0x0201fb90 end:0x0201fba0
+
+src/game/dino_sound_play_bgm_task.cpp:
+    .text       start:0x02020304 end:0x02020394
+
+src/game/m3d_scene_enable_task.cpp:
+    .text       start:0x020230ac end:0x020230bc
+
+src/game/m_polygon_char.cpp:
+    .text       start:0x020292ac end:0x020292e0
+
+src/game/dino_common_window_menu_item_flush_task.cpp:
+    .text       start:0x0202ee48 end:0x0202ee58
+
+src/game/dino_common_window_console_filter.cpp:
+    .text       start:0x02030310 end:0x02030410
+
+src/game/dino_help_sample.cpp:
+    .text       start:0x0203216c end:0x0203230c
+
+src/game/dino_cleaning_sample.cpp:
+    .text       start:0x02033c2c end:0x02033d98
+
+src/game/dino_atm_sample.cpp:
+    .text       start:0x02033f80 end:0x02033fe8
+
+src/game/dino_net_battle_sample.cpp:
+    .text       start:0x02034390 end:0x020343c4
+
+src/game/dino_event_park_kaseki_rock_found.cpp:
+    .text       start:0x02037a58 end:0x02037a8c
+
+src/game/dino_event_revive_field_suspend_task.cpp:
+    .text       start:0x0203927c end:0x02039458
+
+src/game/dino_event_ui_task.cpp:
+    .text       start:0x0203eb40 end:0x0203ef2c
+
+src/game/dino_event_exec_var_value.cpp:
+    .text       start:0x020466f4 end:0x020474a0
+
+src/game/dino_main.cpp:
+    .text       start:0x02048f9c end:0x02049004
+
+src/game/multi_play_error_dialog.cpp:
+    .text       start:0x02049310 end:0x02049388
+
+src/m/ext_affine_transfer.cpp:
+    .text       start:0x0204d144 end:0x0204d164
+
+src/m/looper_v_sync_hook_clock.cpp:
+    .text       start:0x020519b0 end:0x02051a14
+
+src/m/pal_load_task.cpp:
+    .text       start:0x02055384 end:0x02055394
+
+src/m/screen_show_transfer.cpp:
+    .text       start:0x020561fc end:0x0205622c
+
+src/m/text_transfer.cpp:
+    .text       start:0x02057334 end:0x02057354
+
+src/m/3d_wait_transfer_complete_task.cpp:
+    .text       start:0x02058a54 end:0x02058a64
+
+src/m/affine_screen_rot_transfer.cpp:
+    .text       start:0x0205932c end:0x0205937c
+
+src/m/index_bitmap_load_transfer.cpp:
+    .text       start:0x02059a90 end:0x02059abc
+
+src/m/smart_text.cpp:
+    .text       start:0x0205b584 end:0x0205b5b8
+
+src/m/smart_oam_offset_transfer.cpp:
+    .text       start:0x0205bbdc end:0x0205bc1c
+
+src/m/chr256_filter.cpp:
+    .text       start:0x0205c074 end:0x0205c090
+
+src/m/chr16_fill.cpp:
+    .text       start:0x0205c71c end:0x0205c73c
+
+src/m/blend_mode_transfer.cpp:
+    .text       start:0x0205cc54 end:0x0205ccc4
+
+src/m/win_control_show_transfer.cpp:
+    .text       start:0x0205d0c4 end:0x0205d124
+
+src/m/bright_mode_transfer.cpp:
+    .text       start:0x0205d4c8 end:0x0205d4f8
+
+src/m/chr16_bin_font_transfer.cpp:
+    .text       start:0x0205ea70 end:0x0205ea90
+
+src/m/view_coord_transfer.cpp:
+    .text       start:0x0205ee90 end:0x0205ef10
+
+src/m/motion_wait_stop_task.cpp:
+    .text       start:0x02061d68 end:0x02061d88
+
+src/m/canvas_copy_transfer.cpp:
+    .text       start:0x0206465c end:0x0206468c
+
+src/m/menu_item.cpp:
+    .text       start:0x020678f0 end:0x02067988
+
+src/m/raster_trigger.cpp:
+    .text       start:0x02068fc0 end:0x02068fdc
+
+src/m/seed_generator.cpp:
+    .text       start:0x020694cc end:0x020694dc
+
+src/m/multi_play_synchronize_delay_task.cpp:
+    .text       start:0x0206c074 end:0x0206c298
