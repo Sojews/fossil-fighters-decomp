@@ -189,24 +189,35 @@ public:
     BOOL requested;
 };
 
-// Stream player.
-class Unk3218 {
+typedef struct NNSSndStrmHandle {
+    void *strm;
+} NNSSndStrmHandle;
+
+// Stream player (streamed music/voice). Pausing stops the stream and remembers where it was.
+class StrmPlayer {
 public:
-    Unk3218();
-    ~Unk3218();
-    void func_02002d3c();
+    StrmPlayer();
+    ~StrmPlayer();
+    void Init();
     void Update();
-    void func_02002dec();
-    void func_02002e5c(int a);
-    void func_02002e90();
-    void func_02002ec4(int a);
-    void func_02002f44();
-    void func_02002f58();
-    void func_02002f6c(int a, int b);
-    void func_02002f94();
-    u8 unk0[0x14];
-    u8 unk14;
-    u8 unk15[3];
+    BOOL Start(int no, int pos, int unused);
+    void StopStream(int fadeFrames);
+    void Stop(int fadeFrames);
+    void Pause();
+    void Resume(int volume);
+    void SetFlag();
+    void ClearFlag();
+    void MoveVolume(int volume, int frames);
+    BOOL GetFlag();
+
+    NNSSndStrmHandle handle;
+    NNSSndStrmHandle handle2;
+    s32 strmNo;
+    s32 volume;
+    s32 pos;
+    u8 playing;
+    u8 paused;
+    u8 flag;
 };
 
 struct SoundCommand {
@@ -260,7 +271,7 @@ public:
     u8 func_02001388();
     void func_02001394(int a, int b, int c);
     void func_020013cc(int a);
-    void func_020013f0();
+    BOOL func_020013f0();
     void func_02001404(int a, int b, int c);
     int func_02001488();
     void SetVolume8(int volume);
@@ -291,7 +302,7 @@ public:
     Unk2BCC unk2BCC;
     Unk2BCC unk2DE0;
     Unk2FF4 unk2FF4;
-    Unk3218 strm;                       // 0x3218
+    StrmPlayer strm;                    // 0x3218
     NNSSndHeapHandle strmHeap;          // 0x3230
     u8 strmThreadStack[0x3720 - 0x3234];
     u8 unk3720;

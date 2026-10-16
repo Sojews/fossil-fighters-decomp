@@ -306,48 +306,48 @@ void SoundManager::InitStream() {
     strmHeap = NNS_SndHeapCreate(strmHeapMem, sizeof(strmHeapMem));
     NNS_SndArcStrmInit(10, strmHeap);
     NNS_SndArcStrmCreatePrepareThread(strmThreadStack, 11);
-    strm.func_02002d3c();
+    strm.Init();
 }
 
 void SoundManager::func_0200131c(int a, int b, int c) {
-    strm.func_02002dec();
-    strm.func_02002f6c(unk8, 0);
+    strm.Start(a, b, c);
+    strm.MoveVolume(unk8, 0);
 }
 
 void SoundManager::func_02001348(int a) {
-    strm.func_02002e5c(a);
+    strm.Stop(a);
 }
 
 void SoundManager::func_0200135c() {
-    strm.func_02002e90();
+    strm.Pause();
 }
 
 void SoundManager::func_02001370() {
-    strm.func_02002ec4(unk8);
+    strm.Resume(unk8);
 }
 
 u8 SoundManager::func_02001388() {
-    return strm.unk14;
+    return strm.playing;
 }
 
 void SoundManager::func_02001394(int a, int b, int c) {
-    strm.func_02002dec();
-    strm.func_02002f6c(unkC, 0);
-    strm.func_02002f44();
+    strm.Start(a, b, c);
+    strm.MoveVolume(unkC, 0);
+    strm.SetFlag();
 }
 
 void SoundManager::func_020013cc(int a) {
-    strm.func_02002e5c(a);
-    strm.func_02002f58();
+    strm.Stop(a);
+    strm.ClearFlag();
 }
 
-void SoundManager::func_020013f0() {
-    strm.func_02002f94();
+BOOL SoundManager::func_020013f0() {
+    return strm.GetFlag();
 }
 
 void SoundManager::func_02001404(int a, int b, int c) {
-    strm.func_02002dec();
-    strm.func_02002f6c(unkC, 0);
+    strm.Start(a, b, c);
+    strm.MoveVolume(unkC, 0);
     if (!unk3) {
         unk3 = 1;
         unk4 = unk2BCC.GetVolume();
@@ -572,8 +572,8 @@ void func_02001a30(int a) {
     gSoundManager.func_020013cc(a);
 }
 
-void func_02001a48() {
-    gSoundManager.func_020013f0();
+BOOL func_02001a48() {
+    return gSoundManager.func_020013f0();
 }
 
 void func_02001a5c(int a, int b, int c) {

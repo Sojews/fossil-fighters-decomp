@@ -34,6 +34,10 @@ src/sound/bgm_request.cpp:
     complete
     .text       start:0x02002cc0 end:0x02002d14
 
+src/sound/strm_player.cpp:
+    complete
+    .text       start:0x02002d14 end:0x02002fac
+
 src/util/text_parse.c:
     complete
     .text       start:0x020213a0 end:0x02021620
