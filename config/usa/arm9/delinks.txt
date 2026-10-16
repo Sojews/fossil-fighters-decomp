@@ -120,6 +120,9 @@ src/m/display.cpp:
 src/m/lcd.cpp:
     .text       start:0x0204bcc8 end:0x0204c1f4
 
+src/m/looper.cpp:
+    .text       start:0x02050e08 end:0x02051a4c
+
 src/m/multi_message.cpp:
     .text       start:0x02051a4c end:0x02052e28
 
@@ -198,9 +201,6 @@ src/game/multi_play_error_dialog.cpp:
 
 src/m/ext_affine_transfer.cpp:
     .text       start:0x0204d144 end:0x0204d164
-
-src/m/looper_v_sync_hook_clock.cpp:
-    .text       start:0x020519b0 end:0x02051a14
 
 src/m/pal_load_task.cpp:
     .text       start:0x02055384 end:0x02055394

@@ -4,12 +4,8 @@
 
 #include "m/task.h"
 #include "m/display.h"
+#include "m/looper.h"
 
-// A task that's also run at every VBlank.
-class MLooperVSyncTask : public MTask {
-public:
-    u32 mVSyncHook[3];      // 0x10: MLooperVSyncHook base
-};
 
 // The value of one VRAMCNT register.
 union MVramCnt {

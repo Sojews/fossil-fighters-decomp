@@ -28,6 +28,23 @@ struct OSMutex {
     OSMutexLink link;
 };
 
+typedef struct OSThreadInfo {
+    u16 isNeedRescheduling;
+    u16 irqDepth;
+    OSThread *current;
+    OSThread *list;
+    void *switchCallback;
+} OSThreadInfo;
+
+extern OSThreadInfo OSi_ThreadInfo;
+
+static inline OSThread *OS_GetCurrentThread(void) {
+    return OSi_ThreadInfo.current;
+}
+
+u32 OS_GetThreadPriority(const OSThread *thread);
+BOOL OS_SetThreadPriority(OSThread *thread, u32 prio);
+
 void OS_InitMutex(OSMutex *mutex);
 void OS_LockMutex(OSMutex *mutex);
 void OS_UnlockMutex(OSMutex *mutex);
