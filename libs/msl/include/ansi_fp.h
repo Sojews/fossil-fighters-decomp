@@ -9,7 +9,7 @@ extern "C" {
 #define FIXEDDECIMAL ((char) (1))
 
 typedef struct decimal {
-    unsigned char sgn;
+    char sgn;
     char unused;
     short exp;
     struct {

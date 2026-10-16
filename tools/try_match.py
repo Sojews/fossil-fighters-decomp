@@ -43,7 +43,7 @@ def game_symbols():
 def compile_c(src: Path, out_dir: Path) -> Path:
     ninja = (ROOT / "build.ninja").read_text()
     cmd = re.search(r"rule cc\n  command = (.*?) -MD -c", ninja).group(1)
-    edge = re.search(rf"build \S+: cc {re.escape(str(src.relative_to(ROOT)))}\n(?:  .*\n)*?  extra_cflags = (.*)\n", ninja)
+    edge = re.search(rf"build \S+: cc(?:_partial)? {re.escape(str(src.relative_to(ROOT)))}(?: \|[^\n]*)?\n(?:  .*\n)*?  extra_cflags = (.*)\n", ninja)
     cmd = cmd.replace("$extra_cflags", edge.group(1) if edge else "")
     r = subprocess.run(shlex.split(cmd) + ["-c", str(src), "-o", str(out_dir) + "/"], cwd=ROOT,
                        capture_output=True, text=True)

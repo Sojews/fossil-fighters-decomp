@@ -32,7 +32,10 @@ CC_FLAGS = " ".join([
     "-msgstyle gcc",
 ])
 # Extra flags for library code, by path prefix.
-LIB_CC_FLAGS: dict[str, str] = {}
+LIB_CC_FLAGS: dict[str, str] = {
+    # From the Spirit Tracks decomp, which declares variables mid-block.
+    "libs/msl/src/wprintf.c": " -lang c99",
+}
 LD_FLAGS = " ".join([
     "-proc arm946e",
     "-dead",

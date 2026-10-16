@@ -357,3 +357,7 @@ libs/msl/src/extras.c:
     complete
     .text       start:0x02084494 end:0x020844b0
 
+
+
+libs/msl/src/wprintf.c:
+    .text       start:0x020811ec end:0x02082878
