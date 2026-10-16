@@ -22,11 +22,6 @@ union MVramCnt {
     };
 };
 
-// VRAM banks to give some use.
-struct MVramBanks {
-    u32 count;
-    u32 banks[4];
-};
 
 class MLcd : public MLooperVSyncTask {
 public:

@@ -2,6 +2,66 @@
 
 #include <algorithm>
 #include "m/display.h"
+#include "m/window.h"
+#include "m/blend.h"
+#include "m/bright.h"
+
+// The OBJ and BG controllers (not decompiled yet).
+class MBg {
+public:
+    void Update();
+};
+
+class MChr {
+public:
+    void Update();
+};
+
+MDisplay::MDisplay(MLcd *lcd, MDisplayRegs *regs) : mLcd(lcd), mRegs(regs) {
+    mBackdrop = 0x7FFF;
+    mDispCnt.bgMode = 0;
+    mDispCnt.bg0Is3D = FALSE;
+    mDispCnt.objTileMapping = 1;
+    mDispCnt.objBmpMapping = 0;
+    mDispCnt.forceBlank = FALSE;
+    mDispCnt.visiblePlanes = 0;
+    mDispCnt.visibleWindows = 0;
+    mDispCnt.displayMode = 1;
+    mDispCnt.objTileBoundary = 0;
+    mDispCnt.objBmpBoundary = 0;
+    mDispCnt.hblankObj = TRUE;
+    mDispCnt.bgCharBase = 0;
+    mDispCnt.bgScreenBase = 0;
+    mDispCnt.bgExtPalette = FALSE;
+    mDispCnt.objExtPalette = FALSE;
+    mUnk10.lo = 0;
+    mWin = new MWin(this);
+    mBlend = new MBlend(this);
+    mBright = new MBright(this);
+    mBg = NULL;
+    mChr = NULL;
+}
+
+MDisplay::~MDisplay() {
+    delete mWin;
+    delete mBlend;
+    delete mBright;
+}
+
+void MDisplay::Update() {
+    *mRegs->backdrop = mBackdrop;
+    *mRegs->dispcnt = mDispCnt;
+    *mRegs->unk88 = mUnk10;
+    if (mBg != NULL) {
+        mBg->Update();
+    }
+    if (mChr != NULL) {
+        mChr->Update();
+    }
+    mWin->Update();
+    mBlend->Update();
+    mBright->Update();
+}
 
 void MDisplay::AddHook(MDisplayHook *hook) {
     mHooks.push_back(hook);
@@ -27,12 +87,12 @@ u32 MDisplay::GetRegs28(int i) {
     return mRegs->unk28[i];
 }
 
-u32 MDisplay::GetRegs64(int i) {
-    return mRegs->unk64[i];
+volatile u8 *MDisplay::GetRegs64(int i) {
+    return mRegs->winin[i];
 }
 
-u32 MDisplay::GetRegs74(int i) {
-    return mRegs->unk74[i];
+volatile u16 *MDisplay::GetRegs74(int i) {
+    return mRegs->winh[i];
 }
 
 volatile u16 *MDisplay::GetRegs7C() {
@@ -47,8 +107,8 @@ volatile u16 *MDisplay::GetRegs84() {
     return mRegs->bldy;
 }
 
-u32 MDisplay::GetRegs8C() {
-    return mRegs->unk8C;
+volatile u32 *MDisplay::GetRegs8C() {
+    return mRegs->masterBright;
 }
 
 void MDisplay::ShowPlanes(u32 mask) {

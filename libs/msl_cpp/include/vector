@@ -23,9 +23,23 @@ namespace std {
 
     template <typename T, class Allocator> class __vec_deleter_helper;
 
+    // The capacity, with the (empty) allocator folded into it.
+    template <class Allocator> struct __vec_capacity {
+        size_t &first() {
+            return cap;
+        }
+        const size_t &first() const {
+            return cap;
+        }
+        Allocator second() const {
+            return Allocator();
+        }
+        size_t cap;
+    };
+
     template <typename T, class Allocator> class __vec_deleter {
     public:
-        typedef typename Metrowerks::compressed_pair<size_t, Allocator>::second_param allocator_param;
+        typedef const Allocator &allocator_param;
         typedef T value_type;
         typedef Allocator allocator_type;
         typedef size_t size_type;
@@ -36,15 +50,12 @@ namespace std {
         typedef T *pointer;
         typedef const pointer const_pointer;
 
-        __vec_deleter() :
-            data_(nullptr),
-            size_(0),
-            capacity_(0) {}
-
-        explicit __vec_deleter(allocator_param a) :
-            data_(nullptr),
-            size_(0),
-            capacity_(0, a) {}
+        // mwcc never inlines a template base class's constructor, so the most-derived class sets these up.
+        void init() {
+            data_ = nullptr;
+            size_ = 0;
+            capacity_.cap = 0;
+        }
 
         ~__vec_deleter();
 
@@ -225,6 +236,7 @@ namespace std {
             UnkMSLStruct1 unk = UnkMSLStruct1();
             UnkMSLStruct1 unk2 = UnkMSLStruct1();
             __vec_deleter<T, Allocator> tmp;
+            tmp.init();
             tmp.allocate(n);
             tmp.move_construct_to_end(begin(), end());
             optimize_after_moved_from();
@@ -248,6 +260,7 @@ namespace std {
         void reallocate_copy_alt(size_t n) {
             UnkMSLStruct1 unk2 = UnkMSLStruct1();
             __vec_deleter<T, Allocator> tmp;
+            tmp.init();
             tmp.allocate(n);
             tmp.move_construct_to_end_alt(begin(), end());
             optimize_after_moved_from();
@@ -269,7 +282,7 @@ namespace std {
     public:
         T *data_;
         size_t size_;
-        Metrowerks::compressed_pair<size_t, Allocator> capacity_;
+        __vec_capacity<Allocator> capacity_;
     };
 
     template <typename T, typename Allocator> __vec_deleter<T, Allocator>::~__vec_deleter() {
@@ -381,9 +394,10 @@ namespace std {
         typedef _Base::const_iterator const_iterator;
 
     public:
-        __vec_deleter_helper(allocator_param a) :
-            _Base(a),
-            start_(0) {}
+        __vec_deleter_helper(allocator_param a) {
+            this->init();
+            start_ = 0;
+        }
 
         ~__vec_deleter_helper();
 
@@ -450,7 +464,6 @@ namespace std {
         typedef _Base::const_iterator const_iterator;
 
     public:
-        __vec_constructor() {}
         // ~__vec_constructor();
     };
 
@@ -470,7 +483,6 @@ namespace std {
         typedef _Constructor::iterator iterator;
         typedef _Constructor::const_iterator const_iterator;
 
-        __vec_constructor() {}
         // ~__vec_constructor() { }
 
     public:
@@ -506,7 +518,9 @@ namespace std {
         typedef _Constructor::iterator iterator;
         typedef _Constructor::const_iterator const_iterator;
 
-        vector() {}
+        vector() {
+            this->init();
+        }
         ~vector() {}
 
         void push_back(const_reference x) {
@@ -533,7 +547,7 @@ namespace std {
 
     // Vectors of pointers share the vector<void *> code.
     template <typename T, typename Allocator>
-    class vector<T *, Allocator> : public __vec_constructor<void *, allocator<void *>, true> {
+    class vector<T *, Allocator> : public __vec_deleter<void *, allocator<void *> > {
     protected:
         typedef __vec_deleter<void *, allocator<void *> > _Base;
 
@@ -576,7 +590,9 @@ namespace std {
         typedef T *const *const_iterator;
         typedef std::reverse_iterator<iterator> reverse_iterator;
 
-        vector() {}
+        vector() {
+            this->init();
+        }
         ~vector() {}
         void push_back(T *const &x) {
             _Base::push_back((void *const &) x);

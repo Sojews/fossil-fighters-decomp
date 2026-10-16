@@ -13,4 +13,11 @@ struct MPoint {
     int y;
 };
 
+struct MRect {
+    int left;
+    int top;
+    int right;
+    int bottom;
+};
+
 #endif

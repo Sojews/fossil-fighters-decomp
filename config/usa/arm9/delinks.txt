@@ -123,6 +123,12 @@ src/m/lcd.cpp:
 src/m/multi_message.cpp:
     .text       start:0x02051a4c end:0x02052e28
 
+src/m/window.cpp:
+    .text       start:0x0205ccc4 end:0x0205d124
+
+src/m/bright.cpp:
+    .text       start:0x0205d124 end:0x0205d4f8
+
 src/m/blend.cpp:
     .text       start:0x0205c73c end:0x0205ccc4
 
@@ -222,12 +228,6 @@ src/m/chr256_filter.cpp:
 
 src/m/chr16_fill.cpp:
     .text       start:0x0205c71c end:0x0205c73c
-
-src/m/win_control_show_transfer.cpp:
-    .text       start:0x0205d0c4 end:0x0205d124
-
-src/m/bright_mode_transfer.cpp:
-    .text       start:0x0205d4c8 end:0x0205d4f8
 
 src/m/chr16_bin_font_transfer.cpp:
     .text       start:0x0205ea70 end:0x0205ea90

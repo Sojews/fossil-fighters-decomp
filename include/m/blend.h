@@ -7,12 +7,7 @@
 
 class MBlend {
 public:
-    MBlend(MDisplay *display) {
-        mDisplay = display;
-        mBldCnt = 0;
-        mBldAlpha = 0;
-        mBldY = 0;
-    }
+    MBlend(MDisplay *display);
 
     void Update();
     void Reset();

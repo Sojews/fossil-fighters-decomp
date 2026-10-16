@@ -4,6 +4,13 @@
 #include "m/blend_fade_ratio_anime.h"
 #include "m/blend_alpha_ratio_anime.h"
 
+MBlend::MBlend(MDisplay *display) {
+    mDisplay = display;
+    mBldCnt = 0;
+    mBldAlpha = 0;
+    mBldY = 0;
+}
+
 void MBlend::Update() {
     *mDisplay->GetRegs7C() = mBldCnt;
     *mDisplay->GetRegs80() = mBldAlpha;

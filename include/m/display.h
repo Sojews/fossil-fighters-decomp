@@ -5,35 +5,10 @@
 #include <vector>
 #include "types.h"
 
-// Where an engine's registers and VRAM areas are (one table per engine).
-struct MDisplayRegs {
-    u32 unk00;
-    volatile u32 *dispcnt;      // 0x04
-    u32 unk08[4];               // 0x08
-    u32 unk18[4];               // 0x18
-    u32 unk28[4];               // 0x28
-    volatile u16 *backdrop;     // 0x38
-    u32 unk3C;
-    u32 unk40;
-    u32 unk44;
-    u32 unk48;
-    u8 *unk4C;                  // 0x4C: VRAM bank configurations, 0x1C bytes each
-    u8 *unk50;
-    u8 *unk54;
-    u8 *unk58;
-    u8 *unk5C;
-    u8 *unk60;
-    u32 unk64[4];               // 0x64
-    u32 unk74[2];               // 0x74
-    volatile u16 *bldcnt;       // 0x7C
-    volatile u16 *bldalpha;     // 0x80
-    volatile u16 *bldy;         // 0x84
-    volatile u32 *unk88;
-    u32 unk8C;
-};
-
 // The fields of DISPCNT.
-struct MDispCnt {
+union MDispCnt {
+    u32 raw;
+    struct {
     u32 bgMode : 3;
     u32 bg0Is3D : 1;
     u32 objTileMapping : 1;
@@ -49,13 +24,72 @@ struct MDispCnt {
     u32 bgScreenBase : 3;
     u32 bgExtPalette : 1;
     u32 objExtPalette : 1;
+    };
+};
+// The register at MDisplayRegs::unk88.
+union MDisplayUnk88 {
+    u32 raw;
+    struct {
+        u16 lo;
+        u16 hi;
+    };
 };
 
+// Where an engine's registers and VRAM areas are (one table per engine).
+struct MDisplayRegs {
+    u32 unk00;
+    MDispCnt *dispcnt;          // 0x04
+    u32 unk08[4];               // 0x08
+    u32 unk18[4];               // 0x18
+    u32 unk28[4];               // 0x28
+    volatile u16 *backdrop;     // 0x38
+    u32 unk3C;
+    u32 unk40;
+    u32 unk44;
+    u32 unk48;
+    u8 *unk4C;                  // 0x4C: VRAM bank configurations, 0x1C bytes each
+    u8 *unk50;
+    u8 *unk54;
+    u8 *unk58;
+    u8 *unk5C;
+    u8 *unk60;
+    volatile u8 *winin[4];      // 0x64: WININ/WINOUT bytes for windows 0, 1, OBJ and outside
+    volatile u16 *winh[2];      // 0x74: WIN0H, WIN1H (WINxV follows each)
+    volatile u16 *bldcnt;       // 0x7C
+    volatile u16 *bldalpha;     // 0x80
+    volatile u16 *bldy;         // 0x84
+    MDisplayUnk88 *unk88;       // 0x88
+    volatile u32 *masterBright; // 0x8C
+};
+
+
+
 class MDisplayHook;
+class MLcd;
+class MBg;
+class MChr;
+class MWin;
+class MBlend;
+class MBright;
+
+// The VRAM banks given to one use.
+struct MVramBanks {
+    MVramBanks() {
+        for (u32 i = 0; i < 4; i++) {
+            banks[i] = 0;
+        }
+    }
+
+    u32 count;
+    u32 banks[4];
+};
 
 class MDisplay {
 public:
+    MDisplay(MLcd *lcd, MDisplayRegs *regs);
     virtual ~MDisplay();
+
+    void Update();
 
     void AddHook(MDisplayHook *hook);
     void RemoveHook(MDisplayHook *hook);
@@ -64,12 +98,12 @@ public:
     u32 GetRegs08(int i);
     u32 GetRegs18(int i);
     u32 GetRegs28(int i);
-    u32 GetRegs64(int i);
-    u32 GetRegs74(int i);
+    volatile u8 *GetRegs64(int i);
+    volatile u16 *GetRegs74(int i);
     volatile u16 *GetRegs7C();
     volatile u16 *GetRegs80();
     volatile u16 *GetRegs84();
-    u32 GetRegs8C();
+    volatile u32 *GetRegs8C();
     void ShowPlanes(u32 mask);
     void HidePlanes(u32 mask);
     BOOL ArePlanesHidden(u32 mask);
@@ -80,16 +114,22 @@ public:
     void SetBg0Is3D(BOOL on);
     void SetObjTileBoundary(int boundary);
 
-    int mEngine;            // 0x04
+    MLcd *mLcd;             // 0x04
     MDisplayRegs *mRegs;    // 0x08
     MDispCnt mDispCnt;      // 0x0C
-    u32 mUnk10;
-    void *mUnk14;
-    void *mUnk18;
-    void *mUnk1C;
-    void *mUnk20;
-    void *mUnk24;
-    u32 mUnk28[(0xA4 - 0x28) / 4];
+    MDisplayUnk88 mUnk10;   // 0x10
+    MBg *mBg;               // 0x14
+    MChr *mChr;             // 0x18
+    MWin *mWin;             // 0x1C
+    MBlend *mBlend;         // 0x20
+    MBright *mBright;       // 0x24
+    MVramBanks mBanks28;    // 0x28
+    MVramBanks mBanks3C;    // 0x3C
+    MVramBanks mBanks50;    // 0x50
+    MVramBanks mBanks64;    // 0x64
+    MVramBanks mBanks78;    // 0x78
+    MVramBanks mBanks8C;    // 0x8C
+    u32 mUnkA0;
     u16 mBackdrop;          // 0xA4
     std::vector<MDisplayHook *> mHooks; // 0xA8
 };
