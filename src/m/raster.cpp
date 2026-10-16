@@ -1,5 +1,6 @@
 // Raster effects.
 
+#include <algorithm>
 #include "m/raster.h"
 #include "m/display.h"
 #include "m/dma.h"
@@ -101,7 +102,7 @@ MRasterWindow::MRasterWindow(u32 dma, MDisplay *display, u8 autoFlip)
     mWin = display != NULL ? display->mWin : gCurrentDisplay->mWin;
     mAutoFlip = autoFlip;
     mChanged = FALSE;
-    mSpans = new int[M_RASTER_LINES * 4];
+    mSpans = new MRasterSpan[M_RASTER_LINES * 2];
     Hide();
     SetTarget(0);
     SetObjTarget(0);
@@ -146,7 +147,7 @@ void MRasterWindow::SetObjBlendEnabled(BOOL enabled) {
 void MRasterWindow::Clear() {
     mChanged = TRUE;
     MFill(0, mBack, M_RASTER_LINES * 4);
-    MFill(0, mSpans, M_RASTER_LINES * 4 * sizeof(int));
+    MFill(0, mSpans, M_RASTER_LINES * 2 * sizeof(MRasterSpan));
 }
 
 void MRasterWindow::OnVSync() {
@@ -155,4 +156,114 @@ void MRasterWindow::OnVSync() {
         mChanged = FALSE;
     }
     MRasterIO::OnVSync();
+}
+
+// Sets a line's window registers from its spans. A window can't cover a whole line (256 doesn't fit in a byte), so
+// that's done with the two windows covering half each.
+static inline void WriteLine(MRasterSpan *spans, u8 *regs) {
+    if (spans[0].right == 256 && spans[0].left == 0) {
+        regs[1] = 0;
+        regs[0] = 128;
+        regs[3] = 128;
+        regs[2] = 0;
+    } else {
+        regs[0] = spans[0].right;
+        regs[1] = spans[0].left;
+        regs[2] = spans[1].right;
+        regs[3] = spans[1].left;
+    }
+}
+
+// Calls op for each line of rect on the screen, with the rect's left and right edges.
+template <class Op> inline void MRasterWindow::ForEachLine(MRect rect, Op op) {
+    if (mAutoFlip && !mChanged) {
+        Clear();
+    }
+    if (MRect(0, 0, 256, M_RASTER_LINES).Intersects(rect)) {
+        rect = rect.Intersection(MRect(0, 0, 256, M_RASTER_LINES));
+        for (int y = rect.top; y < rect.bottom; y++) {
+            op(rect.left, rect.right, y);
+        }
+    }
+}
+
+// Adds [left, right) to a line, merged into a span it touches.
+struct AddSpanOp {
+    AddSpanOp(MRasterWindow *window) : mWindow(window) {}
+    inline void operator()(int left, int right, int line) {
+        MRasterSpan *spans = &mWindow->mSpans[line * 2];
+        u8 *regs = mWindow->mBack + line * 4;
+        if (spans[0].IsEmpty()) {
+            spans[0].Set(left, right);
+        } else if (spans[0].Touches(left, right)) {
+            spans[0].Merge(left, right);
+            if (!spans[1].IsEmpty() && spans[0].Touches(spans[1].left, spans[1].right)) {
+                spans[0].Merge(spans[1].left, spans[1].right);
+                spans[1].Clear();
+            }
+        } else if (spans[1].IsEmpty()) {
+            spans[1].Set(left, right);
+        } else if (spans[1].Touches(left, right)) {
+            spans[1].Merge(left, right);
+        }
+        WriteLine(spans, regs);
+    }
+
+    MRasterWindow *mWindow;
+};
+
+struct SubtractSpanOp {
+    SubtractSpanOp(MRasterWindow *window) : mWindow(window) {}
+    void operator()(int left, int right, int line) { mWindow->SubtractSpan(left, right, line); }
+
+    MRasterWindow *mWindow;
+};
+
+void MRasterWindow::AddRect(MRect rect) {
+    ForEachLine(rect, AddSpanOp(this));
+}
+
+void MRasterWindow::SubtractSpan(int left, int right, int line) {
+    if (left >= right) {
+        return;
+    }
+    MRasterSpan *spans = &mSpans[line * 2];
+    u8 *regs = mBack + line * 4;
+    for (;;) {
+        if (spans[0].IsEmpty()) {
+            break;
+        }
+        if (left <= spans[0].left && right >= spans[0].right) {
+            spans[0].bits = spans[1].bits;
+            spans[1].Clear();
+            continue;
+        }
+        if (left > spans[0].left && right < spans[0].right) {
+            spans[1].right = spans[0].right;
+            spans[0].right = left;
+            spans[1].left = right;
+            break;
+        }
+        if (left <= spans[0].left && right > spans[0].left) {
+            spans[0].left = right;
+        } else if (left < spans[0].right && right >= spans[0].right) {
+            spans[0].right = left;
+        }
+        if (!spans[0].IsEmpty()) {
+            if (left <= spans[1].left && right >= spans[1].right) {
+                spans[1].right = 0;
+                spans[1].left = 0;
+            } else if (left <= spans[1].left && right > spans[1].left) {
+                spans[1].left = right;
+            } else if (left < spans[1].right && right >= spans[1].right) {
+                spans[1].right = left;
+            }
+        }
+        break;
+    }
+    WriteLine(spans, regs);
+}
+
+void MRasterWindow::SubtractRect(MRect rect) {
+    ForEachLine(rect, SubtractSpanOp(this));
 }

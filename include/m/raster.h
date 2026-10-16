@@ -5,6 +5,8 @@
 
 #include "m/looper.h"
 #include "m/task.h"
+#include <algorithm>
+#include "m/geometry.h"
 
 class MDisplay;
 class MWin;
@@ -52,6 +54,33 @@ public:
     virtual ~MRasterPal() {}
 };
 
+// A horizontal span of a line covered by a window, in the order of the window registers' bytes. All zero is none.
+union MRasterSpan {
+    bool IsEmpty() const { return bits == 0; }
+    void Set(int left_, int right_) {
+        left = left_;
+        right = right_;
+    }
+    void Clear() {
+        right = 0;
+        left = 0;
+    }
+    // Whether [left_, right_) overlaps or touches the span.
+    bool Touches(int left_, int right_) const { return left <= right_ && right >= left_; }
+    void Merge(const int &left_, const int &right_);
+
+    s64 bits;
+    struct {
+        int right;
+        int left;
+    };
+};
+
+inline void MRasterSpan::Merge(const int &left_, const int &right_) {
+    left = std::min(left, left_);
+    right = std::max(right, right_);
+}
+
 // Per-line window 0 and 1 shapes: each line has two spans, one for each window.
 class MRasterWindow : public MRasterIO {
 public:
@@ -66,9 +95,13 @@ public:
     void SetBlendEnabled(BOOL enabled);
     void SetObjBlendEnabled(BOOL enabled);
     void Clear();
+    void AddRect(MRect rect);
+    void SubtractRect(MRect rect);
+    void SubtractSpan(int left, int right, int line);
+    template <class Op> inline void ForEachLine(MRect rect, Op op);
 
-    MWin *mWin;         // 0x3C
-    int *mSpans;        // 0x40: per line, the two spans' left and right edges
+    MWin *mWin;             // 0x3C
+    MRasterSpan *mSpans;    // 0x40: two per line
     u8 mAutoFlip;       // 0x44: flip after the frame when changed
     u8 mChanged;        // 0x45
 };
