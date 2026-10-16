@@ -344,4 +344,39 @@ public:
     u8 unk3721;
 };
 
+// A queued sound request: kept in a free list or the pending list, in array slots linked by index.
+struct SoundRequest {
+    s32 type;
+    s32 args[4];
+    s32 delay;      // frames left before it runs
+    s32 next;
+    s32 prev;
+};
+
+#define SOUND_REQUEST_FREE_HEAD 0
+#define SOUND_REQUEST_LIST_HEAD 1
+#define SOUND_REQUEST_COUNT 256
+
+class SoundRequestQueue {
+public:
+    SoundRequestQueue();
+    ~SoundRequestQueue();
+    void Init();
+    void InsertAfter(int node, int at);
+    void Unlink(int node);
+    int PeekFree();
+    void Push(int type, int delay, int arg0, int arg1, int arg2, int arg3);
+    void Remove(int node);
+    void Begin();
+    void Tick();
+    int GetDelay();
+    BOOL AtEnd();
+    int GetCursor();
+    SoundRequest *GetCurrent();
+    void Next();
+
+    s32 cursor;
+    SoundRequest nodes[SOUND_REQUEST_COUNT];
+};
+
 #endif
