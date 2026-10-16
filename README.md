@@ -52,6 +52,8 @@ For a first draft of a function, run [m2c](https://github.com/matt-kempster/m2c)
 
 Library code (NitroSDK, NitroSystem, MSL) lives at about `0x0206d000`–`0x02088364` and 762 of its 1,021 functions are already named. The game's own code (below `0x0206d000`, plus the overlays) is the main job.
 
+The game keeps RTTI, so its real class names are known: see [docs/classes.md](docs/classes.md) (from `tools/rtti_names.py`, which also names every verified destructor).
+
 Tips:
 - Most game code is Thumb; `-thumb` is the default. Wrap ARM functions in `#pragma thumb off`.
 - `char` is signed in this game.
