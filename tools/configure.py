@@ -35,6 +35,7 @@ CC_FLAGS = " ".join([
 LIB_CC_FLAGS: dict[str, str] = {
     # From the Spirit Tracks decomp, which declares variables mid-block.
     "libs/msl/src/wprintf.c": " -lang c99",
+    "libs/msl/src/printf.c": " -lang c99",
 }
 LD_FLAGS = " ".join([
     "-proc arm946e",

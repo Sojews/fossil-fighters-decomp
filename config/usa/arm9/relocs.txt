@@ -22316,8 +22316,8 @@ from:0x0207f0a8 kind:thumb_call to:0x020748c4 module:main
 from:0x0207f0dc kind:thumb_call to:0x0207480c module:main
 from:0x0207f0fe kind:thumb_call to:0x0207ea64 module:main
 from:0x0207f110 kind:thumb_call to:0x02074860 module:main
-from:0x0207f120 kind:load to:0x020c5994 module:main
-from:0x0207f124 kind:load to:0x021554d0 module:main
+from:0x0207f120 kind:load to:0x020c5948 add:0x4c module:main
+from:0x0207f124 kind:load to:0x02155488 add:0x48 module:main
 from:0x0207f128 kind:load to:0x021518ec module:main
 from:0x0207f12c kind:load to:0x02155440 module:main
 from:0x0207f130 kind:load to:0x02155464 module:main

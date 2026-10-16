@@ -29,27 +29,27 @@ extern const unsigned char __upper_mapC[__msl_cmap_size];
 #define __msl_upper 0x200
 #define __msl_xdigit 0x400
 
-static inline int isalpha(unsigned int c) {
+static inline int isalpha(int c) {
     return ((c < 0) || (c >= __msl_cmap_size)) ? 0 : (int) (_MSL_CMAP_ACCESS[c] & __msl_alpha);
 }
 
-static inline int isdigit(unsigned int c) {
+static inline int isdigit(int c) {
     return ((c < 0) || (c >= __msl_cmap_size)) ? 0 : (int) (_MSL_CMAP_ACCESS[c] & __msl_digit);
 }
 
-static inline int isspace(unsigned int c) {
+static inline int isspace(int c) {
     return ((c < 0) || (c >= __msl_cmap_size)) ? 0 : (int) (_MSL_CMAP_ACCESS[c] & __msl_space);
 }
 
-static inline int isupper(unsigned int c) {
+static inline int isupper(int c) {
     return ((c < 0) || (c >= __msl_cmap_size)) ? 0 : (int) (_MSL_CMAP_ACCESS[c] & __msl_upper);
 }
 
-static inline int isxdigit(unsigned int c) {
+static inline int isxdigit(int c) {
     return ((c < 0) || (c >= __msl_cmap_size)) ? 0 : (int) (_MSL_CMAP_ACCESS[c] & __msl_xdigit);
 }
 
-static inline int toupper(unsigned int c) {
+static inline int toupper(int c) {
     return ((c < 0) || (c >= __msl_cmap_size)) ? c : (int) (_MSL_CUPPER_ACCESS[c]);
 }
 

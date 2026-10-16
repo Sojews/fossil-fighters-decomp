@@ -10,8 +10,10 @@ extern "C" {
 size_t strlen(const char *str);
 char *strcpy(char *dest, const char *src);
 char *strncpy(char *dest, const char *src, size_t num);
+char *strcat(char *dest, const char *src);
 int strcmp(char *str1, char *str2);
 int strncmp(char *str1, char *str2, size_t num);
+char *strchr(const char *str, int chr);
 
 #ifdef __cplusplus
 }

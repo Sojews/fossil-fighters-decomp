@@ -9,6 +9,7 @@
 #include <stdbool.h>
 #include <string.h>
 
+#include <wctype.h>
 #include <wstring.h>
 
 #define MAX_SIG_DIG 32
@@ -154,7 +155,7 @@ static const wchar_t *parse_format(const wchar_t *format_string, va_list *arg, p
 
         c = *++s;
     } else {
-        while (isdigit(c)) {
+        while (iswdigit(c)) {
             f.field_width = (f.field_width * 10) + (c - L'0');
             c             = *++s;
         }
@@ -176,7 +177,7 @@ static const wchar_t *parse_format(const wchar_t *format_string, va_list *arg, p
 
             c = *++s;
         } else {
-            while (isdigit(c)) {
+            while (iswdigit(c)) {
                 f.precision = (f.precision * 10) + (c - L'0');
                 c           = *++s;
             }
@@ -829,14 +830,14 @@ wchar_t *float2str(long double num, wchar_t *wbuff, print_format format) {
             if (num < 0) {
                 pw = wbuff - 5;
 
-                if (isupper(format.conversion_char)) {
+                if (iswupper(format.conversion_char)) {
                     wcscpy(pw, L"-INF");
                 } else {
                     wcscpy(pw, L"-inf");
                 }
             } else {
                 pw = wbuff - 4;
-                if (isupper(format.conversion_char)) {
+                if (iswupper(format.conversion_char)) {
                     wcscpy(pw, L"INF");
                 } else {
                     wcscpy(pw, L"inf");
@@ -849,14 +850,14 @@ wchar_t *float2str(long double num, wchar_t *wbuff, print_format format) {
             if (dec.sgn) {
                 pw = wbuff - 5;
 
-                if (isupper(format.conversion_char)) {
+                if (iswupper(format.conversion_char)) {
                     wcscpy(pw, L"-NAN");
                 } else {
                     wcscpy(pw, L"-nan");
                 }
             } else {
                 pw = wbuff - 4;
-                if (isupper(format.conversion_char)) {
+                if (iswupper(format.conversion_char)) {
                     wcscpy(pw, L"NAN");
                 } else {
                     wcscpy(pw, L"nan");
@@ -1028,7 +1029,6 @@ wchar_t *float2str(long double num, wchar_t *wbuff, print_format format) {
     return pw;
 }
 
-// non-matching: https://decomp.me/scratch/bV2T9
 int __wpformatter(void *(*WriteProc)(void *, const wchar_t *, size_t), void *WriteProcArg, const wchar_t *format_str,
                   va_list arg) {
     int num_chars, chars_written, field_width;

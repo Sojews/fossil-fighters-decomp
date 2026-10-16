@@ -361,3 +361,8 @@ libs/msl/src/extras.c:
 
 libs/msl/src/wprintf.c:
     .text       start:0x020811ec end:0x02082878
+    .exceptix   start:0x02088630 end:0x02088690
+
+libs/msl/src/printf.c:
+    .text       start:0x0207da28 end:0x0207f194
+    .exceptix   start:0x02088534 end:0x020885ac

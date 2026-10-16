@@ -6197,7 +6197,7 @@ labs kind:function(thumb,size=0x8) addr:0x0207d534
 __convert_from_newlines kind:function(thumb,size=0x2) addr:0x0207d53c
 __prep_buffer kind:function(thumb,size=0x18) addr:0x0207d540
 __flush_buffer kind:function(thumb,size=0x4e) addr:0x0207d558
-func_0207d5a8 kind:function(thumb,size=0x1b0) addr:0x0207d5a8
+fwrite kind:function(thumb,size=0x1b0) addr:0x0207d5a8
 fflush kind:function(thumb,size=0x8a) addr:0x0207d758
 mbtowc kind:function(thumb,size=0x10) addr:0x0207d7e4
 __mbtowc_noconv kind:function(thumb,size=0x26) addr:0x0207d7f4
@@ -6212,18 +6212,18 @@ memchr kind:function(thumb,size=0x1c) addr:0x0207d944
 __memrchr kind:function(thumb,size=0x1a) addr:0x0207d960
 memcmp kind:function(thumb,size=0x36) addr:0x0207d97c
 __fill_mem kind:function(thumb,size=0x72) addr:0x0207d9b4
-func_0207da28 kind:function(thumb,size=0x3a2) addr:0x0207da28
-func_0207ddcc kind:function(thumb,size=0x1ac) addr:0x0207ddcc
-func_0207df78 kind:function(thumb,size=0x214) addr:0x0207df78
-func_0207e18c kind:function(thumb,size=0x338) addr:0x0207e18c
-func_0207e4c4 kind:function(thumb,size=0xb6) addr:0x0207e4c4
-func_0207e57c kind:function(thumb,size=0x4e8) addr:0x0207e57c
-func_0207ea64 kind:function(thumb,size=0x5e0) addr:0x0207ea64
-func_0207f044 kind:function(thumb,size=0x1a) addr:0x0207f044
-func_0207f060 kind:function(thumb,size=0x26) addr:0x0207f060
+parse_format kind:function(thumb,size=0x3a2) addr:0x0207da28 local
+long2str kind:function(thumb,size=0x1ac) addr:0x0207ddcc local
+longlong2str kind:function(thumb,size=0x214) addr:0x0207df78 local
+double2hex kind:function(thumb,size=0x338) addr:0x0207e18c local
+round_decimal kind:function(thumb,size=0xb6) addr:0x0207e4c4 local
+float2str kind:function(thumb,size=0x4e8) addr:0x0207e57c local
+__pformatter kind:function(thumb,size=0x5e0) addr:0x0207ea64
+__FileWrite kind:function(thumb,size=0x1a) addr:0x0207f044
+__StringWrite kind:function(thumb,size=0x26) addr:0x0207f060
 printf kind:function(thumb,size=0xb0) addr:0x0207f088
-func_0207f138 kind:function(thumb,size=0x3c) addr:0x0207f138
-func_0207f174 kind:function(thumb,size=0x1e) addr:0x0207f174
+vsnprintf kind:function(thumb,size=0x3c) addr:0x0207f138
+sprintf kind:function(thumb,size=0x1e) addr:0x0207f174
 func_0207f194 kind:function(thumb,size=0x28) addr:0x0207f194
 func_0207f1bc kind:function(thumb,size=0x336) addr:0x0207f1bc
 func_0207f4f4 kind:function(thumb,size=0x84e) addr:0x0207f4f4
@@ -6251,12 +6251,12 @@ func_020811a0 kind:function(thumb,size=0xc) addr:0x020811a0
 func_020811ac kind:function(thumb,size=0xc) addr:0x020811ac
 func_020811b8 kind:function(thumb,size=0x14) addr:0x020811b8
 func_020811cc kind:function(thumb,size=0x1e) addr:0x020811cc
-parse_format kind:function(thumb,size=0x394) addr:0x020811ec
-long2str kind:function(thumb,size=0x1b0) addr:0x02081580
-longlong2str kind:function(thumb,size=0x218) addr:0x02081730
-double2hex kind:function(thumb,size=0x29c) addr:0x02081948
-round_decimal kind:function(thumb,size=0xb6) addr:0x02081be4
-float2str kind:function(thumb,size=0x484) addr:0x02081c9c
+parse_format kind:function(thumb,size=0x394) addr:0x020811ec local
+long2str kind:function(thumb,size=0x1b0) addr:0x02081580 local
+longlong2str kind:function(thumb,size=0x218) addr:0x02081730 local
+double2hex kind:function(thumb,size=0x29c) addr:0x02081948 local
+round_decimal kind:function(thumb,size=0xb6) addr:0x02081be4 local
+float2str kind:function(thumb,size=0x484) addr:0x02081c9c local
 __wpformatter kind:function(thumb,size=0x6d4) addr:0x02082120
 __wStringWrite kind:function(thumb,size=0x26) addr:0x020827f4
 swprintf kind:function(thumb,size=0x1a) addr:0x0208281c
@@ -12782,8 +12782,7 @@ data_020c58c0 kind:data(any) addr:0x020c58c0
 data_020c58fc kind:data(any) addr:0x020c58fc
 data_020c5940 kind:data(any) addr:0x020c5940
 data_020c5944 kind:data(any) addr:0x020c5944
-data_020c5948 kind:data(any) addr:0x020c5948
-data_020c5994 kind:data(any) addr:0x020c5994
+__files kind:data(any) addr:0x020c5948
 data_020c5a2c kind:data(any) addr:0x020c5a2c
 __float_nan kind:data(any) addr:0x020c5a30
 data_020c5a34 kind:data(any) addr:0x020c5a34
@@ -13145,10 +13144,9 @@ data_02154f0c kind:bss addr:0x02154f0c
 data_02154f28 kind:bss addr:0x02154f28
 data_02155330 kind:bss addr:0x02155330
 data_02155340 kind:bss addr:0x02155340
-data_02155440 kind:bss addr:0x02155440
-data_02155464 kind:bss addr:0x02155464
-data_02155488 kind:bss addr:0x02155488
-data_021554d0 kind:bss addr:0x021554d0
+__cs_id kind:bss addr:0x02155440
+__cs_ref kind:bss addr:0x02155464
+__cs kind:bss addr:0x02155488
 data_02155530 kind:bss addr:0x02155530
 data_02155560 kind:bss addr:0x02155560
 data_02155660 kind:bss addr:0x02155660

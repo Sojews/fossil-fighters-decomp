@@ -36,8 +36,21 @@ def game_symbols():
         for line in (cdir / "symbols.txt").read_text().splitlines():
             m = re.match(r"^(\S+) kind:function\((\w+),size=(0x[0-9a-f]+)\) addr:(0x[0-9a-f]+)", line)
             if m:
-                syms[m.group(1)] = (mod, binp, base, int(m.group(4), 16), int(m.group(3), 16), m.group(2) == "thumb")
+                syms.setdefault(m.group(1), []).append(
+                    (mod, binp, base, int(m.group(4), 16), int(m.group(3), 16), m.group(2) == "thumb"))
     return syms
+
+
+def unit_ranges(src: Path) -> list[tuple[int, int]]:
+    """The address ranges the source file's entries in the delinks files cover."""
+    rel = str(src.relative_to(ROOT))
+    out = []
+    for path in CFG.rglob("delinks.txt"):
+        text = path.read_text()
+        m = re.search(rf"^{re.escape(rel)}:\n((?:    .*\n?)*)", text, re.M)
+        if m:
+            out += [(int(a, 16), int(b, 16)) for a, b in re.findall(r"start:(0x[0-9a-f]+) end:(0x[0-9a-f]+)", m.group(1))]
+    return out
 
 
 def compile_c(src: Path, out_dir: Path) -> Path:
@@ -101,6 +114,7 @@ def main() -> None:
     src = Path(sys.argv[1]).resolve()
     only = set(sys.argv[2:])
     syms = game_symbols()
+    ranges = unit_ranges(src)
     with tempfile.TemporaryDirectory() as tmp:
         secs, names, osyms, rels, data = read_elf(compile_c(src, Path(tmp)))
         ok = total = 0
@@ -111,7 +125,10 @@ def main() -> None:
             if name not in syms:
                 print(f"?? {name}: no game function with this name in symbols.txt")
                 continue
-            mod, binp, base, addr, gsize, thumb = syms[name]
+            # (Static functions can share a name with another file's; take the one in this file's ranges.)
+            cands = syms[name]
+            inside = [c for c in cands if any(lo <= c[3] < hi for lo, hi in ranges)]
+            mod, binp, base, addr, gsize, thumb = (inside or cands)[0]
             ours = data(secs[shndx])[val:val + size]
             theirs = binp.read_bytes()[addr - base:addr - base + gsize]
             mask = bytearray(b"\xff" * size)

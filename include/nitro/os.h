@@ -28,10 +28,16 @@ struct OSMutex {
     OSMutexLink link;
 };
 
-// The SDK's thread structure; only its size matters to the game code, which embeds threads in its objects.
+// The SDK's thread structure; the game code only embeds threads in its objects and reads their ids.
 struct OSThread {
-    u8 opaque[0xC0];
+    u8 unk0[0x6C];
+    u32 id;         // 0x6C
+    u8 unk70[0x50];
 };
+
+static inline u32 OS_GetThreadId(const OSThread *thread) {
+    return thread->id;
+}
 
 typedef void (*OSThreadFunc)(void *arg);
 
@@ -83,6 +89,7 @@ u32 OS_EnableIrqMask(u32 mask);
 
 void OS_InitMutex(OSMutex *mutex);
 void OS_LockMutex(OSMutex *mutex);
+BOOL OS_TryLockMutex(OSMutex *mutex);
 void OS_UnlockMutex(OSMutex *mutex);
 void OS_Terminate(void);
 void OS_ResetSystem(u32 parameter);
