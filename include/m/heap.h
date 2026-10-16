@@ -56,7 +56,7 @@ public:
     u32 AllocAddr(u32 size, BOOL fromEnd, u32 align, u32 boundary, u32 boundaryCount, u32 limit);
     void Free(MHeapBlock *block);
     MHeapIterator GetUsedBlocks();
-    BOOL Contains(MHeapBlock *block);
+    BOOL IsFallback(MHeapBlock *block);    // allocated from main memory, not the range
     void Walk();
 
     MHeapBlock *mFree;      // 0x0C: sorted by address

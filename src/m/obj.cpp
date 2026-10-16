@@ -1,8 +1,13 @@
-// MOam, MAfn and MObj.
+// MChr, MOam, MAfn and MObj.
 
+#include <algorithm>
 #include "m/obj.h"
 #include "m/display.h"
+#include "m/looper.h"
 #include "m/transfer.h"
+
+static const u32 sChrShifts[2] = {5, 6};
+static const u32 sChrUnitSizes[2] = {32, 64};
 
 MPoint gObjTileSizes[4][4] = {
     {MPoint(1, 1), MPoint(2, 1), MPoint(1, 2), MPoint()},
@@ -17,6 +22,110 @@ MPoint gObjSizes[4][4] = {
     {MPoint(32, 32), MPoint(32, 16), MPoint(16, 32), MPoint(0, 0)},
     {MPoint(64, 64), MPoint(64, 32), MPoint(32, 64), MPoint(0, 0)},
 };
+
+MTask *MChrBlock::CreateLoadTask(const void *src, u32 start, u32 count, int palette) {
+    count = std::min(unitSize == 32 ? size >> 5 : size >> 6, count);
+    u32 bytes = count * unitSize;
+    if (unitSize == 32) {
+        return new MSimpleTransfer(src, (void *)(addr + start * unitSize), bytes, FALSE);
+    }
+    return new MChr256Transfer(src, (void *)(addr + start * unitSize), bytes, palette);
+}
+
+void MChrBlock::Load(const void *src, u32 start, u32 count, int palette) {
+    gLooper->AddTransferTask(CreateLoadTask(src, start, count, palette));
+}
+
+// NONMATCHING: the unit size is kept in a register in the 16-color path instead of reloaded.
+void MChrBlock::Load(MFileRef *file, u32 offset, u32 start, u32 unused, u32 count, int palette) {
+    u32 bytes = std::min(size - start * unitSize, count * unitSize);
+    offset *= unitSize;
+    if (unitSize == 32) {
+        file->archive->Read(file->index, offset, (void *)(addr + start * unitSize), bytes, NULL);
+    } else {
+        file->archive->Read(file->index, offset, (void *)(addr + start * unitSize), bytes,
+                            new MChr256Filter(palette));
+    }
+}
+
+MTask *MChrBlock::CreateFillTask(int color, u32 start, u32 count) {
+    u32 bytes = std::min(size - start * unitSize, count * unitSize);
+    if (unitSize == 32) {
+        return new MSimpleFill(color * 0x11111111, (void *)(addr + start * unitSize), bytes);
+    }
+    return new MSimpleFill(color * 0x01010101, (void *)(addr + start * unitSize), bytes);
+}
+
+void MChrBlock::Fill(int color, u32 start, u32 count) {
+    gLooper->AddTransferTask(CreateFillTask(color, start, count));
+}
+
+u32 MChr::GetVramSize(int mode, u32 units) {
+    return sChrUnitSizes[mode] * units;
+}
+
+MChr::MChr(MDisplay *display, int charBase, u32 unk44, u32 base, int mode, u32 units, int boundary)
+    : MHeap(base, sChrUnitSizes[mode] * units, sizeof(MChrBlock)) {
+    mDisplay = display;
+    mMode = mode;
+    mCharBase = charBase;
+    mUnk44 = unk44;
+    mBoundary = boundary;
+}
+
+MChrBlock *MChr::Alloc(u32 count, BOOL fromEnd) {
+    return Alloc(mMode, count, fromEnd);
+}
+
+MChrBlock *MChr::Alloc(int mode, u32 count, BOOL fromEnd) {
+    MScopedLock lock(&mMutex, TRUE);
+    u32 unit = sChrUnitSizes[mode];
+    MChrBlock *block = (MChrBlock *)MHeap::Alloc(count * unit, fromEnd, mBoundary * unit, 0, 0, 0);
+    block->unitSize = unit;
+    block->key = NULL;
+    block->refCount = 1;
+    if (!IsFallback(block)) {
+        block->index = (int)(block->addr - mUnk44) >> sChrShifts[mode];
+        block->tile = block->index / mBoundary;
+    } else {
+        block->index = (int)(mBase - mUnk44) >> sChrShifts[mode];
+        block->tile = block->index / mBoundary;
+    }
+    return block;
+}
+
+MChrBlock *MChr::AllocShared(const void *data, u32 count, int palette, BOOL fromEnd) {
+    return AllocShared(mMode, data, count, palette, fromEnd);
+}
+
+// Returns the block already holding data, or allocates one and loads data into it.
+MChrBlock *MChr::AllocShared(int mode, const void *data, u32 count, int palette, BOOL fromEnd) {
+    MScopedLock lock(&mMutex, TRUE);
+    for (MHeapIterator it = GetUsedBlocks(); it.block != NULL; it.block = it.block->next) {
+        MChrBlock *block = (MChrBlock *)it.block;
+        if (block->key == data) {
+            block->refCount++;
+            return block;
+        }
+    }
+    MChrBlock *block = Alloc(mode, count, fromEnd);
+    block->key = data;
+    block->Load(data, 0, 0x7FFF, palette);
+    return block;
+}
+
+void MChr::FreeShared(MChrBlock *block) {
+    MScopedLock lock(&mMutex, TRUE);
+    if (--block->refCount != 0) {
+        return;
+    }
+    MHeap::Free(block);
+}
+
+// NONMATCHING: register allocation (as in MChr256Transfer::Transfer).
+void MChr256Filter::Filter(const void *src, void *dest, u32 size) {
+    MAddPaletteOffset((const u16 *)src, (u16 *)dest, size, mPalette);
+}
 
 void MOamEntry::SetPalette(MPalBlock *pal) {
     palette = pal->index;

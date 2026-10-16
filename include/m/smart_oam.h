@@ -10,14 +10,6 @@ class MDisplay;
 class MSmartOam;
 struct MSmartOamBlock;
 
-// An allocated run of OBJ character memory.
-struct MChrBlock : public MHeapBlock {
-    u32 unk0C;
-    u32 unk10;
-    u32 unk14;
-    u32 tile;   // 0x18: the first tile number
-};
-
 struct MSmartOamEntry {
     MSmartOamEntry();
 

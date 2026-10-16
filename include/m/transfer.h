@@ -53,6 +53,12 @@ inline void MFill(u32 value, void *dest, u32 size) {
 
 class MSimpleTransfer : public MTransfer {
 public:
+    MSimpleTransfer(const void *src, void *dest, u32 size, BOOL freeSrc) {
+        mSrc = src;
+        mDest = dest;
+        mSize = size;
+        mFreeSrc = freeSrc;
+    }
     virtual ~MSimpleTransfer() {}
     virtual void Transfer();
 
@@ -64,6 +70,11 @@ public:
 
 class MSimpleFill : public MTransfer {
 public:
+    MSimpleFill(u32 value, void *dest, u32 size) {
+        mValue = value;
+        mDest = dest;
+        mSize = size;
+    }
     virtual ~MSimpleFill() {}
     virtual void Transfer();
 

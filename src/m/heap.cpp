@@ -215,7 +215,7 @@ MHeapIterator MHeap::GetUsedBlocks() {
     return MHeapIterator(mUsed);
 }
 
-BOOL MHeap::Contains(MHeapBlock *block) {
+BOOL MHeap::IsFallback(MHeapBlock *block) {
     if (mBase <= block->addr && block->addr < mBase + mSize) {
         return FALSE;
     }

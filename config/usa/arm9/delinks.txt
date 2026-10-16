@@ -229,14 +229,11 @@ src/m/smart_text.cpp:
 src/m/smart_oam.cpp:
     .text       start:0x0205b5b8 end:0x0205bc1c
 
-src/m/chr256_filter.cpp:
-    .text       start:0x0205c074 end:0x0205c090
-
 src/m/obj.cpp:
-    .text       start:0x0205c090 end:0x0205c498
+    .text       start:0x0205bc1c end:0x0205c498
 
 src/m/chr16_fill.cpp:
-    .text       start:0x0205c71c end:0x0205c73c
+    .text       start:0x0205c498 end:0x0205c73c
 
 src/m/chr16_bin_font_transfer.cpp:
     .text       start:0x0205ea70 end:0x0205ea90
