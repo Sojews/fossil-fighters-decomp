@@ -8,6 +8,8 @@
 #include "nitro/os.h"
 #include "nitro/section.h"
 
+class MDisplay;
+
 // Locks a mutex for the rest of the scope, if asked to.
 class MScopedLock {
 public:
@@ -171,32 +173,33 @@ public:
 };
 
 // A task with its own serial and parallel task sets. When the serial set is empty, Idle() is called to refill it.
+// Each process belongs to a display (screen), which is made current while it runs.
 class MProcess : public MTask {
 public:
-    MProcess(void *context);
+    MProcess(MDisplay *display);
     virtual void Execute();
     virtual void Idle() = 0;
 
-    void SetContext(void *context);
-    void *GetContext();
+    void SetDisplay(MDisplay *display);
+    MDisplay *GetDisplay();
 
     MSerialTaskSet mSerial;     // 0x10
     MParallelTaskSet mParallel; // 0x40
-    void *mContext;             // 0x70: made current while the process runs; new processes inherit the current one
+    MDisplay *mDisplay;         // 0x70: made current while the process runs; new processes default to the current one
 };
 
-extern void *gCurrentContext;
+extern MDisplay *gCurrentDisplay;
 
-// Makes a context current for the rest of the scope.
-class MContextScope {
+// Makes a display current for the rest of the scope.
+class MDisplayScope {
 public:
-    MContextScope(void *context) {
-        mSaved = gCurrentContext;
-        gCurrentContext = context;
+    MDisplayScope(MDisplay *display) {
+        mSaved = gCurrentDisplay;
+        gCurrentDisplay = display;
     }
-    ~MContextScope() { gCurrentContext = mSaved; }
+    ~MDisplayScope() { gCurrentDisplay = mSaved; }
 
-    void *mSaved;
+    MDisplay *mSaved;
 };
 
 #endif

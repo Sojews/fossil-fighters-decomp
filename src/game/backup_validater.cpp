@@ -4,10 +4,10 @@
 #include "game/backup_validater.h"
 #include "game/common_window_message.h"
 #include "game/help.h"
+#include "m/lcd.h"
 
 extern "C" {
 extern void *data_020cc00c;
-extern void *data_0214d1b8;
 extern void *data_020cb978;
 extern const int data_0208ad0c;
 extern const int data_0208ad08;
@@ -16,7 +16,6 @@ MTask *func_02069ed8(void *arg);
 void func_02050a3c(void);
 void func_02050ba8(void);
 void func_0201ffe8(void);
-void *func_0204c084(void *mgr);
 void func_0205d134(void *arg);
 const char *func_02011dc8(void *table, int id);
 }
@@ -44,8 +43,8 @@ void DinoBackupValidater::Idle() {
         func_02050ba8();
         func_0201ffe8();
         new DinoHelpDisabler();
-        func_0205d134(*(void **)((u8 *)func_0204c084(data_0214d1b8) + 0x24));
-        MTask *window = new DinoCommonWindowMessage(func_0204c084(data_0214d1b8), MPoint(0x80, 0x60),
+        func_0205d134(gLcd->GetBottomDisplay()->mUnk24);
+        MTask *window = new DinoCommonWindowMessage(gLcd->GetBottomDisplay(), MPoint(0x80, 0x60),
                                                     func_02011dc8(data_020cb978, mMessageId), 4, 0);
         mSerial.AddTail(window);
     }

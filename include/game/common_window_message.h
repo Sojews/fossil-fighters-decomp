@@ -8,7 +8,7 @@
 // A message window process.
 class DinoCommonWindowMessage : public MProcess {
 public:
-    DinoCommonWindowMessage(void *context, MPoint pos, const std::string &text, int arg3, int arg4);
+    DinoCommonWindowMessage(MDisplay *display, MPoint pos, const std::string &text, int arg3, int arg4);
     virtual ~DinoCommonWindowMessage();
     virtual void Idle();
 

@@ -2,7 +2,7 @@
 
 #include "m/task.h"
 
-void *gCurrentContext;
+MDisplay *gCurrentDisplay;
 
 MTask *MTaskRunTransfer::Create(MTask *task) {
     return new MTaskRunTransfer(task);
@@ -84,13 +84,13 @@ void MTaskSet::Clear() {
 void MTaskSet::Execute() {
 }
 
-MProcess::MProcess(void *context) {
+MProcess::MProcess(MDisplay *display) {
     mSerial.mUnkC = TRUE;
     mParallel.mUnkC = TRUE;
-    if (context == NULL) {
-        context = gCurrentContext;
+    if (display == NULL) {
+        display = gCurrentDisplay;
     }
-    mContext = context;
+    mDisplay = display;
 }
 
 // The per-frame task loops run from ITCM, as ARM code.
@@ -149,7 +149,7 @@ void MParallelTaskSet::Execute() {
 }
 
 void MProcess::Execute() {
-    MContextScope scope(mContext);
+    MDisplayScope scope(mDisplay);
 
     if (mSerial.IsEmpty()) {
         Idle();
@@ -165,13 +165,13 @@ void MProcess::Execute() {
 #pragma thumb on
 #pragma section ITCM end
 
-void MProcess::SetContext(void *context) {
-    mContext = context;
-    gCurrentContext = context;
+void MProcess::SetDisplay(MDisplay *display) {
+    mDisplay = display;
+    gCurrentDisplay = display;
 }
 
-void *MProcess::GetContext() {
-    return mContext;
+MDisplay *MProcess::GetDisplay() {
+    return mDisplay;
 }
 
 void MTaskSetMakeEmptyTask::Transfer() {
