@@ -1,0 +1,297 @@
+#ifndef _STD_LIST
+#define _STD_LIST
+
+// A doubly linked list with a sentinel node, laid out as the game's MSL has it: the size, then the sentinel's
+// previous and next links. Lists of pointers share the list<void *> code, as vectors of pointers do.
+
+#include <memory>
+#include <iterator>
+#include <compressed_pair.hpp>
+
+namespace std {
+    template <class T, class Allocator = allocator<T> > class list;
+
+    template <class T, class Allocator> class __list_imp {
+    protected:
+        struct node_base {
+            node_base *prev_;
+            node_base *next_;
+        };
+        struct node : public node_base {
+            T data_;
+        };
+        typedef typename Allocator::template rebind<node>::other node_allocator;
+
+        // Frees a node that was allocated but not yet linked in.
+        class node_holder {
+        public:
+            node_holder(node *p) : ptr_(p) {}
+            ~node_holder() {
+                if (ptr_ != 0) {
+                    ::operator delete(ptr_);
+                }
+            }
+            void release() {
+                ptr_ = 0;
+            }
+
+            node *ptr_;
+        };
+
+    public:
+        typedef T value_type;
+        typedef size_t size_type;
+        typedef T &reference;
+        typedef const T &const_reference;
+
+        class iterator {
+        public:
+            typedef bidirectional_iterator_tag iterator_category;
+            typedef T value_type;
+            typedef ptrdiff_t difference_type;
+            typedef T *pointer;
+            typedef T &reference;
+
+            iterator() {}
+            explicit iterator(node_base *n) : node_(n) {}
+            iterator(const iterator &x) : node_(x.node_) {}
+            T &operator*() const {
+                return static_cast<node *>(node_)->data_;
+            }
+            T *operator->() const {
+                return &static_cast<node *>(node_)->data_;
+            }
+            iterator &operator++() {
+                node_ = node_->next_;
+                return *this;
+            }
+            iterator operator++(int) {
+                iterator tmp = *this;
+                node_ = node_->next_;
+                return tmp;
+            }
+            iterator &operator--() {
+                node_ = node_->prev_;
+                return *this;
+            }
+            iterator operator--(int) {
+                iterator tmp = *this;
+                node_ = node_->prev_;
+                return tmp;
+            }
+            bool operator==(const iterator &x) const {
+                return node_ == x.node_;
+            }
+            bool operator!=(const iterator &x) const {
+                return node_ != x.node_;
+            }
+
+            node_base *node_;
+        };
+
+        // mwcc never inlines a template base class's constructor or destructor, so the most-derived class calls
+        // these.
+        void init() {
+            size_ = 0;
+            init_tail();
+        }
+        void init_tail() {
+            node_base *t = &tail_;
+            t->next_ = t;
+            tail_.prev_ = t;
+        }
+
+        iterator begin() {
+            return iterator(tail().next_);
+        }
+        iterator end() {
+            return iterator(&tail());
+        }
+        size_type size() const {
+            return size_;
+        }
+        bool empty() const {
+            return size_ == 0;
+        }
+        reference front() {
+            return *begin();
+        }
+        reference back() {
+            return *--end();
+        }
+
+        iterator insert(iterator pos, const T &x);
+        iterator erase(iterator pos);
+        iterator erase(iterator first, iterator last);
+        void clear() {
+            erase(begin(), end());
+        }
+        void push_back(const T &x) {
+            insert(end(), x);
+        }
+        void push_front(const T &x) {
+            insert(begin(), x);
+        }
+        void pop_front() {
+            erase(begin());
+        }
+        void pop_back() {
+            erase(--end());
+        }
+
+    protected:
+        node_base &tail() {
+            return tail_;
+        }
+        // (MSL keeps the empty allocator in a compressed pair with the sentinel; mwcc won't inline the
+        // constructors that needs, so nodes are allocated the way the allocator does it.)
+        static node *allocate_node() {
+            node *p = static_cast<node *>(::operator new(sizeof(node)));
+            if (p == 0) {
+                printf("Memory allocation failure");
+                abort();
+            }
+            return p;
+        }
+        static void deallocate_node(node_base *p) {
+            ::operator delete(p);
+        }
+
+        size_type size_;    // 0x0
+        node_base tail_;    // 0x4: the sentinel
+    };
+
+    template <class T, class Allocator>
+    typename __list_imp<T, Allocator>::iterator __list_imp<T, Allocator>::insert(iterator pos, const T &x) {
+        node *n = allocate_node();
+        node_holder h(n);
+        allocator<T>().construct(&n->data_, x);
+        h.release();
+        node_base *p = pos.node_;
+        p->prev_->next_ = n;
+        n->prev_ = p->prev_;
+        p->prev_ = n;
+        n->next_ = p;
+        ++size_;
+        return iterator(n);
+    }
+
+    template <class T, class Allocator>
+    typename __list_imp<T, Allocator>::iterator __list_imp<T, Allocator>::erase(iterator pos) {
+        node_base *n = pos.node_;
+        pos.node_ = n->next_;
+        n->prev_->next_ = n->next_;
+        n->next_->prev_ = n->prev_;
+        deallocate_node(n);
+        --size_;
+        return pos;
+    }
+
+    template <class T, class Allocator>
+    typename __list_imp<T, Allocator>::iterator __list_imp<T, Allocator>::erase(iterator first, iterator last) {
+        if (first == last) {
+            return last;
+        }
+        node_base *f = first.node_;
+        node_base *lastPrev = last.node_->prev_;
+        f->prev_->next_ = lastPrev->next_;
+        lastPrev->next_->prev_ = f->prev_;
+        while (first != last) {
+            node_base *n = first.node_;
+            first.node_ = n->next_;
+            deallocate_node(n);
+            --size_;
+        }
+        return last;
+    }
+
+    template <class T, class Allocator> class list : public __list_imp<T, Allocator> {
+    public:
+        list() {
+            this->init();
+        }
+        ~list() {
+            this->clear();
+        }
+    };
+
+    // Lists of pointers share the list<void *> code.
+    template <class T, class Allocator> class list<T *, Allocator> : public __list_imp<void *, allocator<void *> > {
+    protected:
+        typedef __list_imp<void *, allocator<void *> > _Base;
+
+    public:
+        class iterator {
+        public:
+            typedef bidirectional_iterator_tag iterator_category;
+            typedef T *value_type;
+            typedef ptrdiff_t difference_type;
+            typedef T **pointer;
+            typedef T *&reference;
+
+            iterator() {}
+            iterator(const _Base::iterator &it) : it_(it) {}
+            T *&operator*() const {
+                return (T *&) *it_;
+            }
+            iterator &operator++() {
+                ++it_;
+                return *this;
+            }
+            iterator operator++(int) {
+                iterator tmp = *this;
+                ++it_;
+                return tmp;
+            }
+            iterator &operator--() {
+                --it_;
+                return *this;
+            }
+            bool operator==(const iterator &x) const {
+                return it_ == x.it_;
+            }
+            bool operator!=(const iterator &x) const {
+                return it_ != x.it_;
+            }
+
+            _Base::iterator it_;
+        };
+
+        list() {
+            this->init();
+        }
+        ~list() {
+            this->clear();
+        }
+
+        iterator begin() {
+            return iterator(_Base::begin());
+        }
+        iterator end() {
+            return iterator(_Base::end());
+        }
+        T *&front() {
+            return (T *&) _Base::front();
+        }
+        T *&back() {
+            return (T *&) _Base::back();
+        }
+        iterator insert(iterator pos, T *const &x) {
+            return iterator(_Base::insert(pos.it_, (void *const &) x));
+        }
+        iterator erase(iterator pos) {
+            return iterator(_Base::erase(pos.it_));
+        }
+        iterator erase(iterator first, iterator last) {
+            return iterator(_Base::erase(first.it_, last.it_));
+        }
+        void push_back(T *const &x) {
+            _Base::push_back((void *const &) x);
+        }
+        void push_front(T *const &x) {
+            _Base::push_front((void *const &) x);
+        }
+    };
+} // namespace std
+
+#endif

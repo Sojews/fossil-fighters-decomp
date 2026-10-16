@@ -28,6 +28,17 @@ struct OSMutex {
     OSMutexLink link;
 };
 
+// The SDK's thread structure; only its size matters to the game code, which embeds threads in its objects.
+struct OSThread {
+    u8 opaque[0xC0];
+};
+
+typedef void (*OSThreadFunc)(void *arg);
+
+static inline void OS_InitThreadQueue(OSThreadQueue *queue) {
+    queue->head = queue->tail = NULL;
+}
+
 typedef struct OSThreadInfo {
     u16 isNeedRescheduling;
     u16 irqDepth;
@@ -42,6 +53,12 @@ static inline OSThread *OS_GetCurrentThread(void) {
     return OSi_ThreadInfo.current;
 }
 
+void OS_CreateThread(OSThread *thread, OSThreadFunc func, void *arg, void *stack, u32 stackSize, u32 prio);
+void OS_SetThreadStackWarningOffset(OSThread *thread, u32 offset);
+void OS_SleepThreadDirect(OSThread *thread, OSThreadQueue *queue);
+void OS_SleepThread(OSThreadQueue *queue);
+void OS_WakeupThread(OSThreadQueue *queue);
+void OS_WakeupThreadDirect(OSThread *thread);
 u32 OS_GetThreadPriority(const OSThread *thread);
 BOOL OS_SetThreadPriority(OSThread *thread, u32 prio);
 

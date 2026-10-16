@@ -292,6 +292,9 @@ src/m/canvas_copy_transfer.cpp:
 src/m/menu.cpp:
     .text       start:0x0206665c end:0x02067988
 
+src/m/bg_task.cpp:
+    .text       start:0x02067988 end:0x02067d40
+
 src/m/raster_trigger.cpp:
     .text       start:0x02068fc0 end:0x02068fdc
 
