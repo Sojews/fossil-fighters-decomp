@@ -8,6 +8,12 @@ namespace std {
         static const typename Pair::first_type &get(const Pair &p) {
             return p.first;
         }
+        template <class Compare> static bool less(Compare &c, const Pair &p, const typename Pair::first_type &k) {
+            return c(p.first, k);
+        }
+        template <class Compare> static bool less(Compare &c, const typename Pair::first_type &k, const Pair &p) {
+            return c(k, p.first);
+        }
     };
 
     template <class Key, class T, class Compare = less<Key>, class Allocator = allocator<pair<const Key, T> > >
@@ -28,6 +34,58 @@ namespace std {
             return this->insert_equal(v);
         }
     };
+    template <class Key, class T, class Compare = less<Key>, class Allocator = allocator<pair<const Key, T> > >
+    class map
+        : public __red_black_tree<Key, pair<const Key, T>, __select_first<pair<const Key, T> >, Compare, Allocator> {
+        typedef __red_black_tree<Key, pair<const Key, T>, __select_first<pair<const Key, T> >, Compare, Allocator>
+            _Tree;
+        typedef typename _Tree::node node;
+        typedef typename _Tree::node_base node_base;
+
+    public:
+        typedef typename _Tree::iterator iterator;
+        typedef pair<const Key, T> value_type;
+        typedef typename _Tree::size_type size_type;
+
+        map() {
+            this->init();
+        }
+        ~map() {}
+
+        // The element with key k, added (with T()) if there isn't one.
+        value_type &find_or_insert(const Key &k);
+        T &operator[](const Key &k) {
+            return find_or_insert(k).second;
+        }
+        size_type erase(const Key &k);
+        iterator erase(iterator it) {
+            return _Tree::erase(it);
+        }
+    };
+
+    template <class Key, class T, class Compare, class Allocator>
+    typename map<Key, T, Compare, Allocator>::size_type map<Key, T, Compare, Allocator>::erase(const Key &k) {
+        iterator it = this->find(k);
+        if (it == this->end()) {
+            return 0;
+        }
+        erase(it);
+        return 1;
+    }
+
+    template <class Key, class T, class Compare, class Allocator>
+    typename map<Key, T, Compare, Allocator>::value_type &map<Key, T, Compare, Allocator>::find_or_insert(const Key &k) {
+        node_base *last_not_greater;
+        bool left;
+        bool leftmost;
+        node_base *p = this->find_insert_position(k, last_not_greater, left, leftmost);
+        if (last_not_greater == 0 ||
+            __select_first<value_type>::less(static_cast<Compare &>(*this),
+                                             static_cast<node *>(last_not_greater)->data_, k)) {
+            return static_cast<node *>(this->insert_node_at(p, left, leftmost, value_type(k, T())))->data_;
+        }
+        return static_cast<node *>(last_not_greater)->data_;
+    }
 } // namespace std
 
 #endif

@@ -1,10 +1,24 @@
-// MArchive and MArchivePtr. Not decompiled yet: the parts that use the table of open archives (a std::map),
-// and Read.
+// MArchive and MArchivePtr. Not decompiled yet: Read.
 
+#include <map>
 #include "m/archive.h"
 #include "m/file.h"
+#include "m/heap.h"
 #include "m/irq.h"
 #include "m/task.h"
+
+// Read's buffers for compressed and filtered files, and whether they're in use.
+static bool sReadBuffersBusy;
+static u8 *sReadBuffer;
+static u8 *sReadBuffer2;
+// The open archives, by file.
+static std::map<FSFileID, MArchive *> sArchives;
+static OSMutex sArchivesMutex;
+
+void MInitArchive() {
+    sReadBuffer = new u8[0x2004];
+    sReadBuffer2 = new u8[0x2004];
+}
 
 MArchive::MArchive(FSFileID id) : mId(id) {
     MFile file(mId);
@@ -25,9 +39,47 @@ MArchive::~MArchive() {
     delete[] mLocks;
 }
 
+MArchive *MArchive::Open(std::string path) {
+    FSFileID id;
+    if (!MGetFileID(path, &id)) {
+        OS_Terminate();
+    }
+    return Get(id);
+}
+
+MArchive *MArchive::Get(FSFileID id) {
+    MScopedLock lock(&sArchivesMutex, TRUE);
+    MArchive *archive;
+    std::map<FSFileID, MArchive *>::iterator it = sArchives.find(id);
+    if (it != sArchives.end()) {
+        archive = it->second;
+    } else {
+        archive = new MArchive(id);
+        sArchives[id] = archive;
+    }
+    MIrqLock irq;
+    archive->mRefCount++;
+    return archive;
+}
+
 void MArchive::AddRef() {
     MIrqLock lock;
     mRefCount++;
+}
+
+void MArchive::Release() {
+    int refs;
+    {
+        MIrqLock lock;
+        refs = --mRefCount;
+    }
+    if (refs <= 0) {
+        MMutexLock lock(&sArchivesMutex);
+        if (mRefCount == 0) {
+            sArchives.erase(mId);
+            delete this;
+        }
+    }
 }
 
 // Loads the file if it isn't loaded.
@@ -105,13 +157,6 @@ MArchivePtr &MArchivePtr::operator=(const MArchivePtr &other) {
     return *this;
 }
 
-BOOL MArchivePtr::IsValid() {
-    if (mArchive != NULL) {
-        return TRUE;
-    }
-    return FALSE;
-}
-
 MArchiveFile MArchivePtr::GetFile(const char *path, u32 index) const {
     return Open(path).GetFile(index);
 }
@@ -125,4 +170,18 @@ MArchivePtr MArchivePtr::Open(const char *path) const {
         mArchive->mDirectory = file.GetDirectory();
     }
     return MArchivePtr(mArchive->mDirectory + path);
+}
+
+BOOL MArchivePtr::IsValid() {
+    if (mArchive != NULL) {
+        return TRUE;
+    }
+    return FALSE;
+}
+
+// (Walks the open archives; whatever it did with them isn't in this build.)
+void MDumpArchives() {
+    MMutexLock lock(&sArchivesMutex);
+    for (std::map<FSFileID, MArchive *>::iterator it = sArchives.begin(); it != sArchives.end(); ++it) {
+    }
 }

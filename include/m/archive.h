@@ -22,6 +22,10 @@ public:
 
 // A ROM file holding files of its own (a count, then offset and size pairs). Archives are kept open, one per
 // file, while anything refers to them; each file is loaded into memory while it's locked.
+inline bool operator<(const FSFileID &a, const FSFileID &b) {
+    return a.arc < b.arc ? true : a.arc > b.arc ? false : a.file_id < b.file_id;
+}
+
 class MArchive {
 public:
     struct Entry {

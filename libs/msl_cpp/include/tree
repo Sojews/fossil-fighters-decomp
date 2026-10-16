@@ -273,9 +273,11 @@ namespace std {
         }
     };
 
-    // A tree of Value, ordered by the Key that KeyOf::get gets from each.
+    // A tree of Value, ordered by the Key that KeyOf::get gets from each. Comparisons go through KeyOf::less,
+    // which reads the key straight out of the value: comparing what an inline function returned by reference
+    // makes mwcc keep a pointer to the key in a register, which the game's code doesn't.
     template <class Key, class Value, class KeyOf, class Compare, class Allocator>
-    class __red_black_tree : public __red_black_tree_common<true>, private Compare {
+    class __red_black_tree : public __red_black_tree_common<true>, protected Compare {
     protected:
         typedef __red_black_tree_common<true> _Base;
         struct node : public node_base {
@@ -359,6 +361,10 @@ namespace std {
         iterator insert_equal(const Value &v);
         iterator erase(iterator it);
         void destroy(node_base *n);
+        // The first node in x's subtree whose key k doesn't sort after, or y.
+        node_base *lower_bound(const Key &k, node_base *x, node_base *y);
+        iterator find(const Key &k);
+        size_type erase_unique(const Key &k);
 
     protected:
         size_type size_;        // 0x0
@@ -378,7 +384,7 @@ namespace std {
         leftmost = true;
         while (x != 0) {
             p = x;
-            if (Compare::operator()(k, KeyOf::get(static_cast<node *>(x)->data_))) {
+            if (KeyOf::less(static_cast<Compare &>(*this), k, static_cast<node *>(x)->data_)) {
                 x = x->left_;
                 left = true;
             } else {
@@ -444,6 +450,41 @@ namespace std {
         ::operator delete(n);
         --size_;
         return result;
+    }
+
+    template <class Key, class Value, class KeyOf, class Compare, class Allocator>
+    typename __red_black_tree<Key, Value, KeyOf, Compare, Allocator>::node_base *
+    __red_black_tree<Key, Value, KeyOf, Compare, Allocator>::lower_bound(const Key &k, node_base *x, node_base *y) {
+        while (x != 0) {
+            if (!KeyOf::less(static_cast<Compare &>(*this), static_cast<node *>(x)->data_, k)) {
+                y = x;
+                x = x->left_;
+            } else {
+                x = x->right_;
+            }
+        }
+        return y;
+    }
+
+    template <class Key, class Value, class KeyOf, class Compare, class Allocator>
+    typename __red_black_tree<Key, Value, KeyOf, Compare, Allocator>::iterator
+    __red_black_tree<Key, Value, KeyOf, Compare, Allocator>::find(const Key &k) {
+        node_base *j = lower_bound(k, header_.left_, (node_base *) &header_);
+        if (j == (node_base *) &header_ || KeyOf::less(static_cast<Compare &>(*this), k, static_cast<node *>(j)->data_)) {
+            return iterator((node_base *) &header_);
+        }
+        return iterator(j);
+    }
+
+    template <class Key, class Value, class KeyOf, class Compare, class Allocator>
+    typename __red_black_tree<Key, Value, KeyOf, Compare, Allocator>::size_type
+    __red_black_tree<Key, Value, KeyOf, Compare, Allocator>::erase_unique(const Key &k) {
+        iterator it = find(k);
+        if (it == end()) {
+            return 0;
+        }
+        erase(it);
+        return 1;
     }
 
     template <class Key, class Value, class KeyOf, class Compare, class Allocator>
