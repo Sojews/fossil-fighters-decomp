@@ -14,6 +14,10 @@ src/sound/sound_manager.cpp:
     .ctor       start:0x02092fac end:0x02092fb0
     .bss        start:0x020c6220 end:0x020c9950
 
+src/sound/seq_player.cpp:
+    complete
+    .text       start:0x02001c34 end:0x02002218
+
 src/util/text_parse.c:
     complete
     .text       start:0x020213a0 end:0x02021620
