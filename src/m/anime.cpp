@@ -93,6 +93,20 @@ void MValueAnime::Apply(int step) {
     mValue = mFrom + step * mDir;
 }
 
+MFx32ValueAnime::MFx32ValueAnime(MFx32 from, MFx32 to) {
+    mFrom = from;
+    mTo = to;
+    mStepsPerFrame = TRUE;
+}
+
+void MFx32ValueAnime::Apply(int step) {
+    if (step != mSteps - 1) {
+        mValue = mFrom + (mTo - mFrom) * (MFx32(1) * step / (mSteps - 1));
+    } else {
+        mValue = mTo;
+    }
+}
+
 MPointAnime::MPointAnime(MPoint from, MPoint to) {
     mFrom = from;
     mTo = to;
@@ -106,6 +120,22 @@ MPointAnime::MPointAnime(MPoint from, MPoint to) {
 void MPointAnime::Apply(int step) {
     if (step != mSteps - 1) {
         mValue = MPoint(mFrom.x + ((mDeltaX * step) >> 16), mFrom.y + ((mDeltaY * step) >> 16));
+    } else {
+        mValue.x = mTo.x;
+        mValue.y = mTo.y;
+    }
+}
+
+MFx32PointAnime::MFx32PointAnime(MFx32Point from, MFx32Point to) {
+    mFrom = from;
+    mTo = to;
+    mStepsPerFrame = TRUE;
+}
+
+void MFx32PointAnime::Apply(int step) {
+    if (step != mSteps - 1) {
+        mValue.Set(mFrom.x + (mTo.x - mFrom.x) * (MFx32(1) * step / (mSteps - 1)),
+                   mFrom.y + (mTo.y - mFrom.y) * (MFx32(1) * step / (mSteps - 1)));
     } else {
         mValue.x = mTo.x;
         mValue.y = mTo.y;

@@ -5,6 +5,7 @@
 
 #include "m/task.h"
 #include "m/geometry.h"
+#include "m/fx32.h"
 
 class MAnime : public MTask {
 public:
@@ -78,6 +79,28 @@ public:
     MRect mFrom;    // 0x40
     MRect mTo;      // 0x50
     int mDelta[4];  // 0x60: per step, 16.16
+};
+
+class MFx32ValueAnime : public MAnime {
+public:
+    MFx32ValueAnime(MFx32 from, MFx32 to);
+    virtual ~MFx32ValueAnime() {}
+    virtual void Apply(int step);
+
+    MFx32 mValue;   // 0x30
+    MFx32 mFrom;    // 0x34
+    MFx32 mTo;      // 0x38
+};
+
+class MFx32PointAnime : public MAnime {
+public:
+    MFx32PointAnime(MFx32Point from, MFx32Point to);
+    virtual ~MFx32PointAnime() {}
+    virtual void Apply(int step);
+
+    MFx32Point mValue;  // 0x30
+    MFx32Point mFrom;   // 0x38
+    MFx32Point mTo;     // 0x40
 };
 
 #endif
