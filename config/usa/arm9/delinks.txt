@@ -22,6 +22,10 @@ src/sound/seq_player_ex.cpp:
     complete
     .text       start:0x02002218 end:0x020024f0
 
+src/sound/bgm_player.cpp:
+    complete
+    .text       start:0x020024f0 end:0x02002a04
+
 src/util/text_parse.c:
     complete
     .text       start:0x020213a0 end:0x02021620

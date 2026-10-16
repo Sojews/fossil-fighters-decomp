@@ -183,8 +183,8 @@ int SoundManager::func_02000fd4(int a, int b, int c) {
     }
     result = player2.Play(a, b, c);
     if (result && !unk2) {
-        unk4 = unk2BCC.func_020029e8();
-        unk2BCC.func_02002854(1, 6);
+        unk4 = unk2BCC.GetVolume();
+        unk2BCC.SetVolumeFade(1, 6);
         if (unk3) {
             func_02001348(0);
             unk3 = 0;
@@ -221,7 +221,7 @@ int SoundManager::func_020010c4(int a, int b, int c) {
     if (!enabled) {
         return 0;
     }
-    result = unk2BCC.func_02002708(a, b, c);
+    result = unk2BCC.PlayIfNew(a, b, c);
     if (result) {
         if (unk2 && func_020010a0()) {
             func_02001060(0);
@@ -239,14 +239,14 @@ int SoundManager::func_02001158(int a, int b, int c, u16 d, int e) {
     if (!enabled) {
         return 0;
     }
-    return unk2BCC.func_02002744(a, b, c, d, e);
+    return unk2BCC.PlayTracks(a, b, c, d, e);
 }
 
 void SoundManager::func_02001198(int a) {
     if (!enabled) {
         return;
     }
-    unk2BCC.func_020026b4(a);
+    unk2BCC.Stop(a);
     unk4 = 0x7F;
 }
 
@@ -254,8 +254,8 @@ void SoundManager::func_020011c4(int a, int b, int c) {
     if (!enabled) {
         return;
     }
-    if (unk2BCC.func_02002938(a, b)) {
-        unk2BCC.func_020026b4(c);
+    if (unk2BCC.IsCurrent(a, b)) {
+        unk2BCC.Stop(c);
         unk4 = 0x7F;
     }
 }
@@ -264,35 +264,35 @@ void SoundManager::func_0200120c(int a, int b) {
     if (!enabled) {
         return;
     }
-    unk2BCC.func_02002854(a, b);
+    unk2BCC.SetVolumeFade(a, b);
 }
 
 int SoundManager::func_0200122c() {
     if (!enabled) {
         return 0;
     }
-    return unk2BCC.func_020029b8();
+    return unk2BCC.IsPlaying();
 }
 
 int SoundManager::func_02001250(int a, int b, int c) {
     if (!enabled) {
         return 0;
     }
-    return unk2DE0.func_02002618(a, b, c);
+    return unk2DE0.Play(a, b, c);
 }
 
 void SoundManager::func_02001274(int a) {
     if (!enabled) {
         return;
     }
-    unk2DE0.func_020026b4(a);
+    unk2DE0.Stop(a);
 }
 
 void SoundManager::func_02001294(int a, int b) {
     if (!enabled) {
         return;
     }
-    unk2DE0.func_02002854(a, b);
+    unk2DE0.SetVolumeFade(a, b);
 }
 
 void SoundManager::func_020012b4(int a, int b, int c) {
@@ -350,8 +350,8 @@ void SoundManager::func_02001404(int a, int b, int c) {
     strm.func_02002f6c(unkC, 0);
     if (!unk3) {
         unk3 = 1;
-        unk4 = unk2BCC.func_020029e8();
-        unk2BCC.func_02002854(1, 6);
+        unk4 = unk2BCC.GetVolume();
+        unk2BCC.SetVolumeFade(1, 6);
         if (unk2) {
             func_02001060(0);
             unk2 = 0;

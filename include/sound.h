@@ -102,10 +102,18 @@ public:
     SeqEntry entries[SEQ_ENTRY_COUNT];
 };
 
+// Moves a value towards a target over a number of frames (used for volume/pitch fades).
 class Unk18 {
 public:
     Unk18();
-    u32 unk0[0x18 / 4];
+    void Update();
+    void Start(int a, int b, int c);
+    void Reset();
+
+    u8 done;
+    u8 unk1[0xB];
+    s32 value;
+    u32 unk10[2];
 };
 
 class Unk10 {
@@ -115,9 +123,17 @@ public:
     u32 unk0[0x10 / 4];
 };
 
+// Per-track state for the 16 sequence tracks.
 class Unk1A8 {
 public:
     Unk1A8();
+    void Update();
+    void Start(int trackMask);
+    void func_02002ba0(u16 trackMask, int frames, int mute);
+    void Reset();
+    int func_02002c90(int track);
+    BOOL IsActive(int track);
+    int func_02002cb0(int track);
     u8 unk0;
     u16 unk2;
     Unk10 unk4;
@@ -126,23 +142,31 @@ public:
     Unk18 unk28[16];
 };
 
+// Background-music player: a SeqPlayer with volume/pitch fades and per-track volume control.
 class Unk2BCC : public SeqPlayer {
 public:
     void Update();
-    int func_02002618(int a, int b, int c);
-    void func_020026b4(int a);
-    int func_02002708(int a, int b, int c);
-    int func_02002744(int a, int b, int c, u16 d, int e);
-    void func_02002854(int a, int b);
-    int func_02002938(int a, int b);
-    int func_020029b8();
-    int func_020029e8();
+    void UpdateVolume();
+    void UpdatePitch();
+    BOOL Play(int no, int index, int fadeFrames);
+    void Stop(int fadeFrames);
+    BOOL PlayIfNew(int no, int index, int fadeFrames);
+    BOOL PlayTracks(int no, int index, int fadeFrames, u16 trackMask, int trackFadeFrames);
+    void SetTracks(u16 trackMask, int frames, int mute);
+    void ApplyVolume(int volume);
+    void SetVolumeFade(int volume, int frames);
+    void SetTrackVolume(int volume, u16 trackMask);
+    void SetTrackPitch(int pitch, u16 trackMask);
+    BOOL IsCurrent(int no, int index);
+    BOOL IsPlaying();
+    BOOL IsPlayingCurrent(int no, int index);
+    int GetVolume();
 
-    Unk18 unk20;
-    Unk18 unk38;
+    Unk18 volumeFade;   // 0x20
+    Unk18 pitchFade;    // 0x38
     Unk18 unk50;
-    Unk1A8 unk68;
-    u8 unk210[4];
+    Unk1A8 tracks;      // 0x68
+    u16 trackMask;      // 0x210
 };
 
 class Unk2FF4 : public Unk2BCC {
