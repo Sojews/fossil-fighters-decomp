@@ -2,7 +2,6 @@
 
 #include "m/task.h"
 
-MDisplay *gCurrentDisplay;
 
 MTask *MTaskRunTransfer::Create(MTask *task) {
     return new MTaskRunTransfer(task);

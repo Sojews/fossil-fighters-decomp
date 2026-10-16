@@ -1,10 +1,20 @@
-// The 2D graphics engines.
+// The two screens (MLcd) and their 2D graphics engines (MDisplay).
 
 #include <algorithm>
 #include "m/display.h"
+#include "m/lcd.h"
 #include "m/window.h"
 #include "m/blend.h"
 #include "m/bright.h"
+
+// NONMATCHING: this file's .bss holds more than these (0x28 bytes from 0x0214d1ac), and mwcc lays out
+// same-sized variables in an order that depends on how many there are, so the code that reaches these
+// through the pooled base address uses different offsets for now.
+MDisplay *gCurrentDisplay;      // the display processes draw on by default
+MLcd *gLcd;
+static void *sPrevSwitchThreadCallback;
+static void *sThreadDisplays;
+static u32 sUnk;
 
 // The OBJ and BG controllers (not decompiled yet).
 class MBg {
@@ -155,4 +165,133 @@ void MDisplay::SetBg0Is3D(BOOL on) {
 
 void MDisplay::SetObjTileBoundary(int boundary) {
     mDispCnt.objTileBoundary = boundary;
+}
+
+extern "C" {
+extern void *data_0208b378[];   // VRAMCNT register addresses
+extern u8 data_0208b410[];      // texture VRAM configurations, 0x1C bytes each
+extern u32 data_0208bcc8[][5][4];   // bank addresses, by bank, MST and offset
+}
+
+#define REG_POWCNT (*(volatile u16 *)0x04000304)
+
+extern "C" {
+extern MDisplayRegs data_0208b65c;  // main engine
+extern MDisplayRegs data_0208b6ec;  // sub engine
+}
+
+MLcd::MLcd() : MLooperVSyncTask(FALSE, TRUE) {
+    u32 i;
+
+    OS_InitMutex(&mMutex);
+    mPowCnt = REG_POWCNT;
+    mCapture = 0;
+    mSwapped = FALSE;
+    for (i = 0; i < 10; i++) {
+        mBankUsed[i] = FALSE;
+    }
+    for (i = 0; i < 10; i++) {
+        mBankCnt[i].raw = 0;
+    }
+    mMain = new MDisplay(this, &data_0208b65c);
+    mSub = new MDisplay(this, &data_0208b6ec);
+    gCurrentDisplay = mMain;
+}
+
+void MLcd::OnVSync() {
+    VSync();
+}
+
+BOOL MLcd::IsBankUsed(int bank) {
+    return mBankUsed[bank];
+}
+
+void MLcd::UseBank(int bank, int mst, int offset) {
+    if (mBankUsed[bank]) {
+        OS_Terminate();
+    }
+    mBankUsed[bank] = TRUE;
+    mBankCnt[bank].mst = mst;
+    mBankCnt[bank].offset = offset;
+    mBankCnt[bank].enable = TRUE;
+}
+
+void MLcd::FreeBank(int bank) {
+    if (!mBankUsed[bank]) {
+        OS_Terminate();
+    }
+    mBankUsed[bank] = FALSE;
+    mBankCnt[bank].raw = 0;
+}
+
+void MLcd::SetSwapped(BOOL swapped) {
+    mSwapped = swapped;
+}
+
+BOOL MLcd::IsSwapped() {
+    return mSwapped;
+}
+
+void MLcd::SetTopDisplay(MDisplay *display) {
+    if (display == mMain) {
+        mPowCnt |= 0x8000;
+    } else {
+        mPowCnt &= ~0x8000;
+    }
+}
+
+void MLcd::SetBottomDisplay(MDisplay *display) {
+    if (display == mSub) {
+        mPowCnt |= 0x8000;
+    } else {
+        mPowCnt &= ~0x8000;
+    }
+}
+
+MDisplay *MLcd::GetTopDisplay() {
+    if (mPowCnt & 0x8000) {
+        return mMain;
+    }
+    return mSub;
+}
+
+MDisplay *MLcd::GetBottomDisplay() {
+    if (mPowCnt & 0x8000) {
+        return mSub;
+    }
+    return mMain;
+}
+
+MVramCnt MLcd::SetBankCnt(int bank, MVramCnt cnt) {
+    MVramCnt old;
+
+    old.raw = mBankCnt[bank].raw;
+    mBankCnt[bank].raw = cnt.raw;
+    *(u8 *)data_0208b378[bank] = cnt.raw;
+    return old;
+}
+
+void MLcd::UseTextureBanks(int config) {
+    UseBanks(data_0208b410 + config * 0x1C, &mTexBanks);
+}
+
+void MLcd::FreeTextureBanks() {
+    FreeBanks(&mTexBanks);
+}
+
+int MLcd::GetTextureSlotFlags() {
+    if (mTexBanks.banks[0] == 3 && mTexBanks.banks[1] == 4) {
+        return 0xC;
+    }
+    if (mTexBanks.banks[0] == 3) {
+        return 4;
+    }
+    if (mTexBanks.banks[0] == 4) {
+        return 8;
+    }
+    return 0;
+}
+
+u32 MLcd::GetBankAddress(int bank) {
+    return data_0208bcc8[bank][mBankCnt[bank].mst][mBankCnt[bank].offset];
 }

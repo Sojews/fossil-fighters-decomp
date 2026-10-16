@@ -115,10 +115,7 @@ src/m/memory.c:
     .itcm       start:0x01ff8588 end:0x01ff8db8
 
 src/m/display.cpp:
-    .text       start:0x0204b3a0 end:0x0204bb40
-
-src/m/lcd.cpp:
-    .text       start:0x0204bcc8 end:0x0204c1f4
+    .text       start:0x0204b3a0 end:0x0204c258
 
 src/m/looper.cpp:
     .text       start:0x02050e08 end:0x02051a4c

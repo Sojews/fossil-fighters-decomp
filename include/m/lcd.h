@@ -21,6 +21,9 @@ union MVramCnt {
 
 class MLcd : public MLooperVSyncTask {
 public:
+    MLcd();
+    virtual void OnVSync();
+
     BOOL IsBankUsed(int bank);
     void UseBank(int bank, int mst, int offset);
     void FreeBank(int bank);
