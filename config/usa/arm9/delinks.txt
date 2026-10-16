@@ -77,6 +77,9 @@ src/sound/bit_set.cpp:
 src/game/backup_validater.cpp:
     .text       start:0x02005004 end:0x020055dc
 
+src/game/dino_common_font.cpp:
+    .text       start:0x020082b0 end:0x0200843c
+
 src/game/dino_message.cpp:
     .text       start:0x0200a948 end:0x02011138
 

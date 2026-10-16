@@ -315,3 +315,22 @@ void MCompositeFont::Draw(MChrBlock *chr, u32 tile, MPoint pos, MPoint size, u32
         }
     }
 }
+
+MFontSet::MFontSet(std::string path, int color, int shadow, int back) : mResource(path) {
+    for (u32 i = 0; i < GetHeader()->count; i++) {
+        if (GetFontData(i)->count != 0) {
+            switch (GetFontData(i)->type) {
+            default:
+                OS_Terminate();
+                break;
+            case 0:
+                AddFont(new M1BitFont(GetFontData(i)));
+                break;
+            case 1:
+                AddFont(new M4BitFont(GetFontData(i)));
+                break;
+            }
+        }
+    }
+    SetColors(color, shadow, back);
+}
