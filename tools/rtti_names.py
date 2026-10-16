@@ -44,6 +44,29 @@ def thumb_calls(start: int, size: int) -> set[int]:
     return out
 
 
+def is_mangled_name(s: str) -> bool:
+    """Whether s is a whole mangled class name: 5MTask, St9type_info or N10__cxxabiv117__class_type_infoE."""
+    nested = s.startswith("N")
+    if nested:
+        if not s.endswith("E"):
+            return False
+        s = s[1:-1]
+    elif s.startswith("St"):
+        s = s[2:]
+    parts = 0
+    while s:
+        m = re.match(r"(\d+)", s)
+        if not m or m.group(1).startswith("0"):
+            return False
+        n = int(m.group(1))
+        name = s[len(m.group(1)):len(m.group(1)) + n]
+        if len(name) != n or len(name) < 3 or not re.fullmatch(r"[A-Za-z_]\w*", name):
+            return False
+        s = s[len(m.group(1)) + n:]
+        parts += 1
+    return parts == 1 or (nested and parts > 1)
+
+
 def main() -> None:
     syms_path = CFG / "symbols.txt"
     lines = syms_path.read_text().splitlines()
@@ -54,9 +77,9 @@ def main() -> None:
             funcs[int(m.group(4), 16)] = (m.group(1), m.group(2), int(m.group(3), 16))
 
     names = {}
-    for m in re.finditer(rb"(?<![\x20-\x7e])(\d{1,2})([A-Za-z_][A-Za-z0-9_]{2,})\x00", BIN):
-        if len(m.group(2)) == int(m.group(1)):
-            names[BASE + m.start()] = (m.group(1) + m.group(2)).decode()
+    for m in re.finditer(rb"(?<![\x20-\x7e])(N|St)?((?:\d{1,2}[A-Za-z_][A-Za-z0-9_]*?)+)(E?)\x00", BIN):
+        if is_mangled_name(m.group(0)[:-1].decode()):
+            names[BASE + m.start()] = m.group(0)[:-1].decode()
 
     words = {}
     for off in range(0, len(BIN) - 3, 4):
@@ -97,7 +120,8 @@ def main() -> None:
                 for addr, kind in ((d1, "D1"), (d0, "D0")):
                     cur = funcs[addr][0]
                     if cur.startswith("func_"):
-                        renames[cur] = f"_ZN{name}{kind}Ev"
+                        inner = name[1:-1] if name.startswith("N") else name
+                        renames[cur] = f"_ZN{inner}{kind}Ev"
 
     print(f"# classes with typeinfo: {len(typeinfo)}, destructors to name: {len(renames)}", file=sys.stderr)
     if "--apply" in sys.argv:
