@@ -1,0 +1,259 @@
+// MSmartOam and its blocks, transfers and animation. MSmartOam::Execute (in ITCM) isn't decompiled yet.
+
+#include "m/smart_oam.h"
+#include "m/display.h"
+
+
+void MSmartOamEntry::SetChr(MChrBlock *chr) {
+    u32 tile = chr->tile;
+    if (oam.colors256 == 1) {
+        tile <<= 1;
+    }
+    oam.tile = tile;
+}
+
+void MSmartOamEntry::SetPalette(MPalBlock *pal) {
+    oam.palette = pal->index;
+}
+
+void MSmartOamBlock::SetMode(int mode) {
+    u32 n = count;
+    MSmartOamEntry *entry = GetEntries();
+    if (n != 0) {
+        do {
+            n--;
+            entry->oam.gfxMode = mode;
+            entry++;
+        } while (n != 0);
+    }
+}
+
+void MSmartOamBlock::SetObjMode(int mode) {
+    MSmartOamEntry *entry = GetEntries();
+    u32 n = count;
+    if (n != 0) {
+        do {
+            entry->oam.objMode = mode;
+            if (mode != 3) {
+                MPoint size = gObjSizes[0][entry->oam.shape | (entry->oam.size << 2)];
+                entry->width = size.x;
+                entry->height = size.y;
+            } else {
+                MPoint size = gObjSizes[0][entry->oam.shape | (entry->oam.size << 2)];
+                int width = size.x * 2;
+                int height = size.y * 2;
+                entry->width = width;
+                entry->height = height;
+            }
+            n--;
+            entry++;
+        } while (n != 0);
+    }
+}
+
+void MSmartOamBlock::SetAffineParam(int param) {
+    u32 n = count;
+    MSmartOamEntry *entry = GetEntries();
+    if (n != 0) {
+        do {
+            n--;
+            entry->oam.affineParam = param;
+            entry++;
+        } while (n != 0);
+    }
+}
+
+void MSmartOamBlock::SetFlip(BOOL hflip, BOOL vflip) {
+    MSmartOamEntry *entry = GetEntries();
+    u32 n = count;
+    if (n != 0) {
+        do {
+            n--;
+            entry->oam.hflip = hflip;
+            entry->oam.vflip = vflip;
+            entry++;
+        } while (n != 0);
+    }
+}
+
+void MSmartOamBlock::SetPriority(int priority) {
+    u32 n = count;
+    MSmartOamEntry *entry = GetEntries();
+    if (n != 0) {
+        do {
+            n--;
+            entry->oam.priority = priority;
+            entry++;
+        } while (n != 0);
+    }
+}
+
+// NONMATCHING: the shifted anchor and the entry pointer get different registers.
+void MSmartOamBlock::SetAnchor(int anchor) {
+    u32 n = count;
+    MSmartOamEntry *entry = GetEntries();
+    if (n != 0) {
+        do {
+            n--;
+            entry->anchor = anchor;
+            entry++;
+        } while (n != 0);
+    }
+}
+
+void MSmartOamBlock::Clear() {
+    MSmartOamEntry *entry = GetEntries();
+    u32 n = count;
+    if (n != 0) {
+        do {
+            n--;
+            entry->Clear();
+            entry++;
+        } while (n != 0);
+    }
+}
+
+void MSmartOamBlock::Hide() {
+    MSmartOamEntry *entry = GetEntries();
+    u32 n = count;
+    if (n != 0) {
+        do {
+            n--;
+            entry->oam.objMode = 2;
+            entry++;
+        } while (n != 0);
+    }
+}
+
+void MSmartOamBlock::Show() {
+    MSmartOamEntry *entry = GetEntries();
+    u32 n = count;
+    if (n != 0) {
+        do {
+            n--;
+            entry->oam.objMode = 0;
+            entry++;
+        } while (n != 0);
+    }
+}
+
+MSmartOam::MSmartOam(int count, int oamCount, BOOL fromEnd) {
+    mDisplay = gCurrentDisplay;
+    mCount = count;
+    mOamCount = oamCount != 0 ? oamCount : count;
+    mUnk1C = 0;
+    mOffset.x = 0;
+    mOffset.y = 0;
+    mHidden = FALSE;
+    mUnk3C = 0;
+    mUnk40 = 0;
+    mClipWidth = 256;
+    mClipHeight = 192;
+    Init(fromEnd);
+}
+
+MSmartOam::MSmartOam(MDisplay *display, int count, int oamCount, BOOL fromEnd) {
+    mDisplay = display;
+    mCount = count;
+    mOamCount = oamCount != 0 ? oamCount : count;
+    mUnk1C = 0;
+    mOffset.x = 0;
+    mOffset.y = 0;
+    mHidden = FALSE;
+    mUnk3C = 0;
+    mUnk40 = 0;
+    mClipWidth = 256;
+    mClipHeight = 192;
+    Init(fromEnd);
+}
+
+void MSmartOam::Init(BOOL fromEnd) {
+    mOamBlock = mDisplay->mObj->mOam->Alloc(mOamCount, fromEnd);
+    mEntries = new MSmartOamEntry[mCount + 1];
+    mOrder = new int[mCount + 1];
+    mOrder[0] = mCount;
+    mEntries[mCount].links = 0;
+    for (u32 i = 1; i < mCount + 1; i++) {
+        mOrder[i] = i - 1;
+        mEntries[i - 1].links = i;
+    }
+    MSmartOamEntry *entry = mEntries;
+    u32 n = mCount;
+    if (n != 0) {
+        do {
+            n--;
+            entry->Clear();
+            entry++;
+        } while (n != 0);
+    }
+    entry->Clear();
+    mHeap = new MHeap((u32)mEntries, mCount * sizeof(MSmartOamEntry), sizeof(MSmartOamEntry));
+}
+
+MSmartOamEntry::MSmartOamEntry() {
+}
+
+MSmartOam::~MSmartOam() {
+    delete mHeap;
+    delete[] mOrder;
+    delete[] mEntries;
+    mDisplay->mObj->mOam->Free(mOamBlock);
+}
+
+void MSmartOam::SetUnk1C(int value) {
+    mUnk1C = value;
+}
+
+MSmartOamBlock *MSmartOam::Alloc(int count, BOOL fromEnd) {
+    MScopedLock lock(&mHeap->mMutex, TRUE);
+    MSmartOamBlock *block =
+        (MSmartOamBlock *)mHeap->Alloc(count * sizeof(MSmartOamEntry), fromEnd, 4, 0, 0, 0);
+    block->count = count;
+    block->owner = this;
+    MSmartOamEntry *entry = block->GetEntries();
+    while (count != 0) {
+        count--;
+        entry->block = block;
+        entry++;
+    }
+    return block;
+}
+
+void MSmartOam::Free(MSmartOamBlock *block) {
+    MScopedLock lock(&mHeap->mMutex, TRUE);
+    block->Clear();
+    mHeap->Free(block);
+}
+
+MTask *MSmartOam::CreateOffsetTransfer(MPoint offset) {
+    return new MSmartOamOffsetTransfer(this, offset);
+}
+
+MTask *MSmartOam::CreateShowTransfer() {
+    return new MSmartOamShowTransfer(this);
+}
+
+MTask *MSmartOam::CreateHideTransfer() {
+    return new MSmartOamHideTransfer(this);
+}
+
+MTask *MSmartOam::CreateOffsetAnime(MPoint from, MPoint to, int duration, int ease) {
+    return new MSmartOamOffsetAnime(this, from, to, duration, ease);
+}
+
+void MSmartOamOffsetAnime::Apply(int step) {
+    MPointAnime::Apply(step);
+    mOam->SetOffset(MPoint(mValue.x, mValue.y));
+}
+
+void MSmartOamHideTransfer::Transfer() {
+    mOam->mHidden = TRUE;
+}
+
+void MSmartOamShowTransfer::Transfer() {
+    mOam->mHidden = FALSE;
+}
+
+void MSmartOamOffsetTransfer::Transfer() {
+    mOam->SetOffset(mOffset);
+}

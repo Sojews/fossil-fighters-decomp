@@ -6,8 +6,13 @@
 #include "m/heap.h"
 #include "m/pal.h"
 #include "m/chr.h"
+#include "m/geometry.h"
 
 class MDisplay;
+
+// OBJ dimensions by size and shape (the shape 3 entries are unused), in tiles and in pixels.
+extern MPoint gObjTileSizes[4][4];
+extern MPoint gObjSizes[4][4];
 
 // One OAM entry (attributes 0-2 and the affine parameter word that shares its last halfword).
 struct MOamEntry {

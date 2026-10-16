@@ -4,6 +4,20 @@
 #include "m/display.h"
 #include "m/transfer.h"
 
+MPoint gObjTileSizes[4][4] = {
+    {MPoint(1, 1), MPoint(2, 1), MPoint(1, 2), MPoint()},
+    {MPoint(2, 2), MPoint(4, 1), MPoint(1, 4), MPoint()},
+    {MPoint(4, 4), MPoint(4, 2), MPoint(2, 4), MPoint()},
+    {MPoint(8, 8), MPoint(8, 4), MPoint(4, 8), MPoint()},
+};
+
+MPoint gObjSizes[4][4] = {
+    {MPoint(8, 8), MPoint(16, 8), MPoint(8, 16), MPoint(0, 0)},
+    {MPoint(16, 16), MPoint(32, 8), MPoint(8, 32), MPoint(0, 0)},
+    {MPoint(32, 32), MPoint(32, 16), MPoint(16, 32), MPoint(0, 0)},
+    {MPoint(64, 64), MPoint(64, 32), MPoint(32, 64), MPoint(0, 0)},
+};
+
 void MOamEntry::SetPalette(MPalBlock *pal) {
     palette = pal->index;
 }
