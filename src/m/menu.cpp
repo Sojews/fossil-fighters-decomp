@@ -98,6 +98,26 @@ int MMenuItem::GetMode() {
 void MMenuItem::Idle() {
 }
 
+// NONMATCHING (all three constructors): the pointer-to-member constant is at a different offset in the TU's
+// pool until every function that makes one is decompiled.
+MMenu::MMenu(int defaultMode)
+    : MProcess(NULL), mInput(NULL), mDefaultMode(defaultMode), mActive(TRUE), mCursor(0, 0), mLinksOnly(FALSE),
+      mDeferStart(FALSE) {
+    mState = &MMenu::Init;
+}
+
+MMenu::MMenu(MInput *input, int defaultMode)
+    : MProcess(NULL), mInput(input), mDefaultMode(defaultMode), mActive(TRUE), mCursor(0, 0), mLinksOnly(FALSE),
+      mDeferStart(FALSE) {
+    mState = &MMenu::Init;
+}
+
+MMenu::MMenu(MDisplay *display, MInput *input, int defaultMode)
+    : MProcess(display), mInput(input), mDefaultMode(defaultMode), mActive(TRUE), mCursor(0, 0), mLinksOnly(FALSE),
+      mDeferStart(FALSE) {
+    mState = &MMenu::Init;
+}
+
 void MMenu::SetDeferStart(BOOL defer) {
     mDeferStart = defer;
 }

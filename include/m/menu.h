@@ -13,18 +13,26 @@ struct MMenuHalfPlane {
     int y;
 };
 
-// Stands in for the std::map of links (item and direction to item) until MSL's tree is reconstructed.
-struct MMenuLinks {
-    MMenuLinks() {
+// Stands in for the std::map of links (item and direction to item) until MSL's tree is reconstructed. (A
+// template, as the inlined code differs from a plain class's.)
+template <class T> struct MTreeStandIn {
+    struct Header {
+        void *root;
+        void *leftmost;
+    };
+
+    MTreeStandIn() { Init(); }
+    void Init() {
         size = 0;
-        root = NULL;
-        leftmost = &root;
+        header.root = NULL;
+        header.leftmost = &header;
     }
 
     u32 size;
-    void *root;
-    void **leftmost;
+    Header header;
 };
+
+typedef MTreeStandIn<MMenuItem *> MMenuLinks;
 
 class MMenu : public MProcess {
 public:
@@ -39,6 +47,9 @@ public:
     virtual void OnBlur(MMenuItem *item);
     virtual void OnSelect(MMenuItem *item);
     virtual void OnDecide(MMenuItem *item);
+
+    void Init();
+    void StateMain();
 
     void SetDeferStart(BOOL defer);
     void AddItem(MMenuItem *item);
