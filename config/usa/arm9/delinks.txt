@@ -110,6 +110,9 @@ libs/msl/src/math/s_ldexp.c:
     complete
     .text       start:0x0208353c end:0x020836b4
 
+src/game/resource.cpp:
+    .text       start:0x0201197c end:0x02011a54
+
 src/m/memory.c:
     .text       start:0x0204b338 end:0x0204b3a0
     .itcm       start:0x01ff8588 end:0x01ff8db8
@@ -228,6 +231,12 @@ src/m/smart_text.cpp:
 
 src/m/smart_oam.cpp:
     .text       start:0x0205b5b8 end:0x0205bc1c
+
+src/m/file.cpp:
+    .text       start:0x0204e784 end:0x0204e9a8
+
+src/m/archive.cpp:
+    .text       start:0x0204efdc end:0x0204fa64
 
 src/m/obj.cpp:
     .text       start:0x0205bc1c end:0x0205c498

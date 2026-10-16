@@ -37,7 +37,7 @@ void MChrBlock::Load(const void *src, u32 start, u32 count, int palette) {
 }
 
 // NONMATCHING: the unit size is kept in a register in the 16-color path instead of reloaded.
-void MChrBlock::Load(MFileRef *file, u32 offset, u32 start, u32 unused, u32 count, int palette) {
+void MChrBlock::Load(MArchiveFile *file, u32 offset, u32 start, u32 unused, u32 count, int palette) {
     u32 bytes = std::min(size - start * unitSize, count * unitSize);
     offset *= unitSize;
     if (unitSize == 32) {

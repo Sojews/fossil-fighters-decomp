@@ -17,8 +17,9 @@ public:
     typedef const C *const_iterator;
 
     basic_string() {
+        unsigned long i = 0;
         unsigned long *words = mWords;
-        for (unsigned long i = 0; i < 3; i++) {
+        for (; i < 3; i++) {
             *words++ = 0;
         }
     }

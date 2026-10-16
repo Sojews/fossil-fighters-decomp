@@ -17,7 +17,7 @@ struct MChrBlock : public MHeapBlock {
 
     MTask *CreateLoadTask(const void *src, u32 start, u32 count, int palette);
     void Load(const void *src, u32 start, u32 count, int palette);
-    void Load(MFileRef *file, u32 offset, u32 start, u32 unused, u32 count, int palette);
+    void Load(MArchiveFile *file, u32 offset, u32 start, u32 unused, u32 count, int palette);
     MTask *CreateFillTask(int color, u32 start, u32 count);
     void Fill(int color, u32 start, u32 count);
 };
