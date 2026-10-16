@@ -35,16 +35,16 @@ u32 MDisplay::GetRegs74(int i) {
     return mRegs->unk74[i];
 }
 
-u32 MDisplay::GetRegs7C() {
-    return mRegs->unk7C;
+volatile u16 *MDisplay::GetRegs7C() {
+    return mRegs->bldcnt;
 }
 
-u32 MDisplay::GetRegs80() {
-    return mRegs->unk80;
+volatile u16 *MDisplay::GetRegs80() {
+    return mRegs->bldalpha;
 }
 
-u32 MDisplay::GetRegs84() {
-    return mRegs->unk84;
+volatile u16 *MDisplay::GetRegs84() {
+    return mRegs->bldy;
 }
 
 u32 MDisplay::GetRegs8C() {

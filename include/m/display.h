@@ -25,9 +25,9 @@ struct MDisplayRegs {
     u8 *unk60;
     u32 unk64[4];               // 0x64
     u32 unk74[2];               // 0x74
-    u32 unk7C;
-    u32 unk80;
-    u32 unk84;
+    volatile u16 *bldcnt;       // 0x7C
+    volatile u16 *bldalpha;     // 0x80
+    volatile u16 *bldy;         // 0x84
     volatile u32 *unk88;
     u32 unk8C;
 };
@@ -66,9 +66,9 @@ public:
     u32 GetRegs28(int i);
     u32 GetRegs64(int i);
     u32 GetRegs74(int i);
-    u32 GetRegs7C();
-    u32 GetRegs80();
-    u32 GetRegs84();
+    volatile u16 *GetRegs7C();
+    volatile u16 *GetRegs80();
+    volatile u16 *GetRegs84();
     u32 GetRegs8C();
     void ShowPlanes(u32 mask);
     void HidePlanes(u32 mask);
