@@ -3711,9 +3711,9 @@ func_0204fad8 kind:function(thumb,size=0xa4) addr:0x0204fad8
 func_0204fb7c kind:function(thumb,size=0xc) addr:0x0204fb7c
 func_0204fb88 kind:function(thumb,size=0x12) addr:0x0204fb88
 func_0204fb9c kind:function(thumb,size=0x24) addr:0x0204fb9c
-func_0204fbc0 kind:function(thumb,size=0x2c) addr:0x0204fbc0
-func_0204fbec kind:function(thumb,size=0x54) addr:0x0204fbec
-func_0204fc40 kind:function(thumb,size=0x28) addr:0x0204fc40
+_Z18MReserveDmaChannelm kind:function(thumb,size=0x2c) addr:0x0204fbc0
+_Z16MAllocDmaChannelv kind:function(thumb,size=0x54) addr:0x0204fbec
+_Z15MFreeDmaChannelm kind:function(thumb,size=0x28) addr:0x0204fc40
 _ZN7MRegionC1Ev kind:function(thumb,size=0x14) addr:0x0204fc68
 _ZN7MRegionC1E5MRect kind:function(thumb,size=0x68) addr:0x0204fc7c
 _ZN7MRegionC1ERKS_ kind:function(thumb,size=0x34) addr:0x0204fce4
@@ -12995,7 +12995,7 @@ data_0214d40c kind:bss addr:0x0214d40c
 data_0214d418 kind:bss addr:0x0214d418
 data_0214d41c kind:bss addr:0x0214d41c
 data_0214d424 kind:bss addr:0x0214d424
-data_0214d43c kind:bss addr:0x0214d43c
+sDmaChannelUsed kind:bss addr:0x0214d43c
 sIntrTaskSets kind:bss addr:0x0214d440
 sSoftResetEnableCount kind:bss addr:0x0214d478
 sFoldSleepHandler kind:bss addr:0x0214d484

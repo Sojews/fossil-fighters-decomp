@@ -135,6 +135,9 @@ src/m/ext_affine.cpp:
 src/m/serializer.cpp:
     .text       start:0x0204d164 end:0x0204d580
 
+src/m/dma.cpp:
+    .text       start:0x0204fbc0 end:0x0204fc68
+
 src/m/region.cpp:
     .text       start:0x0204fc68 end:0x020505a0
 
