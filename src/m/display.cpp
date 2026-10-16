@@ -6,6 +6,7 @@
 #include "m/window.h"
 #include "m/blend.h"
 #include "m/bright.h"
+#include "m/chr.h"
 
 // NONMATCHING: this file's .bss holds more than these (0x28 bytes from 0x0214d1ac), and mwcc lays out
 // same-sized variables in an order that depends on how many there are, so the code that reaches these
@@ -22,10 +23,6 @@ public:
     void Update();
 };
 
-class MChr {
-public:
-    void Update();
-};
 
 MDisplay::MDisplay(MLcd *lcd, MDisplayRegs *regs) : mLcd(lcd), mRegs(regs) {
     mBackdrop = 0x7FFF;
