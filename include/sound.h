@@ -30,8 +30,12 @@ public:
     void Push(int value);
     int Get(int index);
     int Count();
+    void OnChange();
 
-    u32 unk0[4];
+    u8 initialized;
+    int *buf;
+    s32 count;
+    s32 capacity;
 };
 
 // Loads groups of sound data into the heap, saving the heap state after each so they can be released
@@ -127,31 +131,38 @@ public:
 };
 
 // Moves a value towards a target over a number of frames (used for volume/pitch fades).
-class Unk18 {
+class Fader {
 public:
-    Unk18();
+    Fader();
     void Update();
     void Start(int a, int b, int c);
     void Reset();
 
     u8 done;
-    s32 unk4;
-    s32 unk8;
+    u8 paused;
+    s32 from;
+    s32 to;
     s32 value;
-    u32 unk10[2];
+    s32 duration;
+    s32 frame;
 };
 
 // A bit set stored in caller-provided memory.
-class Unk10 {
+class BitSet {
 public:
-    Unk10();
-    ~Unk10();
-    void Init(u16 *bits, int count);
+    BitSet();
+    ~BitSet();
+    void Init(u16 *storage, int count);
     void Set(int bit);
     void Clear(int bit);
     BOOL Test(int bit);
-    void SetAll(BOOL value);
-    u32 unk0[0x10 / 4];
+    void SetAll(s8 value);
+    void ClearFields();
+
+    s8 *bits;
+    s32 count;
+    s32 bytes;
+    u8 initialized;
 };
 
 // Per-track state for the 16 sequence tracks.
@@ -168,10 +179,10 @@ public:
 
     u8 active;
     u16 activeBits;
-    Unk10 activeTracks;     // 0x04
+    BitSet activeTracks;     // 0x04
     u16 muteBits;
-    Unk10 mutedTracks;      // 0x18
-    Unk18 fades[16];        // 0x28
+    BitSet mutedTracks;      // 0x18
+    Fader fades[16];        // 0x28
 };
 
 // Background-music player: a SeqPlayer with volume/pitch fades and per-track volume control.
@@ -194,9 +205,9 @@ public:
     BOOL IsPlayingCurrent(int no, int index);
     int GetVolume();
 
-    Unk18 volumeFade;   // 0x20
-    Unk18 pitchFade;    // 0x38
-    Unk18 unk50;
+    Fader volumeFade;   // 0x20
+    Fader pitchFade;    // 0x38
+    Fader unk50;
     Unk1A8 tracks;      // 0x68
     u16 trackMask;      // 0x210
 };

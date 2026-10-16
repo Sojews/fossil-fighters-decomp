@@ -47,6 +47,18 @@ src/sound/sound_scenes.cpp:
     .text       start:0x02003f88 end:0x020049f4
     .data       start:0x020b5764 end:0x020b5814
 
+src/sound/int_stack.cpp:
+    complete
+    .text       start:0x02004cc0 end:0x02004d6c
+
+src/sound/fader.cpp:
+    complete
+    .text       start:0x02004d6c end:0x02004e5c
+
+src/sound/bit_set.cpp:
+    complete
+    .text       start:0x02004e5c end:0x02005004
+
 src/util/text_parse.c:
     complete
     .text       start:0x020213a0 end:0x02021620

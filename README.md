@@ -58,7 +58,7 @@ Tips:
 - Parts of the game are C++ (the overlays have static initializers). Game code has no exception tables, so everything is built with `-Cpp_exceptions off`.
 - C++ classes: mwcc 2.0 uses Itanium name mangling (`_ZN12SoundManager4InitEv`). Rename the game's symbols to the mangled names your code produces; base-class constructors/destructors are referenced as `C2`/`D2`, and if the game has one function for both variants, list both names at that address in `symbols.txt`. Pad unknown class members with `u32` arrays, not `u8`, so the class keeps its 4-byte alignment.
 - A file whose statics need construction also owns its `.init` (the `__sinit_<file>` function), its `.ctor` slot and its `.bss`; see `src/sound/sound_manager.cpp`.
-- If a function is right but won't match (usually a register swap), keep the C under `#ifdef NONMATCHING` and use an mwcc `asm` function with the original instructions in the `#else`, as in `SeqPlayerEx::RemoveEntry`. Constructors that nothing calls (often the `C2` variant) are stripped by the linker, like in the original build.
+- If a function is right but won't match (usually a register swap), keep the C under `#ifdef NONMATCHING` and use an mwcc `asm` function with the original instructions in the `#else`, as in `SeqPlayerEx::RemoveEntry`. `python3 tools/asm_fallback.py <function>` prints the body in mwcc's syntax. Constructors that nothing calls (often the `C2` variant) are stripped by the linker, like in the original build.
 - mwcc is picky about expression shape: `x *= 10; x += d;` and `x = x * 10 + d` compile differently, and indexing with `a[i++]` stops the loop being turned into pointer arithmetic.
 - Include any alignment padding after the last function in a file's `.text` range, or later code shifts.
 

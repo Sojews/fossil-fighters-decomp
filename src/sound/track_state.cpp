@@ -40,7 +40,7 @@ void Unk1A8::Start(int trackMask) {
 
     for (i = 0; i < 16; i++) {
         if (trackMask & (u16)(1 << i)) {
-            fades[i].unk4 = fades[i].unk8 = fades[i].value = 127;
+            fades[i].from = fades[i].to = fades[i].value = 127;
             activeTracks.Set(i);
         }
     }
@@ -68,8 +68,8 @@ void Unk1A8::FadeTracks(u16 trackMask, int frames, int mute) {
     }
 }
 #else
-// Unk18::Start, by its symbol name, for the asm below.
-extern "C" void _ZN5Unk185StartEiii(Unk18 *fade, int from, int to, int frames);
+// Fader::Start, by its symbol name, for the asm below.
+extern "C" void _ZN5Fader5StartEiii(Fader *fade, int from, int to, int frames);
 
 asm void Unk1A8::FadeTracks(u16 trackMask, int frames, int mute) {
     nofralloc
@@ -92,7 +92,7 @@ mute_loop:
     mov r0, r10
     mov r2, r7
     mov r3, r4
-    bl _ZN5Unk185StartEiii
+    bl _ZN5Fader5StartEiii
 mute_next:
     add r9, r9, #1
     cmp r9, #16
@@ -111,7 +111,7 @@ unmute_loop:
     mov r0, r10
     mov r2, r7
     mov r3, r4
-    bl _ZN5Unk185StartEiii
+    bl _ZN5Fader5StartEiii
 unmute_next:
     add r9, r9, #1
     cmp r9, #16
