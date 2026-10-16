@@ -22,4 +22,10 @@ public:
     bool mEnabled;
 };
 
+class MTask;
+
+// Adds a task to (or removes it from) the tasks run in one interrupt.
+void MAddIntrTask(int intr, MTask *task);
+void MRemoveIntrTask(int intr, MTask *task);
+
 #endif

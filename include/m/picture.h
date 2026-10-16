@@ -71,9 +71,9 @@ public:
     MPoint GetSize();
     MPoint GetTileSize();
 
-    const MPictureData *GetData() { return (const MPictureData *)mResource.mFile.GetData(); }
+    const MPictureData *GetData() { return mResource.Get(); }
 
-    MResource mResource;    // 0x00
+    MResource<MPictureData> mResource;  // 0x00
     MArchiveFile mPalette;  // 0x10
     MArchiveFile mChr;      // 0x1C
     MArchiveFile mScreen;   // 0x28

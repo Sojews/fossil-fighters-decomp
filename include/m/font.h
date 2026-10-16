@@ -130,13 +130,13 @@ public:
 
     MFontSet(std::string path, int color, int shadow, int back);
 
-    const Header *GetHeader() { return (const Header *)mResource.mFile.GetData(); }
+    const Header *GetHeader() { return mResource.Get(); }
     const MFontData *GetFontData(u32 i) {
         const Header *header = GetHeader();
         return (const MFontData *)((const u8 *)header + ((const u32 *)((const u8 *)header + header->tableOffset))[i]);
     }
 
-    MResource mResource;    // 0x30
+    MResource<Header> mResource;    // 0x30
 };
 
 // Draws a 1-bit glyph into 16-color tiles.

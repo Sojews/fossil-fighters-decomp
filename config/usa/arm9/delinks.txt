@@ -119,7 +119,7 @@ libs/msl/src/math/s_ldexp.c:
     complete
     .text       start:0x0208353c end:0x020836b4
 
-src/game/resource.cpp:
+src/game/dino_resource.cpp:
     .text       start:0x0201197c end:0x02011a54
 
 src/m/memory.c:
@@ -290,7 +290,7 @@ src/m/raster_trigger.cpp:
     .text       start:0x02068fc0 end:0x02068fdc
 
 src/m/seed_generator.cpp:
-    .text       start:0x020694cc end:0x020694dc
+    .text       start:0x020690bc end:0x020694dc
 
 src/m/multi_play_synchronize_delay_task.cpp:
     .text       start:0x0206c074 end:0x0206c298
