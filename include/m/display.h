@@ -67,7 +67,7 @@ struct MDisplayRegs {
 class MDisplayHook;
 class MLcd;
 class MBg;
-class MChr;
+class MObj;
 class MWin;
 class MBlend;
 class MBright;
@@ -119,7 +119,7 @@ public:
     MDispCnt mDispCnt;      // 0x0C
     MDisplayUnk88 mUnk10;   // 0x10
     MBg *mBg;               // 0x14
-    MChr *mChr;             // 0x18
+    MObj *mObj;             // 0x18
     MWin *mWin;             // 0x1C
     MBlend *mBlend;         // 0x20
     MBright *mBright;       // 0x24

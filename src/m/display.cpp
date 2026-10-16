@@ -6,7 +6,7 @@
 #include "m/window.h"
 #include "m/blend.h"
 #include "m/bright.h"
-#include "m/chr.h"
+#include "m/obj.h"
 
 // NONMATCHING: this file's .bss holds more than these (0x28 bytes from 0x0214d1ac), and mwcc lays out
 // same-sized variables in an order that depends on how many there are, so the code that reaches these
@@ -46,7 +46,7 @@ MDisplay::MDisplay(MLcd *lcd, MDisplayRegs *regs) : mLcd(lcd), mRegs(regs) {
     mBlend = new MBlend(this);
     mBright = new MBright(this);
     mBg = NULL;
-    mChr = NULL;
+    mObj = NULL;
 }
 
 MDisplay::~MDisplay() {
@@ -62,8 +62,8 @@ void MDisplay::Update() {
     if (mBg != NULL) {
         mBg->Update();
     }
-    if (mChr != NULL) {
-        mChr->Update();
+    if (mObj != NULL) {
+        mObj->Update();
     }
     mWin->Update();
     mBlend->Update();
