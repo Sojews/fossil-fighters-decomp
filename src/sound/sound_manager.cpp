@@ -40,7 +40,7 @@ int SoundManager::LoadGroups(int count, const int *groups) {
 }
 
 void SoundManager::Unload(int level) {
-    loader.Unload(level);
+    loader.ReplaceTop(level);
 }
 
 void SoundManager::Update() {

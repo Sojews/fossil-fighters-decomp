@@ -38,6 +38,10 @@ src/sound/strm_player.cpp:
     complete
     .text       start:0x02002d14 end:0x02002fac
 
+src/sound/sound_loader.cpp:
+    complete
+    .text       start:0x02002fac end:0x020031d0
+
 src/util/text_parse.c:
     complete
     .text       start:0x020213a0 end:0x02021620

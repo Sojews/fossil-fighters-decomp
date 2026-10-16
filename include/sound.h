@@ -21,15 +21,39 @@ BOOL NNS_SndArcPlayerSetup(NNSSndHeapHandle heap);
 void *NNS_SndArcSetCurrent(void *arc);
 }
 
-// Loads groups of sound data into the heap, using heap save states so they can be released in reverse order.
+// A fixed-capacity stack of ints in caller-provided memory.
+class IntStack {
+public:
+    IntStack();
+    void Init(int *buf, int capacity);
+    void Truncate(int count);
+    void Push(int value);
+    int Get(int index);
+    int Count();
+
+    u32 unk0[4];
+};
+
+// Loads groups of sound data into the heap, saving the heap state after each so they can be released
+// in reverse order.
 class SoundLoader {
 public:
     SoundLoader();
+    BOOL LoadGroup(int group);
+    void Restore(int count);
+    void SaveState();
+    int GetCount();
     void Init(NNSSndHeapHandle heap);
     int Load(int count, const int *groups);
-    void Unload(int level);
+    int CountLoaded(const int *groups, int count);
+    void ReplaceTop(int group);
+    void func_020031cc();
 
-    u32 unk0[0x5C / 4];
+    u8 initialized;
+    NNSSndHeapHandle heap;
+    int groups[16];
+    IntStack stack;     // 0x48
+    s32 lastGroup;      // 0x58
 };
 
 typedef struct NNSSndHandle {
