@@ -6188,8 +6188,8 @@ func_0207d370 kind:function(thumb,size=0x26) addr:0x0207d370
 MATHi_CRC32InitTableRev kind:function(thumb,size=0x30) addr:0x0207d398
 MATHi_CRC32UpdateRev kind:function(thumb,size=0x28) addr:0x0207d3c8
 abort kind:function(thumb,size=0x18) addr:0x0207d3f0
-func_0207d408 kind:function(thumb,size=0x2c) addr:0x0207d408
-func_0207d434 kind:function(thumb,size=0xac) addr:0x0207d434
+exit kind:function(thumb,size=0x2c) addr:0x0207d408
+__exit kind:function(thumb,size=0xac) addr:0x0207d434
 func_0207d4e0 kind:function(thumb,size=0x10) addr:0x0207d4e0
 __flush_all kind:function(thumb,size=0x3c) addr:0x0207d4f0
 abs kind:function(thumb,size=0x8) addr:0x0207d52c
@@ -13142,8 +13142,8 @@ data_02154e20 kind:bss addr:0x02154e20
 data_02154f08 kind:bss addr:0x02154f08
 data_02154f0c kind:bss addr:0x02154f0c
 data_02154f28 kind:bss addr:0x02154f28
-data_02155330 kind:bss addr:0x02155330
-data_02155340 kind:bss addr:0x02155340
+__console_exit kind:bss addr:0x02155330
+__atexit_funcs kind:bss addr:0x02155340
 __cs_id kind:bss addr:0x02155440
 __cs_ref kind:bss addr:0x02155464
 __cs kind:bss addr:0x02155488
