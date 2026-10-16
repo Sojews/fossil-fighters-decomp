@@ -394,7 +394,18 @@ namespace std {
 
     template <typename T, typename Allocator>
     __vec_deleter<T, Allocator>::iterator __vec_deleter<T, Allocator>::erase(iterator pos, UnkMSLStruct1) {
-        std::memmove(pos, pos + 1, (end() - pos - 1) * sizeof(value_type));
+        if (Metrowerks::is_trivial<T>::value) {
+            std::memmove(pos, pos + 1, (end() - pos - 1) * sizeof(value_type));
+        } else {
+            iterator e = end();
+            if (e - pos - 1 != 0) {
+                for (iterator src = pos + 1, dst = pos; src < e; src++, dst++) {
+                    *dst = *src;
+                }
+            }
+            erase_at_end(1);
+            return pos;
+        }
         this->size_--;
         return pos;
     }
@@ -515,7 +526,7 @@ namespace std {
         void push_back(const_reference x) {
             UnkMSLStruct1 unk = UnkMSLStruct1();
             if (this->size_ < this->cap()) {
-                if (Metrowerks::has_trivial_copy_ctor<T>::value && Metrowerks::has_trivial_assignment<T>::value) {
+                if (Metrowerks::is_trivial<T>::value) {
                     this->size_++;
                     this->back() = x;
                 } else {
@@ -578,6 +589,10 @@ namespace std {
 
         iterator erase(iterator __first, iterator __last) {
             return _Deleter::erase(__first, __last, UnkMSLStruct1());
+        }
+
+        iterator erase(iterator pos) {
+            return _Deleter::erase(pos, UnkMSLStruct1());
         }
     };
 

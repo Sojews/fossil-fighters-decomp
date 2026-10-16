@@ -51,11 +51,22 @@ struct MOamEntry {
         attr2 = 0;
         objMode = 2;
     }
+    void SetCoord(MPoint pos) {
+        x = pos.x;
+        y = pos.y;
+    }
+    // shape: size * 4 + shape
+    void SetShape(int shape) {
+        this->shape = shape;
+        size = shape >> 2;
+    }
     void SetPalette(MPalBlock *pal);
 };
 
 // A run of OAM entries.
-struct MOamBlock : public MHeapBlock {
+struct MOamUnit : public MHeapBlock {
+    typedef MOamEntry Entry;
+
     u32 count;  // 0x0C
 
     MOamEntry *GetEntries() { return (MOamEntry *)addr; }
@@ -71,8 +82,8 @@ public:
     MOam(u32 base, u32 size);
     virtual ~MOam();
 
-    MOamBlock *Alloc(u32 count, BOOL fromEnd);
-    void Free(MOamBlock *block);
+    MOamUnit *Alloc(u32 count, BOOL fromEnd);
+    void Free(MOamUnit *block);
 };
 
 // A run of affine parameter slots (32 bytes of OAM each).

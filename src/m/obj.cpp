@@ -131,7 +131,7 @@ void MOamEntry::SetPalette(MPalBlock *pal) {
     palette = pal->index;
 }
 
-void MOamBlock::SetMode(int mode) {
+void MOamUnit::SetMode(int mode) {
     u32 n = count;
     MOamEntry *entry = GetEntries();
     if (n != 0) {
@@ -143,7 +143,7 @@ void MOamBlock::SetMode(int mode) {
     }
 }
 
-void MOamBlock::SetPriority(int priority) {
+void MOamUnit::SetPriority(int priority) {
     u32 n = count;
     MOamEntry *entry = GetEntries();
     if (n != 0) {
@@ -156,7 +156,7 @@ void MOamBlock::SetPriority(int priority) {
 }
 
 // NONMATCHING: the count and entry pointer get different registers.
-void MOamBlock::Clear() {
+void MOamUnit::Clear() {
     u32 n = count;
     MOamEntry *entry = GetEntries();
     if (n != 0) {
@@ -170,7 +170,7 @@ void MOamBlock::Clear() {
     }
 }
 
-void MOamBlock::Hide() {
+void MOamUnit::Hide() {
     MOamEntry *entry = GetEntries();
     u32 n = count;
     if (n != 0) {
@@ -182,7 +182,7 @@ void MOamBlock::Hide() {
     }
 }
 
-void MOamBlock::Show() {
+void MOamUnit::Show() {
     MOamEntry *entry = GetEntries();
     u32 n = count;
     if (n != 0) {
@@ -194,7 +194,7 @@ void MOamBlock::Show() {
     }
 }
 
-MOam::MOam(u32 base, u32 size) : MHeap(base, size, sizeof(MOamBlock)) {
+MOam::MOam(u32 base, u32 size) : MHeap(base, size, sizeof(MOamUnit)) {
     MOamEntry *entry = (MOamEntry *)base;
     for (u32 i = 0; i < 128; i++) {
         entry->Clear();
@@ -209,13 +209,13 @@ MOam::~MOam() {
     }
 }
 
-MOamBlock *MOam::Alloc(u32 count, BOOL fromEnd) {
-    MOamBlock *block = (MOamBlock *)MHeap::Alloc(count * sizeof(MOamEntry), fromEnd, 4, 0, 0, 0);
+MOamUnit *MOam::Alloc(u32 count, BOOL fromEnd) {
+    MOamUnit *block = (MOamUnit *)MHeap::Alloc(count * sizeof(MOamEntry), fromEnd, 4, 0, 0, 0);
     block->count = count;
     return block;
 }
 
-void MOam::Free(MOamBlock *block) {
+void MOam::Free(MOamUnit *block) {
     block->Clear();
     MHeap::Free(block);
 }

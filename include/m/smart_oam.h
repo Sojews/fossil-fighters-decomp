@@ -8,32 +8,46 @@
 
 class MDisplay;
 class MSmartOam;
-struct MSmartOamBlock;
+struct MSmartOamUnit;
 
-struct MSmartOamEntry {
+struct MSmartOamEntry : public MOamEntry {
     MSmartOamEntry();
 
     void SetChr(MChrBlock *chr);
     void SetPalette(MPalBlock *pal);
 
     void Clear() {
-        oam.attr01 = 0;
-        oam.attr2 = 0;
-        oam.objMode = 2;
+        attr01 = 0;
+        attr2 = 0;
+        objMode = 2;
         unk08 = 0;
         unk0C = 0;
-        unk10 = 0;
-        unk14 = 0;
+        posX = 0;
+        posY = 0;
         width = 8;
         height = 8;
         flags = 0;
     }
+    void SetCoord(MPoint pos) {
+        posX = pos.x;
+        posY = pos.y;
+        depth = 0x7FFF - pos.y;
+    }
+    void SetShape(int shape) {
+        MOamEntry::SetShape(shape);
+        if (objMode != 3) {
+            width = gObjSizes[0][shape].x;
+            height = gObjSizes[0][shape].y;
+        } else {
+            width = gObjSizes[0][shape].x * 2;
+            height = gObjSizes[0][shape].y * 2;
+        }
+    }
 
-    MOamEntry oam;          // 0x00
     int unk08;              // 0x08
     int unk0C;              // 0x0C
-    int unk10;              // 0x10
-    int unk14;              // 0x14
+    int posX;               // 0x10
+    int posY;               // 0x14
     int width;              // 0x18: pixels
     int height;             // 0x1C
     union {
@@ -43,15 +57,18 @@ struct MSmartOamEntry {
             u32 flags : 22;
         };
         struct {
-            u32 : 30;
+            u32 : 14;
+            u32 depth : 16;     // drawn front to back by this
             u32 anchor : 2;
         };
     };
-    MSmartOamBlock *block;  // 0x24
+    MSmartOamUnit *block;  // 0x24
 };
 
 // A run of entries.
-struct MSmartOamBlock : public MHeapBlock {
+struct MSmartOamUnit : public MHeapBlock {
+    typedef MSmartOamEntry Entry;
+
     u32 count;          // 0x0C
     MSmartOam *owner;   // 0x10
 
@@ -76,8 +93,8 @@ public:
 
     void Init(BOOL fromEnd);
     void SetUnk1C(int value);
-    MSmartOamBlock *Alloc(int count, BOOL fromEnd);
-    void Free(MSmartOamBlock *block);
+    MSmartOamUnit *Alloc(int count, BOOL fromEnd);
+    void Free(MSmartOamUnit *block);
 
     void SetOffset(MPoint offset) { mOffset = offset; }
 
@@ -90,7 +107,7 @@ public:
     int mCount;                 // 0x14
     int mOamCount;              // 0x18: real OAM entries used
     int mUnk1C;                 // 0x1C
-    MOamBlock *mOamBlock;       // 0x20
+    MOamUnit *mOamBlock;       // 0x20
     MHeap *mHeap;               // 0x24: over mEntries
     MSmartOamEntry *mEntries;   // 0x28: mCount, then a terminator
     int *mOrder;                // 0x2C

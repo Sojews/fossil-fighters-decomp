@@ -22,6 +22,10 @@ public:
     virtual void GetLine(int y, void *dest) = 0;
     virtual void SetLine(int y, const void *src) = 0;
 
+    // Reads or writes one pixel row of a block of 16-color tiles laid out tilesWide to a row.
+    void ReadRow(MChrBlock *chr, int start, int tilesWide, int y, u32 *dest);
+    void WriteRow(MChrBlock *chr, int start, int tilesWide, int y, const u32 *src);
+
     void DrawText(MFont *font, MPoint pos, int spacing, const std::string &text);
     void DrawText(MFont *font, MPoint pos, int spacing, const std::wstring &text);
     MCanvasWindow *CreateWindow(MRect rect);
@@ -103,9 +107,6 @@ public:
     virtual void SetPixel(int x, int y, int color);
     virtual void GetLine(int y, void *dest);
     virtual void SetLine(int y, const void *src);
-
-    void ReadRow(MChrBlock *chr, int start, int tilesWide, int y, u32 *dest);
-    void WriteRow(MChrBlock *chr, int start, int tilesWide, int y, const u32 *src);
 
     void *mBg;              // 0x18
     MSmartText *mText;      // 0x1C

@@ -186,7 +186,7 @@ void MDummyCanvas::Execute() {
 }
 
 // Reads one row of pixels (4 bytes a tile) across a canvas's tiles.
-void MTextCanvas::ReadRow(MChrBlock *chr, int start, int tilesWide, int y, u32 *dest) {
+void MCanvas::ReadRow(MChrBlock *chr, int start, int tilesWide, int y, u32 *dest) {
     const u32 *src = (const u32 *)(chr->addr + (start + (y >> 3) * tilesWide) * chr->unitSize) + (y & 7);
     for (; tilesWide > 0; tilesWide--) {
         *dest++ = *src;
@@ -194,7 +194,7 @@ void MTextCanvas::ReadRow(MChrBlock *chr, int start, int tilesWide, int y, u32 *
     }
 }
 
-void MTextCanvas::WriteRow(MChrBlock *chr, int start, int tilesWide, int y, const u32 *src) {
+void MCanvas::WriteRow(MChrBlock *chr, int start, int tilesWide, int y, const u32 *src) {
     u32 *dest = (u32 *)(chr->addr + (start + (y >> 3) * tilesWide) * chr->unitSize) + (y & 7);
     for (; tilesWide > 0; tilesWide--) {
         *dest = *src++;

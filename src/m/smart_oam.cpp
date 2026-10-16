@@ -6,40 +6,40 @@
 
 void MSmartOamEntry::SetChr(MChrBlock *chr) {
     u32 tile = chr->tile;
-    if (oam.colors256 == 1) {
+    if (colors256 == 1) {
         tile <<= 1;
     }
-    oam.tile = tile;
+    this->tile = tile;
 }
 
 void MSmartOamEntry::SetPalette(MPalBlock *pal) {
-    oam.palette = pal->index;
+    palette = pal->index;
 }
 
-void MSmartOamBlock::SetMode(int mode) {
+void MSmartOamUnit::SetMode(int mode) {
     u32 n = count;
     MSmartOamEntry *entry = GetEntries();
     if (n != 0) {
         do {
             n--;
-            entry->oam.gfxMode = mode;
+            entry->gfxMode = mode;
             entry++;
         } while (n != 0);
     }
 }
 
-void MSmartOamBlock::SetObjMode(int mode) {
+void MSmartOamUnit::SetObjMode(int mode) {
     MSmartOamEntry *entry = GetEntries();
     u32 n = count;
     if (n != 0) {
         do {
-            entry->oam.objMode = mode;
+            entry->objMode = mode;
             if (mode != 3) {
-                MPoint size = gObjSizes[0][entry->oam.shape | (entry->oam.size << 2)];
+                MPoint size = gObjSizes[0][entry->shape | (entry->size << 2)];
                 entry->width = size.x;
                 entry->height = size.y;
             } else {
-                MPoint size = gObjSizes[0][entry->oam.shape | (entry->oam.size << 2)];
+                MPoint size = gObjSizes[0][entry->shape | (entry->size << 2)];
                 int width = size.x * 2;
                 int height = size.y * 2;
                 entry->width = width;
@@ -51,45 +51,45 @@ void MSmartOamBlock::SetObjMode(int mode) {
     }
 }
 
-void MSmartOamBlock::SetAffineParam(int param) {
+void MSmartOamUnit::SetAffineParam(int param) {
     u32 n = count;
     MSmartOamEntry *entry = GetEntries();
     if (n != 0) {
         do {
             n--;
-            entry->oam.affineParam = param;
+            entry->affineParam = param;
             entry++;
         } while (n != 0);
     }
 }
 
-void MSmartOamBlock::SetFlip(BOOL hflip, BOOL vflip) {
+void MSmartOamUnit::SetFlip(BOOL hflip, BOOL vflip) {
     MSmartOamEntry *entry = GetEntries();
     u32 n = count;
     if (n != 0) {
         do {
             n--;
-            entry->oam.hflip = hflip;
-            entry->oam.vflip = vflip;
+            entry->hflip = hflip;
+            entry->vflip = vflip;
             entry++;
         } while (n != 0);
     }
 }
 
-void MSmartOamBlock::SetPriority(int priority) {
+void MSmartOamUnit::SetPriority(int priority) {
     u32 n = count;
     MSmartOamEntry *entry = GetEntries();
     if (n != 0) {
         do {
             n--;
-            entry->oam.priority = priority;
+            entry->priority = priority;
             entry++;
         } while (n != 0);
     }
 }
 
 // NONMATCHING: the shifted anchor and the entry pointer get different registers.
-void MSmartOamBlock::SetAnchor(int anchor) {
+void MSmartOamUnit::SetAnchor(int anchor) {
     u32 n = count;
     MSmartOamEntry *entry = GetEntries();
     if (n != 0) {
@@ -101,7 +101,7 @@ void MSmartOamBlock::SetAnchor(int anchor) {
     }
 }
 
-void MSmartOamBlock::Clear() {
+void MSmartOamUnit::Clear() {
     MSmartOamEntry *entry = GetEntries();
     u32 n = count;
     if (n != 0) {
@@ -113,25 +113,25 @@ void MSmartOamBlock::Clear() {
     }
 }
 
-void MSmartOamBlock::Hide() {
+void MSmartOamUnit::Hide() {
     MSmartOamEntry *entry = GetEntries();
     u32 n = count;
     if (n != 0) {
         do {
             n--;
-            entry->oam.objMode = 2;
+            entry->objMode = 2;
             entry++;
         } while (n != 0);
     }
 }
 
-void MSmartOamBlock::Show() {
+void MSmartOamUnit::Show() {
     MSmartOamEntry *entry = GetEntries();
     u32 n = count;
     if (n != 0) {
         do {
             n--;
-            entry->oam.objMode = 0;
+            entry->objMode = 0;
             entry++;
         } while (n != 0);
     }
@@ -204,10 +204,10 @@ void MSmartOam::SetUnk1C(int value) {
     mUnk1C = value;
 }
 
-MSmartOamBlock *MSmartOam::Alloc(int count, BOOL fromEnd) {
+MSmartOamUnit *MSmartOam::Alloc(int count, BOOL fromEnd) {
     MScopedLock lock(&mHeap->mMutex, TRUE);
-    MSmartOamBlock *block =
-        (MSmartOamBlock *)mHeap->Alloc(count * sizeof(MSmartOamEntry), fromEnd, 4, 0, 0, 0);
+    MSmartOamUnit *block =
+        (MSmartOamUnit *)mHeap->Alloc(count * sizeof(MSmartOamEntry), fromEnd, 4, 0, 0, 0);
     block->count = count;
     block->owner = this;
     MSmartOamEntry *entry = block->GetEntries();
@@ -219,7 +219,7 @@ MSmartOamBlock *MSmartOam::Alloc(int count, BOOL fromEnd) {
     return block;
 }
 
-void MSmartOam::Free(MSmartOamBlock *block) {
+void MSmartOam::Free(MSmartOamUnit *block) {
     MScopedLock lock(&mHeap->mMutex, TRUE);
     block->Clear();
     mHeap->Free(block);

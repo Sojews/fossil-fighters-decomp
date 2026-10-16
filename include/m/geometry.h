@@ -11,6 +11,7 @@ struct MPoint {
     }
 
     MPoint operator+(MPoint o) const { return MPoint(x + o.x, y + o.y); }
+    bool operator==(const MPoint &o) const { return x == o.x && y == o.y; }
 
     void Set(int x_, int y_) {
         x = x_;
