@@ -109,7 +109,7 @@ for f in info["files"]:
     if obj != f["delink_file"]:   # a matched source file: compile it
         extra = next((v for k, v in LIB_CC_FLAGS.items() if f["name"].startswith(k)), "")
         # mwcc keeps the first -lang it sees, so the language is set per file rather than in CC_FLAGS.
-        extra += " -lang c++ -RTTI off" if f["name"].endswith(".cpp") else " -lang c"
+        extra += " -lang c++ -RTTI on" if f["name"].endswith(".cpp") else " -lang c"
         w(f"build {obj}: cc {f['name']}\n  outdir = {Path(obj).parent}\n  stem = {Path(obj).stem}\n  extra_cflags = {extra}")
 
 elf = build_dir / "arm9.o"
