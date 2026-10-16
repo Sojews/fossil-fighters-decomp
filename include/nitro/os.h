@@ -92,6 +92,17 @@ void OS_LockMutex(OSMutex *mutex);
 BOOL OS_TryLockMutex(OSMutex *mutex);
 void OS_UnlockMutex(OSMutex *mutex);
 void OS_Terminate(void);
+void OS_Init(void);
+void OS_SetIrqStackWarningOffset(u32 offset);
+
+typedef enum {
+    OS_ARENA_MAIN = 0,
+} OSArenaId;
+
+void *OS_GetArenaLo(OSArenaId id);
+void *OS_GetArenaHi(OSArenaId id);
+void OS_SetArenaLo(OSArenaId id, void *newLo);
+void DC_FlushAll(void);
 void OS_ResetSystem(u32 parameter);
 void OS_InitTick(void);
 int OS_SPrintf(char *dst, const char *fmt, ...);
