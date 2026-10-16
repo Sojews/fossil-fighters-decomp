@@ -4,6 +4,9 @@
 #include "game/dino_ui_save_slot_select.h"
 #include "game/dino_ui_save_slot_confirm.h"
 #include "game/dino_ui_save_slot_select_menu_confirm_delete_task.h"
+#include "game/dino_ui_save_slot_select_menu_item.h"
+#include "game/dino_ui_save_slot_select_menu_delete_item.h"
+#include "game/dino_ui_save_slot_select_menu_cancel_item.h"
 
 DinoUiSaveSlotSelect::~DinoUiSaveSlotSelect() {
 }
@@ -12,4 +15,13 @@ DinoUiSaveSlotConfirm::~DinoUiSaveSlotConfirm() {
 }
 
 DinoUiSaveSlotSelectMenuConfirmDeleteTask::~DinoUiSaveSlotSelectMenuConfirmDeleteTask() {
+}
+
+DinoUiSaveSlotSelectMenuItem::~DinoUiSaveSlotSelectMenuItem() {
+}
+
+DinoUiSaveSlotSelectMenuDeleteItem::~DinoUiSaveSlotSelectMenuDeleteItem() {
+}
+
+DinoUiSaveSlotSelectMenuCancelItem::~DinoUiSaveSlotSelectMenuCancelItem() {
 }

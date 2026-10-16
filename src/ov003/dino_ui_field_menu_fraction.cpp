@@ -12,6 +12,7 @@
 #include "game/dino_ui_parts_kaseki_button.h"
 #include "game/dino_ui_parts_team_info.h"
 #include "game/dino_ui_parts_team_tech.h"
+#include "game/dino_ui_parts_reviver_name.h"
 
 DinoUiFieldMenuFraction::~DinoUiFieldMenuFraction() {
 }
@@ -44,4 +45,7 @@ DinoUiPartsTeamInfo::~DinoUiPartsTeamInfo() {
 }
 
 DinoUiPartsTeamTech::~DinoUiPartsTeamTech() {
+}
+
+DinoUiPartsReviverName::~DinoUiPartsReviverName() {
 }

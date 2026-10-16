@@ -31,3 +31,9 @@ src/ov005/dino_ui_mask_equip.cpp:
 
 src/ov005/dino_ui_canon_putin.cpp:
     .text       start:0x02164a20 end:0x02164ac8
+
+src/ov005/dino_ui_cleaning_menu_item.cpp:
+    .text       start:0x0215c868 end:0x0215ca8c
+
+src/ov005/dino_ui_container_base_menu_item.cpp:
+    .text       start:0x02163ae4 end:0x02163c38

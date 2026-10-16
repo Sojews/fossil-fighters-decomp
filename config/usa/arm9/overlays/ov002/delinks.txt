@@ -40,3 +40,6 @@ src/ov002/dino_cleaning_rock.cpp:
 
 src/ov002/dino_cleaning_kaseki_rock.cpp:
     .text       start:0x021602bc end:0x02160324
+
+src/ov002/dino_cleaning_stop_confirm_menu_item.cpp:
+    .text       start:0x02157004 end:0x021570ac

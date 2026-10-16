@@ -25,3 +25,6 @@ src/ov001/dino_field_area_panel.cpp:
 
 src/ov001/dino_field_battle_start_effect.cpp:
     .text       start:0x02168bd4 end:0x02168c08
+
+src/ov001/dino_field_capture_fade_out_task.cpp:
+    .text       start:0x0215bd10 end:0x0215bd98

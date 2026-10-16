@@ -8,6 +8,7 @@
 #include "game/dino_ui_island_map_menu_item.h"
 #include "game/island_map_key_check_task.h"
 #include "game/guid_man.h"
+#include "game/dino_map_back_button.h"
 
 DinoUiIslandMap::~DinoUiIslandMap() {
 }
@@ -28,4 +29,7 @@ IslandMapKeyCheckTask::~IslandMapKeyCheckTask() {
 }
 
 GuidMan::~GuidMan() {
+}
+
+DinoMapBackButton::~DinoMapBackButton() {
 }

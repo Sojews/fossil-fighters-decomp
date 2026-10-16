@@ -37,3 +37,15 @@ src/ov004/dino_ui_island_map.cpp:
 
 src/ov004/dino_ui2_parts_rock_name.cpp:
     .text       start:0x0216f2f8 end:0x0216f370
+
+src/ov004/dino_ui_top_menu_item.cpp:
+    .text       start:0x02158274 end:0x02158528
+
+src/ov004/dino_ui_multiplay_menu_item.cpp:
+    .text       start:0x02162ffc end:0x021631a0
+
+src/ov004/dino_ui_save_menu.cpp:
+    .text       start:0x0216a088 end:0x0216a0cc
+
+src/ov004/dino_ui2_container_base_menu_item.cpp:
+    .text       start:0x021705f8 end:0x0217074c
