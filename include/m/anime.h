@@ -23,6 +23,17 @@ public:
 
     void Reset();
 
+    void SetDuration(u32 frames) {
+        mDuration = frames;
+        if (mStepsPerFrame) {
+            if (frames == 0) {
+                mSteps = 1;
+            } else {
+                mSteps = frames * 16;
+            }
+        }
+    }
+
     u8 mStarted;        // 0x10
     u8 mFinished;       // 0x11: the last step has been applied; exits next frame
     u8 mStepsPerFrame;  // 0x12: mSteps is set from the duration (16 per frame) rather than the range

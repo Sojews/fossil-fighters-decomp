@@ -22,6 +22,12 @@ struct MRect {
         right = right_;
         bottom = bottom_;
     }
+    MRect(MPoint topLeft, MPoint bottomRight) {
+        left = topLeft.x;
+        top = topLeft.y;
+        right = bottomRight.x;
+        bottom = bottomRight.y;
+    }
 
     int left;
     int top;
