@@ -17746,8 +17746,8 @@ from:0x0205d5b0 kind:thumb_call to:0x0205d5c4 module:main
 from:0x0205d5b6 kind:thumb_call to:0x02006c14 module:main
 from:0x0205d5bc kind:thumb_call to:0x020051dc module:main
 from:0x0205d6d8 kind:load to:0x020c3a3c module:main
-from:0x0205d6dc kind:load to:0x020c3a40 module:main
-from:0x0205d6e0 kind:load to:0x020c3a44 module:main
+from:0x0205d6dc kind:load to:0x020c3a3c add:0x4 module:main
+from:0x0205d6e0 kind:load to:0x020c3a3c add:0x8 module:main
 from:0x0205d6ea kind:thumb_call to:0x0205d4f8 module:main
 from:0x0205d700 kind:load to:0x020c3bb8 add:0x8 module:main
 from:0x0205d72c kind:thumb_call to:0x0205d78c module:main

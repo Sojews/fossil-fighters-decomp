@@ -4,6 +4,7 @@
 #define M_FONT_H
 
 #include <vector>
+#include <string>
 #include "m/task.h"
 #include "m/geometry.h"
 #include "m/chr.h"
@@ -11,7 +12,7 @@
 class MFont {
 public:
     MFont();
-    virtual int GetHeight() = 0;
+    virtual int GetEncoding() = 0;
     virtual MPoint GetMaxSize() = 0;
     virtual MPoint GetMinSize() = 0;
     virtual MPoint GetGlyphSize(u32 code) = 0;
@@ -29,6 +30,8 @@ public:
     int GetShadowColor();
     int GetBackColor();
     void SetColors(int color, int shadow, int back);
+    MPoint MeasureText(const std::string &text, int spacing, int lineSpacing);
+    MPoint MeasureText(const std::wstring &text, int spacing, int lineSpacing);
 
     int mRefCount;      // 0x04
     int mColor;         // 0x08
@@ -40,7 +43,7 @@ public:
 struct MFontData {
     u32 unk00;
     u32 flags;          // 0x04: bit 0: (1-bit fonts) ...
-    int height;         // 0x08
+    int encoding;       // 0x08: the text encoding the font is indexed by
     u32 entrySize;      // 0x0C: bytes per glyph entry
     u32 unk10;
     u32 count;          // 0x14: glyph entries
@@ -56,7 +59,7 @@ struct MFontData {
 class MRawFont : public MFont {
 public:
     MRawFont(const MFontData *data);
-    virtual int GetHeight();
+    virtual int GetEncoding();
     virtual MPoint GetMaxSize();
     virtual MPoint GetMinSize();
     virtual MPoint GetGlyphSize(u32 code);
@@ -96,7 +99,7 @@ public:
 class MCompositeFont : public MFont {
 public:
     MCompositeFont();
-    virtual int GetHeight();
+    virtual int GetEncoding();
     virtual MPoint GetMaxSize();
     virtual MPoint GetMinSize();
     virtual MPoint GetGlyphSize(u32 code);

@@ -1,5 +1,5 @@
-// std::string as the game's MSL C++ library lays it out. Only the parts the game code uses are declared; the
-// member functions are defined out of line (they're template instantiations kept once in the binary).
+// std::basic_string as the game's MSL C++ library lays it out. Only the parts the game code uses are declared;
+// the out-of-line member functions are template instantiations kept once in the binary.
 #ifndef MSL_STRING
 #define MSL_STRING
 
@@ -13,6 +13,8 @@ template <class C, class Traits = char_traits<C>, class Alloc = allocator<C> >
 class basic_string {
 public:
     typedef unsigned long size_type;
+    typedef C *iterator;
+    typedef const C *const_iterator;
 
     basic_string(const C *s);
     basic_string(const basic_string &other);
@@ -21,11 +23,24 @@ public:
     void reserve(size_type n);
 
     bool is_long() const { return mLong.isLong; }
-    size_type size() const { return is_long() ? mLong.size : mShort.size; }
-    const C *data() const { return is_long() ? mLong.data : mShort.buf; }
+    size_type size() const { return !is_long() ? mShort.size : mLong.size; }
+    const C *data() const { return !is_long() ? mShort.buf : mLong.data; }
     const C *c_str() const { return data(); }
+    const_iterator begin() const { return !is_long() ? mShort.buf : mLong.data; }
+    const_iterator end() const {
+        const C *p;
+        size_type n;
+        if (!is_long()) {
+            p = mShort.buf;
+            n = mShort.size;
+        } else {
+            p = mLong.data;
+            n = mLong.size;
+        }
+        return p + n;
+    }
 
-    // Strings of up to 10 characters are stored in place.
+    // Short strings are stored in place.
     union {
         struct {
             unsigned long isLong : 1;
@@ -36,12 +51,13 @@ public:
         struct {
             unsigned char isLong : 1;
             unsigned char size : 7;
-            C buf[11];
+            C buf[(12 - sizeof(C)) / sizeof(C)];
         } mShort;
     };
 };
 
 typedef basic_string<char> string;
+typedef basic_string<wchar_t> wstring;
 
 string operator+(const char *lhs, const string &rhs);
 

@@ -4,6 +4,9 @@
 #include "m/font.h"
 #include <algorithm>
 #include "m/looper.h"
+#include "m/text_codec.h"
+
+static int sMeasureMin[3] = {0, 1, 1};
 
 MFont::MFont() {
     mRefCount = 0;
@@ -59,14 +62,49 @@ void MFont::SetColors(int color, int shadow, int back) {
     SetBackColor(back);
 }
 
+MPoint MFont::MeasureText(const std::string &text, int spacing, int lineSpacing) {
+    return MeasureText(MDecodeText(text, GetEncoding()), spacing, lineSpacing);
+}
+
+// The size of text: the widest line by the lines' total height (lines end at '\n').
+MPoint MFont::MeasureText(const std::wstring &text, int spacing, int lineSpacing) {
+    int lines = 0;
+    int height = 0;
+    int width = 0;
+    const wchar_t *p = text.begin();
+    while (p != text.end()) {
+        int count = 0;
+        MPoint line(0, 0);
+        while (*p != 0 && *p != '\n') {
+            MPoint size = GetGlyphSize(*p);
+            line.x += size.x;
+            line.y = std::max(line.y, size.y);
+            p++;
+            count++;
+        }
+        if (count != 0) {
+            line.x += (count - 1) * spacing;
+        }
+        width = std::max(width, line.x);
+        height += line.y;
+        if (p == text.end()) {
+            break;
+        }
+        lines++;
+        p++;
+    }
+    height += lines * lineSpacing;
+    return MPoint(std::max(sMeasureMin[2], width), std::max(sMeasureMin[1], height));
+}
+
 MRawFont::MRawFont(const MFontData *data) {
     mData = data;
     mCachedCode = 0;
     mCachedGlyph = NULL;
 }
 
-int MRawFont::GetHeight() {
-    return mData->height;
+int MRawFont::GetEncoding() {
+    return mData->encoding;
 }
 
 MPoint MRawFont::GetMaxSize() {
@@ -200,8 +238,8 @@ MCompositeFont::~MCompositeFont() {
     }
 }
 
-int MCompositeFont::GetHeight() {
-    return mFonts[0]->GetHeight();
+int MCompositeFont::GetEncoding() {
+    return mFonts[0]->GetEncoding();
 }
 
 void MCompositeFont::AddFont(MFont *font) {

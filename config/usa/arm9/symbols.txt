@@ -351,7 +351,7 @@ func_020057a8 kind:function(thumb,size=0x38c) addr:0x020057a8
 func_02005b34 kind:function(thumb,size=0xd4) addr:0x02005b34
 func_02005c08 kind:function(thumb,size=0x46) addr:0x02005c08
 func_02005c50 kind:function(thumb,size=0x32) addr:0x02005c50
-func_02005c84 kind:function(thumb,size=0x52) addr:0x02005c84
+_ZNSsC1ERKSs kind:function(thumb,size=0x52) addr:0x02005c84
 _ZN15MSmartObjCanvasD1Ev kind:function(thumb,size=0xc) addr:0x02005cd8
 _ZN15MSmartObjCanvasD0Ev kind:function(thumb,size=0x12) addr:0x02005ce4
 func_02005cf8 kind:function(thumb,size=0x1c) addr:0x02005cf8
@@ -378,7 +378,7 @@ func_0200663c kind:function(thumb,size=0xc4) addr:0x0200663c
 func_02006700 kind:function(thumb,size=0x20) addr:0x02006700
 func_02006720 kind:function(thumb,size=0x4ac) addr:0x02006720
 func_02006bcc kind:function(thumb,size=0x46) addr:0x02006bcc
-func_02006c14 kind:function(thumb,size=0x16) addr:0x02006c14
+_ZNSbIwSt11char_traitsIwESaIwEED1Ev kind:function(thumb,size=0x16) addr:0x02006c14
 func_02006c2c kind:function(thumb,size=0x124) addr:0x02006c2c
 func_02006d50 kind:function(thumb,size=0x220) addr:0x02006d50
 func_02006f70 kind:function(thumb,size=0x2e) addr:0x02006f70
@@ -3587,7 +3587,7 @@ func_0204d5ec kind:function(thumb,size=0x78) addr:0x0204d5ec
 func_0204d664 kind:function(thumb,size=0x160) addr:0x0204d664
 func_0204d7c4 kind:function(thumb,size=0x56) addr:0x0204d7c4
 func_0204d81c kind:function(thumb,size=0xc) addr:0x0204d81c
-func_0204d828 kind:function(thumb,size=0x5c) addr:0x0204d828
+_Z11MDecodeTextSsi kind:function(thumb,size=0x5c) addr:0x0204d828
 func_0204d884 kind:function(thumb,size=0x5c) addr:0x0204d884
 func_0204d8e0 kind:function(thumb,size=0x5c) addr:0x0204d8e0
 func_0204d93c kind:function(thumb,size=0x6a) addr:0x0204d93c
@@ -4589,10 +4589,10 @@ _ZN5MFont8GetColorEv kind:function(thumb,size=0x4) addr:0x0205d550
 _ZN5MFont14GetShadowColorEv kind:function(thumb,size=0x4) addr:0x0205d554
 _ZN5MFont12GetBackColorEv kind:function(thumb,size=0x4) addr:0x0205d558
 _ZN5MFont9SetColorsEiii kind:function(thumb,size=0x24) addr:0x0205d55c
-func_0205d580 kind:function(thumb,size=0x44) addr:0x0205d580
-func_0205d5c4 kind:function(thumb,size=0x120) addr:0x0205d5c4
+_ZN5MFont11MeasureTextERKSsii kind:function(thumb,size=0x44) addr:0x0205d580
+_ZN5MFont11MeasureTextERKSbIwSt11char_traitsIwESaIwEEii kind:function(thumb,size=0x120) addr:0x0205d5c4
 _ZN8MRawFontC2EPK9MFontData kind:function(thumb,size=0x20) addr:0x0205d6e4
-_ZN8MRawFont9GetHeightEv kind:function(thumb,size=0x6) addr:0x0205d704
+_ZN8MRawFont11GetEncodingEv kind:function(thumb,size=0x6) addr:0x0205d704
 _ZN8MRawFont10GetMaxSizeEv kind:function(thumb,size=0xc) addr:0x0205d70c
 _ZN8MRawFont10GetMinSizeEv kind:function(thumb,size=0xc) addr:0x0205d718
 _ZN8MRawFont12GetGlyphSizeEm kind:function(thumb,size=0x22) addr:0x0205d724
@@ -4611,7 +4611,7 @@ _ZN14MCompositeFontC2Ev kind:function(thumb,size=0x30) addr:0x0205d9f8
 _ZN14MCompositeFontD1Ev kind:function(thumb,size=0x40) addr:0x0205da28
 _ZN14MCompositeFontD0Ev kind:function(thumb,size=0x44) addr:0x0205da68
 _ZN14MCompositeFontD2Ev kind:function(thumb,size=0x40) addr:0x0205daac
-_ZN14MCompositeFont9GetHeightEv kind:function(thumb,size=0xe) addr:0x0205daec
+_ZN14MCompositeFont11GetEncodingEv kind:function(thumb,size=0xe) addr:0x0205daec
 _ZN14MCompositeFont7AddFontEP5MFont kind:function(thumb,size=0xc0) addr:0x0205dafc
 _ZN14MCompositeFont10GetMaxSizeEv kind:function(thumb,size=0xa) addr:0x0205dbbc
 _ZN14MCompositeFont10GetMinSizeEv kind:function(thumb,size=0xa) addr:0x0205dbc8
@@ -4804,8 +4804,8 @@ _ZN13MCanvasWindow7ExecuteEv kind:function(thumb,size=0x2) addr:0x020623e8
 _ZN7MCanvasC2E6MPoint kind:function(thumb,size=0x20) addr:0x020623ec
 _ZN7MCanvasD0Ev kind:function(thumb,size=0x12) addr:0x0206240c
 _ZN7MCanvasD2Ev kind:function(thumb,size=0xc) addr:0x02062420
-func_0206242c kind:function(thumb,size=0x4e) addr:0x0206242c
-func_0206247c kind:function(thumb,size=0x94) addr:0x0206247c
+_ZN7MCanvas8DrawTextEP5MFont6MPointiRKSs kind:function(thumb,size=0x4e) addr:0x0206242c
+_ZN7MCanvas8DrawTextEP5MFont6MPointiRKSbIwSt11char_traitsIwESaIwEE kind:function(thumb,size=0x94) addr:0x0206247c
 _ZN7MCanvas12CreateWindowE5MRect kind:function(thumb,size=0x3a) addr:0x02062510
 _ZN12MDummyCanvasC1E6MPoint kind:function(thumb,size=0x30) addr:0x0206254c
 _ZN12MDummyCanvasD1Ev kind:function(thumb,size=0xc) addr:0x0206257c
@@ -12506,9 +12506,7 @@ _ZTS20MBrightClearTransfer kind:data(any) addr:0x020c39dc
 _ZTV19MBrightModeTransfer kind:data(any) addr:0x020c39f4
 _ZTV17MBrightRatioAnime kind:data(any) addr:0x020c3a0c
 _ZTV20MBrightClearTransfer kind:data(any) addr:0x020c3a24
-data_020c3a3c kind:data(any) addr:0x020c3a3c
-data_020c3a40 kind:data(any) addr:0x020c3a40
-data_020c3a44 kind:data(any) addr:0x020c3a44
+sMeasureMin kind:data(any) addr:0x020c3a3c
 _ZTI8MFontSet kind:data(any) addr:0x020c3a58
 _ZTI9M4BitFont kind:data(any) addr:0x020c3a64
 _ZTI14MCompositeFont kind:data(any) addr:0x020c3a70

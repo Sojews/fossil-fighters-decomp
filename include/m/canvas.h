@@ -5,6 +5,7 @@
 #include "m/view.h"
 #include "m/font.h"
 #include "m/smart_text.h"
+#include <string>
 
 class MCanvasWindow;
 
@@ -21,6 +22,8 @@ public:
     virtual void GetLine(int y, void *dest) = 0;
     virtual void SetLine(int y, const void *src) = 0;
 
+    void DrawText(MFont *font, MPoint pos, int spacing, const std::string &text);
+    void DrawText(MFont *font, MPoint pos, int spacing, const std::wstring &text);
     MCanvasWindow *CreateWindow(MRect rect);
 };
 

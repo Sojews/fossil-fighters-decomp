@@ -4,6 +4,7 @@
 #include "m/canvas.h"
 #include "m/text.h"
 #include "m/looper.h"
+#include "m/text_codec.h"
 #include "nitro/mi.h"
 
 MCanvasWindow::MCanvasWindow(MCanvas *canvas, MRect rect)
@@ -92,6 +93,25 @@ MCanvas::MCanvas(MPoint size) : MFixedSizeView(size) {
 }
 
 MCanvas::~MCanvas() {
+}
+
+void MCanvas::DrawText(MFont *font, MPoint pos, int spacing, const std::string &text) {
+    DrawText(font, pos, spacing, MDecodeText(text, font->GetEncoding()));
+}
+
+// Draws characters left to right until one would go past the right edge.
+void MCanvas::DrawText(MFont *font, MPoint pos, int spacing, const std::wstring &text) {
+    for (const wchar_t *p = text.begin(); p != text.end(); p++) {
+        wchar_t c = *p;
+        int width = font->GetGlyphSize(c).x;
+        if (pos.x + width > GetWidth()) {
+            break;
+        }
+        if (pos.y < GetHeight()) {
+            DrawChar(font, pos, c);
+        }
+        pos.x += width + spacing;
+    }
 }
 
 MCanvasWindow *MCanvas::CreateWindow(MRect rect) {
