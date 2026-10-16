@@ -26,12 +26,13 @@ void MBgTaskManager::Add(MBgTask *task) {
 }
 
 void MBgTaskManager::Remove(MBgTask *task) {
-    OS_LockMutex(&mMutex);
+    OSMutex *mutex = &mMutex;
+    OS_LockMutex(mutex);
     std::list<MBgTask *>::iterator it = std::find(mTasks.begin(), mTasks.end(), task);
     if (it != mTasks.end()) {
         mTasks.erase(it);
     }
-    OS_UnlockMutex(&mMutex);
+    OS_UnlockMutex(mutex);
 }
 
 void MBgTaskManager::OnPostLoop() {
