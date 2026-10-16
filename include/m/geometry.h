@@ -54,6 +54,11 @@ struct MRect {
     int GetWidth() const { return right - left; }
     int GetHeight() const { return bottom - top; }
     MPoint GetCenter() const { return MPoint((left + right) >> 1, (top + bottom) >> 1); }
+    bool Intersects(MRect o) const { return o.right > left && right > o.left && o.bottom > top && bottom > o.top; }
+    MRect Intersection(MRect o) const {
+        return MRect(left > o.left ? left : o.left, top > o.top ? top : o.top, right < o.right ? right : o.right,
+                     bottom < o.bottom ? bottom : o.bottom);
+    }
     bool Contains(MPoint p) const {
         int x = p.x;
         int y = p.y;

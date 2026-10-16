@@ -530,7 +530,7 @@ namespace std {
                     this->size_++;
                     this->back() = x;
                 } else {
-                    this->alloc().construct(this->end(), x);
+                    new (this->end()) T(x);
                     this->size_++;
                 }
             } else {
@@ -563,20 +563,64 @@ namespace std {
         typedef _Constructor::const_pointer const_pointer;
 
     public:
-        typedef _Constructor::iterator iterator;
-        typedef _Constructor::const_iterator const_iterator;
+        // Iterators are small classes around a pointer.
+        class iterator {
+        public:
+            typedef random_access_iterator_tag iterator_category;
+            typedef T value_type;
+            typedef ptrdiff_t difference_type;
+            typedef T *pointer;
+            typedef T &reference;
+
+            iterator() {}
+            explicit iterator(T *p) : ptr_(p) {}
+            T &operator*() const {
+                return *ptr_;
+            }
+            T *operator->() const {
+                return ptr_;
+            }
+            iterator &operator++() {
+                ++ptr_;
+                return *this;
+            }
+            iterator operator++(int) {
+                iterator tmp = *this;
+                ++ptr_;
+                return tmp;
+            }
+            iterator &operator--() {
+                --ptr_;
+                return *this;
+            }
+            bool operator==(const iterator &x) const {
+                return ptr_ == x.ptr_;
+            }
+            bool operator!=(const iterator &x) const {
+                return ptr_ != x.ptr_;
+            }
+            T *ptr_;
+        };
+        typedef const T *const_iterator;
 
         vector() {
             this->init();
         }
         ~vector() {}
 
+        iterator begin() {
+            return iterator(this->data_);
+        }
+        iterator end() {
+            return iterator(this->data_ + this->size_);
+        }
+
         void push_back(const_reference x) {
             _Constructor::push_back(x);
         }
 
         void clear() {
-            _Deleter::clear();
+            this->erase_at_end(this->size_);
         }
 
         reference operator[](size_t n) {
@@ -588,11 +632,11 @@ namespace std {
         }
 
         iterator erase(iterator __first, iterator __last) {
-            return _Deleter::erase(__first, __last, UnkMSLStruct1());
+            return iterator(_Deleter::erase(__first.ptr_, __last.ptr_, UnkMSLStruct1()));
         }
 
         iterator erase(iterator pos) {
-            return _Deleter::erase(pos, UnkMSLStruct1());
+            return iterator(_Deleter::erase(pos.ptr_, UnkMSLStruct1()));
         }
     };
 

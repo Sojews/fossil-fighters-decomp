@@ -213,7 +213,7 @@ void MOamCanvas<TOam, TUnit>::Layout(MRect rect) {
     mRects.push_back(rect);
     while (mRects.size() != 0) {
         MRect r = mRects.back();
-        mRects.erase(&mRects.back());
+        mRects.erase(std::vector<MRect>::iterator(&mRects.back()));
         int h = r.bottom - r.top;
         int w = r.right - r.left;
         int best = -1;
