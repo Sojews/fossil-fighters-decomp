@@ -31,7 +31,7 @@ public:
     int GetShadowColor();
     int GetBackColor();
     void SetColors(int color, int shadow, int back);
-    MPoint MeasureText(const std::string &text, int spacing, int lineSpacing);
+    MPoint MeasureText(std::string text, int spacing, int lineSpacing);
     MPoint MeasureText(const std::wstring &text, int spacing, int lineSpacing);
 
     int mRefCount;      // 0x04

@@ -89,6 +89,9 @@ src/m/bit_vector.cpp:
 src/game/dino_common_window.cpp:
     .text       start:0x0201b574 end:0x0201bad0
 
+src/game/dino_common_label.cpp:
+    .text       start:0x0201c68c end:0x0201c9e4
+
 src/game/help.cpp:
     .text       start:0x0201ce48 end:0x0201fc84
 

@@ -62,7 +62,7 @@ void MFont::SetColors(int color, int shadow, int back) {
     SetBackColor(back);
 }
 
-MPoint MFont::MeasureText(const std::string &text, int spacing, int lineSpacing) {
+MPoint MFont::MeasureText(std::string text, int spacing, int lineSpacing) {
     return MeasureText(MDecodeText(text, GetEncoding()), spacing, lineSpacing);
 }
 
