@@ -163,8 +163,8 @@ src/game/dino_talk_console_filter.cpp:
 src/game/dino_multi_play_icon.cpp:
     .text       start:0x0200a4d4 end:0x0200a54c
 
-src/game/dino_sound_play_bgm_task.cpp:
-    .text       start:0x02020304 end:0x02020394
+src/game/dino_sound.cpp:
+    .text       start:0x0201fc84 end:0x02020394
 
 src/game/m3d_scene_enable_task.cpp:
     .text       start:0x020230ac end:0x020230bc

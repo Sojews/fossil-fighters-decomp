@@ -5632,7 +5632,7 @@ from:0x0201fd28 kind:load to:0x020cc04c module:main
 from:0x0201fd2c kind:load to:0x020cc080 module:main
 from:0x0201fd30 kind:load to:0x020bafa8 module:main
 from:0x0201fd34 kind:load to:0x020baf7c add:0x8 module:main
-from:0x0201fd38 kind:load to:0x020baf9c module:main
+from:0x0201fd38 kind:load to:0x020baf7c add:0x20 module:main
 from:0x0201fd54 kind:thumb_call to:0x0207480c module:main
 from:0x0201fd6e kind:thumb_call to:0x02074860 module:main
 from:0x0201fd80 kind:thumb_call_arm to:0x02003200 module:main
