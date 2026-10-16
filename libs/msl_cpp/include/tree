@@ -1,0 +1,462 @@
+#ifndef _STD_TREE
+#define _STD_TREE
+
+// The red-black tree behind map and set, laid out as the game's MSL has it: the size, then a header node whose
+// left link is the root and whose right link is the leftmost (first) node. A node keeps its parent pointer and its
+// color in one word (the low bit set for red). The balancing code doesn't depend on the element type, so it's in
+// a class template instantiated once (like __vector_common), and every tree shares it.
+
+#include <memory>
+#include <iterator>
+#include <stddef.h>
+#include <utility>
+
+namespace std {
+    template <bool b> class __red_black_tree_common {
+    public:
+        enum color_t {
+            black = 0,
+            red   = 1
+        };
+
+        struct node_base {
+            node_base *parent() const {
+                return (node_base *) ((size_t) parent_ & ~(size_t) 1);
+            }
+            void set_parent(node_base *p) {
+                parent_ = (node_base *) ((size_t) p | ((size_t) parent_ & 1));
+            }
+            color_t color() const {
+                return ((size_t) parent_ & 1) ? red : black;
+            }
+            void set_red() {
+                parent_ = (node_base *) ((size_t) parent_ | 1);
+            }
+            void set_black() {
+                parent_ = (node_base *) ((size_t) parent_ & ~(size_t) 1);
+            }
+            void set_color(color_t c) {
+                if (c) {
+                    set_red();
+                } else {
+                    set_black();
+                }
+            }
+
+            node_base *left_;   // 0x0
+            node_base *right_;  // 0x4
+            node_base *parent_; // 0x8: with the color in bit 0
+        };
+
+        static void increment(node_base *&x);
+        static void rotate_left(node_base *x, node_base *&root);
+        static void rotate_right(node_base *x, node_base *&root);
+        static void balance_insert(node_base *x, node_base *root);
+        static node_base *balance_erase(node_base *z, node_base *root);
+    };
+
+    template <bool b> void __red_black_tree_common<b>::increment(node_base *&x) {
+        if (x->right_ != 0) {
+            node_base *y = x->right_;
+            while (y->left_ != 0) {
+                y = y->left_;
+            }
+            x = y;
+        } else {
+            node_base *p = x->parent();
+            while (x != p->left_) {
+                x = p;
+                p = x->parent();
+            }
+            x = p;
+        }
+    }
+
+    template <bool b> void __red_black_tree_common<b>::rotate_left(node_base *x, node_base *&root) {
+        node_base *y = x->right_;
+        if (root == x) {
+            root = y;
+        }
+        x->right_ = y->left_;
+        if (y->left_ != 0) {
+            y->left_->set_parent(x);
+        }
+        y->set_parent(x->parent());
+        if (x == x->parent()->left_) {
+            x->parent()->left_ = y;
+        } else {
+            x->parent()->right_ = y;
+        }
+        y->left_ = x;
+        x->set_parent(y);
+    }
+
+    template <bool b> void __red_black_tree_common<b>::rotate_right(node_base *x, node_base *&root) {
+        node_base *y = x->left_;
+        if (root == x) {
+            root = y;
+        }
+        x->left_ = y->right_;
+        if (y->right_ != 0) {
+            y->right_->set_parent(x);
+        }
+        y->set_parent(x->parent());
+        if (x == x->parent()->left_) {
+            x->parent()->left_ = y;
+        } else {
+            x->parent()->right_ = y;
+        }
+        y->right_ = x;
+        x->set_parent(y);
+    }
+
+    template <bool b> void __red_black_tree_common<b>::balance_insert(node_base *x, node_base *root) {
+        x->set_red();
+        while (x != root && x->parent()->color() == red) {
+            node_base *xp = x->parent();
+            node_base *xpp = xp->parent();
+            if (xp == xpp->left_) {
+                node_base *y = xpp->right_;
+                if (y != 0 && y->color() == red) {
+                    x->parent()->set_black();
+                    y->set_black();
+                    x = x->parent()->parent();
+                    x->set_red();
+                } else {
+                    if (x == x->parent()->right_) {
+                        x = x->parent();
+                        rotate_left(x, root);
+                    }
+                    x->parent()->set_black();
+                    x->parent()->parent()->set_red();
+                    rotate_right(x->parent()->parent(), root);
+                }
+            } else {
+                node_base *y = xpp->left_;
+                if (y != 0 && y->color() == red) {
+                    x->parent()->set_black();
+                    y->set_black();
+                    x = x->parent()->parent();
+                    x->set_red();
+                } else {
+                    if (x == x->parent()->left_) {
+                        x = x->parent();
+                        rotate_right(x, root);
+                    }
+                    x->parent()->set_black();
+                    x->parent()->parent()->set_red();
+                    rotate_left(x->parent()->parent(), root);
+                }
+            }
+        }
+        root->set_black();
+    }
+
+    // Unlinks z and rebalances; returns the node after z.
+    template <bool b>
+    typename __red_black_tree_common<b>::node_base *__red_black_tree_common<b>::balance_erase(node_base *z,
+                                                                                            node_base *root) {
+        node_base *next = z;
+        increment(next);
+        node_base *y = z;
+        if (z->left_ != 0 && z->right_ != 0) {
+            y = next;
+        }
+        node_base *x = y->left_ != 0 ? y->left_ : y->right_;
+        node_base *x_parent = y->parent();
+        if (x != 0) {
+            x->set_parent(x_parent);
+        }
+        bool x_is_left;
+        if (y == y->parent()->left_) {
+            y->parent()->left_ = x;
+            x_is_left = true;
+        } else {
+            y->parent()->right_ = x;
+            x_is_left = false;
+        }
+        bool rebalance = y->color() == black;
+        if (y != z) {
+            y->set_parent(z->parent());
+            if (z == y->parent()->left_) {
+                y->parent()->left_ = y;
+            } else {
+                y->parent()->right_ = y;
+            }
+            y->left_ = z->left_;
+            if (y->left_ != 0) {
+                y->left_->set_parent(y);
+            } else {
+                x_parent = y;
+            }
+            y->right_ = z->right_;
+            if (y->right_ != 0) {
+                y->right_->set_parent(y);
+            } else {
+                x_parent = y;
+            }
+            y->set_color(z->color());
+            if (root == z) {
+                root = y;
+            }
+        } else if (x == 0 && z == root) {
+            rebalance = false;
+        }
+        if (rebalance) {
+            while (x != root && (x == 0 || x->color() == black)) {
+                if (x_is_left) {
+                    node_base *w = x_parent->right_;
+                    if (w->color() == red) {
+                        w->set_black();
+                        x_parent->set_red();
+                        rotate_left(x_parent, root);
+                        w = x_parent->right_;
+                    }
+                    if ((w->left_ == 0 || w->left_->color() == black) &&
+                        (w->right_ == 0 || w->right_->color() == black)) {
+                        w->set_red();
+                        x = x_parent;
+                        x_parent = x_parent->parent();
+                        x_is_left = x == x_parent->left_;
+                    } else {
+                        if (w->right_ == 0 || w->right_->color() == black) {
+                            w->left_->set_black();
+                            w->set_red();
+                            rotate_right(w, root);
+                            w = x_parent->right_;
+                        }
+                        w->set_color(x_parent->color());
+                        x_parent->set_black();
+                        w->right_->set_black();
+                        rotate_left(x_parent, root);
+                        x = root;
+                    }
+                } else {
+                    node_base *w = x_parent->left_;
+                    if (w->color() == red) {
+                        w->set_black();
+                        x_parent->set_red();
+                        rotate_right(x_parent, root);
+                        w = x_parent->left_;
+                    }
+                    if ((w->left_ == 0 || w->left_->color() == black) &&
+                        (w->right_ == 0 || w->right_->color() == black)) {
+                        w->set_red();
+                        x = x_parent;
+                        x_parent = x_parent->parent();
+                        x_is_left = x == x_parent->left_;
+                    } else {
+                        if (w->left_ == 0 || w->left_->color() == black) {
+                            w->right_->set_black();
+                            w->set_red();
+                            rotate_left(w, root);
+                            w = x_parent->left_;
+                        }
+                        w->set_color(x_parent->color());
+                        x_parent->set_black();
+                        w->left_->set_black();
+                        rotate_right(x_parent, root);
+                        x = root;
+                    }
+                }
+            }
+            if (x != 0) {
+                x->set_black();
+            }
+        }
+        return next;
+    }
+
+    template <class T> struct less {
+        bool operator()(const T &x, const T &y) const {
+            return x < y;
+        }
+    };
+
+    // A tree of Value, ordered by the Key that KeyOf::get gets from each.
+    template <class Key, class Value, class KeyOf, class Compare, class Allocator>
+    class __red_black_tree : public __red_black_tree_common<true>, private Compare {
+    protected:
+        typedef __red_black_tree_common<true> _Base;
+        struct node : public node_base {
+            Value data_;
+        };
+        // The header: its left link is the root (the root's parent is the header).
+        struct end_node {
+            node_base *left_;
+        };
+
+    public:
+        typedef Key key_type;
+        typedef Value value_type;
+        typedef size_t size_type;
+
+        class iterator {
+        public:
+            typedef bidirectional_iterator_tag iterator_category;
+            typedef Value value_type;
+            typedef ptrdiff_t difference_type;
+            typedef Value *pointer;
+            typedef Value &reference;
+
+            iterator() {}
+            explicit iterator(node_base *n) : node_(n) {}
+            Value &operator*() const {
+                return static_cast<node *>(node_)->data_;
+            }
+            Value *operator->() const {
+                return &static_cast<node *>(node_)->data_;
+            }
+            iterator &operator++() {
+                increment(node_);
+                return *this;
+            }
+            iterator operator++(int) {
+                iterator tmp = *this;
+                increment(node_);
+                return tmp;
+            }
+            bool operator==(const iterator &x) const {
+                return node_ == x.node_;
+            }
+            bool operator!=(const iterator &x) const {
+                return node_ != x.node_;
+            }
+
+            node_base *node_;
+        };
+
+        // (mwcc never inlines a template base class's constructor, so the map or set sets the tree up; its
+        // destructor stays out of line.)
+        void init() {
+            size_ = 0;
+            header_.left_ = 0;
+            leftmost_ = (node_base *) &header_;
+        }
+        ~__red_black_tree() {
+            if (header_.left_ != 0) {
+                destroy(header_.left_);
+            }
+        }
+
+        iterator begin() {
+            return iterator(leftmost_);
+        }
+        iterator end() {
+            return iterator((node_base *) &header_);
+        }
+        size_type size() const {
+            return size_;
+        }
+        bool empty() const {
+            return size_ == 0;
+        }
+
+        // Where a value with key k goes after any equal ones: the parent, which side, whether it'd be the first
+        // node, and the last node seen that k doesn't sort before.
+        node_base *find_insert_position(const Key &k, node_base *&last_not_greater, bool &left, bool &leftmost);
+        node_base *insert_node_at(node_base *parent, bool left, bool leftmost, const Value &v);
+        iterator insert_equal(const Value &v);
+        iterator erase(iterator it);
+        void destroy(node_base *n);
+
+    protected:
+        size_type size_;        // 0x0
+        end_node header_;       // 0x4
+        node_base *leftmost_;   // 0x8: the first node, or the header
+    };
+
+    template <class Key, class Value, class KeyOf, class Compare, class Allocator>
+    typename __red_black_tree<Key, Value, KeyOf, Compare, Allocator>::node_base *
+    __red_black_tree<Key, Value, KeyOf, Compare, Allocator>::find_insert_position(const Key &k,
+                                                                                  node_base *&last_not_greater,
+                                                                                  bool &left, bool &leftmost) {
+        last_not_greater = 0;
+        node_base *p = (node_base *) &header_;
+        node_base *x = header_.left_;
+        left = true;
+        leftmost = true;
+        while (x != 0) {
+            p = x;
+            if (Compare::operator()(k, KeyOf::get(static_cast<node *>(x)->data_))) {
+                x = x->left_;
+                left = true;
+            } else {
+                last_not_greater = x;
+                x = x->right_;
+                left = false;
+                leftmost = false;
+            }
+        }
+        return p;
+    }
+
+    template <class Key, class Value, class KeyOf, class Compare, class Allocator>
+    typename __red_black_tree<Key, Value, KeyOf, Compare, Allocator>::node_base *
+    __red_black_tree<Key, Value, KeyOf, Compare, Allocator>::insert_node_at(node_base *parent, bool left,
+                                                                            bool leftmost, const Value &v) {
+        if (size_ == (size_type) -1) {
+            printf("tree::insert length error");
+            abort();
+        }
+        node *n = static_cast<node *>(::operator new(sizeof(node)));
+        if (n == 0) {
+            printf("Memory allocation failure");
+            abort();
+        }
+        ::new (&n->data_) Value(v);
+        n->right_ = 0;
+        n->left_ = 0;
+        n->parent_ = parent;
+        if (left) {
+            parent->left_ = n;
+        } else {
+            parent->right_ = n;
+        }
+        ++size_;
+        balance_insert(n, header_.left_);
+        if (leftmost) {
+            leftmost_ = n;
+        }
+        return n;
+    }
+
+    template <class Key, class Value, class KeyOf, class Compare, class Allocator>
+    typename __red_black_tree<Key, Value, KeyOf, Compare, Allocator>::iterator
+    __red_black_tree<Key, Value, KeyOf, Compare, Allocator>::insert_equal(const Value &v) {
+        node_base *last_not_greater;
+        bool left;
+        bool leftmost;
+        node_base *p = find_insert_position(KeyOf::get(v), last_not_greater, left, leftmost);
+        return iterator(insert_node_at(p, left, leftmost, v));
+    }
+
+    template <class Key, class Value, class KeyOf, class Compare, class Allocator>
+    typename __red_black_tree<Key, Value, KeyOf, Compare, Allocator>::iterator
+    __red_black_tree<Key, Value, KeyOf, Compare, Allocator>::erase(iterator it) {
+        node_base *n = it.node_;
+        if (n == leftmost_) {
+            ++it;
+            leftmost_ = it.node_;
+        }
+        iterator result(balance_erase(n, header_.left_));
+        static_cast<node *>(n)->data_.~Value();
+        ::operator delete(n);
+        --size_;
+        return result;
+    }
+
+    template <class Key, class Value, class KeyOf, class Compare, class Allocator>
+    void __red_black_tree<Key, Value, KeyOf, Compare, Allocator>::destroy(node_base *n) {
+        if (n->left_ != 0) {
+            destroy(n->left_);
+        }
+        if (n->right_ != 0) {
+            destroy(n->right_);
+        }
+        static_cast<node *>(n)->data_.~Value();
+        ::operator delete(n);
+    }
+} // namespace std
+
+#endif

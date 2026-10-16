@@ -3,11 +3,14 @@
 #ifndef GAME_HELP_H
 #define GAME_HELP_H
 
+#include <list>
+#include <map>
 #include <string>
 #include "m/task.h"
 #include "m/geometry.h"
 
 class DinoHelpItem;
+class MInput;
 
 // Something that owns help items (a menu, say).
 class DinoHelpBase {
@@ -67,10 +70,14 @@ class DinoHelpHook {
 public:
     DinoHelpHook();
     virtual ~DinoHelpHook();
-    virtual void Unk08() = 0;
-    virtual void Unk0C() = 0;
+    virtual void Unk08() = 0;   // help opened
+    virtual void Unk0C() = 0;   // help closed
 
-    u8 mUnk4;
+    BOOL IsActive();
+    void Activate();
+    void Deactivate();
+
+    u8 mActive; // 0x04
 };
 
 // While one exists, the help button is disabled.
@@ -97,6 +104,10 @@ public:
 // Keeps track of help bases, items and hooks.
 class DinoHelpDriver : public MProcess {
 public:
+    DinoHelpDriver(MTask *cursor);
+    virtual ~DinoHelpDriver();
+    virtual void Idle();
+
     void Enable();
     void Disable();
     void AddBase(DinoHelpBase *base);
@@ -108,9 +119,18 @@ public:
     void RemoveHook(DinoHelpHook *hook);
     void AddEntry(u32 a, u32 b, u32 c);
     void RemoveEntry(u32 a, u32 b);
+    BOOL CanShowHelp();
+    void NotifyOpen();
+    void NotifyClose();
 
-    u32 mUnk74[(0xA4 - 0x74) / 4];
-    int mEnableCount;       // 0xA4: help is available while this is 0 or more... (see Enable/Disable)
+    MParallelTaskSet *mTasks;                       // 0x74
+    MTask *mCursor;                                 // 0x78
+    MInput *mInput;                                 // 0x7C
+    std::list<DinoHelpBase *> mBases;               // 0x80: the last is current
+    std::list<DinoHelpItem *> mItems;               // 0x8C
+    std::list<DinoHelpHook *> mHooks;               // 0x98
+    int mEnableCount;                               // 0xA4: help is available while this is above 0
+    std::multimap<u32, std::pair<u32, u32> > mEntries;  // 0xA8
 };
 
 #endif

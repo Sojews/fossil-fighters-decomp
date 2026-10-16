@@ -1,0 +1,33 @@
+#ifndef _STD_MAP
+#define _STD_MAP
+
+#include <tree>
+
+namespace std {
+    template <class Pair> struct __select_first {
+        static const typename Pair::first_type &get(const Pair &p) {
+            return p.first;
+        }
+    };
+
+    template <class Key, class T, class Compare = less<Key>, class Allocator = allocator<pair<const Key, T> > >
+    class multimap
+        : public __red_black_tree<Key, pair<const Key, T>, __select_first<pair<const Key, T> >, Compare, Allocator> {
+        typedef __red_black_tree<Key, pair<const Key, T>, __select_first<pair<const Key, T> >, Compare, Allocator>
+            _Tree;
+
+    public:
+        typedef typename _Tree::iterator iterator;
+        typedef pair<const Key, T> value_type;
+
+        multimap() {
+            this->init();
+        }
+        ~multimap() {}
+        iterator insert(const value_type &v) {
+            return this->insert_equal(v);
+        }
+    };
+} // namespace std
+
+#endif
