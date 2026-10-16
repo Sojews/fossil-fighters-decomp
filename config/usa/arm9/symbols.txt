@@ -11972,7 +11972,7 @@ data_020c0aa8 kind:data(any) addr:0x020c0aa8
 data_020c0ab0 kind:data(any) addr:0x020c0ab0
 data_020c0ab8 kind:data(any) addr:0x020c0ab8
 data_020c0ad4 kind:data(any) addr:0x020c0ad4
-data_020c0af0 kind:data(any) addr:0x020c0af0
+gDmaEnabled kind:data(any) addr:0x020c0af0
 data_020c0af4 kind:data(any) addr:0x020c0af4
 _ZTI17MSoftResetHandler kind:data(any) addr:0x020c0b18
 _ZTV17MSoftResetHandler kind:data(any) addr:0x020c0b24
@@ -12995,7 +12995,7 @@ data_0214d40c kind:bss addr:0x0214d40c
 data_0214d418 kind:bss addr:0x0214d418
 data_0214d41c kind:bss addr:0x0214d41c
 data_0214d424 kind:bss addr:0x0214d424
-sDmaChannelUsed kind:bss addr:0x0214d43c
+gDmaChannelUsed kind:bss addr:0x0214d43c
 sIntrTaskSets kind:bss addr:0x0214d440
 sSoftResetEnableCount kind:bss addr:0x0214d478
 sFoldSleepHandler kind:bss addr:0x0214d484

@@ -3,16 +3,12 @@
 #define M_TRANSFER_H
 
 #include "m/task.h"
+#include "m/dma.h"
 #include "nitro/mi.h"
-
-#define M_DMA_NO 3
-
-extern u8 data_020c0af0;    // DMA transfers allowed
-extern u8 data_0214d43c[];
 
 // Copies by DMA when it's allowed and the size is a multiple of 32 bytes, otherwise by CPU.
 inline void MCopy(const void *src, void *dest, u32 size) {
-    if (!data_020c0af0 || data_0214d43c[3] || (size & 0x1F)) {
+    if (!gDmaEnabled || gDmaChannelUsed[3] || (size & 0x1F)) {
         if (((u32)src | (u32)dest | size) & 3) {
             MIi_CpuCopy16(src, dest, size);
         } else if (size & 0x1F) {
@@ -33,7 +29,7 @@ inline void MCopy(const void *src, void *dest, u32 size) {
 
 // Fills by DMA when it's allowed, otherwise by CPU.
 inline void MFill(u32 value, void *dest, u32 size) {
-    if (!data_020c0af0 || data_0214d43c[3]) {
+    if (!gDmaEnabled || gDmaChannelUsed[3]) {
         if (((u32)dest | size) & 3) {
             MIi_CpuClear16(value, dest, size);
         } else if (size & 0x1F) {

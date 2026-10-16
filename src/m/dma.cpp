@@ -4,18 +4,19 @@
 #include "m/irq.h"
 #include "nitro/os.h"
 
-static bool sDmaChannelUsed[4];
+u8 gDmaEnabled = TRUE;
+u8 gDmaChannelUsed[4];
 
 void MReserveDmaChannel(u32 channel) {
     MIrqLock lock;
-    sDmaChannelUsed[channel] = TRUE;
+    gDmaChannelUsed[channel] = TRUE;
 }
 
 u32 MAllocDmaChannel() {
     MIrqLock lock;
     for (u32 i = 0; i < 4; i++) {
-        if (!sDmaChannelUsed[i]) {
-            sDmaChannelUsed[i] = TRUE;
+        if (!gDmaChannelUsed[i]) {
+            gDmaChannelUsed[i] = TRUE;
             return i;
         }
     }
@@ -25,5 +26,5 @@ u32 MAllocDmaChannel() {
 
 void MFreeDmaChannel(u32 channel) {
     MIrqLock lock;
-    sDmaChannelUsed[channel] = FALSE;
+    gDmaChannelUsed[channel] = FALSE;
 }
