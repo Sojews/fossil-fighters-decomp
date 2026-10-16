@@ -41,6 +41,8 @@ public:
     void UseBanks(const void *config, MVramBanks *out);
     void FreeBanks(MVramBanks *banks);
     void VSync();
+    void StartCapture(int mode, int srcA, int srcB, int size, int readOffset, int bank, int writeOffset, int eva,
+                      int evb);
 
     MDisplay *mMain;        // 0x1C
     MDisplay *mSub;         // 0x20

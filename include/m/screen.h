@@ -35,6 +35,12 @@ public:
             u32 extPaletteSlot : 1;
             u32 screenSize : 2;
         } mBgCntBits;
+        struct {
+            u32 : 2;
+            u32 directColor : 1;    // with bitmap set: a direct color bitmap
+            u32 : 4;
+            u32 bitmap : 1;
+        } mBmpCntBits;
     };
     MDisplay *mDisplay;         // 0x10
     int mBg;                    // 0x14

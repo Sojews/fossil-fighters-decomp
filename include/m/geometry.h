@@ -29,6 +29,9 @@ struct MRect {
         bottom = bottomRight.y;
     }
 
+    int GetWidth() const { return right - left; }
+    int GetHeight() const { return bottom - top; }
+
     int left;
     int top;
     int right;

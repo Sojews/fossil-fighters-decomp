@@ -220,8 +220,8 @@ src/m/3d_wait_transfer_complete_task.cpp:
 src/m/affine_screen.cpp:
     .text       start:0x02059090 end:0x0205937c
 
-src/m/index_bitmap_load_transfer.cpp:
-    .text       start:0x02059a90 end:0x02059abc
+src/m/bitmap.cpp:
+    .text       start:0x0205937c end:0x02059abc
 
 src/m/smart_text.cpp:
     .text       start:0x0205b584 end:0x0205b5b8
