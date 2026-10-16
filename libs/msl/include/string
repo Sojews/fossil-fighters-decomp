@@ -16,11 +16,28 @@ public:
     typedef C *iterator;
     typedef const C *const_iterator;
 
+    basic_string() {
+        unsigned long *words = mWords;
+        for (unsigned long i = 0; i < 3; i++) {
+            *words++ = 0;
+        }
+    }
     basic_string(const C *s);
     basic_string(const basic_string &other);
     ~basic_string();
 
     void reserve(size_type n);
+    basic_string &operator+=(const basic_string &str);
+
+    void clear() {
+        if (!is_long()) {
+            mShort.buf[0] = 0;
+            mShort.size = 0;
+        } else {
+            mLong.data[0] = 0;
+            mLong.size = 0;
+        }
+    }
 
     bool is_long() const { return mLong.isLong; }
     size_type size() const { return !is_long() ? mShort.size : mLong.size; }
@@ -42,6 +59,7 @@ public:
 
     // Short strings are stored in place.
     union {
+        unsigned long mWords[3];
         struct {
             unsigned long isLong : 1;
             unsigned long capacity : 31;

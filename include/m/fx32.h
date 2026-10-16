@@ -9,8 +9,14 @@ public:
     MFx32() {}
     MFx32(int i) { v = i << FX32_SHIFT; }
 
+    bool operator==(MFx32 o) const { return v == o.v; }
+
     fx32 v;
 };
+
+inline bool operator!=(MFx32 a, MFx32 b) {
+    return a.v != b.v;
+}
 
 inline MFx32 operator+(MFx32 a, MFx32 b) {
     MFx32 r;
