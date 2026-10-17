@@ -656,6 +656,10 @@ libs/nitrosdk/src/wm/wm_sync.c:
     .text       start:0x0207bce4 end:0x0207bfdc
     .data       start:0x020c5944 end:0x020c5948
 
+libs/nitrosdk/src/wm/wm_standard.c:
+    complete
+    .text       start:0x0207bfdc end:0x0207c378
+
 libs/nitrosdk/src/os/os_init.c:
     complete
     .text       start:0x02074a64 end:0x02074aa8

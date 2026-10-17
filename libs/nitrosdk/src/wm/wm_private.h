@@ -233,6 +233,36 @@ typedef struct {
     u16 myAid;                          // 0x150
 } WMArm9Buf;
 
+#define WM_SIZE_SSID 32
+#define WM_SIZE_USER_GAMEINFO 112
+#define WM_SIZE_MP_DATA_MAX 512
+#define WM_PARENT_PARAM_SIZE 0x40
+#define WM_SIZE_SCAN_EX_BUF 1024
+#define WM_NUM_MAX_CHILD 15
+#define WM_KS_PARENT_DATA_SIZE 42
+#define WM_KS_CHILD_DATA_SIZE 6
+
+typedef struct {
+    void *userGameInfo;     // 0x00
+    u16 userGameInfoLength; // 0x04
+    u16 padding;
+    u32 ggid;               // 0x08
+    u16 tgid;               // 0x0c
+    u16 entryFlag;          // 0x0e
+    u16 maxEntry;           // 0x10
+    u16 multiBootFlag;      // 0x12
+    u16 KS_Flag;            // 0x14
+    u16 CS_Flag;            // 0x16
+    u16 beaconPeriod;       // 0x18
+    u16 rsv1[4];
+    u16 rsv2[8];
+    u16 channel;            // 0x32
+    u16 parentMaxSize;      // 0x34
+    u16 childMaxSize;       // 0x36
+    u16 rsv[4];
+} WMParentParam;
+
+WMErrCode WM_Init(void *sysBuf, u16 dmaNo);
 WMErrCode WM_Finish(void);
 WMErrCode WMi_SendCommand(WMApiid id, u16 paramNum, ...);
 WMErrCode WMi_SendCommandDirect(void *data, u32 length);
