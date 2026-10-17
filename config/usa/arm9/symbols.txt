@@ -7323,9 +7323,7 @@ data_02090208 kind:data(any) addr:0x02090208
 data_02091c28 kind:data(any) addr:0x02091c28
 FX_AtanIdxTable_ kind:data(any) addr:0x02091d44
 sTexPlttStartAddrTable kind:data(any) addr:0x02091e48
-sTexStartAddrTable kind:data(any) addr:0x02091e58
-data_02091e5a kind:data(any) addr:0x02091e5a
-data_02091e5c kind:data(any) addr:0x02091e5c
+sTexStartAddrTable kind:data(short[48]) addr:0x02091e58
 SNDi_DecibelTable kind:data(any) addr:0x02091fb8
 data_02092101 kind:data(any) addr:0x02092101
 VolumeTable kind:data(any) addr:0x020926b8
@@ -13048,7 +13046,7 @@ data_02151620 kind:bss addr:0x02151620
 sDispMode kind:bss addr:0x02151820
 GXi_VRamLockId kind:bss addr:0x02151822
 gGXState kind:bss(size=0x1a) addr:0x02151824
-data_02151840 kind:bss addr:0x02151840
+sClrImgLCDCBlk kind:bss addr:0x02151840
 OSi_IrqCallbackInfo kind:bss(size=0x60) addr:0x02151860
 OSi_IrqStackWarningOffset kind:bss addr:0x021518c0
 data_021518c4 kind:bss addr:0x021518c4

@@ -20633,8 +20633,8 @@ from:0x02072fd8 kind:thumb_call_arm to:0x02072214 module:main
 from:0x02073086 kind:thumb_call to:0x020728dc module:main
 from:0x020730ac kind:load to:0x02151840 module:main
 from:0x020730b0 kind:load to:0x02091e58 module:main
-from:0x020730b4 kind:load to:0x02091e5a module:main
-from:0x020730b8 kind:load to:0x02091e5c module:main
+from:0x020730b4 kind:load to:0x02091e58 add:0x2 module:main
+from:0x020730b8 kind:load to:0x02091e58 add:0x4 module:main
 from:0x02073108 kind:thumb_call to:0x02075430 module:main
 from:0x02073114 kind:thumb_call_arm to:0x02075854 module:main
 from:0x02073130 kind:thumb_call to:0x020755ac module:main
