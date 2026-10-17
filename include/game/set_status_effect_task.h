@@ -20,6 +20,10 @@ class DinoCreatureUpdateTask : public MTask {
 public:
     virtual ~DinoCreatureUpdateTask();
     virtual void Execute();
+
+    u32 mUnk10;         // 0x10
+    u8 mUnk14;          // 0x14
+    u32 mUnk18;         // 0x18
 };
 
 class DamagedUpdate : public MTask {

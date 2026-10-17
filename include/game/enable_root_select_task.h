@@ -7,6 +7,8 @@ class EnableRootSelectTask : public MTask {
 public:
     virtual ~EnableRootSelectTask();
     virtual void Execute();
+
+    u32 mUnk10;         // 0x10
 };
 
 #endif

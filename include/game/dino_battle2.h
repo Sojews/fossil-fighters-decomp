@@ -20,6 +20,9 @@ class DBViewFocusLCDFrameTask : public MTask {
 public:
     virtual ~DBViewFocusLCDFrameTask();
     virtual void Execute();
+
+    u32 mUnk10;         // 0x10
+    u8 mUnk14;          // 0x14
 };
 
 class DinoBattleTalkWindow : public MProcess {

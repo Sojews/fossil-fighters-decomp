@@ -3,6 +3,7 @@
 
 #include "m/menu_item.h"
 #include "m/menu.h"
+#include "m/bg.h"
 #include "m/display.h"
 #include "m/observer.h"
 #include "m/sleep.h"
@@ -22,6 +23,9 @@ class SetBGModeTask : public MTask {
 public:
     virtual ~SetBGModeTask();
     virtual void Execute();
+
+    MBg *mBg;           // 0x10
+    int mMode;          // 0x14
 };
 
 class SkipTelopTask : public MProcess {

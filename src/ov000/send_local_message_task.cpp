@@ -8,6 +8,10 @@
 #include "game/send_local_message_task.h"
 #include "game/set_live_one_shot_flag_task.h"
 
+extern "C" void func_ov000_0215b2a0(void *, u32);
+
+extern "C" void func_ov000_0215c174(void *, u32);
+
 SendLocalMessageTask::~SendLocalMessageTask() {
 }
 
@@ -19,4 +23,14 @@ DinoBattleModelField::~DinoBattleModelField() {
 
 void DinoBattleModelField::Idle() {
     Dispatch();
+}
+
+void SetLiveOneShotFlagTask::Execute() {
+    func_ov000_0215c174((void *)mUnk10, mUnk14);
+    Exit();
+}
+
+void SendLocalMessageTask::Execute() {
+    func_ov000_0215b2a0((void *)mUnk14, mUnk10);
+    Exit();
 }

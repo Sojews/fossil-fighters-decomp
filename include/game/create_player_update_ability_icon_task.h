@@ -14,6 +14,10 @@ class CreatePlayerUpdateAbilityIconTask : public MTask {
 public:
     virtual ~CreatePlayerUpdateAbilityIconTask();
     virtual void Execute();
+
+    u8 mUnk10;          // 0x10
+    u32 mUnk14;         // 0x14
+    u32 mUnk18;         // 0x18
 };
 
 class UpdateAllCreatureTask : public MProcess {
@@ -51,12 +55,18 @@ class ResetStatusEffectSleepTask : public MTask {
 public:
     virtual ~ResetStatusEffectSleepTask();
     virtual void Execute();
+
+    u32 mUnk10;         // 0x10
 };
 
 class AddLifePointTask : public MTask {
 public:
     virtual ~AddLifePointTask();
     virtual void Execute();
+
+    u32 mUnk10;         // 0x10
+    u32 mUnk14;         // 0x14
+    u8 mUnk18;          // 0x18
 };
 
 class ExecSpecialAttackTask : public MProcess {
@@ -75,30 +85,47 @@ class SetLifePointTask : public MTask {
 public:
     virtual ~SetLifePointTask();
     virtual void Execute();
+
+    u32 mUnk10;         // 0x10
+    u32 mUnk14;         // 0x14
 };
 
 class PlayerUpdateTask : public MTask {
 public:
     virtual ~PlayerUpdateTask();
     virtual void Execute();
+
+    u32 mUnk10;         // 0x10
+    u32 mUnk14;         // 0x14
 };
 
 class DinoCreatureUpdateStateIconTask : public MTask {
 public:
     virtual ~DinoCreatureUpdateStateIconTask();
     virtual void Execute();
+
+    u32 mUnk10;         // 0x10
+    u32 mUnk14;         // 0x14
+    u32 mUnk18;         // 0x18
 };
 
 class UpdateAbilityIconTask : public MTask {
 public:
     virtual ~UpdateAbilityIconTask();
     virtual void Execute();
+
+    u32 mUnk10;         // 0x10
+    u32 mUnk14;         // 0x14
+    u8 mUnk18;          // 0x18
 };
 
 class SetKasekiPointTask : public MTask {
 public:
     virtual ~SetKasekiPointTask();
     virtual void Execute();
+
+    u32 mUnk10;         // 0x10
+    u32 mUnk14;         // 0x14
 };
 
 class ExecCreatureEndTask : public MProcess {

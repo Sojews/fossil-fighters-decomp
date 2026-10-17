@@ -7,6 +7,8 @@
 #include "game/dino_battle2.h"
 #include "types.h"
 
+extern "C" void func_ov000_0218b928(void *, u8);
+
 DinoBattleViewFocusLCDFrame::~DinoBattleViewFocusLCDFrame() {
 }
 
@@ -17,4 +19,9 @@ DinoBattleTalkWindow::~DinoBattleTalkWindow() {
 }
 
 void DinoBattleViewFocusLCDFrame::Idle() {
+}
+
+void DBViewFocusLCDFrameTask::Execute() {
+    func_ov000_0218b928((void *)mUnk10, mUnk14);
+    Exit();
 }

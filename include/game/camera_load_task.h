@@ -20,12 +20,20 @@ class NextCameraTask : public MTask {
 public:
     virtual ~NextCameraTask();
     virtual void Execute();
+
+    u32 mUnk10;         // 0x10
+    u32 mUnk14;         // 0x14
 };
 
 class ChangeSetTask : public MTask {
 public:
     virtual ~ChangeSetTask();
     virtual void Execute();
+
+    u32 mUnk10;         // 0x10
+    u32 mUnk14;         // 0x14
+    u32 mUnk18;         // 0x18
+    u32 mUnk1C;         // 0x1C
 };
 
 class CameraPauseTask : public MTask {

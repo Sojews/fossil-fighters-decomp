@@ -8,6 +8,8 @@
 #include "types.h"
 #include "game/create_player_update_ability_icon_task.h"
 
+extern "C" void func_ov000_0216d3c0(void *, u8, u32);
+
 SetStatusEffectTask::~SetStatusEffectTask() {
 }
 
@@ -19,4 +21,9 @@ DamagedUpdate::~DamagedUpdate() {
 
 void DinoBattleModelCreature::Idle() {
     Dispatch();
+}
+
+void DinoCreatureUpdateTask::Execute() {
+    func_ov000_0216d3c0((void *)mUnk10, mUnk14, mUnk18);
+    Exit();
 }

@@ -8,6 +8,8 @@
 #include "types.h"
 #include "game/dino_ui_senryu_menu.h"
 
+extern "C" void func_ov007_02185d28(void *, u32);
+
 DinoSenryuBackButton::~DinoSenryuBackButton() {
 }
 
@@ -86,4 +88,9 @@ const char *DinoUiSenryuMenuItem::GetText() {
 }
 
 DinoUiSenryuList::DinoUiSenryuList() : MProcess(NULL) {
+}
+
+void CurChangeTask::Execute() {
+    func_ov007_02185d28((void *)mUnk10, mUnk14);
+    Exit();
 }

@@ -50,6 +50,10 @@ class UpdateLifeBarTask : public MTask {
 public:
     virtual ~UpdateLifeBarTask();
     virtual void Execute();
+
+    u32 mUnk10;         // 0x10
+    u32 mUnk14;         // 0x14
+    u32 mUnk18;         // 0x18
 };
 
 class UpdateLifePointTask : public MProcess {

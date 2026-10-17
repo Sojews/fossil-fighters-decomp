@@ -12,6 +12,8 @@
 #include "m/call_task.h"
 #include "m/geometry.h"
 
+extern "C" void func_ov000_021795e0(void *, u32, u32);
+
 CreatureMotion::~CreatureMotion() {
 }
 
@@ -57,3 +59,8 @@ template class MCallTask0<DinoBattleViewCreature, DinoBattleViewCreature>;
 template MTask *MCreateCallTask(DinoBattleViewCreature *obj, void (DinoBattleViewCreature::*func)());
 template class MCallTask1<DinoBattleViewStatusEffectIcon, DinoBattleViewStatusEffectIcon, MPoint>;
 template MTask *MCreateCallTask(DinoBattleViewStatusEffectIcon *obj, void (DinoBattleViewStatusEffectIcon::*func)(MPoint), MPoint a0);
+
+void UpdateLifeBarTask::Execute() {
+    func_ov000_021795e0((void *)mUnk10, mUnk14, mUnk18);
+    Exit();
+}

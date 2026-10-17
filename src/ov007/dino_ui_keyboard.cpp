@@ -7,6 +7,8 @@
 #include "game/dino_ui_keyboard.h"
 #include "types.h"
 
+extern "C" void func_ov007_021832f0(void *, u32);
+
 DinoUiKeyboard::~DinoUiKeyboard() {
 }
 
@@ -101,4 +103,9 @@ DinoUiKeyboard::DinoUiKeyboard(int mode, int arg) : MProcess(NULL) {
     mMode = mode;
     mArg = arg;
     mFlag = TRUE;
+}
+
+void PageChangeTask::Execute() {
+    func_ov007_021832f0((void *)mUnk10, mUnk14);
+    Exit();
 }

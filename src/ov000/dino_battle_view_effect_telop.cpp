@@ -38,3 +38,8 @@ void DinoBattleViewEffectTelop::Idle() {
 // instantiated explicitly.
 template class MBgCallTask0<DinoBattleViewEffectTelop>;
 template MTask *MCreateBgCallTask(DinoBattleViewEffectTelop *obj, void (DinoBattleViewEffectTelop::*func)(), int thread);
+
+void SetBGModeTask::Execute() {
+    mBg->SetMode(mMode);
+    Exit();
+}

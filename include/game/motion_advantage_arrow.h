@@ -37,6 +37,8 @@ class TutorialWindowCloseTask : public MTask {
 public:
     virtual ~TutorialWindowCloseTask();
     virtual void Execute();
+
+    u32 mUnk10;         // 0x10
 };
 
 class WaitUpdateSupportEffectAnimeTask : public MTask {

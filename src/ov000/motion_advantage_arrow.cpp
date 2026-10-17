@@ -7,6 +7,8 @@
 #include "game/motion_advantage_arrow.h"
 #include "types.h"
 
+extern "C" void func_ov000_0218e680(void *);
+
 MotionAdvantageArrow::~MotionAdvantageArrow() {
 }
 
@@ -35,4 +37,9 @@ SetTutorialMotionRectTask::~SetTutorialMotionRectTask() {
 }
 
 void DinoBattleViewTutorialMotion::Idle() {
+}
+
+void TutorialWindowCloseTask::Execute() {
+    func_ov000_0218e680((void *)mUnk10);
+    Exit();
 }

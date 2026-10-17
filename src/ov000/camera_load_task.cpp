@@ -8,6 +8,10 @@
 #include "types.h"
 #include "game/dino_battle_view_3d_camera.h"
 
+extern "C" void func_ov000_0218a970(void *, u32);
+
+extern "C" void func_ov000_0218a8ac(void *, u32, u32, u32);
+
 CameraLoadTask::~CameraLoadTask() {
 }
 
@@ -25,4 +29,14 @@ CameraSetDefParentTask::~CameraSetDefParentTask() {
 
 void DinoBattleView3DCamera::Idle() {
     (this->*mState)();
+}
+
+void ChangeSetTask::Execute() {
+    func_ov000_0218a8ac((void *)mUnk10, mUnk14, mUnk1C, mUnk18);
+    Exit();
+}
+
+void NextCameraTask::Execute() {
+    func_ov000_0218a970((void *)mUnk10, mUnk14);
+    Exit();
 }
