@@ -213,3 +213,9 @@ void DinoUiMaskEquip::Idle() {
     serial->AddTail(menu);
     serial->AddTail(exit);
 }
+
+DinoUiMaskEquip::DinoUiMaskEquip() : MProcess(NULL) {
+}
+
+DinoUiMaskEquipTest::DinoUiMaskEquipTest() : MProcess(NULL) {
+}

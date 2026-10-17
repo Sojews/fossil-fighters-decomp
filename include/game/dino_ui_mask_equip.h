@@ -5,6 +5,7 @@
 
 class DinoUiMaskEquip : public MProcess {
 public:
+    DinoUiMaskEquip();
     virtual ~DinoUiMaskEquip();
     virtual void Idle();
 };

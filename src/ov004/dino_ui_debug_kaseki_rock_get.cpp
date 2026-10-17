@@ -148,3 +148,6 @@ void DinoUiDebugKasekiRockGet::Idle() {
     serial->AddTail(menu);
     serial->AddTail(exit);
 }
+
+DinoUiDebugKasekiRockGet::DinoUiDebugKasekiRockGet() : MProcess(NULL) {
+}

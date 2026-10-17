@@ -159,3 +159,6 @@ const char *DinoUiSaveSlotSelectMenuItem::GetText() {
     }
     return gDinoResource->GetText(data_0208ad98 + mSlot);
 }
+
+DinoUiSaveSlotConfirm::DinoUiSaveSlotConfirm() : MProcess(NULL) {
+}
