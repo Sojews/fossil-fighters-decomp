@@ -22,7 +22,7 @@ u32 DinoBattleView::GetUnk124() {
     return mUnk124;
 }
 
-u32 DinoBattleView::GetUnkE4(int index) {
+DinoBattleViewPlayer *DinoBattleView::GetUnkE4(int index) {
     return mUnkE4[index];
 }
 

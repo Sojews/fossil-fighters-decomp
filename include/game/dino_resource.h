@@ -39,6 +39,9 @@ struct DinoCreatureDefs {
 struct DinoCreatureDef {
     u8 unk00[0xD];
     u8 unk0D;
+    u8 unk0E[0x46];
+    u32 unk54;          // 0x54: offset of 4 s8 values, or 0
+    u32 unk58;          // 0x58: offset of 4 s8 values, or 0
 };
 
 struct DinoAttackDefs {

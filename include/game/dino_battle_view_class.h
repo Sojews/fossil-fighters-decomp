@@ -6,6 +6,8 @@
 #include "m/observer.h"
 #include "m/view.h"
 
+class DinoBattleViewPlayer;
+
 class DinoBattleView : public MProcess, public MMessageObserver {
 public:
     virtual ~DinoBattleView();
@@ -16,7 +18,7 @@ public:
     u32 GetUnk118();
     u32 GetUnk120();
     u32 GetUnk124();
-    u32 GetUnkE4(int index);
+    DinoBattleViewPlayer *GetUnkE4(int index);
     u8 GetUnk138();
     void SetUnk128(u32 value);
     void SetUnk12C(u32 value);
@@ -33,7 +35,7 @@ public:
     u32 unkA8[4];
     MMessageSubject mSubject;   // 0xB8
     u32 unkE0;
-    u32 mUnkE4[2];              // 0xE4
+    DinoBattleViewPlayer *mUnkE4[2]; // 0xE4: players
     u32 mUnkEC;                 // 0xEC
     u32 unkF0[5];
     u32 mUnk104;                // 0x104
