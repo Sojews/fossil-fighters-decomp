@@ -31,8 +31,9 @@ namespace std {
         const size_t &first() const {
             return cap;
         }
-        Allocator second() const {
-            return Allocator();
+        // (The allocator is empty; the game keeps it in a compressed pair with the capacity.)
+        Allocator &second() const {
+            return *(Allocator *) this;
         }
         size_t cap;
     };
@@ -128,7 +129,7 @@ namespace std {
             return capacity_.first();
         }
 
-        Allocator alloc() const {
+        typename remove_reference<Allocator>::type &alloc() const {
             return capacity_.second();
         }
 
@@ -217,6 +218,17 @@ namespace std {
         size_t grow_by(size_t n);
 
         void append_realloc(size_t n, const_reference x);
+        // Adds n value-initialized elements (out of line).
+        void append(size_t n, Metrowerks::int2type<true>);
+        void append_realloc(size_t n);
+        void construct_n_at_end(size_t n) {
+            UnkMSLStruct1 unk = UnkMSLStruct1();
+            for (pointer p = data_ + size_; n; n--, p++, size_++) {
+                alloc().construct(p, T());
+            }
+        }
+        // Copies [first, last) into an empty vector (out of line; the copy constructor's work).
+        void init_copy(const T *first, const T *last, Metrowerks::int2type<true>);
 
         size_t max_size() const {
             return typename remove_reference<Allocator>::type().max_size();
@@ -231,7 +243,11 @@ namespace std {
         }
 
         void resize(size_t n) {
-            size_ = n;
+            if (n > size_) {
+                append(n - size_, Metrowerks::int2type<true>());
+            } else if (n < size_) {
+                erase_at_end(size_ - n);
+            }
         }
 
         void move_construct_to_end(iterator begin, iterator end) {
@@ -362,6 +378,46 @@ namespace std {
     }
 
     template <typename T, typename Allocator>
+    void __vec_deleter<T, Allocator>::append(size_t n, Metrowerks::int2type<true>) {
+        if (n > cap() || size_ > cap() - n) {
+            if (expand_by(size_ + n - cap())) {
+                return;
+            }
+        } else {
+            construct_n_at_end(n);
+            return;
+        }
+        append_realloc(n);
+    }
+
+    template <typename T, typename Allocator> void __vec_deleter<T, Allocator>::append_realloc(size_t n) {
+        __vec_deleter_helper<T, typename remove_reference<Allocator>::type &> tmp(alloc_ref());
+
+        size_t max = grow_by((size_ + n) - cap());
+        tmp.allocate(size_ + n, max);
+        tmp.start_ = size_;
+        tmp.construct_at_end(n);
+        tmp.move_construct_to_begin(begin(), end());
+        optimize_after_moved_from();
+
+        std::swap(cap(), tmp.cap());
+        std::swap(data_, tmp.data_);
+        std::swap(size_, tmp.size_);
+    }
+
+    template <typename T, typename Allocator>
+    void __vec_deleter<T, Allocator>::init_copy(const T *first, const T *last, Metrowerks::int2type<true>) {
+        size_t n = last - first;
+        if (n != 0) {
+            allocate(n, Metrowerks::int2type<true>());
+            UnkMSLStruct1 unk = UnkMSLStruct1();
+            for (pointer p = data_ + size_; first != last; first++, p++, size_++) {
+                alloc().construct(p, *first);
+            }
+        }
+    }
+
+    template <typename T, typename Allocator>
     void __vec_deleter<T, Allocator>::sub_push_back(const_reference x, Metrowerks::int2type<TAG_UNK>) {
         if (expand_by(1)) {
             size_++;
@@ -438,6 +494,12 @@ namespace std {
 
         void construct_at_end(size_t n, const_reference x) {
             construct_at_end(n, x, Metrowerks::int2type<Metrowerks::is_trivial<T>::value>());
+        }
+
+        void construct_at_end(size_t n) {
+            for (pointer p = _Base::data_ + start_ + _Base::size_; n; n--, p++, _Base::size_++) {
+                _Base::alloc().construct(p, T());
+            }
         }
 
         void construct_at_end(size_t n, const_reference x, Metrowerks::int2type<TAG_UNK>) {
@@ -606,6 +668,11 @@ namespace std {
 
         vector() {
             this->init();
+        }
+        vector(const vector &x) {
+            this->init();
+            Metrowerks::int2type<true> t;
+            this->init_copy(x.data_, x.data_ + x.size_, t);
         }
         ~vector() {}
 
