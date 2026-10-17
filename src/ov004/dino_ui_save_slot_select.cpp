@@ -104,3 +104,27 @@ void DinoUiSaveSlotSelectMenu::OnFocus(MMenuItem *item) {
     }
     SetSelectedItem(dynamic_cast<DinoHelpItem *>(item));
 }
+
+void DinoUiSaveSlotSelectMenuCancelItem::OnDecide() {
+    MTask *wait1 = mMotion->CreateWaitStopTask();
+    MTask *play1 = mMotion->CreatePlayTransfer(3, 0);
+    MTask *wait2 = mMotion->CreateWaitStopTask();
+    MTask *play2 = mMotion->CreatePlayTransfer(4, 0);
+    MSerialTaskSet *serial = &mSerial;
+    serial->AddTail(play2);
+    serial->AddTail(wait2);
+    serial->AddTail(play1);
+    serial->AddTail(wait1);
+}
+
+void DinoUiSaveSlotSelectMenuDeleteItem::OnDecide() {
+    mMotion->Play(3, 1);
+}
+
+void DinoUiSaveSlotSelectMenuItem::OnDecide() {
+    mMotion->Play(3, 1);
+    if (!mUnkA4) {
+        mMotion2->Play(3, 1);
+        mMotion3->Play(3, 1);
+    }
+}

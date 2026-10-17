@@ -113,3 +113,17 @@ void DinoUiOptionMenuItem::OnFocusChanged(BOOL focused) {
         mMotion->Hide();
     }
 }
+
+void DinoUiOptionOkButton::OnDecide() {
+    mMotion->Play(4, 1);
+    mSerial.AddTail(mMotion->CreateWaitStopTask());
+    DinoSoundPlaySe(0x390, 0);
+    mOwner->OnOKDecided();
+}
+
+void DinoUiOptionBackButton::OnDecide() {
+    mMotion->Play(4, 1);
+    mSerial.AddTail(mMotion->CreateWaitStopTask());
+    DinoSoundPlaySe(0x38F, 0);
+    mOwner->OnBackDecided();
+}

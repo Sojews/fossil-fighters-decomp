@@ -15,8 +15,11 @@ public:
     virtual MRect GetRect();
     virtual const char *GetText();
 
-    u8 unk94[0x14];
+    u32 mUnk94[4];
+    u8 mUnkA4;          // 0xA4
     MMotion *mMotion;   // 0xA8
+    MMotion *mMotion2;  // 0xAC
+    MMotion *mMotion3;  // 0xB0
 };
 
 #endif

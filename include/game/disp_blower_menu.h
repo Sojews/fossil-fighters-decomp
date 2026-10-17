@@ -70,6 +70,8 @@ public:
     virtual void OnFocus(MMenuItem *item);
     virtual void OnIdle();
     virtual void OnPreLoop();
+    void OnOKDecided();
+    void OnBackDecided();
 
     u8 unkBF[0xC5];  // members start in MMenu's tail padding
     u8 mSilentFocus; // 0x184

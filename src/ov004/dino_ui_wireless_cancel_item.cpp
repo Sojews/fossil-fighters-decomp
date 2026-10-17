@@ -181,3 +181,13 @@ void DinoUiChildScannerStartCannonParentItem::OnDecide() {
 void DinoUiChildScannerStartBattleParentItem::OnDecide() {
     mMotion->Play(3, 0);
 }
+
+void DinoUiChildScannerCancelItem::OnDecide() {
+    mMotion->Play(4, 0);
+}
+
+void DinoUiChildScannerParentItem::OnDecide() {
+    if (mUnkA0) {
+        mMotion->Play(3, 1);
+    }
+}
