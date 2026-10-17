@@ -20,3 +20,6 @@ void DinoMainLoop::Idle() {
 // instantiated explicitly.
 template class MBgCallTask0<DinoMainLoop>;
 template MTask *MCreateBgCallTask(DinoMainLoop *obj, void (DinoMainLoop::*func)(), int thread);
+
+DinoMain::DinoMain() : MProcess(NULL) {
+}

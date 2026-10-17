@@ -5,6 +5,7 @@
 
 class DinoMain : public MProcess {
 public:
+    DinoMain();
     virtual ~DinoMain();
     virtual void Idle();
 };
