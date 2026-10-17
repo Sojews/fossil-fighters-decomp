@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 #include "m/font.h"
+#include "m/screen.h"
 #include "m/menu_item.h"
 #include "m/menu.h"
 #include "m/display.h"
@@ -17,6 +18,13 @@ class CameraWipe : public MProcess {
 public:
     virtual ~CameraWipe();
     virtual void Idle();
+
+    struct Owner {
+        u8 unk00[0x88];
+        MScreen *mScreen;   // 0x88
+    } *mOwner;              // 0x74
+    u32 mUnk78;             // 0x78
+    int mMode;              // 0x7C
 };
 
 class M3DFadeTask : public MTask {

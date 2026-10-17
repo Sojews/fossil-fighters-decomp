@@ -4,10 +4,21 @@
 // Derived destructors have their bases' destructor bodies inlined; auto-inlining the ones defined above does that.
 #pragma auto_inline on
 
+#include "m/window.h"
+#include "m/lcd.h"
 #include "game/camera_wipe.h"
 #include "types.h"
 
+extern u8 data_ov000_02197930;
+
 CameraWipe::~CameraWipe() {
+    if ((u32)(mMode - 2) <= 1) {
+        mOwner->mScreen->Hide();
+        data_ov000_02197930 = TRUE;
+    } else {
+        data_ov000_02197930 = FALSE;
+    }
+    gLcd->mMain->mWin->Reset();
 }
 
 M3DFadeTask::~M3DFadeTask() {
