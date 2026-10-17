@@ -7,6 +7,7 @@
 #include "game/dino_ui_item_item_button_menu.h"
 #include "game/dino_ui_item_item_button.h"
 #include "game/dino_ui_item_menu_item.h"
+#include "game/dino_sound.h"
 
 DinoUiItemItemButton::~DinoUiItemItemButton() {
 }
@@ -63,4 +64,10 @@ void DinoUiItemBackButton::OnFocusChanged(BOOL focused) {
     } else {
         mMotion->Play(2, 0);
     }
+}
+
+void DinoUiItemBackButton::OnDecide() {
+    mMotion->Play(4, 1);
+    mOwner->OnBackDecided();
+    DinoSoundPlaySe(0x90, 0);
 }

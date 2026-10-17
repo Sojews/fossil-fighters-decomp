@@ -6,6 +6,8 @@
 #include "m/menu_item.h"
 #include "game/help.h"
 
+class DinoUiShopSellMenu;
+
 class DinoUiShopSellMenuItem : public MMenuItem, public DinoHelpItem {
 public:
     virtual ~DinoUiShopSellMenuItem();
@@ -15,7 +17,7 @@ public:
     virtual MDisplay *GetDisplay();
     virtual const char *GetText();
 
-    u8 unk94[0x4];
+    DinoUiShopSellMenu *mOwner; // 0x94
     MMotion *mMotion;   // 0x98
     u32 mTextId;        // 0x9C
 };

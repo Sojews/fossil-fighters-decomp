@@ -9,6 +9,7 @@
 #include "game/dino_ui_shop_buy_menu_item.h"
 #include "m/bg_new_task.h"
 #include "m/call_task.h"
+#include "game/dino_sound.h"
 
 DinoUiShopBuy::~DinoUiShopBuy() {
 }
@@ -60,6 +61,12 @@ void DinoUiShopBuyBackButton::OnFocusChanged(BOOL focused) {
     } else {
         mMotion->Play(2, 0);
     }
+}
+
+void DinoUiShopBuyBackButton::OnDecide() {
+    mMotion->Play(4, 1);
+    mOwner->OnBackDecided();
+    DinoSoundPlaySe(0x90, 0);
 }
 
 // Template task instances the game emits in this file. Until the code that makes the tasks is decompiled, they are

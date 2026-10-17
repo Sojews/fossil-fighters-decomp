@@ -89,7 +89,7 @@ func_ov006_021759b8 kind:function(thumb,size=0x12c) addr:0x021759b8
 _ZN19DinoUiContainerMenu6OnIdleEv kind:function(thumb,size=0x2) addr:0x02175ae4
 _ZN19DinoUiContainerMenu7OnFocusEP9MMenuItem kind:function(thumb,size=0x1c4) addr:0x02175ae8
 _ZN19DinoUiContainerMenu8OnDecideEP9MMenuItem kind:function(thumb,size=0x62) addr:0x02175cac
-func_ov006_02175d10 kind:function(thumb,size=0xf4) addr:0x02175d10
+_ZN19DinoUiContainerMenu13OnBackDecidedEv kind:function(thumb,size=0xf4) addr:0x02175d10
 func_ov006_02175e04 kind:function(thumb,size=0x14c) addr:0x02175e04
 func_ov006_02175f50 kind:function(thumb,size=0xac) addr:0x02175f50
 func_ov006_02175ffc kind:function(thumb,size=0x174) addr:0x02175ffc
@@ -157,7 +157,7 @@ _ZN14DinoUiItemMenu7OnStartEv kind:function(thumb,size=0xdd8) addr:0x02176ff4
 func_ov006_02177dcc kind:function(thumb,size=0xe0) addr:0x02177dcc
 _ZN14DinoUiItemMenu7OnFocusEP9MMenuItem kind:function(thumb,size=0x220) addr:0x02177eac
 _ZN14DinoUiItemMenu8OnDecideEP9MMenuItem kind:function(thumb,size=0x26) addr:0x021780cc
-func_ov006_021780f4 kind:function(thumb,size=0xf4) addr:0x021780f4
+_ZN14DinoUiItemMenu13OnBackDecidedEv kind:function(thumb,size=0xf4) addr:0x021780f4
 func_ov006_021781e8 kind:function(thumb,size=0x14c) addr:0x021781e8
 func_ov006_02178334 kind:function(thumb,size=0xa8) addr:0x02178334
 func_ov006_021783dc kind:function(thumb,size=0x5e) addr:0x021783dc
@@ -285,7 +285,7 @@ _Z15MCreateCallTaskI18DinoUiRvStatusMenu12DinoHelpBaseEP5MTaskPT_MT0_FvvE kind:f
 func_ov006_0217f40c kind:function(thumb,size=0x24) addr:0x0217f40c
 func_ov006_0217f430 kind:function(thumb,size=0x24) addr:0x0217f430
 func_ov006_0217f454 kind:function(thumb,size=0x98) addr:0x0217f454
-func_ov006_0217f4ec kind:function(thumb,size=0xb8) addr:0x0217f4ec
+_ZN18DinoUiRvStatusMenu13OnBackDecidedEv kind:function(thumb,size=0xb8) addr:0x0217f4ec
 func_ov006_0217f5a4 kind:function(thumb,size=0x1798) addr:0x0217f5a4
 .L_02180d2e kind:label(thumb) addr:0x02180d2e local
 _ZN22DinoUiRvStatusMenuItem7GetRectEv kind:function(thumb,size=0xa) addr:0x02180d3c

@@ -6,6 +6,8 @@
 #include "m/menu_item.h"
 #include "game/help.h"
 
+class DinoUi2ContainerBaseMenu;
+
 class DinoUi2ContainerBaseMenuItem : public MMenuItem, public DinoHelpItem {
 public:
     virtual ~DinoUi2ContainerBaseMenuItem();
@@ -15,7 +17,7 @@ public:
     virtual MDisplay *GetDisplay();
     virtual const char *GetText();
 
-    u8 unk94[0x4];
+    DinoUi2ContainerBaseMenu *mOwner; // 0x94
     MMotion *mMotion;   // 0x98
     u32 mTextId;        // 0x9C
 };

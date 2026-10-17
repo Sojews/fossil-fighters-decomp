@@ -7,6 +7,7 @@
 #include "game/dino_ui_container_drop_menu_page_inc_task_menu.h"
 #include "game/dino_ui_container_drop_menu_page_inc_task.h"
 #include "game/dino_ui_container_drop_menu_item.h"
+#include "game/dino_sound.h"
 
 DinoUiContainerDropMenuPageIncTask::~DinoUiContainerDropMenuPageIncTask() {
 }
@@ -52,4 +53,10 @@ void DinoUiContainerDropBackButton::OnFocusChanged(BOOL focused) {
     } else {
         mMotion->Play(2, 0);
     }
+}
+
+void DinoUiContainerDropBackButton::OnDecide() {
+    mMotion->Play(4, 1);
+    mOwner->OnBackDecided();
+    DinoSoundPlaySe(0x90, 0);
 }

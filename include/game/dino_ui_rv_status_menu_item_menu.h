@@ -15,6 +15,7 @@ public:
     virtual void OnStart();
     virtual void OnFocus(MMenuItem *item);
     virtual void OnDecide(MMenuItem *item);
+    void OnBackDecided();
 
     u32 mUnkB4[13];             // 0xB4
     std::vector<void *> mUnkE8; // 0xE8
