@@ -15,6 +15,8 @@ public:
     virtual void Idle();
     virtual void Unk08();
     virtual void Unk0C();
+
+    u32 mUnk7C;     // 0x7C
 };
 
 #endif

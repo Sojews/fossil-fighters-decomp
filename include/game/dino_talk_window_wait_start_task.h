@@ -7,6 +7,8 @@ class DinoTalkWindowWaitStartTask : public MTask {
 public:
     virtual ~DinoTalkWindowWaitStartTask();
     virtual void Execute();
+
+    u8 *mStarted;   // 0x10: exits once it is set
 };
 
 #endif

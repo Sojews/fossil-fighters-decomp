@@ -18,3 +18,8 @@ void DinoMultiPlayIconHook::Unk08() {
 
 void DinoMultiPlayIcon::Idle() {
 }
+
+void DinoMultiPlayIconHook::Unk0C() {
+    mParallel.Clear();
+    mUnk7C = 0;
+}

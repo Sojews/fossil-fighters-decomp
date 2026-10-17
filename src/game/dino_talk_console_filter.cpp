@@ -23,3 +23,9 @@ DinoTalkWindowNamePanel::~DinoTalkWindowNamePanel() {
 
 void DinoTalkWindowNamePanel::Idle() {
 }
+
+void DinoTalkWindowWaitStartTask::Execute() {
+    if (*mStarted) {
+        Exit();
+    }
+}

@@ -12,3 +12,8 @@ DinoFieldMapInfo *DinoFieldMap::GetInfo() {
 
 void DinoFieldMap::Idle() {
 }
+
+void DinoFieldMap::Read(const void *buf) {
+    MSerializer::Read(buf);
+    Load();
+}

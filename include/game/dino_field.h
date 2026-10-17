@@ -126,6 +126,7 @@ public:
     virtual void Read(const void *buf);
 
     DinoFieldMapInfo *GetInfo();
+    void Load();
 
     DinoFieldMapInfo mInfo; // 0x8C
     u32 mUnk90;             // 0x90

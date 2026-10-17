@@ -103,7 +103,8 @@ public:
     u32 mUnkB0[2];
     std::vector<void *> mUnkB8; // 0xB8
     std::vector<unsigned int> mUnkC4; // 0xC4
-    u32 mUnkD0[2];              // 0xD0
+    u32 mUnkD0;                 // 0xD0
+    u8 mStarted;                // 0xD4: set by the start message
     MArchivePtr mArchive;       // 0xD8
     MArchiveFile mFileDC;       // 0xDC
     MArchiveFile mFileE8;       // 0xE8

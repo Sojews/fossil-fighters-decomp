@@ -219,3 +219,9 @@ extern const u32 data_0208ad78; // a text number
 const char *DinoUiChildScannerCancelItem::GetText() {
     return gDinoResource->GetText(data_0208ad78);
 }
+
+void DinoUiCannonChild::OnMessage(MMessage *msg) {
+    if (msg->mId == 0x100A7) {
+        mStarted = TRUE;
+    }
+}
