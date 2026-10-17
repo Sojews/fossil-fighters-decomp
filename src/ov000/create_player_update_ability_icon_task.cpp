@@ -5,11 +5,12 @@
 
 #include "game/dino_message.h"
 #include "game/create_player_update_ability_icon_task.h"
+#include "m/seed_generator.h"
+#include "nitro/mi.h"
 #include "types.h"
 #include "game/dino_battle_user_controller.h"
 #include "game/set_status_effect_task.h"
 
-extern "C" void func_ov000_0216d1e4(void *);
 
 extern "C" void func_ov000_0216cc64(void *, u32, u8);
 
@@ -108,7 +109,7 @@ void AddLifePointTask::Execute() {
 }
 
 void ResetStatusEffectSleepTask::Execute() {
-    func_ov000_0216d1e4((void *)mUnk10);
+    ((DinoBattleModelCreature *)mUnk10)->ClearStatus8();
     Exit();
 }
 
@@ -262,7 +263,7 @@ DinoBattleCreatureDef *DinoBattleModelCreature::GetDef() {
 }
 
 void *DinoBattleModelCreature::GetUnk12C() {
-    return mUnk12C;
+    return &mStatus;
 }
 
 u8 DinoBattleModelCreature::GetDefTable(int index) {
@@ -276,6 +277,49 @@ u32 DinoBattleModelCreature::GetUnk108() {
 
 void DinoBattleModelCreature::SetUnk108(u32 value) {
     mUnk108 = value;
+}
+
+void DinoBattleModelCreature::RollUnk10C() {
+    mUnk10C = mPlayer->GetRandom()->Next(5) + 1;
+}
+
+void DinoBattleModelCreature::ClearStatus8() {
+    mStatus.flags &= ~8;
+    mStatus.unk05 = 0;
+}
+
+void DinoBattleModelCreature::ResetStatus() {
+    MI_CpuFill8(&mStatus, 0, sizeof(mStatus));
+}
+
+BOOL DinoBattleModelCreature::IsUnkD244() {
+    if (mUnk174) {
+        return FALSE;
+    }
+    if (mUnkB8 == 3) {
+        return FALSE;
+    }
+    if (mStatus.flags & 8) {
+        return FALSE;
+    }
+    return TRUE;
+}
+
+BOOL DinoBattleModelCreature::IsUnkD274() {
+    if (mUnkB8 == 3) {
+        return FALSE;
+    }
+    if (mStatus.flags & 0x28) {
+        return FALSE;
+    }
+    return TRUE;
+}
+
+u32 DinoBattleModelCreature::GetStatusUnk20() {
+    if (mStatus.flags & 0x10) {
+        return mStatus.unk20;
+    }
+    return 0;
 }
 
 u32 DinoBattleModelPlayer::GetUnkB8() {
@@ -331,8 +375,8 @@ u32 DinoBattleModelPlayer::GetUnkFC() {
     return mUnkFC;
 }
 
-u32 DinoBattleModelPlayer::GetUnk110() {
-    return mUnk110;
+MRandom *DinoBattleModelPlayer::GetRandom() {
+    return mRandom;
 }
 
 u32 DinoBattleModelPlayer::GetUnkAC() {

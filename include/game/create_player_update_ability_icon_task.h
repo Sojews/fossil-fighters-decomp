@@ -34,6 +34,7 @@ public:
 };
 
 class DinoBattleModelCreature;
+class MRandom;
 
 // One side of the battle in the battle model.
 class DinoBattleModelPlayer : public MProcess, public MMessageObserver {
@@ -53,7 +54,7 @@ public:
     DinoBattleModelCreature *GetCreature(int index);
     DinoBattleModelCreature *FindCreature(u32 id);
     u32 GetUnkFC();
-    u32 GetUnk110();
+    MRandom *GetRandom();
     u32 GetUnkAC();
 
     u32 mUnkA8;                         // 0xA8
@@ -68,7 +69,7 @@ public:
     DinoBattleModelCreature **mCreatures;   // 0x104
     int mCreatureCount;                 // 0x108
     u32 unk10C;
-    u32 mUnk110;                        // 0x110
+    MRandom *mRandom;                   // 0x110
     u32 unk114[4];
     u32 mUnk124;                        // 0x124
     u32 mUnk128;                        // 0x128
@@ -92,6 +93,16 @@ struct DinoBattleCreatureDef {
 
 struct DinoBattleCreatureStats {
     u32 v[6];
+};
+
+// A creature's status effects.
+struct DinoBattleCreatureStatus {
+    u32 flags;          // 0x00
+    u8 unk04;
+    u8 unk05;           // 0x05
+    u8 unk06[0x20 - 0x06];
+    u32 unk20;          // 0x20
+    u8 unk24[0x40 - 0x24];
 };
 
 class DinoBattleModelCreature : public MProcess, public MMessageObserver {
@@ -124,6 +135,12 @@ public:
     u8 GetDefTable(int index);
     u32 GetUnk108();
     void SetUnk108(u32 value);
+    void ClearStatus8();
+    void ResetStatus();
+    BOOL IsUnkD244();
+    BOOL IsUnkD274();
+    u32 GetStatusUnk20();
+    void RollUnk10C();
 
     class AddLifePointTask : public MTask {
     public:
@@ -132,7 +149,7 @@ public:
     };
 
     u32 mUnkA8;                     // 0xA8
-    u32 mUnkAC;                     // 0xAC
+    DinoBattleModelPlayer *mPlayer; // 0xAC
     u32 mUnkB0;                     // 0xB0
     u32 mUnkB4;                     // 0xB4
     u32 mUnkB8;                     // 0xB8
@@ -154,7 +171,8 @@ public:
     u32 mUnk10C;                    // 0x10C
     u32 unk110[4];
     std::vector<void *> mUnk120;    // 0x120
-    u8 mUnk12C[0x174 - 0x12C];      // 0x12C
+    DinoBattleCreatureStatus mStatus;   // 0x12C
+    u8 unk16C[0x174 - 0x16C];
     u8 mUnk174;                     // 0x174
     u32 mUnk178;                    // 0x178
 };
