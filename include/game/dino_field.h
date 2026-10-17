@@ -10,6 +10,7 @@
 #include <string>
 #include <vector>
 #include "m/task.h"
+#include "game/help.h"
 #include "m/archive.h"
 #include "m/serializer.h"
 #include "game/dino_field_town_map.h"
@@ -141,7 +142,7 @@ public:
 
 class DinoFieldPoint;
 
-class DinoField : public MProcess {
+class DinoField : public MProcess, public MSerializer, public DinoHelpBase {
 public:
     virtual ~DinoField();
     virtual void Read(const void *buf);
@@ -196,7 +197,7 @@ public:
     void ZoomInPict(MDisplay *display, u32 *id, MTextPicture **pict, u32 newId, MPoint pos, MFx32 scale, u32 a, long b);
     void ZoomOutPict(MDisplay *display, MTextPicture **pict, MFx32 scale, u32 a, long b);
 
-    u8 unk074[0x28];            // (the bases at 0x74 and 0x8C)
+    u32 mUnk98;                 // 0x98
     DinoFieldMap *mMap;         // 0x9C
     DinoFieldChara *mCharas[100]; // 0xA0
     u32 mUnk230;                // 0x230
@@ -224,9 +225,19 @@ public:
     u8 mQuake;                  // 0x2A0
     u32 mQuakeArgs[3];          // 0x2A4
     u32 mQuakeTime;             // 0x2B0
-    u8 unk2B4[0xDC];
+    u32 mUnk2B4;                // 0x2B4
+    MTask *mUnk2B8;             // 0x2B8
+    u32 mUnk2BC;                // 0x2BC
+    MTask *mUnk2C0;             // 0x2C0
+    MTask *mUnk2C4;             // 0x2C4
+    BOOL *mUnk2C8;              // 0x2C8
+    u8 unk2CC[0xB4];
+    MArchivePtr mArchive;       // 0x380
+    MArchiveFile mFile;         // 0x384
     DinoFieldPoint *mMoney;     // 0x390: the money panel, while shown
     DinoFieldPoint *mDonate;    // 0x394
+    u8 unk398[0x30];
+    u8 mUnk3C8;                 // 0x3C8
 };
 
 // The event being run.
