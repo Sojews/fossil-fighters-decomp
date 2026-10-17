@@ -18,6 +18,13 @@ public:
     void OnBackDecided();
     void PageRight();
     void PageLeft();
+
+    u8 unkB4[0x3C];
+    struct Info {
+        u32 unk00;
+        u32 mPageCount; // 0x04
+    } *mInfo;           // 0xF0
+    u32 *mPage;         // 0xF4
 };
 
 #endif

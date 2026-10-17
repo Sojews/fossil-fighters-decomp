@@ -218,3 +218,15 @@ void DinoUiMuseumSlotCreateTask::Idle() {
     }
     mIndex++;
 }
+
+extern "C" void func_ov006_0218a570(DinoUiMuseumInformationMenu *menu);
+
+void DinoUiMuseumInformationMenu::PageRight() {
+    *mPage = (*mPage + 1) % mInfo->mPageCount;
+    func_ov006_0218a570(this);
+}
+
+void DinoUiMuseumInformationMenu::PageLeft() {
+    *mPage = (*mPage + mInfo->mPageCount - 1) % mInfo->mPageCount;
+    func_ov006_0218a570(this);
+}
