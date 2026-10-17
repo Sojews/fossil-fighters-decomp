@@ -21,6 +21,8 @@ public:
     void SetRepeat(u32 mask, int delay, int interval);
     void Update(const MInputState &state);
     MPoint GetTouchPos();
+    // Buttons pressed since the last update.
+    u32 GetPressed() { return mButtons & (mButtons ^ mPrevButtons); }
 
     u32 mButtons;           // 0x04
     u32 mPrevButtons;       // 0x08

@@ -54,7 +54,7 @@ template class MBgCallTask0<DinoUiOpening>;
 template MTask *MCreateBgCallTask(DinoUiOpening *obj, void (DinoUiOpening::*func)(), int thread);
 
 void DinoUiTitleMenu::OnFocus(MMenuItem *item) {
-    mUnkC8 = 0;
+    mIdleTime = 0;
     if (mSilentFocus) {
         mSilentFocus = FALSE;
     } else {
@@ -74,4 +74,21 @@ void DinoUiTitleMenu::OnDecide(MMenuItem *item) {
 
 MRect DinoUiTitleMenuGameItem::GetFrame() {
     return MRect(0, 0, 256, 192);
+}
+
+void DinoUiTitleMenu::OnIdle() {
+    if (mOam->mOffset.y == 0) {
+        mMotion->Play(1, 0);
+        if (mIdleTime++ >= 1200) {
+            *mResult = 8;
+            Exit();
+        }
+    }
+}
+
+void DinoUiOpening::Execute() {
+    if (mInput->GetPressed() & 0x1C0B) { // A, B, Start, X, Y or a touch
+        mSkipped = TRUE;
+    }
+    MProcess::Execute();
 }
