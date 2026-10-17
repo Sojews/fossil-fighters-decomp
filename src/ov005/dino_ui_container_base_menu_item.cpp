@@ -4,6 +4,7 @@
 // Derived destructors have their bases' destructor bodies inlined; auto-inlining the ones defined above does that.
 #pragma auto_inline on
 
+#include "game/dino_ui_container_base_menu_item_menu.h"
 #include "game/dino_ui_container_base_menu_item.h"
 #include "m/bg_new_task.h"
 #include "m/call_task.h"
@@ -21,6 +22,9 @@ DinoUiContainerBasePageRButton::~DinoUiContainerBasePageRButton() {
 }
 
 DinoUiContainerBaseDecideButton::~DinoUiContainerBaseDecideButton() {
+}
+
+DinoUiContainerBaseMenu::~DinoUiContainerBaseMenu() {
 }
 
 // Template task instances the game emits in this file. Until the code that makes the tasks is decompiled, they are

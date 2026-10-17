@@ -7,6 +7,7 @@
 class DinoUiStatusChangeModeHelpTask : public DinoHelpBase, public MProcess {
 public:
     virtual ~DinoUiStatusChangeModeHelpTask();
+    virtual void Idle();
 };
 
 #endif
