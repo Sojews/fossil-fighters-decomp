@@ -32,3 +32,19 @@ DinoUiOrganizationSlotCreateTask::~DinoUiOrganizationSlotCreateTask() {
 
 DinoUiOrganizationMenuBlendResetTask::~DinoUiOrganizationMenuBlendResetTask() {
 }
+
+MRect DinoUiOrganizationMenuItem::GetRect() {
+    return GetFrame();
+}
+
+MDisplay *DinoUiOrganizationMenuItem::GetDisplay() {
+    return MProcess::GetDisplay();
+}
+
+MRect DinoUiOrganizationMenuItem::GetFrame() {
+    return mMotion->GetFrame();
+}
+
+const char *DinoUiOrganizationMenuItem::GetText() {
+    return gDinoResource->GetText(mTextId);
+}

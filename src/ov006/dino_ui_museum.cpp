@@ -140,3 +140,10 @@ void DinoUiMuseumInformationPageLButton::OnDecide() {
 
 DinoUiMuseum::DinoUiMuseum() : MProcess(gLcd->mSub) {
 }
+
+DinoUiMuseumReviverButton::~DinoUiMuseumReviverButton() {
+}
+
+MRect DinoUiMuseumReviverButton::GetFrame() {
+    return mMotion->GetFrame();
+}

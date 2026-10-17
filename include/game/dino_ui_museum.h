@@ -106,4 +106,13 @@ public:
     virtual void OnDecide();
 };
 
+class DinoUiMuseumReviverButton : public MMenuItem {
+public:
+    virtual ~DinoUiMuseumReviverButton();
+    virtual MRect GetFrame();
+    virtual void OnFocusChanged(BOOL focused);
+
+    MMotion *mMotion;   // 0x88
+};
+
 #endif
