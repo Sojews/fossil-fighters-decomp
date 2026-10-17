@@ -1,6 +1,10 @@
 // DinoUiFieldMenuFraction, DinoUiFieldMenuNumber, DinoUiFieldMenuNumber3, DinoUiPartsNumber8, DinoUiPartsReviverMedalButton, DinoUiPartsReviverNameCountCheckTask, DinoUiPartsBlackBelt, DinoUiPartsRockName, DinoUiPartsKasekiButton, DinoUiPartsTeamInfo, DinoUiPartsTeamTech.
 // Only the destructors are decompiled so far.
 
+// Derived destructors have their bases' destructor bodies inlined; auto-inlining the ones defined above does that.
+#pragma auto_inline on
+
+#include "game/dino_ui_field_menu_fraction_menu.h"
 #include "game/dino_ui_field_menu_fraction.h"
 #include "game/dino_ui_field_menu_number.h"
 #include "game/dino_ui_field_menu_number3.h"

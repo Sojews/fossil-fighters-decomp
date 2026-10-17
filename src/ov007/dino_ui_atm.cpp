@@ -1,6 +1,10 @@
 // DinoUiATM, DinoUiATMTeamButton.
 // Only the destructors are decompiled so far.
 
+// Derived destructors have their bases' destructor bodies inlined; auto-inlining the ones defined above does that.
+#pragma auto_inline on
+
+#include "game/dino_ui_atm_menu.h"
 #include "game/dino_ui_atm.h"
 #include "game/dino_ui_atm_team_button.h"
 #include "game/dino_ui_atm_back_button.h"
@@ -17,9 +21,11 @@ DinoUiATMTeamButton::~DinoUiATMTeamButton() {
 DinoUiATMBackButton::~DinoUiATMBackButton() {
 }
 
+DinoUiATMMenu::~DinoUiATMMenu() {
+}
+
 // Template task instances the game emits in this file. Until the code that makes the tasks is decompiled, they are
 // instantiated explicitly.
-class DinoUiATMMenu {};
 template class MBgCallTask0<DinoBackup>;
 template MTask *MCreateBgCallTask(DinoBackup *obj, void (DinoBackup::*func)(), int thread);
 template class MCallTask0<DinoUiATMMenu, DinoUiATMMenu>;

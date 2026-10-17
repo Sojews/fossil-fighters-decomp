@@ -7,6 +7,12 @@
 class DinoUiATMBackButton : public MMenuItem, public DinoHelpItem {
 public:
     virtual ~DinoUiATMBackButton();
+    virtual MRect GetFrame();
+    virtual void OnFocusChanged(BOOL focused);
+    virtual void OnDecide();
+    virtual MRect GetRect();
+    virtual MDisplay *GetDisplay();
+    virtual const char *GetText();
 };
 
 #endif

@@ -1,6 +1,10 @@
 // DinoUiIslandMap, DrawFont, BitmapMove, SpotMove, DinoUiIslandMapMenuItem, IslandMapKeyCheckTask, GuidMan.
 // Only the destructors are decompiled so far.
 
+// Derived destructors have their bases' destructor bodies inlined; auto-inlining the ones defined above does that.
+#pragma auto_inline on
+
+#include "game/dino_ui_island_map_menu.h"
 #include "game/dino_ui_island_map.h"
 #include "game/draw_font.h"
 #include "game/bitmap_move.h"

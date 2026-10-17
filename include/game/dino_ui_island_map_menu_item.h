@@ -6,6 +6,10 @@
 class DinoUiIslandMapMenuItem : public MMenuItem {
 public:
     virtual ~DinoUiIslandMapMenuItem();
+    virtual MRect GetFrame();
+    virtual void OnFocusChanged(BOOL focused);
+    virtual void OnSelectChanged(BOOL selected);
+    virtual void OnDecide();
 };
 
 #endif

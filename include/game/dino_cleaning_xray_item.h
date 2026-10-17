@@ -7,6 +7,12 @@
 class DinoCleaningXrayItem : public DinoHelpItem, public MMenuItem {
 public:
     virtual ~DinoCleaningXrayItem();
+    virtual MRect GetRect();
+    virtual MDisplay *GetDisplay();
+    virtual const char *GetText();
+    virtual MRect GetFrame();
+    virtual void OnEnableChanged(BOOL enabled);
+    virtual void OnDecide();
 };
 
 #endif

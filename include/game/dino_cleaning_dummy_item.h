@@ -6,6 +6,8 @@
 class DinoCleaningDummyItem : public MMenuItem {
 public:
     virtual ~DinoCleaningDummyItem();
+    virtual MRect GetFrame();
+    virtual void OnDecide();
 };
 
 #endif

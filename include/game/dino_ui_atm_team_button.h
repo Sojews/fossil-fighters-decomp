@@ -6,6 +6,9 @@
 class DinoUiATMTeamButton : public MMenuItem {
 public:
     virtual ~DinoUiATMTeamButton();
+    virtual MRect GetFrame();
+    virtual void OnFocusChanged(BOOL focused);
+    virtual void OnDecide();
 };
 
 #endif

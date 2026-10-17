@@ -6,6 +6,9 @@
 class DinoUiPartsReviverMedalButton : public MMenuItem {
 public:
     virtual ~DinoUiPartsReviverMedalButton();
+    virtual MRect GetFrame();
+    virtual void OnFocusChanged(BOOL focused);
+    virtual void OnDecide();
 };
 
 #endif
