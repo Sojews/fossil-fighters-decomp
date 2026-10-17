@@ -23,6 +23,6 @@ DinoUiChildScannerStartCannonParentItem::~DinoUiChildScannerStartCannonParentIte
 
 // Template task instances the game emits in this file. Until the code that makes the tasks is decompiled, they are
 // instantiated explicitly.
-class DinoUiBattleParentScanner : public MMessageObserver {};
+class DinoUiBattleParentScanner : public MProcess, public MMessageObserver {};
 template class MCallTask0<DinoUiBattleParentScanner, MMessageObserver>;
 template MTask *MCreateCallTask(DinoUiBattleParentScanner *obj, void (MMessageObserver::*func)());
