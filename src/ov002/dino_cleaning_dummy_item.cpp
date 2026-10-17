@@ -43,3 +43,7 @@ MDisplay *DinoCleaningToolMenuItem::GetDisplay() {
 MDisplay *DinoCleaningXrayItem::GetDisplay() {
     return MProcess::GetDisplay();
 }
+
+void DinoCleaningXrayItem::OnEnableChanged(BOOL enabled) {
+    mMotion->Play(2, 0);
+}
