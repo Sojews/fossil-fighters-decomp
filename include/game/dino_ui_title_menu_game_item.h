@@ -6,6 +6,7 @@
 class DinoUiTitleMenuGameItem : public MMenuItem {
 public:
     virtual ~DinoUiTitleMenuGameItem();
+    virtual MRect GetFrame();
 };
 
 #endif
