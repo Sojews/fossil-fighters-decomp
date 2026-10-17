@@ -8,11 +8,11 @@
 #include "game/help.h"
 #include "game/dino_ui_cleaning_menu_item.h"
 
-class DinoEvent;
+class DinoEventLoop;
 
 class DinoUiCleaningMenu : public DinoHelpBase, public MMenu {
 public:
-    DinoUiCleaningMenu(DinoEvent *event);
+    DinoUiCleaningMenu(DinoEventLoop *event);
     virtual ~DinoUiCleaningMenu();
     virtual void OnStart();
     virtual void OnIdle();

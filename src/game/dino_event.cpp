@@ -1,30 +1,34 @@
-// DinoEvent: runs an event script.
+// DinoEventLoop: runs the event scripts.
 // Only a few small methods are decompiled so far.
 
 #include "game/dino_field.h"
 
-void DinoEvent::SetResult(u32 result) {
+void DinoEventLoop::Idle() {
+    (this->*mState)();
+}
+
+void DinoEventLoop::SetResult(u32 result) {
     if (mResult) {
         *mResult = result;
     }
 }
 
-DinoField *DinoEvent::GetField() {
+DinoField *DinoEventLoop::GetField() {
     return mField;
 }
 
-void DinoEvent::SetEpisodesChanged() {
+void DinoEventLoop::SetEpisodesChanged() {
     mEpisodesChanged = TRUE;
 }
 
-void DinoEvent::MarkCameraUsed() {
+void DinoEventLoop::MarkCameraUsed() {
     mCameraUsed = TRUE;
 }
 
-void DinoEvent::Fade(u32 a, u32 b) {
+void DinoEventLoop::Fade(u32 a, u32 b) {
     mField->Fade(a, b);
 }
 
-MTask *DinoEvent::CreateFadeWaitTask() {
+MTask *DinoEventLoop::CreateFadeWaitTask() {
     return mField->CreateFadeWaitTask();
 }

@@ -169,8 +169,11 @@ public:
     u8 unk10[0x6C];
 };
 
-class DinoEvent : public MProcess {
+// Runs the event scripts (the game's class name; the event commands get it as their event).
+class DinoEventLoop : public MProcess {
 public:
+    virtual ~DinoEventLoop();
+    virtual void Idle();
     MTask *CreateTalkTask(u32 id);
     std::string GetTalkText(u32 id);
     void SetResult(u32 result);
@@ -185,7 +188,7 @@ public:
     void RemoveEpisode(u32 id);
     void ResetEpisode(u32 id);
 
-    u32 mUnk74[2];          // 0x74
+    void (DinoEventLoop::*mState)();    // 0x74
     u32 *mResult;           // 0x7C
     DinoField *mField;      // 0x80
     u32 mUnk84[14];         // 0x84

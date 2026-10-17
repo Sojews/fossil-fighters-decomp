@@ -112,7 +112,6 @@ void SetEpisodeTask::Execute() {
 
 // Template task instances the game emits in this file. Until the code that makes the tasks is decompiled, they are
 // instantiated explicitly.
-class DinoEventLoop {};
 template class MBgCallTask0<DinoEventSaveOption>;
 template MTask *MCreateBgCallTask(DinoEventSaveOption *obj, void (DinoEventSaveOption::*func)(), int thread);
 template class MBgCallTask1<DinoEventLoop, u32>;

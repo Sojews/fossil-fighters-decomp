@@ -115,12 +115,12 @@ public:
 // Puts a chara on a map, at a region's center or a point, facing an angle or another chara.
 class DinoEventExecAppendCharaRegion : public MTask {
 public:
-    DinoEventExecAppendCharaRegion(DinoEvent *event, u32 chara, u32 region, u32 angle, u32 target);
-    DinoEventExecAppendCharaRegion(DinoEvent *event, u32 chara, u32 map, MFx32Point pos, u32 angle, u32 target);
+    DinoEventExecAppendCharaRegion(DinoEventLoop *event, u32 chara, u32 region, u32 angle, u32 target);
+    DinoEventExecAppendCharaRegion(DinoEventLoop *event, u32 chara, u32 map, MFx32Point pos, u32 angle, u32 target);
     virtual ~DinoEventExecAppendCharaRegion();
     virtual void Execute();
 
-    DinoEvent *mEvent;  // 0x10
+    DinoEventLoop *mEvent;  // 0x10
     u32 mChara;         // 0x14
     u32 mMap;           // 0x18
     MFx32Point mPos;    // 0x1C
@@ -131,32 +131,32 @@ public:
 // Puts a chara where another chara is.
 class DinoEventExecAppendCharaChara : public MProcess {
 public:
-    DinoEventExecAppendCharaChara(DinoEvent *event, u32 chara, u32 other);
+    DinoEventExecAppendCharaChara(DinoEventLoop *event, u32 chara, u32 other);
     virtual ~DinoEventExecAppendCharaChara();
     virtual void Idle();
 
-    DinoEvent *mEvent;  // 0x74
+    DinoEventLoop *mEvent;  // 0x74
     u32 mChara;         // 0x78
     u32 mOther;         // 0x7C
 };
 
 class DinoEventExecRemoveChara : public MTask {
 public:
-    DinoEventExecRemoveChara(DinoEvent *event, u32 chara);
+    DinoEventExecRemoveChara(DinoEventLoop *event, u32 chara);
     virtual ~DinoEventExecRemoveChara();
     virtual void Execute();
 
-    DinoEvent *mEvent;  // 0x10
+    DinoEventLoop *mEvent;  // 0x10
     u32 mChara;         // 0x14
 };
 
 class DinoEventExecCharaAngle : public MProcess {
 public:
-    DinoEventExecCharaAngle(DinoEvent *event, u32 chara, u32 angle, u32 a, u32 b);
+    DinoEventExecCharaAngle(DinoEventLoop *event, u32 chara, u32 angle, u32 a, u32 b);
     virtual ~DinoEventExecCharaAngle();
     virtual void Idle();
 
-    DinoEvent *mEvent;  // 0x74
+    DinoEventLoop *mEvent;  // 0x74
     u32 mChara;         // 0x78
     u32 mAngle;         // 0x7C
     u32 mA;             // 0x80
@@ -165,11 +165,11 @@ public:
 
 class DinoEventExecCharaAngleToChara : public MProcess {
 public:
-    DinoEventExecCharaAngleToChara(DinoEvent *event, u32 chara, u32 target, u32 a, u32 b);
+    DinoEventExecCharaAngleToChara(DinoEventLoop *event, u32 chara, u32 target, u32 a, u32 b);
     virtual ~DinoEventExecCharaAngleToChara();
     virtual void Idle();
 
-    DinoEvent *mEvent;  // 0x74
+    DinoEventLoop *mEvent;  // 0x74
     u32 mChara;         // 0x78
     u32 mTarget;        // 0x7C
     u32 mA;             // 0x80
@@ -178,11 +178,11 @@ public:
 
 class DinoEventExecCharaAngleOffset : public MProcess {
 public:
-    DinoEventExecCharaAngleOffset(DinoEvent *event, u32 chara, u32 offset, u32 a, u32 b);
+    DinoEventExecCharaAngleOffset(DinoEventLoop *event, u32 chara, u32 offset, u32 a, u32 b);
     virtual ~DinoEventExecCharaAngleOffset();
     virtual void Idle();
 
-    DinoEvent *mEvent;  // 0x74
+    DinoEventLoop *mEvent;  // 0x74
     u32 mChara;         // 0x78
     u32 mOffset;        // 0x7C
     u32 mA;             // 0x80
@@ -191,11 +191,11 @@ public:
 
 class DinoEventExecCharaAngleOffsetToChara : public MProcess {
 public:
-    DinoEventExecCharaAngleOffsetToChara(DinoEvent *event, u32 chara, u32 target, u16 offset, u32 a, u32 b);
+    DinoEventExecCharaAngleOffsetToChara(DinoEventLoop *event, u32 chara, u32 target, u16 offset, u32 a, u32 b);
     virtual ~DinoEventExecCharaAngleOffsetToChara();
     virtual void Idle();
 
-    DinoEvent *mEvent;  // 0x74
+    DinoEventLoop *mEvent;  // 0x74
     u32 mChara;         // 0x78
     u32 mTarget;        // 0x7C
     u16 mOffset;        // 0x80
@@ -205,11 +205,11 @@ public:
 
 class DinoEventExecCharaMoveToChara : public MProcess {
 public:
-    DinoEventExecCharaMoveToChara(DinoEvent *event, u32 chara, u32 target, u32 a, u32 b, u8 c);
+    DinoEventExecCharaMoveToChara(DinoEventLoop *event, u32 chara, u32 target, u32 a, u32 b, u8 c);
     virtual ~DinoEventExecCharaMoveToChara();
     virtual void Idle();
 
-    DinoEvent *mEvent;  // 0x74
+    DinoEventLoop *mEvent;  // 0x74
     u32 mChara;         // 0x78
     u32 mTarget;        // 0x7C
     u32 mA;             // 0x80
@@ -219,11 +219,11 @@ public:
 
 class DinoEventExecCharaMoveToRegion : public MProcess {
 public:
-    DinoEventExecCharaMoveToRegion(DinoEvent *event, u32 chara, u32 region, u32 a, u32 b, u8 c);
+    DinoEventExecCharaMoveToRegion(DinoEventLoop *event, u32 chara, u32 region, u32 a, u32 b, u8 c);
     virtual ~DinoEventExecCharaMoveToRegion();
     virtual void Idle();
 
-    DinoEvent *mEvent;  // 0x74
+    DinoEventLoop *mEvent;  // 0x74
     u32 mChara;         // 0x78
     u32 mRegion;        // 0x7C
     u32 mA;             // 0x80
@@ -233,11 +233,11 @@ public:
 
 class DinoEventExecCharaMoveToCoord : public MProcess {
 public:
-    DinoEventExecCharaMoveToCoord(DinoEvent *event, u32 chara, MFx32Point coord, u32 a, u32 b, u8 c);
+    DinoEventExecCharaMoveToCoord(DinoEventLoop *event, u32 chara, MFx32Point coord, u32 a, u32 b, u8 c);
     virtual ~DinoEventExecCharaMoveToCoord();
     virtual void Idle();
 
-    DinoEvent *mEvent;  // 0x74
+    DinoEventLoop *mEvent;  // 0x74
     u32 mChara;         // 0x78
     MFx32Point mPoint;    // 0x7C
     u32 mA;             // 0x84
@@ -247,11 +247,11 @@ public:
 
 class DinoEventExecCharaMoveOffset : public MProcess {
 public:
-    DinoEventExecCharaMoveOffset(DinoEvent *event, u32 chara, MFx32Point offset, u32 a, u32 b, u8 c);
+    DinoEventExecCharaMoveOffset(DinoEventLoop *event, u32 chara, MFx32Point offset, u32 a, u32 b, u8 c);
     virtual ~DinoEventExecCharaMoveOffset();
     virtual void Idle();
 
-    DinoEvent *mEvent;  // 0x74
+    DinoEventLoop *mEvent;  // 0x74
     u32 mChara;         // 0x78
     MFx32Point mPoint;    // 0x7C
     u32 mA;             // 0x84
@@ -261,11 +261,11 @@ public:
 
 class DinoEventExecCharaMoveVector : public MProcess {
 public:
-    DinoEventExecCharaMoveVector(DinoEvent *event, u32 chara, u16 direction, u32 a, u32 b, u32 c, u8 d);
+    DinoEventExecCharaMoveVector(DinoEventLoop *event, u32 chara, u16 direction, u32 a, u32 b, u32 c, u8 d);
     virtual ~DinoEventExecCharaMoveVector();
     virtual void Idle();
 
-    DinoEvent *mEvent;  // 0x74
+    DinoEventLoop *mEvent;  // 0x74
     u32 mChara;         // 0x78
     u16 mDirection;     // 0x7C
     u32 mA;             // 0x80
@@ -276,21 +276,21 @@ public:
 
 class DinoEventExecCharaWaitMove : public MProcess {
 public:
-    DinoEventExecCharaWaitMove(DinoEvent *event, u32 chara);
+    DinoEventExecCharaWaitMove(DinoEventLoop *event, u32 chara);
     virtual ~DinoEventExecCharaWaitMove();
     virtual void Idle();
 
-    DinoEvent *mEvent;  // 0x74
+    DinoEventLoop *mEvent;  // 0x74
     u32 mChara;         // 0x78
 };
 
 class DinoEventExecCharaFocus : public MProcess {
 public:
-    DinoEventExecCharaFocus(DinoEvent *event, u32 chara);
+    DinoEventExecCharaFocus(DinoEventLoop *event, u32 chara);
     virtual ~DinoEventExecCharaFocus();
     virtual void Idle();
 
-    DinoEvent *mEvent;  // 0x74
+    DinoEventLoop *mEvent;  // 0x74
     u32 mChara;         // 0x78
 };
 
@@ -312,11 +312,11 @@ public:
 
 class DinoEventExecCamera : public MTransfer {
 public:
-    DinoEventExecCamera(DinoEvent *event, u32 x, u32 y, u32 z, u32 a, u32 b, u32 c);
+    DinoEventExecCamera(DinoEventLoop *event, u32 x, u32 y, u32 z, u32 a, u32 b, u32 c);
     virtual ~DinoEventExecCamera();
     virtual void Transfer();
 
-    DinoEvent *mEvent;  // 0x10
+    DinoEventLoop *mEvent;  // 0x10
     u32 mX;             // 0x14
     u32 mY;             // 0x18
     u32 mZ;             // 0x1C
@@ -345,75 +345,75 @@ public:
 
 class DinoEventExecStartFellow : public MTransfer {
 public:
-    DinoEventExecStartFellow(DinoEvent *event, u32 chara, u32 target);
+    DinoEventExecStartFellow(DinoEventLoop *event, u32 chara, u32 target);
     virtual ~DinoEventExecStartFellow();
     virtual void Transfer();
 
-    DinoEvent *mEvent;  // 0x10
+    DinoEventLoop *mEvent;  // 0x10
     u32 mChara;         // 0x14
     u32 mTarget;        // 0x18
 };
 
 class DinoEventExecFinishFellow : public MTransfer {
 public:
-    DinoEventExecFinishFellow(DinoEvent *event, u32 chara);
+    DinoEventExecFinishFellow(DinoEventLoop *event, u32 chara);
     virtual ~DinoEventExecFinishFellow();
     virtual void Transfer();
 
-    DinoEvent *mEvent;  // 0x10
+    DinoEventLoop *mEvent;  // 0x10
     u32 mChara;         // 0x14
 };
 
 class DinoEventExecStartWander : public MTransfer {
 public:
-    DinoEventExecStartWander(DinoEvent *event, u32 chara, u32 a, u32 b, u32 c, u32 d);
+    DinoEventExecStartWander(DinoEventLoop *event, u32 chara, u32 a, u32 b, u32 c, u32 d);
     virtual ~DinoEventExecStartWander();
     virtual void Transfer();
 
-    DinoEvent *mEvent;  // 0x10
+    DinoEventLoop *mEvent;  // 0x10
     u32 mChara;         // 0x14
     u32 mArgs[4];       // 0x18
 };
 
 class DinoEventExecStartWatch : public MTransfer {
 public:
-    DinoEventExecStartWatch(DinoEvent *event, u32 chara, DinoCharaWatch watch);
+    DinoEventExecStartWatch(DinoEventLoop *event, u32 chara, DinoCharaWatch watch);
     virtual ~DinoEventExecStartWatch();
     virtual void Transfer();
 
-    DinoEvent *mEvent;      // 0x10
+    DinoEventLoop *mEvent;      // 0x10
     u32 mChara;             // 0x14
     DinoCharaWatch mWatch;  // 0x18
 };
 
 class DinoEventExecFinishWatch : public MTransfer {
 public:
-    DinoEventExecFinishWatch(DinoEvent *event, u32 chara);
+    DinoEventExecFinishWatch(DinoEventLoop *event, u32 chara);
     virtual ~DinoEventExecFinishWatch();
     virtual void Transfer();
 
-    DinoEvent *mEvent;  // 0x10
+    DinoEventLoop *mEvent;  // 0x10
     u32 mChara;         // 0x14
 };
 
 class DinoEventExecStartBehold : public MTransfer {
 public:
-    DinoEventExecStartBehold(DinoEvent *event, u32 chara, u32 target);
+    DinoEventExecStartBehold(DinoEventLoop *event, u32 chara, u32 target);
     virtual ~DinoEventExecStartBehold();
     virtual void Transfer();
 
-    DinoEvent *mEvent;  // 0x10
+    DinoEventLoop *mEvent;  // 0x10
     u32 mChara;         // 0x14
     u32 mTarget;        // 0x18
 };
 
 class DinoEventExecFinishBehold : public MTransfer {
 public:
-    DinoEventExecFinishBehold(DinoEvent *event, u32 chara);
+    DinoEventExecFinishBehold(DinoEventLoop *event, u32 chara);
     virtual ~DinoEventExecFinishBehold();
     virtual void Transfer();
 
-    DinoEvent *mEvent;  // 0x10
+    DinoEventLoop *mEvent;  // 0x10
     u32 mChara;         // 0x14
 };
 
@@ -431,11 +431,11 @@ public:
 
 class DinoEventExecYesNo : public MProcess {
 public:
-    DinoEventExecYesNo(DinoEvent *event, u32 flag, u32 text);
+    DinoEventExecYesNo(DinoEventLoop *event, u32 flag, u32 text);
     virtual ~DinoEventExecYesNo();
     virtual void Idle();
 
-    DinoEvent *mEvent;  // 0x74
+    DinoEventLoop *mEvent;  // 0x74
     u32 mFlag;          // 0x78: gets the answer
     u32 mText;          // 0x7C: question, then optionally the two answers, one per line
     u32 mStep;          // 0x80
@@ -456,11 +456,11 @@ public:
 
 class DinoEventExecFade : public MProcess {
 public:
-    DinoEventExecFade(DinoEvent *event, u32 a, u32 b, u8 wait);
+    DinoEventExecFade(DinoEventLoop *event, u32 a, u32 b, u8 wait);
     virtual ~DinoEventExecFade();
     virtual void Idle();
 
-    DinoEvent *mEvent;  // 0x74
+    DinoEventLoop *mEvent;  // 0x74
     u32 mA;             // 0x78
     u32 mB;             // 0x7C
     u8 mWait;           // 0x80
@@ -547,7 +547,7 @@ public:
 // Shows a kaseki rock being got.
 class DinoEventKasekiRockGet : public MProcess {
 public:
-    DinoEventKasekiRockGet(DinoEvent *event, u32 mode, const DinoBackupEntry *entry, u8 *result);
+    DinoEventKasekiRockGet(DinoEventLoop *event, u32 mode, const DinoBackupEntry *entry, u8 *result);
     virtual ~DinoEventKasekiRockGet();
     virtual void Idle();
 
@@ -570,11 +570,11 @@ public:
 
 class DinoEventExecKasekiRockGet : public MProcess {
 public:
-    DinoEventExecKasekiRockGet(DinoEvent *event, u32 flag, u32 id, u32 a, u32 b, u8 c);
+    DinoEventExecKasekiRockGet(DinoEventLoop *event, u32 flag, u32 id, u32 a, u32 b, u8 c);
     virtual ~DinoEventExecKasekiRockGet();
     virtual void Idle();
 
-    DinoEvent *mEvent;  // 0x74
+    DinoEventLoop *mEvent;  // 0x74
     u32 mFlag;          // 0x78: if set, gets the result
     u32 mId;            // 0x7C
     u32 mA;             // 0x80
@@ -586,11 +586,11 @@ public:
 
 class DinoEventExecKasekiRockShot : public MProcess {
 public:
-    DinoEventExecKasekiRockShot(DinoEvent *event, u32 id, u32 a, u32 b);
+    DinoEventExecKasekiRockShot(DinoEventLoop *event, u32 id, u32 a, u32 b);
     virtual ~DinoEventExecKasekiRockShot();
     virtual void Idle();
 
-    DinoEvent *mEvent;  // 0x74
+    DinoEventLoop *mEvent;  // 0x74
     u32 mId;            // 0x78
     u32 mA;             // 0x7C
     u32 mB;             // 0x80
@@ -599,33 +599,33 @@ public:
 
 class DinoEventExecCharaBodyModelIndex : public MTransfer {
 public:
-    DinoEventExecCharaBodyModelIndex(DinoEvent *event, u32 chara, u32 model);
+    DinoEventExecCharaBodyModelIndex(DinoEventLoop *event, u32 chara, u32 model);
     virtual ~DinoEventExecCharaBodyModelIndex();
     virtual void Transfer();
 
-    DinoEvent *mEvent;  // 0x10
+    DinoEventLoop *mEvent;  // 0x10
     u32 mChara;         // 0x14
     u32 mModel;         // 0x18
 };
 
 class DinoEventExecCharaHeadModelIndex : public MTransfer {
 public:
-    DinoEventExecCharaHeadModelIndex(DinoEvent *event, u32 chara, u32 model);
+    DinoEventExecCharaHeadModelIndex(DinoEventLoop *event, u32 chara, u32 model);
     virtual ~DinoEventExecCharaHeadModelIndex();
     virtual void Transfer();
 
-    DinoEvent *mEvent;  // 0x10
+    DinoEventLoop *mEvent;  // 0x10
     u32 mChara;         // 0x14
     u32 mModel;         // 0x18
 };
 
 class DinoEventExecCharaMotionSet : public MTransfer {
 public:
-    DinoEventExecCharaMotionSet(DinoEvent *event, u32 chara, u32 motion, u8 loop);
+    DinoEventExecCharaMotionSet(DinoEventLoop *event, u32 chara, u32 motion, u8 loop);
     virtual ~DinoEventExecCharaMotionSet();
     virtual void Transfer();
 
-    DinoEvent *mEvent;  // 0x10
+    DinoEventLoop *mEvent;  // 0x10
     u32 mChara;         // 0x14
     u32 mMotion;        // 0x18
     u8 mLoop;           // 0x1C
@@ -633,32 +633,32 @@ public:
 
 class DinoEventExecCharaMotionCache : public MTransfer {
 public:
-    DinoEventExecCharaMotionCache(DinoEvent *event, u32 chara, u32 motion);
+    DinoEventExecCharaMotionCache(DinoEventLoop *event, u32 chara, u32 motion);
     virtual ~DinoEventExecCharaMotionCache();
     virtual void Transfer();
 
-    DinoEvent *mEvent;  // 0x10
+    DinoEventLoop *mEvent;  // 0x10
     u32 mChara;         // 0x14
     u32 mMotion;        // 0x18
 };
 
 class DinoEventExecCharaMotionCacheClear : public MTransfer {
 public:
-    DinoEventExecCharaMotionCacheClear(DinoEvent *event, u32 chara);
+    DinoEventExecCharaMotionCacheClear(DinoEventLoop *event, u32 chara);
     virtual ~DinoEventExecCharaMotionCacheClear();
     virtual void Transfer();
 
-    DinoEvent *mEvent;  // 0x10
+    DinoEventLoop *mEvent;  // 0x10
     u32 mChara;         // 0x14
 };
 
 class DinoEventExecManpuShow : public MTransfer {
 public:
-    DinoEventExecManpuShow(DinoEvent *event, u32 chara, u32 manpu, MPoint offset);
+    DinoEventExecManpuShow(DinoEventLoop *event, u32 chara, u32 manpu, MPoint offset);
     virtual ~DinoEventExecManpuShow();
     virtual void Transfer();
 
-    DinoEvent *mEvent;  // 0x10
+    DinoEventLoop *mEvent;  // 0x10
     u32 mChara;         // 0x14
     u32 mManpu;         // 0x18
     MPoint mOffset;     // 0x1C
@@ -666,51 +666,51 @@ public:
 
 class DinoEventExecManpuHide : public MTransfer {
 public:
-    DinoEventExecManpuHide(DinoEvent *event, u32 chara);
+    DinoEventExecManpuHide(DinoEventLoop *event, u32 chara);
     virtual ~DinoEventExecManpuHide();
     virtual void Transfer();
 
-    DinoEvent *mEvent;  // 0x10
+    DinoEventLoop *mEvent;  // 0x10
     u32 mChara;         // 0x14
 };
 
 class DinoEventExecPictShow : public MProcess {
 public:
-    DinoEventExecPictShow(DinoEvent *event, u32 pict);
+    DinoEventExecPictShow(DinoEventLoop *event, u32 pict);
     virtual ~DinoEventExecPictShow();
     virtual void Idle();
 
-    DinoEvent *mEvent;  // 0x74
+    DinoEventLoop *mEvent;  // 0x74
     u32 mPict;          // 0x78
 };
 
 class DinoEventExecPictHide : public MProcess {
 public:
-    DinoEventExecPictHide(DinoEvent *event);
+    DinoEventExecPictHide(DinoEventLoop *event);
     virtual ~DinoEventExecPictHide();
     virtual void Idle();
 
-    DinoEvent *mEvent;  // 0x74
+    DinoEventLoop *mEvent;  // 0x74
 };
 
 class DinoEventExecCmnMotion : public MTransfer {
 public:
-    DinoEventExecCmnMotion(DinoEvent *event, u32 chara, u32 motion);
+    DinoEventExecCmnMotion(DinoEventLoop *event, u32 chara, u32 motion);
     virtual ~DinoEventExecCmnMotion();
     virtual void Transfer();
 
-    DinoEvent *mEvent;  // 0x10
+    DinoEventLoop *mEvent;  // 0x10
     u32 mChara;         // 0x14
     u32 mMotion;        // 0x18
 };
 
 class DinoEventExecChrEffect : public MTransfer {
 public:
-    DinoEventExecChrEffect(DinoEvent *event, u32 chara, u32 effect);
+    DinoEventExecChrEffect(DinoEventLoop *event, u32 chara, u32 effect);
     virtual ~DinoEventExecChrEffect();
     virtual void Transfer();
 
-    DinoEvent *mEvent;  // 0x10
+    DinoEventLoop *mEvent;  // 0x10
     u32 mChara;         // 0x14
     u32 mEffect;        // 0x18
 };
@@ -726,11 +726,11 @@ public:
 
 class DinoEventExecBgmPlay : public MTransfer {
 public:
-    DinoEventExecBgmPlay(DinoEvent *event, u32 bgm, u32 arg, u8 fade);
+    DinoEventExecBgmPlay(DinoEventLoop *event, u32 bgm, u32 arg, u8 fade);
     virtual ~DinoEventExecBgmPlay();
     virtual void Transfer();
 
-    DinoEvent *mEvent;  // 0x10
+    DinoEventLoop *mEvent;  // 0x10
     u32 mBgm;           // 0x14
     u32 mArg;           // 0x18
     u8 mFade;           // 0x1C
@@ -738,31 +738,31 @@ public:
 
 class DinoEventExecMapBgmPlay : public MProcess {
 public:
-    DinoEventExecMapBgmPlay(DinoEvent *event, u32 arg);
+    DinoEventExecMapBgmPlay(DinoEventLoop *event, u32 arg);
     virtual ~DinoEventExecMapBgmPlay();
     virtual void Idle();
 
-    DinoEvent *mEvent;  // 0x74
+    DinoEventLoop *mEvent;  // 0x74
     u32 mArg;           // 0x78
 };
 
 class DinoEventExecBgmStop : public MTransfer {
 public:
-    DinoEventExecBgmStop(DinoEvent *event, u32 fadeFrames);
+    DinoEventExecBgmStop(DinoEventLoop *event, u32 fadeFrames);
     virtual ~DinoEventExecBgmStop();
     virtual void Transfer();
 
-    DinoEvent *mEvent;  // 0x10
+    DinoEventLoop *mEvent;  // 0x10
     u32 mFadeFrames;    // 0x14
 };
 
 class DinoEventExecQuake : public MTransfer {
 public:
-    DinoEventExecQuake(DinoEvent *event, u32 a, u32 b, u32 c);
+    DinoEventExecQuake(DinoEventLoop *event, u32 a, u32 b, u32 c);
     virtual ~DinoEventExecQuake();
     virtual void Transfer();
 
-    DinoEvent *mEvent;  // 0x10
+    DinoEventLoop *mEvent;  // 0x10
     u32 mA;             // 0x14
     u32 mB;             // 0x18
     u32 mC;             // 0x1C
@@ -770,11 +770,11 @@ public:
 
 class DinoEventExecDance : public MProcess {
 public:
-    DinoEventExecDance(DinoEvent *event, u32 a, u32 b, u32 c, u32 d, u32 e);
+    DinoEventExecDance(DinoEventLoop *event, u32 a, u32 b, u32 c, u32 d, u32 e);
     virtual ~DinoEventExecDance();
     virtual void Idle();
 
-    DinoEvent *mEvent;  // 0x74
+    DinoEventLoop *mEvent;  // 0x74
     u32 mA;             // 0x78
     u32 mB;             // 0x7C
     u32 mC;             // 0x80
@@ -784,11 +784,11 @@ public:
 
 class DinoEventExecMapSelect : public MProcess {
 public:
-    DinoEventExecMapSelect(DinoEvent *event, u32 var);
+    DinoEventExecMapSelect(DinoEventLoop *event, u32 var);
     virtual ~DinoEventExecMapSelect();
     virtual void Idle();
 
-    DinoEvent *mEvent;  // 0x74
+    DinoEventLoop *mEvent;  // 0x74
     u32 mVar;           // 0x78: the local variable that gets the chosen map (0 if cancelled)
     s32 mResult;        // 0x7C
     u32 mStep;          // 0x80
@@ -815,31 +815,31 @@ public:
 
 class DinoEventExecGameOver : public MProcess {
 public:
-    DinoEventExecGameOver(DinoEvent *event);
+    DinoEventExecGameOver(DinoEventLoop *event);
     virtual ~DinoEventExecGameOver();
     virtual void Idle();
 
-    DinoEvent *mEvent;  // 0x74
+    DinoEventLoop *mEvent;  // 0x74
     u32 mStep;          // 0x78
 };
 
 class DinoEventExecExit : public MProcess {
 public:
-    DinoEventExecExit(DinoEvent *event);
+    DinoEventExecExit(DinoEventLoop *event);
     virtual ~DinoEventExecExit();
     virtual void Idle();
 
-    DinoEvent *mEvent;  // 0x74
+    DinoEventLoop *mEvent;  // 0x74
     u32 mStep;          // 0x78
 };
 
 class DinoEventExecTalk : public MProcess {
 public:
-    DinoEventExecTalk(DinoEvent *event, u32 id, u8 flag);
+    DinoEventExecTalk(DinoEventLoop *event, u32 id, u8 flag);
     virtual ~DinoEventExecTalk();
     virtual void Idle();
 
-    DinoEvent *mEvent;  // 0x74
+    DinoEventLoop *mEvent;  // 0x74
     u32 mId;            // 0x78
     u8 mFlag;           // 0x7C
     u32 mStep;          // 0x80
@@ -851,11 +851,11 @@ class MPointAnime;
 // Shows a map's name sliding across the bottom screen.
 class DinoEventExecFieldName : public MProcess {
 public:
-    DinoEventExecFieldName(DinoEvent *event, u32 id);
+    DinoEventExecFieldName(DinoEventLoop *event, u32 id);
     virtual ~DinoEventExecFieldName();
     virtual void Idle();
 
-    DinoEvent *mEvent;          // 0x74
+    DinoEventLoop *mEvent;          // 0x74
     u32 mId;                    // 0x78: from 1
     u32 mStep;                  // 0x7C
     MTextPicture *mPicture;     // 0x80
@@ -866,11 +866,11 @@ public:
 
 class DinoEventExecLowerPictFadeIn : public MProcess {
 public:
-    DinoEventExecLowerPictFadeIn(DinoEvent *event, u32 pict, MPoint pos, u32 frames, long unk, u8 wait);
+    DinoEventExecLowerPictFadeIn(DinoEventLoop *event, u32 pict, MPoint pos, u32 frames, long unk, u8 wait);
     virtual ~DinoEventExecLowerPictFadeIn();
     virtual void Idle();
 
-    DinoEvent *mEvent;  // 0x74
+    DinoEventLoop *mEvent;  // 0x74
     u32 mPict;
     MPoint mPos;
     u32 mFrames;
@@ -880,11 +880,11 @@ public:
 
 class DinoEventExecLowerPictFadeOut : public MProcess {
 public:
-    DinoEventExecLowerPictFadeOut(DinoEvent *event, u32 pict, long frames, u8 wait);
+    DinoEventExecLowerPictFadeOut(DinoEventLoop *event, u32 pict, long frames, u8 wait);
     virtual ~DinoEventExecLowerPictFadeOut();
     virtual void Idle();
 
-    DinoEvent *mEvent;  // 0x74
+    DinoEventLoop *mEvent;  // 0x74
     u32 mPict;
     long mFrames;
     u8 mWait;
@@ -892,11 +892,11 @@ public:
 
 class DinoEventExecLowerPictSlideIn : public MProcess {
 public:
-    DinoEventExecLowerPictSlideIn(DinoEvent *event, u32 pict, MPoint pos, u32 a, u32 b, long c, u8 wait);
+    DinoEventExecLowerPictSlideIn(DinoEventLoop *event, u32 pict, MPoint pos, u32 a, u32 b, long c, u8 wait);
     virtual ~DinoEventExecLowerPictSlideIn();
     virtual void Idle();
 
-    DinoEvent *mEvent;  // 0x74
+    DinoEventLoop *mEvent;  // 0x74
     u32 mPict;
     MPoint mPos;
     u32 mA;
@@ -907,11 +907,11 @@ public:
 
 class DinoEventExecLowerPictSlideOut : public MProcess {
 public:
-    DinoEventExecLowerPictSlideOut(DinoEvent *event, u32 pict, u32 a, long b, u8 wait);
+    DinoEventExecLowerPictSlideOut(DinoEventLoop *event, u32 pict, u32 a, long b, u8 wait);
     virtual ~DinoEventExecLowerPictSlideOut();
     virtual void Idle();
 
-    DinoEvent *mEvent;  // 0x74
+    DinoEventLoop *mEvent;  // 0x74
     u32 mPict;
     u32 mA;
     long mB;
@@ -920,11 +920,11 @@ public:
 
 class DinoEventExecLowerPictZoomIn : public MProcess {
 public:
-    DinoEventExecLowerPictZoomIn(DinoEvent *event, u32 pict, MPoint pos, MFx32 scale, u32 a, long b, u8 wait);
+    DinoEventExecLowerPictZoomIn(DinoEventLoop *event, u32 pict, MPoint pos, MFx32 scale, u32 a, long b, u8 wait);
     virtual ~DinoEventExecLowerPictZoomIn();
     virtual void Idle();
 
-    DinoEvent *mEvent;  // 0x74
+    DinoEventLoop *mEvent;  // 0x74
     u32 mPict;
     MPoint mPos;
     MFx32 mScale;
@@ -935,11 +935,11 @@ public:
 
 class DinoEventExecLowerPictZoomOut : public MProcess {
 public:
-    DinoEventExecLowerPictZoomOut(DinoEvent *event, MFx32 scale, u32 a, long b, u8 wait);
+    DinoEventExecLowerPictZoomOut(DinoEventLoop *event, MFx32 scale, u32 a, long b, u8 wait);
     virtual ~DinoEventExecLowerPictZoomOut();
     virtual void Idle();
 
-    DinoEvent *mEvent;  // 0x74
+    DinoEventLoop *mEvent;  // 0x74
     MFx32 mScale;
     u32 mA;
     long mB;
@@ -948,11 +948,11 @@ public:
 
 class DinoEventExecUpperPictFadeIn : public MProcess {
 public:
-    DinoEventExecUpperPictFadeIn(DinoEvent *event, u32 pict, MPoint pos, u32 frames, long unk, u8 wait);
+    DinoEventExecUpperPictFadeIn(DinoEventLoop *event, u32 pict, MPoint pos, u32 frames, long unk, u8 wait);
     virtual ~DinoEventExecUpperPictFadeIn();
     virtual void Idle();
 
-    DinoEvent *mEvent;  // 0x74
+    DinoEventLoop *mEvent;  // 0x74
     u32 mPict;
     MPoint mPos;
     u32 mFrames;
@@ -962,11 +962,11 @@ public:
 
 class DinoEventExecUpperPictFadeOut : public MProcess {
 public:
-    DinoEventExecUpperPictFadeOut(DinoEvent *event, u32 pict, long frames, u8 wait);
+    DinoEventExecUpperPictFadeOut(DinoEventLoop *event, u32 pict, long frames, u8 wait);
     virtual ~DinoEventExecUpperPictFadeOut();
     virtual void Idle();
 
-    DinoEvent *mEvent;  // 0x74
+    DinoEventLoop *mEvent;  // 0x74
     u32 mPict;
     long mFrames;
     u8 mWait;
@@ -974,11 +974,11 @@ public:
 
 class DinoEventExecUpperPictSlideIn : public MProcess {
 public:
-    DinoEventExecUpperPictSlideIn(DinoEvent *event, u32 pict, MPoint pos, u32 a, u32 b, long c, u8 wait);
+    DinoEventExecUpperPictSlideIn(DinoEventLoop *event, u32 pict, MPoint pos, u32 a, u32 b, long c, u8 wait);
     virtual ~DinoEventExecUpperPictSlideIn();
     virtual void Idle();
 
-    DinoEvent *mEvent;  // 0x74
+    DinoEventLoop *mEvent;  // 0x74
     u32 mPict;
     MPoint mPos;
     u32 mA;
@@ -989,11 +989,11 @@ public:
 
 class DinoEventExecUpperPictSlideOut : public MProcess {
 public:
-    DinoEventExecUpperPictSlideOut(DinoEvent *event, u32 pict, u32 a, long b, u8 wait);
+    DinoEventExecUpperPictSlideOut(DinoEventLoop *event, u32 pict, u32 a, long b, u8 wait);
     virtual ~DinoEventExecUpperPictSlideOut();
     virtual void Idle();
 
-    DinoEvent *mEvent;  // 0x74
+    DinoEventLoop *mEvent;  // 0x74
     u32 mPict;
     u32 mA;
     long mB;
@@ -1002,11 +1002,11 @@ public:
 
 class DinoEventExecUpperPictZoomIn : public MProcess {
 public:
-    DinoEventExecUpperPictZoomIn(DinoEvent *event, u32 pict, MPoint pos, MFx32 scale, u32 a, long b, u8 wait);
+    DinoEventExecUpperPictZoomIn(DinoEventLoop *event, u32 pict, MPoint pos, MFx32 scale, u32 a, long b, u8 wait);
     virtual ~DinoEventExecUpperPictZoomIn();
     virtual void Idle();
 
-    DinoEvent *mEvent;  // 0x74
+    DinoEventLoop *mEvent;  // 0x74
     u32 mPict;
     MPoint mPos;
     MFx32 mScale;
@@ -1017,11 +1017,11 @@ public:
 
 class DinoEventExecUpperPictZoomOut : public MProcess {
 public:
-    DinoEventExecUpperPictZoomOut(DinoEvent *event, MFx32 scale, u32 a, long b, u8 wait);
+    DinoEventExecUpperPictZoomOut(DinoEventLoop *event, MFx32 scale, u32 a, long b, u8 wait);
     virtual ~DinoEventExecUpperPictZoomOut();
     virtual void Idle();
 
-    DinoEvent *mEvent;  // 0x74
+    DinoEventLoop *mEvent;  // 0x74
     MFx32 mScale;
     u32 mA;
     long mB;
@@ -1030,11 +1030,11 @@ public:
 
 class DinoEventExecRadarMode : public MProcess {
 public:
-    DinoEventExecRadarMode(DinoEvent *event, u32 mode, u32 a, u8 b);
+    DinoEventExecRadarMode(DinoEventLoop *event, u32 mode, u32 a, u8 b);
     virtual ~DinoEventExecRadarMode();
     virtual void Idle();
 
-    DinoEvent *mEvent;  // 0x74
+    DinoEventLoop *mEvent;  // 0x74
     u32 mMode;          // 0x78
     u32 mA;             // 0x7C
     u8 mB;              // 0x80
@@ -1042,88 +1042,88 @@ public:
 
 class DinoEventExecTownMapMode : public MProcess {
 public:
-    DinoEventExecTownMapMode(DinoEvent *event, u32 mode, u32 a);
+    DinoEventExecTownMapMode(DinoEventLoop *event, u32 mode, u32 a);
     virtual ~DinoEventExecTownMapMode();
     virtual void Idle();
 
-    DinoEvent *mEvent;  // 0x74
+    DinoEventLoop *mEvent;  // 0x74
     u32 mMode;          // 0x78
     u32 mA;             // 0x7C
 };
 
 class DinoEventExecDelAreaNamePanel : public MTask {
 public:
-    DinoEventExecDelAreaNamePanel(DinoEvent *event);
+    DinoEventExecDelAreaNamePanel(DinoEventLoop *event);
     virtual ~DinoEventExecDelAreaNamePanel();
     virtual void Execute();
 
-    DinoEvent *mEvent;  // 0x10
+    DinoEventLoop *mEvent;  // 0x10
 };
 
 class DinoEventExecHeightReset : public MTransfer {
 public:
-    DinoEventExecHeightReset(DinoEvent *event);
+    DinoEventExecHeightReset(DinoEventLoop *event);
     virtual ~DinoEventExecHeightReset();
     virtual void Transfer();
 
-    DinoEvent *mEvent;  // 0x10
+    DinoEventLoop *mEvent;  // 0x10
 };
 
 class DinoEventExecCharaFootSeOff : public MTransfer {
 public:
-    DinoEventExecCharaFootSeOff(DinoEvent *event, u32 chara);
+    DinoEventExecCharaFootSeOff(DinoEventLoop *event, u32 chara);
     virtual ~DinoEventExecCharaFootSeOff();
     virtual void Transfer();
 
-    DinoEvent *mEvent;  // 0x10
+    DinoEventLoop *mEvent;  // 0x10
     u32 mChara;         // 0x14
 };
 
 class DinoEventExecCharaFootSePreserve : public MTransfer {
 public:
-    DinoEventExecCharaFootSePreserve(DinoEvent *event, u32 chara, u32 se);
+    DinoEventExecCharaFootSePreserve(DinoEventLoop *event, u32 chara, u32 se);
     virtual ~DinoEventExecCharaFootSePreserve();
     virtual void Transfer();
 
-    DinoEvent *mEvent;  // 0x10
+    DinoEventLoop *mEvent;  // 0x10
     u32 mChara;         // 0x14
     u32 mSe;            // 0x18
 };
 
 class DinoEventExecMoneyShow : public MProcess {
 public:
-    DinoEventExecMoneyShow(DinoEvent *event);
+    DinoEventExecMoneyShow(DinoEventLoop *event);
     virtual ~DinoEventExecMoneyShow();
     virtual void Idle();
 
-    DinoEvent *mEvent;  // 0x74
+    DinoEventLoop *mEvent;  // 0x74
 };
 
 class DinoEventExecMoneyHide : public MProcess {
 public:
-    DinoEventExecMoneyHide(DinoEvent *event);
+    DinoEventExecMoneyHide(DinoEventLoop *event);
     virtual ~DinoEventExecMoneyHide();
     virtual void Idle();
 
-    DinoEvent *mEvent;  // 0x74
+    DinoEventLoop *mEvent;  // 0x74
 };
 
 class DinoEventExecDonateShow : public MProcess {
 public:
-    DinoEventExecDonateShow(DinoEvent *event);
+    DinoEventExecDonateShow(DinoEventLoop *event);
     virtual ~DinoEventExecDonateShow();
     virtual void Idle();
 
-    DinoEvent *mEvent;  // 0x74
+    DinoEventLoop *mEvent;  // 0x74
 };
 
 class DinoEventExecDonateHide : public MProcess {
 public:
-    DinoEventExecDonateHide(DinoEvent *event);
+    DinoEventExecDonateHide(DinoEventLoop *event);
     virtual ~DinoEventExecDonateHide();
     virtual void Idle();
 
-    DinoEvent *mEvent;  // 0x74
+    DinoEventLoop *mEvent;  // 0x74
 };
 
 class DinoEventExecProhibitNisReset : public MTransfer {

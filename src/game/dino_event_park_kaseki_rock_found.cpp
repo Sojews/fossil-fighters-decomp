@@ -5,6 +5,7 @@
 #include "m/bg_new_task.h"
 #include "m/call_task.h"
 #include "m/polygon_char.h"
+#include "game/dino_field.h"
 
 DinoEventParkKasekiRockFound::~DinoEventParkKasekiRockFound() {
 }
@@ -16,7 +17,6 @@ void DinoEventParkKasekiRockFound::Idle() {
 // Template task instances the game emits in this file. Until the code that makes the tasks is decompiled, they are
 // instantiated explicitly.
 class DinoFieldHole {};
-class DinoEventLoop {};
 template class MCallTask0<DinoFieldHole, DinoFieldHole>;
 template MTask *MCreateCallTask(DinoFieldHole *obj, void (DinoFieldHole::*func)());
 template class MCallTask1<DinoEventLoop, DinoEventLoop, bool>;

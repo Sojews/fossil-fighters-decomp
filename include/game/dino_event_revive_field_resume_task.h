@@ -9,7 +9,7 @@ public:
     virtual ~DinoEventReviveFieldResumeTask();
     virtual void Idle();
 
-    DinoEvent *mEvent;  // 0x74
+    DinoEventLoop *mEvent;  // 0x74
     u32 mStep;          // 0x78
 };
 

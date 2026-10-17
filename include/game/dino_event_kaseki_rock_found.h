@@ -5,7 +5,7 @@
 #include "m/task.h"
 #include "m/archive.h"
 
-class DinoEvent;
+class DinoEventLoop;
 
 class DinoEventKasekiRockFound : public MProcess {
 public:
@@ -13,7 +13,7 @@ public:
     virtual void Idle();
 
     void (DinoEventKasekiRockFound::*mState)(); // 0x74
-    DinoEvent *mEvent;      // 0x7C
+    DinoEventLoop *mEvent;      // 0x7C
     u32 mUnk80[12];         // 0x80
     MArchivePtr mArchive;   // 0xB0
     MArchiveFile mFile;     // 0xB4

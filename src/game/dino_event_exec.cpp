@@ -289,7 +289,7 @@ void DinoEventExecProhibitNisReset::Transfer() {
     ProhibitNisReset();
 }
 
-DinoEventExecCamera::DinoEventExecCamera(DinoEvent *event, u32 x, u32 y, u32 z, u32 a, u32 b, u32 c) {
+DinoEventExecCamera::DinoEventExecCamera(DinoEventLoop *event, u32 x, u32 y, u32 z, u32 a, u32 b, u32 c) {
     mEvent = event;
     mX = x;
     mY = y;
@@ -305,7 +305,7 @@ void DinoEventExecCamera::Transfer() {
     mEvent->GetField()->GetCamera()->StartRotate(mX, mY, mZ, mA, mB, mC);
 }
 
-DinoEventExecStartFellow::DinoEventExecStartFellow(DinoEvent *event, u32 chara, u32 target) {
+DinoEventExecStartFellow::DinoEventExecStartFellow(DinoEventLoop *event, u32 chara, u32 target) {
     mEvent = event;
     mChara = chara;
     mTarget = target;
@@ -323,7 +323,7 @@ void DinoEventExecStartFellow::Transfer() {
     }
 }
 
-DinoEventExecStartWander::DinoEventExecStartWander(DinoEvent *event, u32 chara, u32 a, u32 b, u32 c, u32 d) {
+DinoEventExecStartWander::DinoEventExecStartWander(DinoEventLoop *event, u32 chara, u32 a, u32 b, u32 c, u32 d) {
     mEvent = event;
     mChara = chara;
     mArgs[0] = a;
@@ -347,7 +347,7 @@ void DinoEventExecStartWander::Transfer() {
     }
 }
 
-DinoEventExecFinishFellow::DinoEventExecFinishFellow(DinoEvent *event, u32 chara) {
+DinoEventExecFinishFellow::DinoEventExecFinishFellow(DinoEventLoop *event, u32 chara) {
     mEvent = event;
     mChara = chara;
 }
@@ -363,7 +363,7 @@ void DinoEventExecFinishFellow::Transfer() {
     }
 }
 
-DinoEventExecStartWatch::DinoEventExecStartWatch(DinoEvent *event, u32 chara, DinoCharaWatch watch) {
+DinoEventExecStartWatch::DinoEventExecStartWatch(DinoEventLoop *event, u32 chara, DinoCharaWatch watch) {
     mEvent = event;
     mChara = chara;
     mWatch.w[0] = watch.w[0];
@@ -389,7 +389,7 @@ void DinoEventExecStartWatch::Transfer() {
     }
 }
 
-DinoEventExecFinishWatch::DinoEventExecFinishWatch(DinoEvent *event, u32 chara) {
+DinoEventExecFinishWatch::DinoEventExecFinishWatch(DinoEventLoop *event, u32 chara) {
     mEvent = event;
     mChara = chara;
 }
@@ -405,7 +405,7 @@ void DinoEventExecFinishWatch::Transfer() {
     }
 }
 
-DinoEventExecFade::DinoEventExecFade(DinoEvent *event, u32 a, u32 b, u8 wait) : MProcess(NULL) {
+DinoEventExecFade::DinoEventExecFade(DinoEventLoop *event, u32 a, u32 b, u8 wait) : MProcess(NULL) {
     mEvent = event;
     mA = a;
     mB = b;
@@ -425,7 +425,7 @@ void DinoEventExecFade::Idle() {
     }
 }
 
-DinoEventExecCharaBodyModelIndex::DinoEventExecCharaBodyModelIndex(DinoEvent *event, u32 chara, u32 model) {
+DinoEventExecCharaBodyModelIndex::DinoEventExecCharaBodyModelIndex(DinoEventLoop *event, u32 chara, u32 model) {
     mEvent = event;
     mChara = chara;
     mModel = model;
@@ -442,7 +442,7 @@ void DinoEventExecCharaBodyModelIndex::Transfer() {
     }
 }
 
-DinoEventExecCharaHeadModelIndex::DinoEventExecCharaHeadModelIndex(DinoEvent *event, u32 chara, u32 model) {
+DinoEventExecCharaHeadModelIndex::DinoEventExecCharaHeadModelIndex(DinoEventLoop *event, u32 chara, u32 model) {
     mEvent = event;
     mChara = chara;
     mModel = model;
@@ -460,7 +460,7 @@ void DinoEventExecCharaHeadModelIndex::Transfer() {
     }
 }
 
-DinoEventExecRadarMode::DinoEventExecRadarMode(DinoEvent *event, u32 mode, u32 a, u8 b) : MProcess(NULL) {
+DinoEventExecRadarMode::DinoEventExecRadarMode(DinoEventLoop *event, u32 mode, u32 a, u8 b) : MProcess(NULL) {
     mEvent = event;
     mMode = mode;
     mA = a;
@@ -484,7 +484,7 @@ void DinoEventExecRadarMode::Idle() {
     serial->AddTail(exit);
 }
 
-DinoEventExecTownMapMode::DinoEventExecTownMapMode(DinoEvent *event, u32 mode, u32 a) : MProcess(NULL) {
+DinoEventExecTownMapMode::DinoEventExecTownMapMode(DinoEventLoop *event, u32 mode, u32 a) : MProcess(NULL) {
     mEvent = event;
     mMode = mode;
     mA = a;
@@ -507,7 +507,7 @@ void DinoEventExecTownMapMode::Idle() {
     serial->AddTail(exit);
 }
 
-DinoEventExecPictShow::DinoEventExecPictShow(DinoEvent *event, u32 pict) : MProcess(NULL) {
+DinoEventExecPictShow::DinoEventExecPictShow(DinoEventLoop *event, u32 pict) : MProcess(NULL) {
     mEvent = event;
     mPict = pict;
 }
@@ -524,7 +524,7 @@ void DinoEventExecPictShow::Idle() {
     serial->AddTail(exit);
 }
 
-DinoEventExecPictHide::DinoEventExecPictHide(DinoEvent *event) : MProcess(NULL) {
+DinoEventExecPictHide::DinoEventExecPictHide(DinoEventLoop *event) : MProcess(NULL) {
     mEvent = event;
 }
 
@@ -561,7 +561,7 @@ void DinoEventExecKeyWait::Idle() {
     }
 }
 
-DinoEventExecMapBgmPlay::DinoEventExecMapBgmPlay(DinoEvent *event, u32 arg) : MProcess(NULL) {
+DinoEventExecMapBgmPlay::DinoEventExecMapBgmPlay(DinoEventLoop *event, u32 arg) : MProcess(NULL) {
     mEvent = event;
     mArg = arg;
 }
@@ -586,7 +586,7 @@ void DinoEventExecMapBgmPlay::Idle() {
     }
 }
 
-DinoEventExecDance::DinoEventExecDance(DinoEvent *event, u32 a, u32 b, u32 c, u32 d, u32 e) : MProcess(NULL) {
+DinoEventExecDance::DinoEventExecDance(DinoEventLoop *event, u32 a, u32 b, u32 c, u32 d, u32 e) : MProcess(NULL) {
     mEvent = event;
     mA = a;
     mB = b;
@@ -605,7 +605,7 @@ void DinoEventExecDance::Idle() {
 
 M_EXTERN_OVERLAY(ov004);
 
-DinoEventExecMapSelect::DinoEventExecMapSelect(DinoEvent *event, u32 var) : MProcess(NULL) {
+DinoEventExecMapSelect::DinoEventExecMapSelect(DinoEventLoop *event, u32 var) : MProcess(NULL) {
     mEvent = event;
     mVar = var;
     mResult = 0;
@@ -649,7 +649,7 @@ void DinoEventExecMapSelect::Idle() {
     }
 }
 
-DinoEventExecGameOver::DinoEventExecGameOver(DinoEvent *event) : MProcess(NULL) {
+DinoEventExecGameOver::DinoEventExecGameOver(DinoEventLoop *event) : MProcess(NULL) {
     mEvent = event;
     mStep = 0;
 }
@@ -693,7 +693,7 @@ void DinoEventExecGameOver::Idle() {
     }
 }
 
-DinoEventExecExit::DinoEventExecExit(DinoEvent *event) : MProcess(NULL) {
+DinoEventExecExit::DinoEventExecExit(DinoEventLoop *event) : MProcess(NULL) {
     mEvent = event;
     mStep = 0;
 }
@@ -815,7 +815,7 @@ void DinoEventExecShopSet::Transfer() {
     }
 }
 
-DinoEventExecKasekiRockGet::DinoEventExecKasekiRockGet(DinoEvent *event, u32 flag, u32 id, u32 a, u32 b, u8 c)
+DinoEventExecKasekiRockGet::DinoEventExecKasekiRockGet(DinoEventLoop *event, u32 flag, u32 id, u32 a, u32 b, u8 c)
     : MProcess(NULL) {
     mEvent = event;
     mFlag = flag;
@@ -859,7 +859,7 @@ void DinoEventExecKasekiRockGet::Idle() {
     }
 }
 
-DinoEventExecKasekiRockShot::DinoEventExecKasekiRockShot(DinoEvent *event, u32 id, u32 a, u32 b) : MProcess(NULL) {
+DinoEventExecKasekiRockShot::DinoEventExecKasekiRockShot(DinoEventLoop *event, u32 id, u32 a, u32 b) : MProcess(NULL) {
     mEvent = event;
     mId = id;
     mA = a;
@@ -883,7 +883,7 @@ void DinoEventExecKasekiRockShot::Idle() {
     }
 }
 
-DinoEventExecTalk::DinoEventExecTalk(DinoEvent *event, u32 id, u8 flag) : MProcess(NULL) {
+DinoEventExecTalk::DinoEventExecTalk(DinoEventLoop *event, u32 id, u8 flag) : MProcess(NULL) {
     mEvent = event;
     mId = id;
     mFlag = flag;
@@ -911,7 +911,7 @@ void DinoEventExecTalk::Idle() {
     }
 }
 
-DinoEventExecYesNo::DinoEventExecYesNo(DinoEvent *event, u32 flag, u32 text) : MProcess(NULL) {
+DinoEventExecYesNo::DinoEventExecYesNo(DinoEventLoop *event, u32 flag, u32 text) : MProcess(NULL) {
     mEvent = event;
     mFlag = flag;
     mText = text;
@@ -941,7 +941,7 @@ void DinoEventExecYesNo::Idle() {
     }
 }
 
-DinoEventExecLowerPictFadeIn::DinoEventExecLowerPictFadeIn(DinoEvent *event, u32 pict, MPoint pos, u32 frames, long unk, u8 wait) : MProcess(NULL) {
+DinoEventExecLowerPictFadeIn::DinoEventExecLowerPictFadeIn(DinoEventLoop *event, u32 pict, MPoint pos, u32 frames, long unk, u8 wait) : MProcess(NULL) {
     mEvent = event;
     mPict = pict;
     mPos = pos;
@@ -962,7 +962,7 @@ void DinoEventExecLowerPictFadeIn::Idle() {
     mSerial.AddTail(MTaskExitTransfer::Create(this));
 }
 
-DinoEventExecLowerPictFadeOut::DinoEventExecLowerPictFadeOut(DinoEvent *event, u32 pict, long frames, u8 wait) : MProcess(NULL) {
+DinoEventExecLowerPictFadeOut::DinoEventExecLowerPictFadeOut(DinoEventLoop *event, u32 pict, long frames, u8 wait) : MProcess(NULL) {
     mEvent = event;
     mPict = pict;
     mFrames = frames;
@@ -981,7 +981,7 @@ void DinoEventExecLowerPictFadeOut::Idle() {
     mSerial.AddTail(MTaskExitTransfer::Create(this));
 }
 
-DinoEventExecLowerPictSlideIn::DinoEventExecLowerPictSlideIn(DinoEvent *event, u32 pict, MPoint pos, u32 a, u32 b, long c, u8 wait) : MProcess(NULL) {
+DinoEventExecLowerPictSlideIn::DinoEventExecLowerPictSlideIn(DinoEventLoop *event, u32 pict, MPoint pos, u32 a, u32 b, long c, u8 wait) : MProcess(NULL) {
     mEvent = event;
     mPict = pict;
     mPos = pos;
@@ -1003,7 +1003,7 @@ void DinoEventExecLowerPictSlideIn::Idle() {
     mSerial.AddTail(MTaskExitTransfer::Create(this));
 }
 
-DinoEventExecLowerPictSlideOut::DinoEventExecLowerPictSlideOut(DinoEvent *event, u32 pict, u32 a, long b, u8 wait) : MProcess(NULL) {
+DinoEventExecLowerPictSlideOut::DinoEventExecLowerPictSlideOut(DinoEventLoop *event, u32 pict, u32 a, long b, u8 wait) : MProcess(NULL) {
     mEvent = event;
     mPict = pict;
     mA = a;
@@ -1023,7 +1023,7 @@ void DinoEventExecLowerPictSlideOut::Idle() {
     mSerial.AddTail(MTaskExitTransfer::Create(this));
 }
 
-DinoEventExecLowerPictZoomIn::DinoEventExecLowerPictZoomIn(DinoEvent *event, u32 pict, MPoint pos, MFx32 scale, u32 a, long b, u8 wait) : MProcess(NULL) {
+DinoEventExecLowerPictZoomIn::DinoEventExecLowerPictZoomIn(DinoEventLoop *event, u32 pict, MPoint pos, MFx32 scale, u32 a, long b, u8 wait) : MProcess(NULL) {
     mEvent = event;
     mPict = pict;
     mPos = pos;
@@ -1045,7 +1045,7 @@ void DinoEventExecLowerPictZoomIn::Idle() {
     mSerial.AddTail(MTaskExitTransfer::Create(this));
 }
 
-DinoEventExecLowerPictZoomOut::DinoEventExecLowerPictZoomOut(DinoEvent *event, MFx32 scale, u32 a, long b, u8 wait) : MProcess(NULL) {
+DinoEventExecLowerPictZoomOut::DinoEventExecLowerPictZoomOut(DinoEventLoop *event, MFx32 scale, u32 a, long b, u8 wait) : MProcess(NULL) {
     mEvent = event;
     mScale = scale;
     mA = a;
@@ -1065,7 +1065,7 @@ void DinoEventExecLowerPictZoomOut::Idle() {
     mSerial.AddTail(MTaskExitTransfer::Create(this));
 }
 
-DinoEventExecUpperPictFadeIn::DinoEventExecUpperPictFadeIn(DinoEvent *event, u32 pict, MPoint pos, u32 frames, long unk, u8 wait) : MProcess(NULL) {
+DinoEventExecUpperPictFadeIn::DinoEventExecUpperPictFadeIn(DinoEventLoop *event, u32 pict, MPoint pos, u32 frames, long unk, u8 wait) : MProcess(NULL) {
     mEvent = event;
     mPict = pict;
     mPos = pos;
@@ -1086,7 +1086,7 @@ void DinoEventExecUpperPictFadeIn::Idle() {
     mSerial.AddTail(MTaskExitTransfer::Create(this));
 }
 
-DinoEventExecUpperPictFadeOut::DinoEventExecUpperPictFadeOut(DinoEvent *event, u32 pict, long frames, u8 wait) : MProcess(NULL) {
+DinoEventExecUpperPictFadeOut::DinoEventExecUpperPictFadeOut(DinoEventLoop *event, u32 pict, long frames, u8 wait) : MProcess(NULL) {
     mEvent = event;
     mPict = pict;
     mFrames = frames;
@@ -1105,7 +1105,7 @@ void DinoEventExecUpperPictFadeOut::Idle() {
     mSerial.AddTail(MTaskExitTransfer::Create(this));
 }
 
-DinoEventExecUpperPictSlideIn::DinoEventExecUpperPictSlideIn(DinoEvent *event, u32 pict, MPoint pos, u32 a, u32 b, long c, u8 wait) : MProcess(NULL) {
+DinoEventExecUpperPictSlideIn::DinoEventExecUpperPictSlideIn(DinoEventLoop *event, u32 pict, MPoint pos, u32 a, u32 b, long c, u8 wait) : MProcess(NULL) {
     mEvent = event;
     mPict = pict;
     mPos = pos;
@@ -1127,7 +1127,7 @@ void DinoEventExecUpperPictSlideIn::Idle() {
     mSerial.AddTail(MTaskExitTransfer::Create(this));
 }
 
-DinoEventExecUpperPictSlideOut::DinoEventExecUpperPictSlideOut(DinoEvent *event, u32 pict, u32 a, long b, u8 wait) : MProcess(NULL) {
+DinoEventExecUpperPictSlideOut::DinoEventExecUpperPictSlideOut(DinoEventLoop *event, u32 pict, u32 a, long b, u8 wait) : MProcess(NULL) {
     mEvent = event;
     mPict = pict;
     mA = a;
@@ -1147,7 +1147,7 @@ void DinoEventExecUpperPictSlideOut::Idle() {
     mSerial.AddTail(MTaskExitTransfer::Create(this));
 }
 
-DinoEventExecUpperPictZoomIn::DinoEventExecUpperPictZoomIn(DinoEvent *event, u32 pict, MPoint pos, MFx32 scale, u32 a, long b, u8 wait) : MProcess(NULL) {
+DinoEventExecUpperPictZoomIn::DinoEventExecUpperPictZoomIn(DinoEventLoop *event, u32 pict, MPoint pos, MFx32 scale, u32 a, long b, u8 wait) : MProcess(NULL) {
     mEvent = event;
     mPict = pict;
     mPos = pos;
@@ -1169,7 +1169,7 @@ void DinoEventExecUpperPictZoomIn::Idle() {
     mSerial.AddTail(MTaskExitTransfer::Create(this));
 }
 
-DinoEventExecUpperPictZoomOut::DinoEventExecUpperPictZoomOut(DinoEvent *event, MFx32 scale, u32 a, long b, u8 wait) : MProcess(NULL) {
+DinoEventExecUpperPictZoomOut::DinoEventExecUpperPictZoomOut(DinoEventLoop *event, MFx32 scale, u32 a, long b, u8 wait) : MProcess(NULL) {
     mEvent = event;
     mScale = scale;
     mA = a;
@@ -1189,7 +1189,7 @@ void DinoEventExecUpperPictZoomOut::Idle() {
     mSerial.AddTail(MTaskExitTransfer::Create(this));
 }
 
-DinoEventExecFieldName::DinoEventExecFieldName(DinoEvent *event, u32 id) : MProcess(NULL) {
+DinoEventExecFieldName::DinoEventExecFieldName(DinoEventLoop *event, u32 id) : MProcess(NULL) {
     mEvent = event;
     mId = id;
     mStep = 0;
@@ -1234,7 +1234,7 @@ void DinoEventExecFieldName::Idle() {
     }
 }
 
-DinoEventExecStartBehold::DinoEventExecStartBehold(DinoEvent *event, u32 chara, u32 target) {
+DinoEventExecStartBehold::DinoEventExecStartBehold(DinoEventLoop *event, u32 chara, u32 target) {
     mEvent = event;
     mChara = chara;
     mTarget = target;
@@ -1247,7 +1247,7 @@ void DinoEventExecStartBehold::Transfer() {
     }
 }
 
-DinoEventExecFinishBehold::DinoEventExecFinishBehold(DinoEvent *event, u32 chara) {
+DinoEventExecFinishBehold::DinoEventExecFinishBehold(DinoEventLoop *event, u32 chara) {
     mEvent = event;
     mChara = chara;
 }
@@ -1259,7 +1259,7 @@ void DinoEventExecFinishBehold::Transfer() {
     }
 }
 
-DinoEventExecCharaMotionSet::DinoEventExecCharaMotionSet(DinoEvent *event, u32 chara, u32 motion, u8 loop) {
+DinoEventExecCharaMotionSet::DinoEventExecCharaMotionSet(DinoEventLoop *event, u32 chara, u32 motion, u8 loop) {
     mEvent = event;
     mChara = chara;
     mMotion = motion;
@@ -1274,7 +1274,7 @@ void DinoEventExecCharaMotionSet::Transfer() {
     }
 }
 
-DinoEventExecCharaMotionCache::DinoEventExecCharaMotionCache(DinoEvent *event, u32 chara, u32 motion) {
+DinoEventExecCharaMotionCache::DinoEventExecCharaMotionCache(DinoEventLoop *event, u32 chara, u32 motion) {
     mEvent = event;
     mChara = chara;
     mMotion = motion;
@@ -1287,7 +1287,7 @@ void DinoEventExecCharaMotionCache::Transfer() {
     }
 }
 
-DinoEventExecCharaMotionCacheClear::DinoEventExecCharaMotionCacheClear(DinoEvent *event, u32 chara) {
+DinoEventExecCharaMotionCacheClear::DinoEventExecCharaMotionCacheClear(DinoEventLoop *event, u32 chara) {
     mEvent = event;
     mChara = chara;
 }
@@ -1299,7 +1299,7 @@ void DinoEventExecCharaMotionCacheClear::Transfer() {
     }
 }
 
-DinoEventExecManpuShow::DinoEventExecManpuShow(DinoEvent *event, u32 chara, u32 manpu, MPoint offset) {
+DinoEventExecManpuShow::DinoEventExecManpuShow(DinoEventLoop *event, u32 chara, u32 manpu, MPoint offset) {
     mEvent = event;
     mChara = chara;
     mManpu = manpu;
@@ -1313,7 +1313,7 @@ void DinoEventExecManpuShow::Transfer() {
     }
 }
 
-DinoEventExecManpuHide::DinoEventExecManpuHide(DinoEvent *event, u32 chara) {
+DinoEventExecManpuHide::DinoEventExecManpuHide(DinoEventLoop *event, u32 chara) {
     mEvent = event;
     mChara = chara;
 }
@@ -1325,7 +1325,7 @@ void DinoEventExecManpuHide::Transfer() {
     }
 }
 
-DinoEventExecCmnMotion::DinoEventExecCmnMotion(DinoEvent *event, u32 chara, u32 motion) {
+DinoEventExecCmnMotion::DinoEventExecCmnMotion(DinoEventLoop *event, u32 chara, u32 motion) {
     mEvent = event;
     mChara = chara;
     mMotion = motion;
@@ -1338,7 +1338,7 @@ void DinoEventExecCmnMotion::Transfer() {
     }
 }
 
-DinoEventExecChrEffect::DinoEventExecChrEffect(DinoEvent *event, u32 chara, u32 effect) {
+DinoEventExecChrEffect::DinoEventExecChrEffect(DinoEventLoop *event, u32 chara, u32 effect) {
     mEvent = event;
     mChara = chara;
     mEffect = effect;
@@ -1351,7 +1351,7 @@ void DinoEventExecChrEffect::Transfer() {
     }
 }
 
-DinoEventExecBgmPlay::DinoEventExecBgmPlay(DinoEvent *event, u32 bgm, u32 arg, u8 fade) {
+DinoEventExecBgmPlay::DinoEventExecBgmPlay(DinoEventLoop *event, u32 bgm, u32 arg, u8 fade) {
     mEvent = event;
     mBgm = bgm;
     mArg = arg;
@@ -1370,7 +1370,7 @@ void DinoEventExecBgmPlay::Transfer() {
     }
 }
 
-DinoEventExecBgmStop::DinoEventExecBgmStop(DinoEvent *event, u32 fadeFrames) {
+DinoEventExecBgmStop::DinoEventExecBgmStop(DinoEventLoop *event, u32 fadeFrames) {
     mEvent = event;
     mFadeFrames = fadeFrames;
 }
@@ -1379,7 +1379,7 @@ void DinoEventExecBgmStop::Transfer() {
     mEvent->GetField()->StopBgm(mFadeFrames);
 }
 
-DinoEventExecQuake::DinoEventExecQuake(DinoEvent *event, u32 a, u32 b, u32 c) {
+DinoEventExecQuake::DinoEventExecQuake(DinoEventLoop *event, u32 a, u32 b, u32 c) {
     mEvent = event;
     mA = a;
     mB = b;
@@ -1390,7 +1390,7 @@ void DinoEventExecQuake::Transfer() {
     mEvent->GetField()->Quake(mA, mB, mC);
 }
 
-DinoEventExecDelAreaNamePanel::DinoEventExecDelAreaNamePanel(DinoEvent *event) {
+DinoEventExecDelAreaNamePanel::DinoEventExecDelAreaNamePanel(DinoEventLoop *event) {
     mEvent = event;
 }
 
@@ -1399,7 +1399,7 @@ void DinoEventExecDelAreaNamePanel::Execute() {
     Exit();
 }
 
-DinoEventExecHeightReset::DinoEventExecHeightReset(DinoEvent *event) {
+DinoEventExecHeightReset::DinoEventExecHeightReset(DinoEventLoop *event) {
     mEvent = event;
 }
 
@@ -1407,7 +1407,7 @@ void DinoEventExecHeightReset::Transfer() {
     mEvent->GetField()->GetCamera()->ResetHeight();
 }
 
-DinoEventExecCharaFootSeOff::DinoEventExecCharaFootSeOff(DinoEvent *event, u32 chara) {
+DinoEventExecCharaFootSeOff::DinoEventExecCharaFootSeOff(DinoEventLoop *event, u32 chara) {
     mEvent = event;
     mChara = chara;
 }
@@ -1419,7 +1419,7 @@ void DinoEventExecCharaFootSeOff::Transfer() {
     }
 }
 
-DinoEventExecCharaFootSePreserve::DinoEventExecCharaFootSePreserve(DinoEvent *event, u32 chara, u32 se) {
+DinoEventExecCharaFootSePreserve::DinoEventExecCharaFootSePreserve(DinoEventLoop *event, u32 chara, u32 se) {
     mEvent = event;
     mChara = chara;
     mSe = se;
@@ -1432,7 +1432,7 @@ void DinoEventExecCharaFootSePreserve::Transfer() {
     }
 }
 
-DinoEventExecMoneyShow::DinoEventExecMoneyShow(DinoEvent *event) : MProcess(NULL) {
+DinoEventExecMoneyShow::DinoEventExecMoneyShow(DinoEventLoop *event) : MProcess(NULL) {
     mEvent = event;
 }
 
@@ -1444,7 +1444,7 @@ void DinoEventExecMoneyShow::Idle() {
     serial->AddTail(exit);
 }
 
-DinoEventExecMoneyHide::DinoEventExecMoneyHide(DinoEvent *event) : MProcess(NULL) {
+DinoEventExecMoneyHide::DinoEventExecMoneyHide(DinoEventLoop *event) : MProcess(NULL) {
     mEvent = event;
 }
 
@@ -1456,7 +1456,7 @@ void DinoEventExecMoneyHide::Idle() {
     serial->AddTail(exit);
 }
 
-DinoEventExecDonateShow::DinoEventExecDonateShow(DinoEvent *event) : MProcess(NULL) {
+DinoEventExecDonateShow::DinoEventExecDonateShow(DinoEventLoop *event) : MProcess(NULL) {
     mEvent = event;
 }
 
@@ -1468,7 +1468,7 @@ void DinoEventExecDonateShow::Idle() {
     serial->AddTail(exit);
 }
 
-DinoEventExecDonateHide::DinoEventExecDonateHide(DinoEvent *event) : MProcess(NULL) {
+DinoEventExecDonateHide::DinoEventExecDonateHide(DinoEventLoop *event) : MProcess(NULL) {
     mEvent = event;
 }
 
@@ -1480,7 +1480,7 @@ void DinoEventExecDonateHide::Idle() {
     serial->AddTail(exit);
 }
 
-DinoEventExecAppendCharaChara::DinoEventExecAppendCharaChara(DinoEvent *event, u32 chara, u32 other) : MProcess(NULL) {
+DinoEventExecAppendCharaChara::DinoEventExecAppendCharaChara(DinoEventLoop *event, u32 chara, u32 other) : MProcess(NULL) {
     mEvent = event;
     mChara = chara;
     mOther = other;
@@ -1509,7 +1509,7 @@ void DinoEventExecAppendCharaChara::Idle() {
     serial->AddTail(exit);
 }
 
-DinoEventExecAppendCharaRegion::DinoEventExecAppendCharaRegion(DinoEvent *event, u32 chara, u32 region, u32 angle, u32 target) {
+DinoEventExecAppendCharaRegion::DinoEventExecAppendCharaRegion(DinoEventLoop *event, u32 chara, u32 region, u32 angle, u32 target) {
     mEvent = event;
     mChara = chara;
     mMap = gDinoResource->GetRegionMapMatch(region);
@@ -1519,7 +1519,7 @@ DinoEventExecAppendCharaRegion::DinoEventExecAppendCharaRegion(DinoEvent *event,
     mTarget = target;
 }
 
-DinoEventExecAppendCharaRegion::DinoEventExecAppendCharaRegion(DinoEvent *event, u32 chara, u32 map, MFx32Point pos, u32 angle, u32 target) {
+DinoEventExecAppendCharaRegion::DinoEventExecAppendCharaRegion(DinoEventLoop *event, u32 chara, u32 map, MFx32Point pos, u32 angle, u32 target) {
     mEvent = event;
     mChara = chara;
     mMap = map;
@@ -1560,7 +1560,7 @@ void DinoEventExecAppendCharaRegion::Execute() {
     Exit();
 }
 
-DinoEventExecRemoveChara::DinoEventExecRemoveChara(DinoEvent *event, u32 chara) {
+DinoEventExecRemoveChara::DinoEventExecRemoveChara(DinoEventLoop *event, u32 chara) {
     mEvent = event;
     mChara = chara;
 }
@@ -1576,7 +1576,7 @@ void DinoEventExecRemoveChara::Execute() {
     Exit();
 }
 
-DinoEventExecCharaAngle::DinoEventExecCharaAngle(DinoEvent *event, u32 chara, u32 angle, u32 a, u32 b) : MProcess(NULL) {
+DinoEventExecCharaAngle::DinoEventExecCharaAngle(DinoEventLoop *event, u32 chara, u32 angle, u32 a, u32 b) : MProcess(NULL) {
     mEvent = event;
     mChara = chara;
     mAngle = angle;
@@ -1592,7 +1592,7 @@ void DinoEventExecCharaAngle::Idle() {
     serial->AddTail(exit);
 }
 
-DinoEventExecCharaAngleToChara::DinoEventExecCharaAngleToChara(DinoEvent *event, u32 chara, u32 target, u32 a, u32 b)
+DinoEventExecCharaAngleToChara::DinoEventExecCharaAngleToChara(DinoEventLoop *event, u32 chara, u32 target, u32 a, u32 b)
     : MProcess(NULL) {
     mEvent = event;
     mChara = chara;
@@ -1617,7 +1617,7 @@ void DinoEventExecCharaAngleToChara::Idle() {
     serial->AddTail(exit);
 }
 
-DinoEventExecCharaAngleOffset::DinoEventExecCharaAngleOffset(DinoEvent *event, u32 chara, u32 offset, u32 a, u32 b)
+DinoEventExecCharaAngleOffset::DinoEventExecCharaAngleOffset(DinoEventLoop *event, u32 chara, u32 offset, u32 a, u32 b)
     : MProcess(NULL) {
     mEvent = event;
     mChara = chara;
@@ -1640,7 +1640,7 @@ void DinoEventExecCharaAngleOffset::Idle() {
     serial->AddTail(exit);
 }
 
-DinoEventExecCharaAngleOffsetToChara::DinoEventExecCharaAngleOffsetToChara(DinoEvent *event, u32 chara, u32 target,
+DinoEventExecCharaAngleOffsetToChara::DinoEventExecCharaAngleOffsetToChara(DinoEventLoop *event, u32 chara, u32 target,
                                                                            u16 offset, u32 a, u32 b)
     : MProcess(NULL) {
     mEvent = event;
@@ -1667,7 +1667,7 @@ void DinoEventExecCharaAngleOffsetToChara::Idle() {
     serial->AddTail(exit);
 }
 
-DinoEventExecCharaMoveToChara::DinoEventExecCharaMoveToChara(DinoEvent *event, u32 chara, u32 target, u32 a, u32 b, u8 c)
+DinoEventExecCharaMoveToChara::DinoEventExecCharaMoveToChara(DinoEventLoop *event, u32 chara, u32 target, u32 a, u32 b, u8 c)
     : MProcess(NULL) {
     mEvent = event;
     mChara = chara;
@@ -1690,7 +1690,7 @@ void DinoEventExecCharaMoveToChara::Idle() {
     serial->AddTail(exit);
 }
 
-DinoEventExecCharaMoveToRegion::DinoEventExecCharaMoveToRegion(DinoEvent *event, u32 chara, u32 region, u32 a, u32 b, u8 c) : MProcess(NULL) {
+DinoEventExecCharaMoveToRegion::DinoEventExecCharaMoveToRegion(DinoEventLoop *event, u32 chara, u32 region, u32 a, u32 b, u8 c) : MProcess(NULL) {
     mEvent = event;
     mChara = chara;
     mRegion = region;
@@ -1707,7 +1707,7 @@ void DinoEventExecCharaMoveToRegion::Idle() {
     serial->AddTail(exit);
 }
 
-DinoEventExecCharaMoveToCoord::DinoEventExecCharaMoveToCoord(DinoEvent *event, u32 chara, MFx32Point coord, u32 a, u32 b, u8 c) : MProcess(NULL) {
+DinoEventExecCharaMoveToCoord::DinoEventExecCharaMoveToCoord(DinoEventLoop *event, u32 chara, MFx32Point coord, u32 a, u32 b, u8 c) : MProcess(NULL) {
     mEvent = event;
     mChara = chara;
     mPoint = coord;
@@ -1724,7 +1724,7 @@ void DinoEventExecCharaMoveToCoord::Idle() {
     serial->AddTail(exit);
 }
 
-DinoEventExecCharaMoveOffset::DinoEventExecCharaMoveOffset(DinoEvent *event, u32 chara, MFx32Point offset, u32 a, u32 b, u8 c) : MProcess(NULL) {
+DinoEventExecCharaMoveOffset::DinoEventExecCharaMoveOffset(DinoEventLoop *event, u32 chara, MFx32Point offset, u32 a, u32 b, u8 c) : MProcess(NULL) {
     mEvent = event;
     mChara = chara;
     mPoint = offset;
@@ -1741,7 +1741,7 @@ void DinoEventExecCharaMoveOffset::Idle() {
     serial->AddTail(exit);
 }
 
-DinoEventExecCharaMoveVector::DinoEventExecCharaMoveVector(DinoEvent *event, u32 chara, u16 direction, u32 a, u32 b, u32 c, u8 d) : MProcess(NULL) {
+DinoEventExecCharaMoveVector::DinoEventExecCharaMoveVector(DinoEventLoop *event, u32 chara, u16 direction, u32 a, u32 b, u32 c, u8 d) : MProcess(NULL) {
     mEvent = event;
     mChara = chara;
     mDirection = direction;
@@ -1759,7 +1759,7 @@ void DinoEventExecCharaMoveVector::Idle() {
     serial->AddTail(exit);
 }
 
-DinoEventExecCharaWaitMove::DinoEventExecCharaWaitMove(DinoEvent *event, u32 chara) : MProcess(NULL) {
+DinoEventExecCharaWaitMove::DinoEventExecCharaWaitMove(DinoEventLoop *event, u32 chara) : MProcess(NULL) {
     mEvent = event;
     mChara = chara;
 }
@@ -1772,7 +1772,7 @@ void DinoEventExecCharaWaitMove::Idle() {
     serial->AddTail(exit);
 }
 
-DinoEventExecCharaFocus::DinoEventExecCharaFocus(DinoEvent *event, u32 chara) : MProcess(NULL) {
+DinoEventExecCharaFocus::DinoEventExecCharaFocus(DinoEventLoop *event, u32 chara) : MProcess(NULL) {
     mEvent = event;
     mChara = chara;
 }

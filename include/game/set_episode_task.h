@@ -9,7 +9,7 @@ public:
     virtual ~SetEpisodeTask();
     virtual void Execute();
 
-    DinoEvent *mEvent;  // 0x10
+    DinoEventLoop *mEvent;  // 0x10
     u32 mId;            // 0x14
     u8 mSeen;           // 0x18
 };
