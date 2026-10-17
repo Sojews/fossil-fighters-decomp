@@ -4,7 +4,7 @@
 #pragma auto_inline on
 
 #include "game/dino_cleaning_image.h"
-#include "game/dino_cleaning_kaseki_rock.h"
+#include "game/dino_cleaning.h"
 #include "game/dino_common_live.h"
 #include "game/dino_sound.h"
 #include "m/pal.h"
@@ -37,8 +37,8 @@ void DinoCleaningImageLayer::LoadPalette(MPalBlock *block, u32 start) {
     block->Load(mPalette, start, 2);
 }
 
-DinoCleaningImage::DinoCleaningImage(DinoCleaningKasekiRock *rock)
-    : mRock(rock), mUnk08(FALSE), mPicture(std::string(""), 0) {
+DinoCleaningImage::DinoCleaningImage(DinoCleaning *cleaning)
+    : mCleaning(cleaning), mUnk08(FALSE), mPicture(std::string(""), 0) {
 }
 
 #pragma auto_inline on
@@ -95,7 +95,7 @@ void DinoCleaningImage::PlayLayerSounds() {
             u32 se = (*it)->GetUnk1C3C();
             if (se != 0) {
                 if ((u32)(se - 0x2A) <= 1) {
-                    mRock->GetUnkE4()->SetUnkAC(9);
+                    mCleaning->GetUnkE4()->SetUnkAC(9);
                 }
                 DinoSoundPlaySe((*it)->GetUnk1C3C(), 0);
             }

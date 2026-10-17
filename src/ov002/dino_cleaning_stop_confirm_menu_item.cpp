@@ -14,11 +14,11 @@ DinoCleaningStopConfirmMenu::~DinoCleaningStopConfirmMenu() {
 }
 
 DinoCleaningStopConfirm::~DinoCleaningStopConfirm() {
-    mRock->SetUnk128(FALSE);
+    mCleaning->SetUnk128(FALSE);
 }
 
 DinoCleaningSleep::~DinoCleaningSleep() {
-    mRock->SetUnk128(FALSE);
+    mCleaning->SetUnk128(FALSE);
 }
 
 MRect DinoCleaningStopConfirmMenuItem::GetRect() {

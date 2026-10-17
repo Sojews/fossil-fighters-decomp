@@ -2,17 +2,17 @@
 
 #include "game/dino_cleaning_blower.h"
 #include "game/dino_blower.h"
-#include "game/dino_cleaning_kaseki_rock.h"
+#include "game/dino_cleaning.h"
 #include "game/dino_common_live.h"
 #include "game/dino_sound.h"
 #include "m/input.h"
 
 extern "C" void func_ov002_0215fdec(u32 obj);
 
-DinoCleaningBlower::DinoCleaningBlower(DinoCleaningKasekiRock *rock) : MProcess(NULL) {
+DinoCleaningBlower::DinoCleaningBlower(DinoCleaning *cleaning) : MProcess(NULL) {
     u32 i;
 
-    mRock = rock;
+    mCleaning = cleaning;
     for (i = 0; i < 25; i++) {
         mPressed[i] = FALSE;
     }
@@ -25,7 +25,7 @@ DinoCleaningBlower::~DinoCleaningBlower() {
 }
 
 void DinoCleaningBlower::Idle() {
-    MInput *input = mRock->GetUnkDC();
+    MInput *input = mCleaning->GetUnkDC();
     u32 count;
     u32 i;
     BOOL blowing;
@@ -40,13 +40,13 @@ void DinoCleaningBlower::Idle() {
     blowing = mBlower->IsBlowing();
     tapping = count >= 2 ? TRUE : FALSE;
     if (tapping) {
-        mRock->GetUnkE4()->SetUnkAC(20);
+        mCleaning->GetUnkE4()->SetUnkAC(20);
         DinoSoundFunc_0201feec(0x2C);
     }
     if (blowing) {
-        mRock->GetUnkE4()->SetUnkAC(19);
+        mCleaning->GetUnkE4()->SetUnkAC(19);
     }
-    if ((blowing || tapping) && mRock->GetUnkD8()) {
-        func_ov002_0215fdec(mRock->GetUnkD8());
+    if ((blowing || tapping) && mCleaning->GetUnkD8()) {
+        func_ov002_0215fdec(mCleaning->GetUnkD8());
     }
 }

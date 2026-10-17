@@ -3,12 +3,12 @@
 
 #include "m/task.h"
 
-class DinoCleaningKasekiRock;
+class DinoCleaning;
 
 // A cleaning tool (hammer, drill, X-ray...) working on the fossil rock.
 class DinoCleaningTool : public MProcess {
 public:
-    DinoCleaningTool(DinoCleaningKasekiRock *rock);
+    DinoCleaningTool(DinoCleaning *cleaning);
     // The game's destructor is inline. Its vtable's owner (dino_cleaning_tool.cpp) defines DINO_CLEANING_TOOL_OWNER and emits it out of line
     // until the key function there is decompiled.
 #ifdef DINO_CLEANING_TOOL_OWNER
@@ -21,9 +21,9 @@ public:
     virtual void Unk1C();
     virtual void Unk20();
 
-    DinoCleaningKasekiRock *GetRock();
+    DinoCleaning *GetCleaning();
 
-    DinoCleaningKasekiRock *mRock;  // 0x74
+    DinoCleaning *mCleaning;  // 0x74
 };
 
 #endif

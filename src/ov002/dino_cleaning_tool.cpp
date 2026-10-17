@@ -8,12 +8,12 @@
 #include "game/dino_cleaning_tool.h"
 #include "types.h"
 
-DinoCleaningTool::DinoCleaningTool(DinoCleaningKasekiRock *rock) : MProcess(NULL) {
-    mRock = rock;
+DinoCleaningTool::DinoCleaningTool(DinoCleaning *cleaning) : MProcess(NULL) {
+    mCleaning = cleaning;
 }
 
-DinoCleaningKasekiRock *DinoCleaningTool::GetRock() {
-    return mRock;
+DinoCleaning *DinoCleaningTool::GetCleaning() {
+    return mCleaning;
 }
 
 void DinoCleaningTool::Unk18() {

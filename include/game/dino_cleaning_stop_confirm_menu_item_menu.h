@@ -1,7 +1,7 @@
 #ifndef GAME_DINO_CLEANING_STOP_CONFIRM_MENU_ITEM_MENU_H
 #define GAME_DINO_CLEANING_STOP_CONFIRM_MENU_ITEM_MENU_H
 
-#include "game/dino_cleaning_kaseki_rock.h"
+#include "game/dino_cleaning.h"
 #include <string>
 #include <vector>
 #include "m/menu_item.h"
@@ -31,7 +31,7 @@ public:
     virtual void Idle();
 
     void (DinoCleaningStopConfirm::*mState)(); // 0x80
-    DinoCleaningKasekiRock *mRock;  // 0x88
+    DinoCleaning *mCleaning;    // 0x88
 };
 
 class DinoCleaningSleep : public MProcess, public DinoHelpBase {
@@ -40,7 +40,7 @@ public:
     virtual void Idle();
 
     void (DinoCleaningSleep::*mState)(); // 0x80
-    DinoCleaningKasekiRock *mRock;  // 0x88
+    DinoCleaning *mCleaning;    // 0x88
 };
 
 #endif

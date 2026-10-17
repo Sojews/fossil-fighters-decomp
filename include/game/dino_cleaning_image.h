@@ -6,12 +6,12 @@
 #include "game/dino_cleaning_image_layer.h"
 #include "m/fx32.h"
 
-class DinoCleaningKasekiRock;
+class DinoCleaning;
 
 // A cleaning image: a picture and the layers drawn over it.
 class DinoCleaningImage {
 public:
-    DinoCleaningImage(DinoCleaningKasekiRock *rock);
+    DinoCleaningImage(DinoCleaning *cleaning);
     virtual ~DinoCleaningImage();
 
     void AddLayer(DinoCleaningImageLayer *layer);
@@ -25,7 +25,7 @@ public:
     u8 GetCell(int row, int col);
     void ClearGrid();
 
-    DinoCleaningKasekiRock *mRock;                  // 0x04
+    DinoCleaning *mCleaning;                  // 0x04
     u8 mUnk08;                                      // 0x08
     std::vector<DinoCleaningImageLayer *> mLayers;  // 0x0C
     MPictureFile mPicture;                          // 0x18

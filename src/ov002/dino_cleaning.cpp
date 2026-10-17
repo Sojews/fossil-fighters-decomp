@@ -1,5 +1,6 @@
 // DinoCleaning: the fossil cleaning scene, with DinoCleaningKasekiRock and DinoCleaningLive.
 
+#include "game/dino_cleaning.h"
 #include "game/dino_cleaning_kaseki_rock.h"
 #include "game/dino_cleaning_kaseki_rock_xray_blend_manager.h"
 #include "game/help.h"
@@ -15,28 +16,57 @@ DinoCleaningKasekiRock::~DinoCleaningKasekiRock() {
 DinoCleaningKasekiRockXrayBlendManager::~DinoCleaningKasekiRockXrayBlendManager() {
 }
 
-MInput *DinoCleaningKasekiRock::GetUnkDC() {
+// NONMATCHING: the members' destructors are missing (the member layout isn't known yet).
+DinoCleaning::~DinoCleaning() {
+}
+
+MInput *DinoCleaning::GetUnkDC() {
     return mUnkDC;
 }
 
-u32 DinoCleaningKasekiRock::GetUnkE0() {
+u32 DinoCleaning::GetUnkE0() {
     return mUnkE0;
 }
 
-u32 DinoCleaningKasekiRock::GetUnkD4() {
+u32 DinoCleaning::GetUnkD4() {
     return mUnkD4;
 }
 
-u32 DinoCleaningKasekiRock::GetUnkD8() {
+u32 DinoCleaning::GetUnkD8() {
     return mUnkD8;
 }
 
-DinoCommonLive *DinoCleaningKasekiRock::GetUnkE4() {
+DinoCommonLive *DinoCleaning::GetUnkE4() {
     return mUnkE4;
 }
 
-void DinoCleaningKasekiRock::SetUnk128(BOOL value) {
+void DinoCleaning::SetUnk128(BOOL value) {
     mUnk128 = value;
+}
+
+void DinoCleaning::Execute() {
+    if (!mUnk128) {
+        MProcess::Execute();
+    } else if (mUnk144->mState == STATE_RUN) {
+        mUnk144->Execute();
+    }
+}
+
+void DinoCleaning::Idle() {
+    (this->*mState)();
+}
+
+void DinoCleaning::OnSleep() {
+    mSleepTimer = 180;
+}
+
+void DinoCleaning::OnWake() {
+}
+
+void DinoCleaning::OnPreLoop() {
+    if (mSleepTimer != 0) {
+        mSleepTimer--;
+    }
 }
 
 void DinoCleaningKasekiRockXrayBlendManager::Idle() {
@@ -47,7 +77,6 @@ void DinoCleaningKasekiRockXrayBlendManager::Idle() {
 // instantiated explicitly.
 class DinoCommonLive {};
 class DinoCleaningLive : public DinoCommonLive {};
-class DinoCleaning : public DinoHelpBase {};
 template class MCallTask2<DinoCleaningLive, DinoCommonLive, u32, bool>;
 template MTask *MCreateCallTask(DinoCleaningLive *obj, void (DinoCommonLive::*func)(u32, bool), u32 a0, bool a1);
 template class MCallTask1<DinoCleaningLive, DinoCommonLive, u32>;

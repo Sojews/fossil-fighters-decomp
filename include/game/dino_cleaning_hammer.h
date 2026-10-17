@@ -5,7 +5,7 @@
 
 class DinoCleaningHammer : public DinoCleaningTool {
 public:
-    DinoCleaningHammer(DinoCleaningKasekiRock *rock, u8 arg1);
+    DinoCleaningHammer(DinoCleaning *cleaning, u8 arg1);
     virtual ~DinoCleaningHammer();
     virtual void Unk18();
     virtual void Unk1C();

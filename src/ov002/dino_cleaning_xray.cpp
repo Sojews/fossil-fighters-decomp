@@ -2,7 +2,7 @@
 
 #include "game/dino_cleaning_xray.h"
 
-DinoCleaningXray::DinoCleaningXray(DinoCleaningKasekiRock *rock) : DinoCleaningTool(rock) {
+DinoCleaningXray::DinoCleaningXray(DinoCleaning *cleaning) : DinoCleaningTool(cleaning) {
 }
 
 void DinoCleaningXray::Unk18() {
