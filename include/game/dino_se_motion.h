@@ -8,8 +8,9 @@
 class DinoSeMotion : public MMotion {
 public:
     virtual ~DinoSeMotion();
+    virtual void Unk44(int arg);
 
-    std::vector<void *> mUnk7C; // 0x7C
+    std::vector<void *> mSes;   // 0x7C: sound effects the motion's commands play (1-based)
 };
 
 #endif

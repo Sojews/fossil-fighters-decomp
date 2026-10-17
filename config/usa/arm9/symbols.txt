@@ -513,7 +513,7 @@ _ZNSt13__vec_deleterIPvRSaIS0_EE8allocateEmN10Metrowerks8int2typeILi1EEE kind:fu
 _ZNSt13__vec_deleterIPvRSaIS0_EED2Ev kind:function(thumb,size=0x26) addr:0x0200a834
 func_0200a85c kind:function(thumb,size=0x40) addr:0x0200a85c
 func_0200a89c kind:function(thumb,size=0x5e) addr:0x0200a89c
-func_0200a8fc kind:function(thumb,size=0x1c) addr:0x0200a8fc
+_ZN12DinoSeMotion5Unk44Ei kind:function(thumb,size=0x1c) addr:0x0200a8fc
 _ZN12DinoSeMotionD1Ev kind:function(thumb,size=0x14) addr:0x0200a918
 _ZN12DinoSeMotionD0Ev kind:function(thumb,size=0x1a) addr:0x0200a92c
 _Z17CreateDinoMessagePKv kind:function(thumb,size=0xe10) addr:0x0200a948
@@ -5230,7 +5230,7 @@ func_0206b084 kind:function(thumb,size=0x40) addr:0x0206b084
 func_0206b0c4 kind:function(thumb,size=0x11c) addr:0x0206b0c4
 func_0206b1e0 kind:function(thumb,size=0x1f4) addr:0x0206b1e0
 func_0206b3d4 kind:function(thumb,size=0x118) addr:0x0206b3d4
-func_0206b4ec kind:function(thumb,size=0x2c) addr:0x0206b4ec
+_ZN20MMultiPlayMessageHub7ExecuteEv kind:function(thumb,size=0x2c) addr:0x0206b4ec
 _ZN14MMultiPlayIconC2EP8MDisplayPKcih kind:function(thumb,size=0xa4) addr:0x0206b518
 _ZN14MMultiPlayIconD1Ev kind:function(thumb,size=0x38) addr:0x0206b5bc
 _ZN14MMultiPlayIconD0Ev kind:function(thumb,size=0x40) addr:0x0206b5f4

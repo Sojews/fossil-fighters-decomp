@@ -147,3 +147,9 @@ void DinoUiIslandMapMenu::OnDecide(MMenuItem *item) {
         }
     }
 }
+
+void BitmapMove::Apply(int step) {
+    MPointAnime::Apply(step);
+    MPoint pos = mValue;
+    mScreen->SetOffset(pos);
+}
