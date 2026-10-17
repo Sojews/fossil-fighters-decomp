@@ -28,3 +28,12 @@ DinoUiSaveOptionMenuItem::~DinoUiSaveOptionMenuItem() {
 
 DinoUiSaveOptionMenu::~DinoUiSaveOptionMenu() {
 }
+
+DinoUiSaveOptionSaveButton::~DinoUiSaveOptionSaveButton() {
+}
+
+DinoUiSaveOptionOptionButton::~DinoUiSaveOptionOptionButton() {
+}
+
+DinoUiSaveOptionBackButton::~DinoUiSaveOptionBackButton() {
+}
