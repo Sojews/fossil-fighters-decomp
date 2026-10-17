@@ -7,6 +7,7 @@
 #include "m/view.h"
 
 class DinoBattleViewPlayer;
+class MSmartOam;
 
 struct DinoBattleViewUnkE0 {
     u8 unk00[0x140];
@@ -45,7 +46,7 @@ public:
     u32 unkF0[5];
     u32 mUnk104;                // 0x104
     u32 mUnk108;                // 0x108
-    void *mUnk10C;              // 0x10C
+    MSmartOam *mUnk10C;         // 0x10C
     u32 unk110[2];
     u32 mUnk118;                // 0x118
     void *mUnk11C;              // 0x11C

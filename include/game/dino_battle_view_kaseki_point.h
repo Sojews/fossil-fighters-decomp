@@ -6,6 +6,7 @@
 class MMotion;
 class MIndicator;
 class MPalBlock;
+class MSmartOam;
 class DinoBattleView;
 
 // 32 palette rows fading between two palettes.
@@ -21,7 +22,7 @@ public:
 
 class DinoBattleViewKasekiPoint : public MProcess {
 public:
-    DinoBattleViewKasekiPoint(DinoBattleView *view, void *unk88, u32 side, u32 player);
+    DinoBattleViewKasekiPoint(DinoBattleView *view, MSmartOam *oam, u32 side, u32 player);
     virtual ~DinoBattleViewKasekiPoint();
     virtual void Idle();
 
@@ -35,7 +36,7 @@ public:
     int mUnk7C;                 // 0x7C
     MIndicator *mText;          // 0x80
     MMotion *mUnk84;            // 0x84
-    void *mUnk88;               // 0x88
+    MSmartOam *mOam;            // 0x88
     MPalBlock *mPalBlock;       // 0x8C
     KasekiPointPalette *mPalette; // 0x90
     DinoBattleView *mView;      // 0x94

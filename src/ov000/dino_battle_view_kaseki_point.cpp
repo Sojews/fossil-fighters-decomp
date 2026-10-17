@@ -12,6 +12,9 @@
 #include "m/motion.h"
 #include "game/dino_resource.h"
 #include "m/pal.h"
+#include "m/font.h"
+#include "m/oam_canvas.h"
+#include "nitro/mi.h"
 #include "m/indicator.h"
 #include "game/dino_sound.h"
 #include "game/dino_battle_view2.h"
@@ -59,6 +62,54 @@ void KasekiPointPalette::Init(const u16 *from, const u16 *to) {
             mRows[row][i] = color;
         }
     }
+}
+
+// Pooled file statics.
+struct KasekiPointStatics {
+    u32 unk00;
+    const char *motionPath;     // 0x04
+    u32 unk08[4];
+    MPoint textSize;            // 0x18
+};
+extern "C" KasekiPointStatics data_ov000_02191900;
+extern "C" const char *data_ov000_02191928[];   // font paths, by player
+extern "C" int data_ov000_021919e4[][2];        // text positions, by side
+extern "C" int data_ov000_021919e8[][2];
+extern "C" MPoint data_ov000_021919f4[];        // motion positions, by side
+
+DinoBattleViewKasekiPoint::DinoBattleViewKasekiPoint(DinoBattleView *view, MSmartOam *oam, u32 side, u32 player) : MProcess(NULL) {
+    mValue = 0;
+    mUnk78 = 100;
+    mUnk7C = 0;
+    mOam = oam;
+    mView = view;
+    mUnk98 = side;
+    MFontSet *font = new MFontSet(std::string(data_ov000_02191928[player]), 0, 0, 0);
+    MI_CpuCopy8(font->GetPalette(), mUnk9C, sizeof(mUnk9C));
+    MSmartObjCanvas *canvas = new MSmartObjCanvas(oam->mDisplay, oam, data_ov000_02191900.textSize, font->GetPalette(), TRUE);
+    mPalBlock = canvas->GetPalBlock();
+    canvas->SetPriority(3);
+    canvas->SetAnchor(2);
+    mText = new MIndicator(canvas, font, 0);
+    mText->SetText(std::string("  0"));
+    mText->Show();
+    mText->SetPosition(MPoint(data_ov000_021919e4[side][0] - data_ov000_02191900.textSize.x / 2,
+                              data_ov000_021919e8[side][0] - data_ov000_02191900.textSize.y / 2));
+    mUnk84 = new MMotion(std::string(data_ov000_02191900.motionPath), mOam, 2, 1);
+    mUnk84->SetPriority(3);
+    mUnk84->SetAnchor(3);
+    mUnk84->Show();
+    mUnk84->SetPosition(data_ov000_021919f4[side]);
+    MTask *play = mUnk84->CreatePlayTransfer(side == 1 ? 4 : 1, 0);
+    MTimer *timer = new MTimer(30);
+    MSerialTaskSet *set = new MSerialTaskSet(TRUE);
+    set->AddTail(timer);
+    set->AddTail(play);
+    mParallel.AddTail(set);
+    MTask *text = mText;
+    MTaskSet *parallel = &mParallel;
+    parallel->AddTail(mUnk84);
+    parallel->AddTail(text);
 }
 
 extern "C" const u32 data_ov000_0218fa14[][2];
