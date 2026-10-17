@@ -60,3 +60,25 @@ void DinoUiContainerDropBackButton::OnDecide() {
     mOwner->OnBackDecided();
     DinoSoundPlaySe(0x90, 0);
 }
+
+void DinoUiContainerDropPageRButton::OnDecide() {
+    if (mOwner->PageRight()) {
+        mMotion->Play(2, 1);
+        mSerial.Clear();
+        MTask *play = mMotion->CreatePlayTransfer(1, 0);
+        mSerial.AddTail(mMotion->CreateWaitStopTask());
+        mSerial.AddTail(play);
+        DinoSoundPlaySe(0x93, 0);
+    }
+}
+
+void DinoUiContainerDropPageLButton::OnDecide() {
+    if (mOwner->PageLeft()) {
+        mMotion->Play(2, 1);
+        mSerial.Clear();
+        MTask *play = mMotion->CreatePlayTransfer(1, 0);
+        mSerial.AddTail(mMotion->CreateWaitStopTask());
+        mSerial.AddTail(play);
+        DinoSoundPlaySe(0x93, 0);
+    }
+}

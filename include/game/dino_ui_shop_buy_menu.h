@@ -16,6 +16,8 @@ public:
     virtual void OnFocus(MMenuItem *item);
     virtual void OnDecide(MMenuItem *item);
     void OnBackDecided();
+    BOOL PageRight();
+    BOOL PageLeft();
 
     MArchivePtr mArchive;       // 0xB4
     MArchiveFile mFile;         // 0xB8

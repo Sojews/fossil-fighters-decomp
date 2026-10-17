@@ -21,6 +21,8 @@ public:
     u32 mUnk118[7];                 // 0x118
     std::vector<unsigned short> mUnk134; // 0x134: (the element type is a guess, distinct from other overlays')
     void OnBackDecided();
+    BOOL PageRight();
+    BOOL PageLeft();
 };
 
 class DinoUi2CannonShootMenu : public DinoUi2ContainerBaseMenu {

@@ -70,6 +70,28 @@ void DinoUi2ContainerBaseBackButton::OnDecide() {
     DinoSoundPlaySe(0x90, 0);
 }
 
+void DinoUi2ContainerBasePageRButton::OnDecide() {
+    if (mOwner->PageRight()) {
+        mMotion->Play(2, 1);
+        mSerial.Clear();
+        MTask *play = mMotion->CreatePlayTransfer(1, 0);
+        mSerial.AddTail(mMotion->CreateWaitStopTask());
+        mSerial.AddTail(play);
+        DinoSoundPlaySe(0x93, 0);
+    }
+}
+
+void DinoUi2ContainerBasePageLButton::OnDecide() {
+    if (mOwner->PageLeft()) {
+        mMotion->Play(2, 1);
+        mSerial.Clear();
+        MTask *play = mMotion->CreatePlayTransfer(1, 0);
+        mSerial.AddTail(mMotion->CreateWaitStopTask());
+        mSerial.AddTail(play);
+        DinoSoundPlaySe(0x93, 0);
+    }
+}
+
 // Template task instances the game emits in this file. Until the code that makes the tasks is decompiled, they are
 // instantiated explicitly.
 template class MCallTask0<DinoUi2CannonShootMenu, DinoUi2CannonShootMenu>;

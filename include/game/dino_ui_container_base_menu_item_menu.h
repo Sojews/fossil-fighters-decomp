@@ -16,6 +16,8 @@ class DinoUiContainerBaseMenu : public DinoHelpBase, public MMenu {
 public:
     virtual ~DinoUiContainerBaseMenu();
     void OnBackDecided();
+    BOOL PageRight();
+    BOOL PageLeft();
 
     u32 mUnkB4[21];             // 0xB4
     MArchivePtr mArchive;       // 0x108
