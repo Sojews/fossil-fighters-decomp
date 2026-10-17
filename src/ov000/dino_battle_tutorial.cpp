@@ -32,3 +32,11 @@ void KeyWaitTask::Idle() {
         mWindow->mConsole->SetSpeed(MFx32(0));
     }
 }
+
+void DinoBattleViewTutorialWindow::Idle() {
+    if (!mConsole->IsHidden() && mConsole->mState == MTask::STATE_SUSPEND) {
+        mCursor->Show();
+    } else {
+        mCursor->Hide();
+    }
+}

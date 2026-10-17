@@ -23,6 +23,8 @@ public:
     MPictureFile mPicture;  // 0x74
     u32 unkA8;
     MConsole *mConsole;     // 0xAC
+    u32 unkB0[2];
+    MView *mCursor;         // 0xB8
 };
 
 class KeyWaitTask : public MProcess {
