@@ -2,6 +2,9 @@
 #ifndef GAME_DINO_EVENT_EXEC_H
 #define GAME_DINO_EVENT_EXEC_H
 
+#include <vector>
+#include "game/dino_event_capture_fade_ui_task.h"
+#include "m/archive.h"
 #include "game/dino_common_window_yes_no_dialog.h"
 #include "game/dino_common_tutorial_window.h"
 #include "m/task.h"
@@ -535,9 +538,23 @@ public:
 class DinoEventKasekiRockGet : public MProcess {
 public:
     DinoEventKasekiRockGet(DinoEvent *event, u32 mode, const DinoBackupEntry *entry, u8 *result);
+    virtual ~DinoEventKasekiRockGet();
     virtual void Idle();
 
-    u8 unk74[0x58];
+    u32 mUnk74[9];          // 0x74
+    MArchivePtr mArchive;   // 0x98
+    MArchiveFile mFile;     // 0x9C
+    std::string mUnkA8;     // 0xA8
+    std::string mUnkB4;     // 0xB4
+    u32 mUnkC0[3];          // 0xC0
+};
+
+class DinoEventKasekiRockGetContainerSelect : public DinoEventCaptureFadeUiTask {
+public:
+    virtual ~DinoEventKasekiRockGetContainerSelect();
+
+    u32 mUnk74[6];                      // 0x74
+    std::vector<std::string> mUnk8C;    // 0x8C
 };
 
 class DinoEventExecKasekiRockGet : public MProcess {

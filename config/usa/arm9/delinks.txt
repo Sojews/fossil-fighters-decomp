@@ -782,3 +782,9 @@ libs/nitrosdk/src/os/os_thread.c:
     complete
     .text       start:0x02073f90 end:0x020745b8
     .bss        start:0x021518c8 end:0x02151b44
+
+src/game/dino_senryu_sample.cpp:
+    .text       start:0x020343c4 end:0x02034990
+
+src/game/dino_event_kaseki_rock_get.cpp:
+    .text       start:0x02034990 end:0x02035978
