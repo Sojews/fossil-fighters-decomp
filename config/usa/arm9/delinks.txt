@@ -494,6 +494,11 @@ libs/nitrosdk/src/snd/snd_bank.c:
     complete
     .text       start:0x020768c8 end:0x02076b20
 
+libs/nitrosdk/src/spi/mic.c:
+    complete
+    .text       start:0x02079790 end:0x02079ad4
+    .bss        start:0x021538cc end:0x021538ec
+
 libs/nitrosdk/src/pxi/pxi_fifo.c:
     complete
     .text       start:0x02076b20 end:0x02076d74

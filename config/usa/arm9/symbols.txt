@@ -6017,7 +6017,7 @@ TP_WaitBusy kind:function(thumb,size=0x10) addr:0x02079774
 TP_CheckError kind:function(thumb,size=0xc) addr:0x02079784
 MIC_Init kind:function(thumb,size=0x44) addr:0x02079790
 MIC_StartAutoSamplingAsync kind:function(thumb,size=0xcc) addr:0x020797d4
-func_020798a0 kind:function(thumb,size=0x24) addr:0x020798a0
+MIC_StartAutoSampling kind:function(thumb,size=0x24) addr:0x020798a0
 MIC_StopAutoSamplingAsync kind:function(thumb,size=0x3c) addr:0x020798c4
 MIC_StopAutoSampling kind:function(thumb,size=0x24) addr:0x02079900
 MicCommonCallback kind:function(thumb,size=0xb4) addr:0x02079924
@@ -13085,8 +13085,8 @@ data_0215382c kind:bss addr:0x0215382c
 data_02153834 kind:bss addr:0x02153834
 data_02153890 kind:bss addr:0x02153890
 data_021538ac kind:bss addr:0x021538ac
-data_021538cc kind:bss addr:0x021538cc
-data_021538d0 kind:bss addr:0x021538d0
+micInitialized kind:bss(size=0x2) addr:0x021538cc
+micWork kind:bss(size=0x1c) addr:0x021538d0
 data_021538ec kind:bss addr:0x021538ec
 data_021538f8 kind:bss addr:0x021538f8
 data_02153900 kind:bss addr:0x02153900
