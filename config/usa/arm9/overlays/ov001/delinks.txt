@@ -6,7 +6,7 @@
     .bss        start:0x0216ae60 end:0x021994a0 kind:bss align:32
 
 src/ov001/dino_field_chara_angle_task.cpp:
-    .text       start:0x02158ea4 end:0x0215bcf8
+    .text       start:0x021586e8 end:0x0215bcf8
 
 src/ov001/dino_field_kaseki_rock.cpp:
     .text       start:0x0215bf44 end:0x0215c13c
