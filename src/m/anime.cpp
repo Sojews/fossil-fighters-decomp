@@ -110,9 +110,9 @@ void MFx32ValueAnime::Apply(int step) {
 MPointAnime::MPointAnime(MPoint from, MPoint to) {
     mFrom = from;
     mTo = to;
-    int dy = labs(from.y - to.y);
-    int dx = labs(from.x - to.x);
-    mSteps = std::max(dx, dy) + 1;
+    long dy = labs(from.y - to.y);
+    long dx = labs(from.x - to.x);
+    mSteps = std::max<int>(dx, dy) + 1;
     mDeltaX = ((to.x - from.x) << 16) / (mSteps - 1);
     mDeltaY = ((to.y - from.y) << 16) / (mSteps - 1);
 }
@@ -140,6 +140,21 @@ void MFx32PointAnime::Apply(int step) {
         mValue.x = mTo.x;
         mValue.y = mTo.y;
     }
+}
+
+MRectAnime::MRectAnime(MRect from, MRect to) {
+    mFrom = from;
+    mTo = to;
+    long b = labs(from.bottom - to.bottom);
+    long r = labs(from.right - to.right);
+    const int &m1 = std::max<int>(r, b);
+    long t = labs(from.top - to.top);
+    long l = labs(from.left - to.left);
+    mSteps = std::max(std::max<int>(l, t), m1) + 1;
+    mDelta[0] = ((to.left - from.left) << 16) / (mSteps - 1);
+    mDelta[1] = ((to.top - from.top) << 16) / (mSteps - 1);
+    mDelta[2] = ((to.right - from.right) << 16) / (mSteps - 1);
+    mDelta[3] = ((to.bottom - from.bottom) << 16) / (mSteps - 1);
 }
 
 void MRectAnime::Apply(int step) {
