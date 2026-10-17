@@ -182,6 +182,15 @@ public:
     void AddEpisode(u32 id);
     void RemoveEpisode(u32 id);
     void ResetEpisode(u32 id);
+
+    u32 mUnk74[2];          // 0x74
+    u32 *mResult;           // 0x7C
+    DinoField *mField;      // 0x80
+    u32 mUnk84[14];         // 0x84
+    u8 mCameraUsed;         // 0xBC
+    u8 unkBD[0x57];
+    void *mEpisodes;        // 0x114
+    u8 mEpisodesChanged;    // 0x118
 };
 
 #endif

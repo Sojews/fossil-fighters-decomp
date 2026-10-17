@@ -809,3 +809,6 @@ src/game/dino_common_cursor.cpp:
 
 src/game/dino_common_live.cpp:
     .text       start:0x02020684 end:0x020213a0
+
+src/game/dino_event.cpp:
+    .text       start:0x020398e0 end:0x0203e21c
