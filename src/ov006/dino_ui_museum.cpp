@@ -8,6 +8,8 @@
 #include "game/dino_ui_museum.h"
 #include "m/lcd.h"
 #include "game/dino_sound.h"
+#include "game/dino_ui_museum_3d_model.h"
+#include "m/bg_new_task.h"
 
 DinoUiMuseumInformationMenu::~DinoUiMuseumInformationMenu() {
 }
@@ -230,3 +232,7 @@ void DinoUiMuseumInformationMenu::PageLeft() {
     *mPage = (*mPage + mInfo->mPageCount - 1) % mInfo->mPageCount;
     func_ov006_0218a570(this);
 }
+
+// DinoUiMuseum3DModel::Idle and DinoUiMuseum's page turns (not decompiled yet) start background loads.
+template MTask *MCreateBgCallTask(DinoUiMuseum3DModel *obj, void (DinoUiMuseum3DModel::*func)(), int thread);
+template MTask *MCreateBgCallTask(DinoUiMuseum *obj, void (DinoUiMuseum::*func)(), int thread);
