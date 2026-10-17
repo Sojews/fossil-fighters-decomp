@@ -22,3 +22,11 @@ DinoFieldRadarManager::~DinoFieldRadarManager() {
 // instantiated explicitly.
 template class MCallTask1<DinoFieldRadar, DinoFieldRadar, bool>;
 template MTask *MCreateCallTask(DinoFieldRadar *obj, void (DinoFieldRadar::*func)(bool), bool a0);
+
+void DinoFieldRadarManager::CameraUnk0() {
+    if (mRadar) {
+        mParallel.Remove(mRadar);
+        delete mRadar;
+        mRadar = NULL;
+    }
+}

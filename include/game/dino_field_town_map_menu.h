@@ -1,6 +1,7 @@
 #ifndef GAME_DINO_FIELD_TOWN_MAP_MENU_H
 #define GAME_DINO_FIELD_TOWN_MAP_MENU_H
 
+#include "game/dino_field.h"
 #include "m/menu_item.h"
 #include "m/menu.h"
 #include "m/display.h"
@@ -16,6 +17,9 @@ public:
     virtual void Idle();
     virtual void CameraUnk0();
     virtual void CameraUnk1();
+
+    DinoField *mField;      // 0x78
+    DinoFieldTownMap *mTownMap;  // 0x7C: while the camera allows it
 };
 
 #endif
