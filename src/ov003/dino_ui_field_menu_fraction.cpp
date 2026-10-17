@@ -1,5 +1,5 @@
 // DinoUiFieldMenuFraction, DinoUiFieldMenuNumber, DinoUiFieldMenuNumber3, DinoUiPartsNumber8, DinoUiPartsReviverMedalButton, DinoUiPartsReviverNameCountCheckTask, DinoUiPartsBlackBelt, DinoUiPartsRockName, DinoUiPartsKasekiButton, DinoUiPartsTeamInfo, DinoUiPartsTeamTech.
-// Only the destructors are decompiled so far.
+// One TU: the field menu parts (0x021584d4-0x0215b008).
 
 // Derived destructors have their bases' destructor bodies inlined; auto-inlining the ones defined above does that.
 #pragma auto_inline on
@@ -17,6 +17,8 @@
 #include "game/dino_ui_parts_team_info.h"
 #include "game/dino_ui_parts_team_tech.h"
 #include "game/dino_ui_parts_reviver_name.h"
+#include "game/dino_ui_parts_team_indicator.h"
+#include "game/dino_ui_field_menu_fraction4.h"
 
 DinoUiFieldMenuFraction::~DinoUiFieldMenuFraction() {
 }
@@ -55,4 +57,18 @@ DinoUiPartsReviverName::~DinoUiPartsReviverName() {
 }
 
 void DinoUiFieldMenuFraction::Idle() {
+}
+
+DinoUiPartsTeamIndicator::~DinoUiPartsTeamIndicator() {
+    mFont->Release();
+    delete mView;
+}
+
+void DinoUiPartsTeamIndicator::Idle() {
+}
+
+DinoUiFieldMenuFraction4::~DinoUiFieldMenuFraction4() {
+}
+
+void DinoUiFieldMenuFraction4::Idle() {
 }
