@@ -7,6 +7,8 @@ class DinoBattleViewFieldPlayerBG : public MProcess {
 public:
     virtual ~DinoBattleViewFieldPlayerBG();
     virtual void Idle();
+
+    void (DinoBattleViewFieldPlayerBG::*mState)(); // 0x74
 };
 
 #endif

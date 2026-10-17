@@ -5,3 +5,7 @@
 
 DinoBattleViewFieldPlayerBG::~DinoBattleViewFieldPlayerBG() {
 }
+
+void DinoBattleViewFieldPlayerBG::Idle() {
+    (this->*mState)();
+}
