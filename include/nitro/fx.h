@@ -16,6 +16,23 @@ typedef struct {
 } MtxFx22;
 
 typedef struct {
+    fx32 _00, _01, _02;
+    fx32 _10, _11, _12;
+    fx32 _20, _21, _22;
+} MtxFx33;
+
+typedef struct {
+    fx32 _00, _01, _02;
+    fx32 _10, _11, _12;
+    fx32 _20, _21, _22;
+    fx32 _30, _31, _32;
+} MtxFx43;
+
+typedef struct {
+    fx32 x, y, z;
+} VecFx32;
+
+typedef struct {
     fx32 _00, _01, _02, _03;
     fx32 _10, _11, _12, _13;
     fx32 _20, _21, _22, _23;
@@ -38,6 +55,13 @@ fx32 FX_GetSqrtResult(void);
 u16 FX_Atan2Idx(fx32 y, fx32 x);
 void MTX_Rot22_(MtxFx22 *pDst, fx32 sinVal, fx32 cosVal);
 void MTX_ScaleApply22(const MtxFx22 *pSrc, MtxFx22 *pDst, fx32 x, fx32 y);
+void MTX_Identity33_(MtxFx33 *pDst);
+void MTX_ScaleApply33(const MtxFx33 *pSrc, MtxFx33 *pDst, fx32 x, fx32 y, fx32 z);
+void MTX_Concat33(const MtxFx33 *a, const MtxFx33 *b, MtxFx33 *ab);
+fx32 FX_Mul32x64c(fx32 v32, fx64c v64c);
+fx32 VEC_DotProduct(const VecFx32 *a, const VecFx32 *b);
+void VEC_CrossProduct(const VecFx32 *a, const VecFx32 *b, VecFx32 *axb);
+void VEC_Normalize(const VecFx32 *pSrc, VecFx32 *pDst);
 
 #ifdef __cplusplus
 }

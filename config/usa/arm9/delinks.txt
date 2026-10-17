@@ -723,12 +723,24 @@ libs/nitrosdk/src/fx/fx_mtx22.c:
     complete
     .text       start:0x02070f0c end:0x02071038
 
+libs/nitrosdk/src/fx/fx_mtx33.c:
+    .text       start:0x02071038 end:0x0207133c
+
+libs/nitrosdk/src/fx/fx_mtx43.c:
+    .text       start:0x0207133c end:0x020717ec
+
 libs/nitrosdk/src/fx/fx_mtx44.c:
-    .text       start:0x02071a48 end:0x02071ab4
+    .text       start:0x020717ec end:0x02072118
 
 libs/nitrosdk/src/fx/fx_cp.c:
     complete
     .text       start:0x02072118 end:0x02072214
+
+libs/nitrosdk/src/fx/fx_vec.c:
+    .text       start:0x02072214 end:0x020723ec
+
+libs/nitrosdk/src/fx/fx.c:
+    .text       start:0x020724ec end:0x02072524
 
 libs/nitrosdk/src/gx/gx.c:
     complete

@@ -6,23 +6,9 @@
 #define REG_G3_MTX_LOAD_4x4 (*(volatile u32 *) 0x04000458)
 #define REG_G3_MTX_LOAD_4x3 (*(volatile u32 *) 0x0400045c)
 
-typedef struct {
-    fx32 x;
-    fx32 y;
-    fx32 z;
-} VecFx32;
-
-typedef struct {
-    fx32 _00, _01, _02;
-    fx32 _10, _11, _12;
-    fx32 _20, _21, _22;
-    fx32 _30, _31, _32;
-} MtxFx43;
-
 #define REG_CP_DIV_NUMER (*(volatile s64 *) 0x04000290)
 #define REG_CP_DIV_DENOM (*(volatile u64 *) 0x04000298)
 
-fx32 FX_Mul32x64c(fx32 v32, fx64c v64c);
 
 // (The divider is already in 64/32-bit mode.)
 static inline void FX_DivAsyncImm(fx32 numer, fx32 denom) {
@@ -35,9 +21,6 @@ static inline void FX_InvAsyncImm(fx32 denom) {
     REG_CP_DIV_DENOM = (u32) denom;
 }
 
-void VEC_Normalize(const VecFx32 *pSrc, VecFx32 *pDst);
-void VEC_CrossProduct(const VecFx32 *a, const VecFx32 *b, VecFx32 *axb);
-fx32 VEC_DotProduct(const VecFx32 *a, const VecFx32 *b);
 
 void G3i_PerspectiveW_(fx32 fovySin, fx32 fovyCos, fx32 aspect, fx32 n, fx32 f, fx32 scaleW, BOOL draw,
                        MtxFx44 *mtx) {
