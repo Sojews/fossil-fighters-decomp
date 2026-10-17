@@ -92,7 +92,11 @@ public:
     MSmartOam *mOam; // 0xC0
     u8 unkC4[0x78];
     MTask *mUnk13C;  // 0x13C
-    u8 unk140[0x40];
+    u8 unk140[0x3B];
+    u8 mOldSpeed;       // 0x17B: the settings when the menu opened, put back on Back
+    u8 mOldBgmVolume;   // 0x17C
+    u8 mOldSeVolume;    // 0x17D
+    u8 unk17E[2];
     int mDelay;      // 0x180: frames left before input is taken
     u8 mSilentFocus; // 0x184
 };
