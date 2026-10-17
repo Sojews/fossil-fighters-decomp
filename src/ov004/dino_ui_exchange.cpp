@@ -6,6 +6,8 @@
 
 #include "game/dino_ui_exchange.h"
 #include "types.h"
+#include "m/blend.h"
 
 DinoUiExchange::~DinoUiExchange() {
+    GetDisplay()->mBlend->Reset();
 }
