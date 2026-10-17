@@ -84,3 +84,19 @@ void DinoCleaningSampleMenuKasekiRockIdItem::OnFocusChanged(BOOL focused) {
         mKeyItemB->SetKeys(0);
     }
 }
+
+void DinoCleaningSampleMenuIncItem::OnDecide() {
+    if (*mValue == mMax) {
+        *mValue = mMin;
+    } else {
+        *mValue = *mValue + 1;
+    }
+}
+
+void DinoCleaningSampleMenuDecItem::OnDecide() {
+    if (*mValue == mMin) {
+        *mValue = mMax;
+    } else {
+        *mValue = *mValue - 1;
+    }
+}

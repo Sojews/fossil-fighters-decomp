@@ -80,3 +80,19 @@ void DinoUiDebugKasekiRockGetMenuKasekiRockIdItem::OnFocusChanged(BOOL focused) 
         mKeyItemB->SetKeys(0);
     }
 }
+
+void DinoUiDebugKasekiRockGetMenuIncItem::OnDecide() {
+    if (*mValue == mMax) {
+        *mValue = mMin;
+    } else {
+        *mValue = *mValue + 1;
+    }
+}
+
+void DinoUiDebugKasekiRockGetMenuDecItem::OnDecide() {
+    if (*mValue == mMin) {
+        *mValue = mMax;
+    } else {
+        *mValue = *mValue - 1;
+    }
+}
