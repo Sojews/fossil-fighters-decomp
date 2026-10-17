@@ -294,7 +294,7 @@ src/m/oam_canvas.cpp:
     .text       start:0x02062ac8 end:0x020644a0
 
 src/m/console.cpp:
-    .text       start:0x0206468c end:0x0206520c
+    .text       start:0x020644a0 end:0x0206520c
 
 src/m/indicator.cpp:
     .text       start:0x020652f4 end:0x020659e0
@@ -310,9 +310,6 @@ src/m/view.cpp:
 
 src/m/motion.cpp:
     .text       start:0x0205ef10 end:0x02061d88
-
-src/m/canvas_copy_transfer.cpp:
-    .text       start:0x020644a0 end:0x0206468c
 
 src/m/menu.cpp:
     .text       start:0x0206665c end:0x02067988
