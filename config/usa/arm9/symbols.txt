@@ -6079,7 +6079,7 @@ CARDi_UnlockResource kind:function(thumb,size=0x58) addr:0x0207a820
 CARDi_InitCommon kind:function(thumb,size=0xbc) addr:0x0207a878
 CARD_IsEnabled kind:function(thumb,size=0xc) addr:0x0207a934
 CARD_CheckEnabled kind:function(thumb,size=0x10) addr:0x0207a940
-func_0207a950 kind:function(thumb,size=0xc) addr:0x0207a950
+CARD_Enable kind:function(thumb,size=0xc) addr:0x0207a950
 CARDi_WaitAsync kind:function(thumb,size=0x3c) addr:0x0207a95c
 CARD_LockRom kind:function(thumb,size=0x12) addr:0x0207a998
 CARD_UnlockRom kind:function(thumb,size=0x12) addr:0x0207a9ac
@@ -6105,7 +6105,7 @@ CARD_Init kind:function(thumb,size=0x40) addr:0x0207b3a8
 CARD_WaitRomAsync kind:function(thumb,size=0x8) addr:0x0207b3e8
 CARDi_GetRomAccessor kind:function(thumb,size=0x8) addr:0x0207b3f0
 CARDi_OnFifoRecv kind:function(thumb,size=0x28) addr:0x0207b3f8
-func_0207b420 kind:function(thumb,size=0x44) addr:0x0207b420
+CARDi_TaskThread kind:function(thumb,size=0x44) addr:0x0207b420
 CARDi_Request kind:function(thumb,size=0xdc) addr:0x0207b464
 CARD_InitPulledOutCallback kind:function(thumb,size=0x20) addr:0x0207b540
 CARDi_PulledOutCallback kind:function(thumb,size=0x34) addr:0x0207b560
@@ -13095,10 +13095,10 @@ PMi_Mutex kind:bss(size=0x18) addr:0x02153914
 PMi_RegisterRequest kind:bss(size=0x28) addr:0x0215392c
 rtcInitialized kind:bss(size=0x2) addr:0x02153954
 rtcWork kind:bss(size=0x24) addr:0x02153958
-data_02153980 kind:bss addr:0x02153980
-data_021539a0 kind:bss addr:0x021539a0
-data_02153a00 kind:bss addr:0x02153a00
-data_02153b00 kind:bss addr:0x02153b00
+CARDi_EnableFlag kind:bss(size=0x4) addr:0x02153980
+cardi_arg kind:bss(size=0x60) addr:0x021539a0
+cardi_common kind:bss(size=0x220) addr:0x02153a00
+cardi_thread_stack kind:bss(size=0x400) addr:0x02153c20
 data_02154020 kind:bss addr:0x02154020
 data_02154040 kind:bss addr:0x02154040
 data_02154260 kind:bss addr:0x02154260

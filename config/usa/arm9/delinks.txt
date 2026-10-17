@@ -494,6 +494,11 @@ libs/nitrosdk/src/snd/snd_bank.c:
     complete
     .text       start:0x020768c8 end:0x02076b20
 
+libs/nitrosdk/src/card/card_common.c:
+    complete
+    .text       start:0x0207a78c end:0x0207a9d8
+    .bss        start:0x02153980 end:0x02154020
+
 libs/nitrosdk/src/rtc/rtc_api.c:
     complete
     .text       start:0x0207a244 end:0x0207a6e8
