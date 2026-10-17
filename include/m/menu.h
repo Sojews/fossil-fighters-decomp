@@ -50,6 +50,7 @@ public:
     virtual void OnDecide(MMenuItem *item);
 
     void Init();
+    void Update();
     void StateMain();
 
     void SetDeferStart(BOOL defer);

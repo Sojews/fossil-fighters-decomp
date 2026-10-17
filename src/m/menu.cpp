@@ -2,6 +2,9 @@
 // and the state functions (they load pointer-to-member constants, which can't be matched by name yet).
 
 #include "m/menu.h"
+#include "m/lcd.h"
+#include "m/input.h"
+#include "m/bg_new_task.h"
 #include "nitro/os.h"
 
 #include <stdlib.h>
@@ -301,6 +304,38 @@ void MMenu::DecideItem(MMenuItem *item) {
 
 void MMenu::Idle() {
     (this->*mState)();
+}
+
+// NONMATCHING: the pointer-to-member constant for the next state is in the TU's pooled data.
+void MMenu::Init() {
+    if (mInput == NULL) {
+        MSingleInputHub *hub = new MSingleInputHub(1);
+        if (GetDisplay() == gLcd->GetBottomDisplay()) {
+            hub->EnableTouch();
+        }
+        mInput = hub->GetInput(0);
+        mParallel.AddTail(hub);
+    }
+    mItems = new MParallelTaskSet();
+    mUnk88 = new MParallelTaskSet();
+    MTaskSet *unk88 = mUnk88;
+    MParallelTaskSet *parallel = &mParallel;
+    parallel->AddTail(mItems);
+    parallel->AddTail(unk88);
+    if (!mDeferStart) {
+        OnStart();
+    } else {
+        mParallel.SetUseMutex(TRUE);
+        mSerial.SetUseMutex(TRUE);
+        MTask *run = MTaskRunTransfer::Create(&mParallel);
+        MTask *start = MCreateBgCallTask(this, &MMenu::OnStart, 0);
+        MTask *suspend = MTaskSuspendTransfer::Create(&mParallel);
+        MSerialTaskSet *serial = &mSerial;
+        serial->AddTail(suspend);
+        serial->AddTail(start);
+        serial->AddTail(run);
+    }
+    mState = &MMenu::Update;
 }
 
 MTask *MMenu::CreateFocusItemTransfer(MMenuItem *item) {

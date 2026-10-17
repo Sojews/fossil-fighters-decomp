@@ -75,6 +75,7 @@ public:
     void Remove(MTask *task);
     void Clear();
 
+    void SetUseMutex(BOOL use) { mUseMutex = use; }
     BOOL IsEmpty() {
         MScopedLock lock(&mMutex, mUseMutex);
         return mHead == NULL;
