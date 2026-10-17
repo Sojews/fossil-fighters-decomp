@@ -19,12 +19,17 @@ public:
     BOOL PageRight();
     BOOL PageLeft();
     BOOL Buy();
+    void RefreshPage1();
+    void RefreshPage2();
+    void RefreshPage3();
 
     u32 mUnkB4[4];          // 0xB4
     std::vector<void *> mUnkC4; // 0xC4
     u32 mUnkD0[8];          // 0xD0
     std::vector<void *> mUnkF0; // 0xF0
-    u8 unkFC[0x10];
+    int mPage; // 0xFC
+    int mLastPage; // 0x100
+    u8 unk104[8];
     u8 mUnk10C; // 0x10C
 };
 

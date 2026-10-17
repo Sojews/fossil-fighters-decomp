@@ -14,6 +14,30 @@
 #include "m/display.h"
 #include "m/bright.h"
 
+#pragma auto_inline off
+
+BOOL DinoUiShopBuyMenu::PageLeft() {
+    mPage = (mPage + mLastPage) % (mLastPage + 1);
+    RefreshPage1();
+    RefreshPage2();
+    RefreshPage3();
+    return TRUE;
+}
+
+#pragma auto_inline on
+
+#pragma auto_inline off
+
+BOOL DinoUiShopBuyMenu::PageRight() {
+    mPage = (mPage + 1) % (mLastPage + 1);
+    RefreshPage1();
+    RefreshPage2();
+    RefreshPage3();
+    return TRUE;
+}
+
+#pragma auto_inline on
+
 DinoUiShopBuy::~DinoUiShopBuy() {
 }
 

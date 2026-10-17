@@ -19,6 +19,9 @@ public:
     BOOL PageRight();
     BOOL PageLeft();
     BOOL Buy();
+    void RefreshPage1();
+    void RefreshPage2();
+    void RefreshPage3();
 
     MArchivePtr mArchive;       // 0xB4
     MArchiveFile mFile;         // 0xB8
@@ -26,7 +29,10 @@ public:
     std::vector<void *> mUnkD4; // 0xD4
     u32 mUnkE0[2];              // 0xE0
     std::vector<u32> mUnkE8;    // 0xE8
-    u8 unkF4[0x28];
+    u8 unkF4[24];
+    int mPage; // 0x10C
+    int mLastPage; // 0x110
+    u8 unk114[8];
     u8 mUnk11C; // 0x11C
 };
 

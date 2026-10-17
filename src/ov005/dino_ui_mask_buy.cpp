@@ -15,6 +15,30 @@
 #include "m/display.h"
 #include "m/bright.h"
 
+#pragma auto_inline off
+
+BOOL DinoUiMaskBuyMenu::PageRight() {
+    mPage = (mPage + 1) % (mLastPage + 1);
+    RefreshPage1();
+    RefreshPage2();
+    RefreshPage3();
+    return TRUE;
+}
+
+#pragma auto_inline on
+
+#pragma auto_inline off
+
+BOOL DinoUiMaskBuyMenu::PageLeft() {
+    mPage = (mPage + mLastPage) % (mLastPage + 1);
+    RefreshPage1();
+    RefreshPage2();
+    RefreshPage3();
+    return TRUE;
+}
+
+#pragma auto_inline on
+
 DinoUiMaskBuy::~DinoUiMaskBuy() {
 }
 
