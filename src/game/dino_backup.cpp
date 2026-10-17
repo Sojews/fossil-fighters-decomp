@@ -1244,3 +1244,19 @@ BOOL DinoBackup::GetSystemFlag(u32 id) {
         return FALSE;
     }
 }
+
+void DinoBackup::SetPlayerUnk58(const DinoPlayerUnk58 *value) {
+    *mPlayer->GetUnk58() = *value;
+}
+
+void DinoBackup::GetPlayerUnk58(DinoPlayerUnk58 *value) {
+    *value = *mPlayer->GetUnk58();
+}
+
+void DinoBackup::MakeProfile(DinoPlayerProfile *profile) {
+    InitProfile(profile);
+    profile->unk7A = 0;
+    for (u32 i = 0; i < 8; i++) {
+        profile->name[i] = mPlayer->name[i];
+    }
+}

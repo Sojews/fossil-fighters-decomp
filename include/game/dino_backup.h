@@ -22,6 +22,14 @@ struct DinoEventVar {
 // The player and settings, packed in bits.
 struct DinoExcavateLevel;
 
+struct DinoPlayerUnk58 {
+    u32 unk00;
+    u32 unk04;
+    u32 unk08;
+    u32 unk0C;
+    u32 unk10;
+};
+
 struct DinoPlayerData {
     u16 name[9];                // 0x00
     // 0x14
@@ -76,11 +84,13 @@ struct DinoPlayerData {
         u32 b;
         u32 c;
     } unk4c;                    // 0x4C
-    u32 unk58;                  // 0x58
+    u32 unk58;                  // 0x58: a DinoPlayerUnk58 (kept as words so the whole struct copies the same)
     u32 unk5c;                  // 0x5C
     u32 unk60;                  // 0x60
     u32 unk64;                  // 0x64
     u32 unk68;                  // 0x68
+
+    DinoPlayerUnk58 *GetUnk58() { return (DinoPlayerUnk58 *)&unk58; }
 };
 
 // What the file select screen shows of a save.
@@ -100,6 +110,17 @@ struct DinoSaveSummary {
     u64 playFrames;     // 0x18
 };
 
+// What a player shows others in multiplayer.
+struct DinoPlayerProfile {
+    char unk00[0x66];
+    u16 name[8];        // 0x66
+    u8 unk76[2];
+    u8 unk78;           // 0x78
+    u8 unk79;
+    u8 unk7A;           // 0x7A
+    u8 unk7B[9];
+};
+
 struct DinoCharaState {
     DinoCharaState() {}
     u8 unk0;    // 0x00
@@ -110,7 +131,6 @@ struct DinoCharaState {
     u32 unk8_16 : 16;
     MFx32 x;            // 0x0C
     MFx32 y;            // 0x10
-
 };
 
 struct DinoBackupEntry {
@@ -359,6 +379,10 @@ public:
     u32 GetMaxExcavateLevelUnk0();
     void SetUnk138(u32 index, const DinoBackupEntry28 *entry);
     void GetUnk138(u32 index, DinoBackupEntry28 *entry);
+    void SetPlayerUnk58(const DinoPlayerUnk58 *value);
+    void GetPlayerUnk58(DinoPlayerUnk58 *value);
+    void InitProfile(DinoPlayerProfile *profile);
+    void MakeProfile(DinoPlayerProfile *profile);
     BOOL CanAddUnk138(const DinoBackupEntry *entry, BOOL checkDuplicate, BOOL checkCount, u32 maxCount);
     void AddUnk138(const DinoBackupEntry *entry, BOOL arg);
 
