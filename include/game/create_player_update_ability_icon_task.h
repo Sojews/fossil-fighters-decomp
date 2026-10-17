@@ -1,6 +1,7 @@
 #ifndef GAME_CREATE_PLAYER_UPDATE_ABILITY_ICON_TASK_H
 #define GAME_CREATE_PLAYER_UPDATE_ABILITY_ICON_TASK_H
 
+#include <vector>
 #include "m/menu_item.h"
 #include "m/menu.h"
 #include "m/display.h"
@@ -43,6 +44,9 @@ public:
         virtual ~AddLifePointTask();
         virtual void Execute();
     };
+
+    u32 unkA8[30];
+    std::vector<void *> mUnk120;    // 0x120
 };
 
 class ModelCretureAddLifeTask : public MTask {

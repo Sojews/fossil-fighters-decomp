@@ -7,6 +7,7 @@
 #include "game/create_player_update_ability_icon_task.h"
 #include "types.h"
 #include "game/dino_battle_user_controller.h"
+#include "game/set_status_effect_task.h"
 
 extern "C" void func_ov000_0216d1e4(void *);
 
@@ -155,4 +156,24 @@ void AddKasekiPointCreatureDie::Idle() {
     serial->AddTail(wait);
     serial->AddTail(exit);
     func_ov000_021631c0(mPlayer, (u32)(MMessageObserver *)wait);
+}
+
+extern "C" void func_ov000_0216d3c0(void *, u8, u32);
+
+SetStatusEffectTask::~SetStatusEffectTask() {
+}
+
+DinoCreatureUpdateTask::~DinoCreatureUpdateTask() {
+}
+
+DamagedUpdate::~DamagedUpdate() {
+}
+
+void DinoBattleModelCreature::Idle() {
+    Dispatch();
+}
+
+void DinoCreatureUpdateTask::Execute() {
+    func_ov000_0216d3c0((void *)mUnk10, mUnk14, mUnk18);
+    Exit();
 }
