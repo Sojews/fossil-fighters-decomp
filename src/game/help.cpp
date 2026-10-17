@@ -337,9 +337,9 @@ u32 DinoHelpCursor::GetPlaneMask() {
     return 0x10;
 }
 
-void DinoHelpCursor::SetObjMode(int mode) {
+void DinoHelpCursor::SetAnchor(int anchor) {
     for (u32 i = 0; i < 4; i++) {
-        mCorners[i]->SetObjMode(mode);
+        mCorners[i]->SetAnchor(anchor);
     }
 }
 

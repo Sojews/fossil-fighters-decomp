@@ -88,14 +88,15 @@ void MSmartOamUnit::SetPriority(int priority) {
     }
 }
 
-// NONMATCHING: the shifted anchor and the entry pointer get different registers.
 void MSmartOamUnit::SetAnchor(int anchor) {
-    u32 n = count;
-    MSmartOamEntry *entry = GetEntries();
+    MSmartOamEntry *entry;
+    u32 n;
+    n = count;
+    entry = GetEntries();
     if (n != 0) {
         do {
             n--;
-            entry->anchor = anchor;
+            entry->links = (entry->links & 0x3FFFFFFF) | (anchor << 30);
             entry++;
         } while (n != 0);
     }

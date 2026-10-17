@@ -56,6 +56,7 @@ struct MOamEntry {
         y = pos.y;
     }
     // shape: size * 4 + shape
+    int GetShape() const { return shape | (size << 2); }
     void SetShape(int shape) {
         this->shape = shape;
         size = shape >> 2;

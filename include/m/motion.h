@@ -4,8 +4,33 @@
 
 #include <string>
 #include "m/view.h"
+#include "m/smart_oam.h"
 
 class MSmartOam;
+class MPalBlock;
+class MMotionData;
+class MArchiveFile;
+
+// A shared, reference-counted handle on a loaded motion file.
+class MMotionFile {
+public:
+    MMotionFile(std::string path, int unk);
+    ~MMotionFile();
+
+    void *GetAnime(int anime, MArchiveFile *file);
+
+    MMotionData *mData; // 0x00
+};
+
+// One cell (OBJ) of a motion.
+struct MMotionCell {
+    u8 visible;         // 0x00
+    u8 unk01[7];
+    int objMode;        // 0x08
+    u32 entry;          // 0x0C: index into the motion's smart OAM entries
+    int offsetY;        // 0x10
+    u8 unk14[8];
+};
 
 class MMotion : public MView {
 public:
@@ -16,16 +41,87 @@ public:
     virtual MPoint GetPosition();
     virtual void SetSize(MPoint size);
     virtual MPoint GetSize();
+    virtual MRect GetFrame();
     virtual void SetPriority(int priority);
     virtual int GetPriority();
     virtual void Show();
     virtual void Hide();
     virtual BOOL IsHidden();
     virtual u32 GetPlaneMask();
-    virtual void Play(int anime, int frame);
-    virtual void SetObjMode(int mode);
+    virtual void Play(int anime, int flags);
+    virtual void SetAnchor(int anchor);
+    virtual int GetAnchor();
+    virtual void Unk44();
+    virtual void Unk48();
 
-    u8 mUnk10[0x7C - 0x10];
+    MSmartOamUnit *GetUnit();
+    MPalBlock *GetPalette(u32 index);
+    BOOL IsPlaying();
+    int GetAnime();
+    MTask *CreateWaitStopTask();
+    MTask *CreatePlayTransfer(int anime, int flags);
+    void SetFlip(u8 hflip, u8 vflip);
+    void *GetAnimeData(int anime);
+    void ResetAnime();
+    void Advance(u32 frames);
+
+    MDisplay *mDisplay;         // 0x10
+    MMotionFile mFile;          // 0x14
+    MSmartOam *mOam;            // 0x18
+    MSmartOamUnit *mUnit;       // 0x1C
+    MSmartOamEntry *mEntries;   // 0x20
+    u32 mCellCount;             // 0x24
+    u8 mPlaying;                // 0x28
+    u8 mHidden;                 // 0x29
+    u8 mUnk2A;                  // 0x2A
+    u8 mUnk2B;                  // 0x2B
+    u8 mUnk2C;                  // 0x2C
+    u32 mFramesLeft;            // 0x30: in the current key
+    u32 mFlags;                 // 0x34
+    int mUnk38;                 // 0x38
+    int mAnime;                 // 0x3C
+    u32 mUnk40;                 // 0x40
+    u32 mFrame;                 // 0x44: frames played
+    u32 mTime;                  // 0x48: 24.8, the fraction of a frame carried over
+    u32 mSpeed;                 // 0x4C: 24.8 frames per frame
+    u32 mUnk50;                 // 0x50
+    MPoint mPos;                // 0x54
+    MMotionCell *mCells;        // 0x5C
+    u32 mUnk60;                 // 0x60
+    void *mUnk64;               // 0x64
+    MPalBlock **mPalettes;      // 0x68
+    void *mUnk6C;               // 0x6C
+    void *mUnk70;               // 0x70
+    void *mUnk74;               // 0x74
+    struct Override {
+        MArchiveFile *unk00;
+        MArchiveFile *unk04;
+        u8 file[0xC];       // an MArchiveFile
+    } *mUnk78;              // 0x78
+};
+
+class MMotionWaitStopTask : public MTask {
+public:
+    MMotionWaitStopTask(MMotion *motion) { mMotion = motion; }
+    virtual ~MMotionWaitStopTask() {}
+    virtual void Execute();
+
+    MMotion *mMotion;   // 0x10
+};
+
+class MMotionPlayTransfer : public MTransfer {
+public:
+    MMotionPlayTransfer(MMotion *motion, int anime, int flags) {
+        mMotion = motion;
+        mAnime = anime;
+        mFlags = flags;
+    }
+    virtual ~MMotionPlayTransfer() {}
+    virtual void Transfer();
+
+    MMotion *mMotion;   // 0x10
+    int mAnime;         // 0x14
+    int mFlags;         // 0x18
 };
 
 #endif

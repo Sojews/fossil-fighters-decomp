@@ -305,8 +305,8 @@ src/m/font.cpp:
 src/m/view.cpp:
     .text       start:0x0205ea90 end:0x0205ef10
 
-src/m/motion_wait_stop_task.cpp:
-    .text       start:0x02061d68 end:0x02061d88
+src/m/motion.cpp:
+    .text       start:0x0205ef10 end:0x02061d88
 
 src/m/canvas_copy_transfer.cpp:
     .text       start:0x0206465c end:0x0206468c

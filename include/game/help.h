@@ -142,7 +142,7 @@ public:
     virtual u32 GetPlaneMask();
 
     void Layout();
-    void SetObjMode(int mode);
+    void SetAnchor(int anchor);
 
     MParallelTaskSet mTasks;    // 0x10
     MMotion *mCorners[4];       // 0x40: top left, bottom left, top right, bottom right
