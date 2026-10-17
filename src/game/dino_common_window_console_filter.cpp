@@ -8,6 +8,11 @@
 #include "m/call_task.h"
 #include "game/dino_common_window_message_box.h"
 
+DinoCommonWindowMessage::~DinoCommonWindowMessage() {
+    mSerial.Clear();
+    mParallel.Clear();
+}
+
 DinoCommonWindowConsoleFilter::~DinoCommonWindowConsoleFilter() {
 }
 

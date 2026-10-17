@@ -6,6 +6,10 @@
 
 #include "game/dino_common_yes_no_menu_item_menu.h"
 #include "game/dino_common_yes_no_menu_item.h"
+#include "game/dino_common_window_yes_no_dialog.h"
+
+DinoCommonWindowYesNoDialog::~DinoCommonWindowYesNoDialog() {
+}
 
 DinoCommonYesNoMenuItem::~DinoCommonYesNoMenuItem() {
 }

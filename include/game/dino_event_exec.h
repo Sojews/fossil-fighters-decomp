@@ -2,6 +2,7 @@
 #ifndef GAME_DINO_EVENT_EXEC_H
 #define GAME_DINO_EVENT_EXEC_H
 
+#include "game/dino_common_window_yes_no_dialog.h"
 #include "game/dino_common_tutorial_window.h"
 #include "m/task.h"
 #include "m/input.h"
@@ -415,16 +416,6 @@ public:
 class DinoEventExecChoice2 : public MProcess {
 public:
     virtual ~DinoEventExecChoice2();
-};
-
-// A yes/no question window.
-class DinoCommonWindowYesNoDialog : public MProcess {
-public:
-    DinoCommonWindowYesNoDialog(MDisplay *display, std::string text, BOOL *result);
-    virtual void Idle();
-    void SetLabels(std::string yes, std::string no);
-
-    u8 unk74[0x4C];
 };
 
 class DinoEventExecYesNo : public MProcess {
