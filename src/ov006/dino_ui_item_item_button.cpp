@@ -104,3 +104,11 @@ void DinoUiItemOKButton::OnDecide() {
     mOwner->OnOKDecided();
     DinoSoundPlaySe(0x9A, 0);
 }
+
+void DinoUiItemItemButton::OnFocusChanged(BOOL focused) {
+    if (focused) {
+        mView->Show();
+    } else {
+        mView->Hide();
+    }
+}

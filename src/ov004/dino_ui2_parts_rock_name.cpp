@@ -28,3 +28,11 @@ MDisplay *DinoUi2PartsKasekiButton::GetDisplay() {
 const char *DinoUi2PartsKasekiButton::GetText() {
     return gDinoResource->GetText(mTextId);
 }
+
+void DinoUi2PartsKasekiButton::OnFocusChanged(BOOL focused) {
+    if (focused) {
+        mView->Show();
+    } else {
+        mView->Hide();
+    }
+}

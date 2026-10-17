@@ -33,3 +33,11 @@ void DinoUi3PartsRockName::Idle() {
 
 void DinoUi3PartsFraction::Idle() {
 }
+
+void DinoUi3PartsKasekiButton::OnFocusChanged(BOOL focused) {
+    if (focused) {
+        mView->Show();
+    } else {
+        mView->Hide();
+    }
+}
