@@ -104,6 +104,28 @@ public:
 };
 
 // Keeps track of help bases, items and hooks.
+class MFont;
+class MSmartObjCanvas;
+
+// The bar on the top screen showing the selected item's help text.
+class DinoHelpStatus : public MProcess {
+public:
+    virtual ~DinoHelpStatus();
+    virtual void Idle();
+
+    void OpenStep();
+    void CloseStep();
+
+    void (DinoHelpStatus::*mState)();   // 0x74
+    class DinoHelpDriver *mDriver;      // 0x7C
+    MFont *mFont;                       // 0x80
+    MSmartObjCanvas *mCanvas;           // 0x84
+    u32 mUnk88;                         // 0x88
+    MPoint mPositions[2];               // 0x8C
+    u32 mPosition;                      // 0x9C
+    u32 mLines;                         // 0xA0: open height, in lines of 2 pixels
+};
+
 // The help cursor: four corner motions around a frame.
 class DinoHelpCursor : public MView {
 public:

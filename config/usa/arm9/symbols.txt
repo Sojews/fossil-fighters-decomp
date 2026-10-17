@@ -1903,11 +1903,11 @@ _ZN14DinoHelpStatusD1Ev kind:function(thumb,size=0x34) addr:0x0201d1b4
 _ZN14DinoHelpStatusD0Ev kind:function(thumb,size=0x38) addr:0x0201d1e8
 func_0201d220 kind:function(thumb,size=0x3d8) addr:0x0201d220
 _ZStplIcSt11char_traitsIcESaIcEESbIT_T0_T1_ERKSbIS3_S4_S5_EPKT_ kind:function(thumb,size=0x70) addr:0x0201d5f8
-func_0201d668 kind:function(thumb,size=0x20) addr:0x0201d668
+_ZN14DinoHelpStatus4IdleEv kind:function(thumb,size=0x20) addr:0x0201d668
 func_0201d688 kind:function(thumb,size=0x120) addr:0x0201d688
-func_0201d7a8 kind:function(thumb,size=0x64) addr:0x0201d7a8
+_ZN14DinoHelpStatus8OpenStepEv kind:function(thumb,size=0x64) addr:0x0201d7a8
 func_0201d80c kind:function(thumb,size=0xb0) addr:0x0201d80c
-func_0201d8bc kind:function(thumb,size=0x64) addr:0x0201d8bc
+_ZN14DinoHelpStatus9CloseStepEv kind:function(thumb,size=0x64) addr:0x0201d8bc
 _ZN12DinoHelpSignC1EP12DinoHelpItem kind:function(thumb,size=0x1c) addr:0x0201d920
 _ZN12DinoHelpSign7GetItemEv kind:function(thumb,size=0x6) addr:0x0201d93c
 _ZN12DinoHelpSign8OnDecideEv kind:function(thumb,size=0x2) addr:0x0201d944
@@ -6560,7 +6560,7 @@ data_020899dc kind:data(any) addr:0x020899dc
 data_020899e0 kind:data(any) addr:0x020899e0
 data_020899e4 kind:data(any) addr:0x020899e4
 data_020899e8 kind:data(any) addr:0x020899e8
-data_020899ec kind:data(any) addr:0x020899ec
+kHelpStatusColor kind:data(any) addr:0x020899ec
 data_020899f0 kind:data(any) addr:0x020899f0
 data_020899f4 kind:data(any) addr:0x020899f4
 data_020899f8 kind:data(any) addr:0x020899f8

@@ -6,6 +6,7 @@
 #include "m/input.h"
 #include "m/irq.h"
 #include "m/lcd.h"
+#include "m/oam_canvas.h"
 
 static DinoHelpDriver *sHelpDriver;
 static DinoHelpBase *sHelpCurrentBase;
@@ -364,4 +365,23 @@ MRect DinoHelpSign::GetFrame() {
         return frame;
     }
     return mItem->GetRect();
+}
+
+// The status bar's fill colour.
+extern const int kHelpStatusColor;
+
+void DinoHelpStatus::Idle() {
+    (this->*mState)();
+}
+
+void DinoHelpStatus::OpenStep() {
+    mLines++;
+    mCanvas->Clear();
+    mCanvas->FillRect(MRect(0, 8 - mLines / 2, 256, mLines / 2 + 8), kHelpStatusColor);
+}
+
+void DinoHelpStatus::CloseStep() {
+    mLines--;
+    mCanvas->Clear();
+    mCanvas->FillRect(MRect(0, 8 - mLines / 2, 256, mLines / 2 + 8), kHelpStatusColor);
 }
