@@ -145,7 +145,7 @@ src/m/dma.cpp:
     .text       start:0x0204fbc0 end:0x0204fc68
 
 src/m/region.cpp:
-    .text       start:0x0204fc68 end:0x020505a0
+    .text       start:0x0204fc68 end:0x020506fc
 
 src/m/irq.cpp:
     .text       start:0x020506fc end:0x020509a4

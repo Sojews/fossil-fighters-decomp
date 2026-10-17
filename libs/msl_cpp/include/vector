@@ -435,11 +435,11 @@ namespace std {
         ~__vec_deleter_helper();
 
         void construct_at_end(size_t n, const_reference x) {
-            construct_at_end(n, x, Metrowerks::int2type<Metrowerks::has_trivial_copy_ctor<T>::value>());
+            construct_at_end(n, x, Metrowerks::int2type<Metrowerks::is_trivial<T>::value>());
         }
 
         void construct_at_end(size_t n, const_reference x, Metrowerks::int2type<TAG_UNK>) {
-            for (pointer p = _Base::data_ + _Base::size_; n; n--, p++, _Base::size_++) {
+            for (pointer p = _Base::data_ + start_ + _Base::size_; n; n--, p++, _Base::size_++) {
                 _Base::alloc().construct(p, x);
             }
         }

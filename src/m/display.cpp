@@ -238,6 +238,13 @@ void MLcd::OnVSync() {
     VSync();
 }
 
+void MLcd::VSyncNow() {
+    if (OS_GetCurrentThread() == gLooper->GetThread()) {
+        OS_WaitIrq(TRUE, 1);
+        VSync();
+    }
+}
+
 BOOL MLcd::IsBankUsed(int bank) {
     return mBankUsed[bank];
 }

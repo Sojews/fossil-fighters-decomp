@@ -40,6 +40,8 @@ public:
     u32 GetBankAddress(int bank);
     void UseBanks(const void *config, MVramBanks *out);
     void FreeBanks(MVramBanks *banks);
+    // Waits for the next VBlank and applies the settings now, if called on the looper's thread.
+    void VSyncNow();
     void VSync();
     void StartCapture(int mode, int srcA, int srcB, int size, int readOffset, int bank, int writeOffset, int eva,
                       int evb);
