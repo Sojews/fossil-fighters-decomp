@@ -6,6 +6,10 @@
 
 #include "game/dino_battle_view_ability_menu_bg.h"
 #include "types.h"
+#include "game/dino_battle_view_ui_ability_menu_item.h"
 
 DinoBattleViewAbilityMenuBG::~DinoBattleViewAbilityMenuBG() {
+}
+
+void DinoBattleViewUiAbilityMenuItem::OnDecide() {
 }

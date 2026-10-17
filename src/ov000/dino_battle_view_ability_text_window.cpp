@@ -6,6 +6,11 @@
 
 #include "game/dino_battle_view_ability_text_window.h"
 #include "types.h"
+#include "game/dino_battle_view_ability_menu_bg.h"
 
 DinoBattleViewAbilityTextWindow::~DinoBattleViewAbilityTextWindow() {
+}
+
+void DinoBattleViewAbilityMenuBG::Idle() {
+    (this->*mState)();
 }

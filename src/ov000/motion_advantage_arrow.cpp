@@ -33,3 +33,6 @@ SetTutorialMotionArrorTask::~SetTutorialMotionArrorTask() {
 
 SetTutorialMotionRectTask::~SetTutorialMotionRectTask() {
 }
+
+void DinoBattleViewTutorialMotion::Idle() {
+}

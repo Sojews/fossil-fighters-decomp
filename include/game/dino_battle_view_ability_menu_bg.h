@@ -14,6 +14,9 @@ class DinoBattleViewAbilityMenuBG : public MProcess {
 public:
     virtual ~DinoBattleViewAbilityMenuBG();
     virtual void Idle();
+
+    u8 unk74[0x4C];
+    void (DinoBattleViewAbilityMenuBG::*mState)(); // 0xC0
 };
 
 #endif

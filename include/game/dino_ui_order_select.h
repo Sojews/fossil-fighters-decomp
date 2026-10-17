@@ -1,6 +1,8 @@
 #ifndef GAME_DINO_UI_ORDER_SELECT_H
 #define GAME_DINO_UI_ORDER_SELECT_H
 
+#include "game/dino_resource.h"
+#include "m/motion.h"
 #include <string>
 
 #include "m/menu_item.h"
@@ -29,6 +31,10 @@ public:
     virtual MRect GetRect();
     virtual MDisplay *GetDisplay();
     virtual const char *GetText();
+
+    u8 unk94[0x4];
+    MMotion *mMotion;   // 0x98
+    u32 mTextId;        // 0x9C
 };
 
 class DinoUiOrderSelectBackButton : public DinoUiOrderSelectMenuItem {

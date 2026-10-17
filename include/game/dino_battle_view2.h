@@ -1,6 +1,8 @@
 #ifndef GAME_DINO_BATTLE_VIEW2_H
 #define GAME_DINO_BATTLE_VIEW2_H
 
+#include "game/dino_resource.h"
+#include "m/motion.h"
 #include "m/menu_item.h"
 #include "m/menu.h"
 #include "m/display.h"
@@ -45,6 +47,9 @@ class DinoBattleViewGivingUpMenu : public MProcess {
 public:
     virtual ~DinoBattleViewGivingUpMenu();
     virtual void Idle();
+
+    u8 unk74[0x4];
+    void (DinoBattleViewGivingUpMenu::*mState)(); // 0x78
 };
 
 class MotionDisableHelp : public MMotion, public DinoHelpBase {
@@ -85,6 +90,11 @@ public:
     virtual MRect GetRect();
     virtual MDisplay *GetDisplay();
     virtual const char *GetText();
+
+    u8 unk94[0x4];
+    MMotion *mMotion;   // 0x98
+    u8 unk9C[0x4];
+    u32 mTextId;        // 0xA0
 };
 
 class MenuExitTask : public MTask {

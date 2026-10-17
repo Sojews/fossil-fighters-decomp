@@ -1,6 +1,8 @@
 #ifndef GAME_DINO_UI_TEAM_SELECT_H
 #define GAME_DINO_UI_TEAM_SELECT_H
 
+#include "m/view.h"
+#include "game/dino_resource.h"
 #include "m/menu_item.h"
 #include "m/menu.h"
 #include "m/display.h"
@@ -34,6 +36,10 @@ public:
     virtual MRect GetRect();
     virtual MDisplay *GetDisplay();
     virtual const char *GetText();
+
+    u8 unk94[12];
+    MView *mView; // 0xA0
+    u32 mTextId;        // 0xA4
 };
 
 #endif

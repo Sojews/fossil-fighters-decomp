@@ -15,6 +15,9 @@ public:
     virtual ~DinoUiMuseumInformationMenu();
     virtual void OnStart();
     virtual void OnIdle();
+    void OnBackDecided();
+    void PageRight();
+    void PageLeft();
 };
 
 #endif

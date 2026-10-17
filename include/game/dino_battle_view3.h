@@ -20,6 +20,8 @@ class DinoBattleViewDecideFirstAttackTeam : public MProcess {
 public:
     virtual ~DinoBattleViewDecideFirstAttackTeam();
     virtual void Idle();
+
+    void (DinoBattleViewDecideFirstAttackTeam::*mState)(); // 0x74
 };
 
 #endif

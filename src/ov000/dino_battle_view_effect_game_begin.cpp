@@ -12,3 +12,7 @@ DinoBattleViewEffectGameBeginPlayerNamePanel::~DinoBattleViewEffectGameBeginPlay
 
 DinoBattleViewEffectGameBegin::~DinoBattleViewEffectGameBegin() {
 }
+
+void DinoBattleViewEffectGameBegin::Idle() {
+    (this->*mState)();
+}

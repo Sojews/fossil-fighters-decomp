@@ -1,6 +1,8 @@
 #ifndef GAME_DINO_UI_MUSEUM_H
 #define GAME_DINO_UI_MUSEUM_H
 
+#include "game/dino_resource.h"
+#include "m/motion.h"
 #include "m/menu_item.h"
 #include "m/menu.h"
 #include "m/display.h"
@@ -30,6 +32,10 @@ public:
     virtual MRect GetRect();
     virtual MDisplay *GetDisplay();
     virtual const char *GetText();
+
+    u8 unk94[0x4];
+    MMotion *mMotion;   // 0x98
+    u32 mTextId;        // 0x9C
 };
 
 class DinoUiMuseumBackButton : public DinoUiMuseumMenuItem {
@@ -57,6 +63,8 @@ public:
     virtual void Idle();
 };
 
+class DinoUiMuseumInformationMenu;
+
 class DinoUiMuseumInformationMenuItem : public MMenuItem, public DinoHelpItem {
 public:
     virtual ~DinoUiMuseumInformationMenuItem();
@@ -66,6 +74,10 @@ public:
     virtual MRect GetRect();
     virtual MDisplay *GetDisplay();
     virtual const char *GetText();
+
+    DinoUiMuseumInformationMenu *mOwner; // 0x94
+    MMotion *mMotion;   // 0x98
+    u32 mTextId;        // 0x9C
 };
 
 class DinoUiMuseumInformationBackButton : public DinoUiMuseumInformationMenuItem {

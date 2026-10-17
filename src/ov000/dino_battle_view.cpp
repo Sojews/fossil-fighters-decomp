@@ -27,3 +27,15 @@ DinoBattleHelpCreatureInfo::~DinoBattleHelpCreatureInfo() {
 
 DinoFrameItem::~DinoFrameItem() {
 }
+
+void DinoBattleHelpBase::Idle() {
+}
+
+void DinoBattleViewCancelMenuItem::OnDecide() {
+}
+
+void DinoBattleViewInfoLRItem::OnDecide() {
+}
+
+void DinoBattleViewUiRootMenuItem::OnDecide() {
+}

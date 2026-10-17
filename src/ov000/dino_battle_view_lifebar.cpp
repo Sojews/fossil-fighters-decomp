@@ -21,3 +21,6 @@ LifebarShowTask::~LifebarShowTask() {
 
 LifebarCoordAnime::~LifebarCoordAnime() {
 }
+
+void LifeMotion::Idle() {
+}

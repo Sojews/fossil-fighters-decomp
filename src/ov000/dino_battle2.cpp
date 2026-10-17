@@ -15,3 +15,6 @@ DBViewFocusLCDFrameTask::~DBViewFocusLCDFrameTask() {
 
 DinoBattleTalkWindow::~DinoBattleTalkWindow() {
 }
+
+void DinoBattleViewFocusLCDFrame::Idle() {
+}

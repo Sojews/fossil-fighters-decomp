@@ -14,6 +14,8 @@ class DinoBattleViewEffectTelop : public MProcess {
 public:
     virtual ~DinoBattleViewEffectTelop();
     virtual void Idle();
+
+    void (DinoBattleViewEffectTelop::*mState)(); // 0x74
 };
 
 class SetBGModeTask : public MTask {

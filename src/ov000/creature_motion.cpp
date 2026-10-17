@@ -36,3 +36,9 @@ SetColorMaskTask::~SetColorMaskTask() {
 
 ShuffleMoveTask::~ShuffleMoveTask() {
 }
+
+void EffectMotionTask::Idle() {
+}
+
+void NopTask::Execute() {
+}

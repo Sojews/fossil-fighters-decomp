@@ -21,3 +21,6 @@ ViewStatusEffectIconLoadMotionTask::~ViewStatusEffectIconLoadMotionTask() {
 
 ViewStatusEffectIconShowTask::~ViewStatusEffectIconShowTask() {
 }
+
+void ViewStatusEffectIcon::Idle() {
+}

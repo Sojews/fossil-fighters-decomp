@@ -14,6 +14,8 @@ class DinoBattleView3DCamera : public MProcess {
 public:
     virtual ~DinoBattleView3DCamera();
     virtual void Idle();
+
+    void (DinoBattleView3DCamera::*mState)(); // 0x74
 };
 
 #endif

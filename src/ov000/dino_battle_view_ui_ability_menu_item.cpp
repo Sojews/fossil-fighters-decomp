@@ -21,3 +21,6 @@ MenuEnableTask::~MenuEnableTask() {
 
 DinAttackItemHelp::~DinAttackItemHelp() {
 }
+
+void AttackMenuBarMotion::Idle() {
+}

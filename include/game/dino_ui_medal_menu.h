@@ -2,6 +2,7 @@
 #ifndef GAME_DINO_UI_MEDAL_MENU_H
 #define GAME_DINO_UI_MEDAL_MENU_H
 
+#include "game/dino_resource.h"
 #include <vector>
 #include "m/menu.h"
 #include "m/motion.h"
@@ -14,6 +15,7 @@ public:
     virtual void OnIdle();
     virtual void OnFocus(MMenuItem *item);
     virtual void OnDecide(MMenuItem *item);
+    void OnBackDecided();
 
     u32 mUnkB4[58];                     // 0xB4
     std::vector<void *> mUnk19C;        // 0x19C
@@ -33,13 +35,19 @@ public:
     virtual MRect GetRect();
     virtual MDisplay *GetDisplay();
     virtual const char *GetText();
+
+    u32 mTextId;        // 0x94
 };
 
 class DinoUiMedalList : public MProcess {
 public:
     virtual ~DinoUiMedalList();
     virtual void Idle();
+
+    void (DinoUiMedalList::*mState)(); // 0x74
 };
+
+class DinoUiMedalMenu;
 
 class DinoUiMedalMenuItem : public MMenuItem, public DinoHelpItem {
 public:
@@ -48,6 +56,10 @@ public:
     virtual MRect GetRect();
     virtual MDisplay *GetDisplay();
     virtual const char *GetText();
+
+    DinoUiMedalMenu *mOwner; // 0x94
+    MMotion *mMotion;   // 0x98
+    u32 mTextId;        // 0x9C
 };
 
 class DinoUiMedalBackButton : public DinoUiMedalMenuItem {

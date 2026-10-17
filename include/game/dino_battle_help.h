@@ -1,6 +1,7 @@
 #ifndef GAME_DINO_BATTLE_HELP_H
 #define GAME_DINO_BATTLE_HELP_H
 
+#include "game/dino_resource.h"
 #include "m/menu_item.h"
 #include "m/menu.h"
 #include "m/display.h"
@@ -17,6 +18,9 @@ public:
     virtual MRect GetRect();
     virtual MDisplay *GetDisplay();
     virtual const char *GetText();
+
+    u8 unk80[0x10];
+    u32 mTextId;        // 0x90
 };
 
 class DinoBattleHelpSupport : public DinoBattleHelpBase {

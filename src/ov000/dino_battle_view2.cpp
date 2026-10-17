@@ -39,3 +39,32 @@ WaitEnableRootMenu::~WaitEnableRootMenu() {
 
 DinoBattleViewAbilityIcon::~DinoBattleViewAbilityIcon() {
 }
+
+void DinoBattleViewUiRootSelectItem::OnDecide() {
+}
+
+void DinoBattleViewCreatureAttackIcon::OnFocusChanged(BOOL value) {
+}
+
+void DinoBattleViewCreatureAttackIcon::OnDecide() {
+}
+
+MRect DinoBattleViewUiRootSelectItem::GetRect() {
+    return GetFrame();
+}
+
+MDisplay *DinoBattleViewUiRootSelectItem::GetDisplay() {
+    return MProcess::GetDisplay();
+}
+
+MRect DinoBattleViewUiRootSelectItem::GetFrame() {
+    return mMotion->GetFrame();
+}
+
+const char *DinoBattleViewUiRootSelectItem::GetText() {
+    return gDinoResource->GetText(mTextId);
+}
+
+void DinoBattleViewGivingUpMenu::Idle() {
+    (this->*mState)();
+}

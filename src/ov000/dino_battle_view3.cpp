@@ -12,3 +12,10 @@ DinoBattleViewLPCountPanel::~DinoBattleViewLPCountPanel() {
 
 DinoBattleViewDecideFirstAttackTeam::~DinoBattleViewDecideFirstAttackTeam() {
 }
+
+void DinoBattleViewLPCountPanel::Idle() {
+}
+
+void DinoBattleViewDecideFirstAttackTeam::Idle() {
+    (this->*mState)();
+}

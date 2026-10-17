@@ -33,3 +33,60 @@ SetFocusTask::~SetFocusTask() {
 
 PageChangeTask::~PageChangeTask() {
 }
+
+void DinoKBBackButton::OnSelectChanged(BOOL value) {
+}
+
+void DinoUiKeyboardHideMenuItem::OnDecide() {
+}
+
+void DinoUiKeyboardHideMenuItem::OnSelectChanged(BOOL value) {
+}
+
+void DinoUiKeyboardHideMenuItem::OnFocusChanged(BOOL value) {
+}
+
+void DinoUiKeyboardMenuItem::OnSelectChanged(BOOL value) {
+}
+
+void DinoUiKeyboardMenuItem::OnFocusChanged(BOOL value) {
+}
+
+void KasekiPictCache::Idle() {
+}
+
+MRect DinoKBBackButton::GetRect() {
+    return GetFrame();
+}
+
+MRect DinoUiKeyboardMenuItem::GetRect() {
+    return GetFrame();
+}
+
+MDisplay *DinoKBBackButton::GetDisplay() {
+    return MProcess::GetDisplay();
+}
+
+MDisplay *DinoUiKeyboardMenuItem::GetDisplay() {
+    return MProcess::GetDisplay();
+}
+
+MRect DinoKBBackButton::GetFrame() {
+    return mMotion->GetFrame();
+}
+
+void DinoKBBackButton::OnFocusChanged(BOOL focused) {
+    if (focused) {
+        mMotion->Play(3, 1);
+    } else {
+        mMotion->Play(2, 1);
+    }
+}
+
+const char *DinoKBBackButton::GetText() {
+    return gDinoResource->GetText(mTextId);
+}
+
+const char *DinoUiKeyboardMenuItem::GetText() {
+    return gDinoResource->GetText(mTextId);
+}

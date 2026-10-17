@@ -20,6 +20,8 @@ class DinoBattleViewEffectGameBegin : public MProcess {
 public:
     virtual ~DinoBattleViewEffectGameBegin();
     virtual void Idle();
+
+    void (DinoBattleViewEffectGameBegin::*mState)(); // 0x74
 };
 
 #endif

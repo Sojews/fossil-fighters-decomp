@@ -24,3 +24,10 @@ SkipLoseTelopTask::~SkipLoseTelopTask() {
 
 NopWaitTask::~NopWaitTask() {
 }
+
+void NopWaitTask::Execute() {
+}
+
+void DinoBattleViewEffectTelop::Idle() {
+    (this->*mState)();
+}

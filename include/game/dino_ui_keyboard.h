@@ -1,6 +1,8 @@
 #ifndef GAME_DINO_UI_KEYBOARD_H
 #define GAME_DINO_UI_KEYBOARD_H
 
+#include "game/dino_resource.h"
+#include "m/motion.h"
 #include "m/menu_item.h"
 #include "m/menu.h"
 #include "m/display.h"
@@ -43,6 +45,9 @@ public:
     virtual MRect GetRect();
     virtual MDisplay *GetDisplay();
     virtual const char *GetText();
+
+    u8 unk94[0x2C];
+    u32 mTextId;        // 0xC0
 };
 
 class DinoUiKeyboardHideMenuItem : public KeyboardMenuItem {
@@ -63,6 +68,10 @@ public:
     virtual MRect GetRect();
     virtual MDisplay *GetDisplay();
     virtual const char *GetText();
+
+    u8 unk94[0x28];
+    MMotion *mMotion;   // 0xBC
+    u32 mTextId;        // 0xC0
 };
 
 class SetFocusTask : public MTask {

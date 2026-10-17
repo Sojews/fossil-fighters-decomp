@@ -6,6 +6,7 @@
 
 #include "game/camera_load_task.h"
 #include "types.h"
+#include "game/dino_battle_view_3d_camera.h"
 
 CameraLoadTask::~CameraLoadTask() {
 }
@@ -20,4 +21,8 @@ CameraPauseTask::~CameraPauseTask() {
 }
 
 CameraSetDefParentTask::~CameraSetDefParentTask() {
+}
+
+void DinoBattleView3DCamera::Idle() {
+    (this->*mState)();
 }

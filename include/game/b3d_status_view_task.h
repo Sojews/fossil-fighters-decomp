@@ -14,6 +14,9 @@ class B3DStatusViewTask : public MProcess {
 public:
     virtual ~B3DStatusViewTask();
     virtual void Idle();
+
+    u8 unk74[0x14];
+    void (B3DStatusViewTask::*mState)(); // 0x88
 };
 
 class LoadWinnerLoad : public MProcess {

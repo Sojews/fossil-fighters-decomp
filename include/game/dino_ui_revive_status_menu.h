@@ -1,6 +1,8 @@
 #ifndef GAME_DINO_UI_REVIVE_STATUS_MENU_H
 #define GAME_DINO_UI_REVIVE_STATUS_MENU_H
 
+#include "game/dino_resource.h"
+#include "m/motion.h"
 #include <string>
 #include "m/menu_item.h"
 #include "m/menu.h"
@@ -27,6 +29,7 @@ public:
     virtual void OnStart();
     virtual void OnFocus(MMenuItem *item);
     virtual void OnDecide(MMenuItem *item);
+    void OnBackDecided();
 
     u8 unkB3[0x71];
     MArchivePtr mArchive;   // 0x124
@@ -51,6 +54,8 @@ public:
     virtual void Idle();
 };
 
+class DinoUiReviveStatusMenu;
+
 class DinoUiReviveStatusMenuItem : public MMenuItem, public DinoHelpItem {
 public:
     virtual ~DinoUiReviveStatusMenuItem();
@@ -58,6 +63,10 @@ public:
     virtual MRect GetRect();
     virtual MDisplay *GetDisplay();
     virtual const char *GetText();
+
+    DinoUiReviveStatusMenu *mOwner; // 0x94
+    MMotion *mMotion;   // 0x98
+    u32 mTextId;        // 0x9C
 };
 
 class DinoUiReviveStatusBackButton : public DinoUiReviveStatusMenuItem {

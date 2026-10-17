@@ -12,3 +12,7 @@ B3DStatusViewTask::~B3DStatusViewTask() {
 
 LoadWinnerLoad::~LoadWinnerLoad() {
 }
+
+void B3DStatusViewTask::Idle() {
+    (this->*mState)();
+}

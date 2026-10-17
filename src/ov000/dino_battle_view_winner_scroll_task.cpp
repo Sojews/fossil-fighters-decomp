@@ -6,6 +6,18 @@
 
 #include "game/dino_battle_view_winner_scroll_task.h"
 #include "types.h"
+#include "game/motion_advantage_arrow.h"
+#include "game/dino_battle_view_field.h"
 
 DinoBattleViewWinnerScrollTask::~DinoBattleViewWinnerScrollTask() {
+}
+
+void DinoBattleViewLCDFader::Idle() {
+}
+
+void DinoBattleViewTutorialRect::Idle() {
+}
+
+void DinoBattleViewField::Idle() {
+    Dispatch();
 }

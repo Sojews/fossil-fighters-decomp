@@ -20,12 +20,16 @@ class UseCreatureSelect : public MProcess {
 public:
     virtual ~UseCreatureSelect();
     virtual void Idle();
+
+    void (UseCreatureSelect::*mState)(); // 0x74
 };
 
 class PlayerLevelSelect : public MProcess {
 public:
     virtual ~PlayerLevelSelect();
     virtual void Idle();
+
+    void (PlayerLevelSelect::*mState)(); // 0x74
 };
 
 class IncValTask : public MTask {

@@ -12,3 +12,11 @@ DinoBattleHelpBase::~DinoBattleHelpBase() {
 
 DinoBattleHelpSupport::~DinoBattleHelpSupport() {
 }
+
+MDisplay *DinoBattleHelpBase::GetDisplay() {
+    return MProcess::GetDisplay();
+}
+
+const char *DinoBattleHelpBase::GetText() {
+    return gDinoResource->GetText(mTextId);
+}

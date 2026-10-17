@@ -21,3 +21,14 @@ IncValTask::~IncValTask() {
 
 TimeCountTask::~TimeCountTask() {
 }
+
+void TimeCountTask::Idle() {
+}
+
+void UseCreatureSelect::Idle() {
+    (this->*mState)();
+}
+
+void PlayerLevelSelect::Idle() {
+    (this->*mState)();
+}

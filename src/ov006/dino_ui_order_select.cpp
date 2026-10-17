@@ -18,3 +18,35 @@ DinoUiOrderSelectBackButton::~DinoUiOrderSelectBackButton() {
 
 DinoUiOrderSelectDecideButton::~DinoUiOrderSelectDecideButton() {
 }
+
+MRect DinoUiOrderSelectMenuItem::GetRect() {
+    return GetFrame();
+}
+
+MDisplay *DinoUiOrderSelectMenuItem::GetDisplay() {
+    return MProcess::GetDisplay();
+}
+
+MRect DinoUiOrderSelectMenuItem::GetFrame() {
+    return mMotion->GetFrame();
+}
+
+void DinoUiOrderSelectBackButton::OnFocusChanged(BOOL focused) {
+    if (focused) {
+        mMotion->Play(3, 0);
+    } else {
+        mMotion->Play(2, 0);
+    }
+}
+
+void DinoUiOrderSelectMenuItem::OnFocusChanged(BOOL focused) {
+    if (focused) {
+        mMotion->Play(2, 0);
+    } else {
+        mMotion->Play(1, 0);
+    }
+}
+
+const char *DinoUiOrderSelectMenuItem::GetText() {
+    return gDinoResource->GetText(mTextId);
+}

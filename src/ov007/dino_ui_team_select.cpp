@@ -15,3 +15,29 @@ DinoUiTeamSelect::~DinoUiTeamSelect() {
 
 DinoUiTeamSelectTeamButton::~DinoUiTeamSelectTeamButton() {
 }
+
+void DinoUiTeamSelectMenu::OnIdle() {
+}
+
+void DinoUiTeamSelectTeamButton::OnDecide() {
+}
+
+MRect DinoUiTeamSelectTeamButton::GetRect() {
+    return GetFrame();
+}
+
+MDisplay *DinoUiTeamSelectTeamButton::GetDisplay() {
+    return MProcess::GetDisplay();
+}
+
+const char *DinoUiTeamSelectTeamButton::GetText() {
+    return gDinoResource->GetText(mTextId);
+}
+
+void DinoUiTeamSelectTeamButton::OnFocusChanged(BOOL focused) {
+    if (focused) {
+        mView->Show();
+    } else {
+        mView->Hide();
+    }
+}
