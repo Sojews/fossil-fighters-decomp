@@ -15,7 +15,7 @@ src/ov006/dino_ui_parts_tab_icon_menu_item.cpp:
     .text       start:0x02173278 end:0x02174e90
 
 src/ov006/dino_ui_container_menu_item.cpp:
-    .text       start:0x02176170 end:0x02176b98
+    .text       start:0x02176170 end:0x02176f8c
 
 src/ov006/dino_ui_rv_status_menu_item.cpp:
     .text       start:0x0217f330 end:0x02181308

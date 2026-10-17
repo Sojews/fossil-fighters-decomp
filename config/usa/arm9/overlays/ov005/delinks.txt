@@ -12,7 +12,7 @@ src/ov005/dino_ui3_parts_fraction.cpp:
     .text       start:0x021571fc end:0x021572e4
 
 src/ov005/dino_ui_shop_sell.cpp:
-    .text       start:0x021582cc end:0x02158f24
+    .text       start:0x021582cc end:0x02159318
 
 src/ov005/dino_ui_shop_buy.cpp:
     .text       start:0x0215a018 end:0x0215b11c

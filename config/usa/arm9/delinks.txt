@@ -225,7 +225,7 @@ src/game/m_polygon_char.cpp:
     .text       start:0x020292ac end:0x020292e0
 
 src/game/dino_common_window_menu_item_flush_task.cpp:
-    .text       start:0x0202e450 end:0x0202ee58
+    .text       start:0x0202e450 end:0x0202f204
 
 src/game/dino_common_window_console_filter.cpp:
     .text       start:0x0202fa18 end:0x0203047c
