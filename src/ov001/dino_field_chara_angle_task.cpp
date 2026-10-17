@@ -48,6 +48,26 @@ DinoFieldSpotIn::~DinoFieldSpotIn() {
     gLcd->GetBottomDisplay()->mBright->Reset();
 }
 
+DinoFieldWhiteOut::~DinoFieldWhiteOut() {
+    gLcd->GetTopDisplay()->mBright->SetFactor(16);
+    gLcd->GetBottomDisplay()->mBright->SetFactor(16);
+}
+
+DinoFieldWhiteIn::~DinoFieldWhiteIn() {
+    gLcd->GetTopDisplay()->mBright->Reset();
+    gLcd->GetBottomDisplay()->mBright->Reset();
+}
+
+DinoFieldBlackOut::~DinoFieldBlackOut() {
+    gLcd->GetTopDisplay()->mBright->SetFactor(16);
+    gLcd->GetBottomDisplay()->mBright->SetFactor(16);
+}
+
+DinoFieldBlackIn::~DinoFieldBlackIn() {
+    gLcd->GetTopDisplay()->mBright->Reset();
+    gLcd->GetBottomDisplay()->mBright->Reset();
+}
+
 // Template task instances the game emits in this file. Until the code that makes the tasks is decompiled, they are
 // instantiated explicitly.
 template class MCallTask0<MPolygonChar, MPolygonChar>;

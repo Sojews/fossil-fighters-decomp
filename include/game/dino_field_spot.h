@@ -16,4 +16,28 @@ public:
     virtual void Idle();
 };
 
+class DinoFieldWhiteOut : public MProcess {
+public:
+    virtual ~DinoFieldWhiteOut();
+    virtual void Idle();
+};
+
+class DinoFieldWhiteIn : public MProcess {
+public:
+    virtual ~DinoFieldWhiteIn();
+    virtual void Idle();
+};
+
+class DinoFieldBlackOut : public MProcess {
+public:
+    virtual ~DinoFieldBlackOut();
+    virtual void Idle();
+};
+
+class DinoFieldBlackIn : public MProcess {
+public:
+    virtual ~DinoFieldBlackIn();
+    virtual void Idle();
+};
+
 #endif
