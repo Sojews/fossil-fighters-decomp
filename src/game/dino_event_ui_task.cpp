@@ -1,6 +1,11 @@
 // SetEpisodeTask, DinoEventFieldMenu, DinoEventMedalList, DinoEventDebugMenu, DinoEventSaveOption, DinoEventSave, DinoEventATM, DinoEventNameEntry, DinoEventSenryuEntry, DinoEventSenryuListEntry, DinoEventShopBuy, DinoEventShopSell, DinoEventShopMask, DinoEventMaskEquip, DinoEventLicenseCard, DinoEventEnding, DinoEventMuseum, DinoEventReviveEffectCaller.
 // Only the destructors are decompiled so far.
 
+// Derived destructors have their bases' destructor bodies inlined; auto-inlining the ones defined above does that.
+#pragma auto_inline on
+
+#define DINO_EVENT_UI_TASK_OWNER
+#define DINO_EVENT_CAPTURE_FADE_UI_TASK_OWNER
 #include "game/set_episode_task.h"
 #include "game/dino_event_field_menu.h"
 #include "game/dino_event_medal_list.h"
@@ -25,6 +30,13 @@
 #include "game/dino_event_capture_fade_ui_task.h"
 #include "m/bg_new_task.h"
 #include "m/call_task.h"
+#include "game/dino_event_ui_task.h"
+
+DinoEventUiTask::~DinoEventUiTask() {
+}
+
+DinoEventCaptureFadeUiTask::~DinoEventCaptureFadeUiTask() {
+}
 
 SetEpisodeTask::~SetEpisodeTask() {
 }
