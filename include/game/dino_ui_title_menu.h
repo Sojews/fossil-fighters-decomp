@@ -21,7 +21,9 @@ public:
     virtual void Execute();
     virtual void Idle();
 
-    u8 unk74[0x34];
+    u8 unk74[4];
+    void (DinoUiOpening::*mState)(); // 0x78
+    u8 unk80[40];
     std::vector<void *> mUnkA8; // 0xA8
 };
 

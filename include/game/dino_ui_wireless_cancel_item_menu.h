@@ -111,7 +111,8 @@ public:
     virtual ~DinoUiWirelessMatch();
     virtual void Idle();
 
-    u32 mUnk74[10];     // 0x74
+    void (DinoUiWirelessMatch::*mState)(); // 0x74
+    u32 mUnk7C[8];
     MTask *mUnk9C;      // 0x9C
 };
 

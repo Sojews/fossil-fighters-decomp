@@ -15,7 +15,8 @@ public:
     virtual ~DinoMpGame();
     virtual void Idle();
 
-    u32 mUnk74[5];              // 0x74
+    void (DinoMpGame::*mState)(); // 0x74
+    u32 mUnk7C[3];
     DinoHelpDisabler mDisabler; // 0x88
 };
 

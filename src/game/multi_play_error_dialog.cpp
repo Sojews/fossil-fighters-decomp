@@ -16,3 +16,7 @@ void MultiPlayErrorDialog::Idle() {
 
 DinoMpGame::~DinoMpGame() {
 }
+
+void DinoMpGame::Idle() {
+    (this->*mState)();
+}

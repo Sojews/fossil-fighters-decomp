@@ -2092,3 +2092,7 @@ DinoEventExecBattle::~DinoEventExecBattle() {
 
 DinoEventExecStartPatrol::~DinoEventExecStartPatrol() {
 }
+
+void DinoEventExecBattle::Idle() {
+    (this->*mState)();
+}

@@ -1138,7 +1138,8 @@ public:
     virtual ~DinoEventExecBattle();
     virtual void Idle();
 
-    u32 mUnk74[70];                 // 0x74
+    void (DinoEventExecBattle::*mState)(); // 0x74
+    u32 mUnk7C[68];
     std::vector<void *> mUnk18C;    // 0x18C
     std::vector<void *> mUnk198;    // 0x198
 };

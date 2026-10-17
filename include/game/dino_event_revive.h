@@ -11,7 +11,8 @@ public:
     virtual ~DinoEventRevive();
     virtual void Idle();
 
-    u32 mUnk74[21];             // 0x74
+    void (DinoEventRevive::*mState)(); // 0x74
+    u32 mUnk7C[19];
     MArchivePtr mArchive;       // 0xC8
     MArchiveFile mFile;         // 0xCC
     u32 mUnkD8[2];              // 0xD8
