@@ -7,6 +7,8 @@
 #include "m/menu.h"
 #include "game/help.h"
 
+class DinoCommonYesNoMenuItem;
+
 class DinoCommonYesNoMenu : public MMenu, public DinoHelpBase {
 public:
     virtual ~DinoCommonYesNoMenu();
@@ -14,8 +16,10 @@ public:
     virtual void OnFocus(MMenuItem *item);
     virtual void OnDecide(MMenuItem *item);
 
-    u32 mUnkB4[3];          // 0xB4
-    std::string mUnkC0;     // 0xC0
+    u32 mUnkB4[2];                  // 0xB4
+    DinoCommonYesNoMenuItem *mYes;  // 0xBC
+    std::string mUnkC0;             // 0xC0
+    BOOL *mResult;                  // 0xCC
 };
 
 #endif

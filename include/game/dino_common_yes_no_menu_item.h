@@ -15,9 +15,11 @@ public:
     virtual MRect GetFrame();
     virtual void OnFocusChanged(BOOL focused);
     virtual void OnDecide();
+    MMotion *GetMotion();
 
     MMotion *mMotion;   // 0x94
-    u8 unk98[0x4];
+    u8 mIsYes;          // 0x98
+    u8 unk99[3];
     u32 mTextId;        // 0x9C
 };
 

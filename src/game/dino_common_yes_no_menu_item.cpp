@@ -28,3 +28,37 @@ const char *DinoCommonYesNoMenuItem::GetText() {
 MRect DinoCommonYesNoMenuItem::GetRect() {
     return GetFrame();
 }
+
+void DinoCommonYesNoMenuItem::OnFocusChanged(BOOL focused) {
+    if (focused) {
+        mMotion->Play(mIsYes ? 1 : 4, 0);
+    } else {
+        mMotion->Play(mIsYes ? 2 : 5, 0);
+    }
+}
+
+#pragma auto_inline off
+
+MMotion *DinoCommonYesNoMenuItem::GetMotion() {
+    return mMotion;
+}
+
+#pragma auto_inline on
+
+void DinoCommonYesNoMenu::OnFocus(MMenuItem *item) {
+    DinoHelpItem *help = dynamic_cast<DinoHelpItem *>(item);
+    if (help) {
+        SetSelectedItem(help);
+    }
+}
+
+void DinoCommonYesNoMenu::OnDecide(MMenuItem *item) {
+    DinoCommonYesNoMenuItem *decided = static_cast<DinoCommonYesNoMenuItem *>(item);
+    mSerial.AddTail(decided->GetMotion()->CreateWaitStopTask());
+    Disable();
+    if (mResult) {
+        *mResult = item == mYes;
+        mSerial.AddTail(MTaskExitTransfer::Create(this));
+    }
+}
+
