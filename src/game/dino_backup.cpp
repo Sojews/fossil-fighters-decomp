@@ -6,6 +6,7 @@
 #include "m/backup.h"
 #include "m/irq.h"
 #include "m/heap.h"
+#include "m/lcd.h"
 #include "m/seed_generator.h"
 #include "m/serializer.h"
 #include "m/sleep.h"
@@ -25,6 +26,8 @@ static const s32 sLimits[] = {
 // Text IDs.
 extern const u32 kBackupEntryUnknownText;
 extern const u32 kBackupEntryUnk2Text;
+extern const u64 kBackupRecentFrames;
+extern const u32 kCreatureLevelLimits[2];
 
 #define BACKUP_BLOCK_DATA 480   // what's left of a 512-byte block after the header
 
@@ -910,4 +913,333 @@ BOOL DinoBackup::CanAddUnk138(const DinoBackupEntry *entry, BOOL checkDuplicate,
         }
     }
     return TRUE;
+}
+
+void DinoBackup::SetSystemVar(u32 index, s32 value) {
+    switch (index) {
+    case 1:
+        mPlayer->horiderLevel = value;
+        break;
+    case 2:
+        mPlayer->containerNum = value;
+        break;
+    case 3:
+        mPlayer->money = std::max(sLimits[2], std::min(sLimits[5], value));
+        break;
+    case 4:
+        mPlayer->unk14_0 = value;
+        break;
+    case 5:
+        mPlayer->license = value;
+        break;
+    case 6:
+        mPlayer->unk14_14 = value;
+        break;
+    case 7:
+        mPlayer->rank = value;
+        break;
+    case 14:
+        mPlayer->unk1c_23 = value;
+        break;
+    case 15:
+        mPlayer->unk20_0 = value;
+        break;
+    case 16:
+        mPlayer->unk20_8 = value;
+        break;
+    case 28:
+        mPlayer->unk20_16 = value;
+        break;
+    case 29:
+        mPlayer->unk24 = value;
+        break;
+    case 39:
+        mPlayer->unk30_17 = value;
+        break;
+    case 17:
+        mPlayer->unk28_0 = value;
+        break;
+    case 18:
+        mPlayer->unk28_8 = value;
+        break;
+    case 19:
+        mPlayer->unk2c_0 = std::max(sLimits[13], std::min(sLimits[3], value));
+        break;
+    case 25: {
+        u32 v = value;
+        mPlayer->unk34_0 = std::min(v, (u32) sLimits[9]);
+        break;
+    }
+    case 30:
+        mPlayer->unk34_28 = value;
+        break;
+    case 31:
+        mPlayer->unk34_30 = value;
+        break;
+    case 32:
+        mPlayer->unk38_0 = value;
+        break;
+    case 26: {
+        MMutexLock lock(&sBackupMutex.mutex);
+        mFrames = value;
+        break;
+    }
+    case 43:
+        mPlayer->unk38_4 = value;
+        break;
+    case 44:
+        mUnk1B4 = value;
+        break;
+    case 45:
+        mUnk1B8 = value;
+        break;
+    case 46:
+        mPlayer->unk30_0 = value;
+        break;
+    }
+}
+
+s32 DinoBackup::GetSystemVar(u32 index) {
+    switch (index) {
+    case 1:
+        return mPlayer->horiderLevel;
+    case 2:
+        return mPlayer->containerNum;
+    case 3:
+        return mPlayer->money;
+    case 4:
+        return mPlayer->unk14_0;
+    case 5:
+        return mPlayer->license;
+    case 6:
+        return mPlayer->unk14_14;
+    case 7:
+        return mPlayer->rank;
+    case 13:
+        return mPlayer->unk1c_7;
+    case 14:
+        return mPlayer->unk1c_23;
+    case 15:
+        return mPlayer->unk20_0;
+    case 16:
+        return mPlayer->unk20_8;
+    case 28:
+        return mPlayer->unk20_16;
+    case 29:
+        return mPlayer->unk24;
+    case 39:
+        return mPlayer->unk30_17;
+    case 17:
+        return mPlayer->unk28_0;
+    case 18:
+        return mPlayer->unk28_8;
+    case 19:
+        return mPlayer->unk2c_0;
+    case 20:
+        return CountUnk9C();
+    case 21:
+        return GetExcavateLevelUnk0();
+    case 22:
+        return GetExcavateLevelAverage();
+    case 23:
+        return GetExcavateLevelRemaining();
+    case 24:
+        return CountCreatureParts();
+    case 25:
+        return mPlayer->unk34_0;
+    case 30:
+        return mPlayer->unk34_28;
+    case 31:
+        return mPlayer->unk34_30;
+    case 32:
+        return mPlayer->unk38_0;
+    case 26: {
+        MMutexLock lock(&sBackupMutex.mutex);
+        return mFrames;
+    }
+    case 43:
+        return mPlayer->unk38_4;
+    case 8: {
+        u32 count = 0;
+        for (u32 i = 0; i < 64; i++) {
+            if (mUnk98[i].id != 0 && !mUnk98[i].active) {
+                count++;
+            }
+        }
+        return count;
+    }
+    case 9: {
+        u32 count = 0;
+        for (u32 i = 0; i < 64; i++) {
+            if (mUnk98[i].id != 0 && !mUnk98[i].active && mUnk98[i].unk10_0 >= 2) {
+                count++;
+            }
+        }
+        return count;
+    }
+    case 10: {
+        u32 count = 0;
+        for (u32 i = 0; i < 64; i++) {
+            if (mUnk98[i].id != 0 && !mUnk98[i].active && mUnk98[i].unk10_0 == 1) {
+                count++;
+            }
+        }
+        return count;
+    }
+    case 11: {
+        u32 count = 0;
+        for (u32 i = 0; i < 64; i++) {
+            if (mUnk98[i].id != 0 && mUnk98[i].active && mUnk98[i].type == 1) {
+                count++;
+            }
+        }
+        return count;
+    }
+    case 41: {
+        u32 count = 0;
+        for (u32 i = 0; i < 64; i++) {
+            if (mUnk98[i].id != 0 && !mUnk98[i].active && mUnk98[i].unk10_0 == 0 && mUnk98[i].type == 1) {
+                count++;
+            }
+        }
+        return count;
+    }
+    case 12: {
+        u32 count = 0;
+        for (u32 i = 0; i < 64; i++) {
+            if (mUnk98[i].id != 0 && mUnk98[i].active && mUnk98[i].type == 2) {
+                count++;
+            }
+        }
+        return count;
+    }
+    case 27: {
+        u32 count = 0;
+        for (u32 id = 1; id < gDinoResource->GetCreatureCount(); id++) {
+            if (mCreatures[id].parts[0].level != 0) {
+                count++;
+            }
+        }
+        return count;
+    }
+    case 33:
+    case 34:
+    case 35:
+    case 36:
+    case 37:
+    case 38: {
+        u32 count = 0;
+        DinoTeam team;
+        GetTeam(gDinoBackup->GetUnk34_26(), &team);
+        for (u32 i = 0; i < 5; i++) {
+            if (team.slots[i] != 0 && index - 32 == gDinoResource->GetCreatureDef(team.slots[i])->unk0D) {
+                count++;
+            }
+        }
+        return count;
+    }
+    case 40: {
+        u32 count = 0;
+        DinoTeam team;
+        GetTeam(gDinoBackup->GetUnk34_26(), &team);
+        for (u32 i = 0; i < 5; i++) {
+            if (team.slots[i] != 0) {
+                count++;
+            }
+        }
+        return count;
+    }
+    case 42:
+        return CountUsedUnk14C();
+    case 44:
+        return mUnk1B4;
+    case 45:
+        return mUnk1B8;
+    case 46:
+        return mPlayer->unk30_0;
+    }
+    return 0;
+}
+
+void DinoBackup::SetSystemFlag(u32 id, BOOL value) {
+    switch (id) {
+    default:
+        (*mSystemFlags)[id] = value;
+        break;
+    case 0x18:
+        gLcd->SetSwapped(value);
+        break;
+    case 0x2f:
+        mPlayer->unk38_20 = value;
+        break;
+    }
+}
+
+static inline u32 GetCreatureTotal(const DinoCreatureState *creature) {
+    return creature->unk0_8 + (creature->parts[0].level + creature->parts[1].level + creature->parts[2].level +
+                               creature->parts[3].level);
+}
+
+BOOL DinoBackup::GetSystemFlag(u32 id) {
+    switch (id) {
+    default:
+        return mSystemFlags->Test(id);
+    case 3:
+        return IsUnk98Empty();
+    case 4:
+        return IsUnk98Full();
+    case 0x18:
+        return gLcd->IsSwapped();
+    case 0x23:
+        for (u32 i = 1; i <= 100; i++) {
+            if (mCreatures[i].parts[0].level == 0) {
+                return FALSE;
+            }
+        }
+        return TRUE;
+    case 0x24: {
+        for (u32 i = 1; i <= 100; i++) {
+            u32 total;
+            DinoCreatureState *creature = &mCreatures[i];
+            u32 p0 = creature->parts[0].level;
+            if (p0 == 0) {
+                total = 0;
+            } else {
+                u32 sum = creature->unk0_8 + (p0 + creature->parts[1].level + creature->parts[2].level +
+                                              creature->parts[3].level);
+                total = std::min(kCreatureLevelLimits[0] * 11 + 50, sum);
+            }
+            if (total < 600) {
+                return FALSE;
+            }
+        }
+        return TRUE;
+    }
+    case 0x29:
+        if (IsUnk148Empty() && GetPlayFrames() - GetUnk160() <= kBackupRecentFrames) {
+            return TRUE;
+        }
+        return FALSE;
+    case 0x2a:
+        for (u32 i = 0; i < 64; i++) {
+            DinoBackupEntry *entry = &mUnk98[i];
+            if (entry->id != 0 && entry->unk10_0 != 1 &&
+                (entry->unk10_3 || ((DinoKasekiRock *) &mKasekiRocks[entry->id])->found)) {
+                return FALSE;
+            }
+        }
+        return TRUE;
+    case 0x2b:
+        for (u32 i = 0; i < 42; i++) {
+            if (mRecords[i].unk78) {
+                return FALSE;
+            }
+        }
+        return TRUE;
+    case 0x2f:
+        if (mPlayer->unk38_20) {
+            return TRUE;
+        }
+        return FALSE;
+    }
 }

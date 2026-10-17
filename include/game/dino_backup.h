@@ -30,7 +30,7 @@ struct DinoPlayerData {
     u32 unk14_14 : 2;           // system var 6
     u32 license : 2;            // system var 5
     u32 unk14_18 : 14;
-    s32 money;                  // 0x18: system var 3
+    s32 money : 32;             // 0x18: system var 3
     // 0x1C
     u32 containerNum : 4;       // system var 2
     u32 unk1c_4 : 2;
@@ -43,7 +43,7 @@ struct DinoPlayerData {
     u32 unk20_8 : 8;            // system var 16
     u32 unk20_16 : 8;           // system var 28
     u32 unk20_24 : 8;
-    s32 unk24;                  // 0x24: system var 29
+    s32 unk24 : 32;             // 0x24: system var 29
     // 0x28
     u32 unk28_0 : 8;            // system var 17
     u32 unk28_8 : 8;            // system var 18

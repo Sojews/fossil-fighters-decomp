@@ -6609,14 +6609,14 @@ data_02089aa0 kind:data(any) addr:0x02089aa0
 data_02089ac8 kind:data(any) addr:0x02089ac8
 data_02089acc kind:data(any) addr:0x02089acc
 data_02089ad0 kind:data(any) addr:0x02089ad0
-data_02089ad4 kind:data(any) addr:0x02089ad4
+kBackupRecentFrames kind:data(any) addr:0x02089ad4
 data_02089adc kind:data(any) addr:0x02089adc
 data_02089b04 kind:data(any) addr:0x02089b04
 data_02089ce8 kind:data(any) addr:0x02089ce8
 data_02089ecc kind:data(any) addr:0x02089ecc
 data_0208a0b0 kind:data(any) addr:0x0208a0b0
 data_0208a0cc kind:data(any) addr:0x0208a0cc
-data_0208a0d4 kind:data(any) addr:0x0208a0d4
+kCreatureLevelLimits kind:data(any) addr:0x0208a0d4
 data_0208a0dc kind:data(any) addr:0x0208a0dc
 data_0208a0f0 kind:data(any) addr:0x0208a0f0
 data_0208a0fc kind:data(any) addr:0x0208a0fc
