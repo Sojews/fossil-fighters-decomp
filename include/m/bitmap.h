@@ -61,7 +61,7 @@ public:
         mHFlip = hflip;
         mVFlip = vflip;
     }
-    virtual ~MIndexBitmapLoadTransfer() {}
+    virtual ~MIndexBitmapLoadTransfer();
     virtual void Transfer();
 
     const u8 *mSrc;     // 0x10

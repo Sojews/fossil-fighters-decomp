@@ -80,7 +80,7 @@ public:
         mSize = size;
         mUnk20 = unk;
     }
-    virtual ~MPalLoadTask() {}
+    virtual ~MPalLoadTask();
     virtual void Transfer();
 
     void *mExtPalette;  // 0x10

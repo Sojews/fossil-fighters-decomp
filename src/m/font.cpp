@@ -334,3 +334,9 @@ MFontSet::MFontSet(std::string path, int color, int shadow, int back) : mResourc
     }
     SetColors(color, shadow, back);
 }
+
+MChr16BinFontTransfer::~MChr16BinFontTransfer() {
+}
+
+MChr16FontTransfer::~MChr16FontTransfer() {
+}

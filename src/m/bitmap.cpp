@@ -89,3 +89,6 @@ void MIndexBitmapFillTransfer::Transfer() {
         MFill(mValue | (mValue << 16), (u8 *)mDstBase + mRect.left + mDstSize.x * y, mRect.GetWidth());
     }
 }
+
+MIndexBitmapLoadTransfer::~MIndexBitmapLoadTransfer() {
+}

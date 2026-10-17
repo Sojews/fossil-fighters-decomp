@@ -216,3 +216,6 @@ void MPalAnime::Apply(int step) {
         mBlock->LoadColors(mColors + mLoadStart, mLoadStart, mLoadCount);
     }
 }
+
+MPalLoadTask::~MPalLoadTask() {
+}

@@ -68,7 +68,7 @@ public:
         mAttr = tile | (palette << 12);
         mFlip = (hflip ? 0x400 : 0) | (vflip ? 0x800 : 0);
     }
-    virtual ~MTextTransfer() {}
+    virtual ~MTextTransfer();
     virtual void Transfer();
 
     const u16 *mSrc;    // 0x10
@@ -90,7 +90,7 @@ public:
         mDstSize = text->mSize;
         mEntry = (palette << 12) | tile | (hflip ? 0x400 : 0) | (vflip ? 0x800 : 0);
     }
-    virtual ~MTextFill() {}
+    virtual ~MTextFill();
     virtual void Transfer();
 
     u32 mDstBase;   // 0x10

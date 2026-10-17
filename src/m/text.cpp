@@ -138,3 +138,9 @@ void MText::Fill(MRect rect, int tile, int palette, bool hflip, bool vflip) {
     gLooper->AddTransferTask(
         new MTextFill(this, rect, tile, palette, hflip, vflip));
 }
+
+MTextTransfer::~MTextTransfer() {
+}
+
+MTextFill::~MTextFill() {
+}

@@ -50,3 +50,9 @@ void MExtAffine::Transfer(const u16 *src, MPoint srcSize, MPoint dst, int tile, 
 void MExtAffine::Fill(MRect rect, int tile, int palette, bool hflip, bool vflip) {
     gLooper->AddTransferTask(new MExtAffineFill(this, rect, tile, palette, hflip, vflip));
 }
+
+MExtAffineTransfer::~MExtAffineTransfer() {
+}
+
+MExtAffineFill::~MExtAffineFill() {
+}

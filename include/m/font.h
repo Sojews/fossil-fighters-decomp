@@ -154,7 +154,7 @@ public:
         mBackColor = back;
         mUnk3C = unk;
     }
-    virtual ~MChr16BinFontTransfer() {}
+    virtual ~MChr16BinFontTransfer();
     virtual void Transfer();
 
     const u8 *mSrc;     // 0x10
@@ -179,7 +179,7 @@ public:
         mPos = pos;
         mOwnColors = ownColors;
     }
-    virtual ~MChr16FontTransfer() {}
+    virtual ~MChr16FontTransfer();
     virtual void Transfer();
 
     const u8 *mSrc;     // 0x10

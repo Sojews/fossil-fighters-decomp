@@ -39,7 +39,7 @@ public:
         mAttr = tile | (palette << 12);
         mFlip = (hflip ? 0x400 : 0) | (vflip ? 0x800 : 0);
     }
-    virtual ~MExtAffineTransfer() {}
+    virtual ~MExtAffineTransfer();
     virtual void Transfer();
 
     const u16 *mSrc;    // 0x10
@@ -61,7 +61,7 @@ public:
         mDstSize = screen->GetSize();
         mEntry = (hflip ? 0x400 : 0) | ((palette << 12) | tile) | (vflip ? 0x800 : 0);
     }
-    virtual ~MExtAffineFill() {}
+    virtual ~MExtAffineFill();
     virtual void Transfer();
 
     u32 mDstBase;   // 0x10
