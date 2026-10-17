@@ -11,7 +11,7 @@ public:
     virtual void Idle();
 
     u32 mUnk74[4];      // 0x74
-    std::wstring mText; // 0x84
+    std::string mText;  // 0x84
 };
 
 class DinoCommonWindowMessageWait1 : public MProcess {
@@ -19,7 +19,7 @@ public:
     virtual ~DinoCommonWindowMessageWait1();
     virtual void Idle();
 
-    std::wstring mText; // 0x74
+    std::string mText;  // 0x74
 };
 
 class DinoCommonWindowMessageWait2 : public MProcess {
@@ -27,7 +27,7 @@ public:
     virtual ~DinoCommonWindowMessageWait2();
     virtual void Idle();
 
-    std::wstring mText; // 0x74
+    std::string mText;  // 0x74
 };
 
 #endif

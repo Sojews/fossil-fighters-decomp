@@ -46,3 +46,15 @@ src/ov002/dino_cleaning_stop_confirm_menu_item.cpp:
 
 src/ov002/dino_cleaning_live.cpp:
     .text       start:0x02161f5c end:0x021632c4
+
+src/ov002/dino_cleaning_report.cpp:
+    .text       start:0x02156830 end:0x021568c4
+
+src/ov002/dino_cleaning_tutorial_window.cpp:
+    .text       start:0x0215722c end:0x02157280
+
+src/ov002/dino_cleaning_timer.cpp:
+    .text       start:0x0215c7d8 end:0x0215c86c
+
+src/ov002/dino_cleaning_tool.cpp:
+    .text       start:0x0215c9c8 end:0x0215c9fc
