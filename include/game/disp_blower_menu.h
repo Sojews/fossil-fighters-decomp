@@ -72,6 +72,7 @@ public:
 };
 
 class DinoUiOptionMenu;
+class DinoBlower2;
 
 class DinoUiOptionPower : public MTask, public MSleepHook {
 public:
@@ -98,6 +99,8 @@ public:
     void SetSeVolume(u8 level);
     void SetSpeed(u8 speed);
     void Sleep();
+    BOOL IsWaiting();
+    u8 GetMicStrength();
     void CheckKeys();
 
     u8 unkBF[1];     // members start in MMenu's tail padding
@@ -108,7 +111,8 @@ public:
     MMenuItem *mUnk128;         // 0x128
     MMenuItem *mBackButton;     // 0x12C: B goes to it
     MicTestButton *mMicTest;    // 0x130: the item under the SE volume row
-    u32 mUnk134[2];             // 0x134
+    u32 mUnk134;                // 0x134
+    DinoBlower2 *mBlower;       // 0x138: the microphone
     MTask *mUnk13C;             // 0x13C
     MView *mSpeedMarks[3];      // 0x140
     MMotion *mBgmMotion;        // 0x14C: shows the BGM volume

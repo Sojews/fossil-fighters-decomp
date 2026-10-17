@@ -4,6 +4,7 @@
 // Derived destructors have their bases' destructor bodies inlined; auto-inlining the ones defined above does that.
 #pragma auto_inline on
 
+#include "game/dino_blower.h"
 #include "m/input.h"
 #include "game/dino_backup.h"
 #include "game/dino_sound.h"
@@ -375,4 +376,29 @@ void DinoUiOptionMenu::SetSpeed(u8 speed) {
         RemoveLink(mBackButton, 2);
         AddLink(mBackButton, 2, mTopItems[mSpeed]);
     }
+}
+
+DinoUiOptionMenu::DinoUiOptionMenu() : MLooperPreLoopHook(FALSE, 0), MMenu(NULL, 0) {
+    mSpeed = 0;
+    mBgmVolume = 0;
+    mSeVolume = 0;
+    mSilentFocus = TRUE;
+    SetDeferStart(TRUE);
+    mBackButton = NULL;
+    mDelay = 180;
+    MLooperPreLoopHook::Enable();
+}
+
+u8 DinoUiOptionMenu::GetMicStrength() {
+    if (IsWaiting()) {
+        return 0;
+    }
+    return mBlower->GetStrength();
+}
+
+BOOL DinoUiOptionMenu::IsWaiting() {
+    if (mDelay) {
+        return TRUE;
+    }
+    return FALSE;
 }
