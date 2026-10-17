@@ -3,10 +3,14 @@
 
 #include "m/task.h"
 
+class DinoUiIslandMapMenu;
+
 class IslandMapKeyCheckTask : public MTask {
 public:
     virtual ~IslandMapKeyCheckTask();
     virtual void Execute();
+
+    DinoUiIslandMapMenu *mMenu; // 0x10
 };
 
 #endif

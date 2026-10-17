@@ -153,3 +153,20 @@ void BitmapMove::Apply(int step) {
     MPoint pos = mValue;
     mScreen->SetOffset(pos);
 }
+
+void DinoUiIslandMapMenu::OnBackDecided() {
+    *mResult = -1;
+    OnSpotDecided();
+}
+
+void IslandMapKeyCheckTask::Execute() {
+    mMenu->CheckKeys();
+}
+
+void GuidMan::Execute() {
+    if (mTasks->IsEmpty()) {
+        mHelp->Enable();
+    } else {
+        mHelp->Disable();
+    }
+}
