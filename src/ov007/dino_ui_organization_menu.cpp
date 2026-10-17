@@ -8,6 +8,7 @@
 #include "game/dino_ui_organization_menu.h"
 #include "m/display.h"
 #include "m/blend.h"
+#include "m/call_task.h"
 
 DinoUiOrganizationMenu::~DinoUiOrganizationMenu() {
     gCurrentDisplay->mBlend->Reset();
@@ -158,3 +159,6 @@ void DinoUiOrganizationSlotCreateTask::Idle() {
     }
     mIndex++;
 }
+
+// DinoUiOrganizationMenu::OnFocus (not decompiled yet) re-enables the help through a call task.
+template MTask *MCreateCallTask(DinoUiOrganizationMenu *obj, void (DinoHelpBase::*func)());

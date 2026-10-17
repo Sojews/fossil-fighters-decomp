@@ -9,6 +9,7 @@
 #include "game/dino_ui_keyboard.h"
 #include "game/dino_ui_senryu_menu.h"
 #include "game/dino_ui_senryu.h"
+#include "m/bg_new_task.h"
 
 DinoUiKeyboardMenu::~DinoUiKeyboardMenu() {
 }
@@ -310,3 +311,6 @@ void DinoUiSenryuMenu::OnFocus(MMenuItem *item) {
         }
     }
 }
+
+// DinoUiKeyboardMenu::OnStart (not decompiled yet) starts a background load.
+template MTask *MCreateBgCallTask(DinoUiKeyboardMenu *obj, void (DinoUiKeyboardMenu::*func)(), int thread);

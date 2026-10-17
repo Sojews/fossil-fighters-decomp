@@ -6,6 +6,7 @@
 #include "game/dino_ui_revive_status_menu.h"
 #include "types.h"
 #include "game/dino_sound.h"
+#include "m/call_task.h"
 
 DinoUiReviveStatusMenu::~DinoUiReviveStatusMenu() {
 }
@@ -90,3 +91,6 @@ void DinoUiReviveStatusMenu::OnFocus(MMenuItem *item) {
     }
     mCursor->Show();
 }
+
+// DinoUiReviveStatusMenu::OnStart (not decompiled yet) re-enables the help through a call task.
+template MTask *MCreateCallTask(DinoUiReviveStatusMenu *obj, void (DinoHelpBase::*func)());
