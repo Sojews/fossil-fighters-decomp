@@ -5,7 +5,10 @@
 
 class DinoCleaningXray : public DinoCleaningTool {
 public:
+    DinoCleaningXray(DinoCleaningKasekiRock *rock);
     virtual ~DinoCleaningXray();
+    virtual void Unk18();
+    virtual void Unk1C();
 };
 
 #endif

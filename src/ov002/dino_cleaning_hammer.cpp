@@ -9,6 +9,16 @@
 #include "m/bg_new_task.h"
 #include "m/call_task.h"
 
+DinoCleaningHammer::DinoCleaningHammer(DinoCleaningKasekiRock *rock, u8 arg1) : DinoCleaningTool(rock) {
+    mUnk80 = arg1;
+}
+
+void DinoCleaningHammer::Unk18() {
+}
+
+void DinoCleaningHammer::Unk1C() {
+}
+
 DinoCleaningHammer::~DinoCleaningHammer() {
 }
 

@@ -24,7 +24,7 @@ src/ov002/dino_cleaning_blower.cpp:
     .text       start:0x0215c86c end:0x0215c998
 
 src/ov002/dino_cleaning_xray.cpp:
-    .text       start:0x0215ca78 end:0x0215caac
+    .text       start:0x0215c9fc end:0x0215caac
 
 src/ov002/dino_cleaning_hammer.cpp:
     .text       start:0x0215caac end:0x0215d82c
