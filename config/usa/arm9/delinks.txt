@@ -320,8 +320,8 @@ src/m/raster.cpp:
 src/m/seed_generator.cpp:
     .text       start:0x020690bc end:0x020694dc
 
-src/m/multi_play_synchronize_delay_task.cpp:
-    .text       start:0x0206c074 end:0x0206c298
+src/m/multi_play.cpp:
+    .text       start:0x020694dc end:0x0206c77c
 
 src/game/dino_common_item.cpp:
     .text       start:0x0201cd38 end:0x0201cd7c

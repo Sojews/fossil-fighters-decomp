@@ -30,6 +30,7 @@ public:
 
 class MMessageSubject {
 public:
+    MMessageSubject() { OS_InitMutex(&mMutex); }
     virtual ~MMessageSubject();
 
     void AddObserver(MMessageObserver *observer);

@@ -5,6 +5,7 @@
 #include "game/common_window_message.h"
 #include "game/help.h"
 #include "m/lcd.h"
+#include "m/multi_play.h"
 #include "m/bright.h"
 
 extern "C" {
@@ -13,7 +14,7 @@ extern void *data_020cb978;
 extern const int data_0208ad0c;
 extern const int data_0208ad08;
 BOOL func_02013ab8(void);
-MTask *func_02069ed8(void *arg);
+
 void func_02050a3c(void);
 void func_02050ba8(void);
 void func_0201ffe8(void);
@@ -37,7 +38,7 @@ void DinoBackupValidater::Idle() {
             mSerial.AddTail(new MTimer(1));
         }
         if (mUnk7C != NULL) {
-            mSerial.AddTail(func_02069ed8(mUnk7C));
+            mSerial.AddTail(((MMultiPlay *) mUnk7C)->CreateFinishTask());
         }
         func_02050a3c();
         func_02050ba8();

@@ -7,6 +7,11 @@
 class MMultiPlayAnotherGameParentFoundMessage : public MMessage {
 public:
     MMultiPlayAnotherGameParentFoundMessage() : MMessage(0x1A) {}
+    MMultiPlayAnotherGameParentFoundMessage(u32 ggid, const u8 *gameInfo, const u8 *bssid) : MMessage(0x1A) {
+        mUnk0C = ggid;
+        MI_CpuCopy8(gameInfo, mUnk10, sizeof(mUnk10));
+        MI_CpuCopy8(bssid, mUnk80, sizeof(mUnk80));
+    }
     virtual u32 GetSize() { return 128; }
     virtual void Write(void *buf) {
         MI_CpuCopy8(&mId, buf, 4);
@@ -30,6 +35,11 @@ public:
 class MMultiPlayParentFoundMessage : public MMessage {
 public:
     MMultiPlayParentFoundMessage() : MMessage(0x0) {}
+    MMultiPlayParentFoundMessage(u32 index, const u8 *gameInfo, const u8 *bssid) : MMessage(0x0) {
+        mUnk0C = index;
+        MI_CpuCopy8(gameInfo, mUnk10, sizeof(mUnk10));
+        MI_CpuCopy8(bssid, mUnk80, sizeof(mUnk80));
+    }
     virtual u32 GetSize() { return 128; }
     virtual void Write(void *buf) {
         MI_CpuCopy8(&mId, buf, 4);
@@ -53,6 +63,7 @@ public:
 class MMultiPlayParentLostMessage : public MMessage {
 public:
     MMultiPlayParentLostMessage() : MMessage(0x1) {}
+    MMultiPlayParentLostMessage(u32 index) : MMessage(0x1) { mUnk0C = index; }
     virtual u32 GetSize() { return 8; }
     virtual void Write(void *buf) {
         MI_CpuCopy8(&mId, buf, 4);
@@ -69,6 +80,10 @@ public:
 class MMultiPlayParentUpdatedMessage : public MMessage {
 public:
     MMultiPlayParentUpdatedMessage() : MMessage(0x2) {}
+    MMultiPlayParentUpdatedMessage(u32 index, const u8 *gameInfo) : MMessage(0x2) {
+        mUnk0C = index;
+        MI_CpuCopy8(gameInfo, mUnk10, sizeof(mUnk10));
+    }
     virtual u32 GetSize() { return 120; }
     virtual void Write(void *buf) {
         MI_CpuCopy8(&mId, buf, 4);
@@ -114,6 +129,11 @@ public:
 class MMultiPlayChildConnectedMessage : public MMessage {
 public:
     MMultiPlayChildConnectedMessage() : MMessage(0x5) {}
+    MMultiPlayChildConnectedMessage(u16 aid, const u8 *ssid, const u8 *macAddress) : MMessage(0x5) {
+        mUnk0C = aid;
+        MI_CpuCopy8(ssid, mUnk0E, sizeof(mUnk0E));
+        MI_CpuCopy8(macAddress, mUnk26, sizeof(mUnk26));
+    }
     virtual u32 GetSize() { return 36; }
     virtual void Write(void *buf) {
         MI_CpuCopy8(&mId, buf, 4);
@@ -136,6 +156,7 @@ public:
 class MMultiPlayChildDisconnectedMessage : public MMessage {
 public:
     MMultiPlayChildDisconnectedMessage() : MMessage(0x6) {}
+    MMultiPlayChildDisconnectedMessage(u16 aid) : MMessage(0x6) { mUnk0C = aid; }
     virtual u32 GetSize() { return 8; }
     virtual void Write(void *buf) {
         MI_CpuCopy8(&mId, buf, 4);

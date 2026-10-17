@@ -88,7 +88,7 @@ public:
 // Runs the first task until it stops running, then the next.
 class MSerialTaskSet : public MTaskSet {
 public:
-    MSerialTaskSet() { mExitWhenEmpty = FALSE; }
+    MSerialTaskSet(BOOL exitWhenEmpty = FALSE) { mExitWhenEmpty = exitWhenEmpty; }
     virtual void Execute();
 };
 
