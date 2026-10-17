@@ -15,6 +15,7 @@
 class DinoUiContainerBaseMenu : public DinoHelpBase, public MMenu {
 public:
     virtual ~DinoUiContainerBaseMenu();
+    virtual BOOL TryDecide() = 0;   // the decide button was pressed; FALSE if nothing happens
     void OnBackDecided();
     BOOL PageRight();
     BOOL PageLeft();

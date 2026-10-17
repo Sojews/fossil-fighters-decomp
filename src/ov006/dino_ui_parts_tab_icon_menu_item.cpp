@@ -91,3 +91,10 @@ template class MCallTask0<DinoUiStatusMenu, DinoUiStatusMenu>;
 template MTask *MCreateCallTask(DinoUiStatusMenu *obj, void (DinoUiStatusMenu::*func)());
 template class MCallTask0<DinoUiStatusChangeModeHelpTask, DinoHelpBase>;
 template MTask *MCreateCallTask(DinoUiStatusChangeModeHelpTask *obj, void (DinoHelpBase::*func)());
+
+void DinoUiStatusBackButton::OnDecide() {
+    mMotion->Play(4, 1);
+    mSerial.AddTail(mMotion->CreateWaitStopTask());
+    mOwner->OnBackDecided();
+    DinoSoundPlaySe(0x90, 0);
+}

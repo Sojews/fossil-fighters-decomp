@@ -120,3 +120,10 @@ void DinoUiIslandMapMenuItem::OnFocusChanged(BOOL focused) {
         mMotion->Play(1, 0);
     }
 }
+
+void DinoMapBackButton::OnDecide() {
+    mMotion->Play(4, 1);
+    mSerial.AddTail(mMotion->CreateWaitStopTask());
+    mOwner->OnBackDecided();
+    DinoSoundPlaySe(0x90, 0);
+}

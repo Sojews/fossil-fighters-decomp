@@ -173,3 +173,11 @@ void DinoUiWirelessMatch::Idle() {
 // instantiated explicitly.
 template class MCallTask0<DinoUiBattleParentScanner, MMessageObserver>;
 template MTask *MCreateCallTask(DinoUiBattleParentScanner *obj, void (MMessageObserver::*func)());
+
+void DinoUiChildScannerStartCannonParentItem::OnDecide() {
+    mMotion->Play(3, 0);
+}
+
+void DinoUiChildScannerStartBattleParentItem::OnDecide() {
+    mMotion->Play(3, 0);
+}

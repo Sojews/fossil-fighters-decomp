@@ -13,6 +13,7 @@ public:
     virtual void OnIdle();
     virtual void OnFocus(MMenuItem *item);
     virtual void OnDecide(MMenuItem *item);
+    void OnBackDecided();
     void SetSilentFocus(BOOL silent);
     BOOL IsSilentFocus();
 

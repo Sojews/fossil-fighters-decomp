@@ -116,3 +116,15 @@ void DinoUi2ContainerBaseDecideButton::OnFocusChanged(BOOL focused) {
         mSerial.Clear();
     }
 }
+
+void DinoUi2ContainerBaseDecideButton::OnDecide() {
+    if (mOwner->TryDecide()) {
+        DinoSoundPlaySe(0x98, 0);
+        mMotion->Play(3, 1);
+        MTask *play = mMotion->CreatePlayTransfer(2, 0);
+        MTask *wait = mMotion->CreateWaitStopTask();
+        MSerialTaskSet *serial = &mSerial;
+        serial->AddTail(wait);
+        serial->AddTail(play);
+    }
+}

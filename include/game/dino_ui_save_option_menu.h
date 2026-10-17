@@ -13,6 +13,8 @@ public:
     virtual void OnFocus(MMenuItem *item);
     void RemoveItem();
     void OnBackDecided();
+    void OnOptionDecided();
+    void OnSaveDecided();
 
     u8 unkB3[0x19];  // members start in MMenu's tail padding
     u8 mSilentFocus; // 0xCC

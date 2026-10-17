@@ -122,3 +122,15 @@ void DinoUiContainerBaseDecideButton::OnFocusChanged(BOOL focused) {
 class DinoUiCanonPutinMenu {};
 template class MCallTask0<DinoUiCanonPutinMenu, DinoUiCanonPutinMenu>;
 template MTask *MCreateCallTask(DinoUiCanonPutinMenu *obj, void (DinoUiCanonPutinMenu::*func)());
+
+void DinoUiContainerBaseDecideButton::OnDecide() {
+    if (mOwner->TryDecide()) {
+        DinoSoundPlaySe(0x98, 0);
+        mMotion->Play(3, 1);
+        MTask *play = mMotion->CreatePlayTransfer(2, 0);
+        MTask *wait = mMotion->CreateWaitStopTask();
+        MSerialTaskSet *serial = &mSerial;
+        serial->AddTail(wait);
+        serial->AddTail(play);
+    }
+}

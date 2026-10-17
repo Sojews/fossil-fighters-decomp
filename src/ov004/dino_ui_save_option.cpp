@@ -90,3 +90,13 @@ void DinoUiSaveOptionMenu::OnFocus(MMenuItem *item) {
     }
     SetSelectedItem(dynamic_cast<DinoHelpItem *>(item));
 }
+
+void DinoUiSaveOptionOptionButton::OnDecide() {
+    mMotion->Play(3, 1);
+    mOwner->OnOptionDecided();
+}
+
+void DinoUiSaveOptionSaveButton::OnDecide() {
+    mMotion->Play(3, 1);
+    mOwner->OnSaveDecided();
+}

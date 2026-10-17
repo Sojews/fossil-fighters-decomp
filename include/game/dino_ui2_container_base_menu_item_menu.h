@@ -15,6 +15,7 @@
 class DinoUi2ContainerBaseMenu : public DinoHelpBase, public MMenu {
 public:
     virtual ~DinoUi2ContainerBaseMenu();
+    virtual BOOL TryDecide() = 0;   // the decide button was pressed; FALSE if nothing happens
 
     u32 mUnkB4[18];                 // 0xB4
     u8 mUnkFC;                      // 0xFC
