@@ -380,6 +380,10 @@ libs/msl/src/runtime_arm_div.c:
     complete
     .text       start:0x020863ac end:0x02086cfc
 
+libs/msl/src/console_io.c:
+    complete
+    .text       start:0x02086cfc end:0x02086d6c
+
 
 
 libs/msl/src/wprintf.c:
