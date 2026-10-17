@@ -33,6 +33,52 @@ public:
     virtual void Idle();
 };
 
+class DinoBattleModelCreature;
+
+// One side of the battle in the battle model.
+class DinoBattleModelPlayer : public MProcess, public MMessageObserver {
+public:
+    virtual ~DinoBattleModelPlayer();
+    virtual void Idle();
+    virtual void OnMessage(MMessage *msg);
+
+    u32 GetUnkB8();
+    u32 GetUnk128();
+    u32 GetUnk14C();
+    u8 GetUnkC8();
+    void SetUnkC8(u8 value);
+    u32 GetUnk124();
+    void SetUnk124(u32 value);
+    int GetCreatureCount();
+    DinoBattleModelCreature *GetCreature(int index);
+    DinoBattleModelCreature *FindCreature(u32 id);
+    u32 GetUnkFC();
+    u32 GetUnk110();
+    u32 GetUnkAC();
+
+    u32 mUnkA8;                         // 0xA8
+    u32 mUnkAC;                         // 0xAC
+    u32 unkB0[2];
+    u32 mUnkB8;                         // 0xB8
+    u32 unkBC[3];
+    u8 mUnkC8;                          // 0xC8
+    u8 unkC9[0xFC - 0xC9];
+    u32 mUnkFC;                         // 0xFC
+    u32 unk100;
+    DinoBattleModelCreature **mCreatures;   // 0x104
+    int mCreatureCount;                 // 0x108
+    u32 unk10C;
+    u32 mUnk110;                        // 0x110
+    u32 unk114[4];
+    u32 mUnk124;                        // 0x124
+    u32 mUnk128;                        // 0x128
+    u32 unk12C;
+    u32 mUnk130[7];                     // 0x130
+    u32 mUnk14C;                        // 0x14C
+    u32 unk150;
+    u32 mKasekiPoint;                   // 0x154
+};
+
 // A vivosaur's definition data as the battle reads it (not identified yet).
 struct DinoBattleCreatureDef {
     u8 unk00[0x20];
@@ -219,10 +265,7 @@ public:
     virtual ~AddKasekiPointCreatureDie();
     virtual void Idle();
 
-    struct Player {
-        u8 unk00[0x154];
-        u32 mKasekiPoint;   // 0x154
-    } *mPlayer;             // 0x74
+    DinoBattleModelPlayer *mPlayer; // 0x74
 };
 
 #endif

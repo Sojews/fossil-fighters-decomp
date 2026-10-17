@@ -144,11 +144,9 @@ void PlayerThinkTimeCountTask::Execute() {
     }
 }
 
-extern "C" u32 func_ov000_02163454(void *player);
-
 void AddKasekiPointCreatureDie::Idle() {
     u32 point = mPlayer->mKasekiPoint;
-    u32 add = func_ov000_02163454(mPlayer);
+    u32 add = mPlayer->GetUnk128();
     func_ov000_02163464(mPlayer, add + point);
     DinoSignalWait *wait = new DinoSignalWait(0x10039, NULL, NULL, 1);
     MTask *exit = MTaskExitTransfer::Create(this);
@@ -177,6 +175,8 @@ void DinoCreatureUpdateTask::Execute() {
     func_ov000_0216d3c0((void *)mUnk10, mUnk14, mUnk18);
     Exit();
 }
+
+#pragma auto_inline off
 
 u32 DinoBattleModelCreature::GetUnkB0() {
     return mUnkB0;
@@ -277,3 +277,70 @@ u32 DinoBattleModelCreature::GetUnk108() {
 void DinoBattleModelCreature::SetUnk108(u32 value) {
     mUnk108 = value;
 }
+
+u32 DinoBattleModelPlayer::GetUnkB8() {
+    return mUnkB8;
+}
+
+u32 DinoBattleModelPlayer::GetUnk128() {
+    return mUnk128;
+}
+
+u32 DinoBattleModelPlayer::GetUnk14C() {
+    return mUnk14C;
+}
+
+u8 DinoBattleModelPlayer::GetUnkC8() {
+    return mUnkC8;
+}
+
+void DinoBattleModelPlayer::SetUnkC8(u8 value) {
+    mUnkC8 = value;
+}
+
+u32 DinoBattleModelPlayer::GetUnk124() {
+    return mUnk124;
+}
+
+void DinoBattleModelPlayer::SetUnk124(u32 value) {
+    mUnk124 = value;
+}
+
+int DinoBattleModelPlayer::GetCreatureCount() {
+    return mCreatureCount;
+}
+
+DinoBattleModelCreature *DinoBattleModelPlayer::GetCreature(int index) {
+    return mCreatures[index];
+}
+
+DinoBattleModelCreature *DinoBattleModelPlayer::FindCreature(u32 id) {
+    int count = GetCreatureCount();
+    int i;
+
+    for (i = 0; i < count; i++) {
+        DinoBattleModelCreature *creature = GetCreature(i);
+        if (id == creature->GetUnkB8()) {
+            return creature;
+        }
+    }
+    return NULL;
+}
+
+u32 DinoBattleModelPlayer::GetUnkFC() {
+    return mUnkFC;
+}
+
+u32 DinoBattleModelPlayer::GetUnk110() {
+    return mUnk110;
+}
+
+u32 DinoBattleModelPlayer::GetUnkAC() {
+    return mUnkAC;
+}
+
+void DinoBattleModelPlayer::Idle() {
+    Dispatch();
+}
+
+#pragma auto_inline on
