@@ -2,6 +2,7 @@
 
 #include "m/motion.h"
 #include <map>
+#include "m/display.h"
 #include "m/heap.h"
 #include "m/obj.h"
 
@@ -168,6 +169,41 @@ MSmartOamUnit *MMotion::GetUnit() {
 
 MPalBlock *MMotion::GetPalette(u32 index) {
     return mPalettes[index];
+}
+
+inline void MMotion::FreeAffine(u32 index) {
+    if (mAffines[index] != NULL) {
+        mDisplay->mObj->mAfn->Free(mAffines[index]);
+        mAffines[index] = NULL;
+    }
+}
+
+void MMotion::ResetAnime() {
+    mUnk40 = -1;
+    mFrame = 0;
+    mUnk38 = -1;
+    for (u32 i = 0; i < mCellCount; i++) {
+        mCells[i].entry = mCellCount - i - 1;
+        mCells[i].unk04 = 0;
+        mCells[i].visible = FALSE;
+        mCells[i].objMode = 0;
+        mCells[i].offsetY = 0;
+        mCells[i].unk14 = MPoint(0, 0);
+        MSmartOamEntry *entry = &mEntries[i];
+        entry->unk08 = 0;
+        entry->unk0C = mUnk50;
+        entry->SetCoord(mPos);
+        entry->objMode = 2;
+        entry->SetFlip(mUnk2B, mUnk2C);
+    }
+    if (mUnk2A) {
+        for (u32 i = 0; i < mCellCount; i++) {
+            FreeAffine(i);
+        }
+    }
+    for (u32 i = 0; i < mFile.GetAnimeCount(); i++) {
+        mUnk64[i] = MMotionAnimeState(0, 0);
+    }
 }
 
 void *MMotion::GetAnimeData(int anime) {

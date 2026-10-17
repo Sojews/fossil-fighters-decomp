@@ -60,11 +60,22 @@ public:
 // One cell (OBJ) of a motion.
 struct MMotionCell {
     u8 visible;         // 0x00
-    u8 unk01[7];
+    u32 unk04;          // 0x04
     int objMode;        // 0x08
     u32 entry;          // 0x0C: index into the motion's smart OAM entries
     int offsetY;        // 0x10
-    u8 unk14[8];
+    MPoint unk14;       // 0x14
+};
+
+struct MMotionAnimeState {
+    MMotionAnimeState() {}
+    MMotionAnimeState(u32 a, u32 b) {
+        unk00 = a;
+        unk04 = b;
+    }
+
+    u32 unk00;
+    u32 unk04;
 };
 
 class MMotion : public MView {
@@ -100,6 +111,7 @@ public:
     void ResetAnime();
     void Advance(u32 frames);
     void Init(int fromEnd);
+    void FreeAffine(u32 index);
 
     MDisplay *mDisplay;         // 0x10
     MMotionFile mFile;          // 0x14
@@ -124,10 +136,10 @@ public:
     MPoint mPos;                // 0x54
     MMotionCell *mCells;        // 0x5C
     u32 mUnk60;                 // 0x60
-    void *mUnk64;               // 0x64
+    MMotionAnimeState *mUnk64;  // 0x64
     MPalBlock **mPalettes;      // 0x68
     void *mUnk6C;               // 0x6C
-    void *mUnk70;               // 0x70
+    MAfnBlock **mAffines;       // 0x70
     void *mUnk74;               // 0x74
     struct Override {
         MArchiveFile *unk00;

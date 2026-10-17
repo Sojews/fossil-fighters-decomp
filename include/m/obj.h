@@ -57,6 +57,10 @@ struct MOamEntry {
     }
     // shape: size * 4 + shape
     int GetShape() const { return shape | (size << 2); }
+    void SetFlip(BOOL h, BOOL v) {
+        hflip = h;
+        vflip = v;
+    }
     void SetShape(int shape) {
         this->shape = shape;
         size = shape >> 2;
