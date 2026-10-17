@@ -1,6 +1,7 @@
 // DinoFieldCharaAngleTask, DinoFieldCharaMoveToRegionTask, DinoFieldCharaMoveToCoordTask, DinoFieldCharaMoveOffsetTask, DinoFieldCharaMoveVectorTask, DinoFieldCharaWaitMoveTask, DinoFieldCharaFocusTask.
 // Only the destructors are decompiled so far.
 
+#include "game/dino_sound.h"
 #include "game/dino_field_point.h"
 #include "game/dino_field.h"
 #include "game/dino_field_spot.h"
@@ -314,4 +315,52 @@ MTask *DinoField::CreateDonateHideTask() {
     MTask *task = mDonate->CreateHideTask();
     mDonate = NULL;
     return task;
+}
+
+MTask *DinoField::CreateFadeWaitTask() {
+    return MTaskSetWaitEmptyTask::Create(mFadeTasks);
+}
+
+void DinoField::PlayBgm(u32 bgm, u32 arg) {
+    if (mBgmChanging == 0) {
+        mBgm = bgm;
+        mBgmScene = DinoSoundGetScene();
+        DinoSoundPlayBgm(bgm, arg);
+    }
+}
+
+void DinoField::StopBgm(u32 fadeFrames) {
+    mBgm = 0;
+    mBgmChanging = FALSE;
+    DinoSoundStopBgm(-1, fadeFrames);
+}
+
+void DinoField::PlayBgmFade(u32 bgm, u32 arg) {
+    mBgm = bgm;
+    mBgmScene = DinoSoundGetScene();
+    mBgmChanging = TRUE;
+    DinoSoundPlayBgm(bgm, arg);
+}
+
+u32 DinoField::GetBgm() {
+    return mBgm;
+}
+
+BOOL DinoField::IsBgmChanging() {
+    if (mBgmChanging) {
+        return TRUE;
+    }
+    return FALSE;
+}
+
+void DinoField::Quake(u32 a, u32 b, u32 c) {
+    mQuake = TRUE;
+    mQuakeArgs[0] = a;
+    mQuakeArgs[1] = b;
+    mQuakeArgs[2] = c;
+    mQuakeTime = 0;
+}
+
+MTask *DinoField::CreatePictWaitTask() {
+    return MTaskSetWaitEmptyTask::Create(mPictTasks);
 }

@@ -177,6 +177,7 @@ public:
     u32 GetUnk234();
     u32 GetUnk26C();
     void SetUnk238(u32 value);
+    u32 GetBgm();
     void FadeInPict(MDisplay *display, u32 *id, MTextPicture **pict, u32 newId, MPoint pos, u32 frames, long unk);
     void FadeOutPict(MDisplay *display, MTextPicture **pict, u32 id, long frames);
     void SlideInPict(MDisplay *display, u32 *id, MTextPicture **pict, u32 newId, MPoint pos, u32 a, u32 b, long c);
@@ -196,16 +197,23 @@ public:
     DinoFieldTownMap *mTownMap; // 0x248
     u32 mUnk24C[3];             // 0x24C
     u8 mUnk258;                 // 0x258
-    u8 unk259[0x13];
+    u8 unk259[0xF];
+    MTaskSet *mFadeTasks;       // 0x268
     u32 mUnk26C;                // 0x26C
-    u32 mUnk270;                // 0x270
+    MTaskSet *mPictTasks;       // 0x270
     MTextPicture *mLowerPict;   // 0x274: the event picture on each screen
     MTextPicture *mUpperPict;   // 0x278
     MPoint mLowerPos;           // 0x27C
     MPoint mUpperPos;           // 0x284
     u32 mUpperPictId;           // 0x28C
     u32 mLowerPictId;           // 0x290
-    u8 unk294[0xFC];
+    u32 mBgm;                   // 0x294
+    BOOL mBgmChanging;          // 0x298
+    u32 mBgmScene;              // 0x29C: the sound scene when the BGM was set
+    u8 mQuake;                  // 0x2A0
+    u32 mQuakeArgs[3];          // 0x2A4
+    u32 mQuakeTime;             // 0x2B0
+    u8 unk2B4[0xDC];
     DinoFieldPoint *mMoney;     // 0x390: the money panel, while shown
     DinoFieldPoint *mDonate;    // 0x394
 };
