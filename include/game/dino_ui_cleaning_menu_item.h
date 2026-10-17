@@ -7,6 +7,11 @@
 class DinoUiCleaningMenuItem : public MMenuItem, public DinoHelpItem {
 public:
     virtual ~DinoUiCleaningMenuItem();
+    virtual MRect GetFrame();
+    virtual void OnFocusChanged(BOOL focused);
+    virtual MRect GetRect();
+    virtual MDisplay *GetDisplay();
+    virtual const char *GetText();
 };
 
 #endif
