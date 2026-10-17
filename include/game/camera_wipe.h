@@ -31,6 +31,9 @@ class M3DFadeTask : public MTask {
 public:
     virtual ~M3DFadeTask();
     virtual void Execute();
+
+    int mUnk10;     // 0x10
+    int mUnk14;     // 0x14
 };
 
 class DinoBattleViewActionInfoBar : public MProcess {
