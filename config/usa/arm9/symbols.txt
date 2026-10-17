@@ -5416,11 +5416,11 @@ NNS_FndRecordStateForFrmHeap kind:function(thumb,size=0x2e) addr:0x0206dcc8
 NNS_FndFreeByStateToFrmHeap kind:function(thumb,size=0x30) addr:0x0206dcf8
 IsValidArchiveBinary kind:function(thumb,size=0x34) addr:0x0206dd28
 NNS_FndMountArchive kind:function(thumb,size=0xd0) addr:0x0206dd5c
-func_0206de2c kind:function(thumb,size=0x1a) addr:0x0206de2c
+NNS_FndUnmountArchive kind:function(thumb,size=0x1a) addr:0x0206de2c
 NNS_SndInit kind:function(thumb,size=0x5c) addr:0x0206de48
 NNS_SndMain kind:function(thumb,size=0x22) addr:0x0206dea4
 BeginSleep kind:function(thumb,size=0x26) addr:0x0206dec8
-EndSleep_0206def0 kind:function(thumb,size=0x8) addr:0x0206def0
+EndSleep kind:function(thumb,size=0x8) addr:0x0206def0
 NNS_SndLockChannel kind:function(thumb,size=0x2c) addr:0x0206def8
 NNS_SndUnlockChannel kind:function(thumb,size=0x1c) addr:0x0206df24
 NNS_SndUnlockCapture kind:function(thumb,size=0x10) addr:0x0206df40
@@ -5481,7 +5481,7 @@ ShutdownStrm kind:function(thumb,size=0x20) addr:0x0206ea60
 AlarmCallback kind:function(thumb,size=0xc) addr:0x0206ea80
 StrmCallback kind:function(thumb,size=0x68) addr:0x0206ea8c
 BeginSleep_0206eaf4 kind:function(thumb,size=0x30) addr:0x0206eaf4
-EndSleep kind:function(thumb,size=0x40) addr:0x0206eb24
+EndSleep_0206eb24 kind:function(thumb,size=0x40) addr:0x0206eb24
 NNSi_SndCaptureInit kind:function(thumb,size=0x10) addr:0x0206eb64
 NNSi_SndCaptureMain kind:function(thumb,size=0x58) addr:0x0206eb74
 NNSi_SndCaptureStop kind:function(thumb,size=0x9c) addr:0x0206ebcc
@@ -13021,10 +13021,9 @@ sSeedCount kind:bss addr:0x0214d594
 data_0214d59c kind:bss addr:0x0214d59c
 sRootListInitialized kind:bss addr:0x0214d5a4
 sRootList kind:bss(size=0xc) addr:0x0214d5a8
-data_0214d5c0 kind:bss addr:0x0214d5c0
-data_0214d5d0 kind:bss addr:0x0214d5d0
-data_0214d5dc kind:bss addr:0x0214d5dc
-data_0214f9c0 kind:bss addr:0x0214f9c0
+sSnd kind:bss(size=0x28) addr:0x0214d5c0
+data_0214d5e8 kind:bss addr:0x0214d5e8
+sResources kind:bss(size=0xc) addr:0x0214f9c0
 data_0214f9cc kind:bss addr:0x0214f9cc
 data_0214f9d8 kind:bss addr:0x0214f9d8
 data_0214f9e4 kind:bss addr:0x0214f9e4

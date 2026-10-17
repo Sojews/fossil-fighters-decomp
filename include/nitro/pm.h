@@ -14,6 +14,22 @@ extern "C" {
 #define PM_LCD_POWER_OFF 0
 #define PM_LCD_POWER_ON 1
 
+typedef void (*PMSleepCallback)(void *arg);
+
+typedef struct PMSleepCallbackInfo PMSleepCallbackInfo;
+struct PMSleepCallbackInfo {
+    PMSleepCallback callback;
+    void *arg;
+    PMSleepCallbackInfo *next;
+};
+
+static inline void PM_SetSleepCallback(PMSleepCallbackInfo *info, PMSleepCallback callback, void *arg) {
+    info->callback = callback;
+    info->arg = arg;
+}
+
+void PM_PrependPreSleepCallback(PMSleepCallbackInfo *info);
+void PM_AppendPostSleepCallback(PMSleepCallbackInfo *info);
 void PM_GoSleepMode(u32 trigger, u32 logic, u16 keyPattern);
 u32 PM_GetLCDPower(void);
 BOOL PM_SetLCDPower(u32 sw);

@@ -19968,8 +19968,8 @@ from:0x0206de7e kind:thumb_call to:0x0206e2e0 module:main
 from:0x0206de90 kind:load to:0x0214d5c0 module:main
 from:0x0206de94 kind:load to:0x0206dec9 module:main
 from:0x0206de98 kind:load to:0x0206def1 module:main
-from:0x0206de9c kind:load to:0x0214d5d0 module:main
-from:0x0206dea0 kind:load to:0x0214d5dc module:main
+from:0x0206de9c kind:load to:0x0214d5c0 add:0x10 module:main
+from:0x0206dea0 kind:load to:0x0214d5c0 add:0x1c module:main
 from:0x0206deaa kind:thumb_call to:0x0207636c module:main
 from:0x0206deb2 kind:thumb_call to:0x0206e358 module:main
 from:0x0206deb6 kind:thumb_call to:0x0206eb74 module:main

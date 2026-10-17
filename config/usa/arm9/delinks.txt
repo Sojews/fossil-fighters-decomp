@@ -413,3 +413,12 @@ libs/nitrosystem/src/fnd/heapcommon.c:
 libs/nitrosystem/src/fnd/frameheap.c:
     complete
     .text       start:0x0206db64 end:0x0206dd28
+
+libs/nitrosystem/src/fnd/fnd_archive.c:
+    .text       start:0x0206dd28 end:0x0206de48
+
+libs/nitrosystem/src/snd/main.c:
+    .text       start:0x0206de48 end:0x0206def8
+
+libs/nitrosystem/src/snd/resource_mgr.c:
+    .text       start:0x0206def8 end:0x0206dfa0
