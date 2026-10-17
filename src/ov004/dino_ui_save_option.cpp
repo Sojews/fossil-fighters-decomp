@@ -113,3 +113,24 @@ void DinoUiSaveOptionAppendItemTask::Execute() {
     mMenu->AppendItem(mKind);
     Exit();
 }
+
+void DinoUiSaveOptionMenu::OnSaveDecided() {
+    DinoSoundPlaySe(0x390, 0);
+    mSilentFocus = TRUE;
+    MTask *save = new DinoUiSaveOptionMenuSaveTask(this, mUnkB4);
+    MTask *timer = new MTimer(30);
+    MSerialTaskSet *serial = &mSerial;
+    serial->AddTail(timer);
+    serial->AddTail(save);
+}
+
+void DinoUiSaveOptionMenu::RemoveItem() {
+    RemoveLink(mItems[0], 2);
+    RemoveLink(mItems[2], 3);
+    MMenu::RemoveItem(mItems[0]);
+    MMenu::RemoveItem(mItems[1]);
+    MMenu::RemoveItem(mItems[2]);
+    delete mItems[0];
+    delete mItems[1];
+    delete mItems[2];
+}

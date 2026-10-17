@@ -17,7 +17,11 @@ public:
     void OnOptionDecided();
     void OnSaveDecided();
 
-    u8 unkB3[0x19];  // members start in MMenu's tail padding
+    u8 unkB3[1];     // members start in MMenu's tail padding
+    u32 mUnkB4;      // 0xB4
+    u32 mUnkB8;      // 0xB8
+    MMenuItem *mItems[3]; // 0xBC
+    u32 mUnkC8;      // 0xC8
     u8 mSilentFocus; // 0xCC
 };
 
