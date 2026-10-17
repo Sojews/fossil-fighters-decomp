@@ -1,6 +1,7 @@
 #ifndef GAME_DINO_UI_ITEM_ITEM_BUTTON_MENU_H
 #define GAME_DINO_UI_ITEM_ITEM_BUTTON_MENU_H
 
+#include "game/dino_team.h"
 #include "game/dino_ui_field_menu_fraction.h"
 #include <string>
 #include <vector>
@@ -29,7 +30,9 @@ public:
     MMenuItem *mTabItems[3]; // 0xDC
     u32 mUnkE8;
     int *mResult;               // 0xEC
-    u32 mUnkF0[4];
+    DinoTeam *mOldTeam;         // 0xF0: the team when the menu opened
+    DinoTeam *mTeam;            // 0xF4
+    u32 mUnkF8[2];
     DinoUiFieldMenuFraction *mFraction; // 0x100: "page n/m"
     u32 mUnk104[6];
     std::vector<void *> mUnk11C; // 0x11C
