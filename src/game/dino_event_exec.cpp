@@ -275,6 +275,122 @@ void DinoEventExecProhibitNisReset::Transfer() {
     ProhibitNisReset();
 }
 
+DinoEventExecCamera::DinoEventExecCamera(DinoEvent *event, u32 x, u32 y, u32 z, u32 a, u32 b, u32 c) {
+    mEvent = event;
+    mX = x;
+    mY = y;
+    mZ = z;
+    mB = b;
+    mC = c;
+    mA = a;
+}
+
+void DinoEventExecCamera::Transfer() {
+    mEvent->MarkCameraUsed();
+    mEvent->GetField()->GetCamera()->SetTracking(FALSE);
+    mEvent->GetField()->GetCamera()->StartRotate(mX, mY, mZ, mA, mB, mC);
+}
+
+DinoEventExecStartFellow::DinoEventExecStartFellow(DinoEvent *event, u32 chara, u32 target) {
+    mEvent = event;
+    mChara = chara;
+    mTarget = target;
+}
+
+void DinoEventExecStartFellow::Transfer() {
+    DinoCharaTask task;
+    gDinoBackup->GetCharaTask(mChara, &task);
+    task.unk4 = 1;
+    task.unk8.fellow.target = mTarget;
+    gDinoBackup->SetCharaTask(mChara, &task);
+    DinoFieldChara *chara = mEvent->GetField()->GetChara(mChara);
+    if (chara != NULL) {
+        chara->SetTask(task);
+    }
+}
+
+DinoEventExecStartWander::DinoEventExecStartWander(DinoEvent *event, u32 chara, u32 a, u32 b, u32 c, u32 d) {
+    mEvent = event;
+    mChara = chara;
+    mArgs[0] = a;
+    mArgs[1] = b;
+    mArgs[2] = c;
+    mArgs[3] = d;
+}
+
+void DinoEventExecStartWander::Transfer() {
+    DinoCharaTask task;
+    gDinoBackup->GetCharaTask(mChara, &task);
+    task.unk4 = 2;
+    task.unk8.wander.w[0] = mArgs[0];
+    task.unk8.wander.w[1] = mArgs[1];
+    task.unk8.wander.w[2] = mArgs[2];
+    task.unk8.wander.w[3] = mArgs[3];
+    gDinoBackup->SetCharaTask(mChara, &task);
+    DinoFieldChara *chara = mEvent->GetField()->GetChara(mChara);
+    if (chara != NULL) {
+        chara->SetTask(task);
+    }
+}
+
+DinoEventExecFinishFellow::DinoEventExecFinishFellow(DinoEvent *event, u32 chara) {
+    mEvent = event;
+    mChara = chara;
+}
+
+void DinoEventExecFinishFellow::Transfer() {
+    DinoCharaTask task;
+    gDinoBackup->GetCharaTask(mChara, &task);
+    task.unk4 = 0;
+    gDinoBackup->SetCharaTask(mChara, &task);
+    DinoFieldChara *chara = mEvent->GetField()->GetChara(mChara);
+    if (chara != NULL) {
+        chara->SetTask(task);
+    }
+}
+
+DinoEventExecStartWatch::DinoEventExecStartWatch(DinoEvent *event, u32 chara, DinoCharaWatch watch) {
+    mEvent = event;
+    mChara = chara;
+    mWatch.w[0] = watch.w[0];
+    mWatch.w[1] = watch.w[1];
+    mWatch.w[2] = watch.w[2];
+    mWatch.w[3] = watch.w[3];
+    mWatch.w[4] = watch.w[4];
+}
+
+void DinoEventExecStartWatch::Transfer() {
+    DinoCharaTask task;
+    gDinoBackup->GetCharaTask(mChara, &task);
+    task.unk28.active = TRUE;
+    task.unk28.w[0] = mWatch.w[0];
+    task.unk28.w[1] = mWatch.w[1];
+    task.unk28.w[2] = mWatch.w[2];
+    task.unk28.w[3] = mWatch.w[3];
+    task.unk28.w[4] = mWatch.w[4];
+    gDinoBackup->SetCharaTask(mChara, &task);
+    DinoFieldChara *chara = mEvent->GetField()->GetChara(mChara);
+    if (chara != NULL) {
+        chara->SetTask(task);
+    }
+}
+
+DinoEventExecFinishWatch::DinoEventExecFinishWatch(DinoEvent *event, u32 chara) {
+    mEvent = event;
+    mChara = chara;
+}
+
+void DinoEventExecFinishWatch::Transfer() {
+    DinoCharaTask task;
+    gDinoBackup->GetCharaTask(mChara, &task);
+    task.unk28.active = FALSE;
+    gDinoBackup->SetCharaTask(mChara, &task);
+    DinoFieldChara *chara = mEvent->GetField()->GetChara(mChara);
+    if (chara != NULL) {
+        chara->SetTask(task);
+    }
+}
+
 DinoEventExecStartBehold::DinoEventExecStartBehold(DinoEvent *event, u32 chara, u32 target) {
     mEvent = event;
     mChara = chara;

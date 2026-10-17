@@ -247,7 +247,17 @@ public:
 
 class DinoEventExecCamera : public MTransfer {
 public:
+    DinoEventExecCamera(DinoEvent *event, u32 x, u32 y, u32 z, u32 a, u32 b, u32 c);
     virtual ~DinoEventExecCamera();
+    virtual void Transfer();
+
+    DinoEvent *mEvent;  // 0x10
+    u32 mX;             // 0x14
+    u32 mY;             // 0x18
+    u32 mZ;             // 0x1C
+    u32 mA;             // 0x20
+    u32 mB;             // 0x24
+    u32 mC;             // 0x28
 };
 
 class DinoEventExecProhibitCameraRelease : public MTransfer {
@@ -270,27 +280,55 @@ public:
 
 class DinoEventExecStartFellow : public MTransfer {
 public:
+    DinoEventExecStartFellow(DinoEvent *event, u32 chara, u32 target);
     virtual ~DinoEventExecStartFellow();
+    virtual void Transfer();
+
+    DinoEvent *mEvent;  // 0x10
+    u32 mChara;         // 0x14
+    u32 mTarget;        // 0x18
 };
 
 class DinoEventExecFinishFellow : public MTransfer {
 public:
+    DinoEventExecFinishFellow(DinoEvent *event, u32 chara);
     virtual ~DinoEventExecFinishFellow();
+    virtual void Transfer();
+
+    DinoEvent *mEvent;  // 0x10
+    u32 mChara;         // 0x14
 };
 
 class DinoEventExecStartWander : public MTransfer {
 public:
+    DinoEventExecStartWander(DinoEvent *event, u32 chara, u32 a, u32 b, u32 c, u32 d);
     virtual ~DinoEventExecStartWander();
+    virtual void Transfer();
+
+    DinoEvent *mEvent;  // 0x10
+    u32 mChara;         // 0x14
+    u32 mArgs[4];       // 0x18
 };
 
 class DinoEventExecStartWatch : public MTransfer {
 public:
+    DinoEventExecStartWatch(DinoEvent *event, u32 chara, DinoCharaWatch watch);
     virtual ~DinoEventExecStartWatch();
+    virtual void Transfer();
+
+    DinoEvent *mEvent;      // 0x10
+    u32 mChara;             // 0x14
+    DinoCharaWatch mWatch;  // 0x18
 };
 
 class DinoEventExecFinishWatch : public MTransfer {
 public:
+    DinoEventExecFinishWatch(DinoEvent *event, u32 chara);
     virtual ~DinoEventExecFinishWatch();
+    virtual void Transfer();
+
+    DinoEvent *mEvent;  // 0x10
+    u32 mChara;         // 0x14
 };
 
 class DinoEventExecStartBehold : public MTransfer {

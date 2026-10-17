@@ -8,6 +8,7 @@
 #include "m/geometry.h"
 
 class MTask;
+struct DinoCharaTask;
 
 class DinoFieldNamePanel {
 public:
@@ -17,6 +18,8 @@ public:
 class DinoFieldCamera {
 public:
     void ResetHeight();
+    void SetTracking(u8 tracking);
+    void StartRotate(u16 x, u16 y, u16 z, u32 a, u32 b, u32 c);
 
     u8 unk00[0x144];
     DinoFieldNamePanel *mNamePanel; // 0x144
@@ -35,6 +38,7 @@ public:
     void StartBehold(u32 target);
     void FinishBehold();
     void SetFootSe(u32 se);
+    void SetTask(DinoCharaTask task);
 };
 
 class DinoField {
@@ -62,6 +66,7 @@ public:
 // The event being run.
 class DinoEvent {
 public:
+    void MarkCameraUsed();
     DinoField *GetField();
 };
 

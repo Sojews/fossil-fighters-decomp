@@ -125,15 +125,30 @@ struct DinoBackupEntry {
     u32 unk10_4 : 28;
 };
 
+struct DinoCharaWatch {
+    u32 w[5];
+};
+
 // A character's saved task.
 struct DinoCharaTask {
     u32 id;             // 0x00: 0 = free
-    u8 unk4;            // 0x04
-    struct {
+    u8 unk4;            // 0x04: 0 = none, 1 = follow, 2 = wander, 3 = patrol
+    union {
         u32 w[8];
+        struct {
+            u16 target;
+        } fellow;
+        struct {
+            u32 w[4];
+        } wander;
+        struct {
+            u32 w[3];
+            u32 count;
+            u16 points[8];
+        } patrol;
     } unk8;             // 0x08
     struct {
-        u8 active;
+        u8 active;      // watching
         u8 pad[3];
         u32 w[5];
     } unk28;            // 0x28
