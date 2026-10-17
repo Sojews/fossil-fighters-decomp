@@ -13083,8 +13083,8 @@ data_0215381c kind:bss addr:0x0215381c
 data_02153824 kind:bss addr:0x02153824
 data_0215382c kind:bss addr:0x0215382c
 data_02153834 kind:bss addr:0x02153834
-data_02153890 kind:bss addr:0x02153890
-data_021538ac kind:bss addr:0x021538ac
+tpInitialized kind:bss(size=0x2) addr:0x02153890
+tpState kind:bss(size=0x38) addr:0x02153894
 micInitialized kind:bss(size=0x2) addr:0x021538cc
 micWork kind:bss(size=0x1c) addr:0x021538d0
 PMi_Initialized kind:bss(size=0x2) addr:0x021538ec

@@ -21498,7 +21498,7 @@ from:0x0207966e kind:thumb_call_arm to:0x02074fec module:main
 from:0x02079710 kind:thumb_call_arm to:0x0208638c module:main
 from:0x02079746 kind:thumb_call_arm to:0x0208638c module:main
 from:0x0207976c kind:load to:0x02153890 module:main
-from:0x02079770 kind:load to:0x021538ac module:main
+from:0x02079770 kind:load to:0x02153894 add:0x18 module:main
 from:0x02079780 kind:load to:0x02153890 module:main
 from:0x0207978c kind:load to:0x02153890 module:main
 from:0x020797a4 kind:thumb_call to:0x02076b20 module:main
