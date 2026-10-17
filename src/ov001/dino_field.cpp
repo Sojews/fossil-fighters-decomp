@@ -1,6 +1,7 @@
 // DinoField: the field (the overworld).
 
 #include "game/dino_field.h"
+#include "m/lcd.h"
 #include "game/dino_field_chara_focus_task.h"
 #include "game/dino_field_chara_wait_move_task.h"
 #include "game/dino_field_chara_move_vector_task.h"
@@ -74,4 +75,58 @@ MTask *DinoField::CreateCharaWaitMoveTask(u32 chara) {
 
 MTask *DinoField::CreateCharaFocusTask(u32 chara) {
     return new DinoFieldCharaFocusTask(this, chara);
+}
+
+void DinoField::FadeInLowerPict(u32 pict, MPoint pos, u32 frames, long unk) {
+    mLowerPos = pos;
+    FadeInPict(gLcd->GetBottomDisplay(), &mLowerPictId, &mLowerPict, pict, pos, frames, unk);
+}
+
+void DinoField::FadeOutLowerPict(u32 pict, long frames) {
+    FadeOutPict(gLcd->GetBottomDisplay(), &mLowerPict, pict, frames);
+}
+
+void DinoField::SlideInLowerPict(u32 pict, MPoint pos, u32 a, u32 b, long c) {
+    mLowerPos = pos;
+    SlideInPict(gLcd->GetBottomDisplay(), &mLowerPictId, &mLowerPict, pict, pos, a, b, c);
+}
+
+void DinoField::SlideOutLowerPict(u32 pict, u32 a, long b) {
+    SlideOutPict(gLcd->GetBottomDisplay(), &mLowerPict, pict, a, b);
+}
+
+void DinoField::ZoomInLowerPict(u32 pict, MPoint pos, MFx32 scale, u32 a, long b) {
+    mLowerPos = pos;
+    ZoomInPict(gLcd->GetBottomDisplay(), &mLowerPictId, &mLowerPict, pict, pos, scale, a, b);
+}
+
+void DinoField::ZoomOutLowerPict(MFx32 scale, u32 a, long b) {
+    ZoomOutPict(gLcd->GetBottomDisplay(), &mLowerPict, scale, a, b);
+}
+
+void DinoField::FadeInUpperPict(u32 pict, MPoint pos, u32 frames, long unk) {
+    mUpperPos = pos;
+    FadeInPict(gLcd->GetTopDisplay(), &mUpperPictId, &mUpperPict, pict, pos, frames, unk);
+}
+
+void DinoField::FadeOutUpperPict(u32 pict, long frames) {
+    FadeOutPict(gLcd->GetTopDisplay(), &mUpperPict, pict, frames);
+}
+
+void DinoField::SlideInUpperPict(u32 pict, MPoint pos, u32 a, u32 b, long c) {
+    mUpperPos = pos;
+    SlideInPict(gLcd->GetTopDisplay(), &mUpperPictId, &mUpperPict, pict, pos, a, b, c);
+}
+
+void DinoField::SlideOutUpperPict(u32 pict, u32 a, long b) {
+    SlideOutPict(gLcd->GetTopDisplay(), &mUpperPict, pict, a, b);
+}
+
+void DinoField::ZoomInUpperPict(u32 pict, MPoint pos, MFx32 scale, u32 a, long b) {
+    mUpperPos = pos;
+    ZoomInPict(gLcd->GetTopDisplay(), &mUpperPictId, &mUpperPict, pict, pos, scale, a, b);
+}
+
+void DinoField::ZoomOutUpperPict(MFx32 scale, u32 a, long b) {
+    ZoomOutPict(gLcd->GetTopDisplay(), &mUpperPict, scale, a, b);
 }

@@ -14,6 +14,8 @@
 #include "m/serializer.h"
 #include "game/dino_field_town_map.h"
 struct DinoCharaTask;
+class MTextPicture;
+class MDisplay;
 
 class DinoFieldNamePanel {
 public:
@@ -172,6 +174,12 @@ public:
     u32 GetUnk234();
     u32 GetUnk26C();
     void SetUnk238(u32 value);
+    void FadeInPict(MDisplay *display, u32 *id, MTextPicture **pict, u32 newId, MPoint pos, u32 frames, long unk);
+    void FadeOutPict(MDisplay *display, MTextPicture **pict, u32 id, long frames);
+    void SlideInPict(MDisplay *display, u32 *id, MTextPicture **pict, u32 newId, MPoint pos, u32 a, u32 b, long c);
+    void SlideOutPict(MDisplay *display, MTextPicture **pict, u32 id, u32 a, long b);
+    void ZoomInPict(MDisplay *display, u32 *id, MTextPicture **pict, u32 newId, MPoint pos, MFx32 scale, u32 a, long b);
+    void ZoomOutPict(MDisplay *display, MTextPicture **pict, MFx32 scale, u32 a, long b);
 
     u8 unk000[0x9C];            // (MProcess, and the bases at 0x74 and 0x8C)
     DinoFieldMap *mMap;         // 0x9C
@@ -187,6 +195,13 @@ public:
     u8 mUnk258;                 // 0x258
     u8 unk259[0x13];
     u32 mUnk26C;                // 0x26C
+    u32 mUnk270;                // 0x270
+    MTextPicture *mLowerPict;   // 0x274: the event picture on each screen
+    MTextPicture *mUpperPict;   // 0x278
+    MPoint mLowerPos;           // 0x27C
+    MPoint mUpperPos;           // 0x284
+    u32 mUpperPictId;           // 0x28C
+    u32 mLowerPictId;           // 0x290
 };
 
 // The event being run.
