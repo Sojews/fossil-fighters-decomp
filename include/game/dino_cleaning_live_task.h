@@ -14,7 +14,6 @@ public:
     void Unk021580cc();
     void Unk021580d8();
 
-    u8 unkC4[0xD4 - 0xC4];
     u32 mUnkD4;                     // 0xD4
     DinoCleaningTalkWindow *mTalk;  // 0xD8
 };

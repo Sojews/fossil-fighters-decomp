@@ -17,6 +17,7 @@ public:
     void OnBackDecided();
     void OnOptionDecided();
     void OnSaveDecided();
+    u32 GetUnkB8();
 
     u8 unkB3[1];     // members start in MMenu's tail padding
     u32 mUnkB4;      // 0xB4

@@ -34,8 +34,12 @@ public:
     void SetTracking(u8 tracking);
     void SetFocus(u32 chara);
     void StartRotate(u16 x, u16 y, u16 z, u32 a, u32 b, u32 c);
+    u32 GetFocus();
+    u16 GetUnkD8();
 
-    u8 unk8C[0xE4 - 0x8C];
+    u8 unk8C[0xD8 - 0x8C];
+    u16 mUnkD8;                     // 0xD8
+    u8 unkDA[0xE4 - 0xDA];
     u32 mFocus;                     // 0xE4: the character followed
     u32 mUnkE8;                     // 0xE8
     s32 mUnkEC;                     // 0xEC

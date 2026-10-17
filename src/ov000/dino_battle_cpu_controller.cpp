@@ -4,6 +4,7 @@
 #include "game/dino_battle_controller.h"
 #include "types.h"
 #include "game/dino_battle_cpu_controller.h"
+#include "game/dino_common_live.h"
 
 #pragma auto_inline off
 
@@ -15,15 +16,14 @@ BOOL DinoBattleController::Unk14() {
     return FALSE;
 }
 
-extern "C" void func_020210f4(u32 event);
-extern "C" void func_02021098(u32 event, u8 check);
+extern "C" void func_020210f4(DinoCommonLive *live);
 
 void SetLiveEventCheckTask::Execute() {
-    if (mEvent != 0) {
+    if (mLive != NULL) {
         if (!mCheck) {
-            func_020210f4(mEvent);
+            func_020210f4(mLive);
         }
-        func_02021098(mEvent, mCheck);
+        mLive->SetUnkD2(mCheck);
     }
     Exit();
 }

@@ -165,3 +165,9 @@ void DinoUiSaveOption::Idle() {
     serial->AddTail(menu);
     serial->AddTail(exit);
 }
+
+#pragma auto_inline off
+
+u32 DinoUiSaveOptionMenu::GetUnkB8() {
+    return mUnkB8;
+}

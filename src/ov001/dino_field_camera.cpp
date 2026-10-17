@@ -20,3 +20,13 @@ void DinoFieldCamera::SetTracking(u8 tracking) {
 void DinoFieldCamera::ResetHeight() {
     mHeightSet = FALSE;
 }
+
+#pragma auto_inline off
+
+u32 DinoFieldCamera::GetFocus() {
+    return mFocus;
+}
+
+u16 DinoFieldCamera::GetUnkD8() {
+    return mUnkD8;
+}

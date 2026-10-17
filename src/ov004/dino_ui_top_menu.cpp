@@ -377,3 +377,9 @@ const char *DinoUiSaveSlotSelectMenuItem::GetText() {
 
 DinoUiSaveSlotConfirm::DinoUiSaveSlotConfirm() : MProcess(NULL) {
 }
+
+#pragma auto_inline off
+
+u32 DinoUiTopMenu::GetUnkB4() {
+    return mUnkB4;
+}

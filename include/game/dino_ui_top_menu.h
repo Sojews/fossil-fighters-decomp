@@ -15,8 +15,11 @@ public:
     void OnMultiDecided();
     void OnPassDecided();
     void OnOptionDecided();
+    u32 GetUnkB4();
 
-    u8 unkB3[0x15];  // members start in MMenu's tail padding
+    u8 unkB3[1];     // members start in MMenu's tail padding
+    u32 mUnkB4;      // 0xB4
+    u8 unkB8[0x10];
     int *mResult;    // 0xC8: which button was chosen
     u8 mSilentFocus; // 0xCC
 };

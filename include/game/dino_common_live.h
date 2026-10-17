@@ -22,6 +22,8 @@ public:
     void SetUnkAC(u32 index);
     void SetUnkA0(u32 index, BOOL value);
     void SetUnkB8(int index, void *value);
+    void SetUnkD2(u8 value);
+    u8 GetUnkD2();
 
     MArchivePtr mArchive;               // 0x74
     MArchiveFile mFile;                 // 0x78
@@ -31,6 +33,8 @@ public:
     MBitVector mUnkA0;                  // 0xA0
     MBitVector mUnkAC;                  // 0xAC
     std::vector<void *> mUnkB8;         // 0xB8
+    u8 unkC4[0xE];
+    u8 mUnkD2;                          // 0xD2
 };
 
 #endif

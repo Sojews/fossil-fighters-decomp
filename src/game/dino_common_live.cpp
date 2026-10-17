@@ -23,3 +23,13 @@ void DinoCommonLive::SetUnkB8(int index, void *value) {
 
 DinoCommonLive::~DinoCommonLive() {
 }
+
+#pragma auto_inline off
+
+void DinoCommonLive::SetUnkD2(u8 value) {
+    mUnkD2 = value;
+}
+
+u8 DinoCommonLive::GetUnkD2() {
+    return mUnkD2;
+}

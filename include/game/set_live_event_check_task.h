@@ -3,12 +3,14 @@
 
 #include "m/task.h"
 
+class DinoCommonLive;
+
 class SetLiveEventCheckTask : public MTask {
 public:
     virtual ~SetLiveEventCheckTask();
     virtual void Execute();
 
-    u32 mEvent;     // 0x10
+    DinoCommonLive *mLive;  // 0x10
     u8 mCheck;      // 0x14
 };
 
