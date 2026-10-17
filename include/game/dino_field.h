@@ -39,7 +39,9 @@ public:
 
 // A character's model: where it stands and which way it faces.
 struct DinoFieldCharaModel {
-    u8 unk00[8];
+    u32 id;             // 0x00: the character id
+    u8 unk04;           // 0x04: several characters share the id; see DinoField::GetChara
+    u8 unk05[3];
     MFx32Point pos;     // 0x08
     u8 unk10[6];
     u16 angle;          // 0x16
@@ -161,9 +163,25 @@ public:
     void ZoomInUpperPict(u32 pict, MPoint pos, MFx32 scale, u32 a, long b);
     void ZoomOutUpperPict(MFx32 scale, u32 a, long b);
 
-    u8 unk000[0x244];
+    BOOL IsUnk258();
+    u32 GetUnk234();
+    u32 GetUnk26C();
+    void SetUnk238(u32 value);
+
+    u8 unk000[0x9C];            // (MProcess, and the bases at 0x74 and 0x8C)
+    DinoFieldMap *mMap;         // 0x9C
+    DinoFieldChara *mCharas[100]; // 0xA0
+    u32 mUnk230;                // 0x230
+    u32 mUnk234;                // 0x234
+    u32 mUnk238;                // 0x238: for characters with the model flag, the one GetChara returns
+    u32 mUnk23C;                // 0x23C
+    DinoFieldCamera *mCamera;   // 0x240
     DinoFieldRadar *mRadar;     // 0x244
     DinoFieldTownMap *mTownMap; // 0x248
+    u32 mUnk24C[3];             // 0x24C
+    u8 mUnk258;                 // 0x258
+    u8 unk259[0x13];
+    u32 mUnk26C;                // 0x26C
 };
 
 // The event being run.

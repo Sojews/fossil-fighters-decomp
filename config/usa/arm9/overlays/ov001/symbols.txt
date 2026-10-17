@@ -3,12 +3,12 @@ func_ov001_021558a8 kind:function(thumb,size=0xabc) addr:0x021558a8
 _ZN9DinoFieldD1Ev kind:function(thumb,size=0x128) addr:0x02156364
 _ZN9DinoFieldD0Ev kind:function(thumb,size=0x12c) addr:0x0215648c
 _ZN9DinoField9SetUnk258Ei kind:function(thumb,size=0x74) addr:0x021565b8
-func_ov001_0215662c kind:function(thumb,size=0x12) addr:0x0215662c
+_ZN9DinoField8IsUnk258Ev kind:function(thumb,size=0x12) addr:0x0215662c
 _ZN9DinoField9GetCameraEv kind:function(thumb,size=0x8) addr:0x02156640
 _ZN9DinoField6GetMapEv kind:function(thumb,size=0x6) addr:0x02156648
-func_ov001_02156650 kind:function(thumb,size=0x8) addr:0x02156650
-func_ov001_02156658 kind:function(thumb,size=0x8) addr:0x02156658
-func_ov001_02156660 kind:function(thumb,size=0x8) addr:0x02156660
+_ZN9DinoField9GetUnk234Ev kind:function(thumb,size=0x8) addr:0x02156650
+_ZN9DinoField9GetUnk26CEv kind:function(thumb,size=0x8) addr:0x02156658
+_ZN9DinoField9SetUnk238Em kind:function(thumb,size=0x8) addr:0x02156660
 _ZN9DinoField8GetCharaEm kind:function(thumb,size=0x4a) addr:0x02156668
 func_ov001_021566b4 kind:function(thumb,size=0x8ae) addr:0x021566b4
 .L_02156f56 kind:label(thumb) addr:0x02156f56 local
