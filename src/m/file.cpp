@@ -89,6 +89,15 @@ std::string MFile::GetPath() {
     return MGetFilePath(mId);
 }
 
+std::string MFile::GetDirectory() {
+    std::string path = GetPath();
+    u32 pos = path.rfind('/');
+    if (pos != std::string::npos) {
+        return path.substr(0, pos + 1);
+    }
+    return "";
+}
+
 BOOL MFile::IsUnk10() {
     if ((mFile.stat & 0x10) ? TRUE : FALSE) {
         return TRUE;

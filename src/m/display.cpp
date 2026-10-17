@@ -305,6 +305,16 @@ MDisplay *MLcd::GetBottomDisplay() {
     return mMain;
 }
 
+void MLcd::FreeBanks(MVramBanks *banks) {
+    for (u32 i = 0; i < 4; i++) {
+        if (banks->banks[i]) {
+            FreeBank(banks->banks[i]);
+        }
+        banks->banks[i] = 0;
+    }
+    banks->count = 0;
+}
+
 MVramCnt MLcd::SetBankCnt(int bank, MVramCnt cnt) {
     MVramCnt old;
 
