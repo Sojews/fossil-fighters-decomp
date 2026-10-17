@@ -2,6 +2,7 @@
 
 #include "game/dino_cleaning.h"
 #include "game/dino_cleaning_kaseki_rock.h"
+#include "game/dino_cleaning_rock.h"
 #include "game/dino_cleaning_kaseki_rock_xray_blend_manager.h"
 #include "game/help.h"
 #include "m/bg_new_task.h"
@@ -14,6 +15,54 @@ DinoCleaningKasekiRock::~DinoCleaningKasekiRock() {
 }
 
 DinoCleaningKasekiRockXrayBlendManager::~DinoCleaningKasekiRockXrayBlendManager() {
+}
+
+DinoCleaningRock *DinoCleaningKasekiRock::GetRock8C() {
+    return mRock8C;
+}
+
+DinoCleaningRock *DinoCleaningKasekiRock::GetRock90() {
+    return mRock90;
+}
+
+u8 DinoCleaningKasekiRock::GetUnk4B8() {
+    return mUnk4B8;
+}
+
+BOOL DinoCleaningKasekiRock::IsCellClear(int row, int col) {
+    if (mRock90->IsCellClear(row, col) && mRock8C->IsCellClear(row, col)) {
+        return TRUE;
+    }
+    return FALSE;
+}
+
+s32 DinoCleaningKasekiRock::GetCellLayer(int row, int col) {
+    if (mRock90->IsCellClear(row, col)) {
+        return mRock8C->GetCellLayer(row, col);
+    }
+    return mRock90->GetCellLayer(row, col) + 3;
+}
+
+DinoCleaningRock *DinoCleaningKasekiRock::GetTopRock(int row, int col) {
+    if (!mRock90->IsCellClear(row, col)) {
+        return mRock90;
+    }
+    if (mRock8C->IsCellClear(row, col)) {
+        return NULL;
+    }
+    return mRock8C;
+}
+
+MFx32 DinoCleaningKasekiRock::GetRatio() {
+    return MFx32(100) * MFx32(mUnk9C) / MFx32(mUnk98);
+}
+
+MFx32 DinoCleaningKasekiRock::GetRatio(int index) {
+    return MFx32(100) * MFx32(mUnkA0[index]) / MFx32(mUnk98);
+}
+
+void DinoCleaningKasekiRock::Idle() {
+    (this->*mState)();
 }
 
 // NONMATCHING: the members' destructors are missing (the member layout isn't known yet).
