@@ -199,3 +199,34 @@ void DinoUiItemMenu::OnBackDecided() {
     serial->AddTail(fade);
     serial->AddTail(exit);
 }
+
+extern const u32 data_0208aae0;
+
+// NONMATCHING: the else branch swaps the exit/fade registers.
+void DinoUiItemMenu::OnOKDecided() {
+    MTask *fade;
+    MTask *exit;
+    *mResult = 0;
+    if (mOldTeam->members[0]) {
+        if (DinoTeamDiffers(mOldTeam, mTeam)) {
+            mSerial.AddTail(new DinoCommonWindowMessageBox(MPoint(128, 96), gDinoResource->GetText(data_0208aae0), 4));
+        } else {
+            mSerial.AddTail(new MTimer(30));
+        }
+        MTask &self = *this;
+        exit = MTaskExitTransfer::Create(&self);
+        fade = gLcd->mMain->mBright->CreateFadeOutToBlack(30, 0);
+        MSerialTaskSet *serial = &mSerial;
+        serial->AddTail(fade);
+        serial->AddTail(exit);
+    } else {
+        MTask &self = *this;
+        exit = MTaskExitTransfer::Create(&self);
+        fade = gLcd->mMain->mBright->CreateFadeOutToBlack(30, 0);
+        MTask *timer = new MTimer(30);
+        MSerialTaskSet *serial = &mSerial;
+        serial->AddTail(timer);
+        serial->AddTail(fade);
+        serial->AddTail(exit);
+    }
+}
