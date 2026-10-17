@@ -23,4 +23,56 @@ public:
     std::vector<MMotionFile> mMotions;  // 0x208
 };
 
+class DinoUiSortMenuItem : public MMenuItem, public DinoHelpItem {
+public:
+    virtual ~DinoUiSortMenuItem();
+    virtual MRect GetFrame();
+    virtual void OnFocusChanged(BOOL focused);
+    virtual void OnSelectChanged(BOOL selected);
+    virtual void OnDecide();
+    virtual MRect GetRect();
+    virtual MDisplay *GetDisplay();
+    virtual const char *GetText();
+};
+
+class DinoUiMedalList : public MProcess {
+public:
+    virtual ~DinoUiMedalList();
+    virtual void Idle();
+};
+
+class DinoUiMedalMenuItem : public MMenuItem, public DinoHelpItem {
+public:
+    virtual ~DinoUiMedalMenuItem();
+    virtual MRect GetFrame();
+    virtual MRect GetRect();
+    virtual MDisplay *GetDisplay();
+    virtual const char *GetText();
+};
+
+class DinoUiMedalBackButton : public DinoUiMedalMenuItem {
+public:
+    virtual ~DinoUiMedalBackButton();
+    virtual void OnFocusChanged(BOOL focused);
+    virtual void OnDecide();
+};
+
+class DinoUiMedalPageLButton : public DinoUiMedalMenuItem {
+public:
+    virtual ~DinoUiMedalPageLButton();
+    virtual void OnDecide();
+};
+
+class DinoUiMedalPageRButton : public DinoUiMedalMenuItem {
+public:
+    virtual ~DinoUiMedalPageRButton();
+    virtual void OnDecide();
+};
+
+class DinoUiMedalSlotCreateTask : public MProcess {
+public:
+    virtual ~DinoUiMedalSlotCreateTask();
+    virtual void Idle();
+};
+
 #endif
