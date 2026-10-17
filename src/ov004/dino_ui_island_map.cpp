@@ -4,6 +4,7 @@
 // Derived destructors have their bases' destructor bodies inlined; auto-inlining the ones defined above does that.
 #pragma auto_inline on
 
+#include "m/input.h"
 #include "m/lcd.h"
 #include "m/bg.h"
 #include "m/pal.h"
@@ -168,5 +169,20 @@ void GuidMan::Execute() {
         mHelp->Enable();
     } else {
         mHelp->Disable();
+    }
+}
+
+void DinoUiIslandMapMenu::CheckKeys() {
+    MSerialTaskSet *serial = &mSerial;
+    if (serial->IsEmpty()) {
+        if (GetInput()->GetPressed() & 2) {
+            if (mBackButton) {
+                if (mBackButton->IsFocused()) {
+                    mBackButton->Decide();
+                } else {
+                    mBackButton->Focus();
+                }
+            }
+        }
     }
 }

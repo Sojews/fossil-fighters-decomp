@@ -21,7 +21,8 @@ public:
 
     u32 mUnkB4[2];          // 0xB4
     MMenuItem *mItems[10];  // 0xBC: one per place on the map
-    u32 mUnkE4[7];          // 0xE4
+    u32 mUnkE4[6];          // 0xE4
+    MMenuItem *mBackButton; // 0xFC: B goes to it
     MArchivePtr mArchive;   // 0x100
     MArchiveFile mFile104;  // 0x104
     MArchiveFile mFile110;  // 0x110
