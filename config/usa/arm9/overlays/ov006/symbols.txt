@@ -97,8 +97,8 @@ _Z15MCreateCallTaskI19DinoUiContainerMenuS0_EP5MTaskPT_MT0_FvvE kind:function(th
 func_ov006_021761a8 kind:function(thumb,size=0x100) addr:0x021761a8
 _ZN19DinoUiContainerMenu9PageRightEv kind:function(thumb,size=0x60) addr:0x021762a8
 _ZN19DinoUiContainerMenu8PageLeftEv kind:function(thumb,size=0x60) addr:0x02176308
-func_ov006_02176368 kind:function(thumb,size=0x42) addr:0x02176368
-func_ov006_021763ac kind:function(thumb,size=0x334) addr:0x021763ac
+_ZN19DinoUiContainerMenu12RefreshPage1Ev kind:function(thumb,size=0x42) addr:0x02176368
+_ZN19DinoUiContainerMenu12RefreshPage2Ev kind:function(thumb,size=0x334) addr:0x021763ac
 func_ov006_021766e0 kind:function(thumb,size=0x38) addr:0x021766e0
 _ZN23DinoUiContainerMenuItem7GetRectEv kind:function(thumb,size=0xa) addr:0x02176718
 _ZN23DinoUiContainerMenuItem8GetFrameEv kind:function(thumb,size=0xe) addr:0x02176724

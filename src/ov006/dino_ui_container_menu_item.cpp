@@ -112,3 +112,21 @@ void DinoUiContainerOKButton::OnDecide() {
 // instantiated explicitly.
 template class MCallTask0<DinoUiContainerMenu, DinoUiContainerMenu>;
 template MTask *MCreateCallTask(DinoUiContainerMenu *obj, void (DinoUiContainerMenu::*func)());
+
+BOOL DinoUiContainerMenu::PageRight() {
+    mPage = (mPage + 1) % (mLastPage + 1);
+    RefreshPage1();
+    mFraction->SetNumerator(mPage + 1);
+    RefreshPage2();
+    FocusNearestItem(mCursor->GetPosition());
+    return TRUE;
+}
+
+BOOL DinoUiContainerMenu::PageLeft() {
+    mPage = (mPage + mLastPage) % (mLastPage + 1);
+    RefreshPage1();
+    mFraction->SetNumerator(mPage + 1);
+    RefreshPage2();
+    FocusNearestItem(mCursor->GetPosition());
+    return TRUE;
+}

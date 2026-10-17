@@ -1,6 +1,7 @@
 #ifndef GAME_DINO_UI_SHOP_SELL_MENU_H
 #define GAME_DINO_UI_SHOP_SELL_MENU_H
 
+#include "game/dino_ui3_parts_fraction.h"
 #include <vector>
 #include "m/archive.h"
 #include "m/menu_item.h"
@@ -19,15 +20,27 @@ public:
     BOOL PageRight();
     BOOL PageLeft();
     BOOL Sell();
+    void RefreshPage1();
+    void RefreshPage2();
 
     MArchivePtr mArchive;       // 0xB4
     MArchiveFile mFile;         // 0xB8
-    u32 mUnkC4[4];              // 0xC4
+    u32 mUnkC4[2];              // 0xC4
+    u32 mUnkCC;                 // 0xCC
+    u32 mUnkD0;
     std::vector<void *> mUnkD4; // 0xD4
-    u32 mUnkE0[6];              // 0xE0
+    u32 mUnkE0[2];              // 0xE0
+    DinoUi3PartsFraction *mFraction; // 0xE8: "page n/m"
+    u32 mUnkEC;
+    MView *mCursor;             // 0xF0
+    u32 mUnkF4;
     std::vector<u32> mUnkF8;    // 0xF8
-    u8 unk104[0x4C];
-    u8 mUnk150; // 0x150
+    u32 mUnk104[17];            // 0x104
+    int mPage;                  // 0x148
+    int mLastPage;              // 0x14C
+    u8 mUnk150;                 // 0x150
+    u32 mUnk154;
+    u32 mUnk158;                // 0x158
 };
 
 class DinoUiShopSellBackButton : public DinoUiShopSellMenuItem {

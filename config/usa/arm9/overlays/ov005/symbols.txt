@@ -76,8 +76,8 @@ _Z15MCreateCallTaskI18DinoUiShopSellMenuS0_EP5MTaskPT_MT0_FvvE kind:function(thu
 func_ov005_02158304 kind:function(thumb,size=0x150) addr:0x02158304
 _ZN18DinoUiShopSellMenu9PageRightEv kind:function(thumb,size=0x70) addr:0x02158454
 _ZN18DinoUiShopSellMenu8PageLeftEv kind:function(thumb,size=0x70) addr:0x021584c4
-func_ov005_02158534 kind:function(thumb,size=0x52) addr:0x02158534
-func_ov005_02158588 kind:function(thumb,size=0x278) addr:0x02158588
+_ZN18DinoUiShopSellMenu12RefreshPage1Ev kind:function(thumb,size=0x52) addr:0x02158534
+_ZN18DinoUiShopSellMenu12RefreshPage2Ev kind:function(thumb,size=0x278) addr:0x02158588
 func_ov005_02158800 kind:function(thumb,size=0xb0) addr:0x02158800
 _ZN18DinoUiShopSellMenu6OnIdleEv kind:function(thumb,size=0xac) addr:0x021588b0
 func_ov005_0215895c kind:function(thumb,size=0x94) addr:0x0215895c
@@ -221,8 +221,8 @@ _Z15MCreateCallTaskI18DinoUiCleaningMenuS0_EP5MTaskPT_MT0_FvvE kind:function(thu
 func_ov005_0215c0f4 kind:function(thumb,size=0xf8) addr:0x0215c0f4
 _ZN18DinoUiCleaningMenu9PageRightEv kind:function(thumb,size=0x5a) addr:0x0215c1ec
 _ZN18DinoUiCleaningMenu8PageLeftEv kind:function(thumb,size=0x58) addr:0x0215c248
-func_ov005_0215c2a0 kind:function(thumb,size=0x52) addr:0x0215c2a0
-func_ov005_0215c2f4 kind:function(thumb,size=0x268) addr:0x0215c2f4
+_ZN18DinoUiCleaningMenu12RefreshPage1Ev kind:function(thumb,size=0x52) addr:0x0215c2a0
+_ZN18DinoUiCleaningMenu12RefreshPage2Ev kind:function(thumb,size=0x268) addr:0x0215c2f4
 func_ov005_0215c55c kind:function(thumb,size=0x30) addr:0x0215c55c
 _ZN18DinoUiCleaningTest4IdleEv kind:function(thumb,size=0x20) addr:0x0215c58c
 func_ov005_0215c5ac kind:function(thumb,size=0xec) addr:0x0215c5ac

@@ -140,3 +140,25 @@ void DinoUiShopSellSellButton::OnFocusChanged(BOOL focused) {
 // instantiated explicitly.
 template class MCallTask0<DinoUiShopSellMenu, DinoUiShopSellMenu>;
 template MTask *MCreateCallTask(DinoUiShopSellMenu *obj, void (DinoUiShopSellMenu::*func)());
+
+BOOL DinoUiShopSellMenu::PageRight() {
+    mPage = (mPage + 1) % (mLastPage + 1);
+    RefreshPage1();
+    mFraction->SetNumerator(mPage + 1);
+    RefreshPage2();
+    if (mUnk158 != mUnkCC) {
+        FocusNearestItem(mCursor->GetPosition());
+    }
+    return TRUE;
+}
+
+BOOL DinoUiShopSellMenu::PageLeft() {
+    mPage = (mPage + mLastPage) % (mLastPage + 1);
+    RefreshPage1();
+    mFraction->SetNumerator(mPage + 1);
+    RefreshPage2();
+    if (mUnk158 != mUnkCC) {
+        FocusNearestItem(mCursor->GetPosition());
+    }
+    return TRUE;
+}

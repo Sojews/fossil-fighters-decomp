@@ -119,3 +119,29 @@ void DinoUiCleaningMenu::OnDecide(MMenuItem *item) {
         }
     }
 }
+
+BOOL DinoUiCleaningMenu::PageRight() {
+    if (mPage == mLastPage) {
+        mPage = 0;
+    } else {
+        mPage++;
+    }
+    RefreshPage1();
+    mFraction->SetNumerator(mPage + 1);
+    RefreshPage2();
+    FocusNearestItem(GetCursor());
+    return TRUE;
+}
+
+BOOL DinoUiCleaningMenu::PageLeft() {
+    if (mPage == 0) {
+        mPage = mLastPage;
+    } else {
+        mPage--;
+    }
+    RefreshPage1();
+    mFraction->SetNumerator(mPage + 1);
+    RefreshPage2();
+    FocusNearestItem(GetCursor());
+    return TRUE;
+}

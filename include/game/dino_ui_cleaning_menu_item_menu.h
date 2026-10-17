@@ -1,6 +1,7 @@
 #ifndef GAME_DINO_UI_CLEANING_MENU_ITEM_MENU_H
 #define GAME_DINO_UI_CLEANING_MENU_ITEM_MENU_H
 
+#include "game/dino_ui3_parts_fraction.h"
 #include <vector>
 #include "m/archive.h"
 #include "m/menu_item.h"
@@ -22,17 +23,21 @@ public:
     BOOL PageRight();
     BOOL PageLeft();
     BOOL IsDecidable();
+    void RefreshPage1();
+    void RefreshPage2();
     void Decide(int index);
 
     u32 mUnkB4[3];              // 0xB4
     std::vector<void *> mUnkC0; // 0xC0
-    u32 mUnkCC[7];              // 0xCC
+    u32 mUnkCC[2];              // 0xCC
+    DinoUi3PartsFraction *mFraction; // 0xD4: "page n/m"
+    u32 mUnkD8[4];              // 0xD8
     std::vector<u32> mUnkE8;    // 0xE8
     MArchivePtr mArchive;       // 0xF4
     MArchiveFile mFile;         // 0xF8
     u32 mUnk104[3];             // 0x104
     int mPage;                  // 0x110
-    u32 mUnk114;                // 0x114
+    int mLastPage;              // 0x114
 };
 
 class DinoUiCleaningBackButton : public DinoUiCleaningMenuItem {

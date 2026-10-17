@@ -1,6 +1,7 @@
 #ifndef GAME_DINO_UI_CONTAINER_MENU_ITEM_MENU_H
 #define GAME_DINO_UI_CONTAINER_MENU_ITEM_MENU_H
 
+#include "game/dino_ui_field_menu_fraction.h"
 #include <string>
 #include <vector>
 #include "m/archive.h"
@@ -20,13 +21,22 @@ public:
     BOOL PageRight();
     BOOL PageLeft();
     void OnOKDecided();
+    void RefreshPage1();
+    void RefreshPage2();
 
     u32 mUnkB4[7];              // 0xB4
     std::vector<void *> mUnkD0; // 0xD0
-    u32 mUnkDC[9];              // 0xDC
+    u32 mUnkDC[2];              // 0xDC
+    DinoUiFieldMenuFraction *mFraction; // 0xE4: "page n/m"
+    u32 mUnkE8[4];              // 0xE8
+    MView *mCursor;             // 0xF8
+    u32 mUnkFC;
     std::vector<s32> mUnk100;   // 0x100
     MArchivePtr mArchive;       // 0x10C
     MArchiveFile mFile;         // 0x110
+    u32 mUnk11C[2];             // 0x11C
+    int mPage;                  // 0x124
+    int mLastPage;              // 0x128
 };
 
 class DinoUiContainerBackButton : public DinoUiContainerMenuItem {
