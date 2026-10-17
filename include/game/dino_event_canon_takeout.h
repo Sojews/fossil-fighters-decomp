@@ -1,0 +1,14 @@
+#ifndef GAME_DINO_EVENT_CANON_TAKEOUT_H
+#define GAME_DINO_EVENT_CANON_TAKEOUT_H
+
+#include "game/dino_event_capture_fade_ui_task.h"
+
+class DinoEventCanonTakeout : public DinoEventCaptureFadeUiTask {
+public:
+    virtual ~DinoEventCanonTakeout();
+
+    u32 mUnk74[4];  // 0x74
+    u32 mCount;     // 0x84: the containers in use when the menu opened
+};
+
+#endif

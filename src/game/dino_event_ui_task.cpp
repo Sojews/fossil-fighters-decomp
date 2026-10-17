@@ -12,6 +12,9 @@
 #include "game/dino_event_senryu_entry.h"
 #include "game/dino_event_senryu_list_entry.h"
 #include "game/dino_event_shop_buy.h"
+#include "game/dino_event_canon_putin.h"
+#include "game/dino_event_canon_takeout.h"
+#include "game/dino_backup.h"
 #include "game/dino_event_shop_sell.h"
 #include "game/dino_event_shop_mask.h"
 #include "game/dino_event_mask_equip.h"
@@ -86,3 +89,11 @@ template class MBgCallTask1<DinoEventLoop, u32>;
 template MTask *MCreateBgCallTask(DinoEventLoop *obj, void (DinoEventLoop::*func)(u32), u32 a0, int thread);
 template class MBgCallTask0<DinoEventCaptureFadeUiTask>;
 template MTask *MCreateBgCallTask(DinoEventCaptureFadeUiTask *obj, void (DinoEventCaptureFadeUiTask::*func)(), int thread);
+
+DinoEventCanonTakeout::~DinoEventCanonTakeout() {
+    gDinoBackup->SetSystemFlag(0x26, mCount != gDinoBackup->CountUsedUnk14C());
+}
+
+DinoEventCanonPutin::~DinoEventCanonPutin() {
+    gDinoBackup->SetSystemFlag(0x25, mCount != gDinoBackup->CountUsedUnk14C());
+}
