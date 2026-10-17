@@ -1,7 +1,7 @@
 func_ov007_02171b00 kind:function(thumb,size=0x70) addr:0x02171b00
 _ZN15DinoUiATMCursorD1Ev kind:function(thumb,size=0x24) addr:0x02171b70
 _ZN15DinoUiATMCursorD0Ev kind:function(thumb,size=0x28) addr:0x02171b94
-func_ov007_02171bbc kind:function(thumb,size=0x14) addr:0x02171bbc
+_ZN15DinoUiATMCursor7ExecuteEv kind:function(thumb,size=0x14) addr:0x02171bbc
 func_ov007_02171bd0 kind:function(thumb,size=0x44) addr:0x02171bd0
 func_ov007_02171c14 kind:function(thumb,size=0xa) addr:0x02171c14
 func_ov007_02171c20 kind:function(thumb,size=0x34) addr:0x02171c20

@@ -37,3 +37,6 @@ src/ov005/dino_ui_cleaning_menu_item.cpp:
 
 src/ov005/dino_ui_container_base_menu_item.cpp:
     .text       start:0x021627b4 end:0x021641e8
+
+src/ov005/dino_ui3_parts_cursor.cpp:
+    .text       start:0x02156334 end:0x02156380
