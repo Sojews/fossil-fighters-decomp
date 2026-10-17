@@ -1,6 +1,8 @@
 #ifndef GAME_DINO_UI_MASK_BUY_MENU_H
 #define GAME_DINO_UI_MASK_BUY_MENU_H
 
+#include <string>
+#include <vector>
 #include "m/menu_item.h"
 #include "m/menu.h"
 #include "game/help.h"
@@ -13,6 +15,11 @@ public:
     virtual void OnIdle();
     virtual void OnFocus(MMenuItem *item);
     virtual void OnDecide(MMenuItem *item);
+
+    u32 mUnkB4[4];          // 0xB4
+    std::vector<void *> mUnkC4; // 0xC4
+    u32 mUnkD0[8];          // 0xD0
+    std::vector<void *> mUnkF0; // 0xF0
 };
 
 class DinoUiMaskBuyBackButton : public DinoUiMaskBuyMenuItem {
