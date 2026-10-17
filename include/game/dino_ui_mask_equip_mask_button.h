@@ -6,6 +6,9 @@
 class DinoUiMaskEquipMaskButton : public MMenuItem {
 public:
     virtual ~DinoUiMaskEquipMaskButton();
+    virtual MRect GetFrame();
+    virtual void OnFocusChanged(BOOL focused);
+    virtual void OnDecide();
 };
 
 #endif

@@ -7,6 +7,12 @@
 class DinoUiMaskEquipMenuItem : public MMenuItem, public DinoHelpItem {
 public:
     virtual ~DinoUiMaskEquipMenuItem();
+    virtual MRect GetFrame();
+    virtual void OnFocusChanged(BOOL focused);
+    virtual void OnSelectChanged(BOOL selected);
+    virtual MRect GetRect();
+    virtual MDisplay *GetDisplay();
+    virtual const char *GetText();
 };
 
 #endif

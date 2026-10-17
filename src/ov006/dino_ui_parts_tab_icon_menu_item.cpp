@@ -1,6 +1,10 @@
 // DinoUiPartsTabIconMenuItem, DinoUiStatusMenuItem, DinoUiStatusChangeModeHelpTask.
 // Only the destructors are decompiled so far.
 
+// Derived destructors have their bases' destructor bodies inlined; auto-inlining the ones defined above does that.
+#pragma auto_inline on
+
+#include "game/dino_ui_parts_tab_icon_menu_item_menu.h"
 #include "game/dino_ui_parts_tab_icon_menu_item.h"
 #include "game/dino_ui_status_menu_item.h"
 #include "game/dino_ui_status_change_mode_help_task.h"
@@ -17,9 +21,17 @@ DinoUiStatusMenuItem::~DinoUiStatusMenuItem() {
 DinoUiStatusChangeModeHelpTask::~DinoUiStatusChangeModeHelpTask() {
 }
 
+DinoUiStatusMenu::~DinoUiStatusMenu() {
+}
+
+DinoUiStatusBackButton::~DinoUiStatusBackButton() {
+}
+
+DinoUiStatusOKButton::~DinoUiStatusOKButton() {
+}
+
 // Template task instances the game emits in this file. Until the code that makes the tasks is decompiled, they are
 // instantiated explicitly.
-class DinoUiStatusMenu {};
 template class MCallTask0<DinoUiStatusMenu, DinoUiStatusMenu>;
 template MTask *MCreateCallTask(DinoUiStatusMenu *obj, void (DinoUiStatusMenu::*func)());
 template class MCallTask0<DinoUiStatusChangeModeHelpTask, DinoHelpBase>;

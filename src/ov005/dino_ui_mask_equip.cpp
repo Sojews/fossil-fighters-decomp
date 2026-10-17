@@ -1,6 +1,10 @@
 // DinoUiMaskEquip, DinoUiMaskEquipTest, DinoUiMaskEquipMaskButton.
 // Only the destructors are decompiled so far.
 
+// Derived destructors have their bases' destructor bodies inlined; auto-inlining the ones defined above does that.
+#pragma auto_inline on
+
+#include "game/dino_ui_mask_equip_menu.h"
 #include "game/dino_ui_mask_equip.h"
 #include "game/dino_ui_mask_equip_test.h"
 #include "game/dino_ui_mask_equip_mask_button.h"
@@ -20,8 +24,19 @@ DinoUiMaskEquipMaskButton::~DinoUiMaskEquipMaskButton() {
 DinoUiMaskEquipMenuItem::~DinoUiMaskEquipMenuItem() {
 }
 
+DinoUiMaskEquipMenu::~DinoUiMaskEquipMenu() {
+}
+
+DinoUiMaskEquipBackButton::~DinoUiMaskEquipBackButton() {
+}
+
+DinoUiMaskEquipPageLButton::~DinoUiMaskEquipPageLButton() {
+}
+
+DinoUiMaskEquipPageRButton::~DinoUiMaskEquipPageRButton() {
+}
+
 // Template task instances the game emits in this file. Until the code that makes the tasks is decompiled, they are
 // instantiated explicitly.
-class DinoUiMaskEquipMenu {};
 template class MCallTask0<DinoUiMaskEquipMenu, DinoUiMaskEquipMenu>;
 template MTask *MCreateCallTask(DinoUiMaskEquipMenu *obj, void (DinoUiMaskEquipMenu::*func)());
