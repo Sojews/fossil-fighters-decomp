@@ -9,7 +9,7 @@ src/ov005/dino_ui_license_card.cpp:
     .text       start:0x02155f60 end:0x02155f94
 
 src/ov005/dino_ui3_parts_fraction.cpp:
-    .text       start:0x02156e10 end:0x021572e4
+    .text       start:0x02156380 end:0x021572e4
 
 src/ov005/dino_ui_shop_sell.cpp:
     .text       start:0x02157360 end:0x02159318
