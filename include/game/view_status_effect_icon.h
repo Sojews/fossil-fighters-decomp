@@ -1,6 +1,7 @@
 #ifndef GAME_VIEW_STATUS_EFFECT_ICON_H
 #define GAME_VIEW_STATUS_EFFECT_ICON_H
 
+#include <string>
 #include "m/menu_item.h"
 #include "m/menu.h"
 #include "m/display.h"
@@ -44,6 +45,9 @@ class ViewStatusEffectIconLoadMotionTask : public MTask {
 public:
     virtual ~ViewStatusEffectIconLoadMotionTask();
     virtual void Execute();
+
+    u32 mUnk10;             // 0x10
+    std::string mUnk14;     // 0x14
 };
 
 class ViewStatusEffectIconShowTask : public MTask {

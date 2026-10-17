@@ -1,6 +1,7 @@
 #ifndef GAME_CREATURE_MOTION_H
 #define GAME_CREATURE_MOTION_H
 
+#include <string>
 #include "m/menu_item.h"
 #include "m/menu.h"
 #include "m/display.h"
@@ -26,6 +27,9 @@ class CreateCreatureMotionTask : public MTask {
 public:
     virtual ~CreateCreatureMotionTask();
     virtual void Execute();
+
+    u32 mUnk10[2];          // 0x10
+    std::string mUnk18;     // 0x18
 };
 
 class EffectMotionTask : public MProcess {

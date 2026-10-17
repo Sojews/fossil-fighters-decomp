@@ -8,9 +8,11 @@
 #include "types.h"
 
 B3DStatusViewTask::~B3DStatusViewTask() {
+    mSerial.Clear();
 }
 
 LoadWinnerLoad::~LoadWinnerLoad() {
+    mSerial.Clear();
 }
 
 void B3DStatusViewTask::Idle() {

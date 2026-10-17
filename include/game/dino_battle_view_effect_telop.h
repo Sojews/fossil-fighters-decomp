@@ -1,6 +1,7 @@
 #ifndef GAME_DINO_BATTLE_VIEW_EFFECT_TELOP_H
 #define GAME_DINO_BATTLE_VIEW_EFFECT_TELOP_H
 
+#include <string>
 #include "m/menu_item.h"
 #include "m/menu.h"
 #include "m/bg.h"
@@ -17,6 +18,8 @@ public:
     virtual void Idle();
 
     void (DinoBattleViewEffectTelop::*mState)(); // 0x74
+    u32 mUnk7C;                                 // 0x7C
+    std::string mUnk80;                         // 0x80
 };
 
 class SetBGModeTask : public MTask {

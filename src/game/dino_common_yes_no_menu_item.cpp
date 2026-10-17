@@ -4,6 +4,7 @@
 // Derived destructors have their bases' destructor bodies inlined; auto-inlining the ones defined above does that.
 #pragma auto_inline on
 
+#define DINO_COMMON_YES_NO_MENU_OWNER
 #include "game/dino_common_yes_no_menu_item_menu.h"
 #include "game/dino_common_yes_no_menu_item.h"
 #include "game/dino_common_window_yes_no_dialog.h"
