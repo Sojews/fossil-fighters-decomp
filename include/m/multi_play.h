@@ -214,6 +214,21 @@ public:
     u32 mSynchronizeDelay;          // 0x3220
 };
 
+// Exchanges messages with the other consoles: sends game messages over MP and passes received ones to its
+// observers.
+class MMultiPlayMessageHub : public MLooperVSyncTask, public MMessageSubject {
+public:
+    MMultiPlayMessageHub(int arg);
+    virtual ~MMultiPlayMessageHub();
+    virtual void Execute();
+    virtual void OnVSync();
+
+    // Sends a message to every console but this one.
+    void Broadcast(MMessage *msg);
+
+    u8 unk44[0x27C - 0x44];
+};
+
 class MMultiPlaySynchronizeDelayTask : public MProcess {
 public:
     MMultiPlaySynchronizeDelayTask() : MProcess(NULL) {}

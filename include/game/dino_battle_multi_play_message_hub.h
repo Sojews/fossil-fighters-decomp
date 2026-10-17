@@ -10,17 +10,21 @@
 #include "game/help.h"
 #include "game/dino_field_camera_hook.h"
 
+class MMultiPlayMessageHub;
+
 class DinoBattleMultiPlayMessageHub : public MProcess, public MMessageObserver {
 public:
+    DinoBattleMultiPlayMessageHub(MMessageSubject *target);
     virtual ~DinoBattleMultiPlayMessageHub();
     virtual void Idle();
     virtual void OnMessage(MMessage *msg);
 
-    void *mUnkA8;   // 0xA8
+    MMultiPlayMessageHub *mHub; // 0xA8
 };
 
 class DinoBattleMultiPlayMessageReceiver : public MProcess, public MMessageObserver {
 public:
+    DinoBattleMultiPlayMessageReceiver(MMessageSubject *source, MMessageSubject *target);
     virtual ~DinoBattleMultiPlayMessageReceiver();
     virtual void Idle();
     virtual void OnMessage(MMessage *msg);

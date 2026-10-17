@@ -5,7 +5,28 @@
 #pragma auto_inline on
 
 #include "game/dino_battle_multi_play_message_hub.h"
+#include "m/multi_play.h"
 #include "types.h"
+
+#pragma auto_inline off
+
+// Passes the messages that arrive from the other consoles on to the battle.
+DinoBattleMultiPlayMessageReceiver::DinoBattleMultiPlayMessageReceiver(MMessageSubject *source,
+                                                                       MMessageSubject *target)
+    : MProcess(NULL) {
+    mSubject = target;
+    source->AddObserver(this);
+}
+
+DinoBattleMultiPlayMessageHub::DinoBattleMultiPlayMessageHub(MMessageSubject *target) : MProcess(NULL) {
+    mHub = new MMultiPlayMessageHub(0);
+    DinoBattleMultiPlayMessageReceiver *receiver = new DinoBattleMultiPlayMessageReceiver(mHub, target);
+    MParallelTaskSet *parallel = &mParallel;
+    parallel->AddTail(mHub);
+    parallel->AddTail(receiver);
+}
+
+#pragma auto_inline on
 
 DinoBattleMultiPlayMessageHub::~DinoBattleMultiPlayMessageHub() {
 }
@@ -25,8 +46,6 @@ void DinoBattleMultiPlayMessageReceiver::OnMessage(MMessage *msg) {
     mSubject->Notify(msg);
 }
 
-extern "C" void func_0206af18(void *obj, MMessage *msg);
-
 void DinoBattleMultiPlayMessageHub::OnMessage(MMessage *msg) {
-    func_0206af18(mUnkA8, msg);
+    mHub->Broadcast(msg);
 }
