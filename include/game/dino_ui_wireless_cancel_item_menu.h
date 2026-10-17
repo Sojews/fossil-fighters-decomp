@@ -1,6 +1,8 @@
 #ifndef GAME_DINO_UI_WIRELESS_CANCEL_ITEM_MENU_H
 #define GAME_DINO_UI_WIRELESS_CANCEL_ITEM_MENU_H
 
+#include "m/archive.h"
+#include <vector>
 #include <string>
 #include "m/menu_item.h"
 #include "m/menu.h"
@@ -56,6 +58,43 @@ public:
 
     u32 mUnkB4[10];     // 0xB4
     std::string mText;  // 0xDC
+};
+
+class DinoUiBattleParentScanner : public MProcess, public MMessageObserver {
+public:
+    virtual ~DinoUiBattleParentScanner();
+    virtual void Idle();
+    virtual void OnMessage(MMessage *msg);
+};
+
+class DinoUiCannonParentScanner : public MProcess, public MMessageObserver {
+public:
+    virtual ~DinoUiCannonParentScanner();
+    virtual void Idle();
+    virtual void OnMessage(MMessage *msg);
+
+    u32 mUnkA8[22];             // 0xA8
+    std::vector<unsigned int> mUnk100; // 0x100: (a distinct element type from other overlays' copies)
+    std::vector<int> mUnk10C;  // 0x10C
+};
+
+class DinoUiCannonChild : public MProcess, public MMessageObserver {
+public:
+    virtual ~DinoUiCannonChild();
+    virtual void Idle();
+    virtual void OnMessage(MMessage *msg);
+
+    u32 mUnkA8[4];              // 0xA8
+    std::vector<void *> mUnkB8; // 0xB8
+    std::vector<unsigned int> mUnkC4; // 0xC4
+    u32 mUnkD0[2];              // 0xD0
+    MArchivePtr mArchive;       // 0xD8
+    MArchiveFile mFileDC;       // 0xDC
+    MArchiveFile mFileE8;       // 0xE8
+    MArchiveFile mFileF4;       // 0xF4
+    MArchiveFile mFile100;      // 0x100
+    MArchivePtr mArchive2;      // 0x10C
+    MArchiveFile mFile110;      // 0x110
 };
 
 #endif

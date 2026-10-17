@@ -35,6 +35,18 @@ DinoUiChildScannerParentItem::~DinoUiChildScannerParentItem() {
 DinoUiChildScanner::~DinoUiChildScanner() {
 }
 
+DinoUiBattleParentScanner::~DinoUiBattleParentScanner() {
+    GetDisplay()->mBlend->Reset();
+}
+
+DinoUiCannonParentScanner::~DinoUiCannonParentScanner() {
+    GetDisplay()->mBlend->Reset();
+}
+
+DinoUiCannonChild::~DinoUiCannonChild() {
+    GetDisplay()->mBlend->Reset();
+}
+
 DinoUiChildScannerBattleConnect::~DinoUiChildScannerBattleConnect() {
     GetDisplay()->mBlend->Reset();
 }
@@ -44,6 +56,5 @@ DinoUiChildScannerCannonConnect::~DinoUiChildScannerCannonConnect() {
 
 // Template task instances the game emits in this file. Until the code that makes the tasks is decompiled, they are
 // instantiated explicitly.
-class DinoUiBattleParentScanner : public MProcess, public MMessageObserver {};
 template class MCallTask0<DinoUiBattleParentScanner, MMessageObserver>;
 template MTask *MCreateCallTask(DinoUiBattleParentScanner *obj, void (MMessageObserver::*func)());
