@@ -21,9 +21,6 @@ public:
     virtual ~DinoUiMultiplayWirelessButton();
     virtual MRect GetFrame();
     virtual void OnDecide();
-
-    DinoUiMultiplayMenu *mOwner; // 0x94
-    MMotion *mMotion;   // 0x98
 };
 
 class DinoUiMultiplayMenu;
@@ -34,9 +31,6 @@ public:
     virtual MRect GetFrame();
     virtual void OnFocusChanged(BOOL focused);
     virtual void OnDecide();
-
-    DinoUiMultiplayMenu *mOwner; // 0x94
-    MMotion *mMotion;   // 0x98
 };
 
 class DinoUiMultiplayOrganizationButton : public DinoUiMultiplayMenuItem2 {
