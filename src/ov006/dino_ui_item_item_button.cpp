@@ -121,3 +121,21 @@ void DinoUiItemMenu::OnDecide(MMenuItem *item) {
     }
 }
 
+
+void DinoUiItemMenu::PageRight() {
+    mPage = (mPage + 1) % (mLastPage + 1);
+    mFraction->SetNumerator(mPage + 1);
+    RefreshPage();
+    MPoint cursor = GetCursor();
+    FocusItem(mUnkB8);
+    FocusNearestItem(cursor);
+}
+
+void DinoUiItemMenu::PageLeft() {
+    mPage = (mPage + mLastPage) % (mLastPage + 1);
+    mFraction->SetNumerator(mPage + 1);
+    RefreshPage();
+    MPoint cursor = GetCursor();
+    FocusItem(mUnkB8);
+    FocusNearestItem(cursor);
+}

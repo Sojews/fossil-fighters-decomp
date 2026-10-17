@@ -1,6 +1,7 @@
 #ifndef GAME_DINO_UI_ITEM_ITEM_BUTTON_MENU_H
 #define GAME_DINO_UI_ITEM_ITEM_BUTTON_MENU_H
 
+#include "game/dino_ui_field_menu_fraction.h"
 #include <string>
 #include <vector>
 #include "m/archive.h"
@@ -20,11 +21,18 @@ public:
     void PageLeft();
     void OnOKDecided();
     void SelectTab(int tab);
+    void RefreshPage();
 
-    u32 mUnkB4[10];
+    u32 mUnkB4;
+    MMenuItem *mUnkB8;          // 0xB8: focused after a page change
+    u32 mUnkBC[8];
     MMenuItem *mTabItems[3]; // 0xDC
-    u32 mUnkE8[13];
+    u32 mUnkE8[6];
+    DinoUiFieldMenuFraction *mFraction; // 0x100: "page n/m"
+    u32 mUnk104[6];
     std::vector<void *> mUnk11C; // 0x11C
+    int mPage;                  // 0x128
+    int mLastPage;              // 0x12C
 };
 
 class DinoUiItemBackButton : public DinoUiItemMenuItem {
