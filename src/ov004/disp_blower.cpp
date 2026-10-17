@@ -136,13 +136,11 @@ void MicTestButton::OnDecide() {
 }
 
 MRect BGMVolumeButton::GetFrame() {
-    MPoint p(mPos.x, mPos.y);
-    return MRect(MPoint(p.x - 8, p.y - 8), MPoint(p.x + 8, p.y + 8));
+    return MRect(mPos.Offset(-8, -8), mPos.Offset(8, 8));
 }
 
 MRect SEVolumeButton::GetFrame() {
-    MPoint p(mPos.x, mPos.y);
-    return MRect(MPoint(p.x - 8, p.y - 8), MPoint(p.x + 8, p.y + 8));
+    return MRect(mPos.Offset(-8, -8), mPos.Offset(8, 8));
 }
 
 void BGMVolumeButton::OnFocusChanged(BOOL focused) {

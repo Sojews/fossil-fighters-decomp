@@ -43,6 +43,5 @@ void DinoUi3PartsKasekiButton::OnFocusChanged(BOOL focused) {
 }
 
 MRect DinoUi3PartsKasekiButton::GetFrame() {
-    MPoint p(mPos.x, mPos.y);
-    return MRect(MPoint(p.x - 24, p.y - 24), MPoint(p.x + 24, p.y + 24));
+    return MRect(mPos.Offset(-24, -24), mPos.Offset(24, 24));
 }
