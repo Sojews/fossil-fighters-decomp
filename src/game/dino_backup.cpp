@@ -10,6 +10,7 @@
 #include "m/sleep.h"
 #include "m/soft_reset.h"
 #include "m/task.h"
+#include "game/dino_resource.h"
 #include "game/dino_sound.h"
 #include "nitro/mi.h"
 
@@ -361,4 +362,113 @@ void DinoBackup::ConnectRegion(u32 from, u32 to) {
         OS_Terminate();
     }
     mRegionLinks[from] = to;
+}
+
+void DinoBackup::DisconnectRegion(u32 from, u32 to) {
+    if (to != mRegionLinks[from]) {
+        OS_Terminate();
+    }
+    mRegionLinks[from] = 0;
+}
+
+u16 DinoBackup::GetRegionLink(u32 from) {
+    return mRegionLinks[from];
+}
+
+void DinoBackup::GetLinkedRegions(MBitVector *out) {
+    u32 count = gDinoResource->GetRegionCount();
+    for (u32 i = 1; i < count; i++) {
+        if (mRegionLinks[i] != 0) {
+            out->Set(i);
+        }
+    }
+}
+
+void DinoBackup::SetPlayer(const DinoPlayerData *player) {
+    *mPlayer = *player;
+}
+
+void DinoBackup::GetPlayer(DinoPlayerData *player, BOOL shortName) {
+    *player = *mPlayer;
+    if (shortName) {
+        for (u32 i = 0; i < 8; i++) {
+            if (player->name[i] == 0) {
+                break;
+            }
+            if (i >= 5) {
+                player->name[i] = '.';
+            }
+        }
+    }
+}
+
+void DinoBackup::SetChara(u32 index, const DinoCharaState *chara) {
+    mCharas[index] = *chara;
+}
+
+void DinoBackup::GetChara(u32 index, DinoCharaState *chara) {
+    *chara = mCharas[index];
+}
+
+void DinoBackup::SetCharaTask(u32 id, const DinoCharaTask *task) {
+    if (task->unk4 == 0 && task->unk28.active == 0) {
+        for (u32 i = 0; i < 60; i++) {
+            if (id == mCharaTasks[i].id) {
+                mCharaTasks[i].id = 0;
+                return;
+            }
+        }
+        return;
+    }
+    for (u32 i = 0; i < 60; i++) {
+        if (id == mCharaTasks[i].id) {
+            mCharaTasks[i] = *task;
+            mCharaTasks[i].id = id;
+            return;
+        }
+    }
+    for (u32 i = 0; i < 60; i++) {
+        if (mCharaTasks[i].id == 0) {
+            mCharaTasks[i] = *task;
+            mCharaTasks[i].id = id;
+            return;
+        }
+    }
+    OS_Terminate();
+}
+
+void DinoBackup::GetCharaTask(u32 id, DinoCharaTask *task) {
+    DinoCharaTask *tasks = mCharaTasks;
+    for (u32 i = 0; i < 60; i++) {
+        if (id == tasks[i].id) {
+            *task = mCharaTasks[i];
+            return;
+        }
+    }
+    MI_CpuFill8(task, 0, sizeof(DinoCharaTask));
+    task->id = id;
+}
+
+void DinoBackup::SetUnk98(u32 index, const DinoBackupEntry *entry) {
+    mUnk98[index] = *entry;
+}
+
+void DinoBackup::GetUnk98(u32 index, DinoBackupEntry *entry) {
+    *entry = mUnk98[index];
+}
+
+void DinoBackup::SetKasekiRock(u32 index, const u32 *rock) {
+    mKasekiRocks[index] = *rock;
+}
+
+void DinoBackup::GetKasekiRock(u32 index, u32 *rock) {
+    *rock = mKasekiRocks[index];
+}
+
+void DinoBackup::SetRecord(u32 index, const DinoBackupRecord *record) {
+    mRecords[index] = *record;
+}
+
+void DinoBackup::GetRecord(u32 index, DinoBackupRecord *record) {
+    *record = mRecords[index];
 }

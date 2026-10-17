@@ -20,7 +20,6 @@ struct DinoEventVar {
 // The player and settings, packed in bits.
 struct DinoPlayerData {
     u16 name[9];                // 0x00
-    u8 unk12[2];
     // 0x14
     u32 unk14_0 : 6;            // system var 4
     u32 rank : 4;               // system var 7
@@ -67,7 +66,17 @@ struct DinoPlayerData {
     u32 unk38_4 : 16;           // system var 43
     u32 unk38_20 : 1;           // system flag 0x2F
     u32 unk38_21 : 11;
-    u8 unk3c[0x6C - 0x3C];
+    u32 unk3c[4];               // 0x3C
+    struct {
+        u32 a;
+        u32 b;
+        u32 c;
+    } unk4c;                    // 0x4C
+    u32 unk58;                  // 0x58
+    u32 unk5c;                  // 0x5C
+    u32 unk60;                  // 0x60
+    u32 unk64;                  // 0x64
+    u32 unk68;                  // 0x68
 };
 
 // What the file select screen shows of a save.
@@ -89,12 +98,51 @@ struct DinoSaveSummary {
 
 struct DinoCharaState {
     DinoCharaState() {}
-    u8 data[0x14];
+    u8 unk0;    // 0x00
+    u32 unk4;   // 0x04
+    u32 unk8;   // 0x08
+    u32 unkC;   // 0x0C
+    u32 unk10;  // 0x10
 };
 
 struct DinoBackupEntry {
     DinoBackupEntry() {}
-    u8 data[0x14];
+    u32 unk0;               // 0x00
+    u32 unk4;               // 0x04
+    u32 unk8;               // 0x08
+    // 0x0C
+    u32 id : 10;
+    u32 type : 2;
+    u32 unkC_12 : 1;
+    u32 active : 1;
+    u32 unkC_14 : 18;
+    // 0x10
+    u32 unk10_0 : 3;
+    u32 unk10_3 : 1;
+    u32 unk10_4 : 28;
+};
+
+// A character's saved task.
+struct DinoCharaTask {
+    u32 id;             // 0x00: 0 = free
+    u8 unk4;            // 0x04
+    struct {
+        u32 w[8];
+    } unk8;             // 0x08
+    struct {
+        u8 active;
+        u8 pad[3];
+        u32 w[5];
+    } unk28;            // 0x28
+};
+
+struct DinoBackupRecord {
+    u8 data[0x65];      // 0x00
+    u16 name[9];        // 0x66
+    u8 unk78;           // 0x78
+    u8 unk79;           // 0x79
+    u8 unk7a;           // 0x7A
+    u64 time;           // 0x7C
 };
 
 struct DinoBackupEntry28 {
@@ -167,6 +215,20 @@ public:
     BOOL GetEpisodeSeen(u32 id);
     void ConnectRegion(u32 from, u32 to);
     void DisconnectRegion(u32 from, u32 to);
+    u16 GetRegionLink(u32 from);
+    void GetLinkedRegions(MBitVector *out);
+    void SetPlayer(const DinoPlayerData *player);
+    void GetPlayer(DinoPlayerData *player, BOOL shortName);
+    void SetChara(u32 index, const DinoCharaState *chara);
+    void GetChara(u32 index, DinoCharaState *chara);
+    void SetCharaTask(u32 id, const DinoCharaTask *task);
+    void GetCharaTask(u32 id, DinoCharaTask *task);
+    void SetUnk98(u32 index, const DinoBackupEntry *entry);
+    void GetUnk98(u32 index, DinoBackupEntry *entry);
+    void SetKasekiRock(u32 index, const u32 *rock);
+    void GetKasekiRock(u32 index, u32 *rock);
+    void SetRecord(u32 index, const DinoBackupRecord *record);
+    void GetRecord(u32 index, DinoBackupRecord *record);
 
     MBackupDevice *mDevice;         // 0x00C
     MBackupStorage *mStorage;       // 0x010
@@ -185,12 +247,12 @@ public:
     u32 unk88;
     DinoPlayerData *mPlayer;        // 0x08C
     DinoCharaState *mCharas;        // 0x090
-    u8 *mUnk94;                     // 0x094
+    DinoCharaTask *mCharaTasks;     // 0x094
     DinoBackupEntry *mUnk98;        // 0x098
     DinoBackupEntry *mUnk9C;        // 0x09C
     u32 *mKasekiRocks;              // 0x0A0
     u8 mUnkA4[0x84];                // 0x0A4
-    u8 *mUnk128;                    // 0x128
+    DinoBackupRecord *mRecords;     // 0x128
     u8 *mUnk12C;                    // 0x12C
     u8 *mCreatures;                 // 0x130
     DinoBackupEntry *mUnk134;       // 0x134

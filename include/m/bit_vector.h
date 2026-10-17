@@ -34,6 +34,7 @@ public:
     };
 
     Reference operator[](u32 index) { return Reference(this, index); }
+    void Set(u32 index) { mBytes[index >> 3] |= 1 << (index & 7); }
     BOOL Test(u32 index) { return (mBytes[index >> 3] & (1 << (index & 7))) ? TRUE : FALSE; }
 
     u32 mBits;      // 0x04
