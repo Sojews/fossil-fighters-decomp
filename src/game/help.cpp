@@ -5,6 +5,7 @@
 #include "game/dino_help_sign.h"
 #include "m/input.h"
 #include "m/irq.h"
+#include "m/lcd.h"
 
 static DinoHelpDriver *sHelpDriver;
 static DinoHelpBase *sHelpCurrentBase;
@@ -339,4 +340,28 @@ void DinoHelpCursor::SetObjMode(int mode) {
     for (u32 i = 0; i < 4; i++) {
         mCorners[i]->SetObjMode(mode);
     }
+}
+
+// How far the top screen is from the bottom one, in the help's coordinates.
+extern const int kHelpTopScreenOffset;
+
+DinoHelpSign::DinoHelpSign(DinoHelpItem *item) {
+    mItem = item;
+}
+
+DinoHelpItem *DinoHelpSign::GetItem() {
+    return mItem;
+}
+
+void DinoHelpSign::OnDecide() {
+}
+
+MRect DinoHelpSign::GetFrame() {
+    if (mItem->GetDisplay() == gLcd->GetTopDisplay()) {
+        MRect frame = mItem->GetRect();
+        frame.top += kHelpTopScreenOffset;
+        frame.bottom += kHelpTopScreenOffset;
+        return frame;
+    }
+    return mItem->GetRect();
 }

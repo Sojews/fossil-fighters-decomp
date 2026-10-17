@@ -1908,10 +1908,10 @@ func_0201d688 kind:function(thumb,size=0x120) addr:0x0201d688
 func_0201d7a8 kind:function(thumb,size=0x64) addr:0x0201d7a8
 func_0201d80c kind:function(thumb,size=0xb0) addr:0x0201d80c
 func_0201d8bc kind:function(thumb,size=0x64) addr:0x0201d8bc
-func_0201d920 kind:function(thumb,size=0x1c) addr:0x0201d920
-func_0201d93c kind:function(thumb,size=0x6) addr:0x0201d93c
-func_0201d944 kind:function(thumb,size=0x2) addr:0x0201d944
-func_0201d948 kind:function(thumb,size=0x6c) addr:0x0201d948
+_ZN12DinoHelpSignC1EP12DinoHelpItem kind:function(thumb,size=0x1c) addr:0x0201d920
+_ZN12DinoHelpSign7GetItemEv kind:function(thumb,size=0x6) addr:0x0201d93c
+_ZN12DinoHelpSign8OnDecideEv kind:function(thumb,size=0x2) addr:0x0201d944
+_ZN12DinoHelpSign8GetFrameEv kind:function(thumb,size=0x6c) addr:0x0201d948
 func_0201d9b4 kind:function(thumb,size=0x20) addr:0x0201d9b4
 _ZN8DinoHelpD1Ev kind:function(thumb,size=0x2c) addr:0x0201d9d4
 _ZN8DinoHelpD0Ev kind:function(thumb,size=0x34) addr:0x0201da00
@@ -6566,7 +6566,7 @@ data_020899f4 kind:data(any) addr:0x020899f4
 data_020899f8 kind:data(any) addr:0x020899f8
 data_020899fc kind:data(any) addr:0x020899fc
 data_02089a00 kind:data(any) addr:0x02089a00
-data_02089a04 kind:data(any) addr:0x02089a04
+kHelpTopScreenOffset kind:data(any) addr:0x02089a04
 data_02089a08 kind:data(any) addr:0x02089a08
 data_02089a0c kind:data(any) addr:0x02089a0c
 data_02089a10 kind:data(any) addr:0x02089a10
