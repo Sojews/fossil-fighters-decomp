@@ -427,9 +427,16 @@ public:
     u8 mValue;  // 0x14
 };
 
+// Sets a creature's revived part levels, and puts it in or takes it out of the teams.
 class DinoEventExecReviverSet : public MTransfer {
 public:
+    DinoEventExecReviverSet(u32 creature, u32 head, u32 body, u32 arms, u32 legs, u8 addToTeam);
     virtual ~DinoEventExecReviverSet();
+    virtual void Transfer();
+
+    u32 mCreature;      // 0x10: from 1
+    u32 mLevels[4];     // 0x14
+    u8 mAddToTeam;      // 0x24
 };
 
 class DinoEventExecMedalChange : public MTransfer {

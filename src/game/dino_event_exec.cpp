@@ -660,6 +660,62 @@ void DinoEventExecExit::Idle() {
     }
 }
 
+DinoEventExecReviverSet::DinoEventExecReviverSet(u32 creature, u32 head, u32 body, u32 arms, u32 legs, u8 addToTeam) {
+    mCreature = creature;
+    mLevels[0] = head;
+    mLevels[1] = body;
+    mLevels[2] = arms;
+    mLevels[3] = legs;
+    mAddToTeam = addToTeam;
+}
+
+void DinoEventExecReviverSet::Transfer() {
+    DinoCreatureState old;
+    DinoCreatureState creature;
+    gDinoBackup->GetCreature(mCreature, &creature);
+    *(DinoCreatureBody *) old.parts = *(const DinoCreatureBody *) creature.parts;
+    creature.parts[0].level = mLevels[0];
+    creature.parts[1].level = mLevels[1];
+    creature.parts[2].level = mLevels[2];
+    creature.parts[3].level = mLevels[3];
+    gDinoBackup->SetCreature(mCreature, &creature);
+    for (u32 i = 0; i < 4; i++) {
+        u32 index = i + (mCreature - 1) * 4;
+        DinoKasekiRock rock;
+        MI_CpuFill8(&rock, 0, sizeof(rock));
+        u32 level = creature.parts[i].level;
+        if (level != 0) {
+            rock.found = TRUE;
+            rock.level = level;
+        }
+        gDinoBackup->SetKasekiRock(index + 1, (const u32 *) &rock);
+    }
+    if (old.parts[0].level == 0 && creature.parts[0].level != 0 && mAddToTeam) {
+        DinoTeam team;
+        gDinoBackup->GetTeam(gDinoBackup->GetUnk34_26(), &team);
+        for (u32 i = 0; i < 5; i++) {
+            if (team.slots[i] == 0) {
+                team.slots[i] = mCreature;
+                break;
+            }
+        }
+        gDinoBackup->SetTeam(gDinoBackup->GetUnk34_26(), &team);
+    }
+    if (creature.parts[0].level == 0) {
+        for (u32 t = 0; t < 10; t++) {
+            DinoTeam team;
+            gDinoBackup->GetTeam(t, &team);
+            for (u32 i = 0; i < 5; i++) {
+                if (mCreature == team.slots[i]) {
+                    team.slots[i] = 0;
+                }
+            }
+            gDinoBackup->SetTeam(t, &team);
+        }
+        gDinoBackup->FillTeam();
+    }
+}
+
 DinoEventExecShopSet::DinoEventExecShopSet(u32 shop) {
     mShop = shop;
 }

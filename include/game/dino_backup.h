@@ -181,14 +181,21 @@ struct DinoCreatureState {
     u32 index : 8;
     u32 unk0_8 : 10;
     u32 unk0_18 : 14;
-    DinoCreaturePart parts[4];  // 0x04
+    DinoCreaturePart parts[4];  // 0x04: head, body, arms, legs
     u32 unk14;                  // 0x14
+};
+
+// The part of a creature's state after the first word, copied as one.
+struct DinoCreatureBody {
+    DinoCreaturePart parts[4];
+    u32 unk10;
 };
 
 struct DinoKasekiRock {
     u32 unk0 : 10;
     u32 found : 1;
-    u32 unk11 : 21;
+    u32 level : 10;
+    u32 unk21 : 11;
 };
 
 // Where the entry tables' new entries come from.
