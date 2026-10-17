@@ -17,7 +17,8 @@ public:
     virtual ~SenryuMenuItem();
     virtual MRect GetFrame();
 
-    u32 unk88[2];
+    u32 mIndex;     // 0x88
+    u32 mUnk8C;     // 0x8C
     MRect mFrame;   // 0x90
 };
 

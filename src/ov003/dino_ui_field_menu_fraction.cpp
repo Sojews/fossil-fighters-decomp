@@ -4,6 +4,7 @@
 // Derived destructors have their bases' destructor bodies inlined; auto-inlining the ones defined above does that.
 #pragma auto_inline on
 
+#include "game/dino_sound.h"
 #include "game/dino_ui_field_menu_fraction_menu.h"
 #include "game/dino_ui_field_menu_fraction.h"
 #include "game/dino_ui_field_menu_number.h"
@@ -197,6 +198,25 @@ BOOL DinoUiFieldMenuCursor::IsHidden() {
 
 u32 DinoUiFieldMenuCursor::GetPlaneMask() {
     return 0x10;
+}
+
+void DinoUiFieldMenuCursor::SetMode(u32 mode) {
+    if (mode >= 1 && mode <= 2) {
+        BOOL hidden = IsHidden();
+        Hide();
+        mMode = mode;
+        if (hidden) {
+            Hide();
+        } else {
+            Show();
+        }
+        mUnk2C = 0;
+    }
+}
+
+MTask *DinoUiFieldMenuCursor::CreateMoveTask(MRect from, MRect to, int duration, int ease) {
+    DinoSoundPlaySe(0x96, 0);
+    return CreateFrameAnime(from, to, duration, ease);
 }
 
 void DinoUiFieldMenuFraction::SetPriority(int priority) {

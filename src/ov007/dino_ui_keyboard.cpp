@@ -279,3 +279,34 @@ void DinoUiKeyboardMenuItem::OnDecide() {
         tasks->AddTail(play);
     }
 }
+
+extern "C" MTask *func_ov007_02186da4(DinoUiSenryuMenu *menu, u32 index);
+
+void DinoUiSenryuMenu::OnFocus(MMenuItem *item) {
+    if (item != NULL) {
+        SenryuMenuItem *senryu = static_cast<SenryuMenuItem *>(item);
+        if (senryu->mIndex < 4) {
+            if (!mSilentFocus) {
+                DinoSoundPlaySe(0x96, 0);
+            }
+            mSilentFocus = FALSE;
+        }
+        switch (senryu->mIndex) {
+        case 0:
+            mSerial.AddTail(func_ov007_02186da4(this, mPage * 3));
+            mCursor->Show();
+            return;
+        case 1:
+            mSerial.AddTail(func_ov007_02186da4(this, mPage * 3 + 1));
+            mCursor->Show();
+            return;
+        case 2:
+            mSerial.AddTail(func_ov007_02186da4(this, mPage * 3 + 2));
+            mCursor->Show();
+            return;
+        default:
+            mCursor->Hide();
+            break;
+        }
+    }
+}
