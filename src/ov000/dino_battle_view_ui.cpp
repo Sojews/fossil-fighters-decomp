@@ -15,6 +15,10 @@
 #include "game/dino_battle_view_ui_select_all.h"
 #include "game/dino_battle_view.h"
 #include "game/dino_battle_view_creature_info.h"
+#include "game/dino_battle_view_kaseki_point_menu.h"
+
+DinoBattleViewUiSelectAreaCommon::~DinoBattleViewUiSelectAreaCommon() {
+}
 
 DinoBattleViewUiChangeMenu::~DinoBattleViewUiChangeMenu() {
 }
@@ -28,16 +32,30 @@ template class MCallTask0<DinoBattleViewCreatureInfo, DinoBattleViewCreatureInfo
 template MTask *MCreateCallTask(DinoBattleViewCreatureInfo *obj, void (DinoBattleViewCreatureInfo::*func)());
 
 DinoBattleViewUiDefenderMenu::~DinoBattleViewUiDefenderMenu() {
+    for (int i = 0; i < mCount; i++) {
+        DinoBattleViewCreature *creature = ((DinoBattleView *)mUnkEC)->FindCreatureByAC(unk18C[i]);
+        if (((DinoBattleView *)mUnkEC)->GetUnkE4(mUnkB0)->GetUnkAC() == creature->GetUnkB0()) {
+            creature->ClearFlag144(4);
+        } else {
+            creature->ClearFlag144(3);
+        }
+    }
 }
 
 DinoBattleViewUiSelectAllMenu::~DinoBattleViewUiSelectAllMenu() {
+    for (int i = 0; i < mCount; i++) {
+        DinoBattleViewCreature *creature = ((DinoBattleView *)mView)->FindCreatureByAC(mIds[i]);
+        if (((DinoBattleView *)mView)->GetUnkE4(mPlayer)->GetUnkAC() == creature->GetUnkB0()) {
+            creature->ClearFlag144(4);
+        } else {
+            creature->ClearFlag144(3);
+        }
+    }
 }
 
 DinoBattleViewUiRootMenuItem::~DinoBattleViewUiRootMenuItem() {
 }
 
-DinoBattleViewUiSelectAreaCommon::~DinoBattleViewUiSelectAreaCommon() {
-}
 
 DinoBattleViewUiCreatureInfoMenu::~DinoBattleViewUiCreatureInfoMenu() {
 }

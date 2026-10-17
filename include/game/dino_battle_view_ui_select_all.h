@@ -15,6 +15,12 @@ public:
     virtual ~DinoBattleViewUiSelectAllMenu();
     virtual void OnStart();
     virtual void OnDecide(MMenuItem *item);
+
+    u32 mView;          // 0xB4: DinoBattleView
+    u32 mPlayer;        // 0xB8
+    u32 unkBC;
+    u32 mIds[3];        // 0xC0: creature ids
+    int mCount;         // 0xCC
 };
 
 #endif

@@ -17,6 +17,10 @@ public:
     virtual void OnStart();
     virtual void OnFocus(MMenuItem *item);
     virtual void OnDecide(MMenuItem *item);
+
+    u32 unk188;
+    u32 unk18C[3];  // 0x18C: creature ids
+    int mCount;     // 0x198
 };
 
 #endif

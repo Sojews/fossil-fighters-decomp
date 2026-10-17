@@ -1,6 +1,8 @@
 #ifndef GAME_DINO_BATTLE_VIEW_H
 #define GAME_DINO_BATTLE_VIEW_H
 
+#include <map>
+
 #include "m/menu_item.h"
 #include "m/menu.h"
 #include "m/display.h"
@@ -30,9 +32,13 @@ public:
     virtual void OnFocus(MMenuItem *item);
     virtual void OnDecide(MMenuItem *item);
 
-    u8 unkA8[0x44];
-    u32 mUnkEC;     // 0xEC
-    u8 unkF0[0x8C];
+    u32 unkA8[2];
+    u32 mUnkB0;     // 0xB0: player index
+    u8 unkB4[0x38];
+    u32 mUnkEC;     // 0xEC: DinoBattleView
+    u8 unkF0[0x40];
+    std::map<u32, void *> mUnk130;  // 0x130
+    u8 unk13C[0x40];
 };
 
 class DinoBattleViewUiCreatureInfoMenu : public DinoHelpBase, public DinoBattleViewUiSelectAreaCommon {

@@ -2,6 +2,7 @@
 
 #include "types.h"
 #include "game/dino_battle_view_class.h"
+#include "game/dino_battle_view_kaseki_point_menu.h"
 #include "game/enable_root_select_task.h"
 
 #pragma auto_inline off
@@ -60,6 +61,16 @@ void DinoBattleView::Idle() {
 
 void DinoBattleView::OnMessage(MMessage *msg) {
     mSubject.Notify(msg);
+}
+
+DinoBattleViewCreature *DinoBattleView::FindCreatureByAC(u32 id) {
+    for (int i = 0; i < 2; i++) {
+        DinoBattleViewCreature *creature = mUnkE4[i]->FindCreatureByAC(id);
+        if (creature != NULL) {
+            return creature;
+        }
+    }
+    return NULL;
 }
 
 u32 DinoBattleView::GetUnk104() {

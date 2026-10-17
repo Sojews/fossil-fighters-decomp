@@ -7,6 +7,7 @@
 #include "m/view.h"
 
 class DinoBattleViewPlayer;
+class DinoBattleViewCreature;
 class MSmartOam;
 
 struct DinoBattleViewUnkE0 {
@@ -25,6 +26,7 @@ public:
     u32 GetUnk120();
     u32 GetUnk124();
     DinoBattleViewPlayer *GetUnkE4(int index);
+    DinoBattleViewCreature *FindCreatureByAC(u32 id);
     u8 GetUnk138();
     void SetUnk128(u32 value);
     void SetUnk12C(u32 value);
