@@ -105,6 +105,14 @@ void DinoUiRvStatusPageLButton::OnDecide() {
     DinoSoundPlaySe(0x93, 0);
 }
 
+void DinoUiRvStatusMenu::OnDecide(MMenuItem *item) {
+    for (int i = 0; i < 4; i++) {
+        if (item == mTabItems[i]) {
+            SelectTab(i);
+        }
+    }
+}
+
 // Template task instances the game emits in this file. Until the code that makes the tasks is decompiled, they are
 // instantiated explicitly.
 template class MCallTask0<DinoUiRvStatusMenu, DinoHelpBase>;

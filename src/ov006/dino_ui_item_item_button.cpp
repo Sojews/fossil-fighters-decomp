@@ -112,3 +112,12 @@ void DinoUiItemItemButton::OnFocusChanged(BOOL focused) {
         mView->Hide();
     }
 }
+
+void DinoUiItemMenu::OnDecide(MMenuItem *item) {
+    for (int i = 0; i < 3; i++) {
+        if (item == mTabItems[i]) {
+            SelectTab(i);
+        }
+    }
+}
+

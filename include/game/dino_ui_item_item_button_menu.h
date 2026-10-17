@@ -19,8 +19,11 @@ public:
     void PageRight();
     void PageLeft();
     void OnOKDecided();
+    void SelectTab(int tab);
 
-    u32 mUnkB4[26];             // 0xB4
+    u32 mUnkB4[10];
+    MMenuItem *mTabItems[3]; // 0xDC
+    u32 mUnkE8[13];
     std::vector<void *> mUnk11C; // 0x11C
 };
 
