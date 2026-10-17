@@ -24,7 +24,7 @@ src/ov004/dino_ui_multiplay_loop.cpp:
     .text       start:0x02162b0c end:0x02162ffc
 
 src/ov004/dino_ui_wireless_cancel_item.cpp:
-    .text       start:0x0216814c end:0x02168b20
+    .text       start:0x02163404 end:0x02168b20
 
 src/ov004/dino_ui_save_option.cpp:
     .text       start:0x02169560 end:0x021698c8
@@ -50,5 +50,3 @@ src/ov004/dino_ui_save_menu.cpp:
 src/ov004/dino_ui2_container_base_menu_item.cpp:
     .text       start:0x021705f8 end:0x02171074
 
-src/ov004/dino_ui_battle_parent_scanner.cpp:
-    .text       start:0x02165984 end:0x021659bc
