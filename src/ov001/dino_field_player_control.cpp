@@ -4,4 +4,5 @@
 #include "game/dino_field_player_control.h"
 
 DinoFieldPlayerControl::~DinoFieldPlayerControl() {
+    StoreResult();
 }

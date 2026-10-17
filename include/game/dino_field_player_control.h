@@ -5,12 +5,30 @@
 #include "m/task.h"
 #include "m/archive.h"
 
+// Where the player control leaves the player when it ends.
+struct DinoFieldPlayerControlResult {
+    u16 unk00;
+    u32 unk04;  // 0x04
+    u8 unk08;   // 0x08
+};
+
 class DinoFieldPlayerControl : public MProcess {
 public:
     virtual ~DinoFieldPlayerControl();
     virtual void Idle();
 
-    u32 mUnk74[16];         // 0x74
+    void StoreResult() {
+        mResult->unk08 = 1;
+        mResult->unk00 = mUnk90;
+        mResult->unk04 = mUnk94;
+    }
+
+    u32 mUnk74[2];          // 0x74
+    DinoFieldPlayerControlResult *mResult;  // 0x7C
+    u32 mUnk80[4];          // 0x80
+    u16 mUnk90;             // 0x90
+    u32 mUnk94;             // 0x94
+    u32 mUnk98[7];          // 0x98
     MArchivePtr mArchive;   // 0xB4
     MArchiveFile mFile;     // 0xB8
 };
