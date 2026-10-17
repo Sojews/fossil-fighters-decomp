@@ -1,6 +1,7 @@
 #ifndef GAME_DINO_FIELD_POINT_H
 #define GAME_DINO_FIELD_POINT_H
 
+#include "m/geometry.h"
 #include <string>
 #include "m/menu_item.h"
 #include "m/menu.h"
@@ -13,6 +14,7 @@
 
 class DinoFieldPoint : public MProcess {
 public:
+    DinoFieldPoint(const std::string &path, int digits, u32 a, u32 b, u32 c);
     virtual ~DinoFieldPoint();
     virtual void Idle();
     MTask *CreateShowTask();

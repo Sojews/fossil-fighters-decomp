@@ -4,6 +4,7 @@
 // Derived destructors have their bases' destructor bodies inlined; auto-inlining the ones defined above does that.
 #pragma auto_inline on
 
+#include "game/dino_field.h"
 #include "m/input.h"
 #include "m/lcd.h"
 #include "m/bg.h"
@@ -185,4 +186,9 @@ void DinoUiIslandMapMenu::CheckKeys() {
             }
         }
     }
+}
+
+DinoMapSelectMenu::DinoMapSelectMenu(s32 *result, u32 unlocked) : MProcess(NULL) {
+    mUnlocked = unlocked;
+    mResult = result;
 }

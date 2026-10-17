@@ -239,12 +239,14 @@ public:
 };
 
 // The map select menu (in overlay 4).
-class DinoMapSelectMenu : public MTask {
+class DinoMapSelectMenu : public MProcess {
 public:
     DinoMapSelectMenu(s32 *result, u32 unlocked);
-    virtual void Execute();
+    virtual ~DinoMapSelectMenu();
+    virtual void Idle();
 
-    u8 unk10[0x6C];
+    u32 mUnlocked;      // 0x74
+    s32 *mResult;       // 0x78
 };
 
 // Runs the event scripts (the game's class name; the event commands get it as their event).
