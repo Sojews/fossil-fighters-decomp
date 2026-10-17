@@ -544,3 +544,11 @@ libs/nitrosdk/src/os/os_terminate_proc.c:
 libs/nitrosdk/src/os/os_spinlock.c:
     .text       start:0x02073588 end:0x02073810
     .bss        start:0x021518c4 end:0x021518c8
+
+libs/nitrosdk/src/os/os_vram_exclusive.c:
+    complete
+    .text       start:0x02075204 end:0x0207530c
+    .bss        start:0x02151c04 end:0x02151c1c
+
+libs/nitrosdk/src/os/os_entropy.c:
+    .text       start:0x0207530c end:0x020753ac

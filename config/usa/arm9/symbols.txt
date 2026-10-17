@@ -13071,8 +13071,8 @@ OSi_UseTick kind:bss addr:0x02151bdc
 OSi_TickCounter kind:bss addr:0x02151be4
 OSi_UseVAlarm kind:bss addr:0x02151bec
 data_02151c00 kind:bss addr:0x02151c00
-data_02151c04 kind:bss addr:0x02151c04
-data_02151c08 kind:bss addr:0x02151c08
+OSi_vramExclusive kind:bss addr:0x02151c04
+OSi_vramLockId kind:bss addr:0x02151c08
 sInitialized kind:bss addr:0x02151c1c local
 sSndMutex kind:bss(size=0x18) addr:0x02151c20
 sCommand kind:bss(size=0x24) addr:0x02151c40

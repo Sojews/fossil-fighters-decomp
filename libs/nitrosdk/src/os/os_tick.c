@@ -11,7 +11,7 @@ void OSi_EnterTimerCallback(u32 timerNo, void (*callback)(void *), void *arg);
 
 static void OSi_CountUpTick(void);
 
-u64 OSi_TickCounter;
+volatile u64 OSi_TickCounter;
 static u16 OSi_UseTick;
 static BOOL OSi_NeedResetTimer;
 
