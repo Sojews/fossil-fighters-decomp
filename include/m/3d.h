@@ -9,6 +9,7 @@ class M3d : public MScreen {
 public:
     M3d(MDisplay *display, u32 unk44, u32 unk48);
     virtual ~M3d();
+    virtual void Unk0C();
     BOOL IsTransferComplete();
 
     u8 mUnk20[0x84];

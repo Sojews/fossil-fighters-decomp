@@ -23,3 +23,6 @@ void M3dWaitTransferCompleteTask::Execute() {
         Exit();
     }
 }
+
+void M3d::Unk0C() {
+}
