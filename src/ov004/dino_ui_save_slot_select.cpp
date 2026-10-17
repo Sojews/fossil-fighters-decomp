@@ -139,3 +139,23 @@ void DinoUiSaveSlotConfirm::Idle() {
     mMenu = new DinoUiSaveSlotConfirmMenu();
     mSerial.AddTail(mMenu);
 }
+
+extern u8 data_ov004_02177280;      // set when the screen saves rather than loads
+extern const u32 data_0208ad88;
+extern const u32 data_0208ad90;
+extern const u32 data_0208ad8c;
+extern const u32 data_0208ad98;
+
+const char *DinoUiSaveSlotSelectMenuCancelItem::GetText() {
+    if (data_ov004_02177280) {
+        return gDinoResource->GetText(data_0208ad88);
+    }
+    return gDinoResource->GetText(data_0208ad90);
+}
+
+const char *DinoUiSaveSlotSelectMenuItem::GetText() {
+    if (data_ov004_02177280) {
+        return gDinoResource->GetText(data_0208ad8c + mSlot);
+    }
+    return gDinoResource->GetText(data_0208ad98 + mSlot);
+}
