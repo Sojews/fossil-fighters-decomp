@@ -7,6 +7,7 @@
 
 class DinoCleaningRock;
 class DinoCleaningImageView;
+class MSmartOam;
 
 // The fossil rock being cleaned: an outer rock layer over the fossil.
 class DinoCleaningKasekiRock : public MProcess {
@@ -25,18 +26,22 @@ public:
     BOOL IsViewUnkD9E0Zero();
     void Finish();
     void CountCells();
+    void SetOffset(MPoint offset);
+    void SetOffsetAll(MPoint offset);
 
     void (DinoCleaningKasekiRock::*mState)();   // 0x74
     u32 unk7C;
     MView *mUnk80;                              // 0x80
     DinoCleaningImageView *mView;               // 0x84
-    MTask *mUnk88;                              // 0x88
+    MView *mUnk88;                              // 0x88
     DinoCleaningRock *mRock8C;                  // 0x8C
     DinoCleaningRock *mRock90;                  // 0x90
     MTask *mUnk94;                              // 0x94
     u32 mUnk98;                                 // 0x98
     u32 mUnk9C;                                 // 0x9C
-    u32 mUnkA0[(0x4AC - 0xA0) / 4];             // 0xA0
+    u32 mUnkA0[(0x4A4 - 0xA0) / 4];             // 0xA0
+    MSmartOam *mOam;                            // 0x4A4
+    u32 unk4A8;
     fx32 mUnk4AC;                               // 0x4AC
     fx32 mUnk4B0;                               // 0x4B0
     u32 unk4B4;

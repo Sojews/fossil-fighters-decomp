@@ -6,6 +6,7 @@
 #include "game/dino_cleaning_image.h"
 #include "game/dino_cleaning_image_view.h"
 #include "m/display.h"
+#include "m/smart_oam.h"
 #include "m/blend.h"
 #include "m/bright.h"
 #include "game/dino_cleaning_kaseki_rock_xray_blend_manager.h"
@@ -78,6 +79,28 @@ void DinoCleaningKasekiRock::Finish() {
     mView->LoadPalettes();
     GetDisplay()->mBlend->Reset();
     GetDisplay()->mBright->Reset();
+}
+
+// NONMATCHING: the game reads the size through the returned temporary's address (an inline helper?).
+void DinoCleaningKasekiRock::SetOffsetAll(MPoint offset) {
+    MPoint pos;
+    MPoint size = mUnk80->GetSize();
+    pos.x = -(size.x - 256) / 2 + offset.x;
+    pos.y = -(size.y - 192) / 2 + offset.y;
+    mUnk80->SetPosition(pos);
+    mOam->SetOffset(MPoint(-offset.x, -offset.y));
+    mUnk88->SetPosition(offset);
+    mView->SetPosition(offset);
+}
+
+// NONMATCHING: as SetOffsetAll.
+void DinoCleaningKasekiRock::SetOffset(MPoint offset) {
+    MPoint pos;
+    MPoint size = mUnk80->GetSize();
+    pos.x = -(size.x - 256) / 2 + offset.x;
+    pos.y = -(size.y - 192) / 2 + offset.y;
+    mUnk80->SetPosition(pos);
+    mOam->SetOffset(MPoint(-offset.x, -offset.y));
 }
 
 BOOL DinoCleaningKasekiRock::IsViewUnkD9E0Zero() {
