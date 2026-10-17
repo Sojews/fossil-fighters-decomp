@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Names game functions after the functions in a source file that compile to the same bytes.
 
-Usage: python3 tools/name_from_src.py src/foo.cpp [--dry-run]
+Usage: python3 tools/name_from_src.py src/foo.cpp [--dry-run] [--anywhere]
 Compiles the file and, for each function in it whose name isn't in symbols.txt yet, looks for auto-named
 (func_XXXXXXXX) game functions of the same size whose bytes match, ignoring the bytes that relocations fill in.
 Only the .text range the file has in delinks.txt is searched, when it has one. A function is renamed only when
@@ -32,6 +32,7 @@ def text_range(src: Path):
 def main() -> None:
     src = Path(sys.argv[1]).resolve()
     dry = "--dry-run" in sys.argv
+    anywhere = "--anywhere" in sys.argv     # also search outside the file's own range (template instances)
     syms = t.game_symbols()
     rng = text_range(src)
     cache = {}
@@ -47,15 +48,18 @@ def main() -> None:
                 if val <= off < val + size:
                     mask[off - val:off - val + 4] = b"\0" * min(4, size - (off - val))
             hits = []
-            for gname, (mod, binp, base, addr, gsize, thumb) in syms.items():
-                if gsize != size or not gname.startswith("func_"):
+            for gname, entries in syms.items():
+                if not gname.startswith("func_"):
                     continue
-                if rng and not rng[0] <= addr < rng[1]:
-                    continue
-                b = cache.setdefault(binp, binp.read_bytes())
-                theirs = b[addr - base:addr - base + gsize]
-                if all((x ^ y) & m == 0 for x, y, m in zip(ours, theirs, mask)):
-                    hits.append(gname)
+                for mod, binp, base, addr, gsize, thumb in entries:
+                    if gsize != size:
+                        continue
+                    if rng and not anywhere and not rng[0] <= addr < rng[1]:
+                        continue
+                    b = cache.setdefault(binp, binp.read_bytes())
+                    theirs = b[addr - base:addr - base + gsize]
+                    if all((x ^ y) & m == 0 for x, y, m in zip(ours, theirs, mask)):
+                        hits.append(gname)
             if len(hits) == 1:
                 renames.setdefault(hits[0], []).append(name)
             elif hits:

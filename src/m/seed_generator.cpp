@@ -50,6 +50,10 @@ u32 SeedGenerator::GenerateSeed() {
     return seed + sSeedCount++;
 }
 
+MRandom::MRandom(u32 seed) {
+    Init(seed);
+}
+
 MRandom::MRandom() {
     const u32 *key = (const u32 *)sSeedGenerator->mEntropy;
     Init(19650218);

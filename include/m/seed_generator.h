@@ -26,6 +26,7 @@ public:
     enum { N = 624 };
 
     MRandom();
+    MRandom(u32 seed);
     ~MRandom();
     void Init(u32 seed);
     u32 Next();
