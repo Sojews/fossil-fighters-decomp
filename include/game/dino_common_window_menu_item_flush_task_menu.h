@@ -38,7 +38,8 @@ public:
     virtual MDisplay *GetDisplay();
     virtual const char *GetText();
 
-    u32 mUnk94[5];      // 0x94
+    u32 mUnk94;         // 0x94
+    MRect mFrame;       // 0x98
     std::string mText;  // 0xA8
 };
 

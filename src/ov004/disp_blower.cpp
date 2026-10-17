@@ -131,3 +131,13 @@ void DinoUiOptionBackButton::OnDecide() {
 void MicTestButton::OnDecide() {
     DinoSoundPlaySe(0x390, 0);
 }
+
+MRect BGMVolumeButton::GetFrame() {
+    MPoint p(mPos.x, mPos.y);
+    return MRect(MPoint(p.x - 8, p.y - 8), MPoint(p.x + 8, p.y + 8));
+}
+
+MRect SEVolumeButton::GetFrame() {
+    MPoint p(mPos.x, mPos.y);
+    return MRect(MPoint(p.x - 8, p.y - 8), MPoint(p.x + 8, p.y + 8));
+}

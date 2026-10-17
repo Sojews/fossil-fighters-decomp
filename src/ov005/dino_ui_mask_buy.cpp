@@ -176,3 +176,8 @@ void DinoUiMaskBuyMaskButton::OnFocusChanged(BOOL focused) {
 // instantiated explicitly.
 template class MCallTask0<DinoUiMaskBuyMenu, DinoUiMaskBuyMenu>;
 template MTask *MCreateCallTask(DinoUiMaskBuyMenu *obj, void (DinoUiMaskBuyMenu::*func)());
+
+MRect DinoUiMaskBuyMaskButton::GetFrame() {
+    MPoint p(mPos.x, mPos.y);
+    return MRect(MPoint(p.x - 24, p.y - 24), MPoint(p.x + 24, p.y + 24));
+}

@@ -36,3 +36,8 @@ void DinoUi2PartsKasekiButton::OnFocusChanged(BOOL focused) {
         mView->Hide();
     }
 }
+
+MRect DinoUi2PartsKasekiButton::GetFrame() {
+    MPoint p(mPos.x, mPos.y);
+    return MRect(MPoint(p.x - 24, p.y - 24), MPoint(p.x + 24, p.y + 24));
+}

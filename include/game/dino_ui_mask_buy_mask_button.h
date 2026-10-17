@@ -10,7 +10,8 @@ public:
     virtual MRect GetFrame();
     virtual void OnFocusChanged(BOOL focused);
 
-    u8 unk88[0xC];
+    MPoint mPos;  // 0x88: the center
+    u32 mUnk90;
     MView *mView; // 0x94
 };
 

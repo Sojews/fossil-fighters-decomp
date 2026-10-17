@@ -15,7 +15,8 @@ public:
     virtual MDisplay *GetDisplay();
     virtual const char *GetText();
 
-    u8 unk94[12];
+    MPoint mPos;  // 0x94: the center
+    u32 mUnk9C;
     MView *mView; // 0xA0
     u8 unkA4[24];
     u32 mTextId;        // 0xBC

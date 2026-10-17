@@ -23,6 +23,9 @@ public:
     virtual MRect GetFrame();
     virtual void OnFocusChanged(BOOL focused);
     virtual void OnDecide();
+
+    u32 mUnkA0;
+    MPoint mPos;    // 0xA4
 };
 
 class SEVolumeButton : public DinoUiOptionMenuItem {
@@ -31,6 +34,9 @@ public:
     virtual MRect GetFrame();
     virtual void OnFocusChanged(BOOL focused);
     virtual void OnDecide();
+
+    u32 mUnkA0;
+    MPoint mPos;    // 0xA4
 };
 
 class MicTestButton : public DinoUiOptionMenuItem {

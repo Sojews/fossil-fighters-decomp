@@ -98,3 +98,7 @@ void DinoUiStatusBackButton::OnDecide() {
     mOwner->OnBackDecided();
     DinoSoundPlaySe(0x90, 0);
 }
+
+MRect DinoUiPartsTabIconMenuItem::GetFrame() {
+    return mFrame;
+}

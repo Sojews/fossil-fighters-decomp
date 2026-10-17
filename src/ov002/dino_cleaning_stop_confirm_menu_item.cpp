@@ -58,3 +58,7 @@ void DinoCleaningStopConfirmMenuItem::OnFocusChanged(BOOL focused) {
         Select();
     }
 }
+
+MRect DinoCleaningStopConfirmMenuItem::GetFrame() {
+    return mMotion->GetCellRect(mCell);
+}

@@ -61,3 +61,7 @@ void DinoCleaningToolMenuItem::OnEnableChanged(BOOL enabled) {
 void DinoCleaningToolMenuItem::OnDecide() {
     Focus();
 }
+
+MRect DinoCleaningDummyItem::GetFrame() {
+    return MRect(256, 192, 256, 192);
+}

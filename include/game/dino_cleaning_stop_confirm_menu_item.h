@@ -14,7 +14,8 @@ public:
     virtual MDisplay *GetDisplay();
     virtual const char *GetText();
 
-    u8 unk94[0x8];
+    MMotion *mMotion;   // 0x94
+    u32 mCell;          // 0x98: the cell of mMotion this item covers
     u32 mTextId;        // 0x9C
 };
 

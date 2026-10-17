@@ -40,3 +40,7 @@ MDisplay *DinoCommonWindowMenuItem::GetDisplay() {
 // instantiated explicitly.
 template class MCallTask0<DinoCommonWindowMenu, DinoHelpBase>;
 template MTask *MCreateCallTask(DinoCommonWindowMenu *obj, void (DinoHelpBase::*func)());
+
+MRect DinoCommonWindowMenuItem::GetFrame() {
+    return mFrame;
+}

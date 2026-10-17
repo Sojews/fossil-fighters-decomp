@@ -17,6 +17,7 @@ public:
     virtual const char *GetText();
 
     u32 mTextId;        // 0x94
+    MRect mFrame;       // 0x98
 };
 
 #endif

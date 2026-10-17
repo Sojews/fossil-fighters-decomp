@@ -71,3 +71,7 @@ void DinoUiTitleMenu::OnDecide(MMenuItem *item) {
     }
     mSerial.AddTail(MTaskExitTransfer::Create(this));
 }
+
+MRect DinoUiTitleMenuGameItem::GetFrame() {
+    return MRect(0, 0, 256, 192);
+}

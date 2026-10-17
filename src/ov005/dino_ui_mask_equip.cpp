@@ -148,3 +148,8 @@ void DinoUiMaskEquipMenu::OnDecide(MMenuItem *item) {
         }
     }
 }
+
+MRect DinoUiMaskEquipMaskButton::GetFrame() {
+    MPoint p(mPos.x, mPos.y);
+    return MRect(MPoint(p.x - 24, p.y - 24), MPoint(p.x + 24, p.y + 24));
+}
