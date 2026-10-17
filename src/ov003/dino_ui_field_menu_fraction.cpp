@@ -198,3 +198,27 @@ BOOL DinoUiFieldMenuCursor::IsHidden() {
 u32 DinoUiFieldMenuCursor::GetPlaneMask() {
     return 0x10;
 }
+
+void DinoUiFieldMenuFraction::SetPriority(int priority) {
+    mNumerator->SetPriority(priority);
+    mDenominator->SetPriority(priority);
+}
+
+void DinoUiPartsReviverName::Idle() {
+    if (mLeft) {
+        mLeft--;
+        if (mLength >= mLeft) {
+            mMotion->Play(mLength - mLeft + 1, 0);
+            mMotion->Show();
+            if (mLeft == 0) {
+                mDone->Show();
+            }
+        }
+    }
+}
+
+void DinoUiPartsReviverNameCountCheckTask::Execute() {
+    if (mName->mLeft == 0) {
+        Exit();
+    }
+}

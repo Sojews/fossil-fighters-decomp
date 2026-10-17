@@ -3,10 +3,14 @@
 
 #include "m/task.h"
 
+class DinoUiPartsReviverName;
+
 class DinoUiPartsReviverNameCountCheckTask : public MTask {
 public:
     virtual ~DinoUiPartsReviverNameCountCheckTask();
     virtual void Execute();
+
+    DinoUiPartsReviverName *mName;  // 0x10: exits once its letters are all out
 };
 
 #endif
