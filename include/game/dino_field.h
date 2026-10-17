@@ -36,9 +36,14 @@ public:
 
     u8 unk8C[0xE4 - 0x8C];
     u32 mFocus;                     // 0xE4: the character followed
-    u8 unkE8[0x144 - 0xE8];
+    u32 mUnkE8;                     // 0xE8
+    s32 mUnkEC;                     // 0xEC
+    u32 mUnkF0[2];                  // 0xF0
+    u8 mTracking;                   // 0xF8
+    u8 unkF9[0x144 - 0xF9];
     DinoFieldNamePanel *mNamePanel; // 0x144
-    u32 mUnk148[2];                 // 0x148
+    u32 mUnk148;                    // 0x148
+    u8 mHeightSet;                  // 0x14C
     std::vector<void *> mUnk150;    // 0x150
 };
 
@@ -76,6 +81,7 @@ public:
     void ChangeMotion(u32 motion, u8 loop, MFx32 speed);
     void SetAngle(u32 angle, u32 a, u32 b);
     void SetDirection(u16 angle);
+    BOOL IsMoving();
     void MoveTo(MFx32Point coord, u32 a, u32 b, u8 c);
     MTask *CreateWaitMoveTask();
 
@@ -91,6 +97,7 @@ public:
     BOOL mHasFootSe;            // 0x304
     u32 mFootSe;                // 0x308
     u32 mBeholdTarget;          // 0x30C: the character looked at
+    u32 mUnk310;                // 0x310
 };
 
 struct MAfnBlock;

@@ -12,6 +12,7 @@ public:
 
     DinoFieldChara *mChara; // 0x48
     u8 mUnk4C;              // 0x4C
+    u32 mUnk50;             // 0x50
 };
 
 #endif

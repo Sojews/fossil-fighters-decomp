@@ -3,10 +3,14 @@
 
 #include "m/task.h"
 
+class DinoFieldChara;
+
 class DinoFieldCharaWaitStopTask : public MTask {
 public:
     virtual ~DinoFieldCharaWaitStopTask();
     virtual void Execute();
+
+    DinoFieldChara *mChara; // 0x10
 };
 
 #endif

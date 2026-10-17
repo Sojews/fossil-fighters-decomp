@@ -9,3 +9,14 @@ DinoFieldCamera::~DinoFieldCamera() {
 void DinoFieldCamera::SetFocus(u32 chara) {
     mFocus = chara;
 }
+
+void DinoFieldCamera::SetTracking(u8 tracking) {
+    mTracking = tracking;
+    if (mTracking) {
+        mUnkEC = -1;
+    }
+}
+
+void DinoFieldCamera::ResetHeight() {
+    mHeightSet = FALSE;
+}

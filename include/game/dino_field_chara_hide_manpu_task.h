@@ -3,10 +3,14 @@
 
 #include "m/task.h"
 
+class DinoFieldChara;
+
 class DinoFieldCharaHideManpuTask : public MTransfer {
 public:
     virtual ~DinoFieldCharaHideManpuTask();
     virtual void Transfer();
+
+    DinoFieldChara *mChara; // 0x10
 };
 
 #endif

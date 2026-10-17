@@ -84,3 +84,40 @@ void DinoFieldChara::SetDirection(u16 angle) {
         ApplyMotion();
     }
 }
+
+void DinoFieldCharaAngleToTask::Transfer() {
+    mChara->SetAngle(mAngle, mA, mB);
+}
+
+void DinoFieldCharaShowManpuTask::Transfer() {
+    mChara->ShowManpu(mManpu, mOffset);
+}
+
+void DinoFieldCharaHideManpuTask::Transfer() {
+    mChara->HideManpu();
+}
+
+void DinoFieldCharaMoveToTask::Transfer() {
+    mChara->MoveTo(mCoord, mA, mB, mC);
+}
+
+void DinoFieldCharaModelMotionIdTask::Transfer() {
+    if (mForce) {
+        mChara->ChangeMotion(mMotion, mLoop, mSpeed);
+    } else {
+        mChara->SetMotion(mMotion, mLoop, mSpeed);
+    }
+}
+
+void DinoFieldCharaWaitStopTask::Execute() {
+    if (!mChara->IsMoving()) {
+        Exit();
+    }
+}
+
+void DinoFieldCharaCoordAnime::Execute() {
+    MFx32PointAnime::Execute();
+    if (mUnk50 && !mUnk4C) {
+        mChara->mUnk310 = mUnk50;
+    }
+}
