@@ -8,6 +8,11 @@
 
 class DinoBattleViewPlayer;
 
+struct DinoBattleViewUnkE0 {
+    u8 unk00[0x140];
+    void *mUnk140;  // 0x140
+};
+
 class DinoBattleView : public MProcess, public MMessageObserver {
 public:
     virtual ~DinoBattleView();
@@ -34,7 +39,7 @@ public:
 
     u32 unkA8[4];
     MMessageSubject mSubject;   // 0xB8
-    u32 unkE0;
+    DinoBattleViewUnkE0 *mUnkE0; // 0xE0
     DinoBattleViewPlayer *mUnkE4[2]; // 0xE4: players
     u32 mUnkEC;                 // 0xEC
     u32 unkF0[5];

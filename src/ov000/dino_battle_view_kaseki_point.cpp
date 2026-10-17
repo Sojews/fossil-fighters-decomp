@@ -11,6 +11,7 @@
 #include "game/dino_battle_view_class.h"
 #include "m/motion.h"
 #include "game/dino_resource.h"
+#include "m/pal.h"
 
 DinoBattleViewKasekiPoint::~DinoBattleViewKasekiPoint() {
 }
@@ -20,6 +21,62 @@ WaitKPCountTask::~WaitKPCountTask() {
 
 DinoBattleViewPlayer::~DinoBattleViewPlayer() {
 }
+
+#pragma auto_inline off
+
+extern "C" const u32 data_ov000_0218fa14[][2];
+extern "C" const u32 data_ov000_0218fa1c[2];
+extern "C" const u32 data_ov000_0218fa3c[2];
+
+const u16 *KasekiPointPalette::GetRow(int index) {
+    if (index < 0) {
+        index = 0;
+    }
+    if (index > 31) {
+        index = 31;
+    }
+    return mRows[index];
+}
+
+void DinoBattleViewKasekiPoint::UpdateAnime(u32 player) {
+    int done = mUnk7C == mUnk78 ? 1 : 0;
+    int side = mUnk98 != 0 ? 1 : 0;
+    int anime = mUnk98 == player ? 2 : 3;
+    int current = mUnk84->GetAnime();
+    if (anime == 2) {
+        if (current == data_ov000_0218fa1c[side] || current == data_ov000_0218fa3c[side]) {
+            anime = 0;
+        }
+    }
+    if (done) {
+        anime += 4;
+    }
+    mUnk84->Play(data_ov000_0218fa14[anime][side], 0);
+}
+
+extern "C" void func_ov000_0217df4c(void *obj, int delta, u32 side);
+
+void DinoBattleViewKasekiPoint::SetValue(int value) {
+    func_ov000_0217df4c(mView->mUnkE0->mUnk140, value - mValue, mUnk98);
+    mValue = value;
+}
+
+void DinoBattleViewKasekiPoint::LoadPalette(int index) {
+    mPalBlock->Load(mPalette->GetRow(index), 0, -1);
+}
+
+DinoBattleViewKasekiPoint *DinoBattleViewPlayer::GetKasekiPoint() {
+    return mKasekiPoint;
+}
+
+BOOL DinoBattleViewKasekiPoint::IsCounting() {
+    if (mValue != mUnk7C) {
+        return TRUE;
+    }
+    return FALSE;
+}
+
+#pragma auto_inline on
 
 void DinoBattleViewPlayer::Idle() {
     Dispatch();
@@ -167,10 +224,8 @@ BOOL DinoBattleViewPlayer::HasCommonCreatureFlags() {
 
 #pragma auto_inline on
 
-extern "C" int func_ov000_0215ddf8(void *owner);
-
 void WaitKPCountTask::Execute() {
-    if (func_ov000_0215ddf8(mOwner) == 0) {
+    if (((DinoBattleViewKasekiPoint *)mOwner)->IsCounting() == 0) {
         Exit();
     }
 }
