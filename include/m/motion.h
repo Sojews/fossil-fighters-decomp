@@ -23,6 +23,14 @@ struct MMotionHeader {
     u32 cellOffset;     // 0x14: 16-byte cell definitions
 };
 
+// A cell's graphics, as the motion file lists them.
+struct MMotionCellDef {
+    u32 pal16;      // 0x00
+    u32 chr16;      // 0x04: tiles, 16 colors
+    u32 pal256;     // 0x08
+    u32 chr256;     // 0x0C: tiles, 256 colors
+};
+
 // A loaded motion file and the files it uses, shared by every motion showing it.
 class MMotionData {
 public:
@@ -69,7 +77,7 @@ public:
     void ReleaseChrs(MDisplay *display);
     u32 GetAnimeCount();
     u32 GetCellCount();
-    void *GetCell(u32 index);
+    const MMotionCellDef *GetCell(u32 index);
     void *GetAnime(int anime, MArchiveFile *file);
     void *GetPalette(u32 index, MArchiveFile *file);
 
@@ -78,6 +86,8 @@ public:
 
 // One cell (OBJ) of a motion.
 struct MMotionCell {
+    MMotionCell();
+
     u8 visible;         // 0x00
     u32 unk04;          // 0x04
     int objMode;        // 0x08
@@ -88,7 +98,7 @@ struct MMotionCell {
 
 struct MMotionAnimeState {
     MMotionAnimeState() {}
-    MMotionAnimeState(u32 a, u32 b) {
+    void Set(u32 a, u32 b) {
         unk00 = a;
         unk04 = b;
     }
@@ -133,6 +143,7 @@ public:
     void Init(int fromEnd);
     void FreeAffine(u32 index);
     void SetOverride(BOOL off);
+    void SetPosition(int x, int y);
     MSmartOamEntry *GetCellEntry(int cell) { return &mEntries[mCells[cell].entry]; }
     void SetCellOffset(int cell, int x, int y);
     void SetCellOffsetY(int cell, int y);
