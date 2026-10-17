@@ -89,3 +89,21 @@ void DinoUiMultiplayWirelessButton::OnDecide() {
 // instantiated explicitly.
 template class MCallTask0<DinoUiMultiplayMenu, DinoHelpBase>;
 template MTask *MCreateCallTask(DinoUiMultiplayMenu *obj, void (DinoHelpBase::*func)());
+
+void DinoUiMultiplayMenuItem2::OnFocusChanged(BOOL focused) {
+    if (focused) {
+        mMotion2->Play(2, 0);
+        mMotion->Play(2, 0);
+    } else {
+        mMotion2->Play(1, 0);
+        mMotion->Play(1, 0);
+    }
+}
+
+void DinoUiMultiplayMenu::OnFocus(MMenuItem *item) {
+    SetSelectedItem(dynamic_cast<DinoHelpItem *>(item));
+    if (!mSilentFocus) {
+        DinoSoundPlaySe(0x38E, 0);
+    }
+    mSilentFocus = FALSE;
+}

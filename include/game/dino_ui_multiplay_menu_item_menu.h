@@ -14,6 +14,9 @@ public:
     virtual void OnStart();
     virtual void OnFocus(MMenuItem *item);
     void Decide(int choice);
+
+    u8 unkB3[0x21];  // members start in MMenu's tail padding
+    u8 mSilentFocus; // 0xD4
 };
 
 class DinoUiMultiplayWirelessButton : public DinoUiMultiplayMenuItem {
