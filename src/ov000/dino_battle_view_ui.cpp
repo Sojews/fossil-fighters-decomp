@@ -102,7 +102,7 @@ void DinoBattleViewUiChangeMenu::OnIdle() {
 }
 
 void DinoBattleViewUiCreatureInfoMenu::OnIdle() {
-    MTask *task = func_ov000_0218ec8c(func_ov000_0215bb4c(mUnkF8), -1, 0);
+    MTask *task = func_ov000_0218ec8c(func_ov000_0215bb4c(mUnkEC), -1, 0);
     if (task != NULL) {
         mSerial.AddTail(task);
     }

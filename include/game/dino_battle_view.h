@@ -29,6 +29,10 @@ public:
     virtual void OnStart();
     virtual void OnFocus(MMenuItem *item);
     virtual void OnDecide(MMenuItem *item);
+
+    u8 unkA8[0x44];
+    u32 mUnkEC;     // 0xEC
+    u8 unkF0[0x8C];
 };
 
 class DinoBattleViewUiCreatureInfoMenu : public DinoHelpBase, public DinoBattleViewUiSelectAreaCommon {
@@ -39,8 +43,6 @@ public:
     virtual void OnDecide(MMenuItem *item);
     virtual void OnIdle();
 
-    u8 unkB3[0x45];
-    u32 mUnkF8;     // 0xF8
 };
 
 class DinoBattleViewInfoLRItem : public MMenuItem {
