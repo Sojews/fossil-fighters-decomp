@@ -113,6 +113,8 @@ public:
     virtual void OnFocusChanged(BOOL focused);
 
     MMotion *mMotion;   // 0x88
+    u32 mUnk8C;         // 0x8C
+    u8 mBaseAnime;      // 0x90
 };
 
 #endif

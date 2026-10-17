@@ -16,6 +16,7 @@ public:
     virtual void OnFocusChanged(BOOL focused);
     virtual void OnDecide();
     MMotion *GetMotion();
+    u8 IsYes();
 
     MMotion *mMotion;   // 0x94
     u8 mIsYes;          // 0x98

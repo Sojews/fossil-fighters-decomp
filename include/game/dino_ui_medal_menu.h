@@ -40,6 +40,7 @@ public:
     virtual const char *GetText();
 
     u32 mTextId;        // 0x94
+    MPoint mPos;        // 0x98
 };
 
 class DinoUiMedalList : public MProcess {

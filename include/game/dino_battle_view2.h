@@ -13,6 +13,7 @@
 #include "game/help.h"
 #include "game/dino_common_yes_no_menu_item_menu.h"
 #include "game/dino_field_camera_hook.h"
+#include "game/dino_common_yes_no_menu_item.h"
 
 class AnyInputTimerWait : public MProcess {
 public:
@@ -30,6 +31,9 @@ public:
     virtual void OnIdle();
     virtual void OnFocus(MMenuItem *item);
     virtual void OnDecide(MMenuItem *item);
+
+    u8 unkB4[0x21];
+    u8 mSilentFocus;    // 0xD5
 };
 
 class DinoBattleViewTurnEndDialog : public DinoCommonYesNoMenu {
@@ -48,6 +52,9 @@ public:
     virtual ~DinoBattleViewGivingUpDialog();
     virtual void OnFocus(MMenuItem *item);
     virtual void OnDecide(MMenuItem *item);
+
+    u32 unkD0[3];
+    u8 *mGivingUp;  // 0xDC
 };
 
 class DinoBattleViewGivingUpMenu : public MProcess {

@@ -52,3 +52,7 @@ void DinoUiTeamSelectMenu::OnDecide(MMenuItem *item) {
         }
     }
 }
+
+MRect DinoUiTeamSelectTeamButton::GetFrame() {
+    return MRect(mPos.Offset(-100, -12), mPos.Offset(100, 12));
+}

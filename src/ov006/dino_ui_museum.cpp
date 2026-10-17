@@ -155,3 +155,24 @@ void DinoUiMuseumBackButton::OnDecide() {
     func_ov006_0218935c(mOwner);
     DinoSoundPlaySe(0x90, 0);
 }
+
+void DinoUiMuseumReviverButton::OnFocusChanged(BOOL focused) {
+    if (focused) {
+        mMotion->Play(mBaseAnime + 3, 0);
+    } else {
+        mMotion->Play(mBaseAnime + 1, 0);
+    }
+    mSerial.Clear();
+}
+
+extern "C" void func_ov006_0218a538(DinoUiMuseumInformationMenu *menu);
+
+void DinoUiMuseumInformationVoiceButton::OnDecide() {
+    mMotion->Play(2, 1);
+    MTask *play = mMotion->CreatePlayTransfer(1, 0);
+    MTask *wait = mMotion->CreateWaitStopTask();
+    MSerialTaskSet *serial = &mSerial;
+    serial->AddTail(wait);
+    serial->AddTail(play);
+    func_ov006_0218a538(mOwner);
+}

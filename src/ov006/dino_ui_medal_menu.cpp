@@ -112,3 +112,8 @@ void DinoUiMedalPageLButton::OnDecide() {
 void DinoUiMedalMenu::OnIdle() {
     mUnk204 = TRUE;
 }
+
+// NONMATCHING: the game loads mPos.x once for both corners
+MRect DinoUiSortMenuItem::GetRect() {
+    return MRect(mPos.Offset(0, -2), mPos.Offset(0x28, 0x10));
+}

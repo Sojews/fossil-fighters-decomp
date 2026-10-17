@@ -58,3 +58,10 @@ void DinoUiOrderSelectDecideButton::OnDecide() {
     func_ov006_0218d828(mOwner);
     DinoSoundPlaySe(0x98, 0);
 }
+
+void DinoUiOrderSelectBackButton::OnDecide() {
+    mMotion->Play(4, 1);
+    mSerial.AddTail(mMotion->CreateWaitStopTask());
+    func_ov006_0218d828(mOwner);
+    DinoSoundPlaySe(0x90, 0);
+}

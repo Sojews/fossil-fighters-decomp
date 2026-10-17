@@ -44,6 +44,10 @@ MMotion *DinoCommonYesNoMenuItem::GetMotion() {
     return mMotion;
 }
 
+u8 DinoCommonYesNoMenuItem::IsYes() {
+    return mIsYes;
+}
+
 #pragma auto_inline on
 
 void DinoCommonYesNoMenu::OnFocus(MMenuItem *item) {

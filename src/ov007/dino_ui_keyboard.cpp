@@ -3,6 +3,7 @@
 // Derived destructors have their bases' destructor bodies inlined; auto-inlining the ones defined above does that.
 #pragma auto_inline on
 
+#include "game/dino_sound.h"
 #include "game/dino_ui_keyboard_menu.h"
 #include "types.h"
 #include "game/dino_ui_keyboard.h"
@@ -244,4 +245,21 @@ void DinoUiSenryuMenuItem::OnDecide() {
     if (mMotion != NULL) {
         mSerial.AddTail(mMotion->CreatePlayTransfer(2, 0));
     }
+}
+
+extern "C" void func_ov007_021841f4(u32 owner);
+extern "C" void func_ov007_02186dd8(u32 owner);
+
+void DinoKBBackButton::OnDecide() {
+    mMotion->Play(4, 1);
+    mSerial.AddTail(mMotion->CreateWaitStopTask());
+    func_ov007_021841f4(unkB8);
+    DinoSoundPlaySe(0x90, 0);
+}
+
+void DinoSenryuBackButton::OnDecide() {
+    mMotion->Play(4, 1);
+    mSerial.AddTail(mMotion->CreateWaitStopTask());
+    func_ov007_02186dd8(unkAC);
+    DinoSoundPlaySe(0x90, 0);
 }

@@ -4,6 +4,7 @@
 // Derived destructors have their bases' destructor bodies inlined; auto-inlining the ones defined above does that.
 #pragma auto_inline on
 
+#include "game/dino_sound.h"
 #include "game/dino_battle_view2.h"
 #include "types.h"
 
@@ -106,4 +107,41 @@ void AnyInputTimerWait::Idle() {
     if (mTimer-- == 0) {
         Exit();
     }
+}
+
+void DinoBattleViewTurnEndDialog::OnFocus(MMenuItem *item) {
+    DinoHelpItem *help = dynamic_cast<DinoHelpItem *>(item);
+    if (help != NULL) {
+        SetSelectedItem(help);
+    }
+    DinoSoundPlaySe(0x5E, 0);
+}
+
+void DinoBattleViewGivingUpDialog::OnFocus(MMenuItem *item) {
+    DinoHelpItem *help = dynamic_cast<DinoHelpItem *>(item);
+    if (help != NULL) {
+        SetSelectedItem(help);
+    }
+    DinoSoundPlaySe(0x5E, 0);
+}
+
+void DinoBattleViewGivingUpDialog::OnDecide(MMenuItem *item) {
+    DinoCommonYesNoMenu::OnDecide(item);
+    DinoCommonYesNoMenuItem *yesNo = static_cast<DinoCommonYesNoMenuItem *>(item);
+    DinoSoundPlaySe(yesNo->IsYes() ? 0x61 : 0x63, 0);
+    *mGivingUp = yesNo->IsYes();
+    mSerial.AddTail(MTaskExitTransfer::Create(this));
+}
+
+void DinoBattleViewUiRootSelect::OnFocus(MMenuItem *item) {
+    DinoHelpItem *help = dynamic_cast<DinoHelpItem *>(item);
+    if (help != NULL) {
+        SetSelectedItem(help);
+    }
+    if (mSilentFocus) {
+        mSilentFocus = FALSE;
+        DinoSoundPlaySe(0x5D, 0);
+        return;
+    }
+    DinoSoundPlaySe(0x5E, 0);
 }
