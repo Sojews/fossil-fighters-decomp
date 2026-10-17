@@ -46,4 +46,13 @@ public:
     virtual void OnDecide();
 };
 
+class DinoUiCleaningTest : public MProcess {
+public:
+    virtual ~DinoUiCleaningTest();
+    virtual void Idle();
+
+    u32 mUnk74[2];              // 0x74
+    std::vector<void *> mUnk7C; // 0x7C
+};
+
 #endif

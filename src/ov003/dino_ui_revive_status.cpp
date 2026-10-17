@@ -1,6 +1,10 @@
 // DinoUiReviveStatus, DinoUiReviveStatusDigit, DinoUiReviveEffectLight, DinoUiReviveEffectParticle.
 // Only the destructors are decompiled so far.
 
+// Derived destructors have their bases' destructor bodies inlined; auto-inlining the ones defined above does that.
+#pragma auto_inline on
+
+#include "game/dino_ui_revive_status_menu.h"
 #include "game/dino_ui_revive_status.h"
 #include "game/dino_ui_revive_status_digit.h"
 #include "game/dino_ui_revive_effect_light.h"
@@ -27,6 +31,9 @@ void DinoUiReviveStatusDigit::Idle() {
 
 void DinoUiReviveStatus::Idle() {
     (this->*mState)();
+}
+
+DinoUiReviveStatusParts::~DinoUiReviveStatusParts() {
 }
 
 // Template task instances the game emits in this file. Until the code that makes the tasks is decompiled, they are

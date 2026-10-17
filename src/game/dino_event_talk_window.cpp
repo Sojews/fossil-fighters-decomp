@@ -5,6 +5,9 @@
 #include "m/bg_new_task.h"
 #include "game/dino_window_choice.h"
 
+DinoEventTalkWindow::~DinoEventTalkWindow() {
+}
+
 // Emitted in this file in the game (the window starts background loads with MCreateBgCallTask); until the code
 // that makes them is decompiled, the instances are made explicitly.
 template class MBgCallTask0<DinoEventTalkWindow>;

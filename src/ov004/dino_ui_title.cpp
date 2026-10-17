@@ -36,9 +36,11 @@ void DinoUiTitle::Idle() {
     (this->*mState)();
 }
 
+DinoUiOpening::~DinoUiOpening() {
+}
+
 // Template task instances the game emits in this file. Until the code that makes the tasks is decompiled, they are
 // instantiated explicitly.
-class DinoUiOpening {};
 template class MBgCallTask0<DinoUiTitle>;
 template MTask *MCreateBgCallTask(DinoUiTitle *obj, void (DinoUiTitle::*func)(), int thread);
 template class MCallTask1<MBg, MBg, bg_mode>;
