@@ -56,7 +56,11 @@ struct DinoAttackDef {
     u8 unk00[0x18];
     u32 unk18;          // 0x18
 };
-struct DinoBattleAdjustDefs;
+struct DinoBattleAdjustDefs {
+    u8 unk000[0x138];
+    int kasekiPointX;   // 0x138
+    int kasekiPointY;   // 0x13C
+};
 struct DinoBattleBgDefs;
 struct DinoExcavateRange {
     u32 min;

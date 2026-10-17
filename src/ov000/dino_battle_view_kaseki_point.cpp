@@ -24,6 +24,40 @@ DinoBattleViewPlayer::~DinoBattleViewPlayer() {
 
 #pragma auto_inline off
 
+MPoint GetKasekiPointPos(u32 side) {
+    const DinoBattleAdjustDefs *defs = gDinoResource->GetBattleAdjustDefs();
+    MPoint pos;
+    pos.x = defs->kasekiPointX;
+    pos.y = defs->kasekiPointY;
+    if (side == 1) {
+        pos.x = -pos.x;
+    }
+    return pos;
+}
+
+KasekiPointPalette::KasekiPointPalette(const u16 *from, const u16 *to) {
+    Init(from, to);
+}
+
+void KasekiPointPalette::Init(const u16 *from, const u16 *to) {
+    for (int row = 0; row < 32; row++) {
+        for (int i = 1; i < 16; i++) {
+            u16 a = from[i];
+            u16 b = to[i];
+            u16 color = 0;
+            int k;
+            int shift;
+            for (k = 0, shift = 0; k < 3; k++) {
+                u16 ca = (a & (0x1F << shift)) >> shift;
+                u16 cb = (b & (0x1F << shift)) >> shift;
+                color |= (ca + (cb - ca) * row / 32) << shift;
+                shift += 5;
+            }
+            mRows[row][i] = color;
+        }
+    }
+}
+
 extern "C" const u32 data_ov000_0218fa14[][2];
 extern "C" const u32 data_ov000_0218fa1c[2];
 extern "C" const u32 data_ov000_0218fa3c[2];
@@ -67,6 +101,19 @@ void DinoBattleViewKasekiPoint::LoadPalette(int index) {
 
 DinoBattleViewKasekiPoint *DinoBattleViewPlayer::GetKasekiPoint() {
     return mKasekiPoint;
+}
+
+// Runs the task for 50 frames.
+void DinoBattleViewPlayer::AddTimedTask(MTask *task, MTask *old) {
+    delete old;
+    MTask *exit = MTaskExitTransfer::Create(task);
+    MTimer *timer = new MTimer(50);
+    MSerialTaskSet *set = new MSerialTaskSet(TRUE);
+    set->AddTail(timer);
+    set->AddTail(exit);
+    MTaskSet *parallel = &mParallel;
+    parallel->AddTail(task);
+    parallel->AddTail(set);
 }
 
 BOOL DinoBattleViewKasekiPoint::IsCounting() {

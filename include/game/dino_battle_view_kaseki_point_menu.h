@@ -23,6 +23,7 @@ public:
     virtual void OnMessage(MMessage *msg);
 
     DinoBattleViewKasekiPoint *GetKasekiPoint();
+    void AddTimedTask(MTask *task, MTask *old);
     u32 GetUnk108();
     u32 GetUnkAC();
     std::string GetUnkC0();

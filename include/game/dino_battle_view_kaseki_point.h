@@ -10,6 +10,8 @@ class DinoBattleView;
 // 32 palette rows fading between two palettes.
 class KasekiPointPalette {
 public:
+    KasekiPointPalette(const u16 *from, const u16 *to);
+    void Init(const u16 *from, const u16 *to);
     const u16 *GetRow(int index);
 
     u32 unk00;
