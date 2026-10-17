@@ -72,6 +72,11 @@ public:
     MFx32 RandomFraction();
     void SetUnk12C(u8 value);
     u32 NextUnkId();
+    DinoBattleModelCreature *FindCreatureByB4(u32 id);
+    BOOL AnyCreatureUnkD244();
+    void CollectCreaturesUnkD244(u32 *ids, int *count);
+    BOOL IsUnk2163978();
+    void CollectCreaturesB8In12(u32 *ids, int *count);
 
     u32 mUnkA8;                         // 0xA8
     u32 mUnkAC;                         // 0xAC
@@ -171,6 +176,7 @@ public:
     int CompareUnkED0C(DinoBattleModelCreature *other);
     u32 GetUnkD298();
     BOOL RollDefUnk23();
+    int GetB8Category();
 
     class AddLifePointTask : public MTask {
     public:

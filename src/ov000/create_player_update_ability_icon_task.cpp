@@ -289,6 +289,19 @@ extern "C" BOOL func_ov000_0216f13c(DinoBattleModelCreature *creature);
 extern "C" u32 func_ov000_02163a28(DinoBattleModelPlayer *player);
 extern "C" int func_ov000_0216ecc0(int a, int b);
 
+int DinoBattleModelCreature::GetB8Category() {
+    switch (mUnkB8) {
+    case 0:
+        return 0;
+    case 1:
+    case 2:
+        return 1;
+    case 3:
+        return 2;
+    }
+    return 0;
+}
+
 BOOL DinoBattleModelCreature::IsUnkCE50() {
     if (GetDefUnk61() == 5 && func_ov000_0216ce04(this)) {
         return TRUE;
@@ -448,6 +461,64 @@ void DinoBattleModelPlayer::SetUnk12C(u8 value) {
 u32 DinoBattleModelPlayer::NextUnkId() {
     u32 id = mUnkBC++;
     return (mUnkB8 << 16) | id;
+}
+
+// NONMATCHING: ours folds the first p != end test into a count check; the game compares the pointers.
+DinoBattleModelCreature *DinoBattleModelPlayer::FindCreatureByB4(u32 id) {
+    DinoBattleModelCreature **p;
+
+    for (p = mCreatures; p != mCreatures + mCreatureCount; p++) {
+        if (id == (*p)->GetUnkB4()) {
+            return *p;
+        }
+    }
+    return NULL;
+}
+
+BOOL DinoBattleModelPlayer::AnyCreatureUnkD244() {
+    int i;
+
+    for (i = 0; i < GetCreatureCount(); i++) {
+        if (GetCreature(i)->IsUnkD244()) {
+            return TRUE;
+        }
+    }
+    return FALSE;
+}
+
+void DinoBattleModelPlayer::CollectCreaturesUnkD244(u32 *ids, int *count) {
+    int i;
+
+    *count = 0;
+    for (i = 0; i < GetCreatureCount(); i++) {
+        if (GetCreature(i)->IsUnkD244()) {
+            ids[(*count)++] = GetCreature(i)->GetUnkB4();
+        }
+    }
+}
+
+BOOL DinoBattleModelPlayer::IsUnk2163978() {
+    if (FindCreature(3)) {
+        return FALSE;
+    }
+    if (!FindCreature(0)) {
+        return FALSE;
+    }
+    if (!FindCreature(0)->IsUnkD274()) {
+        return FALSE;
+    }
+    return (FindCreature(1) || FindCreature(2)) ? TRUE : FALSE;
+}
+
+void DinoBattleModelPlayer::CollectCreaturesB8In12(u32 *ids, int *count) {
+    int i;
+
+    *count = 0;
+    for (i = 0; i < GetCreatureCount(); i++) {
+        if (GetCreature(i)->GetUnkB8() == 1 || GetCreature(i)->GetUnkB8() == 2) {
+            ids[(*count)++] = GetCreature(i)->GetUnkB4();
+        }
+    }
 }
 
 // A random fraction in [0, 1].
