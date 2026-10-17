@@ -604,3 +604,7 @@ libs/nitrosdk/src/mi/mi_card.c:
 libs/nitrosdk/src/mi/mi_init.c:
     complete
     .text       start:0x02075fa4 end:0x02075fb4
+
+libs/nitrosdk/src/gx/g3_util.c:
+    complete
+    .text       start:0x02072e24 end:0x02073084
