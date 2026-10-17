@@ -14,6 +14,10 @@ public:
     fx32 v;
 };
 
+inline int MFx32ToInt(MFx32 x) {
+    return x.v >> FX32_SHIFT;
+}
+
 inline bool operator!=(MFx32 a, MFx32 b) {
     return a.v != b.v;
 }

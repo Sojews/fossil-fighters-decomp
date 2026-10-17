@@ -866,8 +866,9 @@ u32 DinoBackup::GetExcavateLevelUnk0() {
 
 s32 DinoBackup::GetExcavateLevelAverage() {
     const DinoExcavateLevel *level = GetExcavateLevel();
-    MFx32 average = (level->unkC + level->unk10) / MFx32(2);
-    return average.v >> FX32_SHIFT;
+    MFx32 b = level->unk10;
+    MFx32 a = level->unkC;
+    return MFx32ToInt((a + b) / MFx32(2));
 }
 
 s32 DinoBackup::GetExcavateLevelRemaining() {
