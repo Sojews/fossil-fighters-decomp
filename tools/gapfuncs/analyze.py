@@ -20,7 +20,7 @@ def sections(path):
 def funcs(path):
     out = {}
     for l in open(path):
-        m = re.match(r'(\S+) kind:function\((\w+),size=0x([0-9a-f]+)\) addr:0x([0-9a-f]+)', l)
+        m = re.match(r'(\S+) kind:function\((\w+),size=0x([0-9a-f]+)(?:,unknown)?\) addr:0x([0-9a-f]+)', l)
         if m:
             out[int(m.group(4), 16)] = (int(m.group(3), 16), m.group(1))
     return out

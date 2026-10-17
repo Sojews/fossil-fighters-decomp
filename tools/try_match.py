@@ -35,7 +35,7 @@ def game_symbols():
     syms = {}
     for mod, (cdir, binp, base) in modules().items():
         for line in (cdir / "symbols.txt").read_text().splitlines():
-            m = re.match(r"^(\S+) kind:function\((\w+),size=(0x[0-9a-f]+)\) addr:(0x[0-9a-f]+)", line)
+            m = re.match(r"^(\S+) kind:function\((\w+),size=(0x[0-9a-f]+)(?:,unknown)?\) addr:(0x[0-9a-f]+)", line)
             if m:
                 syms.setdefault(m.group(1), []).append(
                     (mod, binp, base, int(m.group(4), 16), int(m.group(3), 16), m.group(2) == "thumb"))

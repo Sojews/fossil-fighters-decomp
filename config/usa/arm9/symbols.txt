@@ -6315,13 +6315,13 @@ func_02085d20 kind:function(arm,size=0x1e0) addr:0x02085d20
 func_02085f0c kind:function(arm,size=0x278) addr:0x02085f0c
 func_02086184 kind:function(arm,size=0x10) addr:0x02086184
 _ll_sdiv kind:function(arm,size=0x1b0) addr:0x02086194
-_ll_udiv kind:function(arm,size=0x48) addr:0x02086344
-.L_02086350 kind:label(arm) addr:0x02086350
+_ll_udiv kind:function(arm,size=0xc,unknown) addr:0x02086344
+_ull_mod kind:function(arm,size=0x3c) addr:0x02086350
 _ll_mul kind:function(arm,size=0x20) addr:0x0208638c
-_ull_mul kind:function(arm,size=0x20) addr:0x0208638c
+_ull_mul kind:label(arm) addr:0x0208638c
 _s32_div_f kind:function(arm,size=0x20c) addr:0x020863ac
-_u32_div_f kind:function(arm,size=0x1e4) addr:0x020865b8
-.L_020865c0 kind:label(arm) addr:0x020865c0
+_u32_div_f kind:function(arm,size=0x8,unknown) addr:0x020865b8
+func_020865c0 kind:function(arm,size=0x1dc) addr:0x020865c0
 _ddiv kind:function(arm,size=0x544) addr:0x020867b4
 _fp_init kind:function(arm,size=0x4) addr:0x02086cf8
 func_02086cfc kind:function(thumb,size=0xa) addr:0x02086cfc
@@ -13120,3 +13120,7 @@ errno kind:bss addr:0x02155860
 signal_funcs kind:bss addr:0x02155864
 data_02155880 kind:bss addr:0x02155880
 __global_destructor_chain kind:bss addr:0x02155884
+func_02084f20 kind:function(arm,size=0x18,unknown) addr:0x02084f20
+func_0208585c kind:function(arm,size=0xc,unknown) addr:0x0208585c
+func_02085f00 kind:function(arm,size=0xc,unknown) addr:0x02085f00
+func_0208679c kind:function(arm,size=0x18,unknown) addr:0x0208679c

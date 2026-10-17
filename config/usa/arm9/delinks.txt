@@ -372,6 +372,14 @@ libs/msl/src/extras.c:
     complete
     .text       start:0x02084494 end:0x020844b0
 
+libs/msl/src/runtime_arm.c:
+    complete
+    .text       start:0x020844b0 end:0x0208638c
+
+libs/msl/src/runtime_arm_div.c:
+    complete
+    .text       start:0x020863ac end:0x02086cfc
+
 
 
 libs/msl/src/wprintf.c:

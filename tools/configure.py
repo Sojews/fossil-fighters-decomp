@@ -112,7 +112,7 @@ info = dsd_json()
 delinked = [f["delink_file"] for f in info["files"]]
 w(f"build {' '.join(delinked)}: delink {' '.join(dsd_configs)} {rom_config}")
 lcf, objects = info["arm9_lcf_file"], info["arm9_objects_file"]
-w(f"build {lcf} {objects}: lcf {' '.join(dsd_configs)} {rom_config}")
+w(f"build {lcf} {objects}: lcf {' '.join(dsd_configs)} {rom_config} tools/lcf_extra.py")
 
 to_link = []
 partial = []
