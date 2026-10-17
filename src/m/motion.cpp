@@ -25,6 +25,24 @@ MMotionData *MMotionData::Get(FSFileID id, int unk) {
     return data;
 }
 
+void MMotionData::LockFiles(int which) {
+    if (which & 1) {
+        for (std::vector<MArchiveFile>::iterator it = mChrFiles.begin(); it != mChrFiles.end(); it++) {
+            it->Lock();
+        }
+    }
+    if (which & 2) {
+        for (std::vector<MArchiveFile>::iterator it = mPalFiles.begin(); it != mPalFiles.end(); it++) {
+            it->Lock();
+        }
+    }
+    if (which & 4) {
+        for (std::vector<MArchiveFile>::iterator it = mCellFiles.begin(); it != mCellFiles.end(); it++) {
+            it->Lock();
+        }
+    }
+}
+
 void MMotionData::AddRef() {
     MScopedLock lock(&sMotionDatasMutex, TRUE);
     mRefCount++;
@@ -33,7 +51,8 @@ void MMotionData::AddRef() {
 void MMotionData::Release() {
     MScopedLock lock(&sMotionDatasMutex, TRUE);
     if (--mRefCount <= 0) {
-        sMotionDatas.erase(mArchive.mArchive->mId);
+        FSFileID id = mArchive.mArchive->mId;
+        sMotionDatas.erase(id);
         delete this;
     }
 }
@@ -204,6 +223,22 @@ MPalBlock *MMotion::GetPalette(u32 index) {
     return mPalettes[index];
 }
 
+void MMotion::SetOverride(BOOL off) {
+    if (off == (mUnk78 == NULL)) {
+        return;
+    }
+    if (off) {
+        delete[] mUnk78->animes;
+        delete[] mUnk78->palettes;
+        delete mUnk78;
+        mUnk78 = NULL;
+    } else {
+        mUnk78 = new Override;
+        mUnk78->animes = new MArchiveFile[mCellCount];
+        mUnk78->palettes = new MArchiveFile[mCellCount];
+    }
+}
+
 inline void MMotion::FreeAffine(u32 index) {
     if (mAffines[index] != NULL) {
         mDisplay->mObj->mAfn->Free(mAffines[index]);
@@ -240,7 +275,7 @@ void MMotion::ResetAnime() {
 }
 
 void *MMotion::GetAnimeData(int anime) {
-    return mFile.GetAnime(anime, mUnk78 != NULL ? (MArchiveFile *) mUnk78->file : NULL);
+    return mFile.GetAnime(anime, mUnk78 != NULL ? &mUnk78->file : NULL);
 }
 
 void MMotion::Play(int anime, int flags) {

@@ -38,12 +38,19 @@ public:
     MPalBlock **AcquirePalettes(MDisplay *display);
     void ReleasePalettes(MDisplay *display);
 
-    MArchivePtr mArchive;               // 0x00
-    MArchiveFile mFile;                 // 0x04
-    std::vector<MArchiveFile> mUnk10;   // 0x10
-    std::vector<MArchiveFile> mUnk1C;   // 0x1C
-    std::vector<MArchiveFile> mUnk28;   // 0x28
-    int mRefCount;                      // 0x34
+    MArchivePtr mArchive;                   // 0x00
+    MArchiveFile mFile;                     // 0x04: the motion file
+    std::vector<MArchiveFile> mCellFiles;   // 0x10
+    std::vector<MArchiveFile> mChrFiles;    // 0x1C
+    std::vector<MArchiveFile> mPalFiles;    // 0x28
+    int mRefCount;                          // 0x34
+    int mPalRefs[2];                        // 0x38: per display (main, sub)
+    int mChrRefs[2];                        // 0x40
+    MPalBlock **mPals[2];                   // 0x48
+    MChrBlock **mChrs[2];                   // 0x50
+    OSMutex mMutex;                         // 0x58
+    std::vector<u32> mUnk70;                // 0x70
+    std::vector<u32> mUnk7C;                // 0x7C
 };
 
 // A shared, reference-counted handle on a loaded motion file.
@@ -167,9 +174,9 @@ public:
     MAfnBlock **mAffines;       // 0x70
     const u16 *mScript;         // 0x74: the current anime's commands
     struct Override {
-        MArchiveFile *unk00;
+        MArchiveFile *animes;   // 0x00: one per cell
         MArchiveFile *palettes; // 0x04: one per cell
-        u8 file[0xC];           // an MArchiveFile
+        MArchiveFile file;      // 0x08
     } *mUnk78;                  // 0x78
 };
 
