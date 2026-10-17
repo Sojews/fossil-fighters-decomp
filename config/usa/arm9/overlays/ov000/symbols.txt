@@ -1022,7 +1022,7 @@ func_ov000_0217e594 kind:function(thumb,size=0xd10) addr:0x0217e594
 .L_0217f238 kind:label(thumb) addr:0x0217f238 local
 _ZN30DinoBattleViewStatusEffectIcon4IdleEv kind:function(thumb,size=0x294) addr:0x0217f2a4
 _ZN30DinoBattleViewStatusEffectIcon9HideIconsEv kind:function(thumb,size=0x22) addr:0x0217f538
-func_ov000_0217f55c kind:function(thumb,size=0x70) addr:0x0217f55c
+_ZN30DinoBattleViewStatusEffectIcon11RemoveEntryEm kind:function(thumb,size=0x70) addr:0x0217f55c
 func_ov000_0217f5cc kind:function(thumb,size=0xdc) addr:0x0217f5cc
 _ZN30DinoBattleViewStatusEffectIcon14ResetIconModesEv kind:function(thumb,size=0x28) addr:0x0217f6a8
 _ZN28ViewStatusEffectIconShowTask7ExecuteEv kind:function(thumb,size=0x34) addr:0x0217f6d0
@@ -1031,7 +1031,7 @@ _ZN28ViewStatusEffectIconWaitStop7ExecuteEv kind:function(thumb,size=0x2c) addr:
 _ZN20ViewStatusEffectIcon4IdleEv kind:function(thumb,size=0x2) addr:0x0217f8dc
 _ZN20ViewStatusEffectIcon15SetPriorityTask7ExecuteEv kind:function(thumb,size=0x22) addr:0x0217f8e0
 func_ov000_0217f904 kind:function(thumb,size=0x260) addr:0x0217f904
-func_ov000_0217fb64 kind:function(thumb,size=0x34) addr:0x0217fb64
+_ZNSt13__vec_deleterI17StatusEffectEntrySaIS0_EE5eraseEPS0_13UnkMSLStruct1 kind:function(thumb,size=0x34) addr:0x0217fb64
 func_ov000_0217fb98 kind:function(thumb,size=0x1e) addr:0x0217fb98
 _ZNSt13__vec_deleterI17StatusEffectEntrySaIS0_EED2Ev kind:function(thumb,size=0x26) addr:0x0217fbb8
 _ZN30DinoBattleViewStatusEffectIconD1Ev kind:function(thumb,size=0x28) addr:0x0217fbe0

@@ -37,6 +37,7 @@ public:
     virtual void Idle();
 
     void HideIcons();
+    void RemoveEntry(u32 id);
     void ResetIconModes();
 
     u32 mUnk74;                     // 0x74

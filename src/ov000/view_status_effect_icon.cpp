@@ -69,6 +69,19 @@ void DinoBattleViewStatusEffectIcon::HideIcons() {
     }
 }
 
+// NONMATCHING: the game keeps the iterator in a stack slot and walks the slots with two pointers
+void DinoBattleViewStatusEffectIcon::RemoveEntry(u32 id) {
+    for (int i = 0; i < 2; i++) {
+        for (std::vector<StatusEffectEntry>::iterator it = mSlots[i].mEntries.begin(); it != mSlots[i].mEntries.end(); it++) {
+            if (id == (*it).mId) {
+                mTimer = 60;
+                mSlots[i].mEntries.erase(it);
+                break;
+            }
+        }
+    }
+}
+
 void DinoBattleViewStatusEffectIcon::ResetIconModes() {
     for (int i = 0; i < 2; i++) {
         if (mSlots[i].mIcon->mMotion != NULL) {
