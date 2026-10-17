@@ -66,6 +66,9 @@ void UpdateLifeBarTask::Execute() {
 }
 
 DinoBattleViewEffectGameBeginPlayerNamePanel::~DinoBattleViewEffectGameBeginPlayerNamePanel() {
+    mFont->Release();
+    delete mUnk80;
+    delete mUnk84;
 }
 
 DinoBattleViewEffectGameBegin::~DinoBattleViewEffectGameBegin() {
