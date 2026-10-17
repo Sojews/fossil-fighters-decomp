@@ -5802,7 +5802,7 @@ OS_RestoreInterrupts_IrqAndFiq kind:function(arm,size=0x18) addr:0x02075018
 OS_GetCpsrIrq kind:function(arm,size=0xc) addr:0x02075030
 OS_GetProcMode kind:function(arm,size=0xc) addr:0x0207503c
 OS_SpinWait kind:function(arm,size=0xc) addr:0x02075048
-func_02075054 kind:function(thumb,size=0x12) addr:0x02075054
+OS_WaitVBlankIntr kind:function(thumb,size=0x12) addr:0x02075054
 OS_InitReset kind:function(arm,size=0x54) addr:0x02075068
 OSi_CommonCallback kind:function(arm,size=0x34) addr:0x020750bc
 OSi_SendToPxi kind:function(arm,size=0x2c) addr:0x020750f0
@@ -13066,7 +13066,8 @@ OSi_TimerReserved kind:bss addr:0x02151bd8
 OSi_UseTick kind:bss addr:0x02151bdc
 OSi_TickCounter kind:bss addr:0x02151be4
 OSi_UseVAlarm kind:bss addr:0x02151bec
-data_02151c00 kind:bss addr:0x02151c00
+OSi_IsResetOccurred kind:bss(size=0x2) addr:0x02151c00
+OSi_IsInitReset kind:bss(size=0x2) addr:0x02151c02
 OSi_vramExclusive kind:bss addr:0x02151c04
 OSi_vramLockId kind:bss addr:0x02151c08
 sInitialized kind:bss addr:0x02151c1c local

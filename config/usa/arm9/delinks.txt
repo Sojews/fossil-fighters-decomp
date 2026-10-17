@@ -625,6 +625,15 @@ libs/nitrosdk/src/os/os_exception.c:
     .text       start:0x02074d38 end:0x02074ef0
     .bss        start:0x02151b4c end:0x02151bd8
 
+libs/nitrosdk/src/os/os_system.c:
+    complete
+    .text       start:0x02074fc4 end:0x02075068
+
+libs/nitrosdk/src/os/os_reset.c:
+    complete
+    .text       start:0x02075068 end:0x02075198
+    .bss        start:0x02151c00 end:0x02151c04
+
 libs/nitrosdk/src/os/os_init.c:
     complete
     .text       start:0x02074a64 end:0x02074aa8
