@@ -7,7 +7,7 @@
 #include "m/fx32.h"
 #include "m/geometry.h"
 
-class MTask;
+#include "m/task.h"
 struct DinoCharaTask;
 
 class DinoFieldNamePanel {
@@ -61,7 +61,7 @@ public:
     void StopBgm(u32 fadeFrames);
     void PlayBgmFade(u32 bgm, u32 arg);
     void Quake(u32 a, u32 b, u32 c);
-    void RemoveChara(u32 id);
+    void SyncChara(u32 id);
     MTask *CreateCharaAngleTask(u32 chara, u32 angle, u32 a, u32 b);
     MTask *CreateCharaMoveToRegionTask(u32 chara, u32 region, u32 a, u32 b, u8 c);
     MTask *CreateCharaMoveToCoordTask(u32 chara, MPoint coord, u32 a, u32 b, u8 c);
@@ -80,8 +80,28 @@ public:
 };
 
 // The event being run.
+// The dance minigame.
+class DinoFieldDance : public MTask {
+public:
+    DinoFieldDance(DinoField *field, u32 a, u32 b, u32 c, u32 d, u32 e);
+    virtual void Execute();
+
+    u8 unk10[0x124];
+};
+
+// The map select menu (in overlay 4).
+class DinoMapSelectMenu : public MTask {
+public:
+    DinoMapSelectMenu(s32 *result, u32 unlocked);
+    virtual void Execute();
+
+    u8 unk10[0x6C];
+};
+
 class DinoEvent {
 public:
+    void CloseField(BOOL arg);
+    void OpenField(BOOL arg);
     void MarkCameraUsed();
     DinoField *GetField();
     void Fade(u32 a, u32 b);

@@ -2,7 +2,11 @@
 
 #include "game/dino_event_exec.h"
 #include "nitro/mi.h"
+#include "m/overlay.h"
 #include <algorithm>
+
+#define PAD_BUTTON_A 0x0001
+#define PAD_TOUCH 0x1000
 
 extern "C" void func_0203b80c(void *event);
 
@@ -493,6 +497,88 @@ void DinoEventExecTownMapMode::Idle() {
     serial->AddTail(exit);
 }
 
+DinoEventExecKeyWait::DinoEventExecKeyWait() : MProcess(NULL) {
+    mInput = NULL;
+}
+
+// Waits for A or a touch.
+void DinoEventExecKeyWait::Idle() {
+    if (mInput != NULL) {
+        u32 buttons = mInput->mButtons;
+        if (buttons & (mInput->mPrevButtons ^ buttons) & (PAD_BUTTON_A | PAD_TOUCH)) {
+            Exit();
+        }
+    } else {
+        MSingleInputHub *hub = new MSingleInputHub(1);
+        hub->EnableTouch();
+        mInput = hub->GetInput(0);
+        mParallel.AddTail(hub);
+    }
+}
+
+DinoEventExecDance::DinoEventExecDance(DinoEvent *event, u32 a, u32 b, u32 c, u32 d, u32 e) : MProcess(NULL) {
+    mEvent = event;
+    mA = a;
+    mB = b;
+    mC = c;
+    mD = d;
+    mE = e;
+}
+
+void DinoEventExecDance::Idle() {
+    MTask *exit = MTaskExitTransfer::Create(this);
+    MTask *dance = new DinoFieldDance(mEvent->GetField(), mA, mB, mC, mD, mE);
+    MSerialTaskSet *serial = &mSerial;
+    serial->AddTail(dance);
+    serial->AddTail(exit);
+}
+
+M_EXTERN_OVERLAY(ov004);
+
+DinoEventExecMapSelect::DinoEventExecMapSelect(DinoEvent *event, u32 var) : MProcess(NULL) {
+    mEvent = event;
+    mVar = var;
+    mResult = 0;
+    mStep = 0;
+}
+
+void DinoEventExecMapSelect::Idle() {
+    switch (mStep++) {
+    case 0:
+        mEvent->Fade(1, 30);
+        mSerial.AddTail(mEvent->CreateFadeWaitTask());
+        break;
+    case 1:
+        mEvent->CloseField(FALSE);
+        break;
+    case 2: {
+        MLoadOverlay(0, M_OVERLAY_ID(ov004));
+        u32 unlocked = 0;
+        for (u32 i = 0; i < 10; i++) {
+            if (gDinoBackup->GetSystemFlag(i + 13)) {
+                unlocked |= 1 << i;
+            }
+        }
+        mSerial.AddTail(new DinoMapSelectMenu(&mResult, unlocked));
+        break;
+    }
+    case 3:
+        MUnloadOverlay(0, M_OVERLAY_ID(ov004));
+        if (mResult == -1) {
+            gDinoBackup->SetLocalVar(mVar, 0);
+        } else {
+            gDinoBackup->SetLocalVar(mVar, mResult + 1);
+        }
+        mEvent->OpenField(FALSE);
+        mEvent->Fade(0, 30);
+        mSerial.AddTail(mEvent->CreateFadeWaitTask());
+        break;
+    case 4:
+        Exit();
+        break;
+    }
+}
+
 DinoEventExecStartBehold::DinoEventExecStartBehold(DinoEvent *event, u32 chara, u32 target) {
     mEvent = event;
     mChara = chara;
@@ -750,7 +836,7 @@ void DinoEventExecRemoveChara::Execute() {
     state.unk0 = 0;
     gDinoBackup->SetChara(mChara, &state);
     if (mEvent->GetField() != NULL) {
-        mEvent->GetField()->RemoveChara(mChara);
+        mEvent->GetField()->SyncChara(mChara);
     }
     Exit();
 }

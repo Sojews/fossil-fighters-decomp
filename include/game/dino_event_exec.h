@@ -3,6 +3,7 @@
 #define GAME_DINO_EVENT_EXEC_H
 
 #include "m/task.h"
+#include "m/input.h"
 #include "game/dino_backup.h"
 #include "game/dino_field.h"
 
@@ -577,7 +578,11 @@ public:
 
 class DinoEventExecKeyWait : public MProcess {
 public:
+    DinoEventExecKeyWait();
     virtual ~DinoEventExecKeyWait();
+    virtual void Idle();
+
+    MInput *mInput; // 0x74
 };
 
 class DinoEventExecBgmPlay : public MTransfer {
@@ -621,12 +626,28 @@ public:
 
 class DinoEventExecDance : public MProcess {
 public:
+    DinoEventExecDance(DinoEvent *event, u32 a, u32 b, u32 c, u32 d, u32 e);
     virtual ~DinoEventExecDance();
+    virtual void Idle();
+
+    DinoEvent *mEvent;  // 0x74
+    u32 mA;             // 0x78
+    u32 mB;             // 0x7C
+    u32 mC;             // 0x80
+    u32 mD;             // 0x84
+    u32 mE;             // 0x88
 };
 
 class DinoEventExecMapSelect : public MProcess {
 public:
+    DinoEventExecMapSelect(DinoEvent *event, u32 var);
     virtual ~DinoEventExecMapSelect();
+    virtual void Idle();
+
+    DinoEvent *mEvent;  // 0x74
+    u32 mVar;           // 0x78: the local variable that gets the chosen map (0 if cancelled)
+    s32 mResult;        // 0x7C
+    u32 mStep;          // 0x80
 };
 
 class DinoEventExecEraseAllExcrement : public MTransfer {

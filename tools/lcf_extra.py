@@ -11,6 +11,8 @@ import sys
 SYMBOLS = {
     "SDK_IRQ_STACKSIZE": 0x800,
     "SDK_SYS_STACKSIZE": 0,
+    # Overlay IDs (FS_OVERLAY_ID takes the address of SDK_OVERLAY_<name>_ID).
+    **{f"SDK_OVERLAY_ov{i:03d}_ID": i for i in range(6)},
 }
 
 # Symbols the SDK's linker script puts at the start of the ARM9 .bss: the table of overlay digests (empty in this
