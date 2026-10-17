@@ -24,3 +24,7 @@ MRect DinoCommonYesNoMenuItem::GetFrame() {
 const char *DinoCommonYesNoMenuItem::GetText() {
     return gDinoResource->GetText(mTextId);
 }
+
+MRect DinoCommonYesNoMenuItem::GetRect() {
+    return GetFrame();
+}

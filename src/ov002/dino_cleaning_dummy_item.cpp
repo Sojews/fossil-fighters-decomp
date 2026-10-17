@@ -27,3 +27,19 @@ void DinoCleaningDummyItem::OnDecide() {
 const char *DinoCleaningToolMenuItem::GetText() {
     return gDinoResource->GetText(mTextId);
 }
+
+MRect DinoCleaningToolMenuItem::GetRect() {
+    return GetFrame();
+}
+
+MRect DinoCleaningXrayItem::GetRect() {
+    return GetFrame();
+}
+
+MDisplay *DinoCleaningToolMenuItem::GetDisplay() {
+    return MProcess::GetDisplay();
+}
+
+MDisplay *DinoCleaningXrayItem::GetDisplay() {
+    return MProcess::GetDisplay();
+}
