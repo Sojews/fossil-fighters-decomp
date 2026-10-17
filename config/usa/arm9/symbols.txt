@@ -5778,7 +5778,7 @@ OS_GetInitArenaHi kind:function(thumb,size=0x9c) addr:0x02074bbc
 OS_GetInitArenaLo kind:function(thumb,size=0x70) addr:0x02074c58
 OS_SetArenaHi kind:function(thumb,size=0xc) addr:0x02074cc8
 OS_SetArenaLo kind:function(thumb,size=0xc) addr:0x02074cd4
-func_02074ce0 kind:function(arm,size=0x14) addr:0x02074ce0
+OS_GetDTCMAddress kind:function(arm,size=0x14) addr:0x02074ce0
 func_02074cf4 kind:function(arm,size=0x10) addr:0x02074cf4
 func_02074d04 kind:function(arm,size=0x10) addr:0x02074d04
 OS_SetDPermissionsForProtectionRegion kind:function(arm,size=0x14) addr:0x02074d14
@@ -6098,7 +6098,7 @@ CARDi_SetRomOp kind:function(thumb,size=0x3c) addr:0x0207af54
 CARDi_SetCardDma kind:function(thumb,size=0x3c) addr:0x0207af90
 CARDi_OnReadCard kind:function(thumb,size=0x9c) addr:0x0207afcc
 CARDi_TryReadCardDma kind:function(thumb,size=0x118) addr:0x0207b068
-func_0207b180 kind:function(thumb,size=0xb4) addr:0x0207b180
+CARDi_ReadCard kind:function(thumb,size=0xb4) addr:0x0207b180
 CARDi_ReadRomIDCore kind:function(thumb,size=0x48) addr:0x0207b234
 CARDi_ReadRomSyncCore kind:function(thumb,size=0x70) addr:0x0207b27c
 CARDi_ReadRom kind:function(thumb,size=0xbc) addr:0x0207b2ec
@@ -12779,7 +12779,7 @@ data_020c5890 kind:data(any) addr:0x020c5890
 data_020c58a8 kind:data(any) addr:0x020c58a8
 data_020c58c0 kind:data(any) addr:0x020c58c0
 data_020c58fc kind:data(any) addr:0x020c58fc
-data_020c5940 kind:data(any) addr:0x020c5940
+cardi_rom_header_addr kind:data(word) addr:0x020c5940
 data_020c5944 kind:data(any) addr:0x020c5944
 __files kind:data(any) addr:0x020c5948
 data_020c5a2c kind:data(any) addr:0x020c5a2c
@@ -13100,8 +13100,8 @@ CARDi_EnableFlag kind:bss(size=0x4) addr:0x02153980
 cardi_arg kind:bss(size=0x60) addr:0x021539a0
 cardi_common kind:bss(size=0x220) addr:0x02153a00
 cardi_thread_stack kind:bss(size=0x400) addr:0x02153c20
-data_02154020 kind:bss addr:0x02154020
-data_02154040 kind:bss addr:0x02154040
+cardi_rom_base kind:bss(size=0x4) addr:0x02154020
+rom_stat kind:bss(size=0x220) addr:0x02154040
 data_02154260 kind:bss addr:0x02154260
 data_02154280 kind:bss addr:0x02154280
 data_02154288 kind:bss addr:0x02154288

@@ -5,6 +5,7 @@ Usage: python3 tools/try_match.py src/foo.c [function ...]
 Run `python3 tools/configure.py` first (the compile command is taken from build.ninja).
 Install capstone (`pip install capstone`) to get a side-by-side disassembly of mismatches.
 """
+import os
 import re
 import shlex
 import struct
@@ -58,6 +59,12 @@ def compile_c(src: Path, out_dir: Path) -> Path:
     cmd = re.search(r"rule cc\n  command = (.*?) -MD -c", ninja).group(1)
     edge = re.search(rf"build \S+: cc(?:_partial)? {re.escape(str(src.relative_to(ROOT)))}(?: \|[^\n]*)?\n(?:  .*\n)*?  extra_cflags = (.*)\n", ninja)
     cmd = cmd.replace("$extra_cflags", edge.group(1) if edge else "")
+    if os.environ.get("OPT"):           # Try other optimization flags: OPT=-O4,s
+        cmd = cmd.replace("-O4,p", os.environ["OPT"])
+    if os.environ.get("MWCC"):          # Try another compiler version: MWCC=2.0/sp2p4
+        cmd = re.sub(r"mwccarm/[^ ]+/mwccarm.exe", f"mwccarm/{os.environ['MWCC']}/mwccarm.exe", cmd)
+        if os.environ["MWCC"].startswith("1."):     # (1.2 has no -ipa)
+            cmd = cmd.replace(" -ipa file", "")
     r = subprocess.run(shlex.split(cmd) + ["-c", str(src), "-o", str(out_dir) + "/"], cwd=ROOT,
                        capture_output=True, text=True)
     obj = out_dir / (src.stem + ".o")
