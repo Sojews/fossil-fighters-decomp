@@ -11,11 +11,16 @@
 #include "game/help.h"
 #include "game/dino_field_camera_hook.h"
 
+class DinoBattleViewCreature;
+
 class CreatureMotion : public MMotion {
 public:
+    CreatureMotion(const char *path, MSmartOam *oam, int arg);
     virtual ~CreatureMotion();
     virtual void Execute();
     virtual void Unk44(int arg);
+
+    u32 unk7C[5];
 };
 
 class NopTask : public MTask {
@@ -29,8 +34,11 @@ public:
     virtual ~CreateCreatureMotionTask();
     virtual void Execute();
 
-    u32 mUnk10[2];          // 0x10
-    std::string mUnk18;     // 0x18
+    CreatureMotion **mSlot;         // 0x10
+    DinoBattleViewCreature *mView;  // 0x14
+    std::string mPath;              // 0x18
+    MSmartOam *mOam;                // 0x24
+    int mArg;                       // 0x28
 };
 
 class EffectMotionTask : public MProcess {

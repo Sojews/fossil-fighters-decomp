@@ -107,3 +107,10 @@ void SetColorMaskTask::Execute() {
     mTarget->mColorMask = mColorMask;
     Exit();
 }
+
+void CreateCreatureMotionTask::Execute() {
+    (*mSlot)->Exit();
+    *mSlot = new CreatureMotion(mPath.c_str(), mOam, mArg);
+    func_ov000_021728d4(mView, 1);
+    Exit();
+}
