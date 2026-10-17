@@ -5,3 +5,7 @@
 
 DinoBattleModel::~DinoBattleModel() {
 }
+
+void DinoBattleModel::Idle() {
+    Dispatch();
+}

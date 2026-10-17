@@ -8,3 +8,6 @@ DinoBattleViewPlayerField::~DinoBattleViewPlayerField() {
         mBg->DeleteText(mText);
     }
 }
+
+void DinoBattleViewPlayerField::Execute() {
+}
