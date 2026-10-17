@@ -22,6 +22,21 @@ MRect DinoBattleViewUiAbilityMenuItem::GetFrame() {
 
 #pragma auto_inline off
 
+AttackMenuBarMotion::AttackMenuBarMotion(void *owner, MSmartOam *oam, u32 flags) : MProcess(NULL) {
+    mOwner = owner;
+    mFlags = flags;
+    bool flag1 = (flags & 0x10000) ? true : false;
+    bool flag2 = (flags & 0x20000) ? true : false;
+    Init(oam, (u16)flags, flag1, flag2, false, false);
+}
+
+AttackMenuBarMotion::AttackMenuBarMotion(void *owner, MSmartOam *oam, u32 attack, bool flag1, bool flag2, bool flag3, bool flag4)
+    : MProcess(NULL) {
+    mOwner = owner;
+    mFlags = (u16)attack | (flag1 ? 0x10000 : 0) | (flag2 ? 0x20000 : 0);
+    Init(oam, attack, flag1, flag2, flag3, flag4);
+}
+
 void AttackMenuBarMotion::SetPriority(int priority) {
     mMotion->SetPriority(priority);
     mUnk80->SetPriority(priority);

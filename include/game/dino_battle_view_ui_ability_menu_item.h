@@ -48,12 +48,17 @@ public:
 
 class MMotion;
 
+class MSmartOam;
+
 class AttackMenuBarMotion : public MProcess {
 public:
+    AttackMenuBarMotion(void *owner, MSmartOam *oam, u32 flags);
+    AttackMenuBarMotion(void *owner, MSmartOam *oam, u32 attack, bool flag1, bool flag2, bool flag3, bool flag4);
     virtual ~AttackMenuBarMotion();
     virtual void Idle();
     virtual MRect GetFrame();
 
+    void Init(MSmartOam *oam, u32 attack, bool flag1, bool flag2, bool flag3, bool flag4);
     void SetPriority(int priority);
     MPoint GetPosition();
     void Hide();
@@ -83,6 +88,8 @@ public:
     MView *mUnk78;      // 0x78: optional
     MView *mUnk7C;      // 0x7C
     MView *mUnk80;      // 0x80
+    void *mOwner;       // 0x84
+    u32 mFlags;         // 0x88: attack id, flag1 << 16, flag2 << 17
 };
 
 class MenuEnableTask : public MTask {
