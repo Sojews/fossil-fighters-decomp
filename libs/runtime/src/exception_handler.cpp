@@ -25,15 +25,25 @@ typedef struct ThrowRegisters {
 
 // State of a throw: what is being thrown and the registers of the frame being unwound.
 typedef struct ThrowContext {
-    u32 unk0;
-    u32 unk4;
-    u32 unk8;
-    char *unkC;
-    u32 unk10;
+    char *throw_type;           // mangled type name of the thrown object
+    void *location;             // the thrown object
+    void (*dtor)(void *, s16);
+    char *catch_info;
+    char *return_address;
     u32 unk14;
     char *frame;
     ThrowRegisters regs;
 } ThrowContext;
+
+// Kept in the catching frame while a handler runs.
+typedef struct CatchInfo {
+    void *location;
+    char *throw_type;
+    void (*dtor)(void *, s16);
+    void *sublocation;
+    s32 pointer_copy;
+    u8 *stack_top;
+} CatchInfo;
 
 typedef struct ActionIterator {
     ExceptionInfo info;
@@ -48,6 +58,9 @@ typedef struct ExceptionSpecification {
 } ExceptionSpecification;
 
 extern int func_0208809c(char *throw_type, char *catch_type, void **adjust);
+extern void func_0208714c(ThrowContext *context, ExceptionInfo *info, u8 *target);
+extern void func_020882c8(ThrowContext *context, ExceptionInfo *info, char *address);
+extern void func_02088064(void);
 extern int __FindExceptionTable(ExceptionInfo *info, char *return_address);
 extern char *func_020881bc(ThrowContext *context, ActionIterator *iter);
 extern void func_02088204(ThrowContext *context, ActionIterator *iter);
@@ -347,10 +360,10 @@ char *func_0208775c(ThrowContext *context, ExceptionInfo *info) {
         case 13:
             func_02086d6c((char *)iter.info.action_pointer + 1, &offset);
             p = iter.context.frame + offset;
-            context->unk0 = *(u32 *)(p + 4);
-            context->unk4 = *(u32 *)p;
-            context->unk8 = 0;
-            context->unkC = p;
+            context->throw_type = *(char **)(p + 4);
+            context->location = *(void **)p;
+            context->dtor = NULL;
+            context->catch_info = p;
             return p;
         }
     }
@@ -372,6 +385,132 @@ int func_02087818(char *throw_type, ExceptionSpecification *spec) {
         }
     }
     return 0;
+}
+
+// The thrown type broke an exception specification: unwind to it and run its unexpected handler.
+// NONMATCHING: the game copies the action argument into r2 before saving the context pointer (two moves swapped).
+void func_020878e8(ThrowContext *context, ExceptionInfo *info, ExceptionSpecification *spec, u8 *action) {
+    CatchInfo *ci;
+
+    func_0208714c(context, info, action);
+    ci = (CatchInfo *)(context->frame + spec->unk8);
+    ci->location = context->location;
+    ci->throw_type = context->throw_type;
+    ci->dtor = context->dtor;
+    ci->stack_top = action;
+    func_020882c8(context, info, info->function + spec->unk4);
+}
+
+// Finds the action that handles the throw: a catch block taking the type or a broken specification.
+u8 *func_0208791c(ThrowContext *context, ExceptionInfo *info, s32 *adjust) {
+    ActionIterator iter;
+    struct {
+        char *type;
+        u32 offset;
+        s32 catch_offset;
+    } cb;
+    ExceptionSpecification spec;
+    u8 action;
+
+    iter.info = *info;
+    iter.context = *context;
+    action = func_02086eec(&iter.info);
+    for (;;) {
+        switch (action) {
+        case 12: {
+            u8 *p = iter.info.action_pointer;
+            cb.type = (char *)(p[1] | (p[2] << 8) | (p[3] << 16) | (p[4] << 24));
+            func_02086d6c(func_02086dcc((char *)p + 5, &cb.offset), &cb.catch_offset);
+            if (func_0208809c(context->throw_type, cb.type, (void **)adjust)) {
+                goto found;
+            }
+            break;
+        }
+        case 15:
+            spec.types = (u8 *)func_02086d6c(func_02086dcc(func_02086dcc((char *)iter.info.action_pointer + 1, &spec.count), &spec.unk4), (s32 *)&spec.unk8);
+            if (!func_02087818(context->throw_type, &spec)) {
+                func_020878e8(context, info, &spec, iter.info.action_pointer);
+            }
+            break;
+        default:
+        case 1:
+        case 14:
+            func_02088064();
+            goto found;
+        case 0:
+        case 2:
+        case 3:
+        case 4:
+        case 5:
+        case 6:
+        case 7:
+        case 8:
+        case 9:
+        case 10:
+        case 11:
+        case 13:
+        case 16:
+        case 17:
+        case 18:
+        case 19:
+            break;
+        }
+        action = func_02086f04(&iter);
+    }
+found:
+    return iter.info.action_pointer;
+}
+
+void func_02087a2c(ThrowContext *context, s32 catch_offset, s32 adjust) {
+    CatchInfo *ci = (CatchInfo *)(context->frame + catch_offset);
+
+    ci->location = context->location;
+    ci->throw_type = context->throw_type;
+    ci->dtor = context->dtor;
+    if (*(u8 *)context->throw_type == '*') {
+        ci->sublocation = &ci->pointer_copy;
+        ci->pointer_copy = *(s32 *)context->location + adjust;
+    } else {
+        ci->sublocation = (char *)context->location + adjust;
+    }
+}
+
+void func_02087a64(ThrowContext *context) {
+    ExceptionInfo info;
+    struct {
+        char *type;
+        u32 offset;
+        s32 catch_offset;
+    } cb;
+    s32 adjust;
+    u8 *action;
+
+    func_02086e60(context->return_address, &info);
+    if (info.exception_record == NULL) {
+        func_02088064();
+    }
+    func_02088204(context, (ActionIterator *)&info);
+    if (context->throw_type != NULL) {
+        context->catch_info = NULL;
+    } else {
+        context->catch_info = func_0208775c(context, &info);
+        if (context->catch_info == NULL) {
+            func_02088064();
+        }
+    }
+    action = func_0208791c(context, &info, &adjust);
+    cb.type = (char *)(action[1] | (action[2] << 8) | (action[3] << 16) | (action[4] << 24));
+    func_02086d6c(func_02086dcc((char *)action + 5, &cb.offset), &cb.catch_offset);
+    func_0208714c(context, &info, action);
+    func_02087a2c(context, cb.catch_offset, adjust);
+    func_020882c8(context, &info, info.function + cb.offset);
+}
+
+// Destroys a caught exception object.
+void func_02087af8(CatchInfo *ci) {
+    if (ci->location && ci->dtor) {
+        ci->dtor(ci->location, -1);
+    }
 }
 
 }
