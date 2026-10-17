@@ -739,6 +739,9 @@ libs/nitrosdk/src/fx/fx_cp.c:
 libs/nitrosdk/src/fx/fx_vec.c:
     .text       start:0x02072214 end:0x020723ec
 
+libs/nitrosdk/src/fx/fx_atan.c:
+    .text       start:0x020723ec end:0x020724ec
+
 libs/nitrosdk/src/fx/fx.c:
     .text       start:0x020724ec end:0x02072524
 
