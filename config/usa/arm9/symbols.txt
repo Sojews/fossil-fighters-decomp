@@ -5451,7 +5451,7 @@ NNS_SndPlayerSetTrackPan kind:function(thumb,size=0x14) addr:0x0206e27c
 NNS_SndPlayerSetTempoRatio kind:function(thumb,size=0x14) addr:0x0206e290
 NNS_SndPlayerSetSeqNo kind:function(thumb,size=0x12) addr:0x0206e2a4
 NNS_SndPlayerSetSeqArcNo kind:function(thumb,size=0x1a) addr:0x0206e2b8
-func_0206e2d4 kind:function(thumb,size=0xa) addr:0x0206e2d4
+NNS_SndPlayerWriteGlobalVariable kind:function(thumb,size=0xa) addr:0x0206e2d4
 NNSi_SndPlayerInit kind:function(thumb,size=0x78) addr:0x0206e2e0
 NNSi_SndPlayerMain kind:function(thumb,size=0x118) addr:0x0206e358
 NNSi_SndPlayerAllocSeqPlayer kind:function(thumb,size=0x64) addr:0x0206e470
@@ -13024,14 +13024,10 @@ sRootList kind:bss(size=0xc) addr:0x0214d5a8
 sSnd kind:bss(size=0x28) addr:0x0214d5c0
 data_0214d5e8 kind:bss addr:0x0214d5e8
 sResources kind:bss(size=0xc) addr:0x0214f9c0
-data_0214f9cc kind:bss addr:0x0214f9cc
-data_0214f9d8 kind:bss addr:0x0214f9d8
-data_0214f9e4 kind:bss addr:0x0214f9e4
-data_0214fe24 kind:bss addr:0x0214fe24
-data_0214fe3c kind:bss addr:0x0214fe3c
-data_0214fe40 kind:bss addr:0x0214fe40
-data_0214fe44 kind:bss addr:0x0214fe44
-data_02150214 kind:bss addr:0x02150214
+sFreeList kind:bss(size=0xc) addr:0x0214f9cc
+sPrioList kind:bss(size=0xc) addr:0x0214f9d8
+sSeqPlayer kind:bss(size=0x440) addr:0x0214f9e4
+sPlayer kind:bss(size=0x480) addr:0x0214fe24
 data_021502a4 kind:bss addr:0x021502a4
 data_021502a8 kind:bss addr:0x021502a8
 data_021502b4 kind:bss addr:0x021502b4

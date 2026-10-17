@@ -8,7 +8,7 @@
 extern "C" {
 void _s32_div_f(void);   // runtime division, used by the asm below
 void NNS_SndPlayerSetPlayerVolume(int playerNo, int volume);
-void func_0206e2d4(int a, s16 b);
+BOOL NNS_SndPlayerWriteGlobalVariable(int varNo, s16 var);
 }
 
 // An entry of the sound table. What the parameters mean depends on the type.
@@ -704,7 +704,7 @@ L_02003efc:
 #endif
 
 void func_02003f10(int scene) {
-    func_0206e2d4(1, scene);
+    NNS_SndPlayerWriteGlobalVariable(1, scene);
     SetSoundScene(scene);
 }
 
