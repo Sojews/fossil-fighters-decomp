@@ -39,8 +39,13 @@ DinoUiOptionBackButton::~DinoUiOptionBackButton() {
 DinoUiOptionOkButton::~DinoUiOptionOkButton() {
 }
 
+DinoUiOptionPower::~DinoUiOptionPower() {
+}
+
+DinoUiOptionMenu::~DinoUiOptionMenu() {
+}
+
 // Template task instances the game emits in this file. Until the code that makes the tasks is decompiled, they are
 // instantiated explicitly.
-class DinoUiOptionMenu : public DinoHelpBase {};
 template class MCallTask0<DinoUiOptionMenu, DinoHelpBase>;
 template MTask *MCreateCallTask(DinoUiOptionMenu *obj, void (DinoHelpBase::*func)());
