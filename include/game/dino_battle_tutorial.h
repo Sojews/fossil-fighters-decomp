@@ -11,6 +11,8 @@
 #include "game/dino_field_camera_hook.h"
 #include "m/console_filter.h"
 #include "m/archive.h"
+#include "m/input.h"
+#include "m/console.h"
 #include "m/picture.h"
 
 class DinoBattleViewTutorialWindow : public MProcess {
@@ -19,12 +21,17 @@ public:
     virtual void Idle();
 
     MPictureFile mPicture;  // 0x74
+    u32 unkA8;
+    MConsole *mConsole;     // 0xAC
 };
 
 class KeyWaitTask : public MProcess {
 public:
     virtual ~KeyWaitTask();
     virtual void Idle();
+
+    DinoBattleViewTutorialWindow *mWindow;  // 0x74
+    MInputHub *mHub;                        // 0x78
 };
 
 class DinoBattleTutorialConsoleFilter : public MConsoleFilter {

@@ -4,6 +4,7 @@
 // Derived destructors have their bases' destructor bodies inlined; auto-inlining the ones defined above does that.
 #pragma auto_inline on
 
+#include "game/dino_sound.h"
 #include "game/dino_battle_tutorial.h"
 #include "types.h"
 
@@ -18,4 +19,16 @@ KeyWaitTask::~KeyWaitTask() {
 
 DinoBattleTutorial::~DinoBattleTutorial() {
     delete mFilter;
+}
+
+void KeyWaitTask::Idle() {
+    if (mHub->GetInput(0)->GetPressed() & 0x1003) {
+        if (mWindow->mConsole->IsEmpty()) {
+            DinoSoundPlaySe(0x93, 0);
+            Exit();
+            return;
+        }
+        DinoSoundPlaySe(0xAF, 0);
+        mWindow->mConsole->SetSpeed(MFx32(0));
+    }
 }

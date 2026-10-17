@@ -93,3 +93,16 @@ void DinoBattleView3D::Idle() {
     MMessageObserver::Dispatch();
     (this->*mState)();
 }
+
+extern "C" void func_0202b350(void *model, int alpha);
+
+void DinoBattleView3DMask::Execute() {
+    for (int i = 0; i < 3; i++) {
+        if (mMask & (1 << i)) {
+            func_0202b350(mView->mModels[i], 0x1000);
+        } else {
+            func_0202b350(mView->mModels[i], 0);
+        }
+    }
+    Exit();
+}

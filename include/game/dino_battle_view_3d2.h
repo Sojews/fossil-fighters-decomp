@@ -26,6 +26,12 @@ class DinoBattleView3DMask : public MTask {
 public:
     virtual ~DinoBattleView3DMask();
     virtual void Execute();
+
+    struct View {
+        u8 unk00[0xD0];
+        void *mModels[3];   // 0xD0
+    } *mView;               // 0x10
+    u32 mMask;              // 0x14
 };
 
 class DinoBattleView3DGroupFade : public MProcess {
