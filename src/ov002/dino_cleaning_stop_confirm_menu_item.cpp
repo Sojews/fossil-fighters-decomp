@@ -12,3 +12,11 @@ DinoCleaningStopConfirmMenuItem::~DinoCleaningStopConfirmMenuItem() {
 
 DinoCleaningStopConfirmMenu::~DinoCleaningStopConfirmMenu() {
 }
+
+DinoCleaningStopConfirm::~DinoCleaningStopConfirm() {
+    mRock->SetUnk128(FALSE);
+}
+
+DinoCleaningSleep::~DinoCleaningSleep() {
+    mRock->SetUnk128(FALSE);
+}

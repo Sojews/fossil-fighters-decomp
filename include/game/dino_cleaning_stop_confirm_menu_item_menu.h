@@ -1,6 +1,7 @@
 #ifndef GAME_DINO_CLEANING_STOP_CONFIRM_MENU_ITEM_MENU_H
 #define GAME_DINO_CLEANING_STOP_CONFIRM_MENU_ITEM_MENU_H
 
+#include "game/dino_cleaning_kaseki_rock.h"
 #include <string>
 #include <vector>
 #include "m/menu_item.h"
@@ -16,6 +17,24 @@ public:
 
     u32 mUnkB4;             // 0xB4
     std::string mUnkB8;     // 0xB8
+};
+
+class DinoCleaningStopConfirm : public MProcess, public DinoHelpBase {
+public:
+    virtual ~DinoCleaningStopConfirm();
+    virtual void Idle();
+
+    u32 mUnk80[2];                  // 0x80
+    DinoCleaningKasekiRock *mRock;  // 0x88
+};
+
+class DinoCleaningSleep : public MProcess, public DinoHelpBase {
+public:
+    virtual ~DinoCleaningSleep();
+    virtual void Idle();
+
+    u32 mUnk80[2];                  // 0x80
+    DinoCleaningKasekiRock *mRock;  // 0x88
 };
 
 #endif
