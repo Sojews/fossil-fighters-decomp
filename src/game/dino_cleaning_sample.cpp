@@ -100,3 +100,7 @@ void DinoCleaningSampleMenuDecItem::OnDecide() {
         *mValue = *mValue - 1;
     }
 }
+
+void DinoCleaningSampleMenuStartItem::OnDecide() {
+    GetMenu()->Exit();
+}

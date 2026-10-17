@@ -107,3 +107,20 @@ void DinoUiMultiplayMenu::OnFocus(MMenuItem *item) {
     }
     mSilentFocus = FALSE;
 }
+
+void DinoUiMultiplayOrganizationButton::OnDecide() {
+    DinoSoundPlaySe(0x390, 0);
+    mMotion2->Play(3, 1);
+    mMotion->Play(3, 1);
+    mOwner->Decide(2);
+}
+
+void DinoUiMultiplayMenu::Decide(int choice) {
+    *mResult = choice;
+    MTask &self = *this;
+    MTask *exit = MTaskExitTransfer::Create(&self);
+    MTask *timer = new MTimer(30);
+    MSerialTaskSet *serial = &mSerial;
+    serial->AddTail(timer);
+    serial->AddTail(exit);
+}

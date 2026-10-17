@@ -47,3 +47,17 @@ MDisplay *DinoCleaningXrayItem::GetDisplay() {
 void DinoCleaningXrayItem::OnEnableChanged(BOOL enabled) {
     mMotion->Play(2, 0);
 }
+
+void DinoCleaningToolMenuItem::OnEnableChanged(BOOL enabled) {
+    if (!enabled) {
+        if (IsFocused()) {
+            mMotion->Play(5, 0);
+        } else {
+            mMotion->Play(4, 0);
+        }
+    }
+}
+
+void DinoCleaningToolMenuItem::OnDecide() {
+    Focus();
+}

@@ -15,7 +15,8 @@ public:
     virtual void OnFocus(MMenuItem *item);
     void Decide(int choice);
 
-    u8 unkB3[0x21];  // members start in MMenu's tail padding
+    u8 unkB3[0x1D];  // members start in MMenu's tail padding
+    int *mResult;    // 0xD0
     u8 mSilentFocus; // 0xD4
 };
 
