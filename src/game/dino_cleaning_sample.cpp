@@ -54,3 +54,33 @@ void DinoCleaningSampleKasekiTypeItem::OnDecide() {
 void DinoCleaningSample::Idle() {
     (this->*mState)();
 }
+
+void DinoCleaningSampleChipsTypeItem::OnFocusChanged(BOOL focused) {
+    if (focused) {
+        mKeyItemA->SetKeys(0x20);
+        mKeyItemB->SetKeys(0x10);
+    } else {
+        mKeyItemA->SetKeys(0);
+        mKeyItemB->SetKeys(0);
+    }
+}
+
+void DinoCleaningSampleKasekiTypeItem::OnFocusChanged(BOOL focused) {
+    if (focused) {
+        mKeyItemA->SetKeys(0x20);
+        mKeyItemB->SetKeys(0x10);
+    } else {
+        mKeyItemA->SetKeys(0);
+        mKeyItemB->SetKeys(0);
+    }
+}
+
+void DinoCleaningSampleMenuKasekiRockIdItem::OnFocusChanged(BOOL focused) {
+    if (focused) {
+        mKeyItemA->SetKeys(0x20);
+        mKeyItemB->SetKeys(0x10);
+    } else {
+        mKeyItemA->SetKeys(0);
+        mKeyItemB->SetKeys(0);
+    }
+}

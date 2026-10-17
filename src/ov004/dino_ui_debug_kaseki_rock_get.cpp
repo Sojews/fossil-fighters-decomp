@@ -50,3 +50,33 @@ DinoUiDebugKasekiRockGetChipsTypeItem::~DinoUiDebugKasekiRockGetChipsTypeItem() 
 
 DinoUiDebugKasekiRockGetMenuStartItem::~DinoUiDebugKasekiRockGetMenuStartItem() {
 }
+
+void DinoUiDebugKasekiRockGetChipsTypeItem::OnFocusChanged(BOOL focused) {
+    if (focused) {
+        mKeyItemA->SetKeys(0x20);
+        mKeyItemB->SetKeys(0x10);
+    } else {
+        mKeyItemA->SetKeys(0);
+        mKeyItemB->SetKeys(0);
+    }
+}
+
+void DinoUiDebugKasekiRockGetKasekiTypeItem::OnFocusChanged(BOOL focused) {
+    if (focused) {
+        mKeyItemA->SetKeys(0x20);
+        mKeyItemB->SetKeys(0x10);
+    } else {
+        mKeyItemA->SetKeys(0);
+        mKeyItemB->SetKeys(0);
+    }
+}
+
+void DinoUiDebugKasekiRockGetMenuKasekiRockIdItem::OnFocusChanged(BOOL focused) {
+    if (focused) {
+        mKeyItemA->SetKeys(0x20);
+        mKeyItemB->SetKeys(0x10);
+    } else {
+        mKeyItemA->SetKeys(0);
+        mKeyItemB->SetKeys(0);
+    }
+}

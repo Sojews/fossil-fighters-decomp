@@ -31,7 +31,9 @@ public:
     virtual void OnFocusChanged(BOOL focused);
     virtual void OnDecide();
 
-    u32 mUnk88[6];          // 0x88
+    u32 mUnk88[4];
+    MMenuItem *mKeyItemA; // 0x98
+    MMenuItem *mKeyItemB; // 0x9C
     MArchivePtr mArchive;   // 0xA0
     MArchiveFile mFile;     // 0xA4
     u8 *mBuffer;            // 0xB0
