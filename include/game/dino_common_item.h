@@ -7,6 +7,14 @@
 class DinoCommonItem : public MMenuItem, public DinoHelpItem {
 public:
     virtual ~DinoCommonItem();
+    virtual MRect GetFrame();
+    virtual void OnFocusChanged(BOOL focused);
+    virtual void OnEnableChanged(BOOL enabled);
+    virtual void OnSelectChanged(BOOL selected);
+    virtual void OnDecide();
+    virtual MRect GetRect();
+    virtual MDisplay *GetDisplay();
+    virtual const char *GetText();
 };
 
 #endif

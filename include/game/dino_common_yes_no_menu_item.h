@@ -7,6 +7,12 @@
 class DinoCommonYesNoMenuItem : public DinoHelpItem, public MMenuItem {
 public:
     virtual ~DinoCommonYesNoMenuItem();
+    virtual MRect GetRect();
+    virtual MDisplay *GetDisplay();
+    virtual const char *GetText();
+    virtual MRect GetFrame();
+    virtual void OnFocusChanged(BOOL focused);
+    virtual void OnDecide();
 };
 
 #endif
