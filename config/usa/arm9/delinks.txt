@@ -791,3 +791,9 @@ src/game/dino_event_kaseki_rock_get.cpp:
 
 src/game/dino_event_kaseki_rock_found.cpp:
     .text       start:0x02035978 end:0x02036af8
+
+src/game/dino_multi_play_scanner.cpp:
+    .text       start:0x0204a6d0 end:0x0204acf4
+
+src/game/dino_wireless_battle.cpp:
+    .text       start:0x02049388 end:0x0204a6d0
