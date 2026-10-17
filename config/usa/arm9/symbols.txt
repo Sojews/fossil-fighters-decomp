@@ -6293,7 +6293,7 @@ scalbn kind:function(thumb,size=0x1a) addr:0x02084494
 _dadd kind:function(arm,size=0x318) addr:0x020844b0
 func_020847c8 kind:function(arm,size=0x104) addr:0x020847c8
 func_020848cc kind:function(arm,size=0x4c) addr:0x020848cc
-func_02084918 kind:function(arm,size=0x8c) addr:0x02084918
+_ll_ufrom_d kind:function(arm,size=0x8c) addr:0x02084918
 _dflt kind:function(arm,size=0x40) addr:0x020849a4
 func_020849e4 kind:function(arm,size=0x3c) addr:0x020849e4
 _dmul kind:function(arm,size=0x364) addr:0x02084a20
@@ -6303,7 +6303,7 @@ func_020852ec kind:function(arm,size=0x21c) addr:0x020852ec
 func_02085508 kind:function(arm,size=0x8) addr:0x02085508
 _dgr kind:function(arm,size=0x98) addr:0x02085510
 _dleq kind:function(arm,size=0xa4) addr:0x020855a8
-func_0208564c kind:function(arm,size=0x9c) addr:0x0208564c
+_dls kind:function(arm,size=0x9c) addr:0x0208564c
 _deq kind:function(arm,size=0x8c) addr:0x020856e8
 func_02085774 kind:function(arm,size=0x8c) addr:0x02085774
 func_02085800 kind:function(arm,size=0x5c) addr:0x02085800
@@ -6356,7 +6356,7 @@ func_02087b58 kind:function(thumb,size=0x10) addr:0x02087b58
 func_02087b68 kind:function(thumb,size=0x8) addr:0x02087b68
 func_02087b70 kind:function(thumb,size=0x6) addr:0x02087b70
 __call_static_initializers kind:function(thumb,size=0x1c) addr:0x02087b78
-func_02087b94 kind:function(thumb,size=0x28) addr:0x02087b94
+__destroy_global_chain kind:function(thumb,size=0x28) addr:0x02087b94
 func_02087bbc kind:function(thumb,size=0x38) addr:0x02087bbc
 __cxa_vec_new kind:function(thumb,size=0x94) addr:0x02087bf4
 func_02087c88 kind:function(thumb,size=0x6c) addr:0x02087c88
@@ -6387,7 +6387,7 @@ func_020882a8 kind:function(thumb,size=0x1e) addr:0x020882a8
 func_020882c8 kind:function(thumb,size=0x24) addr:0x020882c8
 func_020882ed_unk kind:function(thumb,size=0x0,unknown) addr:0x020882ec
 func_02088325_unk kind:function(thumb,size=0x0,unknown) addr:0x02088324
-func_0208835c kind:function(thumb,size=0x8) addr:0x0208835c
+_ExitProcess kind:function(thumb,size=0x8) addr:0x0208835c
 @ET@0207e18d kind:data(any) addr:0x02088364
 @ET@0207ea65 kind:data(any) addr:0x0208836c
 @ET@0207f4f5 kind:data(any) addr:0x02088374
