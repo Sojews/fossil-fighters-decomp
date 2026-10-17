@@ -41,7 +41,8 @@ typedef enum {
     FS_COMMAND_ACTIVATE = FS_COMMAND_MAX,
     FS_COMMAND_IDLE,
     FS_COMMAND_SUSPEND,
-    FS_COMMAND_RESUME
+    FS_COMMAND_RESUME,
+    FS_COMMAND_INVALID = 14
 } FSCommandType;
 
 typedef FSResult (*FS_ARCHIVE_READ_FUNC)(FSArchive *p_arc, void *dst, u32 pos, u32 size);

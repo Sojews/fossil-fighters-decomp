@@ -116,6 +116,9 @@ int FSi_StrNICmp(const char *str1, const char *str2, u32 len);
 BOOL FSi_SendCommand(FSFile *p_file, FSCommandType command);
 BOOL FS_SuspendArchive(FSArchive *p_arc);
 BOOL FS_ResumeArchive(FSArchive *p_arc);
+BOOL FSi_ExecuteSyncCommand(FSFile *p_com);
+void FSi_InitRom(u32 default_dma_no);
+BOOL FS_WaitAsync(FSFile *p_file);
 BOOL FS_OpenFileDirect(FSFile *p_file, FSArchive *p_arc, u32 image_top, u32 image_bottom, u32 file_index);
 
 extern FSDirPos current_dir_pos;

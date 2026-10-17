@@ -528,6 +528,11 @@ libs/nitrosdk/src/fs/fs_archive.c:
     .text       start:0x020774f0 end:0x02077c18
     .bss        start:0x02153808 end:0x02153818
 
+libs/nitrosdk/src/fs/fs_file.c:
+    complete
+    .text       start:0x02077c18 end:0x02077f74
+    .bss        start:0x02153818 end:0x0215381c
+
 libs/nitrosdk/src/rtc/rtc_api.c:
     complete
     .text       start:0x0207a244 end:0x0207a6e8
