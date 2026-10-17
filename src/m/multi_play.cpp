@@ -3,6 +3,11 @@
 #include "m/multi_play.h"
 #include "m/irq.h"
 #include "m/dma.h"
+#include "m/file.h"
+#include "m/lcd.h"
+#include "m/motion.h"
+#include "m/smart_oam.h"
+#include "nitro/pxi.h"
 #include <algorithm>
 
 // (The game keeps these two together, addressed from one base.)
@@ -14,7 +19,21 @@ static struct {
 static const struct {
     u32 unk00;
     u32 maxSharedDataSize;
-} sParams = {0, 0x200};
+    const char *wirelessIconPath;
+    const char *linkIconPath;
+    u32 unk10;
+    u32 unk14;
+    const char *sendIconPath;
+} sParams = {
+    0, 0x200, "m2:/motion/mp_wireless_icon.bin", "m2:/motion/mp_link_white.bin", 0x200, 15,
+    "m2:/motion/mp_send_icon.bin",
+};
+
+// The icons' graphics, an archive image in the game's data (not reproduced here).
+extern "C" const u8 gMultiPlayIconArchive[];
+
+extern "C" void WVR_StartUpAsync(int texBank, void (*callback)(void *arg, int result), void *arg);
+extern "C" void WVR_TerminateAsync(void (*callback)(void *arg, int result), void *arg);
 
 static void MultiPlayPrint(const char *fmt, ...) {
 }
@@ -888,4 +907,149 @@ void MMultiPlaySynchronizeTask::OnVSync() {
     sMultiPlay.instance->mPlayerCount = index;
     sMultiPlay.instance->mEvents->mSynchronized = TRUE;
     Exit();
+}
+
+MMultiPlayIcon::MMultiPlayIcon(MDisplay *display, const char *path, BOOL fromEnd, u8 alwaysShown)
+    : MFixedSizeView(MPoint(16, 16)) {
+    mHidden = TRUE;
+    mAlwaysShown = alwaysShown;
+    mLinger = 0;
+    MMountArchive("m2", gMultiPlayIconArchive);
+    if (display == NULL) {
+        display = gCurrentDisplay;
+    }
+    mOam = new MSmartOam(display, 1, 1, fromEnd);
+    mMotion = new MMotion(path, mOam, 0, 1);
+}
+
+MMultiPlayIcon::~MMultiPlayIcon() {
+    delete mMotion;
+    delete mOam;
+    MUnmountArchive("m2");
+}
+
+void MMultiPlayIcon::Execute() {
+    if (mAlwaysShown) {
+        if (mHidden) {
+            mMotion->Hide();
+        } else {
+            mMotion->Show();
+        }
+    } else {
+        if (sMultiPlay.activeCount != 0) {
+            mLinger = 10;
+        }
+        if (mLinger != 0) {
+            mLinger--;
+        }
+        if (mHidden || mLinger == 0) {
+            mMotion->Hide();
+        } else {
+            mMotion->Show();
+        }
+    }
+    if (mMotion->mState == STATE_RUN) {
+        mMotion->Execute();
+    }
+    if (mOam->mState == STATE_RUN) {
+        mOam->Execute();
+    }
+}
+
+MMotion *MMultiPlayIcon::GetMotion() {
+    return mMotion;
+}
+
+void MMultiPlayIcon::SetPosition(MPoint pos) {
+    mMotion->SetPosition(pos);
+}
+
+MPoint MMultiPlayIcon::GetPosition() {
+    return mMotion->GetPosition();
+}
+
+void MMultiPlayIcon::SetPriority(int priority) {
+    mMotion->SetPriority(priority);
+}
+
+int MMultiPlayIcon::GetPriority() {
+    return mMotion->GetPriority();
+}
+
+void MMultiPlayIcon::Show() {
+    mHidden = FALSE;
+}
+
+void MMultiPlayIcon::Hide() {
+    mHidden = TRUE;
+}
+
+BOOL MMultiPlayIcon::IsHidden() {
+    return mHidden;
+}
+
+u32 MMultiPlayIcon::GetPlaneMask() {
+    return 0x10;
+}
+
+MMultiPlayLinkIcon::MMultiPlayLinkIcon(MDisplay *display, BOOL fromEnd)
+    : MMultiPlayIcon(display, sParams.linkIconPath, fromEnd, FALSE) {
+}
+
+void MMultiPlayLinkIcon::Execute() {
+    int level = WM_GetLinkLevel();
+    GetMotion()->Play(level + 2, 0);
+    MMultiPlayIcon::Execute();
+}
+
+void MMultiPlayWirelessDriverStartTask::WaitStartUp() {
+    if (mDone) {
+        Exit();
+    }
+}
+
+void MMultiPlayWirelessDriverStartTask::StartUp() {
+    mDone = FALSE;
+    WVR_StartUpAsync(gLcd->GetTextureSlotFlags(), StartUpCallback, this);
+    mStep = &MMultiPlayWirelessDriverStartTask::WaitStartUp;
+}
+
+void MMultiPlayWirelessDriverStartTask::StartUpCallback(void *arg, int result) {
+    ((MMultiPlayWirelessDriverStartTask *) arg)->mDone = TRUE;
+}
+
+void MMultiPlayWirelessDriverStartTask::Begin() {
+    PXI_Init();
+    if (!PXI_IsCallbackReady(15, 1)) {
+        Exit();
+        return;
+    }
+    gLcd->UseTextureBanks(1);
+    mStep = &MMultiPlayWirelessDriverStartTask::StartUp;
+}
+
+void MMultiPlayWirelessDriverStopTask::WaitTerminate() {
+    if (mDone) {
+        gLcd->FreeTextureBanks();
+        Exit();
+    }
+}
+
+void MMultiPlayWirelessDriverStopTask::Terminate() {
+    mDone = FALSE;
+    WVR_TerminateAsync(TerminateCallback, this);
+    mStep = &MMultiPlayWirelessDriverStopTask::WaitTerminate;
+}
+
+void MMultiPlayWirelessDriverStopTask::TerminateCallback(void *arg, int result) {
+    ((MMultiPlayWirelessDriverStopTask *) arg)->mDone = TRUE;
+}
+
+void MMultiPlayWirelessDriverStopTask::Begin() {
+    PXI_Init();
+    if (!PXI_IsCallbackReady(15, 1)) {
+        Exit();
+        return;
+    }
+    mStep = &MMultiPlayWirelessDriverStopTask::Terminate;
 }

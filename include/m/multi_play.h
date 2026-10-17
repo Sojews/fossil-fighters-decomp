@@ -8,6 +8,7 @@
 #include "m/observer.h"
 #include "m/multi_message.h"
 #include "m/looper.h"
+#include "m/view.h"
 #include "nitro/wm.h"
 
 #define MULTI_PLAY_WM_PORT_COUNT 4
@@ -331,6 +332,68 @@ public:
 
     u8 mSsid[24];   // 0x74
     u32 mIndex;     // 0x8C
+};
+
+class MMotion;
+class MSmartOam;
+
+// An icon shown while wireless is in use.
+class MMultiPlayIcon : public MFixedSizeView {
+public:
+    MMultiPlayIcon(MDisplay *display, const char *path, BOOL fromEnd, u8 alwaysShown);
+    virtual ~MMultiPlayIcon();
+    virtual void Execute();
+    virtual void SetPosition(MPoint pos);
+    virtual MPoint GetPosition();
+    virtual void SetPriority(int priority);
+    virtual int GetPriority();
+    virtual void Show();
+    virtual void Hide();
+    virtual BOOL IsHidden();
+    virtual u32 GetPlaneMask();
+
+    MMotion *GetMotion();
+
+    MMotion *mMotion;   // 0x18
+    MSmartOam *mOam;    // 0x1C
+    u8 mHidden;         // 0x20
+    u8 mAlwaysShown;    // 0x21: otherwise only while the wireless hardware is running
+    u32 mLinger;        // 0x24: frames to stay up after it stops
+};
+
+// Shows the link level.
+class MMultiPlayLinkIcon : public MMultiPlayIcon {
+public:
+    MMultiPlayLinkIcon(MDisplay *display, BOOL fromEnd);
+    virtual ~MMultiPlayLinkIcon() {}
+    virtual void Execute();
+};
+
+// Starts and stops the wireless driver for Wii communication (WVR), one step per frame.
+class MMultiPlayWirelessDriverStartTask : public MProcess {
+public:
+    typedef void (MMultiPlayWirelessDriverStartTask::*Step)();
+
+    void WaitStartUp();
+    void StartUp();
+    static void StartUpCallback(void *arg, int result);
+    void Begin();
+
+    Step mStep;     // 0x74
+    u8 mDone;       // 0x7C
+};
+
+class MMultiPlayWirelessDriverStopTask : public MProcess {
+public:
+    typedef void (MMultiPlayWirelessDriverStopTask::*Step)();
+
+    void WaitTerminate();
+    void Terminate();
+    static void TerminateCallback(void *arg, int result);
+    void Begin();
+
+    Step mStep;     // 0x74
+    u8 mDone;       // 0x7C
 };
 
 #endif
