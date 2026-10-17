@@ -62,3 +62,19 @@ void DinoCleaningStopConfirmMenuItem::OnFocusChanged(BOOL focused) {
 MRect DinoCleaningStopConfirmMenuItem::GetFrame() {
     return mMotion->GetCellRect(mCell);
 }
+
+void DinoCleaningStopConfirmMenu::OnDecide(MMenuItem *item) {
+    Disable();
+    if (item == mYesItem) {
+        mMotion->Play(4, 0);
+        *mResult = TRUE;
+    } else if (item == mNoItem) {
+        mMotion->Play(5, 0);
+        *mResult = FALSE;
+    }
+    MTask *exit = MTaskExitTransfer::Create(this);
+    MTask *wait = mMotion->CreateWaitStopTask();
+    MSerialTaskSet *serial = &mSerial;
+    serial->AddTail(wait);
+    serial->AddTail(exit);
+}

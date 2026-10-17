@@ -18,7 +18,8 @@ public:
 
     u8 mSilentFocus;        // 0xB4
     std::string mUnkB8;     // 0xB8
-    u32 mUnkC4[2];
+    u8 *mResult;            // 0xC4: TRUE if the player stops
+    u32 mUnkC8;
     MMotion *mMotion;       // 0xCC
     MMenuItem *mYesItem;    // 0xD0
     MMenuItem *mNoItem;     // 0xD4
