@@ -8,6 +8,7 @@
 class DinoUiATMMenu : public DinoHelpBase, public MMenu {
 public:
     virtual ~DinoUiATMMenu();
+    void OnBackDecided();
     virtual void OnStart();
     virtual void OnIdle();
     virtual void OnFocus(MMenuItem *item);

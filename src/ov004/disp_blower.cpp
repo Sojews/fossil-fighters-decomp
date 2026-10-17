@@ -327,3 +327,22 @@ void DinoUiOptionMenu::CheckKeys() {
         }
     }
 }
+
+void MicTestButton::OnFocusChanged(BOOL focused) {
+    if (focused) {
+        mMotion->Play(1, 0);
+        mMotion->Show();
+        mMotionA4->Play(2, 0);
+        mMotionA8->Play(4, 0);
+    } else {
+        mMotion->Hide();
+        mMotionA4->Play(1, 0);
+        mMotionA8->Play(3, 0);
+    }
+    for (int i = 0; i < 0x40; i++) {
+        mLevels[i] = 0;
+    }
+    mTasks->Clear();
+    mMeter->Play(1, 1);
+    mMeter->Hide();
+}

@@ -4,6 +4,7 @@
 // Derived destructors have their bases' destructor bodies inlined; auto-inlining the ones defined above does that.
 #pragma auto_inline on
 
+#include "game/dino_sound.h"
 #include "game/dino_ui_atm_menu.h"
 #include "game/dino_ui_atm.h"
 #include "game/dino_ui_atm_team_button.h"
@@ -70,4 +71,31 @@ void DinoUiATMBackButton::OnFocusChanged(BOOL focused) {
         mMotion->Play(2, 0);
         mMotion2->Play(2, 0);
     }
+}
+
+void DinoUiATMTeamButton::OnFocusChanged(BOOL focused) {
+    mSerial.Clear();
+    if (focused) {
+        MTask *show = mMotion->CreateShowTransfer();
+        MTask *timer = new MTimer(10);
+        MSerialTaskSet *serial = &mSerial;
+        serial->AddTail(timer);
+        serial->AddTail(show);
+    } else {
+        mMotion->Hide();
+    }
+}
+
+void DinoUiATMBackButton::OnDecide() {
+    mMotion->Play(4, 1);
+    mMotion2->Play(4, 1);
+    MTask *play2 = mMotion2->CreatePlayTransfer(3, 0);
+    MTask *play = mMotion->CreatePlayTransfer(3, 0);
+    MTask *wait = mMotion->CreateWaitStopTask();
+    MSerialTaskSet *serial = &mSerial;
+    serial->AddTail(wait);
+    serial->AddTail(play);
+    serial->AddTail(play2);
+    mOwner->OnBackDecided();
+    DinoSoundPlaySe(0x90, 0);
 }

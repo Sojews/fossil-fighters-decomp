@@ -47,6 +47,14 @@ public:
     virtual MRect GetFrame();
     virtual void OnFocusChanged(BOOL focused);
     virtual void OnDecide();
+
+    u32 mUnkA0;
+    MMotion *mMotionA4;     // 0xA4
+    MMotion *mMotionA8;     // 0xA8
+    MMotion *mMeter;        // 0xAC
+    MTaskSet *mTasks;       // 0xB0
+    u32 mUnkB4[2];          // 0xB4
+    u8 mLevels[0x40];       // 0xBC
 };
 
 class DinoUiOptionBackButton : public DinoUiOptionMenuItem {
