@@ -9,6 +9,7 @@
 #include "game/dino_battle_view_ability_menu_bg.h"
 
 DinoBattleViewAbilityTextWindow::~DinoBattleViewAbilityTextWindow() {
+    delete mTask;
 }
 
 void DinoBattleViewAbilityMenuBG::Idle() {

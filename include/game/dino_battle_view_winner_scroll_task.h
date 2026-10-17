@@ -14,6 +14,9 @@ class DinoBattleViewWinnerScrollTask : public MProcess {
 public:
     virtual ~DinoBattleViewWinnerScrollTask();
     virtual void Idle();
+
+    u32 mUnk74;     // 0x74
+    u8 mUnk78;      // 0x78
 };
 
 #endif

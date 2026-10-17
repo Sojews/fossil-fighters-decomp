@@ -37,6 +37,8 @@ DinoBattleView3DMask::~DinoBattleView3DMask() {
 }
 
 DinoBattleView3DGroupFade::~DinoBattleView3DGroupFade() {
+    mSerial.Clear();
+    mTarget->mUnk13C = mSaved;
 }
 
 BlackInTask::~BlackInTask() {

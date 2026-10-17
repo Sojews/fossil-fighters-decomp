@@ -38,6 +38,12 @@ class DinoBattleView3DGroupFade : public MProcess {
 public:
     virtual ~DinoBattleView3DGroupFade();
     virtual void Idle();
+
+    struct Target {
+        u8 unk00[0x13C];
+        u32 mUnk13C;    // 0x13C
+    } *mTarget;         // 0x74
+    u32 mSaved;         // 0x78
 };
 
 #endif

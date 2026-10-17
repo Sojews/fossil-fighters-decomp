@@ -121,17 +121,20 @@ DinoUiSenryuMenu::~DinoUiSenryuMenu() {
 
 extern "C" void func_ov007_02185d28(void *, u32);
 
+SenryuMenuItem::~SenryuMenuItem() {
+}
+
 DinoSenryuBackButton::~DinoSenryuBackButton() {
+    mSerial.Clear();
 }
 
 DinoUiSenryuMenuItem::~DinoUiSenryuMenuItem() {
+    mSerial.Clear();
 }
 
 DinoUiSenryuList::~DinoUiSenryuList() {
 }
 
-SenryuMenuItem::~SenryuMenuItem() {
-}
 
 DinoUiSenryuListHideMenuItem::~DinoUiSenryuListHideMenuItem() {
 }
