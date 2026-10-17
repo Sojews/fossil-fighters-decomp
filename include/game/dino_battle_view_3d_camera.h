@@ -16,6 +16,7 @@ public:
     virtual void Idle();
 
     void (DinoBattleView3DCamera::*mState)(); // 0x74
+    void *mCamera;                              // 0x7C
 };
 
 #endif

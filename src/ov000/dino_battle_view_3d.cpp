@@ -3,6 +3,7 @@
 // Derived destructors have their bases' destructor bodies inlined; auto-inlining the ones defined above does that.
 #pragma auto_inline on
 
+#include "game/dino_sound.h"
 #include "game/dino_battle_view_3d.h"
 #include "types.h"
 #include "game/b3d_status_view_task.h"
@@ -27,10 +28,20 @@ void B3DStatusViewTask::Idle() {
     (this->*mState)();
 }
 
+extern "C" BOOL func_ov000_02187ec0(void *model);
+
 DinoBattleView3DDamage::~DinoBattleView3DDamage() {
+    mSerial.Clear();
+    if (func_ov000_02187ec0(mModel)) {
+        DinoSoundFunc_0201feb4(0);
+    }
 }
 
 DinoBattleView3DAction::~DinoBattleView3DAction() {
+    mSerial.Clear();
+    if (func_ov000_02187ec0(mModel)) {
+        DinoSoundFunc_0201feb4(0);
+    }
 }
 
 DinoBattleView3DMask::~DinoBattleView3DMask() {

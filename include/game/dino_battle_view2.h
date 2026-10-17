@@ -134,6 +134,9 @@ class DinoBattleViewAbilityIcon : public MProcess {
 public:
     virtual ~DinoBattleViewAbilityIcon();
     virtual void Idle();
+
+    u32 mUnk74[2];          // 0x74
+    MAfnBlock *mAffine;     // 0x7C
 };
 
 #endif

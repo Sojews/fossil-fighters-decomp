@@ -14,12 +14,16 @@ class DinoBattleView3DDamage : public MProcess {
 public:
     virtual ~DinoBattleView3DDamage();
     virtual void Idle();
+
+    void *mModel;   // 0x74
 };
 
 class DinoBattleView3DAction : public MProcess {
 public:
     virtual ~DinoBattleView3DAction();
     virtual void Idle();
+
+    void *mModel;   // 0x74
 };
 
 class DinoBattleView3DMask : public MTask {
