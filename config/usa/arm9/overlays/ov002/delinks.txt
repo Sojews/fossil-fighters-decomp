@@ -58,3 +58,6 @@ src/ov002/dino_cleaning_timer.cpp:
 
 src/ov002/dino_cleaning_tool.cpp:
     .text       start:0x0215c9c8 end:0x0215c9fc
+
+src/ov002/dino_cleaning_live_task.cpp:
+    .text       start:0x02158018 end:0x02158230

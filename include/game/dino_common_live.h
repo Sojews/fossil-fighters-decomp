@@ -8,7 +8,13 @@
 
 class DinoCommonLive : public MProcess {
 public:
+    // The game's destructor is inline. Its vtable's owner (dino_common_live.cpp) defines DINO_COMMON_LIVE_OWNER and
+    // emits it out of line until the key function there is decompiled.
+#ifdef DINO_COMMON_LIVE_OWNER
     virtual ~DinoCommonLive();
+#else
+    virtual ~DinoCommonLive() {}
+#endif
     virtual void Idle();
 
     MArchivePtr mArchive;               // 0x74
