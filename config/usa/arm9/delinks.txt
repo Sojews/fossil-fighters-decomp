@@ -191,7 +191,7 @@ src/m/heap.cpp:
     .text       start:0x02054334 end:0x02054920
 
 src/m/pal.cpp:
-    .text       start:0x02054920 end:0x02055394
+    .text       start:0x02054920 end:0x02055568
 
 src/m/input.cpp:
     .text       start:0x02053da8 end:0x02054334

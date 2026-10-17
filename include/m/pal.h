@@ -2,7 +2,9 @@
 #ifndef M_PAL_H
 #define M_PAL_H
 
+#include <vector>
 #include "m/heap.h"
+#include "m/anime.h"
 
 class MPal;
 
@@ -33,6 +35,39 @@ public:
     void *mExtPalette;  // 0x3C
     u32 mExtended;      // 0x40
     u32 mUnitSize;      // 0x44: bytes per palette
+};
+
+// Animates a run of palettes through a list of frames (palettes or solid colors), cross-fading between them.
+class MPalAnime : public MAnime {
+public:
+    struct Frame {
+        const u16 *data;    // the colors, or NULL for a solid color
+        s16 owned;          // data was made here (a blend) and is freed with the anime
+        u16 color;
+    };
+
+    MPalAnime(MPalBlock *block, u32 start, u32 count);
+    virtual ~MPalAnime();
+    virtual void Apply(int step);
+
+    void AddFrame(const u16 *data);
+    void AddColor(u16 color);
+    // A frame of the colors blended toward a color (weight 0-32).
+    void AddBlend(const u16 *data, u16 color, int weight);
+    // Loops back to the first frame.
+    void SetLoop();
+    // Loads only these colors each step.
+    void SetLoadRange(u32 start, u32 count);
+
+    std::vector<Frame> mFrames; // 0x30
+    MPalBlock *mBlock;          // 0x3C
+    u32 mStart;                 // 0x40: the first palette of the run
+    u32 mCount;                 // 0x44: palettes
+    u32 mColorCount;            // 0x48
+    u8 mLoop;                   // 0x4C
+    u16 *mColors;               // 0x50: the current step
+    u32 mLoadStart;             // 0x54
+    u32 mLoadCount;             // 0x58: 0: load the whole run
 };
 
 // Copies palette data, mapping the extended palette VRAM in first if needed.
