@@ -962,7 +962,7 @@ _ZN10MCallTask0I22DinoUi2CannonShootMenuS0_ED1Ev kind:function(thumb,size=0x16) 
 _ZThn12_N22DinoUi2CannonShootMenuD0Ev kind:function(thumb,size=0x1c) addr:0x0217103c
 _ZThn12_N22DinoUi2CannonShootMenuD1Ev kind:function(thumb,size=0x1c) addr:0x02171058
 func_ov004_02171074 kind:function(thumb,size=0x5c) addr:0x02171074
-func_ov004_021710d0 kind:function(thumb,size=0x6f0) addr:0x021710d0
+_ZN12DinoUiResult4IdleEv kind:function(thumb,size=0x6f0) addr:0x021710d0
 _ZN12DinoUiResultD1Ev kind:function(thumb,size=0x1e) addr:0x021717c0
 _ZN12DinoUiResultD0Ev kind:function(thumb,size=0x24) addr:0x021717e0
 data_ov004_02171804 kind:data(any) addr:0x02171804
