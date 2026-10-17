@@ -80,4 +80,25 @@ public:
     MBackupFlash2MBitsDevice();
 };
 
+// Files kept in backup memory, each with several copies checked by CRC; the newest good copy is read.
+class MBackupStorage {
+public:
+    MBackupStorage(MBackupDevice *device);
+    ~MBackupStorage();
+    void AddFile(u32 size, u32 copies);
+    u32 AllocRegion(u32 size);
+    void Mount();
+    u8 IsMounted();
+    BOOL ReadRegion(u32 region, void *buf);
+    BOOL WriteRegion(u32 region, const void *buf);
+    u8 IsFileDamaged(u32 file);
+    BOOL HasFile(u32 file);
+    BOOL ReadFile(u32 file, void *buf);
+    BOOL WriteFile(u32 file, const void *buf);
+    void Format();
+
+    MBackupDevice *mDevice; // 0x00
+    u8 unk04[0x42C - 4];
+};
+
 #endif

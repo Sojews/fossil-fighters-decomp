@@ -16,6 +16,26 @@ public:
     virtual void Read(const void *buf);
     virtual int Unk14();
 
+    // One bit, as something to assign to.
+    class Reference {
+    public:
+        Reference(MBitVector *vector, u32 index) : mVector(vector), mIndex(index) {}
+        Reference &operator=(BOOL value) {
+            if (value) {
+                mVector->mBytes[mIndex >> 3] |= 1 << (mIndex & 7);
+            } else {
+                mVector->mBytes[mIndex >> 3] &= ~(1 << (mIndex & 7));
+            }
+            return *this;
+        }
+
+        MBitVector *mVector;
+        u32 mIndex;
+    };
+
+    Reference operator[](u32 index) { return Reference(this, index); }
+    BOOL Test(u32 index) { return (mBytes[index >> 3] & (1 << (index & 7))) ? TRUE : FALSE; }
+
     u32 mBits;      // 0x04
     u8 *mBytes;     // 0x08
 };

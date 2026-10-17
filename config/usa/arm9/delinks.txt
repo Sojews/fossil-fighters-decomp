@@ -83,6 +83,9 @@ src/game/dino_common_font.cpp:
 src/game/dino_message.cpp:
     .text       start:0x0200a948 end:0x02011154
 
+src/game/dino_backup.cpp:
+    .text       start:0x020133e0 end:0x0201b4ac
+
 src/m/bit_vector.cpp:
     .text       start:0x0201b4ac end:0x0201b51c
 

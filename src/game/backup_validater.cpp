@@ -9,7 +9,7 @@
 #include "m/bright.h"
 
 extern "C" {
-extern void *data_020cc00c;
+extern void *gDinoBackup;
 extern void *data_020cb978;
 extern const int data_0208ad0c;
 extern const int data_0208ad08;
@@ -28,7 +28,7 @@ DinoBackupValidater::DinoBackupValidater(int messageId, MTask *caller, void *arg
 }
 
 void DinoBackupValidater::Idle() {
-    if (data_020cc00c != NULL) {
+    if (gDinoBackup != NULL) {
         if (func_02013ab8()) {
             Exit();
             return;
