@@ -5,6 +5,8 @@
 #include "m/display.h"
 #include "m/heap.h"
 #include "m/obj.h"
+#include "m/chr.h"
+#include "m/pal.h"
 
 static std::map<FSFileID, MMotionData *> sMotionDatas;
 static OSMutex sMotionDatasMutex;
@@ -270,12 +272,12 @@ int MMotion::GetAnime() {
 void MMotion::Advance(u32 frames) {
     BOOL done = FALSE;
     struct {
-        u32 chr;
         u32 pal;
+        u32 chr;
     } changes[16];
     for (u32 i = 0; i < mCellCount; i++) {
-        changes[i].chr = -1;
         changes[i].pal = -1;
+        changes[i].chr = -1;
     }
     do {
         u16 command = *mScript++;
@@ -355,10 +357,10 @@ void MMotion::Advance(u32 frames) {
             Unk48(command >> 8);
             break;
         case 0:
-            changes[command >> 8].chr = *mScript++;
+            changes[command >> 8].pal = *mScript++;
             break;
         case 1:
-            changes[command >> 8].pal = *mScript++;
+            changes[command >> 8].chr = *mScript++;
             break;
         case 2:
             ShowCell(command >> 8);
@@ -380,11 +382,11 @@ void MMotion::Advance(u32 frames) {
         }
     } while (!done);
     for (u32 i = 0; i < mCellCount; i++) {
-        if (changes[i].chr != -1) {
-            SetCellChr(i, changes[i].chr);
-        }
         if (changes[i].pal != -1) {
             SetCellPalette(i, changes[i].pal);
+        }
+        if (changes[i].chr != -1) {
+            SetCellChr(i, changes[i].chr);
         }
     }
 }
@@ -474,5 +476,72 @@ void MMotionPlayTransfer::Transfer() {
 void MMotionWaitStopTask::Execute() {
     if (!mMotion->IsPlaying()) {
         Exit();
+    }
+}
+
+MMotion::~MMotion() {
+    SetOverride(TRUE);
+    for (u32 i = 0; i < mCellCount; i++) {
+        mEntries[i].objMode = 2;
+    }
+    if (mFlags & 1) {
+        for (u32 i = 0; i < mCellCount; i++) {
+            if (mPalettes[i] != NULL) {
+                mPalettes[i]->pal->Free(mPalettes[i]);
+            }
+        }
+        delete[] mPalettes;
+    } else {
+        mFile.ReleasePalettes(mDisplay);
+    }
+    if (mFlags & 2) {
+        for (u32 i = 0; i < mCellCount; i++) {
+            if (mChrs[i] != NULL) {
+                mDisplay->mObj->mChr->FreeShared(mChrs[i]);
+            }
+        }
+        delete[] mChrs;
+    } else {
+        mFile.ReleaseChrs(mDisplay);
+    }
+    if (mFile.GetUnk04() != 0) {
+        for (u32 i = 0; i < mCellCount; i++) {
+            FreeAffine(i);
+        }
+        delete[] mAffines;
+    }
+    delete[] mUnk64;
+    delete[] mCells;
+    if (mOam != NULL && mCellCount != 0) {
+        mOam->Free(mUnit);
+    }
+}
+
+void MMotion::SetCellRect(int cell, MRect rect) {
+    MRect r = rect;
+    MRect *p = &r;
+    if (mUnk2B) {
+        p->left = -p->left;
+        p->top = -p->top;
+    }
+    if (mUnk2C) {
+        p->right = -p->right;
+        p->bottom = -p->bottom;
+    }
+    s16 *params = (s16 *) mAffines[cell]->addr;
+    params[3] = r.left >> 4;
+    params[7] = r.top >> 4;
+    params[11] = r.right >> 4;
+    params[15] = r.bottom >> 4;
+}
+
+void MMotion::SetCellPalette(int cell, u32 pal) {
+    MSmartOamEntry *entry = &mEntries[mCells[cell].entry];
+    void *data = mFile.GetPalette(pal, mUnk78 != NULL ? &mUnk78->palettes[cell] : NULL);
+    if (mFlags & 1) {
+        entry->SetPalette(mPalettes[cell]);
+        mPalettes[cell]->Load((u8 *) data + 4, 0, -1);
+    } else {
+        entry->SetPalette(mPalettes[pal]);
     }
 }

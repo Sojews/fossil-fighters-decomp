@@ -64,6 +64,7 @@ public:
     u32 GetCellCount();
     void *GetCell(u32 index);
     void *GetAnime(int anime, MArchiveFile *file);
+    void *GetPalette(u32 index, MArchiveFile *file);
 
     MMotionData *mData; // 0x00
 };
@@ -124,6 +125,7 @@ public:
     void Advance(u32 frames);
     void Init(int fromEnd);
     void FreeAffine(u32 index);
+    void SetOverride(BOOL off);
     MSmartOamEntry *GetCellEntry(int cell) { return &mEntries[mCells[cell].entry]; }
     void SetCellOffset(int cell, int x, int y);
     void SetCellOffsetY(int cell, int y);
@@ -161,14 +163,14 @@ public:
     u32 mUnk60;                 // 0x60
     MMotionAnimeState *mUnk64;  // 0x64
     MPalBlock **mPalettes;      // 0x68
-    void *mUnk6C;               // 0x6C
+    MChrBlock **mChrs;          // 0x6C
     MAfnBlock **mAffines;       // 0x70
     const u16 *mScript;         // 0x74: the current anime's commands
     struct Override {
         MArchiveFile *unk00;
-        MArchiveFile *unk04;
-        u8 file[0xC];       // an MArchiveFile
-    } *mUnk78;              // 0x78
+        MArchiveFile *palettes; // 0x04: one per cell
+        u8 file[0xC];           // an MArchiveFile
+    } *mUnk78;                  // 0x78
 };
 
 class MMotionWaitStopTask : public MTask {
