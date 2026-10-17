@@ -183,3 +183,47 @@ void SEVolumeButton::OnFocusChanged(BOOL focused) {
         mMotion = NULL;
     }
 }
+
+void BGMVolumeButton::OnDecide() {
+    if (mMotion == NULL) {
+        mMotion = new MMotion(data_ov004_0217520c[2], mOwner->GetOam(), 2, 1);
+        mMotion->SetPosition(mPos);
+        mParallel.AddTail(mMotion);
+    }
+    mMotion->Play(1, 0);
+    mMotion->Show();
+    mSerial.AddTail(mMotion->CreateShowTransfer());
+    if (mMotion) {
+        mMotion->Play(2, 1);
+        mSerial.Clear();
+        MTask *play = mMotion->CreatePlayTransfer(1, 0);
+        MTask *wait = mMotion->CreateWaitStopTask();
+        MSerialTaskSet *serial = &mSerial;
+        serial->AddTail(wait);
+        serial->AddTail(play);
+    }
+    mOwner->SetBgmVolume(mLevel);
+    DinoSoundPlaySe(0x38E, 0);
+}
+
+void SEVolumeButton::OnDecide() {
+    if (mMotion == NULL) {
+        mMotion = new MMotion(data_ov004_0217520c[2], mOwner->GetOam(), 2, 1);
+        mMotion->SetPosition(mPos);
+        mParallel.AddTail(mMotion);
+    }
+    mMotion->Play(1, 0);
+    mMotion->Show();
+    mSerial.AddTail(mMotion->CreateShowTransfer());
+    if (mMotion) {
+        mMotion->Play(2, 1);
+        mSerial.Clear();
+        MTask *play = mMotion->CreatePlayTransfer(1, 0);
+        MTask *wait = mMotion->CreateWaitStopTask();
+        MSerialTaskSet *serial = &mSerial;
+        serial->AddTail(wait);
+        serial->AddTail(play);
+    }
+    mOwner->SetSeVolume(mLevel);
+    DinoSoundPlaySe(0x38E, 0);
+}
