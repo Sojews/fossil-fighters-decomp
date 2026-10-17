@@ -333,9 +333,9 @@ _ZN22DinoCleaningKasekiRock8GetUnkE4Ev kind:function(thumb,size=0x6) addr:0x0216
 _ZN22DinoCleaningKasekiRock9SetUnk128Ei kind:function(thumb,size=0x8) addr:0x021605c8
 func_ov002_021605d0 kind:function(thumb,size=0x28) addr:0x021605d0
 func_ov002_021605f8 kind:function(thumb,size=0x20) addr:0x021605f8
-func_ov002_02160618 kind:function(thumb,size=0xa) addr:0x02160618
-func_ov002_02160624 kind:function(thumb,size=0x2) addr:0x02160624
-func_ov002_02160628 kind:function(thumb,size=0x10) addr:0x02160628
+_ZN12DinoCleaning7OnSleepEv kind:function(thumb,size=0xa) addr:0x02160618
+_ZN12DinoCleaning6OnWakeEv kind:function(thumb,size=0x2) addr:0x02160624
+_ZN12DinoCleaning9OnPreLoopEv kind:function(thumb,size=0x10) addr:0x02160628
 func_ov002_02160638 kind:function(thumb,size=0x778) addr:0x02160638
 _Z17MCreateBgCallTaskI12DinoCleaningEP5MTaskPT_MS3_FvvEi kind:function(thumb,size=0x38) addr:0x02160db0
 func_ov002_02160de8 kind:function(thumb,size=0x90) addr:0x02160de8
@@ -380,11 +380,11 @@ func_ov002_021631ac kind:function(thumb,size=0x1c) addr:0x021631ac
 func_ov002_021631c8 kind:function(thumb,size=0x1c) addr:0x021631c8
 func_ov002_021631e4 kind:function(thumb,size=0x1c) addr:0x021631e4
 func_ov002_02163200 kind:function(thumb,size=0x1c) addr:0x02163200
-func_ov002_0216321c kind:function(thumb,size=0x1c) addr:0x0216321c
+_ZThn128_N12DinoCleaning9OnPreLoopEv kind:function(thumb,size=0x1c) addr:0x0216321c
 func_ov002_02163238 kind:function(thumb,size=0x1c) addr:0x02163238
 func_ov002_02163254 kind:function(thumb,size=0x1c) addr:0x02163254
-func_ov002_02163270 kind:function(thumb,size=0x1c) addr:0x02163270
-func_ov002_0216328c kind:function(thumb,size=0x1c) addr:0x0216328c
+_ZThn140_N12DinoCleaning6OnWakeEv kind:function(thumb,size=0x1c) addr:0x02163270
+_ZThn140_N12DinoCleaning7OnSleepEv kind:function(thumb,size=0x1c) addr:0x0216328c
 func_ov002_021632a8 kind:function(thumb,size=0x1c) addr:0x021632a8
 data_ov002_021632c4 kind:data(any) addr:0x021632c4
 data_ov002_02163314 kind:data(any) addr:0x02163314 ambiguous

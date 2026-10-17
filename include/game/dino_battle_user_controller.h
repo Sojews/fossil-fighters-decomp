@@ -14,6 +14,7 @@
 class DinoBattleUserController : public DinoBattleController {
 public:
     virtual ~DinoBattleUserController();
+    virtual void OnMessage(MMessage *msg);
 };
 
 class PlayerThinkTimeCountTask : public MTask {

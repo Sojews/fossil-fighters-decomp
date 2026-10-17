@@ -64,6 +64,7 @@ public:
 class DinAttackItemHelp : public DinoBattleHelpBase {
 public:
     virtual ~DinAttackItemHelp();
+    virtual MRect GetRect();
 };
 
 #endif

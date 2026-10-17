@@ -60,6 +60,7 @@ public:
 class DinoBattleHelpCreatureInfo : public DinoBattleHelpBase {
 public:
     virtual ~DinoBattleHelpCreatureInfo();
+    virtual const char *GetText();
 };
 
 class DinoFrameItem : public MMenuItem {

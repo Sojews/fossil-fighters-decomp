@@ -30,6 +30,7 @@ struct DinoBattleFileGroup {
 class DinoBattleCpuController : public DinoBattleController {
 public:
     virtual ~DinoBattleCpuController();
+    virtual void OnMessage(MMessage *msg);
 
     u32 mUnkA8[4];                      // 0xA8
     DinoBattleFileGroup mGroups[3];     // 0xB8

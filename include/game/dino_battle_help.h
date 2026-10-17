@@ -31,6 +31,7 @@ public:
 class DinoBattleHelpSupport : public DinoBattleHelpBase {
 public:
     virtual ~DinoBattleHelpSupport();
+    virtual MRect GetRect();
 };
 
 #endif

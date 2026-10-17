@@ -8,6 +8,8 @@
 class DinoUiPartsReviverName : public MProcess, public DinoHelpHook {
 public:
     virtual ~DinoUiPartsReviverName();
+    virtual void Unk0C();
+    virtual void Unk08();
     virtual void Idle();
 
     u32 mUnk7C[2];      // 0x7C

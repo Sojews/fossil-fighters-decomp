@@ -60,6 +60,7 @@ struct DinoFieldCharaModel {
 class DinoFieldChara : public MProcess, public MSerializer {
 public:
     virtual ~DinoFieldChara();
+    virtual void Read(const void *buf);
 
     DinoFieldCharaModel *GetModel();
     void ShowManpu(u32 manpu, MPoint offset);
@@ -143,6 +144,8 @@ class DinoFieldPoint;
 class DinoField : public MProcess {
 public:
     virtual ~DinoField();
+    virtual void Read(const void *buf);
+    virtual void Write(void *buf);
     DinoFieldMap *GetMap();
     DinoFieldCamera *GetCamera();
     DinoFieldChara *GetChara(u32 id);
