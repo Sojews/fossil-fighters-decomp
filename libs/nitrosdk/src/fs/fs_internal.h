@@ -70,6 +70,42 @@ static inline BOOL FSi_IsArchiveSync(volatile const FSArchive *p_arc) {
     return (p_arc->flag & FS_ARCHIVE_FLAG_IS_SYNC) ? TRUE : FALSE;
 }
 
+#define FS_ARCHIVE_PROC_SYNC 0x000001fc
+#define FS_ARCHIVE_PROC_ACTIVATE 0x00000200
+#define FS_ARCHIVE_PROC_IDLE 0x00000400
+
+static inline BOOL FS_IsSucceeded(volatile const FSFile *p_file) {
+    return (p_file->error == FS_RESULT_SUCCESS) ? TRUE : FALSE;
+}
+
+static inline BOOL FS_IsArchiveLoaded(volatile const FSArchive *p_arc) {
+    return (p_arc->flag & FS_ARCHIVE_FLAG_LOADED) ? TRUE : FALSE;
+}
+
+static inline BOOL FS_IsArchiveTableLoaded(volatile const FSArchive *p_arc) {
+    return (p_arc->flag & FS_ARCHIVE_FLAG_TABLE_LOAD) ? TRUE : FALSE;
+}
+
+static inline BOOL FS_IsArchiveSuspended(volatile const FSArchive *p_arc) {
+    return (p_arc->flag & FS_ARCHIVE_FLAG_SUSPEND) ? TRUE : FALSE;
+}
+
+static inline BOOL FSi_IsArchiveRunning(volatile const FSArchive *p_arc) {
+    return (p_arc->flag & FS_ARCHIVE_FLAG_RUNNING) ? TRUE : FALSE;
+}
+
+static inline BOOL FSi_IsArchiveCanceling(volatile const FSArchive *p_arc) {
+    return (p_arc->flag & FS_ARCHIVE_FLAG_CANCELING) ? TRUE : FALSE;
+}
+
+static inline BOOL FS_IsArchiveSuspending(volatile const FSArchive *p_arc) {
+    return (p_arc->flag & FS_ARCHIVE_FLAG_SUSPENDING) ? TRUE : FALSE;
+}
+
+static inline BOOL FSi_IsArchiveAsync(volatile const FSArchive *p_arc) {
+    return (p_arc->flag & FS_ARCHIVE_FLAG_IS_ASYNC) ? TRUE : FALSE;
+}
+
 static inline u32 FS_GetArchiveNameLength(const FSArchive *p_arc) {
     return (p_arc->name.pack <= 0x000000ff) ? 1 : (p_arc->name.pack <= 0x0000ff00) ? 2 : 3;
 }
@@ -77,5 +113,11 @@ static inline u32 FS_GetArchiveNameLength(const FSArchive *p_arc) {
 void FSi_ReleaseCommand(FSFile *p_file, FSResult ret);
 FSResult FSi_TranslateCommand(FSFile *p_file, FSCommandType command);
 int FSi_StrNICmp(const char *str1, const char *str2, u32 len);
+BOOL FSi_SendCommand(FSFile *p_file, FSCommandType command);
+BOOL FS_SuspendArchive(FSArchive *p_arc);
+BOOL FS_ResumeArchive(FSArchive *p_arc);
+BOOL FS_OpenFileDirect(FSFile *p_file, FSArchive *p_arc, u32 image_top, u32 image_bottom, u32 file_index);
+
+extern FSDirPos current_dir_pos;
 
 #endif

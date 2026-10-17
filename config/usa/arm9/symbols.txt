@@ -13077,8 +13077,8 @@ sAlarm kind:bss addr:0x02153720
 SNDi_SharedWork kind:bss(size=0x4) addr:0x02153780
 FifoCtrlInit kind:bss addr:0x02153784
 FifoRecvCallbackTable kind:bss(size=0x80) addr:0x02153788
-data_02153808 kind:bss addr:0x02153808
-data_0215380c kind:bss addr:0x0215380c
+arc_list kind:bss(size=0x4) addr:0x02153808
+current_dir_pos kind:bss(size=0xc) addr:0x0215380c
 data_02153818 kind:bss addr:0x02153818
 data_0215381c kind:bss addr:0x0215381c
 data_02153824 kind:bss addr:0x02153824
