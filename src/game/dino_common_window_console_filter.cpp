@@ -37,3 +37,10 @@ template class MBgCallTask0<DinoCommonWindowMessage>;
 template MTask *MCreateBgCallTask(DinoCommonWindowMessage *obj, void (DinoCommonWindowMessage::*func)(), int thread);
 template class MCallTask0<DinoCommonWindowMessage, DinoCommonWindowMessage>;
 template MTask *MCreateCallTask(DinoCommonWindowMessage *obj, void (DinoCommonWindowMessage::*func)());
+
+DinoCommonWindowMessageBox::DinoCommonWindowMessageBox(MPoint pos, const std::string &text, int frames)
+    : MProcess(NULL), mUnk78(0), mPos(pos), mText(text) {
+    mFrames = frames;
+    mUnk94 = 0;
+    mUnk98 = TRUE;
+}
