@@ -13,6 +13,14 @@ extern "C" {
 #define SND_COMMAND_IMMEDIATE 2
 
 typedef struct SNDCommand SNDCommand;
+struct SNDCommand {
+    SNDCommand *next;
+    int id;
+    u32 arg[4];
+};
+
+SNDCommand *SND_AllocCommand(u32 flags);
+void SND_PushCommand(SNDCommand *command);
 
 void SND_Init(void);
 const SNDCommand *SND_RecvCommandReply(u32 flags);
