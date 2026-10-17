@@ -100,3 +100,11 @@ void DinoUiSaveOptionSaveButton::OnDecide() {
     mMotion->Play(3, 1);
     mOwner->OnSaveDecided();
 }
+
+MRect DinoUiSaveOptionOptionButton::GetFrame() {
+    return MRect(mMotion->GetFrame().GetTopLeft(), mMotion->GetFrame().GetTopLeft(108, 76));
+}
+
+MRect DinoUiSaveOptionSaveButton::GetFrame() {
+    return MRect(mMotion->GetFrame().GetTopLeft(), mMotion->GetFrame().GetTopLeft(108, 76));
+}

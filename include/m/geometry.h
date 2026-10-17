@@ -60,6 +60,14 @@ struct MRect {
         r.bottom += d;
         return r;
     }
+    MPoint GetTopLeft() const { return MPoint(left, top); }
+    // The top-left corner moved by (dx, dy). (Sets y first: that's the game's register order.)
+    MPoint GetTopLeft(int dx, int dy) const {
+        MPoint p;
+        p.y = top + dy;
+        p.x = left + dx;
+        return p;
+    }
     int GetWidth() const { return right - left; }
     int GetHeight() const { return bottom - top; }
     MPoint GetSize() const { return MPoint(GetWidth(), GetHeight()); }
