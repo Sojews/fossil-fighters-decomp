@@ -19,6 +19,19 @@ struct SNDCommand {
     u32 arg[4];
 };
 
+typedef struct SNDSharedWork SNDSharedWork;
+extern SNDSharedWork *SNDi_SharedWork;
+
+void SND_CommandInit(void);
+void SND_AlarmInit(void);
+void SNDi_InitSharedWork(SNDSharedWork *work);
+u32 SNDi_GetFinishedCommandTag(void);
+void SNDi_CallAlarmHandler(int alarmNo);
+void SNDi_LockMutex(void);
+void SNDi_UnlockMutex(void);
+int SND_CountFreeCommand(void);
+int SND_CountReservedCommand(void);
+int SND_CountWaitingCommand(void);
 SNDCommand *SND_AllocCommand(u32 flags);
 void SND_PushCommand(SNDCommand *command);
 

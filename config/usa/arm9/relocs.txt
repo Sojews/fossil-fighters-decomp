@@ -21075,8 +21075,8 @@ from:0x02076346 kind:thumb_call to:0x02076470 module:main
 from:0x0207634c kind:thumb_call to:0x02076498 module:main
 from:0x02076354 kind:load to:0x02151f20 module:main
 from:0x02076358 kind:load to:0x02151c40 module:main
-from:0x0207635c kind:load to:0x021536c0 module:main
-from:0x02076360 kind:load to:0x02153708 module:main
+from:0x0207635c kind:load to:0x02151f20 add:0x17a0 module:main
+from:0x02076360 kind:load to:0x02151f20 add:0x17e8 module:main
 from:0x02076364 kind:load to:0x02151ca0 module:main
 from:0x02076368 kind:load to:0x02153780 module:main
 from:0x02076370 kind:thumb_call_arm to:0x02074fd8 module:main

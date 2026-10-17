@@ -13073,16 +13073,14 @@ data_02151bec kind:bss addr:0x02151bec
 data_02151c00 kind:bss addr:0x02151c00
 data_02151c04 kind:bss addr:0x02151c04
 data_02151c08 kind:bss addr:0x02151c08
-data_02151c1c kind:bss addr:0x02151c1c
-data_02151c20 kind:bss addr:0x02151c20
-data_02151c40 kind:bss addr:0x02151c40
-data_02151c64 kind:bss addr:0x02151c64
-data_02151ca0 kind:bss addr:0x02151ca0
-data_02151f20 kind:bss addr:0x02151f20
-data_021536c0 kind:bss addr:0x021536c0
-data_02153708 kind:bss addr:0x02153708
+sInitialized kind:bss addr:0x02151c1c local
+sSndMutex kind:bss(size=0x18) addr:0x02151c20
+sCommand kind:bss(size=0x24) addr:0x02151c40
+sCommandMesgBuffer kind:bss(size=0x20) addr:0x02151c64
+sSharedWork kind:bss addr:0x02151ca0
+sCommandArray kind:bss(size=0x1800) addr:0x02151f20
 data_02153720 kind:bss addr:0x02153720
-data_02153780 kind:bss addr:0x02153780
+SNDi_SharedWork kind:bss addr:0x02153780
 data_02153784 kind:bss addr:0x02153784
 data_02153788 kind:bss addr:0x02153788
 data_02153808 kind:bss addr:0x02153808

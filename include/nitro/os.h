@@ -83,6 +83,8 @@ void OS_CreateThread(OSThread *thread, OSThreadFunc func, void *arg, void *stack
 void OS_SetThreadStackWarningOffset(OSThread *thread, u32 offset);
 void OS_SleepThreadDirect(OSThread *thread, OSThreadQueue *queue);
 void OS_SleepThread(OSThreadQueue *queue);
+void OS_SpinWait(u32 cycles);
+BOOL OS_IsRunOnEmulator(void);
 void OS_WakeupThread(OSThreadQueue *queue);
 void OS_WakeupThreadDirect(OSThread *thread);
 u32 OS_GetThreadPriority(const OSThread *thread);
@@ -119,6 +121,8 @@ u32 OS_DisableIrqMask(u32 mask);
 u32 OS_ResetRequestIrqMask(u32 mask);
 void OS_WaitIrq(BOOL clear, u32 irqFlags);
 void OS_SleepThread(OSThreadQueue *queue);
+void OS_SpinWait(u32 cycles);
+BOOL OS_IsRunOnEmulator(void);
 
 void OS_InitMutex(OSMutex *mutex);
 void OS_LockMutex(OSMutex *mutex);
