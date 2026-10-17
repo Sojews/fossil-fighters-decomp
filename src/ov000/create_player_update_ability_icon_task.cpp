@@ -3,6 +3,7 @@
 // Derived destructors have their bases' destructor bodies inlined; auto-inlining the ones defined above does that.
 #pragma auto_inline on
 
+#include "game/dino_message.h"
 #include "game/create_player_update_ability_icon_task.h"
 #include "types.h"
 #include "game/dino_battle_user_controller.h"
@@ -140,4 +141,18 @@ void PlayerThinkTimeCountTask::Execute() {
     if (mActive && mPlayer != NULL) {
         mPlayer->mModel->mThinkTime = ++mCount;
     }
+}
+
+extern "C" u32 func_ov000_02163454(void *player);
+
+void AddKasekiPointCreatureDie::Idle() {
+    u32 point = mPlayer->mKasekiPoint;
+    u32 add = func_ov000_02163454(mPlayer);
+    func_ov000_02163464(mPlayer, add + point);
+    DinoSignalWait *wait = new DinoSignalWait(0x10039, NULL, NULL, 1);
+    MTask *exit = MTaskExitTransfer::Create(this);
+    MSerialTaskSet *serial = &mSerial;
+    serial->AddTail(wait);
+    serial->AddTail(exit);
+    func_ov000_021631c0(mPlayer, (u32)(MMessageObserver *)wait);
 }

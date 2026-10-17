@@ -150,6 +150,11 @@ class AddKasekiPointCreatureDie : public MProcess {
 public:
     virtual ~AddKasekiPointCreatureDie();
     virtual void Idle();
+
+    struct Player {
+        u8 unk00[0x154];
+        u32 mKasekiPoint;   // 0x154
+    } *mPlayer;             // 0x74
 };
 
 #endif
