@@ -11,9 +11,8 @@
 #include "m/call_task.h"
 #include "m/geometry.h"
 #include "m/motion.h"
+#include "game/dino_battle_view_lifebar.h"
 #include "game/dino_battle_view_effect_game_begin.h"
-
-extern "C" void func_ov000_021795e0(void *, u32, u32);
 
 CreatureMotion::~CreatureMotion() {
 }
@@ -62,7 +61,7 @@ template class MCallTask1<DinoBattleViewStatusEffectIcon, DinoBattleViewStatusEf
 template MTask *MCreateCallTask(DinoBattleViewStatusEffectIcon *obj, void (DinoBattleViewStatusEffectIcon::*func)(MPoint), MPoint a0);
 
 void UpdateLifeBarTask::Execute() {
-    func_ov000_021795e0((void *)mUnk10, mUnk14, mUnk18);
+    mLifebar->SetLife(mLife, mMaxLife);
     Exit();
 }
 

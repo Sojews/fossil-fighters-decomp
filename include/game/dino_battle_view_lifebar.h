@@ -10,14 +10,35 @@
 #include "game/help.h"
 #include "game/dino_field_camera_hook.h"
 
-class DinoBattleViewLifebar : public MProcess {
-public:
-    virtual ~DinoBattleViewLifebar();
-    virtual void Idle();
-};
-
 class MMotion;
 class MSmartOam;
+class LifeMotion;
+class DinoBattleViewCreature;
+
+class DinoBattleViewLifebar : public MProcess {
+public:
+    DinoBattleViewLifebar(DinoBattleViewCreature *creature, MSmartOam *oam, MPoint pos, int life, int maxLife);
+    virtual ~DinoBattleViewLifebar();
+    virtual void Idle();
+
+    void SetLife(int life, int maxLife);
+    void Hide();
+    MTask *CreateShowTask();
+    MTask *CreateHideTask();
+    MTask *CreateCoordTask(MPoint pos);
+    MTask *CreateCoordAnime(MPoint from, MPoint to, u32 duration, int ease);
+    MPoint GetPosition();
+
+    MSmartOam *mOam;                    // 0x74
+    LifeMotion *mBar;                   // 0x78
+    LifeMotion *mFrame;                 // 0x7C
+    DinoBattleViewCreature *mCreature;  // 0x80
+    int mLife;                          // 0x84
+    int mMaxLife;                       // 0x88
+    int mShownLevel;                    // 0x8C
+    int mLevel;                         // 0x90: 1..41, -1 when there's no maximum
+    int mTimer;                         // 0x94
+};
 
 // A motion that can be swapped for another while keeping its position and visibility.
 class LifeMotion : public MProcess {
