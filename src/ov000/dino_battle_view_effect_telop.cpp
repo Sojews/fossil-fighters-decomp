@@ -6,6 +6,8 @@
 
 #include "game/dino_battle_view_effect_telop.h"
 #include "types.h"
+#include "m/bg_new_task.h"
+#include "m/call_task.h"
 
 DinoBattleViewEffectTelop::~DinoBattleViewEffectTelop() {
 }
@@ -31,3 +33,8 @@ void NopWaitTask::Execute() {
 void DinoBattleViewEffectTelop::Idle() {
     (this->*mState)();
 }
+
+// Template task instances the game emits in this file. Until the code that makes the tasks is decompiled, they are
+// instantiated explicitly.
+template class MBgCallTask0<DinoBattleViewEffectTelop>;
+template MTask *MCreateBgCallTask(DinoBattleViewEffectTelop *obj, void (DinoBattleViewEffectTelop::*func)(), int thread);
