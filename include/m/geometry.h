@@ -51,6 +51,15 @@ struct MRect {
         top = p.y;
     }
 
+    // This rect grown by d on every side.
+    MRect Inflate(int d) const {
+        MRect r = *this;
+        r.left -= d;
+        r.top -= d;
+        r.right += d;
+        r.bottom += d;
+        return r;
+    }
     int GetWidth() const { return right - left; }
     int GetHeight() const { return bottom - top; }
     MPoint GetSize() const { return MPoint(GetWidth(), GetHeight()); }

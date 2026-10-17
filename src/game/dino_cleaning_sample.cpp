@@ -104,3 +104,31 @@ void DinoCleaningSampleMenuDecItem::OnDecide() {
 void DinoCleaningSampleMenuStartItem::OnDecide() {
     GetMenu()->Exit();
 }
+
+MRect DinoCleaningSampleMenuIncItem::GetFrame() {
+    return mView->GetFrame().Inflate(8);
+}
+
+MRect DinoCleaningSampleMenuRandomItem::GetFrame() {
+    return mView->GetFrame().Inflate(8);
+}
+
+MRect DinoCleaningSampleMenuStartItem::GetFrame() {
+    return mView->GetFrame().Inflate(8);
+}
+
+MRect DinoCleaningSampleChipsTypeItem::GetFrame() {
+    return mView->GetFrame().Inflate(8);
+}
+
+MRect DinoCleaningSampleKasekiTypeItem::GetFrame() {
+    return mView->GetFrame().Inflate(8);
+}
+
+MRect DinoCleaningSampleMenuKasekiRockIdItem::GetFrame() {
+    return mView->GetFrame().Inflate(8);
+}
+
+MRect DinoCleaningSampleMenuDecItem::GetFrame() {
+    return mView->GetFrame().Inflate(8);
+}

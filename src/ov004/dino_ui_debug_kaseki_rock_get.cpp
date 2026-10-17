@@ -96,3 +96,27 @@ void DinoUiDebugKasekiRockGetMenuDecItem::OnDecide() {
         *mValue = *mValue - 1;
     }
 }
+
+MRect DinoUiDebugKasekiRockGetMenuStartItem::GetFrame() {
+    return mView->GetFrame().Inflate(8);
+}
+
+MRect DinoUiDebugKasekiRockGetChipsTypeItem::GetFrame() {
+    return mView->GetFrame().Inflate(8);
+}
+
+MRect DinoUiDebugKasekiRockGetKasekiTypeItem::GetFrame() {
+    return mView->GetFrame().Inflate(8);
+}
+
+MRect DinoUiDebugKasekiRockGetMenuKasekiRockIdItem::GetFrame() {
+    return mView->GetFrame().Inflate(8);
+}
+
+MRect DinoUiDebugKasekiRockGetMenuIncItem::GetFrame() {
+    return mView->GetFrame().Inflate(8);
+}
+
+MRect DinoUiDebugKasekiRockGetMenuDecItem::GetFrame() {
+    return mView->GetFrame().Inflate(8);
+}

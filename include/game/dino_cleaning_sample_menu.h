@@ -1,6 +1,7 @@
 #ifndef GAME_DINO_CLEANING_SAMPLE_MENU_H
 #define GAME_DINO_CLEANING_SAMPLE_MENU_H
 
+#include "m/view.h"
 #include "m/archive.h"
 #include "m/font.h"
 #include "m/menu_item.h"
@@ -30,7 +31,9 @@ public:
     virtual void OnFocusChanged(BOOL focused);
     virtual void OnDecide();
 
-    u32 mUnk88[4];
+    u32 mUnk88[2];
+    MView *mView;           // 0x90
+    u32 mUnk94;
     MMenuItem *mKeyItemA; // 0x98
     MMenuItem *mKeyItemB; // 0x9C
     MArchivePtr mArchive;   // 0xA0
