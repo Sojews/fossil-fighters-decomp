@@ -263,3 +263,16 @@ void DinoSenryuBackButton::OnDecide() {
     func_ov007_02186dd8(unkAC);
     DinoSoundPlaySe(0x90, 0);
 }
+
+void DinoUiKeyboardMenuItem::OnDecide() {
+    if (mMotion != NULL) {
+        mTasks->Clear();
+        MTask *play = mMotion->CreatePlayTransfer(1, 0);
+        MTask *wait = mMotion->CreateWaitStopTask();
+        MTask *loop = mMotion->CreatePlayTransfer(2, 0);
+        MSerialTaskSet *tasks = mTasks;
+        tasks->AddTail(loop);
+        tasks->AddTail(wait);
+        tasks->AddTail(play);
+    }
+}

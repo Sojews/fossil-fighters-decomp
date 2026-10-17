@@ -4,6 +4,7 @@
 // Derived destructors have their bases' destructor bodies inlined; auto-inlining the ones defined above does that.
 #pragma auto_inline on
 
+#include "game/dino_sound.h"
 #include "game/dino_ui_organization_menu.h"
 #include "m/display.h"
 #include "m/blend.h"
@@ -90,4 +91,55 @@ void DinoUiOrganizationMenu::OnIdle() {
     if (GetInput()->GetPressed() & 0x400) {
         func_ov007_0217dcb0(this);
     }
+}
+
+extern "C" void func_ov007_0217d548(void *owner);
+extern "C" void func_ov007_0217cf88(void *owner);
+extern "C" void func_ov007_0217d9d8(void *owner);
+extern "C" void func_ov007_0217d908(void *owner);
+
+void DinoUiOrganizationOKButton::OnDecide() {
+    mMotion->Play(4, 1);
+    MTask *play = mMotion->CreatePlayTransfer(3, 0);
+    MTask *wait = mMotion->CreateWaitStopTask();
+    MSerialTaskSet *serial = &mSerial;
+    serial->AddTail(wait);
+    serial->AddTail(play);
+    func_ov007_0217d548(mOwner);
+    DinoSoundPlaySe(0x9A, 0);
+}
+
+void DinoUiOrganizationBackButton::OnDecide() {
+    mMotion->Play(4, 1);
+    MTask *play = mMotion->CreatePlayTransfer(3, 0);
+    MTask *wait = mMotion->CreateWaitStopTask();
+    MSerialTaskSet *serial = &mSerial;
+    serial->AddTail(wait);
+    serial->AddTail(play);
+    func_ov007_0217cf88(mOwner);
+    DinoSoundPlaySe(0x90, 0);
+}
+
+void DinoUiOrganizationPageLButton::OnDecide() {
+    func_ov007_0217d9d8(mOwner);
+    mMotion->Play(2, 1);
+    mSerial.Clear();
+    MTask *play = mMotion->CreatePlayTransfer(1, 0);
+    MTask *wait = mMotion->CreateWaitStopTask();
+    MSerialTaskSet *serial = &mSerial;
+    serial->AddTail(wait);
+    serial->AddTail(play);
+    DinoSoundPlaySe(0x93, 0);
+}
+
+void DinoUiOrganizationPageRButton::OnDecide() {
+    func_ov007_0217d908(mOwner);
+    mMotion->Play(2, 1);
+    mSerial.Clear();
+    MTask *play = mMotion->CreatePlayTransfer(1, 0);
+    MTask *wait = mMotion->CreateWaitStopTask();
+    MSerialTaskSet *serial = &mSerial;
+    serial->AddTail(wait);
+    serial->AddTail(play);
+    DinoSoundPlaySe(0x93, 0);
 }

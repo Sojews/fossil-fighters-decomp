@@ -58,8 +58,9 @@ public:
     virtual MDisplay *GetDisplay();
     virtual const char *GetText();
 
-    u32 unkB8[2];
-    u32 mTextId;        // 0xC0
+    MMotion *mMotion;           // 0xB8
+    MSerialTaskSet *mTasks;     // 0xBC
+    u32 mTextId;                // 0xC0
 };
 
 class DinoUiKeyboardHideMenuItem : public KeyboardMenuItem {

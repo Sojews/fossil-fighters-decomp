@@ -176,3 +176,30 @@ void DinoUiMuseumInformationVoiceButton::OnDecide() {
     serial->AddTail(play);
     func_ov006_0218a538(mOwner);
 }
+
+extern "C" void func_ov006_02189660(void *owner);
+extern "C" void func_ov006_02189530(void *owner);
+
+void DinoUiMuseumPageLButton::OnDecide() {
+    func_ov006_02189660(mOwner);
+    mMotion->Play(2, 1);
+    mSerial.Clear();
+    MTask *play = mMotion->CreatePlayTransfer(1, 0);
+    MTask *wait = mMotion->CreateWaitStopTask();
+    MSerialTaskSet *serial = &mSerial;
+    serial->AddTail(wait);
+    serial->AddTail(play);
+    DinoSoundPlaySe(0x93, 0);
+}
+
+void DinoUiMuseumPageRButton::OnDecide() {
+    func_ov006_02189530(mOwner);
+    mMotion->Play(2, 1);
+    mSerial.Clear();
+    MTask *play = mMotion->CreatePlayTransfer(1, 0);
+    MTask *wait = mMotion->CreateWaitStopTask();
+    MSerialTaskSet *serial = &mSerial;
+    serial->AddTail(wait);
+    serial->AddTail(play);
+    DinoSoundPlaySe(0x93, 0);
+}
