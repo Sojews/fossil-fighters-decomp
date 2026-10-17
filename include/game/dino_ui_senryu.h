@@ -16,6 +16,9 @@ class SenryuMenuItem : public MMenuItem {
 public:
     virtual ~SenryuMenuItem();
     virtual MRect GetFrame();
+
+    u32 unk88[2];
+    MRect mFrame;   // 0x90
 };
 
 class DinoSenryuBackButton : public SenryuMenuItem, public DinoHelpItem {
@@ -29,7 +32,7 @@ public:
     virtual MDisplay *GetDisplay();
     virtual const char *GetText();
 
-    u8 unk94[0x1C];
+    u32 unkAC;
     MMotion *mMotion;   // 0xB0
     u32 mTextId;        // 0xB4
 };
@@ -44,7 +47,8 @@ public:
     virtual MDisplay *GetDisplay();
     virtual const char *GetText();
 
-    u8 unk94[0x24];
+    u32 unkAC[2];
+    MMotion *mMotion;   // 0xB4
     u32 mTextId;        // 0xB8
 };
 

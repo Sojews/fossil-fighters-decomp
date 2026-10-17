@@ -35,11 +35,17 @@ class LifebarShowTask : public MTask {
 public:
     virtual ~LifebarShowTask();
     virtual void Execute();
+
+    u8 mShow;           // 0x10
+    void *mLifebar;     // 0x14
 };
 
 class LifebarCoordAnime : public MPointAnime {
 public:
     virtual ~LifebarCoordAnime();
+    virtual void Apply(int step);
+
+    void *mLifebar;     // 0x50
 };
 
 #endif

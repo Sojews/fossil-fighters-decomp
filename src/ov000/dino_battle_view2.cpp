@@ -80,3 +80,10 @@ void WaitEnableRootMenu::Execute() {
 void DinoBattleViewUiRootSelectItem::OnFocusChanged(BOOL focused) {
     mMotion->Play(focused ? mFocusAnime : mBlurAnime, 0);
 }
+
+void MenuExitTask::Execute() {
+    if (*mFlag) {
+        mMenu->Exit();
+    }
+    Exit();
+}

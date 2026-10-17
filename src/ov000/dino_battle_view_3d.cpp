@@ -69,3 +69,22 @@ void MValChange::Execute() {
     *mDst = mValue;
     Exit();
 }
+
+extern "C" MTask *func_ov000_0218ae50(u32 arg);
+extern "C" MTask *func_ov000_0218addc(u32 arg);
+
+void BlackInTask::Idle() {
+    MTask *exit = MTaskExitTransfer::Create(this);
+    MTask *task = func_ov000_0218ae50(mUnk74);
+    MSerialTaskSet *serial = &mSerial;
+    serial->AddTail(task);
+    serial->AddTail(exit);
+}
+
+void BlackOutTask::Idle() {
+    MTask *exit = MTaskExitTransfer::Create(this);
+    MTask *task = func_ov000_0218addc(mUnk74);
+    MSerialTaskSet *serial = &mSerial;
+    serial->AddTail(task);
+    serial->AddTail(exit);
+}

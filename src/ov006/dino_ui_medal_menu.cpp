@@ -81,7 +81,7 @@ void DinoUiMedalList::Idle() {
 
 void DinoUiMedalBackButton::OnDecide() {
     mMotion->Play(4, 1);
-    mOwner->OnBackDecided();
+    mOwner->OnBackDecided(FALSE);
     DinoSoundPlaySe(0x90, 0);
 }
 

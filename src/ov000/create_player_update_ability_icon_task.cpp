@@ -125,3 +125,13 @@ void ModelCretureAddLifeTask::Execute() {
     func_ov000_0216cc64((void *)mUnk10, mUnk14, 0);
     Exit();
 }
+
+extern "C" MTask *func_ov000_02166620(u32 arg0, u32 arg1);
+
+void ExecCreatureEndTask::Idle() {
+    MTask *exit = MTaskExitTransfer::Create(this);
+    MTask *task = func_ov000_02166620(mUnk74, mUnk78);
+    MSerialTaskSet *serial = &mSerial;
+    serial->AddTail(task);
+    serial->AddTail(exit);
+}

@@ -44,12 +44,22 @@ class CameraPauseTask : public MTask {
 public:
     virtual ~CameraPauseTask();
     virtual void Execute();
+
+    void *mCamera;  // 0x10
+    u8 mPause;      // 0x14
 };
 
 class CameraSetDefParentTask : public MTask {
 public:
     virtual ~CameraSetDefParentTask();
     virtual void Execute();
+
+    struct Camera {
+        u8 unk00[0x7C];
+        u32 mUnk7C;     // 0x7C
+        u32 mParent;    // 0x80
+    } *mCamera;         // 0x10
+    u32 mParent;        // 0x14
 };
 
 #endif

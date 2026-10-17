@@ -45,3 +45,12 @@ void DinoBattleViewAbilityTextWindow::Execute() {
         task->Execute();
     }
 }
+
+void MenuEnableTask::Execute() {
+    if (mEnable) {
+        mMenu->Activate();
+    } else {
+        mMenu->Deactivate();
+    }
+    Exit();
+}

@@ -147,3 +147,11 @@ DinoUiMuseumReviverButton::~DinoUiMuseumReviverButton() {
 MRect DinoUiMuseumReviverButton::GetFrame() {
     return mMotion->GetFrame();
 }
+
+extern "C" void func_ov006_0218935c(void *owner);
+
+void DinoUiMuseumBackButton::OnDecide() {
+    mMotion->Play(4, 1);
+    func_ov006_0218935c(mOwner);
+    DinoSoundPlaySe(0x90, 0);
+}

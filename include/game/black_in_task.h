@@ -14,12 +14,16 @@ class BlackInTask : public MProcess {
 public:
     virtual ~BlackInTask();
     virtual void Idle();
+
+    u32 mUnk74;     // 0x74
 };
 
 class BlackOutTask : public MProcess {
 public:
     virtual ~BlackOutTask();
     virtual void Idle();
+
+    u32 mUnk74;     // 0x74
 };
 
 class MValChange : public MTask {

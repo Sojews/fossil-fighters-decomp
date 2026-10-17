@@ -29,6 +29,9 @@ public:
     virtual void OnIdle();
     virtual void OnFocus(MMenuItem *item);
     virtual void OnDecide(MMenuItem *item);
+
+    u8 unkB4[0x50];
+    u32 mUnk104;    // 0x104
 };
 
 class AttackMenuBarMotion : public MProcess {
@@ -53,6 +56,9 @@ class MenuEnableTask : public MTask {
 public:
     virtual ~MenuEnableTask();
     virtual void Execute();
+
+    MMenu *mMenu;   // 0x10
+    u8 mEnable;     // 0x14
 };
 
 class DinAttackItemHelp : public DinoBattleHelpBase {

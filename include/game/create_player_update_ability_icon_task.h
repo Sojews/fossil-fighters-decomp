@@ -135,6 +135,9 @@ class ExecCreatureEndTask : public MProcess {
 public:
     virtual ~ExecCreatureEndTask();
     virtual void Idle();
+
+    u32 mUnk74;     // 0x74
+    u32 mUnk78;     // 0x78
 };
 
 class MoveToHeatAreaAnyCreature : public MProcess {

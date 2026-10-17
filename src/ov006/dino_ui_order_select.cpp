@@ -3,6 +3,7 @@
 // Derived destructors have their bases' destructor bodies inlined; auto-inlining the ones defined above does that.
 #pragma auto_inline on
 
+#include "game/dino_sound.h"
 #include "game/dino_ui_order_select.h"
 #include "types.h"
 
@@ -48,4 +49,12 @@ void DinoUiOrderSelectMenuItem::OnFocusChanged(BOOL focused) {
 
 const char *DinoUiOrderSelectMenuItem::GetText() {
     return gDinoResource->GetText(mTextId);
+}
+
+extern "C" void func_ov006_0218d828(void *owner);
+
+void DinoUiOrderSelectDecideButton::OnDecide() {
+    mMotion->Play(3, 1);
+    func_ov006_0218d828(mOwner);
+    DinoSoundPlaySe(0x98, 0);
 }

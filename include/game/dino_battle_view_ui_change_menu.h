@@ -18,6 +18,9 @@ public:
     virtual void OnIdle();
     virtual void OnFocus(MMenuItem *item);
     virtual void OnDecide(MMenuItem *item);
+
+    u8 unkB4[0x38];
+    u32 mUnkEC;     // 0xEC
 };
 
 #endif

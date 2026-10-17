@@ -18,6 +18,9 @@ public:
     virtual void OnFocusChanged(BOOL focused);
     virtual void OnSelectChanged(BOOL selected);
     virtual void OnDecide();
+
+    u32 unk88[3];
+    void *mOwner;   // 0x94
 };
 
 class DinoBattleViewUiSelectAreaCommon : public MMenu {
@@ -35,6 +38,9 @@ public:
     virtual void OnFocus(MMenuItem *item);
     virtual void OnDecide(MMenuItem *item);
     virtual void OnIdle();
+
+    u8 unkB3[0x45];
+    u32 mUnkF8;     // 0xF8
 };
 
 class DinoBattleViewInfoLRItem : public MMenuItem {

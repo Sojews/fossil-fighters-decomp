@@ -43,6 +43,9 @@ class KeyboardMenuItem : public MMenuItem {
 public:
     virtual ~KeyboardMenuItem();
     virtual MRect GetFrame();
+
+    u32 unk88[5];
+    MRect mFrame;   // 0x9C
 };
 
 class DinoUiKeyboardMenuItem : public KeyboardMenuItem, public DinoHelpItem {
@@ -55,7 +58,7 @@ public:
     virtual MDisplay *GetDisplay();
     virtual const char *GetText();
 
-    u8 unk94[0x2C];
+    u32 unkB8[2];
     u32 mTextId;        // 0xC0
 };
 
@@ -78,7 +81,7 @@ public:
     virtual MDisplay *GetDisplay();
     virtual const char *GetText();
 
-    u8 unk94[0x28];
+    u32 unkB8;
     MMotion *mMotion;   // 0xBC
     u32 mTextId;        // 0xC0
 };

@@ -231,3 +231,17 @@ void DinoUiSenryuSubMenu::Execute() {
     func_ov007_02186c74(mOwner, *mValue, mArg);
     Exit();
 }
+
+MRect SenryuMenuItem::GetFrame() {
+    return mFrame;
+}
+
+MRect KeyboardMenuItem::GetFrame() {
+    return mFrame;
+}
+
+void DinoUiSenryuMenuItem::OnDecide() {
+    if (mMotion != NULL) {
+        mSerial.AddTail(mMotion->CreatePlayTransfer(2, 0));
+    }
+}

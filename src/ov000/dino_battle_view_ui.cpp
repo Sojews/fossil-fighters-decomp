@@ -80,7 +80,8 @@ void DinoBattleViewUiSelectAreaCommon::OnDecide(MMenuItem *item) {
     Exit();
 }
 
-extern "C" void func_ov000_02177804(DinoBattleViewUiRootMenuItem *item, BOOL selected);
+extern "C" void func_ov000_02177804(DinoBattleViewUiRootMenuItem *item, ...);
+extern "C" void func_ov000_02177590(void *owner, DinoBattleViewUiRootMenuItem *item, int arg2, int arg3);
 
 void DinoBattleViewUiRootMenuItem::OnSelectChanged(BOOL selected) {
     func_ov000_02177804(this, selected);
@@ -88,4 +89,28 @@ void DinoBattleViewUiRootMenuItem::OnSelectChanged(BOOL selected) {
 
 MRect DinoFrameItem::GetFrame() {
     return mFrame;
+}
+
+extern "C" u32 func_ov000_0215bb4c(u32 arg);
+extern "C" MTask *func_ov000_0218ec8c(u32 arg0, int arg1, int arg2);
+
+void DinoBattleViewUiChangeMenu::OnIdle() {
+    MTask *task = func_ov000_0218ec8c(func_ov000_0215bb4c(mUnkEC), -1, 0);
+    if (task != NULL) {
+        mSerial.AddTail(task);
+    }
+}
+
+void DinoBattleViewUiCreatureInfoMenu::OnIdle() {
+    MTask *task = func_ov000_0218ec8c(func_ov000_0215bb4c(mUnkF8), -1, 0);
+    if (task != NULL) {
+        mSerial.AddTail(task);
+    }
+}
+
+void DinoBattleViewUiRootMenuItem::OnFocusChanged(BOOL focused) {
+    if (focused) {
+        func_ov000_02177590(mOwner, this, 8, -2);
+    }
+    func_ov000_02177804(this);
 }

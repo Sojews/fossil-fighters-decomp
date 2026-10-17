@@ -103,6 +103,9 @@ class MenuExitTask : public MTask {
 public:
     virtual ~MenuExitTask();
     virtual void Execute();
+
+    MTask *mMenu;   // 0x10
+    u8 *mFlag;      // 0x14
 };
 
 class WaitEnableRootMenu : public MTask {
