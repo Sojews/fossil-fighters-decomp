@@ -521,6 +521,133 @@ void DinoEventExecDonateHide::Idle() {
     serial->AddTail(exit);
 }
 
+DinoEventExecRemoveChara::DinoEventExecRemoveChara(DinoEvent *event, u32 chara) {
+    mEvent = event;
+    mChara = chara;
+}
+
+void DinoEventExecRemoveChara::Execute() {
+    DinoCharaState state;
+    gDinoBackup->GetChara(mChara, &state);
+    state.unk0 = 0;
+    gDinoBackup->SetChara(mChara, &state);
+    if (mEvent->GetField() != NULL) {
+        mEvent->GetField()->RemoveChara(mChara);
+    }
+    Exit();
+}
+
+DinoEventExecCharaAngle::DinoEventExecCharaAngle(DinoEvent *event, u32 chara, u32 angle, u32 a, u32 b) : MProcess(NULL) {
+    mEvent = event;
+    mChara = chara;
+    mAngle = angle;
+    mA = a;
+    mB = b;
+}
+
+void DinoEventExecCharaAngle::Idle() {
+    MTask *exit = MTaskExitTransfer::Create(this);
+    MTask *task = mEvent->GetField()->CreateCharaAngleTask(mChara, mAngle, mA, mB);
+    MSerialTaskSet *serial = &mSerial;
+    serial->AddTail(task);
+    serial->AddTail(exit);
+}
+
+DinoEventExecCharaMoveToRegion::DinoEventExecCharaMoveToRegion(DinoEvent *event, u32 chara, u32 region, u32 a, u32 b, u8 c) : MProcess(NULL) {
+    mEvent = event;
+    mChara = chara;
+    mRegion = region;
+    mA = a;
+    mB = b;
+    mC = c;
+}
+
+void DinoEventExecCharaMoveToRegion::Idle() {
+    MTask *exit = MTaskExitTransfer::Create(this);
+    MTask *task = mEvent->GetField()->CreateCharaMoveToRegionTask(mChara, mRegion, mA, mB, mC);
+    MSerialTaskSet *serial = &mSerial;
+    serial->AddTail(task);
+    serial->AddTail(exit);
+}
+
+DinoEventExecCharaMoveToCoord::DinoEventExecCharaMoveToCoord(DinoEvent *event, u32 chara, MPoint coord, u32 a, u32 b, u8 c) : MProcess(NULL) {
+    mEvent = event;
+    mChara = chara;
+    mPoint = coord;
+    mA = a;
+    mB = b;
+    mC = c;
+}
+
+void DinoEventExecCharaMoveToCoord::Idle() {
+    MTask *exit = MTaskExitTransfer::Create(this);
+    MTask *task = mEvent->GetField()->CreateCharaMoveToCoordTask(mChara, mPoint, mA, mB, mC);
+    MSerialTaskSet *serial = &mSerial;
+    serial->AddTail(task);
+    serial->AddTail(exit);
+}
+
+DinoEventExecCharaMoveOffset::DinoEventExecCharaMoveOffset(DinoEvent *event, u32 chara, MPoint offset, u32 a, u32 b, u8 c) : MProcess(NULL) {
+    mEvent = event;
+    mChara = chara;
+    mPoint = offset;
+    mA = a;
+    mB = b;
+    mC = c;
+}
+
+void DinoEventExecCharaMoveOffset::Idle() {
+    MTask *exit = MTaskExitTransfer::Create(this);
+    MTask *task = mEvent->GetField()->CreateCharaMoveOffsetTask(mChara, mPoint, mA, mB, mC);
+    MSerialTaskSet *serial = &mSerial;
+    serial->AddTail(task);
+    serial->AddTail(exit);
+}
+
+DinoEventExecCharaMoveVector::DinoEventExecCharaMoveVector(DinoEvent *event, u32 chara, u16 direction, u32 a, u32 b, u32 c, u8 d) : MProcess(NULL) {
+    mEvent = event;
+    mChara = chara;
+    mDirection = direction;
+    mA = a;
+    mB = b;
+    mC = c;
+    mD = d;
+}
+
+void DinoEventExecCharaMoveVector::Idle() {
+    MTask *exit = MTaskExitTransfer::Create(this);
+    MTask *task = mEvent->GetField()->CreateCharaMoveVectorTask(mChara, mDirection, mA, mB, mC, mD);
+    MSerialTaskSet *serial = &mSerial;
+    serial->AddTail(task);
+    serial->AddTail(exit);
+}
+
+DinoEventExecCharaWaitMove::DinoEventExecCharaWaitMove(DinoEvent *event, u32 chara) : MProcess(NULL) {
+    mEvent = event;
+    mChara = chara;
+}
+
+void DinoEventExecCharaWaitMove::Idle() {
+    MTask *exit = MTaskExitTransfer::Create(this);
+    MTask *task = mEvent->GetField()->CreateCharaWaitMoveTask(mChara);
+    MSerialTaskSet *serial = &mSerial;
+    serial->AddTail(task);
+    serial->AddTail(exit);
+}
+
+DinoEventExecCharaFocus::DinoEventExecCharaFocus(DinoEvent *event, u32 chara) : MProcess(NULL) {
+    mEvent = event;
+    mChara = chara;
+}
+
+void DinoEventExecCharaFocus::Idle() {
+    MTask *exit = MTaskExitTransfer::Create(this);
+    MTask *task = mEvent->GetField()->CreateCharaFocusTask(mChara);
+    MSerialTaskSet *serial = &mSerial;
+    serial->AddTail(task);
+    serial->AddTail(exit);
+}
+
 DinoEventExecVarValue::~DinoEventExecVarValue() {
 }
 
