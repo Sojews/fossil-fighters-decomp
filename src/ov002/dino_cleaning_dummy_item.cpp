@@ -4,6 +4,7 @@
 // Derived destructors have their bases' destructor bodies inlined; auto-inlining the ones defined above does that.
 #pragma auto_inline on
 
+#include "game/dino_resource.h"
 #include "game/dino_cleaning_dummy_item_menu.h"
 #include "game/dino_cleaning_dummy_item.h"
 #include "game/dino_cleaning_xray_item.h"
@@ -64,4 +65,9 @@ void DinoCleaningToolMenuItem::OnDecide() {
 
 MRect DinoCleaningDummyItem::GetFrame() {
     return MRect(256, 192, 256, 192);
+}
+
+extern const u32 data_0208ad38; // a text number
+const char *DinoCleaningXrayItem::GetText() {
+    return gDinoResource->GetText(data_0208ad38);
 }

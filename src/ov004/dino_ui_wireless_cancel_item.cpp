@@ -4,6 +4,7 @@
 // Derived destructors have their bases' destructor bodies inlined; auto-inlining the ones defined above does that.
 #pragma auto_inline on
 
+#include "game/dino_resource.h"
 #include "m/blend.h"
 #include "game/dino_ui_wireless_cancel_item_menu.h"
 #include "game/dino_ui_wireless_cancel_item.h"
@@ -198,4 +199,19 @@ void DinoUiWirelessCancel::OnDecide(MMenuItem *item) {
 
 void DinoUiWirelessCancel::Cancel() {
     *mCancelled = TRUE;
+}
+
+extern const u32 data_0208ad7c; // a text number
+const char *DinoUiChildScannerStartCannonParentItem::GetText() {
+    return gDinoResource->GetText(data_0208ad7c);
+}
+
+extern const u32 data_0208ad80; // a text number
+const char *DinoUiChildScannerStartBattleParentItem::GetText() {
+    return gDinoResource->GetText(data_0208ad80);
+}
+
+extern const u32 data_0208ad78; // a text number
+const char *DinoUiChildScannerCancelItem::GetText() {
+    return gDinoResource->GetText(data_0208ad78);
 }

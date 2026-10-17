@@ -1,6 +1,7 @@
 // DinoUiSaveSlotSelect, DinoUiSaveSlotConfirm, DinoUiSaveSlotSelectMenuConfirmDeleteTask.
 // Only the destructors are decompiled so far.
 
+#include "game/dino_resource.h"
 #include "game/dino_sound.h"
 #include "game/dino_ui_save_slot_select.h"
 #include "game/dino_ui_save_slot_confirm.h"
@@ -127,4 +128,9 @@ void DinoUiSaveSlotSelectMenuItem::OnDecide() {
         mMotion2->Play(3, 1);
         mMotion3->Play(3, 1);
     }
+}
+
+extern const u32 data_0208ad94; // a text number
+const char *DinoUiSaveSlotSelectMenuDeleteItem::GetText() {
+    return gDinoResource->GetText(data_0208ad94);
 }
