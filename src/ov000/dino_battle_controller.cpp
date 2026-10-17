@@ -4,6 +4,7 @@
 // Derived destructors have their bases' destructor bodies inlined; auto-inlining the ones defined above does that.
 #pragma auto_inline on
 
+#define DINO_BATTLE_CONTROLLER_OWNER
 #include "game/dino_battle_controller.h"
 
 DinoBattleController::~DinoBattleController() {
