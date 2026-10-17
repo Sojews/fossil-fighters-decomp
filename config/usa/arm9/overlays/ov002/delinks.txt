@@ -61,3 +61,9 @@ src/ov002/dino_cleaning_tool.cpp:
 
 src/ov002/dino_cleaning_live_task.cpp:
     .text       start:0x02158018 end:0x02158230
+
+src/ov002/dino_cleaning_image_layer.cpp:
+    .text       start:0x02158448 end:0x02158b5c
+
+src/ov002/dino_cleaning_image.cpp:
+    .text       start:0x02158b5c end:0x02159674

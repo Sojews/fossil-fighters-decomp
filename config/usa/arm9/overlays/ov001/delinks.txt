@@ -49,3 +49,6 @@ src/ov001/dino_field_player_control.cpp:
 
 src/ov001/dino_field.cpp:
     .text       start:0x021558a0 end:0x021582c4
+
+src/ov001/dino_field_hole.cpp:
+    .text       start:0x0215c2d0 end:0x0215c6ec
