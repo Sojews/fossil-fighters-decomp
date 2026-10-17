@@ -37,6 +37,22 @@ void DinoEventRevive::Idle() {
     (this->*mState)();
 }
 
+void DinoEventReviveFieldResumeTask::Idle() {
+    switch (mStep++) {
+    case 0:
+        mEvent->OpenField(0);
+        break;
+    case 1:
+        mEvent->Fade(0, 30);
+        MTask *exit = MTaskExitTransfer::Create(this);
+        MTask *wait = mEvent->CreateFadeWaitTask();
+        MSerialTaskSet *serial = &mSerial;
+        serial->AddTail(wait);
+        serial->AddTail(exit);
+        break;
+    }
+}
+
 // Template task instances the game emits in this file. Until the code that makes the tasks is decompiled, they are
 // instantiated explicitly.
 template class MBgCallTask0<DinoEventReviveEffect>;
