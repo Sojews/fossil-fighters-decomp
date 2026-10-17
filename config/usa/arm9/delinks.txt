@@ -668,6 +668,9 @@ libs/nitrosdk/src/wm/wm_etc.c:
     complete
     .text       start:0x0207cd68 end:0x0207cde0
 
+libs/nitrosdk/src/wm/wm_ds.c:
+    .text       start:0x0207c57c end:0x0207cd68
+
 libs/nitrosdk/src/os/os_init.c:
     complete
     .text       start:0x02074a64 end:0x02074aa8

@@ -29,6 +29,7 @@ typedef enum {
     WM_ERRCODE_ILLEGAL_STATE,
     WM_ERRCODE_WM_DISABLE,
     WM_ERRCODE_NO_KEYSET,
+    WM_ERRCODE_NO_DATASET = WM_ERRCODE_NO_KEYSET,
     WM_ERRCODE_INVALID_PARAM,
     WM_ERRCODE_NO_CHILD,
     WM_ERRCODE_FIFO_ERROR,
@@ -37,11 +38,11 @@ typedef enum {
     WM_ERRCODE_NO_ENTRY,
     WM_ERRCODE_OVER_MAX_ENTRY,
     WM_ERRCODE_INVALID_POLLBITMAP,
-    WM_ERRCODE_NO_DATASET,
-    WM_ERRCODE_SEND_FAILED,
     WM_ERRCODE_NO_DATA,
-    WM_ERRCODE_NOT_ENOUGH_MEM,
+    WM_ERRCODE_SEND_FAILED,
     WM_ERRCODE_DCF_TEST,
+    WM_ERRCODE_WL_INVALID_PARAM,
+    WM_ERRCODE_WL_LENGTH_ERR,
     WM_ERRCODE_FLASH_ERROR,
     WM_ERRCODE_MAX
 } WMErrCode;
@@ -120,6 +121,8 @@ typedef enum {
 #define WM_STATECODE_DISCONNECTED 9
 #define WM_STATECODE_MP_IND 11
 #define WM_STATECODE_MPACK_IND 12
+#define WM_STATECODE_PORT_RECV 21
+#define WM_STATECODE_PORT_INIT 25
 #define WM_STATECODE_DISCONNECTED_FROM_MYSELF 26
 
 typedef void (*WMCallbackFunc)(void *arg);
@@ -155,8 +158,19 @@ typedef struct {
 typedef struct {
     u16 apiid;              // 0x00
     u16 errcode;            // 0x02
-    u8 unk04[0x18];
+    u16 wlCmdID;            // 0x04
+    u16 wlResult;           // 0x06
+    u16 state;              // 0x08
+    u16 port;               // 0x0a
+    u16 destBitmap;         // 0x0c
+    u16 restBitmap;         // 0x0e
+    u16 sentBitmap;         // 0x10
+    u16 rsv;                // 0x12
+    const u16 *data;        // 0x14
+    u16 size;               // 0x18
+    u16 seqNo;              // 0x1a
     WMCallbackFunc callback;    // 0x1c
+    void *arg;              // 0x20
 } WMPortSendCallback;
 
 typedef struct {
@@ -269,6 +283,10 @@ typedef struct {
 } WMParentParam;
 
 WMErrCode WM_Init(void *sysBuf, u16 dmaNo);
+WMErrCode WM_SetPortCallback(u16 port, WMCallbackFunc callback, void *arg);
+WMErrCode WM_SetMPDataToPortEx(WMCallbackFunc callback, void *arg, const u16 *sendData, u16 sendDataSize,
+                               u16 destBitmap, u16 port, u16 prio);
+u16 WMi_GetMPReadyAIDs(void);
 WMErrCode WM_Finish(void);
 WMErrCode WMi_SendCommand(WMApiid id, u16 paramNum, ...);
 WMErrCode WMi_SendCommandDirect(void *data, u32 length);

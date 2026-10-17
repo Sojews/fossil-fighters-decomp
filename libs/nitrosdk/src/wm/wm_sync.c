@@ -3,7 +3,6 @@
 #include "wm_private.h"
 #include "nitro/rtc.h"
 
-#define WM_STATECODE_PORT_INIT 25
 #define WM_GET_ALLOWED_CHANNEL_BEFORE_INIT 0x8000
 #define WM_DEFAULT_BEACON_PERIOD 200
 #define WM_DEFAULT_SCAN_PERIOD 30
