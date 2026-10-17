@@ -279,6 +279,10 @@ void DinoBattleModelCreature::SetUnk108(u32 value) {
     mUnk108 = value;
 }
 
+MFx32 DinoBattleModelCreature::RandomFraction() {
+    return mPlayer->RandomFraction();
+}
+
 void DinoBattleModelCreature::RollUnk10C() {
     mUnk10C = mPlayer->GetRandom()->Next(5) + 1;
 }
@@ -383,6 +387,13 @@ u32 DinoBattleModelPlayer::GetUnkAC() {
     return mUnkAC;
 }
 
+// A random fraction in [0, 1].
+MFx32 DinoBattleModelPlayer::RandomFraction() {
+    MFx32 r;
+    r.v = GetRandom()->Next(FX32_ONE + 1);
+    return r;
+}
+
 void DinoBattleModelPlayer::Idle() {
     Dispatch();
 }
@@ -405,6 +416,14 @@ MTask *DinoBattleModelPlayer::CreateUpdateAllCreatureTask() {
 
 MoveCreatureFromEscape::MoveCreatureFromEscape(DinoBattleModelPlayer *player) : MProcess(NULL) {
     mPlayer = player;
+}
+
+BOOL DinoBattleUserController::Unk14() {
+    return TRUE;
+}
+
+extern "C" BOOL func_ov000_0216c83c(int value) {
+    return (value == 1 || value == 2) ? TRUE : FALSE;
 }
 
 #pragma auto_inline on

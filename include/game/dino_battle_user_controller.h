@@ -14,6 +14,7 @@
 class DinoBattleUserController : public DinoBattleController {
 public:
     virtual ~DinoBattleUserController();
+    virtual BOOL Unk14();
     virtual void OnMessage(MMessage *msg);
 };
 

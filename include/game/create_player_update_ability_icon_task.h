@@ -1,6 +1,8 @@
 #ifndef GAME_CREATE_PLAYER_UPDATE_ABILITY_ICON_TASK_H
 #define GAME_CREATE_PLAYER_UPDATE_ABILITY_ICON_TASK_H
 
+#include "m/fx32.h"
+
 #include <vector>
 #include "m/menu_item.h"
 #include "m/menu.h"
@@ -67,6 +69,7 @@ public:
     u32 GetUnkFC();
     MRandom *GetRandom();
     u32 GetUnkAC();
+    MFx32 RandomFraction();
 
     u32 mUnkA8;                         // 0xA8
     u32 mUnkAC;                         // 0xAC
@@ -152,6 +155,7 @@ public:
     BOOL IsUnkD274();
     u32 GetStatusUnk20();
     void RollUnk10C();
+    MFx32 RandomFraction();
 
     class AddLifePointTask : public MTask {
     public:
