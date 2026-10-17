@@ -20,24 +20,32 @@ class DinoFieldWhiteOut : public MProcess {
 public:
     virtual ~DinoFieldWhiteOut();
     virtual void Idle();
+
+    int mDuration;  // 0x74
 };
 
 class DinoFieldWhiteIn : public MProcess {
 public:
     virtual ~DinoFieldWhiteIn();
     virtual void Idle();
+
+    int mDuration;  // 0x74
 };
 
 class DinoFieldBlackOut : public MProcess {
 public:
     virtual ~DinoFieldBlackOut();
     virtual void Idle();
+
+    int mDuration;  // 0x74
 };
 
 class DinoFieldBlackIn : public MProcess {
 public:
     virtual ~DinoFieldBlackIn();
     virtual void Idle();
+
+    int mDuration;  // 0x74
 };
 
 #endif

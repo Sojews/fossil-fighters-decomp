@@ -68,6 +68,70 @@ DinoFieldBlackIn::~DinoFieldBlackIn() {
     gLcd->GetBottomDisplay()->mBright->Reset();
 }
 
+void DinoFieldWhiteOut::Idle() {
+    MTask *top;
+    MTask *bottom;
+    MTask *exit;
+    MParallelTaskSet *fades;
+    exit = MTaskExitTransfer::Create(this);
+    bottom = gLcd->GetBottomDisplay()->mBright->CreateFadeOutToWhite(mDuration, 0);
+    top = gLcd->GetTopDisplay()->mBright->CreateFadeOutToWhite(mDuration, 0);
+    fades = new MParallelTaskSet(TRUE);
+    fades->AddTail(top);
+    fades->AddTail(bottom);
+    MSerialTaskSet *serial = &mSerial;
+    serial->AddTail(fades);
+    serial->AddTail(exit);
+}
+
+void DinoFieldWhiteIn::Idle() {
+    MTask *top;
+    MTask *bottom;
+    MTask *exit;
+    MParallelTaskSet *fades;
+    exit = MTaskExitTransfer::Create(this);
+    bottom = gLcd->GetBottomDisplay()->mBright->CreateFadeInFromWhite(mDuration, 0);
+    top = gLcd->GetTopDisplay()->mBright->CreateFadeInFromWhite(mDuration, 0);
+    fades = new MParallelTaskSet(TRUE);
+    fades->AddTail(top);
+    fades->AddTail(bottom);
+    MSerialTaskSet *serial = &mSerial;
+    serial->AddTail(fades);
+    serial->AddTail(exit);
+}
+
+void DinoFieldBlackOut::Idle() {
+    MTask *top;
+    MTask *bottom;
+    MTask *exit;
+    MParallelTaskSet *fades;
+    exit = MTaskExitTransfer::Create(this);
+    bottom = gLcd->GetBottomDisplay()->mBright->CreateFadeOutToBlack(mDuration, 0);
+    top = gLcd->GetTopDisplay()->mBright->CreateFadeOutToBlack(mDuration, 0);
+    fades = new MParallelTaskSet(TRUE);
+    fades->AddTail(top);
+    fades->AddTail(bottom);
+    MSerialTaskSet *serial = &mSerial;
+    serial->AddTail(fades);
+    serial->AddTail(exit);
+}
+
+void DinoFieldBlackIn::Idle() {
+    MTask *top;
+    MTask *bottom;
+    MTask *exit;
+    MParallelTaskSet *fades;
+    exit = MTaskExitTransfer::Create(this);
+    bottom = gLcd->GetBottomDisplay()->mBright->CreateFadeInFromBlack(mDuration, 0);
+    top = gLcd->GetTopDisplay()->mBright->CreateFadeInFromBlack(mDuration, 0);
+    fades = new MParallelTaskSet(TRUE);
+    fades->AddTail(top);
+    fades->AddTail(bottom);
+    MSerialTaskSet *serial = &mSerial;
+    serial->AddTail(fades);
+    serial->AddTail(exit);
+}
+
 // Template task instances the game emits in this file. Until the code that makes the tasks is decompiled, they are
 // instantiated explicitly.
 template class MCallTask0<MPolygonChar, MPolygonChar>;
