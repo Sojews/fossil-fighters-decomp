@@ -1,7 +1,16 @@
 // DinoBattleViewPlayerField.
-// Only the destructor is decompiled so far.
 
 #include "game/dino_battle_view_player_field.h"
+#include "m/smart_oam.h"
+#include "m/text.h"
+
+DinoBattleViewPlayerField::DinoBattleViewPlayerField(u32 display) {
+    mUnk10 = 0;
+    mOamOwner = NULL;
+    mBg = NULL;
+    mText = NULL;
+    mDisplay = display;
+}
 
 DinoBattleViewPlayerField::~DinoBattleViewPlayerField() {
     if (mBg) {
@@ -13,6 +22,17 @@ void DinoBattleViewPlayerField::Execute() {
 }
 
 extern MPoint data_ov000_02191dc4[]; // the screen origin for each display
+
+void DinoBattleViewPlayerField::SetPosition(MPoint pos) {
+    if (mText) {
+        MPoint &origin = data_ov000_02191dc4[mDisplay];
+        mText->SetOffset(MPoint(origin.x - pos.x, origin.y - pos.y));
+    }
+    if (mOamOwner) {
+        mOamOwner->mOam->SetOffset(MPoint(-pos.x, -pos.y));
+    }
+    mPos = pos;
+}
 
 MPoint DinoBattleViewPlayerField::GetPosition() {
     if (mText) {

@@ -6,9 +6,17 @@
 #include "m/bg.h"
 
 class MText;
+class MSmartOam;
+
+// What DinoBattleViewPlayerField moves along with its screen (not identified yet).
+struct DinoBattleViewPlayerFieldOamOwner {
+    u8 unk00[0xB0];
+    MSmartOam *mOam;    // 0xB0
+};
 
 class DinoBattleViewPlayerField : public MView {
 public:
+    DinoBattleViewPlayerField(u32 display);
     virtual ~DinoBattleViewPlayerField();
     virtual void Execute();
     virtual void SetPosition(MPoint pos);
@@ -22,7 +30,8 @@ public:
     virtual BOOL IsHidden();
     virtual u32 GetPlaneMask();
 
-    u32 mUnk10[2];  // 0x10
+    u32 mUnk10;     // 0x10
+    DinoBattleViewPlayerFieldOamOwner *mOamOwner;   // 0x14
     MBg *mBg;       // 0x18
     MText *mText;   // 0x1C: the field's BG screen
     u32 mDisplay;   // 0x20: which screen origin applies
