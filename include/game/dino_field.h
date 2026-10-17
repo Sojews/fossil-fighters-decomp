@@ -45,8 +45,10 @@ struct DinoFieldCharaModel {
     u16 angle;          // 0x16
 };
 
-class DinoFieldChara {
+class DinoFieldChara : public MProcess, public MSerializer {
 public:
+    virtual ~DinoFieldChara();
+
     DinoFieldCharaModel *GetModel();
     void ShowManpu(u32 manpu, MPoint offset);
     void HideManpu();
@@ -62,6 +64,22 @@ public:
     void SetTask(DinoCharaTask task);
     void UpdateBodyModel();
     void UpdateHeadModel();
+    void ApplyBodyModel();
+    void ApplyHeadModel();
+    void ChangeMotion(u32 motion, u8 loop, MFx32 speed);
+
+    MArchivePtr mArchive;       // 0x8C
+    MArchiveFile mFile;         // 0x90
+    DinoFieldCharaModel mModel; // 0x9C
+    u32 mMotion;                // 0xB4: the motion playing
+    u32 mUnkB8[22];             // 0xB8
+    MTaskSet *mTaskSet;         // 0x110: where the manpu task runs
+    u32 mUnk114[121];           // 0x114
+    MTask *mManpu;              // 0x2F8: the emotion bubble shown over the character
+    u32 mUnk2FC[2];             // 0x2FC
+    BOOL mHasFootSe;            // 0x304
+    u32 mFootSe;                // 0x308
+    u32 mBeholdTarget;          // 0x30C: the character looked at
 };
 
 struct MAfnBlock;
