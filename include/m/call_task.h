@@ -4,6 +4,46 @@
 
 #include "m/task.h"
 
+template <class T, class U>
+class MCallTask0 : public MProcess {
+public:
+    typedef void (U::*Func)();
+
+    MCallTask0(T *obj, Func func) : MProcess(NULL) {
+        mObj = obj;
+        mFunc = func;
+    }
+    virtual void Idle() {
+        (mObj->*mFunc)();
+        Exit();
+    }
+
+    u32 mUnk74;     // 0x74
+    T *mObj;        // 0x78
+    Func mFunc;     // 0x7C
+};
+
+template <class T, class U, class A1>
+class MCallTask1 : public MProcess {
+public:
+    typedef void (U::*Func)(A1);
+
+    MCallTask1(T *obj, Func func, A1 a1) : MProcess(NULL) {
+        mObj = obj;
+        mFunc = func;
+        mA1 = a1;
+    }
+    virtual void Idle() {
+        (mObj->*mFunc)(mA1);
+        Exit();
+    }
+
+    u32 mUnk74;     // 0x74
+    T *mObj;        // 0x78
+    Func mFunc;     // 0x7C
+    A1 mA1;         // 0x84
+};
+
 template <class T, class U, class A1, class A2>
 class MCallTask2 : public MProcess {
 public:
@@ -107,6 +147,16 @@ public:
     A4 mA4;
     A5 mA5;
 };
+
+template <class T, class U>
+MTask *MCreateCallTask(T *obj, void (U::*func)()) {
+    return new MCallTask0<T, U>(obj, func);
+}
+
+template <class T, class U, class A1>
+MTask *MCreateCallTask(T *obj, void (U::*func)(A1), A1 a1) {
+    return new MCallTask1<T, U, A1>(obj, func, a1);
+}
 
 template <class T, class U, class A1, class A2>
 MTask *MCreateCallTask(T *obj, void (U::*func)(A1, A2), A1 a1, A2 a2) {

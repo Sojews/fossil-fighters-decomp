@@ -9,6 +9,7 @@
 #include "m/task.h"
 #include "m/geometry.h"
 #include "m/motion.h"
+#include "m/menu.h"
 
 class DinoHelpItem;
 class MDisplay;
@@ -104,6 +105,19 @@ public:
 };
 
 // Keeps track of help bases, items and hooks.
+// The help screen: a menu of the current base's help items.
+class DinoHelp : public MMenu {
+public:
+    DinoHelp(MInput *input);
+    virtual ~DinoHelp();
+    virtual void OnStart();
+    virtual void OnIdle();
+    virtual void OnFocus(MMenuItem *item);
+
+    u32 mUnkA8[15];     // 0xA8
+    u8 mUnkE4;          // 0xE4
+};
+
 class MFont;
 class MSmartObjCanvas;
 

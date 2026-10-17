@@ -4,6 +4,8 @@
 #include "game/help.h"
 #include "game/dino_help_sign.h"
 #include "m/input.h"
+#include "game/dino_sound.h"
+#include "m/call_task.h"
 #include "m/irq.h"
 #include "m/lcd.h"
 #include "m/oam_canvas.h"
@@ -384,4 +386,42 @@ void DinoHelpStatus::CloseStep() {
     mLines--;
     mCanvas->Clear();
     mCanvas->FillRect(MRect(0, 8 - mLines / 2, 256, mLines / 2 + 8), kHelpStatusColor);
+}
+
+#define PAD_BUTTON_SELECT 0x0004
+
+DinoHelp::DinoHelp(MInput *input) : MMenu(input, 0) {
+    mUnkE4 = TRUE;
+}
+
+DinoHelp::~DinoHelp() {
+    DinoSoundResume();
+}
+
+void DinoHelpDriver::Idle() {
+    MScopedLock lock(&sHelpMutex, TRUE);
+    if (mTasks->IsEmpty()) {
+        Exit();
+        return;
+    }
+    u32 buttons = mInput->mButtons;
+    if ((buttons & (mInput->mPrevButtons ^ buttons) & PAD_BUTTON_SELECT) || (buttons & 0x2000)) {
+        if (CanShowHelp()) {
+            DinoSoundPause();
+            DinoSoundPlaySe(0x8D, 0);
+            MTask *close;
+            MTask *run;
+            run = MTaskRunTransfer::Create(mCursor);
+            close = MCreateCallTask(this, &DinoHelpDriver::NotifyClose);
+            DinoHelp *help = new DinoHelp(mInput);
+            MTask *suspend = MTaskSuspendTransfer::Create(mCursor);
+            MTask *open = MCreateCallTask(this, &DinoHelpDriver::NotifyOpen);
+            MSerialTaskSet *serial = &mSerial;
+            serial->AddTail(open);
+            serial->AddTail(suspend);
+            serial->AddTail(help);
+            serial->AddTail(close);
+            serial->AddTail(run);
+        }
+    }
 }
