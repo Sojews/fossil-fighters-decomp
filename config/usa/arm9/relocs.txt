@@ -20755,16 +20755,16 @@ from:0x02074150 kind:load to:0x021518ec module:main
 from:0x020741c8 kind:thumb_call to:0x02074540 module:main
 from:0x020741dc kind:thumb_call to:0x02074234 module:main
 from:0x020741f0 kind:load to:0x021518c8 module:main
-from:0x020741f4 kind:load to:0x021518f0 module:main
-from:0x020741f8 kind:load to:0x021519c8 module:main
+from:0x020741f4 kind:load to:0x021518ec add:0x4 module:main
+from:0x020741f8 kind:load to:0x021519bc add:0xc module:main
 from:0x020741fc kind:load to:0x021519bc module:main
 from:0x02074208 kind:load to:0x027e0000 module:dtcm
-from:0x02074210 kind:load to:0x02151a48 module:main
+from:0x02074210 kind:load to:0x021519bc add:0x8c module:main
 from:0x0207421c kind:load to:0x021518ec module:main
 from:0x02074224 kind:load to:0x021518fc module:main
 from:0x02074228 kind:load to:0x0207455d module:main
 from:0x0207422c kind:load to:0x02151b44 module:main
-from:0x02074230 kind:load to:0x02151948 module:main
+from:0x02074230 kind:load to:0x021518fc add:0x4c module:main
 from:0x02074240 kind:thumb_call_arm to:0x02074fd8 module:main
 from:0x02074246 kind:thumb_call to:0x02073f90 module:main
 from:0x02074258 kind:thumb_call to:0x0207407c module:main

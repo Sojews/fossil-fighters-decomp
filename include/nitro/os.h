@@ -54,13 +54,42 @@ typedef struct OSMutexQueue {
     OSMutex *tail;
 } OSMutexQueue;
 
+typedef struct OSContext {
+    u32 cpsr;
+    u32 r[13];
+    u32 sp;
+    u32 lr;
+    u32 pc_plus4;
+    u8 cp_context[0x20];        // The divider/square root unit's state
+} OSContext;
+
+typedef void (*OSThreadDestructor)(void *arg);
+
+typedef struct OSThreadLink {
+    OSThread *prev;
+    OSThread *next;
+} OSThreadLink;
+
 struct OSThread {
-    u8 unk0[0x6C];
+    OSContext context;
+    u32 state;                  // 0x64
+    OSThread *next;             // 0x68: in the list by priority
     u32 id;                     // 0x6C
-    u8 unk70[0x14];
+    u32 priority;               // 0x70
+    void *profiler;             // 0x74
+    OSThreadQueue *queue;       // 0x78: the queue it's sleeping on
+    OSThreadLink link;          // 0x7C
     OSMutex *mutex;             // 0x84: the one it's waiting for
     OSMutexQueue mutexQueue;    // 0x88: the ones it holds
-    u8 unk90[0x30];
+    u32 stackTop;               // 0x90
+    u32 stackBottom;            // 0x94
+    u32 stackWarningOffset;     // 0x98
+    OSThreadQueue joinQueue;    // 0x9C
+    void *specific[3];          // 0xA4
+    void *alarmForSleep;        // 0xB0
+    OSThreadDestructor destructor; // 0xB4
+    void *userParameter;        // 0xB8
+    int systemErrno;            // 0xBC
 };
 
 static inline u32 OS_GetThreadId(const OSThread *thread) {
@@ -73,12 +102,14 @@ static inline void OS_InitThreadQueue(OSThreadQueue *queue) {
     queue->head = queue->tail = NULL;
 }
 
+typedef void (*OSSwitchThreadCallback)(OSThread *from, OSThread *to);
+
 typedef struct OSThreadInfo {
     u16 isNeedRescheduling;
     u16 irqDepth;
     OSThread *current;
     OSThread *list;
-    void *switchCallback;
+    OSSwitchThreadCallback switchCallback;
 } OSThreadInfo;
 
 extern OSThreadInfo OSi_ThreadInfo;

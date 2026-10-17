@@ -608,3 +608,8 @@ libs/nitrosdk/src/mi/mi_init.c:
 libs/nitrosdk/src/gx/g3_util.c:
     complete
     .text       start:0x02072e24 end:0x02073084
+
+libs/nitrosdk/src/os/os_thread.c:
+    complete
+    .text       start:0x02073f90 end:0x020745b8
+    .bss        start:0x021518c8 end:0x02151b44
