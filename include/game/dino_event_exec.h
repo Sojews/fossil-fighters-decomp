@@ -1,0 +1,598 @@
+// The event script commands: each runs as a task in the event process, one per command.
+#ifndef GAME_DINO_EVENT_EXEC_H
+#define GAME_DINO_EVENT_EXEC_H
+
+#include "m/task.h"
+#include "game/dino_backup.h"
+
+class DinoEventExecVarValue : public MTransfer {
+public:
+    DinoEventExecVarValue(u32 op, DinoEventVar var, s32 value);
+    virtual ~DinoEventExecVarValue();
+    virtual void Transfer();
+
+    u32 mOp;            // 0x10: set, add, subtract, multiply, divide
+    DinoEventVar mVar;  // 0x14
+    s32 mValue;         // 0x1C
+};
+
+class DinoEventExecVarVar : public MTransfer {
+public:
+    DinoEventExecVarVar(u32 op, DinoEventVar var, DinoEventVar source);
+    virtual ~DinoEventExecVarVar();
+    virtual void Transfer();
+
+    u32 mOp;                // 0x10
+    DinoEventVar mVar;      // 0x14
+    DinoEventVar mSource;   // 0x1C
+};
+
+class DinoEventExecMapConnect : public MTask {
+public:
+    DinoEventExecMapConnect(u32 cmd, u32 from, u32 to);
+    virtual ~DinoEventExecMapConnect();
+    virtual void Execute();
+
+    u32 mCmd;   // 0x10
+    u32 mFrom;  // 0x14
+    u32 mTo;    // 0x18
+};
+
+class DinoEventExecMapConnectDirectional : public MTask {
+public:
+    DinoEventExecMapConnectDirectional(u32 cmd, u32 from, u32 to);
+    virtual ~DinoEventExecMapConnectDirectional();
+    virtual void Execute();
+
+    u32 mCmd;   // 0x10
+    u32 mFrom;  // 0x14
+    u32 mTo;    // 0x18
+};
+
+class DinoEventExecMapDisconnect : public MTask {
+public:
+    DinoEventExecMapDisconnect(u32 cmd, u32 from, u32 to);
+    virtual ~DinoEventExecMapDisconnect();
+    virtual void Execute();
+
+    u32 mCmd;   // 0x10
+    u32 mFrom;  // 0x14
+    u32 mTo;    // 0x18
+};
+
+class DinoEventExecMapDisconnectDirectional : public MTask {
+public:
+    DinoEventExecMapDisconnectDirectional(u32 cmd, u32 from, u32 to);
+    virtual ~DinoEventExecMapDisconnectDirectional();
+    virtual void Execute();
+
+    u32 mCmd;   // 0x10
+    u32 mFrom;  // 0x14
+    u32 mTo;    // 0x18
+};
+
+class DinoEventExecFlagSet : public MTask {
+public:
+    DinoEventExecFlagSet(u32 cmd, DinoEventVar var, u8 value);
+    virtual ~DinoEventExecFlagSet();
+    virtual void Execute();
+
+    u32 mCmd;           // 0x10
+    DinoEventVar mVar;  // 0x14
+    u8 mValue;          // 0x1C
+};
+
+class DinoEventExecEventClear : public MTask {
+public:
+    DinoEventExecEventClear(u32 cmd, u32 id, u8 value);
+    virtual ~DinoEventExecEventClear();
+    virtual void Execute();
+
+    u32 mCmd;   // 0x10
+    u32 mId;    // 0x14
+    u8 mValue;  // 0x18
+};
+
+class DinoEventExecSetEpisodeClear : public MTask {
+public:
+    DinoEventExecSetEpisodeClear(u32 cmd, u32 id, u8 value);
+    virtual ~DinoEventExecSetEpisodeClear();
+    virtual void Execute();
+
+    u32 mCmd;   // 0x10
+    u32 mId;    // 0x14
+    u8 mValue;  // 0x18
+};
+
+class DinoEventExecAppendCharaRegion : public MTask {
+public:
+    virtual ~DinoEventExecAppendCharaRegion();
+};
+
+class DinoEventExecAppendCharaChara : public MProcess {
+public:
+    virtual ~DinoEventExecAppendCharaChara();
+};
+
+class DinoEventExecRemoveChara : public MTask {
+public:
+    virtual ~DinoEventExecRemoveChara();
+};
+
+class DinoEventExecCharaAngle : public MProcess {
+public:
+    virtual ~DinoEventExecCharaAngle();
+};
+
+class DinoEventExecCharaAngleToChara : public MProcess {
+public:
+    virtual ~DinoEventExecCharaAngleToChara();
+};
+
+class DinoEventExecCharaAngleOffset : public MProcess {
+public:
+    virtual ~DinoEventExecCharaAngleOffset();
+};
+
+class DinoEventExecCharaAngleOffsetToChara : public MProcess {
+public:
+    virtual ~DinoEventExecCharaAngleOffsetToChara();
+};
+
+class DinoEventExecCharaMoveToChara : public MProcess {
+public:
+    virtual ~DinoEventExecCharaMoveToChara();
+};
+
+class DinoEventExecCharaMoveToRegion : public MProcess {
+public:
+    virtual ~DinoEventExecCharaMoveToRegion();
+};
+
+class DinoEventExecCharaMoveToCoord : public MProcess {
+public:
+    virtual ~DinoEventExecCharaMoveToCoord();
+};
+
+class DinoEventExecCharaMoveOffset : public MProcess {
+public:
+    virtual ~DinoEventExecCharaMoveOffset();
+};
+
+class DinoEventExecCharaMoveVector : public MProcess {
+public:
+    virtual ~DinoEventExecCharaMoveVector();
+};
+
+class DinoEventExecCharaWaitMove : public MProcess {
+public:
+    virtual ~DinoEventExecCharaWaitMove();
+};
+
+class DinoEventExecCharaFocus : public MProcess {
+public:
+    virtual ~DinoEventExecCharaFocus();
+};
+
+class DinoEventExecCleaning : public MProcess {
+public:
+    virtual ~DinoEventExecCleaning();
+};
+
+class DinoEventExecAutoWarp : public MProcess {
+public:
+    virtual ~DinoEventExecAutoWarp();
+};
+
+class DinoEventExecCamera : public MTransfer {
+public:
+    virtual ~DinoEventExecCamera();
+};
+
+class DinoEventExecProhibitCameraRelease : public MTransfer {
+public:
+    DinoEventExecProhibitCameraRelease(u8 *flag);
+    virtual ~DinoEventExecProhibitCameraRelease();
+    virtual void Transfer();
+
+    u8 *mFlag;  // 0x10
+};
+
+class DinoEventExecFinish : public MTransfer {
+public:
+    DinoEventExecFinish(void *event);
+    virtual ~DinoEventExecFinish();
+    virtual void Transfer();
+
+    void *mEvent;   // 0x10
+};
+
+class DinoEventExecStartFellow : public MTransfer {
+public:
+    virtual ~DinoEventExecStartFellow();
+};
+
+class DinoEventExecFinishFellow : public MTransfer {
+public:
+    virtual ~DinoEventExecFinishFellow();
+};
+
+class DinoEventExecStartWander : public MTransfer {
+public:
+    virtual ~DinoEventExecStartWander();
+};
+
+class DinoEventExecStartWatch : public MTransfer {
+public:
+    virtual ~DinoEventExecStartWatch();
+};
+
+class DinoEventExecFinishWatch : public MTransfer {
+public:
+    virtual ~DinoEventExecFinishWatch();
+};
+
+class DinoEventExecStartBehold : public MTransfer {
+public:
+    virtual ~DinoEventExecStartBehold();
+};
+
+class DinoEventExecFinishBehold : public MTransfer {
+public:
+    virtual ~DinoEventExecFinishBehold();
+};
+
+class DinoEventExecChoice : public MProcess {
+public:
+    virtual ~DinoEventExecChoice();
+};
+
+class DinoEventExecChoice2 : public MProcess {
+public:
+    virtual ~DinoEventExecChoice2();
+};
+
+class DinoEventExecYesNo : public MProcess {
+public:
+    virtual ~DinoEventExecYesNo();
+};
+
+class DinoEventExecShopChoice : public MProcess {
+public:
+    virtual ~DinoEventExecShopChoice();
+};
+
+class DinoEventExecShopChoice2 : public MProcess {
+public:
+    virtual ~DinoEventExecShopChoice2();
+};
+
+class DinoEventExecFade : public MProcess {
+public:
+    virtual ~DinoEventExecFade();
+};
+
+class DinoEventExecLicenseGet : public MTransfer {
+public:
+    DinoEventExecLicenseGet(u32 license);
+    virtual ~DinoEventExecLicenseGet();
+    virtual void Transfer();
+
+    u32 mValue; // 0x10
+};
+
+class DinoEventExecHoriderLevel : public MTransfer {
+public:
+    DinoEventExecHoriderLevel(u32 level);
+    virtual ~DinoEventExecHoriderLevel();
+    virtual void Transfer();
+
+    u32 mValue; // 0x10
+};
+
+class DinoEventExecContainerNum : public MTransfer {
+public:
+    DinoEventExecContainerNum(u32 count);
+    virtual ~DinoEventExecContainerNum();
+    virtual void Transfer();
+
+    u32 mValue; // 0x10
+};
+
+class DinoEventExecSystemFlag : public MTransfer {
+public:
+    DinoEventExecSystemFlag(u32 id, u8 value);
+    virtual ~DinoEventExecSystemFlag();
+    virtual void Transfer();
+
+    u32 mId;    // 0x10
+    u8 mValue;  // 0x14
+};
+
+class DinoEventExecReviverSet : public MTransfer {
+public:
+    virtual ~DinoEventExecReviverSet();
+};
+
+class DinoEventExecMedalChange : public MTransfer {
+public:
+    DinoEventExecMedalChange(u32 from, u32 to);
+    virtual ~DinoEventExecMedalChange();
+    virtual void Transfer();
+
+    u32 mFrom;  // 0x10: the creature in the team to swap out
+    u32 mTo;    // 0x14
+};
+
+class DinoEventExecBattlePointSet : public MTransfer {
+public:
+    DinoEventExecBattlePointSet(u32 creature, u32 points);
+    virtual ~DinoEventExecBattlePointSet();
+    virtual void Transfer();
+
+    u32 mCreature;  // 0x10
+    u32 mPoints;    // 0x14
+};
+
+class DinoEventExecShopSet : public MTransfer {
+public:
+    virtual ~DinoEventExecShopSet();
+};
+
+class DinoEventExecKasekiRockGet : public MProcess {
+public:
+    virtual ~DinoEventExecKasekiRockGet();
+};
+
+class DinoEventExecKasekiRockShot : public MProcess {
+public:
+    virtual ~DinoEventExecKasekiRockShot();
+};
+
+class DinoEventExecCharaBodyModelIndex : public MTransfer {
+public:
+    virtual ~DinoEventExecCharaBodyModelIndex();
+};
+
+class DinoEventExecCharaHeadModelIndex : public MTransfer {
+public:
+    virtual ~DinoEventExecCharaHeadModelIndex();
+};
+
+class DinoEventExecCharaMotionSet : public MTransfer {
+public:
+    virtual ~DinoEventExecCharaMotionSet();
+};
+
+class DinoEventExecCharaMotionCache : public MTransfer {
+public:
+    virtual ~DinoEventExecCharaMotionCache();
+};
+
+class DinoEventExecCharaMotionCacheClear : public MTransfer {
+public:
+    virtual ~DinoEventExecCharaMotionCacheClear();
+};
+
+class DinoEventExecManpuShow : public MTransfer {
+public:
+    virtual ~DinoEventExecManpuShow();
+};
+
+class DinoEventExecManpuHide : public MTransfer {
+public:
+    virtual ~DinoEventExecManpuHide();
+};
+
+class DinoEventExecPictShow : public MProcess {
+public:
+    virtual ~DinoEventExecPictShow();
+};
+
+class DinoEventExecPictHide : public MProcess {
+public:
+    virtual ~DinoEventExecPictHide();
+};
+
+class DinoEventExecCmnMotion : public MTransfer {
+public:
+    virtual ~DinoEventExecCmnMotion();
+};
+
+class DinoEventExecChrEffect : public MTransfer {
+public:
+    virtual ~DinoEventExecChrEffect();
+};
+
+class DinoEventExecKeyWait : public MProcess {
+public:
+    virtual ~DinoEventExecKeyWait();
+};
+
+class DinoEventExecBgmPlay : public MTransfer {
+public:
+    virtual ~DinoEventExecBgmPlay();
+};
+
+class DinoEventExecMapBgmPlay : public MProcess {
+public:
+    virtual ~DinoEventExecMapBgmPlay();
+};
+
+class DinoEventExecBgmStop : public MTransfer {
+public:
+    virtual ~DinoEventExecBgmStop();
+};
+
+class DinoEventExecQuake : public MTransfer {
+public:
+    virtual ~DinoEventExecQuake();
+};
+
+class DinoEventExecDance : public MProcess {
+public:
+    virtual ~DinoEventExecDance();
+};
+
+class DinoEventExecMapSelect : public MProcess {
+public:
+    virtual ~DinoEventExecMapSelect();
+};
+
+class DinoEventExecEraseAllExcrement : public MTransfer {
+public:
+    DinoEventExecEraseAllExcrement(u32 cmd);
+    virtual ~DinoEventExecEraseAllExcrement();
+    virtual void Transfer();
+
+    u32 mCmd;   // 0x10
+};
+
+class DinoEventExecEraseExcrement : public MTransfer {
+public:
+    DinoEventExecEraseExcrement(u32 cmd, DinoEventVar count);
+    virtual ~DinoEventExecEraseExcrement();
+    virtual void Transfer();
+
+    u32 mCmd;               // 0x10
+    DinoEventVar mCount;    // 0x14
+};
+
+class DinoEventExecGameOver : public MProcess {
+public:
+    virtual ~DinoEventExecGameOver();
+};
+
+class DinoEventExecExit : public MProcess {
+public:
+    virtual ~DinoEventExecExit();
+};
+
+class DinoEventExecTalk : public MProcess {
+public:
+    virtual ~DinoEventExecTalk();
+};
+
+class DinoEventExecFieldName : public MProcess {
+public:
+    virtual ~DinoEventExecFieldName();
+};
+
+class DinoEventExecLowerPictFadeIn : public MProcess {
+public:
+    virtual ~DinoEventExecLowerPictFadeIn();
+};
+
+class DinoEventExecLowerPictFadeOut : public MProcess {
+public:
+    virtual ~DinoEventExecLowerPictFadeOut();
+};
+
+class DinoEventExecLowerPictSlideIn : public MProcess {
+public:
+    virtual ~DinoEventExecLowerPictSlideIn();
+};
+
+class DinoEventExecLowerPictSlideOut : public MProcess {
+public:
+    virtual ~DinoEventExecLowerPictSlideOut();
+};
+
+class DinoEventExecLowerPictZoomIn : public MProcess {
+public:
+    virtual ~DinoEventExecLowerPictZoomIn();
+};
+
+class DinoEventExecLowerPictZoomOut : public MProcess {
+public:
+    virtual ~DinoEventExecLowerPictZoomOut();
+};
+
+class DinoEventExecUpperPictFadeIn : public MProcess {
+public:
+    virtual ~DinoEventExecUpperPictFadeIn();
+};
+
+class DinoEventExecUpperPictFadeOut : public MProcess {
+public:
+    virtual ~DinoEventExecUpperPictFadeOut();
+};
+
+class DinoEventExecUpperPictSlideIn : public MProcess {
+public:
+    virtual ~DinoEventExecUpperPictSlideIn();
+};
+
+class DinoEventExecUpperPictSlideOut : public MProcess {
+public:
+    virtual ~DinoEventExecUpperPictSlideOut();
+};
+
+class DinoEventExecUpperPictZoomIn : public MProcess {
+public:
+    virtual ~DinoEventExecUpperPictZoomIn();
+};
+
+class DinoEventExecUpperPictZoomOut : public MProcess {
+public:
+    virtual ~DinoEventExecUpperPictZoomOut();
+};
+
+class DinoEventExecRadarMode : public MProcess {
+public:
+    virtual ~DinoEventExecRadarMode();
+};
+
+class DinoEventExecTownMapMode : public MProcess {
+public:
+    virtual ~DinoEventExecTownMapMode();
+};
+
+class DinoEventExecDelAreaNamePanel : public MTask {
+public:
+    virtual ~DinoEventExecDelAreaNamePanel();
+};
+
+class DinoEventExecHeightReset : public MTransfer {
+public:
+    virtual ~DinoEventExecHeightReset();
+};
+
+class DinoEventExecCharaFootSeOff : public MTransfer {
+public:
+    virtual ~DinoEventExecCharaFootSeOff();
+};
+
+class DinoEventExecCharaFootSePreserve : public MTransfer {
+public:
+    virtual ~DinoEventExecCharaFootSePreserve();
+};
+
+class DinoEventExecMoneyShow : public MProcess {
+public:
+    virtual ~DinoEventExecMoneyShow();
+};
+
+class DinoEventExecMoneyHide : public MProcess {
+public:
+    virtual ~DinoEventExecMoneyHide();
+};
+
+class DinoEventExecDonateShow : public MProcess {
+public:
+    virtual ~DinoEventExecDonateShow();
+};
+
+class DinoEventExecDonateHide : public MProcess {
+public:
+    virtual ~DinoEventExecDonateHide();
+};
+
+class DinoEventExecProhibitNisReset : public MTransfer {
+public:
+    DinoEventExecProhibitNisReset();
+    virtual ~DinoEventExecProhibitNisReset();
+    virtual void Transfer();
+};
+
+#endif
