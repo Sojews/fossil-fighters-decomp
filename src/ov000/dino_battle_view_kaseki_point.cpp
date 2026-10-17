@@ -12,6 +12,8 @@
 #include "m/motion.h"
 #include "game/dino_resource.h"
 #include "m/pal.h"
+#include "m/indicator.h"
+#include "game/dino_sound.h"
 #include "game/dino_battle_view2.h"
 
 DinoBattleViewKasekiPoint::~DinoBattleViewKasekiPoint() {
@@ -94,6 +96,44 @@ extern "C" void func_ov000_0217df4c(void *obj, int delta, u32 side);
 void DinoBattleViewKasekiPoint::SetValue(int value) {
     func_ov000_0217df4c(mView->mUnkE0->mUnk140, value - mValue, mUnk98);
     mValue = value;
+}
+
+void DinoBattleViewKasekiPoint::Idle() {
+    if (mValue == mUnk7C) {
+        return;
+    }
+    int wasFull = mUnk7C == mUnk78 ? 1 : 0;
+    for (int i = 0; i < 3; i++) {
+        mUnk7C += mValue > mUnk7C ? 1 : -1;
+        if (mValue == mUnk7C) {
+            break;
+        }
+    }
+    char buf[8];
+    OS_SPrintf(buf, "%3d", mUnk7C);
+    mText->SetText(std::string(buf));
+    LoadPalette(mUnk7C * 31 / mUnk78);
+    if (wasFull != (mUnk7C == mUnk78 ? 1 : 0)) {
+        int side = mUnk98 != 0 ? 1 : 0;
+        int anime = mUnk84->GetAnime();
+        for (int k = 0; k < 12; k++) {
+            if (anime == data_ov000_0218fa14[k][side]) {
+                anime = k;
+                break;
+            }
+        }
+        int full = mUnk7C == mUnk78 ? 1 : 0;
+        int next;
+        if ((1 << anime) & 0x577) {
+            next = full ? 10 : 8;
+        } else {
+            next = full ? 11 : 9;
+        }
+        mUnk84->Play(data_ov000_0218fa14[next][side], 0);
+        if (full) {
+            DinoSoundPlaySe(0x564, 0);
+        }
+    }
 }
 
 void DinoBattleViewKasekiPoint::LoadPalette(int index) {

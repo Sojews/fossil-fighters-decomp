@@ -4,6 +4,7 @@
 #include "m/task.h"
 
 class MMotion;
+class MIndicator;
 class MPalBlock;
 class DinoBattleView;
 
@@ -32,7 +33,7 @@ public:
     int mValue;                 // 0x74
     int mUnk78;                 // 0x78
     int mUnk7C;                 // 0x7C
-    MMotion *mUnk80;            // 0x80
+    MIndicator *mText;          // 0x80
     MMotion *mUnk84;            // 0x84
     void *mUnk88;               // 0x88
     MPalBlock *mPalBlock;       // 0x8C
