@@ -62,6 +62,12 @@ class DinoUiMuseumSlotCreateTask : public MProcess {
 public:
     virtual ~DinoUiMuseumSlotCreateTask();
     virtual void Idle();
+
+    struct Menu {
+        u8 unk00[0x15C];
+        u32 mSlotCount; // 0x15C
+    } *mMenu;           // 0x74
+    u32 mIndex;         // 0x78
 };
 
 class DinoUiMuseumInformationMenu;

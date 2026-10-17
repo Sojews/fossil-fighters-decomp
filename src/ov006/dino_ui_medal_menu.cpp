@@ -117,3 +117,18 @@ void DinoUiMedalMenu::OnIdle() {
 MRect DinoUiSortMenuItem::GetRect() {
     return MRect(mPos.Offset(0, -2), mPos.Offset(0x28, 0x10));
 }
+
+extern "C" const int data_02089a0c;
+extern "C" void func_ov006_02182f1c(DinoUiMedalMenu *menu, u32 index);
+
+void DinoUiMedalSlotCreateTask::Idle() {
+    if (mIndex <= 14) {
+        func_ov006_02182f1c(mMenu, mIndex);
+        if (mIndex < mMenu->mSlotCount - 1) {
+            mSerial.AddTail(new MTimer(data_02089a0c));
+        }
+    } else {
+        Exit();
+    }
+    mIndex++;
+}

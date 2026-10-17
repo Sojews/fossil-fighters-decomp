@@ -143,3 +143,18 @@ void DinoUiOrganizationPageRButton::OnDecide() {
     serial->AddTail(play);
     DinoSoundPlaySe(0x93, 0);
 }
+
+extern "C" const int data_02089a0c;
+extern "C" void func_ov007_0217cb90(DinoUiOrganizationMenu *menu, u32 index);
+
+void DinoUiOrganizationSlotCreateTask::Idle() {
+    if (mIndex < 15) {
+        func_ov007_0217cb90(mMenu, mIndex);
+        if (mIndex < mMenu->mSlotCount - 1) {
+            mSerial.AddTail(new MTimer(data_02089a0c));
+        }
+    } else {
+        Exit();
+    }
+    mIndex++;
+}

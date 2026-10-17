@@ -18,7 +18,9 @@ public:
     virtual void OnFocus(MMenuItem *item);
     virtual void OnDecide(MMenuItem *item);
 
-    u32 mUnkB4[62];                     // 0xB4
+    u32 mUnkB4[55];                     // 0xB4
+    u32 mSlotCount;                     // 0x190
+    u32 mUnk194[6];                     // 0x194
     std::vector<void *> mUnk1AC;        // 0x1AC
     std::vector<void *> mUnk1B8;        // 0x1B8
     std::vector<void *> mUnk1C4;        // 0x1C4
@@ -78,6 +80,9 @@ class DinoUiOrganizationSlotCreateTask : public MProcess {
 public:
     virtual ~DinoUiOrganizationSlotCreateTask();
     virtual void Idle();
+
+    DinoUiOrganizationMenu *mMenu;  // 0x74
+    u32 mIndex;                     // 0x78
 };
 
 class DinoUiOrganizationMenuBlendResetTask : public MTask {

@@ -19,7 +19,9 @@ public:
     void PageRight();
     void PageLeft();
 
-    u32 mUnkB4[58];                     // 0xB4
+    u32 mUnkB4[50];                     // 0xB4
+    u32 mSlotCount;                     // 0x17C
+    u32 mUnk180[7];                     // 0x180
     std::vector<void *> mUnk19C;        // 0x19C
     std::vector<void *> mUnk1A8;        // 0x1A8
     std::vector<void *> mUnk1B4;        // 0x1B4
@@ -94,6 +96,9 @@ class DinoUiMedalSlotCreateTask : public MProcess {
 public:
     virtual ~DinoUiMedalSlotCreateTask();
     virtual void Idle();
+
+    DinoUiMedalMenu *mMenu; // 0x74
+    u32 mIndex;             // 0x78
 };
 
 #endif
