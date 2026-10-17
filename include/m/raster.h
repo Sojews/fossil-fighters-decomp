@@ -52,6 +52,8 @@ class MRasterPal : public MRasterIO {
 public:
     MRasterPal(u32 dma, MDisplay *display);
     virtual ~MRasterPal() {}
+
+    u32 mUnk3C;     // 0x3C
 };
 
 // A horizontal span of a line covered by a window, in the order of the window registers' bytes. All zero is none.
