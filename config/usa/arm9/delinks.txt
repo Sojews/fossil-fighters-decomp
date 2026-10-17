@@ -551,6 +551,15 @@ libs/nitrosdk/src/std/std_sprintf.c:
     complete
     .text       start:0x02073810 end:0x02073f90
 
+libs/nitrosdk/src/os/os_context.c:
+    complete
+    .text       start:0x020745b8 end:0x020746b4
+
+libs/nitrosdk/src/os/os_emulator.c:
+    complete
+    .text       start:0x020746b4 end:0x020746c8
+    .data       start:0x020c564c end:0x020c5650
+
 libs/nitrosdk/src/rtc/rtc_api.c:
     complete
     .text       start:0x0207a244 end:0x0207a6e8

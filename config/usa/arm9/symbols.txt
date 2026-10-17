@@ -12764,7 +12764,7 @@ _ZTV17MBackupPageDevice kind:data(any) addr:0x020c5604
 sIsDispOn kind:data(any) addr:0x020c5634
 GXi_DmaId kind:data(any) addr:0x020c5638
 OSi_IrqCallbackInfoIndex kind:data(any) addr:0x020c563c
-data_020c564c kind:data(any) addr:0x020c564c
+OSi_ConsoleTypeCache kind:data(any) addr:0x020c564c
 data_020c5650 kind:data(any) addr:0x020c5650
 fsi_rom_name kind:data(any) addr:0x020c5654
 fsi_digest_key_ptr kind:data(any) addr:0x020c5658

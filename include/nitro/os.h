@@ -60,7 +60,8 @@ typedef struct OSContext {
     u32 sp;
     u32 lr;
     u32 pc_plus4;
-    u8 cp_context[0x20];        // The divider/square root unit's state
+    u32 sp_svc;                 // 0x44
+    u8 cp_context[0x1c];        // 0x48: the divider/square root unit's state
 } OSContext;
 
 typedef void (*OSThreadDestructor)(void *arg);
