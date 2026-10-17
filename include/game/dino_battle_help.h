@@ -13,7 +13,12 @@
 
 class DinoBattleHelpBase : public MProcess, public DinoHelpItem {
 public:
+    // The game's destructor is inline; its vtable's owner (dino_battle_help.cpp) emits it out of line.
+#ifdef DINO_BATTLE_HELP_BASE_OWNER
     virtual ~DinoBattleHelpBase();
+#else
+    virtual ~DinoBattleHelpBase() {}
+#endif
     virtual void Idle();
     virtual MRect GetRect();
     virtual MDisplay *GetDisplay();
