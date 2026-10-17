@@ -45,6 +45,11 @@ public:
     virtual void OnFocus(MMenuItem *item);
     virtual void OnDecide(MMenuItem *item);
     virtual void OnMessage(MMessage *msg);
+
+    u32 mUnkE8[3];              // 0xE8
+    u8 mSilentFocus;            // 0xF4
+    u8 unkF5[0x37];
+    DinoHelpItem *mParentHelp;  // 0x12C: help shown for every parent item
 };
 
 class DinoUiChildScannerBattleConnect : public MProcess, public MMessageObserver, public DinoHelpBase {
