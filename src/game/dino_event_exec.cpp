@@ -7,6 +7,7 @@
 #include "game/dino_sound.h"
 #include "m/picture.h"
 #include "m/seed_generator.h"
+#include "m/text_codec.h"
 #include "m/lcd.h"
 #include "m/bright.h"
 #include <algorithm>
@@ -844,6 +845,36 @@ void DinoEventExecTalk::Idle() {
         mSerial.AddTail(MTaskExitTransfer::Create(this));
         break;
     }
+    }
+}
+
+DinoEventExecYesNo::DinoEventExecYesNo(DinoEvent *event, u32 flag, u32 text) : MProcess(NULL) {
+    mEvent = event;
+    mFlag = flag;
+    mText = text;
+    mStep = 0;
+}
+
+void DinoEventExecYesNo::Idle() {
+    switch (mStep++) {
+    case 0:
+        break;
+    case 1: {
+        MDisplayScope scope(gLcd->GetBottomDisplay());
+        mResult = gDinoBackup->GetFlag(mFlag);
+        std::vector<std::string> lines = MSplitString(mEvent->GetTalkText(mText), '\n');
+        DinoCommonWindowYesNoDialog *dialog = new DinoCommonWindowYesNoDialog(
+            gLcd->GetBottomDisplay(), lines.size() == 0 ? std::string("") : lines[0], &mResult);
+        if (lines.size() >= 3) {
+            dialog->SetLabels(lines[1], lines[2]);
+        }
+        mSerial.AddTail(dialog);
+        break;
+    }
+    case 2:
+        gDinoBackup->SetFlag(mFlag, mResult ? TRUE : FALSE);
+        Exit();
+        break;
     }
 }
 

@@ -397,9 +397,27 @@ public:
     virtual ~DinoEventExecChoice2();
 };
 
+// A yes/no question window.
+class DinoCommonWindowYesNoDialog : public MProcess {
+public:
+    DinoCommonWindowYesNoDialog(MDisplay *display, std::string text, BOOL *result);
+    virtual void Idle();
+    void SetLabels(std::string yes, std::string no);
+
+    u8 unk74[0x4C];
+};
+
 class DinoEventExecYesNo : public MProcess {
 public:
+    DinoEventExecYesNo(DinoEvent *event, u32 flag, u32 text);
     virtual ~DinoEventExecYesNo();
+    virtual void Idle();
+
+    DinoEvent *mEvent;  // 0x74
+    u32 mFlag;          // 0x78: gets the answer
+    u32 mText;          // 0x7C: question, then optionally the two answers, one per line
+    u32 mStep;          // 0x80
+    BOOL mResult;       // 0x84
 };
 
 class DinoEventExecShopChoice : public MProcess {
