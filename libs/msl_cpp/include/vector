@@ -229,6 +229,17 @@ namespace std {
         }
         // Copies [first, last) into an empty vector (out of line; the copy constructor's work).
         void init_copy(const T *first, const T *last, Metrowerks::int2type<true>);
+        // Empties the vector and gets room for max elements (out of line).
+        void reallocate_clear(size_t n, size_t max);
+        void construct_range_at_end(const T *first, const T *last) {
+            UnkMSLStruct1 unk = UnkMSLStruct1();
+            for (pointer p = data_ + size_; first != last; first++, p++, size_++) {
+                alloc().construct(p, *first);
+            }
+        }
+        // Replaces the contents with [first, last) (operator='s work; a member template, so it is emitted after
+        // its first use).
+        template <class It> void assign(It first, It last, Metrowerks::int2type<true>);
 
         size_t max_size() const {
             return typename remove_reference<Allocator>::type().max_size();
@@ -375,6 +386,38 @@ namespace std {
         std::swap(cap(), tmp.cap());
         std::swap(data_, tmp.data_);
         std::swap(size_, tmp.size_);
+    }
+
+    template <typename T, typename Allocator>
+    template <class It>
+    void __vec_deleter<T, Allocator>::assign(It first, It last, Metrowerks::int2type<true>) {
+        size_t n = last - first;
+        if (n > cap()) {
+            size_t max = grow_by(n - cap());
+            reallocate_clear(n, max);
+            construct_range_at_end(first, last);
+        } else {
+            const T *mid = first + std::min(n, size_);
+            T *d = data_;
+            for (; first < mid; first++, d++) {
+                *d = *first;
+            }
+            if (n < size_) {
+                erase_at_end(size_ - n);
+            } else if (size_ < n) {
+                construct_range_at_end(mid, last);
+            }
+        }
+    }
+
+    template <typename T, typename Allocator> void __vec_deleter<T, Allocator>::reallocate_clear(size_t n, size_t max) {
+        erase_at_end(size_);
+        if (data_ != nullptr) {
+            typename remove_reference<Allocator>::type().deallocate(data_, cap());
+            data_ = nullptr;
+            cap() = 0;
+        }
+        allocate(n, max);
     }
 
     template <typename T, typename Allocator>
@@ -673,6 +716,12 @@ namespace std {
             this->init();
             Metrowerks::int2type<true> t;
             this->init_copy(x.data_, x.data_ + x.size_, t);
+        }
+        vector &operator=(const vector &x) {
+            if (this != &x) {
+                this->assign(x.data_, x.data_ + x.size_, Metrowerks::int2type<true>());
+            }
+            return *this;
         }
         ~vector() {}
 
