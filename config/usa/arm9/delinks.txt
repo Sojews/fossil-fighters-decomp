@@ -440,6 +440,11 @@ libs/msl/src/buffer_io.c:
     complete
     .text       start:0x0207d53c end:0x0207d5a8
 
+libs/msl/src/direct_io.c:
+    complete
+    .text       start:0x0207d5a8 end:0x0207d758
+    .exceptix   start:0x020884e0 end:0x020884ec
+
 libs/msl/src/rand.c:
     .text       start:0x0207f194 end:0x0207f1bc
 

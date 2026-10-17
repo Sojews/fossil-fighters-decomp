@@ -38,6 +38,7 @@ LIB_CC_FLAGS: dict[str, str] = {
     "libs/msl/src/printf.c": " -lang c99",
     # The MSL and runtime functions that call others have exception table entries.
     "libs/msl/src/console_io.c": " -Cpp_exceptions on",
+    "libs/msl/src/direct_io.c": " -Cpp_exceptions on",
     "libs/runtime/": " -Cpp_exceptions on",
     # NitroSystem and the NitroSDK were built with interprocedural analysis per file, which (among other
     # things) pools a file's static data behind one base address.
