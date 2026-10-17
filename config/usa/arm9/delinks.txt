@@ -434,6 +434,13 @@ libs/nitrosystem/src/snd/stream.c:
     .text       start:0x0206e7ac end:0x0206eb64
     .bss        start:0x021502a4 end:0x02150374
 
+libs/nitrosystem/src/snd/capture.c:
+    .text       start:0x0206eb64 end:0x0206ed04
+    .bss        start:0x02150374 end:0x02150970
+
+libs/nitrosystem/src/snd/sndarc.c:
+    .text       start:0x0206ed04 end:0x0206f240
+
 libs/nitrosystem/src/snd/snd_heap.c:
     complete
     .text       start:0x0206f240 end:0x0206f4a4

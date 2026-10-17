@@ -20156,7 +20156,7 @@ from:0x0206eba0 kind:thumb_call to:0x0206ebcc module:main
 from:0x0206eba8 kind:thumb_call to:0x02070ecc module:main
 from:0x0206ebba kind:thumb_call to:0x02076170 module:main
 from:0x0206ebc4 kind:load to:0x02150374 module:main
-from:0x0206ebc8 kind:load to:0x021503bc module:main
+from:0x0206ebc8 kind:load to:0x02150374 add:0x48 module:main
 from:0x0206ebf8 kind:thumb_call to:0x020760bc module:main
 from:0x0206ec00 kind:thumb_call to:0x020765f0 module:main
 from:0x0206ec08 kind:thumb_call to:0x02076498 module:main
@@ -20167,21 +20167,21 @@ from:0x0206ec34 kind:thumb_call to:0x0206df24 module:main
 from:0x0206ec3e kind:thumb_call to:0x0206df7c module:main
 from:0x0206ec50 kind:thumb_call to:0x0207621c module:main
 from:0x0206ec5c kind:load to:0x02150374 module:main
-from:0x0206ec60 kind:load to:0x021503bc module:main
-from:0x0206ec64 kind:load to:0x0215037c module:main
+from:0x0206ec60 kind:load to:0x02150374 add:0x48 module:main
+from:0x0206ec64 kind:load to:0x02150374 add:0x8 module:main
 from:0x0206ec8a kind:thumb_call to:0x020760bc module:main
 from:0x0206ec8e kind:thumb_call to:0x020765f0 module:main
 from:0x0206ec96 kind:thumb_call to:0x02076498 module:main
 from:0x0206ec9c kind:thumb_call to:0x020765ac module:main
 from:0x0206eca4 kind:load to:0x02150374 module:main
-from:0x0206eca8 kind:load to:0x021503bc module:main
+from:0x0206eca8 kind:load to:0x02150374 add:0x48 module:main
 from:0x0206ecc0 kind:thumb_call_arm to:0x02075840 module:main
 from:0x0206ecca kind:thumb_call_arm to:0x02075840 module:main
 from:0x0206ecd2 kind:thumb_call_arm to:0x020749ec module:main
 from:0x0206ecda kind:thumb_call_arm to:0x020749ec module:main
 from:0x0206ecf4 kind:thumb_call to:0x020760a0 module:main
 from:0x0206ecfc kind:load to:0x02150374 module:main
-from:0x0206ed00 kind:load to:0x021503bc module:main
+from:0x0206ed00 kind:load to:0x02150374 add:0x48 module:main
 from:0x0206ed24 kind:thumb_call to:0x02077d64 module:main
 from:0x0206ed34 kind:thumb_call to:0x02077c30 module:main
 from:0x0206ed42 kind:thumb_call to:0x02077dbc module:main

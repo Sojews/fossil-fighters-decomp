@@ -25,6 +25,22 @@ typedef struct OSMutexLink {
     OSMutex *prev;
 } OSMutexLink;
 
+typedef void *OSMessage;
+
+#define OS_MESSAGE_NOBLOCK 0
+#define OS_MESSAGE_BLOCK 1
+
+typedef struct OSMessageQueue {
+    OSThreadQueue queueSend;
+    OSThreadQueue queueReceive;
+    OSMessage *msgArray;
+    s32 msgCount;
+    s32 firstIndex;
+    s32 usedCount;
+} OSMessageQueue;
+
+BOOL OS_ReceiveMessage(OSMessageQueue *mq, OSMessage *msg, s32 flags);
+
 struct OSMutex {
     OSThreadQueue queue;
     OSThread *thread;   // owner

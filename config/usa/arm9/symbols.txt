@@ -13032,10 +13032,8 @@ sInitialized kind:bss addr:0x021502a4 local
 sStrmList kind:bss addr:0x021502a8
 sBufferAddrs kind:bss addr:0x021502b4
 sChannelInfo kind:bss addr:0x021502f4
-data_02150374 kind:bss addr:0x02150374
-data_0215037c kind:bss addr:0x0215037c
-data_021503bc kind:bss addr:0x021503bc
-data_02150970 kind:bss addr:0x02150970
+sCapture kind:bss(size=0x5fc) addr:0x02150374
+sCurrent kind:bss addr:0x02150970
 data_02150974 kind:bss addr:0x02150974
 data_021509b0 kind:bss addr:0x021509b0
 data_021509bc kind:bss addr:0x021509bc

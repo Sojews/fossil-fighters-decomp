@@ -46,6 +46,7 @@ void SND_SetupAlarm(int alarmNo, u32 tick, u32 period, SNDAlarmHandler handler, 
 int SND_CalcChannelVolume(int dB);
 void SND_SetChannelVolume(u32 chBitMask, int volume, int shift);
 void SND_SetChannelPan(u32 chBitMask, int pan);
+void SND_SetOutputSelector(int leftOutput, int rightOutput, int channel1Output, int channel3Output);
 void SND_LockChannel(u32 chBitMask, u32 flags);
 void SND_UnlockChannel(u32 chBitMask, u32 flags);
 
