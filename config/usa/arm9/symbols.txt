@@ -13066,10 +13066,10 @@ data_02151b44 kind:bss addr:0x02151b44
 data_02151b4c kind:bss addr:0x02151b4c
 data_02151b54 kind:bss addr:0x02151b54
 data_02151b58 kind:bss addr:0x02151b58
-data_02151bd8 kind:bss addr:0x02151bd8
-data_02151bdc kind:bss addr:0x02151bdc
-data_02151be4 kind:bss addr:0x02151be4
-data_02151bec kind:bss addr:0x02151bec
+OSi_TimerReserved kind:bss addr:0x02151bd8
+OSi_UseTick kind:bss addr:0x02151bdc
+OSi_TickCounter kind:bss addr:0x02151be4
+OSi_UseVAlarm kind:bss addr:0x02151bec
 data_02151c00 kind:bss addr:0x02151c00
 data_02151c04 kind:bss addr:0x02151c04
 data_02151c08 kind:bss addr:0x02151c08

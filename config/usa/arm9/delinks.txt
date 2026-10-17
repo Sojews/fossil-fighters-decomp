@@ -517,3 +517,26 @@ libs/nitrosdk/src/os/os_init.c:
 
 libs/nitrosdk/src/os/os_arena.c:
     .text       start:0x02074aa8 end:0x02074ce0
+
+libs/nitrosdk/src/os/os_timer.c:
+    complete
+    .text       start:0x02074ef0 end:0x02074f04
+    .bss        start:0x02151bd8 end:0x02151bdc
+
+libs/nitrosdk/src/os/os_tick.c:
+    complete
+    .text       start:0x02074f04 end:0x02074f9c
+    .bss        start:0x02151bdc end:0x02151bec
+
+libs/nitrosdk/src/os/os_valarm.c:
+    complete
+    .text       start:0x02074f9c end:0x02074fc4
+    .bss        start:0x02151bec end:0x02151c00
+
+libs/nitrosdk/src/os/os_ownerinfo.c:
+    complete
+    .text       start:0x02075198 end:0x02075204
+
+libs/nitrosdk/src/os/os_terminate_proc.c:
+    complete
+    .text       start:0x020753ac end:0x020753c4
