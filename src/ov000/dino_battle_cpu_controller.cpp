@@ -1,9 +1,11 @@
-// Ov00002156380.
-// Only the destructors are decompiled so far.
+// DinoBattleCpuController.
 
 #include "game/set_live_event_check_task.h"
 #include "game/dino_battle_controller.h"
 #include "types.h"
+#include "game/dino_battle_cpu_controller.h"
+
+#pragma auto_inline off
 
 BOOL DinoBattleController::Unk10() {
     return FALSE;
@@ -25,3 +27,15 @@ void SetLiveEventCheckTask::Execute() {
     }
     Exit();
 }
+
+#pragma auto_inline on
+
+DinoBattleCpuController::~DinoBattleCpuController() {
+}
+
+SetLiveEventCheckTask::~SetLiveEventCheckTask() {
+}
+
+#pragma auto_inline off
+
+
