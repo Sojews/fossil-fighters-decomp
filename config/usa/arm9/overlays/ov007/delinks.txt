@@ -6,4 +6,4 @@
     .bss        start:0x02192640 end:0x02192680 kind:bss align:32
 
 src/ov007/dino_ui_atm.cpp:
-    .text       start:0x02172fc0 end:0x02174ad8
+    .text       start:0x02171d10 end:0x02174ad8

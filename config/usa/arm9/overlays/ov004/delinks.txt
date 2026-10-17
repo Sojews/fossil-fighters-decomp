@@ -6,7 +6,7 @@
     .bss        start:0x02177280 end:0x021772e0 kind:bss align:32
 
 src/ov004/dino_ui_top_menu_loop.cpp:
-    .text       start:0x02156cf8 end:0x02158274
+    .text       start:0x02155a28 end:0x02158274
 
 src/ov004/dino_ui_save_slot_select.cpp:
     .text       start:0x0215b62c end:0x0215cc98
@@ -27,16 +27,16 @@ src/ov004/dino_ui_wireless_cancel_item.cpp:
     .text       start:0x02163404 end:0x02168b20
 
 src/ov004/dino_ui_save_option.cpp:
-    .text       start:0x02169560 end:0x021698c8
+    .text       start:0x02168b50 end:0x021698c8
 
 src/ov004/disp_blower.cpp:
-    .text       start:0x0216b718 end:0x0216c954
+    .text       start:0x0216a3e8 end:0x0216c954
 
 src/ov004/dino_ui_island_map.cpp:
-    .text       start:0x0216e3e4 end:0x0216e65c
+    .text       start:0x0216cb54 end:0x0216e65c
 
 src/ov004/dino_ui2_parts_rock_name.cpp:
-    .text       start:0x0216f2f8 end:0x0216f3fc
+    .text       start:0x0216f2d4 end:0x0216f3fc
 
 src/ov004/dino_ui_top_menu_item.cpp:
     .text       start:0x02158274 end:0x02159510
@@ -48,5 +48,5 @@ src/ov004/dino_ui_save_menu.cpp:
     .text       start:0x0216a088 end:0x0216a104
 
 src/ov004/dino_ui2_container_base_menu_item.cpp:
-    .text       start:0x021705f8 end:0x02171074
+    .text       start:0x0216f48c end:0x02171074
 

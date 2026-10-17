@@ -15,7 +15,7 @@ src/ov001/dino_field_raster.cpp:
     .text       start:0x0215c29c end:0x0215c2d0
 
 src/ov001/dino_field_chara_angle_anime.cpp:
-    .text       start:0x021633e4 end:0x021634a8
+    .text       start:0x02160100 end:0x021634a8
 
 src/ov001/dino_field_town_map.cpp:
     .text       start:0x02166980 end:0x0216845c
