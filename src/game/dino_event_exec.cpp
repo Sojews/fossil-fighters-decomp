@@ -3,6 +3,10 @@
 #include "game/dino_event_exec.h"
 #include "nitro/mi.h"
 #include "m/overlay.h"
+#include "game/dino_sound.h"
+#include "m/picture.h"
+#include "m/lcd.h"
+#include "m/bright.h"
 #include <algorithm>
 
 #define PAD_BUTTON_A 0x0001
@@ -576,6 +580,81 @@ void DinoEventExecMapSelect::Idle() {
     case 4:
         Exit();
         break;
+    }
+}
+
+DinoEventExecGameOver::DinoEventExecGameOver(DinoEvent *event) : MProcess(NULL) {
+    mEvent = event;
+    mStep = 0;
+}
+
+void DinoEventExecGameOver::Idle() {
+    switch (mStep++) {
+    case 0: {
+        MTask *main;
+        MTask *sub;
+        sub = gLcd->mSub->mBright->CreateFadeOutToBlack(60, 0);
+        main = gLcd->mMain->mBright->CreateFadeOutToBlack(60, 0);
+        MParallelTaskSet *set = new MParallelTaskSet(TRUE);
+        set->AddTail(main);
+        set->AddTail(sub);
+        mSerial.AddTail(set);
+        break;
+    }
+    case 1: {
+        mEvent->CloseField(FALSE);
+        mEvent->SetResult(0);
+        MTextPicture *picture = new MTextPicture(gLcd->GetBottomDisplay(), "/image/gameover", TRUE, false);
+        picture->Show();
+        mParallel.AddTail(picture);
+        MTask *fadeOut;
+        MTask *exit;
+        MTask *wait = new MTimer(1);
+        exit = MTaskExitTransfer::Create(mEvent);
+        fadeOut = gLcd->GetBottomDisplay()->mBright->CreateFadeOutToBlack(60, 0);
+        MTask *hold = new MTimer(120);
+        MTask *fadeIn = gLcd->GetBottomDisplay()->mBright->CreateFadeInFromBlack(120, 0);
+        MTask *bgm = DinoSoundCreatePlayBgmTask(0x39f, 0);
+        MSerialTaskSet *serial = &mSerial;
+        serial->AddTail(bgm);
+        serial->AddTail(fadeIn);
+        serial->AddTail(hold);
+        serial->AddTail(fadeOut);
+        serial->AddTail(exit);
+        serial->AddTail(wait);
+        break;
+    }
+    }
+}
+
+DinoEventExecExit::DinoEventExecExit(DinoEvent *event) : MProcess(NULL) {
+    mEvent = event;
+    mStep = 0;
+}
+
+void DinoEventExecExit::Idle() {
+    switch (mStep++) {
+    case 0: {
+        MTask *main;
+        MTask *sub;
+        sub = gLcd->mSub->mBright->CreateFadeOutToWhite(60, 0);
+        main = gLcd->mMain->mBright->CreateFadeOutToWhite(60, 0);
+        MParallelTaskSet *set = new MParallelTaskSet(TRUE);
+        set->AddTail(main);
+        set->AddTail(sub);
+        mSerial.AddTail(set);
+        break;
+    }
+    case 1: {
+        mEvent->CloseField(FALSE);
+        mEvent->SetResult(0);
+        MTask *wait = new MTimer(1);
+        MTask *exit = MTaskExitTransfer::Create(mEvent);
+        MSerialTaskSet *serial = &mSerial;
+        serial->AddTail(exit);
+        serial->AddTail(wait);
+        break;
+    }
     }
 }
 

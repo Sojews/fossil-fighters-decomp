@@ -95,7 +95,7 @@ public:
 // Runs every task each frame.
 class MParallelTaskSet : public MTaskSet {
 public:
-    MParallelTaskSet() { mExitWhenEmpty = FALSE; }
+    MParallelTaskSet(BOOL exitWhenEmpty = FALSE) { mExitWhenEmpty = exitWhenEmpty; }
     virtual void Execute();
 };
 

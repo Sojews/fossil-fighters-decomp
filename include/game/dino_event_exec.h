@@ -671,12 +671,22 @@ public:
 
 class DinoEventExecGameOver : public MProcess {
 public:
+    DinoEventExecGameOver(DinoEvent *event);
     virtual ~DinoEventExecGameOver();
+    virtual void Idle();
+
+    DinoEvent *mEvent;  // 0x74
+    u32 mStep;          // 0x78
 };
 
 class DinoEventExecExit : public MProcess {
 public:
+    DinoEventExecExit(DinoEvent *event);
     virtual ~DinoEventExecExit();
+    virtual void Idle();
+
+    DinoEvent *mEvent;  // 0x74
+    u32 mStep;          // 0x78
 };
 
 class DinoEventExecTalk : public MProcess {

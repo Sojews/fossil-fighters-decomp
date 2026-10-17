@@ -98,8 +98,9 @@ public:
     u8 unk10[0x6C];
 };
 
-class DinoEvent {
+class DinoEvent : public MProcess {
 public:
+    void SetResult(u32 result);
     void CloseField(BOOL arg);
     void OpenField(BOOL arg);
     void MarkCameraUsed();
