@@ -4,6 +4,7 @@
 // Derived destructors have their bases' destructor bodies inlined; auto-inlining the ones defined above does that.
 #pragma auto_inline on
 
+#include "m/obj.h"
 #include "game/dino_ui_mask_equip_menu.h"
 #include "game/dino_ui_mask_equip.h"
 #include "game/dino_ui_mask_equip_test.h"
@@ -196,4 +197,19 @@ void DinoUiMaskEquipMenu::Decide(int index) {
 
 void DinoUiMaskEquipMenu::OnIdle() {
     mUnk104 = TRUE;
+}
+
+void DinoUiMaskEquip::Idle() {
+    gLcd->mMain->ResetHooks();
+    gLcd->mMain->Setup(5, 3, 4, 1, 0, 0);
+    gLcd->mMain->SetBackdrop(0x8000);
+    gLcd->mMain->mObj->Show();
+    gLcd->SetBottomDisplay(gLcd->mMain);
+    gCurrentDisplay = gLcd->GetBottomDisplay();
+    gLcd->VSyncNow();
+    MTask *exit = MTaskExitTransfer::Create(this);
+    MTask *menu = new DinoUiMaskEquipMenu();
+    MSerialTaskSet *serial = &mSerial;
+    serial->AddTail(menu);
+    serial->AddTail(exit);
 }

@@ -8,6 +8,7 @@
 
 class DinoUiSaveOptionMenu : public DinoHelpBase, public MMenu {
 public:
+    DinoUiSaveOptionMenu(u32 arg);
     virtual ~DinoUiSaveOptionMenu();
     virtual void OnStart();
     virtual void OnFocus(MMenuItem *item);

@@ -11,6 +11,7 @@
 
 class DinoUiMaskEquipMenu : public DinoHelpBase, public MMenu {
 public:
+    DinoUiMaskEquipMenu();
     virtual ~DinoUiMaskEquipMenu();
     virtual void OnStart();
     virtual void OnIdle();

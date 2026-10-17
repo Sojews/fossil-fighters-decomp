@@ -4,6 +4,9 @@
 // Derived destructors have their bases' destructor bodies inlined; auto-inlining the ones defined above does that.
 #pragma auto_inline on
 
+#include "m/obj.h"
+#include "m/display.h"
+#include "m/lcd.h"
 #include "game/disp_blower_menu.h"
 #include "game/dino_ui_save_option_menu.h"
 #include "game/dino_ui_save_option.h"
@@ -148,4 +151,17 @@ void DinoUiSaveOptionMenu::OnOptionDecided() {
     serial->AddTail(remove);
     serial->AddTail(option);
     serial->AddTail(append);
+}
+
+void DinoUiSaveOption::Idle() {
+    gLcd->mMain->ResetHooks();
+    gLcd->mMain->Setup(5, 3, 4, 1, 0, 0);
+    gLcd->VSyncNow();
+    gLcd->mMain->SetBackdrop(0x8000);
+    gLcd->mMain->mObj->Show();
+    MTask *exit = MTaskExitTransfer::Create(this);
+    MTask *menu = new DinoUiSaveOptionMenu(mUnk74);
+    MSerialTaskSet *serial = &mSerial;
+    serial->AddTail(menu);
+    serial->AddTail(exit);
 }

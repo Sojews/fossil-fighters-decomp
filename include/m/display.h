@@ -110,6 +110,8 @@ public:
     void ShowWindow(int window);
     void HideWindow(int window);
     void SetBackdrop(u16 color);
+    void ResetHooks();
+    void Setup(int a, int b, int c, int d, int e, int f);
     volatile u16 *GetBackdropReg();
     void SetBg0Is3D(BOOL on);
     // Sets the BG mode, moving the layers listed from one BG number to another.
