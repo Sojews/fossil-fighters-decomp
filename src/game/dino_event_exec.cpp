@@ -6,6 +6,7 @@
 #include "game/dino_resource.h"
 #include "game/dino_sound.h"
 #include "m/picture.h"
+#include "m/seed_generator.h"
 #include "m/lcd.h"
 #include "m/bright.h"
 #include <algorithm>
@@ -656,6 +657,41 @@ void DinoEventExecExit::Idle() {
         serial->AddTail(wait);
         break;
     }
+    }
+}
+
+DinoEventExecShopSet::DinoEventExecShopSet(u32 shop) {
+    mShop = shop;
+}
+
+// Stocks the shop: its fixed entries, then random picks until it is full.
+void DinoEventExecShopSet::Transfer() {
+    MResource<DinoShopData> shop = gDinoResource->LoadShop(mShop);
+    gDinoBackup->SetUnk144(mShop);
+    gDinoBackup->ClearUnk148();
+    for (u32 i = 0; i < shop.Get()->fixedCount; i++) {
+        const DinoShopData *data = shop.Get();
+        gDinoBackup->AddUnk148((const DinoEntrySource *) ((const u8 *) data + data->fixedOffset) + i);
+    }
+    while (!gDinoBackup->IsUnk148Full()) {
+        MRandomRef random(gDinoResource->GetRandom());
+        const DinoEntrySource *chosen;
+        for (u32 i = 0; i < shop.Get()->randomCount; i++) {
+            const DinoShopData *data = shop.Get();
+            const DinoEntrySource *source = (const DinoEntrySource *) ((const u8 *) data + data->randomOffset) + i;
+            BOOL unsold = TRUE;
+            for (int j = 0; j < 8; j++) {
+                DinoBackupEntry entry;
+                gDinoBackup->GetUnk148(j, &entry);
+                if (entry.id != 0 && entry.id == source->id) {
+                    unsold = FALSE;
+                }
+            }
+            if (unsold && random.Roll()) {
+                chosen = source;
+            }
+        }
+        gDinoBackup->AddUnk148(chosen);
     }
 }
 

@@ -82,7 +82,14 @@ struct DinoExcavateDefs {
 struct DinoMapMData;
 struct DinoMapData;
 struct DinoBattleData;
-struct DinoShopData;
+// A shop's stock: entries always sold, then entries picked from at random.
+struct DinoShopData {
+    u32 unk00;
+    u32 fixedCount;     // 0x04
+    u32 fixedOffset;    // 0x08: DinoEntrySource[fixedCount]
+    u32 randomCount;    // 0x0C
+    u32 randomOffset;   // 0x10: DinoEntrySource[randomCount]
+};
 struct DinoDanceData;
 struct DinoCharaData;
 struct DinoMessageData;

@@ -454,7 +454,11 @@ public:
 
 class DinoEventExecShopSet : public MTransfer {
 public:
+    DinoEventExecShopSet(u32 shop);
     virtual ~DinoEventExecShopSet();
+    virtual void Transfer();
+
+    u32 mShop;  // 0x10
 };
 
 // Shows a kaseki rock being got.
