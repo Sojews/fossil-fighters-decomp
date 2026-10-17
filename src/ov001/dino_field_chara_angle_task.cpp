@@ -1,6 +1,9 @@
 // DinoFieldCharaAngleTask, DinoFieldCharaMoveToRegionTask, DinoFieldCharaMoveToCoordTask, DinoFieldCharaMoveOffsetTask, DinoFieldCharaMoveVectorTask, DinoFieldCharaWaitMoveTask, DinoFieldCharaFocusTask.
 // Only the destructors are decompiled so far.
 
+#include "game/dino_field_spot.h"
+#include "m/lcd.h"
+#include "m/bright.h"
 #include "game/dino_field_chara_angle_task.h"
 #include "game/dino_field_chara_move_to_region_task.h"
 #include "game/dino_field_chara_move_to_coord_task.h"
@@ -33,6 +36,16 @@ DinoFieldCharaWaitMoveTask::~DinoFieldCharaWaitMoveTask() {
 }
 
 DinoFieldCharaFocusTask::~DinoFieldCharaFocusTask() {
+}
+
+DinoFieldSpotOut::~DinoFieldSpotOut() {
+    gLcd->GetTopDisplay()->mBright->SetFactor(16);
+    gLcd->GetBottomDisplay()->mBright->SetFactor(16);
+}
+
+DinoFieldSpotIn::~DinoFieldSpotIn() {
+    gLcd->GetTopDisplay()->mBright->Reset();
+    gLcd->GetBottomDisplay()->mBright->Reset();
 }
 
 // Template task instances the game emits in this file. Until the code that makes the tasks is decompiled, they are
