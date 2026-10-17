@@ -14,7 +14,15 @@
 InfoPanelWindow::~InfoPanelWindow() {
 }
 
+// Pooled file statics.
+struct PopNumberStatics {
+    u8 mUnk00;      // 0x00
+    int mCount;     // 0x04: live pop numbers
+};
+extern "C" PopNumberStatics data_ov000_021978e0;
+
 DinoBattleViewPopNumber::~DinoBattleViewPopNumber() {
+    data_ov000_021978e0.mCount--;
 }
 
 DinoBattleViewCreatureInfo::~DinoBattleViewCreatureInfo() {
