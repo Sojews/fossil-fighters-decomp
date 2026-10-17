@@ -3,10 +3,19 @@
 
 #include "m/task.h"
 
+class DinoField;
+
 class DinoFieldCharaWaitMoveTask : public MProcess {
 public:
+    DinoFieldCharaWaitMoveTask(DinoField *field, u32 chara) : MProcess(NULL) {
+        mField = field;
+        mChara = chara;
+    }
     virtual ~DinoFieldCharaWaitMoveTask();
     virtual void Idle();
+
+    DinoField *mField;  // 0x74
+    u32 mChara;         // 0x78
 };
 
 #endif
