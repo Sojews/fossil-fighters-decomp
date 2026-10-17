@@ -809,3 +809,6 @@ src/game/dino_gradation_bg.cpp:
 
 src/game/dino_common_cursor.cpp:
     .text       start:0x02020408 end:0x02020684
+
+src/game/dino_common_live.cpp:
+    .text       start:0x02020684 end:0x020213a0

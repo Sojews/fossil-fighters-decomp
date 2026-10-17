@@ -1,6 +1,7 @@
 // MBitVector. The game has these functions in reverse order among its save data code, as if they were
 // inline functions emitted with the class's vtable.
 
+#define MBIT_VECTOR_OWNER
 #include "m/bit_vector.h"
 
 MBitVector::~MBitVector() {

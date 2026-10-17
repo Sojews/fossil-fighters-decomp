@@ -10,7 +10,13 @@ public:
         mBits = bits;
         mBytes = new u8[(bits + 7) / 8];
     }
+    // Inline in the game (inlined into owners' destructors); src/m/bit_vector.cpp defines MBIT_VECTOR_OWNER and
+    // emits the out-of-line copy.
+#ifdef MBIT_VECTOR_OWNER
     virtual ~MBitVector();
+#else
+    virtual ~MBitVector() { delete[] mBytes; }
+#endif
     virtual u32 GetSize();
     virtual void Write(void *buf);
     virtual void Read(const void *buf);
