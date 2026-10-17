@@ -208,10 +208,7 @@ struct DinoBackupEntry28 {
     DinoBackupEntry28() {}
     u8 used;            // 0x00
     u8 unk1;            // 0x01
-    struct {
-        u32 a;
-        u32 b;
-    } unk4;             // 0x04
+    u64 time;           // 0x04
     u32 unkC;           // 0x0C
     u32 unk10;          // 0x10
     u32 unk14;          // 0x14
