@@ -11,15 +11,27 @@
 #include "game/dino_field_camera_hook.h"
 #include "game/dino_battle_help.h"
 
+class AttackMenuBarMotion;
+
 class DinoBattleViewUiAbilityMenuItem : public MMenuItem {
 public:
     virtual ~DinoBattleViewUiAbilityMenuItem();
     virtual MRect GetFrame();
     virtual void OnFocusChanged(BOOL focused);
     virtual void OnDecide();
+    virtual MRect GetRect();
 
-    u32 unk88[4];
-    MMenuItem *mUnk98;  // 0x98
+    MPoint GetBarPosition();
+    u32 GetUnk8C();
+    u8 GetUnk94();
+    u32 GetUnk90();
+    AttackMenuBarMotion *GetBar();
+
+    u32 unk88;
+    u32 mUnk8C;                 // 0x8C
+    u32 mUnk90;                 // 0x90
+    u8 mUnk94;                  // 0x94
+    AttackMenuBarMotion *mUnk98; // 0x98
 };
 
 class DinoBattleViewUiAbilityMenu : public MMenu, public DinoHelpBase {
@@ -40,6 +52,7 @@ class AttackMenuBarMotion : public MProcess {
 public:
     virtual ~AttackMenuBarMotion();
     virtual void Idle();
+    virtual MRect GetFrame();
 
     void SetPriority(int priority);
     MPoint GetPosition();
@@ -47,7 +60,6 @@ public:
     void Show();
     MTask *CreateShowTask();
     void Play(int anime);
-    MRect GetFrame();
 
     class ShowTask : public MTask {
     public:

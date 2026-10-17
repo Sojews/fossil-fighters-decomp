@@ -65,6 +65,30 @@ MRect AttackMenuBarMotion::GetFrame() {
     return mMotion->GetFrame();
 }
 
+MPoint DinoBattleViewUiAbilityMenuItem::GetBarPosition() {
+    return mUnk98->GetPosition();
+}
+
+u32 DinoBattleViewUiAbilityMenuItem::GetUnk8C() {
+    return mUnk8C;
+}
+
+u8 DinoBattleViewUiAbilityMenuItem::GetUnk94() {
+    return mUnk94;
+}
+
+u32 DinoBattleViewUiAbilityMenuItem::GetUnk90() {
+    return mUnk90;
+}
+
+AttackMenuBarMotion *DinoBattleViewUiAbilityMenuItem::GetBar() {
+    return mUnk98;
+}
+
+MRect DinoBattleViewUiAbilityMenuItem::GetRect() {
+    return GetFrame();
+}
+
 #pragma auto_inline on
 
 extern "C" MTask *func_ov000_0218ec8c(u32 arg0, int arg1, int arg2);
