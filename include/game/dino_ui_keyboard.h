@@ -3,6 +3,8 @@
 
 #include "game/dino_resource.h"
 #include "m/motion.h"
+#include <vector>
+#include "m/picture.h"
 #include "m/menu_item.h"
 #include "m/menu.h"
 #include "m/display.h"
@@ -29,6 +31,9 @@ class KasekiPictCache : public MProcess {
 public:
     virtual ~KasekiPictCache();
     virtual void Idle();
+
+    u32 unk74;
+    std::vector<MPictureFile> mPictures;    // 0x78
 };
 
 class KeyCheckTask : public MTask {

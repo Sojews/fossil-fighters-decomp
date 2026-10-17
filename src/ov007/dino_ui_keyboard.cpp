@@ -10,8 +10,13 @@
 #include "game/dino_ui_senryu_menu.h"
 #include "game/dino_ui_senryu.h"
 #include "m/bg_new_task.h"
+#include "m/blend.h"
+#include "m/window.h"
+#include "m/lcd.h"
 
 DinoUiKeyboardMenu::~DinoUiKeyboardMenu() {
+    gLcd->GetBottomDisplay()->mWin->GetWindow0()->Hide();
+    gLcd->GetBottomDisplay()->mBlend->Reset();
 }
 
 extern "C" void func_ov007_021832f0(void *, u32);
@@ -118,6 +123,10 @@ void PageChangeTask::Execute() {
 }
 
 DinoUiSenryuMenu::~DinoUiSenryuMenu() {
+    mSerial.Clear();
+    mFont120->Release();
+    mFont124->Release();
+    mFont128->Release();
 }
 
 extern "C" void func_ov007_02185d28(void *, u32);
