@@ -13081,8 +13081,8 @@ sSharedWork kind:bss addr:0x02151ca0
 sCommandArray kind:bss(size=0x1800) addr:0x02151f20
 sAlarm kind:bss addr:0x02153720
 SNDi_SharedWork kind:bss(size=0x4) addr:0x02153780
-data_02153784 kind:bss addr:0x02153784
-data_02153788 kind:bss addr:0x02153788
+FifoCtrlInit kind:bss addr:0x02153784
+FifoRecvCallbackTable kind:bss(size=0x80) addr:0x02153788
 data_02153808 kind:bss addr:0x02153808
 data_0215380c kind:bss addr:0x0215380c
 data_02153818 kind:bss addr:0x02153818

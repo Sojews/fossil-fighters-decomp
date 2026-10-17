@@ -14,6 +14,7 @@ extern "C" {
 typedef void (*PXIFifoCallback)(int tag, u32 data, BOOL err);
 
 void PXI_Init(void);
+void PXI_InitFifo(void);
 void PXI_SetFifoRecvCallback(int fifotag, PXIFifoCallback callback);
 BOOL PXI_IsCallbackReady(int fifotag, int proc);
 int PXI_SendWordByFifo(int fifotag, u32 data, BOOL err);
