@@ -3,6 +3,7 @@
 
 #include "game/dino_resource.h"
 #include "m/motion.h"
+#include <vector>
 #include "m/menu_item.h"
 #include "m/menu.h"
 #include "m/input.h"
@@ -34,6 +35,8 @@ public:
 
     u8 unkB4[0x21];
     u8 mSilentFocus;    // 0xD5
+    u8 unkD6[0x2A];
+    std::vector<void *> mUnk100;    // 0x100
 };
 
 class DinoBattleViewTurnEndDialog : public DinoCommonYesNoMenu {
