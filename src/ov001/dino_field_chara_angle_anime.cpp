@@ -77,3 +77,10 @@ void DinoFieldChara::SetFootSe(u32 se) {
     mHasFootSe = TRUE;
     mFootSe = se;
 }
+
+void DinoFieldChara::SetDirection(u16 angle) {
+    if (mBeholdTarget == 0) {
+        mModel.angle = angle;
+        ApplyMotion();
+    }
+}

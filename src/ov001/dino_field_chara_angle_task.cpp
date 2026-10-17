@@ -198,3 +198,29 @@ void DinoFieldCharaWaitMoveTask::Idle() {
         serial->AddTail(exit);
     }
 }
+
+// NONMATCHING: stack slots of the point temporaries only.
+void DinoFieldCharaMoveOffsetTask::Transfer() {
+    DinoFieldChara *chara = mField->GetChara(mChara);
+    if (chara) {
+        MFx32Point offset = mOffset;
+        MFx32Point coord = chara->GetModel()->pos + offset;
+        if (!mC) {
+            chara->SetDirection(MFx32Atan2(offset.y, offset.x));
+        }
+        chara->MoveTo(coord, mA, mB, mC);
+    }
+}
+
+// NONMATCHING: stack slots of the point temporaries only.
+void DinoFieldCharaMoveToCoordTask::Transfer() {
+    DinoFieldChara *chara = mField->GetChara(mChara);
+    if (chara) {
+        MFx32Point coord = mCoord;
+        MFx32Point delta = coord - chara->GetModel()->pos;
+        if (!mC) {
+            chara->SetDirection(MFx32Atan2(delta.y, delta.x));
+        }
+        chara->MoveTo(coord, mA, mB, mC);
+    }
+}

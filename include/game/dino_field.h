@@ -73,6 +73,8 @@ public:
     void ApplyHeadModel();
     void ChangeMotion(u32 motion, u8 loop, MFx32 speed);
     void SetAngle(u32 angle, u32 a, u32 b);
+    void SetDirection(u16 angle);
+    void MoveTo(MFx32Point coord, u32 a, u32 b, u8 c);
     MTask *CreateWaitMoveTask();
 
     MArchivePtr mArchive;       // 0x8C
