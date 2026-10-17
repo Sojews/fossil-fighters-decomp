@@ -3,20 +3,55 @@
 #define M_MOTION_H
 
 #include <string>
+#include <vector>
 #include "m/view.h"
 #include "m/smart_oam.h"
+#include "m/archive.h"
+#include "m/file.h"
 
 class MSmartOam;
 class MPalBlock;
-class MMotionData;
-class MArchiveFile;
+
+// A motion file's header.
+struct MMotionHeader {
+    u32 unk00;
+    u32 unk04;          // 0x04
+    u32 animeCount;     // 0x08
+    u32 unk0C;
+    u32 cellCount;      // 0x10
+    u32 cellOffset;     // 0x14: 16-byte cell definitions
+};
+
+// A loaded motion file and the files it uses, shared by every motion showing it.
+class MMotionData {
+public:
+    MMotionData(FSFileID id, int unk);
+    ~MMotionData();
+
+    static MMotionData *Get(FSFileID id, int unk);
+    void AddRef();
+    void Release();
+
+    MArchivePtr mArchive;               // 0x00
+    MArchiveFile mFile;                 // 0x04
+    std::vector<MArchiveFile> mUnk10;   // 0x10
+    std::vector<MArchiveFile> mUnk1C;   // 0x1C
+    std::vector<MArchiveFile> mUnk28;   // 0x28
+    int mRefCount;                      // 0x34
+};
 
 // A shared, reference-counted handle on a loaded motion file.
 class MMotionFile {
 public:
     MMotionFile(std::string path, int unk);
+    MMotionFile(const MMotionFile &other);
     ~MMotionFile();
+    MMotionFile &operator=(const MMotionFile &other);
 
+    u32 GetUnk04();
+    u32 GetAnimeCount();
+    u32 GetCellCount();
+    void *GetCell(u32 index);
     void *GetAnime(int anime, MArchiveFile *file);
 
     MMotionData *mData; // 0x00
@@ -64,6 +99,7 @@ public:
     void *GetAnimeData(int anime);
     void ResetAnime();
     void Advance(u32 frames);
+    void Init(int fromEnd);
 
     MDisplay *mDisplay;         // 0x10
     MMotionFile mFile;          // 0x14

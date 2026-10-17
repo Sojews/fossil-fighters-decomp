@@ -55,7 +55,7 @@ u8 DinoBackup::TakeLoadFailed() {
 }
 
 void DinoBackup::OnVSync() {
-    MMutexLock lock(&sBackupMutex.mutex);
+    MScopedLock lock(&sBackupMutex.mutex, TRUE);
     mPlayFrames++;
     mFrames = std::min(mFrames + 1, sLimits[4]);
 }
@@ -189,7 +189,7 @@ u8 *DinoBackup::GetUnk140() {
 }
 
 u64 DinoBackup::GetPlayFrames() {
-    MMutexLock lock(&sBackupMutex.mutex);
+    MScopedLock lock(&sBackupMutex.mutex, TRUE);
     return mPlayFrames;
 }
 
@@ -198,7 +198,7 @@ u64 DinoBackup::GetUnk160() {
 }
 
 void DinoBackup::MarkUnk160() {
-    MMutexLock lock(&sBackupMutex.mutex);
+    MScopedLock lock(&sBackupMutex.mutex, TRUE);
     mUnk160 = mPlayFrames;
 }
 
@@ -207,7 +207,7 @@ u64 DinoBackup::GetUnk168() {
 }
 
 void DinoBackup::MarkUnk168() {
-    MMutexLock lock(&sBackupMutex.mutex);
+    MScopedLock lock(&sBackupMutex.mutex, TRUE);
     mUnk168 = mPlayFrames;
 }
 
@@ -980,7 +980,7 @@ void DinoBackup::SetSystemVar(u32 index, s32 value) {
         mPlayer->unk38_0 = value;
         break;
     case 26: {
-        MMutexLock lock(&sBackupMutex.mutex);
+        MScopedLock lock(&sBackupMutex.mutex, TRUE);
         mFrames = value;
         break;
     }
@@ -1054,7 +1054,7 @@ s32 DinoBackup::GetSystemVar(u32 index) {
     case 32:
         return mPlayer->unk38_0;
     case 26: {
-        MMutexLock lock(&sBackupMutex.mutex);
+        MScopedLock lock(&sBackupMutex.mutex, TRUE);
         return mFrames;
     }
     case 43:

@@ -1,7 +1,92 @@
 // Motions: animated OBJ graphics loaded from a motion file, shown as a view.
 
 #include "m/motion.h"
+#include <map>
+#include "m/heap.h"
 #include "m/obj.h"
+
+static std::map<FSFileID, MMotionData *> sMotionDatas;
+static OSMutex sMotionDatasMutex;
+
+MMotionData *MMotionData::Get(FSFileID id, int unk) {
+    MScopedLock lock(&sMotionDatasMutex, TRUE);
+    MMotionData *data;
+    std::map<FSFileID, MMotionData *>::iterator it = sMotionDatas.find(id);
+    if (it != sMotionDatas.end()) {
+        data = it->second;
+    } else {
+        data = new MMotionData(id, unk);
+        sMotionDatas[id] = data;
+    }
+    data->mRefCount++;
+    return data;
+}
+
+void MMotionData::AddRef() {
+    MScopedLock lock(&sMotionDatasMutex, TRUE);
+    mRefCount++;
+}
+
+void MMotionData::Release() {
+    MScopedLock lock(&sMotionDatasMutex, TRUE);
+    if (--mRefCount <= 0) {
+        sMotionDatas.erase(mArchive.mArchive->mId);
+        delete this;
+    }
+}
+
+MMotionFile::MMotionFile(std::string path, int unk) {
+    FSFileID id;
+    if (!MGetFileID(path, &id)) {
+        OS_Terminate();
+    }
+    mData = MMotionData::Get(id, unk);
+}
+
+MMotionFile::MMotionFile(const MMotionFile &other) {
+    mData = other.mData;
+    mData->AddRef();
+}
+
+MMotionFile::~MMotionFile() {
+    mData->Release();
+}
+
+MMotionFile &MMotionFile::operator=(const MMotionFile &other) {
+    MMotionData *old = mData;
+    mData = other.mData;
+    mData->AddRef();
+    old->Release();
+    return *this;
+}
+
+u32 MMotionFile::GetUnk04() {
+    return ((MMotionHeader *) mData->mFile.GetData())->unk04;
+}
+
+u32 MMotionFile::GetAnimeCount() {
+    return ((MMotionHeader *) mData->mFile.GetData())->animeCount;
+}
+
+u32 MMotionFile::GetCellCount() {
+    return ((MMotionHeader *) mData->mFile.GetData())->cellCount;
+}
+
+void *MMotionFile::GetCell(u32 index) {
+    MMotionHeader *header = (MMotionHeader *) mData->mFile.GetData();
+    return (u8 *) header + header->cellOffset + index * 16;
+}
+
+MMotion::MMotion(const std::string &path, MSmartOam *oam, int flags, int fromEnd)
+    : mDisplay(oam->mDisplay), mFile(path, 0) {
+    mOam = oam;
+    mFlags = flags;
+    if (mFile.GetCellCount() != 0) {
+        mUnit = mOam->Alloc(mFile.GetCellCount(), fromEnd);
+        mEntries = mUnit->GetEntries();
+    }
+    Init(fromEnd);
+}
 
 void MMotion::SetPosition(MPoint pos) {
     mPos = pos;
