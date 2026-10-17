@@ -24,11 +24,16 @@ DinoUi2ContainerBasePageRButton::~DinoUi2ContainerBasePageRButton() {
 DinoUi2ContainerBaseDecideButton::~DinoUi2ContainerBaseDecideButton() {
 }
 
+#pragma auto_inline off
+
 DinoUi2ContainerBaseMenu::~DinoUi2ContainerBaseMenu() {
+    GetDisplay()->mBlend->Reset();
 }
 
 DinoUi2CannonShootMenu::~DinoUi2CannonShootMenu() {
 }
+
+#pragma auto_inline on
 
 // Template task instances the game emits in this file. Until the code that makes the tasks is decompiled, they are
 // instantiated explicitly.
