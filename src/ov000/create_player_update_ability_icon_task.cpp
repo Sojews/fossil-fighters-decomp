@@ -286,7 +286,6 @@ MFx32 DinoBattleModelCreature::RandomFraction() {
 
 extern "C" BOOL func_ov000_0216ce04(DinoBattleModelCreature *creature);
 extern "C" BOOL func_ov000_0216f13c(DinoBattleModelCreature *creature);
-extern "C" u32 func_ov000_02163a28(DinoBattleModelPlayer *player);
 extern "C" int func_ov000_0216ecc0(int a, int b);
 
 int DinoBattleModelCreature::GetB8Category() {
@@ -335,11 +334,11 @@ int DinoBattleModelCreature::CompareUnkED0C(DinoBattleModelCreature *other) {
     }
 }
 
-u32 DinoBattleModelCreature::GetUnkD298() {
+BOOL DinoBattleModelCreature::GetUnkD298() {
     if (func_ov000_0216f13c(this)) {
-        return func_ov000_02163a28(mPlayer);
+        return mPlayer->AllCreaturesShareDefFlag();
     }
-    return 0;
+    return FALSE;
 }
 
 BOOL DinoBattleModelCreature::RollDefUnk23() {
@@ -521,6 +520,24 @@ void DinoBattleModelPlayer::CollectCreaturesB8In12(u32 *ids, int *count) {
     }
 }
 
+BOOL DinoBattleModelPlayer::AllCreaturesShareDefFlag() {
+    int count = GetCreatureCount();
+    u32 flags;
+    int i;
+
+    if (count < 3) {
+        return FALSE;
+    }
+    flags = GetCreature(0)->GetDef()->mUnk24;
+    for (i = 1; i < count; i++) {
+        flags &= GetCreature(i)->GetDef()->mUnk24;
+    }
+    if (flags) {
+        return TRUE;
+    }
+    return FALSE;
+}
+
 // A random fraction in [0, 1].
 MFx32 DinoBattleModelPlayer::RandomFraction() {
     MFx32 r;
@@ -550,6 +567,21 @@ MTask *DinoBattleModelPlayer::CreateUpdateAllCreatureTask() {
 
 MoveCreatureFromEscape::MoveCreatureFromEscape(DinoBattleModelPlayer *player) : MProcess(NULL) {
     mPlayer = player;
+}
+
+extern "C" BOOL func_ov000_0216d2cc(DinoBattleModelCreature *creature, int arg);
+
+u32 DinoBattleUserController::GetCreatureMask(DinoBattleModelPlayer *player) {
+    u32 mask = 0;
+    u32 i;
+
+    for (i = 0; i < player->GetCreatureCount(); i++) {
+        DinoBattleModelCreature *creature = player->GetCreature(i);
+        if (creature->GetUnkB8() != 3 && !creature->GetUnk174() && func_ov000_0216d2cc(creature, 0)) {
+            mask |= 1 << creature->GetUnkB8();
+        }
+    }
+    return mask;
 }
 
 BOOL DinoBattleUserController::Unk14() {

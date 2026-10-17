@@ -11,11 +11,15 @@
 #include "game/dino_battle_controller.h"
 #include "game/dino_field_camera_hook.h"
 
+class DinoBattleModelPlayer;
+
 class DinoBattleUserController : public DinoBattleController {
 public:
     virtual ~DinoBattleUserController();
     virtual BOOL Unk14();
     virtual void OnMessage(MMessage *msg);
+
+    u32 GetCreatureMask(DinoBattleModelPlayer *player);
 };
 
 class PlayerThinkTimeCountTask : public MTask {

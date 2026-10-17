@@ -77,6 +77,7 @@ public:
     void CollectCreaturesUnkD244(u32 *ids, int *count);
     BOOL IsUnk2163978();
     void CollectCreaturesB8In12(u32 *ids, int *count);
+    BOOL AllCreaturesShareDefFlag();
 
     u32 mUnkA8;                         // 0xA8
     u32 mUnkAC;                         // 0xAC
@@ -113,7 +114,8 @@ struct DinoBattleCreatureDef {
     u8 mUnk21;          // 0x21
     u8 unk22;
     u8 mUnk23;          // 0x23
-    u8 unk24[0x61 - 0x24];
+    u32 mUnk24;         // 0x24: flags
+    u8 unk28[0x61 - 0x28];
     u8 mUnk61;          // 0x61
     u8 unk62[0x68 - 0x62];
     s32 mUnk68;         // 0x68: offset of a byte table
@@ -174,7 +176,7 @@ public:
     int GetUnkCE7C(u32 attack);
     int CompareUnkECA0(DinoBattleModelCreature *other, u32 attack);
     int CompareUnkED0C(DinoBattleModelCreature *other);
-    u32 GetUnkD298();
+    BOOL GetUnkD298();
     BOOL RollDefUnk23();
     int GetB8Category();
 

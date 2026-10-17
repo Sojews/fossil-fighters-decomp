@@ -371,7 +371,7 @@ _ZN21DinoBattleModelPlayer23CollectCreaturesUnkD244EPmPi kind:function(thumb,siz
 func_ov000_02163924 kind:function(thumb,size=0x54) addr:0x02163924
 _ZN21DinoBattleModelPlayer12IsUnk2163978Ev kind:function(thumb,size=0x56) addr:0x02163978
 _ZN21DinoBattleModelPlayer22CollectCreaturesB8In12EPmPi kind:function(thumb,size=0x58) addr:0x021639d0
-func_ov000_02163a28 kind:function(thumb,size=0x48) addr:0x02163a28
+_ZN21DinoBattleModelPlayer24AllCreaturesShareDefFlagEv kind:function(thumb,size=0x48) addr:0x02163a28
 _ZN21DinoBattleModelPlayer4IdleEv kind:function(thumb,size=0xc) addr:0x02163a70
 _ZN21DinoBattleModelPlayer9OnMessageEP8MMessage kind:function(thumb,size=0x1fa4) addr:0x02163a7c
 .L_021644fe kind:label(thumb) addr:0x021644fe local
@@ -482,7 +482,7 @@ func_ov000_0216b6c0 kind:function(thumb,size=0x268) addr:0x0216b6c0
 func_ov000_0216b928 kind:function(thumb,size=0x74) addr:0x0216b928
 _ZN24DinoBattleUserController9OnMessageEP8MMessage kind:function(thumb,size=0xdb4) addr:0x0216b99c
 .L_0216c71e kind:label(thumb) addr:0x0216c71e local
-func_ov000_0216c750 kind:function(thumb,size=0x56) addr:0x0216c750
+_ZN24DinoBattleUserController15GetCreatureMaskEP21DinoBattleModelPlayer kind:function(thumb,size=0x56) addr:0x0216c750
 _ZN24PlayerThinkTimeCountTask7ExecuteEv kind:function(thumb,size=0x20) addr:0x0216c7a8
 _ZN24DinoBattleUserController5Unk14Ev kind:function(thumb,size=0x4) addr:0x0216c7c8
 _ZN24DinoBattleUserControllerD1Ev kind:function(thumb,size=0x1e) addr:0x0216c7cc
