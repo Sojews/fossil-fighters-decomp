@@ -38,11 +38,13 @@ void SeedGenerator::Create() {
     MAddIntrTask(0, sSeedGenerator);
 }
 
-// NONMATCHING: the loop counter and the seed get each other's registers.
 u32 SeedGenerator::GenerateSeed() {
-    u32 seed = 0;
-    const u32 *p = (const u32 *)sSeedGenerator->mEntropy;
-    for (int i = 0; i < MRandom::N; i++) {
+    int i;
+    u32 seed;
+    const u32 *p;
+    p = (const u32 *)sSeedGenerator->mEntropy;
+    seed = 0;
+    for (i = 0; i < MRandom::N; i++) {
         seed = ((seed << 1) | (seed >> 31)) ^ *p++;
     }
     return seed + sSeedCount++;

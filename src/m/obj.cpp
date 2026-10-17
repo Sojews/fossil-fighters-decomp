@@ -155,10 +155,11 @@ void MOamUnit::SetPriority(int priority) {
     }
 }
 
-// NONMATCHING: the count and entry pointer get different registers.
 void MOamUnit::Clear() {
-    u32 n = count;
-    MOamEntry *entry = GetEntries();
+    MOamEntry *entry;
+    u32 n;
+    n = count;
+    entry = GetEntries();
     if (n != 0) {
         do {
             n--;
