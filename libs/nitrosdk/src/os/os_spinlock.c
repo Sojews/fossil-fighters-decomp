@@ -118,8 +118,10 @@ s32 OS_UnlockCartridge(u16 lockID) {
     return OSi_DoUnlockByWord(lockID, HW_CTRDG_LOCK_BUF, OSi_FreeCartridgeBus, TRUE);
 }
 
-s32 OS_UnLockCartridge(u16 lockID) {
-    return OS_UnlockCartridge(lockID);
+// The old spelling of OS_UnlockCartridge: a jump to it.
+asm s32 OS_UnLockCartridge(u16 lockID) {
+    ldr r1, =OS_UnlockCartridge
+    bx r1
 }
 
 s32 OS_TryLockCartridge(u16 lockID) {
