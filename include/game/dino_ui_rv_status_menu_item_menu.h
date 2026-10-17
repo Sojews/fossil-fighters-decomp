@@ -16,6 +16,8 @@ public:
     virtual void OnFocus(MMenuItem *item);
     virtual void OnDecide(MMenuItem *item);
     void OnBackDecided();
+    void PageRight();
+    void PageLeft();
 
     u32 mUnkB4[13];             // 0xB4
     std::vector<void *> mUnkE8; // 0xE8

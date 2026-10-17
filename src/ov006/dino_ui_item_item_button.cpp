@@ -75,3 +75,26 @@ void DinoUiItemBackButton::OnDecide() {
     DinoSoundPlaySe(0x90, 0);
 }
 
+void DinoUiItemPageRButton::OnDecide() {
+    mOwner->PageRight();
+    mMotion->Play(2, 1);
+    mSerial.Clear();
+    MTask *play = mMotion->CreatePlayTransfer(1, 0);
+    MTask *wait = mMotion->CreateWaitStopTask();
+    MSerialTaskSet *serial = &mSerial;
+    serial->AddTail(wait);
+    serial->AddTail(play);
+    DinoSoundPlaySe(0x93, 0);
+}
+
+void DinoUiItemPageLButton::OnDecide() {
+    mOwner->PageLeft();
+    mMotion->Play(2, 1);
+    mSerial.Clear();
+    MTask *play = mMotion->CreatePlayTransfer(1, 0);
+    MTask *wait = mMotion->CreateWaitStopTask();
+    MSerialTaskSet *serial = &mSerial;
+    serial->AddTail(wait);
+    serial->AddTail(play);
+    DinoSoundPlaySe(0x93, 0);
+}
