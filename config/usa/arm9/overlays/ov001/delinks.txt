@@ -31,3 +31,6 @@ src/ov001/dino_field_capture_fade_out_task.cpp:
 
 src/ov001/dino_field_radar.cpp:
     .text       start:0x0215d6ac end:0x0215eb50
+
+src/ov001/dino_field_point.cpp:
+    .text       start:0x021691cc end:0x02169298
