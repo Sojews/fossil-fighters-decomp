@@ -59,7 +59,7 @@ u8 MBlend::GetEvb() {
     return mBldAlpha >> 8;
 }
 
-void MBlend::SetBrightness(u16 evy) {
+void MBlend::SetBrightness(int evy) {
     mBldY = evy;
 }
 
@@ -93,6 +93,44 @@ MTask *MBlend::CreateTarget2Transfer(int planes) {
 
 MTask *MBlend::CreateClearTransfer() {
     return new MBlendClearTransfer(this);
+}
+
+MTask *MBlend::CreateFadeRatioAnime(int from, int to, u32 duration, int ease) {
+    return new MBlendFadeRatioAnime(this, from, to, duration, ease);
+}
+
+MTask *MBlend::CreateAlphaRatioAnime(int evaFrom, int evaTo, int evbFrom, int evbTo, u32 duration, int ease) {
+    return new MBlendAlphaRatioAnime(this, MPoint(evaFrom, evbFrom), MPoint(evaTo, evbTo), duration, ease);
+}
+
+MTask *MBlend::CreateCrossFadeInTask(int planes, u32 duration, int ease) {
+    MSerialTaskSet *set = new MSerialTaskSet();
+    set->mExitWhenEmpty = TRUE;
+    set->AddTail(CreateModeTransfer(1));
+    set->AddTail(CreateTarget1Transfer(planes));
+    set->AddTail(CreateTarget2Transfer(planes ^ 0x3F));
+    set->AddTail(CreateAlphaRatioAnime(0, 16, 16, 0, duration, ease));
+    return set;
+}
+
+MTask *MBlend::CreateCrossFadeOutTask(int planes, u32 duration, int ease) {
+    MSerialTaskSet *set = new MSerialTaskSet();
+    set->mExitWhenEmpty = TRUE;
+    set->AddTail(CreateModeTransfer(1));
+    set->AddTail(CreateTarget1Transfer(planes));
+    set->AddTail(CreateTarget2Transfer(planes ^ 0x3F));
+    set->AddTail(CreateAlphaRatioAnime(16, 0, 0, 16, duration, ease));
+    return set;
+}
+
+void MBlendAlphaRatioAnime::Apply(int step) {
+    MPointAnime::Apply(step);
+    mBlend->SetAlpha(mValue.x, mValue.y);
+}
+
+void MBlendFadeRatioAnime::Apply(int step) {
+    MValueAnime::Apply(step);
+    mBlend->SetBrightness(mValue);
 }
 
 void MBlendClearTransfer::Transfer() {

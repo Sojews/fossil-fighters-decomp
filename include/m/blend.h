@@ -17,7 +17,7 @@ public:
     void SetAlpha(int eva, int evb);
     u8 GetEva();
     u8 GetEvb();
-    void SetBrightness(u16 evy);
+    void SetBrightness(int evy);
     void SetTarget1(int planes);
     void SetTarget2(int planes);
     int GetTarget1();
@@ -27,6 +27,11 @@ public:
     MTask *CreateTarget1Transfer(int planes);
     MTask *CreateTarget2Transfer(int planes);
     MTask *CreateClearTransfer();
+    MTask *CreateFadeRatioAnime(int from, int to, u32 duration, int ease);
+    MTask *CreateAlphaRatioAnime(int evaFrom, int evaTo, int evbFrom, int evbTo, u32 duration, int ease);
+    // Blends the planes in over the others (or out).
+    MTask *CreateCrossFadeInTask(int planes, u32 duration, int ease);
+    MTask *CreateCrossFadeOutTask(int planes, u32 duration, int ease);
 
     MDisplay *mDisplay;     // 0x00
     u16 mBldCnt;            // 0x04
