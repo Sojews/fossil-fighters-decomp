@@ -1,6 +1,8 @@
 #ifndef GAME_DINO_UI_SHOP_SELL_MENU_H
 #define GAME_DINO_UI_SHOP_SELL_MENU_H
 
+#include <vector>
+#include "m/archive.h"
 #include "m/menu_item.h"
 #include "m/menu.h"
 #include "game/help.h"
@@ -13,6 +15,13 @@ public:
     virtual void OnIdle();
     virtual void OnFocus(MMenuItem *item);
     virtual void OnDecide(MMenuItem *item);
+
+    MArchivePtr mArchive;       // 0xB4
+    MArchiveFile mFile;         // 0xB8
+    u32 mUnkC4[4];              // 0xC4
+    std::vector<void *> mUnkD4; // 0xD4
+    u32 mUnkE0[6];              // 0xE0
+    std::vector<u32> mUnkF8;    // 0xF8
 };
 
 class DinoUiShopSellBackButton : public DinoUiShopSellMenuItem {

@@ -1,6 +1,8 @@
 #ifndef GAME_DINO_UI_CLEANING_MENU_ITEM_MENU_H
 #define GAME_DINO_UI_CLEANING_MENU_ITEM_MENU_H
 
+#include <vector>
+#include "m/archive.h"
 #include "m/menu_item.h"
 #include "m/menu.h"
 #include "game/help.h"
@@ -13,6 +15,13 @@ public:
     virtual void OnIdle();
     virtual void OnFocus(MMenuItem *item);
     virtual void OnDecide(MMenuItem *item);
+
+    u32 mUnkB4[3];              // 0xB4
+    std::vector<void *> mUnkC0; // 0xC0
+    u32 mUnkCC[7];              // 0xCC
+    std::vector<u32> mUnkE8;    // 0xE8
+    MArchivePtr mArchive;       // 0xF4
+    MArchiveFile mFile;         // 0xF8
 };
 
 class DinoUiCleaningBackButton : public DinoUiCleaningMenuItem {
