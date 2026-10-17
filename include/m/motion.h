@@ -144,6 +144,7 @@ public:
     void FreeAffine(u32 index);
     void SetOverride(BOOL off);
     void SetPosition(int x, int y);
+    MRect GetCellRect(u32 cell);
     MSmartOamEntry *GetCellEntry(int cell) { return &mEntries[mCells[cell].entry]; }
     void SetCellOffset(int cell, int x, int y);
     void SetCellOffsetY(int cell, int y);

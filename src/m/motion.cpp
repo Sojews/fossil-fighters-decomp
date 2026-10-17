@@ -1,6 +1,7 @@
 // Motions: animated OBJ graphics loaded from a motion file, shown as a view.
 
 #include "m/motion.h"
+#include <algorithm>
 #include <map>
 #include "m/display.h"
 #include "m/heap.h"
@@ -159,6 +160,19 @@ MPoint MMotion::GetPosition() {
 
 void MMotion::SetPosition(int x, int y) {
     SetPosition(MPoint(x, y));
+}
+
+MRect MMotion::GetFrame() {
+    MRect frame(0x7FFFFFFF, 0x7FFFFFFF, 0x80000000, 0x80000000);
+    for (u32 i = 0; i < mCellCount; i++) {
+        if (mCells[i].visible) {
+            frame.Unite(GetCellRect(i));
+        }
+    }
+    if (frame.left == 0x7FFFFFFF && frame.top == 0x7FFFFFFF && frame.right == 0x80000000 && frame.bottom == 0x80000000) {
+        return MRect(GetPosition(), GetPosition());
+    }
+    return frame;
 }
 
 void MMotion::SetPriority(int priority) {
