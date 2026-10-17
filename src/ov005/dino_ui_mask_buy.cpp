@@ -4,6 +4,7 @@
 // Derived destructors have their bases' destructor bodies inlined; auto-inlining the ones defined above does that.
 #pragma auto_inline on
 
+#include "m/obj.h"
 #include "game/dino_ui_mask_buy_menu.h"
 #include "game/dino_ui_mask_buy.h"
 #include "game/dino_ui_mask_buy_mask_button.h"
@@ -179,4 +180,14 @@ template MTask *MCreateCallTask(DinoUiMaskBuyMenu *obj, void (DinoUiMaskBuyMenu:
 
 MRect DinoUiMaskBuyMaskButton::GetFrame() {
     return MRect(mPos.Offset(-24, -24), mPos.Offset(24, 24));
+}
+
+DinoUiMaskBuy::DinoUiMaskBuy() : MProcess(NULL) {
+    gLcd->mMain->ResetHooks();
+    gLcd->mMain->Setup(5, 3, 4, 1, 0, 0);
+    gLcd->mMain->SetBackdrop(0x8000);
+    gLcd->mMain->mObj->Show();
+    gLcd->VSyncNow();
+    mSerial.AddTail(new DinoUiMaskBuyMenu());
+    mSerial.AddTail(MTaskExitTransfer::Create(this));
 }

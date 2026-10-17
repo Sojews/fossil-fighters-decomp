@@ -4,6 +4,7 @@
 // Derived destructors have their bases' destructor bodies inlined; auto-inlining the ones defined above does that.
 #pragma auto_inline on
 
+#include "m/obj.h"
 #include "game/dino_ui_shop_sell_menu.h"
 #include "game/dino_ui_shop_sell.h"
 #include "game/dino_ui_shop_sell_menu_item.h"
@@ -169,4 +170,14 @@ void DinoUiShopSellMenu::ClearItems() {
         RemoveItem((MMenuItem *)mItems[i]);
         delete (MMenuItem *)mItems[i];
     }
+}
+
+DinoUiShopSell::DinoUiShopSell() : MProcess(NULL) {
+    gLcd->mMain->ResetHooks();
+    gLcd->mMain->Setup(5, 3, 4, 1, 0, 0);
+    gLcd->mMain->SetBackdrop(0x8000);
+    gLcd->mMain->mObj->Show();
+    gLcd->VSyncNow();
+    mSerial.AddTail(new DinoUiShopSellMenu());
+    mSerial.AddTail(MTaskExitTransfer::Create(this));
 }

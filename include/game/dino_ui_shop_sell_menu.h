@@ -11,6 +11,7 @@
 
 class DinoUiShopSellMenu : public DinoHelpBase, public MMenu {
 public:
+    DinoUiShopSellMenu();
     virtual ~DinoUiShopSellMenu();
     virtual void OnStart();
     virtual void OnIdle();
