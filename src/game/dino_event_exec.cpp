@@ -939,6 +939,254 @@ void DinoEventExecYesNo::Idle() {
     }
 }
 
+DinoEventExecLowerPictFadeIn::DinoEventExecLowerPictFadeIn(DinoEvent *event, u32 pict, MPoint pos, u32 frames, long unk, u8 wait) : MProcess(NULL) {
+    mEvent = event;
+    mPict = pict;
+    mPos = pos;
+    mFrames = frames;
+    mUnk = unk;
+    mWait = wait;
+}
+
+void DinoEventExecLowerPictFadeIn::Idle() {
+    MTask *task = MCreateCallTask(mEvent->GetField(), &DinoField::FadeInLowerPict, mPict, mPos, mFrames, mUnk);
+    MTask *wait = mEvent->GetField()->CreatePictWaitTask();
+    MSerialTaskSet *serial = &mSerial;
+    serial->AddTail(wait);
+    serial->AddTail(task);
+    if (mWait) {
+        mSerial.AddTail(mEvent->GetField()->CreatePictWaitTask());
+    }
+    mSerial.AddTail(MTaskExitTransfer::Create(this));
+}
+
+DinoEventExecLowerPictFadeOut::DinoEventExecLowerPictFadeOut(DinoEvent *event, u32 pict, long frames, u8 wait) : MProcess(NULL) {
+    mEvent = event;
+    mPict = pict;
+    mFrames = frames;
+    mWait = wait;
+}
+
+void DinoEventExecLowerPictFadeOut::Idle() {
+    MTask *task = MCreateCallTask(mEvent->GetField(), &DinoField::FadeOutLowerPict, mPict, mFrames);
+    MTask *wait = mEvent->GetField()->CreatePictWaitTask();
+    MSerialTaskSet *serial = &mSerial;
+    serial->AddTail(wait);
+    serial->AddTail(task);
+    if (mWait) {
+        mSerial.AddTail(mEvent->GetField()->CreatePictWaitTask());
+    }
+    mSerial.AddTail(MTaskExitTransfer::Create(this));
+}
+
+DinoEventExecLowerPictSlideIn::DinoEventExecLowerPictSlideIn(DinoEvent *event, u32 pict, MPoint pos, u32 a, u32 b, long c, u8 wait) : MProcess(NULL) {
+    mEvent = event;
+    mPict = pict;
+    mPos = pos;
+    mA = a;
+    mB = b;
+    mC = c;
+    mWait = wait;
+}
+
+void DinoEventExecLowerPictSlideIn::Idle() {
+    MTask *task = MCreateCallTask(mEvent->GetField(), &DinoField::SlideInLowerPict, mPict, mPos, mA, mB, mC);
+    MTask *wait = mEvent->GetField()->CreatePictWaitTask();
+    MSerialTaskSet *serial = &mSerial;
+    serial->AddTail(wait);
+    serial->AddTail(task);
+    if (mWait) {
+        mSerial.AddTail(mEvent->GetField()->CreatePictWaitTask());
+    }
+    mSerial.AddTail(MTaskExitTransfer::Create(this));
+}
+
+DinoEventExecLowerPictSlideOut::DinoEventExecLowerPictSlideOut(DinoEvent *event, u32 pict, u32 a, long b, u8 wait) : MProcess(NULL) {
+    mEvent = event;
+    mPict = pict;
+    mA = a;
+    mB = b;
+    mWait = wait;
+}
+
+void DinoEventExecLowerPictSlideOut::Idle() {
+    MTask *task = MCreateCallTask(mEvent->GetField(), &DinoField::SlideOutLowerPict, mPict, mA, mB);
+    MTask *wait = mEvent->GetField()->CreatePictWaitTask();
+    MSerialTaskSet *serial = &mSerial;
+    serial->AddTail(wait);
+    serial->AddTail(task);
+    if (mWait) {
+        mSerial.AddTail(mEvent->GetField()->CreatePictWaitTask());
+    }
+    mSerial.AddTail(MTaskExitTransfer::Create(this));
+}
+
+DinoEventExecLowerPictZoomIn::DinoEventExecLowerPictZoomIn(DinoEvent *event, u32 pict, MPoint pos, MFx32 scale, u32 a, long b, u8 wait) : MProcess(NULL) {
+    mEvent = event;
+    mPict = pict;
+    mPos = pos;
+    mScale = scale;
+    mA = a;
+    mB = b;
+    mWait = wait;
+}
+
+void DinoEventExecLowerPictZoomIn::Idle() {
+    MTask *task = MCreateCallTask(mEvent->GetField(), &DinoField::ZoomInLowerPict, mPict, mPos, mScale, mA, mB);
+    MTask *wait = mEvent->GetField()->CreatePictWaitTask();
+    MSerialTaskSet *serial = &mSerial;
+    serial->AddTail(wait);
+    serial->AddTail(task);
+    if (mWait) {
+        mSerial.AddTail(mEvent->GetField()->CreatePictWaitTask());
+    }
+    mSerial.AddTail(MTaskExitTransfer::Create(this));
+}
+
+DinoEventExecLowerPictZoomOut::DinoEventExecLowerPictZoomOut(DinoEvent *event, MFx32 scale, u32 a, long b, u8 wait) : MProcess(NULL) {
+    mEvent = event;
+    mScale = scale;
+    mA = a;
+    mB = b;
+    mWait = wait;
+}
+
+void DinoEventExecLowerPictZoomOut::Idle() {
+    MTask *task = MCreateCallTask(mEvent->GetField(), &DinoField::ZoomOutLowerPict, mScale, mA, mB);
+    MTask *wait = mEvent->GetField()->CreatePictWaitTask();
+    MSerialTaskSet *serial = &mSerial;
+    serial->AddTail(wait);
+    serial->AddTail(task);
+    if (mWait) {
+        mSerial.AddTail(mEvent->GetField()->CreatePictWaitTask());
+    }
+    mSerial.AddTail(MTaskExitTransfer::Create(this));
+}
+
+DinoEventExecUpperPictFadeIn::DinoEventExecUpperPictFadeIn(DinoEvent *event, u32 pict, MPoint pos, u32 frames, long unk, u8 wait) : MProcess(NULL) {
+    mEvent = event;
+    mPict = pict;
+    mPos = pos;
+    mFrames = frames;
+    mUnk = unk;
+    mWait = wait;
+}
+
+void DinoEventExecUpperPictFadeIn::Idle() {
+    MTask *task = MCreateCallTask(mEvent->GetField(), &DinoField::FadeInUpperPict, mPict, mPos, mFrames, mUnk);
+    MTask *wait = mEvent->GetField()->CreatePictWaitTask();
+    MSerialTaskSet *serial = &mSerial;
+    serial->AddTail(wait);
+    serial->AddTail(task);
+    if (mWait) {
+        mSerial.AddTail(mEvent->GetField()->CreatePictWaitTask());
+    }
+    mSerial.AddTail(MTaskExitTransfer::Create(this));
+}
+
+DinoEventExecUpperPictFadeOut::DinoEventExecUpperPictFadeOut(DinoEvent *event, u32 pict, long frames, u8 wait) : MProcess(NULL) {
+    mEvent = event;
+    mPict = pict;
+    mFrames = frames;
+    mWait = wait;
+}
+
+void DinoEventExecUpperPictFadeOut::Idle() {
+    MTask *task = MCreateCallTask(mEvent->GetField(), &DinoField::FadeOutUpperPict, mPict, mFrames);
+    MTask *wait = mEvent->GetField()->CreatePictWaitTask();
+    MSerialTaskSet *serial = &mSerial;
+    serial->AddTail(wait);
+    serial->AddTail(task);
+    if (mWait) {
+        mSerial.AddTail(mEvent->GetField()->CreatePictWaitTask());
+    }
+    mSerial.AddTail(MTaskExitTransfer::Create(this));
+}
+
+DinoEventExecUpperPictSlideIn::DinoEventExecUpperPictSlideIn(DinoEvent *event, u32 pict, MPoint pos, u32 a, u32 b, long c, u8 wait) : MProcess(NULL) {
+    mEvent = event;
+    mPict = pict;
+    mPos = pos;
+    mA = a;
+    mB = b;
+    mC = c;
+    mWait = wait;
+}
+
+void DinoEventExecUpperPictSlideIn::Idle() {
+    MTask *task = MCreateCallTask(mEvent->GetField(), &DinoField::SlideInUpperPict, mPict, mPos, mA, mB, mC);
+    MTask *wait = mEvent->GetField()->CreatePictWaitTask();
+    MSerialTaskSet *serial = &mSerial;
+    serial->AddTail(wait);
+    serial->AddTail(task);
+    if (mWait) {
+        mSerial.AddTail(mEvent->GetField()->CreatePictWaitTask());
+    }
+    mSerial.AddTail(MTaskExitTransfer::Create(this));
+}
+
+DinoEventExecUpperPictSlideOut::DinoEventExecUpperPictSlideOut(DinoEvent *event, u32 pict, u32 a, long b, u8 wait) : MProcess(NULL) {
+    mEvent = event;
+    mPict = pict;
+    mA = a;
+    mB = b;
+    mWait = wait;
+}
+
+void DinoEventExecUpperPictSlideOut::Idle() {
+    MTask *task = MCreateCallTask(mEvent->GetField(), &DinoField::SlideOutUpperPict, mPict, mA, mB);
+    MTask *wait = mEvent->GetField()->CreatePictWaitTask();
+    MSerialTaskSet *serial = &mSerial;
+    serial->AddTail(wait);
+    serial->AddTail(task);
+    if (mWait) {
+        mSerial.AddTail(mEvent->GetField()->CreatePictWaitTask());
+    }
+    mSerial.AddTail(MTaskExitTransfer::Create(this));
+}
+
+DinoEventExecUpperPictZoomIn::DinoEventExecUpperPictZoomIn(DinoEvent *event, u32 pict, MPoint pos, MFx32 scale, u32 a, long b, u8 wait) : MProcess(NULL) {
+    mEvent = event;
+    mPict = pict;
+    mPos = pos;
+    mScale = scale;
+    mA = a;
+    mB = b;
+    mWait = wait;
+}
+
+void DinoEventExecUpperPictZoomIn::Idle() {
+    MTask *task = MCreateCallTask(mEvent->GetField(), &DinoField::ZoomInUpperPict, mPict, mPos, mScale, mA, mB);
+    MTask *wait = mEvent->GetField()->CreatePictWaitTask();
+    MSerialTaskSet *serial = &mSerial;
+    serial->AddTail(wait);
+    serial->AddTail(task);
+    if (mWait) {
+        mSerial.AddTail(mEvent->GetField()->CreatePictWaitTask());
+    }
+    mSerial.AddTail(MTaskExitTransfer::Create(this));
+}
+
+DinoEventExecUpperPictZoomOut::DinoEventExecUpperPictZoomOut(DinoEvent *event, MFx32 scale, u32 a, long b, u8 wait) : MProcess(NULL) {
+    mEvent = event;
+    mScale = scale;
+    mA = a;
+    mB = b;
+    mWait = wait;
+}
+
+void DinoEventExecUpperPictZoomOut::Idle() {
+    MTask *task = MCreateCallTask(mEvent->GetField(), &DinoField::ZoomOutUpperPict, mScale, mA, mB);
+    MTask *wait = mEvent->GetField()->CreatePictWaitTask();
+    MSerialTaskSet *serial = &mSerial;
+    serial->AddTail(wait);
+    serial->AddTail(task);
+    if (mWait) {
+        mSerial.AddTail(mEvent->GetField()->CreatePictWaitTask());
+    }
+    mSerial.AddTail(MTaskExitTransfer::Create(this));
+}
+
 DinoEventExecStartBehold::DinoEventExecStartBehold(DinoEvent *event, u32 chara, u32 target) {
     mEvent = event;
     mChara = chara;

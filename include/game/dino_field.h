@@ -98,6 +98,18 @@ public:
     void ShowPict(u32 pict, MPoint pos, u32 frames, long unk);
     void HidePict(u32 frames, long unk);
     void PlayMapBgm(u32 bgm, u32 arg);
+    void FadeInLowerPict(u32 pict, MPoint pos, u32 frames, long unk);
+    void FadeOutLowerPict(u32 pict, long frames);
+    void SlideInLowerPict(u32 pict, MPoint pos, u32 a, u32 b, long c);
+    void SlideOutLowerPict(u32 pict, u32 a, long b);
+    void ZoomInLowerPict(u32 pict, MPoint pos, MFx32 scale, u32 a, long b);
+    void ZoomOutLowerPict(MFx32 scale, u32 a, long b);
+    void FadeInUpperPict(u32 pict, MPoint pos, u32 frames, long unk);
+    void FadeOutUpperPict(u32 pict, long frames);
+    void SlideInUpperPict(u32 pict, MPoint pos, u32 a, u32 b, long c);
+    void SlideOutUpperPict(u32 pict, u32 a, long b);
+    void ZoomInUpperPict(u32 pict, MPoint pos, MFx32 scale, u32 a, long b);
+    void ZoomOutUpperPict(MFx32 scale, u32 a, long b);
 
     u8 unk000[0x244];
     DinoFieldRadar *mRadar;     // 0x244

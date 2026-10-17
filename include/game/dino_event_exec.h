@@ -830,62 +830,166 @@ public:
 
 class DinoEventExecLowerPictFadeIn : public MProcess {
 public:
+    DinoEventExecLowerPictFadeIn(DinoEvent *event, u32 pict, MPoint pos, u32 frames, long unk, u8 wait);
     virtual ~DinoEventExecLowerPictFadeIn();
+    virtual void Idle();
+
+    DinoEvent *mEvent;  // 0x74
+    u32 mPict;
+    MPoint mPos;
+    u32 mFrames;
+    long mUnk;
+    u8 mWait;
 };
 
 class DinoEventExecLowerPictFadeOut : public MProcess {
 public:
+    DinoEventExecLowerPictFadeOut(DinoEvent *event, u32 pict, long frames, u8 wait);
     virtual ~DinoEventExecLowerPictFadeOut();
+    virtual void Idle();
+
+    DinoEvent *mEvent;  // 0x74
+    u32 mPict;
+    long mFrames;
+    u8 mWait;
 };
 
 class DinoEventExecLowerPictSlideIn : public MProcess {
 public:
+    DinoEventExecLowerPictSlideIn(DinoEvent *event, u32 pict, MPoint pos, u32 a, u32 b, long c, u8 wait);
     virtual ~DinoEventExecLowerPictSlideIn();
+    virtual void Idle();
+
+    DinoEvent *mEvent;  // 0x74
+    u32 mPict;
+    MPoint mPos;
+    u32 mA;
+    u32 mB;
+    long mC;
+    u8 mWait;
 };
 
 class DinoEventExecLowerPictSlideOut : public MProcess {
 public:
+    DinoEventExecLowerPictSlideOut(DinoEvent *event, u32 pict, u32 a, long b, u8 wait);
     virtual ~DinoEventExecLowerPictSlideOut();
+    virtual void Idle();
+
+    DinoEvent *mEvent;  // 0x74
+    u32 mPict;
+    u32 mA;
+    long mB;
+    u8 mWait;
 };
 
 class DinoEventExecLowerPictZoomIn : public MProcess {
 public:
+    DinoEventExecLowerPictZoomIn(DinoEvent *event, u32 pict, MPoint pos, MFx32 scale, u32 a, long b, u8 wait);
     virtual ~DinoEventExecLowerPictZoomIn();
+    virtual void Idle();
+
+    DinoEvent *mEvent;  // 0x74
+    u32 mPict;
+    MPoint mPos;
+    MFx32 mScale;
+    u32 mA;
+    long mB;
+    u8 mWait;
 };
 
 class DinoEventExecLowerPictZoomOut : public MProcess {
 public:
+    DinoEventExecLowerPictZoomOut(DinoEvent *event, MFx32 scale, u32 a, long b, u8 wait);
     virtual ~DinoEventExecLowerPictZoomOut();
+    virtual void Idle();
+
+    DinoEvent *mEvent;  // 0x74
+    MFx32 mScale;
+    u32 mA;
+    long mB;
+    u8 mWait;
 };
 
 class DinoEventExecUpperPictFadeIn : public MProcess {
 public:
+    DinoEventExecUpperPictFadeIn(DinoEvent *event, u32 pict, MPoint pos, u32 frames, long unk, u8 wait);
     virtual ~DinoEventExecUpperPictFadeIn();
+    virtual void Idle();
+
+    DinoEvent *mEvent;  // 0x74
+    u32 mPict;
+    MPoint mPos;
+    u32 mFrames;
+    long mUnk;
+    u8 mWait;
 };
 
 class DinoEventExecUpperPictFadeOut : public MProcess {
 public:
+    DinoEventExecUpperPictFadeOut(DinoEvent *event, u32 pict, long frames, u8 wait);
     virtual ~DinoEventExecUpperPictFadeOut();
+    virtual void Idle();
+
+    DinoEvent *mEvent;  // 0x74
+    u32 mPict;
+    long mFrames;
+    u8 mWait;
 };
 
 class DinoEventExecUpperPictSlideIn : public MProcess {
 public:
+    DinoEventExecUpperPictSlideIn(DinoEvent *event, u32 pict, MPoint pos, u32 a, u32 b, long c, u8 wait);
     virtual ~DinoEventExecUpperPictSlideIn();
+    virtual void Idle();
+
+    DinoEvent *mEvent;  // 0x74
+    u32 mPict;
+    MPoint mPos;
+    u32 mA;
+    u32 mB;
+    long mC;
+    u8 mWait;
 };
 
 class DinoEventExecUpperPictSlideOut : public MProcess {
 public:
+    DinoEventExecUpperPictSlideOut(DinoEvent *event, u32 pict, u32 a, long b, u8 wait);
     virtual ~DinoEventExecUpperPictSlideOut();
+    virtual void Idle();
+
+    DinoEvent *mEvent;  // 0x74
+    u32 mPict;
+    u32 mA;
+    long mB;
+    u8 mWait;
 };
 
 class DinoEventExecUpperPictZoomIn : public MProcess {
 public:
+    DinoEventExecUpperPictZoomIn(DinoEvent *event, u32 pict, MPoint pos, MFx32 scale, u32 a, long b, u8 wait);
     virtual ~DinoEventExecUpperPictZoomIn();
+    virtual void Idle();
+
+    DinoEvent *mEvent;  // 0x74
+    u32 mPict;
+    MPoint mPos;
+    MFx32 mScale;
+    u32 mA;
+    long mB;
+    u8 mWait;
 };
 
 class DinoEventExecUpperPictZoomOut : public MProcess {
 public:
+    DinoEventExecUpperPictZoomOut(DinoEvent *event, MFx32 scale, u32 a, long b, u8 wait);
     virtual ~DinoEventExecUpperPictZoomOut();
+    virtual void Idle();
+
+    DinoEvent *mEvent;  // 0x74
+    MFx32 mScale;
+    u32 mA;
+    long mB;
+    u8 mWait;
 };
 
 class DinoEventExecRadarMode : public MProcess {
