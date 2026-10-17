@@ -142,11 +142,21 @@ void OS_SetIrqStackWarningOffset(u32 offset);
 
 typedef enum {
     OS_ARENA_MAIN = 0,
+    OS_ARENA_MAIN_SUBPRIV,
+    OS_ARENA_MAINEX,
+    OS_ARENA_ITCM,
+    OS_ARENA_DTCM,
+    OS_ARENA_SHARED,
+    OS_ARENA_WRAM_MAIN,
+    OS_ARENA_WRAM_SUB,
+    OS_ARENA_WRAM_SUBPRIV,
+    OS_ARENA_MAX
 } OSArenaId;
 
 void *OS_GetArenaLo(OSArenaId id);
 void *OS_GetArenaHi(OSArenaId id);
 void OS_SetArenaLo(OSArenaId id, void *newLo);
+void OS_SetArenaHi(OSArenaId id, void *newHi);
 void DC_FlushAll(void);
 void OS_ResetSystem(u32 parameter);
 void OS_InitTick(void);

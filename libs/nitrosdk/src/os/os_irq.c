@@ -9,7 +9,7 @@
 // The handler table is at the start of DTCM; the IRQ stack ends below the check flags at its end.
 #define OS_IRQTable ((OSIrqFunction *) SDK_AUTOLOAD_DTCM_START)
 #define IRQ_STACK_END ((u32) SDK_AUTOLOAD_DTCM_START + 0x3f80)
-#define IRQ_STACK_SIZE 0x800
+#define IRQ_STACK_SIZE ((u32) SDK_IRQ_STACKSIZE)   // Linker-defined
 #define IRQ_STACK_CHECKNUM_BOTTOM 0xfddb597d
 #define IRQ_STACK_CHECKNUM_TOP 0x7bf9dd5b
 #define IRQ_STACK_CHECKNUM_WARN 0x597dfbd9
@@ -21,6 +21,7 @@ typedef struct {
 } OSIrqCallbackInfo;
 
 extern OSThreadQueue OSi_IrqThreadQueue;
+extern char SDK_IRQ_STACKSIZE[];
 extern const u16 OSi_IrqCallbackInfoIndex[8];
 
 static u32 OSi_IrqStackWarningOffset;
