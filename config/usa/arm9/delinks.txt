@@ -547,6 +547,10 @@ libs/nitrosdk/src/cp/cp_context.c:
     complete
     .text       start:0x02078f60 end:0x02078fdc
 
+libs/nitrosdk/src/std/std_sprintf.c:
+    complete
+    .text       start:0x02073810 end:0x02073f90
+
 libs/nitrosdk/src/rtc/rtc_api.c:
     complete
     .text       start:0x0207a244 end:0x0207a6e8
