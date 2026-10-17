@@ -460,3 +460,7 @@ libs/nitrosystem/src/snd/seqarc.c:
 libs/nitrosystem/src/snd/snd_fader.c:
     complete
     .text       start:0x02070ea8 end:0x02070f0c
+
+libs/nitrosdk/src/os/os_irq.c:
+    .text       start:0x020732a8 end:0x02073588
+    .bss        start:0x02151860 end:0x021518c4

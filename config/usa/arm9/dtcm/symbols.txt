@@ -7,4 +7,4 @@ sMemDisableIrq kind:bss addr:0x027e006c
 sMemSavedIrq kind:bss addr:0x027e0070
 sMemMutex kind:bss addr:0x027e0074
 av_ kind:bss addr:0x027e008c
-data_027e0500 kind:bss addr:0x027e0500
+OSi_IrqThreadQueue kind:bss addr:0x027e0500

@@ -103,9 +103,22 @@ static inline void OS_SetIrqCheckFlag(u32 mask) {
     *(volatile u32 *) ((u32) SDK_AUTOLOAD_DTCM_START + 0x3FF8) |= mask;
 }
 
+static inline u32 OS_GetIrqCheckFlag(void) {
+    return *(volatile u32 *) ((u32) SDK_AUTOLOAD_DTCM_START + 0x3FF8);
+}
+
+static inline void OS_ClearIrqCheckFlag(u32 mask) {
+    *(volatile u32 *) ((u32) SDK_AUTOLOAD_DTCM_START + 0x3FF8) &= ~mask;
+}
+
 void OS_InitIrqTable(void);
 void OS_SetIrqFunction(u32 mask, OSIrqFunction func);
+u32 OS_SetIrqMask(u32 mask);
 u32 OS_EnableIrqMask(u32 mask);
+u32 OS_DisableIrqMask(u32 mask);
+u32 OS_ResetRequestIrqMask(u32 mask);
+void OS_WaitIrq(BOOL clear, u32 irqFlags);
+void OS_SleepThread(OSThreadQueue *queue);
 
 void OS_InitMutex(OSMutex *mutex);
 void OS_LockMutex(OSMutex *mutex);
