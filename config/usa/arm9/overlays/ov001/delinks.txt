@@ -34,3 +34,6 @@ src/ov001/dino_field_radar.cpp:
 
 src/ov001/dino_field_point.cpp:
     .text       start:0x021691cc end:0x02169298
+
+src/ov001/dino_field_lower_spot.cpp:
+    .text       start:0x021582e8 end:0x021585a8
