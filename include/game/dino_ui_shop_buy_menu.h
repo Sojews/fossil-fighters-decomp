@@ -18,6 +18,7 @@ public:
     void OnBackDecided();
     BOOL PageRight();
     BOOL PageLeft();
+    BOOL Buy();
 
     MArchivePtr mArchive;       // 0xB4
     MArchiveFile mFile;         // 0xB8
@@ -25,6 +26,8 @@ public:
     std::vector<void *> mUnkD4; // 0xD4
     u32 mUnkE0[2];              // 0xE0
     std::vector<u32> mUnkE8;    // 0xE8
+    u8 unkF4[0x28];
+    u8 mUnk11C; // 0x11C
 };
 
 class DinoUiShopBuyBackButton : public DinoUiShopBuyMenuItem {

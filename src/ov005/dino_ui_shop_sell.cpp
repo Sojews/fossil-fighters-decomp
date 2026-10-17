@@ -111,6 +111,31 @@ void DinoUiShopSellMenu::OnBackDecided() {
     serial->AddTail(exit);
 }
 
+void DinoUiShopSellSellButton::OnDecide() {
+    if (mOwner->Sell()) {
+        DinoSoundPlaySe(0x98, 0);
+        mMotion->Play(3, 1);
+        MTask *play = mMotion->CreatePlayTransfer(2, 0);
+        MTask *wait = mMotion->CreateWaitStopTask();
+        MSerialTaskSet *serial = &mSerial;
+        serial->AddTail(wait);
+        serial->AddTail(play);
+    }
+}
+
+void DinoUiShopSellSellButton::OnFocusChanged(BOOL focused) {
+    if (focused) {
+        if (mOwner->mUnk150) {
+            mMotion->Play(2, 0);
+        } else {
+            mMotion->Play(1, 0);
+        }
+    } else {
+        mMotion->Play(1, 0);
+        mSerial.Clear();
+    }
+}
+
 // Template task instances the game emits in this file. Until the code that makes the tasks is decompiled, they are
 // instantiated explicitly.
 template class MCallTask0<DinoUiShopSellMenu, DinoUiShopSellMenu>;

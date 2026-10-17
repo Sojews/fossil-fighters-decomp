@@ -18,11 +18,14 @@ public:
     void OnBackDecided();
     BOOL PageRight();
     BOOL PageLeft();
+    BOOL Buy();
 
     u32 mUnkB4[4];          // 0xB4
     std::vector<void *> mUnkC4; // 0xC4
     u32 mUnkD0[8];          // 0xD0
     std::vector<void *> mUnkF0; // 0xF0
+    u8 unkFC[0x10];
+    u8 mUnk10C; // 0x10C
 };
 
 class DinoUiMaskBuyBackButton : public DinoUiMaskBuyMenuItem {
