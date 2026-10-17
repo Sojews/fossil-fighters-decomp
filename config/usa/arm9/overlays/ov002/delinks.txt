@@ -9,37 +9,37 @@ src/ov002/dino_cleaning_talk_filter.cpp:
     .text       start:0x02157e84 end:0x02158018
 
 src/ov002/dino_cleaning_paper.cpp:
-    .text       start:0x02158414 end:0x02158448
+    .text       start:0x02158230 end:0x02158448
 
 src/ov002/dino_cleaning_new_dust.cpp:
-    .text       start:0x0215b0a0 end:0x0215b118
+    .text       start:0x0215ac5c end:0x0215b118
 
 src/ov002/dino_cleaning_status.cpp:
-    .text       start:0x0215b550 end:0x0215b584
+    .text       start:0x0215b118 end:0x0215b584
 
 src/ov002/dino_cleaning_score.cpp:
     .text       start:0x0215bc18 end:0x0215bc4c
 
 src/ov002/dino_cleaning_blower.cpp:
-    .text       start:0x0215c964 end:0x0215c998
+    .text       start:0x0215c86c end:0x0215c998
 
 src/ov002/dino_cleaning_xray.cpp:
     .text       start:0x0215ca78 end:0x0215caac
 
 src/ov002/dino_cleaning_hammer.cpp:
-    .text       start:0x0215d6cc end:0x0215d82c
+    .text       start:0x0215caac end:0x0215d82c
 
 src/ov002/dino_cleaning_drill.cpp:
     .text       start:0x0215e2dc end:0x0215e370
 
 src/ov002/dino_cleaning_dummy_item.cpp:
-    .text       start:0x0215eb50 end:0x0215efc8
+    .text       start:0x0215e370 end:0x0215efc8
 
 src/ov002/dino_cleaning_rock.cpp:
-    .text       start:0x0215f1e4 end:0x0215f218
+    .text       start:0x0215efc8 end:0x0215f218
 
 src/ov002/dino_cleaning_kaseki_rock.cpp:
-    .text       start:0x021602bc end:0x021610b0
+    .text       start:0x0215f218 end:0x021610b0
 
 src/ov002/dino_cleaning_stop_confirm_menu_item.cpp:
     .text       start:0x02156910 end:0x021571e0
@@ -54,10 +54,10 @@ src/ov002/dino_cleaning_tutorial_window.cpp:
     .text       start:0x0215722c end:0x02157280
 
 src/ov002/dino_cleaning_timer.cpp:
-    .text       start:0x0215c7d8 end:0x0215c86c
+    .text       start:0x0215c5fc end:0x0215c86c
 
 src/ov002/dino_cleaning_tool.cpp:
-    .text       start:0x0215c9c8 end:0x0215c9fc
+    .text       start:0x0215c998 end:0x0215c9fc
 
 src/ov002/dino_cleaning_live_task.cpp:
     .text       start:0x02158018 end:0x02158230

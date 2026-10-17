@@ -210,16 +210,16 @@ src/game/dino_event_talk_window.cpp:
     .text       start:0x02007014 end:0x020082b0
 
 src/game/dino_talk_console_filter.cpp:
-    .text       start:0x0200a2a4 end:0x0200a34c
+    .text       start:0x02008f60 end:0x0200a34c
 
 src/game/dino_multi_play_icon.cpp:
-    .text       start:0x0200a428 end:0x0200a5bc
+    .text       start:0x0200a34c end:0x0200a5bc
 
 src/game/dino_sound.cpp:
     .text       start:0x0201fc84 end:0x020203e8
 
 src/game/m3d_scene_enable_task.cpp:
-    .text       start:0x020230ac end:0x020230bc
+    .text       start:0x02023024 end:0x020230bc
 
 src/game/m_polygon_char.cpp:
     .text       start:0x020292ac end:0x020292e0
@@ -237,16 +237,16 @@ src/game/dino_cleaning_sample.cpp:
     .text       start:0x02032590 end:0x02033d98
 
 src/game/dino_atm_sample.cpp:
-    .text       start:0x02033f80 end:0x02033fe8
+    .text       start:0x02033d98 end:0x02033fe8
 
 src/game/dino_net_battle_sample.cpp:
-    .text       start:0x02034390 end:0x020343c4
+    .text       start:0x02033fe8 end:0x020343c4
 
 src/game/dino_event_park_kaseki_rock_found.cpp:
     .text       start:0x02036af8 end:0x02037b28
 
 src/game/dino_event_revive_field_suspend_task.cpp:
-    .text       start:0x02039244 end:0x020398e0
+    .text       start:0x02037b28 end:0x020398e0
 
 src/game/dino_event_ui_task.cpp:
     .text       start:0x0203e21c end:0x0203efb4
@@ -258,7 +258,7 @@ src/game/dino_main.cpp:
     .text       start:0x0204760c end:0x02049004
 
 src/game/multi_play_error_dialog.cpp:
-    .text       start:0x02049310 end:0x02049388
+    .text       start:0x02049004 end:0x02049388
 
 src/m/screen.cpp:
     .text       start:0x0205601c end:0x0205622c
@@ -312,7 +312,7 @@ src/m/motion.cpp:
     .text       start:0x0205ef10 end:0x02061d88
 
 src/m/canvas_copy_transfer.cpp:
-    .text       start:0x0206465c end:0x0206468c
+    .text       start:0x020644a0 end:0x0206468c
 
 src/m/menu.cpp:
     .text       start:0x0206665c end:0x02067988
@@ -330,7 +330,7 @@ src/m/multi_play.cpp:
     .text       start:0x020694dc end:0x0206c77c
 
 src/game/dino_common_item.cpp:
-    .text       start:0x0201cd18 end:0x0201ce08
+    .text       start:0x0201c9e4 end:0x0201ce08
 
 src/game/dino_common_yes_no_menu_item.cpp:
     .text       start:0x0203047c end:0x02030e7c

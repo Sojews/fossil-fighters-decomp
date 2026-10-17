@@ -9,10 +9,10 @@ src/ov001/dino_field_chara_angle_task.cpp:
     .text       start:0x02158ea4 end:0x0215bcf8
 
 src/ov001/dino_field_kaseki_rock.cpp:
-    .text       start:0x0215c108 end:0x0215c13c
+    .text       start:0x0215bf44 end:0x0215c13c
 
 src/ov001/dino_field_raster.cpp:
-    .text       start:0x0215c29c end:0x0215c2d0
+    .text       start:0x0215c13c end:0x0215c2d0
 
 src/ov001/dino_field_chara_angle_anime.cpp:
     .text       start:0x02160100 end:0x021634a8
@@ -21,10 +21,10 @@ src/ov001/dino_field_town_map.cpp:
     .text       start:0x02166980 end:0x0216845c
 
 src/ov001/dino_field_area_panel.cpp:
-    .text       start:0x02168930 end:0x02168964
+    .text       start:0x0216892c end:0x02168964
 
 src/ov001/dino_field_battle_start_effect.cpp:
-    .text       start:0x02168bd4 end:0x02168c08
+    .text       start:0x02168964 end:0x02168c08
 
 src/ov001/dino_field_capture_fade_out_task.cpp:
     .text       start:0x0215bcf8 end:0x0215bf44
@@ -33,7 +33,7 @@ src/ov001/dino_field_radar.cpp:
     .text       start:0x0215d278 end:0x0215eb50
 
 src/ov001/dino_field_point.cpp:
-    .text       start:0x021691cc end:0x02169298
+    .text       start:0x02168c08 end:0x02169298
 
 src/ov001/dino_field_lower_spot.cpp:
     .text       start:0x021582e8 end:0x021585a8
