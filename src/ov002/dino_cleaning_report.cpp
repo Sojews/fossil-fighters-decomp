@@ -9,3 +9,7 @@
 
 DinoCleaningReport::~DinoCleaningReport() {
 }
+
+void DinoCleaningReport::Idle() {
+    (this->*mState)();
+}

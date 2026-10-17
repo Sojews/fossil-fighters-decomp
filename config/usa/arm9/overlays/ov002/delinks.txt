@@ -48,7 +48,7 @@ src/ov002/dino_cleaning_live.cpp:
     .text       start:0x02161f5c end:0x021632c4
 
 src/ov002/dino_cleaning_report.cpp:
-    .text       start:0x02156830 end:0x021568c4
+    .text       start:0x021558a0 end:0x021568c4
 
 src/ov002/dino_cleaning_tutorial_window.cpp:
     .text       start:0x0215722c end:0x02157280

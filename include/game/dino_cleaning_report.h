@@ -16,7 +16,8 @@ public:
     virtual ~DinoCleaningReport();
     virtual void Idle();
 
-    u32 mUnk74[5];          // 0x74
+    void (DinoCleaningReport::*mState)(); // 0x74
+    u32 mUnk7C[3];          // 0x7C
     MArchivePtr mArchive;   // 0x88
     MArchiveFile mFile;     // 0x8C
 };

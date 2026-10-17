@@ -5,3 +5,7 @@
 
 DinoUiFieldMenu::~DinoUiFieldMenu() {
 }
+
+void DinoUiFieldMenu::Idle() {
+    (this->*mState)();
+}

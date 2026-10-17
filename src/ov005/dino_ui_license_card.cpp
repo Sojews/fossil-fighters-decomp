@@ -5,3 +5,7 @@
 
 DinoUiLicenseCard::~DinoUiLicenseCard() {
 }
+
+void DinoUiLicenseCard::Idle() {
+    (this->*mState)();
+}

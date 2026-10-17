@@ -6,7 +6,7 @@
     .bss        start:0x02199180 end:0x02199220 kind:bss align:32
 
 src/ov006/dino_ui_field_menu.cpp:
-    .text       start:0x02171e98 end:0x02171ecc
+    .text       start:0x02171b00 end:0x02171ecc
 
 src/ov006/dino_ui_item_item_button.cpp:
     .text       start:0x02176ff4 end:0x02178b80
