@@ -2,6 +2,7 @@
 #ifndef GAME_DINO_EVENT_EXEC_H
 #define GAME_DINO_EVENT_EXEC_H
 
+#include "game/dino_common_tutorial_window.h"
 #include "m/task.h"
 #include "m/input.h"
 #include "game/dino_backup.h"
@@ -811,15 +812,6 @@ public:
 
     DinoEvent *mEvent;  // 0x74
     u32 mStep;          // 0x78
-};
-
-// A window showing text on one screen (its text starts with "$upper" or "$lower").
-class DinoCommonTutorialWindow : public MProcess {
-public:
-    DinoCommonTutorialWindow(MDisplay *display, std::string text);
-    virtual void Idle();
-
-    u8 unk74[0x28];
 };
 
 class DinoEventExecTalk : public MProcess {
