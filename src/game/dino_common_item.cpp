@@ -43,3 +43,7 @@ void DinoCommonItem::OnSelectChanged(BOOL selected) {
     }
 }
 
+
+void DinoCommonItem::OnFocusChanged(BOOL focused) {
+    UpdateLook();
+}

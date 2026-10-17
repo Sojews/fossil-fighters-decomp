@@ -60,3 +60,14 @@ template class MBgCallTask0<DinoBackup>;
 template MTask *MCreateBgCallTask(DinoBackup *obj, void (DinoBackup::*func)(), int thread);
 template class MCallTask0<DinoUiATMMenu, DinoUiATMMenu>;
 template MTask *MCreateCallTask(DinoUiATMMenu *obj, void (DinoUiATMMenu::*func)());
+
+void DinoUiATMBackButton::OnFocusChanged(BOOL focused) {
+    mSerial.Clear();
+    if (focused) {
+        mMotion->Play(3, 0);
+        mMotion2->Play(3, 0);
+    } else {
+        mMotion->Play(2, 0);
+        mMotion2->Play(2, 0);
+    }
+}

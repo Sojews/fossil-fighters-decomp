@@ -103,3 +103,16 @@ void DinoUi2ContainerBasePageLButton::OnDecide() {
 // instantiated explicitly.
 template class MCallTask0<DinoUi2CannonShootMenu, DinoUi2CannonShootMenu>;
 template MTask *MCreateCallTask(DinoUi2CannonShootMenu *obj, void (DinoUi2CannonShootMenu::*func)());
+
+void DinoUi2ContainerBaseDecideButton::OnFocusChanged(BOOL focused) {
+    if (focused) {
+        if (mOwner->mUnkFC) {
+            mMotion->Play(2, 0);
+        } else {
+            mMotion->Play(1, 0);
+        }
+    } else {
+        mMotion->Play(1, 0);
+        mSerial.Clear();
+    }
+}

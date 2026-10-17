@@ -18,7 +18,7 @@ public:
 
     u8 unk94[0x4];
     MMotion *mMotion;   // 0x98
-    u8 unk9C[0x4];
+    MMotion *mMotion2;  // 0x9C
     u32 mTextId;        // 0xA0
 };
 

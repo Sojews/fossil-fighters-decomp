@@ -4,6 +4,8 @@
 #include "m/motion.h"
 #include "m/menu_item.h"
 
+class DinoUiIslandMapMenu;
+
 class DinoUiIslandMapMenuItem : public MMenuItem {
 public:
     virtual ~DinoUiIslandMapMenuItem();
@@ -12,7 +14,7 @@ public:
     virtual void OnSelectChanged(BOOL selected);
     virtual void OnDecide();
 
-    u8 unk88[0x4];
+    DinoUiIslandMapMenu *mOwner; // 0x88
     MMotion *mMotion;   // 0x8C
 };
 

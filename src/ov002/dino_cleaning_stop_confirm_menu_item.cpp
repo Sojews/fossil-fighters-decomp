@@ -52,3 +52,9 @@ void DinoCleaningStopConfirmMenu::OnFocus(MMenuItem *item) {
         mMotion->Play(3, 0);
     }
 }
+
+void DinoCleaningStopConfirmMenuItem::OnFocusChanged(BOOL focused) {
+    if (focused) {
+        Select();
+    }
+}

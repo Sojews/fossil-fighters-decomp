@@ -13,6 +13,8 @@ public:
     virtual void OnIdle();
     virtual void OnFocus(MMenuItem *item);
     virtual void OnDecide(MMenuItem *item);
+    void SetSilentFocus(BOOL silent);
+    BOOL IsSilentFocus();
 
     u32 mUnkB4[19];         // 0xB4
     MArchivePtr mArchive;   // 0x100
@@ -22,6 +24,8 @@ public:
     MArchiveFile mFile128;  // 0x128
     MIndexBitmap *mBitmap;  // 0x134
     MPalBlock *mPalette;    // 0x138
+    u32 mUnk13C[7];         // 0x13C
+    u8 mSilentFocus;        // 0x158: no focus SE for the next focus change
 };
 
 #endif

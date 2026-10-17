@@ -2,6 +2,7 @@
 #define GAME_DINO_UI_MASK_EQUIP_MASK_BUTTON_H
 
 #include "m/menu_item.h"
+#include "m/motion.h"
 
 class DinoUiMaskEquipMaskButton : public MMenuItem {
 public:
@@ -9,6 +10,9 @@ public:
     virtual MRect GetFrame();
     virtual void OnFocusChanged(BOOL focused);
     virtual void OnDecide();
+
+    u32 mUnk88[4];
+    MMotion *mMotion;   // 0x98
 };
 
 #endif

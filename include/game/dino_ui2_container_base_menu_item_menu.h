@@ -16,7 +16,9 @@ class DinoUi2ContainerBaseMenu : public DinoHelpBase, public MMenu {
 public:
     virtual ~DinoUi2ContainerBaseMenu();
 
-    u32 mUnkB4[22];                 // 0xB4
+    u32 mUnkB4[18];                 // 0xB4
+    u8 mUnkFC;                      // 0xFC
+    u32 mUnk100[3];                 // 0x100
     std::vector<void *> mUnk10C;    // 0x10C
     u32 mUnk118[7];                 // 0x118
     std::vector<unsigned short> mUnk134; // 0x134: (the element type is a guess, distinct from other overlays')

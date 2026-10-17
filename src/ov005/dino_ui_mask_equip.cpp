@@ -120,3 +120,13 @@ void DinoUiMaskEquipMenu::OnBackDecided() {
 // instantiated explicitly.
 template class MCallTask0<DinoUiMaskEquipMenu, DinoUiMaskEquipMenu>;
 template MTask *MCreateCallTask(DinoUiMaskEquipMenu *obj, void (DinoUiMaskEquipMenu::*func)());
+
+void DinoUiMaskEquipMaskButton::OnFocusChanged(BOOL focused) {
+    if (focused) {
+        mMotion->Play(1, 0);
+        mMotion->Show();
+    } else {
+        mMotion->Play(1, 0);
+        mMotion->Hide();
+    }
+}

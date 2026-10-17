@@ -104,3 +104,12 @@ void DinoUiOptionMenu::OnFocus(MMenuItem *item) {
     }
     SetSelectedItem(dynamic_cast<DinoHelpItem *>(item));
 }
+
+void DinoUiOptionMenuItem::OnFocusChanged(BOOL focused) {
+    if (focused) {
+        mMotion->Play(1, 0);
+        mMotion->Show();
+    } else {
+        mMotion->Hide();
+    }
+}

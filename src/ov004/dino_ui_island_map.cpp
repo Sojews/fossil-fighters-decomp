@@ -17,6 +17,7 @@
 #include "game/island_map_key_check_task.h"
 #include "game/guid_man.h"
 #include "game/dino_map_back_button.h"
+#include "game/dino_sound.h"
 
 DinoUiIslandMap::~DinoUiIslandMap() {
 }
@@ -52,6 +53,16 @@ DinoUiIslandMapMenu::~DinoUiIslandMapMenu() {
 void DinoUiIslandMapMenu::OnIdle() {
 }
 
+#pragma auto_inline off
+void DinoUiIslandMapMenu::SetSilentFocus(BOOL silent) {
+    mSilentFocus = silent;
+}
+
+BOOL DinoUiIslandMapMenu::IsSilentFocus() {
+    return mSilentFocus;
+}
+#pragma auto_inline on
+
 void DinoMapBackButton::OnSelectChanged(BOOL value) {
 }
 
@@ -84,4 +95,28 @@ void DinoUiIslandMapMenuItem::OnSelectChanged(BOOL selected) {
 }
 
 void DrawFont::Idle() {
+}
+
+void DinoMapBackButton::OnFocusChanged(BOOL focused) {
+    if (focused) {
+        if (!mOwner->IsSilentFocus()) {
+            DinoSoundPlaySe(0x96, 0);
+        }
+        mOwner->SetSilentFocus(FALSE);
+        mMotion->Play(3, 1);
+    } else {
+        mMotion->Play(2, 1);
+    }
+}
+
+void DinoUiIslandMapMenuItem::OnFocusChanged(BOOL focused) {
+    if (focused) {
+        if (!mOwner->IsSilentFocus()) {
+            DinoSoundPlaySe(0x96, 0);
+        }
+        mOwner->SetSilentFocus(FALSE);
+        mMotion->Play(2, 0);
+    } else {
+        mMotion->Play(1, 0);
+    }
 }
