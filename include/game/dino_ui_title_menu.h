@@ -13,6 +13,10 @@ public:
     virtual void OnIdle();
     virtual void OnFocus(MMenuItem *item);
     virtual void OnDecide(MMenuItem *item);
+
+    u32 mUnkB4[5];
+    u32 mUnkC8;      // 0xC8
+    u8 mSilentFocus; // 0xCC
 };
 
 class DinoUiOpening : public MProcess {

@@ -40,3 +40,15 @@ void DinoCleaningStopConfirm::Idle() {
 void DinoCleaningSleep::Idle() {
     (this->*mState)();
 }
+
+void DinoCleaningStopConfirmMenu::OnFocus(MMenuItem *item) {
+    if (mSilentFocus) {
+        mSilentFocus = FALSE;
+        return;
+    }
+    if (item == mYesItem) {
+        mMotion->Play(2, 0);
+    } else if (item == mNoItem) {
+        mMotion->Play(3, 0);
+    }
+}

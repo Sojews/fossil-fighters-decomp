@@ -4,6 +4,7 @@
 // Derived destructors have their bases' destructor bodies inlined; auto-inlining the ones defined above does that.
 #pragma auto_inline on
 
+#include "game/dino_sound.h"
 #include "game/disp_blower_menu.h"
 #include "game/disp_blower.h"
 #include "game/option_key_check_task.h"
@@ -91,3 +92,15 @@ void DinoUiOptionBackButton::OnFocusChanged(BOOL focused) {
 // instantiated explicitly.
 template class MCallTask0<DinoUiOptionMenu, DinoHelpBase>;
 template MTask *MCreateCallTask(DinoUiOptionMenu *obj, void (DinoHelpBase::*func)());
+
+void DinoUiOptionMenu::OnFocus(MMenuItem *item) {
+    if (item == NULL) {
+        return;
+    }
+    if (mSilentFocus) {
+        mSilentFocus = FALSE;
+    } else {
+        DinoSoundPlaySe(0x38E, 0);
+    }
+    SetSelectedItem(dynamic_cast<DinoHelpItem *>(item));
+}

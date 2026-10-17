@@ -13,6 +13,9 @@ public:
     virtual void OnFocus(MMenuItem *item);
     void RemoveItem();
     void OnBackDecided();
+
+    u8 unkB3[0x19];  // members start in MMenu's tail padding
+    u8 mSilentFocus; // 0xCC
 };
 
 class DinoUiSaveOptionSaveButton : public DinoUiSaveOptionMenuItem {

@@ -1,6 +1,7 @@
 // DinoUiSaveSlotSelect, DinoUiSaveSlotConfirm, DinoUiSaveSlotSelectMenuConfirmDeleteTask.
 // Only the destructors are decompiled so far.
 
+#include "game/dino_sound.h"
 #include "game/dino_ui_save_slot_select.h"
 #include "game/dino_ui_save_slot_confirm.h"
 #include "game/dino_ui_save_slot_select_menu_confirm_delete_task.h"
@@ -94,3 +95,12 @@ template class MBgCallTask0<DinoUiSaveSlotSelect>;
 template MTask *MCreateBgCallTask(DinoUiSaveSlotSelect *obj, void (DinoUiSaveSlotSelect::*func)(), int thread);
 template class MBgCallTask0<DinoUiOpening>;
 template MTask *MCreateBgCallTask(DinoUiOpening *obj, void (DinoUiOpening::*func)(), int thread);
+
+void DinoUiSaveSlotSelectMenu::OnFocus(MMenuItem *item) {
+    if (mSilentFocus) {
+        mSilentFocus = FALSE;
+    } else {
+        DinoSoundPlaySe(0x38E, 0);
+    }
+    SetSelectedItem(dynamic_cast<DinoHelpItem *>(item));
+}

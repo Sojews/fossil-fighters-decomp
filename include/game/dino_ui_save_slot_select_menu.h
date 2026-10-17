@@ -10,6 +10,9 @@ public:
     virtual void OnStart();
     virtual void OnFocus(MMenuItem *item);
     virtual void OnDecide(MMenuItem *item);
+
+    u32 mUnkB4[8];
+    u8 mSilentFocus; // 0xD4
 };
 class DinoUiSaveSlotConfirmMenu : public MMenu {
 public:

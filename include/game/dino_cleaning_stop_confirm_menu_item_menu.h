@@ -6,6 +6,7 @@
 #include <vector>
 #include "m/menu_item.h"
 #include "m/menu.h"
+#include "m/motion.h"
 #include "game/help.h"
 
 class DinoCleaningStopConfirmMenu : public MMenu, public DinoHelpBase {
@@ -15,8 +16,12 @@ public:
     virtual void OnFocus(MMenuItem *item);
     virtual void OnDecide(MMenuItem *item);
 
-    u32 mUnkB4;             // 0xB4
+    u8 mSilentFocus;        // 0xB4
     std::string mUnkB8;     // 0xB8
+    u32 mUnkC4[2];
+    MMotion *mMotion;       // 0xCC
+    MMenuItem *mYesItem;    // 0xD0
+    MMenuItem *mNoItem;     // 0xD4
 };
 
 class DinoCleaningStopConfirm : public MProcess, public DinoHelpBase {

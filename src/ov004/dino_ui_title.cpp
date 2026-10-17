@@ -4,6 +4,7 @@
 // Derived destructors have their bases' destructor bodies inlined; auto-inlining the ones defined above does that.
 #pragma auto_inline on
 
+#include "game/dino_sound.h"
 #include "game/dino_ui_title_menu.h"
 #include "game/dino_ui_title.h"
 #include "game/dino_ui_title_skip.h"
@@ -51,3 +52,12 @@ template class MCallTask1<MBg, MBg, bg_mode>;
 template MTask *MCreateCallTask(MBg *obj, void (MBg::*func)(bg_mode), bg_mode a0);
 template class MBgCallTask0<DinoUiOpening>;
 template MTask *MCreateBgCallTask(DinoUiOpening *obj, void (DinoUiOpening::*func)(), int thread);
+
+void DinoUiTitleMenu::OnFocus(MMenuItem *item) {
+    mUnkC8 = 0;
+    if (mSilentFocus) {
+        mSilentFocus = FALSE;
+    } else {
+        DinoSoundPlaySe(0x38E, 0);
+    }
+}

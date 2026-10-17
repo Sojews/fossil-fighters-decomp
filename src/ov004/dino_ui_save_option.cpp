@@ -81,3 +81,12 @@ void DinoUiSaveOptionBackButton::OnDecide() {
     DinoSoundPlaySe(0x38F, 0);
     mOwner->OnBackDecided();
 }
+
+void DinoUiSaveOptionMenu::OnFocus(MMenuItem *item) {
+    if (mSilentFocus) {
+        mSilentFocus = FALSE;
+    } else {
+        DinoSoundPlaySe(0x38E, 0);
+    }
+    SetSelectedItem(dynamic_cast<DinoHelpItem *>(item));
+}
