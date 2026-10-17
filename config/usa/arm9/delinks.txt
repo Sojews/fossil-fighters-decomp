@@ -90,7 +90,7 @@ src/m/bit_vector.cpp:
     .text       start:0x0201b4ac end:0x0201b51c
 
 src/game/dino_common_window.cpp:
-    .text       start:0x0201b574 end:0x0201bad0
+    .text       start:0x0201b574 end:0x0201be50
 
 src/game/dino_common_label.cpp:
     .text       start:0x0201c68c end:0x0201c9e4
@@ -222,7 +222,7 @@ src/game/m3d_scene_enable_task.cpp:
     .text       start:0x02023024 end:0x020230bc
 
 src/game/m_polygon_char.cpp:
-    .text       start:0x020292ac end:0x020292e0
+    .text       start:0x020292ac end:0x020293e4
 
 src/game/dino_common_window_menu_item_flush_task.cpp:
     .text       start:0x0202d9ac end:0x0202f204
