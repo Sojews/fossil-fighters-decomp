@@ -47,3 +47,23 @@ void DinoCommonItem::OnSelectChanged(BOOL selected) {
 void DinoCommonItem::OnFocusChanged(BOOL focused) {
     UpdateLook();
 }
+
+void DinoCommonItem::UpdateLook() {
+    if (IsSelected()) {
+        mMotion->Play(3, 0);
+    } else if (IsFocused()) {
+        mMotion->Play(2, 0);
+    } else {
+        mMotion->Play(1, 0);
+    }
+}
+
+void DinoCommonItem::OnEnableChanged(BOOL enabled) {
+    if (mView) {
+        if (enabled) {
+            mView->SetColors(0, 1, 10);
+        } else {
+            mView->SetColors(0, 11, 10);
+        }
+    }
+}

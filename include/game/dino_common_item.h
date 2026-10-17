@@ -1,6 +1,8 @@
 #ifndef GAME_DINO_COMMON_ITEM_H
 #define GAME_DINO_COMMON_ITEM_H
 
+#include "game/dino_common_label.h"
+#include "m/motion.h"
 #include "m/smart_oam.h"
 #include "m/view.h"
 #include "game/dino_resource.h"
@@ -21,8 +23,8 @@ public:
     void UpdateLook();
 
     MSmartOam *mOam;        // 0x94
-    u32 mUnk98;             // 0x98
-    MView *mView;           // 0x9C
+    MMotion *mMotion;       // 0x98
+    DinoCommonLabel *mView; // 0x9C
     MPoint mPos;            // 0xA0
     MRect mFrame;           // 0xA8
     u32 mTextId;            // 0xB8

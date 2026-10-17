@@ -127,3 +127,9 @@ void DinoMapBackButton::OnDecide() {
     mOwner->OnBackDecided();
     DinoSoundPlaySe(0x90, 0);
 }
+
+void DinoUiIslandMapMenuItem::OnDecide() {
+    mSerial.AddTail(mMotion->CreatePlayTransfer(3, 0));
+    mOwner->OnSpotDecided();
+    DinoSoundPlaySe(0x98, 0);
+}

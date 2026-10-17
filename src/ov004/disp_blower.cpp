@@ -127,3 +127,7 @@ void DinoUiOptionBackButton::OnDecide() {
     DinoSoundPlaySe(0x38F, 0);
     mOwner->OnBackDecided();
 }
+
+void MicTestButton::OnDecide() {
+    DinoSoundPlaySe(0x390, 0);
+}

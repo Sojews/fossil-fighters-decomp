@@ -62,3 +62,7 @@ void DinoCommonYesNoMenu::OnDecide(MMenuItem *item) {
     }
 }
 
+
+void DinoCommonYesNoMenuItem::OnDecide() {
+    mMotion->Play(mIsYes ? 3 : 6, 1);
+}

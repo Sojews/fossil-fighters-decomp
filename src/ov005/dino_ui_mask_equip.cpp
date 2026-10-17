@@ -130,3 +130,7 @@ void DinoUiMaskEquipMaskButton::OnFocusChanged(BOOL focused) {
         mMotion->Hide();
     }
 }
+
+void DinoUiMaskEquipMaskButton::OnDecide() {
+    mMotion->Show();
+}
