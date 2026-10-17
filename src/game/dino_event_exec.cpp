@@ -391,6 +391,108 @@ void DinoEventExecFinishWatch::Transfer() {
     }
 }
 
+DinoEventExecFade::DinoEventExecFade(DinoEvent *event, u32 a, u32 b, u8 wait) : MProcess(NULL) {
+    mEvent = event;
+    mA = a;
+    mB = b;
+    mWait = wait;
+}
+
+void DinoEventExecFade::Idle() {
+    mEvent->Fade(mA, mB);
+    if (mWait) {
+        MTask *exit = MTaskExitTransfer::Create(this);
+        MTask *task = mEvent->CreateFadeWaitTask();
+        MSerialTaskSet *serial = &mSerial;
+        serial->AddTail(task);
+        serial->AddTail(exit);
+    } else {
+        Exit();
+    }
+}
+
+DinoEventExecCharaBodyModelIndex::DinoEventExecCharaBodyModelIndex(DinoEvent *event, u32 chara, u32 model) {
+    mEvent = event;
+    mChara = chara;
+    mModel = model;
+}
+
+void DinoEventExecCharaBodyModelIndex::Transfer() {
+    DinoCharaState state;
+    gDinoBackup->GetChara(mChara, &state);
+    state.bodyModel = mModel;
+    gDinoBackup->SetChara(mChara, &state);
+    DinoFieldChara *chara = mEvent->GetField()->GetChara(mChara);
+    if (chara != NULL) {
+        chara->UpdateBodyModel();
+    }
+}
+
+DinoEventExecCharaHeadModelIndex::DinoEventExecCharaHeadModelIndex(DinoEvent *event, u32 chara, u32 model) {
+    mEvent = event;
+    mChara = chara;
+    mModel = model;
+}
+
+void DinoEventExecCharaHeadModelIndex::Transfer() {
+    DinoCharaState state;
+    gDinoBackup->GetChara(mChara, &state);
+    state.headModel = mModel;
+    gDinoBackup->SetChara(mChara, &state);
+    DinoFieldChara *chara = mEvent->GetField()->GetChara(mChara);
+    if (chara != NULL) {
+        chara->UpdateHeadModel();
+        chara->ApplyMotion();
+    }
+}
+
+DinoEventExecRadarMode::DinoEventExecRadarMode(DinoEvent *event, u32 mode, u32 a, u8 b) : MProcess(NULL) {
+    mEvent = event;
+    mMode = mode;
+    mA = a;
+    mB = b;
+}
+
+void DinoEventExecRadarMode::Idle() {
+    DinoPlayerData player;
+    gDinoBackup->GetPlayer(&player, FALSE);
+    int from = player.radarMode;
+    if (from == mMode) {
+        Exit();
+        return;
+    }
+    player.radarMode = mMode;
+    gDinoBackup->SetPlayer(&player);
+    MTask *exit = MTaskExitTransfer::Create(this);
+    MTask *task = mEvent->GetField()->mRadar->CreateModeTask(from, mMode, mA, mB);
+    MSerialTaskSet *serial = &mSerial;
+    serial->AddTail(task);
+    serial->AddTail(exit);
+}
+
+DinoEventExecTownMapMode::DinoEventExecTownMapMode(DinoEvent *event, u32 mode, u32 a) : MProcess(NULL) {
+    mEvent = event;
+    mMode = mode;
+    mA = a;
+}
+
+void DinoEventExecTownMapMode::Idle() {
+    DinoPlayerData player;
+    gDinoBackup->GetPlayer(&player, FALSE);
+    if (player.townMapMode == mMode) {
+        Exit();
+        return;
+    }
+    u32 radarMode = player.radarMode;
+    player.townMapMode = mMode;
+    gDinoBackup->SetPlayer(&player);
+    MTask *exit = MTaskExitTransfer::Create(this);
+    MTask *task = mEvent->GetField()->mTownMap->CreateModeTask(radarMode, mMode, mA);
+    MSerialTaskSet *serial = &mSerial;
+    serial->AddTail(task);
+    serial->AddTail(exit);
+}
+
 DinoEventExecStartBehold::DinoEventExecStartBehold(DinoEvent *event, u32 chara, u32 target) {
     mEvent = event;
     mChara = chara;

@@ -33,8 +33,8 @@ struct DinoPlayerData {
     s32 money : 32;             // 0x18: system var 3
     // 0x1C
     u32 containerNum : 4;       // system var 2
-    u32 unk1c_4 : 2;
-    u32 unk1c_6 : 1;
+    u32 radarMode : 2;
+    u32 townMapMode : 1;
     u32 unk1c_7 : 16;
     u32 unk1c_23 : 8;           // system var 14
     u32 unk1c_31 : 1;
@@ -102,7 +102,9 @@ struct DinoSaveSummary {
 struct DinoCharaState {
     DinoCharaState() {}
     u8 unk0;    // 0x00
-    u32 unk4;   // 0x04
+    u32 bodyModel : 8;  // 0x04
+    u32 headModel : 8;
+    u32 unk4_16 : 16;
     u32 unk8;   // 0x08
     u32 unkC;   // 0x0C
     u32 unk10;  // 0x10

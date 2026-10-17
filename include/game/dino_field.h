@@ -39,6 +39,18 @@ public:
     void FinishBehold();
     void SetFootSe(u32 se);
     void SetTask(DinoCharaTask task);
+    void UpdateBodyModel();
+    void UpdateHeadModel();
+};
+
+class DinoFieldRadar {
+public:
+    MTask *CreateModeTask(u32 from, u32 to, u32 a, u8 b);
+};
+
+class DinoFieldTownMap {
+public:
+    MTask *CreateModeTask(u32 radarMode, u32 to, u32 a);
 };
 
 class DinoField {
@@ -61,6 +73,10 @@ public:
     MTask *CreateMoneyHideTask();
     MTask *CreateDonateShowTask();
     MTask *CreateDonateHideTask();
+
+    u8 unk000[0x244];
+    DinoFieldRadar *mRadar;     // 0x244
+    DinoFieldTownMap *mTownMap; // 0x248
 };
 
 // The event being run.
@@ -68,6 +84,8 @@ class DinoEvent {
 public:
     void MarkCameraUsed();
     DinoField *GetField();
+    void Fade(u32 a, u32 b);
+    MTask *CreateFadeWaitTask();
 };
 
 #endif

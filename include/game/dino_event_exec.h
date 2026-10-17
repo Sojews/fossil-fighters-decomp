@@ -379,7 +379,14 @@ public:
 
 class DinoEventExecFade : public MProcess {
 public:
+    DinoEventExecFade(DinoEvent *event, u32 a, u32 b, u8 wait);
     virtual ~DinoEventExecFade();
+    virtual void Idle();
+
+    DinoEvent *mEvent;  // 0x74
+    u32 mA;             // 0x78
+    u32 mB;             // 0x7C
+    u8 mWait;           // 0x80
 };
 
 class DinoEventExecLicenseGet : public MTransfer {
@@ -461,12 +468,24 @@ public:
 
 class DinoEventExecCharaBodyModelIndex : public MTransfer {
 public:
+    DinoEventExecCharaBodyModelIndex(DinoEvent *event, u32 chara, u32 model);
     virtual ~DinoEventExecCharaBodyModelIndex();
+    virtual void Transfer();
+
+    DinoEvent *mEvent;  // 0x10
+    u32 mChara;         // 0x14
+    u32 mModel;         // 0x18
 };
 
 class DinoEventExecCharaHeadModelIndex : public MTransfer {
 public:
+    DinoEventExecCharaHeadModelIndex(DinoEvent *event, u32 chara, u32 model);
     virtual ~DinoEventExecCharaHeadModelIndex();
+    virtual void Transfer();
+
+    DinoEvent *mEvent;  // 0x10
+    u32 mChara;         // 0x14
+    u32 mModel;         // 0x18
 };
 
 class DinoEventExecCharaMotionSet : public MTransfer {
@@ -711,12 +730,25 @@ public:
 
 class DinoEventExecRadarMode : public MProcess {
 public:
+    DinoEventExecRadarMode(DinoEvent *event, u32 mode, u32 a, u8 b);
     virtual ~DinoEventExecRadarMode();
+    virtual void Idle();
+
+    DinoEvent *mEvent;  // 0x74
+    u32 mMode;          // 0x78
+    u32 mA;             // 0x7C
+    u8 mB;              // 0x80
 };
 
 class DinoEventExecTownMapMode : public MProcess {
 public:
+    DinoEventExecTownMapMode(DinoEvent *event, u32 mode, u32 a);
     virtual ~DinoEventExecTownMapMode();
+    virtual void Idle();
+
+    DinoEvent *mEvent;  // 0x74
+    u32 mMode;          // 0x78
+    u32 mA;             // 0x7C
 };
 
 class DinoEventExecDelAreaNamePanel : public MTask {
