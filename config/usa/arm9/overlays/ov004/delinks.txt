@@ -50,3 +50,11 @@ src/ov004/dino_ui_save_menu.cpp:
 src/ov004/dino_ui2_container_base_menu_item.cpp:
     .text       start:0x0216f48c end:0x02171074
 
+src/ov004/dino_ui_debug_reviver_menu.cpp:
+    .text       start:0x021612f0 end:0x02161b50
+
+src/ov004/dino_ui_debug_flag_menu.cpp:
+    .text       start:0x02161b70 end:0x02162298
+
+src/ov004/dino_ui_debug_kaseki_rock_get_menu.cpp:
+    .text       start:0x0215fe44 end:0x021610e0

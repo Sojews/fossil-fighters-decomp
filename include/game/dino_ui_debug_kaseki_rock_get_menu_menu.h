@@ -1,0 +1,40 @@
+#ifndef GAME_DINO_UI_DEBUG_KASEKI_ROCK_GET_MENU_MENU_H
+#define GAME_DINO_UI_DEBUG_KASEKI_ROCK_GET_MENU_MENU_H
+
+#include "m/archive.h"
+#include "m/font.h"
+#include "m/menu_item.h"
+#include "m/menu.h"
+#include "m/display.h"
+#include "m/observer.h"
+#include "m/sleep.h"
+#include "m/looper.h"
+#include "game/help.h"
+#include "game/dino_field_camera_hook.h"
+
+class DinoUiDebugKasekiRockGetMenu : public MMenu {
+public:
+    virtual ~DinoUiDebugKasekiRockGetMenu();
+    virtual void OnStart();
+    virtual void OnFocus(MMenuItem *item);
+    virtual void OnDecide(MMenuItem *item);
+
+    u32 mUnkA8[4];      // 0xA8
+    MFont *mFont;       // 0xB8
+};
+
+class DinoUiDebugKasekiRockGetMenuKasekiRockIdItem : public MMenuItem {
+public:
+    virtual ~DinoUiDebugKasekiRockGetMenuKasekiRockIdItem();
+    virtual void Idle();
+    virtual MRect GetFrame();
+    virtual void OnFocusChanged(BOOL focused);
+    virtual void OnDecide();
+
+    u32 mUnk88[6];          // 0x88
+    MArchivePtr mArchive;   // 0xA0
+    MArchiveFile mFile;     // 0xA4
+    u8 *mBuffer;            // 0xB0
+};
+
+#endif
