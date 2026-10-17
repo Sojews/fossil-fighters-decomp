@@ -265,3 +265,33 @@ void DinoUiOptionMenu::OnBackDecided() {
     serial->AddTail(timer);
     serial->AddTail(exit);
 }
+
+void DinoUiOptionMenu::SetBgmVolume(u8 level) {
+    if (level < 11) {
+        mBgmMotion->Play(level + 1, 0);
+        mBgmVolume = level;
+        gDinoBackup->SetTargetVolume(mBgmVolume);
+        for (int i = 0; i < 3; i++) {
+            RemoveLink(mTopItems[i], 2);
+            AddLink(mTopItems[i], 2, mBgmItems[level]);
+        }
+        for (int i = 0; i < 11; i++) {
+            RemoveLink(mSeItems[i], 4);
+            AddLink(mSeItems[i], 4, mBgmItems[level]);
+        }
+    }
+}
+
+void DinoUiOptionMenu::SetSeVolume(u8 level) {
+    if (level < 11) {
+        mSeMotion->Play(level + 1, 0);
+        mSeVolume = level;
+        gDinoBackup->SetVolume(mSeVolume);
+        for (int i = 0; i < 11; i++) {
+            RemoveLink(mBgmItems[i], 2);
+            AddLink(mBgmItems[i], 2, mSeItems[mSeVolume]);
+        }
+        RemoveLink(mBelowSeItem, 4);
+        AddLink(mBelowSeItem, 4, mSeItems[mSeVolume]);
+    }
+}

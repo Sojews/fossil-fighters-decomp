@@ -90,9 +90,20 @@ public:
 
     u8 unkBF[1];     // members start in MMenu's tail padding
     MSmartOam *mOam; // 0xC0
-    u8 unkC4[0x78];
-    MTask *mUnk13C;  // 0x13C
-    u8 unk140[0x3B];
+    MMenuItem *mTopItems[3];    // 0xC4: the row above the BGM volume row
+    MMenuItem *mBgmItems[11];   // 0xD0: one per volume level
+    MMenuItem *mSeItems[11];    // 0xFC
+    u32 mUnk128[2];             // 0x128
+    MMenuItem *mBelowSeItem;    // 0x130: the item under the SE volume row
+    u32 mUnk134[2];             // 0x134
+    MTask *mUnk13C;             // 0x13C
+    u32 mUnk140[3];             // 0x140
+    MMotion *mBgmMotion;        // 0x14C: shows the BGM volume
+    MMotion *mSeMotion;         // 0x150
+    u8 unk154[0x24];            // 0x154
+    u8 mSpeed;                  // 0x178
+    u8 mBgmVolume;              // 0x179
+    u8 mSeVolume;               // 0x17A
     u8 mOldSpeed;       // 0x17B: the settings when the menu opened, put back on Back
     u8 mOldBgmVolume;   // 0x17C
     u8 mOldSeVolume;    // 0x17D

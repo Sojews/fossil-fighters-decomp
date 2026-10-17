@@ -57,6 +57,7 @@ public:
     void AddItem(MMenuItem *item);
     void RemoveItem(MMenuItem *item);
     void RemoveLink(MMenuItem *from, int dir);
+    void AddLink(MMenuItem *from, int dir, MMenuItem *to);
     void SetLinksOnly(BOOL linksOnly);
     MInput *GetInput();
     void Activate();
