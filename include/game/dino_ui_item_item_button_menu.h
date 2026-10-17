@@ -1,0 +1,43 @@
+#ifndef GAME_DINO_UI_ITEM_ITEM_BUTTON_MENU_H
+#define GAME_DINO_UI_ITEM_ITEM_BUTTON_MENU_H
+
+#include "m/menu_item.h"
+#include "m/menu.h"
+#include "game/help.h"
+#include "game/dino_ui_item_menu_item.h"
+
+class DinoUiItemMenu : public DinoHelpBase, public MMenu {
+public:
+    virtual ~DinoUiItemMenu();
+    virtual void OnStart();
+    virtual void OnFocus(MMenuItem *item);
+    virtual void OnDecide(MMenuItem *item);
+};
+
+class DinoUiItemBackButton : public DinoUiItemMenuItem {
+public:
+    virtual ~DinoUiItemBackButton();
+    virtual void OnFocusChanged(BOOL focused);
+    virtual void OnDecide();
+};
+
+class DinoUiItemOKButton : public DinoUiItemMenuItem {
+public:
+    virtual ~DinoUiItemOKButton();
+    virtual void OnFocusChanged(BOOL focused);
+    virtual void OnDecide();
+};
+
+class DinoUiItemPageLButton : public DinoUiItemMenuItem {
+public:
+    virtual ~DinoUiItemPageLButton();
+    virtual void OnDecide();
+};
+
+class DinoUiItemPageRButton : public DinoUiItemMenuItem {
+public:
+    virtual ~DinoUiItemPageRButton();
+    virtual void OnDecide();
+};
+
+#endif

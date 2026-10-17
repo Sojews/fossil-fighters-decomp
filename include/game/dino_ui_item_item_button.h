@@ -6,6 +6,8 @@
 class DinoUiItemItemButton : public MMenuItem {
 public:
     virtual ~DinoUiItemItemButton();
+    virtual MRect GetFrame();
+    virtual void OnFocusChanged(BOOL focused);
 };
 
 #endif
