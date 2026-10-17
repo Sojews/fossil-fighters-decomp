@@ -102,7 +102,7 @@ BOOL MFile::Seek(s32 offset, FSSeekFileMode origin) {
 }
 
 u32 MFile::GetLength() {
-    return mFile.bottom - mFile.top;
+    return mFile.prop.file.bottom - mFile.prop.file.top;
 }
 
 s32 MFile::Read(void *dest, s32 size) {

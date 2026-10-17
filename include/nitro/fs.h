@@ -1,35 +1,170 @@
-// NitroSDK file system (declarations only, with the FSFile fields the game reads).
+// NitroSDK file system (declarations only).
 #ifndef NITRO_FS_H
 #define NITRO_FS_H
 
 #include "types.h"
+#include "nitro/os.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-typedef struct FSArchive FSArchive;
+#define FS_ARCHIVE_NAME_LEN_MAX 3
+#define FS_ENTRY_LONGNAME_MAX 128
 
+typedef struct FSArchive FSArchive;
 typedef struct FSFile FSFile;
-typedef int (*FS_ARCHIVE_READ_FUNC)(FSArchive *p_arc, void *dst, u32 pos, u32 size);
-typedef int (*FS_ARCHIVE_WRITE_FUNC)(FSArchive *p_arc, const void *src, u32 pos, u32 size);
+
+typedef enum {
+    FS_RESULT_SUCCESS = 0,
+    FS_RESULT_FAILURE,
+    FS_RESULT_BUSY,
+    FS_RESULT_CANCELED,
+    FS_RESULT_UNSUPPORTED,
+    FS_RESULT_ERROR,
+    FS_RESULT_PROC_ASYNC,
+    FS_RESULT_PROC_DEFAULT,
+    FS_RESULT_PROC_UNKNOWN
+} FSResult;
+
+typedef enum {
+    FS_COMMAND_READFILE = 0,
+    FS_COMMAND_WRITEFILE,
+    FS_COMMAND_SEEKDIR,
+    FS_COMMAND_READDIR,
+    FS_COMMAND_FINDPATH,
+    FS_COMMAND_GETPATH,
+    FS_COMMAND_OPENFILEFAST,
+    FS_COMMAND_OPENFILEDIRECT,
+    FS_COMMAND_CLOSEFILE,
+    FS_COMMAND_MAX,
+    FS_COMMAND_ACTIVATE = FS_COMMAND_MAX,
+    FS_COMMAND_IDLE,
+    FS_COMMAND_SUSPEND,
+    FS_COMMAND_RESUME
+} FSCommandType;
+
+typedef FSResult (*FS_ARCHIVE_READ_FUNC)(FSArchive *p_arc, void *dst, u32 pos, u32 size);
+typedef FSResult (*FS_ARCHIVE_WRITE_FUNC)(FSArchive *p_arc, const void *src, u32 pos, u32 size);
+typedef FSResult (*FS_ARCHIVE_PROC_FUNC)(FSFile *p_file, FSCommandType command);
+
+typedef struct FSFileLink {
+    FSFile *prev;   // 0x0
+    FSFile *next;   // 0x4
+} FSFileLink;
 
 struct FSArchive {
-    u8 unk00[0x5C];
+    union {
+        char ptr[FS_ARCHIVE_NAME_LEN_MAX + 1];
+        u32 pack;
+    } name;                             // 0x00
+    FSArchive *next;                    // 0x04
+    FSArchive *prev;                    // 0x08
+    OSThreadQueue sync_q;               // 0x0c
+    OSThreadQueue stat_q;               // 0x14
+    u32 flag;                           // 0x1c
+    FSFileLink list;                    // 0x20: the files with commands waiting
+    u32 base;                           // 0x28
+    u32 fat;                            // 0x2c
+    u32 fat_size;                       // 0x30
+    u32 fnt;                            // 0x34
+    u32 fnt_size;                       // 0x38
+    u32 fat_bak;                        // 0x3c
+    u32 fnt_bak;                        // 0x40
+    void *load_mem;                     // 0x44
+    FS_ARCHIVE_READ_FUNC read_func;     // 0x48
+    FS_ARCHIVE_WRITE_FUNC write_func;   // 0x4c
+    FS_ARCHIVE_READ_FUNC table_func;    // 0x50
+    FS_ARCHIVE_PROC_FUNC proc;          // 0x54
+    u32 proc_flag;                      // 0x58
 };
 
 typedef struct {
-    FSArchive *arc;
-    u32 file_id;
+    FSArchive *arc;     // 0x0
+    u32 file_id;        // 0x4
 } FSFileID;
 
+typedef struct {
+    FSArchive *arc;     // 0x0
+    u16 own_id;         // 0x4
+    u16 index;          // 0x6
+    u32 pos;            // 0x8
+} FSDirPos;
+
+typedef struct {
+    union {
+        FSFileID file_id;
+        FSDirPos dir_id;
+    } id;                               // 0x00
+    u32 is_directory;                   // 0x0c
+    u32 name_len;                       // 0x10
+    char name[FS_ENTRY_LONGNAME_MAX];   // 0x14
+} FSDirEntry;
+
 struct FSFile {
-    u8 unk00[0xC];
-    u32 stat;           // 0x0C
-    u8 unk10[0x14];
-    u32 top;            // 0x24
-    u32 bottom;         // 0x28
-    u8 unk2C[0x1C];
+    FSFileLink link;            // 0x00
+    FSArchive *arc;             // 0x08
+    u32 stat;                   // 0x0c
+    FSCommandType command;      // 0x10
+    FSResult error;             // 0x14
+    OSThreadQueue queue[1];     // 0x18
+    union {
+        struct {
+            u32 own_id;         // 0x20
+            u32 top;            // 0x24
+            u32 bottom;         // 0x28
+            u32 pos;            // 0x2c
+        } file;
+        struct {
+            FSDirPos pos;       // 0x20
+            u32 parent;         // 0x2c
+        } dir;
+    } prop;
+    union {
+        struct {
+            void *dst;
+            u32 len_org;
+            u32 len;
+        } readfile;
+        struct {
+            const void *src;
+            u32 len_org;
+            u32 len;
+        } writefile;
+        struct {
+            FSDirPos pos;
+        } seekdir;
+        struct {
+            FSDirEntry *p_entry;
+            BOOL skip_string;
+        } readdir;
+        struct {
+            FSDirPos pos;
+            const char *path;
+            BOOL find_directory;
+            union {
+                FSFileID *file;
+                FSDirPos *dir;
+            } result;
+        } findpath;
+        struct {
+            u8 *buf;
+            u32 buf_len;
+            u16 total_len;
+            u16 dir_id;
+        } getpath;
+        struct {
+            FSFileID id;
+        } openfilefast;
+        struct {
+            u32 top;
+            u32 bottom;
+            u32 index;
+        } openfiledirect;
+        struct {
+            u32 reserved;
+        } closefile;
+    } arg;                      // 0x30
 };
 
 typedef enum {
