@@ -29,6 +29,11 @@ class DinoBattleTalkWindow : public MProcess {
 public:
     virtual ~DinoBattleTalkWindow();
     virtual void Idle();
+
+    void SetUnk84(u32 value);
+
+    u32 unk74[4];
+    u32 mUnk84;     // 0x84
 };
 
 #endif

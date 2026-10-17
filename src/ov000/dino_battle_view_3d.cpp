@@ -119,3 +119,18 @@ void DinoBattleView3DMask::Execute() {
     }
     Exit();
 }
+
+#pragma auto_inline off
+
+void DinoBattleView3D::GetUnk19C(u32 *a, u32 *b) {
+    *a = mUnk19C;
+    *b = mUnk1A0;
+}
+
+void DinoBattleView3D::SetUnk19C(u32 value) {
+    mUnk19C = value;
+}
+
+u32 DinoBattleView3D::GetUnkB0() {
+    return mUnkB0;
+}
