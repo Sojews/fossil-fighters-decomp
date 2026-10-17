@@ -5,6 +5,8 @@
 #include "m/task.h"
 #include "m/observer.h"
 #include "m/view.h"
+#include "m/archive.h"
+#include "m/font.h"
 
 class DinoBattleViewPlayer;
 class DinoBattleViewCreature;
@@ -21,10 +23,10 @@ public:
     virtual void Idle();
     virtual void OnMessage(MMessage *msg);
 
-    void *GetUnk11C();
-    u32 GetUnk118();
-    u32 GetUnk120();
-    u32 GetUnk124();
+    MFont *GetUnk11C();
+    MFont *GetUnk118();
+    MFont *GetUnk120();
+    MFont *GetUnk124();
     DinoBattleViewPlayer *GetUnkE4(int index);
     DinoBattleViewCreature *FindCreatureByAC(u32 id);
     u8 GetUnk138();
@@ -40,20 +42,22 @@ public:
     void DecUnk13C();
     int GetUnk13C();
 
-    u32 unkA8[4];
+    MArchivePtr mArchive;       // 0xA8
+    MArchiveFile mFile;         // 0xAC
     MMessageSubject mSubject;   // 0xB8
     DinoBattleViewUnkE0 *mUnkE0; // 0xE0
     DinoBattleViewPlayer *mUnkE4[2]; // 0xE4: players
     u32 mUnkEC;                 // 0xEC
-    u32 unkF0[5];
+    u32 unkF0[4];
+    u8 *mUnk100;                // 0x100
     u32 mUnk104;                // 0x104
     u32 mUnk108;                // 0x108
     MSmartOam *mUnk10C;         // 0x10C
     u32 unk110[2];
-    u32 mUnk118;                // 0x118
-    void *mUnk11C;              // 0x11C
-    u32 mUnk120;                // 0x120
-    u32 mUnk124;                // 0x124
+    MFont *mUnk118;             // 0x118
+    MFont *mUnk11C;             // 0x11C
+    MFont *mUnk120;             // 0x120
+    MFont *mUnk124;             // 0x124
     u32 mUnk128;                // 0x128
     u32 mUnk12C;                // 0x12C
     u32 mUnk130;                // 0x130

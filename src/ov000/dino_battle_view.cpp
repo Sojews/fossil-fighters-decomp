@@ -7,20 +7,28 @@
 
 #pragma auto_inline off
 
-void *DinoBattleView::GetUnk11C() {
+MFont *DinoBattleView::GetUnk11C() {
     return mUnk11C;
 }
 
-u32 DinoBattleView::GetUnk118() {
+MFont *DinoBattleView::GetUnk118() {
     return mUnk118;
 }
 
-u32 DinoBattleView::GetUnk120() {
+MFont *DinoBattleView::GetUnk120() {
     return mUnk120;
 }
 
-u32 DinoBattleView::GetUnk124() {
+MFont *DinoBattleView::GetUnk124() {
     return mUnk124;
+}
+
+DinoBattleView::~DinoBattleView() {
+    mUnk118->Release();
+    mUnk11C->Release();
+    mUnk120->Release();
+    mUnk124->Release();
+    delete mUnk100;
 }
 
 DinoBattleViewPlayer *DinoBattleView::GetUnkE4(int index) {
