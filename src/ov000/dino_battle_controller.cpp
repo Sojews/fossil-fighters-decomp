@@ -14,3 +14,7 @@ DinoBattleDummyController::~DinoBattleDummyController() {
 
 void DinoBattleDummyController::OnMessage(MMessage *msg) {
 }
+
+void DinoBattleController::Idle() {
+    Dispatch();
+}

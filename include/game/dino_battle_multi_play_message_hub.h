@@ -22,6 +22,8 @@ public:
     virtual ~DinoBattleMultiPlayMessageReceiver();
     virtual void Idle();
     virtual void OnMessage(MMessage *msg);
+
+    MMessageSubject *mSubject;  // 0xA8
 };
 
 #endif

@@ -16,3 +16,7 @@ WaitKPCountTask::~WaitKPCountTask() {
 
 DinoBattleViewPlayer::~DinoBattleViewPlayer() {
 }
+
+void DinoBattleViewPlayer::Idle() {
+    Dispatch();
+}

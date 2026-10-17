@@ -16,3 +16,7 @@ SetLiveOneShotFlagTask::~SetLiveOneShotFlagTask() {
 
 DinoBattleModelField::~DinoBattleModelField() {
 }
+
+void DinoBattleModelField::Idle() {
+    Dispatch();
+}

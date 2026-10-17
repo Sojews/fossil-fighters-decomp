@@ -12,3 +12,15 @@ DinoBattleMultiPlayMessageHub::~DinoBattleMultiPlayMessageHub() {
 
 DinoBattleMultiPlayMessageReceiver::~DinoBattleMultiPlayMessageReceiver() {
 }
+
+void DinoBattleMultiPlayMessageReceiver::Idle() {
+    Dispatch();
+}
+
+void DinoBattleMultiPlayMessageHub::Idle() {
+    Dispatch();
+}
+
+void DinoBattleMultiPlayMessageReceiver::OnMessage(MMessage *msg) {
+    mSubject->Notify(msg);
+}
