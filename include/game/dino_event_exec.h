@@ -6,6 +6,7 @@
 #include "m/input.h"
 #include "game/dino_backup.h"
 #include "game/dino_field.h"
+#include "game/dino_event_talk_window.h"
 
 class DinoEventExecVarValue : public MTransfer {
 public:
@@ -801,14 +802,6 @@ public:
     virtual void Idle();
 
     u8 unk74[0x28];
-};
-
-class DinoEventTalkWindow : public MProcess {
-public:
-    DinoEventTalkWindow(MDisplay *display, std::string text, int arg, u8 flag);
-    virtual void Idle();
-
-    u8 unk74[0x84];
 };
 
 class DinoEventExecTalk : public MProcess {
