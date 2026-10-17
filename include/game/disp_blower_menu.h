@@ -105,12 +105,12 @@ public:
     MMenuItem *mTopItems[3];    // 0xC4: the row above the BGM volume row
     MMenuItem *mBgmItems[11];   // 0xD0: one per volume level
     MMenuItem *mSeItems[11];    // 0xFC
-    u32 mUnk128;                // 0x128
+    MMenuItem *mUnk128;         // 0x128
     MMenuItem *mBackButton;     // 0x12C: B goes to it
     MicTestButton *mMicTest;    // 0x130: the item under the SE volume row
     u32 mUnk134[2];             // 0x134
     MTask *mUnk13C;             // 0x13C
-    u32 mUnk140[3];             // 0x140
+    MView *mSpeedMarks[3];      // 0x140
     MMotion *mBgmMotion;        // 0x14C: shows the BGM volume
     MMotion *mSeMotion;         // 0x150
     u8 unk154[0x24];            // 0x154

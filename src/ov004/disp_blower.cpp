@@ -357,3 +357,22 @@ void DinoUiOptionMenu::Sleep() {
     mic->mMeter->Play(1, 1);
     mic->mMeter->Hide();
 }
+
+void DinoUiOptionMenu::SetSpeed(u8 speed) {
+    if (speed < 3) {
+        for (int i = 0; i < 3; i++) {
+            mSpeedMarks[i]->Hide();
+        }
+        mSpeedMarks[speed]->Show();
+        mSpeed = speed;
+        gDinoBackup->SetUnk34_16(mSpeed);
+        for (int i = 0; i < 11; i++) {
+            RemoveLink(mBgmItems[i], 4);
+            AddLink(mBgmItems[i], 4, mTopItems[mSpeed]);
+        }
+        RemoveLink(mUnk128, 2);
+        AddLink(mUnk128, 2, mTopItems[mSpeed]);
+        RemoveLink(mBackButton, 2);
+        AddLink(mBackButton, 2, mTopItems[mSpeed]);
+    }
+}
