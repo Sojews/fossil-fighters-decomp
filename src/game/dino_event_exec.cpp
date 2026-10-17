@@ -275,6 +275,252 @@ void DinoEventExecProhibitNisReset::Transfer() {
     ProhibitNisReset();
 }
 
+DinoEventExecStartBehold::DinoEventExecStartBehold(DinoEvent *event, u32 chara, u32 target) {
+    mEvent = event;
+    mChara = chara;
+    mTarget = target;
+}
+
+void DinoEventExecStartBehold::Transfer() {
+    DinoFieldChara *chara = mEvent->GetField()->GetChara(mChara);
+    if (chara != NULL) {
+        chara->StartBehold(mTarget);
+    }
+}
+
+DinoEventExecFinishBehold::DinoEventExecFinishBehold(DinoEvent *event, u32 chara) {
+    mEvent = event;
+    mChara = chara;
+}
+
+void DinoEventExecFinishBehold::Transfer() {
+    DinoFieldChara *chara = mEvent->GetField()->GetChara(mChara);
+    if (chara != NULL) {
+        chara->FinishBehold();
+    }
+}
+
+DinoEventExecCharaMotionSet::DinoEventExecCharaMotionSet(DinoEvent *event, u32 chara, u32 motion, u8 loop) {
+    mEvent = event;
+    mChara = chara;
+    mMotion = motion;
+    mLoop = loop;
+}
+
+void DinoEventExecCharaMotionSet::Transfer() {
+    DinoFieldChara *chara = mEvent->GetField()->GetChara(mChara);
+    if (chara != NULL) {
+        chara->SetMotion(mMotion, mLoop, MFx32(1));
+        chara->ApplyMotion();
+    }
+}
+
+DinoEventExecCharaMotionCache::DinoEventExecCharaMotionCache(DinoEvent *event, u32 chara, u32 motion) {
+    mEvent = event;
+    mChara = chara;
+    mMotion = motion;
+}
+
+void DinoEventExecCharaMotionCache::Transfer() {
+    DinoFieldChara *chara = mEvent->GetField()->GetChara(mChara);
+    if (chara != NULL) {
+        chara->CacheMotion(mMotion);
+    }
+}
+
+DinoEventExecCharaMotionCacheClear::DinoEventExecCharaMotionCacheClear(DinoEvent *event, u32 chara) {
+    mEvent = event;
+    mChara = chara;
+}
+
+void DinoEventExecCharaMotionCacheClear::Transfer() {
+    DinoFieldChara *chara = mEvent->GetField()->GetChara(mChara);
+    if (chara != NULL) {
+        chara->ClearMotionCache();
+    }
+}
+
+DinoEventExecManpuShow::DinoEventExecManpuShow(DinoEvent *event, u32 chara, u32 manpu, MPoint offset) {
+    mEvent = event;
+    mChara = chara;
+    mManpu = manpu;
+    mOffset = offset;
+}
+
+void DinoEventExecManpuShow::Transfer() {
+    DinoFieldChara *chara = mEvent->GetField()->GetChara(mChara);
+    if (chara != NULL) {
+        chara->ShowManpu(mManpu, mOffset);
+    }
+}
+
+DinoEventExecManpuHide::DinoEventExecManpuHide(DinoEvent *event, u32 chara) {
+    mEvent = event;
+    mChara = chara;
+}
+
+void DinoEventExecManpuHide::Transfer() {
+    DinoFieldChara *chara = mEvent->GetField()->GetChara(mChara);
+    if (chara != NULL) {
+        chara->HideManpu();
+    }
+}
+
+DinoEventExecCmnMotion::DinoEventExecCmnMotion(DinoEvent *event, u32 chara, u32 motion) {
+    mEvent = event;
+    mChara = chara;
+    mMotion = motion;
+}
+
+void DinoEventExecCmnMotion::Transfer() {
+    DinoFieldChara *chara = mEvent->GetField()->GetChara(mChara);
+    if (chara != NULL) {
+        chara->SetCommonMotion(mMotion);
+    }
+}
+
+DinoEventExecChrEffect::DinoEventExecChrEffect(DinoEvent *event, u32 chara, u32 effect) {
+    mEvent = event;
+    mChara = chara;
+    mEffect = effect;
+}
+
+void DinoEventExecChrEffect::Transfer() {
+    DinoFieldChara *chara = mEvent->GetField()->GetChara(mChara);
+    if (chara != NULL) {
+        chara->SetEffect(mEffect);
+    }
+}
+
+DinoEventExecBgmPlay::DinoEventExecBgmPlay(DinoEvent *event, u32 bgm, u32 arg, u8 fade) {
+    mEvent = event;
+    mBgm = bgm;
+    mArg = arg;
+    mFade = fade;
+}
+
+void DinoEventExecBgmPlay::Transfer() {
+    u32 bgm = mBgm;
+    if (bgm == 0) {
+        return;
+    }
+    if (mFade) {
+        mEvent->GetField()->PlayBgmFade(bgm, mArg);
+    } else {
+        mEvent->GetField()->PlayBgm(bgm, mArg);
+    }
+}
+
+DinoEventExecBgmStop::DinoEventExecBgmStop(DinoEvent *event, u32 fadeFrames) {
+    mEvent = event;
+    mFadeFrames = fadeFrames;
+}
+
+void DinoEventExecBgmStop::Transfer() {
+    mEvent->GetField()->StopBgm(mFadeFrames);
+}
+
+DinoEventExecQuake::DinoEventExecQuake(DinoEvent *event, u32 a, u32 b, u32 c) {
+    mEvent = event;
+    mA = a;
+    mB = b;
+    mC = c;
+}
+
+void DinoEventExecQuake::Transfer() {
+    mEvent->GetField()->Quake(mA, mB, mC);
+}
+
+DinoEventExecDelAreaNamePanel::DinoEventExecDelAreaNamePanel(DinoEvent *event) {
+    mEvent = event;
+}
+
+void DinoEventExecDelAreaNamePanel::Execute() {
+    mEvent->GetField()->GetCamera()->mNamePanel->SetMode(0, 1);
+    Exit();
+}
+
+DinoEventExecHeightReset::DinoEventExecHeightReset(DinoEvent *event) {
+    mEvent = event;
+}
+
+void DinoEventExecHeightReset::Transfer() {
+    mEvent->GetField()->GetCamera()->ResetHeight();
+}
+
+DinoEventExecCharaFootSeOff::DinoEventExecCharaFootSeOff(DinoEvent *event, u32 chara) {
+    mEvent = event;
+    mChara = chara;
+}
+
+void DinoEventExecCharaFootSeOff::Transfer() {
+    DinoFieldChara *chara = mEvent->GetField()->GetChara(mChara);
+    if (chara != NULL) {
+        chara->SetFootSe(0);
+    }
+}
+
+DinoEventExecCharaFootSePreserve::DinoEventExecCharaFootSePreserve(DinoEvent *event, u32 chara, u32 se) {
+    mEvent = event;
+    mChara = chara;
+    mSe = se;
+}
+
+void DinoEventExecCharaFootSePreserve::Transfer() {
+    DinoFieldChara *chara = mEvent->GetField()->GetChara(mChara);
+    if (chara != NULL) {
+        chara->SetFootSe(mSe);
+    }
+}
+
+DinoEventExecMoneyShow::DinoEventExecMoneyShow(DinoEvent *event) : MProcess(NULL) {
+    mEvent = event;
+}
+
+void DinoEventExecMoneyShow::Idle() {
+    MTask *exit = MTaskExitTransfer::Create(this);
+    MTask *task = mEvent->GetField()->CreateMoneyShowTask();
+    MSerialTaskSet *serial = &mSerial;
+    serial->AddTail(task);
+    serial->AddTail(exit);
+}
+
+DinoEventExecMoneyHide::DinoEventExecMoneyHide(DinoEvent *event) : MProcess(NULL) {
+    mEvent = event;
+}
+
+void DinoEventExecMoneyHide::Idle() {
+    MTask *exit = MTaskExitTransfer::Create(this);
+    MTask *task = mEvent->GetField()->CreateMoneyHideTask();
+    MSerialTaskSet *serial = &mSerial;
+    serial->AddTail(task);
+    serial->AddTail(exit);
+}
+
+DinoEventExecDonateShow::DinoEventExecDonateShow(DinoEvent *event) : MProcess(NULL) {
+    mEvent = event;
+}
+
+void DinoEventExecDonateShow::Idle() {
+    MTask *exit = MTaskExitTransfer::Create(this);
+    MTask *task = mEvent->GetField()->CreateDonateShowTask();
+    MSerialTaskSet *serial = &mSerial;
+    serial->AddTail(task);
+    serial->AddTail(exit);
+}
+
+DinoEventExecDonateHide::DinoEventExecDonateHide(DinoEvent *event) : MProcess(NULL) {
+    mEvent = event;
+}
+
+void DinoEventExecDonateHide::Idle() {
+    MTask *exit = MTaskExitTransfer::Create(this);
+    MTask *task = mEvent->GetField()->CreateDonateHideTask();
+    MSerialTaskSet *serial = &mSerial;
+    serial->AddTail(task);
+    serial->AddTail(exit);
+}
+
 DinoEventExecVarValue::~DinoEventExecVarValue() {
 }
 

@@ -4,6 +4,7 @@
 
 #include "m/task.h"
 #include "game/dino_backup.h"
+#include "game/dino_field.h"
 
 class DinoEventExecVarValue : public MTransfer {
 public:
@@ -234,12 +235,23 @@ public:
 
 class DinoEventExecStartBehold : public MTransfer {
 public:
+    DinoEventExecStartBehold(DinoEvent *event, u32 chara, u32 target);
     virtual ~DinoEventExecStartBehold();
+    virtual void Transfer();
+
+    DinoEvent *mEvent;  // 0x10
+    u32 mChara;         // 0x14
+    u32 mTarget;        // 0x18
 };
 
 class DinoEventExecFinishBehold : public MTransfer {
 public:
+    DinoEventExecFinishBehold(DinoEvent *event, u32 chara);
     virtual ~DinoEventExecFinishBehold();
+    virtual void Transfer();
+
+    DinoEvent *mEvent;  // 0x10
+    u32 mChara;         // 0x14
 };
 
 class DinoEventExecChoice : public MProcess {
@@ -361,27 +373,57 @@ public:
 
 class DinoEventExecCharaMotionSet : public MTransfer {
 public:
+    DinoEventExecCharaMotionSet(DinoEvent *event, u32 chara, u32 motion, u8 loop);
     virtual ~DinoEventExecCharaMotionSet();
+    virtual void Transfer();
+
+    DinoEvent *mEvent;  // 0x10
+    u32 mChara;         // 0x14
+    u32 mMotion;        // 0x18
+    u8 mLoop;           // 0x1C
 };
 
 class DinoEventExecCharaMotionCache : public MTransfer {
 public:
+    DinoEventExecCharaMotionCache(DinoEvent *event, u32 chara, u32 motion);
     virtual ~DinoEventExecCharaMotionCache();
+    virtual void Transfer();
+
+    DinoEvent *mEvent;  // 0x10
+    u32 mChara;         // 0x14
+    u32 mMotion;        // 0x18
 };
 
 class DinoEventExecCharaMotionCacheClear : public MTransfer {
 public:
+    DinoEventExecCharaMotionCacheClear(DinoEvent *event, u32 chara);
     virtual ~DinoEventExecCharaMotionCacheClear();
+    virtual void Transfer();
+
+    DinoEvent *mEvent;  // 0x10
+    u32 mChara;         // 0x14
 };
 
 class DinoEventExecManpuShow : public MTransfer {
 public:
+    DinoEventExecManpuShow(DinoEvent *event, u32 chara, u32 manpu, MPoint offset);
     virtual ~DinoEventExecManpuShow();
+    virtual void Transfer();
+
+    DinoEvent *mEvent;  // 0x10
+    u32 mChara;         // 0x14
+    u32 mManpu;         // 0x18
+    MPoint mOffset;     // 0x1C
 };
 
 class DinoEventExecManpuHide : public MTransfer {
 public:
+    DinoEventExecManpuHide(DinoEvent *event, u32 chara);
     virtual ~DinoEventExecManpuHide();
+    virtual void Transfer();
+
+    DinoEvent *mEvent;  // 0x10
+    u32 mChara;         // 0x14
 };
 
 class DinoEventExecPictShow : public MProcess {
@@ -396,12 +438,24 @@ public:
 
 class DinoEventExecCmnMotion : public MTransfer {
 public:
+    DinoEventExecCmnMotion(DinoEvent *event, u32 chara, u32 motion);
     virtual ~DinoEventExecCmnMotion();
+    virtual void Transfer();
+
+    DinoEvent *mEvent;  // 0x10
+    u32 mChara;         // 0x14
+    u32 mMotion;        // 0x18
 };
 
 class DinoEventExecChrEffect : public MTransfer {
 public:
+    DinoEventExecChrEffect(DinoEvent *event, u32 chara, u32 effect);
     virtual ~DinoEventExecChrEffect();
+    virtual void Transfer();
+
+    DinoEvent *mEvent;  // 0x10
+    u32 mChara;         // 0x14
+    u32 mEffect;        // 0x18
 };
 
 class DinoEventExecKeyWait : public MProcess {
@@ -411,7 +465,14 @@ public:
 
 class DinoEventExecBgmPlay : public MTransfer {
 public:
+    DinoEventExecBgmPlay(DinoEvent *event, u32 bgm, u32 arg, u8 fade);
     virtual ~DinoEventExecBgmPlay();
+    virtual void Transfer();
+
+    DinoEvent *mEvent;  // 0x10
+    u32 mBgm;           // 0x14
+    u32 mArg;           // 0x18
+    u8 mFade;           // 0x1C
 };
 
 class DinoEventExecMapBgmPlay : public MProcess {
@@ -421,12 +482,24 @@ public:
 
 class DinoEventExecBgmStop : public MTransfer {
 public:
+    DinoEventExecBgmStop(DinoEvent *event, u32 fadeFrames);
     virtual ~DinoEventExecBgmStop();
+    virtual void Transfer();
+
+    DinoEvent *mEvent;  // 0x10
+    u32 mFadeFrames;    // 0x14
 };
 
 class DinoEventExecQuake : public MTransfer {
 public:
+    DinoEventExecQuake(DinoEvent *event, u32 a, u32 b, u32 c);
     virtual ~DinoEventExecQuake();
+    virtual void Transfer();
+
+    DinoEvent *mEvent;  // 0x10
+    u32 mA;             // 0x14
+    u32 mB;             // 0x18
+    u32 mC;             // 0x1C
 };
 
 class DinoEventExecDance : public MProcess {
@@ -550,42 +623,77 @@ public:
 
 class DinoEventExecDelAreaNamePanel : public MTask {
 public:
+    DinoEventExecDelAreaNamePanel(DinoEvent *event);
     virtual ~DinoEventExecDelAreaNamePanel();
+    virtual void Execute();
+
+    DinoEvent *mEvent;  // 0x10
 };
 
 class DinoEventExecHeightReset : public MTransfer {
 public:
+    DinoEventExecHeightReset(DinoEvent *event);
     virtual ~DinoEventExecHeightReset();
+    virtual void Transfer();
+
+    DinoEvent *mEvent;  // 0x10
 };
 
 class DinoEventExecCharaFootSeOff : public MTransfer {
 public:
+    DinoEventExecCharaFootSeOff(DinoEvent *event, u32 chara);
     virtual ~DinoEventExecCharaFootSeOff();
+    virtual void Transfer();
+
+    DinoEvent *mEvent;  // 0x10
+    u32 mChara;         // 0x14
 };
 
 class DinoEventExecCharaFootSePreserve : public MTransfer {
 public:
+    DinoEventExecCharaFootSePreserve(DinoEvent *event, u32 chara, u32 se);
     virtual ~DinoEventExecCharaFootSePreserve();
+    virtual void Transfer();
+
+    DinoEvent *mEvent;  // 0x10
+    u32 mChara;         // 0x14
+    u32 mSe;            // 0x18
 };
 
 class DinoEventExecMoneyShow : public MProcess {
 public:
+    DinoEventExecMoneyShow(DinoEvent *event);
     virtual ~DinoEventExecMoneyShow();
+    virtual void Idle();
+
+    DinoEvent *mEvent;  // 0x74
 };
 
 class DinoEventExecMoneyHide : public MProcess {
 public:
+    DinoEventExecMoneyHide(DinoEvent *event);
     virtual ~DinoEventExecMoneyHide();
+    virtual void Idle();
+
+    DinoEvent *mEvent;  // 0x74
 };
 
 class DinoEventExecDonateShow : public MProcess {
 public:
+    DinoEventExecDonateShow(DinoEvent *event);
     virtual ~DinoEventExecDonateShow();
+    virtual void Idle();
+
+    DinoEvent *mEvent;  // 0x74
 };
 
 class DinoEventExecDonateHide : public MProcess {
 public:
+    DinoEventExecDonateHide(DinoEvent *event);
     virtual ~DinoEventExecDonateHide();
+    virtual void Idle();
+
+    DinoEvent *mEvent;  // 0x74
 };
 
 class DinoEventExecProhibitNisReset : public MTransfer {
