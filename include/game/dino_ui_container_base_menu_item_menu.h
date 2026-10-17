@@ -19,7 +19,10 @@ public:
     BOOL PageRight();
     BOOL PageLeft();
 
-    u32 mUnkB4[21];             // 0xB4
+    u32 mUnkB4[19];
+    u8 mUnk100; // 0x100
+    u8 unk101[3];
+    u32 mUnk104[1];
     MArchivePtr mArchive;       // 0x108
     MArchiveFile mFile;         // 0x10C
     u32 mUnk118[2];             // 0x118

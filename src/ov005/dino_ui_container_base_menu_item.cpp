@@ -104,6 +104,19 @@ void DinoUiContainerBaseMenu::OnBackDecided() {
     serial->AddTail(exit);
 }
 
+void DinoUiContainerBaseDecideButton::OnFocusChanged(BOOL focused) {
+    if (focused) {
+        if (mOwner->mUnk100) {
+            mMotion->Play(2, 0);
+        } else {
+            mMotion->Play(1, 0);
+        }
+    } else {
+        mMotion->Play(1, 0);
+        mSerial.Clear();
+    }
+}
+
 // Template task instances the game emits in this file. Until the code that makes the tasks is decompiled, they are
 // instantiated explicitly.
 class DinoUiCanonPutinMenu {};
