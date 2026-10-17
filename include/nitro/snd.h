@@ -96,15 +96,31 @@ typedef struct {
     u16 dataBlocks;
 } SNDBinaryFileHeader;
 
+typedef struct SNDWaveArcLink SNDWaveArcLink;
+
 typedef struct SNDWaveArc {
     SNDBinaryFileHeader fileHeader;
     u32 blockKind;
     u32 blockSize;
-    void *topLink;
+    SNDWaveArcLink *topLink;
     u32 reserved[7];
     u32 waveCount;
     u32 waveOffset[1];
 } SNDWaveArc;
+
+struct SNDWaveArcLink {
+    SNDWaveArc *waveArc;
+    SNDWaveArcLink *next;
+};
+
+struct SNDBankData {
+    SNDBinaryFileHeader fileHeader;
+    u32 blockKind;
+    u32 blockSize;
+    SNDWaveArcLink waveArcLink[4];
+    u32 instCount;
+    u32 instOffset[1];
+};
 
 typedef struct {
     u32 prgNo;
@@ -112,8 +128,6 @@ typedef struct {
 } SNDInstPos;
 
 typedef struct {
-    u8 type;
-    u8 padding;
     u16 wave[2];        // Wave index, wave archive number
     u8 originalKey;
     u8 attack;
@@ -121,6 +135,12 @@ typedef struct {
     u8 sustain;
     u8 release;
     u8 pan;
+} SNDInstParam;
+
+typedef struct {
+    u8 type;
+    u8 padding;
+    SNDInstParam param;
 } SNDInstData;
 
 void SND_AssignWaveArc(SNDBankData *bank, int index, SNDWaveArc *waveArc);

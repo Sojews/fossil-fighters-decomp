@@ -372,8 +372,8 @@ static BOOL LoadSingleWaves(SNDWaveArc *waveArc, SNDBankData *bank, int waveArcI
         return FALSE;
     }
     while (SND_GetNextInstData(bank, &inst, &pos)) {
-        if (inst.type == 1 && waveArcIndex == inst.wave[1]) {
-            if (!LoadSingleWave(waveArc, inst.wave[0], fileId, heap)) {
+        if (inst.type == 1 && waveArcIndex == inst.param.wave[1]) {
+            if (!LoadSingleWave(waveArc, inst.param.wave[0], fileId, heap)) {
                 return FALSE;
             }
         }

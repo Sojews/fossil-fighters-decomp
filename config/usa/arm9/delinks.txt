@@ -489,3 +489,7 @@ libs/nitrosdk/src/snd/snd_work.c:
 libs/nitrosdk/src/snd/snd_util.c:
     complete
     .text       start:0x02076874 end:0x020768c8
+
+libs/nitrosdk/src/snd/snd_bank.c:
+    complete
+    .text       start:0x020768c8 end:0x02076b20
