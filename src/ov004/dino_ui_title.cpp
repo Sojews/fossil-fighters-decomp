@@ -92,3 +92,7 @@ void DinoUiOpening::Execute() {
     }
     MProcess::Execute();
 }
+
+void DinoUiOpeningCloud::Idle() {
+    mSerial.AddTail(mCloud->CreateCoordAnime(MPoint(-512, 0), MPoint(0, 0), 600, 0));
+}

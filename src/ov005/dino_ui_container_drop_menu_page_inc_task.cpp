@@ -111,3 +111,18 @@ void DinoUiContainerDropMenuPageIncTask::Execute() {
     Exit();
 }
 
+
+void DinoUiContainerDropMenu::OnIdle() {
+    mStarted = TRUE;
+    if (mUnk128 == 1) {
+        MTask &self = *this;
+        MTask *exit = MTaskExitTransfer::Create(&self);
+        MTask *fade = gLcd->mMain->mBright->CreateFadeOutToBlack(30, 0);
+        MSerialTaskSet *serial = &mSerial;
+        serial->AddTail(fade);
+        serial->AddTail(exit);
+    }
+    if (mUnk128) {
+        mUnk128 = 0;
+    }
+}

@@ -31,6 +31,9 @@ public:
     MArchiveFile mFile;         // 0x10C
     int mPage; // 0x118
     int mLastPage; // 0x11C
+    u32 mUnk120;                // 0x120
+    u8 mStarted;                // 0x124
+    int mUnk128;                // 0x128: 1 closes the menu
 };
 
 class DinoUiContainerDropBackButton : public DinoUiContainerDropMenuItem {
