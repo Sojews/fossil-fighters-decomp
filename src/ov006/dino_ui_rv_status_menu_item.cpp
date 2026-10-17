@@ -14,6 +14,20 @@
 #include "m/display.h"
 #include "m/bright.h"
 
+#pragma auto_inline off
+
+void DinoUiRvStatusMenu::PageLeft() {
+    mPage = (mPage + mLastPage) % (mLastPage + 1);
+    ShowPage();
+}
+
+void DinoUiRvStatusMenu::PageRight() {
+    mPage = (mPage + 1) % (mLastPage + 1);
+    ShowPage();
+}
+
+#pragma auto_inline on
+
 DinoUiRvStatusMenuItem::~DinoUiRvStatusMenuItem() {
 }
 

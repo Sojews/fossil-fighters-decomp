@@ -12,6 +12,22 @@
 #include "m/display.h"
 #include "m/bright.h"
 
+#pragma auto_inline off
+
+BOOL DinoUiContainerDropMenu::PageLeft() {
+    mPage = (mPage + mLastPage) % (mLastPage + 1);
+    ShowPage();
+    return TRUE;
+}
+
+BOOL DinoUiContainerDropMenu::PageRight() {
+    mPage = (mPage + 1) % (mLastPage + 1);
+    ShowPage();
+    return TRUE;
+}
+
+#pragma auto_inline on
+
 DinoUiContainerDropMenuPageIncTask::~DinoUiContainerDropMenuPageIncTask() {
 }
 

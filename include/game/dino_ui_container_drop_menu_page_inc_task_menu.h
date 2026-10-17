@@ -19,6 +19,7 @@ public:
     void OnBackDecided();
     BOOL PageRight();
     BOOL PageLeft();
+    void ShowPage();
 
     u32 mUnkB4[4];              // 0xB4
     std::vector<void *> mUnkC4; // 0xC4
@@ -28,6 +29,8 @@ public:
     std::vector<u32> mUnkFC;    // 0xFC
     MArchivePtr mArchive;       // 0x108
     MArchiveFile mFile;         // 0x10C
+    int mPage; // 0x118
+    int mLastPage; // 0x11C
 };
 
 class DinoUiContainerDropBackButton : public DinoUiContainerDropMenuItem {

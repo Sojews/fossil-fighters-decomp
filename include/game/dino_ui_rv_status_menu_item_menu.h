@@ -18,10 +18,14 @@ public:
     void OnBackDecided();
     void PageRight();
     void PageLeft();
+    void ShowPage();
 
     u32 mUnkB4[13];             // 0xB4
     std::vector<void *> mUnkE8; // 0xE8
-    u32 mUnkF4[6];              // 0xF4
+    u32 mUnkF4[3];
+    int mPage; // 0x100
+    int mLastPage; // 0x104
+    u32 mUnk108[1];
     MArchivePtr mArchive;       // 0x10C
     MArchiveFile mFile;         // 0x110
 };
