@@ -145,6 +145,38 @@ struct DinoBackupRecord {
     u64 time;           // 0x7C
 };
 
+// A team: a name and up to five creatures.
+struct DinoTeam {
+    u16 name[17];       // 0x00
+    u8 slots[5];        // 0x22
+};
+
+struct DinoCreaturePart {
+    u32 level : 12;
+    u32 rest : 20;
+};
+
+struct DinoCreatureState {
+    // 0x00
+    u32 index : 8;
+    u32 unk0_8 : 10;
+    u32 unk0_18 : 14;
+    DinoCreaturePart parts[4];  // 0x04
+    u32 unk14;                  // 0x14
+};
+
+struct DinoKasekiRock {
+    u32 unk0 : 10;
+    u32 found : 1;
+    u32 unk11 : 21;
+};
+
+// Where the entry tables' new entries come from.
+struct DinoEntrySource {
+    u32 type;   // 0: a given id, 1: a found kaseki rock at random, 2: any rock at random
+    u32 id;
+};
+
 struct DinoBackupEntry28 {
     DinoBackupEntry28() {}
     u8 data[0x28];
@@ -229,6 +261,37 @@ public:
     void GetKasekiRock(u32 index, u32 *rock);
     void SetRecord(u32 index, const DinoBackupRecord *record);
     void GetRecord(u32 index, DinoBackupRecord *record);
+    void SetTeam(u32 index, const DinoTeam *team);
+    void GetTeam(u32 index, DinoTeam *team);
+    void FillTeam();
+    void SetCreature(u32 index, const DinoCreatureState *creature);
+    void GetCreature(u32 index, DinoCreatureState *creature);
+    u32 CountCreatureParts();
+    void SetUnk134(u32 index, const DinoBackupEntry *entry);
+    void GetUnk134(u32 index, DinoBackupEntry *entry);
+    void SetUnk144(s32 value);
+    s32 GetUnk144();
+    void SetUnk148(u32 index, const DinoBackupEntry *entry);
+    void GetUnk148(u32 index, DinoBackupEntry *entry);
+    void ClearUnk148();
+    BOOL IsUnk148Empty();
+    BOOL IsUnk148Full();
+    s32 FindFreeUnk148();
+    void CompactUnk148();
+    void AddUnk148(const DinoEntrySource *source);
+    void SetUnk14C(u32 index, const DinoBackupEntry *entry);
+    void GetUnk14C(u32 index, DinoBackupEntry *entry);
+    u32 CountUsedUnk14C();
+    u32 CountFreeUnk14C();
+    BOOL IsUnk14CEmpty();
+    BOOL IsUnk14CFull();
+    s32 FindFreeUnk14C();
+    void CompactUnk14C();
+    void ClearEntries(DinoBackupEntry *entries, u32 count);
+    BOOL AreEntriesEmpty(DinoBackupEntry *entries, u32 count);
+    BOOL AreEntriesFull(DinoBackupEntry *entries, u32 count);
+    s32 FindFreeEntry(DinoBackupEntry *entries, u32 count);
+    void CompactEntries(DinoBackupEntry *entries, u32 count);
 
     MBackupDevice *mDevice;         // 0x00C
     MBackupStorage *mStorage;       // 0x010
@@ -253,8 +316,8 @@ public:
     u32 *mKasekiRocks;              // 0x0A0
     u8 mUnkA4[0x84];                // 0x0A4
     DinoBackupRecord *mRecords;     // 0x128
-    u8 *mUnk12C;                    // 0x12C
-    u8 *mCreatures;                 // 0x130
+    DinoTeam *mTeams;               // 0x12C
+    DinoCreatureState *mCreatures;  // 0x130
     DinoBackupEntry *mUnk134;       // 0x134
     DinoBackupEntry28 *mUnk138;     // 0x138
     u32 mUnk140Size;                // 0x13C

@@ -6,6 +6,7 @@
 #include "m/backup.h"
 #include "m/irq.h"
 #include "m/heap.h"
+#include "m/seed_generator.h"
 #include "m/serializer.h"
 #include "m/sleep.h"
 #include "m/soft_reset.h"
@@ -471,4 +472,237 @@ void DinoBackup::SetRecord(u32 index, const DinoBackupRecord *record) {
 
 void DinoBackup::GetRecord(u32 index, DinoBackupRecord *record) {
     *record = mRecords[index];
+}
+
+void DinoBackup::SetTeam(u32 index, const DinoTeam *team) {
+    mTeams[index] = *team;
+}
+
+void DinoBackup::GetTeam(u32 index, DinoTeam *team) {
+    *team = mTeams[index];
+}
+
+// Makes sure the current team has at least one creature, taking the first one owned that isn't in it.
+void DinoBackup::FillTeam() {
+    DinoTeam *team = &mTeams[GetUnk34_26()];
+    u32 i;
+    u32 count = 0;
+    for (i = 0; i < 5; i++) {
+        if (team->slots[i] != 0) {
+            count++;
+        }
+    }
+    if (count >= 1) {
+        return;
+    }
+    for (u32 id = 1; id < gDinoResource->GetCreatureCount(); id++) {
+        if (mCreatures[id].parts[0].level == 0) {
+            continue;
+        }
+        BOOL inTeam;
+        for (u32 i = 0; i < 5; i++) {
+            if (id == team->slots[i]) {
+                inTeam = TRUE;
+                goto found;
+            }
+        }
+        inTeam = FALSE;
+    found:
+        if (inTeam) {
+            continue;
+        }
+        u32 slot;
+        for (slot = 0; slot < 5; slot++) {
+            if (team->slots[slot] == 0) {
+                goto empty;
+            }
+        }
+        slot = -1;
+    empty:
+        team->slots[slot] = id;
+        count = 0;
+        for (u32 i = 0; i < 5; i++) {
+            if (team->slots[i] != 0) {
+                count++;
+            }
+        }
+        if (count >= 1) {
+            return;
+        }
+    }
+}
+
+void DinoBackup::SetCreature(u32 index, const DinoCreatureState *creature) {
+    mCreatures[index] = *creature;
+}
+
+void DinoBackup::GetCreature(u32 index, DinoCreatureState *creature) {
+    *creature = mCreatures[index];
+}
+
+static inline u32 CountLooseParts(const DinoCreatureState *creature) {
+    if (creature->parts[0].level != 0) {
+        return 0;
+    }
+    u32 count = 0;
+    for (u32 i = 1; i < 4; i++) {
+        if (creature->parts[i].level != 0) {
+            count++;
+        }
+    }
+    return count;
+}
+
+u32 DinoBackup::CountCreatureParts() {
+    u32 total = 0;
+    for (u32 id = 1; id < gDinoResource->GetCreatureCount(); id++) {
+        total += CountLooseParts(&mCreatures[id]);
+    }
+    return total;
+}
+
+void DinoBackup::SetUnk134(u32 index, const DinoBackupEntry *entry) {
+    mUnk134[index] = *entry;
+}
+
+void DinoBackup::GetUnk134(u32 index, DinoBackupEntry *entry) {
+    *entry = mUnk134[index];
+}
+
+void DinoBackup::SetUnk144(s32 value) {
+    mUnk144 = value;
+}
+
+s32 DinoBackup::GetUnk144() {
+    return mUnk144;
+}
+
+void DinoBackup::SetUnk148(u32 index, const DinoBackupEntry *entry) {
+    mUnk148[index] = *entry;
+}
+
+void DinoBackup::GetUnk148(u32 index, DinoBackupEntry *entry) {
+    *entry = mUnk148[index];
+}
+
+void DinoBackup::ClearUnk148() {
+    ClearEntries(mUnk148, 8);
+}
+
+BOOL DinoBackup::IsUnk148Empty() {
+    return AreEntriesEmpty(mUnk148, 8);
+}
+
+BOOL DinoBackup::IsUnk148Full() {
+    return AreEntriesFull(mUnk148, 8);
+}
+
+s32 DinoBackup::FindFreeUnk148() {
+    return FindFreeEntry(mUnk148, 8);
+}
+
+void DinoBackup::CompactUnk148() {
+    CompactEntries(mUnk148, 8);
+}
+
+void DinoBackup::AddUnk148(const DinoEntrySource *source) {
+    if (IsUnk148Full()) {
+        return;
+    }
+    DinoBackupEntry entry;
+    MI_CpuFill8(&entry, 0, sizeof(entry));
+    switch (source->type) {
+    case 0:
+        entry.id = source->id;
+        break;
+    case 2:
+        entry.id = gDinoResource->GetRandom()->Next(400) + 1;
+        break;
+    case 1: {
+        entry.id = 1;
+        MRandomRef random(gDinoResource->GetRandom());
+        for (u32 id = 1; id <= 400; id++) {
+            if (((DinoKasekiRock *) &mKasekiRocks[id])->found && random.Roll()) {
+                entry.id = id;
+            }
+        }
+        break;
+    }
+    }
+    entry.unkC_12 = 0;
+    entry.type = 0;
+    if (mPlayer->license < 1) {
+        entry.unk10_0 = 0;
+    } else {
+        entry.unk10_0 = gDinoResource->GetCreatureUnk0D((entry.id - 1) / 4 + 1);
+    }
+    entry.unk10_3 = 1;
+    mUnk148[FindFreeUnk148()] = entry;
+}
+
+void DinoBackup::SetUnk14C(u32 index, const DinoBackupEntry *entry) {
+    mUnk14C[index] = *entry;
+}
+
+void DinoBackup::GetUnk14C(u32 index, DinoBackupEntry *entry) {
+    *entry = mUnk14C[index];
+}
+
+u32 DinoBackup::CountUsedUnk14C() {
+    s32 free = FindFreeUnk14C();
+    if (free == -1) {
+        free = 8;
+    }
+    return free;
+}
+
+u32 DinoBackup::CountFreeUnk14C() {
+    return 8 - CountUsedUnk14C();
+}
+
+BOOL DinoBackup::IsUnk14CEmpty() {
+    return AreEntriesEmpty(mUnk14C, 8);
+}
+
+BOOL DinoBackup::IsUnk14CFull() {
+    return AreEntriesFull(mUnk14C, 8);
+}
+
+s32 DinoBackup::FindFreeUnk14C() {
+    return FindFreeEntry(mUnk14C, 8);
+}
+
+void DinoBackup::CompactUnk14C() {
+    CompactEntries(mUnk14C, 8);
+}
+
+void DinoBackup::ClearEntries(DinoBackupEntry *entries, u32 count) {
+    MI_CpuFill8(entries, 0, count * sizeof(DinoBackupEntry));
+}
+
+BOOL DinoBackup::AreEntriesEmpty(DinoBackupEntry *entries, u32 count) {
+    for (u32 i = 0; i < count; i++) {
+        if (entries[i].id != 0) {
+            return FALSE;
+        }
+    }
+    return TRUE;
+}
+
+BOOL DinoBackup::AreEntriesFull(DinoBackupEntry *entries, u32 count) {
+    for (u32 i = 0; i < count; i++) {
+        if (entries[i].id == 0) {
+            return FALSE;
+        }
+    }
+    return TRUE;
+}
+
+s32 DinoBackup::FindFreeEntry(DinoBackupEntry *entries, u32 count) {
+    for (u32 i = 0; i < count; i++) {
+        if (entries[i].id == 0) {
+            return i;
+        }
+    }
+    return -1;
 }
