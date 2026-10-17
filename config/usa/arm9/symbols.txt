@@ -12765,7 +12765,7 @@ GXi_DmaId kind:data(any) addr:0x020c5638
 OSi_IrqCallbackInfoIndex kind:data(any) addr:0x020c563c
 data_020c564c kind:data(any) addr:0x020c564c
 data_020c5650 kind:data(any) addr:0x020c5650
-data_020c5654 kind:data(any) addr:0x020c5654
+fsi_rom_name kind:data(any) addr:0x020c5654
 data_020c5658 kind:data(any) addr:0x020c5658
 data_020c5660 kind:data(any) addr:0x020c5660
 data_020c5664 kind:data(any) addr:0x020c5664
@@ -13080,10 +13080,11 @@ FifoRecvCallbackTable kind:bss(size=0x80) addr:0x02153788
 arc_list kind:bss(size=0x4) addr:0x02153808
 current_dir_pos kind:bss(size=0xc) addr:0x0215380c
 is_init kind:bss(size=0x4) addr:0x02153818
-data_0215381c kind:bss addr:0x0215381c
-data_02153824 kind:bss addr:0x02153824
-data_0215382c kind:bss addr:0x0215382c
-data_02153834 kind:bss addr:0x02153834
+fsi_card_lock_id kind:bss(size=0x4) addr:0x0215381c
+fsi_default_dma_no kind:bss(size=0x4) addr:0x02153820
+fsi_ovt9 kind:bss(size=0x8) addr:0x02153824
+fsi_ovt7 kind:bss(size=0x8) addr:0x0215382c
+fsi_arc_rom kind:bss(size=0x5c) addr:0x02153834
 tpInitialized kind:bss(size=0x2) addr:0x02153890
 tpState kind:bss(size=0x38) addr:0x02153894
 micInitialized kind:bss(size=0x2) addr:0x021538cc
