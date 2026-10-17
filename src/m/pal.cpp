@@ -3,6 +3,8 @@
 #include <algorithm>
 #include "m/pal.h"
 #include "m/looper.h"
+#include "m/lcd.h"
+#include "m/transfer.h"
 
 extern "C" {
 extern u32 data_0208c314[2];    // bytes per palette: normal, extended
@@ -214,6 +216,31 @@ void MPalAnime::Apply(int step) {
         mBlock->Load(mColors, mStart, mCount);
     } else {
         mBlock->LoadColors(mColors + mLoadStart, mLoadStart, mLoadCount);
+    }
+}
+
+// NONMATCHING: register allocation only (the game keeps freeSrc in r7 and spills the bank; ours the reverse).
+void MPalLoadTask::Transfer() {
+    u8 freeSrc = mUnk20;
+    int bank = (int)mExtPalette;
+    u32 size = mSize;
+    void *dest = mDest;
+    const void *src = mSrc;
+    if (bank == 0) {
+        MCopy(src, dest, size);
+    } else {
+        MVramCnt cnt;
+        cnt.raw = 0;
+        cnt.mst = 0;
+        cnt.offset = 0;
+        cnt.enable = TRUE;
+        MVramCnt old = gLcd->SetBankCnt(bank, cnt);
+        MCopy(src, dest, size);
+        MI_WaitDma(M_DMA_NO);
+        gLcd->SetBankCnt(bank, old);
+    }
+    if (freeSrc) {
+        delete[] (u8 *)src;
     }
 }
 

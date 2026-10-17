@@ -16,6 +16,7 @@ void MIi_CpuClear16(u16 data, void *dest, u32 size);
 void MIi_CpuClear32(u32 data, void *dest, u32 size);
 void MIi_CpuClearFast(u32 data, void *dest, u32 size);
 void MI_DmaCopy16(u32 dmaNo, const void *src, void *dest, u32 size);
+void MI_WaitDma(u32 dmaNo);
 void MI_DmaCopy32(u32 dmaNo, const void *src, void *dest, u32 size);
 void MI_DmaFill16(u32 dmaNo, void *dest, u16 data, u32 size);
 void MI_DmaFill32(u32 dmaNo, void *dest, u32 data, u32 size);
