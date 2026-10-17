@@ -13,9 +13,19 @@ SYMBOLS = {
     "SDK_SYS_STACKSIZE": 0,
 }
 
+# Symbols the SDK's linker script puts at the start of the ARM9 .bss: the table of overlay digests (empty in this
+# game, so both ends are the same address).
+AT_BSS_START = ["SDK_OVERLAY_DIGEST", "SDK_OVERLAY_DIGEST_END"]
+
 path = next(a for a in sys.argv[1:] if a.endswith(".lcf"))
 text = open(path).read()
+orig = text
 lines = "".join(f"    {name} = {value:#x};\n" for name, value in SYMBOLS.items() if f"{name} =" not in text)
 if lines:
     text = text.replace("SECTIONS {\n", "SECTIONS {\n" + lines, 1)
+marker = "ARM9_BSS_START = .;\n"
+extra = "".join(f"        {name} = .;\n" for name in AT_BSS_START if f"{name} =" not in text)
+if extra and marker in text:
+    text = text.replace(marker, marker + extra, 1)
+if text != orig:
     open(path, "w").write(text)

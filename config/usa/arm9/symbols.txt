@@ -3665,8 +3665,8 @@ func_0204eb94 kind:function(thumb,size=0x56) addr:0x0204eb94
 func_0204ebec kind:function(thumb,size=0x88) addr:0x0204ebec
 func_0204ec74 kind:function(thumb,size=0x2e) addr:0x0204ec74
 FSi_GetOverlayBinarySize kind:function(thumb,size=0x14) addr:0x0204eca4
-FS_LoadOverlayImage kind:function(thumb,size=0x5a) addr:0x0204ecb8
-FS_LoadOverlay kind:function(thumb,size=0x30) addr:0x0204ed14
+func_0204ecb8 kind:function(thumb,size=0x5a) addr:0x0204ecb8
+func_0204ed14 kind:function(thumb,size=0x30) addr:0x0204ed14
 func_0204ed44 kind:function(thumb,size=0x12) addr:0x0204ed44
 func_0204ed58 kind:function(thumb,size=0x40) addr:0x0204ed58
 func_0204ed98 kind:function(thumb,size=0xa0) addr:0x0204ed98
@@ -5977,17 +5977,17 @@ FSi_ReadDummyCallback kind:function(thumb,size=0x4) addr:0x02077ffc
 FSi_EmptyArchiveProc kind:function(thumb,size=0x4) addr:0x02078000
 FSi_InitRom kind:function(thumb,size=0xdc) addr:0x02078004
 FS_TryLoadTable kind:function(thumb,size=0x14) addr:0x020780e0
-func_020780f4 kind:function(thumb,size=0x14) addr:0x020780f4
+FS_GetOverlayImageSize kind:function(thumb,size=0x14) addr:0x020780f4
 FS_ClearOverlayImage kind:function(thumb,size=0x26) addr:0x02078108
 FS_GetOverlayFileID kind:function(thumb,size=0x18) addr:0x02078130
 FSi_LoadOverlayInfoCore kind:function(thumb,size=0x9c) addr:0x02078148
 FS_LoadOverlayInfo kind:function(thumb,size=0xa0) addr:0x020781e4
-FS_LoadOverlayImage_02078284 kind:function(thumb,size=0x5a) addr:0x02078284
+FS_LoadOverlayImage kind:function(thumb,size=0x5a) addr:0x02078284
 FSi_CompareDigest kind:function(thumb,size=0x58) addr:0x020782e0
 FS_StartOverlay kind:function(thumb,size=0x94) addr:0x02078338
 FS_EndOverlay kind:function(thumb,size=0xa4) addr:0x020783cc
-FS_StopOverlay kind:function(thumb,size=0xa) addr:0x02078470
-FS_LoadOverlay_0207847c kind:function(thumb,size=0x30) addr:0x0207847c
+FS_UnloadOverlayImage kind:function(thumb,size=0xa) addr:0x02078470
+FS_LoadOverlay kind:function(thumb,size=0x30) addr:0x0207847c
 FS_UnloadOverlay kind:function(thumb,size=0x2a) addr:0x020784ac
 func_020784d8 kind:function(thumb,size=0x28) addr:0x020784d8
 func_02078500 kind:function(thumb,size=0x94) addr:0x02078500
@@ -7329,7 +7329,7 @@ SNDi_DecibelTable kind:data(any) addr:0x02091fb8
 data_02092101 kind:data(any) addr:0x02092101
 VolumeTable kind:data(any) addr:0x020926b8
 fsi_default_command kind:data(any) addr:0x0209298c
-data_020929b0 kind:data(any) addr:0x020929b0
+fsi_def_digest_key kind:data(any) addr:0x020929b0
 data_020929f0 kind:data(any) addr:0x020929f0
 data_02092a44 kind:data(any) addr:0x02092a44
 data_02092ac4 kind:data(any) addr:0x02092ac4
@@ -12766,7 +12766,7 @@ OSi_IrqCallbackInfoIndex kind:data(any) addr:0x020c563c
 data_020c564c kind:data(any) addr:0x020c564c
 data_020c5650 kind:data(any) addr:0x020c5650
 fsi_rom_name kind:data(any) addr:0x020c5654
-data_020c5658 kind:data(any) addr:0x020c5658
+fsi_digest_key_ptr kind:data(any) addr:0x020c5658
 data_020c5660 kind:data(any) addr:0x020c5660
 data_020c5664 kind:data(any) addr:0x020c5664
 data_020c5724 kind:data(any) addr:0x020c5724
@@ -13134,4 +13134,4 @@ data_02155760 kind:bss addr:0x02155760
 errno kind:bss addr:0x02155860
 signal_funcs kind:bss addr:0x02155864
 data_02155880 kind:bss addr:0x02155880
-data_02155884 kind:bss addr:0x02155884
+__global_destructor_chain kind:bss addr:0x02155884
