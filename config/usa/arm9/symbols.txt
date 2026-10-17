@@ -13019,8 +13019,8 @@ data_0214d570 kind:bss addr:0x0214d570
 gBgTaskManagers kind:bss addr:0x0214d588
 sSeedCount kind:bss addr:0x0214d594
 data_0214d59c kind:bss addr:0x0214d59c
-data_0214d5a4 kind:bss addr:0x0214d5a4
-data_0214d5a8 kind:bss addr:0x0214d5a8
+sRootListInitialized kind:bss addr:0x0214d5a4
+sRootList kind:bss(size=0xc) addr:0x0214d5a8
 data_0214d5c0 kind:bss addr:0x0214d5c0
 data_0214d5d0 kind:bss addr:0x0214d5d0
 data_0214d5dc kind:bss addr:0x0214d5dc
