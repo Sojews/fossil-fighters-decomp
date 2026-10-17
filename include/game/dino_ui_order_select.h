@@ -14,6 +14,11 @@
 #include "game/help.h"
 #include "game/dino_field_camera_hook.h"
 
+class DinoUiOrderSelectMenu : public DinoHelpBase, public MMenu {
+public:
+    virtual ~DinoUiOrderSelectMenu();
+};
+
 class DinoUiOrderSelect : public MProcess {
 public:
     virtual ~DinoUiOrderSelect();

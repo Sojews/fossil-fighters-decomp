@@ -19,6 +19,11 @@ public:
     virtual void Idle();
 };
 
+class DinoUiMuseumMenu : public DinoHelpBase, public MMenu {
+public:
+    virtual ~DinoUiMuseumMenu();
+};
+
 class DinoUiMuseumEffectLight : public MProcess {
 public:
     virtual ~DinoUiMuseumEffectLight();

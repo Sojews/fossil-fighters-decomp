@@ -6,6 +6,7 @@
 #include "game/dino_sound.h"
 #include "game/dino_ui_order_select.h"
 #include "types.h"
+#include "m/call_task.h"
 
 DinoUiOrderSelect::~DinoUiOrderSelect() {
 }
@@ -65,3 +66,8 @@ void DinoUiOrderSelectBackButton::OnDecide() {
     func_ov006_0218d828(mOwner);
     DinoSoundPlaySe(0x90, 0);
 }
+
+// DinoUiOrderSelectMenu's OnStart/OnFocus/OnDecide (not decompiled yet) queue these call tasks.
+template MTask *MCreateCallTask(DinoUiOrderSelectMenu *obj, void (DinoHelpBase::*func)());
+template MTask *MCreateCallTask(DinoUiOrderSelectMenu *obj, void (DinoUiOrderSelectMenu::*func)());
+template MTask *MCreateCallTask(DinoUiOrderSelectMenu *obj, void (DinoUiOrderSelectMenu::*func)(bool), bool a1);
