@@ -24,6 +24,7 @@ AutoloadCallback kind:function(arm,size=0x4) addr:0x02000a74
 init_cp15 kind:function(arm,size=0xe8) addr:0x02000a78
 OSi_ReferSymbol kind:function(arm,size=0x4) addr:0x02000b60
 BuildInfo kind:data(any) addr:0x02000b64
+cardi_backup_id_string kind:data(any) addr:0x02000b88
 main kind:function(thumb,size=0x20) addr:0x02000ba0
 _ZN12SoundManager4InitEv kind:function(arm,size=0x44) addr:0x02000bc0
 _ZN12SoundManager10CreateHeapEPvm kind:function(arm,size=0x24) addr:0x02000c04
