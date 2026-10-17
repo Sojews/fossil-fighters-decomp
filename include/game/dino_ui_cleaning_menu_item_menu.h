@@ -23,12 +23,14 @@ public:
     BOOL PageRight();
     BOOL PageLeft();
     BOOL IsDecidable();
-    void RefreshPage1();
+    void ClearItems();
     void RefreshPage2();
     void Decide(int index);
 
-    u32 mUnkB4[3];              // 0xB4
-    std::vector<void *> mUnkC0; // 0xC0
+    u32 mUnkB4;                 // 0xB4
+    MMenuItem *mLinkFrom;       // 0xB8: linked to the first page item
+    u32 mUnkBC;
+    std::vector<void *> mItems; // 0xC0: this page's items
     u32 mUnkCC[2];              // 0xCC
     DinoUi3PartsFraction *mFraction; // 0xD4: "page n/m"
     u32 mUnkD8[4];              // 0xD8

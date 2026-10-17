@@ -20,15 +20,15 @@ public:
     BOOL PageRight();
     BOOL PageLeft();
     BOOL Sell();
-    void RefreshPage1();
+    void ClearItems();
     void RefreshPage2();
 
     MArchivePtr mArchive;       // 0xB4
     MArchiveFile mFile;         // 0xB8
     u32 mUnkC4[2];              // 0xC4
-    u32 mUnkCC;                 // 0xCC
+    MMenuItem *mLinkFrom;       // 0xCC: linked to the first page item
     u32 mUnkD0;
-    std::vector<void *> mUnkD4; // 0xD4
+    std::vector<void *> mItems; // 0xD4: this page's items
     u32 mUnkE0[2];              // 0xE0
     DinoUi3PartsFraction *mFraction; // 0xE8: "page n/m"
     u32 mUnkEC;
@@ -40,7 +40,7 @@ public:
     int mLastPage;              // 0x14C
     u8 mUnk150;                 // 0x150
     u32 mUnk154;
-    u32 mUnk158;                // 0x158
+    MMenuItem *mUnk158;         // 0x158
 };
 
 class DinoUiShopSellBackButton : public DinoUiShopSellMenuItem {

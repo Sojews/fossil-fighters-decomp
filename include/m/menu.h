@@ -55,6 +55,8 @@ public:
 
     void SetDeferStart(BOOL defer);
     void AddItem(MMenuItem *item);
+    void RemoveItem(MMenuItem *item);
+    void RemoveLink(MMenuItem *from, int dir);
     void SetLinksOnly(BOOL linksOnly);
     MInput *GetInput();
     void Activate();

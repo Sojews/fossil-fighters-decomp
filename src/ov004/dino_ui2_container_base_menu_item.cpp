@@ -17,7 +17,7 @@
 
 BOOL DinoUi2ContainerBaseMenu::PageLeft() {
     mPage = (mPage + mLastPage) % (mLastPage + 1);
-    RefreshPage1();
+    ClearItems();
     RefreshPage2();
     FocusNearestItem(GetCursor());
     return TRUE;
@@ -29,7 +29,7 @@ BOOL DinoUi2ContainerBaseMenu::PageLeft() {
 
 BOOL DinoUi2ContainerBaseMenu::PageRight() {
     mPage = (mPage + 1) % (mLastPage + 1);
-    RefreshPage1();
+    ClearItems();
     RefreshPage2();
     FocusNearestItem(GetCursor());
     return TRUE;
@@ -151,4 +151,14 @@ void DinoUi2ContainerBaseDecideButton::OnDecide() {
         serial->AddTail(wait);
         serial->AddTail(play);
     }
+}
+
+// NONMATCHING: the game reloads the item count for clear(); ours reuses the loop's last load.
+void DinoUi2ContainerBaseMenu::ClearItems() {
+    RemoveLink(mLinkFrom, 4);
+    for (int i = 0; i < mItems.size(); i++) {
+        RemoveItem((MMenuItem *)mItems[i]);
+        delete (MMenuItem *)mItems[i];
+    }
+    mItems.clear();
 }

@@ -106,7 +106,7 @@ template MTask *MCreateCallTask(DinoUiCleaningMenu *obj, void (DinoUiCleaningMen
 // NONMATCHING: the game computes the index before loading the item count; ours loads the count first.
 void DinoUiCleaningMenu::OnDecide(MMenuItem *item) {
     for (int i = 0; i < 8; i++) {
-        if (item == mUnkC0[i]) {
+        if (item == mItems[i]) {
             int index = i + mPage * 8;
             if (index < mUnkE8.size()) {
                 if (IsDecidable()) {
@@ -126,7 +126,7 @@ BOOL DinoUiCleaningMenu::PageRight() {
     } else {
         mPage++;
     }
-    RefreshPage1();
+    ClearItems();
     mFraction->SetNumerator(mPage + 1);
     RefreshPage2();
     FocusNearestItem(GetCursor());
@@ -139,9 +139,17 @@ BOOL DinoUiCleaningMenu::PageLeft() {
     } else {
         mPage--;
     }
-    RefreshPage1();
+    ClearItems();
     mFraction->SetNumerator(mPage + 1);
     RefreshPage2();
     FocusNearestItem(GetCursor());
     return TRUE;
+}
+
+void DinoUiCleaningMenu::ClearItems() {
+    RemoveLink(mLinkFrom, 2);
+    for (int i = 0; i < mItems.size(); i++) {
+        RemoveItem((MMenuItem *)mItems[i]);
+        delete (MMenuItem *)mItems[i];
+    }
 }

@@ -76,7 +76,7 @@ _Z15MCreateCallTaskI18DinoUiShopSellMenuS0_EP5MTaskPT_MT0_FvvE kind:function(thu
 func_ov005_02158304 kind:function(thumb,size=0x150) addr:0x02158304
 _ZN18DinoUiShopSellMenu9PageRightEv kind:function(thumb,size=0x70) addr:0x02158454
 _ZN18DinoUiShopSellMenu8PageLeftEv kind:function(thumb,size=0x70) addr:0x021584c4
-_ZN18DinoUiShopSellMenu12RefreshPage1Ev kind:function(thumb,size=0x52) addr:0x02158534
+_ZN18DinoUiShopSellMenu10ClearItemsEv kind:function(thumb,size=0x52) addr:0x02158534
 _ZN18DinoUiShopSellMenu12RefreshPage2Ev kind:function(thumb,size=0x278) addr:0x02158588
 func_ov005_02158800 kind:function(thumb,size=0xb0) addr:0x02158800
 _ZN18DinoUiShopSellMenu6OnIdleEv kind:function(thumb,size=0xac) addr:0x021588b0
@@ -221,7 +221,7 @@ _Z15MCreateCallTaskI18DinoUiCleaningMenuS0_EP5MTaskPT_MT0_FvvE kind:function(thu
 func_ov005_0215c0f4 kind:function(thumb,size=0xf8) addr:0x0215c0f4
 _ZN18DinoUiCleaningMenu9PageRightEv kind:function(thumb,size=0x5a) addr:0x0215c1ec
 _ZN18DinoUiCleaningMenu8PageLeftEv kind:function(thumb,size=0x58) addr:0x0215c248
-_ZN18DinoUiCleaningMenu12RefreshPage1Ev kind:function(thumb,size=0x52) addr:0x0215c2a0
+_ZN18DinoUiCleaningMenu10ClearItemsEv kind:function(thumb,size=0x52) addr:0x0215c2a0
 _ZN18DinoUiCleaningMenu12RefreshPage2Ev kind:function(thumb,size=0x268) addr:0x0215c2f4
 func_ov005_0215c55c kind:function(thumb,size=0x30) addr:0x0215c55c
 _ZN18DinoUiCleaningTest4IdleEv kind:function(thumb,size=0x20) addr:0x0215c58c
@@ -432,7 +432,7 @@ _Z15MCreateCallTaskI19DinoUiMaskEquipMenuS0_EP5MTaskPT_MT0_FvvE kind:function(th
 func_ov005_0216192c kind:function(thumb,size=0x84) addr:0x0216192c
 _ZN19DinoUiMaskEquipMenu9PageRightEv kind:function(thumb,size=0x64) addr:0x021619b0
 _ZN19DinoUiMaskEquipMenu8PageLeftEv kind:function(thumb,size=0x62) addr:0x02161a14
-_ZN19DinoUiMaskEquipMenu12RefreshPage1Ev kind:function(thumb,size=0x6a) addr:0x02161a78
+_ZN19DinoUiMaskEquipMenu10ClearItemsEv kind:function(thumb,size=0x6a) addr:0x02161a78
 _ZN19DinoUiMaskEquipMenu12RefreshPage2Ev kind:function(thumb,size=0x4d8) addr:0x02161ae4
 func_ov005_02161fbc kind:function(thumb,size=0x18) addr:0x02161fbc
 _ZN15DinoUiMaskEquip4IdleEv kind:function(thumb,size=0xa0) addr:0x02161fd4
@@ -505,7 +505,7 @@ func_ov005_02163454 kind:function(thumb,size=0x8) addr:0x02163454
 func_ov005_0216345c kind:function(thumb,size=0x42) addr:0x0216345c
 _ZN23DinoUiContainerBaseMenu9PageRightEv kind:function(thumb,size=0x5c) addr:0x021634a0
 _ZN23DinoUiContainerBaseMenu8PageLeftEv kind:function(thumb,size=0x5c) addr:0x021634fc
-_ZN23DinoUiContainerBaseMenu12RefreshPage1Ev kind:function(thumb,size=0x64) addr:0x02163558
+_ZN23DinoUiContainerBaseMenu10ClearItemsEv kind:function(thumb,size=0x64) addr:0x02163558
 _ZN23DinoUiContainerBaseMenu12RefreshPage2Ev kind:function(thumb,size=0x218) addr:0x021635bc
 func_ov005_021637d4 kind:function(thumb,size=0x88) addr:0x021637d4
 func_ov005_0216385c kind:function(thumb,size=0x20) addr:0x0216385c

@@ -143,10 +143,10 @@ template MTask *MCreateCallTask(DinoUiShopSellMenu *obj, void (DinoUiShopSellMen
 
 BOOL DinoUiShopSellMenu::PageRight() {
     mPage = (mPage + 1) % (mLastPage + 1);
-    RefreshPage1();
+    ClearItems();
     mFraction->SetNumerator(mPage + 1);
     RefreshPage2();
-    if (mUnk158 != mUnkCC) {
+    if (mUnk158 != mLinkFrom) {
         FocusNearestItem(mCursor->GetPosition());
     }
     return TRUE;
@@ -154,11 +154,19 @@ BOOL DinoUiShopSellMenu::PageRight() {
 
 BOOL DinoUiShopSellMenu::PageLeft() {
     mPage = (mPage + mLastPage) % (mLastPage + 1);
-    RefreshPage1();
+    ClearItems();
     mFraction->SetNumerator(mPage + 1);
     RefreshPage2();
-    if (mUnk158 != mUnkCC) {
+    if (mUnk158 != mLinkFrom) {
         FocusNearestItem(mCursor->GetPosition());
     }
     return TRUE;
+}
+
+void DinoUiShopSellMenu::ClearItems() {
+    RemoveLink(mLinkFrom, 4);
+    for (int i = 0; i < mItems.size(); i++) {
+        RemoveItem((MMenuItem *)mItems[i]);
+        delete (MMenuItem *)mItems[i];
+    }
 }

@@ -20,7 +20,7 @@ public:
     void OnBackDecided();
     BOOL PageRight();
     BOOL PageLeft();
-    void RefreshPage1();
+    void ClearItems();
     void RefreshPage2();
 
     DinoUi3PartsFraction *mFraction; // 0xB4: "page n/m"
@@ -33,8 +33,10 @@ public:
     MArchivePtr mArchive;       // 0x108
     MArchiveFile mFile;         // 0x10C
     u32 mUnk118[2];             // 0x118
-    std::vector<void *> mUnk120;// 0x120
-    u32 mUnk12C[7];             // 0x12C
+    std::vector<void *> mItems; // 0x120: this page's items
+    u32 mUnk12C[3];             // 0x12C
+    MMenuItem *mLinkFrom;       // 0x138: linked to the first page item
+    u32 mUnk13C[3];
     std::vector<u32> mUnk148;   // 0x148
 };
 

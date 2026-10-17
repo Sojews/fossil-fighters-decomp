@@ -115,7 +115,7 @@ template MTask *MCreateCallTask(DinoUiContainerMenu *obj, void (DinoUiContainerM
 
 BOOL DinoUiContainerMenu::PageRight() {
     mPage = (mPage + 1) % (mLastPage + 1);
-    RefreshPage1();
+    ClearItems();
     mFraction->SetNumerator(mPage + 1);
     RefreshPage2();
     FocusNearestItem(mCursor->GetPosition());
@@ -124,9 +124,16 @@ BOOL DinoUiContainerMenu::PageRight() {
 
 BOOL DinoUiContainerMenu::PageLeft() {
     mPage = (mPage + mLastPage) % (mLastPage + 1);
-    RefreshPage1();
+    ClearItems();
     mFraction->SetNumerator(mPage + 1);
     RefreshPage2();
     FocusNearestItem(mCursor->GetPosition());
     return TRUE;
+}
+
+void DinoUiContainerMenu::ClearItems() {
+    for (int i = 0; i < mItems.size(); i++) {
+        RemoveItem((MMenuItem *)mItems[i]);
+        delete (MMenuItem *)mItems[i];
+    }
 }

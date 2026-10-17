@@ -137,7 +137,7 @@ void DinoUiMaskEquipMaskButton::OnDecide() {
 
 void DinoUiMaskEquipMenu::OnDecide(MMenuItem *item) {
     for (int i = 0; i < 8; i++) {
-        if (item == mUnkC0[i]) {
+        if (item == mItems[i]) {
             int index = i + mPage * 8;
             if (index < mUnkF0.size()) {
                 if (mUnk104) {
@@ -160,7 +160,7 @@ BOOL DinoUiMaskEquipMenu::PageRight() {
     } else {
         mPage++;
     }
-    RefreshPage1();
+    ClearItems();
     mFraction->SetNumerator(mPage + 1);
     RefreshPage2();
     FocusNearestItem(GetCursor());
@@ -173,9 +173,19 @@ BOOL DinoUiMaskEquipMenu::PageLeft() {
     } else {
         mPage--;
     }
-    RefreshPage1();
+    ClearItems();
     mFraction->SetNumerator(mPage + 1);
     RefreshPage2();
     FocusNearestItem(GetCursor());
     return TRUE;
+}
+
+// NONMATCHING: the game reloads the item count for clear(); ours reuses the loop's last load.
+void DinoUiMaskEquipMenu::ClearItems() {
+    RemoveLink(mLinkFrom, 2);
+    for (int i = 0; i < mItems.size(); i++) {
+        RemoveItem((MMenuItem *)mItems[i]);
+        delete (MMenuItem *)mItems[i];
+    }
+    mItems.clear();
 }

@@ -22,13 +22,15 @@ public:
     int mLastPage; // 0xF8
     u8 mUnkFC;                      // 0xFC
     u32 mUnk100[3];                 // 0x100
-    std::vector<void *> mUnk10C;    // 0x10C
-    u32 mUnk118[7];                 // 0x118
+    std::vector<void *> mItems;     // 0x10C: this page's items
+    u32 mUnk118[3];                 // 0x118
+    MMenuItem *mLinkFrom;           // 0x124: linked to the first page item
+    u32 mUnk128[3];
     std::vector<unsigned short> mUnk134; // 0x134: (the element type is a guess, distinct from other overlays')
     void OnBackDecided();
     BOOL PageRight();
     BOOL PageLeft();
-    void RefreshPage1();
+    void ClearItems();
     void RefreshPage2();
 };
 
