@@ -25,3 +25,11 @@ void KPUpDownMotion::Idle() {
 
 void DinoBattleViewKPUpDown::Idle() {
 }
+
+extern "C" int func_ov000_0217de0c(void);
+
+void WaitPopNumberTask::Execute() {
+    if (func_ov000_0217de0c() == 0) {
+        Exit();
+    }
+}

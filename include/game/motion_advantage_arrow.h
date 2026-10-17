@@ -13,6 +13,9 @@
 class MotionAdvantageArrow : public MMotion {
 public:
     virtual ~MotionAdvantageArrow();
+    virtual void Unk44(int arg);
+
+    u8 mUnk7C;  // 0x7C
 };
 
 class DinoBattleViewAdvantageArrow : public MProcess {

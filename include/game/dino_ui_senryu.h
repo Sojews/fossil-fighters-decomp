@@ -67,6 +67,10 @@ class DinoUiSenryuSubMenu : public MTask {
 public:
     virtual ~DinoUiSenryuSubMenu();
     virtual void Execute();
+
+    void *mOwner;   // 0x10
+    u32 *mValue;    // 0x14
+    u32 mArg;       // 0x18
 };
 
 class SenryuKeyCheckTask : public MTask {

@@ -26,6 +26,9 @@ class LifebarCoordTask : public MTask {
 public:
     virtual ~LifebarCoordTask();
     virtual void Execute();
+
+    MPoint mPos;        // 0x10
+    void *mLifebar;     // 0x18
 };
 
 class LifebarShowTask : public MTask {

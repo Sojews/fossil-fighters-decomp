@@ -83,3 +83,16 @@ MRect DinoBattleViewEffectGameBeginPlayerNamePanel::GetFrame() {
     r.right = r.left + 0x88;
     return r;
 }
+
+extern "C" void func_ov000_021728d4(DinoBattleViewCreature *view, int arg);
+extern "C" void func_ov000_0216fd74(DinoBattleViewCreature *view);
+
+void DinoBattleViewCreature::Idle() {
+    MMessageObserver::Dispatch();
+    func_ov000_021728d4(this, 0);
+    func_ov000_0216fd74(this);
+}
+
+MPoint DinoBattleViewEffectGameBeginPlayerNamePanel::GetPosition() {
+    return MMotion::GetPosition().Offset(12, 0);
+}

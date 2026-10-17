@@ -40,3 +40,10 @@ void NextCameraTask::Execute() {
     func_ov000_0218a970((void *)mUnk10, mUnk14);
     Exit();
 }
+
+extern "C" void func_ov000_0218a998(u32 arg0, char *name, u32 arg2);
+
+void CameraLoadTask::Execute() {
+    func_ov000_0218a998(mUnk50, mName, mUnk54);
+    Exit();
+}

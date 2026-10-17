@@ -15,6 +15,7 @@ class CreatureMotion : public MMotion {
 public:
     virtual ~CreatureMotion();
     virtual void Execute();
+    virtual void Unk44(int arg);
 };
 
 class NopTask : public MTask {

@@ -20,6 +20,9 @@ public:
         virtual ~ShowTask();
         virtual void Execute();
     };
+
+    u32 mUnk10;     // 0x10
+    MTask *mTask;   // 0x14
 };
 
 #endif

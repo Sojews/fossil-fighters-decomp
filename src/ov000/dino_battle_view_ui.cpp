@@ -85,3 +85,7 @@ extern "C" void func_ov000_02177804(DinoBattleViewUiRootMenuItem *item, BOOL sel
 void DinoBattleViewUiRootMenuItem::OnSelectChanged(BOOL selected) {
     func_ov000_02177804(this, selected);
 }
+
+MRect DinoFrameItem::GetFrame() {
+    return mFrame;
+}

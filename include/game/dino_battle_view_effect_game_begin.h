@@ -15,6 +15,7 @@ public:
     virtual ~DinoBattleViewEffectGameBeginPlayerNamePanel();
     virtual void Execute();
     virtual MRect GetFrame();
+    virtual MPoint GetPosition();
 };
 
 class DinoBattleViewEffectGameBegin : public MProcess {

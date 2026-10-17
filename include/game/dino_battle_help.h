@@ -24,7 +24,7 @@ public:
     virtual MDisplay *GetDisplay();
     virtual const char *GetText();
 
-    u8 unk80[0x10];
+    MRect mRect;        // 0x80
     u32 mTextId;        // 0x90
 };
 

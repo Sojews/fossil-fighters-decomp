@@ -38,3 +38,10 @@ DinoBattleViewAbilityMenuBG::SetPriorityTask::~SetPriorityTask() {
 
 DinoBattleViewAbilityTextWindow::ShowTask::~ShowTask() {
 }
+
+void DinoBattleViewAbilityTextWindow::Execute() {
+    MTask *task = mTask;
+    if (task != NULL && task->mState == MTask::STATE_RUN) {
+        task->Execute();
+    }
+}

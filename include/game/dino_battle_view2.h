@@ -95,6 +95,8 @@ public:
     MMotion *mMotion;   // 0x98
     u8 unk9C[0x4];
     u32 mTextId;        // 0xA0
+    int mFocusAnime;    // 0xA4
+    int mBlurAnime;     // 0xA8
 };
 
 class MenuExitTask : public MTask {
@@ -107,6 +109,8 @@ class WaitEnableRootMenu : public MTask {
 public:
     virtual ~WaitEnableRootMenu();
     virtual void Execute();
+
+    void *mMenu;    // 0x10
 };
 
 class DinoBattleViewAbilityIcon : public MProcess {

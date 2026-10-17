@@ -14,6 +14,10 @@ class CameraLoadTask : public MTask {
 public:
     virtual ~CameraLoadTask();
     virtual void Execute();
+
+    char mName[0x40];   // 0x10
+    u32 mUnk50;         // 0x50
+    u32 mUnk54;         // 0x54
 };
 
 class NextCameraTask : public MTask {

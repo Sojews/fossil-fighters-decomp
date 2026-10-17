@@ -68,3 +68,15 @@ const char *DinoBattleViewUiRootSelectItem::GetText() {
 void DinoBattleViewGivingUpMenu::Idle() {
     (this->*mState)();
 }
+
+extern "C" int func_ov000_0215bbd0(void *menu);
+
+void WaitEnableRootMenu::Execute() {
+    if (func_ov000_0215bbd0(mMenu) <= 0) {
+        Exit();
+    }
+}
+
+void DinoBattleViewUiRootSelectItem::OnFocusChanged(BOOL focused) {
+    mMotion->Play(focused ? mFocusAnime : mBlurAnime, 0);
+}

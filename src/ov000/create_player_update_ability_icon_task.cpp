@@ -120,3 +120,8 @@ DinoBattleUserController::~DinoBattleUserController() {
 
 PlayerThinkTimeCountTask::~PlayerThinkTimeCountTask() {
 }
+
+void ModelCretureAddLifeTask::Execute() {
+    func_ov000_0216cc64((void *)mUnk10, mUnk14, 0);
+    Exit();
+}

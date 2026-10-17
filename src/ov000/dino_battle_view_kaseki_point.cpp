@@ -20,3 +20,11 @@ DinoBattleViewPlayer::~DinoBattleViewPlayer() {
 void DinoBattleViewPlayer::Idle() {
     Dispatch();
 }
+
+extern "C" int func_ov000_0215ddf8(void *owner);
+
+void WaitKPCountTask::Execute() {
+    if (func_ov000_0215ddf8(mOwner) == 0) {
+        Exit();
+    }
+}

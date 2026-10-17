@@ -11,6 +11,7 @@
 #include "m/looper.h"
 #include "game/help.h"
 #include "game/dino_field_camera_hook.h"
+#include "game/dino_ui_keyboard_menu.h"
 
 class DinoUiKeyboard : public MProcess {
 public:
@@ -86,6 +87,9 @@ class SetFocusTask : public MTask {
 public:
     virtual ~SetFocusTask();
     virtual void Execute();
+
+    DinoUiKeyboardMenu *mMenu;  // 0x10
+    MMenuItem *mItem;           // 0x14
 };
 
 class PageChangeTask : public MTask {

@@ -219,3 +219,15 @@ void SenryuKeyCheckTask::Execute() {
 MRect DinoSenryuBackButton::GetRect() {
     return mMotion->GetFrame();
 }
+
+void SetFocusTask::Execute() {
+    mMenu->FocusItem(mItem);
+    Exit();
+}
+
+extern "C" void func_ov007_02186c74(void *owner, u32 value, u32 arg);
+
+void DinoUiSenryuSubMenu::Execute() {
+    func_ov007_02186c74(mOwner, *mValue, mArg);
+    Exit();
+}

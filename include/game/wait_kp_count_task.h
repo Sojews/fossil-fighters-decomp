@@ -7,6 +7,8 @@ class WaitKPCountTask : public MTask {
 public:
     virtual ~WaitKPCountTask();
     virtual void Execute();
+
+    void *mOwner;   // 0x10
 };
 
 #endif

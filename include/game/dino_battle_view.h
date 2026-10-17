@@ -60,6 +60,8 @@ class DinoFrameItem : public MMenuItem {
 public:
     virtual ~DinoFrameItem();
     virtual MRect GetFrame();
+
+    MRect mFrame;   // 0x88
 };
 
 #endif

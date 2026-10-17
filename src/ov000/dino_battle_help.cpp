@@ -21,3 +21,7 @@ MDisplay *DinoBattleHelpBase::GetDisplay() {
 const char *DinoBattleHelpBase::GetText() {
     return gDinoResource->GetText(mTextId);
 }
+
+MRect DinoBattleHelpBase::GetRect() {
+    return mRect;
+}
