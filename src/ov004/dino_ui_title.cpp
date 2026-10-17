@@ -61,3 +61,13 @@ void DinoUiTitleMenu::OnFocus(MMenuItem *item) {
         DinoSoundPlaySe(0x38E, 0);
     }
 }
+
+void DinoUiTitleMenu::OnDecide(MMenuItem *item) {
+    if (item == mStartItem) {
+        DinoSoundPlaySe(0x390, 0);
+        *mResult = 3;
+        mMotion->Play(2, 0);
+        mSerial.AddTail(mMotion->CreateWaitStopTask());
+    }
+    mSerial.AddTail(MTaskExitTransfer::Create(this));
+}

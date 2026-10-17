@@ -17,6 +17,10 @@ public:
     virtual ~DinoUiWirelessCancel();
     virtual void OnStart();
     virtual void OnDecide(MMenuItem *item);
+    void Cancel();
+
+    u8 unkA7[5];         // members start in MMenu's tail padding
+    u8 *mCancelled;      // 0xAC
 };
 
 class DinoUiChildScannerParentItem : public MMenuItem {

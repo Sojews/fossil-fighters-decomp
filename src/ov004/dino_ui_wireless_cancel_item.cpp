@@ -191,3 +191,11 @@ void DinoUiChildScannerParentItem::OnDecide() {
         mMotion->Play(3, 1);
     }
 }
+
+void DinoUiWirelessCancel::OnDecide(MMenuItem *item) {
+    Cancel();
+}
+
+void DinoUiWirelessCancel::Cancel() {
+    *mCancelled = TRUE;
+}

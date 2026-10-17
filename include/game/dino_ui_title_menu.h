@@ -4,6 +4,7 @@
 #include <vector>
 #include "m/menu_item.h"
 #include "m/menu.h"
+#include "m/motion.h"
 #include "game/help.h"
 
 class DinoUiTitleMenu : public MMenu, public DinoHelpBase {
@@ -14,7 +15,11 @@ public:
     virtual void OnFocus(MMenuItem *item);
     virtual void OnDecide(MMenuItem *item);
 
-    u32 mUnkB4[5];
+    int *mResult;           // 0xB4
+    u32 mUnkB8;
+    MMotion *mMotion;       // 0xBC
+    MMenuItem *mStartItem;  // 0xC0
+    u32 mUnkC4;
     u32 mUnkC8;      // 0xC8
     u8 mSilentFocus; // 0xCC
 };

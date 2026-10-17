@@ -19,6 +19,8 @@
 #include "game/dino_map_back_button.h"
 #include "game/dino_sound.h"
 
+extern const int data_02089adc[10]; // the place each map item stands for
+
 DinoUiIslandMap::~DinoUiIslandMap() {
 }
 
@@ -132,4 +134,16 @@ void DinoUiIslandMapMenuItem::OnDecide() {
     mSerial.AddTail(mMotion->CreatePlayTransfer(3, 0));
     mOwner->OnSpotDecided();
     DinoSoundPlaySe(0x98, 0);
+}
+
+void DinoUiIslandMapMenu::OnDecide(MMenuItem *item) {
+    if (item == NULL) {
+        return;
+    }
+    for (int i = 0; i < 10; i++) {
+        if (item == mItems[i]) {
+            *mResult = data_02089adc[i];
+            return;
+        }
+    }
 }
