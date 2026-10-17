@@ -35,6 +35,7 @@ void FX_InvAsync(fx32 denom);
 fx32 FX_GetDivResult(void);
 fx64c FX_GetDivResultFx64c(void);
 fx32 FX_GetSqrtResult(void);
+u16 FX_Atan2Idx(fx32 y, fx32 x);
 void MTX_Rot22_(MtxFx22 *pDst, fx32 sinVal, fx32 cosVal);
 void MTX_ScaleApply22(const MtxFx22 *pSrc, MtxFx22 *pDst, fx32 x, fx32 y);
 

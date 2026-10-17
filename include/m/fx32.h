@@ -58,4 +58,13 @@ struct MFx32Point {
     MFx32 y;
 };
 
+inline MFx32Point operator-(const MFx32Point &a, const MFx32Point &b) {
+    return MFx32Point(a.x - b.x, a.y - b.y);
+}
+
+// The angle (0-0xFFFF) of the direction (x, y).
+inline u16 MFx32Atan2(MFx32 y, MFx32 x) {
+    return FX_Atan2Idx(y.v, x.v);
+}
+
 #endif

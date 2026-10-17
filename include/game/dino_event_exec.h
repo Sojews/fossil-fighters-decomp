@@ -141,22 +141,56 @@ public:
 
 class DinoEventExecCharaAngleToChara : public MProcess {
 public:
+    DinoEventExecCharaAngleToChara(DinoEvent *event, u32 chara, u32 target, u32 a, u32 b);
     virtual ~DinoEventExecCharaAngleToChara();
+    virtual void Idle();
+
+    DinoEvent *mEvent;  // 0x74
+    u32 mChara;         // 0x78
+    u32 mTarget;        // 0x7C
+    u32 mA;             // 0x80
+    u32 mB;             // 0x84
 };
 
 class DinoEventExecCharaAngleOffset : public MProcess {
 public:
+    DinoEventExecCharaAngleOffset(DinoEvent *event, u32 chara, u32 offset, u32 a, u32 b);
     virtual ~DinoEventExecCharaAngleOffset();
+    virtual void Idle();
+
+    DinoEvent *mEvent;  // 0x74
+    u32 mChara;         // 0x78
+    u32 mOffset;        // 0x7C
+    u32 mA;             // 0x80
+    u32 mB;             // 0x84
 };
 
 class DinoEventExecCharaAngleOffsetToChara : public MProcess {
 public:
+    DinoEventExecCharaAngleOffsetToChara(DinoEvent *event, u32 chara, u32 target, u16 offset, u32 a, u32 b);
     virtual ~DinoEventExecCharaAngleOffsetToChara();
+    virtual void Idle();
+
+    DinoEvent *mEvent;  // 0x74
+    u32 mChara;         // 0x78
+    u32 mTarget;        // 0x7C
+    u16 mOffset;        // 0x80
+    u32 mA;             // 0x84
+    u32 mB;             // 0x88
 };
 
 class DinoEventExecCharaMoveToChara : public MProcess {
 public:
+    DinoEventExecCharaMoveToChara(DinoEvent *event, u32 chara, u32 target, u32 a, u32 b, u8 c);
     virtual ~DinoEventExecCharaMoveToChara();
+    virtual void Idle();
+
+    DinoEvent *mEvent;  // 0x74
+    u32 mChara;         // 0x78
+    u32 mTarget;        // 0x7C
+    u32 mA;             // 0x80
+    u32 mB;             // 0x84
+    u8 mC;              // 0x88
 };
 
 class DinoEventExecCharaMoveToRegion : public MProcess {
@@ -175,13 +209,13 @@ public:
 
 class DinoEventExecCharaMoveToCoord : public MProcess {
 public:
-    DinoEventExecCharaMoveToCoord(DinoEvent *event, u32 chara, MPoint coord, u32 a, u32 b, u8 c);
+    DinoEventExecCharaMoveToCoord(DinoEvent *event, u32 chara, MFx32Point coord, u32 a, u32 b, u8 c);
     virtual ~DinoEventExecCharaMoveToCoord();
     virtual void Idle();
 
     DinoEvent *mEvent;  // 0x74
     u32 mChara;         // 0x78
-    MPoint mPoint;      // 0x7C
+    MFx32Point mPoint;    // 0x7C
     u32 mA;             // 0x84
     u32 mB;             // 0x88
     u8 mC;              // 0x8C
@@ -189,13 +223,13 @@ public:
 
 class DinoEventExecCharaMoveOffset : public MProcess {
 public:
-    DinoEventExecCharaMoveOffset(DinoEvent *event, u32 chara, MPoint offset, u32 a, u32 b, u8 c);
+    DinoEventExecCharaMoveOffset(DinoEvent *event, u32 chara, MFx32Point offset, u32 a, u32 b, u8 c);
     virtual ~DinoEventExecCharaMoveOffset();
     virtual void Idle();
 
     DinoEvent *mEvent;  // 0x74
     u32 mChara;         // 0x78
-    MPoint mPoint;      // 0x7C
+    MFx32Point mPoint;    // 0x7C
     u32 mA;             // 0x84
     u32 mB;             // 0x88
     u8 mC;              // 0x8C

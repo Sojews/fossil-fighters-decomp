@@ -1125,6 +1125,104 @@ void DinoEventExecCharaAngle::Idle() {
     serial->AddTail(exit);
 }
 
+DinoEventExecCharaAngleToChara::DinoEventExecCharaAngleToChara(DinoEvent *event, u32 chara, u32 target, u32 a, u32 b)
+    : MProcess(NULL) {
+    mEvent = event;
+    mChara = chara;
+    mTarget = target;
+    mA = a;
+    mB = b;
+}
+
+void DinoEventExecCharaAngleToChara::Idle() {
+    DinoFieldChara *chara = mEvent->GetField()->GetChara(mChara);
+    DinoFieldChara *target = mEvent->GetField()->GetChara(mTarget);
+    if (chara == NULL || target == NULL) {
+        Exit();
+        return;
+    }
+    MFx32Point d = target->GetModel()->pos - chara->GetModel()->pos;
+    u16 angle = MFx32Atan2(d.y, d.x);
+    MTask *exit = MTaskExitTransfer::Create(this);
+    MTask *task = mEvent->GetField()->CreateCharaAngleTask(mChara, angle, mA, mB);
+    MSerialTaskSet *serial = &mSerial;
+    serial->AddTail(task);
+    serial->AddTail(exit);
+}
+
+DinoEventExecCharaAngleOffset::DinoEventExecCharaAngleOffset(DinoEvent *event, u32 chara, u32 offset, u32 a, u32 b)
+    : MProcess(NULL) {
+    mEvent = event;
+    mChara = chara;
+    mOffset = offset;
+    mA = a;
+    mB = b;
+}
+
+void DinoEventExecCharaAngleOffset::Idle() {
+    DinoFieldChara *chara = mEvent->GetField()->GetChara(mChara);
+    if (chara == NULL) {
+        Exit();
+        return;
+    }
+    u16 angle = mOffset + chara->GetModel()->angle;
+    MTask *exit = MTaskExitTransfer::Create(this);
+    MTask *task = mEvent->GetField()->CreateCharaAngleTask(mChara, angle, mA, mB);
+    MSerialTaskSet *serial = &mSerial;
+    serial->AddTail(task);
+    serial->AddTail(exit);
+}
+
+DinoEventExecCharaAngleOffsetToChara::DinoEventExecCharaAngleOffsetToChara(DinoEvent *event, u32 chara, u32 target,
+                                                                           u16 offset, u32 a, u32 b)
+    : MProcess(NULL) {
+    mEvent = event;
+    mChara = chara;
+    mTarget = target;
+    mOffset = offset;
+    mA = a;
+    mB = b;
+}
+
+void DinoEventExecCharaAngleOffsetToChara::Idle() {
+    DinoFieldChara *chara = mEvent->GetField()->GetChara(mChara);
+    DinoFieldChara *target = mEvent->GetField()->GetChara(mTarget);
+    if (chara == NULL || target == NULL) {
+        Exit();
+        return;
+    }
+    MFx32Point d = target->GetModel()->pos - chara->GetModel()->pos;
+    u16 angle = mOffset + MFx32Atan2(d.y, d.x);
+    MTask *exit = MTaskExitTransfer::Create(this);
+    MTask *task = mEvent->GetField()->CreateCharaAngleTask(mChara, angle, mA, mB);
+    MSerialTaskSet *serial = &mSerial;
+    serial->AddTail(task);
+    serial->AddTail(exit);
+}
+
+DinoEventExecCharaMoveToChara::DinoEventExecCharaMoveToChara(DinoEvent *event, u32 chara, u32 target, u32 a, u32 b, u8 c)
+    : MProcess(NULL) {
+    mEvent = event;
+    mChara = chara;
+    mTarget = target;
+    mA = a;
+    mB = b;
+    mC = c;
+}
+
+void DinoEventExecCharaMoveToChara::Idle() {
+    DinoFieldChara *target = mEvent->GetField()->GetChara(mTarget);
+    if (target == NULL) {
+        Exit();
+        return;
+    }
+    MTask *exit = MTaskExitTransfer::Create(this);
+    MTask *task = mEvent->GetField()->CreateCharaMoveToCoordTask(mChara, target->GetModel()->pos, mA, mB, mC);
+    MSerialTaskSet *serial = &mSerial;
+    serial->AddTail(task);
+    serial->AddTail(exit);
+}
+
 DinoEventExecCharaMoveToRegion::DinoEventExecCharaMoveToRegion(DinoEvent *event, u32 chara, u32 region, u32 a, u32 b, u8 c) : MProcess(NULL) {
     mEvent = event;
     mChara = chara;
@@ -1142,7 +1240,7 @@ void DinoEventExecCharaMoveToRegion::Idle() {
     serial->AddTail(exit);
 }
 
-DinoEventExecCharaMoveToCoord::DinoEventExecCharaMoveToCoord(DinoEvent *event, u32 chara, MPoint coord, u32 a, u32 b, u8 c) : MProcess(NULL) {
+DinoEventExecCharaMoveToCoord::DinoEventExecCharaMoveToCoord(DinoEvent *event, u32 chara, MFx32Point coord, u32 a, u32 b, u8 c) : MProcess(NULL) {
     mEvent = event;
     mChara = chara;
     mPoint = coord;
@@ -1159,7 +1257,7 @@ void DinoEventExecCharaMoveToCoord::Idle() {
     serial->AddTail(exit);
 }
 
-DinoEventExecCharaMoveOffset::DinoEventExecCharaMoveOffset(DinoEvent *event, u32 chara, MPoint offset, u32 a, u32 b, u8 c) : MProcess(NULL) {
+DinoEventExecCharaMoveOffset::DinoEventExecCharaMoveOffset(DinoEvent *event, u32 chara, MFx32Point offset, u32 a, u32 b, u8 c) : MProcess(NULL) {
     mEvent = event;
     mChara = chara;
     mPoint = offset;

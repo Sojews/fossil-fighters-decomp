@@ -26,8 +26,17 @@ public:
     DinoFieldNamePanel *mNamePanel; // 0x144
 };
 
+// A character's model: where it stands and which way it faces.
+struct DinoFieldCharaModel {
+    u8 unk00[8];
+    MFx32Point pos;     // 0x08
+    u8 unk10[6];
+    u16 angle;          // 0x16
+};
+
 class DinoFieldChara {
 public:
+    DinoFieldCharaModel *GetModel();
     void ShowManpu(u32 manpu, MPoint offset);
     void HideManpu();
     void CacheMotion(u32 motion);
@@ -54,8 +63,18 @@ public:
     MTask *CreateModeTask(u32 radarMode, u32 to, u32 a);
 };
 
+struct DinoFieldMapInfo {
+    u32 id;
+};
+
+class DinoFieldMap {
+public:
+    DinoFieldMapInfo *GetInfo();
+};
+
 class DinoField {
 public:
+    DinoFieldMap *GetMap();
     DinoFieldCamera *GetCamera();
     DinoFieldChara *GetChara(u32 id);
     void PlayBgm(u32 bgm, u32 arg);
@@ -65,8 +84,8 @@ public:
     void SyncChara(u32 id);
     MTask *CreateCharaAngleTask(u32 chara, u32 angle, u32 a, u32 b);
     MTask *CreateCharaMoveToRegionTask(u32 chara, u32 region, u32 a, u32 b, u8 c);
-    MTask *CreateCharaMoveToCoordTask(u32 chara, MPoint coord, u32 a, u32 b, u8 c);
-    MTask *CreateCharaMoveOffsetTask(u32 chara, MPoint offset, u32 a, u32 b, u8 c);
+    MTask *CreateCharaMoveToCoordTask(u32 chara, MFx32Point coord, u32 a, u32 b, u8 c);
+    MTask *CreateCharaMoveOffsetTask(u32 chara, MFx32Point offset, u32 a, u32 b, u8 c);
     MTask *CreateCharaMoveVectorTask(u32 chara, u16 direction, u32 a, u32 b, u32 c, u8 d);
     MTask *CreateCharaWaitMoveTask(u32 chara);
     MTask *CreateCharaFocusTask(u32 chara);
