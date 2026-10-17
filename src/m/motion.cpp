@@ -215,7 +215,7 @@ void MMotion::Play(int anime, int flags) {
         return;
     }
     mAnime = anime;
-    mUnk74 = GetAnimeData(anime);
+    mScript = (const u16 *) GetAnimeData(anime);
     mPlaying = TRUE;
     u32 frame;
     if (flags & 2) {
@@ -235,6 +235,165 @@ int MMotion::GetAnime() {
     return mAnime;
 }
 
+// Runs the anime's commands up to the next wait that outlasts the frames given.
+void MMotion::Advance(u32 frames) {
+    BOOL done = FALSE;
+    struct {
+        u32 chr;
+        u32 pal;
+    } changes[16];
+    for (u32 i = 0; i < mCellCount; i++) {
+        changes[i].chr = -1;
+        changes[i].pal = -1;
+    }
+    do {
+        u16 command = *mScript++;
+        switch (command & 0xFF) {
+        default:
+            OS_Terminate();
+            break;
+        case 9:
+            mScript += *(const s16 *) mScript;
+            break;
+        case 11:
+            if (mUnk40 == -1) {
+                mUnk40 = mFrame;
+            } else {
+                mFrame = mUnk40;
+            }
+            break;
+        case 8: {
+            u32 wait = command >> 8;
+            if (wait == 0) {
+                break;
+            }
+            mFramesLeft = wait;
+            if (frames != 0) {
+                if (frames >= mFramesLeft) {
+                    frames -= mFramesLeft;
+                    mFrame += mFramesLeft;
+                } else {
+                    mFramesLeft -= frames;
+                    mFrame += frames;
+                    done = TRUE;
+                }
+            } else {
+                done = TRUE;
+            }
+            break;
+        }
+        case 12:
+            mPlaying = FALSE;
+            done = TRUE;
+            if (mUnk2A) {
+                for (u32 i = 0; i < mCellCount; i++) {
+                    if (!mCells[i].visible) {
+                        FreeAffine(i);
+                    }
+                }
+            }
+            break;
+        case 5: {
+            int x = *(const s16 *) mScript++;
+            int y = *(const s16 *) mScript++;
+            SetCellOffset(command >> 8, x, y);
+            break;
+        }
+        case 15:
+            SetCellOffsetY(command >> 8, *(const s16 *) mScript++);
+            break;
+        case 7: {
+            int length = command >> 8;
+            const char *data = (const char *) mScript;
+            mScript = (const u16 *) ((const u8 *) mScript + length + 1);
+            Command(data, length);
+            break;
+        }
+        case 6: {
+            mScript++;
+            int a = *(const s16 *) mScript++;
+            int b = *(const s16 *) mScript++;
+            SetAnimeState(command >> 8, a, b);
+            break;
+        }
+        case 10:
+            Unk44(command >> 8);
+            break;
+        case 14:
+            mUnk38 = command >> 8;
+            Unk48(command >> 8);
+            break;
+        case 0:
+            changes[command >> 8].chr = *mScript++;
+            break;
+        case 1:
+            changes[command >> 8].pal = *mScript++;
+            break;
+        case 2:
+            ShowCell(command >> 8);
+            break;
+        case 3:
+            HideCell(command >> 8);
+            break;
+        case 4:
+            SetCellAttr(command >> 8, *mScript++);
+            break;
+        case 13: {
+            int left = *(const s16 *) mScript++ << 4;
+            int top = *(const s16 *) mScript++ << 4;
+            int right = *(const s16 *) mScript++ << 4;
+            int bottom = *(const s16 *) mScript++ << 4;
+            SetCellRect(command >> 8, MRect(left, top, right, bottom));
+            break;
+        }
+        }
+    } while (!done);
+    for (u32 i = 0; i < mCellCount; i++) {
+        if (changes[i].chr != -1) {
+            SetCellChr(i, changes[i].chr);
+        }
+        if (changes[i].pal != -1) {
+            SetCellPalette(i, changes[i].pal);
+        }
+    }
+}
+
+void MMotion::SetCellOffsetY(int cell, int y) {
+    mCells[cell].offsetY = y;
+    int posY = mPos.y + y;
+    MSmartOamEntry *entry = &mEntries[mCells[cell].entry];
+    entry->posX = mPos.x;
+    entry->posY = posY;
+    entry->depth = 0x7FFF - posY;
+}
+
+void MMotion::SetAnimeState(int index, int a, int b) {
+    mUnk64[index] = MMotionAnimeState(a, b);
+}
+
+void MMotion::ShowCell(int cell) {
+    mCells[cell].visible = TRUE;
+    if (!mHidden) {
+        MSmartOamEntry *entry = &mEntries[mCells[cell].entry];
+        int mode = mCells[cell].objMode;
+        entry->objMode = mode;
+        if (mode != 3) {
+            int shape = entry->GetShape();
+            entry->width = gObjSizes[0][shape].x;
+            entry->height = gObjSizes[0][shape].y;
+        } else {
+            int shape = entry->GetShape();
+            entry->width = gObjSizes[0][shape].x * 2;
+            entry->height = gObjSizes[0][shape].y * 2;
+        }
+    }
+}
+
+void MMotion::HideCell(int cell) {
+    mCells[cell].visible = FALSE;
+    mEntries[mCells[cell].entry].objMode = 2;
+}
+
 void MMotion::Execute() {
     if (mPlaying) {
         mTime += mSpeed;
@@ -251,10 +410,10 @@ void MMotion::Execute() {
     }
 }
 
-void MMotion::Unk44() {
+void MMotion::Unk44(int arg) {
 }
 
-void MMotion::Unk48() {
+void MMotion::Unk48(int arg) {
 }
 
 void MMotion::SetSize(MPoint size) {

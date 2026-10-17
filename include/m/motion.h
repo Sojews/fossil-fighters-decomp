@@ -97,8 +97,8 @@ public:
     virtual void Play(int anime, int flags);
     virtual void SetAnchor(int anchor);
     virtual int GetAnchor();
-    virtual void Unk44();
-    virtual void Unk48();
+    virtual void Unk44(int arg);
+    virtual void Unk48(int arg);
 
     MSmartOamUnit *GetUnit();
     MPalBlock *GetPalette(u32 index);
@@ -112,6 +112,17 @@ public:
     void Advance(u32 frames);
     void Init(int fromEnd);
     void FreeAffine(u32 index);
+    MSmartOamEntry *GetCellEntry(int cell) { return &mEntries[mCells[cell].entry]; }
+    void SetCellOffset(int cell, int x, int y);
+    void SetCellOffsetY(int cell, int y);
+    void Command(const char *data, int length);
+    void SetAnimeState(int index, int a, int b);
+    void ShowCell(int cell);
+    void HideCell(int cell);
+    void SetCellAttr(int cell, int attr);
+    void SetCellRect(int cell, MRect rect);
+    void SetCellChr(int cell, u32 chr);
+    void SetCellPalette(int cell, u32 pal);
 
     MDisplay *mDisplay;         // 0x10
     MMotionFile mFile;          // 0x14
@@ -140,7 +151,7 @@ public:
     MPalBlock **mPalettes;      // 0x68
     void *mUnk6C;               // 0x6C
     MAfnBlock **mAffines;       // 0x70
-    void *mUnk74;               // 0x74
+    const u16 *mScript;         // 0x74: the current anime's commands
     struct Override {
         MArchiveFile *unk00;
         MArchiveFile *unk04;
