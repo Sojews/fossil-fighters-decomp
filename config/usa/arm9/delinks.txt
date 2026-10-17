@@ -552,3 +552,14 @@ libs/nitrosdk/src/os/os_vram_exclusive.c:
 
 libs/nitrosdk/src/os/os_entropy.c:
     .text       start:0x0207530c end:0x020753ac
+
+libs/nitrosdk/src/fx/fx_mtx22.c:
+    complete
+    .text       start:0x02070f0c end:0x02071038
+
+libs/nitrosdk/src/fx/fx_mtx44.c:
+    .text       start:0x02071a48 end:0x02071ab4
+
+libs/nitrosdk/src/fx/fx_cp.c:
+    complete
+    .text       start:0x02072118 end:0x02072214

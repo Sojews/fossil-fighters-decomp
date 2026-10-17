@@ -5610,7 +5610,7 @@ MTX_RotY44_ kind:function(thumb,size=0x24) addr:0x02071a6c
 MTX_RotZ44_ kind:function(thumb,size=0x22) addr:0x02071a90
 MTX_Concat44 kind:function(arm,size=0x664) addr:0x02071ab4
 FX_Div kind:function(thumb,size=0xc) addr:0x02072118
-func_02072124 kind:function(thumb,size=0x20) addr:0x02072124
+FX_InvFx64c kind:function(thumb,size=0x20) addr:0x02072124
 FX_Sqrt kind:function(thumb,size=0x24) addr:0x02072144
 FX_GetDivResultFx64c kind:function(thumb,size=0x18) addr:0x02072168
 FX_GetDivResult kind:function(thumb,size=0x2c) addr:0x02072180
@@ -6316,7 +6316,7 @@ func_02086184 kind:function(arm,size=0x1c0) addr:0x02086184
 .L_02086194 kind:label(arm) addr:0x02086194
 _ll_udiv kind:function(arm,size=0x48) addr:0x02086344
 .L_02086350 kind:label(arm) addr:0x02086350
-_ull_mul kind:function(arm,size=0x20) addr:0x0208638c
+_ll_mul kind:function(arm,size=0x20) addr:0x0208638c
 _s32_div_f kind:function(arm,size=0x20c) addr:0x020863ac
 _u32_div_f kind:function(arm,size=0x1e4) addr:0x020865b8
 .L_020865c0 kind:label(arm) addr:0x020865c0
