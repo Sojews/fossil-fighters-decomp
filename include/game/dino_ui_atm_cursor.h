@@ -7,8 +7,19 @@ class DinoUiATMCursor : public MView {
 public:
     virtual ~DinoUiATMCursor();
     virtual void Execute();
+    virtual void SetPosition(MPoint pos);
+    virtual MPoint GetPosition();
+    virtual void SetSize(MPoint size);
+    virtual MPoint GetSize();
+    virtual void SetPriority(int priority);
+    virtual int GetPriority();
+    virtual void Show();
+    virtual void Hide();
+    virtual BOOL IsHidden();
+    virtual u32 GetPlaneMask();
 
     MView *mUnk10;  // 0x10
+    MRect mFrame;   // 0x14
 };
 
 #endif
