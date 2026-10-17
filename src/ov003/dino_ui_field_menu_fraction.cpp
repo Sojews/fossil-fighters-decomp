@@ -72,3 +72,53 @@ DinoUiFieldMenuFraction4::~DinoUiFieldMenuFraction4() {
 
 void DinoUiFieldMenuFraction4::Idle() {
 }
+
+void DinoUiPartsReviverMedalButton::OnDecide() {
+}
+
+void DinoUiPartsTeamTech::Idle() {
+}
+
+void DinoUiPartsTeamInfo::Idle() {
+}
+
+void DinoUiPartsRockName::Idle() {
+}
+
+void DinoUiPartsBlackBelt::Idle() {
+}
+
+void DinoUiPartsNumber8::Idle() {
+}
+
+void DinoUiFieldMenuNumber3::Idle() {
+}
+
+void DinoUiFieldMenuNumber::Idle() {
+}
+
+void DinoUiPartsKasekiButton::OnFocusChanged(BOOL focused) {
+    if (focused) {
+        mView->Show();
+    } else {
+        mView->Hide();
+    }
+}
+
+MRect DinoUiPartsKasekiButton::GetFrame() {
+    return MRect(mPos.Offset(-24, -24), mPos.Offset(24, 24));
+}
+
+MRect DinoUiPartsReviverMedalButton::GetFrame() {
+    return mFrame;
+}
+
+void DinoUiPartsReviverMedalButton::OnFocusChanged(BOOL focused) {
+    if (focused) {
+        mMotion->Play(mKind + 3, 0);
+    } else {
+        mMotion->Play(mKind + 1, 0);
+    }
+    mMotion->SetPriority(2);
+    mSerial.Clear();
+}
