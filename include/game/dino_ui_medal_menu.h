@@ -25,7 +25,9 @@ public:
     std::vector<void *> mUnk19C;        // 0x19C
     std::vector<void *> mUnk1A8;        // 0x1A8
     std::vector<void *> mUnk1B4;        // 0x1B4
-    u32 mUnk1C0[17];                    // 0x1C0
+    u32 mPage;                          // 0x1C0
+    u32 mLastPage;                      // 0x1C4
+    u32 mUnk1C8[15];                    // 0x1C8
     u8 mUnk204;                         // 0x204
     std::vector<MMotionFile> mMotions;  // 0x208
 };

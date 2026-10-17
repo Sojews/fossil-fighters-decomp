@@ -132,3 +132,33 @@ void DinoUiMedalSlotCreateTask::Idle() {
     }
     mIndex++;
 }
+
+// The page-slide destinations (file statics).
+extern MPoint data_ov006_02194144;
+extern MPoint data_ov006_0219414c;
+extern MPoint data_ov006_02194154;
+extern MPoint data_ov006_0219415c;
+extern "C" MTask *func_ov006_021835a8(DinoUiMedalMenu *menu, MPoint pos, int arg);
+extern "C" MTask *func_ov006_02183570(DinoUiMedalMenu *menu, MPoint pos);
+
+void DinoUiMedalMenu::PageRight() {
+    if (mPage == mLastPage) {
+        mPage = 0;
+    } else {
+        mPage++;
+    }
+    mSerial.AddTail(func_ov006_021835a8(this, data_ov006_02194144, 1));
+    mSerial.AddTail(func_ov006_02183570(this, data_ov006_0219414c));
+    Disable();
+}
+
+void DinoUiMedalMenu::PageLeft() {
+    if (mPage == 0) {
+        mPage = mLastPage;
+    } else {
+        mPage--;
+    }
+    mSerial.AddTail(func_ov006_021835a8(this, data_ov006_02194154, 1));
+    mSerial.AddTail(func_ov006_02183570(this, data_ov006_0219415c));
+    Disable();
+}
