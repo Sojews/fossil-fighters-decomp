@@ -103,6 +103,7 @@ void DinoUiCleaningTest::Idle() {
 template class MCallTask0<DinoUiCleaningMenu, DinoUiCleaningMenu>;
 template MTask *MCreateCallTask(DinoUiCleaningMenu *obj, void (DinoUiCleaningMenu::*func)());
 
+// NONMATCHING: the game computes the index before loading the item count; ours loads the count first.
 void DinoUiCleaningMenu::OnDecide(MMenuItem *item) {
     for (int i = 0; i < 8; i++) {
         if (item == mUnkC0[i]) {
