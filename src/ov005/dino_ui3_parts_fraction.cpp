@@ -101,3 +101,21 @@ BOOL DinoUi3PartsCursor::IsHidden() {
 u32 DinoUi3PartsCursor::GetPlaneMask() {
     return 0x10;
 }
+
+void DinoUi3PartsFraction::SetNumerator(u8 n) {
+    mNumerator->Play(n % 10 + 1, 0);
+}
+
+void DinoUi3PartsFraction::SetDenominator(u8 n) {
+    mDenominator->Play(n % 10 + 1, 0);
+}
+
+void DinoUi3PartsFraction::Show() {
+    mNumerator->Show();
+    mDenominator->Show();
+}
+
+void DinoUi3PartsFraction::Hide() {
+    mNumerator->Hide();
+    mDenominator->Hide();
+}

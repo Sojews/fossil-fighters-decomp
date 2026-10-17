@@ -222,3 +222,11 @@ void DinoUiPartsReviverNameCountCheckTask::Execute() {
         Exit();
     }
 }
+
+void DinoUiFieldMenuFraction::SetNumerator(u8 n) {
+    mNumerator->Play(n % 10 + 1, 0);
+}
+
+void DinoUiFieldMenuFraction::SetDenominator(u8 n) {
+    mDenominator->Play(n % 10 + 1, 0);
+}
