@@ -31,6 +31,12 @@ DinoUiWirelessCancel::~DinoUiWirelessCancel() {
 DinoUiChildScannerParentItem::~DinoUiChildScannerParentItem() {
 }
 
+DinoUiChildScanner::~DinoUiChildScanner() {
+}
+
+DinoUiChildScannerCannonConnect::~DinoUiChildScannerCannonConnect() {
+}
+
 // Template task instances the game emits in this file. Until the code that makes the tasks is decompiled, they are
 // instantiated explicitly.
 class DinoUiBattleParentScanner : public MProcess, public MMessageObserver {};

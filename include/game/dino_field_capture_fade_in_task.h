@@ -7,6 +7,7 @@
 class DinoFieldCaptureFadeInTask : public MProcess, public DinoHelpDisabler {
 public:
     virtual ~DinoFieldCaptureFadeInTask();
+    virtual void Idle();
 };
 
 #endif

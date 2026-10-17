@@ -1,6 +1,10 @@
 // DinoFieldCaptureFadeOutTask, DinoFieldCaptureFadeInTask.
 // Only the destructors are decompiled so far.
 
+// Derived destructors have their bases' destructor bodies inlined; auto-inlining the ones defined above does that.
+#pragma auto_inline on
+
+#include "game/dino_field_capture_fade_out_task_menu.h"
 #include "game/dino_field_capture_fade_out_task.h"
 #include "game/dino_field_capture_fade_in_task.h"
 #include "m/bg.h"
