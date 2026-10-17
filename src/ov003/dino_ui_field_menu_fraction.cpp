@@ -19,6 +19,7 @@
 #include "game/dino_ui_parts_reviver_name.h"
 #include "game/dino_ui_parts_team_indicator.h"
 #include "game/dino_ui_field_menu_fraction4.h"
+#include "game/dino_ui_field_menu_cursor.h"
 
 DinoUiFieldMenuFraction::~DinoUiFieldMenuFraction() {
 }
@@ -121,4 +122,79 @@ void DinoUiPartsReviverMedalButton::OnFocusChanged(BOOL focused) {
     }
     mMotion->SetPriority(2);
     mSerial.Clear();
+}
+
+void DinoUiFieldMenuCursor::Execute() {
+    if (mUnk10->mState == STATE_RUN) {
+        mUnk10->Execute();
+    }
+    if (mUnk14->mState == STATE_RUN) {
+        mUnk14->Execute();
+    }
+}
+
+void DinoUiFieldMenuCursor::SetPosition(MPoint pos) {
+    mFrame.MoveTo(pos);
+    mUnk10->SetPosition(mFrame.GetTopLeft());
+    mUnk14->SetPosition(mFrame.GetTopLeft());
+    mUnk2C = 0;
+}
+
+MPoint DinoUiFieldMenuCursor::GetPosition() {
+    return mFrame.GetTopLeft();
+}
+
+void DinoUiFieldMenuCursor::SetSize(MPoint size) {
+    mFrame.right = mFrame.left + size.x;
+    mFrame.bottom = mFrame.top + size.y;
+    mUnk10->SetPosition(mFrame.GetTopLeft());
+    mUnk14->SetPosition(mFrame.GetTopLeft());
+    mUnk2C = 0;
+}
+
+MPoint DinoUiFieldMenuCursor::GetSize() {
+    return mFrame.GetSize();
+}
+
+void DinoUiFieldMenuCursor::SetPriority(int priority) {
+    mUnk10->SetPriority(priority);
+    mUnk14->SetPriority(priority);
+}
+
+int DinoUiFieldMenuCursor::GetPriority() {
+    return mUnk10->GetPriority();
+}
+
+void DinoUiFieldMenuCursor::Show() {
+    switch (mMode) {
+    case 1:
+        mUnk10->Show();
+        break;
+    case 2:
+        mUnk14->Show();
+        break;
+    }
+    mHidden = FALSE;
+    mUnk2C = 0;
+}
+
+void DinoUiFieldMenuCursor::Hide() {
+    switch (mMode) {
+    case 1:
+        mUnk10->Hide();
+        break;
+    case 2:
+        mUnk14->Hide();
+        break;
+    }
+    mHidden = TRUE;
+    mUnk2C = 0;
+}
+
+BOOL DinoUiFieldMenuCursor::IsHidden() {
+    return mHidden;
+}
+
+u32 DinoUiFieldMenuCursor::GetPlaneMask() {
+    return 0x10;
 }
