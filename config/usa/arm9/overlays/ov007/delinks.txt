@@ -10,3 +10,6 @@ src/ov007/dino_ui_atm.cpp:
 
 src/ov007/dino_ui_atm_cursor.cpp:
     .text       start:0x02171b70 end:0x02171bbc
+
+src/ov007/dino_ui_organization_menu.cpp:
+    .text       start:0x02174ad8 end:0x02180f60
