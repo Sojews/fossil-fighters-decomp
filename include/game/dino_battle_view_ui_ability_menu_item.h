@@ -34,22 +34,43 @@ public:
     u32 mUnk104;    // 0x104
 };
 
+class MMotion;
+
 class AttackMenuBarMotion : public MProcess {
 public:
     virtual ~AttackMenuBarMotion();
     virtual void Idle();
 
+    void SetPriority(int priority);
+    MPoint GetPosition();
+    void Hide();
+    void Show();
+    MTask *CreateShowTask();
+    void Play(int anime);
+    MRect GetFrame();
+
     class ShowTask : public MTask {
     public:
+        ShowTask(AttackMenuBarMotion *bar) { mBar = bar; }
         virtual ~ShowTask();
         virtual void Execute();
+
+        AttackMenuBarMotion *mBar;  // 0x10
     };
 
     class SetPriorityTask : public MTask {
     public:
         virtual ~SetPriorityTask();
         virtual void Execute();
+
+        AttackMenuBarMotion *mBar;  // 0x10
+        int mPriority;              // 0x14
     };
+
+    MMotion *mMotion;   // 0x74
+    MView *mUnk78;      // 0x78: optional
+    MView *mUnk7C;      // 0x7C
+    MView *mUnk80;      // 0x80
 };
 
 class MenuEnableTask : public MTask {

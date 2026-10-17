@@ -113,6 +113,21 @@ void DinoBattleViewAbilityTextWindow::ShowTask::Execute() {
     Exit();
 }
 
+void DinoBattleViewAbilityMenuBG::SetPriorityTask::Execute() {
+    mBG->SetPriority(mPriority);
+    Exit();
+}
+
+void AttackMenuBarMotion::SetPriorityTask::Execute() {
+    mBar->SetPriority(mPriority);
+    Exit();
+}
+
+void AttackMenuBarMotion::ShowTask::Execute() {
+    mBar->Show();
+    Exit();
+}
+
 #pragma auto_inline on
 
 void MenuEnableTask::Execute() {

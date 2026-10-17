@@ -6,11 +6,22 @@
 
 #include "game/dino_battle_view_ability_text_window.h"
 #include "types.h"
+#include "m/screen.h"
 #include "game/dino_battle_view_ability_menu_bg.h"
 
 DinoBattleViewAbilityTextWindow::~DinoBattleViewAbilityTextWindow() {
     delete mTask;
 }
+
+#pragma auto_inline off
+
+void DinoBattleViewAbilityMenuBG::SetPriority(int priority) {
+    if (mUnk10D4) {
+        mScreen->mBgCntBits.priority = priority;
+    }
+}
+
+#pragma auto_inline on
 
 void DinoBattleViewAbilityMenuBG::Idle() {
     (this->*mState)();
