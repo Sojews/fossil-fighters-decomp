@@ -30,6 +30,8 @@ static inline void PM_SetSleepCallback(PMSleepCallbackInfo *info, PMSleepCallbac
 
 void PM_PrependPreSleepCallback(PMSleepCallbackInfo *info);
 void PM_AppendPostSleepCallback(PMSleepCallbackInfo *info);
+void PM_DeletePreSleepCallback(PMSleepCallbackInfo *info);
+void PM_DeletePostSleepCallback(PMSleepCallbackInfo *info);
 void PM_GoSleepMode(u32 trigger, u32 logic, u16 keyPattern);
 u32 PM_GetLCDPower(void);
 BOOL PM_SetLCDPower(u32 sw);

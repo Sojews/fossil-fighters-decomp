@@ -430,6 +430,14 @@ libs/nitrosystem/src/snd/player.c:
     .text       start:0x0206dfa0 end:0x0206e7ac
     .bss        start:0x0214f9cc end:0x021502a4
 
+libs/nitrosystem/src/snd/stream.c:
+    .text       start:0x0206e7ac end:0x0206eb64
+    .bss        start:0x021502a4 end:0x02150374
+
+libs/nitrosystem/src/snd/snd_heap.c:
+    complete
+    .text       start:0x0206f240 end:0x0206f4a4
+
 libs/nitrosystem/src/snd/snd_fader.c:
     complete
     .text       start:0x02070ea8 end:0x02070f0c

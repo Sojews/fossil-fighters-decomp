@@ -9,6 +9,10 @@ extern "C" {
 #endif
 
 typedef struct OSThread OSThread;
+
+typedef u32 OSIntrMode;
+OSIntrMode OS_DisableInterrupts(void);
+OSIntrMode OS_RestoreInterrupts(OSIntrMode state);
 typedef struct OSMutex OSMutex;
 
 typedef struct OSThreadQueue {

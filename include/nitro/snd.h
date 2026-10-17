@@ -37,6 +37,15 @@ void SND_SetTrackVolume(int playerNo, u32 trackBitMask, int volume);
 void SND_SetTrackPitch(int playerNo, u32 trackBitMask, int pitch);
 void SND_SetTrackPan(int playerNo, u32 trackBitMask, int pan);
 void SND_SetTrackAllocatableChannel(int playerNo, u32 trackBitMask, u32 chBitMask);
+typedef void (*SNDAlarmHandler)(void *arg);
+
+void SND_StartTimer(u32 chBitMask, u32 capBitMask, u32 alarmBitMask, u32 flags);
+void SND_SetupChannelPcm(int chNo, int format, const void *dataAddr, int loop, int loopStart, int loopLen,
+                         int volume, int shift, int timer, int pan);
+void SND_SetupAlarm(int alarmNo, u32 tick, u32 period, SNDAlarmHandler handler, void *arg);
+int SND_CalcChannelVolume(int dB);
+void SND_SetChannelVolume(u32 chBitMask, int volume, int shift);
+void SND_SetChannelPan(u32 chBitMask, int pan);
 void SND_LockChannel(u32 chBitMask, u32 flags);
 void SND_UnlockChannel(u32 chBitMask, u32 flags);
 

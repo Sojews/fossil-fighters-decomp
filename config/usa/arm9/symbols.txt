@@ -5419,8 +5419,8 @@ NNS_FndMountArchive kind:function(thumb,size=0xd0) addr:0x0206dd5c
 NNS_FndUnmountArchive kind:function(thumb,size=0x1a) addr:0x0206de2c
 NNS_SndInit kind:function(thumb,size=0x5c) addr:0x0206de48
 NNS_SndMain kind:function(thumb,size=0x22) addr:0x0206dea4
-BeginSleep kind:function(thumb,size=0x26) addr:0x0206dec8
-EndSleep kind:function(thumb,size=0x8) addr:0x0206def0
+BeginSleep kind:function(thumb,size=0x26) addr:0x0206dec8 local
+EndSleep kind:function(thumb,size=0x8) addr:0x0206def0 local
 NNS_SndLockChannel kind:function(thumb,size=0x2c) addr:0x0206def8
 NNS_SndUnlockChannel kind:function(thumb,size=0x1c) addr:0x0206df24
 NNS_SndUnlockCapture kind:function(thumb,size=0x10) addr:0x0206df40
@@ -5480,8 +5480,8 @@ ForceStopStrm kind:function(thumb,size=0x4e) addr:0x0206ea10
 ShutdownStrm kind:function(thumb,size=0x20) addr:0x0206ea60
 AlarmCallback kind:function(thumb,size=0xc) addr:0x0206ea80
 StrmCallback kind:function(thumb,size=0x68) addr:0x0206ea8c
-BeginSleep_0206eaf4 kind:function(thumb,size=0x30) addr:0x0206eaf4
-EndSleep_0206eb24 kind:function(thumb,size=0x40) addr:0x0206eb24
+BeginSleep kind:function(thumb,size=0x30) addr:0x0206eaf4 local
+EndSleep kind:function(thumb,size=0x40) addr:0x0206eb24 local
 NNSi_SndCaptureInit kind:function(thumb,size=0x10) addr:0x0206eb64
 NNSi_SndCaptureMain kind:function(thumb,size=0x58) addr:0x0206eb74
 NNSi_SndCaptureStop kind:function(thumb,size=0x9c) addr:0x0206ebcc
@@ -13028,10 +13028,10 @@ sFreeList kind:bss(size=0xc) addr:0x0214f9cc
 sPrioList kind:bss(size=0xc) addr:0x0214f9d8
 sSeqPlayer kind:bss(size=0x440) addr:0x0214f9e4
 sPlayer kind:bss(size=0x480) addr:0x0214fe24
-data_021502a4 kind:bss addr:0x021502a4
-data_021502a8 kind:bss addr:0x021502a8
-data_021502b4 kind:bss addr:0x021502b4
-data_021502f4 kind:bss addr:0x021502f4
+sInitialized kind:bss addr:0x021502a4 local
+sStrmList kind:bss addr:0x021502a8
+sBufferAddrs kind:bss addr:0x021502b4
+sChannelInfo kind:bss addr:0x021502f4
 data_02150374 kind:bss addr:0x02150374
 data_0215037c kind:bss addr:0x0215037c
 data_021503bc kind:bss addr:0x021503bc
