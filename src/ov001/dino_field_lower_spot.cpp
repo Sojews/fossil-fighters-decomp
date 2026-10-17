@@ -10,8 +10,20 @@
 #include "m/window.h"
 #include "m/bright.h"
 
+DinoFieldLowerSpotIn::DinoFieldLowerSpotIn(int duration) : MProcess(NULL) {
+    mDuration = duration;
+    mUnk7C = 0;
+    mUnk80 = 0;
+}
+
 DinoFieldLowerSpotIn::~DinoFieldLowerSpotIn() {
     gLcd->mMain->mWin->Reset();
+}
+
+DinoFieldLowerSpotOut::DinoFieldLowerSpotOut(int duration) : MProcess(NULL) {
+    mDuration = duration;
+    mUnk7C = 0;
+    mUnk80 = 0;
 }
 
 DinoFieldLowerSpotOut::~DinoFieldLowerSpotOut() {

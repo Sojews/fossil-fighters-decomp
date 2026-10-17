@@ -8,12 +8,16 @@ class DinoFieldSpotOut : public MProcess {
 public:
     virtual ~DinoFieldSpotOut();
     virtual void Idle();
+
+    int mDuration;  // 0x74
 };
 
 class DinoFieldSpotIn : public MProcess {
 public:
     virtual ~DinoFieldSpotIn();
     virtual void Idle();
+
+    int mDuration;  // 0x74
 };
 
 class DinoFieldWhiteOut : public MProcess {

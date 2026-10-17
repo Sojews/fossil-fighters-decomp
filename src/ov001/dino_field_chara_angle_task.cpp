@@ -16,6 +16,7 @@
 #include "m/bg_new_task.h"
 #include "m/call_task.h"
 #include "m/polygon_char.h"
+#include "game/dino_field_lower_spot.h"
 
 DinoFieldCharaAngleTask::~DinoFieldCharaAngleTask() {
 }
@@ -127,6 +128,38 @@ void DinoFieldBlackIn::Idle() {
     fades = new MParallelTaskSet(TRUE);
     fades->AddTail(top);
     fades->AddTail(bottom);
+    MSerialTaskSet *serial = &mSerial;
+    serial->AddTail(fades);
+    serial->AddTail(exit);
+}
+
+void DinoFieldSpotOut::Idle() {
+    MTask *top;
+    MTask *lower;
+    MTask *exit;
+    MParallelTaskSet *fades;
+    exit = MTaskExitTransfer::Create(this);
+    lower = new DinoFieldLowerSpotOut(mDuration);
+    top = gLcd->GetTopDisplay()->mBright->CreateFadeOutToBlack(mDuration, 0);
+    fades = new MParallelTaskSet(TRUE);
+    fades->AddTail(top);
+    fades->AddTail(lower);
+    MSerialTaskSet *serial = &mSerial;
+    serial->AddTail(fades);
+    serial->AddTail(exit);
+}
+
+void DinoFieldSpotIn::Idle() {
+    MTask *top;
+    MTask *lower;
+    MTask *exit;
+    MParallelTaskSet *fades;
+    exit = MTaskExitTransfer::Create(this);
+    lower = new DinoFieldLowerSpotIn(mDuration);
+    top = gLcd->GetTopDisplay()->mBright->CreateFadeInFromBlack(mDuration, 0);
+    fades = new MParallelTaskSet(TRUE);
+    fades->AddTail(top);
+    fades->AddTail(lower);
     MSerialTaskSet *serial = &mSerial;
     serial->AddTail(fades);
     serial->AddTail(exit);

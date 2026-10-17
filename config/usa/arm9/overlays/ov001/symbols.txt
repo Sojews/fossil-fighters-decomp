@@ -59,11 +59,11 @@ _ZN9DinoField25CreateCharaMoveOffsetTaskEm10MFx32Pointmmh kind:function(thumb,si
 _ZN9DinoField25CreateCharaMoveVectorTaskEmtmmmh kind:function(thumb,size=0x58) addr:0x02158210
 _ZN9DinoField23CreateCharaWaitMoveTaskEm kind:function(thumb,size=0x28) addr:0x02158268
 _ZN9DinoField20CreateCharaFocusTaskEm kind:function(thumb,size=0x34) addr:0x02158290
-func_ov001_021582c4 kind:function(thumb,size=0x24) addr:0x021582c4
+_ZN20DinoFieldLowerSpotInC1Ei kind:function(thumb,size=0x24) addr:0x021582c4
 _ZN20DinoFieldLowerSpotInD1Ev kind:function(thumb,size=0x30) addr:0x021582e8
 _ZN20DinoFieldLowerSpotInD0Ev kind:function(thumb,size=0x38) addr:0x02158318
 _ZN20DinoFieldLowerSpotIn4IdleEv kind:function(thumb,size=0x194) addr:0x02158350
-func_ov001_021584e4 kind:function(thumb,size=0x24) addr:0x021584e4
+_ZN21DinoFieldLowerSpotOutC1Ei kind:function(thumb,size=0x24) addr:0x021584e4
 _ZN21DinoFieldLowerSpotOutD1Ev kind:function(thumb,size=0x4c) addr:0x02158508
 _ZN21DinoFieldLowerSpotOutD0Ev kind:function(thumb,size=0x54) addr:0x02158554
 _ZN21DinoFieldLowerSpotOut4IdleEv kind:function(thumb,size=0x140) addr:0x021585a8
