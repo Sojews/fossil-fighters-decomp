@@ -28,3 +28,9 @@ src/ov000/dino_battle_controller.cpp:
 
 src/ov000/dino_battle.cpp:
     .text       start:0x02159a34 end:0x0215ad0c
+
+src/ov000/dino_battle_model.cpp:
+    .text       start:0x0215ae58 end:0x0215b3ac
+
+src/ov000/dino_battle_view_player_field.cpp:
+    .text       start:0x0215f15c end:0x0215f1ac
