@@ -8,6 +8,7 @@
 #include "game/dino_ui_multiplay_menu_item2.h"
 #include "game/dino_ui_multiplay_menu_item.h"
 #include "game/dino_ui_multiplay_menu_item_menu.h"
+#include "game/dino_sound.h"
 
 DinoUiMultiplayLoop::~DinoUiMultiplayLoop() {
 }
@@ -70,6 +71,18 @@ void DinoUiMultiplayMenuBackButton::OnFocusChanged(BOOL focused) {
     } else {
         mMotion->Play(2, 0);
     }
+}
+
+void DinoUiMultiplayMenuBackButton::OnDecide() {
+    DinoSoundPlaySe(0x38F, 0);
+    mMotion->Play(4, 1);
+    mOwner->Decide(0);
+}
+
+void DinoUiMultiplayWirelessButton::OnDecide() {
+    DinoSoundPlaySe(0x390, 0);
+    mMotion->Play(3, 1);
+    mOwner->Decide(1);
 }
 
 // Template task instances the game emits in this file. Until the code that makes the tasks is decompiled, they are

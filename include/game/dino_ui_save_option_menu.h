@@ -12,6 +12,7 @@ public:
     virtual void OnStart();
     virtual void OnFocus(MMenuItem *item);
     void RemoveItem();
+    void OnBackDecided();
 };
 
 class DinoUiSaveOptionSaveButton : public DinoUiSaveOptionMenuItem {

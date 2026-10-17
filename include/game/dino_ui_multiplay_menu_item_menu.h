@@ -13,6 +13,7 @@ public:
     virtual ~DinoUiMultiplayMenu();
     virtual void OnStart();
     virtual void OnFocus(MMenuItem *item);
+    void Decide(int choice);
 };
 
 class DinoUiMultiplayWirelessButton : public DinoUiMultiplayMenuItem {
@@ -21,9 +22,11 @@ public:
     virtual MRect GetFrame();
     virtual void OnDecide();
 
-    u8 unk94[0x4];
+    DinoUiMultiplayMenu *mOwner; // 0x94
     MMotion *mMotion;   // 0x98
 };
+
+class DinoUiMultiplayMenu;
 
 class DinoUiMultiplayMenuBackButton : public DinoUiMultiplayMenuItem {
 public:
@@ -32,7 +35,7 @@ public:
     virtual void OnFocusChanged(BOOL focused);
     virtual void OnDecide();
 
-    u8 unk94[0x4];
+    DinoUiMultiplayMenu *mOwner; // 0x94
     MMotion *mMotion;   // 0x98
 };
 

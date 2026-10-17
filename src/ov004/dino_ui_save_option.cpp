@@ -10,6 +10,7 @@
 #include "game/dino_ui_save_option_remove_item_task.h"
 #include "game/dino_ui_save_option_menu_save_task.h"
 #include "game/dino_ui_save_option_menu_item.h"
+#include "game/dino_sound.h"
 
 DinoUiSaveOption::~DinoUiSaveOption() {
 }
@@ -75,3 +76,8 @@ void DinoUiSaveOptionRemoveItemTask::Execute() {
     Exit();
 }
 
+void DinoUiSaveOptionBackButton::OnDecide() {
+    mMotion->Play(4, 1);
+    DinoSoundPlaySe(0x38F, 0);
+    mOwner->OnBackDecided();
+}
