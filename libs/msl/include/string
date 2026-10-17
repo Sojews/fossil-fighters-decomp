@@ -32,6 +32,11 @@ public:
     basic_string &operator+=(const C *s);
     basic_string &operator=(const basic_string &str);
 
+    static const size_type npos = (size_type)-1;
+
+    basic_string substr(size_type pos = 0, size_type n = npos) const;
+    int compare(const C *s) const;
+
     void clear() {
         if (!is_long()) {
             mShort.buf[0] = 0;
@@ -80,6 +85,11 @@ public:
 
 template <class C, class Traits, class Alloc>
 bool operator==(const basic_string<C, Traits, Alloc> &lhs, const basic_string<C, Traits, Alloc> &rhs);
+
+template <class C, class Traits, class Alloc>
+inline bool operator==(const basic_string<C, Traits, Alloc> &lhs, const C *rhs) {
+    return lhs.compare(rhs) == 0;
+}
 
 typedef basic_string<char> string;
 typedef basic_string<wchar_t> wstring;

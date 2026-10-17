@@ -728,9 +728,33 @@ public:
     u32 mStep;          // 0x78
 };
 
+// A window showing text on one screen (its text starts with "$upper" or "$lower").
+class DinoCommonTutorialWindow : public MProcess {
+public:
+    DinoCommonTutorialWindow(MDisplay *display, std::string text);
+    virtual void Idle();
+
+    u8 unk74[0x28];
+};
+
+class DinoEventTalkWindow : public MProcess {
+public:
+    DinoEventTalkWindow(MDisplay *display, std::string text, int arg, u8 flag);
+    virtual void Idle();
+
+    u8 unk74[0x84];
+};
+
 class DinoEventExecTalk : public MProcess {
 public:
+    DinoEventExecTalk(DinoEvent *event, u32 id, u8 flag);
     virtual ~DinoEventExecTalk();
+    virtual void Idle();
+
+    DinoEvent *mEvent;  // 0x74
+    u32 mId;            // 0x78
+    u8 mFlag;           // 0x7C
+    u32 mStep;          // 0x80
 };
 
 class DinoEventExecFieldName : public MProcess {

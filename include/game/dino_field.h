@@ -7,6 +7,7 @@
 #include "m/fx32.h"
 #include "m/geometry.h"
 
+#include <string>
 #include "m/task.h"
 struct DinoCharaTask;
 
@@ -100,6 +101,8 @@ public:
 
 class DinoEvent : public MProcess {
 public:
+    MTask *CreateTalkTask(u32 id);
+    std::string GetTalkText(u32 id);
     void SetResult(u32 result);
     void CloseField(BOOL arg);
     void OpenField(BOOL arg);

@@ -819,6 +819,34 @@ void DinoEventExecKasekiRockShot::Idle() {
     }
 }
 
+DinoEventExecTalk::DinoEventExecTalk(DinoEvent *event, u32 id, u8 flag) : MProcess(NULL) {
+    mEvent = event;
+    mId = id;
+    mFlag = flag;
+    mStep = 0;
+}
+
+void DinoEventExecTalk::Idle() {
+    switch (mStep++) {
+    case 0:
+        mSerial.AddTail(mEvent->CreateTalkTask(mId));
+        break;
+    case 1: {
+        std::string text = mEvent->GetTalkText(mId);
+        std::string tag = text.substr(0, 6);
+        if (tag == "$upper") {
+            mSerial.AddTail(new DinoCommonTutorialWindow(gLcd->GetTopDisplay(), text.substr(6)));
+        } else if (tag == "$lower") {
+            mSerial.AddTail(new DinoCommonTutorialWindow(gLcd->GetBottomDisplay(), text.substr(6)));
+        } else {
+            mSerial.AddTail(new DinoEventTalkWindow(gLcd->GetBottomDisplay(), text, 0, mFlag));
+        }
+        mSerial.AddTail(MTaskExitTransfer::Create(this));
+        break;
+    }
+    }
+}
+
 DinoEventExecStartBehold::DinoEventExecStartBehold(DinoEvent *event, u32 chara, u32 target) {
     mEvent = event;
     mChara = chara;
