@@ -6,6 +6,7 @@
 #include "game/dino_message.h"
 #include "game/create_player_update_ability_icon_task.h"
 #include "m/seed_generator.h"
+#include "game/dino_resource.h"
 #include "nitro/mi.h"
 #include "types.h"
 #include "game/dino_battle_user_controller.h"
@@ -283,6 +284,59 @@ MFx32 DinoBattleModelCreature::RandomFraction() {
     return mPlayer->RandomFraction();
 }
 
+extern "C" BOOL func_ov000_0216ce04(DinoBattleModelCreature *creature);
+extern "C" BOOL func_ov000_0216f13c(DinoBattleModelCreature *creature);
+extern "C" u32 func_ov000_02163a28(DinoBattleModelPlayer *player);
+extern "C" int func_ov000_0216ecc0(int a, int b);
+
+BOOL DinoBattleModelCreature::IsUnkCE50() {
+    if (GetDefUnk61() == 5 && func_ov000_0216ce04(this)) {
+        return TRUE;
+    }
+    return FALSE;
+}
+
+int DinoBattleModelCreature::GetUnkCE7C(u32 attack) {
+    if (gDinoResource->GetAttackDef(attack)->unk18 >= 2) {
+        return mUnk10C;
+    }
+    return mDef->mUnk0D;
+}
+
+int DinoBattleModelCreature::CompareUnkECA0(DinoBattleModelCreature *other, u32 attack) {
+    int a = GetUnkCE7C(attack);
+    int b = other->GetUnkCE7C(0);
+    return func_ov000_0216ecc0(a, b);
+}
+
+int DinoBattleModelCreature::CompareUnkED0C(DinoBattleModelCreature *other) {
+    switch (CompareUnkECA0(other, 0)) {
+    case 2:
+        return -1;
+    case 0:
+        return 0;
+    case 1:
+        return 1;
+    default:
+        return 0;
+    }
+}
+
+u32 DinoBattleModelCreature::GetUnkD298() {
+    if (func_ov000_0216f13c(this)) {
+        return func_ov000_02163a28(mPlayer);
+    }
+    return 0;
+}
+
+BOOL DinoBattleModelCreature::RollDefUnk23() {
+    u8 chance = mDef->mUnk23;
+    if (chance >= (int)mPlayer->GetRandom()->Next(100)) {
+        return TRUE;
+    }
+    return FALSE;
+}
+
 void DinoBattleModelCreature::RollUnk10C() {
     mUnk10C = mPlayer->GetRandom()->Next(5) + 1;
 }
@@ -385,6 +439,15 @@ MRandom *DinoBattleModelPlayer::GetRandom() {
 
 u32 DinoBattleModelPlayer::GetUnkAC() {
     return mUnkAC;
+}
+
+void DinoBattleModelPlayer::SetUnk12C(u8 value) {
+    mUnk12C = mUnk12D = value;
+}
+
+u32 DinoBattleModelPlayer::NextUnkId() {
+    u32 id = mUnkBC++;
+    return (mUnkB8 << 16) | id;
 }
 
 // A random fraction in [0, 1].

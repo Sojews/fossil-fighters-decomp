@@ -49,7 +49,10 @@ struct DinoAttackDefs {
     u32 tableOffset;    // 0x10
 };
 
-struct DinoAttackDef;
+struct DinoAttackDef {
+    u8 unk00[0x18];
+    u32 unk18;          // 0x18
+};
 struct DinoBattleAdjustDefs;
 struct DinoBattleBgDefs;
 struct DinoExcavateRange {

@@ -70,12 +70,15 @@ public:
     MRandom *GetRandom();
     u32 GetUnkAC();
     MFx32 RandomFraction();
+    void SetUnk12C(u8 value);
+    u32 NextUnkId();
 
     u32 mUnkA8;                         // 0xA8
     u32 mUnkAC;                         // 0xAC
     u32 unkB0[2];
     u32 mUnkB8;                         // 0xB8
-    u32 unkBC[3];
+    u32 mUnkBC;                         // 0xBC
+    u32 unkC0[2];
     u8 mUnkC8;                          // 0xC8
     u8 unkC9[0xFC - 0xC9];
     u32 mUnkFC;                         // 0xFC
@@ -87,7 +90,9 @@ public:
     u32 unk114[4];
     u32 mUnk124;                        // 0x124
     u32 mUnk128;                        // 0x128
-    u32 unk12C;
+    u8 mUnk12C;                         // 0x12C
+    u8 mUnk12D;                         // 0x12D
+    u8 unk12E[2];
     u32 mUnk130[7];                     // 0x130
     u32 mUnk14C;                        // 0x14C
     u32 unk150;
@@ -96,10 +101,14 @@ public:
 
 // A vivosaur's definition data as the battle reads it (not identified yet).
 struct DinoBattleCreatureDef {
-    u8 unk00[0x20];
+    u8 unk00[0xD];
+    u8 mUnk0D;          // 0x0D
+    u8 unk0E[0x20 - 0x0E];
     u8 mUnk20;          // 0x20
     u8 mUnk21;          // 0x21
-    u8 unk22[0x61 - 0x22];
+    u8 unk22;
+    u8 mUnk23;          // 0x23
+    u8 unk24[0x61 - 0x24];
     u8 mUnk61;          // 0x61
     u8 unk62[0x68 - 0x62];
     s32 mUnk68;         // 0x68: offset of a byte table
@@ -156,6 +165,12 @@ public:
     u32 GetStatusUnk20();
     void RollUnk10C();
     MFx32 RandomFraction();
+    BOOL IsUnkCE50();
+    int GetUnkCE7C(u32 attack);
+    int CompareUnkECA0(DinoBattleModelCreature *other, u32 attack);
+    int CompareUnkED0C(DinoBattleModelCreature *other);
+    u32 GetUnkD298();
+    BOOL RollDefUnk23();
 
     class AddLifePointTask : public MTask {
     public:
