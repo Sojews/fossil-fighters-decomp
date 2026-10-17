@@ -105,7 +105,7 @@ public:
 
     MRandom *GetRandom();
     const char *GetText(u32 id);
-    static const u16 *GetUnkTable();
+    const u16 *GetUnkTable();
     u32 GetCreatureCount();
     const DinoCreatureDef *GetCreatureDef(u32 id);
     const DinoAttackDef *GetAttackDef(u32 id);

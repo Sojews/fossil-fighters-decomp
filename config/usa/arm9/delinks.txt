@@ -225,7 +225,7 @@ src/game/dino_common_window_console_filter.cpp:
     .text       start:0x02030310 end:0x02030410
 
 src/game/dino_help_sample.cpp:
-    .text       start:0x0203216c end:0x0203230c
+    .text       start:0x02031760 end:0x02032590
 
 src/game/dino_cleaning_sample.cpp:
     .text       start:0x02033c2c end:0x02033d98

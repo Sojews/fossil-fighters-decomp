@@ -11,10 +11,9 @@
 #include "m/smart_oam.h"
 #include "m/text_codec.h"
 
-DinoCommonLabel::DinoCommonLabel(MSmartOam *oam, MFont *font, const void *palette, u32 textId, int spacing,
-                                 int lineSpacing)
-    : MFixedSizeView(MPoint(0, 0)), mFont(font), mText(gDinoResource->GetText(textId)), mSpacing(spacing),
-      mLineSpacing(lineSpacing) {
+DinoCommonLabel::DinoCommonLabel(MSmartOam *oam, MFont *font, const void *palette, u32 textId, MPoint spacing)
+    : MFixedSizeView(MPoint(0, 0)), mFont(font), mText(gDinoResource->GetText(textId)), mSpacing(spacing.x),
+      mLineSpacing(spacing.y) {
     mCanvas = mSmartCanvas = new MSmartObjCanvas(
         oam->mDisplay, oam, font->MeasureText(gDinoResource->GetText(textId), mSpacing, mLineSpacing), palette, TRUE);
     Init();

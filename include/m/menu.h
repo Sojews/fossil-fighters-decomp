@@ -22,6 +22,7 @@ template <class T> struct MTreeStandIn {
     };
 
     MTreeStandIn() { Init(); }
+    ~MTreeStandIn();    // (out of line, like the tree's)
     void Init() {
         size = 0;
         header.root = NULL;
@@ -39,7 +40,7 @@ public:
     MMenu(int defaultMode);
     MMenu(MInput *input, int defaultMode);
     MMenu(MDisplay *display, MInput *input, int defaultMode);
-    virtual ~MMenu();
+    virtual ~MMenu() {}
     virtual void Idle();
     virtual void OnStart();
     virtual void OnIdle();

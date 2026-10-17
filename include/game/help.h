@@ -10,6 +10,7 @@
 #include "m/geometry.h"
 
 class DinoHelpItem;
+class MDisplay;
 class MInput;
 
 // Something that owns help items (a menu, say).
@@ -37,7 +38,7 @@ public:
     DinoHelpItem();
     virtual ~DinoHelpItem();
     virtual MRect GetRect() = 0;        // the area the item's help is for
-    virtual u32 GetHelpId() = 0;
+    virtual MDisplay *GetDisplay() = 0;   // where the help is shown
     virtual const char *GetText() = 0;
 
     void Enable();
@@ -52,14 +53,14 @@ public:
 // A help item that's only an area and a text.
 class DinoHelpDummyItem : public DinoHelpItem, public MTask {
 public:
-    DinoHelpDummyItem(u32 id, MRect rect, std::string text);
-    virtual u32 GetHelpId();
+    DinoHelpDummyItem(MDisplay *display, MRect rect, std::string text);
+    virtual MDisplay *GetDisplay();
     virtual MRect GetRect();
     void SetText(const std::string &text);
     virtual const char *GetText();
     virtual void Execute();
 
-    u32 mHelpId;            // 0x1C
+    MDisplay *mDisplay;     // 0x1C
     MRect mRect;            // 0x20
     std::string mText;      // 0x30
     const char *mTextPtr;   // 0x3C: mText's characters

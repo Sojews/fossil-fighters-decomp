@@ -14,7 +14,7 @@ class MSmartObjCanvas;
 class DinoCommonLabel : public MFixedSizeView {
 public:
     // The text is game text number textId.
-    DinoCommonLabel(MSmartOam *oam, MFont *font, const void *palette, u32 textId, int spacing, int lineSpacing);
+    DinoCommonLabel(MSmartOam *oam, MFont *font, const void *palette, u32 textId, MPoint spacing);
     DinoCommonLabel(MDisplay *display, MFont *font, const void *palette, const std::string &text, int spacing,
                     int lineSpacing);
     virtual ~DinoCommonLabel();
