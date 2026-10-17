@@ -1,6 +1,7 @@
 #ifndef GAME_DINO_UI_CLEANING_MENU_ITEM_MENU_H
 #define GAME_DINO_UI_CLEANING_MENU_ITEM_MENU_H
 
+#include "m/resource.h"
 #include "game/dino_ui3_parts_fraction.h"
 #include <vector>
 #include "m/archive.h"
@@ -33,10 +34,10 @@ public:
     std::vector<void *> mItems; // 0xC0: this page's items
     u32 mUnkCC[2];              // 0xCC
     DinoUi3PartsFraction *mFraction; // 0xD4: "page n/m"
-    u32 mUnkD8[4];              // 0xD8
+    DinoEventLoop *mEvent;      // 0xD8
+    u32 mUnkDC[3];              // 0xDC
     std::vector<u32> mUnkE8;    // 0xE8
-    MArchivePtr mArchive;       // 0xF4
-    MArchiveFile mFile;         // 0xF8
+    MResource<void> mResource;  // 0xF4
     u32 mUnk104[3];             // 0x104
     int mPage;                  // 0x110
     int mLastPage;              // 0x114
