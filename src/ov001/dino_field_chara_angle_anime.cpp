@@ -2,6 +2,7 @@
 // Only the destructors are decompiled so far.
 
 #include "game/dino_field_chara_angle_anime.h"
+#include "game/dino_field_chara_coord_anime.h"
 #include "game/dino_field_chara_wait_stop_task.h"
 #include "game/dino_field_chara_angle_to_task.h"
 #include "game/dino_field_chara_move_to_task.h"
@@ -28,4 +29,10 @@ DinoFieldCharaHideManpuTask::~DinoFieldCharaHideManpuTask() {
 }
 
 DinoFieldCharaModelMotionIdTask::~DinoFieldCharaModelMotionIdTask() {
+}
+
+DinoFieldCharaCoordAnime::~DinoFieldCharaCoordAnime() {
+    if (!mUnk4C) {
+        mChara->SetMotion(1, 1, MFx32(1));
+    }
 }
