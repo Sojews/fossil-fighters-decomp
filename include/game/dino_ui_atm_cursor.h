@@ -3,8 +3,12 @@
 
 #include "m/view.h"
 
+class MMotion;
+class MSmartOam;
+
 class DinoUiATMCursor : public MView {
 public:
+    DinoUiATMCursor(MSmartOam *oam);
     virtual ~DinoUiATMCursor();
     virtual void Execute();
     virtual void SetPosition(MPoint pos);
@@ -18,7 +22,7 @@ public:
     virtual BOOL IsHidden();
     virtual u32 GetPlaneMask();
 
-    MView *mUnk10;  // 0x10
+    MMotion *mUnk10;    // 0x10
     MRect mFrame;   // 0x14
 };
 

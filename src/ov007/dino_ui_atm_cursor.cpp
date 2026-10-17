@@ -1,7 +1,15 @@
 // DinoUiATMCursor.
-// Only the destructor is decompiled so far.
 
 #include "game/dino_ui_atm_cursor.h"
+#include "m/motion.h"
+
+extern const char *data_ov007_0218c9e0[];   // motion files
+
+DinoUiATMCursor::DinoUiATMCursor(MSmartOam *oam) : mFrame(0, 0, 0, 0) {
+    mUnk10 = new MMotion(std::string(data_ov007_0218c9e0[5]), oam, 0, 1);
+    mUnk10->Play(1, 0);
+    mUnk10->Hide();
+}
 
 DinoUiATMCursor::~DinoUiATMCursor() {
     delete mUnk10;

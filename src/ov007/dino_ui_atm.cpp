@@ -13,6 +13,17 @@
 #include "m/bg_new_task.h"
 #include "m/call_task.h"
 
+DinoUiATMMenu::DinoUiATMMenu(u32 *result, u8 arg1, u32 arg2, u8 arg3) : MMenu(NULL, 0) {
+    mUnk108 = arg2;
+    mResult = result;
+    mUnk114 = 10;
+    mUnk118 = 0;
+    mUnk11C = 0;
+    mUnk120 = -2;
+    mUnk124 = arg1;
+    mUnk125 = arg3;
+}
+
 DinoUiATM::~DinoUiATM() {
 }
 

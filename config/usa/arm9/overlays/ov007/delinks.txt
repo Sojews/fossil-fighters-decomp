@@ -5,10 +5,10 @@
     .bss        start:0x02192640 end:0x02192680 kind:bss align:32
 
 src/ov007/dino_ui_atm.cpp:
-    .text       start:0x02171d10 end:0x02174ad8
+    .text       start:0x02171ca8 end:0x02174ad8
 
 src/ov007/dino_ui_atm_cursor.cpp:
-    .text       start:0x02171b00 end:0x02171d10
+    .text       start:0x02171b00 end:0x02171ca8
 
 src/ov007/dino_ui_organization_menu.cpp:
     .text       start:0x02174ad8 end:0x02180f98
