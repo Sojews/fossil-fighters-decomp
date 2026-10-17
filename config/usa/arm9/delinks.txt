@@ -589,3 +589,18 @@ libs/nitrosdk/src/gx/g3x.c:
 
 libs/nitrosdk/src/gx/gx_load3d.c:
     .text       start:0x02073084 end:0x0207323c
+
+libs/nitrosdk/src/mi/mi_wram.c:
+    complete
+    .text       start:0x020753c4 end:0x020753d0
+
+libs/nitrosdk/src/mi/mi_uncompress_rl16.c:
+    .text       start:0x02075e08 end:0x02075e70
+
+libs/nitrosdk/src/mi/mi_card.c:
+    complete
+    .text       start:0x02075f54 end:0x02075fa4
+
+libs/nitrosdk/src/mi/mi_init.c:
+    complete
+    .text       start:0x02075fa4 end:0x02075fb4
