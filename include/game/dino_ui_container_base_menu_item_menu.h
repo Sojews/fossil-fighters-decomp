@@ -1,6 +1,7 @@
 #ifndef GAME_DINO_UI_CONTAINER_BASE_MENU_ITEM_MENU_H
 #define GAME_DINO_UI_CONTAINER_BASE_MENU_ITEM_MENU_H
 
+#include "game/dino_ui3_parts_fraction.h"
 #include "m/archive.h"
 #include <vector>
 #include "m/menu_item.h"
@@ -19,8 +20,13 @@ public:
     void OnBackDecided();
     BOOL PageRight();
     BOOL PageLeft();
+    void RefreshPage1();
+    void RefreshPage2();
 
-    u32 mUnkB4[19];
+    DinoUi3PartsFraction *mFraction; // 0xB4: "page n/m"
+    u32 mUnkB8[16];
+    int mPage;                  // 0xF8
+    int mLastPage;              // 0xFC
     u8 mUnk100; // 0x100
     u8 unk101[3];
     u32 mUnk104[1];

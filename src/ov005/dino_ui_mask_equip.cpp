@@ -153,3 +153,29 @@ MRect DinoUiMaskEquipMaskButton::GetFrame() {
     MPoint p(mPos.x, mPos.y);
     return MRect(MPoint(p.x - 24, p.y - 24), MPoint(p.x + 24, p.y + 24));
 }
+
+BOOL DinoUiMaskEquipMenu::PageRight() {
+    if (mPage == mLastPage) {
+        mPage = 0;
+    } else {
+        mPage++;
+    }
+    RefreshPage1();
+    mFraction->SetNumerator(mPage + 1);
+    RefreshPage2();
+    FocusNearestItem(GetCursor());
+    return TRUE;
+}
+
+BOOL DinoUiMaskEquipMenu::PageLeft() {
+    if (mPage == 0) {
+        mPage = mLastPage;
+    } else {
+        mPage--;
+    }
+    RefreshPage1();
+    mFraction->SetNumerator(mPage + 1);
+    RefreshPage2();
+    FocusNearestItem(GetCursor());
+    return TRUE;
+}

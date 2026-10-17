@@ -134,3 +134,21 @@ void DinoUiContainerBaseDecideButton::OnDecide() {
         serial->AddTail(play);
     }
 }
+
+BOOL DinoUiContainerBaseMenu::PageRight() {
+    mPage = (mPage + 1) % (mLastPage + 1);
+    RefreshPage1();
+    mFraction->SetNumerator(mPage + 1);
+    RefreshPage2();
+    FocusNearestItem(GetCursor());
+    return TRUE;
+}
+
+BOOL DinoUiContainerBaseMenu::PageLeft() {
+    mPage = (mPage + mLastPage) % (mLastPage + 1);
+    RefreshPage1();
+    mFraction->SetNumerator(mPage + 1);
+    RefreshPage2();
+    FocusNearestItem(GetCursor());
+    return TRUE;
+}
