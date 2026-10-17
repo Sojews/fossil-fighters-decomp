@@ -9,3 +9,6 @@ DinoFieldMap::~DinoFieldMap() {
 DinoFieldMapInfo *DinoFieldMap::GetInfo() {
     return &mInfo;
 }
+
+void DinoFieldMap::Idle() {
+}

@@ -41,3 +41,6 @@ DinoCleaningSampleMenu::~DinoCleaningSampleMenu() {
 DinoCleaningSampleMenuKasekiRockIdItem::~DinoCleaningSampleMenuKasekiRockIdItem() {
     delete[] mBuffer;
 }
+
+void DinoCleaningSampleMenuKasekiRockIdItem::OnDecide() {
+}

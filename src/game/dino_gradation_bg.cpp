@@ -8,3 +8,6 @@ DinoGradationBg::~DinoGradationBg() {
     delete mRaster;
     mDisplay->SetBackdrop(0);
 }
+
+void DinoGradationBg::Execute() {
+}

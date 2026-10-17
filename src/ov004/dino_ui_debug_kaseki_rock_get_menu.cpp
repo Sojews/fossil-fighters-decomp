@@ -15,3 +15,6 @@ DinoUiDebugKasekiRockGetMenu::~DinoUiDebugKasekiRockGetMenu() {
 DinoUiDebugKasekiRockGetMenuKasekiRockIdItem::~DinoUiDebugKasekiRockGetMenuKasekiRockIdItem() {
     delete[] mBuffer;
 }
+
+void DinoUiDebugKasekiRockGetMenuKasekiRockIdItem::OnDecide() {
+}

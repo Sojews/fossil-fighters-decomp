@@ -30,6 +30,18 @@ DinoUiStatusBackButton::~DinoUiStatusBackButton() {
 DinoUiStatusOKButton::~DinoUiStatusOKButton() {
 }
 
+void DinoUiStatusChangeModeHelpTask::Idle() {
+}
+
+void DinoUiPartsTabIconMenuItem::OnSelectChanged(BOOL value) {
+}
+
+void DinoUiPartsTabIconMenuItem::OnDecide() {
+}
+
+void DinoUiPartsTabIconMenuItem::OnFocusChanged(BOOL value) {
+}
+
 // Template task instances the game emits in this file. Until the code that makes the tasks is decompiled, they are
 // instantiated explicitly.
 template class MCallTask0<DinoUiStatusMenu, DinoUiStatusMenu>;

@@ -19,6 +19,15 @@ DinoCommonWindowMenu::~DinoCommonWindowMenu() {
 DinoCommonWindowMenuItem::~DinoCommonWindowMenuItem() {
 }
 
+void DinoCommonWindowMenuItem::OnSelectChanged(BOOL value) {
+}
+
+void DinoCommonWindowMenuItem::OnFocusChanged(BOOL value) {
+}
+
+void DinoCommonWindowMenuItem::OnDecide() {
+}
+
 // Template task instances the game emits in this file. Until the code that makes the tasks is decompiled, they are
 // instantiated explicitly.
 template class MCallTask0<DinoCommonWindowMenu, DinoHelpBase>;

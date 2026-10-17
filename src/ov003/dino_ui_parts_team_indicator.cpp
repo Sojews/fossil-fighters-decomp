@@ -7,3 +7,6 @@ DinoUiPartsTeamIndicator::~DinoUiPartsTeamIndicator() {
     mFont->Release();
     delete mView;
 }
+
+void DinoUiPartsTeamIndicator::Idle() {
+}

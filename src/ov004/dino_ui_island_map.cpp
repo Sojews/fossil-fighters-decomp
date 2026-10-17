@@ -48,3 +48,9 @@ DinoUiIslandMapMenu::~DinoUiIslandMapMenu() {
     gLcd->mMain->mWin->Reset();
     gLcd->mSub->mWin->Reset();
 }
+
+void DinoUiIslandMapMenu::OnIdle() {
+}
+
+void DinoMapBackButton::OnSelectChanged(BOOL value) {
+}

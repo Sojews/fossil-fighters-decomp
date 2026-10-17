@@ -15,3 +15,6 @@ DinoUiDebugReviverMenu::~DinoUiDebugReviverMenu() {
 DinoUiDebugReviverMenuItem::~DinoUiDebugReviverMenuItem() {
     mFont->Release();
 }
+
+void DinoUiDebugReviverMenuItem::OnDecide() {
+}

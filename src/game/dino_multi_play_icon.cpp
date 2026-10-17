@@ -12,3 +12,6 @@ DinoMultiPlayIcon::~DinoMultiPlayIcon() {
 
 DinoMultiPlayIconHook::~DinoMultiPlayIconHook() {
 }
+
+void DinoMultiPlayIconHook::Unk08() {
+}

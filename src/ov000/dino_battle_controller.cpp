@@ -11,3 +11,6 @@ DinoBattleController::~DinoBattleController() {
 
 DinoBattleDummyController::~DinoBattleDummyController() {
 }
+
+void DinoBattleDummyController::OnMessage(MMessage *msg) {
+}

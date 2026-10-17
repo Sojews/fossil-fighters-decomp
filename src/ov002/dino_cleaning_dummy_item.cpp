@@ -20,3 +20,6 @@ DinoCleaningToolMenuItem::~DinoCleaningToolMenuItem() {
 
 DinoCleaningToolMenu::~DinoCleaningToolMenu() {
 }
+
+void DinoCleaningDummyItem::OnDecide() {
+}
