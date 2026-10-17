@@ -540,3 +540,7 @@ libs/nitrosdk/src/os/os_ownerinfo.c:
 libs/nitrosdk/src/os/os_terminate_proc.c:
     complete
     .text       start:0x020753ac end:0x020753c4
+
+libs/nitrosdk/src/os/os_spinlock.c:
+    .text       start:0x02073588 end:0x02073810
+    .bss        start:0x021518c4 end:0x021518c8
