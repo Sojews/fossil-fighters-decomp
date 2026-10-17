@@ -13102,7 +13102,8 @@ cardi_common kind:bss(size=0x220) addr:0x02153a00
 cardi_thread_stack kind:bss(size=0x400) addr:0x02153c20
 cardi_rom_base kind:bss(size=0x4) addr:0x02154020
 rom_stat kind:bss(size=0x220) addr:0x02154040
-data_02154260 kind:bss addr:0x02154260
+CARDi_IsPulledOutFlag kind:bss(size=0x4) addr:0x02154260
+CARD_UserCallback kind:bss(size=0x4) addr:0x02154264
 data_02154280 kind:bss addr:0x02154280
 data_02154288 kind:bss addr:0x02154288
 data_021542a8 kind:bss addr:0x021542a8
