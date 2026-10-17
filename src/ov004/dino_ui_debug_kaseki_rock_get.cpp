@@ -4,6 +4,8 @@
 // Derived destructors have their bases' destructor bodies inlined; auto-inlining the ones defined above does that.
 #pragma auto_inline on
 
+#include "game/dino_resource.h"
+#include <printf.h>
 #include "m/font.h"
 #include "game/dino_ui_debug_kaseki_rock_get_menu_menu.h"
 #include "game/dino_ui_debug_kaseki_rock_get.h"
@@ -119,4 +121,12 @@ MRect DinoUiDebugKasekiRockGetMenuIncItem::GetFrame() {
 
 MRect DinoUiDebugKasekiRockGetMenuDecItem::GetFrame() {
     return mView->GetFrame().Inflate(8);
+}
+
+extern const u32 data_0208a408; // the rock id's format
+void DinoUiDebugKasekiRockGetMenuKasekiRockIdItem::Idle() {
+    *mValue = mBuffer[mIndex];
+    char text[0x100];
+    sprintf(text, gDinoResource->GetText(data_0208a408), *mValue);
+    mView->SetText(std::string(text));
 }

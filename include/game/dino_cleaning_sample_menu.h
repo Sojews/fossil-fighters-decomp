@@ -1,6 +1,7 @@
 #ifndef GAME_DINO_CLEANING_SAMPLE_MENU_H
 #define GAME_DINO_CLEANING_SAMPLE_MENU_H
 
+#include "m/indicator.h"
 #include "m/view.h"
 #include "m/archive.h"
 #include "m/font.h"
@@ -31,14 +32,15 @@ public:
     virtual void OnFocusChanged(BOOL focused);
     virtual void OnDecide();
 
-    u32 mUnk88[2];
-    MView *mView;           // 0x90
+    u32 *mValue;            // 0x88: set to the chosen rock id
+    u32 mIndex;             // 0x8C: into mBuffer
+    MIndicator *mView;      // 0x90
     u32 mUnk94;
     MMenuItem *mKeyItemA; // 0x98
     MMenuItem *mKeyItemB; // 0x9C
     MArchivePtr mArchive;   // 0xA0
     MArchiveFile mFile;     // 0xA4
-    u8 *mBuffer;            // 0xB0
+    u32 *mBuffer;           // 0xB0: the rock ids
 };
 
 #endif
