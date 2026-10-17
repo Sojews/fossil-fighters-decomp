@@ -638,6 +638,10 @@ libs/nitrosdk/src/mi/mi_memory.c:
     complete
     .text       start:0x0207580c end:0x02075b58
 
+libs/nitrosdk/src/mi/mi_uncompress.c:
+    complete
+    .text       start:0x02075b58 end:0x02075e08
+
 libs/nitrosdk/src/os/os_init.c:
     complete
     .text       start:0x02074a64 end:0x02074aa8
