@@ -383,6 +383,7 @@ libs/msl/src/runtime_arm_div.c:
 libs/msl/src/console_io.c:
     complete
     .text       start:0x02086cfc end:0x02086d6c
+    .exceptix   start:0x02088738 end:0x02088750
 
 
 
