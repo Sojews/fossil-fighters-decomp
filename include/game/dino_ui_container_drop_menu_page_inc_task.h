@@ -3,10 +3,14 @@
 
 #include "m/task.h"
 
+class DinoUiContainerDropMenu;
+
 class DinoUiContainerDropMenuPageIncTask : public MTask {
 public:
     virtual ~DinoUiContainerDropMenuPageIncTask();
     virtual void Execute();
+
+    DinoUiContainerDropMenu *mOwner;  // 0x10
 };
 
 #endif

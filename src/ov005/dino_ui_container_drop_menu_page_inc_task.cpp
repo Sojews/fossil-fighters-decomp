@@ -90,3 +90,8 @@ void DinoUiContainerDropPageLButton::OnDecide() {
     }
 }
 
+void DinoUiContainerDropMenuPageIncTask::Execute() {
+    mOwner->PageRight();
+    Exit();
+}
+

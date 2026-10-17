@@ -3,10 +3,14 @@
 
 #include "m/task.h"
 
+class DinoUiSaveOptionMenu;
+
 class DinoUiSaveOptionRemoveItemTask : public MTask {
 public:
     virtual ~DinoUiSaveOptionRemoveItemTask();
     virtual void Execute();
+
+    DinoUiSaveOptionMenu *mOwner;  // 0x10
 };
 
 #endif

@@ -69,3 +69,9 @@ void DinoUiSaveOptionBackButton::OnFocusChanged(BOOL focused) {
         mMotion->Play(2, 0);
     }
 }
+
+void DinoUiSaveOptionRemoveItemTask::Execute() {
+    mOwner->RemoveItem();
+    Exit();
+}
+
