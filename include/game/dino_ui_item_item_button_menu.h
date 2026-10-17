@@ -18,6 +18,7 @@ public:
     void OnBackDecided();
     void PageRight();
     void PageLeft();
+    void OnOKDecided();
 
     u32 mUnkB4[26];             // 0xB4
     std::vector<void *> mUnk11C; // 0x11C

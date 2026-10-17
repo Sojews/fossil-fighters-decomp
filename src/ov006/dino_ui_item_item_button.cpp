@@ -98,3 +98,9 @@ void DinoUiItemPageLButton::OnDecide() {
     serial->AddTail(play);
     DinoSoundPlaySe(0x93, 0);
 }
+
+void DinoUiItemOKButton::OnDecide() {
+    mMotion->Play(4, 1);
+    mOwner->OnOKDecided();
+    DinoSoundPlaySe(0x9A, 0);
+}

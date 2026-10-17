@@ -102,6 +102,12 @@ void DinoUiContainerPageLButton::OnDecide() {
     }
 }
 
+void DinoUiContainerOKButton::OnDecide() {
+    mMotion->Play(4, 1);
+    mOwner->OnOKDecided();
+    DinoSoundPlaySe(0x9A, 0);
+}
+
 // Template task instances the game emits in this file. Until the code that makes the tasks is decompiled, they are
 // instantiated explicitly.
 template class MCallTask0<DinoUiContainerMenu, DinoUiContainerMenu>;

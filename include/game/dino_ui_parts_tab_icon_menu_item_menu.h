@@ -12,6 +12,7 @@ public:
     virtual void OnStart();
     virtual void OnFocus(MMenuItem *item);
     virtual void OnDecide(MMenuItem *item);
+    void OnOKDecided();
 };
 
 class DinoUiStatusBackButton : public DinoUiStatusMenuItem {
