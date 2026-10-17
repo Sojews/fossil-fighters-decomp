@@ -8,6 +8,7 @@
 #include "game/dino_sound.h"
 #include "game/dino_battle_view2.h"
 #include "types.h"
+#include "game/dino_battle_view_class.h"
 
 AnyInputTimerWait::~AnyInputTimerWait() {
 }
@@ -72,10 +73,9 @@ void DinoBattleViewGivingUpMenu::Idle() {
     (this->*mState)();
 }
 
-extern "C" int func_ov000_0215bbd0(void *menu);
 
 void WaitEnableRootMenu::Execute() {
-    if (func_ov000_0215bbd0(mMenu) <= 0) {
+    if (((DinoBattleView *)mMenu)->GetUnk13C() <= 0) {
         Exit();
     }
 }
@@ -91,12 +91,11 @@ void MenuExitTask::Execute() {
     Exit();
 }
 
-extern "C" u32 func_ov000_0215bb4c(u32 arg);
 extern "C" MTask *func_ov000_0218ec8c(u32 arg0, int arg1, int arg2);
 
 void DinoBattleViewTurnEndDialog::OnStart() {
     DinoCommonYesNoMenu::OnStart();
-    MTask *task = func_ov000_0218ec8c(func_ov000_0215bb4c(mUnkE0), 0x20, 0);
+    MTask *task = func_ov000_0218ec8c(((DinoBattleView *)mUnkE0)->GetUnk12C(), 0x20, 0);
     if (task != NULL) {
         mSerial.AddTail(task);
     }

@@ -6,6 +6,7 @@
 #include "game/dino_sound.h"
 #include "game/dino_battle_view_ui_change_menu.h"
 #include "types.h"
+#include "game/dino_battle_view_class.h"
 #include "game/dino_battle_view_creature.h"
 #include "game/dino_battle_view_ui_attacker_menu.h"
 #include "m/bg_new_task.h"
@@ -92,18 +93,17 @@ MRect DinoFrameItem::GetFrame() {
     return mFrame;
 }
 
-extern "C" u32 func_ov000_0215bb4c(u32 arg);
 extern "C" MTask *func_ov000_0218ec8c(u32 arg0, int arg1, int arg2);
 
 void DinoBattleViewUiChangeMenu::OnIdle() {
-    MTask *task = func_ov000_0218ec8c(func_ov000_0215bb4c(mUnkEC), -1, 0);
+    MTask *task = func_ov000_0218ec8c(((DinoBattleView *)mUnkEC)->GetUnk12C(), -1, 0);
     if (task != NULL) {
         mSerial.AddTail(task);
     }
 }
 
 void DinoBattleViewUiCreatureInfoMenu::OnIdle() {
-    MTask *task = func_ov000_0218ec8c(func_ov000_0215bb4c(mUnkEC), -1, 0);
+    MTask *task = func_ov000_0218ec8c(((DinoBattleView *)mUnkEC)->GetUnk12C(), -1, 0);
     if (task != NULL) {
         mSerial.AddTail(task);
     }

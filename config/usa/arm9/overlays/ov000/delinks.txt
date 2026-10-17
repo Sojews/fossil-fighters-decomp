@@ -5,9 +5,6 @@
     .data       start:0x02190fa0 end:0x021978c0 kind:data align:32
     .bss        start:0x021978c0 end:0x02197d60 kind:bss align:32
 
-src/ov000/enable_root_select_task.cpp:
-    .text       start:0x0215bb78 end:0x0215bc4c
-
 src/ov000/send_local_message_task.cpp:
     .text       start:0x0215be2c end:0x0215d7a8
 
@@ -34,9 +31,6 @@ src/ov000/dino_battle_view_player_field.cpp:
 
 src/ov000/ov000_021558a0.cpp:
     .text       start:0x021558a0 end:0x02156380
-
-src/ov000/ov000_0215b3ac.cpp:
-    .text       start:0x0215b3ac end:0x0215bb78
 
 src/ov000/ov000_0215e870.cpp:
     .text       start:0x0215e870 end:0x0215eeb0
@@ -133,3 +127,6 @@ src/ov000/create_player_update_ability_icon_task.cpp:
 
 src/ov000/dino_battle_cpu_controller.cpp:
     .text       start:0x02156380 end:0x02159a34
+
+src/ov000/dino_battle_view.cpp:
+    .text       start:0x0215b3ac end:0x0215bc4c

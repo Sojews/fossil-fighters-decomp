@@ -1,0 +1,91 @@
+// DinoBattleView, EnableRootSelectTask.
+
+#include "types.h"
+#include "game/dino_battle_view_class.h"
+#include "game/enable_root_select_task.h"
+
+#pragma auto_inline off
+
+void *DinoBattleView::GetUnk11C() {
+    return mUnk11C;
+}
+
+u32 DinoBattleView::GetUnk118() {
+    return mUnk118;
+}
+
+u32 DinoBattleView::GetUnk120() {
+    return mUnk120;
+}
+
+u32 DinoBattleView::GetUnk124() {
+    return mUnk124;
+}
+
+u32 DinoBattleView::GetUnkE4(int index) {
+    return mUnkE4[index];
+}
+
+u8 DinoBattleView::GetUnk138() {
+    return mUnk138;
+}
+
+void DinoBattleView::SetUnk128(u32 value) {
+    mUnk128 = value;
+}
+
+void DinoBattleView::SetUnk12C(u32 value) {
+    mUnk12C = value;
+}
+
+u32 DinoBattleView::GetUnk12C() {
+    return mUnk12C;
+}
+
+u32 DinoBattleView::GetUnk130() {
+    return mUnk130;
+}
+
+u32 DinoBattleView::GetUnk134() {
+    return mUnk134;
+}
+
+u32 DinoBattleView::GetUnkEC() {
+    return mUnkEC;
+}
+
+void DinoBattleView::Idle() {
+    Dispatch();
+}
+
+void DinoBattleView::OnMessage(MMessage *msg) {
+    mSubject.Notify(msg);
+}
+
+u32 DinoBattleView::GetUnk104() {
+    return mUnk104;
+}
+
+u32 DinoBattleView::GetUnk108() {
+    return mUnk108;
+}
+
+void DinoBattleView::IncUnk13C() {
+    mUnk13C++;
+}
+
+void DinoBattleView::DecUnk13C() {
+    mUnk13C--;
+}
+
+int DinoBattleView::GetUnk13C() {
+    return mUnk13C;
+}
+
+EnableRootSelectTask::~EnableRootSelectTask() {
+}
+
+void EnableRootSelectTask::Execute() {
+    ((DinoBattleView *)mUnk10)->DecUnk13C();
+    Exit();
+}
