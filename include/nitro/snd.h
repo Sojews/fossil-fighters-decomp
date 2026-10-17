@@ -12,6 +12,8 @@ extern "C" {
 #define SND_COMMAND_BLOCK 1
 #define SND_COMMAND_IMMEDIATE 2
 
+typedef void (*SNDAlarmHandler)(void *arg);
+
 typedef struct SNDCommand SNDCommand;
 struct SNDCommand {
     SNDCommand *next;
@@ -19,8 +21,24 @@ struct SNDCommand {
     u32 arg[4];
 };
 
-typedef struct SNDSharedWork SNDSharedWork;
+typedef struct {
+    s16 localVar[16];
+    u32 tickCounter;
+} SNDPlayerWork;
+
+typedef struct SNDSharedWork {
+    u32 finishCommandTag;
+    u32 playerStatus;
+    u16 channelStatus;
+    u16 captureStatus;
+    u32 padding[5];
+    SNDPlayerWork player[16];
+    s16 globalVar[16];
+} SNDSharedWork;
 extern SNDSharedWork *SNDi_SharedWork;
+
+int SNDi_SetAlarmHandler(int alarmNo, SNDAlarmHandler handler, void *arg);
+void SNDi_IncAlarmId(int alarmNo);
 
 void SND_CommandInit(void);
 void SND_AlarmInit(void);
@@ -58,8 +76,6 @@ void SND_SetTrackVolume(int playerNo, u32 trackBitMask, int volume);
 void SND_SetTrackPitch(int playerNo, u32 trackBitMask, int pitch);
 void SND_SetTrackPan(int playerNo, u32 trackBitMask, int pan);
 void SND_SetTrackAllocatableChannel(int playerNo, u32 trackBitMask, u32 chBitMask);
-typedef void (*SNDAlarmHandler)(void *arg);
-
 void SND_StartTimer(u32 chBitMask, u32 capBitMask, u32 alarmBitMask, u32 flags);
 void SND_SetupChannelPcm(int chNo, int format, const void *dataAddr, int loop, int loopStart, int loopLen,
                          int volume, int shift, int timer, int pan);

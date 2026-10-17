@@ -46,8 +46,6 @@ static inline void PushCommand(int command, u32 p1, u32 p2, u32 p3, u32 p4) {
 
 void SNDi_SetPlayerParam(int playerNo, u32 offset, u32 data, int size);
 void SNDi_SetTrackParam(int playerNo, u32 trackBitMask, u32 offset, u32 data, int size);
-int SNDi_SetAlarmHandler(int alarmNo, SNDAlarmHandler handler, void *arg);
-void SNDi_IncAlarmId(int alarmNo);
 
 void SND_StopSeq(int playerNo) {
     PushCommand(SND_COMMAND_STOP_SEQ, playerNo, 0, 0, 0);

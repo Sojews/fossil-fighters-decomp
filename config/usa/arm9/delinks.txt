@@ -475,3 +475,17 @@ libs/nitrosdk/src/snd/snd_main.c:
 libs/nitrosdk/src/snd/snd_command.c:
     .text       start:0x020762e4 end:0x0207677c
     .bss        start:0x02151c40 end:0x02153720
+
+libs/nitrosdk/src/snd/snd_alarm.c:
+    complete
+    .text       start:0x0207677c end:0x020767f8
+    .bss        start:0x02153720 end:0x02153780
+
+libs/nitrosdk/src/snd/snd_work.c:
+    complete
+    .text       start:0x020767f8 end:0x02076874
+    .bss        start:0x02153780 end:0x02153784
+
+libs/nitrosdk/src/snd/snd_util.c:
+    complete
+    .text       start:0x02076874 end:0x020768c8

@@ -13079,8 +13079,8 @@ sCommand kind:bss(size=0x24) addr:0x02151c40
 sCommandMesgBuffer kind:bss(size=0x20) addr:0x02151c64
 sSharedWork kind:bss addr:0x02151ca0
 sCommandArray kind:bss(size=0x1800) addr:0x02151f20
-data_02153720 kind:bss addr:0x02153720
-SNDi_SharedWork kind:bss addr:0x02153780
+sAlarm kind:bss addr:0x02153720
+SNDi_SharedWork kind:bss(size=0x4) addr:0x02153780
 data_02153784 kind:bss addr:0x02153784
 data_02153788 kind:bss addr:0x02153788
 data_02153808 kind:bss addr:0x02153808

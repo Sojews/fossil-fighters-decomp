@@ -10,10 +10,6 @@
 #define SND_PXI_FIFO_MESSAGE_BUFSIZE 8
 #define SND_COMMAND_SHARED_WORK 0x1d
 
-struct SNDSharedWork {
-    u8 data[0x280];
-};
-
 static struct {
     SNDCommand *freeList;
     u32 finishCommandTag;
