@@ -1,6 +1,8 @@
 #ifndef GAME_DINO_BATTLE_VIEW_KASEKI_POINT_MENU_H
 #define GAME_DINO_BATTLE_VIEW_KASEKI_POINT_MENU_H
 
+#include <string>
+#include <vector>
 #include "m/menu_item.h"
 #include "m/menu.h"
 #include "m/display.h"
@@ -14,6 +16,12 @@ public:
     virtual ~DinoBattleViewPlayer();
     virtual void Idle();
     virtual void OnMessage(MMessage *msg);
+
+    u32 mUnkA8[6];              // 0xA8
+    std::string mUnkC0;         // 0xC0
+    u32 mUnkCC;                 // 0xCC
+    MMessageSubject mSubject;   // 0xD0
+    std::vector<void *> mUnkF8; // 0xF8
 };
 
 #endif
