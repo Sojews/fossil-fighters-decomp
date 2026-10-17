@@ -45,3 +45,11 @@ void DinoUiContainerDropMenuItem::OnFocusChanged(BOOL focused) {
 const char *DinoUiContainerDropMenuItem::GetText() {
     return gDinoResource->GetText(mTextId);
 }
+
+void DinoUiContainerDropBackButton::OnFocusChanged(BOOL focused) {
+    if (focused) {
+        mMotion->Play(3, 0);
+    } else {
+        mMotion->Play(2, 0);
+    }
+}

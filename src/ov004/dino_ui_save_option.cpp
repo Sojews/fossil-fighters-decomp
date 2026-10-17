@@ -53,3 +53,19 @@ MRect DinoUiSaveOptionMenuItem::GetFrame() {
 const char *DinoUiSaveOptionMenuItem::GetText() {
     return gDinoResource->GetText(mTextId);
 }
+
+void DinoUiSaveOptionMenuItem::OnFocusChanged(BOOL focused) {
+    if (focused) {
+        mMotion->Play(2, 0);
+    } else {
+        mMotion->Play(1, 0);
+    }
+}
+
+void DinoUiSaveOptionBackButton::OnFocusChanged(BOOL focused) {
+    if (focused) {
+        mMotion->Play(3, 0);
+    } else {
+        mMotion->Play(2, 0);
+    }
+}

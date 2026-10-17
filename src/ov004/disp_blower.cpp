@@ -71,6 +71,22 @@ const char *DinoUiOptionMenuItem::GetText() {
     return gDinoResource->GetText(mTextId);
 }
 
+void DinoUiOptionOkButton::OnFocusChanged(BOOL focused) {
+    if (focused) {
+        mMotion->Play(3, 1);
+    } else {
+        mMotion->Play(2, 1);
+    }
+}
+
+void DinoUiOptionBackButton::OnFocusChanged(BOOL focused) {
+    if (focused) {
+        mMotion->Play(3, 1);
+    } else {
+        mMotion->Play(2, 1);
+    }
+}
+
 // Template task instances the game emits in this file. Until the code that makes the tasks is decompiled, they are
 // instantiated explicitly.
 template class MCallTask0<DinoUiOptionMenu, DinoHelpBase>;

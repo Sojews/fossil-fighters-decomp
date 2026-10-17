@@ -74,3 +74,11 @@ MRect DinoUiIslandMapMenuItem::GetFrame() {
 const char *DinoMapBackButton::GetText() {
     return gDinoResource->GetText(mTextId);
 }
+
+void DinoUiIslandMapMenuItem::OnSelectChanged(BOOL selected) {
+    if (selected) {
+        mMotion->Play(2, 0);
+    } else {
+        mMotion->Play(1, 0);
+    }
+}

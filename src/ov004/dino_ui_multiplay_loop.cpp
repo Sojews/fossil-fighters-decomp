@@ -56,6 +56,22 @@ void DinoUiMultiplayLoop::Idle() {
     (this->*mState)();
 }
 
+void DinoUiMultiplayMenuItem::OnFocusChanged(BOOL focused) {
+    if (focused) {
+        mMotion->Play(2, 0);
+    } else {
+        mMotion->Play(1, 0);
+    }
+}
+
+void DinoUiMultiplayMenuBackButton::OnFocusChanged(BOOL focused) {
+    if (focused) {
+        mMotion->Play(3, 0);
+    } else {
+        mMotion->Play(2, 0);
+    }
+}
+
 // Template task instances the game emits in this file. Until the code that makes the tasks is decompiled, they are
 // instantiated explicitly.
 template class MCallTask0<DinoUiMultiplayMenu, DinoHelpBase>;

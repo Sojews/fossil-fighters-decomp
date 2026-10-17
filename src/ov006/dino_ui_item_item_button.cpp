@@ -48,3 +48,19 @@ void DinoUiItemMenuItem::OnFocusChanged(BOOL focused) {
 const char *DinoUiItemMenuItem::GetText() {
     return gDinoResource->GetText(mTextId);
 }
+
+void DinoUiItemOKButton::OnFocusChanged(BOOL focused) {
+    if (focused) {
+        mMotion->Play(3, 0);
+    } else {
+        mMotion->Play(2, 0);
+    }
+}
+
+void DinoUiItemBackButton::OnFocusChanged(BOOL focused) {
+    if (focused) {
+        mMotion->Play(3, 0);
+    } else {
+        mMotion->Play(2, 0);
+    }
+}
