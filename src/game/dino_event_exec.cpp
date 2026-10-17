@@ -10,6 +10,7 @@
 #include "m/text_codec.h"
 #include "m/lcd.h"
 #include "m/bright.h"
+#include "m/call_task.h"
 #include <algorithm>
 
 #define PAD_BUTTON_A 0x0001
@@ -504,6 +505,41 @@ void DinoEventExecTownMapMode::Idle() {
     serial->AddTail(exit);
 }
 
+DinoEventExecPictShow::DinoEventExecPictShow(DinoEvent *event, u32 pict) : MProcess(NULL) {
+    mEvent = event;
+    mPict = pict;
+}
+
+void DinoEventExecPictShow::Idle() {
+    MTask *exit = MTaskExitTransfer::Create(this);
+    MTask *wait = mEvent->GetField()->CreatePictWaitTask();
+    MTask *show = MCreateCallTask(mEvent->GetField(), &DinoField::ShowPict, mPict, MPoint(0, 0), (u32) 30, (long) 0);
+    MTask *wait2 = mEvent->GetField()->CreatePictWaitTask();
+    MSerialTaskSet *serial = &mSerial;
+    serial->AddTail(wait2);
+    serial->AddTail(show);
+    serial->AddTail(wait);
+    serial->AddTail(exit);
+}
+
+DinoEventExecPictHide::DinoEventExecPictHide(DinoEvent *event) : MProcess(NULL) {
+    mEvent = event;
+}
+
+void DinoEventExecPictHide::Idle() {
+    MTask *exit = MTaskExitTransfer::Create(this);
+    MTask *timer = new MTimer(1);
+    MTask *wait = mEvent->GetField()->CreatePictWaitTask();
+    MTask *hide = MCreateCallTask(mEvent->GetField(), &DinoField::HidePict, (u32) 30, (long) 0);
+    MTask *wait2 = mEvent->GetField()->CreatePictWaitTask();
+    MSerialTaskSet *serial = &mSerial;
+    serial->AddTail(wait2);
+    serial->AddTail(hide);
+    serial->AddTail(wait);
+    serial->AddTail(timer);
+    serial->AddTail(exit);
+}
+
 DinoEventExecKeyWait::DinoEventExecKeyWait() : MProcess(NULL) {
     mInput = NULL;
 }
@@ -520,6 +556,31 @@ void DinoEventExecKeyWait::Idle() {
         hub->EnableTouch();
         mInput = hub->GetInput(0);
         mParallel.AddTail(hub);
+    }
+}
+
+DinoEventExecMapBgmPlay::DinoEventExecMapBgmPlay(DinoEvent *event, u32 arg) : MProcess(NULL) {
+    mEvent = event;
+    mArg = arg;
+}
+
+void DinoEventExecMapBgmPlay::Idle() {
+    u32 bgm = gDinoResource->GetMapBgmMatch(mEvent->GetField()->GetMap()->GetInfo()->id);
+    u32 scene = gDinoResource->GetMapSceneMatch(mEvent->GetField()->GetMap()->GetInfo()->id);
+    if (bgm == 0) {
+        Exit();
+        return;
+    }
+    if (!mEvent->GetField()->IsBgmChanging()) {
+        MTask *exit = MTaskExitTransfer::Create(this);
+        MTask *play = MCreateCallTask(mEvent->GetField(), &DinoField::PlayMapBgm, bgm, mArg);
+        MTask *load = DinoSoundCreateLoadSceneTask(scene);
+        MSerialTaskSet *serial = &mSerial;
+        serial->AddTail(load);
+        serial->AddTail(play);
+        serial->AddTail(exit);
+    } else {
+        Exit();
     }
 }
 

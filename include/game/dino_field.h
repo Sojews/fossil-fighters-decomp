@@ -93,6 +93,11 @@ public:
     MTask *CreateMoneyHideTask();
     MTask *CreateDonateShowTask();
     MTask *CreateDonateHideTask();
+    MTask *CreatePictWaitTask();
+    BOOL IsBgmChanging();
+    void ShowPict(u32 pict, MPoint pos, u32 frames, long unk);
+    void HidePict(u32 frames, long unk);
+    void PlayMapBgm(u32 bgm, u32 arg);
 
     u8 unk000[0x244];
     DinoFieldRadar *mRadar;     // 0x244

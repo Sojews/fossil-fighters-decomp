@@ -637,12 +637,21 @@ public:
 
 class DinoEventExecPictShow : public MProcess {
 public:
+    DinoEventExecPictShow(DinoEvent *event, u32 pict);
     virtual ~DinoEventExecPictShow();
+    virtual void Idle();
+
+    DinoEvent *mEvent;  // 0x74
+    u32 mPict;          // 0x78
 };
 
 class DinoEventExecPictHide : public MProcess {
 public:
+    DinoEventExecPictHide(DinoEvent *event);
     virtual ~DinoEventExecPictHide();
+    virtual void Idle();
+
+    DinoEvent *mEvent;  // 0x74
 };
 
 class DinoEventExecCmnMotion : public MTransfer {
@@ -690,7 +699,12 @@ public:
 
 class DinoEventExecMapBgmPlay : public MProcess {
 public:
+    DinoEventExecMapBgmPlay(DinoEvent *event, u32 arg);
     virtual ~DinoEventExecMapBgmPlay();
+    virtual void Idle();
+
+    DinoEvent *mEvent;  // 0x74
+    u32 mArg;           // 0x78
 };
 
 class DinoEventExecBgmStop : public MTransfer {
