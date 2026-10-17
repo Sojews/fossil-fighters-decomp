@@ -1133,4 +1133,23 @@ public:
     virtual void Transfer();
 };
 
+class DinoEventExecBattle : public MProcess {
+public:
+    virtual ~DinoEventExecBattle();
+    virtual void Idle();
+
+    u32 mUnk74[70];                 // 0x74
+    std::vector<void *> mUnk18C;    // 0x18C
+    std::vector<void *> mUnk198;    // 0x198
+};
+
+class DinoEventExecStartPatrol : public MTransfer {
+public:
+    virtual ~DinoEventExecStartPatrol();
+    virtual void Transfer();
+
+    u32 mUnk10[5];                  // 0x10
+    std::vector<void *> mUnk24;     // 0x24
+};
+
 #endif

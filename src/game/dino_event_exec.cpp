@@ -2086,3 +2086,9 @@ void DinoEventExecCleaning::Idle() {
 void DinoEventExecAutoWarp::Idle() {
     (this->*mState)();
 }
+
+DinoEventExecBattle::~DinoEventExecBattle() {
+}
+
+DinoEventExecStartPatrol::~DinoEventExecStartPatrol() {
+}
