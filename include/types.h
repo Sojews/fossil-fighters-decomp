@@ -10,6 +10,10 @@ typedef signed long s32;
 typedef unsigned long long u64;
 typedef signed long long s64;
 
+typedef volatile u32 vu32;
+typedef volatile u16 vu16;
+typedef volatile u8 vu8;
+
 typedef int BOOL;
 #define TRUE 1
 #define FALSE 0
