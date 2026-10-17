@@ -3,6 +3,11 @@
 #include "game/dino_cleaning.h"
 #include "game/dino_cleaning_kaseki_rock.h"
 #include "game/dino_cleaning_rock.h"
+#include "game/dino_cleaning_image.h"
+#include "game/dino_cleaning_image_view.h"
+#include "m/display.h"
+#include "m/blend.h"
+#include "m/bright.h"
 #include "game/dino_cleaning_kaseki_rock_xray_blend_manager.h"
 #include "game/help.h"
 #include "m/bg_new_task.h"
@@ -63,6 +68,40 @@ MFx32 DinoCleaningKasekiRock::GetRatio(int index) {
 
 void DinoCleaningKasekiRock::Idle() {
     (this->*mState)();
+}
+
+void DinoCleaningKasekiRock::Finish() {
+    mUnk94->Exit();
+    mUnk88->Exit();
+    mUnk88 = NULL;
+    mView->DestroyOam();
+    mView->LoadPalettes();
+    GetDisplay()->mBlend->Reset();
+    GetDisplay()->mBright->Reset();
+}
+
+BOOL DinoCleaningKasekiRock::IsViewUnkD9E0Zero() {
+    return mView->IsUnkD9E0Zero();
+}
+
+void DinoCleaningKasekiRock::CountCells() {
+    u32 i;
+    int col;
+
+    mUnk9C = 0;
+    for (i = 0; i < 4; i++) {
+        mUnkA0[i] = 0;
+    }
+    for (col = 0; col < 28; col++) {
+        int row;
+        for (row = 0; row < 36; row++) {
+            if (!mRock8C->GetImage()->GetMask(row, col) &&
+                !mRock8C->GetImage()->GetLayer(1)->mCells410[row][col] && !mRock90->GetCellLayer(row, col)) {
+                mUnk9C++;
+                mUnkA0[mRock8C->GetCellLayer(row, col)]++;
+            }
+        }
+    }
 }
 
 // NONMATCHING: the members' destructors are missing (the member layout isn't known yet).

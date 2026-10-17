@@ -20,7 +20,8 @@ public:
     std::string mName;      // 0x08
     u8 mUnk14;              // 0x14
     u8 *mPixels;            // 0x18
-    u8 unk1C[0x800 - 0x1C];
+    u8 unk1C[0x410 - 0x1C];
+    u8 mCells410[36][28];   // 0x410
     u8 mUnk800;             // 0x800
     u8 mCells[36][28];      // 0x801
     s32 mGrid[36][28];      // 0xBF4
