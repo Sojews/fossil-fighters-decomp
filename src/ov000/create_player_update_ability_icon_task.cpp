@@ -266,7 +266,8 @@ void *DinoBattleModelCreature::GetUnk12C() {
 }
 
 u8 DinoBattleModelCreature::GetDefTable(int index) {
-    return (mDef->mUnk68 + (u8 *)mDef)[index - 2];
+    u8 *table = (u8 *)mDef + mDef->mUnk68;
+    return table[index - 2];
 }
 
 u32 DinoBattleModelCreature::GetUnk108() {
