@@ -19,3 +19,6 @@ src/ov006/dino_ui_container_menu_item.cpp:
 
 src/ov006/dino_ui_rv_status_menu_item.cpp:
     .text       start:0x0217e788 end:0x02181308
+
+src/ov006/dino_ui_medal_menu.cpp:
+    .text       start:0x02181308 end:0x02183dcc

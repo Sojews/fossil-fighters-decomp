@@ -334,8 +334,8 @@ _ZN15DinoUiMedalMenuD1Ev kind:function(thumb,size=0x6c) addr:0x021813d8
 _ZN15DinoUiMedalMenuD0Ev kind:function(thumb,size=0x74) addr:0x02181444
 func_ov006_021814b8 kind:function(thumb,size=0x1b0) addr:0x021814b8
 func_ov006_02181668 kind:function(thumb,size=0x46) addr:0x02181668
-func_ov006_02183d18 kind:function(thumb,size=0x22) addr:0x02183d18
-func_ov006_02183d5c kind:function(thumb,size=0x2a) addr:0x02183d5c
+_ZNSt13__vec_deleterI11MMotionFileSaIS0_EE12erase_at_endEmN10Metrowerks8int2typeILi0EEE kind:function(thumb,size=0x22) addr:0x02183d18
+_ZNSt13__vec_deleterI11MMotionFileSaIS0_EED2Ev kind:function(thumb,size=0x2a) addr:0x02183d5c
 func_ov006_02183d88 kind:function(thumb,size=0x44) addr:0x02183d88
 data_ov006_02183dcd kind:data(any) addr:0x02183dcd
 data_ov006_02183dfd kind:data(any) addr:0x02183dfd
