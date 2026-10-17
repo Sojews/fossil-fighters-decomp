@@ -143,3 +143,38 @@ void DinoUiItemMenu::PageLeft() {
 MRect DinoUiItemItemButton::GetFrame() {
     return MRect(mPos.Offset(-80, -8), mPos.Offset(80, 8));
 }
+
+extern const int data_02089a20; // fade frames
+extern const int data_02089a88;
+
+void DinoUiItemMenu::SelectTab(int tab) {
+    if (tab < 0 || tab > 2) {
+        return;
+    }
+    switch (tab) {
+    case 0: {
+        *mResult = 1;
+        MTask &self = *this;
+        MTask *exit = MTaskExitTransfer::Create(&self);
+        MTask *fade = gLcd->mMain->mBright->CreateFadeOutToBlack(data_02089a20, data_02089a88);
+        MSerialTaskSet *serial = &mSerial;
+        serial->AddTail(fade);
+        serial->AddTail(exit);
+        DinoSoundPlaySe(0x94, 0);
+        break;
+    }
+    case 1: {
+        *mResult = 2;
+        MTask &self = *this;
+        MTask *exit = MTaskExitTransfer::Create(&self);
+        MTask *fade = gLcd->mMain->mBright->CreateFadeOutToBlack(data_02089a20, data_02089a88);
+        MSerialTaskSet *serial = &mSerial;
+        serial->AddTail(fade);
+        serial->AddTail(exit);
+        DinoSoundPlaySe(0x94, 0);
+        break;
+    }
+    case 2:
+        break;
+    }
+}

@@ -27,7 +27,9 @@ public:
     MMenuItem *mUnkB8;          // 0xB8: focused after a page change
     u32 mUnkBC[8];
     MMenuItem *mTabItems[3]; // 0xDC
-    u32 mUnkE8[6];
+    u32 mUnkE8;
+    int *mResult;               // 0xEC
+    u32 mUnkF0[4];
     DinoUiFieldMenuFraction *mFraction; // 0x100: "page n/m"
     u32 mUnk104[6];
     std::vector<void *> mUnk11C; // 0x11C
