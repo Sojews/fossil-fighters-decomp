@@ -71,3 +71,9 @@ void DinoCommonYesNoMenu::OnDecide(MMenuItem *item) {
 void DinoCommonYesNoMenuItem::OnDecide() {
     mMotion->Play(mIsYes ? 3 : 6, 1);
 }
+
+#pragma auto_inline off
+
+void DinoCommonWindowYesNoDialog::SetUnkBC(u8 value) {
+    mUnkBC = value;
+}

@@ -7,6 +7,7 @@
 
 class DinoCommonWindowYesNoDialog : public MProcess {
 public:
+    void SetUnkBC(u8 value);
     DinoCommonWindowYesNoDialog(MDisplay *display, std::string text, BOOL *result);
     virtual ~DinoCommonWindowYesNoDialog();
     virtual void Idle();
@@ -17,7 +18,8 @@ public:
     std::string mUnk8C; // 0x8C
     std::string mUnk98; // 0x98
     std::string mUnkA4; // 0xA4
-    u32 mUnkB0[4];      // 0xB0
+    u32 mUnkB0[3];      // 0xB0
+    u8 mUnkBC;          // 0xBC
 };
 
 #endif

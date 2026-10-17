@@ -44,3 +44,13 @@ DinoCommonWindowMessageBox::DinoCommonWindowMessageBox(MPoint pos, const std::st
     mUnk94 = 0;
     mUnk98 = TRUE;
 }
+
+#pragma auto_inline off
+
+void DinoCommonWindowMessage::SetUnkA8(u32 value) {
+    mUnkA8 = value;
+}
+
+void DinoCommonWindowMessage::SetUnkA4(u8 value) {
+    mUnkA4 = value;
+}

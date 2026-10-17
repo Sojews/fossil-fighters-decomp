@@ -29,3 +29,21 @@ void DinoTalkWindowWaitStartTask::Execute() {
         Exit();
     }
 }
+
+#pragma auto_inline off
+
+void DinoTalkWindow::ClearUnkF4() {
+    mUnkF4 = 0;
+}
+
+void DinoTalkWindow::SetUnkAC(u32 value) {
+    mUnkAC = value;
+}
+
+void DinoTalkWindow::SetUnkB0(u8 value) {
+    mUnkB0 = value;
+}
+
+u8 DinoTalkWindow::GetUnkB0() {
+    return mUnkB0;
+}

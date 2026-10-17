@@ -8,6 +8,8 @@
 
 class DinoCleaningTalkWindow : public MProcess {
 public:
+    void SetUnkD0(u32 value);
+    void SetUnkCC(u32 value);
     DinoCleaningTalkWindow(u32 arg);
     virtual ~DinoCleaningTalkWindow();
     virtual void Idle();
