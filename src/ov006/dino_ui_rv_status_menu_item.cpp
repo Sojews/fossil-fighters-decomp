@@ -33,6 +33,10 @@ MDisplay *DinoUiRvStatusMenuItem::GetDisplay() {
     return MProcess::GetDisplay();
 }
 
+MRect DinoUiRvStatusMenuItem::GetFrame() {
+    return mMotion->GetFrame();
+}
+
 // Template task instances the game emits in this file. Until the code that makes the tasks is decompiled, they are
 // instantiated explicitly.
 template class MCallTask0<DinoUiRvStatusMenu, DinoHelpBase>;

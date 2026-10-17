@@ -36,3 +36,11 @@ MRect DinoUiItemMenuItem::GetRect() {
 MDisplay *DinoUiItemMenuItem::GetDisplay() {
     return MProcess::GetDisplay();
 }
+
+MRect DinoUiItemMenuItem::GetFrame() {
+    return mMotion->GetFrame();
+}
+
+void DinoUiItemMenuItem::OnFocusChanged(BOOL focused) {
+    mMotion->Play(1, 0);
+}

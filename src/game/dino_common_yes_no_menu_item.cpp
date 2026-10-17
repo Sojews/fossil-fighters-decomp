@@ -16,3 +16,7 @@ DinoCommonYesNoMenuItem::~DinoCommonYesNoMenuItem() {
 
 DinoCommonYesNoMenu::~DinoCommonYesNoMenu() {
 }
+
+MRect DinoCommonYesNoMenuItem::GetFrame() {
+    return mMotion->GetFrame();
+}

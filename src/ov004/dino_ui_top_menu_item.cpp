@@ -12,6 +12,7 @@
 #include "game/dino_ui_top_menu.h"
 #include "m/bg_new_task.h"
 #include "m/call_task.h"
+#include "game/dino_ui_save_slot_select_menu_delete_item.h"
 
 DinoUiTopMenu::~DinoUiTopMenu() {
 }
@@ -41,6 +42,10 @@ DinoUiTopMenuPassDarkButton::~DinoUiTopMenuPassDarkButton() {
 }
 
 DinoUiTopMenuOptionButton::~DinoUiTopMenuOptionButton() {
+}
+
+MRect DinoUiSaveSlotSelectMenuDeleteItem::GetFrame() {
+    return mMotion->GetFrame();
 }
 
 // Template task instances the game emits in this file. Until the code that makes the tasks is decompiled, they are

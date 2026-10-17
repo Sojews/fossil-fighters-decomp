@@ -7,6 +7,7 @@
 #include "m/call_task.h"
 #include "game/dino_ui_multiplay_menu_item2.h"
 #include "game/dino_ui_multiplay_menu_item.h"
+#include "game/dino_ui_multiplay_menu_item_menu.h"
 
 DinoUiMultiplayLoop::~DinoUiMultiplayLoop() {
 }
@@ -27,8 +28,23 @@ MDisplay *DinoUiMultiplayMenuItem::GetDisplay() {
     return MProcess::GetDisplay();
 }
 
+MRect DinoUiMultiplayMenuItem2::GetFrame() {
+    return mMotion->GetFrame();
+}
+
+MRect DinoUiMultiplayMenuItem::GetFrame() {
+    return mMotion->GetFrame();
+}
+
+MRect DinoUiMultiplayMenuBackButton::GetFrame() {
+    return mMotion->GetFrame();
+}
+
+MRect DinoUiMultiplayWirelessButton::GetFrame() {
+    return mMotion->GetFrame();
+}
+
 // Template task instances the game emits in this file. Until the code that makes the tasks is decompiled, they are
 // instantiated explicitly.
-class DinoUiMultiplayMenu : public DinoHelpBase {};
 template class MCallTask0<DinoUiMultiplayMenu, DinoHelpBase>;
 template MTask *MCreateCallTask(DinoUiMultiplayMenu *obj, void (DinoHelpBase::*func)());

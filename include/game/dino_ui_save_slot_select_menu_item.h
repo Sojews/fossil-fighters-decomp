@@ -1,6 +1,7 @@
 #ifndef GAME_DINO_UI_SAVE_SLOT_SELECT_MENU_ITEM_H
 #define GAME_DINO_UI_SAVE_SLOT_SELECT_MENU_ITEM_H
 
+#include "m/motion.h"
 #include "m/menu_item.h"
 #include "game/help.h"
 
@@ -13,6 +14,9 @@ public:
     virtual MDisplay *GetDisplay();
     virtual MRect GetRect();
     virtual const char *GetText();
+
+    u8 unk94[0x14];
+    MMotion *mMotion;   // 0xA8
 };
 
 #endif

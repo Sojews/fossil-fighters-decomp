@@ -1,6 +1,7 @@
 #ifndef GAME_DINO_UI_CHILD_SCANNER_START_BATTLE_PARENT_ITEM_H
 #define GAME_DINO_UI_CHILD_SCANNER_START_BATTLE_PARENT_ITEM_H
 
+#include "m/motion.h"
 #include "m/menu_item.h"
 #include "game/help.h"
 
@@ -13,6 +14,8 @@ public:
     virtual MDisplay *GetDisplay();
     virtual MRect GetRect();
     virtual const char *GetText();
+
+    MMotion *mMotion;   // 0x94
 };
 
 #endif

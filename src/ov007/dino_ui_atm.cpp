@@ -38,6 +38,14 @@ MDisplay *DinoUiATMBackButton::GetDisplay() {
     return MProcess::GetDisplay();
 }
 
+MRect DinoUiATMTeamButton::GetFrame() {
+    return mMotion->GetFrame();
+}
+
+MRect DinoUiATMBackButton::GetFrame() {
+    return mMotion->GetFrame();
+}
+
 // Template task instances the game emits in this file. Until the code that makes the tasks is decompiled, they are
 // instantiated explicitly.
 template class MBgCallTask0<DinoBackup>;

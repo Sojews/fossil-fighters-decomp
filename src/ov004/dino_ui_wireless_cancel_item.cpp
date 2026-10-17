@@ -81,6 +81,22 @@ MDisplay *DinoUiChildScannerCancelItem::GetDisplay() {
     return MProcess::GetDisplay();
 }
 
+MRect DinoUiChildScannerStartCannonParentItem::GetFrame() {
+    return mMotion->GetFrame();
+}
+
+MRect DinoUiChildScannerStartBattleParentItem::GetFrame() {
+    return mMotion->GetFrame();
+}
+
+MRect DinoUiChildScannerCancelItem::GetFrame() {
+    return mMotion->GetFrame();
+}
+
+MRect DinoUiWirelessCancelItem::GetFrame() {
+    return mMotion->GetFrame();
+}
+
 // Template task instances the game emits in this file. Until the code that makes the tasks is decompiled, they are
 // instantiated explicitly.
 template class MCallTask0<DinoUiBattleParentScanner, MMessageObserver>;

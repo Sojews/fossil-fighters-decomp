@@ -62,3 +62,11 @@ MRect DinoMapBackButton::GetRect() {
 MDisplay *DinoMapBackButton::GetDisplay() {
     return MProcess::GetDisplay();
 }
+
+MRect DinoMapBackButton::GetFrame() {
+    return mMotion->GetFrame();
+}
+
+MRect DinoUiIslandMapMenuItem::GetFrame() {
+    return mMotion->GetFrame();
+}

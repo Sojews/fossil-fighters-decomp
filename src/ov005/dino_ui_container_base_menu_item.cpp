@@ -35,6 +35,14 @@ MDisplay *DinoUiContainerBaseMenuItem::GetDisplay() {
     return MProcess::GetDisplay();
 }
 
+MRect DinoUiContainerBaseMenuItem::GetFrame() {
+    return mMotion->GetFrame();
+}
+
+void DinoUiContainerBaseMenuItem::OnFocusChanged(BOOL focused) {
+    mMotion->Play(1, 0);
+}
+
 // Template task instances the game emits in this file. Until the code that makes the tasks is decompiled, they are
 // instantiated explicitly.
 class DinoUiCanonPutinMenu {};

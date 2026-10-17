@@ -1,6 +1,7 @@
 #ifndef GAME_DINO_UI_MULTIPLAY_MENU_ITEM_MENU_H
 #define GAME_DINO_UI_MULTIPLAY_MENU_ITEM_MENU_H
 
+#include "m/motion.h"
 #include "m/menu_item.h"
 #include "m/menu.h"
 #include "game/help.h"
@@ -19,6 +20,9 @@ public:
     virtual ~DinoUiMultiplayWirelessButton();
     virtual MRect GetFrame();
     virtual void OnDecide();
+
+    u8 unk94[0x4];
+    MMotion *mMotion;   // 0x98
 };
 
 class DinoUiMultiplayMenuBackButton : public DinoUiMultiplayMenuItem {
@@ -27,6 +31,9 @@ public:
     virtual MRect GetFrame();
     virtual void OnFocusChanged(BOOL focused);
     virtual void OnDecide();
+
+    u8 unk94[0x4];
+    MMotion *mMotion;   // 0x98
 };
 
 class DinoUiMultiplayOrganizationButton : public DinoUiMultiplayMenuItem2 {

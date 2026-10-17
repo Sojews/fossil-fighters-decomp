@@ -46,6 +46,14 @@ MDisplay *DinoUiMaskBuyMenuItem::GetDisplay() {
     return MProcess::GetDisplay();
 }
 
+MRect DinoUiMaskBuyMenuItem::GetFrame() {
+    return mMotion->GetFrame();
+}
+
+void DinoUiMaskBuyMenuItem::OnFocusChanged(BOOL focused) {
+    mMotion->Play(1, 0);
+}
+
 // Template task instances the game emits in this file. Until the code that makes the tasks is decompiled, they are
 // instantiated explicitly.
 template class MCallTask0<DinoUiMaskBuyMenu, DinoUiMaskBuyMenu>;

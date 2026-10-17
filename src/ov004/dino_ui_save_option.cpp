@@ -45,3 +45,7 @@ MRect DinoUiSaveOptionMenuItem::GetRect() {
 MDisplay *DinoUiSaveOptionMenuItem::GetDisplay() {
     return MProcess::GetDisplay();
 }
+
+MRect DinoUiSaveOptionMenuItem::GetFrame() {
+    return mMotion->GetFrame();
+}
