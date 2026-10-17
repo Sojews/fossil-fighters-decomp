@@ -1,6 +1,7 @@
 #ifndef GAME_DINO_UI_RV_STATUS_MENU_ITEM_MENU_H
 #define GAME_DINO_UI_RV_STATUS_MENU_ITEM_MENU_H
 
+#include "game/dino_ui_field_menu_cursor.h"
 #include <string>
 #include <vector>
 #include "m/archive.h"
@@ -23,7 +24,9 @@ public:
 
     u32 mUnkB4[4];
     MMenuItem *mTabItems[4]; // 0xC4
-    u32 mUnkD4[5];
+    MSerialTaskSet *mCursorTasks;   // 0xD4
+    DinoUiFieldMenuCursor *mCursor; // 0xD8
+    u32 mUnkDC[3];
     std::vector<void *> mUnkE8; // 0xE8
     u32 mUnkF4[3];
     int mPage; // 0x100

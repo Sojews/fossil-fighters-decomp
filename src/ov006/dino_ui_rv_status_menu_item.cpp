@@ -119,3 +119,29 @@ template class MCallTask0<DinoUiRvStatusMenu, DinoHelpBase>;
 template MTask *MCreateCallTask(DinoUiRvStatusMenu *obj, void (DinoHelpBase::*func)());
 template class MCallTask1<DinoUiRvStatusMenu, DinoUiRvStatusMenu, u8>;
 template MTask *MCreateCallTask(DinoUiRvStatusMenu *obj, void (DinoUiRvStatusMenu::*func)(u8), u8 a0);
+
+// Where the cursor sits on each tab.
+extern MPoint data_020b5890[4];
+
+void DinoUiRvStatusMenu::OnFocus(MMenuItem *item) {
+    if (item == NULL) {
+        mCursor->Hide();
+        return;
+    }
+    SetSelectedItem(dynamic_cast<DinoHelpItem *>(item));
+    MRect frame = item->GetFrame();
+    mCursor->SetMode(1);
+    for (int i = 0; i < 4; i++) {
+        if (item == mTabItems[i]) {
+            frame.MoveTo(data_020b5890[i]);
+            mCursor->SetMode(2);
+        }
+    }
+    if (mCursor->IsHidden()) {
+        mCursor->SetFrame(frame);
+    } else {
+        mCursorTasks->Clear();
+        mCursorTasks->AddTail(mCursor->CreateMoveTask(mCursor->GetFrame(), frame, 10, -5));
+    }
+    mCursor->Show();
+}

@@ -1,6 +1,7 @@
 #ifndef GAME_DINO_UI_TEAM_SELECT_H
 #define GAME_DINO_UI_TEAM_SELECT_H
 
+#include "game/dino_ui_field_menu_cursor.h"
 #include "m/view.h"
 #include "game/dino_resource.h"
 #include "m/menu_item.h"
@@ -22,7 +23,11 @@ public:
 
     u8 unkB3[0x15];
     MMenuItem *mTeams[3];   // 0xC8
-    u8 unkD4[0x3C];
+    u8 unkD4[0x24];
+    MSerialTaskSet *mCursorTasks;   // 0xF8
+    DinoUiFieldMenuCursor *mCursor; // 0xFC
+    void *mUnk100;          // 0x100
+    u8 unk104[0xC];
     int mSelected;          // 0x110
 };
 

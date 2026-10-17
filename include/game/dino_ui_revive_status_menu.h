@@ -1,6 +1,7 @@
 #ifndef GAME_DINO_UI_REVIVE_STATUS_MENU_H
 #define GAME_DINO_UI_REVIVE_STATUS_MENU_H
 
+#include "game/dino_ui_field_menu_cursor.h"
 #include "game/dino_resource.h"
 #include "m/motion.h"
 #include <string>
@@ -33,7 +34,9 @@ public:
 
     u8 unkB3[0x9];
     MMenuItem *mItems[4];   // 0xBC
-    u8 unkCC[0x58];
+    MSerialTaskSet *mCursorTasks;   // 0xCC
+    DinoUiFieldMenuCursor *mCursor; // 0xD0
+    u8 unkD4[0x50];
     MArchivePtr mArchive;   // 0x124
     MArchiveFile mFile;     // 0x128
 };
