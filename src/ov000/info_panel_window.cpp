@@ -6,9 +6,40 @@
 
 #include "game/info_panel_window.h"
 #include "types.h"
+#include "game/dino_battle_view_creature_info.h"
+#include "m/picture.h"
+#include "m/smart_oam.h"
+#include "m/motion.h"
 
 InfoPanelWindow::~InfoPanelWindow() {
 }
 
 DinoBattleViewPopNumber::~DinoBattleViewPopNumber() {
 }
+
+DinoBattleViewCreatureInfo::~DinoBattleViewCreatureInfo() {
+    delete mPicture;
+}
+
+#pragma auto_inline off
+
+MMotion *DinoBattleViewCreatureInfo::GetMotion(int index) {
+    return mMotions[index];
+}
+
+void DinoBattleViewCreatureInfo::SetPosition(MPoint pos) {
+    mPos.x = pos.x;
+    mPos.y = pos.y;
+    mOam->SetOffset(MPoint(-pos.x, -pos.y));
+}
+
+void DinoBattleViewCreatureInfo::Show() {
+    mWindow->mPicture->Show();
+    mOam->mHidden = FALSE;
+}
+
+void DinoBattleViewCreatureInfo::PlayMotion(int index) {
+    mMotions[index]->Play(2, 1);
+}
+
+#pragma auto_inline on

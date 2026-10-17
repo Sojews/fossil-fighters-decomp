@@ -14,6 +14,7 @@
 #include "game/dino_battle_view_ui_defender_menu.h"
 #include "game/dino_battle_view_ui_select_all.h"
 #include "game/dino_battle_view.h"
+#include "game/dino_battle_view_creature_info.h"
 
 DinoBattleViewUiChangeMenu::~DinoBattleViewUiChangeMenu() {
 }
@@ -23,7 +24,6 @@ DinoBattleViewUiAttackerMenu::~DinoBattleViewUiAttackerMenu() {
 
 // Template task instances the game emits in this file. Until the code that makes the tasks is decompiled, they are
 // instantiated explicitly.
-class DinoBattleViewCreatureInfo {};
 template class MCallTask0<DinoBattleViewCreatureInfo, DinoBattleViewCreatureInfo>;
 template MTask *MCreateCallTask(DinoBattleViewCreatureInfo *obj, void (DinoBattleViewCreatureInfo::*func)());
 

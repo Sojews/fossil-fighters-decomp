@@ -10,10 +10,17 @@
 #include "game/help.h"
 #include "game/dino_field_camera_hook.h"
 
+class MTextPicture;
+class MSmartOam;
+
 class InfoPanelWindow : public MProcess {
 public:
     virtual ~InfoPanelWindow();
     virtual void Idle();
+
+    MTextPicture *mPicture;     // 0x74
+    MSmartOam *mOam;            // 0x78
+    u32 mUnk7C;                 // 0x7C
 };
 
 class DinoBattleViewPopNumber : public MProcess {
