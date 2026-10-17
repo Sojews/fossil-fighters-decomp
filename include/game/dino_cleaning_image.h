@@ -7,6 +7,7 @@
 #include "m/fx32.h"
 
 class DinoCleaning;
+class DinoCleaningImageView;
 
 // A cleaning image: a picture and the layers drawn over it.
 class DinoCleaningImage {
@@ -33,6 +34,7 @@ public:
     u8 mMask[36][28];                               // 0x100C
     u32 mUnk13FC;                                   // 0x13FC
     u32 mUnk1400;                                   // 0x1400
+    DinoCleaningImageView *mView;                   // 0x1404
 };
 
 #endif
