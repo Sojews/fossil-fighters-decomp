@@ -6374,8 +6374,8 @@ _ZN10__cxxabiv121__vmi_class_type_infoD1Ev kind:function(thumb,size=0xc) addr:0x
 _ZN10__cxxabiv121__vmi_class_type_infoD0Ev kind:function(thumb,size=0x12) addr:0x02087e34
 func_02087e48 kind:function(thumb,size=0x194) addr:0x02087e48
 __dynamic_cast kind:function(thumb,size=0x76) addr:0x02087fdc
-func_02088054 kind:function(thumb,size=0x8) addr:0x02088054
-func_0208805c kind:function(thumb,size=0x8) addr:0x0208805c
+_Z9dthandlerv kind:function(thumb,size=0x8) addr:0x02088054
+_Z9duhandlerv kind:function(thumb,size=0x8) addr:0x0208805c
 _ZSt9terminatev kind:function(thumb,size=0x10) addr:0x02088064
 _ZSt10unexpectedv kind:function(thumb,size=0x10) addr:0x02088074
 __register_global_object kind:function(thumb,size=0x18) addr:0x02088084
@@ -6385,8 +6385,8 @@ func_02088204 kind:function(thumb,size=0x8e) addr:0x02088204
 __FindExceptionTable kind:function(thumb,size=0x14) addr:0x02088294
 func_020882a8 kind:function(thumb,size=0x1e) addr:0x020882a8
 func_020882c8 kind:function(thumb,size=0x24) addr:0x020882c8
-__throw kind:function(thumb,size=0x38,unknown) addr:0x020882ec
-__rethrow kind:function(thumb,size=0x38,unknown) addr:0x02088324
+__throw kind:function(thumb,size=0x36,unknown) addr:0x020882ec
+__rethrow kind:function(thumb,size=0x36,unknown) addr:0x02088324
 _ExitProcess kind:function(thumb,size=0x8) addr:0x0208835c
 @ET@0207e18d kind:data(any) addr:0x02088364
 @ET@0207ea65 kind:data(any) addr:0x0208836c

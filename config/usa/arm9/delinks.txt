@@ -402,6 +402,9 @@ libs/runtime/src/cxa_vec.cpp:
 libs/runtime/src/rtti.cpp:
     .text       start:0x02087dbc end:0x02088054
 
+libs/runtime/src/exception_support.cpp:
+    .text       start:0x02088054 end:0x0208835c
+
 
 
 libs/msl/src/wprintf.c:

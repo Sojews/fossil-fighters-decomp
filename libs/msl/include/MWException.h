@@ -23,6 +23,10 @@ typedef struct DestructorChain {
     /* 0x08 */ void *object;
 } DestructorChain;
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 void __end_catch(CatchInfo *catchinfo);
 
 extern DestructorChain *__global_destructor_chain;
@@ -42,6 +46,10 @@ extern void __destroy_global_chain(void);
 extern void __throw(char *throwtype, void *location, void *dtor);
 extern void __rethrow(void);
 extern char __throw_catch_compare(const u8 *throwtype, const u8 *catchtype, s32 *offset_result);
+
+#ifdef __cplusplus
+}
+#endif
 
 #define DTORARG_TYPE short
 #define DTORARG_PARTIAL (0)   //	destroy non-virtual bases

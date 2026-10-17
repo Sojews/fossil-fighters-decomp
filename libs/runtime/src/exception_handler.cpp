@@ -2,69 +2,9 @@
 
 #include "types.h"
 #include <exception>
+#include "exception_internal.h"
 
 extern "C" {
-
-typedef struct ExceptionTableIndex {
-    u32 function;       // start address
-    u32 size_flags;     // size, bit 0 set when the exception record is stored inline
-    u32 record;         // exception record (or its first word, when inline)
-} ExceptionTableIndex;
-
-typedef struct ExceptionInfo {
-    char *function;
-    char *exception_record;
-    u8 *action_pointer;
-    ExceptionTableIndex *table_start;
-    ExceptionTableIndex *table_end;
-    u32 unk14;
-} ExceptionInfo;
-
-typedef struct ThrowRegisters {
-    u32 r[21];
-} ThrowRegisters;
-
-// State of a throw: what is being thrown and the registers of the frame being unwound.
-typedef struct ThrowContext {
-    char *throw_type;           // mangled type name of the thrown object
-    void *location;             // the thrown object
-    void (*dtor)(void *, s16);
-    char *catch_info;
-    char *return_address;
-    u32 unk14;
-    char *frame;
-    ThrowRegisters regs;
-} ThrowContext;
-
-// Kept in the catching frame while a handler runs.
-typedef struct CatchInfo {
-    void *location;
-    char *throw_type;
-    void (*dtor)(void *, s16);
-    void *sublocation;
-    s32 pointer_copy;
-    u8 *stack_top;
-} CatchInfo;
-
-typedef struct ActionIterator {
-    ExceptionInfo info;
-    ThrowContext context;
-} ActionIterator;
-
-typedef struct ExceptionSpecification {
-    u32 count;
-    u32 unk4;
-    u32 unk8;
-    u8 *types;          // unaligned type_info pointers
-} ExceptionSpecification;
-
-extern int __throw_catch_compare(char *throw_type, char *catch_type, void **adjust);
-extern void func_0208714c(ThrowContext *context, ExceptionInfo *info, u8 *target);
-extern void func_020882c8(ThrowContext *context, ExceptionInfo *info, char *address);
-extern int __FindExceptionTable(ExceptionInfo *info, char *return_address);
-extern char *func_020881bc(ThrowContext *context, ActionIterator *iter);
-extern void func_02088204(ThrowContext *context, ActionIterator *iter);
-extern char *func_020882a8(char *record);
 
 // Variable-length numbers: the low bits of the first byte say how many bytes follow.
 char *func_02086d6c(char *p, s32 *value) {
@@ -231,11 +171,11 @@ u8 func_02086f04(ActionIterator *iter) {
         if (ap != NULL && !((type = *ap) & 0x80)) {
             break;
         }
-        func_02086e60(func_020881bc(&iter->context, iter), &iter->info);
+        func_02086e60(func_020881bc(&iter->context, &iter->info), &iter->info);
         if (iter->info.exception_record == NULL) {
             return 0xFF;
         }
-        func_02088204(&iter->context, iter);
+        func_02088204(&iter->context, &iter->info);
         if (iter->info.action_pointer != NULL) {
             goto skip_branches;
         }
@@ -380,7 +320,7 @@ int func_02087818(char *throw_type, ExceptionSpecification *spec) {
             char *type;
         } c;
         c.type = (char *)(p[0] | (p[1] << 8) | (p[2] << 16) | (p[3] << 24));
-        if (__throw_catch_compare(throw_type, c.type, &c.adjust)) {
+        if (__throw_catch_compare((const u8 *)throw_type, (const u8 *)c.type, (s32 *)&c.adjust)) {
             return 1;
         }
     }
@@ -395,9 +335,9 @@ void func_020878e8(ThrowContext *context, ExceptionInfo *info, ExceptionSpecific
     func_0208714c(context, info, action);
     ci = (CatchInfo *)(context->frame + spec->unk8);
     ci->location = context->location;
-    ci->throw_type = context->throw_type;
-    ci->dtor = context->dtor;
-    ci->stack_top = action;
+    ci->typeinfo = context->throw_type;
+    ci->dtor = (void *)context->dtor;
+    ci->stacktop = action;
     func_020882c8(context, info, info->function + spec->unk4);
 }
 
@@ -421,7 +361,7 @@ u8 *func_0208791c(ThrowContext *context, ExceptionInfo *info, s32 *adjust) {
             u8 *p = iter.info.action_pointer;
             cb.type = (char *)(p[1] | (p[2] << 8) | (p[3] << 16) | (p[4] << 24));
             func_02086d6c(func_02086dcc((char *)p + 5, &cb.offset), &cb.catch_offset);
-            if (__throw_catch_compare(context->throw_type, cb.type, (void **)adjust)) {
+            if (__throw_catch_compare((const u8 *)context->throw_type, (const u8 *)cb.type, adjust)) {
                 goto found;
             }
             break;
@@ -465,11 +405,11 @@ void func_02087a2c(ThrowContext *context, s32 catch_offset, s32 adjust) {
     CatchInfo *ci = (CatchInfo *)(context->frame + catch_offset);
 
     ci->location = context->location;
-    ci->throw_type = context->throw_type;
-    ci->dtor = context->dtor;
+    ci->typeinfo = context->throw_type;
+    ci->dtor = (void *)context->dtor;
     if (*(u8 *)context->throw_type == '*') {
-        ci->sublocation = &ci->pointer_copy;
-        ci->pointer_copy = *(s32 *)context->location + adjust;
+        ci->sublocation = &ci->pointercopy;
+        ci->pointercopy = *(s32 *)context->location + adjust;
     } else {
         ci->sublocation = (char *)context->location + adjust;
     }
@@ -489,7 +429,7 @@ void func_02087a64(ThrowContext *context) {
     if (info.exception_record == NULL) {
         std::terminate();
     }
-    func_02088204(context, (ActionIterator *)&info);
+    func_02088204(context, &info);
     if (context->throw_type != NULL) {
         context->catch_info = NULL;
     } else {
@@ -509,7 +449,7 @@ void func_02087a64(ThrowContext *context) {
 // Destroys a caught exception object.
 void __end__catch(CatchInfo *ci) {
     if (ci->location && ci->dtor) {
-        ci->dtor(ci->location, -1);
+        DTORCALL_COMPLETE(ci->dtor, ci->location);
     }
 }
 
