@@ -46,7 +46,7 @@ public:
     virtual void Idle();
     virtual void OnMessage(MMessage *msg);
 
-    u32 mUnkB4[2];
+    void (DinoUiChildScannerBattleConnect::*mState)(); // 0xB4
     void (DinoUiChildScannerBattleConnect::*mOnMessage)(MMessage *msg); // 0xBC
     u32 mUnkC4[6];
     std::string mText;  // 0xDC
@@ -58,7 +58,7 @@ public:
     virtual void Idle();
     virtual void OnMessage(MMessage *msg);
 
-    u32 mUnkB4[2];
+    void (DinoUiChildScannerCannonConnect::*mState)(); // 0xB4
     void (DinoUiChildScannerCannonConnect::*mOnMessage)(MMessage *msg); // 0xBC
     u32 mUnkC4[6];
     std::string mText;  // 0xDC
@@ -79,7 +79,7 @@ public:
     virtual void Idle();
     virtual void OnMessage(MMessage *msg);
 
-    u32 mUnkA8[2];
+    void (DinoUiCannonParentScanner::*mState)(); // 0xA8
     void (DinoUiCannonParentScanner::*mOnMessage)(MMessage *msg); // 0xB0
     u32 mUnkB8[18];
     std::vector<unsigned int> mUnk100; // 0x100: (a distinct element type from other overlays' copies)
