@@ -102,3 +102,23 @@ void DinoUiStatusBackButton::OnDecide() {
 MRect DinoUiPartsTabIconMenuItem::GetFrame() {
     return mFrame;
 }
+
+void DinoUiStatusMenu::OnDecide(MMenuItem *item) {
+    for (int i = 0; i < 3; i++) {
+        if (item == mTabItems[i]) {
+            SelectTab(i);
+            return;
+        }
+    }
+    for (int i = 0; i < 5; i++) {
+        if (item == mMembers[i]) {
+            if (mMode == 1) {
+                DecideMember(i);
+            } else if (mTeam->pickable[i]) {
+                mSelected = i;
+                SelectMember(i);
+            }
+            return;
+        }
+    }
+}
