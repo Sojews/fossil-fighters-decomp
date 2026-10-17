@@ -11,11 +11,14 @@
 #include "game/dino_field_camera_hook.h"
 #include "m/console_filter.h"
 #include "m/archive.h"
+#include "m/picture.h"
 
 class DinoBattleViewTutorialWindow : public MProcess {
 public:
     virtual ~DinoBattleViewTutorialWindow();
     virtual void Idle();
+
+    MPictureFile mPicture;  // 0x74
 };
 
 class KeyWaitTask : public MProcess {

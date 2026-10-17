@@ -1,6 +1,7 @@
 // DinoUiSaveSlotSelect, DinoUiSaveSlotConfirm, DinoUiSaveSlotSelectMenuConfirmDeleteTask.
 // Only the destructors are decompiled so far.
 
+#include "game/dino_ui_ending.h"
 #include "game/dino_resource.h"
 #include "game/dino_sound.h"
 #include "game/dino_ui_save_slot_select.h"
@@ -83,6 +84,9 @@ void DinoUiSaveSlotSelectMenuCancelItem::OnFocusChanged(BOOL focused) {
     } else {
         mMotion->Play(2, 0);
     }
+}
+
+DinoUiEnding::~DinoUiEnding() {
 }
 
 // Template task instances the game emits in this file. Until the code that makes the tasks is decompiled, they are
