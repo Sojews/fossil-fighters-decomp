@@ -6,6 +6,7 @@
 #include "m/canvas.h"
 #include "m/looper.h"
 #include "nitro/mi.h"
+#include "m/oam_canvas.h"
 
 void MCanvasCopyTransfer::Create(MCanvas *dst, MCanvas *src, MRect rect, MPoint pos) {
     gLooper->AddTransferTask(new MCanvasCopyTransfer(dst, src, rect, pos));
@@ -161,3 +162,8 @@ void MConsole::Print(const std::wstring &text) {
     mText += text;
     Run();
 }
+
+// Template instances the game emits in this file.
+template class std::__vec_deleter<MOamCanvas<MOam, MOamUnit>::Piece, std::allocator<MOamCanvas<MOam, MOamUnit>::Piece> >;
+template class std::__vec_deleter<MOamCanvas<MSmartOam, MSmartOamUnit>::Piece,
+                                  std::allocator<MOamCanvas<MSmartOam, MSmartOamUnit>::Piece> >;
