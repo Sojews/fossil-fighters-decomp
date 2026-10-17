@@ -15,17 +15,22 @@ class DinoFieldPoint : public MProcess {
 public:
     virtual ~DinoFieldPoint();
     virtual void Idle();
+    MTask *CreateShowTask();
+    MTask *CreateHideTask();
 
     std::string mText;     // 0x74
+    u32 mUnk80[18];        // 0x80
 };
 
 class DinoFieldMoney : public DinoFieldPoint {
 public:
+    DinoFieldMoney();
     virtual ~DinoFieldMoney();
 };
 
 class DinoFieldDonate : public DinoFieldPoint {
 public:
+    DinoFieldDonate();
     virtual ~DinoFieldDonate();
 };
 

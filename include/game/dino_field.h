@@ -130,8 +130,11 @@ public:
     MArchiveFile mFile3;    // 0xB8
 };
 
-class DinoField {
+class DinoFieldPoint;
+
+class DinoField : public MProcess {
 public:
+    virtual ~DinoField();
     DinoFieldMap *GetMap();
     DinoFieldCamera *GetCamera();
     DinoFieldChara *GetChara(u32 id);
@@ -181,7 +184,7 @@ public:
     void ZoomInPict(MDisplay *display, u32 *id, MTextPicture **pict, u32 newId, MPoint pos, MFx32 scale, u32 a, long b);
     void ZoomOutPict(MDisplay *display, MTextPicture **pict, MFx32 scale, u32 a, long b);
 
-    u8 unk000[0x9C];            // (MProcess, and the bases at 0x74 and 0x8C)
+    u8 unk074[0x28];            // (the bases at 0x74 and 0x8C)
     DinoFieldMap *mMap;         // 0x9C
     DinoFieldChara *mCharas[100]; // 0xA0
     u32 mUnk230;                // 0x230
@@ -202,6 +205,9 @@ public:
     MPoint mUpperPos;           // 0x284
     u32 mUpperPictId;           // 0x28C
     u32 mLowerPictId;           // 0x290
+    u8 unk294[0xFC];
+    DinoFieldPoint *mMoney;     // 0x390: the money panel, while shown
+    DinoFieldPoint *mDonate;    // 0x394
 };
 
 // The event being run.

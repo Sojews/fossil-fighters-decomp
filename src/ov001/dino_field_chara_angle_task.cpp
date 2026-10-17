@@ -1,6 +1,7 @@
 // DinoFieldCharaAngleTask, DinoFieldCharaMoveToRegionTask, DinoFieldCharaMoveToCoordTask, DinoFieldCharaMoveOffsetTask, DinoFieldCharaMoveVectorTask, DinoFieldCharaWaitMoveTask, DinoFieldCharaFocusTask.
 // Only the destructors are decompiled so far.
 
+#include "game/dino_field_point.h"
 #include "game/dino_field.h"
 #include "game/dino_field_spot.h"
 #include "m/lcd.h"
@@ -277,4 +278,40 @@ void DinoField::ZoomInUpperPict(u32 pict, MPoint pos, MFx32 scale, u32 a, long b
 
 void DinoField::ZoomOutUpperPict(MFx32 scale, u32 a, long b) {
     ZoomOutPict(gLcd->GetTopDisplay(), &mUpperPict, scale, a, b);
+}
+
+MTask *DinoField::CreateMoneyShowTask() {
+    if (mMoney) {
+        return new MTimer(0);
+    }
+    mMoney = new DinoFieldMoney();
+    mParallel.AddTail(mMoney);
+    return mMoney->CreateShowTask();
+}
+
+MTask *DinoField::CreateMoneyHideTask() {
+    if (!mMoney) {
+        return new MTimer(0);
+    }
+    MTask *task = mMoney->CreateHideTask();
+    mMoney = NULL;
+    return task;
+}
+
+MTask *DinoField::CreateDonateShowTask() {
+    if (mDonate) {
+        return new MTimer(0);
+    }
+    mDonate = new DinoFieldDonate();
+    mParallel.AddTail(mDonate);
+    return mDonate->CreateShowTask();
+}
+
+MTask *DinoField::CreateDonateHideTask() {
+    if (!mDonate) {
+        return new MTimer(0);
+    }
+    MTask *task = mDonate->CreateHideTask();
+    mDonate = NULL;
+    return task;
 }
