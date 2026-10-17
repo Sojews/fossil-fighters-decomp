@@ -1,6 +1,10 @@
 // DinoUiWirelessCancelItem.
 // Only the destructors are decompiled so far.
 
+// Derived destructors have their bases' destructor bodies inlined; auto-inlining the ones defined above does that.
+#pragma auto_inline on
+
+#include "game/dino_ui_wireless_cancel_item_menu.h"
 #include "game/dino_ui_wireless_cancel_item.h"
 #include "game/dino_ui_child_scanner_cancel_item.h"
 #include "game/dino_ui_child_scanner_start_battle_parent_item.h"
@@ -19,6 +23,12 @@ DinoUiChildScannerStartBattleParentItem::~DinoUiChildScannerStartBattleParentIte
 }
 
 DinoUiChildScannerStartCannonParentItem::~DinoUiChildScannerStartCannonParentItem() {
+}
+
+DinoUiWirelessCancel::~DinoUiWirelessCancel() {
+}
+
+DinoUiChildScannerParentItem::~DinoUiChildScannerParentItem() {
 }
 
 // Template task instances the game emits in this file. Until the code that makes the tasks is decompiled, they are

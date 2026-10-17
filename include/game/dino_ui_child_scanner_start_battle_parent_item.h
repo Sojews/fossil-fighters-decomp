@@ -7,6 +7,12 @@
 class DinoUiChildScannerStartBattleParentItem : public MMenuItem, public DinoHelpItem {
 public:
     virtual ~DinoUiChildScannerStartBattleParentItem();
+    virtual MRect GetFrame();
+    virtual void OnFocusChanged(BOOL focused);
+    virtual void OnDecide();
+    virtual MDisplay *GetDisplay();
+    virtual MRect GetRect();
+    virtual const char *GetText();
 };
 
 #endif

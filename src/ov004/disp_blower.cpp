@@ -1,6 +1,10 @@
 // DispBlower, OptionKeyCheckTask.
 // Only the destructors are decompiled so far.
 
+// Derived destructors have their bases' destructor bodies inlined; auto-inlining the ones defined above does that.
+#pragma auto_inline on
+
+#include "game/disp_blower_menu.h"
 #include "game/disp_blower.h"
 #include "game/option_key_check_task.h"
 #include "game/dino_ui_option_menu_item.h"
@@ -15,6 +19,24 @@ OptionKeyCheckTask::~OptionKeyCheckTask() {
 }
 
 DinoUiOptionMenuItem::~DinoUiOptionMenuItem() {
+}
+
+DinoUiOptionSpeedMenuItem::~DinoUiOptionSpeedMenuItem() {
+}
+
+BGMVolumeButton::~BGMVolumeButton() {
+}
+
+SEVolumeButton::~SEVolumeButton() {
+}
+
+MicTestButton::~MicTestButton() {
+}
+
+DinoUiOptionBackButton::~DinoUiOptionBackButton() {
+}
+
+DinoUiOptionOkButton::~DinoUiOptionOkButton() {
 }
 
 // Template task instances the game emits in this file. Until the code that makes the tasks is decompiled, they are

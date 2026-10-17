@@ -7,6 +7,11 @@
 class DinoUiOptionMenuItem : public MMenuItem, public DinoHelpItem {
 public:
     virtual ~DinoUiOptionMenuItem();
+    virtual MRect GetFrame();
+    virtual void OnFocusChanged(BOOL focused);
+    virtual MRect GetRect();
+    virtual MDisplay *GetDisplay();
+    virtual const char *GetText();
 };
 
 #endif
