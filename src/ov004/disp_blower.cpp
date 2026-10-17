@@ -227,3 +227,27 @@ void SEVolumeButton::OnDecide() {
     mOwner->SetSeVolume(mLevel);
     DinoSoundPlaySe(0x38E, 0);
 }
+
+void DinoUiOptionMenu::OnPreLoop() {
+    if (mDelay) {
+        mDelay--;
+    }
+}
+
+void DinoUiOptionMenu::OnOKDecided() {
+    mUnk13C->Exit();
+    MTask &self = *this;
+    MTask *exit = MTaskExitTransfer::Create(&self);
+    MTask *timer = new MTimer(30);
+    MSerialTaskSet *serial = &mSerial;
+    serial->AddTail(timer);
+    serial->AddTail(exit);
+}
+
+void DinoUiOptionPower::OnSleep() {
+    mMenu->Sleep();
+}
+
+void OptionKeyCheckTask::Execute() {
+    mMenu->CheckKeys();
+}

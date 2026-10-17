@@ -61,12 +61,16 @@ public:
     virtual void OnDecide();
 };
 
+class DinoUiOptionMenu;
+
 class DinoUiOptionPower : public MTask, public MSleepHook {
 public:
     virtual ~DinoUiOptionPower();
     virtual void Execute();
     virtual void OnSleep();
     virtual void OnWake();
+
+    DinoUiOptionMenu *mMenu;    // 0x18
 };
 
 class DinoUiOptionMenu : public DinoHelpBase, public MLooperPreLoopHook, public MMenu {
@@ -81,10 +85,15 @@ public:
     void SetBgmVolume(u8 level);
     MSmartOam *GetOam() { return mOam; }
     void SetSeVolume(u8 level);
+    void Sleep();
+    void CheckKeys();
 
     u8 unkBF[1];     // members start in MMenu's tail padding
     MSmartOam *mOam; // 0xC0
-    u8 unkC4[0xC0];
+    u8 unkC4[0x78];
+    MTask *mUnk13C;  // 0x13C
+    u8 unk140[0x40];
+    int mDelay;      // 0x180: frames left before input is taken
     u8 mSilentFocus; // 0x184
 };
 
