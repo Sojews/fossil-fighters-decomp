@@ -3,7 +3,10 @@
 
 #include "game/dino_resource.h"
 #include "m/menu_item.h"
+#include "m/motion.h"
 #include "game/help.h"
+
+class DinoUiTopMenu;
 
 // The other kind of top menu button.
 class DinoUiTopMenuItem2 : public MMenuItem, public DinoHelpItem {
@@ -15,8 +18,10 @@ public:
     virtual MDisplay *GetDisplay();
     virtual const char *GetText();
 
-    u8 unk94[0xC];
-    u32 mTextId;        // 0xA0
+    DinoUiTopMenu *mOwner;  // 0x94
+    MMotion *mMotion;       // 0x98
+    MMotion *mMotion2;      // 0x9C
+    u32 mTextId;            // 0xA0
 };
 
 class DinoUiTopMenuPassButton : public DinoUiTopMenuItem2 {

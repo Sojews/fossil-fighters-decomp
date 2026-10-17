@@ -13,6 +13,8 @@ public:
     void OnBackDecided();
     void OnSingleDecided();
     void OnMultiDecided();
+    void OnPassDecided();
+    void OnOptionDecided();
 };
 
 #endif

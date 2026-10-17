@@ -80,6 +80,28 @@ void DinoUiTopMenuMultiButton::OnDecide() {
     mOwner->OnMultiDecided();
 }
 
+void DinoUiTopMenuPassButton::OnDecide() {
+    DinoSoundPlaySe(0x390, 0);
+    mMotion->Play(3, 1);
+    mMotion2->Play(3, 1);
+    mOwner->OnPassDecided();
+}
+
+void DinoUiTopMenuPassDarkButton::OnDecide() {
+    DinoSoundPlaySe(0xA4, 0);
+}
+
+void DinoUiTopMenuOptionButton::OnDecide() {
+    DinoSoundPlaySe(0x390, 0);
+    mMotion->Play(3, 1);
+    mMotion2->Play(3, 1);
+    mOwner->OnOptionDecided();
+}
+
+void DinoUiTopMenuMultiDarkButton::OnDecide() {
+    DinoSoundPlaySe(0xA4, 0);
+}
+
 // Template task instances the game emits in this file. Until the code that makes the tasks is decompiled, they are
 // instantiated explicitly.
 template class MBgCallTask0<DinoBackup>;
