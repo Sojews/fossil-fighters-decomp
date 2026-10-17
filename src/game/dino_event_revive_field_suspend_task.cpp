@@ -7,11 +7,15 @@
 #include "game/dino_event_revive_deposit_select.h"
 #include "game/dino_event_revive_cleaning.h"
 #include "game/dino_event_revive_effect.h"
+#include "game/dino_event_revive.h"
 #include "game/dino_event_capture_fade_ui_task.h"
 #include "m/bg_new_task.h"
 #include "m/call_task.h"
 
 DinoEventReviveFieldSuspendTask::~DinoEventReviveFieldSuspendTask() {
+}
+
+DinoEventRevive::~DinoEventRevive() {
 }
 
 DinoEventReviveFieldResumeTask::~DinoEventReviveFieldResumeTask() {
