@@ -19,6 +19,11 @@ public:
     virtual void OnIdle();
     virtual void OnFocus(MMenuItem *item);
     virtual void OnDecide(MMenuItem *item);
+
+    u8 unkB3[0x15];
+    MMenuItem *mTeams[3];   // 0xC8
+    u8 unkD4[0x3C];
+    int mSelected;          // 0x110
 };
 
 class DinoUiTeamSelect : public MProcess {

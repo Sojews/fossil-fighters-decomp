@@ -5,6 +5,7 @@
 #include "m/motion.h"
 #include "m/menu_item.h"
 #include "m/menu.h"
+#include "m/input.h"
 #include "m/display.h"
 #include "m/observer.h"
 #include "m/sleep.h"
@@ -17,6 +18,9 @@ class AnyInputTimerWait : public MProcess {
 public:
     virtual ~AnyInputTimerWait();
     virtual void Idle();
+
+    MInput *mInput; // 0x74
+    int mTimer;     // 0x78
 };
 
 class DinoBattleViewUiRootSelect : public MMenu, public DinoHelpBase {
@@ -34,6 +38,9 @@ public:
     virtual void OnStart();
     virtual void OnFocus(MMenuItem *item);
     virtual void OnDecide(MMenuItem *item);
+
+    u32 unkD0[4];
+    u32 mUnkE0;     // 0xE0
 };
 
 class DinoBattleViewGivingUpDialog : public DinoCommonYesNoMenu {

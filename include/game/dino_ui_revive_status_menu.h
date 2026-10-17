@@ -31,7 +31,9 @@ public:
     virtual void OnDecide(MMenuItem *item);
     void OnBackDecided();
 
-    u8 unkB3[0x71];
+    u8 unkB3[0x9];
+    MMenuItem *mItems[4];   // 0xBC
+    u8 unkCC[0x58];
     MArchivePtr mArchive;   // 0x124
     MArchiveFile mFile;     // 0x128
 };

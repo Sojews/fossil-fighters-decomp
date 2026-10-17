@@ -33,12 +33,33 @@ public:
         virtual ~SetPriorityTask();
         virtual void Execute();
     };
+
+    MMotion *mMotion;   // 0x74
+
+    BOOL IsPlaying() {
+        if (mMotion != NULL && mMotion->IsPlaying()) {
+            return TRUE;
+        }
+        return FALSE;
+    }
+    void ShowMotion() {
+        if (mMotion != NULL) {
+            mMotion->Show();
+        }
+    }
+    void HideMotion() {
+        if (mMotion != NULL) {
+            mMotion->Hide();
+        }
+    }
 };
 
 class ViewStatusEffectIconWaitStop : public MTask {
 public:
     virtual ~ViewStatusEffectIconWaitStop();
     virtual void Execute();
+
+    ViewStatusEffectIcon *mIcon;    // 0x10
 };
 
 class ViewStatusEffectIconLoadMotionTask : public MTask {
@@ -54,6 +75,9 @@ class ViewStatusEffectIconShowTask : public MTask {
 public:
     virtual ~ViewStatusEffectIconShowTask();
     virtual void Execute();
+
+    ViewStatusEffectIcon *mIcon;    // 0x10
+    u8 mShow;                       // 0x14
 };
 
 #endif

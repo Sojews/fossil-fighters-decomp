@@ -15,6 +15,10 @@ public:
     virtual ~DinoBattleView3D();
     virtual void Idle();
     virtual void OnMessage(MMessage *msg);
+
+    u8 unkA8[0x18];
+    void *mUnkC0;                           // 0xC0
+    void (DinoBattleView3D::*mState)();     // 0xC4
 };
 
 #endif

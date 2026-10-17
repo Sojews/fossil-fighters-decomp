@@ -48,3 +48,21 @@ MRect DinoUiOrganizationMenuItem::GetFrame() {
 const char *DinoUiOrganizationMenuItem::GetText() {
     return gDinoResource->GetText(mTextId);
 }
+
+void DinoUiOrganizationOKButton::OnFocusChanged(BOOL focused) {
+    mSerial.Clear();
+    if (focused) {
+        mMotion->Play(3, 0);
+    } else {
+        mMotion->Play(2, 0);
+    }
+}
+
+void DinoUiOrganizationBackButton::OnFocusChanged(BOOL focused) {
+    mSerial.Clear();
+    if (focused) {
+        mMotion->Play(3, 0);
+    } else {
+        mMotion->Play(2, 0);
+    }
+}

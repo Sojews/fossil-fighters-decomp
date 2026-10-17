@@ -54,3 +54,13 @@ void DinoUiReviveStatusBackButton::OnDecide() {
     mOwner->OnBackDecided();
     DinoSoundPlaySe(0x90, 0);
 }
+
+extern "C" void func_ov007_02188e00(DinoUiReviveStatusMenu *menu, u8 index);
+
+void DinoUiReviveStatusMenu::OnDecide(MMenuItem *item) {
+    for (int i = 0; i < 4; i++) {
+        if (item == mItems[i]) {
+            func_ov007_02188e00(this, i);
+        }
+    }
+}

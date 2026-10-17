@@ -96,3 +96,9 @@ void DinoBattleViewCreature::Idle() {
 MPoint DinoBattleViewEffectGameBeginPlayerNamePanel::GetPosition() {
     return MMotion::GetPosition().Offset(12, 0);
 }
+
+void SetCretureIconPriorityTask::Execute() {
+    (*mMotion)->SetPriority(mPriority);
+    (*mMotion)->SetAnchor(mAnchor);
+    Exit();
+}

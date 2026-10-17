@@ -49,6 +49,10 @@ class SetCretureIconPriorityTask : public MTask {
 public:
     virtual ~SetCretureIconPriorityTask();
     virtual void Execute();
+
+    MMotion **mMotion;  // 0x10
+    int mPriority;      // 0x14
+    int mAnchor;        // 0x18
 };
 
 class UpdateLifeBarTask : public MTask {

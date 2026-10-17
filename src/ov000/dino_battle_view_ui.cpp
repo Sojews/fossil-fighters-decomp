@@ -114,3 +114,12 @@ void DinoBattleViewUiRootMenuItem::OnFocusChanged(BOOL focused) {
     }
     func_ov000_02177804(this);
 }
+
+extern "C" void *func_ov000_02177644(DinoBattleViewUiAttackerMenu *menu);
+extern "C" void func_ov000_02172be0(void *arg0, int arg1);
+
+void DinoBattleViewUiAttackerMenu::OnBlur(MMenuItem *item) {
+    if (dynamic_cast<DinoBattleViewUiRootMenuItem *>(item) != NULL) {
+        func_ov000_02172be0(func_ov000_02177644(this), 1);
+    }
+}

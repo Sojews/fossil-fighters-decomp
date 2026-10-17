@@ -41,3 +41,14 @@ void DinoUiTeamSelectTeamButton::OnFocusChanged(BOOL focused) {
         mView->Hide();
     }
 }
+
+extern "C" void func_ov007_0218b81c(DinoUiTeamSelectMenu *menu, int index);
+
+void DinoUiTeamSelectMenu::OnDecide(MMenuItem *item) {
+    for (int i = 0; i < 3; i++) {
+        if (item == mTeams[i]) {
+            mSelected = i + 1;
+            func_ov007_0218b81c(this, i);
+        }
+    }
+}

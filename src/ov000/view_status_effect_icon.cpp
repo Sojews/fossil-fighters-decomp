@@ -30,3 +30,18 @@ ViewStatusEffectIcon::PlayEraseMotionTask::~PlayEraseMotionTask() {
 
 ViewStatusEffectIcon::SetPriorityTask::~SetPriorityTask() {
 }
+
+void ViewStatusEffectIconWaitStop::Execute() {
+    if (!mIcon->IsPlaying()) {
+        Exit();
+    }
+}
+
+void ViewStatusEffectIconShowTask::Execute() {
+    if (mShow) {
+        mIcon->ShowMotion();
+    } else {
+        mIcon->HideMotion();
+    }
+    Exit();
+}

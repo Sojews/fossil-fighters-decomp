@@ -88,3 +88,8 @@ void BlackOutTask::Idle() {
     serial->AddTail(task);
     serial->AddTail(exit);
 }
+
+void DinoBattleView3D::Idle() {
+    MMessageObserver::Dispatch();
+    (this->*mState)();
+}
