@@ -660,6 +660,10 @@ libs/nitrosdk/src/wm/wm_standard.c:
     complete
     .text       start:0x0207bfdc end:0x0207c378
 
+libs/nitrosdk/src/wm/wm_mp.c:
+    complete
+    .text       start:0x0207c378 end:0x0207c57c
+
 libs/nitrosdk/src/os/os_init.c:
     complete
     .text       start:0x02074a64 end:0x02074aa8

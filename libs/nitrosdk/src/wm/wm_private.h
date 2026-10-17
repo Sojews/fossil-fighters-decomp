@@ -205,11 +205,17 @@ typedef struct {
     u16 mp_recvSize;        // 0x03e
     u8 unk040[0x32];
     u16 mp_recvBufSize;     // 0x072
-    u8 unk074[0x12];
+    u8 unk074[0x8];
+    void *mp_sendBuf;       // 0x07c
+    u8 unk080[0x6];
     u16 mp_readyBitmap;     // 0x086
-    u8 unk088[0x34];
+    u8 unk088[0x14];
+    u16 mp_ignoreSizePrecheckMode;  // 0x09c
+    u8 unk09e[0x1e];
     u16 linkLevel;          // 0x0bc
-    u8 unk0be[0x3a];
+    u8 unk0be[0x8];
+    u16 child_mpReady;      // 0x0c6
+    u8 unk0c8[0x30];
     u16 pparam_maxEntry;    // 0x0f8
     u8 unk0fa[0x88];
     u16 child_bitmap;       // 0x182
