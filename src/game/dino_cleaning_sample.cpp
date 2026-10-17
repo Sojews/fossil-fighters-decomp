@@ -142,3 +142,13 @@ void DinoCleaningSampleMenuKasekiRockIdItem::Idle() {
     sprintf(text, gDinoResource->GetText(data_0208a408), *mValue);
     mView->SetText(std::string(text));
 }
+
+void DinoCleaningSampleMenu::OnFocus(MMenuItem *item) {
+    if (mCursor->IsHidden()) {
+        mCursor->Show();
+        mCursor->SetFrame(item->GetFrame());
+    } else {
+        mTasks->Clear();
+        mTasks->AddTail(mCursor->CreateFrameAnime(mCursor->GetFrame(), item->GetFrame(), 5, -2));
+    }
+}

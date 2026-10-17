@@ -25,3 +25,17 @@ MRect DinoUiDebugReviverMenuItem::GetFrame() {
     frame.Offset(mPos);
     return frame.Inflate(6);
 }
+
+void DinoUiDebugReviverMenu::OnFocus(MMenuItem *item) {
+    if (item == NULL) {
+        mCursor->Hide();
+        return;
+    }
+    if (mCursor->IsHidden()) {
+        mCursor->Show();
+        mCursor->SetFrame(item->GetFrame());
+    } else {
+        mTasks->Clear();
+        mTasks->AddTail(mCursor->CreateFrameAnime(mCursor->GetFrame(), item->GetFrame(), 5, -2));
+    }
+}

@@ -22,6 +22,8 @@ public:
 
     u32 mUnkA8[4];      // 0xA8
     MFont *mFont;       // 0xB8
+    MTaskSet *mTasks;   // 0xBC: the cursor's moves
+    MView *mCursor;     // 0xC0
 };
 
 class DinoCleaningSampleMenuKasekiRockIdItem : public MMenuItem {

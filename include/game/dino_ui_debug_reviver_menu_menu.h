@@ -20,6 +20,9 @@ public:
 
     u32 mUnkA8[1];      // 0xA8
     MFont *mFont;       // 0xAC
+    u32 mUnkB0[1];
+    MTaskSet *mTasks;   // 0xB4: the cursor's moves
+    MView *mCursor;     // 0xB8
 };
 
 class DinoUiDebugReviverMenuItem : public MMenuItem {

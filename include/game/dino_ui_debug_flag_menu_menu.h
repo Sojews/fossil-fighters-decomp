@@ -20,6 +20,9 @@ public:
 
     u32 mUnkA8[2];      // 0xA8
     MFont *mFont;       // 0xB0
+    u32 mUnkB4[1];
+    MTaskSet *mTasks;   // 0xB8: the cursor's moves
+    MView *mCursor;     // 0xBC
 };
 
 class DinoUiDebugFlagMenuItem : public MMenuItem {

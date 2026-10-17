@@ -23,3 +23,17 @@ MRect DinoUiDebugFlagMenuItem::GetFrame() {
     frame.Offset(MPoint(-5, -2));
     return frame.Inflate(2);
 }
+
+void DinoUiDebugFlagMenu::OnFocus(MMenuItem *item) {
+    if (item == NULL) {
+        mCursor->Hide();
+        return;
+    }
+    if (mCursor->IsHidden()) {
+        mCursor->Show();
+        mCursor->SetFrame(item->GetFrame());
+    } else {
+        mTasks->Clear();
+        mTasks->AddTail(mCursor->CreateFrameAnime(mCursor->GetFrame(), item->GetFrame(), 5, -2));
+    }
+}
