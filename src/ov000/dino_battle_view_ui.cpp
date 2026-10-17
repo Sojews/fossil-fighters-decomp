@@ -6,6 +6,7 @@
 #include "game/dino_sound.h"
 #include "game/dino_battle_view_ui_change_menu.h"
 #include "types.h"
+#include "game/dino_battle_view_creature.h"
 #include "game/dino_battle_view_ui_attacker_menu.h"
 #include "m/bg_new_task.h"
 #include "m/call_task.h"
@@ -115,11 +116,10 @@ void DinoBattleViewUiRootMenuItem::OnFocusChanged(BOOL focused) {
     func_ov000_02177804(this);
 }
 
-extern "C" void *func_ov000_02177644(DinoBattleViewUiAttackerMenu *menu);
-extern "C" void func_ov000_02172be0(void *arg0, int arg1);
+extern "C" DinoBattleViewCreature *func_ov000_02177644(DinoBattleViewUiAttackerMenu *menu);
 
 void DinoBattleViewUiAttackerMenu::OnBlur(MMenuItem *item) {
     if (dynamic_cast<DinoBattleViewUiRootMenuItem *>(item) != NULL) {
-        func_ov000_02172be0(func_ov000_02177644(this), 1);
+        func_ov000_02177644(this)->ClearFlag144(1);
     }
 }
