@@ -284,6 +284,26 @@ namespace std {
             Value data_;
         };
         // The header: its left link is the root (the root's parent is the header).
+        // Frees a new node unless released (the stack temporaries these make match the game's insert_node_at;
+        // the real MSL shape is a guess).
+        struct __node_e {};
+        struct __node_p {
+            __node_p(node *p) : p_(p) {}
+            node *p_;
+        };
+        struct __node_hold {
+            __node_hold(__node_e, void *a, __node_p p) : alloc_(a), p_(p.p_) {}
+            ~__node_hold() {
+                if (p_ != 0) {
+                    ::operator delete(p_);
+                }
+            }
+            void release() {
+                p_ = 0;
+            }
+            void *alloc_;
+            node *p_;
+        };
         struct end_node {
             node_base *left_;
         };
@@ -410,10 +430,12 @@ namespace std {
             printf("Memory allocation failure");
             abort();
         }
+        __node_hold hold(__node_e(), (void *) &header_, __node_p(n));
         ::new (&n->data_) Value(v);
+        hold.release();
         n->right_ = 0;
         n->left_ = 0;
-        n->parent_ = parent;
+        ::new (&n->parent_) node_base *(parent);
         if (left) {
             parent->left_ = n;
         } else {

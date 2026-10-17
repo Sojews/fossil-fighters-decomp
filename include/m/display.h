@@ -146,4 +146,9 @@ public:
     MDisplay *mDisplay;     // 0x04
 };
 
+// Keeps gCurrentDisplay per thread, starting with the current one.
+void InitThreadDisplays();
+// Makes the thread start out on the current display.
+void AddThreadDisplay(u32 thread);
+
 #endif

@@ -425,3 +425,16 @@ void DinoHelpDriver::Idle() {
         }
     }
 }
+
+typedef std::map<u32, void *> DinoHelpPtrMap;
+typedef std::__red_black_tree<u32, std::pair<const u32, void *>, std::__select_first<std::pair<const u32, void *> >,
+                              std::less<u32>, std::allocator<std::pair<const u32, void *> > >
+    DinoHelpPtrTree;
+template DinoHelpPtrMap::value_type &DinoHelpPtrMap::find_or_insert(const u32 &k);
+template DinoHelpPtrTree::node_base *DinoHelpPtrTree::find_insert_position(const u32 &k, node_base *&last_not_greater,
+                                                                          bool &left, bool &leftmost);
+template DinoHelpPtrTree::iterator DinoHelpPtrTree::find(const u32 &k);
+template DinoHelpPtrTree::node_base *DinoHelpPtrTree::lower_bound(const u32 &k, node_base *x, node_base *y);
+template DinoHelpPtrTree::node_base *DinoHelpPtrTree::insert_node_at(node_base *parent, bool left, bool leftmost,
+                                                                    const value_type &v);
+template void DinoHelpPtrTree::destroy(node_base *n);

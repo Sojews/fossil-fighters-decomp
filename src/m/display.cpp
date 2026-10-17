@@ -1,6 +1,7 @@
 // The two screens (MLcd) and their 2D graphics engines (MDisplay).
 
 #include <algorithm>
+#include <map>
 #include "m/display.h"
 #include "m/lcd.h"
 #include "m/window.h"
@@ -8,15 +9,18 @@
 #include "m/bright.h"
 #include "m/obj.h"
 #include "m/bg.h"
+#include "m/irq.h"
 
 // NONMATCHING: this file's .bss holds more than these (0x28 bytes from 0x0214d1ac), and mwcc lays out
 // same-sized variables in an order that depends on how many there are, so the code that reaches these
 // through the pooled base address uses different offsets for now.
-MDisplay *gCurrentDisplay;      // the display processes draw on by default
+typedef std::map<u32, void *> MThreadDisplayMap;
+// (Declared in this order for the .bss layout.)
 MLcd *gLcd;
-static void *sPrevSwitchThreadCallback;
-static void *sThreadDisplays;
-static u32 sUnk;
+static OSSwitchThreadCallback sPrevSwitchThreadCallback;
+static MThreadDisplayMap *sThreadDisplays;     // the display each thread draws on, while it isn't running
+static u32 data_0214d1ac;
+MDisplay *gCurrentDisplay;      // the display processes draw on by default
 
 
 
@@ -158,6 +162,45 @@ void MDisplay::SetBg0Is3D(BOOL on) {
 
 void MDisplay::SetObjTileBoundary(int boundary) {
     mDispCnt.objTileBoundary = boundary;
+}
+
+// Keeps gCurrentDisplay per thread.
+static void SwitchThreadDisplay(u32 from, u32 to) {
+    if (sPrevSwitchThreadCallback != NULL) {
+        sPrevSwitchThreadCallback((OSThread *) from, (OSThread *) to);
+    }
+    MIrqLock lock;
+    MThreadDisplayMap::iterator it = sThreadDisplays->find(from);
+    if (it != sThreadDisplays->end()) {
+        it->second = gCurrentDisplay;
+    }
+    it = sThreadDisplays->find(to);
+    gCurrentDisplay = it != sThreadDisplays->end() ? (MDisplay *) it->second : NULL;
+}
+
+void InitThreadDisplays() {
+    sThreadDisplays = new MThreadDisplayMap;
+    sPrevSwitchThreadCallback = OS_SetSwitchThreadCallback((OSSwitchThreadCallback) SwitchThreadDisplay);
+    AddThreadDisplay((u32) OS_GetCurrentThread());
+}
+
+void AddThreadDisplay(u32 thread) {
+    MIrqLock lock;
+    (*sThreadDisplays)[thread] = gCurrentDisplay;
+}
+
+MDisplayHook::MDisplayHook(MDisplay *display) {
+    mDisplay = display;
+    display->AddHook(this);
+}
+
+MDisplayHook::~MDisplayHook() {
+    mDisplay->RemoveHook(this);
+}
+
+void InitLcd() {
+    gLcd = new MLcd;
+    InitThreadDisplays();
 }
 
 extern "C" {

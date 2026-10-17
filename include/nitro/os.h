@@ -114,6 +114,7 @@ typedef struct OSThreadInfo {
 } OSThreadInfo;
 
 extern OSThreadInfo OSi_ThreadInfo;
+OSSwitchThreadCallback OS_SetSwitchThreadCallback(OSSwitchThreadCallback callback);
 
 static inline OSThread *OS_GetCurrentThread(void) {
     return OSi_ThreadInfo.current;
