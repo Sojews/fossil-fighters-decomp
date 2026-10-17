@@ -137,3 +137,18 @@ void DinoUiContainerMenu::ClearItems() {
         delete (MMenuItem *)mItems[i];
     }
 }
+
+// NONMATCHING: register allocation only.
+void DinoUiContainerMenu::OnDecide(MMenuItem *item) {
+    for (int i = 0; i < 3; i++) {
+        if (item == mTabItems[i]) {
+            SelectTab(i);
+        }
+    }
+    for (int i = 0; i < (mPage != mLastPage ? 8 : mUnk100.size() - mPage * 8); i++) {
+        if (item == mItems[i]) {
+            Decide();
+            return;
+        }
+    }
+}

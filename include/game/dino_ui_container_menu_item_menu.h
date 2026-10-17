@@ -21,10 +21,14 @@ public:
     BOOL PageRight();
     BOOL PageLeft();
     void OnOKDecided();
+    void SelectTab(int tab);
+    void Decide();
     void ClearItems();
     void RefreshPage2();
 
-    u32 mUnkB4[7];              // 0xB4
+    u32 mUnkB4[3];              // 0xB4
+    MMenuItem *mTabItems[3];    // 0xC0
+    u32 mUnkCC;                 // 0xCC
     std::vector<void *> mItems; // 0xD0: this page's items
     u32 mUnkDC[2];              // 0xDC
     DinoUiFieldMenuFraction *mFraction; // 0xE4: "page n/m"
