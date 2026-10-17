@@ -113,7 +113,7 @@ public:
 class MTextPicture : public MFixedSizeView {
 public:
     MTextPicture(std::string path, BOOL fromEnd, bool loadChr);
-    MTextPicture(MDisplay *display, std::string path, BOOL fromEnd, bool loadChr);
+    MTextPicture(MDisplay *display, std::string path, BOOL fromEnd = TRUE, bool loadChr = false);
     MTextPicture(const MPictureFile &file, BOOL fromEnd, bool loadChr);
     MTextPicture(MDisplay *display, const MPictureFile &file, BOOL fromEnd, bool loadChr);
     virtual ~MTextPicture();

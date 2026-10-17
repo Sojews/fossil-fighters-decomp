@@ -10,6 +10,8 @@
 #include "m/text_codec.h"
 #include "m/lcd.h"
 #include "m/bright.h"
+#include "m/anime.h"
+#include "m/bg_new_task.h"
 #include "m/call_task.h"
 #include <algorithm>
 
@@ -1185,6 +1187,51 @@ void DinoEventExecUpperPictZoomOut::Idle() {
         mSerial.AddTail(mEvent->GetField()->CreatePictWaitTask());
     }
     mSerial.AddTail(MTaskExitTransfer::Create(this));
+}
+
+DinoEventExecFieldName::DinoEventExecFieldName(DinoEvent *event, u32 id) : MProcess(NULL) {
+    mEvent = event;
+    mId = id;
+    mStep = 0;
+}
+
+void DinoEventExecFieldName::Idle() {
+    switch (mStep++) {
+    case 0: {
+        char path[0x100];
+        OS_SPrintf(path, "/image/fname%02d", mId - 1);
+        mSerial.AddTail(MCreateBgNewTask(&mPicture, gLcd->GetBottomDisplay(), std::string(path), 1));
+        break;
+    }
+    case 1:
+        mAnimes = new MParallelTaskSet();
+        mParallel.AddTail(mAnimes);
+        mPicture->SetPosition(0x100, 0);
+        mPicture->Show();
+        mParallel.AddTail(mPicture);
+        mSlide = new MPointAnime(MPoint(0x20, 0), MPoint(-0x20, 0));
+        mSlide->SetDuration(240);
+        mAnimes->AddTail(mSlide);
+        mEase = new MPointAnime(MPoint(0xE0, 0), MPoint(-0xE0, 0));
+        mEase->SetDuration(240);
+        mEase->mEase = -13;
+        mAnimes->AddTail(mEase);
+        break;
+    case 2:
+        mStep--;
+        if (mAnimes->IsEmpty()) {
+            MTask *exit = MTaskExitTransfer::Create(this);
+            MTask *timer = new MTimer(1);
+            MTask *exitPicture = MTaskExitTransfer::Create(mPicture);
+            MSerialTaskSet *serial = &mSerial;
+            serial->AddTail(exitPicture);
+            serial->AddTail(timer);
+            serial->AddTail(exit);
+        } else {
+            mPicture->SetPosition(MPoint(mSlide->mValue.x + mEase->mValue.x, mSlide->mValue.y + mEase->mValue.y));
+        }
+        break;
+    }
 }
 
 DinoEventExecStartBehold::DinoEventExecStartBehold(DinoEvent *event, u32 chara, u32 target) {

@@ -823,9 +823,23 @@ public:
     u32 mStep;          // 0x80
 };
 
+class MTextPicture;
+class MPointAnime;
+
+// Shows a map's name sliding across the bottom screen.
 class DinoEventExecFieldName : public MProcess {
 public:
+    DinoEventExecFieldName(DinoEvent *event, u32 id);
     virtual ~DinoEventExecFieldName();
+    virtual void Idle();
+
+    DinoEvent *mEvent;          // 0x74
+    u32 mId;                    // 0x78: from 1
+    u32 mStep;                  // 0x7C
+    MTextPicture *mPicture;     // 0x80
+    MPointAnime *mSlide;        // 0x84
+    MPointAnime *mEase;         // 0x88
+    MParallelTaskSet *mAnimes;  // 0x8C
 };
 
 class DinoEventExecLowerPictFadeIn : public MProcess {
