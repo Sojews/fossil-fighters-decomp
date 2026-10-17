@@ -29,8 +29,10 @@ public:
     virtual ~DinoMultiPlayScanTelop();
     virtual void Idle();
 
-    u32 mUnk74;         // 0x74
+    MView *mView;       // 0x74
     MFont *mFont;       // 0x78
+    MPoint mFrom;       // 0x7C
+    MPoint mTo;         // 0x84
 };
 
 #endif

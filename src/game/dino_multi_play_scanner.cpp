@@ -13,3 +13,7 @@ DinoMultiPlayScanner::~DinoMultiPlayScanner() {
 DinoMultiPlayScanTelop::~DinoMultiPlayScanTelop() {
     mFont->Release();
 }
+
+void DinoMultiPlayScanTelop::Idle() {
+    mSerial.AddTail(mView->CreateCoordAnime(mFrom, mTo, 200, 0));
+}
