@@ -23,6 +23,7 @@ public:
     virtual BOOL IsHidden();
     virtual u32 GetPlaneMask();
     virtual void Play(int anime, int frame);
+    virtual void SetObjMode(int mode);
 
     u8 mUnk10[0x7C - 0x10];
 };

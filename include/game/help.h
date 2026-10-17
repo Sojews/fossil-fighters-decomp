@@ -8,6 +8,7 @@
 #include <string>
 #include "m/task.h"
 #include "m/geometry.h"
+#include "m/motion.h"
 
 class DinoHelpItem;
 class MDisplay;
@@ -103,6 +104,29 @@ public:
 };
 
 // Keeps track of help bases, items and hooks.
+// The help cursor: four corner motions around a frame.
+class DinoHelpCursor : public MView {
+public:
+    virtual void Execute();
+    virtual void SetPosition(MPoint pos);
+    virtual MPoint GetPosition();
+    virtual void SetSize(MPoint size);
+    virtual MPoint GetSize();
+    virtual void SetPriority(int priority);
+    virtual int GetPriority();
+    virtual void Show();
+    virtual void Hide();
+    virtual BOOL IsHidden();
+    virtual u32 GetPlaneMask();
+
+    void Layout();
+    void SetObjMode(int mode);
+
+    MParallelTaskSet mTasks;    // 0x10
+    MMotion *mCorners[4];       // 0x40: top left, bottom left, top right, bottom right
+    MRect mFrame;               // 0x50
+};
+
 class DinoHelpDriver : public MProcess {
 public:
     DinoHelpDriver(MTask *cursor);

@@ -272,3 +272,71 @@ DinoHelpSign::~DinoHelpSign() {
 
 EnableHelpTask::~EnableHelpTask() {
 }
+
+void DinoHelpCursor::Execute() {
+    if (mTasks.mState == STATE_RUN) {
+        mTasks.Execute();
+    }
+}
+
+void DinoHelpCursor::SetPosition(MPoint pos) {
+    mFrame.MoveTo(pos);
+    Layout();
+}
+
+MPoint DinoHelpCursor::GetPosition() {
+    return MPoint(mFrame.left, mFrame.top);
+}
+
+void DinoHelpCursor::SetSize(MPoint size) {
+    mFrame.right = mFrame.left + size.x;
+    mFrame.bottom = mFrame.top + size.y;
+    Layout();
+}
+
+MPoint DinoHelpCursor::GetSize() {
+    return MPoint(mFrame.GetWidth(), mFrame.GetHeight());
+}
+
+void DinoHelpCursor::Layout() {
+    mCorners[0]->SetPosition(MPoint(mFrame.left, mFrame.top));
+    mCorners[1]->SetPosition(MPoint(mFrame.left, mFrame.bottom));
+    mCorners[2]->SetPosition(MPoint(mFrame.right, mFrame.top));
+    mCorners[3]->SetPosition(MPoint(mFrame.right, mFrame.bottom));
+}
+
+void DinoHelpCursor::SetPriority(int priority) {
+    for (u32 i = 0; i < 4; i++) {
+        mCorners[i]->SetPriority(priority);
+    }
+}
+
+int DinoHelpCursor::GetPriority() {
+    return mCorners[0]->GetPriority();
+}
+
+void DinoHelpCursor::Show() {
+    for (u32 i = 0; i < 4; i++) {
+        mCorners[i]->Show();
+    }
+}
+
+void DinoHelpCursor::Hide() {
+    for (u32 i = 0; i < 4; i++) {
+        mCorners[i]->Hide();
+    }
+}
+
+BOOL DinoHelpCursor::IsHidden() {
+    return mCorners[0]->IsHidden();
+}
+
+u32 DinoHelpCursor::GetPlaneMask() {
+    return 0x10;
+}
+
+void DinoHelpCursor::SetObjMode(int mode) {
+    for (u32 i = 0; i < 4; i++) {
+        mCorners[i]->SetObjMode(mode);
+    }
+}
