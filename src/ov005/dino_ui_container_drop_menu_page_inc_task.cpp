@@ -25,3 +25,11 @@ DinoUiContainerDropPageLButton::~DinoUiContainerDropPageLButton() {
 
 DinoUiContainerDropPageRButton::~DinoUiContainerDropPageRButton() {
 }
+
+MRect DinoUiContainerDropMenuItem::GetRect() {
+    return GetFrame();
+}
+
+MDisplay *DinoUiContainerDropMenuItem::GetDisplay() {
+    return MProcess::GetDisplay();
+}

@@ -35,6 +35,30 @@ DinoUiSaveSlotSelectMenu::~DinoUiSaveSlotSelectMenu() {
 DinoUiSaveSlotConfirmMenu::~DinoUiSaveSlotConfirmMenu() {
 }
 
+MRect DinoUiSaveSlotSelectMenuCancelItem::GetRect() {
+    return GetFrame();
+}
+
+MRect DinoUiSaveSlotSelectMenuDeleteItem::GetRect() {
+    return GetFrame();
+}
+
+MRect DinoUiSaveSlotSelectMenuItem::GetRect() {
+    return GetFrame();
+}
+
+MDisplay *DinoUiSaveSlotSelectMenuCancelItem::GetDisplay() {
+    return MProcess::GetDisplay();
+}
+
+MDisplay *DinoUiSaveSlotSelectMenuDeleteItem::GetDisplay() {
+    return MProcess::GetDisplay();
+}
+
+MDisplay *DinoUiSaveSlotSelectMenuItem::GetDisplay() {
+    return MProcess::GetDisplay();
+}
+
 // Template task instances the game emits in this file. Until the code that makes the tasks is decompiled, they are
 // instantiated explicitly.
 class DinoUiOpening {};

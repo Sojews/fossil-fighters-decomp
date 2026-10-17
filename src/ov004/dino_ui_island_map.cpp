@@ -54,3 +54,11 @@ void DinoUiIslandMapMenu::OnIdle() {
 
 void DinoMapBackButton::OnSelectChanged(BOOL value) {
 }
+
+MRect DinoMapBackButton::GetRect() {
+    return GetFrame();
+}
+
+MDisplay *DinoMapBackButton::GetDisplay() {
+    return MProcess::GetDisplay();
+}

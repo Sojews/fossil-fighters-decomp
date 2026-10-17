@@ -7,8 +7,26 @@
 #include "game/dino_ui_top_menu.h"
 #include "m/bg_new_task.h"
 #include "m/call_task.h"
+#include "game/dino_ui_top_menu_item2.h"
+#include "game/dino_ui_top_menu_item.h"
 
 DinoUiTopMenuLoop::~DinoUiTopMenuLoop() {
+}
+
+MRect DinoUiTopMenuItem2::GetRect() {
+    return GetFrame();
+}
+
+MRect DinoUiTopMenuItem::GetRect() {
+    return GetFrame();
+}
+
+MDisplay *DinoUiTopMenuItem2::GetDisplay() {
+    return MProcess::GetDisplay();
+}
+
+MDisplay *DinoUiTopMenuItem::GetDisplay() {
+    return MProcess::GetDisplay();
 }
 
 // Template task instances the game emits in this file. Until the code that makes the tasks is decompiled, they are

@@ -20,3 +20,11 @@ DinoCleaningStopConfirm::~DinoCleaningStopConfirm() {
 DinoCleaningSleep::~DinoCleaningSleep() {
     mRock->SetUnk128(FALSE);
 }
+
+MRect DinoCleaningStopConfirmMenuItem::GetRect() {
+    return GetFrame();
+}
+
+MDisplay *DinoCleaningStopConfirmMenuItem::GetDisplay() {
+    return MProcess::GetDisplay();
+}

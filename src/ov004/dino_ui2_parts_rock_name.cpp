@@ -16,3 +16,11 @@ DinoUi2PartsKasekiButton::~DinoUi2PartsKasekiButton() {
 
 void DinoUi2PartsRockName::Idle() {
 }
+
+MRect DinoUi2PartsKasekiButton::GetRect() {
+    return GetFrame();
+}
+
+MDisplay *DinoUi2PartsKasekiButton::GetDisplay() {
+    return MProcess::GetDisplay();
+}

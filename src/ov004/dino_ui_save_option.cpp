@@ -37,3 +37,11 @@ DinoUiSaveOptionOptionButton::~DinoUiSaveOptionOptionButton() {
 
 DinoUiSaveOptionBackButton::~DinoUiSaveOptionBackButton() {
 }
+
+MRect DinoUiSaveOptionMenuItem::GetRect() {
+    return GetFrame();
+}
+
+MDisplay *DinoUiSaveOptionMenuItem::GetDisplay() {
+    return MProcess::GetDisplay();
+}

@@ -42,6 +42,22 @@ void DinoUiPartsTabIconMenuItem::OnDecide() {
 void DinoUiPartsTabIconMenuItem::OnFocusChanged(BOOL value) {
 }
 
+MRect DinoUiStatusMenuItem::GetRect() {
+    return GetFrame();
+}
+
+MRect DinoUiPartsTabIconMenuItem::GetRect() {
+    return GetFrame();
+}
+
+MDisplay *DinoUiStatusMenuItem::GetDisplay() {
+    return MProcess::GetDisplay();
+}
+
+MDisplay *DinoUiPartsTabIconMenuItem::GetDisplay() {
+    return MProcess::GetDisplay();
+}
+
 // Template task instances the game emits in this file. Until the code that makes the tasks is decompiled, they are
 // instantiated explicitly.
 template class MCallTask0<DinoUiStatusMenu, DinoUiStatusMenu>;

@@ -28,3 +28,11 @@ DinoUiItemPageLButton::~DinoUiItemPageLButton() {
 
 DinoUiItemPageRButton::~DinoUiItemPageRButton() {
 }
+
+MRect DinoUiItemMenuItem::GetRect() {
+    return GetFrame();
+}
+
+MDisplay *DinoUiItemMenuItem::GetDisplay() {
+    return MProcess::GetDisplay();
+}

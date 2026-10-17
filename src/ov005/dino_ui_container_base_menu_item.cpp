@@ -27,6 +27,14 @@ DinoUiContainerBaseDecideButton::~DinoUiContainerBaseDecideButton() {
 DinoUiContainerBaseMenu::~DinoUiContainerBaseMenu() {
 }
 
+MRect DinoUiContainerBaseMenuItem::GetRect() {
+    return GetFrame();
+}
+
+MDisplay *DinoUiContainerBaseMenuItem::GetDisplay() {
+    return MProcess::GetDisplay();
+}
+
 // Template task instances the game emits in this file. Until the code that makes the tasks is decompiled, they are
 // instantiated explicitly.
 class DinoUiCanonPutinMenu {};

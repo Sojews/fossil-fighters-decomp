@@ -35,6 +35,14 @@ DinoUi2CannonShootMenu::~DinoUi2CannonShootMenu() {
 
 #pragma auto_inline on
 
+MRect DinoUi2ContainerBaseMenuItem::GetRect() {
+    return GetFrame();
+}
+
+MDisplay *DinoUi2ContainerBaseMenuItem::GetDisplay() {
+    return MProcess::GetDisplay();
+}
+
 // Template task instances the game emits in this file. Until the code that makes the tasks is decompiled, they are
 // instantiated explicitly.
 template class MCallTask0<DinoUi2CannonShootMenu, DinoUi2CannonShootMenu>;

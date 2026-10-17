@@ -9,3 +9,11 @@
 
 DinoCommonItem::~DinoCommonItem() {
 }
+
+MRect DinoCommonItem::GetRect() {
+    return GetFrame();
+}
+
+MDisplay *DinoCommonItem::GetDisplay() {
+    return MProcess::GetDisplay();
+}

@@ -38,6 +38,14 @@ DinoUiMaskBuyBuyButton::~DinoUiMaskBuyBuyButton() {
 void DinoUiMaskBuy::Idle() {
 }
 
+MRect DinoUiMaskBuyMenuItem::GetRect() {
+    return GetFrame();
+}
+
+MDisplay *DinoUiMaskBuyMenuItem::GetDisplay() {
+    return MProcess::GetDisplay();
+}
+
 // Template task instances the game emits in this file. Until the code that makes the tasks is decompiled, they are
 // instantiated explicitly.
 template class MCallTask0<DinoUiMaskBuyMenu, DinoUiMaskBuyMenu>;

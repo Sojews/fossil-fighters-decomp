@@ -30,6 +30,14 @@ void DinoUiATMMenu::OnIdle() {
 void DinoUiATMTeamButton::OnDecide() {
 }
 
+MRect DinoUiATMBackButton::GetRect() {
+    return GetFrame();
+}
+
+MDisplay *DinoUiATMBackButton::GetDisplay() {
+    return MProcess::GetDisplay();
+}
+
 // Template task instances the game emits in this file. Until the code that makes the tasks is decompiled, they are
 // instantiated explicitly.
 template class MBgCallTask0<DinoBackup>;
