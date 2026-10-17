@@ -8,8 +8,11 @@
 #include "game/help.h"
 #include "game/dino_ui_cleaning_menu_item.h"
 
+class DinoEvent;
+
 class DinoUiCleaningMenu : public DinoHelpBase, public MMenu {
 public:
+    DinoUiCleaningMenu(DinoEvent *event);
     virtual ~DinoUiCleaningMenu();
     virtual void OnStart();
     virtual void OnIdle();
@@ -25,6 +28,7 @@ public:
     std::vector<u32> mUnkE8;    // 0xE8
     MArchivePtr mArchive;       // 0xF4
     MArchiveFile mFile;         // 0xF8
+    u32 mUnk104[5];             // 0x104
 };
 
 class DinoUiCleaningBackButton : public DinoUiCleaningMenuItem {

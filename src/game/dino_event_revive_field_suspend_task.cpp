@@ -11,6 +11,8 @@
 #include "game/dino_event_capture_fade_ui_task.h"
 #include "m/bg_new_task.h"
 #include "m/call_task.h"
+#include "m/overlay.h"
+#include "game/dino_ui_cleaning_menu_item_menu.h"
 
 DinoEventReviveFieldSuspendTask::~DinoEventReviveFieldSuspendTask() {
 }
@@ -49,6 +51,21 @@ void DinoEventReviveFieldResumeTask::Idle() {
         MSerialTaskSet *serial = &mSerial;
         serial->AddTail(wait);
         serial->AddTail(exit);
+        break;
+    }
+}
+
+M_EXTERN_OVERLAY(ov005);
+
+void DinoEventReviveContainerSelect::Idle() {
+    switch (mStep++) {
+    case 0:
+        MLoadOverlay(0, M_OVERLAY_ID(ov005));
+        mSerial.AddTail(new DinoUiCleaningMenu(mEvent));
+        break;
+    case 1:
+        MUnloadOverlay(0, M_OVERLAY_ID(ov005));
+        Exit();
         break;
     }
 }
