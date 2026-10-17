@@ -3,6 +3,7 @@
 #define M_3D_H
 
 #include "m/screen.h"
+#include "m/looper.h"
 
 class M3d : public MScreen {
 public:
@@ -10,6 +11,15 @@ public:
     virtual ~M3d();
 
     u8 mUnk20[0xE4];
+};
+
+extern OSMutex gM3dMutex;
+
+// Runs the 3D engine's per-frame work at VBlank.
+class M3DVInt : public MLooperVSyncTask {
+public:
+    virtual ~M3DVInt();
+    virtual void OnVSync();
 };
 
 #endif

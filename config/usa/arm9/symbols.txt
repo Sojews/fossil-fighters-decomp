@@ -4237,7 +4237,7 @@ func_020578e0 kind:function(thumb,size=0x40) addr:0x020578e0
 func_02057920 kind:function(thumb,size=0x30) addr:0x02057920
 func_02057950 kind:function(thumb,size=0x1c) addr:0x02057950
 _ZN7M3DVIntD1Ev kind:function(thumb,size=0x54) addr:0x0205796c
-func_020579c0 kind:function(thumb,size=0x2bc) addr:0x020579c0
+_ZN7M3DVInt7OnVSyncEv kind:function(thumb,size=0x2bc) addr:0x020579c0
 _ZN7M3DVIntD0Ev kind:function(thumb,size=0x58) addr:0x02057c7c
 func_02057cd4 kind:function(thumb,size=0x8) addr:0x02057cd4
 func_02057cdc kind:function(thumb,size=0x2) addr:0x02057cdc
@@ -4271,9 +4271,9 @@ func_02058edc kind:function(thumb,size=0x8c) addr:0x02058edc
 func_02058f68 kind:function(thumb,size=0x58) addr:0x02058f68
 func_02058fc0 kind:function(thumb,size=0x34) addr:0x02058fc0
 func_02058ff4 kind:function(thumb,size=0x46) addr:0x02058ff4
-func_0205903c kind:function(thumb,size=0x1c) addr:0x0205903c
-func_02059058 kind:function(thumb,size=0x1c) addr:0x02059058
-func_02059074 kind:function(thumb,size=0x1c) addr:0x02059074
+_ZThn16_N7M3DVIntD0Ev kind:function(thumb,size=0x1c) addr:0x0205903c
+_ZThn16_N7M3DVInt7OnVSyncEv kind:function(thumb,size=0x1c) addr:0x02059058
+_ZThn16_N7M3DVIntD1Ev kind:function(thumb,size=0x1c) addr:0x02059074
 _ZN13MAffineScreenC1EP8MDisplaymmmmi kind:function(thumb,size=0x3c) addr:0x02059090
 _ZN13MAffineScreen6SetRotEt kind:function(thumb,size=0x4) addr:0x020590cc
 _ZN13MAffineScreen8SetScaleE5MFx32S0_ kind:function(thumb,size=0xe) addr:0x020590d0
@@ -12996,7 +12996,7 @@ data_0214d508 kind:bss addr:0x0214d508
 data_0214d530 kind:bss addr:0x0214d530
 data_0214d534 kind:bss addr:0x0214d534
 data_0214d538 kind:bss addr:0x0214d538
-data_0214d53c kind:bss addr:0x0214d53c
+gM3dMutex kind:bss addr:0x0214d53c
 sAffineUpdateCount kind:bss addr:0x0214d554
 data_0214d558 kind:bss addr:0x0214d558
 sMotionDatas kind:bss addr:0x0214d564
