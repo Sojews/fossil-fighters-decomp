@@ -25,3 +25,6 @@ src/ov000/dino_battle_multi_play_message_hub.cpp:
 
 src/ov000/dino_battle_controller.cpp:
     .text       start:0x0215ad0c end:0x0215ae58
+
+src/ov000/dino_battle.cpp:
+    .text       start:0x02159a34 end:0x0215ad0c
