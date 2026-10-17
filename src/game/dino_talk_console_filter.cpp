@@ -11,6 +11,10 @@ DinoTalkConsoleFilter::~DinoTalkConsoleFilter() {
 DinoTalkWindowWaitStartTask::~DinoTalkWindowWaitStartTask() {
 }
 
+void DinoTalkWindow::Idle() {
+    (this->*mState)();
+}
+
 DinoTalkWindow::~DinoTalkWindow() {
 }
 

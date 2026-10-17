@@ -10,8 +10,7 @@ public:
     virtual ~DinoTalkWindow();
     virtual void Idle();
 
-    u32 mUnk74;         // 0x74
-    u32 mUnk78;         // 0x78
+    void (DinoTalkWindow::*mState)(); // 0x74
     std::wstring mText; // 0x7C
 };
 

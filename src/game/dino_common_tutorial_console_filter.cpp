@@ -8,5 +8,9 @@
 DinoCommonTutorialConsoleFilter::~DinoCommonTutorialConsoleFilter() {
 }
 
+void DinoCommonTutorialWindow::Idle() {
+    (this->*mState)();
+}
+
 DinoCommonTutorialWindow::~DinoCommonTutorialWindow() {
 }

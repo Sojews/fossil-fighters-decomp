@@ -17,8 +17,7 @@ public:
 #endif
     virtual void Idle();
 
-    u32 mUnk74;         // 0x74
-    u32 mUnk78;         // 0x78
+    void (DinoCommonTutorialWindow::*mState)(); // 0x74
     std::string mText;  // 0x7C
     u8 unk88[0x14];
 };
