@@ -15,6 +15,8 @@ public:
     virtual ~DinoUiOptionSpeedMenuItem();
     virtual MRect GetFrame();
     virtual void OnDecide();
+
+    u8 mSpeed;      // 0xA0: the message speed this item picks
 };
 
 class BGMVolumeButton : public DinoUiOptionMenuItem {
@@ -85,6 +87,7 @@ public:
     void SetBgmVolume(u8 level);
     MSmartOam *GetOam() { return mOam; }
     void SetSeVolume(u8 level);
+    void SetSpeed(u8 speed);
     void Sleep();
     void CheckKeys();
 

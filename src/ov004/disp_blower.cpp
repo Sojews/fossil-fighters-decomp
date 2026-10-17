@@ -295,3 +295,21 @@ void DinoUiOptionMenu::SetSeVolume(u8 level) {
         AddLink(mBelowSeItem, 4, mSeItems[mSeVolume]);
     }
 }
+
+MRect DinoUiOptionSpeedMenuItem::GetFrame() {
+    return MRect(mMotion->GetPosition().Offset(-25, -8), mMotion->GetPosition().Offset(25, 8));
+}
+
+void DinoUiOptionSpeedMenuItem::OnDecide() {
+    if (mMotion) {
+        mMotion->Play(2, 1);
+        mSerial.Clear();
+        MTask *play = mMotion->CreatePlayTransfer(1, 0);
+        MTask *wait = mMotion->CreateWaitStopTask();
+        MSerialTaskSet *serial = &mSerial;
+        serial->AddTail(wait);
+        serial->AddTail(play);
+    }
+    mOwner->SetSpeed(mSpeed);
+    DinoSoundPlaySe(0x38E, 0);
+}

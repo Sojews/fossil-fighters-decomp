@@ -11,6 +11,8 @@ struct MPoint {
     }
 
     MPoint operator+(MPoint o) const { return MPoint(x + o.x, y + o.y); }
+    // This point moved by (dx, dy).
+    MPoint Offset(int dx, int dy) const { return MPoint(x + dx, y + dy); }
     bool operator==(const MPoint &o) const { return x == o.x && y == o.y; }
 
     void Set(int x_, int y_) {
@@ -61,13 +63,6 @@ struct MRect {
         return r;
     }
     MPoint GetTopLeft() const { return MPoint(left, top); }
-    // The top-left corner moved by (dx, dy). (Sets y first: that's the game's register order.)
-    MPoint GetTopLeft(int dx, int dy) const {
-        MPoint p;
-        p.y = top + dy;
-        p.x = left + dx;
-        return p;
-    }
     int GetWidth() const { return right - left; }
     int GetHeight() const { return bottom - top; }
     MPoint GetSize() const { return MPoint(GetWidth(), GetHeight()); }

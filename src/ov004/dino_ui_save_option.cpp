@@ -102,9 +102,9 @@ void DinoUiSaveOptionSaveButton::OnDecide() {
 }
 
 MRect DinoUiSaveOptionOptionButton::GetFrame() {
-    return MRect(mMotion->GetFrame().GetTopLeft(), mMotion->GetFrame().GetTopLeft(108, 76));
+    return MRect(mMotion->GetFrame().GetTopLeft(), mMotion->GetFrame().GetTopLeft().Offset(108, 76));
 }
 
 MRect DinoUiSaveOptionSaveButton::GetFrame() {
-    return MRect(mMotion->GetFrame().GetTopLeft(), mMotion->GetFrame().GetTopLeft(108, 76));
+    return MRect(mMotion->GetFrame().GetTopLeft(), mMotion->GetFrame().GetTopLeft().Offset(108, 76));
 }
