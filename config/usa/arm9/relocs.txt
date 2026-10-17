@@ -9078,7 +9078,7 @@ from:0x02033f48 kind:load to:0x020bd0c0 add:0x8 module:main
 from:0x02033f4c kind:load to:0x020cc00c module:main
 from:0x02033f54 kind:thumb_call to:0x020530a0 module:main
 from:0x02033f5c kind:thumb_call to:0x02052e38 module:main
-from:0x02033f66 kind:thumb_call to:0x02171b00 module:overlays(6,7)
+from:0x02033f66 kind:thumb_call to:0x02171b00 module:overlay(6)
 from:0x02033f70 kind:thumb_call to:0x020531a4 module:main
 from:0x02033f78 kind:thumb_call to:0x020531a4 module:main
 from:0x02033f86 kind:thumb_call to:0x0205314c module:main
