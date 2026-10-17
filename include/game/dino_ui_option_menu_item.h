@@ -1,6 +1,7 @@
 #ifndef GAME_DINO_UI_OPTION_MENU_ITEM_H
 #define GAME_DINO_UI_OPTION_MENU_ITEM_H
 
+#include "game/dino_resource.h"
 #include "m/motion.h"
 #include "m/menu_item.h"
 #include "game/help.h"
@@ -16,6 +17,7 @@ public:
 
     u8 unk94[0x4];
     MMotion *mMotion;   // 0x98
+    u32 mTextId;        // 0x9C
 };
 
 #endif

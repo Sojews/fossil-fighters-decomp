@@ -43,6 +43,10 @@ void DinoUiContainerBaseMenuItem::OnFocusChanged(BOOL focused) {
     mMotion->Play(1, 0);
 }
 
+const char *DinoUiContainerBaseMenuItem::GetText() {
+    return gDinoResource->GetText(mTextId);
+}
+
 // Template task instances the game emits in this file. Until the code that makes the tasks is decompiled, they are
 // instantiated explicitly.
 class DinoUiCanonPutinMenu {};

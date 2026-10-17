@@ -44,3 +44,7 @@ MRect DinoUiItemMenuItem::GetFrame() {
 void DinoUiItemMenuItem::OnFocusChanged(BOOL focused) {
     mMotion->Play(1, 0);
 }
+
+const char *DinoUiItemMenuItem::GetText() {
+    return gDinoResource->GetText(mTextId);
+}

@@ -17,3 +17,7 @@ MRect DinoCommonItem::GetRect() {
 MDisplay *DinoCommonItem::GetDisplay() {
     return MProcess::GetDisplay();
 }
+
+const char *DinoCommonItem::GetText() {
+    return gDinoResource->GetText(mTextId);
+}

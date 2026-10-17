@@ -44,6 +44,14 @@ MRect DinoUiMultiplayWirelessButton::GetFrame() {
     return mMotion->GetFrame();
 }
 
+const char *DinoUiMultiplayMenuItem2::GetText() {
+    return gDinoResource->GetText(mTextId);
+}
+
+const char *DinoUiMultiplayMenuItem::GetText() {
+    return gDinoResource->GetText(mTextId);
+}
+
 // Template task instances the game emits in this file. Until the code that makes the tasks is decompiled, they are
 // instantiated explicitly.
 template class MCallTask0<DinoUiMultiplayMenu, DinoHelpBase>;

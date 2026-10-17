@@ -1,6 +1,7 @@
 #ifndef GAME_DINO_COMMON_YES_NO_MENU_ITEM_H
 #define GAME_DINO_COMMON_YES_NO_MENU_ITEM_H
 
+#include "game/dino_resource.h"
 #include "m/motion.h"
 #include "game/help.h"
 #include "m/menu_item.h"
@@ -16,6 +17,8 @@ public:
     virtual void OnDecide();
 
     MMotion *mMotion;   // 0x94
+    u8 unk98[0x4];
+    u32 mTextId;        // 0x9C
 };
 
 #endif

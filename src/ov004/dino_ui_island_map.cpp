@@ -70,3 +70,7 @@ MRect DinoMapBackButton::GetFrame() {
 MRect DinoUiIslandMapMenuItem::GetFrame() {
     return mMotion->GetFrame();
 }
+
+const char *DinoMapBackButton::GetText() {
+    return gDinoResource->GetText(mTextId);
+}

@@ -49,3 +49,7 @@ MDisplay *DinoUiSaveOptionMenuItem::GetDisplay() {
 MRect DinoUiSaveOptionMenuItem::GetFrame() {
     return mMotion->GetFrame();
 }
+
+const char *DinoUiSaveOptionMenuItem::GetText() {
+    return gDinoResource->GetText(mTextId);
+}

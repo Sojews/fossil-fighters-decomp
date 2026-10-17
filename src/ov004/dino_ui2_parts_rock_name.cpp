@@ -24,3 +24,7 @@ MRect DinoUi2PartsKasekiButton::GetRect() {
 MDisplay *DinoUi2PartsKasekiButton::GetDisplay() {
     return MProcess::GetDisplay();
 }
+
+const char *DinoUi2PartsKasekiButton::GetText() {
+    return gDinoResource->GetText(mTextId);
+}

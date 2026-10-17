@@ -1,6 +1,7 @@
 #ifndef GAME_DINO_UI_TOP_MENU_ITEM2_H
 #define GAME_DINO_UI_TOP_MENU_ITEM2_H
 
+#include "game/dino_resource.h"
 #include "m/menu_item.h"
 #include "game/help.h"
 
@@ -13,6 +14,9 @@ public:
     virtual MRect GetRect();
     virtual MDisplay *GetDisplay();
     virtual const char *GetText();
+
+    u8 unk94[0xC];
+    u32 mTextId;        // 0xA0
 };
 
 class DinoUiTopMenuPassButton : public DinoUiTopMenuItem2 {

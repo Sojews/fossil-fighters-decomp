@@ -28,3 +28,7 @@ MRect DinoCleaningStopConfirmMenuItem::GetRect() {
 MDisplay *DinoCleaningStopConfirmMenuItem::GetDisplay() {
     return MProcess::GetDisplay();
 }
+
+const char *DinoCleaningStopConfirmMenuItem::GetText() {
+    return gDinoResource->GetText(mTextId);
+}

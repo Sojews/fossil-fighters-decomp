@@ -41,3 +41,7 @@ MRect DinoUiContainerDropMenuItem::GetFrame() {
 void DinoUiContainerDropMenuItem::OnFocusChanged(BOOL focused) {
     mMotion->Play(1, 0);
 }
+
+const char *DinoUiContainerDropMenuItem::GetText() {
+    return gDinoResource->GetText(mTextId);
+}

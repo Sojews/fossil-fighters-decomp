@@ -67,6 +67,10 @@ MRect DinoUiOptionMenuItem::GetFrame() {
     return mMotion->GetFrame();
 }
 
+const char *DinoUiOptionMenuItem::GetText() {
+    return gDinoResource->GetText(mTextId);
+}
+
 // Template task instances the game emits in this file. Until the code that makes the tasks is decompiled, they are
 // instantiated explicitly.
 template class MCallTask0<DinoUiOptionMenu, DinoHelpBase>;

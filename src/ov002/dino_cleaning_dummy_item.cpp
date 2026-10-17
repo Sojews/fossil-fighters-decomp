@@ -23,3 +23,7 @@ DinoCleaningToolMenu::~DinoCleaningToolMenu() {
 
 void DinoCleaningDummyItem::OnDecide() {
 }
+
+const char *DinoCleaningToolMenuItem::GetText() {
+    return gDinoResource->GetText(mTextId);
+}

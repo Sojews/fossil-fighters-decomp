@@ -33,6 +33,14 @@ MRect DinoUiTopMenuBackButton::GetFrame() {
     return mMotion->GetFrame();
 }
 
+const char *DinoUiTopMenuItem2::GetText() {
+    return gDinoResource->GetText(mTextId);
+}
+
+const char *DinoUiTopMenuItem::GetText() {
+    return gDinoResource->GetText(mTextId);
+}
+
 // Template task instances the game emits in this file. Until the code that makes the tasks is decompiled, they are
 // instantiated explicitly.
 template class MBgCallTask0<DinoBackup>;
