@@ -36,6 +36,10 @@ LIB_CC_FLAGS: dict[str, str] = {
     # From the Spirit Tracks decomp, which declares variables mid-block.
     "libs/msl/src/wprintf.c": " -lang c99",
     "libs/msl/src/printf.c": " -lang c99",
+    # NitroSystem and the NitroSDK were built with interprocedural analysis per file, which (among other
+    # things) pools a file's static data behind one base address.
+    "libs/nitrosystem/": " -ipa file",
+    "libs/nitrosdk/": " -ipa file",
 }
 LD_FLAGS = " ".join([
     "-proc arm946e",

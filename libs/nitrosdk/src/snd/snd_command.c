@@ -10,22 +10,19 @@
 #define SND_PXI_FIFO_MESSAGE_BUFSIZE 8
 #define SND_COMMAND_SHARED_WORK 0x1d
 
-static struct {
-    SNDCommand *freeList;
-    u32 finishCommandTag;
-    SNDCommand *reserveList;
-    SNDCommand *reserveListEnd;
-    SNDCommand *freeListEnd;
-    int mesgReadIdx;
-    int mesgWriteIdx;
-    int mesgCount;
-    u32 currentTag;
-} sCommand;
-
-static SNDCommand *sCommandMesgBuffer[SND_PXI_FIFO_MESSAGE_BUFSIZE];
-
-static SNDSharedWork sSharedWork;
+// (With -ipa file a file's statics are laid out in declaration order with the first one moved to the end.)
 static SNDCommand sCommandArray[SND_COMMAND_NUM];
+static SNDCommand *sReserveListEnd;
+static SNDCommand *sFreeListEnd;
+static SNDCommand *sReserveList;
+static SNDCommand *sFreeList;
+static u32 sFinishCommandTag;
+static int sCommandMesgReadIdx;
+static int sCommandMesgWriteIdx;
+static int sCommandMesgCount;
+static u32 sCurrentTag;
+static SNDCommand *sCommandMesgBuffer[SND_PXI_FIFO_MESSAGE_BUFSIZE];
+static SNDSharedWork sSharedWork __attribute__((aligned(32)));
 
 static void InitPXI(void);
 static void RequestCommandProc(void);
@@ -36,19 +33,19 @@ void SND_CommandInit(void) {
     SNDCommand *command;
     int i;
     InitPXI();
-    sCommand.freeList = &sCommandArray[0];
+    sFreeList = &sCommandArray[0];
     for (i = 0; i < SND_COMMAND_NUM - 1; i++) {
         sCommandArray[i].next = &sCommandArray[i + 1];
     }
     sCommandArray[SND_COMMAND_NUM - 1].next = NULL;
-    sCommand.freeListEnd = &sCommandArray[SND_COMMAND_NUM - 1];
-    sCommand.reserveList = NULL;
-    sCommand.reserveListEnd = NULL;
-    sCommand.mesgCount = 0;
-    sCommand.mesgReadIdx = 0;
-    sCommand.mesgWriteIdx = 0;
-    sCommand.currentTag = 1;
-    sCommand.finishCommandTag = 0;
+    sFreeListEnd = &sCommandArray[SND_COMMAND_NUM - 1];
+    sReserveList = NULL;
+    sReserveListEnd = NULL;
+    sCommandMesgCount = 0;
+    sCommandMesgReadIdx = 0;
+    sCommandMesgWriteIdx = 0;
+    sCurrentTag = 1;
+    sFinishCommandTag = 0;
     SNDi_SharedWork = &sSharedWork;
     SNDi_InitSharedWork(SNDi_SharedWork);
     command = SND_AllocCommand(SND_COMMAND_BLOCK);
@@ -66,34 +63,34 @@ const SNDCommand *SND_RecvCommandReply(u32 flags) {
     SNDCommand *commandListEnd;
     if (flags & SND_COMMAND_BLOCK) {
         u32 tag = SNDi_GetFinishedCommandTag();
-        while (sCommand.finishCommandTag == tag) {
+        while (sFinishCommandTag == tag) {
             OS_RestoreInterrupts(enabled);
             OS_SpinWait(100);
             enabled = OS_DisableInterrupts();
             tag = SNDi_GetFinishedCommandTag();
         }
     } else {
-        if (sCommand.finishCommandTag == SNDi_GetFinishedCommandTag()) {
+        if (sFinishCommandTag == SNDi_GetFinishedCommandTag()) {
             OS_RestoreInterrupts(enabled);
             return NULL;
         }
     }
-    commandList = sCommandMesgBuffer[sCommand.mesgReadIdx];
-    if (++sCommand.mesgReadIdx > SND_PXI_FIFO_MESSAGE_BUFSIZE) {
-        sCommand.mesgReadIdx = 0;
+    commandList = sCommandMesgBuffer[sCommandMesgReadIdx];
+    if (++sCommandMesgReadIdx > SND_PXI_FIFO_MESSAGE_BUFSIZE) {
+        sCommandMesgReadIdx = 0;
     }
     commandListEnd = commandList;
     while (commandListEnd->next != NULL) {
         commandListEnd = commandListEnd->next;
     }
-    if (sCommand.freeListEnd != NULL) {
-        sCommand.freeListEnd->next = commandList;
+    if (sFreeListEnd != NULL) {
+        sFreeListEnd->next = commandList;
     } else {
-        sCommand.freeList = commandList;
+        sFreeList = commandList;
     }
-    sCommand.freeListEnd = commandListEnd;
-    sCommand.mesgCount--;
-    sCommand.finishCommandTag++;
+    sFreeListEnd = commandListEnd;
+    sCommandMesgCount--;
+    sFinishCommandTag++;
     OS_RestoreInterrupts(enabled);
     return commandList;
 }
@@ -130,61 +127,61 @@ SNDCommand *SND_AllocCommand(u32 flags) {
 
 void SND_PushCommand(SNDCommand *command) {
     OSIntrMode enabled = OS_DisableInterrupts();
-    if (sCommand.reserveListEnd == NULL) {
-        sCommand.reserveList = command;
+    if (sReserveListEnd == NULL) {
+        sReserveList = command;
     } else {
-        sCommand.reserveListEnd->next = command;
+        sReserveListEnd->next = command;
     }
-    sCommand.reserveListEnd = command;
+    sReserveListEnd = command;
     command->next = NULL;
     OS_RestoreInterrupts(enabled);
 }
 
 BOOL SND_FlushCommand(u32 flags) {
     OSIntrMode enabled = OS_DisableInterrupts();
-    if (sCommand.reserveList == NULL) {
+    if (sReserveList == NULL) {
         OS_RestoreInterrupts(enabled);
         return TRUE;
     }
-    if (sCommand.mesgCount >= SND_PXI_FIFO_MESSAGE_BUFSIZE) {
+    if (sCommandMesgCount >= SND_PXI_FIFO_MESSAGE_BUFSIZE) {
         if (!(flags & SND_COMMAND_BLOCK)) {
             OS_RestoreInterrupts(enabled);
             return FALSE;
         }
         do {
             SND_RecvCommandReply(SND_COMMAND_BLOCK);
-        } while (sCommand.mesgCount >= SND_PXI_FIFO_MESSAGE_BUFSIZE);
-        if (sCommand.reserveList == NULL) {
+        } while (sCommandMesgCount >= SND_PXI_FIFO_MESSAGE_BUFSIZE);
+        if (sReserveList == NULL) {
             OS_RestoreInterrupts(enabled);
             return TRUE;
         }
     }
     DC_FlushRange(sCommandArray, sizeof(sCommandArray));
-    if (PXI_SendWordByFifo(PXI_FIFO_TAG_SOUND, (u32) sCommand.reserveList, FALSE) < 0) {
+    if (PXI_SendWordByFifo(PXI_FIFO_TAG_SOUND, (u32) sReserveList, FALSE) < 0) {
         if (!(flags & SND_COMMAND_BLOCK)) {
             OS_RestoreInterrupts(enabled);
             return FALSE;
         }
-        while (sCommand.mesgCount >= SND_PXI_FIFO_MESSAGE_BUFSIZE ||
-               PXI_SendWordByFifo(PXI_FIFO_TAG_SOUND, (u32) sCommand.reserveList, FALSE) < 0) {
+        while (sCommandMesgCount >= SND_PXI_FIFO_MESSAGE_BUFSIZE ||
+               PXI_SendWordByFifo(PXI_FIFO_TAG_SOUND, (u32) sReserveList, FALSE) < 0) {
             OS_RestoreInterrupts(enabled);
             SND_RecvCommandReply(SND_COMMAND_NOBLOCK);
             enabled = OS_DisableInterrupts();
             DC_FlushRange(sCommandArray, sizeof(sCommandArray));
-            if (sCommand.reserveList == NULL) {
+            if (sReserveList == NULL) {
                 OS_RestoreInterrupts(enabled);
                 return TRUE;
             }
         }
     }
-    sCommandMesgBuffer[sCommand.mesgWriteIdx] = sCommand.reserveList;
-    if (++sCommand.mesgWriteIdx > SND_PXI_FIFO_MESSAGE_BUFSIZE) {
-        sCommand.mesgWriteIdx = 0;
+    sCommandMesgBuffer[sCommandMesgWriteIdx] = sReserveList;
+    if (++sCommandMesgWriteIdx > SND_PXI_FIFO_MESSAGE_BUFSIZE) {
+        sCommandMesgWriteIdx = 0;
     }
-    sCommand.reserveList = NULL;
-    sCommand.reserveListEnd = NULL;
-    sCommand.mesgCount++;
-    sCommand.currentTag++;
+    sReserveList = NULL;
+    sReserveListEnd = NULL;
+    sCommandMesgCount++;
+    sCurrentTag++;
     OS_RestoreInterrupts(enabled);
     if (flags & SND_COMMAND_IMMEDIATE) {
         RequestCommandProc();
@@ -213,10 +210,10 @@ void SND_WaitForCommandProc(u32 tag) {
 u32 SND_GetCurrentCommandTag(void) {
     OSIntrMode enabled = OS_DisableInterrupts();
     u32 tag;
-    if (sCommand.reserveList == NULL) {
-        tag = sCommand.finishCommandTag;
+    if (sReserveList == NULL) {
+        tag = sFinishCommandTag;
     } else {
-        tag = sCommand.currentTag;
+        tag = sCurrentTag;
     }
     OS_RestoreInterrupts(enabled);
     return tag;
@@ -225,14 +222,14 @@ u32 SND_GetCurrentCommandTag(void) {
 BOOL SND_IsFinishedCommandTag(u32 tag) {
     OSIntrMode enabled = OS_DisableInterrupts();
     BOOL result;
-    if (tag > sCommand.finishCommandTag) {
-        if (tag - sCommand.finishCommandTag < 0x80000000) {
+    if (tag > sFinishCommandTag) {
+        if (tag - sFinishCommandTag < 0x80000000) {
             result = FALSE;
         } else {
             result = TRUE;
         }
     } else {
-        if (sCommand.finishCommandTag - tag < 0x80000000) {
+        if (sFinishCommandTag - tag < 0x80000000) {
             result = TRUE;
         } else {
             result = FALSE;
@@ -246,7 +243,7 @@ int SND_CountFreeCommand(void) {
     OSIntrMode enabled = OS_DisableInterrupts();
     SNDCommand *command;
     int count = 0;
-    for (command = sCommand.freeList; command != NULL; command = command->next) {
+    for (command = sFreeList; command != NULL; command = command->next) {
         count++;
     }
     OS_RestoreInterrupts(enabled);
@@ -257,7 +254,7 @@ int SND_CountReservedCommand(void) {
     OSIntrMode enabled = OS_DisableInterrupts();
     SNDCommand *command;
     int count = 0;
-    for (command = sCommand.reserveList; command != NULL; command = command->next) {
+    for (command = sReserveList; command != NULL; command = command->next) {
         count++;
     }
     OS_RestoreInterrupts(enabled);
@@ -293,14 +290,14 @@ static void RequestCommandProc(void) {
 static SNDCommand *AllocCommand(void) {
     OSIntrMode enabled = OS_DisableInterrupts();
     SNDCommand *command;
-    if (sCommand.freeList == NULL) {
+    if (sFreeList == NULL) {
         OS_RestoreInterrupts(enabled);
         return NULL;
     }
-    command = sCommand.freeList;
-    sCommand.freeList = command->next;
-    if (sCommand.freeList == NULL) {
-        sCommand.freeListEnd = NULL;
+    command = sFreeList;
+    sFreeList = command->next;
+    if (sFreeList == NULL) {
+        sFreeListEnd = NULL;
     }
     OS_RestoreInterrupts(enabled);
     return command;
