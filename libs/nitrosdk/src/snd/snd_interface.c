@@ -100,8 +100,11 @@ void SND_StartTimer(u32 chBitMask, u32 capBitMask, u32 alarmBitMask, u32 flags) 
 }
 
 void SND_StopTimer(u32 chBitMask, u32 capBitMask, u32 alarmBitMask, u32 flags) {
-    int i = 0;
-    u32 mask = alarmBitMask;
+    int i;
+    u32 mask;
+
+    mask = alarmBitMask;
+    i = 0;
     while (i < 8 && mask != 0) {
         if (mask & 1) {
             SNDi_IncAlarmId(i);

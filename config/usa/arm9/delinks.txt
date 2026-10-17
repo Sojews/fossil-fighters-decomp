@@ -524,6 +524,7 @@ libs/nitrosdk/src/os/os_irq.c:
     .bss        start:0x02151860 end:0x021518c4
 
 libs/nitrosdk/src/snd/snd_interface.c:
+    complete
     .text       start:0x02075fb4 end:0x0207629c
 
 libs/nitrosdk/src/snd/snd_main.c:
