@@ -6,6 +6,8 @@
 #include "m/menu_item.h"
 #include "game/help.h"
 
+class DinoUiTopMenu;
+
 // A top menu button.
 class DinoUiTopMenuItem : public MMenuItem, public DinoHelpItem {
 public:
@@ -16,7 +18,7 @@ public:
     virtual MDisplay *GetDisplay();
     virtual const char *GetText();
 
-    u32 mUnk94;         // 0x94
+    DinoUiTopMenu *mOwner;  // 0x94
     MMotion *mMotion;   // 0x98
     u32 mTextId;        // 0x9C
 };

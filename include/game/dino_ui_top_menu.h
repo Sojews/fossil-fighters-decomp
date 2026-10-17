@@ -10,6 +10,9 @@ public:
     virtual ~DinoUiTopMenu();
     virtual void OnStart();
     virtual void OnFocus(MMenuItem *item);
+    void OnBackDecided();
+    void OnSingleDecided();
+    void OnMultiDecided();
 };
 
 #endif

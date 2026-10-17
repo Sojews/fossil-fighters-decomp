@@ -9,6 +9,7 @@
 #include "m/call_task.h"
 #include "game/dino_ui_top_menu_item2.h"
 #include "game/dino_ui_top_menu_item.h"
+#include "game/dino_sound.h"
 
 DinoUiTopMenuLoop::~DinoUiTopMenuLoop() {
 }
@@ -59,6 +60,24 @@ void DinoUiTopMenuBackButton::OnFocusChanged(BOOL focused) {
     } else {
         mMotion->Play(2, 0);
     }
+}
+
+void DinoUiTopMenuBackButton::OnDecide() {
+    DinoSoundPlaySe(0x38F, 0);
+    mMotion->Play(4, 1);
+    mOwner->OnBackDecided();
+}
+
+void DinoUiTopMenuSingleButton::OnDecide() {
+    DinoSoundPlaySe(0x390, 0);
+    mMotion->Play(3, 1);
+    mOwner->OnSingleDecided();
+}
+
+void DinoUiTopMenuMultiButton::OnDecide() {
+    DinoSoundPlaySe(0x390, 0);
+    mMotion->Play(3, 1);
+    mOwner->OnMultiDecided();
 }
 
 // Template task instances the game emits in this file. Until the code that makes the tasks is decompiled, they are
