@@ -13,6 +13,26 @@ DinoCleaningKasekiRock::~DinoCleaningKasekiRock() {
 DinoCleaningKasekiRockXrayBlendManager::~DinoCleaningKasekiRockXrayBlendManager() {
 }
 
+u32 DinoCleaningKasekiRock::GetUnkDC() {
+    return mUnkDC;
+}
+
+u32 DinoCleaningKasekiRock::GetUnkE0() {
+    return mUnkE0;
+}
+
+u32 DinoCleaningKasekiRock::GetUnkD4() {
+    return mUnkD4;
+}
+
+u32 DinoCleaningKasekiRock::GetUnkD8() {
+    return mUnkD8;
+}
+
+u32 DinoCleaningKasekiRock::GetUnkE4() {
+    return mUnkE4;
+}
+
 void DinoCleaningKasekiRock::SetUnk128(BOOL value) {
     mUnk128 = value;
 }
