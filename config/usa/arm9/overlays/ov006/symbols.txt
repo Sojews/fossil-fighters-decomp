@@ -684,7 +684,7 @@ _ZThn136_N27DinoUiOrderSelectBackButtonD1Ev kind:function(thumb,size=0x1c) addr:
 _ZThn136_N29DinoUiOrderSelectDecideButtonD0Ev kind:function(thumb,size=0x1c) addr:0x0218ffb4
 _ZThn136_N25DinoUiOrderSelectMenuItem7GetTextEv kind:function(thumb,size=0x1c) addr:0x0218ffd0
 _ZThn136_N25DinoUiOrderSelectMenuItem10GetDisplayEv kind:function(thumb,size=0x1c) addr:0x0218ffec
-func_ov006_02190008 kind:function(thumb,size=0x1c) addr:0x02190008
+_ZThn136_N25DinoUiOrderSelectMenuItem7GetRectEv kind:function(thumb,size=0x1c) addr:0x02190008
 _ZThn136_N29DinoUiOrderSelectDecideButtonD1Ev kind:function(thumb,size=0x1c) addr:0x02190024
 data_ov006_02190040 kind:data(any) addr:0x02190040
 __sinit_ov006_0219004c kind:function(thumb,size=0x20) addr:0x0219004c
