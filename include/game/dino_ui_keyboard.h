@@ -34,6 +34,8 @@ class KeyCheckTask : public MTask {
 public:
     virtual ~KeyCheckTask();
     virtual void Execute();
+
+    void *mOwner;   // 0x10
 };
 
 class KeyboardMenuItem : public MMenuItem {

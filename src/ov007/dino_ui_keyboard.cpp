@@ -204,3 +204,18 @@ void CurChangeTask::Execute() {
     func_ov007_02185d28((void *)mUnk10, mUnk14);
     Exit();
 }
+
+extern "C" void func_ov007_02183558(void *owner);
+extern "C" void func_ov007_02185cb0(void *owner);
+
+void KeyCheckTask::Execute() {
+    func_ov007_02183558(mOwner);
+}
+
+void SenryuKeyCheckTask::Execute() {
+    func_ov007_02185cb0(mOwner);
+}
+
+MRect DinoSenryuBackButton::GetRect() {
+    return mMotion->GetFrame();
+}

@@ -17,6 +17,9 @@ public:
     virtual MRect GetFrame();
     virtual void OnFocusChanged(BOOL focused);
     virtual void OnDecide();
+
+    u32 unk88[4];
+    MMenuItem *mUnk98;  // 0x98
 };
 
 class DinoBattleViewUiAbilityMenu : public MMenu, public DinoHelpBase {

@@ -15,14 +15,14 @@ public:
     virtual ~DinoBattleController() {}
 #endif
     virtual void Idle();
-    virtual void Unk10();
-    virtual void Unk14();
+    virtual BOOL Unk10();
+    virtual BOOL Unk14();
 };
 
 class DinoBattleDummyController : public DinoBattleController {
 public:
     virtual ~DinoBattleDummyController();
-    virtual void Unk10();
+    virtual BOOL Unk10();
     virtual void OnMessage(MMessage *msg);
 };
 

@@ -64,3 +64,8 @@ DinoBattleView3DMove::~DinoBattleView3DMove() {
 
 // Template task instances the game emits in this file. Until the code that makes the tasks is decompiled, they are
 // instantiated explicitly.
+
+void MValChange::Execute() {
+    *mDst = mValue;
+    Exit();
+}

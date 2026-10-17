@@ -19,3 +19,7 @@ void DinoBattleDummyController::OnMessage(MMessage *msg) {
 void DinoBattleController::Idle() {
     Dispatch();
 }
+
+BOOL DinoBattleDummyController::Unk10() {
+    return TRUE;
+}

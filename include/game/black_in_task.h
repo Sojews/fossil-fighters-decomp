@@ -26,6 +26,9 @@ class MValChange : public MTask {
 public:
     virtual ~MValChange();
     virtual void Execute();
+
+    int *mDst;      // 0x10
+    int mValue;     // 0x14
 };
 
 #endif

@@ -13,3 +13,7 @@ DinoBattleViewAbilityMenuBG::~DinoBattleViewAbilityMenuBG() {
 
 void DinoBattleViewUiAbilityMenuItem::OnDecide() {
 }
+
+MRect DinoBattleViewUiAbilityMenuItem::GetFrame() {
+    return mUnk98->GetFrame();
+}

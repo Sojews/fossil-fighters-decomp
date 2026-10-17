@@ -12,3 +12,8 @@ SetVarTask::~SetVarTask() {
 
 DinoBattleLiveConsoleFilter::~DinoBattleLiveConsoleFilter() {
 }
+
+void SetVarTask::Execute() {
+    *mDst = mValue;
+    Exit();
+}

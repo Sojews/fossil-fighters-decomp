@@ -3,6 +3,7 @@
 // Derived destructors have their bases' destructor bodies inlined; auto-inlining the ones defined above does that.
 #pragma auto_inline on
 
+#include "game/dino_sound.h"
 #include "game/dino_battle_view_ui_change_menu.h"
 #include "types.h"
 #include "game/dino_battle_view_ui_attacker_menu.h"
@@ -65,3 +66,22 @@ void DinoBattleViewUiRootMenuItem::OnDecide() {
 
 // Template task instances the game emits in this file. Until the code that makes the tasks is decompiled, they are
 // instantiated explicitly.
+
+MRect DinoBattleViewCancelMenuItem::GetFrame() {
+    return MRect(0, 0, 256, 192);
+}
+
+void DinoBattleViewUiDefenderMenu::OnFocus(MMenuItem *item) {
+    DinoBattleViewUiSelectAreaCommon::OnFocus(item);
+    DinoSoundPlaySe(0x5F, 0);
+}
+
+void DinoBattleViewUiSelectAreaCommon::OnDecide(MMenuItem *item) {
+    Exit();
+}
+
+extern "C" void func_ov000_02177804(DinoBattleViewUiRootMenuItem *item, BOOL selected);
+
+void DinoBattleViewUiRootMenuItem::OnSelectChanged(BOOL selected) {
+    func_ov000_02177804(this, selected);
+}

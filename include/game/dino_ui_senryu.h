@@ -73,6 +73,8 @@ class SenryuKeyCheckTask : public MTask {
 public:
     virtual ~SenryuKeyCheckTask();
     virtual void Execute();
+
+    void *mOwner;   // 0x10
 };
 
 class CurChangeTask : public MTask {

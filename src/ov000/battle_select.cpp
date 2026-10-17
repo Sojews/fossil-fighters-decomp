@@ -32,3 +32,7 @@ void UseCreatureSelect::Idle() {
 void PlayerLevelSelect::Idle() {
     (this->*mState)();
 }
+
+void IncValTask::Execute() {
+    (*mValue)++;
+}

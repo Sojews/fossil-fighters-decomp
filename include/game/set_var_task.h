@@ -15,6 +15,9 @@ class SetVarTask : public MTask {
 public:
     virtual ~SetVarTask();
     virtual void Execute();
+
+    int *mDst;      // 0x10
+    int mValue;     // 0x14
 };
 
 class DinoBattleLiveConsoleFilter : public MConsoleFilter {

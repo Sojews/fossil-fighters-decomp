@@ -108,3 +108,7 @@ void DinoUiMedalPageLButton::OnDecide() {
     serial->AddTail(play);
     DinoSoundPlaySe(0x93, 0);
 }
+
+void DinoUiMedalMenu::OnIdle() {
+    mUnk204 = TRUE;
+}

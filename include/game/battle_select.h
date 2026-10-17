@@ -36,6 +36,8 @@ class IncValTask : public MTask {
 public:
     virtual ~IncValTask();
     virtual void Execute();
+
+    int *mValue;    // 0x10
 };
 
 class TimeCountTask : public MProcess {
