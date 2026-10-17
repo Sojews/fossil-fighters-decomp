@@ -4,6 +4,8 @@
 // Derived destructors have their bases' destructor bodies inlined; auto-inlining the ones defined above does that.
 #pragma auto_inline on
 
+#include "game/dino_resource.h"
+#include "game/dino_common_window_message_box.h"
 #include "game/dino_ui_container_menu_item_menu.h"
 #include "game/dino_ui_container_menu_item.h"
 #include "m/bg_new_task.h"
@@ -186,4 +188,23 @@ void DinoUiContainerMenu::SelectTab(int tab) {
         break;
     }
     }
+}
+
+extern const int data_02089a34;
+extern const u32 data_0208aa3c; // "the team was changed" text
+extern const int data_02089a30;
+extern const int data_02089a2c;
+
+void DinoUiContainerMenu::OnBackDecided() {
+    *mResult = 9;
+    mSerial.AddTail(new MTimer(data_02089a34));
+    if (DinoTeamDiffers(mOldTeam, mTeam)) {
+        mSerial.AddTail(new DinoCommonWindowMessageBox(MPoint(128, 96), gDinoResource->GetText(data_0208aa3c), 4));
+    }
+    MTask &self = *this;
+    MTask *exit = MTaskExitTransfer::Create(&self);
+    MTask *fade = gLcd->mMain->mBright->CreateFadeOutToBlack(data_02089a30, data_02089a2c);
+    MSerialTaskSet *serial = &mSerial;
+    serial->AddTail(fade);
+    serial->AddTail(exit);
 }

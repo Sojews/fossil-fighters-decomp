@@ -1,6 +1,7 @@
 #ifndef GAME_DINO_UI_CONTAINER_MENU_ITEM_MENU_H
 #define GAME_DINO_UI_CONTAINER_MENU_ITEM_MENU_H
 
+#include "game/dino_team.h"
 #include "game/dino_ui_field_menu_fraction.h"
 #include <string>
 #include <vector>
@@ -33,7 +34,9 @@ public:
     u32 mUnkDC[2];              // 0xDC
     DinoUiFieldMenuFraction *mFraction; // 0xE4: "page n/m"
     int *mResult;               // 0xE8
-    u32 mUnkEC[3];              // 0xEC
+    DinoTeam *mOldTeam;         // 0xEC: the team when the menu opened
+    DinoTeam *mTeam;            // 0xF0
+    u32 mUnkF4;                 // 0xF4
     MView *mCursor;             // 0xF8
     u32 mUnkFC;
     std::vector<s32> mUnk100;   // 0x100
