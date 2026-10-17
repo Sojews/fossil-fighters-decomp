@@ -339,7 +339,7 @@ src/game/dino_blower.cpp:
     .text       start:0x020311b0 end:0x02031760
 
 src/m/backup.cpp:
-    .text       start:0x0206c77c end:0x0206d2f4
+    .text       start:0x0206c77c end:0x0206d988
 
 libs/msl/src/string.c:
     complete

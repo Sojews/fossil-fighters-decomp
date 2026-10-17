@@ -2,6 +2,7 @@
 #ifndef M_BACKUP_H
 #define M_BACKUP_H
 
+#include <vector>
 #include "types.h"
 
 extern "C" {
@@ -16,6 +17,10 @@ BOOL CARDi_RequestStreamCommand(u32 src, u32 dst, u32 len, void *callback, void 
                                 int retries, int mode);
 s32 OS_GetLockID(void);
 void OS_ReleaseLockID(u16 lockId);
+
+typedef u32 MATHCRC32Table[256];
+void MATHi_CRC32InitTableRev(MATHCRC32Table *table, u32 poly);
+void MATHi_CRC32UpdateRev(const MATHCRC32Table *table, u32 *context, const void *input, u32 length);
 }
 
 // Locks the backup chip for the rest of the scope.
@@ -83,6 +88,25 @@ public:
 // Files kept in backup memory, each with several copies checked by CRC; the newest good copy is read.
 class MBackupStorage {
 public:
+    // Where one copy of a file is.
+    struct Copy {
+        u32 serial;         // 0x00: 0: never written
+        u32 crc;            // 0x04: of the serial and the data
+        u32 headerRegion;   // 0x08: holds serial and crc
+        u32 dataRegion;     // 0x0C
+    };
+    struct File {
+        u32 size;                   // 0x00
+        u32 current;                // 0x04: the copy written last
+        u32 serial;                 // 0x08: of that copy; 0: the file has never been written
+        std::vector<Copy> copies;   // 0x0C
+        u8 damaged;                 // 0x18: a copy failed its CRC when mounting
+    };
+    struct Region {
+        u32 size;   // 0x00
+        u32 offset; // 0x04
+    };
+
     MBackupStorage(MBackupDevice *device);
     ~MBackupStorage();
     void AddFile(u32 size, u32 copies);
@@ -97,8 +121,21 @@ public:
     BOOL WriteFile(u32 file, const void *buf);
     void Format();
 
-    MBackupDevice *mDevice; // 0x00
-    u8 unk04[0x42C - 4];
+    // Rounds up to whole pages.
+    u32 PageRound(u32 size) {
+        return mDevice->GetPageSize() * ((size + mDevice->GetPageSize() - 1) / mDevice->GetPageSize());
+    }
+
+    MBackupDevice *mDevice;         // 0x00
+    u8 mMountTried;                 // 0x04
+    u8 mMounted;                    // 0x05
+    u8 mFormatted;                  // 0x06
+    u32 mHeaderSize;                // 0x08
+    u8 *mHeader;                    // 0x0C: a magic number and each file's size, kept in region 0
+    u32 *mHeaderWords;              // 0x10
+    std::vector<File> mFiles;       // 0x14
+    std::vector<Region> mRegions;   // 0x20
+    MATHCRC32Table mCrcTable;       // 0x2C
 };
 
 #endif

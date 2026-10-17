@@ -1,5 +1,6 @@
 // Save memory devices.
 
+#include <string.h>
 #include "m/backup.h"
 
 enum {
@@ -104,4 +105,192 @@ BOOL MBackupFlashDevice::Unk24(u32 offset, const void *buf, u32 size) {
 }
 
 MBackupFlash2MBitsDevice::MBackupFlash2MBitsDevice() : MBackupFlashDevice(0x1202) {
+}
+
+MBackupStorage::MBackupStorage(MBackupDevice *device) : mDevice(device) {
+    mMountTried = FALSE;
+    mMounted = FALSE;
+    mFormatted = FALSE;
+}
+
+MBackupStorage::~MBackupStorage() {
+    delete mDevice;
+}
+
+void MBackupStorage::AddFile(u32 size, u32 copies) {
+    File file;
+    file.size = size;
+    file.current = 0;
+    file.serial = 0;
+    file.copies.resize(copies);
+    file.damaged = FALSE;
+    mFiles.push_back(file);
+}
+
+u32 MBackupStorage::AllocRegion(u32 size) {
+    u32 offset;
+    if (mRegions.size() == 0) {
+        offset = 0;
+    } else {
+        Region &last = mRegions[mRegions.size() - 1];
+        offset = mDevice->GetPageSize() * ((last.offset + last.size + mDevice->GetPageSize() - 1) / mDevice->GetPageSize());
+    }
+    Region region;
+    region.size = size;
+    region.offset = offset;
+    u32 index = mRegions.size();
+    mRegions.push_back(region);
+    return index;
+}
+
+void MBackupStorage::Mount() {
+    mMountTried = TRUE;
+    if (!mDevice->IsValid()) {
+        return;
+    }
+    MATHi_CRC32InitTableRev(&mCrcTable, 0xEDB88320);
+    mHeaderSize = mFiles.size() * 4 + 4;
+    mHeader = new u8[mHeaderSize];
+    mHeaderWords = (u32 *) mHeader;
+    mHeaderWords[0] = 'MBKU';
+    for (u32 i = 0; i < mFiles.size(); i++) {
+        mHeaderWords[i + 1] = mFiles[i].size;
+    }
+    AllocRegion(mHeaderSize);
+    for (u32 i = 0; i < mFiles.size(); i++) {
+        File &file = mFiles[i];
+        file.current = 0;
+        file.serial = 0;
+        for (u32 j = 0; j < file.copies.size(); j++) {
+            Copy &copy = file.copies[j];
+            copy.serial = 0;
+            copy.crc = 0;
+            copy.headerRegion = AllocRegion(8);
+            copy.dataRegion = AllocRegion(file.size);
+        }
+    }
+    u8 *header = new u8[mHeaderSize];
+    if (!ReadRegion(0, header) || memcmp(mHeader, header, mHeaderSize) != 0) {
+        delete[] header;
+        Format();
+        return;
+    }
+    delete[] header;
+    for (u32 i = 0; i < mFiles.size(); i++) {
+        File &file = mFiles[i];
+        u32 newestSerial = 0;
+        u32 newest = 0;
+        u8 *data = new u8[file.size];
+        for (u32 j = 0; j < file.copies.size(); j++) {
+            Copy &copy = file.copies[j];
+            if (!ReadRegion(copy.headerRegion, &copy)) {
+                return;
+            }
+            if (copy.serial != 0) {
+                if (!ReadRegion(copy.dataRegion, data)) {
+                    delete[] data;
+                    return;
+                }
+                u32 crc = 0xFFFFFFFF;
+                MATHi_CRC32UpdateRev(&mCrcTable, &crc, &copy, 4);
+                MATHi_CRC32UpdateRev(&mCrcTable, &crc, data, file.size);
+                if (copy.crc != ~crc) {
+                    file.damaged = TRUE;
+                    copy.serial = 0;
+                    if (!WriteRegion(copy.headerRegion, &copy)) {
+                        delete[] data;
+                        return;
+                    }
+                } else if (newestSerial < copy.serial) {
+                    newestSerial = copy.serial;
+                    newest = j;
+                }
+            }
+        }
+        file.serial = newestSerial;
+        file.current = newest;
+        delete[] data;
+    }
+    mMounted = TRUE;
+    PageRound(0);   // (a leftover of a debug check)
+}
+
+u8 MBackupStorage::IsMounted() {
+    return mMounted;
+}
+
+BOOL MBackupStorage::ReadRegion(u32 region, void *buf) {
+    Region &r = mRegions[region];
+    return mDevice->Read(r.offset, buf, r.size);
+}
+
+BOOL MBackupStorage::WriteRegion(u32 region, const void *buf) {
+    Region &r = mRegions[region];
+    return mDevice->Unk14(r.offset, buf, r.size);
+}
+
+u8 MBackupStorage::IsFileDamaged(u32 file) {
+    return mFiles[file].damaged;
+}
+
+BOOL MBackupStorage::HasFile(u32 file) {
+    if (mFiles[file].serial != 0) {
+        return TRUE;
+    }
+    return FALSE;
+}
+
+BOOL MBackupStorage::ReadFile(u32 file, void *buf) {
+    File &f = mFiles[file];
+    if (f.serial == 0) {
+        return FALSE;
+    }
+    return ReadRegion(f.copies[f.current].dataRegion, buf);
+}
+
+BOOL MBackupStorage::WriteFile(u32 file, const void *buf) {
+    File *files = &mFiles[0];
+    File &f = files[file];
+    f.serial++;
+    f.current = (f.current + 1) % f.copies.size();
+    Copy &copy = f.copies[f.current];
+    copy.serial = f.serial;
+    u32 crc = 0xFFFFFFFF;
+    MATHi_CRC32UpdateRev(&mCrcTable, &crc, &copy, 4);
+    MATHi_CRC32UpdateRev(&mCrcTable, &crc, buf, files[file].size);
+    copy.crc = ~crc;
+    if (WriteRegion(copy.dataRegion, buf) && WriteRegion(copy.headerRegion, &copy)) {
+        return TRUE;
+    }
+    return FALSE;
+}
+
+void MBackupStorage::Format() {
+    mMounted = FALSE;
+    mFormatted = FALSE;
+    for (u32 i = 0; i < mFiles.size(); i++) {
+        File &file = mFiles[i];
+        file.current = 0;
+        file.serial = 0;
+        for (u32 j = 0; j < file.copies.size(); j++) {
+            Copy &copy = file.copies[j];
+            copy.serial = 0;
+            copy.crc = 0;
+        }
+    }
+    for (u32 i = 0; i < mFiles.size(); i++) {
+        File &file = mFiles[i];
+        for (u32 j = 0; j < file.copies.size(); j++) {
+            Copy &copy = file.copies[j];
+            if (!WriteRegion(copy.headerRegion, &copy)) {
+                return;
+            }
+        }
+    }
+    if (!WriteRegion(0, mHeader)) {
+        return;
+    }
+    mMounted = TRUE;
+    mFormatted = TRUE;
+    PageRound(0);   // (a leftover of a debug check)
 }
