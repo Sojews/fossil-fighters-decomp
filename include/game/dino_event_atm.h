@@ -6,6 +6,7 @@
 class DinoEventATM : public DinoEventUiTask {
 public:
     virtual ~DinoEventATM();
+    virtual MTask *CreateUi();
 };
 
 #endif

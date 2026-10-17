@@ -31,6 +31,18 @@
 #include "m/bg_new_task.h"
 #include "m/call_task.h"
 #include "game/dino_event_ui_task.h"
+#include "game/dino_ui_shop_buy.h"
+#include "game/dino_ui_shop_sell.h"
+#include "game/dino_ui_mask_buy.h"
+#include "game/dino_ui_mask_equip.h"
+#include "game/dino_ui_canon_takeout.h"
+#include "game/dino_ui_atm.h"
+#include "game/dino_ui_ending.h"
+#include "game/dino_ui_license_card.h"
+#include "game/dino_ui_canon_putin.h"
+#include "game/dino_ui_save_menu.h"
+#include "game/dino_ui_debug_menu.h"
+#include "game/dino_ui_field_menu.h"
 
 DinoEventUiTask::~DinoEventUiTask() {
 }
@@ -125,4 +137,56 @@ DinoEventCanonTakeout::~DinoEventCanonTakeout() {
 
 DinoEventCanonPutin::~DinoEventCanonPutin() {
     gDinoBackup->SetSystemFlag(0x25, mCount != gDinoBackup->CountUsedUnk14C());
+}
+
+MTask *DinoEventCanonTakeout::CreateUi() {
+    return new DinoUiCanonTakeout();
+}
+
+MTask *DinoEventMaskEquip::CreateUi() {
+    return new DinoUiMaskEquip();
+}
+
+MTask *DinoEventShopMask::CreateUi() {
+    return new DinoUiMaskBuy();
+}
+
+MTask *DinoEventShopSell::CreateUi() {
+    return new DinoUiShopSell();
+}
+
+MTask *DinoEventShopBuy::CreateUi() {
+    return new DinoUiShopBuy();
+}
+
+MTask *DinoEventATM::CreateUi() {
+    return new DinoUiATM(0);
+}
+
+MTask *DinoEventEnding::CreateUi() {
+    return new DinoUiEnding();
+}
+
+MTask *DinoEventLicenseCard::CreateUi() {
+    return new DinoUiLicenseCard(1);
+}
+
+MTask *DinoEventCanonPutin::CreateUi() {
+    return new DinoUiCanonPutin();
+}
+
+MTask *DinoEventSave::CreateUi() {
+    return new DinoUiSaveMenu(&mResult, 1);
+}
+
+MTask *DinoEventDebugMenu::CreateUi() {
+    return new DinoUiDebugMenu();
+}
+
+MTask *DinoEventFieldMenu::CreateUi() {
+    MTask *ui = new DinoUiFieldMenu(mUnk84);
+    if (ui->mState == MTask::STATE_RUN) {
+        ui->Execute();
+    }
+    return ui;
 }

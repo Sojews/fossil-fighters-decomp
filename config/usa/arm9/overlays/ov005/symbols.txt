@@ -1,4 +1,4 @@
-func_ov005_021558a0 kind:function(thumb,size=0x34) addr:0x021558a0
+_ZN17DinoUiLicenseCardC1Eh kind:function(thumb,size=0x34) addr:0x021558a0
 _ZN17DinoUiLicenseCard4IdleEv kind:function(thumb,size=0x20) addr:0x021558d4
 func_ov005_021558f4 kind:function(thumb,size=0x608) addr:0x021558f4
 func_ov005_02155efc kind:function(thumb,size=0x48) addr:0x02155efc
@@ -556,7 +556,7 @@ func_ov005_021642ec kind:function(thumb,size=0x10) addr:0x021642ec
 func_ov005_021642fc kind:function(thumb,size=0x24) addr:0x021642fc
 func_ov005_02164320 kind:function(thumb,size=0x48) addr:0x02164320
 func_ov005_02164368 kind:function(thumb,size=0x58) addr:0x02164368
-func_ov005_021643c0 kind:function(thumb,size=0xb0) addr:0x021643c0
+_ZN16DinoUiCanonPutinC1Ev kind:function(thumb,size=0xb0) addr:0x021643c0
 _ZN22DinoUiCanonTakeoutMenuC1Ev kind:function(thumb,size=0x30) addr:0x02164470
 func_ov005_021644a0 kind:function(thumb,size=0x1cc) addr:0x021644a0
 func_ov005_0216466c kind:function(thumb,size=0x13c) addr:0x0216466c

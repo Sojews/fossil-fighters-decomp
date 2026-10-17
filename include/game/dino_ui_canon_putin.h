@@ -5,6 +5,7 @@
 
 class DinoUiCanonPutin : public MProcess {
 public:
+    DinoUiCanonPutin();
     virtual ~DinoUiCanonPutin();
     virtual void Idle();
 };

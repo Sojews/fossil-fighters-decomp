@@ -6,10 +6,15 @@
 
 class DinoUiSaveMenu : public MProcess, public DinoHelpBase {
 public:
+    DinoUiSaveMenu(u32 *result, u8 arg);
     virtual ~DinoUiSaveMenu();
     virtual void Idle();
 
     void (DinoUiSaveMenu::*mState)(); // 0x80
+    u32 *mResult;                     // 0x88
+    u32 mUnk8C;                       // 0x8C
+    u8 mUnk90;                        // 0x90
+    u32 mUnk94;                       // 0x94
 };
 
 #endif

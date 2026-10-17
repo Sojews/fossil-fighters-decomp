@@ -6,6 +6,7 @@
 class DinoEventLicenseCard : public DinoEventUiTask {
 public:
     virtual ~DinoEventLicenseCard();
+    virtual MTask *CreateUi();
 };
 
 #endif

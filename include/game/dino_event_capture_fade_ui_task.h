@@ -12,6 +12,8 @@ public:
 #else
     virtual ~DinoEventCaptureFadeUiTask() {}
 #endif
+    // Makes the UI this event shows.
+    virtual MTask *CreateUi() = 0;
 };
 
 #endif

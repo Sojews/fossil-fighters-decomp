@@ -5,10 +5,12 @@
 
 class DinoUiDebugMenu : public MProcess {
 public:
+    DinoUiDebugMenu();
     virtual ~DinoUiDebugMenu();
     virtual void Idle();
 
     void (DinoUiDebugMenu::*mState)(); // 0x74
+    u32 mUnk7C;                        // 0x7C
 };
 
 #endif

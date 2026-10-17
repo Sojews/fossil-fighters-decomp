@@ -6,6 +6,10 @@
 class DinoEventSave : public DinoEventUiTask {
 public:
     virtual ~DinoEventSave();
+    virtual MTask *CreateUi();
+
+    u32 mUnk74[4];  // 0x74
+    u32 mResult;    // 0x84
 };
 
 #endif
