@@ -1,6 +1,10 @@
 // DinoFieldTownMap, TownMapIcon.
 // Only the destructors are decompiled so far.
 
+// Derived destructors have their bases' destructor bodies inlined; auto-inlining the ones defined above does that.
+#pragma auto_inline on
+
+#include "game/dino_field_town_map_menu.h"
 #include "game/dino_field_town_map.h"
 #include "game/town_map_icon.h"
 #include "game/dino_field.h"
@@ -12,6 +16,9 @@ DinoFieldTownMap::~DinoFieldTownMap() {
 }
 
 TownMapIcon::~TownMapIcon() {
+}
+
+DinoFieldTownMapManager::~DinoFieldTownMapManager() {
 }
 
 // Template task instances the game emits in this file. Until the code that makes the tasks is decompiled, they are
