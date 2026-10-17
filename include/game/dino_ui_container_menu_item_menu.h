@@ -32,7 +32,8 @@ public:
     std::vector<void *> mItems; // 0xD0: this page's items
     u32 mUnkDC[2];              // 0xDC
     DinoUiFieldMenuFraction *mFraction; // 0xE4: "page n/m"
-    u32 mUnkE8[4];              // 0xE8
+    int *mResult;               // 0xE8
+    u32 mUnkEC[3];              // 0xEC
     MView *mCursor;             // 0xF8
     u32 mUnkFC;
     std::vector<s32> mUnk100;   // 0x100
