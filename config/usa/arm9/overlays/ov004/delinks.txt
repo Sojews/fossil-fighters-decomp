@@ -6,13 +6,13 @@
     .bss        start:0x02177280 end:0x021772e0 kind:bss align:32
 
 src/ov004/dino_ui_top_menu_loop.cpp:
-    .text       start:0x02158210 end:0x02158244
+    .text       start:0x02156cf8 end:0x02158274
 
 src/ov004/dino_ui_save_slot_select.cpp:
-    .text       start:0x0215b704 end:0x0215b8bc
+    .text       start:0x0215b62c end:0x0215cc98
 
 src/ov004/dino_ui_title.cpp:
-    .text       start:0x0215fbec end:0x0215fd88
+    .text       start:0x0215edb4 end:0x0215fdbc
 
 src/ov004/dino_ui_debug_kaseki_rock_get.cpp:
     .text       start:0x021611a0 end:0x021612d8
@@ -21,16 +21,16 @@ src/ov004/dino_ui_debug_menu.cpp:
     .text       start:0x02162504 end:0x02162538
 
 src/ov004/dino_ui_multiplay_loop.cpp:
-    .text       start:0x02162f98 end:0x02162fcc
+    .text       start:0x02162b0c end:0x02162ffc
 
 src/ov004/dino_ui_wireless_cancel_item.cpp:
-    .text       start:0x02168180 end:0x021683d0
+    .text       start:0x0216814c end:0x02168404
 
 src/ov004/dino_ui_save_option.cpp:
     .text       start:0x02169560 end:0x02169724
 
 src/ov004/disp_blower.cpp:
-    .text       start:0x0216c398 end:0x0216c5f4
+    .text       start:0x0216b718 end:0x0216c628
 
 src/ov004/dino_ui_island_map.cpp:
     .text       start:0x0216e3e4 end:0x0216e528
@@ -39,13 +39,16 @@ src/ov004/dino_ui2_parts_rock_name.cpp:
     .text       start:0x0216f2f8 end:0x0216f370
 
 src/ov004/dino_ui_top_menu_item.cpp:
-    .text       start:0x02158274 end:0x02158528
+    .text       start:0x02158274 end:0x02159510
 
 src/ov004/dino_ui_multiplay_menu_item.cpp:
-    .text       start:0x02162ffc end:0x021631a0
+    .text       start:0x02162ffc end:0x021631d4
 
 src/ov004/dino_ui_save_menu.cpp:
     .text       start:0x0216a088 end:0x0216a0cc
 
 src/ov004/dino_ui2_container_base_menu_item.cpp:
-    .text       start:0x021705f8 end:0x0217074c
+    .text       start:0x021705f8 end:0x0217103c
+
+src/ov004/dino_ui_battle_parent_scanner.cpp:
+    .text       start:0x02165984 end:0x021659bc

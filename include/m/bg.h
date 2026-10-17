@@ -10,6 +10,11 @@ class MScreen;
 class MText;
 class MDirectBitmap;
 class MIndexBitmap;
+
+// A BG layer's mode (text, affine, ...); the game names the type bg_mode.
+enum bg_mode {
+    BG_MODE_TEXT,
+};
 class MExtAffine;
 class MChr;
 class MPal;
