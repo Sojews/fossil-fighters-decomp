@@ -21,16 +21,24 @@ public:
     u32 mUnk18;         // 0x18
 };
 
+class DinoBattleModelPlayer;
+
 class UpdateAllCreatureTask : public MProcess {
 public:
+    UpdateAllCreatureTask(DinoBattleModelPlayer *player);
     virtual ~UpdateAllCreatureTask();
     virtual void Idle();
+
+    DinoBattleModelPlayer *mPlayer; // 0x74
 };
 
 class MoveCreatureFromEscape : public MProcess {
 public:
+    MoveCreatureFromEscape(DinoBattleModelPlayer *player);
     virtual ~MoveCreatureFromEscape();
     virtual void Idle();
+
+    DinoBattleModelPlayer *mPlayer; // 0x74
 };
 
 class DinoBattleModelCreature;
@@ -53,6 +61,9 @@ public:
     int GetCreatureCount();
     DinoBattleModelCreature *GetCreature(int index);
     DinoBattleModelCreature *FindCreature(u32 id);
+    MTask *CreateMoveToHeatAreaAnyCreature();
+    MTask *CreateAddKasekiPointCreatureDie();
+    MTask *CreateUpdateAllCreatureTask();
     u32 GetUnkFC();
     MRandom *GetRandom();
     u32 GetUnkAC();
@@ -274,12 +285,16 @@ public:
 
 class MoveToHeatAreaAnyCreature : public MProcess {
 public:
+    MoveToHeatAreaAnyCreature(DinoBattleModelPlayer *player) : MProcess(NULL) { mPlayer = player; }
     virtual ~MoveToHeatAreaAnyCreature();
     virtual void Idle();
+
+    DinoBattleModelPlayer *mPlayer; // 0x74
 };
 
 class AddKasekiPointCreatureDie : public MProcess {
 public:
+    AddKasekiPointCreatureDie(DinoBattleModelPlayer *player) : MProcess(NULL) { mPlayer = player; }
     virtual ~AddKasekiPointCreatureDie();
     virtual void Idle();
 

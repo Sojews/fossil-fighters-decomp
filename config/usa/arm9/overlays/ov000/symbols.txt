@@ -391,8 +391,8 @@ func_ov000_02166574 kind:function(thumb,size=0x86) addr:0x02166574
 func_ov000_021665fc kind:function(thumb,size=0x8) addr:0x021665fc
 func_ov000_02166604 kind:function(thumb,size=0x1c) addr:0x02166604
 func_ov000_02166620 kind:function(thumb,size=0x29c) addr:0x02166620
-func_ov000_021668bc kind:function(thumb,size=0x24) addr:0x021668bc
-func_ov000_021668e0 kind:function(thumb,size=0x24) addr:0x021668e0
+_ZN21DinoBattleModelPlayer31CreateMoveToHeatAreaAnyCreatureEv kind:function(thumb,size=0x24) addr:0x021668bc
+_ZN21DinoBattleModelPlayer31CreateAddKasekiPointCreatureDieEv kind:function(thumb,size=0x24) addr:0x021668e0
 func_ov000_02166904 kind:function(thumb,size=0x1a18) addr:0x02166904
 .L_021682dc kind:label(thumb) addr:0x021682dc local
 .L_021682ee kind:label(thumb) addr:0x021682ee local
@@ -403,10 +403,10 @@ func_ov000_02169354 kind:function(thumb,size=0xb0) addr:0x02169354
 func_ov000_02169404 kind:function(thumb,size=0xb8) addr:0x02169404
 func_ov000_021694bc kind:function(thumb,size=0xec) addr:0x021694bc
 func_ov000_021695a8 kind:function(thumb,size=0xd0) addr:0x021695a8
-func_ov000_02169678 kind:function(thumb,size=0x1c) addr:0x02169678
+_ZN21UpdateAllCreatureTaskC1EP21DinoBattleModelPlayer kind:function(thumb,size=0x1c) addr:0x02169678
 _ZN21UpdateAllCreatureTask4IdleEv kind:function(thumb,size=0x118) addr:0x02169694
-func_ov000_021697ac kind:function(thumb,size=0x16) addr:0x021697ac
-func_ov000_021697c4 kind:function(thumb,size=0x1c) addr:0x021697c4
+_ZN21DinoBattleModelPlayer27CreateUpdateAllCreatureTaskEv kind:function(thumb,size=0x16) addr:0x021697ac
+_ZN22MoveCreatureFromEscapeC1EP21DinoBattleModelPlayer kind:function(thumb,size=0x1c) addr:0x021697c4
 func_ov000_021697e0 kind:function(thumb,size=0x1e) addr:0x021697e0
 _ZN22MoveCreatureFromEscape4IdleEv kind:function(thumb,size=0x2f4) addr:0x02169800
 func_ov000_02169af4 kind:function(thumb,size=0x118) addr:0x02169af4

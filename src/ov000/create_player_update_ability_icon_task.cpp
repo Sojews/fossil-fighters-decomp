@@ -387,4 +387,24 @@ void DinoBattleModelPlayer::Idle() {
     Dispatch();
 }
 
+MTask *DinoBattleModelPlayer::CreateMoveToHeatAreaAnyCreature() {
+    return new MoveToHeatAreaAnyCreature(this);
+}
+
+MTask *DinoBattleModelPlayer::CreateAddKasekiPointCreatureDie() {
+    return new AddKasekiPointCreatureDie(this);
+}
+
+UpdateAllCreatureTask::UpdateAllCreatureTask(DinoBattleModelPlayer *player) : MProcess(NULL) {
+    mPlayer = player;
+}
+
+MTask *DinoBattleModelPlayer::CreateUpdateAllCreatureTask() {
+    return new UpdateAllCreatureTask(this);
+}
+
+MoveCreatureFromEscape::MoveCreatureFromEscape(DinoBattleModelPlayer *player) : MProcess(NULL) {
+    mPlayer = player;
+}
+
 #pragma auto_inline on
