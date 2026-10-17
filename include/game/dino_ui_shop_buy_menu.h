@@ -10,6 +10,7 @@
 
 class DinoUiShopBuyMenu : public DinoHelpBase, public MMenu {
 public:
+    DinoUiShopBuyMenu();
     virtual ~DinoUiShopBuyMenu();
     virtual void OnStart();
     virtual void OnIdle();
@@ -34,6 +35,7 @@ public:
     int mLastPage; // 0x110
     u8 unk114[8];
     u8 mUnk11C; // 0x11C
+    u32 mUnk120;    // 0x120
 };
 
 class DinoUiShopBuyBackButton : public DinoUiShopBuyMenuItem {

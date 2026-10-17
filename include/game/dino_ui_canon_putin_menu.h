@@ -18,7 +18,11 @@ public:
 
 class DinoUiCanonTakeoutMenu : public DinoUiContainerBaseMenu {
 public:
+    DinoUiCanonTakeoutMenu();
     virtual ~DinoUiCanonTakeoutMenu();
+    virtual BOOL TryDecide();
+
+    u32 mUnk154[2];     // 0x154
 };
 
 #endif

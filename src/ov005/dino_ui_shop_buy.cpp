@@ -4,6 +4,7 @@
 // Derived destructors have their bases' destructor bodies inlined; auto-inlining the ones defined above does that.
 #pragma auto_inline on
 
+#include "m/obj.h"
 #include "game/dino_ui_shop_buy_menu.h"
 #include "game/dino_ui_shop_buy.h"
 #include "game/dino_ui_shop_buy_menu_item.h"
@@ -164,3 +165,15 @@ void DinoUiShopBuyBuyButton::OnFocusChanged(BOOL focused) {
 // instantiated explicitly.
 template class MCallTask0<DinoUiShopBuyMenu, DinoUiShopBuyMenu>;
 template MTask *MCreateCallTask(DinoUiShopBuyMenu *obj, void (DinoUiShopBuyMenu::*func)());
+
+DinoUiShopBuy::DinoUiShopBuy() : MProcess(NULL) {
+    gLcd->mMain->ResetHooks();
+    gLcd->mMain->Setup(5, 3, 4, 1, 0, 0);
+    gLcd->mMain->SetBackdrop(0x8000);
+    gLcd->mMain->mObj->Show();
+    gLcd->SetBottomDisplay(gLcd->mMain);
+    gCurrentDisplay = gLcd->GetBottomDisplay();
+    gLcd->VSyncNow();
+    mSerial.AddTail(new DinoUiShopBuyMenu());
+    mSerial.AddTail(MTaskExitTransfer::Create(this));
+}
