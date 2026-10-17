@@ -88,6 +88,7 @@ public:
     void StopBgm(u32 fadeFrames);
     void PlayBgmFade(u32 bgm, u32 arg);
     void Quake(u32 a, u32 b, u32 c);
+    void SetUnk258(BOOL value);
     void SyncChara(u32 id);
     MTask *CreateCharaAngleTask(u32 chara, u32 angle, u32 a, u32 b);
     MTask *CreateCharaMoveToRegionTask(u32 chara, u32 region, u32 a, u32 b, u8 c);

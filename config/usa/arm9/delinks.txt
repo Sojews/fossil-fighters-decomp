@@ -788,3 +788,6 @@ src/game/dino_senryu_sample.cpp:
 
 src/game/dino_event_kaseki_rock_get.cpp:
     .text       start:0x02034990 end:0x02035978
+
+src/game/dino_event_kaseki_rock_found.cpp:
+    .text       start:0x02035978 end:0x02036af8
