@@ -12,6 +12,7 @@
 #include "m/motion.h"
 #include "game/dino_resource.h"
 #include "m/pal.h"
+#include "game/dino_battle_view2.h"
 
 DinoBattleViewKasekiPoint::~DinoBattleViewKasekiPoint() {
 }
@@ -123,6 +124,16 @@ BOOL DinoBattleViewKasekiPoint::IsCounting() {
     return FALSE;
 }
 
+DinoBattleViewPlayer::DinoBattleViewPlayer(u32 index, u32 side, u32 unkB0, DinoBattleView *view, u8 unk114)
+    : MProcess(NULL), mUnkA8(index), mUnkAC(side), mUnkB0(unkB0), mView(view) {
+    mMotion = NULL;
+    mUnk114 = unk114;
+    mKasekiPoint = new DinoBattleViewKasekiPoint(mView, view->mUnk10C, side, mUnkA8);
+    mParallel.AddTail(mKasekiPoint);
+    mUnk108 = new DinoBattleViewAbilityIcon(view, mUnkB0, GetKasekiPointPos(side));
+    mParallel.AddTail(mUnk108);
+}
+
 #pragma auto_inline on
 
 void DinoBattleViewPlayer::Idle() {
@@ -131,7 +142,7 @@ void DinoBattleViewPlayer::Idle() {
 
 #pragma auto_inline off
 
-u32 DinoBattleViewPlayer::GetUnk108() {
+DinoBattleViewAbilityIcon *DinoBattleViewPlayer::GetUnk108() {
     return mUnk108;
 }
 
@@ -168,8 +179,6 @@ void DinoBattleViewPlayer::TakeMotions(MMotion **motion, MTask **task) {
     }
 }
 
-extern "C" void func_ov000_021817fc(u32 obj, u32 mask, int *sums);
-
 void DinoBattleViewPlayer::UpdateUnk108() {
     if (mUnk108 == 0) {
         return;
@@ -180,7 +189,7 @@ void DinoBattleViewPlayer::UpdateUnk108() {
     DinoBattleViewCreature *creature = FindCreatureByB4(0);
     if (creature != NULL) {
         if (creature->GetDefUnk61() == 8) {
-            func_ov000_021817fc(mUnk108, 0, sums);
+            mUnk108->Update(0, sums);
             return;
         }
         for (int side = 0; side < 2; side++) {
@@ -191,7 +200,7 @@ void DinoBattleViewPlayer::UpdateUnk108() {
             }
         }
     }
-    func_ov000_021817fc(mUnk108, mask, sums);
+    mUnk108->Update(mask, sums);
 }
 
 void DinoBattleViewPlayer::AccumulateCreature(u32 *mask, int *sums, DinoBattleViewCreature *creature, bool opponent) {

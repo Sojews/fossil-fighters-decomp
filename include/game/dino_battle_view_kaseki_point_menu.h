@@ -15,16 +15,18 @@ class MMotion;
 class DinoBattleView;
 class DinoBattleViewCreature;
 class DinoBattleViewKasekiPoint;
+class DinoBattleViewAbilityIcon;
 
 class DinoBattleViewPlayer : public MProcess, public MMessageObserver {
 public:
+    DinoBattleViewPlayer(u32 index, u32 side, u32 unkB0, DinoBattleView *view, u8 unk114);
     virtual ~DinoBattleViewPlayer();
     virtual void Idle();
     virtual void OnMessage(MMessage *msg);
 
     DinoBattleViewKasekiPoint *GetKasekiPoint();
     void AddTimedTask(MTask *task, MTask *old);
-    u32 GetUnk108();
+    DinoBattleViewAbilityIcon *GetUnk108();
     u32 GetUnkAC();
     std::string GetUnkC0();
     void SetMotions(MMotion *motion, MTask *task);
@@ -49,9 +51,10 @@ public:
     MMessageSubject mSubject;   // 0xD0
     std::vector<DinoBattleViewCreature *> mCreatures; // 0xF8
     DinoBattleViewKasekiPoint *mKasekiPoint; // 0x104
-    u32 mUnk108;                // 0x108
+    DinoBattleViewAbilityIcon *mUnk108; // 0x108
     MMotion *mMotion;           // 0x10C
     MTask *mMotionTask;         // 0x110
+    u8 mUnk114;                 // 0x114
 };
 
 #endif

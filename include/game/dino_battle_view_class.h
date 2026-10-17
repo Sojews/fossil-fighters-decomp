@@ -45,7 +45,8 @@ public:
     u32 unkF0[5];
     u32 mUnk104;                // 0x104
     u32 mUnk108;                // 0x108
-    u32 unk10C[3];
+    void *mUnk10C;              // 0x10C
+    u32 unk110[2];
     u32 mUnk118;                // 0x118
     void *mUnk11C;              // 0x11C
     u32 mUnk120;                // 0x120

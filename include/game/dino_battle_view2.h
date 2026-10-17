@@ -130,13 +130,19 @@ public:
     void *mMenu;    // 0x10
 };
 
+class DinoBattleView;
+
 class DinoBattleViewAbilityIcon : public MProcess {
 public:
+    DinoBattleViewAbilityIcon(DinoBattleView *view, u32 unk, MPoint pos);
     virtual ~DinoBattleViewAbilityIcon();
     virtual void Idle();
 
+    void Update(u32 mask, int *sums);
+
     u32 mUnk74[2];          // 0x74
     MAfnBlock *mAffine;     // 0x7C
+    u32 unk80[19];
 };
 
 #endif

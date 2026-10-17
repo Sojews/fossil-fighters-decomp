@@ -20,6 +20,7 @@ public:
 
 class DinoBattleViewKasekiPoint : public MProcess {
 public:
+    DinoBattleViewKasekiPoint(DinoBattleView *view, void *unk88, u32 side, u32 player);
     virtual ~DinoBattleViewKasekiPoint();
     virtual void Idle();
 
