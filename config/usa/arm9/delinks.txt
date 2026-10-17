@@ -385,6 +385,9 @@ libs/msl/src/console_io.c:
     .text       start:0x02086cfc end:0x02086d6c
     .exceptix   start:0x02088738 end:0x02088750
 
+libs/runtime/src/exception_handler.cpp:
+    .text       start:0x02086d6c end:0x020878e4
+
 
 
 libs/msl/src/wprintf.c:
