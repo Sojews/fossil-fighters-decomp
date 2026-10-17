@@ -58,7 +58,7 @@ typedef struct ExceptionSpecification {
     u8 *types;          // unaligned type_info pointers
 } ExceptionSpecification;
 
-extern int func_0208809c(char *throw_type, char *catch_type, void **adjust);
+extern int __throw_catch_compare(char *throw_type, char *catch_type, void **adjust);
 extern void func_0208714c(ThrowContext *context, ExceptionInfo *info, u8 *target);
 extern void func_020882c8(ThrowContext *context, ExceptionInfo *info, char *address);
 extern int __FindExceptionTable(ExceptionInfo *info, char *return_address);
@@ -380,7 +380,7 @@ int func_02087818(char *throw_type, ExceptionSpecification *spec) {
             char *type;
         } c;
         c.type = (char *)(p[0] | (p[1] << 8) | (p[2] << 16) | (p[3] << 24));
-        if (func_0208809c(throw_type, c.type, &c.adjust)) {
+        if (__throw_catch_compare(throw_type, c.type, &c.adjust)) {
             return 1;
         }
     }
@@ -421,7 +421,7 @@ u8 *func_0208791c(ThrowContext *context, ExceptionInfo *info, s32 *adjust) {
             u8 *p = iter.info.action_pointer;
             cb.type = (char *)(p[1] | (p[2] << 8) | (p[3] << 16) | (p[4] << 24));
             func_02086d6c(func_02086dcc((char *)p + 5, &cb.offset), &cb.catch_offset);
-            if (func_0208809c(context->throw_type, cb.type, (void **)adjust)) {
+            if (__throw_catch_compare(context->throw_type, cb.type, (void **)adjust)) {
                 goto found;
             }
             break;
