@@ -222,7 +222,7 @@ _Z15MCreateCallTaskI14DinoFieldRadarS0_bEP5MTaskPT_MT0_FvT1_ES6_ kind:function(t
 func_ov001_0215d6ec kind:function(thumb,size=0x74) addr:0x0215d6ec
 func_ov001_0215d760 kind:function(thumb,size=0x6c) addr:0x0215d760
 func_ov001_0215d7cc kind:function(thumb,size=0x40) addr:0x0215d7cc
-func_ov001_0215d80c kind:function(thumb,size=0xd18) addr:0x0215d80c
+_ZN14DinoFieldRadar4IdleEv kind:function(thumb,size=0xd18) addr:0x0215d80c
 func_ov001_0215e524 kind:function(thumb,size=0x3c) addr:0x0215e524
 _ZN21DinoFieldRadarManager4IdleEv kind:function(thumb,size=0x4e) addr:0x0215e560
 _ZN21DinoFieldRadarManager10CameraUnk0Ev kind:function(thumb,size=0x22) addr:0x0215e5b0
@@ -230,7 +230,7 @@ _ZN21DinoFieldRadarManager10CameraUnk1Ev kind:function(thumb,size=0x58) addr:0x0
 _ZN14DinoFieldRadar13CreateModeTaskEmmmh kind:function(thumb,size=0x154) addr:0x0215e62c
 func_ov001_0215e780 kind:function(thumb,size=0x86) addr:0x0215e780
 func_ov001_0215e808 kind:function(thumb,size=0x1e) addr:0x0215e808
-func_ov001_0215e828 kind:function(thumb,size=0x26) addr:0x0215e828
+_ZNSt13__vec_deleterIsSaIsEED2Ev kind:function(thumb,size=0x26) addr:0x0215e828
 _ZN10MCallTask1I14DinoFieldRadarS0_bE4IdleEv kind:function(thumb,size=0x36) addr:0x0215e850
 _ZN21DinoFieldRadarManagerD1Ev kind:function(thumb,size=0x16) addr:0x0215e888
 _ZN21DinoFieldRadarManagerD0Ev kind:function(thumb,size=0x1c) addr:0x0215e8a0

@@ -8,6 +8,7 @@
 #include "m/geometry.h"
 
 #include <string>
+#include <vector>
 #include "m/task.h"
 #include "game/dino_field_town_map.h"
 struct DinoCharaTask;
@@ -54,9 +55,18 @@ public:
     void UpdateHeadModel();
 };
 
-class DinoFieldRadar {
+struct MAfnBlock;
+
+class DinoFieldRadar : public MProcess {
 public:
+    virtual ~DinoFieldRadar();
+    virtual void Idle();
     MTask *CreateModeTask(u32 from, u32 to, u32 a, u8 b);
+
+    u32 mUnk74[11];             // 0x74
+    MAfnBlock *mAffine;         // 0xA0
+    u8 unkA4[0x4E8];
+    std::vector<short> mUnk58C; // 0x58C: (the element type is a guess, distinct from other overlays')
 };
 
 

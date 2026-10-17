@@ -7,7 +7,13 @@
 #include "game/dino_field_radar_menu.h"
 #include "game/dino_field.h"
 #include "m/bg_new_task.h"
+#include "m/display.h"
+#include "m/obj.h"
 #include "m/call_task.h"
+
+DinoFieldRadar::~DinoFieldRadar() {
+    GetDisplay()->mObj->mAfn->Free(mAffine);
+}
 
 DinoFieldRadarManager::~DinoFieldRadarManager() {
 }
