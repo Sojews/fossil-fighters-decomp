@@ -14,6 +14,7 @@ public:
     virtual void Idle();
     virtual void Unk08();
     virtual void Unk0C();
+    void Restart();
 
     void (DinoGuideMessage::*mState)(); // 0x7C
     std::string mText;      // 0x84
@@ -21,6 +22,7 @@ public:
     MFont *mFont;           // 0x94
     u32 mUnk98;             // 0x98
     MMotionFile mMotion;    // 0x9C
+    OSMutex mMutex;         // 0xA0
 };
 
 #endif

@@ -11,3 +11,15 @@ DinoGuideMessage::~DinoGuideMessage() {
 void DinoGuideMessage::Idle() {
     (this->*mState)();
 }
+
+void DinoGuideMessage::Unk08() {
+    MScopedLock lock(&mMutex, TRUE);
+    mFont->Release();
+    mParallel.Clear();
+    mSerial.Clear();
+}
+
+void DinoGuideMessage::Unk0C() {
+    MScopedLock lock(&mMutex, TRUE);
+    Restart();
+}
