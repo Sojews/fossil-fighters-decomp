@@ -204,7 +204,7 @@ src/m/task.cpp:
     .itcm       start:0x01ff8f20 end:0x01ff9258
 
 src/game/dino_common_tutorial_console_filter.cpp:
-    .text       start:0x02006fa0 end:0x02007014
+    .text       start:0x02005f5c end:0x02007014
 
 src/game/dino_event_talk_window.cpp:
     .text       start:0x02007014 end:0x020082b0
@@ -803,3 +803,6 @@ src/game/dino_se_motion.cpp:
 
 src/game/dino_guide_message.cpp:
     .text       start:0x020055dc end:0x02005d68
+
+src/game/dino_gradation_bg.cpp:
+    .text       start:0x02005d68 end:0x02005f5c
