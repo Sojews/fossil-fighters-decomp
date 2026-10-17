@@ -6,6 +6,7 @@
 
 #include "game/dino_ui_museum.h"
 #include "types.h"
+#include "m/lcd.h"
 #include "game/dino_sound.h"
 #include "game/dino_ui_museum_information_menu.h"
 
@@ -133,4 +134,7 @@ void DinoUiMuseumInformationPageLButton::OnDecide() {
     serial->AddTail(wait);
     serial->AddTail(play);
     DinoSoundPlaySe(0x93, 0);
+}
+
+DinoUiMuseum::DinoUiMuseum() : MProcess(gLcd->mSub) {
 }

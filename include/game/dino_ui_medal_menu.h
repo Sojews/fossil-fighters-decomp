@@ -41,10 +41,15 @@ public:
 
 class DinoUiMedalList : public MProcess {
 public:
+    DinoUiMedalList();
     virtual ~DinoUiMedalList();
     virtual void Idle();
 
     void (DinoUiMedalList::*mState)(); // 0x74
+    u32 mUnk7C;                         // 0x7C
+    u32 mUnk80;                         // 0x80
+    u8 mUnk84;                          // 0x84
+    u8 mUnk85;                          // 0x85
 };
 
 class DinoUiMedalMenu;

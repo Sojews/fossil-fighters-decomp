@@ -6,6 +6,10 @@
 class DinoEventNameEntry : public DinoEventUiTask {
 public:
     virtual ~DinoEventNameEntry();
+    virtual MTask *CreateUi();
+
+    u8 unk74[0xD];
+    u8 mUnk81;      // 0x81
 };
 
 #endif

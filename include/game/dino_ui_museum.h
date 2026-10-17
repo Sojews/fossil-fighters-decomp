@@ -14,6 +14,7 @@
 
 class DinoUiMuseum : public MProcess {
 public:
+    DinoUiMuseum();
     virtual ~DinoUiMuseum();
     virtual void Idle();
 };

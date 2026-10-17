@@ -90,3 +90,15 @@ const char *DinoKBBackButton::GetText() {
 const char *DinoUiKeyboardMenuItem::GetText() {
     return gDinoResource->GetText(mTextId);
 }
+
+DinoUiKeyboard::DinoUiKeyboard(int mode, int arg, u8 flag) : MProcess(NULL) {
+    mMode = mode;
+    mArg = arg;
+    mFlag = flag;
+}
+
+DinoUiKeyboard::DinoUiKeyboard(int mode, int arg) : MProcess(NULL) {
+    mMode = mode;
+    mArg = arg;
+    mFlag = TRUE;
+}

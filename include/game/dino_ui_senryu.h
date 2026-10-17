@@ -50,6 +50,7 @@ public:
 
 class DinoUiSenryuList : public MProcess {
 public:
+    DinoUiSenryuList();
     virtual ~DinoUiSenryuList();
     virtual void Idle();
 };

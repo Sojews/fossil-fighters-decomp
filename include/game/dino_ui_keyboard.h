@@ -14,8 +14,14 @@
 
 class DinoUiKeyboard : public MProcess {
 public:
+    DinoUiKeyboard(int mode, int arg, u8 flag);
+    DinoUiKeyboard(int mode, int arg);
     virtual ~DinoUiKeyboard();
     virtual void Idle();
+
+    int mMode;      // 0x74
+    int mArg;       // 0x78
+    u8 mFlag;       // 0x7C
 };
 
 class KasekiPictCache : public MProcess {

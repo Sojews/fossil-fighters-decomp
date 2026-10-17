@@ -84,3 +84,6 @@ const char *DinoSenryuBackButton::GetText() {
 const char *DinoUiSenryuMenuItem::GetText() {
     return gDinoResource->GetText(mTextId);
 }
+
+DinoUiSenryuList::DinoUiSenryuList() : MProcess(NULL) {
+}

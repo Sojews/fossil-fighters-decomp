@@ -43,6 +43,10 @@
 #include "game/dino_ui_save_menu.h"
 #include "game/dino_ui_debug_menu.h"
 #include "game/dino_ui_field_menu.h"
+#include "game/dino_ui_museum.h"
+#include "game/dino_ui_keyboard.h"
+#include "game/dino_ui_senryu.h"
+#include "game/dino_ui_medal_menu.h"
 
 DinoEventUiTask::~DinoEventUiTask() {
 }
@@ -185,6 +189,30 @@ MTask *DinoEventDebugMenu::CreateUi() {
 
 MTask *DinoEventFieldMenu::CreateUi() {
     MTask *ui = new DinoUiFieldMenu(mUnk84);
+    if (ui->mState == MTask::STATE_RUN) {
+        ui->Execute();
+    }
+    return ui;
+}
+
+MTask *DinoEventMuseum::CreateUi() {
+    return new DinoUiMuseum();
+}
+
+MTask *DinoEventSenryuListEntry::CreateUi() {
+    return new DinoUiSenryuList();
+}
+
+MTask *DinoEventSenryuEntry::CreateUi() {
+    return new DinoUiKeyboard(2, 0);
+}
+
+MTask *DinoEventNameEntry::CreateUi() {
+    return new DinoUiKeyboard(0, 0, mUnk81);
+}
+
+MTask *DinoEventMedalList::CreateUi() {
+    MTask *ui = new DinoUiMedalList();
     if (ui->mState == MTask::STATE_RUN) {
         ui->Execute();
     }

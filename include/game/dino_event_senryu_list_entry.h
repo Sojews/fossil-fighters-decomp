@@ -6,6 +6,7 @@
 class DinoEventSenryuListEntry : public DinoEventCaptureFadeUiTask {
 public:
     virtual ~DinoEventSenryuListEntry();
+    virtual MTask *CreateUi();
 };
 
 #endif

@@ -6,6 +6,7 @@
 class DinoEventMuseum : public DinoEventUiTask {
 public:
     virtual ~DinoEventMuseum();
+    virtual MTask *CreateUi();
 };
 
 #endif
