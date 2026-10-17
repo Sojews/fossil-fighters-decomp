@@ -5,6 +5,7 @@
 
 class DinoUiCleaningLeave : public MProcess {
 public:
+    DinoUiCleaningLeave(u32 arg);
     virtual ~DinoUiCleaningLeave();
     virtual void Idle();
 };

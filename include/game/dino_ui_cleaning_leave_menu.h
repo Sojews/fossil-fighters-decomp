@@ -13,7 +13,11 @@
 
 class DinoUiCleaningLeaveMenu : public DinoUiContainerBaseMenu {
 public:
+    DinoUiCleaningLeaveMenu(u32 arg);
     virtual ~DinoUiCleaningLeaveMenu();
+    virtual BOOL TryDecide();
+
+    u32 mUnk154[3];     // 0x154
 };
 
 #endif
