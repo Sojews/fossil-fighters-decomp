@@ -71,3 +71,11 @@ extern const u32 data_0208ad38; // a text number
 const char *DinoCleaningXrayItem::GetText() {
     return gDinoResource->GetText(data_0208ad38);
 }
+
+MRect DinoCleaningToolMenuItem::GetFrame() {
+    return mMotion->GetFrame().Intersection(MRect(0, 0, 256, 192));
+}
+
+MRect DinoCleaningXrayItem::GetFrame() {
+    return mMotion->GetFrame().Intersection(MRect(0, 0, 256, 192));
+}

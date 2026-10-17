@@ -139,3 +139,7 @@ void DinoUiItemMenu::PageLeft() {
     FocusItem(mUnkB8);
     FocusNearestItem(cursor);
 }
+
+MRect DinoUiItemItemButton::GetFrame() {
+    return MRect(mPos.Offset(-80, -8), mPos.Offset(80, 8));
+}

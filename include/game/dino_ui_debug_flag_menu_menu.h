@@ -30,6 +30,7 @@ public:
 
     u32 mUnk88;         // 0x88
     MFont *mFont;       // 0x8C
+    MPoint mPos;        // 0x90
 };
 
 #endif
