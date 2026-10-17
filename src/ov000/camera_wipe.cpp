@@ -13,5 +13,8 @@ CameraWipe::~CameraWipe() {
 M3DFadeTask::~M3DFadeTask() {
 }
 
+// NONMATCHING: the game calls std::vector<std::string>'s out-of-line destructor for mLines; ours inlines it into a
+// __vec_deleter call. The bytes are identical, so only callcheck sees it.
 DinoBattleViewActionInfoBar::~DinoBattleViewActionInfoBar() {
+    mFont->Release();
 }

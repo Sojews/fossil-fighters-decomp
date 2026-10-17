@@ -1,6 +1,7 @@
 #ifndef GAME_WAIT_ACTION_INFO_BAR_TASK_H
 #define GAME_WAIT_ACTION_INFO_BAR_TASK_H
 
+#include "game/camera_wipe.h"
 #include "m/menu_item.h"
 #include "m/menu.h"
 #include "m/display.h"
@@ -14,6 +15,8 @@ class WaitActionInfoBarTask : public MTask {
 public:
     virtual ~WaitActionInfoBarTask();
     virtual void Execute();
+
+    DinoBattleViewActionInfoBar *mBar;  // 0x10
 };
 
 #endif

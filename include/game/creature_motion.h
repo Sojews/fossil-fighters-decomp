@@ -75,6 +75,12 @@ class SetColorMaskTask : public MTask {
 public:
     virtual ~SetColorMaskTask();
     virtual void Execute();
+
+    struct Target {
+        u8 unk00[0x144];
+        u32 mColorMask; // 0x144
+    } *mTarget;         // 0x10
+    u32 mColorMask;     // 0x14
 };
 
 class ShuffleMoveTask : public MTask {

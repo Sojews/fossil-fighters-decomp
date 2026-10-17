@@ -9,3 +9,11 @@
 
 WaitActionInfoBarTask::~WaitActionInfoBarTask() {
 }
+
+extern "C" BOOL func_ov000_0218b7f0(DinoBattleViewActionInfoBar *bar);
+
+void WaitActionInfoBarTask::Execute() {
+    if (func_ov000_0218b7f0(mBar) && mBar->mLines.empty()) {
+        Exit();
+    }
+}

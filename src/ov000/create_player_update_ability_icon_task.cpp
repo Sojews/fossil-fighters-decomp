@@ -135,3 +135,9 @@ void ExecCreatureEndTask::Idle() {
     serial->AddTail(task);
     serial->AddTail(exit);
 }
+
+void PlayerThinkTimeCountTask::Execute() {
+    if (mActive && mPlayer != NULL) {
+        mPlayer->mModel->mThinkTime = ++mCount;
+    }
+}

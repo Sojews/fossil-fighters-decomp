@@ -9,3 +9,8 @@
 
 SetToturialFlagTask::~SetToturialFlagTask() {
 }
+
+void SetToturialFlagTask::Execute() {
+    mTutorial->mFlags |= mFlag;
+    Exit();
+}

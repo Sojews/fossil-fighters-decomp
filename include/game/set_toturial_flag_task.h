@@ -14,6 +14,12 @@ class SetToturialFlagTask : public MTask {
 public:
     virtual ~SetToturialFlagTask();
     virtual void Execute();
+
+    struct Tutorial {
+        u8 unk00[0xD0];
+        u32 mFlags;     // 0xD0
+    } *mTutorial;       // 0x10
+    u32 mFlag;          // 0x14
 };
 
 #endif

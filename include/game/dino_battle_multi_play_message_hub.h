@@ -15,6 +15,8 @@ public:
     virtual ~DinoBattleMultiPlayMessageHub();
     virtual void Idle();
     virtual void OnMessage(MMessage *msg);
+
+    void *mUnkA8;   // 0xA8
 };
 
 class DinoBattleMultiPlayMessageReceiver : public MProcess, public MMessageObserver {

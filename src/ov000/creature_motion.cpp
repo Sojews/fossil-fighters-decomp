@@ -102,3 +102,8 @@ void SetCretureIconPriorityTask::Execute() {
     (*mMotion)->SetAnchor(mAnchor);
     Exit();
 }
+
+void SetColorMaskTask::Execute() {
+    mTarget->mColorMask = mColorMask;
+    Exit();
+}

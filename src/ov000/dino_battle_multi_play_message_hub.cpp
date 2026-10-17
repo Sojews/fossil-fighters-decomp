@@ -24,3 +24,9 @@ void DinoBattleMultiPlayMessageHub::Idle() {
 void DinoBattleMultiPlayMessageReceiver::OnMessage(MMessage *msg) {
     mSubject->Notify(msg);
 }
+
+extern "C" void func_0206af18(void *obj, MMessage *msg);
+
+void DinoBattleMultiPlayMessageHub::OnMessage(MMessage *msg) {
+    func_0206af18(mUnkA8, msg);
+}

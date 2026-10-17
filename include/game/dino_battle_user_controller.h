@@ -20,6 +20,16 @@ class PlayerThinkTimeCountTask : public MTask {
 public:
     virtual ~PlayerThinkTimeCountTask();
     virtual void Execute();
+
+    struct Player {
+        u8 unk00[0xE0];
+        struct Model {
+            u8 unk00[0x150];
+            int mThinkTime;     // 0x150
+        } *mModel;              // 0xE0
+    } *mPlayer;                 // 0x10
+    u8 mActive;                 // 0x14
+    int mCount;                 // 0x18
 };
 
 #endif

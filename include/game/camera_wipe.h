@@ -1,6 +1,9 @@
 #ifndef GAME_CAMERA_WIPE_H
 #define GAME_CAMERA_WIPE_H
 
+#include <string>
+#include <vector>
+#include "m/font.h"
 #include "m/menu_item.h"
 #include "m/menu.h"
 #include "m/display.h"
@@ -26,6 +29,11 @@ class DinoBattleViewActionInfoBar : public MProcess {
 public:
     virtual ~DinoBattleViewActionInfoBar();
     virtual void Idle();
+
+    std::string mUnk74;                 // 0x74
+    u32 unk80[6];
+    std::vector<std::string> mLines;    // 0x98
+    MFont *mFont;                       // 0xA4
 };
 
 #endif
