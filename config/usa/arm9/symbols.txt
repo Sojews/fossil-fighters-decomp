@@ -5779,8 +5779,8 @@ OS_GetInitArenaLo kind:function(thumb,size=0x70) addr:0x02074c58
 OS_SetArenaHi kind:function(thumb,size=0xc) addr:0x02074cc8
 OS_SetArenaLo kind:function(thumb,size=0xc) addr:0x02074cd4
 OS_GetDTCMAddress kind:function(arm,size=0x14) addr:0x02074ce0
-func_02074cf4 kind:function(arm,size=0x10) addr:0x02074cf4
-func_02074d04 kind:function(arm,size=0x10) addr:0x02074d04
+OS_EnableProtectionUnit kind:function(arm,size=0x10) addr:0x02074cf4
+OS_DisableProtectionUnit kind:function(arm,size=0x10) addr:0x02074d04
 OS_SetDPermissionsForProtectionRegion kind:function(arm,size=0x14) addr:0x02074d14
 OS_SetProtectionRegion1 kind:function(arm,size=0x8) addr:0x02074d28
 OS_SetProtectionRegion2 kind:function(arm,size=0x8) addr:0x02074d30
@@ -13058,9 +13058,10 @@ OSi_IdleThread kind:bss(size=0xc0) addr:0x021518fc
 OSi_LauncherThread kind:bss(size=0xc0) addr:0x021519bc
 OSi_IdleThreadStack kind:bss(size=0xc8) addr:0x02151a7c
 data_02151b44 kind:bss addr:0x02151b44
-data_02151b4c kind:bss addr:0x02151b4c
-data_02151b54 kind:bss addr:0x02151b54
-data_02151b58 kind:bss addr:0x02151b58
+OSi_UserExceptionHandler kind:bss(size=0x4) addr:0x02151b4c
+OSi_UserExceptionHandlerArg kind:bss(size=0x4) addr:0x02151b50
+OSi_DebuggerHandler kind:bss(size=0x4) addr:0x02151b54
+OSi_ExContext kind:bss(size=0x80) addr:0x02151b58
 OSi_TimerReserved kind:bss addr:0x02151bd8
 OSi_UseTick kind:bss addr:0x02151bdc
 OSi_TickCounter kind:bss addr:0x02151be4

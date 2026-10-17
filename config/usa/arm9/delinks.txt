@@ -608,6 +608,23 @@ libs/nitrosdk/src/os/os_cache.c:
     complete
     .text       start:0x02074948 end:0x02074a64
 
+libs/nitrosdk/src/os/os_tcm.c:
+    complete
+    .text       start:0x02074ce0 end:0x02074cf4
+
+libs/nitrosdk/src/os/os_protectionUnit.c:
+    complete
+    .text       start:0x02074cf4 end:0x02074d14
+
+libs/nitrosdk/src/os/os_protectionRegion.c:
+    complete
+    .text       start:0x02074d14 end:0x02074d38
+
+libs/nitrosdk/src/os/os_exception.c:
+    complete
+    .text       start:0x02074d38 end:0x02074ef0
+    .bss        start:0x02151b4c end:0x02151bd8
+
 libs/nitrosdk/src/os/os_init.c:
     complete
     .text       start:0x02074a64 end:0x02074aa8
