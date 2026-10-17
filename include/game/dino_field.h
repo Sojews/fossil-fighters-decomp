@@ -10,6 +10,7 @@
 #include <string>
 #include <vector>
 #include "m/task.h"
+#include "m/archive.h"
 #include "m/serializer.h"
 #include "game/dino_field_town_map.h"
 struct DinoCharaTask;
@@ -82,9 +83,21 @@ struct DinoFieldMapInfo {
     u32 id;
 };
 
-class DinoFieldMap {
+class DinoFieldMap : public MProcess, public MSerializer {
 public:
+    virtual ~DinoFieldMap();
+    virtual void Idle();
+    virtual void Read(const void *buf);
+
     DinoFieldMapInfo *GetInfo();
+
+    u32 mUnk8C[2];          // 0x8C
+    MArchivePtr mArchive;   // 0x94
+    MArchiveFile mFile;     // 0x98
+    MArchivePtr mArchive2;  // 0xA4
+    MArchiveFile mFile2;    // 0xA8
+    MArchivePtr mArchive3;  // 0xB4
+    MArchiveFile mFile3;    // 0xB8
 };
 
 class DinoField {

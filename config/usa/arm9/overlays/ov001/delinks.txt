@@ -40,3 +40,6 @@ src/ov001/dino_field_lower_spot.cpp:
 
 src/ov001/dino_field_camera.cpp:
     .text       start:0x021634a8 end:0x02164b58
+
+src/ov001/dino_field_map.cpp:
+    .text       start:0x0215eb50 end:0x0215fea0
