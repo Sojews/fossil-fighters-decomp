@@ -10,6 +10,7 @@
 #include <string>
 #include <vector>
 #include "m/task.h"
+#include "m/serializer.h"
 #include "game/dino_field_town_map.h"
 struct DinoCharaTask;
 
@@ -18,14 +19,21 @@ public:
     void SetMode(int mode, int arg);
 };
 
-class DinoFieldCamera {
+class DinoFieldCamera : public MProcess, public MSerializer {
 public:
+    virtual ~DinoFieldCamera();
+    virtual void Idle();
+    virtual void Read(const void *buf);
+    virtual void UnkV14();
+
     void ResetHeight();
     void SetTracking(u8 tracking);
     void StartRotate(u16 x, u16 y, u16 z, u32 a, u32 b, u32 c);
 
-    u8 unk00[0x144];
+    u8 unk8C[0x144 - 0x8C];
     DinoFieldNamePanel *mNamePanel; // 0x144
+    u32 mUnk148[2];                 // 0x148
+    std::vector<void *> mUnk150;    // 0x150
 };
 
 // A character's model: where it stands and which way it faces.
