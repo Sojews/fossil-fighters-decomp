@@ -7,6 +7,9 @@
 #include "game/dino_event_revive_deposit_select.h"
 #include "game/dino_event_revive_cleaning.h"
 #include "game/dino_event_revive_effect.h"
+#include "game/dino_event_capture_fade_ui_task.h"
+#include "m/bg_new_task.h"
+#include "m/call_task.h"
 
 DinoEventReviveFieldSuspendTask::~DinoEventReviveFieldSuspendTask() {
 }
@@ -25,3 +28,10 @@ DinoEventReviveCleaning::~DinoEventReviveCleaning() {
 
 DinoEventReviveEffect::~DinoEventReviveEffect() {
 }
+
+// Template task instances the game emits in this file. Until the code that makes the tasks is decompiled, they are
+// instantiated explicitly.
+template class MBgCallTask0<DinoEventReviveEffect>;
+template MTask *MCreateBgCallTask(DinoEventReviveEffect *obj, void (DinoEventReviveEffect::*func)(), int thread);
+template class MBgCallTask0<DinoEventCaptureFadeUiTask>;
+template MTask *MCreateBgCallTask(DinoEventCaptureFadeUiTask *obj, void (DinoEventCaptureFadeUiTask::*func)(), int thread);

@@ -19,6 +19,9 @@
 #include "game/dino_event_ending.h"
 #include "game/dino_event_museum.h"
 #include "game/dino_event_revive_effect_caller.h"
+#include "game/dino_event_capture_fade_ui_task.h"
+#include "m/bg_new_task.h"
+#include "m/call_task.h"
 
 SetEpisodeTask::~SetEpisodeTask() {
 }
@@ -73,3 +76,13 @@ DinoEventMuseum::~DinoEventMuseum() {
 
 DinoEventReviveEffectCaller::~DinoEventReviveEffectCaller() {
 }
+
+// Template task instances the game emits in this file. Until the code that makes the tasks is decompiled, they are
+// instantiated explicitly.
+class DinoEventLoop {};
+template class MBgCallTask0<DinoEventSaveOption>;
+template MTask *MCreateBgCallTask(DinoEventSaveOption *obj, void (DinoEventSaveOption::*func)(), int thread);
+template class MBgCallTask1<DinoEventLoop, u32>;
+template MTask *MCreateBgCallTask(DinoEventLoop *obj, void (DinoEventLoop::*func)(u32), u32 a0, int thread);
+template class MBgCallTask0<DinoEventCaptureFadeUiTask>;
+template MTask *MCreateBgCallTask(DinoEventCaptureFadeUiTask *obj, void (DinoEventCaptureFadeUiTask::*func)(), int thread);
