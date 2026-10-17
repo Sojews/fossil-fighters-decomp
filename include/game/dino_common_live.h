@@ -17,6 +17,11 @@ public:
 #endif
     virtual void Idle();
 
+    void ClearUnkA0();
+    void SetUnkAC(u32 index);
+    void SetUnkA0(u32 index, BOOL value);
+    void SetUnkB8(int index, void *value);
+
     MArchivePtr mArchive;               // 0x74
     MArchiveFile mFile;                 // 0x78
     MArchivePtr mArchive2;              // 0x84
