@@ -17,6 +17,7 @@ public:
 #endif
     virtual void Idle();
 
+    DinoCommonLive(std::string name, u32 arg1, u32 arg2);
     void ClearUnkA0();
     void SetUnkAC(u32 index);
     void SetUnkA0(u32 index, BOOL value);

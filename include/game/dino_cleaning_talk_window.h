@@ -8,6 +8,7 @@
 
 class DinoCleaningTalkWindow : public MProcess {
 public:
+    DinoCleaningTalkWindow(u32 arg);
     virtual ~DinoCleaningTalkWindow();
     virtual void Idle();
 
@@ -18,6 +19,13 @@ public:
     MArchiveFile mFile94;   // 0x94
     MArchiveFile mFileA0;   // 0xA0
     MMotionFile mMotion;    // 0xAC
+    u32 unkB0;
+    MTaskSet *mTasksB4;     // 0xB4
+    MTaskSet *mTasksB8;     // 0xB8
+    u32 unkBC[4];
+    u32 mUnkCC;             // 0xCC
+    u32 mUnkD0;             // 0xD0
+    u32 unkD4[2];
 };
 
 #endif

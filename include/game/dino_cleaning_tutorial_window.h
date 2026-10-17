@@ -13,6 +13,7 @@
 
 class DinoCleaningTutorialWindow : public DinoCommonTutorialWindow {
 public:
+    DinoCleaningTutorialWindow(MDisplay *display, u32 arg, const std::string &text);
     virtual ~DinoCleaningTutorialWindow();
 
     u32 mUnk9C;                 // 0x9C
