@@ -1,6 +1,9 @@
 #ifndef GAME_DINO_UI_CONTAINER_MENU_ITEM_MENU_H
 #define GAME_DINO_UI_CONTAINER_MENU_ITEM_MENU_H
 
+#include <string>
+#include <vector>
+#include "m/archive.h"
 #include "m/menu_item.h"
 #include "m/menu.h"
 #include "game/help.h"
@@ -13,6 +16,13 @@ public:
     virtual void OnIdle();
     virtual void OnFocus(MMenuItem *item);
     virtual void OnDecide(MMenuItem *item);
+
+    u32 mUnkB4[7];              // 0xB4
+    std::vector<void *> mUnkD0; // 0xD0
+    u32 mUnkDC[9];              // 0xDC
+    std::vector<s32> mUnk100;   // 0x100
+    MArchivePtr mArchive;       // 0x10C
+    MArchiveFile mFile;         // 0x110
 };
 
 class DinoUiContainerBackButton : public DinoUiContainerMenuItem {
