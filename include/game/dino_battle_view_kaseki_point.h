@@ -6,6 +6,7 @@
 class DinoBattleViewKasekiPoint : public MProcess {
 public:
     virtual ~DinoBattleViewKasekiPoint();
+    virtual void Idle();
 };
 
 #endif

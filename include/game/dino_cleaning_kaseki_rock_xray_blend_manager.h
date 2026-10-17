@@ -6,6 +6,7 @@
 class DinoCleaningKasekiRockXrayBlendManager : public MProcess {
 public:
     virtual ~DinoCleaningKasekiRockXrayBlendManager();
+    virtual void Idle();
 };
 
 #endif

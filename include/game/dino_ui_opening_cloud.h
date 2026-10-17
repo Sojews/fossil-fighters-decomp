@@ -6,6 +6,7 @@
 class DinoUiOpeningCloud : public MProcess {
 public:
     virtual ~DinoUiOpeningCloud();
+    virtual void Idle();
 };
 
 #endif

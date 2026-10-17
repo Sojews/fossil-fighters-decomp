@@ -6,6 +6,7 @@
 class DinoUiPartsTeamTech : public MProcess {
 public:
     virtual ~DinoUiPartsTeamTech();
+    virtual void Idle();
 };
 
 #endif

@@ -6,6 +6,7 @@
 class DinoUiIslandMap : public MProcess {
 public:
     virtual ~DinoUiIslandMap();
+    virtual void Idle();
 };
 
 #endif

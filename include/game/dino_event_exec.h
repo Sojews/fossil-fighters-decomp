@@ -297,11 +297,13 @@ public:
 class DinoEventExecCleaning : public MProcess {
 public:
     virtual ~DinoEventExecCleaning();
+    virtual void Idle();
 };
 
 class DinoEventExecAutoWarp : public MProcess {
 public:
     virtual ~DinoEventExecAutoWarp();
+    virtual void Idle();
 };
 
 class DinoEventExecCamera : public MTransfer {
@@ -414,11 +416,13 @@ public:
 class DinoEventExecChoice : public MProcess {
 public:
     virtual ~DinoEventExecChoice();
+    virtual void Idle();
 };
 
 class DinoEventExecChoice2 : public MProcess {
 public:
     virtual ~DinoEventExecChoice2();
+    virtual void Idle();
 };
 
 class DinoEventExecYesNo : public MProcess {
@@ -437,11 +441,13 @@ public:
 class DinoEventExecShopChoice : public MProcess {
 public:
     virtual ~DinoEventExecShopChoice();
+    virtual void Idle();
 };
 
 class DinoEventExecShopChoice2 : public MProcess {
 public:
     virtual ~DinoEventExecShopChoice2();
+    virtual void Idle();
 };
 
 class DinoEventExecFade : public MProcess {

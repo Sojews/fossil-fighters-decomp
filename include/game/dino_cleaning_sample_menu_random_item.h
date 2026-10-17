@@ -6,6 +6,8 @@
 class DinoCleaningSampleMenuRandomItem : public MMenuItem {
 public:
     virtual ~DinoCleaningSampleMenuRandomItem();
+    virtual MRect GetFrame();
+    virtual void OnDecide();
 };
 
 #endif

@@ -15,7 +15,7 @@ src/ov004/dino_ui_title.cpp:
     .text       start:0x0215edb4 end:0x0215fdf4
 
 src/ov004/dino_ui_debug_kaseki_rock_get.cpp:
-    .text       start:0x021611a0 end:0x021612d8
+    .text       start:0x0215fdf4 end:0x021612d8
 
 src/ov004/dino_ui_debug_menu.cpp:
     .text       start:0x02162504 end:0x02162538
@@ -55,9 +55,6 @@ src/ov004/dino_ui_debug_reviver_menu.cpp:
 
 src/ov004/dino_ui_debug_flag_menu.cpp:
     .text       start:0x02161b70 end:0x02162298
-
-src/ov004/dino_ui_debug_kaseki_rock_get_menu.cpp:
-    .text       start:0x0215fe44 end:0x021610e0
 
 src/ov004/dino_ui2_field_menu_cursor.cpp:
     .text       start:0x0216e724 end:0x0216e788

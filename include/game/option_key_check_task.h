@@ -6,6 +6,7 @@
 class OptionKeyCheckTask : public MTask {
 public:
     virtual ~OptionKeyCheckTask();
+    virtual void Execute();
 };
 
 #endif

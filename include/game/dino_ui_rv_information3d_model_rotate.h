@@ -6,6 +6,7 @@
 class DinoUiRvInformation3DModelRotate : public MTask {
 public:
     virtual ~DinoUiRvInformation3DModelRotate();
+    virtual void Execute();
 };
 
 #endif

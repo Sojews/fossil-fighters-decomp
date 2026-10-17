@@ -6,6 +6,7 @@
 class MPolygonChar : public MProcess {
 public:
     virtual ~MPolygonChar();
+    virtual void Idle();
 };
 
 #endif

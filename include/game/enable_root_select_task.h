@@ -6,6 +6,7 @@
 class EnableRootSelectTask : public MTask {
 public:
     virtual ~EnableRootSelectTask();
+    virtual void Execute();
 };
 
 #endif

@@ -6,6 +6,7 @@
 class IslandMapKeyCheckTask : public MTask {
 public:
     virtual ~IslandMapKeyCheckTask();
+    virtual void Execute();
 };
 
 #endif

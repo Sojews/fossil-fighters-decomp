@@ -6,6 +6,7 @@
 class M3DSceneEnableTask : public MTask {
 public:
     virtual ~M3DSceneEnableTask();
+    virtual void Execute();
 };
 
 #endif

@@ -6,6 +6,7 @@
 class DinoUi3PartsFraction : public MProcess {
 public:
     virtual ~DinoUi3PartsFraction();
+    virtual void Idle();
 };
 
 #endif

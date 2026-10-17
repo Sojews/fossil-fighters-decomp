@@ -6,6 +6,7 @@
 class DinoUiATM : public MProcess {
 public:
     virtual ~DinoUiATM();
+    virtual void Idle();
 };
 
 #endif

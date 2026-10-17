@@ -6,6 +6,7 @@
 class DinoUiTitle : public MProcess {
 public:
     virtual ~DinoUiTitle();
+    virtual void Idle();
 };
 
 #endif

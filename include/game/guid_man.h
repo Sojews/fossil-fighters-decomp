@@ -6,6 +6,7 @@
 class GuidMan : public MTask {
 public:
     virtual ~GuidMan();
+    virtual void Execute();
 };
 
 #endif

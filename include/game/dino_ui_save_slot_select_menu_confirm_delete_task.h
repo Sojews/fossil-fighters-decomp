@@ -6,6 +6,7 @@
 class DinoUiSaveSlotSelectMenuConfirmDeleteTask : public MProcess {
 public:
     virtual ~DinoUiSaveSlotSelectMenuConfirmDeleteTask();
+    virtual void Idle();
 };
 
 #endif

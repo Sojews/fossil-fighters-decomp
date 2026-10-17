@@ -6,6 +6,8 @@
 class DinoUiDebugKasekiRockGetMenuDecItem : public MMenuItem {
 public:
     virtual ~DinoUiDebugKasekiRockGetMenuDecItem();
+    virtual MRect GetFrame();
+    virtual void OnDecide();
 };
 
 #endif

@@ -6,6 +6,7 @@
 class DinoFieldCharaHideManpuTask : public MTransfer {
 public:
     virtual ~DinoFieldCharaHideManpuTask();
+    virtual void Transfer();
 };
 
 #endif

@@ -6,6 +6,7 @@
 class DinoUiRvInformation3DModel : public MProcess {
 public:
     virtual ~DinoUiRvInformation3DModel();
+    virtual void Idle();
 };
 
 #endif

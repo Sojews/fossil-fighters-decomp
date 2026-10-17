@@ -6,6 +6,7 @@
 class DinoFieldAreaPanel : public MProcess {
 public:
     virtual ~DinoFieldAreaPanel();
+    virtual void Idle();
 };
 
 #endif

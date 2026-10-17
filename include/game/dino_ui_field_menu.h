@@ -6,6 +6,7 @@
 class DinoUiFieldMenu : public MProcess {
 public:
     virtual ~DinoUiFieldMenu();
+    virtual void Idle();
 };
 
 #endif

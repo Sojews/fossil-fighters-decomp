@@ -6,6 +6,7 @@
 class SetEpisodeTask : public MTask {
 public:
     virtual ~SetEpisodeTask();
+    virtual void Execute();
 };
 
 #endif

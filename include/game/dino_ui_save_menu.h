@@ -7,6 +7,7 @@
 class DinoUiSaveMenu : public MProcess, public DinoHelpBase {
 public:
     virtual ~DinoUiSaveMenu();
+    virtual void Idle();
 };
 
 #endif

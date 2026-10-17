@@ -6,6 +6,7 @@
 class SendLocalMessageTask : public MTask {
 public:
     virtual ~SendLocalMessageTask();
+    virtual void Execute();
 };
 
 #endif

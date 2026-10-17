@@ -6,6 +6,7 @@
 class DinoCommonWindowMenuItemFlushTask : public MTask {
 public:
     virtual ~DinoCommonWindowMenuItemFlushTask();
+    virtual void Execute();
 };
 
 #endif

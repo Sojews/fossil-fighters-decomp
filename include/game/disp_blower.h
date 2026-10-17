@@ -6,6 +6,7 @@
 class DispBlower : public MTask {
 public:
     virtual ~DispBlower();
+    virtual void Execute();
 };
 
 #endif

@@ -6,6 +6,7 @@
 class DinoUi3PartsMaskName : public MProcess {
 public:
     virtual ~DinoUi3PartsMaskName();
+    virtual void Idle();
 };
 
 #endif

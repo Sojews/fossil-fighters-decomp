@@ -6,6 +6,7 @@
 class DinoUiSaveOptionRemoveItemTask : public MTask {
 public:
     virtual ~DinoUiSaveOptionRemoveItemTask();
+    virtual void Execute();
 };
 
 #endif

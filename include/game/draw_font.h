@@ -6,6 +6,7 @@
 class DrawFont : public MProcess {
 public:
     virtual ~DrawFont();
+    virtual void Idle();
 };
 
 #endif

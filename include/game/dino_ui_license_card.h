@@ -6,6 +6,7 @@
 class DinoUiLicenseCard : public MProcess {
 public:
     virtual ~DinoUiLicenseCard();
+    virtual void Idle();
 };
 
 #endif

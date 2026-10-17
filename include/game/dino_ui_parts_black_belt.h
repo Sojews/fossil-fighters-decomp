@@ -6,6 +6,7 @@
 class DinoUiPartsBlackBelt : public MProcess {
 public:
     virtual ~DinoUiPartsBlackBelt();
+    virtual void Idle();
 };
 
 #endif

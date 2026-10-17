@@ -6,6 +6,7 @@
 class DinoEventSaveOption : public MProcess {
 public:
     virtual ~DinoEventSaveOption();
+    virtual void Idle();
 };
 
 #endif

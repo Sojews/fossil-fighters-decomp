@@ -6,6 +6,7 @@
 class DinoUiReviveStatusDigit : public MProcess {
 public:
     virtual ~DinoUiReviveStatusDigit();
+    virtual void Idle();
 };
 
 #endif

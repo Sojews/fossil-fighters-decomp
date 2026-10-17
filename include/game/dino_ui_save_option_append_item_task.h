@@ -6,6 +6,7 @@
 class DinoUiSaveOptionAppendItemTask : public MTask {
 public:
     virtual ~DinoUiSaveOptionAppendItemTask();
+    virtual void Execute();
 };
 
 #endif

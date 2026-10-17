@@ -6,6 +6,7 @@
 class DinoFieldKasekiRock : public MProcess {
 public:
     virtual ~DinoFieldKasekiRock();
+    virtual void Idle();
 };
 
 #endif

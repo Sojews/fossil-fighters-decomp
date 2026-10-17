@@ -6,6 +6,7 @@
 class DinoUiCanonTakeout : public MProcess {
 public:
     virtual ~DinoUiCanonTakeout();
+    virtual void Idle();
 };
 
 #endif

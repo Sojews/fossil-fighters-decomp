@@ -6,6 +6,8 @@
 class DinoUi3PartsKasekiButton : public MMenuItem {
 public:
     virtual ~DinoUi3PartsKasekiButton();
+    virtual MRect GetFrame();
+    virtual void OnFocusChanged(BOOL focused);
 };
 
 #endif

@@ -6,6 +6,8 @@
 class DinoCleaningSampleMenuStartItem : public MMenuItem {
 public:
     virtual ~DinoCleaningSampleMenuStartItem();
+    virtual MRect GetFrame();
+    virtual void OnDecide();
 };
 
 #endif

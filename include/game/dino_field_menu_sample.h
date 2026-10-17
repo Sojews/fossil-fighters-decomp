@@ -6,6 +6,7 @@
 class DinoFieldMenuSample : public MProcess {
 public:
     virtual ~DinoFieldMenuSample();
+    virtual void Idle();
 };
 
 #endif

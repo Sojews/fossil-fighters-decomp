@@ -6,6 +6,7 @@
 class DinoTalkWindowWaitStartTask : public MTask {
 public:
     virtual ~DinoTalkWindowWaitStartTask();
+    virtual void Execute();
 };
 
 #endif

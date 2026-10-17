@@ -6,6 +6,7 @@
 class SpotMove : public MProcess {
 public:
     virtual ~SpotMove();
+    virtual void Idle();
 };
 
 #endif

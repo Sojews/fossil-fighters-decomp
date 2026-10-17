@@ -6,6 +6,7 @@
 class DinoCleaningHammerTask : public MProcess {
 public:
     virtual ~DinoCleaningHammerTask();
+    virtual void Idle();
 };
 
 #endif

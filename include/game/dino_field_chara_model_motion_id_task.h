@@ -6,6 +6,7 @@
 class DinoFieldCharaModelMotionIdTask : public MTransfer {
 public:
     virtual ~DinoFieldCharaModelMotionIdTask();
+    virtual void Transfer();
 };
 
 #endif

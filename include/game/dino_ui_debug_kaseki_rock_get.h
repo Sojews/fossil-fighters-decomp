@@ -6,6 +6,7 @@
 class DinoUiDebugKasekiRockGet : public MProcess {
 public:
     virtual ~DinoUiDebugKasekiRockGet();
+    virtual void Idle();
 };
 
 #endif

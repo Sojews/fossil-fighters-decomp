@@ -6,6 +6,7 @@
 class DinoCleaningHammerEffect : public MProcess {
 public:
     virtual ~DinoCleaningHammerEffect();
+    virtual void Idle();
 };
 
 #endif

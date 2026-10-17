@@ -6,6 +6,7 @@
 class DinoFieldCharaMoveVectorTask : public MTransfer {
 public:
     virtual ~DinoFieldCharaMoveVectorTask();
+    virtual void Transfer();
 };
 
 #endif

@@ -6,6 +6,7 @@
 class DinoUiTopMenuLoop : public MProcess {
 public:
     virtual ~DinoUiTopMenuLoop();
+    virtual void Idle();
 };
 
 #endif

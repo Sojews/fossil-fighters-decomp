@@ -1,5 +1,5 @@
 func_ov006_02171b00 kind:function(thumb,size=0x28) addr:0x02171b00
-func_ov006_02171b28 kind:function(thumb,size=0x20) addr:0x02171b28
+_ZN15DinoUiFieldMenu4IdleEv kind:function(thumb,size=0x20) addr:0x02171b28
 func_ov006_02171b48 kind:function(thumb,size=0xd0) addr:0x02171b48
 func_ov006_02171c18 kind:function(thumb,size=0xc0) addr:0x02171c18
 func_ov006_02171cd8 kind:function(thumb,size=0x1c0) addr:0x02171cd8

@@ -6,6 +6,7 @@
 class DinoUiTitleSkip : public MProcess {
 public:
     virtual ~DinoUiTitleSkip();
+    virtual void Idle();
 };
 
 #endif

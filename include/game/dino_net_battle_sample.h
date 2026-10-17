@@ -6,6 +6,7 @@
 class DinoNetBattleSample : public MProcess {
 public:
     virtual ~DinoNetBattleSample();
+    virtual void Idle();
 };
 
 #endif

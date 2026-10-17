@@ -6,6 +6,7 @@
 class DinoUiPartsRockName : public MProcess {
 public:
     virtual ~DinoUiPartsRockName();
+    virtual void Idle();
 };
 
 #endif

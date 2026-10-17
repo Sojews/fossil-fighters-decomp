@@ -6,6 +6,7 @@
 class SetLiveEventCheckTask : public MTask {
 public:
     virtual ~SetLiveEventCheckTask();
+    virtual void Execute();
 };
 
 #endif

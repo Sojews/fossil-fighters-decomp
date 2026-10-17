@@ -6,6 +6,7 @@
 class SetLiveOneShotFlagTask : public MTask {
 public:
     virtual ~SetLiveOneShotFlagTask();
+    virtual void Execute();
 };
 
 #endif

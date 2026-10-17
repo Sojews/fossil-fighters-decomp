@@ -6,6 +6,7 @@
 class DinoEventReviveContainerSelect : public MProcess {
 public:
     virtual ~DinoEventReviveContainerSelect();
+    virtual void Idle();
 };
 
 #endif

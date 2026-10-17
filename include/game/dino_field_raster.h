@@ -6,6 +6,7 @@
 class DinoFieldRaster : public MProcess {
 public:
     virtual ~DinoFieldRaster();
+    virtual void Idle();
 };
 
 #endif

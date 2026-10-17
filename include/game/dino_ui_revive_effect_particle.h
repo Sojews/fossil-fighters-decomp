@@ -6,6 +6,7 @@
 class DinoUiReviveEffectParticle : public MProcess {
 public:
     virtual ~DinoUiReviveEffectParticle();
+    virtual void Idle();
 };
 
 #endif

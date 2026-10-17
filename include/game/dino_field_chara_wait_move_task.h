@@ -6,6 +6,7 @@
 class DinoFieldCharaWaitMoveTask : public MProcess {
 public:
     virtual ~DinoFieldCharaWaitMoveTask();
+    virtual void Idle();
 };
 
 #endif

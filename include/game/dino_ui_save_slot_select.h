@@ -6,6 +6,7 @@
 class DinoUiSaveSlotSelect : public MProcess {
 public:
     virtual ~DinoUiSaveSlotSelect();
+    virtual void Idle();
 };
 
 #endif

@@ -6,6 +6,10 @@
 class DinoUiDebugKasekiRockGetChipsTypeItem : public MMenuItem {
 public:
     virtual ~DinoUiDebugKasekiRockGetChipsTypeItem();
+    virtual void Idle();
+    virtual MRect GetFrame();
+    virtual void OnFocusChanged(BOOL focused);
+    virtual void OnDecide();
 };
 
 #endif

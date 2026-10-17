@@ -6,6 +6,7 @@
 class DinoEventReviveEffect : public MProcess {
 public:
     virtual ~DinoEventReviveEffect();
+    virtual void Idle();
 };
 
 #endif

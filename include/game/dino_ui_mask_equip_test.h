@@ -6,6 +6,7 @@
 class DinoUiMaskEquipTest : public MProcess {
 public:
     virtual ~DinoUiMaskEquipTest();
+    virtual void Idle();
 };
 
 #endif

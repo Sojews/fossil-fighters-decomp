@@ -6,6 +6,7 @@
 class DinoUiMultiplayLoop : public MProcess {
 public:
     virtual ~DinoUiMultiplayLoop();
+    virtual void Idle();
 };
 
 #endif

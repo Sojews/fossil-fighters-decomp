@@ -6,6 +6,7 @@
 class DinoFieldCharaWaitStopTask : public MTask {
 public:
     virtual ~DinoFieldCharaWaitStopTask();
+    virtual void Execute();
 };
 
 #endif

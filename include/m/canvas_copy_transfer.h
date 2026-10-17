@@ -6,6 +6,8 @@
 class MCanvasCopyTransfer : public MTransfer {
 public:
     virtual ~MCanvasCopyTransfer();
+    virtual void Execute();
+    virtual void Transfer();
 };
 
 #endif

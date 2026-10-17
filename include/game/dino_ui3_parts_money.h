@@ -6,6 +6,7 @@
 class DinoUi3PartsMoney : public MProcess {
 public:
     virtual ~DinoUi3PartsMoney();
+    virtual void Idle();
 };
 
 #endif

@@ -7,6 +7,7 @@
 class DinoHelpDisablerTask : public MTask, public DinoHelpDisabler {
 public:
     virtual ~DinoHelpDisablerTask();
+    virtual void Execute();
 };
 
 #endif

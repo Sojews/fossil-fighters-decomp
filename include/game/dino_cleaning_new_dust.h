@@ -6,6 +6,7 @@
 class DinoCleaningNewDust : public MProcess {
 public:
     virtual ~DinoCleaningNewDust();
+    virtual void Idle();
 };
 
 #endif

@@ -6,6 +6,7 @@
 class M3dWaitTransferCompleteTask : public MTask {
 public:
     virtual ~M3dWaitTransferCompleteTask();
+    virtual void Execute();
 };
 
 #endif
