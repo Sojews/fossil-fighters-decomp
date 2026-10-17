@@ -17,3 +17,11 @@ DinoBattleDebugSelect::~DinoBattleDebugSelect() {
 void DinoBattleAutoDemo::Idle() {
     (this->*mState)();
 }
+
+void DinoBattle::Idle() {
+    (this->*mState)();
+}
+
+void DinoBattleDebugSelect::Idle() {
+    (this->*mState)();
+}

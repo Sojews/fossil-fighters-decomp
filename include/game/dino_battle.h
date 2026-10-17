@@ -18,7 +18,9 @@ public:
 
     u32 mUnk74[12];             // 0x74
     DinoBattleSide mSides[2];   // 0xA4
-    u32 mUnk1BC[19];            // 0x1BC
+    u32 mUnk1BC[12];            // 0x1BC
+    void (DinoBattle::*mState)();   // 0x1EC
+    u32 mUnk1F4[5];             // 0x1F4
     MTask *mUnk208;             // 0x208
 };
 
@@ -38,6 +40,8 @@ public:
 
     u32 mUnk74[13];             // 0x74
     DinoBattleSide mSides[2];   // 0xA8
+    u32 mUnk1C0[9];             // 0x1C0
+    void (DinoBattleDebugSelect::*mState)(); // 0x1E4
 };
 
 #endif
