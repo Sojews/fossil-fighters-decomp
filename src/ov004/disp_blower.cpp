@@ -40,6 +40,7 @@ DinoUiOptionOkButton::~DinoUiOptionOkButton() {
 }
 
 DinoUiOptionPower::~DinoUiOptionPower() {
+    MSleepHook::Unregister();
 }
 
 DinoUiOptionMenu::~DinoUiOptionMenu() {
