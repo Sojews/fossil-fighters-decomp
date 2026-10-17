@@ -20,3 +20,6 @@ DinoTalkWindow::~DinoTalkWindow() {
 
 DinoTalkWindowNamePanel::~DinoTalkWindowNamePanel() {
 }
+
+void DinoTalkWindowNamePanel::Idle() {
+}

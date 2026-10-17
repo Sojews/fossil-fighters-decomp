@@ -15,3 +15,6 @@ DinoMultiPlayIconHook::~DinoMultiPlayIconHook() {
 
 void DinoMultiPlayIconHook::Unk08() {
 }
+
+void DinoMultiPlayIcon::Idle() {
+}

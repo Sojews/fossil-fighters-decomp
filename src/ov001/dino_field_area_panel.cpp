@@ -5,3 +5,6 @@
 
 DinoFieldAreaPanel::~DinoFieldAreaPanel() {
 }
+
+void DinoFieldAreaPanel::Idle() {
+}

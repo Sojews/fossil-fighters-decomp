@@ -21,3 +21,15 @@ DinoUi3PartsKasekiButton::~DinoUi3PartsKasekiButton() {
 
 DinoUi3PartsMoney::~DinoUi3PartsMoney() {
 }
+
+void DinoUi3PartsMoney::Idle() {
+}
+
+void DinoUi3PartsMaskName::Idle() {
+}
+
+void DinoUi3PartsRockName::Idle() {
+}
+
+void DinoUi3PartsFraction::Idle() {
+}

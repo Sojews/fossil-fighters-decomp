@@ -5,3 +5,6 @@
 
 DinoUiFieldMenuFraction4::~DinoUiFieldMenuFraction4() {
 }
+
+void DinoUiFieldMenuFraction4::Idle() {
+}

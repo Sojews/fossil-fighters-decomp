@@ -53,3 +53,6 @@ DinoUiPartsTeamTech::~DinoUiPartsTeamTech() {
 
 DinoUiPartsReviverName::~DinoUiPartsReviverName() {
 }
+
+void DinoUiFieldMenuFraction::Idle() {
+}

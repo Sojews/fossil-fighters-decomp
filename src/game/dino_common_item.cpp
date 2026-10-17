@@ -21,3 +21,6 @@ MDisplay *DinoCommonItem::GetDisplay() {
 const char *DinoCommonItem::GetText() {
     return gDinoResource->GetText(mTextId);
 }
+
+void DinoCommonItem::OnDecide() {
+}

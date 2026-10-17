@@ -5,3 +5,6 @@
 
 DinoFieldKasekiRock::~DinoFieldKasekiRock() {
 }
+
+void DinoFieldKasekiRock::Idle() {
+}

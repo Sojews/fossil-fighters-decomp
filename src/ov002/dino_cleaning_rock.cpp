@@ -5,3 +5,6 @@
 
 DinoCleaningRock::~DinoCleaningRock() {
 }
+
+void DinoCleaningRock::Idle() {
+}

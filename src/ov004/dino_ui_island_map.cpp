@@ -82,3 +82,6 @@ void DinoUiIslandMapMenuItem::OnSelectChanged(BOOL selected) {
         mMotion->Play(1, 0);
     }
 }
+
+void DrawFont::Idle() {
+}

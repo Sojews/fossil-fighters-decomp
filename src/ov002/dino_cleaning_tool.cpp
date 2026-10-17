@@ -10,3 +10,6 @@
 
 DinoCleaningTool::~DinoCleaningTool() {
 }
+
+void DinoCleaningTool::Idle() {
+}
