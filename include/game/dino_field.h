@@ -154,8 +154,6 @@ public:
     MTask *CreateDonateHideTask();
     MTask *CreatePictWaitTask();
     BOOL IsBgmChanging();
-    void ShowPict(u32 pict, MPoint pos, u32 frames, long unk);
-    void HidePict(u32 frames, long unk);
     void PlayMapBgm(u32 bgm, u32 arg);
     void FadeInLowerPict(u32 pict, MPoint pos, u32 frames, long unk);
     void FadeOutLowerPict(u32 pict, long frames);

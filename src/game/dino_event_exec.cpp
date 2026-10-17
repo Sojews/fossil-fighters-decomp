@@ -515,7 +515,7 @@ DinoEventExecPictShow::DinoEventExecPictShow(DinoEventLoop *event, u32 pict) : M
 void DinoEventExecPictShow::Idle() {
     MTask *exit = MTaskExitTransfer::Create(this);
     MTask *wait = mEvent->GetField()->CreatePictWaitTask();
-    MTask *show = MCreateCallTask(mEvent->GetField(), &DinoField::ShowPict, mPict, MPoint(0, 0), (u32) 30, (long) 0);
+    MTask *show = MCreateCallTask(mEvent->GetField(), &DinoField::FadeInLowerPict, mPict, MPoint(0, 0), (u32) 30, (long) 0);
     MTask *wait2 = mEvent->GetField()->CreatePictWaitTask();
     MSerialTaskSet *serial = &mSerial;
     serial->AddTail(wait2);
@@ -532,7 +532,7 @@ void DinoEventExecPictHide::Idle() {
     MTask *exit = MTaskExitTransfer::Create(this);
     MTask *timer = new MTimer(1);
     MTask *wait = mEvent->GetField()->CreatePictWaitTask();
-    MTask *hide = MCreateCallTask(mEvent->GetField(), &DinoField::HidePict, (u32) 30, (long) 0);
+    MTask *hide = MCreateCallTask(mEvent->GetField(), &DinoField::FadeOutLowerPict, (u32) 30, (long) 0);
     MTask *wait2 = mEvent->GetField()->CreatePictWaitTask();
     MSerialTaskSet *serial = &mSerial;
     serial->AddTail(wait2);
