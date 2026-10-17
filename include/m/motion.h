@@ -10,7 +10,8 @@
 #include "m/file.h"
 
 class MSmartOam;
-class MPalBlock;
+struct MPalBlock;
+struct MChrBlock;
 
 // A motion file's header.
 struct MMotionHeader {
@@ -31,6 +32,11 @@ public:
     static MMotionData *Get(FSFileID id, int unk);
     void AddRef();
     void Release();
+    void LockFiles(int which);
+    MChrBlock **AcquireChrs(MDisplay *display);
+    void ReleaseChrs(MDisplay *display);
+    MPalBlock **AcquirePalettes(MDisplay *display);
+    void ReleasePalettes(MDisplay *display);
 
     MArchivePtr mArchive;               // 0x00
     MArchiveFile mFile;                 // 0x04
@@ -49,6 +55,11 @@ public:
     MMotionFile &operator=(const MMotionFile &other);
 
     u32 GetUnk04();
+    u32 GetUnk18();
+    MPalBlock **AcquirePalettes(MDisplay *display);
+    void ReleasePalettes(MDisplay *display);
+    MChrBlock **AcquireChrs(MDisplay *display);
+    void ReleaseChrs(MDisplay *display);
     u32 GetAnimeCount();
     u32 GetCellCount();
     void *GetCell(u32 index);
@@ -80,7 +91,8 @@ struct MMotionAnimeState {
 
 class MMotion : public MView {
 public:
-    MMotion(const std::string &path, MSmartOam *oam, int unk, int priority);
+    MMotion(const MMotionFile &file, MSmartOam *oam, int flags, int fromEnd);
+    MMotion(const std::string &path, MSmartOam *oam, int flags, int fromEnd);
     virtual ~MMotion();
     virtual void Execute();
     virtual void SetPosition(MPoint pos);

@@ -78,6 +78,37 @@ void *MMotionFile::GetCell(u32 index) {
     return (u8 *) header + header->cellOffset + index * 16;
 }
 
+u32 MMotionFile::GetUnk18() {
+    return ((u32 *) mData->mFile.GetData())[6];
+}
+
+MPalBlock **MMotionFile::AcquirePalettes(MDisplay *display) {
+    return mData->AcquirePalettes(display);
+}
+
+void MMotionFile::ReleasePalettes(MDisplay *display) {
+    mData->ReleasePalettes(display);
+}
+
+MChrBlock **MMotionFile::AcquireChrs(MDisplay *display) {
+    return mData->AcquireChrs(display);
+}
+
+void MMotionFile::ReleaseChrs(MDisplay *display) {
+    mData->ReleaseChrs(display);
+}
+
+MMotion::MMotion(const MMotionFile &file, MSmartOam *oam, int flags, int fromEnd)
+    : mDisplay(oam->mDisplay), mFile(file) {
+    mOam = oam;
+    mFlags = flags;
+    if (mFile.GetCellCount() != 0) {
+        mUnit = mOam->Alloc(mFile.GetCellCount(), fromEnd);
+        mEntries = mUnit->GetEntries();
+    }
+    Init(fromEnd);
+}
+
 MMotion::MMotion(const std::string &path, MSmartOam *oam, int flags, int fromEnd)
     : mDisplay(oam->mDisplay), mFile(path, 0) {
     mOam = oam;
