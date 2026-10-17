@@ -457,14 +457,42 @@ public:
     virtual ~DinoEventExecShopSet();
 };
 
+// Shows a kaseki rock being got.
+class DinoEventKasekiRockGet : public MProcess {
+public:
+    DinoEventKasekiRockGet(DinoEvent *event, u32 mode, const DinoBackupEntry *entry, u8 *result);
+    virtual void Idle();
+
+    u8 unk74[0x58];
+};
+
 class DinoEventExecKasekiRockGet : public MProcess {
 public:
+    DinoEventExecKasekiRockGet(DinoEvent *event, u32 flag, u32 id, u32 a, u32 b, u8 c);
     virtual ~DinoEventExecKasekiRockGet();
+    virtual void Idle();
+
+    DinoEvent *mEvent;  // 0x74
+    u32 mFlag;          // 0x78: if set, gets the result
+    u32 mId;            // 0x7C
+    u32 mA;             // 0x80
+    u32 mB;             // 0x84
+    u32 mStep;          // 0x88
+    u8 mResult;         // 0x8C
+    u8 mC;              // 0x8D
 };
 
 class DinoEventExecKasekiRockShot : public MProcess {
 public:
+    DinoEventExecKasekiRockShot(DinoEvent *event, u32 id, u32 a, u32 b);
     virtual ~DinoEventExecKasekiRockShot();
+    virtual void Idle();
+
+    DinoEvent *mEvent;  // 0x74
+    u32 mId;            // 0x78
+    u32 mA;             // 0x7C
+    u32 mB;             // 0x80
+    u32 mStep;          // 0x84
 };
 
 class DinoEventExecCharaBodyModelIndex : public MTransfer {

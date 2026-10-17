@@ -3,6 +3,7 @@
 #include "game/dino_event_exec.h"
 #include "nitro/mi.h"
 #include "m/overlay.h"
+#include "game/dino_resource.h"
 #include "game/dino_sound.h"
 #include "m/picture.h"
 #include "m/lcd.h"
@@ -655,6 +656,74 @@ void DinoEventExecExit::Idle() {
         serial->AddTail(wait);
         break;
     }
+    }
+}
+
+DinoEventExecKasekiRockGet::DinoEventExecKasekiRockGet(DinoEvent *event, u32 flag, u32 id, u32 a, u32 b, u8 c)
+    : MProcess(NULL) {
+    mEvent = event;
+    mFlag = flag;
+    mId = id;
+    mA = a;
+    mB = b;
+    mStep = 0;
+    mC = c;
+}
+
+void DinoEventExecKasekiRockGet::Idle() {
+    switch (mStep++) {
+    case 0: {
+        DinoBackupEntry entry;
+        MResource<DinoKasekiDefs> defs = gDinoResource->LoadKasekiDefs();
+        MI_CpuFill8(&entry, 0, sizeof(entry));
+        entry.id = mId;
+        u32 id = mId;
+        const DinoKasekiDefs *data = defs.Get();
+        entry.type = ((const DinoKasekiDef *) ((const u8 *) data + ((const u32 *) ((const u8 *) data + data->tableOffset))[id]))->unk24;
+        entry.unk10_0 = mA;
+        entry.unkC_12 = mB;
+        entry.unk10_3 = mC;
+        u32 mode;
+        if (mFlag != 0) {
+            mode = 2;
+        } else if (mC) {
+            mode = 4;
+        } else {
+            mode = 1;
+        }
+        mSerial.AddTail(new DinoEventKasekiRockGet(mEvent, mode, &entry, &mResult));
+        break;
+    }
+    case 1:
+        if (mFlag != 0) {
+            gDinoBackup->SetFlag(mFlag, mResult);
+        }
+        Exit();
+        break;
+    }
+}
+
+DinoEventExecKasekiRockShot::DinoEventExecKasekiRockShot(DinoEvent *event, u32 id, u32 a, u32 b) : MProcess(NULL) {
+    mEvent = event;
+    mId = id;
+    mA = a;
+    mB = b;
+    mStep = 0;
+}
+
+void DinoEventExecKasekiRockShot::Idle() {
+    if (mStep++ == 0) {
+        DinoBackupEntry entry;
+        MResource<DinoKasekiDefs> defs = gDinoResource->LoadKasekiDefs();
+        MI_CpuFill8(&entry, 0, sizeof(entry));
+        entry.id = mId;
+        u32 id = mId;
+        const DinoKasekiDefs *data = defs.Get();
+        entry.type = ((const DinoKasekiDef *) ((const u8 *) data + ((const u32 *) ((const u8 *) data + data->tableOffset))[id]))->unk24;
+        entry.unk10_0 = mA;
+        entry.unkC_12 = mB;
+        gDinoBackup->AddUnk138(&entry, FALSE);
+        Exit();
     }
 }
 

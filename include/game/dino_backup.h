@@ -353,6 +353,7 @@ public:
     void SetUnk138(u32 index, const DinoBackupEntry28 *entry);
     void GetUnk138(u32 index, DinoBackupEntry28 *entry);
     BOOL CanAddUnk138(const DinoBackupEntry *entry, BOOL checkDuplicate, BOOL checkCount, u32 maxCount);
+    void AddUnk138(const DinoBackupEntry *entry, BOOL arg);
 
     MBackupDevice *mDevice;         // 0x00C
     MBackupStorage *mStorage;       // 0x010

@@ -98,7 +98,9 @@ struct DinoKasekiDefs {
 };
 
 struct DinoKasekiDef {
-    u8 unk00[0x28];
+    u8 unk00[0x24];
+    u32 unk24;          // 0x24
+
     u32 nameText;       // 0x28
 };
 struct DinoSenryuDefs;
