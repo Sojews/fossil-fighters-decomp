@@ -107,7 +107,7 @@ public:
     MMenuItem *mSeItems[11];    // 0xFC
     u32 mUnk128;                // 0x128
     MMenuItem *mBackButton;     // 0x12C: B goes to it
-    MMenuItem *mBelowSeItem;    // 0x130: the item under the SE volume row
+    MicTestButton *mMicTest;    // 0x130: the item under the SE volume row
     u32 mUnk134[2];             // 0x134
     MTask *mUnk13C;             // 0x13C
     u32 mUnk140[3];             // 0x140

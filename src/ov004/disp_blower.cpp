@@ -290,8 +290,8 @@ void DinoUiOptionMenu::SetSeVolume(u8 level) {
             RemoveLink(mBgmItems[i], 2);
             AddLink(mBgmItems[i], 2, mSeItems[mSeVolume]);
         }
-        RemoveLink(mBelowSeItem, 4);
-        AddLink(mBelowSeItem, 4, mSeItems[mSeVolume]);
+        RemoveLink(mMicTest, 4);
+        AddLink(mMicTest, 4, mSeItems[mSeVolume]);
     }
 }
 
@@ -345,4 +345,15 @@ void MicTestButton::OnFocusChanged(BOOL focused) {
     mTasks->Clear();
     mMeter->Play(1, 1);
     mMeter->Hide();
+}
+
+void DinoUiOptionMenu::Sleep() {
+    mDelay = 180;
+    MicTestButton *mic = mMicTest;
+    for (int i = 0; i < 0x40; i++) {
+        mic->mLevels[i] = 0;
+    }
+    mic->mTasks->Clear();
+    mic->mMeter->Play(1, 1);
+    mic->mMeter->Hide();
 }
