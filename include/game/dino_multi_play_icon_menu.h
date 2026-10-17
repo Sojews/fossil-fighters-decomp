@@ -8,15 +8,22 @@
 #include "m/sleep.h"
 #include "m/looper.h"
 #include "game/help.h"
+#include "m/multi_play.h"
 
+// Shows the wireless icon on one screen.
 class DinoMultiPlayIconHook : public MProcess, public MDisplayHook {
 public:
+    DinoMultiPlayIconHook(MDisplay *display, MPoint pos) : MProcess(display), MDisplayHook(display) {
+        mPos = pos;
+        mUnk7C = 0;
+    }
     virtual ~DinoMultiPlayIconHook();
     virtual void Idle();
     virtual void Unk08();
     virtual void Unk0C();
 
-    u32 mUnk7C;     // 0x7C
+    MMultiPlayIcon *mUnk7C; // 0x7C
+    MPoint mPos;    // 0x80
 };
 
 #endif

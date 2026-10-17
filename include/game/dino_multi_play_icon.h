@@ -5,6 +5,7 @@
 
 class DinoMultiPlayIcon : public MProcess {
 public:
+    DinoMultiPlayIcon();
     virtual ~DinoMultiPlayIcon();
     virtual void Idle();
 };

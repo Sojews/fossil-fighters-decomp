@@ -6,6 +6,16 @@
 
 #include "game/dino_multi_play_icon_menu.h"
 #include "game/dino_multi_play_icon.h"
+#include "m/lcd.h"
+
+// NONMATCHING: the two MPoint temporaries get each other's stack slots.
+DinoMultiPlayIcon::DinoMultiPlayIcon() : MProcess(NULL) {
+    DinoMultiPlayIconHook *bottom = new DinoMultiPlayIconHook(gLcd->GetBottomDisplay(), MPoint(236, 4));
+    DinoMultiPlayIconHook *top = new DinoMultiPlayIconHook(gLcd->GetTopDisplay(), MPoint(236, 4));
+    MParallelTaskSet *parallel = &mParallel;
+    parallel->AddTail(top);
+    parallel->AddTail(bottom);
+}
 
 DinoMultiPlayIcon::~DinoMultiPlayIcon() {
 }
@@ -17,6 +27,19 @@ void DinoMultiPlayIconHook::Unk08() {
 }
 
 void DinoMultiPlayIcon::Idle() {
+}
+
+void DinoMultiPlayIconHook::Idle() {
+    if (mUnk7C == NULL && GetDisplay() == gLcd->GetTopDisplay() && GetDisplay()->mObj != NULL) {
+        mUnk7C = new MMultiPlayLinkIcon(GetDisplay(), FALSE);
+        mUnk7C->SetPosition(mPos);
+        mUnk7C->Show();
+        mParallel.AddTail(mUnk7C);
+    }
+    if (mUnk7C != NULL && GetDisplay() != gLcd->GetTopDisplay()) {
+        mUnk7C->Exit();
+        mUnk7C = NULL;
+    }
 }
 
 void DinoMultiPlayIconHook::Unk0C() {
