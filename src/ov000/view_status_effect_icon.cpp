@@ -7,6 +7,7 @@
 #include "game/view_status_effect_icon.h"
 #include "types.h"
 #include "m/smart_oam.h"
+#include "game/dino_resource.h"
 
 DinoBattleViewStatusEffectIcon::~DinoBattleViewStatusEffectIcon() {
 }
@@ -24,6 +25,36 @@ ViewStatusEffectIconShowTask::~ViewStatusEffectIconShowTask() {
 }
 
 #pragma auto_inline off
+
+// NONMATCHING: spill slots of dx/dy/-dx and the loop counters are permuted
+DinoBattleViewStatusEffectIcon::DinoBattleViewStatusEffectIcon(MSmartOam *oam, u32 side, u32 unk74)
+    : MProcess(NULL), mUnk74(unk74), mOam(oam) {
+    mSide = side;
+    mTimer = 0;
+    const DinoBattleAdjustDefs *defs = gDinoResource->GetBattleAdjustDefs();
+    int dx = defs->statusIconX;
+    int dy = defs->statusIconY;
+    for (int i = 0; i < 2; i++) {
+        mSlots[i].mUnk10 = -1;
+    }
+    mIcons = new MParallelTaskSet();
+    for (int i = 0; i < 2; i++) {
+        mSlots[i].mIcon = new ViewStatusEffectIcon(mOam);
+        mOffsets[i].x = i != mSide ? -11 : -10;
+        mOffsets[i].y = 0;
+        if (mSide == 1) {
+            mOffsets[i].x += (int)-dx;
+            mOffsets[i].y += dy;
+        } else {
+            mOffsets[i].x += dx;
+            mOffsets[i].y += dy;
+        }
+        mIcons->AddTail(mSlots[i].mIcon);
+    }
+    mParallel.AddTail(mIcons);
+    mQueue = new MSerialTaskSet();
+    mParallel.AddTail(mQueue);
+}
 
 int StatusEffectEntry::GetAnime() {
     int offset = mFlag ? 12 : 0;

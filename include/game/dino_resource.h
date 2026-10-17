@@ -60,6 +60,9 @@ struct DinoBattleAdjustDefs {
     u8 unk000[0x138];
     int kasekiPointX;   // 0x138
     int kasekiPointY;   // 0x13C
+    u32 unk140[2];
+    int statusIconX;    // 0x148
+    int statusIconY;    // 0x14C
 };
 struct DinoBattleBgDefs;
 struct DinoExcavateRange {
