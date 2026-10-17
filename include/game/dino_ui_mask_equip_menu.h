@@ -18,11 +18,15 @@ public:
     void OnBackDecided();
     BOOL PageRight();
     BOOL PageLeft();
+    void Decide(int index);
 
     u32 mUnkB4[3];          // 0xB4
     std::vector<void *> mUnkC0; // 0xC0
     u32 mUnkCC[9];          // 0xCC
     std::vector<void *> mUnkF0; // 0xF0
+    int mPage;              // 0xFC
+    u32 mUnk100;            // 0x100
+    u8 mUnk104;             // 0x104
 };
 
 class DinoUiMaskEquipBackButton : public DinoUiMaskEquipMenuItem {

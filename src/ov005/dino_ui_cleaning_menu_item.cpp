@@ -102,3 +102,19 @@ void DinoUiCleaningTest::Idle() {
 // instantiated explicitly.
 template class MCallTask0<DinoUiCleaningMenu, DinoUiCleaningMenu>;
 template MTask *MCreateCallTask(DinoUiCleaningMenu *obj, void (DinoUiCleaningMenu::*func)());
+
+void DinoUiCleaningMenu::OnDecide(MMenuItem *item) {
+    for (int i = 0; i < 8; i++) {
+        if (item == mUnkC0[i]) {
+            int index = i + mPage * 8;
+            if (index < mUnkE8.size()) {
+                if (IsDecidable()) {
+                    Decide(i);
+                } else {
+                    DinoSoundPlaySe(0xA4, 0);
+                }
+            }
+            return;
+        }
+    }
+}

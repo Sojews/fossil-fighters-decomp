@@ -134,3 +134,17 @@ void DinoUiMaskEquipMaskButton::OnFocusChanged(BOOL focused) {
 void DinoUiMaskEquipMaskButton::OnDecide() {
     mMotion->Show();
 }
+
+void DinoUiMaskEquipMenu::OnDecide(MMenuItem *item) {
+    for (int i = 0; i < 8; i++) {
+        if (item == mUnkC0[i]) {
+            int index = i + mPage * 8;
+            if (index < mUnkF0.size()) {
+                if (mUnk104) {
+                    Decide(index);
+                }
+                return;
+            }
+        }
+    }
+}

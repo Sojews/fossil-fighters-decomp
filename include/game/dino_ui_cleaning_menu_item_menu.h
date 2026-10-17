@@ -21,6 +21,8 @@ public:
     void OnBackDecided();
     BOOL PageRight();
     BOOL PageLeft();
+    BOOL IsDecidable();
+    void Decide(int index);
 
     u32 mUnkB4[3];              // 0xB4
     std::vector<void *> mUnkC0; // 0xC0
@@ -28,7 +30,9 @@ public:
     std::vector<u32> mUnkE8;    // 0xE8
     MArchivePtr mArchive;       // 0xF4
     MArchiveFile mFile;         // 0xF8
-    u32 mUnk104[5];             // 0x104
+    u32 mUnk104[3];             // 0x104
+    int mPage;                  // 0x110
+    u32 mUnk114;                // 0x114
 };
 
 class DinoUiCleaningBackButton : public DinoUiCleaningMenuItem {
