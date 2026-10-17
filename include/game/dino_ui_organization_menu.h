@@ -30,4 +30,51 @@ public:
     MArchiveFile mFile;                 // 0x260
 };
 
+class DinoUiOrganizationMenuItem : public MMenuItem, public DinoHelpItem {
+public:
+    virtual ~DinoUiOrganizationMenuItem();
+    virtual MRect GetFrame();
+    virtual MRect GetRect();
+    virtual MDisplay *GetDisplay();
+    virtual const char *GetText();
+};
+
+class DinoUiOrganizationOKButton : public DinoUiOrganizationMenuItem {
+public:
+    virtual ~DinoUiOrganizationOKButton();
+    virtual void OnFocusChanged(BOOL focused);
+    virtual void OnDecide();
+};
+
+class DinoUiOrganizationBackButton : public DinoUiOrganizationMenuItem {
+public:
+    virtual ~DinoUiOrganizationBackButton();
+    virtual void OnFocusChanged(BOOL focused);
+    virtual void OnDecide();
+};
+
+class DinoUiOrganizationPageLButton : public DinoUiOrganizationMenuItem {
+public:
+    virtual ~DinoUiOrganizationPageLButton();
+    virtual void OnDecide();
+};
+
+class DinoUiOrganizationPageRButton : public DinoUiOrganizationMenuItem {
+public:
+    virtual ~DinoUiOrganizationPageRButton();
+    virtual void OnDecide();
+};
+
+class DinoUiOrganizationSlotCreateTask : public MProcess {
+public:
+    virtual ~DinoUiOrganizationSlotCreateTask();
+    virtual void Idle();
+};
+
+class DinoUiOrganizationMenuBlendResetTask : public MTask {
+public:
+    virtual ~DinoUiOrganizationMenuBlendResetTask();
+    virtual void Execute();
+};
+
 #endif
