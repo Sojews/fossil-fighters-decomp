@@ -80,21 +80,20 @@ public:
     void CollectCreaturesB8In12(u32 *ids, int *count);
     BOOL AllCreaturesShareDefFlag();
 
-    u32 mUnkA8;                         // 0xA8
-    u32 mUnkAC;                         // 0xAC
-    u32 unkB0[2];
+    std::vector<u32> mUnkA8;            // 0xA8
+    u32 unkB4;
     u32 mUnkB8;                         // 0xB8
     u32 mUnkBC;                         // 0xBC
     u32 unkC0[2];
     u8 mUnkC8;                          // 0xC8
-    u8 unkC9[0xFC - 0xC9];
+    MMessageSubject mSubject;           // 0xCC
+    u32 unkF4[2];
     u32 mUnkFC;                         // 0xFC
     u32 unk100;
-    DinoBattleModelCreature **mCreatures;   // 0x104
-    int mCreatureCount;                 // 0x108
-    u32 unk10C;
+    std::vector<DinoBattleModelCreature *> mCreatures; // 0x104
     MRandom *mRandom;                   // 0x110
-    u32 unk114[4];
+    std::string mUnk114;                // 0x114
+    u32 unk120;
     u32 mUnk124;                        // 0x124
     u32 mUnk128;                        // 0x128
     u8 mUnk12C;                         // 0x12C

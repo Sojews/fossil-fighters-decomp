@@ -420,8 +420,12 @@ void DinoBattleModelPlayer::SetUnk124(u32 value) {
     mUnk124 = value;
 }
 
+DinoBattleModelPlayer::~DinoBattleModelPlayer() {
+    delete mRandom;
+}
+
 int DinoBattleModelPlayer::GetCreatureCount() {
-    return mCreatureCount;
+    return mCreatures.size();
 }
 
 DinoBattleModelCreature *DinoBattleModelPlayer::GetCreature(int index) {
@@ -450,7 +454,7 @@ MRandom *DinoBattleModelPlayer::GetRandom() {
 }
 
 u32 DinoBattleModelPlayer::GetUnkAC() {
-    return mUnkAC;
+    return mUnkA8.size();
 }
 
 void DinoBattleModelPlayer::SetUnk12C(u8 value) {
@@ -462,13 +466,10 @@ u32 DinoBattleModelPlayer::NextUnkId() {
     return (mUnkB8 << 16) | id;
 }
 
-// NONMATCHING: ours folds the first p != end test into a count check; the game compares the pointers.
 DinoBattleModelCreature *DinoBattleModelPlayer::FindCreatureByB4(u32 id) {
-    DinoBattleModelCreature **p;
-
-    for (p = mCreatures; p != mCreatures + mCreatureCount; p++) {
-        if (id == (*p)->GetUnkB4()) {
-            return *p;
+    for (std::vector<DinoBattleModelCreature *>::iterator it = mCreatures.begin(); it != mCreatures.end(); it++) {
+        if (id == (*it)->GetUnkB4()) {
+            return *it;
         }
     }
     return NULL;
