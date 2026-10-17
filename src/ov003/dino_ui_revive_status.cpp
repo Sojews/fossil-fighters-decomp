@@ -13,6 +13,7 @@
 #include "m/bg_new_task.h"
 #include "m/bitmap.h"
 #include "m/call_task.h"
+#include "game/dino_ui_revive_effect.h"
 
 DinoUiReviveStatus::~DinoUiReviveStatus() {
 }
@@ -46,3 +47,7 @@ template class MCallTask1<MBg, MBg, MIndexBitmap *>;
 template MTask *MCreateCallTask(MBg *obj, void (MBg::*func)(MIndexBitmap *), MIndexBitmap * a0);
 template class MCallTask0<MPalUnit, MPalUnit>;
 template MTask *MCreateCallTask(MPalUnit *obj, void (MPalUnit::*func)());
+
+void DinoUiReviveEffect::Idle() {
+    (this->*mState)();
+}
