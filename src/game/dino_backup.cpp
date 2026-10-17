@@ -22,6 +22,10 @@ static const s32 sLimits[] = {
     0,  -4, 0, 99999, 5184000, 99999999, -4, -4, -4, 9999, -4, 100, 8, 0, -4,
 };
 
+// Text IDs.
+extern const u32 kBackupEntryUnknownText;
+extern const u32 kBackupEntryUnk2Text;
+
 #define BACKUP_BLOCK_DATA 480   // what's left of a 512-byte block after the header
 
 void DinoBackup::Create(u32 extraSize, BOOL useBackup) {
@@ -705,4 +709,205 @@ s32 DinoBackup::FindFreeEntry(DinoBackupEntry *entries, u32 count) {
         }
     }
     return -1;
+}
+
+u32 DinoBackup::GetUnk98Capacity() {
+    return mPlayer->containerNum * 8;
+}
+
+u32 DinoBackup::CountUsedUnk98() {
+    s32 free = FindFreeUnk98();
+    if (free == -1) {
+        free = GetUnk98Capacity();
+    }
+    return free;
+}
+
+u32 DinoBackup::CountFreeUnk98() {
+    return GetUnk98Capacity() - CountUsedUnk98();
+}
+
+BOOL DinoBackup::IsUnk98Empty() {
+    return AreEntriesEmpty(mUnk98, GetUnk98Capacity());
+}
+
+BOOL DinoBackup::IsUnk98Full() {
+    return AreEntriesFull(mUnk98, GetUnk98Capacity());
+}
+
+s32 DinoBackup::FindFreeUnk98() {
+    return FindFreeEntry(mUnk98, GetUnk98Capacity());
+}
+
+void DinoBackup::CompactUnk98() {
+    CompactEntries(mUnk98, GetUnk98Capacity());
+}
+
+std::string DinoBackup::GetEntryName(const DinoBackupEntry *entry) {
+    if (!entry->active) {
+        if (entry->unk10_0 == 1) {
+            return std::string(gDinoResource->GetText(kBackupEntryUnknownText));
+        }
+        if (entry->unk10_0 == 0 && entry->type == 1) {
+            return std::string(gDinoResource->GetText(kBackupEntryUnk2Text));
+        }
+        if (!entry->unk10_3 && !((DinoKasekiRock *) &mKasekiRocks[entry->id])->found) {
+            return std::string(gDinoResource->GetText(kBackupEntryUnknownText));
+        }
+    }
+    switch (entry->type) {
+    case 0:
+        if (entry->id >= 0x1a9) {
+            return std::string(gDinoResource->GetCreatureText08((entry->id - 1) / 4 + 1));
+        }
+        return gDinoResource->GetKasekiRockName(entry->id);
+    case 1: {
+        MResource<DinoKasekiDefs> defs = gDinoResource->LoadKasekiDefs();
+        const DinoKasekiDefs *data = defs.Get();
+        u32 id = entry->id;
+        return std::string(gDinoResource->GetText(
+            ((const DinoKasekiDef *) ((const u8 *) data + ((const u32 *) ((const u8 *) data + data->tableOffset))[id]))
+                ->nameText));
+    }
+    case 2: {
+        MResource<DinoKasekiDefs> defs = gDinoResource->LoadKasekiDefs();
+        const DinoKasekiDefs *data = defs.Get();
+        u32 id = entry->id;
+        return std::string(gDinoResource->GetText(
+            ((const DinoKasekiDef *) ((const u8 *) data + ((const u32 *) ((const u8 *) data + data->tableOffset))[id]))
+                ->nameText));
+    }
+    }
+    return std::string("");
+}
+
+u32 DinoBackup::CountUnk9C() {
+    u32 count = 0;
+    for (u32 i = 0; i < 64; i++) {
+        if (mUnk9C[i].id != 0) {
+            count++;
+        }
+    }
+    return count;
+}
+
+void DinoBackup::SetUnk9C(u32 index, const DinoBackupEntry *entry) {
+    mUnk9C[index] = *entry;
+}
+
+void DinoBackup::GetUnk9C(u32 index, DinoBackupEntry *entry) {
+    *entry = mUnk9C[index];
+}
+
+BOOL DinoBackup::IsUnk9CEmpty() {
+    return AreEntriesEmpty(mUnk9C, 64);
+}
+
+s32 DinoBackup::FindFreeUnk9C() {
+    return FindFreeEntry(mUnk9C, 64);
+}
+
+BOOL DinoBackup::IsEntryUnrevealed(const DinoBackupEntry *entry) {
+    BOOL result = TRUE;
+    BOOL a = FALSE;
+    BOOL b = FALSE;
+    if (entry->type == 1 && !entry->active) {
+        b = TRUE;
+    }
+    if (b && entry->unk10_0 != 1) {
+        a = TRUE;
+    }
+    if (!a) {
+        if (entry->type != 0 || entry->unk10_0 == 1 ||
+            !((DinoKasekiRock *) &mKasekiRocks[entry->id])->found) {
+            result = FALSE;
+        }
+    }
+    return result;
+}
+
+BOOL DinoBackup::HasInactiveUnk98() {
+    for (u32 i = 0; i < 64; i++) {
+        if (mUnk98[i].id != 0 && !mUnk98[i].active) {
+            return TRUE;
+        }
+    }
+    return FALSE;
+}
+
+BOOL DinoBackup::HasUnrevealedUnk98() {
+    for (u32 i = 0; i < 64; i++) {
+        if (mUnk98[i].id != 0 && IsEntryUnrevealed(&mUnk98[i])) {
+            return TRUE;
+        }
+    }
+    return FALSE;
+}
+
+const DinoExcavateLevel *DinoBackup::GetExcavateLevel() {
+    MResource<DinoExcavateDefs> defs = gDinoResource->GetExcavateDefs();
+    for (s32 i = defs.Get()->levelCount - 1; i >= 0; i--) {
+        const DinoExcavateDefs *data = defs.Get();
+        const DinoExcavateLevel *levels = (const DinoExcavateLevel *) ((const u8 *) data + data->levelOffset);
+        if (levels[i].minUnk <= mPlayer->unk34_0) {
+            data = defs.Get();
+            return &((const DinoExcavateLevel *) ((const u8 *) data + data->levelOffset))[i];
+        }
+    }
+    return NULL;
+}
+
+u32 DinoBackup::GetExcavateLevelUnk0() {
+    return GetExcavateLevel()->unk0;
+}
+
+s32 DinoBackup::GetExcavateLevelAverage() {
+    const DinoExcavateLevel *level = GetExcavateLevel();
+    MFx32 average = (level->unkC + level->unk10) / MFx32(2);
+    return average.v >> FX32_SHIFT;
+}
+
+s32 DinoBackup::GetExcavateLevelRemaining() {
+    return GetExcavateLevel()->unk8 - mPlayer->unk34_0;
+}
+
+u32 DinoBackup::GetMaxExcavateLevelUnk0() {
+    MResource<DinoExcavateDefs> defs = gDinoResource->GetExcavateDefs();
+    u32 max = 0;
+    for (s32 i = defs.Get()->levelCount - 1; i >= 0; i--) {
+        const DinoExcavateDefs *data = defs.Get();
+        u32 value = ((const DinoExcavateLevel *) ((const u8 *) data + data->levelOffset))[i].unk0;
+        max = std::max(max, value);
+    }
+    return max;
+}
+
+void DinoBackup::SetUnk138(u32 index, const DinoBackupEntry28 *entry) {
+    mUnk138[index] = *entry;
+}
+
+void DinoBackup::GetUnk138(u32 index, DinoBackupEntry28 *entry) {
+    *entry = mUnk138[index];
+}
+
+BOOL DinoBackup::CanAddUnk138(const DinoBackupEntry *entry, BOOL checkDuplicate, BOOL checkCount, u32 maxCount) {
+    if (checkDuplicate) {
+        for (u32 i = 0; i < 20; i++) {
+            if (mUnk138[i].used && entry->id == mUnk138[i].id) {
+                return FALSE;
+            }
+        }
+    }
+    if (checkCount) {
+        u32 count = 0;
+        for (u32 i = 0; i < 20; i++) {
+            if (mUnk138[i].used && mUnk138[i].flag) {
+                count++;
+            }
+        }
+        if (count >= maxCount) {
+            return FALSE;
+        }
+    }
+    return TRUE;
 }

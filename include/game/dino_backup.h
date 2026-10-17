@@ -3,6 +3,7 @@
 #ifndef GAME_DINO_BACKUP_H
 #define GAME_DINO_BACKUP_H
 
+#include <string>
 #include "m/looper.h"
 #include "m/bit_vector.h"
 #include "nitro/os.h"
@@ -18,6 +19,8 @@ struct DinoEventVar {
 };
 
 // The player and settings, packed in bits.
+struct DinoExcavateLevel;
+
 struct DinoPlayerData {
     u16 name[9];                // 0x00
     // 0x14
@@ -179,7 +182,24 @@ struct DinoEntrySource {
 
 struct DinoBackupEntry28 {
     DinoBackupEntry28() {}
-    u8 data[0x28];
+    u8 used;            // 0x00
+    u8 unk1;            // 0x01
+    struct {
+        u32 a;
+        u32 b;
+    } unk4;             // 0x04
+    u32 unkC;           // 0x0C
+    u32 unk10;          // 0x10
+    u32 unk14;          // 0x14
+    u32 unk18;          // 0x18
+    u32 unk1C;          // 0x1C
+    // 0x20
+    u32 id : 10;
+    u32 unk20_10 : 22;
+    // 0x24
+    u32 unk24_0 : 4;
+    u32 flag : 1;
+    u32 unk24_5 : 27;
 };
 
 class DinoBackup : public MLooperVSyncHook {
@@ -292,6 +312,30 @@ public:
     BOOL AreEntriesFull(DinoBackupEntry *entries, u32 count);
     s32 FindFreeEntry(DinoBackupEntry *entries, u32 count);
     void CompactEntries(DinoBackupEntry *entries, u32 count);
+    u32 GetUnk98Capacity();
+    u32 CountUsedUnk98();
+    u32 CountFreeUnk98();
+    BOOL IsUnk98Empty();
+    BOOL IsUnk98Full();
+    s32 FindFreeUnk98();
+    void CompactUnk98();
+    std::string GetEntryName(const DinoBackupEntry *entry);
+    u32 CountUnk9C();
+    void SetUnk9C(u32 index, const DinoBackupEntry *entry);
+    void GetUnk9C(u32 index, DinoBackupEntry *entry);
+    BOOL IsUnk9CEmpty();
+    s32 FindFreeUnk9C();
+    BOOL IsEntryUnrevealed(const DinoBackupEntry *entry);
+    BOOL HasInactiveUnk98();
+    BOOL HasUnrevealedUnk98();
+    const DinoExcavateLevel *GetExcavateLevel();
+    u32 GetExcavateLevelUnk0();
+    s32 GetExcavateLevelAverage();
+    s32 GetExcavateLevelRemaining();
+    u32 GetMaxExcavateLevelUnk0();
+    void SetUnk138(u32 index, const DinoBackupEntry28 *entry);
+    void GetUnk138(u32 index, DinoBackupEntry28 *entry);
+    BOOL CanAddUnk138(const DinoBackupEntry *entry, BOOL checkDuplicate, BOOL checkCount, u32 maxCount);
 
     MBackupDevice *mDevice;         // 0x00C
     MBackupStorage *mStorage;       // 0x010

@@ -5,6 +5,7 @@
 
 #include "m/font.h"
 #include "m/resource.h"
+#include "m/fx32.h"
 
 class MRandom;
 
@@ -57,8 +58,20 @@ struct DinoExcavateRange {
     u32 value;
 };
 
+struct DinoExcavateLevel {
+    u32 unk0;           // 0x00
+    u32 minUnk;         // 0x04
+    u32 unk8;           // 0x08
+    MFx32 unkC;         // 0x0C
+    MFx32 unk10;        // 0x10
+    u8 unk14[0x2C - 0x14];
+};
+
 struct DinoExcavateDefs {
-    u8 unk00[0x78];
+    u8 unk00[0x68];
+    u32 levelCount;     // 0x68
+    u32 levelOffset;    // 0x6C: DinoExcavateLevel entries
+    u8 unk70[0x78 - 0x70];
     u32 offset78;       // 0x78
     u32 offset7C;       // 0x7C
     u32 offset80;       // 0x80
