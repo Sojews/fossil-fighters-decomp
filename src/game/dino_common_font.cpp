@@ -63,6 +63,6 @@ void DinoCommonFont::SetBackColor(int color) {
     }
 }
 
-void DinoCommonFont::Draw(MChrBlock *chr, u32 tile, MPoint pos, MPoint size, u32 code) {
-    mCurrent->Draw(chr, tile, pos, size, code);
+void DinoCommonFont::Draw(MChrBlock *chr, u32 tile, MPoint size, MPoint pos, u32 code) {
+    mCurrent->Draw(chr, tile, size, pos, code);
 }

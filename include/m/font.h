@@ -22,7 +22,7 @@ public:
     virtual void SetShadowColor(int color);
     virtual void SetBackColor(int color);
     virtual const void *GetPalette();
-    virtual void Draw(MChrBlock *chr, u32 tile, MPoint pos, MPoint size, u32 code) = 0;
+    virtual void Draw(MChrBlock *chr, u32 tile, MPoint size, MPoint pos, u32 code) = 0;
     virtual ~MFont();
 
     void AddRef();
@@ -80,7 +80,7 @@ public:
 class M1BitFont : public MRawFont {
 public:
     M1BitFont(const MFontData *data);
-    virtual void Draw(MChrBlock *chr, u32 tile, MPoint pos, MPoint size, u32 code);
+    virtual void Draw(MChrBlock *chr, u32 tile, MPoint size, MPoint pos, u32 code);
     virtual ~M1BitFont() {}
 
     BOOL mUnk20;    // 0x20
@@ -91,7 +91,7 @@ public:
     M4BitFont(const MFontData *data);
     virtual void SetColor(int color);
     virtual const void *GetPalette();
-    virtual void Draw(MChrBlock *chr, u32 tile, MPoint pos, MPoint size, u32 code);
+    virtual void Draw(MChrBlock *chr, u32 tile, MPoint size, MPoint pos, u32 code);
     virtual ~M4BitFont() {}
 
     u8 mOwnColors;  // 0x20: draw with the font's own colors (SetColor(-1))
@@ -109,7 +109,7 @@ public:
     virtual void SetShadowColor(int color);
     virtual void SetBackColor(int color);
     virtual const void *GetPalette();
-    virtual void Draw(MChrBlock *chr, u32 tile, MPoint pos, MPoint size, u32 code);
+    virtual void Draw(MChrBlock *chr, u32 tile, MPoint size, MPoint pos, u32 code);
     virtual ~MCompositeFont();
 
     void AddFont(MFont *font);
@@ -142,13 +142,13 @@ public:
 // Draws a 1-bit glyph into 16-color tiles.
 class MChr16BinFontTransfer : public MTransfer {
 public:
-    MChr16BinFontTransfer(const u8 *src, MPoint glyphSize, MPoint pos, MPoint size, int color, int shadow,
+    MChr16BinFontTransfer(const u8 *src, MPoint glyphSize, MPoint size, MPoint pos, int color, int shadow,
                           int back, BOOL unk, void *dest) {
         mSrc = src;
         mGlyphSize = glyphSize;
         mDest = dest;
-        mPos = pos;
         mSize = size;
+        mPos = pos;
         mColor = color;
         mShadowColor = shadow;
         mBackColor = back;
@@ -160,8 +160,8 @@ public:
     const u8 *mSrc;     // 0x10
     MPoint mGlyphSize;  // 0x14
     void *mDest;        // 0x1C
-    MPoint mPos;        // 0x20: where in the destination tiles, in pixels
-    MPoint mSize;       // 0x28: the destination's size, in pixels
+    MPoint mSize;       // 0x20: the destination's size, in tiles
+    MPoint mPos;        // 0x28: where in the destination, in pixels
     int mColor;         // 0x30
     int mShadowColor;   // 0x34
     int mBackColor;     // 0x38
@@ -171,12 +171,12 @@ public:
 // Draws a 4-bit glyph into 16-color tiles.
 class MChr16FontTransfer : public MTransfer {
 public:
-    MChr16FontTransfer(const u8 *src, MPoint glyphSize, MPoint pos, MPoint size, u8 ownColors, void *dest) {
+    MChr16FontTransfer(const u8 *src, MPoint glyphSize, MPoint size, MPoint pos, u8 ownColors, void *dest) {
         mSrc = src;
         mGlyphSize = glyphSize;
         mDest = dest;
-        mPos = pos;
         mSize = size;
+        mPos = pos;
         mOwnColors = ownColors;
     }
     virtual ~MChr16FontTransfer() {}
@@ -185,8 +185,8 @@ public:
     const u8 *mSrc;     // 0x10
     MPoint mGlyphSize;  // 0x14
     void *mDest;        // 0x1C
-    MPoint mPos;        // 0x20: where in the destination tiles, in pixels
-    MPoint mSize;       // 0x28: the destination's size, in pixels
+    MPoint mSize;       // 0x20: the destination's size, in tiles
+    MPoint mPos;        // 0x28: where in the destination, in pixels
     u8 mOwnColors;      // 0x30
 };
 

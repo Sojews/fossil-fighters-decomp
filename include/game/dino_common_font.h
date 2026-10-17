@@ -15,7 +15,7 @@ public:
     virtual void SetColor(int color);
     virtual void SetShadowColor(int color);
     virtual void SetBackColor(int color);
-    virtual void Draw(MChrBlock *chr, u32 tile, MPoint pos, MPoint size, u32 code);
+    virtual void Draw(MChrBlock *chr, u32 tile, MPoint size, MPoint pos, u32 code);
     virtual ~DinoCommonFont();
 
     void Select(int size);

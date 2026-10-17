@@ -250,7 +250,7 @@ void MTextCanvas::Execute() {
 }
 
 void MTextCanvas::DrawChar(MFont *font, MPoint pos, u32 code) {
-    font->Draw(mTiles, 0, pos, mTileSize, code);
+    font->Draw(mTiles, 0, mTileSize, pos, code);
 }
 
 void MTextCanvas::SetPosition(MPoint pos) {

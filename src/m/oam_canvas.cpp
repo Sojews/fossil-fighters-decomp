@@ -32,9 +32,9 @@ void MOamCanvas<TOam, TUnit>::DrawChar(MFont *font, MPoint pos, u32 code) {
         MRect rect = piece.rect;
         if (rect.right > glyph.left && glyph.right > rect.left && rect.bottom > glyph.top &&
             glyph.bottom > rect.top) {
-            font->Draw(mChrBlock, piece.chrOffset, MPoint(pos.x - piece.rect.left, pos.y - piece.rect.top),
+            font->Draw(mChrBlock, piece.chrOffset,
                        MPoint((piece.rect.right - piece.rect.left) / 8, (piece.rect.bottom - piece.rect.top) / 8),
-                       code);
+                       MPoint(pos.x - piece.rect.left, pos.y - piece.rect.top), code);
         }
     }
 }

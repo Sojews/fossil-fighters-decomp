@@ -193,11 +193,11 @@ M1BitFont::M1BitFont(const MFontData *data) : MRawFont(data) {
 }
 
 // NONMATCHING: the destination address gets r6 instead of r7 (also M4BitFont::Draw).
-void M1BitFont::Draw(MChrBlock *chr, u32 tile, MPoint pos, MPoint size, u32 code) {
+void M1BitFont::Draw(MChrBlock *chr, u32 tile, MPoint size, MPoint pos, u32 code) {
     const u8 *glyph = FindGlyph(code);
     const u8 *bits = glyph + 2;
     if (bits != NULL) {
-        gLooper->AddTransferTask(new MChr16BinFontTransfer(bits, GetGlyphSize(code), pos, size, GetColor(),
+        gLooper->AddTransferTask(new MChr16BinFontTransfer(bits, GetGlyphSize(code), size, pos, GetColor(),
                                                            GetShadowColor(), GetBackColor(), mUnk20,
                                                            (void *)(chr->addr + tile * chr->unitSize)));
     }
@@ -216,11 +216,11 @@ void M4BitFont::SetColor(int color) {
     mOwnColors = color == -1 ? TRUE : FALSE;
 }
 
-void M4BitFont::Draw(MChrBlock *chr, u32 tile, MPoint pos, MPoint size, u32 code) {
+void M4BitFont::Draw(MChrBlock *chr, u32 tile, MPoint size, MPoint pos, u32 code) {
     const u8 *glyph = FindGlyph(code);
     const u8 *bits = glyph + 2;
     if (bits != NULL) {
-        gLooper->AddTransferTask(new MChr16FontTransfer(bits, GetGlyphSize(code), pos, size, mOwnColors,
+        gLooper->AddTransferTask(new MChr16FontTransfer(bits, GetGlyphSize(code), size, pos, mOwnColors,
                                                         (void *)(chr->addr + tile * chr->unitSize)));
     }
 }
@@ -307,10 +307,10 @@ const void *MCompositeFont::GetPalette() {
     return NULL;
 }
 
-void MCompositeFont::Draw(MChrBlock *chr, u32 tile, MPoint pos, MPoint size, u32 code) {
+void MCompositeFont::Draw(MChrBlock *chr, u32 tile, MPoint size, MPoint pos, u32 code) {
     for (std::vector<MFont *>::iterator it = mFonts.begin(); it != mFonts.end(); it++) {
         if ((*it)->HasGlyph(code)) {
-            (*it)->Draw(chr, tile, pos, size, code);
+            (*it)->Draw(chr, tile, size, pos, code);
             return;
         }
     }
