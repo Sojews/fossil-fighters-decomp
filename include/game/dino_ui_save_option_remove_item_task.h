@@ -7,6 +7,7 @@ class DinoUiSaveOptionMenu;
 
 class DinoUiSaveOptionRemoveItemTask : public MTask {
 public:
+    DinoUiSaveOptionRemoveItemTask(DinoUiSaveOptionMenu *owner) { mOwner = owner; }
     virtual ~DinoUiSaveOptionRemoveItemTask();
     virtual void Execute();
 

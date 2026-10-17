@@ -7,6 +7,10 @@ class DinoUiSaveOptionMenu;
 
 class DinoUiSaveOptionAppendItemTask : public MTask {
 public:
+    DinoUiSaveOptionAppendItemTask(u8 kind, DinoUiSaveOptionMenu *menu) {
+        mKind = kind;
+        mMenu = menu;
+    }
     virtual ~DinoUiSaveOptionAppendItemTask();
     virtual void Execute();
 

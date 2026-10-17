@@ -77,6 +77,7 @@ public:
 
 class DinoUiOptionMenu : public DinoHelpBase, public MLooperPreLoopHook, public MMenu {
 public:
+    DinoUiOptionMenu();
     virtual ~DinoUiOptionMenu();
     virtual void OnStart();
     virtual void OnFocus(MMenuItem *item);
