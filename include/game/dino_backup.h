@@ -6,6 +6,7 @@
 #include <string>
 #include "m/looper.h"
 #include "m/bit_vector.h"
+#include "m/fx32.h"
 #include "nitro/os.h"
 
 class MBackupDevice;
@@ -104,10 +105,12 @@ struct DinoCharaState {
     u8 unk0;    // 0x00
     u32 bodyModel : 8;  // 0x04
     u32 headModel : 8;
-    u32 unk4_16 : 16;
-    u32 unk8;   // 0x08
-    u32 unkC;   // 0x0C
-    u32 unk10;  // 0x10
+    u32 map : 16;       // the map match the chara is on
+    u32 angle : 16;     // 0x08
+    u32 unk8_16 : 16;
+    MFx32 x;            // 0x0C
+    MFx32 y;            // 0x10
+
 };
 
 struct DinoBackupEntry {

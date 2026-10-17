@@ -107,14 +107,32 @@ public:
     u8 mValue;  // 0x18
 };
 
+// Puts a chara on a map, at a region's center or a point, facing an angle or another chara.
 class DinoEventExecAppendCharaRegion : public MTask {
 public:
+    DinoEventExecAppendCharaRegion(DinoEvent *event, u32 chara, u32 region, u32 angle, u32 target);
+    DinoEventExecAppendCharaRegion(DinoEvent *event, u32 chara, u32 map, MFx32Point pos, u32 angle, u32 target);
     virtual ~DinoEventExecAppendCharaRegion();
+    virtual void Execute();
+
+    DinoEvent *mEvent;  // 0x10
+    u32 mChara;         // 0x14
+    u32 mMap;           // 0x18
+    MFx32Point mPos;    // 0x1C
+    u32 mAngle;         // 0x24
+    u32 mTarget;        // 0x28: a chara to face, or 0
 };
 
+// Puts a chara where another chara is.
 class DinoEventExecAppendCharaChara : public MProcess {
 public:
+    DinoEventExecAppendCharaChara(DinoEvent *event, u32 chara, u32 other);
     virtual ~DinoEventExecAppendCharaChara();
+    virtual void Idle();
+
+    DinoEvent *mEvent;  // 0x74
+    u32 mChara;         // 0x78
+    u32 mOther;         // 0x7C
 };
 
 class DinoEventExecRemoveChara : public MTask {

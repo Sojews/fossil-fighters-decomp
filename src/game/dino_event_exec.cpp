@@ -1480,6 +1480,86 @@ void DinoEventExecDonateHide::Idle() {
     serial->AddTail(exit);
 }
 
+DinoEventExecAppendCharaChara::DinoEventExecAppendCharaChara(DinoEvent *event, u32 chara, u32 other) : MProcess(NULL) {
+    mEvent = event;
+    mChara = chara;
+    mOther = other;
+}
+
+void DinoEventExecAppendCharaChara::Idle() {
+    MFx32Point pos(0, 0);
+    u32 map;
+    u32 angle = 0x4000;
+    DinoFieldChara *other = mEvent->GetField()->GetChara(mOther);
+    if (other != NULL) {
+        map = mEvent->GetField()->GetMap()->GetInfo()->id;
+        pos = other->GetModel()->pos;
+    } else {
+        DinoCharaState state;
+        gDinoBackup->GetChara(mOther, &state);
+        map = state.map;
+        pos.x = state.x;
+        pos.y = state.y;
+        angle = state.angle;
+    }
+    MTask *exit = MTaskExitTransfer::Create(this);
+    MTask *task = new DinoEventExecAppendCharaRegion(mEvent, mChara, map, pos, angle, 0);
+    MSerialTaskSet *serial = &mSerial;
+    serial->AddTail(task);
+    serial->AddTail(exit);
+}
+
+DinoEventExecAppendCharaRegion::DinoEventExecAppendCharaRegion(DinoEvent *event, u32 chara, u32 region, u32 angle, u32 target) {
+    mEvent = event;
+    mChara = chara;
+    mMap = gDinoResource->GetRegionMapMatch(region);
+    DinoRegionCenter center = gDinoResource->GetRegionCenter(region);
+    mPos.Set(MFx32((int)center.unk00), MFx32((int)center.unk04));
+    mAngle = angle;
+    mTarget = target;
+}
+
+DinoEventExecAppendCharaRegion::DinoEventExecAppendCharaRegion(DinoEvent *event, u32 chara, u32 map, MFx32Point pos, u32 angle, u32 target) {
+    mEvent = event;
+    mChara = chara;
+    mMap = map;
+    mPos = pos;
+    mAngle = angle;
+    mTarget = target;
+}
+
+static inline u16 AngleOf(MFx32Point d) {
+    return MFx32Atan2(d.y, d.x);
+}
+
+void DinoEventExecAppendCharaRegion::Execute() {
+    if (mTarget != 0) {
+        if (mMap == mEvent->GetField()->GetMap()->GetInfo()->id && mEvent->GetField()->GetChara(mTarget) != NULL) {
+            MFx32Point d = mEvent->GetField()->GetChara(mTarget)->GetModel()->pos - mPos;
+            mAngle = AngleOf(d);
+        } else {
+            DinoCharaState target;
+            gDinoBackup->GetChara(mTarget, &target);
+            if (target.map == mMap) {
+                MFx32Point d(target.x - mPos.x, target.y - mPos.y);
+                mAngle = AngleOf(d);
+            }
+        }
+    }
+    DinoCharaState state;
+    gDinoBackup->GetChara(mChara, &state);
+    state.unk0 = 1;
+    state.map = mMap;
+    state.x = mPos.x;
+    state.y = mPos.y;
+    state.angle = mAngle;
+    gDinoBackup->SetChara(mChara, &state);
+    if (mEvent->GetField() != NULL) {
+        mEvent->GetField()->SyncChara(mChara);
+    }
+    Exit();
+}
+
 DinoEventExecRemoveChara::DinoEventExecRemoveChara(DinoEvent *event, u32 chara) {
     mEvent = event;
     mChara = chara;
