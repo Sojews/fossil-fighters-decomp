@@ -7,6 +7,38 @@
 class DinoUi2ContainerBaseMenuItem : public MMenuItem, public DinoHelpItem {
 public:
     virtual ~DinoUi2ContainerBaseMenuItem();
+    virtual MRect GetFrame();
+    virtual void OnFocusChanged(BOOL focused);
+    virtual MRect GetRect();
+    virtual MDisplay *GetDisplay();
+    virtual const char *GetText();
+};
+
+class DinoUi2ContainerBaseBackButton : public DinoUi2ContainerBaseMenuItem {
+public:
+    virtual ~DinoUi2ContainerBaseBackButton();
+    virtual void OnFocusChanged(BOOL focused);
+    virtual void OnDecide();
+};
+
+class DinoUi2ContainerBasePageLButton : public DinoUi2ContainerBaseMenuItem {
+public:
+    virtual ~DinoUi2ContainerBasePageLButton();
+    virtual void OnDecide();
+};
+
+class DinoUi2ContainerBasePageRButton : public DinoUi2ContainerBaseMenuItem {
+public:
+    virtual ~DinoUi2ContainerBasePageRButton();
+    virtual void OnDecide();
+};
+
+class DinoUi2ContainerBaseDecideButton : public DinoUi2ContainerBaseMenuItem {
+public:
+    virtual ~DinoUi2ContainerBaseDecideButton();
+    virtual MRect GetFrame();
+    virtual void OnFocusChanged(BOOL focused);
+    virtual void OnDecide();
 };
 
 #endif

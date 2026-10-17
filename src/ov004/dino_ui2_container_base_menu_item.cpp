@@ -1,11 +1,26 @@
 // DinoUi2ContainerBaseMenuItem.
 // Only the destructors are decompiled so far.
 
+// The buttons' destructors have the base destructor body inlined; auto-inlining the one defined above does that.
+#pragma auto_inline on
+
 #include "game/dino_ui2_container_base_menu_item.h"
 #include "m/bg_new_task.h"
 #include "m/call_task.h"
 
 DinoUi2ContainerBaseMenuItem::~DinoUi2ContainerBaseMenuItem() {
+}
+
+DinoUi2ContainerBaseBackButton::~DinoUi2ContainerBaseBackButton() {
+}
+
+DinoUi2ContainerBasePageLButton::~DinoUi2ContainerBasePageLButton() {
+}
+
+DinoUi2ContainerBasePageRButton::~DinoUi2ContainerBasePageRButton() {
+}
+
+DinoUi2ContainerBaseDecideButton::~DinoUi2ContainerBaseDecideButton() {
 }
 
 // Template task instances the game emits in this file. Until the code that makes the tasks is decompiled, they are
