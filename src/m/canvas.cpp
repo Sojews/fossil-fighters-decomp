@@ -6,6 +6,9 @@
 #include "m/looper.h"
 #include "m/text_codec.h"
 #include "nitro/mi.h"
+#include "m/bg.h"
+#include "m/pal.h"
+#include "m/chr.h"
 
 MCanvasWindow::MCanvasWindow(MCanvas *canvas, MRect rect)
     : MCanvas(MPoint(rect.right - rect.left, rect.bottom - rect.top)) {
@@ -202,6 +205,44 @@ void MCanvas::WriteRow(MChrBlock *chr, int start, int tilesWide, int y, const u3
     }
 }
 
+MTextCanvas::MTextCanvas(MPoint size, const void *palette, int backColor, BOOL fromEnd) : MCanvas(size) {
+    mDisplay = gCurrentDisplay;
+    mBackColor = backColor;
+    Init(palette, fromEnd);
+}
+
+MTextCanvas::MTextCanvas(MDisplay *display, MPoint size, const void *palette, int backColor, BOOL fromEnd)
+    : MCanvas(size) {
+    mDisplay = display;
+    mBackColor = backColor;
+    Init(palette, fromEnd);
+}
+
+void MTextCanvas::Init(const void *palette, BOOL fromEnd) {
+    u32 count = (GetHeight() + 7) >> 3;
+    mTileSize.x = (GetWidth() + 7) >> 3;
+    mTileSize.y = count;
+    count *= mTileSize.x;
+    MBg *bg = mDisplay->mBg;
+    mPal = bg->mPal->Alloc(1, palette, fromEnd);
+    mChr = bg->CreateChr(0, count + 1, fromEnd);
+    mBlank = mChr->Alloc(1, 1);
+    mTiles = mChr->Alloc(count, 1);
+    mBlank->Fill(0, 0, 0xFFFFFFFF);
+    mText = new MSmartText(mDisplay, fromEnd);
+    mText->mText->SetChr(mChr);
+    mText->Fill(MRect(0x80000000, 0x80000000, 0x7FFFFFFF, 0x7FFFFFFF), mBlank->index, mPal->index, FALSE, FALSE);
+    mText->TransferSequence(mTileSize, MPoint(0, 0), mTiles->index, mPal->index, FALSE, FALSE);
+    Clear();
+}
+
+MTextCanvas::~MTextCanvas() {
+    delete mText;
+    MBg *bg = mDisplay->mBg;
+    bg->DeleteChr(mChr);
+    bg->mPal->Free(mPal);
+}
+
 void MTextCanvas::Execute() {
     if (mText->mState == STATE_RUN) {
         mText->Execute();
@@ -209,7 +250,7 @@ void MTextCanvas::Execute() {
 }
 
 void MTextCanvas::DrawChar(MFont *font, MPoint pos, u32 code) {
-    font->Draw(mTiles, 0, pos, MPoint(mTilesWide, mTilesHigh), code);
+    font->Draw(mTiles, 0, pos, mTileSize, code);
 }
 
 void MTextCanvas::SetPosition(MPoint pos) {
@@ -233,32 +274,32 @@ void MTextCanvas::Clear() {
 }
 
 void MTextCanvas::ClearRect(MRect rect) {
-    gLooper->AddTransferTask(new MChr16Fill(mBackColor, mTiles->addr, MPoint(mTilesWide, mTilesHigh), rect));
+    gLooper->AddTransferTask(new MChr16Fill(mBackColor, mTiles->addr, mTileSize, rect));
 }
 
 void MTextCanvas::FillRect(MRect rect, int color) {
-    gLooper->AddTransferTask(new MChr16Fill(color, mTiles->addr, MPoint(mTilesWide, mTilesHigh), rect));
+    gLooper->AddTransferTask(new MChr16Fill(color, mTiles->addr, mTileSize, rect));
 }
 
 int MTextCanvas::GetPixel(int x, int y) {
     MChrBlock *tiles = mTiles;
-    u32 row = *(u32 *)(tiles->addr + tiles->unitSize * ((x >> 3) + mTilesWide * (y >> 3)) + (y & 7) * 4);
+    u32 row = *(u32 *)(tiles->addr + tiles->unitSize * ((x >> 3) + mTileSize.x * (y >> 3)) + (y & 7) * 4);
     return (row >> ((x & 7) * 4)) & 0xF;
 }
 
 void MTextCanvas::SetPixel(int x, int y, int color) {
     MChrBlock *tiles = mTiles;
-    u32 *row = (u32 *)(tiles->addr + tiles->unitSize * ((x >> 3) + mTilesWide * (y >> 3)) + (y & 7) * 4);
+    u32 *row = (u32 *)(tiles->addr + tiles->unitSize * ((x >> 3) + mTileSize.x * (y >> 3)) + (y & 7) * 4);
     int shift = (x & 7) * 4;
     *row = (color << shift) | (*row & ~(0xF << shift));
 }
 
 void MTextCanvas::GetLine(int y, void *dest) {
-    ReadRow(mTiles, 0, mTilesWide, y, (u32 *)dest);
+    ReadRow(mTiles, 0, mTileSize.x, y, (u32 *)dest);
 }
 
 void MTextCanvas::SetLine(int y, const void *src) {
-    WriteRow(mTiles, 0, mTilesWide, y, (const u32 *)src);
+    WriteRow(mTiles, 0, mTileSize.x, y, (const u32 *)src);
 }
 
 void MTextCanvas::Hide() {

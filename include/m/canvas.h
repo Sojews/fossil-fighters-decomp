@@ -5,6 +5,8 @@
 #include "m/view.h"
 #include "m/font.h"
 #include "m/smart_text.h"
+
+struct MPalBlock;
 #include <string>
 
 class MCanvasWindow;
@@ -89,6 +91,9 @@ public:
 // A canvas on a text BG, each tile of the screen its own character.
 class MTextCanvas : public MCanvas {
 public:
+    // A canvas on the current display's text layer: palette (data) and tiles allocated from the end if fromEnd.
+    MTextCanvas(MPoint size, const void *palette, int backColor, BOOL fromEnd);
+    MTextCanvas(MDisplay *display, MPoint size, const void *palette, int backColor, BOOL fromEnd);
     virtual ~MTextCanvas();
     virtual void Execute();
     virtual void SetPosition(MPoint pos);
@@ -108,14 +113,15 @@ public:
     virtual void GetLine(int y, void *dest);
     virtual void SetLine(int y, const void *src);
 
-    void *mBg;              // 0x18
+    void Init(const void *palette, BOOL fromEnd);
+
+    MDisplay *mDisplay;     // 0x18
     MSmartText *mText;      // 0x1C
     MChr *mChr;             // 0x20
     MChrBlock *mBlank;      // 0x24
     MChrBlock *mTiles;      // 0x28
-    void *mPal;             // 0x2C
-    int mTilesWide;         // 0x30
-    int mTilesHigh;         // 0x34
+    MPalBlock *mPal;        // 0x2C
+    MPoint mTileSize;       // 0x30
     int mBackColor;         // 0x38
 };
 
