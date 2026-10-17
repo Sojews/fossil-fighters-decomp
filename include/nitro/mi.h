@@ -25,6 +25,8 @@ void MI_HBlankDmaCopy32(u32 dmaNo, const void *src, void *dest, u32 size);
 void MI_HBlankDmaCopy16(u32 dmaNo, const void *src, void *dest, u32 size);
 
 void DC_FlushRange(const void *startAddr, u32 nBytes);
+void DC_StoreRange(const void *startAddr, u32 nBytes);
+void MI_CpuFill8(void *dest, u8 data, u32 size);
 
 #ifdef __cplusplus
 }

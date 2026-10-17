@@ -47,6 +47,56 @@ int SND_CalcChannelVolume(int dB);
 void SND_SetChannelVolume(u32 chBitMask, int volume, int shift);
 void SND_SetChannelPan(u32 chBitMask, int pan);
 void SND_SetOutputSelector(int leftOutput, int rightOutput, int channel1Output, int channel3Output);
+typedef struct SNDBankData SNDBankData;
+typedef struct SNDWaveData SNDWaveData;
+
+typedef struct {
+    u32 signature;
+    u16 byteOrder;
+    u16 version;
+    u32 fileSize;
+    u16 headerSize;
+    u16 dataBlocks;
+} SNDBinaryFileHeader;
+
+typedef struct SNDWaveArc {
+    SNDBinaryFileHeader fileHeader;
+    u32 blockKind;
+    u32 blockSize;
+    void *topLink;
+    u32 reserved[7];
+    u32 waveCount;
+    u32 waveOffset[1];
+} SNDWaveArc;
+
+typedef struct {
+    u32 prgNo;
+    u32 index;
+} SNDInstPos;
+
+typedef struct {
+    u8 type;
+    u8 padding;
+    u16 wave[2];        // Wave index, wave archive number
+    u8 originalKey;
+    u8 attack;
+    u8 decay;
+    u8 sustain;
+    u8 release;
+    u8 pan;
+} SNDInstData;
+
+void SND_AssignWaveArc(SNDBankData *bank, int index, SNDWaveArc *waveArc);
+void SND_DestroyBank(SNDBankData *bank);
+void SND_DestroyWaveArc(SNDWaveArc *waveArc);
+void SND_InvalidateSeqData(const void *start, const void *end);
+void SND_InvalidateBankData(const void *start, const void *end);
+void SND_InvalidateWaveData(const void *start, const void *end);
+const SNDWaveData *SND_GetWaveDataAddress(const SNDWaveArc *waveArc, int index);
+void SND_SetWaveDataAddress(SNDWaveArc *waveArc, int index, const SNDWaveData *waveData);
+u32 SND_GetWaveDataCount(const SNDWaveArc *waveArc);
+SNDInstPos SND_GetFirstInstDataPos(const SNDBankData *bank);
+BOOL SND_GetNextInstData(const SNDBankData *bank, SNDInstData *inst, SNDInstPos *pos);
 void SND_LockChannel(u32 chBitMask, u32 flags);
 void SND_UnlockChannel(u32 chBitMask, u32 flags);
 

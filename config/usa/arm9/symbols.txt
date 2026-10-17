@@ -5533,8 +5533,8 @@ LoadWaveArc kind:function(thumb,size=0x44) addr:0x0206f830
 LoadWaveArcTable kind:function(thumb,size=0xc8) addr:0x0206f874
 DisposeCallback kind:function(thumb,size=0x3a) addr:0x0206f93c
 SeqDisposeCallback kind:function(thumb,size=0x18) addr:0x0206f978
-func_0206f990 kind:function(thumb,size=0x1e) addr:0x0206f990
-func_0206f9b0 kind:function(thumb,size=0x1e) addr:0x0206f9b0
+BankDisposeCallback kind:function(thumb,size=0x1e) addr:0x0206f990
+WaveArcDisposeCallback kind:function(thumb,size=0x1e) addr:0x0206f9b0
 WaveArcTableDisposeCallback kind:function(thumb,size=0x14) addr:0x0206f9d0
 SingleWaveDisposeCallback kind:function(thumb,size=0x2a) addr:0x0206f9e4
 LoadSingleWave kind:function(thumb,size=0x90) addr:0x0206fa10
@@ -13034,7 +13034,7 @@ sBufferAddrs kind:bss addr:0x021502b4
 sChannelInfo kind:bss addr:0x021502f4
 sCapture kind:bss(size=0x5fc) addr:0x02150374
 sCurrent kind:bss addr:0x02150970
-data_02150974 kind:bss addr:0x02150974
+sWaveArcHeader kind:bss addr:0x02150974
 data_021509b0 kind:bss addr:0x021509b0
 data_021509bc kind:bss addr:0x021509bc
 data_021509c8 kind:bss addr:0x021509c8

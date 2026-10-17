@@ -68,6 +68,44 @@ typedef struct {
     NNSSndArcInfo *info;
 } NNSSndArc;
 
+typedef struct {
+    u32 fileId;
+    u16 bankNo;
+    u8 volume;
+    u8 channelPrio;
+    u8 playerPrio;
+    u8 playerNo;
+    u16 reserved;
+} NNSSndArcSeqInfo;
+
+typedef struct {
+    u32 fileId;
+} NNSSndArcSeqArcInfo;
+
+typedef struct {
+    u32 fileId;
+    u16 waveArcNo[4];
+} NNSSndArcBankInfo;
+
+typedef struct {
+    u32 fileId : 24;
+    u32 flags : 8;
+} NNSSndArcWaveArcInfo;
+
+#define NNS_SND_ARC_WAVEARC_SINGLE_LOAD (1 << 0)
+
+typedef struct {
+    u8 type;
+    u8 loadFlag;
+    u16 padding;
+    u32 index;
+} NNSSndArcGroupItem;
+
+typedef struct {
+    u32 count;
+    NNSSndArcGroupItem item[1];
+} NNSSndArcGroupInfo;
+
 BOOL NNS_SndArcInit(NNSSndArc *arc, const char *filePath, NNSSndHeapHandle heap, BOOL symbolLoad);
 BOOL NNS_SndArcSetup(NNSSndArc *arc, NNSSndHeapHandle heap, BOOL symbolLoad);
 NNSSndArc *NNS_SndArcSetCurrent(NNSSndArc *arc);
