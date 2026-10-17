@@ -9,6 +9,7 @@
 
 #include <string>
 #include "m/task.h"
+#include "game/dino_field_town_map.h"
 struct DinoCharaTask;
 
 class DinoFieldNamePanel {
@@ -58,10 +59,6 @@ public:
     MTask *CreateModeTask(u32 from, u32 to, u32 a, u8 b);
 };
 
-class DinoFieldTownMap {
-public:
-    MTask *CreateModeTask(u32 radarMode, u32 to, u32 a);
-};
 
 struct DinoFieldMapInfo {
     u32 id;

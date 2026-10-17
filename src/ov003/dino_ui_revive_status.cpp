@@ -5,6 +5,10 @@
 #include "game/dino_ui_revive_status_digit.h"
 #include "game/dino_ui_revive_effect_light.h"
 #include "game/dino_ui_revive_effect_particle.h"
+#include "m/bg.h"
+#include "m/bg_new_task.h"
+#include "m/bitmap.h"
+#include "m/call_task.h"
 
 DinoUiReviveStatus::~DinoUiReviveStatus() {
 }
@@ -17,3 +21,11 @@ DinoUiReviveEffectLight::~DinoUiReviveEffectLight() {
 
 DinoUiReviveEffectParticle::~DinoUiReviveEffectParticle() {
 }
+
+// Template task instances the game emits in this file. Until the code that makes the tasks is decompiled, they are
+// instantiated explicitly.
+class MPalUnit {};
+template class MCallTask1<MBg, MBg, MIndexBitmap *>;
+template MTask *MCreateCallTask(MBg *obj, void (MBg::*func)(MIndexBitmap *), MIndexBitmap * a0);
+template class MCallTask0<MPalUnit, MPalUnit>;
+template MTask *MCreateCallTask(MPalUnit *obj, void (MPalUnit::*func)());

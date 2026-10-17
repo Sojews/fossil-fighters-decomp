@@ -6,6 +6,8 @@
 class DinoFieldTownMap : public MProcess {
 public:
     virtual ~DinoFieldTownMap();
+
+    MTask *CreateModeTask(u32 radarMode, u32 to, u32 a);
 };
 
 #endif

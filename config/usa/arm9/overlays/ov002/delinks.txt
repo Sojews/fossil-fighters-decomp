@@ -27,10 +27,10 @@ src/ov002/dino_cleaning_xray.cpp:
     .text       start:0x0215ca78 end:0x0215caac
 
 src/ov002/dino_cleaning_hammer.cpp:
-    .text       start:0x0215d6cc end:0x0215d79c
+    .text       start:0x0215d6cc end:0x0215d82c
 
 src/ov002/dino_cleaning_drill.cpp:
-    .text       start:0x0215e33c end:0x0215e370
+    .text       start:0x0215e2dc end:0x0215e370
 
 src/ov002/dino_cleaning_dummy_item.cpp:
     .text       start:0x0215ed8c end:0x0215ee94
@@ -39,7 +39,10 @@ src/ov002/dino_cleaning_rock.cpp:
     .text       start:0x0215f1e4 end:0x0215f218
 
 src/ov002/dino_cleaning_kaseki_rock.cpp:
-    .text       start:0x021602bc end:0x02160324
+    .text       start:0x021602bc end:0x021610b0
 
 src/ov002/dino_cleaning_stop_confirm_menu_item.cpp:
     .text       start:0x02157004 end:0x021570ac
+
+src/ov002/dino_cleaning_live.cpp:
+    .text       start:0x02161f5c end:0x02163190
