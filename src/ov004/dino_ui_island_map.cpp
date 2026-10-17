@@ -37,3 +37,6 @@ GuidMan::~GuidMan() {
 
 DinoMapBackButton::~DinoMapBackButton() {
 }
+
+DinoUiIslandMapMenu::~DinoUiIslandMapMenu() {
+}

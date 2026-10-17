@@ -5,4 +5,13 @@
 #include "m/menu.h"
 #include "game/help.h"
 
+class DinoUiIslandMapMenu : public DinoHelpBase, public MMenu {
+public:
+    virtual ~DinoUiIslandMapMenu();
+    virtual void OnStart();
+    virtual void OnIdle();
+    virtual void OnFocus(MMenuItem *item);
+    virtual void OnDecide(MMenuItem *item);
+};
+
 #endif
