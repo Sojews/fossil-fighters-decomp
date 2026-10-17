@@ -372,6 +372,10 @@ MRect DinoHelpSign::GetFrame() {
 // The status bar's fill colour.
 extern const int kHelpStatusColor;
 
+DinoHelpStatus::~DinoHelpStatus() {
+    mFont->Release();
+}
+
 void DinoHelpStatus::Idle() {
     (this->*mState)();
 }

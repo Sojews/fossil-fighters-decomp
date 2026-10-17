@@ -134,7 +134,7 @@ public:
     class DinoHelpDriver *mDriver;      // 0x7C
     MFont *mFont;                       // 0x80
     MSmartObjCanvas *mCanvas;           // 0x84
-    u32 mUnk88;                         // 0x88
+    MMotionFile mMotion;                // 0x88
     MPoint mPositions[2];               // 0x8C
     u32 mPosition;                      // 0x9C
     u32 mLines;                         // 0xA0: open height, in lines of 2 pixels
