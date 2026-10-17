@@ -604,6 +604,10 @@ libs/nitrosdk/src/mi/mi_dma.c:
     complete
     .text       start:0x020753d0 end:0x0207580c
 
+libs/nitrosdk/src/os/os_cache.c:
+    complete
+    .text       start:0x02074948 end:0x02074a64
+
 libs/nitrosdk/src/os/os_init.c:
     complete
     .text       start:0x02074a64 end:0x02074aa8
