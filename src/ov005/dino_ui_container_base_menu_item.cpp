@@ -9,6 +9,9 @@
 #include "m/bg_new_task.h"
 #include "m/call_task.h"
 #include "game/dino_sound.h"
+#include "m/lcd.h"
+#include "m/display.h"
+#include "m/bright.h"
 
 DinoUiContainerBaseMenuItem::~DinoUiContainerBaseMenuItem() {
 }
@@ -86,6 +89,19 @@ void DinoUiContainerBasePageLButton::OnDecide() {
         serial->AddTail(play);
         DinoSoundPlaySe(0x93, 0);
     }
+}
+
+void DinoUiContainerBaseMenu::OnBackDecided() {
+    MTask *fade;
+    MTask *exit;
+    MTask &self = *this;
+    exit = MTaskExitTransfer::Create(&self);
+    fade = gLcd->mMain->mBright->CreateFadeOutToBlack(30, 0);
+    MTask *timer = new MTimer(30);
+    MSerialTaskSet *serial = &mSerial;
+    serial->AddTail(timer);
+    serial->AddTail(fade);
+    serial->AddTail(exit);
 }
 
 // Template task instances the game emits in this file. Until the code that makes the tasks is decompiled, they are

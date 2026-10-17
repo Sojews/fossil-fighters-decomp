@@ -9,6 +9,9 @@
 #include "m/bg_new_task.h"
 #include "m/call_task.h"
 #include "game/dino_sound.h"
+#include "m/lcd.h"
+#include "m/display.h"
+#include "m/bright.h"
 
 DinoUiContainerMenuItem::~DinoUiContainerMenuItem() {
 }

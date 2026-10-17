@@ -8,6 +8,9 @@
 #include "game/dino_ui_container_drop_menu_page_inc_task.h"
 #include "game/dino_ui_container_drop_menu_item.h"
 #include "game/dino_sound.h"
+#include "m/lcd.h"
+#include "m/display.h"
+#include "m/bright.h"
 
 DinoUiContainerDropMenuPageIncTask::~DinoUiContainerDropMenuPageIncTask() {
 }
@@ -86,3 +89,4 @@ void DinoUiContainerDropPageLButton::OnDecide() {
         DinoSoundPlaySe(0x93, 0);
     }
 }
+

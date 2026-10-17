@@ -8,6 +8,9 @@
 #include "game/dino_ui_item_item_button.h"
 #include "game/dino_ui_item_menu_item.h"
 #include "game/dino_sound.h"
+#include "m/lcd.h"
+#include "m/display.h"
+#include "m/bright.h"
 
 DinoUiItemItemButton::~DinoUiItemItemButton() {
 }
@@ -71,3 +74,4 @@ void DinoUiItemBackButton::OnDecide() {
     mOwner->OnBackDecided();
     DinoSoundPlaySe(0x90, 0);
 }
+
