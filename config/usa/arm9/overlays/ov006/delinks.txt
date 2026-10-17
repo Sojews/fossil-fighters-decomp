@@ -29,14 +29,8 @@ src/ov006/ov006_02178b80.cpp:
 src/ov006/dino_ui_museum_3d_model.cpp:
     .text       start:0x021844cc end:0x02184778
 
-src/ov006/dino_ui_museum_information_menu.cpp:
-    .text       start:0x02184778 end:0x021899f8
-
 src/ov006/dino_ui_museum.cpp:
-    .text       start:0x021899f8 end:0x0218b434
+    .text       start:0x02184778 end:0x0218b434
 
 src/ov006/dino_ui_order_select.cpp:
-    .text       start:0x0218b434 end:0x0218fe00
-
-src/ov006/ov006_0218fe00.cpp:
-    .text       start:0x0218fe00 end:0x02190040
+    .text       start:0x0218b434 end:0x02190040

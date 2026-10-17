@@ -13,23 +13,11 @@ src/ov007/dino_ui_atm_cursor.cpp:
 src/ov007/dino_ui_organization_menu.cpp:
     .text       start:0x02174ad8 end:0x02180f98
 
-src/ov007/dino_ui_keyboard_menu.cpp:
-    .text       start:0x02180f98 end:0x02181334
-
-src/ov007/dino_ui_keyboard.cpp:
-    .text       start:0x02181334 end:0x02184a9c
-
-src/ov007/dino_ui_senryu_menu.cpp:
-    .text       start:0x02184a9c end:0x021852b8
-
-src/ov007/dino_ui_senryu.cpp:
-    .text       start:0x021852b8 end:0x0218746c
-
-src/ov007/dino_ui_revive_status_menu.cpp:
-    .text       start:0x0218746c end:0x0218abcc
-
-src/ov007/ov007_0218abcc.cpp:
-    .text       start:0x0218abcc end:0x0218ad84
-
 src/ov007/dino_ui_team_select.cpp:
     .text       start:0x0218ad84 end:0x0218bdc0
+
+src/ov007/dino_ui_keyboard.cpp:
+    .text       start:0x02180f98 end:0x0218746c
+
+src/ov007/dino_ui_revive_status_menu.cpp:
+    .text       start:0x0218746c end:0x0218ad84

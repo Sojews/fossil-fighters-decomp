@@ -56,50 +56,14 @@ src/ov000/ov000_0215ef04.cpp:
 src/ov000/dino_battle_view_field.cpp:
     .text       start:0x0215f22c end:0x0215fe8c
 
-src/ov000/dino_battle_view_winner_scroll_task.cpp:
-    .text       start:0x0215fe8c end:0x02161a28
-
-src/ov000/motion_advantage_arrow.cpp:
-    .text       start:0x02161a28 end:0x02161f20
-
-src/ov000/ov000_02161f20.cpp:
-    .text       start:0x02161f20 end:0x02162694
-
-src/ov000/create_player_update_ability_icon_task.cpp:
-    .text       start:0x02162694 end:0x0216b514
-
-src/ov000/dino_battle_user_controller.cpp:
-    .text       start:0x0216b514 end:0x0216c83c
-
 src/ov000/set_status_effect_task.cpp:
     .text       start:0x0216c83c end:0x0216f294
 
 src/ov000/dino_battle_view_creature.cpp:
     .text       start:0x0216f294 end:0x021700fc
 
-src/ov000/creature_motion.cpp:
-    .text       start:0x021700fc end:0x021733f0
-
-src/ov000/dino_battle_view_effect_game_begin.cpp:
-    .text       start:0x021733f0 end:0x02173fa8
-
 src/ov000/dino_battle_view_effect_telop.cpp:
     .text       start:0x02173fa8 end:0x02175b40
-
-src/ov000/dino_battle_view_ui_change_menu.cpp:
-    .text       start:0x02175b40 end:0x02176740
-
-src/ov000/dino_battle_view_ui_attacker_menu.cpp:
-    .text       start:0x02176740 end:0x021779b8
-
-src/ov000/dino_battle_view_ui_defender_menu.cpp:
-    .text       start:0x021779b8 end:0x0217820c
-
-src/ov000/dino_battle_view_ui_select_all.cpp:
-    .text       start:0x0217820c end:0x021788f0
-
-src/ov000/dino_battle_view.cpp:
-    .text       start:0x021788f0 end:0x021791f8
 
 src/ov000/dino_battle_view_lifebar.cpp:
     .text       start:0x021791f8 end:0x02179aa0
@@ -130,21 +94,6 @@ src/ov000/dino_battle_view2.cpp:
 
 src/ov000/battle_select.cpp:
     .text       start:0x021817fc end:0x02184908
-
-src/ov000/dino_battle_view_3d.cpp:
-    .text       start:0x02184908 end:0x02185a54
-
-src/ov000/b3d_status_view_task.cpp:
-    .text       start:0x02185a54 end:0x02188430
-
-src/ov000/dino_battle_view_3d2.cpp:
-    .text       start:0x02188430 end:0x02189530
-
-src/ov000/black_in_task.cpp:
-    .text       start:0x02189530 end:0x0218a020
-
-src/ov000/dino_battle_view_3d_move.cpp:
-    .text       start:0x0218a020 end:0x0218a5b8
 
 src/ov000/dino_battle_view_3d_camera.cpp:
     .text       start:0x0218a5b8 end:0x0218a8ac
@@ -178,3 +127,18 @@ src/ov000/set_toturial_flag_task.cpp:
 
 src/ov000/dino_battle_help.cpp:
     .text       start:0x0218f7ac end:0x0218fa08
+
+src/ov000/dino_battle_view_winner_scroll_task.cpp:
+    .text       start:0x0215fe8c end:0x02162694
+
+src/ov000/create_player_update_ability_icon_task.cpp:
+    .text       start:0x02162694 end:0x0216c83c
+
+src/ov000/creature_motion.cpp:
+    .text       start:0x021700fc end:0x02173fa8
+
+src/ov000/dino_battle_view_3d.cpp:
+    .text       start:0x02184908 end:0x0218a5b8
+
+src/ov000/dino_battle_view_ui.cpp:
+    .text       start:0x02175b40 end:0x021791f8

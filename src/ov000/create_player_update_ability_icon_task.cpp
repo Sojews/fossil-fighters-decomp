@@ -1,11 +1,11 @@
 // CreatePlayerUpdateAbilityIconTask.
-// Only the destructors are decompiled so far.
 
 // Derived destructors have their bases' destructor bodies inlined; auto-inlining the ones defined above does that.
 #pragma auto_inline on
 
 #include "game/create_player_update_ability_icon_task.h"
 #include "types.h"
+#include "game/dino_battle_user_controller.h"
 
 extern "C" void func_ov000_0216d1e4(void *);
 
@@ -113,4 +113,10 @@ void ResetStatusEffectSleepTask::Execute() {
 void CreatePlayerUpdateAbilityIconTask::Execute() {
     func_ov000_02163408((void *)mUnk18, mUnk10, mUnk14);
     Exit();
+}
+
+DinoBattleUserController::~DinoBattleUserController() {
+}
+
+PlayerThinkTimeCountTask::~PlayerThinkTimeCountTask() {
 }

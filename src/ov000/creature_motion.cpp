@@ -1,5 +1,4 @@
 // CreatureMotion.
-// Only the destructors are decompiled so far.
 
 // Derived destructors have their bases' destructor bodies inlined; auto-inlining the ones defined above does that.
 #pragma auto_inline on
@@ -11,6 +10,7 @@
 #include "m/bg_new_task.h"
 #include "m/call_task.h"
 #include "m/geometry.h"
+#include "game/dino_battle_view_effect_game_begin.h"
 
 extern "C" void func_ov000_021795e0(void *, u32, u32);
 
@@ -64,3 +64,16 @@ void UpdateLifeBarTask::Execute() {
     func_ov000_021795e0((void *)mUnk10, mUnk14, mUnk18);
     Exit();
 }
+
+DinoBattleViewEffectGameBeginPlayerNamePanel::~DinoBattleViewEffectGameBeginPlayerNamePanel() {
+}
+
+DinoBattleViewEffectGameBegin::~DinoBattleViewEffectGameBegin() {
+}
+
+void DinoBattleViewEffectGameBegin::Idle() {
+    (this->*mState)();
+}
+
+// Template task instances the game emits in this file. Until the code that makes the tasks is decompiled, they are
+// instantiated explicitly.

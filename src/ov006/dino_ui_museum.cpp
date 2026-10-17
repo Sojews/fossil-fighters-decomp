@@ -1,14 +1,16 @@
 // DinoUiMuseum.
-// Only the destructors are decompiled so far.
 
 // Derived destructors have their bases' destructor bodies inlined; auto-inlining the ones defined above does that.
 #pragma auto_inline on
 
-#include "game/dino_ui_museum.h"
+#include "game/dino_ui_museum_information_menu.h"
 #include "types.h"
+#include "game/dino_ui_museum.h"
 #include "m/lcd.h"
 #include "game/dino_sound.h"
-#include "game/dino_ui_museum_information_menu.h"
+
+DinoUiMuseumInformationMenu::~DinoUiMuseumInformationMenu() {
+}
 
 DinoUiMuseum::~DinoUiMuseum() {
 }
