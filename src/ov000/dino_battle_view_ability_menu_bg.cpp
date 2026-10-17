@@ -7,10 +7,21 @@
 #include "game/dino_battle_view_ability_menu_bg.h"
 #include "types.h"
 #include "m/motion.h"
+#include "m/bg.h"
+#include "m/text.h"
+#include "m/pal.h"
 #include "game/dino_battle_view_class.h"
 #include "game/dino_battle_view_ui_ability_menu_item.h"
 
+extern "C" int data_ov000_021978dc;    // live ability menu BGs
+
 DinoBattleViewAbilityMenuBG::~DinoBattleViewAbilityMenuBG() {
+    if (mUnk10D4) {
+        mBg->DeleteText(mText);
+        mBg->DeleteChr(mChr);
+        mBg->mPal->Free(mPalBlock);
+    }
+    data_ov000_021978dc--;
 }
 
 void DinoBattleViewUiAbilityMenuItem::OnDecide() {

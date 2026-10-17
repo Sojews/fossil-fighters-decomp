@@ -6,7 +6,7 @@
 
 #include "game/dino_battle_view_ability_text_window.h"
 #include "types.h"
-#include "m/screen.h"
+#include "m/text.h"
 #include "game/dino_battle_view_ability_menu_bg.h"
 
 DinoBattleViewAbilityTextWindow::~DinoBattleViewAbilityTextWindow() {
@@ -17,7 +17,7 @@ DinoBattleViewAbilityTextWindow::~DinoBattleViewAbilityTextWindow() {
 
 void DinoBattleViewAbilityMenuBG::SetPriority(int priority) {
     if (mUnk10D4) {
-        mScreen->mBgCntBits.priority = priority;
+        mText->mBgCntBits.priority = priority;
     }
 }
 
