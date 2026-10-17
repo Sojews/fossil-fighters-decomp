@@ -18,6 +18,11 @@ public:
 
     MTask *CreateModeTransfer(int mode);
     MTask *CreateClearTransfer();
+    MTask *CreateRatioAnime(int from, int to, int duration, int ease);
+    MTask *CreateFadeInFromBlack(int duration, int ease);
+    MTask *CreateFadeOutToBlack(int duration, int ease);
+    MTask *CreateFadeInFromWhite(int duration, int ease);
+    MTask *CreateFadeOutToWhite(int duration, int ease);
 
     MDisplay *mDisplay;     // 0x00
     union {

@@ -40,6 +40,47 @@ MTask *MBright::CreateClearTransfer() {
     return new MBrightClearTransfer(this);
 }
 
+MTask *MBright::CreateRatioAnime(int from, int to, int duration, int ease) {
+    return new MBrightRatioAnime(this, from, to, duration, ease);
+}
+
+MTask *MBright::CreateFadeInFromBlack(int duration, int ease) {
+    MSerialTaskSet *set = new MSerialTaskSet();
+    set->mExitWhenEmpty = TRUE;
+    set->AddTail(CreateModeTransfer(2));
+    set->AddTail(CreateRatioAnime(16, 0, duration, ease));
+    return set;
+}
+
+MTask *MBright::CreateFadeOutToBlack(int duration, int ease) {
+    MSerialTaskSet *set = new MSerialTaskSet();
+    set->mExitWhenEmpty = TRUE;
+    set->AddTail(CreateModeTransfer(2));
+    set->AddTail(CreateRatioAnime(0, 16, duration, ease));
+    return set;
+}
+
+MTask *MBright::CreateFadeInFromWhite(int duration, int ease) {
+    MSerialTaskSet *set = new MSerialTaskSet();
+    set->mExitWhenEmpty = TRUE;
+    set->AddTail(CreateModeTransfer(1));
+    set->AddTail(CreateRatioAnime(16, 0, duration, ease));
+    return set;
+}
+
+MTask *MBright::CreateFadeOutToWhite(int duration, int ease) {
+    MSerialTaskSet *set = new MSerialTaskSet();
+    set->mExitWhenEmpty = TRUE;
+    set->AddTail(CreateModeTransfer(1));
+    set->AddTail(CreateRatioAnime(0, 16, duration, ease));
+    return set;
+}
+
+void MBrightRatioAnime::Apply(int step) {
+    MValueAnime::Apply(step);
+    mBright->SetFactor(mValue);
+}
+
 void MBrightClearTransfer::Transfer() {
     mBright->Reset();
 }
