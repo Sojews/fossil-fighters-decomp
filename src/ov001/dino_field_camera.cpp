@@ -5,3 +5,7 @@
 
 DinoFieldCamera::~DinoFieldCamera() {
 }
+
+void DinoFieldCamera::SetFocus(u32 chara) {
+    mFocus = chara;
+}

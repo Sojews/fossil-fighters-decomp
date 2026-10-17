@@ -29,9 +29,12 @@ public:
 
     void ResetHeight();
     void SetTracking(u8 tracking);
+    void SetFocus(u32 chara);
     void StartRotate(u16 x, u16 y, u16 z, u32 a, u32 b, u32 c);
 
-    u8 unk8C[0x144 - 0x8C];
+    u8 unk8C[0xE4 - 0x8C];
+    u32 mFocus;                     // 0xE4: the character followed
+    u8 unkE8[0x144 - 0xE8];
     DinoFieldNamePanel *mNamePanel; // 0x144
     u32 mUnk148[2];                 // 0x148
     std::vector<void *> mUnk150;    // 0x150
@@ -69,6 +72,8 @@ public:
     void ApplyBodyModel();
     void ApplyHeadModel();
     void ChangeMotion(u32 motion, u8 loop, MFx32 speed);
+    void SetAngle(u32 angle, u32 a, u32 b);
+    MTask *CreateWaitMoveTask();
 
     MArchivePtr mArchive;       // 0x8C
     MArchiveFile mFile;         // 0x90

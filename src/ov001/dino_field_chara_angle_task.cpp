@@ -1,6 +1,7 @@
 // DinoFieldCharaAngleTask, DinoFieldCharaMoveToRegionTask, DinoFieldCharaMoveToCoordTask, DinoFieldCharaMoveOffsetTask, DinoFieldCharaMoveVectorTask, DinoFieldCharaWaitMoveTask, DinoFieldCharaFocusTask.
 // Only the destructors are decompiled so far.
 
+#include "game/dino_field.h"
 #include "game/dino_field_spot.h"
 #include "m/lcd.h"
 #include "m/bright.h"
@@ -173,3 +174,27 @@ template class MBgCallTask0<DinoFieldCaptureFadeInTask>;
 template MTask *MCreateBgCallTask(DinoFieldCaptureFadeInTask *obj, void (DinoFieldCaptureFadeInTask::*func)(), int thread);
 template class MCallTask1<MBg, MBg, bg_mode>;
 template MTask *MCreateCallTask(MBg *obj, void (MBg::*func)(bg_mode), bg_mode a0);
+
+void DinoFieldCharaFocusTask::Transfer() {
+    mField->GetCamera()->SetFocus(mChara);
+}
+
+void DinoFieldCharaAngleTask::Transfer() {
+    DinoFieldChara *chara = mField->GetChara(mChara);
+    if (chara) {
+        chara->SetAngle(mAngle, mA, mB);
+    }
+}
+
+void DinoFieldCharaWaitMoveTask::Idle() {
+    DinoFieldChara *chara = mField->GetChara(mChara);
+    if (!chara) {
+        Exit();
+    } else {
+        MTask *exit = MTaskExitTransfer::Create(this);
+        MTask *wait = chara->CreateWaitMoveTask();
+        MSerialTaskSet *serial = &mSerial;
+        serial->AddTail(wait);
+        serial->AddTail(exit);
+    }
+}
