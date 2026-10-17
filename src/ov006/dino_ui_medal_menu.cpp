@@ -8,6 +8,8 @@
 #include "m/display.h"
 #include "m/blend.h"
 #include "game/dino_sound.h"
+#include "m/call_task.h"
+#include "m/bg_new_task.h"
 
 DinoUiMedalMenu::~DinoUiMedalMenu() {
     gCurrentDisplay->mBlend->Reset();
@@ -133,13 +135,8 @@ void DinoUiMedalSlotCreateTask::Idle() {
     mIndex++;
 }
 
-// The page-slide destinations (file statics).
-extern MPoint data_ov006_02194144;
-extern MPoint data_ov006_0219414c;
-extern MPoint data_ov006_02194154;
-extern MPoint data_ov006_0219415c;
-extern "C" MTask *func_ov006_021835a8(DinoUiMedalMenu *menu, MPoint pos, int arg);
-extern "C" MTask *func_ov006_02183570(DinoUiMedalMenu *menu, MPoint pos);
+
+#pragma auto_inline off
 
 void DinoUiMedalMenu::PageRight() {
     if (mPage == mLastPage) {
@@ -147,8 +144,8 @@ void DinoUiMedalMenu::PageRight() {
     } else {
         mPage++;
     }
-    mSerial.AddTail(func_ov006_021835a8(this, data_ov006_02194144, 1));
-    mSerial.AddTail(func_ov006_02183570(this, data_ov006_0219414c));
+    mSerial.AddTail(MCreateBgCallTask(this, &DinoUiMedalMenu::LoadPage, 1));
+    mSerial.AddTail(MCreateCallTask(this, &DinoUiMedalMenu::FinishPageRight));
     Disable();
 }
 
@@ -158,7 +155,12 @@ void DinoUiMedalMenu::PageLeft() {
     } else {
         mPage--;
     }
-    mSerial.AddTail(func_ov006_021835a8(this, data_ov006_02194154, 1));
-    mSerial.AddTail(func_ov006_02183570(this, data_ov006_0219415c));
+    mSerial.AddTail(MCreateBgCallTask(this, &DinoUiMedalMenu::LoadPage, 1));
+    mSerial.AddTail(MCreateCallTask(this, &DinoUiMedalMenu::FinishPageLeft));
     Disable();
 }
+
+#pragma auto_inline on
+
+// DinoUiMedalMenu::OnFocus (not decompiled yet) re-enables the help through a call task.
+template MTask *MCreateCallTask(DinoUiMedalMenu *obj, void (DinoHelpBase::*func)());

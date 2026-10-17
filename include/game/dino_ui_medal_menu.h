@@ -18,6 +18,9 @@ public:
     void OnBackDecided(BOOL arg);
     void PageRight();
     void PageLeft();
+    void LoadPage();
+    void FinishPageRight();
+    void FinishPageLeft();
 
     u32 mUnkB4[50];                     // 0xB4
     u32 mSlotCount;                     // 0x17C
