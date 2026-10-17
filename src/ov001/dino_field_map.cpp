@@ -1,7 +1,11 @@
 // DinoFieldMap.
-// Only the destructor is decompiled so far.
+// Only the destructor and GetInfo are decompiled so far.
 
 #include "game/dino_field.h"
 
 DinoFieldMap::~DinoFieldMap() {
+}
+
+DinoFieldMapInfo *DinoFieldMap::GetInfo() {
+    return &mInfo;
 }

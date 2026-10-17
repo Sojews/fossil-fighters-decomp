@@ -91,7 +91,8 @@ public:
 
     DinoFieldMapInfo *GetInfo();
 
-    u32 mUnk8C[2];          // 0x8C
+    DinoFieldMapInfo mInfo; // 0x8C
+    u32 mUnk90;             // 0x90
     MArchivePtr mArchive;   // 0x94
     MArchiveFile mFile;     // 0x98
     MArchivePtr mArchive2;  // 0xA4
