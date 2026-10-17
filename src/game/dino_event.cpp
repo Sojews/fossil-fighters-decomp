@@ -20,3 +20,11 @@ void DinoEvent::SetEpisodesChanged() {
 void DinoEvent::MarkCameraUsed() {
     mCameraUsed = TRUE;
 }
+
+void DinoEvent::Fade(u32 a, u32 b) {
+    mField->Fade(a, b);
+}
+
+MTask *DinoEvent::CreateFadeWaitTask() {
+    return mField->CreateFadeWaitTask();
+}

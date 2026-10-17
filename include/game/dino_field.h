@@ -109,6 +109,8 @@ public:
     void PlayBgm(u32 bgm, u32 arg);
     void StopBgm(u32 fadeFrames);
     void PlayBgmFade(u32 bgm, u32 arg);
+    void Fade(u32 a, u32 b);
+    MTask *CreateFadeWaitTask();
     void Quake(u32 a, u32 b, u32 c);
     void SetUnk258(BOOL value);
     void SyncChara(u32 id);

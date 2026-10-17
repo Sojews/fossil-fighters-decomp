@@ -11494,7 +11494,7 @@ from:0x0203de66 kind:thumb_call to:0x0204f478 module:main
 from:0x0203de74 kind:thumb_call to:0x02005198 module:main
 from:0x0203de7c kind:load to:0x020cb978 module:main
 from:0x0203de80 kind:load to:0x020be110 module:main
-from:0x0203de8c kind:load to:0x021586e9 module:overlays(1,2)
+from:0x0203de8c kind:load to:0x021586e9 module:overlay(1)
 from:0x0203de98 kind:load to:0x02158965 module:overlay(1)
 from:0x0203deaa kind:thumb_call to:0x020121bc module:main
 from:0x0203deb6 kind:thumb_call to:0x02012840 module:main
