@@ -178,6 +178,10 @@ public:
     DinoField *GetField();
     void Fade(u32 a, u32 b);
     MTask *CreateFadeWaitTask();
+    void SetEpisodesChanged();
+    void AddEpisode(u32 id);
+    void RemoveEpisode(u32 id);
+    void ResetEpisode(u32 id);
 };
 
 #endif

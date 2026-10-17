@@ -92,6 +92,24 @@ DinoEventMuseum::~DinoEventMuseum() {
 DinoEventReviveEffectCaller::~DinoEventReviveEffectCaller() {
 }
 
+void SetEpisodeTask::Execute() {
+    if (mSeen) {
+        if (!gDinoBackup->GetEpisodeSeen(mId)) {
+            gDinoBackup->SetEpisodeSeen(mId, TRUE);
+            mEvent->AddEpisode(mId);
+            mEvent->SetEpisodesChanged();
+        }
+    } else {
+        if (gDinoBackup->GetEpisodeSeen(mId)) {
+            gDinoBackup->SetEpisodeSeen(mId, FALSE);
+            mEvent->RemoveEpisode(mId);
+            mEvent->ResetEpisode(mId);
+            mEvent->SetEpisodesChanged();
+        }
+    }
+    Exit();
+}
+
 // Template task instances the game emits in this file. Until the code that makes the tasks is decompiled, they are
 // instantiated explicitly.
 class DinoEventLoop {};
