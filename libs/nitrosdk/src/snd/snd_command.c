@@ -129,10 +129,11 @@ void SND_PushCommand(SNDCommand *command) {
     OSIntrMode enabled = OS_DisableInterrupts();
     if (sReserveListEnd == NULL) {
         sReserveList = command;
+        sReserveListEnd = command;
     } else {
         sReserveListEnd->next = command;
+        sReserveListEnd = command;
     }
-    sReserveListEnd = command;
     command->next = NULL;
     OS_RestoreInterrupts(enabled);
 }
