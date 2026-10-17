@@ -201,8 +201,8 @@ typedef struct {
     u8 unk002[0xa];
     u32 mp_flag;            // 0x00c
     u8 unk010[0x2c];
-    u16 mp_maxSendSize;     // 0x03c
-    u16 mp_maxRecvSize;     // 0x03e
+    u16 mp_sendSize;        // 0x03c
+    u16 mp_recvSize;        // 0x03e
     u8 unk040[0x32];
     u16 mp_recvBufSize;     // 0x072
     u8 unk074[0x12];
@@ -214,7 +214,7 @@ typedef struct {
     u8 unk0fa[0x88];
     u16 child_bitmap;       // 0x182
     u8 unk184[4];
-    u16 mp_parentInterval;  // 0x188 (?)
+    u16 aid;                // 0x188
 } WMStatus;
 
 typedef struct {
