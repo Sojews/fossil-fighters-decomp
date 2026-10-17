@@ -27,7 +27,7 @@ public:
     virtual ~DinoBattleAutoDemo();
     virtual void Idle();
 
-    u32 mUnk74[2];      // 0x74
+    void (DinoBattleAutoDemo::*mState)(); // 0x74
     MTask *mUnk7C;      // 0x7C
 };
 
