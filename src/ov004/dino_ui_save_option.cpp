@@ -108,3 +108,8 @@ MRect DinoUiSaveOptionOptionButton::GetFrame() {
 MRect DinoUiSaveOptionSaveButton::GetFrame() {
     return MRect(mMotion->GetFrame().GetTopLeft(), mMotion->GetFrame().GetTopLeft().Offset(108, 76));
 }
+
+void DinoUiSaveOptionAppendItemTask::Execute() {
+    mMenu->AppendItem(mKind);
+    Exit();
+}

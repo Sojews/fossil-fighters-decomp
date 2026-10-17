@@ -188,3 +188,12 @@ void DinoUiMaskEquipMenu::ClearItems() {
     }
     mItems.clear();
 }
+
+void DinoUiMaskEquipMenu::Decide(int index) {
+    mChoice = index;
+    Equip();
+}
+
+void DinoUiMaskEquipMenu::OnIdle() {
+    mUnk104 = TRUE;
+}

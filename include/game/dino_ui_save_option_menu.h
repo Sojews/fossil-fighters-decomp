@@ -12,6 +12,7 @@ public:
     virtual void OnStart();
     virtual void OnFocus(MMenuItem *item);
     void RemoveItem();
+    void AppendItem(u8 kind);
     void OnBackDecided();
     void OnOptionDecided();
     void OnSaveDecided();

@@ -3,10 +3,15 @@
 
 #include "m/task.h"
 
+class DinoUiSaveOptionMenu;
+
 class DinoUiSaveOptionAppendItemTask : public MTask {
 public:
     virtual ~DinoUiSaveOptionAppendItemTask();
     virtual void Execute();
+
+    u8 mKind;                       // 0x10
+    DinoUiSaveOptionMenu *mMenu;    // 0x14
 };
 
 #endif

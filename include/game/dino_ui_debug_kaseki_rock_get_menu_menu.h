@@ -16,6 +16,7 @@
 
 class DinoUiDebugKasekiRockGetMenu : public MMenu {
 public:
+    DinoUiDebugKasekiRockGetMenu() : MMenu(0) {}
     virtual ~DinoUiDebugKasekiRockGetMenu();
     virtual void OnStart();
     virtual void OnFocus(MMenuItem *item);
@@ -25,6 +26,7 @@ public:
     MFont *mFont;       // 0xB8
     MTaskSet *mTasks;   // 0xBC: the cursor's moves
     MView *mCursor;     // 0xC0
+    u32 mUnkC4[2];      // 0xC4
 };
 
 class DinoUiDebugKasekiRockGetMenuKasekiRockIdItem : public MMenuItem {

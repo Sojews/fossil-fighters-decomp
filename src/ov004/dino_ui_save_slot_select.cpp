@@ -134,3 +134,8 @@ extern const u32 data_0208ad94; // a text number
 const char *DinoUiSaveSlotSelectMenuDeleteItem::GetText() {
     return gDinoResource->GetText(data_0208ad94);
 }
+
+void DinoUiSaveSlotConfirm::Idle() {
+    mMenu = new DinoUiSaveSlotConfirmMenu();
+    mSerial.AddTail(mMenu);
+}

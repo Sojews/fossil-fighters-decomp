@@ -140,3 +140,11 @@ void DinoUiDebugKasekiRockGetMenu::OnFocus(MMenuItem *item) {
         mTasks->AddTail(mCursor->CreateFrameAnime(mCursor->GetFrame(), item->GetFrame(), 5, -2));
     }
 }
+
+void DinoUiDebugKasekiRockGet::Idle() {
+    MTask *exit = MTaskExitTransfer::Create(this);
+    MTask *menu = new DinoUiDebugKasekiRockGetMenu();
+    MSerialTaskSet *serial = &mSerial;
+    serial->AddTail(menu);
+    serial->AddTail(exit);
+}

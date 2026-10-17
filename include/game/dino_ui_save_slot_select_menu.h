@@ -16,7 +16,10 @@ public:
 };
 class DinoUiSaveSlotConfirmMenu : public MMenu {
 public:
+    DinoUiSaveSlotConfirmMenu() : MMenu(0) {}
     virtual ~DinoUiSaveSlotConfirmMenu();
     virtual void OnStart();
+
+    u32 mUnkA8;     // 0xA8
 };
 #endif

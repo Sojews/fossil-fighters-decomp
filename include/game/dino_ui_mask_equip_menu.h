@@ -20,6 +20,7 @@ public:
     BOOL PageRight();
     BOOL PageLeft();
     void Decide(int index);
+    void Equip();
     void ClearItems();
     void RefreshPage2();
 
@@ -29,7 +30,8 @@ public:
     std::vector<void *> mItems; // 0xC0: this page's items
     u32 mUnkCC[6];          // 0xCC
     DinoUi3PartsFraction *mFraction; // 0xE4: "page n/m"
-    u32 mUnkE8[2];          // 0xE8
+    int mChoice;            // 0xE8
+    u32 mUnkEC;
     std::vector<void *> mUnkF0; // 0xF0
     int mPage;              // 0xFC
     int mLastPage;          // 0x100
