@@ -24,7 +24,7 @@ public:
     virtual void OnFocusChanged(BOOL focused);
     virtual void OnDecide();
 
-    u32 mUnkA0;
+    u8 mLevel;      // 0xA0: the volume shown, 0-10
     MPoint mPos;    // 0xA4
 };
 
@@ -35,7 +35,7 @@ public:
     virtual void OnFocusChanged(BOOL focused);
     virtual void OnDecide();
 
-    u32 mUnkA0;
+    u8 mLevel;      // 0xA0: the volume shown, 0-10
     MPoint mPos;    // 0xA4
 };
 
@@ -78,8 +78,13 @@ public:
     virtual void OnPreLoop();
     void OnOKDecided();
     void OnBackDecided();
+    void SetBgmVolume(u8 level);
+    MSmartOam *GetOam() { return mOam; }
+    void SetSeVolume(u8 level);
 
-    u8 unkBF[0xC5];  // members start in MMenu's tail padding
+    u8 unkBF[1];     // members start in MMenu's tail padding
+    MSmartOam *mOam; // 0xC0
+    u8 unkC4[0xC0];
     u8 mSilentFocus; // 0x184
 };
 

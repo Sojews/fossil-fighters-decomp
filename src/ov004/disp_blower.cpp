@@ -13,6 +13,8 @@
 #include "m/bg_new_task.h"
 #include "m/call_task.h"
 
+extern const char *data_ov004_0217520c[]; // motion file paths
+
 DispBlower::~DispBlower() {
 }
 
@@ -140,4 +142,44 @@ MRect BGMVolumeButton::GetFrame() {
 MRect SEVolumeButton::GetFrame() {
     MPoint p(mPos.x, mPos.y);
     return MRect(MPoint(p.x - 8, p.y - 8), MPoint(p.x + 8, p.y + 8));
+}
+
+void BGMVolumeButton::OnFocusChanged(BOOL focused) {
+    if (focused) {
+        if (mMotion == NULL) {
+            mMotion = new MMotion(data_ov004_0217520c[2], mOwner->GetOam(), 2, 1);
+            mMotion->SetPosition(mPos);
+            mParallel.AddTail(mMotion);
+        }
+        mMotion->Play(1, 0);
+        mMotion->Show();
+        mSerial.AddTail(mMotion->CreateShowTransfer());
+        mMotion->Play(1, 0);
+        mOwner->SetBgmVolume(mLevel);
+    } else if (mMotion) {
+        mSerial.Clear();
+        mParallel.Remove(mMotion);
+        delete mMotion;
+        mMotion = NULL;
+    }
+}
+
+void SEVolumeButton::OnFocusChanged(BOOL focused) {
+    if (focused) {
+        if (mMotion == NULL) {
+            mMotion = new MMotion(data_ov004_0217520c[2], mOwner->GetOam(), 2, 1);
+            mMotion->SetPosition(mPos);
+            mParallel.AddTail(mMotion);
+        }
+        mMotion->Play(1, 0);
+        mMotion->Show();
+        mSerial.AddTail(mMotion->CreateShowTransfer());
+        mMotion->Play(1, 0);
+        mOwner->SetSeVolume(mLevel);
+    } else if (mMotion) {
+        mSerial.Clear();
+        mParallel.Remove(mMotion);
+        delete mMotion;
+        mMotion = NULL;
+    }
 }
