@@ -35,6 +35,10 @@ DinoUiChildScannerParentItem::~DinoUiChildScannerParentItem() {
 DinoUiChildScanner::~DinoUiChildScanner() {
 }
 
+DinoUiWirelessMatch::~DinoUiWirelessMatch() {
+    delete mUnk9C;
+}
+
 DinoUiBattleParentScanner::~DinoUiBattleParentScanner() {
     GetDisplay()->mBlend->Reset();
 }

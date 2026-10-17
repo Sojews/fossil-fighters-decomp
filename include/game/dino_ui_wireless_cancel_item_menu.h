@@ -106,4 +106,13 @@ public:
     MArchiveFile mFile110;      // 0x110
 };
 
+class DinoUiWirelessMatch : public MProcess {
+public:
+    virtual ~DinoUiWirelessMatch();
+    virtual void Idle();
+
+    u32 mUnk74[10];     // 0x74
+    MTask *mUnk9C;      // 0x9C
+};
+
 #endif
