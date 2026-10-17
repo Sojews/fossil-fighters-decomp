@@ -102,6 +102,24 @@ void DinoUiTopMenuMultiDarkButton::OnDecide() {
     DinoSoundPlaySe(0xA4, 0);
 }
 
+void DinoUiTopMenuItem2::OnFocusChanged(BOOL focused) {
+    if (focused) {
+        mMotion->Play(2, 0);
+        mMotion2->Play(2, 0);
+    } else {
+        mMotion->Play(1, 0);
+        mMotion2->Play(1, 0);
+    }
+}
+
+void DinoUiTopMenu::OnFocus(MMenuItem *item) {
+    SetSelectedItem(dynamic_cast<DinoHelpItem *>(item));
+    if (!mSilentFocus) {
+        DinoSoundPlaySe(0x38E, 0);
+    }
+    mSilentFocus = FALSE;
+}
+
 // Template task instances the game emits in this file. Until the code that makes the tasks is decompiled, they are
 // instantiated explicitly.
 template class MBgCallTask0<DinoBackup>;
