@@ -498,3 +498,11 @@ libs/nitrosdk/src/pxi/pxi_fifo.c:
     complete
     .text       start:0x02076b20 end:0x02076d74
     .bss        start:0x02153784 end:0x02153808
+
+libs/nitrosdk/src/os/os_message.c:
+    complete
+    .text       start:0x020746c8 end:0x02074800
+
+libs/nitrosdk/src/os/os_mutex.c:
+    complete
+    .text       start:0x02074800 end:0x02074948

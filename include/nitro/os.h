@@ -49,10 +49,18 @@ struct OSMutex {
 };
 
 // The SDK's thread structure; the game code only embeds threads in its objects and reads their ids.
+typedef struct OSMutexQueue {
+    OSMutex *head;
+    OSMutex *tail;
+} OSMutexQueue;
+
 struct OSThread {
     u8 unk0[0x6C];
-    u32 id;         // 0x6C
-    u8 unk70[0x50];
+    u32 id;                     // 0x6C
+    u8 unk70[0x14];
+    OSMutex *mutex;             // 0x84: the one it's waiting for
+    OSMutexQueue mutexQueue;    // 0x88: the ones it holds
+    u8 unk90[0x30];
 };
 
 static inline u32 OS_GetThreadId(const OSThread *thread) {
