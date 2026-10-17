@@ -5,3 +5,6 @@
 
 DinoSeMotion::~DinoSeMotion() {
 }
+
+// Template instances the game emits in this file.
+template class std::__vec_deleter<void *, std::allocator<void *> >;
