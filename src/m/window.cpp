@@ -145,12 +145,22 @@ MTask *MWinControl::CreateShapeTransfer(MRect rect) {
     return new MWinControlShapeTransfer(this, rect);
 }
 
+MTask *MWinControl::CreateShapeAnime(MRect from, MRect to, u32 duration, int ease) {
+    return new MWinControlShapeAnime(this, from, to, duration, ease);
+}
+
 MTask *MWin::CreateClearTransfer() {
     return new MWinClearTransfer(this);
 }
 
 void MWinClearTransfer::Transfer() {
     mWin->Reset();
+}
+
+void MWinControlShapeAnime::Apply(int step) {
+    MRectAnime::Apply(step);
+    MRect rect = mValue;
+    mWin->SetShape(rect);
 }
 
 void MWinControlShapeTransfer::Transfer() {

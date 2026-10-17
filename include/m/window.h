@@ -27,6 +27,7 @@ public:
     MTask *CreateTargetTransfer(int planes);
     MTask *CreateBlendEnabledTransfer(bool enabled);
     MTask *CreateShapeTransfer(MRect rect);
+    MTask *CreateShapeAnime(MRect from, MRect to, u32 duration, int ease);
 
     MDisplay *mDisplay;     // 0x00
     int mIndex;             // 0x04
