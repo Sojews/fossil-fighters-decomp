@@ -22,3 +22,11 @@ void CreatureMotion::Unk44(int arg) {
         return;
     }
 }
+
+CreatureMotion::CreatureMotion(const char *path, MSmartOam *oam, int arg) : MMotion(std::string(path), oam, 3, 1) {
+    mArg = arg;
+    mUnk80 = 0;
+    mUnk84 = 0;
+    mUnk88 = 0;
+    mOam = oam;
+}

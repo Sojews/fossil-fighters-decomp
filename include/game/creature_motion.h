@@ -20,7 +20,11 @@ public:
     virtual void Execute();
     virtual void Unk44(int arg);
 
-    u32 unk7C[5];
+    int mArg;           // 0x7C
+    u32 mUnk80;         // 0x80
+    u32 mUnk84;         // 0x84
+    u16 mUnk88;         // 0x88
+    MSmartOam *mOam;    // 0x8C
 };
 
 class NopTask : public MTask {
