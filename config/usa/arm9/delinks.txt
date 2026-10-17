@@ -388,6 +388,12 @@ libs/msl/src/console_io.c:
 libs/runtime/src/exception_handler.cpp:
     .text       start:0x02086d6c end:0x02087b78
 
+libs/runtime/src/cxa_vec.cpp:
+    complete
+    .text       start:0x02087bbc end:0x02087dbc
+    .exception  start:0x02088420 end:0x02088498
+    .exceptix   start:0x02088804 end:0x0208884c
+
 
 
 libs/msl/src/wprintf.c:

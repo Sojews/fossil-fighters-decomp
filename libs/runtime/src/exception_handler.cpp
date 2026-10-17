@@ -1,6 +1,7 @@
 // Metrowerks C++ runtime: exception table lookup and unwinding.
 
 #include "types.h"
+#include <exception>
 
 extern "C" {
 
@@ -60,7 +61,6 @@ typedef struct ExceptionSpecification {
 extern int func_0208809c(char *throw_type, char *catch_type, void **adjust);
 extern void func_0208714c(ThrowContext *context, ExceptionInfo *info, u8 *target);
 extern void func_020882c8(ThrowContext *context, ExceptionInfo *info, char *address);
-extern void func_02088064(void);
 extern int __FindExceptionTable(ExceptionInfo *info, char *return_address);
 extern char *func_020881bc(ThrowContext *context, ActionIterator *iter);
 extern void func_02088204(ThrowContext *context, ActionIterator *iter);
@@ -435,7 +435,7 @@ u8 *func_0208791c(ThrowContext *context, ExceptionInfo *info, s32 *adjust) {
         default:
         case 1:
         case 14:
-            func_02088064();
+            std::terminate();
             goto found;
         case 0:
         case 2:
@@ -487,7 +487,7 @@ void func_02087a64(ThrowContext *context) {
 
     func_02086e60(context->return_address, &info);
     if (info.exception_record == NULL) {
-        func_02088064();
+        std::terminate();
     }
     func_02088204(context, (ActionIterator *)&info);
     if (context->throw_type != NULL) {
@@ -495,7 +495,7 @@ void func_02087a64(ThrowContext *context) {
     } else {
         context->catch_info = func_0208775c(context, &info);
         if (context->catch_info == NULL) {
-            func_02088064();
+            std::terminate();
         }
     }
     action = func_0208791c(context, &info, &adjust);
@@ -507,7 +507,7 @@ void func_02087a64(ThrowContext *context) {
 }
 
 // Destroys a caught exception object.
-void func_02087af8(CatchInfo *ci) {
+void __end__catch(CatchInfo *ci) {
     if (ci->location && ci->dtor) {
         ci->dtor(ci->location, -1);
     }
