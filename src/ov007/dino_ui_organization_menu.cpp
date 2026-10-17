@@ -9,6 +9,7 @@
 #include "m/display.h"
 #include "m/blend.h"
 #include "m/call_task.h"
+#include "m/bg_new_task.h"
 
 DinoUiOrganizationMenu::~DinoUiOrganizationMenu() {
     gCurrentDisplay->mBlend->Reset();
@@ -162,3 +163,6 @@ void DinoUiOrganizationSlotCreateTask::Idle() {
 
 // DinoUiOrganizationMenu::OnFocus (not decompiled yet) re-enables the help through a call task.
 template MTask *MCreateCallTask(DinoUiOrganizationMenu *obj, void (DinoHelpBase::*func)());
+template MTask *MCreateCallTask(DinoUiOrganizationMenu *obj, void (DinoUiOrganizationMenu::*func)());
+template MTask *MCreateBgCallTask(DinoUiOrganizationMenu *obj, void (DinoUiOrganizationMenu::*func)(), int thread);
+template MTask *MCreateCallTask(DinoUiOrganizationMenu *obj, void (DinoUiOrganizationMenu::*func)(bool), bool a1);
