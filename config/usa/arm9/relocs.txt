@@ -21958,10 +21958,10 @@ from:0x0207bc0a kind:thumb_call to:0x0207bc4c module:main
 from:0x0207bc22 kind:thumb_call_arm to:0x020749d0 module:main
 from:0x0207bc2c kind:load to:0x02154280 module:main
 from:0x0207bc34 kind:load to:0x021542d0 module:main
-from:0x0207bc38 kind:load to:0x021542c0 module:main
-from:0x0207bc40 kind:load to:0x02154300 module:main
-from:0x0207bc44 kind:load to:0x021542e4 module:main
-from:0x0207bc48 kind:load to:0x021542f4 module:main
+from:0x0207bc38 kind:load to:0x021542a8 add:0x18 module:main
+from:0x0207bc40 kind:load to:0x021542d0 add:0x30 module:main
+from:0x0207bc44 kind:load to:0x021542d0 add:0x14 module:main
+from:0x0207bc48 kind:load to:0x021542d0 add:0x24 module:main
 from:0x0207bc66 kind:thumb_call_arm to:0x02074fd8 module:main
 from:0x0207bc7c kind:thumb_call_arm to:0x02074fec module:main
 from:0x0207bc84 kind:load to:0x02154280 module:main
