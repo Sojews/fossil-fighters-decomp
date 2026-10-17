@@ -126,3 +126,53 @@ template class MBgCallTask0<DinoBackup>;
 template MTask *MCreateBgCallTask(DinoBackup *obj, void (DinoBackup::*func)(), int thread);
 template class MCallTask0<DinoUiTopMenu, DinoHelpBase>;
 template MTask *MCreateCallTask(DinoUiTopMenu *obj, void (DinoHelpBase::*func)());
+
+void DinoUiTopMenu::OnBackDecided() {
+    MTask &self = *this;
+    MTask *exit = MTaskExitTransfer::Create(&self);
+    MTask *timer = new MTimer(30);
+    MSerialTaskSet *serial = &mSerial;
+    serial->AddTail(timer);
+    serial->AddTail(exit);
+    *mResult = 0;
+}
+
+void DinoUiTopMenu::OnSingleDecided() {
+    MTask &self = *this;
+    MTask *exit = MTaskExitTransfer::Create(&self);
+    MTask *timer = new MTimer(30);
+    MSerialTaskSet *serial = &mSerial;
+    serial->AddTail(timer);
+    serial->AddTail(exit);
+    *mResult = 1;
+}
+
+void DinoUiTopMenu::OnMultiDecided() {
+    MTask &self = *this;
+    MTask *exit = MTaskExitTransfer::Create(&self);
+    MTask *timer = new MTimer(30);
+    MSerialTaskSet *serial = &mSerial;
+    serial->AddTail(timer);
+    serial->AddTail(exit);
+    *mResult = 2;
+}
+
+void DinoUiTopMenu::OnPassDecided() {
+    MTask &self = *this;
+    MTask *exit = MTaskExitTransfer::Create(&self);
+    MTask *timer = new MTimer(30);
+    MSerialTaskSet *serial = &mSerial;
+    serial->AddTail(timer);
+    serial->AddTail(exit);
+    *mResult = 3;
+}
+
+void DinoUiTopMenu::OnOptionDecided() {
+    MTask &self = *this;
+    MTask *exit = MTaskExitTransfer::Create(&self);
+    MTask *timer = new MTimer(30);
+    MSerialTaskSet *serial = &mSerial;
+    serial->AddTail(timer);
+    serial->AddTail(exit);
+    *mResult = 4;
+}
