@@ -177,3 +177,102 @@ void DinoCreatureUpdateTask::Execute() {
     func_ov000_0216d3c0((void *)mUnk10, mUnk14, mUnk18);
     Exit();
 }
+
+u32 DinoBattleModelCreature::GetUnkB0() {
+    return mUnkB0;
+}
+
+u32 DinoBattleModelCreature::GetUnkB4() {
+    return mUnkB4;
+}
+
+u32 DinoBattleModelCreature::GetUnkB8() {
+    return mUnkB8;
+}
+
+u32 DinoBattleModelCreature::GetUnkBC() {
+    return mUnkBC;
+}
+
+void DinoBattleModelCreature::SetUnkB8(u32 value) {
+    mUnkB8 = value;
+}
+
+u32 DinoBattleModelCreature::GetUnkC0() {
+    return mUnkC0;
+}
+
+void DinoBattleModelCreature::SetUnkC0(u32 value) {
+    mUnkC0 = value;
+}
+
+void DinoBattleModelCreature::ClearUnkC4() {
+    mUnkC4 = 0;
+}
+
+DinoBattleCreatureStats DinoBattleModelCreature::GetStats() {
+    return mStats;
+}
+
+u32 DinoBattleModelCreature::GetUnkE4() {
+    return mUnkE4;
+}
+
+u32 DinoBattleModelCreature::GetUnkE8() {
+    return mUnkE8;
+}
+
+u8 DinoBattleModelCreature::GetUnk174() {
+    return mUnk174;
+}
+
+u32 DinoBattleModelCreature::GetUnkEC() {
+    return mUnkEC;
+}
+
+u32 DinoBattleModelCreature::GetUnkF0() {
+    return mUnkF0;
+}
+
+u32 DinoBattleModelCreature::GetUnkF4() {
+    return mUnkF4;
+}
+
+u32 DinoBattleModelCreature::GetUnkF8() {
+    return mUnkF8;
+}
+
+u32 DinoBattleModelCreature::GetUnkFC() {
+    return mUnkFC;
+}
+
+u8 DinoBattleModelCreature::GetDefUnk20(BOOL second) {
+    if (second) {
+        return mDef->mUnk21;
+    }
+    return mDef->mUnk20;
+}
+
+u8 DinoBattleModelCreature::GetDefUnk61() {
+    return mDef->mUnk61;
+}
+
+DinoBattleCreatureDef *DinoBattleModelCreature::GetDef() {
+    return mDef;
+}
+
+void *DinoBattleModelCreature::GetUnk12C() {
+    return mUnk12C;
+}
+
+u8 DinoBattleModelCreature::GetDefTable(int index) {
+    return (mDef->mUnk68 + (u8 *)mDef)[index - 2];
+}
+
+u32 DinoBattleModelCreature::GetUnk108() {
+    return mUnk108;
+}
+
+void DinoBattleModelCreature::SetUnk108(u32 value) {
+    mUnk108 = value;
+}

@@ -33,11 +33,51 @@ public:
     virtual void Idle();
 };
 
+// A vivosaur's definition data as the battle reads it (not identified yet).
+struct DinoBattleCreatureDef {
+    u8 unk00[0x20];
+    u8 mUnk20;          // 0x20
+    u8 mUnk21;          // 0x21
+    u8 unk22[0x61 - 0x22];
+    u8 mUnk61;          // 0x61
+    u8 unk62[0x68 - 0x62];
+    s32 mUnk68;         // 0x68: offset of a byte table
+};
+
+struct DinoBattleCreatureStats {
+    u32 v[6];
+};
+
 class DinoBattleModelCreature : public MProcess, public MMessageObserver {
 public:
     virtual ~DinoBattleModelCreature();
     virtual void Idle();
     virtual void OnMessage(MMessage *msg);
+
+    u32 GetUnkB0();
+    u32 GetUnkB4();
+    u32 GetUnkB8();
+    u32 GetUnkBC();
+    void SetUnkB8(u32 value);
+    u32 GetUnkC0();
+    void SetUnkC0(u32 value);
+    void ClearUnkC4();
+    DinoBattleCreatureStats GetStats();
+    u32 GetUnkE4();
+    u32 GetUnkE8();
+    u8 GetUnk174();
+    u32 GetUnkEC();
+    u32 GetUnkF0();
+    u32 GetUnkF4();
+    u32 GetUnkF8();
+    u32 GetUnkFC();
+    u8 GetDefUnk20(BOOL second);
+    u8 GetDefUnk61();
+    DinoBattleCreatureDef *GetDef();
+    void *GetUnk12C();
+    u8 GetDefTable(int index);
+    u32 GetUnk108();
+    void SetUnk108(u32 value);
 
     class AddLifePointTask : public MTask {
     public:
@@ -45,8 +85,32 @@ public:
         virtual void Execute();
     };
 
-    u32 unkA8[30];
+    u32 mUnkA8;                     // 0xA8
+    u32 mUnkAC;                     // 0xAC
+    u32 mUnkB0;                     // 0xB0
+    u32 mUnkB4;                     // 0xB4
+    u32 mUnkB8;                     // 0xB8
+    u32 mUnkBC;                     // 0xBC
+    u32 mUnkC0;                     // 0xC0
+    u32 mUnkC4;                     // 0xC4
+    DinoBattleCreatureStats mStats; // 0xC8
+    DinoBattleCreatureDef *mDef;    // 0xE0
+    u32 mUnkE4;                     // 0xE4
+    u32 mUnkE8;                     // 0xE8
+    u32 mUnkEC;                     // 0xEC
+    u32 mUnkF0;                     // 0xF0
+    u32 mUnkF4;                     // 0xF4
+    u32 mUnkF8;                     // 0xF8
+    u32 mUnkFC;                     // 0xFC
+    u32 mUnk100;                    // 0x100
+    u32 unk104;
+    u32 mUnk108;                    // 0x108
+    u32 mUnk10C;                    // 0x10C
+    u32 unk110[4];
     std::vector<void *> mUnk120;    // 0x120
+    u8 mUnk12C[0x174 - 0x12C];      // 0x12C
+    u8 mUnk174;                     // 0x174
+    u32 mUnk178;                    // 0x178
 };
 
 class ModelCretureAddLifeTask : public MTask {
