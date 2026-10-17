@@ -17,7 +17,9 @@ public:
     virtual ~DinoUi2ContainerBaseMenu();
     virtual BOOL TryDecide() = 0;   // the decide button was pressed; FALSE if nothing happens
 
-    u32 mUnkB4[18];                 // 0xB4
+    u32 mUnkB4[16];
+    int mPage; // 0xF4
+    int mLastPage; // 0xF8
     u8 mUnkFC;                      // 0xFC
     u32 mUnk100[3];                 // 0x100
     std::vector<void *> mUnk10C;    // 0x10C
@@ -26,6 +28,8 @@ public:
     void OnBackDecided();
     BOOL PageRight();
     BOOL PageLeft();
+    void RefreshPage1();
+    void RefreshPage2();
 };
 
 class DinoUi2CannonShootMenu : public DinoUi2ContainerBaseMenu {
