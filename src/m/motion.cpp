@@ -44,6 +44,90 @@ void MMotionData::LockFiles(int which) {
     }
 }
 
+MChrBlock **MMotionData::AcquireChrs(MDisplay *display) {
+    MScopedLock lock(&mMutex, TRUE);
+    int d = display->GetRegs00();
+    LockFiles(1);
+    if (mChrRefs[d]++ == 0) {
+        const MMotionGfxHeader *data;
+        u32 i;
+        MChr *chr;
+        u32 count;
+        u32 tiles;
+        u32 boundary;
+        u32 size;
+        count = ((MMotionHeader *) mFile.GetData())->chrCount;
+        chr = display->mObj->mChr;
+        mChrs[d] = new MChrBlock *[count];
+        for (i = 0; i < count; i++) {
+            data = (const MMotionGfxHeader *) mChrFiles[i].GetData();
+            tiles = data->tiles;
+            boundary = chr->mBoundary;
+            if (chr->mMode == 0) {
+                size = boundary * ((tiles + boundary - 1) / boundary);
+            } else {
+                size = ((boundary + tiles * 2 - 1) / boundary * boundary) >> 1;
+            }
+            mChrs[d][i] = chr->AllocShared(data->mode, data + 1, size, 0, TRUE);
+        }
+    }
+    return mChrs[d];
+}
+
+void MMotionData::ReleaseChrs(MDisplay *display) {
+    MScopedLock lock(&mMutex, TRUE);
+    int d = display->GetRegs00();
+    mChrRefs[d]--;
+    if (mChrRefs[d] > 0) {
+        return;
+    }
+    MChr *chr = display->mObj->mChr;
+    u32 count = ((MMotionHeader *) mFile.GetData())->chrCount;
+    for (u32 i = 0; i < count; i++) {
+        chr->FreeShared(mChrs[d][i]);
+    }
+    delete[] mChrs[d];
+    mChrs[d] = NULL;
+}
+
+MPalBlock **MMotionData::AcquirePalettes(MDisplay *display) {
+    MScopedLock lock(&mMutex, TRUE);
+    LockFiles(2);
+    int d = display->GetRegs00();
+    if (mPalRefs[d]++ == 0) {
+        u32 i;
+        u32 count = ((MMotionHeader *) mFile.GetData())->palCount;
+        MPal *pal = display->mObj->mPal;
+        MPal *extPal = display->mObj->mExtPal;
+        mFile.GetData();
+        mPals[d] = new MPalBlock *[count];
+        for (i = 0; i < count; i++) {
+            const MMotionGfxHeader *data = (const MMotionGfxHeader *) mPalFiles[i].GetData();
+            if (data->extPalette == 0) {
+                mPals[d][i] = pal->Alloc(1, data + 1, TRUE);
+            } else {
+                mPals[d][i] = extPal->Alloc(1, data + 1, TRUE);
+            }
+        }
+    }
+    return mPals[d];
+}
+
+void MMotionData::ReleasePalettes(MDisplay *display) {
+    MScopedLock lock(&mMutex, TRUE);
+    int d = display->GetRegs00();
+    mPalRefs[d]--;
+    if (mPalRefs[d] > 0) {
+        return;
+    }
+    u32 count = ((MMotionHeader *) mFile.GetData())->palCount;
+    for (u32 i = 0; i < count; i++) {
+        mPals[d][i]->pal->Free(mPals[d][i]);
+    }
+    delete[] mPals[d];
+    mPals[d] = NULL;
+}
+
 void MMotionData::AddRef() {
     MScopedLock lock(&sMotionDatasMutex, TRUE);
     mRefCount++;

@@ -21,6 +21,15 @@ struct MMotionHeader {
     u32 unk0C;
     u32 cellCount;      // 0x10
     u32 cellOffset;     // 0x14: 16-byte cell definitions
+    u32 cellFileCount;  // 0x18
+    u32 cellFileTable;  // 0x1C: offset of their indices in the directory
+    u32 cellFilePath;   // 0x20: offset of the directory's path
+    u32 palCount;       // 0x24
+    u32 palTable;       // 0x28
+    u32 palPath;        // 0x2C
+    u32 chrCount;       // 0x30
+    u32 chrTable;       // 0x34
+    u32 chrPath;        // 0x38
 };
 
 // A cell's graphics, as the motion file lists them.
@@ -29,6 +38,14 @@ struct MMotionCellDef {
     u32 chr16;      // 0x04: tiles, 16 colors
     u32 pal256;     // 0x08
     u32 chr256;     // 0x0C: tiles, 256 colors
+};
+
+// The header of a chr or palette file a motion uses; the data follows.
+struct MMotionGfxHeader {
+    s32 extPalette : 8;     // palette files: in the extended palettes
+    u32 tiles : 8;          // chr files
+    s32 mode : 8;           // chr files: 0: 16 colors, 1: 256 colors
+    u32 : 8;
 };
 
 // A loaded motion file and the files it uses, shared by every motion showing it.
