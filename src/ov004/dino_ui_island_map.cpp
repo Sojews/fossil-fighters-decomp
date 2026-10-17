@@ -4,6 +4,10 @@
 // Derived destructors have their bases' destructor bodies inlined; auto-inlining the ones defined above does that.
 #pragma auto_inline on
 
+#include "m/lcd.h"
+#include "m/bg.h"
+#include "m/pal.h"
+#include "m/window.h"
 #include "game/dino_ui_island_map_menu.h"
 #include "game/dino_ui_island_map.h"
 #include "game/draw_font.h"
@@ -39,4 +43,8 @@ DinoMapBackButton::~DinoMapBackButton() {
 }
 
 DinoUiIslandMapMenu::~DinoUiIslandMapMenu() {
+    gLcd->GetTopDisplay()->mBg->DeleteIndexBitmap(mBitmap);
+    gLcd->GetTopDisplay()->mBg->mPal->Free(mPalette);
+    gLcd->mMain->mWin->Reset();
+    gLcd->mSub->mWin->Reset();
 }
