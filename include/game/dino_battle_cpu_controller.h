@@ -32,7 +32,7 @@ public:
     virtual ~DinoBattleCpuController();
     virtual void OnMessage(MMessage *msg);
 
-    u32 mUnkA8[4];                      // 0xA8
+    u32 mUnkB4;                         // 0xB4
     DinoBattleFileGroup mGroups[3];     // 0xB8
     DinoBattleFile mFiles[2];           // 0x7A8
     u32 mUnk7C8[12];                    // 0x7C8

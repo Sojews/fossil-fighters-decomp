@@ -4,6 +4,7 @@
 
 #include <string>
 #include "m/task.h"
+#include "game/dino_battle_controller.h"
 
 // One side of a battle (the game keeps two).
 struct DinoBattleSide {
@@ -16,11 +17,18 @@ public:
     virtual ~DinoBattle();
     virtual void Idle();
 
+    u32 GetUnk1F4(int i);
+    u32 GetUnk1FC();
+    MMessageObserver *GetUnk200();
+
     u32 mUnk74[12];             // 0x74
     DinoBattleSide mSides[2];   // 0xA4
     u32 mUnk1BC[12];            // 0x1BC
     void (DinoBattle::*mState)();   // 0x1EC
-    u32 mUnk1F4[5];             // 0x1F4
+    u32 mUnk1F4[2];             // 0x1F4
+    u32 mUnk1FC;                // 0x1FC
+    DinoBattleController *mUnk200;  // 0x200
+    u32 mUnk204;                // 0x204
     MTask *mUnk208;             // 0x208
 };
 

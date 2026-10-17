@@ -18,6 +18,18 @@ void DinoBattleAutoDemo::Idle() {
     (this->*mState)();
 }
 
+u32 DinoBattle::GetUnk1F4(int i) {
+    return mUnk1F4[i];
+}
+
+u32 DinoBattle::GetUnk1FC() {
+    return mUnk1FC;
+}
+
+MMessageObserver *DinoBattle::GetUnk200() {
+    return mUnk200;
+}
+
 void DinoBattle::Idle() {
     (this->*mState)();
 }
