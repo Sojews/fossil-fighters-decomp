@@ -44,3 +44,9 @@ DinoCleaningSampleMenuKasekiRockIdItem::~DinoCleaningSampleMenuKasekiRockIdItem(
 
 void DinoCleaningSampleMenuKasekiRockIdItem::OnDecide() {
 }
+
+void DinoCleaningSampleChipsTypeItem::OnDecide() {
+}
+
+void DinoCleaningSampleKasekiTypeItem::OnDecide() {
+}

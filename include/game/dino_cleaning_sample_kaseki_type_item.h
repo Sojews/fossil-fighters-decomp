@@ -6,6 +6,10 @@
 class DinoCleaningSampleKasekiTypeItem : public MMenuItem {
 public:
     virtual ~DinoCleaningSampleKasekiTypeItem();
+    virtual void Idle();
+    virtual MRect GetFrame();
+    virtual void OnFocusChanged(BOOL focused);
+    virtual void OnDecide();
 };
 
 #endif

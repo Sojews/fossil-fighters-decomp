@@ -6,6 +6,10 @@
 class DinoCleaningSampleChipsTypeItem : public MMenuItem {
 public:
     virtual ~DinoCleaningSampleChipsTypeItem();
+    virtual void Idle();
+    virtual MRect GetFrame();
+    virtual void OnFocusChanged(BOOL focused);
+    virtual void OnDecide();
 };
 
 #endif

@@ -6,6 +6,7 @@
 class DinoUiShopSell : public MProcess {
 public:
     virtual ~DinoUiShopSell();
+    virtual void Idle();
 };
 
 #endif

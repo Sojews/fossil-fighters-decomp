@@ -13,3 +13,6 @@ DinoUi2PartsRockName::~DinoUi2PartsRockName() {
 
 DinoUi2PartsKasekiButton::~DinoUi2PartsKasekiButton() {
 }
+
+void DinoUi2PartsRockName::Idle() {
+}

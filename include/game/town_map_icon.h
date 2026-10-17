@@ -6,6 +6,7 @@
 class TownMapIcon : public MProcess {
 public:
     virtual ~TownMapIcon();
+    virtual void Idle();
 };
 
 #endif
