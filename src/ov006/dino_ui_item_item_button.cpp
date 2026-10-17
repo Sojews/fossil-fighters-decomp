@@ -207,7 +207,7 @@ void DinoUiItemMenu::OnOKDecided() {
     MTask *fade;
     MTask *exit;
     *mResult = 0;
-    if (mOldTeam->members[0]) {
+    if (mOldTeam->slots[0]) {
         if (DinoTeamDiffers(mOldTeam, mTeam)) {
             mSerial.AddTail(new DinoCommonWindowMessageBox(MPoint(128, 96), gDinoResource->GetText(data_0208aae0), 4));
         } else {

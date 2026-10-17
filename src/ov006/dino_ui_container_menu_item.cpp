@@ -4,6 +4,7 @@
 // Derived destructors have their bases' destructor bodies inlined; auto-inlining the ones defined above does that.
 #pragma auto_inline on
 
+#include "game/dino_backup.h"
 #include "game/dino_resource.h"
 #include "game/dino_common_window_message_box.h"
 #include "game/dino_ui_container_menu_item_menu.h"
@@ -216,7 +217,7 @@ void DinoUiContainerMenu::OnOKDecided() {
     MTask *fade;
     MTask *exit;
     *mResult = 0;
-    if (mOldTeam->members[0]) {
+    if (mOldTeam->slots[0]) {
         if (DinoTeamDiffers(mOldTeam, mTeam)) {
             mSerial.AddTail(new DinoCommonWindowMessageBox(MPoint(128, 96), gDinoResource->GetText(data_0208aae0), 4));
         } else {
@@ -238,4 +239,48 @@ void DinoUiContainerMenu::OnOKDecided() {
         serial->AddTail(fade);
         serial->AddTail(exit);
     }
+}
+
+// Where the cursor sits on each tab.
+extern MPoint data_020b5858[3];
+extern "C" void func_ov003_02159a8c(void *panel, DinoBackupEntry *entry, int arg);
+extern "C" void func_ov003_02159b28(void *panel);
+
+// NONMATCHING: register allocation only (i and mPage swap in the last loop, as in OnDecide).
+void DinoUiContainerMenu::OnFocus(MMenuItem *item) {
+    if (item == NULL) {
+        mCursor->Hide();
+        return;
+    }
+    SetSelectedItem(dynamic_cast<DinoHelpItem *>(item));
+    MRect frame = item->GetFrame();
+    mCursor->SetMode(1);
+    for (int i = 0; i < 3; i++) {
+        if (item == mTabItems[i]) {
+            frame.MoveTo(data_020b5858[i]);
+            mCursor->SetMode(2);
+        }
+    }
+    for (int i = 0; i < mItems.size(); i++) {
+        if (item == mItems[i]) {
+            frame.top += 16;
+            frame.bottom += 16;
+        }
+    }
+    if (mCursor->IsHidden()) {
+        mCursor->SetFrame(frame);
+    } else {
+        mCursorTasks->Clear();
+        mCursorTasks->AddTail(mCursor->CreateMoveTask(mCursor->GetFrame(), frame, 10, -5));
+    }
+    mCursor->Show();
+    for (int i = 0; i < (mPage != mLastPage ? 8 : mUnk100.size() - mPage * 8); i++) {
+        if (item == mItems[i]) {
+            DinoBackupEntry entry;
+            gDinoBackup->GetUnk98(mPage * 8 + i, &entry);
+            func_ov003_02159a8c(mPanel, &entry, 0);
+            return;
+        }
+    }
+    func_ov003_02159b28(mPanel);
 }

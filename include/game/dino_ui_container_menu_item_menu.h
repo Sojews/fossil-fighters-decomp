@@ -1,6 +1,7 @@
 #ifndef GAME_DINO_UI_CONTAINER_MENU_ITEM_MENU_H
 #define GAME_DINO_UI_CONTAINER_MENU_ITEM_MENU_H
 
+#include "game/dino_ui_field_menu_cursor.h"
 #include "game/dino_team.h"
 #include "game/dino_ui_field_menu_fraction.h"
 #include <string>
@@ -36,9 +37,9 @@ public:
     int *mResult;               // 0xE8
     DinoTeam *mOldTeam;         // 0xEC: the team when the menu opened
     DinoTeam *mTeam;            // 0xF0
-    u32 mUnkF4;                 // 0xF4
-    MView *mCursor;             // 0xF8
-    u32 mUnkFC;
+    MSerialTaskSet *mCursorTasks;   // 0xF4
+    DinoUiFieldMenuCursor *mCursor; // 0xF8
+    void *mPanel;               // 0xFC: shows the focused container
     std::vector<s32> mUnk100;   // 0x100
     MArchivePtr mArchive;       // 0x10C
     MArchiveFile mFile;         // 0x110
