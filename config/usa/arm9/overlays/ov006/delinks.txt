@@ -9,13 +9,13 @@ src/ov006/dino_ui_field_menu.cpp:
     .text       start:0x02171e98 end:0x02171ecc
 
 src/ov006/dino_ui_item_item_button.cpp:
-    .text       start:0x02178798 end:0x02178988
+    .text       start:0x02178798 end:0x02178b80
 
 src/ov006/dino_ui_parts_tab_icon_menu_item.cpp:
-    .text       start:0x02173278 end:0x02174c28
+    .text       start:0x02173278 end:0x02174e90
 
 src/ov006/dino_ui_container_menu_item.cpp:
     .text       start:0x02176170 end:0x02176b98
 
 src/ov006/dino_ui_rv_status_menu_item.cpp:
-    .text       start:0x0217f330 end:0x02181148
+    .text       start:0x0217f330 end:0x02181308

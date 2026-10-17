@@ -9,13 +9,13 @@ src/ov000/set_live_event_check_task.cpp:
     .text       start:0x02159754 end:0x02159840
 
 src/ov000/enable_root_select_task.cpp:
-    .text       start:0x0215bc20 end:0x0215bc30
+    .text       start:0x0215bc20 end:0x0215bc4c
 
 src/ov000/send_local_message_task.cpp:
-    .text       start:0x0215d728 end:0x0215d78c
+    .text       start:0x0215d728 end:0x0215d7a8
 
 src/ov000/dino_battle_view_kaseki_point.cpp:
-    .text       start:0x0215e79c end:0x0215e854
+    .text       start:0x0215e79c end:0x0215e870
 
 src/ov000/dino_battle_view_field_player_bg.cpp:
     .text       start:0x0215eeb0 end:0x0215eee4
