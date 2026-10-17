@@ -66,4 +66,4 @@ src/ov002/dino_cleaning_image_layer.cpp:
     .text       start:0x02158448 end:0x02158b5c
 
 src/ov002/dino_cleaning_image.cpp:
-    .text       start:0x02158b5c end:0x02159674
+    .text       start:0x02158b5c end:0x02159990
