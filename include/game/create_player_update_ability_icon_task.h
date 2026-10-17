@@ -33,6 +33,12 @@ public:
     virtual ~DinoBattleModelCreature();
     virtual void Idle();
     virtual void OnMessage(MMessage *msg);
+
+    class AddLifePointTask : public MTask {
+    public:
+        virtual ~AddLifePointTask();
+        virtual void Execute();
+    };
 };
 
 class ModelCretureAddLifeTask : public MTask {

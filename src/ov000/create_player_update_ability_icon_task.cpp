@@ -57,3 +57,6 @@ MoveToHeatAreaAnyCreature::~MoveToHeatAreaAnyCreature() {
 
 AddKasekiPointCreatureDie::~AddKasekiPointCreatureDie() {
 }
+
+DinoBattleModelCreature::AddLifePointTask::~AddLifePointTask() {
+}

@@ -17,6 +17,12 @@ public:
 
     u8 unk74[0x4C];
     void (DinoBattleViewAbilityMenuBG::*mState)(); // 0xC0
+
+    class SetPriorityTask : public MTask {
+    public:
+        virtual ~SetPriorityTask();
+        virtual void Execute();
+    };
 };
 
 #endif

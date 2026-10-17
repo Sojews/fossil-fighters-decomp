@@ -4,6 +4,8 @@
 // Derived destructors have their bases' destructor bodies inlined; auto-inlining the ones defined above does that.
 #pragma auto_inline on
 
+#include "game/dino_battle_view_ability_text_window.h"
+#include "game/dino_battle_view_ability_menu_bg.h"
 #include "game/dino_battle_view_ui_ability_menu_item.h"
 #include "types.h"
 
@@ -23,4 +25,16 @@ DinAttackItemHelp::~DinAttackItemHelp() {
 }
 
 void AttackMenuBarMotion::Idle() {
+}
+
+AttackMenuBarMotion::ShowTask::~ShowTask() {
+}
+
+AttackMenuBarMotion::SetPriorityTask::~SetPriorityTask() {
+}
+
+DinoBattleViewAbilityMenuBG::SetPriorityTask::~SetPriorityTask() {
+}
+
+DinoBattleViewAbilityTextWindow::ShowTask::~ShowTask() {
 }

@@ -20,6 +20,18 @@ class ViewStatusEffectIcon : public MProcess {
 public:
     virtual ~ViewStatusEffectIcon();
     virtual void Idle();
+
+    class PlayEraseMotionTask : public MTask {
+    public:
+        virtual ~PlayEraseMotionTask();
+        virtual void Execute();
+    };
+
+    class SetPriorityTask : public MTask {
+    public:
+        virtual ~SetPriorityTask();
+        virtual void Execute();
+    };
 };
 
 class ViewStatusEffectIconWaitStop : public MTask {

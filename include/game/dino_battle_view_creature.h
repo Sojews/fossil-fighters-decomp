@@ -15,6 +15,12 @@ public:
     virtual ~DinoBattleViewCreature();
     virtual void Idle();
     virtual void OnMessage(MMessage *msg);
+
+    class SetCoordTask : public MTask {
+    public:
+        virtual ~SetCoordTask();
+        virtual void Execute();
+    };
 };
 
 #endif

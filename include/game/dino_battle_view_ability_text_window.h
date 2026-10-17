@@ -14,6 +14,12 @@ class DinoBattleViewAbilityTextWindow : public MTask {
 public:
     virtual ~DinoBattleViewAbilityTextWindow();
     virtual void Execute();
+
+    class ShowTask : public MTask {
+    public:
+        virtual ~ShowTask();
+        virtual void Execute();
+    };
 };
 
 #endif

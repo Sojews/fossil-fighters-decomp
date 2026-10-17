@@ -24,3 +24,9 @@ ViewStatusEffectIconShowTask::~ViewStatusEffectIconShowTask() {
 
 void ViewStatusEffectIcon::Idle() {
 }
+
+ViewStatusEffectIcon::PlayEraseMotionTask::~PlayEraseMotionTask() {
+}
+
+ViewStatusEffectIcon::SetPriorityTask::~SetPriorityTask() {
+}

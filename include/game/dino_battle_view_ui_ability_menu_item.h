@@ -32,6 +32,18 @@ class AttackMenuBarMotion : public MProcess {
 public:
     virtual ~AttackMenuBarMotion();
     virtual void Idle();
+
+    class ShowTask : public MTask {
+    public:
+        virtual ~ShowTask();
+        virtual void Execute();
+    };
+
+    class SetPriorityTask : public MTask {
+    public:
+        virtual ~SetPriorityTask();
+        virtual void Execute();
+    };
 };
 
 class MenuEnableTask : public MTask {
