@@ -97,6 +97,26 @@ MRect DinoUiWirelessCancelItem::GetFrame() {
     return mMotion->GetFrame();
 }
 
+void DinoUiChildScannerBattleConnect::OnMessage(MMessage *msg) {
+    (this->*mOnMessage)(msg);
+}
+
+void DinoUiChildScannerCannonConnect::OnMessage(MMessage *msg) {
+    (this->*mOnMessage)(msg);
+}
+
+void DinoUiBattleParentScanner::Idle() {
+    (this->*mState)();
+}
+
+void DinoUiCannonParentScanner::OnMessage(MMessage *msg) {
+    (this->*mOnMessage)(msg);
+}
+
+void DinoUiCannonChild::Idle() {
+    (this->*mState)();
+}
+
 // Template task instances the game emits in this file. Until the code that makes the tasks is decompiled, they are
 // instantiated explicitly.
 template class MCallTask0<DinoUiBattleParentScanner, MMessageObserver>;

@@ -9,3 +9,7 @@
 
 DinoWirelessBattle::~DinoWirelessBattle() {
 }
+
+void DinoWirelessBattle::Idle() {
+    (this->*mState)();
+}

@@ -5,3 +5,7 @@
 
 DinoUiSaveMenu::~DinoUiSaveMenu() {
 }
+
+void DinoUiSaveMenu::Idle() {
+    (this->*mState)();
+}

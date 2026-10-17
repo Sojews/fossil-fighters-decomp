@@ -41,6 +41,10 @@ const char *DinoUiTopMenuItem::GetText() {
     return gDinoResource->GetText(mTextId);
 }
 
+void DinoUiTopMenuLoop::Idle() {
+    (this->*mState)();
+}
+
 // Template task instances the game emits in this file. Until the code that makes the tasks is decompiled, they are
 // instantiated explicitly.
 template class MBgCallTask0<DinoBackup>;

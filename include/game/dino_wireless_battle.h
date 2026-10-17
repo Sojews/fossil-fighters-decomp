@@ -16,7 +16,8 @@ public:
     virtual void Idle();
     virtual void OnMessage(MMessage *msg);
 
-    u8 unkA8[0x254];
+    void (DinoWirelessBattle::*mState)(); // 0xA8
+    u8 unkB0[588];
     DinoHelpDisabler mDisabler; // 0x2FC
 };
 

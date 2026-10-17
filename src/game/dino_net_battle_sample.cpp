@@ -5,3 +5,7 @@
 
 DinoNetBattleSample::~DinoNetBattleSample() {
 }
+
+void DinoNetBattleSample::Idle() {
+    (this->*mState)();
+}

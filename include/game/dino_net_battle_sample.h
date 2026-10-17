@@ -7,6 +7,8 @@ class DinoNetBattleSample : public MProcess {
 public:
     virtual ~DinoNetBattleSample();
     virtual void Idle();
+
+    void (DinoNetBattleSample::*mState)(); // 0x74
 };
 
 #endif

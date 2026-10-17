@@ -7,6 +7,8 @@ class DinoMainLoop : public MProcess {
 public:
     virtual ~DinoMainLoop();
     virtual void Idle();
+
+    void (DinoMainLoop::*mState)(); // 0x74
 };
 
 #endif

@@ -5,3 +5,7 @@
 
 MultiPlayErrorDialog::~MultiPlayErrorDialog() {
 }
+
+void MultiPlayErrorDialog::Idle() {
+    (this->*mState)();
+}

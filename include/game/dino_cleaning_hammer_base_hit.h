@@ -7,6 +7,8 @@ class DinoCleaningHammerBaseHit : public MProcess {
 public:
     virtual ~DinoCleaningHammerBaseHit();
     virtual void Idle();
+
+    void (DinoCleaningHammerBaseHit::*mState)(); // 0x74
 };
 
 #endif

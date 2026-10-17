@@ -8,6 +8,8 @@ class DinoUiSaveMenu : public MProcess, public DinoHelpBase {
 public:
     virtual ~DinoUiSaveMenu();
     virtual void Idle();
+
+    void (DinoUiSaveMenu::*mState)(); // 0x80
 };
 
 #endif

@@ -7,6 +7,8 @@ class DinoUiReviveStatus : public MProcess {
 public:
     virtual ~DinoUiReviveStatus();
     virtual void Idle();
+
+    void (DinoUiReviveStatus::*mState)(); // 0x74
 };
 
 #endif

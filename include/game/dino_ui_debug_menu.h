@@ -7,6 +7,8 @@ class DinoUiDebugMenu : public MProcess {
 public:
     virtual ~DinoUiDebugMenu();
     virtual void Idle();
+
+    void (DinoUiDebugMenu::*mState)(); // 0x74
 };
 
 #endif

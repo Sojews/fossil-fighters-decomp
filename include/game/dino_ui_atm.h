@@ -7,6 +7,8 @@ class DinoUiATM : public MProcess {
 public:
     virtual ~DinoUiATM();
     virtual void Idle();
+
+    void (DinoUiATM::*mState)(); // 0x74
 };
 
 #endif

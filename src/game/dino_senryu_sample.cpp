@@ -5,3 +5,7 @@
 
 DinoSenryuSample::~DinoSenryuSample() {
 }
+
+void DinoSenryuSample::Idle() {
+    (this->*mState)();
+}

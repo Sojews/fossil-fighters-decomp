@@ -15,7 +15,7 @@ public:
     virtual void Unk08();
     virtual void Unk0C();
 
-    u32 mUnk7C[2];          // 0x7C
+    void (DinoGuideMessage::*mState)(); // 0x7C
     std::string mText;      // 0x84
     u32 mUnk90;             // 0x90
     MFont *mFont;           // 0x94

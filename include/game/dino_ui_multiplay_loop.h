@@ -7,6 +7,8 @@ class DinoUiMultiplayLoop : public MProcess {
 public:
     virtual ~DinoUiMultiplayLoop();
     virtual void Idle();
+
+    void (DinoUiMultiplayLoop::*mState)(); // 0x74
 };
 
 #endif

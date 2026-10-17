@@ -7,6 +7,8 @@ class DinoEventParkKasekiRockFound : public MProcess {
 public:
     virtual ~DinoEventParkKasekiRockFound();
     virtual void Idle();
+
+    void (DinoEventParkKasekiRockFound::*mState)(); // 0x74
 };
 
 #endif

@@ -7,6 +7,8 @@ class DinoUiTitle : public MProcess {
 public:
     virtual ~DinoUiTitle();
     virtual void Idle();
+
+    void (DinoUiTitle::*mState)(); // 0x74
 };
 
 #endif

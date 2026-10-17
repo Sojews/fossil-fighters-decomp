@@ -50,3 +50,7 @@ void DinoCleaningSampleChipsTypeItem::OnDecide() {
 
 void DinoCleaningSampleKasekiTypeItem::OnDecide() {
 }
+
+void DinoCleaningSample::Idle() {
+    (this->*mState)();
+}

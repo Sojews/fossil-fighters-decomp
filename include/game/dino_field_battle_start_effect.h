@@ -7,6 +7,8 @@ class DinoFieldBattleStartEffect : public MProcess {
 public:
     virtual ~DinoFieldBattleStartEffect();
     virtual void Idle();
+
+    void (DinoFieldBattleStartEffect::*mState)(); // 0x74
 };
 
 #endif

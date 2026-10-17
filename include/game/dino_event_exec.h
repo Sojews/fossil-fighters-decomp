@@ -298,12 +298,16 @@ class DinoEventExecCleaning : public MProcess {
 public:
     virtual ~DinoEventExecCleaning();
     virtual void Idle();
+
+    void (DinoEventExecCleaning::*mState)(); // 0x74
 };
 
 class DinoEventExecAutoWarp : public MProcess {
 public:
     virtual ~DinoEventExecAutoWarp();
     virtual void Idle();
+
+    void (DinoEventExecAutoWarp::*mState)(); // 0x74
 };
 
 class DinoEventExecCamera : public MTransfer {
@@ -547,7 +551,8 @@ public:
     virtual ~DinoEventKasekiRockGet();
     virtual void Idle();
 
-    u32 mUnk74[9];          // 0x74
+    void (DinoEventKasekiRockGet::*mState)(); // 0x74
+    u32 mUnk7C[7];
     MArchivePtr mArchive;   // 0x98
     MArchiveFile mFile;     // 0x9C
     std::string mUnkA8;     // 0xA8

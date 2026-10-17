@@ -2078,3 +2078,11 @@ DinoEventExecDonateHide::~DinoEventExecDonateHide() {
 
 DinoEventExecProhibitNisReset::~DinoEventExecProhibitNisReset() {
 }
+
+void DinoEventExecCleaning::Idle() {
+    (this->*mState)();
+}
+
+void DinoEventExecAutoWarp::Idle() {
+    (this->*mState)();
+}

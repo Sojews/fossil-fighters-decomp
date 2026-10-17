@@ -7,3 +7,7 @@ DinoGuideMessage::~DinoGuideMessage() {
     Deactivate();
     mFont->Release();
 }
+
+void DinoGuideMessage::Idle() {
+    (this->*mState)();
+}

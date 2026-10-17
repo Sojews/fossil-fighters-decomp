@@ -5,3 +5,7 @@
 
 DinoCleaningStatus::~DinoCleaningStatus() {
 }
+
+void DinoCleaningStatus::Idle() {
+    (this->*mState)();
+}

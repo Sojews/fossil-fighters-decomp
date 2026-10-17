@@ -148,12 +148,14 @@ public:
 
 // The event being run.
 // The dance minigame.
-class DinoFieldDance : public MTask {
+class DinoFieldDance : public MProcess {
 public:
     DinoFieldDance(DinoField *field, u32 a, u32 b, u32 c, u32 d, u32 e);
-    virtual void Execute();
+    virtual ~DinoFieldDance();
+    virtual void Idle();
 
-    u8 unk10[0x124];
+    void (DinoFieldDance::*mState)(); // 0x74
+    u8 unk7C[184];
 };
 
 // The map select menu (in overlay 4).

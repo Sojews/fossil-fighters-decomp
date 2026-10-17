@@ -8,3 +8,7 @@ DinoEventKasekiRockGet::~DinoEventKasekiRockGet() {
 
 DinoEventKasekiRockGetContainerSelect::~DinoEventKasekiRockGetContainerSelect() {
 }
+
+void DinoEventKasekiRockGet::Idle() {
+    (this->*mState)();
+}

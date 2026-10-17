@@ -12,7 +12,7 @@ public:
     virtual ~DinoEventKasekiRockFound();
     virtual void Idle();
 
-    u32 mUnk74[2];          // 0x74
+    void (DinoEventKasekiRockFound::*mState)(); // 0x74
     DinoEvent *mEvent;      // 0x7C
     u32 mUnk80[12];         // 0x80
     MArchivePtr mArchive;   // 0xB0

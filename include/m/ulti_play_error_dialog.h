@@ -7,6 +7,8 @@ class MultiPlayErrorDialog : public MProcess {
 public:
     virtual ~MultiPlayErrorDialog();
     virtual void Idle();
+
+    void (MultiPlayErrorDialog::*mState)(); // 0x74
 };
 
 #endif

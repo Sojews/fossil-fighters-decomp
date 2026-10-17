@@ -5,3 +5,7 @@
 
 DinoUiDebugMenu::~DinoUiDebugMenu() {
 }
+
+void DinoUiDebugMenu::Idle() {
+    (this->*mState)();
+}

@@ -21,6 +21,18 @@ DinoCleaningHammerTask::~DinoCleaningHammerTask() {
 DinoCleaningHammerBaseHit::~DinoCleaningHammerBaseHit() {
 }
 
+void DinoCleaningHammerBaseHit::Idle() {
+    (this->*mState)();
+}
+
+void DinoCleaningHammerTask::Idle() {
+    (this->*mState)();
+}
+
+void DinoCleaningHammerEffect::Idle() {
+    (this->*mState)();
+}
+
 // Template task instances the game emits in this file. Until the code that makes the tasks is decompiled, they are
 // instantiated explicitly.
 template class MBgCallTask0<DinoCleaningDrill>;

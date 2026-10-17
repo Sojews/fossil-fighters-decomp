@@ -24,7 +24,7 @@ public:
     virtual ~DinoCleaningStopConfirm();
     virtual void Idle();
 
-    u32 mUnk80[2];                  // 0x80
+    void (DinoCleaningStopConfirm::*mState)(); // 0x80
     DinoCleaningKasekiRock *mRock;  // 0x88
 };
 
@@ -33,7 +33,7 @@ public:
     virtual ~DinoCleaningSleep();
     virtual void Idle();
 
-    u32 mUnk80[2];                  // 0x80
+    void (DinoCleaningSleep::*mState)(); // 0x80
     DinoCleaningKasekiRock *mRock;  // 0x88
 };
 

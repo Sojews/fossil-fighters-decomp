@@ -7,6 +7,8 @@ class DinoCleaningStatus : public MProcess {
 public:
     virtual ~DinoCleaningStatus();
     virtual void Idle();
+
+    void (DinoCleaningStatus::*mState)(); // 0x74
 };
 
 #endif

@@ -32,6 +32,10 @@ DinoUiTitleMenuGameItem::~DinoUiTitleMenuGameItem() {
 DinoUiTitleMenu::~DinoUiTitleMenu() {
 }
 
+void DinoUiTitle::Idle() {
+    (this->*mState)();
+}
+
 // Template task instances the game emits in this file. Until the code that makes the tasks is decompiled, they are
 // instantiated explicitly.
 class DinoUiOpening {};

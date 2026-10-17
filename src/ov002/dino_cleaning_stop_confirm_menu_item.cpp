@@ -32,3 +32,11 @@ MDisplay *DinoCleaningStopConfirmMenuItem::GetDisplay() {
 const char *DinoCleaningStopConfirmMenuItem::GetText() {
     return gDinoResource->GetText(mTextId);
 }
+
+void DinoCleaningStopConfirm::Idle() {
+    (this->*mState)();
+}
+
+void DinoCleaningSleep::Idle() {
+    (this->*mState)();
+}

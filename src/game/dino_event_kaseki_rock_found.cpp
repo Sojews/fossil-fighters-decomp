@@ -7,3 +7,7 @@
 DinoEventKasekiRockFound::~DinoEventKasekiRockFound() {
     mEvent->GetField()->SetUnk258(FALSE);
 }
+
+void DinoEventKasekiRockFound::Idle() {
+    (this->*mState)();
+}

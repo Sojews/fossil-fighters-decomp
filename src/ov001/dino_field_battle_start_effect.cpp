@@ -5,3 +5,7 @@
 
 DinoFieldBattleStartEffect::~DinoFieldBattleStartEffect() {
 }
+
+void DinoFieldBattleStartEffect::Idle() {
+    (this->*mState)();
+}

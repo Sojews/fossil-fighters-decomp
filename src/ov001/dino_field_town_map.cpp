@@ -24,6 +24,10 @@ DinoFieldTownMapManager::~DinoFieldTownMapManager() {
 void TownMapIcon::Idle() {
 }
 
+void DinoFieldDance::Idle() {
+    (this->*mState)();
+}
+
 // Template task instances the game emits in this file. Until the code that makes the tasks is decompiled, they are
 // instantiated explicitly.
 template class MCallTask2<DinoField, DinoField, MFx32Point, long>;
