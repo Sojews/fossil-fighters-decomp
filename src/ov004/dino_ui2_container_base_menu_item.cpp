@@ -4,6 +4,7 @@
 // The buttons' destructors have the base destructor body inlined; auto-inlining the one defined above does that.
 #pragma auto_inline on
 
+#include "m/blend.h"
 #include "game/dino_ui2_container_base_menu_item_menu.h"
 #include "game/dino_ui2_container_base_menu_item.h"
 #include "m/bg_new_task.h"
@@ -161,4 +162,21 @@ void DinoUi2ContainerBaseMenu::ClearItems() {
         delete (MMenuItem *)mItems[i];
     }
     mItems.clear();
+}
+
+extern MView *data_ov004_02177284; // the view the cross-fade keeps
+
+// NONMATCHING: the fade and hide tasks swap registers (as in the ov006 OnOKDecided pair).
+void DinoUi2ContainerBaseMenu::OnBackDecided() {
+    MTask &self = *this;
+    MTask *exit = MTaskExitTransfer::Create(&self);
+    MBlend *blend = gCurrentDisplay->mBlend;
+    MTask *fade = blend->CreateCrossFadeOutTask(data_ov004_02177284->GetPlaneMask() ^ 0x3F, 5, 0);
+    MTask *hide = mOam->CreateHideTransfer();
+    MTask *timer = new MTimer(30);
+    MSerialTaskSet *serial = &mSerial;
+    serial->AddTail(timer);
+    serial->AddTail(hide);
+    serial->AddTail(fade);
+    serial->AddTail(exit);
 }

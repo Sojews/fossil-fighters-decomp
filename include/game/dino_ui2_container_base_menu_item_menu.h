@@ -1,6 +1,7 @@
 #ifndef GAME_DINO_UI2_CONTAINER_BASE_MENU_ITEM_MENU_H
 #define GAME_DINO_UI2_CONTAINER_BASE_MENU_ITEM_MENU_H
 
+#include "m/smart_oam.h"
 #include "m/blend.h"
 #include <vector>
 #include "m/menu_item.h"
@@ -21,7 +22,9 @@ public:
     int mPage; // 0xF4
     int mLastPage; // 0xF8
     u8 mUnkFC;                      // 0xFC
-    u32 mUnk100[3];                 // 0x100
+    u32 mUnk100;                    // 0x100
+    MSmartOam *mOam;                // 0x104
+    u32 mUnk108;                    // 0x108
     std::vector<void *> mItems;     // 0x10C: this page's items
     u32 mUnk118[3];                 // 0x118
     MMenuItem *mLinkFrom;           // 0x124: linked to the first page item
