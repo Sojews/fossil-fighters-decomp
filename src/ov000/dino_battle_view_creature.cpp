@@ -41,8 +41,18 @@ BOOL DinoBattleViewCreature::IsUnkCC2() {
     return (mUnkCC & 2) ? TRUE : FALSE;
 }
 
-void DinoBattleViewCreature::ClearUnk160() {
-    mUnk160 = 0;
+extern "C" int func_ov000_0216ecc0(int a, int b); // the type advantage of a over b
+
+void DinoBattleViewCreature::SetAdvantage(DinoBattleViewCreature *other) {
+    if (other != NULL) {
+        mAdvantage = func_ov000_0216ecc0(GetDefUnk0D(), other->GetDefUnk0D());
+    } else {
+        mAdvantage = 0;
+    }
+}
+
+void DinoBattleViewCreature::ClearAdvantage() {
+    mAdvantage = 0;
 }
 
 void DinoBattleViewCreature::SetCoord(MPoint pos) {

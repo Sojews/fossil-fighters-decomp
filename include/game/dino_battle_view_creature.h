@@ -46,7 +46,7 @@ public:
     void SetFlag144(int bit);
     void ClearFlag144(int bit);
     BOOL IsUnkCC2();
-    void ClearUnk160();
+    void ClearAdvantage();
     void SetAdvantage(DinoBattleViewCreature *other);
     MPoint GetCoord();
     MPoint GetMotionPosition();
@@ -89,7 +89,7 @@ public:
     u32 unk134[4];
     u32 mFlags144;          // 0x144
     u32 unk148[6];
-    u32 mUnk160;            // 0x160
+    u32 mAdvantage;         // 0x160: its type advantage over the creature shown
 };
 
 #endif
