@@ -40,7 +40,7 @@ public:
     std::vector<MAnmKey> mSounds;       // 0x0D0: the frame, then DinoSoundFunc_0202016c's arguments
     std::string mName;                  // 0x0DC
     fx32 mFrame;                        // 0x0E8
-    u32 unkEC;
+    fx32 mStartFrame;                   // 0x0EC
     fx32 mEndFrame;                     // 0x0F0
     u32 mUnkF4;                         // 0x0F4
     fx32 mLoopFrame;                    // 0x0F8
@@ -98,6 +98,24 @@ class MAnmTargetCamera : public MAnmModelBase {
 public:
     virtual ~MAnmTargetCamera();
     virtual void Unk0C();
+};
+
+class MAnmSE : public MAnmModelBase {
+public:
+    virtual ~MAnmSE();
+    virtual void Unk0C();
+};
+
+class M3DRyusen;
+
+class MAnmRyusen : public MAnmModelBase {
+public:
+    virtual ~MAnmRyusen();
+    virtual void Unk0C();
+    virtual void Unk10();
+
+    u8 unk1A8[0x1290 - 0x1A8];
+    M3DRyusen *mTrails;                 // 0x1290: 180 of them
 };
 
 class MAnmModelSh : public MAnmModelBase {

@@ -2261,12 +2261,12 @@ _ZN16MAnmTargetCameraD1Ev kind:function(thumb,size=0x64) addr:0x02027ff4
 _ZN16MAnmTargetCameraD0Ev kind:function(thumb,size=0x6c) addr:0x02028058
 _ZN11MAnmModelShD1Ev kind:function(thumb,size=0x64) addr:0x020280c4
 _ZN11MAnmModelShD0Ev kind:function(thumb,size=0x6c) addr:0x02028128
-func_02028194 kind:function(thumb,size=0x2c) addr:0x02028194
-func_020281c0 kind:function(thumb,size=0x44) addr:0x020281c0
-func_02028204 kind:function(thumb,size=0x2a) addr:0x02028204
-func_02028230 kind:function(thumb,size=0xa8) addr:0x02028230
-func_020282d8 kind:function(thumb,size=0xa4) addr:0x020282d8
-func_0202837c kind:function(thumb,size=0xf10) addr:0x0202837c
+_Z11MAnmMakeKeyP7MAnmKeyiPKhPKi kind:function(thumb,size=0x2c) addr:0x02028194
+_Z14MAnmStrCaseCmpPKcS0_ kind:function(thumb,size=0x44) addr:0x020281c0
+_Z10MAnmLookupPKcPK8MAnmName kind:function(thumb,size=0x2a) addr:0x02028204
+_ZN12MPolygonCharC1EPvtS0_S0_ kind:function(thumb,size=0xa8) addr:0x02028230
+_ZN12MPolygonChar5ResetEv kind:function(thumb,size=0xa4) addr:0x020282d8
+_ZN12MPolygonChar4LoadEPKcS1_ kind:function(thumb,size=0xf10) addr:0x0202837c
 .L_02028498 kind:label(thumb) addr:0x02028498 local
 .L_0202921c kind:label(thumb) addr:0x0202921c local
 .L_02029222 kind:label(thumb) addr:0x02029222 local

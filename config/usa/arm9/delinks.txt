@@ -152,13 +152,10 @@ src/m/3d_resource.cpp:
     .text       start:0x020230bc end:0x02026478
 
 src/m/anm_model.cpp:
-    .text       start:0x02026478 end:0x02028194
-
-src/m/anm_scene.cpp:
-    .text       start:0x02028194 end:0x0202a88c
+    .text       start:0x02026478 end:0x0202a7f0
 
 src/game/dino_3d_load_csv.cpp:
-    .text       start:0x0202a88c end:0x0202d67c
+    .text       start:0x0202a7f0 end:0x0202d67c
 
 src/game/dino_common_window_menu_cursor.cpp:
     .text       start:0x0202d67c end:0x0202d9ac

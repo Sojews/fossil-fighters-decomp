@@ -1,13 +1,14 @@
-// MAnmModelBase and the animated models (MAnmModel, MAnmEmit, MAnmTargetCamera, MAnmModelSh).
-// Not decompiled yet: GetValue, TintPalette and the Unk0C updates.
-
-// Derived destructors have their bases' destructor bodies inlined; auto-inlining the ones defined above does that.
-#pragma auto_inline on
+// The animated 3D objects (MAnmModelBase and its kinds) and MPolygonChar, which plays them from a scene script.
+// Not decompiled yet: GetValue, TintPalette, the Unk0C updates, MPolygonChar::Load (the script reader) and the
+// node data reader.
 
 #include "m/anm_model.h"
 #include "m/3d_model.h"
 #include "m/3d_resource.h"
 #include "m/3d_scene.h"
+#include "m/3d_ryusen.h"
+#include "m/polygon_char.h"
+#include "m/heap.h"
 #include "game/dino_sound.h"
 #include "nitro/mi.h"
 
@@ -177,18 +178,21 @@ void MAnmModelBase::ClearTransformTracks() {
     mTracks[2].clear();
 }
 
-void MAnmModelSh::Unk10() {
-    if (mModel != NULL) {
-        mModel->SetUnk10(mVisible);
-    }
-}
-
+// The kinds' destructors have this one's body inlined.
+#pragma auto_inline on
 MAnmModelBase::~MAnmModelBase() {
     if (mModel != NULL) {
         mScene->RemoveModel(mModel);
         delete mModel;
     }
     Unload();
+}
+#pragma auto_inline reset
+
+void MAnmModelSh::Unk10() {
+    if (mModel != NULL) {
+        mModel->SetUnk10(mVisible);
+    }
 }
 
 MAnmEmit::~MAnmEmit() {
@@ -217,4 +221,175 @@ MAnmTargetCamera::~MAnmTargetCamera() {
 }
 
 MAnmModelSh::~MAnmModelSh() {
+}
+
+// A script keyword and its value; tables end with -1.
+struct MAnmName {
+    const char *mName;
+    int mValue;
+};
+
+// (Kept until MPolygonChar::Load, which uses them, is decompiled.)
+#pragma force_active on
+
+// Makes a key from a script line's values if it has a value (flags[1]), and a maximum (flags[2]).
+static BOOL MAnmMakeKey(MAnmKey *key, int frame, const u8 *flags, const int *values) {
+    if (flags[1] == 1) {
+        key->mFrame = frame;
+        key->mMin = values[1];
+        key->mMax = values[1];
+        key->mUnkC = 0;
+        if (flags[2] == 1) {
+            key->mMax = values[2];
+        }
+        return TRUE;
+    }
+    return FALSE;
+}
+
+static int MAnmStrCaseCmp(const char *s1, const char *s2) {
+    while (*s1 != 0 && *s2 != 0) {
+        char c1 = *s1;
+        char c2 = *s2;
+        if (c1 >= 'A' && c1 <= 'Z') {
+            c1 += 0x20;
+        }
+        if (c2 >= 'A' && c2 <= 'Z') {
+            c2 += 0x20;
+        }
+        if (c1 != c2) {
+            break;
+        }
+        s1++;
+        s2++;
+    }
+    return *s1 - *s2;
+}
+
+static int MAnmLookup(const char *name, const MAnmName *table) {
+    while (table->mValue != -1) {
+        if (MAnmStrCaseCmp(table->mName, name) == 0) {
+            break;
+        }
+        table++;
+    }
+    return table->mValue;
+}
+
+#pragma force_active reset
+
+// Keeps a process's task sets suspended for the rest of the scope (nested scopes count).
+class MProcessPause {
+public:
+    MProcessPause(MProcess *process, OSMutex *mutex, int *count) {
+        mProcess = process;
+        mMutex = mutex;
+        mCount = count;
+        MMutexLock lock(mMutex);
+        if (++*mCount == 1) {
+            mProcess->mParallel.Suspend();
+            mProcess->mSerial.Suspend();
+        }
+    }
+    ~MProcessPause() {
+        MMutexLock lock(mMutex);
+        if (--*mCount == 0) {
+            mProcess->mParallel.Run();
+            mProcess->mSerial.Run();
+        }
+    }
+
+    MProcess *mProcess;
+    OSMutex *mMutex;
+    int *mCount;
+};
+
+MPolygonChar::MPolygonChar(void *unk80, u16 unkA4, void *unk84, void *unk88) : MProcess(NULL) {
+    mUnk74 = NULL;
+    mUnk80 = unk80;
+    mUnk84 = unk84;
+    mUnk88 = unk88;
+    mUnkA4 = unkA4;
+    OS_InitMutex(&mMutex);
+    mParallel.SetUseMutex(TRUE);
+    mUnk98 = 0;
+    mUnk9C = 0;
+    mUnkA0 = 0;
+    mUnk8C = 0;
+    mUnk90 = 0;
+    mUnk94 = 0;
+    mUnkB0 = 0x1000;
+    mUnkAC = 1;
+    mUnkA6 = 0x7FFF;
+    mUnk43C = 0;
+    mPauseCount = 0;
+    Reset();
+}
+
+void MPolygonChar::Reset() {
+    MProcessPause pause(this, &mMutex, &mPauseCount);
+    mUnkA8 = 0;
+    mEndFrame = 0x0FFFFFFF;
+    mFrame = 0;
+    mUnk74 = NULL;
+    mUnk78 = NULL;
+    mUnk7C = NULL;
+    mParallel.Clear();
+}
+
+MPolygonChar::~MPolygonChar() {
+}
+
+void MPolygonChar::Idle() {
+    MScopedLock lock(&mMutex, TRUE);
+    if (mPauseCount != 0) {
+        return;
+    }
+    if (mFrame >= mEndFrame) {
+        Reset();
+        return;
+    }
+    mFrame++;
+    MAnmModelBase *anm = mUnk74;
+    if (anm != NULL && mUnkAC == 1 && mUnkB0 > 0x10) {
+        BOOL looped;
+        if (anm->mModel != NULL) {
+            int frames = anm->mModel->GetFrameCount();
+            looped = (anm->mFrame - anm->mStartFrame) % (frames << 4) == 0 ? TRUE : FALSE;
+        } else {
+            looped = FALSE;
+        }
+        if (looped) {
+            MAnmModelBase *restart = mUnk7C;
+            if (restart != NULL) {
+                restart->Unk10();
+                restart->mFrame = 0;
+                restart->mLoopEnd = 0;
+                restart->mSpeed = 0x10;
+                mUnk7C->Run();
+            }
+        }
+    }
+}
+
+MAnmRyusen::~MAnmRyusen() {
+    for (int i = 0; i < 180; i++) {
+        mScene->RemoveModel(&mTrails[i]);
+    }
+    delete[] mTrails;
+}
+
+void MAnmRyusen::Unk10() {
+    for (int i = 0; i < 180; i++) {
+        mTrails[i].SetUnk10(0);
+    }
+}
+
+void MAnmSE::Unk0C() {
+    if (mFrame >= mStartFrame) {
+        PlaySounds(mFrame - mStartFrame);
+    }
+}
+
+MAnmSE::~MAnmSE() {
 }

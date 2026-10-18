@@ -6,7 +6,10 @@
 
 class M3DRyusen : public M3DModel {
 public:
+    M3DRyusen() {}
     virtual ~M3DRyusen();
+
+    u8 unk32C[0x368 - 0x32C];
 };
 
 #endif
