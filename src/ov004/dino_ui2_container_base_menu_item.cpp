@@ -22,6 +22,7 @@
 #include "m/display.h"
 #include "m/bright.h"
 #include "game/dino_backup.h"
+#include "game/dino_common_window_message_box.h"
 
 #pragma auto_inline off
 
@@ -337,4 +338,10 @@ BOOL DinoUi2CannonShootMenu::CanMark() {
 
 BOOL DinoUi2CannonShootMenu::IsMarkable(DinoBackupEntry *entry) {
     return TRUE;
+}
+
+extern const u32 data_0208a988; // text: no more can be loaded
+
+MTask *DinoUi2CannonShootMenu::CreateUnk2C() {
+    return new DinoCommonWindowMessageBox(MPoint(128, 96), gDinoResource->GetText(data_0208a988), 4);
 }
