@@ -51,9 +51,12 @@ public:
     virtual void OnDecide(MMenuItem *item);
     virtual void OnMessage(MMessage *msg);
     void ExitWithReset();
+    void Cancel();
+    void Choose(u32 choice);
 
     MMultiPlay *mMultiPlay;     // 0xE8
-    u32 mUnkEC[2];              // 0xEC
+    u32 *mChosen;               // 0xEC: set when a partner was chosen
+    u32 *mChoice;               // 0xF0
     u8 mSilentFocus;            // 0xF4
     u8 unkF5[0x37];
     DinoHelpItem *mParentHelp;  // 0x12C: help shown for every parent item

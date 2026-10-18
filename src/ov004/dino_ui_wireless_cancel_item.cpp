@@ -247,6 +247,17 @@ void DinoUiCannonParentScanner::ShowCount() {
     mTens->Play(mCount / 10 + 1, 0);
 }
 
+void DinoUiChildScanner::Cancel() {
+    *mChosen = FALSE;
+    mSerial.AddTail(MTaskExitTransfer::Create(this));
+}
+
+void DinoUiChildScanner::Choose(u32 choice) {
+    *mChosen = TRUE;
+    *mChoice = choice;
+    mSerial.AddTail(MTaskExitTransfer::Create(this));
+}
+
 void DinoUiChildScanner::ExitWithReset() {
     MTask *exit = MTaskExitTransfer::Create(this);
     MTask *reset = mMultiPlay->CreateResetTask();
