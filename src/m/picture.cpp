@@ -1,5 +1,7 @@
 // MPictureFile and the views that show pictures.
 
+#pragma ipa file
+
 #include "m/picture.h"
 #include "m/bg.h"
 #include "m/ext_affine.h"

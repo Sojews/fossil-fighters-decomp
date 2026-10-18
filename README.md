@@ -63,6 +63,7 @@ Tips:
 - If a function is right but won't match (usually a register swap), keep the C under `#ifdef NONMATCHING` and use an mwcc `asm` function with the original instructions in the `#else`, as in `SeqPlayerEx::RemoveEntry`. `python3 tools/asm_fallback.py <function>` prints the body in mwcc's syntax. Constructors that nothing calls (often the `C2` variant) are stripped by the linker, like in the original build.
 - mwcc is picky about expression shape: `x *= 10; x += d;` and `x = x * 10 + d` compile differently, and indexing with `a[i++]` stops the loop being turned into pointer arithmetic.
 - Include any alignment padding after the last function in a file's `.text` range, or later code shifts.
+- The game was built with interprocedural analysis per file (`-ipa file`): its C++ files keep their statics, pointer-to-member constants and type infos in one block, sorted by size (a heapsort of the objects in reverse creation order), and address them as `block + offset`. The build doesn't use it by default, because it also lets mwcc inline functions defined later in a file, which breaks files that hold more than one original file. A file whose code reads that block needs `#pragma ipa file` at the top (see `src/m/region.cpp`); then the order of its static declarations decides the offsets.
 
 ## Tools
 

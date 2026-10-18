@@ -7,8 +7,11 @@ mwcc names the constants it makes up itself (string literals, pointer-to-member 
 aggregate initializers) @1, @2, ... dsd names the same data after its address (data_020c46c4). objdiff compares
 relocations by symbol name, so a function that loads one never matches. For each function that is in both
 objects with the same size, this pairs up their relocations by offset and renames our anonymous symbols to the
-target's names, in place. It only touches the objects objdiff reads for units that aren't complete yet; linked
-objects keep the compiler's names.
+target's names, in place.
+
+With interprocedural analysis (-ipa file) mwcc also addresses a file's own data through its sections (`.data+0x80`,
+`.bss+0`) instead of through symbols. dsd names the same places (data_020c45f8, gLooper), so such relocations are
+pointed at a symbol of that name at the same place: ours if there is one, or a new local one.
 """
 import re
 import struct
@@ -17,6 +20,7 @@ import sys
 SHT_SYMTAB = 2
 SHT_RELA = 4
 STT_FUNC = 2
+STT_SECTION = 3
 
 
 class Elf:
@@ -36,7 +40,7 @@ class Elf:
             off = symtab[4] + i * 16
             name, value, size, info, other, shndx = struct.unpack_from("<IIIBBH", d, off)
             self.symbols.append({"name": self.string(name), "value": value, "size": size, "type": info & 0xF,
-                                 "shndx": shndx, "offset": off})
+                                 "info": info, "shndx": shndx, "offset": off})
 
     def string(self, offset):
         strtab = self.sections[self.strtab_index]
@@ -52,7 +56,7 @@ class Elf:
             relocs = out.setdefault(s[7], [])
             for i in range(s[5] // 12):
                 off, info, addend = struct.unpack_from("<IIi", self.data, s[4] + i * 12)
-                relocs.append((off, info >> 8, info & 0xFF, addend))
+                relocs.append((off, info >> 8, info & 0xFF, addend, s[4] + i * 12))
         for relocs in out.values():
             relocs.sort()
         return out
@@ -60,19 +64,29 @@ class Elf:
     def functions(self):
         return {s["name"]: s for s in self.symbols if s["type"] == STT_FUNC and s["size"]}
 
-    def rename(self, renames):
-        """Renames symbols (index -> new name), appending the names to a new string table at the end."""
+    def rewrite(self, renames, new_symbols, retargets):
+        """Renames symbols (index -> new name), adds symbols ((name, section, value)) and points relocations
+        (file offset -> (symbol index, addend)) elsewhere. The symbol and string tables are rewritten at the end."""
         strtab = self.sections[self.strtab_index]
         table = bytearray(self.data[strtab[4]:strtab[4] + strtab[5]])
         for index, name in renames.items():
-            sym = self.symbols[index]
-            struct.pack_into("<I", self.data, sym["offset"], len(table))
+            struct.pack_into("<I", self.data, self.symbols[index]["offset"], len(table))
             table += name.encode("latin-1") + b"\0"
-        while len(self.data) % 4:
-            self.data.append(0)
-        strtab[4], strtab[5] = len(self.data), len(table)
-        self.data += table
-        struct.pack_into("<IIIIIIIIII", self.data, self.shoff + self.strtab_index * self.shentsize, *strtab)
+        symtab = self.sections[self.symtab_index]
+        entries = bytearray(self.data[symtab[4]:symtab[4] + symtab[5]])
+        for name, shndx, value in new_symbols:
+            entries += struct.pack("<IIIBBH", len(table), value, 0, 0, 0, shndx)
+            table += name.encode("latin-1") + b"\0"
+        for off, (index, addend) in retargets.items():
+            info = struct.unpack_from("<I", self.data, off + 4)[0]
+            struct.pack_into("<Ii", self.data, off + 4, (index << 8) | (info & 0xFF), addend)
+        for section, blob in ((strtab, table), (symtab, entries)):
+            while len(self.data) % 4:
+                self.data.append(0)
+            section[4], section[5] = len(self.data), len(blob)
+            self.data += blob
+        for i in (self.strtab_index, self.symtab_index):
+            struct.pack_into("<IIIIIIIIII", self.data, self.shoff + i * self.shentsize, *self.sections[i])
         open(self.path, "wb").write(self.data)
 
 
@@ -81,6 +95,8 @@ def main():
     our_relocs, target_relocs = ours.relocations(), target.relocations()
     target_funcs = target.functions()
     renames = {}
+    new_symbols = []   # (name, section, value)
+    retargets = {}     # reloc file offset -> (symbol index, addend)
     # A static function whose name another file's function also has is named after its address in the game
     # (ForceStopStrm_02070314): give ours that name when exactly one such function has the same size.
     func_names = {}
@@ -106,10 +122,24 @@ def main():
             if a[0] - func["value"] != b[0] - tfunc["value"] or a[2] != b[2]:
                 break
             sym, tsym = ours.symbols[a[1]], target.symbols[b[1]]
-            if sym["name"].startswith("@") and not tsym["name"].startswith("@") and a[1] not in renames:
+            if tsym["name"].startswith("@") or not tsym["name"] or tsym["type"] == STT_SECTION:
+                continue
+            if sym["name"].startswith("@") and a[1] not in renames:
                 renames[a[1]] = tsym["name"]
-    if renames:
-        ours.rename(renames)
+            elif sym["type"] == STT_SECTION:
+                # Our section + addend is the target's symbol + its addend.
+                value = a[3] - b[3]
+                key = (tsym["name"], sym["shndx"], value)
+                index = next((i for i, s in enumerate(ours.symbols) if s["name"] == tsym["name"]
+                              and s["shndx"] == sym["shndx"] and s["value"] == value and s["type"] != STT_SECTION),
+                             None)
+                if index is None:
+                    if key not in new_symbols:
+                        new_symbols.append(key)
+                    index = len(ours.symbols) + new_symbols.index(key)
+                retargets[a[4]] = (index, b[3])
+    if renames or new_symbols or retargets:
+        ours.rewrite(renames, new_symbols, retargets)
 
 
 if __name__ == "__main__":

@@ -1,5 +1,7 @@
 // MRegion.
 
+#pragma ipa file
+
 #include "m/region.h"
 
 MRegion::MRegion() {

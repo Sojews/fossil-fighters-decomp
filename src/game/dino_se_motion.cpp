@@ -1,6 +1,8 @@
 // DinoSeMotion.
 // Only the destructor is decompiled so far.
 
+#pragma ipa file
+
 #include "game/dino_sound.h"
 #include "game/dino_se_motion.h"
 

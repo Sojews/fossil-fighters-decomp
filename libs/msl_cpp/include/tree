@@ -387,18 +387,14 @@ namespace std {
             node_base *node_;
         };
 
-        // (mwcc never inlines a template base class's constructor, so the map or set sets the tree up; its
-        // destructor stays out of line.)
+        // (mwcc never inlines a template base class's constructor, so the map or set sets the tree up. The
+        // destructor is defined outside the class, so it isn't an inline function and is never inlined.)
         void init() {
             size_ = 0;
             header_.left_ = 0;
             leftmost_ = (node_base *) &header_;
         }
-        ~__red_black_tree() {
-            if (header_.left_ != 0) {
-                destroy(header_.left_);
-            }
-        }
+        ~__red_black_tree();
 
         iterator begin() {
             return iterator(leftmost_);
@@ -499,6 +495,13 @@ namespace std {
         bool leftmost;
         node_base *p = find_insert_position(KeyOf::get(v), last_not_greater, left, leftmost);
         return iterator(insert_node_at(p, left, leftmost, v));
+    }
+
+    template <class Key, class Value, class KeyOf, class Compare, class Allocator>
+    __red_black_tree<Key, Value, KeyOf, Compare, Allocator>::~__red_black_tree() {
+        if (header_.left_ != 0) {
+            destroy(header_.left_);
+        }
     }
 
     template <class Key, class Value, class KeyOf, class Compare, class Allocator>

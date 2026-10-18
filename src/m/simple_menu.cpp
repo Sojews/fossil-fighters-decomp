@@ -3,6 +3,8 @@
 // .data, so their offsets from the data anchor differ), AddItem and Start (the string temporary), Layout, SetCursor,
 // HitTest, Decide and Update (register allocation and scheduling), append_realloc (as everywhere).
 
+#pragma ipa file
+
 #include "m/simple_menu.h"
 #include "m/display.h"
 #include "m/font.h"

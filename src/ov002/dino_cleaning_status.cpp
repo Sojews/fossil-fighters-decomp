@@ -1,6 +1,8 @@
 // DinoCleaningStatus.
 // Only the destructors are decompiled so far.
 
+#pragma ipa file
+
 #include "game/dino_cleaning_status.h"
 #include "game/dino_cleaning_timer.h"
 #include "game/dino_cleaning_score.h"

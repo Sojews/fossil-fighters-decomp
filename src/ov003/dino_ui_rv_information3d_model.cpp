@@ -1,6 +1,8 @@
 // DinoUiRvInformation3DModel, DinoUiRvInformation3DModelRotate.
 // Only the destructors are decompiled so far.
 
+#pragma ipa file
+
 #include "game/dino_ui_rv_information3d_model.h"
 #include "game/dino_ui_rv_information3d_model_rotate.h"
 #include "m/bg_new_task.h"

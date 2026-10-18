@@ -1,5 +1,7 @@
 // MIndicator. Not decompiled yet: Execute (redrawing the runs that changed) and the template functions.
 
+#pragma ipa file
+
 #include "m/indicator.h"
 #include "m/text_codec.h"
 

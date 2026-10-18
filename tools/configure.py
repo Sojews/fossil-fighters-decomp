@@ -95,9 +95,9 @@ w(f"rule lcf\n  command = {DSD} lcf -c {arm9_config} && {PY} tools/lcf_extra.py 
 # mwcc names outputs after the source and writes a Windows-style .d next to them.
 w(f"rule cc\n  command = {wine} {CC} {CC_FLAGS} $extra_cflags -gccinc -i include -i libs/msl/include -i libs/msl_cpp/include -MD -c $in -o $outdir && {PY} tools/fix_dep.py $outdir/$stem.d $out.d\n"
   "  depfile = $out.d\n  deps = gcc\n  description = CC $in")
-# Units that don't match completely yet are only compared by objdiff: rename the compiler's anonymous data symbols
-# to the game's names for it (tools/anon_names.py).
-w(f"rule cc_partial\n  command = {wine} {CC} {CC_FLAGS} $extra_cflags -gccinc -i include -i libs/msl/include -i libs/msl_cpp/include -MD -c $in -o $outdir && {PY} tools/fix_dep.py $outdir/$stem.d $out.d && {PY} tools/anon_names.py $out $target\n"
+# objdiff compares data references by symbol name: give the compiler's anonymous data symbols, and the data it
+# addresses through sections, the game's names (tools/anon_names.py; the linked code doesn't change).
+w(f"rule cc_named\n  command = {wine} {CC} {CC_FLAGS} $extra_cflags -gccinc -i include -i libs/msl/include -i libs/msl_cpp/include -MD -c $in -o $outdir && {PY} tools/fix_dep.py $outdir/$stem.d $out.d && {PY} tools/anon_names.py $out $target\n"
   "  depfile = $out.d\n  deps = gcc\n  description = CC $in")
 w(f"rule ld\n  command = {wine} {LD} {LD_FLAGS} @$objects $lcf -o $out\n  description = LINK $out")
 w(f"rule check\n  command = {DSD} check modules --config-path {arm9_config} --fail && touch $out")
@@ -133,8 +133,8 @@ for f in info["files"]:
         extra = next((v for k, v in LIB_CC_FLAGS.items() if f["name"].startswith(k)), "")
         # mwcc keeps the first -lang it sees, so the language is set per file rather than in CC_FLAGS.
         extra += " -lang c++ -RTTI on" if f["name"].endswith(".cpp") else " -lang c"
-        if obj in partial:
-            w(f"build {obj}: cc_partial {f['name']} | {f['delink_file']} tools/anon_names.py\n  outdir = {Path(obj).parent}\n"
+        if obj in partial or f["name"].startswith("src/"):
+            w(f"build {obj}: cc_named {f['name']} | {f['delink_file']} tools/anon_names.py\n  outdir = {Path(obj).parent}\n"
               f"  stem = {Path(obj).stem}\n  extra_cflags = {extra}\n  target = {f['delink_file']}")
         else:
             w(f"build {obj}: cc {f['name']}\n  outdir = {Path(obj).parent}\n  stem = {Path(obj).stem}\n  extra_cflags = {extra}")

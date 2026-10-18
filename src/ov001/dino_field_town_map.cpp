@@ -4,6 +4,8 @@
 // Derived destructors have their bases' destructor bodies inlined; auto-inlining the ones defined above does that.
 #pragma auto_inline on
 
+#pragma ipa file
+
 #include "game/dino_field_town_map_menu.h"
 #include "game/dino_field_town_map.h"
 #include "game/town_map_icon.h"

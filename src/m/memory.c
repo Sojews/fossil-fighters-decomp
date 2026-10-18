@@ -1,6 +1,8 @@
 // The game's heap: Doug Lea's malloc 2.7.0 (libs/dlmalloc) running from ITCM, on a bump-allocated arena. The heap
 // state lives in DTCM.
 
+#pragma ipa file
+
 #include <stddef.h>
 #include "nitro/os.h"
 #include "nitro/section.h"

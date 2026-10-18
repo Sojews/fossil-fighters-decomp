@@ -1,5 +1,7 @@
 // DinoEventExec*: the event script commands.
 
+#pragma ipa file
+
 #include "game/dino_event_exec.h"
 #include "nitro/mi.h"
 #include "m/overlay.h"

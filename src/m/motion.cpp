@@ -1,5 +1,7 @@
 // Motions: animated OBJ graphics loaded from a motion file, shown as a view.
 
+#pragma ipa file
+
 #include "m/motion.h"
 #include <algorithm>
 #include <map>
