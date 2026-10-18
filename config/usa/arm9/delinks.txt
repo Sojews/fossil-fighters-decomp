@@ -142,6 +142,9 @@ src/game/dino_resource.cpp:
 src/m/3d_scene.cpp:
     .text       start:0x02021620 end:0x02021ddc
 
+src/m/3d_model.cpp:
+    .text       start:0x02021ddc end:0x02022e1c
+
 src/m/memory.c:
     .text       start:0x0204b338 end:0x0204b3a0
     .itcm       start:0x01ff8588 end:0x01ff8db8
