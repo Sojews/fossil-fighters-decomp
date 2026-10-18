@@ -1,5 +1,8 @@
 // DinoBattleViewUi.
 
+// The game built this file without common-subexpression elimination (loops reload their bounds).
+#pragma opt_common_subs off
+
 // Derived destructors have their bases' destructor bodies inlined; auto-inlining the ones defined above does that.
 #pragma auto_inline on
 
@@ -279,4 +282,22 @@ void DinoBattleViewUiAttackerMenu::OnBlur(MMenuItem *item) {
 #pragma auto_inline off
 
 void DinoBattleViewUiSelectAreaCommon::Nop() {
+}
+
+BOOL DinoBattleViewUiChangeMenu::HasId(u32 id) {
+    for (int i = 0; i < mCount; i++) {
+        if (id == mIds[i]) {
+            return TRUE;
+        }
+    }
+    return FALSE;
+}
+
+BOOL DinoBattleViewUiAttackerMenu::HasId(u32 id) {
+    for (int i = 0; i < mCount; i++) {
+        if (id == mIds[i]) {
+            return TRUE;
+        }
+    }
+    return FALSE;
 }

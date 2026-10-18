@@ -18,7 +18,11 @@ public:
     virtual void OnIdle();
     virtual void OnFocus(MMenuItem *item);
     virtual void OnDecide(MMenuItem *item);
+    BOOL HasId(u32 id);
 
+    u8 unk188[0x14];
+    u32 mIds[3];        // 0x19C
+    int mCount;         // 0x1A8
 };
 
 #endif
