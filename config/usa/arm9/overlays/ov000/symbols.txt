@@ -409,7 +409,7 @@ _ZN21DinoBattleModelPlayer27CreateUpdateAllCreatureTaskEv kind:function(thumb,si
 _ZN22MoveCreatureFromEscapeC1EP21DinoBattleModelPlayer kind:function(thumb,size=0x1c) addr:0x021697c4
 func_ov000_021697e0 kind:function(thumb,size=0x1e) addr:0x021697e0
 _ZN22MoveCreatureFromEscape4IdleEv kind:function(thumb,size=0x2f4) addr:0x02169800
-func_ov000_02169af4 kind:function(thumb,size=0x118) addr:0x02169af4
+_ZN21DinoBattleModelPlayer17CreateAbilityTaskEmmm kind:function(thumb,size=0x118) addr:0x02169af4
 func_ov000_02169c0c kind:function(thumb,size=0x184) addr:0x02169c0c
 func_ov000_02169d90 kind:function(thumb,size=0x6e) addr:0x02169d90
 func_ov000_02169e00 kind:function(thumb,size=0x1b8) addr:0x02169e00

@@ -474,6 +474,17 @@ MTask *DinoBattleModelPlayer::CreateMotionEffectTask(u32 a, u32 b, u32 c, u32 d,
     return set;
 }
 
+// Has the view show an ability (type 6), and waits for it to finish.
+MTask *DinoBattleModelPlayer::CreateAbilityTask(u32 a, u32 b, u32 c) {
+    MParallelTaskSet *set = new MParallelTaskSet(TRUE);
+    DinoSignalWait *wait = new DinoSignalWait(0x1002A, NULL, NULL, 1);
+    MTask *post = mUnkF4->CreatePostTask(new DinoBattleViewCreatureAbilityRequest(
+        (u32)(MMessageObserver *)wait, a, b, c, 0, 6, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0));
+    set->AddTail(wait);
+    set->AddTail(post);
+    return set;
+}
+
 u32 DinoBattleModelPlayer::GetUnkB8() {
     return mUnkB8;
 }

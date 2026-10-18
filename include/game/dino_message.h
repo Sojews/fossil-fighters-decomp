@@ -832,6 +832,27 @@ public:
 class DinoBattleViewCreatureAbilityRequest : public MMessage {
 public:
     DinoBattleViewCreatureAbilityRequest() : MMessage(0x10029) {}
+    DinoBattleViewCreatureAbilityRequest(u32 a, u32 b, u32 c, u32 d, u32 e, u32 f, u8 g, u32 h, u8 i, u32 j, u32 k,
+                                         u8 l, u8 m, u8 n, u32 o, u32 p, u32 q)
+        : MMessage(0x10029) {
+        mUnk0C = a;
+        mUnk10 = b;
+        mUnk14 = c;
+        mUnk18 = d;
+        mUnk1C = e;
+        mUnk20 = f;
+        mUnk24 = g;
+        mUnk28 = h;
+        mUnk2C = i;
+        mUnk30 = j;
+        mUnk34 = k;
+        mUnk38 = l;
+        mUnk39 = m;
+        mUnk3A = n;
+        mUnk3C = o;
+        mUnk40 = p;
+        mUnk44 = q;
+    }
     virtual u32 GetSize() { return 60; }
     virtual void Write(void *buf) {
         MI_CpuCopy8(&mId, buf, 4);
