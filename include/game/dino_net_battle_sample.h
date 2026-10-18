@@ -9,6 +9,7 @@ public:
     virtual ~DinoNetBattleSample();
     virtual void Idle();
 
+    void StateSetup();
     void StateTeamSelect();
 
     void (DinoNetBattleSample::*mState)(); // 0x74

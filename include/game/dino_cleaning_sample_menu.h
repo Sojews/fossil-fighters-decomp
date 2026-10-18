@@ -16,11 +16,15 @@
 
 class DinoCleaningSampleMenu : public MMenu {
 public:
+    DinoCleaningSampleMenu(u32 *rock, u32 *unkAC, u32 *unkB0) : MMenu(0), mRock(rock), mUnkAC(unkAC), mUnkB0(unkB0) {}
     virtual ~DinoCleaningSampleMenu();
     virtual void OnStart();
     virtual void OnFocus(MMenuItem *item);
 
-    u32 mUnkA8[4];      // 0xA8
+    u32 *mRock;         // 0xA8: the kaseki rock to clean
+    u32 *mUnkAC;        // 0xAC
+    u32 *mUnkB0;        // 0xB0
+    u32 unkB4;
     MFont *mFont;       // 0xB8
     MTaskSet *mTasks;   // 0xBC: the cursor's moves
     MView *mCursor;     // 0xC0

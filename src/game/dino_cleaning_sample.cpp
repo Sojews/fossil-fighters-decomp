@@ -4,6 +4,10 @@
 // Derived destructors have their bases' destructor bodies inlined; auto-inlining the ones defined above does that.
 #pragma auto_inline on
 
+#include "m/bright.h"
+#include "m/display.h"
+#include "m/lcd.h"
+#include "game/dino_backup.h"
 #include "game/dino_resource.h"
 #include <printf.h>
 #include "game/dino_cleaning_sample_menu.h"
@@ -164,6 +168,8 @@ extern "C" struct {
     void (DinoCleaningSample::*Unk_08)();
     u8 unk10[0x28 - 0x10];
     void (DinoCleaningSample::*Start_28)();
+    u8 unk30[0x40 - 0x30];
+    void (DinoCleaningSample::*StateCleaning_40)();
 } data_020bcc24;
 extern "C" u8 data_0214d158[];
 
@@ -178,4 +184,13 @@ DinoCleaningSample::DinoCleaningSample() : MProcess(NULL) {
 void DinoCleaningSample::StateCleaning() {
     mSerial.AddTail(new DinoCleaning(mUnk7C, data_0214d158, mUnk80, mUnk84, TRUE, 0));
     mState = data_020bcc24.Unk_08;
+}
+
+void DinoCleaningSample::StateMenu() {
+    gLcd->mMain->mBright->Reset();
+    gLcd->mSub->mBright->Reset();
+    gDinoBackup->SetSystemFlag(0x21, TRUE);
+    gDinoBackup->SetSystemFlag(0x22, TRUE);
+    mSerial.AddTail(new DinoCleaningSampleMenu(&mUnk7C, &mUnk80, &mUnk84));
+    mState = data_020bcc24.StateCleaning_40;
 }

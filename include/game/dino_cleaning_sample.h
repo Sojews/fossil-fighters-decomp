@@ -9,6 +9,7 @@ public:
     virtual ~DinoCleaningSample();
     virtual void Idle();
 
+    void StateMenu();
     void StateCleaning();
 
     void (DinoCleaningSample::*mState)(); // 0x74
