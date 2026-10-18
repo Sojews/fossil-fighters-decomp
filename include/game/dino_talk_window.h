@@ -4,10 +4,17 @@
 
 #include <string>
 #include "m/task.h"
+#include "m/fx32.h"
+
+class MConsole;
 
 class DinoTalkWindow : public MProcess {
 public:
+    void SetUnkF4();
     void ClearUnkF4();
+    void SetRate(MFx32 rate);
+    void Print(const std::string &text);
+    BOOL IsEmpty();
     void SetUnkAC(u32 value);
     void SetUnkB0(u8 value);
     u8 GetUnkB0();
@@ -16,10 +23,14 @@ public:
 
     void (DinoTalkWindow::*mState)(); // 0x74
     std::wstring mText; // 0x7C
-    u8 unk88[0x24];
+    u8 unk88[0xC];
+    MConsole *mConsole; // 0x94
+    u8 unk98[0x14];
     u32 mUnkAC;         // 0xAC
     u8 mUnkB0;          // 0xB0
-    u8 unkB1[0x43];
+    u8 unkB1[0xCC - 0xB1];
+    MFx32 mRate;        // 0xCC
+    u8 unkD0[0xF4 - 0xD0];
     u8 mUnkF4;          // 0xF4
 };
 
