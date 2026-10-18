@@ -966,6 +966,18 @@ void DinoBattleModelPlayer::Idle() {
     Dispatch();
 }
 
+MTask *DinoBattleModelPlayer::CreateUpdateTask(u32 arg) {
+    return new PlayerUpdateTask(this, arg);
+}
+
+MTask *DinoBattleModelPlayer::CreateUpdateStateIconTask(u32 creature, u32 arg) {
+    return new DinoCreatureUpdateStateIconTask(this, creature, arg);
+}
+
+MTask *DinoBattleModelPlayer::CreateSetKasekiPointTask(u32 points) {
+    return new SetKasekiPointTask(this, points);
+}
+
 MTask *DinoBattleModelPlayer::CreateMoveToHeatAreaAnyCreature() {
     return new MoveToHeatAreaAnyCreature(this);
 }
@@ -1001,6 +1013,7 @@ template <class T> MTask *DinoCreatePostAndWaitTask(MMessageObserver *target, T 
     return tasks;
 }
 
+template MTask *DinoCreatePostAndWaitTask(MMessageObserver *target, DinoBattleViewPlayerWaitKPCountStopRequest *msg);
 template MTask *DinoCreatePostAndWaitTask(MMessageObserver *target, DinoBattleViewCreaturePlayMotionRequest *msg);
 template MTask *DinoCreatePostAndWaitTask(MMessageObserver *target, DinoBattleView3DTeamAttackRequest *msg);
 

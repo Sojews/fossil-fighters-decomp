@@ -87,6 +87,9 @@ public:
     DinoBattleModelCreature *GetCreature(int index);
     DinoBattleModelCreature *FindCreature(u32 id);
     MTask *CreateMoveToHeatAreaAnyCreature();
+    MTask *CreateUpdateTask(u32 arg);
+    MTask *CreateUpdateStateIconTask(u32 creature, u32 arg);
+    MTask *CreateSetKasekiPointTask(u32 points);
     MTask *CreateAddKasekiPointCreatureDie();
     MTask *CreateUpdateAllCreatureTask();
     DinoBattleModelPlayer *GetOpponent();
@@ -320,6 +323,10 @@ public:
 
 class PlayerUpdateTask : public MTask {
 public:
+    PlayerUpdateTask(void *player, u32 arg) {
+        mUnk10 = (u32)player;
+        mUnk14 = arg;
+    }
     virtual ~PlayerUpdateTask();
     virtual void Execute();
 
@@ -329,6 +336,11 @@ public:
 
 class DinoCreatureUpdateStateIconTask : public MTask {
 public:
+    DinoCreatureUpdateStateIconTask(void *player, u32 creature, u32 arg) {
+        mUnk10 = (u32)player;
+        mUnk14 = creature;
+        mUnk18 = arg;
+    }
     virtual ~DinoCreatureUpdateStateIconTask();
     virtual void Execute();
 
@@ -349,6 +361,10 @@ public:
 
 class SetKasekiPointTask : public MTask {
 public:
+    SetKasekiPointTask(void *player, u32 points) {
+        mUnk10 = (u32)player;
+        mUnk14 = points;
+    }
     virtual ~SetKasekiPointTask();
     virtual void Execute();
 
