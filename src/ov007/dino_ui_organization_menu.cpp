@@ -152,6 +152,17 @@ extern "C" const int data_02089a0c;
 
 #pragma auto_inline off
 
+void DinoUiOrganizationMenu::ShowTabInfo(u8 tab) {
+    mInfo->SetPage(tab);
+    MTask *enable = MCreateCallTask(this, &DinoHelpBase::Enable);
+    MTask *wait = MTaskSetWaitEmptyTask::Create(&mInfo->mSerial);
+    MSerialTaskSet *serial = &mSerial;
+    serial->AddTail(wait);
+    serial->AddTail(enable);
+    mUnk230->Clear();
+    Disable();
+}
+
 void DinoUiOrganizationMenu::ClearSlots() {
     RemoveSlotLinks();
     for (int i = 0; i < 15; i++) {
@@ -195,17 +206,6 @@ void DinoUiOrganizationMenu::PageLeft() {
     }
     mSerial.AddTail(MCreateBgCallTask(this, &DinoUiOrganizationMenu::LoadPage, 1));
     mSerial.AddTail(MCreateCallTask(this, &DinoUiOrganizationMenu::FinishPageLeft));
-    Disable();
-}
-
-void DinoUiOrganizationMenu::ShowTabInfo(u8 tab) {
-    mInfo->SetPage(tab);
-    MTask *enable = MCreateCallTask(this, &DinoHelpBase::Enable);
-    MTask *wait = MTaskSetWaitEmptyTask::Create(&mInfo->mSerial);
-    MSerialTaskSet *serial = &mSerial;
-    serial->AddTail(wait);
-    serial->AddTail(enable);
-    mUnk230->Clear();
     Disable();
 }
 
@@ -315,20 +315,6 @@ extern "C" void func_ov007_0217c92c(DinoUiOrganizationMenu *menu);
 extern "C" void func_ov007_0217e1e4(DinoUiOrganizationMenu *menu);
 extern "C" void func_ov007_0217fb94(DinoUiOrganizationMenu *menu, int a1);
 
-void DinoUiOrganizationMenu::Refresh() {
-    RemoveListLinks();
-    RemoveSlotLinks();
-    ClearList();
-    func_ov007_0217c92c(this);
-    PlaceSlots();
-    func_ov007_0217e1e4(this);
-    LinkList();
-    LinkSlots();
-    Enable();
-    UpdateTeamTech();
-    FocusNearestItem(GetCursor());
-}
-
 void DinoUiOrganizationMenu::ClearList() {
     RemoveLink(mTabs[0], 2);
     RemoveLink(mTabs[1], 2);
@@ -426,6 +412,20 @@ void DinoUiOrganizationMenu::UpdateTeamTech() {
     } else {
         mTeamTech->Hide();
     }
+}
+
+void DinoUiOrganizationMenu::Refresh() {
+    RemoveListLinks();
+    RemoveSlotLinks();
+    ClearList();
+    func_ov007_0217c92c(this);
+    PlaceSlots();
+    func_ov007_0217e1e4(this);
+    LinkList();
+    LinkSlots();
+    Enable();
+    UpdateTeamTech();
+    FocusNearestItem(GetCursor());
 }
 
 void DinoUiOrganizationMenu::CreateSlots() {
