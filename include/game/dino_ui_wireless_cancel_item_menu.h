@@ -237,6 +237,9 @@ public:
     void StateParentScanned();
     void StateCannonParentScan();
     void StateRescan();
+    void StateChosen();
+    void StateAfterReset();
+    void State02167cd0();
 
     void (DinoUiWirelessMatch::*mState)(); // 0x74
     MMultiPlay *mMultiPlay; // 0x7C: kept in DinoResource for the next scene

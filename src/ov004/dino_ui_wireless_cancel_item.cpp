@@ -270,7 +270,7 @@ extern "C" struct {
     const char *mCancelPath;    // 0x20
     const char *mParentPath1;   // 0x24
     u8 unk28[0x34 - 0x28];
-    DinoUiWirelessMatchState state_02167e3c; // 0x34
+    DinoUiWirelessMatchState StateAfterReset; // 0x34
     u8 unk3C[0x44 - 0x3C];
     DinoUiWirelessMatchState StateInit; // 0x44
     DinoUiWirelessMatchState state_021676f8; // 0x4c
@@ -305,8 +305,8 @@ extern "C" struct {
     void (DinoUiBattleParentScanner::*State021655a0_34)(); // 0x34
     DinoUiWirelessMatchState StateChildScan; // 0x3c
     void (DinoUiChildScannerCannonConnect::*IgnoreMessage_44)(MMessage *msg); // 0x44
-    u8 unk4C[0x54 - 0x4C];
-    DinoUiWirelessMatchState state_02167b38; // 0x54
+    DinoUiWirelessMatchState StateKeep_4C; // 0x4c
+    DinoUiWirelessMatchState StateChosen_54; // 0x54
     u8 unk5C[0x64 - 0x5C];
     void (DinoUiCannonParentScanner::*StateCheckFailed_64)(); // 0x64
     u8 unk6C[0x7C - 0x6C];
@@ -358,6 +358,11 @@ extern "C" struct {
     void (DinoUiCannonChild::*Child021674f8_54)(); // 0x54
     DinoUiWirelessMatchState StateParentScanned; // 0x5c
     void (DinoUiCannonChild::*Child021674f8_64)(); // 0x64
+    DinoUiWirelessMatchState StateCannonParentScan_6C; // 0x6c
+    DinoUiWirelessMatchState StateBattleParentScan_74; // 0x74
+    DinoUiWirelessMatchState StateCannonChild_7C; // 0x7c (its second word is in the next block)
+    u8 unk84[0x8C - 0x84];
+    DinoUiWirelessMatchState State02167cd0_8C; // 0x8c
 } data_ov004_02174350;
 extern "C" struct {
     u8 unk00[0x4];
@@ -393,7 +398,7 @@ struct DinoUiChildSsid {
 
 void DinoUiWirelessMatch::StateStart() {
     if (MGetResetParameter() == 1) {
-        mState = data_ov004_021740d0.state_02167e3c;
+        mState = data_ov004_021740d0.StateAfterReset;
     } else if (!mUnk98) {
         mState = data_ov004_021740d0.StateInit;
     } else {
@@ -415,7 +420,7 @@ void DinoUiWirelessMatch::StateInit() {
 
 void DinoUiWirelessMatch::StateChildScan() {
     mSerial.AddTail(new DinoUiChildScanner(mMultiPlay, &mChosen, &mChoice));
-    mState = data_ov004_021741d0.state_02167b38;
+    mState = data_ov004_021741d0.StateChosen_54;
 }
 
 void DinoUiWirelessMatch::StateCannonChild() {
@@ -696,6 +701,44 @@ void DinoUiCannonChild::StateWaitStart() {
         mParallel.AddTail(mHub);
         mState = data_ov004_02174350.State02166f10_44;
     }
+}
+
+// Goes on to what the player chose.
+void DinoUiWirelessMatch::StateChosen() {
+    switch (mChosen) {
+    default:
+        mState = data_ov004_02174350.State02167cd0_8C;
+        break;
+    case 0:
+        mState = data_ov004_021741d0.StateKeep_4C;
+        break;
+    case 1:
+        mState = data_ov004_02174350.StateCannonChild_7C;
+        break;
+    case 2:
+        mState = data_ov004_02174350.StateBattleParentScan_74;
+        break;
+    case 3:
+        mState = data_ov004_02174350.StateCannonParentScan_6C;
+        break;
+    }
+}
+
+extern const u32 data_0208ab5c;
+
+// After a reset during wireless play: restores the teams, says the connection was lost and leaves.
+void DinoUiWirelessMatch::StateAfterReset() {
+    DinoSoundLoadScene(1);
+    DinoSoundPlayBgm(0x77, 0);
+    MClearResetParameter();
+    for (u32 i = 0; i < 3; i++) {
+        DinoTeam team;
+        gDinoBackup->GetTeam(i + 1, &team);
+        gDinoBackup->SetTeam(i + 4, &team);
+    }
+    *mResult = 0;
+    AddSerial(this, new DinoCommonWindowMessageBox(MPoint(0x80, 0x60), gDinoResource->GetText(data_0208ab5c), 4),
+              MTaskExitTransfer::Create(this));
 }
 
 // Ends the scan and leaves after half a second.
