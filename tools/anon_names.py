@@ -98,14 +98,15 @@ def main():
     new_symbols = []   # (name, section, value)
     retargets = {}     # reloc file offset -> (symbol index, addend)
     # A static function whose name another file's function also has is named after its address in the game
-    # (ForceStopStrm_02070314): give ours that name when exactly one such function has the same size.
+    # (ForceStopStrm_02070314), and a weak template instance another overlay also has after its overlay
+    # (..._ov002): give ours that name when exactly one such function has the same size.
     func_names = {}
     for name, func in ours.functions().items():
         func_names[name] = name
         if name in target_funcs:
             continue
         found = [t for t, tf in target_funcs.items()
-                 if re.fullmatch(re.escape(name) + r"_[0-9a-f]{8}", t) and tf["size"] == func["size"]]
+                 if re.fullmatch(re.escape(name) + r"_(?:[0-9a-f]{8}|ov\d{3})", t) and tf["size"] == func["size"]]
         if len(found) == 1:
             renames[ours.symbols.index(func)] = func_names[name] = found[0]
     for name, func in ours.functions().items():

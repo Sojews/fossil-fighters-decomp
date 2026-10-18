@@ -1,6 +1,7 @@
-#pragma ipa file
 // DinoUiMedalMenu.
 // Only the destructor is decompiled so far.
+
+#pragma ipa file
 
 // Derived destructors have their bases' destructor bodies inlined; auto-inlining the ones defined above does that.
 #pragma auto_inline on
@@ -229,6 +230,7 @@ void DinoUiMedalMenu::FinishPageLeft() {
 
 
 #pragma auto_inline off
+// Vector instances the game emits in this file (made explicitly until the code that uses them is decompiled).
 template class std::__vec_deleter<u32, std::allocator<u32> >;
 template void std::__vec_deleter<MMotionFile, std::allocator<MMotionFile> >::sub_push_back(const MMotionFile &x, Metrowerks::int2type<false>);
 template void std::__vec_deleter<u32, std::allocator<u32> >::assign<u32 *>(u32 *first, u32 *last, Metrowerks::int2type<true>);

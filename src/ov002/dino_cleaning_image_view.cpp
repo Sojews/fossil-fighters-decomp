@@ -1,5 +1,7 @@
 // DinoCleaningImageView, DinoCleaningNewDust, DinoCleaningLastDust.
 
+#pragma ipa file
+
 #include "types.h"
 #include "game/dino_cleaning_image_view.h"
 #include "game/dino_cleaning_image.h"
@@ -10,6 +12,7 @@
 #include "game/dino_cleaning_new_dust.h"
 #include "game/dino_cleaning_last_dust.h"
 #include "game/dino_cleaning_image_view_scale_anime.h"
+#include "game/dino_cleaning_status.h"
 
 #pragma auto_inline off
 
@@ -27,6 +30,8 @@ DinoCleaningImageView::~DinoCleaningImageView() {
     }
 }
 
+// NONMATCHING (with the file built ipa, as its vector instances need): push_back's tag temporaries swap stack
+// slots.
 void DinoCleaningImageView::AddImage(DinoCleaningImage *image) {
     image->mView = this;
     mImages.push_back(image);
@@ -134,3 +139,8 @@ DinoCleaningLastDust::~DinoCleaningLastDust() {
 
 DinoCleaningImageViewScaleAnime::~DinoCleaningImageViewScaleAnime() {
 }
+
+#pragma auto_inline off
+// Vector instances the game emits in this file (made explicitly until the code that uses them is decompiled).
+template class std::__vec_deleter<DinoCleaningStatusEntry, std::allocator<DinoCleaningStatusEntry> >;
+template class std::__vec_deleter<u32, std::allocator<u32> >;
