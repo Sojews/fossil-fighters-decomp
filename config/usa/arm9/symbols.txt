@@ -7081,6 +7081,12 @@ data_0208aa3c kind:data(any) addr:0x0208aa3c
 data_0208aa44 kind:data(any) addr:0x0208aa44
 data_0208aa48 kind:data(any) addr:0x0208aa48
 data_0208aa4c kind:data(any) addr:0x0208aa4c
+data_0208aa50 kind:data(any) addr:0x0208aa50
+data_0208aa54 kind:data(any) addr:0x0208aa54
+data_0208aa58 kind:data(any) addr:0x0208aa58
+data_0208aa5c kind:data(any) addr:0x0208aa5c
+data_0208aa60 kind:data(any) addr:0x0208aa60
+data_0208aa64 kind:data(any) addr:0x0208aa64
 data_0208aa68 kind:data(any) addr:0x0208aa68
 data_0208aa6c kind:data(any) addr:0x0208aa6c
 data_0208aa70 kind:data(any) addr:0x0208aa70
@@ -10153,6 +10159,7 @@ data_020b020a kind:data(any) addr:0x020b020a
 sCurrentScene kind:data(any) addr:0x020b5764
 sSceneFuncs kind:data(any) addr:0x020b5768
 data_020b5814 kind:data(any) addr:0x020b5814
+data_020b5818 kind:data(any) addr:0x020b5818
 data_020b5820 kind:data(any) addr:0x020b5820
 data_020b5828 kind:data(any) addr:0x020b5828
 data_020b5830 kind:data(any) addr:0x020b5830

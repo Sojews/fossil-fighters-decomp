@@ -64,6 +64,8 @@ public:
     void Refresh();
     void CreateList();
     void HandleResult();
+    void SelectMember(int index);
+    void RemoveMember();
     void ClearList();
     void LinkSlots();
     void RestoreFocus();
@@ -71,10 +73,11 @@ public:
     MSmartOam *mOam;                    // 0xB4
     MMenuItem *mUnkB8;                  // 0xB8
     DinoUiOrganizationMenuItem *mUnkBC; // 0xBC
-    u32 mUnkC0[2];                      // 0xC0
+    MMenuItem *mUnkC0;                  // 0xC0
+    MMenuItem *mUnkC4;                  // 0xC4
     MMenuItem *mTabs[4];                // 0xC8
-    MMenuItem *mTabLinks[3];            // 0xD8: linked down to the current tab
-    u32 mUnkE4[6];                      // 0xE4
+    MMenuItem *mButtons[5];             // 0xD8: the first three are linked down to the current tab
+    u32 mUnkEC[4];                      // 0xEC
     MTextPicture *mTabPicture;          // 0xFC
     MTextPicture *mSortCursor;          // 0x100
     DinoUiPartsReviverMedalButton *mListItems[5]; // 0x104
@@ -91,8 +94,8 @@ public:
     std::vector<void *> mUnk1D0;        // 0x1D0
     std::vector<void *> mUnk1DC;        // 0x1DC
     std::vector<void *> mUnk1E8;        // 0x1E8
-    u32 mPage;                          // 0x1F4
-    u32 mLastPage;                      // 0x1F8
+    int mPage;                          // 0x1F4
+    int mLastPage;                      // 0x1F8
     u8 mTab;                            // 0x1FC
     u8 mSort;                           // 0x1FD
     u8 mFocusTabs;                      // 0x1FE: focus the new tab's item when paging

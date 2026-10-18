@@ -15,6 +15,8 @@ public:
     void PlayNormal();
     void PlayFocused();
     void PlayDecided();
+    // Flies the medal to `to` and lands it there.
+    MTask *CreateFlyInTask(MPoint to);
 
     MMotion *mMotion;   // 0x88
     u8 mKind;           // 0x8C: the medal's first anime is 1 + mKind

@@ -16,7 +16,6 @@ public:
     virtual void Unk08();
     virtual void Idle();
 
-    MTask *CreateFlyInTask(MPoint to);
     void SetCreature(u32 id);
     void SetPosition(MPoint pos);
     void Hide();

@@ -633,12 +633,12 @@ void DinoUiFieldMenuFraction::SetPriority(int priority) {
     mDenominator->SetPriority(priority);
 }
 
-MTask *DinoUiPartsReviverName::CreateFlyInTask(MPoint to) {
+MTask *DinoUiPartsReviverMedalButton::CreateFlyInTask(MPoint to) {
     MSerialTaskSet *tasks = new MSerialTaskSet(TRUE);
     MTask *front = mMotion->CreatePriorityTransfer(2);
     MTask *wait = mMotion->CreateWaitStopTask();
     MTask *landSe = DinoSoundCreatePlaySeTask(0xA2, 0);
-    MTask *land = mMotion->CreatePlayTransfer(mLength + 7, 0);
+    MTask *land = mMotion->CreatePlayTransfer(mKind + 7, 0);
     MTask *fly = mMotion->CreateCoordAnime(mMotion->GetPosition(), to, 30, 0);
     MTask *flySe = DinoSoundCreatePlaySeTask(0xA0, 0);
     tasks->AddTail(mMotion->CreatePriorityTransfer(1));

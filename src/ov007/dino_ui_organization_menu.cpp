@@ -1,5 +1,5 @@
 // DinoUiOrganizationMenu (team organization).
-// Only the destructor is decompiled so far.
+// NONMATCHING: RemoveMember (the search loop); the rest (OnStart, OnFocus, OnDecide, slot creation...) is to do.
 
 // Derived destructors have their bases' destructor bodies inlined; auto-inlining the ones defined above does that.
 #pragma auto_inline on
@@ -236,8 +236,8 @@ void DinoUiOrganizationMenu::SetTab(u8 tab) {
     mTabPicture->Show();
     mTabPicture->SetPriority(3);
     for (int i = 0; i < 3; i++) {
-        RemoveLink(mTabLinks[i], 2);
-        AddLink(mTabLinks[i], 2, mTabs[tab]);
+        RemoveLink(mButtons[i], 2);
+        AddLink(mButtons[i], 2, mTabs[tab]);
     }
     Disable();
     UpdateDetails(0xFF);
@@ -293,25 +293,72 @@ void DinoUiOrganizationMenu::SetSort(u8 sort) {
     }
 }
 
-extern "C" void func_ov007_0217e3d8(DinoUiOrganizationMenu *menu, int index);
-extern "C" void func_ov007_0217c760(DinoUiOrganizationMenu *menu);
-extern const u32 data_0208aa4c;
-extern const MPoint data_020b5814;
+void DinoUiOrganizationMenu::SelectMember(int index) {
+    if (index < 5) {
+        mListItems[index]->Disable();
+        LinkList();
+        for (int i = 0; i < mSlotCount; i++) {
+            u32 id = mCreatures[mPage * 15 + i];
+            if (InTeam(id)) {
+                mSlots[i]->Enable();
+            } else {
+                DinoCreatureState creature;
+                gDinoBackup->GetCreature(id, &creature);
+                mSlots[i]->Enable();
+            }
+        }
+        if (index == 0) {
+            for (int i = 0; i < 4; i++) {
+                RemoveLink(mTabs[i], 2);
+                AddLink(mTabs[i], 2, mListItems[1]);
+            }
+            RemoveLink(mUnkB8, 2);
+            AddLink(mUnkB8, 2, mListItems[1]);
+        }
+    } else {
+        if (mUnkC0 != NULL) {
+            mUnkC0->Disable();
+            mUnkC4->Disable();
+        }
+        for (int i = 0; i < 15; i++) {
+            mSlots[i]->Disable();
+        }
+        for (int i = 0; i < 5; i++) {
+            mButtons[i]->Disable();
+        }
+        for (int i = 0; i < 4; i++) {
+            RemoveLink(mTabs[i], 4);
+            AddLink(mTabs[i], 4, mListItems[0]);
+        }
+        RemoveLink(mUnkB8, 4);
+        AddLink(mUnkB8, 4, mListItems[4]);
+    }
+    mUnkBC->MMenuItem::Disable();
+    RemoveLink(mButtons[3], 2);
+    AddLink(mButtons[3], 2, mUnkB8);
+    RemoveLink(mTabs[3], 1);
+    AddLink(mTabs[3], 1, mUnkB8);
+    RemoveLink(mUnkB8, 3);
+    AddLink(mUnkB8, 3, mTabs[3]);
+}
+
+extern const u32 data_0208aa54;
+extern const MPoint data_020b5818;
 
 void DinoUiOrganizationMenu::HandleResult() {
     if (mResult == 11) {
         mUnk23C = TRUE;
         func_ov007_0217fb94(this, 1);
-        mMessage = new DinoCommonWindowMessage(data_020b5814, gDinoResource->GetText(data_0208aa4c), 4, 0);
+        mMessage = new DinoCommonWindowMessage(data_020b5818, gDinoResource->GetText(data_0208aa54), 4, 0);
         mParallel.AddTail(mMessage);
-        func_ov007_0217e3d8(this, mSelected);
+        SelectMember(mSelected);
         mListItems[mSelected]->PlayDecided();
         if (mSelected < 3) {
             mTeamTech->Hide();
         }
         FocusNearestItem(GetCursor());
     } else if (mResult == 12) {
-        func_ov007_0217c760(this);
+        RemoveMember();
     } else if (mResult == -2) {
         mListItems[mSelected]->PlayFocused();
     }
@@ -433,6 +480,39 @@ void DinoUiOrganizationMenu::PlaceSlots() {
         }
         mSlots[i]->Enable();
     }
+}
+
+// Where a medal flies to when its creature is on an earlier or a later page.
+extern const MPoint data_ov007_0218ecbc;
+extern const MPoint data_ov007_0218ecc4;
+
+// Sends the selected member back to its place in the list.
+// NONMATCHING: the game reloads the list's size each time round the search loop.
+void DinoUiOrganizationMenu::RemoveMember() {
+    u8 id = mTeam.slots[mSelected];
+    int i;
+    for (i = 0; i < mCreatures.size(); i++) {
+        if (id == mCreatures[i]) {
+            break;
+        }
+    }
+    mTeam.slots[mSelected] = 0;
+    if (i / 15 < mPage) {
+        mSerial.AddTail(mListItems[mSelected]->CreateFlyInTask(data_ov007_0218ecbc));
+    } else if (i / 15 > mPage) {
+        mSerial.AddTail(mListItems[mSelected]->CreateFlyInTask(data_ov007_0218ecc4));
+    } else {
+        int index = i % 15;
+        int row = index / 5;
+        int column = index % 5;
+        MPoint pos;
+        pos.x = data_ov007_0218ebec.slotX + data_ov007_0218ebec.slotColumnX * column + data_ov007_0218ebec.slotRowX * row;
+        pos.y = data_ov007_0218ebec.slotY + data_ov007_0218ebec.slotColumnY * column + data_ov007_0218ebec.slotRowY * row;
+        mSerial.AddTail(mListItems[mSelected]->CreateFlyInTask(pos));
+    }
+    mSerial.AddTail(MCreateCallTask(this, &DinoUiOrganizationMenu::Refresh));
+    mUnk230->Clear();
+    Disable();
 }
 
 void DinoUiOrganizationMenu::LinkList() {
