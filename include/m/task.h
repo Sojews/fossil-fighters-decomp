@@ -48,6 +48,8 @@ public:
     void Exit() { mState = STATE_EXIT; }
     void Suspend() { mState = STATE_SUSPEND; }
     void Run() { mState = STATE_RUN; }
+    // A transfer that exits this task.
+    MTask *CreateExitTransfer();
 
     MTask *mNext;           // 0x04: next task in the set
     s32 mState : 8;         // 0x08
@@ -149,6 +151,10 @@ public:
 
     MTask *mTask;   // 0x10
 };
+
+inline MTask *MTask::CreateExitTransfer() {
+    return MTaskExitTransfer::Create(this);
+}
 
 class MTaskSetMakeEmptyTask : public MTransfer {
 public:

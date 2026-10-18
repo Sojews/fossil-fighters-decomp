@@ -19,6 +19,9 @@
 #include "game/dino_ui_parts_reviver_medal_button.h"
 #include "game/common_window_message.h"
 #include "game/dino_common_window_menu_item_flush_task_menu.h"
+#include "game/dino_common_window_message_box.h"
+#include "m/lcd.h"
+#include "m/bright.h"
 
 DinoUiOrganizationMenu::~DinoUiOrganizationMenu() {
     gCurrentDisplay->mBlend->Reset();
@@ -103,7 +106,6 @@ void DinoUiOrganizationMenu::OnIdle() {
 }
 
 extern "C" void func_ov007_0217d548(void *owner);
-extern "C" void func_ov007_0217cf88(void *owner);
 
 void DinoUiOrganizationOKButton::OnDecide() {
     mMotion->Play(4, 1);
@@ -123,7 +125,7 @@ void DinoUiOrganizationBackButton::OnDecide() {
     MSerialTaskSet *serial = &mSerial;
     serial->AddTail(wait);
     serial->AddTail(play);
-    func_ov007_0217cf88(mOwner);
+    mOwner->Back();
     DinoSoundPlaySe(0x90, 0);
 }
 
@@ -674,6 +676,52 @@ void DinoUiOrganizationMenu::Refresh() {
     Enable();
     UpdateTeamTech();
     FocusNearestItem(GetCursor());
+}
+
+extern "C" MTask *func_ov007_0217d1c0(DinoUiOrganizationMenu *menu, DinoTeam *saved);
+extern const u32 data_0208aa38, data_0208aa3c;
+
+// Puts a moving member back, or leaves (saving the team if it changed).
+void DinoUiOrganizationMenu::Back() {
+    MTask *exit, *mainFade, *subFade, *wait;
+    if (mUnk23C == TRUE) {
+        mUnk23C = FALSE;
+        mMessage->Exit();
+        RemoveListLinks();
+        RemoveSlotLinks();
+        LinkList();
+        LinkSlots();
+        MTask *restore = MCreateCallTask(this, &DinoUiOrganizationMenu::RestoreFocus);
+        MTask *wait = MTaskSetWaitEmptyTask::Create(&mUnkB8->mSerial);
+        MSerialTaskSet *serial = &mSerial;
+        serial->AddTail(wait);
+        serial->AddTail(restore);
+        return;
+    }
+    Disable();
+    mMenuBack->Hide();
+    if (mUnk23D) {
+        mSerial.AddTail(new DinoCommonWindowMessageBox(MPoint(0x80, 0x60), gDinoResource->GetText(data_0208aa38), 4));
+    } else {
+        DinoTeam saved;
+        gDinoBackup->GetTeam(mTeamIndex, &saved);
+        if (DinoTeamDiffers(&mTeam, &saved)) {
+            mSerial.AddTail(
+                new DinoCommonWindowMessageBox(MPoint(0x80, 0x60), gDinoResource->GetText(data_0208aa3c), 4));
+            mSerial.AddTail(func_ov007_0217d1c0(this, &saved));
+        }
+    }
+    exit = CreateExitTransfer();
+    wait = mInfo->CreateWaitModelTask();
+    subFade = gLcd->mSub->mBright->CreateFadeOutToBlack(30, 0);
+    mainFade = gLcd->mMain->mBright->CreateFadeOutToBlack(30, 0);
+    MParallelTaskSet *fades = new MParallelTaskSet(TRUE);
+    fades->AddTail(mainFade);
+    fades->AddTail(subFade);
+    MSerialTaskSet *serial = &mSerial;
+    serial->AddTail(fades);
+    serial->AddTail(wait);
+    serial->AddTail(exit);
 }
 
 void DinoUiOrganizationMenu::CreateSlots() {

@@ -74,6 +74,7 @@ public:
     void HandleMemberResult();
     void EnableAll();
     void OpenMemberMenu(int member);
+    void Back();
     void SelectMember(int index);
     void RemoveMember();
     // Where the creature is in the list (the list's size if it isn't there).
@@ -107,7 +108,7 @@ public:
     u32 mUnk194[2];                     // 0x194
     MView *mMenuBack;                   // 0x19C: behind the member menu
     DinoUiFieldMenuFraction *mFraction; // 0x1A0: "page n/m"
-    u32 mUnk1A4;                        // 0x1A4
+    u32 mTeamIndex;                     // 0x1A4: the saved team being edited
     int mResult;                        // 0x1A8
     std::vector<u32> mCreatures;        // 0x1AC: the ids listed, a page of 15 at a time
     std::vector<void *> mUnk1B8;        // 0x1B8
@@ -127,8 +128,8 @@ public:
     MTaskSet *mUnk230;                  // 0x230
     DinoCommonWindowMessage *mMessage;  // 0x234
     int mSelected;                      // 0x238: a team member (0-4) or slot (5-)
-    u8 mUnk23C;                         // 0x23C
-    u8 unk23D;
+    u8 mUnk23C;                         // 0x23C: a member is being moved
+    u8 mUnk23D;                         // 0x23D
     u8 mUnk23E;                         // 0x23E
     u8 unk23F;
     std::vector<MMotionFile> mMotions;  // 0x240
