@@ -92,6 +92,7 @@ public:
     MTask *CreateSetKasekiPointTask(u32 points);
     void SetKasekiPoints(int points);
     MTask *CreateUpdateAllColorTask(u32 color);
+    MTask *CreateUpdateCreaturesTask();
     void AddKasekiPoints(int delta);
     MTask *CreateAddKasekiPointCreatureDie();
     MTask *CreateUpdateAllCreatureTask();

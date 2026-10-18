@@ -996,6 +996,23 @@ MTask *DinoBattleModelPlayer::CreateUpdateAllColorTask(u32 color) {
     return CreateUpdateColorTask(ids, count, color);
 }
 
+// Updates every creature on both sides, then waits until they have all signalled back.
+MTask *DinoBattleModelPlayer::CreateUpdateCreaturesTask() {
+    DinoBattleModelPlayer *players[2];
+    players[0] = this;
+    players[1] = GetOpponent();
+    MParallelTaskSet *set = new MParallelTaskSet(TRUE);
+    int total = players[0]->GetCreatureCount() + players[1]->GetCreatureCount();
+    DinoSignalWait *wait = new DinoSignalWait(0x10030, NULL, NULL, total);
+    set->AddTail(wait);
+    for (u32 side = 0; side < 2; side++) {
+        for (u32 i = 0; i < players[side]->GetCreatureCount(); i++) {
+            set->AddTail(players[side]->GetCreature(i)->CreateUpdateTask(0, (u32)(MMessageObserver *)wait));
+        }
+    }
+    return set;
+}
+
 // Adds to (or takes from) the player's kaseki points.
 void DinoBattleModelPlayer::AddKasekiPoints(int delta) {
     if (delta < 0 && func_ov000_0218472c(1)) {
