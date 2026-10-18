@@ -9,6 +9,8 @@
 
 class DinoCleaningToolMenu : public MMenu {
 public:
+    void FocusFirst();
+    void DisableAll();
     void EnableItem();
     void DisableItem();
     virtual ~DinoCleaningToolMenu();

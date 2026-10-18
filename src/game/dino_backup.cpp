@@ -993,6 +993,7 @@ BOOL DinoBackup::HasUnrevealedUnk98() {
     return FALSE;
 }
 
+#pragma opt_strength_reduction off
 const DinoExcavateLevel *DinoBackup::GetExcavateLevel() {
     MResource<DinoExcavateDefs> defs = gDinoResource->GetExcavateDefs();
     for (s32 i = defs.Get()->levelCount - 1; i >= 0; i--) {
@@ -1005,6 +1006,7 @@ const DinoExcavateLevel *DinoBackup::GetExcavateLevel() {
     }
     return NULL;
 }
+#pragma opt_strength_reduction reset
 
 u32 DinoBackup::GetExcavateLevelUnk0() {
     return GetExcavateLevel()->unk0;
@@ -1021,6 +1023,7 @@ s32 DinoBackup::GetExcavateLevelRemaining() {
     return GetExcavateLevel()->unk8 - mPlayer->unk34_0;
 }
 
+#pragma opt_strength_reduction off
 u32 DinoBackup::GetMaxExcavateLevelUnk0() {
     MResource<DinoExcavateDefs> defs = gDinoResource->GetExcavateDefs();
     u32 max = 0;
@@ -1031,6 +1034,7 @@ u32 DinoBackup::GetMaxExcavateLevelUnk0() {
     }
     return max;
 }
+#pragma opt_strength_reduction reset
 
 void DinoBackup::SetUnk138(u32 index, const DinoBackupEntry28 *entry) {
     mUnk138[index] = *entry;

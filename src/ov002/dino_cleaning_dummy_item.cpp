@@ -89,6 +89,22 @@ MRect DinoCleaningXrayItem::GetFrame() {
 
 #pragma auto_inline off
 
+// Focuses the first tool unless something has the focus.
+void DinoCleaningToolMenu::FocusFirst() {
+    if (GetFocusedItem() == NULL) {
+        FocusItem((MMenuItem *)mUnkB8.front());
+    }
+}
+
+// Disables every tool and takes the focus away.
+void DinoCleaningToolMenu::DisableAll() {
+    for (std::vector<void *>::iterator it = mUnkB8.begin(); it != mUnkB8.end(); ++it) {
+        ((MMenuItem *)*it)->Disable();
+    }
+    Deactivate();
+    FocusItem(NULL);
+}
+
 void DinoCleaningToolMenu::EnableItem() {
     mItemB4->Enable();
 }
