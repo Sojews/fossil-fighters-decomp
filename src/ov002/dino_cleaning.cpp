@@ -211,10 +211,13 @@ void DinoCleaningKasekiRockXrayBlendManager::Idle() {
 
 // The scene's pooled pointer-to-member constants (see menu.cpp).
 extern "C" struct {
-    u8 unk00[0x50];
+    u8 unk00[0x20];
+    void (DinoCleaningKasekiRockXrayBlendManager::*StateDone_20)(); // 0x20
+    u8 unk28[0x48 - 0x28];
+    void (DinoCleaningKasekiRock::*CountCells_48)(); // 0x48
     void (DinoCleaningKasekiRock::*StateDrop_50)(); // 0x50
     u8 unk58[0x68 - 0x58];
-    void (DinoCleaningKasekiRock::*State021601e0_68)(); // 0x68
+    void (DinoCleaningKasekiRock::*StateShake_68)(); // 0x68
 } data_ov002_021657d4;
 extern "C" struct {
     u8 unk00[0x8];
@@ -281,7 +284,34 @@ void DinoCleaningKasekiRock::StateDrop() {
     mView->Move(0, 0);
     mView->SetPriority(2);
     mUnk4B4 = 20;
-    mState = data_ov002_021657d4.State021601e0_68;
+    mState = data_ov002_021657d4.StateShake_68;
+}
+
+extern const u32 data_0208a23c;  // the X-ray fade's length
+
+// Fades the X-ray image out as the timer runs down.
+void DinoCleaningKasekiRockXrayBlendManager::StateFade() {
+    if (!mHidden) {
+        GetDisplay()->mBlend->SetAlpha(mTimer * 16 / data_0208a23c, 16);
+    }
+    mTimer--;
+    if (mTimer <= 0) {
+        mState = data_ov002_021657d4.StateDone_20;
+    }
+}
+
+void DinoCleaningKasekiRockXrayBlendManager::StateDone() {
+}
+
+// Shakes the landed rock, less and less, then counts its cells.
+void DinoCleaningKasekiRock::StateShake() {
+    mUnk4B4--;
+    MFx32 amp = MFx32((int)mUnk4B4) / MFx32(2);
+    SetOffsetAll(MPoint(MFx32ToInt(amp * mRandom->NextFraction() - amp / MFx32(2)),
+                        MFx32ToInt(amp * mRandom->NextFraction() - amp / MFx32(2))));
+    if (mUnk4B4 == 0) {
+        mState = data_ov002_021657d4.CountCells_48;
+    }
 }
 
 DinoCleaning::DinoCleaning(u32 unk9C, void *unkA0, u32 unkA8, u32 unkAC, int mode, u32 unk140)

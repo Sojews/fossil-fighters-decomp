@@ -8,7 +8,13 @@ public:
     virtual ~DinoCleaningKasekiRockXrayBlendManager();
     virtual void Idle();
 
+    void StateFade();
+    void StateDone();
+
     void (DinoCleaningKasekiRockXrayBlendManager::*mState)(); // 0x74
+    u32 mUnk7C;                                                 // 0x7C
+    int mTimer;                                                 // 0x80
+    u8 mHidden;                                                 // 0x84: no blending while it's set
 };
 
 #endif
