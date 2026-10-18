@@ -9,6 +9,8 @@
 #include "m/blend.h"
 #include "m/bg_new_task.h"
 #include "game/dino_backup.h"
+#include "game/dino_resource.h"
+#include "m/seed_generator.h"
 
 DinoUiExchange::~DinoUiExchange() {
     GetDisplay()->mBlend->Reset();
@@ -24,9 +26,26 @@ void DinoUiExchange::OnMessage(MMessage *msg) {
 
 #pragma auto_inline off
 
+void DinoUiExchange::InitProfile(DinoPlayerProfile *profile) {
+    gDinoBackup->InitProfile(profile);
+}
+
 void DinoUiExchange::ShowCount() {
     mOnes->Play(mCount % 10 + 1, 0);
     mTens->Play(mCount / 10 + 1, 0);
+}
+
+// Starts over as parent or child at random, after a random wait.
+void DinoUiExchange::Start() {
+    ClearQueue();
+    mUnkE4 = gDinoResource->GetRandom()->Next(60) + 60;
+    mMode = gDinoResource->GetRandom()->Next(2);
+    mSerial.AddTail(mMultiPlay->CreateResetTask());
+    if (mMode == 1) {
+        mSerial.AddTail(mMultiPlay->CreateStartParentTask(mBeacon, sizeof(mBeacon), 0));
+    } else {
+        mSerial.AddTail(mMultiPlay->CreateStartScanTask());
+    }
 }
 
 // Ends the wireless session (and the scan, unless it is all there is).

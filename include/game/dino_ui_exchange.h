@@ -14,13 +14,17 @@
 #include "m/motion.h"
 #include "m/multi_play.h"
 
+struct DinoPlayerProfile;
+
 class DinoUiExchange : public MProcess, public MMessageObserver {
 public:
     virtual ~DinoUiExchange();
     virtual void Idle();
     virtual void OnMessage(MMessage *msg);
 
+    void InitProfile(DinoPlayerProfile *profile);
     void ShowCount();
+    void Start();
     void Reset();
 
     void (DinoUiExchange::*mState)();               // 0xA8
@@ -31,9 +35,11 @@ public:
     MMotion *mTens;                 // 0xD8
     u32 mCount;                     // 0xDC
     int mMode;                      // 0xE0: 1: only the scan was started
-    u32 mUnkE4;                     // 0xE4
+    u32 mUnkE4;                     // 0xE4: a random 60-119 (frames)
     std::map<u32, void *> mUnkE8;   // 0xE8
-    u8 unkF4[0x4C];
+    u8 unkF4[8];
+    u8 mBeacon[0x18];               // 0xFC: sent when this side is the parent
+    u8 unk114[0x2C];
     MArchivePtr mArchive;           // 0x140
     MArchiveFile mFile;             // 0x144
 };
