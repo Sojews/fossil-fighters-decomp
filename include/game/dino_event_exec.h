@@ -1135,6 +1135,7 @@ public:
 
 class DinoEventExecBattle : public MProcess {
 public:
+    DinoEventExecBattle(u32 unk7C, u32 unk80, u32 battle, u32 unk88, s32 demo);
     virtual ~DinoEventExecBattle();
     virtual void Idle();
 
@@ -1142,6 +1143,8 @@ public:
     u32 mUnk7C[68];
     std::vector<void *> mUnk18C;    // 0x18C
     std::vector<void *> mUnk198;    // 0x198
+    u32 mUnk1A4;                    // 0x1A4
+    s32 mDemo;                      // 0x1A8: which demo battle, or -1
 };
 
 class DinoEventExecStartPatrol : public MTransfer {

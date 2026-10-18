@@ -3,6 +3,9 @@
 
 #include "m/task.h"
 
+class MMultiPlay;
+class MMultiPlayLinkIcon;
+
 // The game's top level: the title screen, then the game or one of the debug menus' samples.
 class DinoMainLoop : public MProcess {
 public:
@@ -55,13 +58,13 @@ public:
     void StateHelpSample();
 
     void (DinoMainLoop::*mState)(); // 0x74
-    u32 mUnk7C;                     // 0x7C
-    u32 mUnk80;                     // 0x80
+    int mMenuChoice;                // 0x7C: what was chosen on a debug menu
+    int mHelpChoice;                // 0x80: the help sample menu's choice
     u32 mUnk84;                     // 0x84
     u32 mSlot;                      // 0x88: the save slot
-    u32 mUnk8C;                     // 0x8C
-    u32 mUnk90;                     // 0x90
-    u32 mUnk94;                     // 0x94
+    MMultiPlay *mMultiPlay;         // 0x8C
+    MMultiPlayLinkIcon *mLinkIcon;  // 0x90
+    u8 mConnected;                  // 0x94
     s32 mTitleResult;               // 0x98: what was chosen on the title screen
     u32 mUnk9C;                     // 0x9C
     s32 mUnkA0;                     // 0xA0

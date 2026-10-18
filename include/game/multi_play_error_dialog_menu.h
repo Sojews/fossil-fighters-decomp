@@ -10,13 +10,17 @@
 #include "game/help.h"
 #include "game/dino_field_camera_hook.h"
 
+class MMultiPlay;
+
 class DinoMpGame : public MProcess {
 public:
+    DinoMpGame(MMultiPlay *multiPlay);
     virtual ~DinoMpGame();
     virtual void Idle();
 
     void (DinoMpGame::*mState)(); // 0x74
-    u32 mUnk7C[3];
+    MMultiPlay *mMultiPlay;     // 0x7C
+    u32 mUnk80[2];
     DinoHelpDisabler mDisabler; // 0x88
 };
 

@@ -12,6 +12,21 @@ struct DinoBattleSide {
     u8 unk0C[0x80];
 };
 
+// What a battle is set up with.
+struct DinoBattleParams {
+    u32 unk00;                  // 0x00
+    u32 unk04;                  // 0x04
+    u32 unk08;                  // 0x08
+    u32 unk0C;                  // 0x0C
+    u32 unk10;                  // 0x10
+    u32 unk14;                  // 0x14
+    u32 unk18;                  // 0x18
+    u8 unk1C;                   // 0x1C
+    u32 unk20[4];               // 0x20
+    DinoBattleSide sides[2];    // 0x30
+    u32 unk148[8];              // 0x148
+};
+
 class DinoBattle : public MProcess {
 public:
     virtual ~DinoBattle();
@@ -48,6 +63,7 @@ public:
 
 class DinoBattleDebugSelect : public MProcess {
 public:
+    DinoBattleDebugSelect(const DinoBattleParams &params, u8 *result);
     virtual ~DinoBattleDebugSelect();
     virtual void Idle();
 

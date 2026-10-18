@@ -49,7 +49,7 @@ _ZNSt20__vec_deleter_helperI18DinoBattleCpuEntryRSaIS0_EED1Ev kind:function(thum
 _ZNSt13__vec_deleterI18DinoBattleCpuEntryRSaIS0_EE8allocateEmN10Metrowerks8int2typeILi1EEE kind:function(thumb,size=0x34) addr:0x021599bc
 _ZNSt13__vec_deleterI18DinoBattleCpuEntryRSaIS0_EED2Ev kind:function(thumb,size=0x26) addr:0x021599f0
 _ZThn116_N23DinoBattleCpuController9OnMessageEP8MMessage kind:function(thumb,size=0x1c) addr:0x02159a18
-func_ov000_02159a34 kind:function(thumb,size=0x500) addr:0x02159a34
+_ZN21DinoBattleDebugSelectC1ERK16DinoBattleParamsPh kind:function(thumb,size=0x500) addr:0x02159a34
 _ZN21DinoBattleDebugSelect4IdleEv kind:function(thumb,size=0x22) addr:0x02159f34
 func_ov000_02159f58 kind:function(thumb,size=0xa8) addr:0x02159f58
 func_ov000_0215a000 kind:function(thumb,size=0x5c) addr:0x0215a000
@@ -1146,7 +1146,7 @@ func_ov000_02183520 kind:function(thumb,size=0x50) addr:0x02183520
 _ZN17PlayerLevelSelect4IdleEv kind:function(thumb,size=0x20) addr:0x02183570
 func_ov000_02183590 kind:function(thumb,size=0x540) addr:0x02183590
 func_ov000_02183ad0 kind:function(thumb,size=0x3f4) addr:0x02183ad0
-func_ov000_02183ec4 kind:function(thumb,size=0x6a4) addr:0x02183ec4
+_ZN15DebugAutoBattleC1Ev kind:function(thumb,size=0x6a4) addr:0x02183ec4
 _ZN9MResourceI20DinoBattleSelectDataEC1ESs kind:function(thumb,size=0xae) addr:0x02184568
 _ZN15DebugAutoBattleD1Ev kind:function(thumb,size=0x3c) addr:0x02184618
 _ZN15DebugAutoBattleD0Ev kind:function(thumb,size=0x40) addr:0x02184654

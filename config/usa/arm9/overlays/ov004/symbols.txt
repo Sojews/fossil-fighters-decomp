@@ -50,7 +50,7 @@ _ZN13DinoUiTopMenu15OnSingleDecidedEv kind:function(thumb,size=0x54) addr:0x0215
 _ZN13DinoUiTopMenu14OnMultiDecidedEv kind:function(thumb,size=0x54) addr:0x02157c24
 _ZN13DinoUiTopMenu13OnPassDecidedEv kind:function(thumb,size=0x54) addr:0x02157c78
 _ZN13DinoUiTopMenu15OnOptionDecidedEv kind:function(thumb,size=0x54) addr:0x02157ccc
-func_ov004_02157d20 kind:function(thumb,size=0x28) addr:0x02157d20
+_ZN17DinoUiTopMenuLoopC1Em kind:function(thumb,size=0x28) addr:0x02157d20
 _ZN17DinoUiTopMenuLoop4IdleEv kind:function(thumb,size=0x20) addr:0x02157d48
 func_ov004_02157d68 kind:function(thumb,size=0x54) addr:0x02157d68
 func_ov004_02157dbc kind:function(thumb,size=0x38) addr:0x02157dbc
@@ -221,7 +221,7 @@ _Z17MCreateBgCallTaskI13DinoUiOpeningEP5MTaskPT_MS3_FvvEi kind:function(thumb,si
 func_ov004_0215cc98 kind:function(thumb,size=0x864) addr:0x0215cc98
 .L_0215d4e8 kind:label(thumb) addr:0x0215d4e8
 func_ov004_0215d4fc kind:function(thumb,size=0x94) addr:0x0215d4fc
-func_ov004_0215d590 kind:function(thumb,size=0x28) addr:0x0215d590
+_ZN11DinoUiTitleC1EPl kind:function(thumb,size=0x28) addr:0x0215d590
 _ZN11DinoUiTitle4IdleEv kind:function(thumb,size=0x20) addr:0x0215d5b8
 func_ov004_0215d5d8 kind:function(thumb,size=0xdc) addr:0x0215d5d8
 func_ov004_0215d6b4 kind:function(thumb,size=0x164) addr:0x0215d6b4
@@ -617,7 +617,7 @@ _ZN20DinoUiSaveOptionMenu10AppendItemEh kind:function(thumb,size=0x1e4) addr:0x0
 func_ov004_02169108 kind:function(thumb,size=0xc4) addr:0x02169108
 _ZN20DinoUiSaveOptionMenu10RemoveItemEv kind:function(thumb,size=0x7c) addr:0x021691cc
 _ZN24DinoUiSaveOptionMenuItemD0Ev kind:function(thumb,size=0x24) addr:0x02169248
-func_ov004_0216926c kind:function(thumb,size=0x1c) addr:0x0216926c
+_ZN16DinoUiSaveOptionC1Em kind:function(thumb,size=0x1c) addr:0x0216926c
 _ZN16DinoUiSaveOption4IdleEv kind:function(thumb,size=0x84) addr:0x02169288
 _ZN28DinoUiSaveOptionMenuSaveTask4IdleEv kind:function(thumb,size=0x94) addr:0x0216930c
 _ZN30DinoUiSaveOptionRemoveItemTask7ExecuteEv kind:function(thumb,size=0x18) addr:0x021693a0

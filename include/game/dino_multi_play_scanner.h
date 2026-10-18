@@ -15,6 +15,7 @@
 
 class DinoMultiPlayScanner : public DinoHelpBase, public MMenu, public MMessageObserver {
 public:
+    DinoMultiPlayScanner(MMultiPlay *multiPlay, u8 *result);
     virtual ~DinoMultiPlayScanner();
     virtual void OnStart();
     virtual void OnDecide(MMenuItem *item);

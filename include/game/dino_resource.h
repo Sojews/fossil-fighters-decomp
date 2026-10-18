@@ -129,6 +129,15 @@ struct DinoExcavateLevel {
     u8 unk14[0x2C - 0x14];
 };
 
+// The battles the title screen's demo picks from, by how far the save has got: lists of battle ids.
+struct DinoDemoBattles {
+    u32 count;          // 0x00
+    u32 offset;         // 0x04
+    u32 lateCount;      // 0x08: with flag1a in the save
+    u32 lateOffset;     // 0x0C
+    u32 midCount;       // 0x10: with flag1b in the save
+    u32 midOffset;      // 0x14
+};
 struct DinoExcavateDefs {
     u8 unk00[0x68];
     u32 levelCount;     // 0x68
@@ -137,7 +146,9 @@ struct DinoExcavateDefs {
     u32 offset78;       // 0x78
     u32 offset7C;       // 0x7C
     u32 offset80;       // 0x80
-    u8 unk84[0x38];
+    u32 soundOffset;    // 0x84: the u8 passed to DinoSoundInit
+    u8 unk88[0xB8 - 0x88];
+    u32 demoOffset;     // 0xB8: DinoDemoBattles
     u32 rangeCount;     // 0xBC
     u32 rangeOffset;    // 0xC0: DinoExcavateRange entries
 };
