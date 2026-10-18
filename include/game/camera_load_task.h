@@ -11,6 +11,7 @@
 #include "game/dino_field_camera_hook.h"
 
 class Dino3DLoadCsv;
+class DinoBattleView3DCamera;
 
 class CameraLoadTask : public MTask {
 public:
@@ -18,8 +19,8 @@ public:
     virtual void Execute();
 
     char mName[0x40];   // 0x10
-    u32 mUnk50;         // 0x50
-    u32 mUnk54;         // 0x54
+    DinoBattleView3DCamera *mCamera;    // 0x50
+    int mLight;         // 0x54
 };
 
 class NextCameraTask : public MTask {
@@ -27,8 +28,8 @@ public:
     virtual ~NextCameraTask();
     virtual void Execute();
 
-    u32 mUnk10;         // 0x10
-    u32 mUnk14;         // 0x14
+    DinoBattleView3DCamera *mCamera;    // 0x10
+    int mLight;         // 0x14
 };
 
 class ChangeSetTask : public MTask {

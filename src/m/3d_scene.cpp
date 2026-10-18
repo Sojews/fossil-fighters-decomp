@@ -25,7 +25,7 @@ void M3DScene::SetCameraUp(const VecFx32 *up) {
     mDirty = TRUE;
 }
 
-void M3DScene::SetUnk7C(u8 value) {
+void M3DScene::SetUnk7C(BOOL value) {
     mUnk7C = value;
 }
 

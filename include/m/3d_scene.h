@@ -19,7 +19,7 @@ public:
     void SetCameraPos(const VecFx32 *pos);
     void SetCameraTarget(const VecFx32 *target);
     void SetCameraUp(const VecFx32 *up);
-    void SetUnk7C(u8 value);
+    void SetUnk7C(BOOL value);
     void QueueE8(const void *src, u32 size);
     u32 AllocTex(const void *src, u32 size);
     u32 AllocPltt(const void *src, u32 size);

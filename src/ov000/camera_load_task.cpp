@@ -6,10 +6,10 @@
 
 #include "game/camera_load_task.h"
 #include "game/dino_3d_load_csv.h"
+#include "m/3d_scene.h"
+#include "m/file.h"
 #include "types.h"
 #include "game/dino_battle_view_3d_camera.h"
-
-extern "C" void func_ov000_0218a970(void *, u32);
 
 extern "C" void func_ov000_0218a8ac(void *, u32, u32, u32);
 
@@ -38,14 +38,12 @@ void ChangeSetTask::Execute() {
 }
 
 void NextCameraTask::Execute() {
-    func_ov000_0218a970((void *)mUnk10, mUnk14);
+    mCamera->SetLight(mLight);
     Exit();
 }
 
-extern "C" void func_ov000_0218a998(u32 arg0, char *name, u32 arg2);
-
 void CameraLoadTask::Execute() {
-    func_ov000_0218a998(mUnk50, mName, mUnk54);
+    mCamera->Load(mName, mLight);
     Exit();
 }
 
@@ -66,4 +64,35 @@ void CameraSetDefParentTask::Execute() {
     camera->mParent = mParent;
     camera->mUnk7C->SetParent(camera->mParent);
     Exit();
+}
+
+void DinoBattleView3DCamera::Reset() {
+    mLoaded = FALSE;
+    mUnkA1 = 0;
+    mUnkA2 = 1;
+    mUnk8C = 0;
+    mUnk90 = 0;
+    mUnk94 = -1;
+    mCamera->Push18();
+}
+
+void DinoBattleView3DCamera::SetLight(int light) {
+    mLoaded = FALSE;
+    if (light >= 0) {
+        mScene->SetUnk7C(light != 0 ? TRUE : FALSE);
+    }
+    mCamera->Push18();
+}
+
+void DinoBattleView3DCamera::Load(const char *path, int light) {
+    if (MFileExists(path)) {
+        mLoaded = TRUE;
+        if (light >= 0) {
+            mScene->SetUnk7C(light != 0 ? TRUE : FALSE);
+        }
+        mCamera->Load(path, 0);
+    }
+    mUnkA1 = 0;
+    mUnkA2 = 1;
+    mCamera->Push17();
 }
