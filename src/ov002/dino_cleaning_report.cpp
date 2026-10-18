@@ -43,3 +43,9 @@ void DinoCleaningReport::State0215670c() {
                 gDinoResource->GetText(data_0208ad28), gDinoResource->GetText(data_0208ad24));
     mState = data_ov002_02163e60.State02156808_34;
 }
+
+// Ends the report with the answer.
+void DinoCleaningReport::State02156808() {
+    ((u32 *)((DinoCleaning *)mUnk7C)->mUnkA0)[4] = mAnswer == 1 ? 3 : 4;
+    Exit();
+}
