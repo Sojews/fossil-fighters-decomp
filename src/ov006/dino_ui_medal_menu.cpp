@@ -160,6 +160,11 @@ void DinoUiMedalMenu::PageLeft() {
     Disable();
 }
 
+DinoUiMedalSlotCreateTask::DinoUiMedalSlotCreateTask(DinoUiMedalMenu *menu) : MProcess(NULL) {
+    mMenu = menu;
+    mIndex = 0;
+}
+
 void DinoUiMedalMenu::ClearSlots() {
     for (int i = 0; i < 15; i++) {
         RemoveItem(mSlots[i]);

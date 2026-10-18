@@ -108,6 +108,7 @@ public:
 
 class DinoUiMedalSlotCreateTask : public MProcess {
 public:
+    DinoUiMedalSlotCreateTask(DinoUiMedalMenu *menu);
     virtual ~DinoUiMedalSlotCreateTask();
     virtual void Idle();
 
