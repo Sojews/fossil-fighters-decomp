@@ -37,7 +37,7 @@ template MTask *MCreateCallTask(DinoBattleViewCreatureInfo *obj, void (DinoBattl
 
 DinoBattleViewUiDefenderMenu::~DinoBattleViewUiDefenderMenu() {
     for (int i = 0; i < mCount; i++) {
-        DinoBattleViewCreature *creature = ((DinoBattleView *)mUnkEC)->FindCreatureByAC(unk18C[i]);
+        DinoBattleViewCreature *creature = ((DinoBattleView *)mUnkEC)->FindCreatureByAC(mIds[i]);
         if (((DinoBattleView *)mUnkEC)->GetUnkE4(mUnkB0)->GetUnkAC() == creature->GetUnkB0()) {
             creature->ClearFlag144(4);
         } else {
@@ -127,6 +127,18 @@ void DinoBattleViewUiDefenderMenu::OnFocus(MMenuItem *item) {
     DinoSoundPlaySe(0x5F, 0);
 }
 
+#pragma auto_inline off
+// NONMATCHING: the game reloads mCount every time round the loop.
+BOOL DinoBattleViewUiDefenderMenu::CanDefend(u32 id) {
+    for (int i = 0; i < mCount; i++) {
+        if (id == mIds[i]) {
+            return TRUE;
+        }
+    }
+    return FALSE;
+}
+#pragma auto_inline reset
+
 extern const u32 data_ov000_0218fd00[]; // tutorial steps by creature slot
 
 void DinoBattleViewUiDefenderMenu::OnDecide(MMenuItem *item) {
@@ -153,7 +165,7 @@ void DinoBattleViewUiDefenderMenu::OnDecide(MMenuItem *item) {
                 }
                 DinoHelpBase::Disable();
                 DinoSoundPlaySe(0x61, 0);
-                ClearMarks();
+                ResetRows();
                 DinoHelpBase::Disable();
                 MTask *exit = MTaskExitTransfer::Create(this);
                 MTask *post = mTarget->CreatePostTask(new DinoBattleViewUiDefenderMenuResult(creature->GetUnkAC(), FALSE));
@@ -177,7 +189,7 @@ void DinoBattleViewUiDefenderMenu::OnDecide(MMenuItem *item) {
         if (!blocked) {
             DinoHelpBase::Disable();
             DinoSoundPlaySe(0x63, 0);
-            ClearMarks();
+            ResetRows();
             DinoHelpBase::Disable();
             MTask *exit = MTaskExitTransfer::Create(this);
             MTask *post = mTarget->CreatePostTask(new DinoBattleViewUiDefenderMenuResult(0, TRUE));

@@ -18,10 +18,10 @@ public:
     virtual void OnFocus(MMenuItem *item);
     virtual void OnDecide(MMenuItem *item);
     BOOL CanDefend(u32 id);
-    void ClearMarks();
+    void ResetRows();   // (animates the two chosen rows' items back)
 
     u32 unk188;
-    u32 unk18C[3];  // 0x18C: creature ids
+    u32 mIds[3];    // 0x18C: the creatures that can defend
     int mCount;     // 0x198
 };
 
