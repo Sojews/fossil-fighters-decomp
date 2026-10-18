@@ -106,6 +106,28 @@ BOOL DinoBattleCpuController::HasCostlyAttackUnk14(DinoBattleModelPlayer *player
     return FALSE;
 }
 
+// Whether the player's leader (creature 0) has the status bit.
+BOOL DinoBattleCpuController::LeaderHasStatus(DinoBattleModelPlayer *player, u32 bit) {
+    DinoBattleModelCreature *creature = player->FindCreature(0);
+    if (creature != NULL && (creature->GetStatus()->flags & (1 << bit))) {
+        return TRUE;
+    }
+    return FALSE;
+}
+
+// Whether either of the player's support creatures (1 and 2) has the status bit.
+BOOL DinoBattleCpuController::SupportHasStatus(DinoBattleModelPlayer *player, u32 bit) {
+    DinoBattleModelCreature *creature = player->FindCreature(1);
+    if (creature != NULL && (creature->GetStatus()->flags & (1 << bit))) {
+        return TRUE;
+    }
+    creature = player->FindCreature(2);
+    if (creature != NULL && (creature->GetStatus()->flags & (1 << bit))) {
+        return TRUE;
+    }
+    return FALSE;
+}
+
 // The list's vector members the game emits in this file.
 #pragma auto_inline off
 template class std::__vec_deleter<DinoBattleCpuEntry, std::allocator<DinoBattleCpuEntry> >;

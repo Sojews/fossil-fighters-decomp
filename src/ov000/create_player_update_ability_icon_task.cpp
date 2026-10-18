@@ -452,7 +452,7 @@ DinoBattleCreatureDef *DinoBattleModelCreature::GetDef() {
     return mDef;
 }
 
-void *DinoBattleModelCreature::GetUnk12C() {
+DinoBattleCreatureStatus *DinoBattleModelCreature::GetStatus() {
     return &mStatus;
 }
 

@@ -208,7 +208,7 @@ public:
     u8 GetDefUnk20(BOOL second);
     u8 GetDefUnk61();
     DinoBattleCreatureDef *GetDef();
-    void *GetUnk12C();
+    DinoBattleCreatureStatus *GetStatus();
     u8 GetDefTable(int index);
     u32 GetUnk108();
     void SetUnk108(u32 value);

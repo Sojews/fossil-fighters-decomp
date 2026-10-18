@@ -41,6 +41,8 @@ public:
     virtual ~DinoBattleCpuController();
     virtual void OnMessage(MMessage *msg);
 
+    BOOL LeaderHasStatus(DinoBattleModelPlayer *player, u32 bit);
+    BOOL SupportHasStatus(DinoBattleModelPlayer *player, u32 bit);
     BOOL CanUseAttack(DinoBattleModelPlayer *player, DinoBattleModelCreature *creature, u32 index);
     BOOL HasAttackUnk10(DinoBattleModelCreature *creature, u8 value);
     BOOL HasCostlyAttackUnk10(DinoBattleModelPlayer *player, DinoBattleModelCreature *creature, u8 value);
