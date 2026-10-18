@@ -296,12 +296,13 @@ extern "C" struct {
     u8 unk2C[0x34 - 0x2C];
     void (DinoUiBattleParentScanner::*State021655a0_34)(); // 0x34
     DinoUiWirelessMatchState StateChildScan; // 0x3c
-    u8 unk40[0x50 - 0x40];
-    DinoUiWirelessMatchState state_02167b38; // 0x50
-    u8 unk54[0x5C - 0x54];
-    void (DinoUiCannonParentScanner::*StateCheckFailed_64)(); // 0x5c
-    u8 unk64[0x74 - 0x64];
-    void (DinoUiCannonParentScanner::*ParentStart_7C)(); // 0x74
+    void (DinoUiChildScannerCannonConnect::*IgnoreMessage_44)(MMessage *msg); // 0x44
+    u8 unk4C[0x54 - 0x4C];
+    DinoUiWirelessMatchState state_02167b38; // 0x54
+    u8 unk5C[0x64 - 0x5C];
+    void (DinoUiCannonParentScanner::*StateCheckFailed_64)(); // 0x64
+    u8 unk6C[0x7C - 0x6C];
+    void (DinoUiCannonParentScanner::*ParentStart_7C)(); // 0x7c
 } data_ov004_021741d0;
 extern "C" struct {
     u8 unk00[0xc];
@@ -318,11 +319,17 @@ extern "C" struct {
 extern "C" struct {
     u8 unk00[0xC];
     void (DinoUiBattleParentScanner::*StateShowCancel_0C)(); // 0x0c
-    u8 unk14[0x54 - 0x14];
+    u8 unk14[0x44 - 0x14];
+    void (DinoUiChildScannerCannonConnect::*CannonStart_44)(); // 0x44
+    u8 unk4C[0x54 - 0x4C];
     DinoUiWirelessMatchState StateChildScan;    // 0x54
+    u8 unk5C[0x6C - 0x5C];
+    void (DinoUiChildScannerBattleConnect::*BattleStart_6C)(); // 0x6c
 } data_ov004_021742d0;
 extern "C" struct {
-    u8 unk00[0x2c];
+    u8 unk00[0x4];
+    void (DinoUiChildScannerBattleConnect::*IgnoreMessage_04)(MMessage *msg); // 0x04
+    u8 unk0C[0x2c - 0xC];
     DinoUiWirelessMatchState StateKeep; // 0x2c
     u8 unk34[0x5C - 0x34];
     DinoUiWirelessMatchState StateParentScanned; // 0x5c
@@ -533,6 +540,82 @@ void DinoUiChildScanner::OnIdle() {
 }
 
 #pragma auto_inline on
+
+// Ends the scan and leaves after half a second.
+void DinoUiChildScanner::Leave() {
+    MTask *exit = MTaskExitTransfer::Create(this);
+    MTask *endScan = mMultiPlay->CreateEndScanTask();
+    MSerialTaskSet *ending = new MSerialTaskSet(TRUE);
+    ending->AddTail(endScan);
+    MTask *timer = new MTimer(30);
+    MParallelTaskSet *leaving = new MParallelTaskSet(TRUE);
+    leaving->AddTail(timer);
+    leaving->AddTail(ending);
+    MSerialTaskSet *serial = &mSerial;
+    serial->AddTail(leaving);
+    serial->AddTail(exit);
+}
+
+// (The game calls the connections' constructors defined below.)
+#pragma dont_inline on
+void DinoUiChildScanner::OnDecide(MMenuItem *item) {
+    if (item == mCancelItem) {
+        DinoSoundPlaySe(0x38F, 0);
+        *mChosen = 4;
+        Leave();
+        return;
+    }
+    if (item == mStartBattleItem) {
+        DinoSoundPlaySe(0x390, 0);
+        *mChosen = 2;
+        Leave();
+        return;
+    }
+    if (item == mStartCannonItem) {
+        DinoSoundPlaySe(0x390, 0);
+        *mChosen = 3;
+        Leave();
+        return;
+    }
+    DinoUiChildScannerParentItem *parent = dynamic_cast<DinoUiChildScannerParentItem *>(item);
+    if (parent) {
+        if (parent->mMode == 1) {
+            DinoSoundPlaySe(0x390, 0);
+            mSerial.AddTail(new DinoUiChildScannerBattleConnect(this, mMultiPlay, parent));
+        } else if (parent->mMode == 2) {
+            DinoSoundPlaySe(0x390, 0);
+            mSerial.AddTail(new DinoUiChildScannerCannonConnect(this, mMultiPlay, parent));
+        } else {
+            DinoSoundPlaySe(0xA4, 0);
+        }
+    } else {
+        DinoSoundPlaySe(0x390, 0);
+    }
+}
+
+#pragma dont_inline reset
+
+void DinoUiChildScannerBattleConnect::IgnoreMessage(MMessage *msg) {
+}
+
+DinoUiChildScannerBattleConnect::DinoUiChildScannerBattleConnect(DinoUiChildScanner *scanner, MMultiPlay *multiPlay,
+                                                                 DinoUiChildScannerParentItem *parent)
+    : MProcess(NULL), mScanner(scanner), mMultiPlay(multiPlay), mParent(parent), mUnkD0(parent->mUnk8C),
+      mPos(parent->mPos.x, parent->mPos.y), mText(parent->GetName()) {
+    mState = data_ov004_021742d0.BattleStart_6C;
+    mOnMessage = data_ov004_02174350.IgnoreMessage_04;
+}
+
+void DinoUiChildScannerCannonConnect::IgnoreMessage(MMessage *msg) {
+}
+
+DinoUiChildScannerCannonConnect::DinoUiChildScannerCannonConnect(DinoUiChildScanner *scanner, MMultiPlay *multiPlay,
+                                                                 DinoUiChildScannerParentItem *parent)
+    : MProcess(NULL), mScanner(scanner), mMultiPlay(multiPlay), mParent(parent), mUnkD0(parent->mUnk8C),
+      mPos(parent->mPos.x, parent->mPos.y), mText(parent->GetName()) {
+    mState = data_ov004_021742d0.CannonStart_44;
+    mOnMessage = data_ov004_021741d0.IgnoreMessage_44;
+}
 
 void DinoUiChildScanner::OnFocus(MMenuItem *item) {
     if (mSilentFocus) {

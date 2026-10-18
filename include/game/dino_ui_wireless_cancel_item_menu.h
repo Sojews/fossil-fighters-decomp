@@ -63,6 +63,7 @@ public:
     void ExitWithReset();
     void Cancel();
     void Choose(u32 choice);
+    void Leave();
 
     MMultiPlay *mMultiPlay;     // 0xE8
     u32 *mChosen;               // 0xEC: set when a partner was chosen
@@ -70,17 +71,23 @@ public:
     u8 mSilentFocus;            // 0xF4
     u8 unkF5[7];
     DinoUiChildScannerParentItem *mParents[9]; // 0xFC: the consoles found
-    u32 unk120[3];
+    MMenuItem *mStartBattleItem;    // 0x120
+    MMenuItem *mStartCannonItem;    // 0x124
+    MMenuItem *mCancelItem;         // 0x128
     DinoHelpItem *mParentHelp;  // 0x12C: help shown for every parent item
     void Rescan();
 };
 
 class DinoUiChildScannerBattleConnect : public MProcess, public MMessageObserver, public DinoHelpBase {
 public:
+    DinoUiChildScannerBattleConnect(DinoUiChildScanner *scanner, MMultiPlay *multiPlay,
+                                    DinoUiChildScannerParentItem *parent);
     virtual ~DinoUiChildScannerBattleConnect();
     virtual void Idle();
     virtual void OnMessage(MMessage *msg);
 
+    void IgnoreMessage(MMessage *msg);
+    void StateStart();
     void StateCancel();
     void StateRescan();
 
@@ -88,21 +95,34 @@ public:
     void (DinoUiChildScannerBattleConnect::*mOnMessage)(MMessage *msg); // 0xBC
     DinoUiChildScanner *mScanner;   // 0xC4
     MMultiPlay *mMultiPlay;         // 0xC8
-    u32 mUnkCC[4];
+    DinoUiChildScannerParentItem *mParent; // 0xCC: the console to connect to
+    u32 mUnkD0;                     // 0xD0: its mUnk8C
+    MPoint mPos;                    // 0xD4: its place
     std::string mText;  // 0xDC
     MTaskSet *mUnkE8;   // 0xE8
+    u32 unkEC;
 };
 
 class DinoUiChildScannerCannonConnect : public MProcess, public MMessageObserver, public DinoHelpBase {
 public:
+    DinoUiChildScannerCannonConnect(DinoUiChildScanner *scanner, MMultiPlay *multiPlay,
+                                    DinoUiChildScannerParentItem *parent);
     virtual ~DinoUiChildScannerCannonConnect();
     virtual void Idle();
     virtual void OnMessage(MMessage *msg);
 
+    void IgnoreMessage(MMessage *msg);
+    void StateStart();
+
     void (DinoUiChildScannerCannonConnect::*mState)(); // 0xB4
     void (DinoUiChildScannerCannonConnect::*mOnMessage)(MMessage *msg); // 0xBC
-    u32 mUnkC4[6];
+    DinoUiChildScanner *mScanner;   // 0xC4
+    MMultiPlay *mMultiPlay;         // 0xC8
+    DinoUiChildScannerParentItem *mParent; // 0xCC: the console to connect to
+    u32 mUnkD0;                     // 0xD0: its mUnk8C
+    MPoint mPos;                    // 0xD4: its place
     std::string mText;  // 0xDC
+    u32 unkE8[2];
 };
 
 class DinoUiBattleParentScanner : public MProcess, public MMessageObserver {
