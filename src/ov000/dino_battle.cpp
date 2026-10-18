@@ -18,6 +18,18 @@ void DinoBattleAutoDemo::Idle() {
     (this->*mState)();
 }
 
+void DinoBattle::SetUnk1DC(u8 value) {
+    if (mUnk1DC) {
+        *mUnk1DC = value;
+    }
+}
+
+void DinoBattle::SetUnk1E0(u8 value) {
+    if (mUnk1E0) {
+        *mUnk1E0 = value;
+    }
+}
+
 u32 DinoBattle::GetUnk1F4(int i) {
     return mUnk1F4[i];
 }

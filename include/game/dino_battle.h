@@ -20,10 +20,15 @@ public:
     u32 GetUnk1F4(int i);
     u32 GetUnk1FC();
     MMessageObserver *GetUnk200();
+    void SetUnk1DC(u8 value);
+    void SetUnk1E0(u8 value);
 
     u32 mUnk74[12];             // 0x74
     DinoBattleSide mSides[2];   // 0xA4
-    u32 mUnk1BC[12];            // 0x1BC
+    u32 mUnk1BC[8];             // 0x1BC
+    u8 *mUnk1DC;                // 0x1DC: set when the battle ends (if given)
+    u8 *mUnk1E0;                // 0x1E0
+    u32 mUnk1E4[2];             // 0x1E4
     void (DinoBattle::*mState)();   // 0x1EC
     u32 mUnk1F4[2];             // 0x1F4
     u32 mUnk1FC;                // 0x1FC
