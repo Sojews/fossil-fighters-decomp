@@ -5,6 +5,13 @@
 #include "game/dino_talk_window_wait_start_task.h"
 #include "game/dino_talk_window.h"
 #include "m/console.h"
+#include "game/dino_resource.h"
+
+// The text settings in the resource table.
+struct DinoTalkSettings {
+    u8 unk00[0x10];
+    MFx32 mRate;    // 0x10: characters per frame
+};
 
 DinoTalkConsoleFilter::~DinoTalkConsoleFilter() {
 }
@@ -48,6 +55,11 @@ void DinoTalkWindow::SetRate(MFx32 rate) {
 
 void DinoTalkWindow::Print(const std::string &text) {
     mConsole->Print(std::string(text));
+}
+
+void DinoTalkWindow::ResetRate() {
+    MFx32 rate = ((const DinoTalkSettings *) gDinoResource->GetExcavate7C())->mRate;
+    mConsole->SetRate(rate);
 }
 
 BOOL DinoTalkWindow::IsEmpty() {

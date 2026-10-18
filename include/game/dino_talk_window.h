@@ -13,6 +13,7 @@ public:
     void SetUnkF4();
     void ClearUnkF4();
     void SetRate(MFx32 rate);
+    void ResetRate();
     void Print(const std::string &text);
     BOOL IsEmpty();
     void SetUnkAC(u32 value);

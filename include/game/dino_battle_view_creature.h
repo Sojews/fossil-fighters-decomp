@@ -49,11 +49,15 @@ public:
     void ClearUnk160();
     MPoint GetUnk124();
     MPoint GetMotionPosition();
+    void SetCoord(MPoint pos);
 
     class SetCoordTask : public MTask {
     public:
         virtual ~SetCoordTask();
         virtual void Execute();
+
+        DinoBattleViewCreature *mCreature;  // 0x10
+        MPoint mPos;                        // 0x14
     };
 
     u32 mUnkA8;             // 0xA8

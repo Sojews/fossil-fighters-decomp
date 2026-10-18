@@ -3,8 +3,11 @@
 
 #include "m/task.h"
 
+class DinoBattleView;
+
 class EnableRootSelectTask : public MTask {
 public:
+    EnableRootSelectTask(DinoBattleView *view) { mUnk10 = (u32) view; }
     virtual ~EnableRootSelectTask();
     virtual void Execute();
 

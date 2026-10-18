@@ -50,6 +50,12 @@ void EffectMotionTask::Idle() {
 void NopTask::Execute() {
 }
 
+void DinoBattleViewCreature::SetCoordTask::Execute() {
+    mCreature->SetCoord(mPos);
+    mCreature->mMotion->SetPosition(mPos);
+    Exit();
+}
+
 DinoBattleViewCreature::SetCoordTask::~SetCoordTask() {
 }
 

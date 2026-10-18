@@ -44,6 +44,7 @@ public:
     const void *GetUnk11CPalette();
     DinoBattleViewPlayer *GetPlayerByAC(u32 id);
     int GetUnk140();
+    MTask *CreateEnableRootSelectTask();
 
     MArchivePtr mArchive;       // 0xA8
     MArchiveFile mFile;         // 0xAC

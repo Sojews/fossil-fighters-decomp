@@ -119,6 +119,10 @@ int DinoBattleView::GetUnk13C() {
     return mUnk13C;
 }
 
+MTask *DinoBattleView::CreateEnableRootSelectTask() {
+    return new EnableRootSelectTask(this);
+}
+
 EnableRootSelectTask::~EnableRootSelectTask() {
 }
 
