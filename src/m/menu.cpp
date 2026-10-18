@@ -108,24 +108,40 @@ int MMenuItem::GetMode() {
 void MMenuItem::Idle() {
 }
 
-// NONMATCHING (all three constructors): the pointer-to-member constant is at a different offset in the TU's
-// pool until every function that makes one is decompiled.
+// The TU's pooled pointer-to-member constants (built ipa, the game copies each from its own slot of this pool; one
+// member per slot, named after the function it points to and its offset).
+typedef void (MMenu::*MMenuState)();
+extern "C" struct {
+    MMenuState StateTouch_00;   // 0x00
+    MMenuState Update_08;       // 0x08
+    MMenuState Init_10;         // 0x10
+    MMenuState Init_18;         // 0x18
+    MMenuState OnStart_20;      // 0x20
+    MMenuState StateButton_28;  // 0x28
+    MMenuState Update_30;       // 0x30
+    MMenuState Init_38;         // 0x38
+    MMenuState StateKeys_40;    // 0x40
+    MMenuState Update_48;       // 0x48
+    u8 unk50[8];
+    MMenuState Update_58;       // 0x58
+} data_020c46c4;
+
 MMenu::MMenu(int defaultMode)
     : MProcess(NULL), mInput(NULL), mDefaultMode(defaultMode), mActive(TRUE), mCursor(0, 0), mLinkFallback(FALSE),
       mDeferStart(FALSE) {
-    mState = &MMenu::Init;
+    mState = data_020c46c4.Init_10;
 }
 
 MMenu::MMenu(MInput *input, int defaultMode)
     : MProcess(NULL), mInput(input), mDefaultMode(defaultMode), mActive(TRUE), mCursor(0, 0), mLinkFallback(FALSE),
       mDeferStart(FALSE) {
-    mState = &MMenu::Init;
+    mState = data_020c46c4.Init_38;
 }
 
 MMenu::MMenu(MDisplay *display, MInput *input, int defaultMode)
     : MProcess(display), mInput(input), mDefaultMode(defaultMode), mActive(TRUE), mCursor(0, 0), mLinkFallback(FALSE),
       mDeferStart(FALSE) {
-    mState = &MMenu::Init;
+    mState = data_020c46c4.Init_18;
 }
 
 void MMenu::SetDeferStart(BOOL defer) {
@@ -423,13 +439,13 @@ void MMenu::Init() {
         MSerialTaskSet *serial = &mSerial;
         serial->SetUseMutex(TRUE);
         MTask *run = MTaskRunTransfer::Create(deferred);
-        MTask *start = MCreateBgCallTask(this, &MMenu::OnStart, 0);
+        MTask *start = MCreateBgCallTask(this, data_020c46c4.OnStart_20, 0);
         MTask *suspend = MTaskSuspendTransfer::Create(&mParallel);
         serial->AddTail(suspend);
         serial->AddTail(start);
         serial->AddTail(run);
     }
-    mState = &MMenu::Update;
+    mState = data_020c46c4.Update_30;
 }
 
 void MMenu::Update() {
@@ -444,7 +460,7 @@ void MMenu::Update() {
                 mUnkA4 = GetFocusedItem() == item;
                 FocusItem(item);
                 SelectItem(item);
-                mState = &MMenu::StateTouch;
+                mState = data_020c46c4.StateTouch_00;
                 return;
             }
             if (item->GetMode() == 2 && !item->mNoFocus && GetFocusedItem() != item) {
@@ -464,7 +480,7 @@ void MMenu::Update() {
             if (item->GetMode() & 1) {
                 FocusItem(item);
                 SelectItem(item);
-                mState = &MMenu::StateKeys;
+                mState = data_020c46c4.StateKeys_40;
                 return;
             }
             if ((item->GetMode() & 4) && !item->mNoFocus && GetFocusedItem() != item) {
@@ -480,7 +496,7 @@ void MMenu::Update() {
     if (focused != NULL && (mInput->GetPressed() & 1)) {
         if (focused->GetMode() & 1) {
             SelectItem(focused);
-            mState = &MMenu::StateButton;
+            mState = data_020c46c4.StateButton_28;
             return;
         }
         mCursor = focused->GetFrame().GetCenter();
@@ -532,7 +548,7 @@ void MMenu::StateTouch() {
                 DecideItem(item);
             }
         }
-        mState = &MMenu::Update;
+        mState = data_020c46c4.Update_48;
         return;
     }
     MMenuItem *item = HitTest(mInput->GetTouchPos());
@@ -560,7 +576,7 @@ void MMenu::StateButton() {
                 FocusItem(FindNearestItem(mCursor));
             }
         }
-        mState = &MMenu::Update;
+        mState = data_020c46c4.Update_58;
         return;
     }
     int dir = 0;
@@ -602,7 +618,7 @@ void MMenu::StateKeys() {
     if (!(mInput->mButtons & item->mKeys)) {
         SelectItem(NULL);
         DecideItem(item);
-        mState = &MMenu::Update;
+        mState = data_020c46c4.Update_08;
         return;
     }
     OnIdle();
