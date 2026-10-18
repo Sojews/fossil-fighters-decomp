@@ -286,3 +286,14 @@ void DinoUiContainerMenu::OnFocus(MMenuItem *item) {
     }
     mPanel->Clear();
 }
+
+#pragma auto_inline off
+
+// The OK button is usable once the team has a first member.
+void DinoUiContainerMenu::RefreshOKButton() {
+    if (mOldTeam->slots[0]) {
+        mOKButton->mMotion->GetUnit()->SetMode(1);
+    } else {
+        mOKButton->mMotion->GetUnit()->SetMode(0);
+    }
+}

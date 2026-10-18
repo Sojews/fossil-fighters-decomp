@@ -14,6 +14,8 @@
 
 class DinoUiPartsRockName;
 
+class DinoUiContainerMenuItem;
+
 class DinoUiContainerMenu : public DinoHelpBase, public MMenu {
 public:
     virtual ~DinoUiContainerMenu();
@@ -29,8 +31,10 @@ public:
     void Decide();
     void ClearItems();
     void RefreshPage2();
+    void RefreshOKButton();
 
-    u32 mUnkB4[3];              // 0xB4
+    u32 mUnkB4[2];              // 0xB4
+    DinoUiContainerMenuItem *mOKButton; // 0xBC
     MMenuItem *mTabItems[3];    // 0xC0
     u32 mUnkCC;                 // 0xCC
     std::vector<void *> mItems; // 0xD0: this page's items

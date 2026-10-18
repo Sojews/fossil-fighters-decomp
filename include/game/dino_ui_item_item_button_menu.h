@@ -11,6 +11,8 @@
 #include "game/help.h"
 #include "game/dino_ui_item_menu_item.h"
 
+class DinoUiItemMenuItem;
+
 class DinoUiItemMenu : public DinoHelpBase, public MMenu {
 public:
     virtual ~DinoUiItemMenu();
@@ -23,10 +25,12 @@ public:
     void OnOKDecided();
     void SelectTab(int tab);
     void RefreshPage();
+    void RefreshOKButton();
 
     u32 mUnkB4;
     MMenuItem *mUnkB8;          // 0xB8: focused after a page change
-    u32 mUnkBC[8];
+    DinoUiItemMenuItem *mOKButton;  // 0xBC
+    u32 mUnkC0[7];
     MMenuItem *mTabItems[3]; // 0xDC
     u32 mUnkE8;
     int *mResult;               // 0xEC
