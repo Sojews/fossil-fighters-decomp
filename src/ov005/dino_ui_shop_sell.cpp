@@ -15,6 +15,8 @@
 #include "game/dino_ui3_parts_kaseki_button.h"
 
 #include "game/dino_backup.h"
+#include "game/dino_ui3_parts_fraction.h"
+#include "nitro/mi.h"
 
 #include "game/dino_ui3_parts_money.h"
 
@@ -190,6 +192,8 @@ BOOL DinoUiShopSellMenu::PageLeft() {
     return TRUE;
 }
 
+#pragma auto_inline off
+
 void DinoUiShopSellMenu::ClearItems() {
     RemoveLink(mLinkFrom, 4);
     for (int i = 0; i < mItems.size(); i++) {
@@ -318,6 +322,49 @@ BOOL DinoUiShopSellMenu::Sell() {
     serial->AddTail(show);
     serial->AddTail(finish);
     return TRUE;
+}
+
+// After the yes/no: sells the chosen fossils, and fixes up the pages.
+void DinoUiShopSellMenu::FinishSell() {
+    if (mConfirmed == TRUE) {
+        DinoSoundPlaySe(0x107, 0);
+        DinoBackupEntry empty;
+        MI_CpuFill8(&empty, 0, sizeof(empty));
+        for (int i = 0; i < 0x40; i++) {
+            if (mFlags[i]) {
+                mFlags[i] = FALSE;
+                u32 price = GetPrice(i);
+                gDinoBackup->SetSystemVar(3, price + gDinoBackup->GetSystemVar(3));
+                gDinoBackup->SetUnk98(i, &empty);
+            }
+        }
+        mCount = 0;
+        gDinoBackup->CompactUnk98();
+        if (mLastPage > 0) {
+            if (gDinoBackup->CountUsedUnk98() <= 8) {
+                mPageL->MMenuItem::Disable();
+                mPageL->mMotion->Hide();
+                mPageR->MMenuItem::Disable();
+                mPageR->mMotion->Hide();
+                mPage = 0;
+                mFraction->SetNumerator(mPage + 1);
+            } else {
+                int last = (gDinoBackup->CountUsedUnk98() - 1) / 8;
+                if (mPage > last) {
+                    mPage = last;
+                    mFraction->SetNumerator(mPage + 1);
+                }
+            }
+        }
+        LoadFossils();
+        ClearItems();
+        RefreshPage2();
+        mMoney->RefreshMoney();
+        RefreshTotal();
+        DinoUiShopSellSellButton *sell = mLinkFrom;
+        sell->mSerial.Clear();
+        sell->mMotion->Play(1, 0);
+    }
 }
 
 // A fossil button: chooses or unchooses it.

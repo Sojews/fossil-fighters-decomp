@@ -10,6 +10,9 @@
 #include "game/dino_ui_shop_sell_menu_item.h"
 
 class DinoUi3PartsMoney;
+class DinoUiShopSellSellButton;
+class DinoUiShopSellPageLButton;
+class DinoUiShopSellPageRButton;
 class DinoUi3PartsCursor;
 class DinoUi3PartsRockName;
 
@@ -26,6 +29,7 @@ public:
     BOOL PageLeft();
     BOOL Sell();
     void FinishSell();
+    void LoadFossils();
     void ClearItems();
     u8 GetFlag(int index);
     void SetFlag(int index, u8 flag);
@@ -41,10 +45,11 @@ public:
     MArchiveFile mFile;         // 0xB8
     u32 mUnkC4;                 // 0xC4
     MMenuItem *mBack;           // 0xC8
-    MMenuItem *mLinkFrom;       // 0xCC: linked to the first page item
+    DinoUiShopSellSellButton *mLinkFrom; // 0xCC: the sell button, linked to the first page item
     u32 mUnkD0;
     std::vector<void *> mItems; // 0xD4: this page's items
-    u32 mUnkE0[2];              // 0xE0
+    DinoUiShopSellPageLButton *mPageL; // 0xE0
+    DinoUiShopSellPageRButton *mPageR; // 0xE4
     DinoUi3PartsFraction *mFraction; // 0xE8: "page n/m"
     MTaskSet *mCursorTasks;     // 0xEC
     DinoUi3PartsCursor *mCursor; // 0xF0
