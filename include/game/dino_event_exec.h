@@ -302,8 +302,10 @@ public:
     virtual ~DinoEventExecCleaning();
     virtual void Idle();
 
+    void StateFadeOut();
     void StateCloseField();
     void StateCleaning();
+    void StateResult();
     void StateOpenField();
 
     void (DinoEventExecCleaning::*mState)(); // 0x74
@@ -313,7 +315,8 @@ public:
     u8 mUnk88;              // 0x88
     u8 mUnk89;              // 0x89
     u8 unk8A[2];
-    u8 mCleaningData[0xD0 - 0x8C];  // 0x8C: passed to the cleaning
+    u32 mScore;             // 0x8C: the cleaning's result (the cleaning gets this block)
+    u8 unk90[0xD0 - 0x90];
 };
 
 class DinoEventExecAutoWarp : public MProcess {

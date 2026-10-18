@@ -154,8 +154,9 @@ struct DinoBackupEntry {
 // A kaseki rock's saved state (GetKasekiRock).
 struct DinoKasekiRockState {
     u32 unk0 : 10;
-    u32 unk10 : 1;      // 0x400
-    u32 unk11 : 21;
+    u32 unk10 : 1;      // 0x400: cleaned
+    u32 score : 10;     // the cleaning score
+    u32 unk21 : 11;
 };
 
 struct DinoCharaWatch {

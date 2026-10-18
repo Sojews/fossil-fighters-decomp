@@ -2121,14 +2121,17 @@ extern "C" struct {
     void (DinoEventExecBattle::*Battle02041748_78)();
 } data_020be144;
 extern "C" struct {
-    void (DinoEventExecCleaning::*CleaningStart_00)();
-    void (DinoEventExecBattle::*StateCloseField_08)();
-    u8 unk10[0x48 - 0x10];
-    void (DinoEventExecCleaning::*StateOpenField_48)();
+    void (DinoEventExecCleaning::*CleaningStart_00)(); // 0x00
+    void (DinoEventExecBattle::*StateCloseField_08)(); // 0x08
+    u8 unk10[0x28 - 0x10];
+    void (DinoEventExecCleaning::*StateCloseField_28)(); // 0x28
+    u8 unk30[0x40 - 0x30];
+    void (DinoEventExecCleaning::*Unk02159b38_40)(); // 0x40
+    void (DinoEventExecCleaning::*StateOpenField_48)(); // 0x48
     u8 unk50[0x58 - 0x50];
-    void (DinoEventExecBattle::*Battle020401b0_58)();
+    void (DinoEventExecBattle::*Battle020401b0_58)(); // 0x58
     u8 unk60[0x78 - 0x60];
-    void (DinoEventExecBattle::*Battle02041b24_78)();
+    void (DinoEventExecBattle::*Battle02041b24_78)(); // 0x78
 } data_020be1c4;
 extern "C" struct {
     u8 unk00[0x30];
@@ -2155,6 +2158,16 @@ DinoEventExecCleaning::DinoEventExecCleaning(DinoEventLoop *event, u32 unk80, u3
     mState = data_020be1c4.CleaningStart_00;
 }
 
+void DinoEventExecCleaning::StateFadeOut() {
+    MTask *fadeSub = gLcd->mSub->mBright->CreateFadeOutToWhite(30, 0);
+    MTask *fadeMain = gLcd->mMain->mBright->CreateFadeOutToWhite(30, 0);
+    MParallelTaskSet *fades = new MParallelTaskSet(TRUE);
+    fades->AddTail(fadeMain);
+    fades->AddTail(fadeSub);
+    mSerial.AddTail(fades);
+    mState = data_020be1c4.StateCloseField_28;
+}
+
 void DinoEventExecCleaning::StateCloseField() {
     mEvent->CloseField(FALSE);
     mState = data_020be144.Cleaning0203ff38_38;
@@ -2162,8 +2175,28 @@ void DinoEventExecCleaning::StateCloseField() {
 
 void DinoEventExecCleaning::StateCleaning() {
     MLoadOverlay(0, M_OVERLAY_ID(ov002));
-    mSerial.AddTail(new DinoCleaning(mUnk84, mCleaningData, 0, 0, mUnk89 ? 3 : mUnk88 ? 2 : 0, 0));
+    mSerial.AddTail(new DinoCleaning(mUnk84, &mScore, 0, 0, mUnk89 ? 3 : mUnk88 ? 2 : 0, 0));
     mState = data_020be1c4.StateOpenField_48;
+}
+
+// Saves the result: the flag, and for a revived creature its part's level and the rock's score.
+void DinoEventExecCleaning::StateResult() {
+    MUnloadOverlay(0, M_OVERLAY_ID(ov002));
+    gDinoBackup->SetFlag(mUnk80, mScore != 0 ? TRUE : FALSE);
+    if (mUnk88) {
+        u32 part = mUnk84 - 1;
+        DinoCreatureState creature;
+        gDinoBackup->GetCreature(part / 4 + 1, &creature);
+        creature.parts[part % 4].level = mScore;
+        gDinoBackup->SetCreature(part / 4 + 1, &creature);
+        DinoKasekiRockState rock;
+        gDinoBackup->GetKasekiRock(mUnk84, (u32 *)&rock);
+        rock.unk10 = 1;
+        rock.score = mScore;
+        gDinoBackup->SetKasekiRock(mUnk84, (u32 *)&rock);
+        gDinoBackup->FillTeam();
+    }
+    mState = data_020be1c4.Unk02159b38_40;
 }
 
 void DinoEventExecCleaning::StateOpenField() {
