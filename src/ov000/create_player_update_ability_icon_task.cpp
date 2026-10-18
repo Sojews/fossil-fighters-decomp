@@ -325,6 +325,10 @@ BOOL DinoBattleModelCreature::IsInPinch() {
     return FALSE;
 }
 
+MTask *DinoBattleModelCreature::CreateUpdateTask(u8 a, u32 b) {
+    return new DinoCreatureUpdateTask(this, a, b);
+}
+
 MMessage *DinoBattleModelCreature::CreateMotionEffectRequest() {
     return new DinoBattleViewCreatureMotionEffectRequest(0, mUnkB4, 4, 0, 0, -1);
 }
@@ -910,3 +914,14 @@ MResource<DinoAbilityIconData> DinoAbilityIconDataLoad(std::string path) {
     return MResource<DinoAbilityIconData>(path);
 }
 #pragma dont_inline reset
+
+static MFx32 GetAffinityRatio(DinoBattleModelCreature *creature, DinoBattleModelCreature *other, u32 attack) {
+    int result = creature->CompareUnkECA0(other, attack);
+    if (result == 1) {
+        return gDinoResource->GetBattleAdjustDefs()->affinityRatio[0];
+    }
+    if (result == 2) {
+        return gDinoResource->GetBattleAdjustDefs()->affinityRatio[1];
+    }
+    return gDinoResource->GetBattleAdjustDefs()->affinityRatio[2];
+}

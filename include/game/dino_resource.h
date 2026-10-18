@@ -59,7 +59,14 @@ struct DinoAttackDef {
     u32 unk18;          // 0x18
 };
 struct DinoBattleAdjustDefs {
-    u8 unk000[0x138];
+    u8 unk000[0x14];
+    MFx32 unk14;            // 0x14
+    u32 unk18[2];
+    MFx32 randomMin;        // 0x20: the range of the random damage factor
+    MFx32 randomMax;        // 0x24
+    u32 unk28[2];
+    MFx32 affinityRatio[3]; // 0x30: by CompareUnkECA0's result (1, 2, other)
+    u8 unk03C[0x138 - 0x3C];
     int kasekiPointX;   // 0x138
     int kasekiPointY;   // 0x13C
     u32 unk140[2];

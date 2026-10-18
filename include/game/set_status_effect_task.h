@@ -29,6 +29,11 @@ public:
 
 class DinoCreatureUpdateTask : public MTask {
 public:
+    DinoCreatureUpdateTask(DinoBattleModelCreature *creature, u8 a, u32 b) {
+        mCreature = creature;
+        mUnk14 = a;
+        mUnk18 = b;
+    }
     virtual ~DinoCreatureUpdateTask();
     virtual void Execute();
 

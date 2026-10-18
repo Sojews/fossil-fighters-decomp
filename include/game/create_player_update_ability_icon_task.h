@@ -183,6 +183,7 @@ public:
     void BeginAction();
     void EndAction();
     void SendUpdate(u8 a, u32 b);
+    MTask *CreateUpdateTask(u8 a, u32 b);
     void AddUnkFC(int delta);
     void SetLife(int life);
     BOOL IsInPinch();
