@@ -41,11 +41,11 @@ BOOL DinoBattleViewCreature::IsUnkCC2() {
     return (mUnkCC & 2) ? TRUE : FALSE;
 }
 
-extern "C" int func_ov000_0216ecc0(int a, int b); // the type advantage of a over b
+int DinoGetTypeAdvantage(int type, int other); // 1: type beats other, 2: other beats type
 
 void DinoBattleViewCreature::SetAdvantage(DinoBattleViewCreature *other) {
     if (other != NULL) {
-        mAdvantage = func_ov000_0216ecc0(GetDefUnk0D(), other->GetDefUnk0D());
+        mAdvantage = DinoGetTypeAdvantage(GetDefUnk0D(), other->GetDefUnk0D());
     } else {
         mAdvantage = 0;
     }

@@ -560,7 +560,7 @@ func_ov000_0216e918 kind:function(thumb,size=0x14c) addr:0x0216e918
 func_ov000_0216ea64 kind:function(thumb,size=0x1f4) addr:0x0216ea64
 func_ov000_0216ec58 kind:function(thumb,size=0x48) addr:0x0216ec58
 _ZN23DinoBattleModelCreature14CompareUnkECA0EPS_m kind:function(thumb,size=0x1e) addr:0x0216eca0
-func_ov000_0216ecc0 kind:function(thumb,size=0x4c) addr:0x0216ecc0
+_Z20DinoGetTypeAdvantageii kind:function(thumb,size=0x4c) addr:0x0216ecc0
 _ZN23DinoBattleModelCreature14CompareUnkED0CEPS_ kind:function(thumb,size=0x26) addr:0x0216ed0c
 _Z16GetAffinityRatioP23DinoBattleModelCreatureS0_m kind:function(thumb,size=0x44) addr:0x0216ed34
 func_ov000_0216ed78 kind:function(thumb,size=0x180) addr:0x0216ed78
@@ -1449,9 +1449,7 @@ data_ov000_0218fadc kind:data(any) addr:0x0218fadc
 data_ov000_0218fb8c kind:data(any) addr:0x0218fb8c
 kUnkFCMax kind:data(any) addr:0x0218fb98
 kUnkFCMin kind:data(any) addr:0x0218fb9c
-data_ov000_0218fba0 kind:data(any) addr:0x0218fba0
-data_ov000_0218fba4 kind:data(any) addr:0x0218fba4
-data_ov000_0218fba8 kind:data(any) addr:0x0218fba8
+sTypeAdvantages kind:data(any) addr:0x0218fba0
 data_ov000_0218fbdc kind:data(any) addr:0x0218fbdc
 data_ov000_0218fc34 kind:data(any) addr:0x0218fc34
 data_ov000_0218fce4 kind:data(any) addr:0x0218fce4

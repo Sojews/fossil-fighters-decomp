@@ -475,7 +475,38 @@ MFx32 DinoBattleModelCreature::RandomFraction() {
 
 extern "C" BOOL func_ov000_0216ce04(DinoBattleModelCreature *creature);
 extern "C" BOOL func_ov000_0216f13c(DinoBattleModelCreature *creature);
-extern "C" int func_ov000_0216ecc0(int a, int b);
+// Which type each type beats, and which beats it.
+struct DinoTypeAdvantage {
+    int type;
+    int beats;
+    int beatenBy;
+};
+
+static const DinoTypeAdvantage sTypeAdvantages[] = {
+    {1, 3, 4},
+    {3, 2, 1},
+    {2, 4, 3},
+    {4, 1, 2},
+    {0, 0, 0},
+};
+
+// 1 if `type` beats `other`, 2 if `other` beats `type`, else 0.
+int DinoGetTypeAdvantage(int type, int other) {
+    int i = 0;
+    do {
+        if (type == sTypeAdvantages[i].type) {
+            if (other == sTypeAdvantages[i].beats) {
+                return 1;
+            }
+            if (other == sTypeAdvantages[i].beatenBy) {
+                return 2;
+            }
+            break;
+        }
+        i++;
+    } while (sTypeAdvantages[i].type != 0);
+    return 0;
+}
 
 int DinoBattleModelCreature::GetB8Category() {
     switch (mUnkB8) {
@@ -507,7 +538,7 @@ int DinoBattleModelCreature::GetUnkCE7C(u32 attack) {
 int DinoBattleModelCreature::CompareUnkECA0(DinoBattleModelCreature *other, u32 attack) {
     int a = GetUnkCE7C(attack);
     int b = other->GetUnkCE7C(0);
-    return func_ov000_0216ecc0(a, b);
+    return DinoGetTypeAdvantage(a, b);
 }
 
 int DinoBattleModelCreature::CompareUnkED0C(DinoBattleModelCreature *other) {
