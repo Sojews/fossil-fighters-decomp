@@ -81,3 +81,22 @@ MResource<DinoBattleSelectData> DinoBattleSelectLoadData(std::string path) {
     return MResource<DinoBattleSelectData>(path);
 }
 #pragma dont_inline reset
+
+// The TU's pooled pointer-to-member constants (see menu.cpp).
+extern "C" struct {
+    u8 unk00[0x38];
+    void (UseCreatureSelect::*Start_38)();
+    u8 unk40[0x48 - 0x40];
+    void (PlayerLevelSelect::*Start_48)();
+} data_ov000_02195e50;
+
+UseCreatureSelect::UseCreatureSelect(void *params, u32 unk7C, u32 unk80, u8 *cancelled)
+    : MProcess(NULL), mUnk7C(unk7C), mUnk80(unk80), mUnk88(0), mParams(params), mCancelled(cancelled) {
+    *mCancelled = FALSE;
+    mState = data_ov000_02195e50.Start_38;
+}
+
+PlayerLevelSelect::PlayerLevelSelect(u32 *level, BOOL unk7C, u32 unk80)
+    : MProcess(NULL), mUnk7C(unk7C), mUnk80(unk80), mUnk9C(0), mUnkA8(0), mUnkAC(1), mLevel(level) {
+    mState = data_ov000_02195e50.Start_48;
+}

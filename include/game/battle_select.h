@@ -31,18 +31,36 @@ public:
 
 class UseCreatureSelect : public MProcess {
 public:
+    UseCreatureSelect(void *params, u32 unk7C, u32 unk80, u8 *cancelled);
     virtual ~UseCreatureSelect();
     virtual void Idle();
 
     void (UseCreatureSelect::*mState)(); // 0x74
+    u32 mUnk7C;             // 0x7C
+    u32 mUnk80;             // 0x80
+    u32 unk84;
+    u32 mUnk88;             // 0x88
+    u8 unk8C[0x12C - 0x8C];
+    void *mParams;          // 0x12C
+    u8 *mCancelled;         // 0x130
 };
 
 class PlayerLevelSelect : public MProcess {
 public:
+    PlayerLevelSelect(u32 *level, BOOL unk7C, u32 unk80);
     virtual ~PlayerLevelSelect();
     virtual void Idle();
 
     void (PlayerLevelSelect::*mState)(); // 0x74
+    BOOL mUnk7C;            // 0x7C
+    u32 mUnk80;             // 0x80
+    u32 unk84[6];
+    u32 mUnk9C;             // 0x9C
+    u32 unkA0[2];
+    u32 mUnkA8;             // 0xA8
+    u32 mUnkAC;             // 0xAC
+    u32 unkB0[8];
+    u32 *mLevel;            // 0xD0
 };
 
 class IncValTask : public MTask {

@@ -66,6 +66,50 @@ void CameraSetDefParentTask::Execute() {
     Exit();
 }
 
+// The TU's pooled pointer-to-member constants (see menu.cpp).
+extern "C" struct {
+    u8 unk00[0x3C];
+    void (DinoBattleView3DCamera::*Stopped_3C)();
+    u8 unk44[0x4C - 0x44];
+    void (DinoBattleView3DCamera::*Run_4C)();
+    u8 unk54[0x5C - 0x54];
+    void (DinoBattleView3DCamera::*Run_5C)();
+    void (DinoBattleView3DCamera::*Run_64)();
+} data_ov000_02196cd0;
+extern "C" u8 data_ov000_021903dc[];
+
+DinoBattleView3DCamera::DinoBattleView3DCamera(M3DScene *scene, Dino3DLoadCsv *camera, u32 unk88)
+    : MProcess(NULL), mCamera(camera), mScene(scene) {
+    mState = data_ov000_02196cd0.Run_4C;
+    mUnk9C = data_ov000_021903dc;
+    mUnk88 = unk88;
+    Reset();
+    mLight = -1;
+    unk80 = 0;
+}
+
+void DinoBattleView3DCamera::Start(u32 unk88, const void *unk9C, int light) {
+    mState = data_ov000_02196cd0.Run_5C;
+    mUnk88 = unk88;
+    mUnk9C = unk9C;
+    if (light >= 0) {
+        mScene->SetUnk7C(light != 0 ? TRUE : FALSE);
+        mLight = light;
+    }
+    Reset();
+}
+
+void DinoBattleView3DCamera::Stop() {
+    mState = data_ov000_02196cd0.Stopped_3C;
+    mCamera->Push18();
+}
+
+void DinoBattleView3DCamera::Resume() {
+    mState = data_ov000_02196cd0.Run_64;
+    mScene->SetUnk7C(mLight != 0 ? TRUE : FALSE);
+    mCamera->Push17();
+}
+
 void DinoBattleView3DCamera::Reset() {
     mLoaded = FALSE;
     mUnkA1 = 0;

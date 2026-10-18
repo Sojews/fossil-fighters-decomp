@@ -1,6 +1,7 @@
 // DinoBattle, DinoBattleAutoDemo, DinoBattleDebugSelect.
 // Only the destructors are decompiled so far.
 
+#include "game/battle_select.h"
 #include "game/dino_battle.h"
 
 DinoBattle::~DinoBattle() {
@@ -48,4 +49,28 @@ void DinoBattle::Idle() {
 
 void DinoBattleDebugSelect::Idle() {
     (this->*mState)();
+}
+
+// The TU's pooled pointer-to-member constants (see menu.cpp).
+extern "C" struct {
+    u8 unk00[0x28];
+    void (DinoBattleDebugSelect::*Unk0215a05c_28)();
+} data_ov000_021911ac;
+extern "C" struct {
+    u8 unk00[0x10];
+    void (DinoBattleAutoDemo::*Start_10)();
+} data_ov000_0219122c;
+
+void DinoBattleDebugSelect::StateLevelSelect() {
+    if (mCancelled) {
+        Exit();
+        return;
+    }
+    BOOL unk = mParams.unk00 != 2;
+    mSerial.AddTail(new PlayerLevelSelect(&mParams.unk00, unk, 2));
+    mState = data_ov000_021911ac.Unk0215a05c_28;
+}
+
+DinoBattleAutoDemo::DinoBattleAutoDemo(MTask *unk7C, u8 *result) : MProcess(NULL), mUnk7C(unk7C), mResult(result) {
+    mState = data_ov000_0219122c.Start_10;
 }
