@@ -88,8 +88,10 @@ void DinoEventTalkWindow::StateStart() {
     mInputHub = new MSingleInputHub(1);
     mInputHub->EnableTouch();
     mParallel.AddTail(mInputHub);
-    mParallel.SetUseMutex(TRUE);
-    mSerial.SetUseMutex(TRUE);
+    MTaskSet *parallel = &mParallel;
+    parallel->mUseMutex = TRUE;
+    MTaskSet *serial = &mSerial;
+    serial->mUseMutex = TRUE;
     mSerial.AddTail(MCreateBgCallTask(this, data_020b6144.Load_04, 1));
     mState = data_020b6144.Unk02007648_14;
 }
