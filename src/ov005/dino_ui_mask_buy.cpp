@@ -4,6 +4,8 @@
 // Derived destructors have their bases' destructor bodies inlined; auto-inlining the ones defined above does that.
 #pragma auto_inline on
 
+#include "game/dino_backup.h"
+
 #include "game/dino_common_window_yes_no_dialog.h"
 
 #include "game/dino_ui3_parts_mask_name.h"
@@ -323,6 +325,34 @@ BOOL DinoUiMaskBuyMenu::Buy() {
     serial->AddTail(show);
     serial->AddTail(finish);
     return TRUE;
+}
+
+// After the yes/no: buys the chosen masks it can pay for, and starts the page over.
+void DinoUiMaskBuyMenu::FinishBuy() {
+    if (mConfirmed == TRUE) {
+        DinoSoundPlaySe(0x107, 0);
+        for (int i = 0; i < 5; i++) {
+            if (mFlags[i]) {
+                mFlags[i] = FALSE;
+                u32 price = GetPrice(i);
+                if (price <= mFunds) {
+                    mFunds -= price;
+                    gDinoBackup->SetSystemVar(3, mFunds);
+                    gDinoBackup->SetHeadMask(mMasks[i], TRUE);
+                }
+            }
+        }
+        mCount = 0;
+        RefreshPage1();
+        LoadMasks();
+        RefreshPage2();
+        mTotal = 0;
+        mMoney->RefreshMoney();
+        RefreshPage3();
+        DinoUiMaskBuyBuyButton *buy = mBuy;
+        buy->mSerial.Clear();
+        buy->mMotion->Play(1, 0);
+    }
 }
 
 // A mask button: chooses it (if the money allows) or unchooses it.

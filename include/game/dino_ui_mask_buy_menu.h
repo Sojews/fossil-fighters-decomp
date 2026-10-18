@@ -9,6 +9,7 @@
 #include "game/dino_ui_mask_buy_menu_item.h"
 
 class DinoUi3PartsMoney;
+class DinoUiMaskBuyBuyButton;
 class DinoUi3PartsCursor;
 class DinoUi3PartsMaskName;
 
@@ -28,13 +29,14 @@ public:
     u32 GetPrice(int index);
     BOOL Buy();
     void FinishBuy();
+    void LoadMasks();
     void RefreshPage1();
     void RefreshPage2();
     void RefreshPage3();
 
     u32 mUnkB4;             // 0xB4
     MMenuItem *mBack;       // 0xB8
-    MMenuItem *mBuy;        // 0xBC
+    DinoUiMaskBuyBuyButton *mBuy; // 0xBC
     u32 mUnkC0;             // 0xC0
     std::vector<void *> mUnkC4; // 0xC4: the page's mask buttons
     u32 mUnkD0[2];          // 0xD0
