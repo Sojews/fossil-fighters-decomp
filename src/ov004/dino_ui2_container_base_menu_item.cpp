@@ -13,6 +13,7 @@
 #include "m/lcd.h"
 #include "m/display.h"
 #include "m/bright.h"
+#include "game/dino_backup.h"
 
 #pragma auto_inline off
 
@@ -195,4 +196,36 @@ void DinoUi2ContainerBaseMenu::OnBackDecided() {
     serial->AddTail(hide);
     serial->AddTail(fade);
     serial->AddTail(exit);
+}
+
+#pragma auto_inline off
+
+u8 DinoUi2ContainerBaseMenu::GetFlag(int index) {
+    return mFlags[index];
+}
+
+void DinoUi2ContainerBaseMenu::SetFlag(int index, u8 value) {
+    if (value != mFlags[index]) {
+        mFlags[index] = value;
+        if (value) {
+            mUnkFC++;
+            DinoSoundPlaySe(0x9C, 0);
+        } else {
+            mUnkFC--;
+            DinoSoundPlaySe(0x9D, 0);
+        }
+        RefreshMarks();
+    }
+}
+
+void DinoUi2CannonShootMenu::GetEntry(u32 index, DinoBackupEntry *entry) {
+    gDinoBackup->GetUnk14C(index, entry);
+}
+
+BOOL DinoUi2CannonShootMenu::CanMark() {
+    return mUnkFC < 10;
+}
+
+BOOL DinoUi2CannonShootMenu::IsMarkable(DinoBackupEntry *entry) {
+    return TRUE;
 }

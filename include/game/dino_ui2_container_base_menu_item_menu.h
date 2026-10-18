@@ -13,12 +13,23 @@
 #include "game/help.h"
 #include "game/dino_field_camera_hook.h"
 
+struct DinoBackupEntry;
+
 class DinoUi2ContainerBaseMenu : public DinoHelpBase, public MMenu {
 public:
     virtual ~DinoUi2ContainerBaseMenu();
     virtual BOOL TryDecide() = 0;   // the decide button was pressed; FALSE if nothing happens
+    virtual void OnStart();
+    virtual void OnIdle();
+    virtual void OnFocus(MMenuItem *item);
+    virtual void OnDecide(MMenuItem *item);
+    virtual void Setup() = 0;
+    virtual void GetEntry(u32 index, DinoBackupEntry *entry) = 0;
+    virtual BOOL CanMark() = 0;     // FALSE once the most entries are marked
+    virtual BOOL IsMarkable(DinoBackupEntry *entry) = 0;
+    virtual MTask *CreateUnk2C() = 0;
 
-    u32 mUnkB4[16];
+    u8 mFlags[0x41];                // 0xB3: marked entries (members start in MMenu's tail padding)
     int mPage; // 0xF4
     int mLastPage; // 0xF8
     u8 mUnkFC;                      // 0xFC
@@ -35,11 +46,20 @@ public:
     BOOL PageLeft();
     void ClearItems();
     void RefreshPage2();
+    u8 GetFlag(int index);
+    void SetFlag(int index, u8 value);
+    void RefreshMarks();
 };
 
 class DinoUi2CannonShootMenu : public DinoUi2ContainerBaseMenu {
 public:
     virtual ~DinoUi2CannonShootMenu();
+    virtual BOOL TryDecide();
+    virtual void Setup();
+    virtual void GetEntry(u32 index, DinoBackupEntry *entry);
+    virtual BOOL CanMark();
+    virtual BOOL IsMarkable(DinoBackupEntry *entry);
+    virtual MTask *CreateUnk2C();
 };
 
 #endif
