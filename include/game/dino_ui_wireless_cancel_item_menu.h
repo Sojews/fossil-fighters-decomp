@@ -240,6 +240,9 @@ public:
     void StateChosen();
     void StateAfterReset();
     void State02167cd0();
+    void StateAsk();
+    void StateAnswered();
+    void State02167924();
 
     void (DinoUiWirelessMatch::*mState)(); // 0x74
     MMultiPlay *mMultiPlay; // 0x7C: kept in DinoResource for the next scene
@@ -248,7 +251,7 @@ public:
     u32 mChosen;        // 0x88
     u32 mScanResult;    // 0x8C
     u32 mChoice;        // 0x90
-    u32 unk94;
+    BOOL mAnswer;       // 0x94: to the start question
     u8 mUnk98;          // 0x98
     DinoHelpDisabler *mHelpDisabler; // 0x9C
 };

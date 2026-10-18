@@ -273,7 +273,7 @@ extern "C" struct {
     DinoUiWirelessMatchState StateAfterReset; // 0x34
     u8 unk3C[0x44 - 0x3C];
     DinoUiWirelessMatchState StateInit; // 0x44
-    DinoUiWirelessMatchState state_021676f8; // 0x4c
+    DinoUiWirelessMatchState StateAsk; // 0x4c
     u8 unk54[0x5C - 0x54];
     void (DinoUiBattleParentScanner::*StateStart_5C)(); // 0x5c
     u8 unk64[0x6C - 0x64];
@@ -283,7 +283,9 @@ extern "C" struct {
 extern "C" struct {
     u8 unk00[0x4];
     void (DinoUiBattleParentScanner::*StateShowCancel_04)(); // 0x04
-    u8 unk0C[0x2C - 0xC];
+    u8 unk0C[0x1C - 0xC];
+    DinoUiWirelessMatchState State02167924_1C; // 0x1c
+    u8 unk24[0x2C - 0x24];
     void (DinoUiCannonChild::*StateWaitStart_2C)(); // 0x2c
     void (DinoUiCannonChild::*Child02166dc0_34)(); // 0x34
     void (DinoUiCannonChild::*Leave_3C)(); // 0x3c
@@ -320,7 +322,7 @@ extern "C" struct {
     void (DinoUiCannonChild::*StateShot_24)(); // 0x24
     u8 unk2C[0x44 - 0x2C];
     void (DinoUiChildScannerBattleConnect::*OnConnectMessage_44)(MMessage *msg); // 0x44
-    u8 unk4C[0x54 - 0x4C];
+    DinoUiWirelessMatchState StateAnswered_4C; // 0x4c
     void (DinoUiChildScannerCannonConnect::*StateConnecting_54)(); // 0x54
     void (DinoUiCannonParentScanner::*Failed_5C)(); // 0x5c
     u8 unk64[0x6C - 0x64];
@@ -402,7 +404,7 @@ void DinoUiWirelessMatch::StateStart() {
     } else if (!mUnk98) {
         mState = data_ov004_021740d0.StateInit;
     } else {
-        mState = data_ov004_021740d0.state_021676f8;
+        mState = data_ov004_021740d0.StateAsk;
     }
 }
 
@@ -739,6 +741,42 @@ void DinoUiWirelessMatch::StateAfterReset() {
     *mResult = 0;
     AddSerial(this, new DinoCommonWindowMessageBox(MPoint(0x80, 0x60), gDinoResource->GetText(data_0208ab5c), 4),
               MTaskExitTransfer::Create(this));
+}
+
+extern const u32 data_0208ad5c, data_0208ad60, data_0208ad64;
+
+// Asks whether to start, over the dimmed screen.
+void DinoUiWirelessMatch::StateAsk() {
+    mAnswer = TRUE;
+    DinoCommonWindowYesNoDialog *dialog =
+        new DinoCommonWindowYesNoDialog(gDinoResource->GetText(data_0208ad64), &mAnswer);
+    dialog->SetLabels2(gDinoResource->GetText(data_0208ad60), gDinoResource->GetText(data_0208ad5c));
+    dialog->SetUnkBC(TRUE);
+    gCurrentDisplay->mBlend->Reset();
+    gCurrentDisplay->mBlend->SetMode(3);
+    MBlend *blend = gCurrentDisplay->mBlend;
+    blend->SetTarget1(data_ov004_02177284->GetPlaneMask());
+    AddSerial(this, gCurrentDisplay->mBlend->CreateFadeRatioAnime(0, 8, 10, 0), dialog);
+    mState = data_ov004_02174250.StateAnswered_4C;
+}
+
+// No: fades back and leaves. Yes: stops the music and loads the wireless sounds.
+void DinoUiWirelessMatch::StateAnswered() {
+    if (mAnswer == FALSE) {
+        *mResult = 0;
+        AddSerial(this, gCurrentDisplay->mBlend->CreateFadeRatioAnime(8, 0, 10, 0), MTaskExitTransfer::Create(this));
+        return;
+    }
+    MTask *load = DinoSoundCreateLoadSceneTask(0x28);
+    MTask *timer = new MTimer(10);
+    MTask *stopBgm = DinoSoundCreateStopBgmTask(-1, 10);
+    MParallelTaskSet *stopping = new MParallelTaskSet(TRUE);
+    stopping->AddTail(stopBgm);
+    stopping->AddTail(timer);
+    MSerialTaskSet *serial = &mSerial;
+    serial->AddTail(stopping);
+    serial->AddTail(load);
+    mState = data_ov004_02174150.State02167924_1C;
 }
 
 // Ends the scan and leaves after half a second.
