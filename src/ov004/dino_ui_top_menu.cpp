@@ -159,8 +159,6 @@ void DinoUiTopMenu::OnFocus(MMenuItem *item) {
 
 // Template task instances the game emits in this file. Until the code that makes the tasks is decompiled, they are
 // instantiated explicitly.
-template class MBgCallTask0<DinoBackup>;
-template MTask *MCreateBgCallTask(DinoBackup *obj, void (DinoBackup::*func)(), int thread);
 template class MCallTask0<DinoUiTopMenu, DinoHelpBase>;
 template MTask *MCreateCallTask(DinoUiTopMenu *obj, void (DinoHelpBase::*func)());
 
