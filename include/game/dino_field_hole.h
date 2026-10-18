@@ -11,6 +11,8 @@
 #include "game/dino_field_camera_hook.h"
 #include "m/3d_resource.h"
 
+class MAnmModelBase;
+
 class DinoFieldHole : public MProcess {
 public:
     virtual ~DinoFieldHole();
@@ -19,9 +21,12 @@ public:
     u8 GetUnk110();
     void SetUnk114();
     MPoint GetPos();
+    void ChangeToHole();
 
     void (DinoFieldHole::*mState)();    // 0x74
-    u32 mUnk7C[3];                      // 0x7C
+    u32 mUnk7C;                         // 0x7C
+    u32 mUnk80;                         // 0x80
+    MAnmModelBase *mUnk84;              // 0x84
     MPoint mPos;                        // 0x88
     u32 unk90;
     M3DModelResource mModel;            // 0x94

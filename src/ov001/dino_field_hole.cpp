@@ -6,6 +6,9 @@
 
 #include "game/dino_field_hole.h"
 #include "types.h"
+#include "m/anm_model.h"
+#include "m/3d_model.h"
+#include "m/transfer.h"
 
 DinoFieldHole::~DinoFieldHole() {
 }
@@ -24,4 +27,20 @@ void DinoFieldHole::SetUnk114() {
 
 MPoint DinoFieldHole::GetPos() {
     return mPos;
+}
+
+void DinoFieldHole::ChangeToHole() {
+    mModel = M3DModelResource("/model/fieldchar/ana03");
+    MAnmModelBase *anm = mUnk84;
+    anm->mModel->Unk08(mModel.mModel, mModel.mAnim, TRUE);
+    anm = mUnk84;
+    anm->mFrame = 0;
+    anm->mLoopEnd = 0;
+    anm->mUnk11B = TRUE;
+    mUnk84->ClearTransformTracks();
+    MTask *exit = MTaskExitTransfer::Create(this);
+    MTask *timer = new MTimer(27);
+    MSerialTaskSet *serial = &mSerial;
+    serial->AddTail(timer);
+    serial->AddTail(exit);
 }

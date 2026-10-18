@@ -11,7 +11,7 @@ class M3DModel {
 public:
     M3DModel();
     virtual ~M3DModel();
-    virtual void Unk08();
+    virtual void Unk08(void *model, void *anim, BOOL arg);
     virtual void SetModelData(void *data, BOOL arg);
     virtual void SetAnimData(void *data);
     virtual int GetFrameCount();

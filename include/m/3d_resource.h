@@ -137,6 +137,7 @@ class M3DModelResource {
 public:
     M3DModelResource(std::string path);
     ~M3DModelResource();
+    M3DModelResource &operator=(const M3DModelResource &other);
 
     void Setup(M3DModel *model, u8 keepPalette);
     void GetPalette(u32 *plttKey, u8 **palette, u32 *size);
