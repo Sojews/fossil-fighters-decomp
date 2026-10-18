@@ -23,7 +23,11 @@ public:
     void OnBackDecided();
     BOOL PageRight();
     BOOL PageLeft();
-    BOOL IsDecidable();
+    BOOL IsDecidable(u32 index);
+    const DinoKasekiDef *GetKasekiDef(u32 id) {
+        const DinoKasekiDefs *defs = mKasekiDefs.Get();
+        return (const DinoKasekiDef *)((const u8 *)defs + ((const u32 *)((const u8 *)defs + defs->tableOffset))[id]);
+    }
     void ClearItems();
     void RefreshPage2();
     void Decide(int index);
@@ -37,7 +41,7 @@ public:
     DinoEventLoop *mEvent;      // 0xD8
     u32 mUnkDC[3];              // 0xDC
     std::vector<u32> mUnkE8;    // 0xE8
-    MResource<void> mResource;  // 0xF4
+    MResource<DinoKasekiDefs> mKasekiDefs; // 0xF4
     u32 mUnk104[3];             // 0x104
     int mPage;                  // 0x110
     int mLastPage;              // 0x114

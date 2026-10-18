@@ -4,6 +4,8 @@
 // Derived destructors have their bases' destructor bodies inlined; auto-inlining the ones defined above does that.
 #pragma auto_inline on
 
+#include "game/dino_backup.h"
+
 #include "game/dino_ui_cleaning_menu_item_menu.h"
 #include "game/dino_ui_cleaning_menu_item.h"
 #include "m/bg_new_task.h"
@@ -107,17 +109,31 @@ template MTask *MCreateCallTask(DinoUiCleaningMenu *obj, void (DinoUiCleaningMen
 void DinoUiCleaningMenu::OnDecide(MMenuItem *item) {
     for (int i = 0; i < 8; i++) {
         if (item == mItems[i]) {
-            int index = i + mPage * 8;
-            if (index < mUnkE8.size()) {
-                if (IsDecidable()) {
-                    Decide(i);
-                } else {
-                    DinoSoundPlaySe(0xA4, 0);
-                }
+            u32 index = mPage * 8 + i;
+            if (index >= mUnkE8.size()) {
+                return;
+            }
+            if (IsDecidable(index)) {
+                Decide(i);
+            } else {
+                DinoSoundPlaySe(0xA4, 0);
             }
             return;
         }
     }
+}
+
+// Fossils already cleaned, or that can't be, can't be chosen.
+BOOL DinoUiCleaningMenu::IsDecidable(u32 index) {
+    DinoBackupEntry entry;
+    gDinoBackup->GetUnk98(index, &entry);
+    if (entry.active) {
+        return FALSE;
+    }
+    if (GetKasekiDef(entry.id)->unk04 == 0) {
+        return TRUE;
+    }
+    return FALSE;
 }
 
 BOOL DinoUiCleaningMenu::PageRight() {
