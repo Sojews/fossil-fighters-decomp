@@ -28,6 +28,9 @@ DinoFieldTownMapManager::~DinoFieldTownMapManager() {
 void TownMapIcon::Idle() {
 }
 
+DinoFieldDance::~DinoFieldDance() {
+}
+
 void DinoFieldDance::Idle() {
     (this->*mState)();
 }

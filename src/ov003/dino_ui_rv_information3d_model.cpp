@@ -15,6 +15,18 @@ DinoUiRvInformation3DModel::~DinoUiRvInformation3DModel() {
 DinoUiRvInformation3DModelRotate::~DinoUiRvInformation3DModelRotate() {
 }
 
+DinoUiRvInformation::~DinoUiRvInformation() {
+    if (mHasTenPictures) {
+        for (int i = 0; i < 10; i++) {
+            delete mPictures[i];
+        }
+    } else {
+        for (int i = 0; i < 7; i++) {
+            delete mPictures[i];
+        }
+    }
+}
+
 void DinoUiRvInformation::SetUnk1B1(u8 value) {
     mUnk1B1 = value;
 }

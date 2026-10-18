@@ -14,6 +14,9 @@
 #include "m/bitmap.h"
 #include "m/call_task.h"
 #include "game/dino_ui_revive_effect.h"
+#include "m/blend.h"
+#include "m/display.h"
+#include "m/lcd.h"
 
 DinoUiReviveStatus::~DinoUiReviveStatus() {
 }
@@ -47,6 +50,20 @@ template class MCallTask1<MBg, MBg, MIndexBitmap *>;
 template MTask *MCreateCallTask(MBg *obj, void (MBg::*func)(MIndexBitmap *), MIndexBitmap * a0);
 template class MCallTask0<MPalUnit, MPalUnit>;
 template MTask *MCreateCallTask(MPalUnit *obj, void (MPalUnit::*func)());
+
+// Puts the screens back as they were.
+DinoUiReviveEffect::~DinoUiReviveEffect() {
+    mParallel.Clear();
+    gLcd->mMain->ResetHooks();
+    gLcd->mSub->ResetHooks();
+    gLcd->mMain->Setup(5, 4, 0, 0);
+    gLcd->mSub->Setup(5, 4, 0, 0);
+    gLcd->SetBottomDisplay(gLcd->mSub);
+    gCurrentDisplay = gLcd->GetBottomDisplay();
+    gLcd->mMain->mBlend->Reset();
+    gLcd->mSub->mBlend->Reset();
+    gLcd->VSyncNow();
+}
 
 void DinoUiReviveEffect::Idle() {
     (this->*mState)();

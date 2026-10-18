@@ -16,6 +16,7 @@
 #include "m/resource.h"
 #include "m/serializer.h"
 #include "m/3d_resource.h"
+#include "m/picture.h"
 #include "game/dino_resource.h"
 #include "game/dino_field_town_map.h"
 #include "game/dino_backup.h"
@@ -388,7 +389,14 @@ public:
     virtual void Idle();
 
     void (DinoFieldDance::*mState)(); // 0x74
-    u8 unk7C[184];
+    u32 unk7C[2];
+    MResource<DinoDanceData> mDance;  // 0x84
+    u32 unk94[4];
+    std::vector<MTask *> mUnkA4;      // 0xA4
+    u32 unkB0[14];
+    MResource<DinoDanceData> mUnkE8;  // 0xE8
+    u32 unkF8[2];
+    MPictureFile mPicture;            // 0x100
 };
 
 // The map select menu (in overlay 4).
