@@ -1,7 +1,7 @@
 #ifndef GAME_DINO_UI_EXCHANGE_H
 #define GAME_DINO_UI_EXCHANGE_H
 
-#include <map>
+#include <set>
 #include "m/archive.h"
 #include "m/menu_item.h"
 #include "m/menu.h"
@@ -15,6 +15,23 @@
 #include "m/multi_play.h"
 
 struct DinoPlayerProfile;
+
+// A wireless partner's MAC address.
+struct DinoMacAddress {
+    u8 bytes[6];
+};
+
+inline bool operator<(const DinoMacAddress &a, const DinoMacAddress &b) {
+    for (u32 i = 0; i < 6; i++) {
+        if (a.bytes[i] < b.bytes[i]) {
+            return true;
+        }
+        if (a.bytes[i] > b.bytes[i]) {
+            return false;
+        }
+    }
+    return false;
+}
 
 class DinoUiExchange : public MProcess, public MMessageObserver {
 public:
@@ -36,7 +53,7 @@ public:
     u32 mCount;                     // 0xDC
     int mMode;                      // 0xE0: 1: only the scan was started
     u32 mUnkE4;                     // 0xE4: a random 60-119 (frames)
-    std::map<u32, void *> mUnkE8;   // 0xE8
+    std::set<DinoMacAddress> mPartners; // 0xE8: the ones exchanged with already
     u8 unkF4[8];
     u8 mBeacon[0x18];               // 0xFC: sent when this side is the parent
     u8 unk114[0x2C];

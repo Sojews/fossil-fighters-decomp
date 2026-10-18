@@ -65,3 +65,11 @@ void DinoUiExchange::Reset() {
 // instantiated explicitly.
 template class MBgCallTask0<DinoBackup>;
 template MTask *MCreateBgCallTask(DinoBackup *obj, void (DinoBackup::*func)(), int thread);
+
+// The set of partners' addresses. The game built its search loops without strength reduction.
+// NONMATCHING: insert_node_at (register allocation) and insert_unique (its true/false constants sit one byte
+// further into the file's pooled data, after one an undecompiled function uses).
+#pragma opt_strength_reduction off
+template class std::__red_black_tree<DinoMacAddress, DinoMacAddress, std::__identity<DinoMacAddress>,
+                                     std::less<DinoMacAddress>, std::allocator<DinoMacAddress> >;
+#pragma opt_strength_reduction reset
