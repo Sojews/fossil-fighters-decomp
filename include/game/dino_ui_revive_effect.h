@@ -9,6 +9,7 @@
 class MExtAffinePicture;
 class MIndexBitmap;
 class MInput;
+class MView;
 struct MPalBlock;
 
 // The reviving effect (lights and particles).
@@ -26,6 +27,8 @@ public:
     void State0215e274();
     void State0215ee24();
     void StartWait();
+    void CheckSkip();
+    void State0215da04();
     void StateWait();
     void Leave();
 
@@ -42,10 +45,12 @@ public:
     u8 mUnk114;                             // 0x114
     MExtAffinePicture *mScroller;           // 0x118: scrolled up over the effect
     int mScrollFrame;                       // 0x11C
-    u32 unk120[2];
+    u32 unk120;
+    MView *mUnk124;                         // 0x124
     MResource<DinoUiReviveEffectData> mUnk128; // 0x128
     int mTimer;                             // 0x138
     MInput *mInput;                         // 0x13C
+    u8 mShowText;                           // 0x140: tell the player the creature's name after the effect
 };
 
 #endif

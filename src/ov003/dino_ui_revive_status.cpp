@@ -27,6 +27,7 @@
 #include "m/seed_generator.h"
 #include "game/dino_resource.h"
 #include "game/dino_sound.h"
+#include "game/dino_event_talk_window.h"
 
 DinoUiReviveStatus::~DinoUiReviveStatus() {
 }
@@ -79,11 +80,16 @@ void DinoUiReviveEffect::Idle() {
     (this->*mState)();
 }
 
+extern "C" u8 data_ov003_021624c0;
+
 // The TU's pooled pointer-to-member constants (see menu.cpp).
 extern "C" struct {
-    u8 unk00[0x4C];
+    u8 unk00[0x34];
+    void (DinoUiReviveEffect::*CheckSkip_34)();     // 0x34
+    u8 unk3C[0x4C - 0x3C];
     void (DinoUiReviveEffect::*Leave_4C)();         // 0x4C
-    u8 unk54[0x5C - 0x54];
+    void (DinoUiReviveEffect::*State0215da04_54)(); // 0x54
+
     void (DinoUiReviveEffect::*StateWait_5C)();     // 0x5C
     u8 unk64[0x84 - 0x64];
     void (DinoUiReviveEffect::*State0215ee24_84)(); // 0x84
@@ -91,6 +97,7 @@ extern "C" struct {
     void (DinoUiReviveEffect::*State0215e274_CC)(); // 0xCC
     u8 unkD4[0xE4 - 0xD4];
     void (DinoUiReviveEffect::*State0215ec2c_E4)(); // 0xE4
+    void (DinoUiReviveEffect::*State0215da04_EC)(); // 0xEC
 } data_ov003_02161d20;
 
 // Puts the picture away.
@@ -104,8 +111,38 @@ void DinoUiReviveEffect::State0215e220() {
     mState = data_ov003_02161d20.State0215ee24_84;
 }
 
-extern "C" u8 data_ov003_021624c0;
 extern "C" int func_ov003_0215b480(int frames);
+
+// Puts value in place of the first tag in text (unless value has the tag itself).
+std::string DinoReplaceTag(std::string text, std::string tag, std::string value);
+
+// Fades the effect out, then says what was revived.
+void DinoUiReviveEffect::State0215ec2c() {
+    MTask *timer = new MTimer(1);
+    MTask *fade;
+    MTask *exit;
+    exit = MTaskExitTransfer::Create(mUnk124);
+    MBlend *blend = gCurrentDisplay->mBlend;
+    fade = blend->CreateFadeRatioAnime(16, 0, func_ov003_0215b480(60), 0);
+    MPoint from(0, 0);
+    MPoint to(0, 192);
+    MTask *move = mUnk124->CreateCoordAnime(from, to, func_ov003_0215b480(60), 2);
+    MParallelTaskSet *anims = new MParallelTaskSet(TRUE);
+    anims->AddTail(move);
+    anims->AddTail(fade);
+    MSerialTaskSet *serial = &mSerial;
+    serial->AddTail(anims);
+    serial->AddTail(exit);
+    serial->AddTail(timer);
+    if (mShowText) {
+        const u8 *data = (const u8 *)mUnk128.Get();
+        const u8 *entry = data + ((const u32 *)(data + ((const u32 *)data)[2]))[15];
+        std::string text((const char *)entry + ((const u32 *)entry)[1]);
+        text = DinoReplaceTag(text, "%s", gDinoResource->GetCreatureText08(mUnkAC.index));
+        mSerial.AddTail(new DinoEventTalkWindow(gCurrentDisplay, text, 0, 0));
+    }
+    mState = data_ov003_02161d20.State0215da04_EC;
+}
 
 // Scrolls the picture up from a random place across, with a sound on the way.
 void DinoUiReviveEffect::StateScroll() {
@@ -140,6 +177,29 @@ void DinoUiReviveEffect::StateWait() {
         }
     }
     mState = data_ov003_02161d20.Leave_4C;
+}
+
+extern "C" const int data_020899fc;
+extern "C" const int data_02089a48;
+
+// A button skips the rest of the effect.
+void DinoUiReviveEffect::CheckSkip() {
+    if (!data_ov003_021624c0 && (mInput->GetPressed() & 0x1003)) {
+        MTask *mainFade;
+        MTask *subFade;
+        MTask *exit;
+        exit = MTaskExitTransfer::Create(this);
+        subFade = gLcd->mSub->mBright->CreateFadeOutToBlack(data_02089a48, data_020899fc);
+        mainFade = gLcd->mMain->mBright->CreateFadeOutToBlack(data_02089a48, data_020899fc);
+        MParallelTaskSet *fades = new MParallelTaskSet(TRUE);
+        fades->AddTail(mainFade);
+        fades->AddTail(subFade);
+        MSerialTaskSet *serial = &mSerial;
+        serial->AddTail(fades);
+        serial->AddTail(exit);
+        return;
+    }
+    mState = data_ov003_02161d20.State0215da04_54;
 }
 
 // Fades both screens out and exits.
