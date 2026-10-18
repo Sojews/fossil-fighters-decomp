@@ -564,7 +564,7 @@ class DinoEventKasekiRockGetContainerSelect : public DinoEventCaptureFadeUiTask 
 public:
     virtual ~DinoEventKasekiRockGetContainerSelect();
 
-    u32 mUnk74[6];                      // 0x74
+    u32 mUnk80[3];                      // 0x80
     std::vector<std::string> mUnk8C;    // 0x8C
 };
 

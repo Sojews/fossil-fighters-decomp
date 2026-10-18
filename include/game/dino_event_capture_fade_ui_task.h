@@ -3,8 +3,11 @@
 
 #include "m/task.h"
 
+class DinoEventLoop;
+
 class DinoEventCaptureFadeUiTask : public MProcess {
 public:
+    DinoEventCaptureFadeUiTask(DinoEventLoop *event, u32 arg);
     // The game's destructor is inline. Its vtable's owner (dino_event_ui_task.cpp) defines DINO_EVENT_CAPTURE_FADE_UI_TASK_OWNER and emits it out of line
     // until the key function there is decompiled.
 #ifdef DINO_EVENT_CAPTURE_FADE_UI_TASK_OWNER
@@ -14,6 +17,10 @@ public:
 #endif
     // Makes the UI this event shows.
     virtual MTask *CreateUi() = 0;
+
+    DinoEventLoop *mEvent;  // 0x74
+    u32 mArg;               // 0x78
+    MTask *mUi;             // 0x7C
 };
 
 #endif

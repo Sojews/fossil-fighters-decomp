@@ -9,6 +9,7 @@
 #include "game/dino_event_revive_effect.h"
 #include "game/dino_event_revive.h"
 #include "game/dino_event_capture_fade_ui_task.h"
+#include "game/dino_event_ui_task.h"
 #include "m/bg_new_task.h"
 #include "m/call_task.h"
 #include "m/overlay.h"
@@ -76,3 +77,18 @@ template class MBgCallTask0<DinoEventReviveEffect>;
 template MTask *MCreateBgCallTask(DinoEventReviveEffect *obj, void (DinoEventReviveEffect::*func)(), int thread);
 template class MBgCallTask0<DinoEventCaptureFadeUiTask>;
 template MTask *MCreateBgCallTask(DinoEventCaptureFadeUiTask *obj, void (DinoEventCaptureFadeUiTask::*func)(), int thread);
+
+#pragma auto_inline off
+
+DinoEventUiTask::DinoEventUiTask(DinoEventLoop *event, u32 arg, u8 flag) : MProcess(NULL) {
+    mEvent = event;
+    mArg = arg;
+    mUi = NULL;
+    mFlag = flag;
+}
+
+DinoEventCaptureFadeUiTask::DinoEventCaptureFadeUiTask(DinoEventLoop *event, u32 arg) : MProcess(NULL) {
+    mEvent = event;
+    mArg = arg;
+    mUi = NULL;
+}
