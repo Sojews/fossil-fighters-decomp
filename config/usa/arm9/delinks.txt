@@ -857,10 +857,14 @@ libs/nitrosdk/src/gx/g3.c:
 
 libs/nitrosdk/src/gx/g3x.c:
     complete
-    .text       start:0x02072a2c end:0x02072d90
+    .text       start:0x02072a2c end:0x02072e24
 
 libs/nitrosdk/src/gx/gx_load3d.c:
     .text       start:0x02073084 end:0x0207323c
+
+libs/nitrosdk/src/gx/gxasm.c:
+    complete
+    .text       start:0x0207323c end:0x020732a8
 
 libs/nitrosdk/src/mi/mi_wram.c:
     complete

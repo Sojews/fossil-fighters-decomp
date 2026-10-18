@@ -33,7 +33,7 @@
 typedef void (*MIDmaCallback)(void *arg);
 void MI_DmaFill32Async(u32 dmaNo, void *dest, u32 data, u32 size, MIDmaCallback callback, void *arg);
 void MI_Copy32B(const void *src, void *dest);
-void GXi_NopClearFifo128_(void *reg);
+static asm void GXi_NopClearFifo128_(register void *pDest);
 void G3X_ClearFifo(void);
 void G3X_InitMtxStack(void);
 void G3X_ResetMtxStack(void);
@@ -208,3 +208,48 @@ s32 G3X_GetPositionTestResult(void *vec, s32 *w) {
 void G2_SetBG0Offset_(u32 offset) {
     REG_G2_BG0OFS = offset;
 }
+
+#pragma thumb off
+
+// 128 words of zeros (32 NOPs) into the geometry FIFO.
+static asm void GXi_NopClearFifo128_(register void *pDest) {
+    mov r1, #0
+    mov r2, #0
+    mov r3, #0
+    mov r12, #0
+    stmia r0, {r1-r3, r12}
+    stmia r0, {r1-r3, r12}
+    stmia r0, {r1-r3, r12}
+    stmia r0, {r1-r3, r12}
+    stmia r0, {r1-r3, r12}
+    stmia r0, {r1-r3, r12}
+    stmia r0, {r1-r3, r12}
+    stmia r0, {r1-r3, r12}
+    stmia r0, {r1-r3, r12}
+    stmia r0, {r1-r3, r12}
+    stmia r0, {r1-r3, r12}
+    stmia r0, {r1-r3, r12}
+    stmia r0, {r1-r3, r12}
+    stmia r0, {r1-r3, r12}
+    stmia r0, {r1-r3, r12}
+    stmia r0, {r1-r3, r12}
+    stmia r0, {r1-r3, r12}
+    stmia r0, {r1-r3, r12}
+    stmia r0, {r1-r3, r12}
+    stmia r0, {r1-r3, r12}
+    stmia r0, {r1-r3, r12}
+    stmia r0, {r1-r3, r12}
+    stmia r0, {r1-r3, r12}
+    stmia r0, {r1-r3, r12}
+    stmia r0, {r1-r3, r12}
+    stmia r0, {r1-r3, r12}
+    stmia r0, {r1-r3, r12}
+    stmia r0, {r1-r3, r12}
+    stmia r0, {r1-r3, r12}
+    stmia r0, {r1-r3, r12}
+    stmia r0, {r1-r3, r12}
+    stmia r0, {r1-r3, r12}
+    bx lr
+}
+
+#pragma thumb reset
