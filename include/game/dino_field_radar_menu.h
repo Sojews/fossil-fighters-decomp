@@ -16,7 +16,7 @@ public:
     DinoFieldRadarManager(DinoField *field);
     virtual ~DinoFieldRadarManager();
     virtual void Idle();
-    virtual void CameraUnk0();
+    virtual void CameraUnk0(u32 map);
     virtual void CameraUnk1(u32 map);
 
     DinoField *mField;      // 0x78

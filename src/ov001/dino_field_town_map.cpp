@@ -33,7 +33,7 @@ void DinoFieldDance::Idle() {
 template class MCallTask2<DinoField, DinoField, MFx32Point, long>;
 template MTask *MCreateCallTask(DinoField *obj, void (DinoField::*func)(MFx32Point, long), MFx32Point a0, long a1);
 
-void DinoFieldTownMapManager::CameraUnk0() {
+void DinoFieldTownMapManager::CameraUnk0(u32 map) {
     if (mTownMap) {
         mParallel.Remove(mTownMap);
         delete mTownMap;

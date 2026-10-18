@@ -72,7 +72,7 @@ void DinoFieldRadarManager::CameraUnk1(u32 map) {
 
 #pragma auto_inline on
 
-void DinoFieldRadarManager::CameraUnk0() {
+void DinoFieldRadarManager::CameraUnk0(u32 map) {
     if (mRadar) {
         mParallel.Remove(mRadar);
         delete mRadar;

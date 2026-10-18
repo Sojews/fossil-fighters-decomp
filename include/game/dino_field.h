@@ -18,6 +18,7 @@
 #include "game/dino_backup.h"
 struct DinoCharaTask;
 class DinoField;
+class DinoFieldCameraHook;
 class MTextPicture;
 class DinoGradationBg;
 class MSmartOam;
@@ -41,10 +42,27 @@ public:
     void StartRotate(u16 x, u16 y, u16 z, u32 a, u32 b, u32 c);
     u32 GetFocus();
     u16 GetUnkD8();
+    void SetUnk15C(u8 value);
+    MFx32 GetUnk148();
+    void SetUnk94(u32 a, u32 b, u32 c);
+    void SetUnkD4(u16 a, u16 b, u16 c, u32 d);
+    void AddHook(DinoFieldCameraHook *hook);
+    void NotifyHooks0();
+    void NotifyHooks1();
 
-    u8 unk8C[0xD8 - 0x8C];
+    DinoField *mField;              // 0x8C
+    u32 mUnk90;                     // 0x90
+    u32 mUnk94;                     // 0x94
+    u32 mUnk98;                     // 0x98
+    u32 mUnk9C;                     // 0x9C
+    u8 unkA0[0xD0 - 0xA0];
+    u32 mUnkD0;                     // 0xD0
+    u16 mUnkD4;                     // 0xD4
+    u16 mUnkD6;                     // 0xD6
     u16 mUnkD8;                     // 0xD8
-    u8 unkDA[0xE4 - 0xDA];
+    u8 unkDA[0xDC - 0xDA];
+    u32 mUnkDC;                     // 0xDC
+    u8 unkE0[0xE4 - 0xE0];
     u32 mFocus;                     // 0xE4: the character followed
     u32 mUnkE8;                     // 0xE8
     s32 mUnkEC;                     // 0xEC
@@ -52,9 +70,10 @@ public:
     u8 mTracking;                   // 0xF8
     u8 unkF9[0x144 - 0xF9];
     DinoFieldNamePanel *mNamePanel; // 0x144
-    u32 mUnk148;                    // 0x148
+    MFx32 mUnk148;                  // 0x148
     u8 mHeightSet;                  // 0x14C
-    std::vector<void *> mUnk150;    // 0x150
+    std::vector<DinoFieldCameraHook *> mHooks;  // 0x150: told when the field changes maps
+    u8 mHooksMuted;                 // 0x15C
 };
 
 // A character's model: where it stands and which way it faces.
