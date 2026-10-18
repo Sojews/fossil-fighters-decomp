@@ -205,7 +205,7 @@ void DinoUiWirelessCancel::OnDecide(MMenuItem *item) {
 
 #pragma auto_inline off
 
-std::string DinoUiChildScannerParentItem::GetText() {
+std::string DinoUiChildScannerParentItem::GetName() {
     return mText;
 }
 

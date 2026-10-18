@@ -31,7 +31,7 @@ public:
     virtual void OnFocusChanged(BOOL focused);
     virtual void OnDecide();
 
-    std::string GetText();
+    std::string GetName();  // the parent console's name
 
     u32 mUnk88[4];      // 0x88
     MMotion *mMotion;   // 0x98
