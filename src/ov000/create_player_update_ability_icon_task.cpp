@@ -175,7 +175,6 @@ void AddKasekiPointCreatureDie::Idle() {
     mPlayer->SendUpdateRequest((u32)(MMessageObserver *)wait);
 }
 
-extern "C" void func_ov000_0216d3c0(void *, u8, u32);
 
 SetStatusEffectTask::~SetStatusEffectTask() {
 }
@@ -208,7 +207,7 @@ void DinoBattleModelCreature::Idle() {
 }
 
 void DinoCreatureUpdateTask::Execute() {
-    func_ov000_0216d3c0((void *)mUnk10, mUnk14, mUnk18);
+    mCreature->SendUpdate(mUnk14, mUnk18);
     Exit();
 }
 
@@ -274,6 +273,13 @@ void DinoBattleModelCreature::BeginAction() {
 void DinoBattleModelCreature::EndAction() {
     mActing = FALSE;
     mView->Post(new DinoBattleViewCreatureActionSignal(GetUnkB4(), FALSE));
+}
+
+// Sends the view the creature's state.
+void DinoBattleModelCreature::SendUpdate(u8 a, u32 b) {
+    mView->Post(new DinoBattleViewCreatureUpdateRequest(b, mUnkB4, GetUnkE8(), GetUnkE4(), GetUnkEC(), GetUnkF0(),
+                                                        GetUnkF4(), GetUnkF8(), GetUnkFC(), GetUnk108(), 0,
+                                                        mStatus.flags, a));
 }
 
 u8 DinoBattleModelCreature::GetUnk174() {

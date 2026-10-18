@@ -31,7 +31,7 @@ public:
     virtual ~DinoCreatureUpdateTask();
     virtual void Execute();
 
-    u32 mUnk10;         // 0x10
+    DinoBattleModelCreature *mCreature; // 0x10
     u8 mUnk14;          // 0x14
     u32 mUnk18;         // 0x18
 };

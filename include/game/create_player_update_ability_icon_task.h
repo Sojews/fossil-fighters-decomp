@@ -175,6 +175,7 @@ public:
     MMessage *CreateMotionEffectRequest();
     void BeginAction();
     void EndAction();
+    void SendUpdate(u8 a, u32 b);
     u8 GetUnk174();
     u32 GetUnkEC();
     u32 GetUnkF0();
