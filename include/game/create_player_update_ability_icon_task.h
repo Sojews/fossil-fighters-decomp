@@ -31,6 +31,7 @@ public:
     UpdateAllCreatureTask(DinoBattleModelPlayer *player);
     virtual ~UpdateAllCreatureTask();
     virtual void Idle();
+    BOOL IsNeeded();
 
     DinoBattleModelPlayer *mPlayer; // 0x74
 };
@@ -40,6 +41,7 @@ public:
     MoveCreatureFromEscape(DinoBattleModelPlayer *player);
     virtual ~MoveCreatureFromEscape();
     virtual void Idle();
+    BOOL IsNeeded();
 
     DinoBattleModelPlayer *mPlayer; // 0x74
 };

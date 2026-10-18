@@ -1053,6 +1053,15 @@ MoveCreatureFromEscape::MoveCreatureFromEscape(DinoBattleModelPlayer *player) : 
     mPlayer = player;
 }
 
+// Whether the player has a creature in the escape area (position 3).
+BOOL MoveCreatureFromEscape::IsNeeded() {
+    DinoBattleModelCreature *creature = mPlayer->FindCreature(3);
+    if (creature != NULL && creature->GetUnkC0() == 3) {
+        return TRUE;
+    }
+    return FALSE;
+}
+
 extern "C" BOOL func_ov000_0216d2cc(DinoBattleModelCreature *creature, int arg);
 
 template MTask *DinoCreatePostAndWaitTask(MMessageObserver *target, DinoBattleViewPlayerWaitKPCountStopRequest *msg);
