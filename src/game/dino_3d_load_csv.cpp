@@ -141,6 +141,61 @@ void Dino3DLoadCsv::LoadScene(u32 index, u32 arg) {
     delete[] text;
 }
 
+void Dino3DLoadCsv::Load(const char *path, u32 arg) {
+    MFile file;
+    int last = 0;
+    char dir[0x80];
+    strcpy(dir, path);
+    for (u32 i = 0; i < strlen(dir); i++) {
+        if (dir[i] == '/') {
+            last = i;
+        }
+    }
+    int name = last + 1;
+    dir[name] = 0;
+    LoadSoundNames(dir);
+    mPath = path;
+    Reset();
+    if (file.Open(mPath)) {
+        char *text = new char[file.GetLength() + 1];
+        text[file.GetLength()] = 0;
+        file.Read(text, file.GetLength());
+        file.Close();
+        ParseScript(text, mUnk84, dir, arg, 0);
+        delete[] text;
+    }
+    // The camera ("cm_") and sound ("snd_") scripts next to it.
+    char other[0x80];
+    strcpy(other, dir);
+    strcat(other, "cm_");
+    strcat(other, path + name);
+    mPath = other;
+    if (MFileExists(mPath)) {
+        if (file.Open(mPath)) {
+            char *text = new char[file.GetLength() + 1];
+            text[file.GetLength()] = 0;
+            file.Read(text, file.GetLength());
+            file.Close();
+            ParseScript(text, (void *) ((u32) mUnk84 | 4), dir, arg, 0);
+            delete[] text;
+        }
+    }
+    strcpy(other, dir);
+    strcat(other, "snd_");
+    strcat(other, path + name);
+    mPath = other;
+    if (MFileExists(mPath)) {
+        if (file.Open(mPath)) {
+            char *text = new char[file.GetLength() + 1];
+            text[file.GetLength()] = 0;
+            file.Read(text, file.GetLength());
+            file.Close();
+            ParseScript(text, mUnk84, dir, arg, 0);
+            delete[] text;
+        }
+    }
+}
+
 void Dino3DLoadCsv::LoadFile(const char *path, void *unk84, u32 arg) {
     MFile file;
     char dir[0x80];
