@@ -4,6 +4,10 @@
 // Derived destructors have their bases' destructor bodies inlined; auto-inlining the ones defined above does that.
 #pragma auto_inline on
 
+#include "game/dino_ui3_parts_rock_name.h"
+
+#include "game/dino_ui3_parts_cursor.h"
+
 #include "m/input.h"
 
 #include "game/dino_ui3_parts_kaseki_button.h"
@@ -168,7 +172,7 @@ BOOL DinoUiShopSellMenu::PageRight() {
     ClearItems();
     mFraction->SetNumerator(mPage + 1);
     RefreshPage2();
-    if (mUnk158 != mLinkFrom) {
+    if (mFocused != mLinkFrom) {
         FocusNearestItem(mCursor->GetPosition());
     }
     return TRUE;
@@ -179,7 +183,7 @@ BOOL DinoUiShopSellMenu::PageLeft() {
     ClearItems();
     mFraction->SetNumerator(mPage + 1);
     RefreshPage2();
-    if (mUnk158 != mLinkFrom) {
+    if (mFocused != mLinkFrom) {
         FocusNearestItem(mCursor->GetPosition());
     }
     return TRUE;
@@ -254,6 +258,40 @@ void DinoUiShopSellMenu::RefreshTotal() {
         }
     }
     mMoney->SetChange(total);
+}
+
+// Moves the cursor to the item, and shows the fossil's name and price.
+void DinoUiShopSellMenu::OnFocus(MMenuItem *item) {
+    if (item == NULL) {
+        mCursor->Hide();
+        return;
+    }
+    mFocused = item;
+    SetSelectedItem(dynamic_cast<DinoHelpItem *>(item));
+    if (mCursor->IsHidden()) {
+        mCursor->Show();
+        mCursor->SetFrame(item->GetFrame());
+    } else {
+        mCursorTasks->Clear();
+        mCursorTasks->AddTail(mCursor->CreateMoveTask(mCursor->GetFrame(), item->GetFrame(), 10, -5));
+    }
+    for (int i = 0; i < 8; i++) {
+        if (item == mItems[i]) {
+            u32 index = mPage * 8 + i;
+            if (index >= mFossils.size()) {
+                continue;
+            }
+            DinoBackupEntry entry;
+            gDinoBackup->GetUnk98(index, &entry);
+            mRockName->SetEntry(&entry, FALSE);
+            mMoney->SetPrice(GetPrice(mPage * 8 + i));
+            mSelected = mPage * 8 + i;
+            return;
+        }
+    }
+    mRockName->Clear();
+    mMoney->SetPrice(0);
+    mSelected = 0xFF;
 }
 
 // A fossil button: chooses or unchooses it.

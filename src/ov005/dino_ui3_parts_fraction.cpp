@@ -53,6 +53,24 @@ MRect DinoUi3PartsKasekiButton::GetFrame() {
 extern "C" const char data_ov005_02165f58[]; // ""
 extern "C" const char data_ov005_02165f74[]; // the number format
 
+// The fossil's name, in a color by its state.
+void DinoUi3PartsRockName::SetEntry(const DinoBackupEntry *entry, BOOL selected) {
+    DinoKasekiRockState rock;
+    gDinoBackup->GetKasekiRock(entry->id, (u32 *)&rock);
+    mText->SetText(std::string(data_ov005_02165f58));
+    if (mText->mState == STATE_RUN) {
+        mText->Execute();
+    }
+    if (selected) {
+        mFont->SetShadowColor(3);
+    } else if (!rock.unk10 && entry->unk10_3) {
+        mFont->SetShadowColor(5);
+    } else {
+        mFont->SetShadowColor(1);
+    }
+    mText->SetText(gDinoBackup->GetEntryName(entry));
+}
+
 void DinoUi3PartsRockName::Clear() {
     mText->SetText(std::string(data_ov005_02165f58));
 }

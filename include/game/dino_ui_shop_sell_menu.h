@@ -10,6 +10,8 @@
 #include "game/dino_ui_shop_sell_menu_item.h"
 
 class DinoUi3PartsMoney;
+class DinoUi3PartsCursor;
+class DinoUi3PartsRockName;
 
 class DinoUiShopSellMenu : public DinoHelpBase, public MMenu {
 public:
@@ -43,9 +45,9 @@ public:
     std::vector<void *> mItems; // 0xD4: this page's items
     u32 mUnkE0[2];              // 0xE0
     DinoUi3PartsFraction *mFraction; // 0xE8: "page n/m"
-    u32 mUnkEC;
-    MView *mCursor;             // 0xF0
-    u32 mUnkF4;
+    MTaskSet *mCursorTasks;     // 0xEC
+    DinoUi3PartsCursor *mCursor; // 0xF0
+    DinoUi3PartsRockName *mRockName; // 0xF4
     std::vector<u32> mFossils;  // 0xF8: the fossils for sale
     DinoUi3PartsMoney *mMoney;  // 0x104
     u8 mFlags[0x40];            // 0x108
@@ -54,7 +56,7 @@ public:
     u8 mCount;                  // 0x150: how many are chosen
     u8 mSelected;               // 0x151: 0xFF for none
     u32 mUnk154;
-    MMenuItem *mUnk158;         // 0x158
+    MMenuItem *mFocused;        // 0x158
 };
 
 class DinoUiShopSellBackButton : public DinoUiShopSellMenuItem {
