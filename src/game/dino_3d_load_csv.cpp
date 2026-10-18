@@ -2,6 +2,10 @@
 // Not decompiled yet: the script reader, Idle, the sound name loader and the scene loaders.
 
 #include "game/dino_3d_load_csv.h"
+#include "m/3d_resource.h"
+#include "m/file.h"
+#include <string.h>
+#include <printf.h>
 #include "m/anm_model.h"
 #include "m/3d_model.h"
 #include "m/process_pause.h"
@@ -134,6 +138,43 @@ void Dino3DLoadCsv::LoadScene(u32 index, u32 arg) {
     char *text = new char[file.GetSize()];
     file.Read(text, file.GetSize());
     ParseScript(text, mUnk84, "/model/battle/", arg, 0);
+    delete[] text;
+}
+
+void Dino3DLoadCsv::LoadFile(const char *path, void *unk84, u32 arg) {
+    MFile file;
+    char dir[0x80];
+    int last = 0;
+    strcpy(dir, path);
+    for (u32 i = 0; i < strlen(dir); i++) {
+        if (dir[i] == '/') {
+            last = i;
+        }
+    }
+    dir[last + 1] = 0;
+    mPath = path;
+    if (file.Open(mPath)) {
+        char *text = new char[file.GetLength() + 1];
+        text[file.GetLength()] = 0;
+        file.Read(text, file.GetLength());
+        file.Close();
+        ParseScript(text, unk84, dir, 0, arg);
+        delete[] text;
+    }
+}
+
+void Dino3DLoadCsv::LoadByName(const char *name, BOOL loop, u32 variant) {
+    char *text = new char[0x200];
+    mPath = name;
+    Reset();
+    sprintf(text, "\nscript\nModel,%s,1,%s\nname,din\nAnimSpeed,1\nscale_x,1\nscale_y,1\nscale_z,1\n", name,
+            loop ? "loop" : "", variant);
+    char path[0x80];
+    strcpy(path, "/model/battle/");
+    strcat(path, name);
+    if (M3DModelExists(path)) {
+        ParseScript(text, mUnk84, "/model/battle/", 0, 0);
+    }
     delete[] text;
 }
 

@@ -47,7 +47,7 @@ public:
     void Reset();
     void Load(const char *path, u32 arg);
     void LoadScene(u32 index, u32 arg);
-    void LoadFile(const char *path, void *arg2, u32 arg3);
+    void LoadFile(const char *path, void *unk84, u32 arg);
     void LoadByName(const char *name, BOOL alt, u32 variant);
     void LoadSoundNames(const char *dir);
     void ParseScript(char *text, void *unk84, const char *dir, u32 arg, u32 arg2);
