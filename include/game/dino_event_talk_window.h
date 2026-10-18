@@ -26,6 +26,9 @@ public:
     void StateStart();
     void Load();
     void StatePage();
+    void StateChoose();
+    void StateWait();
+    void StateEnd();
 
     void (DinoEventTalkWindow::*mState)();  // 0x74
     DinoTalkWindow *mWindow;                // 0x7C

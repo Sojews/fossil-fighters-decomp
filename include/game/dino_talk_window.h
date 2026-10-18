@@ -20,6 +20,10 @@ public:
     void SetUnkAC(u32 value);
     void SetUnkB0(u8 value);
     u8 GetUnkB0();
+    BOOL IsPageDone();
+    void Skip();
+    BOOL IsAnimating();
+    MTask *CreateCloseTask();
     virtual ~DinoTalkWindow();
     virtual void Idle();
 

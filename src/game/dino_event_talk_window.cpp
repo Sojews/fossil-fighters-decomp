@@ -8,6 +8,7 @@
 #include "game/dino_event_talk_window.h"
 #include "m/bg_new_task.h"
 #include "game/dino_window_choice.h"
+#include "game/dino_common_window_menu_item_flush_task_menu.h"
 
 DinoEventTalkWindow::~DinoEventTalkWindow() {
 }
@@ -54,12 +55,13 @@ template class std::__vec_deleter<DinoCommonWindowMenuEntry, std::allocator<Dino
 extern "C" struct {
     u8 unk00[0x4];
     void (DinoEventTalkWindow::*Load_04)();
-    void (DinoEventTalkWindow::*Unk02007ab4_0C)();
-    void (DinoEventTalkWindow::*Unk02007648_14)();
+    void (DinoEventTalkWindow::*StateEnd_0C)();
+    void (DinoEventTalkWindow::*StateWait_14)();
     void (DinoEventTalkWindow::*StateStart_1C)();
     u8 unk24[0x2C - 0x24];
     void (DinoEventTalkWindow::*Unk0200770c_2C)();
-    void (DinoEventTalkWindow::*Unk02007a00_34)();
+    void (DinoEventTalkWindow::*StateChoose_34)();
+    void (DinoEventTalkWindow::*StateEnd_3C)();
 } data_020b6144;
 
 // Waits for the window to show the page, then asks, chooses or ends.
@@ -68,9 +70,9 @@ void DinoEventTalkWindow::StatePage() {
         if (mUnk98 != 0) {
             mState = data_020b6144.Unk0200770c_2C;
         } else if (mUnk9C != 0) {
-            mState = data_020b6144.Unk02007a00_34;
+            mState = data_020b6144.StateChoose_34;
         } else {
-            mState = data_020b6144.Unk02007ab4_0C;
+            mState = data_020b6144.StateEnd_0C;
         }
     } else {
         mWindow->NextPage();
@@ -93,6 +95,66 @@ void DinoEventTalkWindow::StateStart() {
     MTaskSet *serial = &mSerial;
     serial->mUseMutex = TRUE;
     mSerial.AddTail(MCreateBgCallTask(this, data_020b6144.Load_04, 1));
-    mState = data_020b6144.Unk02007648_14;
+    mState = data_020b6144.StateWait_14;
 }
 #pragma dont_inline reset
+
+// Shows the choices.
+void DinoEventTalkWindow::StateChoose() {
+    mWindow->ClearUnkF4();
+    DinoCommonWindowMenu *menu = new DinoCommonWindowMenu((void *)mUnk9C, mPos, &mChoices, mUnkB4);
+    for (std::vector<DinoCommonWindowMenuEntry>::iterator entry = mEntries.begin(); entry != mEntries.end(); entry++) {
+        menu->AddEntry(entry->id, entry->rect, std::string(entry->text));
+    }
+    mSerial.AddTail(menu);
+    mState = data_020b6144.StateEnd_3C;
+}
+
+// Pages on with A (or after holding the buttons a while); B makes the text fast, A skips it.
+void DinoEventTalkWindow::StateWait() {
+    MInput *input = mInputHub->GetInput(0);
+    if (mWindow->GetUnkB0()) {
+        if (!mWindow->IsAnimating() && mWindow->IsPageDone()) {
+            StatePage();
+        }
+        return;
+    }
+    if (mWindow->IsPageDone()) {
+        if (input->GetPressed() & 0x110B) {
+            StatePage();
+            return;
+        }
+        if (input->mButtons & 0x10A) {
+            mUnk90++;
+            if (mUnk90 >= 18) {
+                StatePage();
+            }
+            return;
+        }
+        if (input->mButtons & 0x8) {
+            mUnk90 = 18;
+        } else {
+            mUnk90 = 0;
+        }
+        return;
+    }
+    if (input->GetPressed() & 0x1) {
+        mWindow->Skip();
+        return;
+    }
+    if (input->mButtons & 0x110A) {
+        mWindow->ResetRate();
+    }
+}
+
+// Closes the window and exits.
+void DinoEventTalkWindow::StateEnd() {
+    MTask *exit = MTaskExitTransfer::Create(this);
+    MTask *timer = new MTimer(1);
+    MTask *windowExit = MTaskExitTransfer::Create(mWindow);
+    MSerialTaskSet *serial = &mSerial;
+    serial->AddTail(mWindow->CreateCloseTask());
+    serial->AddTail(windowExit);
+    serial->AddTail(timer);
+    serial->AddTail(exit);
+}
