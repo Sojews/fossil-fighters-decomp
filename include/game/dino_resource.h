@@ -154,7 +154,8 @@ struct DinoHeadMaskDefs {
     u32 tableOffset;    // 0x08: offsets of the masks
 };
 struct DinoHeadMaskDef {
-    u32 unk00[2];
+    u32 unk00;
+    u32 price;          // 0x04
     u32 modelName;      // 0x08: offset of the head model's name, from the mask
     u32 moveSe;         // 0x0C: the player's footstep sounds with it on
     u32 moveSe2;        // 0x10

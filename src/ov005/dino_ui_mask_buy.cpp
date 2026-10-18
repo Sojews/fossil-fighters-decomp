@@ -4,6 +4,12 @@
 // Derived destructors have their bases' destructor bodies inlined; auto-inlining the ones defined above does that.
 #pragma auto_inline on
 
+#include "m/smart_oam.h"
+
+#include "game/dino_resource.h"
+
+#include "game/dino_ui3_parts_money.h"
+
 #include "m/obj.h"
 #include "game/dino_ui_mask_buy_menu.h"
 #include "game/dino_ui_mask_buy.h"
@@ -167,7 +173,7 @@ void DinoUiMaskBuyBuyButton::OnDecide() {
 
 void DinoUiMaskBuyBuyButton::OnFocusChanged(BOOL focused) {
     if (focused) {
-        if (mOwner->mUnk10C) {
+        if (mOwner->mCount) {
             mMotion->Play(2, 0);
         } else {
             mMotion->Play(1, 0);
@@ -209,4 +215,43 @@ DinoUiMaskBuy::DinoUiMaskBuy() : MProcess(NULL) {
 
 u8 DinoUiMaskBuyMenu::GetFlag(int index) {
     return mFlags[index];
+}
+
+u32 DinoUiMaskBuyMenu::GetPrice(int index) {
+    MResource<DinoHeadMaskDefs> defs = gDinoResource->LoadHeadMaskDefs();
+    u32 id = mMasks[index];
+    const DinoHeadMaskDefs *data = defs.Get();
+    return ((const DinoHeadMaskDef *)((const u8 *)data + ((const u32 *)((const u8 *)data + data->tableOffset))[id]))
+        ->price;
+}
+
+// Chooses or unchooses the mask, keeping the total.
+void DinoUiMaskBuyMenu::SetFlag(int index, u8 flag) {
+    if (flag != mFlags[index]) {
+        mFlags[index] = flag;
+        if (flag) {
+            mTotal += GetPrice(index);
+            mCount++;
+            DinoSoundPlaySe(0x9C, 0);
+        } else {
+            mTotal -= GetPrice(index);
+            mCount--;
+            DinoSoundPlaySe(0x9D, 0);
+        }
+    }
+}
+
+// The masks whose price would go over the money are greyed out.
+void DinoUiMaskBuyMenu::RefreshPage3() {
+    mMoney->SetChange(mTotal);
+    for (int i = 0; i < 8; i++) {
+        int index = mPage * 8 + i;
+        if (index < mMasks.size()) {
+            if (!GetFlag(index) && mTotal + GetPrice(mPage * 8 + i) > mFunds) {
+                ((DinoUiMaskBuyMaskButton *)mUnkC4[i])->mMotion->GetUnit()->SetMode(0);
+            } else {
+                ((DinoUiMaskBuyMaskButton *)mUnkC4[i])->mMotion->GetUnit()->SetMode(1);
+            }
+        }
+    }
 }

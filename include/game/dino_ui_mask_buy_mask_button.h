@@ -11,7 +11,7 @@ public:
     virtual void OnFocusChanged(BOOL focused);
 
     MPoint mPos;  // 0x88: the center
-    u32 mUnk90;
+    MMotion *mMotion; // 0x90
     MView *mView; // 0x94
 };
 

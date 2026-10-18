@@ -8,6 +8,8 @@
 #include "game/help.h"
 #include "game/dino_ui_mask_buy_menu_item.h"
 
+class DinoUi3PartsMoney;
+
 class DinoUiMaskBuyMenu : public DinoHelpBase, public MMenu {
 public:
     DinoUiMaskBuyMenu();
@@ -20,6 +22,8 @@ public:
     BOOL PageRight();
     BOOL PageLeft();
     u8 GetFlag(int index);
+    void SetFlag(int index, u8 flag);
+    u32 GetPrice(int index);
     BOOL Buy();
     void RefreshPage1();
     void RefreshPage2();
@@ -27,13 +31,15 @@ public:
 
     u32 mUnkB4[4];          // 0xB4
     std::vector<void *> mUnkC4; // 0xC4
-    u32 mUnkD0[6];          // 0xD0
-    u8 mFlags[8];           // 0xE8
-    std::vector<void *> mUnkF0; // 0xF0
+    u32 mUnkD0[5];          // 0xD0
+    DinoUi3PartsMoney *mMoney;  // 0xE4
+    u8 mFlags[8];           // 0xE8: the page's chosen masks
+    std::vector<u32> mMasks;    // 0xF0: the masks for sale
     int mPage; // 0xFC
     int mLastPage; // 0x100
-    u8 unk104[8];
-    u8 mUnk10C; // 0x10C
+    u32 mFunds;             // 0x104
+    u32 mTotal;             // 0x108: the chosen masks' price
+    u8 mCount;              // 0x10C: how many are chosen
     u32 mUnk110;    // 0x110
 };
 
