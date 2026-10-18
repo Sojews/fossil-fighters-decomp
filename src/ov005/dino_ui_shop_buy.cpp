@@ -213,29 +213,9 @@ u8 DinoUiShopBuyMenu::GetFlag(int index) {
 u32 DinoUiShopBuyMenu::GetPrice(int index) {
     DinoBackupEntry entry;
     gDinoBackup->GetUnk148(index, &entry);
+    u32 id = entry.id;
     const DinoKasekiDefs *defs = (const DinoKasekiDefs *)mFile.GetData();
-    return ((const DinoKasekiDef *)((const u8 *)defs + ((const u32 *)((const u8 *)defs + defs->tableOffset))[entry.id]))
-        ->price;
-}
-
-// X jumps to the buy button; B unchooses the selected item, or goes to (and then presses) the back button.
-void DinoUiShopBuyMenu::OnIdle() {
-    if (GetInput()->GetPressed() & 8) {
-        FocusItem(mLinkFrom);
-    }
-    if (GetInput()->GetPressed() & 2) {
-        if (mSelected != 0xFF && GetFlag(mSelected)) {
-            SetFlag(mSelected, FALSE);
-            ((DinoUi3PartsKasekiButton *)mItems[mSelected % 8])->SetMarked(FALSE);
-            RefreshPage3();
-            return;
-        }
-        if (mUnkC8->IsFocused()) {
-            mUnkC8->Decide();
-        } else {
-            FocusItem(mUnkC8);
-        }
-    }
+    return ((const DinoKasekiDef *)((const u8 *)defs + ((const u32 *)((const u8 *)defs + defs->tableOffset))[id]))->price;
 }
 
 // Chooses or unchooses the item, keeping the total.
@@ -263,6 +243,26 @@ void DinoUiShopBuyMenu::RefreshPage3() {
             ((DinoUi3PartsKasekiButton *)mItems[i])->SetActive(FALSE);
         } else {
             ((DinoUi3PartsKasekiButton *)mItems[i])->SetActive(TRUE);
+        }
+    }
+}
+
+// X jumps to the buy button; B unchooses the selected item, or goes to (and then presses) the back button.
+void DinoUiShopBuyMenu::OnIdle() {
+    if (GetInput()->GetPressed() & 8) {
+        FocusItem(mLinkFrom);
+    }
+    if (GetInput()->GetPressed() & 2) {
+        if (mSelected != 0xFF && GetFlag(mSelected)) {
+            SetFlag(mSelected, FALSE);
+            ((DinoUi3PartsKasekiButton *)mItems[mSelected % 8])->SetMarked(FALSE);
+            RefreshPage3();
+            return;
+        }
+        if (mUnkC8->IsFocused()) {
+            mUnkC8->Decide();
+        } else {
+            FocusItem(mUnkC8);
         }
     }
 }
