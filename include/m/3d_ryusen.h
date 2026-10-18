@@ -10,8 +10,13 @@ public:
     virtual ~M3DRyusen();
     virtual int GetFrameCount();
     virtual BOOL IsAnimDone();
+    virtual void Draw();
 
-    u8 unk32C[0x368 - 0x32C];
+    void SetQuad(const VecFx32 *origin, const VecFx32 *a, const VecFx32 *b, const VecFx32 *c);
+
+    VecFx32 mOrigin;    // 0x32C
+    VecFx32 mUnk338;    // 0x338
+    VecFx32 mEdges[3];  // 0x344: the other corners, relative to the origin
 };
 
 #endif

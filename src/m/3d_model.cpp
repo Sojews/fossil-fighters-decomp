@@ -1,5 +1,5 @@
 // M3DModel.
-// Not decompiled yet: SetModelData, Draw and the virtual at 0x02023048 (in another file).
+// Not decompiled yet: SetModelData and Draw. (Unk08, IsAnimDone and GetFrameCount are in m3d_scene_enable_task.cpp.)
 // NONMATCHING: LoadGrid (the game indexes the chunk lengths as cmds[i + 3] and cmds[i + 2] from scratch; ours folds
 // them into one address).
 

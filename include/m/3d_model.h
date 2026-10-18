@@ -18,6 +18,7 @@ public:
     virtual void SetAnimData(void *data);
     virtual int GetFrameCount();
     virtual BOOL IsAnimDone();
+    virtual void Draw();
 
     fx32 GetGroundHeight(fx32 x, fx32 z);
     BOOL IsOnGround(fx32 x, fx32 z, fx32 *height);
