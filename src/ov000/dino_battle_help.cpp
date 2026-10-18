@@ -6,6 +6,7 @@
 
 #define DINO_BATTLE_HELP_BASE_OWNER
 #include "game/dino_battle_help.h"
+#include "game/dino_battle_view2.h"
 #include "types.h"
 
 DinoBattleHelpBase::~DinoBattleHelpBase() {
@@ -24,4 +25,8 @@ const char *DinoBattleHelpBase::GetText() {
 
 MRect DinoBattleHelpBase::GetRect() {
     return mRect;
+}
+
+MRect DinoBattleHelpSupport::GetRect() {
+    return mIcon->GetRect();
 }

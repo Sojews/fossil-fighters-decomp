@@ -28,10 +28,14 @@ public:
     u32 mTextId;        // 0x90
 };
 
+class DinoBattleViewAbilityIcon;
+
 class DinoBattleHelpSupport : public DinoBattleHelpBase {
 public:
     virtual ~DinoBattleHelpSupport();
     virtual MRect GetRect();
+
+    DinoBattleViewAbilityIcon *mIcon;   // 0x94
 };
 
 #endif

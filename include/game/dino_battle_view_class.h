@@ -41,6 +41,9 @@ public:
     void IncUnk13C();
     void DecUnk13C();
     int GetUnk13C();
+    const void *GetUnk11CPalette();
+    DinoBattleViewPlayer *GetPlayerByAC(u32 id);
+    int GetUnk140();
 
     MArchivePtr mArchive;       // 0xA8
     MArchiveFile mFile;         // 0xAC
@@ -64,6 +67,7 @@ public:
     u32 mUnk134;                // 0x134
     u8 mUnk138;                 // 0x138
     int mUnk13C;                // 0x13C
+    int mUnk140;                // 0x140
 };
 
 #endif

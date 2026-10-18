@@ -31,6 +31,24 @@ DinoBattleView::~DinoBattleView() {
     delete mUnk100;
 }
 
+const void *DinoBattleView::GetUnk11CPalette() {
+    return mUnk11C->GetPalette();
+}
+
+DinoBattleViewPlayer *DinoBattleView::GetPlayerByAC(u32 id) {
+    if (id == mUnkE4[0]->GetUnkAC()) {
+        return mUnkE4[0];
+    }
+    return mUnkE4[1];
+}
+
+int DinoBattleView::GetUnk140() {
+    if (GetUnk138()) {
+        return -1;
+    }
+    return mUnk140;
+}
+
 DinoBattleViewPlayer *DinoBattleView::GetUnkE4(int index) {
     return mUnkE4[index];
 }
