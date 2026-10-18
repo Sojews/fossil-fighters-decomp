@@ -21,6 +21,13 @@ static struct {
     int left, top, right, bottom;
 } sArea = {0, 0, 0, 0};
 
+// The TU's pooled pointer-to-member constants (see menu.cpp).
+extern "C" struct {
+    u8 unk00[4];
+    void (MSimpleMenu::*Update_04)();   // 0x04
+    void (MSimpleMenu::*Start_0C)();    // 0x0C
+} data_020c45f8;
+
 MSimpleMenu::MSimpleMenu(int *result, MFont *font, const Item *items, int initial)
     : MProcess(NULL), mResult(result), mFont(font), mItems(items), mInitial(initial), mHasCancel(FALSE),
       mLocked(FALSE) {
@@ -34,7 +41,7 @@ void MSimpleMenu::Init() {
     mViews = new MParallelTaskSet;
     mParallel.AddTail(mAnimTasks);
     mParallel.AddTail(mViews);
-    mState = &MSimpleMenu::Start;
+    mState = data_020c45f8.Start_0C;
 }
 
 MSimpleMenu::~MSimpleMenu() {
@@ -190,7 +197,7 @@ void MSimpleMenu::Start() {
     }
     mInput = hub->GetInput(0);
     mParallel.AddTail(hub);
-    mState = &MSimpleMenu::Update;
+    mState = data_020c45f8.Update_04;
 }
 
 // The buttons: touch, A or Start, B, up and down.
