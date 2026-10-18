@@ -221,10 +221,15 @@ extern "C" struct {
     void (DinoCleaning::*Unk02161c20_20)();
     u8 unk28[0x60 - 0x28];
     void (DinoCleaning::*StateStopTool_60)();
+    u8 unk68[0x80 - 0x68];
+    void (DinoCommonLive::*SetUnkA0_80)(u32, bool); // 0x80 (the next block's first entry)
 } data_ov002_02165aec;
 extern "C" struct {
-    u8 unk00[0x10];
+    void (DinoCommonLive::*SetUnkA0_00)(u32, bool); // 0x00 (DinoCommonLive::SetUnkA0)
+    u8 unk08[0x10 - 0x8];
     void (DinoCleaning::*State02161260_10)(); // 0x10
+    void (DinoHelpBase::*Enable_18)(); // 0x18
+    void (DinoCleaning::*State021610b0_20)(); // 0x20
 } data_ov002_02165b6c;
 
 extern "C" void func_ov002_0215fdec(DinoCleaningKasekiRock *rock);
@@ -270,6 +275,26 @@ void DinoCleaning::State021610b0() {
     mUnk110 = mUnk110 - 1;
     DinoSoundPlaySe(0x3B, 0);
     mState = data_ov002_02165a6c.State02161164_10;
+}
+
+extern "C" void func_ov002_021600f8(DinoCleaningKasekiRock *rock);
+
+static inline void AddSerial(DinoCleaning *process, MTask *a, MTask *b, MTask *c, MTask *d) {
+    MSerialTaskSet *serial = &process->mSerial;
+    serial->AddTail(a);
+    serial->AddTail(b);
+    serial->AddTail(c);
+    serial->AddTail(d);
+}
+
+// Starts the rock and, after a moment, the help and the live commentary.
+void DinoCleaning::State02160f54() {
+    mUnk11C->AddTail(mKasekiRock);
+    func_ov002_021600f8(mKasekiRock);
+    AddSerial(this, new MTimer(60), MCreateCallTask((DinoCleaningLive *)mUnkE4, data_ov002_02165aec.SetUnkA0_80, (u32)3, true),
+              new MTimer(2), MCreateCallTask(this, data_ov002_02165b6c.Enable_18));
+    mUnk110 = 3;
+    mState = data_ov002_02165b6c.State021610b0_20;
 }
 
 void DinoCleaning::StateEnableToolMenu() {
