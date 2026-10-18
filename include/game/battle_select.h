@@ -15,6 +15,7 @@
 // A debug process that plays battles automatically.
 class DebugAutoBattle : public MProcess {
 public:
+    DebugAutoBattle();
     virtual ~DebugAutoBattle();
     virtual void Idle();
 

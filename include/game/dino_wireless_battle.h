@@ -12,6 +12,7 @@
 
 class DinoWirelessBattle : public MProcess, public MMessageObserver {
 public:
+    DinoWirelessBattle();
     virtual ~DinoWirelessBattle();
     virtual void Idle();
     virtual void OnMessage(MMessage *msg);
@@ -19,6 +20,7 @@ public:
     void (DinoWirelessBattle::*mState)(); // 0xA8
     u8 unkB0[588];
     DinoHelpDisabler mDisabler; // 0x2FC
+    u8 unk300[0x30];
 };
 
 #endif

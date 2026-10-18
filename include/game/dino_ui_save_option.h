@@ -5,6 +5,7 @@
 
 class DinoUiSaveOption : public MProcess {
 public:
+    DinoUiSaveOption(u32 arg);
     virtual ~DinoUiSaveOption();
     virtual void Idle();
 

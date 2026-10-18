@@ -5,10 +5,12 @@
 
 class DinoNetBattleSample : public MProcess {
 public:
+    DinoNetBattleSample();
     virtual ~DinoNetBattleSample();
     virtual void Idle();
 
     void (DinoNetBattleSample::*mState)(); // 0x74
+    u32 mUnk7C;                            // 0x7C
 };
 
 #endif
