@@ -47,7 +47,7 @@ public:
     void ClearFlag144(int bit);
     BOOL IsUnkCC2();
     void ClearUnk160();
-    MPoint GetUnk124();
+    MPoint GetCoord();
     MPoint GetMotionPosition();
     void SetCoord(MPoint pos);
 
@@ -83,8 +83,9 @@ public:
     u32 unk110[2];
     u32 mUnk118;            // 0x118
     u32 unk11C[2];
-    MPoint mUnk124;         // 0x124
-    u32 unk12C[6];
+    MPoint mCoord;          // 0x124
+    MPoint mCoordOffset;    // 0x12C: added to the coordinate to place the motion
+    u32 unk134[4];
     u32 mFlags144;          // 0x144
     u32 unk148[6];
     u32 mUnk160;            // 0x160

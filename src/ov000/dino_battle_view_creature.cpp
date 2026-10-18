@@ -45,8 +45,13 @@ void DinoBattleViewCreature::ClearUnk160() {
     mUnk160 = 0;
 }
 
-MPoint DinoBattleViewCreature::GetUnk124() {
-    return mUnk124;
+void DinoBattleViewCreature::SetCoord(MPoint pos) {
+    mCoord = pos;
+    mMotion->SetPosition(mCoord + mCoordOffset);
+}
+
+MPoint DinoBattleViewCreature::GetCoord() {
+    return mCoord;
 }
 
 MPoint DinoBattleViewCreature::GetMotionPosition() {
