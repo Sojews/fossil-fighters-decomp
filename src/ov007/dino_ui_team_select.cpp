@@ -4,6 +4,9 @@
 // Derived destructors have their bases' destructor bodies inlined; auto-inlining the ones defined above does that.
 #pragma auto_inline on
 
+#include "m/bright.h"
+#include "m/display.h"
+#include "m/lcd.h"
 #include "game/dino_ui_team_select.h"
 #include "types.h"
 #include "m/call_task.h"
@@ -87,4 +90,22 @@ template MTask *MCreateCallTask(DinoUiTeamSelectMenu *obj, void (DinoUiTeamSelec
 
 DinoUiTeamSelect::DinoUiTeamSelect(u32 *result, u8 unk78, u8 unk79)
     : MProcess(NULL), mResult(result), mUnk78(unk78), mUnk79(unk79) {
+}
+
+// Fades both screens out to white and leaves.
+void DinoUiTeamSelectMenu::Close() {
+    MTask *fadeMain;
+    MTask *fadeSub;
+    MTask *exit;
+    exit = CreateExitTransfer();
+    fadeSub = gLcd->mSub->mBright->CreateFadeOutToWhite(30, 0);
+    fadeMain = gLcd->mMain->mBright->CreateFadeOutToWhite(30, 0);
+    MParallelTaskSet *fades = new MParallelTaskSet(TRUE);
+    fades->AddTail(fadeMain);
+    fades->AddTail(fadeSub);
+    MTask *wait = new MTimer(30);
+    MTaskSet &serial = mSerial;
+    serial.AddTail(wait);
+    serial.AddTail(fades);
+    serial.AddTail(exit);
 }

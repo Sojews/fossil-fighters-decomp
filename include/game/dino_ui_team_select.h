@@ -29,6 +29,8 @@ public:
     void *mUnk100;          // 0x100
     u8 unk104[0xC];
     int mSelected;          // 0x110
+
+    void Close();
 };
 
 class DinoUiTeamSelect : public MProcess {

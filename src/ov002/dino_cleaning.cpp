@@ -1,5 +1,6 @@
 // DinoCleaning: the fossil cleaning scene, with DinoCleaningKasekiRock and DinoCleaningLive.
 
+#include "m/lcd.h"
 #include "game/dino_cleaning.h"
 #include "game/dino_cleaning_kaseki_rock.h"
 #include "game/dino_cleaning_dummy_item_menu.h"
@@ -271,3 +272,21 @@ template class MCallTask0<DinoCleaning, DinoHelpBase>;
 template MTask *MCreateCallTask(DinoCleaning *obj, void (DinoHelpBase::*func)());
 template class MBgCallTask0<DinoCleaning>;
 template MTask *MCreateBgCallTask(DinoCleaning *obj, void (DinoCleaning::*func)(), int thread);
+
+// Quits: fades both screens and the music out.
+void DinoCleaning::StateQuit() {
+    MTask *fadeTop;
+    MTask *fadeBottom;
+    MTask *exit;
+    exit = CreateExitTransfer();
+    fadeBottom = gLcd->GetBottomDisplay()->mBright->CreateFadeOutToBlack(120, 0);
+    fadeTop = gLcd->GetTopDisplay()->mBright->CreateFadeOutToBlack(120, 0);
+    MParallelTaskSet *fades = new MParallelTaskSet(TRUE);
+    fades->AddTail(fadeTop);
+    fades->AddTail(fadeBottom);
+    MTask *stopBgm = DinoSoundCreateStopBgmTask(-1, 120);
+    MTaskSet &serial = mSerial;
+    serial.AddTail(stopBgm);
+    serial.AddTail(fades);
+    serial.AddTail(exit);
+}

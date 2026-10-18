@@ -37,6 +37,7 @@ public:
     void StateSleep();
     void StateWake();
     void StateStopConfirm();
+    void StateQuit();
 
     void (DinoCleaning::*mState)(); // 0x94
     u8 unk9C[0xD4 - 0x9C];
