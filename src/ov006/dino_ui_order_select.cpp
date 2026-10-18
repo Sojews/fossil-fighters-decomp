@@ -3,6 +3,7 @@
 // Derived destructors have their bases' destructor bodies inlined; auto-inlining the ones defined above does that.
 #pragma auto_inline on
 
+#include "m/blend.h"
 #include "game/dino_sound.h"
 #include "game/dino_ui_order_select.h"
 #include "types.h"
@@ -74,6 +75,15 @@ template MTask *MCreateCallTask(DinoUiOrderSelectMenu *obj, void (DinoUiOrderSel
 template MTask *MCreateCallTask(DinoUiOrderSelectMenu *obj, void (DinoUiOrderSelectMenu::*func)(bool), bool a1);
 
 #pragma auto_inline off
+
+DinoUiOrderSelectMenu::~DinoUiOrderSelectMenu() {
+    if (mPictures[0] != NULL) {
+        for (int i = 0; i < 4; i++) {
+            delete mPictures[i];
+        }
+    }
+    gCurrentDisplay->mBlend->Reset();
+}
 
 void DinoUiOrderSelectMenu::OnIdle() {
     mUnk1F6 = TRUE;

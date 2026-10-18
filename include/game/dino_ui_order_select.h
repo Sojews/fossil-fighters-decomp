@@ -3,6 +3,8 @@
 
 #include "game/dino_resource.h"
 #include "m/motion.h"
+#include "m/picture.h"
+#include "m/resource.h"
 #include <string>
 
 #include "m/menu_item.h"
@@ -14,10 +16,16 @@
 #include "game/help.h"
 #include "game/dino_field_camera_hook.h"
 
+// (The data's layout isn't known yet.)
+struct DinoUiOrderSelectData;
+
 class DinoUiOrderSelectMenu : public DinoHelpBase, public MMenu {
 public:
     virtual ~DinoUiOrderSelectMenu();
+    virtual void OnStart();
     virtual void OnIdle();
+    virtual void OnFocus(MMenuItem *item);
+    virtual void OnDecide(MMenuItem *item);
 
     void SetPage(u8 page);
     void PageLeft();
@@ -31,9 +39,12 @@ public:
 
     u8 unkB3[0xC0 - 0xB3];
     MMenuItem *mTabs[4];        // 0xC0
-    u8 unkD0[0xE4 - 0xD0];
+    u8 unkD0[0xD4 - 0xD0];
+    MPictureFile *mPictures[4]; // 0xD4
     MMenuItem *mItems[5];       // 0xE4
-    u8 unkF8[0x1A8 - 0xF8];
+    u8 unkF8[0x110 - 0xF8];
+    std::string mUnk110;        // 0x110
+    u8 unk11C[0x1A8 - 0x11C];
     u8 mHasFourthTab;           // 0x1A8
     u8 unk1A9[0x1EC - 0x1A9];
     u32 mFocusIndex;            // 0x1EC: the item focused after a tab change
@@ -41,6 +52,8 @@ public:
     u8 mPage;                   // 0x1F4
     u8 mFocusTabs;              // 0x1F5: focus the new page's tab when paging
     u8 mUnk1F6;                 // 0x1F6
+    u8 unk1F7[0x20C - 0x1F7];
+    MResource<DinoUiOrderSelectData> mUnk20C;   // 0x20C
 };
 
 class DinoUiOrderSelect : public MProcess {

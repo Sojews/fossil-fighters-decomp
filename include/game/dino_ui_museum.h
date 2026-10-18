@@ -3,6 +3,8 @@
 
 #include "game/dino_resource.h"
 #include "m/motion.h"
+#include "m/picture.h"
+#include <vector>
 #include "m/menu_item.h"
 #include "m/menu.h"
 #include "m/display.h"
@@ -37,17 +39,24 @@ public:
 
     u8 unkB3[0xB8 - 0xB3];  // members start in MMenu's tail padding
     MMenuItem *mLinkFrom;   // 0xB8: linked down to the slots
-    u8 unkBC[0xE4 - 0xBC];
+    u8 unkBC[0xD8 - 0xBC];
+    MPictureFile *mPicture; // 0xD8
+    u8 unkDC[0xE4 - 0xDC];
     MMenuItem *mSlots[15];  // 0xE4
     u8 unk120[0x15C - 0x120];
     u32 mSlotCount;     // 0x15C
     u8 unk160[0x168 - 0x160];
     MView *mCursor;                     // 0x168
     DinoUiFieldMenuFraction *mFraction; // 0x16C: "page n/m"
-    u8 unk170[0x19C - 0x170];
+    u8 unk170[0x178 - 0x170];
+    std::vector<MTask *> mUnk178;       // 0x178
+    std::vector<MTask *> mUnk184;       // 0x184
+    std::vector<MTask *> mUnk190;       // 0x190
     u32 mPage;                          // 0x19C
     u8 unk1A0[0x1AC - 0x1A0];
     u8 mUnk1AC;     // 0x1AC
+    u8 unk1AD[0x1B4 - 0x1AD];
+    std::vector<MMotionFile> mUnk1B4;   // 0x1B4
 };
 
 class DinoUiMuseumEffectLight : public MProcess {

@@ -215,6 +215,12 @@ extern "C" const int data_02089a0c;
 
 #pragma auto_inline off
 
+DinoUiMuseumMenu::~DinoUiMuseumMenu() {
+    if (mPicture != NULL) {
+        delete mPicture;
+    }
+}
+
 void DinoUiMuseumMenu::ClearSlots() {
     for (int i = 0; i < 15; i++) {
         RemoveItem(mSlots[i]);
