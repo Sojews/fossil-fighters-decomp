@@ -170,6 +170,12 @@ public:
 
 struct MAfnBlock;
 
+// An 8-byte entry of the radar's list (only its size is known).
+struct DinoFieldRadarEntry {
+    u32 unk0;
+    u32 unk4;
+};
+
 class DinoFieldRadar : public MProcess {
 public:
     DinoFieldRadar(DinoField *field, u32 map);
@@ -186,7 +192,7 @@ public:
     u8 unkA4[0x56C - 0xA4];
     MFx32 mScale;               // 0x56C: map units to radar pixels
     u8 unk570[0x58C - 0x570];
-    std::vector<short> mUnk58C; // 0x58C: (the element type is a guess, distinct from other overlays')
+    std::vector<DinoFieldRadarEntry> mEntries;  // 0x58C
     MFx32Point mPlayerPos;      // 0x598
     u16 mPlayerAngle;           // 0x5A0
     MFx32 mPlayerHeight;        // 0x5A4

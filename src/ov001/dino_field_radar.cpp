@@ -79,3 +79,7 @@ void DinoFieldRadarManager::CameraUnk0(u32 map) {
         mRadar = NULL;
     }
 }
+
+// The radar list's vector members the game emits in this file.
+#pragma auto_inline off
+template class std::__vec_deleter<DinoFieldRadarEntry, std::allocator<DinoFieldRadarEntry> >;
