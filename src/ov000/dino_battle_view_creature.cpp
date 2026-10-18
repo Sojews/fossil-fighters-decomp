@@ -30,3 +30,25 @@ CreatureMotion::CreatureMotion(const char *path, MSmartOam *oam, int arg) : MMot
     mUnk88 = 0;
     mOam = oam;
 }
+
+#pragma auto_inline off
+
+void CreatureMotion::SetArg(int arg, BOOL flag) {
+    mArg = arg | (flag ? 2 : 0);
+}
+
+BOOL DinoBattleViewCreature::IsUnkCC2() {
+    return (mUnkCC & 2) ? TRUE : FALSE;
+}
+
+void DinoBattleViewCreature::ClearUnk160() {
+    mUnk160 = 0;
+}
+
+MPoint DinoBattleViewCreature::GetUnk124() {
+    return mUnk124;
+}
+
+MPoint DinoBattleViewCreature::GetMotionPosition() {
+    return mMotion->GetPosition();
+}

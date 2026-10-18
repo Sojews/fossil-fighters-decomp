@@ -45,6 +45,10 @@ public:
     void PlayMotion3();
     void SetFlag144(int bit);
     void ClearFlag144(int bit);
+    BOOL IsUnkCC2();
+    void ClearUnk160();
+    MPoint GetUnk124();
+    MPoint GetMotionPosition();
 
     class SetCoordTask : public MTask {
     public:
@@ -56,7 +60,8 @@ public:
     u32 mUnkAC;             // 0xAC
     u32 mUnkB0;             // 0xB0
     u32 mUnkB4;             // 0xB4
-    u32 unkB8[6];
+    u32 unkB8[5];
+    u32 mUnkCC;             // 0xCC
     MMotion *mMotion;       // 0xD0
     u32 unkD4;
     u32 mUnkD8;             // 0xD8
@@ -73,8 +78,12 @@ public:
     u32 mUnk10C;            // 0x10C
     u32 unk110[2];
     u32 mUnk118;            // 0x118
-    u32 unk11C[10];
+    u32 unk11C[2];
+    MPoint mUnk124;         // 0x124
+    u32 unk12C[6];
     u32 mFlags144;          // 0x144
+    u32 unk148[6];
+    u32 mUnk160;            // 0x160
 };
 
 #endif

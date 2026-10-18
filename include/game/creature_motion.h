@@ -23,6 +23,8 @@ public:
     virtual MRect GetFrame();
     virtual void Unk44(int arg);
 
+    void SetArg(int arg, BOOL flag);
+
     int mArg;           // 0x7C
     u32 mUnk80;         // 0x80
     u32 mUnk84;         // 0x84
