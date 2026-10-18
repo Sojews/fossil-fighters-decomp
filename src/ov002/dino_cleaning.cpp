@@ -24,6 +24,7 @@
 #include "game/dino_cleaning_status.h"
 #include "m/picture.h"
 #include "m/menu.h"
+#include "m/seed_generator.h"
 #include "m/window.h"
 #include <stdio.h>
 
@@ -140,7 +141,19 @@ void DinoCleaningKasekiRock::CountCells() {
 }
 
 // NONMATCHING: the members' destructors are missing (the member layout isn't known yet).
+// Puts both screens back the way the field wants them.
 DinoCleaning::~DinoCleaning() {
+    Unregister();
+    mParallel.Clear();
+    delete (MRandom *)mUnkE0;
+    gLcd->mMain->ResetHooks();
+    gLcd->mSub->ResetHooks();
+    gLcd->mMain->SetBackdrop(0x8000);
+    gLcd->mMain->Setup(5, 4, 0, 0);
+    gLcd->mSub->Setup(5, 4, 0, 0);
+    gLcd->VSyncNow();
+    gLcd->SetBottomDisplay(gLcd->mSub);
+    gCurrentDisplay = gLcd->GetBottomDisplay();
 }
 
 MInput *DinoCleaning::GetUnkDC() {
