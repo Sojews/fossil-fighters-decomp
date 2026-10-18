@@ -63,6 +63,24 @@ namespace std {
         }
     };
 
+    // The value find_or_insert gives a new element of scalar type, read from a zeroed 8-byte constant in the file's
+    // data (the game's file.cpp, archive.cpp and help.cpp maps all do this; the real MSL source is unknown). Other
+    // types are made with T() there instead.
+    template <class T, bool scalar> struct __map_default {
+        static const T &get() {
+            return *(const T *) 0;
+        }
+    };
+    template <class T> struct __map_default<T, true> {
+        static const T &get() {
+            static const struct {
+                int pad;
+                T value;
+            } s = {0, 0};
+            return s.value;
+        }
+    };
+
     template <class Key, class T, class Compare, class Allocator>
     typename map<Key, T, Compare, Allocator>::size_type map<Key, T, Compare, Allocator>::erase(const Key &k) {
         iterator it = this->find(k);
@@ -83,6 +101,10 @@ namespace std {
         if (last_not_greater == 0 ||
             __select_first<value_type>::less(static_cast<Compare &>(*this),
                                              static_cast<node *>(last_not_greater)->data_, k)) {
+            if (is_scalar<T>::value) {
+                typedef __map_default<T, is_scalar<T>::value> Default;
+                return static_cast<node *>(this->insert_node_at(p, left, leftmost, value_type(k, Default::get())))->data_;
+            }
             return static_cast<node *>(this->insert_node_at(p, left, leftmost, value_type(k, T())))->data_;
         }
         return static_cast<node *>(last_not_greater)->data_;

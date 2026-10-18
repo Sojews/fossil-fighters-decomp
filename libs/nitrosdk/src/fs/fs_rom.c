@@ -6,11 +6,6 @@
 #define FS_ARCHIVE_PROC_WRITEFILE (1 << FS_COMMAND_WRITEFILE)
 #define FS_ARCHIVE_PROC_ALL (~0)
 
-typedef struct {
-    u32 offset;
-    u32 length;
-} CARDRomRegion;
-
 // Where the ROM header (copied to the end of main memory at boot) gives the file tables: the name table, then
 // the allocation table.
 #define HW_ROM_HEADER_FNT 0x027ffe40

@@ -7,42 +7,11 @@
 
 #define OS_BOOTTYPE_DOWNLOAD_MB 2
 #define DGT_HASH2_DIGEST_SIZE 20
-#define FS_OVERLAY_FLAG_COMP 0x01
 #define FS_OVERLAY_FLAG_AUTH 0x02
 
 // Where the ROM header (copied to the end of main memory at boot) gives the ARM9 overlay table, then the ARM7's.
 #define HW_ROM_HEADER_OVT 0x027ffe50
 
-typedef enum {
-    MI_PROCESSOR_ARM9 = 0,
-    MI_PROCESSOR_ARM7 = 1
-} MIProcessor;
-
-typedef u32 FSOverlayID;
-typedef void (*FSOverlayInitFunc)(void);
-
-typedef struct {
-    u32 offset;
-    u32 length;
-} CARDRomRegion;
-
-typedef struct {
-    u32 id;                                 // 0x00
-    u8 *ram_address;                        // 0x04
-    u32 ram_size;                           // 0x08
-    u32 bss_size;                           // 0x0c
-    FSOverlayInitFunc *sinit_init;          // 0x10
-    FSOverlayInitFunc *sinit_init_end;      // 0x14
-    u32 file_id;                            // 0x18
-    u32 compressed : 24;                    // 0x1c
-    u32 flag : 8;
-} FSOverlayInfoHeader;
-
-typedef struct {
-    FSOverlayInfoHeader header;             // 0x00
-    MIProcessor target;                     // 0x20
-    CARDRomRegion file_pos;                 // 0x24
-} FSOverlayInfo;
 
 void IC_InvalidateRange(void *startAddr, u32 nBytes);
 void DC_InvalidateRange(void *startAddr, u32 nBytes);

@@ -276,6 +276,11 @@ namespace std {
         size_t unused_;
     };
 
+    // Whether a tree of Value has the unused word (see end_node below).
+    template <class Value> struct __tree_header_padded {
+        static const bool value = !Metrowerks::has_trivial_dtor<Value>::value;
+    };
+
     template <class T> struct less {
         bool operator()(const T &x, const T &y) const {
             return x < y;
@@ -317,8 +322,8 @@ namespace std {
         };
         // Trees of values with a non-trivial destructor have a word between the header and leftmost_ that's
         // never written (seen in the game's map<MArchiveFile, ...> and map<u32, DinoEventEpisode>; the real MSL
-        // reason is unknown).
-        typedef __tree_end_node<Metrowerks::has_trivial_dtor<Value>::value> end_node;
+        // reason is unknown, and the map<std::string, MFileArchive *> in file.cpp doesn't have it).
+        typedef __tree_end_node<!__tree_header_padded<Value>::value> end_node;
 
     public:
         typedef Key key_type;

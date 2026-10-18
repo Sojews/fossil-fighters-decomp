@@ -4,6 +4,7 @@
 #define MSL_STRING
 
 #include <memory>
+#include <iterator>
 
 namespace std {
 
@@ -24,6 +25,7 @@ public:
         }
     }
     basic_string(const C *s);
+    basic_string(const C *s, size_type n);
     basic_string(const basic_string &other);
     ~basic_string();
 
@@ -36,8 +38,12 @@ public:
     static const size_type npos = (size_type)-1;
 
     basic_string substr(size_type pos = 0, size_type n = npos) const;
+    size_type find(const C *s, size_type pos = 0) const;
     size_type rfind(C c, size_type pos = npos) const;
     int compare(const C *s) const;
+    int compare(const basic_string &str) const;
+    int compare(size_type pos, size_type n1, const C *s, size_type n2) const;
+    void swap(basic_string &str);
 
     void clear() {
         if (!is_long()) {
@@ -69,6 +75,9 @@ public:
         return p + n;
     }
 
+    // Replaces [pos, pos + n) with [first, last) (the iterator tag picks the copy loop).
+    basic_string &__replace(size_type pos, size_type n, const C *first, const C *last, random_access_iterator_tag);
+
     // Short strings are stored in place.
     union {
         unsigned long mWords[3];
@@ -90,9 +99,87 @@ template <class C, class Traits, class Alloc>
 bool operator==(const basic_string<C, Traits, Alloc> &lhs, const basic_string<C, Traits, Alloc> &rhs);
 
 template <class C, class Traits, class Alloc>
+inline bool operator<(const basic_string<C, Traits, Alloc> &lhs, const basic_string<C, Traits, Alloc> &rhs) {
+    return lhs.compare(rhs) < 0;
+}
+
+template <class C, class Traits, class Alloc>
 inline bool operator==(const basic_string<C, Traits, Alloc> &lhs, const C *rhs) {
     return lhs.compare(rhs) == 0;
 }
+
+// The out-of-line members a file instantiates itself (defined only where MSL_STRING_DEFINITIONS is, so other
+// files keep calling the copies they link against).
+#ifdef MSL_STRING_DEFINITIONS
+template <class C, class Traits, class Alloc>
+basic_string<C, Traits, Alloc>::basic_string(const C *s, size_type n) {
+    unsigned long i = 0;
+    unsigned long *words = mWords;
+    for (; i < 3; i++) {
+        *words++ = 0;
+    }
+    reserve(n);
+    __replace(0, 0, s, s + n, random_access_iterator_tag());
+}
+
+template <class C, class Traits, class Alloc>
+void basic_string<C, Traits, Alloc>::swap(basic_string &str) {
+    if (this != &str) {
+        struct Rep {
+            unsigned long words[3];
+        };
+        Rep tmp = *(Rep *) mWords;
+        *(Rep *) mWords = *(Rep *) str.mWords;
+        *(Rep *) str.mWords = tmp;
+    }
+}
+
+template <class C, class Traits, class Alloc>
+typename basic_string<C, Traits, Alloc>::size_type basic_string<C, Traits, Alloc>::rfind(C c, size_type pos) const {
+    const C *p;
+    size_type n;
+    if (!is_long()) {
+        p = mShort.buf;
+        n = mShort.size;
+    } else {
+        p = mLong.data;
+        n = mLong.size;
+    }
+    if (n != 0) {
+        if (pos > n - 1) {
+            pos = n - 1;
+        }
+        for (const C *q = p + pos;; q--) {
+            if (c == *q) {
+                return q - p;
+            }
+            if (q <= p) {
+                break;
+            }
+        }
+    }
+    return npos;
+}
+
+template <class C, class Traits, class Alloc>
+int basic_string<C, Traits, Alloc>::compare(const basic_string &str) const {
+    const C *s;
+    size_type n;
+    if (!str.is_long()) {
+        s = str.mShort.buf;
+        n = str.mShort.size;
+    } else {
+        s = str.mLong.data;
+        n = str.mLong.size;
+    }
+    return compare(0, size(), s, n);
+}
+
+template <class C, class Traits, class Alloc>
+bool operator==(const basic_string<C, Traits, Alloc> &lhs, const basic_string<C, Traits, Alloc> &rhs) {
+    return lhs.size() == rhs.size() && lhs.compare(rhs) == 0;
+}
+#endif
 
 typedef basic_string<char> string;
 typedef basic_string<wchar_t> wstring;
@@ -101,6 +188,10 @@ string operator+(const char *lhs, const string &rhs);
 
 template <class C, class Traits, class Alloc>
 basic_string<C, Traits, Alloc> operator+(const basic_string<C, Traits, Alloc> &lhs, const C *rhs);
+
+template <class C, class Traits, class Alloc>
+basic_string<C, Traits, Alloc> operator+(const basic_string<C, Traits, Alloc> &lhs,
+                                         const basic_string<C, Traits, Alloc> &rhs);
 
 }  // namespace std
 

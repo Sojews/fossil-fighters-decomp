@@ -189,6 +189,47 @@ BOOL FS_OpenFileFast(FSFile *p_file, FSFileID file_id);
 BOOL FS_CloseFile(FSFile *p_file);
 BOOL FS_SeekFile(FSFile *p_file, s32 offset, FSSeekFileMode origin);
 s32 FS_ReadFile(FSFile *p_file, void *dst, s32 len);
+s32 FS_GetPathLength(FSFile *p_file);
+BOOL FS_GetPathName(FSFile *p_file, char *buf, u32 len);
+
+#define FS_OVERLAY_FLAG_COMP 0x01
+
+typedef enum {
+    MI_PROCESSOR_ARM9 = 0,
+    MI_PROCESSOR_ARM7 = 1
+} MIProcessor;
+
+typedef u32 FSOverlayID;
+typedef void (*FSOverlayInitFunc)(void);
+
+typedef struct {
+    u32 offset;
+    u32 length;
+} CARDRomRegion;
+
+typedef struct {
+    u32 id;                                 // 0x00
+    u8 *ram_address;                        // 0x04
+    u32 ram_size;                           // 0x08
+    u32 bss_size;                           // 0x0c
+    FSOverlayInitFunc *sinit_init;          // 0x10
+    FSOverlayInitFunc *sinit_init_end;      // 0x14
+    u32 file_id;                            // 0x18
+    u32 compressed : 24;                    // 0x1c
+    u32 flag : 8;
+} FSOverlayInfoHeader;
+
+typedef struct {
+    FSOverlayInfoHeader header;             // 0x00
+    MIProcessor target;                     // 0x20
+    CARDRomRegion file_pos;                 // 0x24
+} FSOverlayInfo;
+
+BOOL FS_LoadOverlayInfo(FSOverlayInfo *p_ovi, MIProcessor target, FSOverlayID id);
+FSFileID FS_GetOverlayFileID(const FSOverlayInfo *p_ovi);
+void FS_ClearOverlayImage(FSOverlayInfo *p_ovi);
+void FS_StartOverlay(FSOverlayInfo *p_ovi);
+BOOL FS_UnloadOverlay(MIProcessor target, FSOverlayID id);
 
 #ifdef __cplusplus
 }
