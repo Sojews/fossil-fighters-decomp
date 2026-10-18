@@ -151,8 +151,14 @@ void DinoHelpSampleConsole::SetText(const char *text) {
     mConsole->Print(std::string(text));
 }
 
+// The file's pooled statics (the game addresses sConsoleRect as a slot of this block; see menu.cpp).
+extern "C" struct {
+    u8 unk00[0x2C];
+    MRect consoleRect;  // 0x2C: sConsoleRect
+} data_020bc804;
+
 MRect DinoHelpSampleConsole::GetRect() {
-    return sConsoleRect;
+    return data_020bc804.consoleRect;
 }
 
 MDisplay *DinoHelpSampleConsole::GetDisplay() {
