@@ -398,3 +398,6 @@ void MAnmSE::Unk0C() {
 
 MAnmSE::~MAnmSE() {
 }
+
+#pragma auto_inline off
+template class std::__vec_deleter<MAnmKey, std::allocator<MAnmKey> >;
