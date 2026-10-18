@@ -5,6 +5,7 @@
 #include "game/dino_event_exec.h"
 #include "nitro/mi.h"
 #include "m/overlay.h"
+#include "game/dino_field_battle_start_effect.h"
 #include "game/dino_resource.h"
 #include "game/dino_sound.h"
 #include "m/picture.h"
@@ -605,7 +606,10 @@ void DinoEventExecDance::Idle() {
     serial->AddTail(exit);
 }
 
+M_EXTERN_OVERLAY(ov003);
 M_EXTERN_OVERLAY(ov004);
+M_EXTERN_OVERLAY(ov006);
+M_EXTERN_OVERLAY(ov007);
 
 DinoEventExecMapSelect::DinoEventExecMapSelect(DinoEventLoop *event, u32 var) : MProcess(NULL) {
     mEvent = event;
@@ -2097,4 +2101,89 @@ DinoEventExecStartPatrol::~DinoEventExecStartPatrol() {
 
 void DinoEventExecBattle::Idle() {
     (this->*mState)();
+}
+
+// The TU's pooled pointer-to-member constants (see menu.cpp).
+extern "C" struct {
+    u8 unk00[0x8];
+    void (DinoEventExecAutoWarp::*AutoWarpStart_08)();
+    u8 unk10[0x20 - 0x10];
+    void (DinoEventExecBattle::*Battle02041644_20)();
+    u8 unk28[0x38 - 0x28];
+    void (DinoEventExecCleaning::*Cleaning0203ff38_38)();
+    u8 unk40[0x48 - 0x40];
+    void (DinoEventExecCleaning::*Cleaning020400a8_48)();
+} data_020be144;
+extern "C" struct {
+    void (DinoEventExecCleaning::*CleaningStart_00)();
+    void (DinoEventExecBattle::*StateCloseField_08)();
+    u8 unk10[0x58 - 0x10];
+    void (DinoEventExecBattle::*Battle020401b0_58)();
+    u8 unk60[0x78 - 0x60];
+    void (DinoEventExecBattle::*Battle02041b24_78)();
+} data_020be1c4;
+extern "C" struct {
+    u8 unk00[0x50];
+    void (DinoEventExecBattle::*Battle0204079c_50)();
+    u8 unk58[0x70 - 0x58];
+    void (DinoEventExecBattle::*BattleStart_70)();
+    void (DinoEventExecBattle::*DemoStart_78)();
+} data_020be244;
+
+DinoEventExecBattle::DinoEventExecBattle(DinoEventLoop *event, u32 unk80, u32 battle, u32 unk88, s32 demo)
+    : MProcess(NULL), mEvent(event), mUnk80(unk80), mBattle(battle), mUnk88(unk88), mDemo(demo) {
+    if (mDemo == -1) {
+        mState = data_020be244.BattleStart_70;
+    } else {
+        mState = data_020be244.DemoStart_78;
+    }
+}
+
+DinoEventExecCleaning::DinoEventExecCleaning(DinoEventLoop *event, u32 unk80, u32 unk84, u8 unk88, u8 unk89)
+    : MProcess(NULL), mEvent(event), mUnk80(unk80), mUnk84(unk84), mUnk88(unk88), mUnk89(unk89) {
+    mState = data_020be1c4.CleaningStart_00;
+}
+
+void DinoEventExecCleaning::StateCloseField() {
+    mEvent->CloseField(FALSE);
+    mState = data_020be144.Cleaning0203ff38_38;
+}
+
+void DinoEventExecCleaning::StateOpenField() {
+    mEvent->OpenField(FALSE);
+    mState = data_020be144.Cleaning020400a8_48;
+}
+
+void DinoEventExecBattle::StateStartEffect() {
+    if (mUnk80 == 0) {
+        mSerial.AddTail(new DinoFieldBattleStartEffect(mEvent->GetField()));
+    }
+    mState = data_020be1c4.StateCloseField_08;
+}
+
+void DinoEventExecBattle::StateCloseField() {
+    mEvent->CloseField(TRUE);
+    mState = data_020be1c4.Battle020401b0_58;
+}
+
+void DinoEventExecBattle::StateUnloadOverlays() {
+    MUnloadOverlay(0, M_OVERLAY_ID(ov003));
+    MUnloadOverlay(0, M_OVERLAY_ID(ov006));
+    mState = data_020be244.Battle0204079c_50;
+}
+
+void DinoEventExecBattle::StateLoadOverlays() {
+    MLoadOverlay(0, M_OVERLAY_ID(ov003));
+    MLoadOverlay(0, M_OVERLAY_ID(ov007));
+    mState = data_020be144.Battle02041644_20;
+}
+
+void DinoEventExecBattle::StateOpenField() {
+    mEvent->OpenField(TRUE);
+    mState = data_020be1c4.Battle02041b24_78;
+}
+
+DinoEventExecAutoWarp::DinoEventExecAutoWarp(DinoEventLoop *event, u32 unk80, u32 unk84, u32 unk88)
+    : MProcess(NULL), mEvent(event), mUnk80(unk80), mUnk84(unk84), mUnk88(unk88) {
+    mState = data_020be144.AutoWarpStart_08;
 }

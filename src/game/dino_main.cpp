@@ -243,7 +243,7 @@ void DinoMainLoop::StateGame() {
         mUnkA0 = (mUnkA0 + 1) % demos->count;
         battle = ((const u32 *)((const u8 *)demos + demos->offset))[mUnkA0];
     }
-    mSerial.AddTail(new DinoEventExecBattle(0, 0, battle, 0, mUnkA0));
+    mSerial.AddTail(new DinoEventExecBattle(NULL, 0, battle, 0, mUnkA0));
 }
 
 void DinoMainLoop::StateVolume() {
