@@ -229,6 +229,12 @@ void DinoUiMuseumMenu::ClearSlots() {
     RemoveLink(mLinkFrom, 2);
 }
 
+void DinoUiMuseumMenu::CreateSlots() {
+    for (int i = 0; i < 15; i++) {
+        CreateSlot(i);
+    }
+}
+
 void DinoUiMuseumMenu::FinishPageRight() {
     ClearSlots();
     mFraction->SetNumerator(mPage + 1);
@@ -243,12 +249,6 @@ void DinoUiMuseumMenu::FinishPageLeft() {
     CreateSlots();
     Enable();
     FocusNearestItem(mCursor->GetPosition());
-}
-
-void DinoUiMuseumMenu::CreateSlots() {
-    for (int i = 0; i < 15; i++) {
-        CreateSlot(i);
-    }
 }
 
 DinoUiMuseumSlotCreateTask::DinoUiMuseumSlotCreateTask(DinoUiMuseumMenu *menu) : MProcess(NULL) {
