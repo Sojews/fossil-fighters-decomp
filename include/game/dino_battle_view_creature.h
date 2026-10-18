@@ -15,6 +15,9 @@
 
 class MMotion;
 
+class DinoBattleViewStatusEffectIcon;
+class MPalAnime;
+
 class DinoBattleViewCreature : public MProcess, public MMessageObserver {
 public:
     virtual ~DinoBattleViewCreature();
@@ -24,6 +27,8 @@ public:
     u32 GetUnkAC();
     u32 GetUnkB0();
     void SetUnitModes(BOOL on);
+    void HideAll();
+    MPalAnime *CreatePalBlend(BOOL withBase, u16 color, int weight, u32 duration);
     u32 CountAttacks();
     u32 GetAttack(u32 index);
     u32 GetSpecialAttack();
@@ -92,7 +97,9 @@ public:
     u32 unk11C[2];
     MPoint mCoord;          // 0x124
     MPoint mCoordOffset;    // 0x12C: added to the coordinate to place the motion
-    u32 unk134[3];
+    u32 unk134;
+    DinoBattleViewStatusEffectIcon *mStatusIcons; // 0x138
+    MTaskSet *mUnk13C;      // 0x13C
     MMotion *mMotion140;    // 0x140
     u32 mFlags144;          // 0x144
     u32 unk148[6];

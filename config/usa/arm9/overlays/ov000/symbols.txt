@@ -646,7 +646,7 @@ _ZN22DinoBattleViewCreature9OnMessageEP8MMessage kind:function(thumb,size=0x1f5c
 .L_021724ae kind:label(thumb) addr:0x021724ae local
 .L_021724c0 kind:label(thumb) addr:0x021724c0 local
 _Z15MCreateCallTaskI30DinoBattleViewStatusEffectIconS0_6MPointEP5MTaskPT_MT0_FvT1_ES7_ kind:function(thumb,size=0x54) addr:0x021724d4
-func_ov000_02172528 kind:function(thumb,size=0x6a) addr:0x02172528
+_ZN22DinoBattleViewCreature7HideAllEv kind:function(thumb,size=0x6a) addr:0x02172528
 func_ov000_02172594 kind:function(thumb,size=0xa4) addr:0x02172594
 _Z15MCreateCallTaskI22DinoBattleViewCreatureS0_EP5MTaskPT_MT0_FvvE kind:function(thumb,size=0x38) addr:0x02172638
 func_ov000_02172670 kind:function(thumb,size=0x90) addr:0x02172670
@@ -656,7 +656,7 @@ _ZN22DinoBattleViewCreature17SetMotionPriorityEi kind:function(thumb,size=0xe) a
 _ZN22DinoBattleViewCreature15SetMotionAnchorEi kind:function(thumb,size=0xe) addr:0x021728b0
 _ZN22DinoBattleViewCreature11PlayMotion3Ev kind:function(thumb,size=0x12) addr:0x021728c0
 func_ov000_021728d4 kind:function(thumb,size=0x260) addr:0x021728d4
-func_ov000_02172b34 kind:function(thumb,size=0x94) addr:0x02172b34
+_ZN22DinoBattleViewCreature14CreatePalBlendEitim kind:function(thumb,size=0x94) addr:0x02172b34
 _ZN22DinoBattleViewCreature10SetFlag144Ei kind:function(thumb,size=0x16) addr:0x02172bc8
 _ZN22DinoBattleViewCreature12ClearFlag144Ei kind:function(thumb,size=0x16) addr:0x02172be0
 func_ov000_02172bf8 kind:function(thumb,size=0xb0) addr:0x02172bf8

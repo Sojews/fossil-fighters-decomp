@@ -8,6 +8,7 @@
 #include "m/fx32.h"
 #include "types.h"
 #include "game/dino_battle_view_creature.h"
+#include "m/pal.h"
 #include "game/dino_battle_view_kaseki_point_menu.h"
 #include "game/view_status_effect_icon.h"
 #include "m/bg_new_task.h"
@@ -169,6 +170,36 @@ void CreateCreatureMotionTask::Execute() {
 void DinoBattleViewCreature::SetUnitModes(BOOL on) {
     mMotion->GetUnit()->SetMode(on ? 1 : 0);
     mMotion140->GetUnit()->SetMode(on ? 1 : 0);
+}
+
+// Hides the creature's icons, lifebar and motion, and plays its marker's closing animation.
+void DinoBattleViewCreature::HideAll() {
+    mStatusIcons->HideIcons();
+    ((DinoBattleViewLifebar *)mUnkE0)->Hide();
+    mMotion->Hide();
+    MTask *hide = mMotion140->CreateHideTransfer();
+    MTask *wait = mMotion140->CreateWaitStopTask();
+    MTask *play = mMotion140->CreatePlayTransfer(2, 0);
+    MTaskSet *set = mUnk13C;
+    set->AddTail(play);
+    set->AddTail(wait);
+    set->AddTail(hide);
+}
+
+// A palette animation that blends the motion's colors toward a color (from them, if withBase), looping.
+// NONMATCHING: the game spills weight first thing; ours after the first loads.
+MPalAnime *DinoBattleViewCreature::CreatePalBlend(BOOL withBase, u16 color, int weight, u32 duration) {
+    MMotionFile *file = &mMotion->mFile;
+    MPalBlock *palette = mMotion->GetPalette(0);
+    MPalAnime *anime = new MPalAnime(palette, 0, 0x7FFF);
+    anime->SetLoadRange(2, 0xFE);
+    if (withBase) {
+        anime->AddFrame((const u16 *)((u8 *)file->GetPalette(0, NULL) + 4));
+    }
+    anime->AddBlend((const u16 *)((u8 *)file->GetPalette(0, NULL) + 4), color, weight);
+    anime->SetLoop();
+    anime->SetDuration(duration);
+    return anime;
 }
 
 // The number of the creature's attacks its level allows.
