@@ -6,6 +6,7 @@
 
 #include "game/dino_sound.h"
 #include "game/dino_ui_organization_menu.h"
+#include "game/dino_ui_field_menu_fraction.h"
 #include "m/display.h"
 #include "m/blend.h"
 #include "m/call_task.h"
@@ -156,6 +157,22 @@ void DinoUiOrganizationMenu::ClearSlots() {
         RemoveItem(mSlots[i]);
         delete mSlots[i];
     }
+}
+
+void DinoUiOrganizationMenu::FinishPageRight() {
+    ClearSlots();
+    mFraction->SetNumerator(mPage + 1);
+    CreateSlots();
+    Enable();
+    FocusNearestItem(GetCursor());
+}
+
+void DinoUiOrganizationMenu::FinishPageLeft() {
+    ClearSlots();
+    mFraction->SetNumerator(mPage + 1);
+    CreateSlots();
+    Enable();
+    FocusNearestItem(GetCursor());
 }
 
 void DinoUiOrganizationMenu::CreateSlots() {

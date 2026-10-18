@@ -10,6 +10,8 @@
 #include "m/archive.h"
 #include "game/help.h"
 
+class DinoUiFieldMenuFraction;
+
 class DinoUiOrganizationMenu : public DinoHelpBase, public MMenu {
 public:
     virtual ~DinoUiOrganizationMenu();
@@ -22,19 +24,24 @@ public:
     void CreateSlot(u32 index);
     void ClearSlots();
     void RemoveSlotLinks();
+    void FinishPageRight();
+    void FinishPageLeft();
 
     u32 mUnkB4[25];                     // 0xB4
     MMenuItem *mSlots[15];              // 0x118
     u32 mUnk154[15];                    // 0x154
     u32 mSlotCount;                     // 0x190
-    u32 mUnk194[6];                     // 0x194
+    u32 mUnk194[3];                     // 0x194
+    DinoUiFieldMenuFraction *mFraction; // 0x1A0: "page n/m"
+    u32 mUnk1A4[2];                     // 0x1A4
     std::vector<void *> mUnk1AC;        // 0x1AC
     std::vector<void *> mUnk1B8;        // 0x1B8
     std::vector<void *> mUnk1C4;        // 0x1C4
     std::vector<void *> mUnk1D0;        // 0x1D0
     std::vector<void *> mUnk1DC;        // 0x1DC
     std::vector<void *> mUnk1E8;        // 0x1E8
-    u32 mUnk1F4[18];                    // 0x1F4
+    u32 mPage;                          // 0x1F4
+    u32 mUnk1F8[17];                    // 0x1F8
     u8 unk23C[2];
     u8 mUnk23E;                         // 0x23E
     u8 unk23F;
