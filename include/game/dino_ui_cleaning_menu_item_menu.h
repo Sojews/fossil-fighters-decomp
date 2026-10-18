@@ -66,6 +66,7 @@ class DinoUiCleaningTest : public MProcess {
 public:
     virtual ~DinoUiCleaningTest();
     virtual void Idle();
+    void Finish();
 
     void (DinoUiCleaningTest::*mState)(); // 0x74
     std::vector<void *> mUnk7C; // 0x7C

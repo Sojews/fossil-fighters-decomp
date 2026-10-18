@@ -160,3 +160,9 @@ DinoUiCleaningMenu::DinoUiCleaningMenu(DinoEventLoop *event) : MMenu(NULL, 0), m
     mPage = 0;
     mLastPage = 0;
 }
+
+#pragma auto_inline off
+
+void DinoUiCleaningTest::Finish() {
+    mSerial.AddTail(MTaskExitTransfer::Create(this));
+}
