@@ -62,6 +62,7 @@ static u32 CARDi_ReadRomIDCore(void);
 static void CARDi_ReadCard(CARDRomStat *p);
 static void *CARDi_GetRomAccessor(void);
 
+#pragma opt_common_subs off
 static BOOL CARDi_ReadFromCache(CARDRomStat *p) {
     CARDiCommon *const c = &cardi_common;
     const u32 cur_page = (u32) (c->src & ~(CARD_ROM_PAGE_SIZE - 1));
@@ -78,6 +79,7 @@ static BOOL CARDi_ReadFromCache(CARDRomStat *p) {
     }
     return c->len > 0;
 }
+#pragma opt_common_subs reset
 
 static void CARDi_SetRomOp(u32 cmd1, u32 cmd2) {
     while ((reg_CARD_CNT & CARD_START) != 0) {

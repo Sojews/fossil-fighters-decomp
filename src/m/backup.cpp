@@ -338,6 +338,7 @@ BOOL MBackupStorage::WriteFile(u32 file, const void *buf) {
     return FALSE;
 }
 
+#pragma opt_common_subs off
 void MBackupStorage::Format() {
     mMounted = FALSE;
     mFormatted = FALSE;
@@ -367,3 +368,4 @@ void MBackupStorage::Format() {
     mFormatted = TRUE;
     PageRound(0);   // (a leftover of a debug check)
 }
+#pragma opt_common_subs reset

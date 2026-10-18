@@ -129,6 +129,7 @@ void Dino3DLoadCsv::Reset() {
     mCommands.clear();
 }
 
+#pragma opt_common_subs off
 void Dino3DLoadCsv::LoadScene(u32 index, u32 arg) {
     MResource<Dino3DSceneFiles> scenes("/model/battle/arcscenecsv");
     MArchiveFile file = scenes.Get()->GetFile(scenes.mArchive, index);
@@ -140,6 +141,7 @@ void Dino3DLoadCsv::LoadScene(u32 index, u32 arg) {
     ParseScript(text, mUnk84, "/model/battle/", arg, 0);
     delete[] text;
 }
+#pragma opt_common_subs reset
 
 void Dino3DLoadCsv::Load(const char *path, u32 arg) {
     MFile file;
