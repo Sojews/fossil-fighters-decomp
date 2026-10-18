@@ -7,6 +7,7 @@
 // The title screen's top menu.
 class DinoUiTopMenu : public DinoHelpBase, public MMenu {
 public:
+    DinoUiTopMenu(int *result);
     virtual ~DinoUiTopMenu();
     virtual void OnStart();
     virtual void OnFocus(MMenuItem *item);

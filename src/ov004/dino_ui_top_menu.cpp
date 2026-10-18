@@ -149,6 +149,12 @@ void DinoUiTopMenuItem2::OnFocusChanged(BOOL focused) {
     }
 }
 
+DinoUiTopMenu::DinoUiTopMenu(int *result) : MMenu(0) {
+    mResult = result;
+    mSilentFocus = TRUE;
+    SetDeferStart(TRUE);
+}
+
 void DinoUiTopMenu::OnFocus(MMenuItem *item) {
     SetSelectedItem(dynamic_cast<DinoHelpItem *>(item));
     if (!mSilentFocus) {
