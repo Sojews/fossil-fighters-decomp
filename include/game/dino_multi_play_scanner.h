@@ -30,7 +30,8 @@ public:
     u8 *mResult;        // 0xF0
     MRandom mRandom;    // 0xF4
     u32 mUnkFC;         // 0xFC
-    u32 mWait;          // 0x100: frames before trying the other side
+    int mWait;          // 0x100: frames before trying the other side
+    u8 mFound;          // 0x104: a partner was found
 };
 
 class DinoMultiPlayScanTelop : public MProcess {
