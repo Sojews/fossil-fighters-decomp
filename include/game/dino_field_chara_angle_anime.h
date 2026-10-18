@@ -8,6 +8,7 @@ class DinoFieldChara;
 // Turns a field character from one direction to another.
 class DinoFieldCharaAngleAnime : public MAnime {
 public:
+    DinoFieldCharaAngleAnime(DinoFieldChara *chara, u32 angle, u32 frames, int ease);
     virtual ~DinoFieldCharaAngleAnime();
     virtual void Apply(int step);
 

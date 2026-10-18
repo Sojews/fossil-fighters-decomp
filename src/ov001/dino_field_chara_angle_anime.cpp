@@ -66,6 +66,26 @@ BOOL DinoFieldChara::IsUnkA1Motion() {
     return mModel.unk05[0] && (mMotion == 2 || mMotion == 3);
 }
 
+inline DinoFieldCharaAngleAnime::DinoFieldCharaAngleAnime(DinoFieldChara *chara, u32 angle, u32 frames, int ease) {
+    mChara = chara;
+    mSteps = 256;
+    SetDuration(frames);
+    mEase = ease;
+    u16 from = mChara->GetModel()->angle;
+    u16 diff = angle - from;
+    mFrom = from;
+    if (diff < 0x8000) {
+        mTo = from + diff;
+    } else {
+        mTo = from - (0x10000 - diff);
+    }
+}
+
+void DinoFieldChara::SetAngle(u32 angle, u32 frames, u32 ease) {
+    mAngleTasks->Clear();
+    mAngleTasks->AddTail(new DinoFieldCharaAngleAnime(this, angle, frames, ease));
+}
+
 void DinoFieldChara::SetTask(DinoCharaTask task) {
     mTask = task;
     switch (task.unk4) {
@@ -95,13 +115,13 @@ void DinoFieldChara::Read(const void *buf) {
 }
 
 MTask *DinoFieldChara::CreateWaitMoveTask() {
-    MTask *angle;
     MTask *move;
-    move = MTaskSetWaitEmptyTask::Create(mMoveTasks);
+    MTask *angle;
     angle = MTaskSetWaitEmptyTask::Create(mAngleTasks);
+    move = MTaskSetWaitEmptyTask::Create(mMoveTasks);
     MParallelTaskSet *set = new MParallelTaskSet(TRUE);
-    set->AddTail(angle);
     set->AddTail(move);
+    set->AddTail(angle);
     return set;
 }
 

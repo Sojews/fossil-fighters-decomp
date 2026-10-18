@@ -90,7 +90,7 @@ public:
     void ApplyBodyModel();
     void ApplyHeadModel();
     void ChangeMotion(u32 motion, u8 loop, MFx32 speed);
-    void SetAngle(u32 angle, u32 a, u32 b);
+    void SetAngle(u32 angle, u32 frames, u32 ease);
     void SetDirection(u16 angle);
     BOOL IsMoving();
     BOOL IsUnkA1Motion();
@@ -107,8 +107,8 @@ public:
     u32 mUnkC0;                 // 0xC0
     u32 mUnkC4;                 // 0xC4
     DinoCharaTask mTask;        // 0xC8: what the character does on its own
-    MTaskSet *mMoveTasks;       // 0x108
-    MTaskSet *mAngleTasks;      // 0x10C
+    MTaskSet *mAngleTasks;      // 0x108
+    MTaskSet *mMoveTasks;       // 0x10C
     MTaskSet *mTaskSet;         // 0x110: where the manpu task runs
     u32 mUnk114;                // 0x114
     DinoField *mField;          // 0x118
