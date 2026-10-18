@@ -36,6 +36,11 @@ void MSetMaxReadSize(u32 size) {
     sMaxReadSize = size;
 }
 
+BOOL MFileExists(std::string path) {
+    FSFileID id;
+    return MGetFileID(path, &id);
+}
+
 void MFile::Init() {
     FS_InitFile(&mFile);
     mResult = FALSE;

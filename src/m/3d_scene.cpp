@@ -33,14 +33,14 @@ void M3DScene::QueueE8(const void *src, u32 size) {
     mM3d->QueueE8(src, size);
 }
 
-void M3DScene::AllocTex(const void *src, u32 size) {
+u32 M3DScene::AllocTex(const void *src, u32 size) {
     mUnk148 = 2;
-    mM3d->AllocTex(src, size, TRUE);
+    return mM3d->AllocTex(src, size, TRUE);
 }
 
-void M3DScene::AllocPltt(const void *src, u32 size) {
+u32 M3DScene::AllocPltt(const void *src, u32 size) {
     mUnk148 = 2;
-    mM3d->AllocPltt(src, size);
+    return mM3d->AllocPltt(src, size);
 }
 
 void *M3DScene::QueueD0(const void *src, u32 size, u32 arg) {

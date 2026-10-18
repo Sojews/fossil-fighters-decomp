@@ -45,6 +45,7 @@ public:
     void AddLock(u32 index);
     void Unlock(u32 index);
     void *GetData(u32 index);
+    u32 GetSize(u32 index) const { return mEntries[index].size; }
     // Reads part of a file into dest, through filter if there is one (which is deleted afterwards).
     void Read(u32 index, u32 offset, void *dest, u32 size, MArchiveFilter *filter);
 
@@ -123,6 +124,7 @@ public:
         }
     }
     void *GetData() { return archive->GetData(index); }
+    u32 GetSize() const { return archive->mEntries[index].size; }
 
     MArchive *archive;
     u32 index;

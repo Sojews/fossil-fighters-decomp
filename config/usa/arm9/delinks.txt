@@ -148,6 +148,21 @@ src/m/3d_model.cpp:
 src/m/3d_ryusen.cpp:
     .text       start:0x02022e1c end:0x02023024
 
+src/m/3d_resource.cpp:
+    .text       start:0x020230bc end:0x02026478
+
+src/m/anm_model.cpp:
+    .text       start:0x02026478 end:0x02028194
+
+src/m/anm_scene.cpp:
+    .text       start:0x02028194 end:0x0202a88c
+
+src/game/dino_3d_load_csv.cpp:
+    .text       start:0x0202a88c end:0x0202d67c
+
+src/game/dino_common_window_menu_cursor.cpp:
+    .text       start:0x0202d67c end:0x0202d9ac
+
 src/m/memory.c:
     .text       start:0x0204b338 end:0x0204b3a0
     .itcm       start:0x01ff8588 end:0x01ff8db8
@@ -240,9 +255,6 @@ src/game/dino_sound.cpp:
 
 src/game/m3d_scene_enable_task.cpp:
     .text       start:0x02023024 end:0x020230bc
-
-src/game/m_polygon_char.cpp:
-    .text       start:0x020292ac end:0x020293e4
 
 src/game/dino_common_window_menu_item_flush_task.cpp:
     .text       start:0x0202d9ac end:0x0202f204

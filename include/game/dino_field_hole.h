@@ -9,6 +9,7 @@
 #include "m/looper.h"
 #include "game/help.h"
 #include "game/dino_field_camera_hook.h"
+#include "m/3d_resource.h"
 
 class DinoFieldHole : public MProcess {
 public:
@@ -22,7 +23,9 @@ public:
     void (DinoFieldHole::*mState)();    // 0x74
     u32 mUnk7C[3];                      // 0x7C
     MPoint mPos;                        // 0x88
-    u8 unk90[0x110 - 0x90];
+    u32 unk90;
+    M3DModelResource mModel;            // 0x94
+    u8 unkF8[0x110 - 0xF8];
     u8 mUnk110;                         // 0x110
     u32 mUnk114;                        // 0x114
 };

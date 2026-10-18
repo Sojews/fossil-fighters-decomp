@@ -10,6 +10,9 @@ class M3DScene;
 class M3DModel {
 public:
     virtual ~M3DModel();
+    virtual void Unk08();
+    virtual void SetModelData(void *data, BOOL arg);
+    virtual void SetAnimData(void *data);
 
     void SetPolygonId(int id);
     void SetUnk1C(u32 value);

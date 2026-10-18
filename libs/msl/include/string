@@ -53,6 +53,7 @@ public:
     bool empty() const { return size() == 0; }
     const C *data() const { return !is_long() ? mShort.buf : mLong.data; }
     const C *c_str() const { return data(); }
+    C &operator[](size_type i) { return (!is_long() ? mShort.buf : mLong.data)[i]; }
     const_iterator begin() const { return !is_long() ? mShort.buf : mLong.data; }
     const_iterator end() const {
         const C *p;

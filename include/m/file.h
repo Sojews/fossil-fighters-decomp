@@ -39,6 +39,7 @@ public:
 // Looks up a path's file ID (caching the last few).
 BOOL MGetFileID(std::string path, FSFileID *id);
 std::string MGetFilePath(FSFileID id);
+BOOL MFileExists(std::string path);
 
 // Mounts an archive image in memory under a name (reference counted), and unmounts it.
 void MMountArchive(const char *name, const void *data);

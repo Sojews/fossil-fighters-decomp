@@ -13,8 +13,8 @@ public:
     virtual void Unk0C();
     BOOL IsTransferComplete();
     void QueueE8(const void *src, u32 size);
-    void AllocTex(const void *src, u32 size, BOOL arg);
-    void AllocPltt(const void *src, u32 size);
+    u32 AllocTex(const void *src, u32 size, BOOL arg);
+    u32 AllocPltt(const void *src, u32 size);
     void *QueueD0(const void *src, u32 size, u32 arg);
     void FreeTex(u32 key);
     void FreePltt(u32 key);

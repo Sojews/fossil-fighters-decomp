@@ -10,6 +10,7 @@
 #include <iterator>
 #include <stddef.h>
 #include <utility>
+#include <type_traits.hpp>
 
 namespace std {
     template <bool b> class __red_black_tree_common {
@@ -267,6 +268,14 @@ namespace std {
         return next;
     }
 
+    template <bool trivial> struct __tree_end_node {
+        __red_black_tree_common<true>::node_base *left_;
+    };
+    template <> struct __tree_end_node<false> {
+        __red_black_tree_common<true>::node_base *left_;
+        size_t unused_;
+    };
+
     template <class T> struct less {
         bool operator()(const T &x, const T &y) const {
             return x < y;
@@ -298,15 +307,18 @@ namespace std {
                     ::operator delete(p_);
                 }
             }
-            void release() {
+            node *release() {
+                node *p = p_;
                 p_ = 0;
+                return p;
             }
             void *alloc_;
             node *p_;
         };
-        struct end_node {
-            node_base *left_;
-        };
+        // Trees of values with a non-trivial destructor have a word between the header and leftmost_ that's
+        // never written (seen in the game's map<MArchiveFile, ...> and map<u32, DinoEventEpisode>; the real MSL
+        // reason is unknown).
+        typedef __tree_end_node<Metrowerks::has_trivial_dtor<Value>::value> end_node;
 
     public:
         typedef Key key_type;
@@ -389,7 +401,7 @@ namespace std {
     protected:
         size_type size_;        // 0x0
         end_node header_;       // 0x4
-        node_base *leftmost_;   // 0x8: the first node, or the header
+        node_base *leftmost_;   // 0x8 (0xC with the unused word): the first node, or the header
     };
 
     template <class Key, class Value, class KeyOf, class Compare, class Allocator>
@@ -432,7 +444,7 @@ namespace std {
         }
         __node_hold hold(__node_e(), (void *) &header_, __node_p(n));
         ::new (&n->data_) Value(v);
-        hold.release();
+        n = hold.release();
         n->right_ = 0;
         n->left_ = 0;
         ::new (&n->parent_) node_base *(parent);

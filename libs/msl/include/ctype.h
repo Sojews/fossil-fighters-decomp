@@ -49,6 +49,10 @@ static inline int isxdigit(int c) {
     return ((c < 0) || (c >= __msl_cmap_size)) ? 0 : (int) (_MSL_CMAP_ACCESS[c] & __msl_xdigit);
 }
 
+static inline int tolower(int c) {
+    return ((c < 0) || (c >= __msl_cmap_size)) ? c : (int) (_MSL_CLOWER_ACCESS[c]);
+}
+
 static inline int toupper(int c) {
     return ((c < 0) || (c >= __msl_cmap_size)) ? c : (int) (_MSL_CUPPER_ACCESS[c]);
 }

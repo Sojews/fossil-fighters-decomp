@@ -394,7 +394,6 @@ public:
     u32 *mResult;           // 0x7C
     DinoField *mField;      // 0x80
     std::map<u32, DinoEventEpisode> mEpisodeFiles;  // 0x84
-    u32 mUnk90;             // 0x90
     MArchivePtr mArchive;   // 0x94
     MArchiveFile mFile;     // 0x98
     u32 mUnkA4[6];          // 0xA4
