@@ -3385,4 +3385,16 @@ template <class T> MTask *DinoCreatePostAndWaitTask(MMessageObserver *target, T 
     return tasks;
 }
 
+// The same, posting to an observer given as its derived class.
+template <class O, class T> MTask *DinoCreatePostAndWaitTask(O *target, T *msg) {
+    MParallelTaskSet *tasks = new MParallelTaskSet(TRUE);
+    DinoSignalWait *wait = new DinoSignalWait(0, NULL, NULL, 1);
+    MTask *post = target->CreatePostTask(msg);
+    tasks->AddTail(wait);
+    tasks->AddTail(post);
+    msg->mUnk0C = (u32)(MMessageObserver *)wait;
+    wait->mId = msg->mId + 1;
+    return tasks;
+}
+
 #endif

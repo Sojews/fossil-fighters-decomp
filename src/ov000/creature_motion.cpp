@@ -8,6 +8,8 @@
 #include "m/fx32.h"
 #include "types.h"
 #include "game/dino_battle_view_creature.h"
+#include "game/dino_message.h"
+#include "game/dino_battle_view_class.h"
 #include "m/pal.h"
 #include "game/dino_battle_view_kaseki_point_menu.h"
 #include "game/view_status_effect_icon.h"
@@ -166,6 +168,8 @@ void CreateCreatureMotionTask::Execute() {
 }
 
 #pragma auto_inline off
+
+template MTask *DinoCreatePostAndWaitTask(DinoBattleView *target, DinoBattleViewWaitActionInfoBarRequest *msg);
 
 void DinoBattleViewCreature::SetUnitModes(BOOL on) {
     mMotion->GetUnit()->SetMode(on ? 1 : 0);
