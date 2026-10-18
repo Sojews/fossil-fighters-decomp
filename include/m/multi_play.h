@@ -225,8 +225,15 @@ public:
 
     // Sends a message to every console but this one.
     void Broadcast(MMessage *msg);
+    // Sends a message to the consoles in an AID mask.
+    void SendTo(u32 mask, MMessage *msg);
+    void SendPending();
+    void ReceivePending();
 
-    u8 unk44[0x27C - 0x44];
+    u8 unk44[0x264 - 0x44];
+    int mSelf;          // 0x264: this console's AID
+    u8 unk268[0x10];
+    u8 mRunning;        // 0x278
 };
 
 class MMultiPlaySynchronizeDelayTask : public MProcess {

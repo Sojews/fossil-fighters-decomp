@@ -17,6 +17,11 @@ DinoFieldCharaAngleAnime::~DinoFieldCharaAngleAnime() {
 DinoFieldCharaWaitStopTask::~DinoFieldCharaWaitStopTask() {
 }
 
+void DinoFieldCharaAngleAnime::Apply(int step) {
+    int last = mSteps - 1;
+    mChara->SetDirection((mFrom * (last - step) + mTo * step) / last);
+}
+
 DinoFieldCharaAngleToTask::~DinoFieldCharaAngleToTask() {
 }
 

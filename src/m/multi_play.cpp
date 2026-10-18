@@ -1053,3 +1053,14 @@ void MMultiPlayWirelessDriverStopTask::Begin() {
     }
     mStep = &MMultiPlayWirelessDriverStopTask::Terminate;
 }
+
+void MMultiPlayMessageHub::Broadcast(MMessage *msg) {
+    SendTo(0xFFFF ^ (1 << mSelf), msg);
+}
+
+void MMultiPlayMessageHub::Execute() {
+    if (!sMultiPlay.instance->IsFailed() && mRunning) {
+        SendPending();
+        ReceivePending();
+    }
+}

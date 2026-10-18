@@ -3,9 +3,17 @@
 
 #include "m/anime.h"
 
+class DinoFieldChara;
+
+// Turns a field character from one direction to another.
 class DinoFieldCharaAngleAnime : public MAnime {
 public:
     virtual ~DinoFieldCharaAngleAnime();
+    virtual void Apply(int step);
+
+    DinoFieldChara *mChara; // 0x30
+    u32 mFrom;              // 0x34
+    u32 mTo;                // 0x38
 };
 
 #endif
