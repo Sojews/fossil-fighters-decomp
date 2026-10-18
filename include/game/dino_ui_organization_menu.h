@@ -29,6 +29,7 @@ public:
     void SetTab(u8 tab);
     void TabLeft();
     void TabRight();
+    BOOL HasUnk222(u8 id);
 
     u32 mUnkB4[5];                      // 0xB4
     MMenuItem *mTabs[4];                // 0xC8
@@ -51,7 +52,11 @@ public:
     u8 unk1FD;
     u8 mFocusTabs;                      // 0x1FE: focus the new tab's item when paging
     u8 unk1FF;
-    u32 mUnk200[15];                    // 0x200
+    u32 mUnk200[8];                     // 0x200
+    u8 unk220[2];
+    u8 mUnk222[5];                      // 0x222
+    u8 unk227;
+    u32 mUnk228[5];                     // 0x228
     u8 unk23C[2];
     u8 mUnk23E;                         // 0x23E
     u8 unk23F;

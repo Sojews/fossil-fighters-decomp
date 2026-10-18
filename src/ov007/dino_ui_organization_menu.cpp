@@ -187,6 +187,15 @@ void DinoUiOrganizationMenu::TabRight() {
     }
 }
 
+BOOL DinoUiOrganizationMenu::HasUnk222(u8 id) {
+    for (int i = 0; i < 5; i++) {
+        if (id == mUnk222[i]) {
+            return TRUE;
+        }
+    }
+    return FALSE;
+}
+
 void DinoUiOrganizationMenu::CreateSlots() {
     for (int i = 0; i < 15; i++) {
         CreateSlot(i);
