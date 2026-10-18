@@ -77,7 +77,7 @@ public:
     virtual void OnMessage(MMessage *msg);
 
     u32 GetUnkB8();
-    u32 GetUnk128();
+    int GetUnk128();
     u32 GetUnk14C();
     u8 GetUnkC8();
     void SetUnkC8(u8 value);
@@ -139,7 +139,7 @@ public:
     std::string mUnk114;                // 0x114
     u32 unk120;
     u32 mUnk124;                        // 0x124
-    u32 mUnk128;                        // 0x128
+    int mUnk128;                        // 0x128: kaseki points
     u8 mUnk12C;                         // 0x12C
     u8 mUnk12D;                         // 0x12D
     u8 unk12E[2];

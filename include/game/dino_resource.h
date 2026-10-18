@@ -64,9 +64,17 @@ struct DinoAttackDefs {
 };
 
 struct DinoAttackDef {
-    u8 unk00[0x18];
+    u8 unk00[0xC];
+    u32 cost;           // 0x0C: offset of the u16 cost (in kaseki points), 0 for none
+    u32 unk10;          // 0x10: offset of a u8
+    u32 unk14;          // 0x14: offset of a u8
     u32 unk18;          // 0x18
 };
+
+// The data `offset` bytes into `base`, or NULL for offset 0.
+template <class T> inline const T *DinoOffsetPtr(const void *base, u32 offset) {
+    return offset == 0 ? NULL : (const T *)((const u8 *)base + offset);
+}
 struct DinoBattleAdjustDefs {
     u8 unk000[0x14];
     MFx32 unk14;            // 0x14

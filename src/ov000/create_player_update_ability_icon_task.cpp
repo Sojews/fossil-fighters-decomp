@@ -745,7 +745,7 @@ u32 DinoBattleModelPlayer::GetUnkB8() {
     return mUnkB8;
 }
 
-u32 DinoBattleModelPlayer::GetUnk128() {
+int DinoBattleModelPlayer::GetUnk128() {
     return mUnk128;
 }
 

@@ -33,10 +33,19 @@ struct DinoBattleCpuEntry {
     u32 unk[4];
 };
 
+class DinoBattleModelPlayer;
+class DinoBattleModelCreature;
+
 class DinoBattleCpuController : public DinoBattleController {
 public:
     virtual ~DinoBattleCpuController();
     virtual void OnMessage(MMessage *msg);
+
+    BOOL CanUseAttack(DinoBattleModelPlayer *player, DinoBattleModelCreature *creature, u32 index);
+    BOOL HasAttackUnk10(DinoBattleModelCreature *creature, u8 value);
+    BOOL HasCostlyAttackUnk10(DinoBattleModelPlayer *player, DinoBattleModelCreature *creature, u8 value);
+    BOOL HasAttackUnk14(DinoBattleModelCreature *creature, u8 value);
+    BOOL HasCostlyAttackUnk14(DinoBattleModelPlayer *player, DinoBattleModelCreature *creature, u8 value);
 
     u32 mUnkB4;                         // 0xB4
     DinoBattleFileGroup mGroups[3];     // 0xB8
