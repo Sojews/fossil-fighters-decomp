@@ -21,6 +21,7 @@
 #include "m/observer.h"
 #include "m/multi_play.h"
 #include "m/text_codec.h"
+#include "game/dino_common_window_menu_item_flush_task_menu.h"
 #include "m/oam_canvas.h"
 #include "m/indicator.h"
 #include "m/smart_oam.h"
@@ -272,7 +273,8 @@ extern "C" struct {
     DinoUiWirelessMatchState state_021676f8; // 0x4c
     u8 unk54[0x5C - 0x54];
     void (DinoUiBattleParentScanner::*StateStart_5C)(); // 0x5c
-    u8 unk64[0x74 - 0x64];
+    u8 unk64[0x6C - 0x64];
+    void (DinoUiChildScannerCannonConnect::*StateConnect_6C)(); // 0x6c
     void (DinoUiCannonParentScanner::*Parent0216623c_74)(); // 0x74
 } data_ov004_021740d0;
 extern "C" struct {
@@ -310,7 +312,9 @@ extern "C" struct {
     u8 unk14[0x1C - 0x14];
     DinoUiWirelessMatchState StateChildScan; // 0x1c
     void (DinoUiCannonChild::*StateShot_24)(); // 0x24
-    u8 unk2C[0x5C - 0x2C];
+    u8 unk2C[0x44 - 0x2C];
+    void (DinoUiChildScannerBattleConnect::*OnConnectMessage_44)(MMessage *msg); // 0x44
+    u8 unk4C[0x5C - 0x4C];
     void (DinoUiCannonParentScanner::*Failed_5C)(); // 0x5c
     u8 unk64[0x6C - 0x64];
     void (DinoUiCannonParentScanner::*Failed_6C)(); // 0x6c
@@ -329,7 +333,10 @@ extern "C" struct {
 extern "C" struct {
     u8 unk00[0x4];
     void (DinoUiChildScannerBattleConnect::*IgnoreMessage_04)(MMessage *msg); // 0x04
-    u8 unk0C[0x2c - 0xC];
+    u8 unk0C[0x14 - 0xC];
+    void (DinoUiChildScannerBattleConnect::*StateConnect_14)(); // 0x14
+    u8 unk1C[0x24 - 0x1C];
+    void (DinoUiChildScannerBattleConnect::*StateChoose_24)(); // 0x24
     DinoUiWirelessMatchState StateKeep; // 0x2c
     u8 unk34[0x5C - 0x34];
     DinoUiWirelessMatchState StateParentScanned; // 0x5c
@@ -607,6 +614,57 @@ DinoUiChildScannerBattleConnect::DinoUiChildScannerBattleConnect(DinoUiChildScan
 }
 
 void DinoUiChildScannerCannonConnect::IgnoreMessage(MMessage *msg) {
+}
+
+void DinoUiChildScannerBattleConnect::StateStart() {
+    mUnkE8 = new MParallelTaskSet;
+    mParallel.AddTail(mUnkE8);
+    mMultiPlay->AddObserver(this);
+    mState = data_ov004_02174350.StateConnect_14;
+}
+
+extern const u32 data_0208ab90, data_0208ab94, data_0208ad70, data_0208ad74;
+
+static inline void AddMarkedChoice(DinoCommonWindowMenu *window, u32 id, const std::string &help,
+                                   const std::string &text) {
+    window->AddChoice(id, text, help);
+}
+
+// Offers to connect (or not) to the console, by its item.
+// NONMATCHING: the game keeps destroy flags for the marked choice's temporaries, and swaps r6/r7
+void DinoUiChildScannerBattleConnect::StateConnect() {
+    u32 connect = data_0208ab94;
+    mChoice = connect;
+    u32 anchor;
+    switch (mUnkD0 % 3) {
+    case 0:
+        anchor = 0;
+        break;
+    case 1:
+        anchor = 5;
+        break;
+    case 2:
+        anchor = 1;
+        break;
+    }
+    DinoCommonWindowMenu *window = new DinoCommonWindowMenu(&mChoice, mPos, NULL, anchor);
+    {
+        std::string text(gDinoResource->GetText(connect));
+        std::string help(gDinoResource->GetText(data_0208ad74));
+        window->AddChoice(connect, text, help);
+        AddMarkedChoice(window, data_0208ab90, gDinoResource->GetText(data_0208ad70),
+                        std::string("*") + gDinoResource->GetText(data_0208ab90));
+    }
+    mUnkE8->AddTail(window);
+    mState = data_ov004_02174350.StateChoose_24;
+    mOnMessage = data_ov004_02174250.OnConnectMessage_44;
+}
+
+void DinoUiChildScannerCannonConnect::StateStart() {
+    mUnkE8 = new MParallelTaskSet;
+    mParallel.AddTail(mUnkE8);
+    mMultiPlay->AddObserver(this);
+    mState = data_ov004_021740d0.StateConnect_6C;
 }
 
 DinoUiChildScannerCannonConnect::DinoUiChildScannerCannonConnect(DinoUiChildScanner *scanner, MMultiPlay *multiPlay,

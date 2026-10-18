@@ -87,7 +87,10 @@ public:
     virtual void OnMessage(MMessage *msg);
 
     void IgnoreMessage(MMessage *msg);
+    void OnConnectMessage(MMessage *msg);
     void StateStart();
+    void StateConnect();
+    void StateChoose();
     void StateCancel();
     void StateRescan();
 
@@ -100,7 +103,7 @@ public:
     MPoint mPos;                    // 0xD4: its place
     std::string mText;  // 0xDC
     MTaskSet *mUnkE8;   // 0xE8
-    u32 unkEC;
+    u32 mChoice;        // 0xEC: the window's
 };
 
 class DinoUiChildScannerCannonConnect : public MProcess, public MMessageObserver, public DinoHelpBase {
@@ -113,6 +116,7 @@ public:
 
     void IgnoreMessage(MMessage *msg);
     void StateStart();
+    void StateConnect();
 
     void (DinoUiChildScannerCannonConnect::*mState)(); // 0xB4
     void (DinoUiChildScannerCannonConnect::*mOnMessage)(MMessage *msg); // 0xBC
@@ -122,7 +126,8 @@ public:
     u32 mUnkD0;                     // 0xD0: its mUnk8C
     MPoint mPos;                    // 0xD4: its place
     std::string mText;  // 0xDC
-    u32 unkE8[2];
+    MTaskSet *mUnkE8;   // 0xE8
+    u32 unkEC;
 };
 
 class DinoUiBattleParentScanner : public MProcess, public MMessageObserver {
