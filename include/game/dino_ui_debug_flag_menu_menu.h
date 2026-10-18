@@ -13,6 +13,7 @@
 
 class DinoUiDebugFlagMenu : public MMenu {
 public:
+    DinoUiDebugFlagMenu(int mode);
     virtual ~DinoUiDebugFlagMenu();
     virtual void OnStart();
     virtual void OnIdle();
@@ -23,6 +24,7 @@ public:
     u32 mUnkB4[1];
     MTaskSet *mTasks;   // 0xB8: the cursor's moves
     MView *mCursor;     // 0xBC
+    u8 unkC0[0xCC - 0xC0];
 };
 
 class DinoUiDebugFlagMenuItem : public MMenuItem {

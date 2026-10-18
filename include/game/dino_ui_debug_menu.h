@@ -9,6 +9,8 @@ public:
     virtual ~DinoUiDebugMenu();
     virtual void Idle();
 
+    void StateChosen();
+
     void (DinoUiDebugMenu::*mState)(); // 0x74
     u32 mUnk7C;                        // 0x7C
 };
