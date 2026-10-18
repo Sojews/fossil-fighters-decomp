@@ -139,6 +139,12 @@ void DinoUiMedalSlotCreateTask::Idle() {
 
 #pragma auto_inline off
 
+// The call-task makers, instantiated ahead of their users so none directly follows a function that calls it
+// (DinoUiMedalMenu::OnFocus, not decompiled yet, uses the DinoHelpBase one).
+template MTask *MCreateCallTask(DinoUiMedalMenu *obj, void (DinoHelpBase::*func)());
+template MTask *MCreateCallTask(DinoUiMedalMenu *obj, void (DinoUiMedalMenu::*func)());
+template MTask *MCreateBgCallTask(DinoUiMedalMenu *obj, void (DinoUiMedalMenu::*func)(), int thread);
+
 void DinoUiMedalMenu::PageRight() {
     if (mPage == mLastPage) {
         mPage = 0;
@@ -220,5 +226,4 @@ void DinoUiMedalMenu::FinishPageLeft() {
 
 #pragma auto_inline on
 
-// DinoUiMedalMenu::OnFocus (not decompiled yet) re-enables the help through a call task.
-template MTask *MCreateCallTask(DinoUiMedalMenu *obj, void (DinoHelpBase::*func)());
+
