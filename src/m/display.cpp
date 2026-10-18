@@ -348,3 +348,7 @@ int MLcd::GetTextureSlotFlags() {
 u32 MLcd::GetBankAddress(int bank) {
     return data_0208bcc8[bank][mBankCnt[bank].mst][mBankCnt[bank].offset];
 }
+
+void MDisplay::Setup(int a, int c, int e, int f) {
+    Setup(a, 0, c, 0, e, f);
+}
