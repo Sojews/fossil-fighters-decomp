@@ -1,7 +1,7 @@
-func_ov002_021558a0 kind:function(thumb,size=0xf4) addr:0x021558a0
+_ZN18DinoCleaningReportC1Em kind:function(thumb,size=0xf4) addr:0x021558a0
 func_ov002_02155994 kind:function(thumb,size=0x174) addr:0x02155994
 _ZN18DinoCleaningReport4IdleEv kind:function(thumb,size=0x20) addr:0x02155b08
-func_ov002_02155b28 kind:function(thumb,size=0xbe4) addr:0x02155b28
+_ZN18DinoCleaningReport13State02155b28Ev kind:function(thumb,size=0xbe4) addr:0x02155b28
 .L_02156526 kind:label(thumb) addr:0x02156526 local
 func_ov002_0215670c kind:function(thumb,size=0xfc) addr:0x0215670c
 func_ov002_02156808 kind:function(thumb,size=0x26) addr:0x02156808
