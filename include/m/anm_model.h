@@ -77,8 +77,8 @@ public:
     u8 mUnk11A;                         // 0x11A
     u8 mUnk11B;                         // 0x11B
     u8 mUnk11C;                         // 0x11C
-    u32 mUnk120;                        // 0x120
-    u32 mUnk124;                        // 0x124
+    const VecFx32 *mPosRef;             // 0x120: a position to follow
+    const VecFx32 *mRotRef;             // 0x124: a rotation to follow
     u32 unk128[3];
     u32 mUnk134;                        // 0x134
     u16 mUnk138;                        // 0x138

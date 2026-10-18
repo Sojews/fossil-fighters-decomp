@@ -89,6 +89,7 @@ struct DinoFieldCharaModel {
 
 class M3DScene;
 class MAnmModelBase;
+class MPolygonChar;
 
 class DinoFieldChara : public MProcess, public MSerializer {
 public:
@@ -158,7 +159,9 @@ public:
     M3DScene *mScene;           // 0x11C
     MAnmModelBase *mBody;       // 0x120
     MAnmModelBase *mHead;       // 0x124: on the body's head joint
-    u32 mUnk128[108];           // 0x128
+    u32 mUnk128;                // 0x128
+    MPolygonChar *mEffect;      // 0x12C
+    u32 mUnk130[106];           // 0x130
     MPoint mUnk2D8;             // 0x2D8
     u32 mUnk2E0;                // 0x2E0
     u32 mUnk2E4;                // 0x2E4

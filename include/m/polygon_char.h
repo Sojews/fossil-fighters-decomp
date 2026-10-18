@@ -3,6 +3,7 @@
 #define M_POLYGON_CHAR_H
 
 #include "m/task.h"
+#include "nitro/fx.h"
 
 class MAnmModelBase;
 
@@ -12,6 +13,21 @@ public:
     virtual ~MPolygonChar();
     virtual void Idle();
 
+    void SetPosition(fx32 x, fx32 y, fx32 z) {
+        mPos.x = x;
+        mPos.y = y;
+        mPos.z = z;
+    }
+    void SetRotation(fx32 x, fx32 y, fx32 z) {
+        mRot.x = x;
+        mRot.y = y;
+        mRot.z = z;
+    }
+    void SetAngle(u16 angle) {
+        mRot.x = 0;
+        mRot.y = (angle * 360) >> 4;
+        mRot.z = 0;
+    }
     void Reset();
     // Loads a scene script and the model it plays.
     void Load(const char *script, const char *model);
@@ -22,12 +38,8 @@ public:
     void *mUnk80;               // 0x80
     void *mUnk84;               // 0x84
     void *mUnk88;               // 0x88
-    u32 mUnk8C;                 // 0x8C
-    u32 mUnk90;                 // 0x90
-    u32 mUnk94;                 // 0x94
-    u32 mUnk98;                 // 0x98
-    u32 mUnk9C;                 // 0x9C
-    u32 mUnkA0;                 // 0xA0
+    VecFx32 mPos;               // 0x8C
+    VecFx32 mRot;               // 0x98
     u16 mUnkA4;                 // 0xA4
     u16 mUnkA6;                 // 0xA6
     u32 mUnkA8;                 // 0xA8

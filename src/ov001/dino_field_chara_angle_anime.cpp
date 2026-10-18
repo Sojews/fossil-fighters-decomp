@@ -5,6 +5,7 @@
 #include "nitro/mi.h"
 #include "m/anm_model.h"
 #include "m/3d_model.h"
+#include "m/polygon_char.h"
 #include "game/dino_field_chara_angle_anime.h"
 #include "game/dino_field_chara_coord_anime.h"
 #include "game/dino_field_chara_wait_stop_task.h"
@@ -389,6 +390,46 @@ void DinoFieldChara::ApplyHeadModel() {
                 mTaskSet->AddTail(mHead);
             }
         }
+    }
+}
+
+void DinoFieldChara::SetEffect(u32 effect) {
+    if (mEffect == NULL) {
+        mEffect = new MPolygonChar(mScene, 0x7FFF, NULL, NULL);
+        mTaskSet->AddTail(mEffect);
+        int angle = (u16) (0x4000 - mModel.angle);
+        fx32 z = mModel.pos.y.v;
+        fx32 y = mUnk114;
+        MPolygonChar *e = mEffect;
+        e->SetPosition(mModel.pos.x.v, y, z);
+        for (MAnmModelBase *anm = (MAnmModelBase *) e->mParallel.mHead; anm != NULL;
+             anm = (MAnmModelBase *) anm->mNext) {
+            anm->mPosRef = &e->mPos;
+            anm->mUnk11B = TRUE;
+        }
+        e = mEffect;
+        e->SetAngle(angle);
+        for (MAnmModelBase *anm = (MAnmModelBase *) e->mParallel.mHead; anm != NULL;
+             anm = (MAnmModelBase *) anm->mNext) {
+            anm->mRotRef = &e->mRot;
+            anm->mUnk11B = TRUE;
+        }
+    }
+    if (effect == 0) {
+        mEffect->Reset();
+        return;
+    }
+    char path[64];
+    OS_SPrintf(path, "/model/fieldchar/effect%02d.csv", effect);
+    mEffect->Load(path, NULL);
+    MPolygonChar *e = mEffect;
+    e->mUnkAC = 1;
+    for (MAnmModelBase *anm = (MAnmModelBase *) e->mParallel.mHead; anm != NULL; anm = (MAnmModelBase *) anm->mNext) {
+        anm->mFollowParent = TRUE;
+    }
+    for (MAnmModelBase *anm = (MAnmModelBase *) mEffect->mParallel.mHead; anm != NULL;
+         anm = (MAnmModelBase *) anm->mNext) {
+        anm->mActive = TRUE;
     }
 }
 
