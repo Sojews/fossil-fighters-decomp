@@ -60,6 +60,12 @@ void MTX_ScaleApply33(const MtxFx33 *pSrc, MtxFx33 *pDst, fx32 x, fx32 y, fx32 z
 void MTX_Concat33(const MtxFx33 *a, const MtxFx33 *b, MtxFx33 *ab);
 void MTX_Identity44_(MtxFx44 *pDst);
 void MTX_Concat44(const MtxFx44 *a, const MtxFx44 *b, MtxFx44 *ab);
+void MTX_TransApply44(const MtxFx44 *pSrc, MtxFx44 *pDst, fx32 x, fx32 y, fx32 z);
+void MTX_ScaleApply44(const MtxFx44 *pSrc, MtxFx44 *pDst, fx32 x, fx32 y, fx32 z);
+void MTX_Copy43To44_(const MtxFx43 *pSrc, MtxFx44 *pDst);
+void MTX_RotX44_(MtxFx44 *pDst, fx32 sinVal, fx32 cosVal);
+void MTX_RotY44_(MtxFx44 *pDst, fx32 sinVal, fx32 cosVal);
+void MTX_RotZ44_(MtxFx44 *pDst, fx32 sinVal, fx32 cosVal);
 fx32 FX_Mul32x64c(fx32 v32, fx64c v64c);
 fx32 VEC_DotProduct(const VecFx32 *a, const VecFx32 *b);
 void VEC_CrossProduct(const VecFx32 *a, const VecFx32 *b, VecFx32 *axb);
@@ -69,8 +75,28 @@ void VEC_Normalize(const VecFx32 *pSrc, VecFx32 *pDst);
 }
 #endif
 
+static inline void MTX_Identity44(MtxFx44 *pDst) {
+    MTX_Identity44_(pDst);
+}
+static inline void MTX_Copy43To44(const MtxFx43 *pSrc, MtxFx44 *pDst) {
+    MTX_Copy43To44_(pSrc, pDst);
+}
+static inline void MTX_RotX44(MtxFx44 *pDst, fx32 sinVal, fx32 cosVal) {
+    MTX_RotX44_(pDst, sinVal, cosVal);
+}
+static inline void MTX_RotY44(MtxFx44 *pDst, fx32 sinVal, fx32 cosVal) {
+    MTX_RotY44_(pDst, sinVal, cosVal);
+}
+static inline void MTX_RotZ44(MtxFx44 *pDst, fx32 sinVal, fx32 cosVal) {
+    MTX_RotZ44_(pDst, sinVal, cosVal);
+}
+
 #define FX_Mul(v1, v2) FX_MulFunc(v1, v2)
-#define FX_SinIdx(idx) ((fx32)FX_SinCosTable_[((idx) >> 4) << 1])
-#define FX_CosIdx(idx) ((fx32)FX_SinCosTable_[(((idx) >> 4) << 1) + 1])
+static inline fx16 FX_SinIdx(int idx) {
+    return FX_SinCosTable_[(idx >> 4) << 1];
+}
+static inline fx16 FX_CosIdx(int idx) {
+    return FX_SinCosTable_[((idx >> 4) << 1) + 1];
+}
 
 #endif

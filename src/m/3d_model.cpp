@@ -5,6 +5,42 @@
 #include <string.h>
 #include "m/3d_resource.h"
 #include "m/3d_scene.h"
+#include "nitro/mi.h"
+
+extern VecFx32 data_0214c180; // set up with the scene
+
+M3DModel::M3DModel() {
+    mUnkC = 1;
+    mUnk10 = 0;
+    mUnk14 = 0xF;
+    mPolygonId = 0;
+    mUnk1C = 0x1F;
+    mUnk20 = 0;
+    mColors[0] = 0x5EF7;
+    mColors[1] = 0x2108;
+    mColors[2] = 0x7FFF;
+    mColors[3] = 0;
+    mUnk2C = 0;
+    mUnk2D = 0;
+    mMatrixValid = FALSE;
+    mTrans.x = mTrans.y = mTrans.z = 0;
+    mRotation.x = mRotation.y = mRotation.z = 0;
+    mScale.x = mScale.y = mScale.z = FX32_ONE;
+    mUnk2EC = 0;
+    mUnk2F0 = 1;
+    mUnk2F4 = 0x7FFF;
+    mUnk2F8 = 0;
+    mHasTexture = FALSE;
+    mUnkC4 = NULL;
+    mUnk32A = 0;
+    mModelData = NULL;
+    mUnk300 = 0;
+    mFlags = 0;
+    mGrid = NULL;
+    mUnk2E = 0;
+    MI_CpuCopy32(&data_0214c180, &mUnk318, sizeof(VecFx32));
+    mOwnsModelData = FALSE;
+}
 
 void M3DModel::SetPolygonId(int id) {
     mPolygonId = id & 0x3F;
@@ -136,4 +172,53 @@ int M3DModel::FindJoint(const char *name) {
         }
     }
     return joint;
+}
+
+const MtxFx44 *M3DModel::GetMatrix() {
+    if (!mMatrixValid) {
+        mMatrixValid = TRUE;
+        MTX_Identity44(&mMatrix);
+        MTX_TransApply44(&mMatrix, &mMatrix, mTrans.x, mTrans.y, mTrans.z);
+        MtxFx44 rot;
+        MTX_RotX44(&rot, FX_SinIdx(mRotation.x), FX_CosIdx(mRotation.x));
+        MTX_Concat44(&rot, &mMatrix, &mMatrix);
+        MTX_RotY44(&rot, FX_SinIdx(mRotation.y), FX_CosIdx(mRotation.y));
+        MTX_Concat44(&rot, &mMatrix, &mMatrix);
+        MTX_RotZ44(&rot, FX_SinIdx(mRotation.z), FX_CosIdx(mRotation.z));
+        MTX_Concat44(&rot, &mMatrix, &mMatrix);
+        MTX_ScaleApply44(&mMatrix, &mMatrix, mScale.x, mScale.y, mScale.z);
+    }
+    return &mMatrix;
+}
+
+// The joint's matrix in the current frame (with withRotation false, only its translation), or the identity for
+// joint -1.
+BOOL M3DModel::GetJointMatrix(int joint, MtxFx44 *mtx, u8 withRotation) {
+    if (joint == -1) {
+        MTX_Identity44(mtx);
+        return TRUE;
+    }
+    const u32 *model = (const u32 *) mModelRes;
+    if (model[3] != 0) {
+        const u32 *anim = (const u32 *) mAnimRes;
+        if (anim[5] != 0) {
+            const MtxFx43 *frames = (const MtxFx43 *) ((const u8 *) anim + (anim[4] + (anim[3] + (anim[1] + anim[2])) + 8));
+            int count = *(const int *) ((const u8 *) model + (model[1] + model[2]));
+            u32 frameCount = anim[6];
+            if (joint >= count) {
+                return FALSE;
+            }
+            frames += count * ((mUnk2EC >> 4) % frameCount);
+            if (withRotation) {
+                MTX_Copy43To44(&frames[joint], mtx);
+            } else {
+                MTX_Identity44(mtx);
+                mtx->_30 = frames[joint]._30;
+                mtx->_31 = frames[joint]._31;
+                mtx->_32 = frames[joint]._32;
+            }
+            return TRUE;
+        }
+    }
+    return FALSE;
 }

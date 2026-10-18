@@ -53,23 +53,31 @@ public:
     VecFx32 mTrans;             // 0x30
     VecFx32 mRotation;          // 0x3C: angles, 16 bits each
     VecFx32 mScale;             // 0x48
-    u8 unk54[0x70];
+    MtxFx44 mMatrix;            // 0x54: translation * rotation (x, y, z) * scale
+    u8 unk94[0xC4 - 0x94];
     const MtxFx44 *mUnkC4;      // 0xC4: a matrix to apply
     u32 mTexKey;                // 0xC8
     u32 mPlttKey;               // 0xCC
     u8 mHasTexture;             // 0xD0
-    u32 unkD4;
+    const void *mAnimRes;       // 0xD4: the joint animation resource
     const void *mModelRes;      // 0xD8: the model resource (its joint names)
     u32 mUnkDC;                 // 0xDC
     u8 unkE0[0x2E4 - 0xE0];
     M3DGrid *mGrid;             // 0x2E4: the ground, if the model has one
-    u32 unk2E8[3];
+    u32 unk2E8;
+    u32 mUnk2EC;                // 0x2EC
+    u32 mUnk2F0;                // 0x2F0
     u16 mUnk2F4;                // 0x2F4
-    u8 unk2F6[0x2FC - 0x2F6];
+    u32 mUnk2F8;                // 0x2F8
     u8 *mModelData;             // 0x2FC
-    u8 unk300[0x328 - 0x300];
+    u32 mUnk300;                // 0x300
+    u8 unk304[0x318 - 0x304];
+    VecFx32 mUnk318;            // 0x318
+    u32 unk324;
     u8 mOwnsModelData;          // 0x328
-    u8 unk329[0x32C - 0x329];
+    u8 unk329;
+    u8 mUnk32A;                 // 0x32A
+    u8 unk32B;
 };
 
 #endif
