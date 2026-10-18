@@ -9,6 +9,7 @@
 #include "m/task.h"
 #include "m/archive.h"
 #include "m/resource.h"
+#include "m/heap.h"
 #include "nitro/fx.h"
 
 class MAnmModelBase;
@@ -45,6 +46,16 @@ public:
     virtual void Idle();
 
     void Reset();
+    int GetPauseCount() {
+        MMutexLock lock(&mPauseMutex);
+        return mPauseCount;
+    }
+    BOOL IsParentPaused() {
+        if (mUnk464 != NULL && mUnk464->GetPauseCount() != 0) {
+            return TRUE;
+        }
+        return FALSE;
+    }
     void Load(const char *path, u32 arg);
     void LoadScene(u32 index, u32 arg);
     void LoadFile(const char *path, void *unk84, u32 arg);
