@@ -53,6 +53,7 @@ public:
 
 class DinoBattleViewGivingUpDialog : public DinoCommonYesNoMenu {
 public:
+    DinoBattleViewGivingUpDialog(const char *text, u8 *givingUp);
     virtual ~DinoBattleViewGivingUpDialog();
     virtual void OnFocus(MMenuItem *item);
     virtual void OnDecide(MMenuItem *item);
@@ -63,9 +64,12 @@ public:
 
 class DinoBattleViewGivingUpMenu : public MProcess {
 public:
+    DinoBattleViewGivingUpMenu(MMessageObserver *view, u8 *result);
     virtual ~DinoBattleViewGivingUpMenu();
     virtual void Idle();
 
+    void StateAsk();
+    void StateAnswered();
     void StateDone();
 
     MMessageObserver *mView;    // 0x74

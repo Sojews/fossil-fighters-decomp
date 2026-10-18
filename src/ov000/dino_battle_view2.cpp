@@ -4,6 +4,7 @@
 // Derived destructors have their bases' destructor bodies inlined; auto-inlining the ones defined above does that.
 #pragma auto_inline on
 
+#include "game/dino_resource.h"
 #include "m/obj.h"
 #include "game/dino_sound.h"
 #include "game/dino_battle_view2.h"
@@ -191,4 +192,38 @@ void DinoBattleViewUiRootSelect::OnFocus(MMenuItem *item) {
         return;
     }
     DinoSoundPlaySe(0x5E, 0);
+}
+
+// The TU's pooled pointer-to-member constants (see menu.cpp).
+extern "C" struct {
+    u8 unk00[0xC];
+    void (DinoBattleViewGivingUpMenu::*StateDone_0C)();
+    u8 unk14[0x4C - 0x14];
+    void (DinoBattleViewGivingUpMenu::*StateAsk_4C)();
+    u8 unk54[0x6C - 0x54];
+    void (DinoBattleViewGivingUpMenu::*StateAnswered_6C)();
+} data_ov000_0219569c;
+
+// "Give up the battle?" (a text id).
+extern "C" const u32 data_0208a3c4;
+
+DinoBattleViewGivingUpMenu::DinoBattleViewGivingUpMenu(MMessageObserver *view, u8 *result)
+    : MProcess(NULL), mView(view), mResult(result) {
+    mState = data_ov000_0219569c.StateAsk_4C;
+}
+
+void DinoBattleViewGivingUpMenu::StateAsk() {
+    *mResult = FALSE;
+    mSerial.AddTail(new DinoBattleViewGivingUpDialog(gDinoResource->GetText(data_0208a3c4), &mGaveUp));
+    mState = data_ov000_0219569c.StateAnswered_6C;
+}
+
+// Asks again to be sure.
+void DinoBattleViewGivingUpMenu::StateAnswered() {
+    if (mGaveUp) {
+        mSerial.AddTail(new DinoBattleViewGivingUpDialog(gDinoResource->GetText(data_0208a3c4), &mGaveUp));
+        mState = data_ov000_0219569c.StateDone_0C;
+        return;
+    }
+    Exit();
 }
