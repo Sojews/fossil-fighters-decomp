@@ -204,3 +204,9 @@ DinoUiMaskBuy::DinoUiMaskBuy() : MProcess(NULL) {
     mSerial.AddTail(new DinoUiMaskBuyMenu());
     mSerial.AddTail(MTaskExitTransfer::Create(this));
 }
+
+#pragma auto_inline off
+
+u8 DinoUiMaskBuyMenu::GetFlag(int index) {
+    return mFlags[index];
+}

@@ -21,6 +21,7 @@ public:
     BOOL PageLeft();
     BOOL Buy();
     void ClearItems();
+    u8 GetFlag(int index);
     void RefreshPage2();
     void RefreshPage3();
 
@@ -32,7 +33,8 @@ public:
     std::vector<void *> mItems; // 0xD4: this page's items
     u32 mUnkE0[2];              // 0xE0
     std::vector<u32> mUnkE8;    // 0xE8
-    u8 unkF4[24];
+    u8 unkF4[0x10];
+    u8 mFlags[8];               // 0x104
     int mPage; // 0x10C
     int mLastPage; // 0x110
     u8 unk114[8];

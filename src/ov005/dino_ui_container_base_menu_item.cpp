@@ -175,3 +175,9 @@ void DinoUiContainerBaseMenu::ClearItems() {
     }
     mItems.clear();
 }
+
+#pragma auto_inline off
+
+u8 DinoUiContainerBaseMenu::GetFlag(int index) {
+    return mFlags[index];
+}

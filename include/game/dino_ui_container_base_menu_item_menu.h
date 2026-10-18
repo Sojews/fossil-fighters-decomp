@@ -22,9 +22,10 @@ public:
     BOOL PageLeft();
     void ClearItems();
     void RefreshPage2();
+    u8 GetFlag(int index);
 
     DinoUi3PartsFraction *mFraction; // 0xB4: "page n/m"
-    u32 mUnkB8[16];
+    u8 mFlags[0x40];            // 0xB8
     int mPage;                  // 0xF8
     int mLastPage;              // 0xFC
     u8 mUnk100; // 0x100

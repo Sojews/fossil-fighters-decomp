@@ -194,3 +194,9 @@ DinoUiShopSell::DinoUiShopSell() : MProcess(NULL) {
     mSerial.AddTail(new DinoUiShopSellMenu());
     mSerial.AddTail(MTaskExitTransfer::Create(this));
 }
+
+#pragma auto_inline off
+
+u8 DinoUiShopSellMenu::GetFlag(int index) {
+    return mFlags[index];
+}

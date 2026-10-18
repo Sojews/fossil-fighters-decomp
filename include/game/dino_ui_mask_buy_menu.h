@@ -19,6 +19,7 @@ public:
     void OnBackDecided();
     BOOL PageRight();
     BOOL PageLeft();
+    u8 GetFlag(int index);
     BOOL Buy();
     void RefreshPage1();
     void RefreshPage2();
@@ -26,7 +27,8 @@ public:
 
     u32 mUnkB4[4];          // 0xB4
     std::vector<void *> mUnkC4; // 0xC4
-    u32 mUnkD0[8];          // 0xD0
+    u32 mUnkD0[6];          // 0xD0
+    u8 mFlags[8];           // 0xE8
     std::vector<void *> mUnkF0; // 0xF0
     int mPage; // 0xFC
     int mLastPage; // 0x100

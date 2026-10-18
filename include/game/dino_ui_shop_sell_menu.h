@@ -22,6 +22,7 @@ public:
     BOOL PageLeft();
     BOOL Sell();
     void ClearItems();
+    u8 GetFlag(int index);
     void RefreshPage2();
 
     MArchivePtr mArchive;       // 0xB4
@@ -36,7 +37,8 @@ public:
     MView *mCursor;             // 0xF0
     u32 mUnkF4;
     std::vector<u32> mUnkF8;    // 0xF8
-    u32 mUnk104[17];            // 0x104
+    u32 mUnk104;                // 0x104
+    u8 mFlags[0x40];            // 0x108
     int mPage;                  // 0x148
     int mLastPage;              // 0x14C
     u8 mUnk150;                 // 0x150
