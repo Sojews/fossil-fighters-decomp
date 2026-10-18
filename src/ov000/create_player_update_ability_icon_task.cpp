@@ -85,6 +85,38 @@ ExecCreatureEndTask::~ExecCreatureEndTask() {
 MoveToHeatAreaAnyCreature::~MoveToHeatAreaAnyCreature() {
 }
 
+// Moves the frontmost creature into the heat area, unless the battle is over or one is already there.
+void MoveToHeatAreaAnyCreature::Idle() {
+    if (((u8 *) mPlayer->mBattle->GetUnk1FC())[0xA8]) {
+        Exit();
+        return;
+    }
+    if (mPlayer->FindCreature(0) != NULL) {
+        Exit();
+        return;
+    }
+    int frontPos = 4;
+    DinoBattleModelCreature *front = NULL;
+    for (int i = 0; i < mPlayer->GetCreatureCount(); i++) {
+        DinoBattleModelCreature *creature = mPlayer->GetCreature(i);
+        if ((int) creature->GetUnkB8() < frontPos) {
+            front = creature;
+            frontPos = creature->GetUnkB8();
+        }
+    }
+    if (front != NULL) {
+        DinoSignalWait *wait = new DinoSignalWait(0x10013, NULL, NULL, 1);
+        MTask *exit = MTaskExitTransfer::Create(this);
+        MSerialTaskSet *serial = &mSerial;
+        serial->AddTail(wait);
+        serial->AddTail(exit);
+        front->Post(new DinoBattleModelCreatureMoveRequest((u32)(MMessageObserver *)wait, mPlayer->GetUnkB8(),
+                                                           front->GetUnkB4(), front->GetUnkB8(), 0, 0, 0));
+    } else {
+        Exit();
+    }
+}
+
 AddKasekiPointCreatureDie::~AddKasekiPointCreatureDie() {
 }
 

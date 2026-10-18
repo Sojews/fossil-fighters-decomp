@@ -340,6 +340,15 @@ public:
 class DinoBattleModelCreatureMoveRequest : public MMessage {
 public:
     DinoBattleModelCreatureMoveRequest() : MMessage(0x10012) {}
+    DinoBattleModelCreatureMoveRequest(u32 a, u32 b, u32 c, u32 d, u32 e, u32 f, u32 g) : MMessage(0x10012) {
+        mUnk0C = a;
+        mUnk10 = b;
+        mUnk14 = c;
+        mUnk18 = d;
+        mUnk1C = e;
+        mUnk20 = f;
+        mUnk24 = g;
+    }
     virtual u32 GetSize() { return 32; }
     virtual void Write(void *buf) {
         MI_CpuCopy8(&mId, buf, 4);
