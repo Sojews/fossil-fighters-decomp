@@ -3,6 +3,7 @@
 #define M_3D_H
 
 #include "m/screen.h"
+#include "m/heap.h"
 #include "m/looper.h"
 
 class M3d : public MScreen {
@@ -19,7 +20,13 @@ public:
     void FreePltt(u32 key);
     MTask *CreateWaitTransferCompleteTask();
 
-    u8 mUnk20[0x84];
+    u32 mTexSize;       // 0x20
+    u32 mPlttSize;      // 0x24
+    u32 mPlttBanks;     // 0x28
+    u32 mTexBanks;      // 0x2C
+    MHeap mTexHeap;     // 0x30
+    MHeap mPlttHeap;    // 0x68
+    u32 unkA0;
     void *mUnkA4;       // 0xA4: transfers still queued
     u8 unkA8[0x14];
     void *mUnkBC;       // 0xBC
