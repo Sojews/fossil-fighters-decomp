@@ -18,6 +18,9 @@
 #include "game/dino_battle_view_creature_info.h"
 #include "game/dino_battle_view_kaseki_point_menu.h"
 
+// The tutorial step for an action (or -1): a task to run, and whether the action is blocked.
+extern "C" MTask *func_ov000_0218ec8c(u32 arg0, int arg1, BOOL *blocked);
+
 DinoBattleViewUiSelectAreaCommon::~DinoBattleViewUiSelectAreaCommon() {
 }
 
@@ -124,6 +127,69 @@ void DinoBattleViewUiDefenderMenu::OnFocus(MMenuItem *item) {
     DinoSoundPlaySe(0x5F, 0);
 }
 
+extern const u32 data_ov000_0218fd00[]; // tutorial steps by creature slot
+
+void DinoBattleViewUiDefenderMenu::OnDecide(MMenuItem *item) {
+    DinoBattleViewUiRootMenuItem *root = dynamic_cast<DinoBattleViewUiRootMenuItem *>(item);
+    if (HandlePageItem(item)) {
+        return;
+    }
+    if (root != NULL) {
+        DinoBattleViewCreature *creature = GetItemCreature(root);
+        if (root->mDisabled) {
+            DinoSoundPlaySe(0x62, 0);
+            return;
+        }
+        if (creature != NULL) {
+            if (CanDefend(creature->GetUnkAC())) {
+                BOOL blocked = FALSE;
+                MTask *task = func_ov000_0218ec8c(((DinoBattleView *)mUnkEC)->GetUnk12C(),
+                                                  data_ov000_0218fd00[creature->GetUnkB4()], &blocked);
+                if (task != NULL) {
+                    mSerial.AddTail(task);
+                }
+                if (blocked) {
+                    return;
+                }
+                DinoHelpBase::Disable();
+                DinoSoundPlaySe(0x61, 0);
+                ClearMarks();
+                DinoHelpBase::Disable();
+                MTask *exit = MTaskExitTransfer::Create(this);
+                MTask *post = mTarget->CreatePostTask(new DinoBattleViewUiDefenderMenuResult(creature->GetUnkAC(), FALSE));
+                MTask *wait = MTaskSetWaitEmptyTask::Create(mUnkF8);
+                MSerialTaskSet *serial = &mSerial;
+                serial->AddTail(wait);
+                serial->AddTail(post);
+                serial->AddTail(exit);
+            } else {
+                DinoSoundPlaySe(0x62, 0);
+            }
+            return;
+        }
+    }
+    if (item == mItem120) {
+        BOOL blocked = FALSE;
+        MTask *task = func_ov000_0218ec8c(((DinoBattleView *)mUnkEC)->GetUnk12C(), 0x27, &blocked);
+        if (task != NULL) {
+            mSerial.AddTail(task);
+        }
+        if (!blocked) {
+            DinoHelpBase::Disable();
+            DinoSoundPlaySe(0x63, 0);
+            ClearMarks();
+            DinoHelpBase::Disable();
+            MTask *exit = MTaskExitTransfer::Create(this);
+            MTask *post = mTarget->CreatePostTask(new DinoBattleViewUiDefenderMenuResult(0, TRUE));
+            MTask *wait = MTaskSetWaitEmptyTask::Create(mUnkF8);
+            MSerialTaskSet *serial = &mSerial;
+            serial->AddTail(wait);
+            serial->AddTail(post);
+            serial->AddTail(exit);
+        }
+    }
+}
+
 void DinoBattleViewUiSelectAreaCommon::OnDecide(MMenuItem *item) {
     Exit();
 }
@@ -145,7 +211,6 @@ MRect DinoFrameItem::GetFrame() {
     return mFrame;
 }
 
-extern "C" MTask *func_ov000_0218ec8c(u32 arg0, int arg1, int arg2);
 
 void DinoBattleViewUiChangeMenu::OnIdle() {
     MTask *task = func_ov000_0218ec8c(((DinoBattleView *)mUnkEC)->GetUnk12C(), -1, 0);

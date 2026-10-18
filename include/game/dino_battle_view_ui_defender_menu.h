@@ -17,6 +17,8 @@ public:
     virtual void OnStart();
     virtual void OnFocus(MMenuItem *item);
     virtual void OnDecide(MMenuItem *item);
+    BOOL CanDefend(u32 id);
+    void ClearMarks();
 
     u32 unk188;
     u32 unk18C[3];  // 0x18C: creature ids

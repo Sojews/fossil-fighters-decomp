@@ -29,6 +29,8 @@ public:
     u32 mIndex;     // 0x88: the row
     u32 unk8C[2];
     void *mOwner;   // 0x94
+    u8 unk98;
+    u8 mDisabled;   // 0x99
 };
 
 class DinoBattleViewUiSelectAreaCommon : public MMenu {
@@ -39,12 +41,16 @@ public:
     virtual void OnDecide(MMenuItem *item);
     void Nop();     // (empty in the game)
     DinoBattleViewCreature *GetItemCreature(MMenuItem *item);
+    BOOL HandlePageItem(MMenuItem *item);
 
     u32 unkA8[2];
     u32 mUnkB0;     // 0xB0: player index
     u8 unkB4[0x38];
     u32 mUnkEC;     // 0xEC: DinoBattleView
-    u8 unkF0[0x30];
+    MMessageObserver *mTarget;  // 0xF0: told the choice
+    u32 unkF4;
+    MTaskSet *mUnkF8;           // 0xF8: waited on before answering
+    u8 unkFC[0x24];
     MMenuItem *mItem120;    // 0x120
     MMenuItem *mItem124;    // 0x124
     MMenuItem *mItem128;    // 0x128
