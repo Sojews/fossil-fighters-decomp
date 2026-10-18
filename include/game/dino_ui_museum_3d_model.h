@@ -14,6 +14,13 @@ class DinoUiMuseum3DModel : public MProcess {
 public:
     virtual ~DinoUiMuseum3DModel();
     virtual void Idle();
+
+    void SetModel(u32 id);
+
+    MTaskSet *mTasks;   // 0x74
+    u32 unk78[2];
+    u32 mCurrent;       // 0x80: the model shown
+    u32 mRequested;     // 0x84: the model to show next
 };
 
 #endif

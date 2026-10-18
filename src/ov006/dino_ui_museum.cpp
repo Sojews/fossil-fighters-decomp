@@ -301,3 +301,9 @@ template MTask *MCreateBgCallTask(DinoUiMuseum *obj, void (DinoUiMuseum::*func)(
 // DinoUiMuseumMenu::OnFocus (not decompiled yet) re-enables the help through a call task.
 template MTask *MCreateCallTask(DinoUiMuseumMenu *obj, void (DinoHelpBase::*func)());
 template MTask *MCreateCallTask(DinoUiMuseum *obj, void (DinoUiMuseum::*func)());
+
+void DinoUiMuseum3DModel::SetModel(u32 id) {
+    if (mRequested != id) {
+        mRequested = id;
+    }
+}
