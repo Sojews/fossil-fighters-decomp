@@ -6,6 +6,9 @@
 #include "nitro/mi.h"
 #include "m/overlay.h"
 #include "game/dino_field_battle_start_effect.h"
+#include "game/dino_cleaning.h"
+#include "game/dino_ui_revive_status_menu.h"
+#include "m/bg.h"
 #include "game/dino_resource.h"
 #include "game/dino_sound.h"
 #include "m/picture.h"
@@ -606,6 +609,7 @@ void DinoEventExecDance::Idle() {
     serial->AddTail(exit);
 }
 
+M_EXTERN_OVERLAY(ov002);
 M_EXTERN_OVERLAY(ov003);
 M_EXTERN_OVERLAY(ov004);
 M_EXTERN_OVERLAY(ov006);
@@ -2113,19 +2117,26 @@ extern "C" struct {
     void (DinoEventExecCleaning::*Cleaning0203ff38_38)();
     u8 unk40[0x48 - 0x40];
     void (DinoEventExecCleaning::*Cleaning020400a8_48)();
+    u8 unk50[0x78 - 0x50];
+    void (DinoEventExecBattle::*Battle02041748_78)();
 } data_020be144;
 extern "C" struct {
     void (DinoEventExecCleaning::*CleaningStart_00)();
     void (DinoEventExecBattle::*StateCloseField_08)();
-    u8 unk10[0x58 - 0x10];
+    u8 unk10[0x48 - 0x10];
+    void (DinoEventExecCleaning::*StateOpenField_48)();
+    u8 unk50[0x58 - 0x50];
     void (DinoEventExecBattle::*Battle020401b0_58)();
     u8 unk60[0x78 - 0x60];
     void (DinoEventExecBattle::*Battle02041b24_78)();
 } data_020be1c4;
 extern "C" struct {
-    u8 unk00[0x50];
+    u8 unk00[0x30];
+    void (DinoEventExecBattle::*Battle020416d0_30)();
+    u8 unk38[0x50 - 0x38];
     void (DinoEventExecBattle::*Battle0204079c_50)();
-    u8 unk58[0x70 - 0x58];
+    void (DinoEventExecAutoWarp::*AutoWarp02042014_58)();
+    u8 unk60[0x70 - 0x60];
     void (DinoEventExecBattle::*BattleStart_70)();
     void (DinoEventExecBattle::*DemoStart_78)();
 } data_020be244;
@@ -2147,6 +2158,12 @@ DinoEventExecCleaning::DinoEventExecCleaning(DinoEventLoop *event, u32 unk80, u3
 void DinoEventExecCleaning::StateCloseField() {
     mEvent->CloseField(FALSE);
     mState = data_020be144.Cleaning0203ff38_38;
+}
+
+void DinoEventExecCleaning::StateCleaning() {
+    MLoadOverlay(0, M_OVERLAY_ID(ov002));
+    mSerial.AddTail(new DinoCleaning(mUnk84, mCleaningData, 0, 0, mUnk89 ? 3 : mUnk88 ? 2 : 0, 0));
+    mState = data_020be1c4.StateOpenField_48;
 }
 
 void DinoEventExecCleaning::StateOpenField() {
@@ -2178,6 +2195,29 @@ void DinoEventExecBattle::StateLoadOverlays() {
     mState = data_020be144.Battle02041644_20;
 }
 
+void DinoEventExecBattle::StateReviveStatus() {
+    if (mUnk18C.size() == 0) {
+        MUnloadOverlay(0, M_OVERLAY_ID(ov003));
+        MUnloadOverlay(0, M_OVERLAY_ID(ov007));
+        mState = data_020be244.Battle020416d0_30;
+        return;
+    }
+    u32 i = (u32)mUnk18C.front();
+    mUnk18C.erase(mUnk18C.begin());
+    mSerial.AddTail(new DinoUiReviveStatusLoopBattle(&mCreatures[i], &mCreatures2[i]));
+}
+
+void DinoEventExecBattle::StateResetDisplays() {
+    gLcd->mMain->ResetHooks();
+    gLcd->mSub->ResetHooks();
+    gLcd->mMain->SetBackdrop(0x8000);
+    gLcd->mMain->Setup(5, 2, 4, 0, 0, 0);
+    gLcd->mMain->mBg->SetMode(3);
+    gLcd->SetBottomDisplay(gLcd->mMain);
+    gLcd->VSyncNow();
+    mState = data_020be144.Battle02041748_78;
+}
+
 void DinoEventExecBattle::StateOpenField() {
     mEvent->OpenField(TRUE);
     mState = data_020be1c4.Battle02041b24_78;
@@ -2186,4 +2226,23 @@ void DinoEventExecBattle::StateOpenField() {
 DinoEventExecAutoWarp::DinoEventExecAutoWarp(DinoEventLoop *event, u32 unk80, u32 unk84, u32 unk88)
     : MProcess(NULL), mEvent(event), mUnk80(unk80), mUnk84(unk84), mUnk88(unk88) {
     mState = data_020be144.AutoWarpStart_08;
+}
+
+// The position at a region's center.
+static inline MFx32Point RegionPos(DinoRegionCenter center) {
+    MFx32Point pos;
+    pos.Set(MFx32((int)center.unk00), MFx32((int)center.unk04));
+    return pos;
+}
+
+void DinoEventExecAutoWarp::StateWarp() {
+    u32 focus = mEvent->GetField()->GetCamera()->GetFocus();
+    DinoCharaState chara;
+    gDinoBackup->GetChara(focus, &chara);
+    chara.map = gDinoResource->GetRegionMapMatch(mUnk88);
+    MFx32Point pos = RegionPos(gDinoResource->GetRegionCenter(mUnk88));
+    chara.x = pos.x;
+    chara.y = pos.y;
+    gDinoBackup->SetChara(focus, &chara);
+    mState = data_020be244.AutoWarp02042014_58;
 }

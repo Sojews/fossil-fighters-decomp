@@ -15,7 +15,7 @@ class DinoCleaningToolMenu;
 
 class DinoCleaning : public DinoHelpBase, public MProcess, public MLooperPreLoopHook, public MSleepHook {
 public:
-    DinoCleaning(u32 unk9C, void *unkA0, u32 unkA8, u32 unkAC, BOOL unkB0, u32 unk140);
+    DinoCleaning(u32 unk9C, void *unkA0, u32 unkA8, u32 unkAC, int mode, u32 unk140);
     virtual ~DinoCleaning();
     virtual void Execute();
     virtual void Idle();

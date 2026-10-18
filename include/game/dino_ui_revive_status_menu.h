@@ -57,10 +57,15 @@ public:
     virtual void Idle();
 };
 
+struct DinoEventReviveCreature;
+
 class DinoUiReviveStatusLoopBattle : public MProcess {
 public:
+    DinoUiReviveStatusLoopBattle(const DinoEventReviveCreature *creature, const DinoEventReviveCreature *creature2);
     virtual ~DinoUiReviveStatusLoopBattle();
     virtual void Idle();
+
+    u8 unk74[0xA4 - 0x74];
 };
 
 class DinoUiReviveStatusMenu;

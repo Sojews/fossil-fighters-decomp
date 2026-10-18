@@ -5,6 +5,7 @@
 #include <vector>
 #include "game/dino_event_capture_fade_ui_task.h"
 #include "m/archive.h"
+#include "game/dino_event_revive_effect.h"
 #include "m/resource.h"
 #include "game/dino_common_window_yes_no_dialog.h"
 #include "game/dino_common_tutorial_window.h"
@@ -302,6 +303,7 @@ public:
     virtual void Idle();
 
     void StateCloseField();
+    void StateCleaning();
     void StateOpenField();
 
     void (DinoEventExecCleaning::*mState)(); // 0x74
@@ -310,7 +312,8 @@ public:
     u32 mUnk84;             // 0x84
     u8 mUnk88;              // 0x88
     u8 mUnk89;              // 0x89
-    u8 unk8A[0xD0 - 0x8A];
+    u8 unk8A[2];
+    u8 mCleaningData[0xD0 - 0x8C];  // 0x8C: passed to the cleaning
 };
 
 class DinoEventExecAutoWarp : public MProcess {
@@ -318,6 +321,8 @@ public:
     DinoEventExecAutoWarp(DinoEventLoop *event, u32 unk80, u32 unk84, u32 unk88);
     virtual ~DinoEventExecAutoWarp();
     virtual void Idle();
+
+    void StateWarp();
 
     void (DinoEventExecAutoWarp::*mState)(); // 0x74
     DinoEventLoop *mEvent;  // 0x7C
@@ -1172,6 +1177,8 @@ public:
     void StateCloseField();
     void StateUnloadOverlays();
     void StateLoadOverlays();
+    void StateReviveStatus();
+    void StateResetDisplays();
     void StateOpenField();
 
     void (DinoEventExecBattle::*mState)(); // 0x74
@@ -1179,7 +1186,9 @@ public:
     u32 mUnk80;                     // 0x80: 0 shows the battle start effect
     u32 mBattle;                    // 0x84
     u32 mUnk88;                     // 0x88
-    u32 mUnk8C[64];
+    u32 mUnk8C[4];
+    DinoEventReviveCreature mCreatures[5];  // 0x9C
+    DinoEventReviveCreature mCreatures2[5]; // 0x114
     std::vector<void *> mUnk18C;    // 0x18C
     std::vector<void *> mUnk198;    // 0x198
     u32 mUnk1A4;                    // 0x1A4
