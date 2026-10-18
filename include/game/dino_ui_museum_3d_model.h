@@ -10,15 +10,20 @@
 #include "game/help.h"
 #include "game/dino_field_camera_hook.h"
 
+class M3DScene;
+class MAnmModelBase;
+
 class DinoUiMuseum3DModel : public MProcess {
 public:
     virtual ~DinoUiMuseum3DModel();
     virtual void Idle();
 
     void SetModel(u32 id);
+    void LoadModel();
 
     MTaskSet *mTasks;   // 0x74
-    u32 unk78[2];
+    M3DScene *mScene;   // 0x78
+    MAnmModelBase *mModel;  // 0x7C
     u32 mCurrent;       // 0x80: the model shown
     u32 mRequested;     // 0x84: the model to show next
 };

@@ -14,6 +14,8 @@
 #include "game/dino_ui_museum_3d_model.h"
 #include "m/bg_new_task.h"
 #include "m/call_task.h"
+#include "m/anm_model.h"
+#include "m/irq.h"
 
 DinoUiMuseumInformationMenu::~DinoUiMuseumInformationMenu() {
 }
@@ -301,6 +303,19 @@ template MTask *MCreateBgCallTask(DinoUiMuseum *obj, void (DinoUiMuseum::*func)(
 // DinoUiMuseumMenu::OnFocus (not decompiled yet) re-enables the help through a call task.
 template MTask *MCreateCallTask(DinoUiMuseumMenu *obj, void (DinoHelpBase::*func)());
 template MTask *MCreateCallTask(DinoUiMuseum *obj, void (DinoUiMuseum::*func)());
+
+void DinoUiMuseum3DModel::LoadModel() {
+    char path[0x100];
+    OS_SPrintf(path, "/model/battle/din%03d_07", mCurrent);
+    mModel = new MAnmModel(mScene);
+    mModel->SetFrames(0, 0x40000000);
+    mModel->Load(path, 0);
+    mModel->Run();
+    mModel->mUnkF4 = 1;
+    mModel->mFollowParent = TRUE;
+    MIrqLock lock;
+    mTasks->AddTail(mModel);
+}
 
 void DinoUiMuseum3DModel::SetModel(u32 id) {
     if (mRequested != id) {
