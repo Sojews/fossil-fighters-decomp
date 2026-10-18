@@ -4,6 +4,9 @@
 // Derived destructors have their bases' destructor bodies inlined; auto-inlining the ones defined above does that.
 #pragma auto_inline on
 
+#include <algorithm>
+#include "game/dino_backup.h"
+
 #include "game/dino_ui_revive_status_menu.h"
 #include "game/dino_ui_revive_status.h"
 #include "game/dino_ui_revive_status_digit.h"
@@ -68,3 +71,25 @@ DinoUiReviveEffect::~DinoUiReviveEffect() {
 void DinoUiReviveEffect::Idle() {
     (this->*mState)();
 }
+
+extern const u32 kCreatureLevelLimits[2];
+
+// A creature's experience, up to what the top level needs.
+u32 DinoGetCreatureTotal(const DinoCreatureState *creature) {
+    if (creature->parts[0].level == 0) {
+        return 0;
+    }
+    u32 max, sum;
+    sum = creature->unk0_8 + (creature->parts[0].level + creature->parts[1].level + creature->parts[2].level +
+                              creature->parts[3].level);
+    max = kCreatureLevelLimits[0] * 11 + 50;
+    return std::min(max, sum);
+}
+
+u32 DinoGetCreatureLevel(const DinoCreatureState *creature) {
+    if (creature->parts[0].level == 0) {
+        return 0;
+    }
+    return (DinoGetCreatureTotal(creature) - 50) / kCreatureLevelLimits[0] + 1;
+}
+
