@@ -1,0 +1,12 @@
+// A model with a ryusen (streamline) effect.
+#ifndef M_3D_RYUSEN_H
+#define M_3D_RYUSEN_H
+
+#include "m/3d_model.h"
+
+class M3DRyusen : public M3DModel {
+public:
+    virtual ~M3DRyusen();
+};
+
+#endif
