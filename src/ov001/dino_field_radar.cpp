@@ -23,6 +23,24 @@ DinoFieldRadarManager::~DinoFieldRadarManager() {
 template class MCallTask1<DinoFieldRadar, DinoFieldRadar, bool>;
 template MTask *MCreateCallTask(DinoFieldRadar *obj, void (DinoFieldRadar::*func)(bool), bool a0);
 
+#pragma auto_inline off
+
+void DinoFieldRadarManager::Idle() {
+    if (mRadar) {
+        u32 focus = mField->GetCamera()->GetFocus();
+        if (focus) {
+            DinoFieldChara *chara = mField->GetChara(focus);
+            if (chara) {
+                DinoFieldCharaModel *model = chara->GetModel();
+                DinoFieldCharaModel *model2 = chara->GetModel();
+                mRadar->SetPlayer(model->pos, model2->angle, chara->GetHeight());
+            }
+        }
+    }
+}
+
+#pragma auto_inline on
+
 void DinoFieldRadarManager::CameraUnk0() {
     if (mRadar) {
         mParallel.Remove(mRadar);

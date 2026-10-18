@@ -91,6 +91,8 @@ public:
     void SetAngle(u32 angle, u32 a, u32 b);
     void SetDirection(u16 angle);
     BOOL IsMoving();
+    BOOL IsUnkA1Motion();
+    MFx32 GetHeight();
     void MoveTo(MFx32Point coord, u32 a, u32 b, u8 c);
     MTask *CreateWaitMoveTask();
 
@@ -121,6 +123,7 @@ public:
     virtual ~DinoFieldRadar();
     virtual void Idle();
     MTask *CreateModeTask(u32 from, u32 to, u32 a, u8 b);
+    void SetPlayer(MFx32Point pos, u16 angle, MFx32 height);
 
     u32 mUnk74[11];             // 0x74
     MAfnBlock *mAffine;         // 0xA0

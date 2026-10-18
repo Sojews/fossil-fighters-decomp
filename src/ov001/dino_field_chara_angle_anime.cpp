@@ -47,6 +47,25 @@ DinoFieldCharaModel *DinoFieldChara::GetModel() {
     return &mModel;
 }
 
+// The chara file's header.
+struct DinoFieldCharaData {
+    u8 unk00[0x18];
+    MFx32 mHeight;  // 0x18
+};
+
+MFx32 DinoFieldChara::GetHeight() {
+    if (IsUnkA1Motion()) {
+        MFx32 zero;
+        zero.v = 0;
+        return zero;
+    }
+    return ((DinoFieldCharaData *) mFile.GetData())->mHeight;
+}
+
+BOOL DinoFieldChara::IsUnkA1Motion() {
+    return mModel.unk05[0] && (mMotion == 2 || mMotion == 3);
+}
+
 void DinoFieldChara::Read(const void *buf) {
     MSerializer::Read(buf);
     if (mModel.id) {
