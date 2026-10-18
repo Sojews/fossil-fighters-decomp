@@ -12,6 +12,7 @@ typedef signed long long s64;
 
 typedef volatile u32 vu32;
 typedef volatile u16 vu16;
+typedef volatile u64 vu64;
 typedef volatile u8 vu8;
 
 typedef int BOOL;

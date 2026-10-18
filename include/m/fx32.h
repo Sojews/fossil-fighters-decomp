@@ -9,10 +9,30 @@ public:
     MFx32() {}
     MFx32(int i) { v = i << FX32_SHIFT; }
 
-    bool operator==(MFx32 o) const { return v == o.v; }
-
     fx32 v;
 };
+
+inline bool operator==(MFx32 a, MFx32 b) {
+    return a.v == b.v;
+}
+
+inline bool operator<(MFx32 a, MFx32 b) {
+    return a.v < b.v;
+}
+
+inline bool operator>(MFx32 a, MFx32 b) {
+    return a.v > b.v;
+}
+
+inline bool operator>=(MFx32 a, MFx32 b) {
+    return a.v >= b.v;
+}
+
+inline MFx32 operator-(MFx32 a) {
+    MFx32 r;
+    r.v = -a.v;
+    return r;
+}
 
 inline int MFx32ToInt(MFx32 x) {
     return x.v >> FX32_SHIFT;
@@ -58,6 +78,19 @@ struct MFx32Point {
         y = y_;
     }
 
+    MFx32Point &operator+=(const MFx32Point &o) {
+        x = o.x + x;
+        y = o.y + y;
+        return *this;
+    }
+    MFx32Point &operator-=(const MFx32Point &o) {
+        x = x - o.x;
+        y = y - o.y;
+        return *this;
+    }
+    // (With the hardware square root.)
+    MFx32 Length() const;
+
     MFx32 x;
     MFx32 y;
 };
@@ -68,6 +101,103 @@ inline MFx32Point operator+(const MFx32Point &a, const MFx32Point &b) {
 
 inline MFx32Point operator-(const MFx32Point &a, const MFx32Point &b) {
     return MFx32Point(a.x - b.x, a.y - b.y);
+}
+
+inline MFx32Point operator*(const MFx32Point &a, MFx32 b) {
+    return MFx32Point(a.x * b, a.y * b);
+}
+
+inline MFx32Point operator/(const MFx32Point &a, MFx32 b) {
+    return MFx32Point(a.x / b, a.y / b);
+}
+
+inline MFx32 MFx32Point::Length() const {
+    MFx32 r;
+    s64 xx = x.v;
+    *(vu16 *) 0x040002B0 = 1;
+    *(vu64 *) 0x040002B8 = (s64) y.v * y.v + 0x1000 + xx * xx;
+    while (*(vu16 *) 0x040002B0 & 0x8000) {
+    }
+    r.v = *(vu32 *) 0x040002B4;
+    return r;
+}
+
+struct MFx32Circle {
+    MFx32Circle(MFx32 x_, MFx32 y_, MFx32 r_) {
+        x = x_;
+        y = y_;
+        r = r_;
+    }
+
+    // Whether it overlaps the rectangle.
+    bool Overlaps(const struct MFx32Rect &rect) const;
+
+    MFx32 x;
+    MFx32 y;
+    MFx32 r;
+};
+
+struct MFx32Rect {
+    MFx32 left;
+    MFx32 top;
+    MFx32 right;
+    MFx32 bottom;
+
+    // The shortest move that takes the circle out of the rectangle.
+    MFx32Point PushOut(const MFx32Circle &c) const;
+};
+
+inline MFx32Rect operator+(const MFx32Rect &a, MFx32Point b) {
+    MFx32Rect r = a;
+    r.left = r.left + b.x;
+    r.top = r.top + b.y;
+    r.right = r.right + b.x;
+    r.bottom = r.bottom + b.y;
+    return r;
+}
+
+inline bool MFx32Circle::Overlaps(const MFx32Rect &rect) const {
+    MFx32 d = 0;
+    if (x < rect.left) {
+        d = d + (rect.left - x) * (rect.left - x);
+    }
+    if (x > rect.right) {
+        d = d + (x - rect.right) * (x - rect.right);
+    }
+    if (y < rect.top) {
+        d = d + (rect.top - y) * (rect.top - y);
+    }
+    if (y > rect.bottom) {
+        d = d + (y - rect.bottom) * (y - rect.bottom);
+    }
+    return d < r * r;
+}
+
+inline MFx32Point MFx32Rect::PushOut(const MFx32Circle &c) const {
+    MFx32Point to(c.x, c.y);
+    MFx32 best;
+    best.v = 0x7FFFFFFF;
+    MFx32 d = c.y + c.r - top;
+    if (d > MFx32(0) && d < best) {
+        best = d;
+        to.Set(c.x, top - c.r);
+    }
+    d = bottom - (c.y - c.r);
+    if (d > MFx32(0) && d < best) {
+        best = d;
+        to.Set(c.x, bottom + c.r);
+    }
+    d = c.x + c.r - left;
+    if (d > MFx32(0) && d < best) {
+        best = d;
+        to.Set(left - c.r, c.y);
+    }
+    d = right - (c.x - c.r);
+    if (d > MFx32(0) && d < best) {
+        best = d;
+        to.Set(right + c.r, c.y);
+    }
+    return to - MFx32Point(c.x, c.y);
 }
 
 // The angle (0-0xFFFF) of the direction (x, y).

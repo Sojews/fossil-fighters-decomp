@@ -108,6 +108,221 @@ DinoFieldChara *DinoField::GetChara(u32 id) {
     return NULL;
 }
 
+// (The game calls even the inline MFx32 operators here, and keeps their copies after this function.)
+// NONMATCHING: the logic is the game's, but not the temporaries' stack slots or the skip test's branches.
+#pragma dont_inline on
+
+MFx32Point DinoField::ResolveMove(DinoFieldChara *chara, MFx32Point move) {
+    u32 focus = mCamera->GetFocus();
+    MFx32Point pos = chara->GetModel()->pos;
+    MFx32Point result = pos + move;
+    if (chara->GetHeight() == MFx32(0)) {
+        return result;
+    }
+    for (u32 i = 0; i < 100; i++) {
+        DinoFieldChara *other = mCharas[i];
+        if (other->GetModel()->id == 0 || other == chara || other->GetHeight() == MFx32(0) ||
+            (focus == chara->GetModel()->id && other->GetTask()->unk4 == 1) ||
+            (focus == other->GetModel()->id && chara->GetTask()->unk4 == 1)) {
+            continue;
+        }
+        if (other->GetUnk2C() == 0) {
+            MFx32Point d = result - other->GetModel()->pos;
+            MFx32 r = chara->GetHeight() + other->GetHeight();
+            if (!(d.x * d.x + d.y * d.y >= r * r)) {
+                MFx32 len = d.Length();
+                result += d / len * (r - len);
+            }
+        } else {
+            MFx32Circle circle(result.x, result.y, chara->GetHeight());
+            MFx32Rect rect = other->GetRect30() + other->GetModel()->pos;
+            if (circle.Overlaps(rect)) {
+                result += rect.PushOut(circle);
+            }
+        }
+    }
+    DinoFieldMapInfo *info = mMap->GetInfo();
+    if (info->id == mDefs.Get()->GetRockMap() && focus == chara->GetModel()->id) {
+        for (u32 i = 0; i < 20; i++) {
+            DinoBackupEntry28 rock;
+            gDinoBackup->GetUnk138(i, &rock);
+            if (rock.used) {
+                MFx32Point d = result - *(MFx32Point *) &rock.unkC;
+                MFx32 r = chara->GetHeight() + MFx32(1);
+                if (!(d.x * d.x + d.y * d.y >= r * r)) {
+                    MFx32 len = d.Length();
+                    result += d / len * (r - len);
+                }
+            }
+        }
+    }
+    if (chara->GetTask()->unk4 == 1) {
+        return result;
+    }
+
+    // Walls: walk the move in small steps, feeling a radius ahead in each direction.
+    MFx32Point diff = result - pos;
+    MFx32 len = diff.Length();
+    MFx32Point dir;
+    int shift = 3;
+    if (len.v < 0x400 && len.v > 0x400 / 2) {
+        dir = diff / len / MFx32(16);
+        shift += 1;
+    } else if (len.v <= 0x200) {
+        dir = diff / len / MFx32(4);
+        shift += 2;
+    } else {
+        dir = diff / len / MFx32(8);
+    }
+    fx32 height = 0;
+    MFx32Point step(MFx32(0), MFx32(0));
+    MFx32Point up(MFx32(0), -chara->GetHeight());
+    MFx32Point down(MFx32(0), chara->GetHeight());
+    MFx32Point left(-chara->GetHeight(), MFx32(0));
+    MFx32Point right(chara->GetHeight(), MFx32(0));
+    int hit = 0;
+    int hit2 = 0;
+    while (step.Length() < len) {
+        if (!IsWalkable(pos + step + up, &height) && dir.y.v <= 0) {
+            hit |= 8;
+        }
+        if (!IsWalkable(pos + step + down, &height) && dir.y.v >= 0) {
+            hit |= 1;
+        }
+        if (!IsWalkable(pos + step + left, &height) && dir.x.v <= 0) {
+            hit |= 2;
+        }
+        if (!IsWalkable(pos + step + right, &height) && dir.x.v >= 0) {
+            hit |= 4;
+        }
+        if (hit & 0xF) {
+            break;
+        }
+        hit = 0x10;
+        step += dir;
+    }
+    if (!(hit & 0xF)) {
+        return result;
+    }
+    if (hit & 0x10) {
+        step -= dir;
+    }
+
+    // Blocked: try sliding along the wall, as long as that gets closer to where the move was going.
+    if (hit & 1) {
+        dir.y.v -= 0x1000 >> shift;
+    }
+    if (hit & 2) {
+        dir.x.v += 0x1000 >> shift;
+    }
+    if (hit & 8) {
+        dir.y.v += 0x1000 >> shift;
+    }
+    if (hit & 4) {
+        dir.x.v -= 0x1000 >> shift;
+    }
+    if (dir.x.v != 0 || dir.y.v != 0) {
+        u32 best = diff.x.v * diff.x.v + diff.y.v * diff.y.v;
+        while (step.Length() < len) {
+            if (!IsWalkable(pos + step + up, &height) && dir.y.v <= 0) {
+                hit2 |= 8;
+            }
+            if (!IsWalkable(pos + step + down, &height) && dir.y.v >= 0) {
+                hit2 |= 1;
+            }
+            if (!IsWalkable(pos + step + left, &height) && dir.x.v <= 0) {
+                hit2 |= 2;
+            }
+            if (!IsWalkable(pos + step + right, &height) && dir.x.v >= 0) {
+                hit2 |= 4;
+            }
+            if (hit2 & 0xF) {
+                break;
+            }
+            fx32 dy = step.y.v - diff.y.v;
+            fx32 dx = step.x.v - diff.x.v;
+            u32 dist = dx * dx + dy * dy;
+            if (dist > best) {
+                break;
+            }
+            best = dist;
+            hit2 |= 0x20;
+            step += dir;
+        }
+    }
+    if (hit2 & 0x20) {
+        step -= dir;
+    }
+    int both = (hit | hit2) & 0xF;
+    if (both == 6 || both == 9) {
+        // Into a corner: keep only the free direction of the move.
+        hit2 = 0;
+        if (hit & 9) {
+            dir.y.v = 0;
+        }
+        if (hit & 6) {
+            dir.x.v = 0;
+        }
+        if (dir.x.v != 0 || dir.y.v != 0) {
+            while (step.Length() < len) {
+                if (!IsWalkable(pos + step + up, &height) && dir.y.v < 0) {
+                    hit2 |= 8;
+                }
+                if (!IsWalkable(pos + step + down, &height) && dir.y.v > 0) {
+                    hit2 |= 2;
+                }
+                if (!IsWalkable(pos + step + left, &height) && dir.x.v < 0) {
+                    hit2 |= 4;
+                }
+                if (!IsWalkable(pos + step + right, &height) && dir.x.v > 0) {
+                    hit2 |= 6;
+                }
+                if (hit2 & 0xF) {
+                    break;
+                }
+                hit2 |= 0x20;
+                step += dir;
+            }
+        }
+        if (hit2 & 0x20) {
+            step -= dir;
+        }
+    } else if (step.Length().v < 0x200) {
+        int same = hit2 & hit & 0xF;
+        if (same == 1) {
+            step.y.v = 0;
+        } else if (same == 8) {
+            step.y.v = 0;
+        } else if (same == 2) {
+            step.x.v = 0;
+        } else if (same == 4) {
+            step.x.v = 0;
+        }
+    }
+    result = pos + step;
+    return result;
+}
+
+#pragma dont_inline reset
+
+BOOL DinoField::IsWalkable(fx32 x, fx32 y) {
+    if (mMap != NULL) {
+        return mMap->IsWalkable(x, y);
+    }
+    return FALSE;
+}
+
+BOOL DinoField::IsWalkable(MFx32Point pos, fx32 *height) {
+    return IsWalkable(pos.x.v, pos.y.v);
+}
+
+fx32 DinoField::GetGroundHeight(fx32 x, fx32 y) {
+    if (mMap != NULL) {
+        return mMap->GetGroundHeight(x, y);
+    }
+    return 0;
+}
+
 void DinoField::Write(void *buf) {
     MSerializer::Write(buf);
 }

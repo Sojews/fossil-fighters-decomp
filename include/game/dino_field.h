@@ -13,6 +13,7 @@
 #include "m/task.h"
 #include "game/help.h"
 #include "m/archive.h"
+#include "m/resource.h"
 #include "m/serializer.h"
 #include "game/dino_field_town_map.h"
 #include "game/dino_backup.h"
@@ -120,10 +121,11 @@ public:
     BOOL IsMoving();
     BOOL IsUnkA1Motion();
     MFx32 GetHeight();
+    DinoCharaTask *GetTask() { return &mTask; }
     void ResetState();
     MFx32 GetMoveSpeed();
     u8 GetUnk2C();
-    MRect GetRect30();
+    MFx32Rect GetRect30();
     u8 GetUnk2D();
     MRect GetRect40();
     MFx32 GetUnk50();
@@ -222,6 +224,14 @@ struct DinoFieldMapData {
     u32 mEntries4C;     // 0x4C: offset of a table of offsets
 };
 
+// The field's settings file.
+struct DinoFieldDefs {
+    u8 unk00[0x9C];
+    u32 mRockMap;       // 0x9C: the map the kaseki rocks are on
+
+    u32 GetRockMap() const { return mRockMap; }
+};
+
 class DinoFieldMap : public MProcess, public MSerializer {
 public:
     virtual ~DinoFieldMap();
@@ -229,6 +239,8 @@ public:
     virtual void Read(const void *buf);
 
     DinoFieldMapInfo *GetInfo();
+    fx32 GetGroundHeight(fx32 x, fx32 y);
+    BOOL IsWalkable(fx32 x, fx32 y);
     void Load();
     MFx32 GetWalkSpeed();
     void ClearGradation();
@@ -255,6 +267,11 @@ public:
     virtual ~DinoField();
     void CreateEffects(MPolygonChar **effects, u32 count, u32 id);
     fx32 GetGroundHeight(fx32 x, fx32 y);
+    BOOL IsWalkable(fx32 x, fx32 y);
+    BOOL IsWalkable(MFx32Point pos, fx32 *height);
+    // Where the character ends up moving by move: pushed out of the other characters (and, on the map in the
+    // field defs, the kaseki rocks), then stopped or slid along walls.
+    MFx32Point ResolveMove(DinoFieldChara *chara, MFx32Point move);
     virtual void Read(const void *buf);
     virtual void Write(void *buf);
     DinoFieldMap *GetMap();
@@ -344,8 +361,7 @@ public:
     u8 unk2CC[0xA8];
     MTaskSet *mEffectTasks;     // 0x374
     u8 unk378[8];
-    MArchivePtr mArchive;       // 0x380
-    MArchiveFile mFile;         // 0x384
+    MResource<DinoFieldDefs> mDefs; // 0x380
     DinoFieldPoint *mMoney;     // 0x390: the money panel, while shown
     DinoFieldPoint *mDonate;    // 0x394
     u8 unk398[0x30];

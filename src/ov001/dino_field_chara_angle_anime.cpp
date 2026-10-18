@@ -61,7 +61,7 @@ struct DinoFieldCharaData {
     u8 unk24[0x2C - 0x24];
     u8 mUnk2C;          // 0x2C
     u8 mUnk2D;          // 0x2D
-    MRect mRect30;      // 0x30
+    MFx32Rect mRect30;  // 0x30: the collision box, around the position
     MRect mRect40;      // 0x40
     MFx32 mUnk50;       // 0x50: -10 = the default
 };
@@ -93,7 +93,7 @@ u8 DinoFieldChara::GetUnk2C() {
     return ((DinoFieldCharaData *) mFile.GetData())->mUnk2C;
 }
 
-MRect DinoFieldChara::GetRect30() {
+MFx32Rect DinoFieldChara::GetRect30() {
     const DinoFieldCharaData *data = (const DinoFieldCharaData *) mFile.GetData();
     return data->mRect30;
 }
