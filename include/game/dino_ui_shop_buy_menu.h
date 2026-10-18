@@ -9,6 +9,7 @@
 #include "game/dino_ui_shop_buy_menu_item.h"
 
 class DinoUi3PartsMoney;
+class DinoUiShopBuyBuyButton;
 class DinoUi3PartsCursor;
 class DinoUi3PartsRockName;
 
@@ -25,6 +26,11 @@ public:
     BOOL PageLeft();
     BOOL Buy();
     void FinishBuy();
+    void LoadFossils();
+    const DinoKasekiDef *GetKasekiDef(u32 id) {
+        const DinoKasekiDefs *defs = (const DinoKasekiDefs *)mFile.GetData();
+        return (const DinoKasekiDef *)((const u8 *)defs + ((const u32 *)((const u8 *)defs + defs->tableOffset))[id]);
+    }
     void ClearItems();
     u8 GetFlag(int index);
     void SetFlag(int index, u8 flag);
@@ -36,7 +42,7 @@ public:
     MArchiveFile mFile;         // 0xB8
     u32 mUnkC4;                 // 0xC4
     MMenuItem *mUnkC8;          // 0xC8: the back button
-    MMenuItem *mLinkFrom;       // 0xCC: linked to the first page item
+    DinoUiShopBuyBuyButton *mLinkFrom; // 0xCC: the buy button, linked to the first page item
     u32 mUnkD0;                 // 0xD0
     std::vector<void *> mItems; // 0xD4: this page's items
     u32 mUnkE0[2];              // 0xE0

@@ -23,6 +23,7 @@
 #include "game/dino_ui3_parts_money.h"
 #include "game/dino_ui3_parts_kaseki_button.h"
 #include "game/dino_backup.h"
+#include "nitro/mi.h"
 #include "m/input.h"
 
 #pragma auto_inline off
@@ -313,6 +314,40 @@ BOOL DinoUiShopBuyMenu::Buy() {
     serial->AddTail(show);
     serial->AddTail(finish);
     return TRUE;
+}
+
+// After the yes/no: buys the chosen fossils there's money and room for, and starts the page over.
+void DinoUiShopBuyMenu::FinishBuy() {
+    if (mConfirmed == TRUE) {
+        DinoSoundPlaySe(0x107, 0);
+        for (int i = 0; i < 8; i++) {
+            if (mFlags[i]) {
+                mFlags[i] = FALSE;
+                DinoBackupEntry entry;
+                gDinoBackup->GetUnk148(i, &entry);
+                u32 price = GetKasekiDef(entry.id)->price;
+                if (!gDinoBackup->IsUnk98Full() && price <= mFunds) {
+                    mFunds = mFunds - price;
+                    gDinoBackup->SetSystemVar(3, mFunds);
+                    gDinoBackup->SetUnk98(gDinoBackup->FindFreeUnk98(), &entry);
+                    MI_CpuFill8(&entry, 0, sizeof(entry));
+                    gDinoBackup->SetUnk148(i, &entry);
+                }
+            }
+        }
+        mCount = 0;
+        gDinoBackup->CompactUnk148();
+        LoadFossils();
+        ClearItems();
+        RefreshPage2();
+        mTotal = 0;
+        mMoney->RefreshMoney();
+        RefreshPage3();
+        gDinoBackup->MarkUnk160();
+        DinoUiShopBuyBuyButton *buy = mLinkFrom;
+        buy->mSerial.Clear();
+        buy->mMotion->Play(1, 0);
+    }
 }
 
 // A fossil button: chooses it (if the money and the room allow) or unchooses it.
