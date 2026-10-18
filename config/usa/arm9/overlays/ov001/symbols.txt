@@ -401,13 +401,13 @@ _ZN22DinoFieldPlayerControl4IdleEv kind:function(thumb,size=0x1b38) addr:0x02164
 .L_02166318 kind:label(thumb) addr:0x02166318 local
 .L_02166946 kind:label(thumb) addr:0x02166946
 _Z15MCreateCallTaskI9DinoFieldS0_10MFx32PointlEP5MTaskPT_MT0_FvT1_T2_ES7_S8_ kind:function(thumb,size=0x5c) addr:0x02166980
-func_ov001_021669dc kind:function(thumb,size=0x6c) addr:0x021669dc
-func_ov001_02166a48 kind:function(thumb,size=0x50) addr:0x02166a48
+_Z15MCreateCallTaskI22DinoFieldPlayerControlS0_10MFx32Point5MFx32tmEP5MTaskPT_MT0_FvT1_T2_T3_T4_ES8_S9_SA_SB_ kind:function(thumb,size=0x6c) addr:0x021669dc
+_ZN10MCallTask4I22DinoFieldPlayerControlS0_10MFx32Point5MFx32tmE4IdleEv kind:function(thumb,size=0x50) addr:0x02166a48
 _ZN10MCallTask2I9DinoFieldS0_10MFx32PointlE4IdleEv kind:function(thumb,size=0x3c) addr:0x02166a98
 _ZN10MCallTask2I9DinoFieldS0_10MFx32PointlED0Ev kind:function(thumb,size=0x1c) addr:0x02166ad4
 _ZN10MCallTask2I9DinoFieldS0_10MFx32PointlED1Ev kind:function(thumb,size=0x16) addr:0x02166af0
-func_ov001_02166b08 kind:function(thumb,size=0x1c) addr:0x02166b08
-func_ov001_02166b24 kind:function(thumb,size=0x16) addr:0x02166b24
+_ZN10MCallTask4I22DinoFieldPlayerControlS0_10MFx32Point5MFx32tmED0Ev kind:function(thumb,size=0x1c) addr:0x02166b08
+_ZN10MCallTask4I22DinoFieldPlayerControlS0_10MFx32Point5MFx32tmED1Ev kind:function(thumb,size=0x16) addr:0x02166b24
 _ZN14DinoFieldDanceC1EP9DinoFieldmmmmm kind:function(thumb,size=0xe8) addr:0x02166b3c
 _ZN14DinoFieldDance4IdleEv kind:function(thumb,size=0x20) addr:0x02166c24
 func_ov001_02166c44 kind:function(thumb,size=0xc4) addr:0x02166c44
