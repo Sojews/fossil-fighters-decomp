@@ -11,6 +11,7 @@
 #include "m/bg_new_task.h"
 #include "m/call_task.h"
 #include "m/fx32.h"
+#include "m/lcd.h"
 
 DinoFieldTownMap::~DinoFieldTownMap() {
 }
@@ -39,4 +40,11 @@ void DinoFieldTownMapManager::CameraUnk0(u32 map) {
         delete mTownMap;
         mTownMap = NULL;
     }
+}
+
+#pragma auto_inline off
+
+DinoFieldTownMapManager::DinoFieldTownMapManager(DinoField *field) : MProcess(gLcd->GetTopDisplay()) {
+    mField = field;
+    mTownMap = NULL;
 }

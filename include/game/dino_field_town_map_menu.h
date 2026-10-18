@@ -13,6 +13,7 @@
 
 class DinoFieldTownMapManager : public MProcess, public DinoFieldCameraHook {
 public:
+    DinoFieldTownMapManager(DinoField *field);
     virtual ~DinoFieldTownMapManager();
     virtual void Idle();
     virtual void CameraUnk0(u32 map);

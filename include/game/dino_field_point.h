@@ -17,6 +17,7 @@ public:
     DinoFieldPoint(const std::string &path, int digits, u32 a, u32 b, u32 c);
     virtual ~DinoFieldPoint();
     virtual void Idle();
+    virtual void Format(char *buf) = 0;  // the shown value
     MTask *CreateShowTask();
     MTask *CreateHideTask();
 
@@ -28,12 +29,14 @@ class DinoFieldMoney : public DinoFieldPoint {
 public:
     DinoFieldMoney();
     virtual ~DinoFieldMoney();
+    virtual void Format(char *buf);
 };
 
 class DinoFieldDonate : public DinoFieldPoint {
 public:
     DinoFieldDonate();
     virtual ~DinoFieldDonate();
+    virtual void Format(char *buf);
 };
 
 #endif
