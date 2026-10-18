@@ -2159,8 +2159,10 @@ DinoEventExecCleaning::DinoEventExecCleaning(DinoEventLoop *event, u32 unk80, u3
 }
 
 void DinoEventExecCleaning::StateFadeOut() {
-    MTask *fadeSub = gLcd->mSub->mBright->CreateFadeOutToWhite(30, 0);
-    MTask *fadeMain = gLcd->mMain->mBright->CreateFadeOutToWhite(30, 0);
+    MTask *fadeMain;
+    MTask *fadeSub;
+    fadeSub = gLcd->mSub->mBright->CreateFadeOutToWhite(30, 0);
+    fadeMain = gLcd->mMain->mBright->CreateFadeOutToWhite(30, 0);
     MParallelTaskSet *fades = new MParallelTaskSet(TRUE);
     fades->AddTail(fadeMain);
     fades->AddTail(fadeSub);
