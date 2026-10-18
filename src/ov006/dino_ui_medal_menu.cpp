@@ -5,6 +5,7 @@
 #pragma auto_inline on
 
 #include "game/dino_ui_medal_menu.h"
+#include "game/dino_ui_field_menu_fraction.h"
 #include "m/display.h"
 #include "m/blend.h"
 #include "game/dino_sound.h"
@@ -121,11 +122,10 @@ MRect DinoUiSortMenuItem::GetRect() {
 }
 
 extern "C" const int data_02089a0c;
-extern "C" void func_ov006_02182f1c(DinoUiMedalMenu *menu, u32 index);
 
 void DinoUiMedalSlotCreateTask::Idle() {
     if (mIndex <= 14) {
-        func_ov006_02182f1c(mMenu, mIndex);
+        mMenu->CreateSlot(mIndex);
         if (mIndex < mMenu->mSlotCount - 1) {
             mSerial.AddTail(new MTimer(data_02089a0c));
         }
@@ -158,6 +158,35 @@ void DinoUiMedalMenu::PageLeft() {
     mSerial.AddTail(MCreateBgCallTask(this, &DinoUiMedalMenu::LoadPage, 1));
     mSerial.AddTail(MCreateCallTask(this, &DinoUiMedalMenu::FinishPageLeft));
     Disable();
+}
+
+void DinoUiMedalMenu::ClearSlots() {
+    for (int i = 0; i < 15; i++) {
+        RemoveItem(mSlots[i]);
+        delete mSlots[i];
+    }
+}
+
+void DinoUiMedalMenu::CreateSlots() {
+    for (int i = 0; i < 15; i++) {
+        CreateSlot(i);
+    }
+}
+
+void DinoUiMedalMenu::FinishPageRight() {
+    ClearSlots();
+    mFraction->SetNumerator(mPage + 1);
+    CreateSlots();
+    Enable();
+    FocusNearestItem(GetCursor());
+}
+
+void DinoUiMedalMenu::FinishPageLeft() {
+    ClearSlots();
+    mFraction->SetNumerator(mPage + 1);
+    CreateSlots();
+    Enable();
+    FocusNearestItem(GetCursor());
 }
 
 #pragma auto_inline on
