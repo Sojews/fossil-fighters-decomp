@@ -19,6 +19,7 @@
 struct DinoCharaTask;
 class DinoField;
 class MTextPicture;
+class DinoGradationBg;
 class MSmartOam;
 class MDisplay;
 
@@ -182,6 +183,10 @@ struct DinoFieldMapInfo {
 struct DinoFieldMapData {
     u8 unk00[0x30];
     MFx32 mWalkSpeed;   // 0x30: the speed characters' walk motion plays at
+    u8 unk34[0x44 - 0x34];
+    u32 mEntries44;     // 0x44: offset of a table of 12-byte entries
+    u32 unk48;
+    u32 mEntries4C;     // 0x4C: offset of a table of offsets
 };
 
 class DinoFieldMap : public MProcess, public MSerializer {
@@ -193,6 +198,9 @@ public:
     DinoFieldMapInfo *GetInfo();
     void Load();
     MFx32 GetWalkSpeed();
+    void ClearGradation();
+    void *GetEntry44(int index);
+    void *GetEntry4C(int index);
 
     DinoFieldMapInfo mInfo; // 0x8C
     u32 mUnk90;             // 0x90
@@ -202,6 +210,9 @@ public:
     MArchiveFile mFile2;    // 0xA8
     MArchivePtr mArchive3;  // 0xB4
     MArchiveFile mFile3;    // 0xB8
+    void *mUnkC4;           // 0xC4
+    void *mUnkC8;           // 0xC8
+    DinoGradationBg *mGradation;    // 0xCC
 };
 
 class DinoFieldPoint;
