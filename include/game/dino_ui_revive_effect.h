@@ -4,7 +4,9 @@
 #include "m/picture.h"
 #include "m/resource.h"
 #include "m/task.h"
+#include "game/dino_backup.h"
 
+class MExtAffinePicture;
 class MIndexBitmap;
 class MInput;
 struct MPalBlock;
@@ -19,21 +21,28 @@ public:
     virtual void Idle();
 
     void State0215e220();
+    void StateScroll();
+    void State0215ec2c();
     void State0215e274();
     void State0215ee24();
     void StartWait();
     void StateWait();
-    void State0215fab4();
+    void Leave();
 
     void (DinoUiReviveEffect::*mState)(); // 0x74
-    u32 unk7C[19];
+    DinoCreatureState mCreature;            // 0x7C
+    DinoCreatureState mUnk94;               // 0x94
+    DinoCreatureState mUnkAC;               // 0xAC
+    u32 *mResult;                           // 0xC4
     u32 mUnkC8;                             // 0xC8
     MPictureFile mPicture;                  // 0xCC
     MIndexBitmap *mBitmap;                  // 0x100
     MPalBlock *mPalBlock;                   // 0x104
     u32 unk108[3];
     u8 mUnk114;                             // 0x114
-    u32 unk118[4];
+    MExtAffinePicture *mScroller;           // 0x118: scrolled up over the effect
+    int mScrollFrame;                       // 0x11C
+    u32 unk120[2];
     MResource<DinoUiReviveEffectData> mUnk128; // 0x128
     int mTimer;                             // 0x138
     MInput *mInput;                         // 0x13C

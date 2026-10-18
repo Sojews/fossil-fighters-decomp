@@ -18,10 +18,15 @@
 #include "m/call_task.h"
 #include "game/dino_ui_revive_effect.h"
 #include "m/blend.h"
+#include "m/bright.h"
 #include "m/display.h"
 #include "m/input.h"
 #include "m/lcd.h"
 #include "m/pal.h"
+#include "m/picture.h"
+#include "m/seed_generator.h"
+#include "game/dino_resource.h"
+#include "game/dino_sound.h"
 
 DinoUiReviveStatus::~DinoUiReviveStatus() {
 }
@@ -77,13 +82,15 @@ void DinoUiReviveEffect::Idle() {
 // The TU's pooled pointer-to-member constants (see menu.cpp).
 extern "C" struct {
     u8 unk00[0x4C];
-    void (DinoUiReviveEffect::*State0215fab4_4C)(); // 0x4C
+    void (DinoUiReviveEffect::*Leave_4C)();         // 0x4C
     u8 unk54[0x5C - 0x54];
     void (DinoUiReviveEffect::*StateWait_5C)();     // 0x5C
     u8 unk64[0x84 - 0x64];
     void (DinoUiReviveEffect::*State0215ee24_84)(); // 0x84
     u8 unk8C[0xCC - 0x8C];
     void (DinoUiReviveEffect::*State0215e274_CC)(); // 0xCC
+    u8 unkD4[0xE4 - 0xD4];
+    void (DinoUiReviveEffect::*State0215ec2c_E4)(); // 0xE4
 } data_ov003_02161d20;
 
 // Puts the picture away.
@@ -99,6 +106,20 @@ void DinoUiReviveEffect::State0215e220() {
 
 extern "C" u8 data_ov003_021624c0;
 extern "C" int func_ov003_0215b480(int frames);
+
+// Scrolls the picture up from a random place across, with a sound on the way.
+void DinoUiReviveEffect::StateScroll() {
+    mScrollFrame++;
+    int x = gDinoResource->GetRandom()->Next(mScroller->GetWidth() - 256);
+    int height = mScroller->GetHeight();
+    mScroller->SetPosition(-x, mScrollFrame * -(height - 192) / func_ov003_0215b480(360));
+    if (mScrollFrame == func_ov003_0215b480(200)) {
+        DinoSoundPlaySe(mUnkAC.index + 0x475, 0);
+    }
+    if (mScrollFrame >= func_ov003_0215b480(360)) {
+        mState = data_ov003_02161d20.State0215ec2c_E4;
+    }
+}
 extern "C" const int data_020899d0;  // how long the effect waits
 
 void DinoUiReviveEffect::StartWait() {
@@ -118,7 +139,24 @@ void DinoUiReviveEffect::StateWait() {
             return;
         }
     }
-    mState = data_ov003_02161d20.State0215fab4_4C;
+    mState = data_ov003_02161d20.Leave_4C;
+}
+
+// Fades both screens out and exits.
+void DinoUiReviveEffect::Leave() {
+    *mResult = 1;
+    MTask *mainFade;
+    MTask *subFade;
+    MTask *exit;
+    exit = MTaskExitTransfer::Create(this);
+    subFade = gLcd->mSub->mBright->CreateFadeOutToBlack(60, 0);
+    mainFade = gLcd->mMain->mBright->CreateFadeOutToBlack(60, 0);
+    MParallelTaskSet *fades = new MParallelTaskSet(TRUE);
+    fades->AddTail(mainFade);
+    fades->AddTail(subFade);
+    MSerialTaskSet *serial = &mSerial;
+    serial->AddTail(fades);
+    serial->AddTail(exit);
 }
 
 extern const u32 kCreatureLevelLimits[2];
