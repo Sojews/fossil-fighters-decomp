@@ -9,6 +9,7 @@
 class DinoCommonWindowYesNoDialog : public MProcess {
 public:
     void SetUnkBC(u8 value);
+    void SetPosition(MPoint pos);
     DinoCommonWindowYesNoDialog(std::string text, BOOL *result);
     DinoCommonWindowYesNoDialog(MDisplay *display, std::string text, BOOL *result);
     virtual ~DinoCommonWindowYesNoDialog();

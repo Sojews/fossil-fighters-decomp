@@ -4,6 +4,8 @@
 #include "m/task.h"
 #include "game/help.h"
 
+class DinoCommonWindowYesNoDialog;
+
 class DinoUiSaveMenu : public MProcess, public DinoHelpBase {
 public:
     DinoUiSaveMenu(u32 *result, u8 arg);
@@ -11,10 +13,14 @@ public:
     virtual void Idle();
     void StateFinish();
     void StateConfirmed();
+    void StateStart();
+    void StateAskSave();
+    void StateAskOverwrite();
+    void AddDialogHelp(DinoCommonWindowYesNoDialog *dialog);
 
     void (DinoUiSaveMenu::*mState)(); // 0x80
     u32 *mResult;                     // 0x88
-    u32 mUnk8C;                       // 0x8C
+    BOOL mUnk8C;                      // 0x8C: the dialogs' answer
     u8 mUnk90;                        // 0x90
     MTask *mUnk94;                    // 0x94
 };
