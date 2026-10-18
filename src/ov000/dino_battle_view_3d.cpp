@@ -134,3 +134,11 @@ void DinoBattleView3D::SetUnk19C(u32 value) {
 u32 DinoBattleView3D::GetUnkB0() {
     return mUnkB0;
 }
+
+DelDmgMotionTask::~DelDmgMotionTask() {
+    delete mUnk10;
+}
+
+void DelDmgMotionTask::Execute() {
+    Exit();
+}

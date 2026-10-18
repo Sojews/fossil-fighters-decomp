@@ -46,6 +46,9 @@ void DinoBattleViewCreatureInfo::Show() {
     mOam->mHidden = FALSE;
 }
 
+void DinoBattleViewCreatureInfo::Idle() {
+}
+
 void DinoBattleViewCreatureInfo::PlayMotion(int index) {
     mMotions[index]->Play(2, 1);
 }

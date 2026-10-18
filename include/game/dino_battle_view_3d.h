@@ -30,4 +30,12 @@ public:
     u32 mUnk1A0;                            // 0x1A0
 };
 
+class DelDmgMotionTask : public MTask {
+public:
+    virtual ~DelDmgMotionTask();
+    virtual void Execute();
+
+    u8 *mUnk10;     // 0x10
+};
+
 #endif
