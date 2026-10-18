@@ -49,6 +49,18 @@ void DinoUi2PartsRockName::Clear() {
     mText->SetText(std::string(data_ov004_02176b2c));
 }
 
+void DinoUi2PartsKasekiButton::SetMarked(BOOL marked) {
+    if (marked) {
+        mMark->Show();
+    } else {
+        mMark->Hide();
+    }
+}
+
+void DinoUi2PartsKasekiButton::HideMotion() {
+    mMotion->Hide();
+}
+
 MTask *DinoUi2FieldMenuCursor::CreateMoveTask(MRect from, MRect to, int duration, int ease) {
     DinoSoundPlaySe(0x96, 0);
     return CreateFrameAnime(from, to, duration, ease);
