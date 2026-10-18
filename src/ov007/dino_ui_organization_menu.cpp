@@ -156,6 +156,12 @@ extern "C" const int data_02089a0c;
 
 #pragma auto_inline off
 
+// The call-task makers, instantiated ahead of their users so none directly follows a function that calls it.
+template MTask *MCreateCallTask(DinoUiOrganizationMenu *obj, void (DinoHelpBase::*func)());
+template MTask *MCreateCallTask(DinoUiOrganizationMenu *obj, void (DinoUiOrganizationMenu::*func)());
+template MTask *MCreateBgCallTask(DinoUiOrganizationMenu *obj, void (DinoUiOrganizationMenu::*func)(), int thread);
+template MTask *MCreateCallTask(DinoUiOrganizationMenu *obj, void (DinoUiOrganizationMenu::*func)(u8), u8 a1);
+
 extern "C" void func_ov007_0217fb94(DinoUiOrganizationMenu *menu, int a1);
 // Where the team's medals go.
 extern MPoint data_ov007_0218ef0c[5];
@@ -779,9 +785,3 @@ void DinoUiOrganizationSlotCreateTask::Idle() {
     }
     mIndex++;
 }
-
-// DinoUiOrganizationMenu::OnFocus (not decompiled yet) re-enables the help through a call task.
-template MTask *MCreateCallTask(DinoUiOrganizationMenu *obj, void (DinoHelpBase::*func)());
-template MTask *MCreateCallTask(DinoUiOrganizationMenu *obj, void (DinoUiOrganizationMenu::*func)());
-template MTask *MCreateBgCallTask(DinoUiOrganizationMenu *obj, void (DinoUiOrganizationMenu::*func)(), int thread);
-template MTask *MCreateCallTask(DinoUiOrganizationMenu *obj, void (DinoUiOrganizationMenu::*func)(u8), u8 a1);
