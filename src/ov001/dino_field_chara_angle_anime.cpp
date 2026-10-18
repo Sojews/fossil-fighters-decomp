@@ -47,6 +47,22 @@ DinoFieldCharaModel *DinoFieldChara::GetModel() {
     return &mModel;
 }
 
+void DinoFieldChara::Read(const void *buf) {
+    MSerializer::Read(buf);
+    if (mModel.id) {
+        gDinoBackup->GetCharaTask(mModel.id, &mTask);
+    }
+}
+
+MTask *DinoFieldChara::CreateWaitMoveTask() {
+    MTask *move = MTaskSetWaitEmptyTask::Create(mMoveTasks);
+    MTask *angle = MTaskSetWaitEmptyTask::Create(mAngleTasks);
+    MParallelTaskSet *set = new MParallelTaskSet(TRUE);
+    set->AddTail(angle);
+    set->AddTail(move);
+    return set;
+}
+
 void DinoFieldChara::HideManpu() {
     if (mManpu) {
         mTaskSet->Remove(mManpu);

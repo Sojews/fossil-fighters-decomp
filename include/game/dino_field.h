@@ -15,6 +15,7 @@
 #include "m/archive.h"
 #include "m/serializer.h"
 #include "game/dino_field_town_map.h"
+#include "game/dino_backup.h"
 struct DinoCharaTask;
 class DinoField;
 class MTextPicture;
@@ -97,7 +98,10 @@ public:
     MArchiveFile mFile;         // 0x90
     DinoFieldCharaModel mModel; // 0x9C
     u32 mMotion;                // 0xB4: the motion playing
-    u32 mUnkB8[22];             // 0xB8
+    u32 mUnkB8[4];              // 0xB8
+    DinoCharaTask mTask;        // 0xC8: what the character does on its own
+    MTaskSet *mMoveTasks;       // 0x108
+    MTaskSet *mAngleTasks;      // 0x10C
     MTaskSet *mTaskSet;         // 0x110: where the manpu task runs
     u32 mUnk114;                // 0x114
     DinoField *mField;          // 0x118
