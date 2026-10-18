@@ -4,6 +4,9 @@
 // Derived destructors have their bases' destructor bodies inlined; auto-inlining the ones defined above does that.
 #pragma auto_inline on
 
+#include <algorithm>
+#include "game/dino_backup.h"
+#include "game/dino_sound.h"
 #include "game/dino_wireless_battle.h"
 #include "game/dino_message.h"
 #include "game/dino_ui_team_select.h"
@@ -20,25 +23,32 @@ void DinoWirelessBattle::Idle() {
 
 // The TU's pooled pointer-to-member constants (see menu.cpp).
 extern "C" struct {
-    u8 unk00[0x10];
-    void (DinoWirelessBattle::*StateBattleEnd_10)();
-    u8 unk18[0x38 - 0x18];
-    void (DinoWirelessBattle::*StateCloseHub_38)();
-    u8 unk40[0x50 - 0x40];
-    void (DinoWirelessBattle::*Unk0204a39c_50)();
-    u8 unk58[0x78 - 0x58];
-    void (DinoWirelessBattle::*Failed_78)();
+    u8 unk00[0x8];
+    void (DinoWirelessBattle::*StateContinue_08)(); // 0x08
+    void (DinoWirelessBattle::*StateBattleEnd_10)(); // 0x10
+    void (DinoWirelessBattle::*Unk0204a4dc_18)(); // 0x18
+    u8 unk20[0x38 - 0x20];
+    void (DinoWirelessBattle::*StateCloseHub_38)(); // 0x38
+    void (DinoWirelessBattle::*StateWaitLevels_40)(); // 0x40
+    u8 unk48[0x50 - 0x48];
+    void (DinoWirelessBattle::*Unk0204a39c_50)(); // 0x50
+    void (DinoWirelessBattle::*Unk02049d30_58)(); // 0x58
+    u8 unk60[0x78 - 0x60];
+    void (DinoWirelessBattle::*Failed_78)(); // 0x78
 } data_020c0400;
 extern "C" struct {
     u8 unk00[0x10];
-    void (DinoWirelessBattle::*Unk02049f3c_10)();
-    u8 unk18[0x30 - 0x18];
-    void (DinoWirelessBattle::*Unk02049ae4_30)();
+    void (DinoWirelessBattle::*Unk02049f3c_10)(); // 0x10
+    u8 unk18[0x28 - 0x18];
+    void (DinoWirelessBattle::*StateTeamSelect_28)(); // 0x28
+    void (DinoWirelessBattle::*Unk02049ae4_30)(); // 0x30
     u8 unk38[0x40 - 0x38];
-    void (DinoWirelessBattle::*Start_40)();
-    u8 unk48[0x68 - 0x48];
-    void (DinoWirelessBattle::*StateWaitReady_68)();
-    void (DinoWirelessBattle::*Failed_70)();
+    void (DinoWirelessBattle::*Start_40)(); // 0x40
+    void (DinoWirelessBattle::*Failed_48)(); // 0x48
+    u8 unk50[0x60 - 0x50];
+    void (DinoWirelessBattle::*Failed_60)(); // 0x60
+    void (DinoWirelessBattle::*StateWaitReady_68)(); // 0x68
+    void (DinoWirelessBattle::*Failed_70)(); // 0x70
 } data_020c0480;
 
 // "Waiting for the other player" (a text id).
@@ -46,6 +56,7 @@ extern "C" const u32 data_0208ad10;
 
 M_EXTERN_OVERLAY(ov000);
 M_EXTERN_OVERLAY(ov003);
+M_EXTERN_OVERLAY(ov004);
 M_EXTERN_OVERLAY(ov006);
 M_EXTERN_OVERLAY(ov007);
 
@@ -57,7 +68,7 @@ void DinoWirelessBattle::StateTeamSelect() {
     MLoadOverlay(0, M_OVERLAY_ID(ov003));
     MLoadOverlay(0, M_OVERLAY_ID(ov007));
     for (u32 i = 0; i < 2; i++) {
-        mPlayers[i].unk01 = 0;
+        mPlayers[i].mTeamChosen = 0;
     }
     mSerial.AddTail(new DinoUiTeamSelect(&mTeam, mUnk304, mUnk305));
     mUnk304 = mUnk305 = 0;
@@ -107,4 +118,62 @@ void DinoWirelessBattle::StateContinue() {
     mHub->SendToAll(new DinoBattleReadyToContinueBattleSignal(mMultiPlay->GetPlayerIndex(), mContinue != 0));
     ShowText(data_0208ad10);
     mState = data_020c0400.Unk0204a39c_50;
+}
+
+void DinoWirelessBattle::StateSendLevel() {
+    DinoPlayerData player;
+    gDinoBackup->GetPlayer(&player, 0);
+    mLevel = player.horiderLevel;
+    gDinoBackup->GetTeam(gDinoBackup->GetUnk34_26(), &mTeamData);
+    mHub->SendToAll(new DinoBattlePlayerLevelSignal(mMultiPlay->GetPlayerIndex(), mLevel));
+    mState = data_020c0400.StateWaitLevels_40;
+}
+
+// Both play at the lower horider level.
+void DinoWirelessBattle::StateWaitLevels() {
+    if (mMultiPlay->IsFailed()) {
+        mState = data_020c0480.Failed_48;
+        return;
+    }
+    Dispatch();
+    if (mPlayers[0].mInfoReceived && mPlayers[1].mInfoReceived) {
+        DinoPlayerData player;
+        gDinoBackup->GetPlayer(&player, 0);
+        u32 level0;
+        u32 level1;
+        level1 = mPlayers[1].mData.horiderLevel;
+        level0 = mPlayers[0].mData.horiderLevel;
+        player.horiderLevel = std::min(level0, level1);
+        gDinoBackup->SetPlayer(&player);
+        mState = data_020c0480.StateTeamSelect_28;
+    }
+}
+
+void DinoWirelessBattle::StateWaitTeams() {
+    if (mMultiPlay->IsFailed()) {
+        mState = data_020c0480.Failed_60;
+        return;
+    }
+    Dispatch();
+    if (mPlayers[0].mTeamChosen && mPlayers[1].mTeamChosen) {
+        FadeIn();
+        DinoSoundStopBgm(-1, 10);
+        mSerial.AddTail(new MTimer(10));
+        mState = data_020c0400.Unk02049d30_58;
+    }
+}
+
+void DinoWirelessBattle::StateReset() {
+    MUnloadOverlay(0, M_OVERLAY_ID(ov004));
+    if (mContinue) {
+        mState = data_020c0400.StateContinue_08;
+        return;
+    }
+    FadeIn();
+    MTask *reset = mMultiPlay->CreateResetTask();
+    MTask *wait = new MTimer(5);
+    MTaskSet &serial = mSerial;
+    serial.AddTail(wait);
+    serial.AddTail(reset);
+    mState = data_020c0400.Unk0204a4dc_18;
 }

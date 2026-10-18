@@ -8,6 +8,7 @@
 #include "m/sleep.h"
 #include "m/looper.h"
 #include "game/help.h"
+#include "game/dino_backup.h"
 #include "game/dino_field_camera_hook.h"
 
 class MMultiPlay;
@@ -15,10 +16,12 @@ class MMultiPlayMessageHub;
 
 // A player in a wireless battle, as their DinoBattlePlayerInfoSignal tells.
 struct DinoWirelessBattlePlayer {
-    u8 unk00;
-    u8 unk01;
-    u8 mReady;      // 0x02: sent DinoBattleReadyToBeginBattleSignal
-    u8 unk03[0x114 - 3];
+    u8 mInfoReceived;   // 0x00: sent DinoBattlePlayerInfoSignal
+    u8 mTeamChosen;     // 0x01
+    u8 mReady;          // 0x02: sent DinoBattleReadyToBeginBattleSignal
+    u8 unk03[5];
+    DinoPlayerData mData;   // 0x08
+    u8 unk74[0x114 - 0x74];
 };
 
 class DinoWirelessBattle : public MProcess, public MMessageObserver {
@@ -30,12 +33,16 @@ public:
 
     void ShowText(u32 text);
     void FadeIn();
+    void StateSendLevel();
+    void StateWaitLevels();
     void StateTeamSelect();
+    void StateWaitTeams();
     void StateBeginBattle();
     void StateWaitReady();
     void StateCloseHub();
     void StateBattleEnd();
     void StateContinue();
+    void StateReset();
 
     void (DinoWirelessBattle::*mState)(); // 0xA8
     MMultiPlay *mMultiPlay;         // 0xB0
@@ -49,10 +56,11 @@ public:
     u32 mContinue;                  // 0x2F4
     MTaskSet *mUnk2F8;              // 0x2F8
     DinoHelpDisabler mDisabler;     // 0x2FC
-    u8 unk300[4];
+    u32 mLevel;                     // 0x300: the player's horider level
     u8 mUnk304;                     // 0x304
     u8 mUnk305;                     // 0x305
-    u8 unk306[0x330 - 0x306];
+    DinoTeam mTeamData;             // 0x306: the team used
+    u8 unk32E[0x330 - 0x32E];
 };
 
 #endif

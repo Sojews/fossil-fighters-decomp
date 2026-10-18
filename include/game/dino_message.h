@@ -3117,6 +3117,10 @@ public:
 class DinoBattlePlayerLevelSignal : public MMessage {
 public:
     DinoBattlePlayerLevelSignal() : MMessage(0x1009C) {}
+    DinoBattlePlayerLevelSignal(u32 player, u32 level) : MMessage(0x1009C) {
+        mUnk0C = player;
+        mUnk10 = level;
+    }
     virtual u32 GetSize() { return 12; }
     virtual void Write(void *buf) {
         MI_CpuCopy8(&mId, buf, 4);
