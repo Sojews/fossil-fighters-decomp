@@ -19,6 +19,8 @@ public:
     virtual void Idle();
 };
 
+class DinoUiFieldMenuFraction;
+
 class DinoUiMuseumMenu : public DinoHelpBase, public MMenu {
 public:
     virtual ~DinoUiMuseumMenu();
@@ -27,6 +29,8 @@ public:
     void CreateSlots();
     void CreateSlot(u32 index);
     void ClearSlots();
+    void FinishPageRight();
+    void FinishPageLeft();
 
     u8 unkB3[0xB8 - 0xB3];  // members start in MMenu's tail padding
     MMenuItem *mLinkFrom;   // 0xB8: linked down to the slots
@@ -34,7 +38,12 @@ public:
     MMenuItem *mSlots[15];  // 0xE4
     u8 unk120[0x15C - 0x120];
     u32 mSlotCount;     // 0x15C
-    u8 unk160[0x1AC - 0x160];
+    u8 unk160[0x168 - 0x160];
+    MView *mCursor;                     // 0x168
+    DinoUiFieldMenuFraction *mFraction; // 0x16C: "page n/m"
+    u8 unk170[0x19C - 0x170];
+    u32 mPage;                          // 0x19C
+    u8 unk1A0[0x1AC - 0x1A0];
     u8 mUnk1AC;     // 0x1AC
 };
 

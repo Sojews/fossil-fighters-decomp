@@ -6,6 +6,7 @@
 #include "game/dino_ui_museum_information_menu.h"
 #include "types.h"
 #include "game/dino_ui_museum.h"
+#include "game/dino_ui_field_menu_fraction.h"
 #include "m/lcd.h"
 #include "game/dino_sound.h"
 #include "game/dino_ui_museum_3d_model.h"
@@ -217,6 +218,22 @@ void DinoUiMuseumMenu::ClearSlots() {
         delete mSlots[i];
     }
     RemoveLink(mLinkFrom, 2);
+}
+
+void DinoUiMuseumMenu::FinishPageRight() {
+    ClearSlots();
+    mFraction->SetNumerator(mPage + 1);
+    CreateSlots();
+    Enable();
+    FocusNearestItem(mCursor->GetPosition());
+}
+
+void DinoUiMuseumMenu::FinishPageLeft() {
+    ClearSlots();
+    mFraction->SetNumerator(mPage + 1);
+    CreateSlots();
+    Enable();
+    FocusNearestItem(mCursor->GetPosition());
 }
 
 void DinoUiMuseumMenu::CreateSlots() {
