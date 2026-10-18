@@ -9,3 +9,9 @@
 
 DinoBattleLive::~DinoBattleLive() {
 }
+
+void DinoBattleLive::Open() {
+}
+
+void DinoBattleLive::ShowTutorial(MDisplay *display, const char *text) {
+}
