@@ -4,6 +4,8 @@
 // Derived destructors have their bases' destructor bodies inlined; auto-inlining the ones defined above does that.
 #pragma auto_inline on
 
+#include "game/dino_common_window_yes_no_dialog.h"
+
 #include "game/dino_ui3_parts_mask_name.h"
 
 #include "game/dino_ui3_parts_cursor.h"
@@ -201,7 +203,6 @@ void DinoUiMaskBuyMaskButton::OnFocusChanged(BOOL focused) {
 // Template task instances the game emits in this file. Until the code that makes the tasks is decompiled, they are
 // instantiated explicitly.
 template class MCallTask0<DinoUiMaskBuyMenu, DinoUiMaskBuyMenu>;
-template MTask *MCreateCallTask(DinoUiMaskBuyMenu *obj, void (DinoUiMaskBuyMenu::*func)());
 
 MRect DinoUiMaskBuyMaskButton::GetFrame() {
     return MRect(mPos.Offset(-24, -24), mPos.Offset(24, 24));
@@ -218,6 +219,8 @@ DinoUiMaskBuy::DinoUiMaskBuy() : MProcess(NULL) {
 }
 
 #pragma auto_inline off
+
+template MTask *MCreateCallTask(DinoUiMaskBuyMenu *obj, void (DinoUiMaskBuyMenu::*func)());
 
 u8 DinoUiMaskBuyMenu::GetFlag(int index) {
     return mFlags[index];
@@ -297,6 +300,29 @@ void DinoUiMaskBuyMenu::OnFocus(MMenuItem *item) {
     mMaskName->Clear();
     mMoney->SetPrice(0);
     mSelected = 0xFF;
+}
+
+extern const u32 data_0208a9ec, data_0208a9f0, data_0208a9f4, data_0208aa04, data_0208aa08;
+
+// Asks whether to buy the chosen masks.
+BOOL DinoUiMaskBuyMenu::Buy() {
+    if (mCount == 0) {
+        DinoSoundPlaySe(0xA4, 0);
+        return FALSE;
+    }
+    mCursor->Hide();
+    mConfirmed = FALSE;
+    DinoCommonWindowYesNoDialog *dialog =
+        new DinoCommonWindowYesNoDialog(gDinoResource->GetText(data_0208a9f4), &mConfirmed);
+    dialog->SetLabels(gDinoResource->GetText(data_0208aa08), gDinoResource->GetText(data_0208aa04));
+    dialog->SetLabels2(gDinoResource->GetText(data_0208a9f0), gDinoResource->GetText(data_0208a9ec));
+    MTask *finish = MCreateCallTask(this, &DinoUiMaskBuyMenu::FinishBuy);
+    MTask *show = mCursor->CreateShowTransfer();
+    MSerialTaskSet *serial = &mSerial;
+    serial->AddTail(dialog);
+    serial->AddTail(show);
+    serial->AddTail(finish);
+    return TRUE;
 }
 
 // A mask button: chooses it (if the money allows) or unchooses it.

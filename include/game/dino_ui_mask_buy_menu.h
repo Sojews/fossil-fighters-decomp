@@ -27,6 +27,7 @@ public:
     void SetFlag(int index, u8 flag);
     u32 GetPrice(int index);
     BOOL Buy();
+    void FinishBuy();
     void RefreshPage1();
     void RefreshPage2();
     void RefreshPage3();
@@ -49,7 +50,7 @@ public:
     u32 mTotal;             // 0x108: the chosen masks' price
     u8 mCount;              // 0x10C: how many are chosen
     u8 mSelected;           // 0x10D: 0xFF for none
-    u32 mUnk110;    // 0x110
+    BOOL mConfirmed;        // 0x110: the yes/no answer
 };
 
 class DinoUiMaskBuyBackButton : public DinoUiMaskBuyMenuItem {
