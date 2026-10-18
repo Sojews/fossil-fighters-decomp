@@ -5,6 +5,7 @@
 
 #include "game/dino_sound.h"
 #include "game/dino_battle_view_3d.h"
+#include "game/dino_battle_view_class.h"
 #include "types.h"
 #include "game/b3d_status_view_task.h"
 #include "game/dino_battle_view_3d2.h"
@@ -28,18 +29,17 @@ void B3DStatusViewTask::Idle() {
     (this->*mState)();
 }
 
-extern "C" BOOL func_ov000_02187ec0(void *model);
 
 DinoBattleView3DDamage::~DinoBattleView3DDamage() {
     mSerial.Clear();
-    if (func_ov000_02187ec0(mModel)) {
+    if (mModel->GetUnk180()) {
         DinoSoundFunc_0201feb4(0);
     }
 }
 
 DinoBattleView3DAction::~DinoBattleView3DAction() {
     mSerial.Clear();
-    if (func_ov000_02187ec0(mModel)) {
+    if (mModel->GetUnk180()) {
         DinoSoundFunc_0201feb4(0);
     }
 }
@@ -141,4 +141,20 @@ DelDmgMotionTask::~DelDmgMotionTask() {
 
 void DelDmgMotionTask::Execute() {
     Exit();
+}
+
+#pragma auto_inline off
+
+void DinoBattleView3D::SetUnk180(u8 value) {
+    mUnk180 = value;
+    if (value && !mView->GetUnk138()) {
+        DinoSoundFunc_0201feb4(0);
+    }
+}
+
+u8 DinoBattleView3D::GetUnk180() {
+    if (mView->GetUnk138()) {
+        return FALSE;
+    }
+    return mUnk180;
 }

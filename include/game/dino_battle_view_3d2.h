@@ -10,12 +10,14 @@
 #include "game/help.h"
 #include "game/dino_field_camera_hook.h"
 
+class DinoBattleView3D;
+
 class DinoBattleView3DDamage : public MProcess {
 public:
     virtual ~DinoBattleView3DDamage();
     virtual void Idle();
 
-    void *mModel;   // 0x74
+    DinoBattleView3D *mModel;   // 0x74
 };
 
 class DinoBattleView3DAction : public MProcess {
@@ -23,7 +25,7 @@ public:
     virtual ~DinoBattleView3DAction();
     virtual void Idle();
 
-    void *mModel;   // 0x74
+    DinoBattleView3D *mModel;   // 0x74
 };
 
 class DinoBattleView3DMask : public MTask {

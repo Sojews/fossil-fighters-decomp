@@ -10,6 +10,8 @@
 #include "game/help.h"
 #include "game/dino_field_camera_hook.h"
 
+class DinoBattleView;
+
 class DinoBattleView3D : public MProcess, public MMessageObserver {
 public:
     virtual ~DinoBattleView3D();
@@ -19,13 +21,18 @@ public:
     void GetUnk19C(u32 *a, u32 *b);
     void SetUnk19C(u32 value);
     u32 GetUnkB0();
+    void SetUnk180(u8 value);
+    u8 GetUnk180();
 
-    u32 unkA8[2];
+    u32 unkA8;
+    DinoBattleView *mView;                  // 0xAC
     u32 mUnkB0;                             // 0xB0
     u32 unkB4[3];
     void *mUnkC0;                           // 0xC0
     void (DinoBattleView3D::*mState)();     // 0xC4
-    u8 unkCC[0x19C - 0xCC];
+    u8 unkCC[0x180 - 0xCC];
+    u8 mUnk180;                             // 0x180
+    u8 unk181[0x19C - 0x181];
     u32 mUnk19C;                            // 0x19C
     u32 mUnk1A0;                            // 0x1A0
 };

@@ -14,10 +14,19 @@ WaitActionInfoBarTask::WaitActionInfoBarTask(DinoBattleViewActionInfoBar *bar) {
 WaitActionInfoBarTask::~WaitActionInfoBarTask() {
 }
 
-extern "C" BOOL func_ov000_0218b7f0(DinoBattleViewActionInfoBar *bar);
+#pragma auto_inline off
+
+BOOL DinoBattleViewActionInfoBar::IsIdle() {
+    if (mUnk80 == 0) {
+        return TRUE;
+    }
+    return FALSE;
+}
+
+#pragma auto_inline on
 
 void WaitActionInfoBarTask::Execute() {
-    if (func_ov000_0218b7f0(mBar) && mBar->mLines.empty()) {
+    if (mBar->IsIdle() && mBar->mLines.empty()) {
         Exit();
     }
 }

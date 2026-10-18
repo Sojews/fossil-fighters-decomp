@@ -41,8 +41,11 @@ public:
     virtual ~DinoBattleViewActionInfoBar();
     virtual void Idle();
 
+    BOOL IsIdle();
+
     std::string mUnk74;                 // 0x74
-    u32 unk80[6];
+    u32 mUnk80;                         // 0x80
+    u32 unk84[5];
     std::vector<std::string> mLines;    // 0x98
     MFont *mFont;                       // 0xA4
 };
