@@ -645,6 +645,25 @@ void DinoField::ZoomOutUpperPict(MFx32 scale, u32 a, long b) {
     ZoomOutPict(gLcd->GetTopDisplay(), &mUpperPict, scale, a, b);
 }
 
+// NONMATCHING (and WalkOnLand1): the game keeps the run test even with run 0 (movs r2, #0; bne).
+void DinoField::WalkOnLand0(u32 dir) {
+    if (mMap->GetMapData()[0x68] == 0) {
+        Walk(dir, 0, &mSteps[0], 3, 10, 6, 5, 1);
+    }
+}
+
+void DinoField::WalkOnLand1(u32 dir) {
+    if (mMap->GetMapData()[0x68] == 0) {
+        Walk(dir, 0, &mSteps[1], 3, 7, 6, 3, 2);
+    }
+}
+
+void DinoField::WalkInWater(u32 dir, u32 run) {
+    if (mMap->GetMapData()[0x68] != 0) {
+        Walk(dir, run, &mSteps[2], 4, 8, 8, 4, 0x1D);
+    }
+}
+
 MTask *DinoField::CreateMoneyShowTask() {
     if (mMoney) {
         return new MTimer(0);

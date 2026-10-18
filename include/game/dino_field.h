@@ -246,6 +246,7 @@ struct DinoFieldDefs {
 
 class DinoFieldMap : public MProcess, public MSerializer {
 public:
+    const u8 *GetMapData() { return (const u8 *)mFile.GetData(); }
     virtual ~DinoFieldMap();
     virtual void Idle();
     virtual void Read(const void *buf);
@@ -273,6 +274,11 @@ public:
 };
 
 class DinoFieldPoint;
+
+// One of the field's walk animation states.
+struct DinoFieldStep {
+    u8 unk00[0x18];
+};
 
 class DinoField : public MProcess, public MSerializer, public DinoHelpBase {
 public:
@@ -304,6 +310,22 @@ public:
     MTask *CreateCharaMoveVectorTask(u32 chara, u16 direction, u32 a, u32 b, u32 c, u8 d);
     MTask *CreateCharaWaitMoveTask(u32 chara);
     MTask *CreateCharaFocusTask(u32 chara);
+    void Step(u32 dir, DinoFieldStep *step, int a, int frames, int c);
+    // Steps the player one way when walking, another when running.
+    // Steps the player one way when walking, another when running.
+    void Walk(u32 dir, u32 run, DinoFieldStep *step, int a, int frames, int runA, int runFrames, int c) {
+        if (!run) {
+            Step(dir, step, a, frames, c);
+        } else {
+            if (!(mUnk37C & 1)) {
+                dir = run;
+            }
+            Step(dir, step, runA, runFrames, c);
+        }
+    }
+    void WalkOnLand0(u32 dir);
+    void WalkOnLand1(u32 dir);
+    void WalkInWater(u32 dir, u32 run);
     MTask *CreateMoneyShowTask();
     MTask *CreateMoneyHideTask();
     MTask *CreateDonateShowTask();
@@ -370,9 +392,12 @@ public:
     MTask *mUnk2C0;             // 0x2C0
     MTask *mUnk2C4;             // 0x2C4
     BOOL *mUnk2C8;              // 0x2C8
-    u8 unk2CC[0xA8];
+    u8 unk2CC[0x320 - 0x2CC];
+    DinoFieldStep mSteps[3];    // 0x320: the walk animations
+    u8 unk368[0xC];
     MTaskSet *mEffectTasks;     // 0x374
-    u8 unk378[8];
+    u32 unk378;
+    u32 mUnk37C;                // 0x37C: bit 0: running keeps the direction
     MResource<DinoFieldDefs> mDefs; // 0x380
     DinoFieldPoint *mMoney;     // 0x390: the money panel, while shown
     DinoFieldPoint *mDonate;    // 0x394
