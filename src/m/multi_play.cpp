@@ -1054,6 +1054,18 @@ void MMultiPlayWirelessDriverStopTask::Begin() {
     mStep = &MMultiPlayWirelessDriverStopTask::Terminate;
 }
 
+MMultiPlayMessageHub::~MMultiPlayMessageHub() {
+    Disable();
+    delete[] mSendData;
+    for (u32 i = 0; i < mConsoleCount; i++) {
+        delete mIncoming[i].data;
+    }
+    for (u32 i = 0; i < mOutgoing.size(); i++) {
+        delete mOutgoing[i].data;
+    }
+    delete mSending;
+}
+
 void MMultiPlayMessageHub::SetUnk279(u8 value) {
     mUnk279 = value;
 }

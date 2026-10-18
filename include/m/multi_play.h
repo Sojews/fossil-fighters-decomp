@@ -10,6 +10,7 @@
 #include "m/looper.h"
 #include "m/view.h"
 #include "nitro/wm.h"
+#include <vector>
 
 #define MULTI_PLAY_WM_PORT_COUNT 4
 
@@ -216,6 +217,19 @@ public:
 
 // Exchanges messages with the other consoles: sends game messages over MP and passes received ones to its
 // observers.
+// A serialized message waiting to go out, and the consoles it goes to.
+struct MMultiPlayHubOutgoing {
+    std::vector<char> *data;    // 0x0
+    u16 mask;               // 0x4
+};
+
+// A message arriving from one console, assembled as its pieces come in.
+struct MMultiPlayHubIncoming {
+    std::vector<char> *data;    // 0x0
+    u32 unk4;               // 0x4
+    u32 unk8;               // 0x8
+};
+
 class MMultiPlayMessageHub : public MLooperVSyncTask, public MMessageSubject {
 public:
     MMultiPlayMessageHub(int arg);
@@ -233,11 +247,15 @@ public:
     void ReceivePending();
     void SetUnk279(u8 value);
 
-    u8 unk44[0x60 - 0x44];
+    std::vector<MMultiPlayHubOutgoing> mOutgoing;  // 0x44
+    std::vector<char> *mSending;                    // 0x50: the message being sent
+    std::vector<MMultiPlayHubIncoming> mIncoming;  // 0x54: one per console
     WMDataSet mReceived;    // 0x60
     u16 *mSendData;         // 0x260
     int mSelf;              // 0x264: this console's AID
-    u8 unk268[0x10];
+    u32 unk268[2];
+    u32 mConsoleCount;      // 0x270
+    u32 unk274;
     u8 mRunning;            // 0x278: data sharing stepped last frame
     u8 mUnk279;             // 0x279
 };
