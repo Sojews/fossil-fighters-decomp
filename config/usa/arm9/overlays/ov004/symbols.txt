@@ -443,9 +443,9 @@ _ZN31DinoUiChildScannerCannonConnect9OnMessageEP8MMessage kind:function(thumb,si
 _ZN31DinoUiChildScannerCannonConnect10StateStartEv kind:function(thumb,size=0xa0) addr:0x02163eb8
 _ZN31DinoUiChildScannerCannonConnect13IgnoreMessageEP8MMessage kind:function(thumb,size=0x2) addr:0x02163f58
 _ZN31DinoUiChildScannerCannonConnect12StateConnectEv kind:function(thumb,size=0x140) addr:0x02163f5c
-func_ov004_0216409c kind:function(thumb,size=0x128) addr:0x0216409c
-func_ov004_021641c4 kind:function(thumb,size=0x54) addr:0x021641c4
-func_ov004_02164218 kind:function(thumb,size=0xc0) addr:0x02164218
+_ZN31DinoUiChildScannerCannonConnect11StateChooseEv kind:function(thumb,size=0x128) addr:0x0216409c
+_ZN31DinoUiChildScannerCannonConnect16OnConnectMessageEP8MMessage kind:function(thumb,size=0x54) addr:0x021641c4
+_ZN31DinoUiChildScannerCannonConnect15StateConnectingEv kind:function(thumb,size=0xc0) addr:0x02164218
 _ZN18DinoUiChildScannerC1EP10MMultiPlayPmS2_ kind:function(thumb,size=0x80) addr:0x021642d8
 _ZN18DinoUiChildScanner13ExitWithResetEv kind:function(thumb,size=0x28) addr:0x02164358
 _ZN18DinoUiChildScanner5LeaveEv kind:function(thumb,size=0x124) addr:0x02164380

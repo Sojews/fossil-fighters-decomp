@@ -116,8 +116,11 @@ public:
     virtual void OnMessage(MMessage *msg);
 
     void IgnoreMessage(MMessage *msg);
+    void OnConnectMessage(MMessage *msg);
     void StateStart();
     void StateConnect();
+    void StateChoose();
+    void StateConnecting();
 
     void (DinoUiChildScannerCannonConnect::*mState)(); // 0xB4
     void (DinoUiChildScannerCannonConnect::*mOnMessage)(MMessage *msg); // 0xBC
@@ -128,7 +131,7 @@ public:
     MPoint mPos;                    // 0xD4: its place
     std::string mText;  // 0xDC
     MTaskSet *mUnkE8;   // 0xE8
-    u32 unkEC;
+    u32 mChoice;        // 0xEC: the window's
 };
 
 class DinoUiBattleParentScanner : public MProcess, public MMessageObserver {

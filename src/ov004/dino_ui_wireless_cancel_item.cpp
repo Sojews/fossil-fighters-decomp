@@ -294,7 +294,8 @@ extern "C" struct {
 extern "C" struct {
     u8 unk00[0x4];
     void (DinoUiChildScannerBattleConnect::*Unk02163cdc_04)(); // 0x04
-    u8 unk0C[0x1C - 0xC];
+    u8 unk0C[0x14 - 0xC];
+    void (DinoUiChildScannerCannonConnect::*StateChoose_14)(); // 0x14
     MPoint mParentNameOffset; // 0x1c
     void (DinoUiBattleParentScanner::*State02165818_24)(); // 0x24
     u8 unk2C[0x34 - 0x2C];
@@ -316,7 +317,8 @@ extern "C" struct {
     void (DinoUiCannonChild::*StateShot_24)(); // 0x24
     u8 unk2C[0x44 - 0x2C];
     void (DinoUiChildScannerBattleConnect::*OnConnectMessage_44)(MMessage *msg); // 0x44
-    u8 unk4C[0x5C - 0x4C];
+    u8 unk4C[0x54 - 0x4C];
+    void (DinoUiChildScannerCannonConnect::*StateConnecting_54)(); // 0x54
     void (DinoUiCannonParentScanner::*Failed_5C)(); // 0x5c
     u8 unk64[0x6C - 0x64];
     void (DinoUiCannonParentScanner::*Failed_6C)(); // 0x6c
@@ -326,7 +328,10 @@ extern "C" struct {
     u8 unk00[0xC];
     void (DinoUiBattleParentScanner::*StateShowCancel_0C)(); // 0x0c
     void (DinoUiChildScannerBattleConnect::*StateConnecting_14)(); // 0x14
-    u8 unk1C[0x44 - 0x1C];
+    u8 unk1C[0x2C - 0x1C];
+    void (DinoUiChildScannerCannonConnect::*IgnoreMessage_2C)(MMessage *msg); // 0x2c
+    void (DinoUiChildScannerCannonConnect::*OnConnectMessage_34)(MMessage *msg); // 0x34
+    u8 unk3C[0x44 - 0x3C];
     void (DinoUiChildScannerCannonConnect::*CannonStart_44)(); // 0x44
     u8 unk4C[0x54 - 0x4C];
     DinoUiWirelessMatchState StateChildScan;    // 0x54
@@ -653,9 +658,9 @@ static inline void AddMarkedChoice(DinoCommonWindowMenu *window, u32 id, const s
 // Offers to connect (or not) to the console, by its item.
 // NONMATCHING: the game keeps destroy flags for the marked choice's temporaries, and swaps r6/r7
 void DinoUiChildScannerBattleConnect::StateConnect() {
+    u32 anchor;
     u32 connect = data_0208ab94;
     mChoice = connect;
-    u32 anchor;
     switch (mUnkD0 % 3) {
     case 0:
         anchor = 0;
@@ -702,7 +707,95 @@ void DinoUiChildScannerBattleConnect::OnConnectMessage(MMessage *msg) {
     }
 }
 
-extern const u32 data_0208ab7c, data_0208ab84;
+extern const u32 data_0208ab7c, data_0208ab84, data_0208ab88, data_0208ab8c, data_0208ad68, data_0208ad6c;
+
+// Drops the window if the console goes away or changes.
+void DinoUiChildScannerCannonConnect::OnConnectMessage(MMessage *msg) {
+    switch (msg->mId) {
+    case 2: {
+        MMultiPlayParentUpdatedMessage *updated = (MMultiPlayParentUpdatedMessage *)msg;
+        if (updated->mUnk0C == mUnkD0) {
+            mUnkE8->Clear();
+            mChoice = data_0208ab88;
+        }
+        break;
+    }
+    case 1: {
+        MMultiPlayParentLostMessage *lost = (MMultiPlayParentLostMessage *)msg;
+        if (lost->mUnk0C == mUnkD0) {
+            mUnkE8->Clear();
+            mChoice = data_0208ab88;
+        }
+        break;
+    }
+    }
+}
+
+// Once the window closes: leaves on "don't join", says the console can't be joined unless it's a cannon game, or
+// joins.
+void DinoUiChildScannerCannonConnect::StateChoose() {
+    mScanner->MMessageObserver::Dispatch();
+    MMessageObserver::Dispatch();
+    if (mUnkE8->IsEmpty()) {
+        if (mChoice == data_0208ab88) {
+            Exit();
+            return;
+        }
+        if (mParent->mMode != 2) {
+            MTask *box = new DinoCommonWindowMessageBox(MPoint(0x80, 0x60), gDinoResource->GetText(data_0208ab7c), 4);
+            MTask *exit = MTaskExitTransfer::Create(this);
+            MSerialTaskSet *serial = &mSerial;
+            serial->AddTail(box);
+            serial->AddTail(exit);
+        } else {
+            mSerial.AddTail(mMultiPlay->CreateEndScanTask());
+            mState = data_ov004_02174250.StateConnecting_54;
+            mOnMessage = data_ov004_021742d0.IgnoreMessage_2C;
+        }
+    }
+}
+
+// Picks the console once it's still a cannon game; otherwise says so and scans again.
+void DinoUiChildScannerCannonConnect::StateConnecting() {
+    mScanner->MMessageObserver::Dispatch();
+    MMessageObserver::Dispatch();
+    if (mParent->mMode != 2) {
+        MTask *box = new DinoCommonWindowMessageBox(MPoint(0x80, 0x60), gDinoResource->GetText(data_0208ab7c), 4);
+        mScanner->Rescan();
+        MTask *exit = MTaskExitTransfer::Create(this);
+        MSerialTaskSet *serial = &mSerial;
+        serial->AddTail(box);
+        serial->AddTail(exit);
+    } else {
+        mScanner->Choose(mParent->mUnk8C);
+        mSerial.AddTail(MTaskExitTransfer::Create(this));
+    }
+}
+
+// Offers to join (or not) the console, by its item.
+void DinoUiChildScannerCannonConnect::StateConnect() {
+    u32 anchor;
+    u32 join = data_0208ab8c;
+    mChoice = join;
+    switch (mUnkD0 % 3) {
+    case 0:
+        anchor = 0;
+        break;
+    case 1:
+        anchor = 5;
+        break;
+    case 2:
+        anchor = 1;
+        break;
+    }
+    DinoCommonWindowMenu *window = new DinoCommonWindowMenu(&mChoice, mPos, NULL, anchor);
+    window->AddChoice(join, gDinoResource->GetText(join), gDinoResource->GetText(data_0208ad6c));
+    window->AddChoice(data_0208ab88, std::string("*") + gDinoResource->GetText(data_0208ab88),
+                      gDinoResource->GetText(data_0208ad68));
+    mUnkE8->AddTail(window);
+    mState = data_ov004_021741d0.StateChoose_14;
+    mOnMessage = data_ov004_021742d0.OnConnectMessage_34;
+}
 extern MView *data_ov004_02177284; // the view the cross-fade keeps
 
 // What a child sends the parent: its mode and its owner's name.
