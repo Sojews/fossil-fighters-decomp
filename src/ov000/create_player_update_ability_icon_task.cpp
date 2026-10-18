@@ -371,6 +371,15 @@ u32 DinoBattleModelCreature::GetSpecialAttack() {
     return 0;
 }
 
+// The index'th attack, counting the special attack after the level ones; NULL if there's none.
+const DinoAttackDef *DinoBattleModelCreature::GetAttackDef(u32 index) {
+    u32 attack = index < CountAttacks() ? GetAttack(index, NULL) : GetSpecialAttack();
+    if (attack != 0) {
+        return gDinoResource->GetAttackDef(attack);
+    }
+    return NULL;
+}
+
 MMessage *DinoBattleModelCreature::CreateMotionEffectRequest() {
     return new DinoBattleViewCreatureMotionEffectRequest(0, mUnkB4, 4, 0, 0, -1);
 }

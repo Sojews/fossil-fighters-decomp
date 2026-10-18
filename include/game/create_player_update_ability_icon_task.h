@@ -45,6 +45,7 @@ public:
 };
 
 class DinoBattleModelCreature;
+struct DinoAttackDef;
 class MRandom;
 
 // One side of the battle in the battle model.
@@ -187,6 +188,7 @@ public:
     u32 CountAttacks();
     u32 GetAttack(u32 index, int *arg);
     u32 GetSpecialAttack();
+    const DinoAttackDef *GetAttackDef(u32 index);
     void AddUnkFC(int delta);
     void SetLife(int life);
     BOOL IsInPinch();
