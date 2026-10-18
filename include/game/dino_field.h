@@ -16,6 +16,7 @@
 #include "m/serializer.h"
 #include "game/dino_field_town_map.h"
 struct DinoCharaTask;
+class DinoField;
 class MTextPicture;
 class MDisplay;
 
@@ -98,7 +99,9 @@ public:
     u32 mMotion;                // 0xB4: the motion playing
     u32 mUnkB8[22];             // 0xB8
     MTaskSet *mTaskSet;         // 0x110: where the manpu task runs
-    u32 mUnk114[121];           // 0x114
+    u32 mUnk114;                // 0x114
+    DinoField *mField;          // 0x118
+    u32 mUnk11C[119];           // 0x11C
     MTask *mManpu;              // 0x2F8: the emotion bubble shown over the character
     u32 mUnk2FC[2];             // 0x2FC
     BOOL mHasFootSe;            // 0x304
@@ -126,6 +129,12 @@ struct DinoFieldMapInfo {
     u32 id;
 };
 
+// The map file's header.
+struct DinoFieldMapData {
+    u8 unk00[0x30];
+    MFx32 mWalkSpeed;   // 0x30: the speed characters' walk motion plays at
+};
+
 class DinoFieldMap : public MProcess, public MSerializer {
 public:
     virtual ~DinoFieldMap();
@@ -134,6 +143,7 @@ public:
 
     DinoFieldMapInfo *GetInfo();
     void Load();
+    MFx32 GetWalkSpeed();
 
     DinoFieldMapInfo mInfo; // 0x8C
     u32 mUnk90;             // 0x90

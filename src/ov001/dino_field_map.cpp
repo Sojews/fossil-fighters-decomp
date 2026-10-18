@@ -17,3 +17,7 @@ void DinoFieldMap::Read(const void *buf) {
     MSerializer::Read(buf);
     Load();
 }
+
+MFx32 DinoFieldMap::GetWalkSpeed() {
+    return ((DinoFieldMapData *) mFile.GetData())->mWalkSpeed;
+}

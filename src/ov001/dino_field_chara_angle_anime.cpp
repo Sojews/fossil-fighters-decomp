@@ -120,6 +120,19 @@ void DinoFieldCharaWaitStopTask::Execute() {
     }
 }
 
+void DinoFieldCharaCoordAnime::Apply(int step) {
+    MFx32PointAnime::Apply(step);
+    if (!mUnk4C) {
+        mChara->SetMotion(2, 1, mChara->mField->GetMap()->GetWalkSpeed());
+    }
+    fx32 x = mValue.x.v;
+    fx32 y = mValue.y.v;
+    MFx32Point *pos = &mChara->GetModel()->pos;
+    pos->x.v = x;
+    pos->y.v = y;
+    mChara->ApplyMotion();
+}
+
 void DinoFieldCharaCoordAnime::Execute() {
     MFx32PointAnime::Execute();
     if (mUnk50 && !mUnk4C) {
