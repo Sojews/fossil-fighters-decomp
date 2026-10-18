@@ -42,7 +42,7 @@ public:
     u8 mDirty;                  // 0x1C
     u8 mCameraDirty;            // 0x1D
     u8 unk1E[0x2A];
-    std::list<void *> mModels;  // 0x48
+    std::list<M3DModel *> mModels; // 0x48
     u32 unk54;
     VecFx32 mCameraPos;         // 0x58
     VecFx32 mCameraTarget;      // 0x64
