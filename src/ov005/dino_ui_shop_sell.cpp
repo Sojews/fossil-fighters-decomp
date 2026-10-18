@@ -4,6 +4,8 @@
 // Derived destructors have their bases' destructor bodies inlined; auto-inlining the ones defined above does that.
 #pragma auto_inline on
 
+#include "game/dino_common_window_yes_no_dialog.h"
+
 #include "game/dino_ui3_parts_rock_name.h"
 
 #include "game/dino_ui3_parts_cursor.h"
@@ -165,7 +167,6 @@ void DinoUiShopSellSellButton::OnFocusChanged(BOOL focused) {
 // Template task instances the game emits in this file. Until the code that makes the tasks is decompiled, they are
 // instantiated explicitly.
 template class MCallTask0<DinoUiShopSellMenu, DinoUiShopSellMenu>;
-template MTask *MCreateCallTask(DinoUiShopSellMenu *obj, void (DinoUiShopSellMenu::*func)());
 
 BOOL DinoUiShopSellMenu::PageRight() {
     mPage = (mPage + 1) % (mLastPage + 1);
@@ -208,6 +209,8 @@ DinoUiShopSell::DinoUiShopSell() : MProcess(NULL) {
 }
 
 #pragma auto_inline off
+
+template MTask *MCreateCallTask(DinoUiShopSellMenu *obj, void (DinoUiShopSellMenu::*func)());
 
 u8 DinoUiShopSellMenu::GetFlag(int index) {
     return mFlags[index];
@@ -292,6 +295,29 @@ void DinoUiShopSellMenu::OnFocus(MMenuItem *item) {
     mRockName->Clear();
     mMoney->SetPrice(0);
     mSelected = 0xFF;
+}
+
+extern const u32 data_0208a9e0, data_0208a9e4, data_0208a9e8, data_0208aa04, data_0208aa08;
+
+// Asks whether to sell the chosen fossils.
+BOOL DinoUiShopSellMenu::Sell() {
+    if (mCount == 0) {
+        DinoSoundPlaySe(0xA4, 0);
+        return FALSE;
+    }
+    mCursor->Hide();
+    mConfirmed = FALSE;
+    DinoCommonWindowYesNoDialog *dialog =
+        new DinoCommonWindowYesNoDialog(gDinoResource->GetText(data_0208a9e8), &mConfirmed);
+    dialog->SetLabels(gDinoResource->GetText(data_0208aa08), gDinoResource->GetText(data_0208aa04));
+    dialog->SetLabels2(gDinoResource->GetText(data_0208a9e4), gDinoResource->GetText(data_0208a9e0));
+    MTask *finish = MCreateCallTask(this, &DinoUiShopSellMenu::FinishSell);
+    MTask *show = mCursor->CreateShowTransfer();
+    MSerialTaskSet *serial = &mSerial;
+    serial->AddTail(dialog);
+    serial->AddTail(show);
+    serial->AddTail(finish);
+    return TRUE;
 }
 
 // A fossil button: chooses or unchooses it.

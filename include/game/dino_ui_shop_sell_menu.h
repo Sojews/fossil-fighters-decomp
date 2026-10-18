@@ -25,6 +25,7 @@ public:
     BOOL PageRight();
     BOOL PageLeft();
     BOOL Sell();
+    void FinishSell();
     void ClearItems();
     u8 GetFlag(int index);
     void SetFlag(int index, u8 flag);
@@ -55,7 +56,7 @@ public:
     int mLastPage;              // 0x14C
     u8 mCount;                  // 0x150: how many are chosen
     u8 mSelected;               // 0x151: 0xFF for none
-    u32 mUnk154;
+    BOOL mConfirmed;            // 0x154: the yes/no answer
     MMenuItem *mFocused;        // 0x158
 };
 
