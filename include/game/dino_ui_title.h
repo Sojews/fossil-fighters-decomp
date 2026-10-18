@@ -15,6 +15,9 @@ public:
     virtual void Idle();
 
     void StateStart();
+    void StateWarning();
+    void StateAdvice();
+    void StateAdvice2();
     void StateShowLogo();
     void LoadLogo();
     void StateOpening();
@@ -27,7 +30,7 @@ public:
     void (DinoUiTitle::*mState)(); // 0x74
     s32 *mResult;                  // 0x7C: what the player chose
     MInput *mInput;                // 0x80
-    u32 unk84;
+    u8 mSkipped;                   // 0x84
     MSmartOam *mOam;               // 0x88
     u32 unk8C[2];
     MMenu *mMenu;                  // 0x94: the title menu

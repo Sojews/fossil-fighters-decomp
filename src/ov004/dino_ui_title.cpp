@@ -4,6 +4,8 @@
 // Derived destructors have their bases' destructor bodies inlined; auto-inlining the ones defined above does that.
 #pragma auto_inline on
 
+#include "m/bright.h"
+#include "m/picture.h"
 #include "game/backup_validater.h"
 #include "m/display.h"
 #include "m/lcd.h"
@@ -110,7 +112,9 @@ void DinoUiOpeningCloud::Idle() {
 // The TU's pooled pointer-to-member constants (see menu.cpp). The game's pool is one block; dsd splits it every 0x80
 // bytes (data_ov004_02172ff8, data_ov004_02173078), and tools/anon_names.py maps the offsets back.
 extern "C" struct {
-    u8 unk00[0x24];
+    u8 unk00[0x8];
+    const char *mScreenPaths[3]; // 0x08: the screens before the opening
+    u8 unk14[0x24 - 0x14];
     const char *mLogoPath; // 0x24
     u8 unk28[0x2C - 0x28];
     void (DinoUiTitle::*StateMenu_2C)(); // 0x2c
@@ -119,7 +123,7 @@ extern "C" struct {
     void (DinoUiTitle::*Unk0215f4ec_44)(); // 0x44
     u8 unk4C[0x6C - 0x4C];
     void (DinoUiTitle::*Unk0215d818_6C)(); // 0x6c
-    u8 unk74[0x7C - 0x74];
+    void (DinoUiTitle::*StateOpening_74)(); // 0x74
     void (DinoUiTitle::*StateSaveSlot_7C)(); // 0x7c
     void (DinoUiTitle::*StateTopMenuEnd_84)(); // 0x84
     u8 unk8C[0x94 - 0x8C];
@@ -130,16 +134,20 @@ extern "C" struct {
     void (DinoUiTitle::*Start_B4)(); // 0xb4
     u8 unkBC[0xC4 - 0xBC];
     void (DinoUiTitle::*Unk0215d818_C4)(); // 0xc4
-    u8 unkCC[0xF4 - 0xCC];
+    u8 unkCC[0xE4 - 0xCC];
+    void (DinoUiTitle::*StateAdvice2_E4)(); // 0xe4
+    void (DinoUiTitle::*Unk0215e03c_EC)(); // 0xec
     void (DinoUiTitle::*Unk0215f5ac_F4)(); // 0xf4
     u8 unkFC[0x114 - 0xFC];
     void (DinoUiOpening::*OpeningStart_114)(); // 0x114
-    u8 unk11C[0x12C - 0x11C];
+    u8 unk11C[0x124 - 0x11C];
+    void (DinoUiTitle::*Unk0215e03c_124)(); // 0x124
     void (DinoUiTitle::*Unk0215f420_12C)(); // 0x12c
     void (DinoUiTitle::*Unk0215d6b4_134)(); // 0x134
     void (DinoUiTitle::*Unk0215d818_13C)(); // 0x13c
     void (DinoUiTitle::*Unk0215e9e4_144)(); // 0x144
-    u8 unk14C[0x164 - 0x14C];
+    void (DinoUiTitle::*StateWarning_14C)(); // 0x14c
+    u8 unk154[0x164 - 0x154];
     void (DinoUiTitle::*StateSaveSlotEnd_164)(); // 0x164
 } data_ov004_02172f78;
 
@@ -249,3 +257,58 @@ void DinoUiTitle::StateShowLogo() {
     mState = data_ov004_02172f78.StateMenu_2C;
 }
 #pragma dont_inline reset
+
+// The health and safety warning (and the backup check).
+void DinoUiTitle::StateWarning() {
+    MTextPicture *screen = new MTextPicture(data_ov004_02172f78.mScreenPaths[1], TRUE, true);
+    screen->Show();
+    mParallel.AddTail(screen);
+    MTask *validate = new DinoBackupReadValidater(NULL, NULL);
+    MTask *exit = MTaskExitTransfer::Create(screen);
+    MTask *skip = new DinoUiTitleSkip(&mSkipped, mInput, 30, 30, 1, 0);
+    MTask *wait = new MTimer(60);
+    MTask *fade = gLcd->GetBottomDisplay()->mBright->CreateFadeInFromBlack(30, 0);
+    MTaskSet &serial = mSerial;
+    serial.AddTail(fade);
+    serial.AddTail(wait);
+    serial.AddTail(skip);
+    serial.AddTail(exit);
+    serial.AddTail(validate);
+    mState = data_ov004_02172f78.StateWarning_14C;
+}
+
+void DinoUiTitle::StateAdvice() {
+    if (mSkipped) {
+        mState = data_ov004_02172f78.Unk0215e03c_EC;
+        return;
+    }
+    MTextPicture *screen = new MTextPicture(data_ov004_02172f78.mScreenPaths[2], TRUE, false);
+    screen->Show();
+    mParallel.AddTail(screen);
+    MTask *exit = MTaskExitTransfer::Create(screen);
+    MTask *skip = new DinoUiTitleSkip(&mSkipped, mInput, 60, 15, 1, 0);
+    MTask *fade = gLcd->GetBottomDisplay()->mBright->CreateFadeInFromBlack(15, 0);
+    MTaskSet &serial = mSerial;
+    serial.AddTail(fade);
+    serial.AddTail(skip);
+    serial.AddTail(exit);
+    mState = data_ov004_02172f78.StateAdvice2_E4;
+}
+
+void DinoUiTitle::StateAdvice2() {
+    if (mSkipped) {
+        mState = data_ov004_02172f78.Unk0215e03c_124;
+        return;
+    }
+    MTextPicture *screen = new MTextPicture(data_ov004_02172f78.mScreenPaths[0], TRUE, false);
+    screen->Show();
+    mParallel.AddTail(screen);
+    MTask *exit = MTaskExitTransfer::Create(screen);
+    MTask *skip = new DinoUiTitleSkip(&mSkipped, mInput, 60, 15, 1, 1);
+    MTask *fade = gLcd->GetBottomDisplay()->mBright->CreateFadeInFromBlack(15, 0);
+    MTaskSet &serial = mSerial;
+    serial.AddTail(fade);
+    serial.AddTail(skip);
+    serial.AddTail(exit);
+    mState = data_ov004_02172f78.StateOpening_74;
+}
