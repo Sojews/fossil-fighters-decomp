@@ -171,7 +171,6 @@ void DinoUiMuseumReviverButton::OnFocusChanged(BOOL focused) {
     mSerial.Clear();
 }
 
-extern "C" void func_ov006_0218a538(DinoUiMuseumInformationMenu *menu);
 
 void DinoUiMuseumInformationVoiceButton::OnDecide() {
     mMotion->Play(2, 1);
@@ -180,7 +179,7 @@ void DinoUiMuseumInformationVoiceButton::OnDecide() {
     MSerialTaskSet *serial = &mSerial;
     serial->AddTail(wait);
     serial->AddTail(play);
-    func_ov006_0218a538(mOwner);
+    mOwner->PlayVoice();
 }
 
 extern "C" void func_ov006_02189660(void *owner);
@@ -264,6 +263,10 @@ void DinoUiMuseumSlotCreateTask::Idle() {
 }
 
 extern "C" void func_ov006_0218a570(DinoUiMuseumInformationMenu *menu);
+
+void DinoUiMuseumInformationMenu::PlayVoice() {
+    DinoSoundPlaySe(gDinoResource->GetCreatureDef(mInfo->mCreatures[*mPage])->voice + 0x475, 0);
+}
 
 void DinoUiMuseumInformationMenu::OnBackDecided() {
     MTask *fade;

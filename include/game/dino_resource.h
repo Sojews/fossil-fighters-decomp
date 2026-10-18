@@ -42,6 +42,8 @@ struct DinoCreatureDef {
     u8 unk0E[0x46];
     u32 unk54;          // 0x54: offset of 4 s8 values, or 0
     u32 unk58;          // 0x58: offset of 4 s8 values, or 0
+    u8 unk5C[0x84 - 0x5C];
+    u32 voice;          // 0x84: the cry, from SE 0x475
 };
 
 struct DinoAttackDefs {
