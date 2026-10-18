@@ -53,7 +53,9 @@ struct DinoFieldCharaData {
     u8 unk00[0x14];
     MFx32 mMoveSpeed;   // 0x14: -1 = the default
     MFx32 mHeight;      // 0x18
-    u8 unk1C[0x2C - 0x1C];
+    u8 unk1C[0x20 - 0x1C];
+    u32 mUnk20;         // 0x20
+    u8 unk24[0x2C - 0x24];
     u8 mUnk2C;          // 0x2C
     u8 mUnk2D;          // 0x2D
     MRect mRect30;      // 0x30
@@ -118,6 +120,19 @@ void DinoFieldChara::SetUnk2D8(MPoint pos, u32 a, u32 b) {
 
 void DinoFieldChara::ClearUnk2E0() {
     mUnk2E0 = 0;
+}
+
+// NONMATCHING: two dead stores to the MPoint temporaries are in a different order.
+void DinoFieldChara::StopWalking() {
+    if (!mModel.unk05[0]) {
+        SetMotion(1, 1, mField->GetMap()->GetWalkSpeed());
+    }
+    SetUnk2D8Pos(MPoint(0, 0));
+    mUnk2E0 = 0;
+}
+
+BOOL DinoFieldChara::IsUnk20Two() {
+    return ((DinoFieldCharaData *) mFile.GetData())->mUnk20 == 2 ? TRUE : FALSE;
 }
 
 BOOL DinoFieldChara::IsUnkA1Motion() {
