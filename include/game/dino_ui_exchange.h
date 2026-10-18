@@ -17,6 +17,7 @@
 #include "game/dino_resource.h"
 
 struct DinoPlayerProfile;
+class DinoUiWirelessCancel;
 
 // A wireless partner's MAC address.
 struct DinoMacAddress {
@@ -49,9 +50,11 @@ public:
     void StateEnd();
     void StateStart();
     void StateCheck();
-    void State02155e10();
+    void StateAsk();
     void StateWait();
-    void State0215639c();
+    void StateRestart();
+    void State02156484();
+    void OnScanMessage(MMessage *msg);
     void Unk02155f24();
     // Sets when the next exchange may happen.
     void SetNextTime() {
@@ -65,8 +68,9 @@ public:
     void (DinoUiExchange::*mOnMessage)(MMessage *msg); // 0xB0
     MMultiPlay *mMultiPlay;         // 0xB8
     u32 unkBC;
-    u32 mUnkC0;                     // 0xC0
-    u8 unkC4[0xD4 - 0xC4];
+    BOOL mAnswer;                   // 0xC0: whether to exchange
+    MTaskSet *mTasks;               // 0xC4
+    u8 unkC8[0xD4 - 0xC8];
     MMotion *mOnes;                 // 0xD4: the count's digits
     MMotion *mTens;                 // 0xD8
     u32 mCount;                     // 0xDC
@@ -77,7 +81,9 @@ public:
     u8 mBeacon[0x18];               // 0xFC: sent when this side is the parent
     u8 unk114[0x130 - 0x114];
     u64 mNextTime;                  // 0x130: in play frames
-    u8 unk138[0x140 - 0x138];
+    DinoUiWirelessCancel *mCancel;  // 0x138
+    u8 mCancelled;                  // 0x13C
+    u8 unk13D[3];
     MResource<void> mResource;      // 0x140
     u8 unk150[0x1EC - 0x150];
 };

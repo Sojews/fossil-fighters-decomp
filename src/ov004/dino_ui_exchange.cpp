@@ -13,6 +13,8 @@
 #include "game/dino_resource.h"
 #include "m/seed_generator.h"
 #include "game/dino_common_window_message_box.h"
+#include "game/dino_common_window_yes_no_dialog.h"
+#include "game/dino_ui_wireless_cancel_item_menu.h"
 
 DinoUiExchange::~DinoUiExchange() {
     GetDisplay()->mBlend->Reset();
@@ -78,18 +80,22 @@ template class std::__red_black_tree<DinoMacAddress, DinoMacAddress, std::__iden
 
 // The TU's pooled pointer-to-member constants (see menu.cpp).
 extern "C" struct {
-    u8 unk00[0x3C];
-    void (DinoUiExchange::*State02155e10_3C)(); // 0x3c
+    u8 unk00[0x24];
+    void (DinoUiExchange::*OnScanMessage_24)(MMessage *msg); // 0x24
+    u8 unk2C[0x3C - 0x2C];
+    void (DinoUiExchange::*StateAsk_3C)(); // 0x3c
 } data_ov004_02171de0;
 extern "C" struct {
-    u8 unk00[0x34];
+    u8 unk00[0x2C];
+    void (DinoUiExchange::*StateEnd_2C)(); // 0x2c
     void (DinoUiExchange::*Unk02155f24_34)();
-    u8 unk3C[0x44 - 0x3C];
-    void (DinoUiExchange::*State0215639c_44)(); // 0x44
+    MPoint mMessagePos;  // 0x3c
+    void (DinoUiExchange::*StateRestart_44)(); // 0x44
     u8 unk4C[0x54 - 0x4C];
     void (DinoUiExchange::*StateCheck_54)(); // 0x54
     u8 unk5C[0x6C - 0x5C];
     void (DinoUiExchange::*StateStart_6C)(); // 0x6c
+    void (DinoUiExchange::*State02156484_74)(); // 0x74
 } data_ov004_02171e60;
 
 DinoUiExchange::DinoUiExchange() : MProcess(NULL) {
@@ -122,17 +128,41 @@ void DinoUiExchange::StateCheck() {
         serial->AddTail(fade);
         serial->AddTail(exit);
     } else {
-        mState = data_ov004_02171de0.State02155e10_3C;
+        mState = data_ov004_02171de0.StateAsk_3C;
     }
+}
+
+extern const u32 data_0208ab44, data_0208ab4c, data_0208ad54, data_0208ad58;
+
+// Asks whether to exchange.
+void DinoUiExchange::StateAsk() {
+    mAnswer = TRUE;
+    DinoCommonWindowYesNoDialog *dialog = new DinoCommonWindowYesNoDialog(gDinoResource->GetText(data_0208ab4c), &mAnswer);
+    dialog->SetLabels2(gDinoResource->GetText(data_0208ad58), gDinoResource->GetText(data_0208ad54));
+    dialog->SetUnkBC(TRUE);
+    mSerial.AddTail(dialog);
+    mState = data_ov004_02171e60.StateEnd_2C;
+}
+
+// Starts over; shows "searching" with a cancel button unless already showing.
+void DinoUiExchange::StateRestart() {
+    Start();
+    if (mTasks->IsEmpty()) {
+        mTasks->AddTail(new DinoCommonWindowMessageWait2(gDinoResource->GetText(data_0208ab44),
+                                                         data_ov004_02171e60.mMessagePos, 4, 0),
+                        mCancel = new DinoUiWirelessCancel(&mCancelled));
+    }
+    mState = data_ov004_02171e60.State02156484_74;
+    mOnMessage = data_ov004_02171de0.OnScanMessage_24;
 }
 
 void DinoUiExchange::StateWait() {
     SetNextTime();
-    mState = data_ov004_02171e60.State0215639c_44;
+    mState = data_ov004_02171e60.StateRestart_44;
 }
 
 void DinoUiExchange::StateEnd() {
-    if (mUnkC0 == 0) {
+    if (mAnswer == FALSE) {
         MTask *exit = MTaskExitTransfer::Create(this);
         MTask *fade = gCurrentDisplay->mBlend->CreateFadeRatioAnime(8, 0, 10, 0);
         MTaskSet &serial = mSerial;
