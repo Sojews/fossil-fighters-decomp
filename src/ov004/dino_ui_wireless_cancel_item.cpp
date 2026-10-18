@@ -247,6 +247,17 @@ void DinoUiCannonParentScanner::ShowCount() {
     mTens->Play(mCount / 10 + 1, 0);
 }
 
+// Hands the connection's tasks over to DinoResource and ends.
+void DinoUiWirelessMatch::StateKeep() {
+    MTask *b = mUnk80;
+    MParallelTaskSet *parallel = &mParallel;
+    parallel->Remove(mUnk7C);
+    parallel->Remove(b);
+    gDinoResource->SetUnk90((u32)mUnk7C, (u32)mUnk80);
+    *mResult = 1;
+    Exit();
+}
+
 void DinoUiChildScanner::Cancel() {
     *mChosen = FALSE;
     mSerial.AddTail(MTaskExitTransfer::Create(this));

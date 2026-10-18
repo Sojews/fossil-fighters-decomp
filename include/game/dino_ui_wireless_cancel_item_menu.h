@@ -140,8 +140,13 @@ public:
     virtual ~DinoUiWirelessMatch();
     virtual void Idle();
 
+    void StateKeep();
+
     void (DinoUiWirelessMatch::*mState)(); // 0x74
-    u32 mUnk7C[8];
+    MTask *mUnk7C;      // 0x7C: kept in DinoResource for the next scene
+    MTask *mUnk80;      // 0x80
+    u32 *mResult;       // 0x84
+    u32 mUnk88[5];
     MTask *mUnk9C;      // 0x9C
 };
 
