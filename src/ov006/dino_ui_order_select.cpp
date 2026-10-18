@@ -99,3 +99,19 @@ void DinoUiOrderSelectMenu::PageRight() {
         FocusItem(mTabs[mPage]);
     }
 }
+
+void DinoUiOrderSelectMenu::FinishPage() {
+    mUnk1F0 = 0;
+    ClearItems();
+    CreateItems();
+    RefreshItems();
+    Enable();
+    RefreshOKButton();
+    FocusNearestItem(GetCursor());
+}
+
+void DinoUiOrderSelectMenu::FinishTab() {
+    RefreshItems();
+    FocusItem(mItems[mFocusIndex]);
+    RefreshOKButton();
+}
