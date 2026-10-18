@@ -15,6 +15,10 @@
 #include "game/dino_ui_save_slot_select.h"
 #include "game/dino_ui_save_slot_select_menu_delete_item.h"
 #include "game/dino_ui_ending.h"
+#include "m/pal.h"
+#include "m/bg.h"
+#include "m/display.h"
+#include "m/lcd.h"
 #include "game/dino_resource.h"
 #include "game/dino_ui_save_slot_confirm.h"
 #include "game/dino_ui_save_slot_select_menu_confirm_delete_task.h"
@@ -343,6 +347,17 @@ DinoUiEnding::~DinoUiEnding() {
 
 void DinoUiEnding::Idle() {
     (this->*mState)();
+}
+
+// Frees both screens' pictures and ends.
+void DinoUiEnding::StateEnd() {
+    for (u32 i = 0; i < 2; i++) {
+        MDisplay *display = i == 0 ? gLcd->mMain : gLcd->mSub;
+        display->mBg->mPal->Free(mScreens[i].palette);
+        display->mBg->DeleteIndexBitmap(mScreens[i].bitmap);
+        display->mBg->DeleteIndexBitmap(mScreens[i].bitmap2);
+    }
+    Exit();
 }
 
 // Template task instances the game emits in this file. Until the code that makes the tasks is decompiled, they are

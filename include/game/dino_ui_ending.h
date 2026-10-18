@@ -3,6 +3,7 @@
 
 #include "m/task.h"
 #include "m/picture.h"
+#include "m/bg.h"
 
 // The ending sequence.
 class DinoUiEnding : public MProcess {
@@ -11,8 +12,17 @@ public:
     virtual ~DinoUiEnding();
     virtual void Idle();
 
+    void StateEnd();
+
+    // A picture on each screen.
+    struct Screen {
+        MPalBlock *palette;
+        MIndexBitmap *bitmap;
+        MIndexBitmap *bitmap2;
+    };
+
     void (DinoUiEnding::*mState)(); // 0x74
-    u8 unk7C[0x18];
+    Screen mScreens[2];             // 0x7C
     MPictureFile mPicture;          // 0x94
 };
 
