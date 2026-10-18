@@ -2,6 +2,8 @@
 
 #include <string.h>
 #include "m/backup.h"
+#include "nitro/mi.h"
+#include <mem.h>
 
 enum {
     CARD_REQ_READ_BACKUP = 6,
@@ -43,6 +45,77 @@ MBackupPageDevice::~MBackupPageDevice() {
 
 BOOL MBackupPageDevice::Read(u32 offset, void *buf, u32 size) {
     return ReadPages(offset, buf, size);
+}
+
+// Writes through whole pages: each page the range touches is read, patched and written back if it changed.
+// (The game's code is a do-while behind an if, with the last page's number kept in a variable.)
+BOOL MBackupPageDevice::Write(u32 offset, const void *buf, u32 size) {
+    u8 *pageBuf;
+    u32 lastPage;
+    u32 first;
+    u32 last;
+    u32 len;
+    u32 end;
+    first = offset / mPageSize;
+    end = offset + size;
+    last = (mPageSize + end - 1) / mPageSize;
+    u32 page = first;
+    if (page != last) {
+        lastPage = last - 1;
+        do {
+            u32 start = page == first ? offset % mPageSize : 0;
+            u32 stop = page == lastPage ? (mPageSize + end - 1) % mPageSize + 1 : mPageSize;
+            pageBuf = mPageBuf;
+            len = stop - start;
+            if (!ReadPages(page * mPageSize, pageBuf, mPageSize)) {
+                return FALSE;
+            }
+            if (memcmp(buf, pageBuf + start, len) != 0) {
+                MI_CpuCopy8(buf, pageBuf + start, len);
+                if (!WritePages(page * mPageSize, mPageBuf, mPageSize)) {
+                    return FALSE;
+                }
+            }
+            buf = (const u8 *) buf + len;
+            page++;
+        } while (page != last);
+    }
+    return TRUE;
+}
+
+// As Write, through Unk24.
+BOOL MBackupPageDevice::Unk14(u32 offset, const void *buf, u32 size) {
+    u8 *pageBuf;
+    u32 lastPage;
+    u32 first;
+    u32 last;
+    u32 len;
+    u32 end;
+    first = offset / mPageSize;
+    end = offset + size;
+    last = (mPageSize + end - 1) / mPageSize;
+    u32 page = first;
+    if (page != last) {
+        lastPage = last - 1;
+        do {
+            u32 start = page == first ? offset % mPageSize : 0;
+            u32 stop = page == lastPage ? (mPageSize + end - 1) % mPageSize + 1 : mPageSize;
+            pageBuf = mPageBuf;
+            len = stop - start;
+            if (!ReadPages(page * mPageSize, pageBuf, mPageSize)) {
+                return FALSE;
+            }
+            if (memcmp(buf, pageBuf + start, len) != 0) {
+                MI_CpuCopy8(buf, pageBuf + start, len);
+                if (!Unk24(page * mPageSize, mPageBuf, mPageSize)) {
+                    return FALSE;
+                }
+            }
+            buf = (const u8 *) buf + len;
+            page++;
+        } while (page != last);
+    }
+    return TRUE;
 }
 
 BOOL MBackupPageDevice::Unk10(u32 offset, void *buf, u32 size) {
