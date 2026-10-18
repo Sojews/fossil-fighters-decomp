@@ -49,6 +49,13 @@ void DinoCleaningXrayItem::OnEnableChanged(BOOL enabled) {
     mMotion->Play(2, 0);
 }
 
+void DinoCleaningXrayItem::OnDecide() {
+    if (!mCleaning->mUnk128) {
+        mMotion->Play(1, 1);
+        mCleaning->GetKasekiRock()->StartXray();
+    }
+}
+
 void DinoCleaningToolMenuItem::OnEnableChanged(BOOL enabled) {
     if (!enabled) {
         if (IsFocused()) {

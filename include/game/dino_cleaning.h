@@ -9,6 +9,7 @@
 
 class MInput;
 class DinoCommonLive;
+class DinoCleaningKasekiRock;
 
 class DinoCleaning : public DinoHelpBase, public MProcess, public MLooperPreLoopHook, public MSleepHook {
 public:
@@ -22,14 +23,14 @@ public:
     MInput *GetUnkDC();
     u32 GetUnkE0();
     u32 GetUnkD4();
-    u32 GetUnkD8();
+    DinoCleaningKasekiRock *GetKasekiRock();
     DinoCommonLive *GetUnkE4();
     void SetUnk128(BOOL value);
 
     void (DinoCleaning::*mState)(); // 0x94
     u8 unk9C[0xD4 - 0x9C];
     u32 mUnkD4;                     // 0xD4
-    u32 mUnkD8;                     // 0xD8
+    DinoCleaningKasekiRock *mKasekiRock; // 0xD8
     MInput *mUnkDC;                 // 0xDC
     u32 mUnkE0;                     // 0xE0
     DinoCommonLive *mUnkE4;         // 0xE4

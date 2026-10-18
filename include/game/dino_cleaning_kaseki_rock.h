@@ -25,6 +25,7 @@ public:
     MFx32 GetRatio(int index);
     BOOL IsViewUnkD9E0Zero();
     void Finish();
+    void StartXray();
     void CountCells();
     void SetOffset(MPoint offset);
     void SetOffsetAll(MPoint offset);

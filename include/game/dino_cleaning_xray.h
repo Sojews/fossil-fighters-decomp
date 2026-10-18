@@ -9,6 +9,7 @@ public:
     virtual ~DinoCleaningXray();
     virtual void Unk18();
     virtual void Unk1C();
+    virtual void Unk20();
 };
 
 #endif

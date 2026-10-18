@@ -7,7 +7,7 @@
 #include "game/dino_sound.h"
 #include "m/input.h"
 
-extern "C" void func_ov002_0215fdec(u32 obj);
+extern "C" void func_ov002_0215fdec(DinoCleaningKasekiRock *rock);
 
 DinoCleaningBlower::DinoCleaningBlower(DinoCleaning *cleaning) : MProcess(NULL) {
     u32 i;
@@ -46,7 +46,7 @@ void DinoCleaningBlower::Idle() {
     if (blowing) {
         mCleaning->GetUnkE4()->SetUnkAC(19);
     }
-    if ((blowing || tapping) && mCleaning->GetUnkD8()) {
-        func_ov002_0215fdec(mCleaning->GetUnkD8());
+    if ((blowing || tapping) && mCleaning->GetKasekiRock()) {
+        func_ov002_0215fdec(mCleaning->GetKasekiRock());
     }
 }

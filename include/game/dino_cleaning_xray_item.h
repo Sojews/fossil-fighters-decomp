@@ -4,6 +4,8 @@
 #include "m/motion.h"
 #include "game/help.h"
 #include "m/menu_item.h"
+#include "game/dino_cleaning.h"
+#include "game/dino_cleaning_kaseki_rock.h"
 
 class DinoCleaningXrayItem : public DinoHelpItem, public MMenuItem {
 public:
@@ -15,7 +17,7 @@ public:
     virtual void OnEnableChanged(BOOL enabled);
     virtual void OnDecide();
 
-    u8 unk94[0x4];
+    DinoCleaning *mCleaning; // 0x94
     MMotion *mMotion; // 0x98
 };
 

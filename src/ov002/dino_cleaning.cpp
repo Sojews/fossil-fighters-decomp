@@ -143,8 +143,8 @@ u32 DinoCleaning::GetUnkD4() {
     return mUnkD4;
 }
 
-u32 DinoCleaning::GetUnkD8() {
-    return mUnkD8;
+DinoCleaningKasekiRock *DinoCleaning::GetKasekiRock() {
+    return mKasekiRock;
 }
 
 DinoCommonLive *DinoCleaning::GetUnkE4() {
