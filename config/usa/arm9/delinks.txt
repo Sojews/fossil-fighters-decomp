@@ -459,6 +459,9 @@ libs/nitrosdk/src/ctrdg/ctrdg_task.c:
 libs/nitrosdk/src/math/math.c:
     .text       start:0x0207d338 end:0x0207d370
 
+libs/nitrosdk/src/math/dgt.c:
+    .text       start:0x0207d370 end:0x0207d398
+
 libs/nitrosdk/src/math/crc.c:
     .text       start:0x0207d398 end:0x0207d3f0
 
