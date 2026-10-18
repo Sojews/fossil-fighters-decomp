@@ -2,21 +2,43 @@
 #ifndef GAME_DINO_EVENT_REVIVE_H
 #define GAME_DINO_EVENT_REVIVE_H
 
+#include <string>
 #include <vector>
 #include "m/task.h"
 #include "m/archive.h"
+#include "game/dino_event_revive_cleaning.h"
+#include "game/dino_event_revive_effect.h"
+
+class DinoEventLoop;
 
 class DinoEventRevive : public MProcess {
 public:
     virtual ~DinoEventRevive();
     virtual void Idle();
 
+    MTask *CreateMessage(u32 message, std::string extra);
+    void StateNoneMessage();
+    void StateStart();
+    void StateContainerSelect();
+    void StateSelected();
+    void StateCleaning();
+    void StateCleaned();
+    void StateEffect();
+    void StateEffectEnd();
+
     void (DinoEventRevive::*mState)(); // 0x74
-    u32 mUnk7C[19];
+    DinoEventLoop *mEvent;      // 0x7C
+    s32 mRock;                  // 0x80: the one chosen, or -1
+    DinoEventReviveResult mResult;          // 0x84: mOutcome is at 0x94
+    DinoEventReviveCreature mCreature;      // 0x98
+    DinoEventReviveCreature mCreature2;     // 0xB0
     MArchivePtr mArchive;       // 0xC8
     MArchiveFile mFile;         // 0xCC
-    u32 mUnkD8[2];              // 0xD8
+    u32 mUnkD8;                 // 0xD8
+    u32 mEffectDone;            // 0xDC
     std::vector<void *> mUnkE0; // 0xE0
+    int mScene;                 // 0xEC: the sound scene to load
+    int mBgm;                   // 0xF0
 };
 
 #endif

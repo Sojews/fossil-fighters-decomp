@@ -7,10 +7,11 @@ class DinoEventLoop;
 
 class DinoEventReviveContainerSelect : public MProcess {
 public:
+    DinoEventReviveContainerSelect(s32 *result) : MProcess(NULL), mResult(result), mStep(0) {}
     virtual ~DinoEventReviveContainerSelect();
     virtual void Idle();
 
-    DinoEventLoop *mEvent;  // 0x74
+    s32 *mResult;       // 0x74: the rock chosen, or -1
     u32 mStep;          // 0x78
 };
 

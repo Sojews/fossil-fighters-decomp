@@ -204,7 +204,7 @@ void DinoUiCleaningMenu::ClearItems() {
     }
 }
 
-DinoUiCleaningMenu::DinoUiCleaningMenu(DinoEventLoop *event) : MMenu(NULL, 0), mEvent(event) {
+DinoUiCleaningMenu::DinoUiCleaningMenu(s32 *result) : MMenu(NULL, 0), mResult(result) {
     mUnk104[0] = 0;
     mUnk104[1] = 0;
     mPage = 0;

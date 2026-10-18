@@ -17,7 +17,7 @@ class DinoUi3PartsRockName;
 
 class DinoUiCleaningMenu : public DinoHelpBase, public MMenu {
 public:
-    DinoUiCleaningMenu(DinoEventLoop *event);
+    DinoUiCleaningMenu(s32 *result);
     virtual ~DinoUiCleaningMenu();
     virtual void OnStart();
     virtual void OnIdle();
@@ -41,7 +41,7 @@ public:
     std::vector<void *> mItems; // 0xC0: this page's items
     u32 mUnkCC[2];              // 0xCC
     DinoUi3PartsFraction *mFraction; // 0xD4: "page n/m"
-    DinoEventLoop *mEvent;      // 0xD8
+    s32 *mResult;               // 0xD8: the rock chosen, or -1
     MTaskSet *mCursorTasks;     // 0xDC
     DinoUi3PartsCursor *mCursor; // 0xE0
     DinoUi3PartsRockName *mRockName; // 0xE4

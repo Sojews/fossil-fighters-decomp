@@ -6,6 +6,7 @@
 
 class DinoEventReviveFieldResumeTask : public MProcess {
 public:
+    DinoEventReviveFieldResumeTask(DinoEventLoop *event) : MProcess(NULL), mEvent(event), mStep(0) {}
     virtual ~DinoEventReviveFieldResumeTask();
     virtual void Idle();
 
