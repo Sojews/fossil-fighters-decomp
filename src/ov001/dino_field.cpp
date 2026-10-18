@@ -82,6 +82,10 @@ DinoFieldChara *DinoField::GetChara(u32 id) {
     return NULL;
 }
 
+void DinoField::Write(void *buf) {
+    MSerializer::Write(buf);
+}
+
 MTask *DinoField::CreateCharaAngleTask(u32 chara, u32 angle, u32 a, u32 b) {
     return new DinoFieldCharaAngleTask(this, chara, angle, a, b);
 }

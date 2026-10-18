@@ -7,6 +7,14 @@
 #include "game/battle_select.h"
 #include "types.h"
 
+DebugAutoBattle::~DebugAutoBattle() {
+    delete mRandom;
+}
+
+void DebugAutoBattle::Idle() {
+    Exit();
+}
+
 BattleSelect::~BattleSelect() {
 }
 

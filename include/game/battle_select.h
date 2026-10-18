@@ -9,6 +9,18 @@
 #include "m/looper.h"
 #include "game/help.h"
 #include "game/dino_field_camera_hook.h"
+#include "m/seed_generator.h"
+#include <vector>
+
+// A debug process that plays battles automatically.
+class DebugAutoBattle : public MProcess {
+public:
+    virtual ~DebugAutoBattle();
+    virtual void Idle();
+
+    MRandom *mRandom;           // 0x74
+    std::vector<u32> mUnk78;    // 0x78
+};
 
 class BattleSelect : public MProcess {
 public:
