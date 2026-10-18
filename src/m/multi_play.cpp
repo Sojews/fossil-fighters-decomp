@@ -1002,6 +1002,16 @@ void MMultiPlayLinkIcon::Execute() {
     MMultiPlayIcon::Execute();
 }
 
+// The TU's pooled pointer-to-member constants the driver tasks copy their next steps from (see menu.cpp).
+extern "C" struct {
+    u8 unk00[0x24];
+    void (MMultiPlayWirelessDriverStartTask::*WaitStartUp_24)();  // 0x24
+    void (MMultiPlayWirelessDriverStartTask::*StartUp_2C)();      // 0x2C
+    void (MMultiPlayWirelessDriverStopTask::*WaitTerminate_34)();  // 0x34
+    u8 unk3C[0x54 - 0x3C];
+    void (MMultiPlayWirelessDriverStopTask::*Terminate_54)();      // 0x54
+} data_020c4b0c;
+
 void MMultiPlayWirelessDriverStartTask::WaitStartUp() {
     if (mDone) {
         Exit();
@@ -1011,7 +1021,7 @@ void MMultiPlayWirelessDriverStartTask::WaitStartUp() {
 void MMultiPlayWirelessDriverStartTask::StartUp() {
     mDone = FALSE;
     WVR_StartUpAsync(gLcd->GetTextureSlotFlags(), StartUpCallback, this);
-    mStep = &MMultiPlayWirelessDriverStartTask::WaitStartUp;
+    mStep = data_020c4b0c.WaitStartUp_24;
 }
 
 void MMultiPlayWirelessDriverStartTask::StartUpCallback(void *arg, int result) {
@@ -1025,7 +1035,7 @@ void MMultiPlayWirelessDriverStartTask::Begin() {
         return;
     }
     gLcd->UseTextureBanks(1);
-    mStep = &MMultiPlayWirelessDriverStartTask::StartUp;
+    mStep = data_020c4b0c.StartUp_2C;
 }
 
 void MMultiPlayWirelessDriverStopTask::WaitTerminate() {
@@ -1038,7 +1048,7 @@ void MMultiPlayWirelessDriverStopTask::WaitTerminate() {
 void MMultiPlayWirelessDriverStopTask::Terminate() {
     mDone = FALSE;
     WVR_TerminateAsync(TerminateCallback, this);
-    mStep = &MMultiPlayWirelessDriverStopTask::WaitTerminate;
+    mStep = data_020c4b0c.WaitTerminate_34;
 }
 
 void MMultiPlayWirelessDriverStopTask::TerminateCallback(void *arg, int result) {
@@ -1051,7 +1061,7 @@ void MMultiPlayWirelessDriverStopTask::Begin() {
         Exit();
         return;
     }
-    mStep = &MMultiPlayWirelessDriverStopTask::Terminate;
+    mStep = data_020c4b0c.Terminate_54;
 }
 
 MMultiPlayMessageHub::MMultiPlayMessageHub(int first)
