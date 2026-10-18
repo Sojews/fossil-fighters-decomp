@@ -34,6 +34,7 @@ public:
     void ClearItems();
     void RefreshPage2();
     void Decide(int index);
+    void FinishDecide();
 
     u32 mUnkB4;                 // 0xB4
     MMenuItem *mLinkFrom;       // 0xB8: linked to the first page item
@@ -47,7 +48,9 @@ public:
     DinoUi3PartsRockName *mRockName; // 0xE4
     std::vector<u32> mUnkE8;    // 0xE8
     MResource<DinoKasekiDefs> mKasekiDefs; // 0xF4
-    u32 mUnk104[3];             // 0x104
+    s32 mChoice;                // 0x104: the rock decided on
+    u32 mAnswer;                // 0x108: the confirmation's answer
+    u32 mUnk10C;                // 0x10C
     int mPage;                  // 0x110
     int mLastPage;              // 0x114
 };

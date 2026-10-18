@@ -19,6 +19,7 @@
 #include "m/lcd.h"
 #include "m/display.h"
 #include "m/bright.h"
+#include "game/dino_common_window_menu_item_flush_task_menu.h"
 
 DinoUiCleaningMenuItem::~DinoUiCleaningMenuItem() {
 }
@@ -205,8 +206,8 @@ void DinoUiCleaningMenu::ClearItems() {
 }
 
 DinoUiCleaningMenu::DinoUiCleaningMenu(s32 *result) : MMenu(NULL, 0), mResult(result) {
-    mUnk104[0] = 0;
-    mUnk104[1] = 0;
+    mChoice = 0;
+    mAnswer = 0;
     mPage = 0;
     mLastPage = 0;
 }
@@ -251,4 +252,62 @@ void DinoUiCleaningMenu::OnBackDecided() {
     serial.AddTail(wait);
     serial.AddTail(fades);
     serial.AddTail(exit);
+}
+
+// Where the confirmation window opens: by the decided item's place in the 4-wide grid.
+extern "C" struct {
+    u8 unk00[0x4C];
+    MPoint mWindowBase;     // 0x4C
+    MPoint mWindowColStep;  // 0x54
+    MPoint mWindowRowStep;  // 0x5C
+    MPoint mWindowOffset;   // 0x64
+} data_ov005_02167184;
+extern "C" struct {
+    void (DinoUiCleaningMenu::*FinishDecide_00)();
+} data_ov005_02167200;
+extern const u32 data_0208aa24, data_0208aa28, data_0208a638, data_0208a63c;
+
+// Asks to confirm the rock.
+// NONMATCHING: the game works the window's place out after allocating it, the column twice
+void DinoUiCleaningMenu::Decide(int index) {
+    mCursor->Hide();
+    mChoice = index + mPage * 8;
+    mAnswer = 0;
+    int row = index / 4;
+    int col = index % 4;
+    MPoint pos(data_ov005_02167184.mWindowBase.x + (col - (col == 3)) * data_ov005_02167184.mWindowColStep.x +
+                   row * data_ov005_02167184.mWindowRowStep.x + data_ov005_02167184.mWindowOffset.x,
+               data_ov005_02167184.mWindowBase.y + (col - (col == 3)) * data_ov005_02167184.mWindowColStep.y +
+                   row * data_ov005_02167184.mWindowRowStep.y + data_ov005_02167184.mWindowOffset.y);
+    DinoCommonWindowMenu *window = new DinoCommonWindowMenu(gLcd->GetBottomDisplay(), &mAnswer, pos, NULL, 0);
+    window->AddChoice(1, gDinoResource->GetText(data_0208aa28), gDinoResource->GetText(data_0208a63c));
+    window->AddChoice(-2, gDinoResource->GetText(data_0208aa24), gDinoResource->GetText(data_0208a638));
+    MTask *show = mCursor->CreateShowTransfer();
+    MTask *finish = MCreateCallTask(this, data_ov005_02167200.FinishDecide_00);
+    MSerialTaskSet *serial = &mSerial;
+    serial->AddTail(window);
+    serial->AddTail(finish);
+    serial->AddTail(show);
+}
+
+// Yes: saves the page and fades both screens out to white, then leaves.
+void DinoUiCleaningMenu::FinishDecide() {
+    if (mAnswer == 1) {
+        gDinoBackup->SetSystemVar(0x2D, mPage);
+        *mResult = mChoice;
+        MTask *fadeMain;
+        MTask *fadeSub;
+        MTask *exit;
+        exit = CreateExitTransfer();
+        fadeSub = gLcd->mSub->mBright->CreateFadeOutToWhite(30, 0);
+        fadeMain = gLcd->mMain->mBright->CreateFadeOutToWhite(30, 0);
+        MParallelTaskSet *fades = new MParallelTaskSet(TRUE);
+        fades->AddTail(fadeMain);
+        fades->AddTail(fadeSub);
+        MTask *stopBgm = DinoSoundCreateStopBgmTask(-1, 30);
+        MSerialTaskSet *serial = &mSerial;
+        serial->AddTail(stopBgm);
+        serial->AddTail(fades);
+        serial->AddTail(exit);
+    }
 }
