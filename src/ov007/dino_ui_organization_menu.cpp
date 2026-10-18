@@ -293,6 +293,53 @@ void DinoUiOrganizationMenu::SetSort(u8 sort) {
     }
 }
 
+// Everything back on, and the links back to how they start.
+void DinoUiOrganizationMenu::EnableAll() {
+    if (mUnkC0 != NULL) {
+        mUnkC0->Enable();
+        mUnkC4->Enable();
+    }
+    int i;
+    for (i = 0; i < 5; i++) {
+        mListItems[i]->Enable();
+    }
+    for (i = 0; i < 15; i++) {
+        if (i < mSlotCount) {
+            if (InTeam(mCreatures[mPage * 15 + i])) {
+                mSlots[i]->mMotion->GetUnit()->SetMode(0);
+            } else {
+                mSlots[i]->mMotion->GetUnit()->SetMode(1);
+            }
+        }
+        mSlots[i]->Enable();
+    }
+    for (i = 0; i < 5; i++) {
+        mButtons[i]->Enable();
+    }
+    for (i = 0; i < 4; i++) {
+        mTabs[i]->Enable();
+    }
+    mUnkBC->MMenuItem::Enable();
+    for (i = 0; i < 4; i++) {
+        RemoveLink(mTabs[i], 4);
+        AddLink(mTabs[i], 4, mButtons[0]);
+    }
+    RemoveLink(mUnkB8, 4);
+    AddLink(mUnkB8, 4, mButtons[4]);
+    RemoveLink(mButtons[3], 2);
+    AddLink(mButtons[3], 2, mUnkBC);
+    RemoveLink(mTabs[3], 1);
+    AddLink(mTabs[3], 1, mUnkBC);
+    RemoveLink(mUnkB8, 3);
+    AddLink(mUnkB8, 3, mUnkBC);
+    for (i = 0; i < 4; i++) {
+        RemoveLink(mTabs[i], 2);
+        AddLink(mTabs[i], 2, mListItems[0]);
+    }
+    RemoveLink(mUnkB8, 2);
+    AddLink(mUnkB8, 2, mListItems[0]);
+}
+
 void DinoUiOrganizationMenu::SelectMember(int index) {
     if (index < 5) {
         mListItems[index]->Disable();
@@ -364,6 +411,32 @@ void DinoUiOrganizationMenu::HandleResult() {
     }
 }
 
+extern const u32 data_0208aa50;
+
+void DinoUiOrganizationMenu::HandleMemberResult() {
+    if (mResult == 11) {
+        mUnk23C = TRUE;
+        func_ov007_0217fb94(this, 2);
+        mMessage = new DinoCommonWindowMessage(data_020b5818, gDinoResource->GetText(data_0208aa50), 4, 0);
+        mParallel.AddTail(mMessage);
+        SelectMember(mSelected);
+        mListItems[mSelected]->PlayDecided();
+        for (int i = 0; i < mSlotCount; i++) {
+            u32 id = mCreatures[mPage * 15 + i];
+            if (!InTeam(id)) {
+                DinoCreatureState creature;
+                gDinoBackup->GetCreature(id, &creature);
+                if (creature.parts[0].level != 0) {
+                    FocusItem(mSlots[i]);
+                    return;
+                }
+            }
+        }
+    } else if (mResult == -2) {
+        mListItems[mSelected]->PlayFocused();
+    }
+}
+
 void DinoUiOrganizationMenu::RemoveListLinks() {
     if (mListLinked) {
         RemoveLink(mListItems[0], 3);
@@ -386,7 +459,6 @@ void DinoUiOrganizationMenu::RemoveSlotLinks() {
     }
 }
 
-extern "C" void func_ov007_0217e1e4(DinoUiOrganizationMenu *menu);
 
 extern const u32 kCreatureLevelLimits[2];
 
@@ -447,7 +519,7 @@ void DinoUiOrganizationMenu::ClearList() {
 
 void DinoUiOrganizationMenu::RestoreFocus() {
     func_ov007_0217fb94(this, 0);
-    func_ov007_0217e1e4(this);
+    EnableAll();
     if (mSelected < 5) {
         mListItems[mSelected]->PlayNormal();
         FocusItem(mListItems[mSelected]);
@@ -489,13 +561,7 @@ extern const MPoint data_ov007_0218ecc4;
 // Sends the selected member back to its place in the list.
 // NONMATCHING: the game reloads the list's size each time round the search loop.
 void DinoUiOrganizationMenu::RemoveMember() {
-    u8 id = mTeam.slots[mSelected];
-    int i;
-    for (i = 0; i < mCreatures.size(); i++) {
-        if (id == mCreatures[i]) {
-            break;
-        }
-    }
+    int i = FindCreature(mTeam.slots[mSelected]);
     mTeam.slots[mSelected] = 0;
     if (i / 15 < mPage) {
         mSerial.AddTail(mListItems[mSelected]->CreateFlyInTask(data_ov007_0218ecbc));
@@ -570,7 +636,7 @@ void DinoUiOrganizationMenu::Refresh() {
     ClearList();
     CreateList();
     PlaceSlots();
-    func_ov007_0217e1e4(this);
+    EnableAll();
     LinkList();
     LinkSlots();
     Enable();

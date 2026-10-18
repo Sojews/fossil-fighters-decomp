@@ -64,8 +64,20 @@ public:
     void Refresh();
     void CreateList();
     void HandleResult();
+    void HandleMemberResult();
+    void EnableAll();
     void SelectMember(int index);
     void RemoveMember();
+    // Where the creature is in the list (the list's size if it isn't there).
+    int FindCreature(u8 id) {
+        int i;
+        for (i = 0; i < mCreatures.size(); i++) {
+            if (id == mCreatures[i]) {
+                break;
+            }
+        }
+        return i;
+    }
     void ClearList();
     void LinkSlots();
     void RestoreFocus();
