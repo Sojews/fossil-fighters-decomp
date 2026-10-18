@@ -3,6 +3,7 @@
 #include "game/set_live_event_check_task.h"
 #include "game/dino_battle_controller.h"
 #include "types.h"
+#include "game/dino_message.h"
 #include "game/dino_battle_cpu_controller.h"
 #include "game/dino_common_live.h"
 
@@ -42,3 +43,5 @@ SetLiveEventCheckTask::~SetLiveEventCheckTask() {
 // The list's vector members the game emits in this file.
 #pragma auto_inline off
 template class std::__vec_deleter<DinoBattleCpuEntry, std::allocator<DinoBattleCpuEntry> >;
+
+template MTask *DinoCreatePostAndWaitTask(MMessageObserver *target, DinoBattleViewWaitActionInfoBarRequest *msg);

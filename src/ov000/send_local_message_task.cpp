@@ -4,6 +4,7 @@
 // Derived destructors have their bases' destructor bodies inlined; auto-inlining the ones defined above does that.
 #pragma auto_inline on
 
+#include "game/dino_message.h"
 #include "game/send_local_message_task_menu.h"
 #include "game/send_local_message_task.h"
 #include "game/dino_battle_model.h"
@@ -23,6 +24,8 @@ DinoBattleModelField::~DinoBattleModelField() {
 void DinoBattleModelField::Idle() {
     Dispatch();
 }
+
+template MTask *DinoCreatePostAndWaitTask(MMessageObserver *target, DinoBattleViewDecideFirstAttackTeamRequest *msg);
 
 void SetLiveOneShotFlagTask::Execute() {
     func_ov000_0215c174((void *)mUnk10, mUnk14);

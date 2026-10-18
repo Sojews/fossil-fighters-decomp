@@ -3372,4 +3372,17 @@ public:
     u32 mSerial;                // 0x54
 };
 
+// Posts the request, then waits for the signal that answers it (the next message id), which goes to the waiter
+// the request names.
+template <class T> MTask *DinoCreatePostAndWaitTask(MMessageObserver *target, T *msg) {
+    MParallelTaskSet *tasks = new MParallelTaskSet(TRUE);
+    DinoSignalWait *wait = new DinoSignalWait(0, NULL, NULL, 1);
+    MTask *post = target->CreatePostTask(msg);
+    tasks->AddTail(wait);
+    tasks->AddTail(post);
+    msg->mUnk0C = (u32)(MMessageObserver *)wait;
+    wait->mId = msg->mId + 1;
+    return tasks;
+}
+
 #endif

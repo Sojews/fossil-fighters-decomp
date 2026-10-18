@@ -9,7 +9,7 @@ _ZN19DinoBattleFileGroupD1Ev kind:function(thumb,size=0x78) addr:0x02156230
 _ZN9MResourceI14DinoOv000DataBEC1ESs kind:function(thumb,size=0xae) addr:0x021562a8
 _ZN14DinoBattleFileD1Ev kind:function(thumb,size=0x26) addr:0x02156358
 _ZN23DinoBattleCpuController9OnMessageEP8MMessage kind:function(thumb,size=0x3c4) addr:0x02156380
-func_ov000_02156744 kind:function(thumb,size=0xb0) addr:0x02156744
+_Z25DinoCreatePostAndWaitTaskI38DinoBattleViewWaitActionInfoBarRequestEP5MTaskP16MMessageObserverPT_ kind:function(thumb,size=0xb0) addr:0x02156744
 func_ov000_021567f4 kind:function(thumb,size=0x4c) addr:0x021567f4
 func_ov000_02156840 kind:function(thumb,size=0x36) addr:0x02156840
 func_ov000_02156878 kind:function(thumb,size=0x4e) addr:0x02156878
@@ -158,7 +158,7 @@ _ZN20DinoBattleModelField9OnMessageEP8MMessage kind:function(thumb,size=0x1368) 
 .L_0215d4d4 kind:label(thumb) addr:0x0215d4d4
 .L_0215d60c kind:label(thumb) addr:0x0215d60c
 .L_0215d62a kind:label(thumb) addr:0x0215d62a local
-func_ov000_0215d640 kind:function(thumb,size=0xb0) addr:0x0215d640
+_Z25DinoCreatePostAndWaitTaskI42DinoBattleViewDecideFirstAttackTeamRequestEP5MTaskP16MMessageObserverPT_ kind:function(thumb,size=0xb0) addr:0x0215d640
 _ZN22SetLiveOneShotFlagTask7ExecuteEv kind:function(thumb,size=0x1a) addr:0x0215d6f0
 _ZN20SendLocalMessageTask7ExecuteEv kind:function(thumb,size=0x1a) addr:0x0215d70c
 _ZN20SendLocalMessageTaskD1Ev kind:function(thumb,size=0x2) addr:0x0215d728
