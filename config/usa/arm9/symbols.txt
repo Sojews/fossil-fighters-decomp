@@ -10150,6 +10150,7 @@ data_020b5a60 kind:data(any) addr:0x020b5a60
 data_020b5a70 kind:data(any) addr:0x020b5a70
 data_020b5a80 kind:data(any) addr:0x020b5a80
 data_020b5a90 kind:data(any) addr:0x020b5a90
+data_020b5aa0 kind:data(any) addr:0x020b5aa0
 data_020b5ab0 kind:data(any) addr:0x020b5ab0
 data_020b5ab4 kind:data(any) addr:0x020b5ab4
 data_020b5ab8 kind:data(any) addr:0x020b5ab8

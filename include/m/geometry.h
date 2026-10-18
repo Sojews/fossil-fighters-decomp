@@ -62,6 +62,15 @@ struct MRect {
         r.bottom += d;
         return r;
     }
+    // This rect moved by p.
+    MRect Moved(MPoint p) const {
+        MRect r = *this;
+        r.left += p.x;
+        r.top += p.y;
+        r.right += p.x;
+        r.bottom += p.y;
+        return r;
+    }
     MPoint GetTopLeft() const { return MPoint(left, top); }
     int GetWidth() const { return right - left; }
     int GetHeight() const { return bottom - top; }

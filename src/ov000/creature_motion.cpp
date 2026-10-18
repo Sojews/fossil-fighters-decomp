@@ -60,6 +60,13 @@ template MTask *MCreateCallTask(DinoBattleViewCreature *obj, void (DinoBattleVie
 template class MCallTask1<DinoBattleViewStatusEffectIcon, DinoBattleViewStatusEffectIcon, MPoint>;
 template MTask *MCreateCallTask(DinoBattleViewStatusEffectIcon *obj, void (DinoBattleViewStatusEffectIcon::*func)(MPoint), MPoint a0);
 
+// The frame around a creature's position (main's data).
+extern "C" const MRect data_020b5aa0;
+
+MRect CreatureMotion::GetFrame() {
+    return data_020b5aa0.Moved(GetPosition());
+}
+
 void UpdateLifeBarTask::Execute() {
     mLifebar->SetLife(mLife, mMaxLife);
     Exit();

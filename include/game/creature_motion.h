@@ -20,6 +20,7 @@ public:
     CreatureMotion(const char *path, MSmartOam *oam, int arg);
     virtual ~CreatureMotion();
     virtual void Execute();
+    virtual MRect GetFrame();
     virtual void Unk44(int arg);
 
     int mArg;           // 0x7C

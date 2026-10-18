@@ -6401,7 +6401,7 @@ from:0x02173192 kind:thumb_call to:0x02052e38 module:main
 from:0x021731ae kind:thumb_call to:0x0216f6b4 module:overlay(0)
 from:0x021731ba kind:thumb_call to:0x021728d4 module:overlay(0)
 from:0x021731dc kind:thumb_call to:0x0216fe7c module:overlay(0)
-from:0x02173244 kind:load to:0x020b5a90 add:0x10 module:main
+from:0x02173244 kind:load to:0x020b5aa0 module:main
 from:0x021732b4 kind:thumb_call to:0x02060514 module:main
 from:0x021732c0 kind:thumb_call to:0x02060514 module:main
 from:0x021732c6 kind:thumb_call to:0x02052e48 module:main
