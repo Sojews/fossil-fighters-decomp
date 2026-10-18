@@ -15,6 +15,7 @@
 #include "game/dino_backup.h"
 #include "m/bg_new_task.h"
 #include "m/call_task.h"
+#include "m/bright.h"
 
 DinoUiATMMenu::DinoUiATMMenu(u32 *result, u8 arg1, u32 arg2, u8 arg3) : MMenu(NULL, 0) {
     mUnk108 = arg2;
@@ -40,6 +41,43 @@ DinoUiATMMenu::~DinoUiATMMenu() {
 }
 
 void DinoUiATMMenu::OnIdle() {
+}
+
+extern "C" void func_ov007_02172e08(DinoUiATMMenu *menu, int team);
+extern "C" void func_ov007_02173694(DinoUiATMMenu *menu, int team);
+
+void DinoUiATMMenu::OnDecide(MMenuItem *item) {
+    for (int i = 0; i < 3; i++) {
+        if (item == mTeamButtons[i]) {
+            if (mUnk11C == 0) {
+                mUnk118 = i + 1;
+                DinoTeam team;
+                gDinoBackup->GetTeam(mUnk118, &team);
+                u32 j;
+                int count = 0;
+                for (j = 0; j < 5; j++) {
+                    if (team.slots[j] != 0) {
+                        count++;
+                    }
+                }
+                if (count == 0) {
+                    *mResult = mUnk118 + 300;
+                    MTask *exit = CreateExitTransfer();
+                    MTask *fade = gLcd->mSub->mBright->CreateFadeOutToBlack(30, 0);
+                    MParallelTaskSet *fades = new MParallelTaskSet(TRUE);
+                    fades->AddTail(fade);
+                    MSerialTaskSet *serial = &mSerial;
+                    serial->AddTail(fades);
+                    serial->AddTail(exit);
+                } else {
+                    func_ov007_02173694(this, i + 1);
+                }
+            } else if (mUnk11C == 1) {
+                func_ov007_02172e08(this, i + 1);
+            }
+            return;
+        }
+    }
 }
 
 void DinoUiATMTeamButton::OnDecide() {

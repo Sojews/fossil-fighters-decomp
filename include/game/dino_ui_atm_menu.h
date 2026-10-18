@@ -15,7 +15,9 @@ public:
     virtual void OnFocus(MMenuItem *item);
     virtual void OnDecide(MMenuItem *item);
 
-    u32 unkB4[21];      // 0xB4
+    u32 unkB4[3];       // 0xB4
+    MMenuItem *mTeamButtons[3]; // 0xC0
+    u32 unkCC[15];      // 0xCC
     u32 mUnk108;        // 0x108
     u32 mUnk10C;        // 0x10C
     u32 *mResult;       // 0x110

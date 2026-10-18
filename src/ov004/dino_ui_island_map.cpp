@@ -21,6 +21,8 @@
 #include "game/guid_man.h"
 #include "game/dino_map_back_button.h"
 #include "game/dino_sound.h"
+#include "m/bright.h"
+#include "m/display.h"
 
 extern const int data_02089adc[10]; // the place each map item stands for
 
@@ -178,6 +180,25 @@ void BitmapMove::Apply(int step) {
 void DinoUiIslandMapMenu::OnBackDecided() {
     *mResult = -1;
     OnSpotDecided();
+}
+
+extern const int data_020899c4, data_020899d8, data_02089a00;
+
+// Fades both screens out, then exits.
+void DinoUiIslandMapMenu::OnSpotDecided() {
+    mUnk150->Clear();
+    mUnkF8->Exit();
+    MTask *exit = CreateExitTransfer();
+    MTask *fadeSub = gLcd->mSub->mBright->CreateFadeOutToBlack(data_020899d8, data_020899c4);
+    MTask *fadeMain = gLcd->mMain->mBright->CreateFadeOutToBlack(data_020899d8, data_020899c4);
+    MParallelTaskSet *fades = new MParallelTaskSet(TRUE);
+    fades->AddTail(fadeMain);
+    fades->AddTail(fadeSub);
+    MTask *timer = new MTimer(data_02089a00);
+    MSerialTaskSet *serial = &mSerial;
+    serial->AddTail(timer);
+    serial->AddTail(fades);
+    serial->AddTail(exit);
 }
 
 void IslandMapKeyCheckTask::Execute() {
