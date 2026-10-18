@@ -46,6 +46,8 @@ public:
     void State021610b0();
     void State02161164();
     void State02161260();
+    void StateStopAnswered();
+    void State02161d48();
 
     void (DinoCleaning::*mState)(); // 0x94
     u32 mUnk9C;                     // 0x9C
@@ -64,7 +66,8 @@ public:
     DinoCleaningToolMenu *mToolMenu;    // 0xEC
     u32 mTool;                      // 0xF0: the tool in use
     u32 mNextTool;                  // 0xF4: the tool to switch to
-    DinoCleaningTool *mTools[6];    // 0xF8
+    DinoCleaningTool *mTools[5];    // 0xF8
+    MTask *mUnk10C;                 // 0x10C
     u32 mUnk110;                    // 0x110: a count shown as text
     u32 mUnk114;                    // 0x114
     MTextPicture *mUnk118;          // 0x118: the count's text

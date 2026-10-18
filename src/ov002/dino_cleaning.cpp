@@ -24,6 +24,7 @@
 #include "game/dino_cleaning_status.h"
 #include "m/picture.h"
 #include "m/menu.h"
+#include "m/window.h"
 #include <stdio.h>
 
 #pragma auto_inline off
@@ -207,18 +208,23 @@ extern "C" struct {
 extern "C" struct {
     u8 unk00[0x10];
     void (DinoCleaning::*State02161164_10)(); // 0x10
-    u8 unk18[0x40 - 0x18];
+    u8 unk18[0x28 - 0x18];
+    void (DinoCleaning::*State02161490_28)(); // 0x28
+    u8 unk30[0x40 - 0x30];
     void (DinoCleaning::*Unk021618c8_40)();
-    u8 unk48[0x68 - 0x48];
+    u8 unk48[0x58 - 0x48];
+    void (DinoCleaning::*State021618c8_58)(); // 0x58
+    u8 unk60[0x68 - 0x60];
     void (DinoCleaning::*Unk02161490_68)();
     void (DinoCleaning::*StateWake_70)();
     void (DinoCleaning::*State02160f54_78)(); // 0x78
 } data_ov002_02165a6c;
 extern "C" struct {
-    u8 unk00[0x10];
+    u8 unk00[0x8];
+    void (DinoCleaning::*State02161d48_08)(); // 0x08
     void (DinoCleaning::*StateStopTool_10)();
     u8 unk18[0x20 - 0x18];
-    void (DinoCleaning::*Unk02161c20_20)();
+    void (DinoCleaning::*StateStopAnswered_20)();
     u8 unk28[0x60 - 0x28];
     void (DinoCleaning::*StateStopTool_60)();
     u8 unk68[0x80 - 0x68];
@@ -342,7 +348,7 @@ void DinoCleaning::StateStopConfirm() {
     DinoSoundPause();
     mUnkE4->SetUnkA0(0x19, TRUE);
     mUnk144->AddTail(new DinoCleaningStopConfirm(this, &mStop));
-    mState = data_ov002_02165aec.Unk02161c20_20;
+    mState = data_ov002_02165aec.StateStopAnswered_20;
 }
 
 // Template task instances the game emits in this file. Until the code that makes the tasks is decompiled, they are
@@ -355,6 +361,32 @@ template class MCallTask0<DinoCleaning, DinoHelpBase>;
 template MTask *MCreateCallTask(DinoCleaning *obj, void (DinoHelpBase::*func)());
 template class MBgCallTask0<DinoCleaning>;
 template MTask *MCreateBgCallTask(DinoCleaning *obj, void (DinoCleaning::*func)(), int thread);
+
+// The answer to "stop cleaning?": no goes back to it; yes finishes the rock and stops the tools.
+void DinoCleaning::StateStopAnswered() {
+    DinoSoundResume();
+    if (!mStop) {
+        mUnkE4->SetUnkA0(0x19, FALSE);
+        mState = data_ov002_02165a6c.State02161490_28;
+        return;
+    }
+    DinoSoundPlaySe(0x1F, 0);
+    mUnkE4->SetUnkA0(0x18, TRUE);
+    mUnkE4->SetUnkA0(1, FALSE);
+    mUnkE4->SetUnkA0(2, TRUE);
+    mUnk10C->Exit();
+    mStatus->StatePause();
+    mToolMenu->DisableAll();
+    mKasekiRock->Finish();
+    mToolMenu->Deactivate();
+    gCurrentDisplay->mBlend->Reset();
+    gCurrentDisplay->mWin->Reset();
+    DinoHelpBase::Disable();
+    mTools[mTool]->Unk1C();
+    mSerial.AddTail(new MTimer(60));
+    DinoSoundPlaySe(0x37, 0);
+    mState = data_ov002_02165aec.State02161d48_08;
+}
 
 // Quits: fades both screens and the music out.
 void DinoCleaning::StateQuit() {
