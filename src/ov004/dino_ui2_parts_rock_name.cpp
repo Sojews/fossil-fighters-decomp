@@ -4,6 +4,7 @@
 // Derived destructors have their bases' destructor bodies inlined; auto-inlining the ones defined above does that.
 #pragma auto_inline on
 
+#include "game/dino_backup.h"
 #include "game/dino_ui2_parts_rock_name_menu.h"
 #include "game/dino_ui2_parts_rock_name.h"
 #include "game/dino_ui2_parts_kaseki_button.h"
@@ -44,6 +45,24 @@ MRect DinoUi2PartsKasekiButton::GetFrame() {
 }
 
 extern "C" const char data_ov004_02176b2c[]; // ""
+
+// The fossil's name, in a color by its state.
+void DinoUi2PartsRockName::SetEntry(const DinoBackupEntry *entry, BOOL selected) {
+    DinoKasekiRockState rock;
+    gDinoBackup->GetKasekiRock(entry->id, (u32 *)&rock);
+    mText->SetText(std::string(data_ov004_02176b2c));
+    if (mText->mState == STATE_RUN) {
+        mText->Execute();
+    }
+    if (selected) {
+        mFont->SetShadowColor(3);
+    } else if (!rock.unk10 && entry->unk10_3) {
+        mFont->SetShadowColor(5);
+    } else {
+        mFont->SetShadowColor(1);
+    }
+    mText->SetText(gDinoBackup->GetEntryName(entry));
+}
 
 void DinoUi2PartsRockName::Clear() {
     mText->SetText(std::string(data_ov004_02176b2c));

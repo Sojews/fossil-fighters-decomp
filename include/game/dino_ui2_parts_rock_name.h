@@ -5,13 +5,17 @@
 #include "m/motion.h"
 #include "m/indicator.h"
 
+struct DinoBackupEntry;
+class MFont;
+
 class DinoUi2PartsRockName : public MProcess {
 public:
     virtual ~DinoUi2PartsRockName();
     virtual void Idle();
+    void SetEntry(const DinoBackupEntry *entry, BOOL selected);
     void Clear();
 
-    MMotion *mMotion;       // 0x74
+    MFont *mFont;           // 0x74
     MIndicator *mText;      // 0x78
 };
 

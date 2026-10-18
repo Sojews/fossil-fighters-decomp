@@ -4,6 +4,10 @@
 // The buttons' destructors have the base destructor body inlined; auto-inlining the one defined above does that.
 #pragma auto_inline on
 
+#include "game/dino_ui2_parts_rock_name.h"
+
+#include "game/dino_ui2_field_menu_cursor.h"
+
 #include "m/input.h"
 
 #include "game/dino_ui2_parts_kaseki_button.h"
@@ -253,6 +257,42 @@ void DinoUi2ContainerBaseMenu::OnIdle() {
             FocusItem(mBack);
         }
     }
+}
+
+// Moves the cursor to the item, and shows the entry's name (marked if it can't be marked now).
+void DinoUi2ContainerBaseMenu::OnFocus(MMenuItem *item) {
+    mIdled = FALSE;
+    if (item == NULL) {
+        mCursor->Hide();
+        return;
+    }
+    SetSelectedItem(dynamic_cast<DinoHelpItem *>(item));
+    if (mCursor->IsHidden()) {
+        mCursor->Show();
+        mCursor->SetFrame(item->GetFrame());
+    } else {
+        mCursorTasks->Clear();
+        mCursorTasks->AddTail(mCursor->CreateMoveTask(mCursor->GetFrame(), item->GetFrame(), 10, -5));
+    }
+    for (int i = 0; i < 8; i++) {
+        if (item == mItems[i]) {
+            u32 index = mPage * 8 + i;
+            if (index >= mUnk134.size()) {
+                continue;
+            }
+            DinoBackupEntry entry;
+            GetEntry(index, &entry);
+            if (!GetFlag(mPage * 8 + i) && (!IsMarkable(&entry) || !CanMark())) {
+                mRockName->SetEntry(&entry, TRUE);
+            } else {
+                mRockName->SetEntry(&entry, FALSE);
+            }
+            mSelected = mPage * 8 + i;
+            return;
+        }
+    }
+    mRockName->Clear();
+    mSelected = 0xFF;
 }
 
 // An entry button: marks it (if it and the container allow) or unmarks it.

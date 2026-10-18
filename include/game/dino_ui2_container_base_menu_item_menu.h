@@ -15,6 +15,9 @@
 
 struct DinoBackupEntry;
 
+class DinoUi2FieldMenuCursor;
+class DinoUi2PartsRockName;
+
 class DinoUi2ContainerBaseMenu : public DinoHelpBase, public MMenu {
 public:
     virtual ~DinoUi2ContainerBaseMenu();
@@ -40,7 +43,9 @@ public:
     u32 mUnk118[2];                 // 0x118
     MMenuItem *mBack;               // 0x120
     MMenuItem *mLinkFrom;           // 0x124: linked to the first page item
-    u32 mUnk128[3];
+    MTaskSet *mCursorTasks;         // 0x128
+    DinoUi2FieldMenuCursor *mCursor; // 0x12C
+    DinoUi2PartsRockName *mRockName; // 0x130
     std::vector<unsigned short> mUnk134; // 0x134: (the element type is a guess, distinct from other overlays')
     u8 mSelected;                   // 0x140: 0xFF for none
     u8 mIdled;                      // 0x141: set once the menu has idled (decides only count after)

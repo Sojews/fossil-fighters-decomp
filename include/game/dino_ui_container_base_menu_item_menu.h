@@ -15,6 +15,9 @@
 
 struct DinoBackupEntry;
 
+class DinoUi3PartsCursor;
+class DinoUi3PartsRockName;
+
 class DinoUiContainerBaseMenu : public DinoHelpBase, public MMenu {
 public:
     virtual ~DinoUiContainerBaseMenu();
@@ -51,7 +54,9 @@ public:
     u32 mUnk12C[2];             // 0x12C
     MMenuItem *mBack;           // 0x134
     MMenuItem *mLinkFrom;       // 0x138: linked to the first page item
-    u32 mUnk13C[3];
+    MTaskSet *mCursorTasks;     // 0x13C
+    DinoUi3PartsCursor *mCursor; // 0x140
+    DinoUi3PartsRockName *mRockName; // 0x144
     std::vector<u32> mUnk148;   // 0x148: the entries
     u8 mSelected;               // 0x154: 0xFF for none
     u8 mIdled;                  // 0x155: set once the menu has idled (decides only count after)
