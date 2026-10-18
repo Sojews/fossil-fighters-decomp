@@ -60,6 +60,8 @@ public:
     void StateLeave();
     void StateFinish();
     void OnScanMessage(MMessage *msg);
+    void OnExchangeMessage(MMessage *msg);
+    void StateExchange();
     void Unk02155f24();
     // Sets when the next exchange may happen.
     void SetNextTime() {
@@ -72,7 +74,7 @@ public:
     void (DinoUiExchange::*mState)();               // 0xA8
     void (DinoUiExchange::*mOnMessage)(MMessage *msg); // 0xB0
     MMultiPlay *mMultiPlay;         // 0xB8
-    u32 unkBC;
+    MTask *mUnkBC;                  // 0xBC
     BOOL mAnswer;                   // 0xC0: whether to exchange
     MTaskSet *mTasks;               // 0xC4
     u32 unkC8;
@@ -86,13 +88,17 @@ public:
     std::set<DinoMacAddress> mPartners; // 0xE8: the ones exchanged with already
     u8 unkF4[8];
     u8 mBeacon[0x18];               // 0xFC: sent when this side is the parent
-    u8 unk114[0x130 - 0x114];
+    u8 unk114[0x12C - 0x114];
+    u8 mDone[2];                    // 0x12C: each side has sent its DinoExchangeDoneSignal
+    u8 unk12E[2];
     u64 mNextTime;                  // 0x130: in play frames
     DinoUiWirelessCancel *mCancel;  // 0x138
     u8 mCancelled;                  // 0x13C
     u8 unk13D[3];
     MResource<void> mResource;      // 0x140
-    u8 unk150[0x1EC - 0x150];
+    DinoBackupEntry mRock;          // 0x150: the partner's
+    DinoPlayerProfile mProfile;     // 0x164: the partner's
+    u8 unk1E8[0x1EC - 0x1E8];
 };
 
 #endif

@@ -12,6 +12,7 @@
 #include "game/dino_backup.h"
 #include "game/dino_resource.h"
 #include "m/seed_generator.h"
+#include "game/dino_message.h"
 #include "m/smart_oam.h"
 #include "game/dino_sound.h"
 #include "m/sleep.h"
@@ -84,9 +85,12 @@ template class std::__red_black_tree<DinoMacAddress, DinoMacAddress, std::__iden
 
 // The TU's pooled pointer-to-member constants (see menu.cpp).
 extern "C" struct {
-    u8 unk00[0x24];
+    u8 unk00[0x14];
+    void (DinoUiExchange::*State02156acc_14)(); // 0x14
+    u8 unk1C[0x24 - 0x1C];
     void (DinoUiExchange::*OnScanMessage_24)(MMessage *msg); // 0x24
-    u8 unk2C[0x3C - 0x2C];
+    void (DinoUiExchange::*StateRestart_2C)(); // 0x2c
+    u8 unk34[0x3C - 0x34];
     void (DinoUiExchange::*StateAsk_3C)(); // 0x3c
     u8 unk44[0x4C - 0x44];
     void (DinoUiExchange::*StateQuit_4C)(); // 0x4c
@@ -244,6 +248,41 @@ void DinoUiExchange::StateFinish() {
         serial->AddTail(hide);
         serial->AddTail(fade);
         serial->AddTail(exit);
+    }
+}
+
+static inline void AddSerial(MProcess *process, MTask *a, MTask *b, MTask *c) {
+    MSerialTaskSet *serial = &process->mSerial;
+    serial->AddTail(a);
+    serial->AddTail(b);
+    serial->AddTail(c);
+}
+
+// Waits until both sides are done, then ends the session.
+void DinoUiExchange::StateExchange() {
+    Dispatch();
+    if (mMultiPlay->IsFailed()) {
+        mUnkBC->Exit();
+        mState = data_ov004_02171de0.StateRestart_2C;
+        return;
+    }
+    if (mDone[0] && mDone[1]) {
+        AddSerial(this, new MTimer(5), MTaskExitTransfer::Create(mUnkBC), mMultiPlay->CreateResetTask());
+        mState = data_ov004_02171de0.State02156acc_14;
+    }
+}
+
+void DinoUiExchange::OnExchangeMessage(MMessage *msg) {
+    switch (msg->mId) {
+    case 0x100A8:
+        mRock = *(DinoBackupEntry *)((DinoExchangeKasekiRockSignal *)msg)->mUnk0C;
+        break;
+    case 0x100A9:
+        mProfile = *(DinoPlayerProfile *)((DinoExchangeSenryuSignal *)msg)->mUnk0C;
+        break;
+    case 0x100AA:
+        mDone[((DinoExchangeDoneSignal *)msg)->mUnk0C] = TRUE;
+        break;
     }
 }
 

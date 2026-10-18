@@ -112,13 +112,12 @@ struct DinoSaveSummary {
 
 // What a player shows others in multiplayer.
 struct DinoPlayerProfile {
-    char unk00[0x66];
-    u16 name[8];        // 0x66
-    u8 unk76[2];
+    char unk00[0x65];
+    u16 name[9];        // 0x66
     u8 unk78;           // 0x78
     u8 unk79;
     u8 unk7A;           // 0x7A
-    u8 unk7B[9];
+    u64 unk7C;          // 0x7C
 };
 
 struct DinoCharaState {
