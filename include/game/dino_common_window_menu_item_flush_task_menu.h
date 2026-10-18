@@ -6,12 +6,6 @@
 #include "game/help.h"
 #include "game/dino_window_choice.h"
 
-// One of the menu's entries.
-struct DinoCommonWindowMenuEntry {
-    u32 id;             // 0x00
-    MRect rect;         // 0x04
-    std::string text;   // 0x14
-};
 
 class DinoCommonWindowMenu : public DinoHelpBase, public MMenu {
 public:

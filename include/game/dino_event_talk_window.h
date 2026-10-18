@@ -14,6 +14,8 @@ public:
     virtual ~DinoEventTalkWindow();
     virtual void Idle();
 
+    void AddEntry(u32 id, MRect rect, const std::string &text);
+
     void (DinoEventTalkWindow::*mState)();  // 0x74
     u32 mUnk7C[2];                          // 0x7C
     std::string mText;                      // 0x84
@@ -24,7 +26,7 @@ public:
     std::string mUnkC8;                     // 0xC8
     std::string mUnkD4;                     // 0xD4
     std::string mUnkE0;                     // 0xE0
-    std::vector<std::string> mUnkEC;        // 0xEC
+    std::vector<DinoCommonWindowMenuEntry> mEntries;    // 0xEC
 };
 
 #endif

@@ -8,6 +8,14 @@
 DinoEventTalkWindow::~DinoEventTalkWindow() {
 }
 
+void DinoEventTalkWindow::AddEntry(u32 id, MRect rect, const std::string &text) {
+    DinoCommonWindowMenuEntry entry;
+    entry.id = id;
+    entry.rect = rect;
+    entry.text = text;
+    mEntries.push_back(entry);
+}
+
 void DinoEventTalkWindow::Idle() {
     (this->*mState)();
 }
@@ -18,3 +26,4 @@ template class MBgCallTask0<DinoEventTalkWindow>;
 template MTask *MCreateBgCallTask(DinoEventTalkWindow *obj, void (DinoEventTalkWindow::*func)(), int thread);
 template class std::__vec_deleter<DinoWindowChoice, std::allocator<DinoWindowChoice> >;
 template class std::__vec_deleter<std::string, std::allocator<std::string> >;
+template class std::__vec_deleter<DinoCommonWindowMenuEntry, std::allocator<DinoCommonWindowMenuEntry> >;
