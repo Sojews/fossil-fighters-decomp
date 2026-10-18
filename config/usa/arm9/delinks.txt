@@ -444,6 +444,21 @@ libs/msl/src/printf.c:
     .text       start:0x0207da28 end:0x0207f194
     .exceptix   start:0x02088534 end:0x020885ac
 
+libs/nitrosdk/src/ctrdg/ctrdg.c:
+    .text       start:0x0207cde0 end:0x0207cff8
+
+libs/nitrosdk/src/ctrdg/ctrdg_proc.c:
+    .text       start:0x0207cff8 end:0x0207d230
+
+libs/nitrosdk/src/ctrdg/ctrdg_task.c:
+    .text       start:0x0207d230 end:0x0207d338
+
+libs/nitrosdk/src/math/math.c:
+    .text       start:0x0207d338 end:0x0207d370
+
+libs/nitrosdk/src/math/crc.c:
+    .text       start:0x0207d398 end:0x0207d3f0
+
 libs/msl/src/abort_exit_arm_eabi.c:
     .text       start:0x0207d3f0 end:0x0207d4e0
 
