@@ -45,7 +45,7 @@ public:
     u32 mUnk108;                    // 0x108
     std::vector<void *> mItems;     // 0x10C: this page's items
     u32 mUnk118[2];                 // 0x118
-    MMenuItem *mBack;               // 0x120
+    DinoUi2ContainerBaseMenuItem *mBack; // 0x120
     DinoUi2ContainerBaseMenuItem *mLinkFrom; // 0x124: the decide button, linked to the first page item
     MTaskSet *mCursorTasks;         // 0x128
     DinoUi2FieldMenuCursor *mCursor; // 0x12C
@@ -62,6 +62,7 @@ public:
     void SetFlag(int index, u8 value);
     void RefreshMarks();
     void ResetDecideButton();
+    void AddHelpEntries(u32 backText);
 };
 
 class DinoUi2CannonShootMenu : public DinoUi2ContainerBaseMenu {

@@ -226,6 +226,12 @@ DinoUi2ContainerBaseMenu::DinoUi2ContainerBaseMenu()
     mItems.clear();
 }
 
+// The help for the decide and back buttons.
+void DinoUi2ContainerBaseMenu::AddHelpEntries(u32 backText) {
+    AddEntry((u32)(DinoHelpItem *)mLinkFrom, 1, 0);
+    AddEntry((u32)(DinoHelpItem *)mBack, 4, backText);
+}
+
 void DinoUi2ContainerBaseMenu::ResetDecideButton() {
     DinoUi2ContainerBaseMenuItem *decide = mLinkFrom;
     decide->mSerial.Clear();
