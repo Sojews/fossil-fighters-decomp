@@ -90,12 +90,16 @@ public:
     // slot unk18 0x20619a0 _ZN7MMotion5Unk48Ei
 };
 
+class DinoBattleViewCreature;
+
 class DinoBattleViewCreatureAttackIcon : public MMenuItem {
 public:
     virtual ~DinoBattleViewCreatureAttackIcon();
     virtual MRect GetFrame();
     virtual void OnFocusChanged(BOOL focused);
     virtual void OnDecide();
+
+    DinoBattleViewCreature *mCreature;  // 0x88
 };
 
 class DinoBattleViewUiRootSelectItem : public MMenuItem, public DinoHelpItem {

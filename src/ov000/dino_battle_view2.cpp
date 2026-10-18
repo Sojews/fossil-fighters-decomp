@@ -9,6 +9,9 @@
 #include "game/dino_battle_view2.h"
 #include "types.h"
 #include "game/dino_battle_view_class.h"
+#include "m/smart_oam.h"
+#include "game/creature_motion.h"
+#include "game/dino_battle_view_creature.h"
 
 AnyInputTimerWait::~AnyInputTimerWait() {
 }
@@ -45,6 +48,14 @@ DinoBattleViewAbilityIcon::~DinoBattleViewAbilityIcon() {
 }
 
 void DinoBattleViewUiRootSelectItem::OnDecide() {
+}
+
+// NONMATCHING: the frame copy loads the offset's y before x (register order only).
+MRect DinoBattleViewCreatureAttackIcon::GetFrame() {
+    CreatureMotion *motion = (CreatureMotion *) mCreature->mMotion;
+    MSmartOam *oam = motion->mOam;
+    MPoint offset(-oam->mOffset.x, -oam->mOffset.y);
+    return motion->GetFrame().Moved(offset);
 }
 
 void DinoBattleViewCreatureAttackIcon::OnFocusChanged(BOOL value) {
