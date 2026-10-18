@@ -4,14 +4,18 @@
 #include "m/task.h"
 #include "m/motion.h"
 #include "m/indicator.h"
+#include "game/dino_backup.h"
 
+// A kaseki rock's name.
 class DinoUiPartsRockName : public MProcess {
 public:
+    DinoUiPartsRockName(MPoint pos);
     virtual ~DinoUiPartsRockName();
     virtual void Idle();
+    void SetEntry(const DinoBackupEntry *entry, BOOL selected);
     void Clear();
 
-    MMotion *mMotion;       // 0x74
+    MFont *mFont;           // 0x74
     MIndicator *mText;      // 0x78
 };
 

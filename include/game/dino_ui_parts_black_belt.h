@@ -3,8 +3,10 @@
 
 #include "m/task.h"
 
+// A black band across the top screen.
 class DinoUiPartsBlackBelt : public MProcess {
 public:
+    DinoUiPartsBlackBelt();
     virtual ~DinoUiPartsBlackBelt();
     virtual void Idle();
 };

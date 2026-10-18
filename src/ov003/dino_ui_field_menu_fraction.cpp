@@ -2,8 +2,9 @@
 // One TU: the field menu parts (0x021584d4-0x0215b008).
 // NONMATCHING: the constructors of DinoUiFieldMenuNumber and DinoUiFieldMenuFraction4 (the game keeps this + i * 4
 // in a stack slot across the first string temporary's destructor), DinoUiFieldMenuNumber3, DinoUiPartsNumber8 and
-// DinoUiPartsReviverName (the game loads gCurrentDisplay after copying the canvas size), and
-// DinoUiPartsReviverName::SetCreature (the game takes the length limit's address from its own literal).
+// DinoUiPartsReviverName and DinoUiPartsRockName (the game loads gCurrentDisplay after copying the canvas size),
+// DinoUiPartsReviverName::SetCreature (the game takes the length limit's address from its own literal) and
+// DinoUiPartsKasekiButton::Setup (four stack slots in another order).
 
 // Derived destructors have their bases' destructor bodies inlined; auto-inlining the ones defined above does that.
 #pragma auto_inline on
@@ -27,6 +28,7 @@
 #include "game/dino_ui_field_menu_fraction4.h"
 #include "game/dino_ui_field_menu_cursor.h"
 #include "m/display.h"
+#include "m/lcd.h"
 #include "m/font.h"
 #include "m/obj.h"
 #include "m/oam_canvas.h"
@@ -43,6 +45,8 @@ struct MedalMotion {
 };
 extern MedalMotion data_ov003_02160fb0[5];
 extern const char *data_ov003_02160f60[];
+extern const MPoint data_ov003_02160d3c; // where the black belt goes
+extern const char *data_ov003_02161028[]; // the kaseki icon motions
 
 DinoUiFieldMenuFraction::~DinoUiFieldMenuFraction() {
 }
@@ -224,8 +228,111 @@ void DinoUiFieldMenuNumber::Idle() {
 
 extern "C" const char data_ov003_02161cd4[]; // ""
 
+DinoUiPartsBlackBelt::DinoUiPartsBlackBelt() : MProcess(NULL) {
+    MObjCanvas *canvas = new MObjCanvas(gLcd->GetTopDisplay(), MPoint(256, 16), gDinoResource->GetUnkTable(), TRUE);
+    mParallel.AddTail(canvas);
+    canvas->FillRect(MRect(0, 0, 256, 16), 1);
+    canvas->FillRect(MRect(0, 0, 256, 1), 10);
+    canvas->SetPosition(data_ov003_02160d3c);
+    canvas->SetPriority(1);
+    canvas->Show();
+}
+
+DinoUiPartsRockName::DinoUiPartsRockName(MPoint pos) : MProcess(NULL) {
+    mFont = gDinoResource->CreateFont12(0, 1, 0);
+    MObjCanvas *canvas = new MObjCanvas(gCurrentDisplay, gCurrentDisplay->mObj->mOam, MPoint(256, 32),
+                                        gDinoResource->GetUnkTable(), TRUE);
+    canvas->GetOamUnit()->SetMode(1);
+    mText = new MIndicator(canvas, mFont, 0);
+    mParallel.AddTail(mText);
+    mText->SetPosition(pos);
+    mText->SetPriority(2);
+    mText->Show();
+}
+
+// The rock's name, in the selected color or, for a rock not cleaned yet, its own.
+void DinoUiPartsRockName::SetEntry(const DinoBackupEntry *entry, BOOL selected) {
+    DinoKasekiRockState rock;
+    gDinoBackup->GetKasekiRock(entry->id, (u32 *)&rock);
+    mText->SetText(std::string(data_ov003_02161cd4));
+    if (mText->mState == STATE_RUN) {
+        mText->Execute();
+    }
+    if (selected) {
+        mFont->SetShadowColor(3);
+    } else if (!rock.unk10 && entry->unk10_3) {
+        mFont->SetShadowColor(5);
+    } else {
+        mFont->SetShadowColor(1);
+    }
+    mText->SetText(gDinoBackup->GetEntryName(entry));
+}
+
 void DinoUiPartsRockName::Clear() {
     mText->SetText(std::string(data_ov003_02161cd4));
+}
+
+DinoUiPartsKasekiButton::DinoUiPartsKasekiButton(MSmartOam *oam, MPoint pos, DinoKasekiButtonInfo info, u8 marked) {
+    mPos = pos;
+    Setup(oam, info);
+    SetMarked(marked);
+    SetMode(2);
+}
+
+void DinoUiPartsKasekiButton::Setup(MSmartOam *oam, DinoKasekiButtonInfo info) {
+    mMotion = new MMotion(std::string(data_ov003_02161028[info.icon % 30]), oam, 2, 1);
+    mMotion->Play(info.color + 1, 0);
+    mMotion->SetPosition(mPos);
+    mMotion->SetPriority(2);
+    mMotion->GetUnit()->SetMode(1);
+    mMotion->Show();
+    mParallel.AddTail(mMotion);
+    mView = new MMotion(std::string(data_ov003_02160c60[31]), oam, 2, 1);
+    mView->Play(1, 0);
+    mView->SetPosition(mPos);
+    mView->SetPriority(2);
+    mView->GetUnit()->SetMode(1);
+    mView->Hide();
+    mParallel.AddTail(mView);
+    mMark = new MMotion(std::string(data_ov003_02160c60[31]), oam, 2, 1);
+    mMark->Play(2, 0);
+    mMark->SetPosition(mPos);
+    mMark->SetPriority(2);
+    mMark->GetUnit()->SetMode(1);
+    mParallel.AddTail(mMark);
+    u8 type = info.type;
+    if (type == 3 || ((type == 1 || type == 2) && info.level >= 125)) {
+        mBadge = new MMotion(std::string(data_ov003_02160c60[26]), oam, 0, 1);
+        if (type == 3) {
+            mBadge->Play(3, 0);
+        } else {
+            mBadge->Play(4, 0);
+        }
+        mBadge->SetPosition(MPoint(mPos.x - 3, mPos.y + 15));
+        mBadge->SetPriority(2);
+        mBadge->GetUnit()->SetMode(1);
+        mBadge->Show();
+        mParallel.AddTail(mBadge);
+    } else if (type == 1 || type == 2 || type == 5) {
+        for (int i = 0; i < 4; i++) {
+            mLevel[i] = new MMotion(std::string(data_ov003_02160c60[6]), oam, 0, 1);
+            mLevel[i]->SetPosition(mPos.Offset(i * 8 - 14, 16));
+            mLevel[i]->SetPriority(2);
+            mLevel[i]->GetUnit()->SetMode(1);
+            mLevel[i]->Show();
+            mParallel.AddTail(mLevel[i]);
+        }
+        mLevel[3]->SetPosition(MPoint(mPos.x + 9, mPos.y + 15));
+        int level = info.level;
+        mLevel[0]->Play(level / 100 % 10 + 3, 0);
+        mLevel[1]->Play(level / 10 % 10 + 3, 0);
+        mLevel[2]->Play(level % 10 + 3, 0);
+        if (type == 5) {
+            mLevel[3]->Play(2, 0);
+        } else {
+            mLevel[3]->Play(1, 0);
+        }
+    }
 }
 
 void DinoUiPartsKasekiButton::SetMarked(BOOL marked) {

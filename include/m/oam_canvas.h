@@ -4,6 +4,7 @@
 
 #include <vector>
 #include "m/canvas.h"
+#include "m/display.h"
 #include "m/obj.h"
 #include "m/smart_oam.h"
 
@@ -61,6 +62,9 @@ class MObjCanvas : public MOamCanvas<MOam, MOamUnit> {
 public:
     MObjCanvas(MDisplay *display, MOam *oam, MPoint size, const void *palette, BOOL fromEnd)
         : MOamCanvas<MOam, MOamUnit>(display, oam, size, palette, fromEnd) {}
+    // With the display's sprites.
+    MObjCanvas(MDisplay *display, MPoint size, const void *palette, BOOL fromEnd)
+        : MOamCanvas<MOam, MOamUnit>(display, display->mObj->mOam, size, palette, fromEnd) {}
     virtual ~MObjCanvas() {}
 };
 
