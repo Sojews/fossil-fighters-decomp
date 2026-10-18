@@ -203,12 +203,11 @@ DinoUiContainerBaseDecideButton::DinoUiContainerBaseDecideButton(DinoUiContainer
     : DinoUiContainerBaseMenuItem(owner, motion, data_ov005_0216c2e8.mDecidePos, textId) {
 }
 
-// NONMATCHING: the game reads the owner's oam before copying the motion's name; ours copies first.
 DinoUiContainerBaseMenuItem::DinoUiContainerBaseMenuItem(DinoUiContainerBaseMenu *owner, std::string motion,
                                                          MPoint pos, u32 textId) {
     mOwner = owner;
     mTextId = textId;
-    mMotion = new MMotion(std::string(motion), mOwner->mOam, 2, 1);
+    mMotion = new MMotion(std::string(motion), mOwner->GetOam(), 2, 1);
     mMotion->Play(1, 0);
     mMotion->SetPosition(pos);
     mMotion->SetPriority(1);

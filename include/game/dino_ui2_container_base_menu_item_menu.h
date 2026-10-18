@@ -23,6 +23,8 @@ class DinoUi2ContainerBaseMenuItem;
 class DinoUi2ContainerBaseMenu : public DinoHelpBase, public MMenu {
 public:
     DinoUi2ContainerBaseMenu();
+    void CreateDecideButton(const char *motion, u32 textId);
+    MSmartOam *GetOam() { return mOam; }
     virtual ~DinoUi2ContainerBaseMenu();
     virtual BOOL TryDecide() = 0;   // the decide button was pressed; FALSE if nothing happens
     virtual void OnStart();

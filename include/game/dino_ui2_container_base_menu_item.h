@@ -10,6 +10,7 @@ class DinoUi2ContainerBaseMenu;
 
 class DinoUi2ContainerBaseMenuItem : public MMenuItem, public DinoHelpItem {
 public:
+    DinoUi2ContainerBaseMenuItem(DinoUi2ContainerBaseMenu *owner, std::string motion, MPoint pos, u32 textId);
     virtual ~DinoUi2ContainerBaseMenuItem();
     virtual MRect GetFrame();
     virtual void OnFocusChanged(BOOL focused);
@@ -43,6 +44,7 @@ public:
 
 class DinoUi2ContainerBaseDecideButton : public DinoUi2ContainerBaseMenuItem {
 public:
+    DinoUi2ContainerBaseDecideButton(DinoUi2ContainerBaseMenu *owner, std::string motion, u32 textId);
     virtual ~DinoUi2ContainerBaseDecideButton();
     virtual MRect GetFrame();
     virtual void OnFocusChanged(BOOL focused);

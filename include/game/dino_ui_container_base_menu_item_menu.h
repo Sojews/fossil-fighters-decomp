@@ -46,6 +46,7 @@ public:
     void HidePageButtons();
     void AddHelpEntries(u32 backText);
     void CreateDecideButton(const char *motion, u32 textId);
+    MSmartOam *GetOam() { return mOam; }
 
     DinoUi3PartsFraction *mFraction; // 0xB4: "page n/m"
     u8 mFlags[0x40];            // 0xB8

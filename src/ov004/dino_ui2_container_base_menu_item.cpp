@@ -156,7 +156,9 @@ void DinoUi2ContainerBaseDecideButton::OnFocusChanged(BOOL focused) {
 struct DinoUi2ContainerBaseStatics {
     u8 unk00[0x50];
     MPoint mDecideTopLeft;      // 0x50
-    u8 unk58[0x20];
+    u8 unk58[0x10];
+    MPoint mDecidePos;          // 0x68
+    u8 unk70[8];
     MPoint mDecideBottomRight;  // 0x78
 };
 extern "C" DinoUi2ContainerBaseStatics data_ov004_02176b44;
@@ -212,6 +214,29 @@ void DinoUi2ContainerBaseMenu::OnBackDecided() {
 #pragma auto_inline off
 
 template MTask *MCreateCallTask(DinoUi2CannonShootMenu *obj, void (DinoUi2CannonShootMenu::*func)());
+
+void DinoUi2ContainerBaseMenu::CreateDecideButton(const char *motion, u32 textId) {
+    AddItem(mLinkFrom = new DinoUi2ContainerBaseDecideButton(this, motion, textId));
+    AddLink(mLinkFrom, 1, NULL);
+    AddLink(mLinkFrom, 3, NULL);
+}
+
+DinoUi2ContainerBaseDecideButton::DinoUi2ContainerBaseDecideButton(DinoUi2ContainerBaseMenu *owner,
+                                                                   std::string motion, u32 textId)
+    : DinoUi2ContainerBaseMenuItem(owner, motion, data_ov004_02176b44.mDecidePos, textId) {
+}
+
+DinoUi2ContainerBaseMenuItem::DinoUi2ContainerBaseMenuItem(DinoUi2ContainerBaseMenu *owner, std::string motion,
+                                                           MPoint pos, u32 textId) {
+    mOwner = owner;
+    mTextId = textId;
+    mMotion = new MMotion(std::string(motion), mOwner->GetOam(), 2, 1);
+    mMotion->Play(1, 0);
+    mMotion->SetPosition(pos);
+    mMotion->SetPriority(1);
+    mMotion->Show();
+    mParallel.AddTail(mMotion);
+}
 
 u8 DinoUi2ContainerBaseMenu::GetFlag(int index) {
     return mFlags[index];
