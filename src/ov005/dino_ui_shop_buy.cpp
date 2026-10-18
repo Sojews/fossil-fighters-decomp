@@ -14,6 +14,10 @@
 #include "m/lcd.h"
 #include "m/display.h"
 #include "m/bright.h"
+#include "game/dino_ui3_parts_money.h"
+#include "game/dino_ui3_parts_kaseki_button.h"
+#include "game/dino_backup.h"
+#include "m/input.h"
 
 #pragma auto_inline off
 
@@ -172,7 +176,7 @@ void DinoUiShopBuyBuyButton::OnDecide() {
 
 void DinoUiShopBuyBuyButton::OnFocusChanged(BOOL focused) {
     if (focused) {
-        if (mOwner->mUnk11C) {
+        if (mOwner->mCount) {
             mMotion->Play(2, 0);
         } else {
             mMotion->Play(1, 0);
@@ -204,4 +208,61 @@ DinoUiShopBuy::DinoUiShopBuy() : MProcess(NULL) {
 
 u8 DinoUiShopBuyMenu::GetFlag(int index) {
     return mFlags[index];
+}
+
+u32 DinoUiShopBuyMenu::GetPrice(int index) {
+    DinoBackupEntry entry;
+    gDinoBackup->GetUnk148(index, &entry);
+    const DinoKasekiDefs *defs = (const DinoKasekiDefs *)mFile.GetData();
+    return ((const DinoKasekiDef *)((const u8 *)defs + ((const u32 *)((const u8 *)defs + defs->tableOffset))[entry.id]))
+        ->price;
+}
+
+// X jumps to the buy button; B unchooses the selected item, or goes to (and then presses) the back button.
+void DinoUiShopBuyMenu::OnIdle() {
+    if (GetInput()->GetPressed() & 8) {
+        FocusItem(mLinkFrom);
+    }
+    if (GetInput()->GetPressed() & 2) {
+        if (mSelected != 0xFF && GetFlag(mSelected)) {
+            SetFlag(mSelected, FALSE);
+            ((DinoUi3PartsKasekiButton *)mItems[mSelected % 8])->SetMarked(FALSE);
+            RefreshPage3();
+            return;
+        }
+        if (mUnkC8->IsFocused()) {
+            mUnkC8->Decide();
+        } else {
+            FocusItem(mUnkC8);
+        }
+    }
+}
+
+// Chooses or unchooses the item, keeping the total.
+void DinoUiShopBuyMenu::SetFlag(int index, u8 flag) {
+    if (flag != mFlags[index]) {
+        mFlags[index] = flag;
+        if (flag) {
+            mTotal += GetPrice(index);
+            mCount++;
+            DinoSoundPlaySe(0x9C, 0);
+        } else {
+            mTotal -= GetPrice(index);
+            mCount--;
+            DinoSoundPlaySe(0x9D, 0);
+        }
+    }
+}
+
+// The items whose price would go over the money (or that there's no room for) can't be chosen.
+void DinoUiShopBuyMenu::RefreshPage3() {
+    mMoney->SetChange(mTotal);
+    for (int i = 0; i < mItems.size(); i++) {
+        if (!GetFlag(mPage * 8 + i) &&
+            (mTotal + GetPrice(mPage * 8 + i) > mFunds || mCount >= gDinoBackup->CountFreeUnk98())) {
+            ((DinoUi3PartsKasekiButton *)mItems[i])->SetActive(FALSE);
+        } else {
+            ((DinoUi3PartsKasekiButton *)mItems[i])->SetActive(TRUE);
+        }
+    }
 }
