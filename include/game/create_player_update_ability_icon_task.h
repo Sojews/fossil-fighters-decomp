@@ -111,6 +111,7 @@ public:
     u8 GetUnk15C();
     void SetUnk15C();
     MTask *CreateSendAbilityResultTask(MMessageObserver *target);
+    MTask *CreateUpdateColorTask(const u32 *ids, u32 count, u32 color);
 
     std::vector<DinoBattlePlayerEvent> mUnkA8; // 0xA8
     u32 unkB4;

@@ -450,6 +450,19 @@ u32 DinoBattleModelCreature::GetStatusUnk20() {
     return 0;
 }
 
+// Has the view recolor the creatures, all at once.
+MTask *DinoBattleModelPlayer::CreateUpdateColorTask(const u32 *ids, u32 count, u32 color) {
+    if (count != 0) {
+        MParallelTaskSet *set = new MParallelTaskSet(TRUE);
+        for (u32 i = 0; i < count; i++) {
+            set->AddTail(mUnkF4->CreatePostTask(new DinoBattleViewCreatureUpdateColorRequest(0, *ids, color)));
+            ids++;
+        }
+        return set;
+    }
+    return NULL;
+}
+
 u32 DinoBattleModelPlayer::GetUnkB8() {
     return mUnkB8;
 }

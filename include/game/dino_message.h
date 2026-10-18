@@ -2996,6 +2996,11 @@ public:
 class DinoBattleViewCreatureUpdateColorRequest : public MMessage {
 public:
     DinoBattleViewCreatureUpdateColorRequest() : MMessage(0x1009A) {}
+    DinoBattleViewCreatureUpdateColorRequest(u32 a, u32 b, u32 c) : MMessage(0x1009A) {
+        mUnk0C = a;
+        mUnk10 = b;
+        mUnk14 = c;
+    }
     virtual u32 GetSize() { return 16; }
     virtual void Write(void *buf) {
         MI_CpuCopy8(&mId, buf, 4);
