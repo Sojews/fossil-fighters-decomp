@@ -8,6 +8,7 @@
 #include "m/3d_scene.h"
 #include "m/3d_ryusen.h"
 #include "m/polygon_char.h"
+#include "m/process_pause.h"
 #include "m/heap.h"
 #include "game/dino_sound.h"
 #include "nitro/mi.h"
@@ -277,32 +278,6 @@ static int MAnmLookup(const char *name, const MAnmName *table) {
 }
 
 #pragma force_active reset
-
-// Keeps a process's task sets suspended for the rest of the scope (nested scopes count).
-class MProcessPause {
-public:
-    MProcessPause(MProcess *process, OSMutex *mutex, int *count) {
-        mProcess = process;
-        mMutex = mutex;
-        mCount = count;
-        MMutexLock lock(mMutex);
-        if (++*mCount == 1) {
-            mProcess->mParallel.Suspend();
-            mProcess->mSerial.Suspend();
-        }
-    }
-    ~MProcessPause() {
-        MMutexLock lock(mMutex);
-        if (--*mCount == 0) {
-            mProcess->mParallel.Run();
-            mProcess->mSerial.Run();
-        }
-    }
-
-    MProcess *mProcess;
-    OSMutex *mMutex;
-    int *mCount;
-};
 
 MPolygonChar::MPolygonChar(void *unk80, u16 unkA4, void *unk84, void *unk88) : MProcess(NULL) {
     mUnk74 = NULL;

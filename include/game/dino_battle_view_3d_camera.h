@@ -10,13 +10,15 @@
 #include "game/help.h"
 #include "game/dino_field_camera_hook.h"
 
+class Dino3DLoadCsv;
+
 class DinoBattleView3DCamera : public MProcess {
 public:
     virtual ~DinoBattleView3DCamera();
     virtual void Idle();
 
     void (DinoBattleView3DCamera::*mState)(); // 0x74
-    void *mCamera;                              // 0x7C
+    Dino3DLoadCsv *mCamera;                     // 0x7C
 };
 
 #endif

@@ -15,6 +15,7 @@ public:
     virtual void SetModelData(void *data, BOOL arg);
     virtual void SetAnimData(void *data);
     virtual int GetFrameCount();
+    virtual BOOL IsAnimDone();
 
     void SetPolygonId(int id);
     void SetUnk1C(u32 value);

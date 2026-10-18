@@ -10,6 +10,8 @@
 #include "game/help.h"
 #include "game/dino_field_camera_hook.h"
 
+class Dino3DLoadCsv;
+
 class CameraLoadTask : public MTask {
 public:
     virtual ~CameraLoadTask();
@@ -56,10 +58,10 @@ public:
 
     struct Camera {
         u8 unk00[0x7C];
-        u32 mUnk7C;     // 0x7C
-        u32 mParent;    // 0x80
+        Dino3DLoadCsv *mUnk7C;  // 0x7C
+        Dino3DLoadCsv *mParent; // 0x80
     } *mCamera;         // 0x10
-    u32 mParent;        // 0x14
+    Dino3DLoadCsv *mParent; // 0x14
 };
 
 #endif

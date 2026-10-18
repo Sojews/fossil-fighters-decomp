@@ -10,6 +10,8 @@
 #include "game/help.h"
 #include "game/dino_field_camera_hook.h"
 
+class Dino3DLoadCsv;
+
 class DinoBattleView3D;
 
 class DinoBattleView3DDamage : public MProcess {
@@ -35,7 +37,7 @@ public:
 
     struct View {
         u8 unk00[0xD0];
-        void *mModels[3];   // 0xD0
+        Dino3DLoadCsv *mModels[3];  // 0xD0
     } *mView;               // 0x10
     u32 mMask;              // 0x14
 };

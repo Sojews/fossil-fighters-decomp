@@ -5,6 +5,7 @@
 
 #include "game/dino_sound.h"
 #include "game/dino_battle_view_3d.h"
+#include "game/dino_3d_load_csv.h"
 #include "game/dino_battle_view_class.h"
 #include "types.h"
 #include "game/b3d_status_view_task.h"
@@ -107,14 +108,12 @@ void DinoBattleView3D::Idle() {
     (this->*mState)();
 }
 
-extern "C" void func_0202b350(void *model, int alpha);
-
 void DinoBattleView3DMask::Execute() {
     for (int i = 0; i < 3; i++) {
         if (mMask & (1 << i)) {
-            func_0202b350(mView->mModels[i], 0x1000);
+            mView->mModels[i]->Push7(0x1000);
         } else {
-            func_0202b350(mView->mModels[i], 0);
+            mView->mModels[i]->Push7(0);
         }
     }
     Exit();

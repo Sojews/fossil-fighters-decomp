@@ -6,9 +6,8 @@
 
 #include "game/dino_battle_view_3d_camera.h"
 #include "types.h"
-
-extern "C" void func_0202b520(void *camera);
+#include "game/dino_3d_load_csv.h"
 
 DinoBattleView3DCamera::~DinoBattleView3DCamera() {
-    func_0202b520(mCamera);
+    mCamera->Push18();
 }

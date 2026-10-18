@@ -5,6 +5,7 @@
 #pragma auto_inline on
 
 #include "game/camera_load_task.h"
+#include "game/dino_3d_load_csv.h"
 #include "types.h"
 #include "game/dino_battle_view_3d_camera.h"
 
@@ -50,7 +51,6 @@ void CameraLoadTask::Execute() {
 
 extern "C" void func_ov000_0218a924(void *camera);
 extern "C" void func_ov000_0218a93c(void *camera);
-extern "C" void func_0202d264(u32 arg0, u32 parent);
 
 void CameraPauseTask::Execute() {
     if (mPause) {
@@ -64,6 +64,6 @@ void CameraPauseTask::Execute() {
 void CameraSetDefParentTask::Execute() {
     Camera *camera = mCamera;
     camera->mParent = mParent;
-    func_0202d264(camera->mUnk7C, camera->mParent);
+    camera->mUnk7C->SetParent(camera->mParent);
     Exit();
 }
