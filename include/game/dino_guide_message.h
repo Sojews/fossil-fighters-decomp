@@ -10,6 +10,7 @@
 
 class DinoGuideMessage : public MProcess, public DinoHelpHook {
 public:
+    DinoGuideMessage(std::string text);
     virtual ~DinoGuideMessage();
     virtual void Idle();
     virtual void Unk08();

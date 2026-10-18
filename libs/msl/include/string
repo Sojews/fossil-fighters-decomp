@@ -283,7 +283,34 @@ bool operator==(const basic_string<C, Traits, Alloc> &lhs, const basic_string<C,
 typedef basic_string<char> string;
 typedef basic_string<wchar_t> wstring;
 
-string operator+(const char *lhs, const string &rhs);
+template <class C, class Traits, class Alloc>
+basic_string<C, Traits, Alloc> operator+(const C *lhs, const basic_string<C, Traits, Alloc> &rhs);
+
+// Defined only in the file that instantiates it.
+// NONMATCHING: the result and lhs swap registers.
+#ifdef MSL_STRING_PLUS_DEFINITIONS
+}  // namespace std
+#include <string.h>
+namespace std {
+template <class C, class Traits, class Alloc>
+basic_string<C, Traits, Alloc> operator+(const C *lhs, const basic_string<C, Traits, Alloc> &rhs) {
+    basic_string<C, Traits, Alloc> result;
+    typename basic_string<C, Traits, Alloc>::size_type n = strlen(lhs);
+    typename basic_string<C, Traits, Alloc>::size_type rn;
+    const C *rp;
+    if (!rhs.is_long()) {
+        rp = rhs.mShort.buf;
+        rn = rhs.mShort.size;
+    } else {
+        rp = rhs.mLong.data;
+        rn = rhs.mLong.size;
+    }
+    result.reserve(n + rn);
+    result.__replace(0, 0, lhs, lhs + n, random_access_iterator_tag());
+    result.__replace(n, 0, rp, rp + rn, random_access_iterator_tag());
+    return result;
+}
+#endif
 
 template <class C, class Traits, class Alloc>
 basic_string<C, Traits, Alloc> operator+(const basic_string<C, Traits, Alloc> &lhs, const C *rhs);
