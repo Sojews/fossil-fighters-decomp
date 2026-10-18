@@ -1,3 +1,4 @@
+#pragma ipa file
 // DinoUiMedalMenu.
 // Only the destructor is decompiled so far.
 
@@ -227,3 +228,7 @@ void DinoUiMedalMenu::FinishPageLeft() {
 #pragma auto_inline on
 
 
+#pragma auto_inline off
+template class std::__vec_deleter<u32, std::allocator<u32> >;
+template void std::__vec_deleter<MMotionFile, std::allocator<MMotionFile> >::sub_push_back(const MMotionFile &x, Metrowerks::int2type<false>);
+template void std::__vec_deleter<u32, std::allocator<u32> >::assign<u32 *>(u32 *first, u32 *last, Metrowerks::int2type<true>);

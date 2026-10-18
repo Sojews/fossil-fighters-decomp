@@ -229,6 +229,10 @@ namespace std {
         }
         // Copies [first, last) into an empty vector (out of line; the copy constructor's work).
         void init_copy(const T *first, const T *last, Metrowerks::int2type<true>);
+        // Copies plain data in one move (an inline of its own, so the length is worked out again).
+        static void copy_trivial(const T *first, const T *last, T *dest) {
+            memmove(dest, first, (last - first) * sizeof(T));
+        }
         // Empties the vector and gets room for max elements (out of line).
         void reallocate_clear(size_t n, size_t max);
         void construct_range_at_end(const T *first, const T *last) {
@@ -391,6 +395,18 @@ namespace std {
     template <typename T, typename Allocator>
     template <class It>
     void __vec_deleter<T, Allocator>::assign(It first, It last, Metrowerks::int2type<true>) {
+        if (Metrowerks::has_trivial_copy_ctor<T>::value && Metrowerks::has_trivial_assignment<T>::value) {
+            // Plain data: room for all of it, then one move.
+            size_t n = last - first;
+            size_t c = cap();
+            if (n > c) {
+                UnkMSLStruct1 unk = UnkMSLStruct1();
+                reallocate_clear(n, grow_by(n - c));
+            }
+            copy_trivial(first, last, data_);
+            size_ = n;
+            return;
+        }
         size_t n = last - first;
         if (n > cap()) {
             size_t max = grow_by(n - cap());
