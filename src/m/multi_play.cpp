@@ -1054,6 +1054,25 @@ void MMultiPlayWirelessDriverStopTask::Begin() {
     mStep = &MMultiPlayWirelessDriverStopTask::Terminate;
 }
 
+MMultiPlayMessageHub::MMultiPlayMessageHub(int first)
+    : MLooperVSyncTask(first, FALSE), mSending(NULL), mRunning(FALSE), mUnk279(FALSE) {
+    mSelf = sMultiPlay.instance->mPlayerIndex;
+    mConnectedAids = sMultiPlay.instance->mConnectedAids;
+    mUnk26C = 0;
+    mConsoleCount = sMultiPlay.instance->mPlayerCount;
+    mMaxPlayers = sMultiPlay.instance->mMaxPlayers;
+    mSendData = (u16 *) new u8[sMultiPlay.instance->GetSharedDataSize()];
+    MI_CpuFill8(mSendData, 0, sMultiPlay.instance->GetSharedDataSize());
+    for (u32 i = 0; i < mConsoleCount; i++) {
+        MMultiPlayHubIncoming in;
+        in.data = new std::vector<char>;
+        in.unk4 = 0;
+        in.unk8 = 0;
+        mIncoming.push_back(in);
+    }
+    Enable();
+}
+
 MMultiPlayMessageHub::~MMultiPlayMessageHub() {
     Disable();
     delete[] mSendData;

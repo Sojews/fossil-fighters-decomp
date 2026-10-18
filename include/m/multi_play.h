@@ -226,7 +226,7 @@ struct MMultiPlayHubOutgoing {
 // A message arriving from one console, assembled as its pieces come in.
 struct MMultiPlayHubIncoming {
     std::vector<char> *data;    // 0x0
-    u32 unk4;               // 0x4
+    u16 unk4;               // 0x4
     u32 unk8;               // 0x8
 };
 
@@ -253,9 +253,10 @@ public:
     WMDataSet mReceived;    // 0x60
     u16 *mSendData;         // 0x260
     int mSelf;              // 0x264: this console's AID
-    u32 unk268[2];
+    u32 mConnectedAids;     // 0x268
+    u32 mUnk26C;            // 0x26C
     u32 mConsoleCount;      // 0x270
-    u32 unk274;
+    u32 mMaxPlayers;        // 0x274
     u8 mRunning;            // 0x278: data sharing stepped last frame
     u8 mUnk279;             // 0x279
 };
