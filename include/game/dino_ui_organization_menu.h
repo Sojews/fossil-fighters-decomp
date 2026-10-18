@@ -11,6 +11,8 @@
 #include "game/help.h"
 
 class DinoUiFieldMenuFraction;
+class DinoUiRvInformation;
+class MTextPicture;
 
 class DinoUiOrganizationMenu : public DinoHelpBase, public MMenu {
 public:
@@ -27,13 +29,25 @@ public:
     void FinishPageRight();
     void FinishPageLeft();
     void SetTab(u8 tab);
+    void LoadPage();
+    void PageRight();
+    void PageLeft();
+    void ShowTabInfo(u8 tab);
+    void SetSort(u8 sort);
+    void Sort(u8 sort);
+    void RemoveListLinks();
+    void UpdateDetails(u8 index);
     void TabLeft();
     void TabRight();
     BOOL HasUnk222(u8 id);
 
     u32 mUnkB4[5];                      // 0xB4
     MMenuItem *mTabs[4];                // 0xC8
-    u32 mUnkD8[16];                     // 0xD8
+    MMenuItem *mTabLinks[3];            // 0xD8: linked down to the current tab
+    u32 mUnkE4[6];                      // 0xE4
+    MTextPicture *mTabPicture;          // 0xFC
+    MTextPicture *mSortCursor;          // 0x100
+    MMenuItem *mListItems[5];           // 0x104
     MMenuItem *mSlots[15];              // 0x118
     u32 mUnk154[15];                    // 0x154
     u32 mSlotCount;                     // 0x190
@@ -47,16 +61,19 @@ public:
     std::vector<void *> mUnk1DC;        // 0x1DC
     std::vector<void *> mUnk1E8;        // 0x1E8
     u32 mPage;                          // 0x1F4
-    u32 mUnk1F8;                        // 0x1F8
+    u32 mLastPage;                      // 0x1F8
     u8 mTab;                            // 0x1FC
-    u8 unk1FD;
+    u8 mSort;                           // 0x1FD
     u8 mFocusTabs;                      // 0x1FE: focus the new tab's item when paging
     u8 unk1FF;
     u32 mUnk200[8];                     // 0x200
     u8 unk220[2];
     u8 mUnk222[5];                      // 0x222
     u8 unk227;
-    u32 mUnk228[5];                     // 0x228
+    DinoUiRvInformation *mInfo;         // 0x228
+    u32 mUnk22C;                        // 0x22C
+    MTaskSet *mUnk230;                  // 0x230
+    u32 mUnk234[2];                     // 0x234
     u8 unk23C[2];
     u8 mUnk23E;                         // 0x23E
     u8 unk23F;
@@ -64,6 +81,9 @@ public:
     u32 mUnk24C[4];                     // 0x24C
     MArchivePtr mArchive;               // 0x25C
     MArchiveFile mFile;                 // 0x260
+    u8 unk26C[0x2B0 - 0x26C];
+    u8 mListLinked;                     // 0x2B0
+    u8 mSlotsLinked;                    // 0x2B1
 };
 
 class DinoUiOrganizationMenuItem : public MMenuItem, public DinoHelpItem {
@@ -74,7 +94,7 @@ public:
     virtual MDisplay *GetDisplay();
     virtual const char *GetText();
 
-    void *mOwner;       // 0x94
+    DinoUiOrganizationMenu *mOwner; // 0x94
     MMotion *mMotion;   // 0x98
     u32 mTextId;        // 0x9C
 };

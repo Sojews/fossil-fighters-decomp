@@ -21,6 +21,7 @@ public:
     virtual ~DinoUiRvInformation();
     virtual void Idle();
 
+    void SetPage(u8 page);
     void SetUnk1B1(u8 value);
     void SetUnk1AC(u32 value);
     MTask *CreateWaitModelTask();   // waits until the 3D model's tasks finish
