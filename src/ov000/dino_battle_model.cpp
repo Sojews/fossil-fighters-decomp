@@ -14,3 +14,9 @@ void DinoBattleModel::OnMessage(MMessage *msg) {
     mSubject.Notify(msg);
     mSubject2.Notify(msg);
 }
+
+#pragma auto_inline off
+
+void DinoBattleModel::SendLocalMessage(MMessage *msg) {
+    mSubject2.Notify(msg);
+}

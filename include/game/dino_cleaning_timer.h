@@ -13,10 +13,13 @@
 
 class DinoCleaningTimer : public MProcess {
 public:
+    int GetSeconds();
     virtual ~DinoCleaningTimer();
     virtual void Idle();
 
-    u32 mUnk74[6];          // 0x74
+    u32 mUnk74[3];          // 0x74
+    int mFrames;            // 0x80
+    u32 mUnk84[2];          // 0x84
     MArchivePtr mArchive;   // 0x8C
     MArchiveFile mFile;     // 0x90
 };

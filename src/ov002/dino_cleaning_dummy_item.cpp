@@ -79,3 +79,13 @@ MRect DinoCleaningToolMenuItem::GetFrame() {
 MRect DinoCleaningXrayItem::GetFrame() {
     return mMotion->GetFrame().Intersection(MRect(0, 0, 256, 192));
 }
+
+#pragma auto_inline off
+
+void DinoCleaningToolMenu::EnableItem() {
+    mItemB4->Enable();
+}
+
+void DinoCleaningToolMenu::DisableItem() {
+    mItemB4->Disable();
+}

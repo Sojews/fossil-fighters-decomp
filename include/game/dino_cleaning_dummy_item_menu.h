@@ -9,10 +9,13 @@
 
 class DinoCleaningToolMenu : public MMenu {
 public:
+    void EnableItem();
+    void DisableItem();
     virtual ~DinoCleaningToolMenu();
     virtual void OnStart();
 
-    u32 mUnkA8[4];          // 0xA8
+    u32 mUnkA8[3];          // 0xA8
+    MMenuItem *mItemB4;     // 0xB4
     std::vector<void *> mUnkB8; // 0xB8
 };
 

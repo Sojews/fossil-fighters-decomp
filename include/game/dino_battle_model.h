@@ -8,6 +8,7 @@
 
 class DinoBattleModel : public MProcess, public MMessageObserver {
 public:
+    void SendLocalMessage(MMessage *msg);
     virtual ~DinoBattleModel();
     virtual void Idle();
     virtual void OnMessage(MMessage *msg);

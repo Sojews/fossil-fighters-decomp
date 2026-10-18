@@ -6,9 +6,8 @@
 
 #include "game/send_local_message_task_menu.h"
 #include "game/send_local_message_task.h"
+#include "game/dino_battle_model.h"
 #include "game/set_live_one_shot_flag_task.h"
-
-extern "C" void func_ov000_0215b2a0(void *, u32);
 
 extern "C" void func_ov000_0215c174(void *, u32);
 
@@ -31,6 +30,6 @@ void SetLiveOneShotFlagTask::Execute() {
 }
 
 void SendLocalMessageTask::Execute() {
-    func_ov000_0215b2a0((void *)mUnk14, mUnk10);
+    mModel->SendLocalMessage(mMessage);
     Exit();
 }

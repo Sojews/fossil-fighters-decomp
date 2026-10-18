@@ -9,3 +9,9 @@
 
 DinoCleaningTimer::~DinoCleaningTimer() {
 }
+
+#pragma auto_inline off
+
+int DinoCleaningTimer::GetSeconds() {
+    return mFrames / 60;
+}
