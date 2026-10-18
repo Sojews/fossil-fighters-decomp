@@ -2,6 +2,7 @@
 // Also DinoFieldChara's members here: models, motions, movement.
 
 #include "game/dino_field.h"
+#include "game/dino_sound.h"
 #include "m/file.h"
 #include "nitro/os.h"
 #include "nitro/mi.h"
@@ -68,7 +69,8 @@ struct DinoFieldCharaData {
     MFx32 mHeight;      // 0x18
     u8 unk1C[0x20 - 0x1C];
     u32 mUnk20;         // 0x20
-    u8 unk24[0x2C - 0x24];
+    u32 mUnk24;         // 0x24
+    u8 unk28[0x2C - 0x28];
     u8 mUnk2C;          // 0x2C
     u8 mUnk2D;          // 0x2D
     MFx32Rect mRect30;  // 0x30: the collision box, around the position
@@ -151,6 +153,77 @@ BOOL DinoFieldChara::IsUnk20Two() {
 
 BOOL DinoFieldChara::IsUnkA1Motion() {
     return mModel.unk05[0] && (mMotion == 2 || mMotion == 3);
+}
+
+// One of the shared motions (1-based), or none.
+void DinoFieldChara::SetCommonMotion(u32 motion) {
+    if (motion == 0) {
+        mBody->ClearTransformTracks();
+        return;
+    }
+    char path[64];
+    OS_SPrintf(path, data_ov001_0216a20c[3], motion - 1);
+    MAnmLoadTracks(path, mBody);
+    mBody->SetFrame(0);
+}
+
+// When the field's unk258 mode ends (StopWalking when it starts).
+void DinoFieldChara::LeaveUnk258() {
+    HideManpu();
+    mMotionModelsAlt.clear();
+    if (mEffect != NULL) {
+        mEffect->Reset();
+    }
+    mBeholdTarget = 0;
+}
+
+static inline BOOL IsAnimDone(MAnmModelBase *model) {
+    if (model->mModel != NULL) {
+        return model->mModel->IsAnimDone();
+    }
+    return FALSE;
+}
+
+// Once the motion is done: motion 4 (motion 3 outside unk A1), with a sound by the character's kind.
+void DinoFieldChara::PlayReaction() {
+    if (mBody != NULL && IsAnimDone(mBody)) {
+        if (IsUnkA1Motion()) {
+            SetMotion(4, 0, MFx32(1));
+            if (((DinoFieldCharaData *) mFile.GetData())->mUnk20 == 2) {
+                DinoSoundPlaySe(0xBF, 0);
+            } else if (((DinoFieldCharaData *) mFile.GetData())->mUnk24 == 2) {
+                DinoSoundPlaySe(0xC1, 0);
+            } else {
+                DinoSoundPlaySe(0xBD, 0);
+            }
+        } else {
+            SetMotion(3, 0, MFx32(1));
+            if (((DinoFieldCharaData *) mFile.GetData())->mUnk20 == 2) {
+                DinoSoundPlaySe(0xBE, 0);
+            } else if (((DinoFieldCharaData *) mFile.GetData())->mUnk24 == 2) {
+                DinoSoundPlaySe(0xC0, 0);
+            } else {
+                DinoSoundPlaySe(0xBB, 0);
+            }
+        }
+    }
+}
+
+static inline BOOL IsUnk20One(DinoFieldChara *chara) {
+    return chara->mBody != NULL && ((DinoFieldCharaData *) chara->mFile.GetData())->mUnk20 == 1;
+}
+
+static inline BOOL IsUnk24Kind(DinoFieldChara *chara) {
+    return IsUnk20One(chara) && (((DinoFieldCharaData *) chara->mFile.GetData())->mUnk24 == 1 ||
+                                 ((DinoFieldCharaData *) chara->mFile.GetData())->mUnk24 == 2);
+}
+
+BOOL DinoFieldChara::IsUnk24Reacting() {
+    return IsUnk24Kind(this) && IsUnkA1Motion();
+}
+
+BOOL DinoFieldChara::IsMoving() {
+    return !IsAnimDone(mBody);
 }
 
 MFx32 DinoFieldChara::GetHeight() {

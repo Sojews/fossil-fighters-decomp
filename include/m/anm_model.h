@@ -121,6 +121,9 @@ public:
     u32 mUnk1A4;                        // 0x1A4
 };
 
+// Loads a text file of transform tracks into the model.
+void MAnmLoadTracks(const char *path, MAnmModelBase *model);
+
 class MAnmModel : public MAnmModelBase {
 public:
     MAnmModel(M3DScene *scene) : MAnmModelBase(scene) {}

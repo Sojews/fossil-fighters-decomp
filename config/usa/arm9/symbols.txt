@@ -2277,7 +2277,7 @@ _ZN9M3DRyusenC1Ev kind:function(thumb,size=0x14) addr:0x02029298
 _ZN12MPolygonCharD1Ev kind:function(thumb,size=0x16) addr:0x020292ac
 _ZN12MPolygonCharD0Ev kind:function(thumb,size=0x1c) addr:0x020292c4
 _ZN12MPolygonChar4IdleEv kind:function(thumb,size=0x104) addr:0x020292e0
-func_020293e4 kind:function(thumb,size=0xc68) addr:0x020293e4
+_Z14MAnmLoadTracksPKcP13MAnmModelBase kind:function(thumb,size=0xc68) addr:0x020293e4
 .L_02029510 kind:label(thumb) addr:0x02029510 local
 .L_0202a024 kind:label(thumb) addr:0x0202a024 local
 .L_0202a02a kind:label(thumb) addr:0x0202a02a

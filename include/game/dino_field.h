@@ -135,6 +135,9 @@ public:
     void SetUnk2D8(MPoint pos, u32 a, u32 b);
     void ClearUnk2E0();
     void StopWalking();
+    void LeaveUnk258();
+    void PlayReaction();
+    BOOL IsUnk24Reacting();
     void SetUnk2D8Pos(MPoint pos) { mUnk2D8 = pos; }
     BOOL IsUnk20Two();
     void MoveTo(MFx32Point coord, u32 frames, u32 ease, u8 silent);
