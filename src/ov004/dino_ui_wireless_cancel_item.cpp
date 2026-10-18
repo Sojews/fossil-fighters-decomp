@@ -21,6 +21,10 @@
 #include "m/observer.h"
 #include "m/multi_play.h"
 #include "m/text_codec.h"
+#include "m/oam_canvas.h"
+#include "m/indicator.h"
+#include "m/smart_oam.h"
+#include "m/motion.h"
 #include "game/dino_common_window_message_box.h"
 #include "game/dino_common_window_yes_no_dialog.h"
 #include <stdio.h>
@@ -197,7 +201,7 @@ void DinoUiChildScannerCancelItem::OnDecide() {
 }
 
 void DinoUiChildScannerParentItem::OnDecide() {
-    if (mUnkA0) {
+    if (mMode) {
         mMotion->Play(3, 1);
     }
 }
@@ -255,7 +259,13 @@ void DinoUiCannonParentScanner::ShowCount() {
 // points to).
 typedef void (DinoUiWirelessMatch::*DinoUiWirelessMatchState)();
 extern "C" struct {
-    u8 unk00[0x34];
+    u8 unk00[0x14];
+    const char *mParentPath2;   // 0x14: the parent items' motions, by mode
+    u8 unk18[0x4];
+    const char *mParentPath0;   // 0x1c
+    u8 unk20[0x4];
+    const char *mParentPath1;   // 0x24
+    u8 unk28[0x34 - 0x28];
     DinoUiWirelessMatchState state_02167e3c; // 0x34
     u8 unk3C[0x44 - 0x3C];
     DinoUiWirelessMatchState StateInit; // 0x44
@@ -274,11 +284,14 @@ extern "C" struct {
     DinoUiWirelessMatchState StateRescan; // 0x4c
     void (DinoUiBattleParentScanner::*StateAsk_54)(); // 0x54
     void (MMessageObserver::*ClearQueue_5C)(); // 0x5c
+    u8 unk64[0x6C - 0x64];
+    MPoint mParentNameFocusedOffset; // 0x6c
 } data_ov004_02174150;
 extern "C" struct {
     u8 unk00[0x4];
     void (DinoUiChildScannerBattleConnect::*Unk02163cdc_04)(); // 0x04
-    u8 unk0C[0x24 - 0xC];
+    u8 unk0C[0x1C - 0xC];
+    MPoint mParentNameOffset; // 0x1c
     void (DinoUiBattleParentScanner::*State02165818_24)(); // 0x24
     u8 unk2C[0x34 - 0x2C];
     void (DinoUiBattleParentScanner::*State021655a0_34)(); // 0x34
@@ -387,6 +400,109 @@ void DinoUiWirelessMatch::StateKeep() {
     gDinoResource->SetUnk90((u32)mMultiPlay, (u32)mUnk80);
     *mResult = 1;
     Exit();
+}
+
+DinoUiChildScanner::DinoUiChildScanner(MMultiPlay *multiPlay, u32 *chosen, u32 *choice) : MMenu(0) {
+    mMultiPlay = multiPlay;
+    mChosen = chosen;
+    mChoice = choice;
+    SetDeferStart(TRUE);
+}
+
+void DinoUiChildScannerParentItem::OnFocusChanged(BOOL focused) {
+    if (focused) {
+        mMotion->Play(2, 0);
+        if (mName) {
+            mName->SetPosition(MPoint(mPos.x + data_ov004_02174150.mParentNameFocusedOffset.x,
+                                      mPos.y + data_ov004_02174150.mParentNameFocusedOffset.y));
+        }
+    } else {
+        mMotion->Play(1, 0);
+        if (mName) {
+            mName->SetPosition(MPoint(mPos.x + data_ov004_021741d0.mParentNameOffset.x,
+                                      mPos.y + data_ov004_021741d0.mParentNameOffset.y));
+        }
+    }
+}
+
+void DinoUiChildScannerParentItem::SetParent(u32 mode, const std::wstring &name) {
+    if (mode == mMode) {
+        return;
+    }
+    if (mMode == 0) {
+        DinoSoundPlaySe(0x3B0, 0);
+    }
+    mMode = mode;
+    mText = MEncodeUtf8(name);
+    mParallel.Clear();
+    const char *path;
+    BOOL named;
+    switch (mMode) {
+    case 0:
+        path = data_ov004_021740d0.mParentPath0;
+        named = FALSE;
+        break;
+    case 1:
+        path = data_ov004_021740d0.mParentPath1;
+        named = TRUE;
+        break;
+    case 2:
+        path = data_ov004_021740d0.mParentPath2;
+        named = TRUE;
+        break;
+    }
+    mMotion = new MMotion(path, mOam, 0, 1);
+    mMotion->SetPosition(mPos);
+    mMotion->SetPriority(3);
+    mMotion->SetAnchor(3);
+    mMotion->Show();
+    mParallel.AddTail(mMotion);
+    if (named) {
+        MSmartObjCanvas *canvas =
+            new MSmartObjCanvas(mOam->mDisplay, mOam, MPoint(0x30, 0xC), gDinoResource->GetUnkTable(), TRUE);
+        canvas->SetPriority(3);
+        canvas->SetAnchor(2);
+        mName = new MIndicator(canvas, gDinoResource->CreateFont12(0, 1, 0xB), 0);
+        mName->SetText(std::wstring(name));
+        mName->Show();
+        mParallel.AddTail(mName);
+    } else {
+        mName = NULL;
+    }
+    OnFocusChanged(IsFocused());
+}
+
+// Forgets the consoles found and scans again.
+void DinoUiChildScanner::Rescan() {
+    for (u32 i = 0; i < 9; i++) {
+        mParents[i]->SetParent(0, std::wstring(L""));
+    }
+    MTask *start = mMultiPlay->CreateStartScanTask();
+    MTask *reset = mMultiPlay->CreateResetTask();
+    MSerialTaskSet *serial = &mSerial;
+    serial->AddTail(reset);
+    serial->AddTail(start);
+}
+
+void DinoUiChildScanner::OnMessage(MMessage *msg) {
+    switch (msg->mId) {
+    case 0: {
+        MMultiPlayParentFoundMessage *found = (MMultiPlayParentFoundMessage *)msg;
+        mParents[found->mUnk0C]->SetParent(*(u32 *)found->mUnk10, std::wstring((const wchar_t *)((const u32 *)found->mUnk10 + 1)));
+        break;
+    }
+    case 2: {
+        MMultiPlayParentUpdatedMessage *updated = (MMultiPlayParentUpdatedMessage *)msg;
+        mParents[updated->mUnk0C]->SetParent(*(u32 *)updated->mUnk10,
+                                             std::wstring((const wchar_t *)((const u32 *)updated->mUnk10 + 1)));
+        break;
+    }
+    case 1: {
+        MMultiPlayParentLostMessage *lost = (MMultiPlayParentLostMessage *)msg;
+        mParents[lost->mUnk0C]->SetParent(0, std::wstring(L""));
+        break;
+    }
+    }
 }
 
 void DinoUiChildScanner::Cancel() {

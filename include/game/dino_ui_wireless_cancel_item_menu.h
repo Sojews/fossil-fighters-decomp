@@ -12,6 +12,9 @@
 #include "m/looper.h"
 #include "game/help.h"
 
+class MSmartOam;
+class MIndicator;
+
 class DinoUiWirelessCancel : public MMenu {
 public:
     DinoUiWirelessCancel(u8 *cancelled);
@@ -34,11 +37,15 @@ public:
     virtual void OnDecide();
 
     std::string GetName();  // the parent console's name
+    // Shows a parent console (mode 0: none).
+    void SetParent(u32 mode, const std::wstring &name);
 
-    u32 mUnk88[4];      // 0x88
+    MSmartOam *mOam;    // 0x88
+    u32 mUnk8C;         // 0x8C
+    MPoint mPos;        // 0x90
     MMotion *mMotion;   // 0x98
-    u32 mUnk9C;         // 0x9C
-    void *mUnkA0;       // 0xA0
+    MIndicator *mName;  // 0x9C: the console's owner, if it has one
+    u32 mMode;          // 0xA0: what the console is doing (0: nothing)
     std::string mText;  // 0xA4
 };
 
@@ -61,7 +68,9 @@ public:
     u32 *mChosen;               // 0xEC: set when a partner was chosen
     u32 *mChoice;               // 0xF0
     u8 mSilentFocus;            // 0xF4
-    u8 unkF5[0x37];
+    u8 unkF5[7];
+    DinoUiChildScannerParentItem *mParents[9]; // 0xFC: the consoles found
+    u32 unk120[3];
     DinoHelpItem *mParentHelp;  // 0x12C: help shown for every parent item
     void Rescan();
 };
