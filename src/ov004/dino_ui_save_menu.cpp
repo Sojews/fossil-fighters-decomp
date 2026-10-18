@@ -26,8 +26,19 @@ void DinoUiSaveMenu::StateFinish() {
 extern "C" struct {
     u8 unk00[0xC];
     void (DinoUiSaveMenu::*Start_0C)();
+    u8 unk14[0x24 - 0x14];
+    void (DinoUiSaveMenu::*Unk02169db8_24)();
 } data_ov004_02175130;
 
 DinoUiSaveMenu::DinoUiSaveMenu(u32 *result, u8 arg) : MProcess(NULL), mResult(result), mUnk90(arg) {
     mState = data_ov004_02175130.Start_0C;
+}
+
+void DinoUiSaveMenu::StateConfirmed() {
+    if (mUnk8C == 1) {
+        mState = data_ov004_02175130.Unk02169db8_24;
+        return;
+    }
+    *mResult = 0;
+    Exit();
 }

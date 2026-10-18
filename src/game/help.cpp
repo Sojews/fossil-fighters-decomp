@@ -372,6 +372,19 @@ MRect DinoHelpSign::GetFrame() {
 // The status bar's fill colour.
 extern const int kHelpStatusColor;
 
+// The TU's pooled constants (see menu.cpp).
+extern "C" struct {
+    u8 unk00[0xC];
+    const char *mMotionPath;    // 0x0C
+    u8 unk10[0x5C - 0x10];
+    void (DinoHelpStatus::*Start_5C)();
+} data_020ba91c;
+
+DinoHelpStatus::DinoHelpStatus(DinoHelpDriver *driver)
+    : MProcess(NULL), mDriver(driver), mCanvas(NULL), mMotion(data_020ba91c.mMotionPath, 2) {
+    mState = data_020ba91c.Start_5C;
+}
+
 DinoHelpStatus::~DinoHelpStatus() {
     mFont->Release();
 }

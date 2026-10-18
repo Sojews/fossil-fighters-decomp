@@ -16,6 +16,7 @@ public:
     void ResetRate();
     void Print(const std::string &text);
     BOOL IsEmpty();
+    void NextPage();
     void SetUnkAC(u32 value);
     void SetUnkB0(u8 value);
     u8 GetUnkB0();

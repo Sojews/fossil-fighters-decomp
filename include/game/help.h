@@ -124,6 +124,7 @@ class MSmartObjCanvas;
 // The bar on the top screen showing the selected item's help text.
 class DinoHelpStatus : public MProcess {
 public:
+    DinoHelpStatus(class DinoHelpDriver *driver);
     virtual ~DinoHelpStatus();
     virtual void Idle();
 

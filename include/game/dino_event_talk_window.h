@@ -8,6 +8,8 @@
 
 class MDisplay;
 
+class DinoTalkWindow;
+
 class DinoEventTalkWindow : public MProcess {
 public:
     DinoEventTalkWindow(MDisplay *display, std::string text, int arg, u8 flag);
@@ -19,10 +21,14 @@ public:
                   const std::string &d);
     void SetChoices(u32 arg, MPoint pos, const std::vector<DinoWindowChoice> &choices, u32 unkB4);
 
+    void StatePage();
+
     void (DinoEventTalkWindow::*mState)();  // 0x74
-    u32 mUnk7C[2];                          // 0x7C
+    DinoTalkWindow *mWindow;                // 0x7C
+    u32 unk80;
     std::string mText;                      // 0x84
-    u32 mUnk90[2];                          // 0x90
+    u32 mUnk90;                             // 0x90
+    u32 unk94;
     u32 mUnk98;                             // 0x98
     u32 mUnk9C;                             // 0x9C
     MPoint mPos;                            // 0xA0

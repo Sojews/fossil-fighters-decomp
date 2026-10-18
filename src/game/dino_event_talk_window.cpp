@@ -3,6 +3,7 @@
 
 #pragma ipa file
 
+#include "game/dino_talk_window.h"
 #include "game/dino_event_talk_window.h"
 #include "m/bg_new_task.h"
 #include "game/dino_window_choice.h"
@@ -47,3 +48,28 @@ template MTask *MCreateBgCallTask(DinoEventTalkWindow *obj, void (DinoEventTalkW
 template class std::__vec_deleter<DinoWindowChoice, std::allocator<DinoWindowChoice> >;
 template class std::__vec_deleter<std::string, std::allocator<std::string> >;
 template class std::__vec_deleter<DinoCommonWindowMenuEntry, std::allocator<DinoCommonWindowMenuEntry> >;
+
+// The TU's pooled pointer-to-member constants (see menu.cpp).
+extern "C" struct {
+    u8 unk00[0xC];
+    void (DinoEventTalkWindow::*Unk02007ab4_0C)();
+    u8 unk14[0x2C - 0x14];
+    void (DinoEventTalkWindow::*Unk0200770c_2C)();
+    void (DinoEventTalkWindow::*Unk02007a00_34)();
+} data_020b6144;
+
+// Waits for the window to show the page, then asks, chooses or ends.
+void DinoEventTalkWindow::StatePage() {
+    if (mWindow->IsEmpty()) {
+        if (mUnk98 != 0) {
+            mState = data_020b6144.Unk0200770c_2C;
+        } else if (mUnk9C != 0) {
+            mState = data_020b6144.Unk02007a00_34;
+        } else {
+            mState = data_020b6144.Unk02007ab4_0C;
+        }
+    } else {
+        mWindow->NextPage();
+        mUnk90 = 0;
+    }
+}

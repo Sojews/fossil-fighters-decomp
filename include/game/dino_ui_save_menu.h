@@ -10,6 +10,7 @@ public:
     virtual ~DinoUiSaveMenu();
     virtual void Idle();
     void StateFinish();
+    void StateConfirmed();
 
     void (DinoUiSaveMenu::*mState)(); // 0x80
     u32 *mResult;                     // 0x88
