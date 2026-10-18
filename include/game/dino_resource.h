@@ -39,10 +39,19 @@ struct DinoCreatureDefs {
 struct DinoCreatureDef {
     u8 unk00[0xD];
     u8 unk0D;
-    u8 unk0E[0x46];
+    u8 unk0E[0x28 - 0xE];
+    u32 attackCount;        // 0x28
+    u32 attackIds;          // 0x2C: offset of attackCount u32 attack ids
+    u32 specialAttack;      // 0x30
+    u32 unk34[2];
+    u32 attackLevels;       // 0x3C: offset of the level each attack needs (u32 each)
+    u32 specialAttackLevel; // 0x40
+    u8 unk44[0x54 - 0x44];
     u32 unk54;          // 0x54: offset of 4 s8 values, or 0
     u32 unk58;          // 0x58: offset of 4 s8 values, or 0
-    u8 unk5C[0x84 - 0x5C];
+    u8 unk5C[0x78 - 0x5C];
+    u32 attackUnk78;        // 0x78: offset of a u8 per attack
+    u8 unk7C[0x84 - 0x7C];
     u32 voice;          // 0x84: the cry, from SE 0x475
 };
 

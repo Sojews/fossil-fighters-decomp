@@ -329,6 +329,48 @@ MTask *DinoBattleModelCreature::CreateUpdateTask(u8 a, u32 b) {
     return new DinoCreatureUpdateTask(this, a, b);
 }
 
+// The number of the creature's attacks its level allows.
+// NONMATCHING (and GetAttack): the game indexes the level table with i * 4 each time; ours strength-reduces it.
+u32 DinoBattleModelCreature::CountAttacks() {
+    const DinoCreatureDef *def = gDinoResource->GetCreatureDef(mUnkB0);
+    u32 count = 0;
+    int i = 0;
+    if (i < def->attackCount) {
+        const u32 *levels = (const u32 *) ((const u8 *) def + def->attackLevels);
+        for (; i < def->attackCount; i++) {
+            if (levels[i] <= mUnk100) {
+                count++;
+            }
+        }
+    }
+    return count;
+}
+
+// The index'th attack its level allows (and, with arg, that attack's value from the u8 table, less one); 0 if none.
+u32 DinoBattleModelCreature::GetAttack(u32 index, int *arg) {
+    const DinoCreatureDef *def = gDinoResource->GetCreatureDef(mUnkB0);
+    for (int i = 0; i < def->attackCount; i++) {
+        if (((const u32 *) ((const u8 *) def + def->attackLevels))[i] <= mUnk100 && index-- == 0) {
+            if (arg != NULL) {
+                *arg = ((const u8 *) def + def->attackUnk78)[i] - 1;
+            }
+            return ((const u32 *) ((const u8 *) def + def->attackIds))[i];
+        }
+    }
+    return 0;
+}
+
+// The creature's special attack, if the whole team qualifies and its level allows.
+u32 DinoBattleModelCreature::GetSpecialAttack() {
+    if (mPlayer->AllCreaturesShareDefFlag() && mPlayer->GetUnk15C()) {
+        const DinoCreatureDef *def = gDinoResource->GetCreatureDef(mUnkB0);
+        if (def->specialAttackLevel <= mUnk100) {
+            return def->specialAttack;
+        }
+    }
+    return 0;
+}
+
 MMessage *DinoBattleModelCreature::CreateMotionEffectRequest() {
     return new DinoBattleViewCreatureMotionEffectRequest(0, mUnkB4, 4, 0, 0, -1);
 }

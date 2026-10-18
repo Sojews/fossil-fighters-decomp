@@ -184,6 +184,9 @@ public:
     void EndAction();
     void SendUpdate(u8 a, u32 b);
     MTask *CreateUpdateTask(u8 a, u32 b);
+    u32 CountAttacks();
+    u32 GetAttack(u32 index, int *arg);
+    u32 GetSpecialAttack();
     void AddUnkFC(int delta);
     void SetLife(int life);
     BOOL IsInPinch();
