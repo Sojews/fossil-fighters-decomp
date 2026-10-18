@@ -4,21 +4,6 @@
 #include "nitro/os.h"
 
 typedef struct {
-    u8 month;
-    u8 day;
-} OSBirthday;
-
-typedef struct {
-    u8 language;
-    u8 favoriteColor;
-    OSBirthday birthday;
-    u16 nickName[10 + 1];
-    u16 nickNameLength;
-    u16 comment[26 + 1];
-    u16 commentLength;
-} OSOwnerInfo;
-
-typedef struct {
     u8 version;
     u8 padding;
     u8 favoriteColor : 4;

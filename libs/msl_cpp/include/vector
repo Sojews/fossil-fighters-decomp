@@ -731,6 +731,12 @@ namespace std {
         iterator end() {
             return iterator(this->data_ + this->size_);
         }
+        const_iterator begin() const {
+            return const_iterator(this->data_);
+        }
+        const_iterator end() const {
+            return const_iterator(this->data_ + this->size_);
+        }
 
         void push_back(const_reference x) {
             _Constructor::push_back(x);

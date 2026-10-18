@@ -168,7 +168,10 @@ src/m/ext_affine.cpp:
     .text       start:0x0204c258 end:0x0204d164
 
 src/m/serializer.cpp:
-    .text       start:0x0204d164 end:0x0204d580
+    .text       start:0x0204d164 end:0x0204d5ec
+
+src/m/text_codec.cpp:
+    .text       start:0x0204d5ec end:0x0204e19c
 
 src/m/dma.cpp:
     .text       start:0x0204fbc0 end:0x0204fc68

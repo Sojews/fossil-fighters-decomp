@@ -1,0 +1,52 @@
+#ifndef _STD_SET
+#define _STD_SET
+
+#include <tree>
+
+namespace std {
+    template <class T> struct __identity {
+        static const T &get(const T &v) {
+            return v;
+        }
+        template <class Compare> static bool less(Compare &c, const T &a, const T &b) {
+            return c(a, b);
+        }
+    };
+
+    template <class Key, class Compare = less<Key>, class Allocator = allocator<Key> >
+    class set : public __red_black_tree<Key, Key, __identity<Key>, Compare, Allocator> {
+        typedef __red_black_tree<Key, Key, __identity<Key>, Compare, Allocator> _Tree;
+
+    public:
+        typedef typename _Tree::iterator iterator;
+        typedef Key value_type;
+
+        set() {
+            this->init();
+        }
+        ~set() {}
+
+        pair<iterator, bool> insert(const value_type &v) {
+            return this->insert_unique(v);
+        }
+        iterator insert(iterator hint, const value_type &v) {
+            return this->insert_unique(hint, v);
+        }
+        typename _Tree::size_type count(const Key &k) {
+            iterator i = this->find(k);
+            return i != this->end();
+        }
+        template <class InputIterator> void insert(InputIterator first, InputIterator last);
+    };
+
+    template <class Key, class Compare, class Allocator>
+    template <class InputIterator>
+    void set<Key, Compare, Allocator>::insert(InputIterator first, InputIterator last) {
+        iterator e = this->end();
+        for (; first != last; ++first) {
+            insert(e, *first);
+        }
+    }
+} // namespace std
+
+#endif

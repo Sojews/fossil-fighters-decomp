@@ -15,7 +15,21 @@ class basic_string {
 public:
     typedef unsigned long size_type;
     typedef C *iterator;
-    typedef const C *const_iterator;
+    // (A class around the pointer: the game passes these by value in memory.)
+    class const_iterator {
+    public:
+        const_iterator(const C *p) : p_(p) {}
+        operator const C *() const { return p_; }
+        const C &operator*() const { return *p_; }
+        const_iterator &operator++() {
+            ++p_;
+            return *this;
+        }
+        bool operator!=(const const_iterator &x) const { return p_ != x.p_; }
+        bool operator==(const const_iterator &x) const { return p_ == x.p_; }
+
+        const C *p_;
+    };
 
     basic_string() {
         unsigned long i = 0;
@@ -39,6 +53,12 @@ public:
 
     basic_string substr(size_type pos = 0, size_type n = npos) const;
     size_type find(const C *s, size_type pos = 0) const;
+    size_type find(C c, size_type pos = 0) const;
+    size_type find_first_not_of(const C *s, size_type pos = 0) const;
+    size_type find_first_not_of(const C *s, size_type pos, size_type n) const;
+    size_type find_last_not_of(const C *s, size_type pos = npos) const;
+    size_type find_last_not_of(const C *s, size_type pos, size_type n) const;
+    void push_back(C c);
     size_type rfind(C c, size_type pos = npos) const;
     int compare(const C *s) const;
     int compare(const basic_string &str) const;
@@ -111,6 +131,11 @@ inline bool operator==(const basic_string<C, Traits, Alloc> &lhs, const C *rhs) 
 // The out-of-line members a file instantiates itself (defined only where MSL_STRING_DEFINITIONS is, so other
 // files keep calling the copies they link against).
 #ifdef MSL_STRING_DEFINITIONS
+}  // namespace std
+#include <string.h>
+namespace std {
+
+
 template <class C, class Traits, class Alloc>
 basic_string<C, Traits, Alloc>::basic_string(const C *s, size_type n) {
     unsigned long i = 0;
@@ -156,6 +181,80 @@ typename basic_string<C, Traits, Alloc>::size_type basic_string<C, Traits, Alloc
             if (q <= p) {
                 break;
             }
+        }
+    }
+    return npos;
+}
+
+template <class C, class Traits, class Alloc>
+typename basic_string<C, Traits, Alloc>::size_type basic_string<C, Traits, Alloc>::find_first_not_of(const C *s,
+                                                                                                size_type pos) const {
+    return find_first_not_of(s, pos, strlen(s));
+}
+
+template <class C, class Traits, class Alloc>
+typename basic_string<C, Traits, Alloc>::size_type
+basic_string<C, Traits, Alloc>::find_first_not_of(const C *s, size_type pos, size_type n) const {
+    const C *d;
+    size_type sz;
+    if (!is_long()) {
+        d = mShort.buf;
+        sz = mShort.size;
+    } else {
+        d = mLong.data;
+        sz = mLong.size;
+    }
+    if (pos < sz) {
+        if (n == 0) {
+            return pos;
+        }
+        const C *e = d + sz;
+        for (const C *p = d + pos; p < e; p++) {
+            const C *q = s;
+            for (size_type i = 0; i < n; i++, q++) {
+                if (*p == *q) {
+                    goto next_first;
+                }
+            }
+            return p - d;
+        next_first:;
+        }
+    }
+    return npos;
+}
+
+template <class C, class Traits, class Alloc>
+typename basic_string<C, Traits, Alloc>::size_type basic_string<C, Traits, Alloc>::find_last_not_of(const C *s,
+                                                                                               size_type pos) const {
+    return find_last_not_of(s, pos, strlen(s));
+}
+
+template <class C, class Traits, class Alloc>
+typename basic_string<C, Traits, Alloc>::size_type
+basic_string<C, Traits, Alloc>::find_last_not_of(const C *s, size_type pos, size_type n) const {
+    const C *d;
+    size_type sz;
+    if (!is_long()) {
+        d = mShort.buf;
+        sz = mShort.size;
+    } else {
+        d = mLong.data;
+        sz = mLong.size;
+    }
+    if (sz != 0) {
+        if (pos > sz - 1) {
+            pos = sz - 1;
+        }
+        for (const C *p = d + pos + 1; p > d;) {
+            p--;
+            const C *q = s;
+            for (size_type i = 0; i < n; i++, q++) {
+                if (*p == *q) {
+                    goto next_last;
+                }
+            }
+            return p - d;
+        next_last:;
         }
     }
     return npos;

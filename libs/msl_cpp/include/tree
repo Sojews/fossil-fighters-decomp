@@ -50,6 +50,7 @@ namespace std {
         };
 
         static void increment(node_base *&x);
+        static void decrement(node_base *&x);
         static void rotate_left(node_base *x, node_base *&root);
         static void rotate_right(node_base *x, node_base *&root);
         static void balance_insert(node_base *x, node_base *root);
@@ -66,6 +67,23 @@ namespace std {
         } else {
             node_base *p = x->parent();
             while (x != p->left_) {
+                x = p;
+                p = x->parent();
+            }
+            x = p;
+        }
+    }
+
+    template <bool b> void __red_black_tree_common<b>::decrement(node_base *&x) {
+        if (x->left_ != 0) {
+            node_base *y = x->left_;
+            while (y->right_ != 0) {
+                y = y->right_;
+            }
+            x = y;
+        } else {
+            node_base *p = x->parent();
+            while (x == p->left_) {
                 x = p;
                 p = x->parent();
             }
@@ -355,6 +373,10 @@ namespace std {
                 increment(node_);
                 return tmp;
             }
+            iterator &operator--() {
+                decrement(node_);
+                return *this;
+            }
             bool operator==(const iterator &x) const {
                 return node_ == x.node_;
             }
@@ -396,6 +418,9 @@ namespace std {
         node_base *find_insert_position(const Key &k, node_base *&last_not_greater, bool &left, bool &leftmost);
         node_base *insert_node_at(node_base *parent, bool left, bool leftmost, const Value &v);
         iterator insert_equal(const Value &v);
+        pair<iterator, bool> insert_unique(const Value &v);
+        iterator insert_unique(iterator hint, const Value &v);
+        void clear();
         iterator erase(iterator it);
         void destroy(node_base *n);
         // The first node in x's subtree whose key k doesn't sort after, or y.
@@ -474,6 +499,65 @@ namespace std {
         bool leftmost;
         node_base *p = find_insert_position(KeyOf::get(v), last_not_greater, left, leftmost);
         return iterator(insert_node_at(p, left, leftmost, v));
+    }
+
+    template <class Key, class Value, class KeyOf, class Compare, class Allocator>
+    void __red_black_tree<Key, Value, KeyOf, Compare, Allocator>::clear() {
+        if (header_.left_ != 0) {
+            destroy(header_.left_);
+            size_ = 0;
+            header_.left_ = 0;
+            leftmost_ = (node_base *) &header_;
+        }
+    }
+
+    template <class Key, class Value, class KeyOf, class Compare, class Allocator>
+    pair<typename __red_black_tree<Key, Value, KeyOf, Compare, Allocator>::iterator, bool>
+    __red_black_tree<Key, Value, KeyOf, Compare, Allocator>::insert_unique(const Value &v) {
+        node_base *last_not_greater;
+        bool left;
+        bool leftmost;
+        node_base *p = find_insert_position(KeyOf::get(v), last_not_greater, left, leftmost);
+        if (last_not_greater == 0 ||
+            KeyOf::less(static_cast<Compare &>(*this), static_cast<node *>(last_not_greater)->data_, KeyOf::get(v))) {
+            return pair<iterator, bool>(iterator(insert_node_at(p, left, leftmost, v)), true);
+        }
+        return pair<iterator, bool>(iterator(last_not_greater), false);
+    }
+
+    // Inserts v next to hint if it belongs there, else wherever it goes.
+    template <class Key, class Value, class KeyOf, class Compare, class Allocator>
+    typename __red_black_tree<Key, Value, KeyOf, Compare, Allocator>::iterator
+    __red_black_tree<Key, Value, KeyOf, Compare, Allocator>::insert_unique(iterator hint, const Value &v) {
+        if (hint == end() || KeyOf::less(static_cast<Compare &>(*this), KeyOf::get(v), *hint)) {
+            iterator prev = hint;
+            bool ok = true;
+            if (prev != begin() && !KeyOf::less(static_cast<Compare &>(*this), *--prev, KeyOf::get(v))) {
+                ok = false;
+            }
+            if (ok) {
+                if (hint.node_->left_ == 0) {
+                    return iterator(insert_node_at(hint.node_, true, hint == begin(), v));
+                }
+                return iterator(insert_node_at(prev.node_, false, false, v));
+            }
+        } else if (KeyOf::less(static_cast<Compare &>(*this), *hint, KeyOf::get(v))) {
+            iterator next = hint;
+            ++next;
+            bool ok = true;
+            if (next != end() && !KeyOf::less(static_cast<Compare &>(*this), KeyOf::get(v), *next)) {
+                ok = false;
+            }
+            if (ok) {
+                if (hint.node_->right_ == 0) {
+                    return iterator(insert_node_at(hint.node_, false, false, v));
+                }
+                return iterator(insert_node_at(next.node_, true, false, v));
+            }
+        } else {
+            return hint;
+        }
+        return insert_unique(v).first;
     }
 
     template <class Key, class Value, class KeyOf, class Compare, class Allocator>

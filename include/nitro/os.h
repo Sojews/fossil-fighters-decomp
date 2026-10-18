@@ -196,6 +196,24 @@ void OS_InitTick(void);
 int OS_SPrintf(char *dst, const char *fmt, ...);
 void OS_GetLowEntropyData(u32 buffer[8]);
 
+typedef struct {
+    u8 month;
+    u8 day;
+} OSBirthday;
+
+// The console owner's settings.
+typedef struct {
+    u8 language;
+    u8 favoriteColor;
+    OSBirthday birthday;
+    u16 nickName[10 + 1];
+    u16 nickNameLength;
+    u16 comment[26 + 1];
+    u16 commentLength;
+} OSOwnerInfo;
+
+void OS_GetOwnerInfo(OSOwnerInfo *info);
+
 #ifdef __cplusplus
 }
 #endif
