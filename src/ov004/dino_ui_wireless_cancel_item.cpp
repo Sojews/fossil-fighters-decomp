@@ -4,6 +4,8 @@
 // Derived destructors have their bases' destructor bodies inlined; auto-inlining the ones defined above does that.
 #pragma auto_inline on
 
+#include "game/dino_ui2_container_base_menu_item_menu.h"
+#include "m/multi_message.h"
 #include "game/dino_sound.h"
 #include "game/dino_resource.h"
 #include "m/soft_reset.h"
@@ -254,36 +256,51 @@ void DinoUiCannonParentScanner::ShowCount() {
 typedef void (DinoUiWirelessMatch::*DinoUiWirelessMatchState)();
 extern "C" struct {
     u8 unk00[0x34];
-    DinoUiWirelessMatchState state_02167e3c;    // 0x34
+    DinoUiWirelessMatchState state_02167e3c; // 0x34
     u8 unk3C[0x44 - 0x3C];
-    DinoUiWirelessMatchState StateInit;         // 0x44
-    DinoUiWirelessMatchState state_021676f8;    // 0x4C
+    DinoUiWirelessMatchState StateInit; // 0x44
+    DinoUiWirelessMatchState state_021676f8; // 0x4c
+    u8 unk54[0x74 - 0x54];
+    void (DinoUiCannonParentScanner::*Parent0216623c_74)(); // 0x74
 } data_ov004_021740d0;
 extern "C" struct {
-    u8 unk00[0x4C];
-    DinoUiWirelessMatchState StateRescan;       // 0x4C
+    u8 unk00[0x34];
+    void (DinoUiCannonChild::*Child02166dc0_34)(); // 0x34
+    u8 unk3C[0x4C - 0x3C];
+    DinoUiWirelessMatchState StateRescan; // 0x4c
 } data_ov004_02174150;
 extern "C" struct {
-    u8 unk00[0x3C];
-    DinoUiWirelessMatchState StateChildScan;    // 0x3C
+    u8 unk00[0x3c];
+    DinoUiWirelessMatchState StateChildScan; // 0x3c
     u8 unk44[0x54 - 0x44];
-    DinoUiWirelessMatchState state_02167b38;    // 0x54
+    DinoUiWirelessMatchState state_02167b38; // 0x54
+    u8 unk5C[0x64 - 0x5C];
+    void (DinoUiCannonParentScanner::*StateCheckFailed_64)(); // 0x64
+    u8 unk6C[0x7C - 0x6C];
+    void (DinoUiCannonParentScanner::*ParentStart_7C)(); // 0x7c
 } data_ov004_021741d0;
 extern "C" struct {
-    u8 unk00[0xC];
-    DinoUiWirelessMatchState StateStart;        // 0x0C
+    u8 unk00[0xc];
+    DinoUiWirelessMatchState StateStart; // 0x0c
     u8 unk14[0x1C - 0x14];
-    DinoUiWirelessMatchState StateChildScan;    // 0x1C
+    DinoUiWirelessMatchState StateChildScan; // 0x1c
+    void (DinoUiCannonChild::*StateShot_24)(); // 0x24
+    u8 unk2C[0x5C - 0x2C];
+    void (DinoUiCannonParentScanner::*Failed_5C)(); // 0x5c
+    u8 unk64[0x6C - 0x64];
+    void (DinoUiCannonParentScanner::*Failed_6C)(); // 0x6c
+    void (DinoUiCannonParentScanner::*StateSync_74)(); // 0x74
 } data_ov004_02174250;
 extern "C" struct {
     u8 unk00[0x54];
     DinoUiWirelessMatchState StateChildScan;    // 0x54
 } data_ov004_021742d0;
 extern "C" struct {
-    u8 unk00[0x2C];
-    DinoUiWirelessMatchState StateKeep;         // 0x2C
+    u8 unk00[0x2c];
+    DinoUiWirelessMatchState StateKeep; // 0x2c
     u8 unk34[0x5C - 0x34];
-    DinoUiWirelessMatchState StateParentScanned; // 0x5C
+    DinoUiWirelessMatchState StateParentScanned; // 0x5c
+    void (DinoUiCannonChild::*Child021674f8_64)(); // 0x64
 } data_ov004_02174350;
 extern "C" struct {
     u8 unk00[0x4];
@@ -404,4 +421,56 @@ void DinoUiChildScanner::OnFocus(MMenuItem *item) {
 DinoUiWirelessMatch::DinoUiWirelessMatch(u32 *result, u8 arg)
     : MProcess(NULL), mResult(result), mUnk98(arg), mHelpDisabler(NULL) {
     mState = data_ov004_02174250.StateStart;
+}
+
+DinoUiCannonParentScanner::DinoUiCannonParentScanner(MMultiPlay *multiPlay, u32 *result)
+    : MProcess(NULL), mMultiPlay(multiPlay), mResult(result) {
+    mState = data_ov004_021741d0.ParentStart_7C;
+}
+
+void DinoUiCannonParentScanner::OnConnectMessage(MMessage *msg) {
+    if (msg->mId == 5) {
+        MMultiPlayChildConnectedMessage *connected = (MMultiPlayChildConnectedMessage *)msg;
+        mAid = connected->mUnk0C;
+        MI_CpuCopy8(connected->mUnk0E, mSsid, sizeof(mSsid));
+        if (mSsid[0] != 2) {
+            mSerial.AddTail(mMultiPlay->CreateDisconnectTask(mAid));
+        } else {
+            mState = data_ov004_02174250.StateSync_74;
+        }
+    }
+}
+
+void DinoUiCannonParentScanner::StateSync() {
+    mSerial.AddTail(mMultiPlay->CreateSynchronizeDelayTask());
+    mState = data_ov004_021741d0.StateCheckFailed_64;
+}
+
+void DinoUiCannonParentScanner::StateCheckFailed() {
+    if (mMultiPlay->IsFailed()) {
+        mState = data_ov004_02174250.Failed_6C;
+    } else {
+        mState = data_ov004_021740d0.Parent0216623c_74;
+    }
+}
+
+void DinoUiCannonParentScanner::StateWait() {
+    if (mMultiPlay->IsFailed()) {
+        mState = data_ov004_02174250.Failed_5C;
+        return;
+    }
+    Dispatch();
+}
+
+void DinoUiCannonChild::StateShootMenu() {
+    mSerial.AddTail(new DinoUi2CannonShootMenu(&mUnkB8));
+    mState = data_ov004_02174250.StateShot_24;
+}
+
+void DinoUiCannonChild::StateShot() {
+    if (mUnkB8.size() == 0) {
+        mState = data_ov004_02174350.Child021674f8_64;
+    } else {
+        mState = data_ov004_02174150.Child02166dc0_34;
+    }
 }

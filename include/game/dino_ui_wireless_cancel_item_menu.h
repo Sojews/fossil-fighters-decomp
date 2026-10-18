@@ -106,10 +106,19 @@ public:
     virtual void OnMessage(MMessage *msg);
 
     void ShowCount();
+    void OnConnectMessage(MMessage *msg);
+    void StateSync();
+    void StateCheckFailed();
+    void StateWait();
 
     void (DinoUiCannonParentScanner::*mState)(); // 0xA8
     void (DinoUiCannonParentScanner::*mOnMessage)(MMessage *msg); // 0xB0
-    u32 mUnkB8[13];
+    MMultiPlay *mMultiPlay;             // 0xB8
+    u32 *mResult;                       // 0xBC
+    u32 unkC0;
+    u16 mAid;                           // 0xC4: the child that connected
+    u32 mSsid[6];                       // 0xC8: what it sent (the first word is its mode)
+    u32 unkE0[3];
     MMotion *mOnes;                     // 0xEC: the count's digits
     MMotion *mTens;                     // 0xF0
     u32 mCount;                         // 0xF4
@@ -124,6 +133,9 @@ public:
     virtual ~DinoUiCannonChild();
     virtual void Idle();
     virtual void OnMessage(MMessage *msg);
+
+    void StateShootMenu();
+    void StateShot();
 
     void (DinoUiCannonChild::*mState)(); // 0xA8
     u32 mUnkB0[2];
