@@ -21,6 +21,8 @@
 #include "m/observer.h"
 #include "m/multi_play.h"
 #include "m/text_codec.h"
+#include "game/dino_backup.h"
+#include "nitro/mi.h"
 #include "game/dino_common_window_menu_item_flush_task_menu.h"
 #include "m/oam_canvas.h"
 #include "m/indicator.h"
@@ -323,17 +325,20 @@ extern "C" struct {
 extern "C" struct {
     u8 unk00[0xC];
     void (DinoUiBattleParentScanner::*StateShowCancel_0C)(); // 0x0c
-    u8 unk14[0x44 - 0x14];
+    void (DinoUiChildScannerBattleConnect::*StateConnecting_14)(); // 0x14
+    u8 unk1C[0x44 - 0x1C];
     void (DinoUiChildScannerCannonConnect::*CannonStart_44)(); // 0x44
     u8 unk4C[0x54 - 0x4C];
     DinoUiWirelessMatchState StateChildScan;    // 0x54
     u8 unk5C[0x6C - 0x5C];
     void (DinoUiChildScannerBattleConnect::*BattleStart_6C)(); // 0x6c
+    u8 unk74[0x7C - 0x74];
+    void (DinoUiChildScannerBattleConnect::*StateCancel_7C)(); // 0x7c (its second word is in the next block)
 } data_ov004_021742d0;
 extern "C" struct {
     u8 unk00[0x4];
     void (DinoUiChildScannerBattleConnect::*IgnoreMessage_04)(MMessage *msg); // 0x04
-    u8 unk0C[0x14 - 0xC];
+    void (DinoUiChildScannerBattleConnect::*IgnoreMessage_0C)(MMessage *msg); // 0x0c
     void (DinoUiChildScannerBattleConnect::*StateConnect_14)(); // 0x14
     u8 unk1C[0x24 - 0x1C];
     void (DinoUiChildScannerBattleConnect::*StateChoose_24)(); // 0x24
@@ -625,6 +630,21 @@ void DinoUiChildScannerBattleConnect::StateStart() {
 
 extern const u32 data_0208ab90, data_0208ab94, data_0208ad70, data_0208ad74;
 
+static inline void AddSerial(MProcess *process, MTask *a, MTask *b, MTask *c) {
+    MSerialTaskSet *serial = &process->mSerial;
+    serial->AddTail(a);
+    serial->AddTail(b);
+    serial->AddTail(c);
+}
+
+static inline void AddSerial(MProcess *process, MTask *a, MTask *b, MTask *c, MTask *d) {
+    MSerialTaskSet *serial = &process->mSerial;
+    serial->AddTail(a);
+    serial->AddTail(b);
+    serial->AddTail(c);
+    serial->AddTail(d);
+}
+
 static inline void AddMarkedChoice(DinoCommonWindowMenu *window, u32 id, const std::string &help,
                                    const std::string &text) {
     window->AddChoice(id, text, help);
@@ -658,6 +678,81 @@ void DinoUiChildScannerBattleConnect::StateConnect() {
     mUnkE8->AddTail(window);
     mState = data_ov004_02174350.StateChoose_24;
     mOnMessage = data_ov004_02174250.OnConnectMessage_44;
+}
+
+// Drops the window if the console goes away or changes.
+void DinoUiChildScannerBattleConnect::OnConnectMessage(MMessage *msg) {
+    switch (msg->mId) {
+    case 2: {
+        MMultiPlayParentUpdatedMessage *updated = (MMultiPlayParentUpdatedMessage *)msg;
+        if (updated->mUnk0C == mUnkD0) {
+            mUnkE8->Clear();
+            mChoice = data_0208ab90;
+        }
+        break;
+    }
+    case 1: {
+        MMultiPlayParentLostMessage *lost = (MMultiPlayParentLostMessage *)msg;
+        if (lost->mUnk0C == mUnkD0) {
+            mUnkE8->Clear();
+            mChoice = data_0208ab90;
+        }
+        break;
+    }
+    }
+}
+
+extern const u32 data_0208ab7c, data_0208ab84;
+extern MView *data_ov004_02177284; // the view the cross-fade keeps
+
+// What a child sends the parent: its mode and its owner's name.
+struct DinoUiChildSsid {
+    u32 mode;
+    u16 name[9];
+};
+
+// Once the window closes: leaves on "don't connect", says the console can't be joined unless it's a battle, or
+// connects.
+void DinoUiChildScannerBattleConnect::StateChoose() {
+    mScanner->MMessageObserver::Dispatch();
+    MMessageObserver::Dispatch();
+    if (mUnkE8->IsEmpty()) {
+        if (mChoice == data_0208ab90) {
+            Exit();
+            return;
+        }
+        if (mParent->mMode != 1) {
+            MTask *box = new DinoCommonWindowMessageBox(MPoint(0x80, 0x60), gDinoResource->GetText(data_0208ab7c), 4);
+            MTask *exit = MTaskExitTransfer::Create(this);
+            MSerialTaskSet *serial = &mSerial;
+            serial->AddTail(box);
+            serial->AddTail(exit);
+        } else {
+            mState = data_ov004_021742d0.StateConnecting_14;
+            mOnMessage = data_ov004_02174350.IgnoreMessage_0C;
+        }
+    }
+}
+
+// Dims the screen, says it's connecting and joins the console.
+void DinoUiChildScannerBattleConnect::StateConnecting() {
+    gCurrentDisplay->mBlend->Reset();
+    gCurrentDisplay->mBlend->SetMode(3);
+    MBlend *blend = gCurrentDisplay->mBlend;
+    blend->SetTarget1(data_ov004_02177284->GetPlaneMask() | 0x10);
+    gCurrentDisplay->mBlend->SetTarget2(0x3F);
+    gCurrentDisplay->mBlend->SetAlpha(16, 0);
+    char text[0x100];
+    sprintf(text, gDinoResource->GetText(data_0208ab84), mText.c_str());
+    mUnkE8->AddTail(new DinoCommonWindowMessageWait1(std::string(text), MPoint(0x80, 0x60), 4, TRUE));
+    DinoPlayerData player;
+    gDinoBackup->GetPlayer(&player, TRUE);
+    DinoUiChildSsid ssid;
+    ssid.mode = 1;
+    MIi_CpuCopy16(player.name, ssid.name, sizeof(ssid.name));
+    AddSerial(this, gCurrentDisplay->mBlend->CreateFadeRatioAnime(0, 8, 10, 0), mMultiPlay->CreateEndScanTask(),
+              mMultiPlay->CreateStartChildTask(mUnkD0, (const u8 *)&ssid), mMultiPlay->CreateSynchronizeDelayTask());
+    mState = data_ov004_021742d0.StateCancel_7C;
 }
 
 void DinoUiChildScannerCannonConnect::StateStart() {
@@ -740,20 +835,6 @@ void DinoUiBattleParentScanner::StateAsk() {
 
 extern const u32 data_0208ab5c;
 
-static inline void AddSerial(MProcess *process, MTask *a, MTask *b, MTask *c) {
-    MSerialTaskSet *serial = &process->mSerial;
-    serial->AddTail(a);
-    serial->AddTail(b);
-    serial->AddTail(c);
-}
-
-static inline void AddSerial(MProcess *process, MTask *a, MTask *b, MTask *c, MTask *d) {
-    MSerialTaskSet *serial = &process->mSerial;
-    serial->AddTail(a);
-    serial->AddTail(b);
-    serial->AddTail(c);
-    serial->AddTail(d);
-}
 
 // Waits for a child; cancelling fades out and leaves with no partner.
 void DinoUiBattleParentScanner::State021655a0() {

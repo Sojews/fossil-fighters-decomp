@@ -91,6 +91,7 @@ public:
     void StateStart();
     void StateConnect();
     void StateChoose();
+    void StateConnecting();
     void StateCancel();
     void StateRescan();
 

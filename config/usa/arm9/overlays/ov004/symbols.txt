@@ -433,7 +433,7 @@ _ZN31DinoUiChildScannerBattleConnect13IgnoreMessageEP8MMessage kind:function(thu
 _ZN31DinoUiChildScannerBattleConnect12StateConnectEv kind:function(thumb,size=0x14c) addr:0x02163844
 _ZN31DinoUiChildScannerBattleConnect11StateChooseEv kind:function(thumb,size=0x114) addr:0x02163990
 _ZN31DinoUiChildScannerBattleConnect16OnConnectMessageEP8MMessage kind:function(thumb,size=0x54) addr:0x02163aa4
-func_ov004_02163af8 kind:function(thumb,size=0x178) addr:0x02163af8
+_ZN31DinoUiChildScannerBattleConnect15StateConnectingEv kind:function(thumb,size=0x178) addr:0x02163af8
 _ZN31DinoUiChildScannerBattleConnect11StateCancelEv kind:function(thumb,size=0x6c) addr:0x02163c70
 func_ov004_02163cdc kind:function(thumb,size=0x80) addr:0x02163cdc
 _ZN31DinoUiChildScannerBattleConnect11StateRescanEv kind:function(thumb,size=0x40) addr:0x02163d5c
