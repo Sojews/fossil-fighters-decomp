@@ -44,6 +44,7 @@ class MMultiPlay;
 
 class DinoUiChildScanner : public MMenu, public MMessageObserver, public DinoHelpBase {
 public:
+    DinoUiChildScanner(MMultiPlay *multiPlay, u32 *chosen, u32 *choice);
     virtual ~DinoUiChildScanner();
     virtual void OnStart();
     virtual void OnIdle();
@@ -88,15 +89,18 @@ public:
 
 class DinoUiBattleParentScanner : public MProcess, public MMessageObserver {
 public:
+    DinoUiBattleParentScanner(MMultiPlay *multiPlay, u32 *result);
     virtual ~DinoUiBattleParentScanner();
     virtual void Idle();
     virtual void OnMessage(MMessage *msg);
 
     void (DinoUiBattleParentScanner::*mState)(); // 0xA8
+    u8 unkB0[0xFC - 0xB0];
 };
 
 class DinoUiCannonParentScanner : public MProcess, public MMessageObserver {
 public:
+    DinoUiCannonParentScanner(MMultiPlay *multiPlay, u32 *result);
     virtual ~DinoUiCannonParentScanner();
     virtual void Idle();
     virtual void OnMessage(MMessage *msg);
@@ -116,6 +120,7 @@ public:
 
 class DinoUiCannonChild : public MProcess, public MMessageObserver {
 public:
+    DinoUiCannonChild(MMultiPlay *multiPlay, u32 choice);
     virtual ~DinoUiCannonChild();
     virtual void Idle();
     virtual void OnMessage(MMessage *msg);
@@ -142,14 +147,24 @@ public:
 
     void StateKeep();
     void StateStart();
+    void StateInit();
+    void StateChildScan();
+    void StateCannonChild();
+    void StateBattleParentScan();
+    void StateParentScanned();
+    void StateCannonParentScan();
+    void StateRescan();
 
     void (DinoUiWirelessMatch::*mState)(); // 0x74
-    MTask *mUnk7C;      // 0x7C: kept in DinoResource for the next scene
+    MMultiPlay *mMultiPlay; // 0x7C: kept in DinoResource for the next scene
     MTask *mUnk80;      // 0x80
     u32 *mResult;       // 0x84
-    u32 mUnk88[4];
+    u32 mChosen;        // 0x88
+    u32 mScanResult;    // 0x8C
+    u32 mChoice;        // 0x90
+    u32 unk94;
     u8 mUnk98;          // 0x98
-    MTask *mUnk9C;      // 0x9C
+    DinoHelpDisabler *mHelpDisabler; // 0x9C
 };
 
 #endif

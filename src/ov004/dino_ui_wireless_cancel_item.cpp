@@ -40,7 +40,7 @@ DinoUiChildScanner::~DinoUiChildScanner() {
 }
 
 DinoUiWirelessMatch::~DinoUiWirelessMatch() {
-    delete mUnk9C;
+    delete mHelpDisabler;
 }
 
 DinoUiBattleParentScanner::~DinoUiBattleParentScanner() {
@@ -252,32 +252,107 @@ void DinoUiCannonParentScanner::ShowCount() {
 // so until every state of the file is decompiled they are reached through these (named after the state each
 // points to).
 typedef void (DinoUiWirelessMatch::*DinoUiWirelessMatchState)();
-struct DinoUiWirelessMatchPool0 {
+extern "C" struct {
     u8 unk00[0x34];
     DinoUiWirelessMatchState state_02167e3c;    // 0x34
     u8 unk3C[0x44 - 0x3C];
-    DinoUiWirelessMatchState state_02167aa0;    // 0x44
+    DinoUiWirelessMatchState StateInit;         // 0x44
     DinoUiWirelessMatchState state_021676f8;    // 0x4C
-};
-extern "C" DinoUiWirelessMatchPool0 data_ov004_021740d0;
+} data_ov004_021740d0;
+extern "C" struct {
+    u8 unk00[0x4C];
+    DinoUiWirelessMatchState StateRescan;       // 0x4C
+} data_ov004_02174150;
+extern "C" struct {
+    u8 unk00[0x3C];
+    DinoUiWirelessMatchState StateChildScan;    // 0x3C
+    u8 unk44[0x54 - 0x44];
+    DinoUiWirelessMatchState state_02167b38;    // 0x54
+} data_ov004_021741d0;
+extern "C" struct {
+    u8 unk00[0x1C];
+    DinoUiWirelessMatchState StateChildScan;    // 0x1C
+} data_ov004_02174250;
+extern "C" struct {
+    u8 unk00[0x54];
+    DinoUiWirelessMatchState StateChildScan;    // 0x54
+} data_ov004_021742d0;
+extern "C" struct {
+    u8 unk00[0x2C];
+    DinoUiWirelessMatchState StateKeep;         // 0x2C
+    u8 unk34[0x5C - 0x34];
+    DinoUiWirelessMatchState StateParentScanned; // 0x5C
+} data_ov004_02174350;
+extern "C" struct {
+    u8 unk00[0x4];
+    DinoUiWirelessMatchState StateChildScan;    // 0x4
+} data_ov004_021743d0;
 
 void DinoUiWirelessMatch::StateStart() {
     if (MGetResetParameter() == 1) {
         mState = data_ov004_021740d0.state_02167e3c;
     } else if (!mUnk98) {
-        mState = data_ov004_021740d0.state_02167aa0;
+        mState = data_ov004_021740d0.StateInit;
     } else {
         mState = data_ov004_021740d0.state_021676f8;
     }
+}
+
+// Takes over the connection kept in DinoResource.
+void DinoUiWirelessMatch::StateInit() {
+    mHelpDisabler = new DinoHelpDisabler;
+    gDinoResource->GetUnk90((u32 *)&mMultiPlay, (u32 *)&mUnk80);
+    MTask *b = mUnk80;
+    MParallelTaskSet *parallel = &mParallel;
+    parallel->AddTail(mMultiPlay);
+    parallel->AddTail(b);
+    mChosen = 2;
+    mState = data_ov004_021743d0.StateChildScan;
+}
+
+void DinoUiWirelessMatch::StateChildScan() {
+    mSerial.AddTail(new DinoUiChildScanner(mMultiPlay, &mChosen, &mChoice));
+    mState = data_ov004_021741d0.state_02167b38;
+}
+
+void DinoUiWirelessMatch::StateCannonChild() {
+    mSerial.AddTail(new DinoUiCannonChild(mMultiPlay, mChoice));
+    mChosen = 2;
+    mState = data_ov004_021741d0.StateChildScan;
+}
+
+void DinoUiWirelessMatch::StateBattleParentScan() {
+    mSerial.AddTail(new DinoUiBattleParentScanner(mMultiPlay, &mScanResult));
+    mState = data_ov004_02174350.StateParentScanned;
+}
+
+void DinoUiWirelessMatch::StateParentScanned() {
+    switch (mScanResult) {
+    case 0:
+        mState = data_ov004_02174250.StateChildScan;
+        break;
+    case 1:
+        mState = data_ov004_02174350.StateKeep;
+        break;
+    }
+}
+
+void DinoUiWirelessMatch::StateCannonParentScan() {
+    mSerial.AddTail(new DinoUiCannonParentScanner(mMultiPlay, &mScanResult));
+    mState = data_ov004_02174150.StateRescan;
+}
+
+void DinoUiWirelessMatch::StateRescan() {
+    mState = data_ov004_021742d0.StateChildScan;
 }
 
 // Hands the connection's tasks over to DinoResource and ends.
 void DinoUiWirelessMatch::StateKeep() {
     MTask *b = mUnk80;
     MParallelTaskSet *parallel = &mParallel;
-    parallel->Remove(mUnk7C);
+    parallel->Remove(mMultiPlay);
     parallel->Remove(b);
-    gDinoResource->SetUnk90((u32)mUnk7C, (u32)mUnk80);
+    gDinoResource->SetUnk90((u32)mMultiPlay, (u32)mUnk80);
     *mResult = 1;
     Exit();
 }
