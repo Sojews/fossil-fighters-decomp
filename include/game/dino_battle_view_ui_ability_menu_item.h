@@ -12,9 +12,12 @@
 #include "game/dino_battle_help.h"
 
 class AttackMenuBarMotion;
+class DinoBattleViewUiAbilityMenu;
+class MSmartOam;
 
 class DinoBattleViewUiAbilityMenuItem : public MMenuItem {
 public:
+    DinoBattleViewUiAbilityMenuItem(DinoBattleViewUiAbilityMenu *menu, bool flag, bool flag3, u32 attack, u32 kind, u32 unk90);
     virtual ~DinoBattleViewUiAbilityMenuItem();
     virtual MRect GetFrame();
     virtual void OnFocusChanged(BOOL focused);
@@ -28,11 +31,13 @@ public:
     u32 GetUnk90();
     AttackMenuBarMotion *GetBar();
 
-    u32 unk88;
-    u32 mUnk8C;                 // 0x8C
+    u32 mUnk88;                 // 0x88
+    u32 mUnk8C;                 // 0x8C: attack
     u32 mUnk90;                 // 0x90
-    u8 mUnk94;                  // 0x94
+    bool mUnk94;                // 0x94
     AttackMenuBarMotion *mUnk98; // 0x98
+    DinoBattleViewUiAbilityMenu *mMenu; // 0x9C
+    MParallelTaskSet *mTasks;   // 0xA0
 };
 
 class DinoBattleViewUiAbilityMenu : public MMenu, public DinoHelpBase {
@@ -43,8 +48,11 @@ public:
     virtual void OnFocus(MMenuItem *item);
     virtual void OnDecide(MMenuItem *item);
 
-    u8 unkB4[0x50];
-    u32 mUnk104;    // 0x104
+    MSmartOam *GetUnkB4();
+
+    MSmartOam *mUnkB4;  // 0xB4
+    u8 unkB8[0x4C];
+    void *mUnk104;  // 0x104
 };
 
 class MMotion;
