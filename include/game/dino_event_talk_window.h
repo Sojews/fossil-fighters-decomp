@@ -15,13 +15,20 @@ public:
     virtual void Idle();
 
     void AddEntry(u32 id, MRect rect, const std::string &text);
+    void SetYesNo(u32 arg, MPoint pos, u32 unkB4, const std::string &a, const std::string &b, const std::string &c,
+                  const std::string &d);
+    void SetChoices(u32 arg, MPoint pos, const std::vector<DinoWindowChoice> &choices, u32 unkB4);
 
     void (DinoEventTalkWindow::*mState)();  // 0x74
     u32 mUnk7C[2];                          // 0x7C
     std::string mText;                      // 0x84
-    u32 mUnk90[6];                          // 0x90
+    u32 mUnk90[2];                          // 0x90
+    u32 mUnk98;                             // 0x98
+    u32 mUnk9C;                             // 0x9C
+    MPoint mPos;                            // 0xA0
     std::vector<DinoWindowChoice> mChoices; // 0xA8
-    u32 mUnkB4[2];                          // 0xB4
+    u32 mUnkB4;                             // 0xB4
+    u32 mUnkB8;                             // 0xB8
     std::string mUnkBC;                     // 0xBC
     std::string mUnkC8;                     // 0xC8
     std::string mUnkD4;                     // 0xD4

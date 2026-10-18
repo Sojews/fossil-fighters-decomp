@@ -719,7 +719,7 @@ namespace std {
         }
         vector &operator=(const vector &x) {
             if (this != &x) {
-                this->assign(x.data_, x.data_ + x.size_, Metrowerks::int2type<true>());
+                this->assign(x.begin(), x.end(), Metrowerks::int2type<true>());
             }
             return *this;
         }

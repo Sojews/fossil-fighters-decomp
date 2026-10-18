@@ -8,6 +8,24 @@
 DinoEventTalkWindow::~DinoEventTalkWindow() {
 }
 
+void DinoEventTalkWindow::SetYesNo(u32 arg, MPoint pos, u32 unkB4, const std::string &a, const std::string &b,
+                                   const std::string &c, const std::string &d) {
+    mUnk98 = arg;
+    mPos = pos;
+    mUnkB4 = unkB4;
+    mUnkBC = a;
+    mUnkC8 = b;
+    mUnkD4 = c;
+    mUnkE0 = d;
+}
+
+void DinoEventTalkWindow::SetChoices(u32 arg, MPoint pos, const std::vector<DinoWindowChoice> &choices, u32 unkB4) {
+    mUnk9C = arg;
+    mPos = pos;
+    mChoices = choices;
+    mUnkB4 = unkB4;
+}
+
 void DinoEventTalkWindow::AddEntry(u32 id, MRect rect, const std::string &text) {
     DinoCommonWindowMenuEntry entry;
     entry.id = id;
