@@ -143,7 +143,8 @@ struct DinoBackupEntry {
     u32 type : 2;
     u32 unkC_12 : 1;
     u32 active : 1;
-    u32 unkC_14 : 18;
+    u32 score : 8;          // the cleaning score, out of 100
+    u32 unkC_22 : 10;
     // 0x10
     u32 unk10_0 : 3;
     u32 unk10_3 : 1;

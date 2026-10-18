@@ -171,7 +171,8 @@ struct DinoKasekiDefs {
 struct DinoKasekiDef {
     u8 unk00[0x18];
     u32 price;          // 0x18
-    u8 unk1C[0x24 - 0x1C];
+    u32 sellPrice;      // 0x1C
+    u32 unk20;          // 0x20: the selling price of one still in its rock?
     u32 unk24;          // 0x24
 
     u32 nameText;       // 0x28

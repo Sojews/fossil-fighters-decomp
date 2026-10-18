@@ -9,6 +9,8 @@
 #include "game/help.h"
 #include "game/dino_ui_shop_sell_menu_item.h"
 
+class DinoUi3PartsMoney;
+
 class DinoUiShopSellMenu : public DinoHelpBase, public MMenu {
 public:
     DinoUiShopSellMenu();
@@ -23,6 +25,13 @@ public:
     BOOL Sell();
     void ClearItems();
     u8 GetFlag(int index);
+    void SetFlag(int index, u8 flag);
+    u32 GetPrice(int index);
+    void RefreshTotal();
+    const DinoKasekiDef *GetKasekiDef(u32 id) {
+        const DinoKasekiDefs *defs = (const DinoKasekiDefs *)mFile.GetData();
+        return (const DinoKasekiDef *)((const u8 *)defs + ((const u32 *)((const u8 *)defs + defs->tableOffset))[id]);
+    }
     void RefreshPage2();
 
     MArchivePtr mArchive;       // 0xB4
@@ -37,11 +46,11 @@ public:
     MView *mCursor;             // 0xF0
     u32 mUnkF4;
     std::vector<u32> mUnkF8;    // 0xF8
-    u32 mUnk104;                // 0x104
+    DinoUi3PartsMoney *mMoney;  // 0x104
     u8 mFlags[0x40];            // 0x108
     int mPage;                  // 0x148
     int mLastPage;              // 0x14C
-    u8 mUnk150;                 // 0x150
+    u8 mCount;                  // 0x150: how many are chosen
     u32 mUnk154;
     MMenuItem *mUnk158;         // 0x158
 };
