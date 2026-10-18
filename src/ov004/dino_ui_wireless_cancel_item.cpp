@@ -365,7 +365,7 @@ extern "C" struct {
     DinoUiWirelessMatchState StateBattleParentScan_74; // 0x74
     DinoUiWirelessMatchState StateCannonChild_7C; // 0x7c (its second word is in the next block)
     u8 unk84[0x8C - 0x84];
-    DinoUiWirelessMatchState State02167cd0_8C; // 0x8c
+    DinoUiWirelessMatchState StateFinish_8C; // 0x8c
 } data_ov004_02174350;
 extern "C" struct {
     u8 unk00[0x4];
@@ -710,7 +710,7 @@ void DinoUiCannonChild::StateWaitStart() {
 void DinoUiWirelessMatch::StateChosen() {
     switch (mChosen) {
     default:
-        mState = data_ov004_02174350.State02167cd0_8C;
+        mState = data_ov004_02174350.StateFinish_8C;
         break;
     case 0:
         mState = data_ov004_021741d0.StateKeep_4C;
@@ -798,6 +798,35 @@ void DinoUiWirelessMatch::StateStartWireless() {
               new DinoCommonWindowMessageBox(MPoint(0x80, 0x60), gDinoResource->GetText(data_0208ab60), 4),
               gCurrentDisplay->mBlend->CreateFadeRatioAnime(8, 0, 10, 0));
     mState = data_ov004_02174150.StateChildScan_24;
+}
+
+// Ends wireless play: brings the field's sounds back and leaves.
+void DinoUiWirelessMatch::StateFinish() {
+    MEnableSoftReset();
+    MEnableSleep();
+    *mResult = 0;
+    MTask *stopBgm;
+    MTask *timer;
+    MTask *load;
+    MTask *bgm;
+    MTask *exit;
+    exit = MTaskExitTransfer::Create(this);
+    bgm = DinoSoundCreatePlayBgmTask(0x77, 0);
+    load = DinoSoundCreateLoadSceneTask(1);
+    timer = new MTimer(10);
+    stopBgm = DinoSoundCreateStopBgmTask(-1, 10);
+    MSerialTaskSet *sounds = new MSerialTaskSet(TRUE);
+    sounds->AddTail(stopBgm);
+    sounds->AddTail(timer);
+    sounds->AddTail(load);
+    sounds->AddTail(bgm);
+    MTask *finish = mMultiPlay->CreateFinishTask();
+    MParallelTaskSet *ending = new MParallelTaskSet(TRUE);
+    ending->AddTail(finish);
+    ending->AddTail(sounds);
+    MSerialTaskSet *serial = &mSerial;
+    serial->AddTail(ending);
+    serial->AddTail(exit);
 }
 
 // Ends the scan and leaves after half a second.

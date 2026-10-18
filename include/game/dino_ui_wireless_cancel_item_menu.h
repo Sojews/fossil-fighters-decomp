@@ -239,7 +239,7 @@ public:
     void StateRescan();
     void StateChosen();
     void StateAfterReset();
-    void State02167cd0();
+    void StateFinish();
     void StateAsk();
     void StateAnswered();
     void StateStartWireless();
