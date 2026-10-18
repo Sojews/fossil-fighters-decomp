@@ -4,16 +4,21 @@
 #include <string>
 #include "m/task.h"
 #include "m/archive.h"
+#include "m/resource.h"
 
 class DinoSenryuSample : public MProcess {
 public:
+    DinoSenryuSample();
     virtual ~DinoSenryuSample();
     virtual void Idle();
 
+    void StateEnd();
+    void StateMenu();
+
     void (DinoSenryuSample::*mState)(); // 0x74
     std::wstring mText;     // 0x7C
-    MArchivePtr mArchive;   // 0x88
-    MArchiveFile mFile;     // 0x8C
+    MResource<u8> mData;    // 0x88
+    s32 mResult;            // 0x98: -2 to leave
 };
 
 #endif

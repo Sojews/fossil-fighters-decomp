@@ -14,6 +14,7 @@
 
 class DinoUiSenryuMenu : public DinoHelpBase, public MMenu {
 public:
+    DinoUiSenryuMenu();
     virtual ~DinoUiSenryuMenu();
     virtual void OnStart();
     virtual void OnIdle();
@@ -34,6 +35,7 @@ public:
     u8 mSilentFocus;    // 0x13D
     std::wstring mUnk140[126];  // 0x140
     std::wstring mUnk728[42];   // 0x728
+    u8 unk920[0x9D0 - 0x920];
 };
 
 #endif

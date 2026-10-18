@@ -227,6 +227,7 @@ typedef struct {
 } FSOverlayInfo;
 
 BOOL FS_LoadOverlayInfo(FSOverlayInfo *p_ovi, MIProcessor target, FSOverlayID id);
+BOOL FS_LoadOverlay(MIProcessor target, FSOverlayID id);
 FSFileID FS_GetOverlayFileID(const FSOverlayInfo *p_ovi);
 void FS_ClearOverlayImage(FSOverlayInfo *p_ovi);
 void FS_StartOverlay(FSOverlayInfo *p_ovi);

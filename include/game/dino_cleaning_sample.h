@@ -5,10 +5,16 @@
 
 class DinoCleaningSample : public MProcess {
 public:
+    DinoCleaningSample();
     virtual ~DinoCleaningSample();
     virtual void Idle();
 
+    void StateCleaning();
+
     void (DinoCleaningSample::*mState)(); // 0x74
+    u32 mUnk7C;             // 0x7C
+    u32 mUnk80;             // 0x80
+    u32 mUnk84;             // 0x84
 };
 
 #endif

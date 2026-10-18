@@ -8,6 +8,9 @@
 #include <printf.h>
 #include "game/dino_cleaning_sample_menu.h"
 #include "game/dino_cleaning_sample.h"
+#include "game/dino_cleaning.h"
+#include "m/overlay.h"
+#include "nitro/fs.h"
 #include "game/dino_cleaning_sample_menu_dec_item.h"
 #include "game/dino_cleaning_sample_menu_inc_item.h"
 #include "game/dino_cleaning_sample_kaseki_type_item.h"
@@ -151,4 +154,28 @@ void DinoCleaningSampleMenu::OnFocus(MMenuItem *item) {
         mTasks->Clear();
         mTasks->AddTail(mCursor->CreateFrameAnime(mCursor->GetFrame(), item->GetFrame(), 5, -2));
     }
+}
+
+M_EXTERN_OVERLAY(ov002);
+
+// The TU's pooled pointer-to-member constants (see menu.cpp).
+extern "C" struct {
+    u8 unk00[0x8];
+    void (DinoCleaningSample::*Unk_08)();
+    u8 unk10[0x28 - 0x10];
+    void (DinoCleaningSample::*Start_28)();
+} data_020bcc24;
+extern "C" u8 data_0214d158[];
+
+DinoCleaningSample::DinoCleaningSample() : MProcess(NULL) {
+    mState = data_020bcc24.Start_28;
+    mUnk7C = 0;
+    mUnk80 = 0;
+    mUnk84 = 0;
+    FS_LoadOverlay(MI_PROCESSOR_ARM9, M_OVERLAY_ID(ov002));
+}
+
+void DinoCleaningSample::StateCleaning() {
+    mSerial.AddTail(new DinoCleaning(mUnk7C, data_0214d158, mUnk80, mUnk84, TRUE, 0));
+    mState = data_020bcc24.Unk_08;
 }
