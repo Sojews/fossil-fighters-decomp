@@ -7,9 +7,9 @@
 | | |
 |---|---|
 | Target | Fossil Fighters (USA), `YKHE`, SHA-1 `8148a65040b5085337b76e6051601da1b1fc28ef` |
-| Functions | 10,055 found across ARM9 main, ITCM and 8 overlays |
-| Matched | 3,360 functions, 114,980 bytes (10.4%): the ARM sound system, much of the `M` engine library (tasks, interrupts, displays, BG layers, screens, sprites, fonts, text, menus, pictures, resources, animations, raster effects, background threads, sleep and soft reset, memory) and its message classes, the game's sound interface, fonts and data file registry, plus C and C++ library bits (`std::vector`, `std::list`) |
-| Named | 4,820 functions, incl. ~800 NitroSDK/NitroSystem/MSL functions found by `tools/sdk_names` and ~1,200 destructors named from the RTTI |
+| Functions | 11,776 found across ARM9 main, ITCM and 8 overlays |
+| Matched | 9,065 functions, 432,810 bytes (30.9%): the `M` engine library (tasks, interrupts, displays, BG layers, sprites, fonts, text, menus, pictures, 3D models and scenes, motions, resources, backups, wireless play), the NitroSDK, NitroSystem, MSL and MW runtime code the game uses, and much of the game: sound, events, the field, cleaning, saves, menus and the battle models and UI |
+| Named | 10,036 functions, incl. the NitroSDK/NitroSystem/MSL functions found by `tools/sdk_names` and the destructors and virtuals named from the RTTI |
 | Compiler | Metrowerks CodeWarrior for ARM 2.0 (`mwccarm`), NitroSDK 4.0 |
 
 ## Building
