@@ -6,6 +6,7 @@
 
 #include "game/dino_ui_team_select.h"
 #include "types.h"
+#include "m/call_task.h"
 
 DinoUiTeamSelectMenu::~DinoUiTeamSelectMenu() {
 }
@@ -78,3 +79,8 @@ void DinoUiTeamSelectMenu::OnFocus(MMenuItem *item) {
         }
     }
 }
+
+// Template task instances the game emits in this file. Until the code that makes the tasks is decompiled, they are
+// instantiated explicitly.
+template class MCallTask0<DinoUiTeamSelectMenu, DinoUiTeamSelectMenu>;
+template MTask *MCreateCallTask(DinoUiTeamSelectMenu *obj, void (DinoUiTeamSelectMenu::*func)());

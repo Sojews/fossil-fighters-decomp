@@ -6,6 +6,11 @@
 
 class DinoUiRvInformation3DModel;
 
+// A creature's details as the information screen shows them (passed by value).
+struct DinoCreatureInfo {
+    u32 unk00[6];
+};
+
 class DinoUiRvInformation : public MProcess {
 public:
     virtual ~DinoUiRvInformation();

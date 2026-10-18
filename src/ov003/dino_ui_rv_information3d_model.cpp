@@ -34,5 +34,9 @@ template class MCallTask0<DinoUiRvInformation, DinoUiRvInformation>;
 template MTask *MCreateCallTask(DinoUiRvInformation *obj, void (DinoUiRvInformation::*func)());
 template class MCallTask1<DinoUiRvInformation, DinoUiRvInformation, u8>;
 template MTask *MCreateCallTask(DinoUiRvInformation *obj, void (DinoUiRvInformation::*func)(u8), u8 a0);
+// NONMATCHING (this creator only): we copy the DinoCreatureInfo argument to a stack temporary before constructing;
+// the game copies it straight from the argument (a const A1 & constructor does that but breaks the MPoint instances).
+template class MCallTask1<DinoUiRvInformation, DinoUiRvInformation, DinoCreatureInfo>;
+template MTask *MCreateCallTask(DinoUiRvInformation *obj, void (DinoUiRvInformation::*func)(DinoCreatureInfo), DinoCreatureInfo a0);
 template class MBgCallTask0<DinoUiRvInformation3DModel>;
 template MTask *MCreateBgCallTask(DinoUiRvInformation3DModel *obj, void (DinoUiRvInformation3DModel::*func)(), int thread);
