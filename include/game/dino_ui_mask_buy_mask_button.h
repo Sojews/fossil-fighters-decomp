@@ -12,7 +12,8 @@ public:
 
     MPoint mPos;  // 0x88: the center
     MMotion *mMotion; // 0x90
-    MView *mView; // 0x94
+    MView *mView; // 0x94: the mask's details
+    MView *mMark; // 0x98: shown while the mask is chosen
 };
 
 #endif

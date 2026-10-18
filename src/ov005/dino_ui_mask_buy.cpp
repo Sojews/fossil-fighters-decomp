@@ -4,6 +4,8 @@
 // Derived destructors have their bases' destructor bodies inlined; auto-inlining the ones defined above does that.
 #pragma auto_inline on
 
+#include "m/input.h"
+
 #include "m/smart_oam.h"
 
 #include "game/dino_resource.h"
@@ -252,6 +254,38 @@ void DinoUiMaskBuyMenu::RefreshPage3() {
             } else {
                 ((DinoUiMaskBuyMaskButton *)mUnkC4[i])->mMotion->GetUnit()->SetMode(1);
             }
+        }
+    }
+}
+
+// Removes the page's mask buttons.
+// NONMATCHING: the game reloads the size for clear() (as in the containers' ClearItems).
+void DinoUiMaskBuyMenu::RefreshPage1() {
+    RemoveLink(mBuy, 4);
+    RemoveLink(mBack, 2);
+    for (int i = 0; i < mUnkC4.size(); i++) {
+        RemoveItem((MMenuItem *)mUnkC4[i]);
+        delete (MMenuItem *)mUnkC4[i];
+    }
+    mUnkC4.clear();
+}
+
+// X jumps to the buy button; B unchooses the selected mask, or goes to (and then presses) the back button.
+void DinoUiMaskBuyMenu::OnIdle() {
+    if (GetInput()->GetPressed() & 8) {
+        FocusItem(mBuy);
+    }
+    if (GetInput()->GetPressed() & 2) {
+        if (mSelected != 0xFF && GetFlag(mSelected)) {
+            SetFlag(mSelected, FALSE);
+            ((DinoUiMaskBuyMaskButton *)mUnkC4[mSelected % 8])->mMark->Hide();
+            RefreshPage3();
+            return;
+        }
+        if (mBack->IsFocused()) {
+            mBack->Decide();
+        } else {
+            FocusItem(mBack);
         }
     }
 }

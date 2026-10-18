@@ -29,8 +29,11 @@ public:
     void RefreshPage2();
     void RefreshPage3();
 
-    u32 mUnkB4[4];          // 0xB4
-    std::vector<void *> mUnkC4; // 0xC4
+    u32 mUnkB4;             // 0xB4
+    MMenuItem *mBack;       // 0xB8
+    MMenuItem *mBuy;        // 0xBC
+    u32 mUnkC0;             // 0xC0
+    std::vector<void *> mUnkC4; // 0xC4: the page's mask buttons
     u32 mUnkD0[5];          // 0xD0
     DinoUi3PartsMoney *mMoney;  // 0xE4
     u8 mFlags[8];           // 0xE8: the page's chosen masks
@@ -40,6 +43,7 @@ public:
     u32 mFunds;             // 0x104
     u32 mTotal;             // 0x108: the chosen masks' price
     u8 mCount;              // 0x10C: how many are chosen
+    u8 mSelected;           // 0x10D: 0xFF for none
     u32 mUnk110;    // 0x110
 };
 
