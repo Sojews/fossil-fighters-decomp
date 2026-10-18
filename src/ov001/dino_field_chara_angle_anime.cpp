@@ -55,8 +55,10 @@ void DinoFieldChara::Read(const void *buf) {
 }
 
 MTask *DinoFieldChara::CreateWaitMoveTask() {
-    MTask *move = MTaskSetWaitEmptyTask::Create(mMoveTasks);
-    MTask *angle = MTaskSetWaitEmptyTask::Create(mAngleTasks);
+    MTask *angle;
+    MTask *move;
+    move = MTaskSetWaitEmptyTask::Create(mMoveTasks);
+    angle = MTaskSetWaitEmptyTask::Create(mAngleTasks);
     MParallelTaskSet *set = new MParallelTaskSet(TRUE);
     set->AddTail(angle);
     set->AddTail(move);
