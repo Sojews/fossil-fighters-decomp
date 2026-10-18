@@ -46,6 +46,10 @@ void DinoBattleViewCreatureInfo::Show() {
     mOam->mHidden = FALSE;
 }
 
+void InfoPanelWindow::Idle() {
+    mPicture->SetPosition(MPoint(-(mOam->mOffset.x + mUnk7C * 256), -mOam->mOffset.y));
+}
+
 void DinoBattleViewCreatureInfo::Idle() {
 }
 

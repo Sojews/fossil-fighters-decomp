@@ -143,8 +143,11 @@ public:
 
     void Update(u32 mask, int *sums);
     BOOL IsAnimating();
+    MRect GetRect();
+    BOOL IsHidden();
 
-    u32 mUnk74[2];          // 0x74
+    MMotion *mMotion;       // 0x74
+    MSmartOam *mOam;        // 0x78
     MAfnBlock *mAffine;     // 0x7C
     u32 unk80[9];
     u32 mMask;              // 0xA4
