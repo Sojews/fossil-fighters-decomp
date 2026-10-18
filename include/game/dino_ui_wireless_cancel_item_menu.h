@@ -11,6 +11,7 @@
 #include "m/sleep.h"
 #include "m/looper.h"
 #include "game/help.h"
+#include "game/dino_backup.h"
 #include "m/picture.h"
 #include "m/resource.h"
 #include "game/dino_resource.h"
@@ -210,8 +211,8 @@ public:
     u8 mCancelled;                      // 0xF8
     u8 mUnkF9;                          // 0xF9
     DinoUiWirelessCancel *mCancel;      // 0xFC
-    std::vector<unsigned int> mUnk100; // 0x100: (a distinct element type from other overlays' copies)
-    std::vector<int> mUnk10C;  // 0x10C
+    std::vector<DinoBackupEntry> mRocks;        // 0x100: the fossil rocks the children sent
+    std::vector<DinoPlayerProfile> mProfiles;   // 0x10C: the children's profiles
 };
 
 class DinoUiCannonChild : public MProcess, public MMessageObserver {
@@ -233,7 +234,7 @@ public:
     MMultiPlay *mMultiPlay;     // 0xB0
     u16 mChoice;                // 0xB4
     std::vector<void *> mUnkB8; // 0xB8
-    std::vector<unsigned int> mUnkC4; // 0xC4
+    std::vector<DinoBackupEntry> mRocks; // 0xC4: the ones shot
     MMultiPlayMessageHub *mHub; // 0xD0
     u8 mStarted;                // 0xD4: set by the start message
     MPictureFile mBack;         // 0xD8: image/m_back00

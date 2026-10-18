@@ -21,6 +21,7 @@
 #include "m/observer.h"
 #include "m/multi_play.h"
 #include "m/text_codec.h"
+#include "game/dino_message.h"
 #include "game/dino_multi_play_icon.h"
 #include "m/pal.h"
 #include "game/dino_backup.h"
@@ -312,7 +313,8 @@ extern "C" struct {
     DinoUiWirelessMatchState StateChosen_54; // 0x54
     u8 unk5C[0x64 - 0x5C];
     void (DinoUiCannonParentScanner::*StateCheckFailed_64)(); // 0x64
-    u8 unk6C[0x7C - 0x6C];
+    void (DinoUiCannonParentScanner::*State021664c0_6C)(); // 0x6c
+    u8 unk74[0x7C - 0x74];
     void (DinoUiCannonParentScanner::*ParentStart_7C)(); // 0x7c
 } data_ov004_021741d0;
 extern "C" struct {
@@ -835,10 +837,39 @@ void DinoUiCannonParentScanner::StateListen() {
     mHub->SetUnk279(TRUE);
     mHub->AddObserver(this);
     mParallel.AddTail(mHub);
-    mUnk100.clear();
-    mUnk10C.clear();
+    mRocks.clear();
+    mProfiles.clear();
     mState = data_ov004_02174250.StateWait_64;
     mOnMessage = data_ov004_021741d0.OnCountMessage_0C;
+}
+
+// Collects the children's fossil rocks and profiles, and answers their pings.
+// NONMATCHING: the game gives the push_back tags other stack bytes
+void DinoUiCannonParentScanner::OnCountMessage(MMessage *msg) {
+    switch (msg->mId) {
+    case 0x100A5: {
+        DinoWirelessCannonKasekiRockSignal *rock = (DinoWirelessCannonKasekiRockSignal *)msg;
+        if (!gDinoBackup->CanAddUnk138((const DinoBackupEntry *)rock->mUnk0C, rock->mUnk20, rock->mUnk21,
+                                       rock->mUnk24)) {
+            break;
+        }
+        mRocks.push_back(*(const DinoBackupEntry *)rock->mUnk0C);
+        break;
+    }
+    case 0x100A9:
+        mProfiles.push_back(*(const DinoPlayerProfile *)((DinoExchangeSenryuSignal *)msg)->mUnk0C);
+        break;
+    case 0x100A6:
+        mUnkF9 = FALSE;
+        mHub->SendToAll(new DinoWirelessCannonPongSignal);
+        mState = data_ov004_021741d0.State021664c0_6C;
+        break;
+    case 0x100A7:
+        mUnkF9 = TRUE;
+        break;
+    case 0x100A8:
+        break;
+    }
 }
 
 // The connection was lost: says so.
