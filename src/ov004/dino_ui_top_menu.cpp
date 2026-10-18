@@ -253,6 +253,15 @@ MRect DinoUiSaveSlotSelectMenuDeleteItem::GetFrame() {
 template class MBgCallTask0<DinoUiSaveSlotSelect>;
 template MTask *MCreateBgCallTask(DinoUiSaveSlotSelect *obj, void (DinoUiSaveSlotSelect::*func)(), int thread);
 
+#pragma auto_inline off
+
+DinoUiSaveSlotSelect::DinoUiSaveSlotSelect(u32 a, u32 b) : MProcess(NULL) {
+    mUnk74 = a;
+    mUnk78 = b;
+}
+
+#pragma auto_inline on
+
 DinoUiSaveSlotSelect::~DinoUiSaveSlotSelect() {
 }
 

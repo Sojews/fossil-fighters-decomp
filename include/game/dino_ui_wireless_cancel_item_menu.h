@@ -14,6 +14,7 @@
 
 class DinoUiWirelessCancel : public MMenu {
 public:
+    DinoUiWirelessCancel(u8 *cancelled);
     virtual ~DinoUiWirelessCancel();
     virtual void OnStart();
     virtual void OnDecide(MMenuItem *item);

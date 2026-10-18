@@ -203,6 +203,14 @@ void DinoUiWirelessCancel::OnDecide(MMenuItem *item) {
     Cancel();
 }
 
+#pragma auto_inline off
+
+DinoUiWirelessCancel::DinoUiWirelessCancel(u8 *cancelled) : MMenu(0) {
+    mCancelled = cancelled;
+}
+
+#pragma auto_inline on
+
 void DinoUiWirelessCancel::Cancel() {
     *mCancelled = TRUE;
 }
