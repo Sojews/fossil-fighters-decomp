@@ -37,6 +37,10 @@ MDisplay *DinoCommonWindowMenuItem::GetDisplay() {
     return MProcess::GetDisplay();
 }
 
+const char *DinoCommonWindowMenuItem::GetText() {
+    return mText.c_str();
+}
+
 // Template task instances the game emits in this file. Until the code that makes the tasks is decompiled, they are
 // instantiated explicitly.
 template class MCallTask0<DinoCommonWindowMenu, DinoHelpBase>;

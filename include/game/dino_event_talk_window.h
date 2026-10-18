@@ -14,7 +14,8 @@ public:
     virtual ~DinoEventTalkWindow();
     virtual void Idle();
 
-    u32 mUnk74[4];                          // 0x74
+    void (DinoEventTalkWindow::*mState)();  // 0x74
+    u32 mUnk7C[2];                          // 0x7C
     std::string mText;                      // 0x84
     u32 mUnk90[6];                          // 0x90
     std::vector<DinoWindowChoice> mChoices; // 0xA8

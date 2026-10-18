@@ -131,6 +131,7 @@ void SetEpisodeTask::Execute() {
 template class MBgCallTask0<DinoEventSaveOption>;
 template MTask *MCreateBgCallTask(DinoEventSaveOption *obj, void (DinoEventSaveOption::*func)(), int thread);
 template class MBgCallTask1<DinoEventLoop, u32>;
+// (Its creator is in dino_event.cpp; this copy makes mwcc emit the class's virtuals here.)
 template MTask *MCreateBgCallTask(DinoEventLoop *obj, void (DinoEventLoop::*func)(u32), u32 a0, int thread);
 template class MBgCallTask0<DinoEventCaptureFadeUiTask>;
 template MTask *MCreateBgCallTask(DinoEventCaptureFadeUiTask *obj, void (DinoEventCaptureFadeUiTask::*func)(), int thread);

@@ -9,6 +9,7 @@
 
 #include <string>
 #include <vector>
+#include <map>
 #include "m/task.h"
 #include "game/help.h"
 #include "m/archive.h"
@@ -267,12 +268,19 @@ public:
     s32 *mResult;       // 0x78
 };
 
+// A loaded episode file and the archive holding it.
+struct DinoEventEpisode {
+    MArchivePtr mArchive;   // 0x00
+    MArchiveFile mFile;     // 0x04
+};
+
 // Runs the event scripts (the game's class name; the event commands get it as their event).
 class DinoEventLoop : public MProcess {
 public:
     virtual ~DinoEventLoop();
     virtual void Idle();
     MTask *CreateTalkTask(u32 id);
+    void Talk(u32 id);
     std::string GetTalkText(u32 id);
     void SetResult(u32 result);
     void CloseField(BOOL arg);
@@ -285,11 +293,16 @@ public:
     void AddEpisode(u32 id);
     void RemoveEpisode(u32 id);
     void ResetEpisode(u32 id);
+    void ProcessEpisode(const std::map<u32, DinoEventEpisode>::iterator &it);
 
     void (DinoEventLoop::*mState)();    // 0x74
     u32 *mResult;           // 0x7C
     DinoField *mField;      // 0x80
-    u32 mUnk84[14];         // 0x84
+    std::map<u32, DinoEventEpisode> mEpisodeFiles;  // 0x84
+    u32 mUnk90;             // 0x90
+    MArchivePtr mArchive;   // 0x94
+    MArchiveFile mFile;     // 0x98
+    u32 mUnkA4[6];          // 0xA4
     u8 mCameraUsed;         // 0xBC
     u8 unkBD[0x57];
     void *mEpisodes;        // 0x114

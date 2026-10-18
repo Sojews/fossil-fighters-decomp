@@ -8,6 +8,7 @@
 #include "game/dino_common_yes_no_menu_item_menu.h"
 #include "game/dino_common_yes_no_menu_item.h"
 #include "game/dino_common_window_yes_no_dialog.h"
+#include "m/lcd.h"
 
 DinoCommonWindowYesNoDialog::~DinoCommonWindowYesNoDialog() {
 }
@@ -28,6 +29,10 @@ const char *DinoCommonYesNoMenuItem::GetText() {
 
 MRect DinoCommonYesNoMenuItem::GetRect() {
     return GetFrame();
+}
+
+MDisplay *DinoCommonYesNoMenuItem::GetDisplay() {
+    return gLcd->GetBottomDisplay();
 }
 
 void DinoCommonYesNoMenuItem::OnFocusChanged(BOOL focused) {

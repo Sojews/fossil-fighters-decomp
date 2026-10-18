@@ -69,7 +69,8 @@ namespace std {
         if (it == this->end()) {
             return 0;
         }
-        erase(it);
+        // (The game passes a fresh iterator, which the temporary here reproduces.)
+        this->_Tree::erase(iterator(it.node_));
         return 1;
     }
 

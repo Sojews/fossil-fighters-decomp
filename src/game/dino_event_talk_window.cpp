@@ -8,6 +8,10 @@
 DinoEventTalkWindow::~DinoEventTalkWindow() {
 }
 
+void DinoEventTalkWindow::Idle() {
+    (this->*mState)();
+}
+
 // Emitted in this file in the game (the window starts background loads with MCreateBgCallTask); until the code
 // that makes them is decompiled, the instances are made explicitly.
 template class MBgCallTask0<DinoEventTalkWindow>;
