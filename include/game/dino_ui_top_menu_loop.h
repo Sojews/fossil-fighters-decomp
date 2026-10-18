@@ -11,6 +11,7 @@ public:
 
     void StateStart();
     void StateTopMenu();
+    void StateTopMenuEnd();
     void StateMultiplay();
     void StateMultiplayEnd();
     void StateExchange();

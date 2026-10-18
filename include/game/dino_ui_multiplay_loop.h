@@ -9,7 +9,9 @@ public:
     virtual ~DinoUiMultiplayLoop();
     virtual void Idle();
 
+    void StateStart();
     void StateMenu();
+    void StateMenuEnd();
     void StateMatch();
     void StateMatchEnd();
 

@@ -1,6 +1,7 @@
 // DinoUiMultiplayLoop.
 // Only the destructors are decompiled so far.
 
+#include "game/dino_backup.h"
 #include "game/dino_ui_wireless_cancel_item_menu.h"
 #include "game/dino_ui_multiplay_loop.h"
 #include "game/help.h"
@@ -128,16 +129,20 @@ void DinoUiMultiplayMenu::Decide(int choice) {
 
 // The TU's pooled pointer-to-member constants (see menu.cpp).
 extern "C" struct {
-    u8 unk00[0x3C];
-    void (DinoUiMultiplayLoop::*Start_3C)();
-    u8 unk44[0x4C - 0x44];
-    void (DinoUiMultiplayLoop::*StateMenu_4C)();
-    u8 unk54[0x64 - 0x54];
-    void (DinoUiMultiplayLoop::*StateMatchEnd_64)();
+    u8 unk00[0x3c];
+    void (DinoUiMultiplayLoop::*Start_3C)(); // 0x3c
+    void (DinoUiMultiplayLoop::*StateMatch_44)(); // 0x44
+    void (DinoUiMultiplayLoop::*StateMenu_4C)(); // 0x4c
+    void (DinoUiMultiplayLoop::*StateMenu_54)(); // 0x54
+    u8 unk5C[0x64 - 0x5C];
+    void (DinoUiMultiplayLoop::*StateMatchEnd_64)(); // 0x64
 } data_ov004_02173b70;
 extern "C" struct {
     u8 unk00[0x4];
-    void (DinoUiMultiplayLoop::*MenuEnd_04)();
+    void (DinoUiMultiplayLoop::*MenuEnd_04)(); // 0x04
+    u8 unk0C[0x24 - 0xC];
+    void (DinoUiMultiplayLoop::*StateMatch_24)(); // 0x24
+    void (DinoUiMultiplayLoop::*StateMenu_2C)(); // 0x2c
 } data_ov004_02173bf0;
 
 DinoUiMultiplayLoop::DinoUiMultiplayLoop(int *result) : MProcess(NULL), mResult(result) {
@@ -168,4 +173,43 @@ void DinoUiMultiplayLoop::StateMatchEnd() {
         Exit();
         break;
     }
+}
+
+// Wireless battles use teams 4-6: copies of teams 1-3 unless the match is to be kept.
+void DinoUiMultiplayLoop::StateStart() {
+    if (*mResult == 1) {
+        mUnk88 = 0;
+        mState = data_ov004_02173bf0.StateMatch_24;
+        return;
+    }
+    if (*mResult != 2) {
+        for (int i = 0; i < 3; i++) {
+            DinoTeam team;
+            gDinoBackup->GetTeam(i + 1, &team);
+            gDinoBackup->SetTeam(i + 4, &team);
+        }
+    }
+    mState = data_ov004_02173b70.StateMenu_54;
+}
+
+void DinoUiMultiplayLoop::StateMenuEnd() {
+    switch (mChoice) {
+    case 0:
+        *mResult = 0;
+        Exit();
+        break;
+    case 1:
+        mUnk88 = 1;
+        mState = data_ov004_02173b70.StateMatch_44;
+        return;
+    case 2: {
+        DinoTeam team;
+        gDinoBackup->GetTeam(gDinoBackup->GetUnk34_26() + 3, &team);
+        gDinoBackup->SetTeam(gDinoBackup->GetUnk34_26(), &team);
+        *mResult = 2;
+        Exit();
+        break;
+    }
+    }
+    mState = data_ov004_02173bf0.StateMenu_2C;
 }

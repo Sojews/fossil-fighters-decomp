@@ -3,6 +3,7 @@
 // Derived destructors have their bases' destructor bodies inlined; auto-inlining the ones defined above does that.
 #pragma auto_inline on
 
+#include "game/disp_blower_menu.h"
 #include "game/dino_ui_title_menu.h"
 #include "game/dino_ui_exchange.h"
 #include "game/dino_ui_multiplay_loop.h"
@@ -36,7 +37,8 @@ DinoUiTopMenuLoop::~DinoUiTopMenuLoop() {
 struct DinoUiTopMenuStatics {
     u8 unk00[0x2C];
     void (DinoUiTopMenuLoop::*mTopMenu_2C)();       // 0x2C: (pooled pointer-to-member constants, see menu.cpp)
-    u8 unk34[0x44 - 0x34];
+    void (DinoUiTopMenuLoop::*mTopMenu_34)();       // 0x34
+    u8 unk3C[0x44 - 0x3C];
     void (DinoUiTopMenuLoop::*mMultiplayEnd_44)();  // 0x44
     void (DinoUiTopMenuLoop::*mMultiplay_4C)();     // 0x4C
     void (DinoUiTopMenuLoop::*mTopMenuEnd_54)();    // 0x54
@@ -51,7 +53,9 @@ struct DinoUiTopMenuStatics2 {
     void (DinoUiTopMenuLoop::*mLoopStart)();    // 0x1C
     u8 unk24[0x2C - 0x24];
     void (DinoUiTopMenuLoop::*mExchangeEnd_2C)();   // 0x2C
-    u8 unk34[0x4C - 0x34];
+    u8 unk34[0x3C - 0x34];
+    void (DinoUiTopMenuLoop::*mMultiplay_3C)();     // 0x3C
+    void (DinoUiTopMenuLoop::*mExchange_44)();      // 0x44
     MPoint mItemBottomRight;    // 0x4C
     u8 unk54[0x64 - 0x54];
     MPoint mItem2TopLeft;       // 0x64
@@ -491,6 +495,34 @@ void DinoUiTopMenuLoop::StateTopMenu() {
     mState = data_ov004_0217206c.mTopMenuEnd_54;
 }
 #pragma dont_inline reset
+
+// The top menu's choices: 0 and 1 leave, 2 multiplay, 3 exchange, 4 options.
+void DinoUiTopMenuLoop::StateTopMenuEnd() {
+    mState = data_ov004_0217206c.mTopMenu_34;
+    switch (mChoice) {
+    case 0:
+        if (mResult != NULL) {
+            *mResult = 0;
+        }
+        Exit();
+        break;
+    case 1:
+        if (mResult != NULL) {
+            *mResult = 1;
+        }
+        Exit();
+        break;
+    case 2:
+        mState = data_ov004_021720ec.mMultiplay_3C;
+        break;
+    case 3:
+        mState = data_ov004_021720ec.mExchange_44;
+        break;
+    case 4:
+        mSerial.AddTail(new DinoUiOptionMenu);
+        break;
+    }
+}
 
 void DinoUiTopMenuLoop::StateMultiplay() {
     mSerial.AddTail(new DinoUiMultiplayLoop(&mMode));
