@@ -15,6 +15,7 @@
 #include "m/archive.h"
 #include "m/resource.h"
 #include "m/serializer.h"
+#include "m/3d_resource.h"
 #include "game/dino_field_town_map.h"
 #include "game/dino_backup.h"
 struct DinoCharaTask;
@@ -100,6 +101,7 @@ public:
     DinoFieldCharaModel *GetModel();
     void ShowManpu(u32 manpu, MPoint offset);
     void HideManpu();
+    const char *GetMotionModelPath(u32 motion);
     void CacheMotion(u32 motion);
     void ClearMotionCache();
     void SetMotion(u32 motion, u8 loop, MFx32 speed);
@@ -163,11 +165,16 @@ public:
     MAnmModelBase *mHead;       // 0x124: on the body's head joint
     u32 mUnk128;                // 0x128
     MPolygonChar *mEffect;      // 0x12C
-    u32 mUnk130[106];           // 0x130
+    u32 mUnk130[9];             // 0x130
+    std::map<u32, M3DModelResource> mMotionModels;      // 0x154: by motion, cached ahead
+    std::map<u32, M3DModelResource> mMotionModelsAlt;   // 0x164: (when the field's unk258 is set)
+    M3DModelResource mModelResource;                    // 0x174
+    char mMotionModelPath[256]; // 0x1D8
     MPoint mUnk2D8;             // 0x2D8
     u32 mUnk2E0;                // 0x2E0
     u32 mUnk2E4;                // 0x2E4
-    u32 mUnk2E8[4];             // 0x2E8
+    MArchivePtr mArchive2E8;    // 0x2E8
+    MArchiveFile mFile2EC;      // 0x2EC
     MTask *mManpu;              // 0x2F8: the emotion bubble shown over the character
     u32 mUnk2FC[2];             // 0x2FC
     BOOL mHasFootSe;            // 0x304

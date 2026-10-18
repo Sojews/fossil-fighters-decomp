@@ -109,6 +109,11 @@ struct M3DDinTable {
 // A model's files, loaded through the caches, by path.
 class M3DModelResource {
 public:
+    M3DModelResource() {
+        mModel = NULL;
+        mAnim = NULL;
+        mTex = NULL;
+    }
     M3DModelResource(std::string path);
     ~M3DModelResource();
     M3DModelResource &operator=(const M3DModelResource &other);

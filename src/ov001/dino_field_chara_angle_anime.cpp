@@ -2,6 +2,8 @@
 // Only the destructors are decompiled so far.
 
 #include "game/dino_field.h"
+#include "m/file.h"
+#include "nitro/os.h"
 #include "nitro/mi.h"
 #include "m/anm_model.h"
 #include "m/3d_model.h"
@@ -47,13 +49,20 @@ DinoFieldCharaCoordAnime::~DinoFieldCharaCoordAnime() {
     }
 }
 
+DinoFieldChara::~DinoFieldChara() {
+    mParallel.Clear();
+}
+
 DinoFieldCharaModel *DinoFieldChara::GetModel() {
     return &mModel;
 }
 
 // The chara file's header.
 struct DinoFieldCharaData {
-    u8 unk00[0x14];
+    u32 unk00;
+    u32 mBodyModelCount;    // 0x04
+    u32 mBodyModelNames;    // 0x08: offset of the offsets of their names
+    u8 unk0C[0x14 - 0x0C];
     MFx32 mMoveSpeed;   // 0x14: -1 = the default
     MFx32 mHeight;      // 0x18
     u8 unk1C[0x20 - 0x1C];
@@ -70,6 +79,7 @@ struct DinoFieldCharaData {
 extern "C" const MFx32 data_020b5ab8;   // move speed
 extern "C" const MFx32 data_020b5abc;   // mUnk50
 extern "C" const MFx32 data_020b5ac8;   // move speed while following
+extern const char *data_ov001_0216a20c[];   // the file's constants; [1] is the motion model path format
 
 void DinoFieldChara::ResetState() {
     MI_CpuFill8(&mModel, 0, 0x2C);
@@ -358,15 +368,44 @@ void DinoFieldCharaCoordAnime::Execute() {
     }
 }
 
-// The character's map at 0x164 (cleared by ClearMotionCache): lookups the game emits in this file. The value type
-// is unknown (these members don't depend on it).
-struct DinoFieldCharaCacheEntry {
-    u32 unk0;
-};
-typedef std::__red_black_tree<u32, std::pair<const u32, DinoFieldCharaCacheEntry>,
-                              std::__select_first<std::pair<const u32, DinoFieldCharaCacheEntry> >, std::less<u32>,
-                              std::allocator<std::pair<const u32, DinoFieldCharaCacheEntry> > >
+// The tree of the character's motion model caches: lookups the game emits in this file.
+typedef std::__red_black_tree<u32, std::pair<const u32, M3DModelResource>,
+                              std::__select_first<std::pair<const u32, M3DModelResource> >, std::less<u32>,
+                              std::allocator<std::pair<const u32, M3DModelResource> > >
     DinoFieldCharaCacheTree;
+// The model a motion of the character's body model uses, if it has its own.
+const char *DinoFieldChara::GetMotionModelPath(u32 motion) {
+    DinoCharaState state;
+    gDinoBackup->GetChara(mModel.id, &state);
+    u32 count = ((DinoFieldCharaData *) mFile.GetData())->mBodyModelCount;
+    u32 body = state.bodyModel;
+    if (body >= count) {
+        return NULL;
+    }
+    const u8 *data = (const u8 *) mFile.GetData();
+    const u32 *names = (const u32 *) (data + ((const DinoFieldCharaData *) data)->mBodyModelNames);
+    OS_SPrintf(mMotionModelPath, data_ov001_0216a20c[1], data + names[body], motion);
+    if (!MFileExists(std::string(mMotionModelPath))) {
+        return NULL;
+    }
+    return mMotionModelPath;
+}
+
+void DinoFieldChara::CacheMotion(u32 motion) {
+    const char *path = GetMotionModelPath(motion);
+    if (path != NULL) {
+        if (mField->IsUnk258()) {
+            mMotionModelsAlt[mMotion] = M3DModelResource(std::string(path));
+        } else {
+            mMotionModels[mMotion] = M3DModelResource(std::string(path));
+        }
+    }
+}
+
+void DinoFieldChara::ClearMotionCache() {
+    mMotionModelsAlt.clear();
+}
+
 void DinoFieldChara::ApplyHeadModel() {
     if (mHead != NULL) {
         mTaskSet->Remove(mHead);
