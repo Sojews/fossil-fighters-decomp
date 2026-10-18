@@ -1,10 +1,12 @@
-// DinoUiFieldMenuFraction, DinoUiFieldMenuNumber, DinoUiFieldMenuNumber3, DinoUiPartsNumber8, DinoUiPartsReviverMedalButton, DinoUiPartsReviverNameCountCheckTask, DinoUiPartsBlackBelt, DinoUiPartsRockName, DinoUiPartsKasekiButton, DinoUiPartsTeamInfo, DinoUiPartsTeamTech.
+// DinoUiFieldMenuCursor, DinoUiFieldMenuFraction(4), DinoUiFieldMenuNumber(3), DinoUiPartsNumber8,
+// DinoUiPartsReviverMedalButton, DinoUiPartsReviverName(CountCheckTask), DinoUiPartsBlackBelt, DinoUiPartsRockName,
+// DinoUiPartsKasekiButton, DinoUiPartsTeamInfo, DinoUiPartsTeamTech, DinoUiPartsTeamIndicator.
 // One TU: the field menu parts (0x021584d4-0x0215b008).
-// NONMATCHING: the constructors of DinoUiFieldMenuNumber and DinoUiFieldMenuFraction4 (the game keeps this + i * 4
-// in a stack slot across the first string temporary's destructor), DinoUiFieldMenuNumber3, DinoUiPartsNumber8 and
-// DinoUiPartsReviverName and DinoUiPartsRockName (the game loads gCurrentDisplay after copying the canvas size),
-// DinoUiPartsReviverName::SetCreature (the game takes the length limit's address from its own literal) and
-// DinoUiPartsKasekiButton::Setup (four stack slots in another order).
+// NONMATCHING: the constructors of DinoUiFieldMenuNumber, DinoUiFieldMenuFraction4 and DinoUiPartsTeamTech (the game
+// keeps this + i * 4 in a stack slot across the first string temporary's destructor), DinoUiFieldMenuNumber3,
+// DinoUiPartsNumber8, DinoUiPartsReviverName, DinoUiPartsRockName and DinoUiPartsTeamIndicator (the game loads
+// gCurrentDisplay after copying the canvas size), DinoUiPartsReviverName::SetCreature (the game takes the length
+// limit's address from its own literal) and DinoUiPartsKasekiButton::Setup (four stack slots in another order).
 
 // Derived destructors have their bases' destructor bodies inlined; auto-inlining the ones defined above does that.
 #pragma auto_inline on
@@ -47,6 +49,14 @@ extern MedalMotion data_ov003_02160fb0[5];
 extern const char *data_ov003_02160f60[];
 extern const MPoint data_ov003_02160d3c; // where the black belt goes
 extern const char *data_ov003_02161028[]; // the kaseki icon motions
+extern const u16 data_020b5870[];         // a palette
+
+// Which way of looking a kind uses (-1 ends the table).
+struct KindLook {
+    int kind;
+    int look;
+};
+extern const KindLook data_ov003_02160210[6];
 
 DinoUiFieldMenuFraction::~DinoUiFieldMenuFraction() {
 }
@@ -89,7 +99,7 @@ void DinoUiFieldMenuFraction::Idle() {
 
 DinoUiPartsTeamIndicator::~DinoUiPartsTeamIndicator() {
     mFont->Release();
-    delete mView;
+    delete mCanvas;
 }
 
 DinoUiFieldMenuNumber::DinoUiFieldMenuNumber(MSmartOam *oam, MPoint pos) : MProcess(NULL) {
@@ -191,6 +201,90 @@ void DinoUiPartsNumber8::SetValue(u32 value) {
     }
     sprintf(text, "%8d", value);
     mText->SetText(std::string(text));
+}
+
+#pragma auto_inline off
+static int GetKindLook(int kind) {
+    for (u32 i = 0; i < 6; i++) {
+        if (kind == data_ov003_02160210[i].kind || data_ov003_02160210[i].kind == -1) {
+            return data_ov003_02160210[i].look;
+        }
+    }
+    return 1;
+}
+#pragma auto_inline reset
+
+DinoUiPartsTeamTech::DinoUiPartsTeamTech(const MPoint *positions) : MProcess(NULL) {
+    for (int i = 0; i < 3; i++) {
+        mPositions[i] = positions[i];
+    }
+    mOam = new MSmartOam(10, 0, TRUE);
+    mIconTasks = new MParallelTaskSet;
+    mParallel.AddTail(mIconTasks);
+    for (int i = 0; i < 3; i++) {
+        mIcons[i] = new MMotion(std::string(data_ov003_02160c60[29]), mOam, 0, 1);
+        mIcons[i]->SetPosition(mPositions[i]);
+        mIcons[i]->SetPriority(1);
+        mIcons[i]->Show();
+        mIcons[i]->GetUnit()->SetMode(1);
+        mIconTasks->AddTail(mIcons[i]);
+        mIcons[i]->Play(1, 0);
+    }
+    mParallel.AddTail(mOam);
+}
+
+void DinoUiPartsTeamTech::Show() {
+    for (int i = 0; i < 3; i++) {
+        mIcons[i]->Show();
+        mIcons[i]->Play(1, 1);
+    }
+}
+
+void DinoUiPartsTeamTech::Hide() {
+    for (int i = 0; i < 3; i++) {
+        mIcons[i]->Hide();
+    }
+}
+
+// Lifts one icon a little.
+void DinoUiPartsTeamTech::Raise(u32 index) {
+    if (index < 3) {
+        mIcons[index]->SetPosition(MPoint(mPositions[index].x, mPositions[index].y - 2));
+    }
+}
+
+void DinoUiPartsTeamTech::Lower() {
+    for (int i = 0; i < 3; i++) {
+        mIcons[i]->SetPosition(mPositions[i]);
+    }
+}
+
+DinoUiPartsTeamIndicator::DinoUiPartsTeamIndicator(MPoint pos, MFont *font) : MProcess(NULL) {
+    mFont = font;
+    mCanvas = new MObjCanvas(gCurrentDisplay, gCurrentDisplay->mObj->mOam, MPoint(256, 32), data_020b5870, TRUE);
+    mFont->AddRef();
+    mCanvas->SetPosition(pos);
+    mCanvas->SetPriority(3);
+}
+
+// Outlined in the font's back color.
+void DinoUiPartsTeamIndicator::SetText(const std::wstring &text) {
+    int shadow = mFont->GetShadowColor();
+    mFont->SetShadowColor(mFont->GetBackColor());
+    mFont->SetColor(-1);
+    mCanvas->Clear();
+    mCanvas->DrawText(mFont, MPoint(1, 0), 0, std::wstring(text));
+    mCanvas->DrawText(mFont, MPoint(0, 1), 0, std::wstring(text));
+    mFont->SetShadowColor(shadow);
+    mCanvas->DrawText(mFont, MPoint(1, 1), 0, std::wstring(text));
+}
+
+void DinoUiPartsTeamIndicator::Show() {
+    mCanvas->Show();
+}
+
+void DinoUiPartsTeamIndicator::Hide() {
+    mCanvas->Hide();
 }
 
 void DinoUiPartsTeamIndicator::Idle() {
