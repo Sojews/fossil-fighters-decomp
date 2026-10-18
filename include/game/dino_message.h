@@ -1550,6 +1550,10 @@ public:
 class DinoBattleViewDeleteStatusEffectSignal : public MMessage {
 public:
     DinoBattleViewDeleteStatusEffectSignal();
+    DinoBattleViewDeleteStatusEffectSignal(u32 a, u32 b) : MMessage(0x10048) {
+        mUnk0C = a;
+        mUnk10 = b;
+    }
     virtual u32 GetSize() { return 12; }
     virtual void Write(void *buf) {
         MI_CpuCopy8(&mId, buf, 4);
@@ -1953,6 +1957,15 @@ public:
 class DinoBattleViewCreatureDamagedUpdateRequest : public MMessage {
 public:
     DinoBattleViewCreatureDamagedUpdateRequest();
+    DinoBattleViewCreatureDamagedUpdateRequest(u32 a, u32 b, u32 c, u32 d, u32 e, u8 f, u8 g) : MMessage(0x1005F) {
+        mUnk0C = a;
+        mUnk10 = b;
+        mUnk14 = c;
+        mUnk18 = d;
+        mUnk1C = e;
+        mUnk20 = f;
+        mUnk21 = g;
+    }
     virtual u32 GetSize() { return 28; }
     virtual void Write(void *buf) {
         MI_CpuCopy8(&mId, buf, 4);

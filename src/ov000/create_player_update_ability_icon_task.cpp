@@ -176,6 +176,23 @@ DinoCreatureUpdateTask::~DinoCreatureUpdateTask() {
 DamagedUpdate::~DamagedUpdate() {
 }
 
+extern "C" BOOL func_ov000_0216cfac(DinoBattleModelCreature *creature, u32 a, u32 b, u32 c, u32 d, u8 e);
+
+void SetStatusEffectTask::Execute() {
+    if (func_ov000_0216cfac(mCreature, mUnk14, mUnk18, mUnk1C, mUnk20, mUnk24) && mView != NULL) {
+        mView->Post(new DinoBattleViewDeleteStatusEffectSignal(mCreature->GetUnkB4(), mUnk14));
+    }
+    Exit();
+}
+
+void DamagedUpdate::Execute() {
+    if (mCreature != NULL) {
+        mUnk20 = mCreature->GetUnkE4();
+    }
+    mView->Post(new DinoBattleViewCreatureDamagedUpdateRequest(mUnk18, mUnk1C, mUnk20, mUnk24, mUnk28, mUnk2C, mUnk2D));
+    Exit();
+}
+
 void DinoBattleModelCreature::Idle() {
     Dispatch();
 }
