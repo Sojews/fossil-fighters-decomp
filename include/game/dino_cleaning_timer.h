@@ -13,6 +13,9 @@
 
 class DinoCleaningTimer : public MProcess {
 public:
+    void Start();
+    void Stop();
+    void Pause();
     int GetSeconds();
     virtual ~DinoCleaningTimer();
     virtual void Idle();

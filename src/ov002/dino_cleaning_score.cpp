@@ -15,3 +15,7 @@ u8 DinoCleaningScore::GetUnk90() {
 u8 DinoCleaningScore::GetUnk91() {
     return mUnk91;
 }
+
+void DinoCleaningScore::SetUnk9CC() {
+    mUnk9CC = TRUE;
+}
