@@ -16,7 +16,10 @@ public:
     virtual ~DinoEventRevive();
     virtual void Idle();
 
-    MTask *CreateMessage(u32 message, std::string extra);
+    MTask *CreateMessage(u32 message, const std::string &extra);
+    void AddMessage(u32 message);
+    void StateMode();
+    void StateLevelMessage();
     void StateNoneMessage();
     void StateStart();
     void StateContainerSelect();
