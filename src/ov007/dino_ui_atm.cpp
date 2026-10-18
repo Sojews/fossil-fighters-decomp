@@ -4,6 +4,8 @@
 // Derived destructors have their bases' destructor bodies inlined; auto-inlining the ones defined above does that.
 #pragma auto_inline on
 
+#include "m/obj.h"
+#include "m/display.h"
 #include "m/lcd.h"
 #include "game/dino_sound.h"
 #include "game/dino_ui_atm_menu.h"
@@ -114,10 +116,37 @@ void DinoUiATMBackButton::OnDecide() {
 
 // The TU's pooled pointer-to-member constants (see menu.cpp).
 extern "C" struct {
-    u8 unk00[0x18];
+    u8 unk00[0x10];
+    void (DinoUiATM::*Unk021741c4_10)();
     void (DinoUiATM::*Start_18)();
 } data_ov007_0218cbe0;
+extern "C" struct {
+    u8 unk00[0x48];
+    void (DinoUiATM::*Unk021743b8_48)();
+} data_ov007_0218cb60;
 
 DinoUiATM::DinoUiATM(u8 arg) : MProcess(gLcd->mSub), mUnk7C(arg) {
     mState = data_ov007_0218cbe0.Start_18;
 }
+
+void DinoUiATM::StateStart() {
+    mResult = 0;
+    mTasks = new MParallelTaskSet;
+    mParallel.AddTail(mTasks);
+    mState = data_ov007_0218cbe0.Unk021741c4_10;
+}
+
+// (The game calls the menu's constructor defined above.)
+#pragma dont_inline on
+void DinoUiATM::StateMenu() {
+    gLcd->mSub->ResetHooks();
+    gLcd->mSub->Setup(5, 2, 4, 1, 0, 0);
+    gLcd->mSub->SetBackdrop(0x8000);
+    gLcd->mSub->mObj->Show();
+    gLcd->VSyncNow();
+    gLcd->SetBottomDisplay(gLcd->mSub);
+    gCurrentDisplay = gLcd->GetBottomDisplay();
+    mSerial.AddTail(new DinoUiATMMenu(&mResult, mUnk7C, mUnk88, 0));
+    mState = data_ov007_0218cb60.Unk021743b8_48;
+}
+#pragma dont_inline reset
