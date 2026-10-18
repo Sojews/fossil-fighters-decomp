@@ -13,3 +13,15 @@ DinoFieldHole::~DinoFieldHole() {
 void DinoFieldHole::Idle() {
     (this->*mState)();
 }
+
+u8 DinoFieldHole::GetUnk110() {
+    return mUnk110;
+}
+
+void DinoFieldHole::SetUnk114() {
+    mUnk114 = 0xB1;
+}
+
+MPoint DinoFieldHole::GetPos() {
+    return mPos;
+}
