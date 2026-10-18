@@ -117,7 +117,7 @@ void MenuExitTask::Execute() {
     Exit();
 }
 
-extern "C" MTask *func_ov000_0218ec8c(u32 arg0, int arg1, int arg2);
+extern "C" MTask *func_ov000_0218ec8c(u32 arg0, int arg1, BOOL *proceed);
 
 void DinoBattleViewTurnEndDialog::OnStart() {
     DinoCommonYesNoMenu::OnStart();
@@ -142,6 +142,26 @@ void DinoBattleViewTurnEndDialog::OnFocus(MMenuItem *item) {
         SetSelectedItem(help);
     }
     DinoSoundPlaySe(0x5E, 0);
+}
+
+void DinoBattleViewTurnEndDialog::OnDecide(MMenuItem *item) {
+    DinoCommonYesNoMenu::OnDecide(item);
+    DinoCommonYesNoMenuItem *yesNo = static_cast<DinoCommonYesNoMenuItem *>(item);
+    BOOL proceed = TRUE;
+    MTask *task = func_ov000_0218ec8c(((DinoBattleView *)mUnkE0)->GetUnk12C(), yesNo->IsYes() ? 0xC : 0xD, &proceed);
+    if (task != NULL) {
+        mSerial.AddTail(task);
+    }
+    if (proceed) {
+        if (yesNo->IsYes()) {
+            DinoSoundPlaySe(0x61, 0);
+            mSerial.AddTail(mTarget->CreatePostTask(new DinoBattleViewUiTurnEndResult(TRUE)));
+        } else {
+            DinoSoundPlaySe(0x63, 0);
+            mSerial.AddTail(mTarget->CreatePostTask(new DinoBattleViewUiTurnEndResult(FALSE)));
+        }
+        mSerial.AddTail(MTaskExitTransfer::Create(this));
+    }
 }
 
 void DinoBattleViewGivingUpDialog::OnFocus(MMenuItem *item) {

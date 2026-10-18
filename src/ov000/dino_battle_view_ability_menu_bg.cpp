@@ -164,7 +164,7 @@ MRect DinoBattleViewUiAbilityMenuItem::GetRect() {
 
 #pragma auto_inline on
 
-extern "C" MTask *func_ov000_0218ec8c(u32 arg0, int arg1, int arg2);
+extern "C" MTask *func_ov000_0218ec8c(u32 arg0, int arg1, BOOL *proceed);
 
 void DinoBattleViewUiAbilityMenu::OnIdle() {
     MTask *task = func_ov000_0218ec8c(((DinoBattleView *)mUnk104)->GetUnk12C(), -1, 0);

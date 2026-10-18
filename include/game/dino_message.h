@@ -1644,6 +1644,9 @@ public:
 class DinoBattleViewUiTurnEndResult : public MMessage {
 public:
     DinoBattleViewUiTurnEndResult() : MMessage(0x1004C) {}
+    DinoBattleViewUiTurnEndResult(u8 a) : MMessage(0x1004C) {
+        mUnk0C = a;
+    }
     virtual u32 GetSize() { return 8; }
     virtual void Write(void *buf) {
         MI_CpuCopy8(&mId, buf, 4);
