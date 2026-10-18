@@ -32,11 +32,12 @@ public:
 
 class DinoBattleViewEffectGameBegin : public MProcess {
 public:
+    DinoBattleViewEffectGameBegin(u32 unk7C, std::string name, std::string name2);
     virtual ~DinoBattleViewEffectGameBegin();
     virtual void Idle();
 
     void (DinoBattleViewEffectGameBegin::*mState)(); // 0x74
-    u32 unk7C;
+    u32 mUnk7C;             // 0x7C
     std::string mNames[2];  // 0x80
 };
 

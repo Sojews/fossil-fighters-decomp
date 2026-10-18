@@ -26,3 +26,14 @@ void DinoBattleViewAbilityMenuBG::SetPriority(int priority) {
 void DinoBattleViewAbilityMenuBG::Idle() {
     (this->*mState)();
 }
+
+// The TU's pooled pointer-to-member constants (see menu.cpp).
+extern "C" struct {
+    u8 unk00[0x38];
+    void (DinoBattleViewAbilityMenuBG::*Unk0217bee0_38)();
+} data_ov000_021947ac;
+
+void DinoBattleViewAbilityMenuBG::StateShow() {
+    mText->Show();
+    mState = data_ov000_021947ac.Unk0217bee0_38;
+}

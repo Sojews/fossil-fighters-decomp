@@ -24,6 +24,7 @@ public:
     virtual void Idle();
 
     void SetPriority(int priority);
+    void StateShow();
 
     MBg *mBg;                   // 0x74
     u32 unk78;

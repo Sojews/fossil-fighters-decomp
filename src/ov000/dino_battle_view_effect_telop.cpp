@@ -30,6 +30,17 @@ NopWaitTask::~NopWaitTask() {
 void NopWaitTask::Execute() {
 }
 
+// The TU's pooled pointer-to-member constants (see menu.cpp).
+extern "C" struct {
+    u8 unk00[0x40];
+    void (DinoBattleViewEffectTelop::*Start_40)();
+} data_ov000_0219387c;
+
+DinoBattleViewEffectTelop::DinoBattleViewEffectTelop(u32 unk7C, std::string text, u32 unk98, u32 unk8C, u32 unk90, u8 unk9C)
+    : MProcess(NULL), mUnk7C(unk7C), mUnk80(text), mUnk8C(unk8C), mUnk90(unk90), mUnk98(unk98), mUnk9C(unk9C) {
+    mState = data_ov000_0219387c.Start_40;
+}
+
 void DinoBattleViewEffectTelop::Idle() {
     (this->*mState)();
 }

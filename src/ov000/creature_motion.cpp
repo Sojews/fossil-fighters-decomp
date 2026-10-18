@@ -93,6 +93,19 @@ DinoBattleViewEffectGameBeginPlayerNamePanel::~DinoBattleViewEffectGameBeginPlay
 DinoBattleViewEffectGameBegin::~DinoBattleViewEffectGameBegin() {
 }
 
+// The TU's pooled pointer-to-member constants (see menu.cpp).
+extern "C" struct {
+    u8 unk00[0x48];
+    void (DinoBattleViewEffectGameBegin::*Start_48)();
+} data_ov000_02193668;
+
+DinoBattleViewEffectGameBegin::DinoBattleViewEffectGameBegin(u32 unk7C, std::string name, std::string name2)
+    : MProcess(NULL), mUnk7C(unk7C) {
+    mNames[0] = name;
+    mNames[1] = name2;
+    mState = data_ov000_02193668.Start_48;
+}
+
 void DinoBattleViewEffectGameBegin::Idle() {
     (this->*mState)();
 }

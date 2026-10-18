@@ -14,12 +14,18 @@
 
 class DinoBattleViewEffectTelop : public MProcess {
 public:
+    DinoBattleViewEffectTelop(u32 unk7C, std::string text, u32 unk98, u32 unk8C, u32 unk90, u8 unk9C);
     virtual ~DinoBattleViewEffectTelop();
     virtual void Idle();
 
     void (DinoBattleViewEffectTelop::*mState)(); // 0x74
     u32 mUnk7C;                                 // 0x7C
     std::string mUnk80;                         // 0x80
+    u32 mUnk8C;                                 // 0x8C
+    u32 mUnk90;                                 // 0x90
+    u32 unk94;
+    u32 mUnk98;                                 // 0x98
+    u8 mUnk9C;                                  // 0x9C
 };
 
 class SetBGModeTask : public MTask {
