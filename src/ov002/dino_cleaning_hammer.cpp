@@ -8,6 +8,16 @@
 #include "game/dino_cleaning_drill.h"
 #include "m/bg_new_task.h"
 #include "m/call_task.h"
+#include "m/display.h"
+#include "m/raster.h"
+#include "m/window.h"
+
+// Done: frees the window and resets the display's windows.
+void DinoCleaningHammerEffect::StateEnd() {
+    delete mWindow;
+    gCurrentDisplay->mWin->Reset();
+    Exit();
+}
 
 DinoCleaningHammer::DinoCleaningHammer(DinoCleaning *cleaning, u8 arg1) : DinoCleaningTool(cleaning) {
     mUnk80 = arg1;
