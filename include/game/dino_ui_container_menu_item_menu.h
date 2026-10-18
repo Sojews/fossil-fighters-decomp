@@ -12,6 +12,8 @@
 #include "game/help.h"
 #include "game/dino_ui_container_menu_item.h"
 
+class DinoUiPartsRockName;
+
 class DinoUiContainerMenu : public DinoHelpBase, public MMenu {
 public:
     virtual ~DinoUiContainerMenu();
@@ -39,7 +41,7 @@ public:
     DinoTeam *mTeam;            // 0xF0
     MSerialTaskSet *mCursorTasks;   // 0xF4
     DinoUiFieldMenuCursor *mCursor; // 0xF8
-    void *mPanel;               // 0xFC: shows the focused container
+    DinoUiPartsRockName *mPanel;    // 0xFC: shows the focused container
     std::vector<s32> mUnk100;   // 0x100
     MArchivePtr mArchive;       // 0x10C
     MArchiveFile mFile;         // 0x110

@@ -99,6 +99,24 @@ void DinoUiFieldMenuNumber3::Idle() {
 void DinoUiFieldMenuNumber::Idle() {
 }
 
+extern "C" const char data_ov003_02161cd4[]; // ""
+
+void DinoUiPartsRockName::Clear() {
+    mText->SetText(std::string(data_ov003_02161cd4));
+}
+
+void DinoUiPartsKasekiButton::SetMarked(BOOL marked) {
+    if (marked) {
+        mMark->Show();
+    } else {
+        mMark->Hide();
+    }
+}
+
+void DinoUiPartsKasekiButton::HideMotion() {
+    mMotion->Hide();
+}
+
 void DinoUiPartsKasekiButton::OnFocusChanged(BOOL focused) {
     if (focused) {
         mView->Show();

@@ -8,6 +8,7 @@
 #include "game/dino_resource.h"
 #include "game/dino_common_window_message_box.h"
 #include "game/dino_ui_container_menu_item_menu.h"
+#include "game/dino_ui_parts_rock_name.h"
 #include "game/dino_ui_container_menu_item.h"
 #include "m/bg_new_task.h"
 #include "m/call_task.h"
@@ -246,7 +247,6 @@ void DinoUiContainerMenu::OnOKDecided() {
 // Where the cursor sits on each tab.
 extern MPoint data_020b5858[3];
 extern "C" void func_ov003_02159a8c(void *panel, DinoBackupEntry *entry, int arg);
-extern "C" void func_ov003_02159b28(void *panel);
 
 // NONMATCHING: register allocation only (i and mPage swap in the last loop, as in OnDecide).
 void DinoUiContainerMenu::OnFocus(MMenuItem *item) {
@@ -284,5 +284,5 @@ void DinoUiContainerMenu::OnFocus(MMenuItem *item) {
             return;
         }
     }
-    func_ov003_02159b28(mPanel);
+    mPanel->Clear();
 }
