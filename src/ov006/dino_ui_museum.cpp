@@ -307,3 +307,6 @@ void DinoUiMuseum3DModel::SetModel(u32 id) {
         mRequested = id;
     }
 }
+
+// The museum's definitions, held in a static object (made and freed by the file's static initializer).
+static MResource<DinoMuseumDefs> sMuseumDefs;
