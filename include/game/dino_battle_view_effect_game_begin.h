@@ -18,10 +18,16 @@ public:
     virtual void Execute();
     virtual MRect GetFrame();
     virtual MPoint GetPosition();
+    virtual void SetPosition(MPoint pos);
+    virtual void Show();
+    virtual void Hide();
 
     MFont *mFont;       // 0x7C
-    MTask *mUnk80;      // 0x80
-    MTask *mUnk84;      // 0x84
+    MMotion *mUnk80;    // 0x80
+    MMotion *mUnk84;    // 0x84
+    BOOL mUnk88;        // 0x88
+    u8 mUnk8C;          // 0x8C
+    int mUnk90;         // 0x90: the name's width
 };
 
 class DinoBattleViewEffectGameBegin : public MProcess {

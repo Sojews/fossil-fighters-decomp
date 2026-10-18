@@ -100,6 +100,36 @@ MPoint DinoBattleViewEffectGameBeginPlayerNamePanel::GetPosition() {
     return MMotion::GetPosition().Offset(12, 0);
 }
 
+void DinoBattleViewEffectGameBeginPlayerNamePanel::Hide() {
+    MMotion::Hide();
+    mUnk80->Hide();
+    mUnk84->Hide();
+}
+
+void DinoBattleViewEffectGameBeginPlayerNamePanel::Show() {
+    MMotion::Show();
+    mUnk80->Show();
+    mUnk84->Show();
+}
+
+void DinoBattleViewEffectGameBeginPlayerNamePanel::SetPosition(MPoint pos) {
+    MMotion::SetPosition(MPoint(pos.x - 12, pos.y));
+    mUnk80->SetPosition(MPoint(pos.x + (0x44 - mUnk90 / 2), pos.y + 4));
+    int dx = mUnk88 == 0 ? 8 : 0x40;
+    int dy = mUnk8C ? -0x40 : 0x18;
+    mUnk84->SetPosition(MPoint(pos.x + dx, pos.y + dy));
+}
+
+void DinoBattleViewEffectGameBeginPlayerNamePanel::Execute() {
+    MMotion::Execute();
+    if (mUnk84->mState == MTask::STATE_RUN) {
+        mUnk84->Execute();
+    }
+    if (mUnk80->mState == MTask::STATE_RUN) {
+        mUnk80->Execute();
+    }
+}
+
 void SetCretureIconPriorityTask::Execute() {
     (*mMotion)->SetPriority(mPriority);
     (*mMotion)->SetAnchor(mAnchor);
