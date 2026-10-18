@@ -6,6 +6,8 @@
 #include "m/archive.h"
 #include "m/bit_vector.h"
 
+class MDisplay;
+
 class DinoCommonLive : public MProcess {
 public:
     // The game's destructor is inline. Its vtable's owner (dino_common_live.cpp) defines DINO_COMMON_LIVE_OWNER and
@@ -16,8 +18,14 @@ public:
     virtual ~DinoCommonLive() {}
 #endif
     virtual void Idle();
+    virtual void Open() = 0;
+    virtual void Signal(u32 id);
+    virtual void Close() = 0;
+    virtual void ShowTutorial(MDisplay *display, const char *text) = 0;
+    virtual BOOL IsBusy();
 
     DinoCommonLive(std::string name, u32 arg1, u32 arg2);
+    void CloseIfOpen();
     void ClearUnkA0();
     void SetUnkAC(u32 index);
     void SetUnkA0(u32 index, BOOL value);
@@ -33,7 +41,10 @@ public:
     MBitVector mUnkA0;                  // 0xA0
     MBitVector mUnkAC;                  // 0xAC
     std::vector<void *> mUnkB8;         // 0xB8
-    u8 unkC4[0xE];
+    u32 unkC4;
+    u32 mUnkC8;                         // 0xC8
+    u32 mOpen;                          // 0xCC
+    u8 unkD0[2];
     u8 mUnkD2;                          // 0xD2
 };
 

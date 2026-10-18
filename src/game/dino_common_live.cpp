@@ -26,6 +26,21 @@ DinoCommonLive::~DinoCommonLive() {
 
 #pragma auto_inline off
 
+void DinoCommonLive::Signal(u32 id) {
+}
+
+BOOL DinoCommonLive::IsBusy() {
+    return FALSE;
+}
+
+void DinoCommonLive::CloseIfOpen() {
+    if (mOpen) {
+        mOpen = 0;
+        Close();
+        mUnkC8 = 0;
+    }
+}
+
 void DinoCommonLive::SetUnkD2(u8 value) {
     mUnkD2 = value;
 }

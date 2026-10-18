@@ -16,12 +16,11 @@ BOOL DinoBattleController::Unk14() {
     return FALSE;
 }
 
-extern "C" void func_020210f4(DinoCommonLive *live);
 
 void SetLiveEventCheckTask::Execute() {
     if (mLive != NULL) {
         if (!mCheck) {
-            func_020210f4(mLive);
+            mLive->CloseIfOpen();
         }
         mLive->SetUnkD2(mCheck);
     }

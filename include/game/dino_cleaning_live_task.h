@@ -10,9 +10,9 @@ public:
     DinoCleaningLive(u32 arg, const std::string &name);
     virtual ~DinoCleaningLive();
 
-    void ShowTutorial(MDisplay *display, const char *text);
-    void Unk021580cc();
-    void Unk021580d8();
+    virtual void Open();
+    virtual void Close();
+    virtual void ShowTutorial(MDisplay *display, const char *text);
 
     u32 mUnkD4;                     // 0xD4
     DinoCleaningTalkWindow *mTalk;  // 0xD8

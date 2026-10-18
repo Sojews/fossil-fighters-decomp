@@ -15,6 +15,11 @@ class DinoBattleLive : public DinoCommonLive {
 public:
     virtual ~DinoBattleLive();
     virtual void Idle();
+    virtual void Open();
+    virtual void Signal(u32 id);
+    virtual void Close();
+    virtual void ShowTutorial(MDisplay *display, const char *text);
+    virtual BOOL IsBusy();
 };
 
 #endif

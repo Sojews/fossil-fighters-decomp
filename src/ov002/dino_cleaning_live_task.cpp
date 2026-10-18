@@ -23,11 +23,11 @@ void DinoCleaningLive::ShowTutorial(MDisplay *display, const char *text) {
     mSerial.AddTail(new DinoCleaningTutorialWindow(display, mUnkD4, std::string(text)));
 }
 
-void DinoCleaningLive::Unk021580cc() {
+void DinoCleaningLive::Open() {
     func_ov002_021573e8(mTalk);
 }
 
-void DinoCleaningLive::Unk021580d8() {
+void DinoCleaningLive::Close() {
     func_ov002_0215785c(mTalk);
 }
 
