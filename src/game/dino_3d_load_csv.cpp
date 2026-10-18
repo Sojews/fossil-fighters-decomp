@@ -125,6 +125,18 @@ void Dino3DLoadCsv::Reset() {
     mCommands.clear();
 }
 
+void Dino3DLoadCsv::LoadScene(u32 index, u32 arg) {
+    MResource<Dino3DSceneFiles> scenes("/model/battle/arcscenecsv");
+    MArchiveFile file = scenes.Get()->GetFile(scenes.mArchive, index);
+    mPath = "";
+    LoadSoundNames("/model/battle/");
+    Reset();
+    char *text = new char[file.GetSize()];
+    file.Read(text, file.GetSize());
+    ParseScript(text, mUnk84, "/model/battle/", arg, 0);
+    delete[] text;
+}
+
 Dino3DLoadCsv::~Dino3DLoadCsv() {
 }
 

@@ -7,6 +7,7 @@
 #include <vector>
 #include "m/archive.h"
 #include "m/task.h"
+#include "m/resource.h"
 
 class M3DModel;
 
@@ -96,40 +97,13 @@ struct M3DDinEntry {
     u32 mTexPath;       // 0x18
 };
 
-// A model archive held open, with its first file (the model's M3DModelFiles) loaded.
-class M3DModelArchive {
-public:
-    M3DModelArchive() {}
-    M3DModelArchive(std::string path) : mArchive(path) {
-        mFile = mArchive.GetFile(0);
-        mFile.Lock();
-        mFile.GetData();
-    }
-
-    const M3DModelFiles *GetFiles() { return (const M3DModelFiles *) mFile.GetData(); }
-
-    MArchivePtr mArchive;   // 0x00
-    MArchiveFile mFile;     // 0x04
-};
-
-// The battle model table archive held open, with its first file (the table) loaded.
-class M3DDinTable {
-public:
-    M3DDinTable() {}
-    M3DDinTable(std::string path) : mArchive(path) {
-        mFile = mArchive.GetFile(0);
-        mFile.Lock();
-        mFile.GetData();
-    }
-
-    const M3DDinEntry *GetEntry(int species, int variant) {
-        const u8 *data = (const u8 *) mFile.GetData();
+// The battle model table: per species, per variant, an entry.
+struct M3DDinTable {
+    const M3DDinEntry *GetEntry(int species, int variant) const {
+        const u8 *data = (const u8 *) this;
         const u8 *group = data + ((const u32 *) (data + ((const u32 *) data)[2]))[species];
         return (const M3DDinEntry *) (group + ((const u32 *) (group + ((const u32 *) group)[1]))[variant]);
     }
-
-    MArchivePtr mArchive;   // 0x00
-    MArchiveFile mFile;     // 0x04
 };
 
 // A model's files, loaded through the caches, by path.
@@ -142,8 +116,8 @@ public:
     void Setup(M3DModel *model, u8 keepPalette);
     void GetPalette(u32 *plttKey, u8 **palette, u32 *size);
 
-    M3DModelArchive mArchive;   // 0x00
-    M3DDinTable mDinTable;      // 0x10
+    MResource<M3DModelFiles> mArchive;  // 0x00
+    MResource<M3DDinTable> mDinTable;   // 0x10
     MArchiveFile mModelFile;    // 0x20
     MArchiveFile mAnimFile;     // 0x2C
     MArchiveFile mTexFile;      // 0x38

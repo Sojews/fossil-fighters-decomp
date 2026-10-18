@@ -8,6 +8,7 @@
 #include <vector>
 #include "m/task.h"
 #include "m/archive.h"
+#include "m/resource.h"
 #include "nitro/fx.h"
 
 class MAnmModelBase;
@@ -48,6 +49,8 @@ public:
     void LoadScene(u32 index, u32 arg);
     void LoadFile(const char *path, void *arg2, u32 arg3);
     void LoadByName(const char *name, BOOL alt, u32 variant);
+    void LoadSoundNames(const char *dir);
+    void ParseScript(char *text, void *unk84, const char *dir, u32 arg, u32 arg2);
     BOOL IsStopped();
     int GetFrameCount();
     int GetUnkB0();

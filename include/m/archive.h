@@ -125,6 +125,7 @@ public:
     }
     void *GetData() { return archive->GetData(index); }
     u32 GetSize() const { return archive->mEntries[index].size; }
+    void Read(void *dest, u32 size) { archive->Read(index, 0, dest, size, NULL); }
 
     MArchive *archive;
     u32 index;

@@ -254,8 +254,8 @@ BOOL M3DModelExists(std::string path) {
     if (sscanf(path.c_str(), "/model/battle/din%03d_%02d", &species, &variant) != 2) {
         return MFileExists(path);
     }
-    M3DDinTable table("/model/battle/arcdin");
-    return table.GetEntry(species, variant)->mExists;
+    MResource<M3DDinTable> table("/model/battle/arcdin");
+    return table.Get()->GetEntry(species, variant)->mExists;
 }
 
 M3DModelResource::M3DModelResource(std::string path) : mPath(path) {
@@ -265,13 +265,13 @@ M3DModelResource::M3DModelResource(std::string path) : mPath(path) {
     int species;
     int variant;
     if (sscanf(mPath.c_str(), "/model/battle/din%03d_%02d", &species, &variant) != 2) {
-        mArchive = M3DModelArchive(mPath);
-        mModelFile = mArchive.GetFiles()->GetModelFile(mArchive.mArchive);
-        mAnimFile = mArchive.GetFiles()->GetAnimFile(mArchive.mArchive);
-        mTexFile = mArchive.GetFiles()->GetTexFile(mArchive.mArchive);
+        mArchive = MResource<M3DModelFiles>(mPath);
+        mModelFile = mArchive.Get()->GetModelFile(mArchive.mArchive);
+        mAnimFile = mArchive.Get()->GetAnimFile(mArchive.mArchive);
+        mTexFile = mArchive.Get()->GetTexFile(mArchive.mArchive);
     } else {
-        mDinTable = M3DDinTable("/model/battle/arcdin");
-        const M3DDinEntry *entry = mDinTable.GetEntry(species, variant);
+        mDinTable = MResource<M3DDinTable>("/model/battle/arcdin");
+        const M3DDinEntry *entry = mDinTable.Get()->GetEntry(species, variant);
         mModelFile = entry->GetModelFile(mDinTable.mArchive);
         mAnimFile = entry->GetAnimFile(mDinTable.mArchive);
         mTexFile = entry->GetTexFile(mDinTable.mArchive);
