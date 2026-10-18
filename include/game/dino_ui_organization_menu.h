@@ -20,8 +20,12 @@ public:
 
     void CreateSlots();
     void CreateSlot(u32 index);
+    void ClearSlots();
+    void RemoveSlotLinks();
 
-    u32 mUnkB4[55];                     // 0xB4
+    u32 mUnkB4[25];                     // 0xB4
+    MMenuItem *mSlots[15];              // 0x118
+    u32 mUnk154[15];                    // 0x154
     u32 mSlotCount;                     // 0x190
     u32 mUnk194[6];                     // 0x194
     std::vector<void *> mUnk1AC;        // 0x1AC
@@ -81,6 +85,7 @@ public:
 
 class DinoUiOrganizationSlotCreateTask : public MProcess {
 public:
+    DinoUiOrganizationSlotCreateTask(DinoUiOrganizationMenu *menu);
     virtual ~DinoUiOrganizationSlotCreateTask();
     virtual void Idle();
 

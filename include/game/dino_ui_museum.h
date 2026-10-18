@@ -26,8 +26,13 @@ public:
 
     void CreateSlots();
     void CreateSlot(u32 index);
+    void ClearSlots();
 
-    u8 unkB3[0x15C - 0xB3];  // members start in MMenu's tail padding
+    u8 unkB3[0xB8 - 0xB3];  // members start in MMenu's tail padding
+    MMenuItem *mLinkFrom;   // 0xB8: linked down to the slots
+    u8 unkBC[0xE4 - 0xBC];
+    MMenuItem *mSlots[15];  // 0xE4
+    u8 unk120[0x15C - 0x120];
     u32 mSlotCount;     // 0x15C
     u8 unk160[0x1AC - 0x160];
     u8 mUnk1AC;     // 0x1AC

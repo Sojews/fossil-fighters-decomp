@@ -150,10 +150,23 @@ extern "C" const int data_02089a0c;
 
 #pragma auto_inline off
 
+void DinoUiOrganizationMenu::ClearSlots() {
+    RemoveSlotLinks();
+    for (int i = 0; i < 15; i++) {
+        RemoveItem(mSlots[i]);
+        delete mSlots[i];
+    }
+}
+
 void DinoUiOrganizationMenu::CreateSlots() {
     for (int i = 0; i < 15; i++) {
         CreateSlot(i);
     }
+}
+
+DinoUiOrganizationSlotCreateTask::DinoUiOrganizationSlotCreateTask(DinoUiOrganizationMenu *menu) : MProcess(NULL) {
+    mMenu = menu;
+    mIndex = 0;
 }
 
 #pragma auto_inline on
