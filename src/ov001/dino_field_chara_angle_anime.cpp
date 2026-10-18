@@ -3,6 +3,8 @@
 
 #include "game/dino_field.h"
 #include "nitro/mi.h"
+#include "m/anm_model.h"
+#include "m/3d_model.h"
 #include "game/dino_field_chara_angle_anime.h"
 #include "game/dino_field_chara_coord_anime.h"
 #include "game/dino_field_chara_wait_stop_task.h"
@@ -188,7 +190,7 @@ void DinoFieldChara::MoveTo(MFx32Point coord, u32 frames, u32 ease, u8 silent) {
         mHasFootSe = FALSE;
         se = mFootSe;
     }
-    if (mUnk120 == NULL) {
+    if (mBody == NULL) {
         se = 0;
     }
     mMoveTasks->Clear();
@@ -364,6 +366,32 @@ typedef std::__red_black_tree<u32, std::pair<const u32, DinoFieldCharaCacheEntry
                               std::__select_first<std::pair<const u32, DinoFieldCharaCacheEntry> >, std::less<u32>,
                               std::allocator<std::pair<const u32, DinoFieldCharaCacheEntry> > >
     DinoFieldCharaCacheTree;
+void DinoFieldChara::ApplyHeadModel() {
+    if (mHead != NULL) {
+        mTaskSet->Remove(mHead);
+        delete mHead;
+        mHead = NULL;
+    }
+    if (mBody != NULL) {
+        int joint = mBody->mModel->FindJoint("head");
+        if (joint != -1) {
+            const char *path = GetHeadModelPath();
+            if (path != NULL) {
+                mHead = new MAnmModel(mScene);
+                mHead->unk100 = 0x20;
+                mHead->SetFrames(0, 0x40000000);
+                mHead->Load(path, 0);
+                mHead->SetParent(mBody, joint);
+                mHead->Run();
+                mHead->mUnkF4 = 1;
+                mHead->mFollowParent = TRUE;
+                mHead->SetUnk145();
+                mTaskSet->AddTail(mHead);
+            }
+        }
+    }
+}
+
 #pragma auto_inline off
 template DinoFieldCharaCacheTree::node_base *DinoFieldCharaCacheTree::find_insert_position(const u32 &k,
                                                                                         node_base *&last_not_greater,

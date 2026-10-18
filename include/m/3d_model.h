@@ -30,6 +30,7 @@ public:
     BOOL SetFlag100(BOOL on);
     const MtxFx44 *GetMatrix();
     BOOL GetJointMatrix(int joint, MtxFx44 *mtx, u8 arg);
+    int FindJoint(const char *name);
 
     M3DScene *mScene;           // 0x04
     u32 mFlags;                 // 0x08

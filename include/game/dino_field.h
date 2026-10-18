@@ -87,6 +87,9 @@ struct DinoFieldCharaModel {
     u16 angle;          // 0x16
 };
 
+class M3DScene;
+class MAnmModelBase;
+
 class DinoFieldChara : public MProcess, public MSerializer {
 public:
     virtual ~DinoFieldChara();
@@ -109,6 +112,7 @@ public:
     void UpdateHeadModel();
     void ApplyBodyModel();
     void ApplyHeadModel();
+    const char *GetHeadModelPath();
     void ChangeMotion(u32 motion, u8 loop, MFx32 speed);
     void SetAngle(u32 angle, u32 frames, u32 ease);
     void SetDirection(u16 angle);
@@ -151,9 +155,10 @@ public:
     MTaskSet *mTaskSet;         // 0x110: where the manpu task runs
     u32 mUnk114;                // 0x114
     DinoField *mField;          // 0x118
-    u32 mUnk11C;                // 0x11C
-    void *mUnk120;              // 0x120
-    u32 mUnk124[109];           // 0x124
+    M3DScene *mScene;           // 0x11C
+    MAnmModelBase *mBody;       // 0x120
+    MAnmModelBase *mHead;       // 0x124: on the body's head joint
+    u32 mUnk128[108];           // 0x128
     MPoint mUnk2D8;             // 0x2D8
     u32 mUnk2E0;                // 0x2E0
     u32 mUnk2E4;                // 0x2E4

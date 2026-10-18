@@ -23,10 +23,28 @@ struct MAnmKey {
 
 class MAnmModelBase : public MTask {
 public:
+    MAnmModelBase(M3DScene *scene) {
+        mScene = scene;
+        Init();
+    }
     virtual ~MAnmModelBase();
     virtual void Execute();
     virtual void Unk0C();
     virtual void Unk10();
+
+    void SetFrames(fx32 start, fx32 end) {
+        mStartFrame = start;
+        mEndFrame = end;
+    }
+    void SetParent(MAnmModelBase *parent, int joint) {
+        mParent = parent;
+        mJoint = joint;
+        mUnk11B = TRUE;
+    }
+    void SetUnk145() {
+        mUnk145 = 1;
+        mUnk11B = TRUE;
+    }
 
     void Init();
     void Load(const char *path, u8 keepPalette);
@@ -80,6 +98,7 @@ public:
 
 class MAnmModel : public MAnmModelBase {
 public:
+    MAnmModel(M3DScene *scene) : MAnmModelBase(scene) {}
     virtual ~MAnmModel();
     virtual void Unk0C();
     virtual void Unk10();
