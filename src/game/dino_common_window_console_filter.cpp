@@ -45,6 +45,17 @@ DinoCommonWindowMessageBox::DinoCommonWindowMessageBox(MPoint pos, const std::st
     mUnk98 = TRUE;
 }
 
+DinoCommonWindowMessage::DinoCommonWindowMessage(MPoint pos, const std::string &text, int arg3, int arg4)
+    : MProcess(NULL), mPos(pos), mText(text), mUnk90(arg3), mUnk94(-1), mUnk98(FALSE), mUnk9C(arg4), mUnkA4(FALSE),
+      mUnkA8(0) {
+}
+
+DinoCommonWindowMessage::DinoCommonWindowMessage(MDisplay *display, MPoint pos, const std::string &text, int arg3,
+                                                 int arg4)
+    : MProcess(display), mPos(pos), mText(text), mUnk90(arg3), mUnk94(-1), mUnk98(FALSE), mUnk9C(arg4), mUnkA4(FALSE),
+      mUnkA8(0) {
+}
+
 #pragma auto_inline off
 
 void DinoCommonWindowMessage::SetUnkA8(u32 value) {

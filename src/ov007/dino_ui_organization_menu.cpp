@@ -4,6 +4,7 @@
 // Derived destructors have their bases' destructor bodies inlined; auto-inlining the ones defined above does that.
 #pragma auto_inline on
 
+#include <algorithm>
 #include "game/dino_sound.h"
 #include "game/dino_ui_organization_menu.h"
 #include "game/dino_ui_field_menu_fraction.h"
@@ -16,6 +17,7 @@
 #include "game/dino_team.h"
 #include "game/dino_ui_parts_team_tech.h"
 #include "game/dino_ui_parts_reviver_medal_button.h"
+#include "game/common_window_message.h"
 
 DinoUiOrganizationMenu::~DinoUiOrganizationMenu() {
     gCurrentDisplay->mBlend->Reset();
@@ -151,6 +153,8 @@ void DinoUiOrganizationPageRButton::OnDecide() {
 extern "C" const int data_02089a0c;
 
 #pragma auto_inline off
+
+extern "C" void func_ov007_0217fb94(DinoUiOrganizationMenu *menu, int a1);
 
 void DinoUiOrganizationMenu::ShowTabInfo(u8 tab) {
     mInfo->SetPage(tab);
@@ -289,6 +293,30 @@ void DinoUiOrganizationMenu::SetSort(u8 sort) {
     }
 }
 
+extern "C" void func_ov007_0217e3d8(DinoUiOrganizationMenu *menu, int index);
+extern "C" void func_ov007_0217c760(DinoUiOrganizationMenu *menu);
+extern const u32 data_0208aa4c;
+extern const MPoint data_020b5814;
+
+void DinoUiOrganizationMenu::HandleResult() {
+    if (mResult == 11) {
+        mUnk23C = TRUE;
+        func_ov007_0217fb94(this, 1);
+        mMessage = new DinoCommonWindowMessage(data_020b5814, gDinoResource->GetText(data_0208aa4c), 4, 0);
+        mParallel.AddTail(mMessage);
+        func_ov007_0217e3d8(this, mSelected);
+        mListItems[mSelected]->PlayDecided();
+        if (mSelected < 3) {
+            mTeamTech->Hide();
+        }
+        FocusNearestItem(GetCursor());
+    } else if (mResult == 12) {
+        func_ov007_0217c760(this);
+    } else if (mResult == -2) {
+        mListItems[mSelected]->PlayFocused();
+    }
+}
+
 void DinoUiOrganizationMenu::RemoveListLinks() {
     if (mListLinked) {
         RemoveLink(mListItems[0], 3);
@@ -311,9 +339,51 @@ void DinoUiOrganizationMenu::RemoveSlotLinks() {
     }
 }
 
-extern "C" void func_ov007_0217c92c(DinoUiOrganizationMenu *menu);
 extern "C" void func_ov007_0217e1e4(DinoUiOrganizationMenu *menu);
-extern "C" void func_ov007_0217fb94(DinoUiOrganizationMenu *menu, int a1);
+
+extern const u32 kCreatureLevelLimits[2];
+
+// A creature's experience, up to what the top level needs.
+static inline u32 GetCreatureTotal(const DinoCreatureState &creature) {
+    if (creature.parts[0].level == 0) {
+        return 0;
+    }
+    u32 sum = creature.unk0_8 + (creature.parts[0].level + creature.parts[1].level + creature.parts[2].level +
+                                 creature.parts[3].level);
+    return std::min(kCreatureLevelLimits[0] * 11 + 50, sum);
+}
+
+static inline u32 GetCreatureLevel(const DinoCreatureState &creature) {
+    if (creature.parts[0].level == 0) {
+        return 0;
+    }
+    return (GetCreatureTotal(creature) - 50) / kCreatureLevelLimits[0] + 1;
+}
+
+// Where the team's medals go.
+extern MPoint data_ov007_0218ef0c[5];
+
+void DinoUiOrganizationMenu::CreateList() {
+    for (int i = 0; i < 5; i++) {
+        DinoCreatureState creature;
+        gDinoBackup->GetCreature(mTeam.slots[i], &creature);
+        u8 maxed;
+        if (GetCreatureLevel(creature) == 12) {
+            maxed = TRUE;
+        } else {
+            maxed = FALSE;
+        }
+        mListItems[i] = new DinoUiPartsReviverMedalButton(mOam, data_ov007_0218ef0c[i], mTeam.slots[i], maxed, 0);
+        AddItem(mListItems[i]);
+        AddLink(mListItems[i], 4, mUnkB8);
+    }
+    AddLink(mTabs[0], 2, mListItems[0]);
+    AddLink(mTabs[1], 2, mListItems[0]);
+    AddLink(mTabs[2], 2, mListItems[0]);
+    AddLink(mTabs[3], 2, mListItems[0]);
+    AddLink(mUnkBC, 2, mListItems[0]);
+    AddLink(mUnkB8, 2, mListItems[0]);
+}
 
 void DinoUiOrganizationMenu::ClearList() {
     RemoveLink(mTabs[0], 2);
@@ -418,7 +488,7 @@ void DinoUiOrganizationMenu::Refresh() {
     RemoveListLinks();
     RemoveSlotLinks();
     ClearList();
-    func_ov007_0217c92c(this);
+    CreateList();
     PlaceSlots();
     func_ov007_0217e1e4(this);
     LinkList();

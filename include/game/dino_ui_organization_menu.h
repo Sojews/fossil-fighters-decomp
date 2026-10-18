@@ -18,6 +18,8 @@ class DinoUiOrganizationMenuItem;
 class DinoUiPartsReviverName;
 class DinoUiPartsTeamTech;
 class DinoUiPartsReviverMedalButton;
+class MSmartOam;
+class DinoCommonWindowMessage;
 
 // Where things go on the screen (filled in at start).
 struct DinoUiOrganizationLayout {
@@ -60,11 +62,13 @@ public:
     void LinkList();
     void UpdateTeamTech();
     void Refresh();
+    void CreateList();
+    void HandleResult();
     void ClearList();
     void LinkSlots();
     void RestoreFocus();
 
-    u32 mUnkB4;                         // 0xB4
+    MSmartOam *mOam;                    // 0xB4
     MMenuItem *mUnkB8;                  // 0xB8
     DinoUiOrganizationMenuItem *mUnkBC; // 0xBC
     u32 mUnkC0[2];                      // 0xC0
@@ -79,7 +83,8 @@ public:
     int mSlotCount;                     // 0x190
     u32 mUnk194[3];                     // 0x194
     DinoUiFieldMenuFraction *mFraction; // 0x1A0: "page n/m"
-    u32 mUnk1A4[2];                     // 0x1A4
+    u32 mUnk1A4;                        // 0x1A4
+    int mResult;                        // 0x1A8
     std::vector<u32> mCreatures;        // 0x1AC: the ids listed, a page of 15 at a time
     std::vector<void *> mUnk1B8;        // 0x1B8
     std::vector<void *> mUnk1C4;        // 0x1C4
@@ -96,9 +101,10 @@ public:
     DinoUiRvInformation *mInfo;         // 0x228
     DinoUiPartsReviverName *mName;      // 0x22C
     MTaskSet *mUnk230;                  // 0x230
-    u32 mUnk234;                        // 0x234
+    DinoCommonWindowMessage *mMessage;  // 0x234
     int mSelected;                      // 0x238: a team member (0-4) or slot (5-)
-    u8 unk23C[2];
+    u8 mUnk23C;                         // 0x23C
+    u8 unk23D;
     u8 mUnk23E;                         // 0x23E
     u8 unk23F;
     std::vector<MMotionFile> mMotions;  // 0x240
