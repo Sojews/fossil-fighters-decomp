@@ -1109,3 +1109,8 @@ void MMultiPlayMessageHub::Execute() {
         ReceivePending();
     }
 }
+
+#pragma auto_inline off
+// Vector instances the game emits in this file (made explicitly until the hub's send code is decompiled).
+template class std::__vec_deleter<char, std::allocator<char> >;
+template class std::__vec_deleter<MMultiPlayHubOutgoing, std::allocator<MMultiPlayHubOutgoing> >;
