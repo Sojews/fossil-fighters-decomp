@@ -397,9 +397,9 @@ _ZN19DinoEventTalkWindow10SetChoicesEm6MPointRKSt6vectorI16DinoWindowChoiceSaIS2
 _ZNSt13__vec_deleterI16DinoWindowChoiceSaIS0_EE6assignIPS0_EEvT_S5_N10Metrowerks8int2typeILi1EEE kind:function(thumb,size=0x12c) addr:0x02007204
 _ZN19DinoEventTalkWindow8AddEntryEm5MRectRKSs kind:function(thumb,size=0xa8) addr:0x02007330
 _ZN19DinoEventTalkWindow4IdleEv kind:function(thumb,size=0x20) addr:0x020073d8
-func_020073f8 kind:function(thumb,size=0x78) addr:0x020073f8
+_ZN19DinoEventTalkWindow10StateStartEv kind:function(thumb,size=0x78) addr:0x020073f8
 _Z17MCreateBgCallTaskI19DinoEventTalkWindowEP5MTaskPT_MS3_FvvEi kind:function(thumb,size=0x38) addr:0x02007470
-func_020074a8 kind:function(thumb,size=0x148) addr:0x020074a8
+_ZN19DinoEventTalkWindow4LoadEv kind:function(thumb,size=0x148) addr:0x020074a8
 _ZN19DinoEventTalkWindow9StatePageEv kind:function(thumb,size=0x58) addr:0x020075f0
 func_02007648 kind:function(thumb,size=0xc4) addr:0x02007648
 func_0200770c kind:function(thumb,size=0x2d4) addr:0x0200770c

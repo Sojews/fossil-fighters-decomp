@@ -3,6 +3,7 @@
 
 #pragma ipa file
 
+#include "m/input.h"
 #include "game/dino_talk_window.h"
 #include "game/dino_event_talk_window.h"
 #include "m/bg_new_task.h"
@@ -51,9 +52,12 @@ template class std::__vec_deleter<DinoCommonWindowMenuEntry, std::allocator<Dino
 
 // The TU's pooled pointer-to-member constants (see menu.cpp).
 extern "C" struct {
-    u8 unk00[0xC];
+    u8 unk00[0x4];
+    void (DinoEventTalkWindow::*Load_04)();
     void (DinoEventTalkWindow::*Unk02007ab4_0C)();
-    u8 unk14[0x2C - 0x14];
+    void (DinoEventTalkWindow::*Unk02007648_14)();
+    void (DinoEventTalkWindow::*StateStart_1C)();
+    u8 unk24[0x2C - 0x24];
     void (DinoEventTalkWindow::*Unk0200770c_2C)();
     void (DinoEventTalkWindow::*Unk02007a00_34)();
 } data_020b6144;
@@ -73,3 +77,20 @@ void DinoEventTalkWindow::StatePage() {
         mUnk90 = 0;
     }
 }
+
+DinoEventTalkWindow::DinoEventTalkWindow(MDisplay *display, std::string text, int arg, u8 flag)
+    : MProcess(display), mText(text), mArg(arg), mUnk98(0), mUnk9C(0), mFlag(flag) {
+    mState = data_020b6144.StateStart_1C;
+}
+
+#pragma dont_inline on
+void DinoEventTalkWindow::StateStart() {
+    mInputHub = new MSingleInputHub(1);
+    mInputHub->EnableTouch();
+    mParallel.AddTail(mInputHub);
+    mParallel.SetUseMutex(TRUE);
+    mSerial.SetUseMutex(TRUE);
+    mSerial.AddTail(MCreateBgCallTask(this, data_020b6144.Load_04, 1));
+    mState = data_020b6144.Unk02007648_14;
+}
+#pragma dont_inline reset
