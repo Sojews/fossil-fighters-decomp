@@ -11,6 +11,7 @@
 #include "game/dino_sound.h"
 #include "m/call_task.h"
 #include "m/bg_new_task.h"
+#include "m/picture.h"
 
 DinoUiMedalMenu::~DinoUiMedalMenu() {
     gCurrentDisplay->mBlend->Reset();
@@ -176,6 +177,22 @@ void DinoUiMedalMenu::ClearSlots() {
     for (int i = 0; i < 15; i++) {
         RemoveItem(mSlots[i]);
         delete mSlots[i];
+    }
+}
+
+void DinoUiMedalMenu::SetSort(u8 sort) {
+    if (sort < 5 && mSort != sort) {
+        mSort = sort;
+        DinoSoundPlaySe(0x98, 0);
+        mSortCursor->SetPosition(0, sort * -0xC0);
+        ClearSlots();
+        Sort(sort);
+        Disable();
+        MTask *enable = MCreateCallTask(this, &DinoHelpBase::Enable);
+        MTask *create = new DinoUiMedalSlotCreateTask(this);
+        MSerialTaskSet *serial = &mSerial;
+        serial->AddTail(create);
+        serial->AddTail(enable);
     }
 }
 

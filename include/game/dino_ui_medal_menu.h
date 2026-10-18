@@ -9,6 +9,7 @@
 #include "game/help.h"
 
 class DinoUiFieldMenuFraction;
+class MTextPicture;
 
 class DinoUiMedalMenu : public DinoHelpBase, public MMenu {
 public:
@@ -27,8 +28,12 @@ public:
     void CreateSlots();
     void CreateSlot(u32 index);
     BOOL HasUnk1EC(u8 id);
+    void SetSort(u8 sort);
+    void Sort(u8 sort);
 
-    u32 mUnkB4[20];                     // 0xB4
+    u32 mUnkB4[14];                     // 0xB4
+    MTextPicture *mSortCursor;          // 0xEC
+    u32 mUnkF0[5];                      // 0xF0
     MMenuItem *mSlots[15];              // 0x104
     u32 mUnk140[15];                    // 0x140
     u32 mSlotCount;                     // 0x17C
@@ -40,7 +45,9 @@ public:
     std::vector<void *> mUnk1B4;        // 0x1B4
     u32 mPage;                          // 0x1C0
     u32 mLastPage;                      // 0x1C4
-    u32 mUnk1C8[9];                     // 0x1C8
+    u8 mSort;                           // 0x1C8
+    u8 unk1C9[3];
+    u32 mUnk1CC[8];                     // 0x1CC
     u8 mUnk1EC[5];                      // 0x1EC
     u8 unk1F1[0x13];
     u8 mUnk204;                         // 0x204

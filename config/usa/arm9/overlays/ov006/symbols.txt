@@ -334,7 +334,7 @@ _ZN15DinoUiMedalMenuD1Ev kind:function(thumb,size=0x6c) addr:0x021813d8
 _ZN15DinoUiMedalMenuD0Ev kind:function(thumb,size=0x74) addr:0x02181444
 func_ov006_021814b8 kind:function(thumb,size=0x1b0) addr:0x021814b8
 func_ov006_02181668 kind:function(thumb,size=0x46) addr:0x02181668
-func_ov006_021816b0 kind:function(thumb,size=0x1a0) addr:0x021816b0
+_ZN15DinoUiMedalMenu4SortEh kind:function(thumb,size=0x1a0) addr:0x021816b0
 _ZN15DinoUiMedalMenu7OnStartEv kind:function(thumb,size=0xff4) addr:0x02181850
 func_ov006_02182844 kind:function(thumb,size=0xe0) addr:0x02182844
 _ZN15DinoUiMedalMenu6OnIdleEv kind:function(thumb,size=0xa) addr:0x02182924
@@ -355,7 +355,7 @@ _Z17MCreateBgCallTaskI15DinoUiMedalMenuEP5MTaskPT_MS3_FvvEi kind:function(thumb,
 _ZN15DinoUiMedalMenu15FinishPageRightEv kind:function(thumb,size=0x44) addr:0x021835e0
 _ZN15DinoUiMedalMenu8PageLeftEv kind:function(thumb,size=0x54) addr:0x02183624
 _ZN15DinoUiMedalMenu14FinishPageLeftEv kind:function(thumb,size=0x44) addr:0x02183678
-func_ov006_021836bc kind:function(thumb,size=0x7c) addr:0x021836bc
+_ZN15DinoUiMedalMenu7SetSortEh kind:function(thumb,size=0x7c) addr:0x021836bc
 _ZN15DinoUiMedalMenu9HasUnk1ECEh kind:function(thumb,size=0x32) addr:0x02183738
 func_ov006_0218376c kind:function(thumb,size=0xf4) addr:0x0218376c
 _ZN15DinoUiMedalListC1Ev kind:function(thumb,size=0x3c) addr:0x02183860
