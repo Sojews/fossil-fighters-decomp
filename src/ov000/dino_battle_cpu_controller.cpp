@@ -38,3 +38,7 @@ SetLiveEventCheckTask::~SetLiveEventCheckTask() {
 #pragma auto_inline off
 
 
+
+// The list's vector members the game emits in this file.
+#pragma auto_inline off
+template class std::__vec_deleter<DinoBattleCpuEntry, std::allocator<DinoBattleCpuEntry> >;
