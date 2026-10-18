@@ -15,6 +15,7 @@
 #include "m/bg_new_task.h"
 #include "m/call_task.h"
 #include "m/observer.h"
+#include "m/multi_play.h"
 
 DinoUiWirelessCancelItem::~DinoUiWirelessCancelItem() {
 }
@@ -226,6 +227,26 @@ void DinoUiCannonChild::OnMessage(MMessage *msg) {
         mStarted = TRUE;
     }
 }
+
+#pragma auto_inline off
+
+void DinoUiChildScanner::ExitWithReset() {
+    MTask *exit = MTaskExitTransfer::Create(this);
+    MTask *reset = mMultiPlay->CreateResetTask();
+    MSerialTaskSet *serial = &mSerial;
+    serial->AddTail(reset);
+    serial->AddTail(exit);
+}
+
+void DinoUiChildScanner::OnIdle() {
+    if (mMultiPlay->IsFailed()) {
+        ExitWithReset();
+    } else {
+        MMessageObserver::Dispatch();
+    }
+}
+
+#pragma auto_inline on
 
 void DinoUiChildScanner::OnFocus(MMenuItem *item) {
     if (mSilentFocus) {

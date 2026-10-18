@@ -37,6 +37,8 @@ public:
     std::string mText;  // 0xA4
 };
 
+class MMultiPlay;
+
 class DinoUiChildScanner : public MMenu, public MMessageObserver, public DinoHelpBase {
 public:
     virtual ~DinoUiChildScanner();
@@ -45,8 +47,10 @@ public:
     virtual void OnFocus(MMenuItem *item);
     virtual void OnDecide(MMenuItem *item);
     virtual void OnMessage(MMessage *msg);
+    void ExitWithReset();
 
-    u32 mUnkE8[3];              // 0xE8
+    MMultiPlay *mMultiPlay;     // 0xE8
+    u32 mUnkEC[2];              // 0xEC
     u8 mSilentFocus;            // 0xF4
     u8 unkF5[0x37];
     DinoHelpItem *mParentHelp;  // 0x12C: help shown for every parent item

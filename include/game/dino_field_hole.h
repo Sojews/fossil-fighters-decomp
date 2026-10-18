@@ -14,6 +14,8 @@ class DinoFieldHole : public MProcess {
 public:
     virtual ~DinoFieldHole();
     virtual void Idle();
+
+    void (DinoFieldHole::*mState)();    // 0x74
 };
 
 #endif

@@ -9,3 +9,7 @@
 
 DinoFieldHole::~DinoFieldHole() {
 }
+
+void DinoFieldHole::Idle() {
+    (this->*mState)();
+}
