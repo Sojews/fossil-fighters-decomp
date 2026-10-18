@@ -49,6 +49,23 @@ public:
         mRotRef = rot;
         mUnk11B = TRUE;
     }
+    void SetFrame(fx32 frame) {
+        mFrame = frame;
+        mLoopEnd = frame;
+        mUnk11B = TRUE;
+    }
+    void SetUnk117(u8 value) {
+        mUnk117 = value;
+        mUnk11B = TRUE;
+    }
+    void SetUnk134(u32 value) {
+        mUnk134 = value;
+        mUnk11B = TRUE;
+    }
+    void SetUnk138(u16 value) {
+        mUnk138 = value;
+        mUnk11B = TRUE;
+    }
     void SetUnk145() {
         mUnk145 = 1;
         mUnk11B = TRUE;
@@ -125,6 +142,8 @@ class MAnmTargetCamera : public MAnmModelBase {
 public:
     virtual ~MAnmTargetCamera();
     virtual void Unk0C();
+
+    VecFx32 mTarget;                    // 0x1A8
 };
 
 class MAnmSE : public MAnmModelBase {

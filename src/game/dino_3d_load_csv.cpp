@@ -109,12 +109,12 @@ Dino3DLoadCsv::Dino3DLoadCsv(u32 index, void *unk80, u16 unkA4, void *unk84, voi
 void Dino3DLoadCsv::Reset() {
     MProcessPause pause(this, &mPauseMutex, &mPauseCount);
     MScopedLock lock(&mCommandMutex, TRUE);
-    mUnk98 = 0;
-    mUnk9C = 0;
-    mUnkA0 = 0;
-    mUnk8C = 0;
-    mUnk90 = 0;
-    mUnk94 = 0;
+    mRot.x = 0;
+    mRot.y = 0;
+    mRot.z = 0;
+    mPos.x = 0;
+    mPos.y = 0;
+    mPos.z = 0;
     mUnkB0 = 0x1000;
     mUnkAC = 1;
     mUnkA6 = 0x7FFF;
@@ -234,6 +234,168 @@ void Dino3DLoadCsv::LoadByName(const char *name, BOOL loop, u32 variant) {
 }
 
 Dino3DLoadCsv::~Dino3DLoadCsv() {
+}
+
+void Dino3DLoadCsv::Idle() {
+    MScopedLock pauseLock(&mPauseMutex, TRUE);
+    MScopedLock commandLock(&mCommandMutex, TRUE);
+    if (mPauseCount != 0) {
+        return;
+    }
+    for (std::list<Dino3DCommand>::iterator it = mCommands.begin(); it != mCommands.end(); ++it) {
+        switch (it->mType) {
+        case 2:
+            mRot.x = it->mArgs[0];
+            mRot.y = it->mArgs[1];
+            mRot.z = it->mArgs[2];
+            if (mUnk74 != NULL) {
+                mUnk74->SetRotRef(&mRot);
+            }
+            break;
+        case 3:
+            mPos.x = it->mArgs[0];
+            mPos.y = it->mArgs[1];
+            mPos.z = it->mArgs[2];
+            if (mUnk74 != NULL) {
+                mUnk74->SetPosRef(&mPos);
+            }
+            break;
+        case 4:
+            for (MAnmModelBase *anm = (MAnmModelBase *) mParallel.mHead; anm != NULL; anm = (MAnmModelBase *) anm->mNext) {
+                anm->SetFrame(it->mArgs[0]);
+            }
+            break;
+        case 6:
+            mUnkA6 = it->mArgs[0];
+            if (mUnk74 != NULL) {
+                mUnk74->SetUnk138(it->mArgs[0]);
+            }
+            break;
+        case 7:
+            mUnkB0 = it->mArgs[0];
+            for (MAnmModelBase *anm = (MAnmModelBase *) mParallel.mHead; anm != NULL; anm = (MAnmModelBase *) anm->mNext) {
+                anm->SetUnk134(it->mArgs[0]);
+            }
+            break;
+        case 8:
+            if (mUnk74 != NULL) {
+                mUnk74->SetUnk117(it->mArgs[0] != 0 ? TRUE : FALSE);
+            }
+            break;
+        case 9:
+            for (MAnmModelBase *anm = (MAnmModelBase *) mParallel.mHead; anm != NULL; anm = (MAnmModelBase *) anm->mNext) {
+                anm->mActive = FALSE;
+            }
+            break;
+        case 10:
+            for (MAnmModelBase *anm = (MAnmModelBase *) mParallel.mHead; anm != NULL; anm = (MAnmModelBase *) anm->mNext) {
+                anm->mActive = TRUE;
+            }
+            break;
+        case 11:
+            mUnkAC = 0;
+            for (MAnmModelBase *anm = (MAnmModelBase *) mParallel.mHead; anm != NULL; anm = (MAnmModelBase *) anm->mNext) {
+                anm->mFollowParent = FALSE;
+            }
+            break;
+        case 12:
+            mUnkAC = 1;
+            for (MAnmModelBase *anm = (MAnmModelBase *) mParallel.mHead; anm != NULL; anm = (MAnmModelBase *) anm->mNext) {
+                anm->mFollowParent = TRUE;
+            }
+            break;
+        case 13:
+            for (MAnmModelBase *anm = (MAnmModelBase *) mParallel.mHead; anm != NULL; anm = (MAnmModelBase *) anm->mNext) {
+                anm->Unk10();
+                anm->mFrame = 0;
+                anm->mLoopEnd = 0;
+                anm->mSpeed = 0x10;
+                anm->Run();
+                anm->mActive = TRUE;
+                anm->mFollowParent = TRUE;
+            }
+            break;
+        case 14:
+            for (MAnmModelBase *anm = (MAnmModelBase *) mParallel.mHead; anm != NULL; anm = (MAnmModelBase *) anm->mNext) {
+                anm->Run();
+            }
+            break;
+        case 15:
+            for (MAnmModelBase *anm = (MAnmModelBase *) mParallel.mHead; anm != NULL; anm = (MAnmModelBase *) anm->mNext) {
+                anm->Suspend();
+            }
+            break;
+        case 17:
+            if (mUnk78 != NULL) {
+                mUnk78->Run();
+            }
+            break;
+        case 18:
+            if (mUnk78 != NULL) {
+                mUnk78->Suspend();
+            }
+            break;
+        case 19:
+            if (mUnk78 != NULL) {
+                mUnk78->mEndFrame = it->mArgs[0];
+            }
+            break;
+        case 0:
+            if (mUnk78 != NULL) {
+                fx32 y = it->mArgs[1];
+                fx32 z = it->mArgs[2];
+                MAnmTargetCamera *camera = (MAnmTargetCamera *) mUnk78;
+                camera->mTarget.x = it->mArgs[0];
+                camera->mTarget.y = y;
+                camera->mTarget.z = z;
+            }
+            break;
+        case 20:
+            if (mUnk74 != NULL && mUnk74->mModel != NULL) {
+                mUnk74->mModel->SetUnk2F4(it->mArgs[0]);
+                mUnk74->mModel->SetUnk1C(it->mArgs[1]);
+            }
+            break;
+        case 22:
+            if (mUnk74 != NULL) {
+                mUnk74->TintPalette(it->mArgs[0], it->mArgs[1]);
+            }
+            break;
+        case 21:
+            for (MAnmModelBase *anm = (MAnmModelBase *) mParallel.mHead; anm != NULL; anm = (MAnmModelBase *) anm->mNext) {
+                if (anm->mModel != NULL) {
+                    anm->mModel->SetFlag100(it->mArgs[0] != 0 ? TRUE : FALSE);
+                }
+            }
+            break;
+        }
+    }
+    mCommands.clear();
+    if (mFrame >= mEndFrame) {
+        Reset();
+        return;
+    }
+    mFrame++;
+    MAnmModelBase *anm = mUnk74;
+    if (anm != NULL && mUnkAC == 1 && mUnkB0 > 0x10) {
+        BOOL looped;
+        if (anm->mModel != NULL) {
+            int frames = anm->mModel->GetFrameCount();
+            looped = (anm->mFrame - anm->mStartFrame) % (frames << 4) == 0 ? TRUE : FALSE;
+        } else {
+            looped = FALSE;
+        }
+        if (looped) {
+            MAnmModelBase *restart = mUnk7C;
+            if (restart != NULL) {
+                restart->Unk10();
+                restart->mFrame = 0;
+                restart->mLoopEnd = 0;
+                restart->mSpeed = 0x10;
+                mUnk7C->Run();
+            }
+        }
+    }
 }
 
 BOOL Dino3DLoadCsv::IsStopped() {
