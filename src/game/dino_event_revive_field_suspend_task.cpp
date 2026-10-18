@@ -1,6 +1,7 @@
 // DinoEventReviveFieldSuspendTask, DinoEventReviveFieldResumeTask, DinoEventReviveContainerSelect, DinoEventReviveDepositSelect, DinoEventReviveCleaning, DinoEventReviveEffect.
 // Only the destructors are decompiled so far.
 
+#include "m/bright.h"
 #include "game/dino_event_revive_field_suspend_task.h"
 #include "game/dino_event_revive_field_resume_task.h"
 #include "game/dino_event_revive_container_select.h"
@@ -42,6 +43,26 @@ DinoEventReviveEffect::~DinoEventReviveEffect() {
 
 void DinoEventRevive::Idle() {
     (this->*mState)();
+}
+
+void DinoEventReviveFieldSuspendTask::Idle() {
+    switch (mStep++) {
+    case 0: {
+        MTask *fadeMain;
+        MTask *fadeSub;
+        fadeSub = gLcd->mSub->mBright->CreateFadeOutToBlack(30, 0);
+        fadeMain = gLcd->mMain->mBright->CreateFadeOutToBlack(30, 0);
+        MParallelTaskSet *fades = new MParallelTaskSet(TRUE);
+        fades->AddTail(fadeMain);
+        fades->AddTail(fadeSub);
+        mSerial.AddTail(fades);
+        break;
+    }
+    case 1:
+        mEvent->CloseField(0);
+        Exit();
+        break;
+    }
 }
 
 void DinoEventReviveFieldResumeTask::Idle() {

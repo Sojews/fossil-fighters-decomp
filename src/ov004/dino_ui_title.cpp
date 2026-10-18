@@ -378,3 +378,34 @@ void DinoUiTitle::StateATM() {
     serial.AddTail(fades);
     serial.AddTail(exit);
 }
+
+// Counts the screen's frames down; A, B, Start, X, Y or a touch cuts it short (Start skips the rest).
+void DinoUiTitleSkip::Idle() {
+    u32 pressed = mInput->GetPressed();
+    if (pressed & 0x1C0B) {
+        if (pressed & 0x8) {
+            *mSkipped = TRUE;
+        }
+        mFrames = 0;
+        mFadeFrames = 15;
+    }
+    if (mFrames != 0) {
+        mFrames--;
+        return;
+    }
+    if (mUnk85 || (*mSkipped && mUnk84)) {
+        MTask *fadeTop;
+        MTask *fadeBottom;
+        fadeBottom = gLcd->GetBottomDisplay()->mBright->CreateFadeOutToWhite(mFadeFrames, 0);
+        fadeTop = gLcd->GetTopDisplay()->mBright->CreateFadeOutToWhite(mFadeFrames, 0);
+        MParallelTaskSet *fades = new MParallelTaskSet(TRUE);
+        fades->AddTail(fadeTop);
+        fades->AddTail(fadeBottom);
+        mSerial.AddTail(fades);
+    } else {
+        mSerial.AddTail(gCurrentDisplay->mBright->CreateFadeOutToBlack(mFadeFrames, 0));
+    }
+    MTask *exit = MTaskExitTransfer::Create(this);
+    MTaskSet &serial = mSerial;
+    serial.AddTail(exit);
+}
