@@ -18,6 +18,8 @@
 #include "m/bright.h"
 #include "m/indicator.h"
 #include "m/bg.h"
+#include "game/backup_validater.h"
+#include "game/dino_common_window_message_box.h"
 #include "game/dino_ui_parts_team_indicator.h"
 #include "game/dino_ui_parts_team_info.h"
 #include "game/dino_ui_keyboard_menu.h"
@@ -110,6 +112,53 @@ const char *DinoUiATMBackButton::GetText() {
 
 void DinoUiATM::Idle() {
     (this->*mState)();
+}
+
+extern "C" struct {
+    void (DinoUiATMMenu::*ExitMoveMode_00)();
+    void (DinoUiATMMenu::*Leave_08)();
+    u8 unk10[0x8];
+    void (DinoBackup::*Save_18)();
+} data_ov007_0218cc38;
+extern const u32 data_0208ab54;
+
+// Fades out and leaves, saving the teams first if they changed.
+void DinoUiATMMenu::Leave() {
+    DinoHelpBase::Disable();
+    if (mUnk114 == 1) {
+        for (int i = 0; i < 3; i++) {
+            DinoTeam team;
+            gDinoBackup->GetTeam(i + 1, &team);
+            gDinoBackup->SetTeam(i + 4, &team);
+        }
+        MTask *wait = new DinoCommonWindowMessageWait1(std::string(gDinoResource->GetText(data_0208ab54)),
+                                                       MPoint(0x80, 0x8C), 4, 0);
+        mParallel.AddTail(wait);
+        MTask *waitExit = MTaskExitTransfer::Create(wait);
+        MTask *validate = new DinoBackupWriteValidater(wait, NULL);
+        MTask *save = MCreateBgCallTask(gDinoBackup, data_ov007_0218cc38.Save_18, 1);
+        MTask *validateSave = new DinoBackupWriteValidater(wait, NULL);
+        MSerialTaskSet *serial = &mSerial;
+        serial->AddTail(validateSave);
+        serial->AddTail(save);
+        serial->AddTail(validate);
+        serial->AddTail(waitExit);
+    }
+    MTask *fadeMain;
+    MTask *fadeSub;
+    MTask *stopBgm;
+    MTask *exit;
+    exit = CreateExitTransfer();
+    stopBgm = DinoSoundCreateStopBgmTask(-1, 30);
+    fadeSub = gLcd->mSub->mBright->CreateFadeOutToBlack(30, 0);
+    fadeMain = gLcd->mMain->mBright->CreateFadeOutToBlack(30, 0);
+    MParallelTaskSet *fades = new MParallelTaskSet(TRUE);
+    fades->AddTail(fadeMain);
+    fades->AddTail(fadeSub);
+    fades->AddTail(stopBgm);
+    MSerialTaskSet *serial = &mSerial;
+    serial->AddTail(fades);
+    serial->AddTail(exit);
 }
 
 // Template task instances the game emits in this file. Until the code that makes the tasks is decompiled, they are

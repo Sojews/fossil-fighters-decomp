@@ -22,6 +22,22 @@ DinoHelpDisablerTask::~DinoHelpDisablerTask() {
 DinoCommonWindowMessageBox::~DinoCommonWindowMessageBox() {
 }
 
+DinoCommonWindowMessageWait1::DinoCommonWindowMessageWait1(std::string text, MPoint pos, int arg, u8 flag)
+    : MProcess(NULL), mText(text) {
+    mUnk80 = 0;
+    mPos = pos;
+    mUnk8C = arg;
+    mUnk90 = flag;
+}
+
+DinoCommonWindowMessageWait2::DinoCommonWindowMessageWait2(std::string text, MPoint pos, int arg, u8 flag)
+    : MProcess(NULL), mText(text) {
+    mUnk80 = 0;
+    mPos = pos;
+    mUnk8C = arg;
+    mUnk90 = flag;
+}
+
 DinoCommonWindowMessageWait1::~DinoCommonWindowMessageWait1() {
 }
 

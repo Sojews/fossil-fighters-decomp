@@ -21,6 +21,7 @@ public:
     virtual void OnFocus(MMenuItem *item);
     virtual void OnDecide(MMenuItem *item);
     void ExitMoveMode();
+    void Leave();
     void RefreshTeams();
     void Unk02173d08();
     void ClearTeam();

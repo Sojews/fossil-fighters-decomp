@@ -24,18 +24,28 @@ public:
 
 class DinoCommonWindowMessageWait1 : public MProcess {
 public:
+    DinoCommonWindowMessageWait1(std::string text, MPoint pos, int arg, u8 flag);
     virtual ~DinoCommonWindowMessageWait1();
     virtual void Idle();
 
     std::string mText;  // 0x74
+    u32 mUnk80;         // 0x80
+    MPoint mPos;        // 0x84
+    int mUnk8C;         // 0x8C
+    u8 mUnk90;          // 0x90
 };
 
 class DinoCommonWindowMessageWait2 : public MProcess {
 public:
+    DinoCommonWindowMessageWait2(std::string text, MPoint pos, int arg, u8 flag);
     virtual ~DinoCommonWindowMessageWait2();
     virtual void Idle();
 
     std::string mText;  // 0x74
+    u32 mUnk80;         // 0x80
+    MPoint mPos;        // 0x84
+    int mUnk8C;         // 0x8C
+    u8 mUnk90;          // 0x90
 };
 
 #endif
