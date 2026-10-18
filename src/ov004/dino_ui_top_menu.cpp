@@ -3,6 +3,7 @@
 // Derived destructors have their bases' destructor bodies inlined; auto-inlining the ones defined above does that.
 #pragma auto_inline on
 
+#include "game/dino_ui_title_menu.h"
 #include "game/dino_ui_exchange.h"
 #include "game/dino_ui_multiplay_loop.h"
 #include "game/dino_ui_top_menu_loop.h"
@@ -375,7 +376,6 @@ void DinoUiEnding::StateEnd() {
 
 // Template task instances the game emits in this file. Until the code that makes the tasks is decompiled, they are
 // instantiated explicitly.
-class DinoUiOpening {};
 template class MCallTask1<DinoUiSaveSlotSelectMenu, DinoUiSaveSlotSelectMenu, u32>;
 template MTask *MCreateCallTask(DinoUiSaveSlotSelectMenu *obj, void (DinoUiSaveSlotSelectMenu::*func)(u32), u32 a0);
 template class MCallTask0<DinoUiSaveSlotSelectMenu, DinoUiSaveSlotSelectMenu>;
@@ -516,4 +516,50 @@ void DinoUiTopMenuLoop::StateMultiplayEnd() {
 void DinoUiTopMenuLoop::StateExchange() {
     mSerial.AddTail(new DinoUiExchange);
     mState = data_ov004_021720ec.mExchangeEnd_2C;
+}
+
+// The opening's states. (They use the title's pooled pointer-to-member constants, see dino_ui_title.cpp.)
+extern "C" struct {
+    u8 unk00[0x34];
+    void (DinoUiOpening::*End_34)();
+    u8 unk3C[0x4C - 0x3C];
+    void (DinoUiOpening::*StateNextScene_4C)();
+    u8 unk54[0x64 - 0x54];
+    void (DinoUiOpening::*StateWaitScene_64)();
+    u8 unk6C[0xFC - 0x6C];
+    void (DinoUiOpening::*End_FC)();
+    void (DinoUiOpening::*LoadScene_104)();
+    void (DinoUiOpening::*StateShowScene_10C)();
+} data_ov004_02172f78;
+
+void DinoUiOpening::StateShowScene() {
+    MTask *wait1 = new MTimer(1);
+    MTask *exit = MTaskExitTransfer::Create(mPrevious);
+    MTask *wait = new MTimer(mSceneFrames);
+    MTaskSet *tasks = mShowTasks;
+    tasks->AddTail(wait);
+    tasks->AddTail(exit);
+    tasks->AddTail(wait1);
+    mState = data_ov004_02172f78.StateWaitScene_64;
+}
+
+#pragma dont_inline on
+void DinoUiOpening::StateNextScene() {
+    if (mScene >= mSceneCount) {
+        mState = data_ov004_02172f78.End_34;
+        return;
+    }
+    mSerial.AddTail(MCreateBgCallTask(this, data_ov004_02172f78.LoadScene_104, 1));
+    mState = data_ov004_02172f78.StateShowScene_10C;
+}
+#pragma dont_inline reset
+
+void DinoUiOpening::StateWaitScene() {
+    if (mSkipped) {
+        mState = data_ov004_02172f78.End_FC;
+        return;
+    }
+    if (mShowTasks->IsEmpty()) {
+        mState = data_ov004_02172f78.StateNextScene_4C;
+    }
 }

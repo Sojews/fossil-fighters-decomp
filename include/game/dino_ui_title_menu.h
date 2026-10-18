@@ -33,12 +33,23 @@ public:
     virtual void Execute();
     virtual void Idle();
 
+    void LoadScene();
+    void StateNextScene();
+    void StateShowScene();
+    void StateWaitScene();
+
     MInput *mInput;     // 0x74
     void (DinoUiOpening::*mState)(); // 0x78
-    u8 unk80[0x24];
+    u8 unk80[0x94 - 0x80];
+    MTask *mPrevious;   // 0x94: what the scene shown replaces
+    u32 mScene;         // 0x98
+    u32 unk9C;
+    MTaskSet *mShowTasks;   // 0xA0
     u8 mSkipped;        // 0xA4
     std::vector<void *> mUnkA8; // 0xA8
-    u8 unkB4[0xC4 - 0xB4];
+    u32 mSceneCount;    // 0xB4
+    int mSceneFrames;   // 0xB8
+    u8 unkBC[0xC4 - 0xBC];
 };
 
 #endif

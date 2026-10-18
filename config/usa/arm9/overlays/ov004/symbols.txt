@@ -213,10 +213,10 @@ _ZN12DinoUiEnding8StateEndEv kind:function(thumb,size=0x58) addr:0x0215c528
 _ZN12DinoUiEndingD1Ev kind:function(thumb,size=0xbe) addr:0x0215c580
 _ZN12DinoUiEndingD0Ev kind:function(thumb,size=0xc4) addr:0x0215c640
 func_ov004_0215c704 kind:function(thumb,size=0x320) addr:0x0215c704
-func_ov004_0215ca24 kind:function(thumb,size=0xf8) addr:0x0215ca24
-func_ov004_0215cb1c kind:function(thumb,size=0x90) addr:0x0215cb1c
-func_ov004_0215cbac kind:function(thumb,size=0x4c) addr:0x0215cbac
-func_ov004_0215cbf8 kind:function(thumb,size=0x68) addr:0x0215cbf8
+_ZN13DinoUiOpening9LoadSceneEv kind:function(thumb,size=0xf8) addr:0x0215ca24
+_ZN13DinoUiOpening14StateShowSceneEv kind:function(thumb,size=0x90) addr:0x0215cb1c
+_ZN13DinoUiOpening14StateNextSceneEv kind:function(thumb,size=0x4c) addr:0x0215cbac
+_ZN13DinoUiOpening14StateWaitSceneEv kind:function(thumb,size=0x68) addr:0x0215cbf8
 _Z17MCreateBgCallTaskI13DinoUiOpeningEP5MTaskPT_MS3_FvvEi kind:function(thumb,size=0x38) addr:0x0215cc60
 func_ov004_0215cc98 kind:function(thumb,size=0x864) addr:0x0215cc98
 .L_0215d4e8 kind:label(thumb) addr:0x0215d4e8
