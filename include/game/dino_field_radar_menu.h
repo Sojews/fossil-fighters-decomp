@@ -13,6 +13,7 @@
 
 class DinoFieldRadarManager : public MProcess, public DinoFieldCameraHook {
 public:
+    DinoFieldRadarManager(DinoField *field);
     virtual ~DinoFieldRadarManager();
     virtual void Idle();
     virtual void CameraUnk0();

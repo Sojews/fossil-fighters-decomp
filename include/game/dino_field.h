@@ -157,6 +157,7 @@ public:
     virtual void Idle();
     MTask *CreateModeTask(u32 from, u32 to, u32 a, u8 b);
     void SetPlayer(MFx32Point pos, u16 angle, MFx32 height);
+    void SetUnk5A8(u8 value);
 
     u32 mUnk74[3];              // 0x74
     MSmartOam *mOam;            // 0x80
@@ -169,7 +170,7 @@ public:
     MFx32Point mPlayerPos;      // 0x598
     u16 mPlayerAngle;           // 0x5A0
     MFx32 mPlayerHeight;        // 0x5A4
-    u32 unk5A8;
+    u8 mUnk5A8;                 // 0x5A8
 };
 
 

@@ -8,6 +8,7 @@
 #include "game/dino_field.h"
 #include "m/bg_new_task.h"
 #include "m/display.h"
+#include "m/lcd.h"
 #include "m/obj.h"
 #include "m/smart_oam.h"
 #include "m/call_task.h"
@@ -27,6 +28,15 @@ template class MCallTask1<DinoFieldRadar, DinoFieldRadar, bool>;
 template MTask *MCreateCallTask(DinoFieldRadar *obj, void (DinoFieldRadar::*func)(bool), bool a0);
 
 #pragma auto_inline off
+
+void DinoFieldRadar::SetUnk5A8(u8 value) {
+    mUnk5A8 = value;
+}
+
+DinoFieldRadarManager::DinoFieldRadarManager(DinoField *field) : MProcess(gLcd->GetTopDisplay()) {
+    mField = field;
+    mRadar = NULL;
+}
 
 // NONMATCHING: the game keeps more MFx32 temporaries on the stack (stack layout and scheduling differ).
 void DinoFieldRadar::SetPlayer(MFx32Point pos, u16 angle, MFx32 height) {
