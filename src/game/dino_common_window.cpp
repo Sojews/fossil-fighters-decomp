@@ -35,6 +35,15 @@ DinoCommonWindow::DinoCommonWindow(u32 extraTiles, bool battle, bool large) : MF
     Draw(sDrawPos, MRect(0, 0, 64, 64));
 }
 
+// Fills rect of the text screen with the window graphics' tile at pos.
+void DinoCommonWindow::Draw(MPoint pos, MRect rect) {
+    if (rect.left <= rect.right && rect.top <= rect.bottom) {
+        u32 base = mChrBlock->index;
+        mText->Fill(rect, base + ((const u16 *) mFile.GetScreen())[pos.y * mTileSize.x + pos.x], mPalBlock->index,
+                    FALSE, FALSE);
+    }
+}
+
 DinoCommonWindow::~DinoCommonWindow() {
     MBg *bg = mDisplay->mBg;
     bg->DeleteText(mText);
