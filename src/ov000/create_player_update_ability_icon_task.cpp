@@ -4,6 +4,7 @@
 #pragma auto_inline on
 
 #include "game/dino_message.h"
+#include "m/resource.h"
 #include "game/create_player_update_ability_icon_task.h"
 #include "m/seed_generator.h"
 #include "game/dino_resource.h"
@@ -677,3 +678,12 @@ void DinoBattleModelPlayer::SetUnk15C() {
 MTask *DinoBattleModelPlayer::CreateSendAbilityResultTask(MMessageObserver *target) {
     return new SendModelCreatureAbilityResultTask(mUnkF4, target);
 }
+
+// Resources the file loads (their data types are unknown); until the code that constructs them is decompiled,
+// these keep out-of-line copies of the constructors.
+struct DinoAbilityIconData;
+#pragma dont_inline on
+MResource<DinoAbilityIconData> DinoAbilityIconDataLoad(std::string path) {
+    return MResource<DinoAbilityIconData>(path);
+}
+#pragma dont_inline reset

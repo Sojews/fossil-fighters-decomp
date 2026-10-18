@@ -1,6 +1,7 @@
 // DinoBattleView, EnableRootSelectTask.
 
 #include "types.h"
+#include "m/resource.h"
 #include "game/dino_battle_view_class.h"
 #include "game/dino_battle_view_kaseki_point_menu.h"
 #include "game/enable_root_select_task.h"
@@ -130,3 +131,12 @@ void EnableRootSelectTask::Execute() {
     ((DinoBattleView *)mUnk10)->DecUnk13C();
     Exit();
 }
+
+// Resources the file loads (their data types are unknown); until the code that constructs them is decompiled,
+// these keep out-of-line copies of the constructors.
+struct DinoBattleViewData;
+#pragma dont_inline on
+MResource<DinoBattleViewData> DinoBattleViewDataLoad(std::string path) {
+    return MResource<DinoBattleViewData>(path);
+}
+#pragma dont_inline reset

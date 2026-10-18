@@ -3,6 +3,7 @@
 
 #define DINO_COMMON_LIVE_OWNER
 #include "game/dino_common_live.h"
+#include "m/resource.h"
 #include "nitro/mi.h"
 
 void DinoCommonLive::ClearUnkA0() {
@@ -48,3 +49,12 @@ void DinoCommonLive::SetUnkD2(u8 value) {
 u8 DinoCommonLive::GetUnkD2() {
     return mUnkD2;
 }
+
+// Resources the file loads (their data types are unknown); until the code that constructs them is decompiled,
+// these keep out-of-line copies of the constructors.
+struct DinoCommonLiveData;
+#pragma dont_inline on
+MResource<DinoCommonLiveData> DinoCommonLiveDataLoad(std::string path) {
+    return MResource<DinoCommonLiveData>(path);
+}
+#pragma dont_inline reset

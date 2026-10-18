@@ -5,6 +5,7 @@
 #pragma auto_inline on
 
 #include "game/dino_sound.h"
+#include "m/resource.h"
 #include "game/dino_battle_tutorial.h"
 #include "types.h"
 
@@ -40,3 +41,12 @@ void DinoBattleViewTutorialWindow::Idle() {
         mCursor->Hide();
     }
 }
+
+// Resources the file loads (their data types are unknown); until the code that constructs them is decompiled,
+// these keep out-of-line copies of the constructors.
+struct DinoBattleTutorialData;
+#pragma dont_inline on
+MResource<DinoBattleTutorialData> DinoBattleTutorialDataLoad(std::string path) {
+    return MResource<DinoBattleTutorialData>(path);
+}
+#pragma dont_inline reset
