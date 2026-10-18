@@ -81,7 +81,7 @@ void MMotionData::ReleaseChrs(MDisplay *display) {
     mChrs[d] = NULL;
 }
 
-MPalBlock **MMotionData::AcquirePalettes(MDisplay *display) {
+MPalUnit **MMotionData::AcquirePalettes(MDisplay *display) {
     MScopedLock lock(&mMutex, TRUE);
     LockFiles(2);
     int d = display->GetRegs00();
@@ -91,7 +91,7 @@ MPalBlock **MMotionData::AcquirePalettes(MDisplay *display) {
         MPal *pal = display->mObj->mPal;
         MPal *extPal = display->mObj->mExtPal;
         mFile.GetData();
-        mPals[d] = new MPalBlock *[count];
+        mPals[d] = new MPalUnit *[count];
         for (i = 0; i < count; i++) {
             const MMotionGfxHeader *data = (const MMotionGfxHeader *) mPalFiles[i].GetData();
             if (data->extPalette == 0) {
@@ -219,7 +219,7 @@ void *MMotionFile::GetAnime(int anime, MArchiveFile *file) {
     return f.GetData();
 }
 
-MPalBlock **MMotionFile::AcquirePalettes(MDisplay *display) {
+MPalUnit **MMotionFile::AcquirePalettes(MDisplay *display) {
     return mData->AcquirePalettes(display);
 }
 
@@ -274,7 +274,7 @@ void MMotion::Init(int fromEnd) {
     mCells = new MMotionCell[mCellCount];
     mUnk64 = new MMotionAnimeState[mFile.GetAnimeCount()];
     if (mFlags & 1) {
-        mPalettes = new MPalBlock *[mCellCount];
+        mPalettes = new MPalUnit *[mCellCount];
         for (u32 i = 0; i < mCellCount; i++) {
             if (mFile.GetCell(i)->pal16 != 0) {
                 mPalettes[i] = mDisplay->mObj->mPal->Alloc(1, NULL, fromEnd);
@@ -523,7 +523,7 @@ MSmartOamUnit *MMotion::GetUnit() {
     return mUnit;
 }
 
-MPalBlock *MMotion::GetPalette(u32 index) {
+MPalUnit *MMotion::GetPalette(u32 index) {
     return mPalettes[index];
 }
 

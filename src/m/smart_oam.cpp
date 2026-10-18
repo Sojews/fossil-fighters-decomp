@@ -12,7 +12,7 @@ void MSmartOamEntry::SetChr(MChrBlock *chr) {
     this->tile = tile;
 }
 
-void MSmartOamEntry::SetPalette(MPalBlock *pal) {
+void MSmartOamEntry::SetPalette(MPalUnit *pal) {
     palette = pal->index;
 }
 

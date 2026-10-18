@@ -10,7 +10,7 @@
 #include "m/file.h"
 
 class MSmartOam;
-struct MPalBlock;
+struct MPalUnit;
 struct MChrBlock;
 
 // A motion file's header.
@@ -60,7 +60,7 @@ public:
     void LockFiles(int which);
     MChrBlock **AcquireChrs(MDisplay *display);
     void ReleaseChrs(MDisplay *display);
-    MPalBlock **AcquirePalettes(MDisplay *display);
+    MPalUnit **AcquirePalettes(MDisplay *display);
     void ReleasePalettes(MDisplay *display);
 
     MArchivePtr mArchive;                   // 0x00
@@ -71,7 +71,7 @@ public:
     int mRefCount;                          // 0x34
     int mPalRefs[2];                        // 0x38: per display (main, sub)
     int mChrRefs[2];                        // 0x40
-    MPalBlock **mPals[2];                   // 0x48
+    MPalUnit **mPals[2];                   // 0x48
     MChrBlock **mChrs[2];                   // 0x50
     OSMutex mMutex;                         // 0x58
     std::vector<u32> mUnk70;                // 0x70
@@ -88,7 +88,7 @@ public:
 
     u32 GetUnk04();
     u32 GetUnk18();
-    MPalBlock **AcquirePalettes(MDisplay *display);
+    MPalUnit **AcquirePalettes(MDisplay *display);
     void ReleasePalettes(MDisplay *display);
     MChrBlock **AcquireChrs(MDisplay *display);
     void ReleaseChrs(MDisplay *display);
@@ -148,7 +148,7 @@ public:
     virtual void Unk48(int arg);
 
     MSmartOamUnit *GetUnit();
-    MPalBlock *GetPalette(u32 index);
+    MPalUnit *GetPalette(u32 index);
     BOOL IsPlaying();
     int GetAnime();
     MTask *CreateWaitStopTask();
@@ -198,7 +198,7 @@ public:
     MMotionCell *mCells;        // 0x5C
     u32 mUnk60;                 // 0x60
     MMotionAnimeState *mUnk64;  // 0x64
-    MPalBlock **mPalettes;      // 0x68
+    MPalUnit **mPalettes;      // 0x68
     MChrBlock **mChrs;          // 0x6C
     MAfnBlock **mAffines;       // 0x70
     const u16 *mScript;         // 0x74: the current anime's commands

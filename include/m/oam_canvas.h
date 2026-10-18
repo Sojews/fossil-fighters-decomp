@@ -40,7 +40,7 @@ public:
     virtual void SetLine(int y, const void *src);
     virtual void Execute();
 
-    MPalBlock *GetPalBlock();
+    MPalUnit *GetPalBlock();
     TUnit *GetOamUnit();
     void SetPosition(int x, int y);
     // Cuts a rectangle into pieces, biggest sprites first.
@@ -53,7 +53,7 @@ public:
     MPoint mPos;                    // 0x20
     std::vector<Piece> mPieces;     // 0x28
     std::vector<MRect> mRects;      // 0x34: still to cut
-    MPalBlock *mPalBlock;           // 0x40
+    MPalUnit *mPalBlock;           // 0x40
     MChrBlock *mChrBlock;           // 0x44
     TUnit *mUnit;                   // 0x48
 };

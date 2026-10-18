@@ -65,7 +65,7 @@ struct MOamEntry {
         this->shape = shape;
         size = shape >> 2;
     }
-    void SetPalette(MPalBlock *pal);
+    void SetPalette(MPalUnit *pal);
 };
 
 // A run of OAM entries.

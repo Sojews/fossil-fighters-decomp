@@ -269,7 +269,7 @@ void MTextPicture::Execute() {
     }
 }
 
-MPalBlock *MTextPicture::GetPalBlock() {
+MPalUnit *MTextPicture::GetPalBlock() {
     return mPalBlock;
 }
 

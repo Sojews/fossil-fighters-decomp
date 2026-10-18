@@ -15,7 +15,7 @@
 
 class MBg;
 class MText;
-class MPalBlock;
+class MPalUnit;
 class MChr;
 
 class DinoBattleViewAbilityMenuBG : public MProcess {
@@ -29,7 +29,7 @@ public:
     MBg *mBg;                   // 0x74
     u32 unk78;
     MText *mText;               // 0x7C
-    MPalBlock *mPalBlock;       // 0x80
+    MPalUnit *mPalBlock;       // 0x80
     u32 unk84;
     MChr *mChr;                 // 0x88
     MPictureFile mPicture;      // 0x8C

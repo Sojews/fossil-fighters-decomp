@@ -12,8 +12,8 @@ public:
     void SetUnk14(u8 value);
     u32 GetUnk1C3C();
     u8 GetUnk800();
-    void CreatePalAnime(MTaskSet *set, MPalBlock *block, u32 start, u16 color);
-    void LoadPalette(MPalBlock *block, u32 start);
+    void CreatePalAnime(MTaskSet *set, MPalUnit *block, u32 start, u16 color);
+    void LoadPalette(MPalUnit *block, u32 start);
 
 
     u8 mShared;             // 0x04: mPixels belongs to someone else

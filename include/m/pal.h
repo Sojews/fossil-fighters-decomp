@@ -9,13 +9,14 @@
 class MPal;
 
 // An allocated palette run.
-struct MPalBlock : public MHeapBlock {
+struct MPalUnit : public MHeapBlock {
     MPal *pal;          // 0x0C
     const void *data;   // 0x10: what was loaded into it; allocating the same data again shares the block
     u32 index;          // 0x14: the first palette number
     u32 unitSize;       // 0x18
     int refCount;       // 0x1C
 
+    void Free();
     MTask *CreateLoadTask(const void *src, u32 start, u32 count);
     void Load(const void *src, u32 start, u32 count);
     MTask *CreateColorLoadTask(const void *src, u32 start, u32 count);
@@ -27,8 +28,8 @@ public:
     MPal(u32 base, void *extPalette);
     virtual ~MPal();
 
-    MPalBlock *Alloc(u32 count, const void *data, BOOL fromEnd);
-    void Free(MPalBlock *block);
+    MPalUnit *Alloc(u32 count, const void *data, BOOL fromEnd);
+    void Free(MPalUnit *block);
     MTask *CreateLoadTask(const void *src, void *dest, u32 size, u8 unk);
 
     u32 mUnk38;         // 0x38
@@ -46,7 +47,7 @@ public:
         u16 color;
     };
 
-    MPalAnime(MPalBlock *block, u32 start, u32 count);
+    MPalAnime(MPalUnit *block, u32 start, u32 count);
     virtual ~MPalAnime();
     virtual void Apply(int step);
 
@@ -60,7 +61,7 @@ public:
     void SetLoadRange(u32 start, u32 count);
 
     std::vector<Frame> mFrames; // 0x30
-    MPalBlock *mBlock;          // 0x3C
+    MPalUnit *mBlock;          // 0x3C
     u32 mStart;                 // 0x40: the first palette of the run
     u32 mCount;                 // 0x44: palettes
     u32 mColorCount;            // 0x48

@@ -11,7 +11,7 @@ extern u32 data_0208c314[2];    // bytes per palette: normal, extended
 }
 
 // Palettes start..start+count of this block. Color 0 of the whole palette memory (the backdrop) is left alone.
-MTask *MPalBlock::CreateLoadTask(const void *src, u32 start, u32 count) {
+MTask *MPalUnit::CreateLoadTask(const void *src, u32 start, u32 count) {
     u32 size = std::min(this->size - start * unitSize, count * unitSize);
     u32 dest = addr + start * unitSize;
 
@@ -23,12 +23,12 @@ MTask *MPalBlock::CreateLoadTask(const void *src, u32 start, u32 count) {
     return pal->CreateLoadTask(src, (void *)dest, size, 0);
 }
 
-void MPalBlock::Load(const void *src, u32 start, u32 count) {
+void MPalUnit::Load(const void *src, u32 start, u32 count) {
     gLooper->AddTransferTask(CreateLoadTask(src, start, count));
 }
 
 // Colors start..start+count of this block.
-MTask *MPalBlock::CreateColorLoadTask(const void *src, u32 start, u32 count) {
+MTask *MPalUnit::CreateColorLoadTask(const void *src, u32 start, u32 count) {
     u32 size = std::min(this->size - start * 2, count * 2);
     u32 dest = addr + start * 2;
 
@@ -40,12 +40,12 @@ MTask *MPalBlock::CreateColorLoadTask(const void *src, u32 start, u32 count) {
     return pal->CreateLoadTask(src, (void *)dest, size, 0);
 }
 
-void MPalBlock::LoadColors(const void *src, u32 start, u32 count) {
+void MPalUnit::LoadColors(const void *src, u32 start, u32 count) {
     gLooper->AddTransferTask(CreateColorLoadTask(src, start, count));
 }
 
 MPal::MPal(u32 base, void *extPalette)
-    : MHeap(base, data_0208c314[extPalette != NULL ? 1 : 0] << 4, sizeof(MPalBlock)) {
+    : MHeap(base, data_0208c314[extPalette != NULL ? 1 : 0] << 4, sizeof(MPalUnit)) {
     mUnk38 = 0;
     mExtPalette = extPalette;
     mExtended = extPalette != NULL ? 1 : 0;
@@ -59,13 +59,13 @@ MPal::~MPal() {
     }
 }
 
-MPalBlock *MPal::Alloc(u32 count, const void *data, BOOL fromEnd) {
+MPalUnit *MPal::Alloc(u32 count, const void *data, BOOL fromEnd) {
     MScopedLock lock(&mMutex, TRUE);
-    MPalBlock *block;
+    MPalUnit *block;
 
     if (data != NULL) {
         MHeapIterator it = GetUsedBlocks();
-        while ((block = (MPalBlock *)it.block) != NULL) {
+        while ((block = (MPalUnit *)it.block) != NULL) {
             if (block->data == data) {
                 block->refCount++;
                 return block;
@@ -73,7 +73,7 @@ MPalBlock *MPal::Alloc(u32 count, const void *data, BOOL fromEnd) {
             it.block = block->next;
         }
     }
-    block = (MPalBlock *)MHeap::Alloc(count * mUnitSize, fromEnd, mUnitSize, 0, 0, 0);
+    block = (MPalUnit *)MHeap::Alloc(count * mUnitSize, fromEnd, mUnitSize, 0, 0, 0);
     block->pal = this;
     block->index = (block->addr - mBase) / mUnitSize;
     block->data = data;
@@ -85,7 +85,7 @@ MPalBlock *MPal::Alloc(u32 count, const void *data, BOOL fromEnd) {
     return block;
 }
 
-void MPal::Free(MPalBlock *block) {
+void MPal::Free(MPalUnit *block) {
     MScopedLock lock(&mMutex, TRUE);
 
     if (--block->refCount != 0) {
@@ -106,7 +106,7 @@ static inline u16 MBlendColor(u16 a, u16 b, u32 w) {
     return red | green | blue;
 }
 
-MPalAnime::MPalAnime(MPalBlock *block, u32 start, u32 count) {
+MPalAnime::MPalAnime(MPalUnit *block, u32 start, u32 count) {
     mBlock = block;
     mStart = start;
     mCount = std::min(count, block->size / block->unitSize - start);

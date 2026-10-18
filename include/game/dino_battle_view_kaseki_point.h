@@ -5,7 +5,7 @@
 
 class MMotion;
 class MIndicator;
-class MPalBlock;
+class MPalUnit;
 class MSmartOam;
 class DinoBattleView;
 
@@ -37,7 +37,7 @@ public:
     MIndicator *mText;          // 0x80
     MMotion *mUnk84;            // 0x84
     MSmartOam *mOam;            // 0x88
-    MPalBlock *mPalBlock;       // 0x8C
+    MPalUnit *mPalBlock;       // 0x8C
     KasekiPointPalette *mPalette; // 0x90
     DinoBattleView *mView;      // 0x94
     u32 mUnk98;                 // 0x98

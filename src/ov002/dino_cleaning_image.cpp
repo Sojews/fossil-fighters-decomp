@@ -25,7 +25,7 @@ u8 DinoCleaningImageLayer::GetUnk800() {
     return mUnk800;
 }
 
-void DinoCleaningImageLayer::CreatePalAnime(MTaskSet *set, MPalBlock *block, u32 start, u16 color) {
+void DinoCleaningImageLayer::CreatePalAnime(MTaskSet *set, MPalUnit *block, u32 start, u16 color) {
     MPalAnime *anime = new MPalAnime(block, start, 2);
     anime->AddColor(color);
     anime->AddFrame(mPalette);
@@ -33,7 +33,7 @@ void DinoCleaningImageLayer::CreatePalAnime(MTaskSet *set, MPalBlock *block, u32
     set->AddTail(anime);
 }
 
-void DinoCleaningImageLayer::LoadPalette(MPalBlock *block, u32 start) {
+void DinoCleaningImageLayer::LoadPalette(MPalUnit *block, u32 start) {
     block->Load(mPalette, start, 2);
 }
 
@@ -70,7 +70,7 @@ int DinoCleaningImage::CountPalettes() {
     return count;
 }
 
-void DinoCleaningImage::CreatePalAnimes(MTaskSet *set, MPalBlock *block, u32 start, u16 color) {
+void DinoCleaningImage::CreatePalAnimes(MTaskSet *set, MPalUnit *block, u32 start, u16 color) {
     for (std::vector<DinoCleaningImageLayer *>::iterator it = mLayers.begin(); it != mLayers.end(); ++it) {
         (*it)->CreatePalAnime(set, block, start, color);
         if (!(*it)->GetUnk800()) {
@@ -79,7 +79,7 @@ void DinoCleaningImage::CreatePalAnimes(MTaskSet *set, MPalBlock *block, u32 sta
     }
 }
 
-void DinoCleaningImage::LoadPalettes(MPalBlock *block, u32 start) {
+void DinoCleaningImage::LoadPalettes(MPalUnit *block, u32 start) {
     for (std::vector<DinoCleaningImageLayer *>::iterator it = mLayers.begin(); it != mLayers.end(); ++it) {
         (*it)->LoadPalette(block, start);
         if (!(*it)->GetUnk800()) {

@@ -10,7 +10,7 @@ class MExtAffine;
 class MChr;
 class MChrBlock;
 class MPal;
-class MPalBlock;
+class MPalUnit;
 class MSmartText;
 
 // The header of a picture file. Its parts are files of other archives, named relative to its own.
@@ -105,7 +105,7 @@ public:
     MChr *mChr;             // 0x20
     MChrBlock *mChrBlock;   // 0x24
     MPal *mPal;             // 0x28
-    MPalBlock *mPalBlock;   // 0x2C
+    MPalUnit *mPalBlock;   // 0x2C
     MPictureFile mFile;     // 0x30
 };
 
@@ -128,7 +128,7 @@ public:
     virtual u32 GetPlaneMask();
     virtual void SetPosition(int x, int y);
 
-    MPalBlock *GetPalBlock();
+    MPalUnit *GetPalBlock();
     void Init(BOOL fromEnd, bool loadChr);
 
     MDisplay *mDisplay;         // 0x18
@@ -137,7 +137,7 @@ public:
     MChrBlock *mChrBlock;       // 0x24
     MChrBlock *mBlank;          // 0x28: one blank tile, filling the rest of the layer
     MPal *mPal;                 // 0x2C
-    MPalBlock *mPalBlock;       // 0x30
+    MPalUnit *mPalBlock;       // 0x30
     MPictureFile mFile;         // 0x34
 };
 

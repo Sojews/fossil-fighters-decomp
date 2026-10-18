@@ -56,11 +56,15 @@ void DinoUiReviveStatusParts::Idle() {
 
 // Template task instances the game emits in this file. Until the code that makes the tasks is decompiled, they are
 // instantiated explicitly.
-class MPalUnit {};
 template class MCallTask1<MBg, MBg, MIndexBitmap *>;
 template MTask *MCreateCallTask(MBg *obj, void (MBg::*func)(MIndexBitmap *), MIndexBitmap * a0);
 template class MCallTask0<MPalUnit, MPalUnit>;
 template MTask *MCreateCallTask(MPalUnit *obj, void (MPalUnit::*func)());
+
+// Gives the palettes back (as a task: see State0215e030).
+void MPalUnit::Free() {
+    pal->Free(this);
+}
 
 // Puts the screens back as they were.
 DinoUiReviveEffect::~DinoUiReviveEffect() {
@@ -98,6 +102,8 @@ extern "C" struct {
     u8 unkD4[0xE4 - 0xD4];
     void (DinoUiReviveEffect::*State0215ec2c_E4)(); // 0xE4
     void (DinoUiReviveEffect::*State0215da04_EC)(); // 0xEC
+    u8 unkF4[0x104 - 0xF4];
+    void (DinoUiReviveEffect::*State0215f668_104)(); // 0x104
 } data_ov003_02161d20;
 
 // Puts the picture away.
@@ -200,6 +206,26 @@ void DinoUiReviveEffect::CheckSkip() {
         return;
     }
     mState = data_ov003_02161d20.State0215da04_54;
+}
+
+// The same, going on elsewhere. (Nothing uses this one.)
+void DinoUiReviveEffect::CheckSkip2() {
+    if (!data_ov003_021624c0 && (mInput->GetPressed() & 0x1003)) {
+        MTask *mainFade;
+        MTask *subFade;
+        MTask *exit;
+        exit = MTaskExitTransfer::Create(this);
+        subFade = gLcd->mSub->mBright->CreateFadeOutToBlack(data_02089a48, data_020899fc);
+        mainFade = gLcd->mMain->mBright->CreateFadeOutToBlack(data_02089a48, data_020899fc);
+        MParallelTaskSet *fades = new MParallelTaskSet(TRUE);
+        fades->AddTail(mainFade);
+        fades->AddTail(subFade);
+        MSerialTaskSet *serial = &mSerial;
+        serial->AddTail(fades);
+        serial->AddTail(exit);
+        return;
+    }
+    mState = data_ov003_02161d20.State0215f668_104;
 }
 
 // Fades both screens out and exits.

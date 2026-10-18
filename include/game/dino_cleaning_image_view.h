@@ -9,7 +9,7 @@
 #include "m/motion.h"
 
 class DinoCleaningImage;
-class MPalBlock;
+class MPalUnit;
 class MSmartOam;
 
 class DinoCleaningImageView : public MFixedSizeView {
@@ -39,7 +39,7 @@ public:
     MDisplay *mDisplay;                         // 0x1C
     MPoint mPos;                                // 0x20
     MAffineScreen *mScreen;                     // 0x28
-    MPalBlock *mPal;                            // 0x2C
+    MPalUnit *mPal;                            // 0x2C
     u32 unk30;
     std::vector<DinoCleaningImage *> mImages;   // 0x34
     u8 unk40[0xD9E0 - 0x40];

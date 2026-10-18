@@ -28,7 +28,7 @@ public:
     MText *mText;           // 0x1C
     MChr *mChr;             // 0x20
     MChrBlock *mChrBlock;   // 0x24
-    MPalBlock *mPalBlock;   // 0x28
+    MPalUnit *mPalBlock;   // 0x28
     MPictureFile mFile;     // 0x2C
     MPoint mPos;            // 0x60
     MPoint mTileSize;       // 0x68: of the window graphics

@@ -6,7 +6,7 @@
 #include "m/font.h"
 #include "m/smart_text.h"
 
-struct MPalBlock;
+struct MPalUnit;
 #include <string>
 
 class MCanvasWindow;
@@ -120,7 +120,7 @@ public:
     MChr *mChr;             // 0x20
     MChrBlock *mBlank;      // 0x24
     MChrBlock *mTiles;      // 0x28
-    MPalBlock *mPal;        // 0x2C
+    MPalUnit *mPal;        // 0x2C
     MPoint mTileSize;       // 0x30
     int mBackColor;         // 0x38
 };

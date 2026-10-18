@@ -219,7 +219,7 @@ MTask *DinoBattleViewCreature::CreateDownTask() {
 // NONMATCHING: the game spills weight first thing; ours after the first loads.
 MPalAnime *DinoBattleViewCreature::CreatePalBlend(BOOL withBase, u16 color, int weight, u32 duration) {
     MMotionFile *file = &mMotion->mFile;
-    MPalBlock *palette = mMotion->GetPalette(0);
+    MPalUnit *palette = mMotion->GetPalette(0);
     MPalAnime *anime = new MPalAnime(palette, 0, 0x7FFF);
     anime->SetLoadRange(2, 0xFE);
     if (withBase) {

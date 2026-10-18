@@ -14,7 +14,7 @@ struct MSmartOamEntry : public MOamEntry {
     MSmartOamEntry();
 
     void SetChr(MChrBlock *chr);
-    void SetPalette(MPalBlock *pal);
+    void SetPalette(MPalUnit *pal);
 
     void Clear() {
         attr01 = 0;

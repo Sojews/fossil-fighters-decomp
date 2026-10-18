@@ -30,7 +30,7 @@ public:
     MMenuItem *mBackButton; // 0xFC: B goes to it
     MPictureFile mMap;      // 0x100: image/all_map
     MIndexBitmap *mBitmap;  // 0x134
-    MPalBlock *mPalette;    // 0x138
+    MPalUnit *mPalette;    // 0x138
     u32 mUnk13C[2];         // 0x13C
     u32 mUnk144;            // 0x144
     int *mResult;           // 0x148

@@ -16,7 +16,7 @@ public:
 
     // A picture on each screen.
     struct Screen {
-        MPalBlock *palette;
+        MPalUnit *palette;
         MIndexBitmap *bitmap;
         MIndexBitmap *bitmap2;
     };

@@ -10,7 +10,7 @@ class MExtAffinePicture;
 class MIndexBitmap;
 class MInput;
 class MView;
-struct MPalBlock;
+struct MPalUnit;
 
 // The reviving effect (lights and particles).
 // (The data's layout isn't known yet.)
@@ -21,6 +21,7 @@ public:
     virtual ~DinoUiReviveEffect();
     virtual void Idle();
 
+    void State0215e030();
     void State0215e220();
     void StateScroll();
     void State0215ec2c();
@@ -28,6 +29,8 @@ public:
     void State0215ee24();
     void StartWait();
     void CheckSkip();
+    void CheckSkip2();
+    void State0215f668();
     void State0215da04();
     void StateWait();
     void Leave();
@@ -40,7 +43,7 @@ public:
     u32 mUnkC8;                             // 0xC8
     MPictureFile mPicture;                  // 0xCC
     MIndexBitmap *mBitmap;                  // 0x100
-    MPalBlock *mPalBlock;                   // 0x104
+    MPalUnit *mPalBlock;                   // 0x104
     u32 unk108[3];
     u8 mUnk114;                             // 0x114
     MExtAffinePicture *mScroller;           // 0x118: scrolled up over the effect

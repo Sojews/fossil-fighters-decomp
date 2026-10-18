@@ -129,7 +129,7 @@ void MChr256Filter::Filter(const void *src, void *dest, u32 size) {
     MAddPaletteOffset((const u16 *)src, (u16 *)dest, size, mPalette);
 }
 
-void MOamEntry::SetPalette(MPalBlock *pal) {
+void MOamEntry::SetPalette(MPalUnit *pal) {
     palette = pal->index;
 }
 

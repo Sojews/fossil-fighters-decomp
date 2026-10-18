@@ -18,8 +18,8 @@ public:
     void AddLayer(DinoCleaningImageLayer *layer);
     DinoCleaningImageLayer *GetLayer(int index);
     int CountPalettes();
-    void CreatePalAnimes(MTaskSet *set, MPalBlock *block, u32 start, u16 color);
-    void LoadPalettes(MPalBlock *block, u32 start);
+    void CreatePalAnimes(MTaskSet *set, MPalUnit *block, u32 start, u16 color);
+    void LoadPalettes(MPalUnit *block, u32 start);
     void PlayLayerSounds();
     MFx32 GetRatio();
     u8 GetMask(int row, int col);

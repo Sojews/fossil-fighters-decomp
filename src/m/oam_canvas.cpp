@@ -40,7 +40,7 @@ void MOamCanvas<TOam, TUnit>::DrawChar(MFont *font, MPoint pos, u32 code) {
 }
 
 template <class TOam, class TUnit>
-MPalBlock *MOamCanvas<TOam, TUnit>::GetPalBlock() {
+MPalUnit *MOamCanvas<TOam, TUnit>::GetPalBlock() {
     return mPalBlock;
 }
 
