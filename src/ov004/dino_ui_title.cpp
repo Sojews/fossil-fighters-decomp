@@ -4,6 +4,9 @@
 // Derived destructors have their bases' destructor bodies inlined; auto-inlining the ones defined above does that.
 #pragma auto_inline on
 
+#include "m/menu.h"
+#include "game/dino_ui_top_menu_loop.h"
+#include "game/dino_ui_save_slot_select.h"
 #include "game/dino_sound.h"
 #include "game/dino_ui_title_menu.h"
 #include "game/dino_ui_title.h"
@@ -98,11 +101,87 @@ void DinoUiOpeningCloud::Idle() {
 }
 
 // The TU's pooled pointer-to-member constants (see menu.cpp).
+// The TU's pooled pointer-to-member constants (see menu.cpp). The game's pool is one block; dsd splits it every 0x80
+// bytes (data_ov004_02172ff8, data_ov004_02173078), and tools/anon_names.py maps the offsets back.
 extern "C" struct {
-    u8 unk00[0x34];
-    void (DinoUiTitle::*Start_34)();
-} data_ov004_02172ff8;
+    u8 unk00[0x3C];
+    void (DinoUiTitle::*Unk0215ee60_3C)();
+    void (DinoUiTitle::*Unk0215f4ec_44)();
+    u8 unk4C[0x7C - 0x4C];
+    void (DinoUiTitle::*StateSaveSlot_7C)();
+    void (DinoUiTitle::*StateTopMenuEnd_84)();
+    u8 unk8C[0x9C - 0x8C];
+    void (DinoUiTitle::*Unk0215f1e0_9C)();
+    u8 unkA4[0xAC - 0xA4];
+    void (DinoUiTitle::*Unk0215e03c_AC)();
+    void (DinoUiTitle::*Start_B4)();
+    u8 unkBC[0xF4 - 0xBC];
+    void (DinoUiTitle::*Unk0215f5ac_F4)();
+    u8 unkFC[0x114 - 0xFC];
+    void (DinoUiOpening::*OpeningStart_114)();
+    u8 unk11C[0x12C - 0x11C];
+    void (DinoUiTitle::*Unk0215f420_12C)();
+    u8 unk134[0x144 - 0x134];
+    void (DinoUiTitle::*Unk0215e9e4_144)();
+    u8 unk14C[0x164 - 0x14C];
+    void (DinoUiTitle::*StateSaveSlotEnd_164)();
+} data_ov004_02172f78;
+
+inline DinoUiOpening::DinoUiOpening(MInput *input) : MProcess(NULL), mInput(input) {
+    mState = data_ov004_02172f78.OpeningStart_114;
+}
 
 DinoUiTitle::DinoUiTitle(s32 *result) : MProcess(NULL), mResult(result) {
-    mState = data_ov004_02172ff8.Start_34;
+    mState = data_ov004_02172f78.Start_B4;
+}
+
+void DinoUiTitle::StateOpening() {
+    mSerial.AddTail(new DinoUiOpening(mInput));
+    mState = data_ov004_02172f78.Unk0215e03c_AC;
+}
+
+void DinoUiTitle::StateMenu() {
+    mParallel.Remove(mMenu);
+    mMenu->Activate();
+    mSerial.AddTail(mMenu);
+    mState = data_ov004_02172f78.Unk0215e9e4_144;
+}
+
+void DinoUiTitle::StateSaveSlot() {
+    *mResult = 4;
+    mSerial.AddTail(new DinoUiSaveSlotSelect(mInput, &mSlotChoice));
+    mState = data_ov004_02172f78.StateSaveSlotEnd_164;
+}
+
+void DinoUiTitle::StateSaveSlotEnd() {
+    switch (mSlotChoice) {
+    case 1:
+        mState = data_ov004_02172f78.Unk0215ee60_3C;
+        break;
+    case 0:
+        mState = data_ov004_02172f78.Unk0215f1e0_9C;
+        break;
+    }
+}
+
+void DinoUiTitle::StateTopMenu() {
+    mSerial.AddTail(new DinoUiTopMenuLoop(&mTopResult));
+    mState = data_ov004_02172f78.StateTopMenuEnd_84;
+}
+
+void DinoUiTitle::StateTopMenuEnd() {
+    switch (mTopResult) {
+    case 1:
+        mState = data_ov004_02172f78.Unk0215f420_12C;
+        break;
+    case 0:
+        mState = data_ov004_02172f78.StateSaveSlot_7C;
+        break;
+    case 2:
+        mState = data_ov004_02172f78.Unk0215f4ec_44;
+        break;
+    case 3:
+        mState = data_ov004_02172f78.Unk0215f5ac_F4;
+        break;
+    }
 }

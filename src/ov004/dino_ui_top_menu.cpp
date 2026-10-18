@@ -276,9 +276,9 @@ template MTask *MCreateBgCallTask(DinoUiSaveSlotSelect *obj, void (DinoUiSaveSlo
 
 #pragma auto_inline off
 
-DinoUiSaveSlotSelect::DinoUiSaveSlotSelect(u32 a, u32 b) : MProcess(NULL) {
-    mUnk74 = a;
-    mUnk78 = b;
+DinoUiSaveSlotSelect::DinoUiSaveSlotSelect(MInput *input, u32 *result) : MProcess(NULL) {
+    mInput = input;
+    mResult = result;
 }
 
 #pragma auto_inline on

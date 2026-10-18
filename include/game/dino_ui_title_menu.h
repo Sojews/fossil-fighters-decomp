@@ -28,6 +28,7 @@ public:
 
 class DinoUiOpening : public MProcess {
 public:
+    DinoUiOpening(MInput *input);
     virtual ~DinoUiOpening();
     virtual void Execute();
     virtual void Idle();
@@ -37,6 +38,7 @@ public:
     u8 unk80[0x24];
     u8 mSkipped;        // 0xA4
     std::vector<void *> mUnkA8; // 0xA8
+    u8 unkB4[0xC4 - 0xB4];
 };
 
 #endif

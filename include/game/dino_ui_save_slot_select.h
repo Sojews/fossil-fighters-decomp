@@ -3,14 +3,16 @@
 
 #include "m/task.h"
 
+class MInput;
+
 class DinoUiSaveSlotSelect : public MProcess {
 public:
-    DinoUiSaveSlotSelect(u32 a, u32 b);
+    DinoUiSaveSlotSelect(MInput *input, u32 *result);
     virtual ~DinoUiSaveSlotSelect();
     virtual void Idle();
 
-    u32 mUnk74;     // 0x74
-    u32 mUnk78;     // 0x78
+    MInput *mInput;     // 0x74
+    u32 *mResult;       // 0x78
 };
 
 #endif

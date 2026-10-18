@@ -12,6 +12,10 @@ target's names, in place.
 With interprocedural analysis (-ipa file) mwcc also addresses a file's own data through its sections (`.data+0x80`,
 `.bss+0`) instead of through symbols. dsd names the same places (data_020c45f8, gLooper), so such relocations are
 pointed at a symbol of that name at the same place: ours if there is one, or a new local one.
+
+dsd also splits one block of data into symbols every so often (a TU's pooled constants every 0x80 bytes), while the
+source declares the block once: our `data_02172f78+0x80` is the game's `data_02172ff8`. Such a relocation is pointed at
+an (undefined) symbol of the game's name.
 """
 import re
 import struct
@@ -75,7 +79,8 @@ class Elf:
         symtab = self.sections[self.symtab_index]
         entries = bytearray(self.data[symtab[4]:symtab[4] + symtab[5]])
         for name, shndx, value in new_symbols:
-            entries += struct.pack("<IIIBBH", len(table), value, 0, 0, 0, shndx)
+            # Undefined ones are global (data in other objects); others local.
+            entries += struct.pack("<IIIBBH", len(table), value, 0, 0x10 if shndx == 0 else 0, 0, shndx)
             table += name.encode("latin-1") + b"\0"
         for off, (index, addend) in retargets.items():
             info = struct.unpack_from("<I", self.data, off + 4)[0]
@@ -88,6 +93,15 @@ class Elf:
         for i in (self.strtab_index, self.symtab_index):
             struct.pack_into("<IIIIIIIIII", self.data, self.shoff + i * self.shentsize, *self.sections[i])
         open(self.path, "wb").write(self.data)
+
+
+DATA_NAME = re.compile(r"(data_(?:ov\d{3}_)?)([0-9a-f]{8})$")
+
+
+def data_address(name, addend):
+    """(prefix, address) for a dsd data symbol name plus an addend, or None."""
+    m = DATA_NAME.match(name)
+    return (m.group(1), int(m.group(2), 16) + addend) if m else None
 
 
 def main():
@@ -127,6 +141,15 @@ def main():
                 continue
             if sym["name"].startswith("@") and a[1] not in renames:
                 renames[a[1]] = tsym["name"]
+            elif (sym["name"] != tsym["name"] and data_address(sym["name"], a[3]) is not None
+                  and data_address(sym["name"], a[3]) == data_address(tsym["name"], b[3])):
+                key = (tsym["name"], 0, 0)
+                index = next((i for i, s in enumerate(ours.symbols) if s["name"] == tsym["name"]), None)
+                if index is None:
+                    if key not in new_symbols:
+                        new_symbols.append(key)
+                    index = len(ours.symbols) + new_symbols.index(key)
+                retargets[a[4]] = (index, b[3])
             elif sym["type"] == STT_SECTION:
                 # Our section + addend is the target's symbol + its addend.
                 value = a[3] - b[3]
