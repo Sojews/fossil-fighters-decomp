@@ -145,7 +145,7 @@ void DinoCleaningKasekiRock::CountCells() {
 DinoCleaning::~DinoCleaning() {
     Unregister();
     mParallel.Clear();
-    delete (MRandom *)mUnkE0;
+    delete mRandom;
     gLcd->mMain->ResetHooks();
     gLcd->mSub->ResetHooks();
     gLcd->mMain->SetBackdrop(0x8000);
@@ -160,8 +160,8 @@ MInput *DinoCleaning::GetUnkDC() {
     return mUnkDC;
 }
 
-u32 DinoCleaning::GetUnkE0() {
-    return mUnkE0;
+MRandom *DinoCleaning::GetRandom() {
+    return mRandom;
 }
 
 u32 DinoCleaning::GetUnkD4() {

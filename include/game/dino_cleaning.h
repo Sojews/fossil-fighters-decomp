@@ -7,6 +7,8 @@
 #include "m/sleep.h"
 #include "game/help.h"
 
+class MRandom;
+
 class MInput;
 class DinoCommonLive;
 class DinoCleaningKasekiRock;
@@ -26,7 +28,7 @@ public:
     virtual void OnPreLoop();
 
     MInput *GetUnkDC();
-    u32 GetUnkE0();
+    MRandom *GetRandom();
     u32 GetUnkD4();
     DinoCleaningKasekiRock *GetKasekiRock();
     DinoCommonLive *GetUnkE4();
@@ -60,7 +62,7 @@ public:
     u32 mUnkD4;                     // 0xD4
     DinoCleaningKasekiRock *mKasekiRock; // 0xD8
     MInput *mUnkDC;                 // 0xDC
-    u32 mUnkE0;                     // 0xE0
+    MRandom *mRandom;               // 0xE0
     DinoCommonLive *mUnkE4;         // 0xE4
     DinoCleaningStatus *mStatus;    // 0xE8
     DinoCleaningToolMenu *mToolMenu;    // 0xEC
