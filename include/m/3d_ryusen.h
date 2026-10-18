@@ -8,6 +8,8 @@ class M3DRyusen : public M3DModel {
 public:
     M3DRyusen() {}
     virtual ~M3DRyusen();
+    virtual int GetFrameCount();
+    virtual BOOL IsAnimDone();
 
     u8 unk32C[0x368 - 0x32C];
 };
