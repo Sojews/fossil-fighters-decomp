@@ -2,6 +2,7 @@
 #define GAME_MOTION_ADVANTAGE_ARROW_H
 
 #include "m/menu_item.h"
+#include "m/motion.h"
 #include "m/menu.h"
 #include "m/display.h"
 #include "m/observer.h"
@@ -24,10 +25,24 @@ public:
     virtual void Idle();
 };
 
+class MSmartOam;
+class MMotion;
+
+// The tutorial's pointing arrows and highlight rectangle.
 class DinoBattleViewTutorialMotion : public MProcess {
 public:
+    DinoBattleViewTutorialMotion(MSmartOam *oam);
     virtual ~DinoBattleViewTutorialMotion();
     virtual void Idle();
+
+    void ShowArrow(int index, int dir, MPoint pos);
+    void SetRect(MRect rect);
+    // Removes one arrow, or with -1 every arrow and the rectangle.
+    void Hide(int index);
+
+    MSmartOam *mOam;        // 0x74
+    MMotion *mArrows[3];    // 0x78
+    MMotion *mRect;         // 0x84
 };
 
 class DinoBattleViewLCDFader : public MProcess {
@@ -65,12 +80,21 @@ class SetTutorialMotionArrorTask : public MTask {
 public:
     virtual ~SetTutorialMotionArrorTask();
     virtual void Execute();
+
+    DinoBattleViewTutorialMotion *mMotion;  // 0x10
+    int mIndex;                             // 0x14
+    int mDir;                               // 0x18: 0 hides the arrow
+    MPoint mPos;                            // 0x1C
 };
 
 class SetTutorialMotionRectTask : public MTask {
 public:
     virtual ~SetTutorialMotionRectTask();
     virtual void Execute();
+
+    DinoBattleViewTutorialMotion *mMotion;  // 0x10
+    MPoint mTopLeft;                        // 0x14
+    MPoint mBottomRight;                    // 0x1C
 };
 
 #endif

@@ -60,6 +60,20 @@ SetTutorialMotionRectTask::~SetTutorialMotionRectTask() {
 void DinoBattleViewTutorialMotion::Idle() {
 }
 
+void SetTutorialMotionRectTask::Execute() {
+    mMotion->SetRect(MRect(mTopLeft, mBottomRight));
+    Exit();
+}
+
+void SetTutorialMotionArrorTask::Execute() {
+    if (mDir == 0) {
+        mMotion->Hide(mIndex);
+    } else {
+        mMotion->ShowArrow(mIndex, mDir, mPos);
+    }
+    Exit();
+}
+
 void WaitUpdateSupportEffectAnimeTask::Execute() {
     for (int i = 0; i < 2; i++) {
         if (mView->GetUnkE4(i)->GetUnk108()->IsAnimating()) {
