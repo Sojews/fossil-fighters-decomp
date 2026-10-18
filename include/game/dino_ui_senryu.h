@@ -12,6 +12,8 @@
 #include "game/help.h"
 #include "game/dino_field_camera_hook.h"
 
+class DinoUiSenryuMenu;
+
 class SenryuMenuItem : public MMenuItem {
 public:
     virtual ~SenryuMenuItem();
@@ -90,6 +92,10 @@ public:
 
 class CurChangeTask : public MTask {
 public:
+    CurChangeTask(DinoUiSenryuMenu *menu, u32 cur) {
+        mUnk10 = (u32)menu;
+        mUnk14 = cur;
+    }
     virtual ~CurChangeTask();
     virtual void Execute();
 

@@ -117,6 +117,12 @@ DinoUiKeyboard::DinoUiKeyboard(int mode, int arg) : MProcess(NULL) {
     mFlag = TRUE;
 }
 
+DinoUiKeyboard::DinoUiKeyboard(int mode) : MProcess(NULL) {
+    mMode = mode;
+    mArg = 0;
+    mFlag = TRUE;
+}
+
 void PageChangeTask::Execute() {
     func_ov007_021832f0((void *)mUnk10, mUnk14);
     Exit();
@@ -290,7 +296,6 @@ void DinoUiKeyboardMenuItem::OnDecide() {
     }
 }
 
-extern "C" MTask *func_ov007_02186da4(DinoUiSenryuMenu *menu, u32 index);
 
 void DinoUiSenryuMenu::OnFocus(MMenuItem *item) {
     if (item != NULL) {
@@ -303,15 +308,15 @@ void DinoUiSenryuMenu::OnFocus(MMenuItem *item) {
         }
         switch (senryu->mIndex) {
         case 0:
-            mSerial.AddTail(func_ov007_02186da4(this, mPage * 3));
+            mSerial.AddTail(CreateCurChangeTask(mPage * 3));
             mCursor->Show();
             return;
         case 1:
-            mSerial.AddTail(func_ov007_02186da4(this, mPage * 3 + 1));
+            mSerial.AddTail(CreateCurChangeTask(mPage * 3 + 1));
             mCursor->Show();
             return;
         case 2:
-            mSerial.AddTail(func_ov007_02186da4(this, mPage * 3 + 2));
+            mSerial.AddTail(CreateCurChangeTask(mPage * 3 + 2));
             mCursor->Show();
             return;
         default:
@@ -338,4 +343,16 @@ MRect DinoUiSenryuListHideMenuItem::GetRect() {
 
 MDisplay *DinoUiSenryuListHideMenuItem::GetDisplay() {
     return MProcess::GetDisplay();
+}
+
+MTask *DinoUiKeyboardMenu::CreateSetFocusTask(MMenuItem *item) {
+    return new SetFocusTask(this, item);
+}
+
+MTask *DinoUiKeyboardMenu::CreatePageChangeTask(u32 page) {
+    return new PageChangeTask(this, page);
+}
+
+MTask *DinoUiSenryuMenu::CreateCurChangeTask(u32 cur) {
+    return new CurChangeTask(this, cur);
 }

@@ -19,6 +19,9 @@ public:
     virtual void OnFocus(MMenuItem *item);
     virtual void OnDecide(MMenuItem *item);
 
+    MTask *CreateSetFocusTask(MMenuItem *item);
+    MTask *CreatePageChangeTask(u32 page);
+
     u8 unkB4[0xE8];
     std::wstring mUnk19C;       // 0x19C
     std::wstring mUnk1A8;       // 0x1A8

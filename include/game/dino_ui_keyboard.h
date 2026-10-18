@@ -19,6 +19,7 @@ class DinoUiKeyboard : public MProcess {
 public:
     DinoUiKeyboard(int mode, int arg, u8 flag);
     DinoUiKeyboard(int mode, int arg);
+    DinoUiKeyboard(int mode);
     virtual ~DinoUiKeyboard();
     virtual void Idle();
 
@@ -96,6 +97,10 @@ public:
 
 class SetFocusTask : public MTask {
 public:
+    SetFocusTask(DinoUiKeyboardMenu *menu, MMenuItem *item) {
+        mMenu = menu;
+        mItem = item;
+    }
     virtual ~SetFocusTask();
     virtual void Execute();
 
@@ -105,6 +110,10 @@ public:
 
 class PageChangeTask : public MTask {
 public:
+    PageChangeTask(DinoUiKeyboardMenu *menu, u32 page) {
+        mUnk10 = (u32)menu;
+        mUnk14 = page;
+    }
     virtual ~PageChangeTask();
     virtual void Execute();
 

@@ -20,6 +20,8 @@ public:
     virtual void OnFocus(MMenuItem *item);
     virtual void OnDecide(MMenuItem *item);
 
+    MTask *CreateCurChangeTask(u32 cur);
+
     u8 unkB4[0x38];
     MView *mCursor;     // 0xEC
     u8 unkF0[0x30];
