@@ -5221,9 +5221,9 @@ _ZN10MMultiPlay14OnStartConnectEP22WMStartConnectCallback kind:function(thumb,si
 _ZN20MMultiPlayMessageHubC1Ei kind:function(thumb,size=0x190) addr:0x0206abfc
 _ZN20MMultiPlayMessageHubD1Ev kind:function(thumb,size=0xbc) addr:0x0206ad8c
 _ZN20MMultiPlayMessageHubD0Ev kind:function(thumb,size=0xc4) addr:0x0206ae48
-func_0206af0c kind:function(thumb,size=0xc) addr:0x0206af0c
+_ZN20MMultiPlayMessageHub9SetUnk279Eh kind:function(thumb,size=0xc) addr:0x0206af0c
 _ZN20MMultiPlayMessageHub9BroadcastEP8MMessage kind:function(thumb,size=0x1c) addr:0x0206af18
-func_0206af34 kind:function(thumb,size=0x10) addr:0x0206af34
+_ZN20MMultiPlayMessageHub9SendToAllEP8MMessage kind:function(thumb,size=0x10) addr:0x0206af34
 _ZN20MMultiPlayMessageHub6SendToEmP8MMessage kind:function(thumb,size=0xbe) addr:0x0206af44
 func_0206b004 kind:function(thumb,size=0x7e) addr:0x0206b004
 _ZN20MMultiPlayMessageHub7OnVSyncEv kind:function(thumb,size=0x40) addr:0x0206b084

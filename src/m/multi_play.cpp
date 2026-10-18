@@ -1054,8 +1054,22 @@ void MMultiPlayWirelessDriverStopTask::Begin() {
     mStep = &MMultiPlayWirelessDriverStopTask::Terminate;
 }
 
+void MMultiPlayMessageHub::SetUnk279(u8 value) {
+    mUnk279 = value;
+}
+
 void MMultiPlayMessageHub::Broadcast(MMessage *msg) {
     SendTo(0xFFFF ^ (1 << mSelf), msg);
+}
+
+void MMultiPlayMessageHub::SendToAll(MMessage *msg) {
+    SendTo(0xFFFF, msg);
+}
+
+void MMultiPlayMessageHub::OnVSync() {
+    if (!sMultiPlay.instance->IsFailed()) {
+        mRunning = WM_StepDataSharing(sMultiPlay.instance->mDataSharing[3].info, mSendData, &mReceived) == WM_ERRCODE_SUCCESS;
+    }
 }
 
 void MMultiPlayMessageHub::Execute() {

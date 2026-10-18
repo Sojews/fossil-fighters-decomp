@@ -227,13 +227,19 @@ public:
     void Broadcast(MMessage *msg);
     // Sends a message to the consoles in an AID mask.
     void SendTo(u32 mask, MMessage *msg);
+    // Sends a message to every console, this one included.
+    void SendToAll(MMessage *msg);
     void SendPending();
     void ReceivePending();
+    void SetUnk279(u8 value);
 
-    u8 unk44[0x264 - 0x44];
-    int mSelf;          // 0x264: this console's AID
+    u8 unk44[0x60 - 0x44];
+    WMDataSet mReceived;    // 0x60
+    u16 *mSendData;         // 0x260
+    int mSelf;              // 0x264: this console's AID
     u8 unk268[0x10];
-    u8 mRunning;        // 0x278
+    u8 mRunning;            // 0x278: data sharing stepped last frame
+    u8 mUnk279;             // 0x279
 };
 
 class MMultiPlaySynchronizeDelayTask : public MProcess {
