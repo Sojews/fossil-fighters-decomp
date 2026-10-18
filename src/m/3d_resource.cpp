@@ -1,5 +1,5 @@
 // The 3D resources: the 3D heap, the model, animation and texture caches, and M3DModelResource.
-// Not decompiled yet: the model grid functions at the start.
+// Not decompiled yet: the M3DGrid functions that build and search it.
 
 #include <ctype.h>
 #include <map>
@@ -57,6 +57,20 @@ public:
 
     u32 unk[2];
 };
+
+M3DGrid::M3DGrid() {
+    mDim = 32;
+    mCells = new std::vector<u16>[mDim * mDim];
+}
+
+M3DGrid::~M3DGrid() {
+    u32 count = mDim * mDim;
+    for (u32 i = 0; i < count; i++) {
+        mCells[i].clear();
+    }
+    mVerts.clear();
+    delete[] mCells;
+}
 
 inline bool operator<(const MArchiveFile &a, const MArchiveFile &b) {
     if (&b == &a) {
@@ -290,3 +304,7 @@ void M3DModelResource::GetPalette(u32 *plttKey, u8 **palette, u32 *size) {
     *palette = entry.mPalette;
     *size = entry.mPaletteSize;
 }
+
+#pragma auto_inline off
+template class std::__vec_deleter<u16, std::allocator<u16> >;
+template class std::__vec_deleter<M3DVec16, std::allocator<M3DVec16> >;

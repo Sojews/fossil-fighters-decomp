@@ -4,10 +4,31 @@
 #define M_3D_RESOURCE_H
 
 #include <string>
+#include <vector>
 #include "m/archive.h"
 #include "m/task.h"
 
 class M3DModel;
+
+struct M3DVec16 {
+    s16 x;
+    s16 y;
+    s16 z;
+};
+
+// A model's triangles (as indices into its vertices) sorted into a grid of cells over the XZ plane, to find the
+// ground under a point.
+class M3DGrid {
+public:
+    M3DGrid();
+    ~M3DGrid();
+
+    std::vector<M3DVec16> mVerts;   // 0x00
+    std::vector<u16> *mCells;       // 0x0C: mDim * mDim cells, three indices per triangle
+    u32 mDim;                       // 0x10
+    int mShiftX;                    // 0x14
+    int mShiftZ;                    // 0x18
+};
 
 // Sets up the 3D heap for as long as it exists.
 class M3DHeap : public MTask {
