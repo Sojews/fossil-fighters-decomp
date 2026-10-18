@@ -2475,6 +2475,9 @@ public:
 class DinoBattleViewSetCreaturePriorityRequest : public MMessage {
 public:
     DinoBattleViewSetCreaturePriorityRequest() : MMessage(0x1007D) {}
+    DinoBattleViewSetCreaturePriorityRequest(u32 a) : MMessage(0x1007D) {
+        mUnk0C = a;
+    }
     virtual u32 GetSize() { return 8; }
     virtual void Write(void *buf) {
         MI_CpuCopy8(&mId, buf, 4);

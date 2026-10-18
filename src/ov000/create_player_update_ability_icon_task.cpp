@@ -54,6 +54,16 @@ ExecSpecialAttackTask::~ExecSpecialAttackTask() {
 SendModelCreatureAbilityResultTask::~SendModelCreatureAbilityResultTask() {
 }
 
+// Answers the model, then has the view reset the creatures' priorities and mark them as having acted.
+void SendModelCreatureAbilityResultTask::Execute() {
+    if (mTarget != NULL) {
+        mTarget->Post(new DinoBattleModelCreatureAbilityResult());
+    }
+    mView->Post(new DinoBattleViewSetCreaturePriorityRequest(0));
+    mView->Post(new DinoBattleViewSetActionedSignal());
+    Exit();
+}
+
 SetLifePointTask::~SetLifePointTask() {
 }
 
