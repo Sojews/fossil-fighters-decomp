@@ -8,6 +8,7 @@
 #include "game/dino_ui2_parts_rock_name.h"
 #include "game/dino_ui2_parts_kaseki_button.h"
 #include "game/dino_ui2_field_menu_cursor.h"
+#include "game/dino_sound.h"
 
 DinoUi2PartsRockName::~DinoUi2PartsRockName() {
 }
@@ -40,6 +41,17 @@ void DinoUi2PartsKasekiButton::OnFocusChanged(BOOL focused) {
 
 MRect DinoUi2PartsKasekiButton::GetFrame() {
     return MRect(mPos.Offset(-24, -24), mPos.Offset(24, 24));
+}
+
+extern "C" const char data_ov004_02176b2c[]; // ""
+
+void DinoUi2PartsRockName::Clear() {
+    mText->SetText(std::string(data_ov004_02176b2c));
+}
+
+MTask *DinoUi2FieldMenuCursor::CreateMoveTask(MRect from, MRect to, int duration, int ease) {
+    DinoSoundPlaySe(0x96, 0);
+    return CreateFrameAnime(from, to, duration, ease);
 }
 
 void DinoUi2FieldMenuCursor::Execute() {

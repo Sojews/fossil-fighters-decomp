@@ -19,6 +19,8 @@ public:
     virtual BOOL IsHidden();
     virtual u32 GetPlaneMask();
 
+    MTask *CreateMoveTask(MRect from, MRect to, int duration, int ease);
+
     MView *mUnk10;  // 0x10: shown in mode 1
     MView *mUnk14;  // 0x14: shown in mode 2
     MRect mFrame;   // 0x18

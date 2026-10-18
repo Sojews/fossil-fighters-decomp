@@ -9,6 +9,7 @@
 #include "game/dino_ui3_parts_cursor.h"
 #include "game/dino_backup.h"
 #include <printf.h>
+#include "game/dino_sound.h"
 
 DinoUi3PartsFraction::~DinoUi3PartsFraction() {
 }
@@ -100,6 +101,11 @@ void DinoUi3PartsKasekiButton::SetActive(BOOL active) {
 
 void DinoUi3PartsKasekiButton::HideMotion() {
     mMotion->Hide();
+}
+
+MTask *DinoUi3PartsCursor::CreateMoveTask(MRect from, MRect to, int duration, int ease) {
+    DinoSoundPlaySe(0x96, 0);
+    return CreateFrameAnime(from, to, duration, ease);
 }
 
 void DinoUi3PartsCursor::Execute() {
