@@ -171,3 +171,6 @@ void DinoUiSaveOption::Idle() {
 u32 DinoUiSaveOptionMenu::GetUnkB8() {
     return mUnkB8;
 }
+
+DinoUiSaveOption::DinoUiSaveOption(u32 arg) : MProcess(NULL), mUnk74(arg) {
+}

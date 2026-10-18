@@ -20,3 +20,13 @@ DinoMpGame::~DinoMpGame() {
 void DinoMpGame::Idle() {
     (this->*mState)();
 }
+
+// The TU's pooled pointer-to-member constants (see menu.cpp).
+extern "C" struct {
+    u8 unk00[0x4];
+    void (DinoMpGame::*Start_04)();
+} data_020c02fc;
+
+DinoMpGame::DinoMpGame(MMultiPlay *multiPlay) : MProcess(NULL), mMultiPlay(multiPlay) {
+    mState = data_020c02fc.Start_04;
+}

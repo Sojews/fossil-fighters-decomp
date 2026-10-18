@@ -96,3 +96,13 @@ void DinoUiOpening::Execute() {
 void DinoUiOpeningCloud::Idle() {
     mSerial.AddTail(mCloud->CreateCoordAnime(MPoint(-512, 0), MPoint(0, 0), 600, 0));
 }
+
+// The TU's pooled pointer-to-member constants (see menu.cpp).
+extern "C" struct {
+    u8 unk00[0x34];
+    void (DinoUiTitle::*Start_34)();
+} data_ov004_02172ff8;
+
+DinoUiTitle::DinoUiTitle(s32 *result) : MProcess(NULL), mResult(result) {
+    mState = data_ov004_02172ff8.Start_34;
+}

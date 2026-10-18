@@ -37,7 +37,9 @@ struct DinoUiTopMenuStatics {
     MPoint mItem2BottomRight;   // 0x74
 };
 struct DinoUiTopMenuStatics2 {
-    u8 unk00[0x4C];
+    u8 unk00[0x1C];
+    void (DinoUiTopMenuLoop::*mLoopStart)();    // 0x1C: (a pooled pointer-to-member constant, see menu.cpp)
+    u8 unk24[0x4C - 0x24];
     MPoint mItemBottomRight;    // 0x4C
     u8 unk54[0x64 - 0x54];
     MPoint mItem2TopLeft;       // 0x64
@@ -440,4 +442,8 @@ DinoUiSaveSlotConfirm::DinoUiSaveSlotConfirm() : MProcess(NULL) {
 
 u32 DinoUiTopMenu::GetUnkB4() {
     return mUnkB4;
+}
+
+DinoUiTopMenuLoop::DinoUiTopMenuLoop(u32 arg) : MProcess(NULL), mUnk7C(arg) {
+    mState = data_ov004_021720ec.mLoopStart;
 }

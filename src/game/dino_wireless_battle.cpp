@@ -13,3 +13,13 @@ DinoWirelessBattle::~DinoWirelessBattle() {
 void DinoWirelessBattle::Idle() {
     (this->*mState)();
 }
+
+// The TU's pooled pointer-to-member constants (see menu.cpp).
+extern "C" struct {
+    u8 unk00[0x40];
+    void (DinoWirelessBattle::*Start_40)();
+} data_020c0480;
+
+DinoWirelessBattle::DinoWirelessBattle() : MProcess(NULL) {
+    mState = data_020c0480.Start_40;
+}
