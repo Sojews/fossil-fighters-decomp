@@ -4,6 +4,7 @@
 // Derived destructors have their bases' destructor bodies inlined; auto-inlining the ones defined above does that.
 #pragma auto_inline on
 
+#include "m/display.h"
 #include "game/dino_ui2_container_base_menu_item_menu.h"
 #include "m/multi_message.h"
 #include "game/dino_sound.h"
@@ -270,14 +271,16 @@ extern "C" struct {
     DinoUiWirelessMatchState StateRescan; // 0x4c
 } data_ov004_02174150;
 extern "C" struct {
-    u8 unk00[0x3c];
+    u8 unk00[0x4];
+    void (DinoUiChildScannerBattleConnect::*Unk02163cdc_04)(); // 0x04
+    u8 unk0C[0x3C - 0xC];
     DinoUiWirelessMatchState StateChildScan; // 0x3c
-    u8 unk44[0x54 - 0x44];
-    DinoUiWirelessMatchState state_02167b38; // 0x54
-    u8 unk5C[0x64 - 0x5C];
-    void (DinoUiCannonParentScanner::*StateCheckFailed_64)(); // 0x64
-    u8 unk6C[0x7C - 0x6C];
-    void (DinoUiCannonParentScanner::*ParentStart_7C)(); // 0x7c
+    u8 unk40[0x50 - 0x40];
+    DinoUiWirelessMatchState state_02167b38; // 0x50
+    u8 unk54[0x5C - 0x54];
+    void (DinoUiCannonParentScanner::*StateCheckFailed_64)(); // 0x5c
+    u8 unk64[0x74 - 0x64];
+    void (DinoUiCannonParentScanner::*ParentStart_7C)(); // 0x74
 } data_ov004_021741d0;
 extern "C" struct {
     u8 unk00[0xc];
@@ -473,4 +476,27 @@ void DinoUiCannonChild::StateShot() {
     } else {
         mState = data_ov004_02174150.Child02166dc0_34;
     }
+}
+
+void DinoUiChildScannerBattleConnect::StateCancel() {
+    if (mMultiPlay->IsFailed()) {
+        mState = data_ov004_021741d0.Unk02163cdc_04;
+        return;
+    }
+    mUnkE8->Clear();
+    mScanner->Cancel();
+    MTask *exit = MTaskExitTransfer::Create(this);
+    MTask *fade = gCurrentDisplay->mBlend->CreateFadeRatioAnime(8, 0, 10, 0);
+    MTaskSet &serial = mSerial;
+    serial.AddTail(fade);
+    serial.AddTail(exit);
+}
+
+void DinoUiChildScannerBattleConnect::StateRescan() {
+    mScanner->Rescan();
+    MTask *exit = MTaskExitTransfer::Create(this);
+    MTask *fade = gCurrentDisplay->mBlend->CreateFadeRatioAnime(8, 0, 10, 0);
+    MTaskSet &serial = mSerial;
+    serial.AddTail(fade);
+    serial.AddTail(exit);
 }

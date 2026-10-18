@@ -61,6 +61,7 @@ public:
     u8 mSilentFocus;            // 0xF4
     u8 unkF5[0x37];
     DinoHelpItem *mParentHelp;  // 0x12C: help shown for every parent item
+    void Rescan();
 };
 
 class DinoUiChildScannerBattleConnect : public MProcess, public MMessageObserver, public DinoHelpBase {
@@ -69,10 +70,16 @@ public:
     virtual void Idle();
     virtual void OnMessage(MMessage *msg);
 
+    void StateCancel();
+    void StateRescan();
+
     void (DinoUiChildScannerBattleConnect::*mState)(); // 0xB4
     void (DinoUiChildScannerBattleConnect::*mOnMessage)(MMessage *msg); // 0xBC
-    u32 mUnkC4[6];
+    DinoUiChildScanner *mScanner;   // 0xC4
+    MMultiPlay *mMultiPlay;         // 0xC8
+    u32 mUnkCC[4];
     std::string mText;  // 0xDC
+    MTaskSet *mUnkE8;   // 0xE8
 };
 
 class DinoUiChildScannerCannonConnect : public MProcess, public MMessageObserver, public DinoHelpBase {

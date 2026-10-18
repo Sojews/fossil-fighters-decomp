@@ -4,6 +4,7 @@
 // Derived destructors have their bases' destructor bodies inlined; auto-inlining the ones defined above does that.
 #pragma auto_inline on
 
+#include "m/display.h"
 #include "game/dino_ui_exchange.h"
 #include "types.h"
 #include "m/blend.h"
@@ -73,3 +74,21 @@ template MTask *MCreateBgCallTask(DinoBackup *obj, void (DinoBackup::*func)(), i
 template class std::__red_black_tree<DinoMacAddress, DinoMacAddress, std::__identity<DinoMacAddress>,
                                      std::less<DinoMacAddress>, std::allocator<DinoMacAddress> >;
 #pragma opt_strength_reduction reset
+
+// The TU's pooled pointer-to-member constants (see menu.cpp).
+extern "C" struct {
+    u8 unk00[0x34];
+    void (DinoUiExchange::*Unk02155f24_34)();
+} data_ov004_02171e60;
+
+void DinoUiExchange::StateEnd() {
+    if (mUnkC0 == 0) {
+        MTask *exit = MTaskExitTransfer::Create(this);
+        MTask *fade = gCurrentDisplay->mBlend->CreateFadeRatioAnime(8, 0, 10, 0);
+        MTaskSet &serial = mSerial;
+        serial.AddTail(fade);
+        serial.AddTail(exit);
+    } else {
+        mState = data_ov004_02171e60.Unk02155f24_34;
+    }
+}

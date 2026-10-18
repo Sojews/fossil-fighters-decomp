@@ -2253,6 +2253,21 @@ void DinoEventExecBattle::StateResetDisplays() {
     mState = data_020be144.Battle02041748_78;
 }
 
+void DinoEventExecBattle::StateFadeOut() {
+    if (mUnk80 == 0) {
+        if (mUnk8C) {
+            mEvent->Fade(2, 30);
+        } else {
+            mEvent->Fade(0, 30);
+        }
+    }
+    MTask *exit = MTaskExitTransfer::Create(this);
+    MTask *wait = mEvent->CreateFadeWaitTask();
+    MTaskSet &serial = mSerial;
+    serial.AddTail(wait);
+    serial.AddTail(exit);
+}
+
 void DinoEventExecBattle::StateOpenField() {
     mEvent->OpenField(TRUE);
     mState = data_020be1c4.Battle02041b24_78;

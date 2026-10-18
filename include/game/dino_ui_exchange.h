@@ -44,11 +44,14 @@ public:
     void ShowCount();
     void Start();
     void Reset();
+    void StateEnd();
 
     void (DinoUiExchange::*mState)();               // 0xA8
     void (DinoUiExchange::*mOnMessage)(MMessage *msg); // 0xB0
     MMultiPlay *mMultiPlay;         // 0xB8
-    u8 unkBC[0xD4 - 0xBC];
+    u32 unkBC;
+    u32 mUnkC0;                     // 0xC0
+    u8 unkC4[0xD4 - 0xC4];
     MMotion *mOnes;                 // 0xD4: the count's digits
     MMotion *mTens;                 // 0xD8
     u32 mCount;                     // 0xDC
