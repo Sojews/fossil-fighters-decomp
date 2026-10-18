@@ -19,8 +19,11 @@ public:
     virtual void Idle();
 
     void (DinoMpGame::*mState)(); // 0x74
+    void StateFinish();
+
     MMultiPlay *mMultiPlay;     // 0x7C
-    u32 mUnk80[2];
+    u32 mUnk80;
+    u8 mFailed;                 // 0x84: shows the error dialog
     DinoHelpDisabler mDisabler; // 0x88
 };
 

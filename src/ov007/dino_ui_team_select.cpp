@@ -84,3 +84,7 @@ void DinoUiTeamSelectMenu::OnFocus(MMenuItem *item) {
 // instantiated explicitly.
 template class MCallTask0<DinoUiTeamSelectMenu, DinoUiTeamSelectMenu>;
 template MTask *MCreateCallTask(DinoUiTeamSelectMenu *obj, void (DinoUiTeamSelectMenu::*func)());
+
+DinoUiTeamSelect::DinoUiTeamSelect(u32 *result, u8 unk78, u8 unk79)
+    : MProcess(NULL), mResult(result), mUnk78(unk78), mUnk79(unk79) {
+}

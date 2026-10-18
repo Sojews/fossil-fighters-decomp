@@ -5,6 +5,7 @@
 
 class MultiPlayErrorDialog : public MProcess {
 public:
+    MultiPlayErrorDialog();
     virtual ~MultiPlayErrorDialog();
     virtual void Idle();
 

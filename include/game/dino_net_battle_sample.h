@@ -9,8 +9,10 @@ public:
     virtual ~DinoNetBattleSample();
     virtual void Idle();
 
+    void StateTeamSelect();
+
     void (DinoNetBattleSample::*mState)(); // 0x74
-    u32 mUnk7C;                            // 0x7C
+    u32 mTeam;                             // 0x7C
 };
 
 #endif

@@ -33,8 +33,13 @@ public:
 
 class DinoUiTeamSelect : public MProcess {
 public:
+    DinoUiTeamSelect(u32 *result, u8 unk78, u8 unk79);
     virtual ~DinoUiTeamSelect();
     virtual void Idle();
+
+    u32 *mResult;   // 0x74
+    u8 mUnk78;      // 0x78
+    u8 mUnk79;      // 0x79
 };
 
 class DinoUiTeamSelectTeamButton : public MMenuItem, public DinoHelpItem {
