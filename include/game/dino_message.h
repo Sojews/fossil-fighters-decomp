@@ -3136,6 +3136,7 @@ public:
 class DinoBattleReadyToBeginBattleSignal : public MMessage {
 public:
     DinoBattleReadyToBeginBattleSignal() : MMessage(0x1009E) {}
+    DinoBattleReadyToBeginBattleSignal(u32 player) : MMessage(0x1009E) { mUnk0C = player; }
     virtual u32 GetSize() { return 8; }
     virtual void Write(void *buf) {
         MI_CpuCopy8(&mId, buf, 4);
@@ -3152,6 +3153,10 @@ public:
 class DinoBattleReadyToContinueBattleSignal : public MMessage {
 public:
     DinoBattleReadyToContinueBattleSignal() : MMessage(0x100A4) {}
+    DinoBattleReadyToContinueBattleSignal(u32 player, u8 cont) : MMessage(0x100A4) {
+        mUnk0C = player;
+        mUnk10 = cont;
+    }
     virtual u32 GetSize() { return 12; }
     virtual void Write(void *buf) {
         MI_CpuCopy8(&mId, buf, 4);
