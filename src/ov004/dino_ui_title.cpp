@@ -4,6 +4,7 @@
 // Derived destructors have their bases' destructor bodies inlined; auto-inlining the ones defined above does that.
 #pragma auto_inline on
 
+#include "game/dino_backup.h"
 #include "m/bright.h"
 #include "m/picture.h"
 #include "game/backup_validater.h"
@@ -311,4 +312,34 @@ void DinoUiTitle::StateAdvice2() {
     serial.AddTail(skip);
     serial.AddTail(exit);
     mState = data_ov004_02172f78.StateOpening_74;
+}
+
+// Leaves for the game: fades both screens out to white.
+void DinoUiTitle::StateEnd() {
+    *mResult = 3;
+    DinoSoundStopBgm(-1, 60);
+    MTask *fadeTop;
+    MTask *fadeBottom;
+    MTask *exit;
+    exit = MTaskExitTransfer::Create(this);
+    fadeBottom = gLcd->GetBottomDisplay()->mBright->CreateFadeOutToWhite(60, 0);
+    fadeTop = gLcd->GetTopDisplay()->mBright->CreateFadeOutToWhite(60, 0);
+    MParallelTaskSet *fades = new MParallelTaskSet(TRUE);
+    fades->AddTail(fadeTop);
+    fades->AddTail(fadeBottom);
+    MTaskSet &serial = mSerial;
+    serial.AddTail(fades);
+    serial.AddTail(exit);
+}
+
+// (Run in the background.)
+void DinoUiTitle::ResetBackup() {
+    gDinoBackup->Reset(TRUE);
+    gDinoBackup->WriteSlotRaw();
+    gDinoBackup->WriteHeader();
+}
+
+void DinoUiTitle::LoadBackup() {
+    gDinoBackup->Load();
+    gDinoBackup->WriteHeader();
 }

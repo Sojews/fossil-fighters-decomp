@@ -15,6 +15,9 @@ public:
     virtual void Idle();
 
     void StateStart();
+    void StateEnd();
+    void ResetBackup();
+    void LoadBackup();
     void StateWarning();
     void StateAdvice();
     void StateAdvice2();
