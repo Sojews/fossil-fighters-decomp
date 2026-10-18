@@ -107,6 +107,10 @@ public:
     void CollectCreaturesNearB8(int pos, u32 *ids, int *count);
     void SendUpdateRequest(u32 arg);
     void SendUpdateAbilityIconRequest(u8 a, u32 b);
+    BOOL IsCpu();
+    u8 GetUnk15C();
+    void SetUnk15C();
+    MTask *CreateSendAbilityResultTask(MMessageObserver *target);
 
     std::vector<DinoBattlePlayerEvent> mUnkA8; // 0xA8
     u32 unkB4;
@@ -132,6 +136,8 @@ public:
     u32 mUnk14C;                        // 0x14C
     u32 unk150;
     u32 mKasekiPoint;                   // 0x154
+    u32 unk158;
+    u8 mUnk15C;                         // 0x15C
 };
 
 
@@ -268,8 +274,15 @@ public:
 
 class SendModelCreatureAbilityResultTask : public MTask {
 public:
+    SendModelCreatureAbilityResultTask(MMessageObserver *view, MMessageObserver *target) {
+        mView = view;
+        mTarget = target;
+    }
     virtual ~SendModelCreatureAbilityResultTask();
     virtual void Execute();
+
+    MMessageObserver *mView;    // 0x10
+    MMessageObserver *mTarget;  // 0x14
 };
 
 class SetLifePointTask : public MTask {

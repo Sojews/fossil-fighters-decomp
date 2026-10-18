@@ -11,6 +11,7 @@
 #include "types.h"
 #include "game/dino_battle_model.h"
 #include "game/dino_battle.h"
+#include "game/dino_battle_cpu_controller.h"
 #include "game/dino_battle_user_controller.h"
 #include "game/set_status_effect_task.h"
 
@@ -657,3 +658,22 @@ extern "C" BOOL func_ov000_0216c83c(int value) {
 #pragma auto_inline on
 
 #pragma auto_inline off
+
+BOOL DinoBattleModelPlayer::IsCpu() {
+    if (dynamic_cast<DinoBattleCpuController *>((DinoBattleController *)mBattle->GetUnk1F4(mUnkB8)) != NULL) {
+        return TRUE;
+    }
+    return FALSE;
+}
+
+u8 DinoBattleModelPlayer::GetUnk15C() {
+    return mUnk15C;
+}
+
+void DinoBattleModelPlayer::SetUnk15C() {
+    mUnk15C = 1;
+}
+
+MTask *DinoBattleModelPlayer::CreateSendAbilityResultTask(MMessageObserver *target) {
+    return new SendModelCreatureAbilityResultTask(mUnkF4, target);
+}
