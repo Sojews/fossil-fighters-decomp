@@ -642,6 +642,15 @@ libs/nitrosdk/src/fs/fs_overlay.c:
     .text       start:0x020780f4 end:0x020784d8
     .data       start:0x020c5658 end:0x020c5660
 
+libs/nitrosdk/src/dgt/hash1.c:
+    .text       start:0x020784d8 end:0x02078944
+
+libs/nitrosdk/src/dgt/hash2.c:
+    .text       start:0x02078944 end:0x02078bd8
+
+libs/nitrosdk/src/dgt/hmac.c:
+    .text       start:0x02078bd8 end:0x02078ccc
+
 libs/nitrosdk/src/cp/cp_context.c:
     complete
     .text       start:0x02078f60 end:0x02078fdc
