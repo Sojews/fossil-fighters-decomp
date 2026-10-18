@@ -21,6 +21,7 @@
 #include "m/observer.h"
 #include "m/multi_play.h"
 #include "m/text_codec.h"
+#include "game/dino_multi_play_icon.h"
 #include "m/pal.h"
 #include "game/dino_backup.h"
 #include "nitro/mi.h"
@@ -284,8 +285,8 @@ extern "C" struct {
     u8 unk00[0x4];
     void (DinoUiBattleParentScanner::*StateShowCancel_04)(); // 0x04
     u8 unk0C[0x1C - 0xC];
-    DinoUiWirelessMatchState State02167924_1C; // 0x1c
-    u8 unk24[0x2C - 0x24];
+    DinoUiWirelessMatchState StateStartWireless_1C; // 0x1c
+    DinoUiWirelessMatchState StateChildScan_24; // 0x24
     void (DinoUiCannonChild::*StateWaitStart_2C)(); // 0x2c
     void (DinoUiCannonChild::*Child02166dc0_34)(); // 0x34
     void (DinoUiCannonChild::*Leave_3C)(); // 0x3c
@@ -776,7 +777,27 @@ void DinoUiWirelessMatch::StateAnswered() {
     MSerialTaskSet *serial = &mSerial;
     serial->AddTail(stopping);
     serial->AddTail(load);
-    mState = data_ov004_02174150.State02167924_1C;
+    mState = data_ov004_02174150.StateStartWireless_1C;
+}
+
+extern const u32 data_0208ab48, data_0208ab60;
+
+// Starts the wireless connection and scans for parents.
+void DinoUiWirelessMatch::StateStartWireless() {
+    mHelpDisabler = new DinoHelpDisabler;
+    MDisableSoftReset();
+    MDisableSleep();
+    mMultiPlay = new MMultiPlay(0x400868, 2, 9, 0x10000, -1, -1);
+    mMultiPlay->SetParentLifetime(1200);
+    mParallel.AddTail(mMultiPlay);
+    mUnk80 = new DinoMultiPlayIcon;
+    mParallel.AddTail(mUnk80);
+    mChosen = 2;
+    AddSerial(this, mMultiPlay->CreateInitializeTask(),
+              new DinoCommonWindowMessageBox(MPoint(0x80, 0x60), gDinoResource->GetText(data_0208ab48), 4),
+              new DinoCommonWindowMessageBox(MPoint(0x80, 0x60), gDinoResource->GetText(data_0208ab60), 4),
+              gCurrentDisplay->mBlend->CreateFadeRatioAnime(8, 0, 10, 0));
+    mState = data_ov004_02174150.StateChildScan_24;
 }
 
 // Ends the scan and leaves after half a second.
