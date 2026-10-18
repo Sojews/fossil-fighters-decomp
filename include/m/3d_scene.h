@@ -30,6 +30,7 @@ public:
     void SetUnk14C(u32 a, u32 b);
     void SetUnk164(u32 a, u32 b);
     void SetUnk80(u32 a, u32 b);
+    MTask *CreateEnableTask(u8 enable);
 
     u32 mUnk10;                 // 0x10
     u32 mUnk14;                 // 0x14
@@ -46,7 +47,8 @@ public:
     u32 mUnk80;                 // 0x80
     u32 mUnk84;                 // 0x84
     M3d *mM3d;                  // 0x88
-    u8 unk8C[0xBC];
+    u8 unk8C[0xB8];
+    u8 mEnabled;                // 0x144
     u32 mUnk148;                // 0x148
     u32 mUnk14C;                // 0x14C
     u32 mUnk150;                // 0x150

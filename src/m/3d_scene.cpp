@@ -3,6 +3,7 @@
 
 #include "m/3d_scene.h"
 #include "m/3d.h"
+#include "m/3d_scene_enable_task.h"
 
 extern "C" void G3X_SetClearColor(u16 rgb, int alpha, int depth, int polygonID, BOOL fog);
 
@@ -80,4 +81,8 @@ void M3DScene::SetUnk80(u32 a, u32 b) {
 }
 
 void M3DScene::Unk0C() {
+}
+
+MTask *M3DScene::CreateEnableTask(u8 enable) {
+    return new M3DSceneEnableTask(this, enable);
 }
