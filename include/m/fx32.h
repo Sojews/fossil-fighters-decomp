@@ -14,7 +14,9 @@ public:
         return r;
     }
     MFx32 Mul(MFx32 b) const;
+    MFx32 &operator+=(MFx32 b);
     MFx32 &operator*=(MFx32 b);
+    MFx32 &operator/=(MFx32 b);
 
     fx32 v;
 };
@@ -77,6 +79,11 @@ inline MFx32 MFx32::Mul(MFx32 b) const {
     return r;
 }
 
+inline MFx32 &MFx32::operator+=(MFx32 b) {
+    *this = *this + b;
+    return *this;
+}
+
 inline MFx32 &MFx32::operator*=(MFx32 b) {
     *this = *this * b;
     return *this;
@@ -86,6 +93,11 @@ inline MFx32 operator/(MFx32 a, MFx32 b) {
     MFx32 r;
     r.v = FX_Div(a.v, b.v);
     return r;
+}
+
+inline MFx32 &MFx32::operator/=(MFx32 b) {
+    *this = *this / b;
+    return *this;
 }
 
 struct MFx32Point {

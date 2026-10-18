@@ -13,7 +13,10 @@ struct DinoBattleCreatureDef {
     u8 unk22;
     u8 mUnk23;          // 0x23
     u32 mUnk24;         // 0x24: flags
-    u8 unk28[0x61 - 0x28];
+    u8 unk28[0x54 - 0x28];
+    u32 mUnk54;         // 0x54: offset of its support effect on its own side (s8)
+    u32 mUnk58;         // 0x58: offset of its support effect on the other side (s8)
+    u8 unk5C[0x61 - 0x5C];
     u8 mUnk61;          // 0x61
     u8 mUnk62;          // 0x62: a percentage
     u8 unk63[0x68 - 0x63];

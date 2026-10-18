@@ -76,7 +76,9 @@ template <class T> inline const T *DinoOffsetPtr(const void *base, u32 offset) {
     return offset == 0 ? NULL : (const T *)((const u8 *)base + offset);
 }
 struct DinoBattleAdjustDefs {
-    u8 unk000[0x14];
+    u8 unk000[0x10];
+    MFx32 unk10;            // 0x10: divides the damage
+
     MFx32 unk14;            // 0x14
     u32 unk18[2];
     MFx32 randomMin;        // 0x20: the range of the random damage factor
@@ -96,7 +98,9 @@ struct DinoBattleAdjustDefs {
     u32 backdropTop;    // 0x154: offset of the backdrops' top colors (DinoRgb)
     u32 unk158;
     u32 backdropBottom; // 0x15C: offset of their bottom colors
-    u32 unk160[3];
+    u32 unk160[2];
+    u8 unk168;          // 0x168: whether the support effects apply
+    u8 unk169[3];
     MFx32 pinchRatio;   // 0x16C: at or below this share of its life, a creature is in a pinch
 };
 
