@@ -268,13 +268,15 @@ void DinoUiCannonParentScanner::ShowCount() {
 // points to).
 typedef void (DinoUiWirelessMatch::*DinoUiWirelessMatchState)();
 extern "C" struct {
-    u8 unk00[0x14];
+    u8 unk00[0x10];
+    const char *mDigitPath;     // 0x10: the count's digits
     const char *mParentPath2;   // 0x14: the parent items' motions, by mode
     u32 mMaxRockCount;          // 0x18
     const char *mParentPath0;   // 0x1c
     const char *mCancelPath;    // 0x20
     const char *mParentPath1;   // 0x24
-    u8 unk28[0x34 - 0x28];
+    u8 unk28[0x30 - 0x28];
+    const char *mCountFramePath; // 0x30
     DinoUiWirelessMatchState StateAfterReset; // 0x34
     void (DinoUiCannonChild::*Leave_3C)(); // 0x3c
     DinoUiWirelessMatchState StateInit; // 0x44
@@ -321,7 +323,7 @@ extern "C" struct {
     void (DinoUiCannonParentScanner::*StateCheckFailed_64)(); // 0x64
     void (DinoUiCannonParentScanner::*State021664c0_6C)(); // 0x6c
     u8 unk74[0x7C - 0x74];
-    void (DinoUiCannonParentScanner::*ParentStart_7C)(); // 0x7c
+    void (DinoUiCannonParentScanner::*StateStart_7C)(); // 0x7c
 } data_ov004_021741d0;
 extern "C" struct {
     u8 unk00[0x4];
@@ -343,7 +345,8 @@ extern "C" struct {
     void (DinoUiCannonParentScanner::*StateWaitChildren_7C)(); // 0x7c (its second word is in the next block)
 } data_ov004_02174250;
 extern "C" struct {
-    u8 unk00[0xC];
+    u8 unk00[0x4];
+    void (DinoUiCannonParentScanner::*StateShowCancel_04)(); // 0x04
     void (DinoUiBattleParentScanner::*StateShowCancel_0C)(); // 0x0c
     void (DinoUiChildScannerBattleConnect::*StateConnecting_14)(); // 0x14
     void (DinoUiCannonParentScanner::*StateCancelled_1C)(); // 0x1c
@@ -385,6 +388,14 @@ extern "C" struct {
     u8 unk00[0x4];
     DinoUiWirelessMatchState StateChildScan;    // 0x4
 } data_ov004_021743d0;
+
+static inline void AddParallel(MProcess *process, MTask *a, MTask *b, MTask *c, MTask *d) {
+    MParallelTaskSet *parallel = &process->mParallel;
+    parallel->AddTail(a);
+    parallel->AddTail(b);
+    parallel->AddTail(c);
+    parallel->AddTail(d);
+}
 
 static inline void AddSerial(MProcess *process, MTask *a, MTask *b) {
     MSerialTaskSet *serial = &process->mSerial;
@@ -854,6 +865,54 @@ void DinoUiCannonParentScanner::StateListen() {
 }
 
 extern const u32 data_0208ab64;
+
+// Dims the screen, shows the count and starts being a parent with the owner's name.
+// NONMATCHING: the game swaps the stack slots of the ones digit and the show transfer
+void DinoUiCannonParentScanner::StateStart() {
+    gCurrentDisplay->mBlend->Reset();
+    gCurrentDisplay->mBlend->SetMode(3);
+    MBlend *blend = gCurrentDisplay->mBlend;
+    blend->SetTarget1(data_ov004_02177284->GetPlaneMask());
+    mCount = 0;
+    mOam = new MSmartOam(10, 0, 1);
+    mOam->mHidden = TRUE;
+    mFrame = new MMotion(data_ov004_021740d0.mCountFramePath, mOam, 0, 1);
+    mFrame->SetPosition(0x80, 0x60);
+    mFrame->SetPriority(3);
+    mFrame->Play(1, 0);
+    mFrame->Show();
+    mOnes = new MMotion(data_ov004_021740d0.mDigitPath, mOam, 0, 1);
+    mOnes->SetPosition(0x88, 0x60);
+    mOnes->Play(1, 0);
+    mOnes->SetPriority(3);
+    mOnes->Show();
+    mTens = new MMotion(data_ov004_021740d0.mDigitPath, mOam, 0, 1);
+    mTens->SetPosition(0x78, 0x60);
+    mTens->Play(1, 0);
+    mTens->SetPriority(3);
+    mTens->Show();
+    AddParallel(this, mFrame, mOnes, mTens, mOam);
+    mMultiPlay->AddObserver(this);
+    DinoPlayerData player;
+    gDinoBackup->GetPlayer(&player, TRUE);
+    DinoUiWirelessSsid ssid;
+    ssid.mode = 2;
+    MIi_CpuCopy16(player.name, ssid.name, sizeof(ssid.name));
+    MTask *show = mOam->CreateShowTransfer();
+    MTask *fade = gCurrentDisplay->mBlend->CreateFadeRatioAnime(0, 8, 10, 0);
+    MTask *start = mMultiPlay->CreateStartParentTask(&ssid, sizeof(ssid), 0);
+    MSerialTaskSet *starting = new MSerialTaskSet(TRUE);
+    starting->AddTail(start);
+    MParallelTaskSet *opening = new MParallelTaskSet(TRUE);
+    opening->AddTail(starting);
+    opening->AddTail(fade);
+    MSerialTaskSet *serial = &mSerial;
+    serial->AddTail(opening);
+    serial->AddTail(show);
+    mTasks = new MParallelTaskSet;
+    mParallel.AddTail(mTasks);
+    mState = data_ov004_021742d0.StateShowCancel_04;
+}
 
 // Keeps the rocks and profiles the children sent, counts them, and saves.
 void DinoUiCannonParentScanner::StateReceived() {
@@ -1508,7 +1567,7 @@ void DinoUiBattleParentScanner::State02165818() {
 
 DinoUiCannonParentScanner::DinoUiCannonParentScanner(MMultiPlay *multiPlay, u32 *result)
     : MProcess(NULL), mMultiPlay(multiPlay), mResult(result) {
-    mState = data_ov004_021741d0.ParentStart_7C;
+    mState = data_ov004_021741d0.StateStart_7C;
 }
 
 void DinoUiCannonParentScanner::OnConnectMessage(MMessage *msg) {

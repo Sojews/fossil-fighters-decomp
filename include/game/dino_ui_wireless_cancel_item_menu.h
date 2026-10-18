@@ -194,6 +194,7 @@ public:
     void StateWaitChildren();
     void State021664c0();
     void StateReceived();
+    void StateStart();
 
     void (DinoUiCannonParentScanner::*mState)(); // 0xA8
     void (DinoUiCannonParentScanner::*mOnMessage)(MMessage *msg); // 0xB0
@@ -204,7 +205,7 @@ public:
     u32 mSsid[6];                       // 0xC8: what it sent (the first word is its mode)
     MMultiPlayMessageHub *mHub;         // 0xE0
     MSmartOam *mOam;                    // 0xE4
-    u32 unkE8;
+    MMotion *mFrame;                    // 0xE8: around the count
     MMotion *mOnes;                     // 0xEC: the count's digits
     MMotion *mTens;                     // 0xF0
     u32 mCount;                         // 0xF4
