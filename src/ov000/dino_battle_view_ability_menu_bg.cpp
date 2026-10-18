@@ -57,6 +57,29 @@ void AttackMenuBarMotion::SetPriority(int priority) {
     }
 }
 
+// Pooled file statics: the parts' offsets from the bar.
+struct AttackMenuBarStatics {
+    u8 unk00[0x48];
+    MPoint mUnk7COffset;    // 0x48
+    u32 unk50[2];
+    MPoint mUnk80Offset;    // 0x58
+};
+struct AttackMenuBarStatics2 {
+    u8 unk00[0x20];
+    MPoint mUnk78Offset;    // 0x20
+};
+extern "C" AttackMenuBarStatics data_ov000_021947ac;
+extern "C" AttackMenuBarStatics2 data_ov000_0219482c;
+
+void AttackMenuBarMotion::SetPosition(MPoint pos) {
+    mMotion->SetPosition(pos);
+    mUnk80->SetPosition(MPoint(pos.x + data_ov000_021947ac.mUnk80Offset.x, pos.y + data_ov000_021947ac.mUnk80Offset.y));
+    mUnk7C->SetPosition(MPoint(pos.x + data_ov000_021947ac.mUnk7COffset.x, pos.y + data_ov000_021947ac.mUnk7COffset.y));
+    if (mUnk78 != NULL) {
+        mUnk78->SetPosition(MPoint(pos.x + data_ov000_0219482c.mUnk78Offset.x, pos.y + data_ov000_0219482c.mUnk78Offset.y));
+    }
+}
+
 MPoint AttackMenuBarMotion::GetPosition() {
     return mMotion->GetPosition();
 }
@@ -89,6 +112,10 @@ void AttackMenuBarMotion::Play(int anime) {
 
 MRect AttackMenuBarMotion::GetFrame() {
     return mMotion->GetFrame();
+}
+
+void DinoBattleViewUiAbilityMenuItem::SetBarPosition(MPoint pos) {
+    mUnk98->SetPosition(pos);
 }
 
 MPoint DinoBattleViewUiAbilityMenuItem::GetBarPosition() {

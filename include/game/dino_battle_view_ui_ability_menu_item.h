@@ -22,6 +22,7 @@ public:
     virtual MRect GetRect();
 
     MPoint GetBarPosition();
+    void SetBarPosition(MPoint pos);
     u32 GetUnk8C();
     u8 GetUnk94();
     u32 GetUnk90();
@@ -60,6 +61,7 @@ public:
 
     void Init(MSmartOam *oam, u32 attack, bool flag1, bool flag2, bool flag3, bool flag4);
     void SetPriority(int priority);
+    void SetPosition(MPoint pos);
     MPoint GetPosition();
     void Hide();
     void Show();
