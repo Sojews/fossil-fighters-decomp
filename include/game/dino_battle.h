@@ -70,6 +70,7 @@ public:
     virtual ~DinoBattleDebugSelect();
     virtual void Idle();
 
+    void StateCreatureSelect();
     void StateLevelSelect();
 
     u8 mCancelled;              // 0x74: set by the selects

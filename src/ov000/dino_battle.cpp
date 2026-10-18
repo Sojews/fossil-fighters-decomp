@@ -3,6 +3,11 @@
 
 #include "game/battle_select.h"
 #include "game/dino_battle.h"
+#include "game/dino_sound.h"
+#include "m/blend.h"
+#include "m/bright.h"
+#include "m/display.h"
+#include "m/lcd.h"
 
 DinoBattle::~DinoBattle() {
     delete mUnk208;
@@ -53,13 +58,28 @@ void DinoBattleDebugSelect::Idle() {
 
 // The TU's pooled pointer-to-member constants (see menu.cpp).
 extern "C" struct {
-    u8 unk00[0x28];
+    u8 unk00[0x20];
+    void (DinoBattleDebugSelect::*StateLevelSelect_20)(); // 0x20
     void (DinoBattleDebugSelect::*Unk0215a05c_28)();
 } data_ov000_021911ac;
 extern "C" struct {
     u8 unk00[0x10];
     void (DinoBattleAutoDemo::*Start_10)();
 } data_ov000_0219122c;
+
+// Clears both screens and the music and opens the creature select.
+void DinoBattleDebugSelect::StateCreatureSelect() {
+    BOOL unk = mParams.unk00 != 2;
+    gLcd->mMain->SetBackdrop(0x8000);
+    gLcd->mSub->SetBackdrop(0x8000);
+    gLcd->mMain->mBright->Reset();
+    gLcd->mSub->mBright->Reset();
+    gLcd->mMain->mBlend->Reset();
+    gLcd->mSub->mBlend->Reset();
+    DinoSoundStopBgm(-1, 0);
+    mSerial.AddTail(new UseCreatureSelect(&mParams, unk, 2, &mCancelled));
+    mState = data_ov000_021911ac.StateLevelSelect_20;
+}
 
 void DinoBattleDebugSelect::StateLevelSelect() {
     if (mCancelled) {
