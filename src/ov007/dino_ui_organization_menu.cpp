@@ -22,6 +22,8 @@
 #include "game/dino_common_window_message_box.h"
 #include "m/lcd.h"
 #include "m/bright.h"
+#include "game/dino_ui_medal_menu.h"
+#include "game/dino_ui_parts_tab_icon_menu_item.h"
 
 DinoUiOrganizationMenu::~DinoUiOrganizationMenu() {
     gCurrentDisplay->mBlend->Reset();
@@ -784,4 +786,65 @@ void DinoUiOrganizationSlotCreateTask::Idle() {
         Exit();
     }
     mIndex++;
+}
+
+// The sort and tab items (see dino_ui_medal_menu.cpp and dino_ui_parts_tab_icon_menu_item.cpp) are compiled into
+// this file again.
+
+DinoUiSortMenuItem::~DinoUiSortMenuItem() {
+}
+
+DinoUiPartsTabIconMenuItem::~DinoUiPartsTabIconMenuItem() {
+}
+
+MRect DinoUiSortMenuItem::GetRect() {
+    int y = mPos.y;
+    int x = mPos.x;
+    return MRect(MPoint(x, y - 2), MPoint(x + 0x28, y + 0x10));
+}
+
+MDisplay *DinoUiSortMenuItem::GetDisplay() {
+    return MProcess::GetDisplay();
+}
+
+const char *DinoUiSortMenuItem::GetText() {
+    return gDinoResource->GetText(mTextId);
+}
+
+void DinoUiSortMenuItem::OnSelectChanged(BOOL value) {
+}
+
+void DinoUiSortMenuItem::OnDecide() {
+}
+
+void DinoUiSortMenuItem::OnFocusChanged(BOOL value) {
+}
+
+MRect DinoUiSortMenuItem::GetFrame() {
+    return MRect(mPos, MPoint(mPos.x + 0x28, mPos.y + 0xE));
+}
+
+MRect DinoUiPartsTabIconMenuItem::GetRect() {
+    return GetFrame();
+}
+
+MRect DinoUiPartsTabIconMenuItem::GetFrame() {
+    return mFrame;
+}
+
+MDisplay *DinoUiPartsTabIconMenuItem::GetDisplay() {
+    return MProcess::GetDisplay();
+}
+
+const char *DinoUiPartsTabIconMenuItem::GetText() {
+    return gDinoResource->GetText(mTextId);
+}
+
+void DinoUiPartsTabIconMenuItem::OnSelectChanged(BOOL value) {
+}
+
+void DinoUiPartsTabIconMenuItem::OnDecide() {
+}
+
+void DinoUiPartsTabIconMenuItem::OnFocusChanged(BOOL value) {
 }
