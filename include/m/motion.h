@@ -162,7 +162,7 @@ public:
     void SetOverride(BOOL off);
     void SetPosition(int x, int y);
     MRect GetCellRect(u32 cell);
-    MSmartOamEntry *GetCellEntry(int cell) { return &mEntries[mCells[cell].entry]; }
+    MSmartOamCell *GetCellEntry(int cell) { return &mEntries[mCells[cell].entry]; }
     void SetCellOffset(int cell, int x, int y);
     void SetCellOffsetY(int cell, int y);
     void Command(const char *data, int length);
@@ -178,7 +178,7 @@ public:
     MMotionFile mFile;          // 0x14
     MSmartOam *mOam;            // 0x18
     MSmartOamUnit *mUnit;       // 0x1C
-    MSmartOamEntry *mEntries;   // 0x20
+    MSmartOamCell *mEntries;   // 0x20
     u32 mCellCount;             // 0x24
     u8 mPlaying;                // 0x28
     u8 mHidden;                 // 0x29

@@ -10,8 +10,8 @@ class MDisplay;
 class MSmartOam;
 struct MSmartOamUnit;
 
-struct MSmartOamEntry : public MOamEntry {
-    MSmartOamEntry();
+struct MSmartOamCell : public MOamCell {
+    MSmartOamCell();
 
     void SetChr(MChrBlock *chr);
     void SetPalette(MPalUnit *pal);
@@ -34,7 +34,7 @@ struct MSmartOamEntry : public MOamEntry {
         depth = 0x7FFF - pos.y;
     }
     void SetShape(int shape) {
-        MOamEntry::SetShape(shape);
+        MOamCell::SetShape(shape);
         if (objMode != 3) {
             width = gObjSizes[0][shape].x;
             height = gObjSizes[0][shape].y;
@@ -67,12 +67,12 @@ struct MSmartOamEntry : public MOamEntry {
 
 // A run of entries.
 struct MSmartOamUnit : public MHeapBlock {
-    typedef MSmartOamEntry Entry;
+    typedef MSmartOamCell Entry;
 
     u32 count;          // 0x0C
     MSmartOam *owner;   // 0x10
 
-    MSmartOamEntry *GetEntries() { return (MSmartOamEntry *)addr; }
+    MSmartOamCell *GetEntries() { return (MSmartOamCell *)addr; }
     void SetMode(int mode);
     void SetObjMode(int mode);
     void SetAffineParam(int param);
@@ -109,7 +109,7 @@ public:
     int mUnk1C;                 // 0x1C
     MOamUnit *mOamBlock;       // 0x20
     MHeap *mHeap;               // 0x24: over mEntries
-    MSmartOamEntry *mEntries;   // 0x28: mCount, then a terminator
+    MSmartOamCell *mEntries;   // 0x28: mCount, then a terminator
     int *mOrder;                // 0x2C
     MPoint mOffset;             // 0x30
     u8 mHidden;                 // 0x38

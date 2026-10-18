@@ -15,7 +15,7 @@ extern MPoint gObjTileSizes[4][4];
 extern MPoint gObjSizes[4][4];
 
 // One OAM entry (attributes 0-2 and the affine parameter word that shares its last halfword).
-struct MOamEntry {
+struct MOamCell {
     union {
         u32 attr01;
         struct {
@@ -70,11 +70,11 @@ struct MOamEntry {
 
 // A run of OAM entries.
 struct MOamUnit : public MHeapBlock {
-    typedef MOamEntry Entry;
+    typedef MOamCell Entry;
 
     u32 count;  // 0x0C
 
-    MOamEntry *GetEntries() { return (MOamEntry *)addr; }
+    MOamCell *GetEntries() { return (MOamCell *)addr; }
     void SetMode(int mode);
     void SetPriority(int priority);
     void Clear();

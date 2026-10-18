@@ -129,13 +129,13 @@ void MChr256Filter::Filter(const void *src, void *dest, u32 size) {
     MAddPaletteOffset((const u16 *)src, (u16 *)dest, size, mPalette);
 }
 
-void MOamEntry::SetPalette(MPalUnit *pal) {
+void MOamCell::SetPalette(MPalUnit *pal) {
     palette = pal->index;
 }
 
 void MOamUnit::SetMode(int mode) {
     u32 n = count;
-    MOamEntry *entry = GetEntries();
+    MOamCell *entry = GetEntries();
     if (n != 0) {
         do {
             n--;
@@ -147,7 +147,7 @@ void MOamUnit::SetMode(int mode) {
 
 void MOamUnit::SetPriority(int priority) {
     u32 n = count;
-    MOamEntry *entry = GetEntries();
+    MOamCell *entry = GetEntries();
     if (n != 0) {
         do {
             n--;
@@ -158,7 +158,7 @@ void MOamUnit::SetPriority(int priority) {
 }
 
 void MOamUnit::Clear() {
-    MOamEntry *entry;
+    MOamCell *entry;
     u32 n;
     n = count;
     entry = GetEntries();
@@ -174,7 +174,7 @@ void MOamUnit::Clear() {
 }
 
 void MOamUnit::Hide() {
-    MOamEntry *entry = GetEntries();
+    MOamCell *entry = GetEntries();
     u32 n = count;
     if (n != 0) {
         do {
@@ -186,7 +186,7 @@ void MOamUnit::Hide() {
 }
 
 void MOamUnit::Show() {
-    MOamEntry *entry = GetEntries();
+    MOamCell *entry = GetEntries();
     u32 n = count;
     if (n != 0) {
         do {
@@ -198,7 +198,7 @@ void MOamUnit::Show() {
 }
 
 MOam::MOam(u32 base, u32 size) : MHeap(base, size, sizeof(MOamUnit)) {
-    MOamEntry *entry = (MOamEntry *)base;
+    MOamCell *entry = (MOamCell *)base;
     for (u32 i = 0; i < 128; i++) {
         entry->Clear();
         entry++;
@@ -213,7 +213,7 @@ MOam::~MOam() {
 }
 
 MOamUnit *MOam::Alloc(u32 count, BOOL fromEnd) {
-    MOamUnit *block = (MOamUnit *)MHeap::Alloc(count * sizeof(MOamEntry), fromEnd, 4, 0, 0, 0);
+    MOamUnit *block = (MOamUnit *)MHeap::Alloc(count * sizeof(MOamCell), fromEnd, 4, 0, 0, 0);
     block->count = count;
     return block;
 }

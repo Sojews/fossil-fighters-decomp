@@ -405,7 +405,7 @@ void MMotion::SetPosition(MPoint pos) {
     mPos = pos;
     for (u32 i = 0; i < mCellCount; i++) {
         MMotionCell *cell = &mCells[i];
-        MSmartOamEntry *entry = &mEntries[cell->entry];
+        MSmartOamCell *entry = &mEntries[cell->entry];
         int y = pos.y + cell->offsetY;
         entry->posX = pos.x;
         entry->posY = y;
@@ -448,7 +448,7 @@ void MMotion::Show() {
         MMotionCell *cell = &mCells[i];
         if (cell->visible) {
             int mode = cell->objMode;
-            MSmartOamEntry *entry = &mEntries[cell->entry];
+            MSmartOamCell *entry = &mEntries[cell->entry];
             entry->objMode = mode;
             if (mode != 3) {
                 MPoint size = gObjSizes[0][entry->GetShape()];
@@ -499,7 +499,7 @@ void MMotion::ResetAnime() {
         mCells[i].objMode = 0;
         mCells[i].offsetY = 0;
         mCells[i].unk14 = MPoint(0, 0);
-        MSmartOamEntry *entry = &mEntries[i];
+        MSmartOamCell *entry = &mEntries[i];
         entry->unk08 = 0;
         entry->unk0C = mUnk50;
         entry->SetCoord(mPos);
@@ -685,7 +685,7 @@ void MMotion::SetCellOffset(int cell, int x, int y) {
     mCells[cell].unk14 = MPoint(x, y);
     int ox = mCells[cell].unk14.x;
     int oy = mCells[cell].unk14.y;
-    MSmartOamEntry *entry = &mEntries[mCells[cell].entry];
+    MSmartOamCell *entry = &mEntries[mCells[cell].entry];
     if (mUnk2B || mUnk2C) {
         int shape = entry->GetShape();
         int w = gObjSizes[0][shape].x;
@@ -708,7 +708,7 @@ void MMotion::SetCellOffset(int cell, int x, int y) {
 void MMotion::SetCellOffsetY(int cell, int y) {
     mCells[cell].offsetY = y;
     int posY = mPos.y + y;
-    MSmartOamEntry *entry = &mEntries[mCells[cell].entry];
+    MSmartOamCell *entry = &mEntries[mCells[cell].entry];
     entry->posX = mPos.x;
     entry->posY = posY;
     entry->depth = 0x7FFF - posY;
@@ -721,7 +721,7 @@ void MMotion::SetAnimeState(int index, int a, int b) {
 void MMotion::ShowCell(int cell) {
     mCells[cell].visible = TRUE;
     if (!mHidden) {
-        MSmartOamEntry *entry = &mEntries[mCells[cell].entry];
+        MSmartOamCell *entry = &mEntries[mCells[cell].entry];
         int mode = mCells[cell].objMode;
         entry->objMode = mode;
         if (mode != 3) {
@@ -760,7 +760,7 @@ void MMotion::SetCellRect(int cell, MRect rect) {
 }
 
 void MMotion::SetCellPalette(int cell, u32 pal) {
-    MSmartOamEntry *entry = &mEntries[mCells[cell].entry];
+    MSmartOamCell *entry = &mEntries[mCells[cell].entry];
     void *data = mFile.GetPalette(pal, mUnk78 != NULL ? &mUnk78->palettes[cell] : NULL);
     if (mFlags & 1) {
         entry->SetPalette(mPalettes[cell]);

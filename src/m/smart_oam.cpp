@@ -4,7 +4,7 @@
 #include "m/display.h"
 
 
-void MSmartOamEntry::SetChr(MChrBlock *chr) {
+void MSmartOamCell::SetChr(MChrBlock *chr) {
     u32 tile = chr->tile;
     if (colors256 == 1) {
         tile <<= 1;
@@ -12,13 +12,13 @@ void MSmartOamEntry::SetChr(MChrBlock *chr) {
     this->tile = tile;
 }
 
-void MSmartOamEntry::SetPalette(MPalUnit *pal) {
+void MSmartOamCell::SetPalette(MPalUnit *pal) {
     palette = pal->index;
 }
 
 void MSmartOamUnit::SetMode(int mode) {
     u32 n = count;
-    MSmartOamEntry *entry = GetEntries();
+    MSmartOamCell *entry = GetEntries();
     if (n != 0) {
         do {
             n--;
@@ -29,7 +29,7 @@ void MSmartOamUnit::SetMode(int mode) {
 }
 
 void MSmartOamUnit::SetObjMode(int mode) {
-    MSmartOamEntry *entry = GetEntries();
+    MSmartOamCell *entry = GetEntries();
     u32 n = count;
     if (n != 0) {
         do {
@@ -53,7 +53,7 @@ void MSmartOamUnit::SetObjMode(int mode) {
 
 void MSmartOamUnit::SetAffineParam(int param) {
     u32 n = count;
-    MSmartOamEntry *entry = GetEntries();
+    MSmartOamCell *entry = GetEntries();
     if (n != 0) {
         do {
             n--;
@@ -64,7 +64,7 @@ void MSmartOamUnit::SetAffineParam(int param) {
 }
 
 void MSmartOamUnit::SetFlip(BOOL hflip, BOOL vflip) {
-    MSmartOamEntry *entry = GetEntries();
+    MSmartOamCell *entry = GetEntries();
     u32 n = count;
     if (n != 0) {
         do {
@@ -78,7 +78,7 @@ void MSmartOamUnit::SetFlip(BOOL hflip, BOOL vflip) {
 
 void MSmartOamUnit::SetPriority(int priority) {
     u32 n = count;
-    MSmartOamEntry *entry = GetEntries();
+    MSmartOamCell *entry = GetEntries();
     if (n != 0) {
         do {
             n--;
@@ -89,7 +89,7 @@ void MSmartOamUnit::SetPriority(int priority) {
 }
 
 void MSmartOamUnit::SetAnchor(int anchor) {
-    MSmartOamEntry *entry;
+    MSmartOamCell *entry;
     u32 n;
     n = count;
     entry = GetEntries();
@@ -103,7 +103,7 @@ void MSmartOamUnit::SetAnchor(int anchor) {
 }
 
 void MSmartOamUnit::Clear() {
-    MSmartOamEntry *entry = GetEntries();
+    MSmartOamCell *entry = GetEntries();
     u32 n = count;
     if (n != 0) {
         do {
@@ -115,7 +115,7 @@ void MSmartOamUnit::Clear() {
 }
 
 void MSmartOamUnit::Hide() {
-    MSmartOamEntry *entry = GetEntries();
+    MSmartOamCell *entry = GetEntries();
     u32 n = count;
     if (n != 0) {
         do {
@@ -127,7 +127,7 @@ void MSmartOamUnit::Hide() {
 }
 
 void MSmartOamUnit::Show() {
-    MSmartOamEntry *entry = GetEntries();
+    MSmartOamCell *entry = GetEntries();
     u32 n = count;
     if (n != 0) {
         do {
@@ -170,7 +170,7 @@ MSmartOam::MSmartOam(MDisplay *display, int count, int oamCount, BOOL fromEnd) {
 
 void MSmartOam::Init(BOOL fromEnd) {
     mOamBlock = mDisplay->mObj->mOam->Alloc(mOamCount, fromEnd);
-    mEntries = new MSmartOamEntry[mCount + 1];
+    mEntries = new MSmartOamCell[mCount + 1];
     mOrder = new int[mCount + 1];
     mOrder[0] = mCount;
     mEntries[mCount].links = 0;
@@ -178,7 +178,7 @@ void MSmartOam::Init(BOOL fromEnd) {
         mOrder[i] = i - 1;
         mEntries[i - 1].links = i;
     }
-    MSmartOamEntry *entry = mEntries;
+    MSmartOamCell *entry = mEntries;
     u32 n = mCount;
     if (n != 0) {
         do {
@@ -188,10 +188,10 @@ void MSmartOam::Init(BOOL fromEnd) {
         } while (n != 0);
     }
     entry->Clear();
-    mHeap = new MHeap((u32)mEntries, mCount * sizeof(MSmartOamEntry), sizeof(MSmartOamEntry));
+    mHeap = new MHeap((u32)mEntries, mCount * sizeof(MSmartOamCell), sizeof(MSmartOamCell));
 }
 
-MSmartOamEntry::MSmartOamEntry() {
+MSmartOamCell::MSmartOamCell() {
 }
 
 MSmartOam::~MSmartOam() {
@@ -208,10 +208,10 @@ void MSmartOam::SetUnk1C(int value) {
 MSmartOamUnit *MSmartOam::Alloc(int count, BOOL fromEnd) {
     MScopedLock lock(&mHeap->mMutex, TRUE);
     MSmartOamUnit *block =
-        (MSmartOamUnit *)mHeap->Alloc(count * sizeof(MSmartOamEntry), fromEnd, 4, 0, 0, 0);
+        (MSmartOamUnit *)mHeap->Alloc(count * sizeof(MSmartOamCell), fromEnd, 4, 0, 0, 0);
     block->count = count;
     block->owner = this;
-    MSmartOamEntry *entry = block->GetEntries();
+    MSmartOamCell *entry = block->GetEntries();
     while (count != 0) {
         count--;
         entry->block = block;
