@@ -18,6 +18,7 @@
 
 struct DinoPlayerProfile;
 class DinoUiWirelessCancel;
+class MSmartOam;
 
 // A wireless partner's MAC address.
 struct DinoMacAddress {
@@ -74,7 +75,9 @@ public:
     u32 unkBC;
     BOOL mAnswer;                   // 0xC0: whether to exchange
     MTaskSet *mTasks;               // 0xC4
-    u8 unkC8[0xD4 - 0xC8];
+    u32 unkC8;
+    MSmartOam *mOam;                // 0xCC: the count's
+    u32 unkD0;
     MMotion *mOnes;                 // 0xD4: the count's digits
     MMotion *mTens;                 // 0xD8
     u32 mCount;                     // 0xDC

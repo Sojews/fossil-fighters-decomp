@@ -12,6 +12,10 @@
 #include "game/dino_backup.h"
 #include "game/dino_resource.h"
 #include "m/seed_generator.h"
+#include "m/smart_oam.h"
+#include "game/dino_sound.h"
+#include "m/sleep.h"
+#include "m/soft_reset.h"
 #include "game/dino_common_window_message_box.h"
 #include "game/dino_common_window_yes_no_dialog.h"
 #include "game/dino_ui_wireless_cancel_item_menu.h"
@@ -211,6 +215,36 @@ void DinoUiExchange::StateQuit() {
 void DinoUiExchange::StateLeave() {
     mSerial.AddTail(mMultiPlay->CreateFinishTask());
     mState = data_ov004_02171e60.StateFinish_7C;
+}
+
+extern const u32 data_0208ab38, data_0208ab3c;
+
+// Ends wireless play and says how many exchanges were made (if any), then fades out and leaves.
+void DinoUiExchange::StateFinish() {
+    MEnableSoftReset();
+    MEnableSleep();
+    DinoSoundPlayBgm(0x77, 0);
+    if (mCount != 0) {
+        MTask *box = new DinoCommonWindowMessageBox(data_ov004_02171e60.mMessagePos, gDinoResource->GetText(data_0208ab3c), 4);
+        MTask *exit = MTaskExitTransfer::Create(this);
+        MTask *fade = gCurrentDisplay->mBlend->CreateFadeRatioAnime(8, 0, 10, 0);
+        MTask *hide = mOam->CreateHideTransfer();
+        MSerialTaskSet *serial = &mSerial;
+        serial->AddTail(box);
+        serial->AddTail(hide);
+        serial->AddTail(fade);
+        serial->AddTail(exit);
+    } else {
+        MTask *box = new DinoCommonWindowMessageBox(data_ov004_02171e60.mMessagePos, gDinoResource->GetText(data_0208ab38), 4);
+        MTask *exit = MTaskExitTransfer::Create(this);
+        MTask *fade = gCurrentDisplay->mBlend->CreateFadeRatioAnime(8, 0, 10, 0);
+        MTask *hide = mOam->CreateHideTransfer();
+        MSerialTaskSet *serial = &mSerial;
+        serial->AddTail(box);
+        serial->AddTail(hide);
+        serial->AddTail(fade);
+        serial->AddTail(exit);
+    }
 }
 
 void DinoUiExchange::StateWait() {
