@@ -5316,7 +5316,7 @@ _ZNSt20__vec_deleter_helperI21MMultiPlayHubIncomingRSaIS0_EED1Ev kind:function(t
 func_0206c59c kind:function(thumb,size=0x10) addr:0x0206c59c
 func_0206c5ac kind:function(thumb,size=0x34) addr:0x0206c5ac
 func_0206c5e0 kind:function(thumb,size=0x26) addr:0x0206c5e0
-func_0206c608 kind:function(thumb,size=0x34) addr:0x0206c608
+_ZNSt13__vec_deleterI21MMultiPlayHubIncomingRSaIS0_EE8allocateEmN10Metrowerks8int2typeILi1EEE kind:function(thumb,size=0x34) addr:0x0206c608
 _ZNSt13__vec_deleterI21MMultiPlayHubIncomingRSaIS0_EED2Ev kind:function(thumb,size=0x26) addr:0x0206c63c
 _ZThn16_N10MMultiPlayD0Ev kind:function(thumb,size=0x1c) addr:0x0206c664
 _ZThn16_N10MMultiPlayD1Ev kind:function(thumb,size=0x1c) addr:0x0206c680
