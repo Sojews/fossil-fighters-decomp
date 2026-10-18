@@ -57,6 +57,9 @@ void DinoUi2PartsKasekiButton::SetMarked(BOOL marked) {
     }
 }
 
+void DinoUi2PartsKasekiButton::SetActive(BOOL active) {
+}
+
 void DinoUi2PartsKasekiButton::HideMotion() {
     mMotion->Hide();
 }

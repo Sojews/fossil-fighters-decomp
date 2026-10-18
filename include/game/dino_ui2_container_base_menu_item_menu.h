@@ -37,10 +37,13 @@ public:
     MSmartOam *mOam;                // 0x104
     u32 mUnk108;                    // 0x108
     std::vector<void *> mItems;     // 0x10C: this page's items
-    u32 mUnk118[3];                 // 0x118
+    u32 mUnk118[2];                 // 0x118
+    MMenuItem *mBack;               // 0x120
     MMenuItem *mLinkFrom;           // 0x124: linked to the first page item
     u32 mUnk128[3];
     std::vector<unsigned short> mUnk134; // 0x134: (the element type is a guess, distinct from other overlays')
+    u8 mSelected;                   // 0x140: 0xFF for none
+    u8 mIdled;                      // 0x141: set once the menu has idled (decides only count after)
     void OnBackDecided();
     BOOL PageRight();
     BOOL PageLeft();

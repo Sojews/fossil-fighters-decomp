@@ -4,6 +4,10 @@
 // The buttons' destructors have the base destructor body inlined; auto-inlining the one defined above does that.
 #pragma auto_inline on
 
+#include "m/input.h"
+
+#include "game/dino_ui2_parts_kaseki_button.h"
+
 #include "m/blend.h"
 #include "game/dino_ui2_container_base_menu_item_menu.h"
 #include "game/dino_ui2_container_base_menu_item.h"
@@ -204,6 +208,19 @@ u8 DinoUi2ContainerBaseMenu::GetFlag(int index) {
     return mFlags[index];
 }
 
+// Entries that can't be marked now (and aren't) are greyed out.
+void DinoUi2ContainerBaseMenu::RefreshMarks() {
+    for (int i = 0; i < mItems.size(); i++) {
+        DinoBackupEntry entry;
+        GetEntry(mPage * 8 + i, &entry);
+        if (!GetFlag(mPage * 8 + i) && (!IsMarkable(&entry) || !CanMark())) {
+            ((DinoUi2PartsKasekiButton *)mItems[i])->SetActive(FALSE);
+        } else {
+            ((DinoUi2PartsKasekiButton *)mItems[i])->SetActive(TRUE);
+        }
+    }
+}
+
 void DinoUi2ContainerBaseMenu::SetFlag(int index, u8 value) {
     if (value != mFlags[index]) {
         mFlags[index] = value;
@@ -215,6 +232,58 @@ void DinoUi2ContainerBaseMenu::SetFlag(int index, u8 value) {
             DinoSoundPlaySe(0x9D, 0);
         }
         RefreshMarks();
+    }
+}
+
+// X jumps to the decide button; B unmarks the selected entry, or goes to (and then presses) the back button.
+void DinoUi2ContainerBaseMenu::OnIdle() {
+    mIdled = TRUE;
+    if (GetInput()->GetPressed() & 8) {
+        FocusItem(mLinkFrom);
+    }
+    if (GetInput()->GetPressed() & 2) {
+        if (mSelected != 0xFF && GetFlag(mSelected)) {
+            SetFlag(mSelected, FALSE);
+            ((DinoUi2PartsKasekiButton *)mItems[mSelected % 8])->SetMarked(FALSE);
+            return;
+        }
+        if (mBack->IsFocused()) {
+            mBack->Decide();
+        } else {
+            FocusItem(mBack);
+        }
+    }
+}
+
+// An entry button: marks it (if it and the container allow) or unmarks it.
+void DinoUi2ContainerBaseMenu::OnDecide(MMenuItem *item) {
+    for (int i = 0; i < 8; i++) {
+        if (item == mItems[i]) {
+            if (!mIdled) {
+                return;
+            }
+            u32 index = mPage * 8 + i;
+            if (index >= mUnk134.size()) {
+                return;
+            }
+            u8 flag = !GetFlag(index);
+            if (flag) {
+                DinoBackupEntry entry;
+                GetEntry(mPage * 8 + i, &entry);
+                if (!IsMarkable(&entry)) {
+                    DinoSoundPlaySe(0xA4, 0);
+                    return;
+                }
+                if (!CanMark()) {
+                    DinoSoundPlaySe(0xA4, 0);
+                    mSerial.AddTail(CreateUnk2C());
+                    return;
+                }
+            }
+            SetFlag(mPage * 8 + i, flag);
+            ((DinoUi2PartsKasekiButton *)mItems[i])->SetMarked(flag);
+            return;
+        }
     }
 }
 

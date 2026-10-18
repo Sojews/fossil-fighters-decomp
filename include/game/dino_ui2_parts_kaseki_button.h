@@ -17,6 +17,7 @@ public:
     virtual const char *GetText();
 
     void SetMarked(BOOL marked);
+    void SetActive(BOOL active);    // (does nothing here)
     void HideMotion();
 
     MPoint mPos;        // 0x94: the center
