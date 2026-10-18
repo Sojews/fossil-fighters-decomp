@@ -4,11 +4,28 @@
 #include "game/dino_cleaning_image_view.h"
 #include "game/dino_cleaning_image.h"
 #include "m/smart_oam.h"
+#include "m/bg.h"
+#include "m/display.h"
+#include "m/pal.h"
 #include "game/dino_cleaning_new_dust.h"
 #include "game/dino_cleaning_last_dust.h"
 #include "game/dino_cleaning_image_view_scale_anime.h"
 
 #pragma auto_inline off
+
+DinoCleaningImageView::~DinoCleaningImageView() {
+    delete mOamTasks;
+    operator delete(mUnkD9F8);
+    delete mPalTasks;
+    for (std::vector<DinoCleaningImage *>::iterator it = mImages.begin(); it != mImages.end(); it++) {
+        delete *it;
+    }
+    MBg *bg = mDisplay->mBg;
+    bg->DeleteIndexBitmap((MIndexBitmap *) mScreen);
+    if (!mKeepPal) {
+        bg->mPal->Free(mPal);
+    }
+}
 
 void DinoCleaningImageView::AddImage(DinoCleaningImage *image) {
     image->mView = this;

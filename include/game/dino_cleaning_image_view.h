@@ -6,6 +6,7 @@
 #include <vector>
 #include "m/affine_screen.h"
 #include "m/fx32.h"
+#include "m/motion.h"
 
 class DinoCleaningImage;
 class MPalBlock;
@@ -34,7 +35,8 @@ public:
     void SetScale(MFx32 scale);
     MTask *CreateScaleAnime(MFx32 from, MFx32 to, int duration, int ease);
 
-    u32 unk18[2];
+    u8 mKeepPal;                                // 0x18: the palette isn't the view's to free
+    MDisplay *mDisplay;                         // 0x1C
     MPoint mPos;                                // 0x20
     MAffineScreen *mScreen;                     // 0x28
     MPalBlock *mPal;                            // 0x2C
@@ -44,9 +46,10 @@ public:
     u32 mUnkD9E0;                               // 0xD9E0
     u32 unkD9E4[4];
     MSmartOam *mOam;                            // 0xD9F4
-    u32 unkD9F8;
+    void *mUnkD9F8;                             // 0xD9F8
     MTaskSet *mOamTasks;                        // 0xD9FC
-    u32 unkDA00[4];
+    MMotionFile mMotion;                        // 0xDA00
+    std::vector<u16> mUnkDA04;                  // 0xDA04
     MTaskSet *mPalTasks;                        // 0xDA10
 };
 
