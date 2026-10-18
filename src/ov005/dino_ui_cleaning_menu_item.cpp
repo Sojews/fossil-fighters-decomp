@@ -4,6 +4,7 @@
 // Derived destructors have their bases' destructor bodies inlined; auto-inlining the ones defined above does that.
 #pragma auto_inline on
 
+#include "game/dino_ui_cleaning_leave.h"
 #include "game/dino_ui3_parts_rock_name.h"
 
 #include "game/dino_ui3_parts_cursor.h"
@@ -214,4 +215,21 @@ DinoUiCleaningMenu::DinoUiCleaningMenu(DinoEventLoop *event) : MMenu(NULL, 0), m
 
 void DinoUiCleaningTest::Finish() {
     mSerial.AddTail(MTaskExitTransfer::Create(this));
+}
+
+// The test's pooled pointer-to-member constants (see menu.cpp).
+extern "C" struct {
+    u8 unk00[0xC];
+    void (DinoUiCleaningTest::*Setup_0C)();
+    void (DinoUiCleaningTest::*Unk_14)();
+    void (DinoUiCleaningTest::*Finish_1C)();
+} data_ov005_02167204;
+
+DinoUiCleaningTest::DinoUiCleaningTest() : MProcess(NULL) {
+    mState = data_ov005_02167204.Setup_0C;
+}
+
+void DinoUiCleaningTest::Leave() {
+    mSerial.AddTail(new DinoUiCleaningLeave(&mUnk7C));
+    mState = data_ov005_02167204.Finish_1C;
 }

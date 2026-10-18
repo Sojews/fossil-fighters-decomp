@@ -447,3 +447,13 @@ u32 DinoUiTopMenu::GetUnkB4() {
 DinoUiTopMenuLoop::DinoUiTopMenuLoop(u32 arg) : MProcess(NULL), mUnk7C(arg) {
     mState = data_ov004_021720ec.mLoopStart;
 }
+
+// The ending's pooled pointer-to-member constant (see menu.cpp).
+extern "C" struct {
+    u8 unk00[0x1C];
+    void (DinoUiEnding::*Start_1C)();
+} data_ov004_02172eb8;
+
+DinoUiEnding::DinoUiEnding() : MProcess(NULL) {
+    mState = data_ov004_02172eb8.Start_1C;
+}

@@ -4,6 +4,7 @@
 // Derived destructors have their bases' destructor bodies inlined; auto-inlining the ones defined above does that.
 #pragma auto_inline on
 
+#include "m/lcd.h"
 #include "game/dino_sound.h"
 #include "game/dino_ui_atm_menu.h"
 #include "game/dino_ui_atm.h"
@@ -109,4 +110,14 @@ void DinoUiATMBackButton::OnDecide() {
     serial->AddTail(play2);
     mOwner->OnBackDecided();
     DinoSoundPlaySe(0x90, 0);
+}
+
+// The TU's pooled pointer-to-member constants (see menu.cpp).
+extern "C" struct {
+    u8 unk00[0x18];
+    void (DinoUiATM::*Start_18)();
+} data_ov007_0218cbe0;
+
+DinoUiATM::DinoUiATM(u8 arg) : MProcess(gLcd->mSub), mUnk7C(arg) {
+    mState = data_ov007_0218cbe0.Start_18;
 }

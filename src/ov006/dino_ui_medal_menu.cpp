@@ -234,3 +234,13 @@ void DinoUiMedalMenu::FinishPageLeft() {
 template class std::__vec_deleter<u32, std::allocator<u32> >;
 template void std::__vec_deleter<MMotionFile, std::allocator<MMotionFile> >::sub_push_back(const MMotionFile &x, Metrowerks::int2type<false>);
 template void std::__vec_deleter<u32, std::allocator<u32> >::assign<u32 *>(u32 *first, u32 *last, Metrowerks::int2type<true>);
+
+// The list's pooled pointer-to-member constants (see menu.cpp).
+extern "C" struct {
+    u8 unk00[0x1C];
+    void (DinoUiMedalList::*Start_1C)();
+} data_ov006_02194158;
+
+DinoUiMedalList::DinoUiMedalList() : MProcess(NULL), mUnk7C(1), mUnk80(0), mUnk84(0), mUnk85(0) {
+    mState = data_ov006_02194158.Start_1C;
+}
