@@ -4,6 +4,22 @@
 
 #include "m/bg_task.h"
 
+template <class T, class A1>
+class MBgNewTask1 : public MBgTask {
+public:
+    MBgNewTask1(T **result, A1 a1, int thread) : MBgTask(NULL, thread), mResult(result), mA1(a1) {}
+    virtual ~MBgNewTask1() { Cancel(); }
+    virtual void Run() { *mResult = new T(mA1); }
+
+    T **mResult;    // 0x34: gets the object
+    A1 mA1;         // 0x38
+};
+
+template <class T, class A1>
+MTask *MCreateBgNewTask(T **result, A1 a1, int thread) {
+    return new MBgNewTask1<T, A1>(result, a1, thread);
+}
+
 template <class T, class A1, class A2>
 class MBgNewTask2 : public MBgTask {
 public:

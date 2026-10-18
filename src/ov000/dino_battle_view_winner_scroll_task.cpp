@@ -6,6 +6,8 @@
 #include "game/dino_sound.h"
 #include "game/dino_battle_view_winner_scroll_task.h"
 #include "types.h"
+#include "m/bg_new_task.h"
+#include "m/picture.h"
 #include "game/motion_advantage_arrow.h"
 #include "game/dino_battle_view_field.h"
 #include "game/dino_battle_view_class.h"
@@ -87,3 +89,7 @@ void TutorialWindowCloseTask::Execute() {
     func_ov000_0218e680((void *)mUnk10);
     Exit();
 }
+
+// A background load of a text picture (its creator lives in another file).
+template class MBgNewTask1<MTextPicture, const char *>;
+template MTask *MCreateBgNewTask(MTextPicture **result, const char *a1, int thread);

@@ -112,7 +112,7 @@ public:
 // Shows a picture on a text layer (through MSmartText, which scrolls it over a bigger area).
 class MTextPicture : public MFixedSizeView {
 public:
-    MTextPicture(std::string path, BOOL fromEnd, bool loadChr);
+    MTextPicture(std::string path, BOOL fromEnd = TRUE, bool loadChr = false);
     MTextPicture(MDisplay *display, std::string path, BOOL fromEnd = TRUE, bool loadChr = false);
     MTextPicture(const MPictureFile &file, BOOL fromEnd, bool loadChr);
     MTextPicture(MDisplay *display, const MPictureFile &file, BOOL fromEnd, bool loadChr);
