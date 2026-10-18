@@ -36,7 +36,8 @@ public:
 
     MArchivePtr mArchive;       // 0xB4
     MArchiveFile mFile;         // 0xB8
-    u32 mUnkC4[2];              // 0xC4
+    u32 mUnkC4;                 // 0xC4
+    MMenuItem *mBack;           // 0xC8
     MMenuItem *mLinkFrom;       // 0xCC: linked to the first page item
     u32 mUnkD0;
     std::vector<void *> mItems; // 0xD4: this page's items
@@ -45,12 +46,13 @@ public:
     u32 mUnkEC;
     MView *mCursor;             // 0xF0
     u32 mUnkF4;
-    std::vector<u32> mUnkF8;    // 0xF8
+    std::vector<u32> mFossils;  // 0xF8: the fossils for sale
     DinoUi3PartsMoney *mMoney;  // 0x104
     u8 mFlags[0x40];            // 0x108
     int mPage;                  // 0x148
     int mLastPage;              // 0x14C
     u8 mCount;                  // 0x150: how many are chosen
+    u8 mSelected;               // 0x151: 0xFF for none
     u32 mUnk154;
     MMenuItem *mUnk158;         // 0x158
 };

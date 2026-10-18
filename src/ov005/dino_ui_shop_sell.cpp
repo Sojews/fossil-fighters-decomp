@@ -4,6 +4,10 @@
 // Derived destructors have their bases' destructor bodies inlined; auto-inlining the ones defined above does that.
 #pragma auto_inline on
 
+#include "m/input.h"
+
+#include "game/dino_ui3_parts_kaseki_button.h"
+
 #include "game/dino_backup.h"
 
 #include "game/dino_ui3_parts_money.h"
@@ -250,4 +254,40 @@ void DinoUiShopSellMenu::RefreshTotal() {
         }
     }
     mMoney->SetChange(total);
+}
+
+// A fossil button: chooses or unchooses it.
+void DinoUiShopSellMenu::OnDecide(MMenuItem *item) {
+    for (int i = 0; i < 8; i++) {
+        if (item == mItems[i]) {
+            int index = mPage * 8 + i;
+            if (index < mFossils.size()) {
+                u8 flag = !GetFlag(index);
+                SetFlag(mPage * 8 + i, flag);
+                ((DinoUi3PartsKasekiButton *)mItems[i])->SetMarked(flag);
+                RefreshTotal();
+            }
+            return;
+        }
+    }
+}
+
+// X jumps to the sell button; B unchooses the selected fossil, or goes to (and then presses) the back button.
+void DinoUiShopSellMenu::OnIdle() {
+    if (GetInput()->GetPressed() & 8) {
+        FocusItem(mLinkFrom);
+    }
+    if (GetInput()->GetPressed() & 2) {
+        if (mSelected != 0xFF && GetFlag(mSelected)) {
+            SetFlag(mSelected, FALSE);
+            ((DinoUi3PartsKasekiButton *)mItems[mSelected % 8])->SetMarked(FALSE);
+            RefreshTotal();
+            return;
+        }
+        if (mBack->IsFocused()) {
+            mBack->Decide();
+        } else {
+            FocusItem(mBack);
+        }
+    }
 }
