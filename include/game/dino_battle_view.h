@@ -20,8 +20,11 @@ public:
     virtual void OnFocusChanged(BOOL focused);
     virtual void OnSelectChanged(BOOL selected);
     virtual void OnDecide();
+    virtual u32 GetUnk4();  // from the item's row of the root menu table
+    virtual u32 GetUnk0();
 
-    u32 unk88[3];
+    u32 mIndex;     // 0x88: the row
+    u32 unk8C[2];
     void *mOwner;   // 0x94
 };
 

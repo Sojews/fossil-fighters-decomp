@@ -81,6 +81,21 @@ void DinoBattleViewCancelMenuItem::OnDecide() {
 void DinoBattleViewInfoLRItem::OnDecide() {
 }
 
+// The root menu's rows (two words each).
+struct DinoBattleViewUiRootRow {
+    u32 unk0;
+    u32 unk4;
+};
+extern "C" const DinoBattleViewUiRootRow data_ov000_0218fec4[];
+
+u32 DinoBattleViewUiRootMenuItem::GetUnk4() {
+    return data_ov000_0218fec4[mIndex].unk4;
+}
+
+u32 DinoBattleViewUiRootMenuItem::GetUnk0() {
+    return data_ov000_0218fec4[mIndex].unk0;
+}
+
 void DinoBattleViewUiRootMenuItem::OnDecide() {
 }
 
