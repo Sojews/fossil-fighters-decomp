@@ -172,6 +172,9 @@ public:
     DinoBattleCreatureStats GetStats();
     u32 GetUnkE4();
     u32 GetUnkE8();
+    MMessage *CreateMotionEffectRequest();
+    void BeginAction();
+    void EndAction();
     u8 GetUnk174();
     u32 GetUnkEC();
     u32 GetUnkF0();
@@ -210,7 +213,7 @@ public:
         u8 mUnk18;      // 0x18
     };
 
-    u32 mUnkA8;                     // 0xA8
+    MMessageObserver *mView;        // 0xA8
     DinoBattleModelPlayer *mPlayer; // 0xAC
     u32 mUnkB0;                     // 0xB0
     u32 mUnkB4;                     // 0xB4
@@ -235,7 +238,7 @@ public:
     std::vector<void *> mUnk120;    // 0x120
     DinoBattleCreatureStatus mStatus;   // 0x12C
     u8 unk16C[0x174 - 0x16C];
-    u8 mUnk174;                     // 0x174
+    u8 mActing;                     // 0x174
     u32 mUnk178;                    // 0x178
 };
 

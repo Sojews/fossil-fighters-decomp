@@ -258,8 +258,26 @@ u32 DinoBattleModelCreature::GetUnkE8() {
     return mUnkE8;
 }
 
+extern "C" BOOL func_ov000_0218472c(int flag); // a debug switch, always off
+
+MMessage *DinoBattleModelCreature::CreateMotionEffectRequest() {
+    return new DinoBattleViewCreatureMotionEffectRequest(0, mUnkB4, 4, 0, 0, -1);
+}
+
+void DinoBattleModelCreature::BeginAction() {
+    if (!func_ov000_0218472c(0)) {
+        mActing = TRUE;
+        mView->Post(new DinoBattleViewCreatureActionSignal(GetUnkB4(), TRUE));
+    }
+}
+
+void DinoBattleModelCreature::EndAction() {
+    mActing = FALSE;
+    mView->Post(new DinoBattleViewCreatureActionSignal(GetUnkB4(), FALSE));
+}
+
 u8 DinoBattleModelCreature::GetUnk174() {
-    return mUnk174;
+    return mActing;
 }
 
 u32 DinoBattleModelCreature::GetUnkEC() {
@@ -397,7 +415,7 @@ void DinoBattleModelCreature::ResetStatus() {
 }
 
 BOOL DinoBattleModelCreature::IsUnkD244() {
-    if (mUnk174) {
+    if (mActing) {
         return FALSE;
     }
     if (mUnkB8 == 3) {
