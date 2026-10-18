@@ -439,6 +439,26 @@ void DinoBattleModelPlayer::SendUpdateAbilityIconRequest(u8 a, u32 b) {
     mUnkF4->Post(new DinoBattleViewPlayerUpdateAbilityIconRequest(b, mUnkB8, a));
 }
 
+void DinoBattleModelPlayer::PushEvent(u32 a, u32 b, u8 c) {
+    if (a != 0 && b != 0) {
+        mUnkA8.push_back(DinoBattlePlayerEvent(a, b, c));
+    }
+}
+
+DinoBattlePlayerEvent DinoBattleModelPlayer::PopEvent(bool remove) {
+    if (GetUnkAC() != 0) {
+        DinoBattlePlayerEvent &front = mUnkA8[0];
+        u32 a = front.mUnk0;
+        u32 b = front.mUnk4;
+        u8 c = front.mUnk8;
+        if (remove) {
+            mUnkA8.erase(mUnkA8.begin());
+        }
+        return DinoBattlePlayerEvent(a, b, c);
+    }
+    return DinoBattlePlayerEvent(0, 0, 0);
+}
+
 int DinoBattleModelPlayer::GetCreatureCount() {
     return mCreatures.size();
 }

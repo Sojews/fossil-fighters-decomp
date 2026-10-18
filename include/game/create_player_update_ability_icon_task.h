@@ -50,6 +50,25 @@ class MRandom;
 // One side of the battle in the battle model.
 class DinoBattle;
 
+struct DinoBattlePlayerEvent {
+    DinoBattlePlayerEvent(u32 a, u32 b, u8 c) {
+        mUnk0 = a;
+        mUnk4 = b;
+        mUnk8 = c;
+    }
+
+    u32 mUnk0;  // 0x0
+    u32 mUnk4;  // 0x4
+    u8 mUnk8;   // 0x8
+};
+
+// Declared trivial for MSL's containers (as MSL allows), so vectors of it copy with memmove and plain assignment.
+namespace Metrowerks {
+template <> struct is_trivial<DinoBattlePlayerEvent> {
+    static const bool value = true;
+};
+}
+
 class DinoBattleModelPlayer : public MProcess, public MMessageObserver {
 public:
     virtual ~DinoBattleModelPlayer();
@@ -82,10 +101,12 @@ public:
     void CollectCreaturesB8In12(u32 *ids, int *count);
     BOOL AllCreaturesShareDefFlag();
     void SetBattle(DinoBattle *battle);
+    void PushEvent(u32 a, u32 b, u8 c);
+    DinoBattlePlayerEvent PopEvent(bool remove);
     void SendUpdateRequest(u32 arg);
     void SendUpdateAbilityIconRequest(u8 a, u32 b);
 
-    std::vector<u32> mUnkA8;            // 0xA8
+    std::vector<DinoBattlePlayerEvent> mUnkA8; // 0xA8
     u32 unkB4;
     u32 mUnkB8;                         // 0xB8
     u32 mUnkBC;                         // 0xBC
