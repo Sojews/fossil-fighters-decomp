@@ -13,6 +13,7 @@
 #include "game/dino_ui_island_map_menu.h"
 #include "game/dino_ui_island_map.h"
 #include "game/draw_font.h"
+#include "m/console.h"
 #include "game/bitmap_move.h"
 #include "game/spot_move.h"
 #include "game/dino_ui_island_map_menu_item.h"
@@ -99,6 +100,17 @@ void DinoUiIslandMapMenuItem::OnSelectChanged(BOOL selected) {
 }
 
 void DrawFont::Idle() {
+}
+
+// Centres the text on pos.
+void DrawFont::SetCenter(const MPoint &pos) {
+    int width = mConsole->GetWidth();
+    int height = mConsole->GetHeight();
+    mConsole->SetPosition(pos.x - width / 2, pos.y - height / 2);
+}
+
+void DrawFont::Show() {
+    mConsole->Show();
 }
 
 void DinoMapBackButton::OnFocusChanged(BOOL focused) {
