@@ -64,8 +64,11 @@ public:
 
 class DinoUiCleaningTest : public MProcess {
 public:
+    DinoUiCleaningTest();
     virtual ~DinoUiCleaningTest();
     virtual void Idle();
+    void Setup();
+    void Leave();
     void Finish();
 
     void (DinoUiCleaningTest::*mState)(); // 0x74
