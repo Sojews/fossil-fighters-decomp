@@ -279,7 +279,7 @@ extern "C" struct {
     DinoUiWirelessMatchState StateAsk; // 0x4c
     void (DinoUiCannonParentScanner::*StateLost_54)(); // 0x54
     void (DinoUiBattleParentScanner::*StateStart_5C)(); // 0x5c
-    u8 unk64[0x6C - 0x64];
+    void (DinoUiCannonChild::*State021672f8_64)(); // 0x64
     void (DinoUiChildScannerCannonConnect::*StateConnect_6C)(); // 0x6c
     void (DinoUiCannonParentScanner::*StateListen_74)(); // 0x74
 } data_ov004_021740d0;
@@ -287,7 +287,7 @@ extern "C" struct {
     u8 unk00[0x4];
     void (DinoUiBattleParentScanner::*StateShowCancel_04)(); // 0x04
     u8 unk0C[0x14 - 0xC];
-    void (DinoUiCannonChild::*State021670bc_14)(); // 0x14
+    void (DinoUiCannonChild::*StateSendProfile_14)(); // 0x14
     DinoUiWirelessMatchState StateStartWireless_1C; // 0x1c
     DinoUiWirelessMatchState StateChildScan_24; // 0x24
     void (DinoUiCannonChild::*StateWaitStart_2C)(); // 0x2c
@@ -1001,7 +1001,30 @@ void DinoUiCannonChild::StateSendRocks() {
     serial->AddTail(save);
     serial->AddTail(validate);
     serial->AddTail(waitExit);
-    mState = data_ov004_02174150.State021670bc_14;
+    mState = data_ov004_02174150.StateSendProfile_14;
+}
+
+extern const u32 data_0208ab70;
+
+// Sends the rocks and the owner's profile to the parent, then pings it.
+void DinoUiCannonChild::StateSendProfile() {
+    for (u32 i = 0; i < mRocks.size(); i++) {
+        mHub->Broadcast(new DinoWirelessCannonKasekiRockSignal(mRocks[i]));
+    }
+    DinoPlayerProfile profile;
+    gDinoBackup->MakeProfile(&profile);
+    if (profile.unk78) {
+        mHub->Broadcast(new DinoExchangeSenryuSignal(profile));
+    }
+    mHub->Broadcast(new DinoWirelessCannonPingSignal);
+    mStarted = FALSE;
+    DinoSoundPlaySe(0x10B, 0);
+    MTask *wait = new DinoCommonWindowMessageWait1(std::string(gDinoResource->GetText(data_0208ab70)), MPoint(0x80, 0x60),
+                                                   4, 0);
+    mParallel.AddTail(wait);
+    MTask *exit = MTaskExitTransfer::Create(wait);
+    AddSerial(this, new MTimer(60), exit);
+    mState = data_ov004_021740d0.State021672f8_64;
 }
 
 // Ends the scan and leaves after half a second.

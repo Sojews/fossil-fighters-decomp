@@ -4,6 +4,7 @@
 
 #include "m/message.h"
 #include "m/observer.h"
+#include "game/dino_backup.h"
 
 class DinoDummyMessage : public MMessage {
 public:
@@ -3258,6 +3259,12 @@ public:
 class DinoWirelessCannonKasekiRockSignal : public MMessage {
 public:
     DinoWirelessCannonKasekiRockSignal() : MMessage(0x100A5) {}
+    DinoWirelessCannonKasekiRockSignal(DinoBackupEntry entry) : MMessage(0x100A5) {
+        *(DinoBackupEntry *)mUnk0C = entry;
+        mUnk20 = 0;
+        mUnk21 = 0;
+        mUnk24 = 0;
+    }
     virtual u32 GetSize() { return 32; }
     virtual void Write(void *buf) {
         MI_CpuCopy8(&mId, buf, 4);
@@ -3342,6 +3349,9 @@ public:
 class DinoExchangeSenryuSignal : public MMessage {
 public:
     DinoExchangeSenryuSignal() : MMessage(0x100A9) {}
+    DinoExchangeSenryuSignal(DinoPlayerProfile profile) : MMessage(0x100A9) {
+        *(DinoPlayerProfile *)mUnk0C = profile;
+    }
     virtual u32 GetSize() { return 136; }
     virtual void Write(void *buf) {
         MI_CpuCopy8(&mId, buf, 4);
