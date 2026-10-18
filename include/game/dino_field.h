@@ -95,7 +95,7 @@ public:
     BOOL IsMoving();
     BOOL IsUnkA1Motion();
     MFx32 GetHeight();
-    void MoveTo(MFx32Point coord, u32 a, u32 b, u8 c);
+    void MoveTo(MFx32Point coord, u32 frames, u32 ease, u8 silent);
     MTask *CreateWaitMoveTask();
 
     MArchivePtr mArchive;       // 0x8C
@@ -112,13 +112,17 @@ public:
     MTaskSet *mTaskSet;         // 0x110: where the manpu task runs
     u32 mUnk114;                // 0x114
     DinoField *mField;          // 0x118
-    u32 mUnk11C[119];           // 0x11C
+    u32 mUnk11C;                // 0x11C
+    void *mUnk120;              // 0x120
+    u32 mUnk124[117];           // 0x124
     MTask *mManpu;              // 0x2F8: the emotion bubble shown over the character
     u32 mUnk2FC[2];             // 0x2FC
     BOOL mHasFootSe;            // 0x304
     u32 mFootSe;                // 0x308
     u32 mBeholdTarget;          // 0x30C: the character looked at
     u32 mUnk310;                // 0x310
+    u32 mUnk314;                // 0x314
+    u32 mMoveSe;                // 0x318: the footstep sound when walking
 };
 
 struct MAfnBlock;

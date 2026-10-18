@@ -7,6 +7,7 @@
 
 class DinoFieldCharaCoordAnime : public MFx32PointAnime {
 public:
+    DinoFieldCharaCoordAnime(DinoFieldChara *chara, MFx32Point to, u32 frames, int ease, u8 silent, u32 se);
     virtual ~DinoFieldCharaCoordAnime();
     virtual void Execute();
     virtual void Apply(int step);
@@ -14,6 +15,7 @@ public:
     DinoFieldChara *mChara; // 0x48
     u8 mUnk4C;              // 0x4C
     u32 mUnk50;             // 0x50
+    u32 mUnk54;             // 0x54
 };
 
 #endif

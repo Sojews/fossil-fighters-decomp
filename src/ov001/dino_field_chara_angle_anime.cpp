@@ -86,6 +86,33 @@ void DinoFieldChara::SetAngle(u32 angle, u32 frames, u32 ease) {
     mAngleTasks->AddTail(new DinoFieldCharaAngleAnime(this, angle, frames, ease));
 }
 
+inline DinoFieldCharaCoordAnime::DinoFieldCharaCoordAnime(DinoFieldChara *chara, MFx32Point to, u32 frames, int ease,
+                                                          u8 silent, u32 se)
+    : MFx32PointAnime(chara->GetModel()->pos, to) {
+    mChara = chara;
+    mUnk4C = silent;
+    mUnk50 = se;
+    mUnk54 = 0;
+    SetDuration(frames);
+    mEase = ease;
+}
+
+void DinoFieldChara::MoveTo(MFx32Point coord, u32 frames, u32 ease, u8 silent) {
+    u32 se = mMoveSe;
+    if (silent) {
+        se = 0;
+    }
+    if (mHasFootSe) {
+        mHasFootSe = FALSE;
+        se = mFootSe;
+    }
+    if (mUnk120 == NULL) {
+        se = 0;
+    }
+    mMoveTasks->Clear();
+    mMoveTasks->AddTail(new DinoFieldCharaCoordAnime(this, coord, frames, ease, silent, se));
+}
+
 void DinoFieldChara::SetTask(DinoCharaTask task) {
     mTask = task;
     switch (task.unk4) {
