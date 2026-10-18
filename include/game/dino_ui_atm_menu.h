@@ -8,11 +8,12 @@
 class DinoUiATMBackButton;
 class DinoUiATMTeamButton;
 class DinoUiPartsTeamIndicator;
+class DinoUiPartsTeamInfo;
 class MIndicator;
 
 class DinoUiATMMenu : public DinoHelpBase, public MMenu {
 public:
-    DinoUiATMMenu(u32 *result, u8 arg1, u32 arg2, u8 arg3);
+    DinoUiATMMenu(u32 *result, u8 arg1, DinoUiPartsTeamInfo *teamInfo, u8 arg3);
     virtual ~DinoUiATMMenu();
     void OnBackDecided();
     virtual void OnStart();
@@ -35,7 +36,7 @@ public:
     u32 unkF0[3];       // 0xF0
     MView *mUnkFC;      // 0xFC
     u32 unk100[2];      // 0x100
-    u32 mUnk108;        // 0x108
+    DinoUiPartsTeamInfo *mTeamInfo; // 0x108
     u32 mUnk10C;        // 0x10C
     u32 *mResult;       // 0x110
     int mUnk114;        // 0x114

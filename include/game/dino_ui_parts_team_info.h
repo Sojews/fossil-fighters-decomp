@@ -5,8 +5,14 @@
 
 class DinoUiPartsTeamInfo : public MProcess {
 public:
+    DinoUiPartsTeamInfo();
     virtual ~DinoUiPartsTeamInfo();
     virtual void Idle();
+
+    // Shows the saved team's members.
+    void SetTeam(u32 team);
+
+    u8 unk74[0xE0 - 0x74];
 };
 
 #endif

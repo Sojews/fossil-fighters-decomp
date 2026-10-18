@@ -17,10 +17,14 @@
 #include "m/call_task.h"
 #include "m/bright.h"
 #include "m/indicator.h"
+#include "m/bg.h"
 #include "game/dino_ui_parts_team_indicator.h"
+#include "game/dino_ui_parts_team_info.h"
+#include "game/dino_ui_keyboard_menu.h"
+#include "game/dino_ui_organization_menu.h"
 
-DinoUiATMMenu::DinoUiATMMenu(u32 *result, u8 arg1, u32 arg2, u8 arg3) : MMenu(NULL, 0) {
-    mUnk108 = arg2;
+DinoUiATMMenu::DinoUiATMMenu(u32 *result, u8 arg1, DinoUiPartsTeamInfo *teamInfo, u8 arg3) : MMenu(NULL, 0) {
+    mTeamInfo = teamInfo;
     mResult = result;
     mUnk114 = 10;
     mUnk118 = 0;
@@ -155,16 +159,23 @@ void DinoUiATMBackButton::OnDecide() {
 
 // The TU's pooled pointer-to-member constants (see menu.cpp).
 extern "C" struct {
-    u8 unk00[0x10];
-    void (DinoUiATM::*Unk021741c4_10)();
-    void (DinoUiATM::*Start_18)();
-} data_ov007_0218cbe0;
-extern "C" struct {
     u8 unk00[0x38];
     void (DinoUiATMMenu::*ClearTeam_38)();
     u8 unk40[0x8];
-    void (DinoUiATM::*Unk021743b8_48)();
+    void (DinoUiATM::*StateResult_48)();
+    void (DinoUiATM::*StateMenu_50)();
+    u8 unk58[0x8];
+    void (DinoUiATM::*StateSetup_60)();
+    u8 unk68[0x8];
+    void (DinoUiATM::*StateNamed_70)();
+    void (DinoUiATM::*StateResult_78)();
 } data_ov007_0218cb60;
+extern "C" struct {
+    void (DinoUiATM::*StateMenu_00)();
+    void (DinoUiATM::*StateSetup_08)();
+    void (DinoUiATM::*StateSetup_10)();
+    void (DinoUiATM::*Start_18)();
+} data_ov007_0218cbe0;
 
 DinoUiATM::DinoUiATM(u8 arg) : MProcess(gLcd->mSub), mUnk7C(arg) {
     mState = data_ov007_0218cbe0.Start_18;
@@ -174,11 +185,34 @@ void DinoUiATM::StateStart() {
     mResult = 0;
     mTasks = new MParallelTaskSet;
     mParallel.AddTail(mTasks);
-    mState = data_ov007_0218cbe0.Unk021741c4_10;
+    mState = data_ov007_0218cbe0.StateSetup_10;
 }
 
 // (The game calls the menu's constructor defined above.)
 #pragma dont_inline on
+// Sets up both screens, with the team info on the top one, and opens the menu.
+void DinoUiATM::StateSetup() {
+    gLcd->mMain->ResetHooks();
+    gLcd->mSub->ResetHooks();
+    gLcd->mMain->Setup(5, 0, 3, 1, 1, 1);
+    gLcd->mMain->mBg->SetBg0Reserved(1);
+    gLcd->mMain->SetBackdrop(0x8000);
+    gLcd->mMain->mObj->Show();
+    mTeamInfo = new DinoUiPartsTeamInfo;
+    mTasks->AddTail(mTeamInfo);
+    gLcd->mMain->mBright->SetMode(2);
+    gLcd->mMain->mBright->SetFactor(16);
+    gLcd->mSub->ResetHooks();
+    gLcd->mSub->Setup(5, 2, 4, 1, 0, 0);
+    gLcd->mSub->SetBackdrop(0x8000);
+    gLcd->mSub->mObj->Show();
+    gLcd->VSyncNow();
+    gLcd->SetBottomDisplay(gLcd->mSub);
+    gCurrentDisplay = gLcd->GetBottomDisplay();
+    mSerial.AddTail(new DinoUiATMMenu(&mResult, mUnk7C, mTeamInfo, 1));
+    mState = data_ov007_0218cb60.StateResult_78;
+}
+
 void DinoUiATM::StateMenu() {
     gLcd->mSub->ResetHooks();
     gLcd->mSub->Setup(5, 2, 4, 1, 0, 0);
@@ -187,10 +221,67 @@ void DinoUiATM::StateMenu() {
     gLcd->VSyncNow();
     gLcd->SetBottomDisplay(gLcd->mSub);
     gCurrentDisplay = gLcd->GetBottomDisplay();
-    mSerial.AddTail(new DinoUiATMMenu(&mResult, mUnk7C, mUnk88, 0));
-    mState = data_ov007_0218cb60.Unk021743b8_48;
+    mSerial.AddTail(new DinoUiATMMenu(&mResult, mUnk7C, mTeamInfo, 0));
+    mState = data_ov007_0218cb60.StateResult_48;
+}
+
+// After naming a new team: back to the menu if it was left unnamed, or on to its members.
+void DinoUiATM::StateNamed() {
+    DinoTeam team;
+    gDinoBackup->GetTeam(mResult, &team);
+    if (team.name[0] == 0) {
+        mState = data_ov007_0218cbe0.StateMenu_00;
+        return;
+    }
+    mTasks->Clear();
+    gLcd->mMain->ResetHooks();
+    gLcd->mSub->ResetHooks();
+    gLcd->mMain->Setup(5, 0, 3, 1, 1, 1);
+    gLcd->mMain->mBg->SetBg0Reserved(1);
+    gLcd->mMain->SetBackdrop(0x8000);
+    gLcd->mMain->mObj->Show();
+    gLcd->mSub->Setup(5, 2, 4, 1, 0, 0);
+    gLcd->mSub->SetBackdrop(0x8000);
+    gLcd->mSub->mObj->Show();
+    gLcd->VSyncNow();
+    gLcd->SetBottomDisplay(gLcd->mSub);
+    gCurrentDisplay = gLcd->GetBottomDisplay();
+    gLcd->GetTopDisplay()->mBright->Reset();
+    gLcd->GetBottomDisplay()->mBright->Reset();
+    mSerial.AddTail(new DinoUiOrganizationMenu(mResult));
+    mState = data_ov007_0218cbe0.StateSetup_08;
 }
 #pragma dont_inline reset
+
+// What the menu chose: under 100 leaves, then 100 + team renames the team, 200 + team edits it and 300 + team names
+// a new one.
+void DinoUiATM::StateResult() {
+    if (mResult < 100) {
+        Exit();
+    } else if (mResult < 200) {
+        mResult -= 100;
+        gLcd->GetTopDisplay()->mBright->Reset();
+        gLcd->GetBottomDisplay()->mBright->Reset();
+        mSerial.AddTail(new DinoUiKeyboardMenu(1, mResult, 1));
+        mState = data_ov007_0218cb60.StateMenu_50;
+    } else if (mResult < 300) {
+        mResult -= 200;
+        mTasks->Clear();
+        mSerial.AddTail(new DinoUiOrganizationMenu(mResult));
+        mState = data_ov007_0218cb60.StateSetup_60;
+    } else {
+        mResult -= 300;
+        DinoTeam team;
+        gDinoBackup->GetTeam(mResult, &team);
+        team.name[0] = 0;
+        gDinoBackup->SetTeam(mResult, &team);
+        gLcd->GetTopDisplay()->mBright->Reset();
+        gLcd->GetBottomDisplay()->mBright->Reset();
+        mSerial.AddTail(new DinoUiKeyboardMenu(1, mResult, 1));
+        mState = data_ov007_0218cb60.StateNamed_70;
+    }
+}
+
 
 // Shows each team's name, or a blank for an empty team, and marks the current team.
 void DinoUiATMMenu::RefreshTeams() {
@@ -248,8 +339,6 @@ void DinoUiATMMenu::Unk02173d08() {
 }
 #pragma dont_inline reset
 
-extern "C" void func_ov003_0215a4ec(u32 obj, u32 team);
-
 void DinoUiATMMenu::ClearTeam() {
     DinoTeam team;
     gDinoBackup->GetTeam(mUnk118, &team);
@@ -260,7 +349,7 @@ void DinoUiATMMenu::ClearTeam() {
     team.slots[3] = 0;
     team.slots[4] = 0;
     gDinoBackup->SetTeam(mUnk118, &team);
-    func_ov003_0215a4ec(mUnk108, mUnk118);
+    mTeamInfo->SetTeam(mUnk118);
     RefreshTeams();
 }
 

@@ -11,6 +11,7 @@
 #include "m/sleep.h"
 #include "m/looper.h"
 #include "game/help.h"
+#include "game/dino_ui_parts_team_info.h"
 #include "game/dino_field_camera_hook.h"
 
 class DinoUiTeamSelectMenu : public DinoHelpBase, public MMenu {
@@ -26,7 +27,7 @@ public:
     u8 unkD4[0x24];
     MSerialTaskSet *mCursorTasks;   // 0xF8
     DinoUiFieldMenuCursor *mCursor; // 0xFC
-    void *mUnk100;          // 0x100
+    DinoUiPartsTeamInfo *mTeamInfo; // 0x100
     u8 unk104[0xC];
     int mSelected;          // 0x110
 

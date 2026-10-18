@@ -13,6 +13,7 @@
 
 class DinoUiKeyboardMenu : public DinoHelpBase, public MMenu {
 public:
+    DinoUiKeyboardMenu(int mode, u32 arg, int flag);
     virtual ~DinoUiKeyboardMenu();
     virtual void OnStart();
     virtual void OnIdle();
@@ -27,6 +28,7 @@ public:
     std::wstring mUnk1A8;       // 0x1A8
     std::wstring mUnk1B4[3];    // 0x1B4
     std::wstring mUnk1D8;       // 0x1D8
+    u8 unk1E4[0x1F8 - 0x1E4];
 };
 
 #endif

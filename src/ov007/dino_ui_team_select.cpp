@@ -61,8 +61,6 @@ MRect DinoUiTeamSelectTeamButton::GetFrame() {
     return MRect(mPos.Offset(-100, -12), mPos.Offset(100, 12));
 }
 
-extern "C" void func_ov003_0215a4ec(void *arg0, int team);
-
 void DinoUiTeamSelectMenu::OnFocus(MMenuItem *item) {
     if (item == NULL) {
         mCursor->Hide();
@@ -78,7 +76,7 @@ void DinoUiTeamSelectMenu::OnFocus(MMenuItem *item) {
     }
     for (int i = 0; i < 3; i++) {
         if (item == mTeams[i]) {
-            func_ov003_0215a4ec(mUnk100, i + 1);
+            mTeamInfo->SetTeam(i + 1);
         }
     }
 }

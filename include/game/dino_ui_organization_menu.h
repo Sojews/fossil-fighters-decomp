@@ -41,6 +41,7 @@ struct DinoUiOrganizationLayout2 {
 
 class DinoUiOrganizationMenu : public DinoHelpBase, public MMenu {
 public:
+    DinoUiOrganizationMenu(u32 team);
     virtual ~DinoUiOrganizationMenu();
     virtual void OnStart();
     virtual void OnIdle();
