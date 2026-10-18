@@ -445,6 +445,17 @@ void DinoBattleModelPlayer::PushEvent(u32 a, u32 b, u8 c) {
     }
 }
 
+// NONMATCHING: the game keeps all three MSL tag temporaries in separate stack bytes and compares field to id
+void DinoBattleModelPlayer::RemoveEvents(u32 id) {
+    std::vector<DinoBattlePlayerEvent> kept;
+    for (u32 i = 0; i < mUnkA8.size(); i++) {
+        if (id != mUnkA8[i].mUnk4) {
+            kept.push_back(mUnkA8[i]);
+        }
+    }
+    mUnkA8 = kept;
+}
+
 DinoBattlePlayerEvent DinoBattleModelPlayer::PopEvent(bool remove) {
     if (GetUnkAC() != 0) {
         DinoBattlePlayerEvent &front = mUnkA8[0];
@@ -458,6 +469,7 @@ DinoBattlePlayerEvent DinoBattleModelPlayer::PopEvent(bool remove) {
     }
     return DinoBattlePlayerEvent(0, 0, 0);
 }
+
 
 int DinoBattleModelPlayer::GetCreatureCount() {
     return mCreatures.size();
@@ -499,6 +511,15 @@ void DinoBattleModelPlayer::SetUnk12C(u8 value) {
 u32 DinoBattleModelPlayer::NextUnkId() {
     u32 id = mUnkBC++;
     return (mUnkB8 << 16) | id;
+}
+
+void DinoBattleModelPlayer::CollectCreaturesNearB8(int pos, u32 *ids, int *count) {
+    *count = 0;
+    for (int i = 0; i < GetCreatureCount(); i++) {
+        if (pos + GetCreature(i)->GetB8Category() + 1 <= 2) {
+            ids[(*count)++] = GetCreature(i)->GetUnkB4();
+        }
+    }
 }
 
 DinoBattleModelCreature *DinoBattleModelPlayer::FindCreatureByB4(u32 id) {
@@ -629,3 +650,5 @@ extern "C" BOOL func_ov000_0216c83c(int value) {
 }
 
 #pragma auto_inline on
+
+#pragma auto_inline off

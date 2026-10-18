@@ -103,6 +103,8 @@ public:
     void SetBattle(DinoBattle *battle);
     void PushEvent(u32 a, u32 b, u8 c);
     DinoBattlePlayerEvent PopEvent(bool remove);
+    void RemoveEvents(u32 id);
+    void CollectCreaturesNearB8(int pos, u32 *ids, int *count);
     void SendUpdateRequest(u32 arg);
     void SendUpdateAbilityIconRequest(u8 a, u32 b);
 
