@@ -76,7 +76,10 @@ template <class T> inline const T *DinoOffsetPtr(const void *base, u32 offset) {
     return offset == 0 ? NULL : (const T *)((const u8 *)base + offset);
 }
 struct DinoBattleAdjustDefs {
-    u8 unk000[0x10];
+    u32 unk00;
+    MFx32 curveBase;        // 0x04
+    MFx32 curveRange;       // 0x08
+    MFx32 curveLow;         // 0x0C
     MFx32 unk10;            // 0x10: divides the damage
 
     MFx32 unk14;            // 0x14

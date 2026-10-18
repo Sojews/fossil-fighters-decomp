@@ -1220,3 +1220,27 @@ MFx32 DinoBattleModelCreature::RandomDamageFactor() {
     const MFx32 min = gDinoResource->GetBattleAdjustDefs()->randomMin;
     return min + (MFx32(gDinoResource->GetBattleAdjustDefs()->randomMax) - min) * RandomFraction();
 }
+
+// A ratio that follows a quarter sine wave of (a - b) over the curve's range, capped at 1.
+// NONMATCHING: the copies std::min and std::max make for their comparisons take the lowest stack slots here, the
+// ones right after the subtraction's in the game.
+MFx32 DinoBattleModelCreature::CurveRatio(MFx32 a, MFx32 b) {
+    const MFx32 range = gDinoResource->GetBattleAdjustDefs()->curveRange;
+    const MFx32 base = gDinoResource->GetBattleAdjustDefs()->curveBase;
+    const MFx32 low = gDinoResource->GetBattleAdjustDefs()->curveLow;
+    MFx32 x = (a - b) / range;
+    x = std::max(MFx32(-1), std::min(MFx32(1), x));
+    MFx32 angle = MFx32::FromRaw(0x800) * MFx32::FromRaw(0x3244) * x; // pi / 2 * x
+    MFx32 sine;
+    sine.v = FX_SinIdx((u16)((angle * MFx32(0x10000) / MFx32::FromRaw(0x6488)).v >> FX32_SHIFT)); // 2 pi
+    MFx32 ratio;
+    if (a >= b) {
+        ratio = (MFx32(1) - base) * sine + base;
+    } else {
+        ratio = (base - low) * sine + base;
+    }
+    if (ratio > MFx32(1)) {
+        ratio = MFx32(1);
+    }
+    return ratio;
+}

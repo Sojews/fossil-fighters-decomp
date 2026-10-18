@@ -234,6 +234,7 @@ public:
     MFx32 ReduceByDefense(MFx32 damage, MFx32 defense);
     MFx32 ApplyRatio(MFx32 damage, MFx32 ratio);
     MFx32 ApplyRatio2(MFx32 damage, MFx32 ratio);
+    MFx32 CurveRatio(MFx32 a, MFx32 b);
     MFx32 RandomDamageFactor();
     MFx32 CalcDamage(DinoBattleModelCreature *target, MFx32 attack, MFx32 defense, u8 *hit);
     MFx32 ApplyPositionRatio(MFx32 damage, int otherCategory);
