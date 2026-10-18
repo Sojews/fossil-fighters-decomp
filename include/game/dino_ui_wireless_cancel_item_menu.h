@@ -11,6 +11,9 @@
 #include "m/sleep.h"
 #include "m/looper.h"
 #include "game/help.h"
+#include "m/picture.h"
+#include "m/resource.h"
+#include "game/dino_resource.h"
 
 class MSmartOam;
 class DinoUiWirelessCancelItem;
@@ -199,22 +202,19 @@ public:
     virtual void Idle();
     virtual void OnMessage(MMessage *msg);
 
+    void StateStart();
     void StateShootMenu();
     void StateShot();
 
     void (DinoUiCannonChild::*mState)(); // 0xA8
-    u32 mUnkB0[2];
+    MMultiPlay *mMultiPlay;     // 0xB0
+    u16 mChoice;                // 0xB4
     std::vector<void *> mUnkB8; // 0xB8
     std::vector<unsigned int> mUnkC4; // 0xC4
     u32 mUnkD0;                 // 0xD0
     u8 mStarted;                // 0xD4: set by the start message
-    MArchivePtr mArchive;       // 0xD8
-    MArchiveFile mFileDC;       // 0xDC
-    MArchiveFile mFileE8;       // 0xE8
-    MArchiveFile mFileF4;       // 0xF4
-    MArchiveFile mFile100;      // 0x100
-    MArchivePtr mArchive2;      // 0x10C
-    MArchiveFile mFile110;      // 0x110
+    MPictureFile mBack;         // 0xD8: image/m_back00
+    MResource<DinoSenryuDefs> mSenryuDefs; // 0x10C
 };
 
 class DinoUiWirelessMatch : public MProcess {

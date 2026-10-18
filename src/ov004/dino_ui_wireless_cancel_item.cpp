@@ -21,6 +21,7 @@
 #include "m/observer.h"
 #include "m/multi_play.h"
 #include "m/text_codec.h"
+#include "m/pal.h"
 #include "game/dino_backup.h"
 #include "nitro/mi.h"
 #include "game/dino_common_window_menu_item_flush_task_menu.h"
@@ -312,7 +313,7 @@ extern "C" struct {
 extern "C" struct {
     u8 unk00[0xc];
     DinoUiWirelessMatchState StateStart; // 0x0c
-    u8 unk14[0x1C - 0x14];
+    void (DinoUiCannonChild::*StateShootMenu_14)(); // 0x14
     DinoUiWirelessMatchState StateChildScan; // 0x1c
     void (DinoUiCannonChild::*StateShot_24)(); // 0x24
     u8 unk2C[0x44 - 0x2C];
@@ -335,7 +336,8 @@ extern "C" struct {
     void (DinoUiChildScannerCannonConnect::*CannonStart_44)(); // 0x44
     u8 unk4C[0x54 - 0x4C];
     DinoUiWirelessMatchState StateChildScan;    // 0x54
-    u8 unk5C[0x6C - 0x5C];
+    void (DinoUiCannonChild::*ChildStart_5C)(); // 0x5c
+    u8 unk64[0x6C - 0x64];
     void (DinoUiChildScannerBattleConnect::*BattleStart_6C)(); // 0x6c
     u8 unk74[0x7C - 0x74];
     void (DinoUiChildScannerBattleConnect::*StateCancel_7C)(); // 0x7c (its second word is in the next block)
@@ -348,7 +350,8 @@ extern "C" struct {
     u8 unk1C[0x24 - 0x1C];
     void (DinoUiChildScannerBattleConnect::*StateChoose_24)(); // 0x24
     DinoUiWirelessMatchState StateKeep; // 0x2c
-    u8 unk34[0x5C - 0x34];
+    u8 unk34[0x54 - 0x34];
+    void (DinoUiCannonChild::*Child021674f8_54)(); // 0x54
     DinoUiWirelessMatchState StateParentScanned; // 0x5c
     void (DinoUiCannonChild::*Child021674f8_64)(); // 0x64
 } data_ov004_02174350;
@@ -593,6 +596,31 @@ MTask *DinoUiWirelessCancel::CreateCloseTask() {
 }
 #pragma auto_inline reset
 
+DinoUiCannonChild::DinoUiCannonChild(MMultiPlay *multiPlay, u32 choice)
+    : MProcess(NULL), mMultiPlay(multiPlay), mChoice(choice), mBack("/image/m_back00", 0),
+      mSenryuDefs(gDinoResource->LoadSenryuDefs()) {
+    mState = data_ov004_021742d0.ChildStart_5C;
+}
+
+extern const u32 data_0208ab50;
+extern MTextPicture *data_ov004_02177284; // the view the cross-fade keeps (the bottom screen's backdrop)
+
+// Fades the backdrop's palette in; with no fossils to shoot, says so first.
+void DinoUiCannonChild::StateStart() {
+    MPalAnime *fade = new MPalAnime(data_ov004_02177284->GetPalBlock(), 0, 0x7FFF);
+    fade->AddFrame((const u16 *)mBack.GetPalette());
+    fade->AddBlend((const u16 *)mBack.GetPalette(), 0, 16);
+    fade->SetDuration(5);
+    mSerial.AddTail(fade);
+    if (gDinoBackup->IsUnk14CEmpty()) {
+        MTask *box = new DinoCommonWindowMessageBox(MPoint(0x80, 0x60), gDinoResource->GetText(data_0208ab50), 4);
+        mSerial.AddTail(box);
+        mState = data_ov004_02174350.Child021674f8_54;
+    } else {
+        mState = data_ov004_02174250.StateShootMenu_14;
+    }
+}
+
 // Ends the scan and leaves after half a second.
 void DinoUiChildScanner::Leave() {
     MTask *exit = MTaskExitTransfer::Create(this);
@@ -831,7 +859,6 @@ void DinoUiChildScannerCannonConnect::StateConnect() {
     mState = data_ov004_021741d0.StateChoose_14;
     mOnMessage = data_ov004_021742d0.OnConnectMessage_34;
 }
-extern MView *data_ov004_02177284; // the view the cross-fade keeps
 
 // What a child sends the parent: its mode and its owner's name.
 struct DinoUiChildSsid {
