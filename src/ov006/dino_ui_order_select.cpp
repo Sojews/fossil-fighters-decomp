@@ -7,6 +7,7 @@
 #include "game/dino_ui_order_select.h"
 #include "types.h"
 #include "m/call_task.h"
+#include "m/input.h"
 
 DinoUiOrderSelect::~DinoUiOrderSelect() {
 }
@@ -71,3 +72,30 @@ void DinoUiOrderSelectBackButton::OnDecide() {
 template MTask *MCreateCallTask(DinoUiOrderSelectMenu *obj, void (DinoHelpBase::*func)());
 template MTask *MCreateCallTask(DinoUiOrderSelectMenu *obj, void (DinoUiOrderSelectMenu::*func)());
 template MTask *MCreateCallTask(DinoUiOrderSelectMenu *obj, void (DinoUiOrderSelectMenu::*func)(bool), bool a1);
+
+#pragma auto_inline off
+
+void DinoUiOrderSelectMenu::OnIdle() {
+    mUnk1F6 = TRUE;
+    if (GetInput()->GetPressed() & 0x800) {
+        PageLeft();
+    } else if (GetInput()->GetPressed() & 0x400) {
+        PageRight();
+    }
+}
+
+void DinoUiOrderSelectMenu::PageLeft() {
+    u8 count = mHasFourthTab ? 4 : 3;
+    SetPage((mPage + count - 1) % count);
+    if (mFocusTabs) {
+        FocusItem(mTabs[mPage]);
+    }
+}
+
+void DinoUiOrderSelectMenu::PageRight() {
+    u8 count = mHasFourthTab ? 4 : 3;
+    SetPage((mPage + 1) % count);
+    if (mFocusTabs) {
+        FocusItem(mTabs[mPage]);
+    }
+}

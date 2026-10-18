@@ -17,6 +17,20 @@
 class DinoUiOrderSelectMenu : public DinoHelpBase, public MMenu {
 public:
     virtual ~DinoUiOrderSelectMenu();
+    virtual void OnIdle();
+
+    void SetPage(u8 page);
+    void PageLeft();
+    void PageRight();
+
+    u8 unkB3[0xC0 - 0xB3];
+    MMenuItem *mTabs[4];        // 0xC0
+    u8 unkD0[0x1A8 - 0xD0];
+    u8 mHasFourthTab;           // 0x1A8
+    u8 unk1A9[0x1F4 - 0x1A9];
+    u8 mPage;                   // 0x1F4
+    u8 mFocusTabs;              // 0x1F5: focus the new page's tab when paging
+    u8 mUnk1F6;                 // 0x1F6
 };
 
 class DinoUiOrderSelect : public MProcess {
