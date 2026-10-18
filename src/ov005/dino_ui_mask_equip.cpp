@@ -4,6 +4,12 @@
 // Derived destructors have their bases' destructor bodies inlined; auto-inlining the ones defined above does that.
 #pragma auto_inline on
 
+#include "game/dino_resource.h"
+
+#include "m/indicator.h"
+
+#include "game/dino_ui3_parts_cursor.h"
+
 #include "m/obj.h"
 #include "game/dino_ui_mask_equip_menu.h"
 #include "game/dino_ui_mask_equip.h"
@@ -134,6 +140,42 @@ void DinoUiMaskEquipMaskButton::OnFocusChanged(BOOL focused) {
 
 void DinoUiMaskEquipMaskButton::OnDecide() {
     mMotion->Show();
+}
+
+// Moves the cursor to the item, and shows the mask's name.
+// NONMATCHING: register allocation in the item loop (the list pointer and the item swap registers).
+void DinoUiMaskEquipMenu::OnFocus(MMenuItem *item) {
+    mUnk104 = FALSE;
+    if (item == NULL) {
+        mCursor->Hide();
+        return;
+    }
+    if (item == mLinkFrom) {
+        SetSelectedItem(dynamic_cast<DinoHelpItem *>(item));
+    }
+    if (mCursor->IsHidden()) {
+        mCursor->Show();
+        mCursor->SetFrame(item->GetFrame());
+    } else {
+        mCursorTasks->Clear();
+        mCursorTasks->AddTail(mCursor->CreateMoveTask(mCursor->GetFrame(), item->GetFrame(), 10, -5));
+    }
+    for (int i = 0; i < 8; i++) {
+        if (item == mItems[i]) {
+            u32 index = mPage * 8 + i;
+            if (index >= mUnkF0.size()) {
+                continue;
+            }
+            MResource<DinoHeadMaskDefs> defs = gDinoResource->LoadHeadMaskDefs();
+            u32 id = (u32)mUnkF0[mPage * 8 + i];
+            const DinoHeadMaskDefs *data = defs.Get();
+            mName->SetText(std::string(gDinoResource->GetText(
+                ((const DinoHeadMaskDef *)((const u8 *)data + ((const u32 *)((const u8 *)data + data->tableOffset))[id]))
+                    ->nameText)));
+            return;
+        }
+    }
+    mName->SetText(std::string(""));
 }
 
 void DinoUiMaskEquipMenu::OnDecide(MMenuItem *item) {

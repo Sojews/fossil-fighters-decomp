@@ -9,6 +9,9 @@
 #include "game/help.h"
 #include "game/dino_ui_mask_equip_menu_item.h"
 
+class DinoUi3PartsCursor;
+class MIndicator;
+
 class DinoUiMaskEquipMenu : public DinoHelpBase, public MMenu {
 public:
     DinoUiMaskEquipMenu();
@@ -29,11 +32,14 @@ public:
     MMenuItem *mLinkFrom;   // 0xB8: linked to the first page item
     u32 mUnkBC;
     std::vector<void *> mItems; // 0xC0: this page's items
-    u32 mUnkCC[6];          // 0xCC
+    u32 mUnkCC[3];          // 0xCC
+    MTaskSet *mCursorTasks; // 0xD8
+    DinoUi3PartsCursor *mCursor; // 0xDC
+    MIndicator *mName;      // 0xE0: the focused mask's name
     DinoUi3PartsFraction *mFraction; // 0xE4: "page n/m"
     int mChoice;            // 0xE8
     u32 mUnkEC;
-    std::vector<void *> mUnkF0; // 0xF0
+    std::vector<void *> mUnkF0; // 0xF0: the masks (ids)
     int mPage;              // 0xFC
     int mLastPage;          // 0x100
     u8 mUnk104;             // 0x104
