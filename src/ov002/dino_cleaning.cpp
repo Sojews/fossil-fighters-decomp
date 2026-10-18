@@ -2,6 +2,12 @@
 
 #include "game/dino_cleaning.h"
 #include "game/dino_cleaning_kaseki_rock.h"
+#include "game/dino_cleaning_dummy_item_menu.h"
+#include "game/dino_cleaning_live_task.h"
+#include "game/dino_cleaning_stop_confirm_menu_item_menu.h"
+#include "game/dino_cleaning_tool.h"
+#include "game/dino_common_live.h"
+#include "game/dino_sound.h"
 #include "game/dino_cleaning_rock.h"
 #include "game/dino_cleaning_image.h"
 #include "game/dino_cleaning_image_view.h"
@@ -184,10 +190,79 @@ void DinoCleaningKasekiRockXrayBlendManager::Idle() {
     (this->*mState)();
 }
 
+// The scene's pooled pointer-to-member constants (see menu.cpp).
+extern "C" struct {
+    u8 unk00[0x78];
+    void (DinoCleaning::*Unk02161490_78)();
+} data_ov002_021659ec;
+extern "C" struct {
+    u8 unk00[0x40];
+    void (DinoCleaning::*Unk021618c8_40)();
+    u8 unk48[0x68 - 0x48];
+    void (DinoCleaning::*Unk02161490_68)();
+    void (DinoCleaning::*StateWake_70)();
+} data_ov002_02165a6c;
+extern "C" struct {
+    u8 unk00[0x10];
+    void (DinoCleaning::*StateStopTool_10)();
+    u8 unk18[0x20 - 0x18];
+    void (DinoCleaning::*Unk02161c20_20)();
+    u8 unk28[0x60 - 0x28];
+    void (DinoCleaning::*StateStopTool_60)();
+} data_ov002_02165aec;
+
+extern "C" void func_ov002_0215fdec(DinoCleaningKasekiRock *rock);
+
+void DinoCleaning::StateEnableToolMenu() {
+    mUnkE4->SetUnkA0(0x15, TRUE);
+    mToolMenu->EnableItem();
+    mState = data_ov002_02165aec.StateStopTool_60;
+}
+
+void DinoCleaning::StateStopTool() {
+    mTools[mTool]->Unk18();
+    mUnk124 = 0;
+    mState = data_ov002_021659ec.Unk02161490_78;
+}
+
+void DinoCleaning::StateSwitchTool() {
+    mTools[mTool]->Unk1C();
+    mTool = mNextTool;
+    mState = data_ov002_02165aec.StateStopTool_10;
+}
+
+void DinoCleaning::StateCheckDone() {
+    DinoHelpBase::Disable();
+    if (!mKasekiRock->IsViewUnkD9E0Zero()) {
+        DinoSoundFunc_0201feec(0x2C);
+        func_ov002_0215fdec(mKasekiRock);
+        return;
+    }
+    mState = data_ov002_02165a6c.Unk021618c8_40;
+}
+
+void DinoCleaning::StateSleep() {
+    mUnk128 = TRUE;
+    DinoSoundPause();
+    mUnk144->AddTail(new DinoCleaningSleep(this, &mSleepTimer));
+    mState = data_ov002_02165a6c.StateWake_70;
+}
+
+void DinoCleaning::StateWake() {
+    DinoSoundResume();
+    mState = data_ov002_02165a6c.Unk02161490_68;
+}
+
+void DinoCleaning::StateStopConfirm() {
+    mUnk128 = TRUE;
+    DinoSoundPause();
+    mUnkE4->SetUnkA0(0x19, TRUE);
+    mUnk144->AddTail(new DinoCleaningStopConfirm(this, &mStop));
+    mState = data_ov002_02165aec.Unk02161c20_20;
+}
+
 // Template task instances the game emits in this file. Until the code that makes the tasks is decompiled, they are
 // instantiated explicitly.
-class DinoCommonLive {};
-class DinoCleaningLive : public DinoCommonLive {};
 template class MCallTask2<DinoCleaningLive, DinoCommonLive, u32, bool>;
 template MTask *MCreateCallTask(DinoCleaningLive *obj, void (DinoCommonLive::*func)(u32, bool), u32 a0, bool a1);
 template class MCallTask1<DinoCleaningLive, DinoCommonLive, u32>;

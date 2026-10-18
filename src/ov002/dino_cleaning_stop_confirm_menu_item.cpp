@@ -79,9 +79,9 @@ void DinoCleaningStopConfirmMenu::OnDecide(MMenuItem *item) {
     serial->AddTail(exit);
 }
 
-// Closes the window once the answer is no.
-void DinoCleaningStopConfirm::StateClose() {
-    if (*mResult == FALSE) {
+// Closes the window once the cleaning takes input again.
+void DinoCleaningSleep::StateClose() {
+    if (*mTimer == 0) {
         mMotion->Play(2, 0);
         MTask *exit = MTaskExitTransfer::Create(this);
         MTask *wait = mMotion->CreateWaitStopTask();
@@ -89,4 +89,32 @@ void DinoCleaningStopConfirm::StateClose() {
         serial->AddTail(wait);
         serial->AddTail(exit);
     }
+}
+
+// The TU's pooled pointer-to-member constants (see menu.cpp).
+extern "C" struct {
+    u8 unk00[0x18];
+    void (DinoCleaningStopConfirm::*Start_18)();
+    u8 unk20[0x48 - 0x20];
+    void (DinoCleaningSleep::*Start_48)();
+    u8 unk50[0x60 - 0x50];
+    void (DinoCleaningStopConfirm::*Unk02156a9c_60)();
+} data_ov002_02163f40;
+
+DinoCleaningStopConfirm::DinoCleaningStopConfirm(DinoCleaning *cleaning, u8 *result)
+    : MProcess(NULL), mCleaning(cleaning), mResult(result) {
+    mState = data_ov002_02163f40.Start_18;
+}
+
+// Leaves once the answer is no.
+void DinoCleaningStopConfirm::StateDecided() {
+    if (*mResult == FALSE) {
+        Exit();
+        return;
+    }
+    mState = data_ov002_02163f40.Unk02156a9c_60;
+}
+
+DinoCleaningSleep::DinoCleaningSleep(DinoCleaning *cleaning, u32 *timer) : MProcess(NULL), mCleaning(cleaning), mTimer(timer) {
+    mState = data_ov002_02163f40.Start_48;
 }
