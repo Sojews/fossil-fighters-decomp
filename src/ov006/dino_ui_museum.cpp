@@ -8,6 +8,8 @@
 #include "game/dino_ui_museum.h"
 #include "game/dino_ui_field_menu_fraction.h"
 #include "m/lcd.h"
+#include "m/bright.h"
+#include "m/display.h"
 #include "game/dino_sound.h"
 #include "game/dino_ui_museum_3d_model.h"
 #include "m/bg_new_task.h"
@@ -257,6 +259,19 @@ void DinoUiMuseumSlotCreateTask::Idle() {
 }
 
 extern "C" void func_ov006_0218a570(DinoUiMuseumInformationMenu *menu);
+
+void DinoUiMuseumInformationMenu::OnBackDecided() {
+    MTask *fade;
+    MTask *exit;
+    MTask &self = *this;
+    exit = MTaskExitTransfer::Create(&self);
+    fade = gLcd->mSub->mBright->CreateFadeOutToBlack(5, 0);
+    MTask *timer = new MTimer(30);
+    MSerialTaskSet *serial = &mSerial;
+    serial->AddTail(timer);
+    serial->AddTail(fade);
+    serial->AddTail(exit);
+}
 
 void DinoUiMuseumInformationMenu::PageRight() {
     *mPage = (*mPage + 1) % mInfo->mPageCount;
