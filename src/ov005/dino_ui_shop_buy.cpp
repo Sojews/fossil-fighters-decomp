@@ -4,6 +4,10 @@
 // Derived destructors have their bases' destructor bodies inlined; auto-inlining the ones defined above does that.
 #pragma auto_inline on
 
+#include "game/dino_ui3_parts_rock_name.h"
+
+#include "game/dino_ui3_parts_cursor.h"
+
 #include "m/obj.h"
 #include "game/dino_ui_shop_buy_menu.h"
 #include "game/dino_ui_shop_buy.h"
@@ -245,6 +249,44 @@ void DinoUiShopBuyMenu::RefreshPage3() {
             ((DinoUi3PartsKasekiButton *)mItems[i])->SetActive(TRUE);
         }
     }
+}
+
+// Moves the cursor to the item, and shows the fossil's name (marked if it can't be bought now) and price.
+void DinoUiShopBuyMenu::OnFocus(MMenuItem *item) {
+    if (item == NULL) {
+        mCursor->Hide();
+        return;
+    }
+    SetSelectedItem(dynamic_cast<DinoHelpItem *>(item));
+    if (mCursor->IsHidden()) {
+        mCursor->Show();
+        mCursor->SetFrame(item->GetFrame());
+    } else {
+        mCursorTasks->Clear();
+        mCursorTasks->AddTail(mCursor->CreateMoveTask(mCursor->GetFrame(), item->GetFrame(), 10, -5));
+    }
+    for (int i = 0; i < 8; i++) {
+        if (item == mItems[i]) {
+            u32 index = mPage * 8 + i;
+            if (index >= mUnkE8.size()) {
+                continue;
+            }
+            DinoBackupEntry entry;
+            gDinoBackup->GetUnk148(index, &entry);
+            if (!GetFlag(mPage * 8 + i) &&
+                (mTotal + GetPrice(mPage * 8 + i) > mFunds || mCount >= gDinoBackup->CountFreeUnk98())) {
+                mRockName->SetEntry(&entry, TRUE);
+            } else {
+                mRockName->SetEntry(&entry, FALSE);
+            }
+            mMoney->SetPrice(GetPrice(mPage * 8 + i));
+            mSelected = mPage * 8 + i;
+            return;
+        }
+    }
+    mRockName->Clear();
+    mMoney->SetPrice(0);
+    mSelected = 0xFF;
 }
 
 // A fossil button: chooses it (if the money and the room allow) or unchooses it.

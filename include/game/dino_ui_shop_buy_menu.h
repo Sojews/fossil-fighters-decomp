@@ -9,6 +9,8 @@
 #include "game/dino_ui_shop_buy_menu_item.h"
 
 class DinoUi3PartsMoney;
+class DinoUi3PartsCursor;
+class DinoUi3PartsRockName;
 
 class DinoUiShopBuyMenu : public DinoHelpBase, public MMenu {
 public:
@@ -38,7 +40,9 @@ public:
     std::vector<void *> mItems; // 0xD4: this page's items
     u32 mUnkE0[2];              // 0xE0
     std::vector<u32> mUnkE8;    // 0xE8
-    u8 unkF4[0xC];
+    MTaskSet *mCursorTasks;     // 0xF4
+    DinoUi3PartsCursor *mCursor; // 0xF8
+    DinoUi3PartsRockName *mRockName; // 0xFC
     DinoUi3PartsMoney *mMoney;  // 0x100
     u8 mFlags[8];               // 0x104: the page's chosen items
     int mPage; // 0x10C
