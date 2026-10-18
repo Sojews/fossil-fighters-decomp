@@ -19,6 +19,8 @@ public:
     void FreeTex(u32 key);
     void FreePltt(u32 key);
     MTask *CreateWaitTransferCompleteTask();
+    void SetClearColor(u16 rgb, int alpha, int depth, int polygonID, BOOL fog);
+    void SetViewport(int x1, int y1, int x2, int y2);
 
     u32 mTexSize;       // 0x20
     u32 mPlttSize;      // 0x24
