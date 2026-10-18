@@ -425,11 +425,11 @@ _ZNSt13__vec_deleterISsRSaISsEE12erase_at_endEmN10Metrowerks8int2typeILi0EEE kin
 _ZNSt13__vec_deleterI25DinoCommonWindowMenuEntrySaIS0_EE7grow_byEm kind:function(thumb,size=0x80) addr:0x02007e28 local
 _ZNSt13__vec_deleterI25DinoCommonWindowMenuEntrySaIS0_EE14append_reallocEmRKS0_ kind:function(thumb,size=0x11a) addr:0x02007ea8 local
 _ZNSt13__vec_deleterI25DinoCommonWindowMenuEntrySaIS0_EE12erase_at_endEmN10Metrowerks8int2typeILi0EEE kind:function(thumb,size=0x24) addr:0x02007fc4 local
-func_02007fe8 kind:function(thumb,size=0x34) addr:0x02007fe8
+_ZNSt13__vec_deleterI16DinoWindowChoiceSaIS0_EE8allocateEmN10Metrowerks8int2typeILi1EEE kind:function(thumb,size=0x34) addr:0x02007fe8
 _ZNSt13__vec_deleterI16DinoWindowChoiceSaIS0_EE14append_reallocEmRKS0_ kind:function(thumb,size=0x112) addr:0x0200801c
 _ZNSt20__vec_deleter_helperI25DinoCommonWindowMenuEntryRSaIS0_EED1Ev kind:function(thumb,size=0x32) addr:0x02008130 local
 _ZNSt20__vec_deleter_helperI16DinoWindowChoiceRSaIS0_EED1Ev kind:function(thumb,size=0x3c) addr:0x02008164
-func_020081a0 kind:function(thumb,size=0x34) addr:0x020081a0
+_ZNSt13__vec_deleterI16DinoWindowChoiceRSaIS0_EE8allocateEmN10Metrowerks8int2typeILi1EEE kind:function(thumb,size=0x34) addr:0x020081a0
 _ZNSt13__vec_deleterI16DinoWindowChoiceRSaIS0_EED2Ev kind:function(thumb,size=0x2a) addr:0x020081d4
 _ZNSt13__vec_deleterI25DinoCommonWindowMenuEntryRSaIS0_EE8allocateEmN10Metrowerks8int2typeILi1EEE kind:function(thumb,size=0x34) addr:0x02008200 local
 _ZNSt13__vec_deleterI25DinoCommonWindowMenuEntryRSaIS0_EED2Ev kind:function(thumb,size=0x2a) addr:0x02008234 local
@@ -2121,7 +2121,7 @@ _ZN8M3DScene8SetUnk80Emm kind:function(thumb,size=0xc) addr:0x02021b24
 _ZN8M3DScene7ExecuteEv kind:function(thumb,size=0x274) addr:0x02021b30
 _ZN8M3DScene5Unk0CEv kind:function(thumb,size=0x2) addr:0x02021da4
 _ZN8M3DScene16CreateEnableTaskEh kind:function(thumb,size=0x34) addr:0x02021da8
-func_02021ddc kind:function(thumb,size=0xc0) addr:0x02021ddc
+_ZN8M3DModelC2Ev kind:function(thumb,size=0xc0) addr:0x02021ddc
 _ZN8M3DModelC1Ev kind:function(thumb,size=0xc0) addr:0x02021e9c
 _ZN8M3DModelD1Ev kind:function(thumb,size=0x20) addr:0x02021f5c
 _ZN8M3DModelD0Ev kind:function(thumb,size=0x28) addr:0x02021f7c
@@ -2272,8 +2272,8 @@ _ZN12MPolygonChar4LoadEPKcS1_ kind:function(thumb,size=0xf10) addr:0x0202837c
 .L_02029222 kind:label(thumb) addr:0x02029222 local
 .L_02029232 kind:label(thumb) addr:0x02029232 local
 .L_02029238 kind:label(thumb) addr:0x02029238
-func_0202928c kind:function(thumb,size=0xa) addr:0x0202928c
-func_02029298 kind:function(thumb,size=0x14) addr:0x02029298
+_ZNSt6vectorI7MAnmKeySaIS0_EEC1Ev kind:function(thumb,size=0xa) addr:0x0202928c
+_ZN9M3DRyusenC1Ev kind:function(thumb,size=0x14) addr:0x02029298
 _ZN12MPolygonCharD1Ev kind:function(thumb,size=0x16) addr:0x020292ac
 _ZN12MPolygonCharD0Ev kind:function(thumb,size=0x1c) addr:0x020292c4
 _ZN12MPolygonChar4IdleEv kind:function(thumb,size=0x104) addr:0x020292e0

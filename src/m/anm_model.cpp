@@ -401,3 +401,11 @@ MAnmSE::~MAnmSE() {
 
 #pragma auto_inline off
 template class std::__vec_deleter<MAnmKey, std::allocator<MAnmKey> >;
+// (The script reader makes arrays of key vectors and trail models; until it is decompiled, this keeps the
+// constructors it uses out of line.)
+#pragma dont_inline on
+void MAnmMakeArrays() {
+    delete[] new std::vector<MAnmKey>[1];
+    delete[] new M3DRyusen[1];
+}
+#pragma dont_inline reset
