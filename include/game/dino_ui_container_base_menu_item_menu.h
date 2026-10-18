@@ -34,22 +34,27 @@ public:
     void ClearItems();
     void RefreshPage2();
     u8 GetFlag(int index);
+    void SetFlag(int index, u8 flag);
+    void RefreshMarks();
 
     DinoUi3PartsFraction *mFraction; // 0xB4: "page n/m"
     u8 mFlags[0x40];            // 0xB8
     int mPage;                  // 0xF8
     int mLastPage;              // 0xFC
-    u8 mUnk100; // 0x100
+    u8 mCount;                  // 0x100: how many are marked
     u8 unk101[3];
     u32 mUnk104[1];
     MArchivePtr mArchive;       // 0x108
     MArchiveFile mFile;         // 0x10C
     u32 mUnk118[2];             // 0x118
     std::vector<void *> mItems; // 0x120: this page's items
-    u32 mUnk12C[3];             // 0x12C
+    u32 mUnk12C[2];             // 0x12C
+    MMenuItem *mBack;           // 0x134
     MMenuItem *mLinkFrom;       // 0x138: linked to the first page item
     u32 mUnk13C[3];
-    std::vector<u32> mUnk148;   // 0x148
+    std::vector<u32> mUnk148;   // 0x148: the entries
+    u8 mSelected;               // 0x154: 0xFF for none
+    u8 mIdled;                  // 0x155: set once the menu has idled (decides only count after)
 };
 
 #endif

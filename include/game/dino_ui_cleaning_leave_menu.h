@@ -22,7 +22,7 @@ public:
     virtual BOOL IsMarkable(DinoBackupEntry *entry);
     virtual MTask *CreateUnk2C();
 
-    u32 mUnk154[3];     // 0x154
+    u32 mUnk158[2];     // 0x158
 };
 
 #endif

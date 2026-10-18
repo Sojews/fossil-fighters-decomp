@@ -4,6 +4,12 @@
 // Derived destructors have their bases' destructor bodies inlined; auto-inlining the ones defined above does that.
 #pragma auto_inline on
 
+#include "game/dino_backup.h"
+
+#include "m/input.h"
+
+#include "game/dino_ui3_parts_kaseki_button.h"
+
 #include "game/dino_ui_container_base_menu_item_menu.h"
 #include "game/dino_ui_container_base_menu_item.h"
 #include "m/bg_new_task.h"
@@ -106,7 +112,7 @@ void DinoUiContainerBaseMenu::OnBackDecided() {
 
 void DinoUiContainerBaseDecideButton::OnFocusChanged(BOOL focused) {
     if (focused) {
-        if (mOwner->mUnk100) {
+        if (mOwner->mCount) {
             mMotion->Play(2, 0);
         } else {
             mMotion->Play(1, 0);
@@ -174,4 +180,83 @@ void DinoUiContainerBaseMenu::ClearItems() {
 
 u8 DinoUiContainerBaseMenu::GetFlag(int index) {
     return mFlags[index];
+}
+
+// Entries that can't be marked now (and aren't) are greyed out.
+void DinoUiContainerBaseMenu::RefreshMarks() {
+    for (int i = 0; i < mItems.size(); i++) {
+        DinoBackupEntry entry;
+        GetEntry(mPage * 8 + i, &entry);
+        if (!GetFlag(mPage * 8 + i) && (!IsMarkable(&entry) || !CanMark())) {
+            ((DinoUi3PartsKasekiButton *)mItems[i])->SetActive(FALSE);
+        } else {
+            ((DinoUi3PartsKasekiButton *)mItems[i])->SetActive(TRUE);
+        }
+    }
+}
+
+void DinoUiContainerBaseMenu::SetFlag(int index, u8 flag) {
+    if (flag != mFlags[index]) {
+        mFlags[index] = flag;
+        if (flag) {
+            mCount++;
+            DinoSoundPlaySe(0x9C, 0);
+        } else {
+            mCount--;
+            DinoSoundPlaySe(0x9D, 0);
+        }
+        RefreshMarks();
+    }
+}
+
+// X jumps to the decide button; B unmarks the selected entry, or goes to (and then presses) the back button.
+void DinoUiContainerBaseMenu::OnIdle() {
+    mIdled = TRUE;
+    if (GetInput()->GetPressed() & 8) {
+        FocusItem(mLinkFrom);
+    }
+    if (GetInput()->GetPressed() & 2) {
+        if (mSelected != 0xFF && GetFlag(mSelected)) {
+            SetFlag(mSelected, FALSE);
+            ((DinoUi3PartsKasekiButton *)mItems[mSelected % 8])->SetMarked(FALSE);
+            return;
+        }
+        if (mBack->IsFocused()) {
+            mBack->Decide();
+        } else {
+            FocusItem(mBack);
+        }
+    }
+}
+
+// An entry button: marks it (if it and the container allow) or unmarks it.
+void DinoUiContainerBaseMenu::OnDecide(MMenuItem *item) {
+    for (int i = 0; i < 8; i++) {
+        if (item == mItems[i]) {
+            if (!mIdled) {
+                return;
+            }
+            u32 index = mPage * 8 + i;
+            if (index >= mUnk148.size()) {
+                return;
+            }
+            u8 flag = !GetFlag(index);
+            if (flag) {
+                DinoBackupEntry entry;
+                GetEntry(mPage * 8 + i, &entry);
+                if (!IsMarkable(&entry)) {
+                    DinoSoundPlaySe(0xA4, 0);
+                    return;
+                }
+                if (!CanMark()) {
+                    DinoSoundPlaySe(0xA4, 0);
+                    mSerial.AddTail(CreateUnk2C());
+                    return;
+                }
+            }
+            SetFlag(mPage * 8 + i, flag);
+            ((DinoUi3PartsKasekiButton *)mItems[i])->SetMarked(flag);
+            return;
+        }
+    }
 }

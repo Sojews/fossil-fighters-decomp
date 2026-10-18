@@ -63,7 +63,7 @@ void DinoUiCanonPutinMenu::GetEntry(u32 index, DinoBackupEntry *entry) {
 }
 
 BOOL DinoUiCanonPutinMenu::CanMark() {
-    if (gDinoBackup->CountFreeUnk14C() > mUnk100) {
+    if (gDinoBackup->CountFreeUnk14C() > mCount) {
         return TRUE;
     }
     return FALSE;
@@ -90,7 +90,7 @@ void DinoUiCanonTakeoutMenu::GetEntry(u32 index, DinoBackupEntry *entry) {
 }
 
 BOOL DinoUiCanonTakeoutMenu::CanMark() {
-    if (gDinoBackup->CountFreeUnk98() > mUnk100) {
+    if (gDinoBackup->CountFreeUnk98() > mCount) {
         return TRUE;
     }
     return FALSE;
