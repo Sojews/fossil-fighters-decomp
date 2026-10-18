@@ -66,6 +66,13 @@ void DinoUiIslandMapMenu::SetSilentFocus(BOOL silent) {
 BOOL DinoUiIslandMapMenu::IsSilentFocus() {
     return mSilentFocus;
 }
+
+DinoUiIslandMapMenu::DinoUiIslandMapMenu(int *result, u32 arg)
+    : MMenu(NULL, 2), mUnkE8(0), mMap("image/all_map", 0) {
+    mUnk144 = arg;
+    mResult = result;
+    mBackButton = NULL;
+}
 #pragma auto_inline on
 
 void DinoMapBackButton::OnSelectChanged(BOOL value) {
