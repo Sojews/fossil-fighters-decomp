@@ -66,6 +66,8 @@ public:
     virtual void OnFocusChanged(BOOL focused);
     virtual void OnSelectChanged(BOOL selected);
     virtual void OnDecide();
+    virtual MRect GetRect();
+    virtual MDisplay *GetDisplay();
 };
 
 class DinoUiSenryuSubMenu : public MTask {

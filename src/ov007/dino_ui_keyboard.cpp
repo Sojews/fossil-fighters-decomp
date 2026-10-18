@@ -323,3 +323,19 @@ void DinoUiSenryuMenu::OnFocus(MMenuItem *item) {
 
 // DinoUiKeyboardMenu::OnStart (not decompiled yet) starts a background load.
 template MTask *MCreateBgCallTask(DinoUiKeyboardMenu *obj, void (DinoUiKeyboardMenu::*func)(), int thread);
+
+MRect DinoUiKeyboardHideMenuItem::GetRect() {
+    return GetFrame();
+}
+
+MDisplay *DinoUiKeyboardHideMenuItem::GetDisplay() {
+    return MProcess::GetDisplay();
+}
+
+MRect DinoUiSenryuListHideMenuItem::GetRect() {
+    return GetFrame();
+}
+
+MDisplay *DinoUiSenryuListHideMenuItem::GetDisplay() {
+    return MProcess::GetDisplay();
+}

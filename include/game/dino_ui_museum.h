@@ -22,6 +22,10 @@ public:
 class DinoUiMuseumMenu : public DinoHelpBase, public MMenu {
 public:
     virtual ~DinoUiMuseumMenu();
+    virtual void OnIdle();
+
+    u8 unkB3[0xF9];  // members start in MMenu's tail padding
+    u8 mUnk1AC;     // 0x1AC
 };
 
 class DinoUiMuseumEffectLight : public MProcess {

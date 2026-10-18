@@ -234,6 +234,10 @@ void DinoUiMuseumInformationMenu::PageLeft() {
     func_ov006_0218a570(this);
 }
 
+void DinoUiMuseumMenu::OnIdle() {
+    mUnk1AC = TRUE;
+}
+
 // DinoUiMuseum3DModel::Idle and DinoUiMuseum's page turns (not decompiled yet) start background loads.
 template MTask *MCreateBgCallTask(DinoUiMuseum3DModel *obj, void (DinoUiMuseum3DModel::*func)(), int thread);
 template MTask *MCreateBgCallTask(DinoUiMuseum *obj, void (DinoUiMuseum::*func)(), int thread);
