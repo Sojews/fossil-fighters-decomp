@@ -681,7 +681,7 @@ from:0x02159004 kind:thumb_call to:0x020654bc module:main
 from:0x0215900a kind:thumb_call to:0x020051dc module:main
 from:0x02159018 kind:load to:0x02161ca4 module:overlay(3)
 from:0x02159048 kind:load to:0x02160fb0 module:overlay(3)
-from:0x0215904c kind:load to:0x02160fb4 module:overlay(3)
+from:0x0215904c kind:load to:0x02160fb0 add:0x4 module:overlay(3)
 from:0x02159050 kind:load to:0x02160f60 module:overlay(3)
 from:0x02159060 kind:thumb_call to:0x0206665c module:main
 from:0x021590a4 kind:thumb_call to:0x02011ed4 module:main

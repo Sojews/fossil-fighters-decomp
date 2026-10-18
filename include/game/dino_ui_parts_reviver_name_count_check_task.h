@@ -7,6 +7,7 @@ class DinoUiPartsReviverName;
 
 class DinoUiPartsReviverNameCountCheckTask : public MTask {
 public:
+    DinoUiPartsReviverNameCountCheckTask(DinoUiPartsReviverName *name);
     virtual ~DinoUiPartsReviverNameCountCheckTask();
     virtual void Execute();
 

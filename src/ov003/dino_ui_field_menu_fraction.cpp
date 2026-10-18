@@ -1,12 +1,14 @@
 // DinoUiFieldMenuFraction, DinoUiFieldMenuNumber, DinoUiFieldMenuNumber3, DinoUiPartsNumber8, DinoUiPartsReviverMedalButton, DinoUiPartsReviverNameCountCheckTask, DinoUiPartsBlackBelt, DinoUiPartsRockName, DinoUiPartsKasekiButton, DinoUiPartsTeamInfo, DinoUiPartsTeamTech.
 // One TU: the field menu parts (0x021584d4-0x0215b008).
 // NONMATCHING: the constructors of DinoUiFieldMenuNumber and DinoUiFieldMenuFraction4 (the game keeps this + i * 4
-// in a stack slot across the first string temporary's destructor), DinoUiFieldMenuNumber3 and DinoUiPartsNumber8 (the
-// game loads gCurrentDisplay after copying the canvas size).
+// in a stack slot across the first string temporary's destructor), DinoUiFieldMenuNumber3, DinoUiPartsNumber8 and
+// DinoUiPartsReviverName (the game loads gCurrentDisplay after copying the canvas size), and
+// DinoUiPartsReviverName::SetCreature (the game takes the length limit's address from its own literal).
 
 // Derived destructors have their bases' destructor bodies inlined; auto-inlining the ones defined above does that.
 #pragma auto_inline on
 
+#include "game/dino_resource.h"
 #include "game/dino_sound.h"
 #include "game/dino_ui_field_menu_fraction_menu.h"
 #include "game/dino_ui_field_menu_fraction.h"
@@ -28,9 +30,19 @@
 #include "m/font.h"
 #include "m/obj.h"
 #include "m/oam_canvas.h"
+#include <algorithm>
 #include <stdio.h>
 
 extern const char *data_ov003_02160c60[]; // motion file paths
+extern const char *data_ov003_02160ce0[]; // more motion file paths
+
+// The medal motions by medal kind (-1 ends the table).
+struct MedalMotion {
+    int kind;
+    const char *path;
+};
+extern MedalMotion data_ov003_02160fb0[5];
+extern const char *data_ov003_02160f60[];
 
 DinoUiFieldMenuFraction::~DinoUiFieldMenuFraction() {
 }
@@ -240,6 +252,65 @@ MRect DinoUiPartsKasekiButton::GetFrame() {
     return MRect(mPos.Offset(-24, -24), mPos.Offset(24, 24));
 }
 
+#pragma auto_inline off
+static const char *GetMedalMotion(int kind) {
+    for (u32 i = 0; i < 5; i++) {
+        if (kind == data_ov003_02160fb0[i].kind || data_ov003_02160fb0[i].kind == -1) {
+            return data_ov003_02160fb0[i].path;
+        }
+    }
+    return data_ov003_02160f60[21];
+}
+#pragma auto_inline reset
+
+DinoUiPartsReviverMedalButton::DinoUiPartsReviverMedalButton(MSmartOam *oam, MPoint pos, u32 creature, u8 lit,
+                                                             u8 byKind) {
+    mKind = lit == 0 ? 1 : 0;
+    mEmpty = creature == 0xFFFF ? 1 : 0;
+    if (creature == 0xFFFF) {
+        creature = 1;
+    }
+    if (byKind) {
+        const DinoCreatureDef *def = gDinoResource->GetCreatureDef(creature);
+        mMotion = new MMotion(std::string(GetMedalMotion(def->unk0D)), oam, 2, 1);
+    } else if (creature == 0) {
+        mMotion = new MMotion(std::string(data_ov003_02160ce0[11]), oam, 2, 1);
+    } else {
+        char path[256];
+        OS_SPrintf(path, "/motion/ui_reviver_medal/reviver_%03d.bin", creature);
+        mMotion = new MMotion(std::string(path), oam, 2, 1);
+    }
+    mMotion->Play(mKind + 1, 0);
+    mMotion->SetPosition(pos);
+    mMotion->SetPriority(2);
+    mParallel.AddTail(mMotion);
+    if (mEmpty) {
+        mMotion->Hide();
+    } else {
+        mMotion->Show();
+    }
+    mMotion->GetUnit()->SetMode(1);
+    mFrame = MRect(pos.Offset(-16, -16), pos.Offset(16, 16));
+}
+
+void DinoUiPartsReviverMedalButton::PlayNormal() {
+    mMotion->Play(mKind + 1, 0);
+    mMotion->SetPriority(2);
+}
+
+void DinoUiPartsReviverMedalButton::PlayFocused() {
+    mMotion->Play(mKind + 3, 0);
+    mMotion->SetPriority(2);
+}
+
+void DinoUiPartsReviverMedalButton::PlayDecided() {
+    mMotion->Play(mKind + 5, 0);
+    mMotion->SetPriority(1);
+    if (!mEmpty) {
+        DinoSoundPlaySe(0x9E, 0);
+    }
+}
+
 MRect DinoUiPartsReviverMedalButton::GetFrame() {
     return mFrame;
 }
@@ -361,6 +432,84 @@ void DinoUiFieldMenuFraction::SetPriority(int priority) {
     mDenominator->SetPriority(priority);
 }
 
+MTask *DinoUiPartsReviverName::CreateFlyInTask(MPoint to) {
+    MSerialTaskSet *tasks = new MSerialTaskSet(TRUE);
+    MTask *front = mMotion->CreatePriorityTransfer(2);
+    MTask *wait = mMotion->CreateWaitStopTask();
+    MTask *landSe = DinoSoundCreatePlaySeTask(0xA2, 0);
+    MTask *land = mMotion->CreatePlayTransfer(mLength + 7, 0);
+    MTask *fly = mMotion->CreateCoordAnime(mMotion->GetPosition(), to, 30, 0);
+    MTask *flySe = DinoSoundCreatePlaySeTask(0xA0, 0);
+    tasks->AddTail(mMotion->CreatePriorityTransfer(1));
+    tasks->AddTail(flySe);
+    tasks->AddTail(fly);
+    tasks->AddTail(land);
+    tasks->AddTail(landSe);
+    tasks->AddTail(wait);
+    tasks->AddTail(front);
+    return tasks;
+}
+
+DinoUiPartsReviverName::DinoUiPartsReviverName() : MProcess(NULL) {
+    mLength = 0;
+    mLeft = 0;
+    mMotionHidden = FALSE;
+    mTextHidden = FALSE;
+    mOam = new MSmartOam(20, 0, TRUE);
+    mMotion = new MMotion(std::string(data_ov003_02160c60[14]), mOam, 2, 1);
+    mMotion->Play(1, 0);
+    mMotion->SetPosition(0, 0);
+    mMotion->SetPriority(1);
+    mMotion->Hide();
+    mParallel.AddTail(mMotion);
+    mMotion->GetUnit()->SetMode(1);
+    mFont = gDinoResource->CreateFont12(0, 1, 0);
+    MObjCanvas *canvas = new MObjCanvas(gCurrentDisplay, gCurrentDisplay->mObj->mOam, MPoint(160, 16),
+                                        gDinoResource->GetUnkTable(), TRUE);
+    canvas->GetOamUnit()->SetMode(1);
+    mText = new MIndicator(canvas, mFont, 0);
+    mParallel.AddTail(mText);
+    mText->SetPosition(0, 0);
+    mText->SetPriority(1);
+    mText->Hide();
+    mParallel.AddTail(mOam);
+    Activate();
+}
+
+void DinoUiPartsReviverName::SetCreature(u32 id) {
+    std::string name(gDinoResource->GetCreatureText08(id));
+    mText->SetText(std::string(name));
+    MPoint size = mFont->MeasureText(name, 0, 0);
+    u8 length = (size.x + 7) / 8;
+    // The longest plate (16 letters) is a constant in the file's data.
+    mLength = std::min(length, ((const u8 *)data_ov003_02160c60)[2]);
+    mMotion->Hide();
+    mText->Hide();
+    mLeft = mLength + 15;
+    mTextWidth = size.x;
+}
+
+// Keeps the plate on the screen.
+void DinoUiPartsReviverName::SetPosition(MPoint pos) {
+    int x = pos.x;
+    int y = pos.y;
+    if (x < 8) {
+        x = 8;
+    }
+    if (x + mLength * 8 + 16 > 248) {
+        x = 232 - mLength * 8;
+    }
+    mMotion->SetPosition(MPoint(x + 16, y));
+    x += 8;
+    mText->SetPosition(MPoint(x + (u8)((mLength * 8 - mTextWidth) / 2), y + 6));
+}
+
+void DinoUiPartsReviverName::Hide() {
+    mMotion->Hide();
+    mText->Hide();
+    mLeft = 0;
+}
+
 void DinoUiPartsReviverName::Idle() {
     if (mLeft) {
         mLeft--;
@@ -368,10 +517,45 @@ void DinoUiPartsReviverName::Idle() {
             mMotion->Play(mLength - mLeft + 1, 0);
             mMotion->Show();
             if (mLeft == 0) {
-                mDone->Show();
+                mText->Show();
             }
         }
     }
+}
+
+// While the help is open, the name is hidden.
+void DinoUiPartsReviverName::Unk08() {
+    if (!mMotion->IsHidden()) {
+        mMotion->Hide();
+        mMotionHidden = TRUE;
+        if (mMotion->mState == STATE_RUN) {
+            mMotion->Execute();
+        }
+        if (mOam->mState == STATE_RUN) {
+            mOam->Execute();
+        }
+    } else {
+        mMotionHidden = FALSE;
+    }
+    if (!mText->IsHidden()) {
+        mText->Hide();
+        mTextHidden = TRUE;
+    } else {
+        mTextHidden = FALSE;
+    }
+}
+
+void DinoUiPartsReviverName::Unk0C() {
+    if (mMotionHidden) {
+        mMotion->Show();
+    }
+    if (mTextHidden) {
+        mText->Show();
+    }
+}
+
+DinoUiPartsReviverNameCountCheckTask::DinoUiPartsReviverNameCountCheckTask(DinoUiPartsReviverName *name) {
+    mName = name;
 }
 
 void DinoUiPartsReviverNameCountCheckTask::Execute() {
