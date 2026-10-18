@@ -6,6 +6,9 @@
 #include "m/call_task.h"
 #include "m/polygon_char.h"
 #include "game/dino_field.h"
+#include "game/dino_event_kaseki_rock_found.h"
+#include "game/dino_field_hole.h"
+#include "nitro/mi.h"
 
 DinoEventParkKasekiRockFound::~DinoEventParkKasekiRockFound() {
 }
@@ -14,9 +17,70 @@ void DinoEventParkKasekiRockFound::Idle() {
     (this->*mState)();
 }
 
+// The TU's pooled pointer-to-member constants (see menu.cpp).
+extern "C" struct {
+    u8 unk00[0x30];
+    void (DinoEventKasekiRockFound::*Unk02037064_30)();
+    u8 unk38[0x40 - 0x38];
+    void (DinoEventKasekiRockFound::*Unk02036b90_40)();
+    u8 unk48[0x58 - 0x48];
+    void (DinoEventKasekiRockFound::*StateAnswered_58)();
+    void (DinoEventKasekiRockFound::*Unk02036f64_60)();
+    u8 unk68[0x78 - 0x68];
+    void (DinoEventKasekiRockFound::*StateFoundEnd_78)();
+} data_020bd380;
+extern "C" struct {
+    u8 unk00[0x28];
+    void (DinoEventKasekiRockFound::*Unk02036bd4_28)();
+    void (DinoEventParkKasekiRockFound::*Unk02037704_30)();
+    void (DinoEventParkKasekiRockFound::*StateStart_38)();
+} data_020bd400;
+
+void DinoEventKasekiRockFound::StateFound() {
+    mSerial.AddTail(CreateFoundMessage());
+    mState = data_020bd380.StateFoundEnd_78;
+}
+
+void DinoEventKasekiRockFound::StateFoundEnd() {
+    if (mUnk80[3] != 0) {
+        mState = data_020bd400.Unk02036bd4_28;
+    } else {
+        mState = data_020bd380.Unk02036b90_40;
+    }
+}
+
+void DinoEventKasekiRockFound::StateAsk() {
+    mAnswer = 1;
+    mSerial.AddTail(CreateYesNo(0xF));
+    mState = data_020bd380.StateAnswered_58;
+}
+
+void DinoEventKasekiRockFound::StateAnswered() {
+    if (mAnswer == 0) {
+        mState = data_020bd380.Unk02036f64_60;
+    } else {
+        mState = data_020bd380.Unk02037064_30;
+    }
+}
+
+DinoEventParkKasekiRockFound::DinoEventParkKasekiRockFound(DinoEventLoop *event, u32 index)
+    : MProcess(NULL), mEvent(event), mIndex(index) {
+    mState = data_020bd400.StateStart_38;
+}
+
+void DinoEventParkKasekiRockFound::StateStart() {
+    mEvent->GetField()->SetUnk258(TRUE);
+    gDinoBackup->GetUnk138(mIndex, &mEntry);
+    DinoBackupEntry28 empty;
+    MI_CpuFill8(&empty, 0, sizeof(empty));
+    gDinoBackup->SetUnk138(mIndex, &empty);
+    u32 focus = mEvent->GetField()->GetCamera()->GetFocus();
+    mChara = mEvent->GetField()->GetChara(focus);
+    mState = data_020bd400.Unk02037704_30;
+}
+
 // Template task instances the game emits in this file. Until the code that makes the tasks is decompiled, they are
 // instantiated explicitly.
-class DinoFieldHole {};
 template class MCallTask0<DinoFieldHole, DinoFieldHole>;
 template MTask *MCreateCallTask(DinoFieldHole *obj, void (DinoFieldHole::*func)());
 template class MCallTask1<DinoEventLoop, DinoEventLoop, bool>;
