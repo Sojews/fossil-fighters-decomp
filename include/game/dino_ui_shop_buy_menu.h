@@ -20,14 +20,16 @@ public:
     BOOL PageRight();
     BOOL PageLeft();
     BOOL Buy();
-    void RefreshPage1();
+    void ClearItems();
     void RefreshPage2();
     void RefreshPage3();
 
     MArchivePtr mArchive;       // 0xB4
     MArchiveFile mFile;         // 0xB8
-    u32 mUnkC4[4];              // 0xC4
-    std::vector<void *> mUnkD4; // 0xD4
+    u32 mUnkC4[2];              // 0xC4
+    MMenuItem *mLinkFrom;       // 0xCC: linked to the first page item
+    u32 mUnkD0;                 // 0xD0
+    std::vector<void *> mItems; // 0xD4: this page's items
     u32 mUnkE0[2];              // 0xE0
     std::vector<u32> mUnkE8;    // 0xE8
     u8 unkF4[24];

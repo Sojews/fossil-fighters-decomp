@@ -17,9 +17,18 @@
 
 #pragma auto_inline off
 
+// Clears the page's items.
+void DinoUiShopBuyMenu::ClearItems() {
+    RemoveLink(mLinkFrom, 4);
+    for (int i = 0; i < mItems.size(); i++) {
+        RemoveItem((MMenuItem *)mItems[i]);
+        delete (MMenuItem *)mItems[i];
+    }
+}
+
 BOOL DinoUiShopBuyMenu::PageLeft() {
     mPage = (mPage + mLastPage) % (mLastPage + 1);
-    RefreshPage1();
+    ClearItems();
     RefreshPage2();
     RefreshPage3();
     return TRUE;
@@ -31,7 +40,7 @@ BOOL DinoUiShopBuyMenu::PageLeft() {
 
 BOOL DinoUiShopBuyMenu::PageRight() {
     mPage = (mPage + 1) % (mLastPage + 1);
-    RefreshPage1();
+    ClearItems();
     RefreshPage2();
     RefreshPage3();
     return TRUE;
