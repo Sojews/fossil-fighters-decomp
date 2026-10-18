@@ -228,7 +228,8 @@ public:
     void Leave();
     void StateJoin();
     void StateWaitStart();
-    void State02166f10();
+    void StateSendRocks();
+    void State021670bc();
 
     void (DinoUiCannonChild::*mState)(); // 0xA8
     MMultiPlay *mMultiPlay;     // 0xB0

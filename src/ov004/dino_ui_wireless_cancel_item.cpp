@@ -21,6 +21,7 @@
 #include "m/observer.h"
 #include "m/multi_play.h"
 #include "m/text_codec.h"
+#include "game/backup_validater.h"
 #include "game/dino_message.h"
 #include "game/dino_multi_play_icon.h"
 #include "m/pal.h"
@@ -285,7 +286,8 @@ extern "C" struct {
 extern "C" struct {
     u8 unk00[0x4];
     void (DinoUiBattleParentScanner::*StateShowCancel_04)(); // 0x04
-    u8 unk0C[0x1C - 0xC];
+    u8 unk0C[0x14 - 0xC];
+    void (DinoUiCannonChild::*State021670bc_14)(); // 0x14
     DinoUiWirelessMatchState StateStartWireless_1C; // 0x1c
     DinoUiWirelessMatchState StateChildScan_24; // 0x24
     void (DinoUiCannonChild::*StateWaitStart_2C)(); // 0x2c
@@ -318,7 +320,8 @@ extern "C" struct {
     void (DinoUiCannonParentScanner::*ParentStart_7C)(); // 0x7c
 } data_ov004_021741d0;
 extern "C" struct {
-    u8 unk00[0xc];
+    u8 unk00[0x4];
+    void (DinoBackup::*Save_04)(); // 0x04
     DinoUiWirelessMatchState StateStart; // 0x0c
     void (DinoUiCannonChild::*StateShootMenu_14)(); // 0x14
     DinoUiWirelessMatchState StateChildScan; // 0x1c
@@ -363,7 +366,7 @@ extern "C" struct {
     DinoUiWirelessMatchState StateKeep; // 0x2c
     void (DinoUiCannonParentScanner::*State02166588_34)(); // 0x34
     u8 unk3C[0x44 - 0x3C];
-    void (DinoUiCannonChild::*State02166f10_44)(); // 0x44
+    void (DinoUiCannonChild::*StateSendRocks_44)(); // 0x44
     u8 unk4C[0x54 - 0x4C];
     void (DinoUiCannonChild::*Child021674f8_54)(); // 0x54
     DinoUiWirelessMatchState StateParentScanned; // 0x5c
@@ -704,7 +707,7 @@ void DinoUiCannonChild::StateWaitStart() {
         mHub->SetUnk279(TRUE);
         mHub->AddObserver(this);
         mParallel.AddTail(mHub);
-        mState = data_ov004_02174350.State02166f10_44;
+        mState = data_ov004_02174350.StateSendRocks_44;
     }
 }
 
@@ -972,6 +975,33 @@ void DinoUiBattleParentScanner::StateStart() {
     mTasks = new MParallelTaskSet;
     mParallel.AddTail(mTasks);
     mState = data_ov004_021742d0.StateShowCancel_24;
+}
+
+extern const u32 data_0208ab54;
+
+// Sends off the fossil rocks shot: takes them out of the backup and saves.
+void DinoUiCannonChild::StateSendRocks() {
+    for (u32 i = 0; i < mUnkB8.size(); i++) {
+        DinoBackupEntry entry;
+        gDinoBackup->GetUnk14C((u32)mUnkB8[i], &entry);
+        mRocks.push_back(entry);
+        MI_CpuFill8(&entry, 0, sizeof(entry));
+        gDinoBackup->SetUnk14C((u32)mUnkB8[i], &entry);
+    }
+    gDinoBackup->CompactUnk14C();
+    MTask *wait = new DinoCommonWindowMessageWait1(std::string(gDinoResource->GetText(data_0208ab54)), MPoint(0x80, 0x60),
+                                                   4, 0);
+    mParallel.AddTail(wait);
+    MTask *waitExit = MTaskExitTransfer::Create(wait);
+    MTask *validate = new DinoBackupWriteValidater(wait, mMultiPlay);
+    MTask *save = MCreateBgCallTask(gDinoBackup, data_ov004_02174250.Save_04, 1);
+    MTask *validateSave = new DinoBackupWriteValidater(wait, mMultiPlay);
+    MSerialTaskSet *serial = &mSerial;
+    serial->AddTail(validateSave);
+    serial->AddTail(save);
+    serial->AddTail(validate);
+    serial->AddTail(waitExit);
+    mState = data_ov004_02174150.State021670bc_14;
 }
 
 // Ends the scan and leaves after half a second.
