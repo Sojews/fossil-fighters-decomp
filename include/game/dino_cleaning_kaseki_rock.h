@@ -29,6 +29,9 @@ public:
     void CountCells();
     void SetOffset(MPoint offset);
     void SetOffsetAll(MPoint offset);
+    void StartDrop();
+    void StateDrop();
+    void State021601e0();
 
     void (DinoCleaningKasekiRock::*mState)();   // 0x74
     u32 unk7C;
@@ -43,9 +46,9 @@ public:
     u32 mUnkA0[(0x4A4 - 0xA0) / 4];             // 0xA0
     MSmartOam *mOam;                            // 0x4A4
     u32 unk4A8;
-    fx32 mUnk4AC;                               // 0x4AC
-    fx32 mUnk4B0;                               // 0x4B0
-    u32 unk4B4;
+    MFx32 mDropY;                               // 0x4AC: the view's height while it drops in
+    MFx32 mDropSpeed;                           // 0x4B0
+    u32 mUnk4B4;                                // 0x4B4
     u8 mUnk4B8;                                 // 0x4B8
 };
 

@@ -211,6 +211,12 @@ void DinoCleaningKasekiRockXrayBlendManager::Idle() {
 
 // The scene's pooled pointer-to-member constants (see menu.cpp).
 extern "C" struct {
+    u8 unk00[0x50];
+    void (DinoCleaningKasekiRock::*StateDrop_50)(); // 0x50
+    u8 unk58[0x68 - 0x58];
+    void (DinoCleaningKasekiRock::*State021601e0_68)(); // 0x68
+} data_ov002_021657d4;
+extern "C" struct {
     u8 unk00[0x8];
     const char *mCountFormat;   // 0x08
     u8 unk0C[0x48 - 0xC];
@@ -252,6 +258,31 @@ extern "C" struct {
 } data_ov002_02165b6c;
 
 extern "C" void func_ov002_0215fdec(DinoCleaningKasekiRock *rock);
+
+// Drops the rock in from above.
+void DinoCleaningKasekiRock::StartDrop() {
+    mDropY.v = 0xC0000;
+    mDropSpeed.v = -0x15000;
+    mView->SetPriority(0);
+    DinoSoundPlaySe(0x43, 0);
+    mState = data_ov002_021657d4.StateDrop_50;
+}
+
+// Falls until it lands, then settles.
+// NONMATCHING: the two additions' argument copies swap stack slots.
+void DinoCleaningKasekiRock::StateDrop() {
+    mDropY = mDropY + mDropSpeed;
+    mDropSpeed = mDropSpeed + MFx32::FromRaw(0xE66);
+    if (mDropY < MFx32(0) || mDropSpeed < MFx32(0)) {
+        mView->Move(0, MFx32ToInt(mDropY));
+        return;
+    }
+    DinoSoundPlaySe(0x3F, 0);
+    mView->Move(0, 0);
+    mView->SetPriority(2);
+    mUnk4B4 = 20;
+    mState = data_ov002_021657d4.State021601e0_68;
+}
 
 DinoCleaning::DinoCleaning(u32 unk9C, void *unkA0, u32 unkA8, u32 unkAC, int mode, u32 unk140)
     : MProcess(NULL), MLooperPreLoopHook(FALSE, TRUE) {
@@ -296,7 +327,7 @@ void DinoCleaning::State021610b0() {
     mState = data_ov002_02165a6c.State02161164_10;
 }
 
-extern "C" void func_ov002_021600f8(DinoCleaningKasekiRock *rock);
+
 
 static inline void AddSerial(DinoCleaning *process, MTask *a, MTask *b, MTask *c, MTask *d) {
     MSerialTaskSet *serial = &process->mSerial;
@@ -309,7 +340,7 @@ static inline void AddSerial(DinoCleaning *process, MTask *a, MTask *b, MTask *c
 // Starts the rock and, after a moment, the help and the live commentary.
 void DinoCleaning::State02160f54() {
     mUnk11C->AddTail(mKasekiRock);
-    func_ov002_021600f8(mKasekiRock);
+    mKasekiRock->StartDrop();
     AddSerial(this, new MTimer(60), MCreateCallTask((DinoCleaningLive *)mUnkE4, data_ov002_02165aec.SetUnkA0_80, (u32)3, true),
               new MTimer(2), MCreateCallTask(this, data_ov002_02165b6c.Enable_18));
     mUnk110 = 3;
