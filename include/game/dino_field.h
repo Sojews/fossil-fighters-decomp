@@ -275,6 +275,8 @@ public:
 
 class DinoFieldPoint;
 
+class DinoFieldKasekiRock;
+
 // One of the field's walk animation states.
 struct DinoFieldStep {
     u8 unk00[0x18];
@@ -324,6 +326,8 @@ public:
         }
     }
     void WalkOnLand0(u32 dir);
+    void CreateKasekiRock(u32 index);
+    void HideUnk2B4();
     void WalkOnLand1(u32 dir);
     void WalkInWater(u32 dir, u32 run);
     MTask *CreateMoneyShowTask();
@@ -386,13 +390,14 @@ public:
     u8 mQuake;                  // 0x2A0
     u32 mQuakeArgs[3];          // 0x2A4
     u32 mQuakeTime;             // 0x2B0
-    u32 mUnk2B4;                // 0x2B4
+    MView *mUnk2B4;             // 0x2B4
     MTask *mUnk2B8;             // 0x2B8
-    u32 mUnk2BC;                // 0x2BC
+    MView *mUnk2BC;             // 0x2BC
     MTask *mUnk2C0;             // 0x2C0
     MTask *mUnk2C4;             // 0x2C4
     BOOL *mUnk2C8;              // 0x2C8
-    u8 unk2CC[0x320 - 0x2CC];
+    DinoFieldKasekiRock *mKasekiRocks[20]; // 0x2CC
+    MTaskSet *mKasekiRockTasks; // 0x31C
     DinoFieldStep mSteps[3];    // 0x320: the walk animations
     u8 unk368[0xC];
     MTaskSet *mEffectTasks;     // 0x374

@@ -1,6 +1,7 @@
 // DinoField.
 
 #include "game/dino_field.h"
+#include "game/dino_field_kaseki_rock.h"
 #include "m/lcd.h"
 #include "game/dino_field_chara_focus_task.h"
 #include "game/dino_field_chara_wait_move_task.h"
@@ -643,6 +644,17 @@ void DinoField::ZoomInUpperPict(u32 pict, MPoint pos, MFx32 scale, u32 a, long b
 
 void DinoField::ZoomOutUpperPict(MFx32 scale, u32 a, long b) {
     ZoomOutPict(gLcd->GetTopDisplay(), &mUpperPict, scale, a, b);
+}
+
+void DinoField::CreateKasekiRock(u32 index) {
+    mKasekiRocks[index] = new DinoFieldKasekiRock(this, mScene, index);
+    mKasekiRockTasks->AddTail(mKasekiRocks[index]);
+}
+
+void DinoField::HideUnk2B4() {
+    mUnk2B4->Hide();
+    mUnk2BC->Hide();
+    mCamera->mNamePanel->SetMode(0, 1);
 }
 
 // NONMATCHING (and WalkOnLand1): the game keeps the run test even with run 0 (movs r2, #0; bne).
