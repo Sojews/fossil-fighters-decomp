@@ -12,6 +12,10 @@ DinoCleaningTimer::~DinoCleaningTimer() {
 
 #pragma auto_inline off
 
+int DinoCleaningTimer::GetRemainingFrames() {
+    return mLimit - mFrames;
+}
+
 int DinoCleaningTimer::GetSeconds() {
     return mFrames / 60;
 }

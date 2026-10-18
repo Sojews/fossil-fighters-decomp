@@ -8,6 +8,14 @@ DinoCleaningScore::~DinoCleaningScore() {
 
 #pragma auto_inline off
 
+MFx32 DinoCleaningScore::GetUnk80() {
+    return mUnk80;
+}
+
+MFx32 DinoCleaningScore::GetUnk84() {
+    return mUnk84;
+}
+
 u8 DinoCleaningScore::GetUnk90() {
     return mUnk90;
 }
