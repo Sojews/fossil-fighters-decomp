@@ -970,6 +970,32 @@ void DinoBattleModelPlayer::Idle() {
     Dispatch();
 }
 
+// Collects the ids of both players' creatures (either player may be missing).
+void DinoCollectCreatureIds(std::vector<void *> &ids, DinoBattleModelPlayer *first, DinoBattleModelPlayer *second) {
+    for (u32 side = 0; side < 2; side++) {
+        DinoBattleModelPlayer *player = side ? second : first;
+        if (player != NULL) {
+            for (u32 i = 0; i < player->GetCreatureCount(); i++) {
+                ids.push_back((void *)player->GetCreature(i)->GetUnkB4());
+            }
+        }
+    }
+}
+
+// Recolors every creature on both sides.
+MTask *DinoBattleModelPlayer::CreateUpdateAllColorTask(u32 color) {
+    u32 ids[6];
+    u32 count = 0;
+    DinoBattleModelPlayer *player = this;
+    for (u32 side = 0; side < 2; side++) {
+        for (u32 i = 0; i < player->GetCreatureCount(); i++) {
+            ids[count++] = player->GetCreature(i)->GetUnkB4();
+        }
+        player = player->GetOpponent();
+    }
+    return CreateUpdateColorTask(ids, count, color);
+}
+
 // Adds to (or takes from) the player's kaseki points.
 void DinoBattleModelPlayer::AddKasekiPoints(int delta) {
     if (delta < 0 && func_ov000_0218472c(1)) {

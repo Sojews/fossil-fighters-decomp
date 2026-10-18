@@ -91,6 +91,7 @@ public:
     MTask *CreateUpdateStateIconTask(u32 creature, u32 arg);
     MTask *CreateSetKasekiPointTask(u32 points);
     void SetKasekiPoints(int points);
+    MTask *CreateUpdateAllColorTask(u32 color);
     void AddKasekiPoints(int delta);
     MTask *CreateAddKasekiPointCreatureDie();
     MTask *CreateUpdateAllCreatureTask();
