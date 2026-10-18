@@ -11,10 +11,12 @@
 #include "game/help.h"
 #include "game/dino_ui_item_menu_item.h"
 
+struct DinoTeam;
 class DinoUiItemMenuItem;
 
 class DinoUiItemMenu : public DinoHelpBase, public MMenu {
 public:
+    DinoUiItemMenu(int *choice, DinoTeam *team, DinoTeam *team2);
     virtual ~DinoUiItemMenu();
     virtual void OnStart();
     virtual void OnFocus(MMenuItem *item);

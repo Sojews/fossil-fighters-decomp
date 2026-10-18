@@ -6,8 +6,10 @@
 #include "game/help.h"
 #include "game/dino_ui_status_menu_item.h"
 
+struct DinoTeam;
 class DinoUiStatusMenu : public DinoHelpBase, public MMenu {
 public:
+    DinoUiStatusMenu(int *choice, DinoTeam *team, DinoTeam *team2);
     virtual ~DinoUiStatusMenu();
     virtual void OnStart();
     virtual void OnFocus(MMenuItem *item);
@@ -31,6 +33,7 @@ public:
     u32 mUnk120;                // 0x120
     int mSelected;              // 0x124
     int mMode;                  // 0x128
+    u8 unk12C[0x138 - 0x12C];
 };
 
 class DinoUiStatusBackButton : public DinoUiStatusMenuItem {

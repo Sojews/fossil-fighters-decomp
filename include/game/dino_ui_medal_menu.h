@@ -13,6 +13,7 @@ class MTextPicture;
 
 class DinoUiMedalMenu : public DinoHelpBase, public MMenu {
 public:
+    DinoUiMedalMenu(u32 *mode, u32 *index, u8 *unk);
     virtual ~DinoUiMedalMenu();
     virtual void OnStart();
     virtual void OnIdle();
@@ -52,6 +53,7 @@ public:
     u8 unk1F1[0x13];
     u8 mUnk204;                         // 0x204
     std::vector<MMotionFile> mMotions;  // 0x208
+    u8 unk214[0x224 - 0x214];
 };
 
 class DinoUiSortMenuItem : public MMenuItem, public DinoHelpItem {
@@ -74,6 +76,8 @@ public:
     DinoUiMedalList();
     virtual ~DinoUiMedalList();
     virtual void Idle();
+
+    void StateMenu();
 
     void (DinoUiMedalList::*mState)(); // 0x74
     u32 mUnk7C;                         // 0x7C

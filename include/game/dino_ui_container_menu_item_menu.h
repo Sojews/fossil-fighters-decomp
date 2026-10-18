@@ -12,12 +12,14 @@
 #include "game/help.h"
 #include "game/dino_ui_container_menu_item.h"
 
+struct DinoTeam;
 class DinoUiPartsRockName;
 
 class DinoUiContainerMenuItem;
 
 class DinoUiContainerMenu : public DinoHelpBase, public MMenu {
 public:
+    DinoUiContainerMenu(int *choice, DinoTeam *team, DinoTeam *team2);
     virtual ~DinoUiContainerMenu();
     virtual void OnStart();
     virtual void OnIdle();
@@ -52,6 +54,7 @@ public:
     u32 mUnk11C[2];             // 0x11C
     int mPage;                  // 0x124
     int mLastPage;              // 0x128
+    u8 unk12C[0x130 - 0x12C];
 };
 
 class DinoUiContainerBackButton : public DinoUiContainerMenuItem {

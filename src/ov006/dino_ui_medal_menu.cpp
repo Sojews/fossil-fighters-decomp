@@ -6,6 +6,8 @@
 // Derived destructors have their bases' destructor bodies inlined; auto-inlining the ones defined above does that.
 #pragma auto_inline on
 
+#include "m/obj.h"
+#include "m/lcd.h"
 #include "game/dino_ui_medal_menu.h"
 #include "game/dino_ui_field_menu_fraction.h"
 #include "m/display.h"
@@ -239,8 +241,24 @@ template void std::__vec_deleter<u32, std::allocator<u32> >::assign<u32 *>(u32 *
 extern "C" struct {
     u8 unk00[0x1C];
     void (DinoUiMedalList::*Start_1C)();
+    void (DinoUiMedalList::*Unk02183980_24)();
 } data_ov006_02194158;
 
 DinoUiMedalList::DinoUiMedalList() : MProcess(NULL), mUnk7C(1), mUnk80(0), mUnk84(0), mUnk85(0) {
     mState = data_ov006_02194158.Start_1C;
+}
+
+void DinoUiMedalList::StateMenu() {
+    gLcd->mMain->ResetHooks();
+    gLcd->mMain->Setup(5, 1, 4, 1, 0, 0);
+    gLcd->mMain->SetBackdrop(0x8000);
+    gLcd->mMain->mObj->Show();
+    gLcd->VSyncNow();
+    gLcd->SetBottomDisplay(gLcd->mMain);
+    gCurrentDisplay = gLcd->GetBottomDisplay();
+    if (mUnk7C == 1) {
+        mUnk80 += mUnk85 * 15;
+    }
+    mSerial.AddTail(new DinoUiMedalMenu(&mUnk7C, &mUnk80, &mUnk84));
+    mState = data_ov006_02194158.Unk02183980_24;
 }
