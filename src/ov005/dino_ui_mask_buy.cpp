@@ -258,6 +258,32 @@ void DinoUiMaskBuyMenu::RefreshPage3() {
     }
 }
 
+// A mask button: chooses it (if the money allows) or unchooses it.
+void DinoUiMaskBuyMenu::OnDecide(MMenuItem *item) {
+    for (int i = 0; i < 8; i++) {
+        if (item == mUnkC4[i]) {
+            int index = mPage * 8 + i;
+            if (index >= mMasks.size()) {
+                continue;
+            }
+            u8 flag = !GetFlag(index);
+            if (flag && mTotal + GetPrice(mPage * 8 + i) > mFunds) {
+                DinoSoundPlaySe(0xA4, 0);
+                return;
+            }
+            SetFlag(mPage * 8 + i, flag);
+            DinoUiMaskBuyMaskButton *button = (DinoUiMaskBuyMaskButton *)mUnkC4[i];
+            if (flag) {
+                button->mMark->Show();
+            } else {
+                button->mMark->Hide();
+            }
+            RefreshPage3();
+            return;
+        }
+    }
+}
+
 // Removes the page's mask buttons.
 // NONMATCHING: the game reloads the size for clear() (as in the containers' ClearItems).
 void DinoUiMaskBuyMenu::RefreshPage1() {

@@ -247,6 +247,30 @@ void DinoUiShopBuyMenu::RefreshPage3() {
     }
 }
 
+// A fossil button: chooses it (if the money and the room allow) or unchooses it.
+void DinoUiShopBuyMenu::OnDecide(MMenuItem *item) {
+    for (int i = 0; i < 8; i++) {
+        if (item == mItems[i]) {
+            int index = mPage * 8 + i;
+            if (index < mUnkE8.size()) {
+                u8 flag = !GetFlag(index);
+                if (flag && mTotal + GetPrice(mPage * 8 + i) > mFunds) {
+                    DinoSoundPlaySe(0xA4, 0);
+                    return;
+                }
+                if (flag && mCount >= gDinoBackup->CountFreeUnk98()) {
+                    DinoSoundPlaySe(0xA4, 0);
+                    return;
+                }
+                SetFlag(mPage * 8 + i, flag);
+                ((DinoUi3PartsKasekiButton *)mItems[i])->SetMarked(flag);
+                RefreshPage3();
+            }
+            return;
+        }
+    }
+}
+
 // X jumps to the buy button; B unchooses the selected item, or goes to (and then presses) the back button.
 void DinoUiShopBuyMenu::OnIdle() {
     if (GetInput()->GetPressed() & 8) {
