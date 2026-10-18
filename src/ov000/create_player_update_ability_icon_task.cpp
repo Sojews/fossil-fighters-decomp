@@ -750,6 +750,17 @@ DinoBattleModelCreature *DinoBattleModelPlayer::FindCreatureByB4(u32 id) {
     return NULL;
 }
 
+DinoBattleModelCreature *DinoBattleModelPlayer::GetCreatureInSlot(int slot) {
+    if (mUnk130[slot] == 0) {
+        return NULL;
+    }
+    return FindCreatureByB4(mUnk130[slot]);
+}
+
+void DinoBattleModelPlayer::ClearEvents() {
+    mUnkA8.clear();
+}
+
 BOOL DinoBattleModelPlayer::AnyCreatureUnkD244() {
     int i;
 
