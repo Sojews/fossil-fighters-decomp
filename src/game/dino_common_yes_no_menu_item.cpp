@@ -18,6 +18,11 @@ void DinoCommonWindowYesNoDialog::SetLabels(std::string yes, std::string no) {
     mUnk80 = no;
 }
 
+void DinoCommonWindowYesNoDialog::SetLabels2(std::string yes, std::string no) {
+    mUnkA4 = yes;
+    mUnk98 = no;
+}
+
 DinoCommonYesNoMenuItem::~DinoCommonYesNoMenuItem() {
 }
 

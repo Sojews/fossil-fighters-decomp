@@ -12,6 +12,7 @@ public:
     virtual ~DinoCommonWindowYesNoDialog();
     virtual void Idle();
     void SetLabels(std::string yes, std::string no);
+    void SetLabels2(std::string yes, std::string no);   // (a second pair of labels)
 
     std::string mUnk74; // 0x74
     std::string mUnk80; // 0x80
