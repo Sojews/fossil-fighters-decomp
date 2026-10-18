@@ -286,6 +286,32 @@ DinoUiSaveSlotSelect::DinoUiSaveSlotSelect(MInput *input, u32 *result) : MProces
     mResult = result;
 }
 
+// The pooled pointer-to-member constant (see menu.cpp).
+extern "C" struct {
+    u8 unk00[0x4C];
+    void (DinoUiSaveSlotSelect::*Run_4C)();   // 0x4C
+} data_ov004_02172844;
+
+#pragma dont_inline on
+void DinoUiSaveSlotSelect::Idle() {
+    MTaskSet *serial = &mSerial;
+    serial->mUseMutex = TRUE;
+    mSerial.AddTail(MCreateBgCallTask(this, data_ov004_02172844.Run_4C, 1));
+}
+#pragma dont_inline reset
+
+// (In the background.) Runs the menu once, then exits.
+void DinoUiSaveSlotSelect::Run() {
+    DinoUiSaveSlotSelectMenu *menu = new DinoUiSaveSlotSelectMenu(mInput, mResult);
+    if (menu->MTask::mState == MTask::STATE_RUN) {
+        menu->Execute();
+    }
+    MTask *exit = MTaskExitTransfer::Create(this);
+    MSerialTaskSet *serial = &mSerial;
+    serial->AddTail(menu);
+    serial->AddTail(exit);
+}
+
 #pragma auto_inline on
 
 DinoUiSaveSlotSelect::~DinoUiSaveSlotSelect() {

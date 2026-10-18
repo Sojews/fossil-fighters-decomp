@@ -6,12 +6,14 @@
 
 class DinoUiSaveSlotSelectMenu : public MMenu, public DinoHelpBase {
 public:
+    DinoUiSaveSlotSelectMenu(MInput *input, u32 *result) : MMenu(input, 0) { mResult = result; }
     virtual ~DinoUiSaveSlotSelectMenu();
     virtual void OnStart();
     virtual void OnFocus(MMenuItem *item);
     virtual void OnDecide(MMenuItem *item);
 
-    u32 mUnkB4[8];
+    u32 *mResult;   // 0xB4
+    u32 mUnkB8[7];
     u8 mSilentFocus; // 0xD4
 };
 class DinoUiSaveSlotConfirmMenu : public MMenu {

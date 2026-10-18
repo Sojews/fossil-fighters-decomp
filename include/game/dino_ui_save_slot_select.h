@@ -11,6 +11,8 @@ public:
     virtual ~DinoUiSaveSlotSelect();
     virtual void Idle();
 
+    void Run();
+
     MInput *mInput;     // 0x74
     u32 *mResult;       // 0x78
 };
