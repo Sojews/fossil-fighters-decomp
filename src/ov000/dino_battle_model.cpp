@@ -20,3 +20,11 @@ void DinoBattleModel::OnMessage(MMessage *msg) {
 void DinoBattleModel::SendLocalMessage(MMessage *msg) {
     mSubject2.Notify(msg);
 }
+
+u32 DinoBattleModel::GetUnk104(int index) {
+    return mUnk104[index];
+}
+
+u32 DinoBattleModel::GetUnk10C() {
+    return mUnk10C;
+}

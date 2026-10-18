@@ -9,6 +9,8 @@
 #include "game/dino_resource.h"
 #include "nitro/mi.h"
 #include "types.h"
+#include "game/dino_battle_model.h"
+#include "game/dino_battle.h"
 #include "game/dino_battle_user_controller.h"
 #include "game/set_status_effect_task.h"
 
@@ -17,11 +19,9 @@ extern "C" void func_ov000_0216cc64(void *, u32, u8);
 
 extern "C" void func_ov000_0216cc20(void *, u32);
 
-extern "C" void func_ov000_021631c0(void *, u32);
 
 extern "C" void func_ov000_02163258(void *, u32, u32);
 
-extern "C" void func_ov000_02163408(void *, u8, u32);
 
 extern "C" void func_ov000_02163464(void *, u32);
 
@@ -85,7 +85,7 @@ void SetKasekiPointTask::Execute() {
 }
 
 void UpdateAbilityIconTask::Execute() {
-    func_ov000_02163408((void *)mUnk10, mUnk18, mUnk14);
+    ((DinoBattleModelPlayer *)mUnk10)->SendUpdateAbilityIconRequest(mUnk18, mUnk14);
     Exit();
 }
 
@@ -95,7 +95,7 @@ void DinoCreatureUpdateStateIconTask::Execute() {
 }
 
 void PlayerUpdateTask::Execute() {
-    func_ov000_021631c0((void *)mUnk10, mUnk14);
+    ((DinoBattleModelPlayer *)mUnk10)->SendUpdateRequest(mUnk14);
     Exit();
 }
 
@@ -115,7 +115,7 @@ void ResetStatusEffectSleepTask::Execute() {
 }
 
 void CreatePlayerUpdateAbilityIconTask::Execute() {
-    func_ov000_02163408((void *)mUnk18, mUnk10, mUnk14);
+    ((DinoBattleModelPlayer *)mUnk18)->SendUpdateAbilityIconRequest(mUnk10, mUnk14);
     Exit();
 }
 
@@ -155,7 +155,7 @@ void AddKasekiPointCreatureDie::Idle() {
     MSerialTaskSet *serial = &mSerial;
     serial->AddTail(wait);
     serial->AddTail(exit);
-    func_ov000_021631c0(mPlayer, (u32)(MMessageObserver *)wait);
+    mPlayer->SendUpdateRequest((u32)(MMessageObserver *)wait);
 }
 
 extern "C" void func_ov000_0216d3c0(void *, u8, u32);
@@ -422,6 +422,21 @@ void DinoBattleModelPlayer::SetUnk124(u32 value) {
 
 DinoBattleModelPlayer::~DinoBattleModelPlayer() {
     delete mRandom;
+}
+
+void DinoBattleModelPlayer::SetBattle(DinoBattle *battle) {
+    mBattle = battle;
+    mUnkF4 = battle->GetUnk200();
+    mUnk100 = ((DinoBattleModel *)battle->GetUnk1FC())->GetUnk10C();
+    mUnkFC = ((DinoBattleModel *)battle->GetUnk1FC())->GetUnk104(1 - mUnkB8);
+}
+
+void DinoBattleModelPlayer::SendUpdateRequest(u32 arg) {
+    mUnkF4->Post(new DinoBattleViewPlayerUpdateRequest(arg, mUnkB8, GetUnk128()));
+}
+
+void DinoBattleModelPlayer::SendUpdateAbilityIconRequest(u8 a, u32 b) {
+    mUnkF4->Post(new DinoBattleViewPlayerUpdateAbilityIconRequest(b, mUnkB8, a));
 }
 
 int DinoBattleModelPlayer::GetCreatureCount() {

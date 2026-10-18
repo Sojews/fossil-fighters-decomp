@@ -48,6 +48,8 @@ class DinoBattleModelCreature;
 class MRandom;
 
 // One side of the battle in the battle model.
+class DinoBattle;
+
 class DinoBattleModelPlayer : public MProcess, public MMessageObserver {
 public:
     virtual ~DinoBattleModelPlayer();
@@ -79,6 +81,9 @@ public:
     BOOL IsUnk2163978();
     void CollectCreaturesB8In12(u32 *ids, int *count);
     BOOL AllCreaturesShareDefFlag();
+    void SetBattle(DinoBattle *battle);
+    void SendUpdateRequest(u32 arg);
+    void SendUpdateAbilityIconRequest(u8 a, u32 b);
 
     std::vector<u32> mUnkA8;            // 0xA8
     u32 unkB4;
@@ -87,9 +92,10 @@ public:
     u32 unkC0[2];
     u8 mUnkC8;                          // 0xC8
     MMessageSubject mSubject;           // 0xCC
-    u32 unkF4[2];
+    MMessageObserver *mUnkF4;           // 0xF4
+    DinoBattle *mBattle;                // 0xF8
     u32 mUnkFC;                         // 0xFC
-    u32 unk100;
+    u32 mUnk100;                        // 0x100
     std::vector<DinoBattleModelCreature *> mCreatures; // 0x104
     MRandom *mRandom;                   // 0x110
     std::string mUnk114;                // 0x114

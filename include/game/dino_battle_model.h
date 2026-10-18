@@ -8,6 +8,8 @@
 
 class DinoBattleModel : public MProcess, public MMessageObserver {
 public:
+    u32 GetUnk104(int index);
+    u32 GetUnk10C();
     void SendLocalMessage(MMessage *msg);
     virtual ~DinoBattleModel();
     virtual void Idle();
@@ -16,7 +18,10 @@ public:
     u32 mUnkA8;                 // 0xA8
     MMessageSubject mSubject;   // 0xAC
     MMessageSubject mSubject2;  // 0xD4
-    u32 mUnkFC[18];             // 0xFC
+    u32 mUnkFC[2];              // 0xFC
+    u32 mUnk104[2];             // 0x104
+    u32 mUnk10C;                // 0x10C
+    u32 mUnk110[13];            // 0x110
     DinoBattleSide mSides[2];   // 0x144
 };
 
