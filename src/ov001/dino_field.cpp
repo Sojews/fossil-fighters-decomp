@@ -19,6 +19,7 @@
 #include "game/dino_field_capture_fade_in_task.h"
 #include "m/bg.h"
 #include "m/bg_new_task.h"
+#include "m/picture.h"
 #include "m/call_task.h"
 #include "m/polygon_char.h"
 #include "game/dino_field_capture_fade_out_task_menu.h"
@@ -498,3 +499,13 @@ DinoFieldCaptureFadeInTask::~DinoFieldCaptureFadeInTask() {
 
 // Template task instances the game emits in this file. Until the code that makes the tasks is decompiled, they are
 // instantiated explicitly.
+
+// Background loads of the lower screen's pictures (made by functions not decompiled yet).
+// NONMATCHING (the MFx32 creator only): we copy the MFx32 argument to a stack temporary like the MPoint one; the
+// game copies only the MPoint (maybe its MFx32 had no user-declared constructors).
+template class MBgCallTask8<DinoField, MDisplay *, MView *, MExtAffinePicture **, u32, MPoint, MFx32, u32, long>;
+template MTask *MCreateBgCallTask(DinoField *obj, void (DinoField::*func)(MDisplay *, MView *, MExtAffinePicture **, u32, MPoint, MFx32, u32, long), MDisplay *a1, MView *a2, MExtAffinePicture **a3, u32 a4, MPoint a5, MFx32 a6, u32 a7, long a8, int thread);
+template class MBgCallTask8<DinoField, MDisplay *, MView *, MExtAffinePicture **, u32, MPoint, u32, u32, long>;
+template MTask *MCreateBgCallTask(DinoField *obj, void (DinoField::*func)(MDisplay *, MView *, MExtAffinePicture **, u32, MPoint, u32, u32, long), MDisplay *a1, MView *a2, MExtAffinePicture **a3, u32 a4, MPoint a5, u32 a6, u32 a7, long a8, int thread);
+template class MBgCallTask7<DinoField, MDisplay *, MView *, MExtAffinePicture **, u32, MPoint, u32, long>;
+template MTask *MCreateBgCallTask(DinoField *obj, void (DinoField::*func)(MDisplay *, MView *, MExtAffinePicture **, u32, MPoint, u32, long), MDisplay *a1, MView *a2, MExtAffinePicture **a3, u32 a4, MPoint a5, u32 a6, long a7, int thread);
