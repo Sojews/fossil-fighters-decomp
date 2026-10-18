@@ -1,5 +1,7 @@
 // M3DModel.
-// Only the small functions are decompiled so far.
+// Not decompiled yet: SetModelData, Draw and the virtual at 0x02023048 (in another file).
+// NONMATCHING: LoadGrid (the game indexes the chunk lengths as cmds[i + 3] and cmds[i + 2] from scratch; ours folds
+// them into one address).
 
 #include "m/3d_model.h"
 #include <string.h>
@@ -26,7 +28,7 @@ M3DModel::M3DModel() {
     mTrans.x = mTrans.y = mTrans.z = 0;
     mRotation.x = mRotation.y = mRotation.z = 0;
     mScale.x = mScale.y = mScale.z = FX32_ONE;
-    mUnk2EC = 0;
+    mFrame = 0;
     mUnk2F0 = 1;
     mUnk2F4 = 0x7FFF;
     mUnk2F8 = 0;
@@ -208,7 +210,7 @@ BOOL M3DModel::GetJointMatrix(int joint, MtxFx44 *mtx, u8 withRotation) {
             if (joint >= count) {
                 return FALSE;
             }
-            frames += count * ((mUnk2EC >> 4) % frameCount);
+            frames += count * ((mFrame >> 4) % frameCount);
             if (withRotation) {
                 MTX_Copy43To44(&frames[joint], mtx);
             } else {
@@ -221,4 +223,70 @@ BOOL M3DModel::GetJointMatrix(int joint, MtxFx44 *mtx, u8 withRotation) {
         }
     }
     return FALSE;
+}
+
+void M3DModel::SetAnimData(void *data) {
+    mAnimRes = data;
+    int i;
+    const u32 *anim = (const u32 *) mAnimRes;
+    const u8 *p = (const u8 *) anim + (anim[3] + (anim[1] + anim[2]));
+    int size = anim[4];
+    for (i = 0; i < 0x80; i++) {
+        mJointFrames[i] = NULL;
+    }
+    while (size > 0) {
+        int joint = *(const int *) p;
+        if (joint >= 0x80) {
+            break;
+        }
+        p += 4;
+        mJointFrames[joint] = (const MtxFx43 *) p;
+        int len = ((const u32 *) mAnimRes)[6] * sizeof(MtxFx43);
+        size -= len + 4;
+        p += len;
+    }
+    mFlags |= 2;
+    mUnk329 = 0;
+    mFrame = 0;
+}
+
+// A 32-bit value stored as two halfwords.
+static inline u32 ReadU32(const u16 *p, u32 i) {
+    return (p[i + 1] << 16) | p[i];
+}
+
+// Makes the ground from the model file's grid chunk.
+void M3DModel::LoadGrid(const void *data) {
+    mFlags &= ~0x100;
+    ReleaseGrid();
+    mGrid = new M3DGrid();
+    mGridUnk = ((const u32 *) data)[7];
+    const u16 *cmds = (const u16 *) ((const u8 *) data + 0x28);
+    int i = 0;
+    while (cmds[i] != 0xFFF) {
+        switch (cmds[i]) {
+        case 0x50: {
+            u32 len = ReadU32(cmds, i + 2);
+            i = i + 4 + (len >> 1);
+            break;
+        }
+        case 0x51: {
+            u32 len = ReadU32(cmds, i + 2);
+            i = i + 4 + (len >> 1);
+            break;
+        }
+        case 0x52: {
+            u32 len = ReadU32(cmds, i + 2);
+            i += 4;
+            mGrid->Load(&cmds[i]);
+            i += len >> 1;
+            break;
+        }
+        case 0x53:
+            i += 8;
+            break;
+        default:
+            return;
+        }
+    }
 }

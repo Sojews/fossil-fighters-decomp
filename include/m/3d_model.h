@@ -31,6 +31,7 @@ public:
     void ReleaseTexture();
     void ReleaseModelData();
     void ReleaseGrid();
+    void LoadGrid(const void *data);
     void SetUnk2F4(u16 value);
     BOOL SetFlag100(BOOL on);
     const MtxFx44 *GetMatrix();
@@ -62,10 +63,11 @@ public:
     const void *mAnimRes;       // 0xD4: the joint animation resource
     const void *mModelRes;      // 0xD8: the model resource (its joint names)
     u32 mUnkDC;                 // 0xDC
-    u8 unkE0[0x2E4 - 0xE0];
+    const MtxFx43 *mJointFrames[0x80]; // 0xE0: each animated joint's matrices, one per frame
+    u32 unk2E0;
     M3DGrid *mGrid;             // 0x2E4: the ground, if the model has one
-    u32 unk2E8;
-    u32 mUnk2EC;                // 0x2EC
+    u32 mGridUnk;               // 0x2E8
+    u32 mFrame;                 // 0x2EC: the animation frame, in 1/16ths
     u32 mUnk2F0;                // 0x2F0
     u16 mUnk2F4;                // 0x2F4
     u32 mUnk2F8;                // 0x2F8
@@ -75,7 +77,7 @@ public:
     VecFx32 mUnk318;            // 0x318
     u32 unk324;
     u8 mOwnsModelData;          // 0x328
-    u8 unk329;
+    u8 mUnk329;                 // 0x329
     u8 mUnk32A;                 // 0x32A
     u8 unk32B;
 };

@@ -2136,7 +2136,7 @@ _ZN8M3DModel9GetMatrixEv kind:function(thumb,size=0xbc) addr:0x0202209c
 _ZN8M3DModel8SetUnk10Eh kind:function(thumb,size=0x4) addr:0x02022158
 _ZN8M3DModel8GetUnk10Ev kind:function(thumb,size=0x4) addr:0x0202215c
 func_02022160 kind:function(thumb,size=0x224) addr:0x02022160
-func_02022384 kind:function(thumb,size=0x78) addr:0x02022384
+_ZN8M3DModel11SetAnimDataEPv kind:function(thumb,size=0x78) addr:0x02022384
 _ZN8M3DModel10SetTextureEmmm kind:function(thumb,size=0x20) addr:0x020223fc
 _ZN8M3DModel14ReleaseTextureEv kind:function(thumb,size=0x2c) addr:0x0202241c
 _ZN8M3DModel9SetUnk2F4Et kind:function(thumb,size=0x8) addr:0x02022448
@@ -2145,7 +2145,7 @@ _ZN8M3DModel9FindJointEPKc kind:function(thumb,size=0x44) addr:0x02022adc
 _ZN8M3DModel14GetJointMatrixEiP7MtxFx44h kind:function(thumb,size=0xa6) addr:0x02022b20
 func_02022bc8 kind:function(thumb,size=0xfc) addr:0x02022bc8
 _ZN8M3DModel11ReleaseGridEv kind:function(thumb,size=0x26) addr:0x02022cc4
-func_02022cec kind:function(thumb,size=0xc8) addr:0x02022cec
+_ZN8M3DModel8LoadGridEPKv kind:function(thumb,size=0xc8) addr:0x02022cec
 _ZN8M3DModel15GetGroundHeightEll kind:function(thumb,size=0x16) addr:0x02022db4
 _ZN8M3DModel10IsOnGroundEllPl kind:function(thumb,size=0x16) addr:0x02022dcc
 _ZN8M3DModel10SetFlag100Ei kind:function(thumb,size=0x38) addr:0x02022de4
@@ -2165,7 +2165,7 @@ _ZN7M3DGridC1Ev kind:function(thumb,size=0x34) addr:0x020230bc
 _ZNSt6vectorItSaItEEC1Ev kind:function(thumb,size=0xa) addr:0x020230f0
 _ZNSt6vectorItSaItEED1Ev kind:function(thumb,size=0xc) addr:0x020230fc
 _ZN7M3DGridD1Ev kind:function(thumb,size=0x58) addr:0x02023108
-func_02023160 kind:function(thumb,size=0xd98) addr:0x02023160
+_ZN7M3DGrid4LoadEPKv kind:function(thumb,size=0xd98) addr:0x02023160
 .L_0202317a kind:label(thumb) addr:0x0202317a
 .L_020231ce kind:label(thumb) addr:0x020231ce
 .L_020231d2 kind:label(thumb) addr:0x020231d2

@@ -25,6 +25,7 @@ public:
     ~M3DGrid();
     fx32 GetHeight(fx32 x, fx32 z);
     BOOL IsOnGround(fx32 x, fx32 z, fx32 *height);
+    void Load(const void *data);
 
     std::vector<M3DVec16> mVerts;   // 0x00
     std::vector<u16> *mCells;       // 0x0C: mDim * mDim cells, three indices per triangle
