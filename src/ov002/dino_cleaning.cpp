@@ -21,6 +21,10 @@
 #include "m/bg_new_task.h"
 #include "m/call_task.h"
 #include "types.h"
+#include "game/dino_cleaning_status.h"
+#include "m/picture.h"
+#include "m/menu.h"
+#include <stdio.h>
 
 #pragma auto_inline off
 
@@ -193,15 +197,22 @@ void DinoCleaningKasekiRockXrayBlendManager::Idle() {
 
 // The scene's pooled pointer-to-member constants (see menu.cpp).
 extern "C" struct {
-    u8 unk00[0x78];
+    u8 unk00[0x8];
+    const char *mCountFormat;   // 0x08
+    u8 unk0C[0x48 - 0xC];
+    void (DinoCleaning::*State02160638_48)(); // 0x48
+    u8 unk50[0x78 - 0x50];
     void (DinoCleaning::*Unk02161490_78)();
 } data_ov002_021659ec;
 extern "C" struct {
-    u8 unk00[0x40];
+    u8 unk00[0x10];
+    void (DinoCleaning::*State02161164_10)(); // 0x10
+    u8 unk18[0x40 - 0x18];
     void (DinoCleaning::*Unk021618c8_40)();
     u8 unk48[0x68 - 0x48];
     void (DinoCleaning::*Unk02161490_68)();
     void (DinoCleaning::*StateWake_70)();
+    void (DinoCleaning::*State02160f54_78)(); // 0x78
 } data_ov002_02165a6c;
 extern "C" struct {
     u8 unk00[0x10];
@@ -211,8 +222,55 @@ extern "C" struct {
     u8 unk28[0x60 - 0x28];
     void (DinoCleaning::*StateStopTool_60)();
 } data_ov002_02165aec;
+extern "C" struct {
+    u8 unk00[0x10];
+    void (DinoCleaning::*State02161260_10)(); // 0x10
+} data_ov002_02165b6c;
 
 extern "C" void func_ov002_0215fdec(DinoCleaningKasekiRock *rock);
+
+DinoCleaning::DinoCleaning(u32 unk9C, void *unkA0, u32 unkA8, u32 unkAC, int mode, u32 unk140)
+    : MProcess(NULL), MLooperPreLoopHook(FALSE, TRUE) {
+    mUnk9C = unk9C;
+    mUnkA0 = unkA0;
+    mUnkA8 = unkA8;
+    mUnkAC = unkAC;
+    mMode = mode;
+    mUnk128 = FALSE;
+    mUnk138 = 0;
+    mUnk140 = unk140;
+    mState = data_ov002_021659ec.State02160638_48;
+}
+
+// Starts the status display, then waits a moment.
+void DinoCleaning::State02160e78() {
+    DinoSoundPlaySe(0x38, 0);
+    mStatus->Start();
+    MTask *timer = new MTimer(30);
+    MTask *wait = MTaskSetWaitEmptyTask::Create(mUnk11C);
+    MParallelTaskSet *waiting = new MParallelTaskSet(TRUE);
+    waiting->AddTail(wait);
+    waiting->AddTail(timer);
+    mSerial.AddTail(waiting);
+    mState = data_ov002_02165a6c.State02160f54_78;
+}
+
+// Shows the count (if any left) as text for a second, counting it down.
+void DinoCleaning::State021610b0() {
+    mToolMenu->Activate();
+    if (mUnk110 == 0) {
+        mState = data_ov002_02165b6c.State02161260_10;
+        return;
+    }
+    char text[0x100];
+    sprintf(text, data_ov002_021659ec.mCountFormat, mUnk110);
+    mUnk118 = new MTextPicture(text, TRUE, true);
+    mParallel.AddTail(mUnk118);
+    mUnk114 = 60;
+    mUnk110 = mUnk110 - 1;
+    DinoSoundPlaySe(0x3B, 0);
+    mState = data_ov002_02165a6c.State02161164_10;
+}
 
 void DinoCleaning::StateEnableToolMenu() {
     mUnkE4->SetUnkA0(0x15, TRUE);
