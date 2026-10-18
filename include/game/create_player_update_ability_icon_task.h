@@ -89,7 +89,7 @@ public:
     MTask *CreateMoveToHeatAreaAnyCreature();
     MTask *CreateAddKasekiPointCreatureDie();
     MTask *CreateUpdateAllCreatureTask();
-    u32 GetUnkFC();
+    DinoBattleModelPlayer *GetOpponent();
     MRandom *GetRandom();
     u32 GetUnkAC();
     MFx32 RandomFraction();
@@ -129,7 +129,7 @@ public:
     MMessageSubject mSubject;           // 0xCC
     MMessageObserver *mUnkF4;           // 0xF4
     DinoBattle *mBattle;                // 0xF8
-    u32 mUnkFC;                         // 0xFC
+    DinoBattleModelPlayer *mOpponent;   // 0xFC
     u32 mUnk100;                        // 0x100
     std::vector<DinoBattleModelCreature *> mCreatures; // 0x104
     MRandom *mRandom;                   // 0x110
@@ -191,6 +191,10 @@ public:
     const DinoAttackDef *GetAttackDef(u32 index);
     void AddUnkFC(int delta);
     void SetLife(int life);
+    void AddLife(int amount, u8 effect);
+    void ClearOthersUnk108();
+    void ResetUnk108();
+    void ChangeUnkB8(u32 value);
     BOOL IsInPinch();
     u8 GetUnk174();
     u32 GetUnkEC();

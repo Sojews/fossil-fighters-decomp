@@ -11,7 +11,7 @@ class DinoBattleModelPlayer;
 
 class DinoBattleModel : public MProcess, public MMessageObserver {
 public:
-    u32 GetUnk104(int index);
+    DinoBattleModelPlayer *GetPlayer(int index);
     u32 GetUnk10C();
     void SendLocalMessage(MMessage *msg);
     void SetBattle(DinoBattle *battle);
@@ -24,7 +24,7 @@ public:
     MMessageSubject mSubject2;  // 0xD4
     u32 mUnkFC;                 // 0xFC
     DinoBattle *mBattle;        // 0x100
-    u32 mUnk104[2];             // 0x104: the players (DinoBattleModelPlayer *)
+    DinoBattleModelPlayer *mPlayers[2]; // 0x104
     u32 mUnk10C;                // 0x10C
     u32 mUnk110[13];            // 0x110
     DinoBattleSide mSides[2];   // 0x144

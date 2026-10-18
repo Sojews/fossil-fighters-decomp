@@ -25,14 +25,14 @@ void DinoBattleModel::SendLocalMessage(MMessage *msg) {
 extern "C" void func_ov000_0215c218(void *controller, DinoBattle *battle);
 
 void DinoBattleModel::SetBattle(DinoBattle *battle) {
-    ((DinoBattleModelPlayer *) mUnk104[0])->SetBattle(battle);
-    ((DinoBattleModelPlayer *) mUnk104[1])->SetBattle(battle);
+    mPlayers[0]->SetBattle(battle);
+    mPlayers[1]->SetBattle(battle);
     func_ov000_0215c218((void *) mUnk10C, battle);
     mBattle = battle;
 }
 
-u32 DinoBattleModel::GetUnk104(int index) {
-    return mUnk104[index];
+DinoBattleModelPlayer *DinoBattleModel::GetPlayer(int index) {
+    return mPlayers[index];
 }
 
 u32 DinoBattleModel::GetUnk10C() {

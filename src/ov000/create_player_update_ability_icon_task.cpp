@@ -18,9 +18,6 @@
 #include "game/set_status_effect_task.h"
 
 
-extern "C" void func_ov000_0216cc64(void *, u32, u8);
-
-extern "C" void func_ov000_0216cc20(void *, u32);
 
 
 extern "C" void func_ov000_02163258(void *, u32, u32);
@@ -145,17 +142,17 @@ void PlayerUpdateTask::Execute() {
 }
 
 void SetLifePointTask::Execute() {
-    func_ov000_0216cc20((void *)mUnk10, mUnk14);
+    ((DinoBattleModelCreature *)mUnk10)->SetLife(mUnk14);
     Exit();
 }
 
 void AddLifePointTask::Execute() {
-    func_ov000_0216cc64((void *)mUnk10, mUnk14, mUnk18);
+    ((DinoBattleModelCreature *)mUnk10)->AddLife(mUnk14, mUnk18);
     Exit();
 }
 
 void DinoBattleModelCreature::AddLifePointTask::Execute() {
-    func_ov000_0216cc64((void *)mUnk10, mUnk14, mUnk18);
+    ((DinoBattleModelCreature *)mUnk10)->AddLife(mUnk14, mUnk18);
     Exit();
 }
 
@@ -176,7 +173,7 @@ PlayerThinkTimeCountTask::~PlayerThinkTimeCountTask() {
 }
 
 void ModelCretureAddLifeTask::Execute() {
-    func_ov000_0216cc64((void *)mUnk10, mUnk14, 0);
+    ((DinoBattleModelCreature *)mUnk10)->AddLife(mUnk14, 0);
     Exit();
 }
 
@@ -316,6 +313,19 @@ void DinoBattleModelCreature::SetLife(int life) {
     mUnkE4 = life;
     s32 floor = mPlayer->GetUnkC8();
     mUnkE4 = std::max(floor, std::min(mUnkE8, mUnkE4));
+}
+
+// Adds to (or takes from) the creature's life, within the same bounds; a gain can show an effect.
+void DinoBattleModelCreature::AddLife(int amount, u8 effect) {
+    if (amount < 0 && func_ov000_0218472c(2)) {
+        return;
+    }
+    mUnkE4 += amount;
+    s32 floor = mPlayer->GetUnkC8();
+    mUnkE4 = std::max(floor, std::min(mUnkE8, mUnkE4));
+    if (amount > 0 && effect) {
+        mView->Post(CreateMotionEffectRequest());
+    }
 }
 
 BOOL DinoBattleModelCreature::IsInPinch() {
@@ -541,6 +551,40 @@ void DinoBattleModelCreature::ResetStatus() {
     MI_CpuFill8(&mStatus, 0, sizeof(mStatus));
 }
 
+// Clears bit 0 of the other creatures' unk108 on this side and bit 1 on the opponent's.
+void DinoBattleModelCreature::ClearOthersUnk108() {
+    if (GetUnkB8() != 0) {
+        return;
+    }
+    int i;
+    DinoBattleModelPlayer *player = mPlayer;
+    for (i = 0; i < player->GetCreatureCount(); i++) {
+        DinoBattleModelCreature *creature = player->GetCreature(i);
+        if (creature != this) {
+            creature->SetUnk108(creature->GetUnk108() & ~1);
+        }
+    }
+    DinoBattleModelPlayer *opponent = player->GetOpponent();
+    for (i = 0; i < opponent->GetCreatureCount(); i++) {
+        DinoBattleModelCreature *creature = opponent->GetCreature(i);
+        creature->SetUnk108(creature->GetUnk108() & ~2);
+    }
+}
+
+void DinoBattleModelCreature::ResetUnk108() {
+    SetUnk108(0);
+    if (GetUnkB8() == 0) {
+        ClearOthersUnk108();
+    }
+}
+
+void DinoBattleModelCreature::ChangeUnkB8(u32 value) {
+    ResetUnk108();
+    ResetStatus();
+    func_ov000_02163258(mPlayer, (u32)this, 0);
+    mUnkB8 = value;
+}
+
 BOOL DinoBattleModelCreature::IsUnkD244() {
     if (mActing) {
         return FALSE;
@@ -702,7 +746,7 @@ void DinoBattleModelPlayer::SetBattle(DinoBattle *battle) {
     mBattle = battle;
     mUnkF4 = battle->GetUnk200();
     mUnk100 = ((DinoBattleModel *)battle->GetUnk1FC())->GetUnk10C();
-    mUnkFC = ((DinoBattleModel *)battle->GetUnk1FC())->GetUnk104(1 - mUnkB8);
+    mOpponent = ((DinoBattleModel *)battle->GetUnk1FC())->GetPlayer(1 - mUnkB8);
 }
 
 void DinoBattleModelPlayer::SendUpdateRequest(u32 arg) {
@@ -766,8 +810,8 @@ DinoBattleModelCreature *DinoBattleModelPlayer::FindCreature(u32 id) {
     return NULL;
 }
 
-u32 DinoBattleModelPlayer::GetUnkFC() {
-    return mUnkFC;
+DinoBattleModelPlayer *DinoBattleModelPlayer::GetOpponent() {
+    return mOpponent;
 }
 
 MRandom *DinoBattleModelPlayer::GetRandom() {
