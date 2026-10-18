@@ -11,6 +11,9 @@
 #include "game/dino_ui_cleaning_leave.h"
 #include "m/bg_new_task.h"
 #include "m/call_task.h"
+#include "game/dino_backup.h"
+#include "game/dino_resource.h"
+#include "game/dino_common_window_message_box.h"
 
 DinoUiCleaningLeave::~DinoUiCleaningLeave() {
 }
@@ -36,4 +39,42 @@ DinoUiCleaningLeave::DinoUiCleaningLeave(u32 arg) : MProcess(NULL) {
     gLcd->VSyncNow();
     mSerial.AddTail(new DinoUiCleaningLeaveMenu(arg));
     mSerial.AddTail(MTaskExitTransfer::Create(this));
+}
+
+#pragma auto_inline off
+
+void DinoUiCleaningLeaveMenu::GetEntry(u32 index, DinoBackupEntry *entry) {
+    gDinoBackup->GetUnk98(index, entry);
+}
+
+BOOL DinoUiCleaningLeaveMenu::CanMark() {
+    return TRUE;
+}
+
+BOOL DinoUiCleaningLeaveMenu::IsMarkable(DinoBackupEntry *entry) {
+    if (entry->active) {
+        return FALSE;
+    }
+    if (entry->unk10_0 == 1) {
+        return FALSE;
+    }
+    if (entry->type == 1) {
+        return TRUE;
+    }
+    DinoKasekiRockState rock;
+    gDinoBackup->GetKasekiRock(entry->id, (u32 *)&rock);
+    if (!rock.unk10) {
+        return FALSE;
+    }
+    u32 id = entry->id;
+    const u8 *data = (const u8 *)mFile.GetData();
+    const u8 *def = data + ((const u32 *)(data + *(const u32 *)(data + 8)))[id];
+    if (def[4] == 0) {
+        return TRUE;
+    }
+    return FALSE;
+}
+
+MTask *DinoUiCleaningLeaveMenu::CreateUnk2C() {
+    return new MTimer(1);
 }

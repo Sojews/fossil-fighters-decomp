@@ -13,10 +13,21 @@
 #include "game/help.h"
 #include "game/dino_field_camera_hook.h"
 
+struct DinoBackupEntry;
+
 class DinoUiContainerBaseMenu : public DinoHelpBase, public MMenu {
 public:
     virtual ~DinoUiContainerBaseMenu();
     virtual BOOL TryDecide() = 0;   // the decide button was pressed; FALSE if nothing happens
+    virtual void OnStart();
+    virtual void OnIdle();
+    virtual void OnFocus(MMenuItem *item);
+    virtual void OnDecide(MMenuItem *item);
+    virtual void Setup() = 0;
+    virtual void GetEntry(u32 index, DinoBackupEntry *entry) = 0;
+    virtual BOOL CanMark() = 0;     // FALSE when no more entries can be marked
+    virtual BOOL IsMarkable(DinoBackupEntry *entry) = 0;
+    virtual MTask *CreateUnk2C() = 0;
     void OnBackDecided();
     BOOL PageRight();
     BOOL PageLeft();

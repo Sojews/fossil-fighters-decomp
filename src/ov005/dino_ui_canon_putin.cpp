@@ -12,6 +12,9 @@
 #include "game/dino_ui_canon_takeout.h"
 #include "m/bg_new_task.h"
 #include "m/call_task.h"
+#include "game/dino_backup.h"
+#include "game/dino_resource.h"
+#include "game/dino_common_window_message_box.h"
 
 DinoUiCanonPutin::~DinoUiCanonPutin() {
 }
@@ -48,4 +51,55 @@ DinoUiCanonTakeout::DinoUiCanonTakeout() : MProcess(NULL) {
     gLcd->VSyncNow();
     mSerial.AddTail(new DinoUiCanonTakeoutMenu());
     mSerial.AddTail(MTaskExitTransfer::Create(this));
+}
+
+#pragma auto_inline off
+
+extern const u32 data_0208a98c; // text shown when nothing can be taken out
+extern const u32 data_0208a990; // text shown when nothing can be put in
+
+void DinoUiCanonPutinMenu::GetEntry(u32 index, DinoBackupEntry *entry) {
+    gDinoBackup->GetUnk98(index, entry);
+}
+
+BOOL DinoUiCanonPutinMenu::CanMark() {
+    if (gDinoBackup->CountFreeUnk14C() > mUnk100) {
+        return TRUE;
+    }
+    return FALSE;
+}
+
+BOOL DinoUiCanonPutinMenu::IsMarkable(DinoBackupEntry *entry) {
+    if (entry->unk10_0 == 1) {
+        return FALSE;
+    }
+    DinoKasekiRockState rock;
+    gDinoBackup->GetKasekiRock(entry->id, (u32 *)&rock);
+    if (!rock.unk10 && !entry->unk10_3) {
+        return FALSE;
+    }
+    return TRUE;
+}
+
+MTask *DinoUiCanonPutinMenu::CreateUnk2C() {
+    return new DinoCommonWindowMessageBox(MPoint(128, 96), gDinoResource->GetText(data_0208a990), 4);
+}
+
+void DinoUiCanonTakeoutMenu::GetEntry(u32 index, DinoBackupEntry *entry) {
+    gDinoBackup->GetUnk14C(index, entry);
+}
+
+BOOL DinoUiCanonTakeoutMenu::CanMark() {
+    if (gDinoBackup->CountFreeUnk98() > mUnk100) {
+        return TRUE;
+    }
+    return FALSE;
+}
+
+BOOL DinoUiCanonTakeoutMenu::IsMarkable(DinoBackupEntry *entry) {
+    return TRUE;
+}
+
+MTask *DinoUiCanonTakeoutMenu::CreateUnk2C() {
+    return new DinoCommonWindowMessageBox(MPoint(128, 96), gDinoResource->GetText(data_0208a98c), 4);
 }

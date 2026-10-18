@@ -150,6 +150,13 @@ struct DinoBackupEntry {
     u32 unk10_4 : 28;
 };
 
+// A kaseki rock's saved state (GetKasekiRock).
+struct DinoKasekiRockState {
+    u32 unk0 : 10;
+    u32 unk10 : 1;      // 0x400
+    u32 unk11 : 21;
+};
+
 struct DinoCharaWatch {
     u32 w[5];
 };

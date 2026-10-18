@@ -16,6 +16,11 @@ public:
     DinoUiCleaningLeaveMenu(u32 arg);
     virtual ~DinoUiCleaningLeaveMenu();
     virtual BOOL TryDecide();
+    virtual void Setup();
+    virtual void GetEntry(u32 index, DinoBackupEntry *entry);
+    virtual BOOL CanMark();
+    virtual BOOL IsMarkable(DinoBackupEntry *entry);
+    virtual MTask *CreateUnk2C();
 
     u32 mUnk154[3];     // 0x154
 };

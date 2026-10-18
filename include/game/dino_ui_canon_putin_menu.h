@@ -14,6 +14,12 @@
 class DinoUiCanonPutinMenu : public DinoUiContainerBaseMenu {
 public:
     virtual ~DinoUiCanonPutinMenu();
+    virtual BOOL TryDecide();
+    virtual void Setup();
+    virtual void GetEntry(u32 index, DinoBackupEntry *entry);
+    virtual BOOL CanMark();
+    virtual BOOL IsMarkable(DinoBackupEntry *entry);
+    virtual MTask *CreateUnk2C();
 };
 
 class DinoUiCanonTakeoutMenu : public DinoUiContainerBaseMenu {
@@ -21,6 +27,11 @@ public:
     DinoUiCanonTakeoutMenu();
     virtual ~DinoUiCanonTakeoutMenu();
     virtual BOOL TryDecide();
+    virtual void Setup();
+    virtual void GetEntry(u32 index, DinoBackupEntry *entry);
+    virtual BOOL CanMark();
+    virtual BOOL IsMarkable(DinoBackupEntry *entry);
+    virtual MTask *CreateUnk2C();
 
     u32 mUnk154[2];     // 0x154
 };
