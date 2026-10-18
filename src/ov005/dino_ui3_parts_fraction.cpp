@@ -7,6 +7,8 @@
 #include "game/dino_ui3_parts_kaseki_button.h"
 #include "game/dino_ui3_parts_money.h"
 #include "game/dino_ui3_parts_cursor.h"
+#include "game/dino_backup.h"
+#include <printf.h>
 
 DinoUi3PartsFraction::~DinoUi3PartsFraction() {
 }
@@ -45,6 +47,39 @@ void DinoUi3PartsKasekiButton::OnFocusChanged(BOOL focused) {
 
 MRect DinoUi3PartsKasekiButton::GetFrame() {
     return MRect(mPos.Offset(-24, -24), mPos.Offset(24, 24));
+}
+
+extern "C" const char data_ov005_02165f58[]; // ""
+extern "C" const char data_ov005_02165f74[]; // the number format
+
+void DinoUi3PartsRockName::Clear() {
+    mText->SetText(std::string(data_ov005_02165f58));
+}
+
+void DinoUi3PartsMaskName::Clear() {
+    mText->SetText(std::string(data_ov005_02165f58));
+}
+
+void DinoUi3PartsMoney::RefreshMoney() {
+    char text[12];
+    sprintf(text, data_ov005_02165f74, gDinoBackup->GetSystemVar(3));
+    mMoney->SetText(std::string(text));
+}
+
+void DinoUi3PartsMoney::SetPrice(int price) {
+    if (price == 0) {
+        mPrice->SetText(std::string(data_ov005_02165f58));
+        return;
+    }
+    char text[12];
+    sprintf(text, data_ov005_02165f74, price);
+    mPrice->SetText(std::string(text));
+}
+
+void DinoUi3PartsMoney::SetChange(int change) {
+    char text[12];
+    sprintf(text, data_ov005_02165f74, change);
+    mChange->SetText(std::string(text));
 }
 
 void DinoUi3PartsKasekiButton::SetMarked(BOOL marked) {
