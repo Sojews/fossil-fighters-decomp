@@ -193,7 +193,7 @@ public:
     void StateShowCancel();
     void StateWaitChildren();
     void State021664c0();
-    void State02166588();
+    void StateReceived();
 
     void (DinoUiCannonParentScanner::*mState)(); // 0xA8
     void (DinoUiCannonParentScanner::*mOnMessage)(MMessage *msg); // 0xB0
@@ -259,6 +259,7 @@ public:
     void StateCannonParentScan();
     void StateRescan();
     void StateChosen();
+    void StateNone();
     void StateAfterReset();
     void StateFinish();
     void StateAsk();

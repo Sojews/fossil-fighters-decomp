@@ -392,6 +392,8 @@ public:
     void GetPlayerUnk58(DinoPlayerUnk58 *value);
     void InitProfile(DinoPlayerProfile *profile);
     void MakeProfile(DinoPlayerProfile *profile);
+    // Keeps a wireless partner's profile.
+    void AddProfile(const DinoPlayerProfile *profile, int arg);
     BOOL CanAddUnk138(const DinoBackupEntry *entry, BOOL checkDuplicate, BOOL checkCount, u32 maxCount);
     void AddUnk138(const DinoBackupEntry *entry, BOOL arg);
 

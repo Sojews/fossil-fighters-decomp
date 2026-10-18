@@ -22,6 +22,7 @@ template <class T> MTask *MCreateBgCallTask(T *obj, void (T::*func)(), int threa
 #include "m/observer.h"
 #include "m/multi_play.h"
 #include "m/text_codec.h"
+#include <algorithm>
 #include "game/backup_validater.h"
 #include "game/dino_message.h"
 #include "game/dino_multi_play_icon.h"
@@ -269,7 +270,7 @@ typedef void (DinoUiWirelessMatch::*DinoUiWirelessMatchState)();
 extern "C" struct {
     u8 unk00[0x14];
     const char *mParentPath2;   // 0x14: the parent items' motions, by mode
-    u8 unk18[0x4];
+    u32 mMaxRockCount;          // 0x18
     const char *mParentPath0;   // 0x1c
     const char *mCancelPath;    // 0x20
     const char *mParentPath1;   // 0x24
@@ -295,12 +296,13 @@ extern "C" struct {
     void (DinoUiCannonChild::*StateWaitStart_2C)(); // 0x2c
     void (DinoUiCannonChild::*Child02166dc0_34)(); // 0x34
     void (DinoUiCannonChild::*Leave_3C)(); // 0x3c
-    u8 unk44[0x4C - 0x44];
+    void (DinoBackup::*Save_44)(); // 0x44
     DinoUiWirelessMatchState StateRescan; // 0x4c
     void (DinoUiBattleParentScanner::*StateAsk_54)(); // 0x54
     void (MMessageObserver::*ClearQueue_5C)(); // 0x5c
-    u8 unk64[0x6C - 0x64];
+    void (DinoUiCannonParentScanner::*StateWaitChildren_64)(); // 0x64
     MPoint mParentNameFocusedOffset; // 0x6c
+    void (DinoUiCannonParentScanner::*OnConnectMessage_74)(MMessage *msg); // 0x74
 } data_ov004_02174150;
 extern "C" struct {
     u8 unk00[0x4];
@@ -366,10 +368,10 @@ extern "C" struct {
     MPoint mMessagePos;  // 0x1c
     void (DinoUiChildScannerBattleConnect::*StateChoose_24)(); // 0x24
     DinoUiWirelessMatchState StateKeep; // 0x2c
-    void (DinoUiCannonParentScanner::*State02166588_34)(); // 0x34
+    void (DinoUiCannonParentScanner::*StateReceived_34)(); // 0x34
     u8 unk3C[0x44 - 0x3C];
     void (DinoUiCannonChild::*StateSendRocks_44)(); // 0x44
-    u8 unk4C[0x54 - 0x4C];
+    void (DinoUiCannonParentScanner::*StateShowCancel_4C)(); // 0x4c
     void (DinoUiCannonChild::*Child021674f8_54)(); // 0x54
     DinoUiWirelessMatchState StateParentScanned; // 0x5c
     void (DinoUiCannonChild::*Child021674f8_64)(); // 0x64
@@ -713,6 +715,9 @@ void DinoUiCannonChild::StateWaitStart() {
     }
 }
 
+void DinoUiWirelessMatch::StateNone() {
+}
+
 // Goes on to what the player chose.
 void DinoUiWirelessMatch::StateChosen() {
     switch (mChosen) {
@@ -848,6 +853,45 @@ void DinoUiCannonParentScanner::StateListen() {
     mOnMessage = data_ov004_021741d0.OnCountMessage_0C;
 }
 
+extern const u32 data_0208ab64;
+
+// Keeps the rocks and profiles the children sent, counts them, and saves.
+void DinoUiCannonParentScanner::StateReceived() {
+    if (mRocks.size() == 0) {
+        mOnMessage = data_ov004_02174150.OnConnectMessage_74;
+        mState = data_ov004_02174150.StateWaitChildren_64;
+        return;
+    }
+    u32 i;
+    for (i = 0; i < mRocks.size(); i++) {
+        gDinoBackup->AddUnk138(&mRocks[i], FALSE);
+        mCount = std::min(data_ov004_021740d0.mMaxRockCount, mCount + 1);
+    }
+    for (i = 0; i < mProfiles.size(); i++) {
+        gDinoBackup->AddProfile(&mProfiles[i], 0);
+    }
+    ShowCount();
+    mTasks->Clear();
+    char text[0x200];
+    sprintf(text, gDinoResource->GetText(data_0208ab64),
+            MEncodeUtf8(std::wstring((const wchar_t *)&mSsid[1])).c_str());
+    MTask *wait = new DinoCommonWindowMessageWait1(std::string(text), data_ov004_02174350.mMessagePos, 4, 0);
+    MTask *se = DinoSoundCreatePlaySeTask(0x10B, 0);
+    MParallelTaskSet *parallel = &mParallel;
+    parallel->AddTail(wait);
+    parallel->AddTail(se);
+    MTask *waitExit = MTaskExitTransfer::Create(wait);
+    MTask *validate = new DinoBackupWriteValidater(wait, mMultiPlay);
+    MTask *save = MCreateBgCallTask(gDinoBackup, data_ov004_02174150.Save_44, 1);
+    MTask *validateSave = new DinoBackupWriteValidater(wait, mMultiPlay);
+    MSerialTaskSet *serial = &mSerial;
+    serial->AddTail(validateSave);
+    serial->AddTail(save);
+    serial->AddTail(validate);
+    serial->AddTail(waitExit);
+    mState = data_ov004_02174350.StateShowCancel_4C;
+}
+
 // Collects the children's fossil rocks and profiles, and answers their pings.
 // NONMATCHING: the game gives the push_back tags other stack bytes
 void DinoUiCannonParentScanner::OnCountMessage(MMessage *msg) {
@@ -923,7 +967,7 @@ void DinoUiCannonParentScanner::State021664c0() {
     if (mUnkF9) {
         AddSerial(this, new MTimer(5), MTaskExitTransfer::Create(mHub), mMultiPlay->CreateReleaseSynchronizeTask(),
                   mMultiPlay->CreateDisconnectTask(mAid));
-        mState = data_ov004_02174350.State02166588_34;
+        mState = data_ov004_02174350.StateReceived_34;
     }
 }
 
