@@ -12,6 +12,9 @@
 
 class DinoEventLoop;
 
+class DinoUi3PartsCursor;
+class DinoUi3PartsRockName;
+
 class DinoUiCleaningMenu : public DinoHelpBase, public MMenu {
 public:
     DinoUiCleaningMenu(DinoEventLoop *event);
@@ -39,7 +42,9 @@ public:
     u32 mUnkCC[2];              // 0xCC
     DinoUi3PartsFraction *mFraction; // 0xD4: "page n/m"
     DinoEventLoop *mEvent;      // 0xD8
-    u32 mUnkDC[3];              // 0xDC
+    MTaskSet *mCursorTasks;     // 0xDC
+    DinoUi3PartsCursor *mCursor; // 0xE0
+    DinoUi3PartsRockName *mRockName; // 0xE4
     std::vector<u32> mUnkE8;    // 0xE8
     MResource<DinoKasekiDefs> mKasekiDefs; // 0xF4
     u32 mUnk104[3];             // 0x104
