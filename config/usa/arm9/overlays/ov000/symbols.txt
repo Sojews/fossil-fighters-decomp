@@ -398,8 +398,8 @@ func_ov000_02166904 kind:function(thumb,size=0x1a18) addr:0x02166904
 .L_021682ee kind:label(thumb) addr:0x021682ee local
 func_ov000_0216831c kind:function(thumb,size=0xf88) addr:0x0216831c
 .L_0216929e kind:label(thumb) addr:0x0216929e local
-func_ov000_021692a4 kind:function(thumb,size=0xb0) addr:0x021692a4
-func_ov000_02169354 kind:function(thumb,size=0xb0) addr:0x02169354
+_Z25DinoCreatePostAndWaitTaskI39DinoBattleViewCreaturePlayMotionRequestEP5MTaskP16MMessageObserverPT_ kind:function(thumb,size=0xb0) addr:0x021692a4
+_Z25DinoCreatePostAndWaitTaskI33DinoBattleView3DTeamAttackRequestEP5MTaskP16MMessageObserverPT_ kind:function(thumb,size=0xb0) addr:0x02169354
 func_ov000_02169404 kind:function(thumb,size=0xb8) addr:0x02169404
 _ZN21DinoBattleModelPlayer22CreateMotionEffectTaskEmmmmm kind:function(thumb,size=0xec) addr:0x021694bc
 func_ov000_021695a8 kind:function(thumb,size=0xd0) addr:0x021695a8

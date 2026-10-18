@@ -988,6 +988,22 @@ MoveCreatureFromEscape::MoveCreatureFromEscape(DinoBattleModelPlayer *player) : 
 
 extern "C" BOOL func_ov000_0216d2cc(DinoBattleModelCreature *creature, int arg);
 
+// Posts the request, then waits for the signal that answers it (the next message id), which goes to the waiter
+// the request names.
+template <class T> MTask *DinoCreatePostAndWaitTask(MMessageObserver *target, T *msg) {
+    MParallelTaskSet *tasks = new MParallelTaskSet(TRUE);
+    DinoSignalWait *wait = new DinoSignalWait(0, NULL, NULL, 1);
+    MTask *post = target->CreatePostTask(msg);
+    tasks->AddTail(wait);
+    tasks->AddTail(post);
+    msg->mUnk0C = (u32)(MMessageObserver *)wait;
+    wait->mId = msg->mId + 1;
+    return tasks;
+}
+
+template MTask *DinoCreatePostAndWaitTask(MMessageObserver *target, DinoBattleViewCreaturePlayMotionRequest *msg);
+template MTask *DinoCreatePostAndWaitTask(MMessageObserver *target, DinoBattleView3DTeamAttackRequest *msg);
+
 DinoBattleUserController::DinoBattleUserController(void *unkBC, u32 arg, u8 unkB8) : DinoBattleController(arg) {
     mUnkB8 = unkB8;
     mUnkBC = unkBC;
