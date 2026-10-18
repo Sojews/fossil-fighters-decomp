@@ -74,6 +74,11 @@ public:
 
     void AddHead(MTask *task);
     void AddTail(MTask *task);
+    // Several at once (the arguments are evaluated last to first).
+    void AddTail(MTask *a, MTask *b) {
+        AddTail(a);
+        AddTail(b);
+    }
     void Remove(MTask *task);
     void Clear();
 

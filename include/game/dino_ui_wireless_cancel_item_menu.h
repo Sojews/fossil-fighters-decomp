@@ -19,6 +19,8 @@ public:
     virtual void OnStart();
     virtual void OnDecide(MMenuItem *item);
     void Cancel();
+    // The button's closing animation and sound, then exiting.
+    MTask *CreateCloseTask();
 
     u8 unkA7[5];         // members start in MMenu's tail padding
     u8 *mCancelled;      // 0xAC
@@ -101,8 +103,24 @@ public:
     virtual void Idle();
     virtual void OnMessage(MMessage *msg);
 
+    void StateStart();
+    void StateShowCancel();
+    void State021655a0();
+    void StateAsk();
+    void State02165818();
+
     void (DinoUiBattleParentScanner::*mState)(); // 0xA8
-    u8 unkB0[0xFC - 0xB0];
+    MMultiPlay *mMultiPlay;             // 0xB0
+    u32 *mResult;                       // 0xB4
+    MTaskSet *mTasks;                   // 0xB8
+    u16 mAid;                           // 0xBC: the child that connected
+    u32 mSsid[6];                       // 0xC0: what it sent (its mode, then its owner's name)
+    BOOL mAnswer;                       // 0xD8: whether to play with it
+    u8 mCancelled;                      // 0xDC
+    u8 mDisconnected;                   // 0xDD
+    u32 mStartData[6];                  // 0xE0: what the parent sends
+
+    DinoUiWirelessCancel *mCancel;      // 0xF8
 };
 
 class DinoUiCannonParentScanner : public MProcess, public MMessageObserver {
