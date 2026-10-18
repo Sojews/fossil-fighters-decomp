@@ -95,6 +95,15 @@ public:
     BOOL IsMoving();
     BOOL IsUnkA1Motion();
     MFx32 GetHeight();
+    void ResetState();
+    MFx32 GetMoveSpeed();
+    u8 GetUnk2C();
+    MRect GetRect30();
+    u8 GetUnk2D();
+    MRect GetRect40();
+    MFx32 GetUnk50();
+    void SetUnk2D8(MPoint pos, u32 a, u32 b);
+    void ClearUnk2E0();
     void MoveTo(MFx32Point coord, u32 frames, u32 ease, u8 silent);
     MTask *CreateWaitMoveTask();
 
@@ -114,7 +123,11 @@ public:
     DinoField *mField;          // 0x118
     u32 mUnk11C;                // 0x11C
     void *mUnk120;              // 0x120
-    u32 mUnk124[117];           // 0x124
+    u32 mUnk124[109];           // 0x124
+    MPoint mUnk2D8;             // 0x2D8
+    u32 mUnk2E0;                // 0x2E0
+    u32 mUnk2E4;                // 0x2E4
+    u32 mUnk2E8[4];             // 0x2E8
     MTask *mManpu;              // 0x2F8: the emotion bubble shown over the character
     u32 mUnk2FC[2];             // 0x2FC
     BOOL mHasFootSe;            // 0x304

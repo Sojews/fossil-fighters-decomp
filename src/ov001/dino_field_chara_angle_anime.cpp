@@ -2,6 +2,7 @@
 // Only the destructors are decompiled so far.
 
 #include "game/dino_field.h"
+#include "nitro/mi.h"
 #include "game/dino_field_chara_angle_anime.h"
 #include "game/dino_field_chara_coord_anime.h"
 #include "game/dino_field_chara_wait_stop_task.h"
@@ -49,9 +50,79 @@ DinoFieldCharaModel *DinoFieldChara::GetModel() {
 
 // The chara file's header.
 struct DinoFieldCharaData {
-    u8 unk00[0x18];
-    MFx32 mHeight;  // 0x18
+    u8 unk00[0x14];
+    MFx32 mMoveSpeed;   // 0x14: -1 = the default
+    MFx32 mHeight;      // 0x18
+    u8 unk1C[0x2C - 0x1C];
+    u8 mUnk2C;          // 0x2C
+    u8 mUnk2D;          // 0x2D
+    MRect mRect30;      // 0x30
+    MRect mRect40;      // 0x40
+    MFx32 mUnk50;       // 0x50: -10 = the default
 };
+
+// Defaults in main's data.
+extern "C" const MFx32 data_020b5ab8;   // move speed
+extern "C" const MFx32 data_020b5abc;   // mUnk50
+extern "C" const MFx32 data_020b5ac8;   // move speed while following
+
+void DinoFieldChara::ResetState() {
+    MI_CpuFill8(&mModel, 0, 0x2C);
+    mMotion = 1;
+    mUnk114 = 0;
+    MI_CpuFill8(&mTask, 0, sizeof(DinoCharaTask));
+}
+
+MFx32 DinoFieldChara::GetMoveSpeed() {
+    if (mTask.unk4 == 1) {
+        return data_020b5ac8;
+    }
+    MFx32 speed = ((DinoFieldCharaData *) mFile.GetData())->mMoveSpeed;
+    if (!(speed != MFx32(-1))) {
+        return data_020b5ab8;
+    }
+    return speed;
+}
+
+u8 DinoFieldChara::GetUnk2C() {
+    return ((DinoFieldCharaData *) mFile.GetData())->mUnk2C;
+}
+
+MRect DinoFieldChara::GetRect30() {
+    const DinoFieldCharaData *data = (const DinoFieldCharaData *) mFile.GetData();
+    return data->mRect30;
+}
+
+u8 DinoFieldChara::GetUnk2D() {
+    return ((DinoFieldCharaData *) mFile.GetData())->mUnk2D;
+}
+
+MRect DinoFieldChara::GetRect40() {
+    const DinoFieldCharaData *data = (const DinoFieldCharaData *) mFile.GetData();
+    return data->mRect40;
+}
+
+MFx32 DinoFieldChara::GetUnk50() {
+    MFx32 v = ((DinoFieldCharaData *) mFile.GetData())->mUnk50;
+    if (!(v != MFx32(-10))) {
+        return data_020b5abc;
+    }
+    return v;
+}
+
+void DinoFieldChara::SetUnk2D8(MPoint pos, u32 a, u32 b) {
+    mUnk2D8 = pos;
+    mUnk2E0 = a;
+    mUnk2E4 = b;
+}
+
+void DinoFieldChara::ClearUnk2E0() {
+    mUnk2E0 = 0;
+}
+
+BOOL DinoFieldChara::IsUnkA1Motion() {
+    return mModel.unk05[0] && (mMotion == 2 || mMotion == 3);
+}
 
 MFx32 DinoFieldChara::GetHeight() {
     if (IsUnkA1Motion()) {
@@ -60,10 +131,6 @@ MFx32 DinoFieldChara::GetHeight() {
         return zero;
     }
     return ((DinoFieldCharaData *) mFile.GetData())->mHeight;
-}
-
-BOOL DinoFieldChara::IsUnkA1Motion() {
-    return mModel.unk05[0] && (mMotion == 2 || mMotion == 3);
 }
 
 inline DinoFieldCharaAngleAnime::DinoFieldCharaAngleAnime(DinoFieldChara *chara, u32 angle, u32 frames, int ease) {
