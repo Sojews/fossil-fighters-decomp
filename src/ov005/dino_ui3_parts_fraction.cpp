@@ -47,6 +47,26 @@ MRect DinoUi3PartsKasekiButton::GetFrame() {
     return MRect(mPos.Offset(-24, -24), mPos.Offset(24, 24));
 }
 
+void DinoUi3PartsKasekiButton::SetMarked(BOOL marked) {
+    if (marked) {
+        mMark->Show();
+    } else {
+        mMark->Hide();
+    }
+}
+
+void DinoUi3PartsKasekiButton::SetActive(BOOL active) {
+    if (active) {
+        mMotion->GetUnit()->SetMode(1);
+    } else {
+        mMotion->GetUnit()->SetMode(0);
+    }
+}
+
+void DinoUi3PartsKasekiButton::HideMotion() {
+    mMotion->Hide();
+}
+
 void DinoUi3PartsCursor::Execute() {
     if (mUnk10->mState == STATE_RUN) {
         mUnk10->Execute();

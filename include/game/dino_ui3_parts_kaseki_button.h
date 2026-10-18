@@ -3,6 +3,7 @@
 
 #include "m/view.h"
 #include "m/menu_item.h"
+#include "m/motion.h"
 
 class DinoUi3PartsKasekiButton : public MMenuItem {
 public:
@@ -10,9 +11,14 @@ public:
     virtual MRect GetFrame();
     virtual void OnFocusChanged(BOOL focused);
 
-    MPoint mPos;  // 0x88: the center
-    u32 mUnk90;
-    MView *mView; // 0x94
+    void SetMarked(BOOL marked);
+    void SetActive(BOOL active);
+    void HideMotion();
+
+    MPoint mPos;        // 0x88: the center
+    MMotion *mMotion;   // 0x90
+    MView *mView;       // 0x94: the focus highlight
+    MView *mMark;       // 0x98
 };
 
 #endif
