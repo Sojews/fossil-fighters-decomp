@@ -187,6 +187,7 @@ void FS_InitFile(FSFile *p_file);
 BOOL FS_ConvertPathToFileID(FSFileID *p_file_id, const char *path);
 BOOL FS_OpenFileFast(FSFile *p_file, FSFileID file_id);
 BOOL FS_CloseFile(FSFile *p_file);
+void FS_CancelFile(FSFile *p_file);
 BOOL FS_SeekFile(FSFile *p_file, s32 offset, FSSeekFileMode origin);
 s32 FS_ReadFile(FSFile *p_file, void *dst, s32 len);
 s32 FS_GetPathLength(FSFile *p_file);

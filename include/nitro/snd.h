@@ -61,6 +61,10 @@ void SND_WaitForCommandProc(u32 tag);
 void SND_StopTimer(u32 chBitMask, u32 capBitMask, u32 alarmBitMask, u32 flags);
 extern const s16 SNDi_DecibelTable[128];
 
+static inline s16 SND_CalcDecibel(int scale) {
+    return SNDi_DecibelTable[scale];
+}
+
 u32 SND_GetPlayerStatus(void);
 BOOL SND_IsFinishedCommandTag(u32 tag);
 void SND_PrepareSeq(int playerNo, const void *seqBase, u32 seqOffset, const void *bank);
@@ -95,6 +99,11 @@ typedef struct {
     u16 headerSize;
     u16 dataBlocks;
 } SNDBinaryFileHeader;
+
+typedef struct {
+    u32 kind;
+    u32 size;
+} SNDBinaryBlockHeader;
 
 typedef struct SNDWaveArcLink SNDWaveArcLink;
 

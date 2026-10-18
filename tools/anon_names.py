@@ -10,6 +10,7 @@ objects with the same size, this pairs up their relocations by offset and rename
 target's names, in place. It only touches the objects objdiff reads for units that aren't complete yet; linked
 objects keep the compiler's names.
 """
+import re
 import struct
 import sys
 
@@ -80,8 +81,19 @@ def main():
     our_relocs, target_relocs = ours.relocations(), target.relocations()
     target_funcs = target.functions()
     renames = {}
+    # A static function whose name another file's function also has is named after its address in the game
+    # (ForceStopStrm_02070314): give ours that name when exactly one such function has the same size.
+    func_names = {}
     for name, func in ours.functions().items():
-        tfunc = target_funcs.get(name)
+        func_names[name] = name
+        if name in target_funcs:
+            continue
+        found = [t for t, tf in target_funcs.items()
+                 if re.fullmatch(re.escape(name) + r"_[0-9a-f]{8}", t) and tf["size"] == func["size"]]
+        if len(found) == 1:
+            renames[ours.symbols.index(func)] = func_names[name] = found[0]
+    for name, func in ours.functions().items():
+        tfunc = target_funcs.get(func_names[name])
         if tfunc is None or tfunc["size"] != func["size"]:
             continue
         mine = [r for r in our_relocs.get(func["shndx"], [])
