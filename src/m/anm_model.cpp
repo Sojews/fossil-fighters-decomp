@@ -156,6 +156,7 @@ void MAnmModelBase::Unk10() {
 void MAnmModelBase::Unk0C() {
 }
 
+#pragma opt_strength_reduction off
 void MAnmModelBase::PlaySounds(int frame) {
     if (mSounds.size() != 0) {
         for (u32 i = 0; i < mSounds.size(); i++) {
@@ -166,6 +167,7 @@ void MAnmModelBase::PlaySounds(int frame) {
         }
     }
 }
+#pragma opt_strength_reduction reset
 
 void MAnmModelBase::TintPalette(u16 color, fx32 amount) {
     if (mResource == NULL) {
