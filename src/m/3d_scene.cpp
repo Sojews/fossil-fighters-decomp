@@ -4,8 +4,19 @@
 #include "m/3d_scene.h"
 #include "m/3d.h"
 #include "m/3d_scene_enable_task.h"
+#include "m/3d_resource.h"
+#include "m/bg.h"
+#include "m/display.h"
+#include "m/lcd.h"
+#include "game/dino_3d_load_csv.h"
 
 extern "C" void G3X_SetClearColor(u16 rgb, int alpha, int depth, int polygonID, BOOL fog);
+
+M3DScene::~M3DScene() {
+    Dino3DDestroySoundNames();
+    delete mHeap;
+    gLcd->mMain->mBg->Delete3d(mM3d);
+}
 
 void M3DScene::SetCameraPos(const VecFx32 *pos) {
     mCameraPos = *pos;

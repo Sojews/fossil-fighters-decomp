@@ -14,6 +14,9 @@
 static std::map<FSFileID, MMotionData *> sMotionDatas;
 static OSMutex sMotionDatasMutex;
 
+MMotionData::~MMotionData() {
+}
+
 void MMotionData::LockFiles(int which) {
     if (which & 1) {
         for (std::vector<MArchiveFile>::iterator it = mChrFiles.begin(); it != mChrFiles.end(); it++) {
