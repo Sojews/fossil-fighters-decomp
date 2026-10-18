@@ -679,6 +679,32 @@ void MMotion::Advance(u32 frames) {
     }
 }
 
+// Where the cell sits in the motion (mirrored with the motion's flips).
+// NONMATCHING: register allocation (the game keeps this in r4 and the scaled index in r0) and when mCells is reloaded.
+void MMotion::SetCellOffset(int cell, int x, int y) {
+    mCells[cell].unk14 = MPoint(x, y);
+    int ox = mCells[cell].unk14.x;
+    int oy = mCells[cell].unk14.y;
+    MSmartOamEntry *entry = &mEntries[mCells[cell].entry];
+    if (mUnk2B || mUnk2C) {
+        int shape = entry->GetShape();
+        int w = gObjSizes[0][shape].x;
+        int h = gObjSizes[0][shape].y;
+        if (mCells[cell].objMode == 3) {
+            w *= 2;
+            h *= 2;
+        }
+        if (mUnk2B) {
+            ox = w - ox;
+        }
+        if (mUnk2C) {
+            oy = h - oy;
+        }
+    }
+    entry->unk08 = ox;
+    entry->unk0C = oy + mUnk50;
+}
+
 void MMotion::SetCellOffsetY(int cell, int y) {
     mCells[cell].offsetY = y;
     int posY = mPos.y + y;
