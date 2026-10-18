@@ -14,6 +14,9 @@
 #include "game/dino_backup.h"
 #include "game/dino_resource.h"
 #include "game/dino_common_window_message_box.h"
+#include "game/dino_common_window_yes_no_dialog.h"
+#include "game/dino_ui3_parts_cursor.h"
+#include "game/dino_sound.h"
 
 DinoUiCleaningLeave::~DinoUiCleaningLeave() {
 }
@@ -24,12 +27,7 @@ void DinoUiCleaningLeave::Idle() {
 DinoUiCleaningLeaveMenu::~DinoUiCleaningLeaveMenu() {
 }
 
-// Template task instances the game emits in this file. Until the code that makes the tasks is decompiled, they are
-// instantiated explicitly.
-template class MCallTask0<DinoUiCleaningLeaveMenu, DinoUiCleaningLeaveMenu>;
-template MTask *MCreateCallTask(DinoUiCleaningLeaveMenu *obj, void (DinoUiCleaningLeaveMenu::*func)());
-
-DinoUiCleaningLeave::DinoUiCleaningLeave(u32 arg) : MProcess(NULL) {
+DinoUiCleaningLeave::DinoUiCleaningLeave(std::vector<void *> *chosen) : MProcess(NULL) {
     gLcd->mMain->ResetHooks();
     gLcd->mMain->Setup(5, 3, 4, 1, 0, 0);
     gLcd->mMain->SetBackdrop(0x8000);
@@ -37,11 +35,61 @@ DinoUiCleaningLeave::DinoUiCleaningLeave(u32 arg) : MProcess(NULL) {
     gLcd->SetBottomDisplay(gLcd->mMain);
     gCurrentDisplay = gLcd->GetBottomDisplay();
     gLcd->VSyncNow();
-    mSerial.AddTail(new DinoUiCleaningLeaveMenu(arg));
+    mSerial.AddTail(new DinoUiCleaningLeaveMenu(chosen));
     mSerial.AddTail(MTaskExitTransfer::Create(this));
 }
 
 #pragma auto_inline off
+
+template MTask *MCreateCallTask(DinoUiCleaningLeaveMenu *obj, void (DinoUiCleaningLeaveMenu::*func)());
+
+extern const u32 data_0208a628; // text: the back button's help
+
+DinoUiCleaningLeaveMenu::DinoUiCleaningLeaveMenu(std::vector<void *> *chosen) {
+    mChosen = chosen;
+    mChosen->clear();
+    mUnk101 = 0x40;
+    mUnk104 = data_0208a628;
+}
+
+extern const u32 data_0208a9a4, data_0208a9a0, data_0208a99c, data_0208a998, data_0208a994;
+
+// Asks whether to leave the marked fossils.
+BOOL DinoUiCleaningLeaveMenu::TryDecide() {
+    if (mCount == 0) {
+        DinoSoundPlaySe(0xA4, 0);
+        return FALSE;
+    }
+    mCursor->Hide();
+    mConfirmed = FALSE;
+    DinoCommonWindowYesNoDialog *dialog =
+        new DinoCommonWindowYesNoDialog(gDinoResource->GetText(data_0208a9a4), &mConfirmed);
+    dialog->SetLabels(gDinoResource->GetText(data_0208a9a0), gDinoResource->GetText(data_0208a99c));
+    dialog->SetLabels2(gDinoResource->GetText(data_0208a998), gDinoResource->GetText(data_0208a994));
+    dialog->SetUnkBC(1);
+    MTask *finish = MCreateCallTask(this, &DinoUiCleaningLeaveMenu::FinishDecide);
+    MTask *show = mCursor->CreateShowTransfer();
+    MSerialTaskSet *serial = &mSerial;
+    serial->AddTail(dialog);
+    serial->AddTail(show);
+    serial->AddTail(finish);
+    return TRUE;
+}
+
+// After the yes/no: hands back the marked entries and leaves.
+void DinoUiCleaningLeaveMenu::FinishDecide() {
+    if (mConfirmed == TRUE) {
+        for (int i = 0; i < 0x40; i++) {
+            if (mFlags[i]) {
+                mFlags[i] = FALSE;
+                mChosen->push_back((void *)i);
+            }
+        }
+        mCount = 0;
+        ResetDecideButton();
+        OnBackDecided();
+    }
+}
 
 void DinoUiCleaningLeaveMenu::GetEntry(u32 index, DinoBackupEntry *entry) {
     gDinoBackup->GetUnk98(index, entry);
@@ -67,7 +115,7 @@ BOOL DinoUiCleaningLeaveMenu::IsMarkable(DinoBackupEntry *entry) {
         return FALSE;
     }
     u32 id = entry->id;
-    const u8 *data = (const u8 *)mFile.GetData();
+    const u8 *data = mDefs.Get();
     const u8 *def = data + ((const u32 *)(data + *(const u32 *)(data + 8)))[id];
     if (def[4] == 0) {
         return TRUE;

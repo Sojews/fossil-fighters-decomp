@@ -13,7 +13,7 @@
 
 class DinoUiCleaningLeaveMenu : public DinoUiContainerBaseMenu {
 public:
-    DinoUiCleaningLeaveMenu(u32 arg);
+    DinoUiCleaningLeaveMenu(std::vector<void *> *chosen);
     virtual ~DinoUiCleaningLeaveMenu();
     virtual BOOL TryDecide();
     virtual void Setup();
@@ -21,8 +21,10 @@ public:
     virtual BOOL CanMark();
     virtual BOOL IsMarkable(DinoBackupEntry *entry);
     virtual MTask *CreateUnk2C();
+    void FinishDecide();
 
-    u32 mUnk158[2];     // 0x158
+    BOOL mConfirmed;                // 0x158: the yes/no's answer
+    std::vector<void *> *mChosen;   // 0x15C: gets the marked entries
 };
 
 #endif

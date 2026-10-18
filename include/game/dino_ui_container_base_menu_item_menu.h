@@ -2,7 +2,7 @@
 #define GAME_DINO_UI_CONTAINER_BASE_MENU_ITEM_MENU_H
 
 #include "game/dino_ui3_parts_fraction.h"
-#include "m/archive.h"
+#include "m/resource.h"
 #include <vector>
 #include "m/menu_item.h"
 #include "m/menu.h"
@@ -22,6 +22,7 @@ class DinoUiContainerBaseMenuItem;
 
 class DinoUiContainerBaseMenu : public DinoHelpBase, public MMenu {
 public:
+    DinoUiContainerBaseMenu();
     virtual ~DinoUiContainerBaseMenu();
     virtual BOOL TryDecide() = 0;   // the decide button was pressed; FALSE if nothing happens
     virtual void OnStart();
@@ -50,10 +51,10 @@ public:
     int mPage;                  // 0xF8
     int mLastPage;              // 0xFC
     u8 mCount;                  // 0x100: how many are marked
-    u8 unk101[3];
-    u32 mUnk104[1];
-    MArchivePtr mArchive;       // 0x108
-    MArchiveFile mFile;         // 0x10C
+    u8 mUnk101;                 // 0x101
+    u8 unk102[2];
+    u32 mUnk104;                // 0x104
+    MResource<u8> mDefs;        // 0x108: the definitions the entries are looked up in
     u32 mUnk118[2];             // 0x118
     std::vector<void *> mItems; // 0x120: this page's items
     DinoUiContainerBaseMenuItem *mPageL; // 0x12C

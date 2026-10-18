@@ -38,6 +38,14 @@ DinoUiContainerBasePageRButton::~DinoUiContainerBasePageRButton() {
 DinoUiContainerBaseDecideButton::~DinoUiContainerBaseDecideButton() {
 }
 
+DinoUiContainerBaseMenu::DinoUiContainerBaseMenu()
+    : MMenu(NULL, 0), mPage(0), mLastPage(0), mCount(0), mUnk104(0), mSelected(0xFF), mIdled(FALSE) {
+    for (int i = 0; i < 0x40; i++) {
+        mFlags[i] = 0;
+    }
+    mItems.clear();
+}
+
 DinoUiContainerBaseMenu::~DinoUiContainerBaseMenu() {
 }
 
