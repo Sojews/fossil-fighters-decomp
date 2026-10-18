@@ -8,6 +8,13 @@ class MFx32 {
 public:
     MFx32() {}
     MFx32(int i) { v = i << FX32_SHIFT; }
+    static MFx32 FromRaw(fx32 raw) {
+        MFx32 r;
+        r.v = raw;
+        return r;
+    }
+    MFx32 Mul(MFx32 b) const;
+    MFx32 &operator*=(MFx32 b);
 
     fx32 v;
 };
@@ -62,6 +69,17 @@ inline MFx32 operator*(MFx32 a, MFx32 b) {
     MFx32 r;
     r.v = FX_Mul(a.v, b.v);
     return r;
+}
+
+inline MFx32 MFx32::Mul(MFx32 b) const {
+    MFx32 r;
+    r.v = FX_Mul(v, b.v);
+    return r;
+}
+
+inline MFx32 &MFx32::operator*=(MFx32 b) {
+    *this = *this * b;
+    return *this;
 }
 
 inline MFx32 operator/(MFx32 a, MFx32 b) {

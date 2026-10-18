@@ -1147,3 +1147,37 @@ static MFx32 GetAffinityRatio(DinoBattleModelCreature *creature, DinoBattleModel
     }
     return gDinoResource->GetBattleAdjustDefs()->affinityRatio[2];
 }
+
+MFx32 DinoBattleModelCreature::ReduceByDefense(MFx32 damage, MFx32 defense) {
+    return damage - gDinoResource->GetBattleAdjustDefs()->unk14.Mul(defense);
+}
+
+MFx32 DinoBattleModelCreature::ApplyRatio(MFx32 damage, MFx32 ratio) {
+    return damage * ratio;
+}
+
+MFx32 DinoBattleModelCreature::ApplyRatio2(MFx32 damage, MFx32 ratio) {
+    return damage * ratio;
+}
+
+// The creature's unkEC as a ratio, raised when it is in a pinch with the right ability.
+MFx32 DinoBattleModelCreature::GetUnkECRatio() {
+    MFx32 ratio = MFx32(mUnkEC);
+    if (IsInPinch() && GetDefUnk61() == 5) {
+        const DinoBattleAdjustDefs *defs = gDinoResource->GetBattleAdjustDefs();
+        ratio *= defs->unk3C.Mul(MFx32(mDef->mUnk62)) * MFx32::FromRaw(0x19A); // 0.1
+    }
+    return ratio;
+}
+
+// Scales damage by the creature's percentages for the two relative positions.
+MFx32 DinoBattleModelCreature::ApplyPositionRatio(MFx32 damage, int otherCategory) {
+    int distance = otherCategory + GetB8Category() + 1;
+    if (distance == 2) {
+        return damage * MFx32(mDef->mUnk6C) / MFx32(100);
+    }
+    if (distance == 3) {
+        return damage * MFx32(mDef->mUnk70) / MFx32(100);
+    }
+    return damage;
+}

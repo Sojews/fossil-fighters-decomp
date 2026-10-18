@@ -15,8 +15,11 @@ struct DinoBattleCreatureDef {
     u32 mUnk24;         // 0x24: flags
     u8 unk28[0x61 - 0x28];
     u8 mUnk61;          // 0x61
-    u8 unk62[0x68 - 0x62];
+    u8 mUnk62;          // 0x62: a percentage
+    u8 unk63[0x68 - 0x63];
     s32 mUnk68;         // 0x68: offset of a byte table
+    s32 mUnk6C;         // 0x6C
+    s32 mUnk70;         // 0x70
 };
 
 #endif

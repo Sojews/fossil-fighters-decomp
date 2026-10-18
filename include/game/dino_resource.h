@@ -83,7 +83,10 @@ struct DinoBattleAdjustDefs {
     MFx32 randomMax;        // 0x24
     u32 unk28[2];
     MFx32 affinityRatio[3]; // 0x30: by CompareUnkECA0's result (1, 2, other)
-    u8 unk03C[0x138 - 0x3C];
+    MFx32 unk3C;            // 0x3C
+    u8 unk040[0x50 - 0x40];
+    MFx32 unk50;            // 0x50
+    u8 unk054[0x138 - 0x54];
     int kasekiPointX;   // 0x138
     int kasekiPointY;   // 0x13C
     u32 unk140[2];

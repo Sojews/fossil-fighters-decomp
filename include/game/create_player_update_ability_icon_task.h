@@ -206,6 +206,7 @@ public:
     void ResetUnk108();
     void ChangeUnkB8(u32 value);
     BOOL IsInPinch();
+    MFx32 GetUnkECRatio();
     u8 GetUnk174();
     u32 GetUnkEC();
     u32 GetUnkF0();
@@ -230,6 +231,10 @@ public:
     int GetUnkCE7C(u32 attack);
     int CompareUnkECA0(DinoBattleModelCreature *other, u32 attack);
     int CompareUnkED0C(DinoBattleModelCreature *other);
+    MFx32 ReduceByDefense(MFx32 damage, MFx32 defense);
+    MFx32 ApplyRatio(MFx32 damage, MFx32 ratio);
+    MFx32 ApplyRatio2(MFx32 damage, MFx32 ratio);
+    MFx32 ApplyPositionRatio(MFx32 damage, int otherCategory);
     BOOL GetUnkD298();
     BOOL RollDefUnk23();
     int GetB8Category();
