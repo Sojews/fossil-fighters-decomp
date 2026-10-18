@@ -329,7 +329,7 @@ src/m/console.cpp:
     .text       start:0x020644a0 end:0x0206520c
 
 src/m/indicator.cpp:
-    .text       start:0x020652f4 end:0x020659e0
+    .text       start:0x020652f4 end:0x02065a4c
 
 src/m/chr16_fill.cpp:
     .text       start:0x0205c498 end:0x0205c73c
