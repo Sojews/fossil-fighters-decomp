@@ -7,8 +7,11 @@
 
 class DinoSeMotion : public MMotion {
 public:
+    DinoSeMotion(const std::string &path, MSmartOam *oam, int flags, int fromEnd);
     virtual ~DinoSeMotion();
     virtual void Unk44(int arg);
+
+    void AddSe(u32 se);
 
     std::vector<void *> mSes;   // 0x7C: sound effects the motion's commands play (1-based)
 };
