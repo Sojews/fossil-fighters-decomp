@@ -1,4 +1,5 @@
-// DinoBattleViewWinnerScrollTask.
+// DinoBattleViewWinnerScrollTask, DinoBattleViewBackdrop.
+// NONMATCHING: DinoBattleViewBackdrop::Execute (spilled values in other stack slots, registers in the loop).
 
 // Derived destructors have their bases' destructor bodies inlined; auto-inlining the ones defined above does that.
 #pragma auto_inline on
@@ -13,6 +14,8 @@
 #include "game/dino_battle_view_class.h"
 #include "game/dino_battle_view_kaseki_point_menu.h"
 #include "game/dino_battle_view2.h"
+#include "game/dino_battle_view_backdrop.h"
+#include "game/dino_resource.h"
 
 DinoBattleViewWinnerScrollTask::~DinoBattleViewWinnerScrollTask() {
     if (!mUnk78) {
@@ -93,3 +96,63 @@ void TutorialWindowCloseTask::Execute() {
 // A background load of a text picture (its creator lives in another file).
 template class MBgNewTask1<MTextPicture, const char *>;
 template MTask *MCreateBgNewTask(MTextPicture **result, const char *a1, int thread);
+
+DinoBattleViewBackdrop::~DinoBattleViewBackdrop() {
+    for (int i = 0; i < 5; i++) {
+        delete mTables[i];
+    }
+}
+
+void DinoBattleViewBackdrop::OnVSync() {
+    if (mFading) {
+        MI_CpuCopy32(mFadeLines, mBack, sizeof(mFadeLines));
+    } else {
+        MI_CpuCopy32(mTables[mTable], mBack, sizeof(mFadeLines));
+    }
+    Flip();
+}
+
+static inline const DinoRgb &GetBackdropTop(u32 i) {
+    const DinoBattleAdjustDefs *defs = gDinoResource->GetBattleAdjustDefs();
+    return ((const DinoRgb *)((const u8 *)defs + defs->backdropTop))[i];
+}
+
+static inline const DinoRgb &GetBackdropBottom(u32 i) {
+    const DinoBattleAdjustDefs *defs = gDinoResource->GetBattleAdjustDefs();
+    return ((const DinoRgb *)((const u8 *)defs + defs->backdropBottom))[i];
+}
+
+// Fades from one backdrop's colors to another's: the top and bottom colors are faded, the lines in between blend them.
+void DinoBattleViewBackdrop::Execute() {
+    MLooperVSyncTask::Execute();
+    if (!mFading) {
+        return;
+    }
+    mFrame++;
+    if (mFrame >= mDuration) {
+        mTable = mTo;
+        mFading = FALSE;
+        return;
+    }
+    const DinoRgb &topFrom = GetBackdropTop(mFrom);
+    const DinoRgb &topTo = GetBackdropTop(mTo);
+    const DinoRgb &bottomFrom = GetBackdropBottom(mFrom);
+    const DinoRgb &bottomTo = GetBackdropBottom(mTo);
+    int r = topFrom.r + (topTo.r - topFrom.r) * mFrame / mDuration;
+    int g = topFrom.g + (topTo.g - topFrom.g) * mFrame / mDuration;
+    int b = topFrom.b + (topTo.b - topFrom.b) * mFrame / mDuration;
+    int dr = bottomFrom.r + (bottomTo.r - bottomFrom.r) * mFrame / mDuration - r;
+    int dg = bottomFrom.g + (bottomTo.g - bottomFrom.g) * mFrame / mDuration - g;
+    int db = bottomFrom.b + (bottomTo.b - bottomFrom.b) * mFrame / mDuration - b;
+    u16 *line = mFadeLines;
+    int ar = 0;
+    int ag = 0;
+    int ab = 0;
+    for (int i = 0; i < M_RASTER_LINES; i++) {
+        *line++ = 0x8000 | ((u32)(b + ab / (M_RASTER_LINES - 1)) >> 3 << 10) |
+                  ((u32)(g + ag / (M_RASTER_LINES - 1)) >> 3 << 5) | ((u32)(r + ar / (M_RASTER_LINES - 1)) >> 3);
+        ar += dr;
+        ag += dg;
+        ab += db;
+    }
+}

@@ -65,6 +65,17 @@ struct DinoBattleAdjustDefs {
     u32 unk140[2];
     int statusIconX;    // 0x148
     int statusIconY;    // 0x14C
+    u32 unk150;
+    u32 backdropTop;    // 0x154: offset of the backdrops' top colors (DinoRgb)
+    u32 unk158;
+    u32 backdropBottom; // 0x15C: offset of their bottom colors
+};
+
+struct DinoRgb {
+    u8 r;
+    u8 g;
+    u8 b;
+    u8 unk3;
 };
 struct DinoBattleBgDefs;
 struct DinoExcavateRange {

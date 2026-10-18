@@ -30,6 +30,10 @@ void DC_FlushRange(const void *startAddr, u32 nBytes);
 void DC_StoreRange(const void *startAddr, u32 nBytes);
 void MI_CpuFill8(void *dest, u8 data, u32 size);
 
+static inline void MI_CpuCopy32(const void *src, void *dest, u32 size) {
+    MIi_CpuCopy32(src, dest, size);
+}
+
 #ifdef __cplusplus
 }
 #endif
