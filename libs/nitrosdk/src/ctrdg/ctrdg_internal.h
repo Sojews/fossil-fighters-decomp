@@ -20,7 +20,7 @@
 #define reg_OS_PAUSE (*(vu16 *) 0x04000300)
 
 #define PXI_FIFO_TAG_CTRDG 13
-#define PXI_FIFO_TAG_CTRDG_Ex 14
+#define PXI_FIFO_TAG_CTRDG_Ex 16
 #define PXI_FIFO_TAG_CTRDG_PHI 17
 #define PXI_FIFO_SUCCESS 0
 
