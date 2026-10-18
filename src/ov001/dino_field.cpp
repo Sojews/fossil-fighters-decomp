@@ -22,8 +22,33 @@
 #include "m/picture.h"
 #include "m/call_task.h"
 #include "m/polygon_char.h"
+#include "m/anm_model.h"
 #include "game/dino_field_capture_fade_out_task_menu.h"
 #include "game/dino_field_capture_fade_out_task.h"
+
+void DinoField::CreateEffects(MPolygonChar **effects, u32 count, u32 id) {
+    if (effects[0] != NULL) {
+        return;
+    }
+    char path[0x100];
+    OS_SPrintf(path, "/model/fieldchar/effect%02d.csv", id);
+    for (u32 i = 0; i < count; i++) {
+        *effects = new MPolygonChar(mScene, 0x7FFF, NULL, NULL);
+        (*effects)->Load(path, NULL);
+        MPolygonChar *e = *effects;
+        e->mUnkAC = 0;
+        for (MAnmModelBase *anm = (MAnmModelBase *) e->mParallel.mHead; anm != NULL;
+             anm = (MAnmModelBase *) anm->mNext) {
+            anm->mFollowParent = FALSE;
+        }
+        for (MAnmModelBase *anm = (MAnmModelBase *) (*effects)->mParallel.mHead; anm != NULL;
+             anm = (MAnmModelBase *) anm->mNext) {
+            anm->mActive = FALSE;
+        }
+        mEffectTasks->AddTail(*effects);
+        effects++;
+    }
+}
 
 #pragma auto_inline off
 

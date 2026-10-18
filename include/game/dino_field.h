@@ -253,6 +253,7 @@ class DinoFieldPoint;
 class DinoField : public MProcess, public MSerializer, public DinoHelpBase {
 public:
     virtual ~DinoField();
+    void CreateEffects(MPolygonChar **effects, u32 count, u32 id);
     virtual void Read(const void *buf);
     virtual void Write(void *buf);
     DinoFieldMap *GetMap();
@@ -311,7 +312,7 @@ public:
     u32 mUnk230;                // 0x230
     u32 mUnk234;                // 0x234
     u32 mUnk238;                // 0x238: for characters with the model flag, the one GetChara returns
-    u32 mUnk23C;                // 0x23C
+    M3DScene *mScene;           // 0x23C
     DinoFieldCamera *mCamera;   // 0x240
     DinoFieldRadar *mRadar;     // 0x244
     DinoFieldTownMap *mTownMap; // 0x248
@@ -339,7 +340,9 @@ public:
     MTask *mUnk2C0;             // 0x2C0
     MTask *mUnk2C4;             // 0x2C4
     BOOL *mUnk2C8;              // 0x2C8
-    u8 unk2CC[0xB4];
+    u8 unk2CC[0xA8];
+    MTaskSet *mEffectTasks;     // 0x374
+    u8 unk378[8];
     MArchivePtr mArchive;       // 0x380
     MArchiveFile mFile;         // 0x384
     DinoFieldPoint *mMoney;     // 0x390: the money panel, while shown
