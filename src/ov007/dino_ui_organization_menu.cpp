@@ -18,6 +18,7 @@
 #include "game/dino_ui_parts_team_tech.h"
 #include "game/dino_ui_parts_reviver_medal_button.h"
 #include "game/common_window_message.h"
+#include "game/dino_common_window_menu_item_flush_task_menu.h"
 
 DinoUiOrganizationMenu::~DinoUiOrganizationMenu() {
     gCurrentDisplay->mBlend->Reset();
@@ -155,6 +156,8 @@ extern "C" const int data_02089a0c;
 #pragma auto_inline off
 
 extern "C" void func_ov007_0217fb94(DinoUiOrganizationMenu *menu, int a1);
+// Where the team's medals go.
+extern MPoint data_ov007_0218ef0c[5];
 
 void DinoUiOrganizationMenu::ShowTabInfo(u8 tab) {
     mInfo->SetPage(tab);
@@ -437,6 +440,37 @@ void DinoUiOrganizationMenu::HandleMemberResult() {
     }
 }
 
+extern DinoUiOrganizationLayout2 data_ov007_0218ec6c;
+extern const u32 data_0208aa58, data_0208aa5c, data_0208aa60, data_0208aa64;
+extern const u32 data_0208a694, data_0208a698, data_0208a69c, data_0208a6a0;
+
+// The menu for a team member: change and remove, or just add for an empty place.
+void DinoUiOrganizationMenu::OpenMemberMenu(int member) {
+    mResult = 0;
+    mMenuBack->Hide();
+    MPoint pos = data_ov007_0218ef0c[member] + data_ov007_0218ec6c.memberMenuOffset;
+    if (member == 4) {
+        pos.x -= 16;
+    }
+    DinoCommonWindowMenu *menu = new DinoCommonWindowMenu(&mResult, pos, NULL, 0);
+    MTask *show = mMenuBack->CreateShowTransfer();
+    MTask *blend = new DinoUiOrganizationMenuBlendResetTask;
+    MTask *task = menu;
+    MSerialTaskSet *serial = &mSerial;
+    serial->AddTail(task);
+    serial->AddTail(blend);
+    serial->AddTail(show);
+    if (mTeam.slots[member] != 0) {
+        menu->AddChoice(11, gDinoResource->GetText(data_0208aa60), gDinoResource->GetText(data_0208a69c));
+        menu->AddChoice(12, gDinoResource->GetText(data_0208aa5c), gDinoResource->GetText(data_0208a698));
+        mSerial.AddTail(MCreateCallTask(this, &DinoUiOrganizationMenu::HandleResult));
+    } else {
+        menu->AddChoice(11, gDinoResource->GetText(data_0208aa64), gDinoResource->GetText(data_0208a6a0));
+        mSerial.AddTail(MCreateCallTask(this, &DinoUiOrganizationMenu::HandleMemberResult));
+    }
+    menu->AddChoice(-2, gDinoResource->GetText(data_0208aa58), gDinoResource->GetText(data_0208a694));
+}
+
 void DinoUiOrganizationMenu::RemoveListLinks() {
     if (mListLinked) {
         RemoveLink(mListItems[0], 3);
@@ -479,8 +513,6 @@ static inline u32 GetCreatureLevel(const DinoCreatureState &creature) {
     return (GetCreatureTotal(creature) - 50) / kCreatureLevelLimits[0] + 1;
 }
 
-// Where the team's medals go.
-extern MPoint data_ov007_0218ef0c[5];
 
 void DinoUiOrganizationMenu::CreateList() {
     for (int i = 0; i < 5; i++) {

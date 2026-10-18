@@ -29,6 +29,7 @@ public:
     MPoint mPos;                                    // 0xE8
     std::vector<DinoWindowChoice> mChoices;         // 0xF0
     u32 mUnkFC;                                     // 0xFC
+    u32 mUnk100[3];                                 // 0x100
 };
 
 class DinoCommonWindowMenuItem : public MMenuItem, public DinoHelpItem {

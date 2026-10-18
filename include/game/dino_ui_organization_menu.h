@@ -19,6 +19,7 @@ class DinoUiPartsReviverName;
 class DinoUiPartsTeamTech;
 class DinoUiPartsReviverMedalButton;
 class MSmartOam;
+class MView;
 class DinoCommonWindowMessage;
 
 // Where things go on the screen (filled in at start).
@@ -30,6 +31,12 @@ struct DinoUiOrganizationLayout {
     int slotColumnY;    // 0x4C
     int slotRowX;       // 0x50: to the next row
     int slotRowY;       // 0x54
+};
+
+// More of the screen's positions (filled in at start).
+struct DinoUiOrganizationLayout2 {
+    u8 unk00[0x30];
+    MPoint memberMenuOffset;    // 0x30: from the member's medal
 };
 
 class DinoUiOrganizationMenu : public DinoHelpBase, public MMenu {
@@ -66,6 +73,7 @@ public:
     void HandleResult();
     void HandleMemberResult();
     void EnableAll();
+    void OpenMemberMenu(int member);
     void SelectMember(int index);
     void RemoveMember();
     // Where the creature is in the list (the list's size if it isn't there).
@@ -96,7 +104,8 @@ public:
     DinoUiPartsReviverMedalButton *mSlots[15]; // 0x118
     u32 mUnk154[15];                    // 0x154
     int mSlotCount;                     // 0x190
-    u32 mUnk194[3];                     // 0x194
+    u32 mUnk194[2];                     // 0x194
+    MView *mMenuBack;                   // 0x19C: behind the member menu
     DinoUiFieldMenuFraction *mFraction; // 0x1A0: "page n/m"
     u32 mUnk1A4;                        // 0x1A4
     int mResult;                        // 0x1A8

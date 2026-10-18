@@ -177,7 +177,7 @@ _Z15MCreateCallTaskI22DinoUiOrganizationMenuS0_hEP5MTaskPT_MT0_FvT1_ES6_ kind:fu
 _ZN22DinoUiOrganizationMenu7TabLeftEv kind:function(thumb,size=0x44) addr:0x0217dc6c
 _ZN22DinoUiOrganizationMenu8TabRightEv kind:function(thumb,size=0x44) addr:0x0217dcb0
 _ZN22DinoUiOrganizationMenu7SetSortEh kind:function(thumb,size=0x84) addr:0x0217dcf4
-func_ov007_0217dd78 kind:function(thumb,size=0x22c) addr:0x0217dd78
+_ZN22DinoUiOrganizationMenu14OpenMemberMenuEi kind:function(thumb,size=0x22c) addr:0x0217dd78
 _ZN22DinoUiOrganizationMenu12HandleResultEv kind:function(thumb,size=0xf4) addr:0x0217dfa4
 _ZN22DinoUiOrganizationMenu18HandleMemberResultEv kind:function(thumb,size=0x128) addr:0x0217e098
 _ZN22DinoUiOrganizationMenu6InTeamEm kind:function(thumb,size=0x24) addr:0x0217e1c0
@@ -796,7 +796,6 @@ _ZTI22DinoUiOrganizationMenu kind:data(any) addr:0x0218eeac
 _ZTI18DinoUiSortMenuItem_ov007 kind:data(any) addr:0x0218eecc
 _ZTI26DinoUiPartsTabIconMenuItem_ov007 kind:data(any) addr:0x0218eeec
 data_ov007_0218ef0c kind:data(any) addr:0x0218ef0c
-data_ov007_0218ef10 kind:data(any) addr:0x0218ef10
 data_ov007_0218ef14 kind:data(any) addr:0x0218ef14
 data_ov007_0218ef1c kind:data(any) addr:0x0218ef1c
 data_ov007_0218ef24 kind:data(any) addr:0x0218ef24
