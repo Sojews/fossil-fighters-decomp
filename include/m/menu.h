@@ -2,6 +2,7 @@
 #define M_MENU_H
 
 #include "m/menu_item.h"
+#include <map>
 
 class MInput;
 
@@ -13,27 +14,8 @@ struct MMenuHalfPlane {
     int y;
 };
 
-// Stands in for the std::map of links (item and direction to item) until MSL's tree is reconstructed. (A
-// template, as the inlined code differs from a plain class's.)
-template <class T> struct MTreeStandIn {
-    struct Header {
-        void *root;
-        void *leftmost;
-    };
-
-    MTreeStandIn() { Init(); }
-    ~MTreeStandIn();    // (out of line, like the tree's)
-    void Init() {
-        size = 0;
-        header.root = NULL;
-        header.leftmost = &header;
-    }
-
-    u32 size;
-    Header header;
-};
-
-typedef MTreeStandIn<MMenuItem *> MMenuLinks;
+// The links between items: from an item, in a direction, to an item.
+typedef std::multimap<MMenuItem *, std::pair<int, MMenuItem *> > MMenuLinks;
 
 class MMenu : public MProcess {
 public:
@@ -56,6 +38,7 @@ public:
     void SetDeferStart(BOOL defer);
     void AddItem(MMenuItem *item);
     void RemoveItem(MMenuItem *item);
+    void ClearItems();
     void RemoveLink(MMenuItem *from, int dir);
     void AddLink(MMenuItem *from, int dir, MMenuItem *to);
     void SetLinksOnly(BOOL linksOnly);

@@ -1,5 +1,7 @@
-// MMenuItem, MMenu and the focus transfers. Not decompiled yet: the parts that use the link map (MSL's tree)
-// and the state functions (they load pointer-to-member constants, which can't be matched by name yet).
+// MMenuItem, MMenu and the focus transfers. Not decompiled yet: the state functions (they load pointer-to-member
+// constants, which can't be matched by name yet).
+// NONMATCHING: RemoveItem, AddLink and RemoveLink (the game keeps a stored copy of the iterator or of the inner pair
+// that ours optimizes away, as in help.cpp), the tree's insert_node_at (two stores swapped).
 
 #include "m/menu.h"
 #include "m/lcd.h"
@@ -128,6 +130,39 @@ void MMenu::SetDeferStart(BOOL defer) {
 void MMenu::AddItem(MMenuItem *item) {
     item->mMenu = this;
     mItems->AddTail(item);
+}
+
+void MMenu::RemoveItem(MMenuItem *item) {
+    mItems->Remove(item);
+    item->mMenu = NULL;
+    // Drop the links to or from the item.
+    MMenuLinks::iterator it = mLinks.begin();
+    while (it != mLinks.end()) {
+        if (it->first == item || it->second.second == item) {
+            mLinks.erase(it);
+            it = mLinks.begin();
+        } else {
+            ++it;
+        }
+    }
+}
+
+void MMenu::ClearItems() {
+    mItems->Clear();
+    mLinks.clear();
+}
+
+void MMenu::AddLink(MMenuItem *from, int dir, MMenuItem *to) {
+    mLinks.insert(MMenuLinks::value_type(from, std::make_pair(dir, to)));
+}
+
+void MMenu::RemoveLink(MMenuItem *from, int dir) {
+    for (MMenuLinks::iterator it = mLinks.begin(); it != mLinks.end(); ++it) {
+        if (it->first == from && dir == it->second.first) {
+            mLinks.erase(it);
+            return;
+        }
+    }
 }
 
 void MMenu::SetLinksOnly(BOOL linksOnly) {
