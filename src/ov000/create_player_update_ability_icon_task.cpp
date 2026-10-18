@@ -463,6 +463,17 @@ MTask *DinoBattleModelPlayer::CreateUpdateColorTask(const u32 *ids, u32 count, u
     return NULL;
 }
 
+// Has the view play a motion effect, and waits for it to finish.
+MTask *DinoBattleModelPlayer::CreateMotionEffectTask(u32 a, u32 b, u32 c, u32 d, u32 e) {
+    MParallelTaskSet *set = new MParallelTaskSet(TRUE);
+    DinoSignalWait *wait = new DinoSignalWait(0x10054, NULL, NULL, 1);
+    MTask *post = mUnkF4->CreatePostTask(
+        new DinoBattleViewCreatureMotionEffectRequest((u32)(MMessageObserver *)wait, a, b, c, d, e));
+    set->AddTail(wait);
+    set->AddTail(post);
+    return set;
+}
+
 u32 DinoBattleModelPlayer::GetUnkB8() {
     return mUnkB8;
 }
