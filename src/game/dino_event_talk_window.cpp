@@ -1,6 +1,8 @@
 // DinoEventTalkWindow: the window event text is shown in.
 // Only the background-call template it instantiates is here so far.
 
+#pragma ipa file
+
 #include "game/dino_event_talk_window.h"
 #include "m/bg_new_task.h"
 #include "game/dino_window_choice.h"
