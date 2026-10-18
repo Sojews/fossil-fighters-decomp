@@ -133,6 +133,17 @@ void DinoUiOptionBackButton::OnDecide() {
     mOwner->OnBackDecided();
 }
 
+// Pooled file statics.
+struct DispBlowerStatics {
+    u8 unk00[0x5C];
+    MRect mMicTestFrame;    // 0x5C
+};
+extern "C" DispBlowerStatics data_ov004_0217530c;
+
+MRect MicTestButton::GetFrame() {
+    return data_ov004_0217530c.mMicTestFrame;
+}
+
 void MicTestButton::OnDecide() {
     DinoSoundPlaySe(0x390, 0);
 }

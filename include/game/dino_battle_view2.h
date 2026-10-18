@@ -142,10 +142,15 @@ public:
     virtual void Idle();
 
     void Update(u32 mask, int *sums);
+    BOOL IsAnimating();
 
     u32 mUnk74[2];          // 0x74
     MAfnBlock *mAffine;     // 0x7C
-    u32 unk80[19];
+    u32 unk80[9];
+    u32 mMask;              // 0xA4
+    int mTarget[4];         // 0xA8
+    int mValue[4];          // 0xB8: counts toward mTarget
+    u32 unkC8;
 };
 
 #endif

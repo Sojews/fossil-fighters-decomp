@@ -44,10 +44,15 @@ public:
     u32 mUnk10;         // 0x10
 };
 
+class DinoBattleView;
+
+// Waits until both players' ability icons stop counting.
 class WaitUpdateSupportEffectAnimeTask : public MTask {
 public:
     virtual ~WaitUpdateSupportEffectAnimeTask();
     virtual void Execute();
+
+    DinoBattleView *mView;  // 0x10
 };
 
 class DinoBattleViewTutorialRect : public MProcess {

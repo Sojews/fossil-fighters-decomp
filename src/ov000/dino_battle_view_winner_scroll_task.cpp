@@ -8,6 +8,9 @@
 #include "types.h"
 #include "game/motion_advantage_arrow.h"
 #include "game/dino_battle_view_field.h"
+#include "game/dino_battle_view_class.h"
+#include "game/dino_battle_view_kaseki_point_menu.h"
+#include "game/dino_battle_view2.h"
 
 DinoBattleViewWinnerScrollTask::~DinoBattleViewWinnerScrollTask() {
     if (!mUnk78) {
@@ -55,6 +58,15 @@ SetTutorialMotionRectTask::~SetTutorialMotionRectTask() {
 }
 
 void DinoBattleViewTutorialMotion::Idle() {
+}
+
+void WaitUpdateSupportEffectAnimeTask::Execute() {
+    for (int i = 0; i < 2; i++) {
+        if (mView->GetUnkE4(i)->GetUnk108()->IsAnimating()) {
+            return;
+        }
+    }
+    Exit();
 }
 
 void TutorialWindowCloseTask::Execute() {

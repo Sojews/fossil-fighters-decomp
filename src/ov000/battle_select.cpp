@@ -6,6 +6,20 @@
 
 #include "game/battle_select.h"
 #include "types.h"
+#include "game/dino_battle_view2.h"
+
+#pragma auto_inline off
+
+BOOL DinoBattleViewAbilityIcon::IsAnimating() {
+    for (int i = 0; i < 4; i++) {
+        if ((mMask & (1 << i)) && mValue[i] != mTarget[i]) {
+            return TRUE;
+        }
+    }
+    return FALSE;
+}
+
+#pragma auto_inline on
 
 DebugAutoBattle::~DebugAutoBattle() {
     delete mRandom;
