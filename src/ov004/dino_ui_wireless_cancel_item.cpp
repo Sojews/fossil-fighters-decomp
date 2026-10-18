@@ -279,7 +279,7 @@ extern "C" struct {
     void (DinoUiBattleParentScanner::*StateStart_5C)(); // 0x5c
     u8 unk64[0x6C - 0x64];
     void (DinoUiChildScannerCannonConnect::*StateConnect_6C)(); // 0x6c
-    void (DinoUiCannonParentScanner::*Parent0216623c_74)(); // 0x74
+    void (DinoUiCannonParentScanner::*StateListen_74)(); // 0x74
 } data_ov004_021740d0;
 extern "C" struct {
     u8 unk00[0x4];
@@ -300,7 +300,7 @@ extern "C" struct {
 extern "C" struct {
     u8 unk00[0x4];
     void (DinoUiChildScannerBattleConnect::*Unk02163cdc_04)(); // 0x04
-    u8 unk0C[0x14 - 0xC];
+    void (DinoUiCannonParentScanner::*OnCountMessage_0C)(MMessage *msg); // 0x0c
     void (DinoUiChildScannerCannonConnect::*StateChoose_14)(); // 0x14
     MPoint mParentNameOffset; // 0x1c
     void (DinoUiBattleParentScanner::*State02165818_24)(); // 0x24
@@ -321,20 +321,24 @@ extern "C" struct {
     void (DinoUiCannonChild::*StateShootMenu_14)(); // 0x14
     DinoUiWirelessMatchState StateChildScan; // 0x1c
     void (DinoUiCannonChild::*StateShot_24)(); // 0x24
-    u8 unk2C[0x44 - 0x2C];
+    void (DinoUiCannonParentScanner::*OnConnectMessage_2C)(MMessage *msg); // 0x2c
+    void (DinoUiCannonParentScanner::*StateLost_34)(); // 0x34
+    u8 unk3C[0x44 - 0x3C];
     void (DinoUiChildScannerBattleConnect::*OnConnectMessage_44)(MMessage *msg); // 0x44
     DinoUiWirelessMatchState StateAnswered_4C; // 0x4c
     void (DinoUiChildScannerCannonConnect::*StateConnecting_54)(); // 0x54
     void (DinoUiCannonParentScanner::*Failed_5C)(); // 0x5c
-    u8 unk64[0x6C - 0x64];
+    void (DinoUiCannonParentScanner::*StateWait_64)(); // 0x64
     void (DinoUiCannonParentScanner::*Failed_6C)(); // 0x6c
     void (DinoUiCannonParentScanner::*StateSync_74)(); // 0x74
+    void (DinoUiCannonParentScanner::*State02165ff0_7C)(); // 0x7c (its second word is in the next block)
 } data_ov004_02174250;
 extern "C" struct {
     u8 unk00[0xC];
     void (DinoUiBattleParentScanner::*StateShowCancel_0C)(); // 0x0c
     void (DinoUiChildScannerBattleConnect::*StateConnecting_14)(); // 0x14
-    u8 unk1C[0x2C - 0x1C];
+    void (DinoUiCannonParentScanner::*StateCancelled_1C)(); // 0x1c
+    u8 unk24[0x2C - 0x24];
     void (DinoUiChildScannerCannonConnect::*IgnoreMessage_2C)(MMessage *msg); // 0x2c
     void (DinoUiChildScannerCannonConnect::*OnConnectMessage_34)(MMessage *msg); // 0x34
     u8 unk3C[0x44 - 0x3C];
@@ -352,10 +356,11 @@ extern "C" struct {
     void (DinoUiChildScannerBattleConnect::*IgnoreMessage_04)(MMessage *msg); // 0x04
     void (DinoUiChildScannerBattleConnect::*IgnoreMessage_0C)(MMessage *msg); // 0x0c
     void (DinoUiChildScannerBattleConnect::*StateConnect_14)(); // 0x14
-    u8 unk1C[0x24 - 0x1C];
+    MPoint mMessagePos;  // 0x1c
     void (DinoUiChildScannerBattleConnect::*StateChoose_24)(); // 0x24
     DinoUiWirelessMatchState StateKeep; // 0x2c
-    u8 unk34[0x44 - 0x34];
+    void (DinoUiCannonParentScanner::*State02166588_34)(); // 0x34
+    u8 unk3C[0x44 - 0x3C];
     void (DinoUiCannonChild::*State02166f10_44)(); // 0x44
     u8 unk4C[0x54 - 0x4C];
     void (DinoUiCannonChild::*Child021674f8_54)(); // 0x54
@@ -829,6 +834,68 @@ void DinoUiWirelessMatch::StateFinish() {
     serial->AddTail(exit);
 }
 
+// Listens for children through a message hub, from no count.
+void DinoUiCannonParentScanner::StateListen() {
+    mHub = new MMultiPlayMessageHub(0);
+    mHub->SetUnk279(TRUE);
+    mHub->AddObserver(this);
+    mParallel.AddTail(mHub);
+    mUnk100.clear();
+    mUnk10C.clear();
+    mState = data_ov004_02174250.StateWait_64;
+    mOnMessage = data_ov004_021741d0.OnCountMessage_0C;
+}
+
+// The connection was lost: says so.
+void DinoUiCannonParentScanner::StateLost() {
+    mTasks->Clear();
+    MTask *box = new DinoCommonWindowMessageBox(data_ov004_02174350.mMessagePos, gDinoResource->GetText(data_0208ab5c), 4);
+    mSerial.AddTail(box);
+    mState = data_ov004_021742d0.StateCancelled_1C;
+}
+
+// Cancelled: hides the counter, resets the connection and leaves.
+void DinoUiCannonParentScanner::StateCancelled() {
+    mOam->mHidden = TRUE;
+    mTasks->Clear();
+    MTask *reset;
+    MTask *fade;
+    MTask *exit;
+    exit = MTaskExitTransfer::Create(this);
+    fade = GetDisplay()->mBlend->CreateFadeRatioAnime(8, 0, 10, 0);
+    reset = mMultiPlay->CreateResetTask();
+    MParallelTaskSet *closing = new MParallelTaskSet(TRUE);
+    closing->AddTail(reset);
+    closing->AddTail(fade);
+    MSerialTaskSet *serial = &mSerial;
+    serial->AddTail(closing);
+    serial->AddTail(exit);
+}
+
+extern const u32 data_0208ab68;
+
+// Shows "waiting for children" with a cancel button.
+void DinoUiCannonParentScanner::StateShowCancel() {
+    mTasks->AddTail(new DinoCommonWindowMessageWait2(gDinoResource->GetText(data_0208ab68),
+                                                     data_ov004_02174350.mMessagePos, 4, 0),
+                    mCancel = new DinoUiWirelessCancel(&mCancelled));
+    mOnMessage = data_ov004_02174250.OnConnectMessage_2C;
+    mState = data_ov004_02174250.State02165ff0_7C;
+}
+
+void DinoUiCannonParentScanner::State021664c0() {
+    if (mMultiPlay->IsFailed()) {
+        mState = data_ov004_02174250.StateLost_34;
+        return;
+    }
+    Dispatch();
+    if (mUnkF9) {
+        AddSerial(this, new MTimer(5), MTaskExitTransfer::Create(mHub), mMultiPlay->CreateReleaseSynchronizeTask(),
+                  mMultiPlay->CreateDisconnectTask(mAid));
+        mState = data_ov004_02174350.State02166588_34;
+    }
+}
+
 // Ends the scan and leaves after half a second.
 void DinoUiChildScanner::Leave() {
     MTask *exit = MTaskExitTransfer::Create(this);
@@ -1254,7 +1321,7 @@ void DinoUiCannonParentScanner::StateCheckFailed() {
     if (mMultiPlay->IsFailed()) {
         mState = data_ov004_02174250.Failed_6C;
     } else {
-        mState = data_ov004_021740d0.Parent0216623c_74;
+        mState = data_ov004_021740d0.StateListen_74;
     }
 }
 

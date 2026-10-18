@@ -179,19 +179,31 @@ public:
     void StateSync();
     void StateCheckFailed();
     void StateWait();
+    void StateListen();
+    void OnCountMessage(MMessage *msg);
+    void StateLost();
+    void StateCancelled();
+    void StateShowCancel();
+    void State02165ff0();
+    void State021664c0();
+    void State02166588();
 
     void (DinoUiCannonParentScanner::*mState)(); // 0xA8
     void (DinoUiCannonParentScanner::*mOnMessage)(MMessage *msg); // 0xB0
     MMultiPlay *mMultiPlay;             // 0xB8
     u32 *mResult;                       // 0xBC
-    u32 unkC0;
+    MTaskSet *mTasks;                   // 0xC0
     u16 mAid;                           // 0xC4: the child that connected
     u32 mSsid[6];                       // 0xC8: what it sent (the first word is its mode)
-    u32 unkE0[3];
+    MMultiPlayMessageHub *mHub;         // 0xE0
+    MSmartOam *mOam;                    // 0xE4
+    u32 unkE8;
     MMotion *mOnes;                     // 0xEC: the count's digits
     MMotion *mTens;                     // 0xF0
     u32 mCount;                         // 0xF4
-    u32 mUnkF8[2];                      // 0xF8
+    u8 mCancelled;                      // 0xF8
+    u8 mUnkF9;                          // 0xF9
+    DinoUiWirelessCancel *mCancel;      // 0xFC
     std::vector<unsigned int> mUnk100; // 0x100: (a distinct element type from other overlays' copies)
     std::vector<int> mUnk10C;  // 0x10C
 };
