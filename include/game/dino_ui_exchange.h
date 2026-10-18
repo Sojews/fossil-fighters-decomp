@@ -13,6 +13,8 @@
 #include "game/dino_field_camera_hook.h"
 #include "m/motion.h"
 #include "m/multi_play.h"
+#include "game/dino_backup.h"
+#include "game/dino_resource.h"
 
 struct DinoPlayerProfile;
 
@@ -45,6 +47,19 @@ public:
     void Start();
     void Reset();
     void StateEnd();
+    void StateStart();
+    void StateCheck();
+    void State02155e10();
+    void StateWait();
+    void State0215639c();
+    void Unk02155f24();
+    // Sets when the next exchange may happen.
+    void SetNextTime() {
+        MResource<DinoExcavateDefs> defs = gDinoResource->GetExcavateDefs();
+        u32 wait = defs.Get()->exchangeWait;
+        u64 frames = gDinoBackup->GetPlayFrames();
+        mNextTime = frames + wait;
+    }
 
     void (DinoUiExchange::*mState)();               // 0xA8
     void (DinoUiExchange::*mOnMessage)(MMessage *msg); // 0xB0
@@ -60,9 +75,10 @@ public:
     std::set<DinoMacAddress> mPartners; // 0xE8: the ones exchanged with already
     u8 unkF4[8];
     u8 mBeacon[0x18];               // 0xFC: sent when this side is the parent
-    u8 unk114[0x2C];
-    MArchivePtr mArchive;           // 0x140
-    MArchiveFile mFile;             // 0x144
+    u8 unk114[0x130 - 0x114];
+    u64 mNextTime;                  // 0x130: in play frames
+    u8 unk138[0x140 - 0x138];
+    MResource<void> mResource;      // 0x140
     u8 unk150[0x1EC - 0x150];
 };
 

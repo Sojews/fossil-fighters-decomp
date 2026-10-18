@@ -12,6 +12,7 @@
 #include "game/dino_backup.h"
 #include "game/dino_resource.h"
 #include "m/seed_generator.h"
+#include "game/dino_common_window_message_box.h"
 
 DinoUiExchange::~DinoUiExchange() {
     GetDisplay()->mBlend->Reset();
@@ -77,9 +78,58 @@ template class std::__red_black_tree<DinoMacAddress, DinoMacAddress, std::__iden
 
 // The TU's pooled pointer-to-member constants (see menu.cpp).
 extern "C" struct {
+    u8 unk00[0x3C];
+    void (DinoUiExchange::*State02155e10_3C)(); // 0x3c
+} data_ov004_02171de0;
+extern "C" struct {
     u8 unk00[0x34];
     void (DinoUiExchange::*Unk02155f24_34)();
+    u8 unk3C[0x44 - 0x3C];
+    void (DinoUiExchange::*State0215639c_44)(); // 0x44
+    u8 unk4C[0x54 - 0x4C];
+    void (DinoUiExchange::*StateCheck_54)(); // 0x54
+    u8 unk5C[0x6C - 0x5C];
+    void (DinoUiExchange::*StateStart_6C)(); // 0x6c
 } data_ov004_02171e60;
+
+DinoUiExchange::DinoUiExchange() : MProcess(NULL) {
+    mState = data_ov004_02171e60.StateStart_6C;
+}
+
+extern MView *data_ov004_02177284; // the view the cross-fade keeps
+extern const u32 data_0208ab50;
+
+// Dims the screen and fades it in.
+void DinoUiExchange::StateStart() {
+    gCurrentDisplay->mBlend->Reset();
+    gCurrentDisplay->mBlend->SetMode(3);
+    MBlend *blend = gCurrentDisplay->mBlend;
+    blend->SetTarget1(data_ov004_02177284->GetPlaneMask());
+    mCount = 0;
+    SetNextTime();
+    mSerial.AddTail(gCurrentDisplay->mBlend->CreateFadeRatioAnime(0, 8, 10, 0));
+    mState = data_ov004_02171e60.StateCheck_54;
+}
+
+// With no fossils to exchange, says so and leaves.
+void DinoUiExchange::StateCheck() {
+    if (gDinoBackup->IsUnk14CEmpty()) {
+        MTask *box = new DinoCommonWindowMessageBox(MPoint(0x80, 0x60), gDinoResource->GetText(data_0208ab50), 4);
+        MTask *exit = MTaskExitTransfer::Create(this);
+        MTask *fade = gCurrentDisplay->mBlend->CreateFadeRatioAnime(8, 0, 10, 0);
+        MSerialTaskSet *serial = &mSerial;
+        serial->AddTail(box);
+        serial->AddTail(fade);
+        serial->AddTail(exit);
+    } else {
+        mState = data_ov004_02171de0.State02155e10_3C;
+    }
+}
+
+void DinoUiExchange::StateWait() {
+    SetNextTime();
+    mState = data_ov004_02171e60.State0215639c_44;
+}
 
 void DinoUiExchange::StateEnd() {
     if (mUnkC0 == 0) {
