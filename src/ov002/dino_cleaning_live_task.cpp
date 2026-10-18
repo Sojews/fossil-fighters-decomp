@@ -9,7 +9,6 @@
 
 extern "C" void func_ov002_021573e8(DinoCleaningTalkWindow *window);
 extern "C" void func_ov002_0215785c(DinoCleaningTalkWindow *window);
-extern "C" void func_ov002_021579ec(DinoCleaningTalkWindow *window);
 
 #pragma auto_inline off
 
@@ -20,7 +19,7 @@ DinoCleaningLive::DinoCleaningLive(u32 arg, const std::string &name) : DinoCommo
 }
 
 void DinoCleaningLive::ShowTutorial(MDisplay *display, const char *text) {
-    func_ov002_021579ec(mTalk);
+    mTalk->Reset();
     mSerial.AddTail(new DinoCleaningTutorialWindow(display, mUnkD4, std::string(text)));
 }
 
