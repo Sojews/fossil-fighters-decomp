@@ -16,7 +16,8 @@
 #include "game/dino_ui_child_scanner_cancel_item.h"
 #include "game/dino_ui_child_scanner_start_battle_parent_item.h"
 #include "game/dino_ui_child_scanner_start_cannon_parent_item.h"
-#include "m/bg_new_task.h"
+// (MCreateBgCallTask is only declared here: the game calls the copy in dino_ui_exchange.cpp.)
+template <class T> MTask *MCreateBgCallTask(T *obj, void (T::*func)(), int thread);
 #include "m/call_task.h"
 #include "m/observer.h"
 #include "m/multi_play.h"
@@ -274,7 +275,7 @@ extern "C" struct {
     const char *mParentPath1;   // 0x24
     u8 unk28[0x34 - 0x28];
     DinoUiWirelessMatchState StateAfterReset; // 0x34
-    u8 unk3C[0x44 - 0x3C];
+    void (DinoUiCannonChild::*Leave_3C)(); // 0x3c
     DinoUiWirelessMatchState StateInit; // 0x44
     DinoUiWirelessMatchState StateAsk; // 0x4c
     void (DinoUiCannonParentScanner::*StateLost_54)(); // 0x54
@@ -282,11 +283,12 @@ extern "C" struct {
     void (DinoUiCannonChild::*State021672f8_64)(); // 0x64
     void (DinoUiChildScannerCannonConnect::*StateConnect_6C)(); // 0x6c
     void (DinoUiCannonParentScanner::*StateListen_74)(); // 0x74
+    void (DinoBackup::*Save_7C)(); // 0x7c (its second word is in the next block)
 } data_ov004_021740d0;
 extern "C" struct {
     u8 unk00[0x4];
     void (DinoUiBattleParentScanner::*StateShowCancel_04)(); // 0x04
-    u8 unk0C[0x14 - 0xC];
+    void (DinoUiCannonChild::*Leave_0C)(); // 0x0c
     void (DinoUiCannonChild::*StateSendProfile_14)(); // 0x14
     DinoUiWirelessMatchState StateStartWireless_1C; // 0x1c
     DinoUiWirelessMatchState StateChildScan_24; // 0x24
@@ -1025,6 +1027,41 @@ void DinoUiCannonChild::StateSendProfile() {
     MTask *exit = MTaskExitTransfer::Create(wait);
     AddSerial(this, new MTimer(60), exit);
     mState = data_ov004_021740d0.State021672f8_64;
+}
+
+extern const u32 data_0208ab6c;
+
+// Waits for the shot; if the connection fails, says so (after putting the rocks back and saving, if the shot never
+// started) and leaves.
+void DinoUiCannonChild::State021672f8() {
+    Dispatch();
+    if (!mMultiPlay->IsFailed()) {
+        return;
+    }
+    if (mStarted) {
+        MTask *box = new DinoCommonWindowMessageBox(MPoint(0x80, 0x60), gDinoResource->GetText(data_0208ab6c), 4);
+        mSerial.AddTail(box);
+        mState = data_ov004_02174150.Leave_0C;
+        return;
+    }
+    for (u32 i = 0; i < mRocks.size(); i++) {
+        gDinoBackup->SetUnk14C(gDinoBackup->FindFreeUnk14C(), &mRocks[i]);
+    }
+    MTask *wait = new DinoCommonWindowMessageWait1(std::string(gDinoResource->GetText(data_0208ab54)), MPoint(0x80, 0x60),
+                                                   4, 0);
+    mParallel.AddTail(wait);
+    MTask *waitExit = MTaskExitTransfer::Create(wait);
+    MTask *validate = new DinoBackupWriteValidater(wait, mMultiPlay);
+    MTask *save = MCreateBgCallTask(gDinoBackup, data_ov004_021740d0.Save_7C, 1);
+    MTask *validateSave = new DinoBackupWriteValidater(wait, mMultiPlay);
+    MSerialTaskSet *serial = &mSerial;
+    serial->AddTail(validateSave);
+    serial->AddTail(save);
+    serial->AddTail(validate);
+    serial->AddTail(waitExit);
+    MTask *box = new DinoCommonWindowMessageBox(MPoint(0x80, 0x60), gDinoResource->GetText(data_0208ab7c), 4);
+    mSerial.AddTail(box);
+    mState = data_ov004_021740d0.Leave_3C;
 }
 
 // Ends the scan and leaves after half a second.
