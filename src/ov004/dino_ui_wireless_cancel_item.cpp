@@ -275,7 +275,7 @@ extern "C" struct {
     u8 unk3C[0x44 - 0x3C];
     DinoUiWirelessMatchState StateInit; // 0x44
     DinoUiWirelessMatchState StateAsk; // 0x4c
-    u8 unk54[0x5C - 0x54];
+    void (DinoUiCannonParentScanner::*StateLost_54)(); // 0x54
     void (DinoUiBattleParentScanner::*StateStart_5C)(); // 0x5c
     u8 unk64[0x6C - 0x64];
     void (DinoUiChildScannerCannonConnect::*StateConnect_6C)(); // 0x6c
@@ -331,7 +331,7 @@ extern "C" struct {
     void (DinoUiCannonParentScanner::*StateWait_64)(); // 0x64
     void (DinoUiCannonParentScanner::*Failed_6C)(); // 0x6c
     void (DinoUiCannonParentScanner::*StateSync_74)(); // 0x74
-    void (DinoUiCannonParentScanner::*State02165ff0_7C)(); // 0x7c (its second word is in the next block)
+    void (DinoUiCannonParentScanner::*StateWaitChildren_7C)(); // 0x7c (its second word is in the next block)
 } data_ov004_02174250;
 extern "C" struct {
     u8 unk00[0xC];
@@ -880,7 +880,7 @@ void DinoUiCannonParentScanner::StateShowCancel() {
                                                      data_ov004_02174350.mMessagePos, 4, 0),
                     mCancel = new DinoUiWirelessCancel(&mCancelled));
     mOnMessage = data_ov004_02174250.OnConnectMessage_2C;
-    mState = data_ov004_02174250.State02165ff0_7C;
+    mState = data_ov004_02174250.StateWaitChildren_7C;
 }
 
 void DinoUiCannonParentScanner::State021664c0() {
@@ -893,6 +893,34 @@ void DinoUiCannonParentScanner::State021664c0() {
         AddSerial(this, new MTimer(5), MTaskExitTransfer::Create(mHub), mMultiPlay->CreateReleaseSynchronizeTask(),
                   mMultiPlay->CreateDisconnectTask(mAid));
         mState = data_ov004_02174350.State02166588_34;
+    }
+}
+
+// Waits for children; cancelling hides the counter, fades out and leaves.
+void DinoUiCannonParentScanner::StateWaitChildren() {
+    if (mMultiPlay->IsFailed()) {
+        mState = data_ov004_021740d0.StateLost_54;
+        return;
+    }
+    Dispatch();
+    if (mCancelled) {
+        MTask *exit = MTaskExitTransfer::Create(this);
+        MTask *fade = GetDisplay()->mBlend->CreateFadeRatioAnime(8, 0, 10, 0);
+        MTask *reset = mMultiPlay->CreateResetTask();
+        MSerialTaskSet *resets = new MSerialTaskSet(TRUE);
+        resets->AddTail(reset);
+        MParallelTaskSet *closing = new MParallelTaskSet(TRUE);
+        closing->AddTail(resets);
+        closing->AddTail(fade);
+        MTask *hide = mOam->CreateHideTransfer();
+        MTask *empty = MTaskSetMakeEmptyTask::Create(mTasks);
+        MTask *close = mCancel->CreateCloseTask();
+        MSerialTaskSet *serial = &mSerial;
+        serial->AddTail(close);
+        serial->AddTail(empty);
+        serial->AddTail(hide);
+        serial->AddTail(closing);
+        serial->AddTail(exit);
     }
 }
 

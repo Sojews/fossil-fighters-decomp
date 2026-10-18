@@ -184,7 +184,7 @@ public:
     void StateLost();
     void StateCancelled();
     void StateShowCancel();
-    void State02165ff0();
+    void StateWaitChildren();
     void State021664c0();
     void State02166588();
 
