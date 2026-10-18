@@ -18,7 +18,9 @@ public:
     virtual void Idle();
     virtual void OnMessage(MMessage *msg);
 
-    u8 unkA8[0x40];
+    void (DinoUiExchange::*mState)();               // 0xA8
+    void (DinoUiExchange::*mOnMessage)(MMessage *msg); // 0xB0
+    u8 unkB8[0x30];
     std::map<u32, void *> mUnkE8;   // 0xE8
     u8 unkF4[0x4C];
     MArchivePtr mArchive;           // 0x140

@@ -142,6 +142,19 @@ void DinoUi2ContainerBaseDecideButton::OnFocusChanged(BOOL focused) {
     }
 }
 
+// Pooled file statics: the button corners.
+struct DinoUi2ContainerBaseStatics {
+    u8 unk00[0x50];
+    MPoint mDecideTopLeft;      // 0x50
+    u8 unk58[0x20];
+    MPoint mDecideBottomRight;  // 0x78
+};
+extern "C" DinoUi2ContainerBaseStatics data_ov004_02176b44;
+
+MRect DinoUi2ContainerBaseDecideButton::GetFrame() {
+    return MRect(data_ov004_02176b44.mDecideTopLeft, data_ov004_02176b44.mDecideBottomRight);
+}
+
 void DinoUi2ContainerBaseDecideButton::OnDecide() {
     if (mOwner->TryDecide()) {
         DinoSoundPlaySe(0x98, 0);

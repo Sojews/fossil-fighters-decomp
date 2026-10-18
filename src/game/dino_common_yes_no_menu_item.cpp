@@ -13,6 +13,11 @@
 DinoCommonWindowYesNoDialog::~DinoCommonWindowYesNoDialog() {
 }
 
+void DinoCommonWindowYesNoDialog::SetLabels(std::string yes, std::string no) {
+    mUnk8C = yes;
+    mUnk80 = no;
+}
+
 DinoCommonYesNoMenuItem::~DinoCommonYesNoMenuItem() {
 }
 

@@ -11,3 +11,11 @@
 DinoUiExchange::~DinoUiExchange() {
     GetDisplay()->mBlend->Reset();
 }
+
+void DinoUiExchange::Idle() {
+    (this->*mState)();
+}
+
+void DinoUiExchange::OnMessage(MMessage *msg) {
+    (this->*mOnMessage)(msg);
+}

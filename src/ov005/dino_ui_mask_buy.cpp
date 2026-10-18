@@ -140,6 +140,19 @@ void DinoUiMaskBuyMenu::OnBackDecided() {
     serial->AddTail(exit);
 }
 
+// Pooled file statics: the button corners.
+struct DinoUiMaskBuyStatics {
+    u8 unk00[0x28];
+    MPoint mTopLeft;     // 0x28
+    u8 unk30[0x8];
+    MPoint mBottomRight; // 0x38
+};
+extern "C" DinoUiMaskBuyStatics data_ov005_0216b200;
+
+MRect DinoUiMaskBuyBuyButton::GetFrame() {
+    return MRect(data_ov005_0216b200.mTopLeft, data_ov005_0216b200.mBottomRight);
+}
+
 void DinoUiMaskBuyBuyButton::OnDecide() {
     if (mOwner->Buy()) {
         DinoSoundPlaySe(0x98, 0);

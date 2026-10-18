@@ -123,6 +123,19 @@ class DinoUiCanonPutinMenu {};
 template class MCallTask0<DinoUiCanonPutinMenu, DinoUiCanonPutinMenu>;
 template MTask *MCreateCallTask(DinoUiCanonPutinMenu *obj, void (DinoUiCanonPutinMenu::*func)());
 
+// Pooled file statics: the button corners.
+struct DinoUiContainerBaseStatics {
+    u8 unk00[0x50];
+    MPoint mTopLeft;     // 0x50
+    u8 unk58[0x20];
+    MPoint mBottomRight; // 0x78
+};
+extern "C" DinoUiContainerBaseStatics data_ov005_0216c2e8;
+
+MRect DinoUiContainerBaseDecideButton::GetFrame() {
+    return MRect(data_ov005_0216c2e8.mTopLeft, data_ov005_0216c2e8.mBottomRight);
+}
+
 void DinoUiContainerBaseDecideButton::OnDecide() {
     if (mOwner->TryDecide()) {
         DinoSoundPlaySe(0x98, 0);

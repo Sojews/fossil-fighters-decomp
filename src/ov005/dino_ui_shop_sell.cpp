@@ -112,6 +112,19 @@ void DinoUiShopSellMenu::OnBackDecided() {
     serial->AddTail(exit);
 }
 
+// Pooled file statics: the button corners.
+struct DinoUiShopSellStatics {
+    u8 unk00[0x8];
+    MPoint mTopLeft;     // 0x08
+    u8 unk10[0x48];
+    MPoint mBottomRight; // 0x58
+};
+extern "C" DinoUiShopSellStatics data_ov005_02165ff8;
+
+MRect DinoUiShopSellSellButton::GetFrame() {
+    return MRect(data_ov005_02165ff8.mTopLeft, data_ov005_02165ff8.mBottomRight);
+}
+
 void DinoUiShopSellSellButton::OnDecide() {
     if (mOwner->Sell()) {
         DinoSoundPlaySe(0x98, 0);
