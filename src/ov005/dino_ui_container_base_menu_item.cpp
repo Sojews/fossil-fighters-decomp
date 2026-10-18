@@ -186,6 +186,25 @@ u8 DinoUiContainerBaseMenu::GetFlag(int index) {
     return mFlags[index];
 }
 
+// The help for the decide and back buttons.
+void DinoUiContainerBaseMenu::AddHelpEntries(u32 backText) {
+    AddEntry((u32)(DinoHelpItem *)mLinkFrom, 1, 0);
+    AddEntry((u32)(DinoHelpItem *)mBack, 4, backText);
+}
+
+void DinoUiContainerBaseMenu::ResetDecideButton() {
+    DinoUiContainerBaseMenuItem *decide = mLinkFrom;
+    decide->mSerial.Clear();
+    decide->mMotion->Play(1, 0);
+}
+
+void DinoUiContainerBaseMenu::HidePageButtons() {
+    mPageL->MMenuItem::Disable();
+    mPageL->mMotion->Hide();
+    mPageR->MMenuItem::Disable();
+    mPageR->mMotion->Hide();
+}
+
 // Entries that can't be marked now (and aren't) are greyed out.
 void DinoUiContainerBaseMenu::RefreshMarks() {
     for (int i = 0; i < mItems.size(); i++) {

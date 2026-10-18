@@ -18,6 +18,8 @@ struct DinoBackupEntry;
 class DinoUi3PartsCursor;
 class DinoUi3PartsRockName;
 
+class DinoUiContainerBaseMenuItem;
+
 class DinoUiContainerBaseMenu : public DinoHelpBase, public MMenu {
 public:
     virtual ~DinoUiContainerBaseMenu();
@@ -39,6 +41,9 @@ public:
     u8 GetFlag(int index);
     void SetFlag(int index, u8 flag);
     void RefreshMarks();
+    void ResetDecideButton();
+    void HidePageButtons();
+    void AddHelpEntries(u32 backText);
 
     DinoUi3PartsFraction *mFraction; // 0xB4: "page n/m"
     u8 mFlags[0x40];            // 0xB8
@@ -51,9 +56,10 @@ public:
     MArchiveFile mFile;         // 0x10C
     u32 mUnk118[2];             // 0x118
     std::vector<void *> mItems; // 0x120: this page's items
-    u32 mUnk12C[2];             // 0x12C
-    MMenuItem *mBack;           // 0x134
-    MMenuItem *mLinkFrom;       // 0x138: linked to the first page item
+    DinoUiContainerBaseMenuItem *mPageL; // 0x12C
+    DinoUiContainerBaseMenuItem *mPageR; // 0x130
+    DinoUiContainerBaseMenuItem *mBack;  // 0x134
+    DinoUiContainerBaseMenuItem *mLinkFrom; // 0x138: the decide button, linked to the first page item
     MTaskSet *mCursorTasks;     // 0x13C
     DinoUi3PartsCursor *mCursor; // 0x140
     DinoUi3PartsRockName *mRockName; // 0x144
