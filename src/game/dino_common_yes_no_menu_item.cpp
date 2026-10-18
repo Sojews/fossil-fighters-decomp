@@ -13,6 +13,17 @@
 DinoCommonWindowYesNoDialog::~DinoCommonWindowYesNoDialog() {
 }
 
+extern const u32 data_0208acc8; // "No"
+extern const u32 data_0208accc; // "Yes"
+
+DinoCommonWindowYesNoDialog::DinoCommonWindowYesNoDialog(std::string text, BOOL *result)
+    : MProcess(NULL), mUnk74(text), mUnk80(gDinoResource->GetText(data_0208acc8)),
+      mUnk8C(gDinoResource->GetText(data_0208accc)) {
+    mResult = result;
+    mPos = MPoint(0x80, 0x60);
+    mUnkBC = 0;
+}
+
 void DinoCommonWindowYesNoDialog::SetLabels(std::string yes, std::string no) {
     mUnk8C = yes;
     mUnk80 = no;
