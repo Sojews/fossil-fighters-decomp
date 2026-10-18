@@ -7,6 +7,8 @@
 #include "game/dino_sound.h"
 #include "m/resource.h"
 #include "game/dino_battle_tutorial.h"
+#include "game/dino_message.h"
+#include "game/dino_battle_view_class.h"
 #include "types.h"
 
 DinoBattleViewTutorialWindow::~DinoBattleViewTutorialWindow() {
@@ -50,3 +52,11 @@ MResource<DinoBattleTutorialData> DinoBattleTutorialDataLoad(std::string path) {
     return MResource<DinoBattleTutorialData>(path);
 }
 #pragma dont_inline reset
+
+#pragma auto_inline off
+
+// Instances the game emits here (for the tutorial's requests to the battle view); until the code that posts them
+// is decompiled they are made explicitly.
+template MTask *DinoCreatePostAndWaitTask(DinoBattleView *target, DinoBattleViewTutorialSetRectRequest *msg);
+template MTask *DinoCreatePostAndWaitTask(DinoBattleView *target, DinoBattleViewTutorialSetArroeRequest *msg);
+template MTask *DinoCreatePostAndWaitTask(DinoBattleView *target, DinoBattleViewTutorialWindowRequest *msg);
