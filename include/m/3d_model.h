@@ -29,6 +29,8 @@ public:
     u8 GetUnk10();
     void SetTexture(u32 unkDC, u32 texKey, u32 plttKey);
     void ReleaseTexture();
+    void ReleaseModelData();
+    void ReleaseGrid();
     void SetUnk2F4(u16 value);
     BOOL SetFlag100(BOOL on);
     const MtxFx44 *GetMatrix();
@@ -56,13 +58,18 @@ public:
     u32 mTexKey;                // 0xC8
     u32 mPlttKey;               // 0xCC
     u8 mHasTexture;             // 0xD0
-    u32 unkD4[2];
+    u32 unkD4;
+    const void *mModelRes;      // 0xD8: the model resource (its joint names)
     u32 mUnkDC;                 // 0xDC
     u8 unkE0[0x2E4 - 0xE0];
     M3DGrid *mGrid;             // 0x2E4: the ground, if the model has one
     u32 unk2E8[3];
     u16 mUnk2F4;                // 0x2F4
-    u8 unk2F6[0x32C - 0x2F6];
+    u8 unk2F6[0x2FC - 0x2F6];
+    u8 *mModelData;             // 0x2FC
+    u8 unk300[0x328 - 0x300];
+    u8 mOwnsModelData;          // 0x328
+    u8 unk329[0x32C - 0x329];
 };
 
 #endif

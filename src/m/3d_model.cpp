@@ -2,6 +2,7 @@
 // Only the small functions are decompiled so far.
 
 #include "m/3d_model.h"
+#include <string.h>
 #include "m/3d_resource.h"
 #include "m/3d_scene.h"
 
@@ -94,4 +95,45 @@ BOOL M3DModel::IsOnGround(fx32 x, fx32 z, fx32 *height) {
         return FALSE;
     }
     return mGrid->IsOnGround(x, z, height);
+}
+
+M3DModel::~M3DModel() {
+    ReleaseModelData();
+    ReleaseTexture();
+    ReleaseGrid();
+}
+
+void M3DModel::ReleaseModelData() {
+    if (mOwnsModelData) {
+        delete[] mModelData;
+        mModelData = NULL;
+        mOwnsModelData = FALSE;
+    }
+}
+
+void M3DModel::ReleaseGrid() {
+    if (mGrid != NULL) {
+        delete mGrid;
+    }
+    mGrid = NULL;
+}
+
+// The index of the joint with the name, or -1.
+int M3DModel::FindJoint(const char *name) {
+    int joint = -1;
+    const u32 *res = (const u32 *) mModelRes;
+    if (res[3] != 0) {
+        int i;
+        u32 offset = res[1] + res[2];
+        const char *entry = (const char *) res + (offset + 4);
+        int count = *(const int *) ((const u8 *) res + offset);
+        for (i = 0; i < count; i++) {
+            if (strncmp((char *) entry, (char *) name, 16) == 0) {
+                joint = i;
+                break;
+            }
+            entry += 0x40;
+        }
+    }
+    return joint;
 }
