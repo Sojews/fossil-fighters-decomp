@@ -4,6 +4,7 @@
 #pragma auto_inline on
 
 #include "game/dino_message.h"
+#include <algorithm>
 #include "m/resource.h"
 #include "game/create_player_update_ability_icon_task.h"
 #include "m/seed_generator.h"
@@ -219,6 +220,17 @@ DamagedUpdate::~DamagedUpdate() {
 
 extern "C" BOOL func_ov000_0216cfac(DinoBattleModelCreature *creature, u32 a, u32 b, u32 c, u32 d, u8 e);
 
+SetStatusEffectTask::SetStatusEffectTask(DinoBattleModelCreature *creature, u32 a, u32 b, u32 c, u32 d, u8 e,
+                                         MMessageObserver *view) {
+    mCreature = creature;
+    mUnk14 = a;
+    mUnk18 = b;
+    mUnk1C = c;
+    mUnk20 = d;
+    mUnk24 = e;
+    mView = view;
+}
+
 void SetStatusEffectTask::Execute() {
     if (func_ov000_0216cfac(mCreature, mUnk14, mUnk18, mUnk1C, mUnk20, mUnk24) && mView != NULL) {
         mView->Post(new DinoBattleViewDeleteStatusEffectSignal(mCreature->GetUnkB4(), mUnk14));
@@ -290,6 +302,28 @@ u32 DinoBattleModelCreature::GetUnkE8() {
 }
 
 extern "C" BOOL func_ov000_0218472c(int flag); // a debug switch, always off
+
+static const int kUnkFCMax = 12;
+static const int kUnkFCMin = 1;
+
+void DinoBattleModelCreature::AddUnkFC(int delta) {
+    int value = mUnkFC + delta;
+    mUnkFC = std::max(kUnkFCMin, std::min(kUnkFCMax, value));
+}
+
+// Sets the creature's life: at most its maximum, at least the player's floor.
+void DinoBattleModelCreature::SetLife(int life) {
+    mUnkE4 = life;
+    s32 floor = mPlayer->GetUnkC8();
+    mUnkE4 = std::max(floor, std::min(mUnkE8, mUnkE4));
+}
+
+BOOL DinoBattleModelCreature::IsInPinch() {
+    if (MFx32(mUnkE4) / MFx32(mUnkE8) <= MFx32(gDinoResource->GetBattleAdjustDefs()->pinchRatio)) {
+        return TRUE;
+    }
+    return FALSE;
+}
 
 MMessage *DinoBattleModelCreature::CreateMotionEffectRequest() {
     return new DinoBattleViewCreatureMotionEffectRequest(0, mUnkB4, 4, 0, 0, -1);

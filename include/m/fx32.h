@@ -28,6 +28,10 @@ inline bool operator>=(MFx32 a, MFx32 b) {
     return a.v >= b.v;
 }
 
+inline bool operator<=(MFx32 a, MFx32 b) {
+    return a.v <= b.v;
+}
+
 inline MFx32 operator-(MFx32 a) {
     MFx32 r;
     r.v = -a.v;

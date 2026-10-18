@@ -14,6 +14,7 @@ class DinoBattleModelCreature;
 
 class SetStatusEffectTask : public MTask {
 public:
+    SetStatusEffectTask(DinoBattleModelCreature *creature, u32 a, u32 b, u32 c, u32 d, u8 e, MMessageObserver *view);
     virtual ~SetStatusEffectTask();
     virtual void Execute();
 

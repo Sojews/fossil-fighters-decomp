@@ -494,7 +494,7 @@ func_ov000_0216c83c kind:function(thumb,size=0x10) addr:0x0216c83c
 _ZN23DinoBattleModelCreature14RandomFractionEv kind:function(thumb,size=0xc) addr:0x0216c84c
 func_ov000_0216c858 kind:function(thumb,size=0xb4) addr:0x0216c858
 func_ov000_0216c90c kind:function(thumb,size=0x250) addr:0x0216c90c
-func_ov000_0216cb5c kind:function(thumb,size=0x34) addr:0x0216cb5c
+_ZN23DinoBattleModelCreature8AddUnkFCEi kind:function(thumb,size=0x34) addr:0x0216cb5c
 _ZN23DinoBattleModelCreature8GetUnkB0Ev kind:function(thumb,size=0x6) addr:0x0216cb90
 _ZN23DinoBattleModelCreature8GetUnkB4Ev kind:function(thumb,size=0x6) addr:0x0216cb98
 _ZN23DinoBattleModelCreature8GetUnkB8Ev kind:function(thumb,size=0x6) addr:0x0216cba0
@@ -507,7 +507,7 @@ _ZN23DinoBattleModelCreature10ClearUnkC4Ev kind:function(thumb,size=0x8) addr:0x
 _ZN23DinoBattleModelCreature8GetStatsEv kind:function(thumb,size=0x14) addr:0x0216cbfc
 _ZN23DinoBattleModelCreature8GetUnkE4Ev kind:function(thumb,size=0x6) addr:0x0216cc10
 _ZN23DinoBattleModelCreature8GetUnkE8Ev kind:function(thumb,size=0x6) addr:0x0216cc18
-func_ov000_0216cc20 kind:function(thumb,size=0x44) addr:0x0216cc20
+_ZN23DinoBattleModelCreature7SetLifeEi kind:function(thumb,size=0x44) addr:0x0216cc20
 func_ov000_0216cc64 kind:function(thumb,size=0x7a) addr:0x0216cc64
 _ZN23DinoBattleModelCreature25CreateMotionEffectRequestEv kind:function(thumb,size=0x40) addr:0x0216cce0
 _ZN23DinoBattleModelCreature11BeginActionEv kind:function(thumb,size=0x54) addr:0x0216cd20
@@ -519,7 +519,7 @@ _ZN23DinoBattleModelCreature8GetUnkF4Ev kind:function(thumb,size=0x6) addr:0x021
 _ZN23DinoBattleModelCreature8GetUnkF8Ev kind:function(thumb,size=0x6) addr:0x0216cddc
 _ZN23DinoBattleModelCreature8GetUnkFCEv kind:function(thumb,size=0x6) addr:0x0216cde4
 _ZN23DinoBattleModelCreature11GetDefUnk20Ei kind:function(thumb,size=0x18) addr:0x0216cdec
-func_ov000_0216ce04 kind:function(thumb,size=0x4c) addr:0x0216ce04
+_ZN23DinoBattleModelCreature9IsInPinchEv kind:function(thumb,size=0x4c) addr:0x0216ce04
 _ZN23DinoBattleModelCreature9IsUnkCE50Ev kind:function(thumb,size=0x1e) addr:0x0216ce50
 _ZN23DinoBattleModelCreature11GetDefUnk61Ev kind:function(thumb,size=0xa) addr:0x0216ce70
 _ZN23DinoBattleModelCreature10GetUnkCE7CEm kind:function(thumb,size=0x28) addr:0x0216ce7c
@@ -529,7 +529,7 @@ _ZN23DinoBattleModelCreature9GetUnk12CEv kind:function(thumb,size=0x8) addr:0x02
 _ZN23DinoBattleModelCreature11GetDefTableEi kind:function(thumb,size=0xe) addr:0x0216ced0
 _ZN23DinoBattleModelCreature9GetUnk108Ev kind:function(thumb,size=0x8) addr:0x0216cee0
 _ZN23DinoBattleModelCreature9SetUnk108Em kind:function(thumb,size=0x8) addr:0x0216cee8
-func_ov000_0216cef0 kind:function(thumb,size=0x48) addr:0x0216cef0
+_ZN19SetStatusEffectTaskC1EP23DinoBattleModelCreaturemmmmhP16MMessageObserver kind:function(thumb,size=0x48) addr:0x0216cef0
 _ZN19SetStatusEffectTask7ExecuteEv kind:function(thumb,size=0x74) addr:0x0216cf38
 func_ov000_0216cfac kind:function(thumb,size=0x238) addr:0x0216cfac
 _ZN23DinoBattleModelCreature12ClearStatus8Ev kind:function(thumb,size=0x14) addr:0x0216d1e4
@@ -1447,8 +1447,8 @@ data_ov000_0218fa94 kind:data(any) addr:0x0218fa94
 data_ov000_0218faa4 kind:data(any) addr:0x0218faa4
 data_ov000_0218fadc kind:data(any) addr:0x0218fadc
 data_ov000_0218fb8c kind:data(any) addr:0x0218fb8c
-data_ov000_0218fb98 kind:data(any) addr:0x0218fb98
-data_ov000_0218fb9c kind:data(any) addr:0x0218fb9c
+kUnkFCMax kind:data(any) addr:0x0218fb98
+kUnkFCMin kind:data(any) addr:0x0218fb9c
 data_ov000_0218fba0 kind:data(any) addr:0x0218fba0
 data_ov000_0218fba4 kind:data(any) addr:0x0218fba4
 data_ov000_0218fba8 kind:data(any) addr:0x0218fba8

@@ -181,6 +181,9 @@ public:
     void BeginAction();
     void EndAction();
     void SendUpdate(u8 a, u32 b);
+    void AddUnkFC(int delta);
+    void SetLife(int life);
+    BOOL IsInPinch();
     u8 GetUnk174();
     u32 GetUnkEC();
     u32 GetUnkF0();
@@ -229,13 +232,13 @@ public:
     u32 mUnkC4;                     // 0xC4
     DinoBattleCreatureStats mStats; // 0xC8
     DinoBattleCreatureDef *mDef;    // 0xE0
-    u32 mUnkE4;                     // 0xE4
-    u32 mUnkE8;                     // 0xE8
+    s32 mUnkE4;                     // 0xE4: life
+    s32 mUnkE8;                     // 0xE8: maximum life
     u32 mUnkEC;                     // 0xEC
     u32 mUnkF0;                     // 0xF0
     u32 mUnkF4;                     // 0xF4
     u32 mUnkF8;                     // 0xF8
-    u32 mUnkFC;                     // 0xFC
+    s32 mUnkFC;                     // 0xFC
     u32 mUnk100;                    // 0x100
     u32 unk104;
     u32 mUnk108;                    // 0x108

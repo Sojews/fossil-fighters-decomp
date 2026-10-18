@@ -69,6 +69,8 @@ struct DinoBattleAdjustDefs {
     u32 backdropTop;    // 0x154: offset of the backdrops' top colors (DinoRgb)
     u32 unk158;
     u32 backdropBottom; // 0x15C: offset of their bottom colors
+    u32 unk160[3];
+    MFx32 pinchRatio;   // 0x16C: at or below this share of its life, a creature is in a pinch
 };
 
 struct DinoRgb {
