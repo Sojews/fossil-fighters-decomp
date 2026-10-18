@@ -18,8 +18,11 @@ struct DinoBackupEntry;
 class DinoUi2FieldMenuCursor;
 class DinoUi2PartsRockName;
 
+class DinoUi2ContainerBaseMenuItem;
+
 class DinoUi2ContainerBaseMenu : public DinoHelpBase, public MMenu {
 public:
+    DinoUi2ContainerBaseMenu();
     virtual ~DinoUi2ContainerBaseMenu();
     virtual BOOL TryDecide() = 0;   // the decide button was pressed; FALSE if nothing happens
     virtual void OnStart();
@@ -35,14 +38,15 @@ public:
     u8 mFlags[0x41];                // 0xB3: marked entries (members start in MMenu's tail padding)
     int mPage; // 0xF4
     int mLastPage; // 0xF8
-    u8 mUnkFC;                      // 0xFC
+    u8 mUnkFC;                      // 0xFC: how many are marked
+    u8 mUnkFD;                      // 0xFD: the most that can be
     u32 mUnk100;                    // 0x100
     MSmartOam *mOam;                // 0x104
     u32 mUnk108;                    // 0x108
     std::vector<void *> mItems;     // 0x10C: this page's items
     u32 mUnk118[2];                 // 0x118
     MMenuItem *mBack;               // 0x120
-    MMenuItem *mLinkFrom;           // 0x124: linked to the first page item
+    DinoUi2ContainerBaseMenuItem *mLinkFrom; // 0x124: the decide button, linked to the first page item
     MTaskSet *mCursorTasks;         // 0x128
     DinoUi2FieldMenuCursor *mCursor; // 0x12C
     DinoUi2PartsRockName *mRockName; // 0x130
@@ -57,10 +61,12 @@ public:
     u8 GetFlag(int index);
     void SetFlag(int index, u8 value);
     void RefreshMarks();
+    void ResetDecideButton();
 };
 
 class DinoUi2CannonShootMenu : public DinoUi2ContainerBaseMenu {
 public:
+    DinoUi2CannonShootMenu(std::vector<void *> *chosen);
     virtual ~DinoUi2CannonShootMenu();
     virtual BOOL TryDecide();
     virtual void Setup();
@@ -71,6 +77,7 @@ public:
     void FinishDecide();
 
     BOOL mConfirmed;                // 0x144: the yes/no answer
+    std::vector<void *> *mChosen;   // 0x148: gets the indices of the marked entries
 };
 
 #endif

@@ -189,6 +189,8 @@ void DinoUi2ContainerBaseMenu::ClearItems() {
 
 extern MView *data_ov004_02177284; // the view the cross-fade keeps
 
+#pragma auto_inline off
+
 void DinoUi2ContainerBaseMenu::OnBackDecided() {
     MTask &self = *this;
     MTask *timer;
@@ -213,6 +215,21 @@ template MTask *MCreateCallTask(DinoUi2CannonShootMenu *obj, void (DinoUi2Cannon
 
 u8 DinoUi2ContainerBaseMenu::GetFlag(int index) {
     return mFlags[index];
+}
+
+DinoUi2ContainerBaseMenu::DinoUi2ContainerBaseMenu()
+    : MMenu(NULL, 0), mPage(0), mLastPage(0), mUnkFC(0), mSelected(0xFF), mIdled(FALSE) {
+    for (int i = 0; i < 0x40; i++) {
+        mFlags[i] = 0;
+    }
+    SetDeferStart(TRUE);
+    mItems.clear();
+}
+
+void DinoUi2ContainerBaseMenu::ResetDecideButton() {
+    DinoUi2ContainerBaseMenuItem *decide = mLinkFrom;
+    decide->mSerial.Clear();
+    decide->mMotion->Play(1, 0);
 }
 
 // Entries that can't be marked now (and aren't) are greyed out.
@@ -343,6 +360,27 @@ BOOL DinoUi2CannonShootMenu::IsMarkable(DinoBackupEntry *entry) {
 }
 
 extern const u32 data_0208a9c4, data_0208aa04, data_0208aa08;
+
+DinoUi2CannonShootMenu::DinoUi2CannonShootMenu(std::vector<void *> *chosen) {
+    mChosen = chosen;
+    mChosen->clear();
+    mUnkFD = 8;
+}
+
+// After the yes/no: hands back the marked entries and leaves.
+void DinoUi2CannonShootMenu::FinishDecide() {
+    if (mConfirmed == TRUE) {
+        for (int i = 0; i < 8; i++) {
+            if (mFlags[i]) {
+                mFlags[i] = FALSE;
+                mChosen->push_back((void *)i);
+            }
+        }
+        mUnkFC = 0;
+        ResetDecideButton();
+        OnBackDecided();
+    }
+}
 
 // Asks whether to load the marked fossils.
 BOOL DinoUi2CannonShootMenu::TryDecide() {
