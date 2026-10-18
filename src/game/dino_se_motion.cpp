@@ -1,6 +1,9 @@
 // DinoSeMotion.
 // Also DinoWeightedRandom.
 
+// The game built this file without common-subexpression elimination (loops reload their bounds).
+#pragma opt_common_subs off
+
 
 #include "game/dino_sound.h"
 #include "game/dino_se_motion.h"
@@ -15,7 +18,6 @@ void DinoWeightedRandom::Add(int weight) {
     mBounds.push_back(reinterpret_cast<void *&>(mTotal));
 }
 
-// NONMATCHING: the game reloads the count every pass; ours keeps it in a register.
 u32 DinoWeightedRandom::Pick() {
     int value = mRandom->Next(mTotal);
     for (u32 i = 0; i < mBounds.size(); i++) {

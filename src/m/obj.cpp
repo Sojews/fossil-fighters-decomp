@@ -36,7 +36,8 @@ void MChrBlock::Load(const void *src, u32 start, u32 count, int palette) {
     gLooper->AddTransferTask(CreateLoadTask(src, start, count, palette));
 }
 
-// NONMATCHING: the unit size is kept in a register in the 16-color path instead of reloaded.
+// Built without common-subexpression elimination (the 16-color path reloads the unit size).
+#pragma opt_common_subs off
 void MChrBlock::Load(MArchiveFile *file, u32 offset, u32 start, u32 unused, u32 count, int palette) {
     u32 bytes = std::min(size - start * unitSize, count * unitSize);
     offset *= unitSize;
@@ -47,6 +48,7 @@ void MChrBlock::Load(MArchiveFile *file, u32 offset, u32 start, u32 unused, u32 
                             new MChr256Filter(palette));
     }
 }
+#pragma opt_common_subs reset
 
 MTask *MChrBlock::CreateFillTask(int color, u32 start, u32 count) {
     u32 bytes = std::min(size - start * unitSize, count * unitSize);

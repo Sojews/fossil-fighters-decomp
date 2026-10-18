@@ -131,7 +131,6 @@ void DinoBattleViewUiDefenderMenu::OnFocus(MMenuItem *item) {
 }
 
 #pragma auto_inline off
-// NONMATCHING: the game reloads mCount every time round the loop.
 BOOL DinoBattleViewUiDefenderMenu::CanDefend(u32 id) {
     for (int i = 0; i < mCount; i++) {
         if (id == mIds[i]) {

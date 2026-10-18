@@ -95,13 +95,15 @@ void MMenuItem::SetMode(int mode) {
     mMode = mode;
 }
 
-// NONMATCHING: the game reloads mMode for the last return.
+// Built without common-subexpression elimination (mMode is read again for the last return).
+#pragma opt_common_subs off
 int MMenuItem::GetMode() {
     if (mMode == -1 && mMenu != NULL) {
         return mMenu->mDefaultMode;
     }
     return GetOwnMode();
 }
+#pragma opt_common_subs reset
 
 void MMenuItem::Idle() {
 }
