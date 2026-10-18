@@ -244,6 +244,11 @@ void DinoUiMuseumMenu::CreateSlots() {
     }
 }
 
+DinoUiMuseumSlotCreateTask::DinoUiMuseumSlotCreateTask(DinoUiMuseumMenu *menu) : MProcess(NULL) {
+    mMenu = menu;
+    mIndex = 0;
+}
+
 #pragma auto_inline on
 
 void DinoUiMuseumSlotCreateTask::Idle() {

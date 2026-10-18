@@ -24,7 +24,10 @@ class DinoUiFieldMenuFraction;
 class DinoUiMuseumMenu : public DinoHelpBase, public MMenu {
 public:
     virtual ~DinoUiMuseumMenu();
+    virtual void OnStart();
     virtual void OnIdle();
+    virtual void OnFocus(MMenuItem *item);
+    virtual void OnDecide(MMenuItem *item);
 
     void CreateSlots();
     void CreateSlot(u32 index);
@@ -88,6 +91,7 @@ public:
 
 class DinoUiMuseumSlotCreateTask : public MProcess {
 public:
+    DinoUiMuseumSlotCreateTask(DinoUiMuseumMenu *menu);
     virtual ~DinoUiMuseumSlotCreateTask();
     virtual void Idle();
 
