@@ -76,18 +76,6 @@ extern "C" struct {
     void (DinoBattleView3DCamera::*Run_5C)();
     void (DinoBattleView3DCamera::*Run_64)();
 } data_ov000_02196cd0;
-extern "C" u8 data_ov000_021903dc[];
-
-DinoBattleView3DCamera::DinoBattleView3DCamera(M3DScene *scene, Dino3DLoadCsv *camera, u32 unk88)
-    : MProcess(NULL), mCamera(camera), mScene(scene) {
-    mState = data_ov000_02196cd0.Run_4C;
-    mUnk9C = data_ov000_021903dc;
-    mUnk88 = unk88;
-    Reset();
-    mLight = -1;
-    unk80 = 0;
-}
-
 void DinoBattleView3DCamera::Start(u32 unk88, const void *unk9C, int light) {
     mState = data_ov000_02196cd0.Run_5C;
     mUnk88 = unk88;

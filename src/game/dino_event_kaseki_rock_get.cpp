@@ -37,8 +37,11 @@ extern "C" struct {
     void (DinoEventKasekiRockGet::*StateAskSwap_7C)();
 } data_020bd1f8;
 
+// "/msg/msg_dig" (the TU's string literals are pooled data too).
+extern "C" const char data_020bd360[];
+
 DinoEventKasekiRockGet::DinoEventKasekiRockGet(DinoEventLoop *event, u32 mode, const DinoBackupEntry *entry, u8 *result)
-    : MProcess(gLcd->GetBottomDisplay()), mEvent(event), mMode(mode), mEntry(*entry), mMessages("/msg/msg_dig"),
+    : MProcess(gLcd->GetBottomDisplay()), mEvent(event), mMode(mode), mEntry(*entry), mMessages(data_020bd360),
       mResult(result) {
     mState = data_020bd1f8.StateStart_5C;
 }
