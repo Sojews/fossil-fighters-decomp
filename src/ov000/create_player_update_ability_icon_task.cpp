@@ -485,6 +485,30 @@ MTask *DinoBattleModelPlayer::CreateAbilityTask(u32 a, u32 b, u32 c) {
     return set;
 }
 
+// Fade settings (constants in main).
+extern const u32 data_0208a110;
+extern const u32 data_0208a11c;
+extern const u32 data_0208a16c;
+extern const u32 data_0208a198;
+extern const u32 data_0208a1c0;
+
+// Has the view fade the screens (first clearing the status effect icons' blending), and waits for it.
+MTask *DinoBattleModelPlayer::CreateLcdFadeTask(BOOL clearIcons) {
+    MParallelTaskSet *set = new MParallelTaskSet(TRUE);
+    DinoSignalWait *wait = new DinoSignalWait(0x1006A, NULL, NULL, 1);
+    if (clearIcons) {
+        MTask *clear = mUnkF4->CreatePostTask(new DinoBattleViewStatusEffectIconBlendClearSignal());
+        set->AddTail(mUnkF4->CreatePostTask(new DinoBattleViewLCDFadeRequest(
+            (u32)(MMessageObserver *)wait, 0, 0, -1, data_0208a110, data_0208a11c, data_0208a16c)));
+        set->AddTail(clear);
+    } else {
+        set->AddTail(mUnkF4->CreatePostTask(new DinoBattleViewLCDFadeRequest(
+            (u32)(MMessageObserver *)wait, 0, 0, -1, 0, data_0208a198, data_0208a1c0)));
+    }
+    set->AddTail(wait);
+    return set;
+}
+
 u32 DinoBattleModelPlayer::GetUnkB8() {
     return mUnkB8;
 }

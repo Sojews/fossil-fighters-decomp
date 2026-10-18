@@ -114,6 +114,7 @@ public:
     MTask *CreateUpdateColorTask(const u32 *ids, u32 count, u32 color);
     MTask *CreateMotionEffectTask(u32 a, u32 b, u32 c, u32 d, u32 e);
     MTask *CreateAbilityTask(u32 a, u32 b, u32 c);
+    MTask *CreateLcdFadeTask(BOOL clearIcons);
 
     std::vector<DinoBattlePlayerEvent> mUnkA8; // 0xA8
     u32 unkB4;
