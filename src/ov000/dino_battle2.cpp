@@ -12,6 +12,11 @@ extern "C" void func_ov000_0218b928(void *, u8);
 DinoBattleViewFocusLCDFrame::~DinoBattleViewFocusLCDFrame() {
 }
 
+DBViewFocusLCDFrameTask::DBViewFocusLCDFrameTask(u32 a, u8 b) {
+    mUnk10 = a;
+    mUnk14 = b;
+}
+
 DBViewFocusLCDFrameTask::~DBViewFocusLCDFrameTask() {
 }
 

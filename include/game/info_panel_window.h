@@ -27,6 +27,9 @@ class DinoBattleViewPopNumber : public MProcess {
 public:
     virtual ~DinoBattleViewPopNumber();
     virtual void Idle();
+
+    static int GetCount();          // the numbers still popping
+    static MTask *CreateWaitTask(); // waits for them
 };
 
 #endif

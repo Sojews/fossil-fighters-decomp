@@ -18,6 +18,7 @@ public:
 
 class WaitPopNumberTask : public MTask {
 public:
+    WaitPopNumberTask() {}
     virtual ~WaitPopNumberTask();
     virtual void Execute();
 };

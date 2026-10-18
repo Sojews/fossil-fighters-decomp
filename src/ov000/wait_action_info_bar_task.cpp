@@ -7,6 +7,10 @@
 #include "game/wait_action_info_bar_task.h"
 #include "types.h"
 
+WaitActionInfoBarTask::WaitActionInfoBarTask(DinoBattleViewActionInfoBar *bar) {
+    mBar = bar;
+}
+
 WaitActionInfoBarTask::~WaitActionInfoBarTask() {
 }
 

@@ -18,6 +18,7 @@ public:
 
 class DBViewFocusLCDFrameTask : public MTask {
 public:
+    DBViewFocusLCDFrameTask(u32 a, u8 b);
     virtual ~DBViewFocusLCDFrameTask();
     virtual void Execute();
 

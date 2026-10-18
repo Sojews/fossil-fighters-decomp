@@ -13,6 +13,7 @@
 
 class WaitActionInfoBarTask : public MTask {
 public:
+    WaitActionInfoBarTask(DinoBattleViewActionInfoBar *bar);
     virtual ~WaitActionInfoBarTask();
     virtual void Execute();
 
