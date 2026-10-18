@@ -233,3 +233,22 @@ void DinoUiCleaningTest::Leave() {
     mSerial.AddTail(new DinoUiCleaningLeave(&mUnk7C));
     mState = data_ov005_02167204.Finish_1C;
 }
+
+// Back: no rock; fades both screens out and leaves.
+void DinoUiCleaningMenu::OnBackDecided() {
+    *mResult = -1;
+    MTask *fadeMain;
+    MTask *fadeSub;
+    MTask *exit;
+    exit = CreateExitTransfer();
+    fadeSub = gLcd->mSub->mBright->CreateFadeOutToBlack(30, 0);
+    fadeMain = gLcd->mMain->mBright->CreateFadeOutToBlack(30, 0);
+    MParallelTaskSet *fades = new MParallelTaskSet(TRUE);
+    fades->AddTail(fadeMain);
+    fades->AddTail(fadeSub);
+    MTask *wait = new MTimer(30);
+    MTaskSet &serial = mSerial;
+    serial.AddTail(wait);
+    serial.AddTail(fades);
+    serial.AddTail(exit);
+}
