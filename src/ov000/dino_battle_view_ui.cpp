@@ -4,6 +4,7 @@
 #pragma auto_inline on
 
 #include "game/dino_sound.h"
+#include "game/dino_message.h"
 #include "game/dino_battle_view_ui_change_menu.h"
 #include "types.h"
 #include "game/dino_battle_view_class.h"
@@ -51,6 +52,18 @@ DinoBattleViewUiSelectAllMenu::~DinoBattleViewUiSelectAllMenu() {
             creature->ClearFlag144(3);
         }
     }
+}
+
+void DinoBattleViewUiSelectAllMenu::OnDecide(MMenuItem *item) {
+    DinoHelpBase::Disable();
+    if (item == mOkItem) {
+        DinoSoundPlaySe(0x63, 0);
+        mTarget->Post(new DinoBattleViewUiDefenderMenuResult(mIds[0], TRUE));
+    } else {
+        DinoSoundPlaySe(0x61, 0);
+        mTarget->Post(new DinoBattleViewUiDefenderMenuResult(mIds[0], FALSE));
+    }
+    Exit();
 }
 
 DinoBattleViewUiRootMenuItem::~DinoBattleViewUiRootMenuItem() {

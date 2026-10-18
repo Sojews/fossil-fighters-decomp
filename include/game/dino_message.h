@@ -673,6 +673,10 @@ public:
 class DinoBattleViewUiDefenderMenuResult : public MMessage {
 public:
     DinoBattleViewUiDefenderMenuResult() : MMessage(0x1001A) {}
+    DinoBattleViewUiDefenderMenuResult(u32 a, u8 b) : MMessage(0x1001A) {
+        mUnk0C = a;
+        mUnk10 = b;
+    }
     virtual u32 GetSize() { return 12; }
     virtual void Write(void *buf) {
         MI_CpuCopy8(&mId, buf, 4);

@@ -18,9 +18,11 @@ public:
 
     u32 mView;          // 0xB4: DinoBattleView
     u32 mPlayer;        // 0xB8
-    u32 unkBC;
+    MMessageObserver *mTarget; // 0xBC: told the choice
     u32 mIds[3];        // 0xC0: creature ids
     int mCount;         // 0xCC
+    u32 unkD0[3];
+    MMenuItem *mOkItem; // 0xDC
 };
 
 #endif
