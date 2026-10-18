@@ -3,6 +3,7 @@
 #define GAME_DINO_UI_ORGANIZATION_MENU_H
 
 #include "game/dino_resource.h"
+#include "game/dino_backup.h"
 #include <vector>
 #include "m/menu.h"
 #include "m/input.h"
@@ -13,6 +14,21 @@
 class DinoUiFieldMenuFraction;
 class DinoUiRvInformation;
 class MTextPicture;
+class DinoUiOrganizationMenuItem;
+class DinoUiPartsReviverName;
+class DinoUiPartsTeamTech;
+class DinoUiPartsReviverMedalButton;
+
+// Where things go on the screen (filled in at start).
+struct DinoUiOrganizationLayout {
+    const char *unk00[16];
+    int slotX;          // 0x40: the first slot
+    int slotY;          // 0x44
+    int slotColumnX;    // 0x48: to the next slot in a row
+    int slotColumnY;    // 0x4C
+    int slotRowX;       // 0x50: to the next row
+    int slotRowY;       // 0x54
+};
 
 class DinoUiOrganizationMenu : public DinoHelpBase, public MMenu {
 public:
@@ -39,22 +55,32 @@ public:
     void UpdateDetails(u8 index);
     void TabLeft();
     void TabRight();
-    BOOL HasUnk222(u8 id);
+    BOOL InTeam(u32 id);
+    void PlaceSlots();
+    void LinkList();
+    void UpdateTeamTech();
+    void Refresh();
+    void ClearList();
+    void LinkSlots();
+    void RestoreFocus();
 
-    u32 mUnkB4[5];                      // 0xB4
+    u32 mUnkB4;                         // 0xB4
+    MMenuItem *mUnkB8;                  // 0xB8
+    DinoUiOrganizationMenuItem *mUnkBC; // 0xBC
+    u32 mUnkC0[2];                      // 0xC0
     MMenuItem *mTabs[4];                // 0xC8
     MMenuItem *mTabLinks[3];            // 0xD8: linked down to the current tab
     u32 mUnkE4[6];                      // 0xE4
     MTextPicture *mTabPicture;          // 0xFC
     MTextPicture *mSortCursor;          // 0x100
-    MMenuItem *mListItems[5];           // 0x104
-    MMenuItem *mSlots[15];              // 0x118
+    DinoUiPartsReviverMedalButton *mListItems[5]; // 0x104
+    DinoUiPartsReviverMedalButton *mSlots[15]; // 0x118
     u32 mUnk154[15];                    // 0x154
-    u32 mSlotCount;                     // 0x190
+    int mSlotCount;                     // 0x190
     u32 mUnk194[3];                     // 0x194
     DinoUiFieldMenuFraction *mFraction; // 0x1A0: "page n/m"
     u32 mUnk1A4[2];                     // 0x1A4
-    std::vector<void *> mUnk1AC;        // 0x1AC
+    std::vector<u32> mCreatures;        // 0x1AC: the ids listed, a page of 15 at a time
     std::vector<void *> mUnk1B8;        // 0x1B8
     std::vector<void *> mUnk1C4;        // 0x1C4
     std::vector<void *> mUnk1D0;        // 0x1D0
@@ -66,19 +92,18 @@ public:
     u8 mSort;                           // 0x1FD
     u8 mFocusTabs;                      // 0x1FE: focus the new tab's item when paging
     u8 unk1FF;
-    u32 mUnk200[8];                     // 0x200
-    u8 unk220[2];
-    u8 mUnk222[5];                      // 0x222
-    u8 unk227;
+    DinoTeam mTeam;                     // 0x200
     DinoUiRvInformation *mInfo;         // 0x228
-    u32 mUnk22C;                        // 0x22C
+    DinoUiPartsReviverName *mName;      // 0x22C
     MTaskSet *mUnk230;                  // 0x230
-    u32 mUnk234[2];                     // 0x234
+    u32 mUnk234;                        // 0x234
+    int mSelected;                      // 0x238: a team member (0-4) or slot (5-)
     u8 unk23C[2];
     u8 mUnk23E;                         // 0x23E
     u8 unk23F;
     std::vector<MMotionFile> mMotions;  // 0x240
-    u32 mUnk24C[4];                     // 0x24C
+    u32 mUnk24C[3];                     // 0x24C
+    DinoUiPartsTeamTech *mTeamTech;     // 0x258
     MArchivePtr mArchive;               // 0x25C
     MArchiveFile mFile;                 // 0x260
     u8 unk26C[0x2B0 - 0x26C];

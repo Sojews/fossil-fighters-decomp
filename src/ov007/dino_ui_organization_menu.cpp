@@ -13,6 +13,9 @@
 #include "m/bg_new_task.h"
 #include "m/picture.h"
 #include "game/dino_ui_rv_information.h"
+#include "game/dino_team.h"
+#include "game/dino_ui_parts_team_tech.h"
+#include "game/dino_ui_parts_reviver_medal_button.h"
 
 DinoUiOrganizationMenu::~DinoUiOrganizationMenu() {
     gCurrentDisplay->mBlend->Reset();
@@ -260,9 +263,9 @@ void DinoUiOrganizationMenu::TabRight() {
     }
 }
 
-BOOL DinoUiOrganizationMenu::HasUnk222(u8 id) {
+BOOL DinoUiOrganizationMenu::InTeam(u32 id) {
     for (int i = 0; i < 5; i++) {
-        if (id == mUnk222[i]) {
+        if (id == mTeam.slots[i]) {
             return TRUE;
         }
     }
@@ -305,6 +308,123 @@ void DinoUiOrganizationMenu::RemoveSlotLinks() {
         RemoveLink(mSlots[9], 1);
         RemoveLink(mSlots[14], 1);
         mSlotsLinked = FALSE;
+    }
+}
+
+extern "C" void func_ov007_0217c92c(DinoUiOrganizationMenu *menu);
+extern "C" void func_ov007_0217e1e4(DinoUiOrganizationMenu *menu);
+extern "C" void func_ov007_0217fb94(DinoUiOrganizationMenu *menu, int a1);
+
+void DinoUiOrganizationMenu::Refresh() {
+    RemoveListLinks();
+    RemoveSlotLinks();
+    ClearList();
+    func_ov007_0217c92c(this);
+    PlaceSlots();
+    func_ov007_0217e1e4(this);
+    LinkList();
+    LinkSlots();
+    Enable();
+    UpdateTeamTech();
+    FocusNearestItem(GetCursor());
+}
+
+void DinoUiOrganizationMenu::ClearList() {
+    RemoveLink(mTabs[0], 2);
+    RemoveLink(mTabs[1], 2);
+    RemoveLink(mTabs[2], 2);
+    RemoveLink(mTabs[3], 2);
+    RemoveLink(mUnkBC, 2);
+    RemoveLink(mUnkB8, 2);
+    for (int i = 0; i < 5; i++) {
+        RemoveItem(mListItems[i]);
+        delete mListItems[i];
+    }
+}
+
+void DinoUiOrganizationMenu::RestoreFocus() {
+    func_ov007_0217fb94(this, 0);
+    func_ov007_0217e1e4(this);
+    if (mSelected < 5) {
+        mListItems[mSelected]->PlayNormal();
+        FocusItem(mListItems[mSelected]);
+    } else {
+        mSlots[mSelected - 5]->PlayNormal();
+        FocusItem(mSlots[mSelected - 5]);
+    }
+    UpdateTeamTech();
+}
+
+extern DinoUiOrganizationLayout data_ov007_0218ebec;
+
+void DinoUiOrganizationMenu::PlaceSlots() {
+    if (mPage == mLastPage) {
+        mSlotCount = mCreatures.size() - mPage * 15;
+    } else {
+        mSlotCount = 15;
+    }
+    for (int i = 0; i < mSlotCount; i++) {
+        u32 id = mCreatures[mPage * 15 + i];
+        int row = i / 5;
+        int column = i % 5;
+        mSlots[i]->mMotion->SetPosition(MPoint(
+            data_ov007_0218ebec.slotX + data_ov007_0218ebec.slotColumnX * column + data_ov007_0218ebec.slotRowX * row,
+            data_ov007_0218ebec.slotY + data_ov007_0218ebec.slotColumnY * column + data_ov007_0218ebec.slotRowY * row));
+        if (InTeam(id)) {
+            mSlots[i]->mMotion->GetUnit()->SetMode(0);
+        } else {
+            mSlots[i]->mMotion->GetUnit()->SetMode(1);
+        }
+        mSlots[i]->Enable();
+    }
+}
+
+void DinoUiOrganizationMenu::LinkList() {
+    if (mListLinked) {
+        RemoveListLinks();
+    }
+    if (!mListItems[0]->IsEnabled()) {
+        AddLink(mListItems[1], 3, mListItems[4]);
+        AddLink(mListItems[4], 1, mListItems[1]);
+        AddLink(mListItems[0], 3, mListItems[4]);
+        AddLink(mListItems[3], 1, mListItems[4]);
+    } else if (!mListItems[4]->IsEnabled()) {
+        AddLink(mListItems[0], 3, mListItems[3]);
+        AddLink(mListItems[3], 1, mListItems[0]);
+        AddLink(mListItems[1], 3, mListItems[0]);
+        AddLink(mListItems[4], 1, mListItems[0]);
+    } else {
+        AddLink(mListItems[0], 3, mListItems[4]);
+        AddLink(mListItems[4], 1, mListItems[0]);
+        AddLink(mListItems[3], 1, mListItems[4]);
+        AddLink(mListItems[1], 3, mListItems[0]);
+    }
+    mListLinked = TRUE;
+}
+
+void DinoUiOrganizationMenu::LinkSlots() {
+    if (mSlotsLinked) {
+        RemoveSlotLinks();
+    }
+    AddLink(mSlots[0], 3, mSlots[4]);
+    AddLink(mSlots[5], 3, mSlots[9]);
+    AddLink(mSlots[10], 3, mSlots[14]);
+    AddLink(mSlots[4], 1, mSlots[0]);
+    AddLink(mSlots[9], 1, mSlots[5]);
+    AddLink(mSlots[14], 1, mSlots[10]);
+    mSlotsLinked = TRUE;
+}
+
+void DinoUiOrganizationMenu::UpdateTeamTech() {
+    if (mTeam.slots[0] != 0) {
+        mUnkBC->mMotion->GetUnit()->SetMode(1);
+    } else {
+        mUnkBC->mMotion->GetUnit()->SetMode(0);
+    }
+    if (DinoTeamHasTech(&mTeam)) {
+        mTeamTech->Show();
+    } else {
+        mTeamTech->Hide();
     }
 }
 
