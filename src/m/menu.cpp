@@ -1,7 +1,10 @@
-// MMenuItem, MMenu and the focus transfers. Not decompiled yet: the state functions (they load pointer-to-member
-// constants, which can't be matched by name yet).
-// NONMATCHING: RemoveItem, AddLink and RemoveLink (the game keeps a stored copy of the iterator or of the inner pair
-// that ours optimizes away, as in help.cpp), the tree's insert_node_at (two stores swapped).
+// MMenuItem, MMenu and the focus transfers.
+// NONMATCHING: the constructors, Init, Update and the three hold states (StateTouch, StateButton, StateKeys) are right
+// except for where their pointer-to-member constants sit in the TU's pooled .data (the game's pool order isn't
+// reproduced yet; see the README); RemoveItem, AddLink and RemoveLink (the game keeps a stored copy of the iterator
+// or of the inner pair that ours optimizes away, as in help.cpp); FindLinkedItem (the game keeps a copy of the range
+// and two zeroed bytes on the stack); FindItemInDirection (the order the rect's words are loaded); the tree's
+// insert_node_at (two stores swapped).
 
 #include "m/menu.h"
 #include "m/lcd.h"
@@ -106,19 +109,19 @@ void MMenuItem::Idle() {
 // NONMATCHING (all three constructors): the pointer-to-member constant is at a different offset in the TU's
 // pool until every function that makes one is decompiled.
 MMenu::MMenu(int defaultMode)
-    : MProcess(NULL), mInput(NULL), mDefaultMode(defaultMode), mActive(TRUE), mCursor(0, 0), mLinksOnly(FALSE),
+    : MProcess(NULL), mInput(NULL), mDefaultMode(defaultMode), mActive(TRUE), mCursor(0, 0), mLinkFallback(FALSE),
       mDeferStart(FALSE) {
     mState = &MMenu::Init;
 }
 
 MMenu::MMenu(MInput *input, int defaultMode)
-    : MProcess(NULL), mInput(input), mDefaultMode(defaultMode), mActive(TRUE), mCursor(0, 0), mLinksOnly(FALSE),
+    : MProcess(NULL), mInput(input), mDefaultMode(defaultMode), mActive(TRUE), mCursor(0, 0), mLinkFallback(FALSE),
       mDeferStart(FALSE) {
     mState = &MMenu::Init;
 }
 
 MMenu::MMenu(MDisplay *display, MInput *input, int defaultMode)
-    : MProcess(display), mInput(input), mDefaultMode(defaultMode), mActive(TRUE), mCursor(0, 0), mLinksOnly(FALSE),
+    : MProcess(display), mInput(input), mDefaultMode(defaultMode), mActive(TRUE), mCursor(0, 0), mLinkFallback(FALSE),
       mDeferStart(FALSE) {
     mState = &MMenu::Init;
 }
@@ -165,8 +168,8 @@ void MMenu::RemoveLink(MMenuItem *from, int dir) {
     }
 }
 
-void MMenu::SetLinksOnly(BOOL linksOnly) {
-    mLinksOnly = linksOnly;
+void MMenu::SetLinkFallback(BOOL fallback) {
+    mLinkFallback = fallback;
 }
 
 MInput *MMenu::GetInput() {
@@ -302,6 +305,59 @@ MMenuItem *MMenu::FindNearestItem(MPoint pos) {
     return best;
 }
 
+// The item linked from `from` in the direction (1 right, 2 down, 3 left, 4 up). Without links from it, or when
+// they miss the direction and the menu falls back, the nearest item that way.
+MMenuItem *MMenu::FindLinkedItem(MMenuItem *from, int dir) {
+    std::pair<MMenuLinks::iterator, MMenuLinks::iterator> range = mLinks.equal_range(from);
+    if (range.first != range.second) {
+        for (MMenuLinks::iterator it = range.first; it != range.second; ++it) {
+            if (dir == it->second.first) {
+                MMenuItem *to = it->second.second;
+                if (to != NULL && to->mEnabled && !to->mNoFocus) {
+                    return to;
+                }
+                return NULL;
+            }
+        }
+        if (!mLinkFallback) {
+            return NULL;
+        }
+    }
+    return FindItemInDirection(from->GetFrame(), dir);
+}
+
+// The nearest item in the direction: inside the 90 degree wedge from the frame's center that way.
+MMenuItem *MMenu::FindItemInDirection(MRect from, int dir) {
+    switch (dir) {
+    default:
+        return NULL;
+    case 1: {
+        int x = (from.left + from.right) >> 1;
+        int y = (from.top + from.bottom) >> 1;
+        MMenuHalfPlane planes[3] = {{1, x, 0, y}, {1, x, -1, from.top}, {1, x, 1, from.bottom}};
+        return FindItemInRegion(MPoint(x, y), planes);
+    }
+    case 2: {
+        int x = (from.left + from.right) >> 1;
+        int y = (from.top + from.bottom) >> 1;
+        MMenuHalfPlane planes[3] = {{0, x, 1, y}, {-1, from.right, 1, y}, {1, from.left, 1, y}};
+        return FindItemInRegion(MPoint(x, y), planes);
+    }
+    case 3: {
+        int x = (from.left + from.right) >> 1;
+        int y = (from.top + from.bottom) >> 1;
+        MMenuHalfPlane planes[3] = {{-1, x, 0, y}, {-1, x, -1, from.top}, {-1, x, 1, from.bottom}};
+        return FindItemInRegion(MPoint(x, y), planes);
+    }
+    case 4: {
+        int x = (from.left + from.right) >> 1;
+        int y = (from.top + from.bottom) >> 1;
+        MMenuHalfPlane planes[3] = {{0, x, -1, y}, {-1, from.right, -1, y}, {1, from.left, -1, y}};
+        return FindItemInRegion(MPoint(x, y), planes);
+    }
+    }
+}
+
 static inline bool MIsInside(MPoint p, const MMenuHalfPlane *planes) {
     for (u32 i = 0; i < 3; i++) {
         if ((p.x - planes->x) * planes->a + (p.y - planes->y) * planes->b < 0) {
@@ -360,17 +416,194 @@ void MMenu::Init() {
     if (!mDeferStart) {
         OnStart();
     } else {
-        mParallel.SetUseMutex(TRUE);
-        mSerial.SetUseMutex(TRUE);
-        MTask *run = MTaskRunTransfer::Create(&mParallel);
+        MParallelTaskSet *deferred = &mParallel;
+        deferred->SetUseMutex(TRUE);
+        MSerialTaskSet *serial = &mSerial;
+        serial->SetUseMutex(TRUE);
+        MTask *run = MTaskRunTransfer::Create(deferred);
         MTask *start = MCreateBgCallTask(this, &MMenu::OnStart, 0);
         MTask *suspend = MTaskSuspendTransfer::Create(&mParallel);
-        MSerialTaskSet *serial = &mSerial;
         serial->AddTail(suspend);
         serial->AddTail(start);
         serial->AddTail(run);
     }
     mState = &MMenu::Update;
+}
+
+void MMenu::Update() {
+    if (!mActive) {
+        return;
+    }
+    if (mInput->GetPressed() & 0x1000) {
+        MMenuItem *item = HitTest(mInput->GetTouchPos());
+        if (item != NULL) {
+            if (item->GetMode() & 1) {
+                // Held: decided when the touch is let go.
+                mUnkA4 = GetFocusedItem() == item;
+                FocusItem(item);
+                SelectItem(item);
+                mState = &MMenu::StateTouch;
+                return;
+            }
+            if (item->GetMode() == 2 && !item->mNoFocus && GetFocusedItem() != item) {
+                // The first touch only focuses it.
+                FocusItem(item);
+                return;
+            }
+            FocusItem(item);
+            DecideItem(item);
+            return;
+        }
+    }
+    u32 keys = mInput->GetPressed() & 0x3FFF;
+    if (keys != 0) {
+        MMenuItem *item = FindItemByKeys(keys);
+        if (item != NULL) {
+            if (item->GetMode() & 1) {
+                FocusItem(item);
+                SelectItem(item);
+                mState = &MMenu::StateKeys;
+                return;
+            }
+            if ((item->GetMode() & 4) && !item->mNoFocus && GetFocusedItem() != item) {
+                FocusItem(item);
+                return;
+            }
+            FocusItem(item);
+            DecideItem(item);
+            return;
+        }
+    }
+    MMenuItem *focused = GetFocusedItem();
+    if (focused != NULL && (mInput->GetPressed() & 1)) {
+        if (focused->GetMode() & 1) {
+            SelectItem(focused);
+            mState = &MMenu::StateButton;
+            return;
+        }
+        mCursor = focused->GetFrame().GetCenter();
+        DecideItem(focused);
+        if (GetFocusedItem() == NULL) {
+            FocusItem(FindNearestItem(mCursor));
+        }
+        return;
+    }
+    int dir = 0;
+    if (mInput->GetPressed() & 0x10) {
+        dir = 1;
+    }
+    if (mInput->GetPressed() & 0x20) {
+        dir = 3;
+    }
+    if (mInput->GetPressed() & 0x40) {
+        dir = 4;
+    }
+    if (mInput->GetPressed() & 0x80) {
+        dir = 2;
+    }
+    if (dir != 0) {
+        MMenuItem *next;
+        if (focused == NULL) {
+            next = FindItemInDirection(MRect(mCursor, mCursor), dir);
+            if (next == NULL) {
+                FindNearestItem(mCursor); // (the game drops the result)
+            }
+        } else {
+            next = FindLinkedItem(focused, dir);
+        }
+        if (next != NULL) {
+            FocusItem(next);
+            return;
+        }
+    }
+    OnIdle();
+}
+
+// A held item touched: follows the touch until it's let go, then decides the item still under it.
+void MMenu::StateTouch() {
+    if (!(mInput->mButtons & 0x1000)) {
+        MMenuItem *item = GetSelectedItem();
+        if (item != NULL) {
+            SelectItem(NULL);
+            FocusItem(item);
+            if (!(item->GetMode() & 2) || item->mNoFocus || mUnkA4) {
+                DecideItem(item);
+            }
+        }
+        mState = &MMenu::Update;
+        return;
+    }
+    MMenuItem *item = HitTest(mInput->GetTouchPos());
+    if (item != GetSelectedItem()) {
+        mUnkA4 = FALSE;
+    }
+    if (item != NULL) {
+        SelectItem(item);
+        FocusItem(item);
+    } else {
+        SelectItem(NULL);
+    }
+    OnIdle();
+}
+
+// A held item chosen with A: decided when A is let go; the pad moves the selection meanwhile.
+void MMenu::StateButton() {
+    if (!(mInput->mButtons & 1)) {
+        MMenuItem *item = GetSelectedItem();
+        if (item != NULL) {
+            SelectItem(NULL);
+            mCursor = item->GetFrame().GetCenter();
+            DecideItem(item);
+            if (GetFocusedItem() == NULL) {
+                FocusItem(FindNearestItem(mCursor));
+            }
+        }
+        mState = &MMenu::Update;
+        return;
+    }
+    int dir = 0;
+    MMenuItem *focused = GetFocusedItem();
+    if (mInput->GetPressed() & 0x10) {
+        dir = 1;
+    }
+    if (mInput->GetPressed() & 0x20) {
+        dir = 3;
+    }
+    if (mInput->GetPressed() & 0x40) {
+        dir = 4;
+    }
+    if (mInput->GetPressed() & 0x80) {
+        dir = 2;
+    }
+    if (dir != 0) {
+        MMenuItem *next;
+        if (focused == NULL) {
+            next = FindItemInDirection(MRect(mCursor, mCursor), dir);
+            if (next == NULL) {
+                FindNearestItem(mCursor); // (the game drops the result)
+            }
+        } else {
+            next = FindLinkedItem(focused, dir);
+        }
+        if (next != NULL) {
+            FocusItem(next);
+            SelectItem(next);
+        }
+    } else {
+        OnIdle();
+    }
+}
+
+// A held item chosen with its keys: decided when they're let go.
+void MMenu::StateKeys() {
+    MMenuItem *item = GetSelectedItem();
+    if (!(mInput->mButtons & item->mKeys)) {
+        SelectItem(NULL);
+        DecideItem(item);
+        mState = &MMenu::Update;
+        return;
+    }
+    OnIdle();
 }
 
 MTask *MMenu::CreateFocusItemTransfer(MMenuItem *item) {

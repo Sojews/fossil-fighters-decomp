@@ -33,7 +33,9 @@ public:
 
     void Init();
     void Update();
-    void StateMain();
+    void StateTouch();
+    void StateButton();
+    void StateKeys();
 
     void SetDeferStart(BOOL defer);
     void AddItem(MMenuItem *item);
@@ -41,7 +43,7 @@ public:
     void ClearItems();
     void RemoveLink(MMenuItem *from, int dir);
     void AddLink(MMenuItem *from, int dir, MMenuItem *to);
-    void SetLinksOnly(BOOL linksOnly);
+    void SetLinkFallback(BOOL fallback);
     MInput *GetInput();
     void Activate();
     void Deactivate();
@@ -55,6 +57,8 @@ public:
     void SelectItem(MMenuItem *item);
     MMenuItem *HitTest(MPoint pos);
     MMenuItem *FindNearestItem(MPoint pos);
+    MMenuItem *FindLinkedItem(MMenuItem *from, int dir);
+    MMenuItem *FindItemInDirection(MRect from, int dir);
     MMenuItem *FindItemInRegion(MPoint from, const MMenuHalfPlane *planes);
     void DecideItem(MMenuItem *item);
 
@@ -70,7 +74,7 @@ public:
     MPoint mCursor;             // 0x90: the center of the focused item
     MMenuLinks mLinks;          // 0x98
     u8 mUnkA4;                  // 0xA4
-    u8 mLinksOnly;              // 0xA5: move only along links
+    u8 mLinkFallback;           // 0xA5: when an item's links miss a direction, search that way anyway
     u8 mDeferStart;             // 0xA6
 };
 
