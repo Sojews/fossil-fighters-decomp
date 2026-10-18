@@ -509,6 +509,42 @@ MTask *DinoBattleModelPlayer::CreateLcdFadeTask(BOOL clearIcons) {
     return set;
 }
 
+// Adds the view's side of an ability to set: the attack bar, the ability itself, the fade and the targets'
+// coloring, then undoes them.
+void DinoBattleModelPlayer::AddAbilitySequence(MTaskSet *set, u32 a, u32 b, u32 attacker,
+                                               std::vector<u32> &targets, u8 recolor) {
+    u32 ids[6] = {attacker};
+    u32 n = 1;
+    for (u32 i = 0; i < targets.size(); i++) {
+        if (attacker != targets[i]) {
+            ids[n++] = targets[i];
+        }
+    }
+    MTask *color;
+    MTask *fadeOut;
+    MTask *barOn;
+    MTask *ability;
+    MTask *clearBar;
+    MTask *barOff;
+    barOff = mUnkF4->CreatePostTask(new DinoBattleViewSetAttackBarUpperLCDRequest(0, 0, 0));
+    clearBar = mUnkF4->CreatePostTask(new DinoBattleViewClearAttackBarRequest(0));
+    ability = CreateAbilityTask(a, attacker, b);
+    barOn = mUnkF4->CreatePostTask(new DinoBattleViewSetAttackBarUpperLCDRequest(0, b, 0));
+    fadeOut = CreateLcdFadeTask(TRUE);
+    color = CreateUpdateColorTask(ids, targets.size() + 1, 0x20);
+    set->AddTail(mUnkF4->CreatePostTask(new DinoBattleViewCreatureSetBlendRequest(0, targets.size() + 1, ids, TRUE)));
+    set->AddTail(color);
+    set->AddTail(fadeOut);
+    set->AddTail(barOn);
+    set->AddTail(ability);
+    set->AddTail(clearBar);
+    set->AddTail(barOff);
+    if (recolor) {
+        set->AddTail(CreateUpdateColorTask(ids, targets.size() + 1, 0));
+    }
+    set->AddTail(CreateLcdFadeTask(FALSE));
+}
+
 u32 DinoBattleModelPlayer::GetUnkB8() {
     return mUnkB8;
 }

@@ -2162,6 +2162,12 @@ public:
 class DinoBattleViewCreatureSetBlendRequest : public MMessage {
 public:
     DinoBattleViewCreatureSetBlendRequest() : MMessage(0x10067) {}
+    DinoBattleViewCreatureSetBlendRequest(u32 a, u32 count, const u32 *ids, u8 on) : MMessage(0x10067) {
+        mUnk0C = a;
+        mUnk10 = count;
+        MI_CpuCopy8(ids, mUnk14, sizeof(mUnk14));
+        mUnk2C = on;
+    }
     virtual u32 GetSize() { return 40; }
     virtual void Write(void *buf) {
         MI_CpuCopy8(&mId, buf, 4);
@@ -2283,6 +2289,9 @@ public:
 class DinoBattleViewClearAttackBarRequest : public MMessage {
 public:
     DinoBattleViewClearAttackBarRequest() : MMessage(0x1006D) {}
+    DinoBattleViewClearAttackBarRequest(u32 a) : MMessage(0x1006D) {
+        mUnk0C = a;
+    }
     virtual u32 GetSize() { return 8; }
     virtual void Write(void *buf) {
         MI_CpuCopy8(&mId, buf, 4);
@@ -2935,6 +2944,11 @@ public:
 class DinoBattleViewSetAttackBarUpperLCDRequest : public MMessage {
 public:
     DinoBattleViewSetAttackBarUpperLCDRequest() : MMessage(0x10095) {}
+    DinoBattleViewSetAttackBarUpperLCDRequest(u32 a, u32 b, u8 c) : MMessage(0x10095) {
+        mUnk0C = a;
+        mUnk10 = b;
+        mUnk14 = c;
+    }
     virtual u32 GetSize() { return 16; }
     virtual void Write(void *buf) {
         MI_CpuCopy8(&mId, buf, 4);

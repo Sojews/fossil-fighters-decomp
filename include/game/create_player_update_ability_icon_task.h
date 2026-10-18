@@ -115,6 +115,7 @@ public:
     MTask *CreateMotionEffectTask(u32 a, u32 b, u32 c, u32 d, u32 e);
     MTask *CreateAbilityTask(u32 a, u32 b, u32 c);
     MTask *CreateLcdFadeTask(BOOL clearIcons);
+    void AddAbilitySequence(MTaskSet *set, u32 a, u32 b, u32 attacker, std::vector<u32> &targets, u8 recolor);
 
     std::vector<DinoBattlePlayerEvent> mUnkA8; // 0xA8
     u32 unkB4;
