@@ -47,6 +47,7 @@ public:
     void ClearFlag144(int bit);
     BOOL IsUnkCC2();
     void ClearUnk160();
+    void SetAdvantage(DinoBattleViewCreature *other);
     MPoint GetCoord();
     MPoint GetMotionPosition();
     void SetCoord(MPoint pos);

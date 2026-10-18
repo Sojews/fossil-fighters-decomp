@@ -2424,6 +2424,10 @@ public:
 class DinoBattleView3DWatchStatusRequest : public MMessage {
 public:
     DinoBattleView3DWatchStatusRequest() : MMessage(0x10075) {}
+    DinoBattleView3DWatchStatusRequest(u32 a, u32 b) : MMessage(0x10075) {
+        mUnk0C = a;
+        mUnk10 = b;
+    }
     virtual u32 GetSize() { return 12; }
     virtual void Write(void *buf) {
         MI_CpuCopy8(&mId, buf, 4);

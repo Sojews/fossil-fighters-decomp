@@ -154,6 +154,29 @@ void DinoBattleViewUiChangeMenu::OnIdle() {
     }
 }
 
+// Has the 3D view show the focused creature's status, and marks its type advantages against the other side.
+void DinoBattleViewUiCreatureInfoMenu::OnFocus(MMenuItem *item) {
+    DinoBattleViewUiSelectAreaCommon::OnFocus(item);
+    if (item == mItem124 || item == mItem128 || item == mItem120) {
+        return;
+    }
+    DinoSoundPlaySe(0x5F, 0);
+    DinoBattleViewCreature *creature = GetItemCreature(item);
+    ((DinoBattleView *)mUnkEC)->Post(new DinoBattleView3DWatchStatusRequest(0, creature->GetUnkAC()));
+    DinoBattleViewUiRootMenuItem *root = dynamic_cast<DinoBattleViewUiRootMenuItem *>(item);
+    if (root != NULL) {
+        DinoBattleViewCreature *focused = GetItemCreature(root);
+        DinoBattleViewPlayer *player = (DinoBattleViewPlayer *)focused->GetUnkDC();
+        DinoBattleViewPlayer *opponent = player->GetOpponent();
+        for (int i = 0; i < opponent->GetCreatureCount(); i++) {
+            opponent->GetCreature(i)->SetAdvantage(focused);
+        }
+        for (int i = 0; i < player->GetCreatureCount(); i++) {
+            player->GetCreature(i)->SetAdvantage(NULL);
+        }
+    }
+}
+
 void DinoBattleViewUiCreatureInfoMenu::OnIdle() {
     MTask *task = func_ov000_0218ec8c(((DinoBattleView *)mUnkEC)->GetUnk12C(), -1, 0);
     if (task != NULL) {
@@ -168,11 +191,11 @@ void DinoBattleViewUiRootMenuItem::OnFocusChanged(BOOL focused) {
     Refresh();
 }
 
-extern "C" DinoBattleViewCreature *func_ov000_02177644(DinoBattleViewUiAttackerMenu *menu);
 
 void DinoBattleViewUiAttackerMenu::OnBlur(MMenuItem *item) {
-    if (dynamic_cast<DinoBattleViewUiRootMenuItem *>(item) != NULL) {
-        func_ov000_02177644(this)->ClearFlag144(1);
+    DinoBattleViewUiRootMenuItem *root = dynamic_cast<DinoBattleViewUiRootMenuItem *>(item);
+    if (root != NULL) {
+        GetItemCreature(root)->ClearFlag144(1);
     }
 }
 

@@ -3,6 +3,8 @@
 
 #include <map>
 
+class DinoBattleViewCreature;
+
 #include "m/menu_item.h"
 #include "m/menu.h"
 #include "m/display.h"
@@ -36,12 +38,17 @@ public:
     virtual void OnFocus(MMenuItem *item);
     virtual void OnDecide(MMenuItem *item);
     void Nop();     // (empty in the game)
+    DinoBattleViewCreature *GetItemCreature(MMenuItem *item);
 
     u32 unkA8[2];
     u32 mUnkB0;     // 0xB0: player index
     u8 unkB4[0x38];
     u32 mUnkEC;     // 0xEC: DinoBattleView
-    u8 unkF0[0x40];
+    u8 unkF0[0x30];
+    MMenuItem *mItem120;    // 0x120
+    MMenuItem *mItem124;    // 0x124
+    MMenuItem *mItem128;    // 0x128
+    u32 unk12C;
     std::map<u32, void *> mUnk130;  // 0x130
     u8 unk13C[0x40];
 };
