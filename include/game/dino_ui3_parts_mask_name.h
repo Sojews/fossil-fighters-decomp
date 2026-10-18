@@ -5,13 +5,16 @@
 #include "m/motion.h"
 #include "m/indicator.h"
 
+class MFont;
+
 class DinoUi3PartsMaskName : public MProcess {
 public:
     virtual ~DinoUi3PartsMaskName();
     virtual void Idle();
+    void SetMask(u32 id, BOOL greyed);
     void Clear();
 
-    MMotion *mMotion;       // 0x74
+    MFont *mFont;           // 0x74
     MIndicator *mText;      // 0x78
 };
 

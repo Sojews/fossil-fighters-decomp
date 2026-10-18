@@ -8,6 +8,7 @@
 #include "game/dino_ui3_parts_money.h"
 #include "game/dino_ui3_parts_cursor.h"
 #include "game/dino_backup.h"
+#include "game/dino_resource.h"
 #include <printf.h>
 #include "game/dino_sound.h"
 
@@ -73,6 +74,24 @@ void DinoUi3PartsRockName::SetEntry(const DinoBackupEntry *entry, BOOL selected)
 
 void DinoUi3PartsRockName::Clear() {
     mText->SetText(std::string(data_ov005_02165f58));
+}
+
+// The mask's name, greyed if it can't be bought.
+void DinoUi3PartsMaskName::SetMask(u32 id, BOOL greyed) {
+    mText->SetText(std::string(data_ov005_02165f58));
+    if (mText->mState == STATE_RUN) {
+        mText->Execute();
+    }
+    if (greyed) {
+        mFont->SetShadowColor(3);
+    } else {
+        mFont->SetShadowColor(1);
+    }
+    MResource<DinoHeadMaskDefs> defs = gDinoResource->LoadHeadMaskDefs();
+    const DinoHeadMaskDefs *data = defs.Get();
+    mText->SetText(std::string(gDinoResource->GetText(
+        ((const DinoHeadMaskDef *)((const u8 *)data + ((const u32 *)((const u8 *)data + data->tableOffset))[id]))
+            ->nameText)));
 }
 
 void DinoUi3PartsMaskName::Clear() {

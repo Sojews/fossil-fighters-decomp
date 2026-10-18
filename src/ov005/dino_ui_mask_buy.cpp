@@ -4,6 +4,10 @@
 // Derived destructors have their bases' destructor bodies inlined; auto-inlining the ones defined above does that.
 #pragma auto_inline on
 
+#include "game/dino_ui3_parts_mask_name.h"
+
+#include "game/dino_ui3_parts_cursor.h"
+
 #include "m/input.h"
 
 #include "m/smart_oam.h"
@@ -256,6 +260,43 @@ void DinoUiMaskBuyMenu::RefreshPage3() {
             }
         }
     }
+}
+
+// Moves the cursor to the item, and shows the mask's name (greyed if it can't be bought now) and price.
+void DinoUiMaskBuyMenu::OnFocus(MMenuItem *item) {
+    if (item == NULL) {
+        mCursor->Hide();
+        return;
+    }
+    if (item == mBack || item == mBuy) {
+        SetSelectedItem(dynamic_cast<DinoHelpItem *>(item));
+    }
+    if (mCursor->IsHidden()) {
+        mCursor->Show();
+        mCursor->SetFrame(item->GetFrame());
+    } else {
+        mCursorTasks->Clear();
+        mCursorTasks->AddTail(mCursor->CreateMoveTask(mCursor->GetFrame(), item->GetFrame(), 10, -5));
+    }
+    for (int i = 0; i < 8; i++) {
+        if (item == mUnkC4[i]) {
+            u32 index = mPage * 8 + i;
+            if (index >= mMasks.size()) {
+                continue;
+            }
+            if (!GetFlag(index) && mTotal + GetPrice(mPage * 8 + i) > mFunds) {
+                mMaskName->SetMask(mMasks[mPage * 8 + i], TRUE);
+            } else {
+                mMaskName->SetMask(mMasks[mPage * 8 + i], FALSE);
+            }
+            mMoney->SetPrice(GetPrice(mPage * 8 + i));
+            mSelected = mPage * 8 + i;
+            return;
+        }
+    }
+    mMaskName->Clear();
+    mMoney->SetPrice(0);
+    mSelected = 0xFF;
 }
 
 // A mask button: chooses it (if the money allows) or unchooses it.
