@@ -24,6 +24,7 @@ public:
     BOOL PageRight();
     BOOL PageLeft();
     BOOL Buy();
+    void FinishBuy();
     void ClearItems();
     u8 GetFlag(int index);
     void SetFlag(int index, u8 flag);
@@ -51,7 +52,7 @@ public:
     u32 mTotal;                 // 0x118: the chosen items' price
     u8 mCount;                  // 0x11C: how many are chosen
     u8 mSelected;               // 0x11D: 0xFF for none
-    u32 mUnk120;    // 0x120
+    BOOL mConfirmed;            // 0x120: the yes/no answer
 };
 
 class DinoUiShopBuyBackButton : public DinoUiShopBuyMenuItem {

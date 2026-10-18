@@ -4,6 +4,8 @@
 // Derived destructors have their bases' destructor bodies inlined; auto-inlining the ones defined above does that.
 #pragma auto_inline on
 
+#include "game/dino_common_window_yes_no_dialog.h"
+
 #include "game/dino_ui3_parts_rock_name.h"
 
 #include "game/dino_ui3_parts_cursor.h"
@@ -194,7 +196,6 @@ void DinoUiShopBuyBuyButton::OnFocusChanged(BOOL focused) {
 // Template task instances the game emits in this file. Until the code that makes the tasks is decompiled, they are
 // instantiated explicitly.
 template class MCallTask0<DinoUiShopBuyMenu, DinoUiShopBuyMenu>;
-template MTask *MCreateCallTask(DinoUiShopBuyMenu *obj, void (DinoUiShopBuyMenu::*func)());
 
 DinoUiShopBuy::DinoUiShopBuy() : MProcess(NULL) {
     gLcd->mMain->ResetHooks();
@@ -209,6 +210,8 @@ DinoUiShopBuy::DinoUiShopBuy() : MProcess(NULL) {
 }
 
 #pragma auto_inline off
+
+template MTask *MCreateCallTask(DinoUiShopBuyMenu *obj, void (DinoUiShopBuyMenu::*func)());
 
 u8 DinoUiShopBuyMenu::GetFlag(int index) {
     return mFlags[index];
@@ -287,6 +290,29 @@ void DinoUiShopBuyMenu::OnFocus(MMenuItem *item) {
     mRockName->Clear();
     mMoney->SetPrice(0);
     mSelected = 0xFF;
+}
+
+extern const u32 data_0208a9f8, data_0208a9fc, data_0208aa00, data_0208aa04, data_0208aa08;
+
+// Asks whether to buy the chosen fossils.
+BOOL DinoUiShopBuyMenu::Buy() {
+    if (mCount == 0) {
+        DinoSoundPlaySe(0xA4, 0);
+        return FALSE;
+    }
+    mCursor->Hide();
+    mConfirmed = FALSE;
+    DinoCommonWindowYesNoDialog *dialog =
+        new DinoCommonWindowYesNoDialog(gDinoResource->GetText(data_0208aa00), &mConfirmed);
+    dialog->SetLabels(gDinoResource->GetText(data_0208aa08), gDinoResource->GetText(data_0208aa04));
+    dialog->SetLabels2(gDinoResource->GetText(data_0208a9fc), gDinoResource->GetText(data_0208a9f8));
+    MTask *finish = MCreateCallTask(this, &DinoUiShopBuyMenu::FinishBuy);
+    MTask *show = mCursor->CreateShowTransfer();
+    MSerialTaskSet *serial = &mSerial;
+    serial->AddTail(dialog);
+    serial->AddTail(show);
+    serial->AddTail(finish);
+    return TRUE;
 }
 
 // A fossil button: chooses it (if the money and the room allow) or unchooses it.
