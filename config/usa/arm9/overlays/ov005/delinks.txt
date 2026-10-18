@@ -30,13 +30,13 @@ src/ov005/dino_ui_mask_equip.cpp:
     .text       start:0x02160d24 end:0x02162720
 
 src/ov005/dino_ui_canon_putin.cpp:
-    .text       start:0x021647a8 end:0x02164ba0
+    .text       start:0x02163ddc end:0x02164ba0
 
 src/ov005/dino_ui_cleaning_menu_item.cpp:
     .text       start:0x0215b11c end:0x0215cc9c
 
 src/ov005/dino_ui_container_base_menu_item.cpp:
-    .text       start:0x021627b4 end:0x021641e8
+    .text       start:0x021627b4 end:0x02163ddc
 
 src/ov005/dino_ui3_parts_cursor.cpp:
     .text       start:0x02156334 end:0x02156380

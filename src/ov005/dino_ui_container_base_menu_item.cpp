@@ -117,12 +117,6 @@ void DinoUiContainerBaseDecideButton::OnFocusChanged(BOOL focused) {
     }
 }
 
-// Template task instances the game emits in this file. Until the code that makes the tasks is decompiled, they are
-// instantiated explicitly.
-class DinoUiCanonPutinMenu {};
-template class MCallTask0<DinoUiCanonPutinMenu, DinoUiCanonPutinMenu>;
-template MTask *MCreateCallTask(DinoUiCanonPutinMenu *obj, void (DinoUiCanonPutinMenu::*func)());
-
 // Pooled file statics: the button corners.
 struct DinoUiContainerBaseStatics {
     u8 unk00[0x50];
