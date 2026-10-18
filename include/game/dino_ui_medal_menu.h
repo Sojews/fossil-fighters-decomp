@@ -26,6 +26,7 @@ public:
     void ClearSlots();
     void CreateSlots();
     void CreateSlot(u32 index);
+    BOOL HasUnk1EC(u8 id);
 
     u32 mUnkB4[20];                     // 0xB4
     MMenuItem *mSlots[15];              // 0x104
@@ -39,7 +40,9 @@ public:
     std::vector<void *> mUnk1B4;        // 0x1B4
     u32 mPage;                          // 0x1C0
     u32 mLastPage;                      // 0x1C4
-    u32 mUnk1C8[15];                    // 0x1C8
+    u32 mUnk1C8[9];                     // 0x1C8
+    u8 mUnk1EC[5];                      // 0x1EC
+    u8 unk1F1[0x13];
     u8 mUnk204;                         // 0x204
     std::vector<MMotionFile> mMotions;  // 0x208
 };

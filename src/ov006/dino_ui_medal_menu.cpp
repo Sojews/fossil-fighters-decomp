@@ -165,6 +165,13 @@ DinoUiMedalSlotCreateTask::DinoUiMedalSlotCreateTask(DinoUiMedalMenu *menu) : MP
     mIndex = 0;
 }
 
+BOOL DinoUiMedalMenu::HasUnk1EC(u8 id) {
+    if (id == mUnk1EC[0] || id == mUnk1EC[1] || id == mUnk1EC[2] || id == mUnk1EC[3] || id == mUnk1EC[4]) {
+        return TRUE;
+    }
+    return FALSE;
+}
+
 void DinoUiMedalMenu::ClearSlots() {
     for (int i = 0; i < 15; i++) {
         RemoveItem(mSlots[i]);
