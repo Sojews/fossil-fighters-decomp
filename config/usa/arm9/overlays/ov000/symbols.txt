@@ -649,7 +649,7 @@ _Z15MCreateCallTaskI30DinoBattleViewStatusEffectIconS0_6MPointEP5MTaskPT_MT0_FvT
 _ZN22DinoBattleViewCreature7HideAllEv kind:function(thumb,size=0x6a) addr:0x02172528
 func_ov000_02172594 kind:function(thumb,size=0xa4) addr:0x02172594
 _Z15MCreateCallTaskI22DinoBattleViewCreatureS0_EP5MTaskPT_MT0_FvvE kind:function(thumb,size=0x38) addr:0x02172638
-func_ov000_02172670 kind:function(thumb,size=0x90) addr:0x02172670
+_ZN22DinoBattleViewCreature14CreateDownTaskEv kind:function(thumb,size=0x90) addr:0x02172670
 func_ov000_02172700 kind:function(thumb,size=0x164) addr:0x02172700
 _ZN22DinoBattleViewCreature12SetUnitModesEi kind:function(thumb,size=0x3a) addr:0x02172864
 _ZN22DinoBattleViewCreature17SetMotionPriorityEi kind:function(thumb,size=0xe) addr:0x021728a0

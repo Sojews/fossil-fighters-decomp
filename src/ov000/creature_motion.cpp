@@ -186,6 +186,18 @@ void DinoBattleViewCreature::HideAll() {
     set->AddTail(hide);
 }
 
+// Plays the motion's down animation (14) and waits for it to stop.
+MTask *DinoBattleViewCreature::CreateDownTask() {
+    MTask *play;
+    MTask *wait;
+    wait = mMotion->CreateWaitStopTask();
+    play = mMotion->CreatePlayTransfer(14, 0);
+    MSerialTaskSet *set = new MSerialTaskSet(TRUE);
+    set->AddTail(play);
+    set->AddTail(wait);
+    return set;
+}
+
 // A palette animation that blends the motion's colors toward a color (from them, if withBase), looping.
 // NONMATCHING: the game spills weight first thing; ours after the first loads.
 MPalAnime *DinoBattleViewCreature::CreatePalBlend(BOOL withBase, u16 color, int weight, u32 duration) {

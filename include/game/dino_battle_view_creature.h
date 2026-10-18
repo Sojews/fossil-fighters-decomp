@@ -28,6 +28,7 @@ public:
     u32 GetUnkB0();
     void SetUnitModes(BOOL on);
     void HideAll();
+    MTask *CreateDownTask();
     MPalAnime *CreatePalBlend(BOOL withBase, u16 color, int weight, u32 duration);
     u32 CountAttacks();
     u32 GetAttack(u32 index);
