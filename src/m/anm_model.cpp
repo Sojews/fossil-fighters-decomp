@@ -167,6 +167,36 @@ void MAnmModelBase::PlaySounds(int frame) {
     }
 }
 
+void MAnmModelBase::TintPalette(u16 color, fx32 amount) {
+    if (mResource == NULL) {
+        return;
+    }
+    u32 plttKey;
+    u32 size;
+    u8 *palette;
+    mResource->GetPalette(&plttKey, &palette, &size);
+    if (palette == NULL) {
+        return;
+    }
+    u16 *tinted = new u16[size / 2];
+    int r = (color & 0x1F) * amount;
+    int g = ((color >> 5) & 0x1F) * amount;
+    int b = ((color >> 10) & 0x1F) * amount;
+    fx32 keep = 0x1000 - amount;
+    for (u32 i = 0; i < size / 2; i++) {
+        u16 c = ((u16 *) palette)[i];
+        int cr = c & 0x1F;
+        int cg = (c >> 5) & 0x1F;
+        int cb = (c >> 10) & 0x1F;
+        cr = (cr * keep + r) >> 12;
+        cg = (cg * keep + g) >> 12;
+        cb = (cb * keep + b) >> 12;
+        tinted[i] = cr | (cg << 5) | (cb << 10);
+    }
+    mScene->LoadPltt(plttKey, tinted);
+    mScene->QueueE8(NULL, (u32) tinted);
+}
+
 void MAnmModelBase::ClearTransformTracks() {
     mTracks[6].clear();
     mTracks[7].clear();

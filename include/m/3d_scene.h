@@ -32,6 +32,7 @@ public:
     void SetUnk164(u32 a, u32 b);
     void SetUnk80(u32 a, u32 b);
     MTask *CreateEnableTask(u8 enable);
+    void LoadPltt(u32 key, const void *data);
     void AddModel(M3DModel *model);
     void RemoveModel(M3DModel *model);
 
