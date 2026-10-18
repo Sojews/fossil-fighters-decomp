@@ -62,7 +62,8 @@ struct DinoFieldCharaModel {
     u8 unk04;           // 0x04: several characters share the id; see DinoField::GetChara
     u8 unk05[3];
     MFx32Point pos;     // 0x08
-    u8 unk10[6];
+    u32 unk10;          // 0x10
+    u8 unk14[2];
     u16 angle;          // 0x16
 };
 
@@ -101,7 +102,10 @@ public:
     MArchiveFile mFile;         // 0x90
     DinoFieldCharaModel mModel; // 0x9C
     u32 mMotion;                // 0xB4: the motion playing
-    u32 mUnkB8[4];              // 0xB8
+    MFx32 mHomeX;               // 0xB8: where the character was placed
+    MFx32 mHomeY;               // 0xBC
+    u32 mUnkC0;                 // 0xC0
+    u32 mUnkC4;                 // 0xC4
     DinoCharaTask mTask;        // 0xC8: what the character does on its own
     MTaskSet *mMoveTasks;       // 0x108
     MTaskSet *mAngleTasks;      // 0x10C

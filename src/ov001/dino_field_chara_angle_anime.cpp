@@ -66,6 +66,27 @@ BOOL DinoFieldChara::IsUnkA1Motion() {
     return mModel.unk05[0] && (mMotion == 2 || mMotion == 3);
 }
 
+void DinoFieldChara::SetTask(DinoCharaTask task) {
+    mTask = task;
+    switch (task.unk4) {
+    case 0: {
+        DinoCharaState state;
+        gDinoBackup->GetChara(mModel.id, &state);
+        mHomeX = state.x;
+        mHomeY = state.y;
+        break;
+    }
+    case 2:
+        mUnkC0 = 1;
+        break;
+    case 3:
+        mUnkC0 = 1;
+        mUnkC4 = 0;
+        break;
+    }
+    mModel.unk10 = 0;
+}
+
 void DinoFieldChara::Read(const void *buf) {
     MSerializer::Read(buf);
     if (mModel.id) {
