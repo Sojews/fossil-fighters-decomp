@@ -4,6 +4,7 @@
 
 #include "types.h"
 #include "nitro/fx.h"
+#include "m/geometry.h"
 
 class M3DScene;
 class M3DGrid;
@@ -37,6 +38,7 @@ public:
     const MtxFx44 *GetMatrix();
     BOOL GetJointMatrix(int joint, MtxFx44 *mtx, u8 arg);
     int FindJoint(const char *name);
+    BOOL GetJointScreenPos(int joint, MPoint *pos);
 
     M3DScene *mScene;           // 0x04
     u32 mFlags;                 // 0x08

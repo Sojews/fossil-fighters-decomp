@@ -51,7 +51,8 @@ public:
     u32 mUnk80;                 // 0x80
     u32 mUnk84;                 // 0x84
     M3d *mM3d;                  // 0x88
-    u8 unk8C[0xB8];
+    MtxFx43 mCamera;            // 0x8C: the view matrix
+    u8 unkBC[0x144 - 0xBC];
     u8 mEnabled;                // 0x144
     u32 mUnk148;                // 0x148
     u32 mUnk14C;                // 0x14C

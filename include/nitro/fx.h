@@ -67,6 +67,7 @@ void MTX_RotX44_(MtxFx44 *pDst, fx32 sinVal, fx32 cosVal);
 void MTX_RotY44_(MtxFx44 *pDst, fx32 sinVal, fx32 cosVal);
 void MTX_RotZ44_(MtxFx44 *pDst, fx32 sinVal, fx32 cosVal);
 fx32 FX_Mul32x64c(fx32 v32, fx64c v64c);
+fx64c FX_InvFx64c(fx32 denom);
 fx32 VEC_DotProduct(const VecFx32 *a, const VecFx32 *b);
 void VEC_CrossProduct(const VecFx32 *a, const VecFx32 *b, VecFx32 *axb);
 void VEC_Normalize(const VecFx32 *pSrc, VecFx32 *pDst);

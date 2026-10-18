@@ -7,6 +7,7 @@
 #include <string.h>
 #include "m/3d_resource.h"
 #include "m/3d_scene.h"
+#include "nitro/g3.h"
 #include "nitro/mi.h"
 
 extern VecFx32 data_0214c180; // set up with the scene
@@ -289,4 +290,32 @@ void M3DModel::LoadGrid(const void *data) {
             return;
         }
     }
+}
+
+// Where the joint shows on the bottom screen (in pixels); FALSE if that's off it.
+BOOL M3DModel::GetJointScreenPos(int joint, MPoint *pos) {
+    MtxFx44 mtx;
+    GetJointMatrix(joint, &mtx, FALSE);
+    G3_MtxMode(GX_MTXMODE_POSITION_VECTOR);
+    G3_PushMtx();
+    G3_LoadMtx43(&mScene->mCamera);
+    if (mUnkC4 != NULL) {
+        G3_MultMtx44(mUnkC4);
+    }
+    G3_MultMtx44(GetMatrix());
+    G3_PositionTest(mtx._30, mtx._31, mtx._32);
+    fx32 w;
+    VecFx32 vec;
+    while (G3X_GetPositionTestResult(&vec, &w)) {
+    }
+    fx64c inv = FX_InvFx64c(w);
+    vec.x = (FX_Mul32x64c(vec.x, inv) + FX32_ONE) / 2;
+    vec.y = (FX_Mul32x64c(vec.y, inv) + FX32_ONE) / 2;
+    G3_PopMtx(1);
+    pos->x = (vec.x * 255 + (FX32_ONE >> 1)) >> FX32_SHIFT;
+    pos->y = 191 - ((vec.y * 192 + (FX32_ONE >> 1)) >> FX32_SHIFT);
+    if (vec.x < 0 || vec.y < 0 || vec.x > FX32_ONE || vec.y > FX32_ONE) {
+        return FALSE;
+    }
+    return TRUE;
 }
