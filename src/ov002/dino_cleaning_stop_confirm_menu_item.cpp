@@ -78,3 +78,15 @@ void DinoCleaningStopConfirmMenu::OnDecide(MMenuItem *item) {
     serial->AddTail(wait);
     serial->AddTail(exit);
 }
+
+// Closes the window once the answer is no.
+void DinoCleaningStopConfirm::StateClose() {
+    if (*mResult == FALSE) {
+        mMotion->Play(2, 0);
+        MTask *exit = MTaskExitTransfer::Create(this);
+        MTask *wait = mMotion->CreateWaitStopTask();
+        MSerialTaskSet *serial = &mSerial;
+        serial->AddTail(wait);
+        serial->AddTail(exit);
+    }
+}

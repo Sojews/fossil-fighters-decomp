@@ -30,8 +30,12 @@ public:
     virtual ~DinoCleaningStopConfirm();
     virtual void Idle();
 
+    void StateClose();
+
     void (DinoCleaningStopConfirm::*mState)(); // 0x80
     DinoCleaning *mCleaning;    // 0x88
+    BOOL *mResult;              // 0x8C: the answer
+    MMotion *mMotion;           // 0x90
 };
 
 class DinoCleaningSleep : public MProcess, public DinoHelpBase {
