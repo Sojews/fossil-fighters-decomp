@@ -354,3 +354,20 @@ void DinoFieldCharaCoordAnime::Execute() {
         mChara->mUnk310 = mUnk50;
     }
 }
+
+// The character's map at 0x164 (cleared by ClearMotionCache): lookups the game emits in this file. The value type
+// is unknown (these members don't depend on it).
+struct DinoFieldCharaCacheEntry {
+    u32 unk0;
+};
+typedef std::__red_black_tree<u32, std::pair<const u32, DinoFieldCharaCacheEntry>,
+                              std::__select_first<std::pair<const u32, DinoFieldCharaCacheEntry> >, std::less<u32>,
+                              std::allocator<std::pair<const u32, DinoFieldCharaCacheEntry> > >
+    DinoFieldCharaCacheTree;
+#pragma auto_inline off
+template DinoFieldCharaCacheTree::node_base *DinoFieldCharaCacheTree::find_insert_position(const u32 &k,
+                                                                                        node_base *&last_not_greater,
+                                                                                        bool &left, bool &leftmost);
+template DinoFieldCharaCacheTree::iterator DinoFieldCharaCacheTree::find(const u32 &k);
+template DinoFieldCharaCacheTree::node_base *DinoFieldCharaCacheTree::lower_bound(const u32 &k, node_base *x,
+                                                                               node_base *y);
