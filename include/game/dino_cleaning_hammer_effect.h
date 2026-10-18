@@ -11,6 +11,7 @@ public:
     virtual void Idle();
 
     void StateEnd();
+    void StateClear();
 
     void (DinoCleaningHammerEffect::*mState)(); // 0x74
     u8 unk7C[0x94 - 0x7C];

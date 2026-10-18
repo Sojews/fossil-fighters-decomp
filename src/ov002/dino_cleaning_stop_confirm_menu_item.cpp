@@ -93,9 +93,14 @@ void DinoCleaningSleep::StateClose() {
 
 // The TU's pooled pointer-to-member constants (see menu.cpp).
 extern "C" struct {
-    u8 unk00[0x18];
+    u8 unk00[0x4];
+    const char *mMotion04;  // 0x04: the questions' motions
+    const char *mMotion08;  // 0x08
+    u8 unk0C[0x18 - 0xC];
     void (DinoCleaningStopConfirm::*Start_18)();
-    u8 unk20[0x48 - 0x20];
+    u8 unk20[0x38 - 0x20];
+    void (DinoCleaningStopConfirm::*Unk02156b08_38)();
+    void (DinoCleaningStopConfirm::*StateDecided_40)();
     void (DinoCleaningSleep::*Start_48)();
     u8 unk50[0x60 - 0x50];
     void (DinoCleaningStopConfirm::*Unk02156a9c_60)();
@@ -113,6 +118,26 @@ void DinoCleaningStopConfirm::StateDecided() {
         return;
     }
     mState = data_ov002_02163f40.Unk02156a9c_60;
+}
+
+// The questions' text ids.
+extern "C" const u32 data_0208ad14;
+extern "C" const u32 data_0208ad18;
+extern "C" const u32 data_0208ad1c;
+extern "C" const u32 data_0208ad20;
+
+DinoCleaningStopConfirmMenu::DinoCleaningStopConfirmMenu(std::string motion, u8 *result, u32 yesText, u32 noText)
+    : MMenu(0), mUnkB8(motion), mResult(result), mYesText(yesText), mNoText(noText) {
+}
+
+void DinoCleaningStopConfirm::StateAsk() {
+    mSerial.AddTail(new DinoCleaningStopConfirmMenu(data_ov002_02163f40.mMotion04, mResult, data_0208ad20, data_0208ad1c));
+    mState = data_ov002_02163f40.StateDecided_40;
+}
+
+void DinoCleaningStopConfirm::StateAskAgain() {
+    mSerial.AddTail(new DinoCleaningStopConfirmMenu(data_ov002_02163f40.mMotion08, mResult, data_0208ad18, data_0208ad14));
+    mState = data_ov002_02163f40.Unk02156b08_38;
 }
 
 DinoCleaningSleep::DinoCleaningSleep(DinoCleaning *cleaning, u32 *timer) : MProcess(NULL), mCleaning(cleaning), mTimer(timer) {

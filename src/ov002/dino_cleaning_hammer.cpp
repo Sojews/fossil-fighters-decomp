@@ -57,3 +57,14 @@ void DinoCleaningHammerEffect::Idle() {
 // instantiated explicitly.
 template class MBgCallTask0<DinoCleaningDrill>;
 template MTask *MCreateBgCallTask(DinoCleaningDrill *obj, void (DinoCleaningDrill::*func)(), int thread);
+
+// The TU's pooled pointer-to-member constants (see menu.cpp).
+extern "C" struct {
+    u8 unk00[0x30];
+    void (DinoCleaningHammerEffect::*StateEnd_30)();
+} data_ov002_02164fb8;
+
+void DinoCleaningHammerEffect::StateClear() {
+    mWindow->Clear();
+    mState = data_ov002_02164fb8.StateEnd_30;
+}

@@ -21,6 +21,7 @@ public:
     DinoCleaningScore *GetScore();
     void Start();
     void Stop();
+    void StatePause();
 
     void (DinoCleaningStatus::*mState)(); // 0x74
     u32 unk7C[2];

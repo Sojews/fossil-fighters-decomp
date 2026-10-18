@@ -21,7 +21,10 @@ public:
     virtual ~DinoCleaningTimer();
     virtual void Idle();
 
-    u32 mUnk74[3];          // 0x74
+    void StateExtend();
+
+    void (DinoCleaningTimer::*mState)(); // 0x74
+    u32 unk7C;
     int mFrames;            // 0x80
     int mLimit;             // 0x84: frames allowed
     u32 mUnk88;             // 0x88
