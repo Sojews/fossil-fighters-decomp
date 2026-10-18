@@ -18,6 +18,9 @@ public:
     virtual void OnFocus(MMenuItem *item);
     virtual void OnDecide(MMenuItem *item);
 
+    void CreateSlots();
+    void CreateSlot(u32 index);
+
     u32 mUnkB4[55];                     // 0xB4
     u32 mSlotCount;                     // 0x190
     u32 mUnk194[6];                     // 0x194

@@ -24,7 +24,12 @@ public:
     virtual ~DinoUiMuseumMenu();
     virtual void OnIdle();
 
-    u8 unkB3[0xF9];  // members start in MMenu's tail padding
+    void CreateSlots();
+    void CreateSlot(u32 index);
+
+    u8 unkB3[0x15C - 0xB3];  // members start in MMenu's tail padding
+    u32 mSlotCount;     // 0x15C
+    u8 unk160[0x1AC - 0x160];
     u8 mUnk1AC;     // 0x1AC
 };
 
@@ -72,10 +77,7 @@ public:
     virtual ~DinoUiMuseumSlotCreateTask();
     virtual void Idle();
 
-    struct Menu {
-        u8 unk00[0x15C];
-        u32 mSlotCount; // 0x15C
-    } *mMenu;           // 0x74
+    DinoUiMuseumMenu *mMenu;    // 0x74
     u32 mIndex;         // 0x78
 };
 

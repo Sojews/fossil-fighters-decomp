@@ -208,11 +208,20 @@ void DinoUiMuseumPageRButton::OnDecide() {
 }
 
 extern "C" const int data_02089a0c;
-extern "C" void func_ov006_02188fb8(DinoUiMuseumSlotCreateTask::Menu *menu, u32 index);
+
+#pragma auto_inline off
+
+void DinoUiMuseumMenu::CreateSlots() {
+    for (int i = 0; i < 15; i++) {
+        CreateSlot(i);
+    }
+}
+
+#pragma auto_inline on
 
 void DinoUiMuseumSlotCreateTask::Idle() {
     if (mIndex <= 14) {
-        func_ov006_02188fb8(mMenu, mIndex);
+        mMenu->CreateSlot(mIndex);
         if (mIndex < mMenu->mSlotCount - 1) {
             mSerial.AddTail(new MTimer(data_02089a0c));
         }

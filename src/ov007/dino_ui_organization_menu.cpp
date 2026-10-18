@@ -147,11 +147,20 @@ void DinoUiOrganizationPageRButton::OnDecide() {
 }
 
 extern "C" const int data_02089a0c;
-extern "C" void func_ov007_0217cb90(DinoUiOrganizationMenu *menu, u32 index);
+
+#pragma auto_inline off
+
+void DinoUiOrganizationMenu::CreateSlots() {
+    for (int i = 0; i < 15; i++) {
+        CreateSlot(i);
+    }
+}
+
+#pragma auto_inline on
 
 void DinoUiOrganizationSlotCreateTask::Idle() {
     if (mIndex < 15) {
-        func_ov007_0217cb90(mMenu, mIndex);
+        mMenu->CreateSlot(mIndex);
         if (mIndex < mMenu->mSlotCount - 1) {
             mSerial.AddTail(new MTimer(data_02089a0c));
         }

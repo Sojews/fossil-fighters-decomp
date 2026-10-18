@@ -488,11 +488,11 @@ _Z15MCreateCallTaskI16DinoUiMuseumMenu12DinoHelpBaseEP5MTaskPT_MT0_FvvE kind:fun
 func_ov006_02188d80 kind:function(thumb,size=0x72) addr:0x02188d80
 func_ov006_02188df4 kind:function(thumb,size=0x40) addr:0x02188df4
 _ZN25DinoUiMuseumReviverButtonD0Ev kind:function(thumb,size=0x1c) addr:0x02188e34
-func_ov006_02188e50 kind:function(thumb,size=0x16) addr:0x02188e50
+_ZN16DinoUiMuseumMenu11CreateSlotsEv kind:function(thumb,size=0x16) addr:0x02188e50
 func_ov006_02188e68 kind:function(thumb,size=0xbe) addr:0x02188e68
 func_ov006_02188f28 kind:function(thumb,size=0x20) addr:0x02188f28
 _ZN26DinoUiMuseumSlotCreateTask4IdleEv kind:function(thumb,size=0x70) addr:0x02188f48
-func_ov006_02188fb8 kind:function(thumb,size=0x3a4) addr:0x02188fb8
+_ZN16DinoUiMuseumMenu10CreateSlotEm kind:function(thumb,size=0x3a4) addr:0x02188fb8
 func_ov006_0218935c kind:function(thumb,size=0x100) addr:0x0218935c
 func_ov006_0218945c kind:function(thumb,size=0xd4) addr:0x0218945c
 func_ov006_02189530 kind:function(thumb,size=0x78) addr:0x02189530
