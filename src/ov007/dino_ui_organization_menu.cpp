@@ -105,7 +105,6 @@ void DinoUiOrganizationMenu::OnIdle() {
     }
 }
 
-extern "C" void func_ov007_0217d548(void *owner);
 
 void DinoUiOrganizationOKButton::OnDecide() {
     mMotion->Play(4, 1);
@@ -114,7 +113,7 @@ void DinoUiOrganizationOKButton::OnDecide() {
     MSerialTaskSet *serial = &mSerial;
     serial->AddTail(wait);
     serial->AddTail(play);
-    func_ov007_0217d548(mOwner);
+    mOwner->Confirm();
     DinoSoundPlaySe(0x9A, 0);
 }
 
@@ -681,9 +680,51 @@ void DinoUiOrganizationMenu::Refresh() {
 extern "C" MTask *func_ov007_0217d1c0(DinoUiOrganizationMenu *menu, DinoTeam *saved);
 extern const u32 data_0208aa38, data_0208aa3c;
 
+// Fades out and exits once the 3D model is done.
+inline void DinoUiOrganizationMenu::Leave() {
+    MTask *exit = CreateExitTransfer();
+    MTask *wait = mInfo->CreateWaitModelTask();
+    MTask *subFade = gLcd->mSub->mBright->CreateFadeOutToBlack(30, 0);
+    MTask *mainFade = gLcd->mMain->mBright->CreateFadeOutToBlack(30, 0);
+    MParallelTaskSet *fades = new MParallelTaskSet(TRUE);
+    fades->AddTail(mainFade);
+    fades->AddTail(subFade);
+    MSerialTaskSet *serial = &mSerial;
+    serial->AddTail(fades);
+    serial->AddTail(wait);
+    serial->AddTail(exit);
+}
+
+extern const u32 data_0208aa40, data_0208aa4c;
+
+// Saves the team and leaves; a team needs its leader.
+void DinoUiOrganizationMenu::Confirm() {
+    if (mUnk23C == TRUE) {
+        return;
+    }
+    if (mTeam.slots[0] != 0) {
+        DinoTeam saved;
+        gDinoBackup->GetTeam(mTeamIndex, &saved);
+        if (DinoTeamDiffers(&mTeam, &saved)) {
+            gDinoBackup->SetTeam(mTeamIndex, &mTeam);
+            mMenuBack->Hide();
+            mSerial.AddTail(
+                new DinoCommonWindowMessageBox(MPoint(0x80, 0x60), gDinoResource->GetText(data_0208aa40), 0x78, 4));
+            Leave();
+        } else {
+            mMenuBack->Hide();
+            Leave();
+        }
+    } else {
+        mSerial.AddTail(
+            new DinoCommonWindowMessageBox(MPoint(0x80, 0x60), gDinoResource->GetText(data_0208aa4c), 0x78, 4));
+        mMenuBack->Hide();
+        mSerial.AddTail(mMenuBack->CreateShowTransfer());
+    }
+}
+
 // Puts a moving member back, or leaves (saving the team if it changed).
 void DinoUiOrganizationMenu::Back() {
-    MTask *exit, *mainFade, *subFade, *wait;
     if (mUnk23C == TRUE) {
         mUnk23C = FALSE;
         mMessage->Exit();
@@ -711,17 +752,7 @@ void DinoUiOrganizationMenu::Back() {
             mSerial.AddTail(func_ov007_0217d1c0(this, &saved));
         }
     }
-    exit = CreateExitTransfer();
-    wait = mInfo->CreateWaitModelTask();
-    subFade = gLcd->mSub->mBright->CreateFadeOutToBlack(30, 0);
-    mainFade = gLcd->mMain->mBright->CreateFadeOutToBlack(30, 0);
-    MParallelTaskSet *fades = new MParallelTaskSet(TRUE);
-    fades->AddTail(mainFade);
-    fades->AddTail(subFade);
-    MSerialTaskSet *serial = &mSerial;
-    serial->AddTail(fades);
-    serial->AddTail(wait);
-    serial->AddTail(exit);
+    Leave();
 }
 
 void DinoUiOrganizationMenu::CreateSlots() {

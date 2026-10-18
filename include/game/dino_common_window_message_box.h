@@ -9,6 +9,7 @@
 class DinoCommonWindowMessageBox : public MProcess {
 public:
     DinoCommonWindowMessageBox(MPoint pos, const std::string &text, int frames);
+    DinoCommonWindowMessageBox(MPoint pos, const std::string &text, u32 unk78, int frames);
     virtual ~DinoCommonWindowMessageBox();
     virtual void Idle();
 

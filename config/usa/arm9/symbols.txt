@@ -2431,7 +2431,7 @@ _Z15MCreateCallTaskI23DinoCommonWindowMessageS0_EP5MTaskPT_MT0_FvvE kind:functio
 _Z17MCreateBgCallTaskI23DinoCommonWindowMessageEP5MTaskPT_MS3_FvvEi kind:function(thumb,size=0x38) addr:0x0202fa50
 _ZN26DinoCommonWindowMessageBoxC1E6MPointRKSsi kind:function(thumb,size=0x54) addr:0x0202fa88
 func_0202fadc kind:function(thumb,size=0x50) addr:0x0202fadc
-func_0202fb2c kind:function(thumb,size=0x54) addr:0x0202fb2c
+_ZN26DinoCommonWindowMessageBoxC1E6MPointRKSsmi kind:function(thumb,size=0x54) addr:0x0202fb2c
 _ZN26DinoCommonWindowMessageBox4IdleEv kind:function(thumb,size=0x1a0) addr:0x0202fb80
 func_0202fd20 kind:function(thumb,size=0x54) addr:0x0202fd20
 _ZN28DinoCommonWindowMessageWait14IdleEv kind:function(thumb,size=0x114) addr:0x0202fd74
@@ -7086,7 +7086,9 @@ data_0208aa28 kind:data(any) addr:0x0208aa28
 kBackupEntryUnk2Text kind:data(any) addr:0x0208aa2c
 kBackupEntryUnknownText kind:data(any) addr:0x0208aa30
 data_0208aa34 kind:data(any) addr:0x0208aa34
+data_0208aa38 kind:data(any) addr:0x0208aa38
 data_0208aa3c kind:data(any) addr:0x0208aa3c
+data_0208aa40 kind:data(any) addr:0x0208aa40
 data_0208aa44 kind:data(any) addr:0x0208aa44
 data_0208aa48 kind:data(any) addr:0x0208aa48
 data_0208aa4c kind:data(any) addr:0x0208aa4c

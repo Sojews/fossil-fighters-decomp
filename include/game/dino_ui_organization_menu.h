@@ -75,6 +75,8 @@ public:
     void EnableAll();
     void OpenMemberMenu(int member);
     void Back();
+    void Confirm();
+    void Leave();
     void SelectMember(int index);
     void RemoveMember();
     // Where the creature is in the list (the list's size if it isn't there).
