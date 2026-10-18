@@ -212,10 +212,7 @@ void DinoUiContainerMenu::OnBackDecided() {
 
 extern const u32 data_0208aae0; // "the team will be saved" text
 
-// NONMATCHING: the else branch swaps the exit/fade registers.
 void DinoUiContainerMenu::OnOKDecided() {
-    MTask *fade;
-    MTask *exit;
     *mResult = 0;
     if (mOldTeam->slots[0]) {
         if (DinoTeamDiffers(mOldTeam, mTeam)) {
@@ -223,6 +220,8 @@ void DinoUiContainerMenu::OnOKDecided() {
         } else {
             mSerial.AddTail(new MTimer(30));
         }
+        MTask *fade;
+        MTask *exit;
         MTask &self = *this;
         exit = MTaskExitTransfer::Create(&self);
         fade = gLcd->mMain->mBright->CreateFadeOutToBlack(30, 0);
@@ -230,10 +229,13 @@ void DinoUiContainerMenu::OnOKDecided() {
         serial->AddTail(fade);
         serial->AddTail(exit);
     } else {
+        MTask *timer;
+        MTask *fade;
+        MTask *exit;
         MTask &self = *this;
         exit = MTaskExitTransfer::Create(&self);
         fade = gLcd->mMain->mBright->CreateFadeOutToBlack(30, 0);
-        MTask *timer = new MTimer(30);
+        timer = new MTimer(30);
         MSerialTaskSet *serial = &mSerial;
         serial->AddTail(timer);
         serial->AddTail(fade);

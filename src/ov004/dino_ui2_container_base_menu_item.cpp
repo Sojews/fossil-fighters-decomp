@@ -179,14 +179,17 @@ void DinoUi2ContainerBaseMenu::ClearItems() {
 
 extern MView *data_ov004_02177284; // the view the cross-fade keeps
 
-// NONMATCHING: the fade and hide tasks swap registers (as in the ov006 OnOKDecided pair).
 void DinoUi2ContainerBaseMenu::OnBackDecided() {
     MTask &self = *this;
-    MTask *exit = MTaskExitTransfer::Create(&self);
+    MTask *timer;
+    MTask *hide;
+    MTask *fade;
+    MTask *exit;
+    exit = MTaskExitTransfer::Create(&self);
     MBlend *blend = gCurrentDisplay->mBlend;
-    MTask *fade = blend->CreateCrossFadeOutTask(data_ov004_02177284->GetPlaneMask() ^ 0x3F, 5, 0);
-    MTask *hide = mOam->CreateHideTransfer();
-    MTask *timer = new MTimer(30);
+    fade = blend->CreateCrossFadeOutTask(data_ov004_02177284->GetPlaneMask() ^ 0x3F, 5, 0);
+    hide = mOam->CreateHideTransfer();
+    timer = new MTimer(30);
     MSerialTaskSet *serial = &mSerial;
     serial->AddTail(timer);
     serial->AddTail(hide);
