@@ -4,6 +4,12 @@
 // Derived destructors have their bases' destructor bodies inlined; auto-inlining the ones defined above does that.
 #pragma auto_inline on
 
+#include "game/backup_validater.h"
+#include "m/display.h"
+#include "m/lcd.h"
+#include "m/smart_oam.h"
+#include "m/motion.h"
+#include "m/input.h"
 #include "m/menu.h"
 #include "game/dino_ui_top_menu_loop.h"
 #include "game/dino_ui_save_slot_select.h"
@@ -104,27 +110,37 @@ void DinoUiOpeningCloud::Idle() {
 // The TU's pooled pointer-to-member constants (see menu.cpp). The game's pool is one block; dsd splits it every 0x80
 // bytes (data_ov004_02172ff8, data_ov004_02173078), and tools/anon_names.py maps the offsets back.
 extern "C" struct {
-    u8 unk00[0x3C];
-    void (DinoUiTitle::*Unk0215ee60_3C)();
-    void (DinoUiTitle::*Unk0215f4ec_44)();
-    u8 unk4C[0x7C - 0x4C];
-    void (DinoUiTitle::*StateSaveSlot_7C)();
-    void (DinoUiTitle::*StateTopMenuEnd_84)();
-    u8 unk8C[0x9C - 0x8C];
-    void (DinoUiTitle::*Unk0215f1e0_9C)();
+    u8 unk00[0x24];
+    const char *mLogoPath; // 0x24
+    u8 unk28[0x2C - 0x28];
+    void (DinoUiTitle::*StateMenu_2C)(); // 0x2c
+    u8 unk34[0x3C - 0x34];
+    void (DinoUiTitle::*Unk0215ee60_3C)(); // 0x3c
+    void (DinoUiTitle::*Unk0215f4ec_44)(); // 0x44
+    u8 unk4C[0x6C - 0x4C];
+    void (DinoUiTitle::*Unk0215d818_6C)(); // 0x6c
+    u8 unk74[0x7C - 0x74];
+    void (DinoUiTitle::*StateSaveSlot_7C)(); // 0x7c
+    void (DinoUiTitle::*StateTopMenuEnd_84)(); // 0x84
+    u8 unk8C[0x94 - 0x8C];
+    void (DinoUiTitle::*LoadLogo_94)(); // 0x94
+    void (DinoUiTitle::*Unk0215f1e0_9C)(); // 0x9c
     u8 unkA4[0xAC - 0xA4];
-    void (DinoUiTitle::*Unk0215e03c_AC)();
-    void (DinoUiTitle::*Start_B4)();
-    u8 unkBC[0xF4 - 0xBC];
-    void (DinoUiTitle::*Unk0215f5ac_F4)();
+    void (DinoUiTitle::*Unk0215e03c_AC)(); // 0xac
+    void (DinoUiTitle::*Start_B4)(); // 0xb4
+    u8 unkBC[0xC4 - 0xBC];
+    void (DinoUiTitle::*Unk0215d818_C4)(); // 0xc4
+    u8 unkCC[0xF4 - 0xCC];
+    void (DinoUiTitle::*Unk0215f5ac_F4)(); // 0xf4
     u8 unkFC[0x114 - 0xFC];
-    void (DinoUiOpening::*OpeningStart_114)();
+    void (DinoUiOpening::*OpeningStart_114)(); // 0x114
     u8 unk11C[0x12C - 0x11C];
-    void (DinoUiTitle::*Unk0215f420_12C)();
-    u8 unk134[0x144 - 0x134];
-    void (DinoUiTitle::*Unk0215e9e4_144)();
+    void (DinoUiTitle::*Unk0215f420_12C)(); // 0x12c
+    void (DinoUiTitle::*Unk0215d6b4_134)(); // 0x134
+    void (DinoUiTitle::*Unk0215d818_13C)(); // 0x13c
+    void (DinoUiTitle::*Unk0215e9e4_144)(); // 0x144
     u8 unk14C[0x164 - 0x14C];
-    void (DinoUiTitle::*StateSaveSlotEnd_164)();
+    void (DinoUiTitle::*StateSaveSlotEnd_164)(); // 0x164
 } data_ov004_02172f78;
 
 inline DinoUiOpening::DinoUiOpening(MInput *input) : MProcess(NULL), mInput(input) {
@@ -185,3 +201,51 @@ void DinoUiTitle::StateTopMenuEnd() {
         break;
     }
 }
+
+// How the title starts: 0 normally, 4 after the opening, 5 and 7 (the backup checked first) to the top menu, 6 to
+// the save slots.
+void DinoUiTitle::StateStart() {
+    MSingleInputHub *hub = new MSingleInputHub(1);
+    hub->EnableTouch();
+    mInput = hub->GetInput(0);
+    mParallel.AddTail(hub);
+    switch (*mResult) {
+    case 0:
+        mTopResult = 1;
+        mState = data_ov004_02172f78.Unk0215d6b4_134;
+        break;
+    case 4:
+        mTopResult = 1;
+        mState = data_ov004_02172f78.Unk0215d818_13C;
+        break;
+    case 7:
+        mSerial.AddTail(new DinoBackupReadValidater(NULL, NULL));
+    case 5:
+        mTopResult = 2;
+        mState = data_ov004_02172f78.Unk0215d818_C4;
+        break;
+    case 6:
+        DinoSoundPlayBgm(0x77, 0);
+        mTopResult = 3;
+        mState = data_ov004_02172f78.Unk0215d818_6C;
+        break;
+    }
+}
+
+#pragma dont_inline on
+void DinoUiTitle::StateShowLogo() {
+    gLcd->mMain->mBg->SetMode(3);
+    mOam = new MSmartOam(10, 0, 1);
+    mLogo = new MMotion(data_ov004_02172f78.mLogoPath, mOam, 0, 1);
+    mLogo->SetPriority(1);
+    mLogo->SetPosition(0x80, 0x60);
+    mLogo->Play(3, 0);
+    mLogo->Show();
+    MSmartOam *oam = mOam;
+    MTaskSet &parallel = mParallel;
+    parallel.AddTail(mLogo);
+    parallel.AddTail(oam);
+    mSerial.AddTail(MCreateBgCallTask(this, data_ov004_02172f78.LoadLogo_94, 1));
+    mState = data_ov004_02172f78.StateMenu_2C;
+}
+#pragma dont_inline reset
