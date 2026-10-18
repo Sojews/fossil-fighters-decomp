@@ -25,6 +25,32 @@
 DinoUiTopMenuLoop::~DinoUiTopMenuLoop() {
 }
 
+// Pooled file statics: the items' corners relative to their motions.
+struct DinoUiTopMenuStatics {
+    u8 unk00[0x64];
+    MPoint mItemTopLeft;        // 0x64
+    u8 unk6C[0x74 - 0x6C];
+    MPoint mItem2BottomRight;   // 0x74
+};
+struct DinoUiTopMenuStatics2 {
+    u8 unk00[0x4C];
+    MPoint mItemBottomRight;    // 0x4C
+    u8 unk54[0x64 - 0x54];
+    MPoint mItem2TopLeft;       // 0x64
+};
+extern "C" DinoUiTopMenuStatics data_ov004_0217206c;
+extern "C" DinoUiTopMenuStatics2 data_ov004_021720ec;
+
+MRect DinoUiTopMenuItem::GetFrame() {
+    return MRect(mMotion->GetPosition() + data_ov004_0217206c.mItemTopLeft,
+                 mMotion->GetPosition() + data_ov004_021720ec.mItemBottomRight);
+}
+
+MRect DinoUiTopMenuItem2::GetFrame() {
+    return MRect(mMotion->GetPosition() + data_ov004_021720ec.mItem2TopLeft,
+                 mMotion->GetPosition() + data_ov004_0217206c.mItem2BottomRight);
+}
+
 MRect DinoUiTopMenuItem2::GetRect() {
     return GetFrame();
 }

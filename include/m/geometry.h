@@ -10,7 +10,7 @@ struct MPoint {
         y = y_;
     }
 
-    MPoint operator+(MPoint o) const { return MPoint(x + o.x, y + o.y); }
+    MPoint operator+(const MPoint &o) const { return MPoint(x + o.x, y + o.y); }
     // This point moved by (dx, dy).
     MPoint Offset(int dx, int dy) const { return MPoint(x + dx, y + dy); }
     bool operator==(const MPoint &o) const { return x == o.x && y == o.y; }
