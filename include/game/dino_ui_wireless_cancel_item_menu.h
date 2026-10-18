@@ -13,6 +13,7 @@
 #include "game/help.h"
 
 class MSmartOam;
+class DinoUiWirelessCancelItem;
 class MIndicator;
 
 class DinoUiWirelessCancel : public MMenu {
@@ -25,7 +26,8 @@ public:
     // The button's closing animation and sound, then exiting.
     MTask *CreateCloseTask();
 
-    u8 unkA7[5];         // members start in MMenu's tail padding
+    u8 unkA7;            // members start in MMenu's tail padding
+    DinoUiWirelessCancelItem *mButton; // 0xA8
     u8 *mCancelled;      // 0xAC
 };
 

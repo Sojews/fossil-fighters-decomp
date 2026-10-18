@@ -266,7 +266,7 @@ extern "C" struct {
     const char *mParentPath2;   // 0x14: the parent items' motions, by mode
     u8 unk18[0x4];
     const char *mParentPath0;   // 0x1c
-    u8 unk20[0x4];
+    const char *mCancelPath;    // 0x20
     const char *mParentPath1;   // 0x24
     u8 unk28[0x34 - 0x28];
     DinoUiWirelessMatchState state_02167e3c; // 0x34
@@ -557,6 +557,41 @@ void DinoUiChildScanner::OnIdle() {
 }
 
 #pragma auto_inline on
+
+inline DinoUiWirelessCancelItem::DinoUiWirelessCancelItem() {
+    MSmartOam *oam = new MSmartOam(1, 0, 1);
+    mMotion = new MMotion(data_ov004_021740d0.mCancelPath, oam, 0, 1);
+    mMotion->Play(2, 0);
+    mMotion->Show();
+    mMotion->SetPosition(0x80, 0x60);
+    MParallelTaskSet *parallel = &mParallel;
+    parallel->AddTail(mMotion);
+    parallel->AddTail(oam);
+    SetNoFocus(TRUE);
+    SetKeys(2);
+}
+
+void DinoUiWirelessCancel::OnStart() {
+    *mCancelled = FALSE;
+    mButton = new DinoUiWirelessCancelItem;
+    AddItem(mButton);
+}
+
+// (Not inlined into the battle parent scanner, which calls it.)
+#pragma auto_inline off
+// NONMATCHING: the game gives the sound task and the set each other's registers
+MTask *DinoUiWirelessCancel::CreateCloseTask() {
+    DinoUiWirelessCancelItem *button = mButton;
+    MTask *wait = button->mMotion->CreateWaitStopTask();
+    MTask *play = button->mMotion->CreatePlayTransfer(4, 0);
+    MTask *se = DinoSoundCreatePlaySeTask(0x38F, 0);
+    MSerialTaskSet *close = new MSerialTaskSet(TRUE);
+    close->AddTail(se);
+    close->AddTail(play);
+    close->AddTail(wait);
+    return close;
+}
+#pragma auto_inline reset
 
 // Ends the scan and leaves after half a second.
 void DinoUiChildScanner::Leave() {

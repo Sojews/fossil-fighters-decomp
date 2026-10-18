@@ -6,6 +6,7 @@
 
 class DinoUiWirelessCancelItem : public MMenuItem {
 public:
+    DinoUiWirelessCancelItem();
     virtual ~DinoUiWirelessCancelItem();
     virtual MRect GetFrame();
     virtual void OnFocusChanged(BOOL focused);
