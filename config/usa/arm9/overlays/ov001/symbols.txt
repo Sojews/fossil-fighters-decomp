@@ -395,7 +395,7 @@ _ZThn116_N15DinoFieldCamera4ReadEPKv kind:function(thumb,size=0x1c) addr:0x02164
 func_ov001_02164b58 kind:function(thumb,size=0xdc) addr:0x02164b58
 _ZN22DinoFieldPlayerControlD1Ev kind:function(thumb,size=0x6c) addr:0x02164c34
 _ZN22DinoFieldPlayerControlD0Ev kind:function(thumb,size=0x70) addr:0x02164ca0
-func_ov001_02164d10 kind:function(thumb,size=0x138) addr:0x02164d10
+_ZN22DinoFieldPlayerControl9SetEffectE7VecFx32tm kind:function(thumb,size=0x138) addr:0x02164d10
 _ZN22DinoFieldPlayerControl4IdleEv kind:function(thumb,size=0x1b38) addr:0x02164e48
 .L_02165f08 kind:label(thumb) addr:0x02165f08 local
 .L_02166318 kind:label(thumb) addr:0x02166318 local
