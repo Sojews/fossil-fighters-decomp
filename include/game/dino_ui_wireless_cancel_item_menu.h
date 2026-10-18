@@ -55,6 +55,7 @@ public:
 };
 
 class MMultiPlay;
+class MMultiPlayMessageHub;
 
 class DinoUiChildScanner : public MMenu, public MMessageObserver, public DinoHelpBase {
 public:
@@ -205,13 +206,17 @@ public:
     void StateStart();
     void StateShootMenu();
     void StateShot();
+    void Leave();
+    void StateJoin();
+    void StateWaitStart();
+    void State02166f10();
 
     void (DinoUiCannonChild::*mState)(); // 0xA8
     MMultiPlay *mMultiPlay;     // 0xB0
     u16 mChoice;                // 0xB4
     std::vector<void *> mUnkB8; // 0xB8
     std::vector<unsigned int> mUnkC4; // 0xC4
-    u32 mUnkD0;                 // 0xD0
+    MMultiPlayMessageHub *mHub; // 0xD0
     u8 mStarted;                // 0xD4: set by the start message
     MPictureFile mBack;         // 0xD8: image/m_back00
     MResource<DinoSenryuDefs> mSenryuDefs; // 0x10C
