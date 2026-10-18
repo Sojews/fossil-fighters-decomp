@@ -165,3 +165,8 @@ struct DinoBattleView3DEntry {
 };
 #pragma auto_inline off
 template class std::__vec_deleter<DinoBattleView3DEntry, std::allocator<DinoBattleView3DEntry> >;
+
+// A vector of string lists (its elements are destroyed with vector<string>'s out-of-line destructor).
+// NONMATCHING (both erase_at_end, callcheck only): our vector<string> destructor is inlined into a
+// __vec_deleter<string> D2 call, so the bytes match but the call target differs (see the vector<string> note).
+template class std::__vec_deleter<std::vector<std::string>, std::allocator<std::vector<std::string> > >;
