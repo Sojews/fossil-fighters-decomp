@@ -4,6 +4,8 @@
 #pragma auto_inline on
 
 #include "game/creature_motion.h"
+#include "game/dino_resource.h"
+#include "m/fx32.h"
 #include "types.h"
 #include "game/dino_battle_view_creature.h"
 #include "game/view_status_effect_icon.h"
@@ -213,6 +215,14 @@ u8 DinoBattleViewCreature::GetDefUnk0D() {
 
 u8 DinoBattleViewCreature::GetDefUnk61() {
     return mDef->mUnk61;
+}
+
+// At or below the pinch share of its life.
+BOOL DinoBattleViewCreature::IsInPinch() {
+    if (MFx32(mUnkF8) / MFx32(mUnkF4) <= MFx32(gDinoResource->GetBattleAdjustDefs()->pinchRatio)) {
+        return TRUE;
+    }
+    return FALSE;
 }
 
 u32 DinoBattleViewCreature::GetUnkE0() {

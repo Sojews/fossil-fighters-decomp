@@ -11,6 +11,7 @@
 #include "m/looper.h"
 #include "game/help.h"
 #include "game/dino_field_camera_hook.h"
+#include "m/multi_play.h"
 
 class DinoMultiPlayScanner : public DinoHelpBase, public MMenu, public MMessageObserver {
 public:
@@ -20,8 +21,16 @@ public:
     virtual void OnIdle();
     virtual void OnMessage(MMessage *msg);
 
-    u32 mUnkE8[3];      // 0xE8
+    void Start();
+    void Reset();
+    void Cancel();
+
+    MMultiPlay *mMultiPlay; // 0xE8
+    int mMode;          // 0xEC: 1: parent, else child
+    u8 *mResult;        // 0xF0
     MRandom mRandom;    // 0xF4
+    u32 mUnkFC;         // 0xFC
+    u32 mWait;          // 0x100: frames before trying the other side
 };
 
 class DinoMultiPlayScanTelop : public MProcess {

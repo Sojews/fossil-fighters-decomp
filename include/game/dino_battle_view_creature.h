@@ -34,6 +34,7 @@ public:
     u32 GetUnk108();
     u8 GetDefUnk0D();
     u8 GetDefUnk61();
+    BOOL IsInPinch();
     u32 GetUnkE0();
     u32 GetUnkDC();
     u32 GetUnkD8();
@@ -74,8 +75,8 @@ public:
     u32 mUnkE0;             // 0xE0
     DinoBattleCreatureDef *mDef;    // 0xE4
     std::string mUnkE8;     // 0xE8
-    u32 mUnkF4;             // 0xF4
-    u32 mUnkF8;             // 0xF8
+    s32 mUnkF4;             // 0xF4: maximum life
+    s32 mUnkF8;             // 0xF8: life
     u32 mUnkFC;             // 0xFC
     u32 mUnk100;            // 0x100
     u32 mUnk104;            // 0x104

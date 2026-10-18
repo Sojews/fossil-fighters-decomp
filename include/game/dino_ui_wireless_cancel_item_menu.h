@@ -98,9 +98,15 @@ public:
     virtual void Idle();
     virtual void OnMessage(MMessage *msg);
 
+    void ShowCount();
+
     void (DinoUiCannonParentScanner::*mState)(); // 0xA8
     void (DinoUiCannonParentScanner::*mOnMessage)(MMessage *msg); // 0xB0
-    u32 mUnkB8[18];
+    u32 mUnkB8[13];
+    MMotion *mOnes;                     // 0xEC: the count's digits
+    MMotion *mTens;                     // 0xF0
+    u32 mCount;                         // 0xF4
+    u32 mUnkF8[2];                      // 0xF8
     std::vector<unsigned int> mUnk100; // 0x100: (a distinct element type from other overlays' copies)
     std::vector<int> mUnk10C;  // 0x10C
 };

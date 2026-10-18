@@ -242,6 +242,11 @@ void DinoUiCannonChild::OnMessage(MMessage *msg) {
 
 #pragma auto_inline off
 
+void DinoUiCannonParentScanner::ShowCount() {
+    mOnes->Play(mCount % 10 + 1, 0);
+    mTens->Play(mCount / 10 + 1, 0);
+}
+
 void DinoUiChildScanner::ExitWithReset() {
     MTask *exit = MTaskExitTransfer::Create(this);
     MTask *reset = mMultiPlay->CreateResetTask();
