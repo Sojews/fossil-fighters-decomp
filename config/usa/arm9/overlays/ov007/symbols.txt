@@ -470,7 +470,7 @@ func_ov007_02188f30 kind:function(thumb,size=0x44) addr:0x02188f30
 _ZN22DinoUiReviveStatusMenu13OnBackDecidedEv kind:function(thumb,size=0x1fc) addr:0x02188f74
 func_ov007_02189170 kind:function(thumb,size=0x13ce) addr:0x02189170
 .L_0218a538 kind:label(thumb) addr:0x0218a538 local
-func_ov007_0218a540 kind:function(thumb,size=0x20) addr:0x0218a540
+_ZN22DinoUiReviveStatusLoopC1Emm kind:function(thumb,size=0x20) addr:0x0218a540
 _ZN22DinoUiReviveStatusLoop4IdleEv kind:function(thumb,size=0xe8) addr:0x0218a560
 func_ov007_0218a648 kind:function(thumb,size=0x54) addr:0x0218a648
 _ZN30DinoUiReviveStatusLoopCleaning4IdleEv kind:function(thumb,size=0x130) addr:0x0218a69c

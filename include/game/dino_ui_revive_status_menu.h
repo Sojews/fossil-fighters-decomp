@@ -43,8 +43,12 @@ public:
 
 class DinoUiReviveStatusLoop : public MProcess {
 public:
+    DinoUiReviveStatusLoop(u32 a, u32 b);
     virtual ~DinoUiReviveStatusLoop();
     virtual void Idle();
+
+    u32 mUnk74;     // 0x74
+    u32 mUnk78;     // 0x78
 };
 
 class DinoUiReviveStatusLoopCleaning : public MProcess {

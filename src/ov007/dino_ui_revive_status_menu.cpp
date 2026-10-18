@@ -95,3 +95,10 @@ void DinoUiReviveStatusMenu::OnFocus(MMenuItem *item) {
 // DinoUiReviveStatusMenu::OnStart (not decompiled yet) re-enables the help through a call task.
 template MTask *MCreateCallTask(DinoUiReviveStatusMenu *obj, void (DinoHelpBase::*func)());
 template MTask *MCreateCallTask(DinoUiReviveStatusMenu *obj, void (DinoUiReviveStatusMenu::*func)(bool), bool a1);
+
+#pragma auto_inline off
+
+DinoUiReviveStatusLoop::DinoUiReviveStatusLoop(u32 a, u32 b) : MProcess(NULL) {
+    mUnk74 = a;
+    mUnk78 = b;
+}
