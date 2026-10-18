@@ -344,7 +344,7 @@ void DinoMainLoop::State020483fc() {
 
 void DinoMainLoop::StateTopMenu() {
     MLoadOverlay(0, M_OVERLAY_ID(ov004));
-    mSerial.AddTail(new DinoUiTopMenuLoop(0));
+    mSerial.AddTail(new DinoUiTopMenuLoop(NULL));
     mState = data_020c0070.StateTopMenuEnd_6C;
 }
 

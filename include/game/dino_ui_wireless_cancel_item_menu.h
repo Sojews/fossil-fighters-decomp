@@ -142,6 +142,7 @@ public:
 
 class DinoUiWirelessMatch : public MProcess {
 public:
+    DinoUiWirelessMatch(u32 *result, u8 arg);
     virtual ~DinoUiWirelessMatch();
     virtual void Idle();
 

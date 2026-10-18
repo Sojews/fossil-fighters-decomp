@@ -35,6 +35,7 @@ inline bool operator<(const DinoMacAddress &a, const DinoMacAddress &b) {
 
 class DinoUiExchange : public MProcess, public MMessageObserver {
 public:
+    DinoUiExchange();
     virtual ~DinoUiExchange();
     virtual void Idle();
     virtual void OnMessage(MMessage *msg);
@@ -59,6 +60,7 @@ public:
     u8 unk114[0x2C];
     MArchivePtr mArchive;           // 0x140
     MArchiveFile mFile;             // 0x144
+    u8 unk150[0x1EC - 0x150];
 };
 
 #endif

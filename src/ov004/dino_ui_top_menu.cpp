@@ -3,6 +3,8 @@
 // Derived destructors have their bases' destructor bodies inlined; auto-inlining the ones defined above does that.
 #pragma auto_inline on
 
+#include "game/dino_ui_exchange.h"
+#include "game/dino_ui_multiplay_loop.h"
 #include "game/dino_ui_top_menu_loop.h"
 #include "game/dino_backup.h"
 #include "game/help.h"
@@ -31,15 +33,24 @@ DinoUiTopMenuLoop::~DinoUiTopMenuLoop() {
 
 // Pooled file statics: the items' corners relative to their motions.
 struct DinoUiTopMenuStatics {
-    u8 unk00[0x64];
+    u8 unk00[0x2C];
+    void (DinoUiTopMenuLoop::*mTopMenu_2C)();       // 0x2C: (pooled pointer-to-member constants, see menu.cpp)
+    u8 unk34[0x44 - 0x34];
+    void (DinoUiTopMenuLoop::*mMultiplayEnd_44)();  // 0x44
+    void (DinoUiTopMenuLoop::*mMultiplay_4C)();     // 0x4C
+    void (DinoUiTopMenuLoop::*mTopMenuEnd_54)();    // 0x54
+    u8 unk5C[0x64 - 0x5C];
     MPoint mItemTopLeft;        // 0x64
-    u8 unk6C[0x74 - 0x6C];
+    void (DinoUiTopMenuLoop::*mMultiplay_6C)();     // 0x6C
     MPoint mItem2BottomRight;   // 0x74
 };
 struct DinoUiTopMenuStatics2 {
-    u8 unk00[0x1C];
-    void (DinoUiTopMenuLoop::*mLoopStart)();    // 0x1C: (a pooled pointer-to-member constant, see menu.cpp)
-    u8 unk24[0x4C - 0x24];
+    u8 unk00[0x14];
+    void (DinoUiTopMenuLoop::*mTopMenu_14)();   // 0x14: (pooled pointer-to-member constants, see menu.cpp)
+    void (DinoUiTopMenuLoop::*mLoopStart)();    // 0x1C
+    u8 unk24[0x2C - 0x24];
+    void (DinoUiTopMenuLoop::*mExchangeEnd_2C)();   // 0x2C
+    u8 unk34[0x4C - 0x34];
     MPoint mItemBottomRight;    // 0x4C
     u8 unk54[0x64 - 0x54];
     MPoint mItem2TopLeft;       // 0x64
@@ -444,7 +455,7 @@ u32 DinoUiTopMenu::GetUnkB4() {
     return mUnkB4;
 }
 
-DinoUiTopMenuLoop::DinoUiTopMenuLoop(u32 arg) : MProcess(NULL), mUnk7C(arg) {
+DinoUiTopMenuLoop::DinoUiTopMenuLoop(int *result) : MProcess(NULL), mResult(result) {
     mState = data_ov004_021720ec.mLoopStart;
 }
 
@@ -456,4 +467,53 @@ extern "C" struct {
 
 DinoUiEnding::DinoUiEnding() : MProcess(NULL) {
     mState = data_ov004_02172eb8.Start_1C;
+}
+
+
+void DinoUiTopMenuLoop::StateStart() {
+    mMode = 0;
+    if (*mResult == 2) {
+        mMode = 1;
+        mState = data_ov004_0217206c.mMultiplay_4C;
+    } else if (*mResult == 3) {
+        mMode = 2;
+        mState = data_ov004_0217206c.mMultiplay_6C;
+    } else {
+        mChoice = 0;
+        mState = data_ov004_0217206c.mTopMenu_2C;
+    }
+}
+
+// (The game calls the constructor defined above.)
+#pragma dont_inline on
+void DinoUiTopMenuLoop::StateTopMenu() {
+    mSerial.AddTail(new DinoUiTopMenu(&mChoice));
+    mState = data_ov004_0217206c.mTopMenuEnd_54;
+}
+#pragma dont_inline reset
+
+void DinoUiTopMenuLoop::StateMultiplay() {
+    mSerial.AddTail(new DinoUiMultiplayLoop(&mMode));
+    mState = data_ov004_0217206c.mMultiplayEnd_44;
+}
+
+void DinoUiTopMenuLoop::StateMultiplayEnd() {
+    switch (mMode) {
+    case 0:
+        mState = data_ov004_021720ec.mTopMenu_14;
+        break;
+    case 1:
+        *mResult = 2;
+        Exit();
+        break;
+    case 2:
+        *mResult = 3;
+        Exit();
+        break;
+    }
+}
+
+void DinoUiTopMenuLoop::StateExchange() {
+    mSerial.AddTail(new DinoUiExchange);
+    mState = data_ov004_021720ec.mExchangeEnd_2C;
 }

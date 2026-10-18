@@ -10,6 +10,7 @@
 
 class DinoUiMultiplayMenu : public DinoHelpBase, public MMenu {
 public:
+    DinoUiMultiplayMenu(int *result);
     virtual ~DinoUiMultiplayMenu();
     virtual void OnStart();
     virtual void OnFocus(MMenuItem *item);

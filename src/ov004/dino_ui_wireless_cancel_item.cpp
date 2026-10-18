@@ -270,7 +270,9 @@ extern "C" struct {
     DinoUiWirelessMatchState state_02167b38;    // 0x54
 } data_ov004_021741d0;
 extern "C" struct {
-    u8 unk00[0x1C];
+    u8 unk00[0xC];
+    DinoUiWirelessMatchState StateStart;        // 0x0C
+    u8 unk14[0x1C - 0x14];
     DinoUiWirelessMatchState StateChildScan;    // 0x1C
 } data_ov004_02174250;
 extern "C" struct {
@@ -397,4 +399,9 @@ void DinoUiChildScanner::OnFocus(MMenuItem *item) {
     } else {
         SetSelectedItem(dynamic_cast<DinoHelpItem *>(item));
     }
+}
+
+DinoUiWirelessMatch::DinoUiWirelessMatch(u32 *result, u8 arg)
+    : MProcess(NULL), mResult(result), mUnk98(arg), mHelpDisabler(NULL) {
+    mState = data_ov004_02174250.StateStart;
 }

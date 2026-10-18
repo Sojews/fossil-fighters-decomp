@@ -1,6 +1,7 @@
 // DinoUiMultiplayLoop.
 // Only the destructors are decompiled so far.
 
+#include "game/dino_ui_wireless_cancel_item_menu.h"
 #include "game/dino_ui_multiplay_loop.h"
 #include "game/help.h"
 #include "m/bg_new_task.h"
@@ -123,4 +124,48 @@ void DinoUiMultiplayMenu::Decide(int choice) {
     MSerialTaskSet *serial = &mSerial;
     serial->AddTail(timer);
     serial->AddTail(exit);
+}
+
+// The TU's pooled pointer-to-member constants (see menu.cpp).
+extern "C" struct {
+    u8 unk00[0x3C];
+    void (DinoUiMultiplayLoop::*Start_3C)();
+    u8 unk44[0x4C - 0x44];
+    void (DinoUiMultiplayLoop::*StateMenu_4C)();
+    u8 unk54[0x64 - 0x54];
+    void (DinoUiMultiplayLoop::*StateMatchEnd_64)();
+} data_ov004_02173b70;
+extern "C" struct {
+    u8 unk00[0x4];
+    void (DinoUiMultiplayLoop::*MenuEnd_04)();
+} data_ov004_02173bf0;
+
+DinoUiMultiplayLoop::DinoUiMultiplayLoop(int *result) : MProcess(NULL), mResult(result) {
+    mState = data_ov004_02173b70.Start_3C;
+}
+
+void DinoUiMultiplayLoop::StateMenu() {
+    mChoice = 0;
+    if (*mResult == 2) {
+        mChoice = 2;
+    }
+    mSerial.AddTail(new DinoUiMultiplayMenu(&mChoice));
+    mState = data_ov004_02173bf0.MenuEnd_04;
+}
+
+void DinoUiMultiplayLoop::StateMatch() {
+    mSerial.AddTail(new DinoUiWirelessMatch(&mMatchResult, mUnk88));
+    mState = data_ov004_02173b70.StateMatchEnd_64;
+}
+
+void DinoUiMultiplayLoop::StateMatchEnd() {
+    switch (mMatchResult) {
+    case 0:
+        mState = data_ov004_02173b70.StateMenu_4C;
+        break;
+    case 1:
+        *mResult = 1;
+        Exit();
+        break;
+    }
 }
