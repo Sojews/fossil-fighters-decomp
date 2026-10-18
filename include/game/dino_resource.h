@@ -201,7 +201,11 @@ struct DinoKasekiDef {
 
     u32 nameText;       // 0x28
 };
-struct DinoSenryuDefs;
+// The senryu (poems) sample's data.
+struct DinoSenryuDefs {
+    u32 unk00;
+    u32 count;          // 0x04
+};
 struct DinoBattleAttackType;
 
 // A file holding one number: how many of something there are.
