@@ -9,6 +9,7 @@ class M3DScene;
 
 class M3DModel {
 public:
+    M3DModel();
     virtual ~M3DModel();
     virtual void Unk08();
     virtual void SetModelData(void *data, BOOL arg);
@@ -25,6 +26,8 @@ public:
     void ReleaseTexture();
     void SetUnk2F4(u16 value);
     BOOL SetFlag100(BOOL on);
+    const MtxFx44 *GetMatrix();
+    BOOL GetJointMatrix(int joint, MtxFx44 *mtx, u8 arg);
 
     M3DScene *mScene;           // 0x04
     u32 mFlags;                 // 0x08
@@ -43,7 +46,7 @@ public:
     VecFx32 mRotation;          // 0x3C: angles, 16 bits each
     VecFx32 mScale;             // 0x48
     u8 unk54[0x70];
-    u32 mUnkC4;                 // 0xC4
+    const MtxFx44 *mUnkC4;      // 0xC4: a matrix to apply
     u32 mTexKey;                // 0xC8
     u32 mPlttKey;               // 0xCC
     u8 mHasTexture;             // 0xD0
@@ -51,6 +54,7 @@ public:
     u32 mUnkDC;                 // 0xDC
     u8 unkE0[0x214];
     u16 mUnk2F4;                // 0x2F4
+    u8 unk2F6[0x32C - 0x2F6];
 };
 
 #endif

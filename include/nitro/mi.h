@@ -9,6 +9,7 @@ extern "C" {
 #endif
 
 void MI_CpuCopy8(const void *src, void *dest, u32 size);
+void MI_Copy64B(const void *pSrc, void *pDest);
 void MIi_CpuCopy16(const void *src, void *dest, u32 size);
 void MIi_CpuCopy32(const void *src, void *dest, u32 size);
 void MIi_CpuCopyFast(const void *src, void *dest, u32 size);

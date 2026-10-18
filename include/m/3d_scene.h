@@ -8,6 +8,7 @@
 
 class M3d;
 class M3DHeap;
+class M3DModel;
 
 class M3DScene : public MTask {
 public:
@@ -31,6 +32,8 @@ public:
     void SetUnk164(u32 a, u32 b);
     void SetUnk80(u32 a, u32 b);
     MTask *CreateEnableTask(u8 enable);
+    void AddModel(M3DModel *model);
+    void RemoveModel(M3DModel *model);
 
     u32 mUnk10;                 // 0x10
     u32 mUnk14;                 // 0x14

@@ -58,6 +58,8 @@ void MTX_ScaleApply22(const MtxFx22 *pSrc, MtxFx22 *pDst, fx32 x, fx32 y);
 void MTX_Identity33_(MtxFx33 *pDst);
 void MTX_ScaleApply33(const MtxFx33 *pSrc, MtxFx33 *pDst, fx32 x, fx32 y, fx32 z);
 void MTX_Concat33(const MtxFx33 *a, const MtxFx33 *b, MtxFx33 *ab);
+void MTX_Identity44_(MtxFx44 *pDst);
+void MTX_Concat44(const MtxFx44 *a, const MtxFx44 *b, MtxFx44 *ab);
 fx32 FX_Mul32x64c(fx32 v32, fx64c v64c);
 fx32 VEC_DotProduct(const VecFx32 *a, const VecFx32 *b);
 void VEC_CrossProduct(const VecFx32 *a, const VecFx32 *b, VecFx32 *axb);
