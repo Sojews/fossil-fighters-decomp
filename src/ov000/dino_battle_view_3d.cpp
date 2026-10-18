@@ -158,3 +158,10 @@ u8 DinoBattleView3D::GetUnk180() {
     }
     return mUnk180;
 }
+
+// A 16-byte-element vector the game emits members of in this file (the element type is unknown).
+struct DinoBattleView3DEntry {
+    u32 unk[4];
+};
+#pragma auto_inline off
+template class std::__vec_deleter<DinoBattleView3DEntry, std::allocator<DinoBattleView3DEntry> >;

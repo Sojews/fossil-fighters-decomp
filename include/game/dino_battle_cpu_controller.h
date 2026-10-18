@@ -28,7 +28,7 @@ struct DinoBattleFileGroup {
 };
 
 // A 16-byte entry of a list the computer player keeps (only its size is known; not mUnk930, whose deleter the
-// destructor shares with main.s vector<void *>).
+// destructor shares with main's vector<void *>).
 struct DinoBattleCpuEntry {
     u32 unk[4];
 };
