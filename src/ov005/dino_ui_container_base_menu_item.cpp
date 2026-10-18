@@ -139,7 +139,9 @@ void DinoUiContainerBaseDecideButton::OnFocusChanged(BOOL focused) {
 struct DinoUiContainerBaseStatics {
     u8 unk00[0x50];
     MPoint mTopLeft;     // 0x50
-    u8 unk58[0x20];
+    u8 unk58[0x10];
+    MPoint mDecidePos;   // 0x68
+    u8 unk70[8];
     MPoint mBottomRight; // 0x78
 };
 extern "C" DinoUiContainerBaseStatics data_ov005_0216c2e8;
@@ -189,6 +191,31 @@ void DinoUiContainerBaseMenu::ClearItems() {
 }
 
 #pragma auto_inline off
+
+void DinoUiContainerBaseMenu::CreateDecideButton(const char *motion, u32 textId) {
+    AddItem(mLinkFrom = new DinoUiContainerBaseDecideButton(this, motion, textId));
+    AddLink(mLinkFrom, 1, NULL);
+    AddLink(mLinkFrom, 3, NULL);
+}
+
+DinoUiContainerBaseDecideButton::DinoUiContainerBaseDecideButton(DinoUiContainerBaseMenu *owner, std::string motion,
+                                                                 u32 textId)
+    : DinoUiContainerBaseMenuItem(owner, motion, data_ov005_0216c2e8.mDecidePos, textId) {
+}
+
+// NONMATCHING: the game reads the owner's oam before copying the motion's name; ours copies first.
+DinoUiContainerBaseMenuItem::DinoUiContainerBaseMenuItem(DinoUiContainerBaseMenu *owner, std::string motion,
+                                                         MPoint pos, u32 textId) {
+    mOwner = owner;
+    mTextId = textId;
+    mMotion = new MMotion(std::string(motion), mOwner->mOam, 2, 1);
+    mMotion->Play(1, 0);
+    mMotion->SetPosition(pos);
+    mMotion->SetPriority(1);
+    mMotion->GetUnit()->SetMode(1);
+    mMotion->Show();
+    mParallel.AddTail(mMotion);
+}
 
 u8 DinoUiContainerBaseMenu::GetFlag(int index) {
     return mFlags[index];

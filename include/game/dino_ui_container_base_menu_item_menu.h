@@ -45,6 +45,7 @@ public:
     void ResetDecideButton();
     void HidePageButtons();
     void AddHelpEntries(u32 backText);
+    void CreateDecideButton(const char *motion, u32 textId);
 
     DinoUi3PartsFraction *mFraction; // 0xB4: "page n/m"
     u8 mFlags[0x40];            // 0xB8
@@ -55,7 +56,8 @@ public:
     u8 unk102[2];
     u32 mUnk104;                // 0x104
     MResource<u8> mDefs;        // 0x108: the definitions the entries are looked up in
-    u32 mUnk118[2];             // 0x118
+    MSmartOam *mOam;            // 0x118
+    u32 mUnk11C;                // 0x11C
     std::vector<void *> mItems; // 0x120: this page's items
     DinoUiContainerBaseMenuItem *mPageL; // 0x12C
     DinoUiContainerBaseMenuItem *mPageR; // 0x130
