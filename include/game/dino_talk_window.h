@@ -34,7 +34,8 @@ public:
     u8 unk98[0x14];
     u32 mUnkAC;         // 0xAC
     u8 mUnkB0;          // 0xB0
-    u8 unkB1[0xCC - 0xB1];
+    MTaskSet *mAnims;   // 0xB4: the window's own animations
+    u8 unkB8[0xCC - 0xB8];
     MFx32 mRate;        // 0xCC
     u8 unkD0[0xF4 - 0xD0];
     u8 mUnkF4;          // 0xF4

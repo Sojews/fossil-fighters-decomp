@@ -6,6 +6,7 @@
 #include "game/dino_talk_window.h"
 #include "m/console.h"
 #include "game/dino_resource.h"
+#include "game/dino_sound.h"
 
 // The text settings in the resource table.
 struct DinoTalkSettings {
@@ -76,4 +77,27 @@ void DinoTalkWindow::SetUnkB0(u8 value) {
 
 u8 DinoTalkWindow::GetUnkB0() {
     return mUnkB0;
+}
+
+// The page is all out (the console waits) and the window is still.
+BOOL DinoTalkWindow::IsPageDone() {
+    BOOL done = mConsole->mState == MTask::STATE_SUSPEND;
+    if (done) {
+        done = mAnims->IsEmpty();
+    }
+    return done;
+}
+
+// Shows the rest of the page at once.
+void DinoTalkWindow::Skip() {
+    DinoSoundPlaySe(0xAF, 0);
+    mConsole->SetSpeed(MFx32(0));
+    if (!mAnims->IsEmpty()) {
+        mConsole->Run();
+        mAnims->Clear();
+    }
+}
+
+BOOL DinoTalkWindow::IsAnimating() {
+    return !mAnims->IsEmpty();
 }
