@@ -16,6 +16,12 @@
 #include "game/dino_resource.h"
 
 class MSmartOam;
+
+// What a child sends the parent (and a parent advertises): the mode and the owner's name.
+struct DinoUiWirelessSsid {
+    u32 mode;
+    u16 name[9];
+};
 class DinoUiWirelessCancelItem;
 class MIndicator;
 
@@ -162,7 +168,7 @@ public:
     BOOL mAnswer;                       // 0xD8: whether to play with it
     u8 mCancelled;                      // 0xDC
     u8 mDisconnected;                   // 0xDD
-    u32 mStartData[6];                  // 0xE0: what the parent sends
+    DinoUiWirelessSsid mStartData;      // 0xE0: what the parent sends
 
     DinoUiWirelessCancel *mCancel;      // 0xF8
 };

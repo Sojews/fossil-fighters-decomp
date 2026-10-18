@@ -338,7 +338,7 @@ extern "C" struct {
     void (DinoUiBattleParentScanner::*StateShowCancel_0C)(); // 0x0c
     void (DinoUiChildScannerBattleConnect::*StateConnecting_14)(); // 0x14
     void (DinoUiCannonParentScanner::*StateCancelled_1C)(); // 0x1c
-    u8 unk24[0x2C - 0x24];
+    void (DinoUiBattleParentScanner::*StateShowCancel_24)(); // 0x24
     void (DinoUiChildScannerCannonConnect::*IgnoreMessage_2C)(MMessage *msg); // 0x2c
     void (DinoUiChildScannerCannonConnect::*OnConnectMessage_34)(MMessage *msg); // 0x34
     u8 unk3C[0x44 - 0x3C];
@@ -398,11 +398,6 @@ static inline void AddSerial(MProcess *process, MTask *a, MTask *b, MTask *c, MT
     serial->AddTail(d);
 }
 
-// What a child sends the parent: its mode and its owner's name.
-struct DinoUiChildSsid {
-    u32 mode;
-    u16 name[9];
-};
 
 void DinoUiWirelessMatch::StateStart() {
     if (MGetResetParameter() == 1) {
@@ -687,7 +682,7 @@ void DinoUiCannonChild::Leave() {
 void DinoUiCannonChild::StateJoin() {
     DinoPlayerData player;
     gDinoBackup->GetPlayer(&player, TRUE);
-    DinoUiChildSsid ssid;
+    DinoUiWirelessSsid ssid;
     ssid.mode = 2;
     MIi_CpuCopy16(player.name, ssid.name, sizeof(ssid.name));
     AddSerial(this, mMultiPlay->CreateStartChildTask(mChoice, (const u8 *)&ssid), mMultiPlay->CreateSynchronizeDelayTask());
@@ -922,6 +917,30 @@ void DinoUiCannonParentScanner::StateWaitChildren() {
         serial->AddTail(closing);
         serial->AddTail(exit);
     }
+}
+
+// Dims the screen and starts being a parent with the owner's name.
+void DinoUiBattleParentScanner::StateStart() {
+    gCurrentDisplay->mBlend->Reset();
+    gCurrentDisplay->mBlend->SetMode(3);
+    MBlend *blend = gCurrentDisplay->mBlend;
+    blend->SetTarget1(data_ov004_02177284->GetPlaneMask());
+    mMultiPlay->AddObserver(this);
+    DinoPlayerData player;
+    gDinoBackup->GetPlayer(&player, TRUE);
+    mStartData.mode = 1;
+    MIi_CpuCopy16(player.name, mStartData.name, sizeof(mStartData.name));
+    MTask *fade = gCurrentDisplay->mBlend->CreateFadeRatioAnime(0, 8, 10, 0);
+    MTask *start = mMultiPlay->CreateStartParentTask(&mStartData, sizeof(mStartData), 0);
+    MSerialTaskSet *starting = new MSerialTaskSet(TRUE);
+    starting->AddTail(start);
+    MParallelTaskSet *opening = new MParallelTaskSet(TRUE);
+    opening->AddTail(starting);
+    opening->AddTail(fade);
+    mSerial.AddTail(opening);
+    mTasks = new MParallelTaskSet;
+    mParallel.AddTail(mTasks);
+    mState = data_ov004_021742d0.StateShowCancel_24;
 }
 
 // Ends the scan and leaves after half a second.
@@ -1186,7 +1205,7 @@ void DinoUiChildScannerBattleConnect::StateConnecting() {
     mUnkE8->AddTail(new DinoCommonWindowMessageWait1(std::string(text), MPoint(0x80, 0x60), 4, TRUE));
     DinoPlayerData player;
     gDinoBackup->GetPlayer(&player, TRUE);
-    DinoUiChildSsid ssid;
+    DinoUiWirelessSsid ssid;
     ssid.mode = 1;
     MIi_CpuCopy16(player.name, ssid.name, sizeof(ssid.name));
     AddSerial(this, gCurrentDisplay->mBlend->CreateFadeRatioAnime(0, 8, 10, 0), mMultiPlay->CreateEndScanTask(),
@@ -1306,7 +1325,7 @@ void DinoUiBattleParentScanner::State02165818() {
         AddSerial(this, mMultiPlay->CreateResetTask(),
                   new DinoCommonWindowMessageBox(MPoint(0x80, 0x60), gDinoResource->GetText(data_0208ab5c), 4),
                   MCreateCallTask(this, data_ov004_02174150.ClearQueue_5C),
-                  mMultiPlay->CreateStartParentTask(mStartData, sizeof(mStartData), 0));
+                  mMultiPlay->CreateStartParentTask(&mStartData, sizeof(mStartData), 0));
         mState = data_ov004_021742d0.StateShowCancel_0C;
         return;
     }
