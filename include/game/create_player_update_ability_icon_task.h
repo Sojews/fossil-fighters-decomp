@@ -196,6 +196,7 @@ public:
     void SetLife(int life);
     void AddLife(int amount, u8 effect);
     void ClearOthersUnk108();
+    void UpdateMarks();
     void ResetUnk108();
     void ChangeUnkB8(u32 value);
     BOOL IsInPinch();

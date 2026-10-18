@@ -602,6 +602,11 @@ void DinoBattleModelCreature::ClearOthersUnk108() {
     }
 }
 
+// (The game keeps this as its own function, which only forwards.)
+void DinoBattleModelCreature::UpdateMarks() {
+    ClearOthersUnk108();
+}
+
 void DinoBattleModelCreature::ResetUnk108() {
     SetUnk108(0);
     if (GetUnkB8() == 0) {
