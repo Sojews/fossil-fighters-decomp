@@ -5,6 +5,7 @@
 #include "game/dino_ui_rv_information3d_model_rotate.h"
 #include "m/bg_new_task.h"
 #include "m/call_task.h"
+#include "game/dino_ui_rv_information.h"
 
 DinoUiRvInformation3DModel::~DinoUiRvInformation3DModel() {
 }
@@ -12,9 +13,23 @@ DinoUiRvInformation3DModel::~DinoUiRvInformation3DModel() {
 DinoUiRvInformation3DModelRotate::~DinoUiRvInformation3DModelRotate() {
 }
 
+void DinoUiRvInformation::SetUnk1B1(u8 value) {
+    mUnk1B1 = value;
+}
+
+void DinoUiRvInformation::SetUnk1AC(u32 value) {
+    mUnk1AC = value;
+}
+
+MTask *DinoUiRvInformation::CreateWaitModelTask() {
+    return MTaskSetWaitEmptyTask::Create(&mModel->mSerial);
+}
+
+void DinoUiRvInformation::Idle() {
+}
+
 // Template task instances the game emits in this file. Until the code that makes the tasks is decompiled, they are
 // instantiated explicitly.
-class DinoUiRvInformation {};
 template class MCallTask0<DinoUiRvInformation, DinoUiRvInformation>;
 template MTask *MCreateCallTask(DinoUiRvInformation *obj, void (DinoUiRvInformation::*func)());
 template class MCallTask1<DinoUiRvInformation, DinoUiRvInformation, u8>;
