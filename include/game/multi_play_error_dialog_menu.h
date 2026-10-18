@@ -19,6 +19,7 @@ public:
     virtual void Idle();
 
     void (DinoMpGame::*mState)(); // 0x74
+    void StateStart();
     void StateFinish();
 
     MMultiPlay *mMultiPlay;     // 0x7C
