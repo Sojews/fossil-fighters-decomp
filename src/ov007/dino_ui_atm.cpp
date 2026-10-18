@@ -16,6 +16,8 @@
 #include "m/bg_new_task.h"
 #include "m/call_task.h"
 #include "m/bright.h"
+#include "m/indicator.h"
+#include "game/dino_ui_parts_team_indicator.h"
 
 DinoUiATMMenu::DinoUiATMMenu(u32 *result, u8 arg1, u32 arg2, u8 arg3) : MMenu(NULL, 0) {
     mUnk108 = arg2;
@@ -45,7 +47,6 @@ void DinoUiATMMenu::OnIdle() {
 
 extern "C" void func_ov007_02172e08(DinoUiATMMenu *menu, int team);
 extern "C" void func_ov007_02173694(DinoUiATMMenu *menu, int team);
-
 void DinoUiATMMenu::OnDecide(MMenuItem *item) {
     for (int i = 0; i < 3; i++) {
         if (item == mTeamButtons[i]) {
@@ -159,7 +160,9 @@ extern "C" struct {
     void (DinoUiATM::*Start_18)();
 } data_ov007_0218cbe0;
 extern "C" struct {
-    u8 unk00[0x48];
+    u8 unk00[0x38];
+    void (DinoUiATMMenu::*ClearTeam_38)();
+    u8 unk40[0x8];
     void (DinoUiATM::*Unk021743b8_48)();
 } data_ov007_0218cb60;
 
@@ -188,3 +191,98 @@ void DinoUiATM::StateMenu() {
     mState = data_ov007_0218cb60.Unk021743b8_48;
 }
 #pragma dont_inline reset
+
+// Shows each team's name, or a blank for an empty team, and marks the current team.
+void DinoUiATMMenu::RefreshTeams() {
+    for (int i = 0; i < 3; i++) {
+        DinoTeam team;
+        gDinoBackup->GetTeam(i + 1, &team);
+        u32 j;
+        int count = 0;
+        for (j = 0; j < 5; j++) {
+            if (team.slots[j] != 0) {
+                count++;
+            }
+        }
+        if (count == 0) {
+            mTeamNames[i]->SetText(std::wstring(L" "));
+            mTeamTexts[i]->SetText(std::string(" "));
+            mEmptyMarks[i]->Show();
+        } else {
+            mTeamNames[i]->SetText(std::wstring((const wchar_t *)team.name));
+            mTeamTexts[i]->SetText(std::wstring((const wchar_t *)team.name));
+            mEmptyMarks[i]->Hide();
+        }
+        if (i + 1 == gDinoBackup->GetUnk34_26()) {
+            mTeamNames[i]->Show();
+            mTeamTexts[i]->Hide();
+        } else {
+            mTeamTexts[i]->Show();
+            mTeamNames[i]->Hide();
+        }
+    }
+}
+
+void DinoUiATMMenu::ExitMoveMode() {
+    DinoUiATMBackButton *back = mBackButton;
+    back->mMotion->Show();
+    back->mMotion2->Hide();
+    back->SetMode(4);
+    RefreshTeams();
+    mUnk11C = 0;
+    LinkTeamButtons();
+}
+
+#pragma dont_inline on
+void DinoUiATMMenu::Unk02173d08() {
+    if (mUnk114 == 1) {
+        mUnkFC->Hide();
+        MTask *clear = MCreateCallTask(this, data_ov007_0218cb60.ClearTeam_38);
+        DinoUiATMTeamButton *button = mTeamButtons[(int)mUnk118 - 1];
+        button->mMotion->Play(3, 0);
+        MTask *wait = button->mMotion->CreateWaitStopTask();
+        MSerialTaskSet *serial = &mSerial;
+        serial->AddTail(wait);
+        serial->AddTail(clear);
+    }
+}
+#pragma dont_inline reset
+
+extern "C" void func_ov003_0215a4ec(u32 obj, u32 team);
+
+void DinoUiATMMenu::ClearTeam() {
+    DinoTeam team;
+    gDinoBackup->GetTeam(mUnk118, &team);
+    team.name[0] = 0;
+    team.slots[0] = 0;
+    team.slots[1] = 0;
+    team.slots[2] = 0;
+    team.slots[3] = 0;
+    team.slots[4] = 0;
+    gDinoBackup->SetTeam(mUnk118, &team);
+    func_ov003_0215a4ec(mUnk108, mUnk118);
+    RefreshTeams();
+}
+
+void DinoUiATMMenu::LinkTeamButtons() {
+    for (int i = 0; i < 3; i++) {
+        mTeamButtons[i]->Enable();
+        if (mUnk120 == i + 1) {
+            DinoUiATMTeamButton *button = mTeamButtons[i];
+            button->mMotion->Play(1, 0);
+            button->mMotion->Show();
+        } else {
+            DinoUiATMTeamButton *button = mTeamButtons[i];
+            button->mMotion->Play(1, 0);
+            button->mMotion->Hide();
+        }
+    }
+    RemoveLink(mBackButton, 4);
+    AddLink(mBackButton, 4, mTeamButtons[2]);
+    RemoveLink(mBackButton, 2);
+    AddLink(mBackButton, 2, mTeamButtons[0]);
+    RemoveLink(mTeamButtons[1], 4);
+    AddLink(mTeamButtons[1], 4, mTeamButtons[0]);
+    RemoveLink(mTeamButtons[2], 4);
+    AddLink(mTeamButtons[2], 4, mTeamButtons[1]);
+}
