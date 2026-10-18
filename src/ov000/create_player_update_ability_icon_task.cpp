@@ -1214,3 +1214,9 @@ MFx32 DinoBattleModelCreature::CalcDamage(DinoBattleModelCreature *target, MFx32
         return attack * defense / MFx32(gDinoResource->GetBattleAdjustDefs()->unk10);
     }
 }
+
+// A random damage factor between the minimum and maximum.
+MFx32 DinoBattleModelCreature::RandomDamageFactor() {
+    const MFx32 min = gDinoResource->GetBattleAdjustDefs()->randomMin;
+    return min + (MFx32(gDinoResource->GetBattleAdjustDefs()->randomMax) - min) * RandomFraction();
+}
