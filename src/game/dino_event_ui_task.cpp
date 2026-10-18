@@ -219,3 +219,7 @@ MTask *DinoEventMedalList::CreateUi() {
     }
     return ui;
 }
+
+#pragma auto_inline off
+// Vector instances the game emits in this file (made explicitly until the code that uses them is decompiled).
+template class std::__vec_deleter<u32, std::allocator<u32> >;
