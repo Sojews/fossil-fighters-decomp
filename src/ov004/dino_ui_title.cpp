@@ -343,3 +343,38 @@ void DinoUiTitle::LoadBackup() {
     gDinoBackup->Load();
     gDinoBackup->WriteHeader();
 }
+
+// Leaves for a wireless battle.
+void DinoUiTitle::StateWirelessBattle() {
+    *mResult = 5;
+    MTask *fadeTop;
+    MTask *fadeBottom;
+    MTask *exit;
+    exit = MTaskExitTransfer::Create(this);
+    fadeBottom = gLcd->GetBottomDisplay()->mBright->CreateFadeOutToWhite(60, 0);
+    fadeTop = gLcd->GetTopDisplay()->mBright->CreateFadeOutToWhite(60, 0);
+    MParallelTaskSet *fades = new MParallelTaskSet(TRUE);
+    fades->AddTail(fadeTop);
+    fades->AddTail(fadeBottom);
+    MTaskSet &serial = mSerial;
+    serial.AddTail(fades);
+    serial.AddTail(exit);
+}
+
+// Leaves for the ATM (the download play).
+void DinoUiTitle::StateATM() {
+    *mResult = 6;
+    DinoSoundStopBgm(-1, 60);
+    MTask *fadeTop;
+    MTask *fadeBottom;
+    MTask *exit;
+    exit = MTaskExitTransfer::Create(this);
+    fadeBottom = gLcd->GetBottomDisplay()->mBright->CreateFadeOutToBlack(60, 0);
+    fadeTop = gLcd->GetTopDisplay()->mBright->CreateFadeOutToBlack(60, 0);
+    MParallelTaskSet *fades = new MParallelTaskSet(TRUE);
+    fades->AddTail(fadeTop);
+    fades->AddTail(fadeBottom);
+    MTaskSet &serial = mSerial;
+    serial.AddTail(fades);
+    serial.AddTail(exit);
+}

@@ -16,6 +16,8 @@ public:
 
     void StateStart();
     void StateEnd();
+    void StateWirelessBattle();
+    void StateATM();
     void ResetBackup();
     void LoadBackup();
     void StateWarning();
