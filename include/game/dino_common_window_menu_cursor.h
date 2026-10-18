@@ -3,9 +3,13 @@
 
 #include "m/view.h"
 
+class MMotion;
+class MSmartOam;
+
 // The cursor of a window's menu: one view kept on a frame.
 class DinoCommonWindowMenuCursor : public MView {
 public:
+    DinoCommonWindowMenuCursor(MSmartOam *oam);
     virtual ~DinoCommonWindowMenuCursor();
     virtual void Execute();
     virtual void SetPosition(MPoint pos);
@@ -19,7 +23,7 @@ public:
     virtual BOOL IsHidden();
     virtual u32 GetPlaneMask();
 
-    MView *mUnk10;  // 0x10
+    MMotion *mUnk10;    // 0x10
     MRect mFrame;   // 0x14
 };
 

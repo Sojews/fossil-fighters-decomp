@@ -10,6 +10,53 @@
 #include "game/dino_common_window_menu_cursor.h"
 #include "m/bg_new_task.h"
 #include "m/call_task.h"
+#include "m/motion.h"
+
+static const char *sCursorMotions[] = {NULL, "/motion/ui_cursor/shovel.bin"};
+
+DinoCommonWindowMenuCursor::DinoCommonWindowMenuCursor(MSmartOam *oam) {
+    mFrame.left = 0;
+    mFrame.top = 0;
+    mFrame.right = 0;
+    mFrame.bottom = 0;
+    mUnk10 = new MMotion(sCursorMotions[1], oam, 0, 1);
+    mUnk10->Play(3, 0);
+    mUnk10->GetUnit()->SetMode(1);
+}
+
+DinoCommonWindowMenu::DinoCommonWindowMenu(void *unkE4, MPoint pos, const std::vector<DinoWindowChoice> *choices,
+                                           u32 unkFC)
+    : MMenu(0), mUnkE4(unkE4), mPos(pos), mUnkFC(unkFC) {
+    Disable();
+    if (choices != NULL) {
+        mChoices = *choices;
+    }
+}
+
+DinoCommonWindowMenu::DinoCommonWindowMenu(MDisplay *display, void *unkE4, MPoint pos,
+                                           const std::vector<DinoWindowChoice> *choices, u32 unkFC)
+    : MMenu(display, NULL, 0), mUnkE4(unkE4), mPos(pos), mUnkFC(unkFC) {
+    Disable();
+    if (choices != NULL) {
+        mChoices = *choices;
+    }
+}
+
+void DinoCommonWindowMenu::AddChoice(u32 id, const std::string &a, const std::string &b) {
+    DinoWindowChoice choice;
+    choice.unk00 = id;
+    choice.unk04 = a;
+    choice.unk10 = b;
+    mChoices.push_back(choice);
+}
+
+void DinoCommonWindowMenu::AddEntry(u32 id, MRect rect, const std::string &text) {
+    DinoCommonWindowMenuEntry entry;
+    entry.id = id;
+    entry.rect = rect;
+    entry.text = text;
+    mEntries.push_back(entry);
+}
 
 DinoCommonWindowMenuItemFlushTask::~DinoCommonWindowMenuItemFlushTask() {
 }

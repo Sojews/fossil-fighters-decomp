@@ -157,9 +157,6 @@ src/m/anm_model.cpp:
 src/game/dino_3d_load_csv.cpp:
     .text       start:0x0202a7f0 end:0x0202d67c
 
-src/game/dino_common_window_menu_cursor.cpp:
-    .text       start:0x0202d67c end:0x0202d9ac
-
 src/m/memory.c:
     .text       start:0x0204b338 end:0x0204b3a0
     .itcm       start:0x01ff8588 end:0x01ff8db8
@@ -254,7 +251,7 @@ src/game/m3d_scene_enable_task.cpp:
     .text       start:0x02023024 end:0x020230bc
 
 src/game/dino_common_window_menu_item_flush_task.cpp:
-    .text       start:0x0202d9ac end:0x0202f204
+    .text       start:0x0202d67c end:0x0202f204
 
 src/game/dino_common_window_console_filter.cpp:
     .text       start:0x0202f204 end:0x0203047c
