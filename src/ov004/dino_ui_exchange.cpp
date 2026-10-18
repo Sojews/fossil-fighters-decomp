@@ -84,6 +84,11 @@ extern "C" struct {
     void (DinoUiExchange::*OnScanMessage_24)(MMessage *msg); // 0x24
     u8 unk2C[0x3C - 0x2C];
     void (DinoUiExchange::*StateAsk_3C)(); // 0x3c
+    u8 unk44[0x4C - 0x44];
+    void (DinoUiExchange::*StateQuit_4C)(); // 0x4c
+    void (DinoUiExchange::*StateRestart_54)(); // 0x54
+    u8 unk5C[0x7C - 0x5C];
+    void (DinoUiExchange::*StateCancelled_7C)(); // 0x7c (its second word is in the next block)
 } data_ov004_02171de0;
 extern "C" struct {
     u8 unk00[0x2C];
@@ -95,8 +100,13 @@ extern "C" struct {
     void (DinoUiExchange::*StateCheck_54)(); // 0x54
     u8 unk5C[0x6C - 0x5C];
     void (DinoUiExchange::*StateStart_6C)(); // 0x6c
-    void (DinoUiExchange::*State02156484_74)(); // 0x74
+    void (DinoUiExchange::*StateSearch_74)(); // 0x74
+    void (DinoUiExchange::*StateFinish_7C)(); // 0x7c (its second word is in the next block)
 } data_ov004_02171e60;
+extern "C" struct {
+    u8 unk00[0xC];
+    void (DinoUiExchange::*StateLeave_0C)(); // 0x0c
+} data_ov004_02171ee0;
 
 DinoUiExchange::DinoUiExchange() : MProcess(NULL) {
     mState = data_ov004_02171e60.StateStart_6C;
@@ -152,8 +162,55 @@ void DinoUiExchange::StateRestart() {
                                                          data_ov004_02171e60.mMessagePos, 4, 0),
                         mCancel = new DinoUiWirelessCancel(&mCancelled));
     }
-    mState = data_ov004_02171e60.State02156484_74;
+    mState = data_ov004_02171e60.StateSearch_74;
     mOnMessage = data_ov004_02171de0.OnScanMessage_24;
+}
+
+// Searches until a partner turns up; restarts as the other side every so often, and on failure.
+void DinoUiExchange::StateSearch() {
+    if (mMultiPlay->IsFailed()) {
+        mSerial.AddTail(mMultiPlay->CreateResetTask());
+        Start();
+        return;
+    }
+    if (mCancelled) {
+        mSerial.AddTail(mCancel->CreateCloseTask());
+        Reset();
+        mState = data_ov004_02171de0.StateCancelled_7C;
+        return;
+    }
+    mUnkE4--;
+    if (mUnkE4 == 0) {
+        Reset();
+        Start();
+    } else {
+        Dispatch();
+    }
+}
+
+extern const u32 data_0208ab40, data_0208ad4c, data_0208ad50;
+
+// Cancelled: asks whether to stop exchanging.
+void DinoUiExchange::StateCancelled() {
+    mTasks->Clear();
+    mAnswer = TRUE;
+    DinoCommonWindowYesNoDialog *dialog = new DinoCommonWindowYesNoDialog(gDinoResource->GetText(data_0208ab40), &mAnswer);
+    dialog->SetLabels2(gDinoResource->GetText(data_0208ad50), gDinoResource->GetText(data_0208ad4c));
+    mSerial.AddTail(dialog);
+    mState = data_ov004_02171de0.StateQuit_4C;
+}
+
+void DinoUiExchange::StateQuit() {
+    if (mAnswer == TRUE) {
+        mState = data_ov004_02171ee0.StateLeave_0C;
+    } else {
+        mState = data_ov004_02171de0.StateRestart_54;
+    }
+}
+
+void DinoUiExchange::StateLeave() {
+    mSerial.AddTail(mMultiPlay->CreateFinishTask());
+    mState = data_ov004_02171e60.StateFinish_7C;
 }
 
 void DinoUiExchange::StateWait() {

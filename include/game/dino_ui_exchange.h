@@ -53,7 +53,11 @@ public:
     void StateAsk();
     void StateWait();
     void StateRestart();
-    void State02156484();
+    void StateSearch();
+    void StateCancelled();
+    void StateQuit();
+    void StateLeave();
+    void StateFinish();
     void OnScanMessage(MMessage *msg);
     void Unk02155f24();
     // Sets when the next exchange may happen.
