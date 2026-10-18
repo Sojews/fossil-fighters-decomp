@@ -115,12 +115,18 @@ void DinoBattleViewUiSelectAreaCommon::OnDecide(MMenuItem *item) {
     Exit();
 }
 
-extern "C" void func_ov000_02177804(DinoBattleViewUiRootMenuItem *item, ...);
 extern "C" void func_ov000_02177590(void *owner, DinoBattleViewUiRootMenuItem *item, int arg2, int arg3);
 
 void DinoBattleViewUiRootMenuItem::OnSelectChanged(BOOL selected) {
-    func_ov000_02177804(this, selected);
+    Refresh();
 }
+
+#pragma auto_inline off
+
+void DinoBattleViewUiRootMenuItem::Refresh() {
+}
+
+#pragma auto_inline on
 
 MRect DinoFrameItem::GetFrame() {
     return mFrame;
@@ -146,7 +152,7 @@ void DinoBattleViewUiRootMenuItem::OnFocusChanged(BOOL focused) {
     if (focused) {
         func_ov000_02177590(mOwner, this, 8, -2);
     }
-    func_ov000_02177804(this);
+    Refresh();
 }
 
 extern "C" DinoBattleViewCreature *func_ov000_02177644(DinoBattleViewUiAttackerMenu *menu);

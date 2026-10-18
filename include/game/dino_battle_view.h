@@ -22,6 +22,7 @@ public:
     virtual void OnDecide();
     virtual u32 GetUnk4();  // from the item's row of the root menu table
     virtual u32 GetUnk0();
+    void Refresh();     // (empty in the game)
 
     u32 mIndex;     // 0x88: the row
     u32 unk8C[2];
