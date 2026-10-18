@@ -12,8 +12,11 @@ class DinoBattleViewPlayer;
 class DinoBattleViewCreature;
 class MSmartOam;
 
-struct DinoBattleViewUnkE0 {
-    u8 unk00[0x140];
+class DinoBattleViewUnkE0 : public MProcess, public MMessageObserver {
+public:
+    u8 unkA8[0x138 - 0xA8];
+    void *mUnk138;  // 0x138
+    u8 unk13C[4];
     void *mUnk140;  // 0x140
 };
 

@@ -2721,6 +2721,9 @@ public:
 class DinoBattleViewLiveMessageSignal : public MMessage {
 public:
     DinoBattleViewLiveMessageSignal();
+    DinoBattleViewLiveMessageSignal(u32 id) : MMessage(0x1008D) {
+        mUnk0C = id;
+    }
     virtual u32 GetSize() { return 8; }
     virtual void Write(void *buf) {
         MI_CpuCopy8(&mId, buf, 4);
