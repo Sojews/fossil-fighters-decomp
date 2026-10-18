@@ -65,8 +65,12 @@ public:
     virtual ~DinoBattleViewGivingUpMenu();
     virtual void Idle();
 
-    u8 unk74[0x4];
+    void StateDone();
+
+    MMessageObserver *mView;    // 0x74
     void (DinoBattleViewGivingUpMenu::*mState)(); // 0x78
+    u8 mGaveUp;                 // 0x80
+    u8 *mResult;                // 0x84
 };
 
 class MotionDisableHelp : public MMotion, public DinoHelpBase {

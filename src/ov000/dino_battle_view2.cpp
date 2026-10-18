@@ -7,6 +7,7 @@
 #include "m/obj.h"
 #include "game/dino_sound.h"
 #include "game/dino_battle_view2.h"
+#include "game/dino_message.h"
 #include "types.h"
 #include "game/dino_battle_view_class.h"
 #include "m/smart_oam.h"
@@ -82,6 +83,20 @@ const char *DinoBattleViewUiRootSelectItem::GetText() {
 
 void DinoBattleViewGivingUpMenu::Idle() {
     (this->*mState)();
+}
+
+// After the dialog: if the player gave up, tells the root menu (5) and exits.
+void DinoBattleViewGivingUpMenu::StateDone() {
+    if (mGaveUp) {
+        *mResult = TRUE;
+        MTask *exit = MTaskExitTransfer::Create(this);
+        MTask *post = mView->CreatePostTask(new DinoBattleViewUiRootMenuResult(5, 0, 0));
+        MSerialTaskSet *serial = &mSerial;
+        serial->AddTail(post);
+        serial->AddTail(exit);
+    } else {
+        Exit();
+    }
 }
 
 
