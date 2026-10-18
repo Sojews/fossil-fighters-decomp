@@ -35,6 +35,7 @@ public:
     virtual void OnStart();
     virtual void OnFocus(MMenuItem *item);
     virtual void OnDecide(MMenuItem *item);
+    void Nop();     // (empty in the game)
 
     u32 unkA8[2];
     u32 mUnkB0;     // 0xB0: player index

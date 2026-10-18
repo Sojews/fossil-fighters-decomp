@@ -162,3 +162,8 @@ void DinoBattleViewUiAttackerMenu::OnBlur(MMenuItem *item) {
         func_ov000_02177644(this)->ClearFlag144(1);
     }
 }
+
+#pragma auto_inline off
+
+void DinoBattleViewUiSelectAreaCommon::Nop() {
+}
