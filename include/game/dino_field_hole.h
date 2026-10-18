@@ -22,6 +22,9 @@ public:
     void SetUnk114();
     MPoint GetPos();
     void ChangeToHole();
+    void StartChangeToHole();
+    void StateWait();
+    void StateCountdown();
 
     void (DinoFieldHole::*mState)();    // 0x74
     u32 mUnk7C;                         // 0x7C
@@ -33,6 +36,7 @@ public:
     u8 unkF8[0x110 - 0xF8];
     u8 mUnk110;                         // 0x110
     u32 mUnk114;                        // 0x114
+    u8 mUnk118;                         // 0x118
 };
 
 #endif

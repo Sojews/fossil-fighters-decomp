@@ -44,3 +44,32 @@ void DinoFieldHole::ChangeToHole() {
     serial->AddTail(timer);
     serial->AddTail(exit);
 }
+
+// The TU's pooled pointer-to-member constants (see menu.cpp).
+extern "C" struct {
+    u8 unk00[0x4];
+    void (DinoFieldHole::*ChangeToHole_04)();
+    u8 unk0C[0x14 - 0xC];
+    void (DinoFieldHole::*ChangeToHole_14)();
+    u8 unk1C[0x24 - 0x1C];
+    void (DinoFieldHole::*Unk0215c418_24)();
+} data_ov001_02169ddc;
+
+void DinoFieldHole::StartChangeToHole() {
+    mState = data_ov001_02169ddc.ChangeToHole_14;
+}
+
+void DinoFieldHole::StateWait() {
+    mSerial.AddTail(new MTimer(30));
+    mState = data_ov001_02169ddc.Unk0215c418_24;
+}
+
+void DinoFieldHole::StateCountdown() {
+    if (!mUnk118) {
+        mUnk114--;
+        if (mUnk114 == 0) {
+            mUnk110 = 0;
+            mState = data_ov001_02169ddc.ChangeToHole_04;
+        }
+    }
+}
