@@ -9,6 +9,7 @@
 #include "m/bg_new_task.h"
 #include "m/display.h"
 #include "m/obj.h"
+#include "m/smart_oam.h"
 #include "m/call_task.h"
 #include "game/dino_backup.h"
 #include "game/dino_resource.h"
@@ -26,6 +27,15 @@ template class MCallTask1<DinoFieldRadar, DinoFieldRadar, bool>;
 template MTask *MCreateCallTask(DinoFieldRadar *obj, void (DinoFieldRadar::*func)(bool), bool a0);
 
 #pragma auto_inline off
+
+// NONMATCHING: the game keeps more MFx32 temporaries on the stack (stack layout and scheduling differ).
+void DinoFieldRadar::SetPlayer(MFx32Point pos, u16 angle, MFx32 height) {
+    mPlayerPos = pos;
+    mPlayerAngle = angle;
+    mPlayerHeight = height;
+    MFx32Point p(pos.x * mScale, pos.y * mScale);
+    mOam->SetOffset(MPoint(MFx32ToInt(p.x) - 128, MFx32ToInt(p.y) - 96));
+}
 
 void DinoFieldRadarManager::Idle() {
     if (mRadar) {

@@ -19,6 +19,7 @@
 struct DinoCharaTask;
 class DinoField;
 class MTextPicture;
+class MSmartOam;
 class MDisplay;
 
 class DinoFieldNamePanel {
@@ -126,12 +127,18 @@ public:
     MTask *CreateModeTask(u32 from, u32 to, u32 a, u8 b);
     void SetPlayer(MFx32Point pos, u16 angle, MFx32 height);
 
-    u32 mUnk74[11];             // 0x74
+    u32 mUnk74[3];              // 0x74
+    MSmartOam *mOam;            // 0x80
+    u32 mUnk84[7];              // 0x84
     MAfnBlock *mAffine;         // 0xA0
-    u8 unkA4[0x4E8];
+    u8 unkA4[0x56C - 0xA4];
+    MFx32 mScale;               // 0x56C: map units to radar pixels
+    u8 unk570[0x58C - 0x570];
     std::vector<short> mUnk58C; // 0x58C: (the element type is a guess, distinct from other overlays')
     MFx32Point mPlayerPos;      // 0x598
-    u32 unk5A0[3];
+    u16 mPlayerAngle;           // 0x5A0
+    MFx32 mPlayerHeight;        // 0x5A4
+    u32 unk5A8;
 };
 
 
