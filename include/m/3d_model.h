@@ -6,6 +6,7 @@
 #include "nitro/fx.h"
 
 class M3DScene;
+class M3DGrid;
 
 class M3DModel {
 public:
@@ -17,6 +18,8 @@ public:
     virtual int GetFrameCount();
     virtual BOOL IsAnimDone();
 
+    fx32 GetGroundHeight(fx32 x, fx32 z);
+    BOOL IsOnGround(fx32 x, fx32 z, fx32 *height);
     void SetPolygonId(int id);
     void SetUnk1C(u32 value);
     void SetScale(const VecFx32 *scale);
@@ -55,7 +58,9 @@ public:
     u8 mHasTexture;             // 0xD0
     u32 unkD4[2];
     u32 mUnkDC;                 // 0xDC
-    u8 unkE0[0x214];
+    u8 unkE0[0x2E4 - 0xE0];
+    M3DGrid *mGrid;             // 0x2E4: the ground, if the model has one
+    u32 unk2E8[3];
     u16 mUnk2F4;                // 0x2F4
     u8 unk2F6[0x32C - 0x2F6];
 };

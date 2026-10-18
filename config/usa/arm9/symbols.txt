@@ -2146,8 +2146,8 @@ _ZN8M3DModel14GetJointMatrixEiP7MtxFx44h kind:function(thumb,size=0xa6) addr:0x0
 func_02022bc8 kind:function(thumb,size=0xfc) addr:0x02022bc8
 func_02022cc4 kind:function(thumb,size=0x26) addr:0x02022cc4
 func_02022cec kind:function(thumb,size=0xc8) addr:0x02022cec
-func_02022db4 kind:function(thumb,size=0x16) addr:0x02022db4
-func_02022dcc kind:function(thumb,size=0x16) addr:0x02022dcc
+_ZN8M3DModel15GetGroundHeightEll kind:function(thumb,size=0x16) addr:0x02022db4
+_ZN8M3DModel10IsOnGroundEllPl kind:function(thumb,size=0x16) addr:0x02022dcc
 _ZN8M3DModel10SetFlag100Ei kind:function(thumb,size=0x38) addr:0x02022de4
 _ZN9M3DRyusenD1Ev kind:function(thumb,size=0xc) addr:0x02022e1c
 _ZN9M3DRyusenD0Ev kind:function(thumb,size=0x12) addr:0x02022e28
@@ -2170,8 +2170,8 @@ func_02023160 kind:function(thumb,size=0xd98) addr:0x02023160
 .L_020231ce kind:label(thumb) addr:0x020231ce
 .L_020231d2 kind:label(thumb) addr:0x020231d2
 .L_02023e86 kind:label(thumb) addr:0x02023e86 local
-func_02023ef8 kind:function(thumb,size=0x2f8) addr:0x02023ef8
-func_020241f0 kind:function(thumb,size=0x24e) addr:0x020241f0
+_ZN7M3DGrid9GetHeightEll kind:function(thumb,size=0x2f8) addr:0x02023ef8
+_ZN7M3DGrid10IsOnGroundEllPl kind:function(thumb,size=0x24e) addr:0x020241f0
 _ZNSt13__vec_deleterItSaItEE13sub_push_backERKtN10Metrowerks8int2typeILi1EEE kind:function(thumb,size=0x1e) addr:0x02024440
 _ZNSt13__vec_deleterItSaItEED2Ev kind:function(thumb,size=0x26) addr:0x02024460 local
 _ZNSt13__vec_deleterI8M3DVec16SaIS0_EE13sub_push_backERKS0_N10Metrowerks8int2typeILi1EEE kind:function(thumb,size=0x1e) addr:0x02024488

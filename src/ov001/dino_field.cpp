@@ -305,15 +305,15 @@ MFx32Point DinoField::ResolveMove(DinoFieldChara *chara, MFx32Point move) {
 
 #pragma dont_inline reset
 
-BOOL DinoField::IsWalkable(fx32 x, fx32 y) {
+BOOL DinoField::IsWalkable(fx32 x, fx32 y, fx32 *height) {
     if (mMap != NULL) {
-        return mMap->IsWalkable(x, y);
+        return mMap->IsWalkable(x, y, height);
     }
     return FALSE;
 }
 
 BOOL DinoField::IsWalkable(MFx32Point pos, fx32 *height) {
-    return IsWalkable(pos.x.v, pos.y.v);
+    return IsWalkable(pos.x.v, pos.y.v, height);
 }
 
 fx32 DinoField::GetGroundHeight(fx32 x, fx32 y) {

@@ -2,6 +2,7 @@
 // Only the small functions are decompiled so far.
 
 #include "m/3d_model.h"
+#include "m/3d_resource.h"
 #include "m/3d_scene.h"
 
 void M3DModel::SetPolygonId(int id) {
@@ -79,4 +80,18 @@ BOOL M3DModel::SetFlag100(BOOL on) {
         mFlags |= 0x100;
     }
     return old;
+}
+
+fx32 M3DModel::GetGroundHeight(fx32 x, fx32 z) {
+    if (mGrid == NULL) {
+        return 0;
+    }
+    return mGrid->GetHeight(x, z);
+}
+
+BOOL M3DModel::IsOnGround(fx32 x, fx32 z, fx32 *height) {
+    if (mGrid == NULL) {
+        return FALSE;
+    }
+    return mGrid->IsOnGround(x, z, height);
 }

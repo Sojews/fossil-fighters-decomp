@@ -252,7 +252,7 @@ public:
 
     DinoFieldMapInfo *GetInfo();
     fx32 GetGroundHeight(fx32 x, fx32 y);
-    BOOL IsWalkable(fx32 x, fx32 y);
+    BOOL IsWalkable(fx32 x, fx32 y, fx32 *height);
     void Load();
     MFx32 GetWalkSpeed();
     void ClearGradation();
@@ -268,7 +268,7 @@ public:
     MArchivePtr mArchive3;  // 0xB4
     MArchiveFile mFile3;    // 0xB8
     void *mUnkC4;           // 0xC4
-    void *mUnkC8;           // 0xC8
+    MAnmModelBase *mModel;  // 0xC8: the map's model
     DinoGradationBg *mGradation;    // 0xCC
 };
 
@@ -279,7 +279,7 @@ public:
     virtual ~DinoField();
     void CreateEffects(MPolygonChar **effects, u32 count, u32 id);
     fx32 GetGroundHeight(fx32 x, fx32 y);
-    BOOL IsWalkable(fx32 x, fx32 y);
+    BOOL IsWalkable(fx32 x, fx32 y, fx32 *height);
     BOOL IsWalkable(MFx32Point pos, fx32 *height);
     // Where the character ends up moving by move: pushed out of the other characters (and, on the map in the
     // field defs, the kaseki rocks), then stopped or slid along walls.

@@ -1,6 +1,8 @@
 // DinoFieldMap.
 // Only the destructor and GetInfo are decompiled so far.
 
+#include "m/anm_model.h"
+#include "m/3d_model.h"
 #include "game/dino_field.h"
 #include "game/dino_gradation_bg.h"
 
@@ -17,6 +19,20 @@ void DinoFieldMap::Idle() {
 void DinoFieldMap::Read(const void *buf) {
     MSerializer::Read(buf);
     Load();
+}
+
+fx32 DinoFieldMap::GetGroundHeight(fx32 x, fx32 y) {
+    if (mModel != NULL) {
+        return mModel->mModel->GetGroundHeight(x, y);
+    }
+    return 0;
+}
+
+BOOL DinoFieldMap::IsWalkable(fx32 x, fx32 y, fx32 *height) {
+    if (mModel != NULL) {
+        return mModel->mModel->IsOnGround(x, y, height);
+    }
+    return TRUE;
 }
 
 MFx32 DinoFieldMap::GetWalkSpeed() {
