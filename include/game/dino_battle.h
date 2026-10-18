@@ -37,6 +37,8 @@ public:
     MMessageObserver *GetUnk200();
     void SetUnk1DC(u8 value);
     void SetUnk1E0(u8 value);
+    void StateSetupDisplays();
+    void State0215a540();
 
     u32 mUnk74[12];             // 0x74
     DinoBattleSide mSides[2];   // 0xA4

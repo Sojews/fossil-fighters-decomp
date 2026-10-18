@@ -3,6 +3,8 @@
 
 #include "game/battle_select.h"
 #include "game/dino_battle.h"
+#include "m/obj.h"
+#include "m/bg.h"
 #include "m/soft_reset.h"
 #include "m/input.h"
 #include "m/smart_oam.h"
@@ -75,6 +77,8 @@ extern "C" struct {
     void (DinoBattleAutoDemo::*StateWatch_38)(); // 0x38
     void (DinoBattleAutoDemo::*StateEnd_40)(); // 0x40
     void (DinoBattleAutoDemo::*StateEnd_48)(); // 0x48
+    u8 unk50[0x68 - 0x50];
+    void (DinoBattle::*State0215a540_68)(); // 0x68
 } data_ov000_021911ac;
 extern "C" struct {
     u8 unk00[0x10];
@@ -191,4 +195,21 @@ void DinoBattleAutoDemo::StateEnd() {
 // Restarts the game, telling the title screen the demo ran.
 void DinoBattleAutoDemo::StateFadeOut() {
     MSoftReset((u32)mResult + 2);
+}
+
+// Sets both screens up for the battle, the touch screen at the bottom.
+void DinoBattle::StateSetupDisplays() {
+    gLcd->mMain->ResetHooks();
+    gLcd->mSub->ResetHooks();
+    gLcd->mMain->Setup(1, 3, 2, 1);
+    gLcd->mSub->Setup(5, 2, 4, 1, 0, 0);
+    gLcd->VSyncNow();
+    gLcd->mMain->mBg->SetBg0Reserved(1);
+    gLcd->mMain->SetBackdrop(0x8000);
+    gLcd->mSub->SetBackdrop(0x8000);
+    gLcd->mMain->mObj->Show();
+    gLcd->mSub->mObj->Show();
+    gLcd->SetBottomDisplay(gLcd->mSub);
+    SetDisplay(gCurrentDisplay = gLcd->GetBottomDisplay());
+    mState = data_ov000_021911ac.State0215a540_68;
 }
