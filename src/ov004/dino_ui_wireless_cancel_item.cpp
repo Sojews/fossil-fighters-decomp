@@ -308,7 +308,7 @@ extern "C" struct {
 } data_ov004_02174150;
 extern "C" struct {
     u8 unk00[0x4];
-    void (DinoUiChildScannerBattleConnect::*Unk02163cdc_04)(); // 0x04
+    void (DinoUiChildScannerBattleConnect::*StateFailed_04)(); // 0x04
     void (DinoUiCannonParentScanner::*OnCountMessage_0C)(MMessage *msg); // 0x0c
     void (DinoUiChildScannerCannonConnect::*StateChoose_14)(); // 0x14
     MPoint mParentNameOffset; // 0x1c
@@ -372,7 +372,7 @@ extern "C" struct {
     void (DinoUiChildScannerBattleConnect::*StateChoose_24)(); // 0x24
     DinoUiWirelessMatchState StateKeep; // 0x2c
     void (DinoUiCannonParentScanner::*StateReceived_34)(); // 0x34
-    u8 unk3C[0x44 - 0x3C];
+    void (DinoUiChildScannerBattleConnect::*StateRescan_3C)(); // 0x3c
     void (DinoUiCannonChild::*StateSendRocks_44)(); // 0x44
     void (DinoUiCannonParentScanner::*StateShowCancel_4C)(); // 0x4c
     void (DinoUiCannonChild::*Child021674f8_54)(); // 0x54
@@ -1617,9 +1617,19 @@ void DinoUiCannonChild::StateShot() {
     }
 }
 
+extern const u32 data_0208ab80;
+
+// The connection failed: says so, then scans again.
+void DinoUiChildScannerBattleConnect::StateFailed() {
+    mUnkE8->Clear();
+    MTask *box = new DinoCommonWindowMessageBox(MPoint(0x80, 0x60), gDinoResource->GetText(data_0208ab80), 4);
+    mSerial.AddTail(box);
+    mState = data_ov004_02174350.StateRescan_3C;
+}
+
 void DinoUiChildScannerBattleConnect::StateCancel() {
     if (mMultiPlay->IsFailed()) {
-        mState = data_ov004_021741d0.Unk02163cdc_04;
+        mState = data_ov004_021741d0.StateFailed_04;
         return;
     }
     mUnkE8->Clear();

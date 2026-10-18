@@ -107,6 +107,7 @@ public:
     void StateConnecting();
     void StateCancel();
     void StateRescan();
+    void StateFailed();
 
     void (DinoUiChildScannerBattleConnect::*mState)(); // 0xB4
     void (DinoUiChildScannerBattleConnect::*mOnMessage)(MMessage *msg); // 0xBC
