@@ -68,6 +68,9 @@ public:
     virtual BOOL CanMark();
     virtual BOOL IsMarkable(DinoBackupEntry *entry);
     virtual MTask *CreateUnk2C();
+    void FinishDecide();
+
+    BOOL mConfirmed;                // 0x144: the yes/no answer
 };
 
 #endif

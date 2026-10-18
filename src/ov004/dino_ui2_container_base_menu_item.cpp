@@ -22,6 +22,7 @@
 #include "m/display.h"
 #include "m/bright.h"
 #include "game/dino_backup.h"
+#include "game/dino_common_window_yes_no_dialog.h"
 #include "game/dino_common_window_message_box.h"
 
 #pragma auto_inline off
@@ -137,7 +138,6 @@ void DinoUi2ContainerBasePageLButton::OnDecide() {
 // Template task instances the game emits in this file. Until the code that makes the tasks is decompiled, they are
 // instantiated explicitly.
 template class MCallTask0<DinoUi2CannonShootMenu, DinoUi2CannonShootMenu>;
-template MTask *MCreateCallTask(DinoUi2CannonShootMenu *obj, void (DinoUi2CannonShootMenu::*func)());
 
 void DinoUi2ContainerBaseDecideButton::OnFocusChanged(BOOL focused) {
     if (focused) {
@@ -208,6 +208,8 @@ void DinoUi2ContainerBaseMenu::OnBackDecided() {
 }
 
 #pragma auto_inline off
+
+template MTask *MCreateCallTask(DinoUi2CannonShootMenu *obj, void (DinoUi2CannonShootMenu::*func)());
 
 u8 DinoUi2ContainerBaseMenu::GetFlag(int index) {
     return mFlags[index];
@@ -337,6 +339,28 @@ BOOL DinoUi2CannonShootMenu::CanMark() {
 }
 
 BOOL DinoUi2CannonShootMenu::IsMarkable(DinoBackupEntry *entry) {
+    return TRUE;
+}
+
+extern const u32 data_0208a9c4, data_0208aa04, data_0208aa08;
+
+// Asks whether to load the marked fossils.
+BOOL DinoUi2CannonShootMenu::TryDecide() {
+    if (mUnkFC == 0) {
+        DinoSoundPlaySe(0xA4, 0);
+        return FALSE;
+    }
+    mCursor->Hide();
+    mConfirmed = FALSE;
+    DinoCommonWindowYesNoDialog *dialog =
+        new DinoCommonWindowYesNoDialog(gDinoResource->GetText(data_0208a9c4), &mConfirmed);
+    dialog->SetLabels(gDinoResource->GetText(data_0208aa08), gDinoResource->GetText(data_0208aa04));
+    MTask *finish = MCreateCallTask(this, &DinoUi2CannonShootMenu::FinishDecide);
+    MTask *show = mCursor->CreateShowTransfer();
+    MSerialTaskSet *serial = &mSerial;
+    serial->AddTail(dialog);
+    serial->AddTail(show);
+    serial->AddTail(finish);
     return TRUE;
 }
 
