@@ -3,6 +3,7 @@
 
 #include "game/battle_select.h"
 #include "game/dino_battle.h"
+#include "m/soft_reset.h"
 #include "m/input.h"
 #include "m/smart_oam.h"
 #include "m/motion.h"
@@ -185,4 +186,9 @@ void DinoBattleAutoDemo::StateEnd() {
         mSerial.AddTail(fades);
         mState = data_ov000_021911ac.StateFadeOut_18;
     }
+}
+
+// Restarts the game, telling the title screen the demo ran.
+void DinoBattleAutoDemo::StateFadeOut() {
+    MSoftReset((u32)mResult + 2);
 }
