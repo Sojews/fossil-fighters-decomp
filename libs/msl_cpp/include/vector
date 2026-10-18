@@ -746,6 +746,12 @@ namespace std {
             this->erase_at_end(this->size_);
         }
 
+        void swap(vector &x) {
+            std::swap(this->cap(), x.cap());
+            std::swap(this->data_, x.data_);
+            std::swap(this->size_, x.size_);
+        }
+
         reference operator[](size_t n) {
             return _Deleter::operator[](n);
         }

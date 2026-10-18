@@ -1,4 +1,4 @@
-// MIndicator. Not decompiled yet: Execute (redrawing the runs that changed) and the template functions.
+// MIndicator. Not decompiled yet: the template functions.
 
 #pragma ipa file
 
@@ -20,6 +20,30 @@ MIndicator::MIndicator(MCanvas *canvas, MFont *font, int spacing)
 MIndicator::~MIndicator() {
     delete mCanvas;
     mFont->Release();
+}
+
+// Draws the runs of the pending line that differ from the shown one, then shows it.
+void MIndicator::Execute() {
+    if (mCanvas->mState == STATE_RUN) {
+        mCanvas->Execute();
+    }
+    if (!mPending.empty()) {
+        std::vector<Entry>::iterator shown = mShown.begin();
+        for (std::vector<Entry>::iterator it = mPending.begin(); it != mPending.end(); it++) {
+            while (shown->end < it->x) {
+                shown++;
+            }
+            if (shown->code == it->code && shown->x == it->x && shown->end == it->end) {
+                shown++;
+            } else if (it->code != 0) {
+                mCanvas->DrawChar(mFont, MPoint(it->x, 0), it->code);
+            } else {
+                mCanvas->ClearRect(MRect(it->x, 0, it->end, mCanvas->GetHeight()));
+            }
+        }
+        mShown.swap(mPending);
+        mPending.clear();
+    }
 }
 
 MFont *MIndicator::GetFont() {
