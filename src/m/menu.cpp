@@ -1,7 +1,5 @@
 // MMenuItem, MMenu and the focus transfers.
-// NONMATCHING: the constructors, Init, Update and the three hold states (StateTouch, StateButton, StateKeys) are right
-// except for where their pointer-to-member constants sit in the TU's pooled .data (the game's pool order isn't
-// reproduced yet; see the README); RemoveItem, AddLink and RemoveLink (the game keeps a stored copy of the iterator
+// NONMATCHING: Init (where it works out &mSerial); RemoveItem, AddLink and RemoveLink (the game keeps a stored copy of the iterator
 // or of the inner pair that ours optimizes away, as in help.cpp); FindLinkedItem (the game keeps a copy of the range
 // and two zeroed bytes on the stack); FindItemInDirection (the order the rect's words are loaded); the tree's
 // insert_node_at (two stores swapped).
@@ -415,7 +413,7 @@ void MMenu::Idle() {
     (this->*mState)();
 }
 
-// NONMATCHING: the pointer-to-member constant for the next state is in the TU's pooled data.
+// NONMATCHING: the game works out &mSerial after making the tasks.
 void MMenu::Init() {
     if (mInput == NULL) {
         MSingleInputHub *hub = new MSingleInputHub(1);
