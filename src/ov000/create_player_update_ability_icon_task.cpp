@@ -988,6 +988,13 @@ MoveCreatureFromEscape::MoveCreatureFromEscape(DinoBattleModelPlayer *player) : 
 
 extern "C" BOOL func_ov000_0216d2cc(DinoBattleModelCreature *creature, int arg);
 
+DinoBattleUserController::DinoBattleUserController(void *unkBC, u32 arg, u8 unkB8) : DinoBattleController(arg) {
+    mUnkB8 = unkB8;
+    mUnkBC = unkBC;
+    mThinkTimer = new PlayerThinkTimeCountTask;
+    mParallel.AddTail(mThinkTimer);
+}
+
 u32 DinoBattleUserController::GetCreatureMask(DinoBattleModelPlayer *player) {
     u32 mask = 0;
     u32 i;

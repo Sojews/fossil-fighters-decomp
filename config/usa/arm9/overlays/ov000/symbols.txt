@@ -479,7 +479,7 @@ func_ov000_0216b648 kind:function(thumb,size=0x34) addr:0x0216b648
 _ZNSt13__vec_deleterI21DinoBattlePlayerEventRSaIS0_EED2Ev kind:function(thumb,size=0x26) addr:0x0216b67c
 _ZThn116_N21DinoBattleModelPlayer9OnMessageEP8MMessage kind:function(thumb,size=0x1c) addr:0x0216b6a4
 func_ov000_0216b6c0 kind:function(thumb,size=0x268) addr:0x0216b6c0
-func_ov000_0216b928 kind:function(thumb,size=0x74) addr:0x0216b928
+_ZN24DinoBattleUserControllerC1EPvmh kind:function(thumb,size=0x74) addr:0x0216b928
 _ZN24DinoBattleUserController9OnMessageEP8MMessage kind:function(thumb,size=0xdb4) addr:0x0216b99c
 .L_0216c71e kind:label(thumb) addr:0x0216c71e local
 _ZN24DinoBattleUserController15GetCreatureMaskEP21DinoBattleModelPlayer kind:function(thumb,size=0x56) addr:0x0216c750

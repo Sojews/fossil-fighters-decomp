@@ -12,18 +12,30 @@
 #include "game/dino_field_camera_hook.h"
 
 class DinoBattleModelPlayer;
+class PlayerThinkTimeCountTask;
 
 class DinoBattleUserController : public DinoBattleController {
 public:
+    DinoBattleUserController(void *unkBC, u32 arg, u8 unkB8);
     virtual ~DinoBattleUserController();
     virtual BOOL Unk14();
     virtual void OnMessage(MMessage *msg);
 
     u32 GetCreatureMask(DinoBattleModelPlayer *player);
+
+    u32 mUnkB4;                             // 0xB4
+    u8 mUnkB8;                              // 0xB8
+    void *mUnkBC;                           // 0xBC
+    PlayerThinkTimeCountTask *mThinkTimer;  // 0xC0
 };
 
 class PlayerThinkTimeCountTask : public MTask {
 public:
+    PlayerThinkTimeCountTask() {
+        mPlayer = NULL;
+        mActive = FALSE;
+        mCount = 0;
+    }
     virtual ~PlayerThinkTimeCountTask();
     virtual void Execute();
 
