@@ -41,6 +41,14 @@ public:
         mJoint = joint;
         mUnk11B = TRUE;
     }
+    void SetPosRef(const VecFx32 *pos) {
+        mPosRef = pos;
+        mUnk11B = TRUE;
+    }
+    void SetRotRef(const VecFx32 *rot) {
+        mRotRef = rot;
+        mUnk11B = TRUE;
+    }
     void SetUnk145() {
         mUnk145 = 1;
         mUnk11B = TRUE;

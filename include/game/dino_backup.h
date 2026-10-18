@@ -248,7 +248,8 @@ struct DinoBackupEntry28 {
     u32 id : 10;
     u32 unk20_10 : 22;
     // 0x24
-    u32 unk24_0 : 4;
+    u32 color : 3;      // the field rock's color
+    u32 unk24_3 : 1;
     u32 flag : 1;
     u32 unk24_5 : 27;
 };

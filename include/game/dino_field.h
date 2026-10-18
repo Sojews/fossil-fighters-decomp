@@ -254,6 +254,7 @@ class DinoField : public MProcess, public MSerializer, public DinoHelpBase {
 public:
     virtual ~DinoField();
     void CreateEffects(MPolygonChar **effects, u32 count, u32 id);
+    fx32 GetGroundHeight(fx32 x, fx32 y);
     virtual void Read(const void *buf);
     virtual void Write(void *buf);
     DinoFieldMap *GetMap();
