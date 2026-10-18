@@ -23,6 +23,10 @@ public:
 
     u32 GetUnkAC();
     u32 GetUnkB0();
+    void SetUnitModes(BOOL on);
+    u32 CountAttacks();
+    u32 GetAttack(u32 index);
+    u32 GetSpecialAttack();
     u32 GetUnkB4();
     u32 GetUnkA8();
     u32 GetUnkF4();
@@ -82,12 +86,14 @@ public:
     u32 mUnk104;            // 0x104
     u32 mUnk108;            // 0x108
     u32 mUnk10C;            // 0x10C
-    u32 unk110[2];
+    u32 unk110;
+    u32 mLevel;             // 0x114
     u32 mUnk118;            // 0x118
     u32 unk11C[2];
     MPoint mCoord;          // 0x124
     MPoint mCoordOffset;    // 0x12C: added to the coordinate to place the motion
-    u32 unk134[4];
+    u32 unk134[3];
+    MMotion *mMotion140;    // 0x140
     u32 mFlags144;          // 0x144
     u32 unk148[6];
     u32 mAdvantage;         // 0x160: its type advantage over the creature shown

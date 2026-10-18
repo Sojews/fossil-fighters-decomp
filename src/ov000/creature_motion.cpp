@@ -8,6 +8,7 @@
 #include "m/fx32.h"
 #include "types.h"
 #include "game/dino_battle_view_creature.h"
+#include "game/dino_battle_view_kaseki_point_menu.h"
 #include "game/view_status_effect_icon.h"
 #include "m/bg_new_task.h"
 #include "m/call_task.h"
@@ -164,6 +165,50 @@ void CreateCreatureMotionTask::Execute() {
 }
 
 #pragma auto_inline off
+
+void DinoBattleViewCreature::SetUnitModes(BOOL on) {
+    mMotion->GetUnit()->SetMode(on ? 1 : 0);
+    mMotion140->GetUnit()->SetMode(on ? 1 : 0);
+}
+
+// The number of the creature's attacks its level allows.
+// NONMATCHING (and GetAttack): as DinoBattleModelCreature's, the game indexes the tables with i * 4 every time.
+u32 DinoBattleViewCreature::CountAttacks() {
+    const DinoCreatureDef *def = gDinoResource->GetCreatureDef(mUnkA8);
+    u32 count = 0;
+    int i = 0;
+    if (i < def->attackCount) {
+        const u32 *levels = (const u32 *) ((const u8 *) def + def->attackLevels);
+        for (; i < def->attackCount; i++) {
+            if (levels[i] <= mLevel) {
+                count++;
+            }
+        }
+    }
+    return count;
+}
+
+// The index'th attack its level allows; 0 if none.
+u32 DinoBattleViewCreature::GetAttack(u32 index) {
+    const DinoCreatureDef *def = gDinoResource->GetCreatureDef(mUnkA8);
+    for (int i = 0; i < def->attackCount; i++) {
+        if (((const u32 *) ((const u8 *) def + def->attackLevels))[i] <= mLevel && index-- == 0) {
+            return ((const u32 *) ((const u8 *) def + def->attackIds))[i];
+        }
+    }
+    return 0;
+}
+
+// The creature's special attack, if the whole team qualifies and its level allows.
+u32 DinoBattleViewCreature::GetSpecialAttack() {
+    if (((DinoBattleViewPlayer *)mUnkDC)->HasCommonCreatureFlags() && ((DinoBattleViewPlayer *)mUnkDC)->mUnk114) {
+        const DinoCreatureDef *def = gDinoResource->GetCreatureDef(mUnkA8);
+        if (def->specialAttackLevel <= mLevel) {
+            return def->specialAttack;
+        }
+    }
+    return 0;
+}
 
 u32 DinoBattleViewCreature::GetUnkAC() {
     return mUnkAC;
