@@ -65,7 +65,7 @@ public:
 
     MArchivePtr mArchive;                   // 0x00
     MArchiveFile mFile;                     // 0x04: the motion file
-    std::vector<MArchiveFile> mCellFiles;   // 0x10
+    std::vector<MArchiveFile> mAnimeFiles;   // 0x10
     std::vector<MArchiveFile> mChrFiles;    // 0x1C
     std::vector<MArchiveFile> mPalFiles;    // 0x28
     int mRefCount;                          // 0x34

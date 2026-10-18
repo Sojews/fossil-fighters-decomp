@@ -29,7 +29,7 @@ void MMotionData::LockFiles(int which) {
         }
     }
     if (which & 4) {
-        for (std::vector<MArchiveFile>::iterator it = mCellFiles.begin(); it != mCellFiles.end(); it++) {
+        for (std::vector<MArchiveFile>::iterator it = mAnimeFiles.begin(); it != mAnimeFiles.end(); it++) {
             it->Lock();
         }
     }
@@ -189,8 +189,34 @@ const MMotionCellDef *MMotionFile::GetCell(u32 index) {
     return (const MMotionCellDef *) ((u8 *) header + header->cellOffset) + index;
 }
 
+// The palette file's data, locked; with file, also a reference to the file (which keeps it locked).
+void *MMotionFile::GetPalette(u32 index, MArchiveFile *file) {
+    if (file != NULL) {
+        MArchiveFile f = mData->mPalFiles[index];
+        f.Lock();
+        *file = f;
+        return f.GetData();
+    }
+    MArchiveFile &f = mData->mPalFiles[index];
+    f.Lock();
+    return f.GetData();
+}
+
 u32 MMotionFile::GetUnk18() {
     return ((u32 *) mData->mFile.GetData())[6];
+}
+
+// The anime file's data, as for GetPalette.
+void *MMotionFile::GetAnime(int anime, MArchiveFile *file) {
+    if (file != NULL) {
+        MArchiveFile f = mData->mAnimeFiles[anime];
+        f.Lock();
+        *file = f;
+        return f.GetData();
+    }
+    MArchiveFile &f = mData->mAnimeFiles[anime];
+    f.Lock();
+    return f.GetData();
 }
 
 MPalBlock **MMotionFile::AcquirePalettes(MDisplay *display) {
