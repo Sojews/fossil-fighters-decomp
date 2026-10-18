@@ -52,15 +52,22 @@ public:
     MTask *mUnk208;             // 0x208
 };
 
+class MInput;
+
 class DinoBattleAutoDemo : public MProcess {
 public:
     DinoBattleAutoDemo(MTask *unk7C, u8 *result);
     virtual ~DinoBattleAutoDemo();
     virtual void Idle();
 
+    void StateSetup();
+    void StateWatch();
+    void StateEnd();
+    void StateFadeOut();
+
     void (DinoBattleAutoDemo::*mState)(); // 0x74
-    MTask *mUnk7C;      // 0x7C
-    u32 unk80;
+    MTask *mUnk7C;      // 0x7C: the battle
+    MInput *mInput;     // 0x80
     u8 *mResult;        // 0x84
 };
 

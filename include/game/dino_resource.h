@@ -137,6 +137,7 @@ struct DinoDemoBattles {
     u32 lateOffset;     // 0x0C
     u32 midCount;       // 0x10: with flag1b in the save
     u32 midOffset;      // 0x14
+    u32 unk18;          // 0x18: the demo battles watched before the demo stops
 };
 struct DinoExcavateDefs {
     u8 unk00[0x68];
