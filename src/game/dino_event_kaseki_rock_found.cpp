@@ -11,3 +11,7 @@ DinoEventKasekiRockFound::~DinoEventKasekiRockFound() {
 void DinoEventKasekiRockFound::Idle() {
     (this->*mState)();
 }
+
+#pragma auto_inline off
+// Vector instances the game emits in this file (made explicitly until the code that uses them is decompiled).
+template class std::__vec_deleter<std::string, std::allocator<std::string> >;
