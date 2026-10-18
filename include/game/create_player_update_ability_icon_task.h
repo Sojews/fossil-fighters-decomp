@@ -198,6 +198,10 @@ public:
     public:
         virtual ~AddLifePointTask();
         virtual void Execute();
+
+        u32 mUnk10;     // 0x10
+        u32 mUnk14;     // 0x14
+        u8 mUnk18;      // 0x18
     };
 
     u32 mUnkA8;                     // 0xA8

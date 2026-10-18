@@ -109,6 +109,11 @@ void AddLifePointTask::Execute() {
     Exit();
 }
 
+void DinoBattleModelCreature::AddLifePointTask::Execute() {
+    func_ov000_0216cc64((void *)mUnk10, mUnk14, mUnk18);
+    Exit();
+}
+
 void ResetStatusEffectSleepTask::Execute() {
     ((DinoBattleModelCreature *)mUnk10)->ClearStatus8();
     Exit();
