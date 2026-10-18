@@ -1,5 +1,8 @@
 // DinoUiFieldMenuFraction, DinoUiFieldMenuNumber, DinoUiFieldMenuNumber3, DinoUiPartsNumber8, DinoUiPartsReviverMedalButton, DinoUiPartsReviverNameCountCheckTask, DinoUiPartsBlackBelt, DinoUiPartsRockName, DinoUiPartsKasekiButton, DinoUiPartsTeamInfo, DinoUiPartsTeamTech.
 // One TU: the field menu parts (0x021584d4-0x0215b008).
+// NONMATCHING: the constructors of DinoUiFieldMenuNumber and DinoUiFieldMenuFraction4 (the game keeps this + i * 4
+// in a stack slot across the first string temporary's destructor), DinoUiFieldMenuNumber3 and DinoUiPartsNumber8 (the
+// game loads gCurrentDisplay after copying the canvas size).
 
 // Derived destructors have their bases' destructor bodies inlined; auto-inlining the ones defined above does that.
 #pragma auto_inline on
@@ -21,6 +24,13 @@
 #include "game/dino_ui_parts_team_indicator.h"
 #include "game/dino_ui_field_menu_fraction4.h"
 #include "game/dino_ui_field_menu_cursor.h"
+#include "m/display.h"
+#include "m/font.h"
+#include "m/obj.h"
+#include "m/oam_canvas.h"
+#include <stdio.h>
+
+extern const char *data_ov003_02160c60[]; // motion file paths
 
 DinoUiFieldMenuFraction::~DinoUiFieldMenuFraction() {
 }
@@ -64,6 +74,107 @@ void DinoUiFieldMenuFraction::Idle() {
 DinoUiPartsTeamIndicator::~DinoUiPartsTeamIndicator() {
     mFont->Release();
     delete mView;
+}
+
+DinoUiFieldMenuNumber::DinoUiFieldMenuNumber(MSmartOam *oam, MPoint pos) : MProcess(NULL) {
+    for (int i = 0; i < 5; i++) {
+        mDigits[i] = new MMotion(std::string(data_ov003_02160c60[28]), oam, 2, 1);
+        mDigits[i]->Play(1, 0);
+        mDigits[i]->SetPosition(pos.x + i * 8, pos.y);
+        mDigits[i]->SetPriority(2);
+        mDigits[i]->Show();
+        mParallel.AddTail(mDigits[i]);
+        mDigits[i]->GetUnit()->SetMode(1);
+    }
+}
+
+void DinoUiFieldMenuNumber::SetValue(int value) {
+    if (value >= 100000) {
+        value = 100000 - 1;
+    }
+    if (value < 0) {
+        value = 0;
+    }
+    BOOL shown = FALSE;
+    int unit = 100000;
+    for (int i = 0; i < 5; i++) {
+        unit /= 10;
+        if (shown || value / unit % 10 > 0) {
+            mDigits[i]->Play(value / unit % 10 + 1, 0);
+            mDigits[i]->Show();
+            shown = TRUE;
+        } else {
+            mDigits[i]->Hide();
+        }
+    }
+    // Zero still shows one digit.
+    if (!shown) {
+        mDigits[4]->Play(1, 0);
+        mDigits[4]->Show();
+    }
+}
+
+DinoUiFieldMenuNumber3::DinoUiFieldMenuNumber3(MPoint pos) : MProcess(NULL) {
+    MFontSet *font = new MFontSet(std::string("/font/btl_fontset_8x16"), 0, 0, 0);
+    mText = new MIndicator(new MObjCanvas(gCurrentDisplay, gCurrentDisplay->mObj->mOam, MPoint(0x20, 0x10),
+                                          font->GetPalette(), TRUE),
+                           font, 0);
+    mParallel.AddTail(mText);
+    mText->SetPosition(pos.x, pos.y);
+    mText->SetPriority(2);
+    mText->Show();
+}
+
+void DinoUiFieldMenuNumber3::SetValue(u32 value) {
+    char text[4];
+    if (value == VALUE_MANY) {
+        sprintf(text, "+++");
+    } else if (value == VALUE_MORE) {
+        sprintf(text, "  +");
+    } else if (value == VALUE_UNKNOWN) {
+        sprintf(text, "???");
+    } else if (value == VALUE_UNKNOWN2) {
+        sprintf(text, " ??");
+    } else {
+        if (value >= 1000) {
+            value = 1000 - 1;
+        }
+        sprintf(text, "%3d", value);
+    }
+    mText->SetText(std::string(text));
+}
+
+void DinoUiFieldMenuNumber3::SetPriority(int priority) {
+    mText->SetPriority(priority);
+}
+
+void DinoUiFieldMenuNumber3::Show() {
+    mText->Show();
+}
+
+void DinoUiFieldMenuNumber3::Hide() {
+    mText->Hide();
+}
+
+DinoUiPartsNumber8::DinoUiPartsNumber8(MPoint pos) : MProcess(NULL) {
+    MFontSet *font = new MFontSet(std::string("/font/kp_number"), 0, 0, 0);
+    MObjCanvas *canvas = new MObjCanvas(gCurrentDisplay, gCurrentDisplay->mObj->mOam, MPoint(0x40, 0x20),
+                                        font->GetPalette(), TRUE);
+    canvas->GetOamUnit()->SetMode(1);
+    mText = new MIndicator(canvas, font, 0);
+    mParallel.AddTail(mText);
+    mText->SetPosition(pos.x, pos.y);
+    mText->SetPriority(2);
+    mText->Show();
+}
+
+void DinoUiPartsNumber8::SetValue(u32 value) {
+    char text[16];
+    if (value >= 100000000) {
+        value = 100000000 - 1;
+    }
+    sprintf(text, "%8d", value);
+    mText->SetText(std::string(text));
 }
 
 void DinoUiPartsTeamIndicator::Idle() {
@@ -232,6 +343,14 @@ void DinoUiFieldMenuCursor::SetMode(u32 mode) {
     }
 }
 
+// Plays both motions once.
+MTask *DinoUiFieldMenuCursor::CreatePlayTask() {
+    MParallelTaskSet *tasks = new MParallelTaskSet(TRUE);
+    tasks->AddTail(mUnk10->CreatePlayTransfer(1, 1));
+    tasks->AddTail(mUnk14->CreatePlayTransfer(1, 1));
+    return tasks;
+}
+
 MTask *DinoUiFieldMenuCursor::CreateMoveTask(MRect from, MRect to, int duration, int ease) {
     DinoSoundPlaySe(0x96, 0);
     return CreateFrameAnime(from, to, duration, ease);
@@ -261,10 +380,82 @@ void DinoUiPartsReviverNameCountCheckTask::Execute() {
     }
 }
 
+// The numerator up and left of pos, the denominator down and right.
+DinoUiFieldMenuFraction::DinoUiFieldMenuFraction(MSmartOam *oam, MPoint pos) : MProcess(NULL) {
+    mNumerator = new MMotion(std::string(data_ov003_02160c60[9]), oam, 2, 1);
+    mNumerator->Play(1, 0);
+    mNumerator->SetPosition(pos.x - 4, pos.y - 4);
+    mNumerator->SetPriority(2);
+    mNumerator->Show();
+    mNumerator->GetUnit()->SetMode(1);
+    mParallel.AddTail(mNumerator);
+    mDenominator = new MMotion(std::string(data_ov003_02160c60[9]), oam, 2, 1);
+    mDenominator->Play(1, 0);
+    mDenominator->SetPosition(pos.x + 4, pos.y + 4);
+    mDenominator->SetPriority(2);
+    mDenominator->Show();
+    mDenominator->GetUnit()->SetMode(1);
+    mParallel.AddTail(mDenominator);
+}
+
 void DinoUiFieldMenuFraction::SetNumerator(u8 n) {
     mNumerator->Play(n % 10 + 1, 0);
 }
 
 void DinoUiFieldMenuFraction::SetDenominator(u8 n) {
     mDenominator->Play(n % 10 + 1, 0);
+}
+
+DinoUiFieldMenuFraction4::DinoUiFieldMenuFraction4(MSmartOam *oam, MPoint pos, u8 digits) : MProcess(NULL) {
+    mDigits = digits;
+    if (mDigits < 1) {
+        mDigits = 1;
+    }
+    if (mDigits > 3) {
+        mDigits = 3;
+    }
+    for (int i = 0; i < mDigits; i++) {
+        mNumerator[i] = new MMotion(std::string(data_ov003_02160c60[9]), oam, 2, 1);
+        mNumerator[i]->Play(1, 0);
+        mNumerator[i]->SetPosition(pos.x - 6 - i * 8, pos.y);
+        mNumerator[i]->SetPriority(2);
+        mNumerator[i]->Show();
+        mNumerator[i]->GetUnit()->SetMode(1);
+        mParallel.AddTail(mNumerator[i]);
+        mDenominator[i] = new MMotion(std::string(data_ov003_02160c60[9]), oam, 2, 1);
+        mDenominator[i]->Play(1, 0);
+        mDenominator[i]->SetPosition(pos.x + 7 + (mDigits - 1 - i) * 8, pos.y);
+        mDenominator[i]->SetPriority(2);
+        mDenominator[i]->Show();
+        mDenominator[i]->GetUnit()->SetMode(1);
+        mParallel.AddTail(mDenominator[i]);
+    }
+    mSlash = new MMotion(std::string(data_ov003_02160c60[9]), oam, 2, 1);
+    mSlash->Play(11, 0);
+    mSlash->SetPosition(pos.x, pos.y);
+    mSlash->SetPriority(2);
+    mSlash->Show();
+    mParallel.AddTail(mSlash);
+}
+
+void DinoUiFieldMenuFraction4::SetNumerator(u8 n) {
+    for (int i = 0; i < mDigits; i++) {
+        mNumerator[i]->Play(n % 10 + 1, 0);
+        n /= 10;
+    }
+}
+
+void DinoUiFieldMenuFraction4::SetDenominator(u8 n) {
+    for (int i = 0; i < mDigits; i++) {
+        mDenominator[i]->Play(n % 10 + 1, 0);
+        n /= 10;
+    }
+}
+
+void DinoUiFieldMenuFraction4::SetPriority(int priority) {
+    for (int i = 0; i < mDigits; i++) {
+        mNumerator[i]->SetPriority(priority);
+        mDenominator[i]->SetPriority(priority);
+    }
+    mSlash->SetPriority(priority);
 }

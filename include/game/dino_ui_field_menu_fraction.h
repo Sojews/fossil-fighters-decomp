@@ -6,6 +6,7 @@
 
 class DinoUiFieldMenuFraction : public MProcess {
 public:
+    DinoUiFieldMenuFraction(MSmartOam *oam, MPoint pos);
     virtual ~DinoUiFieldMenuFraction();
     virtual void Idle();
     void SetNumerator(u8 n);

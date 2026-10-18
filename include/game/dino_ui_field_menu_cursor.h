@@ -1,6 +1,7 @@
 #ifndef GAME_DINO_UI_FIELD_MENU_CURSOR_H
 #define GAME_DINO_UI_FIELD_MENU_CURSOR_H
 
+#include "m/motion.h"
 #include "m/view.h"
 
 // The field menu's cursor: two views (mMode picks the one shown) kept on one frame.
@@ -20,10 +21,11 @@ public:
     virtual u32 GetPlaneMask();
 
     void SetMode(u32 mode);
+    MTask *CreatePlayTask();
     MTask *CreateMoveTask(MRect from, MRect to, int duration, int ease);
 
-    MView *mUnk10;  // 0x10: shown in mode 1
-    MView *mUnk14;  // 0x14: shown in mode 2
+    MMotion *mUnk10;  // 0x10: shown in mode 1
+    MMotion *mUnk14;  // 0x14: shown in mode 2
     MRect mFrame;   // 0x18
     u8 mMode;       // 0x28
     u8 mHidden;     // 0x29
