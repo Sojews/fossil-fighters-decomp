@@ -6,6 +6,7 @@
 
 #include "game/dino_sound.h"
 #include "game/dino_resource.h"
+#include "m/soft_reset.h"
 #include "m/blend.h"
 #include "game/dino_ui_wireless_cancel_item_menu.h"
 #include "game/dino_ui_wireless_cancel_item.h"
@@ -245,6 +246,29 @@ void DinoUiCannonChild::OnMessage(MMessage *msg) {
 void DinoUiCannonParentScanner::ShowCount() {
     mOnes->Play(mCount % 10 + 1, 0);
     mTens->Play(mCount / 10 + 1, 0);
+}
+
+// The file's pooled pointer-to-member constants: the game (built ipa) addresses them from anchors every 0x80 bytes,
+// so until every state of the file is decompiled they are reached through these (named after the state each
+// points to).
+typedef void (DinoUiWirelessMatch::*DinoUiWirelessMatchState)();
+struct DinoUiWirelessMatchPool0 {
+    u8 unk00[0x34];
+    DinoUiWirelessMatchState state_02167e3c;    // 0x34
+    u8 unk3C[0x44 - 0x3C];
+    DinoUiWirelessMatchState state_02167aa0;    // 0x44
+    DinoUiWirelessMatchState state_021676f8;    // 0x4C
+};
+extern "C" DinoUiWirelessMatchPool0 data_ov004_021740d0;
+
+void DinoUiWirelessMatch::StateStart() {
+    if (MGetResetParameter() == 1) {
+        mState = data_ov004_021740d0.state_02167e3c;
+    } else if (!mUnk98) {
+        mState = data_ov004_021740d0.state_02167aa0;
+    } else {
+        mState = data_ov004_021740d0.state_021676f8;
+    }
 }
 
 // Hands the connection's tasks over to DinoResource and ends.
