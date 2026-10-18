@@ -517,7 +517,6 @@ _ZN12DinoSeMotion5Unk44Ei kind:function(thumb,size=0x1c) addr:0x0200a8fc
 _ZN12DinoSeMotionD1Ev kind:function(thumb,size=0x14) addr:0x0200a918
 _ZN12DinoSeMotionD0Ev kind:function(thumb,size=0x1a) addr:0x0200a92c
 _Z17CreateDinoMessagePKv kind:function(thumb,size=0xe10) addr:0x0200a948
-.L_0200b74a kind:label(thumb) addr:0x0200b74a local
 _ZN16DinoDummyMessageC1Ev kind:function(thumb,size=0x20) addr:0x0200b758
 _ZN30DinoBattleModelGameBeginSignalC1Ev kind:function(thumb,size=0x20) addr:0x0200b778
 _ZN31DinoBattleControllerInitRequestC1Ev kind:function(thumb,size=0x20) addr:0x0200b798
