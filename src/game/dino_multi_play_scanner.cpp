@@ -43,6 +43,11 @@ void DinoMultiPlayScanner::Cancel() {
     mSerial.AddTail(CreateExitTransfer());
 }
 
+// Any decide cancels the scan.
+void DinoMultiPlayScanner::OnDecide(MMenuItem *item) {
+    Cancel();
+}
+
 #pragma auto_inline on
 
 void DinoMultiPlayScanTelop::Idle() {
