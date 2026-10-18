@@ -5,6 +5,7 @@
 #include <vector>
 #include "game/dino_event_capture_fade_ui_task.h"
 #include "m/archive.h"
+#include "m/resource.h"
 #include "game/dino_common_window_yes_no_dialog.h"
 #include "game/dino_common_tutorial_window.h"
 #include "m/task.h"
@@ -567,13 +568,25 @@ public:
     virtual ~DinoEventKasekiRockGet();
     virtual void Idle();
 
+    MTask *CreateMessageBox(u32 message);
+    MTask *CreateYesNo(u32 message);
+    void StateStart();
+    void StateAskSwap();
+    void StateAnswered();
+    void StateChosen();
+    void StateConfirmed();
+    void StateSwap();
+
     void (DinoEventKasekiRockGet::*mState)(); // 0x74
-    u32 mUnk7C[7];
-    MArchivePtr mArchive;   // 0x98
-    MArchiveFile mFile;     // 0x9C
-    std::string mUnkA8;     // 0xA8
-    std::string mUnkB4;     // 0xB4
-    u32 mUnkC0[3];          // 0xC0
+    DinoEventLoop *mEvent;  // 0x7C
+    u32 mMode;              // 0x80
+    DinoBackupEntry mEntry; // 0x84: the rock got
+    MResource<DinoMessageData> mMessages;   // 0x98
+    std::string mName;      // 0xA8: the rock got's
+    std::string mSwapName;  // 0xB4: the one it replaces
+    int mAnswer;            // 0xC0: the yes/no dialog's
+    s32 mSwapIndex;         // 0xC4: or -1
+    u8 *mResult;            // 0xC8
 };
 
 class DinoEventKasekiRockGetContainerSelect : public DinoEventCaptureFadeUiTask {
