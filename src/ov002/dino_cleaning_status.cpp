@@ -29,3 +29,11 @@ void DinoCleaningStatus::Stop() {
     mTimer->Stop();
     mScore->SetUnk9CC();
 }
+
+// An 8-byte-element vector the game emits members of in this file (the element type is unknown).
+struct DinoCleaningStatusEntry {
+    u32 unk0;
+    u32 unk4;
+};
+#pragma auto_inline off
+template class std::__vec_deleter<DinoCleaningStatusEntry, std::allocator<DinoCleaningStatusEntry> >;
