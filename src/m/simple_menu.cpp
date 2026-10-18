@@ -1,7 +1,7 @@
 // MSimpleMenu.
 // NONMATCHING: Init and Start (the pointer-to-member constants and the type infos come out in a different order in
 // .data, so their offsets from the data anchor differ), AddItem and Start (the string temporary), Layout, SetCursor,
-// HitTest, Decide and Update (register allocation and scheduling), append_realloc (as everywhere).
+// Decide and Update (register allocation and scheduling), append_realloc (as everywhere).
 
 #pragma ipa file
 
@@ -113,6 +113,7 @@ void MSimpleMenu::SetCursor(int id) {
     }
 }
 
+#pragma opt_common_subs off
 // The id of the item at pos, or near it, or -1.
 int MSimpleMenu::HitTest(MPoint pos) {
     u32 i;
@@ -128,6 +129,7 @@ int MSimpleMenu::HitTest(MPoint pos) {
     }
     return -1;
 }
+#pragma opt_common_subs reset
 
 // Clears away the other items, then exits.
 void MSimpleMenu::Decide(int id) {

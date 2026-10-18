@@ -568,6 +568,7 @@ void DinoBackup::SetCharaTask(u32 id, const DinoCharaTask *task) {
     OS_Terminate();
 }
 
+#pragma opt_common_subs off
 void DinoBackup::GetCharaTask(u32 id, DinoCharaTask *task) {
     DinoCharaTask *tasks = mCharaTasks;
     for (u32 i = 0; i < 60; i++) {
@@ -579,6 +580,7 @@ void DinoBackup::GetCharaTask(u32 id, DinoCharaTask *task) {
     MI_CpuFill8(task, 0, sizeof(DinoCharaTask));
     task->id = id;
 }
+#pragma opt_common_subs reset
 
 void DinoBackup::SetUnk98(u32 index, const DinoBackupEntry *entry) {
     mUnk98[index] = *entry;

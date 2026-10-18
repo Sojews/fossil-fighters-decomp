@@ -140,6 +140,7 @@ void DinoUiFieldMenuNumber::SetValue(int value) {
     }
 }
 
+#pragma opt_common_subs off
 DinoUiFieldMenuNumber3::DinoUiFieldMenuNumber3(MPoint pos) : MProcess(NULL) {
     MFontSet *font = new MFontSet(std::string("/font/btl_fontset_8x16"), 0, 0, 0);
     mText = new MIndicator(new MObjCanvas(gCurrentDisplay, gCurrentDisplay->mObj->mOam, MPoint(0x20, 0x10),
@@ -150,6 +151,7 @@ DinoUiFieldMenuNumber3::DinoUiFieldMenuNumber3(MPoint pos) : MProcess(NULL) {
     mText->SetPriority(2);
     mText->Show();
 }
+#pragma opt_common_subs reset
 
 void DinoUiFieldMenuNumber3::SetValue(u32 value) {
     char text[4];
@@ -182,6 +184,7 @@ void DinoUiFieldMenuNumber3::Hide() {
     mText->Hide();
 }
 
+#pragma opt_common_subs off
 DinoUiPartsNumber8::DinoUiPartsNumber8(MPoint pos) : MProcess(NULL) {
     MFontSet *font = new MFontSet(std::string("/font/kp_number"), 0, 0, 0);
     MObjCanvas *canvas = new MObjCanvas(gCurrentDisplay, gCurrentDisplay->mObj->mOam, MPoint(0x40, 0x20),
@@ -193,6 +196,7 @@ DinoUiPartsNumber8::DinoUiPartsNumber8(MPoint pos) : MProcess(NULL) {
     mText->SetPriority(2);
     mText->Show();
 }
+#pragma opt_common_subs reset
 
 void DinoUiPartsNumber8::SetValue(u32 value) {
     char text[16];
@@ -259,6 +263,7 @@ void DinoUiPartsTeamTech::Lower() {
     }
 }
 
+#pragma opt_common_subs off
 DinoUiPartsTeamIndicator::DinoUiPartsTeamIndicator(MPoint pos, MFont *font) : MProcess(NULL) {
     mFont = font;
     mCanvas = new MObjCanvas(gCurrentDisplay, gCurrentDisplay->mObj->mOam, MPoint(256, 32), data_020b5870, TRUE);
@@ -266,6 +271,7 @@ DinoUiPartsTeamIndicator::DinoUiPartsTeamIndicator(MPoint pos, MFont *font) : MP
     mCanvas->SetPosition(pos);
     mCanvas->SetPriority(3);
 }
+#pragma opt_common_subs reset
 
 // Outlined in the font's back color.
 void DinoUiPartsTeamIndicator::SetText(const std::wstring &text) {
@@ -332,6 +338,7 @@ DinoUiPartsBlackBelt::DinoUiPartsBlackBelt() : MProcess(NULL) {
     canvas->Show();
 }
 
+#pragma opt_common_subs off
 DinoUiPartsRockName::DinoUiPartsRockName(MPoint pos) : MProcess(NULL) {
     mFont = gDinoResource->CreateFont12(0, 1, 0);
     MObjCanvas *canvas = new MObjCanvas(gCurrentDisplay, gCurrentDisplay->mObj->mOam, MPoint(256, 32),
@@ -343,6 +350,7 @@ DinoUiPartsRockName::DinoUiPartsRockName(MPoint pos) : MProcess(NULL) {
     mText->SetPriority(2);
     mText->Show();
 }
+#pragma opt_common_subs reset
 
 // The rock's name, in the selected color or, for a rock not cleaned yet, its own.
 void DinoUiPartsRockName::SetEntry(const DinoBackupEntry *entry, BOOL selected) {
@@ -651,6 +659,7 @@ MTask *DinoUiPartsReviverMedalButton::CreateFlyInTask(MPoint to) {
     return tasks;
 }
 
+#pragma opt_common_subs off
 DinoUiPartsReviverName::DinoUiPartsReviverName() : MProcess(NULL) {
     mLength = 0;
     mLeft = 0;
@@ -676,6 +685,7 @@ DinoUiPartsReviverName::DinoUiPartsReviverName() : MProcess(NULL) {
     mParallel.AddTail(mOam);
     Activate();
 }
+#pragma opt_common_subs reset
 
 void DinoUiPartsReviverName::SetCreature(u32 id) {
     std::string name(gDinoResource->GetCreatureText08(id));
