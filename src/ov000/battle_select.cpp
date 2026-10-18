@@ -6,6 +6,7 @@
 
 #include "game/battle_select.h"
 #include "types.h"
+#include "m/resource.h"
 #include "game/dino_battle_view2.h"
 
 #pragma auto_inline off
@@ -71,3 +72,12 @@ void PlayerLevelSelect::Idle() {
 void IncValTask::Execute() {
     (*mValue)++;
 }
+
+// A resource the debug battle select loads (its data type is unknown).
+struct DinoBattleSelectData;
+// (Not decompiled yet: the select screen's setup constructs it; this keeps an out-of-line copy of the constructor.)
+#pragma dont_inline on
+MResource<DinoBattleSelectData> DinoBattleSelectLoadData(std::string path) {
+    return MResource<DinoBattleSelectData>(path);
+}
+#pragma dont_inline reset
