@@ -90,6 +90,8 @@ public:
     MTask *CreateUpdateTask(u32 arg);
     MTask *CreateUpdateStateIconTask(u32 creature, u32 arg);
     MTask *CreateSetKasekiPointTask(u32 points);
+    void SetKasekiPoints(int points);
+    void AddKasekiPoints(int delta);
     MTask *CreateAddKasekiPointCreatureDie();
     MTask *CreateUpdateAllCreatureTask();
     DinoBattleModelPlayer *GetOpponent();

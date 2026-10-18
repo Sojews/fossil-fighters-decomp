@@ -23,7 +23,6 @@
 extern "C" void func_ov000_02163258(void *, u32, u32);
 
 
-extern "C" void func_ov000_02163464(void *, u32);
 
 CreatePlayerUpdateAbilityIconTask::~CreatePlayerUpdateAbilityIconTask() {
 }
@@ -122,7 +121,7 @@ DinoBattleModelCreature::AddLifePointTask::~AddLifePointTask() {
 }
 
 void SetKasekiPointTask::Execute() {
-    func_ov000_02163464((void *)mUnk10, mUnk14);
+    ((DinoBattleModelPlayer *)mUnk10)->SetKasekiPoints(mUnk14);
     Exit();
 }
 
@@ -196,7 +195,7 @@ void PlayerThinkTimeCountTask::Execute() {
 void AddKasekiPointCreatureDie::Idle() {
     u32 point = mPlayer->mKasekiPoint;
     u32 add = mPlayer->GetUnk128();
-    func_ov000_02163464(mPlayer, add + point);
+    mPlayer->SetKasekiPoints(add + point);
     DinoSignalWait *wait = new DinoSignalWait(0x10039, NULL, NULL, 1);
     MTask *exit = MTaskExitTransfer::Create(this);
     MSerialTaskSet *serial = &mSerial;
@@ -971,6 +970,14 @@ void DinoBattleModelPlayer::Idle() {
     Dispatch();
 }
 
+// Adds to (or takes from) the player's kaseki points.
+void DinoBattleModelPlayer::AddKasekiPoints(int delta) {
+    if (delta < 0 && func_ov000_0218472c(1)) {
+        return;
+    }
+    SetKasekiPoints(mUnk128 + delta);
+}
+
 MTask *DinoBattleModelPlayer::CreateUpdateTask(u32 arg) {
     return new PlayerUpdateTask(this, arg);
 }
@@ -1008,6 +1015,15 @@ extern "C" BOOL func_ov000_0216d2cc(DinoBattleModelCreature *creature, int arg);
 template MTask *DinoCreatePostAndWaitTask(MMessageObserver *target, DinoBattleViewPlayerWaitKPCountStopRequest *msg);
 template MTask *DinoCreatePostAndWaitTask(MMessageObserver *target, DinoBattleViewCreaturePlayMotionRequest *msg);
 template MTask *DinoCreatePostAndWaitTask(MMessageObserver *target, DinoBattleView3DTeamAttackRequest *msg);
+
+// Whether the attack has bit 0 of the fourth byte of its unk10 data set.
+BOOL DinoAttackHasUnk10Flag(u32 id) {
+    const DinoAttackDef *def = gDinoResource->GetAttackDef(id);
+    if (DinoOffsetPtr<u8>(def, def->unk10)[3] & 1) {
+        return TRUE;
+    }
+    return FALSE;
+}
 
 DinoBattleUserController::DinoBattleUserController(void *unkBC, u32 arg, u8 unkB8) : DinoBattleController(arg) {
     mUnkB8 = unkB8;

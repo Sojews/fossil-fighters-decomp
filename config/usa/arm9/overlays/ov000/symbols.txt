@@ -329,7 +329,7 @@ _ZN21DinoBattleModelPlayer21CreateUpdateColorTaskEPKmmm kind:function(thumb,size
 func_ov000_021628c4 kind:function(thumb,size=0x5c) addr:0x021628c4
 func_ov000_02162920 kind:function(thumb,size=0x92) addr:0x02162920
 func_ov000_021629b4 kind:function(thumb,size=0xfc) addr:0x021629b4
-func_ov000_02162ab0 kind:function(thumb,size=0x28) addr:0x02162ab0
+_Z22DinoAttackHasUnk10Flagm kind:function(thumb,size=0x28) addr:0x02162ab0
 func_ov000_02162ad8 kind:function(thumb,size=0xd0) addr:0x02162ad8
 func_ov000_02162ba8 kind:function(thumb,size=0x428) addr:0x02162ba8
 func_ov000_02162fd0 kind:function(thumb,size=0xc4) addr:0x02162fd0
@@ -346,8 +346,8 @@ _ZN21DinoBattleModelPlayer28SendUpdateAbilityIconRequestEhm kind:function(thumb,
 _ZN21DinoBattleModelPlayer8GetUnkB8Ev kind:function(thumb,size=0x6) addr:0x0216344c
 _ZN21DinoBattleModelPlayer9GetUnk128Ev kind:function(thumb,size=0x8) addr:0x02163454
 _ZN21DinoBattleModelPlayer9GetUnk14CEv kind:function(thumb,size=0x8) addr:0x0216345c
-func_ov000_02163464 kind:function(thumb,size=0x64) addr:0x02163464
-func_ov000_021634c8 kind:function(thumb,size=0x22) addr:0x021634c8
+_ZN21DinoBattleModelPlayer15SetKasekiPointsEi kind:function(thumb,size=0x64) addr:0x02163464
+_ZN21DinoBattleModelPlayer15AddKasekiPointsEi kind:function(thumb,size=0x22) addr:0x021634c8
 _ZN21DinoBattleModelPlayer24CreateSetKasekiPointTaskEm kind:function(thumb,size=0x34) addr:0x021634ec
 _ZN21DinoBattleModelPlayer8GetUnkC8Ev kind:function(thumb,size=0x6) addr:0x02163520
 _ZN21DinoBattleModelPlayer8SetUnkC8Eh kind:function(thumb,size=0x6) addr:0x02163528
