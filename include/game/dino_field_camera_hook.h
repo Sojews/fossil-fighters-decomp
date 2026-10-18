@@ -7,7 +7,7 @@
 class DinoFieldCameraHook {
 public:
     virtual void CameraUnk0() = 0;
-    virtual void CameraUnk1() = 0;
+    virtual void CameraUnk1(u32 map) = 0;  // the field moved to a map
 };
 
 #endif

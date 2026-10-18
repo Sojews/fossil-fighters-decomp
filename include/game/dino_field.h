@@ -120,6 +120,7 @@ struct MAfnBlock;
 
 class DinoFieldRadar : public MProcess {
 public:
+    DinoFieldRadar(DinoField *field, u32 map);
     virtual ~DinoFieldRadar();
     virtual void Idle();
     MTask *CreateModeTask(u32 from, u32 to, u32 a, u8 b);
@@ -129,6 +130,8 @@ public:
     MAfnBlock *mAffine;         // 0xA0
     u8 unkA4[0x4E8];
     std::vector<short> mUnk58C; // 0x58C: (the element type is a guess, distinct from other overlays')
+    MFx32Point mPlayerPos;      // 0x598
+    u32 unk5A0[3];
 };
 
 

@@ -10,6 +10,8 @@
 #include "m/display.h"
 #include "m/obj.h"
 #include "m/call_task.h"
+#include "game/dino_backup.h"
+#include "game/dino_resource.h"
 
 DinoFieldRadar::~DinoFieldRadar() {
     GetDisplay()->mObj->mAfn->Free(mAffine);
@@ -36,6 +38,15 @@ void DinoFieldRadarManager::Idle() {
                 mRadar->SetPlayer(model->pos, model2->angle, chara->GetHeight());
             }
         }
+    }
+}
+
+void DinoFieldRadarManager::CameraUnk1(u32 map) {
+    DinoPlayerData player;
+    gDinoBackup->GetPlayer(&player, 0);
+    if (player.radarMode && gDinoResource->GetMapExcavateMatch(map)) {
+        mRadar = new DinoFieldRadar(mField, map);
+        mParallel.AddTail(mRadar);
     }
 }
 
