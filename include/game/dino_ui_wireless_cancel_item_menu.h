@@ -31,6 +31,8 @@ public:
     virtual void OnFocusChanged(BOOL focused);
     virtual void OnDecide();
 
+    std::string GetText();
+
     u32 mUnk88[4];      // 0x88
     MMotion *mMotion;   // 0x98
     u32 mUnk9C;         // 0x9C
