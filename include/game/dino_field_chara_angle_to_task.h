@@ -7,6 +7,12 @@ class DinoFieldChara;
 
 class DinoFieldCharaAngleToTask : public MTransfer {
 public:
+    DinoFieldCharaAngleToTask(DinoFieldChara *chara, u32 angle, u32 a, u32 b) {
+        mChara = chara;
+        mAngle = angle;
+        mA = a;
+        mB = b;
+    }
     virtual ~DinoFieldCharaAngleToTask();
     virtual void Transfer();
 

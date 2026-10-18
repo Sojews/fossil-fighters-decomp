@@ -8,6 +8,13 @@ class DinoFieldChara;
 
 class DinoFieldCharaMoveToTask : public MTransfer {
 public:
+    DinoFieldCharaMoveToTask(DinoFieldChara *chara, MFx32Point coord, u32 a, u32 b, u8 c) {
+        mChara = chara;
+        mCoord = coord;
+        mA = a;
+        mB = b;
+        mC = c;
+    }
     virtual ~DinoFieldCharaMoveToTask();
     virtual void Transfer();
 

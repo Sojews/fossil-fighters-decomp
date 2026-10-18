@@ -8,6 +8,13 @@ class DinoFieldChara;
 
 class DinoFieldCharaModelMotionIdTask : public MTransfer {
 public:
+    DinoFieldCharaModelMotionIdTask(DinoFieldChara *chara, u32 motion, u8 loop, const MFx32 &speed, u8 force) {
+        mChara = chara;
+        mMotion = motion;
+        mLoop = loop;
+        mSpeed = speed;
+        mForce = force;
+    }
     virtual ~DinoFieldCharaModelMotionIdTask();
     virtual void Transfer();
 

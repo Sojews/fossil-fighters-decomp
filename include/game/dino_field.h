@@ -109,6 +109,13 @@ public:
     BOOL IsUnk20Two();
     void MoveTo(MFx32Point coord, u32 frames, u32 ease, u8 silent);
     MTask *CreateWaitMoveTask();
+    MTask *CreateWaitStopTask();
+    MTask *CreateAngleToTask(u32 angle, u32 frames, u32 ease);
+    MTask *CreateMoveToTask(MFx32Point coord, u32 frames, u32 ease, u8 silent);
+    MTask *CreateShowManpuTask(u32 manpu, MPoint offset);
+    MTask *CreateHideManpuTask();
+    MTask *CreateSetMotionTask(u32 motion, u8 loop, MFx32 speed);
+    MTask *CreateChangeMotionTask(u32 motion, u8 loop, MFx32 speed);
 
     MArchivePtr mArchive;       // 0x8C
     MArchiveFile mFile;         // 0x90

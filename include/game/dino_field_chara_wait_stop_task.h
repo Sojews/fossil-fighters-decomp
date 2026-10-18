@@ -7,6 +7,7 @@ class DinoFieldChara;
 
 class DinoFieldCharaWaitStopTask : public MTask {
 public:
+    DinoFieldCharaWaitStopTask(DinoFieldChara *chara) { mChara = chara; }
     virtual ~DinoFieldCharaWaitStopTask();
     virtual void Execute();
 

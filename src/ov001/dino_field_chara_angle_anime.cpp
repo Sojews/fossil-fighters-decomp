@@ -234,6 +234,34 @@ MTask *DinoFieldChara::CreateWaitMoveTask() {
     return set;
 }
 
+MTask *DinoFieldChara::CreateWaitStopTask() {
+    return new DinoFieldCharaWaitStopTask(this);
+}
+
+MTask *DinoFieldChara::CreateAngleToTask(u32 angle, u32 frames, u32 ease) {
+    return new DinoFieldCharaAngleToTask(this, angle, frames, ease);
+}
+
+MTask *DinoFieldChara::CreateMoveToTask(MFx32Point coord, u32 frames, u32 ease, u8 silent) {
+    return new DinoFieldCharaMoveToTask(this, coord, frames, ease, silent);
+}
+
+MTask *DinoFieldChara::CreateShowManpuTask(u32 manpu, MPoint offset) {
+    return new DinoFieldCharaShowManpuTask(this, manpu, offset);
+}
+
+MTask *DinoFieldChara::CreateHideManpuTask() {
+    return new DinoFieldCharaHideManpuTask(this);
+}
+
+MTask *DinoFieldChara::CreateSetMotionTask(u32 motion, u8 loop, MFx32 speed) {
+    return new DinoFieldCharaModelMotionIdTask(this, motion, loop, speed, FALSE);
+}
+
+MTask *DinoFieldChara::CreateChangeMotionTask(u32 motion, u8 loop, MFx32 speed) {
+    return new DinoFieldCharaModelMotionIdTask(this, motion, loop, speed, TRUE);
+}
+
 void DinoFieldChara::HideManpu() {
     if (mManpu) {
         mTaskSet->Remove(mManpu);

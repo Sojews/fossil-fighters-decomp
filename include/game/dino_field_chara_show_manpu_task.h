@@ -8,6 +8,11 @@ class DinoFieldChara;
 
 class DinoFieldCharaShowManpuTask : public MTransfer {
 public:
+    DinoFieldCharaShowManpuTask(DinoFieldChara *chara, u32 manpu, MPoint offset) {
+        mChara = chara;
+        mManpu = manpu;
+        mOffset = offset;
+    }
     virtual ~DinoFieldCharaShowManpuTask();
     virtual void Transfer();
 
