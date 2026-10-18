@@ -60,6 +60,129 @@ void DinoBackup::OnVSync() {
     mFrames = std::min(mFrames + 1, sLimits[4]);
 }
 
+// The save file cipher (RC4, it seems): the key schedule and the stream.
+struct DinoBackupCipher {
+    u32 i, j;
+    u32 state[256];
+};
+extern "C" void func_0204b0ec(DinoBackupCipher *cipher, const void *key, u32 keySize);
+extern "C" void func_0204b15c(DinoBackupCipher *cipher, const void *src, u32 size, void *dest);
+extern "C" void MATH_CalcMD5(void *digest, const void *data, u32 size);
+extern "C" const u8 data_0208ae00[16]; // the key, XORed with each block's own
+
+// Reads a save file: 0x200-byte blocks of a 16-byte key, the MD5 of the data, and 0x1E0 bytes of data, all but
+// the key encrypted. Fails if a block's data doesn't match its MD5.
+BOOL DinoBackup::Read(u32 file, u32 size, void *dest) {
+    if (mStorage == NULL) {
+        return FALSE;
+    }
+    if (!mStorage->HasFile(file)) {
+        return FALSE;
+    }
+    MDisableSoftReset();
+    MDisableSleep();
+    BOOL ok = FALSE;
+    u8 *buf;
+    u32 blocks = (size + 0x1DF) / 0x1E0;
+    buf = new u8[blocks << 9];
+    if (!mStorage->ReadFile(file, buf)) {
+        mEnabled = FALSE;
+    } else {
+        for (u32 i = 0; i < blocks; i++) {
+            u8 *block = buf + i * 0x200;
+            u8 key[16];
+            for (u32 j = 0; j < 16; j++) {
+                key[j] = block[j] ^ data_0208ae00[j];
+            }
+            DinoBackupCipher cipher;
+            func_0204b0ec(&cipher, key, 16);
+            func_0204b15c(&cipher, block + 0x10, 0x1F0, block + 0x10);
+            u8 digest[16];
+            MATH_CalcMD5(digest, block + 0x20, 0x1E0);
+            if (memcmp(digest, block + 0x10, 16) != 0) {
+                goto done;
+            }
+            MI_CpuCopy8(block + 0x20, (u8 *) dest + i * 0x1E0, 0x1E0);
+        }
+        ok = TRUE;
+    }
+done:
+    delete[] buf;
+    MEnableSoftReset();
+    MEnableSleep();
+    return ok;
+}
+
+// Writes a save file in Read's format. Blocks whose data hasn't changed keep their old encryption.
+// NONMATCHING: the end of the loop (the game makes the 0x200 step first and the source step from it).
+BOOL DinoBackup::Write(u32 file, u32 size, const void *src) {
+    if (mStorage == NULL) {
+        return FALSE;
+    }
+    MDisableSoftReset();
+    MDisableSleep();
+    BOOL ok = FALSE;
+    u8 *out;
+    u8 *old;
+    u32 i;
+    u32 blocks = (size + 0x1DF) / 0x1E0;
+    out = new u8[blocks << 9];
+    old = NULL;
+    if (mStorage->HasFile(file)) {
+        old = new u8[blocks << 9];
+        if (!mStorage->ReadFile(file, old)) {
+            mEnabled = FALSE;
+            goto done;
+        }
+    }
+    for (i = 0; i < blocks; i++) {
+        u8 *block = out + i * 0x200;
+        u8 *oldBlock = old + i * 0x200;
+        if (old != NULL) {
+            MI_CpuCopy8(oldBlock, block, 0x200);
+            u8 key[16];
+            for (u32 j = 0; j < 16; j++) {
+                key[j] = oldBlock[j] ^ data_0208ae00[j];
+            }
+            DinoBackupCipher cipher;
+            func_0204b0ec(&cipher, key, 16);
+            func_0204b15c(&cipher, oldBlock + 0x10, 0x1F0, oldBlock + 0x10);
+            u8 digest[16];
+            MATH_CalcMD5(digest, oldBlock + 0x20, 0x1E0);
+            if (memcmp(digest, oldBlock + 0x10, 16) == 0 && memcmp(oldBlock + 0x20, src, 0x1E0) == 0) {
+                goto next;
+            }
+        }
+        {
+            MI_CpuCopy8(src, block + 0x20, 0x1E0);
+            MATH_CalcMD5(block + 0x10, block + 0x20, 0x1E0);
+            for (u32 k = 0; k < 4; k++) {
+                ((u32 *) block)[k] = gDinoResource->GetRandom()->Next();
+            }
+            u8 key[16];
+            for (u32 j = 0; j < 16; j++) {
+                key[j] = block[j] ^ data_0208ae00[j];
+            }
+            DinoBackupCipher cipher;
+            func_0204b0ec(&cipher, key, 16);
+            func_0204b15c(&cipher, block + 0x10, 0x1F0, block + 0x10);
+        }
+    next:
+        src = (const u8 *) src + 0x1E0;
+    }
+    if (!mStorage->WriteFile(file, out)) {
+        mEnabled = FALSE;
+    } else {
+        ok = TRUE;
+    }
+done:
+    delete[] old;
+    delete[] out;
+    MEnableSoftReset();
+    MEnableSleep();
+    return ok;
+}
+
 u32 DinoBackup::GetSlot() {
     return mSlot;
 }
