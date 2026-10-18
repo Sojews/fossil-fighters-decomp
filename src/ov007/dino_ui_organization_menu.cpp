@@ -82,17 +82,15 @@ void DinoUiOrganizationMenuBlendResetTask::Execute() {
     Exit();
 }
 
-extern "C" void func_ov007_0217dc6c(DinoUiOrganizationMenu *menu);
-extern "C" void func_ov007_0217dcb0(DinoUiOrganizationMenu *menu);
 
 void DinoUiOrganizationMenu::OnIdle() {
     mUnk23E = TRUE;
     if (GetInput()->GetPressed() & 0x800) {
-        func_ov007_0217dc6c(this);
+        TabLeft();
         return;
     }
     if (GetInput()->GetPressed() & 0x400) {
-        func_ov007_0217dcb0(this);
+        TabRight();
     }
 }
 
@@ -173,6 +171,20 @@ void DinoUiOrganizationMenu::FinishPageLeft() {
     CreateSlots();
     Enable();
     FocusNearestItem(GetCursor());
+}
+
+void DinoUiOrganizationMenu::TabLeft() {
+    SetTab((mTab + 3) % 4);
+    if (mFocusTabs) {
+        FocusItem(mTabs[mTab]);
+    }
+}
+
+void DinoUiOrganizationMenu::TabRight() {
+    SetTab((mTab + 1) % 4);
+    if (mFocusTabs) {
+        FocusItem(mTabs[mTab]);
+    }
 }
 
 void DinoUiOrganizationMenu::CreateSlots() {

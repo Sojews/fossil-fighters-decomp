@@ -26,8 +26,13 @@ public:
     void RemoveSlotLinks();
     void FinishPageRight();
     void FinishPageLeft();
+    void SetTab(u8 tab);
+    void TabLeft();
+    void TabRight();
 
-    u32 mUnkB4[25];                     // 0xB4
+    u32 mUnkB4[5];                      // 0xB4
+    MMenuItem *mTabs[4];                // 0xC8
+    u32 mUnkD8[16];                     // 0xD8
     MMenuItem *mSlots[15];              // 0x118
     u32 mUnk154[15];                    // 0x154
     u32 mSlotCount;                     // 0x190
@@ -41,7 +46,12 @@ public:
     std::vector<void *> mUnk1DC;        // 0x1DC
     std::vector<void *> mUnk1E8;        // 0x1E8
     u32 mPage;                          // 0x1F4
-    u32 mUnk1F8[17];                    // 0x1F8
+    u32 mUnk1F8;                        // 0x1F8
+    u8 mTab;                            // 0x1FC
+    u8 unk1FD;
+    u8 mFocusTabs;                      // 0x1FE: focus the new tab's item when paging
+    u8 unk1FF;
+    u32 mUnk200[15];                    // 0x200
     u8 unk23C[2];
     u8 mUnk23E;                         // 0x23E
     u8 unk23F;
