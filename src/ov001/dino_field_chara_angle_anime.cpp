@@ -1,5 +1,5 @@
 // DinoFieldCharaAngleAnime, DinoFieldCharaWaitStopTask, DinoFieldCharaAngleToTask, DinoFieldCharaMoveToTask, DinoFieldCharaShowManpuTask, DinoFieldCharaHideManpuTask, DinoFieldCharaModelMotionIdTask.
-// Only the destructors are decompiled so far.
+// Also DinoFieldChara's members here: models, motions, movement.
 
 #include "game/dino_field.h"
 #include "m/file.h"
@@ -62,7 +62,8 @@ struct DinoFieldCharaData {
     u32 unk00;
     u32 mBodyModelCount;    // 0x04
     u32 mBodyModelNames;    // 0x08: offset of the offsets of their names
-    u8 unk0C[0x14 - 0x0C];
+    u32 mHeadModelCount;    // 0x0C
+    u32 mHeadModelNames;    // 0x10
     MFx32 mMoveSpeed;   // 0x14: -1 = the default
     MFx32 mHeight;      // 0x18
     u8 unk1C[0x20 - 0x1C];
@@ -373,6 +374,43 @@ typedef std::__red_black_tree<u32, std::pair<const u32, M3DModelResource>,
                               std::__select_first<std::pair<const u32, M3DModelResource> >, std::less<u32>,
                               std::allocator<std::pair<const u32, M3DModelResource> > >
     DinoFieldCharaCacheTree;
+static inline const DinoHeadMaskDef *GetHeadMask(DinoFieldChara *chara, u32 id) {
+    const u8 *defs = (const u8 *) chara->mHeadMasks.Get();
+    return (const DinoHeadMaskDef *) (defs + ((const u32 *) (defs + ((const DinoHeadMaskDefs *) defs)->tableOffset))[id]);
+}
+
+// The head model, with its footstep sounds: the player's head mask, if one is on.
+const char *DinoFieldChara::GetHeadModelPath() {
+    if (mModel.id == 1) {
+        mMoveSe = 0x4E8;
+        mMoveSe2 = 0x4FC;
+    } else {
+        mMoveSe = 0xC5;
+        mMoveSe2 = 0xC6;
+    }
+    DinoCharaState state;
+    gDinoBackup->GetChara(mModel.id, &state);
+    if (state.headModel >= ((DinoFieldCharaData *) mFile.GetData())->mHeadModelCount) {
+        return NULL;
+    }
+    if (mModel.id == 1 && gDinoBackup->GetSystemVar(4) != 0) {
+        mHeadMasks = gDinoResource->LoadHeadMaskDefs();
+        const DinoHeadMaskDef *mask = GetHeadMask(this, gDinoBackup->GetSystemVar(4));
+        OS_SPrintf(mMotionModelPath, data_ov001_0216a20c[2], (const char *) mask + mask->modelName);
+        mMoveSe = GetHeadMask(this, gDinoBackup->GetSystemVar(4))->moveSe;
+        mMoveSe2 = GetHeadMask(this, gDinoBackup->GetSystemVar(4))->moveSe2;
+    } else {
+        u32 head = state.headModel;
+        const u8 *data = (const u8 *) mFile.GetData();
+        const u32 *names = (const u32 *) (data + ((const DinoFieldCharaData *) data)->mHeadModelNames);
+        OS_SPrintf(mMotionModelPath, data_ov001_0216a20c[2], data + names[head]);
+    }
+    if (!MFileExists(std::string(mMotionModelPath))) {
+        return NULL;
+    }
+    return mMotionModelPath;
+}
+
 // The model a motion of the character's body model uses, if it has its own.
 const char *DinoFieldChara::GetMotionModelPath(u32 motion) {
     DinoCharaState state;

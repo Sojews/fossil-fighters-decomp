@@ -16,6 +16,7 @@
 #include "m/resource.h"
 #include "m/serializer.h"
 #include "m/3d_resource.h"
+#include "game/dino_resource.h"
 #include "game/dino_field_town_map.h"
 #include "game/dino_backup.h"
 struct DinoCharaTask;
@@ -173,8 +174,7 @@ public:
     MPoint mUnk2D8;             // 0x2D8
     u32 mUnk2E0;                // 0x2E0
     u32 mUnk2E4;                // 0x2E4
-    MArchivePtr mArchive2E8;    // 0x2E8
-    MArchiveFile mFile2EC;      // 0x2EC
+    MResource<DinoHeadMaskDefs> mHeadMasks; // 0x2E8: loaded for the player's head mask
     MTask *mManpu;              // 0x2F8: the emotion bubble shown over the character
     u32 mUnk2FC[2];             // 0x2FC
     BOOL mHasFootSe;            // 0x304
@@ -183,6 +183,7 @@ public:
     u32 mUnk310;                // 0x310
     u32 mUnk314;                // 0x314
     u32 mMoveSe;                // 0x318: the footstep sound when walking
+    u32 mMoveSe2;               // 0x31C
 };
 
 struct MAfnBlock;
