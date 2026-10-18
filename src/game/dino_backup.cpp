@@ -714,6 +714,27 @@ s32 DinoBackup::FindFreeEntry(DinoBackupEntry *entries, u32 count) {
     return -1;
 }
 
+// The order the entries are sorted into (std::stable_sort's comparison, not decompiled yet).
+struct DinoBackupEntryOrder {};
+extern "C" void func_020187c4(DinoBackupEntry *first, DinoBackupEntry *last, DinoBackupEntryOrder order);
+
+// Moves the used entries in front of the free ones, then sorts them.
+void DinoBackup::CompactEntries(DinoBackupEntry *entries, u32 count) {
+again:
+    s32 hole = -1;
+    for (u32 i = 0; i < count; i++) {
+        if (entries[i].id != 0) {
+            if (hole != -1) {
+                std::swap(entries[i], entries[hole]);
+                goto again;
+            }
+        } else if (hole == -1) {
+            hole = i;
+        }
+    }
+    func_020187c4(entries, entries + count, DinoBackupEntryOrder());
+}
+
 u32 DinoBackup::GetUnk98Capacity() {
     return mPlayer->containerNum * 8;
 }
