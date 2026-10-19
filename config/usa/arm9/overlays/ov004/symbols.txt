@@ -1398,7 +1398,6 @@ data_ov004_0217514c kind:data(any) addr:0x0217514c
 _ZTI14DinoUiSaveMenu kind:data(any) addr:0x021751a0
 _ZTS14DinoUiSaveMenu kind:data(any) addr:0x021751c0
 _ZTV14DinoUiSaveMenu kind:data(any) addr:0x021751d4
-data_ov004_021751f4 kind:data(any) addr:0x021751f4
 data_ov004_021751fc kind:data(any) addr:0x021751fc
 data_ov004_0217520c kind:data(any) addr:0x0217520c
 data_ov004_02175244 kind:data(any) addr:0x02175244

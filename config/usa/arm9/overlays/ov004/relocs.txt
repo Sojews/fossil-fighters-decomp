@@ -4882,7 +4882,7 @@ from:0x021698c4 kind:load to:0x021696b1 module:overlay(4)
 from:0x021698d2 kind:thumb_call to:0x0205329c module:main
 from:0x021698da kind:thumb_call to:0x0201ef30 module:main
 from:0x02169908 kind:load to:0x021751d4 add:0x8 module:overlay(4)
-from:0x0216990c kind:load to:0x021751f4 module:overlay(4)
+from:0x0216990c kind:load to:0x021751d4 add:0x20 module:overlay(4)
 from:0x02169910 kind:load to:0x02175130 module:overlay(4)
 from:0x02169950 kind:thumb_call to:0x02052e38 module:main
 from:0x02169960 kind:thumb_call to:0x02011dc8 module:main
