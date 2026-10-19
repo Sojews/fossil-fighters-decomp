@@ -29,7 +29,8 @@ public:
     u32 mUnkBC;                                     // 0xBC
     std::vector<void *> mUnkC0;                     // 0xC0
     std::vector<DinoCommonWindowMenuEntry> mEntries;// 0xCC
-    u32 mUnkD8[2];                                  // 0xD8
+    u32 mUnkD8;                                     // 0xD8
+    MTaskSet *mCursorTasks;                         // 0xDC: the cursor's moves
     DinoCommonWindowMenuCursor *mCursor;            // 0xE0
     void *mUnkE4;                                   // 0xE4
     MPoint mPos;                                    // 0xE8

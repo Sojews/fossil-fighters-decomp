@@ -63,6 +63,37 @@ void DinoCommonWindowMenu::AddEntry(u32 id, MRect rect, const std::string &text)
 DinoCommonWindowMenuItemFlushTask::~DinoCommonWindowMenuItemFlushTask() {
 }
 
+// The TU's pooled data (the offset is set by the TU's static initializer).
+extern "C" struct {
+    u8 unk00[0x18];
+    MPoint mCursorOffset;   // 0x18: (-9, 7), from an item to the cursor
+} data_020bbd1c;
+
+// Moves the cursor to the item and flashes its row of the window.
+void DinoCommonWindowMenu::OnFocus(MMenuItem *item) {
+    if (item == NULL) {
+        mCursor->Hide();
+        return;
+    }
+    SetSelectedItem(dynamic_cast<DinoHelpItem *>(item));
+    if (mCursor->IsHidden()) {
+        mCursor->Show();
+        mCursor->SetPosition(item->GetFrame().GetTopLeft() + data_020bbd1c.mCursorOffset);
+    } else {
+        mCursorTasks->Clear();
+        mCursorTasks->AddTail(mCursor->CreateCoordAnime(
+            mCursor->GetPosition(), item->GetFrame().GetTopLeft() + data_020bbd1c.mCursorOffset, 10, -5));
+        DinoSoundPlaySe(0x96, 0);
+    }
+    for (int i = 0; i < mChoices.size(); i++) {
+        if (item == mUnkC0[i]) {
+            mWindow->Unk0201bb5c();
+            mWindow->Flush(MRect(3, i / 4 + (i * 2 + 1), mWidth - 1, i / 4 + (i * 2 + 1) + (i % 4 < 2 ? 2 : 3)),
+                           i % 4);
+        }
+    }
+}
+
 // Sets the result, hides the items, flashes the decided one and closes the window.
 #pragma opt_strength_reduction off
 void DinoCommonWindowMenu::OnDecide(MMenuItem *item) {
