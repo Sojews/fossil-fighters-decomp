@@ -17,6 +17,7 @@ class MBg;
 class MText;
 class MPalUnit;
 class MChr;
+struct MChrBlock;
 
 class DinoBattleViewAbilityMenuBG : public MProcess {
 public:
@@ -26,16 +27,17 @@ public:
 
     void SetPriority(int priority);
     void StateShow();
+    void StateUpdate();
 
     MBg *mBg;                   // 0x74
     u32 unk78;
     MText *mText;               // 0x7C
     MPalUnit *mPalBlock;       // 0x80
-    u32 unk84;
+    MChrBlock *mChrBlock;       // 0x84
     MChr *mChr;                 // 0x88
     MPictureFile mPicture;      // 0x8C
     void (DinoBattleViewAbilityMenuBG::*mState)(); // 0xC0
-    u8 unkC8[0x1000];
+    u16 mScreen[64][32];        // 0xC8: built here, then transferred
     std::vector<void *> mUnk10C8; // 0x10C8
     u8 mUnk10D4;                // 0x10D4: owns the BG resources
     u8 unk10D5[0x10E0 - 0x10D5];

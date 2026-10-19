@@ -81,7 +81,7 @@ extern "C" void func_ov000_0218c960(DinoBattleTalkWindow *window) {
     window->mFace = 0;
     if (!window->mTasksC4->IsEmpty()) {
         if (window->mState == 2) {
-        return;
+            return;
         }
         window->mState = 2;
         window->mTasksC0->Clear();

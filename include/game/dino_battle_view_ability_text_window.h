@@ -14,6 +14,7 @@ class MRectAnime;
 
 class DinoBattleViewAbilityTextWindow : public MTask {
 public:
+    DinoBattleViewAbilityTextWindow(BOOL rows, u32 arg);
     virtual ~DinoBattleViewAbilityTextWindow();
     virtual void Execute();
 
