@@ -411,3 +411,10 @@ void MAnmMakeArrays() {
     delete[] new M3DRyusen[1];
 }
 #pragma dont_inline reset
+
+// (Calling find here instantiates it with the name the game's callers use.)
+#pragma dont_inline on
+std::string::size_type MAnmModelFindAnchor(const std::string &s, const char *text) {
+    return s.find(text, 0);
+}
+#pragma dont_inline reset

@@ -152,3 +152,9 @@ u32 DinoCommonWindowMenuCursor::GetPlaneMask() {
 
 // String members the game emits in this file.
 template std::string std::string::substr(std::string::size_type pos, std::string::size_type n) const;
+// (Calling find here instantiates it with the name the game's callers use.)
+#pragma dont_inline on
+std::string::size_type DinoFlushTaskFindAnchor(const std::string &s, char c) {
+    return s.find(c, 0);
+}
+#pragma dont_inline reset
