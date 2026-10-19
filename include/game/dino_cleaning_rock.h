@@ -19,12 +19,14 @@ public:
     u8 GetCell(int row, int col);
     // Works out each cell's hardness: its layer's, scaled.
     void RefreshHardness();
+    // Hits the cell with the power, breaking through layers; returns what's left of the power.
+    MFx32 Hit(int row, int col, MFx32 power);
 
     u32 mUnk74;                 // 0x74
     DinoCleaningImage *mImage;  // 0x78
     u32 mUnk7C;                 // 0x7C
     MFx32 mScale;               // 0x80
-    fx32 mHardness[36][28];     // 0x84
+    MFx32 mHardness[36][28];    // 0x84
 };
 
 #endif

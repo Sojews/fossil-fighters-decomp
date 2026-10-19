@@ -20,7 +20,8 @@ public:
     std::string mName;      // 0x08
     u8 mUnk14;              // 0x14
     u8 *mPixels;            // 0x18
-    u8 unk1C[0x410 - 0x1C];
+    u8 unk1C[0x20 - 0x1C];
+    u8 mHard[36][28];       // 0x20: cells the tools can't break
     u8 mCells410[36][28];   // 0x410
     u8 mUnk800;             // 0x800
     u8 mCells[36][28];      // 0x801

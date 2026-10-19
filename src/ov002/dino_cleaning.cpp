@@ -125,7 +125,6 @@ MFx32 DinoCleaningKasekiRock::GetDirtRatio() {
     return mView->GetDirtRatio();
 }
 
-extern "C" MFx32 func_ov002_0215f0ac(DinoCleaningRock *rock, int row, int col, MFx32 power);
 extern "C" void func_ov002_02159990(DinoCleaningImage *image, int row, int col, s32 layer);
 
 // Hits the cell: the top rock takes the power, and what breaks through (less the decay, scaled) hits the rock below;
@@ -135,12 +134,12 @@ void DinoCleaningKasekiRock::Hit(int row, int col, MFx32 power, MFx32 scale, MFx
     if (mUnk4B8) {
         return;
     }
-    MFx32 left = func_ov002_0215f0ac(mRock90, row, col, power);
+    MFx32 left = mRock90->Hit(row, col, power);
     if (left != power) {
         left = std::max(MFx32(0), left - decay);
     }
     power = left;
-    func_ov002_0215f0ac(mRock8C, row, col, power * scale);
+    mRock8C->Hit(row, col, power * scale);
     if (mUnk4A0 != 1) {
         func_ov002_02159990(((DinoCleaningImageView *)mUnk88)->GetImage(0), row, col, mRock8C->GetCellLayer(row, col));
         return;
