@@ -3,6 +3,7 @@
 #pragma ipa file
 
 #include "game/dino_event_exec.h"
+#include "game/dino_field_area_panel.h"
 #include "game/dino_battle.h"
 #include "nitro/mi.h"
 #include "m/overlay.h"

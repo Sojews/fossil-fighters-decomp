@@ -3,6 +3,7 @@
 #pragma ipa file
 
 #include "game/dino_field.h"
+#include "game/dino_field_area_panel.h"
 #include "game/dino_field_kaseki_rock.h"
 #include "m/lcd.h"
 #include "game/dino_field_chara_focus_task.h"
@@ -975,7 +976,7 @@ void DinoField::Read(const void *buf) {
     if (!mUnk258 && gDinoBackup->GetSystemFlag(0x20)) {
         mUnk2BC->Play(1, 0);
     }
-    DinoFieldNamePanel *panel = mCamera->mNamePanel;
+    DinoFieldAreaPanel *panel = mCamera->mNamePanel;
     panel->SetMode(gDinoBackup->GetUnk180(), 0);
 }
 

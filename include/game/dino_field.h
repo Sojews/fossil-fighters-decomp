@@ -31,17 +31,7 @@ class DinoGradationBg;
 class MSmartOam;
 class MDisplay;
 
-// The panel that shows the area's name.
-class DinoFieldNamePanel : public MProcess {
-public:
-    // Not decompiled yet.
-    DinoFieldNamePanel();
-    virtual ~DinoFieldNamePanel();
-    virtual void Idle();
-    void SetMode(int mode, int arg);
-
-    u8 unk74[0x88 - 0x74];
-};
+class DinoFieldAreaPanel;
 
 class DinoFieldCamera : public MProcess, public MSerializer {
 public:
@@ -117,7 +107,7 @@ public:
     u32 mSavedRotateArgs[3];        // 0x130
     s32 mSavedSteps;                // 0x13C
     u32 mUnk140;                    // 0x140
-    DinoFieldNamePanel *mNamePanel; // 0x144
+    DinoFieldAreaPanel *mNamePanel; // 0x144
     MFx32 mUnk148;                  // 0x148
     u8 mHeightSet;                  // 0x14C
     std::vector<DinoFieldCameraHook *> mHooks;  // 0x150: told when the field changes maps

@@ -1,6 +1,7 @@
 // DinoFieldCamera.
 
 #include "game/dino_field.h"
+#include "game/dino_field_area_panel.h"
 #include "game/dino_field_camera_hook.h"
 #include "m/anime.h"
 
@@ -51,7 +52,7 @@ DinoFieldCamera::DinoFieldCamera(DinoField *field, u32 namePanel)
     Add(&mSavedSteps, 1);
     Close();
     if (mUnk90 != 0) {
-        mNamePanel = new DinoFieldNamePanel;
+        mNamePanel = new DinoFieldAreaPanel;
         mParallel.AddTail(mNamePanel);
     }
 }
