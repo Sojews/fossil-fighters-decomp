@@ -2,6 +2,7 @@
 // Only a few small methods are decompiled so far.
 
 #include "game/dino_field.h"
+#include "m/font.h"
 #include "m/bg_new_task.h"
 #include "m/overlay.h"
 #include "game/dino_event_save_option.h"
@@ -213,8 +214,16 @@ void DinoEventLoop::UpdateRegions() {
     }
 }
 
+void DinoEventLoop::ReleasePicture() {
+    if (mHasPicture) {
+        mHasPicture = FALSE;
+        mFont->Release();
+        mPicture = MPictureFile();
+    }
+}
+
 void DinoEventLoop::FinishCommands() {
-    ReleaseUnkCD();
+    ReleasePicture();
     mUnkA4 = MResource<DinoEventLoopUnkA4Data>();
     if (!mUnkBE) {
         mField->SetUnk258(FALSE);

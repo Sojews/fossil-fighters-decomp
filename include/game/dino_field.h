@@ -508,7 +508,8 @@ public:
     void RunCommand(const u8 *command);
     // When the commands are done: lets go of what they loaded, lets the player move and the camera follow again.
     void FinishCommands();
-    void ReleaseUnkCD();
+    // Lets go of the font and the picture, if loaded.
+    void ReleasePicture();
 
     void (DinoEventLoop::*mState)();    // 0x74
     u32 *mResult;           // 0x7C
@@ -524,7 +525,9 @@ public:
     u8 unkBF;
     MBitVector mRegions;    // 0xC0: the regions the open events' conditions name, and the linked ones
     u8 mEventCleared;       // 0xCC: an event was just cleared
-    u8 unkCD[0x108 - 0xCD];
+    u8 mHasPicture;         // 0xCD: the font and the picture below are loaded
+    MFont *mFont;           // 0xD0
+    MPictureFile mPicture;  // 0xD4
     u32 mUnk108;            // 0x108
     u32 mUnk10C;            // 0x10C
     MScreen *mScreen;       // 0x110: the field's screen
