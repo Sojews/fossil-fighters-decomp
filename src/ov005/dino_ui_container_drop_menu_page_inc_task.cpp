@@ -13,6 +13,7 @@
 #include "m/bright.h"
 #include "game/dino_resource.h"
 #include "game/dino_common_window_yes_no_dialog.h"
+#include "game/dino_ui3_parts_fraction.h"
 
 // The text with every tag replaced by the value (unless the value has the tag itself).
 // NONMATCHING: ours keeps an unreachable epilogue after the loop (as ov003's copy).
@@ -61,12 +62,12 @@ BOOL DinoUiContainerDropMenu::PageRight() {
 
 #pragma opt_strength_reduction off
 void DinoUiContainerDropMenu::DeleteItems() {
-    for (u32 i = 0; i < mUnkC4.size(); i++) {
-        RemoveLink((MMenuItem *)mUnkC4[i], 2);
-        RemoveLink((MMenuItem *)mUnkC4[i], 3);
-        RemoveLink((MMenuItem *)mUnkC4[i], 1);
-        RemoveItem((MMenuItem *)mUnkC4[i]);
-        delete (MMenuItem *)mUnkC4[i];
+    for (u32 i = 0; i < mItems.size(); i++) {
+        RemoveLink(mItems[i], 2);
+        RemoveLink(mItems[i], 3);
+        RemoveLink(mItems[i], 1);
+        RemoveItem(mItems[i]);
+        delete mItems[i];
     }
 }
 #pragma opt_strength_reduction reset
@@ -182,4 +183,54 @@ void DinoUiContainerDropMenu::OnBackDecided() {
     dialog->SetLabels2(std::string(gDinoResource->GetText(data_0208a654)),
                        std::string(gDinoResource->GetText(data_0208a650)));
     mSerial.AddTail(dialog);
+}
+
+extern const u32 data_0208a660, data_0208a664, data_0208a66c, data_0208a674;
+
+// Shows the page: the last page has mUnkC0 and its own help texts.
+void DinoUiContainerDropMenu::ShowPage() {
+    if (mPage == mLastPage) {
+        mUnkC0->Show();
+        mHelp12C->SetText(gDinoResource->GetText(data_0208a664));
+        mHelp130->SetText(gDinoResource->GetText(data_0208a660));
+    } else {
+        mUnkC0->Hide();
+        mHelp12C->SetText(gDinoResource->GetText(data_0208a674));
+        mHelp130->SetText(gDinoResource->GetText(data_0208a66c));
+    }
+    DeleteItems();
+    mFraction->SetNumerator(mPage + 1);
+    CreateItems();
+    FocusNearestItem(GetCursor());
+}
+
+// Links the items as a grid four wide (ov005's copy; see dino_ui2_parts_kaseki_button.h).
+void DinoUi2LinkKasekiGrid(MMenu *menu, std::vector<MMenuItem *> &items, MMenuItem *below);
+
+// Where the kaseki buttons go: two rows of four.
+extern struct {
+    u8 unk00[0x4C];
+    int x;          // 0x4C: the first button
+    int y;          // 0x50
+    int columnX;    // 0x54: to the next in a row
+    int columnY;    // 0x58
+    int rowX;       // 0x5C: to the next row
+    int rowY;       // 0x60
+} data_ov005_02169388;
+
+// NONMATCHING: clear's and push_back's byte temporaries take each other's stack slots.
+void DinoUiContainerDropMenu::CreateItems() {
+    mItems.clear();
+    for (int i = 0; i < 8; i++) {
+        if (i + mPage * 8 < mIcons.size()) {
+            MMenuItem *item = new DinoUi3PartsKasekiButton(
+                mOam,
+                MPoint(data_ov005_02169388.x + data_ov005_02169388.columnX * (i % 4) + data_ov005_02169388.rowX * (i / 4),
+                       data_ov005_02169388.y + data_ov005_02169388.columnY * (i % 4) + data_ov005_02169388.rowY * (i / 4)),
+                mIcons[mPage * 8 + i], 0);
+            AddItem(item);
+            mItems.push_back(item);
+        }
+    }
+    DinoUi2LinkKasekiGrid(this, mItems, mUnkB8);
 }
