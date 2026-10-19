@@ -159,11 +159,13 @@ void DinoUi2ContainerBaseDecideButton::OnFocusChanged(BOOL focused) {
 
 // Pooled file statics: the button corners.
 struct DinoUi2ContainerBaseStatics {
-    u8 unk00[0x50];
+    u8 unk00[0x28];
+    MPoint mRow;                // 0x28: from a page button to the next row's
+    u8 unk30[0x50 - 0x30];
     MPoint mDecideTopLeft;      // 0x50
     u8 unk58[0x10];
     MPoint mDecidePos;          // 0x68
-    u8 unk70[8];
+    MPoint mColumn;             // 0x70: from a page button to the next in its row
     MPoint mDecideBottomRight;  // 0x78
 };
 extern "C" DinoUi2ContainerBaseStatics data_ov004_02176b44;
@@ -266,6 +268,45 @@ void DinoUi2ContainerBaseMenu::ResetDecideButton() {
     DinoUi2ContainerBaseMenuItem *decide = mLinkFrom;
     decide->mSerial.Clear();
     decide->mMotion->Play(1, 0);
+}
+
+// The page's first button.
+extern "C" MPoint data_ov004_02176bc4;
+extern "C" const u32 data_0208aac8; // the empty slots' help text
+
+// Makes the page's buttons (blank past the last entry) and links them in a grid.
+// NONMATCHING: scheduling only (as DinoUiContainerBaseMenu::RefreshPage2).
+void DinoUi2ContainerBaseMenu::RefreshPage2() {
+    u32 emptyText = data_0208aac8;
+    for (int i = 0; i < 8; i++) {
+        DinoUi2PartsKasekiButton *button;
+        if (mUnk134.size() > i + mPage * 8) {
+            DinoBackupEntry entry;
+            GetEntry(i + mPage * 8, &entry);
+            button = new DinoUi2PartsKasekiButton(
+                mOam,
+                MPoint(data_ov004_02176bc4.x + data_ov004_02176b44.mColumn.x * (i % 4) +
+                           data_ov004_02176b44.mRow.x * (i / 4),
+                       data_ov004_02176bc4.y + data_ov004_02176b44.mColumn.y * (i % 4) +
+                           data_ov004_02176b44.mRow.y * (i / 4)),
+                (const DinoUiKasekiIcon &)mUnk134[i + mPage * 8], GetFlag(i + mPage * 8), mUnk100);
+            button->SetActive(IsMarkable(&entry));
+        } else {
+            button = new DinoUi2PartsKasekiButton(
+                mOam,
+                MPoint(data_ov004_02176bc4.x + data_ov004_02176b44.mColumn.x * (i % 4) +
+                           data_ov004_02176b44.mRow.x * (i / 4),
+                       data_ov004_02176bc4.y + data_ov004_02176b44.mColumn.y * (i % 4) +
+                           data_ov004_02176b44.mRow.y * (i / 4)),
+                (const DinoUiKasekiIcon &)DinoUi2GetEmptyKasekiInfo(), 0, emptyText);
+            button->HideMotion();
+        }
+        mItems.push_back(button);
+        AddItem(button);
+    }
+    DinoUi2LinkKasekiGrid(this, (std::vector<MMenuItem *> &)mItems, mLinkFrom);
+    AddLink(mLinkFrom, 4, (MMenuItem *)mItems[4]);
+    RefreshMarks();
 }
 
 // Entries that can't be marked now (and aren't) are greyed out.
