@@ -89,9 +89,12 @@ public:
     int mMode;                      // 0xE0: 1: only the scan was started
     u32 mUnkE4;                     // 0xE4: a random 60-119 (frames)
     std::set<DinoMacAddress> mPartners; // 0xE8: the ones exchanged with already
-    u8 unkF4[8];
+    u8 mPartnerMac[6];              // 0xF4
+    u8 unkFA[2];
     u8 mBeacon[0x18];               // 0xFC: sent when this side is the parent
-    u8 unk114[0x12C - 0x114];
+    u8 mPartnerInfo[4];             // 0x114: the partner's beacon
+    u16 mPartnerName[9];            // 0x118
+    u8 unk12A[2];
     u8 mDone[2];                    // 0x12C: each side has sent its DinoExchangeDoneSignal
     u8 unk12E[2];
     u64 mNextTime;                  // 0x130: in play frames
@@ -101,7 +104,8 @@ public:
     MResource<void> mResource;      // 0x140
     DinoBackupEntry mRock;          // 0x150: the partner's
     DinoPlayerProfile mProfile;     // 0x164: the partner's
-    u8 unk1E8[0x1EC - 0x1E8];
+    u8 mIsParent;                   // 0x1E8: this side found the partner
+    u8 unk1E9[0x1EC - 0x1E9];
 };
 
 #endif

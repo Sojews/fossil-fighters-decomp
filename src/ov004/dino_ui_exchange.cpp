@@ -121,12 +121,16 @@ extern "C" struct {
     void (DinoUiExchange::*StateCancelled_7C)(); // 0x7c (its second word is in the next block)
 } data_ov004_02171de0;
 extern "C" struct {
-    u8 unk00[0x2C];
+    u8 unk00[0xC];
+    void (DinoUiExchange::*OnNoMessage_0C)(MMessage *msg); // 0x0c
+    u8 unk14[0x1C - 0x14];
+    void (DinoUiExchange::*State02156718_1C)(); // 0x1c
+    void (DinoUiExchange::*State02156acc_24)(); // 0x24
     void (DinoUiExchange::*StateEnd_2C)(); // 0x2c
     void (DinoUiExchange::*Unk02155f24_34)();
     MPoint mMessagePos;  // 0x3c
     void (DinoUiExchange::*StateRestart_44)(); // 0x44
-    u8 unk4C[0x54 - 0x4C];
+    void (DinoUiExchange::*OnNoMessage_4C)(MMessage *msg); // 0x4c
     void (DinoUiExchange::*StateCheck_54)(); // 0x54
     u8 unk5C[0x6C - 0x5C];
     void (DinoUiExchange::*StateStart_6C)(); // 0x6c
@@ -134,8 +138,10 @@ extern "C" struct {
     void (DinoUiExchange::*StateFinish_7C)(); // 0x7c (its second word is in the next block)
 } data_ov004_02171e60;
 extern "C" struct {
-    u8 unk00[0xC];
+    u8 unk00[0x4];
+    void (DinoUiExchange::*OnNoMessage_04)(MMessage *msg); // 0x04
     void (DinoUiExchange::*StateLeave_0C)(); // 0x0c
+    void (DinoUiExchange::*State02156718_14)(); // 0x14
 } data_ov004_02171ee0;
 
 DinoUiExchange::DinoUiExchange() : MProcess(NULL) {
@@ -219,6 +225,55 @@ void DinoUiExchange::StateSearch() {
 }
 
 extern const u32 data_0208ab40, data_0208ad4c, data_0208ad50;
+
+// A partner found while scanning (taken once the retry wait is over), or a child's join as the parent or the child.
+void DinoUiExchange::OnScanMessage(MMessage *msg) {
+    switch (msg->mId) {
+    case 0x1A:
+        if (gDinoBackup->GetPlayFrames() < mNextTime) {
+            return;
+        }
+        {
+            MI_CpuCopy8((u8 *)msg + 0x80, mPartnerMac, 6);
+            {
+                MResource<DinoExcavateDefs> defs = gDinoResource->GetExcavateDefs();
+                u32 wait = defs.Get()->exchangeRetryWait;
+                u64 frames = gDinoBackup->GetPlayFrames();
+                mNextTime = frames + wait;
+            }
+            mIsParent = TRUE;
+            MakeExchangeEntry(&mRock);
+            InitProfile(&mProfile);
+            for (u32 i = 0; i < 9; i++) {
+                mPartnerName[i] = mProfile.name[i];
+            }
+            Reset();
+            mOnMessage = data_ov004_02171e60.OnNoMessage_4C;
+            mState = data_ov004_02171e60.State02156acc_24;
+        }
+        break;
+    case 0:
+        if (mMode == 0) {
+            MI_CpuCopy8((u8 *)msg + 0x80, mPartnerMac, 6);
+            MI_CpuCopy8((u8 *)msg + 0x10, mPartnerInfo, 0x18);
+            GetSerial()->AddTail(mMultiPlay->CreateEndScanTask(),
+                                 mMultiPlay->CreateStartChildTask(*(u32 *)((u8 *)msg + 0xC), mBeacon),
+                                 mMultiPlay->CreateSynchronizeDelayTask());
+            mOnMessage = data_ov004_02171e60.OnNoMessage_0C;
+            mState = data_ov004_02171e60.State02156718_1C;
+        }
+        break;
+    case 5:
+        if (mMode == 1) {
+            MI_CpuCopy8((u8 *)msg + 0x26, mPartnerMac, 6);
+            MI_CpuCopy8((u8 *)msg + 0xE, mPartnerInfo, 0x18);
+            mSerial.AddTail(mMultiPlay->CreateSynchronizeDelayTask());
+            mOnMessage = data_ov004_02171ee0.OnNoMessage_04;
+            mState = data_ov004_02171ee0.State02156718_14;
+        }
+        break;
+    }
+}
 
 // Cancelled: asks whether to stop exchanging.
 void DinoUiExchange::StateCancelled() {

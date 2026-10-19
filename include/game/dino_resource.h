@@ -194,7 +194,8 @@ struct DinoExcavateDefs {
     u32 exchangeCount;  // 0x88: how many fossils an exchange can give
     u32 exchangeOffset; // 0x8C: the fossil ids an exchange can give (u32 each)
     u32 exchangeWait;   // 0x90: frames between wireless exchanges
-    u8 unk94[0x9C - 0x94];
+    u32 exchangeRetryWait;  // 0x94: frames before a found partner is taken again
+    u8 unk98[0x9C - 0x98];
     u32 kasekiRockMap;  // 0x9C: the map the kaseki rocks are on
     u8 unkA0[0xB8 - 0xA0];
     u32 demoOffset;     // 0xB8: DinoDemoBattles
