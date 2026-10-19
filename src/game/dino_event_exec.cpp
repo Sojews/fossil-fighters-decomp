@@ -1900,6 +1900,31 @@ DinoEventExecStartBehold::~DinoEventExecStartBehold() {
 DinoEventExecFinishBehold::~DinoEventExecFinishBehold() {
 }
 
+DinoEventExecChoice::DinoEventExecChoice(DinoEventLoop *event, u32 a, u32 b, u32 c, u32 d) : MProcess(NULL) {
+    mEvent = event;
+    mUnk78 = a;
+    mUnk7C = b;
+    mUnk80 = c;
+    mStep = 0;
+    mUnk8C = d;
+}
+
+DinoEventExecShopChoice::DinoEventExecShopChoice(DinoEventLoop *event, u32 a, DinoEventVar var) : MProcess(NULL) {
+    mEvent = event;
+    mUnk78 = a;
+    mVar = var;
+    mStep = 0;
+}
+
+DinoEventExecShopChoice2::DinoEventExecShopChoice2(DinoEventLoop *event, u32 a, DinoEventVar var, u32 b)
+    : MProcess(NULL) {
+    mEvent = event;
+    mUnk78 = a;
+    mVar = var;
+    mUnk84 = b;
+    mStep = 0;
+}
+
 DinoEventExecChoice::~DinoEventExecChoice() {
 }
 

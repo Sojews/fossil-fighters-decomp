@@ -444,8 +444,17 @@ public:
 
 class DinoEventExecChoice : public MProcess {
 public:
+    DinoEventExecChoice(DinoEventLoop *event, u32 a, u32 b, u32 c, u32 d);
     virtual ~DinoEventExecChoice();
     virtual void Idle();
+
+    DinoEventLoop *mEvent;  // 0x74
+    u32 mUnk78;             // 0x78
+    u32 mUnk7C;             // 0x7C
+    u32 mUnk80;             // 0x80
+    u32 mStep;              // 0x84
+    u32 mUnk88;             // 0x88
+    u32 mUnk8C;             // 0x8C
 };
 
 class DinoEventExecChoice2 : public MProcess {
@@ -469,14 +478,29 @@ public:
 
 class DinoEventExecShopChoice : public MProcess {
 public:
+    DinoEventExecShopChoice(DinoEventLoop *event, u32 a, DinoEventVar var);
     virtual ~DinoEventExecShopChoice();
     virtual void Idle();
+
+    DinoEventLoop *mEvent;  // 0x74
+    u32 mUnk78;             // 0x78
+    DinoEventVar mVar;      // 0x7C
+    u32 mStep;              // 0x84
+    u32 mUnk88;             // 0x88
 };
 
 class DinoEventExecShopChoice2 : public MProcess {
 public:
+    DinoEventExecShopChoice2(DinoEventLoop *event, u32 a, DinoEventVar var, u32 b);
     virtual ~DinoEventExecShopChoice2();
     virtual void Idle();
+
+    DinoEventLoop *mEvent;  // 0x74
+    u32 mUnk78;             // 0x78
+    DinoEventVar mVar;      // 0x7C
+    u32 mUnk84;             // 0x84
+    u32 mStep;              // 0x88
+    u32 mUnk8C;             // 0x8C
 };
 
 class DinoEventExecFade : public MProcess {
