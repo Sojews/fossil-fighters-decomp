@@ -11,6 +11,12 @@
 DinoEventKasekiRockGet::~DinoEventKasekiRockGet() {
 }
 
+DinoEventKasekiRockGetContainerSelect::DinoEventKasekiRockGetContainerSelect(DinoEventLoop *event, u32 arg0,
+                                                                             u32 arg1,
+                                                                             const std::vector<std::string> &names)
+    : DinoEventCaptureFadeUiTask(event, 3), mArg0(arg0), mArg1(arg1), mNames(names) {
+}
+
 DinoEventKasekiRockGetContainerSelect::~DinoEventKasekiRockGetContainerSelect() {
 }
 
@@ -124,7 +130,10 @@ void DinoEventKasekiRockGet::StateEnd() {
 }
 
 template class std::__vec_deleter<std::string, std::allocator<std::string> >;
+// NONMATCHING: the game puts the reallocating branch's tail at the end.
+template void std::__vec_deleter<std::string, std::allocator<std::string> >::assign<std::string *>(
+    std::string *first, std::string *last, Metrowerks::int2type<true>);
 
 MTask *DinoEventKasekiRockGetContainerSelect::CreateUi() {
-    return new DinoUiContainerDropMenu(mUnk84[0], mUnk84[1], std::vector<std::string>(mUnk8C));
+    return new DinoUiContainerDropMenu(mArg0, mArg1, std::vector<std::string>(mNames));
 }

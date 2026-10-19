@@ -408,9 +408,10 @@ namespace std {
             return;
         }
         size_t n = last - first;
-        if (n > cap()) {
-            size_t max = grow_by(n - cap());
-            reallocate_clear(n, max);
+        size_t c = cap();
+        if (n > c) {
+            UnkMSLStruct1 unk = UnkMSLStruct1();
+            reallocate_clear(n, grow_by(n - c));
             construct_range_at_end(first, last);
         } else {
             const T *mid = first + std::min(n, size_);

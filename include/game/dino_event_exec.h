@@ -627,11 +627,14 @@ public:
 
 class DinoEventKasekiRockGetContainerSelect : public DinoEventCaptureFadeUiTask {
 public:
+    DinoEventKasekiRockGetContainerSelect(DinoEventLoop *event, u32 arg0, u32 arg1,
+                                          const std::vector<std::string> &names);
     virtual ~DinoEventKasekiRockGetContainerSelect();
     virtual MTask *CreateUi();
 
-    u32 mUnk84[2];                      // 0x84
-    std::vector<std::string> mUnk8C;    // 0x8C
+    u32 mArg0;                          // 0x84
+    u32 mArg1;                          // 0x88
+    std::vector<std::string> mNames;    // 0x8C
 };
 
 class DinoEventExecKasekiRockGet : public MProcess {
