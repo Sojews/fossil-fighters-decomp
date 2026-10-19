@@ -19,6 +19,8 @@ public:
     MTask *CreateMessage(u32 message, const std::string &extra);
     void AddMessage(u32 message);
     void StateMode();
+    void StateCheckRocks();
+    void State02038544();
     void StateLevelMessage();
     void StateNoneMessage();
     void StateStart();

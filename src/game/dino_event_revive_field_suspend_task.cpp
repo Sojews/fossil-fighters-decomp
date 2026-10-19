@@ -112,7 +112,9 @@ extern "C" struct {
     void (DinoEventRevive::*End_4C)();
     void (DinoEventRevive::*StateContainerSelect_54)();
     void (DinoEventRevive::*StateContainerSelect_5C)();
-    u8 unk64[0x7C - 0x64];
+    void (DinoEventRevive::*State02038544_64)();
+    void (DinoEventRevive::*StateMode_6C)();
+    u8 unk74[0x7C - 0x74];
     void (DinoEventRevive::*StateStart_7C)();
     u8 unk84[0x94 - 0x84];
     void (DinoEventRevive::*End_94)();
@@ -120,11 +122,31 @@ extern "C" struct {
     u8 unkA4[0xBC - 0xA4];
     void (DinoEventRevive::*StateSelected_BC)();
     u8 unkC4[0xCC - 0xC4];
-    void (DinoEventRevive::*Unk02038abc_CC)();
+    void (DinoEventRevive::*StateCheckRocks_CC)();
     u8 unkD4[0xDC - 0xD4];
     void (DinoEventRevive::*StateContainerSelect_DC)();
     void (DinoEventRevive::*StateNoneMessage_E4)();
 } data_020bd628;
+
+inline void DinoEventRevive::AddMessage(u32 message) {
+    mSerial.AddTail(CreateMessage(message, ""));
+}
+
+// Nothing to revive (the flag is set, or no rock is left), or choose the rocks to put in.
+// NONMATCHING: the game's messages share one stack slot for their temporary string (see StateLevelMessage).
+void DinoEventRevive::StateCheckRocks() {
+    if (gDinoBackup->GetSystemFlag(12)) {
+        AddMessage(0x14);
+        mState = data_020bd628.StateCleaned_34;
+    } else if (!gDinoBackup->HasUnrevealedUnk98()) {
+        AddMessage(3);
+        mState = data_020bd628.State02038544_64;
+    } else {
+        mUnkE0.clear();
+        mSerial.AddTail(new DinoEventReviveDepositSelect(mEvent, &mUnkE0));
+        mState = data_020bd628.StateMode_6C;
+    }
+}
 
 // What the event was started for: 0 revives, 1 and 2 other messages, 3 the excavation level.
 void DinoEventRevive::StateMode() {
@@ -148,15 +170,12 @@ void DinoEventRevive::StateMode() {
         mState = data_020bd628.StateNoneMessage_E4;
         break;
     case 1:
-        mState = data_020bd628.Unk02038abc_CC;
+        mState = data_020bd628.StateCheckRocks_CC;
         break;
     }
 }
 
 // Shows a message (no extra text).
-inline void DinoEventRevive::AddMessage(u32 message) {
-    mSerial.AddTail(CreateMessage(message, ""));
-}
 
 // NONMATCHING: the game's messages share one stack slot for their temporary string.
 void DinoEventRevive::StateLevelMessage() {
