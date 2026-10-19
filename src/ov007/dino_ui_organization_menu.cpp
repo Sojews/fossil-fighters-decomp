@@ -1,5 +1,5 @@
 // DinoUiOrganizationMenu (team organization).
-// NONMATCHING: RemoveMember (the search loop); the rest (OnStart, OnFocus, OnDecide, slot creation...) is to do.
+// NONMATCHING: RemoveMember (the search loop); the rest (OnStart, OnFocus, SetMember, UpdateDetails...) is to do.
 
 #pragma ipa file
 
@@ -322,6 +322,62 @@ void DinoUiOrganizationMenu::SetSort(u8 sort) {
 }
 
 // Everything back on, and the links back to how they start.
+void DinoUiOrganizationMenu::OnDecide(MMenuItem *item) {
+    for (int i = 0; i < 4; i++) {
+        if (item == mTabs[i]) {
+            SetTab(i);
+        }
+    }
+    for (int i = 0; i < 5; i++) {
+        if (item == mButtons[i]) {
+            SetSort(i);
+        }
+    }
+    if (mUnk23C == TRUE) {
+        if (mSelected < 5) {
+            for (int i = 0; i < 5; i++) {
+                if (i != mSelected && item == mListItems[i]) {
+                    if (mTeam.slots[mSelected] != 0 || mTeam.slots[i] != 0) {
+                        SwapMember(i);
+                    }
+                    return;
+                }
+            }
+            for (int i = 0; i < mSlotCount; i++) {
+                if (item == mSlots[i] && mUnk23E && !InTeam(mCreatures[mPage * 15 + i])) {
+                    PlaceSlot(i);
+                    return;
+                }
+            }
+        } else {
+            for (int i = 0; i < 5; i++) {
+                if (item == mListItems[i]) {
+                    PlaceMember(i);
+                    return;
+                }
+            }
+        }
+    } else {
+        for (int i = 0; i < 5; i++) {
+            if (item == mListItems[i]) {
+                if (mUnk23E) {
+                    mSelected = i;
+                    OpenMemberMenu(i);
+                }
+                return;
+            }
+        }
+        for (int i = 0; i < mSlotCount; i++) {
+            if (item == mSlots[i]) {
+                if (mUnk23E && !InTeam(mCreatures[mPage * 15 + i])) {
+                    PickSlot(i);
+                }
+                return;
+            }
+        }
+    }
+}
+
 void DinoUiOrganizationMenu::SwapMember(int member) {
     mUnk23C = FALSE;
     func_ov007_0217fb94(this, 0);
