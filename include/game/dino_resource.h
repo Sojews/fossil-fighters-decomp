@@ -38,6 +38,9 @@ struct DinoCreatureDefs {
 };
 
 struct DinoCreatureDef {
+    u8 GetUnk0D() const { return unk0D; }
+    u32 GetVoice() const { return voice; }
+
     u8 unk00[0xD];
     u8 unk0D;
     u8 unk0E[0x24 - 0xE];
@@ -229,10 +232,15 @@ struct DinoMuseumDef {
     u8 unk08[0x10 - 0x08];
 };
 // The fossil (kaseki) definitions.
+struct DinoKasekiDef;
 struct DinoKasekiDefs {
+    const DinoKasekiDef *GetDef(u32 id) const {
+        return (const DinoKasekiDef *)((const u8 *)this + ((const u32 *)((const u8 *)this + tableOffset))[id]);
+    }
+
     u32 unk00;
     u32 count;          // 0x04
-    u32 tableOffset;    // 0x08
+    u32 tableOffset;    // 0x08: of an offset of each def
 };
 
 struct DinoKasekiDef {
@@ -245,6 +253,11 @@ struct DinoKasekiDef {
     u32 unk24;          // 0x24
 
     u32 nameText;       // 0x28
+    u8 unk2C[0x38 - 0x2C];
+    u32 unk38;          // 0x38
+
+    u8 IsUncleanable() const { return unk04; }
+    u32 GetUnk38() const { return unk38; }
 };
 // The senryu (poems) sample's data.
 struct DinoSenryuDefs {

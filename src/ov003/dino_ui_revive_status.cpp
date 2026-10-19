@@ -19,6 +19,8 @@
 #include "m/call_task.h"
 #include "game/dino_ui_revive_effect.h"
 #include "m/blend.h"
+#include "m/oam_canvas.h"
+#include "m/smart_oam.h"
 #include "m/bright.h"
 #include "m/display.h"
 #include "m/input.h"
@@ -310,5 +312,14 @@ MTask *DinoReviveStatusTimerAnchor(int frames) {
 }
 MParallelTaskSet *DinoReviveStatusParallelAnchor(MProcess *process) {
     return process->GetParallel();
+}
+u32 DinoReviveStatusKasekiAnchor(const DinoKasekiDef *def) {
+    return def->IsUncleanable() + def->GetUnk38();
+}
+u32 DinoReviveStatusCreatureAnchor(const DinoCreatureDef *def) {
+    return def->GetVoice() + def->GetUnk0D();
+}
+MSmartObjCanvas *DinoReviveStatusCanvasAnchor(MSmartOam *oam, MPoint size, const void *palette) {
+    return new MSmartObjCanvas(oam, size, palette, FALSE);
 }
 #pragma dont_inline reset

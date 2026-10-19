@@ -59,3 +59,14 @@ extern "C" void func_ov003_0215b16c() {
     blend->SetTarget1(0x10);
     blend->SetTarget2(0x3F);
 }
+
+// (Emits the out-of-line copies of inline functions the game emits in this file.)
+// (Taking its address emits it, with its own calls inlined.)
+const DinoKasekiDefs *(MResource<DinoKasekiDefs>::*DinoKasekiDefsGetAnchor())() {
+    return &MResource<DinoKasekiDefs>::Get;
+}
+#pragma dont_inline on
+const DinoKasekiDef *DinoKasekiDefsAnchor(const DinoKasekiDefs *defs, u32 id) {
+    return defs->GetDef(id);
+}
+#pragma dont_inline reset

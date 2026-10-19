@@ -72,6 +72,9 @@ class MSmartObjCanvas : public MOamCanvas<MSmartOam, MSmartOamUnit> {
 public:
     MSmartObjCanvas(MDisplay *display, MSmartOam *oam, MPoint size, const void *palette, BOOL fromEnd)
         : MOamCanvas<MSmartOam, MSmartOamUnit>(display, oam, size, palette, fromEnd) {}
+    // On the sprites' display.
+    MSmartObjCanvas(MSmartOam *oam, MPoint size, const void *palette, BOOL fromEnd)
+        : MOamCanvas<MSmartOam, MSmartOamUnit>(oam->mDisplay, oam, size, palette, fromEnd) {}
     virtual ~MSmartObjCanvas() {}
 
     void SetAnchor(int anchor);
