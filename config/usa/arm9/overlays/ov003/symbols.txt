@@ -13,7 +13,7 @@ _ZN19DinoUiRvInformation11Unk02156ee8E16DinoCreatureInfo kind:function(thumb,siz
 _Z15MCreateCallTaskI19DinoUiRvInformationS0_hEP5MTaskPT_MT0_FvT1_ES6_ kind:function(thumb,size=0x40) addr:0x0215717c
 _ZN19DinoUiRvInformation11Unk021571bcEv kind:function(thumb,size=0x1a8) addr:0x021571bc
 func_ov003_02157364 kind:function(thumb,size=0x320) addr:0x02157364
-func_ov003_02157684 kind:function(thumb,size=0x78) addr:0x02157684
+_Z18DinoUiRvAttackFlagm kind:function(thumb,size=0x78) addr:0x02157684
 func_ov003_021576fc kind:function(thumb,size=0x474) addr:0x021576fc
 func_ov003_02157b70 kind:function(thumb,size=0x21c) addr:0x02157b70
 _ZN19DinoUiRvInformation7SetPageEh kind:function(thumb,size=0x23c) addr:0x02157d8c

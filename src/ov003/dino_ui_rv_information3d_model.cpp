@@ -8,6 +8,7 @@
 #include "m/bg_new_task.h"
 #include "m/call_task.h"
 #include "game/dino_ui_rv_information.h"
+#include "game/dino_resource.h"
 #include "m/picture.h"
 #include "m/display.h"
 #include "m/lcd.h"
@@ -113,6 +114,26 @@ template class MBgCallTask0<DinoUiRvInformation3DModel>;
 template MTask *MCreateBgCallTask(DinoUiRvInformation3DModel *obj, void (DinoUiRvInformation3DModel::*func)(), int thread);
 
 #pragma auto_inline off
+
+// Whether the attack's first value is 8 to 11, or its second 2 or 9 to 15.
+BOOL DinoUiRvAttackFlag(u32 id) {
+    const DinoAttackDef *def = gDinoResource->GetAttackDef(id);
+    if ((1 << *DinoOffsetPtr<u8>(def, def->unk10)) & 0xF00) {
+        return TRUE;
+    }
+    switch (*DinoOffsetPtr<u8>(def, def->unk14)) {
+    case 2:
+    case 9:
+    case 10:
+    case 11:
+    case 12:
+    case 13:
+    case 14:
+    case 15:
+        return TRUE;
+    }
+    return FALSE;
+}
 
 extern "C" void func_ov003_02156eac(DinoUiRvInformation3DModel *model, MFx32 angle) {
     BOOL out = angle < MFx32(0) || MFx32(100) <= angle;
