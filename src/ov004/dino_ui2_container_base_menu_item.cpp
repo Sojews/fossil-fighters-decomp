@@ -443,4 +443,21 @@ MTask *DinoUi2CannonShootMenu::CreateUnk2C() {
 #pragma auto_inline off
 // The fossil list's vector members the game emits in this file (made explicitly until the code that fills the list is
 // decompiled).
+// NONMATCHING: the game addresses the button info from the stack temporaries' base (ours keeps its own pointer).
+void DinoUi2ContainerBaseMenu::RefreshEntries() {
+    mUnk134.clear();
+    for (int i = 0; i < mUnkFD; i++) {
+        DinoBackupEntry entry;
+        GetEntry(i, &entry);
+        if (entry.id) {
+            mUnk134.push_back((const DinoUiFossilEntry &)DinoUi2GetKasekiButtonInfo(&entry));
+        }
+    }
+    if (mUnk134.size() == 0) {
+        mLastPage = 0;
+    } else {
+        mLastPage = (mUnk134.size() - 1) / 8;
+    }
+}
+
 template void std::__vec_deleter<DinoUiFossilEntry, std::allocator<DinoUiFossilEntry> >::sub_push_back(const DinoUiFossilEntry &x, Metrowerks::int2type<true>);

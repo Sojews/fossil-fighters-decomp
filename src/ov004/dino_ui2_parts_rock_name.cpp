@@ -5,6 +5,7 @@
 #pragma auto_inline on
 
 #include "game/dino_backup.h"
+#include "game/dino_ui_common.h"
 #include "game/dino_ui2_parts_rock_name_menu.h"
 #include "game/dino_ui2_parts_rock_name.h"
 #include "game/dino_ui2_parts_kaseki_button.h"
@@ -173,6 +174,48 @@ BOOL DinoUi2FieldMenuCursor::IsHidden() {
 
 u32 DinoUi2FieldMenuCursor::GetPlaneMask() {
     return 0x10;
+}
+
+// What the container entry's button shows: a kaseki rock, a fossil (cleaned or not, and whether the creature is
+// revived), or one of the two special kinds of rock.
+DinoKasekiButtonInfo DinoUi2GetKasekiButtonInfo(const DinoBackupEntry *entry) {
+    DinoKasekiButtonInfo info;
+    info.type = 0;
+    info.level = 0;
+    u32 id = entry->id;
+    if (id >= 501 && id <= 530 && entry->active == 1) {
+        info.icon = (id - 501) / 3 + 19;
+        info.color = 0;
+        info.type = 5;
+        info.level = entry->score;
+    } else if (id >= 601 && id <= 630 && entry->active == 1) {
+        info.icon = 29;
+        info.color = 0;
+    } else {
+        MResource<DinoKasekiDefs> defs("/etc/kaseki_defs");
+        info.icon = defs.Get()->GetDef(entry->id)->icon;
+        info.color = entry->unk10_0;
+        DinoKasekiRockState rock;
+        gDinoBackup->GetKasekiRock(entry->id, (u32 *)&rock);
+        if (rock.unk10) {
+            DinoCreatureState creature;
+            gDinoBackup->GetCreature((entry->id - 1) / 4 + 1, &creature);
+            if (creature.parts[0].level != 0) {
+                info.type = 1;
+            } else {
+                info.type = 2;
+            }
+            info.level = rock.score;
+        } else if (entry->unk10_3) {
+            info.type = 3;
+        } else {
+            info.type = 4;
+        }
+        if (entry->unk10_0 == 1) {
+            info.type = 4;
+        }
+    }
+    return info;
 }
 
 DinoKasekiButtonInfo DinoUi2GetEmptyKasekiInfo() {

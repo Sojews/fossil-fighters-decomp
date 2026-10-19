@@ -34,6 +34,9 @@ public:
     u32 mTextId;        // 0xBC
 };
 
+// What the container entry's button shows (as DinoGetKasekiButtonInfo, but an uncleaned fossil shows as type 4
+// unless the entry's unk10_3 is set).
+DinoKasekiButtonInfo DinoUi2GetKasekiButtonInfo(const DinoBackupEntry *entry);
 // What an empty slot's button shows.
 DinoKasekiButtonInfo DinoUi2GetEmptyKasekiInfo();
 // Links the items as a grid four wide: down to the next row (from the last row, to below), and left and right

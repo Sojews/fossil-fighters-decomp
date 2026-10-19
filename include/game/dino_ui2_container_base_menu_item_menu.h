@@ -1,6 +1,7 @@
 #ifndef GAME_DINO_UI2_CONTAINER_BASE_MENU_ITEM_MENU_H
 #define GAME_DINO_UI2_CONTAINER_BASE_MENU_ITEM_MENU_H
 
+#include "game/dino_ui_fossil_entry.h"
 #include "m/smart_oam.h"
 #include "m/blend.h"
 #include <vector>
@@ -52,7 +53,7 @@ public:
     MTaskSet *mCursorTasks;         // 0x128
     DinoUi2FieldMenuCursor *mCursor; // 0x12C
     DinoUi2PartsRockName *mRockName; // 0x130
-    std::vector<unsigned short> mUnk134; // 0x134: (the element type is a guess, distinct from other overlays')
+    std::vector<DinoUiFossilEntry> mUnk134; // 0x134: the entries' buttons
     u8 mSelected;                   // 0x140: 0xFF for none
     u8 mIdled;                      // 0x141: set once the menu has idled (decides only count after)
     void OnBackDecided();
@@ -64,6 +65,8 @@ public:
     void SetFlag(int index, u8 value);
     void RefreshMarks();
     void ResetDecideButton();
+    // Builds the entries' buttons from the backup, and how many pages they take.
+    void RefreshEntries();
     void AddHelpEntries(u32 backText);
 };
 
