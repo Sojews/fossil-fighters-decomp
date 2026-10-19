@@ -45,6 +45,45 @@ void B3DStatusViewTask::Idle() {
     (this->*mState)();
 }
 
+// The TU's pooled pointer-to-member constants (set up at startup).
+extern "C" struct {
+    u8 unk00[0x6C];
+    void (B3DStatusViewTask::*State_6C)();
+    void (B3DStatusViewTask::*State_74)();
+    u8 unk7C[0xD4 - 0x7C];
+    void (B3DStatusViewTask::*State_D4)();
+} data_ov000_021962e8;
+
+// Shows the view's current status, then goes on to the next (fading in between different ones).
+void B3DStatusViewTask::StateAdvance() {
+    mView->SetUnk19C(mUnk80);
+    mView->GetUnk19C(&mUnk7C, &mUnk80);
+    if (mUnk80 == (u32)-1) {
+        mSerial.AddTail(MTaskExitTransfer::Create(this));
+        return;
+    }
+    if (mUnk7C != mUnk80) {
+        mSerial.AddTail(new BlackInTask());
+        mState = data_ov000_021962e8.State_6C;
+        return;
+    }
+    Exit();
+}
+
+void B3DStatusViewTask::StateCheck() {
+    mView->GetUnk19C(&mUnk7C, &mUnk80);
+    if (mUnk80 == (u32)-1) {
+        mSerial.AddTail(MTaskExitTransfer::Create(this));
+        return;
+    }
+    if (mUnk7C == mUnk80) {
+        mState = data_ov000_021962e8.State_D4;
+        return;
+    }
+    mSerial.AddTail(new BlackInTask());
+    mState = data_ov000_021962e8.State_74;
+}
+
 
 DinoBattleView3DDamage::~DinoBattleView3DDamage() {
     mSerial.Clear();
@@ -242,6 +281,15 @@ void DinoBattleView3D::CancelQueue() {
     }
     mUnk19C = -1;
     mUnk1A0 = -1;
+}
+
+// Starts the next waiting task once the task set is idle.
+void DinoBattleView3D::RunNextQueued() {
+    if (!mQueue.empty() && mUnkC0->IsEmpty()) {
+        MTask *task = mQueue.front();
+        mQueue.pop_front();
+        mUnkC0->AddTail(task);
+    }
 }
 
 // Hands the tasks waiting to run to the task set.

@@ -10,8 +10,13 @@
 #include "game/help.h"
 #include "game/dino_field_camera_hook.h"
 
+extern "C" u32 data_0208a0b8;
+
 class BlackInTask : public MProcess {
 public:
+    BlackInTask() : MProcess(NULL) {
+        mUnk74 = data_0208a0b8;
+    }
     virtual ~BlackInTask();
     virtual void Idle();
 

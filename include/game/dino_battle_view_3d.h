@@ -31,6 +31,7 @@ public:
     u8 GetUnk180();
     void CancelQueue();
     void FlushQueue();
+    void RunNextQueued();
 
     u32 unkA8;
     DinoBattleView *mView;                  // 0xAC
