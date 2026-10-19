@@ -24,6 +24,15 @@ DinoCommonWindowYesNoDialog::DinoCommonWindowYesNoDialog(std::string text, BOOL 
     mUnkBC = 0;
 }
 
+DinoCommonWindowYesNoDialog::DinoCommonWindowYesNoDialog(MDisplay *display, std::string text, BOOL *result)
+    : MProcess(display), mUnk74(text), mUnk80(gDinoResource->GetText(data_0208acc8)),
+      mUnk8C(gDinoResource->GetText(data_0208accc)), mUnk98(gDinoResource->GetText(data_0208acc8)),
+      mUnkA4(gDinoResource->GetText(data_0208accc)) {
+    mResult = result;
+    mPos = MPoint(0x80, 0x60);
+    mUnkBC = 0;
+}
+
 void DinoCommonWindowYesNoDialog::SetLabels(std::string yes, std::string no) {
     mUnk8C = yes;
     mUnk80 = no;
