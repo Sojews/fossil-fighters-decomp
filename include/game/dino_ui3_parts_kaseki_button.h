@@ -31,6 +31,7 @@ public:
     MMotion *mMotion;   // 0x90
     MView *mView;       // 0x94: the focus highlight
     MView *mMark;       // 0x98
+    u8 unk9C[0xB0 - 0x9C];
 };
 
 #endif

@@ -900,7 +900,7 @@ namespace std {
             _Base::push_back((void *const &) x);
         }
         void clear() {
-            _Base::clear();
+            this->erase_at_end(this->size_);
         }
         T *&operator[](size_t n) {
             return (T *&) _Base::operator[](n);

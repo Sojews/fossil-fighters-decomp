@@ -255,11 +255,10 @@ extern struct {
     int rowY;       // 0x60
 } data_ov005_02169388;
 
-// NONMATCHING: clear's and push_back's byte temporaries take each other's stack slots.
 void DinoUiContainerDropMenu::CreateItems() {
     mItems.clear();
     for (int i = 0; i < 8; i++) {
-        if (i + mPage * 8 < mIcons.size()) {
+        if (mIcons.size() > i + mPage * 8) {
             MMenuItem *item = new DinoUi3PartsKasekiButton(
                 mOam,
                 MPoint(data_ov005_02169388.x + data_ov005_02169388.columnX * (i % 4) + data_ov005_02169388.rowX * (i / 4),
