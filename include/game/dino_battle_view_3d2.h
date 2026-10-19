@@ -65,8 +65,24 @@ public:
     u32 mMask;              // 0x14
 };
 
+extern "C" u32 data_0208a0b4, data_0208a0b8;
+
 class DinoBattleView3DGroupFade : public MProcess {
 public:
+    struct Target;
+    DinoBattleView3DGroupFade(void *camera, Target *target, u32 saved, int slot) : MProcess(NULL) {
+        mTarget = target;
+        mSaved = saved;
+        mUnk7C = 0;
+        mSlot = slot;
+        mUnk84 = 0;
+        mCamera = camera;
+        u32 duration = data_0208a0b8;
+        mDuration = duration;
+        if (duration == (u32)-1) {
+            mDuration = data_0208a0b4;
+        }
+    }
     virtual ~DinoBattleView3DGroupFade();
     virtual void Idle();
 
@@ -77,8 +93,13 @@ public:
         u32 mUnk13C;    // 0x13C
     } *mTarget;         // 0x74
     u32 mSaved;         // 0x78
-    u32 unk7C[3];
+    u32 mUnk7C;         // 0x7C
+    int mSlot;          // 0x80
+    u32 mUnk84;         // 0x84
     char mNames[3][64]; // 0x88
+    void *mCamera;      // 0x148
+    u32 mDuration;      // 0x14C
+    u32 unk150[3];
 };
 
 #endif

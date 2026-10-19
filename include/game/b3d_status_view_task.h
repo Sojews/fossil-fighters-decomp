@@ -18,6 +18,7 @@ public:
     void StateAdvance();
     void StateCheck();
     void StateShow();
+    void StateFade();
 
     class DinoBattleView3D *mView;      // 0x74
     u32 unk78;

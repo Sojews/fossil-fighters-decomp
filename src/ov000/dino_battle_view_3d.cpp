@@ -73,7 +73,9 @@ void B3DStatusViewTask::Idle() {
 extern "C" struct {
     u8 unk00[0x4C];
     void (B3DStatusViewTask::*State_4C)();
-    u8 unk54[0x6C - 0x54];
+    u8 unk54[0x5C - 0x54];
+    void (B3DStatusViewTask::*State_5C)();
+    u8 unk64[0x6C - 0x64];
     void (B3DStatusViewTask::*State_6C)();
     void (B3DStatusViewTask::*State_74)();
     u8 unk7C[0xD4 - 0x7C];
@@ -117,6 +119,22 @@ void B3DStatusViewTask::StateShow() {
     serial->AddTail(mask);
     serial->AddTail(show);
     mState = data_ov000_021962e8.State_4C;
+}
+
+// Fades the status's creature group in.
+void B3DStatusViewTask::StateFade() {
+    mView->GetUnk19C(&mUnk7C, &mUnk80);
+    if (mUnk80 == (u32)-1) {
+        mSerial.AddTail(MTaskExitTransfer::Create(this));
+        return;
+    }
+    mUnk84 = mView->mView->GetUnkE4(mUnk80 >> 16)->GetUnkAC();
+    int i = (u16)mUnk80 - 1;
+    GetSerial()->AddTail(new DinoBattleView3DMask((DinoBattleView3DMask::View *)mView, 1 << i),
+                         func_ov000_0218ac04(mView->mUnkE8, (u8 *)mView + 0x1E0, &data_ov000_02190334, mUnk84 == 0),
+                         new DinoBattleView3DGroupFade(mView->mUnkE8, (DinoBattleView3DGroupFade::Target *)mView,
+                                                       mUnk84, i));
+    mState = data_ov000_021962e8.State_5C;
 }
 
 // Shows the view's current status, then goes on to the next (fading in between different ones).
