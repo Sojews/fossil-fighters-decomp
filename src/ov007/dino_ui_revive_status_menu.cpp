@@ -7,10 +7,15 @@
 #include "types.h"
 #include "game/dino_backup.h"
 #include "m/lcd.h"
+#include "m/bright.h"
+#include "m/obj.h"
+#include "m/bg.h"
+#include "m/display.h"
 #include "game/dino_sound.h"
 #include "m/call_task.h"
 #include "game/dino_ui_rv_information.h"
 
+#pragma auto_inline off
 DinoUiReviveStatusMenu::DinoUiReviveStatusMenu(u32 id, u32 *result, u8 flag)
     : MMenu(gLcd->mMain, NULL, 0), mResult(result), mUnk118(0), mUnk11C(0), mUnk120(0xFF), mFlag(flag) {
     mUnk122 = 1;
@@ -29,6 +34,14 @@ DinoUiReviveStatusMenu::DinoUiReviveStatusMenu(const DinoCreatureState &creature
       mUnk120(0xFF), mFlag(flag) {
     mUnk122 = 0;
 }
+
+DinoUiReviveStatusMenu::DinoUiReviveStatusMenu(const DinoCreatureState &creature, const DinoCreatureState &creature2,
+                                               u32 *result, u8 flag)
+    : MMenu(gLcd->mMain, NULL, 0), mCreature(creature), mCreature2(creature2), mResult(result), mUnk118(1),
+      mUnk11C(0), mUnk120(0xFF), mFlag(flag) {
+    mUnk122 = 1;
+}
+#pragma auto_inline reset
 
 DinoUiReviveStatusMenu::~DinoUiReviveStatusMenu() {
 }
@@ -143,10 +156,72 @@ DinoUiReviveStatusLoop::DinoUiReviveStatusLoop(u32 a, u32 b) : MProcess(NULL) {
     mUnk78 = b;
 }
 
+void DinoUiReviveStatusLoop::Idle() {
+    gLcd->mSub->ResetHooks();
+    gLcd->mMain->ResetHooks();
+    gLcd->mSub->Setup(5, 1, 0, 0);
+    gLcd->mSub->SetBackdrop(0x8000);
+    gLcd->mMain->Setup(5, 0, 4, 1, 1, 1);
+    gLcd->mMain->mBg->SetBg0Reserved(1);
+    gLcd->mMain->SetBackdrop(0x8000);
+    gLcd->mMain->mObj->Show();
+    gLcd->VSyncNow();
+    gLcd->SetBottomDisplay(gLcd->mMain);
+    gCurrentDisplay = gLcd->GetBottomDisplay();
+    gLcd->GetBottomDisplay()->mBright->Reset();
+    MTask *exit = MTaskExitTransfer::Create(this);
+    MTask *menu = new DinoUiReviveStatusMenu(mUnk74, (u32 *)mUnk78, 0);
+    MSerialTaskSet *serial = &mSerial;
+    serial->AddTail(menu);
+    serial->AddTail(exit);
+}
+
 DinoUiReviveStatusLoopCleaning::DinoUiReviveStatusLoopCleaning(const DinoEventReviveCreature *creature,
                                                                const DinoEventReviveCreature *creature2, u32 *done,
                                                                u8 flag)
     : MProcess(NULL), mCreature(*creature), mCreature2(*creature2), mDone(done), mFlag(flag), mStep(0) {
+}
+
+void DinoUiReviveStatusLoopBattle::Idle() {
+    gLcd->mSub->ResetHooks();
+    gLcd->mMain->ResetHooks();
+    gLcd->mSub->Setup(5, 1, 0, 0);
+    gLcd->mSub->SetBackdrop(0x8000);
+    gLcd->mMain->Setup(5, 0, 4, 1, 1, 1);
+    gLcd->mMain->mBg->SetBg0Reserved(1);
+    gLcd->mMain->mBg->SetMode(3);
+    gLcd->mMain->SetBackdrop(0x8000);
+    gLcd->mMain->mObj->Show();
+    gLcd->VSyncNow();
+    gLcd->SetBottomDisplay(gLcd->mMain);
+    gCurrentDisplay = gLcd->GetBottomDisplay();
+    gLcd->GetBottomDisplay()->mBright->Reset();
+    MTask *exit = MTaskExitTransfer::Create(this);
+    MTask *menu = new DinoUiReviveStatusMenu(mCreature, mCreature2, 1);
+    MSerialTaskSet *serial = &mSerial;
+    serial->AddTail(menu);
+    serial->AddTail(exit);
+}
+
+void DinoUiReviveStatusLoopCleaning::Idle() {
+    gLcd->mSub->ResetHooks();
+    gLcd->mMain->ResetHooks();
+    gLcd->mSub->Setup(5, 1, 0, 0);
+    gLcd->mSub->SetBackdrop(0x8000);
+    gLcd->mMain->Setup(5, 0, 4, 1, 1, 1);
+    gLcd->mMain->mBg->SetBg0Reserved(1);
+    gLcd->mMain->mBg->SetMode(3);
+    gLcd->mMain->SetBackdrop(0x8000);
+    gLcd->mMain->mObj->Show();
+    gLcd->VSyncNow();
+    gLcd->SetBottomDisplay(gLcd->mMain);
+    gCurrentDisplay = gLcd->GetBottomDisplay();
+    if (mCreature.parts[0].level == 0) {
+        mSerial.AddTail(new DinoUiReviveStatusMenu(mCreature2, mDone, 0));
+    } else {
+        mSerial.AddTail(new DinoUiReviveStatusMenu(mCreature, mCreature2, mDone, mFlag));
+    }
+    mSerial.AddTail(MTaskExitTransfer::Create(this));
 }
 
 #pragma auto_inline off

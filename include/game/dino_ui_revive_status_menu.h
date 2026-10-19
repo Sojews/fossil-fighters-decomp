@@ -35,6 +35,8 @@ public:
     DinoUiReviveStatusMenu(u32 id, u32 *result, u8 flag);
     DinoUiReviveStatusMenu(const DinoCreatureState &creature, u32 *result, u8 flag);
     DinoUiReviveStatusMenu(const DinoCreatureState &creature, const DinoCreatureState &creature2, u8 flag);
+    DinoUiReviveStatusMenu(const DinoCreatureState &creature, const DinoCreatureState &creature2, u32 *result,
+                           u8 flag);
     virtual ~DinoUiReviveStatusMenu();
     virtual void OnStart();
     virtual void OnFocus(MMenuItem *item);
@@ -59,6 +61,7 @@ public:
     u8 mFlag;               // 0x121
     u8 mUnk122;             // 0x122
     MResource<DinoMessageData> mMessages;   // 0x124
+    u8 unk134[0x160 - 0x134];
 };
 
 class DinoUiReviveStatusLoop : public MProcess {
