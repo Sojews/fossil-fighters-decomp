@@ -8,9 +8,11 @@
 #include "game/dino_cleaning_drill.h"
 #include "game/dino_cleaning_kaseki_rock.h"
 #include "game/dino_cleaning_rock.h"
+#include <algorithm>
 #include "m/bg_new_task.h"
 #include "m/call_task.h"
 #include "m/display.h"
+#include "nitro/mi.h"
 #include "m/raster.h"
 #include "m/window.h"
 
@@ -118,6 +120,55 @@ void DinoCleaningHammerTask::StateStart() {
     }
     mRadius2 = mRadius;
     mState = data_ov002_02164fb8.State0215ccfc_78;
+}
+
+// The cell next to pos in a direction (0 right, then counterclockwise), for even and odd columns.
+static inline MPoint GetNeighbour(MPoint pos, u32 dir) {
+    static const MPoint sOffsets[2][6] = {
+        {MPoint(1, 0), MPoint(0, 1), MPoint(-1, 1), MPoint(-1, 0), MPoint(-1, -1), MPoint(0, -1)},
+        {MPoint(1, 0), MPoint(1, 1), MPoint(0, 1), MPoint(-1, 0), MPoint(0, -1), MPoint(1, -1)},
+    };
+    const MPoint &d = sOffsets[pos.y & 1][dir];
+    return MPoint(pos.x + d.x, pos.y + d.y);
+}
+
+// NONMATCHING: one stack slot more in the game (std::max's operator< argument copies) and the neighbour sums'
+// registers.
+// Spreads the hit to the joined cells around it (no deeper ones), breaking what it reached last frame, and shakes the
+// rock, less and less.
+void DinoCleaningHammerTask::State0215ccfc() {
+    MI_CpuCopy8(mHit, mPrevHit, sizeof(mHit));
+    MFx32 radius = mRadius;
+    for (u32 x = 2; x < 0x22; x++) {
+        for (u32 y = 2; y < 0x1A; y++) {
+            switch (mHit[x][y]) {
+            case 0:
+                break;
+            case 2:
+                mKasekiRock->Hit(x, y, radius, MFx32(1), mDecay);
+                mHit[x][y] = 0;
+                break;
+            case 1:
+                MPoint pos(x, y);
+                for (u32 i = 0; i < 6; i++) {
+                    MPoint n = GetNeighbour(pos, i);
+                    if (mPrevHit[n.x][n.y] == 2 && mLayers[n.x][n.y] >= mLayers[x][y] && (mCells[x][y] & (1 << i)) &&
+                        (mCells[n.x][n.y] & (1 << (i + 3) % 6))) {
+                        mHit[x][y] = 2;
+                        break;
+                    }
+                }
+                break;
+            }
+        }
+    }
+    mRadius = mRadius - mDecay;
+    MFx32 amp = std::max(MFx32(0), mRadius * MFx32(1));
+    mKasekiRock->SetOffsetAll(MPoint(MFx32ToInt(amp * mRandom->NextFraction() - amp / MFx32(2)),
+                                     MFx32ToInt(amp * mRandom->NextFraction() - amp / MFx32(2))));
+    if (mRadius <= MFx32(0)) {
+        Exit();
+    }
 }
 
 void DinoCleaningHammerBaseHit::StateStart() {

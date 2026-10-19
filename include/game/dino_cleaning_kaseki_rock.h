@@ -30,6 +30,7 @@ public:
     void CountCells();
     void SetOffset(MPoint offset);
     void SetOffsetAll(MPoint offset);
+    void Hit(int row, int col, MFx32 power, MFx32 scale, MFx32 decay);
     void StartDrop();
     void StateDrop();
     void StateShake();
