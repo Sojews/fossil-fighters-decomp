@@ -1,6 +1,7 @@
 // DinoTalkConsoleFilter, DinoTalkWindowWaitStartTask.
 // Only the destructors are decompiled so far.
 
+#define MSL_STRING_DEFINITIONS
 #include "game/dino_talk_console_filter.h"
 #include "game/dino_talk_window_wait_start_task.h"
 #include "game/dino_talk_window.h"
@@ -102,5 +103,7 @@ BOOL DinoTalkWindow::IsAnimating() {
     return !mAnims->IsEmpty();
 }
 
-// A string member the game emits in this file (made explicitly until the filter code using it is decompiled).
+// String members the game emits in this file (made explicitly until the filter code using them is decompiled).
 template std::wstring::const_iterator std::wstring::erase(std::wstring::const_iterator p);
+template void std::wstring::push_back(wchar_t c);
+template void std::string::push_back(char c);

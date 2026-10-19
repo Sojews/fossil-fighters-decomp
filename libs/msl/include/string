@@ -59,6 +59,7 @@ public:
     size_type find_last_not_of(const C *s, size_type pos = npos) const;
     size_type find_last_not_of(const C *s, size_type pos, size_type n) const;
     void push_back(C c);
+    basic_string &replace(size_type pos, size_type n, const basic_string &str);
     size_type rfind(C c, size_type pos = npos) const;
     int compare(const C *s) const;
     int compare(const basic_string &str) const;
@@ -162,6 +163,23 @@ basic_string<C, Traits, Alloc>::basic_string(const C *s, size_type n) {
     }
     reserve(n);
     __replace(0, 0, s, s + n, random_access_iterator_tag());
+}
+
+template <class C, class Traits, class Alloc>
+void basic_string<C, Traits, Alloc>::push_back(C c) {
+    __replace(size(), 0, &c, &c + 1, random_access_iterator_tag());
+}
+
+template <class C, class Traits, class Alloc>
+int basic_string<C, Traits, Alloc>::compare(const C *s) const {
+    size_type n = strlen(s);
+    return compare(0, size(), s, n);
+}
+
+template <class C, class Traits, class Alloc>
+basic_string<C, Traits, Alloc> &basic_string<C, Traits, Alloc>::replace(size_type pos, size_type n,
+                                                                         const basic_string &str) {
+    return __replace(pos, n, str.data(), str.data() + str.size(), random_access_iterator_tag());
 }
 
 template <class C, class Traits, class Alloc>
