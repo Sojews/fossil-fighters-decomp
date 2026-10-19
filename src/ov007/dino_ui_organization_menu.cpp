@@ -421,6 +421,13 @@ void DinoUiOrganizationMenu::LoadCreatures() {
     mFraction->SetDenominator(mLastPage + 1);
 }
 
+DinoUiOrganizationMenu::DinoUiOrganizationMenu(u32 team)
+    : MMenu(gLcd->mSub, NULL, 0), mUnkC0(NULL), mTabPicture(NULL), mTeamIndex(team), mResult(0), mPage(0),
+      mLastPage(0), mTab(0xFF), mSort(0), mFocusTabs(FALSE), mSelected(0), mUnk23C(FALSE), mUnk23D(0), mUnk23E(0),
+      mUnk254(0xFF), mUnk255(0), mListLinked(FALSE), mSlotsLinked(FALSE) {
+    mMotions.clear();
+}
+
 // Lists the creatures in the sort's order.
 void DinoUiOrganizationMenu::Sort(u8 sort) {
     if (sort > 4) {
