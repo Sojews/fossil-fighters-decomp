@@ -27,6 +27,36 @@
 DinoWirelessBattle::~DinoWirelessBattle() {
 }
 
+void DinoWirelessBattle::OnMessage(MMessage *msg) {
+    switch (msg->mId) {
+    case 0x1009C: {
+        DinoBattlePlayerLevelSignal *sig = (DinoBattlePlayerLevelSignal *) msg;
+        mPlayers[sig->mUnk0C].mData.horiderLevel = sig->mUnk10;
+        mPlayers[sig->mUnk0C].mInfoReceived = TRUE;
+        break;
+    }
+    case 0x1009D: {
+        DinoBattlePlayerInfoSignal *sig = (DinoBattlePlayerInfoSignal *) msg;
+        mPlayers[sig->mPlayer].mData = sig->mData;
+        mPlayers[sig->mPlayer].mTeam = sig->mTeam;
+        for (u32 i = 0; i < 5; i++) {
+            mPlayers[sig->mPlayer].mCreatures[i] = sig->mCreatures[i];
+        }
+        mPlayers[sig->mPlayer].mTeamChosen = TRUE;
+        break;
+    }
+    case 0x1009E:
+        mPlayers[((DinoBattleReadyToBeginBattleSignal *) msg)->mUnk0C].mReady = TRUE;
+        break;
+    case 0x100A4: {
+        DinoBattleReadyToContinueBattleSignal *sig = (DinoBattleReadyToContinueBattleSignal *) msg;
+        mPlayers[sig->mUnk0C].unk03[0] = TRUE;
+        mPlayers[sig->mUnk0C].unk03[1] = sig->mUnk10;
+        break;
+    }
+    }
+}
+
 void DinoWirelessBattle::Idle() {
     (this->*mState)();
 }
