@@ -13,7 +13,7 @@ static u8 *sReadBuffer;
 static u8 *sReadBuffer2;
 // The open archives, by file.
 static std::map<FSFileID, MArchive *> sArchives;
-static OSMutex sArchivesMutex;
+static MMutex sArchivesMutex;
 
 void MInitArchive() {
     sReadBuffer = new u8[0x2004];
@@ -48,7 +48,7 @@ MArchive *MArchive::Open(std::string path) {
 }
 
 MArchive *MArchive::Get(FSFileID id) {
-    MScopedLock lock(&sArchivesMutex, TRUE);
+    MScopedLock lock(&sArchivesMutex.mutex, TRUE);
     MArchive *archive;
     std::map<FSFileID, MArchive *>::iterator it = sArchives.find(id);
     if (it != sArchives.end()) {
@@ -74,7 +74,7 @@ void MArchive::Release() {
         refs = --mRefCount;
     }
     if (refs <= 0) {
-        MMutexLock lock(&sArchivesMutex);
+        MMutexLock lock(&sArchivesMutex.mutex);
         if (mRefCount == 0) {
             sArchives.erase(mId);
             delete this;
@@ -181,7 +181,7 @@ BOOL MArchivePtr::IsValid() {
 
 // (Walks the open archives; whatever it did with them isn't in this build.)
 void MDumpArchives() {
-    MMutexLock lock(&sArchivesMutex);
+    MMutexLock lock(&sArchivesMutex.mutex);
     for (std::map<FSFileID, MArchive *>::iterator it = sArchives.begin(); it != sArchives.end(); ++it) {
     }
 }

@@ -7,6 +7,8 @@
 #include "nitro/mi.h"
 #include "m/3d_wait_transfer_complete_task.h"
 
+MMutex gM3dMutex;
+
 extern "C" void G3X_SetClearColor(u16 rgb, int alpha, int depth, int polygonID, BOOL fog);
 extern "C" u32 GX_DisableBankForTex(void);
 extern "C" u32 GX_DisableBankForTexPltt(void);
@@ -30,7 +32,7 @@ static inline BOOL M3dInVBlank() {
 }
 
 M3DVInt::~M3DVInt() {
-    MScopedLock lock(&gM3dMutex, TRUE);
+    MScopedLock lock(&gM3dMutex.mutex, TRUE);
     Disable();
 }
 
@@ -111,24 +113,24 @@ M3dWaitTransferCompleteTask::~M3dWaitTransferCompleteTask() {
 }
 
 BOOL M3d::IsTransferComplete() {
-    MMutexLock lock(&gM3dMutex);
+    MMutexLock lock(&gM3dMutex.mutex);
     return mQueues[0].empty() && mQueues[1].empty() && mQueueD0.empty();
 }
 
 void M3d::FreeTex(u32 key) {
-    MScopedLock lock(&gM3dMutex, TRUE);
+    MScopedLock lock(&gM3dMutex.mutex, TRUE);
     mTexHeap.Free(key, FALSE);
 }
 
 void M3d::FreePltt(u32 key) {
-    MScopedLock lock(&gM3dMutex, TRUE);
+    MScopedLock lock(&gM3dMutex.mutex, TRUE);
     mPlttHeap.Free(key, FALSE);
 }
 
 // Runs the queued transfers while VBlank lasts: palettes, then textures (a texture too big for the lines left
 // waits once something was loaded), then, once all are done, the queued frees.
 void M3DVInt::OnVSync() {
-    MScopedLock lock(&gM3dMutex, TRUE);
+    MScopedLock lock(&gM3dMutex.mutex, TRUE);
     BOOL loaded = FALSE;
     u32 i;
     if (MI_IsDmaBusy(GXi_DmaId)) {
@@ -198,7 +200,7 @@ u32 M3d::AllocTex(const void *src, u32 size, BOOL queue) {
     t.src = (u32)src;
     t.dst = addr;
     t.size = size;
-    MScopedLock lock(&gM3dMutex, TRUE);
+    MScopedLock lock(&gM3dMutex.mutex, TRUE);
     mQueues[queue].push_back(t);
     return addr;
 }
@@ -211,7 +213,7 @@ u32 M3d::AllocPltt(const void *src, u32 size) {
     t.src = (u32)src;
     t.dst = addr;
     t.size = size;
-    MScopedLock lock(&gM3dMutex, TRUE);
+    MScopedLock lock(&gM3dMutex.mutex, TRUE);
     mQueueD0.push_back(t);
     return addr;
 }
@@ -220,7 +222,7 @@ void M3d::QueueE8(const void *heap, u32 addr) {
     M3dTransfer t;
     t.src = addr;
     t.dst = (u32)heap;
-    MScopedLock lock(&gM3dMutex, TRUE);
+    MScopedLock lock(&gM3dMutex.mutex, TRUE);
     mQueueE8.push_back(t);
 }
 
@@ -229,7 +231,7 @@ void M3d::QueueD0(const void *dst, u32 src, u32 size) {
     t.src = src;
     t.dst = (u32)dst;
     t.size = size;
-    MScopedLock lock(&gM3dMutex, TRUE);
+    MScopedLock lock(&gM3dMutex.mutex, TRUE);
     mQueueD0.push_back(t);
 }
 

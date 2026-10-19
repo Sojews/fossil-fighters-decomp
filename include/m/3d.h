@@ -5,6 +5,7 @@
 #include "m/screen.h"
 #include "m/heap.h"
 #include "m/looper.h"
+#include "m/archive.h"
 #include <deque>
 
 // A queued transfer to VRAM.
@@ -45,7 +46,7 @@ public:
     M3DVInt *mVInt;                     // 0x100
 };
 
-extern OSMutex gM3dMutex;
+extern MMutex gM3dMutex;
 
 // Runs the 3D engine's per-frame work at VBlank.
 class M3DVInt : public MLooperVSyncTask {

@@ -2,6 +2,7 @@
 
 #pragma ipa file
 
+#include "m/archive.h"
 #include "m/motion.h"
 #include <algorithm>
 #include <map>
@@ -11,8 +12,8 @@
 #include "m/chr.h"
 #include "m/pal.h"
 
+static MMutex sMotionDatasMutex;
 static std::map<FSFileID, MMotionData *> sMotionDatas;
-static OSMutex sMotionDatasMutex;
 
 // Opens the files of a list (in the directory it names).
 static inline void OpenFiles(const MArchivePtr &archive, const void *header, const MMotionFileList *list,
@@ -148,7 +149,7 @@ void MMotionData::ReleasePalettes(MDisplay *display) {
 }
 
 MMotionData *MMotionData::Get(FSFileID id, int unk) {
-    MScopedLock lock(&sMotionDatasMutex, TRUE);
+    MScopedLock lock(&sMotionDatasMutex.mutex, TRUE);
     MMotionData *data;
     std::map<FSFileID, MMotionData *>::iterator it = sMotionDatas.find(id);
     if (it != sMotionDatas.end()) {
@@ -162,12 +163,12 @@ MMotionData *MMotionData::Get(FSFileID id, int unk) {
 }
 
 void MMotionData::AddRef() {
-    MScopedLock lock(&sMotionDatasMutex, TRUE);
+    MScopedLock lock(&sMotionDatasMutex.mutex, TRUE);
     mRefCount++;
 }
 
 void MMotionData::Release() {
-    MScopedLock lock(&sMotionDatasMutex, TRUE);
+    MScopedLock lock(&sMotionDatasMutex.mutex, TRUE);
     if (--mRefCount <= 0) {
         FSFileID id = mArchive.mArchive->mId;
         sMotionDatas.erase(id);
