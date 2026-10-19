@@ -17,6 +17,11 @@ DinoMultiPlayScanTelop::~DinoMultiPlayScanTelop() {
 
 #pragma auto_inline off
 
+DinoMultiPlayScanner::DinoMultiPlayScanner(MMultiPlay *multiPlay, u8 *result)
+    : MMenu(1), mMultiPlay(multiPlay), mResult(result) {
+    mFound = FALSE;
+}
+
 void DinoMultiPlayScanner::Start() {
     if (mMode == 1) {
         mSerial.AddTail(mMultiPlay->CreateStartParentTask(NULL, 0, 0));
