@@ -1,11 +1,11 @@
 // DinoBattleViewAbilityMenuB.
-// Only the destructors are decompiled so far.
 
 // Derived destructors have their bases' destructor bodies inlined; auto-inlining the ones defined above does that.
 #pragma auto_inline on
 
 #include "game/dino_battle_view_ability_menu_bg.h"
 #include "types.h"
+#include "game/dino_resource.h"
 #include "m/motion.h"
 #include "m/bg.h"
 #include "m/text.h"
@@ -160,6 +160,38 @@ AttackMenuBarMotion *DinoBattleViewUiAbilityMenuItem::GetBar() {
 
 MRect DinoBattleViewUiAbilityMenuItem::GetRect() {
     return GetFrame();
+}
+
+// Whether the attack hits several creatures: its kind is 8 to 11, or its range is 2 or 9 to 15.
+extern "C" BOOL func_ov000_02179aa0(u32 id) {
+    const DinoAttackDef *def = gDinoResource->GetAttackDef(id);
+    if ((1 << *DinoOffsetPtr<u8>(def, def->unk10)) & 0xF00) {
+        return TRUE;
+    }
+    switch (*DinoOffsetPtr<u8>(def, def->unk14)) {
+    case 2:
+    case 9:
+    case 10:
+    case 11:
+    case 12:
+    case 13:
+    case 14:
+    case 15:
+        return TRUE;
+    }
+    return FALSE;
+}
+
+// (Unreferenced.)
+extern "C" void func_ov000_0217b838() {
+}
+
+// Moves the bar.
+extern "C" void func_ov000_0217a080(AttackMenuBarMotion *bar, MPoint from, MPoint to, int frames, int ease);
+
+extern "C" void func_ov000_0217a45c(DinoBattleViewUiAbilityMenuItem *item, MPoint from, MPoint to, int frames,
+                                    int ease) {
+    func_ov000_0217a080(item->mUnk98, from, to, frames, ease);
 }
 
 #pragma auto_inline on
