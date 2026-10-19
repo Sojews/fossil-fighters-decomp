@@ -32,6 +32,7 @@
 #include "game/dino_ui_save_slot_select_menu_item.h"
 #include "game/dino_ui_save_slot_select_menu_cancel_item.h"
 #include "game/dino_ui_save_slot_select_menu.h"
+#include "game/common_window_message.h"
 
 DinoUiTopMenuLoop::~DinoUiTopMenuLoop() {
 }
@@ -271,6 +272,43 @@ DinoUiTopMenuPassDarkButton::~DinoUiTopMenuPassDarkButton() {
 }
 
 DinoUiTopMenuOptionButton::~DinoUiTopMenuOptionButton() {
+}
+
+extern u8 data_ov004_02177280;      // set when the screen saves rather than loads
+extern const u32 data_0208a978;
+
+void DinoUiSaveSlotSelectMenu::StartDelete() {
+    mDelete->MMenuItem::Disable();
+    mDelete->DinoHelpItem::Disable();
+    mDeleting = TRUE;
+    data_ov004_02177280 = TRUE;
+    mMessage = new DinoCommonWindowMessage(gLcd->GetBottomDisplay(), mDelete->GetFrame().GetCenter(),
+                                           std::string(gDinoResource->GetText(data_0208a978)), 4, 0);
+    for (u32 i = 0; i < 2; i++) {
+        DinoSaveSummary summary;
+        gDinoBackup->GetSummary(i, &summary);
+        if (!summary.valid) {
+            mSlots[i]->MMenuItem::Disable();
+        }
+    }
+    mParallel.AddTail(mMessage);
+    mSilentFocus = TRUE;
+    FocusItem(mCancel);
+    RemoveLink(mSlots[0], 4);
+    RemoveLink(mDelete, 2);
+    AddLink(mSlots[0], 4, mCancel);
+    AddLink(mSlots[1], 2, mCancel);
+    if (!mSlots[1]->MMenuItem::IsEnabled()) {
+        AddLink(mSlots[0], 2, mCancel);
+        RemoveLink(mCancel, 4);
+        AddLink(mCancel, 4, mSlots[0]);
+    }
+    if (!mSlots[0]->MMenuItem::IsEnabled()) {
+        AddLink(mSlots[1], 4, mCancel);
+        RemoveLink(mCancel, 2);
+        AddLink(mCancel, 2, mSlots[1]);
+    }
+    AddEntry((u32)(DinoHelpItem *)mCancel, 3, 0);
 }
 
 MRect DinoUiSaveSlotSelectMenuDeleteItem::GetFrame() {
