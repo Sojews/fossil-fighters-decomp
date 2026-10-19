@@ -43,21 +43,28 @@ public:
     void RefreshItems();
     void RefreshOKButton();
     BOOL IsTeamInvalid();
+    void LinkItems();
     void FinishPage();
     void FinishTab();
 
     u8 unkB3[1];
     MSmartOam *mOam;            // 0xB4: the items' sprites
-    MMenuItem *mUnkB8;          // 0xB8
+    DinoUiOrderSelectMenuItem *mBackButton; // 0xB8
     DinoUiOrderSelectMenuItem *mOKButton;   // 0xBC
     MMenuItem *mTabs[4];        // 0xC0
     u8 unkD0[0xD4 - 0xD0];
     MPictureFile *mPictures[4]; // 0xD4
     MMenuItem *mItems[5];       // 0xE4
-    MMenuItem *mUnkF8[4];       // 0xF8: by tab
-    u8 unk108[0x110 - 0x108];
+    MMenuItem *mUnkF8[5];       // 0xF8: by tab
+    u8 unk10C[0x110 - 0x10C];
     std::string mUnk110;        // 0x110
-    u8 unk11C[0x1A8 - 0x11C];
+    // (What each tab shows; only the first byte is known: whether the tab is there.)
+    struct Tab {
+        u32 present : 8;
+        u32 unk0_8 : 24;
+        u8 unk04[0x14];
+    } mTabData[5];              // 0x11C
+    u8 unk194[0x1A8 - 0x194];
     u8 mHasFourthTab;           // 0x1A8
     u8 unk1A9[0x1B4 - 0x1A9];
     DinoUiRvInformation *mInfo; // 0x1B4

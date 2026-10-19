@@ -142,7 +142,7 @@ void DinoUiOrderSelectMenu::SetInfoPage(u8 page) {
 
 void DinoUiOrderSelectMenu::ClearItems() {
     RemoveLink(mOKButton, 4);
-    RemoveLink(mUnkB8, 4);
+    RemoveLink(mBackButton, 4);
     RemoveLink(mUnkF8[mHasFourthTab ? 3 : 2], 2);
     for (int i = 0; i < 5; i++) {
         RemoveItem(mItems[i]);
@@ -163,6 +163,33 @@ void DinoUiOrderSelectMenu::RefreshOKButton() {
     } else {
         mTech->Hide();
     }
+}
+
+void DinoUiOrderSelectMenu::RefreshItems() {
+    for (int i = 0; i < 5; i++) {
+        mItems[i]->Enable();
+    }
+    for (int j = 0; j < 5; j++) {
+        if (mTabData[j].present) {
+            mUnkF8[j]->Enable();
+        }
+    }
+    mBackButton->MMenuItem::Disable();
+    mBackButton->DinoHelpItem::Disable();
+    mBackButton->mMotion->Hide();
+    mOKButton->MMenuItem::Enable();
+    mOKButton->DinoHelpItem::Enable();
+    mOKButton->mMotion->Show();
+    RemoveLink(mTabs[0], 3);
+    AddLink(mTabs[0], 3, mOKButton);
+    if (mHasFourthTab) {
+        RemoveLink(mTabs[3], 1);
+        AddLink(mTabs[3], 1, mOKButton);
+    } else {
+        RemoveLink(mTabs[2], 1);
+        AddLink(mTabs[2], 1, mOKButton);
+    }
+    LinkItems();
 }
 
 void DinoUiOrderSelectMenu::FinishPage() {
