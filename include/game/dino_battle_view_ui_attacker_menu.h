@@ -26,6 +26,7 @@ public:
     u32 mIds[3];        // 0x18C
     int mCount;         // 0x198
     u32 mUnk19C;        // 0x19C
+    u8 mUnk1A0;         // 0x1A0: while starting, whether there is a cursor
 };
 
 #endif

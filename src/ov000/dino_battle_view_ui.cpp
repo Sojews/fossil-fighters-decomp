@@ -345,7 +345,7 @@ DinoBattleViewUiSelectAreaCommon::DinoBattleViewUiSelectAreaCommon(DinoBattleVie
                                                                    MMessageObserver *target, u32 arg3, u8 arg4,
                                                                    u8 arg5)
     : MMenu(2), mUnkB0(player), mUnkB4(arg3), mUnkE0(data_ov000_02193ae4.unk30), mUnkE8(0), mUnkEC((u32)view),
-      mTarget(target), mUnkF4(0), mCursor(NULL), mInfoKind(0), mUnk12C(0), mUnk13C(0), mUnk178(1), mUnk179(arg4),
+      mTarget(target), mCursorTask(NULL), mCursor(NULL), mInfoKind(0), mUnk12C(0), mUnk13C(0), mUnk178(1), mUnk179(arg4),
       mUnk17A(arg5) {
     SetDeferStart(TRUE);
     mUnkAC = ((DinoBattleView *)mUnkEC)->GetUnkE4(mUnkB0)->GetUnkAC() ? 4 : 0;
@@ -688,4 +688,65 @@ DinoBattleViewUiDefenderMenu::DinoBattleViewUiDefenderMenu(DinoBattleView *view,
     }
     mUnkAC = mSide ? 4 : 0;
     mUnkE0 += mSide ? MPoint(-0x30, -0x20) : MPoint(0x30, -0x20);
+}
+
+void DinoBattleViewUiAttackerMenu::OnStart() {
+    mParallel.AddTail(new DinoBattleHelpBase(gLcd->GetBottomDisplay(), data_ov000_02193ca0[mSide], data_0208a34c));
+    ((DinoBattleView *)mUnkEC)->GetUnkE4(mUnkB0)->TakeMotions(&mCursor, &mCursorTask);
+    mUnk1A0 = mCursor != NULL ? TRUE : FALSE;
+    DinoBattleViewUiSelectAreaCommon::OnStart();
+    mUnk1A0 = FALSE;
+    for (int i = 0; i < mCount; i++) {
+        ((DinoBattleView *)mUnkEC)->FindCreatureByAC(mIds[i])->ClearFlag144(2);
+    }
+    MTask *task = func_ov000_0218ec8c(((DinoBattleView *)mUnkEC)->GetUnk12C(), 0x21, 0);
+    if (task != NULL) {
+        mSerial.AddTail(task);
+    }
+    if (!GetUnk12CFlag((DinoBattleView *)mUnkEC)) {
+        DinoHelpBase &help = *this;
+        mSerial.AddTail(DinoHelpBase::CreateEnableTask(&help));
+    }
+}
+
+// The defender help's texts: with one of the player's own creatures among the defenders, or not.
+extern "C" const u32 data_0208a354, data_0208a358;
+
+// NONMATCHING: the end iterator and the locals get other stack slots.
+void DinoBattleViewUiDefenderMenu::OnStart() {
+    DinoBattleViewUiSelectAreaCommon::OnStart();
+    u32 text = data_0208a358;
+    for (int i = 0; i < mCount; i++) {
+        DinoBattleViewCreature *creature = ((DinoBattleView *)mUnkEC)->FindCreatureByAC(mIds[i]);
+        if (((DinoBattleView *)mUnkEC)->GetUnkE4(mUnkB0)->GetUnkAC() == creature->GetUnkB0()) {
+            text = data_0208a354;
+            creature->SetFlag144(4);
+        } else {
+            creature->SetFlag144(3);
+        }
+    }
+    mParallel.AddTail(new DinoBattleHelpBase(gLcd->GetBottomDisplay(), data_ov000_02193ca0[mSide], text));
+    for (std::map<u32, void *>::iterator it = mUnk130.begin(); it != mUnk130.end(); ++it) {
+        BOOL other = TRUE;
+        for (int i = 0; i < mCount; i++) {
+            if (it->first == (u32)((DinoBattleView *)mUnkEC)->FindCreatureByAC(mIds[i])) {
+                other = FALSE;
+                break;
+            }
+        }
+        if (other) {
+            DinoBattleViewUiRootMenuItem *root = dynamic_cast<DinoBattleViewUiRootMenuItem *>((MMenuItem *)it->second);
+            if (root == NULL || !root->mDisabled) {
+                ((MMenuItem *)it->second)->Disable();
+            }
+        }
+    }
+    MTask *task = func_ov000_0218ec8c(((DinoBattleView *)mUnkEC)->GetUnk12C(), 0x26, 0);
+    if (task != NULL) {
+        mSerial.AddTail(task);
+    }
+    if (!GetUnk12CFlag((DinoBattleView *)mUnkEC)) {
+        DinoHelpBase &help = *this;
+        mSerial.AddTail(DinoHelpBase::CreateEnableTask(&help));
+    }
 }

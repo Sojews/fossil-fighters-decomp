@@ -9,6 +9,7 @@ class DinoBattleViewCreatureInfo;
 
 #include "m/menu_item.h"
 #include "m/menu.h"
+#include "m/motion.h"
 #include "m/display.h"
 #include "m/observer.h"
 #include "m/sleep.h"
@@ -65,9 +66,9 @@ public:
     u8 mUnkE8;
     u32 mUnkEC;     // 0xEC: DinoBattleView
     MMessageObserver *mTarget;  // 0xF0: told the choice
-    u32 mUnkF4;
+    MTask *mCursorTask;         // 0xF4: comes with the cursor
     MTaskSet *mUnkF8;           // 0xF8: waited on before answering
-    MView *mCursor;             // 0xFC
+    MMotion *mCursor;           // 0xFC
     u8 unk100[0x18];
     DinoBattleViewCreatureInfo *mInfo;  // 0x118
     int mInfoKind;      // 0x11C
