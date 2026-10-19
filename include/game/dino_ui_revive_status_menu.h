@@ -54,7 +54,8 @@ public:
     MSerialTaskSet *mCursorTasks;   // 0xCC
     DinoUiFieldMenuCursor *mCursor; // 0xD0
     DinoUiRvInformation *mInfo;     // 0xD4
-    u8 unkD8[0xE4 - 0xD8];
+    u8 unkD8[0xE0 - 0xD8];
+    MTaskSet *mUnkE0;       // 0xE0: waited on before leaving
     DinoCreatureState mCreature;    // 0xE4
     DinoCreatureState mCreature2;   // 0xFC
     u32 *mResult;           // 0x114

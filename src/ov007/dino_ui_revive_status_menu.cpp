@@ -4,6 +4,9 @@
 #pragma auto_inline on
 
 #include "game/dino_ui_revive_status_menu.h"
+#include "m/resource.h"
+#include "game/dino_resource.h"
+#include "game/dino_event_talk_window.h"
 #include "types.h"
 #include "game/dino_backup.h"
 #include "m/lcd.h"
@@ -292,4 +295,45 @@ void DinoUiReviveStatusMenu::SetPage(u8 page) {
     GetSerial()->AddTail(MTaskSetWaitEmptyTask::Create(&mInfo->mSerial),
                          MCreateCallTask(this, data_ov007_02191eb0.Enable_00));
     Disable();
+}
+
+extern const int data_02089a74;
+struct DinoMessageData;
+// The revive messages' file, and what goes before the second answer.
+extern "C" const char data_ov007_02192300[], data_ov007_02192314[];
+extern const u32 data_0208a49c, data_0208a4a0, data_0208a4a4, data_0208a4a8;
+
+// The message's text.
+static inline const char *GetMessageText(const DinoMessageData *messages, u32 id) {
+    const u8 *data = (const u8 *)messages;
+    const u8 *entry = data + ((const u32 *)(data + ((const u32 *)data)[2]))[id];
+    return (const char *)entry + ((const u32 *)entry)[1];
+}
+
+// Leaves; with a result to give and rocks still to clean, first asks whether to keep reviving.
+void DinoUiReviveStatusMenu::OnBackDecided() {
+    Disable();
+    MTask *wait = MTaskSetWaitEmptyTask::Create(mUnkE0);
+    MTask *timer = new MTimer(data_02089a74);
+    MSerialTaskSet *serial = &mSerial;
+    serial->AddTail(timer);
+    serial->AddTail(wait);
+    if (mResult != NULL) {
+        if (gDinoBackup->HasInactiveUnk98()) {
+            gLcd->mMain->mBg->SetMode(0);
+            *mResult = 0;
+            MResource<DinoMessageData> messages((std::string(data_ov007_02192300)));
+            DinoEventTalkWindow *talk = new DinoEventTalkWindow(
+                gCurrentDisplay, std::string(GetMessageText(messages.Get(), 17)), (int)mOam, 0);
+            talk->SetYesNo((u32)mResult, MPoint(0xFE, 0x8E), 3, std::string(gDinoResource->GetText(data_0208a4a8)),
+                           std::string(data_ov007_02192314) + gDinoResource->GetText(data_0208a4a4),
+                           std::string(gDinoResource->GetText(data_0208a4a0)),
+                           std::string(gDinoResource->GetText(data_0208a49c)));
+            mSerial.AddTail(talk);
+            Disable();
+        } else {
+            *mResult = 1;
+        }
+    }
+    Leave();
 }
