@@ -49,6 +49,7 @@ public:
     void StateBattleEnd();
     void StateResult();
     void StateContinue();
+    void StateWaitContinue();
     void StateReset();
     void StateFinish();
     void Failed();

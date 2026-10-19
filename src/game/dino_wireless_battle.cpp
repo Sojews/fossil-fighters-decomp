@@ -43,10 +43,11 @@ extern "C" struct {
     void (DinoWirelessBattle::*StateCloseHub_38)(); // 0x38
     void (DinoWirelessBattle::*StateWaitLevels_40)(); // 0x40
     u8 unk48[0x50 - 0x48];
-    void (DinoWirelessBattle::*Unk0204a39c_50)(); // 0x50
+    void (DinoWirelessBattle::*StateWaitContinue_50)(); // 0x50
     void (DinoWirelessBattle::*StateOrderSelect_58)(); // 0x58
     void (DinoWirelessBattle::*StateSoftReset_60)(); // 0x60
-    u8 unk68[0x78 - 0x68];
+    u8 unk68[0x70 - 0x68];
+    void (DinoWirelessBattle::*StateFinish_70)(); // 0x70
     void (DinoWirelessBattle::*Failed_78)(); // 0x78
 } data_020c0400;
 extern "C" struct {
@@ -65,7 +66,12 @@ extern "C" struct {
     void (DinoWirelessBattle::*Failed_60)(); // 0x60
     void (DinoWirelessBattle::*StateWaitReady_68)(); // 0x68
     void (DinoWirelessBattle::*Failed_70)(); // 0x70
+    void (DinoWirelessBattle::*StateFinish_78)(); // 0x78
 } data_020c0480;
+extern "C" struct {
+    void (DinoWirelessBattle::*StateTeamSelect_00)(); // 0x00
+    void (DinoWirelessBattle::*Failed_08)(); // 0x08
+} data_020c0500;
 
 // "Waiting for the other player" (a text id).
 extern "C" const u32 data_0208ad10;
@@ -260,7 +266,40 @@ void DinoWirelessBattle::StateResult() {
 void DinoWirelessBattle::StateContinue() {
     mHub->SendToAll(new DinoBattleReadyToContinueBattleSignal(mMultiPlay->GetPlayerIndex(), mContinue != 0));
     ShowText(data_0208ad10);
-    mState = data_020c0400.Unk0204a39c_50;
+    mState = data_020c0400.StateWaitContinue_50;
+}
+
+// Battles again when both want to, else closes the connection.
+void DinoWirelessBattle::StateWaitContinue() {
+    if (mMultiPlay->IsFatal()) {
+        FadeIn();
+        MTask *reset = mMultiPlay->CreateResetTask();
+        MTask *wait = new MTimer(5);
+        MTaskSet &serial = mSerial;
+        serial.AddTail(wait);
+        serial.AddTail(reset);
+        mState = data_020c0400.StateFinish_70;
+        return;
+    }
+    if (mMultiPlay->IsFailed()) {
+        mState = data_020c0500.Failed_08;
+        return;
+    }
+    Dispatch();
+    if (mPlayers[0].unk03[0] && mPlayers[1].unk03[0]) {
+        if (mPlayers[0].unk03[1] && mPlayers[1].unk03[1]) {
+            FadeIn();
+            mState = data_020c0500.StateTeamSelect_00;
+            return;
+        }
+        FadeIn();
+        MTask *reset = mMultiPlay->CreateResetTask();
+        MTask *wait = new MTimer(5);
+        MTaskSet &serial = mSerial;
+        serial.AddTail(wait);
+        serial.AddTail(reset);
+        mState = data_020c0480.StateFinish_78;
+    }
 }
 
 void DinoWirelessBattle::StateSendLevel() {
