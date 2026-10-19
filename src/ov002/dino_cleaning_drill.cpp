@@ -17,13 +17,6 @@ extern "C" struct {
     const char *columnPath; // 0x20
 } data_ov002_021651f8;
 
-static inline void AddTasks(MTaskSet *set, MTask *a, MTask *b, MTask *c) {
-    set->AddTail(a);
-    set->AddTail(b);
-    set->AddTail(c);
-}
-
-// NONMATCHING: the game keeps &mParallel in a register for the three adds (ours rematerializes it).
 void DinoCleaningDrill::LoadGuides() {
     mUnk84 = 0;
     mRowGuide = new MMotion(std::string(data_ov002_021651f8.rowPath), (MSmartOam *)GetCleaning()->GetUnkD4(), 0, 1);
@@ -36,7 +29,7 @@ void DinoCleaningDrill::LoadGuides() {
     mMark->SetPriority(2);
     mMark->SetAnchor(1);
     mMark->Play(1, 0);
-    AddTasks(&mParallel, mColumnGuide, mRowGuide, mMark);
+    GetParallel()->AddTail(mColumnGuide, mRowGuide, mMark);
 }
 
 void DinoCleaningDrill::Unk1C() {

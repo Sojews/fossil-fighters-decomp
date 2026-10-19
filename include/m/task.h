@@ -79,6 +79,11 @@ public:
         AddTail(a);
         AddTail(b);
     }
+    void AddTail(MTask *a, MTask *b, MTask *c) {
+        AddTail(a);
+        AddTail(b);
+        AddTail(c);
+    }
     void Remove(MTask *task);
     void Clear();
 
@@ -194,6 +199,9 @@ public:
 
     void SetDisplay(MDisplay *display);
     MDisplay *GetDisplay();
+
+    MSerialTaskSet *GetSerial() { return &mSerial; }
+    MParallelTaskSet *GetParallel() { return &mParallel; }
 
     MSerialTaskSet mSerial;     // 0x10
     MParallelTaskSet mParallel; // 0x40

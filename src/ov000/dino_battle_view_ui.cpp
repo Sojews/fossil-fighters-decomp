@@ -308,8 +308,9 @@ struct ChangeMenuArrow {
     MPoint offset;  // from the slot
     u32 unk8;
     u32 id;         // 0x0C
-    u32 anime;      // 0x10
-    u8 unk14[8];
+    u32 anime;      // 0x10: while focused
+    u32 offAnime;   // 0x14: another was chosen
+    u32 onAnime;    // 0x18: this one was chosen
 };
 extern "C" const ChangeMenuArrow data_ov000_02193d20[][3];
 
@@ -855,4 +856,70 @@ void DinoBattleViewUiSelectAllMenu::OnStart() {
         DinoHelpBase &help = *this;
         mSerial.AddTail(DinoHelpBase::CreateEnableTask(&help));
     }
+}
+
+#pragma opt_common_subs on
+// The cancel item backs out; a creature that can be swapped in is told to the target.
+void DinoBattleViewUiChangeMenu::OnDecide(MMenuItem *item) {
+    if (HandlePageItem(item)) {
+        return;
+    }
+    if (mItem120 == item) {
+        BOOL ok = TRUE;
+        MTask *task = func_ov000_0218ec8c(((DinoBattleView *)mUnkEC)->GetUnk12C(), 0x1F, &ok);
+        if (task != NULL) {
+            mSerial.AddTail(task);
+        }
+        if (!ok) {
+            return;
+        }
+        DinoSoundPlaySe(0x63, 0);
+        for (int i = 0; i < 3; i++) {
+            mArrows[i]->Play(data_ov000_02193d20[mSide][i].offAnime, 0);
+        }
+        Disable();
+        GetSerial()->AddTail(mArrows[0]->CreateWaitStopTask(),
+                        mTarget->CreatePostTask(new DinoBattleViewUiChangeMenuResult(1, 0, 0)),
+                        MTaskExitTransfer::Create(this));
+        return;
+    }
+    DinoBattleViewUiChangeMenuResult *result = NULL;
+    DinoBattleViewCreature *creature = GetItemCreature(item);
+    if (creature != NULL && HasId(creature->GetUnkAC())) {
+        BOOL ok = TRUE;
+        MTask *task = NULL;
+        switch (creature->GetUnkB4()) {
+        case 1:
+            task = func_ov000_0218ec8c(((DinoBattleView *)mUnkEC)->GetUnk12C(), 0x1D, &ok);
+            break;
+        case 2:
+            task = func_ov000_0218ec8c(((DinoBattleView *)mUnkEC)->GetUnk12C(), 0x1E, &ok);
+            break;
+        }
+        if (task != NULL) {
+            mSerial.AddTail(task);
+        }
+        if (!ok) {
+            return;
+        }
+        DinoSoundPlaySe(0x61, 0);
+        if (((DinoBattleView *)mUnkEC)->GetUnkE4(mUnkB0)->GetUnkAC() == creature->GetUnkB0()) {
+            result = new DinoBattleViewUiChangeMenuResult(0, unk18C, creature->GetUnkAC());
+        }
+    }
+    if (result == NULL) {
+        return;
+    }
+    int chosen = 0;
+    for (int i = 0; i < 3; i++) {
+        if (i == 2 || data_ov000_02193d20[mSide][i].id == ((DinoBattleViewUiRootMenuItem *)item)->GetUnk4()) {
+            mArrows[i]->Play(data_ov000_02193d20[mSide][i].onAnime, 1);
+            chosen = i;
+        } else {
+            mArrows[i]->Play(data_ov000_02193d20[mSide][i].offAnime, 0);
+        }
+    }
+    Disable();
+    GetSerial()->AddTail(mArrows[chosen]->CreateWaitStopTask(), mTarget->CreatePostTask(result),
+                    MTaskExitTransfer::Create(this));
 }
