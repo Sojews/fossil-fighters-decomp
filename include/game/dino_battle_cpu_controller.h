@@ -2,6 +2,7 @@
 #ifndef GAME_DINO_BATTLE_CPU_CONTROLLER_H
 #define GAME_DINO_BATTLE_CPU_CONTROLLER_H
 
+#include "m/resource.h"
 #include <vector>
 #include "m/archive.h"
 #include "game/dino_battle.h"
@@ -19,12 +20,13 @@ struct DinoBattleFileSet {
     DinoBattleFile mFiles[6];   // 0x10
 };
 
+struct DinoOv000DataA;
+struct DinoOv000DataB;
+
 struct DinoBattleFileGroup {
-    DinoBattleFileSet mSets[5]; // 0x000
-    MArchivePtr mArchive;       // 0x230
-    MArchiveFile mFile;         // 0x234
-    MArchivePtr mArchive2;      // 0x240
-    MArchiveFile mFile2;        // 0x244
+    DinoBattleFileSet mSets[5];             // 0x000
+    MResource<DinoOv000DataA> mDataA;       // 0x230
+    MResource<DinoOv000DataB> mDataB;       // 0x240
 };
 
 // A 16-byte entry of a list the computer player keeps (only its size is known; not mUnk930, whose deleter the

@@ -1,9 +1,9 @@
 func_ov000_021558a0 kind:function(thumb,size=0x40) addr:0x021558a0
-func_ov000_021558e0 kind:function(thumb,size=0x12) addr:0x021558e0
+_ZN14DinoBattleFileC1Ev kind:function(thumb,size=0x12) addr:0x021558e0
 _ZN9MResourceI14DinoOv000DataAEC1ESs kind:function(thumb,size=0xae) addr:0x021558f4
 func_ov000_021559a4 kind:function(thumb,size=0x7e0) addr:0x021559a4
-func_ov000_02156184 kind:function(thumb,size=0x44) addr:0x02156184
-func_ov000_021561c8 kind:function(thumb,size=0x30) addr:0x021561c8
+_ZN19DinoBattleFileGroupC1Ev kind:function(thumb,size=0x44) addr:0x02156184
+_ZN17DinoBattleFileSetC1Ev kind:function(thumb,size=0x30) addr:0x021561c8
 _ZN17DinoBattleFileSetD1Ev kind:function(thumb,size=0x38) addr:0x021561f8
 _ZN19DinoBattleFileGroupD1Ev kind:function(thumb,size=0x78) addr:0x02156230
 _ZN9MResourceI14DinoOv000DataBEC1ESs kind:function(thumb,size=0xae) addr:0x021562a8

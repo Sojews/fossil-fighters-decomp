@@ -1,5 +1,4 @@
 // Ov000021558a0.
-// Only the destructors are decompiled so far.
 
 #include "types.h"
 #include "m/resource.h"
@@ -31,5 +30,28 @@ void DinoOv000DataBFlush() {
 #pragma dont_inline on
 void DinoOv000FileGroupAnchor(DinoBattleFileGroup *group) {
     group->~DinoBattleFileGroup();
+}
+#pragma dont_inline reset
+
+// The TU's pooled constants.
+extern "C" struct {
+    u8 unk00[8];
+    const char *aiPath;     // 0x08: "/btl_ai/btl_ai_%03d"
+} data_ov000_02190fa0;
+
+// The CPU's AI data for the id (none for 0).
+extern "C" MResource<DinoOv000DataA> func_ov000_021558a0(int id) {
+    if (id == 0) {
+        return MResource<DinoOv000DataA>();
+    }
+    char path[256];
+    OS_SPrintf(path, data_ov000_02190fa0.aiPath, id);
+    return MResource<DinoOv000DataA>(std::string(path));
+}
+
+// (Constructing a group here emits the file structs' implicit constructors.)
+#pragma dont_inline on
+void DinoOv000FileGroupCtorAnchor(void *p) {
+    new (p) DinoBattleFileGroup;
 }
 #pragma dont_inline reset
