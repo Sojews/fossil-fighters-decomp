@@ -107,6 +107,20 @@ void DinoUi3PartsRockName::Clear() {
 }
 
 // The mask's name, greyed if it can't be bought.
+#pragma opt_common_subs off
+DinoUi3PartsMaskName::DinoUi3PartsMaskName(MPoint pos) : MProcess(NULL) {
+    mFont = gDinoResource->CreateFont12(0, 1, 0);
+    MObjCanvas *canvas = new MObjCanvas(gCurrentDisplay, gCurrentDisplay->mObj->mOam, MPoint(160, 16),
+                                        gDinoResource->GetUnkTable(), TRUE);
+    canvas->GetOamUnit()->SetMode(1);
+    mText = new MIndicator(canvas, mFont, 0);
+    mParallel.AddTail(mText);
+    mText->SetPosition(pos);
+    mText->SetPriority(2);
+    mText->Show();
+}
+#pragma opt_common_subs reset
+
 void DinoUi3PartsMaskName::SetMask(u32 id, BOOL greyed) {
     mText->SetText(std::string(data_ov005_02165f58));
     if (mText->mState == STATE_RUN) {

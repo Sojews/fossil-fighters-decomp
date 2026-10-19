@@ -9,6 +9,7 @@ class MFont;
 
 class DinoUi3PartsMaskName : public MProcess {
 public:
+    DinoUi3PartsMaskName(MPoint pos);
     virtual ~DinoUi3PartsMaskName();
     virtual void Idle();
     void SetMask(u32 id, BOOL greyed);
