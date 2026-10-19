@@ -59,6 +59,10 @@ def compile_c(src: Path, out_dir: Path) -> Path:
     cmd = re.search(r"rule cc\n  command = (.*?) -MD -c", ninja).group(1)
     edge = re.search(rf"build \S+: cc(?:_partial|_named)? {re.escape(str(src.relative_to(ROOT)))}(?: \|[^\n]*)?\n(?:  .*\n)*?  extra_cflags = (.*)\n", ninja)
     cmd = cmd.replace("$extra_cflags", edge.group(1) if edge else "")
+    # The compiler: the file's own (configure.py's CC_VERSION_BY_PATH), else the default.
+    cc = re.search(r"^cc = (.*)$", ninja, re.M)
+    own = re.search(rf"build \S+: cc(?:_partial|_named)? {re.escape(str(src.relative_to(ROOT)))}(?: \|[^\n]*)?\n(?:  .*\n)*?  cc = (.*)\n", ninja)
+    cmd = cmd.replace("$cc", own.group(1) if own else cc.group(1) if cc else "$cc")
     if os.environ.get("OPT"):           # Try other optimization flags: OPT=-O4,s
         cmd = cmd.replace("-O4,p", os.environ["OPT"])
     if os.environ.get("MWCC"):          # Try another compiler version: MWCC=2.0/sp2p4

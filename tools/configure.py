@@ -46,6 +46,11 @@ LIB_CC_FLAGS: dict[str, str] = {
     "libs/nitrosystem/": " -ipa file",
     "libs/nitrosdk/": " -ipa file",
 }
+# Files built with another compiler than MWCC_VERSION, by path prefix (1.2 has no -ipa).
+CC_VERSION_BY_PATH: dict[str, str] = {
+    # The save data's RC4 comes from an older library build.
+    "libs/nitrosdk/src/crypto/": "1.2/sp2",
+}
 LD_FLAGS = " ".join([
     "-proc arm946e",
     "-dead",
@@ -93,11 +98,12 @@ w(f"rule extract\n  command = {DSD} rom extract --rom $in --output-path {extract
 w(f"rule delink\n  command = {DSD} delink --config-path {arm9_config}")
 w(f"rule lcf\n  command = {DSD} lcf -c {arm9_config} && {PY} tools/lcf_extra.py $out")
 # mwcc names outputs after the source and writes a Windows-style .d next to them.
-w(f"rule cc\n  command = {wine} {CC} {CC_FLAGS} $extra_cflags -gccinc -i include -i libs/msl/include -i libs/msl_cpp/include -MD -c $in -o $outdir && {PY} tools/fix_dep.py $outdir/$stem.d $out.d\n"
+w(f"cc = {CC}")
+w(f"rule cc\n  command = {wine} $cc {CC_FLAGS} $extra_cflags -gccinc -i include -i libs/msl/include -i libs/msl_cpp/include -MD -c $in -o $outdir && {PY} tools/fix_dep.py $outdir/$stem.d $out.d\n"
   "  depfile = $out.d\n  deps = gcc\n  description = CC $in")
 # objdiff compares data references by symbol name: give the compiler's anonymous data symbols, and the data it
 # addresses through sections, the game's names (tools/anon_names.py; the linked code doesn't change).
-w(f"rule cc_named\n  command = {wine} {CC} {CC_FLAGS} $extra_cflags -gccinc -i include -i libs/msl/include -i libs/msl_cpp/include -MD -c $in -o $outdir && {PY} tools/fix_dep.py $outdir/$stem.d $out.d && {PY} tools/anon_names.py $out $target\n"
+w(f"rule cc_named\n  command = {wine} $cc {CC_FLAGS} $extra_cflags -gccinc -i include -i libs/msl/include -i libs/msl_cpp/include -MD -c $in -o $outdir && {PY} tools/fix_dep.py $outdir/$stem.d $out.d && {PY} tools/anon_names.py $out $target\n"
   "  depfile = $out.d\n  deps = gcc\n  description = CC $in")
 w(f"rule ld\n  command = {wine} {LD} {LD_FLAGS} @$objects $lcf -o $out\n  description = LINK $out")
 w(f"rule check\n  command = {DSD} check modules --config-path {arm9_config} --fail && touch $out")
@@ -133,6 +139,9 @@ for f in info["files"]:
         extra = next((v for k, v in LIB_CC_FLAGS.items() if f["name"].startswith(k)), "")
         # mwcc keeps the first -lang it sees, so the language is set per file rather than in CC_FLAGS.
         extra += " -lang c++ -RTTI on" if f["name"].endswith(".cpp") else " -lang c"
+        version = next((v for k, v in CC_VERSION_BY_PATH.items() if f["name"].startswith(k)), None)
+        if version:
+            extra = extra.replace(" -ipa file", "") + f"\n  cc = tools/mwccarm/{version}/mwccarm.exe"
         if obj in partial or f["name"].startswith("src/"):
             w(f"build {obj}: cc_named {f['name']} | {f['delink_file']} tools/anon_names.py\n  outdir = {Path(obj).parent}\n"
               f"  stem = {Path(obj).stem}\n  extra_cflags = {extra}\n  target = {f['delink_file']}")

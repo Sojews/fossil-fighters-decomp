@@ -165,6 +165,9 @@ src/game/dino_3d_load_csv.cpp:
 libs/nitrosdk/src/wvr/wvr.c:
     .text       start:0x0204acf4 end:0x0204b0ec
 
+libs/nitrosdk/src/crypto/rc4.c:
+    .text       start:0x0204b0ec end:0x0204b338
+
 src/m/memory.c:
     .text       start:0x0204b338 end:0x0204b3a0
     .itcm       start:0x01ff8588 end:0x01ff8db8
