@@ -44,6 +44,7 @@ public:
     void StateWaitReady();
     void StateCloseHub();
     void StateBattleEnd();
+    void StateResult();
     void StateContinue();
     void StateReset();
     void StateFinish();

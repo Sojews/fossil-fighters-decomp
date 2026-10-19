@@ -20,6 +20,7 @@
 #include "game/dino_ui_order_select.h"
 #include "m/text_codec.h"
 #include "nitro/mi.h"
+#include "game/dino_ui_result.h"
 #include "types.h"
 
 DinoWirelessBattle::~DinoWirelessBattle() {
@@ -33,7 +34,7 @@ void DinoWirelessBattle::Idle() {
 extern "C" struct {
     u8 unk00[0x8];
     void (DinoWirelessBattle::*StateContinue_08)(); // 0x08
-    void (DinoWirelessBattle::*StateBattleEnd_10)(); // 0x10
+    void (DinoWirelessBattle::*StateResult_10)(); // 0x10
     void (DinoWirelessBattle::*StateFinish_18)(); // 0x18
     u8 unk20[0x38 - 0x20];
     void (DinoWirelessBattle::*StateCloseHub_38)(); // 0x38
@@ -46,7 +47,8 @@ extern "C" struct {
     void (DinoWirelessBattle::*Failed_78)(); // 0x78
 } data_020c0400;
 extern "C" struct {
-    u8 unk00[0x10];
+    void (DinoWirelessBattle::*StateReset_00)(); // 0x00
+    u8 unk08[0x10 - 0x08];
     void (DinoWirelessBattle::*Unk02049f3c_10)(); // 0x10
     u8 unk18[0x20 - 0x18];
     void (DinoWirelessBattle::*StateBeginBattle_20)(); // 0x20
@@ -139,7 +141,24 @@ void DinoWirelessBattle::StateBattleEnd() {
     } else {
         mLosses++;
     }
-    mState = data_020c0400.StateBattleEnd_10;
+    mState = data_020c0400.StateResult_10;
+}
+
+// Shows the wins and losses so far (asking whether to go on), listening to the other console again.
+void DinoWirelessBattle::StateResult() {
+    MLoadOverlay(0, M_OVERLAY_ID(ov004));
+    mContinue = 1;
+    mHub = new MMultiPlayMessageHub(0);
+    mHub->AddObserver(this);
+    mParallel.AddTail(mHub);
+    for (u32 i = 0; i < 2; i++) {
+        mPlayers[i].unk03[0] = 0;
+        mPlayers[i].unk03[1] = 0;
+    }
+    u32 other = (mMultiPlay->GetPlayerIndex() + 1) & 1;
+    mSerial.AddTail(new DinoUiResult((u32) &mContinue, mWon, mWins, mLosses,
+                                     MEncodeUtf8(std::wstring((const wchar_t *) mPlayers[other].mData.name))));
+    mState = data_020c0480.StateReset_00;
 }
 
 void DinoWirelessBattle::StateContinue() {
