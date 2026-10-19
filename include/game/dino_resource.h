@@ -44,13 +44,26 @@ struct DinoCreatureDefs {
     u32 text24;         // 0x24
 };
 
+// A creature's stat: by rank, from low (rank 0) to high (rank 8) along a curve, then on towards max (rank 12).
+struct DinoCreatureStatDef {
+    u8 curve;   // which of the curves (1-4)
+    u8 high;
+    u8 low;
+    u8 max;
+};
+
 struct DinoCreatureDef {
     u8 GetUnk0D() const { return unk0D; }
     u32 GetVoice() const { return voice; }
 
+    // The hit points by rank, from rank 1 (u16 each).
+    const u16 *GetHpTable() const { return (const u16 *)((const u8 *)this + hpTable); }
+
     u8 unk00[0xD];
     u8 unk0D;
-    u8 unk0E[0x24 - 0xE];
+    u8 unk0E[0x10 - 0xE];
+    DinoCreatureStatDef stats[4];   // 0x10
+    u8 unk20[0x24 - 0x20];
     u32 types;              // 0x24: a bit per type
     u32 attackCount;        // 0x28
     u32 attackIds;          // 0x2C: offset of attackCount u32 attack ids
@@ -61,11 +74,13 @@ struct DinoCreatureDef {
     u8 unk44[0x54 - 0x44];
     u32 unk54;          // 0x54: offset of 4 s8 values, or 0
     u32 unk58;          // 0x58: offset of 4 s8 values, or 0
-    u8 unk5C[0x61 - 0x5C];
+    u8 unk5C;
+    DinoCreatureStatDef stat4;      // 0x5D
     u8 unk61;
     u8 unk62[0x78 - 0x62];
     u32 attackUnk78;        // 0x78: offset of a u8 per attack
-    u8 unk7C[0x84 - 0x7C];
+    u32 unk7C;
+    u32 hpTable;        // 0x80: offset of the hit points by rank
     u32 voice;          // 0x84: the cry, from SE 0x475
     u32 unk88;          // 0x88
 };
@@ -145,7 +160,10 @@ struct DinoBattleAdjustDefs {
     int advantageArrowX1;   // 0x188: and at the second
     int advantageArrowY1;   // 0x18C
     u8 abilityMenuWrap; // 0x190: the ability menu's cursor wraps around
-    u8 unk191[0x1AC - 0x191];
+    u8 unk191[0x198 - 0x191];
+    fx32 rankScaleHigh;     // 0x198
+    fx32 rankScaleLow;      // 0x19C
+    u8 unk1A0[0x1AC - 0x1A0];
     u32 kpUpDownPoints; // 0x1AC: offset of the KP up/down numbers' positions (MPoint), by side
     u32 unk1B0;
     u32 wirelessUnk1B4;     // 0x1B4: the wireless battle's settings
