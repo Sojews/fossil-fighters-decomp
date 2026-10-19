@@ -123,6 +123,12 @@ void DinoHelpSampleYesNoMenu::OnDecide(MMenuItem *item) {
     }
 }
 
+// The file's pooled statics (the game addresses sConsoleRect as a slot of this block; see menu.cpp).
+extern "C" struct {
+    u8 unk00[0x2C];
+    MRect consoleRect;  // 0x2C: sConsoleRect
+} data_020bc804;
+
 DinoHelpSampleConsole::DinoHelpSampleConsole(MDisplay *display) : MProcess(display) {
     DinoHelpItem::Enable();
     MDisplayScope scope(display);
@@ -134,13 +140,13 @@ DinoHelpSampleConsole::DinoHelpSampleConsole(MDisplay *display) : MProcess(displ
     blend->SetAlpha(8, 8);
     blend->SetTarget1(mBg->GetPlaneMask());
     blend->SetTarget2(0x3f);
-    MObjCanvas *canvas = new MObjCanvas(gCurrentDisplay, gCurrentDisplay->mObj->mOam,
-                                        MPoint(sConsoleRect.right - sConsoleRect.left,
-                                               sConsoleRect.bottom - sConsoleRect.top),
+    MObjCanvas *canvas = new MObjCanvas(gCurrentDisplay,
+                                        MPoint(data_020bc804.consoleRect.right - data_020bc804.consoleRect.left,
+                                               data_020bc804.consoleRect.bottom - data_020bc804.consoleRect.top),
                                         gDinoResource->GetUnkTable(), TRUE);
     MFont *font = gDinoResource->CreateFont12(0, 10, 1);
     mConsole = new MConsole(canvas, font, MPoint(0, 3), MFx32(3));
-    mConsole->SetPosition(MPoint(sConsoleRect.left, sConsoleRect.top));
+    mConsole->SetPosition(MPoint(data_020bc804.consoleRect.left, data_020bc804.consoleRect.top));
     mConsole->Show();
     mParallel.AddTail(mConsole);
 }
@@ -150,12 +156,6 @@ void DinoHelpSampleConsole::SetText(const char *text) {
     mConsole->ClearText();
     mConsole->Print(std::string(text));
 }
-
-// The file's pooled statics (the game addresses sConsoleRect as a slot of this block; see menu.cpp).
-extern "C" struct {
-    u8 unk00[0x2C];
-    MRect consoleRect;  // 0x2C: sConsoleRect
-} data_020bc804;
 
 MRect DinoHelpSampleConsole::GetRect() {
     return data_020bc804.consoleRect;
