@@ -97,3 +97,28 @@ void DinoUiDebugFlagMenu::OnIdle() {
         Exit();
     }
 }
+
+// Draws the page's row and column labels and makes an item for each of its flags.
+void DinoUiDebugFlagMenu::ShowPage() {
+    ClearItems();
+    mCanvas->Clear();
+    u32 count = mPage == mPageCount - 1 ? mLastPageCount : 100;
+    for (u32 i = 0; i < 10; i++) {
+        MPoint pos(0x1E, 0x1C + i * 16);
+        char text[256];
+        OS_SPrintf(text, "%06d:", mPage * 100 + i * 10);
+        mCanvas->DrawText(mFont, pos, 0, std::string(text));
+    }
+    for (u32 i = 0; i < 10; i++) {
+        MPoint pos(0x4D + i * 16, 0xA);
+        char text[256];
+        OS_SPrintf(text, "+%d", i);
+        mCanvas->DrawText(mFont, pos, 0, std::string(text));
+    }
+    for (u32 i = 0; i < count; i++) {
+        u32 id = mPage * 100 + i;
+        MPoint pos(i % 10 * 16 + 0x50, i / 10 * 16 + 0x1C);
+        AddItem(new DinoUiDebugFlagMenuItem(mMode, id, mCanvas, mFont, pos));
+    }
+    FocusNearestItem(GetCursor());
+}

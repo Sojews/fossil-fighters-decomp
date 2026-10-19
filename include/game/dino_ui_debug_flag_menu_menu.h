@@ -2,6 +2,7 @@
 #define GAME_DINO_UI_DEBUG_FLAG_MENU_MENU_H
 
 #include "m/font.h"
+#include "m/canvas.h"
 #include "m/menu_item.h"
 #include "m/menu.h"
 #include "game/dino_backup.h"
@@ -39,6 +40,17 @@ public:
 
 class DinoUiDebugFlagMenuItem : public MMenuItem {
 public:
+    // Draws the flag's value (0 or 1) at pos.
+    DinoUiDebugFlagMenuItem(int mode, u32 id, MCanvas *canvas, MFont *font, MPoint pos)
+        : mCanvas(canvas), mFont(font), mPos(pos), mId(id), mMode(mode) {
+        mFont->AddRef();
+        if (!GetValue()) {
+            mCanvas->DrawText(mFont, mPos, 0, std::string("0"));
+        } else {
+            std::string one("1");
+            mCanvas->DrawText(mFont, mPos, 0, one);
+        }
+    }
     virtual ~DinoUiDebugFlagMenuItem();
     virtual MRect GetFrame();
     virtual void OnDecide();
