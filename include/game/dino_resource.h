@@ -214,7 +214,18 @@ struct DinoHeadMaskDef {
     u32 moveSe;         // 0x0C: the player's footstep sounds with it on
     u32 moveSe2;        // 0x10
 };
-struct DinoMuseumDefs;
+// The museum's descriptions of the creatures.
+struct DinoMuseumDefs {
+    u32 unk00;
+    u32 count;          // 0x04
+    u32 tableOffset;    // 0x08: of the DinoMuseumDef, one per creature
+};
+
+struct DinoMuseumDef {
+    u32 unk00;
+    u32 text;           // 0x04
+    u8 unk08[0x10 - 0x08];
+};
 // The fossil (kaseki) definitions.
 struct DinoKasekiDefs {
     u32 unk00;

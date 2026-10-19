@@ -17,6 +17,9 @@
 #include "m/call_task.h"
 #include "m/anm_model.h"
 #include "m/irq.h"
+#include "m/console.h"
+#include "m/indicator.h"
+#include <stdio.h>
 #include "game/dino_guide_message.h"
 #include "game/dino_resource.h"
 
@@ -361,7 +364,46 @@ void DinoUiMuseumSlotCreateTask::Idle() {
     mIndex++;
 }
 
-extern "C" void func_ov006_0218a570(DinoUiMuseumInformationMenu *menu);
+static inline const DinoMuseumDef *GetMuseumDef(const DinoMuseumDefs *defs, u32 id) {
+    return (const DinoMuseumDef *)((const u8 *)defs + defs->tableOffset) + id;
+}
+
+// Shows the page's creature: its number, element, name, description and model.
+void DinoUiMuseumInformationMenu::Refresh() {
+    u32 id = mInfo->mCreatures[*mPage];
+    const DinoCreatureDef *def = gDinoResource->GetCreatureDef(id);
+    char number[4];
+    sprintf(number, "%03d", def->voice);
+    mNumber->SetText(std::string(number));
+    for (int i = 0; i < 6; i++) {
+        mTypes[i]->Hide();
+    }
+    switch (def->unk0D) {
+    case 1:
+        mTypes[0]->Show();
+        break;
+    case 2:
+        mTypes[1]->Show();
+        break;
+    case 3:
+        mTypes[2]->Show();
+        break;
+    case 4:
+        mTypes[3]->Show();
+        break;
+    case 5:
+        mTypes[4]->Show();
+        break;
+    case 0:
+    default:
+        mTypes[5]->Show();
+        break;
+    }
+    mName->SetText(std::string(gDinoResource->GetCreatureText08(id)));
+    mDescription->Clear();
+    mDescription->Print(std::string(gDinoResource->GetText(GetMuseumDef(gDinoResource->LoadMuseumDefs().Get(), id)->text)));
+    mModel->SetModel(id);
+}
 
 void DinoUiMuseumInformationMenu::PlayVoice() {
     DinoSoundPlaySe(gDinoResource->GetCreatureDef(mInfo->mCreatures[*mPage])->voice + 0x475, 0);
@@ -382,12 +424,12 @@ void DinoUiMuseumInformationMenu::OnBackDecided() {
 
 void DinoUiMuseumInformationMenu::PageRight() {
     *mPage = (*mPage + 1) % mInfo->mPageCount;
-    func_ov006_0218a570(this);
+    Refresh();
 }
 
 void DinoUiMuseumInformationMenu::PageLeft() {
     *mPage = (*mPage + mInfo->mPageCount - 1) % mInfo->mPageCount;
-    func_ov006_0218a570(this);
+    Refresh();
 }
 
 void DinoUiMuseumMenu::OnIdle() {
@@ -457,8 +499,8 @@ void DinoUiMuseumMenu::OnDecide(MMenuItem *item) {
 
 #pragma auto_inline off
 
-DinoUiMuseumInformationMenu::DinoUiMuseumInformationMenu(Info *info, u32 *page, u32 unkFC)
-    : MMenu(gLcd->mSub, NULL, 0), mInfo(info), mPage(page), mStartPage(*page), mUnkFC(unkFC) {
+DinoUiMuseumInformationMenu::DinoUiMuseumInformationMenu(Info *info, u32 *page, DinoUiMuseum3DModel *model)
+    : MMenu(gLcd->mSub, NULL, 0), mInfo(info), mPage(page), mStartPage(*page), mModel(model) {
 }
 
 // The TU's pooled pointer-to-member constants (typed as the call tasks the game makes of them).
@@ -473,7 +515,7 @@ extern "C" struct {
 void DinoUiMuseumMenu::OnBackDecided() {
     MTask *main, *sub, *wait, *exit;
     exit = MTaskExitTransfer::Create(&(MTask &)*this);
-    wait = MTaskSetWaitEmptyTask::Create(&mUnk1B0->mSerial);
+    wait = MTaskSetWaitEmptyTask::Create(&mModel->mSerial);
     sub = gLcd->mSub->mBright->CreateFadeOutToWhite(30, 0);
     main = gLcd->mMain->mBright->CreateFadeOutToWhite(30, 0);
     MParallelTaskSet *fades = new MParallelTaskSet(TRUE);
@@ -487,7 +529,7 @@ void DinoUiMuseumMenu::ShowInformation() {
     GetSerial()->AddTail(gLcd->mSub->mBright->CreateFadeOutToBlack(5, 0),
                          MCreateCallTask((DinoUiMuseum *)this, data_ov006_021961dc.CloseInformation_00),
                          new DinoUiMuseumInformationMenu((DinoUiMuseumInformationMenu::Info *)&mCreatures,
-                                                         (u32 *)&mSelected, (u32)mUnk1B0),
+                                                         (u32 *)&mSelected, mModel),
                          MCreateCallTask((DinoUiMuseum *)this, data_ov006_0219621c.OpenInformation_00),
                          gLcd->mSub->mBright->CreateFadeInFromBlack(5, 0));
 }
