@@ -164,3 +164,6 @@ void DinoBattleViewBackdrop::Execute() {
 template void std::__vec_deleter<MMotionFile, std::allocator<MMotionFile> >::sub_push_back(const MMotionFile &x, Metrowerks::int2type<false>);
 template std::__vec_deleter<MMotionFile, std::allocator<MMotionFile> >::~__vec_deleter();
 template void std::__vec_deleter<MMotionFile, std::allocator<MMotionFile> >::erase_at_end(size_t n, Metrowerks::int2type<false>);
+template void std::__vec_deleter<MPictureFile, std::allocator<MPictureFile> >::sub_push_back(const MPictureFile &x, Metrowerks::int2type<false>);
+template std::__vec_deleter<MPictureFile, std::allocator<MPictureFile> >::~__vec_deleter();
+template void std::__vec_deleter<MPictureFile, std::allocator<MPictureFile> >::erase_at_end(size_t n, Metrowerks::int2type<false>);
