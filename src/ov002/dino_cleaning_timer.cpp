@@ -7,6 +7,8 @@
 #include "game/dino_sound.h"
 #include "game/dino_cleaning_timer.h"
 #include "types.h"
+#include "m/resource.h"
+#include "game/dino_resource.h"
 
 DinoCleaningTimer::~DinoCleaningTimer() {
 }
@@ -57,3 +59,10 @@ void DinoCleaningTimer::StateExtend() {
         mState = data_ov002_02164c74.Done_20;
     }
 }
+
+// (Emits the out-of-line copy of the resource constructor the game emits in this file.)
+#pragma dont_inline on
+void DinoCleaningTimerMessagesAnchor(std::string path) {
+    MResource<DinoMessageData> messages(path);
+}
+#pragma dont_inline reset
