@@ -9,6 +9,9 @@
 #include "game/dino_event_kaseki_rock_found.h"
 #include "game/dino_field_hole.h"
 #include "game/dino_event_exec.h"
+#include "m/display.h"
+#include "game/dino_resource.h"
+#include "game/dino_event_talk_window.h"
 #include "nitro/mi.h"
 
 DinoEventParkKasekiRockFound::~DinoEventParkKasekiRockFound() {
@@ -21,12 +24,13 @@ void DinoEventParkKasekiRockFound::Idle() {
 // The TU's pooled pointer-to-member constants (see menu.cpp).
 extern "C" struct {
     u8 unk00[0x18];
-    void (DinoEventKasekiRockFound::*State02037204_18)();
+    void (DinoEventKasekiRockFound::*StateBattleEnd_18)();
     u8 unk20[0x30 - 0x20];
     void (DinoEventKasekiRockFound::*StateBattle_30)();
     u8 unk38[0x40 - 0x38];
     void (DinoEventKasekiRockFound::*StateGet_40)();
-    u8 unk48[0x58 - 0x48];
+    u8 unk48[0x50 - 0x48];
+    void (DinoEventKasekiRockFound::*StateFound_50)();
     void (DinoEventKasekiRockFound::*StateAnswered_58)();
     void (DinoEventKasekiRockFound::*StateLeave_60)();
     u8 unk68[0x78 - 0x68];
@@ -71,9 +75,30 @@ void DinoEventKasekiRockFound::StateLeave() {
 void DinoEventKasekiRockFound::StateBattle() {
     mHole = NULL;
     mMessages = MResource<DinoMessageData>();
-    mUnkC0 = MResource<DinoMessageData>();
+    mBattleData = MResource<DinoBattleData>();
     mSerial.AddTail(new DinoEventExecBattle(mEvent, 0, mBattle, 0, -1));
-    mState = data_020bd380.State02037204_18;
+    mState = data_020bd380.StateBattleEnd_18;
+}
+
+void DinoEventKasekiRockFound::StateBattleEnd() {
+    mMessages = MResource<DinoMessageData>("/msg/msg_dig");
+    mBattleData = gDinoResource->LoadBattle(mBattle);
+    if (gDinoBackup->GetFlag(0)) {
+        mBattle = 0;
+        if (((const u32 *)mBattleData.Get())[8] != 0) {
+            mSerial.AddTail(new DinoEventTalkWindow(gCurrentDisplay,
+                                                    mEvent->GetTalkText(((const u32 *)mBattleData.Get())[8]), 0, 0));
+        }
+        mSerial.AddTail(CreateMessageBox(5));
+        mState = data_020bd380.StateFound_50;
+        return;
+    }
+    if (((const u32 *)mBattleData.Get())[7] != 0) {
+        mSerial.AddTail(new DinoEventTalkWindow(gCurrentDisplay,
+                                                mEvent->GetTalkText(((const u32 *)mBattleData.Get())[7]), 0, 0));
+    }
+    mSerial.AddTail(CreateMessageBox(6, gDinoBackup->GetEntryName(&mEntry)));
+    mSerial.AddTail(MTaskExitTransfer::Create(this));
 }
 
 void DinoEventKasekiRockFound::StateAsk() {
