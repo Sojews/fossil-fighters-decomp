@@ -14,6 +14,7 @@
 #include "m/blend.h"
 #include "m/window.h"
 #include "m/lcd.h"
+#include "m/bright.h"
 #include "m/picture.h"
 
 DinoUiKeyboardMenu::DinoUiKeyboardMenu(int mode, u32 arg, int flag)
@@ -296,7 +297,6 @@ void DinoUiSenryuMenuItem::OnDecide() {
 }
 
 extern "C" void func_ov007_021841f4(u32 owner);
-extern "C" void func_ov007_02186dd8(u32 owner);
 
 void DinoKBBackButton::OnDecide() {
     mMotion->Play(4, 1);
@@ -308,8 +308,20 @@ void DinoKBBackButton::OnDecide() {
 void DinoSenryuBackButton::OnDecide() {
     mMotion->Play(4, 1);
     mSerial.AddTail(mMotion->CreateWaitStopTask());
-    func_ov007_02186dd8(unkAC);
+    ((DinoUiSenryuMenu *)unkAC)->OnBackDecided();
     DinoSoundPlaySe(0x90, 0);
+}
+
+extern const int data_020899d4, data_020899e8, data_02089a1c;
+
+// Fades out and leaves.
+void DinoUiSenryuMenu::OnBackDecided() {
+    Deactivate();
+    mUnk11C->Exit();
+    MTask *fade, *exit;
+    exit = MTaskExitTransfer::Create(&(MTask &)*this);
+    fade = gLcd->mMain->mBright->CreateFadeOutToBlack(data_020899e8, data_020899d4);
+    GetSerial()->AddTail(new MTimer(data_02089a1c), fade, exit);
 }
 
 void DinoUiKeyboardMenuItem::OnDecide() {

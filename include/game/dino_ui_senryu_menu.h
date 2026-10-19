@@ -24,13 +24,15 @@ public:
     MTask *CreateCurChangeTask(u32 cur);
     // B focuses the back button, or presses it once it's focused.
     void CheckKeys();
+    void OnBackDecided();
 
     u8 unkB4[0x38];
     MView *mCursor;     // 0xEC
     u8 unkF0[0x18];
     u32 mUnk108;        // 0x108
     u32 mUnk10C;        // 0x10C
-    u8 unk110[0x10];
+    u8 unk110[0x11C - 0x110];
+    MTask *mUnk11C;     // 0x11C
     MFont *mFont120;    // 0x120
     MFont *mFont124;    // 0x124
     MFont *mFont128;    // 0x128
