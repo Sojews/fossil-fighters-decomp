@@ -45,7 +45,9 @@ public:
 
     u32 unkA8[2];
     u32 mUnkB0;     // 0xB0: player index
-    u8 unkB4[0x38];
+    u32 unkB4;
+    u32 mFocusedRow;    // 0xB8
+    u8 unkBC[0x30];
     u32 mUnkEC;     // 0xEC: DinoBattleView
     MMessageObserver *mTarget;  // 0xF0: told the choice
     u32 unkF4;

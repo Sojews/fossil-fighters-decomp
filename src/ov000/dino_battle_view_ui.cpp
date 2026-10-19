@@ -290,6 +290,47 @@ void DinoBattleViewUiCreatureInfoMenu::OnStart() {
     }
 }
 
+// Where the change help is shown for each side, and its text.
+extern "C" const MRect data_ov000_02193ca0[];
+extern "C" const u32 data_0208a34c;
+
+void DinoBattleViewUiChangeMenu::OnStart() {
+    mParallel.AddTail(new DinoBattleHelpBase(gLcd->GetBottomDisplay(), data_ov000_02193ca0[mSide], data_0208a34c));
+    DinoBattleViewUiSelectAreaCommon::OnStart();
+    if (!GetUnk12CFlag((DinoBattleView *)mUnkEC)) {
+        DinoHelpBase &help = *this;
+        mSerial.AddTail(DinoHelpBase::CreateEnableTask(&help));
+    }
+}
+
+// Per side and row of the root menu: where each arrow goes, and which entry it points at.
+struct ChangeMenuArrow {
+    int x, y;
+    u32 unk8;
+    u32 id;         // 0x0C
+    u32 anime;      // 0x10
+    u8 unk14[8];
+};
+extern "C" const ChangeMenuArrow data_ov000_02193d20[][3];
+
+// Shows the arrows pointing at the focused row's entry.
+void DinoBattleViewUiChangeMenu::OnFocus(MMenuItem *item) {
+    DinoBattleViewUiSelectAreaCommon::OnFocus(item);
+    DinoBattleViewUiRootMenuItem *root = dynamic_cast<DinoBattleViewUiRootMenuItem *>(item);
+    if (root != NULL) {
+        DinoSoundPlaySe(0x5F, 0);
+        mFocusedRow = root->mIndex;
+        for (int i = 0; i < 2; i++) {
+            if (root->GetUnk4() == data_ov000_02193d20[root->GetUnk0()][i].id) {
+                mArrows[i]->Show();
+                mArrows[i]->Play(data_ov000_02193d20[root->GetUnk0()][i].anime, 1);
+            } else {
+                mArrows[i]->Hide();
+            }
+        }
+    }
+}
+
 void DinoBattleViewUiCreatureInfoMenu::OnIdle() {
     MTask *task = func_ov000_0218ec8c(((DinoBattleView *)mUnkEC)->GetUnk12C(), -1, 0);
     if (task != NULL) {

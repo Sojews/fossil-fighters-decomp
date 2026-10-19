@@ -3,6 +3,7 @@
 
 #include "m/menu_item.h"
 #include "m/menu.h"
+#include "m/motion.h"
 #include "m/display.h"
 #include "m/observer.h"
 #include "m/sleep.h"
@@ -20,7 +21,9 @@ public:
     virtual void OnDecide(MMenuItem *item);
     BOOL HasId(u32 id);
 
-    u8 unk188[0x14];
+    int mSide;          // 0x188
+    u32 unk18C;
+    MMotion *mArrows[3];    // 0x190
     u32 mIds[3];        // 0x19C
     int mCount;         // 0x1A8
 };
