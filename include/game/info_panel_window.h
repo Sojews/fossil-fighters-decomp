@@ -25,13 +25,21 @@ public:
     u32 mUnk7C;                 // 0x7C
 };
 
+class DinoBattleView;
+class MIndicator;
+
+// A number that pops up over a creature, bounces and goes. kind: 0 the value's own color (up or down), 3 rises
+// without bouncing, others that color.
 class DinoBattleViewPopNumber : public MProcess {
 public:
+    DinoBattleViewPopNumber(DinoBattleView *view, MSmartOam *oam, MPoint pos, int value, int arg4, int kind);
     virtual ~DinoBattleViewPopNumber();
     virtual void Idle();
 
     static int GetCount();          // the numbers still popping
     static MTask *CreateWaitTask(); // waits for them
+
+    MIndicator *mIndicator;     // 0x74
 };
 
 #endif

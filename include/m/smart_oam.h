@@ -97,6 +97,7 @@ public:
     void Free(MSmartOamUnit *block);
 
     void SetOffset(MPoint offset) { mOffset = offset; }
+    MPoint GetOffset() { return mOffset; }
 
     MTask *CreateOffsetTransfer(MPoint offset);
     MTask *CreateShowTransfer();
