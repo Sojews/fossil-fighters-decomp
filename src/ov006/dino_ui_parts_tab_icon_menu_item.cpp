@@ -15,6 +15,7 @@
 #include "m/call_task.h"
 #include "game/dino_sound.h"
 #include "m/lcd.h"
+#include "game/dino_ui_parts_reviver_name.h"
 #include "game/dino_common_window_message_box.h"
 #include "game/common_window_message.h"
 #include "m/view.h"
@@ -457,5 +458,29 @@ void DinoUiStatusMenu::OnOKDecided() {
     } else {
         mSerial.AddTail(
             new DinoCommonWindowMessageBox(MPoint(128, 96), std::string(gDinoResource->GetText(data_0208aa4c)), 4));
+    }
+}
+
+// Swaps the picked member with the one decided on.
+void DinoUiStatusMenu::DecideMember(int index) {
+    mMode = 0;
+    mMessage->mUnk98 = 15;
+    mName->Hide();
+    MParallelTaskSet *anims = new MParallelTaskSet(TRUE);
+    if (mTeam->slots[index]) {
+        mMembers[index]->PlayDecided();
+        anims->AddTail(mMembers[index]->CreateFlyInTask(data_ov006_02191000[mSelected]));
+    } else {
+        mMembers[index]->PlayNormal();
+    }
+    anims->AddTail(mMembers[mSelected]->CreateFlyInTask(data_ov006_02191000[index]));
+    GetSerial()->AddTail(new MTimer(5), anims, MTaskExitTransfer::Create(mMessage),
+                         MCreateCallTask(this, &DinoUiStatusMenu::FinishPage));
+    u8 slot = mTeam->slots[mSelected];
+    mTeam->slots[mSelected] = mTeam->slots[index];
+    mTeam->slots[index] = slot;
+    if (mHelp != NULL) {
+        mHelp->mSerial.Clear();
+        mHelp->Disable();
     }
 }
