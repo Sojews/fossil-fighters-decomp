@@ -1,5 +1,4 @@
 // DinoWirelessBattle.
-// Only the destructors are decompiled so far.
 
 // Derived destructors have their bases' destructor bodies inlined; auto-inlining the ones defined above does that.
 #pragma auto_inline on
@@ -18,6 +17,9 @@
 #include "m/multi_play.h"
 #include "m/overlay.h"
 #include "m/soft_reset.h"
+#include "game/dino_ui_order_select.h"
+#include "m/text_codec.h"
+#include "nitro/mi.h"
 #include "types.h"
 
 DinoWirelessBattle::~DinoWirelessBattle() {
@@ -38,7 +40,7 @@ extern "C" struct {
     void (DinoWirelessBattle::*StateWaitLevels_40)(); // 0x40
     u8 unk48[0x50 - 0x48];
     void (DinoWirelessBattle::*Unk0204a39c_50)(); // 0x50
-    void (DinoWirelessBattle::*Unk02049d30_58)(); // 0x58
+    void (DinoWirelessBattle::*StateOrderSelect_58)(); // 0x58
     void (DinoWirelessBattle::*StateSoftReset_60)(); // 0x60
     u8 unk68[0x78 - 0x68];
     void (DinoWirelessBattle::*Failed_78)(); // 0x78
@@ -46,7 +48,8 @@ extern "C" struct {
 extern "C" struct {
     u8 unk00[0x10];
     void (DinoWirelessBattle::*Unk02049f3c_10)(); // 0x10
-    u8 unk18[0x28 - 0x18];
+    u8 unk18[0x20 - 0x18];
+    void (DinoWirelessBattle::*StateBeginBattle_20)(); // 0x20
     void (DinoWirelessBattle::*StateTeamSelect_28)(); // 0x28
     void (DinoWirelessBattle::*Unk02049ae4_30)(); // 0x30
     u8 unk38[0x40 - 0x38];
@@ -80,6 +83,24 @@ void DinoWirelessBattle::StateTeamSelect() {
     mSerial.AddTail(new DinoUiTeamSelect(&mTeam, mUnk304, mUnk305));
     mUnk304 = mUnk305 = 0;
     mState = data_020c0480.Unk02049ae4_30;
+}
+
+void DinoWirelessBattle::StateOrderSelect() {
+    MLoadOverlay(0, M_OVERLAY_ID(ov003));
+    MLoadOverlay(0, M_OVERLAY_ID(ov006));
+    u32 other = (mMultiPlay->GetPlayerIndex() + 1) & 1;
+    DinoWirelessBattlePlayer *opponent = &mPlayers[other];
+    DinoUiOrderSelectInfo info;
+    MI_CpuFill8(&info, 0, sizeof(info));
+    info.name = MEncodeUtf8(std::wstring((const wchar_t *) opponent->mData.name));
+    for (u32 i = 0; i < 5; i++) {
+        info.creatures[i] = opponent->mCreatures[i];
+    }
+    for (u32 i = 0; i < 2; i++) {
+        mPlayers[i].mReady = FALSE;
+    }
+    mSerial.AddTail(new DinoUiOrderSelect(mTeam, info, 1, 0, 0, 1));
+    mState = data_020c0480.StateBeginBattle_20;
 }
 
 void DinoWirelessBattle::StateBeginBattle() {
@@ -166,7 +187,7 @@ void DinoWirelessBattle::StateWaitTeams() {
         FadeIn();
         DinoSoundStopBgm(-1, 10);
         mSerial.AddTail(new MTimer(10));
-        mState = data_020c0400.Unk02049d30_58;
+        mState = data_020c0400.StateOrderSelect_58;
     }
 }
 

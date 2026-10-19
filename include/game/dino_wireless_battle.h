@@ -21,7 +21,8 @@ struct DinoWirelessBattlePlayer {
     u8 mReady;          // 0x02: sent DinoBattleReadyToBeginBattleSignal
     u8 unk03[5];
     DinoPlayerData mData;   // 0x08
-    u8 unk74[0x114 - 0x74];
+    u8 unk74[0x9C - 0x74];
+    DinoCreatureState mCreatures[5];    // 0x9C: the team
 };
 
 class DinoWirelessBattle : public MProcess, public MMessageObserver {
@@ -36,6 +37,8 @@ public:
     void StateSendLevel();
     void StateWaitLevels();
     void StateTeamSelect();
+    // Shows the opponent's team for the player to pick the order in.
+    void StateOrderSelect();
     void StateWaitTeams();
     void StateBeginBattle();
     void StateWaitReady();
