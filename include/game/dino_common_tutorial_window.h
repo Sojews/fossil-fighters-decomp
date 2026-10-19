@@ -3,7 +3,10 @@
 #define GAME_DINO_COMMON_TUTORIAL_WINDOW_H
 
 #include <string>
+#include "m/geometry.h"
 #include "m/task.h"
+
+class MSmartOam;
 
 class DinoCommonTutorialWindow : public MProcess {
 public:
@@ -17,9 +20,15 @@ public:
 #endif
     virtual void Idle();
 
+    void ShowLongArrow(MPoint pos, int dir);
+    void ShowShortArrow(MPoint pos, int dir);
+
     void (DinoCommonTutorialWindow::*mState)(); // 0x74
     std::string mText;  // 0x7C
-    u8 unk88[0x14];
+    u32 unk88[2];
+    MTaskSet *mArrows;  // 0x90: the pointing arrows shown
+    MSmartOam *mOam;    // 0x94
+    u32 unk98;
 };
 
 #endif
