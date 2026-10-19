@@ -236,9 +236,9 @@ typedef std::__red_black_tree<u32, std::pair<const u32, DinoEventEpisode>,
                               std::__select_first<std::pair<const u32, DinoEventEpisode> >, std::less<u32>,
                               std::allocator<std::pair<const u32, DinoEventEpisode> > >
     DinoEventEpisodeTree;
-template void DinoEventEpisodeTree::clear();
-template void DinoEventEpisodeTree::destroy(DinoEventEpisodeTree::node_base *n);
-template DinoEventEpisodeTree::iterator DinoEventEpisodeTree::erase(DinoEventEpisodeTree::iterator it);
+template class std::__red_black_tree<u32, std::pair<const u32, DinoEventEpisode>,
+                                     std::__select_first<std::pair<const u32, DinoEventEpisode> >, std::less<u32>,
+                                     std::allocator<std::pair<const u32, DinoEventEpisode> > >;
 
 #pragma auto_inline off
 
