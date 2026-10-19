@@ -5,6 +5,14 @@
 #include "m/screen.h"
 #include "m/heap.h"
 #include "m/looper.h"
+#include <deque>
+
+// A queued transfer to VRAM.
+struct M3dTransfer {
+    const void *src;    // 0x0
+    u32 size;           // 0x4
+    u32 arg;            // 0x8
+};
 
 class M3d : public MScreen {
 public:
@@ -28,13 +36,11 @@ public:
     u32 mTexBanks;      // 0x2C
     MHeap mTexHeap;     // 0x30
     MHeap mPlttHeap;    // 0x68
-    u32 unkA0;
-    void *mUnkA4;       // 0xA4: transfers still queued
-    u8 unkA8[0x14];
-    void *mUnkBC;       // 0xBC
-    u8 unkC0[0x14];
-    void *mUnkD4;       // 0xD4
-    u8 unkD8[0x2C];
+    std::deque<M3dTransfer> mQueueA0;   // 0xA0: transfers still queued
+    std::deque<M3dTransfer> mQueueB8;   // 0xB8
+    std::deque<M3dTransfer> mQueueD0;   // 0xD0
+    std::deque<M3dTransfer> mQueueE8;   // 0xE8
+    u32 unk100;
 };
 
 extern OSMutex gM3dMutex;

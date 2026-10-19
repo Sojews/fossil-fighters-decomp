@@ -17,7 +17,7 @@ M3dWaitTransferCompleteTask::~M3dWaitTransferCompleteTask() {
 
 BOOL M3d::IsTransferComplete() {
     MMutexLock lock(&gM3dMutex);
-    return mUnkA4 == NULL && mUnkBC == NULL && mUnkD4 == NULL;
+    return mQueueA0.empty() && mQueueB8.empty() && mQueueD0.empty();
 }
 
 void M3d::FreeTex(u32 key) {
@@ -50,3 +50,12 @@ void M3d::SetClearColor(u16 rgb, int alpha, int depth, int polygonID, BOOL fog) 
 void M3d::SetViewport(int x1, int y1, int x2, int y2) {
     *(vu32 *)0x04000580 = (u32)(x1 | (y1 << 8) | (x2 << 16) | (y2 << 24));   // G3_Viewport
 }
+
+// The queues' members the game emits in this file.
+#pragma auto_inline off
+template class std::__cdeque_deleter<void *, std::allocator<void *> >;
+template class std::__cdeque_deleter<void *, std::allocator<void *> &>;
+template std::deque<M3dTransfer>::~deque();
+template std::deque<M3dTransfer>::iterator std::deque<M3dTransfer>::make_iter(size_t n);
+template void std::deque<M3dTransfer>::push_back(const M3dTransfer &x, Metrowerks::int2type<true>);
+template void std::deque<M3dTransfer>::erase_front(size_t n);
