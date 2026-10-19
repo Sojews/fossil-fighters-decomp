@@ -1,5 +1,4 @@
 // CameraLoadTask.
-// Only the destructors are decompiled so far.
 
 // Derived destructors have their bases' destructor bodies inlined; auto-inlining the ones defined above does that.
 #pragma auto_inline on
@@ -127,4 +126,27 @@ void DinoBattleView3DCamera::Load(const char *path, int light) {
     mUnkA1 = 0;
     mUnkA2 = 1;
     mCamera->Push17();
+}
+
+#pragma auto_inline off
+
+// The battle 3D's camera tasks.
+extern "C" MTask *func_ov000_0218ab8c(DinoBattleView3DCamera *camera, const char *name, int light) {
+    return new CameraLoadTask(camera, name, light);
+}
+
+extern "C" MTask *func_ov000_0218abd0(DinoBattleView3DCamera *camera, int light) {
+    return new NextCameraTask(camera, light);
+}
+
+extern "C" MTask *func_ov000_0218ac04(u32 arg0, u32 arg1, u32 arg2, u32 arg3) {
+    return new ChangeSetTask(arg0, arg1, arg2, arg3);
+}
+
+extern "C" MTask *func_ov000_0218ac40(void *camera, u8 pause) {
+    return new CameraPauseTask(camera, pause);
+}
+
+extern "C" MTask *func_ov000_0218ac74(CameraSetDefParentTask::Camera *camera, Dino3DLoadCsv *parent) {
+    return new CameraSetDefParentTask(camera, parent);
 }
