@@ -99,7 +99,7 @@ _ZN17DinoCleaningImage8GetRatioEv kind:function(thumb,size=0x38) addr:0x0215990c
 _ZN17DinoCleaningImage7GetMaskEii kind:function(thumb,size=0x14) addr:0x02159944
 _ZN17DinoCleaningImage7GetCellEii kind:function(thumb,size=0x28) addr:0x02159958
 _ZN17DinoCleaningImage9ClearGridEv kind:function(thumb,size=0x10) addr:0x02159980
-func_ov002_02159990 kind:function(thumb,size=0x1a4) addr:0x02159990
+_ZN17DinoCleaningImage12SetCellLayerEiim kind:function(thumb,size=0x1a4) addr:0x02159990
 func_ov002_02159b34 kind:function(thumb,size=0x158) addr:0x02159b34
 func_ov002_02159c8c kind:function(thumb,size=0x300) addr:0x02159c8c
 _ZNSt13__vec_deleterI23DinoCleaningStatusEntrySaIS0_EE6assignIPS0_EEvT_S5_N10Metrowerks8int2typeILi1EEE kind:function(thumb,size=0xe2) addr:0x02159f8c
@@ -499,18 +499,7 @@ _ZTI20DinoCleaningLastDust kind:data(any) addr:0x02164754
 data_ov002_02164764 kind:data(any) addr:0x02164764
 _ZTI21DinoCleaningImageView kind:data(any) addr:0x0216476c
 _ZTI31DinoCleaningImageViewScaleAnime kind:data(any) addr:0x02164790
-data_ov002_021647dc kind:data(any) addr:0x021647dc
-data_ov002_021647e4 kind:data(any) addr:0x021647e4
-data_ov002_021647ec kind:data(any) addr:0x021647ec
-data_ov002_021647f4 kind:data(any) addr:0x021647f4
-data_ov002_021647fc kind:data(any) addr:0x021647fc
-data_ov002_02164804 kind:data(any) addr:0x02164804
-data_ov002_0216480c kind:data(any) addr:0x0216480c
-data_ov002_02164814 kind:data(any) addr:0x02164814
-data_ov002_0216481c kind:data(any) addr:0x0216481c
-data_ov002_02164824 kind:data(any) addr:0x02164824
-data_ov002_0216482c kind:data(any) addr:0x0216482c
-data_ov002_02164834 kind:data(any) addr:0x02164834
+_ZZ12GetNeighbour6MPointmE8sOffsets kind:data(byte[96]) addr:0x021647dc
 _ZTV17DinoCleaningImage kind:data(any) addr:0x0216483c
 _ZTV22DinoCleaningImageLayer kind:data(any) addr:0x0216484c
 _ZTS17DinoCleaningImage kind:data(any) addr:0x0216485c
@@ -711,5 +700,5 @@ data_ov002_02165f48 kind:data(any) addr:0x02165f48
 data_ov002_02165f58 kind:data(any) addr:0x02165f58
 data_ov002_02165f6c kind:data(any) addr:0x02165f6c
 data_ov002_02165f84 kind:data(any) addr:0x02165f84
-data_ov002_02165fa0 kind:bss addr:0x02165fa0
+_ZGVZ12GetNeighbour6MPointmE8sOffsets kind:bss addr:0x02165fa0
 data_ov002_02165fa4 kind:bss addr:0x02165fa4

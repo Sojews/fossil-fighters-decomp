@@ -25,6 +25,8 @@ public:
     u8 GetMask(int row, int col);
     u8 GetCell(int row, int col);
     void ClearGrid();
+    // Lowers (or sets) the cell's layer, counting the cells broken on the way, and marks it and its neighbours dirty.
+    void SetCellLayer(int row, int col, u32 layer);
 
     DinoCleaning *mCleaning;                  // 0x04
     u8 mUnk08;                                      // 0x08

@@ -1,6 +1,7 @@
 // DinoCleaningHammer, DinoCleaningHammerEffect, DinoCleaningHammerTask, DinoCleaningHammerBaseHit.
 // Only the destructors are decompiled so far.
 
+#include "game/dino_cleaning_neighbour.h"
 #include "game/dino_cleaning_hammer.h"
 #include "game/dino_cleaning_hammer_effect.h"
 #include "game/dino_cleaning_hammer_task.h"
@@ -121,16 +122,6 @@ void DinoCleaningHammerTask::StateStart() {
     }
     mRadius2 = mRadius;
     mState = data_ov002_02164fb8.State0215ccfc_78;
-}
-
-// The cell next to pos in a direction (0 right, then counterclockwise), for even and odd columns.
-static inline MPoint GetNeighbour(MPoint pos, u32 dir) {
-    static const MPoint sOffsets[2][6] = {
-        {MPoint(1, 0), MPoint(0, 1), MPoint(-1, 1), MPoint(-1, 0), MPoint(-1, -1), MPoint(0, -1)},
-        {MPoint(1, 0), MPoint(1, 1), MPoint(0, 1), MPoint(-1, 0), MPoint(0, -1), MPoint(1, -1)},
-    };
-    const MPoint &d = sOffsets[pos.y & 1][dir];
-    return MPoint(pos.x + d.x, pos.y + d.y);
 }
 
 // NONMATCHING: one stack slot more in the game (std::max's operator< argument copies) and the neighbour sums'

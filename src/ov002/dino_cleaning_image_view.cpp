@@ -13,6 +13,8 @@
 #include "game/dino_cleaning_last_dust.h"
 #include "game/dino_cleaning_image_view_scale_anime.h"
 #include "game/dino_cleaning_status.h"
+#include "game/dino_cleaning_image_layer.h"
+#include "game/dino_cleaning_neighbour.h"
 
 #pragma auto_inline off
 
@@ -112,6 +114,27 @@ BOOL DinoCleaningImageView::IsUnkD9E0Zero() {
         return TRUE;
     }
     return FALSE;
+}
+
+// NONMATCHING: 96%, the game reloads the column in the neighbour loop (one instruction more).
+void DinoCleaningImage::SetCellLayer(int row, int col, u32 layer) {
+    u32 cur = mGrid[row][col];
+    if (layer == cur) {
+        return;
+    }
+    for (; cur > layer; cur--) {
+        DinoCleaningImageLayer *l = mLayers[cur];
+        if (l->mHard[row][col] == 0 && l->mCells410[row][col] == 0) {
+            mUnk13FC--;
+            mLayers[cur]->mUnk1C48 = TRUE;
+        }
+    }
+    mGrid[row][col] = layer;
+    mView->mDirty[row][col] = TRUE;
+    for (u32 i = 0; i < 6; i++) {
+        MPoint n = GetNeighbour(MPoint(row, col), i);
+        mView->mDirty[n.x][n.y] = TRUE;
+    }
 }
 
 // The pooled constants the code reads.

@@ -58,7 +58,6 @@ u8 DinoCleaningRock::GetCell(int row, int col) {
     return mImage->GetCell(row, col);
 }
 
-extern "C" void func_ov002_02159990(DinoCleaningImage *image, int row, int col, s32 layer);
 
 // NONMATCHING: 99.7%, temporaries take stack slots in the opposite order (incl. the MFx32 operators' copies).
 MFx32 DinoCleaningRock::Hit(int row, int col, MFx32 power) {
@@ -69,7 +68,7 @@ MFx32 DinoCleaningRock::Hit(int row, int col, MFx32 power) {
     if (layer != 0) {
         do {
             if (mImage->GetLayer(layer)->mHard[row][col] == 0) {
-                func_ov002_02159990(mImage, row, col, layer);
+                mImage->SetCellLayer(row, col, layer);
                 if (mHardness[row][col] == MFx32(0)) {
                     if (mImage->mGrid[row][col] != 0) {
                         mHardness[row][col] =
@@ -79,7 +78,7 @@ MFx32 DinoCleaningRock::Hit(int row, int col, MFx32 power) {
                     }
                 }
                 if (mHardness[row][col] > power) {
-                    func_ov002_02159990(mImage, row, col, layer);
+                    mImage->SetCellLayer(row, col, layer);
                     MFx32 &hardness = mHardness[row][col];
                     hardness = hardness - power;
                     return MFx32(0);
@@ -89,7 +88,7 @@ MFx32 DinoCleaningRock::Hit(int row, int col, MFx32 power) {
             }
         } while (--layer != 0);
     }
-    func_ov002_02159990(mImage, row, col, 0);
+    mImage->SetCellLayer(row, col, 0);
     mHardness[row][col] = MFx32(0);
     return power;
 }
