@@ -5,6 +5,8 @@
 #pragma auto_inline on
 
 #include "game/dino_backup.h"
+#include "game/dino_resource.h"
+#include "m/seed_generator.h"
 #include "m/bright.h"
 #include "m/picture.h"
 #include "game/backup_validater.h"
@@ -36,14 +38,29 @@ DinoUiTitleSkip::~DinoUiTitleSkip() {
 DinoUiOpeningCloud::~DinoUiOpeningCloud() {
 }
 
-DinoUiOpeningChara::DinoUiOpeningChara(MSmartOam *oam, std::string path, MPoint unk78) : MProcess(NULL) {
-    mUnk78 = unk78;
+DinoUiOpeningChara::DinoUiOpeningChara(MSmartOam *oam, std::string path, MPoint pos) : MProcess(NULL) {
+    mPos = pos;
     mMotion = new MMotion(std::string(path), oam, 2, 1);
     mMotion->SetPriority(0);
     mMotion->SetAnchor(1);
     mMotion->Play(1, 0);
     mMotion->Show();
     mParallel.AddTail(mMotion);
+}
+
+static inline void AddSerial(DinoUiOpeningChara *chara, MTask *a, MTask *b) {
+    MSerialTaskSet *serial = &chara->mSerial;
+    serial->AddTail(a);
+    serial->AddTail(b);
+}
+
+// Sways from side to side, at a random pace.
+void DinoUiOpeningChara::Idle() {
+    AddSerial(this,
+              mMotion->CreateCoordAnime(mPos.Offset(-16, 0), mPos.Offset(8, 0),
+                                        gDinoResource->GetRandom()->Next(20) + 80, 0),
+              mMotion->CreateCoordAnime(mPos.Offset(8, 0), mPos.Offset(-16, 0),
+                                        gDinoResource->GetRandom()->Next(20) + 40, 11));
 }
 
 DinoUiOpeningChara::~DinoUiOpeningChara() {
