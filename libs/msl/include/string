@@ -210,6 +210,84 @@ basic_string<C, Traits, Alloc> &basic_string<C, Traits, Alloc>::replace(size_typ
     return __replace(pos1, n1, p, p + n2, random_access_iterator_tag());
 }
 
+// The basic members, defined only where MSL_STRING_BASICS is (each file that emits one instantiates it).
+#ifdef MSL_STRING_BASICS
+template <class C, class Traits, class Alloc>
+basic_string<C, Traits, Alloc>::basic_string(const C *s) {
+    unsigned long i = 0;
+    unsigned long *words = mWords;
+    for (; i < 3; i++) {
+        *words++ = 0;
+    }
+    size_type n = Traits::length(s);
+    reserve(n);
+    __replace(0, 0, s, s + n, random_access_iterator_tag());
+}
+
+template <class C, class Traits, class Alloc>
+basic_string<C, Traits, Alloc>::~basic_string() {
+    if (is_long()) {
+        ::operator delete(mLong.data);
+    }
+}
+
+template <class C, class Traits, class Alloc>
+basic_string<C, Traits, Alloc>::basic_string(const basic_string &other) {
+    if (!other.is_long()) {
+        struct Rep {
+            unsigned long words[3];
+        };
+        *(Rep *)mWords = *(const Rep *)other.mWords;
+    } else {
+        unsigned long i = 0;
+        unsigned long *words = mWords;
+        for (; i < 3; i++) {
+            *words++ = 0;
+        }
+        reserve(other.mLong.size);
+        __replace(0, 0, other.mLong.data, other.mLong.data + other.mLong.size, random_access_iterator_tag());
+    }
+}
+
+template <class C, class Traits, class Alloc>
+basic_string<C, Traits, Alloc> &basic_string<C, Traits, Alloc>::operator=(const basic_string &str) {
+    bool isLong = is_long();
+    if (!isLong && !str.is_long()) {
+        struct Rep {
+            unsigned long words[3];
+        };
+        *(Rep *)mWords = *(const Rep *)str.mWords;
+        return *this;
+    }
+    return replace(0, isLong ? mLong.size : mShort.size, str);
+}
+
+template <class C, class Traits, class Alloc>
+basic_string<C, Traits, Alloc> &basic_string<C, Traits, Alloc>::replace(size_type pos, size_type n,
+                                                                         const basic_string &str) {
+    const C *p;
+    size_type size;
+    if (!str.is_long()) {
+        p = str.mShort.buf;
+        size = str.mShort.size;
+    } else {
+        p = str.mLong.data;
+        size = str.mLong.size;
+    }
+    return __replace(pos, n, p, p + size, random_access_iterator_tag());
+}
+
+template <class C, class Traits, class Alloc>
+basic_string<C, Traits, Alloc> &basic_string<C, Traits, Alloc>::operator+=(const basic_string &str) {
+    return replace(size(), 0, str);
+}
+
+template <class C, class Traits, class Alloc>
+basic_string<C, Traits, Alloc> &basic_string<C, Traits, Alloc>::operator+=(const C *s) {
+    return replace(size(), 0, s);
+}
+#endif
+
 // The out-of-line members a file instantiates itself (defined only where MSL_STRING_DEFINITIONS is, so other
 // files keep calling the copies they link against).
 #ifdef MSL_STRING_DEFINITIONS
@@ -238,12 +316,6 @@ template <class C, class Traits, class Alloc>
 int basic_string<C, Traits, Alloc>::compare(const C *s) const {
     size_type n = strlen(s);
     return compare(0, size(), s, n);
-}
-
-template <class C, class Traits, class Alloc>
-basic_string<C, Traits, Alloc> &basic_string<C, Traits, Alloc>::replace(size_type pos, size_type n,
-                                                                         const basic_string &str) {
-    return __replace(pos, n, str.data(), str.data() + str.size(), random_access_iterator_tag());
 }
 
 template <class C, class Traits, class Alloc>

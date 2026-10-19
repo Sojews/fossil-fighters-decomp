@@ -1,5 +1,6 @@
 // Save data checks run before the game reads or writes its save.
 
+#define MSL_STRING_BASICS
 #include <string>
 #include "game/backup_validater.h"
 #include "game/common_window_message.h"
@@ -58,3 +59,7 @@ DinoBackupReadValidater::DinoBackupReadValidater(MTask *caller, void *arg)
 DinoBackupWriteValidater::DinoBackupWriteValidater(MTask *caller, void *arg)
     : DinoBackupValidater(data_0208ad08, caller, arg) {
 }
+
+// String members the game emits in this file.
+template std::string::basic_string(const char *s);
+template std::string::~basic_string();

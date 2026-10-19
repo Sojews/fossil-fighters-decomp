@@ -1,6 +1,7 @@
 // DinoEventReviveFieldSuspendTask, DinoEventReviveFieldResumeTask, DinoEventReviveContainerSelect, DinoEventReviveDepositSelect, DinoEventReviveCleaning, DinoEventReviveEffect.
 // Only the destructors are decompiled so far.
 
+#define MSL_STRING_BASICS
 #include "game/dino_cleaning.h"
 #include "m/bright.h"
 #include "game/dino_event_revive_field_suspend_task.h"
@@ -302,3 +303,6 @@ DinoEventCaptureFadeUiTask::DinoEventCaptureFadeUiTask(DinoEventLoop *event, u32
     mArg = arg;
     mUi = NULL;
 }
+
+// String members the game emits in this file.
+template std::string &std::string::operator+=(const std::string &str);

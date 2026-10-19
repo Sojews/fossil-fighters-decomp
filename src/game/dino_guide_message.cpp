@@ -2,6 +2,7 @@
 // The constructor (with the "  " + text operator+ instance), the destructor and the hooks are decompiled so far.
 
 #define MSL_STRING_PLUS_DEFINITIONS
+#define MSL_STRING_BASICS
 #include "game/dino_guide_message.h"
 #include "m/lcd.h"
 
@@ -39,3 +40,6 @@ void DinoGuideMessage::Unk0C() {
     MScopedLock lock(&mMutex, TRUE);
     Restart();
 }
+
+// String members the game emits in this file.
+template std::string::basic_string(const std::string &other);

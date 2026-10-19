@@ -417,7 +417,7 @@ _ZNSt13__vec_deleterI16DinoWindowChoiceSaIS0_EE13sub_push_backERKS0_N10Metrowerk
 _ZNSt13__vec_deleterI16DinoWindowChoiceSaIS0_EED2Ev kind:function(thumb,size=0x2a) addr:0x02007cec
 _ZNSt15__vector_commonILb1EE18throw_length_errorEv kind:function(thumb,size=0x14) addr:0x02007d18
 _ZNSsaSERKSs kind:function(thumb,size=0x46) addr:0x02007d2c
-func_02007d74 kind:function(thumb,size=0x30) addr:0x02007d74
+_ZNSs7replaceEmmRKSs kind:function(thumb,size=0x30) addr:0x02007d74
 _ZN12MBgCallTask0I19DinoEventTalkWindowED1Ev kind:function(thumb,size=0x1c) addr:0x02007da4
 _ZN12MBgCallTask0I19DinoEventTalkWindowED0Ev kind:function(thumb,size=0x20) addr:0x02007dc0
 _ZN12MBgCallTask0I19DinoEventTalkWindowE3RunEv kind:function(thumb,size=0x22) addr:0x02007de0

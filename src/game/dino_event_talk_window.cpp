@@ -3,6 +3,7 @@
 
 #pragma ipa file
 
+#define MSL_STRING_BASICS
 #include "m/input.h"
 #include "game/dino_talk_window.h"
 #include "game/dino_event_talk_window.h"
@@ -158,3 +159,6 @@ void DinoEventTalkWindow::StateEnd() {
     serial->AddTail(timer);
     serial->AddTail(exit);
 }
+
+// String members the game emits in this file.
+template std::string &std::string::operator=(const std::string &str);

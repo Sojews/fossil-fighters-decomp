@@ -1,6 +1,7 @@
 // DinoResource, the game's resources. Only a few functions are decompiled so far: the file's statics (the data
 // file paths, pooled together, and caches made at startup) aren't all here, so code that loads them can't match.
 
+#define MSL_STRING_BASICS
 #include "game/dino_resource.h"
 #include "m/seed_generator.h"
 #include "nitro/fs.h"
@@ -478,3 +479,6 @@ u32 DinoResource::FindExcavateRange(u32 value) {
     }
     return 1;
 }
+
+// String members the game emits in this file.
+template std::string &std::string::operator+=(const char *s);
