@@ -253,7 +253,7 @@ struct DinoKeyItemDefs {
 };
 struct DinoKeyItemDef {
     u16 nameText;       // 0x00
-    u16 unk02;
+    u16 descText;       // 0x02
     u32 unk04;          // 0x04
 };
 // The head masks (the player's alternative heads).
@@ -264,7 +264,7 @@ struct DinoHeadMaskDefs {
 };
 struct DinoHeadMaskDef {
     u16 nameText;       // 0x00
-    u16 unk02;
+    u16 descText;       // 0x02
     u32 price;          // 0x04
     u32 modelName;      // 0x08: offset of the head model's name, from the mask
     u32 moveSe;         // 0x0C: the player's footstep sounds with it on

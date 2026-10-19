@@ -17,6 +17,9 @@ class DinoUiItemMenuItem;
 
 class MIndicator;
 
+class DinoUiFieldMenuCursor;
+class MConsole;
+
 class DinoUiItemMenu : public DinoHelpBase, public MMenu {
 public:
     DinoUiItemMenu(int *choice, DinoTeam *team, DinoTeam *team2);
@@ -44,10 +47,11 @@ public:
     int *mResult;               // 0xEC
     DinoTeam *mOldTeam;         // 0xF0: the team when the menu opened
     DinoTeam *mTeam;            // 0xF4
-    u32 mUnkF8[2];
+    MTaskSet *mCursorTasks;     // 0xF8
+    DinoUiFieldMenuCursor *mCursor; // 0xFC
     DinoUiFieldMenuFraction *mFraction; // 0x100: "page n/m"
     MIndicator *mLabels[5];     // 0x104: the page's item names
-    u32 mUnk118;
+    MConsole *mConsole;         // 0x118: the focused item's description
     std::vector<u32> mKeyItems; // 0x11C: the items the player has
     int mPage;                  // 0x128
     int mLastPage;              // 0x12C

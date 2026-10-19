@@ -9,6 +9,8 @@
 #include "m/smart_oam.h"
 #include "game/dino_common_window_message_box.h"
 #include "game/dino_ui_item_item_button_menu.h"
+#include "m/console.h"
+#include "game/dino_ui_field_menu_cursor.h"
 #include "game/dino_ui_item_item_button.h"
 #include "game/dino_ui_item_menu_item.h"
 #include "game/dino_sound.h"
@@ -271,6 +273,56 @@ DinoUiItemMenuItem::DinoUiItemMenuItem(DinoUiItemMenu *owner, const std::string 
     mMotion->Show();
     mParallel.AddTail(mMotion);
     mMotion->GetUnit()->SetMode(1);
+}
+
+extern MPoint data_020b5858[3];
+
+static inline const DinoKeyItemDef *GetKeyItemDef(const DinoKeyItemDefs *defs, u32 id) {
+    return (const DinoKeyItemDef *)((const u8 *)defs + defs->tableOffset) + id;
+}
+
+// Moves the cursor to the item (a tab, or an item button), and shows the item's description.
+// NONMATCHING: the item-button loop's counter and pointer swap registers.
+void DinoUiItemMenu::OnFocus(MMenuItem *item) {
+    if (item == NULL) {
+        mCursor->Hide();
+        return;
+    }
+    SetSelectedItem(dynamic_cast<DinoHelpItem *>(item));
+    MRect frame = item->GetFrame();
+    mCursor->SetMode(1);
+    for (int i = 0; i < 3; i++) {
+        if (item == mTabItems[i]) {
+            frame.MoveTo(data_020b5858[i]);
+            mCursor->SetMode(2);
+        }
+    }
+    for (int i = 0; i < 5; i++) {
+        if (item == mItems[i]) {
+            frame.left -= 8;
+            frame.top += 8;
+            frame.right -= 8;
+            frame.bottom += 8;
+        }
+    }
+    if (mCursor->IsHidden()) {
+        mCursor->SetFrame(frame);
+    } else {
+        mCursorTasks->Clear();
+        MRect from = mCursor->GetFrame();
+        mCursorTasks->AddTail(mCursor->CreateMoveTask(from, frame, 10, -5));
+    }
+    mCursor->Show();
+    mConsole->Clear();
+    for (u32 i = 0; i < (mPage == mLastPage ? mKeyItems.size() - mPage * 5 : 5); i++) {
+        if (item == mItems[i]) {
+            MResource<DinoKeyItemDefs> defs = gDinoResource->LoadKeyItemDefs();
+            u32 id = mKeyItems[mPage * 5 + i];
+            const DinoKeyItemDefs *data = defs.Get();
+            const DinoKeyItemDef *def = (const DinoKeyItemDef *)((const u8 *)data + data->tableOffset) + id;
+            mConsole->Print(std::string(gDinoResource->GetText(def->descText)));
+        }
+    }
 }
 
 // The OK button is usable once the team has a first member.
