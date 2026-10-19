@@ -2359,7 +2359,7 @@ _ZN20DinoCommonWindowMenuC1EP8MDisplayPv6MPointPKSt6vectorI16DinoWindowChoiceSaI
 _ZN20DinoCommonWindowMenu9AddChoiceEmRKSsS2_ kind:function(thumb,size=0xaa) addr:0x0202d858
 _ZN20DinoCommonWindowMenu8AddEntryEm5MRectRKSs kind:function(thumb,size=0xa8) addr:0x0202d904
 _ZN20DinoCommonWindowMenu7OnStartEv kind:function(thumb,size=0x938) addr:0x0202d9ac
-func_0202e2e4 kind:function(thumb,size=0x154) addr:0x0202e2e4
+_ZN24DinoCommonWindowMenuItemC1EP5MFont6MPointSsSsi kind:function(thumb,size=0x154) addr:0x0202e2e4
 _ZN26DinoCommonWindowMenuCursor11SetPriorityEi kind:function(thumb,size=0xc) addr:0x0202e438
 _ZN26DinoCommonWindowMenuCursor4HideEv kind:function(thumb,size=0xc) addr:0x0202e444
 _Z15MCreateCallTaskI20DinoCommonWindowMenu12DinoHelpBaseEP5MTaskPT_MT0_FvvE kind:function(thumb,size=0x38) addr:0x0202e450

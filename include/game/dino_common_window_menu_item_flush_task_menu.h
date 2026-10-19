@@ -42,6 +42,7 @@ public:
 
 class DinoCommonWindowMenuItem : public MMenuItem, public DinoHelpItem {
 public:
+    DinoCommonWindowMenuItem(MFont *font, MPoint pos, std::string text, std::string name, int width);
     virtual ~DinoCommonWindowMenuItem();
     virtual MRect GetFrame();
     virtual void OnFocusChanged(BOOL focused);

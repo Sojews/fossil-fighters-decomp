@@ -14,6 +14,11 @@
 #include "m/call_task.h"
 #include "m/motion.h"
 #include "m/input.h"
+#include "game/dino_resource.h"
+#include "m/font.h"
+#include "m/display.h"
+#include "m/oam_canvas.h"
+#include "m/indicator.h"
 
 static const char *sCursorMotions[] = {NULL, "/motion/ui_cursor/shovel.bin"};
 
@@ -59,6 +64,22 @@ void DinoCommonWindowMenu::AddEntry(u32 id, MRect rect, const std::string &text)
     entry.rect = rect;
     entry.text = text;
     mEntries.push_back(entry);
+}
+
+// A choice: its text in an indicator (hidden until shown) at pos, and its frame the given width.
+// NONMATCHING: ours loads gCurrentDisplay before the size argument's copy (into ip) and swaps this/canvas registers.
+DinoCommonWindowMenuItem::DinoCommonWindowMenuItem(MFont *font, MPoint pos, std::string text, std::string name,
+                                                   int width)
+    : mText(name) {
+    mUnk94 = new MIndicator(new MObjCanvas(gCurrentDisplay, MPoint(font->MeasureText(text, 0, 0).x, 16),
+                                           gDinoResource->GetUnkTable(), TRUE),
+                            font, 0);
+    mParallel.AddTail(mUnk94);
+    ((MIndicator *) mUnk94)->SetPosition(pos.x, pos.y + 1);
+    mUnk94->SetPriority(0);
+    mUnk94->Hide();
+    ((MIndicator *) mUnk94)->SetText(std::string(text));
+    mFrame = MRect(pos, MPoint(pos.x + width, pos.y + 14));
 }
 
 DinoCommonWindowMenuItemFlushTask::~DinoCommonWindowMenuItemFlushTask() {
