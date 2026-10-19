@@ -11,10 +11,12 @@
 #include "game/dino_field_camera_hook.h"
 
 class MTextPicture;
+class MPictureFile;
 class MSmartOam;
 
 class InfoPanelWindow : public MProcess {
 public:
+    InfoPanelWindow(MPictureFile *file, MSmartOam *oam);
     virtual ~InfoPanelWindow();
     virtual void Idle();
 
