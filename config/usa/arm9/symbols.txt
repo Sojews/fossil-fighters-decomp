@@ -4244,7 +4244,7 @@ _ZNSt15__deque_deleterI11M3dTransferSaIS0_EE9push_backERKS0_N10Metrowerks8int2ty
 _ZNSt15__deque_deleterI11M3dTransferSaIS0_EE17add_back_capacityEm kind:function(thumb,size=0x330) addr:0x02057d30
 _ZNSt15__deque_deleterI11M3dTransferSaIS0_EE11erase_frontEmN10Metrowerks8int2typeILi1EEE kind:function(thumb,size=0x5c) addr:0x02058060
 _ZNSt15__deque_deleterI11M3dTransferSaIS0_EED2Ev kind:function(thumb,size=0x66) addr:0x020580bc
-func_02058124 kind:function(thumb,size=0xc) addr:0x02058124
+_ZNSt14__deque_commonILb1EE18throw_length_errorEPKc kind:function(thumb,size=0xc) addr:0x02058124
 _ZNSt16__cdeque_deleterIPvSaIS0_EE7reserveEm kind:function(thumb,size=0xda) addr:0x02058130
 _ZNSt16__cdeque_deleterIPvSaIS0_EE9push_backERKS0_ kind:function(thumb,size=0x118) addr:0x0205820c
 _ZNSt16__cdeque_deleterIPvSaIS0_EE7grow_byEm kind:function(thumb,size=0xac) addr:0x02058324
@@ -4263,13 +4263,13 @@ _ZNSt16__cdeque_deleterIPvRSaIS0_EE18construct_at_frontINS_IS0_SaIS0_EE8iterator
 _ZNSt16__cdeque_deleterIPvRSaIS0_EE16construct_at_endINS_IS0_SaIS0_EE8iteratorEEEvRKT_SA_N10Metrowerks8int2typeILi1EEE kind:function(thumb,size=0xa0) addr:0x02058c50
 _ZNSt16__cdeque_deleterIPvSaIS0_EED1Ev kind:function(thumb,size=0x26) addr:0x02058cf0
 _ZNSt16__cdeque_deleterIPvSaIS0_EE8iteratorpLEl kind:function(thumb,size=0x34) addr:0x02058d18
-func_02058d4c kind:function(thumb,size=0x46) addr:0x02058d4c
+_ZNKSt16__cdeque_deleterIPvSaIS0_EE8iteratormiERKS4_ kind:function(thumb,size=0x46) addr:0x02058d4c
 func_02058d94 kind:function(thumb,size=0x6c) addr:0x02058d94
 func_02058e00 kind:function(thumb,size=0xda) addr:0x02058e00
 func_02058edc kind:function(thumb,size=0x8c) addr:0x02058edc
 _ZNSt16__cdeque_deleterIPvSaIS0_EE8allocateEmN10Metrowerks8int2typeILi1EEE kind:function(thumb,size=0x58) addr:0x02058f68
-func_02058fc0 kind:function(thumb,size=0x34) addr:0x02058fc0
-func_02058ff4 kind:function(thumb,size=0x46) addr:0x02058ff4
+_ZNSt16__cdeque_deleterIPvRSaIS0_EE8iteratorpLEl kind:function(thumb,size=0x34) addr:0x02058fc0
+_ZNKSt16__cdeque_deleterIPvRSaIS0_EE8iteratormiERKS5_ kind:function(thumb,size=0x46) addr:0x02058ff4
 _ZThn16_N7M3DVIntD0Ev kind:function(thumb,size=0x1c) addr:0x0205903c
 _ZThn16_N7M3DVInt7OnVSyncEv kind:function(thumb,size=0x1c) addr:0x02059058
 _ZThn16_N7M3DVIntD1Ev kind:function(thumb,size=0x1c) addr:0x02059074

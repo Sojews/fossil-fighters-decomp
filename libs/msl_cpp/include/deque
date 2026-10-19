@@ -262,12 +262,13 @@ namespace std {
     template <class T, class Allocator>
     typename __cdeque_deleter<T, Allocator>::difference_type __cdeque_deleter<T, Allocator>::iterator::operator-(
         const iterator &x) const {
+        T *f = first_;
         difference_type d = ptr_ - x.ptr_;
-        if (ptr_ >= first_) {
-            if (x.ptr_ < first_) {
+        if (ptr_ >= f) {
+            if (x.ptr_ < f) {
                 d -= end_ - beg_;
             }
-        } else if (x.ptr_ >= first_) {
+        } else if (x.ptr_ >= f) {
             d += end_ - beg_;
         }
         return d;
