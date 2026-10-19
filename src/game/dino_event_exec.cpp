@@ -3,6 +3,7 @@
 #pragma ipa file
 
 #include "game/dino_event_exec.h"
+#include "game/dino_battle.h"
 #include "nitro/mi.h"
 #include "m/overlay.h"
 #include "game/dino_field_battle_start_effect.h"
@@ -2344,3 +2345,10 @@ void DinoEventExecAutoWarp::StateWarp() {
     gDinoBackup->SetChara(focus, &chara);
     mState = data_020be244.AutoWarp02042014_58;
 }
+
+// (A battle side made here emits its implicit constructor and destructor, which the game's code in this file calls.)
+#pragma dont_inline on
+void DinoEventExecSideAnchor() {
+    DinoBattleSide side;
+}
+#pragma dont_inline reset
