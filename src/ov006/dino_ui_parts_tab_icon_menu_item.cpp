@@ -251,3 +251,77 @@ void DinoUiStatusMenu::CreateItems() {
     AddLink(mOKButton, 2, mMembers[0]);
     AddLink(mUnkB8, 2, mMembers[0]);
 }
+
+// Links the members left and right to the nearest enabled ones (round the row), and the tabs and buttons down to the
+// first enabled member.
+void DinoUiStatusMenu::LinkMembers() {
+    MMenuItem *left[5];
+    MMenuItem *right[5];
+    int i;
+    for (i = 0; i < 5; i++) {
+        left[i] = mMembers[(i + 4) % 5];
+        right[i] = mMembers[(i + 1) % 5];
+    }
+    int first = 0;
+    for (i = 0; i < 5; i++) {
+        if (mMembers[i]->IsEnabled()) {
+            first = i;
+            break;
+        }
+    }
+    for (i = 0; i < 5; i++) {
+        int k = first + i;
+        if (!mMembers[k % 5]->IsEnabled()) {
+            left[(k + 1) % 5] = left[k % 5];
+        }
+    }
+    int start = (first + 1) % 5;
+    for (i = 4; i >= 0; i--) {
+        int k = start + i;
+        if (!mMembers[k % 5]->IsEnabled()) {
+            right[(k + 4) % 5] = right[k % 5];
+        }
+    }
+    if (mUnk12D) {
+        RemoveLink(mUnkB8, 4);
+        for (i = 0; i < 5; i++) {
+            RemoveLink(mMembers[i], 3);
+            RemoveLink(mMembers[i], 1);
+        }
+    }
+    if (mMembers[4]->IsEnabled()) {
+        AddLink(mUnkB8, 4, mMembers[4]);
+    } else if (mMembers[3]->IsEnabled()) {
+        AddLink(mUnkB8, 4, mMembers[3]);
+    } else {
+        AddLink(mUnkB8, 4, mMembers[2]);
+    }
+    for (i = 0; i < 5; i++) {
+        AddLink(mMembers[i], 3, left[i]);
+        AddLink(mMembers[i], 1, right[i]);
+    }
+    if (mMembers[0]->IsEnabled()) {
+        RemoveLink(mTabItems[0], 2);
+        RemoveLink(mTabItems[1], 2);
+        RemoveLink(mTabItems[2], 2);
+        RemoveLink(mOKButton, 2);
+        RemoveLink(mUnkB8, 2);
+        AddLink(mTabItems[0], 2, mMembers[0]);
+        AddLink(mTabItems[1], 2, mMembers[0]);
+        AddLink(mTabItems[2], 2, mMembers[0]);
+        AddLink(mOKButton, 2, mMembers[0]);
+        AddLink(mUnkB8, 2, mMembers[0]);
+    } else {
+        RemoveLink(mTabItems[0], 2);
+        RemoveLink(mTabItems[1], 2);
+        RemoveLink(mTabItems[2], 2);
+        RemoveLink(mOKButton, 2);
+        RemoveLink(mUnkB8, 2);
+        AddLink(mTabItems[0], 2, mMembers[1]);
+        AddLink(mTabItems[1], 2, mMembers[1]);
+        AddLink(mTabItems[2], 2, mMembers[1]);
+        AddLink(mOKButton, 2, mMembers[1]);
+        AddLink(mUnkB8, 2, mMembers[1]);
+    }
+    mUnk12D = 1;
+}
