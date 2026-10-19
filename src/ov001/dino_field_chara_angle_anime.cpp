@@ -67,7 +67,7 @@ struct DinoFieldCharaData {
     u32 mHeadModelNames;    // 0x10
     MFx32 mMoveSpeed;   // 0x14: -1 = the default
     MFx32 mHeight;      // 0x18
-    u8 unk1C[0x20 - 0x1C];
+    MFx32 mNearRange;   // 0x1C: how close the camera's focus counts as near
     u32 mUnk20;         // 0x20
     u32 mUnk24;         // 0x24
     u8 unk28[0x2C - 0x28];
@@ -225,6 +225,28 @@ static inline BOOL IsUnk24Kind(DinoFieldChara *chara) {
 
 BOOL DinoFieldChara::IsUnk24Reacting() {
     return IsUnk24Kind(this) && IsUnkA1Motion();
+}
+
+// Whether the camera's focus stands within the chara's range (for a chara of kind 2, in an A1 motion).
+BOOL DinoFieldChara::IsFocusNear() {
+    if (mBody != NULL && ((DinoFieldCharaData *) mFile.GetData())->mUnk20 == 2 && IsUnkA1Motion()) {
+        u32 focus = mField->GetCamera()->GetFocus();
+        if (focus == 0) {
+            return FALSE;
+        }
+        DinoFieldChara *chara = mField->GetChara(focus);
+        if (chara == NULL) {
+            return FALSE;
+        }
+        MFx32 len;
+        MFx32 range;
+        len = (chara->mModel.pos - mModel.pos).Length();
+        range = ((DinoFieldCharaData *) mFile.GetData())->mNearRange;
+        if (len <= range) {
+            return TRUE;
+        }
+    }
+    return FALSE;
 }
 
 BOOL DinoFieldChara::IsMoving() {

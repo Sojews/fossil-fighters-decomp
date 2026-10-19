@@ -1,6 +1,8 @@
 // DinoFieldMap.
 // Only the destructor and GetInfo are decompiled so far.
 
+#pragma ipa file
+
 #include "m/anm_model.h"
 #include "m/3d_model.h"
 #include "game/dino_field.h"
@@ -62,7 +64,6 @@ static inline MPoint ToPoint(MFx32Point p) {
     return MPoint(MFx32ToInt(p.x), MFx32ToInt(p.y));
 }
 
-// NONMATCHING: stack slots of the division's temporaries only (as GetCameraIndex).
 void *DinoFieldMap::GetArea(MFx32Point pos) {
     MResource<DinoFieldMapGrid> &grid = mGrid;
     MPoint cell = ToPoint(pos / MFx32(2));
@@ -84,7 +85,6 @@ extern "C" struct {
     int minX;   // 0xC
 } data_ov001_0216a134;
 
-// NONMATCHING: stack slots of the division's temporaries only (the game's go the other way round).
 int DinoFieldMap::GetCameraIndex(MFx32Point pos) {
     DinoFieldMapData *data = (DinoFieldMapData *) mData.mFile.GetData();
     if (data->mCameraCount <= 1) {
