@@ -141,7 +141,7 @@ public:
     virtual void Idle();
 
     void Start();
-    void SetText(const char *title, const char *text);
+    void SetText(u32 position, const char *text);
     void OpenStep();
     // Scrolls a text wider than the screen across it.
     void Scroll();

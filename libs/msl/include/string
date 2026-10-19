@@ -588,6 +588,55 @@ template <class C, class Traits, class Alloc>
 basic_string<C, Traits, Alloc> operator+(const basic_string<C, Traits, Alloc> &lhs,
                                          const basic_string<C, Traits, Alloc> &rhs);
 
+#ifdef MSL_STRING_PLUS_DEFINITIONS
+template <class C, class Traits, class Alloc>
+basic_string<C, Traits, Alloc> operator+(const basic_string<C, Traits, Alloc> &lhs, const C *rhs) {
+    basic_string<C, Traits, Alloc> result;
+    typename basic_string<C, Traits, Alloc>::size_type n = strlen(rhs);
+    typename basic_string<C, Traits, Alloc>::size_type ln;
+    const C *lp;
+    if (!lhs.is_long()) {
+        lp = lhs.mShort.buf;
+        ln = lhs.mShort.size;
+    } else {
+        lp = lhs.mLong.data;
+        ln = lhs.mLong.size;
+    }
+    result.reserve(ln + n);
+    result.__replace(0, 0, lp, lp + ln, random_access_iterator_tag())
+        .__replace(ln, 0, rhs, rhs + n, random_access_iterator_tag());
+    return result;
+}
+
+template <class C, class Traits, class Alloc>
+basic_string<C, Traits, Alloc> operator+(const basic_string<C, Traits, Alloc> &lhs,
+                                         const basic_string<C, Traits, Alloc> &rhs) {
+    basic_string<C, Traits, Alloc> result;
+    typename basic_string<C, Traits, Alloc>::size_type ln;
+    const C *lp;
+    if (!lhs.is_long()) {
+        lp = lhs.mShort.buf;
+        ln = lhs.mShort.size;
+    } else {
+        lp = lhs.mLong.data;
+        ln = lhs.mLong.size;
+    }
+    typename basic_string<C, Traits, Alloc>::size_type rn;
+    const C *rp;
+    if (!rhs.is_long()) {
+        rp = rhs.mShort.buf;
+        rn = rhs.mShort.size;
+    } else {
+        rp = rhs.mLong.data;
+        rn = rhs.mLong.size;
+    }
+    result.reserve(ln + rn);
+    result.__replace(0, 0, lp, lp + ln, random_access_iterator_tag())
+        .__replace(ln, 0, rp, rp + rn, random_access_iterator_tag());
+    return result;
+}
+#endif
+
 }  // namespace std
 
 namespace Metrowerks {

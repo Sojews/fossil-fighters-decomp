@@ -1,5 +1,6 @@
 // The help system.
 
+#define MSL_STRING_PLUS_DEFINITIONS
 #include <algorithm>
 #include "game/help.h"
 #include "game/dino_help_sign.h"
@@ -413,7 +414,9 @@ extern "C" struct {
     u8 unk14[0x1C - 0x14];
     void (DinoHelpStatus::*Scroll_1C)();
     void (DinoHelpStatus::*OpenStep_24)();
-    u8 unk2C[0x5C - 0x2C];
+    u8 unk2C[0x4C - 0x2C];
+    void (DinoHelpStatus::*CloseStep_4C)();
+    u8 unk54[0x5C - 0x54];
     void (DinoHelpStatus::*Start_5C)();
 } data_020ba91c;
 
@@ -448,6 +451,54 @@ void DinoHelpStatus::Start() {
     mParallel.AddTail(mCanvas);
     mLines = 0;
     mState = data_020ba91c.OpenStep_24;
+}
+
+extern const char data_020bad5c[];  // put in front of every text
+extern const int data_020899f0;     // frames before the text scrolls
+
+// Remakes the bar's canvas with the text (wider texts get drawn twice, to scroll round) and moves it to the
+// position (0: top, 1: bottom). With no text, the bar closes.
+void DinoHelpStatus::SetText(u32 position, const char *text) {
+    mSerial.Clear();
+    mParallel.Remove(mCanvas);
+    delete mCanvas;
+    mCanvas = NULL;
+    if (text == NULL) {
+        mCanvas = new MSmartObjCanvas(mOam, MPoint(256, 16), (const u8 *) mMotion.GetPalette(0, NULL) + 4, TRUE);
+        mCanvas->Clear();
+        mCanvas->SetPosition(mPositions[mPosition]);
+        mCanvas->Show();
+        SetBlendedMode(mCanvas->GetOamUnit());
+        mParallel.AddTail(mCanvas);
+        mLines = 32;
+        mState = data_020ba91c.CloseStep_4C;
+        return;
+    }
+    std::string str = std::string(data_020bad5c) + text;
+    MPoint size = mFont->MeasureText(str, 0, 0);
+    size.y = 16;
+    if (size.x <= 256) {
+        mCanvas = new MSmartObjCanvas(mOam, MPoint(256, 16), (const u8 *) mMotion.GetPalette(0, NULL) + 4, TRUE);
+        mCanvas->FillRect(MRect(MPoint(0, 0), mCanvas->GetSize()), kHelpStatusColor);
+        mCanvas->DrawText(mFont, MPoint(0, 2), 0, std::string(str));
+    } else {
+        mCanvas = new MSmartObjCanvas(mOam, MPoint(size.x + 256, size.y), (const u8 *) mMotion.GetPalette(0, NULL) + 4,
+                                      TRUE);
+        mCanvas->FillRect(MRect(MPoint(0, 0), mCanvas->GetSize()), kHelpStatusColor);
+        mCanvas->DrawText(mFont, MPoint(0, 2), 0, std::string(str));
+        mCanvas->DrawText(mFont, MPoint(size.x, 2), 0, std::string(str));
+    }
+    mCanvas->Show();
+    SetBlendedMode(mCanvas->GetOamUnit());
+    mParallel.AddTail(mCanvas);
+    if (mPosition == position) {
+        mCanvas->SetPosition(mPositions[position]);
+    } else {
+        mSerial.AddTail(mCanvas->CreateCoordAnime(mPositions[mPosition], mPositions[position], 30, -2));
+        mPosition = position;
+    }
+    mSerial.AddTail(new MTimer(data_020899f0));
+    mState = data_020ba91c.Scroll_1C;
 }
 
 void DinoHelpStatus::OpenStep() {
@@ -496,7 +547,7 @@ void DinoHelp::OnIdle() {
     mTasks->Clear();
     mUnkAC->Clear();
     for (u32 i = 0; i < 2; i++) {
-        mStatus[i]->SetText(NULL, NULL);
+        mStatus[i]->SetText(0, NULL);
         MTask *panelMove = mPanels[i]->CreateCoordAnime(
             mPanels[i]->GetPosition(),
             mPanels[i]->GetPosition() + (mPanels[i]->GetFrame().GetCenter().x <= 128 ? MPoint(-256, 0) : MPoint(256, 0)),
