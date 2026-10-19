@@ -49,6 +49,10 @@ extern OSMutex gM3dMutex;
 // Runs the 3D engine's per-frame work at VBlank.
 class M3DVInt : public MLooperVSyncTask {
 public:
+    M3DVInt(M3d *m3d) : MLooperVSyncTask(FALSE, FALSE) {
+        mM3d = m3d;
+        Enable();
+    }
     virtual ~M3DVInt();
     virtual void OnVSync();
 

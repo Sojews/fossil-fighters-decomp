@@ -12297,7 +12297,6 @@ data_020c22bc kind:data(any) addr:0x020c22bc
 _ZTV3M3d kind:data(any) addr:0x020c22d8
 _ZTS27M3dWaitTransferCompleteTask kind:data(any) addr:0x020c22f4
 _ZTV7M3DVInt kind:data(any) addr:0x020c2314
-data_020c2330 kind:data(any) addr:0x020c2330
 data_020c2340 kind:data(any) addr:0x020c2340
 data_020c2358 kind:data(any) addr:0x020c2358
 _ZTI23MAffineScreenScaleAnime kind:data(any) addr:0x020c2388

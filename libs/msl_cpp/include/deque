@@ -383,7 +383,8 @@ namespace std {
             T *cur_;
         };
 
-        __deque_deleter() {
+        // (mwcc never inlines a template base class's constructor, so the deque sets these up.)
+        void init() {
             start_ = 0;
             size_ = 0;
             buf().init();
@@ -492,7 +493,9 @@ namespace std {
     }
     template <class T, class Allocator = allocator<T> > class deque : public __deque_deleter<T, Allocator> {
     public:
-        deque() {}
+        deque() {
+            this->init();
+        }
         ~deque() {}
     };
 } // namespace std

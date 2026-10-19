@@ -19,6 +19,9 @@ extern "C" void GX_LoadTexPltt(const void *src, u32 dst, u32 size);
 extern "C" void GX_EndLoadTexPltt(void);
 extern "C" BOOL MI_IsDmaBusy(u32 dma);
 extern "C" u32 GXi_DmaId;
+extern "C" void G3X_Init(void);
+extern "C" void GX_SetBankForTex(u32 banks);
+extern "C" void GX_SetBankForTexPltt(u32 banks);
 
 // Whether the display is in VBlank (when VRAM can be written).
 static inline BOOL M3dInVBlank() {
@@ -29,6 +32,72 @@ static inline BOOL M3dInVBlank() {
 M3DVInt::~M3DVInt() {
     MScopedLock lock(&gM3dMutex, TRUE);
     Disable();
+}
+
+M3d::M3d(MDisplay *display, u32 texSize, u32 plttSize)
+    : MScreen(display, 0, 0, 0, 0, 0), mTexSize(texSize), mPlttSize(plttSize), mTexHeap(0, texSize, 12),
+      mPlttHeap(0, plttSize, 12) {
+    // The 3D engine's DMA: the last free channel, else any.
+    u32 dma = 15;
+    for (u32 i = 0; i < 4; i++) {
+        if (gDmaChannelUsed[i] == 0) {
+            dma = i;
+        }
+    }
+    if (dma == 15) {
+        GX_SetDefaultDMA(MAllocDmaChannel());
+    } else {
+        MReserveDmaChannel(dma);
+        GX_SetDefaultDMA(dma);
+    }
+    G3X_Init();
+    vu16 *disp3dcnt = (vu16 *)0x04000060;
+    *disp3dcnt = (u16)(*disp3dcnt & ~0x3002);           // toon shading
+    *disp3dcnt = (u16)((*disp3dcnt & ~0x3000) | 0x10);  // antialiasing
+    *disp3dcnt = (u16)((*disp3dcnt & ~0x3000) | 0x08);  // alpha blending
+    // The display's texture and palette banks.
+    mTexBanks = 0;
+    mPlttBanks = 0;
+    for (int i = 0; i < 4; i++) {
+        switch (display->mBanks78.banks[i]) {
+        case 1:
+            mTexBanks |= 1;
+            break;
+        case 2:
+            mTexBanks |= 2;
+            break;
+        case 3:
+            mTexBanks |= 4;
+            break;
+        case 4:
+            mTexBanks |= 8;
+            break;
+        }
+    }
+    GX_SetBankForTex(mTexBanks);
+    for (int i = 0; i < 4; i++) {
+        switch (display->mBanks8C.banks[i]) {
+        case 5:
+            mPlttBanks |= 0x10;
+            break;
+        case 6:
+            mPlttBanks |= 0x20;
+            break;
+        case 7:
+            mPlttBanks |= 0x40;
+            break;
+        }
+    }
+    GX_SetBankForTexPltt(mPlttBanks);
+    *(vu32 *)0x04000540 = 2;    // SWAP_BUFFERS: auto sort, Z buffering
+    SetClearColor(0, 31, 0x7FFF, 63, FALSE);
+    SetViewport(0, 0, 255, 191);
+    *(vu32 *)0x040004A4 = 0x1F0080;         // POLYGON_ATTR
+    *(vu32 *)0x040004C0 = 0x7FFF7FFF;       // DIF_AMB
+    *(vu32 *)0x040004C4 = 0x7FFF7FFF;       // SPE_EMI
+    *(vu32 *)0x04000480 = 0x7FFF7FFF >> 16; // COLOR
+    *(vu32 *)0x04000540 = 2;
+    mVInt = new M3DVInt(this);
 }
 
 M3d::~M3d() {
