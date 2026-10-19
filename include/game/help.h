@@ -12,6 +12,8 @@
 #include "m/menu.h"
 
 class DinoHelpItem;
+class MMotion;
+class MView;
 class MDisplay;
 class MInput;
 
@@ -114,8 +116,17 @@ public:
     virtual void OnIdle();
     virtual void OnFocus(MMenuItem *item);
 
-    u32 mUnkA8[15];     // 0xA8
-    u8 mUnkE4;          // 0xE4
+    MParallelTaskSet *mTasks;   // 0xA8: the screens' moves
+    MTaskSet *mUnkAC;           // 0xAC
+    MSmartOam *mOam;            // 0xB0
+    u32 mUnkB4;                 // 0xB4
+    MView *mPanels[2];          // 0xB8: per screen
+    MView *mLabels[2];          // 0xC0
+    MMotion *mMarks[2];         // 0xC8
+    u32 mUnkD0[2];              // 0xD0
+    class DinoHelpStatus *mStatus[2];   // 0xD8
+    u32 mUnkE0;                 // 0xE0
+    u8 mUnkE4;                  // 0xE4
 };
 
 class MFont;
@@ -130,6 +141,7 @@ public:
     virtual void Idle();
 
     void Start();
+    void SetText(const char *title, const char *text);
     void OpenStep();
     // Scrolls a text wider than the screen across it.
     void Scroll();
