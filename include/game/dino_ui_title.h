@@ -31,6 +31,7 @@ public:
     void StateToSaveSlot();
     void StateSaveSlot();
     void StateSaveSlotEnd();
+    void StatePrepareBackup();
     void StateTopMenu();
     void StateTopMenuEnd();
 

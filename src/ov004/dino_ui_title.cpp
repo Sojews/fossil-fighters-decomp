@@ -28,6 +28,7 @@
 #include "m/bg.h"
 #include "m/bg_new_task.h"
 #include "m/call_task.h"
+#include "game/dino_common_window_message_box.h"
 
 DinoUiTitle::~DinoUiTitle() {
 }
@@ -154,14 +155,15 @@ extern "C" struct {
     void (DinoUiTitle::*Unk0215f4ec_44)(); // 0x44
     u8 unk4C[0x54 - 0x4C];
     void (DinoUiTitle::*StateToSaveSlot_54)(); // 0x54
-    u8 unk5C[0x6C - 0x5C];
+    void (DinoUiTitle::*LoadBackup_5C)(); // 0x5c
+    u8 unk64[0x6C - 0x64];
     void (DinoUiTitle::*Unk0215d818_6C)(); // 0x6c
     void (DinoUiTitle::*StateOpening_74)(); // 0x74
     void (DinoUiTitle::*StateSaveSlot_7C)(); // 0x7c
     void (DinoUiTitle::*StateTopMenuEnd_84)(); // 0x84
-    u8 unk8C[0x94 - 0x8C];
+    void (DinoUiTitle::*ResetBackup_8C)(); // 0x8c
     void (DinoUiTitle::*LoadLogo_94)(); // 0x94
-    void (DinoUiTitle::*Unk0215f1e0_9C)(); // 0x9c
+    void (DinoUiTitle::*StatePrepareBackup_9C)(); // 0x9c
     void (DinoUiTitle::*StateWarning_A4)(); // 0xa4
     void (DinoUiTitle::*Unk0215e03c_AC)(); // 0xac
     void (DinoUiTitle::*Start_B4)(); // 0xb4
@@ -183,6 +185,7 @@ extern "C" struct {
     void (MBg::*SetMode_154)(bg_mode); // 0x154
     void (DinoUiTitle::*StateSaveSlot_15C)(); // 0x15c
     void (DinoUiTitle::*StateSaveSlotEnd_164)(); // 0x164
+    void (DinoUiTitle::*StateTopMenu_16C)(); // 0x16c
 } data_ov004_02172f78;
 
 inline DinoUiOpening::DinoUiOpening(MInput *input) : MProcess(NULL), mInput(input) {
@@ -191,6 +194,29 @@ inline DinoUiOpening::DinoUiOpening(MInput *input) : MProcess(NULL), mInput(inpu
 
 DinoUiTitle::DinoUiTitle(s32 *result) : MProcess(NULL), mResult(result) {
     mState = data_ov004_02172f78.Start_B4;
+}
+
+extern const u32 data_0208ab58;
+
+// Loads the slot's save, or (for a new one) says so and writes a fresh one, unless leaving for multiplayer.
+void DinoUiTitle::StatePrepareBackup() {
+    if (*mResult != 5 && *mResult != 6) {
+        DinoSaveSummary summary;
+        gDinoBackup->GetSummary(gDinoBackup->GetSlot(), &summary);
+        if (summary.valid) {
+            GetSerial()->AddTail(MCreateBgCallTask(this, data_ov004_02172f78.LoadBackup_5C, 1),
+                                 new DinoBackupReadValidater(NULL, NULL));
+        } else {
+            MTask *message = new DinoCommonWindowMessageWait1(std::string(gDinoResource->GetText(data_0208ab58)),
+                                                              MPoint(0x80, 0x60), 4, 0);
+            mParallel.AddTail(message);
+            GetSerial()->AddTail(new DinoBackupWriteValidater(message, NULL),
+                                 MCreateBgCallTask(this, data_ov004_02172f78.ResetBackup_8C, 1),
+                                 new DinoBackupWriteValidater(message, NULL), MTaskExitTransfer::Create(message),
+                                 new MTimer(1));
+        }
+    }
+    mState = data_ov004_02172f78.StateTopMenu_16C;
 }
 
 // Sets up both screens (the main one at the bottom) and fades them in from white.
@@ -270,7 +296,7 @@ void DinoUiTitle::StateSaveSlotEnd() {
         mState = data_ov004_02172f78.Unk0215ee60_3C;
         break;
     case 0:
-        mState = data_ov004_02172f78.Unk0215f1e0_9C;
+        mState = data_ov004_02172f78.StatePrepareBackup_9C;
         break;
     }
 }
