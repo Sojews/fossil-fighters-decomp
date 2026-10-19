@@ -32,6 +32,7 @@ public:
     void SetUnkB8(int index, void *value);
     void SetUnkD2(u8 value);
     u8 GetUnkD2();
+    void RefreshEntries();
 
     MArchivePtr mArchive;               // 0x74
     MArchiveFile mFile;                 // 0x78

@@ -58,3 +58,21 @@ MResource<DinoCommonLiveData> DinoCommonLiveDataLoad(std::string path) {
     return MResource<DinoCommonLiveData>(path);
 }
 #pragma dont_inline reset
+
+#pragma auto_inline off
+
+// An entry of mUnk94 (12 bytes).
+struct DinoCommonLiveEntry {
+    u32 unk00;
+    u32 mUnk04;     // 0x04: from the data's line
+    u32 unk08;
+};
+
+// Rereads each entry's value from the commentary data.
+void DinoCommonLive::RefreshEntries() {
+    for (u32 i = 0; i < ((u32 *)mFile.GetData())[1]; i++) {
+        u8 *data = (u8 *)mFile.GetData();
+        u8 *line = data + ((u32 *)(data + ((u32 *)data)[2]))[i];
+        ((DinoCommonLiveEntry *)&mUnk94[0])[i].mUnk04 = *(u32 *)(line + 0x18);
+    }
+}
