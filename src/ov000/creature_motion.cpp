@@ -2,6 +2,9 @@
 
 // Derived destructors have their bases' destructor bodies inlined; auto-inlining the ones defined above does that.
 #pragma auto_inline on
+#include "m/display.h"
+#include "m/bright.h"
+#include "m/lcd.h"
 
 #include "game/creature_motion.h"
 #include "game/dino_resource.h"
@@ -97,7 +100,9 @@ DinoBattleViewEffectGameBegin::~DinoBattleViewEffectGameBegin() {
 
 // The TU's pooled pointer-to-member constants (see menu.cpp).
 extern "C" struct {
-    u8 unk00[0x48];
+    u8 unk00[0x38];
+    void (DinoBattleViewEffectGameBegin::*State_38)();
+    u8 unk40[0x48 - 0x40];
     void (DinoBattleViewEffectGameBegin::*Start_48)();
 } data_ov000_02193668;
 
@@ -198,6 +203,18 @@ MTask *DinoBattleViewCreature::CreateMotionCallTask() {
     set->AddTail(call);
     mParallel.AddTail(set);
     return mMotion->CreateWaitStopTask();
+}
+
+// Both screens fade in from white.
+void DinoBattleViewEffectGameBegin::StateFadeIn() {
+    MTask *top, *bottom;
+    bottom = gLcd->GetBottomDisplay()->mBright->CreateFadeInFromWhite(30, 0);
+    top = gLcd->GetTopDisplay()->mBright->CreateFadeInFromWhite(30, 0);
+    MParallelTaskSet *set = new MParallelTaskSet(TRUE);
+    set->AddTail(top);
+    set->AddTail(bottom);
+    mSerial.AddTail(set);
+    mState = data_ov000_02193668.State_38;
 }
 
 void SetCretureIconTask::Idle() {

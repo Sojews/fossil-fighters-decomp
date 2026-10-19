@@ -37,6 +37,8 @@ public:
     virtual ~DinoBattleViewEffectGameBegin();
     virtual void Idle();
 
+    void StateFadeIn();
+
     void (DinoBattleViewEffectGameBegin::*mState)(); // 0x74
     u32 mUnk7C;             // 0x7C
     std::string mNames[2];  // 0x80
