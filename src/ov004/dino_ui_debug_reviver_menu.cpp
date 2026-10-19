@@ -12,6 +12,7 @@
 #include "game/dino_resource.h"
 #include "game/dino_ui_debug_reviver_menu_menu.h"
 #include "types.h"
+#include "nitro/mi.h"
 
 DinoUiDebugReviverMenu::DinoUiDebugReviverMenu() : MMenu(0) {
 }
@@ -32,6 +33,21 @@ void DinoUiDebugReviverMenu::OnStart() {
     mUnkBC = 1;
     GetParallel()->AddTail(mCanvas, mTasks, mCursor, mOam);
     Refresh();
+}
+
+// Draws the creature's name, and an item for each of its parts.
+// NONMATCHING: stack slots of the items' inlined constructor only (the state, the rock and the strings).
+void DinoUiDebugReviverMenu::Refresh() {
+    ClearItems();
+    mCanvas->Clear();
+    char text[256];
+    sprintf(text, "din%03d: %s", mUnkBC, gDinoResource->GetCreatureName(mUnkBC));
+    mCanvas->DrawText(mFont, MPoint(0x32, 0x28), 0, std::string(text));
+    for (u32 i = 0; i < 4; i++) {
+        MPoint pos(0x40 + i * 0x20, 0x60);
+        AddItem(new DinoUiDebugReviverMenuItem(mCanvas, mFont, pos, i, mUnkBC));
+    }
+    FocusNearestItem(GetCursor());
 }
 
 DinoUiDebugReviverMenuItem::~DinoUiDebugReviverMenuItem() {
