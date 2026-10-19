@@ -36,6 +36,12 @@
 #include "m/overlay.h"
 #include "m/simple_menu.h"
 #include "m/soft_reset.h"
+#include "game/help.h"
+#include "m/bright.h"
+#include "m/sleep.h"
+#include "m/file.h"
+#include "m/dma.h"
+#include "game/dino_message.h"
 
 M_EXTERN_OVERLAY(ov000);
 M_EXTERN_OVERLAY(ov003);
@@ -582,6 +588,37 @@ void DinoMainLoop::StateHelpSample() {
 template class MBgCallTask0<DinoMainLoop>;
 
 DinoMain::DinoMain() : MProcess(NULL) {
+}
+
+M_EXTERN_OVERLAY(ov001);
+
+// Sets up the screens, measures the field's saved size (with the field's overlay loaded for it) and starts the main
+// loop.
+void DinoMain::Idle() {
+    gDmaEnabled = FALSE;
+    MSetMaxReadSize(0x1000);
+    MEnableSoftReset();
+    MEnableSleep();
+    RegisterDinoMessages();
+    gLcd->GetTopDisplay()->Setup(5, 4, 0, 0);
+    gLcd->GetBottomDisplay()->Setup(5, 4, 0, 0);
+    gLcd->GetTopDisplay()->mObj->Show();
+    gLcd->GetBottomDisplay()->mObj->Show();
+    gLcd->GetTopDisplay()->mBright->SetMode(1);
+    gLcd->GetTopDisplay()->mBright->SetFactor(16);
+    gLcd->GetBottomDisplay()->mBright->SetMode(1);
+    gLcd->GetBottomDisplay()->mBright->SetFactor(16);
+    gLcd->SetBottomDisplay(gLcd->mMain);
+    gCurrentDisplay = gLcd->GetTopDisplay();
+    MLoadOverlay(0, M_OVERLAY_ID(ov001));
+    MScreen *screen = NULL;
+    DinoHelpDriver *driver = new DinoHelpDriver(new MTimer(1));
+    DinoField *field = new DinoField(&screen, 1);
+    u32 size = field->GetSize();
+    delete field;
+    delete driver;
+    MUnloadOverlay(0, M_OVERLAY_ID(ov001));
+    mSerial.AddTail(new DinoHelpDriver(new DinoMainLoop(size)));
 }
 
 DinoMain::~DinoMain() {

@@ -3421,4 +3421,7 @@ template <class O, class T> MTask *DinoCreatePostAndWaitTask(O *target, T *msg) 
     return tasks;
 }
 
+// Registers the game's message types.
+void RegisterDinoMessages();
+
 #endif

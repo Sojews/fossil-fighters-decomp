@@ -9,6 +9,8 @@
 #include "game/dino_common_yes_no_menu_item.h"
 #include "game/dino_common_window_yes_no_dialog.h"
 #include "m/lcd.h"
+#include "game/dino_common_window_menu_item_flush_task_menu.h"
+#include "game/common_window_message.h"
 
 DinoCommonWindowYesNoDialog::~DinoCommonWindowYesNoDialog() {
 }
@@ -147,4 +149,17 @@ void DinoCommonWindowYesNoDialog::SetUnkBC(u8 value) {
 
 void DinoCommonWindowYesNoDialog::SetPosition(MPoint pos) {
     mPos = pos;
+}
+
+void DinoCommonWindowYesNoDialog::Idle() {
+    DinoCommonWindowMessage *message = new DinoCommonWindowMessage(mPos, std::string(mUnk74), 6, 0);
+    mParallel.AddTail(message);
+    if (mUnkBC) {
+        mUnk80 = "*" + mUnk80;
+    }
+    DinoCommonWindowMenu *menu = new DinoCommonWindowMenu(mResult, mPos, NULL, 5);
+    menu->AddChoice(1, std::string(mUnk8C), std::string(mUnkA4));
+    menu->AddChoice(0, std::string(mUnk80), std::string(mUnk98));
+    GetSerial()->AddTail(new MTimer(1), MTaskSetWaitEmptyTask::Create(&message->mSerial), menu,
+                         MTaskExitTransfer::Create(this));
 }
