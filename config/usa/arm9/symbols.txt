@@ -6226,11 +6226,11 @@ vsnprintf kind:function(thumb,size=0x3c) addr:0x0207f138
 sprintf kind:function(thumb,size=0x1e) addr:0x0207f174
 rand kind:function(thumb,size=0x28) addr:0x0207f194
 func_0207f1bc kind:function(thumb,size=0x336) addr:0x0207f1bc
-func_0207f4f4 kind:function(thumb,size=0x84e) addr:0x0207f4f4
+__sformatter kind:function(thumb,size=0x84e) addr:0x0207f4f4
 .L_0207f51e kind:label(thumb) addr:0x0207f51e local
 .L_0207fd22 kind:label(thumb) addr:0x0207fd22 local
-func_0207fd44 kind:function(thumb,size=0x48) addr:0x0207fd44
-func_0207fd8c kind:function(thumb,size=0x34) addr:0x0207fd8c
+__StringRead kind:function(thumb,size=0x48) addr:0x0207fd44
+vsscanf kind:function(thumb,size=0x34) addr:0x0207fd8c
 sscanf kind:function(thumb,size=0x1a) addr:0x0207fdc0
 raise kind:function(thumb,size=0xb4) addr:0x0207fddc
 strlen kind:function(thumb,size=0x14) addr:0x0207fe90

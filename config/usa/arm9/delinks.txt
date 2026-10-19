@@ -506,6 +506,9 @@ libs/msl/src/direct_io.c:
 libs/msl/src/rand.c:
     .text       start:0x0207f194 end:0x0207f1bc
 
+libs/msl/src/scanf.c:
+    .text       start:0x0207f1bc end:0x0207fddc
+
 libs/msl/src/signal.c:
     .text       start:0x0207fddc end:0x0207fe90
 
