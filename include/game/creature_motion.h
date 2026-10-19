@@ -10,6 +10,7 @@
 #include "m/looper.h"
 #include "game/help.h"
 #include "game/dino_field_camera_hook.h"
+#include "m/fx32.h"
 
 class DinoBattleViewCreature;
 
@@ -100,10 +101,24 @@ public:
     u32 mColorMask;     // 0x14
 };
 
+// Moves a creature's motion from one point to another along a curve.
 class ShuffleMoveTask : public MTask {
 public:
+    ShuffleMoveTask(int arg, MMotion *motion, MPoint from, MPoint to)
+        : mArg(arg), mMotion(motion), mFrom(from), mTo(to), mDuration(120), mFrame(0), mAngle(0), mUnk34(0) {
+        mAngle = FX_Atan2Idx(from.y << FX32_SHIFT, from.x << FX32_SHIFT);
+    }
     virtual ~ShuffleMoveTask();
     virtual void Execute();
+
+    int mArg;           // 0x10
+    MMotion *mMotion;   // 0x14
+    MPoint mFrom;       // 0x18
+    MPoint mTo;         // 0x20
+    int mDuration;      // 0x28
+    int mFrame;         // 0x2C
+    u16 mAngle;         // 0x30
+    int mUnk34;         // 0x34
 };
 
 #endif

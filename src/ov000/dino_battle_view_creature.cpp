@@ -288,6 +288,30 @@ extern "C" void func_ov000_0216fd74(DinoBattleViewCreature *creature) {
     }
 }
 
+// The TU's pooled constants.
+extern "C" struct {
+    u8 unk00[0x4C];
+    MPoint markOffset;  // 0x4C: of the advantage mark from the creature
+} data_ov000_02193030;
+
+// Moves the creature (shuffling over, or sliding) and its advantage mark from one coordinate to another.
+// NONMATCHING: the game loads the mark offset first and keeps to.y in a register for the new coordinate.
+extern "C" MTask *func_ov000_0216ff18(DinoBattleViewCreature *creature, MPoint from, MPoint to, int frames, int ease,
+                                       BOOL shuffle, int arg) {
+    MParallelTaskSet *set = new MParallelTaskSet(TRUE);
+    if (shuffle) {
+        set->AddTail(new ShuffleMoveTask(arg, creature->mMotion, from, to));
+    } else {
+        set->AddTail(creature->mMotion->CreateCoordAnime(from + creature->mCoordOffset, to + creature->mCoordOffset,
+                                                         frames, ease));
+    }
+    MPoint markOffset = data_ov000_02193030.markOffset;
+    set->AddTail(creature->mMotion140->CreateCoordAnime(MPoint(from.x + markOffset.x, from.y + markOffset.y),
+                                                        MPoint(to.x + markOffset.x, to.y + markOffset.y), frames, ease));
+    creature->mCoord = to;
+    return set;
+}
+
 // Sets where the motion goes from the coordinate (mirrored on side 1).
 extern "C" void func_ov000_0216fee0(DinoBattleViewCreature *creature, MPoint offset) {
     creature->mCoordOffset = offset;
