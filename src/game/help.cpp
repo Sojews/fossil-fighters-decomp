@@ -458,6 +458,14 @@ template DinoHelpPtrTree::node_base *DinoHelpPtrTree::lower_bound(const u32 &k, 
 template DinoHelpPtrTree::node_base *DinoHelpPtrTree::insert_node_at(node_base *parent, bool left, bool leftmost,
                                                                     const value_type &v);
 template void DinoHelpPtrTree::destroy(node_base *n);
+template DinoHelpPtrTree::~__red_black_tree();
+
+// (Destroying one here emits the destructor the game's code in this file calls.)
+#pragma dont_inline on
+void DinoHelpParallelAnchor(MParallelTaskSet *set) {
+    set->MParallelTaskSet::~MParallelTaskSet();
+}
+#pragma dont_inline reset
 
 // Makes the unit semi-transparent when its display blends sprites over everything at full strength. (The game
 // emits it first in the file; defined first here, it moves the statics in .bss.)
