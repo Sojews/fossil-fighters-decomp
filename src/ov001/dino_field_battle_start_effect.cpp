@@ -47,13 +47,14 @@ void DinoFieldBattleStartEffect::Start() {
     mState = data_ov001_0216aad4.StateClose_04;
 }
 
-// NONMATCHING: the game spills two copies of each fixed-point operand and of the product (as in DinoHelpStatus::Scroll).
+// NONMATCHING: the game takes the minimum radius's address afresh for std::max's result (ours keeps it).
 void DinoFieldBattleStartEffect::StateClose() {
     if (++mFrame > 90) {
         gLcd->GetBottomDisplay()->mBright->SetMode(1);
         gLcd->GetBottomDisplay()->mBright->SetFactor(16);
+        MTask *clear;
         MTask *exit = MTaskExitTransfer::Create(this);
-        MTask *clear = gLcd->GetBottomDisplay()->mBlend->CreateClearTransfer();
+        clear = gLcd->GetBottomDisplay()->mBlend->CreateClearTransfer();
         MTask *timer = new MTimer(1);
         MSerialTaskSet *serial = &mSerial;
         serial->AddTail(timer);
@@ -62,9 +63,7 @@ void DinoFieldBattleStartEffect::StateClose() {
         return;
     }
     int radius = 160 - mFrame * 160 / 90;
-    MFx32 wave = MFx32::FromRaw(FX_SinCosTable_[(((u16) ((mFrame * 3 << 16) / 90)) >> 4) * 2]);
-    wave *= MFx32(30);
-    radius -= MFx32ToInt(wave);
+    radius -= MFx32ToInt(MFx32(30) * MFx32::FromRaw(FX_SinCosTable_[(((u16) ((mFrame * 3 << 16) / 90)) >> 4) * 2]));
     radius = std::max(data_ov001_0216aad4.mMinRadius, radius);
     mWindow->SetCircle(MPoint(128, 96), radius);
 }
