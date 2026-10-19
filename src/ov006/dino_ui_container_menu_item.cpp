@@ -18,6 +18,13 @@
 #include "m/display.h"
 #include "m/bright.h"
 
+#pragma auto_inline off
+DinoUiContainerMenu::DinoUiContainerMenu(int *choice, DinoTeam *team, DinoTeam *team2)
+    : MMenu(gLcd->GetBottomDisplay(), NULL, 0), mResult(choice), mOldTeam(team), mTeam(team2), mUnk11C(0), mUnk120(0),
+      mPage(0), mLastPage(0) {
+}
+#pragma auto_inline on
+
 DinoUiContainerMenuItem::~DinoUiContainerMenuItem() {
 }
 

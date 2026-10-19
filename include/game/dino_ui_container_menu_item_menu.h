@@ -1,6 +1,7 @@
 #ifndef GAME_DINO_UI_CONTAINER_MENU_ITEM_MENU_H
 #define GAME_DINO_UI_CONTAINER_MENU_ITEM_MENU_H
 
+#include "m/resource.h"
 #include "game/dino_ui_field_menu_cursor.h"
 #include "game/dino_team.h"
 #include "game/dino_ui_field_menu_fraction.h"
@@ -52,9 +53,9 @@ public:
     DinoUiFieldMenuCursor *mCursor; // 0xF8
     DinoUiPartsRockName *mPanel;    // 0xFC: shows the focused container
     std::vector<s32> mUnk100;   // 0x100
-    MArchivePtr mArchive;       // 0x10C
-    MArchiveFile mFile;         // 0x110
-    u32 mUnk11C[2];             // 0x11C
+    MResource<void> mUnk10C;    // 0x10C
+    u32 mUnk11C;                // 0x11C
+    u32 mUnk120;                // 0x120
     int mPage;                  // 0x124
     int mLastPage;              // 0x128
     u8 unk12C[0x130 - 0x12C];

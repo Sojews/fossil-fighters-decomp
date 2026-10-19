@@ -28,7 +28,8 @@ public:
     MMenuItem *mTabItems[3];    // 0xC0
     u32 mUnkCC[2];              // 0xCC
     MMenuItem *mMembers[5];     // 0xD4
-    u8 unkE8[0x30];
+    u8 unkE8[0x2C];
+    int *mResult;               // 0x114
     struct Team {
         u8 unk00[0x22];
         u8 pickable[5];         // 0x22
@@ -37,7 +38,9 @@ public:
     u32 mUnk120;                // 0x120
     int mSelected;              // 0x124
     int mMode;                  // 0x128
-    u8 unk12C[0x138 - 0x12C];
+    u8 unk12C;
+    u8 mUnk12D;                 // 0x12D
+    u8 unk12E[0x138 - 0x12E];
 };
 
 class DinoUiStatusBackButton : public DinoUiStatusMenuItem {

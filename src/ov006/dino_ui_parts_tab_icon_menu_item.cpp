@@ -12,6 +12,14 @@
 #include "m/bg_new_task.h"
 #include "m/call_task.h"
 #include "game/dino_sound.h"
+#include "m/lcd.h"
+
+#pragma auto_inline off
+DinoUiStatusMenu::DinoUiStatusMenu(int *choice, DinoTeam *team, DinoTeam *team2)
+    : MMenu(gLcd->GetBottomDisplay(), NULL, 0), mResult(choice), mTeam((Team *)team), mUnk11C((u32)team2), mUnk120(0),
+      mSelected(0), mMode(0), mUnk12D(0) {
+}
+#pragma auto_inline on
 
 DinoUiPartsTabIconMenuItem::~DinoUiPartsTabIconMenuItem() {
 }
