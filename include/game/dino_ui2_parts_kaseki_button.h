@@ -6,9 +6,11 @@
 #include "m/menu_item.h"
 #include "m/motion.h"
 #include "game/help.h"
+#include "game/dino_ui3_parts_kaseki_button.h"
 
 class DinoUi2PartsKasekiButton : public MMenuItem, public DinoHelpItem {
 public:
+    DinoUi2PartsKasekiButton(MSmartOam *oam, MPoint pos, DinoUiKasekiIcon icon, u8 marked, u32 textId);
     virtual ~DinoUi2PartsKasekiButton();
     virtual MRect GetFrame();
     virtual void OnFocusChanged(BOOL focused);
@@ -16,6 +18,7 @@ public:
     virtual MDisplay *GetDisplay();
     virtual const char *GetText();
 
+    void Setup(MSmartOam *oam, DinoUiKasekiIcon icon);
     void SetMarked(BOOL marked);
     void SetActive(BOOL active);    // (does nothing here)
     void HideMotion();

@@ -145,7 +145,7 @@ void DinoUi3PartsMoney::SetChange(int change) {
     mChange->SetText(std::string(text));
 }
 
-DinoUi3PartsKasekiButton::DinoUi3PartsKasekiButton(MSmartOam *oam, MPoint pos, DinoUi3KasekiIcon icon, u8 marked) {
+DinoUi3PartsKasekiButton::DinoUi3PartsKasekiButton(MSmartOam *oam, MPoint pos, DinoUiKasekiIcon icon, u8 marked) {
     mPos = pos;
     Setup(oam, icon);
     SetMarked(marked);

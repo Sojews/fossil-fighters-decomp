@@ -68,6 +68,15 @@ void DinoUi2PartsRockName::Clear() {
     mText->SetText(std::string(data_ov004_02176b2c));
 }
 
+DinoUi2PartsKasekiButton::DinoUi2PartsKasekiButton(MSmartOam *oam, MPoint pos, DinoUiKasekiIcon icon, u8 marked,
+                                                   u32 textId) {
+    mPos = pos;
+    mTextId = textId;
+    Setup(oam, icon);
+    SetMarked(marked);
+    DinoHelpItem::Disable();
+}
+
 void DinoUi2PartsKasekiButton::SetMarked(BOOL marked) {
     if (marked) {
         mMark->Show();

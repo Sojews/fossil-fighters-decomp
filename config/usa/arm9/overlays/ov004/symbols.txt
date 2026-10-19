@@ -852,8 +852,8 @@ _ZN22DinoUi2FieldMenuCursor14CreateMoveTaskE5MRectS0_ii kind:function(thumb,size
 func_ov004_0216e97c kind:function(thumb,size=0xc0) addr:0x0216e97c
 _ZN20DinoUi2PartsRockName8SetEntryEPK15DinoBackupEntryi kind:function(thumb,size=0x9c) addr:0x0216ea3c
 _ZN20DinoUi2PartsRockName5ClearEv kind:function(thumb,size=0x24) addr:0x0216ead8
-func_ov004_0216eafc kind:function(thumb,size=0x78) addr:0x0216eafc
-func_ov004_0216eb74 kind:function(thumb,size=0x3e4) addr:0x0216eb74
+_ZN24DinoUi2PartsKasekiButtonC1EP9MSmartOam6MPoint16DinoUiKasekiIconhm kind:function(thumb,size=0x78) addr:0x0216eafc
+_ZN24DinoUi2PartsKasekiButton5SetupEP9MSmartOam16DinoUiKasekiIcon kind:function(thumb,size=0x3e4) addr:0x0216eb74
 _ZN24DinoUi2PartsKasekiButton8GetFrameEv kind:function(thumb,size=0x38) addr:0x0216ef58
 _ZN24DinoUi2PartsKasekiButton14OnFocusChangedEi kind:function(thumb,size=0x1e) addr:0x0216ef90
 _ZN24DinoUi2PartsKasekiButton9SetMarkedEi kind:function(thumb,size=0x1e) addr:0x0216efb0
