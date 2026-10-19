@@ -18,6 +18,7 @@ public:
     virtual void OnStart();
     virtual void OnIdle();
     virtual void OnFocus(MMenuItem *item);
+    void ShowPage();
 
     int mMode;          // 0xA8
     u32 mUnkAC;
@@ -25,7 +26,9 @@ public:
     u32 mUnkB4[1];
     MTaskSet *mTasks;   // 0xB8: the cursor's moves
     MView *mCursor;     // 0xBC
-    u8 unkC0[0xCC - 0xC0];
+    int mPage;          // 0xC0
+    int mPageCount;     // 0xC4
+    u8 unkC8[0xCC - 0xC8];
 };
 
 class DinoUiDebugFlagMenuItem : public MMenuItem {

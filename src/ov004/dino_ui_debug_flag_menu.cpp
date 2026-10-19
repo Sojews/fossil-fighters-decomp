@@ -7,6 +7,7 @@
 #include "m/font.h"
 #include "game/dino_ui_debug_flag_menu_menu.h"
 #include "types.h"
+#include "m/input.h"
 
 DinoUiDebugFlagMenu::DinoUiDebugFlagMenu(int mode) : MMenu(0), mMode(mode) {
 }
@@ -38,5 +39,22 @@ void DinoUiDebugFlagMenu::OnFocus(MMenuItem *item) {
     } else {
         mTasks->Clear();
         mTasks->AddTail(mCursor->CreateFrameAnime(mCursor->GetFrame(), item->GetFrame(), 5, -2));
+    }
+}
+
+// R and L turn the page; B leaves.
+void DinoUiDebugFlagMenu::OnIdle() {
+    if (GetInput()->GetPressed() & 0x100) {
+        mPage = (mPage + 1) % mPageCount;
+        ShowPage();
+        return;
+    }
+    if (GetInput()->GetPressed() & 0x200) {
+        mPage = (mPage + mPageCount - 1) % mPageCount;
+        ShowPage();
+        return;
+    }
+    if (GetInput()->GetPressed() & 2) {
+        Exit();
     }
 }
