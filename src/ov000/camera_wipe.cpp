@@ -1,5 +1,4 @@
 // CameraWipe.
-// Only the destructors are decompiled so far.
 
 // Derived destructors have their bases' destructor bodies inlined; auto-inlining the ones defined above does that.
 #pragma auto_inline on
@@ -8,6 +7,8 @@
 #include "m/lcd.h"
 #include "game/camera_wipe.h"
 #include "types.h"
+#include "m/seed_generator.h"
+#include "game/dino_resource.h"
 
 extern u8 data_ov000_02197930;
 
@@ -47,4 +48,40 @@ M3DFadeTask::~M3DFadeTask() {
 // __vec_deleter call. The bytes are identical, so only callcheck sees it.
 DinoBattleViewActionInfoBar::~DinoBattleViewActionInfoBar() {
     mFont->Release();
+}
+
+#pragma auto_inline off
+
+extern u32 data_ov000_02197954[256];    // random fog values (0 to 127)
+
+extern "C" void func_ov000_0218ada0() {
+    MRandom random;
+    for (int i = 0; i < 256; i++) {
+        data_ov000_02197954[i] = random.Next() & 0x7F;
+    }
+    data_ov000_02197930 = FALSE;
+}
+
+// Fades the 3D scene out (just a frame's wait when it's out already).
+extern "C" MTask *func_ov000_0218addc(int arg) {
+    if (data_ov000_02197930) {
+        return new MTimer(1);
+    }
+    data_ov000_02197930 = TRUE;
+    return new M3DFadeTask(arg, FALSE);
+}
+
+// Fades it back in.
+extern "C" MTask *func_ov000_0218ae50(int arg) {
+    if (!data_ov000_02197930) {
+        return new MTimer(1);
+    }
+    data_ov000_02197930 = FALSE;
+    return new M3DFadeTask(arg, TRUE);
+}
+
+DinoBattleViewActionInfoBar::DinoBattleViewActionInfoBar(u32 arg)
+    : MProcess(NULL), mText(NULL), mUnk84(arg), mTimer(0), mFade(0) {
+    mFont = gDinoResource->CreateFont12(1, 10, 1);
+    mFont->AddRef();
 }
