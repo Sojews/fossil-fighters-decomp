@@ -6,6 +6,7 @@
 // Derived destructors have their bases' destructor bodies inlined; auto-inlining the ones defined above does that.
 #pragma auto_inline on
 
+#include "m/bright.h"
 #include "m/obj.h"
 #include "m/lcd.h"
 #include "game/dino_ui_medal_menu.h"
@@ -278,4 +279,23 @@ void DinoUiMedalList::StateMenu() {
     }
     mSerial.AddTail(new DinoUiMedalMenu(&mUnk7C, &mUnk80, &mUnk84));
     mState = data_ov006_02194158.Unk02183980_24;
+}
+
+extern const int data_02089aa4, data_02089aa8, data_02089aac, data_02089ab0, data_02089ab4, data_02089ab8;
+
+void DinoUiMedalMenu::OnBackDecided(BOOL result) {
+    *mResult = result;
+    if (result == 0) {
+        MTask *exit = MTaskExitTransfer::Create(&(MTask &)*this);
+        MTask *fade = gLcd->GetBottomDisplay()->mBright->CreateFadeOutToBlack(data_02089ab4, data_02089ab0);
+        MParallelTaskSet *fades = new MParallelTaskSet(TRUE);
+        fades->AddTail(fade);
+        GetSerial()->AddTail(new MTimer(data_02089ab8), MTaskSetWaitEmptyTask::Create(mUnk220), fades, exit);
+    } else {
+        MTask *exit = MTaskExitTransfer::Create(&(MTask &)*this);
+        MTask *fade = gLcd->GetBottomDisplay()->mBright->CreateFadeOutToBlack(data_02089aa8, data_02089aa4);
+        MParallelTaskSet *fades = new MParallelTaskSet(TRUE);
+        fades->AddTail(fade);
+        GetSerial()->AddTail(new MTimer(data_02089aac), MTaskSetWaitEmptyTask::Create(mUnk220), fades, exit);
+    }
 }

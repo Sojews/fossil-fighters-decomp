@@ -43,7 +43,8 @@ public:
     u32 mSlotCount;                     // 0x17C
     u32 mUnk180[3];                     // 0x180
     DinoUiFieldMenuFraction *mFraction; // 0x18C: "page n/m"
-    u32 mUnk190[3];                     // 0x190
+    int *mResult;                       // 0x190
+    u32 mUnk194[2];
     std::vector<void *> mUnk19C;        // 0x19C
     std::vector<void *> mUnk1A8;        // 0x1A8
     std::vector<void *> mUnk1B4;        // 0x1B4
@@ -56,7 +57,8 @@ public:
     u8 unk1F1[0x13];
     u8 mUnk204;                         // 0x204
     std::vector<MMotionFile> mMotions;  // 0x208
-    u8 unk214[0x224 - 0x214];
+    u8 unk214[0x220 - 0x214];
+    MTaskSet *mUnk220;                  // 0x220
 };
 
 class DinoUiSortMenuItem : public MMenuItem, public DinoHelpItem {
