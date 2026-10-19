@@ -185,7 +185,6 @@ BOOL DinoUiContainerBaseMenu::PageLeft() {
     return TRUE;
 }
 
-// NONMATCHING: the game reloads the item count for clear(); ours reuses the loop's last load.
 void DinoUiContainerBaseMenu::ClearItems() {
     RemoveLink(mLinkFrom, 4);
     for (int i = 0; i < mItems.size(); i++) {
@@ -267,7 +266,6 @@ void DinoUiContainerBaseMenu::HidePageButtons() {
 
 // Entries that can't be marked now (and aren't) are greyed out.
 // Makes the page's buttons (blank past the last entry) and links them in a grid.
-// NONMATCHING: scheduling only (the game works out the entry's index before loading the list's size).
 void DinoUiContainerBaseMenu::RefreshPage2() {
     for (int i = 0; i < 8; i++) {
         DinoUi3PartsKasekiButton *button;

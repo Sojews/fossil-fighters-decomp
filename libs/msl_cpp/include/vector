@@ -253,7 +253,7 @@ namespace std {
             return capacity_.first();
         }
 
-        volatile size_t size() {
+        size_t size() const {
             return size_;
         }
 

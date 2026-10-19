@@ -400,7 +400,6 @@ void DinoUiMaskBuyMenu::OnDecide(MMenuItem *item) {
 }
 
 // Removes the page's mask buttons.
-// NONMATCHING: the game reloads the size for clear() (as in the containers' ClearItems).
 void DinoUiMaskBuyMenu::RefreshPage1() {
     RemoveLink(mBuy, 4);
     RemoveLink(mBack, 2);

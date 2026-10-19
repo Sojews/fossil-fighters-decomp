@@ -855,7 +855,6 @@ extern const MPoint data_ov007_0218ecbc;
 extern const MPoint data_ov007_0218ecc4;
 
 // Sends the selected member back to its place in the list.
-// NONMATCHING: the game reloads the list's size each time round the search loop.
 void DinoUiOrganizationMenu::RemoveMember() {
     int i = FindCreature(mTeam.slots[mSelected]);
     mTeam.slots[mSelected] = 0;
@@ -877,7 +876,6 @@ void DinoUiOrganizationMenu::RemoveMember() {
     Disable();
 }
 
-// NONMATCHING: as RemoveMember (the search loop reloads the list's size; registers follow from it).
 void DinoUiOrganizationMenu::SetMember(u8 index, u8 member) {
     mUnk23C = FALSE;
     func_ov007_0217fb94(this, 0);
@@ -904,8 +902,9 @@ void DinoUiOrganizationMenu::SetMember(u8 index, u8 member) {
         mListItems[member]->PlayNormal();
     }
     MTask *exit = MTaskExitTransfer::Create(mMessage);
+    MTask *timer = new MTimer(5);
     MSerialTaskSet *serial = &mSerial;
-    serial->AddTail(new MTimer(5));
+    serial->AddTail(timer);
     serial->AddTail(moves);
     serial->AddTail(exit);
     mSerial.AddTail(MCreateCallTask(this, &DinoUiOrganizationMenu::Refresh));

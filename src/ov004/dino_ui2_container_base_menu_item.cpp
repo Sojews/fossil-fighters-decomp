@@ -186,7 +186,6 @@ void DinoUi2ContainerBaseDecideButton::OnDecide() {
     }
 }
 
-// NONMATCHING: the game reloads the item count for clear(); ours reuses the loop's last load.
 void DinoUi2ContainerBaseMenu::ClearItems() {
     RemoveLink(mLinkFrom, 4);
     for (int i = 0; i < mItems.size(); i++) {
@@ -275,7 +274,6 @@ extern "C" MPoint data_ov004_02176bc4;
 extern "C" const u32 data_0208aac8; // the empty slots' help text
 
 // Makes the page's buttons (blank past the last entry) and links them in a grid.
-// NONMATCHING: scheduling only (as DinoUiContainerBaseMenu::RefreshPage2).
 void DinoUi2ContainerBaseMenu::RefreshPage2() {
     u32 emptyText = data_0208aac8;
     for (int i = 0; i < 8; i++) {

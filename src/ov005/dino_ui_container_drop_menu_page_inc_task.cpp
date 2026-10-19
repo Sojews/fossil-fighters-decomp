@@ -196,7 +196,6 @@ void DinoUiContainerDropMenu::OnIdle() {
 }
 
 // Moves the cursor to the item, and shows its entry's name (the last page's entry is mUnkE0).
-// NONMATCHING: the game reloads the list's size each time round the search loop (as RemoveMember in ov007).
 void DinoUiContainerDropMenu::OnFocus(MMenuItem *item) {
     mStarted = FALSE;
     if (item == NULL) {

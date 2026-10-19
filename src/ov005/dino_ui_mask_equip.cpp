@@ -152,7 +152,6 @@ void DinoUiMaskEquipMaskButton::OnDecide() {
 }
 
 // Moves the cursor to the item, and shows the mask's name.
-// NONMATCHING: register allocation in the item loop (the list pointer and the item swap registers).
 void DinoUiMaskEquipMenu::OnFocus(MMenuItem *item) {
     mUnk104 = FALSE;
     if (item == NULL) {
@@ -231,7 +230,6 @@ BOOL DinoUiMaskEquipMenu::PageLeft() {
     return TRUE;
 }
 
-// NONMATCHING: the game reloads the item count for clear(); ours reuses the loop's last load.
 void DinoUiMaskEquipMenu::ClearItems() {
     RemoveLink(mLinkFrom, 2);
     for (int i = 0; i < mItems.size(); i++) {
