@@ -860,3 +860,8 @@ void DinoUiPartsTabIconMenuItem::OnDecide() {
 
 void DinoUiPartsTabIconMenuItem::OnFocusChanged(BOOL value) {
 }
+
+#pragma auto_inline off
+// Vector members the game emits in this file (made explicitly until the code that uses them is decompiled).
+template void std::__vec_deleter<MMotionFile, std::allocator<MMotionFile> >::sub_push_back(const MMotionFile &x, Metrowerks::int2type<false>);
+template void std::__vec_deleter<u32, std::allocator<u32> >::assign<u32 *>(u32 *first, u32 *last, Metrowerks::int2type<true>);
