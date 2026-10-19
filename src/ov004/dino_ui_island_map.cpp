@@ -61,6 +61,18 @@ void DinoUiIslandMapMenu::OnIdle() {
 }
 
 #pragma auto_inline off
+
+DinoUiIslandMapMenuItem::DinoUiIslandMapMenuItem(DinoUiIslandMapMenu *owner, const std::string &path, MPoint pos, u32 spot,
+                                                 MSmartOam *oam) {
+    mOwner = owner;
+    mSpot = spot;
+    mMotion = new MMotion(std::string(path), oam, 2, 1);
+    mMotion->Play(1, 0);
+    mMotion->SetPosition(pos);
+    mMotion->SetPriority(3);
+    mMotion->Show();
+    mParallel.AddTail(mMotion);
+}
 void DinoUiIslandMapMenu::SetSilentFocus(BOOL silent) {
     mSilentFocus = silent;
 }
