@@ -9,6 +9,7 @@
 #include "game/dino_ui3_parts_cursor.h"
 
 #include "game/dino_backup.h"
+#include "game/dino_ui_common.h"
 
 #include "m/input.h"
 
@@ -191,6 +192,27 @@ void DinoUiContainerBaseMenu::ClearItems() {
 }
 
 #pragma auto_inline off
+
+static inline const DinoUiFossilEntry &AsFossilEntry(const DinoKasekiButtonInfo &info) {
+    return *(const DinoUiFossilEntry *)&info;
+}
+
+// NONMATCHING: the game addresses the button info and the resource copy from one stack base register.
+void DinoUiContainerBaseMenu::RefreshEntries() {
+    mUnk148.clear();
+    for (int i = 0; i < mUnk101; i++) {
+        DinoBackupEntry entry;
+        GetEntry(i, &entry);
+        if (entry.id) {
+            mUnk148.push_back(AsFossilEntry(DinoGetKasekiButtonInfo(&entry, mDefs)));
+        }
+    }
+    if (mUnk148.size() == 0) {
+        mLastPage = 0;
+    } else {
+        mLastPage = (mUnk148.size() - 1) / 8;
+    }
+}
 
 void DinoUiContainerBaseMenu::CreateDecideButton(const char *motion, u32 textId) {
     AddItem(mLinkFrom = new DinoUiContainerBaseDecideButton(this, motion, textId));

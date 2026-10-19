@@ -108,8 +108,6 @@ BOOL DinoUiCanonPutinMenu::IsMarkable(DinoBackupEntry *entry) {
     return TRUE;
 }
 
-extern "C" void func_ov005_02162f98(DinoUiContainerBaseMenu *menu);
-
 void DinoUiCanonPutinMenu::PutIn() {
     if (mUnk158 == 1) {
         for (int i = 0; i < 64; i++) {
@@ -139,7 +137,7 @@ void DinoUiCanonPutinMenu::PutIn() {
                 }
             }
         }
-        func_ov005_02162f98(this);
+        RefreshEntries();
         ClearItems();
         RefreshPage2();
         ResetDecideButton();
@@ -182,7 +180,7 @@ void DinoUiCanonTakeoutMenu::TakeOut() {
         }
         mCount = 0;
         gDinoBackup->CompactUnk14C();
-        func_ov005_02162f98(this);
+        RefreshEntries();
         ClearItems();
         RefreshPage2();
         ResetDecideButton();

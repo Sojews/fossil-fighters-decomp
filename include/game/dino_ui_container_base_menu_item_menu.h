@@ -3,6 +3,8 @@
 
 #include "game/dino_ui3_parts_fraction.h"
 #include "m/resource.h"
+#include "game/dino_resource.h"
+#include "game/dino_ui_fossil_entry.h"
 #include <vector>
 #include "m/menu_item.h"
 #include "m/menu.h"
@@ -43,6 +45,8 @@ public:
     void SetFlag(int index, u8 flag);
     void RefreshMarks();
     void ResetDecideButton();
+    // Builds the entries' buttons from the backup, and how many pages they take.
+    void RefreshEntries();
     void HidePageButtons();
     void AddHelpEntries(u32 backText);
     void CreateDecideButton(const char *motion, u32 textId);
@@ -56,7 +60,7 @@ public:
     u8 mUnk101;                 // 0x101
     u8 unk102[2];
     u32 mUnk104;                // 0x104
-    MResource<u8> mDefs;        // 0x108: the definitions the entries are looked up in
+    MResource<DinoKasekiDefs> mDefs;    // 0x108: the definitions the entries are looked up in
     MSmartOam *mOam;            // 0x118
     u32 mUnk11C;                // 0x11C
     std::vector<void *> mItems; // 0x120: this page's items
@@ -67,7 +71,7 @@ public:
     MTaskSet *mCursorTasks;     // 0x13C
     DinoUi3PartsCursor *mCursor; // 0x140
     DinoUi3PartsRockName *mRockName; // 0x144
-    std::vector<u32> mUnk148;   // 0x148: the entries
+    std::vector<DinoUiFossilEntry> mUnk148; // 0x148: the entries' buttons
     u8 mSelected;               // 0x154: 0xFF for none
     u8 mIdled;                  // 0x155: set once the menu has idled (decides only count after)
 };

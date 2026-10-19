@@ -9,7 +9,7 @@
 #include "m/resource.h"
 
 // What the container entry's button shows.
-DinoKasekiButtonInfo DinoGetKasekiButtonInfo(const DinoBackupEntry *entry, MResource<DinoKasekiDefs> &defs);
+DinoKasekiButtonInfo DinoGetKasekiButtonInfo(const DinoBackupEntry *entry, MResource<DinoKasekiDefs> defs);
 DinoKasekiButtonInfo DinoGetKasekiButtonInfo(const DinoBackupEntry *entry);
 // Dims the screen behind a menu.
 void DinoDimScreen();

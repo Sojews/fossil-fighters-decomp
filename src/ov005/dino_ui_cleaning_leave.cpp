@@ -115,7 +115,7 @@ BOOL DinoUiCleaningLeaveMenu::IsMarkable(DinoBackupEntry *entry) {
         return FALSE;
     }
     u32 id = entry->id;
-    const u8 *data = mDefs.Get();
+    const u8 *data = (const u8 *)mDefs.Get();
     const u8 *def = data + ((const u32 *)(data + *(const u32 *)(data + 8)))[id];
     if (def[4] == 0) {
         return TRUE;

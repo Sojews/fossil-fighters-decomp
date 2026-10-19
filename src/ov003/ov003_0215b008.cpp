@@ -37,7 +37,7 @@ BOOL DinoTeamDiffers(const DinoTeam *a, const DinoTeam *b) {
 
 // What the container entry's button shows: a kaseki rock, a fossil (cleaned or not, and whether the creature is
 // revived), or one of the two special kinds of rock.
-DinoKasekiButtonInfo DinoGetKasekiButtonInfo(const DinoBackupEntry *entry, MResource<DinoKasekiDefs> &defs) {
+DinoKasekiButtonInfo DinoGetKasekiButtonInfo(const DinoBackupEntry *entry, MResource<DinoKasekiDefs> defs) {
     DinoKasekiButtonInfo info;
     info.type = 0;
     info.level = 0;
