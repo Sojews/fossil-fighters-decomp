@@ -1,5 +1,4 @@
 // DinoFieldCamera.
-// Only the destructor is decompiled so far.
 
 #include "game/dino_field.h"
 #include "game/dino_field_camera_hook.h"
@@ -91,4 +90,43 @@ void DinoFieldCamera::Read(const void *buf) {
         }
     }
     NotifyHooks1();
+}
+
+void DinoFieldCamera::Idle() {
+    if (mFocus == 0) {
+        return;
+    }
+    DinoCharaState state;
+    gDinoBackup->GetChara(mFocus, &state);
+    if (!state.unk0) {
+        return;
+    }
+    BOOL changed = state.map != mField->mMap->GetInfo()->id;
+    if (changed) {
+        NotifyHooks0();
+        mField->mMap->GetInfo()->id = state.map;
+        mField->ReloadMap();
+        NotifyHooks1();
+        MResource<DinoMapMData> map = gDinoResource->LoadMapM(state.map);
+        s32 area = map.Get()->area;
+        gDinoBackup->SetUnk180(area);
+        mNamePanel->SetMode(area, 1);
+    }
+    DinoFieldChara *chara = mField->GetChara(mFocus);
+    if (chara == NULL) {
+        return;
+    }
+    DinoFieldCharaModel *model = chara->GetModel();
+    mFocusPos.Set(model->pos.x, model->pos.y);
+    SetUnk94(mFocusPos.x.v, 0x1000, mFocusPos.y.v);
+    if (changed) {
+        mUnkFC = 0;
+    }
+    IdleUnk0();
+    if (changed) {
+        IdleUnk1();
+    } else {
+        IdleUnk2();
+    }
+    UnkV14();
 }

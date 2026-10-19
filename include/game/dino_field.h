@@ -56,6 +56,10 @@ public:
     void AddHook(DinoFieldCameraHook *hook);
     void NotifyHooks0();
     void NotifyHooks1();
+    // Not decompiled yet: Idle runs them after following the focus (the second after a map change, else the third).
+    void IdleUnk0();
+    void IdleUnk1();
+    void IdleUnk2();
 
     DinoField *mField;              // 0x8C
     u32 mUnk90;                     // 0x90
@@ -75,7 +79,11 @@ public:
     s32 mUnkEC;                     // 0xEC
     u32 mUnkF0[2];                  // 0xF0
     u8 mTracking;                   // 0xF8
-    u8 unkF9[0x11C - 0xF9];
+    u8 unkF9[0xFC - 0xF9];
+    u32 mUnkFC;                     // 0xFC: cleared on a map change
+    u8 unk100[0x10C - 0x100];
+    MFx32Point mFocusPos;           // 0x10C: where the followed character stands
+    u8 unk114[0x11C - 0x114];
     // What Write saved of a rotation in progress (Read restarts it).
     u16 mSavedD4;                   // 0x11C
     u16 mSavedD6;                   // 0x11E

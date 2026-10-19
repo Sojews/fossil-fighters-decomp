@@ -180,7 +180,11 @@ struct DinoExcavateDefs {
     u32 rangeCount;     // 0xBC
     u32 rangeOffset;    // 0xC0: DinoExcavateRange entries
 };
-struct DinoMapMData;
+// A map's settings.
+struct DinoMapMData {
+    u8 unk00[0x34];
+    s32 area;           // 0x34: the area the map is in (for the name panel)
+};
 struct DinoMapData;
 struct DinoBattleData;
 // A shop's stock: entries always sold, then entries picked from at random.
