@@ -1781,7 +1781,7 @@ DinoEventExecCharaMoveVector::DinoEventExecCharaMoveVector(DinoEventLoop *event,
     mEvent = event;
     mChara = chara;
     mDirection = direction;
-    mA = a;
+    mA.v = a;
     mB = b;
     mC = c;
     mD = d;

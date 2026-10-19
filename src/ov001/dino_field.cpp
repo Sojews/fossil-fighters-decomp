@@ -409,7 +409,7 @@ MTask *DinoField::CreateCharaMoveOffsetTask(u32 chara, MFx32Point offset, u32 a,
 }
 
 // NONMATCHING: the game spills the register arguments instead of keeping a in r7.
-MTask *DinoField::CreateCharaMoveVectorTask(u32 chara, u16 direction, u32 a, u32 b, u32 c, u8 d) {
+MTask *DinoField::CreateCharaMoveVectorTask(u32 chara, u16 direction, MFx32 a, u32 b, u32 c, u8 d) {
     return new DinoFieldCharaMoveVectorTask(this, chara, direction, a, b, c, d);
 }
 
@@ -710,6 +710,20 @@ void DinoFieldCharaMoveToRegionTask::Transfer() {
             }
             chara->MoveTo(coord, mA, mB, mC);
         }
+    }
+}
+
+// Moves the chara the distance mA in mDirection from where it faces.
+void DinoFieldCharaMoveVectorTask::Transfer() {
+    DinoFieldChara *chara = mField->GetChara(mChara);
+    if (chara) {
+        u16 direction = mDirection + chara->GetModel()->angle;
+        MFx32Point coord = chara->GetModel()->pos +
+                           MFx32Point(MFx32::FromRaw(FX_CosIdx(direction)), MFx32::FromRaw(FX_SinIdx(direction))) * mA;
+        if (!mD) {
+            chara->SetDirection(direction);
+        }
+        chara->MoveTo(coord, mB, mC, mD);
     }
 }
 

@@ -363,7 +363,7 @@ public:
     MTask *CreateCharaMoveToRegionTask(u32 chara, u32 region, u32 a, u32 b, u8 c);
     MTask *CreateCharaMoveToCoordTask(u32 chara, MFx32Point coord, u32 a, u32 b, u8 c);
     MTask *CreateCharaMoveOffsetTask(u32 chara, MFx32Point offset, u32 a, u32 b, u8 c);
-    MTask *CreateCharaMoveVectorTask(u32 chara, u16 direction, u32 a, u32 b, u32 c, u8 d);
+    MTask *CreateCharaMoveVectorTask(u32 chara, u16 direction, MFx32 a, u32 b, u32 c, u8 d);
     MTask *CreateCharaWaitMoveTask(u32 chara);
     MTask *CreateCharaFocusTask(u32 chara);
     void Step(u32 dir, DinoFieldStep *step, int a, int frames, int c);

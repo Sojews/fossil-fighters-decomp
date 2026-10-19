@@ -270,7 +270,7 @@ public:
     DinoEventLoop *mEvent;  // 0x74
     u32 mChara;         // 0x78
     u16 mDirection;     // 0x7C
-    u32 mA;             // 0x80
+    MFx32 mA;           // 0x80: the distance
     u32 mB;             // 0x84
     u32 mC;             // 0x88
     u8 mD;              // 0x8C
