@@ -321,6 +321,64 @@ void DinoUiOrganizationMenu::SetSort(u8 sort) {
 }
 
 // Everything back on, and the links back to how they start.
+void DinoUiOrganizationMenu::LoadCreatures() {
+    mCreatures.clear();
+    for (u32 id = 1; id <= gDinoResource->GetCreatureCount() - 1; id++) {
+        DinoCreatureState creature;
+        gDinoBackup->GetCreature(id, &creature);
+        if (creature.parts[0].level != 0 ||
+            creature.parts[1].level + creature.parts[2].level + creature.parts[3].level != 0) {
+            u32 index = creature.index;
+            mCreatures.push_back(index);
+        }
+    }
+    DinoCreatureByVoice byVoice;
+    std::stable_sort(mCreatures.begin(), mCreatures.end(), byVoice);
+    mByVoice = mCreatures;
+    mByUnk88 = mCreatures;
+    DinoCreatureByUnk88 byUnk88;
+    std::stable_sort(mByUnk88.begin(), mByUnk88.end(), byUnk88);
+    mByLevel = mCreatures;
+    DinoCreatureByLevel byLevel;
+    std::stable_sort(mByLevel.begin(), mByLevel.end(), byLevel);
+    mByUnk02031104 = mCreatures;
+    DinoCreatureByUnk02031104 byUnk02031104;
+    std::stable_sort(mByUnk02031104.begin(), mByUnk02031104.end(), byUnk02031104);
+    mByUnk0D = mCreatures;
+    DinoCreatureByUnk0D byUnk0D;
+    std::stable_sort(mByUnk0D.begin(), mByUnk0D.end(), byUnk0D);
+    if (mCreatures.size() == 0) {
+        mLastPage = 0;
+    } else {
+        mLastPage = (mCreatures.size() - 1) / 15;
+    }
+    mFraction->SetDenominator(mLastPage + 1);
+}
+
+// Lists the creatures in the sort's order.
+void DinoUiOrganizationMenu::Sort(u8 sort) {
+    if (sort > 4) {
+        return;
+    }
+    switch (sort) {
+    case 0:
+        mCreatures = mByVoice;
+        break;
+    case 1:
+        mCreatures = mByUnk88;
+        break;
+    case 2:
+        mCreatures = mByLevel;
+        break;
+    case 3:
+        mCreatures = mByUnk02031104;
+        break;
+    case 4:
+        mCreatures = mByUnk0D;
+        break;
+    }
+}
+
 void DinoUiOrganizationMenu::EnableAll() {
     if (mUnkC0 != NULL) {
         mUnkC0->Enable();

@@ -651,9 +651,13 @@ namespace std {
         // ~__vec_constructor() { }
 
     public:
-        // Unlike vector<void *>'s, the slow path's tag is made one call further in (it lands below the other
-        // temporary on the stack).
+        // For class types, unlike vector<void *>'s, the slow path's tag is made one call further in (it lands
+        // below the other temporary on the stack); scalars push as vector<void *> does.
         void push_back(const_reference x) {
+            if (is_scalar<T>::value) {
+                _Deleter::push_back(x);
+                return;
+            }
             UnkMSLStruct1 unk = UnkMSLStruct1();
             if (this->size_ < this->cap()) {
                 if (Metrowerks::is_trivial<T>::value) {
@@ -786,7 +790,7 @@ namespace std {
         }
         vector &operator=(const vector &x) {
             if (this != &x) {
-                this->assign(x.begin(), x.end(), Metrowerks::int2type<true>());
+                this->assign((pointer)x.begin(), (pointer)x.end(), Metrowerks::int2type<true>());
             }
             return *this;
         }

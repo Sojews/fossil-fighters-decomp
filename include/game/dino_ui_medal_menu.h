@@ -53,9 +53,9 @@ public:
     int *mResult;                       // 0x190
     u32 *mIndex;                        // 0x194
     u8 *mUnk198;                        // 0x198
-    std::vector<void *> mUnk19C;        // 0x19C
-    std::vector<void *> mUnk1A8;        // 0x1A8
-    std::vector<void *> mUnk1B4;        // 0x1B4
+    std::vector<u32> mUnk19C;           // 0x19C: the creature ids listed, in the sort's order
+    std::vector<u32> mUnk1A8;           // 0x1A8
+    std::vector<u32> mUnk1B4;           // 0x1B4
     u32 mPage;                          // 0x1C0
     u32 mLastPage;                      // 0x1C4
     u8 mSort;                           // 0x1C8

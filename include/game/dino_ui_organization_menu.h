@@ -62,6 +62,8 @@ public:
     void ShowTabInfo(u8 tab);
     void SetSort(u8 sort);
     void Sort(u8 sort);
+    // Lists the creatures with any part, in each sort's order, and counts the pages.
+    void LoadCreatures();
     void RemoveListLinks();
     void UpdateDetails(u8 index);
     void TabLeft();
@@ -115,11 +117,12 @@ public:
     u32 mTeamIndex;                     // 0x1A4: the saved team being edited
     int mResult;                        // 0x1A8
     std::vector<u32> mCreatures;        // 0x1AC: the ids listed, a page of 15 at a time
-    std::vector<void *> mUnk1B8;        // 0x1B8
-    std::vector<void *> mUnk1C4;        // 0x1C4
-    std::vector<void *> mUnk1D0;        // 0x1D0
-    std::vector<void *> mUnk1DC;        // 0x1DC
-    std::vector<void *> mUnk1E8;        // 0x1E8
+    // The creatures in each sort's order.
+    std::vector<u32> mByVoice;          // 0x1B8
+    std::vector<u32> mByUnk88;          // 0x1C4
+    std::vector<u32> mByLevel;          // 0x1D0
+    std::vector<u32> mByUnk02031104;    // 0x1DC
+    std::vector<u32> mByUnk0D;          // 0x1E8
     int mPage;                          // 0x1F4
     int mLastPage;                      // 0x1F8
     u8 mTab;                            // 0x1FC

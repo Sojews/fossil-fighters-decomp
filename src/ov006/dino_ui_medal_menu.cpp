@@ -207,7 +207,7 @@ void DinoUiMedalMenu::LoadPage() {
     mMotions.clear();
     for (int i = 0; i < count; i++) {
         char path[0x100];
-        OS_SPrintf(path, "/motion/ui_reviver_medal/reviver_%03d.bin", (u32)mUnk19C[mPage * 15 + i]);
+        OS_SPrintf(path, "/motion/ui_reviver_medal/reviver_%03d.bin", mUnk19C[mPage * 15 + i]);
         mMotions.push_back(MMotionFile(std::string(path), 7));
     }
 }
@@ -314,6 +314,42 @@ void DinoUiMedalMenu::SetSort(u8 sort) {
         MSerialTaskSet *serial = &mSerial;
         serial->AddTail(create);
         serial->AddTail(enable);
+    }
+}
+
+// Lists the creatures in the order: 0 and 1 are kept lists, the rest sort mUnk1A8.
+void DinoUiMedalMenu::Sort(u8 sort) {
+    if (sort > 4) {
+        return;
+    }
+    switch (sort) {
+    case 0:
+        mUnk19C = mUnk1A8;
+        break;
+    case 1:
+        mUnk19C = mUnk1B4;
+        break;
+    case 2:
+        mUnk19C = mUnk1A8;
+        {
+            DinoCreatureByLevel order;
+            std::stable_sort(mUnk19C.begin(), mUnk19C.end(), order);
+        }
+        break;
+    case 3:
+        mUnk19C = mUnk1A8;
+        {
+            DinoCreatureByUnk02031104 order;
+            std::stable_sort(mUnk19C.begin(), mUnk19C.end(), order);
+        }
+        break;
+    case 4:
+        mUnk19C = mUnk1A8;
+        {
+            DinoCreatureByUnk0D order;
+            std::stable_sort(mUnk19C.begin(), mUnk19C.end(), order);
+        }
+        break;
     }
 }
 
