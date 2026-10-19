@@ -121,6 +121,10 @@ BOOL DinoCleaningKasekiRock::IsViewUnkD9E0Zero() {
     return mView->IsUnkD9E0Zero();
 }
 
+MFx32 DinoCleaningKasekiRock::GetDirtRatio() {
+    return mView->GetDirtRatio();
+}
+
 void DinoCleaningKasekiRock::CountCells() {
     u32 i;
     int col;

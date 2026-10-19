@@ -24,6 +24,7 @@ public:
     BOOL IsCellClear(int row, int col);
     s32 GetCellLayer(int row, int col);
     DinoCleaningRock *GetTopRock(int row, int col);
+    MFx32 GetDirtRatio();
     MFx32 GetRatio();
     MFx32 GetRatio(int index);
     BOOL IsViewUnkD9E0Zero();

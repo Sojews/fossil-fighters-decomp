@@ -114,6 +114,19 @@ BOOL DinoCleaningImageView::IsUnkD9E0Zero() {
     return FALSE;
 }
 
+// How much of the image is still dirty, in percent.
+MFx32 DinoCleaningImageView::GetDirtRatio() {
+    int count = 0;
+    for (int col = 0; col < 28; col++) {
+        for (int row = 0; row < 36; row++) {
+            if (mCells[row][col] != 0) {
+                count++;
+            }
+        }
+    }
+    return MFx32(100) * MFx32(count) / MFx32(36 * 28);
+}
+
 void DinoCleaningImageView::SetScale(MFx32 scale) {
     mScreen->SetCenter(128, 108);
     mScreen->SetScale(scale, scale);

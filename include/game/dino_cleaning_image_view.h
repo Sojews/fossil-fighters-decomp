@@ -32,6 +32,7 @@ public:
     void CreateOam();
     void DestroyOam();
     BOOL IsUnkD9E0Zero();
+    MFx32 GetDirtRatio();
     void SetScale(MFx32 scale);
     MTask *CreateScaleAnime(MFx32 from, MFx32 to, int duration, int ease);
 
@@ -42,7 +43,8 @@ public:
     MPalUnit *mPal;                            // 0x2C
     u32 unk30;
     std::vector<DinoCleaningImage *> mImages;   // 0x34
-    u8 unk40[0xD9E0 - 0x40];
+    u8 unk40[0xCA20 - 0x40];
+    u32 mCells[36][28];                         // 0xCA20: the dirt left on each cell
     u32 mUnkD9E0;                               // 0xD9E0
     u32 unkD9E4[4];
     MSmartOam *mOam;                            // 0xD9F4
