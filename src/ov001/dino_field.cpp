@@ -742,6 +742,27 @@ static inline const char *GetPictName(const DinoExcavateDefs *defs, u32 pict) {
     return (const char *)entry + *(const u32 *)entry;
 }
 
+// Loads the picture over the old one (still hidden, below it), then shows it and cross-fades it in, and frees the old
+// one.
+// NONMATCHING: stack slots only (the game puts the priority transfer below the path temporary's destroy flag).
+void DinoField::LoadFadeInPict(MDisplay *display, MView *old, MExtAffinePicture **pict, u32 id, MPoint pos, u32 frames,
+                               long unk) {
+    MResource<DinoExcavateDefs> defs = gDinoResource->GetExcavateDefs();
+    *pict = new MExtAffinePicture(display, std::string("/image/") + GetPictName(defs.Get(), id), TRUE, false);
+    (*pict)->SetPosition(pos);
+    (*pict)->SetPriority(1);
+    mParallel.AddTail(*pict);
+    MTask *priority = (*pict)->CreatePriorityTransfer(2);
+    MBlend *blend = display->mBlend;
+    MTask *fade = blend->CreateCrossFadeInTask((*pict)->GetPlaneMask(), frames, unk);
+    MTask *show = (*pict)->CreateShowTransfer();
+    MTask *timer = new MTimer(1);
+    mPictTasks->AddTail(timer, show, fade, priority);
+    if (old) {
+        mPictTasks->AddTail(MTaskExitTransfer::Create(old));
+    }
+}
+
 extern "C" struct {
     void (DinoField::*LoadFadeInPict_00)(MDisplay *, MView *, MExtAffinePicture **, u32, MPoint, u32, long);
 } data_ov001_0216939c;
@@ -794,6 +815,29 @@ void DinoField::FadeOutPict(MDisplay *display, MExtAffinePicture **pict, u32 fra
     *pict = NULL;
 }
 
+// Loads the picture over the old one, off the screen (0 left, 1 up, 2 right, 3 down of pos), then slides it in and frees
+// the old one.
+// NONMATCHING: sDirs' offset in the TU's data (like SlideOutPict's), r4/r5 swapped, and LoadFadeInPict's stack slots.
+void DinoField::LoadSlideInPict(MDisplay *display, MView *old, MExtAffinePicture **pict, u32 id, MPoint pos, u32 dir,
+                                u32 frames, long ease) {
+    static const MPoint sDirs[4] = {MPoint(256, 0), MPoint(0, 192), MPoint(-256, 0), MPoint(0, -192)};
+    MResource<DinoExcavateDefs> defs = gDinoResource->GetExcavateDefs();
+    *pict = new MExtAffinePicture(display, std::string("/image/") + GetPictName(defs.Get(), id), TRUE, false);
+    int x = pos.x + sDirs[dir].x;
+    int y = pos.y + sDirs[dir].y;
+    (*pict)->SetPosition(MPoint(x, y));
+    (*pict)->SetPriority(1);
+    mParallel.AddTail(*pict);
+    MTask *priority = (*pict)->CreatePriorityTransfer(2);
+    MTask *slide = (*pict)->CreateCoordAnime(MPoint(x, y), pos, frames, ease);
+    MTask *show = (*pict)->CreateShowTransfer();
+    MTask *timer = new MTimer(1);
+    mPictTasks->AddTail(timer, show, slide, priority);
+    if (old) {
+        mPictTasks->AddTail(MTaskExitTransfer::Create(old));
+    }
+}
+
 extern "C" struct {
     void (DinoField::*LoadSlideInPict_00)(MDisplay *, MView *, MExtAffinePicture **, u32, MPoint, u32, u32, long);
 } data_ov001_0216937c;
@@ -844,6 +888,33 @@ void DinoField::SlideOutPict(MDisplay *display, MExtAffinePicture **pict, u32 di
     MTask *slide = (*pict)->CreateCoordAnime((*pict)->GetPosition(), to, frames, ease);
     mPictTasks->AddTail(slide, exit, timer, reset);
     *pict = NULL;
+}
+
+// Loads the picture over the old one, then shows it and cross-fades it in while scaling it from scale to 1, and frees
+// the old one.
+// NONMATCHING: the scale points' build order and a cached ease (like ZoomOutPict), and LoadFadeInPict's stack slots.
+void DinoField::LoadZoomInPict(MDisplay *display, MView *old, MExtAffinePicture **pict, u32 id, MPoint pos, MFx32 scale,
+                               u32 frames, long ease) {
+    MResource<DinoExcavateDefs> defs = gDinoResource->GetExcavateDefs();
+    *pict = new MExtAffinePicture(display, std::string("/image/") + GetPictName(defs.Get(), id), TRUE, false);
+    (*pict)->SetPosition(pos);
+    (*pict)->GetScreen()->SetCenter(128, 96);
+    (*pict)->SetPriority(1);
+    mParallel.AddTail(*pict);
+    MTask *priority = (*pict)->CreatePriorityTransfer(2);
+    MTask *zoom = (*pict)->GetScreen()->CreateScaleAnime(MFx32Point(scale, scale), MFx32Point(MFx32(1), MFx32(1)),
+                                                         frames, ease);
+    MBlend *blend = display->mBlend;
+    MTask *fade = blend->CreateCrossFadeInTask((*pict)->GetPlaneMask(), frames, ease);
+    MParallelTaskSet *both = new MParallelTaskSet(TRUE);
+    both->AddTail(fade);
+    both->AddTail(zoom);
+    MTask *show = (*pict)->CreateShowTransfer();
+    MTask *timer = new MTimer(1);
+    mPictTasks->AddTail(timer, show, both, priority);
+    if (old) {
+        mPictTasks->AddTail(MTaskExitTransfer::Create(old));
+    }
 }
 
 extern "C" struct {
