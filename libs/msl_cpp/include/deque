@@ -366,8 +366,8 @@ namespace std {
         }
     }
 
-    // A deque of T: blocks of __block elements; start_ is the first element's index in the first block.
-    template <class T, class Allocator = allocator<T> > class deque {
+    // A deque's storage: blocks of __block elements; start_ is the first element's index in the first block.
+    template <class T, class Allocator> class __deque_deleter {
     public:
         typedef T value_type;
         typedef size_t size_type;
@@ -383,12 +383,12 @@ namespace std {
             T *cur_;
         };
 
-        deque() {
+        __deque_deleter() {
             start_ = 0;
             size_ = 0;
             buf().init();
         }
-        ~deque();
+        ~__deque_deleter();
 
         size_type size() const {
             return size_;
@@ -442,7 +442,7 @@ namespace std {
         }
     }
 
-    template <class T, class Allocator> deque<T, Allocator>::~deque() {
+    template <class T, class Allocator> __deque_deleter<T, Allocator>::~__deque_deleter() {
         erase_at_end(size_, Metrowerks::int2type<true>());
         buf_type &b = buf();
         if (!b.empty()) {
@@ -456,7 +456,7 @@ namespace std {
     }
 
     template <class T, class Allocator>
-    typename deque<T, Allocator>::iterator deque<T, Allocator>::make_iter(size_type n) {
+    typename __deque_deleter<T, Allocator>::iterator __deque_deleter<T, Allocator>::make_iter(size_type n) {
         buf_type::iterator i = buf().begin();
         i += (start_ + n) / __block;
         iterator r;
@@ -466,7 +466,7 @@ namespace std {
     }
 
     template <class T, class Allocator>
-    void deque<T, Allocator>::push_back(const T &x, Metrowerks::int2type<true>) {
+    void __deque_deleter<T, Allocator>::push_back(const T &x, Metrowerks::int2type<true>) {
         if (back_spare() == 0) {
             add_back_capacity(1);
         }
@@ -475,7 +475,7 @@ namespace std {
         ++size_;
     }
 
-    template <class T, class Allocator> void deque<T, Allocator>::erase_front(size_type n, Metrowerks::int2type<true>) {
+    template <class T, class Allocator> void __deque_deleter<T, Allocator>::erase_front(size_type n, Metrowerks::int2type<true>) {
         if (n != 0) {
             buf_type &b = buf();
             size_ -= n;
@@ -490,6 +490,11 @@ namespace std {
             }
         }
     }
+    template <class T, class Allocator = allocator<T> > class deque : public __deque_deleter<T, Allocator> {
+    public:
+        deque() {}
+        ~deque() {}
+    };
 } // namespace std
 
 #endif

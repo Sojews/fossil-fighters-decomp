@@ -14,6 +14,8 @@ struct M3dTransfer {
     u32 arg;            // 0x8
 };
 
+class M3DVInt;
+
 class M3d : public MScreen {
 public:
     M3d(MDisplay *display, u32 unk44, u32 unk48);
@@ -36,11 +38,10 @@ public:
     u32 mTexBanks;      // 0x2C
     MHeap mTexHeap;     // 0x30
     MHeap mPlttHeap;    // 0x68
-    std::deque<M3dTransfer> mQueueA0;   // 0xA0: transfers still queued
-    std::deque<M3dTransfer> mQueueB8;   // 0xB8
+    std::deque<M3dTransfer> mQueues[2]; // 0xA0: transfers still queued
     std::deque<M3dTransfer> mQueueD0;   // 0xD0
     std::deque<M3dTransfer> mQueueE8;   // 0xE8
-    u32 unk100;
+    M3DVInt *mVInt;                     // 0x100
 };
 
 extern OSMutex gM3dMutex;

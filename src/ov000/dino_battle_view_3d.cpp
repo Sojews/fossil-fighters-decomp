@@ -254,7 +254,7 @@ void DinoBattleView3D::FlushQueue() {
 }
 
 // The queue's members the game emits in this file.
-template std::deque<MTask *>::~deque();
-template std::deque<MTask *>::iterator std::deque<MTask *>::make_iter(size_t n);
-template void std::deque<MTask *>::push_back(MTask *const &x, Metrowerks::int2type<true>);
-template void std::deque<MTask *>::erase_front(size_t n, Metrowerks::int2type<true>);
+template std::__deque_deleter<MTask *, std::allocator<MTask *> >::~__deque_deleter();
+template std::__deque_deleter<MTask *, std::allocator<MTask *> >::iterator std::__deque_deleter<MTask *, std::allocator<MTask *> >::make_iter(size_t n);
+template void std::__deque_deleter<MTask *, std::allocator<MTask *> >::push_back(MTask *const &x, Metrowerks::int2type<true>);
+template void std::__deque_deleter<MTask *, std::allocator<MTask *> >::erase_front(size_t n, Metrowerks::int2type<true>);
