@@ -10,6 +10,8 @@
 #include "game/dino_ui3_parts_cursor.h"
 
 #include "game/dino_backup.h"
+#include "game/dino_ui3_parts_kaseki_button.h"
+#include "game/dino_ui2_parts_kaseki_button.h"
 
 #include "game/dino_ui_cleaning_menu_item_menu.h"
 #include "game/dino_ui_cleaning_menu_item.h"
@@ -157,6 +159,8 @@ void DinoUiCleaningMenu::OnDecide(MMenuItem *item) {
     }
 }
 
+// (Not auto-inlined: RefreshPage2 calls it.)
+#pragma auto_inline off
 // Fossils already cleaned, or that can't be, can't be chosen.
 BOOL DinoUiCleaningMenu::IsDecidable(u32 index) {
     DinoBackupEntry entry;
@@ -169,6 +173,7 @@ BOOL DinoUiCleaningMenu::IsDecidable(u32 index) {
     }
     return FALSE;
 }
+#pragma auto_inline reset
 
 BOOL DinoUiCleaningMenu::PageRight() {
     if (mPage == mLastPage) {
@@ -196,12 +201,53 @@ BOOL DinoUiCleaningMenu::PageLeft() {
     return TRUE;
 }
 
+// The page's button grid (its first button, and the steps to the next in a row and to the next row); the confirmation
+// window opens by the decided button.
+extern "C" struct {
+    u8 unk00[0x4C];
+    MPoint mWindowBase;     // 0x4C: the first button
+    MPoint mWindowColStep;  // 0x54
+    MPoint mWindowRowStep;  // 0x5C
+    MPoint mWindowOffset;   // 0x64
+} data_ov005_02167184;
+
 void DinoUiCleaningMenu::ClearItems() {
     RemoveLink(mLinkFrom, 2);
     for (int i = 0; i < mItems.size(); i++) {
         RemoveItem((MMenuItem *)mItems[i]);
         delete (MMenuItem *)mItems[i];
     }
+}
+
+// Makes the page's buttons (blank past the last rock; greyed out if it can't be cleaned) and links them in a grid.
+void DinoUiCleaningMenu::RefreshPage2() {
+    mItems.clear();
+    for (int i = 0; i < 8; i++) {
+        DinoUi3PartsKasekiButton *button;
+        if (mUnkE8.size() > i + mPage * 8) {
+            button = new DinoUi3PartsKasekiButton(
+                mOam,
+                MPoint(data_ov005_02167184.mWindowBase.x + data_ov005_02167184.mWindowColStep.x * (i % 4) + data_ov005_02167184.mWindowRowStep.x * (i / 4),
+                       data_ov005_02167184.mWindowBase.y + data_ov005_02167184.mWindowColStep.y * (i % 4) + data_ov005_02167184.mWindowRowStep.y * (i / 4)),
+                (const DinoUiKasekiIcon &)mUnkE8[i + mPage * 8], 0);
+            button->SetActive(IsDecidable(i + mPage * 8));
+        } else {
+            button = new DinoUi3PartsKasekiButton(
+                mOam,
+                MPoint(data_ov005_02167184.mWindowBase.x + data_ov005_02167184.mWindowColStep.x * (i % 4) + data_ov005_02167184.mWindowRowStep.x * (i / 4),
+                       data_ov005_02167184.mWindowBase.y + data_ov005_02167184.mWindowColStep.y * (i % 4) + data_ov005_02167184.mWindowRowStep.y * (i / 4)),
+                (const DinoUiKasekiIcon &)DinoUi2GetEmptyKasekiInfo(), 0);
+            button->HideMotion();
+        }
+        mItems.push_back(button);
+        AddItem(button);
+    }
+    DinoUi2LinkKasekiGrid(this, (std::vector<MMenuItem *> &)mItems, mLinkFrom);
+    AddLink((MMenuItem *)mItems[0], 4, mLinkFrom);
+    AddLink((MMenuItem *)mItems[1], 4, mLinkFrom);
+    AddLink((MMenuItem *)mItems[2], 4, mLinkFrom);
+    AddLink((MMenuItem *)mItems[3], 4, mLinkFrom);
+    AddLink(mLinkFrom, 2, (MMenuItem *)mItems[0]);
 }
 
 DinoUiCleaningMenu::DinoUiCleaningMenu(s32 *result) : MMenu(NULL, 0), mResult(result) {
@@ -290,14 +336,6 @@ void DinoUiCleaningMenu::OnBackDecided() {
     serial.AddTail(exit);
 }
 
-// Where the confirmation window opens: by the decided item's place in the 4-wide grid.
-extern "C" struct {
-    u8 unk00[0x4C];
-    MPoint mWindowBase;     // 0x4C
-    MPoint mWindowColStep;  // 0x54
-    MPoint mWindowRowStep;  // 0x5C
-    MPoint mWindowOffset;   // 0x64
-} data_ov005_02167184;
 extern "C" struct {
     void (DinoUiCleaningMenu::*FinishDecide_00)();
 } data_ov005_02167200;

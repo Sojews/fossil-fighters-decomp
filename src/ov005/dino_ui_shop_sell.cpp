@@ -14,6 +14,7 @@
 #include "m/input.h"
 
 #include "game/dino_ui3_parts_kaseki_button.h"
+#include "game/dino_ui2_parts_kaseki_button.h"
 
 #include "game/dino_backup.h"
 #include "game/dino_ui3_parts_fraction.h"
@@ -139,7 +140,11 @@ void DinoUiShopSellMenu::OnBackDecided() {
 struct DinoUiShopSellStatics {
     u8 unk00[0x8];
     MPoint mTopLeft;     // 0x08
-    u8 unk10[0x48];
+    u8 unk10[0x28 - 0x10];
+    MPoint mColumn;      // 0x28: from a page button to the next in its row
+    MPoint mRow;         // 0x30: to the next row
+    u8 unk38[0x50 - 0x38];
+    MPoint mFirst;       // 0x50: the page's first button
     MPoint mBottomRight; // 0x58
 };
 extern "C" DinoUiShopSellStatics data_ov005_02165ff8;
@@ -240,6 +245,40 @@ u8 DinoUiShopSellMenu::GetFlag(int index) {
 }
 
 extern const u32 data_0208a1f4;
+
+// Makes the page's buttons (blank past the last fossil) and links them in a grid, the top row to the back button.
+void DinoUiShopSellMenu::RefreshPage2() {
+    mItems.clear();
+    for (int i = 0; i < 8; i++) {
+        DinoUi3PartsKasekiButton *button;
+        if (mFossils.size() > i + mPage * 8) {
+            button = new DinoUi3PartsKasekiButton(
+                mOam,
+                MPoint(data_ov005_02165ff8.mFirst.x + data_ov005_02165ff8.mColumn.x * (i % 4) +
+                           data_ov005_02165ff8.mRow.x * (i / 4),
+                       data_ov005_02165ff8.mFirst.y + data_ov005_02165ff8.mColumn.y * (i % 4) +
+                           data_ov005_02165ff8.mRow.y * (i / 4)),
+                (const DinoUiKasekiIcon &)mFossils[i + mPage * 8], GetFlag(i + mPage * 8));
+        } else {
+            button = new DinoUi3PartsKasekiButton(
+                mOam,
+                MPoint(data_ov005_02165ff8.mFirst.x + data_ov005_02165ff8.mColumn.x * (i % 4) +
+                           data_ov005_02165ff8.mRow.x * (i / 4),
+                       data_ov005_02165ff8.mFirst.y + data_ov005_02165ff8.mColumn.y * (i % 4) +
+                           data_ov005_02165ff8.mRow.y * (i / 4)),
+                (const DinoUiKasekiIcon &)DinoUi2GetEmptyKasekiInfo(), 0);
+            button->HideMotion();
+        }
+        mItems.push_back(button);
+        AddItem(button);
+    }
+    DinoUi2LinkKasekiGrid(this, (std::vector<MMenuItem *> &)mItems, mLinkFrom);
+    AddLink((MMenuItem *)mItems[0], 4, mBack);
+    AddLink((MMenuItem *)mItems[1], 4, mBack);
+    AddLink((MMenuItem *)mItems[2], 4, mBack);
+    AddLink((MMenuItem *)mItems[3], 4, mBack);
+    AddLink(mLinkFrom, 4, (MMenuItem *)mItems[4]);
+}
 
 // What the fossil sells for: cleaned ones by their score (100 is full price), uncleaned ones by their own price.
 u32 DinoUiShopSellMenu::GetPrice(int index) {

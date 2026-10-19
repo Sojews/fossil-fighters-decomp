@@ -9,6 +9,7 @@
 #include "m/menu.h"
 #include "game/help.h"
 #include "game/dino_ui_shop_sell_menu_item.h"
+#include "game/dino_ui_fossil_entry.h"
 
 class MSmartOam;
 class DinoUi3PartsMoney;
@@ -56,7 +57,7 @@ public:
     MTaskSet *mCursorTasks;     // 0xEC
     DinoUi3PartsCursor *mCursor; // 0xF0
     DinoUi3PartsRockName *mRockName; // 0xF4
-    std::vector<u32> mFossils;  // 0xF8: the fossils for sale
+    std::vector<DinoUiFossilEntry> mFossils;  // 0xF8: the fossils for sale
     DinoUi3PartsMoney *mMoney;  // 0x104
     u8 mFlags[0x40];            // 0x108
     int mPage;                  // 0x148

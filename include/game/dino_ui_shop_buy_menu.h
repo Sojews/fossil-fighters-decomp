@@ -3,6 +3,7 @@
 
 #include "m/resource.h"
 #include <vector>
+#include "game/dino_ui_fossil_entry.h"
 #include "m/archive.h"
 #include "m/menu_item.h"
 #include "m/menu.h"
@@ -50,7 +51,7 @@ public:
     u32 mUnkD0;                 // 0xD0
     std::vector<void *> mItems; // 0xD4: this page's items
     u32 mUnkE0[2];              // 0xE0
-    std::vector<u32> mUnkE8;    // 0xE8
+    std::vector<DinoUiFossilEntry> mUnkE8;    // 0xE8: the fossils for sale
     MTaskSet *mCursorTasks;     // 0xF4
     DinoUi3PartsCursor *mCursor; // 0xF8
     DinoUi3PartsRockName *mRockName; // 0xFC

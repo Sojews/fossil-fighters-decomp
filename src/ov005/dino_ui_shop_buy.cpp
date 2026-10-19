@@ -24,6 +24,7 @@
 #include "m/bright.h"
 #include "game/dino_ui3_parts_money.h"
 #include "game/dino_ui3_parts_kaseki_button.h"
+#include "game/dino_ui2_parts_kaseki_button.h"
 #include "game/dino_backup.h"
 #include "nitro/mi.h"
 #include "m/input.h"
@@ -212,8 +213,12 @@ void DinoUiShopBuyMenu::OnBackDecided() {
 struct DinoUiShopBuyStatics {
     u8 unk00[0x14];
     MPoint mBottomRight; // 0x14
-    u8 unk1C[0x18];
+    MPoint mRow;         // 0x1C: to the next row
+    u8 unk24[0x34 - 0x24];
     MPoint mTopLeft;     // 0x34
+    u8 unk3C[0x54 - 0x3C];
+    MPoint mFirst;       // 0x54: the page's first button
+    MPoint mColumn;      // 0x5C: from a page button to the next in its row
 };
 extern "C" DinoUiShopBuyStatics data_ov005_02166ac8;
 
@@ -268,6 +273,40 @@ template MTask *MCreateCallTask(DinoUiShopBuyMenu *obj, void (DinoUiShopBuyMenu:
 
 u8 DinoUiShopBuyMenu::GetFlag(int index) {
     return mFlags[index];
+}
+
+// Makes the page's buttons (blank past the last fossil) and links them in a grid, the top row to the back button.
+void DinoUiShopBuyMenu::RefreshPage2() {
+    mItems.clear();
+    for (int i = 0; i < 8; i++) {
+        DinoUi3PartsKasekiButton *button;
+        if (mUnkE8.size() > i + mPage * 8) {
+            button = new DinoUi3PartsKasekiButton(
+                mOam,
+                MPoint(data_ov005_02166ac8.mFirst.x + data_ov005_02166ac8.mColumn.x * (i % 4) +
+                           data_ov005_02166ac8.mRow.x * (i / 4),
+                       data_ov005_02166ac8.mFirst.y + data_ov005_02166ac8.mColumn.y * (i % 4) +
+                           data_ov005_02166ac8.mRow.y * (i / 4)),
+                (const DinoUiKasekiIcon &)mUnkE8[i + mPage * 8], GetFlag(i + mPage * 8));
+        } else {
+            button = new DinoUi3PartsKasekiButton(
+                mOam,
+                MPoint(data_ov005_02166ac8.mFirst.x + data_ov005_02166ac8.mColumn.x * (i % 4) +
+                           data_ov005_02166ac8.mRow.x * (i / 4),
+                       data_ov005_02166ac8.mFirst.y + data_ov005_02166ac8.mColumn.y * (i % 4) +
+                           data_ov005_02166ac8.mRow.y * (i / 4)),
+                (const DinoUiKasekiIcon &)DinoUi2GetEmptyKasekiInfo(), 0);
+            button->HideMotion();
+        }
+        mItems.push_back(button);
+        AddItem(button);
+    }
+    DinoUi2LinkKasekiGrid(this, (std::vector<MMenuItem *> &)mItems, mLinkFrom);
+    AddLink((MMenuItem *)mItems[0], 4, mUnkC8);
+    AddLink((MMenuItem *)mItems[1], 4, mUnkC8);
+    AddLink((MMenuItem *)mItems[2], 4, mUnkC8);
+    AddLink((MMenuItem *)mItems[3], 4, mUnkC8);
+    AddLink(mLinkFrom, 4, (MMenuItem *)mItems[4]);
 }
 
 u32 DinoUiShopBuyMenu::GetPrice(int index) {

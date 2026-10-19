@@ -4,6 +4,7 @@
 #include "m/resource.h"
 #include "game/dino_ui3_parts_fraction.h"
 #include <vector>
+#include "game/dino_ui_fossil_entry.h"
 #include "m/archive.h"
 #include "m/menu_item.h"
 #include "m/menu.h"
@@ -48,7 +49,7 @@ public:
     MTaskSet *mCursorTasks;     // 0xDC
     DinoUi3PartsCursor *mCursor; // 0xE0
     DinoUi3PartsRockName *mRockName; // 0xE4
-    std::vector<u32> mUnkE8;    // 0xE8
+    std::vector<DinoUiFossilEntry> mUnkE8;    // 0xE8: the rocks
     MResource<DinoKasekiDefs> mKasekiDefs; // 0xF4
     s32 mChoice;                // 0x104: the rock decided on
     u32 mAnswer;                // 0x108: the confirmation's answer
