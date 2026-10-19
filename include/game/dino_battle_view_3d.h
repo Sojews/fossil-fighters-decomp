@@ -44,10 +44,13 @@ public:
     u8 unkDC[0xE4 - 0xDC];
     MTask *mUnkE4;                          // 0xE4
     MTask *mUnkE8;                          // 0xE8
-    u8 unkEC[0x11C - 0xEC];
+    u32 mCreatureIds[6];                    // 0xEC: each slot's three creatures
+    u8 unk104[0x11C - 0x104];
     void *mSlotModels[6];                   // 0x11C: what each slot's models show (3 per slot)
     u32 mSlot;                              // 0x134
-    u8 unk138[0x178 - 0x138];
+    u8 unk138[0x14A - 0x138];
+    u8 mUnk14A[6];                          // 0x14A: by slot and creature
+    u8 unk150[0x178 - 0x150];
     MRandom mRandom;                        // 0x178
     u8 mUnk180;                             // 0x180
     u8 unk181[0x184 - 0x181];

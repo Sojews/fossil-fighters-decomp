@@ -6,6 +6,7 @@
 #pragma ipa file
 
 #include "game/dino_sound.h"
+#include <printf.h>
 #include "game/dino_battle_view_3d.h"
 #include "game/dino_3d_load_csv.h"
 #include "game/dino_battle_view_class.h"
@@ -39,6 +40,27 @@ B3DStatusViewTask::~B3DStatusViewTask() {
 
 LoadWinnerLoad::~LoadWinnerLoad() {
     mSerial.Clear();
+}
+
+extern "C" const char data_ov000_021965c0[];   // "din%03d_%02d"
+extern "C" const VecFx32 data_ov000_02190334, data_ov000_0219034c;
+
+// Loads the slot's i-th creature's winner model into the view's i-th model.
+void LoadWinnerLoad::LoadModel(int i) {
+    for (int j = 0; j < 3; j++) {
+        mView->mModels[j]->Reset();
+    }
+    char name[64];
+    sprintf(name, data_ov000_021965c0, mView->mCreatureIds[mSlot * 3 + i], 4);
+    mView->mModels[i]->LoadByName(name, TRUE, 0x0FFFFFFF);
+    mView->mModels[i]->PushVec3(&data_ov000_02190334);
+    mView->mModels[i]->PushVec2(&data_ov000_0219034c);
+    if (mView->mUnk14A[mSlot * 3 + i] == 0) {
+        mView->mModels[i]->Push11();
+    } else {
+        mView->mModels[i]->Push12();
+    }
+    mView->mModels[i]->Push7(0x1000);
 }
 
 void B3DStatusViewTask::Idle() {

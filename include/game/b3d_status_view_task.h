@@ -30,6 +30,11 @@ class LoadWinnerLoad : public MProcess {
 public:
     virtual ~LoadWinnerLoad();
     virtual void Idle();
+
+    void LoadModel(int i);
+
+    class DinoBattleView3D *mView;  // 0x74
+    int mSlot;                      // 0x78
 };
 
 #endif
