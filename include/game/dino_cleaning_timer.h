@@ -2,6 +2,8 @@
 #define GAME_DINO_CLEANING_TIMER_H
 
 #include "m/archive.h"
+#include "m/raster.h"
+#include "m/motion.h"
 #include "m/menu_item.h"
 #include "m/menu.h"
 #include "m/display.h"
@@ -22,15 +24,18 @@ public:
     virtual ~DinoCleaningTimer();
     virtual void Idle();
 
+    void StateCountdown();
+    void StateIdle();
     void StateExtend();
 
     void (DinoCleaningTimer::*mState)(); // 0x74
-    u32 unk7C;
+    class DinoCleaning *mOwner; // 0x7C
     int mFrames;            // 0x80
     int mLimit;             // 0x84: frames allowed
-    u32 mUnk88;             // 0x88
+    MRasterIO *mRaster;     // 0x88: the timer bar
     MArchivePtr mArchive;   // 0x8C
-    MArchiveFile mFile;     // 0x90
+    MArchiveFile mFile;     // 0x90: the bar's frames
+    MMotion *mDigits[2];    // 0x9C: elapsed seconds, ones and tens
 };
 
 #endif
