@@ -1,5 +1,6 @@
 // The game's sound interface and its tasks.
 
+#include "m/archive.h"
 #include <algorithm>
 #include <string>
 #include "game/dino_sound.h"
@@ -16,7 +17,7 @@ static u32 sFadeUpStep = 8;
 
 static u8 sInitialized;
 static int sPauseCount;
-static OSMutex sMutex;
+static MMutex sMutex;
 static int sScene;
 static u8 sHeap[0x80000];
 
@@ -51,7 +52,7 @@ static void DinoSoundNothing() {
 }
 
 void DinoSoundInit(u8 arg) {
-    DinoSoundLock lock(&sMutex, TRUE);
+    DinoSoundLock lock(&sMutex.mutex, TRUE);
     if (sInitialized) {
         return;
     }
@@ -65,7 +66,7 @@ void DinoSoundInit(u8 arg) {
 }
 
 void DinoSoundPlayBgm(int bgm, int arg) {
-    DinoSoundLock lock(&sMutex, TRUE);
+    DinoSoundLock lock(&sMutex.mutex, TRUE);
     if (sBgm == bgm && arg == 0) {
         return;
     }
@@ -75,7 +76,7 @@ void DinoSoundPlayBgm(int bgm, int arg) {
 
 // bgm -1 stops the BGM that was last played.
 void DinoSoundStopBgm(int bgm, int fadeFrames) {
-    DinoSoundLock lock(&sMutex, TRUE);
+    DinoSoundLock lock(&sMutex.mutex, TRUE);
     if (bgm == -1) {
         bgm = sBgm;
         sBgm = -1;
@@ -87,32 +88,32 @@ void DinoSoundStopBgm(int bgm, int fadeFrames) {
 }
 
 void DinoSoundStopBgmAll(int fadeFrames) {
-    DinoSoundLock lock(&sMutex, TRUE);
+    DinoSoundLock lock(&sMutex.mutex, TRUE);
     func_02003264(fadeFrames);
 }
 
 void DinoSoundPlaySe(int se, int arg) {
-    DinoSoundLock lock(&sMutex, TRUE);
+    DinoSoundLock lock(&sMutex.mutex, TRUE);
     func_02003200(se, arg, 0);
 }
 
 void DinoSoundStopSe(int se, int fadeFrames) {
-    DinoSoundLock lock(&sMutex, TRUE);
+    DinoSoundLock lock(&sMutex.mutex, TRUE);
     func_0200320c(se, fadeFrames);
 }
 
 void DinoSoundFunc_0201feb4(int fadeFrames) {
-    DinoSoundLock lock(&sMutex, TRUE);
+    DinoSoundLock lock(&sMutex.mutex, TRUE);
     func_02003258(fadeFrames);
 }
 
 void DinoSoundFunc_0201feec(int id) {
-    DinoSoundLock lock(&sMutex, TRUE);
+    DinoSoundLock lock(&sMutex.mutex, TRUE);
     func_0200321c(id, 0);
 }
 
 void DinoSoundLoadScene(int scene) {
-    DinoSoundLock lock(&sMutex, TRUE);
+    DinoSoundLock lock(&sMutex.mutex, TRUE);
     if (sScene == scene) {
         return;
     }
@@ -127,24 +128,24 @@ int DinoSoundGetScene() {
 }
 
 void DinoSoundSetVolume(int volume) {
-    DinoSoundLock lock(&sMutex, TRUE);
+    DinoSoundLock lock(&sMutex.mutex, TRUE);
     func_02003228(volume);
 }
 
 void DinoSoundSetTargetVolume(int volume) {
-    DinoSoundLock lock(&sMutex);
+    DinoSoundLock lock(&sMutex.mutex);
     sTargetVolume = volume;
 }
 
 void DinoSoundPause() {
-    DinoSoundLock lock(&sMutex, TRUE);
+    DinoSoundLock lock(&sMutex.mutex, TRUE);
     if (sPauseCount++ == 0) {
         func_02003240();
     }
 }
 
 void DinoSoundResume() {
-    DinoSoundLock lock(&sMutex, TRUE);
+    DinoSoundLock lock(&sMutex.mutex, TRUE);
     if (--sPauseCount == 0) {
         func_0200324c();
     }
@@ -171,7 +172,7 @@ MTask *DinoSoundCreateStopSeTask(int se, int fadeFrames) {
 }
 
 void DinoSoundFunc_0202016c(int type, int id, int a, int b) {
-    DinoSoundLock lock(&sMutex, TRUE);
+    DinoSoundLock lock(&sMutex.mutex, TRUE);
     func_02003270(type, id, a, b);
 }
 
@@ -206,13 +207,13 @@ void DinoSoundPlayBgmTask::Transfer() {
 }
 
 void DinoSoundMainTask::OnVSync() {
-    DinoSoundLock lock(&sMutex, TRUE);
+    DinoSoundLock lock(&sMutex.mutex, TRUE);
     func_020031f4();
 }
 
 // NONMATCHING: the game's frame has the unused word below the std::min temporaries, not in the lock.
 void DinoSoundMainTask::OnPostLoop() {
-    DinoSoundLock lock(&sMutex, TRUE);
+    DinoSoundLock lock(&sMutex.mutex, TRUE);
     if (sVolume != sTargetVolume) {
         if (sVolume < sTargetVolume) {
             sVolume += std::min(sTargetVolume - sVolume, sFadeUpStep);

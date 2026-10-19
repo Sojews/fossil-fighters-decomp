@@ -260,6 +260,7 @@ src/game/dino_multi_play_icon.cpp:
 
 src/game/dino_sound.cpp:
     .text       start:0x0201fc84 end:0x02020408
+    .init       start:0x02088ff8 end:0x02089008
 
 src/game/m3d_scene_enable_task.cpp:
     .text       start:0x02023024 end:0x020230bc
