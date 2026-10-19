@@ -26,6 +26,8 @@ public:
     u8 mSilentFocus; // 0xCC
 };
 
+class Dino3DLoadCsv;
+
 class DinoUiOpening : public MProcess {
 public:
     DinoUiOpening(MInput *input);
@@ -40,10 +42,12 @@ public:
 
     MInput *mInput;     // 0x74
     void (DinoUiOpening::*mState)(); // 0x78
-    u8 unk80[0x94 - 0x80];
-    MTask *mPrevious;   // 0x94: what the scene shown replaces
+    u8 unk80[0x8C - 0x80];
+    void *mUnk8C;       // 0x8C
+    u32 unk90;
+    Dino3DLoadCsv *mLoad;   // 0x94: the scene loaded next
     u32 mScene;         // 0x98
-    u32 unk9C;
+    MTaskSet *mLoadTasks;   // 0x9C
     MTaskSet *mShowTasks;   // 0xA0
     u8 mSkipped;        // 0xA4
     std::vector<void *> mUnkA8; // 0xA8

@@ -4,6 +4,9 @@
 #pragma auto_inline on
 
 #include "game/disp_blower_menu.h"
+#include "m/irq.h"
+#include "game/dino_3d_load_csv.h"
+#include "game/dino_common_window_yes_no_dialog.h"
 #include "game/dino_ui_title_menu.h"
 #include "game/dino_ui_exchange.h"
 #include "game/dino_ui_multiplay_loop.h"
@@ -280,6 +283,47 @@ template class MBgCallTask0<DinoUiSaveSlotSelect>;
 template MTask *MCreateBgCallTask(DinoUiSaveSlotSelect *obj, void (DinoUiSaveSlotSelect::*func)(), int thread);
 
 #pragma auto_inline off
+
+// Starts loading the next scene of the opening (a battle field model, its camera and sounds).
+void DinoUiOpening::LoadScene() {
+    u32 id = (u32)mUnkA8[mScene++];
+    char path[256];
+    OS_SPrintf(path, "din%03d_04", id);
+    mLoad = new Dino3DLoadCsv(mUnk8C, 0x7FFF, NULL, NULL);
+    mLoad->LoadByName(path, 0, 0xFFFF);
+    mLoad->LoadSoundNames("/model/battle/");
+    OS_SPrintf(path, "/model/battle/cm_btl%03d_99.csv", id);
+    mLoad->LoadFile(path, (void *)4, 0);
+    OS_SPrintf(path, "/model/battle/snd_btl%03d_99.csv", id);
+    mLoad->LoadFile(path, (void *)4, 0);
+    MIrqLock lock;
+    mLoadTasks->AddTail(mLoad);
+}
+
+// "Delete this file?" (text ids) and the answers.
+extern "C" const u32 data_0208a96c, data_0208a970, data_0208a974;
+
+// Asks, then deletes (runs the task) or not.
+void DinoUiSaveSlotSelectMenuConfirmDeleteTask::Idle() {
+    switch (mStep++) {
+    case 0: {
+        mAnswer = FALSE;
+        DinoCommonWindowYesNoDialog *dialog =
+            new DinoCommonWindowYesNoDialog(gDinoResource->GetText(data_0208a974), &mAnswer);
+        dialog->SetLabels(gDinoResource->GetText(data_0208a970), gDinoResource->GetText(data_0208a96c));
+        mSerial.AddTail(dialog);
+        break;
+    }
+    case 1:
+        if (mAnswer == TRUE) {
+            mSerial.AddTail(mDelete);
+        } else {
+            delete mDelete;
+        }
+        mSerial.AddTail(MTaskExitTransfer::Create(this));
+        break;
+    }
+}
 
 DinoUiSaveSlotSelect::DinoUiSaveSlotSelect(MInput *input, u32 *result) : MProcess(NULL) {
     mInput = input;
@@ -592,7 +636,7 @@ extern "C" struct {
 
 void DinoUiOpening::StateShowScene() {
     MTask *wait1 = new MTimer(1);
-    MTask *exit = MTaskExitTransfer::Create(mPrevious);
+    MTask *exit = MTaskExitTransfer::Create(mLoad);
     MTask *wait = new MTimer(mSceneFrames);
     MTaskSet *tasks = mShowTasks;
     tasks->AddTail(wait);
