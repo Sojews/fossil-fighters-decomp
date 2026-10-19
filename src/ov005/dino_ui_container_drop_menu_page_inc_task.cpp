@@ -11,6 +11,8 @@
 #include "m/lcd.h"
 #include "m/display.h"
 #include "m/bright.h"
+#include "game/dino_resource.h"
+#include "game/dino_common_window_yes_no_dialog.h"
 
 #pragma auto_inline off
 
@@ -141,4 +143,16 @@ void DinoUiContainerDropMenu::OnIdle() {
     if (mUnk128) {
         mUnk128 = 0;
     }
+}
+
+extern const u32 data_0208a650, data_0208a654;
+
+// Asks whether to leave.
+void DinoUiContainerDropMenu::OnBackDecided() {
+    *(int *)mUnkDC = -1;
+    DinoCommonWindowYesNoDialog *dialog = new DinoCommonWindowYesNoDialog(mUnkE4[0], &mUnk128);
+    dialog->SetLabels(mUnkE4[1], mUnkE4[2]);
+    dialog->SetLabels2(std::string(gDinoResource->GetText(data_0208a654)),
+                       std::string(gDinoResource->GetText(data_0208a650)));
+    mSerial.AddTail(dialog);
 }
