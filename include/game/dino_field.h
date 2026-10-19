@@ -482,8 +482,8 @@ public:
     void Talk(u32 id);
     std::string GetTalkText(u32 id);
     void SetResult(u32 result);
-    void CloseField(BOOL arg);
-    void OpenField(BOOL arg);
+    void CloseField(bool arg);
+    void OpenField(bool arg);
     void CreateField();
     void MarkCameraUsed();
     DinoField *GetField();

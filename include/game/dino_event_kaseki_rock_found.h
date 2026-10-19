@@ -24,6 +24,8 @@ public:
     MTask *CreateMessageBox(u32 index, const std::string &arg = "");
     // Gives the player the rock.
     void StateGet();
+    // The rock isn't taken: says so, and fades the field out and back in.
+    void StateLeave();
     MTask *CreateYesNo(u32 message);
     void StateFound();
     void StateFoundEnd();

@@ -26,7 +26,7 @@ extern "C" struct {
     void (DinoEventKasekiRockFound::*StateGet_40)();
     u8 unk48[0x58 - 0x48];
     void (DinoEventKasekiRockFound::*StateAnswered_58)();
-    void (DinoEventKasekiRockFound::*Unk02036f64_60)();
+    void (DinoEventKasekiRockFound::*StateLeave_60)();
     u8 unk68[0x78 - 0x68];
     void (DinoEventKasekiRockFound::*StateFoundEnd_78)();
 } data_020bd380;
@@ -58,6 +58,14 @@ void DinoEventKasekiRockFound::StateGet() {
     GetSerial()->AddTail(new DinoEventKasekiRockGet(mEvent, 0, &mEntry, NULL), exit);
 }
 
+void DinoEventKasekiRockFound::StateLeave() {
+    std::string name = gDinoBackup->GetEntryName(&mEntry);
+    GetSerial()->AddTail(CreateMessageBox(0x10, name), new DinoEventExecFade(mEvent, 5, 60, TRUE),
+                         MCreateCallTask(mEvent, &DinoEventLoop::CloseField, false),
+                         MCreateCallTask(mEvent, &DinoEventLoop::OpenField, false),
+                         new DinoEventExecFade(mEvent, 0, 30, TRUE), MTaskExitTransfer::Create(this));
+}
+
 void DinoEventKasekiRockFound::StateAsk() {
     mAnswer = 1;
     mSerial.AddTail(CreateYesNo(0xF));
@@ -66,7 +74,7 @@ void DinoEventKasekiRockFound::StateAsk() {
 
 void DinoEventKasekiRockFound::StateAnswered() {
     if (mAnswer == 0) {
-        mState = data_020bd380.Unk02036f64_60;
+        mState = data_020bd380.StateLeave_60;
     } else {
         mState = data_020bd380.Unk02037064_30;
     }

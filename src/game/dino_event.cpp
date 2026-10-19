@@ -99,7 +99,7 @@ void DinoEventLoop::AddSeenEpisodes() {
 }
 
 // Loads the field overlay and makes the field from the saved state.
-void DinoEventLoop::OpenField(BOOL arg) {
+void DinoEventLoop::OpenField(bool arg) {
     if (arg) {
         AddSeenEpisodes();
     }
@@ -359,7 +359,7 @@ void DinoEventLoop::ClearEpisodes() {
 }
 
 // Saves the field's state and deletes it. Unless closing for good, the episodes are reloaded if they changed.
-void DinoEventLoop::CloseField(BOOL arg) {
+void DinoEventLoop::CloseField(bool arg) {
     mField->Write(gDinoBackup->GetUnk140());
     mParallel.Remove(mField);
     delete mField;
