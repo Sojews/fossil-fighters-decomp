@@ -57,6 +57,22 @@ void DinoFieldMap::ClearGradation() {
     mGradation->SetGradation(0, 0, 0, 0, 0, 0);
 }
 
+// NONMATCHING: the game keeps the bounds and the cell in memory (more temporaries; the rect's fields re-read).
+void *DinoFieldMap::GetArea(MFx32Point pos) {
+    MResource<DinoFieldMapGrid> &grid = mGrid;
+    MFx32Point half = pos / MFx32(2);
+    MPoint cell(MFx32ToInt(half.x), MFx32ToInt(half.y));
+    MRect bounds(0, 0, grid.Get()->width, grid.Get()->height);
+    if (!bounds.Contains(cell)) {
+        DinoFieldMapData *data = (DinoFieldMapData *) mData.mFile.GetData();
+        return (u8 *) data + data->mAreas;
+    }
+    u32 at = cell.y * grid.Get()->width + cell.x;
+    u8 area = ((const u8 *) grid.Get() + grid.Get()->cells)[at];
+    DinoFieldMapData *data = (DinoFieldMapData *) mData.mFile.GetData();
+    return (u8 *) data + data->mAreas + area * 0x14;
+}
+
 void *DinoFieldMap::GetEntry44(int index) {
     DinoFieldMapData *data = (DinoFieldMapData *) mData.mFile.GetData();
     return (u8 *) data + data->mEntries44 + index * 12;

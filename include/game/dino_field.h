@@ -273,10 +273,21 @@ struct DinoFieldMapInfo {
 struct DinoFieldMapData {
     u8 unk00[0x30];
     MFx32 mWalkSpeed;   // 0x30: the speed characters' walk motion plays at
-    u8 unk34[0x44 - 0x34];
+    u8 unk34[0x3C - 0x34];
+    u32 mAreas;         // 0x3C: offset of the areas (0x14 bytes each)
+    u8 unk40[0x44 - 0x40];
     u32 mEntries44;     // 0x44: offset of a table of 12-byte entries
     u32 unk48;
     u32 mEntries4C;     // 0x4C: offset of a table of offsets
+};
+
+// The map's area grid: an area index per 2x2 cell.
+struct DinoFieldMapGrid {
+    u32 unk00;
+    u32 width;          // 0x04: in cells
+    u32 height;         // 0x08
+    u32 unk0C;
+    u32 cells;          // 0x10: offset of width * height u8 area indexes
 };
 
 // The field's settings file.
@@ -302,12 +313,14 @@ public:
     MFx32 GetWalkSpeed();
     void ClearGradation();
     void *GetEntry44(int index);
+    // The area at the position (the first one off the grid).
+    void *GetArea(MFx32Point pos);
     void *GetEntry4C(int index);
 
     DinoFieldMapInfo mInfo; // 0x8C
     u32 mUnk90;             // 0x90
     MResource<u8> mData;    // 0x94
-    MResource<u8> mData2;   // 0xA4
+    MResource<DinoFieldMapGrid> mGrid;  // 0xA4
     MResource<u8> mData3;   // 0xB4
     void *mUnkC4;           // 0xC4: with a gradation behind the map
     MAnmModelBase *mModel;  // 0xC8: the map's model
