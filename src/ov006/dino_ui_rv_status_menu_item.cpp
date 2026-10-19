@@ -177,7 +177,7 @@ extern "C" struct {
 void DinoUiRvStatusMenu::ShowPage() {
     mFraction->SetNumerator(mPage + 1);
     DinoCreatureState creature;
-    gDinoBackup->GetCreature((u32)mUnkE8[mPage], &creature);
+    gDinoBackup->GetCreature(mCreatures[mPage], &creature);
     mInfo->Unk02156ee8(*(DinoCreatureInfo *)&creature);
     GetSerial()->AddTail(MTaskSetWaitEmptyTask::Create(&mInfo->mSerial),
                          MCreateCallTask(this, data_ov006_02193a10.Enable_00));
