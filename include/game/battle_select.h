@@ -35,6 +35,8 @@ public:
     virtual ~UseCreatureSelect();
     virtual void Idle();
 
+    class MIndicator *CreateIndicator(class MSmartOam *oam, class MFont *font, MPoint size, MPoint pos);
+
     void (UseCreatureSelect::*mState)(); // 0x74
     u32 mUnk7C;             // 0x7C
     u32 mUnk80;             // 0x80

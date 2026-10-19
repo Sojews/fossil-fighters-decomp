@@ -5,6 +5,10 @@
 #pragma auto_inline on
 
 #include "game/battle_select.h"
+#include "game/dino_resource.h"
+#include "m/smart_oam.h"
+#include "m/oam_canvas.h"
+#include "m/indicator.h"
 #include "types.h"
 #include "m/resource.h"
 #include "game/dino_battle_view2.h"
@@ -112,4 +116,27 @@ template std::__vec_deleter<DinoBattleView3DEntry, std::allocator<DinoBattleView
 // A debug switch, always off.
 extern "C" BOOL func_ov000_0218472c(int flag) {
     return FALSE;
+}
+
+// A line of text on the sprites at pos.
+MIndicator *UseCreatureSelect::CreateIndicator(MSmartOam *oam, MFont *font, MPoint size, MPoint pos) {
+    MIndicator *indicator = new MIndicator(new MSmartObjCanvas(oam, size, gDinoResource->GetUnkTable(), TRUE), font, 0);
+    indicator->SetPosition(pos);
+    indicator->SetPriority(0);
+    indicator->Show();
+    return indicator;
+}
+
+// The same, for the level select.
+static MIndicator *CreateLevelIndicator(MSmartOam *oam, MFont *font, MPoint size, MPoint pos) {
+    MIndicator *indicator = new MIndicator(new MSmartObjCanvas(oam, size, gDinoResource->GetUnkTable(), TRUE), font, 0);
+    indicator->SetPosition(pos);
+    indicator->SetPriority(0);
+    indicator->Show();
+    return indicator;
+}
+
+// (Uses the level select's copy, so the game's static function is emitted.)
+extern "C" MIndicator *DinoBattleSelectLevelIndicatorAnchor(MSmartOam *oam, MFont *font, MPoint size, MPoint pos) {
+    return CreateLevelIndicator(oam, font, size, pos);
 }
