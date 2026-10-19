@@ -13,6 +13,7 @@
 #include "m/bg_new_task.h"
 #include "m/call_task.h"
 #include "m/motion.h"
+#include "m/input.h"
 
 static const char *sCursorMotions[] = {NULL, "/motion/ui_cursor/shovel.bin"};
 
@@ -62,6 +63,32 @@ void DinoCommonWindowMenu::AddEntry(u32 id, MRect rect, const std::string &text)
 
 DinoCommonWindowMenuItemFlushTask::~DinoCommonWindowMenuItemFlushTask() {
 }
+
+// B chooses the cancel item: sets the result, hides the items and the cursor and closes the window.
+// NONMATCHING: the game reloads the choice count each pass.
+#pragma opt_strength_reduction off
+void DinoCommonWindowMenu::OnIdle() {
+    if (mCancelItem != NULL && (GetInput()->GetPressed() & 2)) {
+        for (u32 i = 0; i < mChoices.size(); i++) {
+            if (mUnkC0[i] == mCancelItem) {
+                *(u32 *)mUnkE4 = mChoices[i].unk00;
+                DinoSoundPlaySe(0x9A, 0);
+                MParallelTaskSet *hides = new MParallelTaskSet(TRUE);
+                for (u32 j = 0; j < mChoices.size(); j++) {
+                    hides->AddTail(((DinoCommonWindowMenuItem *)mUnkC0[j])->mUnk94->CreateHideTransfer());
+                }
+                GetSerial()->AddTail(mCursor->CreateHideTransfer(), hides,
+                                     mWindow->CreateCloseTask(MRect(mWidth * 4, 0, mWidth * 4, mUnkBC * 8)
+                                                                  .Moved(MPoint(mPos.x - mUnk100.x,
+                                                                                mPos.y - mUnk100.y))),
+                                     CreateExitTransfer());
+                Disable();
+                return;
+            }
+        }
+    }
+}
+#pragma opt_strength_reduction reset
 
 // The TU's pooled data (the offset is set by the TU's static initializer).
 extern "C" struct {

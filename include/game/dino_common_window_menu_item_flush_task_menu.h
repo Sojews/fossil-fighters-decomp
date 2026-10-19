@@ -37,7 +37,7 @@ public:
     std::vector<DinoWindowChoice> mChoices;         // 0xF0
     u32 mUnkFC;                                     // 0xFC
     MPoint mUnk100;                                 // 0x100: the window's offset from mPos
-    u32 mUnk108;                                    // 0x108
+    MMenuItem *mCancelItem;                         // 0x108: chosen by B, if any
 };
 
 class DinoCommonWindowMenuItem : public MMenuItem, public DinoHelpItem {
