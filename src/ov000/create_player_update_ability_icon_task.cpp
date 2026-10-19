@@ -1289,3 +1289,10 @@ MFx32 DinoBattleModelCreature::CurveRatio(MFx32 a, MFx32 b) {
     }
     return ratio;
 }
+
+// A vector member the game emits in this file (made explicitly until the code that uses it is decompiled).
+// NONMATCHING: its two int2type temporaries swap stack slots (they match with `#pragma ipa file`, which this file
+// can't take yet: three other functions stop matching).
+#pragma auto_inline off
+template void std::__vec_deleter<DinoBattlePlayerEvent, std::allocator<DinoBattlePlayerEvent> >::reallocate_clear(
+    size_t n, size_t max);

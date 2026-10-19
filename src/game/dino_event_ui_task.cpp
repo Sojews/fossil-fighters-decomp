@@ -6,6 +6,8 @@
 
 #define DINO_EVENT_UI_TASK_OWNER
 #define DINO_EVENT_CAPTURE_FADE_UI_TASK_OWNER
+#pragma ipa file
+
 #include "game/set_episode_task.h"
 #include "game/dino_event_field_menu.h"
 #include "game/dino_event_medal_list.h"
