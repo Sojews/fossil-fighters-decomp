@@ -284,7 +284,9 @@ struct DinoFieldStep {
 
 class DinoField : public MProcess, public MSerializer, public DinoHelpBase {
 public:
+    DinoField(void *arg0, u32 arg1);
     virtual ~DinoField();
+    virtual void Idle();
     void CreateEffects(MPolygonChar **effects, u32 count, u32 id);
     fx32 GetGroundHeight(fx32 x, fx32 y);
     BOOL IsWalkable(fx32 x, fx32 y, fx32 *height);
@@ -292,8 +294,8 @@ public:
     // Where the character ends up moving by move: pushed out of the other characters (and, on the map in the
     // field defs, the kaseki rocks), then stopped or slid along walls.
     MFx32Point ResolveMove(DinoFieldChara *chara, MFx32Point move);
-    virtual void Read(const void *buf);
     virtual void Write(void *buf);
+    virtual void Read(const void *buf);
     DinoFieldMap *GetMap();
     DinoFieldCamera *GetCamera();
     DinoFieldChara *GetChara(u32 id);
@@ -481,7 +483,8 @@ public:
     MArchiveFile mFile;     // 0x98
     u32 mUnkA4[6];          // 0xA4
     u8 mCameraUsed;         // 0xBC
-    u8 unkBD[0x57];
+    u8 unkBD[0x110 - 0xBD];
+    u32 mUnk110;            // 0x110: handed to the field
     void *mEpisodes;        // 0x114
     u8 mEpisodesChanged;    // 0x118
 };

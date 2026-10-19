@@ -806,11 +806,20 @@ extern "C" MProcess *func_ov001_02159cd0(void *field) {
     return new DinoFieldCaptureFadeOutTask(field);
 }
 
-extern "C" MProcess *func_ov001_02159d3c(void *field) {
+extern "C" MProcess *func_ov001_02159d3c(DinoField *field) {
     return new DinoFieldCaptureFadeInTask(field);
 }
 
 // The player's control on the field.
 extern "C" MProcess *func_ov001_021580a0(DinoField *field, u32 arg1, DinoFieldPlayerControlResult *result, u32 arg3) {
     return new DinoFieldPlayerControl(field, arg1, result, arg3);
+}
+
+// Loads the field back from the saved state (in the background), running its task once.
+void DinoFieldCaptureFadeInTask::LoadField() {
+    mField->Read(gDinoBackup->GetUnk140());
+    MTask *task = (MTask *)mField->mUnk24C[0];
+    if (task->mState == MTask::STATE_RUN) {
+        task->Execute();
+    }
 }

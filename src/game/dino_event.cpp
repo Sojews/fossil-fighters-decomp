@@ -3,6 +3,8 @@
 
 #include "game/dino_field.h"
 #include "m/bg_new_task.h"
+#include "m/overlay.h"
+#include "game/dino_backup.h"
 
 void DinoEventLoop::Idle() {
     (this->*mState)();
@@ -44,4 +46,20 @@ MTask *DinoEventLoop::CreateFadeWaitTask() {
 
 MTask *DinoEventLoop::CreateTalkTask(u32 id) {
     return MCreateBgCallTask(this, &DinoEventLoop::Talk, id, 1);
+}
+
+#pragma auto_inline off
+
+extern "C" void func_0203a4f4(DinoEventLoop *event);
+M_EXTERN_OVERLAY(ov001);
+
+// Loads the field overlay and makes the field from the saved state.
+void DinoEventLoop::OpenField(BOOL arg) {
+    if (arg) {
+        func_0203a4f4(this);
+    }
+    MLoadOverlay(0, M_OVERLAY_ID(ov001));
+    mField = new DinoField(&mUnk110, 0);
+    mParallel.AddTail(mField);
+    mField->Read(gDinoBackup->GetUnk140());
 }
