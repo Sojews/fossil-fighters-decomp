@@ -18,6 +18,8 @@ public:
     virtual ~DinoBattleViewEffectTelop();
     virtual void Idle();
 
+    void StateStart();
+
     void (DinoBattleViewEffectTelop::*mState)(); // 0x74
     u32 mUnk7C;                                 // 0x7C
     std::string mUnk80;                         // 0x80
