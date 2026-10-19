@@ -136,6 +136,62 @@ DinoUiOrderSelectMenu::~DinoUiOrderSelectMenu() {
     gCurrentDisplay->mBlend->Reset();
 }
 
+// Where the team's medals go.
+extern "C" const MPoint data_ov006_02197340[5];
+extern const u32 kCreatureLevelLimits[2];
+
+// A creature's experience, up to what the top level needs.
+static inline u32 GetCreatureTotal(const DinoCreatureState &creature) {
+    if (creature.parts[0].level == 0) {
+        return 0;
+    }
+    u32 sum = creature.unk0_8 + (creature.parts[0].level + creature.parts[1].level + creature.parts[2].level +
+                                 creature.parts[3].level);
+    return std::min(kCreatureLevelLimits[0] * 11 + 50, sum);
+}
+
+static inline u32 GetCreatureLevel(const DinoCreatureState &creature) {
+    if (creature.parts[0].level == 0) {
+        return 0;
+    }
+    return (GetCreatureTotal(creature) - 50) / kCreatureLevelLimits[0] + 1;
+}
+
+// Where the opponent's medals go: beside four tabs, or three.
+extern "C" const MPoint data_ov006_02197318[5], data_ov006_021972f0[5];
+
+void DinoUiOrderSelectMenu::CreateOpponentItems() {
+    for (int i = 0; i < 5; i++) {
+        if (mOpponent.creatures[i].index) {
+            u8 maxed;
+            if (GetCreatureLevel(mOpponent.creatures[i]) == 12) {
+                maxed = TRUE;
+            } else {
+                maxed = FALSE;
+            }
+            mUnkF8[i] = new DinoUiPartsReviverMedalButton(
+                mOam, mHasFourthTab ? data_ov006_02197318[i] : data_ov006_021972f0[i], mOpponent.creatures[i].index,
+                maxed, (mOpponent.creatures[i].unk14 & 1) ? (u8)TRUE : (u8)FALSE);
+            AddItem(mUnkF8[i]);
+        } else {
+            mUnkF8[i] = new DinoUiPartsReviverMedalButton(
+                mOam, mHasFourthTab ? data_ov006_02197318[i] : data_ov006_021972f0[i], 0xFFFF, 0, 0);
+            AddItem(mUnkF8[i]);
+            mUnkF8[i]->Disable();
+        }
+    }
+    if (mOpponent.creatures[4].index) {
+        AddLink(mUnkF8[0], 3, mUnkF8[4]);
+        AddLink(mUnkF8[4], 1, mUnkF8[0]);
+    } else if (mOpponent.creatures[3].index) {
+        AddLink(mUnkF8[0], 3, mUnkF8[3]);
+        AddLink(mUnkF8[3], 1, mUnkF8[0]);
+    } else {
+        AddLink(mUnkF8[0], 3, mUnkF8[2]);
+        AddLink(mUnkF8[2], 1, mUnkF8[0]);
+    }
+}
+
 void DinoUiOrderSelectMenu::OnIdle() {
     mUnk1F6 = TRUE;
     if (GetInput()->GetPressed() & 0x800) {
@@ -191,7 +247,7 @@ void DinoUiOrderSelectMenu::RefreshItems() {
         mItems[i]->Enable();
     }
     for (int j = 0; j < 5; j++) {
-        if (mOpponent.tabs[j].present) {
+        if (mOpponent.creatures[j].index) {
             mUnkF8[j]->Enable();
         }
     }
@@ -221,27 +277,6 @@ DinoUiOrderSelectMenu::DinoUiOrderSelectMenu(u32 team, const DinoUiOrderSelectIn
     for (int i = 0; i < 4; i++) {
         mPictures[i] = NULL;
     }
-}
-
-// Where the team's medals go.
-extern "C" const MPoint data_ov006_02197340[5];
-extern const u32 kCreatureLevelLimits[2];
-
-// A creature's experience, up to what the top level needs.
-static inline u32 GetCreatureTotal(const DinoCreatureState &creature) {
-    if (creature.parts[0].level == 0) {
-        return 0;
-    }
-    u32 sum = creature.unk0_8 + (creature.parts[0].level + creature.parts[1].level + creature.parts[2].level +
-                                 creature.parts[3].level);
-    return std::min(kCreatureLevelLimits[0] * 11 + 50, sum);
-}
-
-static inline u32 GetCreatureLevel(const DinoCreatureState &creature) {
-    if (creature.parts[0].level == 0) {
-        return 0;
-    }
-    return (GetCreatureTotal(creature) - 50) / kCreatureLevelLimits[0] + 1;
 }
 
 void DinoUiOrderSelectMenu::CreateItems() {

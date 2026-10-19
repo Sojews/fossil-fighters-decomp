@@ -30,7 +30,7 @@ struct DinoUiOrderSelectTab {
 // The opponent the order is chosen against.
 struct DinoUiOrderSelectInfo {
     std::string name;               // 0x00
-    DinoUiOrderSelectTab tabs[5];   // 0x0C
+    DinoCreatureState creatures[5]; // 0x0C: the opponent's team
     MFx32 unk84[5];                 // 0x84 (some 4-byte class: the game copies them one by one)
 };
 
@@ -67,6 +67,8 @@ public:
     void LinkItems();
     void FinishPage();
     void FinishTab();
+    // The opponent's team's medals (on the right of the four tabs, or of three).
+    void CreateOpponentItems();
     // The decide and back buttons: cancels a swap, or (if the team can fight) saves it and leaves, else says why not.
     void Confirm();
     // The battle's rule text (empty for none).
