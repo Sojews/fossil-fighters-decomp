@@ -997,3 +997,35 @@ void DinoBattleViewUiAttackerMenu::OnDecide(MMenuItem *item) {
                              MTaskExitTransfer::Create(this));
     }
 }
+
+#pragma opt_common_subs off
+DinoBattleViewUiCreatureInfoMenu::DinoBattleViewUiCreatureInfoMenu(DinoBattleView *view, int player,
+                                                                   MMessageObserver *target)
+    : DinoBattleViewUiSelectAreaCommon(view, player, target, 0, 1, 1) {
+    Disable();
+    // Moves every creature's info view, waiting until they all have.
+    int count = 0;
+    for (u32 i = 0; i < 2; i++) {
+        count += view->GetUnkE4(i)->GetCreatureCount();
+    }
+    if (count != 0) {
+        DinoSignalWait *wait = new DinoSignalWait(0x100A1, NULL, NULL, count);
+        mSerial.AddTail(wait);
+        for (u32 i = 0; i < 2; i++) {
+            DinoBattleViewPlayer *player = view->GetUnkE4(i);
+            for (u32 j = 0; j < player->GetCreatureCount(); j++) {
+                player->GetCreature(j)->Post(new DinoBattleViewCreatureViewInfoMoveRequest(wait, TRUE));
+            }
+        }
+    }
+    mUnkF8 = new MSerialTaskSet;
+    mParallel.AddTail(mUnkF8);
+    mUnkF8->Clear();
+    MParallelTaskSet *set = new MParallelTaskSet(TRUE);
+    for (int i = 0; i < 2; i++) {
+        int side = view->GetUnkE4(i)->GetUnkAC();
+        MView *slots = ((DinoBattleView *)mUnkEC)->mUnkE0->mSlotViewsC0[side];
+        set->AddTail(slots->CreateCoordAnime(slots->GetPosition(), func_ov000_0215f22c(1, side), 8, -2));
+    }
+    mUnkF8->AddTail(set);
+}

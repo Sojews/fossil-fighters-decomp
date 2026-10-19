@@ -87,6 +87,7 @@ public:
 
 class DinoBattleViewUiCreatureInfoMenu : public DinoHelpBase, public DinoBattleViewUiSelectAreaCommon {
 public:
+    DinoBattleViewUiCreatureInfoMenu(DinoBattleView *view, int player, MMessageObserver *target);
     virtual ~DinoBattleViewUiCreatureInfoMenu();
     virtual void OnStart();
     virtual void OnFocus(MMenuItem *item);

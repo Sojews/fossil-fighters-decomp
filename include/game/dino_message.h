@@ -3202,6 +3202,8 @@ public:
 class DinoBattleViewCreatureViewInfoMoveRequest : public MMessage {
 public:
     DinoBattleViewCreatureViewInfoMoveRequest() : MMessage(0x100A0) {}
+    DinoBattleViewCreatureViewInfoMoveRequest(MMessageObserver *reply, u8 arg)
+        : MMessage(0x100A0), mUnk0C((u32)reply), mUnk10(arg) {}
     virtual u32 GetSize() { return 12; }
     virtual void Write(void *buf) {
         MI_CpuCopy8(&mId, buf, 4);
