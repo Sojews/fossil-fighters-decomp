@@ -19,6 +19,8 @@
 #include "m/obj.h"
 #include "game/dino_resource.h"
 #include "game/bitmap_move.h"
+#include "m/bitmap.h"
+#include "m/anime.h"
 #include "game/spot_move.h"
 #include "game/dino_ui_island_map_menu_item.h"
 #include "game/island_map_key_check_task.h"
@@ -86,7 +88,7 @@ BOOL DinoUiIslandMapMenu::IsSilentFocus() {
 }
 
 DinoUiIslandMapMenu::DinoUiIslandMapMenu(int *result, u32 arg)
-    : MMenu(NULL, 2), mUnkE8(0), mMap("image/all_map", 0) {
+    : MMenu(NULL, 2), mNameMotion(0), mMap("image/all_map", 0) {
     mUnk144 = arg;
     mResult = result;
     mBackButton = NULL;
@@ -207,6 +209,80 @@ void DinoUiIslandMapMenu::OnDecide(MMenuItem *item) {
             return;
         }
     }
+}
+
+extern "C" const int data_ov004_02175c6c[]; // per place: the x of its spot on the map (pairs with the y)
+extern "C" const int data_ov004_02175c70[]; // and the y
+extern "C" const char *data_ov004_02175bf4[]; // per place: its name plate's motion
+extern "C" const char *data_ov004_021759d8[];
+extern "C" const MPoint data_ov004_02175a54, data_ov004_02175a6c;
+
+// Scrolls the map to the focused place and shines the spotlight on it.
+// NONMATCHING: the game loads both spot tables' addresses first (the x and y swap registers).
+void DinoUiIslandMapMenu::OnFocus(MMenuItem *item) {
+    if (item == NULL) {
+        return;
+    }
+    int place = -1;
+    for (int i = 0; i < 10; i++) {
+        if (item == mItems[i]) {
+            place = data_02089adc[i];
+            break;
+        }
+    }
+    if (place == -1) {
+        return;
+    }
+    mSpotTasks->Clear();
+    mMoveTasks->Clear();
+    int x = data_ov004_02175c6c[place * 2];
+    int y = data_ov004_02175c70[place * 2];
+    MPoint scroll(-x, -y);
+    if (scroll.x < 0) {
+        scroll.x = 0;
+    } else if (scroll.x > 256) {
+        scroll.x = 256;
+    }
+    if (scroll.y < 0) {
+        scroll.y = 0;
+    } else if (scroll.y > 320) {
+        scroll.y = 320;
+    }
+    int dy = scroll.y - mScroll.y;
+    int dx = scroll.x - mScroll.x;
+    MPoint center(128 - (scroll.x + x), 64 - (scroll.y + y));
+    int sy = scroll.y;
+    *(vu16 *) 0x040002B0 = 0;
+    *(vu32 *) 0x040002B8 = dx * dx + dy * dy;
+    while (*(vu16 *) 0x040002B0 & 0x8000) {
+    }
+    int frames = (*(vu32 *) 0x040002B4 << 10) >> 12;
+    if (frames < 20) {
+        frames = 20;
+    }
+    mNameMotion = new MMotion(std::string(data_ov004_02175bf4[place]), mOam, 0, 1);
+    mNameMotion->Play(1, 0);
+    mNameMotion->SetPosition(data_ov004_02175a54);
+    mNameMotion->SetPriority(5);
+    mNameMotion->SetAnchor(2);
+    mNameMotion->Hide();
+    mSpotTasks->AddTail(mNameMotion);
+    mMarkMotion = new MMotion(std::string(data_ov004_021759d8[3]), mOam, 0, 1);
+    mMarkMotion->Play(1, 0);
+    mMarkMotion->SetPosition(data_ov004_02175a6c);
+    mMarkMotion->SetPriority(3);
+    mMarkMotion->SetAnchor(2);
+    mMarkMotion->Hide();
+    mSpotTasks->AddTail(mMarkMotion);
+    DrawFont *font = new DrawFont(place);
+    mSpotTasks->AddTail(font);
+    BitmapMove *move = new BitmapMove(mBitmap, mScroll, scroll, frames);
+    SpotMove *spot = new SpotMove(mWindow, center, frames, mNameMotion, mMarkMotion, font, place == 8 ? TRUE : FALSE);
+    MTaskSet *tasks = mMoveTasks;
+    tasks->AddTail(spot);
+    tasks->AddTail(move);
+    mScroll.x = scroll.x;
+    mScroll.y = sy;
 }
 
 void BitmapMove::Apply(int step) {

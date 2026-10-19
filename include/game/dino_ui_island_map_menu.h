@@ -7,6 +7,10 @@
 #include "m/menu.h"
 #include "game/help.h"
 
+class MSmartOam;
+class MRasterWindow;
+class MMotion;
+
 class DinoUiIslandMapMenu : public DinoHelpBase, public MMenu {
 public:
     DinoUiIslandMapMenu(int *result, u32 arg);
@@ -21,17 +25,20 @@ public:
     void SetSilentFocus(BOOL silent);
     BOOL IsSilentFocus();
 
-    u32 mUnkB4[2];          // 0xB4
+    u32 mUnkB4;             // 0xB4
+    MSmartOam *mOam;        // 0xB8
     MMenuItem *mItems[10];  // 0xBC: one per place on the map
-    u32 mUnkE4;             // 0xE4
-    u32 mUnkE8;             // 0xE8
-    u32 mUnkEC[3];          // 0xEC
+    MRasterWindow *mWindow; // 0xE4: the spotlight on the focused place
+    MMotion *mNameMotion;   // 0xE8: the focused place's name plate
+    MMotion *mMarkMotion;   // 0xEC
+    MTaskSet *mSpotTasks;   // 0xF0: the motions and text of the focused place
+    MTaskSet *mMoveTasks;   // 0xF4: the scroll and spotlight moves
     MTask *mUnkF8;          // 0xF8
     MMenuItem *mBackButton; // 0xFC: B goes to it
     MPictureFile mMap;      // 0x100: image/all_map
     MIndexBitmap *mBitmap;  // 0x134
     MPalUnit *mPalette;    // 0x138
-    u32 mUnk13C[2];         // 0x13C
+    MPoint mScroll;         // 0x13C: the map's offset
     u32 mUnk144;            // 0x144
     int *mResult;           // 0x148
     u32 mUnk14C;            // 0x14C

@@ -6,6 +6,11 @@
 
 class BitmapMove : public MPointAnime {
 public:
+    BitmapMove(MScreen *screen, MPoint from, MPoint to, u32 frames) : MPointAnime(from, to) {
+        mScreen = screen;
+        SetDuration(frames);
+        mEase = -3;
+    }
     virtual ~BitmapMove();
     virtual void Apply(int step);
 
