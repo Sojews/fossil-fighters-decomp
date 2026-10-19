@@ -461,7 +461,7 @@ namespace std {
         i += (start_ + n) / __block;
         iterator r;
         r.i_ = i;
-        r.cur_ = (buf().size_ == 0 ? (T *) 0 : (T *) *i) + (start_ + n) % __block;
+        r.cur_ = (buf().empty() ? (T *) 0 : (T *) *i) + (start_ + n) % __block;
         return r;
     }
 
