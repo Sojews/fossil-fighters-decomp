@@ -3,6 +3,7 @@
 // Derived destructors have their bases' destructor bodies inlined; auto-inlining the ones defined above does that.
 #pragma auto_inline on
 
+#include "m/input.h"
 #include "game/dino_sound.h"
 #include "game/dino_ui_keyboard_menu.h"
 #include "types.h"
@@ -226,14 +227,13 @@ void CurChangeTask::Execute() {
 }
 
 extern "C" void func_ov007_02183558(void *owner);
-extern "C" void func_ov007_02185cb0(void *owner);
 
 void KeyCheckTask::Execute() {
     func_ov007_02183558(mOwner);
 }
 
 void SenryuKeyCheckTask::Execute() {
-    func_ov007_02185cb0(mOwner);
+    ((DinoUiSenryuMenu *)mOwner)->CheckKeys();
 }
 
 MRect DinoSenryuBackButton::GetRect() {
@@ -353,6 +353,21 @@ MTask *DinoUiKeyboardMenu::CreatePageChangeTask(u32 page) {
     return new PageChangeTask(this, page);
 }
 
+void DinoUiSenryuMenu::CheckKeys() {
+    MSerialTaskSet *serial = &mSerial;
+    if (serial->IsEmpty()) {
+        if (GetInput()->GetPressed() & 2) {
+            if (mBackButton) {
+                if (mBackButton->IsFocused()) {
+                    mBackButton->Decide();
+                } else {
+                    mBackButton->Focus();
+                }
+            }
+        }
+    }
+}
+
 MTask *DinoUiSenryuMenu::CreateCurChangeTask(u32 cur) {
     return new CurChangeTask(this, cur);
 }
@@ -362,7 +377,7 @@ MTask *DinoUiSenryuMenu::CreateCurChangeTask(u32 cur) {
 DinoUiSenryuMenu::DinoUiSenryuMenu() : MMenu(NULL, 0), mCursor(NULL), mPage(99), mUnk134(99) {
     mUnk108 = 0;
     mUnk10C = 0;
-    unk12C = 0;
+    mBackButton = NULL;
 }
 
 #pragma auto_inline off

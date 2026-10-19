@@ -385,7 +385,7 @@ _ZN16DinoUiSenryuMenuC1Ev kind:function(thumb,size=0x84) addr:0x02185128
 _ZN16DinoUiSenryuMenuD1Ev kind:function(thumb,size=0x84) addr:0x021851ac
 _ZN16DinoUiSenryuMenuD0Ev kind:function(thumb,size=0x88) addr:0x02185230
 _ZN16DinoUiSenryuMenu7OnStartEv kind:function(thumb,size=0x9f8) addr:0x021852b8
-func_ov007_02185cb0 kind:function(thumb,size=0x78) addr:0x02185cb0
+_ZN16DinoUiSenryuMenu9CheckKeysEv kind:function(thumb,size=0x78) addr:0x02185cb0
 func_ov007_02185d28 kind:function(thumb,size=0xb44) addr:0x02185d28
 .L_0218681a kind:label(thumb) addr:0x0218681a local
 _ZN16DinoUiSenryuMenu6OnIdleEv kind:function(thumb,size=0x2) addr:0x0218686c
