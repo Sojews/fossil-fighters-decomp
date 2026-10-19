@@ -176,6 +176,7 @@ src/m/serializer.cpp:
 
 src/m/text_codec.cpp:
     .text       start:0x0204d5ec end:0x0204e19c
+    .init       start:0x020895ac end:0x020895fc
 
 src/m/dma.cpp:
     .text       start:0x0204fbc0 end:0x0204fc68
@@ -198,6 +199,7 @@ src/m/looper.cpp:
 
 src/m/multi_message.cpp:
     .text       start:0x02051a4c end:0x02052e34
+    .init       start:0x0208978c end:0x020897b4
 
 src/m/startup.cpp:
     .text       start:0x02052e34 end:0x02052ee0
@@ -314,12 +316,14 @@ src/m/smart_oam.cpp:
 
 src/m/file.cpp:
     .text       start:0x0204e2a0 end:0x0204efbc
+    .init       start:0x02089688 end:0x0208971c
 
 src/m/archive.cpp:
     .text       start:0x0204efbc end:0x0204fbc0
 
 src/m/obj.cpp:
     .text       start:0x0205bc1c end:0x0205c498
+    .init       start:0x0208983c end:0x0208996c
 
 src/m/canvas.cpp:
     .text       start:0x020621a0 end:0x02062ac8
