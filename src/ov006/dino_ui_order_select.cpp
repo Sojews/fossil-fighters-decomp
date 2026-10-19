@@ -338,6 +338,33 @@ void DinoUiOrderSelectMenu::LinkItems() {
     mItemsLinked = TRUE;
 }
 
+void DinoUiOrderSelectMenu::SelectItem(int index) {
+    int i;
+    for (i = 0; i < 5; i++) {
+        mItems[i]->Enable();
+    }
+    mItems[index]->Disable();
+    for (i = 0; i < 5; i++) {
+        mUnkF8[i]->Disable();
+    }
+    mBackButton->MMenuItem::Enable();
+    mBackButton->DinoHelpItem::Enable();
+    mBackButton->mMotion->Show();
+    mOKButton->MMenuItem::Disable();
+    mOKButton->DinoHelpItem::Disable();
+    mOKButton->mMotion->Hide();
+    RemoveLink(mTabs[0], 3);
+    AddLink(mTabs[0], 3, mBackButton);
+    if (mHasFourthTab) {
+        RemoveLink(mTabs[3], 1);
+        AddLink(mTabs[3], 1, mBackButton);
+    } else {
+        RemoveLink(mTabs[2], 1);
+        AddLink(mTabs[2], 1, mBackButton);
+    }
+    LinkItems();
+}
+
 void DinoUiOrderSelectMenu::FinishPage() {
     mUnk1F0 = 0;
     ClearItems();

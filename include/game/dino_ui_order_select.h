@@ -57,6 +57,8 @@ public:
     void ClearItems();
     void CreateItems();
     void RefreshItems();
+    // While an item is picked: the others and the back button can be chosen instead.
+    void SelectItem(int index);
     void RefreshOKButton();
     BOOL IsTeamInvalid();
     void LinkItems();

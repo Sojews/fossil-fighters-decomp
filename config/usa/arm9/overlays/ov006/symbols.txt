@@ -640,7 +640,7 @@ _Z15MCreateCallTaskI21DinoUiOrderSelectMenuS0_bEP5MTaskPT_MT0_FvT1_ES6_ kind:fun
 _ZN21DinoUiOrderSelectMenu8PageLeftEv kind:function(thumb,size=0x54) addr:0x0218e1d4
 _ZN21DinoUiOrderSelectMenu9PageRightEv kind:function(thumb,size=0x50) addr:0x0218e228
 _ZN21DinoUiOrderSelectMenu12RefreshItemsEv kind:function(thumb,size=0x112) addr:0x0218e278
-func_ov006_0218e38c kind:function(thumb,size=0x110) addr:0x0218e38c
+_ZN21DinoUiOrderSelectMenu10SelectItemEi kind:function(thumb,size=0x110) addr:0x0218e38c
 _ZN21DinoUiOrderSelectMenu9LinkItemsEv kind:function(thumb,size=0x210) addr:0x0218e49c
 func_ov006_0218e6ac kind:function(thumb,size=0x1332) addr:0x0218e6ac
 .L_0218f9d8 kind:label(thumb) addr:0x0218f9d8 local
