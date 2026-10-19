@@ -1191,7 +1191,7 @@ func_ov000_02185220 kind:function(thumb,size=0x158) addr:0x02185220
 func_ov000_02185378 kind:function(thumb,size=0x90) addr:0x02185378
 func_ov000_02185408 kind:function(thumb,size=0x4a4) addr:0x02185408
 func_ov000_021858ac kind:function(thumb,size=0xa) addr:0x021858ac
-func_ov000_021858b8 kind:function(thumb,size=0xc) addr:0x021858b8
+_ZNSt6vectorIS_ISsSaISsEESaIS2_EED1Ev kind:function(thumb,size=0xc) addr:0x021858b8
 _ZN16DinoBattleView3DD1Ev kind:function(thumb,size=0xc4) addr:0x021858c4
 _ZN16DinoBattleView3DD0Ev kind:function(thumb,size=0xcc) addr:0x02185988
 _ZN16DinoBattleView3D4IdleEv kind:function(thumb,size=0x28) addr:0x02185a54
@@ -2381,7 +2381,6 @@ data_ov000_02196b28 kind:data(any) addr:0x02196b28
 data_ov000_02196b4c kind:data(any) addr:0x02196b4c
 data_ov000_02196b74 kind:data(any) addr:0x02196b74
 _ZTV16DinoBattleView3D kind:data(any) addr:0x02196b9c
-data_ov000_02196bc0 kind:data(any) addr:0x02196bc0
 data_ov000_02196bc4 kind:data(any) addr:0x02196bc4
 data_ov000_02196bf0 kind:data(any) addr:0x02196bf0
 data_ov000_02196c1c kind:data(any) addr:0x02196c1c

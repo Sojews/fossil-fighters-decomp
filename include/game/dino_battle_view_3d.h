@@ -10,6 +10,9 @@
 #include "game/help.h"
 #include "game/dino_field_camera_hook.h"
 #include <deque>
+#include <vector>
+#include <string>
+#include "m/seed_generator.h"
 
 class DinoBattleView;
 
@@ -33,19 +36,24 @@ public:
     DinoBattleView *mView;                  // 0xAC
     u32 mUnkB0;                             // 0xB0
     u32 unkB4[3];
-    void *mUnkC0;                           // 0xC0
+    MTaskSet *mUnkC0;                       // 0xC0
     void (DinoBattleView3D::*mState)();     // 0xC4
-    u32 unkCC;
+    MTaskSet *mUnkCC;                       // 0xCC
     Dino3DLoadCsv *mModels[3];              // 0xD0
-    u8 unkDC[0x11C - 0xDC];
+    u8 unkDC[0xE4 - 0xDC];
+    MTask *mUnkE4;                          // 0xE4
+    MTask *mUnkE8;                          // 0xE8
+    u8 unkEC[0x11C - 0xEC];
     void *mSlotModels[6];                   // 0x11C: what each slot's models show (3 per slot)
     u32 mSlot;                              // 0x134
-    u8 unk138[0x180 - 0x138];
+    u8 unk138[0x178 - 0x138];
+    MRandom mRandom;                        // 0x178
     u8 mUnk180;                             // 0x180
     u8 unk181[0x184 - 0x181];
     std::deque<MTask *> mQueue;             // 0x184: tasks waiting to run
     u32 mUnk19C;                            // 0x19C
     u32 mUnk1A0;                            // 0x1A0
+    std::vector<std::vector<std::string> > mUnk1A4[6]; // 0x1A4
 };
 
 class DelDmgMotionTask : public MTask {

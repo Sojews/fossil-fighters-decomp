@@ -19,6 +19,18 @@
 
 DinoBattleView3D::~DinoBattleView3D() {
     CancelQueue();
+    mUnkC0->Clear();
+    if (mUnkE4 != NULL) {
+        mParallel.Remove(mUnkE4);
+        delete mUnkE4;
+        mUnkE4 = NULL;
+    }
+    if (mUnkE8 != NULL) {
+        mParallel.Remove(mUnkE8);
+        delete mUnkE8;
+        mUnkE8 = NULL;
+    }
+    mUnkCC->Clear();
 }
 
 B3DStatusViewTask::~B3DStatusViewTask() {
@@ -237,7 +249,7 @@ void DinoBattleView3D::FlushQueue() {
     while (!mQueue.empty()) {
         MTask *task = mQueue.front();
         mQueue.pop_front();
-        ((MTaskSet *)mUnkC0)->AddTail(task);
+        mUnkC0->AddTail(task);
     }
 }
 
