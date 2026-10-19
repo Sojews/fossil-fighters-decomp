@@ -1,5 +1,6 @@
 // DinoCleaning: the fossil cleaning scene, with DinoCleaningKasekiRock and DinoCleaningLive.
 
+#include <algorithm>
 #include "m/lcd.h"
 #include "game/dino_cleaning.h"
 #include "game/dino_cleaning_kaseki_rock.h"
@@ -223,7 +224,9 @@ extern "C" struct {
 extern "C" struct {
     u8 unk00[0x8];
     const char *mCountFormat;   // 0x08
-    u8 unk0C[0x48 - 0xC];
+    u8 unk0C[0x2C - 0xC];
+    int mZero_2C;               // 0x2C: (the constant the count's shake is clamped to)
+    u8 unk30[0x48 - 0x30];
     void (DinoCleaning::*State02160638_48)(); // 0x48
     u8 unk50[0x78 - 0x50];
     void (DinoCleaning::*Unk02161490_78)();
@@ -250,7 +253,8 @@ extern "C" struct {
     void (DinoCleaning::*StateStopAnswered_20)();
     u8 unk28[0x60 - 0x28];
     void (DinoCleaning::*StateStopTool_60)();
-    u8 unk68[0x80 - 0x68];
+    u8 unk68[0x78 - 0x68];
+    void (DinoCleaning::*State021610b0_78)();
     void (DinoCommonLive::*SetUnkA0_80)(u32, bool); // 0x80 (the next block's first entry)
 } data_ov002_02165aec;
 extern "C" struct {
@@ -356,6 +360,26 @@ void DinoCleaning::State021610b0() {
     mUnk110 = mUnk110 - 1;
     DinoSoundPlaySe(0x3B, 0);
     mState = data_ov002_02165a6c.State02161164_10;
+}
+
+// A random offset in [-range/2, range/2).
+static inline MFx32 RandomOffset(MRandom *random, MFx32 range) {
+    return range * random->NextFraction() - range / MFx32(2);
+}
+
+// Shakes the count's text, less as its second runs out, then counts on.
+// NONMATCHING: the game loads mRandom just before each NextFraction call.
+void DinoCleaning::State02161164() {
+    MFx32 scale = MFx32(std::max((int)mUnk114 - 45, data_ov002_021659ec.mZero_2C)) / MFx32(2);
+    mUnk118->Show();
+    MFx32 x = RandomOffset(mRandom, scale);
+    MFx32 y = RandomOffset(mRandom, scale);
+    mUnk118->SetPosition(MFx32ToInt(x), MFx32ToInt(y));
+    mUnk114--;
+    if (mUnk114 == 0) {
+        mUnk118->Exit();
+        mState = data_ov002_02165aec.State021610b0_78;
+    }
 }
 
 
