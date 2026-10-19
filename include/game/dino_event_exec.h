@@ -307,6 +307,7 @@ public:
     void StateCleaning();
     void StateResult();
     void StateOpenField();
+    void StateEnd();
 
     void (DinoEventExecCleaning::*mState)(); // 0x74
     DinoEventLoop *mEvent;  // 0x7C
@@ -1211,6 +1212,8 @@ public:
     void StateResetDisplays();
     void StateOpenField();
     void StateFadeOut();
+    // Restarts the game into the demo battle's follow-up (after a demo battle).
+    void SoftReset();
 
     void (DinoEventExecBattle::*mState)(); // 0x74
     DinoEventLoop *mEvent;          // 0x7C

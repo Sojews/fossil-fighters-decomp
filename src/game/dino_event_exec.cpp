@@ -6,6 +6,7 @@
 #include "game/dino_battle.h"
 #include "nitro/mi.h"
 #include "m/overlay.h"
+#include "m/soft_reset.h"
 #include "game/dino_field_battle_start_effect.h"
 #include "game/dino_cleaning.h"
 #include "game/dino_ui_revive_status_menu.h"
@@ -2164,7 +2165,7 @@ extern "C" struct {
     u8 unk28[0x38 - 0x28];
     void (DinoEventExecCleaning::*Cleaning0203ff38_38)();
     u8 unk40[0x48 - 0x40];
-    void (DinoEventExecCleaning::*Cleaning020400a8_48)();
+    void (DinoEventExecCleaning::*StateEnd_48)();
     u8 unk50[0x78 - 0x50];
     void (DinoEventExecBattle::*Battle02041748_78)();
 } data_020be144;
@@ -2251,7 +2252,11 @@ void DinoEventExecCleaning::StateResult() {
 
 void DinoEventExecCleaning::StateOpenField() {
     mEvent->OpenField(FALSE);
-    mState = data_020be144.Cleaning020400a8_48;
+    mState = data_020be144.StateEnd_48;
+}
+
+void DinoEventExecCleaning::StateEnd() {
+    mSerial.AddTail(MTaskExitTransfer::Create(this));
 }
 
 void DinoEventExecBattle::StateStartEffect() {
@@ -2314,6 +2319,10 @@ void DinoEventExecBattle::StateFadeOut() {
     MTaskSet &serial = mSerial;
     serial.AddTail(wait);
     serial.AddTail(exit);
+}
+
+void DinoEventExecBattle::SoftReset() {
+    MSoftReset(mDemo + 2);
 }
 
 void DinoEventExecBattle::StateOpenField() {
