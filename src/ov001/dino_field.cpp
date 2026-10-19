@@ -1,5 +1,7 @@
 // DinoField.
 
+#pragma ipa file
+
 #include "game/dino_field.h"
 #include "game/dino_field_kaseki_rock.h"
 #include "m/lcd.h"
