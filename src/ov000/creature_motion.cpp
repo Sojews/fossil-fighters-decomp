@@ -205,6 +205,31 @@ MTask *DinoBattleViewCreature::CreateMotionCallTask() {
     return mMotion->CreateWaitStopTask();
 }
 
+struct DinoAttackHit {
+    u16 unk0;
+    u16 weight;
+};
+
+// Splits the damage between the attack's hits by their weights (the rounding goes to the first).
+// NONMATCHING: 90%, the game keeps the loop counter in a register (ours spills it and strength-reduces the index).
+void DinoSplitDamage(int *out, u32 attack, int total) {
+    MI_CpuFill8(out, 0, 12);
+    const DinoAttackDef *def = gDinoResource->GetAttackDef(attack);
+    int count = def->hitCount;
+    MFx32 sum = MFx32(DinoOffsetPtr<u16>(def, def->cost)[1]);
+    int assigned = 0;
+    int *p = out;
+    for (int i = 0; i < count; i++) {
+        int part = MFx32ToInt(MFx32(total) * MFx32(((const DinoAttackHit *)((const u8 *)def + def->hits))[i].weight) / sum);
+        *p++ = part;
+        assigned += part;
+    }
+    while (assigned < total) {
+        out[0]++;
+        assigned++;
+    }
+}
+
 // Both screens fade in from white.
 void DinoBattleViewEffectGameBegin::StateFadeIn() {
     MTask *top, *bottom;

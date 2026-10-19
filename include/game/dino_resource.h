@@ -79,7 +79,9 @@ struct DinoAttackDefs {
 };
 
 struct DinoAttackDef {
-    u8 unk00[0xC];
+    u32 unk00;
+    u32 hitCount;       // 0x04
+    u32 hits;           // 0x08: offset of hitCount {u16, u16 weight}
     u32 cost;           // 0x0C: offset of the u16 cost (in kaseki points), 0 for none
     u32 unk10;          // 0x10: offset of a u8
     u32 unk14;          // 0x14: offset of a u8
