@@ -20,6 +20,10 @@
 #include "game/dino_common_window_message_box.h"
 #include "game/dino_common_window_yes_no_dialog.h"
 #include "game/dino_ui_wireless_cancel_item_menu.h"
+#include "game/backup_validater.h"
+#include "m/text_codec.h"
+#include <printf.h>
+#include <algorithm>
 
 DinoUiExchange::~DinoUiExchange() {
     GetDisplay()->mBlend->Reset();
@@ -107,17 +111,21 @@ template class std::__red_black_tree<DinoMacAddress, DinoMacAddress, std::__iden
 
 // The TU's pooled pointer-to-member constants (see menu.cpp).
 extern "C" struct {
-    u8 unk00[0x14];
-    void (DinoUiExchange::*State02156acc_14)(); // 0x14
+    u8 unk00[0x8];
+    u32 maxCount_08;    // 0x08: the most exchanges counted
+    u8 unk0C[0x14 - 0xC];
+    void (DinoUiExchange::*StateSave_14)(); // 0x14
     void (DinoUiExchange::*StateExchange_1C)(); // 0x1c
     void (DinoUiExchange::*OnScanMessage_24)(MMessage *msg); // 0x24
     void (DinoUiExchange::*StateRestart_2C)(); // 0x2c
-    u8 unk34[0x3C - 0x34];
+    void (DinoUiExchange::*StateRestart_34)(); // 0x34
     void (DinoUiExchange::*StateAsk_3C)(); // 0x3c
-    u8 unk44[0x4C - 0x44];
+    void (DinoBackup::*Save_44)(); // 0x44
     void (DinoUiExchange::*StateQuit_4C)(); // 0x4c
     void (DinoUiExchange::*StateRestart_54)(); // 0x54
-    u8 unk5C[0x74 - 0x5C];
+    u8 unk5C[0x64 - 0x5C];
+    void (DinoUiExchange::*StateRestart_64)(); // 0x64
+    u8 unk6C[0x74 - 0x6C];
     void (DinoUiExchange::*OnScanMessage_74)(MMessage *msg); // 0x74
     void (DinoUiExchange::*StateCancelled_7C)(); // 0x7c (its second word is in the next block)
 } data_ov004_02171de0;
@@ -127,7 +135,7 @@ extern "C" struct {
     void (DinoUiExchange::*OnNoMessage_0C)(MMessage *msg); // 0x0c
     void (DinoUiExchange::*StateSearch_14)(); // 0x14
     void (DinoUiExchange::*State02156718_1C)(); // 0x1c
-    void (DinoUiExchange::*State02156acc_24)(); // 0x24
+    void (DinoUiExchange::*StateSave_24)(); // 0x24
     void (DinoUiExchange::*StateEnd_2C)(); // 0x2c
     void (DinoUiExchange::*Unk02155f24_34)();
     MPoint mMessagePos;  // 0x3c
@@ -144,6 +152,7 @@ extern "C" struct {
     void (DinoUiExchange::*OnNoMessage_04)(MMessage *msg); // 0x04
     void (DinoUiExchange::*StateLeave_0C)(); // 0x0c
     void (DinoUiExchange::*State02156718_14)(); // 0x14
+    void (DinoUiExchange::*StateLeave_1C)(); // 0x1c
 } data_ov004_02171ee0;
 
 DinoUiExchange::DinoUiExchange() : MProcess(NULL) {
@@ -251,7 +260,7 @@ void DinoUiExchange::OnScanMessage(MMessage *msg) {
             }
             Reset();
             mOnMessage = data_ov004_02171e60.OnNoMessage_4C;
-            mState = data_ov004_02171e60.State02156acc_24;
+            mState = data_ov004_02171e60.StateSave_24;
         }
         break;
     case 0:
@@ -304,6 +313,47 @@ void DinoUiExchange::StateJoined() {
     mDone[0] = mDone[1] = FALSE;
     mState = data_ov004_02171de0.StateExchange_1C;
     mOnMessage = data_ov004_02171e60.OnExchangeMessage_04;
+}
+
+extern const u32 data_0208ab34;
+
+// Takes the exchanged rock (and senryu), counts the exchange (once per partner found as the parent), says whom it was
+// with while saving, then goes on (or leaves when there is nothing left to exchange).
+// NONMATCHING: the game's set::insert leaves two empty temporaries on the stack (zeroed after the call), which
+// shifts the other slots.
+void DinoUiExchange::StateSave() {
+    if (!mIsParent && HasExchangedWith()) {
+        mState = data_ov004_02171de0.StateRestart_34;
+        return;
+    }
+    mCount = std::min(data_ov004_02171de0.maxCount_08, mCount + 1);
+    gDinoBackup->AddUnk138(&mRock, 0);
+    if (mProfile.unk78) {
+        gDinoBackup->AddProfile(&mProfile, 0);
+    }
+    DinoBackupEntry empty;
+    MI_CpuFill8(&empty, 0, sizeof(empty));
+    gDinoBackup->SetUnk14C(0, &empty);
+    gDinoBackup->CompactUnk14C();
+    if (!mIsParent) {
+        mPartners.insert(*(DinoMacAddress *)mPartnerMac);
+    }
+    ShowCount();
+    mTasks->Clear();
+    char text[0x200];
+    sprintf(text, gDinoResource->GetText(data_0208ab34),
+            MEncodeUtf8(std::wstring((const wchar_t *)mPartnerName)).c_str());
+    MTask *message = new DinoCommonWindowMessageWait1(std::string(text), data_ov004_02171e60.mMessagePos, 4, 0);
+    mParallel.AddTail(message);
+    MTask *exit = MTaskExitTransfer::Create(message);
+    GetSerial()->AddTail(new DinoBackupWriteValidater(message, mMultiPlay),
+                         MCreateBgCallTask(gDinoBackup, data_ov004_02171de0.Save_44, 1),
+                         new DinoBackupWriteValidater(message, mMultiPlay), exit);
+    if (gDinoBackup->IsUnk14CEmpty()) {
+        mState = data_ov004_02171ee0.StateLeave_1C;
+    } else {
+        mState = data_ov004_02171de0.StateRestart_64;
+    }
 }
 
 // Cancelled: asks whether to stop exchanging.
@@ -380,7 +430,7 @@ void DinoUiExchange::StateExchange() {
     }
     if (mDone[0] && mDone[1]) {
         AddSerial(this, new MTimer(5), MTaskExitTransfer::Create(mHub), mMultiPlay->CreateResetTask());
-        mState = data_ov004_02171de0.State02156acc_14;
+        mState = data_ov004_02171de0.StateSave_14;
     }
 }
 

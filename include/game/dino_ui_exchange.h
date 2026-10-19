@@ -66,6 +66,9 @@ public:
     void StateExchange();
     // Joined: sends this side's rock, profile and done signals, then exchanges.
     void StateJoined();
+    void StateSave();
+    // Whether this partner was exchanged with already.
+    BOOL HasExchangedWith() { return mPartners.find(*(DinoMacAddress *)mPartnerMac) != mPartners.end() ? TRUE : FALSE; }
     void Unk02155f24();
     // A random fossil an exchange can give.
     void MakeExchangeEntry(DinoBackupEntry *entry);
