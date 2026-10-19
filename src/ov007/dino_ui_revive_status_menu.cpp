@@ -11,12 +11,23 @@
 #include "m/call_task.h"
 #include "game/dino_ui_rv_information.h"
 
-// NONMATCHING: the game keeps the resource's address in a register to construct it; ours addresses its fields
-// from this.
 DinoUiReviveStatusMenu::DinoUiReviveStatusMenu(u32 id, u32 *result, u8 flag)
     : MMenu(gLcd->mMain, NULL, 0), mResult(result), mUnk118(0), mUnk11C(0), mUnk120(0xFF), mFlag(flag) {
     mUnk122 = 1;
     gDinoBackup->GetCreature(id, &mCreature);
+}
+
+DinoUiReviveStatusMenu::DinoUiReviveStatusMenu(const DinoCreatureState &creature, u32 *result, u8 flag)
+    : MMenu(gLcd->mMain, NULL, 0), mCreature(creature), mResult(result), mUnk118(0), mUnk11C(0), mUnk120(0xFF),
+      mFlag(flag) {
+    mUnk122 = 1;
+}
+
+DinoUiReviveStatusMenu::DinoUiReviveStatusMenu(const DinoCreatureState &creature, const DinoCreatureState &creature2,
+                                               u8 flag)
+    : MMenu(gLcd->mMain, NULL, 0), mCreature(creature), mCreature2(creature2), mResult(NULL), mUnk118(1), mUnk11C(0),
+      mUnk120(0xFF), mFlag(flag) {
+    mUnk122 = 0;
 }
 
 DinoUiReviveStatusMenu::~DinoUiReviveStatusMenu() {
