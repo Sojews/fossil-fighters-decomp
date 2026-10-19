@@ -15,6 +15,7 @@
 #include "game/help.h"
 #include "game/dino_field_camera_hook.h"
 
+class MSmartOam;
 class DinoUiReviveStatusParts : public MProcess {
 public:
     virtual ~DinoUiReviveStatusParts();
@@ -26,13 +27,16 @@ public:
 
 class DinoUiReviveStatusMenu : public DinoHelpBase, public MMenu {
 public:
+    MSmartOam *GetOam() { return mOam; }
     virtual ~DinoUiReviveStatusMenu();
     virtual void OnStart();
     virtual void OnFocus(MMenuItem *item);
     virtual void OnDecide(MMenuItem *item);
     void OnBackDecided();
 
-    u8 unkB3[0x9];
+    u8 unkB3[1];
+    MSmartOam *mOam;        // 0xB4: the items' sprites
+    u8 unkB8[4];
     MMenuItem *mItems[4];   // 0xBC
     MSerialTaskSet *mCursorTasks;   // 0xCC
     DinoUiFieldMenuCursor *mCursor; // 0xD0
@@ -72,6 +76,7 @@ class DinoUiReviveStatusMenu;
 
 class DinoUiReviveStatusMenuItem : public MMenuItem, public DinoHelpItem {
 public:
+    DinoUiReviveStatusMenuItem(DinoUiReviveStatusMenu *owner, const std::string &path, MPoint pos, u32 textId);
     virtual ~DinoUiReviveStatusMenuItem();
     virtual MRect GetFrame();
     virtual MRect GetRect();

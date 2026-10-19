@@ -10,6 +10,7 @@ class DinoUiStatusMenu;
 
 class DinoUiStatusMenuItem : public MMenuItem, public DinoHelpItem {
 public:
+    DinoUiStatusMenuItem(DinoUiStatusMenu *owner, const std::string &path, MPoint pos, u32 textId);
     virtual ~DinoUiStatusMenuItem();
     virtual MRect GetFrame();
     virtual void OnFocusChanged(BOOL focused);

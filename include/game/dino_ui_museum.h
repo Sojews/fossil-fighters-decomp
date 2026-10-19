@@ -14,6 +14,7 @@
 #include "game/help.h"
 #include "game/dino_field_camera_hook.h"
 
+class MSmartOam;
 class DinoUiMuseum : public MProcess {
 public:
     DinoUiMuseum();
@@ -25,6 +26,7 @@ class DinoUiFieldMenuFraction;
 
 class DinoUiMuseumMenu : public DinoHelpBase, public MMenu {
 public:
+    MSmartOam *GetOam() { return mOam; }
     virtual ~DinoUiMuseumMenu();
     virtual void OnStart();
     virtual void OnIdle();
@@ -37,7 +39,8 @@ public:
     void FinishPageRight();
     void FinishPageLeft();
 
-    u8 unkB3[0xB8 - 0xB3];  // members start in MMenu's tail padding
+    u8 unkB3[1];            // members start in MMenu's tail padding
+    MSmartOam *mOam;        // 0xB4: the items' sprites
     MMenuItem *mLinkFrom;   // 0xB8: linked down to the slots
     u8 unkBC[0xD8 - 0xBC];
     MPictureFile *mPicture; // 0xD8
@@ -65,8 +68,11 @@ public:
     virtual void Idle();
 };
 
+class DinoUiMuseumMenu;
+
 class DinoUiMuseumMenuItem : public MMenuItem, public DinoHelpItem {
 public:
+    DinoUiMuseumMenuItem(DinoUiMuseumMenu *owner, const std::string &path, MPoint pos, u32 textId);
     virtual ~DinoUiMuseumMenuItem();
     virtual MRect GetFrame();
     virtual void OnFocusChanged(BOOL focused);
@@ -74,7 +80,7 @@ public:
     virtual MDisplay *GetDisplay();
     virtual const char *GetText();
 
-    void *mOwner;       // 0x94
+    DinoUiMuseumMenu *mOwner;  // 0x94
     MMotion *mMotion;   // 0x98
     u32 mTextId;        // 0x9C
 };
@@ -112,6 +118,7 @@ class DinoUiMuseumInformationMenu;
 
 class DinoUiMuseumInformationMenuItem : public MMenuItem, public DinoHelpItem {
 public:
+    DinoUiMuseumInformationMenuItem(DinoUiMuseumInformationMenu *owner, const std::string &path, MPoint pos, u32 textId);
     virtual ~DinoUiMuseumInformationMenuItem();
     virtual MRect GetFrame();
     virtual void OnFocusChanged(BOOL focused);

@@ -10,8 +10,10 @@
 #include "game/help.h"
 #include "game/dino_ui_rv_status_menu_item.h"
 
+class MSmartOam;
 class DinoUiRvStatusMenu : public DinoHelpBase, public MMenu {
 public:
+    MSmartOam *GetOam() { return mOam; }
     virtual ~DinoUiRvStatusMenu();
     virtual void OnStart();
     virtual void OnFocus(MMenuItem *item);
@@ -22,7 +24,8 @@ public:
     void ShowPage();
     void SelectTab(u8 tab);
 
-    u32 mUnkB4[4];
+    MSmartOam *mOam;    // 0xB4: the items' sprites
+    u32 mUnkB8[3];
     MMenuItem *mTabItems[4]; // 0xC4
     MSerialTaskSet *mCursorTasks;   // 0xD4
     DinoUiFieldMenuCursor *mCursor; // 0xD8

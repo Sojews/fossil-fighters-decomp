@@ -8,11 +8,13 @@
 #include "m/motion.h"
 #include "game/help.h"
 
+class MSmartOam;
 class DinoUiFieldMenuFraction;
 class MTextPicture;
 
 class DinoUiMedalMenu : public DinoHelpBase, public MMenu {
 public:
+    MSmartOam *GetOam() { return mOam; }
     DinoUiMedalMenu(u32 *mode, u32 *index, u8 *unk);
     virtual ~DinoUiMedalMenu();
     virtual void OnStart();
@@ -32,7 +34,8 @@ public:
     void SetSort(u8 sort);
     void Sort(u8 sort);
 
-    u32 mUnkB4[14];                     // 0xB4
+    MSmartOam *mOam;                    // 0xB4: the items' sprites
+    u32 mUnkB8[13];                     // 0xB8
     MTextPicture *mSortCursor;          // 0xEC
     u32 mUnkF0[5];                      // 0xF0
     MMenuItem *mSlots[15];              // 0x104
@@ -90,6 +93,7 @@ class DinoUiMedalMenu;
 
 class DinoUiMedalMenuItem : public MMenuItem, public DinoHelpItem {
 public:
+    DinoUiMedalMenuItem(DinoUiMedalMenu *owner, const std::string &path, MPoint pos, u32 textId);
     virtual ~DinoUiMedalMenuItem();
     virtual MRect GetFrame();
     virtual MRect GetRect();

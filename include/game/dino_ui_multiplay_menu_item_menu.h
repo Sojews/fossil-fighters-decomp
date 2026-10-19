@@ -8,15 +8,19 @@
 #include "game/dino_ui_multiplay_menu_item2.h"
 #include "game/dino_ui_multiplay_menu_item.h"
 
+class MSmartOam;
 class DinoUiMultiplayMenu : public DinoHelpBase, public MMenu {
 public:
+    MSmartOam *GetOam() { return mOam; }
     DinoUiMultiplayMenu(int *result);
     virtual ~DinoUiMultiplayMenu();
     virtual void OnStart();
     virtual void OnFocus(MMenuItem *item);
     void Decide(int choice);
 
-    u8 unkB3[0x1D];  // members start in MMenu's tail padding
+    u8 unkB3[1];     // members start in MMenu's tail padding
+    MSmartOam *mOam; // 0xB4: the items' sprites
+    u8 unkB8[0x18];
     int *mResult;    // 0xD0
     u8 mSilentFocus; // 0xD4
 };

@@ -7,8 +7,10 @@
 #include "game/dino_ui_status_menu_item.h"
 
 struct DinoTeam;
+class MSmartOam;
 class DinoUiStatusMenu : public DinoHelpBase, public MMenu {
 public:
+    MSmartOam *GetOam() { return mOam; }
     DinoUiStatusMenu(int *choice, DinoTeam *team, DinoTeam *team2);
     virtual ~DinoUiStatusMenu();
     virtual void OnStart();
@@ -20,7 +22,9 @@ public:
     void DecideMember(int index);
     void SelectMember(int index);
 
-    u8 unkB3[0xD];              // members start in MMenu's tail padding
+    u8 unkB3[1];                // members start in MMenu's tail padding
+    MSmartOam *mOam;            // 0xB4: the items' sprites
+    u8 unkB8[8];
     MMenuItem *mTabItems[3];    // 0xC0
     u32 mUnkCC[2];              // 0xCC
     MMenuItem *mMembers[5];     // 0xD4

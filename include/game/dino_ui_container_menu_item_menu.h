@@ -13,12 +13,14 @@
 #include "game/dino_ui_container_menu_item.h"
 
 struct DinoTeam;
+class MSmartOam;
 class DinoUiPartsRockName;
 
 class DinoUiContainerMenuItem;
 
 class DinoUiContainerMenu : public DinoHelpBase, public MMenu {
 public:
+    MSmartOam *GetOam() { return mOam; }
     DinoUiContainerMenu(int *choice, DinoTeam *team, DinoTeam *team2);
     virtual ~DinoUiContainerMenu();
     virtual void OnStart();
@@ -35,7 +37,8 @@ public:
     void RefreshPage2();
     void RefreshOKButton();
 
-    u32 mUnkB4[2];              // 0xB4
+    MSmartOam *mOam;            // 0xB4: the items' sprites
+    u32 mUnkB8;                 // 0xB8
     DinoUiContainerMenuItem *mOKButton; // 0xBC
     MMenuItem *mTabItems[3];    // 0xC0
     u32 mUnkCC;                 // 0xCC

@@ -10,6 +10,7 @@ class DinoUiMaskEquipMenu;
 
 class DinoUiMaskEquipMenuItem : public MMenuItem, public DinoHelpItem {
 public:
+    DinoUiMaskEquipMenuItem(DinoUiMaskEquipMenu *owner, const std::string &path, MPoint pos, u32 textId);
     virtual ~DinoUiMaskEquipMenuItem();
     virtual MRect GetFrame();
     virtual void OnFocusChanged(BOOL focused);

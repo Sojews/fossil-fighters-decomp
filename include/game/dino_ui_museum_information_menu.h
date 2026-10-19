@@ -10,8 +10,10 @@
 #include "game/help.h"
 #include "game/dino_field_camera_hook.h"
 
+class MSmartOam;
 class DinoUiMuseumInformationMenu : public DinoHelpBase, public MMenu {
 public:
+    MSmartOam *GetOam() { return mOam; }
     virtual ~DinoUiMuseumInformationMenu();
     virtual void OnStart();
     virtual void OnIdle();
@@ -20,7 +22,8 @@ public:
     void PageLeft();
     void PlayVoice();
 
-    u8 unkB4[0x3C];
+    MSmartOam *mOam;    // 0xB4: the items' sprites
+    u8 unkB8[0x38];
     struct Info {
         u32 *mCreatures;    // 0x00: one per page
         u32 mPageCount;     // 0x04

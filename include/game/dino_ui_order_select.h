@@ -19,8 +19,10 @@
 // (The data's layout isn't known yet.)
 struct DinoUiOrderSelectData;
 
+class MSmartOam;
 class DinoUiOrderSelectMenu : public DinoHelpBase, public MMenu {
 public:
+    MSmartOam *GetOam() { return mOam; }
     virtual ~DinoUiOrderSelectMenu();
     virtual void OnStart();
     virtual void OnIdle();
@@ -37,7 +39,9 @@ public:
     void FinishPage();
     void FinishTab();
 
-    u8 unkB3[0xC0 - 0xB3];
+    u8 unkB3[1];
+    MSmartOam *mOam;            // 0xB4: the items' sprites
+    u8 unkB8[0xC0 - 0xB8];
     MMenuItem *mTabs[4];        // 0xC0
     u8 unkD0[0xD4 - 0xD0];
     MPictureFile *mPictures[4]; // 0xD4
@@ -65,8 +69,11 @@ public:
     std::string mUnk78; // 0x78
 };
 
+class DinoUiOrderSelectMenu;
+
 class DinoUiOrderSelectMenuItem : public MMenuItem, public DinoHelpItem {
 public:
+    DinoUiOrderSelectMenuItem(DinoUiOrderSelectMenu *owner, const std::string &path, MPoint pos, u32 textId);
     virtual ~DinoUiOrderSelectMenuItem();
     virtual MRect GetFrame();
     virtual void OnFocusChanged(BOOL focused);
@@ -74,7 +81,7 @@ public:
     virtual MDisplay *GetDisplay();
     virtual const char *GetText();
 
-    void *mOwner;       // 0x94
+    DinoUiOrderSelectMenu *mOwner;  // 0x94
     MMotion *mMotion;   // 0x98
     u32 mTextId;        // 0x9C
 };

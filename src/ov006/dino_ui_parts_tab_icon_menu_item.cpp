@@ -122,3 +122,17 @@ void DinoUiStatusMenu::OnDecide(MMenuItem *item) {
         }
     }
 }
+
+#pragma auto_inline off
+
+DinoUiStatusMenuItem::DinoUiStatusMenuItem(DinoUiStatusMenu *owner, const std::string &path, MPoint pos, u32 textId) {
+    mOwner = owner;
+    mTextId = textId;
+    mMotion = new MMotion(std::string(path), mOwner->GetOam(), 2, 1);
+    mMotion->Play(2, 0);
+    mMotion->SetPosition(pos);
+    mMotion->SetPriority(2);
+    mMotion->Show();
+    mParallel.AddTail(mMotion);
+    mMotion->GetUnit()->SetMode(1);
+}

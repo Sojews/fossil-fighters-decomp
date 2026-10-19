@@ -76,6 +76,17 @@ template MTask *MCreateCallTask(DinoUiOrderSelectMenu *obj, void (DinoUiOrderSel
 
 #pragma auto_inline off
 
+DinoUiOrderSelectMenuItem::DinoUiOrderSelectMenuItem(DinoUiOrderSelectMenu *owner, const std::string &path, MPoint pos, u32 textId) {
+    mOwner = owner;
+    mTextId = textId;
+    mMotion = new MMotion(std::string(path), mOwner->GetOam(), 2, 1);
+    mMotion->Play(1, 0);
+    mMotion->SetPosition(pos);
+    mMotion->SetPriority(2);
+    mMotion->Show();
+    mParallel.AddTail(mMotion);
+}
+
 DinoUiOrderSelectMenu::~DinoUiOrderSelectMenu() {
     if (mPictures[0] != NULL) {
         for (int i = 0; i < 4; i++) {

@@ -9,11 +9,13 @@
 #include "game/help.h"
 #include "game/dino_ui_mask_equip_menu_item.h"
 
+class MSmartOam;
 class DinoUi3PartsCursor;
 class MIndicator;
 
 class DinoUiMaskEquipMenu : public DinoHelpBase, public MMenu {
 public:
+    MSmartOam *GetOam() { return mOam; }
     DinoUiMaskEquipMenu();
     virtual ~DinoUiMaskEquipMenu();
     virtual void OnStart();
@@ -28,7 +30,7 @@ public:
     void ClearItems();
     void RefreshPage2();
 
-    u32 mUnkB4;
+    MSmartOam *mOam;        // 0xB4: the items' sprites
     MMenuItem *mLinkFrom;   // 0xB8: linked to the first page item
     u32 mUnkBC;
     std::vector<void *> mItems; // 0xC0: this page's items

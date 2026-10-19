@@ -9,8 +9,10 @@
 #include "game/help.h"
 #include "game/dino_ui_container_drop_menu_item.h"
 
+class MSmartOam;
 class DinoUiContainerDropMenu : public DinoHelpBase, public MMenu {
 public:
+    MSmartOam *GetOam() { return mOam; }
     virtual ~DinoUiContainerDropMenu();
     virtual void OnStart();
     virtual void OnIdle();
@@ -21,7 +23,8 @@ public:
     BOOL PageLeft();
     void ShowPage();
 
-    u32 mUnkB4[4];              // 0xB4
+    MSmartOam *mOam;            // 0xB4: the items' sprites
+    u32 mUnkB8[3];              // 0xB8
     std::vector<void *> mUnkC4; // 0xC4
     u32 mUnkD0[5];              // 0xD0
     std::vector<std::string> mUnkE4; // 0xE4
