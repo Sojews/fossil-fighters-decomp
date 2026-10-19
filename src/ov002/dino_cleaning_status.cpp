@@ -6,6 +6,7 @@
 #include "game/dino_cleaning_status.h"
 #include "game/dino_cleaning_timer.h"
 #include "game/dino_cleaning_score.h"
+#include "m/smart_oam.h"
 
 DinoCleaningStatus::~DinoCleaningStatus() {
 }
@@ -39,10 +40,14 @@ template class std::__vec_deleter<DinoCleaningStatusEntry, std::allocator<DinoCl
 // The TU's pooled pointer-to-member constants (see menu.cpp).
 extern "C" struct {
     u8 unk00[0x14];
-    void (DinoCleaningStatus::*Unk0215b4c0_14)();
+    void (DinoCleaningStatus::*StatePaused_14)();
 } data_ov002_021649cc;
 
 void DinoCleaningStatus::StatePause() {
     mTimer->Pause();
-    mState = data_ov002_021649cc.Unk0215b4c0_14;
+    mState = data_ov002_021649cc.StatePaused_14;
+}
+
+void DinoCleaningStatus::StatePaused() {
+    GetSerial()->AddTail(mOam->CreateHideTransfer(), new MTimer(15), mOam->CreateShowTransfer(), new MTimer(15));
 }

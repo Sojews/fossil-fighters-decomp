@@ -12,6 +12,8 @@ struct DinoCleaningStatusEntry {
 class DinoCleaningTimer;
 class DinoCleaningScore;
 
+class MSmartOam;
+
 class DinoCleaningStatus : public MProcess {
 public:
     virtual ~DinoCleaningStatus();
@@ -22,11 +24,14 @@ public:
     void Start();
     void Stop();
     void StatePause();
+    // Blinks while paused.
+    void StatePaused();
 
     void (DinoCleaningStatus::*mState)(); // 0x74
     u32 unk7C[2];
     DinoCleaningTimer *mTimer;            // 0x84
     DinoCleaningScore *mScore;            // 0x88
+    MSmartOam *mOam;                      // 0x8C
 };
 
 #endif

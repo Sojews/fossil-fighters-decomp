@@ -4,6 +4,7 @@
 // Derived destructors have their bases' destructor bodies inlined; auto-inlining the ones defined above does that.
 #pragma auto_inline on
 
+#include "game/dino_backup.h"
 #include "game/dino_ui_rv_status_menu_item_menu.h"
 #include "game/dino_ui_rv_status_menu_item.h"
 #include "game/help.h"
@@ -167,6 +168,22 @@ extern "C" struct {
 extern "C" struct {
     void (DinoHelpBase::*Enable_00)();
 } data_ov006_02193a48;
+
+extern "C" struct {
+    void (DinoHelpBase::*Enable_00)();
+} data_ov006_02193a10;
+
+// Shows the page's creature, with help back once the information has.
+void DinoUiRvStatusMenu::ShowPage() {
+    mFraction->SetNumerator(mPage + 1);
+    DinoCreatureState creature;
+    gDinoBackup->GetCreature((u32)mUnkE8[mPage], &creature);
+    mInfo->Unk02156ee8(*(DinoCreatureInfo *)&creature);
+    GetSerial()->AddTail(MTaskSetWaitEmptyTask::Create(&mInfo->mSerial),
+                         MCreateCallTask(this, data_ov006_02193a10.Enable_00));
+    Disable();
+    RefreshTab();
+}
 
 void DinoUiRvStatusMenu::SelectTab(u8 tab) {
     if (tab > 3 || mTab == tab) {
