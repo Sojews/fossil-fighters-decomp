@@ -13,8 +13,12 @@ class MSmartOam;
 // The fossil rock being cleaned: an outer rock layer over the fossil.
 class DinoCleaningKasekiRockXrayBlendManager;
 
+class DinoCleaning;
+
 class DinoCleaningKasekiRock : public MProcess {
 public:
+    DinoCleaningKasekiRock(DinoCleaning *cleaning, u32 a, u32 b, u32 c, u32 d, u8 e, u32 f, u32 g, u32 h, u8 i, u8 j,
+                           u32 k, u32 l);
     virtual ~DinoCleaningKasekiRock();
     virtual void Idle();
 

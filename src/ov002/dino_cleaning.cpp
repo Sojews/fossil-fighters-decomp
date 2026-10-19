@@ -232,7 +232,9 @@ extern "C" struct {
     int mZero_2C;               // 0x2C: (the constant the count's shake is clamped to)
     u8 unk30[0x48 - 0x30];
     void (DinoCleaning::*State02160638_48)(); // 0x48
-    u8 unk50[0x78 - 0x50];
+    u8 unk50[0x58 - 0x50];
+    void (DinoCleaning::*State02160de8_58)(); // 0x58
+    u8 unk60[0x78 - 0x60];
     void (DinoCleaning::*Unk02161490_78)();
 } data_ov002_021659ec;
 extern "C" struct {
@@ -334,6 +336,16 @@ DinoCleaning::DinoCleaning(u32 unk9C, void *unkA0, u32 unkA8, u32 unkAC, int mod
     mUnk138 = 0;
     mUnk140 = unk140;
     mState = data_ov002_021659ec.State02160638_48;
+}
+
+// Creates the kaseki rock (and runs it once).
+void DinoCleaning::State02160de8() {
+    DinoCleaningKasekiRock *rock = new DinoCleaningKasekiRock(this, mUnk120, mUnkB4, mUnkC0, mUnkA8, mUnkBC, mUnkB8,
+                                                              mUnkC4, mUnkAC, mUnkC8, mUnkC9, mUnkCC, mUnkD0);
+    if (rock->MTask::mState == STATE_RUN) {
+        rock->Execute();
+    }
+    mKasekiRock = rock;
 }
 
 // Starts the status display, then waits a moment.

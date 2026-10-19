@@ -43,6 +43,7 @@ public:
     void StateStopConfirm();
     void StateQuit();
     void State02160638();
+    void State02160de8();
     void State02160e78();
     void State02160f54();
     void State021610b0();
@@ -58,7 +59,15 @@ public:
     u32 mUnkA8;                     // 0xA8
     u32 mUnkAC;                     // 0xAC
     int mMode;                      // 0xB0
-    u8 unkB4[0xD4 - 0xB4];
+    u32 mUnkB4;                     // 0xB4
+    u32 mUnkB8;                     // 0xB8
+    u8 mUnkBC;                      // 0xBC
+    u32 mUnkC0;                     // 0xC0
+    u32 mUnkC4;                     // 0xC4
+    u8 mUnkC8;                      // 0xC8
+    u8 mUnkC9;                      // 0xC9
+    u32 mUnkCC;                     // 0xCC
+    u32 mUnkD0;                     // 0xD0
     u32 mUnkD4;                     // 0xD4
     DinoCleaningKasekiRock *mKasekiRock; // 0xD8
     MInput *mUnkDC;                 // 0xDC
@@ -74,7 +83,7 @@ public:
     u32 mUnk114;                    // 0x114
     MTextPicture *mUnk118;          // 0x118: the count's text
     MTaskSet *mUnk11C;              // 0x11C
-    u32 unk120;
+    u32 mUnk120;                    // 0x120
     u32 mUnk124;                    // 0x124
     u8 mUnk128;                     // 0x128: a tool task runs instead of the scene
     u8 unk129[0x138 - 0x129];
