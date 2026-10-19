@@ -25,16 +25,29 @@ public:
     void SetUnk1B1(u8 value);
     void SetUnk1AC(u32 value);
     MTask *CreateWaitModelTask();   // waits until the 3D model's tasks finish
+    // Shows the page's second picture (the last three pictures, hidden at first).
+    void CreateSubPicture();
+    void Unk02156800();
+    void Unk021571bc();
+    void Unk02156ee8(DinoCreatureInfo info);
 
     MPictureFile *mPictures[10];        // 0x74
-    u8 unk9C[0x174 - 0x9C];
+    MTextPicture *mPagePicture;         // 0x9C
+    u8 unkA0[4];
+    MTextPicture *mSubPicture;          // 0xA4
+    u8 unkA8[0x168 - 0xA8];
+    MTaskSet *mPictureTasks;            // 0x168
+    MTaskSet *mUnk16C;                  // 0x16C
+    u8 unk170[0x174 - 0x170];
     DinoUiRvInformation3DModel *mModel; // 0x174
-    u8 unk178[0x194 - 0x178];
+    u8 mPage;                           // 0x178
+    DinoCreatureInfo mInfo;             // 0x17C
     u8 mHasTenPictures;                 // 0x194: else 7
-    u8 unk195[0x19C - 0x195];
+    u8 mUnk195;                         // 0x195
+    u32 mUnk198;                        // 0x198
     MResource<DinoUiRvInformationData> mUnk19C; // 0x19C
     u32 mUnk1AC;                        // 0x1AC
-    u8 unk1B0;
+    u8 mUnk1B0;                         // 0x1B0
     u8 mUnk1B1;                         // 0x1B1
 };
 
