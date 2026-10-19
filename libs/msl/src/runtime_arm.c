@@ -21,7 +21,7 @@ void _dgr(void);
 void _dleq(void);
 void _dls(void);
 void _deq(void);
-void func_02085774(void);
+void _dneq(void);
 void func_02085800(void);
 void func_0208585c(void);
 void func_02085868(void);
@@ -1414,7 +1414,7 @@ asm void _deq(void) {
     b @20856fc
 }
 
-asm void func_02085774(void) {
+asm void _dneq(void) {
     mov ip, #0x200000
     cmn ip, r1, lsl #1
     bhs @20857dc
