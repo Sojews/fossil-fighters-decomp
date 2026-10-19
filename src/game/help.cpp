@@ -12,6 +12,7 @@
 #include "m/blend.h"
 #include "m/smart_oam.h"
 #include "m/display.h"
+#include "m/bright.h"
 
 static DinoHelpDriver *sHelpDriver;
 static DinoHelpBase *sHelpCurrentBase;
@@ -130,6 +131,33 @@ void DinoHelpDriver::NotifyClose() {
             (*it)->Unk0C();
         }
     }
+}
+
+// Whether there is help to show: help is on, the current base is enabled, neither screen is faded and one of the
+// base's enabled items has text.
+// NONMATCHING: the game keeps copies of the list iterators on the stack.
+BOOL DinoHelpDriver::CanShowHelp() {
+    MScopedLock lock(&sHelpMutex, TRUE);
+    if (mEnableCount <= 0) {
+        return FALSE;
+    }
+    if (sHelpCurrentBase == NULL) {
+        return FALSE;
+    }
+    if (!sHelpCurrentBase->IsEnabled()) {
+        return FALSE;
+    }
+    if ((gLcd->GetTopDisplay()->mBright->GetMode() != 0 && gLcd->GetTopDisplay()->mBright->GetFactor() != 0) ||
+        (gLcd->GetBottomDisplay()->mBright->GetMode() != 0 && gLcd->GetBottomDisplay()->mBright->GetFactor() != 0)) {
+        return FALSE;
+    }
+    for (std::list<DinoHelpItem *>::iterator it = mItems.begin(); it != mItems.end(); it++) {
+        if ((*it)->mBase == sHelpCurrentBase && (*it)->IsEnabled() && (*it)->GetText() != NULL &&
+            (*it)->GetText()[0] != '\0') {
+            return TRUE;
+        }
+    }
+    return FALSE;
 }
 
 void DinoHelpDriver::AddEntry(u32 a, u32 b, u32 c) {
