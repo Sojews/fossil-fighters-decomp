@@ -299,7 +299,7 @@ _ZN27DinoUiContainerDropMenuItemC1EP23DinoUiContainerDropMenuRKSs6MPointm kind:f
 func_ov005_0215ddd4 kind:function(thumb,size=0x1a4) addr:0x0215ddd4
 _ZN23DinoUiContainerDropMenu6OnIdleEv kind:function(thumb,size=0x58) addr:0x0215df78
 _ZN23DinoUiContainerDropMenu7OnFocusEP9MMenuItem kind:function(thumb,size=0x16c) addr:0x0215dfd0
-func_ov005_0215e13c kind:function(thumb,size=0x66) addr:0x0215e13c
+_Z14DinoReplaceTagSsSsSs_ov005 kind:function(thumb,size=0x66) addr:0x0215e13c
 _ZN23DinoUiContainerDropMenu8OnDecideEP9MMenuItem kind:function(thumb,size=0x184) addr:0x0215e1a4
 _ZN23DinoUiContainerDropMenu13OnBackDecidedEv kind:function(thumb,size=0xd0) addr:0x0215e328
 _ZN23DinoUiContainerDropMenu9PageRightEv kind:function(thumb,size=0x26) addr:0x0215e3f8
