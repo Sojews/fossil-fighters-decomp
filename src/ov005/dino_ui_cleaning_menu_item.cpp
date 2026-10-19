@@ -233,12 +233,37 @@ void DinoUiCleaningTest::Finish() {
 extern "C" struct {
     u8 unk00[0xC];
     void (DinoUiCleaningTest::*Setup_0C)();
-    void (DinoUiCleaningTest::*Unk_14)();
+    void (DinoUiCleaningTest::*Leave_14)();
     void (DinoUiCleaningTest::*Finish_1C)();
 } data_ov005_02167204;
 
 DinoUiCleaningTest::DinoUiCleaningTest() : MProcess(NULL) {
     mState = data_ov005_02167204.Setup_0C;
+}
+
+// Shows the lower screen, and gives the player sixteen fossils and ten kaseki rocks to clean.
+void DinoUiCleaningTest::Setup() {
+    gLcd->mSub->ResetHooks();
+    gLcd->mSub->Setup(5, 2, 4, 1, 0, 0);
+    gLcd->VSyncNow();
+    gLcd->mSub->SetBackdrop(0x8000);
+    gLcd->mSub->mObj->Show();
+    gLcd->SetBottomDisplay(gLcd->mSub);
+    gCurrentDisplay = gLcd->GetBottomDisplay();
+    gDinoBackup->SetSystemVar(2, 3);
+    DinoBackupEntry entry;
+    MI_CpuFill8(&entry, 0, sizeof(entry));
+    for (int i = 0; i < 16; i++) {
+        entry.id = i + 1;
+        gDinoBackup->SetUnk98(i, &entry);
+    }
+    u32 rock;
+    for (int i = 0; i < 10; i++) {
+        gDinoBackup->GetKasekiRock(i + 1, &rock);
+        rock |= 0x400;
+        gDinoBackup->SetKasekiRock(i + 1, &rock);
+    }
+    mState = data_ov005_02167204.Leave_14;
 }
 
 void DinoUiCleaningTest::Leave() {
