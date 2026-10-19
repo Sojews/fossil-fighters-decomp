@@ -19,6 +19,8 @@ public:
 
     // Asks which file to delete: only the saved slots and cancel stay enabled.
     void StartDelete();
+    // Deletes the slot's save (after the player confirmed it).
+    void DeleteSlot(u32 slot);
 
     u32 *mResult;   // 0xB4
     u32 mUnkB8;     // 0xB8

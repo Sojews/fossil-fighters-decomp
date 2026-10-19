@@ -542,12 +542,89 @@ void DinoUiEnding::StateEnd() {
 
 // Template task instances the game emits in this file. Until the code that makes the tasks is decompiled, they are
 // instantiated explicitly.
+#pragma auto_inline off
 template class MCallTask1<DinoUiSaveSlotSelectMenu, DinoUiSaveSlotSelectMenu, u32>;
 template MTask *MCreateCallTask(DinoUiSaveSlotSelectMenu *obj, void (DinoUiSaveSlotSelectMenu::*func)(u32), u32 a0);
 template class MCallTask0<DinoUiSaveSlotSelectMenu, DinoUiSaveSlotSelectMenu>;
 template MTask *MCreateCallTask(DinoUiSaveSlotSelectMenu *obj, void (DinoUiSaveSlotSelectMenu::*func)());
+#pragma auto_inline reset
 template class MBgCallTask0<DinoUiOpening>;
 template MTask *MCreateBgCallTask(DinoUiOpening *obj, void (DinoUiOpening::*func)(), int thread);
+
+// The TU's pooled pointer-to-member constants.
+extern "C" struct {
+    void (DinoUiSaveSlotSelectMenu::*StartDelete_00)();
+} data_ov004_02172880;
+extern "C" struct {
+    void (DinoUiSaveSlotSelectMenu::*DeleteSlot_00)(u32);
+} data_ov004_021728b0;
+
+// Cancel leaves delete mode (or the screen); delete enters it; a slot is loaded, or (in delete mode) deleted once the
+// player confirms.
+void DinoUiSaveSlotSelectMenu::OnDecide(MMenuItem *item) {
+    if (item == mCancel) {
+        if (mDeleting) {
+            DinoSoundPlaySe(0x38F, 0);
+            mDeleting = FALSE;
+            data_ov004_02177280 = FALSE;
+            mDelete->MMenuItem::Enable();
+            mDelete->DinoHelpItem::Enable();
+            mMessage->Exit();
+            mSlots[0]->MMenuItem::Enable();
+            mSlots[1]->MMenuItem::Enable();
+            RemoveLink(mSlots[0], 4);
+            RemoveLink(mSlots[1], 2);
+            RemoveLink(mSlots[0], 2);
+            RemoveLink(mSlots[1], 4);
+            RemoveLink(mCancel, 4);
+            AddLink(mCancel, 4, mSlots[1]);
+            RemoveLink(mCancel, 2);
+            AddLink(mCancel, 2, mSlots[0]);
+            RemoveEntry((u32)(DinoHelpItem *)mCancel, 3);
+            AddLink(mSlots[0], 4, mDelete);
+            AddLink(mDelete, 2, mSlots[0]);
+            mSerial.AddTail(MTaskSetWaitEmptyTask::Create(&mCancel->mSerial));
+        } else {
+            DinoSoundPlaySe(0x38F, 0);
+            *mResult = 1;
+            MTask *exit = MTaskExitTransfer::Create(this);
+            MTask *wait = MTaskSetWaitEmptyTask::Create(&mCancel->mSerial);
+            MSerialTaskSet *serial = &mSerial;
+            serial->AddTail(wait);
+            serial->AddTail(exit);
+        }
+        return;
+    }
+    if (mDelete != NULL && item == mDelete) {
+        DinoSoundPlaySe(0x390, 0);
+        MTask *start = MCreateCallTask(this, data_ov004_02172880.StartDelete_00);
+        MTask *wait = mDelete->mMotion->CreateWaitStopTask();
+        MSerialTaskSet *serial = &mSerial;
+        serial->AddTail(wait);
+        serial->AddTail(start);
+        return;
+    }
+    if (item == mSlots[0] || item == mSlots[1]) {
+        DinoUiSaveSlotSelectMenuItem *slot = (DinoUiSaveSlotSelectMenuItem *)item;
+        DinoSoundPlaySe(0x390, 0);
+        if (mDeleting) {
+            MTask *confirm = new DinoUiSaveSlotSelectMenuConfirmDeleteTask(
+                MCreateCallTask(this, data_ov004_021728b0.DeleteSlot_00, slot->mSlot));
+            MTask *wait = slot->mMotion->CreateWaitStopTask();
+            MSerialTaskSet *serial = &mSerial;
+            serial->AddTail(wait);
+            serial->AddTail(confirm);
+        } else {
+            gDinoBackup->SetSlot(slot->mSlot);
+            *mResult = 0;
+            MTask *exit = MTaskExitTransfer::Create(this);
+            MTask *wait = slot->mMotion->CreateWaitStopTask();
+            MSerialTaskSet *serial = &mSerial;
+            serial->AddTail(wait);
+            serial->AddTail(exit);
+        }
+    }
+}
 
 void DinoUiSaveSlotSelectMenu::OnFocus(MMenuItem *item) {
     if (mSilentFocus) {
