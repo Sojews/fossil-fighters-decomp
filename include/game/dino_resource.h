@@ -39,7 +39,8 @@ struct DinoCreatureDefs {
 struct DinoCreatureDef {
     u8 unk00[0xD];
     u8 unk0D;
-    u8 unk0E[0x28 - 0xE];
+    u8 unk0E[0x24 - 0xE];
+    u32 types;              // 0x24: a bit per type
     u32 attackCount;        // 0x28
     u32 attackIds;          // 0x2C: offset of attackCount u32 attack ids
     u32 specialAttack;      // 0x30
