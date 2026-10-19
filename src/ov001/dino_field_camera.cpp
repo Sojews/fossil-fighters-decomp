@@ -175,6 +175,54 @@ void DinoFieldCamera::IdleUnk1() {
     mUnk114 = mFocusPos;
 }
 
+// The excavation settings' block at offset78 (only the camera's part is known).
+struct DinoExcavate78 {
+    u8 unk00[0x10];
+    MFx32 cameraEase;   // 0x10: how much of the camera's setting stays each frame as it eases to the default
+};
+
+// (The game passes the value through a copy.)
+static inline u32 MFx32ToRaw(MFx32 x) {
+    return x.v;
+}
+
+static inline const DinoExcavate78 *GetExcavate78(const DinoExcavateDefs *defs) {
+    if (defs->offset78 == 0) {
+        return NULL;
+    }
+    return (const DinoExcavate78 *)((const u8 *)defs + defs->offset78);
+}
+
+// Turns to the map's camera setting where the focus stands when it changes; while nothing turns, eases toward the
+// default setting as the focus moves.
+// NONMATCHING: stack slots only (the game puts the setting's scale above the easing's temporaries, and the position
+// test's below them).
+void DinoFieldCamera::IdleUnk2() {
+    if (mTracking) {
+        s32 old = mUnkEC;
+        mUnkEC = mField->GetMap()->GetCameraIndex(mFocusPos);
+        s32 index = mUnkEC;
+        if (old != index) {
+            if (index != 0) {
+                DinoFieldMapCamera *camera = mField->GetMap()->GetCamera(index);
+                StartRotate(camera->x, camera->y, camera->z, MFx32ToRaw(camera->scale), 60, 12);
+            } else {
+                StartRotate(mUnk100, mUnk102, mUnk104, mUnk108.v, 60, 12);
+            }
+        }
+        if (mUnkE8->IsEmpty() && mUnkEC == 0 && !(mUnk114 == mFocusPos)) {
+            const MFx32 t = GetExcavate78(gDinoResource->GetExcavateDefs().Get())->cameraEase;
+            DinoFieldMapCamera camera;
+            camera.x = LerpAngle(mUnkD4, mUnk100, t);
+            camera.y = LerpAngle(mUnkD6, mUnk102, t);
+            camera.z = LerpAngle(mUnkD8, mUnk104, t);
+            camera.scale = mUnkDC * t + mUnk108 * (MFx32(1) - t);
+            SetUnkD4(camera.x, camera.y, camera.z, camera.scale);
+        }
+    }
+    mUnk114 = mFocusPos;
+}
+
 void DinoFieldCamera::Read(const void *buf) {
     MSerializer::Read(buf);
     if (mSavedSteps != 0) {

@@ -129,6 +129,10 @@ struct MFx32Point {
     MFx32 y;
 };
 
+inline bool operator==(const MFx32Point &a, const MFx32Point &b) {
+    return a.x == b.x && a.y == b.y;
+}
+
 inline MFx32Point operator+(const MFx32Point &a, const MFx32Point &b) {
     return MFx32Point(a.x + b.x, a.y + b.y);
 }
