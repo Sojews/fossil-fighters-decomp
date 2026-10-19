@@ -151,4 +151,7 @@ public:
     MArchive *mArchive;
 };
 
+// Walks the open archives (whatever it did with them isn't in this build).
+void MDumpArchives();
+
 #endif
