@@ -7,6 +7,9 @@
 #include "m/task.h"
 
 class MSmartOam;
+class MInput;
+class MConsole;
+class MView;
 
 class DinoCommonTutorialWindow : public MProcess {
 public:
@@ -26,13 +29,17 @@ public:
     void ShowLongArrow(MPoint pos, int dir);
     void ShowShortArrow(MPoint pos, int dir);
     void ShowCorners(MRect rect);
+    // Pages through the text: A, B or the debug buttons hurry it up, then turn the page (or close at the end).
+    void StateRead();
+    void StateClose();
 
     void (DinoCommonTutorialWindow::*mState)(); // 0x74
     std::string mText;  // 0x7C
-    u32 unk88[2];
+    MInput *mInput;     // 0x88
+    MConsole *mConsole; // 0x8C
     MTaskSet *mArrows;  // 0x90: the pointing arrows shown
     MSmartOam *mOam;    // 0x94
-    u32 unk98;
+    MView *mNextMark;   // 0x98: shown while a page waits
 };
 
 #endif

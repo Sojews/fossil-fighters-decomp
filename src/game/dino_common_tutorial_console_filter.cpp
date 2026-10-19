@@ -8,6 +8,9 @@
 #include "game/dino_common_tutorial_window.h"
 #include "game/dino_sound.h"
 #include "m/motion.h"
+#include "m/view.h"
+#include "m/input.h"
+#include "m/console.h"
 
 DinoCommonTutorialConsoleFilter::~DinoCommonTutorialConsoleFilter() {
 }
@@ -27,12 +30,39 @@ extern "C" struct {
     const char *bgPath;             // 0x10
     const char *cursorPath;         // 0x14
     const char *shortArrowPath;     // 0x18
-    u8 unk1C[0x2C - 0x1C];
+    u8 unk1C[0x24 - 0x1C];
+    void (DinoCommonTutorialWindow::*StateClose_24)();
     void (DinoCommonTutorialWindow::*Start_2C)();
 } data_020b5e5c;
 
 DinoCommonTutorialWindow::DinoCommonTutorialWindow(MDisplay *display, std::string text) : MProcess(display), mText(text) {
     mState = data_020b5e5c.Start_2C;
+}
+
+void DinoCommonTutorialWindow::StateRead() {
+    if (mConsole->mState == STATE_SUSPEND) {
+        mNextMark->Show();
+        if (mInput->GetPressed() & 0x1003) {
+            DinoSoundPlaySe(0x93, 0);
+            if (mConsole->IsEmpty()) {
+                mState = data_020b5e5c.StateClose_24;
+                return;
+            }
+            mNextMark->Hide();
+            mConsole->Clear();
+            mConsole->SetSpeed(MFx32(2));
+            mConsole->Run();
+        }
+    } else if (mInput->GetPressed() & 0x1003) {
+        DinoSoundPlaySe(0xAF, 0);
+        mConsole->SetSpeed(MFx32(0));
+    }
+}
+
+void DinoCommonTutorialWindow::StateClose() {
+    SetActive(FALSE);
+    DinoSoundPlaySe(0xA9, 0);
+    Exit();
 }
 
 // Points at pos with an arrow (dir picks the anime).
