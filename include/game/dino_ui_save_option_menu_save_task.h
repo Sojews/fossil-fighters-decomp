@@ -10,15 +10,15 @@ public:
     DinoUiSaveOptionMenuSaveTask(DinoUiSaveOptionMenu *menu, u32 arg) : MProcess(NULL) {
         mMenu = menu;
         mArg = arg;
-        mUnk7C = 0;
+        mStep = 0;
     }
     virtual ~DinoUiSaveOptionMenuSaveTask();
     virtual void Idle();
 
     DinoUiSaveOptionMenu *mMenu;    // 0x74
-    u32 mArg;                       // 0x78
-    u32 mUnk7C;                     // 0x7C
-    u32 mUnk80;                     // 0x80
+    u32 mArg;                       // 0x78: (a u32 *) set when the game was saved and the menu is left
+    u32 mStep;                      // 0x7C
+    u32 mResult;                    // 0x80: the save menu's
 };
 
 #endif

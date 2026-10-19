@@ -15,6 +15,7 @@
 #include "game/dino_ui_save_option_menu_save_task.h"
 #include "game/dino_ui_save_option_menu_item.h"
 #include "game/dino_sound.h"
+#include "game/dino_ui_save_menu.h"
 
 DinoUiSaveOption::~DinoUiSaveOption() {
 }
@@ -78,6 +79,35 @@ void DinoUiSaveOptionBackButton::OnFocusChanged(BOOL focused) {
 void DinoUiSaveOptionRemoveItemTask::Execute() {
     mOwner->RemoveItem();
     Exit();
+}
+
+// Saves through the save menu, then goes back to the options or leaves.
+void DinoUiSaveOptionMenuSaveTask::Idle() {
+    switch (mStep++) {
+    case 0:
+        mMenu->RemoveItem();
+        mSerial.AddTail(new DinoUiSaveMenu(&mResult, 0));
+        break;
+    case 1:
+        switch (mResult) {
+        case 2:
+            if (mArg != 0) {
+                *(u32 *)mArg = 1;
+            }
+            mMenu->OnBackDecided();
+            Exit();
+            break;
+        case 1:
+            mMenu->OnBackDecided();
+            Exit();
+            break;
+        case 0:
+            mMenu->AppendItem(1);
+            Exit();
+            break;
+        }
+        break;
+    }
 }
 
 void DinoUiSaveOptionBackButton::OnDecide() {
@@ -167,6 +197,7 @@ void DinoUiSaveOption::Idle() {
 }
 
 #pragma auto_inline off
+
 
 u32 DinoUiSaveOptionMenu::GetUnkB8() {
     return mUnkB8;
