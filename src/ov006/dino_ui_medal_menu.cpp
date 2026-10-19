@@ -200,14 +200,14 @@ void DinoUiMedalMenu::LinkItems() {
 void DinoUiMedalMenu::LoadPage() {
     int count;
     if (mPage == mLastPage) {
-        count = mUnk19C.size() - mPage * 15;
+        count = mCreatures.size() - mPage * 15;
     } else {
         count = 15;
     }
     mMotions.clear();
     for (int i = 0; i < count; i++) {
         char path[0x100];
-        OS_SPrintf(path, "/motion/ui_reviver_medal/reviver_%03d.bin", mUnk19C[mPage * 15 + i]);
+        OS_SPrintf(path, "/motion/ui_reviver_medal/reviver_%03d.bin", mCreatures[mPage * 15 + i]);
         mMotions.push_back(MMotionFile(std::string(path), 7));
     }
 }
@@ -317,37 +317,62 @@ void DinoUiMedalMenu::SetSort(u8 sort) {
     }
 }
 
-// Lists the creatures in the order: 0 and 1 are kept lists, the rest sort mUnk1A8.
+void DinoUiMedalMenu::LoadCreatures() {
+    mCreatures.clear();
+    for (u32 id = 1; id <= gDinoResource->GetCreatureCount() - 1; id++) {
+        DinoCreatureState creature;
+        gDinoBackup->GetCreature(id, &creature);
+        if (creature.parts[0].level != 0 ||
+            creature.parts[1].level + creature.parts[2].level + creature.parts[3].level != 0) {
+            u32 index = creature.index;
+            mCreatures.push_back(index);
+        }
+    }
+    DinoCreatureByVoice byVoice;
+    std::stable_sort(mCreatures.begin(), mCreatures.end(), byVoice);
+    mByVoice = mCreatures;
+    mByUnk88 = mCreatures;
+    DinoCreatureByUnk88 byUnk88;
+    std::stable_sort(mByUnk88.begin(), mByUnk88.end(), byUnk88);
+    if (mCreatures.size() == 0) {
+        mLastPage = 0;
+    } else {
+        mLastPage = (mCreatures.size() - 1) / 15;
+    }
+    mFraction->SetDenominator(mLastPage + 1);
+}
+
+// Lists the creatures in the sort's order: 0 and 1 are kept lists, the rest sort mByVoice.
 void DinoUiMedalMenu::Sort(u8 sort) {
     if (sort > 4) {
         return;
     }
     switch (sort) {
     case 0:
-        mUnk19C = mUnk1A8;
+        mCreatures = mByVoice;
         break;
     case 1:
-        mUnk19C = mUnk1B4;
+        mCreatures = mByUnk88;
         break;
     case 2:
-        mUnk19C = mUnk1A8;
+        mCreatures = mByVoice;
         {
             DinoCreatureByLevel order;
-            std::stable_sort(mUnk19C.begin(), mUnk19C.end(), order);
+            std::stable_sort(mCreatures.begin(), mCreatures.end(), order);
         }
         break;
     case 3:
-        mUnk19C = mUnk1A8;
+        mCreatures = mByVoice;
         {
             DinoCreatureByUnk02031104 order;
-            std::stable_sort(mUnk19C.begin(), mUnk19C.end(), order);
+            std::stable_sort(mCreatures.begin(), mCreatures.end(), order);
         }
         break;
     case 4:
-        mUnk19C = mUnk1A8;
+        mCreatures = mByVoice;
         {
             DinoCreatureByUnk0D order;
-            std::stable_sort(mUnk19C.begin(), mUnk19C.end(), order);
+            std::stable_sort(mCreatures.begin(), mCreatures.end(), order);
         }
         break;
     }
