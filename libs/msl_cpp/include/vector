@@ -677,6 +677,86 @@ namespace std {
         }
     };
 
+    // Vector iterators are small classes around a pointer.
+    template <class T> class __vec_iterator {
+    public:
+        typedef random_access_iterator_tag iterator_category;
+        typedef T value_type;
+        typedef ptrdiff_t difference_type;
+        typedef T *pointer;
+        typedef T &reference;
+
+        __vec_iterator() {}
+        explicit __vec_iterator(T *p) : ptr_(p) {}
+        T &operator*() const {
+            return *ptr_;
+        }
+        T *operator->() const {
+            return ptr_;
+        }
+        __vec_iterator &operator++() {
+            ++ptr_;
+            return *this;
+        }
+        __vec_iterator operator++(int) {
+            __vec_iterator tmp = *this;
+            ++ptr_;
+            return tmp;
+        }
+        __vec_iterator &operator--() {
+            --ptr_;
+            return *this;
+        }
+        __vec_iterator &operator+=(difference_type n) {
+            ptr_ += n;
+            return *this;
+        }
+        __vec_iterator operator+(difference_type n) const {
+            __vec_iterator tmp = *this;
+            return tmp += n;
+        }
+        __vec_iterator operator-(difference_type n) const {
+            return __vec_iterator(ptr_ - n);
+        }
+        difference_type operator-(const __vec_iterator &x) const {
+            return ptr_ - x.ptr_;
+        }
+        bool operator==(const __vec_iterator &x) const {
+            return ptr_ == x.ptr_;
+        }
+        T *const &base() const {
+            return ptr_;
+        }
+        bool operator!=(const __vec_iterator &x) const {
+            return !(*this == x);
+        }
+        T *ptr_;
+    };
+
+    // Copies between vector iterators move the bytes.
+    template <class T> inline T *__copy_trivial(T *first, T *last, T *result) {
+        ptrdiff_t n = last - first;
+        memmove(result, first, n * (ptrdiff_t)sizeof(T));
+        return result + n;
+    }
+
+    template <class T> inline T *__copy_backward_trivial(T *first, T *last, T *result) {
+        ptrdiff_t n = last - first;
+        result -= n;
+        memmove(result, first, n * (ptrdiff_t)sizeof(T));
+        return result;
+    }
+
+    template <class T>
+    inline __vec_iterator<T> copy(__vec_iterator<T> first, __vec_iterator<T> last, __vec_iterator<T> result) {
+        return __vec_iterator<T>(__copy_trivial(first.base(), last.base(), result.base()));
+    }
+
+    template <class T>
+    inline __vec_iterator<T> copy_backward(__vec_iterator<T> first, __vec_iterator<T> last, __vec_iterator<T> result) {
+        return __vec_iterator<T>(__copy_backward_trivial(first.base(), last.base(), result.base()));
+    }
+
     // clang-format off
     template <typename T, typename Allocator = allocator<T> > class vector : public __vec_constructor<T, Allocator, true> {
         // clang-format on
@@ -693,50 +773,7 @@ namespace std {
         typedef _Constructor::const_pointer const_pointer;
 
     public:
-        // Iterators are small classes around a pointer.
-        class iterator {
-        public:
-            typedef random_access_iterator_tag iterator_category;
-            typedef T value_type;
-            typedef ptrdiff_t difference_type;
-            typedef T *pointer;
-            typedef T &reference;
-
-            iterator() {}
-            explicit iterator(T *p) : ptr_(p) {}
-            T &operator*() const {
-                return *ptr_;
-            }
-            T *operator->() const {
-                return ptr_;
-            }
-            iterator &operator++() {
-                ++ptr_;
-                return *this;
-            }
-            iterator operator++(int) {
-                iterator tmp = *this;
-                ++ptr_;
-                return tmp;
-            }
-            iterator &operator--() {
-                --ptr_;
-                return *this;
-            }
-            iterator operator+(difference_type n) const {
-                return iterator(ptr_ + n);
-            }
-            iterator operator-(difference_type n) const {
-                return iterator(ptr_ - n);
-            }
-            bool operator==(const iterator &x) const {
-                return ptr_ == x.ptr_;
-            }
-            bool operator!=(const iterator &x) const {
-                return ptr_ != x.ptr_;
-            }
-            T *ptr_;
-        };
+        typedef __vec_iterator<T> iterator;
         typedef const T *const_iterator;
 
         vector() {

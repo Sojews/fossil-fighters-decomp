@@ -4,6 +4,9 @@
 // from rb3/key decomp
 
 #include <msl_unk.hpp>
+#include <iterator>
+#include <new>
+#include <utility>
 
 namespace std {
 
@@ -77,6 +80,401 @@ namespace std {
         T temp = move(a);
         a       = move(b);
         b       = move(temp);
+    }
+
+    // stable_sort (Hinnant's): merge sort with a temporary buffer, insertion sort below 21 elements.
+
+    // The temporary buffer: its storage, how much of it is constructed.
+    template <class T> struct __temp_buffer {
+        __temp_buffer(ptrdiff_t len);
+        ~__temp_buffer() { delete[] (u8 *)data_; }
+
+        ptrdiff_t size_;    // 0x00
+        ptrdiff_t n_;       // 0x04: the elements constructed so far
+        T *data_;           // 0x08
+    };
+
+    // Writes into the buffer construct the slots not yet constructed.
+    template <class T> class __temp_buffer_iterator {
+    public:
+        typedef random_access_iterator_tag iterator_category;
+        typedef T value_type;
+        typedef ptrdiff_t difference_type;
+        typedef T *pointer;
+        typedef T &reference;
+
+        __temp_buffer_iterator() {}
+        __temp_buffer_iterator(T *p, __temp_buffer<T> *buf) : ptr_((char *)p), buf_(buf) {}
+        __temp_buffer_iterator operator*() const { return *this; }
+        __temp_buffer_iterator &operator=(const T &x) {
+            if ((T *)ptr_ - buf_->data_ < buf_->n_) {
+                *(T *)ptr_ = x;
+            } else {
+                ::new (ptr_) T(x);
+                ++buf_->n_;
+            }
+            return *this;
+        }
+        operator T &() const { return *(T *)ptr_; }
+        __temp_buffer_iterator &operator++() {
+            ptr_ += sizeof(T);
+            return *this;
+        }
+        __temp_buffer_iterator &operator--() {
+            ptr_ -= sizeof(T);
+            return *this;
+        }
+        __temp_buffer_iterator &operator+=(difference_type n) {
+            ptr_ += n * (difference_type)sizeof(T);
+            return *this;
+        }
+        __temp_buffer_iterator operator+(difference_type n) const {
+            __temp_buffer_iterator tmp = *this;
+            return tmp += n;
+        }
+        difference_type operator-(const __temp_buffer_iterator &x) const { return (T *)ptr_ - (T *)x.ptr_; }
+        T *base() const { return (T *)ptr_; }
+        bool operator==(const __temp_buffer_iterator &x) const { return ptr_ == x.ptr_; }
+        bool operator!=(const __temp_buffer_iterator &x) const { return ptr_ != x.ptr_; }
+
+        char *ptr_;
+        __temp_buffer<T> *buf_;
+    };
+
+
+
+    template <class BidirectionalIterator, class Compare>
+    void __insertion_sort(BidirectionalIterator first, BidirectionalIterator last, Compare &comp) {
+        typedef typename iterator_traits<BidirectionalIterator>::value_type value_type;
+        if (first != last) {
+            BidirectionalIterator i = first;
+            for (++i; i != last; ++i) {
+                BidirectionalIterator j = i;
+                BidirectionalIterator k = j;
+                if (comp(*i, *--k)) {
+                    value_type tmp = *i;
+                    *j = *k;
+                    for (--j; k != first && comp(tmp, *--k); --j) {
+                        *j = *k;
+                    }
+                    *j = tmp;
+                }
+            }
+        }
+    }
+
+    template <class InputIterator, class OutputIterator>
+    inline OutputIterator copy(InputIterator first, InputIterator last, OutputIterator result) {
+        for (; first != last; ++first, ++result) {
+            *result = *first;
+        }
+        return result;
+    }
+
+    template <class BidirectionalIterator1, class BidirectionalIterator2>
+    inline BidirectionalIterator2 copy_backward(BidirectionalIterator1 first, BidirectionalIterator1 last,
+                                                BidirectionalIterator2 result) {
+        while (last != first) {
+            *--result = *--last;
+        }
+        return result;
+    }
+
+    template <class BidirectionalIterator, class OutputIterator>
+    inline OutputIterator reverse_copy(BidirectionalIterator first, BidirectionalIterator last, OutputIterator result) {
+        while (first != last) {
+            *result = *--last;
+            ++result;
+        }
+        return result;
+    }
+
+    template <class ForwardIterator>
+    ForwardIterator rotate(ForwardIterator first, ForwardIterator middle, ForwardIterator last) {
+        if (first == middle) {
+            return last;
+        }
+        if (middle == last) {
+            return first;
+        }
+        ForwardIterator i = middle;
+        while (true) {
+            swap(*first, *i);
+            ++first;
+            ++i;
+            if (i == last) {
+                break;
+            }
+            if (first == middle) {
+                middle = i;
+            }
+        }
+        ForwardIterator result = first;
+        if (first != middle) {
+            i = middle;
+            while (true) {
+                swap(*first, *i);
+                ++first;
+                ++i;
+                if (i == last) {
+                    if (first == middle) {
+                        break;
+                    }
+                    i = middle;
+                } else if (first == middle) {
+                    middle = i;
+                }
+            }
+        }
+        return result;
+    }
+
+    template <class ForwardIterator, class T, class Compare>
+    ForwardIterator __lower_bound(ForwardIterator first, ForwardIterator last, const T &value, Compare &comp) {
+        typedef typename iterator_traits<ForwardIterator>::difference_type difference_type;
+        difference_type len = distance(first, last);
+        while (len > 0) {
+            ForwardIterator i = first;
+            difference_type half = len / 2;
+            advance(i, half);
+            if (comp(*i, value)) {
+                first = ++i;
+                len -= half + 1;
+            } else {
+                len = half;
+            }
+        }
+        return first;
+    }
+
+    template <class ForwardIterator, class T, class Compare>
+    ForwardIterator __upper_bound(ForwardIterator first, ForwardIterator last, const T &value, Compare &comp) {
+        typedef typename iterator_traits<ForwardIterator>::difference_type difference_type;
+        difference_type len = distance(first, last);
+        while (len > 0) {
+            ForwardIterator i = first;
+            difference_type half = len / 2;
+            advance(i, half);
+            if (!comp(value, *i)) {
+                first = ++i;
+                len -= half + 1;
+            } else {
+                len = half;
+            }
+        }
+        return first;
+    }
+
+    template <class InputIterator1, class InputIterator2, class OutputIterator, class Compare>
+    OutputIterator __merge(InputIterator1 first1, InputIterator1 last1, InputIterator2 first2, InputIterator2 last2,
+                           OutputIterator result, Compare &comp) {
+        for (; first1 != last1 && first2 != last2; ++result) {
+            if (comp(*first2, *first1)) {
+                *result = *first2;
+                ++first2;
+            } else {
+                *result = *first1;
+                ++first1;
+            }
+        }
+        if (first1 == last1) {
+            return copy(first2, last2, result);
+        }
+        return copy(first1, last1, result);
+    }
+
+    template <class BidirectionalIterator1, class BidirectionalIterator2, class BidirectionalIterator3, class Compare>
+    BidirectionalIterator3 __merge_backward(BidirectionalIterator1 first1, BidirectionalIterator1 last1,
+                                            BidirectionalIterator2 first2, BidirectionalIterator2 last2,
+                                            BidirectionalIterator3 result, Compare &comp) {
+        if (first1 == last1) {
+            return copy_backward(first2, last2, result);
+        }
+        if (first2 == last2) {
+            return copy_backward(first1, last1, result);
+        }
+        --last1;
+        --last2;
+        while (true) {
+            if (comp(*last2, *last1)) {
+                *--result = *last1;
+                if (first1 == last1) {
+                    return copy_backward(first2, ++last2, result);
+                }
+                --last1;
+            } else {
+                *--result = *last2;
+                if (first2 == last2) {
+                    return copy_backward(first1, ++last1, result);
+                }
+                --last2;
+            }
+        }
+    }
+
+    template <class BidirectionalIterator, class OutputIterator, class Compare>
+    OutputIterator __insertion_sort_move(BidirectionalIterator first, BidirectionalIterator last,
+                                         OutputIterator result, Compare &comp) {
+        typedef typename iterator_traits<OutputIterator>::value_type value_type;
+        BidirectionalIterator f = first;
+        __vec_iterator<value_type> last2(result.base());
+        if (!(f == last)) {
+            *result = *first;
+            for (++f, ++last2; f != last; ++f, ++last2) {
+                value_type *j = last2.ptr_;
+                value_type *i = j;
+                for (; i != result.base() && comp(*f, *--i); --j) {
+                    *OutputIterator(j, result.buf_) = *i;
+                }
+                *OutputIterator(j, result.buf_) = *f;
+            }
+        }
+        return OutputIterator(last2.ptr_, result.buf_);
+    }
+
+    template <class RandomAccessIterator, class BufferIterator, class Compare>
+    void __stable_sort(RandomAccessIterator first, RandomAccessIterator last, BufferIterator buf_first,
+                       BufferIterator buf_last, Compare &comp);
+
+    template <class RandomAccessIterator, class BufferIterator, class Compare>
+    void __stable_sort_move(RandomAccessIterator first, RandomAccessIterator last, BufferIterator result,
+                            Compare &comp) {
+        typedef typename iterator_traits<RandomAccessIterator>::difference_type difference_type;
+        difference_type len = last - first;
+        if (len <= 0) {
+            return;
+        }
+        if (len == 1) {
+            *result = *first;
+            return;
+        }
+        if (len == 2) {
+            RandomAccessIterator i = last;
+            if (comp(*--i, *first)) {
+                reverse_copy(first, last, result);
+            } else {
+                copy(first, last, result);
+            }
+            return;
+        }
+        if (len <= 20) {
+            __insertion_sort_move(first, last, result, comp);
+            return;
+        }
+        difference_type l2 = len - len / 2;
+        RandomAccessIterator m = first + l2;
+        __stable_sort(first, m, result, result + l2, comp);
+        __stable_sort(m, last, result + l2, result + len, comp);
+        __merge(first, first + l2, first + l2, first + len, result, comp);
+    }
+
+    template <class BidirectionalIterator, class BufferIterator, class Compare>
+    void __inplace_merge(BidirectionalIterator first, BidirectionalIterator middle, BidirectionalIterator last,
+                         Compare &comp, typename iterator_traits<BidirectionalIterator>::difference_type len1,
+                         typename iterator_traits<BidirectionalIterator>::difference_type len2,
+                         BufferIterator buf_first, BufferIterator buf_last) {
+        typedef typename iterator_traits<BidirectionalIterator>::difference_type difference_type;
+        if (len1 == 0 || len2 == 0) {
+            return;
+        }
+        if (len1 + len2 == 2) {
+            if (comp(*middle, *first)) {
+                swap(*first, *middle);
+            }
+            return;
+        }
+        difference_type buf_len = buf_last - buf_first;
+        if (len1 <= len2 && len1 <= buf_len) {
+            BufferIterator buf_end = copy(first, middle, buf_first);
+            __merge(buf_first, buf_end, middle, last, first, comp);
+            return;
+        }
+        if (len2 <= buf_len) {
+            BufferIterator buf_end = copy(middle, last, buf_first);
+            __merge_backward(first, middle, buf_first, buf_end, last, comp);
+            return;
+        }
+        BidirectionalIterator first_cut;
+        BidirectionalIterator second_cut;
+        difference_type len11;
+        difference_type len22;
+        if (len1 <= len2) {
+            len22 = len2 / 2;
+            second_cut = middle;
+            advance(second_cut, len22);
+            first_cut = __upper_bound(first, middle, *second_cut, comp);
+            len11 = distance(first, first_cut);
+        } else {
+            len11 = len1 / 2;
+            first_cut = first;
+            advance(first_cut, len11);
+            second_cut = __lower_bound(middle, last, *first_cut, comp);
+            len22 = distance(middle, second_cut);
+        }
+        middle = rotate(first_cut, middle, second_cut);
+        __inplace_merge(first, first_cut, middle, comp, len11, len22, buf_first, buf_last);
+        __inplace_merge(middle, second_cut, last, comp, len1 - len11, len2 - len22, buf_first, buf_last);
+    }
+
+    template <class RandomAccessIterator, class BufferIterator, class Compare>
+    void __stable_sort(RandomAccessIterator first, RandomAccessIterator last, BufferIterator buf_first,
+                       BufferIterator buf_last, Compare &comp) {
+        typedef typename iterator_traits<RandomAccessIterator>::difference_type difference_type;
+        difference_type len = last - first;
+        if (len <= 1) {
+            return;
+        }
+        if (len == 2) {
+            if (comp(*--last, *first)) {
+                swap(*first, *last);
+            }
+            return;
+        }
+        if (len <= 20) {
+            __insertion_sort(first, last, comp);
+            return;
+        }
+        difference_type l2 = len - len / 2;
+        RandomAccessIterator m = first + l2;
+        if (len <= buf_last - buf_first) {
+            __stable_sort_move(first, m, buf_first, comp);
+            __stable_sort_move(m, last, buf_first + l2, comp);
+            __merge(buf_first, buf_first + l2, buf_first + l2, buf_first + len, first, comp);
+            return;
+        }
+        __stable_sort(first, m, buf_first, buf_last, comp);
+        __stable_sort(m, last, buf_first, buf_last, comp);
+        __inplace_merge(first, m, last, comp, m - first, last - m, buf_first, buf_last);
+    }
+
+    template <class T> pair<T *, ptrdiff_t> get_temporary_buffer(ptrdiff_t len) {
+        pair<T *, ptrdiff_t> result(0, 0);
+        while (len > 0) {
+            result.first = (T *)::operator new[](len * sizeof(T), nothrow);
+            if (result.first != 0) {
+                result.second = len;
+                return result;
+            }
+            len /= 2;
+        }
+        return result;
+    }
+
+    template <class T> inline __temp_buffer<T>::__temp_buffer(ptrdiff_t len) {
+        pair<T *, ptrdiff_t> p = get_temporary_buffer<T>(len);
+        size_ = p.second;
+        n_ = 0;
+        data_ = p.first;
+    }
+
+    template <class RandomAccessIterator, class Compare>
+    void stable_sort(RandomAccessIterator first, RandomAccessIterator last, Compare comp) {
+        typedef typename iterator_traits<RandomAccessIterator>::value_type value_type;
+        typedef typename iterator_traits<RandomAccessIterator>::difference_type difference_type;
+        difference_type len = last - first;
+        __temp_buffer<value_type> buf(len > 20 ? len : 0);
+        __stable_sort(first, last, __temp_buffer_iterator<value_type>(buf.data_, &buf),
+                      __temp_buffer_iterator<value_type>(buf.data_ + buf.size_, &buf), comp);
     }
 } // namespace std
 

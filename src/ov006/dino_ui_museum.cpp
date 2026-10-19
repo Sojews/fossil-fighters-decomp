@@ -3,6 +3,7 @@
 // Derived destructors have their bases' destructor bodies inlined; auto-inlining the ones defined above does that.
 #pragma auto_inline on
 
+#include <algorithm>
 #include "m/picture.h"
 #include "game/dino_ui_museum_information_menu.h"
 #include "types.h"
@@ -489,8 +490,19 @@ void DinoUiMuseum3DModel::SetModel(u32 id) {
     }
 }
 
+// OnStart's function-local static and its guard come first in the file's .bss (OnStart isn't decompiled yet).
+static u32 sOnStartStatic[2];
 // The museum's definitions, held in a static object (made and freed by the file's static initializer).
 static MResource<DinoMuseumDefs> sMuseumDefs;
+
+// The tabs' orders.
+struct DinoMuseumByUnk0C {
+    static u32 Key(u32 id) { return GetMuseumDef(sMuseumDefs.Get(), id)->unk0C; }
+    bool operator()(const u32 &a, const u32 &b) const {
+        u32 x = Key(a);
+        return x > Key(b);
+    }
+};
 
 // Rises into place, bobbing up and down.
 void DinoUiMuseumEffectLight::Idle() {
@@ -601,3 +613,8 @@ void DinoUiMuseumMenu::SelectTab(u8 tab) {
     Disable();
     GetSerial()->AddTail(new DinoUiMuseumSlotCreateTask(this), MCreateCallTask(this, data_ov006_021962a4.Enable_00));
 }
+
+// The tab's sort (the game emits the whole stable_sort machinery here).
+// NONMATCHING: std::__inplace_merge (stack layout, and the game elides one argument copy), std::__stable_sort_move
+// (comp and the buffer's owner swap registers), std::__insertion_sort_move (the first few instructions' order).
+template void std::stable_sort(std::vector<u32>::iterator, std::vector<u32>::iterator, DinoMuseumByUnk0C);
