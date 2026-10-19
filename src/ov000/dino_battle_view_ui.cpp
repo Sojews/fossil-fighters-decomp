@@ -115,8 +115,8 @@ void DinoBattleViewInfoLRItem::OnDecide() {
 
 // The root menu's rows (two words each).
 struct DinoBattleViewUiRootRow {
-    u32 unk0;
-    u32 unk4;
+    u32 unk0;   // the creature's side (unkB0)
+    u32 unk4;   // its slot (unkB4)
 };
 extern "C" const DinoBattleViewUiRootRow data_ov000_0218fec4[];
 
@@ -345,7 +345,7 @@ DinoBattleViewUiSelectAreaCommon::DinoBattleViewUiSelectAreaCommon(DinoBattleVie
                                                                    MMessageObserver *target, u32 arg3, u8 arg4,
                                                                    u8 arg5)
     : MMenu(2), mUnkB0(player), mUnkB4(arg3), mUnkE0(data_ov000_02193ae4.unk30), mUnkE8(0), mUnkEC((u32)view),
-      mTarget(target), mUnkF4(0), mCursor(NULL), mUnk11C(0), mUnk12C(0), mUnk13C(0), mUnk178(1), mUnk179(arg4),
+      mTarget(target), mUnkF4(0), mCursor(NULL), mInfoKind(0), mUnk12C(0), mUnk13C(0), mUnk178(1), mUnk179(arg4),
       mUnk17A(arg5) {
     SetDeferStart(TRUE);
     mUnkAC = ((DinoBattleView *)mUnkEC)->GetUnkE4(mUnkB0)->GetUnkAC() ? 4 : 0;
@@ -432,7 +432,7 @@ void DinoBattleViewUiAttackerMenu::OnBlur(MMenuItem *item) {
 
 #pragma auto_inline off
 
-void DinoBattleViewUiSelectAreaCommon::Nop() {
+void DinoBattleViewUiSelectAreaCommon::OnFocusCreature(DinoBattleViewCreature *creature, MMenuItem *item) {
 }
 
 BOOL DinoBattleViewUiChangeMenu::HasId(u32 id) {
@@ -533,4 +533,76 @@ MRect DinoBattleViewUiRootMenuItem::GetFrame() {
         return creature->mMotion->GetFrame() + offset;
     }
     return MRect(0, 0, 0, 0);
+}
+
+// Per info kind: what it shows, and how many attacks fit.
+struct DinoBattleInfoKind {
+    u32 kind;
+    u32 attacks;
+};
+extern "C" const DinoBattleInfoKind data_ov000_0218fd1c[];
+
+// Whether the info kind can show the creature (or the one shown).
+// The game built these with common-subexpression elimination.
+#pragma opt_common_subs on
+extern "C" BOOL func_ov000_02176454(DinoBattleViewUiSelectAreaCommon *menu, int kind,
+                                    DinoBattleViewCreature *creature) {
+    if (creature == NULL) {
+        creature = menu->mInfo->mCreature;
+    }
+    if (creature != NULL && data_ov000_0218fd1c[kind].kind == 2) {
+        gDinoResource->GetCreatureDef(creature->GetUnkA8());
+        int attacks = creature->CountAttacks();
+        if (creature->GetSpecialAttack()) {
+            attacks++;
+        }
+        if (attacks <= (int)data_ov000_0218fd1c[kind].attacks * 2) {
+            return FALSE;
+        }
+    }
+    return TRUE;
+}
+
+void DinoBattleViewUiSelectAreaCommon::OnFocus(MMenuItem *item) {
+    if (mUnk178) {
+        mUnk178 = FALSE;
+    }
+    if (item == mItem124 || item == mItem128 || item == mItem120) {
+        return;
+    }
+    DinoBattleViewCreature *creature = GetItemCreature(item);
+    mFocusedRow = ((DinoBattleViewUiRootMenuItem *)item)->mIndex;
+    if (mInfo != NULL) {
+        if (creature != NULL) {
+            ((DinoBattleView *)mUnkEC)->GetUnkE4(mUnkB0);
+            while (!func_ov000_02176454(this, mInfoKind, creature) && mInfoKind >= 0) {
+                mInfoKind--;
+            }
+            mInfo->Update(TRUE, creature, data_ov000_0218fd1c[mInfoKind].kind, TRUE,
+                          data_ov000_0218fd1c[mInfoKind].attacks);
+        } else {
+            mInfo->Update(FALSE, NULL, 0, 0, 0);
+        }
+    }
+    if (creature != NULL) {
+        mUnkBC = creature->GetUnkB0();
+    }
+    OnFocusCreature(creature, item);
+}
+
+// NONMATCHING: the game keeps the side in a register and the slot on the stack (it inlines func_ov000_02177430).
+DinoBattleViewCreature *DinoBattleViewUiSelectAreaCommon::GetItemCreature(MMenuItem *item) {
+    u32 row = ((DinoBattleViewUiRootMenuItem *)item)->mIndex;
+    u32 side = data_ov000_0218fec4[row].unk0;
+    u32 slot = data_ov000_0218fec4[row].unk4;
+    for (int i = 0; i < 2; i++) {
+        DinoBattleViewPlayer *player = ((DinoBattleView *)mUnkEC)->GetUnkE4(i);
+        for (int j = 0; j < player->GetCreatureCount(); j++) {
+            DinoBattleViewCreature *creature = player->GetCreature(j);
+            if (side == creature->GetUnkB0() && slot == creature->GetUnkB4()) {
+                return creature;
+            }
+        }
+    }
+    return NULL;
 }

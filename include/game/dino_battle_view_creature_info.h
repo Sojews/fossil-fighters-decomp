@@ -9,6 +9,7 @@ class MSmartOam;
 class MMotion;
 class MPictureFile;
 class InfoPanelWindow;
+class DinoBattleViewCreature;
 
 class DinoBattleViewCreatureInfo : public MProcess {
 public:
@@ -19,6 +20,7 @@ public:
     void SetPosition(MPoint pos);
     void Show();
     void PlayMotion(int index);
+    void Update(BOOL show, DinoBattleViewCreature *creature, u32 kind, u8 arg3, u32 count);
 
     MPoint mPos;                    // 0x74
     MSmartOam *mOam;                // 0x7C
@@ -26,7 +28,7 @@ public:
     u32 unk84[25];
     u32 mUnkE8;                     // 0xE8
     u32 unkEC;
-    u32 mUnkF0;                     // 0xF0
+    DinoBattleViewCreature *mCreature;  // 0xF0: shown
     MParallelTaskSet *mTasks;       // 0xF4
     InfoPanelWindow *mWindow;       // 0xF8
     u32 unkFC[5];

@@ -5,6 +5,7 @@
 
 class DinoBattleViewCreature;
 class DinoBattleView;
+class DinoBattleViewCreatureInfo;
 
 #include "m/menu_item.h"
 #include "m/menu.h"
@@ -46,7 +47,7 @@ public:
     virtual void OnStart();
     virtual void OnFocus(MMenuItem *item);
     virtual void OnDecide(MMenuItem *item);
-    void Nop();     // (empty in the game)
+    void OnFocusCreature(DinoBattleViewCreature *creature, MMenuItem *item);  // (empty in the game)
     DinoBattleViewCreature *GetItemCreature(MMenuItem *item);
     BOOL HandlePageItem(MMenuItem *item);
     void MoveCursor(MPoint pos, int frames, int arg);
@@ -67,8 +68,9 @@ public:
     u32 mUnkF4;
     MTaskSet *mUnkF8;           // 0xF8: waited on before answering
     MView *mCursor;             // 0xFC
-    u8 unk100[0x1C];
-    u32 mUnk11C;
+    u8 unk100[0x18];
+    DinoBattleViewCreatureInfo *mInfo;  // 0x118
+    int mInfoKind;      // 0x11C
     MMenuItem *mItem120;    // 0x120
     MMenuItem *mItem124;    // 0x124
     MMenuItem *mItem128;    // 0x128
