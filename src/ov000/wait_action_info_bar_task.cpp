@@ -6,6 +6,10 @@
 #include "game/wait_action_info_bar_task.h"
 #include "types.h"
 #include "game/dino_resource.h"
+#include "game/dino_battle_view_ability_menu_bg.h"
+#include "game/dino_battle_view_ability_text_window.h"
+#include "m/indicator.h"
+#include "m/oam_canvas.h"
 
 WaitActionInfoBarTask::WaitActionInfoBarTask(DinoBattleViewActionInfoBar *bar) {
     mBar = bar;
@@ -29,8 +33,41 @@ extern "C" void func_ov000_0218b4dc(DinoBattleViewActionInfoBar *bar, const char
     }
 }
 
+extern "C" DinoBattleViewAbilityTextWindow *func_ov000_0217c0b8(DinoBattleViewAbilityMenuBG *bg, int arg);
+
+// The TU's pooled constants.
+extern "C" struct {
+    u8 unk00[8];
+    int textY;      // 0x08
+    u8 unk0C[0x18];
+    int textX;      // 0x24: the text is centered on it
+} data_ov000_02196f64;
+
+// Shows a line (making the text and its window the first time).
+// NONMATCHING: the game loads gCurrentDisplay for the canvas after copying the size (as elsewhere with MObjCanvas).
+extern "C" void func_ov000_0218b55c(DinoBattleViewActionInfoBar *bar, const char *text) {
+    bar->mTimer = gDinoResource->GetBattleAdjustDefs()->actionLog;
+    MPoint size = bar->mFont->MeasureText(std::string(text), 0, 0);
+    if (bar->mText != NULL) {
+        bar->mText->SetPosition(data_ov000_02196f64.textX - size.x / 2, data_ov000_02196f64.textY);
+    } else {
+        MObjCanvas *canvas = new MObjCanvas(gCurrentDisplay, MPoint(0x100, 0x10), gDinoResource->GetUnkTable(), TRUE);
+        bar->mText = new MIndicator(canvas, bar->mFont, 0);
+        canvas->GetOamUnit()->SetMode(1);
+        bar->mText->SetPosition(data_ov000_02196f64.textX - size.x / 2, data_ov000_02196f64.textY);
+        bar->mText->SetPriority(0);
+        bar->mParallel.AddTail(bar->mText);
+        bar->mBg = new DinoBattleViewAbilityMenuBG;
+        bar->mWindow = func_ov000_0217c0b8(bar->mBg, 1);
+        bar->mWindow->Show();
+        bar->mWindow->SetUnk1C(0);
+        bar->mParallel.AddTail(bar->mBg);
+    }
+    bar->mText->SetText(std::string(text));
+}
+
 BOOL DinoBattleViewActionInfoBar::IsIdle() {
-    if (mUnk80 == 0) {
+    if (mText == NULL) {
         return TRUE;
     }
     return FALSE;

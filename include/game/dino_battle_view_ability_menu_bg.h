@@ -20,6 +20,7 @@ class MChr;
 
 class DinoBattleViewAbilityMenuBG : public MProcess {
 public:
+    DinoBattleViewAbilityMenuBG();
     virtual ~DinoBattleViewAbilityMenuBG();
     virtual void Idle();
 
@@ -37,6 +38,7 @@ public:
     u8 unkC8[0x1000];
     std::vector<void *> mUnk10C8; // 0x10C8
     u8 mUnk10D4;                // 0x10D4: owns the BG resources
+    u8 unk10D5[0x10E0 - 0x10D5];
 
     class SetPriorityTask : public MTask {
     public:

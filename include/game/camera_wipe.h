@@ -14,6 +14,10 @@
 #include "game/help.h"
 #include "game/dino_field_camera_hook.h"
 
+class MIndicator;
+class DinoBattleViewAbilityMenuBG;
+class DinoBattleViewAbilityTextWindow;
+
 class CameraWipe : public MProcess {
 public:
     virtual ~CameraWipe();
@@ -44,9 +48,13 @@ public:
     BOOL IsIdle();
 
     std::string mUnk74;                 // 0x74
-    u32 mUnk80;                         // 0x80
-    u32 unk84[5];
-    std::vector<std::string> mLines;    // 0x98
+    MIndicator *mText;                  // 0x80: the line shown
+    u32 unk84;
+    int mTimer;                         // 0x88: frames left to show it
+    int mFade;                          // 0x8C: 0 (hidden) to 6
+    DinoBattleViewAbilityMenuBG *mBg;   // 0x90
+    DinoBattleViewAbilityTextWindow *mWindow;   // 0x94
+    std::vector<std::string> mLines;    // 0x98: waiting to be shown
     MFont *mFont;                       // 0xA4
 };
 
