@@ -1,5 +1,5 @@
 // DinoUiOrganizationMenu (team organization).
-// NONMATCHING: RemoveMember (the search loop); the rest (OnStart, OnFocus, SetMember, UpdateDetails...) is to do.
+// NONMATCHING: RemoveMember and SetMember (the search loop); the rest (OnStart, OnFocus, SetMember, UpdateDetails...) is to do.
 
 #pragma ipa file
 
@@ -816,6 +816,42 @@ void DinoUiOrganizationMenu::RemoveMember() {
         pos.y = data_ov007_0218ebec.slotY + data_ov007_0218ebec.slotColumnY * column + data_ov007_0218ebec.slotRowY * row;
         mSerial.AddTail(mListItems[mSelected]->CreateFlyInTask(pos));
     }
+    mSerial.AddTail(MCreateCallTask(this, &DinoUiOrganizationMenu::Refresh));
+    mUnk230->Clear();
+    Disable();
+}
+
+// NONMATCHING: as RemoveMember (the search loop reloads the list's size; registers follow from it).
+void DinoUiOrganizationMenu::SetMember(u8 index, u8 member) {
+    mUnk23C = FALSE;
+    func_ov007_0217fb94(this, 0);
+    u8 old = mTeam.slots[member];
+    int i = FindCreature(old);
+    mTeam.slots[member] = mCreatures[index];
+    MParallelTaskSet *moves = new MParallelTaskSet(TRUE);
+    moves->AddTail(mSlots[index % 15]->CreateFlyInTask(data_ov007_0218ef0c[member]));
+    if (old != 0) {
+        if (i / 15 < mPage) {
+            moves->AddTail(mListItems[member]->CreateFlyInTask(data_ov007_0218ecbc));
+        } else if (i / 15 > mPage) {
+            moves->AddTail(mListItems[member]->CreateFlyInTask(data_ov007_0218ecc4));
+        } else {
+            int slot = i % 15;
+            int row = slot / 5;
+            int column = slot % 5;
+            MPoint pos;
+            pos.x = data_ov007_0218ebec.slotX + data_ov007_0218ebec.slotColumnX * column + data_ov007_0218ebec.slotRowX * row;
+            pos.y = data_ov007_0218ebec.slotY + data_ov007_0218ebec.slotColumnY * column + data_ov007_0218ebec.slotRowY * row;
+            moves->AddTail(mListItems[member]->CreateFlyInTask(pos));
+        }
+    } else {
+        mListItems[member]->PlayNormal();
+    }
+    MTask *exit = MTaskExitTransfer::Create(mMessage);
+    MSerialTaskSet *serial = &mSerial;
+    serial->AddTail(new MTimer(5));
+    serial->AddTail(moves);
+    serial->AddTail(exit);
     mSerial.AddTail(MCreateCallTask(this, &DinoUiOrganizationMenu::Refresh));
     mUnk230->Clear();
     Disable();
