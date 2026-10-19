@@ -11,6 +11,7 @@
 #include "game/dino_field_camera_hook.h"
 #include "m/console_filter.h"
 #include "m/archive.h"
+#include "m/resource.h"
 #include "m/input.h"
 #include "m/console.h"
 #include "m/picture.h"
@@ -46,19 +47,25 @@ public:
     virtual ~DinoBattleTutorialConsoleFilter();
 };
 
+struct DinoBattleTutorialData;
+
 class DinoBattleTutorial {
 public:
+    // With id 0, no tutorial.
+    DinoBattleTutorial(u32 id);
     virtual ~DinoBattleTutorial();
 
     void SetView(class DinoBattleView *view);
     void SetUnk24(u32 value);
 
-    u32 unk04[3];
-    MArchivePtr mArchive;                       // 0x10
-    MArchiveFile mFile;                         // 0x14
+    u32 mId;                                    // 0x04
+    u32 mUnk08;                                 // 0x08
+    u8 mUnk0C;                                  // 0x0C
+    u8 mUnk0D;                                  // 0x0D
+    MResource<DinoBattleTutorialData> mData;    // 0x10
     class DinoBattleView *mView;                // 0x20
     u32 mUnk24;                                 // 0x24
-    DinoBattleTutorialConsoleFilter *mFilter;   // 0x28
+    DinoHelpDisabler *mDisabler;                // 0x28: keeps the help off during the tutorial
 };
 
 #endif

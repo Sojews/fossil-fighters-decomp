@@ -21,7 +21,23 @@ KeyWaitTask::~KeyWaitTask() {
 }
 
 DinoBattleTutorial::~DinoBattleTutorial() {
-    delete mFilter;
+    delete mDisabler;
+}
+
+extern "C" const char data_ov000_021977bc[];  // the tutorial data's path format
+
+DinoBattleTutorial::DinoBattleTutorial(u32 id) : mId(id), mUnk08(0), mDisabler(NULL) {
+    if (id != 0) {
+        char path[32];
+        OS_SPrintf(path, data_ov000_021977bc, id);
+        mData = MResource<DinoBattleTutorialData>(std::string(path));
+        mUnk0C = FALSE;
+        mUnk0D = TRUE;
+        mDisabler = new DinoHelpDisabler();
+    } else {
+        mUnk0C = TRUE;
+        mUnk0D = FALSE;
+    }
 }
 
 void KeyWaitTask::Idle() {
@@ -46,7 +62,6 @@ void DinoBattleViewTutorialWindow::Idle() {
 
 // Resources the file loads (their data types are unknown); until the code that constructs them is decompiled,
 // these keep out-of-line copies of the constructors.
-struct DinoBattleTutorialData;
 #pragma dont_inline on
 MResource<DinoBattleTutorialData> DinoBattleTutorialDataLoad(std::string path) {
     return MResource<DinoBattleTutorialData>(path);
