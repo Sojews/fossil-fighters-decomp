@@ -63,3 +63,4 @@ DinoBackupWriteValidater::DinoBackupWriteValidater(MTask *caller, void *arg)
 // String members the game emits in this file.
 template std::string::basic_string(const char *s);
 template std::string::~basic_string();
+template std::string &std::string::assign(const char *first, const char *last);
