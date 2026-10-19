@@ -14,8 +14,7 @@ static MPoint sDrawPos;
 // NONMATCHING: the file's statics aren't all here yet, so they're pooled at different offsets.
 DinoCommonWindow::DinoCommonWindow(u32 extraTiles, bool battle, bool large) : MFixedSizeView(MPoint(0, 0)) {
     mPos = MPoint(0, 0);
-    mUnk70 = MPoint(0, 0);
-    mUnk78 = MPoint(0, 0);
+    mFrame = MRect(0, 0, 0, 0);
     mBattle = battle;
     mDisplay = gCurrentDisplay;
     MBg *bg = mDisplay->mBg;
@@ -42,6 +41,12 @@ void DinoCommonWindow::Draw(MPoint pos, MRect rect) {
         mText->Fill(rect, base + ((const u16 *) mFile.GetScreen())[pos.y * mTileSize.x + pos.x], mPalBlock->index,
                     FALSE, FALSE);
     }
+}
+
+extern "C" const MRect data_020ba5e8;
+
+void DinoCommonWindow::Unk0201bb5c() {
+    Unk0201c098(data_020ba5e8, mFrame.Inflate(-1));
 }
 
 DinoCommonWindow::~DinoCommonWindow() {

@@ -23,6 +23,9 @@ public:
     virtual void SetPosition(int x, int y);
 
     void Draw(MPoint pos, MRect rect);
+    void Unk0201c098(MRect a, MRect b);
+    // Unk0201c098 with the frame inside the window's rect.
+    void Unk0201bb5c();
 
     MDisplay *mDisplay;     // 0x18
     MText *mText;           // 0x1C
@@ -32,8 +35,7 @@ public:
     MPictureFile mFile;     // 0x2C
     MPoint mPos;            // 0x60
     MPoint mTileSize;       // 0x68: of the window graphics
-    MPoint mUnk70;          // 0x70
-    MPoint mUnk78;          // 0x78
+    MRect mFrame;           // 0x70
     u8 mBattle;             // 0x80
 };
 
