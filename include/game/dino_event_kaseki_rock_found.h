@@ -3,10 +3,12 @@
 #define GAME_DINO_EVENT_KASEKI_ROCK_FOUND_H
 
 #include "m/task.h"
-#include "m/archive.h"
+#include "m/resource.h"
 #include "m/geometry.h"
 
 class DinoEventLoop;
+
+struct DinoMessageData;
 
 class DinoEventKasekiRockFound : public MProcess {
 public:
@@ -14,6 +16,7 @@ public:
     virtual ~DinoEventKasekiRockFound();
     virtual void Idle();
 
+    void Start();
     MTask *CreateFoundMessage();
     MTask *CreateYesNo(u32 message);
     void StateFound();
@@ -26,10 +29,8 @@ public:
     MPoint mPos;            // 0x80
     u32 mArg;               // 0x88
     u32 mUnk8C[9];          // 0x8C
-    MArchivePtr mArchive;   // 0xB0
-    MArchiveFile mFile;     // 0xB4
-    MArchivePtr mArchive2;  // 0xC0
-    MArchiveFile mFile2;    // 0xC4
+    MResource<DinoMessageData> mMessages;   // 0xB0: the digging messages
+    MResource<DinoMessageData> mUnkC0;      // 0xC0
     u32 unkD0[2];
     int mAnswer;            // 0xD8: the yes/no dialog's
     u32 unkDC[2];
