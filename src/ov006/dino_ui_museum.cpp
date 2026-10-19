@@ -187,11 +187,9 @@ void DinoUiMuseumInformationVoiceButton::OnDecide() {
     mOwner->PlayVoice();
 }
 
-extern "C" void func_ov006_02189660(void *owner);
-extern "C" void func_ov006_02189530(void *owner);
 
 void DinoUiMuseumPageLButton::OnDecide() {
-    func_ov006_02189660(mOwner);
+    mOwner->PageLeft();
     mMotion->Play(2, 1);
     mSerial.Clear();
     MTask *play = mMotion->CreatePlayTransfer(1, 0);
@@ -203,7 +201,7 @@ void DinoUiMuseumPageLButton::OnDecide() {
 }
 
 void DinoUiMuseumPageRButton::OnDecide() {
-    func_ov006_02189530(mOwner);
+    mOwner->PageRight();
     mMotion->Play(2, 1);
     mSerial.Clear();
     MTask *play = mMotion->CreatePlayTransfer(1, 0);
@@ -260,12 +258,67 @@ void DinoUiMuseumMenu::CreateSlots() {
     }
 }
 
+// Loads the motions of the page's slots.
+void DinoUiMuseumMenu::LoadPageMotions() {
+    int count;
+    if (mPage == mPageCount) {
+        count = mCreatures.size() - mPage * 15;
+    } else {
+        count = 15;
+    }
+    for (int i = 0; i < count; i++) {
+        char path[0x100];
+        OS_SPrintf(path, "/motion/ui_reviver_medal/reviver_%03d.bin", mCreatures[mPage * 15 + i]);
+        mMotions.push_back(MMotionFile(std::string(path), 7));
+    }
+}
+
+// The TU's pooled pointer-to-member constants.
+extern "C" struct {
+    void (DinoUiMuseum::*FinishPageRight_00)();
+} data_ov006_02196234;
+extern "C" struct {
+    void (DinoUiMuseum::*LoadPageMotions_00)();
+} data_ov006_02196274;
+extern "C" struct {
+    void (DinoUiMuseum::*LoadPageMotions_00)();
+} data_ov006_02196254;
+extern "C" struct {
+    void (DinoUiMuseum::*FinishPageLeft_00)();
+} data_ov006_0219627c;
+
+// Turns to the next page (wrapping around), loading its motions in the background.
+void DinoUiMuseumMenu::PageRight() {
+    if (mPage == mPageCount) {
+        mPage = 0;
+    } else {
+        mPage++;
+    }
+    mMotions.clear();
+    mSerial.AddTail(MCreateBgCallTask((DinoUiMuseum *)this, data_ov006_02196274.LoadPageMotions_00, 1));
+    mSerial.AddTail(MCreateCallTask((DinoUiMuseum *)this, data_ov006_02196234.FinishPageRight_00));
+    Disable();
+}
+
 void DinoUiMuseumMenu::FinishPageRight() {
     ClearSlots();
     mFraction->SetNumerator(mPage + 1);
     CreateSlots();
     Enable();
     FocusNearestItem(mCursor->GetPosition());
+}
+
+// Turns to the previous page (wrapping around), loading its motions in the background.
+void DinoUiMuseumMenu::PageLeft() {
+    if (mPage == 0) {
+        mPage = mPageCount;
+    } else {
+        mPage--;
+    }
+    mMotions.clear();
+    mSerial.AddTail(MCreateBgCallTask((DinoUiMuseum *)this, data_ov006_02196254.LoadPageMotions_00, 1));
+    mSerial.AddTail(MCreateCallTask((DinoUiMuseum *)this, data_ov006_0219627c.FinishPageLeft_00));
+    Disable();
 }
 
 void DinoUiMuseumMenu::FinishPageLeft() {
@@ -407,7 +460,7 @@ extern "C" struct {
 void DinoUiMuseumMenu::ShowInformation() {
     GetSerial()->AddTail(gLcd->mSub->mBright->CreateFadeOutToBlack(5, 0),
                          MCreateCallTask((DinoUiMuseum *)this, data_ov006_021961dc.CloseInformation_00),
-                         new DinoUiMuseumInformationMenu((DinoUiMuseumInformationMenu::Info *)&mUnk178,
+                         new DinoUiMuseumInformationMenu((DinoUiMuseumInformationMenu::Info *)&mCreatures,
                                                          (u32 *)&mSelected, mUnk1B0),
                          MCreateCallTask((DinoUiMuseum *)this, data_ov006_0219621c.OpenInformation_00),
                          gLcd->mSub->mBright->CreateFadeInFromBlack(5, 0));

@@ -36,7 +36,10 @@ public:
     void CreateSlots();
     void CreateSlot(u32 index);
     void ClearSlots();
+    void LoadPageMotions();
+    void PageRight();
     void FinishPageRight();
+    void PageLeft();
     void FinishPageLeft();
     void SelectTab(u8 tab);
     void LoadTab(u8 tab);
@@ -59,17 +62,17 @@ public:
     MView *mCursor;                     // 0x168
     DinoUiFieldMenuFraction *mFraction; // 0x16C: "page n/m"
     u8 unk170[0x178 - 0x170];
-    std::vector<MTask *> mUnk178;       // 0x178
+    std::vector<u32> mCreatures;        // 0x178: one slot each
     std::vector<MTask *> mUnk184;       // 0x184
     std::vector<MTask *> mUnk190;       // 0x190
     u32 mPage;                          // 0x19C
-    u8 unk1A0[0x1A4 - 0x1A0];
+    u32 mPageCount;                     // 0x1A0: the last page
     u8 mTab;                            // 0x1A4
     int mSelected;  // 0x1A8: the fossil whose information is shown
     u8 mUnk1AC;     // 0x1AC: whether the slots can be chosen
     u8 unk1AD[3];
     u32 mUnk1B0;        // 0x1B0
-    std::vector<MMotionFile> mUnk1B4;   // 0x1B4
+    std::vector<MMotionFile> mMotions;  // 0x1B4: the page's slots' motions
     MTaskSet *mUnk1C0;                  // 0x1C0
 };
 
