@@ -104,6 +104,7 @@ src/game/dino_common_label.cpp:
 
 src/game/help.cpp:
     .text       start:0x0201ce08 end:0x0201fc84
+    .init       start:0x02088fe8 end:0x02088ff8
 
 src/util/text_parse.c:
     complete

@@ -19,7 +19,7 @@
 
 static DinoHelpDriver *sHelpDriver;
 static DinoHelpBase *sHelpCurrentBase;
-static OSMutex sHelpMutex;
+static MMutex sHelpMutex;
 
 DinoHelpHook::DinoHelpHook() {
     mActive = FALSE;
@@ -62,13 +62,13 @@ DinoHelpDriver::~DinoHelpDriver() {
 }
 
 void DinoHelpDriver::AddBase(DinoHelpBase *base) {
-    MScopedLock lock(&sHelpMutex, TRUE);
+    MScopedLock lock(&sHelpMutex.mutex, TRUE);
     mBases.push_back(base);
     sHelpCurrentBase = base;
 }
 
 void DinoHelpDriver::RemoveBase(DinoHelpBase *base) {
-    MScopedLock lock(&sHelpMutex, TRUE);
+    MScopedLock lock(&sHelpMutex.mutex, TRUE);
     std::list<DinoHelpBase *>::iterator it = std::find(mBases.begin(), mBases.end(), base);
     if (it == mBases.end()) {
         OS_Terminate();
@@ -78,7 +78,7 @@ void DinoHelpDriver::RemoveBase(DinoHelpBase *base) {
 }
 
 BOOL DinoHelpDriver::HasBase(DinoHelpBase *base) {
-    OSMutex *mutex = &sHelpMutex;
+    OSMutex *mutex = &sHelpMutex.mutex;
     OS_LockMutex(mutex);
     BOOL found = std::find(mBases.begin(), mBases.end(), base) != mBases.end();
     OS_UnlockMutex(mutex);
@@ -86,12 +86,12 @@ BOOL DinoHelpDriver::HasBase(DinoHelpBase *base) {
 }
 
 void DinoHelpDriver::AddItem(DinoHelpItem *item) {
-    MScopedLock lock(&sHelpMutex, TRUE);
+    MScopedLock lock(&sHelpMutex.mutex, TRUE);
     mItems.push_back(item);
 }
 
 void DinoHelpDriver::RemoveItem(DinoHelpItem *item) {
-    OS_LockMutex(&sHelpMutex);
+    OS_LockMutex(&sHelpMutex.mutex);
     mItems.erase(std::find(mItems.begin(), mItems.end(), item));
     // Drop the entries linking to or from the item.
     std::multimap<u32, std::pair<u32, u32> >::iterator it = mEntries.begin();
@@ -103,23 +103,23 @@ void DinoHelpDriver::RemoveItem(DinoHelpItem *item) {
             ++it;
         }
     }
-    OS_UnlockMutex(&sHelpMutex);
+    OS_UnlockMutex(&sHelpMutex.mutex);
 }
 
 void DinoHelpDriver::AddHook(DinoHelpHook *hook) {
-    MScopedLock lock(&sHelpMutex, TRUE);
+    MScopedLock lock(&sHelpMutex.mutex, TRUE);
     mHooks.push_back(hook);
 }
 
 void DinoHelpDriver::RemoveHook(DinoHelpHook *hook) {
-    OSMutex *mutex = &sHelpMutex;
+    OSMutex *mutex = &sHelpMutex.mutex;
     OS_LockMutex(mutex);
     mHooks.erase(std::find(mHooks.begin(), mHooks.end(), hook));
     OS_UnlockMutex(mutex);
 }
 
 void DinoHelpDriver::NotifyOpen() {
-    MScopedLock lock(&sHelpMutex, TRUE);
+    MScopedLock lock(&sHelpMutex.mutex, TRUE);
     for (std::list<DinoHelpHook *>::iterator it = mHooks.begin(); it != mHooks.end(); it++) {
         if ((*it)->IsActive()) {
             (*it)->Unk08();
@@ -128,7 +128,7 @@ void DinoHelpDriver::NotifyOpen() {
 }
 
 void DinoHelpDriver::NotifyClose() {
-    MScopedLock lock(&sHelpMutex, TRUE);
+    MScopedLock lock(&sHelpMutex.mutex, TRUE);
     for (std::list<DinoHelpHook *>::iterator it = mHooks.begin(); it != mHooks.end(); it++) {
         if ((*it)->IsActive()) {
             (*it)->Unk0C();
@@ -140,7 +140,7 @@ void DinoHelpDriver::NotifyClose() {
 // base's enabled items has text.
 // NONMATCHING: the game keeps copies of the list iterators on the stack.
 BOOL DinoHelpDriver::CanShowHelp() {
-    MScopedLock lock(&sHelpMutex, TRUE);
+    MScopedLock lock(&sHelpMutex.mutex, TRUE);
     if (mEnableCount <= 0) {
         return FALSE;
     }
@@ -164,20 +164,20 @@ BOOL DinoHelpDriver::CanShowHelp() {
 }
 
 void DinoHelpDriver::AddEntry(u32 a, u32 b, u32 c) {
-    MScopedLock lock(&sHelpMutex, TRUE);
+    MScopedLock lock(&sHelpMutex.mutex, TRUE);
     mEntries.insert(std::multimap<u32, std::pair<u32, u32> >::value_type(a, std::make_pair(b, c)));
 }
 
 void DinoHelpDriver::RemoveEntry(u32 a, u32 b) {
-    OS_LockMutex(&sHelpMutex);
+    OS_LockMutex(&sHelpMutex.mutex);
     for (std::multimap<u32, std::pair<u32, u32> >::iterator it = mEntries.begin(); it != mEntries.end(); ++it) {
         if (a == it->first && b == it->second.first) {
             mEntries.erase(it);
-            OS_UnlockMutex(&sHelpMutex);
+            OS_UnlockMutex(&sHelpMutex.mutex);
             return;
         }
     }
-    OS_UnlockMutex(&sHelpMutex);
+    OS_UnlockMutex(&sHelpMutex.mutex);
 }
 
 void DinoHelpDriver::Enable() {
@@ -572,7 +572,7 @@ void DinoHelp::OnIdle() {
 }
 
 void DinoHelpDriver::Idle() {
-    MScopedLock lock(&sHelpMutex, TRUE);
+    MScopedLock lock(&sHelpMutex.mutex, TRUE);
     if (mTasks->IsEmpty()) {
         Exit();
         return;
