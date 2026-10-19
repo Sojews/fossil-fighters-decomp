@@ -21,7 +21,7 @@ public:
     virtual void Idle();
 
     MPictureFile mPicture;  // 0x74
-    u32 unkA8;
+    MView *mFrame;          // 0xA8
     MConsole *mConsole;     // 0xAC
     u32 unkB0[2];
     MView *mCursor;         // 0xB8
@@ -29,6 +29,11 @@ public:
 
 class KeyWaitTask : public MProcess {
 public:
+    KeyWaitTask(DinoBattleViewTutorialWindow *window) : MProcess(NULL), mWindow(window) {
+        mHub = new MSingleInputHub(1);
+        mHub->EnableTouch();
+        mParallel.AddTail(mHub);
+    }
     virtual ~KeyWaitTask();
     virtual void Idle();
 

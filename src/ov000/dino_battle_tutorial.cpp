@@ -1,5 +1,4 @@
 // DinoBattleTutorial.
-// Only the destructors are decompiled so far.
 
 // Derived destructors have their bases' destructor bodies inlined; auto-inlining the ones defined above does that.
 #pragma auto_inline on
@@ -60,3 +59,36 @@ MResource<DinoBattleTutorialData> DinoBattleTutorialDataLoad(std::string path) {
 template MTask *DinoCreatePostAndWaitTask(DinoBattleView *target, DinoBattleViewTutorialSetRectRequest *msg);
 template MTask *DinoCreatePostAndWaitTask(DinoBattleView *target, DinoBattleViewTutorialSetArroeRequest *msg);
 template MTask *DinoCreatePostAndWaitTask(DinoBattleView *target, DinoBattleViewTutorialWindowRequest *msg);
+
+#pragma auto_inline off
+
+extern "C" void func_ov000_0218e65c(DinoBattleViewTutorialWindow *window);
+
+// Opens the window with the text.
+extern "C" void func_ov000_0218e600(DinoBattleViewTutorialWindow *window, const char *text) {
+    func_ov000_0218e65c(window);
+    window->mConsole->Clear();
+    window->mConsole->ClearText();
+    window->mConsole->SetSpeed(MFx32(2));
+    window->mConsole->Print(std::string(text));
+    window->mConsole->Run();
+}
+
+extern "C" void func_ov000_0218e65c(DinoBattleViewTutorialWindow *window) {
+    DinoSoundPlaySe(0xA8, 0);
+    window->mConsole->Show();
+    window->mFrame->Show();
+}
+
+// Closes it.
+extern "C" void func_ov000_0218e680(DinoBattleViewTutorialWindow *window) {
+    DinoSoundPlaySe(0xA9, 0);
+    window->mConsole->Clear();
+    window->mConsole->Hide();
+    window->mFrame->Hide();
+}
+
+// Waits for a button or a touch (speeding the text up first).
+extern "C" MTask *func_ov000_0218e6b0(DinoBattleViewTutorialWindow *window) {
+    return new KeyWaitTask(window);
+}
