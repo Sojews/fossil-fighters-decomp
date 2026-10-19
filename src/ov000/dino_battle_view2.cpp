@@ -131,6 +131,12 @@ void DinoBattleViewTurnEndDialog::OnStart() {
     }
 }
 
+AnyInputTimerWait::AnyInputTimerWait(int frames) : MProcess(NULL), mTimer(frames) {
+    MSingleInputHub *hub = new MSingleInputHub(1);
+    mParallel.AddTail(hub);
+    mInput = hub->GetInput(0);
+}
+
 void AnyInputTimerWait::Idle() {
     if (mInput->GetPressed() & 0x1003) {
         mTimer = 0;

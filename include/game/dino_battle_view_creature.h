@@ -104,7 +104,9 @@ public:
     MTaskSet *mUnk13C;      // 0x13C
     MMotion *mMotion140;    // 0x140
     u32 mFlags144;          // 0x144
-    u32 unk148[6];
+    u32 unk148;
+    u32 mFlags14C;          // 0x14C: 8 while it can't be attacked
+    u32 unk150[4];
     u32 mAdvantage;         // 0x160: its type advantage over the creature shown
 };
 

@@ -18,6 +18,7 @@
 
 class AnyInputTimerWait : public MProcess {
 public:
+    AnyInputTimerWait(int frames);
     virtual ~AnyInputTimerWait();
     virtual void Idle();
 

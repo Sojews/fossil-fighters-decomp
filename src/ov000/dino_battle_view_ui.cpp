@@ -21,6 +21,7 @@
 #include "game/dino_battle_view.h"
 #include "game/dino_battle_view_creature_info.h"
 #include "game/dino_battle_view_kaseki_point_menu.h"
+#include "game/dino_battle_view2.h"
 
 // The tutorial step for an action (or -1): a task to run, and whether the action is blocked.
 extern "C" MTask *func_ov000_0218ec8c(u32 arg0, int arg1, BOOL *blocked);
@@ -334,7 +335,8 @@ void DinoBattleViewUiChangeMenu::OnFocus(MMenuItem *item) {
 
 // The TU's pooled constants.
 extern "C" struct {
-    u8 unk00[0xC];
+    u8 unk00[0x8];
+    const char *crossPath;  // 0x08
     const char *markPath;   // 0x0C
     const char *arrowPath;  // 0x10
     u8 unk14[0x1C];
@@ -922,4 +924,76 @@ void DinoBattleViewUiChangeMenu::OnDecide(MMenuItem *item) {
     Disable();
     GetSerial()->AddTail(mArrows[chosen]->CreateWaitStopTask(), mTarget->CreatePostTask(result),
                     MTaskExitTransfer::Create(this));
+}
+
+// The tutorial step for attacking a slot.
+extern "C" const u32 data_ov000_0218fcf4[];
+// How long the cross over a slot that can't be attacked stays.
+extern "C" const u32 data_0208a140;
+extern "C" void func_ov000_02161748(DinoBattleViewUnkE0 *views);
+
+#pragma opt_common_subs on
+void DinoBattleViewUiAttackerMenu::OnDecide(MMenuItem *item) {
+    if (HandlePageItem(item)) {
+        return;
+    }
+    DinoBattleViewUiRootMenuItem *root = dynamic_cast<DinoBattleViewUiRootMenuItem *>(item);
+    if (root != NULL) {
+        DinoBattleViewCreature *creature = GetItemCreature(root);
+        if ((creature != NULL && (creature->GetUnkB4() == 3 || (creature->mFlags14C & 8))) || root->mDisabled) {
+            DinoSoundPlaySe(0x62, 0);
+            return;
+        }
+        if (creature != NULL && !(mUnk19C & (1 << creature->GetUnkB4()))) {
+            // Out of reach: a cross over it for a while.
+            DinoSoundPlaySe(0x62, 0);
+            MParallelTaskSet *set = new MParallelTaskSet(TRUE);
+            MSmartOam *oam = new MSmartOam(4, 0, 1);
+            MMotion *cross = new MMotion(std::string(data_ov000_02193ae4.crossPath), oam, 0, 1);
+            cross->SetPosition(MPoint(0x80, 0x60));
+            cross->Show();
+            cross->SetPriority(0);
+            set->AddTail(cross, oam);
+            mParallel.AddTail(set);
+            GetSerial()->AddTail(cross->CreatePlayTransfer(1, 0), new AnyInputTimerWait(data_0208a140),
+                                 cross->CreatePlayTransfer(2, 0), cross->CreateWaitStopTask(),
+                                 MTaskExitTransfer::Create(set));
+            return;
+        }
+        if (creature != NULL && HasId(creature->GetUnkAC())) {
+            BOOL blocked = FALSE;
+            MTask *task = func_ov000_0218ec8c(((DinoBattleView *)mUnkEC)->GetUnk12C(),
+                                              data_ov000_0218fcf4[creature->GetUnkB4()], &blocked);
+            if (task != NULL) {
+                mSerial.AddTail(task);
+            }
+            if (blocked) {
+                return;
+            }
+            DinoSoundPlaySe(0x61, 0);
+            creature->ClearFlag144(1);
+            creature->SetFlag144(2);
+            GetParallel()->Remove(mCursor, mCursorTask);
+            ((DinoBattleView *)mUnkEC)->GetUnkE4(mUnkB0)->SetMotions(mCursor, mCursorTask);
+            Disable();
+            GetSerial()->AddTail(mTarget->CreatePostTask(new DinoBattleViewUiAttackerMenuResult(creature->GetUnkAC(), 0)),
+                                 MTaskExitTransfer::Create(this));
+            return;
+        }
+    }
+    if (item == mItem120) {
+        BOOL blocked = FALSE;
+        MTask *task = func_ov000_0218ec8c(((DinoBattleView *)mUnkEC)->GetUnk12C(), 0x22, &blocked);
+        if (task != NULL) {
+            mSerial.AddTail(task);
+        }
+        if (blocked) {
+            return;
+        }
+        func_ov000_02161748(((DinoBattleView *)mUnkEC)->mUnkE0);
+        DinoSoundPlaySe(0x63, 0);
+        GetItemCreature(dynamic_cast<DinoBattleViewUiRootMenuItem *>(GetFocusedItem()))->ClearFlag144(1);
+        GetSerial()->AddTail(mTarget->CreatePostTask(new DinoBattleViewUiAttackerMenuResult(0, 1)),
+                             MTaskExitTransfer::Create(this));
+    }
 }

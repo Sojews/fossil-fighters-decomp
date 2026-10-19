@@ -84,7 +84,18 @@ public:
         AddTail(b);
         AddTail(c);
     }
+    void AddTail(MTask *a, MTask *b, MTask *c, MTask *d, MTask *e) {
+        AddTail(a);
+        AddTail(b);
+        AddTail(c);
+        AddTail(d);
+        AddTail(e);
+    }
     void Remove(MTask *task);
+    void Remove(MTask *a, MTask *b) {
+        Remove(a);
+        Remove(b);
+    }
     void Clear();
 
     void SetUseMutex(BOOL use) { mUseMutex = use; }

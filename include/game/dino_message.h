@@ -637,6 +637,7 @@ public:
 class DinoBattleViewUiAttackerMenuResult : public MMessage {
 public:
     DinoBattleViewUiAttackerMenuResult() : MMessage(0x10018) {}
+    DinoBattleViewUiAttackerMenuResult(u32 id, u8 cancelled) : MMessage(0x10018), mUnk0C(id), mUnk10(cancelled) {}
     virtual u32 GetSize() { return 12; }
     virtual void Write(void *buf) {
         MI_CpuCopy8(&mId, buf, 4);
