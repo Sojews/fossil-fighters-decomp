@@ -21,6 +21,7 @@ public:
     void (DinoMpGame::*mState)(); // 0x74
     void StateStart();
     void StateFinish();
+    void StateWaitExit();
 
     MMultiPlay *mMultiPlay;     // 0x7C
     u32 mUnk80;

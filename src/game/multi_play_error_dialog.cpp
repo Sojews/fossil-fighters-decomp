@@ -28,7 +28,9 @@ void DinoMpGame::Idle() {
 extern "C" struct {
     u8 unk00[0x4];
     void (DinoMpGame::*Start_04)();
-    u8 unk0C[0x3C - 0xC];
+    u8 unk0C[0x2C - 0xC];
+    void (DinoMpGame::*StateWaitExit_2C)();
+    u8 unk34[0x3C - 0x34];
     void (DinoMpGame::*Unk_3C)();
     void (MultiPlayErrorDialog::*ErrorStart_44)();
 } data_020c02fc;
@@ -39,6 +41,11 @@ inline MultiPlayErrorDialog::MultiPlayErrorDialog() : MProcess(NULL) {
 
 DinoMpGame::DinoMpGame(MMultiPlay *multiPlay) : MProcess(NULL), mMultiPlay(multiPlay) {
     mState = data_020c02fc.Start_04;
+}
+
+// Waits three seconds, then ends.
+void DinoMpGame::StateWaitExit() {
+    GetSerial()->AddTail(new MTimer(180), MTaskExitTransfer::Create(this));
 }
 
 void DinoMpGame::StateFinish() {

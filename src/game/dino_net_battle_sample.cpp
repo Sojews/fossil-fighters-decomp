@@ -17,7 +17,7 @@ void DinoNetBattleSample::Idle() {
 extern "C" struct {
     u8 unk00[0x4];
     void (DinoNetBattleSample::*Unk02034130_04)();
-    u8 unk0C[0x14 - 0xC];
+    void (DinoNetBattleSample::*StateEnd_0C)();
     void (DinoNetBattleSample::*Start_14)();
     void (DinoNetBattleSample::*StateTeamSelect_1C)();
 } data_020bd0d8;
@@ -26,7 +26,14 @@ extern "C" const wchar_t data_020bd14c[];
 extern "C" int swprintf(wchar_t *s, size_t n, const wchar_t *format, ...);
 
 M_EXTERN_OVERLAY(ov003);
+M_EXTERN_OVERLAY(ov006);
 M_EXTERN_OVERLAY(ov007);
+
+void DinoNetBattleSample::StateEnd() {
+    MUnloadOverlay(0, M_OVERLAY_ID(ov003));
+    MUnloadOverlay(0, M_OVERLAY_ID(ov006));
+    Exit();
+}
 
 DinoNetBattleSample::DinoNetBattleSample() : MProcess(NULL) {
     mState = data_020bd0d8.Start_14;

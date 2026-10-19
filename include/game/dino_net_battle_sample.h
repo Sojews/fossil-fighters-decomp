@@ -11,6 +11,7 @@ public:
 
     void StateSetup();
     void StateTeamSelect();
+    void StateEnd();
 
     void (DinoNetBattleSample::*mState)(); // 0x74
     u32 mTeam;                             // 0x7C
