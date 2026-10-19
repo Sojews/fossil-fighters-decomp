@@ -37,20 +37,35 @@ public:
     int mMode;          // 0x14
 };
 
+class MInput;
+
+// Waits for a telop's tasks to finish, or for the player to skip it.
 class SkipTelopTask : public MProcess {
 public:
     virtual ~SkipTelopTask();
     virtual void Idle();
+    virtual void OnFinished() = 0;
+    virtual void OnSkipped() = 0;
+
+    MTaskSet *mTasks;   // 0x74: the telop's
+    MInput *mInput;     // 0x78
+    u32 mDelay;         // 0x7C: before it can be skipped
+    u8 mUnk80;          // 0x80
+    u8 mNoSkip;         // 0x81
 };
 
 class SkipWinTelopTask : public SkipTelopTask {
 public:
     virtual ~SkipWinTelopTask();
+    virtual void OnFinished();
+    virtual void OnSkipped();
 };
 
 class SkipLoseTelopTask : public SkipTelopTask {
 public:
     virtual ~SkipLoseTelopTask();
+    virtual void OnFinished();
+    virtual void OnSkipped();
 };
 
 class NopWaitTask : public MTask {

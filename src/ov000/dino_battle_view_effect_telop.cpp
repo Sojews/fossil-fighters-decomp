@@ -4,6 +4,7 @@
 // Derived destructors have their bases' destructor bodies inlined; auto-inlining the ones defined above does that.
 #pragma auto_inline on
 
+#include "m/input.h"
 #include "game/dino_battle_view_effect_telop.h"
 #include "types.h"
 #include "m/bg_new_task.h"
@@ -53,4 +54,20 @@ template MTask *MCreateBgCallTask(DinoBattleViewEffectTelop *obj, void (DinoBatt
 void SetBGModeTask::Execute() {
     mBg->SetMode(mMode);
     Exit();
+}
+
+void SkipTelopTask::Idle() {
+    if (mTasks->IsEmpty()) {
+        OnFinished();
+        mSerial.AddTail(MTaskExitTransfer::Create(this));
+        return;
+    }
+    if (mDelay != 0) {
+        mDelay--;
+        return;
+    }
+    if (!mNoSkip && (mInput->GetPressed() & 0x1003)) {
+        OnSkipped();
+        mSerial.AddTail(MTaskExitTransfer::Create(this));
+    }
 }
