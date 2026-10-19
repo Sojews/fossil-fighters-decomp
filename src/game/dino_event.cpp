@@ -155,3 +155,35 @@ void DinoEventLoop::RunCommands(const u8 *block) {
     mField->SetUnk258(TRUE);
     mSerial.AddTail(new DinoEventExecFinish(this));
 }
+
+// The TU's pooled pointer-to-member constants.
+extern "C" struct {
+    u8 unk00[0x20];
+    void (DinoEventLoop::*State0203ad00_20)();
+} data_020bd9d0;
+
+void DinoEventLoop::Start() {
+    MTaskSet *parallel = &mParallel;
+    parallel->mUseMutex = TRUE;
+    MLoadOverlay(0, M_OVERLAY_ID(ov001));
+    mEpisodes = new DinoEventLoopEpisode[gDinoResource->GetEpisodeCount()];
+    u32 size = gDinoResource->GetEpisodeCount() * sizeof(DinoEventLoopEpisode);
+    MI_CpuFill8(mEpisodes, 0, size);
+    mEpisodesChanged = FALSE;
+    mUnkB4 = new DinoEventLoopUnkB4;
+    mUnkB4->unk0 = 0;
+    mUnkB8 = new DinoEventLoopUnkB8;
+    mUnkB8->unk8 = 0;
+    mCameraUsed = FALSE;
+    mUnkBD = 0;
+    mUnkBE = 0;
+    AddSeenEpisodes();
+    mField = new DinoField(&mScreen, 0);
+    mParallel.AddTail(mField);
+    if (gDinoBackup->IsLoaded()) {
+        mField->Read(gDinoBackup->GetUnk140());
+        Fade(2, 30);
+        mSerial.AddTail(CreateFadeWaitTask());
+    }
+    mState = data_020bd9d0.State0203ad00_20;
+}

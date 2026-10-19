@@ -457,6 +457,20 @@ struct DinoEventEpisode {
     MArchiveFile mFile;     // 0x04
 };
 
+// (Made and deleted by the event loop; nothing is known of them yet.)
+struct DinoEventLoopUnkB4 {
+    u32 unk0;
+    u32 unk4[3];
+};
+// What the event loop keeps of each episode (nothing is known of it yet).
+struct DinoEventLoopEpisode {
+    u32 unk[2];
+};
+struct DinoEventLoopUnkB8 {
+    u32 unk0[2];
+    u8 unk8;
+};
+
 // Runs the event scripts (the game's class name; the event commands get it as their event).
 class DinoEventLoop : public MProcess {
 public:
@@ -478,6 +492,9 @@ public:
     void AddSeenEpisodes();
     void RemoveEpisode(u32 id);
     void ResetEpisode(u32 id);
+    // Makes the field (reading the saved state, if any) and fades it in.
+    void Start();
+    void State0203ad00();
     BOOL ProcessEpisode(const std::map<u32, DinoEventEpisode>::iterator &it);
     // TRUE if an entry's conditions hold (all of them, or any, by its mode).
     BOOL CheckConditions(const u8 *entry);
@@ -491,15 +508,19 @@ public:
     DinoField *mField;      // 0x80
     std::map<u32, DinoEventEpisode> mEpisodeFiles;  // 0x84
     MResource<DinoEpisodeData> mCommands;  // 0x94: the commands of the episode being run
-    u32 mUnkA4[6];          // 0xA4
+    u32 mUnkA4[4];          // 0xA4
+    DinoEventLoopUnkB4 *mUnkB4; // 0xB4
+    DinoEventLoopUnkB8 *mUnkB8; // 0xB8
     u8 mCameraUsed;         // 0xBC
-    u8 unkBD[0xCC - 0xBD];
+    u8 mUnkBD;              // 0xBD
+    u8 mUnkBE;              // 0xBE
+    u8 unkBF[0xCC - 0xBF];
     u8 mEventCleared;       // 0xCC: an event was just cleared
     u8 unkCD[0x108 - 0xCD];
     u32 mUnk108;            // 0x108
     u32 mUnk10C;            // 0x10C
     MScreen *mScreen;       // 0x110: the field's screen
-    void *mEpisodes;        // 0x114
+    DinoEventLoopEpisode *mEpisodes;   // 0x114: one per episode
     u8 mEpisodesChanged;    // 0x118
 };
 
