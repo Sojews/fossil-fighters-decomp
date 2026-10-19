@@ -4,6 +4,7 @@
 // Derived destructors have their bases' destructor bodies inlined; auto-inlining the ones defined above does that.
 #pragma auto_inline on
 
+#include "game/dino_ui_parts_reviver_medal_button.h"
 #include "game/dino_ui_parts_tab_icon_menu_item_menu.h"
 #include "game/dino_ui_parts_tab_icon_menu_item.h"
 #include "game/dino_ui_status_menu_item.h"
@@ -143,4 +144,18 @@ DinoUiStatusMenuItem::DinoUiStatusMenuItem(DinoUiStatusMenu *owner, const std::s
     mMotion->Show();
     mParallel.AddTail(mMotion);
     mMotion->GetUnit()->SetMode(1);
+}
+
+void DinoUiStatusMenu::FinishPage() {
+    ClearItems();
+    CreateItems();
+    RefreshItems();
+    RefreshOKButton();
+    FocusNearestItem(GetCursor());
+}
+
+void DinoUiStatusMenu::FinishTab() {
+    mMembers[mSelected]->PlayNormal();
+    FocusItem(mMembers[mSelected]);
+    RefreshOKButton();
 }

@@ -8,6 +8,8 @@
 
 struct DinoTeam;
 class MSmartOam;
+class DinoUiPartsReviverMedalButton;
+
 class DinoUiStatusMenu : public DinoHelpBase, public MMenu {
 public:
     MSmartOam *GetOam() { return mOam; }
@@ -21,13 +23,19 @@ public:
     void SelectTab(int tab);
     void DecideMember(int index);
     void SelectMember(int index);
+    void ClearItems();
+    void CreateItems();
+    void RefreshItems();
+    void RefreshOKButton();
+    void FinishPage();
+    void FinishTab();
 
     u8 unkB3[1];                // members start in MMenu's tail padding
     MSmartOam *mOam;            // 0xB4: the items' sprites
     u8 unkB8[8];
     MMenuItem *mTabItems[3];    // 0xC0
     u32 mUnkCC[2];              // 0xCC
-    MMenuItem *mMembers[5];     // 0xD4
+    DinoUiPartsReviverMedalButton *mMembers[5];     // 0xD4
     u8 unkE8[0x2C];
     int *mResult;               // 0x114
     struct Team {
