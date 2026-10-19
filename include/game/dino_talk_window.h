@@ -24,6 +24,8 @@ public:
     void Skip();
     BOOL IsAnimating();
     MTask *CreateCloseTask();
+    // Waits until the window has started showing its text.
+    MTask *CreateWaitStartTask();
     virtual ~DinoTalkWindow();
     virtual void Idle();
 
@@ -31,7 +33,8 @@ public:
     std::wstring mText; // 0x7C
     u8 unk88[0xC];
     MConsole *mConsole; // 0x94
-    u8 unk98[0x14];
+    u8 mStarted;        // 0x98
+    u8 unk99[0x13];
     u32 mUnkAC;         // 0xAC
     u8 mUnkB0;          // 0xB0
     MTaskSet *mAnims;   // 0xB4: the window's own animations

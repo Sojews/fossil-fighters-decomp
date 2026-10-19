@@ -43,6 +43,10 @@ void DinoTalkWindowWaitStartTask::Execute() {
 
 #pragma auto_inline off
 
+MTask *DinoTalkWindow::CreateWaitStartTask() {
+    return new DinoTalkWindowWaitStartTask(&mStarted);
+}
+
 void DinoTalkWindow::SetUnkF4() {
     mUnkF4 = TRUE;
 }

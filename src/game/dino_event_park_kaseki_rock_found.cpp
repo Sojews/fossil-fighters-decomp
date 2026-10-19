@@ -35,7 +35,8 @@ extern "C" struct {
     void (DinoEventKasekiRockFound::*StateFound_50)();
     void (DinoEventKasekiRockFound::*StateAnswered_58)();
     void (DinoEventKasekiRockFound::*StateLeave_60)();
-    u8 unk68[0x78 - 0x68];
+    u8 unk68[0x70 - 0x68];
+    void (DinoEventParkKasekiRockFound::*StateEnd_70)();
     void (DinoEventKasekiRockFound::*StateFoundEnd_78)();
 } data_020bd380;
 extern "C" struct {
@@ -156,3 +157,12 @@ template class MCallTask1<DinoEventLoop, DinoEventLoop, bool>;
 template MTask *MCreateCallTask(DinoEventLoop *obj, void (DinoEventLoop::*func)(bool), bool a0);
 template class MCallTask2<MPolygonChar, MPolygonChar, const char *, const char *>;
 template MTask *MCreateCallTask(MPolygonChar *obj, void (MPolygonChar::*func)(const char *, const char *), const char * a0, const char * a1);
+
+void DinoEventParkKasekiRockFound::StateEnd() {
+    if (!mTaken) {
+        gDinoBackup->SetUnk138(mIndex, &mEntry);
+        mEvent->GetField()->CreateKasekiRock(mIndex);
+    }
+    mEvent->GetField()->SetUnk258(FALSE);
+    Exit();
+}

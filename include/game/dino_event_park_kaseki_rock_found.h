@@ -14,6 +14,8 @@ public:
     virtual void Idle();
 
     void StateStart();
+    // Puts the rock back in the park (unless it was taken) and ends.
+    void StateEnd();
 
     void (DinoEventParkKasekiRockFound::*mState)(); // 0x74
     DinoEventLoop *mEvent;      // 0x7C
@@ -21,7 +23,7 @@ public:
     DinoBackupEntry28 mEntry;   // 0x84: the rock, taken out of the park
     u32 unkAC;
     DinoFieldChara *mChara;     // 0xB0: the one the camera follows
-    u32 unkB4;
+    u8 mTaken;                  // 0xB4
 };
 
 #endif
