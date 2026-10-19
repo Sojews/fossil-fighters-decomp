@@ -2,6 +2,7 @@
 #define GAME_DINO_UI_ORDER_SELECT_H
 
 #include "game/dino_resource.h"
+#include "game/dino_backup.h"
 #include "m/motion.h"
 #include "m/picture.h"
 #include "m/resource.h"
@@ -21,6 +22,8 @@ struct DinoUiOrderSelectData;
 
 class MSmartOam;
 class DinoUiRvInformation;
+class DinoUiOrderSelectMenuItem;
+class DinoUiPartsTeamTech;
 class DinoUiOrderSelectMenu : public DinoHelpBase, public MMenu {
 public:
     MSmartOam *GetOam() { return mOam; }
@@ -39,17 +42,20 @@ public:
     void CreateItems();
     void RefreshItems();
     void RefreshOKButton();
+    BOOL IsTeamInvalid();
     void FinishPage();
     void FinishTab();
 
     u8 unkB3[1];
     MSmartOam *mOam;            // 0xB4: the items' sprites
-    u8 unkB8[0xC0 - 0xB8];
+    MMenuItem *mUnkB8;          // 0xB8
+    DinoUiOrderSelectMenuItem *mOKButton;   // 0xBC
     MMenuItem *mTabs[4];        // 0xC0
     u8 unkD0[0xD4 - 0xD0];
     MPictureFile *mPictures[4]; // 0xD4
     MMenuItem *mItems[5];       // 0xE4
-    u8 unkF8[0x110 - 0xF8];
+    MMenuItem *mUnkF8[4];       // 0xF8: by tab
+    u8 unk108[0x110 - 0x108];
     std::string mUnk110;        // 0x110
     u8 unk11C[0x1A8 - 0x11C];
     u8 mHasFourthTab;           // 0x1A8
@@ -57,13 +63,17 @@ public:
     DinoUiRvInformation *mInfo; // 0x1B4
     u32 unk1B8;
     MTaskSet *mUnk1BC;          // 0x1BC
-    u8 unk1C0[0x1EC - 0x1C0];
+    u8 unk1C0[0x1C4 - 0x1C0];
+    DinoTeam mTeam;             // 0x1C4
     u32 mFocusIndex;            // 0x1EC: the item focused after a tab change
     u32 mUnk1F0;                // 0x1F0
     u8 mPage;                   // 0x1F4
     u8 mFocusTabs;              // 0x1F5: focus the new page's tab when paging
     u8 mUnk1F6;                 // 0x1F6
-    u8 unk1F7[0x20C - 0x1F7];
+    u8 unk1F7[0x1FC - 0x1F7];
+    u8 mItemsLinked;            // 0x1FC
+    u8 unk1FD[0x208 - 0x1FD];
+    DinoUiPartsTeamTech *mTech; // 0x208: shown when the team has a technique
     MResource<DinoUiOrderSelectData> mUnk20C;   // 0x20C
 };
 

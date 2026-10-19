@@ -8,6 +8,9 @@
 #include "game/dino_ui_order_select.h"
 #include "game/dino_ui_rv_information.h"
 #include "types.h"
+#include "m/smart_oam.h"
+#include "game/dino_team.h"
+#include "game/dino_ui_parts_team_tech.h"
 #include "m/call_task.h"
 #include "m/input.h"
 
@@ -135,6 +138,31 @@ void DinoUiOrderSelectMenu::SetInfoPage(u8 page) {
                          MCreateCallTask(this, data_ov006_02197110.Enable_00));
     mUnk1BC->Clear();
     Disable();
+}
+
+void DinoUiOrderSelectMenu::ClearItems() {
+    RemoveLink(mOKButton, 4);
+    RemoveLink(mUnkB8, 4);
+    RemoveLink(mUnkF8[mHasFourthTab ? 3 : 2], 2);
+    for (int i = 0; i < 5; i++) {
+        RemoveItem(mItems[i]);
+        delete mItems[i];
+    }
+    mItemsLinked = FALSE;
+}
+
+// The OK button lights up when the team can fight; the technique shows when the team has one.
+void DinoUiOrderSelectMenu::RefreshOKButton() {
+    if (!IsTeamInvalid()) {
+        mOKButton->mMotion->GetUnit()->SetMode(1);
+    } else {
+        mOKButton->mMotion->GetUnit()->SetMode(0);
+    }
+    if (DinoTeamHasTech(&mTeam)) {
+        mTech->Show();
+    } else {
+        mTech->Hide();
+    }
 }
 
 void DinoUiOrderSelectMenu::FinishPage() {
