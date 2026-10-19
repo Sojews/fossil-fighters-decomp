@@ -375,3 +375,10 @@ void DinoBattleViewCreature::ClearFlag144(int bit) {
 }
 
 #pragma auto_inline on
+
+#pragma auto_inline off
+
+// A player name panel for the game's opening.
+extern "C" MMotion *func_ov000_02173d64(MSmartOam *oam, const std::string &name, u32 arg2, u32 arg3, u8 arg4) {
+    return new DinoBattleViewEffectGameBeginPlayerNamePanel(oam, name, arg2, arg3, arg4);
+}

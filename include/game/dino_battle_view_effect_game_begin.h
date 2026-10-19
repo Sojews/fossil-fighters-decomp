@@ -14,6 +14,7 @@
 
 class DinoBattleViewEffectGameBeginPlayerNamePanel : public MMotion {
 public:
+    DinoBattleViewEffectGameBeginPlayerNamePanel(MSmartOam *oam, std::string name, u32 arg2, u32 arg3, u8 arg4);
     virtual ~DinoBattleViewEffectGameBeginPlayerNamePanel();
     virtual void Execute();
     virtual MRect GetFrame();
