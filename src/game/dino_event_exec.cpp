@@ -25,7 +25,6 @@
 #define PAD_BUTTON_A 0x0001
 #define PAD_TOUCH 0x1000
 
-extern "C" void func_0203b80c(void *event);
 
 DinoEventExecVarValue::DinoEventExecVarValue(u32 op, DinoEventVar var, s32 value) {
     mOp = op;
@@ -171,7 +170,7 @@ DinoEventExecFinish::DinoEventExecFinish(void *event) {
 }
 
 void DinoEventExecFinish::Transfer() {
-    func_0203b80c(mEvent);
+    ((DinoEventLoop *)mEvent)->FinishCommands();
 }
 
 DinoEventExecLicenseGet::DinoEventExecLicenseGet(u32 license) {

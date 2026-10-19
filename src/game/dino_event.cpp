@@ -212,3 +212,17 @@ void DinoEventLoop::UpdateRegions() {
         }
     }
 }
+
+void DinoEventLoop::FinishCommands() {
+    ReleaseUnkCD();
+    mUnkA4 = MResource<DinoEventLoopUnkA4Data>();
+    if (!mUnkBE) {
+        mField->SetUnk258(FALSE);
+    }
+    mUnkBE = FALSE;
+    if (mCameraUsed && !mUnkBD) {
+        mCameraUsed = FALSE;
+        mField->GetCamera()->SetTracking(TRUE);
+    }
+    mUnkBD = FALSE;
+}

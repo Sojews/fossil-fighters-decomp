@@ -462,6 +462,8 @@ struct DinoEventLoopUnkB4 {
     u32 unk0;
     u32 unk4[3];
 };
+struct DinoEventLoopUnkA4Data;
+
 // What the event loop keeps of each episode (nothing is known of it yet).
 struct DinoEventLoopEpisode {
     u32 unk[2];
@@ -504,13 +506,16 @@ public:
     // Runs a block of commands, then lets the player move again.
     void RunCommands(const u8 *block);
     void RunCommand(const u8 *command);
+    // When the commands are done: lets go of what they loaded, lets the player move and the camera follow again.
+    void FinishCommands();
+    void ReleaseUnkCD();
 
     void (DinoEventLoop::*mState)();    // 0x74
     u32 *mResult;           // 0x7C
     DinoField *mField;      // 0x80
     std::map<u32, DinoEventEpisode> mEpisodeFiles;  // 0x84
     MResource<DinoEpisodeData> mCommands;  // 0x94: the commands of the episode being run
-    u32 mUnkA4[4];          // 0xA4
+    MResource<DinoEventLoopUnkA4Data> mUnkA4;   // 0xA4
     DinoEventLoopUnkB4 *mUnkB4; // 0xB4
     DinoEventLoopUnkB8 *mUnkB8; // 0xB8
     u8 mCameraUsed;         // 0xBC
