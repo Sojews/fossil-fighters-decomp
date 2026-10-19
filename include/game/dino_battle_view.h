@@ -29,6 +29,7 @@ public:
     virtual u32 GetUnk4();  // from the item's row of the root menu table
     virtual u32 GetUnk0();
     void Refresh();     // (empty in the game)
+    MPoint GetCursorPos();
 
     u32 mIndex;     // 0x88: the row
     MPoint mPos;    // 0x8C: where the cursor goes when no creature is there

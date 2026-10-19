@@ -780,7 +780,7 @@ _ZN32DinoBattleViewUiSelectAreaCommon12MoveCursorToEP28DinoBattleViewUiRootMenuI
 _ZN32DinoBattleViewUiSelectAreaCommon10MoveCursorE6MPointii kind:function(thumb,size=0x78) addr:0x021775cc
 _ZN32DinoBattleViewUiSelectAreaCommon15GetItemCreatureEP9MMenuItem kind:function(thumb,size=0x7c) addr:0x02177644
 _ZN28DinoBattleViewUiRootMenuItemC1EP32DinoBattleViewUiSelectAreaCommonm6MPoint kind:function(thumb,size=0x60) addr:0x021776c0
-func_ov000_02177720 kind:function(thumb,size=0x52) addr:0x02177720
+_ZN28DinoBattleViewUiRootMenuItem12GetCursorPosEv kind:function(thumb,size=0x52) addr:0x02177720
 _ZN28DinoBattleViewUiRootMenuItem8GetFrameEv kind:function(thumb,size=0x66) addr:0x02177774
 _ZN28DinoBattleViewUiRootMenuItem14OnFocusChangedEi kind:function(thumb,size=0x20) addr:0x021777dc
 _ZN28DinoBattleViewUiRootMenuItem15OnSelectChangedEi kind:function(thumb,size=0x8) addr:0x021777fc

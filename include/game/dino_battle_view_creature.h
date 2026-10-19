@@ -4,6 +4,7 @@
 #include "game/dino_battle_creature_def.h"
 
 #include <string>
+#include "game/creature_motion.h"
 #include "m/menu_item.h"
 #include "m/menu.h"
 #include "m/display.h"
@@ -78,7 +79,7 @@ public:
     u32 mUnkB4;             // 0xB4
     u32 unkB8[5];
     u32 mUnkCC;             // 0xCC
-    MMotion *mMotion;       // 0xD0
+    CreatureMotion *mMotion;    // 0xD0
     u32 unkD4;
     u32 mUnkD8;             // 0xD8
     u32 mUnkDC;             // 0xDC

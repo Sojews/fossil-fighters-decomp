@@ -498,6 +498,10 @@ DinoBattleViewUiRootMenuItem::DinoBattleViewUiRootMenuItem(DinoBattleViewUiSelec
     mHasCreature = ((DinoBattleViewUiSelectAreaCommon *)mOwner)->GetItemCreature(this) != NULL ? TRUE : FALSE;
 }
 
+void DinoBattleViewUiSelectAreaCommon::MoveCursorTo(DinoBattleViewUiRootMenuItem *item, int frames, int arg) {
+    MoveCursor(item->GetCursorPos() + data_ov000_02193ae4.unk58, frames, arg);
+}
+
 void DinoBattleViewUiSelectAreaCommon::MoveCursor(MPoint pos, int frames, int arg) {
     mCursorAnime->Clear();
     if (mCursor != NULL) {
@@ -509,9 +513,24 @@ void DinoBattleViewUiSelectAreaCommon::MoveCursor(MPoint pos, int frames, int ar
     }
 }
 
-// Where the cursor goes for an item.
-extern "C" MPoint func_ov000_02177720(DinoBattleViewUiRootMenuItem *item);
+// Where the cursor goes for the item: at its creature, or where the item says.
+MPoint DinoBattleViewUiRootMenuItem::GetCursorPos() {
+    DinoBattleViewCreature *creature = ((DinoBattleViewUiSelectAreaCommon *)mOwner)->GetItemCreature(this);
+    if (creature != NULL) {
+        MPoint pos = creature->mMotion->GetPosition();
+        MSmartOam *oam = creature->mMotion->mOam;
+        return MPoint(pos.x - oam->mOffset.x, pos.y - oam->mOffset.y);
+    }
+    return mPos;
+}
 
-void DinoBattleViewUiSelectAreaCommon::MoveCursorTo(DinoBattleViewUiRootMenuItem *item, int frames, int arg) {
-    MoveCursor(func_ov000_02177720(item) + data_ov000_02193ae4.unk58, frames, arg);
+// NONMATCHING: the game loads the frame before the offset and adds in another order.
+MRect DinoBattleViewUiRootMenuItem::GetFrame() {
+    DinoBattleViewCreature *creature = ((DinoBattleViewUiSelectAreaCommon *)mOwner)->GetItemCreature(this);
+    if (creature != NULL) {
+        MSmartOam *oam = creature->mMotion->mOam;
+        MPoint offset(-oam->mOffset.x, -oam->mOffset.y);
+        return creature->mMotion->GetFrame() + offset;
+    }
+    return MRect(0, 0, 0, 0);
 }
