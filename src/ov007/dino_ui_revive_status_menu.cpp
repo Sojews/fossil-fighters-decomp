@@ -299,8 +299,8 @@ void DinoUiReviveStatusMenu::SetPage(u8 page) {
 
 extern const int data_02089a74;
 struct DinoMessageData;
-// The revive messages' file, and what goes before the second answer.
-extern "C" const char data_ov007_02192300[], data_ov007_02192314[];
+// The revive messages' file, then (at +0x14) what goes before the second answer.
+extern "C" const char data_ov007_02192300[];
 extern const u32 data_0208a49c, data_0208a4a0, data_0208a4a4, data_0208a4a8;
 
 // The message's text.
@@ -326,7 +326,7 @@ void DinoUiReviveStatusMenu::OnBackDecided() {
             DinoEventTalkWindow *talk = new DinoEventTalkWindow(
                 gCurrentDisplay, std::string(GetMessageText(messages.Get(), 17)), (int)mOam, 0);
             talk->SetYesNo((u32)mResult, MPoint(0xFE, 0x8E), 3, std::string(gDinoResource->GetText(data_0208a4a8)),
-                           std::string(data_ov007_02192314) + gDinoResource->GetText(data_0208a4a4),
+                           std::string(data_ov007_02192300 + 0x14) + gDinoResource->GetText(data_0208a4a4),
                            std::string(gDinoResource->GetText(data_0208a4a0)),
                            std::string(gDinoResource->GetText(data_0208a49c)));
             mSerial.AddTail(talk);
