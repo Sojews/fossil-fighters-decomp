@@ -3,6 +3,7 @@
 
 #include "game/dino_ui_field_menu_cursor.h"
 #include "game/dino_resource.h"
+#include "game/dino_backup.h"
 #include "m/motion.h"
 #include <string>
 #include "m/menu_item.h"
@@ -30,6 +31,7 @@ class DinoUiRvInformation;
 class DinoUiReviveStatusMenu : public DinoHelpBase, public MMenu {
 public:
     MSmartOam *GetOam() { return mOam; }
+    DinoUiReviveStatusMenu(u32 id, u32 *result, u8 flag);
     virtual ~DinoUiReviveStatusMenu();
     virtual void OnStart();
     virtual void OnFocus(MMenuItem *item);
@@ -44,7 +46,15 @@ public:
     MSerialTaskSet *mCursorTasks;   // 0xCC
     DinoUiFieldMenuCursor *mCursor; // 0xD0
     DinoUiRvInformation *mInfo;     // 0xD4
-    u8 unkD8[0x4C];
+    u8 unkD8[0xE4 - 0xD8];
+    DinoCreatureState mCreature;    // 0xE4
+    u8 unkFC[0x114 - 0xFC];
+    u32 *mResult;           // 0x114
+    u8 mUnk118;             // 0x118
+    u32 mUnk11C;            // 0x11C
+    u8 mUnk120;             // 0x120
+    u8 mFlag;               // 0x121
+    u8 mUnk122;             // 0x122
     MArchivePtr mArchive;   // 0x124
     MArchiveFile mFile;     // 0x128
 };

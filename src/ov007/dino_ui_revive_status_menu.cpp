@@ -5,9 +5,19 @@
 
 #include "game/dino_ui_revive_status_menu.h"
 #include "types.h"
+#include "game/dino_backup.h"
+#include "m/lcd.h"
 #include "game/dino_sound.h"
 #include "m/call_task.h"
 #include "game/dino_ui_rv_information.h"
+
+// NONMATCHING: the game keeps the resource's address in a register to construct it; ours addresses its fields
+// from this.
+DinoUiReviveStatusMenu::DinoUiReviveStatusMenu(u32 id, u32 *result, u8 flag)
+    : MMenu(gLcd->mMain, NULL, 0), mResult(result), mUnk118(0), mUnk11C(0), mUnk120(0xFF), mFlag(flag) {
+    mUnk122 = 1;
+    gDinoBackup->GetCreature(id, &mCreature);
+}
 
 DinoUiReviveStatusMenu::~DinoUiReviveStatusMenu() {
 }
