@@ -120,6 +120,7 @@ public:
 
 class MFont;
 class MSmartObjCanvas;
+class MSmartOam;
 
 // The bar on the top screen showing the selected item's help text.
 class DinoHelpStatus : public MProcess {
@@ -144,6 +145,7 @@ public:
 // The help cursor: four corner motions around a frame.
 class DinoHelpCursor : public MView {
 public:
+    DinoHelpCursor(MSmartOam *oam);
     virtual void Execute();
     virtual void SetPosition(MPoint pos);
     virtual MPoint GetPosition();

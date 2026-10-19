@@ -407,7 +407,8 @@ extern const int kHelpStatusColor;
 extern "C" struct {
     u8 unk00[0xC];
     const char *mMotionPath;    // 0x0C
-    u8 unk10[0x5C - 0x10];
+    const char *mCursorPath;    // 0x10
+    u8 unk14[0x5C - 0x14];
     void (DinoHelpStatus::*Start_5C)();
 } data_020ba91c;
 
@@ -501,5 +502,19 @@ void SetBlendedMode(MSmartOamUnit *unit) {
     MBlend *blend = unit->owner->mDisplay->mBlend;
     if (blend->GetMode() != 0 && (blend->GetTarget1() & 0x10) && blend->GetEva() == 16 && blend->GetEvb() == 0) {
         unit->SetMode(1);
+    }
+}
+
+extern "C" const int data_0208ae10[4]; // the corners' animes
+
+// NONMATCHING: the game keeps the corner's address on the stack across the path's destructor.
+DinoHelpCursor::DinoHelpCursor(MSmartOam *oam) {
+    mFrame = MRect(0, 0, 0, 0);
+    for (u32 i = 0; i < 4; i++) {
+        mCorners[i] = new MMotion(std::string(data_020ba91c.mCursorPath), oam, 0, 1);
+        mCorners[i]->Play(data_0208ae10[i], 0);
+        mCorners[i]->SetAnchor(2);
+        SetBlendedMode(mCorners[i]->GetUnit());
+        mTasks.AddTail(mCorners[i]);
     }
 }
