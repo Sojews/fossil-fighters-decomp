@@ -839,9 +839,29 @@ s32 DinoBackup::FindFreeEntry(DinoBackupEntry *entries, u32 count) {
     return -1;
 }
 
-// The order the entries are sorted into (std::stable_sort's comparison, not decompiled yet).
-struct DinoBackupEntryOrder {};
-extern "C" void func_020187c4(DinoBackupEntry *first, DinoBackupEntry *last, DinoBackupEntryOrder order);
+// The order the entries are sorted into: used ones first, then active ones (by type). (The game emits the whole
+// stable_sort machinery after CompactEntries. NONMATCHING: stable_sort, get_temporary_buffer, __stable_sort,
+// __stable_sort_move, __merge_backward and two of the __merges, as for the creature lists' sorts.)
+struct DinoBackupEntryOrder {
+    bool operator()(const DinoBackupEntry &a, const DinoBackupEntry &b) const {
+        if (a.id != 0 && b.id == 0) {
+            return true;
+        }
+        if (b.id != 0 && a.id == 0) {
+            return false;
+        }
+        if (a.active < b.active) {
+            return true;
+        }
+        if (a.active > b.active) {
+            return false;
+        }
+        if (a.active == 0) {
+            return false;
+        }
+        return a.type < b.type;
+    }
+};
 
 // Moves the used entries in front of the free ones, then sorts them.
 void DinoBackup::CompactEntries(DinoBackupEntry *entries, u32 count) {
@@ -857,7 +877,7 @@ again:
             hole = i;
         }
     }
-    func_020187c4(entries, entries + count, DinoBackupEntryOrder());
+    std::stable_sort(entries, entries + count, DinoBackupEntryOrder());
 }
 
 u32 DinoBackup::GetUnk98Capacity() {
