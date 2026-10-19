@@ -80,3 +80,14 @@ void DinoCommonTutorialWindow::ShowCorners(MRect rect) {
     corner->Show();
     mArrows->AddTail(corner);
 }
+
+void DinoCommonTutorialWindow::SetActive(BOOL active) {
+    OnSetActive(active);
+}
+
+void DinoCommonTutorialWindow::OnSetActive(BOOL active) {
+}
+
+void DinoCommonTutorialWindow::ClearArrows() {
+    mArrows->Clear();
+}

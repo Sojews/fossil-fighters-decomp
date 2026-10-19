@@ -19,7 +19,10 @@ public:
     virtual ~DinoCommonTutorialWindow() {}
 #endif
     virtual void Idle();
+    virtual void OnSetActive(BOOL active);
 
+    void SetActive(BOOL active);
+    void ClearArrows();
     void ShowLongArrow(MPoint pos, int dir);
     void ShowShortArrow(MPoint pos, int dir);
     void ShowCorners(MRect rect);

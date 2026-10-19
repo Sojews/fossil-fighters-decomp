@@ -11,12 +11,15 @@
 #include "game/dino_common_tutorial_window.h"
 #include "game/dino_field_camera_hook.h"
 
+class DinoCleaning;
+
 class DinoCleaningTutorialWindow : public DinoCommonTutorialWindow {
 public:
     DinoCleaningTutorialWindow(MDisplay *display, u32 arg, const std::string &text);
     virtual ~DinoCleaningTutorialWindow();
+    virtual void OnSetActive(BOOL active);
 
-    u32 mUnk9C;                 // 0x9C
+    DinoCleaning *mCleaning;    // 0x9C
     DinoHelpDisabler mDisabler; // 0xA0
 };
 

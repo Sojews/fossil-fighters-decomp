@@ -20,6 +20,11 @@
 #include "game/dino_sound.h"
 #include "game/dino_ui_save_menu.h"
 
+#pragma auto_inline off
+DinoUiSaveOptionMenu::DinoUiSaveOptionMenu(u32 arg) : MMenu(0), mUnkB4(arg) {
+}
+#pragma auto_inline on
+
 DinoUiSaveOption::~DinoUiSaveOption() {
 }
 
