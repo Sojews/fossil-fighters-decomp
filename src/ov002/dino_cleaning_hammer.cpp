@@ -8,6 +8,7 @@
 #include "game/dino_cleaning_drill.h"
 #include "game/dino_cleaning_kaseki_rock.h"
 #include "game/dino_cleaning_rock.h"
+#include "game/dino_cleaning.h"
 #include <algorithm>
 #include "m/bg_new_task.h"
 #include "m/call_task.h"
@@ -189,4 +190,21 @@ void DinoCleaningHammerBaseHit::State0215d0c4() {
     if (mRadius <= MFx32(0)) {
         Exit();
     }
+}
+
+// The TU's pooled pointer-to-member constants.
+extern "C" struct {
+    void (DinoCleaningDrill::*LoadGuides_00)();
+} data_ov002_0216523c;
+
+DinoCleaningDrill::DinoCleaningDrill(DinoCleaning *cleaning, u8 arg1) : DinoCleaningTool(cleaning) {
+    MTaskSet *parallel = &mParallel;
+    mUnk87C = arg1;
+    parallel->mUseMutex = TRUE;
+}
+
+// Loads the guides in the background.
+void DinoCleaningDrill::Unk18() {
+    MTask *task = MCreateBgCallTask(this, data_ov002_0216523c.LoadGuides_00, 1);
+    GetCleaning()->GetSerial()->AddTail(task);
 }

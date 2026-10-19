@@ -6,7 +6,9 @@
 
 class DinoCleaningDrill : public DinoCleaningTool {
 public:
+    DinoCleaningDrill(DinoCleaning *cleaning, u8 arg1);
     virtual ~DinoCleaningDrill();
+    virtual void Unk18();
     virtual void Unk1C();
     virtual void Unk20();
 
@@ -19,6 +21,8 @@ public:
     MMotion *mColumnGuide;  // 0x7C: a line down at the drill's x
     MMotion *mMark;         // 0x80: at the drill
     u8 mUnk84;              // 0x84
+    u8 unk85[0x87C - 0x85];
+    u8 mUnk87C;             // 0x87C
 };
 
 #endif

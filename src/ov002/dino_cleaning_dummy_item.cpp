@@ -112,3 +112,9 @@ void DinoCleaningToolMenu::EnableItem() {
 void DinoCleaningToolMenu::DisableItem() {
     mItemB4->Disable();
 }
+
+#pragma auto_inline off
+
+DinoCleaningToolMenu::DinoCleaningToolMenu(u32 arg0, u32 arg1, u32 arg2)
+    : MMenu(0), mUnkA8(arg0), mUnkAC(arg1), mUnkB0(arg2) {
+}
