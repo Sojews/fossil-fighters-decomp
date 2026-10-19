@@ -14,6 +14,7 @@
 #include "m/bg.h"
 #include "game/dino_ui_rv_status_menu_item_menu.h"
 #include "game/dino_backup.h"
+#include "game/dino_creature_sort.h"
 #include "game/dino_ui_parts_reviver_medal_button.h"
 #include "game/dino_ui_field_menu_fraction.h"
 #include "m/display.h"
@@ -162,27 +163,6 @@ DinoUiMedalMenu::DinoUiMedalMenu(u32 *mode, u32 *index, u8 *unk)
 
 // Where the mUnk1EC creatures' medals go.
 extern "C" const MPoint data_ov006_021942f4[5];
-extern const u32 kCreatureLevelLimits[2];
-
-// A creature's experience, up to what the top level needs.
-static inline u32 GetCreatureTotal(const DinoCreatureState &creature) {
-    if (creature.parts[0].level == 0) {
-        return 0;
-    }
-    u32 max, sum;
-    sum = creature.unk0_8 + (creature.parts[0].level + creature.parts[1].level + creature.parts[2].level +
-                                 creature.parts[3].level);
-    max = kCreatureLevelLimits[0] * 11 + 50;
-    return std::min(max, sum);
-}
-
-static inline u32 GetCreatureLevel(const DinoCreatureState &creature) {
-    if (creature.parts[0].level == 0) {
-        return 0;
-    }
-    return (GetCreatureTotal(creature) - 50) / kCreatureLevelLimits[0] + 1;
-}
-
 void DinoUiMedalMenu::CreateUnkF0Items() {
     for (int i = 0; i < 5; i++) {
         DinoCreatureState creature;

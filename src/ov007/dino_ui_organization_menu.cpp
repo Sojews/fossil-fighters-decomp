@@ -1,6 +1,8 @@
 // DinoUiOrganizationMenu (team organization).
 // NONMATCHING: RemoveMember (the search loop); the rest (OnStart, OnFocus, OnDecide, slot creation...) is to do.
 
+#pragma ipa file
+
 // Derived destructors have their bases' destructor bodies inlined; auto-inlining the ones defined above does that.
 #pragma auto_inline on
 
@@ -24,6 +26,7 @@
 #include "m/bright.h"
 #include "game/dino_ui_medal_menu.h"
 #include "game/dino_ui_parts_tab_icon_menu_item.h"
+#include "game/dino_creature_sort.h"
 
 DinoUiOrganizationMenu::~DinoUiOrganizationMenu() {
     gCurrentDisplay->mBlend->Reset();
@@ -515,24 +518,6 @@ void DinoUiOrganizationMenu::RemoveSlotLinks() {
 }
 
 
-extern const u32 kCreatureLevelLimits[2];
-
-// A creature's experience, up to what the top level needs.
-static inline u32 GetCreatureTotal(const DinoCreatureState &creature) {
-    if (creature.parts[0].level == 0) {
-        return 0;
-    }
-    u32 sum = creature.unk0_8 + (creature.parts[0].level + creature.parts[1].level + creature.parts[2].level +
-                                 creature.parts[3].level);
-    return std::min(kCreatureLevelLimits[0] * 11 + 50, sum);
-}
-
-static inline u32 GetCreatureLevel(const DinoCreatureState &creature) {
-    if (creature.parts[0].level == 0) {
-        return 0;
-    }
-    return (GetCreatureTotal(creature) - 50) / kCreatureLevelLimits[0] + 1;
-}
 
 
 void DinoUiOrganizationMenu::CreateList() {
@@ -865,3 +850,12 @@ void DinoUiPartsTabIconMenuItem::OnFocusChanged(BOOL value) {
 // Vector members the game emits in this file (made explicitly until the code that uses them is decompiled).
 template void std::__vec_deleter<MMotionFile, std::allocator<MMotionFile> >::sub_push_back(const MMotionFile &x, Metrowerks::int2type<false>);
 template void std::__vec_deleter<u32, std::allocator<u32> >::assign<u32 *>(u32 *first, u32 *last, Metrowerks::int2type<true>);
+
+// The list's sorts (the game emits the whole stable_sort machinery here, after SetSort's caller).
+// NONMATCHING: std::__inplace_merge, std::__stable_sort_move, std::__insertion_sort_move and std::get_temporary_buffer,
+// as in ov006_02178b80.cpp.
+template void std::stable_sort(std::vector<u32>::iterator, std::vector<u32>::iterator, DinoCreatureByUnk0D);
+template void std::stable_sort(std::vector<u32>::iterator, std::vector<u32>::iterator, DinoCreatureByUnk02031104);
+template void std::stable_sort(std::vector<u32>::iterator, std::vector<u32>::iterator, DinoCreatureByLevel);
+template void std::stable_sort(std::vector<u32>::iterator, std::vector<u32>::iterator, DinoCreatureByUnk88);
+template void std::stable_sort(std::vector<u32>::iterator, std::vector<u32>::iterator, DinoCreatureByVoice);

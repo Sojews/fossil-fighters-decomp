@@ -7,9 +7,9 @@
 #include "game/dino_backup.h"
 #include "game/dino_resource.h"
 
-extern const u32 kCreatureLevelLimits[2];
-
 extern "C" u32 func_02031104(const DinoCreatureState *creature);
+
+extern const u32 kCreatureLevelLimits[2];
 
 // A creature's experience, up to what the top level needs.
 static inline u32 GetCreatureTotal(const DinoCreatureState &creature) {
