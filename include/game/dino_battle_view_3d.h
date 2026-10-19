@@ -32,6 +32,7 @@ public:
     void CancelQueue();
     void FlushQueue();
     void RunNextQueued();
+    MTask *CreateMove(int unkA, u32 shown, int slot);
 
     u32 unkA8;
     DinoBattleView *mView;                  // 0xAC

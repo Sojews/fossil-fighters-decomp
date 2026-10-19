@@ -1213,7 +1213,7 @@ _ZN16DinoBattleView3D9OnMessageEP8MMessage kind:function(thumb,size=0x1fa4) addr
 .L_02187a16 kind:label(thumb) addr:0x02187a16 local
 func_ov000_02187a44 kind:function(thumb,size=0x238) addr:0x02187a44
 _ZN16DinoBattleView3D13RunNextQueuedEv kind:function(thumb,size=0x8e) addr:0x02187c7c
-func_ov000_02187d0c kind:function(thumb,size=0x15c) addr:0x02187d0c
+_ZN16DinoBattleView3D10CreateMoveEimi kind:function(thumb,size=0x15c) addr:0x02187d0c
 func_ov000_02187e68 kind:function(thumb,size=0x38) addr:0x02187e68
 _ZN16DinoBattleView3D9SetUnk180Eh kind:function(thumb,size=0x20) addr:0x02187ea0
 _ZN16DinoBattleView3D9GetUnk180Ev kind:function(thumb,size=0x1c) addr:0x02187ec0
@@ -1284,7 +1284,7 @@ _ZNSt13__vec_deleterISt6vectorISsSaISsEERSaIS3_EE8allocateEmN10Metrowerks8int2ty
 _ZNSt13__vec_deleterISt6vectorISsSaISsEERSaIS3_EED2Ev kind:function(thumb,size=0x2a) addr:0x0218a46c
 _ZNSt13__vec_deleterISt6vectorISsSaISsEERSaIS3_EE12erase_at_endEmN10Metrowerks8int2typeILi0EEE kind:function(thumb,size=0x24) addr:0x0218a498
 _ZThn116_N16DinoBattleView3D9OnMessageEP8MMessage kind:function(thumb,size=0x1c) addr:0x0218a4bc
-_ZN20DinoBattleView3DMoveC1EPK26DinoBattleView3DMoveParamsmmP13Dino3DLoadCsvmh kind:function(thumb,size=0xac) addr:0x0218a4d8
+_ZN20DinoBattleView3DMoveC1EPK26DinoBattleView3DMoveParamsmP13Dino3DLoadCsvS4_PKvh kind:function(thumb,size=0xac) addr:0x0218a4d8
 _ZN20DinoBattleView3DMoveD1Ev kind:function(thumb,size=0x16) addr:0x0218a584
 _ZN20DinoBattleView3DMoveD0Ev kind:function(thumb,size=0x1c) addr:0x0218a59c
 _ZN20DinoBattleView3DMove4IdleEv kind:function(thumb,size=0x9c) addr:0x0218a5b8

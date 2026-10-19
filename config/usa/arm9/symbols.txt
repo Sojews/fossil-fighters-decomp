@@ -6611,6 +6611,10 @@ data_02089ecc kind:data(any) addr:0x02089ecc
 data_0208a0b0 kind:data(any) addr:0x0208a0b0
 data_0208a0b4 kind:data(any) addr:0x0208a0b4
 data_0208a0b8 kind:data(any) addr:0x0208a0b8
+data_0208a0bc kind:data(any) addr:0x0208a0bc
+data_0208a0c0 kind:data(any) addr:0x0208a0c0
+data_0208a0c4 kind:data(any) addr:0x0208a0c4
+data_0208a0c8 kind:data(any) addr:0x0208a0c8
 data_0208a0cc kind:data(any) addr:0x0208a0cc
 kCreatureLevelLimits kind:data(any) addr:0x0208a0d4
 data_0208a0dc kind:data(any) addr:0x0208a0dc

@@ -26,8 +26,8 @@ struct DinoBattleView3DMoveParams {
 
 class DinoBattleView3DMove : public MProcess {
 public:
-    DinoBattleView3DMove(const DinoBattleView3DMoveParams *params, u32 unk74, u32 unkB8, Dino3DLoadCsv *camera,
-                         u32 unk164, u8 unk160);
+    DinoBattleView3DMove(const DinoBattleView3DMoveParams *params, u32 unk74, Dino3DLoadCsv *model,
+                         Dino3DLoadCsv *camera, const void *unk164, u8 unk160);
     virtual ~DinoBattleView3DMove();
     virtual void Idle();
 
@@ -39,7 +39,7 @@ public:
     u32 mUnk74;     // 0x74
     u8 unk78[0xB0 - 0x78];
     void (DinoBattleView3DMove::*mState)();  // 0xB0
-    u32 mUnkB8;     // 0xB8
+    Dino3DLoadCsv *mModel;  // 0xB8
     u32 mUnkBC;     // 0xBC
     Dino3DLoadCsv *mCamera; // 0xC0
     u32 unkC4;
@@ -61,7 +61,7 @@ public:
     u8 unk15C[0x160 - 0x15C];
     u8 mUnk160;     // 0x160
     u8 unk161[3];
-    u32 mUnk164;    // 0x164
+    const void *mUnk164;    // 0x164
 };
 
 #endif

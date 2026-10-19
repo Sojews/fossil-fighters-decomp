@@ -17,6 +17,7 @@
 #include "m/bg_new_task.h"
 #include "m/call_task.h"
 #include "game/dino_battle_view_3d_move.h"
+#include "game/camera_load_task.h"
 #include "game/dino_battle_view_kaseki_point_menu.h"
 #include "m/3d_scene.h"
 
@@ -383,6 +384,37 @@ void DinoBattleView3D::CancelQueue() {
     }
     mUnk19C = -1;
     mUnk1A0 = -1;
+}
+
+extern "C" u32 data_0208a0c0;
+extern "C" u8 data_ov000_02196cb4[];
+extern "C" Dino3DLoadCsv *func_ov000_02187e68(DinoBattleView3D *view, int slot);
+
+// Shows something on the slot's models: the camera follows a free model, and (on the current side) one of the
+// models moves.
+MTask *DinoBattleView3D::CreateMove(int unkA, u32 shown, int slot) {
+    mSlotModels[slot] = (void *)shown;
+    Dino3DLoadCsv *model = func_ov000_02187e68(this, -1);
+    CameraSetDefParentTask::Camera *camera = (CameraSetDefParentTask::Camera *)mUnkE4;
+    camera->mParent = model;
+    camera->mUnk7C->SetParent(camera->mParent);
+    if (slot / 3 == mSlot) {
+        MSerialTaskSet *set = new MSerialTaskSet();
+        DinoBattleView3DMoveParams params;
+        params.unk0 = mCreatureIds[slot];
+        params.unk4 = 8;
+        params.unk10 = 0x7FFF;
+        params.unk8 = 0;
+        params.unkA = unkA;
+        params.unkC = shown;
+        params.unkE = 20;
+        set->mExitWhenEmpty = TRUE;
+        MTask *move = new DinoBattleView3DMove(&params, mUnkB0, mModels[slot % 3], NULL, data_ov000_02196cb4, 0);
+        set->AddTail(func_ov000_0218addc(data_0208a0c0));
+        set->AddTail(move);
+        return set;
+    }
+    return new MTimer(1);
 }
 
 // Starts the next waiting task once the task set is idle.

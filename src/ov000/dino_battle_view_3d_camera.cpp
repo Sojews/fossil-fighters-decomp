@@ -25,13 +25,13 @@ extern "C" struct {
 // The default camera data.
 extern "C" u8 data_ov000_021903dc[];
 
-DinoBattleView3DMove::DinoBattleView3DMove(const DinoBattleView3DMoveParams *params, u32 unk74, u32 unkB8,
-                                           Dino3DLoadCsv *camera, u32 unk164, u8 unk160)
+DinoBattleView3DMove::DinoBattleView3DMove(const DinoBattleView3DMoveParams *params, u32 unk74, Dino3DLoadCsv *model,
+                                           Dino3DLoadCsv *camera, const void *unk164, u8 unk160)
     : MProcess(NULL) {
     mState = data_ov000_02196cd0.State_14;
     mUnkBC = 0;
     mUnk74 = unk74;
-    mUnkB8 = unkB8;
+    mModel = model;
     mUnkEC = params->unk0;
     mUnkF0 = params->unk4;
     mUnkFC = params->unk10;
