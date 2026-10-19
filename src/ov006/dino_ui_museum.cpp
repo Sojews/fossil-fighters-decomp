@@ -17,6 +17,8 @@
 #include "m/call_task.h"
 #include "m/anm_model.h"
 #include "m/irq.h"
+#include "game/dino_guide_message.h"
+#include "game/dino_resource.h"
 
 DinoUiMuseumInformationMenu::~DinoUiMuseumInformationMenu() {
 }
@@ -409,6 +411,25 @@ void DinoUiMuseumMenu::ShowInformation() {
                                                          (u32 *)&mSelected, mUnk1B0),
                          MCreateCallTask((DinoUiMuseum *)this, data_ov006_0219621c.OpenInformation_00),
                          gLcd->mSub->mBright->CreateFadeInFromBlack(5, 0));
+}
+
+extern "C" const u32 data_0208a914;
+
+// Shows the information picture, and turns to the page of the fossil whose information was shown.
+void DinoUiMuseumMenu::OpenInformation() {
+    mInformation = new MTextPicture(*mPicture, 1, false);
+    mParallel.AddTail(mInformation);
+    mInformation->Show();
+    mInformation->SetPriority(3);
+    u32 page = mSelected / 15;
+    if (mPage != page) {
+        mPage = page;
+        ClearSlots();
+        mFraction->SetNumerator(mPage + 1);
+        CreateSlots();
+    }
+    FocusItem(mSlots[mSelected % 15]);
+    mUnk1C0->AddTail(new DinoGuideMessage(gDinoResource->GetText(data_0208a914)));
 }
 
 void DinoUiMuseumMenu::CloseInformation() {

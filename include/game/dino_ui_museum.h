@@ -50,7 +50,7 @@ public:
     u8 unkBC[0xC4 - 0xBC];
     MMenuItem *mTabs[5];    // 0xC4
     MPictureFile *mPicture; // 0xD8
-    MTask *mInformation;    // 0xDC: the fossil information shown
+    MTextPicture *mInformation; // 0xDC: the fossil information shown
     MExtAffinePicture *mTabPicture; // 0xE0: scrolled to the tab's part
     MMenuItem *mSlots[15];  // 0xE4
     u8 unk120[0x15C - 0x120];
