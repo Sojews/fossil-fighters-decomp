@@ -57,6 +57,7 @@ void DinoUiKeyboardMenu::SetPage(int page) {
     mSerial.AddTail(CreateSetFocusTask(mUnkE8));
 }
 
+
 DinoUiKeyboard::~DinoUiKeyboard() {
 }
 
@@ -605,4 +606,31 @@ void DinoUiSenryuList::Idle() {
     MSerialTaskSet *serial = &mSerial;
     serial->AddTail(menu);
     serial->AddTail(exit);
+}
+
+// Dims the keyboard behind a window while the name is blank; lifts it once a letter is typed.
+void DinoUiKeyboardMenu::OnIdle() {
+    BOOL changed = FALSE;
+    for (int i = 0; i < mMaxLength && i < mUnk19C.size(); i++) {
+        if (mUnk19C[i] != mUnk1B4[2][29]) {
+            changed = TRUE;
+            break;
+        }
+    }
+    if (changed) {
+        gLcd->GetBottomDisplay()->mBlend->Reset();
+        gLcd->GetBottomDisplay()->mWin->GetWindow0()->Hide();
+        return;
+    }
+    gLcd->GetBottomDisplay()->mBlend->SetTarget1(0xF);
+    gLcd->GetBottomDisplay()->mBlend->SetTarget2(0xF);
+    gLcd->GetBottomDisplay()->mBlend->SetMode(3);
+    gLcd->GetBottomDisplay()->mBlend->SetBrightness(8);
+    gLcd->GetBottomDisplay()->mWin->GetWindow0()->SetShape(0x4F, 0xAE, 0xB0, 0xBA);
+    gLcd->GetBottomDisplay()->mWin->GetWindow0()->SetBlendEnabled(1);
+    gLcd->GetBottomDisplay()->mWin->GetWindow0()->SetTarget(0x1F);
+    gLcd->GetBottomDisplay()->mWin->GetWindow0()->Show();
+    gLcd->GetBottomDisplay()->mWin->GetObjWindow()->SetBlendEnabled(0);
+    gLcd->GetBottomDisplay()->mWin->GetObjWindow()->SetTarget(0x1F);
+    gLcd->GetBottomDisplay()->mWin->GetObjWindow()->Show();
 }
