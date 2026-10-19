@@ -8,12 +8,14 @@
 #include <iterator>
 #include <string.h>
 #include <wstring.h>
+#include <mem.h>
 
 namespace std {
 
 template <class T> struct char_traits {};
 template <> struct char_traits<char> {
     static size_t length(const char *s) { return strlen(s); }
+    static int compare(const char *a, const char *b, size_t n) { return memcmp(a, b, n); }
 };
 template <> struct char_traits<wchar_t> {
     static size_t length(const wchar_t *s) { return wcslen(s); }
@@ -236,6 +238,35 @@ typename basic_string<C, Traits, Alloc>::size_type basic_string<C, Traits, Alloc
 template <class C, class Traits, class Alloc>
 typename basic_string<C, Traits, Alloc>::size_type basic_string<C, Traits, Alloc>::find(const C *s, size_type pos) const {
     return find(s, pos, Traits::length(s));
+}
+
+template <class C, class Traits, class Alloc>
+int basic_string<C, Traits, Alloc>::compare(size_type pos, size_type n1, const C *s, size_type n2) const {
+    const C *p;
+    size_type size;
+    if (!is_long()) {
+        p = mShort.buf;
+        size = mShort.size;
+    } else {
+        p = mLong.data;
+        size = mLong.size;
+    }
+    if (pos > size) {
+        printf("string compare: pos > len");
+        abort();
+    }
+    size_type rlen = min(size - pos, n1);
+    int result = Traits::compare(p + pos, s, min(rlen, n2));
+    if (result == 0) {
+        if (rlen < n2) {
+            return -1;
+        }
+        if (rlen != n2) {
+            return 1;
+        }
+        return 0;
+    }
+    return result;
 }
 
 // The basic members, defined only where MSL_STRING_BASICS is (each file that emits one instantiates it).

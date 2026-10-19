@@ -117,6 +117,9 @@ template std::wstring &std::wstring::operator=(const std::wstring &str);
 int DinoTalkFilterCompareAnchor(const std::string &s, const char *text) {
     return s.compare(text);
 }
+int DinoTalkFilterCompare4Anchor(const std::string &s, const char *text) {
+    return s.compare(0, 0, text, 0);
+}
 std::wstring &DinoTalkFilterReplaceAnchor(std::wstring &s, const std::wstring &text) {
     return s.replace(0, 0, text);
 }
