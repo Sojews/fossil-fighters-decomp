@@ -23,6 +23,7 @@
 #include "m/call_task.h"
 #include "types.h"
 #include "game/dino_cleaning_status.h"
+#include "game/dino_cleaning_score.h"
 #include "m/picture.h"
 #include "m/menu.h"
 #include "m/seed_generator.h"
@@ -257,19 +258,23 @@ extern "C" struct {
     void (DinoCleaning::*State02160638_48)(); // 0x48
     u8 unk50[0x58 - 0x50];
     void (DinoCleaning::*State02160de8_58)(); // 0x58
-    u8 unk60[0x78 - 0x60];
+    u8 unk60[0x70 - 0x60];
+    void (DinoCleaning::*State02161d48_70)(); // 0x70
     void (DinoCleaning::*Unk02161490_78)();
 } data_ov002_021659ec;
 extern "C" struct {
     u8 unk00[0x10];
     void (DinoCleaning::*State02161164_10)(); // 0x10
-    u8 unk18[0x28 - 0x18];
+    u8 unk18[0x20 - 0x18];
+    void (DinoCleaning::*StateQuit_20)(); // 0x20
     void (DinoCleaning::*State02161490_28)(); // 0x28
-    u8 unk30[0x40 - 0x30];
-    void (DinoCleaning::*Unk021618c8_40)();
-    u8 unk48[0x58 - 0x48];
+    u8 unk30[0x38 - 0x30];
+    void (DinoCleaning::*State02162544_38)(); // 0x38
+    void (DinoCleaning::*State021618c8_40)(); // 0x40
+    u8 unk48[0x50 - 0x48];
+    void (DinoCleaning::*State02161d48_50)(); // 0x50
     void (DinoCleaning::*StateCheckDone_58)(); // 0x58
-    u8 unk60[0x68 - 0x60];
+    void (DinoCleaning::*State02161f9c_60)(); // 0x60
     void (DinoCleaning::*Unk02161490_68)();
     void (DinoCleaning::*StateWake_70)();
     void (DinoCleaning::*State02160f54_78)(); // 0x78
@@ -382,6 +387,45 @@ void DinoCleaning::State0216177c() {
     }
 }
 
+extern "C" const int data_0208a238;    // the score below which the result is poor
+
+// Stops everything and judges the cleaning by the score.
+void DinoCleaning::State021618c8() {
+    mUnkE4->SetUnkA0(1, FALSE);
+    mUnkE4->SetUnkA0(2, TRUE);
+    DinoHelpBase::Disable();
+    mUnk10C->Exit();
+    mStatus->StatePause();
+    mToolMenu->DisableAll();
+    mKasekiRock->Finish();
+    mToolMenu->Deactivate();
+    gCurrentDisplay->mBlend->Reset();
+    gCurrentDisplay->mWin->Reset();
+    DinoHelpBase::Disable();
+    mSerial.AddTail(new MTimer(60));
+    if (mUnkC8) {
+        mState = data_ov002_02165a6c.StateQuit_20;
+        return;
+    }
+    if (mStatus->GetScore()->GetUnk80() < MFx32(mUnk130)) {
+        DinoSoundPlaySe(0x37, 0);
+        mState = data_ov002_021659ec.State02161d48_70;
+        return;
+    }
+    if (mStatus->GetScore()->GetUnk84() > MFx32(100 - mUnk130)) {
+        DinoSoundPlaySe(0x37, 0);
+        mState = data_ov002_02165a6c.State02161d48_50;
+        return;
+    }
+    if (mStatus->GetScore()->GetUnk80() < MFx32(data_0208a238)) {
+        DinoSoundPlaySe(0x39, 0);
+        mState = data_ov002_02165a6c.State02161f9c_60;
+        return;
+    }
+    DinoSoundPlaySe(0x3A, 0);
+    mState = data_ov002_02165a6c.State02162544_38;
+}
+
 // Creates the kaseki rock (and runs it once).
 void DinoCleaning::State02160de8() {
     DinoCleaningKasekiRock *rock = new DinoCleaningKasekiRock(this, mUnk120, mUnkB4, mUnkC0, mUnkA8, mUnkBC, mUnkB8,
@@ -487,7 +531,7 @@ void DinoCleaning::StateCheckDone() {
         func_ov002_0215fdec(mKasekiRock);
         return;
     }
-    mState = data_ov002_02165a6c.Unk021618c8_40;
+    mState = data_ov002_02165a6c.State021618c8_40;
 }
 
 void DinoCleaning::StateSleep() {

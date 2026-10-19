@@ -45,6 +45,9 @@ public:
     void State02160638();
     void State02160de8();
     void State0216177c();
+    void State021618c8();
+    void State02161f9c();
+    void State02162544();
     void State02160e78();
     void State02160f54();
     void State021610b0();
@@ -87,7 +90,9 @@ public:
     u32 mUnk120;                    // 0x120
     u32 mUnk124;                    // 0x124
     u8 mUnk128;                     // 0x128: a tool task runs instead of the scene
-    u8 unk129[0x138 - 0x129];
+    u8 unk129[0x130 - 0x129];
+    int mUnk130;                    // 0x130: a percentage
+    u32 unk134;
     u32 mUnk138;                    // 0x138
     u32 unk13C;
     u32 mUnk140;                    // 0x140
