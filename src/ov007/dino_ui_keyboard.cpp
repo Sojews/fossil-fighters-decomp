@@ -14,6 +14,8 @@
 #include "m/blend.h"
 #include "m/window.h"
 #include "m/lcd.h"
+#include "m/indicator.h"
+#include "m/motion.h"
 #include "game/dino_backup.h"
 #include "m/bright.h"
 #include "m/picture.h"
@@ -428,7 +430,6 @@ template void std::__vec_deleter<MPictureFile, std::allocator<MPictureFile> >::s
 template std::wstring std::wstring::substr(std::wstring::size_type pos, std::wstring::size_type n) const;
 template std::wstring &std::wstring::operator=(const wchar_t *s);
 
-extern "C" void func_ov007_02181334(DinoUiKeyboardMenu *menu);
 extern const int data_02089ac8, data_02089acc, data_02089ad0;
 
 // NONMATCHING: the two fade constants swap registers.
@@ -444,7 +445,7 @@ void DinoUiKeyboardMenu::OnBackDecided() {
             player.name[3] = mUnk1B4[0][8];
         }
         mUnk19C = (const wchar_t *)player.name;
-        func_ov007_02181334(this);
+        RefreshName();
         gDinoBackup->SetPlayer(&player);
     }
     MParallelTaskSet *fades = new MParallelTaskSet(TRUE);
@@ -459,4 +460,32 @@ void DinoUiKeyboardMenu::OnBackDecided() {
     ((u8 *)other)[0x84] = TRUE;
     MTask *waitTask = MTaskSetWaitEmptyTask::Create(&other->mSerial);
     GetSerial()->AddTail(new MTimer(data_02089ad0), fades, waitTask, exit);
+}
+
+// Where the cursor goes for each place in the name, per mode.
+extern "C" const MPoint data_ov007_021911f0[][18];
+
+void DinoUiKeyboardMenu::RefreshName() {
+    for (int i = mUnk19C.size(); i < mMaxLength; i++) {
+        mChars[i]->SetText(std::string(""));
+    }
+    for (u32 i = 0; i < mUnk19C.size(); i++) {
+        wchar_t text[3];
+        text[0] = mUnk19C.substr(i, 1)[0];
+        text[1] = mUnk1A8.substr(i, 1)[0];
+        text[2] = 0;
+        mChars[i]->SetText(std::wstring(text));
+    }
+    if (mCursorPos < 0) {
+        mCursorPos = 0;
+    }
+    if (mCursorPos > mMaxLength) {
+        mCursorPos = mMaxLength;
+    }
+    mCursor->SetPosition(data_ov007_021911f0[mMode][mCursorPos]);
+    if (mCursorPos == mMaxLength) {
+        mSerial.AddTail(mCursor->CreatePlayTransfer(2, 0));
+    } else {
+        mSerial.AddTail(mCursor->CreatePlayTransfer(1, 0));
+    }
 }

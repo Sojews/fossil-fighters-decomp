@@ -12,6 +12,8 @@
 #include "game/dino_field_camera_hook.h"
 
 class MTextPicture;
+class MMotion;
+class MIndicator;
 
 class DinoUiKeyboardMenu : public DinoHelpBase, public MMenu {
 public:
@@ -27,14 +29,18 @@ public:
     void SetPage(int page);
     // Keeps the name (a default one if it's empty) and fades out.
     void OnBackDecided();
+    // Shows the name (each character over its reading) and moves the cursor to its place.
+    void RefreshName();
 
     u8 unkB4[0xE8 - 0xB4];
     MMenuItem *mUnkE8;          // 0xE8: focused after a page change
-    u8 unkEC[0x13C - 0xEC];
+    u32 unkEC;
+    MIndicator *mChars[19];     // 0xF0: the name's characters
     MTextPicture *mPagePicture; // 0x13C
     u32 unk140;
     u32 mUnk144;                // 0x144
-    u8 unk148[0x158 - 0x148];
+    MMotion *mCursor;           // 0x148
+    u8 unk14C[0x158 - 0x14C];
     MTask *mUnk158;             // 0x158
     u8 unk15C[0x188 - 0x15C];
     int mMode;                  // 0x188
@@ -46,7 +52,10 @@ public:
     std::wstring mUnk1A8;       // 0x1A8
     std::wstring mUnk1B4[3];    // 0x1B4
     std::wstring mUnk1D8;       // 0x1D8
-    u8 unk1E4[0x1F4 - 0x1E4];
+    u8 unk1E4[0x1E8 - 0x1E4];
+    int mCursorPos;             // 0x1E8
+    int mMaxLength;             // 0x1EC
+    u8 unk1F0[0x1F4 - 0x1F0];
     u8 mUnk1F4;                 // 0x1F4
     u8 mFlag;                   // 0x1F5
     u8 unk1F6[2];
