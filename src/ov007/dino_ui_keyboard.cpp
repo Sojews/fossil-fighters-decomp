@@ -23,7 +23,7 @@
 #include "m/picture.h"
 
 DinoUiKeyboardMenu::DinoUiKeyboardMenu(int mode, u32 arg, int flag)
-    : MMenu(NULL, 0), mPagePicture(NULL), mUnk144(0), mMode(mode), mArg(arg), mPage(0x20), mFlag(flag) {
+    : MMenu(NULL, 0), mPagePicture(NULL), mFocusFrame(0), mMode(mode), mArg(arg), mPage(0x20), mFlag(flag) {
 }
 
 DinoUiKeyboardMenu::~DinoUiKeyboardMenu() {
@@ -401,6 +401,36 @@ void DinoUiSenryuMenu::OnFocus(MMenuItem *item) {
         default:
             mCursor->Hide();
             break;
+        }
+    }
+}
+
+// The function keys' focus frames.
+extern "C" const char *const data_ov007_02191120[4];
+
+// Frames a focused function key.
+void DinoUiKeyboardMenu::OnFocus(MMenuItem *item) {
+    KeyboardMenuItem *key = static_cast<KeyboardMenuItem *>(item);
+    if (key != NULL && key->mIndex < 0xF0) {
+        mUnk154->Clear();
+        mFocusTasks->Clear();
+        if (key->mIndex < 4) {
+            mFocusFrame = new MMotion(std::string(data_ov007_02191120[key->mIndex]), mOam, 0, 1);
+            mFocusFrame->Play(1, 0);
+            mFocusFrame->SetPosition(MPoint(key->mPos.x, key->mPos.y));
+            mFocusFrame->SetPriority(2);
+            mFocusFrame->Show();
+            mFocusTasks->AddTail(mFocusFrame);
+            mFocusPos = MPoint(key->mPos.x, key->mPos.y);
+            if (!mUnk1F4) {
+                DinoSoundPlaySe(0x96, 0);
+            }
+            mUnk1F4 = FALSE;
+        } else if (key->mIndex == 6) {
+            if (!mUnk1F4) {
+                DinoSoundPlaySe(0x96, 0);
+            }
+            mUnk1F4 = FALSE;
         }
     }
 }

@@ -53,7 +53,10 @@ public:
     virtual ~KeyboardMenuItem();
     virtual MRect GetFrame();
 
-    u32 unk88[5];
+    u32 mIndex;     // 0x88: below 4 a function key, 0xF0 and up not a key
+    u32 unk8C;
+    MPoint mPos;    // 0x90
+    u32 unk98;
     MRect mFrame;   // 0x9C
 };
 

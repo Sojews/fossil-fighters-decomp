@@ -16,6 +16,8 @@ class KasekiPictCache;
 class MMotion;
 class MIndicator;
 
+class MSmartOam;
+
 class DinoUiKeyboardMenu : public DinoHelpBase, public MMenu {
 public:
     DinoUiKeyboardMenu(int mode, u32 arg, int flag);
@@ -33,17 +35,21 @@ public:
     // Shows the name (each character over its reading) and moves the cursor to its place.
     void RefreshName();
 
-    u8 unkB4[0xE8 - 0xB4];
+    MSmartOam *mOam;            // 0xB4
+    u8 unkB8[0xE8 - 0xB8];
     MMenuItem *mUnkE8;          // 0xE8: focused after a page change
     u32 unkEC;
     MIndicator *mChars[19];     // 0xF0: the name's characters
     MTextPicture *mPagePicture; // 0x13C
     u32 unk140;
-    u32 mUnk144;                // 0x144
+    MMotion *mFocusFrame;       // 0x144: around the focused function key
     MMotion *mCursor;           // 0x148
-    u8 unk14C[0x158 - 0x14C];
+    MTaskSet *mFocusTasks;      // 0x14C
+    u32 unk150;
+    MTaskSet *mUnk154;          // 0x154
     MTask *mUnk158;             // 0x158
-    u8 unk15C[0x188 - 0x15C];
+    u8 unk15C[0x180 - 0x15C];
+    MPoint mFocusPos;           // 0x180
     int mMode;                  // 0x188
     u32 mArg;                   // 0x18C
     int mPage;                  // 0x190
