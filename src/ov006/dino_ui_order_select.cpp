@@ -20,6 +20,7 @@
 #include "game/dino_ui_parts_team_tech.h"
 #include "m/call_task.h"
 #include "m/input.h"
+#include <printf.h>
 
 DinoUiOrderSelect::~DinoUiOrderSelect() {
 }
@@ -417,4 +418,97 @@ void DinoUiOrderSelectMenu::FinishTab() {
     RefreshItems();
     FocusItem(mItems[mFocusIndex]);
     RefreshOKButton();
+}
+
+extern const u32 data_0208aae8;
+extern const u32 data_0208aaec;
+extern const u32 data_0208aaf0;
+extern const u32 data_0208aaf4;
+extern const u32 data_0208aaf8;
+extern const u32 data_0208aafc;
+extern const u32 data_0208ab00;
+extern const u32 data_0208ab04;
+extern const u32 data_0208ab08;
+
+std::string DinoUiOrderSelectMenu::GetUnk44Text() {
+    char text[0x80];
+    text[0] = 0;
+    if (mUnk1F8 != 0) {
+        MResource<DinoBattleData> battle = gDinoResource->LoadBattle(mUnk1F8);
+        if (battle.Get()->unk44 != 0) {
+            u32 arg;
+            switch (battle.Get()->unk44) {
+            case 1:
+                arg = data_0208aafc;
+                break;
+            case 2:
+                arg = data_0208aaf8;
+                break;
+            case 3:
+                arg = data_0208aaf4;
+                break;
+            case 4:
+                arg = data_0208aaf0;
+                break;
+            case 5:
+                arg = data_0208aaec;
+                break;
+            case 6:
+            default:
+                arg = data_0208aae8;
+                break;
+            }
+            u32 format;
+            switch (battle.Get()->unk48) {
+            case 1:
+                format = data_0208ab08;
+                break;
+            case 2:
+                format = data_0208ab04;
+                break;
+            case 3:
+            default:
+                format = data_0208ab00;
+                break;
+            }
+            sprintf(text, gDinoResource->GetText(format), gDinoResource->GetText(arg));
+        }
+    }
+    return std::string(text);
+}
+
+extern const u32 data_0208ab0c;
+extern const u32 data_0208ab10;
+extern const u32 data_0208ab14;
+
+std::string DinoUiOrderSelectMenu::GetUnk3CText() {
+    char text[0x80];
+    if (mUnk1F8 != 0) {
+        MResource<DinoBattleData> battle = gDinoResource->LoadBattle(mUnk1F8);
+        switch (battle.Get()->unk3C) {
+        case 1:
+            sprintf(text, gDinoResource->GetText(data_0208ab14),
+                    gDinoResource->GetCreatureText08(battle.Get()->GetUnk40()[0]));
+            break;
+        case 2: {
+            u32 b = battle.Get()->GetUnk40()[1];
+            u32 a = battle.Get()->GetUnk40()[0];
+            sprintf(text, gDinoResource->GetText(data_0208ab10), gDinoResource->GetCreatureText08(a),
+                    gDinoResource->GetCreatureText08(b));
+            break;
+        }
+        case 3: {
+            u32 c = battle.Get()->GetUnk40()[2];
+            u32 b = battle.Get()->GetUnk40()[1];
+            u32 a = battle.Get()->GetUnk40()[0];
+            sprintf(text, gDinoResource->GetText(data_0208ab0c), gDinoResource->GetCreatureText08(a),
+                    gDinoResource->GetCreatureText08(b), gDinoResource->GetCreatureText08(c));
+            break;
+        }
+        default:
+            sprintf(text, "");
+            break;
+        }
+    }
+    return std::string(text);
 }

@@ -189,7 +189,20 @@ struct DinoMapMData {
     s32 area;           // 0x34: the area the map is in (for the name panel)
 };
 struct DinoMapData;
-struct DinoBattleData;
+// A battle's settings.
+struct DinoBattleData {
+    // The creatures the rule names.
+    const u32 *GetUnk40() const { return (const u32 *)((const u8 *)this + unk40); }
+
+    u8 unk00[0x1C];
+    u32 unk1C;          // 0x1C: a talk text
+    u32 unk20;          // 0x20: a talk text
+    u8 unk24[0x3C - 0x24];
+    u32 unk3C;          // 0x3C: 1-3
+    u32 unk40;          // 0x40: offset of unk3C creature ids
+    u32 unk44;          // 0x44: 1-5, or 0 for none
+    u32 unk48;          // 0x48: 1-3
+};
 // A shop's stock: entries always sold, then entries picked from at random.
 struct DinoShopData {
     u32 unk00;

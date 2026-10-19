@@ -65,6 +65,9 @@ public:
     void LinkItems();
     void FinishPage();
     void FinishTab();
+    // The battle's rule text (empty for none).
+    std::string GetUnk44Text();
+    std::string GetUnk3CText();
 
     u8 unkB3[1];
     MSmartOam *mOam;            // 0xB4: the items' sprites
