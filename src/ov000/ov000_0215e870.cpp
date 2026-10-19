@@ -7,6 +7,9 @@
 
 #include "m/motion.h"
 #include "game/dino_resource.h"
+#include "game/dino_battle_view_field_player_bg.h"
+#include "game/dino_battle_view_class.h"
+#include "m/picture.h"
 
 DinoBattleViewTutorialMotion::DinoBattleViewTutorialMotion(MSmartOam *oam) : MProcess(NULL) {
     mOam = oam;
@@ -83,4 +86,37 @@ void DinoBattleViewAdvantageArrow::PointAt(int side) {
         mArrow->SetPosition(to);
     }
     mParallel.AddTail(mArrow->CreateCoordAnime(mArrow->GetPosition(), to, 40, 1));
+}
+
+// The player BG's pooled constants (see ov000_0215ef04.cpp).
+extern "C" struct {
+    u8 unk00[0x20];
+    void (DinoBattleViewFieldPlayerBG::*StateDone_20)();
+} data_ov000_02191b9c;
+extern "C" const char data_ov000_02192484[];    // the default background
+
+DinoBattleViewFieldPlayerBG::DinoBattleViewFieldPlayerBG(DinoBattleView *view) : MProcess(NULL) {
+    mSide = 2;
+    mPicture = NULL;
+    mChanging = FALSE;
+    mView = view;
+    mFixed = gDinoResource->GetBattleAdjustDefs()->fixedFieldBg;
+    if (mFixed != 0) {
+        const DinoBattleBgDefs *defs = gDinoResource->GetBattleBgDefs();
+        for (u32 i = 0; i < defs->count; i++) {
+            u32 battle = defs->Get(i)->battle;
+            u32 cur = mView->GetUnk134();
+            if (cur == battle) {
+                mPicture = new MTextPicture(std::string(defs->GetPath(i)), TRUE, true);
+                break;
+            }
+        }
+        if (mPicture == NULL) {
+            mPicture = new MTextPicture(std::string(data_ov000_02192484), TRUE, true);
+        }
+        mParallel.AddTail(mPicture);
+        mPicture->Show();
+        mPicture->SetPriority(3);
+    }
+    mState = data_ov000_02191b9c.StateDone_20;
 }

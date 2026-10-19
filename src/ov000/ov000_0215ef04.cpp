@@ -25,7 +25,7 @@ extern "C" struct {
 extern "C" const int data_ov000_0218fa74[2];
 
 BOOL DinoBattleViewFieldPlayerBG::SetSide(u32 side) {
-    if (mBusy != 0) {
+    if (mFixed != 0) {
         return TRUE;
     }
     if (mChanging) {
