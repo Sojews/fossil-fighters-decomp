@@ -59,6 +59,10 @@ MDisplay *DinoUiMedalMenuItem::GetDisplay() {
     return MProcess::GetDisplay();
 }
 
+MRect DinoUiSortMenuItem::GetFrame() {
+    return MRect(mPos, MPoint(mPos.x + 0x28, mPos.y + 0xE));
+}
+
 MDisplay *DinoUiSortMenuItem::GetDisplay() {
     return MProcess::GetDisplay();
 }
