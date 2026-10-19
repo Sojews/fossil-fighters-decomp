@@ -14,6 +14,11 @@
 #include "m/call_task.h"
 #include "game/dino_sound.h"
 #include "m/lcd.h"
+#include "m/smart_oam.h"
+#include "m/motion.h"
+#include "game/dino_backup.h"
+#include "game/dino_team.h"
+#include "game/dino_ui_parts_team_tech.h"
 
 #pragma auto_inline off
 DinoUiStatusMenu::DinoUiStatusMenu(int *choice, DinoTeam *team, DinoTeam *team2)
@@ -158,4 +163,29 @@ void DinoUiStatusMenu::FinishTab() {
     mMembers[mSelected]->PlayNormal();
     FocusItem(mMembers[mSelected]);
     RefreshOKButton();
+}
+
+void DinoUiStatusMenu::ClearItems() {
+    RemoveLink(mUnkB8, 4);
+    for (int i = 0; i < 5; i++) {
+        RemoveItem(mMembers[i]);
+        delete mMembers[i];
+    }
+    mUnk12D = 0;
+}
+
+// The OK button lights up when the first member can be picked; the technique shows when the team has one.
+void DinoUiStatusMenu::RefreshOKButton() {
+    if (mTeam->pickable[0]) {
+        mOKButton->mMotion->GetUnit()->SetMode(1);
+    } else {
+        mOKButton->mMotion->GetUnit()->SetMode(0);
+    }
+    if (!gDinoBackup->GetSystemFlag(2)) {
+        if (DinoTeamHasTech((const DinoTeam *)mTeam)) {
+            mTech->Show();
+        } else {
+            mTech->Hide();
+        }
+    }
 }

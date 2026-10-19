@@ -9,6 +9,8 @@
 struct DinoTeam;
 class MSmartOam;
 class DinoUiPartsReviverMedalButton;
+class DinoUiStatusMenuItem;
+class DinoUiPartsTeamTech;
 
 class DinoUiStatusMenu : public DinoHelpBase, public MMenu {
 public:
@@ -32,7 +34,8 @@ public:
 
     u8 unkB3[1];                // members start in MMenu's tail padding
     MSmartOam *mOam;            // 0xB4: the items' sprites
-    u8 unkB8[8];
+    MMenuItem *mUnkB8;          // 0xB8
+    DinoUiStatusMenuItem *mOKButton;    // 0xBC
     MMenuItem *mTabItems[3];    // 0xC0
     u32 mUnkCC[2];              // 0xCC
     DinoUiPartsReviverMedalButton *mMembers[5];     // 0xD4
@@ -48,7 +51,8 @@ public:
     int mMode;                  // 0x128
     u8 unk12C;
     u8 mUnk12D;                 // 0x12D
-    u8 unk12E[0x138 - 0x12E];
+    u8 unk12E[0x134 - 0x12E];
+    DinoUiPartsTeamTech *mTech; // 0x134: shown when the team has a technique
 };
 
 class DinoUiStatusBackButton : public DinoUiStatusMenuItem {
