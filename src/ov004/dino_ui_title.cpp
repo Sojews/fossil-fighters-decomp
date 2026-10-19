@@ -180,7 +180,7 @@ extern "C" struct {
     void (DinoUiTitle::*Unk0215f420_12C)(); // 0x12c
     void (DinoUiTitle::*StateInit_134)(); // 0x134
     void (DinoUiTitle::*Unk0215d818_13C)(); // 0x13c
-    void (DinoUiTitle::*Unk0215e9e4_144)(); // 0x144
+    void (DinoUiTitle::*StateMenuChosen_144)(); // 0x144
     void (DinoUiTitle::*StateWarning_14C)(); // 0x14c
     void (MBg::*SetMode_154)(bg_mode); // 0x154
     void (DinoUiTitle::*StateSaveSlot_15C)(); // 0x15c
@@ -239,6 +239,56 @@ void DinoUiTitle::StateInit() {
     mState = data_ov004_02172f78.StateWarning_A4;
 }
 
+// Leaves for the game (0, 8) or another mode (2), or opens the save slots (3).
+// NONMATCHING: stack slots only (the game's wait task takes the first slot).
+void DinoUiTitle::StateMenuChosen() {
+    mLogo->Play(2, 0);
+    mParallel.AddTail((new MSerialTaskSet(TRUE))
+                          ->Add(mLogo->CreateWaitStopTask())
+                          ->Add(MTaskExitTransfer::Create(mLogo))
+                          ->Add(MTaskExitTransfer::Create(mOam)));
+    switch (mChoice) {
+    case 0:
+    case 8: {
+        *mResult = mChoice;
+        DinoSoundStopBgm(-1, 60);
+        MTask *fadeTop;
+        MTask *fadeBottom;
+        MTask *exit;
+        exit = MTaskExitTransfer::Create(this);
+        fadeBottom = gLcd->GetBottomDisplay()->mBright->CreateFadeOutToWhite(60, 0);
+        fadeTop = gLcd->GetTopDisplay()->mBright->CreateFadeOutToWhite(60, 0);
+        MParallelTaskSet *fades = new MParallelTaskSet(TRUE);
+        fades->AddTail(fadeTop);
+        fades->AddTail(fadeBottom);
+        MTaskSet &serial = mSerial;
+        serial.AddTail(fades);
+        serial.AddTail(exit);
+        break;
+    }
+    case 3:
+        mState = data_ov004_02172f78.StateToSaveSlot_54;
+        break;
+    case 2: {
+        DinoSoundStopBgmAll(0);
+        *mResult = mChoice;
+        MTask *fadeTop;
+        MTask *fadeBottom;
+        MTask *exit;
+        exit = MTaskExitTransfer::Create(this);
+        fadeBottom = gLcd->GetBottomDisplay()->mBright->CreateFadeOutToWhite(60, 0);
+        fadeTop = gLcd->GetTopDisplay()->mBright->CreateFadeOutToWhite(60, 0);
+        MParallelTaskSet *fades = new MParallelTaskSet(TRUE);
+        fades->AddTail(fadeTop);
+        fades->AddTail(fadeBottom);
+        MTaskSet &serial = mSerial;
+        serial.AddTail(fades);
+        serial.AddTail(exit);
+        break;
+    }
+    }
+}
+
 // Slides the title away and the save slots in, then shows the slot select.
 void DinoUiTitle::StateToSaveSlot() {
     GetSerial()->AddTail((new MParallelTaskSet(TRUE))
@@ -281,7 +331,7 @@ void DinoUiTitle::StateMenu() {
     mParallel.Remove(mMenu);
     mMenu->Activate();
     mSerial.AddTail(mMenu);
-    mState = data_ov004_02172f78.Unk0215e9e4_144;
+    mState = data_ov004_02172f78.StateMenuChosen_144;
 }
 
 void DinoUiTitle::StateSaveSlot() {

@@ -29,6 +29,7 @@ public:
     void StateOpening();
     void StateMenu();
     void StateToSaveSlot();
+    void StateMenuChosen();
     void StateSaveSlot();
     void StateSaveSlotEnd();
     void StatePrepareBackup();
@@ -44,7 +45,7 @@ public:
     MView *mUnk90;                 // 0x90: the save slots' panel
     MMenu *mMenu;                  // 0x94: the title menu
     MMotion *mLogo;                // 0x98
-    u32 unk9C;
+    u32 mChoice;                   // 0x9C: the title menu's
     u32 mSlotChoice;               // 0xA0: the save slot select's
     int mTopResult;                // 0xA4: the top menu loop's
 };
