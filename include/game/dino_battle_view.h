@@ -74,6 +74,9 @@ public:
     virtual ~DinoBattleViewInfoLRItem();
     virtual MRect GetFrame();
     virtual void OnDecide();
+
+    MView *mView;       // 0x88
+    MPoint mOffset;     // 0x8C: of the touch area from the view
 };
 
 class DinoBattleViewCancelMenuItem : public MMenuItem {
