@@ -749,6 +749,48 @@ u32 DinoBattleModelCreature::GetStatusUnk20() {
     return 0;
 }
 
+// The attacks the creature can use now, as a bitmask by index (the special attack's bit is after the others):
+// those it has the points for, and (with check) not sealed by its status, nor needing more life or company than it
+// has.
+extern "C" u32 func_ov000_0216d2cc(DinoBattleModelCreature *creature, BOOL check) {
+    u32 mask = 0;
+    int points = creature->mPlayer->GetUnk128();
+    gDinoResource->GetCreatureDef(creature->mUnkB0);
+    for (u32 i = 0; i <= creature->CountAttacks(); i++) {
+        u32 attack;
+        if (i != creature->CountAttacks()) {
+            if (check && (creature->mStatus.flags & 0x10) && (creature->mStatus.unk20 & (1 << i))) {
+                continue;
+            }
+            const DinoAttackDef *def = gDinoResource->GetAttackDef(creature->GetAttack(i, NULL));
+            switch (*DinoOffsetPtr<u8>(def, def->unk14)) {
+            case 11:
+            case 12:
+                if (creature->mPlayer->GetCreatureCount() <= 1) {
+                    continue;
+                }
+                break;
+            case 6:
+                if ((int)creature->GetUnkE4() <= 1) {
+                    continue;
+                }
+                break;
+            }
+            attack = creature->GetAttack(i, NULL);
+        } else {
+            if (!creature->GetUnkD298()) {
+                continue;
+            }
+            attack = creature->GetSpecialAttack();
+        }
+        const DinoAttackDef *def = gDinoResource->GetAttackDef(attack);
+        if (points >= *DinoOffsetPtr<u16>(def, def->cost)) {
+            mask |= 1 << i;
+        }
+    }
+    return mask;
+}
+
 // Has the view recolor the creatures, all at once.
 MTask *DinoBattleModelPlayer::CreateUpdateColorTask(const u32 *ids, u32 count, u32 color) {
     if (count != 0) {
@@ -1199,7 +1241,6 @@ BOOL MoveCreatureFromEscape::IsNeeded() {
     return FALSE;
 }
 
-extern "C" BOOL func_ov000_0216d2cc(DinoBattleModelCreature *creature, int arg);
 
 template MTask *DinoCreatePostAndWaitTask(MMessageObserver *target, DinoBattleViewPlayerWaitKPCountStopRequest *msg);
 template MTask *DinoCreatePostAndWaitTask(MMessageObserver *target, DinoBattleViewCreaturePlayMotionRequest *msg);
