@@ -364,3 +364,23 @@ void DinoUiMuseumEffectLight::Idle() {
     mAngle += 0x190;
     mPicture->SetPosition(0, MFx32ToInt(MFx32::FromRaw(FX_SinIdx(mAngle)) * MFx32(10)) - mHeight);
 }
+
+// A tab shows its fossils; a slot shows that fossil's information.
+void DinoUiMuseumMenu::OnDecide(MMenuItem *item) {
+    for (int i = 0; i < 5; i++) {
+        if (item == mTabs[i]) {
+            SelectTab(i);
+        }
+    }
+    for (int i = 0; i < (int)mSlotCount; i++) {
+        if (item == mSlots[i]) {
+            if (!mUnk1AC) {
+                return;
+            }
+            mSelected = i + mPage * 15;
+            DinoSoundPlaySe(0x98, 0);
+            ShowInformation();
+            return;
+        }
+    }
+}
