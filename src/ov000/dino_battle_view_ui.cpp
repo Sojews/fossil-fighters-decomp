@@ -782,3 +782,30 @@ BOOL DinoBattleViewUiSelectAreaCommon::HandlePageItem(MMenuItem *item) {
     }
     return FALSE;
 }
+
+// Where a slot group rests.
+extern "C" MPoint func_ov000_0215f22c(int arg0, int group);
+
+// The two tasks at once (the arguments are evaluated last to first).
+static inline MTask *Together(MTask *a, MTask *b) {
+    MParallelTaskSet *set = new MParallelTaskSet(TRUE);
+    set->AddTail(a);
+    set->AddTail(b);
+    return set;
+}
+
+// NONMATCHING: the other view and the other anime swap stack slots.
+void DinoBattleViewUiDefenderMenu::ResetRows() {
+    if (mUnkBC == mSideC0) {
+        return;
+    }
+    mCursor->Hide();
+    mUnkF8->Clear();
+    int side = mSideC0;
+    int other = mUnkBC;
+    MView *otherView;
+    MView *sideView = ((DinoBattleView *)mUnkEC)->mUnkE0->mSlotViewsC0[side];
+    otherView = ((DinoBattleView *)mUnkEC)->mUnkE0->mSlotViewsC0[other];
+    mUnkF8->AddTail(Together(sideView->CreateCoordAnime(sideView->GetPosition(), func_ov000_0215f22c(2, side), 8, -2),
+                             otherView->CreateCoordAnime(otherView->GetPosition(), func_ov000_0215f22c(3, other), 8, -2)));
+}
