@@ -284,6 +284,16 @@ template MTask *MCreateBgCallTask(DinoUiSaveSlotSelect *obj, void (DinoUiSaveSlo
 
 #pragma auto_inline off
 
+DinoUiTopMenuItem::DinoUiTopMenuItem(DinoUiTopMenu *owner, const std::string &path, MPoint pos, u32 textId) {
+    mOwner = owner;
+    mTextId = textId;
+    mMotion = new MMotion(std::string(path), mOwner->GetOam(), 2, 1);
+    mMotion->Play(1, 0);
+    mMotion->SetPosition(pos);
+    mMotion->Show();
+    mParallel.AddTail(mMotion);
+}
+
 // Starts loading the next scene of the opening (a battle field model, its camera and sounds).
 void DinoUiOpening::LoadScene() {
     u32 id = (u32)mUnkA8[mScene++];
@@ -525,8 +535,8 @@ DinoUiSaveSlotConfirm::DinoUiSaveSlotConfirm() : MProcess(NULL) {
 
 #pragma auto_inline off
 
-u32 DinoUiTopMenu::GetUnkB4() {
-    return mUnkB4;
+MSmartOam *DinoUiTopMenu::GetOam() {
+    return mOam;
 }
 
 DinoUiTopMenuLoop::DinoUiTopMenuLoop(int *result) : MProcess(NULL), mResult(result) {

@@ -5,6 +5,8 @@
 #include "game/help.h"
 
 // The title screen's top menu.
+class MSmartOam;
+
 class DinoUiTopMenu : public DinoHelpBase, public MMenu {
 public:
     DinoUiTopMenu(int *result);
@@ -16,10 +18,10 @@ public:
     void OnMultiDecided();
     void OnPassDecided();
     void OnOptionDecided();
-    u32 GetUnkB4();
+    MSmartOam *GetOam();
 
     u8 unkB3[1];     // members start in MMenu's tail padding
-    u32 mUnkB4;      // 0xB4
+    MSmartOam *mOam;    // 0xB4: the items' sprites
     u8 unkB8[0x10];
     int *mResult;    // 0xC8: which button was chosen
     u8 mSilentFocus; // 0xCC
