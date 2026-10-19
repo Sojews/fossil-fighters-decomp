@@ -96,9 +96,11 @@ namespace std {
             init_tail();
         }
         void init_tail() {
-            node_base *t = &tail_;
+            // (Through this: the game forms the list's address before the tail's.)
+            __list_imp *self = this;
+            node_base *t = &self->tail_;
             t->next_ = t;
-            tail_.prev_ = t;
+            self->tail_.prev_ = t;
         }
 
         iterator begin() {

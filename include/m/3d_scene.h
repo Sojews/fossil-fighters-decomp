@@ -12,6 +12,7 @@ class M3DModel;
 
 class M3DScene : public MTask {
 public:
+    M3DScene();
     // With its textures and palettes in a heap of the size at heap.
     M3DScene(u32 heap, u32 heapSize);
     virtual ~M3DScene();
@@ -33,6 +34,10 @@ public:
     void SetUnk14C(u32 a, u32 b);
     void SetUnk164(u32 a, u32 b);
     void SetUnk80(u32 a, u32 b);
+    // Makes the projection for the vertical field of view (mirrored when mUnk7C is set, then offset).
+    void SetFov(int fovy);
+    // Back to the defaults: one white light, the camera at z = 1 looking at the origin, the 3D layer shown.
+    void Init();
     MTask *CreateEnableTask(u8 enable);
     void LoadPltt(u32 key, const void *data);
     void AddModel(M3DModel *model);
@@ -43,7 +48,12 @@ public:
     fx32 mUnk18;                // 0x18
     u8 mDirty;                  // 0x1C
     u8 mCameraDirty;            // 0x1D
-    u8 unk1E[0x2A];
+    struct Light {
+        s16 dir[3];             // 0x00
+        u16 color;              // 0x06
+        u8 enabled;             // 0x08
+    } mLights[4];               // 0x1E
+    u8 unk46[2];
     std::list<M3DModel *> mModels; // 0x48
     u32 unk54;
     VecFx32 mCameraPos;         // 0x58
@@ -54,7 +64,8 @@ public:
     u32 mUnk84;                 // 0x84
     M3d *mM3d;                  // 0x88
     MtxFx43 mCamera;            // 0x8C: the view matrix
-    u8 unkBC[0x144 - 0xBC];
+    MtxFx44 mProjection;        // 0xBC
+    u8 unkFC[0x144 - 0xFC];
     u8 mEnabled;                // 0x144
     u32 mUnk148;                // 0x148
     u32 mUnk14C;                // 0x14C
