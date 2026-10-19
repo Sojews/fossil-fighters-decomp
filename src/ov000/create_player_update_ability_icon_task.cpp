@@ -815,6 +815,24 @@ MTask *DinoBattleModelPlayer::CreateMotionEffectTask(u32 a, u32 b, u32 c, u32 d,
     return set;
 }
 
+// Updates every creature on both sides, and waits for them all (NULL with no creatures).
+extern "C" MTask *func_ov000_02166470(DinoBattleModelPlayer *player) {
+    int count = player->GetCreatureCount() + player->GetOpponent()->GetCreatureCount();
+    if (count != 0) {
+        DinoSignalWait *wait = new DinoSignalWait(0x10030, NULL, NULL, count);
+        MParallelTaskSet *set = new MParallelTaskSet(TRUE);
+        set->AddTail(wait);
+        for (int side = 0; side < 2; side++) {
+            for (int i = 0; i < player->GetCreatureCount(); i++) {
+                set->AddTail(player->GetCreature(i)->CreateUpdateTask(0, (u32)(MMessageObserver *)wait));
+            }
+            player = player->GetOpponent();
+        }
+        return set;
+    }
+    return NULL;
+}
+
 // Has the view update the ability icons, and waits for it.
 MTask *DinoBattleModelPlayer::CreateUpdateAbilityIconTask(u8 flag) {
     MParallelTaskSet *set = new MParallelTaskSet(TRUE);
