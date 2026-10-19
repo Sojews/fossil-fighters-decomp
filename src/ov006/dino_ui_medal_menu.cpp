@@ -11,6 +11,8 @@
 #include "m/lcd.h"
 #include <algorithm>
 #include "game/dino_ui_medal_menu.h"
+#include "m/bg.h"
+#include "game/dino_ui_rv_status_menu_item_menu.h"
 #include "game/dino_backup.h"
 #include "game/dino_ui_parts_reviver_medal_button.h"
 #include "game/dino_ui_field_menu_fraction.h"
@@ -196,6 +198,24 @@ void DinoUiMedalMenu::CreateUnkF0Items() {
     }
 }
 
+void DinoUiMedalMenu::LinkItems() {
+    if (!gDinoBackup->GetSystemFlag(2)) {
+        AddLink(mUnkB8, 2, mUnkF0[0]);
+        for (int i = 0; i < 5; i++) {
+            AddLink(mUnkF0[i], 4, mUnkB8);
+        }
+        AddLink(mUnkF0[0], 3, mUnkF0[4]);
+        AddLink(mUnkF0[4], 1, mUnkF0[0]);
+    }
+    AddLink(mSortButtons[0], 3, mSortButtons[4]);
+    AddLink(mSortButtons[4], 1, mSortButtons[0]);
+    for (int i = 0; i < 5; i++) {
+        AddLink(mSortButtons[i], 2, mUnkB8);
+    }
+    AddLink(mUnkB8, 4, mSortButtons[4]);
+    AddLink(mUnkB8, 3, NULL);
+}
+
 // Loads the motions of the page's slots.
 void DinoUiMedalMenu::LoadPage() {
     int count;
@@ -352,7 +372,9 @@ template void std::__vec_deleter<u32, std::allocator<u32> >::assign<u32 *>(u32 *
 extern "C" struct {
     u8 unk00[0x1C];
     void (DinoUiMedalList::*Start_1C)();
-    void (DinoUiMedalList::*Unk02183980_24)();
+    void (DinoUiMedalList::*StateResult_24)();
+    void (DinoUiMedalList::*StateMenu_2C)();
+    void (DinoUiMedalList::*StateMenu_34)();
 } data_ov006_02194158;
 
 DinoUiMedalList::DinoUiMedalList() : MProcess(NULL), mUnk7C(1), mUnk80(0), mUnk84(0), mUnk85(0) {
@@ -371,7 +393,35 @@ void DinoUiMedalList::StateMenu() {
         mUnk80 += mUnk85 * 15;
     }
     mSerial.AddTail(new DinoUiMedalMenu(&mUnk7C, &mUnk80, &mUnk84));
-    mState = data_ov006_02194158.Unk02183980_24;
+    mState = data_ov006_02194158.StateResult_24;
+}
+
+void DinoUiMedalList::StateResult() {
+    if (mUnk7C == 0) {
+        gLcd->GetTopDisplay()->mBright->Reset();
+        gLcd->GetBottomDisplay()->mBright->Reset();
+        mSerial.AddTail(MTaskExitTransfer::Create(this));
+        return;
+    }
+    gLcd->mMain->ResetHooks();
+    gLcd->mMain->Setup(5, 0, 4, 1, 1, 1);
+    gLcd->mMain->mBg->SetBg0Reserved(1);
+    gLcd->mMain->SetBackdrop(0x8000);
+    gLcd->mMain->mObj->Show();
+    gLcd->VSyncNow();
+    gLcd->SetBottomDisplay(gLcd->mMain);
+    gCurrentDisplay = gLcd->GetBottomDisplay();
+    if (mUnk7C == 1) {
+        mUnk85 = mUnk80 / 15;
+        mUnk80 = mUnk80 % 15;
+        mSerial.AddTail(new DinoUiRvStatusMenu((int *)&mUnk80));
+        mState = data_ov006_02194158.StateMenu_2C;
+    } else if (mUnk7C == 2) {
+        mSerial.AddTail(new DinoUiRvStatusMenu((int *)&mUnk80, mUnk84));
+        mState = data_ov006_02194158.StateMenu_34;
+    } else {
+        Exit();
+    }
 }
 
 extern const int data_02089aa4, data_02089aa8, data_02089aac, data_02089ab0, data_02089ab4, data_02089ab8;

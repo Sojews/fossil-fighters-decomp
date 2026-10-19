@@ -17,6 +17,8 @@ class DinoUiFieldMenuFraction4;
 class DinoUiRvStatusMenu : public DinoHelpBase, public MMenu {
 public:
     MSmartOam *GetOam() { return mOam; }
+    DinoUiRvStatusMenu(int *page);
+    DinoUiRvStatusMenu(int *page, u8 kind);
     virtual ~DinoUiRvStatusMenu();
     virtual void OnStart();
     virtual void OnFocus(MMenuItem *item);
@@ -47,6 +49,7 @@ public:
     u8 mTab;            // 0x108
     MArchivePtr mArchive;       // 0x10C
     MArchiveFile mFile;         // 0x110
+    u8 unk11C[0x148 - 0x11C];
 };
 
 class DinoUiRvStatusBackButton : public DinoUiRvStatusMenuItem {

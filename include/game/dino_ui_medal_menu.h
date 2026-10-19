@@ -35,9 +35,10 @@ public:
     void Sort(u8 sort);
     // The medals of the mUnk1EC creatures (lit at the top level).
     void CreateUnkF0Items();
+    void LinkItems();
 
     MSmartOam *mOam;                    // 0xB4: the items' sprites
-    u32 mUnkB8;                         // 0xB8
+    MMenuItem *mUnkB8;                  // 0xB8
     u32 mUnkBC;                         // 0xBC
     u32 mUnkC0;                         // 0xC0
     MMenuItem *mSortButtons[5];         // 0xC4
@@ -92,6 +93,8 @@ public:
     virtual void Idle();
 
     void StateMenu();
+    // After the menu: shows the chosen creature's status, or leaves.
+    void StateResult();
 
     void (DinoUiMedalList::*mState)(); // 0x74
     u32 mUnk7C;                         // 0x7C
