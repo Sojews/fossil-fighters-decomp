@@ -24,7 +24,7 @@ src/ov004/dino_ui_wireless_cancel_item.cpp:
     .text       start:0x02163404 end:0x02168b20
 
 src/ov004/dino_ui_save_option.cpp:
-    .text       start:0x02168b50 end:0x021698c8
+    .text       start:0x02168b20 end:0x021698c8
 
 src/ov004/disp_blower.cpp:
     .text       start:0x0216a104 end:0x0216c954
@@ -42,7 +42,7 @@ src/ov004/dino_ui_save_menu.cpp:
     .text       start:0x021698c8 end:0x0216a104
 
 src/ov004/dino_ui2_container_base_menu_item.cpp:
-    .text       start:0x0216f48c end:0x02171074
+    .text       start:0x0216f3fc end:0x02171074
 
 src/ov004/dino_ui_debug_reviver_menu.cpp:
     .text       start:0x021612d8 end:0x02161b50

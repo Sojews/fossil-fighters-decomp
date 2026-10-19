@@ -12,10 +12,10 @@ src/ov005/dino_ui3_parts_fraction.cpp:
     .text       start:0x02156380 end:0x021572e4
 
 src/ov005/dino_ui_shop_sell.cpp:
-    .text       start:0x02157360 end:0x02159318
+    .text       start:0x021572e4 end:0x02159318
 
 src/ov005/dino_ui_shop_buy.cpp:
-    .text       start:0x02159398 end:0x0215b11c
+    .text       start:0x02159318 end:0x0215b11c
 
 src/ov005/dino_ui_cleaning_leave.cpp:
     .text       start:0x0215cc9c end:0x0215d42c
@@ -24,10 +24,10 @@ src/ov005/dino_ui_container_drop_menu_page_inc_task.cpp:
     .text       start:0x0215d4dc end:0x0215ec84
 
 src/ov005/dino_ui_mask_buy.cpp:
-    .text       start:0x0215ecf8 end:0x02160cc0
+    .text       start:0x0215ec84 end:0x02160cc0
 
 src/ov005/dino_ui_mask_equip.cpp:
-    .text       start:0x02160d24 end:0x02162720
+    .text       start:0x02160cc0 end:0x02162720
 
 src/ov005/dino_ui_canon_putin.cpp:
     .text       start:0x02163ddc end:0x02164ba0

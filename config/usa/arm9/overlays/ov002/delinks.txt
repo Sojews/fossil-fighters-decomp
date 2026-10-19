@@ -36,7 +36,7 @@ src/ov002/dino_cleaning_rock.cpp:
     .text       start:0x0215efc8 end:0x0215f218
 
 src/ov002/dino_cleaning_stop_confirm_menu_item.cpp:
-    .text       start:0x02156910 end:0x021571e0
+    .text       start:0x021568c4 end:0x021571e0
 
 src/ov002/dino_cleaning_report.cpp:
     .text       start:0x021558a0 end:0x021568c4
