@@ -106,7 +106,11 @@ public:
     u32 mFlags144;          // 0x144
     u32 unk148;
     u32 mFlags14C;          // 0x14C: 8 while it can't be attacked
-    u32 unk150[4];
+    u32 unk150[2];
+    u8 unk158;
+    u8 mUnk159;             // 0x159: set, it can't be chosen in the support modes
+    u8 unk15A[2];
+    u32 unk15C;
     u32 mAdvantage;         // 0x160: its type advantage over the creature shown
 };
 

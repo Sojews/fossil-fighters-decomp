@@ -11,8 +11,11 @@ class MPictureFile;
 class InfoPanelWindow;
 class DinoBattleViewCreature;
 
+class DinoBattleView;
+
 class DinoBattleViewCreatureInfo : public MProcess {
 public:
+    DinoBattleViewCreatureInfo(DinoBattleView *view, MPoint pos);
     virtual ~DinoBattleViewCreatureInfo();
     virtual void Idle();
 
@@ -35,6 +38,7 @@ public:
     MMotion *mMotions[2];           // 0x110
     u32 unk118[3];
     MPictureFile *mPicture;         // 0x124
+    u32 unk128[2];
 };
 
 #endif

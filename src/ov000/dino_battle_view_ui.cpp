@@ -38,7 +38,9 @@ DinoBattleViewUiAttackerMenu::~DinoBattleViewUiAttackerMenu() {
 // Template task instances the game emits in this file. Until the code that makes the tasks is decompiled, they are
 // instantiated explicitly.
 template class MCallTask0<DinoBattleViewCreatureInfo, DinoBattleViewCreatureInfo>;
+#pragma auto_inline off
 template MTask *MCreateCallTask(DinoBattleViewCreatureInfo *obj, void (DinoBattleViewCreatureInfo::*func)());
+#pragma auto_inline reset
 
 DinoBattleViewUiDefenderMenu::~DinoBattleViewUiDefenderMenu() {
     for (int i = 0; i < mCount; i++) {
@@ -339,7 +341,9 @@ extern "C" struct {
     const char *crossPath;  // 0x08
     const char *markPath;   // 0x0C
     const char *arrowPath;  // 0x10
-    u8 unk14[0x1C];
+    const char *cursorPath; // 0x14: the cursor with mUnk12C set
+    void (DinoBattleViewCreatureInfo::*showInfo)();     // 0x18
+    u8 unk20[0x10];
     MPoint unk30;           // 0x30
     u8 unk38[0x20];
     MPoint unk58;           // 0x58
@@ -360,6 +364,152 @@ DinoBattleViewUiSelectAreaCommon::DinoBattleViewUiSelectAreaCommon(DinoBattleVie
 
 // Where a creature slot is on screen.
 extern "C" MPoint func_ov000_02175b40(DinoBattleView *view, u32 slot);
+extern "C" DinoBattleViewCreature *func_ov000_02177430(DinoBattleViewUiSelectAreaCommon *menu, u32 unkB0, u32 unkB4);
+
+// The rows' links for the d-pad: the direction, and the row it leads to. Ends with direction 0.
+struct DinoBattleViewUiRootLink {
+    int dir;
+    int row;
+};
+extern "C" const DinoBattleViewUiRootLink *const data_ov000_02193ce0[];
+
+// Adds the row's item when there is a creature in its slot (the game repeats this in every case).
+#define ADD_ROOT_ITEM(row, side, slot)                                                                         \
+    {                                                                                                          \
+        u32 creature = (u32)func_ov000_02177430(this, side, slot);                                             \
+        if (creature != 0) {                                                                                   \
+            mRootItems[row] =                                                                                  \
+                new DinoBattleViewUiRootMenuItem(this, row, func_ov000_02175b40((DinoBattleView *)mUnkEC, row)); \
+            AddItem(mRootItems[row]);                                                                          \
+            mUnk130[creature] = mRootItems[row];                                                               \
+        }                                                                                                      \
+    }
+
+// Sets up the info panel, the cursor and the items of the creatures that can be chosen (mUnkA8 says which), then
+// links the items up and focuses the first.
+void DinoBattleViewUiSelectAreaCommon::OnStart() {
+    mUnkF8 = new MSerialTaskSet;
+    mParallel.AddTail(mUnkF8);
+    if (mCursorTask == NULL) {
+        mCursorTask = new MSmartOam(2, 0, 1);
+        ((MSmartOam *)mCursorTask)->mHidden = TRUE;
+        mSerial.AddTail(((MSmartOam *)mCursorTask)->CreateShowTransfer());
+    }
+    if (mUnk17A) {
+        mInfo = new DinoBattleViewCreatureInfo((DinoBattleView *)mUnkEC, mUnkE0);
+        mParallel.AddTail(mInfo);
+        mSerial.AddTail(MCreateCallTask(mInfo, data_ov000_02193ae4.showInfo));
+    } else {
+        mInfo = NULL;
+    }
+    if (mCursor != NULL) {
+        mCursor->Play(4, 0);
+    } else if (mUnk179 && mCursor == NULL) {
+        mCursor = new MMotion(std::string(mUnk12C == 0 ? data_ov000_02193ae4.markPath : data_ov000_02193ae4.cursorPath),
+                              (MSmartOam *)mCursorTask, 0, 1);
+        mCursor->SetPosition(func_ov000_02175b40((DinoBattleView *)mUnkEC, 0));
+        mCursor->Play(1, 0);
+        mCursor->SetPriority(1);
+        mCursor->SetAnchor(0);
+        mCursor->Show();
+    }
+    mCursorAnime = new MParallelTaskSet;
+    if (mUnk17A) {
+        mPageItems[0] = new DinoBattleViewInfoLRItem(mInfo->GetMotion(0), mUnkE0, 0x200);
+        AddItem(mPageItems[0]);
+        mPageItems[1] = new DinoBattleViewInfoLRItem(mInfo->GetMotion(1), mUnkE0, 0x100);
+        AddItem(mPageItems[1]);
+    }
+    for (int row = 0; row < 8; row++) {
+        mRootItems[row] = NULL;
+        const DinoBattleViewUiRootRow &slot = data_ov000_0218fec4[row];
+        u32 mode = mUnkA8;
+        switch (mode) {
+        case 3:
+            if (slot.unk0 == 0 && slot.unk4 - 1 <= 1) {
+                ADD_ROOT_ITEM(row, slot.unk0, slot.unk4)
+            }
+            break;
+        case 4:
+            if (slot.unk0 == 1 && slot.unk4 - 1 <= 1) {
+                ADD_ROOT_ITEM(row, slot.unk0, slot.unk4)
+            }
+            break;
+        case 9:
+            if (slot.unk0 == 0) {
+                ADD_ROOT_ITEM(row, slot.unk0, slot.unk4)
+            }
+            break;
+        case 10:
+            if (slot.unk0 == 1) {
+                ADD_ROOT_ITEM(row, slot.unk0, slot.unk4)
+            }
+            break;
+        case 5:
+        case 6:
+        case 7:
+        case 8: {
+            u32 side = 1;
+            if (mode == 5 || mode == 7) {
+                side = 0;
+            }
+            BOOL support = FALSE;
+            if (mode - 7 <= 1) {
+                support = TRUE;
+            }
+            if (side == slot.unk0) {
+                u32 creature = (u32)func_ov000_02177430(this, slot.unk0, slot.unk4);
+                if (creature != 0) {
+                    mRootItems[row] =
+                        new DinoBattleViewUiRootMenuItem(this, row, func_ov000_02175b40((DinoBattleView *)mUnkEC, row));
+                    AddItem(mRootItems[row]);
+                    mUnk130[creature] = mRootItems[row];
+                    if (slot.unk4 == 3 || (support && (((DinoBattleViewCreature *)creature)->mUnk159 ||
+                                                       (((DinoBattleViewCreature *)creature)->mFlags14C & 8)))) {
+                        mRootItems[row]->SetNoFocus(TRUE);
+                        mRootItems[row]->SetMode(0);
+                        mRootItems[row]->mDisabled = TRUE;
+                    }
+                }
+            }
+            break;
+        }
+        default:
+            if (mode == 2 || mode == slot.unk0) {
+                ADD_ROOT_ITEM(row, slot.unk0, slot.unk4)
+            }
+            break;
+        }
+    }
+    mItem120 = new DinoBattleViewCancelMenuItem;
+    AddItem(mItem120);
+    for (int row = 0; row < 8; row++) {
+        if (mRootItems[row] != NULL) {
+            u32 used = 0;
+            int dir;
+            for (const DinoBattleViewUiRootLink *link = data_ov000_02193ce0[row]; (dir = link->dir) != 0; link++) {
+                if (!((1 << dir) & used) && mRootItems[link->row] != NULL) {
+                    AddLink(mRootItems[row], link->dir, mRootItems[link->row]);
+                    used |= 1 << link->dir;
+                }
+            }
+        }
+    }
+    FocusItem(mRootItems[mUnkAC]);
+    MoveCursorTo(mRootItems[mUnkAC], 0, 0);
+    mParallel.AddTail(mCursorAnime);
+    if (mCursor != NULL) {
+        mParallel.AddTail(mCursor);
+    }
+    MMenuItem *item = mRootItems[mFocusedRow];
+    if (item != NULL) {
+        DinoBattleViewCreature *creature = GetItemCreature(item);
+        if (creature != NULL) {
+            OnFocusCreature(creature, item);
+        }
+    }
+    mParallel.AddTail(mCursorTask);
+}
 
 DinoBattleViewUiChangeMenu::DinoBattleViewUiChangeMenu(DinoBattleView *view, int player, u32 arg2,
                                                        MMessageObserver *target, const u32 *ids, int count,

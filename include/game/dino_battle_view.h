@@ -77,7 +77,8 @@ public:
     u32 mUnk12C;
     std::map<u32, void *> mUnk130;  // 0x130
     u32 mUnk13C;
-    u8 unk140[0x30];
+    DinoBattleViewUiRootMenuItem *mRootItems[8];    // 0x140: by row, where there is a creature to choose
+    u8 unk160[0x10];
     MTaskSet *mCursorAnime;     // 0x170
     u32 unk174;
     u8 mUnk178;
@@ -98,6 +99,10 @@ public:
 
 class DinoBattleViewInfoLRItem : public MMenuItem {
 public:
+    DinoBattleViewInfoLRItem(MView *view, MPoint offset, u32 keys) : mView(view), mOffset(offset) {
+        SetNoFocus(TRUE);
+        SetKeys(keys);
+    }
     virtual ~DinoBattleViewInfoLRItem();
     virtual MRect GetFrame();
     virtual void OnDecide();
