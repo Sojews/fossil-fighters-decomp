@@ -212,3 +212,10 @@ extern "C" Dino3DLoadCsv *func_ov000_02187e68(DinoBattleView3D *view, int slot) 
     }
     return model;
 }
+
+// Zeroes three words (nothing in the game calls it).
+extern "C" void func_ov000_021858ac(u32 *p) {
+    p[0] = 0;
+    p[1] = 0;
+    p[2] = 0;
+}

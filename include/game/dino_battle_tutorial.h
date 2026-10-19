@@ -50,12 +50,13 @@ class DinoBattleTutorial {
 public:
     virtual ~DinoBattleTutorial();
 
+    void SetView(class DinoBattleView *view);
     void SetUnk24(u32 value);
 
     u32 unk04[3];
     MArchivePtr mArchive;                       // 0x10
     MArchiveFile mFile;                         // 0x14
-    u32 unk20;
+    class DinoBattleView *mView;                // 0x20
     u32 mUnk24;                                 // 0x24
     DinoBattleTutorialConsoleFilter *mFilter;   // 0x28
 };

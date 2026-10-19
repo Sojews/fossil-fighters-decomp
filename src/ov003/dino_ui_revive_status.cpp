@@ -331,3 +331,7 @@ void DinoReviveStatusStateAnchor(DinoCreatureState *a, const DinoCreatureState &
     *a = b;
 }
 #pragma dont_inline reset
+
+// (Empty; nothing in the game calls it.)
+extern "C" void func_ov003_0215cf1c() {
+}

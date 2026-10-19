@@ -15,6 +15,7 @@ public:
     void StateLoad();
     void StateShow();
     void StateHide();
+    void StateDone();
 
     void (DinoBattleViewFieldPlayerBG::*mState)(); // 0x74
     u32 mSide;                  // 0x7C: 2 for none

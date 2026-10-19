@@ -105,3 +105,8 @@ void DinoBattleViewFieldPlayerBG::StateHide() {
     serial.AddTail(exit);
     mState = data_ov000_02191b1c.StateLoad_88;
 }
+
+// The picture is in place.
+void DinoBattleViewFieldPlayerBG::StateDone() {
+    mChanging = FALSE;
+}

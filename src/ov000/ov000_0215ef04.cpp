@@ -13,7 +13,7 @@ extern "C" struct {
     u8 unk00[0x38];
     void (DinoBattleViewFieldPlayerBG::*StateHide_38)();
     u8 unk40[0x60 - 0x40];
-    void (DinoBattleViewFieldPlayerBG::*Unk0215f0a0_60)();
+    void (DinoBattleViewFieldPlayerBG::*StateDone_60)();
     const char *mPaths[2];      // 0x68: each side's picture
     u8 unk70[0x98 - 0x70];
     void (DinoBattleViewFieldPlayerBG::*StateLoad_98)();
@@ -53,5 +53,5 @@ void DinoBattleViewFieldPlayerBG::StateShow() {
     mPicture->Show();
     mPicture->SetPriority(3);
     mSerial.AddTail(mPicture->CreateCoordAnime(MPoint(data_ov000_0218fa74[mSide], 0), MPoint(0, 0), 40, -2));
-    mState = data_ov000_02191b1c.Unk0215f0a0_60;
+    mState = data_ov000_02191b1c.StateDone_60;
 }

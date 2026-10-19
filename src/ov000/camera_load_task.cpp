@@ -150,3 +150,7 @@ extern "C" MTask *func_ov000_0218ac40(void *camera, u8 pause) {
 extern "C" MTask *func_ov000_0218ac74(CameraSetDefParentTask::Camera *camera, Dino3DLoadCsv *parent) {
     return new CameraSetDefParentTask(camera, parent);
 }
+
+// (Empty; nothing in the game calls it.)
+extern "C" void func_ov000_0218ab68() {
+}

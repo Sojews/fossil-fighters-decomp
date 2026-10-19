@@ -108,3 +108,8 @@ template void std::__vec_deleter<DinoBattleView3DRecord, std::allocator<DinoBatt
 template std::__vec_deleter<DinoBattleView3DRecord, std::allocator<DinoBattleView3DRecord> >::~__vec_deleter();
 template void std::__vec_deleter<DinoBattleView3DEntry, std::allocator<DinoBattleView3DEntry> >::append(size_t n, Metrowerks::int2type<true>);
 template std::__vec_deleter<DinoBattleView3DEntry, std::allocator<DinoBattleView3DEntry> >::~__vec_deleter();
+
+// A debug switch, always off.
+extern "C" BOOL func_ov000_0218472c(int flag) {
+    return FALSE;
+}

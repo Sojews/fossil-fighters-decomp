@@ -269,3 +269,7 @@ extern "C" const u32 data_0208a394, data_0208a3a0;
 DinoBattleViewGivingUpDialog::DinoBattleViewGivingUpDialog(const char *text, u8 *givingUp)
     : DinoCommonYesNoMenu(std::string(text), NULL, data_0208a394, data_0208a3a0, 1), mGivingUp(givingUp) {
 }
+
+// (Empty; nothing in the game calls it.)
+extern "C" void func_ov000_02180860() {
+}

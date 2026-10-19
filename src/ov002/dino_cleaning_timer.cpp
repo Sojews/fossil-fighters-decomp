@@ -66,3 +66,7 @@ void DinoCleaningTimerMessagesAnchor(std::string path) {
     MResource<DinoMessageData> messages(path);
 }
 #pragma dont_inline reset
+
+// (Empty; nothing in the game calls it.)
+extern "C" void func_ov002_0215c6e0() {
+}

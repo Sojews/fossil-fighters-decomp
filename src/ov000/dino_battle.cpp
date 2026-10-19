@@ -226,3 +226,8 @@ static struct DinoBattleStaticInit {
         DINO_POOL_WORD(data_ov000_021911ac, 0x34) = 112;
     }
 } sDinoBattleStaticInit;
+
+// Resets to the title (nothing in the game calls it).
+extern "C" void func_ov000_0215a888() {
+    MSoftReset(1);
+}
