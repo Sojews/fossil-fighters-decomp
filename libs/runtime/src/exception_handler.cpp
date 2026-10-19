@@ -328,6 +328,28 @@ int func_02087818(char *throw_type, ExceptionSpecification *spec) {
     return 0;
 }
 
+// Runs the unexpected handler for a broken exception specification. What the handler throws goes on if the
+// specification allows it; otherwise a bad_exception does if it allows that; otherwise the program terminates.
+void __unexpected(CatchInfo *catchinfo) {
+    u8 *action = (u8 *)catchinfo->stacktop;
+    ExceptionSpecification spec;
+
+#pragma exception_magic
+    try {
+        std::unexpected();
+    } catch (...) {
+        spec.types = (u8 *)func_02086d6c(func_02086dcc(func_02086dcc((char *)action + 1, &spec.count), &spec.unk4),
+                                         (s32 *)&spec.unk8);
+        if (func_02087818((char *)((CatchInfo *)&__exception_magic)->typeinfo, &spec)) {
+            throw;
+        }
+        if (func_02087818("!bad_exception!!", &spec)) {
+            throw std::bad_exception();
+        }
+    }
+    std::terminate();
+}
+
 // The thrown type broke an exception specification: unwind to it and run its unexpected handler.
 // NONMATCHING: the game copies the action argument into r2 before saving the context pointer (two moves swapped).
 void func_020878e8(ThrowContext *context, ExceptionInfo *info, ExceptionSpecification *spec, u8 *action) {
