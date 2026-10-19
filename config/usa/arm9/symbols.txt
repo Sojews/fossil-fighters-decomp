@@ -12057,7 +12057,6 @@ _ZTS23MLooperPreLoopHookClock kind:data(any) addr:0x020c0d14
 _ZTS24MLooperPostLoopHookClock kind:data(any) addr:0x020c0d30
 _ZTS35MLooperAppendVBlankTransferTransfer kind:data(any) addr:0x020c0d4c
 _ZTV16MLooperVSyncTask kind:data(any) addr:0x020c0d74
-data_020c0d90 kind:data(any) addr:0x020c0d90
 _ZTS37MLooperAppendVBlank3dTransferTransfer kind:data(any) addr:0x020c0d9c
 _ZTI15MMessageSubject kind:data(any) addr:0x020c0dc4
 _ZTI31MMultiBootChildRequestedMessage kind:data(any) addr:0x020c0de4
