@@ -509,15 +509,15 @@ void DinoHelpStatus::OpenStep() {
 
 extern const MFx32 data_020b5814; // frames per pixel
 
-// NONMATCHING: stack slots (the game spills the fixed-point temporaries and orders the points' slots differently).
+// NONMATCHING: stack slots only (the game has the frame count's temporaries below the points', as if all one
+// statement, yet works out dx before the first point's position).
 void DinoHelpStatus::Scroll() {
     if (mCanvas != NULL && mCanvas->GetWidth() > 256) {
-        MFx32 frames = MFx32(mCanvas->GetWidth() - 256);
-        frames *= data_020b5814;
+        int frames = MFx32ToInt(MFx32(mCanvas->GetWidth() - 256) * data_020b5814);
         int dx = mCanvas->GetWidth() - 256;
         MPoint to(-dx, mCanvas->GetPosition().y);
         MPoint from(0, mCanvas->GetPosition().y);
-        mSerial.AddTail(mCanvas->CreateCoordAnime(from, to, MFx32ToInt(frames), 0));
+        mSerial.AddTail(mCanvas->CreateCoordAnime(from, to, frames, 0));
     }
 }
 
