@@ -12,6 +12,7 @@ public:
 
     void StateStart();
     void StateMenu();
+    void StateChoose();
 
     void (DinoUiFieldMenu::*mState)();  // 0x74
     u32 mUnk7C;                         // 0x7C

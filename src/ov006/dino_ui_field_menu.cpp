@@ -9,6 +9,8 @@
 #include "game/dino_ui_container_menu_item_menu.h"
 #include "game/dino_ui_parts_tab_icon_menu_item_menu.h"
 #include "game/dino_ui_field_menu.h"
+#include "game/dino_ui_rv_status_menu_item_menu.h"
+#include "m/bright.h"
 
 DinoUiFieldMenu::~DinoUiFieldMenu() {
 }
@@ -20,7 +22,7 @@ void DinoUiFieldMenu::Idle() {
 // The TU's pooled pointer-to-member constants (see menu.cpp).
 extern "C" struct {
     u8 unk00[0x8];
-    void (DinoUiFieldMenu::*Unk02171cd8_08)();
+    void (DinoUiFieldMenu::*StateChoose_08)();
     void (DinoUiFieldMenu::*Start_10)();
     u8 unk18[0x30 - 0x18];
     void (DinoUiFieldMenu::*StateMenu_30)();
@@ -59,5 +61,49 @@ void DinoUiFieldMenu::StateMenu() {
         mSerial.AddTail(new DinoUiItemMenu(&mChoice, &mTeam, &mTeam2));
         break;
     }
-    mState = data_ov006_02190da0.Unk02171cd8_08;
+    mState = data_ov006_02190da0.StateChoose_08;
+}
+
+// Opens what the menu chose: the status, container or item menu, or a creature's status (4-8, coming back to the
+// status menu); leaving saves the team (or, with an empty team, insists on the status menu).
+void DinoUiFieldMenu::StateChoose() {
+    switch (mChoice) {
+    case 0:
+        if (mTeam.slots[0] != 0) {
+            gDinoBackup->SetTeam(gDinoBackup->GetUnk34_26(), &mTeam);
+        } else if (mHasCreature) {
+            mChoice = 98;
+            mSerial.AddTail(new DinoUiStatusMenu(&mChoice, &mTeam, &mTeam2));
+            gDinoBackup->SetSystemVar(0x2C, 0);
+            return;
+        }
+        gLcd->GetTopDisplay()->mBright->Reset();
+        gLcd->GetBottomDisplay()->mBright->Reset();
+        mSerial.AddTail(MTaskExitTransfer::Create(this));
+        break;
+    case 1:
+        mSerial.AddTail(new DinoUiStatusMenu(&mChoice, &mTeam, &mTeam2));
+        gDinoBackup->SetSystemVar(0x2C, 0);
+        break;
+    case 2:
+        mSerial.AddTail(new DinoUiContainerMenu(&mChoice, &mTeam, &mTeam2));
+        gDinoBackup->SetSystemVar(0x2C, 1);
+        break;
+    case 3:
+        mSerial.AddTail(new DinoUiItemMenu(&mChoice, &mTeam, &mTeam2));
+        gDinoBackup->SetSystemVar(0x2C, 2);
+        break;
+    case 4:
+    case 5:
+    case 6:
+    case 7:
+    case 8:
+        mSerial.AddTail(new DinoUiRvStatusMenu(mChoice - 4, &mTeam));
+        mChoice = 1;
+        break;
+    case 9:
+    default:
+        Exit();
+        break;
+    }
 }
