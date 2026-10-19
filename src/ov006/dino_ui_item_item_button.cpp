@@ -5,6 +5,7 @@
 #pragma auto_inline on
 
 #include "game/dino_resource.h"
+#include "m/smart_oam.h"
 #include "game/dino_common_window_message_box.h"
 #include "game/dino_ui_item_item_button_menu.h"
 #include "game/dino_ui_item_item_button.h"
@@ -234,6 +235,18 @@ void DinoUiItemMenu::OnOKDecided() {
 }
 
 #pragma auto_inline off
+
+DinoUiItemMenuItem::DinoUiItemMenuItem(DinoUiItemMenu *owner, const std::string &path, MPoint pos, u32 textId) {
+    mOwner = owner;
+    mTextId = textId;
+    mMotion = new MMotion(std::string(path), mOwner->GetOam(), 2, 1);
+    mMotion->Play(1, 0);
+    mMotion->SetPosition(pos);
+    mMotion->SetPriority(1);
+    mMotion->Show();
+    mMotion->GetUnit()->SetMode(1);
+    mParallel.AddTail(mMotion);
+}
 
 // The OK button is usable once the team has a first member.
 void DinoUiItemMenu::RefreshOKButton() {

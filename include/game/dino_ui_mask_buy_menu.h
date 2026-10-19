@@ -8,6 +8,7 @@
 #include "game/help.h"
 #include "game/dino_ui_mask_buy_menu_item.h"
 
+class MSmartOam;
 class DinoUi3PartsMoney;
 class DinoUiMaskBuyBuyButton;
 class DinoUi3PartsCursor;
@@ -34,7 +35,9 @@ public:
     void RefreshPage2();
     void RefreshPage3();
 
-    u32 mUnkB4;             // 0xB4
+    MSmartOam *GetOam() { return mOam; }
+
+    MSmartOam *mOam;        // 0xB4: the items' sprites
     MMenuItem *mBack;       // 0xB8
     DinoUiMaskBuyBuyButton *mBuy; // 0xBC
     u32 mUnkC0;             // 0xC0

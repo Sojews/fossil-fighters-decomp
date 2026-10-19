@@ -12,6 +12,7 @@
 #include "game/dino_ui_item_menu_item.h"
 
 struct DinoTeam;
+class MSmartOam;
 class DinoUiItemMenuItem;
 
 class DinoUiItemMenu : public DinoHelpBase, public MMenu {
@@ -29,7 +30,9 @@ public:
     void RefreshPage();
     void RefreshOKButton();
 
-    u32 mUnkB4;
+    MSmartOam *GetOam() { return mOam; }
+
+    MSmartOam *mOam;            // 0xB4: the items' sprites
     MMenuItem *mUnkB8;          // 0xB8: focused after a page change
     DinoUiItemMenuItem *mOKButton;  // 0xBC
     u32 mUnkC0[7];

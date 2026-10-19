@@ -10,6 +10,7 @@ class DinoUiMaskBuyMenu;
 
 class DinoUiMaskBuyMenuItem : public MMenuItem, public DinoHelpItem {
 public:
+    DinoUiMaskBuyMenuItem(DinoUiMaskBuyMenu *owner, const std::string &path, MPoint pos, u32 textId);
     virtual ~DinoUiMaskBuyMenuItem();
     virtual MRect GetFrame();
     virtual void OnFocusChanged(BOOL focused);

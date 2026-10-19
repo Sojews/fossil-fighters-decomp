@@ -5,6 +5,7 @@
 #pragma auto_inline on
 
 #include "game/dino_common_window_yes_no_dialog.h"
+#include "m/smart_oam.h"
 
 #include "game/dino_ui3_parts_rock_name.h"
 
@@ -27,6 +28,18 @@
 #include "m/input.h"
 
 #pragma auto_inline off
+
+DinoUiShopBuyMenuItem::DinoUiShopBuyMenuItem(DinoUiShopBuyMenu *owner, const std::string &path, MPoint pos, u32 textId) {
+    mOwner = owner;
+    mTextId = textId;
+    mMotion = new MMotion(std::string(path), mOwner->GetOam(), 2, 1);
+    mMotion->Play(1, 0);
+    mMotion->SetPosition(pos);
+    mMotion->SetPriority(1);
+    mMotion->Show();
+    mMotion->GetUnit()->SetMode(1);
+    mParallel.AddTail(mMotion);
+}
 
 // Clears the page's items.
 void DinoUiShopBuyMenu::ClearItems() {

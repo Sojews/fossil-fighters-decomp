@@ -8,6 +8,7 @@
 #include "game/help.h"
 #include "game/dino_ui_shop_buy_menu_item.h"
 
+class MSmartOam;
 class DinoUi3PartsMoney;
 class DinoUiShopBuyBuyButton;
 class DinoUi3PartsCursor;
@@ -40,7 +41,9 @@ public:
 
     MArchivePtr mArchive;       // 0xB4
     MArchiveFile mFile;         // 0xB8
-    u32 mUnkC4;                 // 0xC4
+    MSmartOam *GetOam() { return mOam; }
+
+    MSmartOam *mOam;            // 0xC4: the items' sprites
     MMenuItem *mUnkC8;          // 0xC8: the back button
     DinoUiShopBuyBuyButton *mLinkFrom; // 0xCC: the buy button, linked to the first page item
     u32 mUnkD0;                 // 0xD0
