@@ -5,6 +5,7 @@
 #pragma auto_inline on
 
 #include "game/dino_resource.h"
+#include "game/dino_backup.h"
 #include <printf.h>
 #include "m/font.h"
 #include "m/indicator.h"
@@ -161,6 +162,36 @@ void DinoUiDebugKasekiRockGetMenuKasekiRockIdItem::Idle() {
     char text[0x100];
     sprintf(text, gDinoResource->GetText(data_0208a408), *mValue);
     mView->SetText(std::string(text));
+}
+
+extern "C" struct {
+    u8 unk00[4];
+    const char *mDefsPath;  // 0x04: "/etc/kaseki_defs"
+} data_ov004_02173580;
+
+// Start adds the chosen fossil rock (if there's room); back leaves.
+void DinoUiDebugKasekiRockGetMenu::OnDecide(MMenuItem *item) {
+    if (item == mBackItem) {
+        Exit();
+        return;
+    }
+    if (item == mStartItem) {
+        if (!gDinoBackup->IsUnk98Full()) {
+            MResource<DinoKasekiDefs> defs(std::string(data_ov004_02173580.mDefsPath));
+            DinoBackupEntry entry;
+            MI_CpuFill8(&entry, 0, sizeof(entry));
+            entry.id = mKaseki;
+            entry.type = defs.Get()->GetDef(mKaseki)->unk24;
+            entry.unkC_12 = mUnkAC;
+            entry.unk10_0 = mUnkB0;
+            if (defs.Get()->GetDef(mKaseki)->IsUncleanable()) {
+                entry.unk10_3 = TRUE;
+            }
+            gDinoBackup->SetUnk98(gDinoBackup->FindFreeUnk98(), &entry);
+            gDinoBackup->CompactUnk98();
+        }
+        Exit();
+    }
 }
 
 void DinoUiDebugKasekiRockGetMenu::OnFocus(MMenuItem *item) {

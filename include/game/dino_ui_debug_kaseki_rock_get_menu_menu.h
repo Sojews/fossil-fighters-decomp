@@ -22,11 +22,15 @@ public:
     virtual void OnFocus(MMenuItem *item);
     virtual void OnDecide(MMenuItem *item);
 
-    u32 mUnkA8[4];      // 0xA8
+    u32 mKaseki;        // 0xA8: the fossil's id
+    u32 mUnkAC;         // 0xAC
+    u32 mUnkB0;         // 0xB0
+    u32 mUnkB4;         // 0xB4
     MFont *mFont;       // 0xB8
     MTaskSet *mTasks;   // 0xBC: the cursor's moves
     MView *mCursor;     // 0xC0
-    u32 mUnkC4[2];      // 0xC4
+    MMenuItem *mStartItem;  // 0xC4
+    MMenuItem *mBackItem;   // 0xC8
 };
 
 class DinoUiDebugKasekiRockGetMenuKasekiRockIdItem : public MMenuItem {
