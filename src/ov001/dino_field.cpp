@@ -736,6 +736,45 @@ void DinoFieldCharaMoveToCoordTask::Transfer() {
     }
 }
 
+// An event picture entry: its name is at the offset in its first word.
+static inline const char *GetPictName(const DinoExcavateDefs *defs, u32 pict) {
+    const u8 *entry = (const u8 *)defs + ((const u32 *)((const u8 *)defs + defs->picts))[pict];
+    return (const char *)entry + *(const u32 *)entry;
+}
+
+extern "C" struct {
+    void (DinoField::*LoadFadeInPict_00)(MDisplay *, MView *, MExtAffinePicture **, u32, MPoint, u32, long);
+} data_ov001_0216939c;
+
+extern "C" struct {
+    void (MBg::*SetMode_00)(bg_mode);
+} data_ov001_021693dc;
+
+// Shows the picture: keeps a copy of the old one (as a text picture) on screen while the new one loads and fades in.
+void DinoField::FadeInPict(MDisplay *display, u32 *id, MExtAffinePicture **pict, u32 newId, MPoint pos, u32 frames,
+                           long unk) {
+    MTextPicture *old;
+    if (*pict) {
+        MResource<DinoExcavateDefs> defs = gDinoResource->GetExcavateDefs();
+        old = new MTextPicture(display, std::string("/image/") + GetPictName(defs.Get(), *id), FALSE, false);
+        old->SetPosition((*pict)->GetPosition());
+        old->SetPriority(2);
+        old->Show();
+        mParallel.AddTail(old);
+        mParallel.Remove(*pict);
+        delete *pict;
+    } else {
+        old = NULL;
+    }
+    *id = newId;
+    MTask *load = MCreateBgCallTask(this, data_ov001_0216939c.LoadFadeInPict_00, display, (MView *)old, pict, newId,
+                                    pos, frames, unk, 1);
+    MTask *mode = MCreateCallTask(display->mBg, data_ov001_021693dc.SetMode_00, (bg_mode)3);
+    MTaskSet *tasks = mPictTasks;
+    tasks->AddTail(mode);
+    tasks->AddTail(load);
+}
+
 extern "C" struct {
     void (MBg::*SetMode_00)(bg_mode);
 } data_ov001_021693d4;
@@ -756,6 +795,38 @@ void DinoField::FadeOutPict(MDisplay *display, MExtAffinePicture **pict, u32 fra
 }
 
 extern "C" struct {
+    void (DinoField::*LoadSlideInPict_00)(MDisplay *, MView *, MExtAffinePicture **, u32, MPoint, u32, u32, long);
+} data_ov001_0216937c;
+
+extern "C" struct {
+    void (MBg::*SetMode_00)(bg_mode);
+} data_ov001_021693ec;
+
+// Shows the picture: keeps a copy of the old one (as a text picture) on screen while the new one loads and comes in.
+void DinoField::SlideInPict(MDisplay *display, u32 *id, MExtAffinePicture **pict, u32 newId, MPoint pos, u32 a, u32 b, long c) {
+    MTextPicture *old;
+    if (*pict) {
+        MResource<DinoExcavateDefs> defs = gDinoResource->GetExcavateDefs();
+        old = new MTextPicture(display, std::string("/image/") + GetPictName(defs.Get(), *id), FALSE, false);
+        old->SetPosition((*pict)->GetPosition());
+        old->SetPriority(2);
+        old->Show();
+        mParallel.AddTail(old);
+        mParallel.Remove(*pict);
+        delete *pict;
+    } else {
+        old = NULL;
+    }
+    *id = newId;
+    MTask *load = MCreateBgCallTask(this, data_ov001_0216937c.LoadSlideInPict_00, display, (MView *)old, pict, newId, pos,
+                                    a, b, c, 1);
+    MTask *mode = MCreateCallTask(display->mBg, data_ov001_021693ec.SetMode_00, (bg_mode)3);
+    MTaskSet *tasks = mPictTasks;
+    tasks->AddTail(mode);
+    tasks->AddTail(load);
+}
+
+extern "C" struct {
     void (MBg::*SetMode_00)(bg_mode);
 } data_ov001_0216938c;
 
@@ -773,6 +844,38 @@ void DinoField::SlideOutPict(MDisplay *display, MExtAffinePicture **pict, u32 di
     MTask *slide = (*pict)->CreateCoordAnime((*pict)->GetPosition(), to, frames, ease);
     mPictTasks->AddTail(slide, exit, timer, reset);
     *pict = NULL;
+}
+
+extern "C" struct {
+    void (DinoField::*LoadZoomInPict_00)(MDisplay *, MView *, MExtAffinePicture **, u32, MPoint, MFx32, u32, long);
+} data_ov001_02169384;
+
+extern "C" struct {
+    void (MBg::*SetMode_00)(bg_mode);
+} data_ov001_021693c4;
+
+// Shows the picture: keeps a copy of the old one (as a text picture) on screen while the new one loads and comes in.
+void DinoField::ZoomInPict(MDisplay *display, u32 *id, MExtAffinePicture **pict, u32 newId, MPoint pos, MFx32 scale, u32 a, long b) {
+    MTextPicture *old;
+    if (*pict) {
+        MResource<DinoExcavateDefs> defs = gDinoResource->GetExcavateDefs();
+        old = new MTextPicture(display, std::string("/image/") + GetPictName(defs.Get(), *id), FALSE, false);
+        old->SetPosition((*pict)->GetPosition());
+        old->SetPriority(2);
+        old->Show();
+        mParallel.AddTail(old);
+        mParallel.Remove(*pict);
+        delete *pict;
+    } else {
+        old = NULL;
+    }
+    *id = newId;
+    MTask *load = MCreateBgCallTask(this, data_ov001_02169384.LoadZoomInPict_00, display, (MView *)old, pict, newId, pos,
+                                    scale, a, b, 1);
+    MTask *mode = MCreateCallTask(display->mBg, data_ov001_021693c4.SetMode_00, (bg_mode)3);
+    MTaskSet *tasks = mPictTasks;
+    tasks->AddTail(mode);
+    tasks->AddTail(load);
 }
 
 extern "C" struct {
@@ -1153,19 +1256,6 @@ DinoFieldCaptureFadeOutTask::~DinoFieldCaptureFadeOutTask() {
 
 DinoFieldCaptureFadeInTask::~DinoFieldCaptureFadeInTask() {
 }
-
-// Template task instances the game emits in this file. Until the code that makes the tasks is decompiled, they are
-// instantiated explicitly.
-
-// Background loads of the lower screen's pictures (made by functions not decompiled yet).
-// NONMATCHING (the MFx32 creator only): we copy the MFx32 argument to a stack temporary like the MPoint one; the
-// game copies only the MPoint (maybe its MFx32 had no user-declared constructors).
-template class MBgCallTask8<DinoField, MDisplay *, MView *, MExtAffinePicture **, u32, MPoint, MFx32, u32, long>;
-template MTask *MCreateBgCallTask(DinoField *obj, void (DinoField::*func)(MDisplay *, MView *, MExtAffinePicture **, u32, MPoint, MFx32, u32, long), MDisplay *a1, MView *a2, MExtAffinePicture **a3, u32 a4, MPoint a5, MFx32 a6, u32 a7, long a8, int thread);
-template class MBgCallTask8<DinoField, MDisplay *, MView *, MExtAffinePicture **, u32, MPoint, u32, u32, long>;
-template MTask *MCreateBgCallTask(DinoField *obj, void (DinoField::*func)(MDisplay *, MView *, MExtAffinePicture **, u32, MPoint, u32, u32, long), MDisplay *a1, MView *a2, MExtAffinePicture **a3, u32 a4, MPoint a5, u32 a6, u32 a7, long a8, int thread);
-template class MBgCallTask7<DinoField, MDisplay *, MView *, MExtAffinePicture **, u32, MPoint, u32, long>;
-template MTask *MCreateBgCallTask(DinoField *obj, void (DinoField::*func)(MDisplay *, MView *, MExtAffinePicture **, u32, MPoint, u32, long), MDisplay *a1, MView *a2, MExtAffinePicture **a3, u32 a4, MPoint a5, u32 a6, long a7, int thread);
 
 #pragma auto_inline off
 

@@ -466,10 +466,16 @@ public:
     void SetUnk238(u32 value);
     u32 GetBgm();
     void FadeInPict(MDisplay *display, u32 *id, MExtAffinePicture **pict, u32 newId, MPoint pos, u32 frames, long unk);
+    // Loads the picture in the background and cross-fades it in over the old one (FadeInPict's task).
+    void LoadFadeInPict(MDisplay *display, MView *old, MExtAffinePicture **pict, u32 id, MPoint pos, u32 frames, long unk);
     void FadeOutPict(MDisplay *display, MExtAffinePicture **pict, u32 id, long frames);
     void SlideInPict(MDisplay *display, u32 *id, MExtAffinePicture **pict, u32 newId, MPoint pos, u32 a, u32 b, long c);
+    // Loads the picture in the background and slides it in (SlideInPict's task).
+    void LoadSlideInPict(MDisplay *display, MView *old, MExtAffinePicture **pict, u32 id, MPoint pos, u32 a, u32 b, long c);
     void SlideOutPict(MDisplay *display, MExtAffinePicture **pict, u32 id, u32 a, long b);
     void ZoomInPict(MDisplay *display, u32 *id, MExtAffinePicture **pict, u32 newId, MPoint pos, MFx32 scale, u32 a, long b);
+    // Loads the picture in the background and zooms it in (ZoomInPict's task).
+    void LoadZoomInPict(MDisplay *display, MView *old, MExtAffinePicture **pict, u32 id, MPoint pos, MFx32 scale, u32 a, long b);
     void ZoomOutPict(MDisplay *display, MExtAffinePicture **pict, MFx32 scale, u32 a, long b);
 
     u32 mUnk98;                 // 0x98
