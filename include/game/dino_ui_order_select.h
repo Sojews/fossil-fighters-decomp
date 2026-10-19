@@ -20,6 +20,20 @@
 // (The data's layout isn't known yet.)
 struct DinoUiOrderSelectData;
 
+// What a tab of the order select shows; only the first byte is known: whether the tab is there.
+struct DinoUiOrderSelectTab {
+    u32 present : 8;
+    u32 unk0_8 : 24;
+    u8 unk04[0x14];
+};
+
+// The opponent the order is chosen against.
+struct DinoUiOrderSelectInfo {
+    std::string name;               // 0x00
+    DinoUiOrderSelectTab tabs[5];   // 0x0C
+    MFx32 unk84[5];                 // 0x84 (some 4-byte class: the game copies them one by one)
+};
+
 class MSmartOam;
 class DinoUiRvInformation;
 class DinoUiOrderSelectMenuItem;
@@ -58,12 +72,7 @@ public:
     MMenuItem *mUnkF8[5];       // 0xF8: by tab
     u8 unk10C[0x110 - 0x10C];
     std::string mUnk110;        // 0x110
-    // (What each tab shows; only the first byte is known: whether the tab is there.)
-    struct Tab {
-        u32 present : 8;
-        u32 unk0_8 : 24;
-        u8 unk04[0x14];
-    } mTabData[5];              // 0x11C
+    DinoUiOrderSelectTab mTabData[5];   // 0x11C
     u8 unk194[0x1A8 - 0x194];
     u8 mHasFourthTab;           // 0x1A8
     u8 unk1A9[0x1B4 - 0x1A9];
@@ -86,11 +95,16 @@ public:
 
 class DinoUiOrderSelect : public MProcess {
 public:
+    DinoUiOrderSelect(u32 team, const DinoUiOrderSelectInfo &info, u8 unk110, u8 unk111, u32 unk114, u8 unk112);
     virtual ~DinoUiOrderSelect();
     virtual void Idle();
 
-    u32 mUnk74;         // 0x74
-    std::string mUnk78; // 0x78
+    u32 mTeam;                  // 0x74
+    DinoUiOrderSelectInfo mInfo;    // 0x78
+    u8 mUnk110;                 // 0x110
+    u8 mUnk111;                 // 0x111
+    u8 mUnk112;                 // 0x112
+    u32 mUnk114;                // 0x114
 };
 
 class DinoUiOrderSelectMenu;

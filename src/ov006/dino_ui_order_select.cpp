@@ -19,6 +19,11 @@
 DinoUiOrderSelect::~DinoUiOrderSelect() {
 }
 
+DinoUiOrderSelect::DinoUiOrderSelect(u32 team, const DinoUiOrderSelectInfo &info, u8 unk110, u8 unk111, u32 unk114,
+                                     u8 unk112)
+    : MProcess(NULL), mTeam(team), mInfo(info), mUnk110(unk110), mUnk111(unk111), mUnk112(unk112), mUnk114(unk114) {
+}
+
 DinoUiOrderSelectMenuItem::~DinoUiOrderSelectMenuItem() {
 }
 

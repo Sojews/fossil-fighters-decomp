@@ -644,7 +644,7 @@ func_ov006_0218e38c kind:function(thumb,size=0x110) addr:0x0218e38c
 _ZN21DinoUiOrderSelectMenu9LinkItemsEv kind:function(thumb,size=0x210) addr:0x0218e49c
 func_ov006_0218e6ac kind:function(thumb,size=0x1332) addr:0x0218e6ac
 .L_0218f9d8 kind:label(thumb) addr:0x0218f9d8 local
-func_ov006_0218f9e0 kind:function(thumb,size=0x6c) addr:0x0218f9e0
+_ZN17DinoUiOrderSelectC1EmRK21DinoUiOrderSelectInfohhmh kind:function(thumb,size=0x6c) addr:0x0218f9e0
 _ZN17DinoUiOrderSelect4IdleEv kind:function(thumb,size=0x124) addr:0x0218fa4c
 _ZN25DinoUiOrderSelectMenuItem7GetRectEv kind:function(thumb,size=0xa) addr:0x0218fb70
 _ZN25DinoUiOrderSelectMenuItem8GetFrameEv kind:function(thumb,size=0xe) addr:0x0218fb7c
