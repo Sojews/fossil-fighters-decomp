@@ -12,7 +12,6 @@
 #include "game/dino_common_window_message_box.h"
 #include "game/backup_validater.h"
 #include "game/dino_backup.h"
-#include "m/bg_new_task.h"
 
 DinoUiSaveMenu::~DinoUiSaveMenu() {
 }
@@ -45,6 +44,9 @@ extern "C" struct {
     u8 unk34[0x44 - 0x34];
     void (DinoUiSaveMenu::*StateAskSave_44)();
 } data_ov004_02175130;
+// (MCreateBgCallTask is only declared here: the game calls the copy in dino_ui_exchange.cpp.)
+template <class T> MTask *MCreateBgCallTask(T *obj, void (T::*func)(), int thread);
+
 // "/image/m_back00" (the TU's string literals are pooled data too).
 extern "C" const char data_ov004_021751fc[];
 // Text ids.
