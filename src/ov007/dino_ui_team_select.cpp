@@ -10,6 +10,8 @@
 #include "game/dino_ui_team_select.h"
 #include "types.h"
 #include "m/call_task.h"
+#include "game/dino_backup.h"
+#include "game/dino_common_window_menu_item_flush_task_menu.h"
 
 DinoUiTeamSelectMenu::~DinoUiTeamSelectMenu() {
 }
@@ -54,13 +56,72 @@ void DinoUiTeamSelectTeamButton::OnFocusChanged(BOOL focused) {
     }
 }
 
-extern "C" void func_ov007_0218b81c(DinoUiTeamSelectMenu *menu, int index);
+void DinoUiTeamSelectMenu::RefreshTeams() {
+    for (int i = 0; i < 3; i++) {
+        DinoTeam team;
+        gDinoBackup->GetTeam(i + 1, &team);
+        u32 j;
+        int count = 0;
+        for (j = 0; j < 5; j++) {
+            if (team.slots[j] != 0) {
+                count++;
+            }
+        }
+        if (count == 0) {
+            mNames[i]->SetText(std::wstring(L" "));
+            mLabels[i]->SetText(std::string(" "));
+            mUnkEC[i]->Show();
+            mTeams[i]->Disable();
+        } else {
+            mNames[i]->SetText(std::wstring((const wchar_t *)team.name));
+            mLabels[i]->SetText(std::wstring((const wchar_t *)team.name));
+            mUnkEC[i]->Hide();
+            mTeams[i]->Enable();
+        }
+        if (i + 1 == gDinoBackup->GetUnk34_26()) {
+            mNames[i]->Show();
+            mLabels[i]->Hide();
+        } else {
+            mLabels[i]->Show();
+            mNames[i]->Hide();
+        }
+    }
+}
+
+// Where the teams are, and the menu's offset from them.
+extern MPoint data_ov007_02192414[3];
+extern struct {
+    u8 unk00[0x74];
+    MPoint menuOffset;  // 0x74
+} data_ov007_02192318;
+extern const u32 data_0208ab24;
+extern const u32 data_0208ab28;
+
+void DinoUiTeamSelectMenu::OpenMenu(int team) {
+    mUnk10C = 0;
+    mCursor->Hide();
+    MPoint pos = data_ov007_02192414[team] + data_ov007_02192318.menuOffset;
+    if (team >= 1) {
+        pos.y -= 0x40;
+    }
+    DinoCommonWindowMenu *menu = new DinoCommonWindowMenu(&mUnk10C, pos, NULL, 0);
+    menu->AddChoice(1, gDinoResource->GetText(data_0208ab28), gDinoResource->GetText(data_0208ab28));
+    menu->AddChoice(-2, gDinoResource->GetText(data_0208ab24), gDinoResource->GetText(data_0208ab24));
+    MTask *decided;
+    MTask *show = mCursor->CreateShowTransfer();
+    decided = MCreateCallTask(this, &DinoUiTeamSelectMenu::StateDecided);
+    MTask *task = menu;
+    MSerialTaskSet *serial = &mSerial;
+    serial->AddTail(task);
+    serial->AddTail(decided);
+    serial->AddTail(show);
+}
 
 void DinoUiTeamSelectMenu::OnDecide(MMenuItem *item) {
     for (int i = 0; i < 3; i++) {
         if (item == mTeams[i]) {
             mSelected = i + 1;
-            func_ov007_0218b81c(this, i);
+            OpenMenu(i);
         }
     }
 }
