@@ -95,6 +95,30 @@ u32 DinoField::GetUnk26C() {
     return mUnk26C;
 }
 
+void DinoField::SetUnk258(BOOL value) {
+    if (mUnk258 == value) {
+        return;
+    }
+    mUnk258 = value;
+    mUnk25C = 0;
+    mUnk260 = 0;
+    if (mUnk258) {
+        mUnk264 = FALSE;
+        Disable();
+    } else {
+        mUnk264 = TRUE;
+    }
+    for (u32 i = 0; i < 100; i++) {
+        if (mCharas[i]->GetModel()->id != 0) {
+            if (mUnk258) {
+                mCharas[i]->StopWalking();
+            } else {
+                mCharas[i]->LeaveUnk258();
+            }
+        }
+    }
+}
+
 void DinoField::SetUnk238(u32 value) {
     mUnk238 = value;
 }

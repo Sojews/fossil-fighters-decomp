@@ -1,6 +1,7 @@
 #ifndef GAME_DINO_FIELD_TOWN_MAP_MENU_H
 #define GAME_DINO_FIELD_TOWN_MAP_MENU_H
 
+#include "m/fx32.h"
 #include "game/dino_field.h"
 #include "m/menu_item.h"
 #include "m/menu.h"
@@ -21,6 +22,9 @@ public:
 
     DinoField *mField;      // 0x78
     DinoFieldTownMap *mTownMap;  // 0x7C: while the camera allows it
+    MFx32Point mOffset;     // 0x80
+    MFx32 mScale;           // 0x88
+    u8 mCentered;           // 0x8C: show the map's centre instead of the player
 };
 
 #endif

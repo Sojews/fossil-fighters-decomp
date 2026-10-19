@@ -85,3 +85,19 @@ DinoFieldTownMapManager::DinoFieldTownMapManager(DinoField *field) : MProcess(gL
 // DinoField picture-load creators). An aggregate MFx32 fixes it but breaks MFx32 returns (hidden pointer).
 template class MCallTask4<DinoFieldPlayerControl, DinoFieldPlayerControl, MFx32Point, MFx32, u16, u32>;
 template MTask *MCreateCallTask(DinoFieldPlayerControl *obj, void (DinoFieldPlayerControl::*func)(MFx32Point, MFx32, u16, u32), MFx32Point a0, MFx32 a1, u16 a2, u32 a3);
+
+// Keeps the town map on the player (or its centre).
+void DinoFieldTownMapManager::Idle() {
+    if (mTownMap == NULL) {
+        return;
+    }
+    DinoFieldChara *chara = mField->GetChara(1);
+    if (chara == NULL) {
+        return;
+    }
+    if (!mCentered) {
+        mTownMap->Update(chara->GetModel()->pos, mOffset, mScale);
+    } else {
+        mTownMap->Update(MFx32Point(MFx32(0), MFx32(0)), mOffset, MFx32(1));
+    }
+}

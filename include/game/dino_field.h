@@ -384,8 +384,12 @@ public:
     DinoFieldRadar *mRadar;     // 0x244
     DinoFieldTownMap *mTownMap; // 0x248
     u32 mUnk24C[3];             // 0x24C
-    u8 mUnk258;                 // 0x258
-    u8 unk259[0xF];
+    u8 mUnk258;                 // 0x258: the player can't move (an event is running)
+    u8 unk259[3];
+    u32 mUnk25C;                // 0x25C
+    u32 mUnk260;                // 0x260
+    u8 mUnk264;                 // 0x264
+    u8 unk265[3];
     MTaskSet *mFadeTasks;       // 0x268
     u32 mUnk26C;                // 0x26C
     MTaskSet *mPictTasks;       // 0x270
