@@ -243,6 +243,10 @@ void M3dWaitTransferCompleteTask::Execute() {
     }
 }
 
+MPoint M3d::Unk10() {
+    return MPoint(0, 0);
+}
+
 void M3d::Unk0C() {
 }
 

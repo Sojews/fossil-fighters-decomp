@@ -21,6 +21,7 @@ public:
     M3d(MDisplay *display, u32 unk44, u32 unk48);
     virtual ~M3d();
     virtual void Unk0C();
+    virtual MPoint Unk10();
     BOOL IsTransferComplete();
     void QueueE8(const void *heap, u32 addr);   // frees addr (from heap, else delete[]) once transfers are done
     u32 AllocTex(const void *src, u32 size, BOOL queue);
