@@ -5,6 +5,7 @@
 #pragma auto_inline on
 
 #include "game/dino_backup.h"
+#include "game/dino_ui_fossil_entry.h"
 #include "game/dino_resource.h"
 #include "game/dino_common_window_message_box.h"
 #include "game/dino_ui_container_menu_item_menu.h"
@@ -309,3 +310,8 @@ void DinoUiContainerMenu::RefreshOKButton() {
         mOKButton->mMotion->GetUnit()->SetMode(0);
     }
 }
+
+#pragma auto_inline off
+// The fossil list's vector members the game emits in this file (made explicitly until the code that fills the list is
+// decompiled).
+template void std::__vec_deleter<DinoUiFossilEntry, std::allocator<DinoUiFossilEntry> >::sub_push_back(const DinoUiFossilEntry &x, Metrowerks::int2type<true>);

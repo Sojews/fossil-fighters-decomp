@@ -5,6 +5,7 @@
 #pragma auto_inline on
 
 #include "game/dino_ui2_parts_rock_name.h"
+#include "game/dino_ui_fossil_entry.h"
 
 #include "game/dino_ui2_field_menu_cursor.h"
 
@@ -438,3 +439,8 @@ extern const u32 data_0208a988; // text: no more can be loaded
 MTask *DinoUi2CannonShootMenu::CreateUnk2C() {
     return new DinoCommonWindowMessageBox(MPoint(128, 96), gDinoResource->GetText(data_0208a988), 4);
 }
+
+#pragma auto_inline off
+// The fossil list's vector members the game emits in this file (made explicitly until the code that fills the list is
+// decompiled).
+template void std::__vec_deleter<DinoUiFossilEntry, std::allocator<DinoUiFossilEntry> >::sub_push_back(const DinoUiFossilEntry &x, Metrowerks::int2type<true>);
