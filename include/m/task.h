@@ -105,6 +105,25 @@ public:
         AddTail(e);
         AddTail(f);
     }
+    void AddTail(MTask *a, MTask *b, MTask *c, MTask *d, MTask *e, MTask *f, MTask *g) {
+        AddTail(a);
+        AddTail(b);
+        AddTail(c);
+        AddTail(d);
+        AddTail(e);
+        AddTail(f);
+        AddTail(g);
+    }
+    void AddTail(MTask *a, MTask *b, MTask *c, MTask *d, MTask *e, MTask *f, MTask *g, MTask *h) {
+        AddTail(a);
+        AddTail(b);
+        AddTail(c);
+        AddTail(d);
+        AddTail(e);
+        AddTail(f);
+        AddTail(g);
+        AddTail(h);
+    }
     void AddTail(MTask *a, MTask *b, MTask *c, MTask *d, MTask *e, MTask *f, MTask *g, MTask *h, MTask *i,
                  MTask *j) {
         AddTail(a);

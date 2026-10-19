@@ -9,6 +9,8 @@
 #include "m/lcd.h"
 #include "game/dino_sound.h"
 #include "game/dino_ui_atm_menu.h"
+#include "game/dino_ui_atm_cursor.h"
+#include "game/common_window_message.h"
 #include "game/dino_ui_atm.h"
 #include "game/dino_ui_atm_team_button.h"
 #include "game/dino_ui_atm_back_button.h"
@@ -51,7 +53,6 @@ DinoUiATMMenu::~DinoUiATMMenu() {
 void DinoUiATMMenu::OnIdle() {
 }
 
-extern "C" void func_ov007_02172e08(DinoUiATMMenu *menu, int team);
 extern "C" void func_ov007_02173694(DinoUiATMMenu *menu, int team);
 void DinoUiATMMenu::OnDecide(MMenuItem *item) {
     for (int i = 0; i < 3; i++) {
@@ -80,7 +81,7 @@ void DinoUiATMMenu::OnDecide(MMenuItem *item) {
                     func_ov007_02173694(this, i + 1);
                 }
             } else if (mUnk11C == 1) {
-                func_ov007_02172e08(this, i + 1);
+                MoveTeam(i + 1);
             }
             return;
         }
@@ -163,10 +164,12 @@ void DinoUiATMMenu::Leave() {
 
 // Template task instances the game emits in this file. Until the code that makes the tasks is decompiled, they are
 // instantiated explicitly.
+#pragma auto_inline off
 template class MBgCallTask0<DinoBackup>;
 template MTask *MCreateBgCallTask(DinoBackup *obj, void (DinoBackup::*func)(), int thread);
 template class MCallTask0<DinoUiATMMenu, DinoUiATMMenu>;
 template MTask *MCreateCallTask(DinoUiATMMenu *obj, void (DinoUiATMMenu::*func)());
+#pragma auto_inline reset
 
 void DinoUiATMBackButton::OnFocusChanged(BOOL focused) {
     mSerial.Clear();
@@ -224,6 +227,8 @@ extern "C" struct {
     void (DinoUiATM::*StateSetup_08)();
     void (DinoUiATM::*StateSetup_10)();
     void (DinoUiATM::*Start_18)();
+    u8 unk20[0x38 - 0x20];
+    MPoint mCursorOffset;   // 0x38: from a team's button
 } data_ov007_0218cbe0;
 
 DinoUiATM::DinoUiATM(u8 arg) : MProcess(gLcd->mSub), mUnk7C(arg) {
@@ -376,7 +381,7 @@ void DinoUiATMMenu::ExitMoveMode() {
 #pragma dont_inline on
 void DinoUiATMMenu::Unk02173d08() {
     if (mUnk114 == 1) {
-        mUnkFC->Hide();
+        mCursor->Hide();
         MTask *clear = MCreateCallTask(this, data_ov007_0218cb60.ClearTeam_38);
         DinoUiATMTeamButton *button = mTeamButtons[(int)mUnk118 - 1];
         button->mMotion->Play(3, 0);
@@ -423,4 +428,32 @@ void DinoUiATMMenu::LinkTeamButtons() {
     AddLink(mTeamButtons[1], 4, mTeamButtons[0]);
     RemoveLink(mTeamButtons[2], 4);
     AddLink(mTeamButtons[2], 4, mTeamButtons[1]);
+}
+
+// Where the teams' buttons are.
+extern const MPoint data_ov007_0218cd10[3];
+extern const int data_020899f4, data_02089a08;
+
+// Moves the team being moved (mUnk118) into the team, with the cursor flying across.
+void DinoUiATMMenu::MoveTeam(int team) {
+    DinoSoundPlaySe(0x99, 0);
+    mTeamButtons[team - 1]->mMotion->Hide();
+    mCursor->SetPosition(data_ov007_0218cd10[mUnk118 - 1] + data_ov007_0218cbe0.mCursorOffset);
+    mCursor->Show();
+    mMessage->mUnk98 = data_020899f4;
+    MTask *show = mTeamButtons[team - 1]->mMotion->CreateShowTransfer();
+    MTask *exitMessage = MTaskExitTransfer::Create(mMessage);
+    MTask *hide = mCursor->mUnk10->CreateHideTransfer();
+    MTask *wait = mCursor->mUnk10->CreateWaitStopTask();
+    MTask *play = mCursor->mUnk10->CreatePlayTransfer(3, 1);
+    MTask *se = DinoSoundCreatePlaySeTask(0xA3, 0);
+    MTask *move = mCursor->CreateCoordAnime(mCursor->GetPosition(),
+                                            data_ov007_0218cd10[team - 1] + data_ov007_0218cbe0.mCursorOffset,
+                                            data_02089a08, 0);
+    GetSerial()->AddTail(DinoSoundCreatePlaySeTask(0xA1, 0), move, se, play, wait, hide, exitMessage, show);
+    DinoTeam moved;
+    gDinoBackup->GetTeam(mUnk118, &moved);
+    gDinoBackup->SetTeam(team, &moved);
+    mTeamInfo->SetTeam(team);
+    mSerial.AddTail(MCreateCallTask(this, data_ov007_0218cc38.ExitMoveMode_00));
 }

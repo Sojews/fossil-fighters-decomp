@@ -11,6 +11,9 @@ class DinoUiPartsTeamIndicator;
 class DinoUiPartsTeamInfo;
 class MIndicator;
 
+class DinoUiATMCursor;
+class DinoCommonWindowMessage;
+
 class DinoUiATMMenu : public DinoHelpBase, public MMenu {
 public:
     DinoUiATMMenu(u32 *result, u8 arg1, DinoUiPartsTeamInfo *teamInfo, u8 arg3);
@@ -21,6 +24,7 @@ public:
     virtual void OnFocus(MMenuItem *item);
     virtual void OnDecide(MMenuItem *item);
     void ExitMoveMode();
+    void MoveTeam(int team);
     void Leave();
     void RefreshTeams();
     void Unk02173d08();
@@ -35,10 +39,10 @@ public:
     MIndicator *mTeamTexts[3];  // 0xD8
     MView *mEmptyMarks[3];      // 0xE4
     u32 unkF0[3];       // 0xF0
-    MView *mUnkFC;      // 0xFC
+    DinoUiATMCursor *mCursor;   // 0xFC: marks the team being moved
     u32 unk100[2];      // 0x100
     DinoUiPartsTeamInfo *mTeamInfo; // 0x108
-    u32 mUnk10C;        // 0x10C
+    DinoCommonWindowMessage *mMessage;  // 0x10C
     u32 *mResult;       // 0x110
     int mUnk114;        // 0x114
     u32 mUnk118;        // 0x118
