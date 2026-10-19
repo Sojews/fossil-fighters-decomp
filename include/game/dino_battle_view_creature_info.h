@@ -26,8 +26,8 @@ public:
     MSmartOam *mOam;                // 0x7C
     u32 mUnk80;                     // 0x80
     u32 unk84[25];
-    u32 mUnkE8;                     // 0xE8
-    u32 unkEC;
+    u32 mUnkE8;                     // 0xE8: what is shown
+    u8 mUnkEC;                      // 0xEC
     DinoBattleViewCreature *mCreature;  // 0xF0: shown
     MParallelTaskSet *mTasks;       // 0xF4
     InfoPanelWindow *mWindow;       // 0xF8

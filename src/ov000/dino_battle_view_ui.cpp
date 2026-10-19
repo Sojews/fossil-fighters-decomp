@@ -271,7 +271,7 @@ void DinoBattleViewUiCreatureInfoMenu::OnFocus(MMenuItem *item) {
 
 // Where the creature info help is shown, and its text.
 extern "C" const MRect data_ov000_02193c10;
-extern "C" const u32 data_0208a3c4;
+extern "C" const u32 data_0208a3c4[];
 
 static inline u8 GetUnk12CFlag(DinoBattleView *view) {
     return ((const u8 *)view->GetUnk12C())[0xD];
@@ -279,7 +279,7 @@ static inline u8 GetUnk12CFlag(DinoBattleView *view) {
 
 void DinoBattleViewUiCreatureInfoMenu::OnStart() {
     mParallel.AddTail(
-        new DinoBattleHelpCreatureInfo(gLcd->GetBottomDisplay(), data_ov000_02193c10, data_0208a3c4, this));
+        new DinoBattleHelpCreatureInfo(gLcd->GetBottomDisplay(), data_ov000_02193c10, data_0208a3c4[0], this));
     DinoBattleViewUiSelectAreaCommon::OnStart();
     MTask *task = func_ov000_0218ec8c(((DinoBattleView *)mUnkEC)->GetUnk12C(), 0x19, 0);
     if (task != NULL) {
@@ -605,4 +605,30 @@ DinoBattleViewCreature *DinoBattleViewUiSelectAreaCommon::GetItemCreature(MMenuI
         }
     }
     return NULL;
+}
+
+#pragma opt_common_subs off
+// The creature info help's texts.
+extern "C" const u32 data_0208a3a8, data_0208a3ac, data_0208a3b0, data_0208a3b4, data_0208a3c8;
+
+const char *DinoBattleHelpCreatureInfo::GetText() {
+    u32 id = data_0208a3c8;
+    switch (mMenu->mInfo->mUnkE8) {
+    case 0:
+        if (mMenu->mInfo->mUnkEC) {
+            id = data_0208a3b4;
+        } else {
+            id = data_0208a3a8;
+        }
+        break;
+    case 1:
+        id = data_0208a3b0;
+        break;
+    case 2:
+        id = data_0208a3ac;
+        break;
+    case 3:
+        break;
+    }
+    return gDinoResource->GetText(id);
 }
