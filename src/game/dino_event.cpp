@@ -245,3 +245,26 @@ void DinoEventLoop::FinishCommands() {
     }
     mUnkBD = FALSE;
 }
+
+void DinoEventLoop::ClearEpisodes() {
+    mEpisodeFiles.clear();
+}
+
+// Saves the field's state and deletes it. Unless closing for good, the episodes are reloaded if they changed.
+void DinoEventLoop::CloseField(BOOL arg) {
+    mField->Write(gDinoBackup->GetUnk140());
+    mParallel.Remove(mField);
+    delete mField;
+    MUnloadOverlay(0, M_OVERLAY_ID(ov001));
+    ReleasePicture();
+    mUnkA4 = MResource<DinoEventLoopUnkA4Data>();
+    mCommands = MResource<DinoEpisodeData>();
+    if (arg) {
+        ClearEpisodes();
+        mEpisodesChanged = FALSE;
+    } else if (mEpisodesChanged) {
+        mEpisodesChanged = FALSE;
+        ClearEpisodes();
+        AddSeenEpisodes();
+    }
+}

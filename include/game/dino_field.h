@@ -495,6 +495,7 @@ public:
     void AddSeenEpisodes();
     void RemoveEpisode(u32 id);
     void ResetEpisode(u32 id);
+    void ClearEpisodes();
     // Makes the field (reading the saved state, if any) and fades it in.
     void Start();
     void State0203ad00();
