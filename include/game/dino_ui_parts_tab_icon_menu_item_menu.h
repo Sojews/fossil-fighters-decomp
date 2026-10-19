@@ -15,6 +15,7 @@ class DinoUiPartsReviverName;
 class DinoUiStatusChangeModeHelpTask;
 class DinoCommonWindowMessage;
 class DinoUiPartsTeamTech;
+class DinoUiFieldMenuCursor;
 
 class DinoUiStatusMenu : public DinoHelpBase, public MMenu {
 public:
@@ -47,14 +48,15 @@ public:
     MMenuItem *mTabItems[3];    // 0xC0
     u32 mUnkCC[2];              // 0xCC
     DinoUiPartsReviverMedalButton *mMembers[5];     // 0xD4
-    u8 unkE8[0xF4 - 0xE8];
-    MView *mMenuBack;           // 0xF4: behind the member menu
+    u8 unkE8[0xF0 - 0xE8];
+    MTaskSet *mCursorTasks;     // 0xF0
+    DinoUiFieldMenuCursor *mCursor; // 0xF4
     u8 unkF8[0x100 - 0xF8];
     DinoUiPartsReviverName *mName;      // 0x100
     DinoCommonWindowMessage *mMessage;  // 0x104
     MTaskSet *mUnk108;          // 0x108
     DinoUiStatusChangeModeHelpTask *mHelp;  // 0x10C: while a replacement is picked
-    u32 unk110;
+    MTaskSet *mUnk110;          // 0x110
     int *mResult;               // 0x114
     DinoTeam *mTeam;            // 0x118
     u32 mUnk11C;                // 0x11C

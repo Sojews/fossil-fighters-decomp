@@ -282,8 +282,8 @@ static inline const DinoKeyItemDef *GetKeyItemDef(const DinoKeyItemDefs *defs, u
 }
 
 // Moves the cursor to the item (a tab, or an item button), and shows the item's description.
-// NONMATCHING: the item-button loop's counter and pointer swap registers.
 void DinoUiItemMenu::OnFocus(MMenuItem *item) {
+    int i;
     if (item == NULL) {
         mCursor->Hide();
         return;
@@ -291,13 +291,13 @@ void DinoUiItemMenu::OnFocus(MMenuItem *item) {
     SetSelectedItem(dynamic_cast<DinoHelpItem *>(item));
     MRect frame = item->GetFrame();
     mCursor->SetMode(1);
-    for (int i = 0; i < 3; i++) {
+    for (i = 0; i < 3; i++) {
         if (item == mTabItems[i]) {
             frame.MoveTo(data_020b5858[i]);
             mCursor->SetMode(2);
         }
     }
-    for (int i = 0; i < 5; i++) {
+    for (i = 0; i < 5; i++) {
         if (item == mItems[i]) {
             frame.left -= 8;
             frame.top += 8;
@@ -314,7 +314,7 @@ void DinoUiItemMenu::OnFocus(MMenuItem *item) {
     }
     mCursor->Show();
     mConsole->Clear();
-    for (u32 i = 0; i < (mPage == mLastPage ? mKeyItems.size() - mPage * 5 : 5); i++) {
+    for (i = 0; i < (mPage == mLastPage ? mKeyItems.size() - mPage * 5 : 5); i++) {
         if (item == mItems[i]) {
             MResource<DinoKeyItemDefs> defs = gDinoResource->LoadKeyItemDefs();
             u32 id = mKeyItems[mPage * 5 + i];

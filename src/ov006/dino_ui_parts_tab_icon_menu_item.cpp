@@ -16,6 +16,8 @@
 #include "game/dino_sound.h"
 #include "m/lcd.h"
 #include "game/dino_ui_parts_reviver_name.h"
+#include "game/dino_ui_parts_reviver_name_count_check_task.h"
+#include "game/dino_ui_field_menu_cursor.h"
 #include "game/dino_common_window_message_box.h"
 #include "game/common_window_message.h"
 #include "m/view.h"
@@ -109,6 +111,78 @@ void DinoUiStatusOKButton::OnDecide() {
 
 // Template task instances the game emits in this file. Until the code that makes the tasks is decompiled, they are
 // instantiated explicitly.
+// Where things go on the screen (filled in at start).
+struct DinoUiStatusLayout {
+    u8 unk00[0x14];
+    MPoint memberMenuOffset;    // 0x14: from the member's medal
+    u8 unk1C[0x2C - 0x1C];
+    MPoint memberFocusOffset;   // 0x2C: of the cursor on a member's medal
+};
+extern DinoUiStatusLayout data_ov006_02190e9c;
+struct DinoUiStatusLayout2 {
+    u8 unk00[0x54];
+    MPoint nameOffset;          // 0x54: of the member's name from its medal
+};
+extern DinoUiStatusLayout2 data_ov006_02190e1c;
+extern "C" const MPoint data_ov006_02191000[5];
+extern MPoint data_020b5858[3];
+
+// Moves the cursor to the item; a member's medal also shows the member's name and (in the team view) raises its
+// technique, or (while a replacement is picked) restarts the help.
+void DinoUiStatusMenu::OnFocus(MMenuItem *item) {
+    int i;
+    if (item == NULL) {
+        mCursor->Hide();
+        return;
+    }
+    SetSelectedItem(dynamic_cast<DinoHelpItem *>(item));
+    MRect frame = item->GetFrame();
+    mCursor->SetMode(1);
+    for (i = 0; i < 3; i++) {
+        if (item == mTabItems[i]) {
+            frame.MoveTo(data_020b5858[i]);
+            mCursor->SetMode(2);
+        }
+    }
+    for (i = 0; i < 5; i++) {
+        if (item == mMembers[i]) {
+            frame.Offset(data_ov006_02190e9c.memberFocusOffset);
+        }
+    }
+    if (mCursor->IsHidden()) {
+        mCursor->SetFrame(frame);
+    } else {
+        mCursorTasks->Clear();
+        mCursorTasks->AddTail(mCursor->CreateMoveTask(mCursor->GetFrame(), frame, 10, -5));
+    }
+    mCursor->Show();
+    for (i = 0; i < 5; i++) {
+        if (item == mMembers[i] && mTeam->slots[i]) {
+            mName->SetCreature(mTeam->slots[i]);
+            mName->SetPosition(data_ov006_02191000[i] + data_ov006_02190e1c.nameOffset);
+            if (mMode == 0) {
+                if (i < 3) {
+                    mTech->Raise((u8)i);
+                }
+                return;
+            }
+            DinoUiStatusChangeModeHelpTask *help = mHelp;
+            if (help != NULL) {
+                DinoUiPartsReviverName *name = mName;
+                help->Disable();
+                help->mSerial.Clear();
+                help->GetSerial()->AddTail(new DinoUiPartsReviverNameCountCheckTask(name),
+                                           MCreateCallTask(help, &DinoHelpBase::Enable));
+            }
+            return;
+        }
+    }
+    mName->Hide();
+    mUnk110->Clear();
+    Enable();
+    mTech->Lower();
+}
+
 #pragma auto_inline off
 template class MCallTask0<DinoUiStatusMenu, DinoUiStatusMenu>;
 template MTask *MCreateCallTask(DinoUiStatusMenu *obj, void (DinoUiStatusMenu::*func)());
@@ -366,25 +440,19 @@ void DinoUiStatusMenu::SelectTab(int tab) {
     }
 }
 
-// Where things go on the screen (filled in at start).
-struct DinoUiStatusLayout {
-    u8 unk00[0x14];
-    MPoint memberMenuOffset;    // 0x14: from the member's medal
-};
-extern DinoUiStatusLayout data_ov006_02190e9c;
 extern const u32 data_0208aad4, data_0208aad8, data_0208aadc;
 extern const u32 data_0208a878, data_0208a87c, data_0208a880;
 
 // The menu for a team member.
 void DinoUiStatusMenu::SelectMember(int index) {
     mUnk120 = 0;
-    mMenuBack->Hide();
+    mCursor->Hide();
     DinoCommonWindowMenu *menu = new DinoCommonWindowMenu(
         &mUnk120, data_ov006_02191000[index] + data_ov006_02190e9c.memberMenuOffset, NULL, 0);
     menu->AddChoice(1, gDinoResource->GetText(data_0208aadc), gDinoResource->GetText(data_0208a880));
     menu->AddChoice(2, gDinoResource->GetText(data_0208aad8), gDinoResource->GetText(data_0208a87c));
     menu->AddChoice(-2, gDinoResource->GetText(data_0208aad4), gDinoResource->GetText(data_0208a878));
-    GetSerial()->AddTail(menu, mMenuBack->CreateShowTransfer(),
+    GetSerial()->AddTail(menu, mCursor->CreateShowTransfer(),
                          MCreateCallTask(this, &DinoUiStatusMenu::HandleMemberResult));
 }
 

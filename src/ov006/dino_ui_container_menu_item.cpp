@@ -182,14 +182,14 @@ void DinoUiContainerMenu::ClearItems() {
     }
 }
 
-// NONMATCHING: register allocation only (the game keeps the item index in r1, Decide's argument register).
 void DinoUiContainerMenu::OnDecide(MMenuItem *item) {
-    for (int i = 0; i < 3; i++) {
+    int i;
+    for (i = 0; i < 3; i++) {
         if (item == mTabItems[i]) {
             SelectTab(i);
         }
     }
-    for (int i = 0; i < (mPage == mLastPage ? mUnk100.size() - mPage * 8 : 8); i++) {
+    for (i = 0; i < (mPage == mLastPage ? mUnk100.size() - mPage * 8 : 8); i++) {
         if (item == mItems[i]) {
             Decide(i);
             return;
@@ -326,8 +326,8 @@ void DinoUiContainerMenu::OnOKDecided() {
 extern MPoint data_020b5858[3];
 extern "C" void func_ov003_02159a8c(void *panel, DinoBackupEntry *entry, int arg);
 
-// NONMATCHING: register allocation only (i and mPage swap in the last loop, as in OnDecide).
 void DinoUiContainerMenu::OnFocus(MMenuItem *item) {
+    int i;
     if (item == NULL) {
         mCursor->Hide();
         return;
@@ -335,13 +335,13 @@ void DinoUiContainerMenu::OnFocus(MMenuItem *item) {
     SetSelectedItem(dynamic_cast<DinoHelpItem *>(item));
     MRect frame = item->GetFrame();
     mCursor->SetMode(1);
-    for (int i = 0; i < 3; i++) {
+    for (i = 0; i < 3; i++) {
         if (item == mTabItems[i]) {
             frame.MoveTo(data_020b5858[i]);
             mCursor->SetMode(2);
         }
     }
-    for (int i = 0; i < mItems.size(); i++) {
+    for (i = 0; i < mItems.size(); i++) {
         if (item == mItems[i]) {
             frame.top += 16;
             frame.bottom += 16;
@@ -354,7 +354,7 @@ void DinoUiContainerMenu::OnFocus(MMenuItem *item) {
         mCursorTasks->AddTail(mCursor->CreateMoveTask(mCursor->GetFrame(), frame, 10, -5));
     }
     mCursor->Show();
-    for (int i = 0; i < (mPage == mLastPage ? mUnk100.size() - mPage * 8 : 8); i++) {
+    for (i = 0; i < (mPage == mLastPage ? mUnk100.size() - mPage * 8 : 8); i++) {
         if (item == mItems[i]) {
             DinoBackupEntry entry;
             gDinoBackup->GetUnk98(mPage * 8 + i, &entry);
