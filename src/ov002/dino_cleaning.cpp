@@ -24,6 +24,7 @@
 #include "types.h"
 #include "game/dino_cleaning_status.h"
 #include "game/dino_cleaning_score.h"
+#include "m/ext_affine.h"
 #include "m/picture.h"
 #include "m/menu.h"
 #include "m/seed_generator.h"
@@ -252,7 +253,8 @@ extern "C" struct {
     u8 unk00[0x4];
     MFx32 mChipPower;           // 0x04: what each cell takes when the rock is cleared at once
     const char *mCountFormat;   // 0x08
-    u8 unk0C[0x14 - 0xC];
+    u8 unk0C[0x10 - 0xC];
+    const char *mFailPath;      // 0x10: the picture of a failed cleaning
     const char *mCleanPath;     // 0x14: the picture shown when the rock comes clean
     u8 unk18[0x2C - 0x18];
     int mZero_2C;               // 0x2C: (the constant the count's shake is clamped to)
@@ -288,7 +290,8 @@ extern "C" struct {
     void (DinoCleaning::*StateStopTool_10)();
     u8 unk18[0x20 - 0x18];
     void (DinoCleaning::*StateStopAnswered_20)();
-    u8 unk28[0x60 - 0x28];
+    void (DinoCleaning::*State02162cec_28)(); // 0x28
+    u8 unk30[0x60 - 0x30];
     void (DinoCleaning::*StateStopTool_60)();
     u8 unk68[0x78 - 0x68];
     void (DinoCleaning::*State021610b0_78)();
@@ -539,6 +542,48 @@ void DinoCleaning::State02161260() {
     AddSerial(this, new MTimer(1), blend->CreateAlphaRatioAnime(16, 0, 16, 16, 5, 0), MTaskExitTransfer::Create(picture),
               blend->CreateClearTransfer(), new MTimer(1), MCreateCallTask(this, data_ov002_02165b5c.Enable_00));
     mState = data_ov002_02165a6c.StateEnableToolMenu_00;
+}
+
+extern "C" struct {
+    void (DinoCommonLive::*SetUnkAC_00)(u32); // 0x00
+} data_ov002_02165b24;
+
+static inline void AddSerial(DinoCleaning *process, MTask *a, MTask *b) {
+    MSerialTaskSet *serial = &process->mSerial;
+    serial->AddTail(a);
+    serial->AddTail(b);
+}
+
+static inline void AddSerial(DinoCleaning *process, MTask *a, MTask *b, MTask *c, MTask *d, MTask *e) {
+    MSerialTaskSet *serial = &process->mSerial;
+    serial->AddTail(a);
+    serial->AddTail(b);
+    serial->AddTail(c);
+    serial->AddTail(d);
+    serial->AddTail(e);
+}
+
+// The cleaning failed: the picture rises, swaying, then spins in.
+void DinoCleaning::State02161d48() {
+    mUnkE4->SetUnkA0(6, TRUE);
+    if (mUnkA0 != NULL) {
+        ((u32 *)mUnkA0)[0] = 0;
+        ((u32 *)mUnkA0)[3] = 0;
+    }
+    mResultPicture = new MExtAffinePicture(std::string(data_ov002_021659ec.mFailPath), TRUE, false);
+    mParallel.AddTail(mResultPicture);
+    mResultPicture->Show();
+    mResultPicture->GetScreen()->SetCenter(0x33, 0x2E);
+    for (u32 i = 0; i <= 120; i++) {
+        MPoint pos;
+        pos.x = MFx32ToInt(MFx32::FromRaw(FX_SinIdx((u16)(i * 0x10000 / 40))) * MFx32(30));
+        pos.y = 192 - i * 192 / 120;
+        AddSerial(this, mResultPicture->CreateCoordTransfer(pos), new MTimer(1));
+    }
+    AddSerial(this, new MTimer(60), DinoSoundCreatePlaySeTask(0x41, 0),
+              mResultPicture->GetScreen()->CreateRotAnime(0, 0x1000, 20, 2),
+              MCreateCallTask((DinoCleaningLive *)mUnkE4, data_ov002_02165b24.SetUnkAC_00, (u32)0x16), new MTimer(120));
+    mState = data_ov002_02165aec.State02162cec_28;
 }
 
 // Starts the rock and, after a moment, the help and the live commentary.

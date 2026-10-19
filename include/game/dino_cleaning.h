@@ -17,6 +17,8 @@ class DinoCleaningToolMenu;
 class DinoCleaningStatus;
 class MTextPicture;
 
+class MExtAffinePicture;
+
 class DinoCleaning : public DinoHelpBase, public MProcess, public MLooperPreLoopHook, public MSleepHook {
 public:
     DinoCleaning(u32 unk9C, void *unkA0, u32 unkA8, u32 unkAC, int mode, u32 unk140);
@@ -47,6 +49,7 @@ public:
     void State0216177c();
     void State021618c8();
     void State02161f9c();
+    void State02162cec();
     void State02162544();
     void State02160e78();
     void State02160f54();
@@ -92,7 +95,7 @@ public:
     u8 mUnk128;                     // 0x128: a tool task runs instead of the scene
     u8 unk129[0x130 - 0x129];
     int mUnk130;                    // 0x130: a percentage
-    u32 unk134;
+    MExtAffinePicture *mResultPicture;  // 0x134
     u32 mUnk138;                    // 0x138
     u32 unk13C;
     u32 mUnk140;                    // 0x140
