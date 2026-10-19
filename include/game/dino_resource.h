@@ -246,7 +246,9 @@ struct DinoKasekiDefs {
 struct DinoKasekiDef {
     u32 unk00;
     u8 unk04;           // 0x04: nonzero for fossils that can't be cleaned
-    u8 unk05[0x18 - 0x05];
+    u8 unk05[0x0C - 0x05];
+    u32 icon;           // 0x0C: its button's icon
+    u8 unk10[0x18 - 0x10];
     u32 price;          // 0x18
     u32 sellPrice;      // 0x1C
     u32 unk20;          // 0x20: the selling price of one still in its rock?

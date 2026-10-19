@@ -4,6 +4,8 @@
 #include <string>
 #include "game/dino_team.h"
 #include "game/dino_resource.h"
+#include "game/dino_ui_parts_kaseki_button.h"
+#include "game/dino_ui_common.h"
 #include "m/blend.h"
 #include "m/display.h"
 #include "m/task.h"
@@ -33,6 +35,45 @@ BOOL DinoTeamDiffers(const DinoTeam *a, const DinoTeam *b) {
     return FALSE;
 }
 
+// What the container entry's button shows: a kaseki rock, a fossil (cleaned or not, and whether the creature is
+// revived), or one of the two special kinds of rock.
+DinoKasekiButtonInfo DinoGetKasekiButtonInfo(const DinoBackupEntry *entry, MResource<DinoKasekiDefs> &defs) {
+    DinoKasekiButtonInfo info;
+    info.type = 0;
+    info.level = 0;
+    u32 id = entry->id;
+    if (id >= 501 && id <= 530 && entry->active == 1) {
+        info.icon = (id - 501) / 3 + 19;
+        info.color = 0;
+        info.type = 5;
+        info.level = entry->score;
+    } else if (id >= 601 && id <= 630 && entry->active == 1) {
+        info.icon = 29;
+        info.color = 0;
+    } else {
+        info.icon = defs.Get()->GetDef(id)->icon;
+        info.color = entry->unk10_0;
+        DinoKasekiRockState rock;
+        gDinoBackup->GetKasekiRock(entry->id, (u32 *)&rock);
+        if (rock.unk10) {
+            DinoCreatureState creature;
+            gDinoBackup->GetCreature((entry->id - 1) / 4 + 1, &creature);
+            if (creature.parts[0].level != 0) {
+                info.type = 1;
+            } else {
+                info.type = 2;
+            }
+            info.level = rock.score;
+        } else {
+            info.type = 3;
+        }
+        if (entry->unk10_0 == 1) {
+            info.type = 4;
+        }
+    }
+    return info;
+}
+
 // The text with every tag replaced by the value (unless the value has the tag itself).
 // NONMATCHING: ours keeps an unreachable epilogue after the loop.
 std::string DinoReplaceTag(std::string text, std::string tag, std::string value) {
@@ -60,8 +101,7 @@ int DinoReviveFrames(int frames) {
 
 #pragma auto_inline off
 
-// Dims the screen behind a menu.
-extern "C" void func_ov003_0215b16c() {
+void DinoDimScreen() {
     MBlend *blend = gCurrentDisplay->mBlend;
     blend->Reset();
     blend->SetMode(3);

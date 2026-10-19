@@ -8,6 +8,9 @@
 src/ov005/dino_ui_license_card.cpp:
     .text       start:0x021558a0 end:0x02155f94
 
+src/ov005/ov005_02155f94.cpp:
+    .text       start:0x02155f94 end:0x021562a8
+
 src/ov005/dino_ui3_parts_fraction.cpp:
     .text       start:0x02156380 end:0x021572e4
 
