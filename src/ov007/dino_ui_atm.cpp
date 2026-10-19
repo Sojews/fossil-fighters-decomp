@@ -383,7 +383,7 @@ void DinoUiATMMenu::Unk02173d08() {
     if (mUnk114 == 1) {
         mCursor->Hide();
         MTask *clear = MCreateCallTask(this, data_ov007_0218cb60.ClearTeam_38);
-        DinoUiATMTeamButton *button = mTeamButtons[(int)mUnk118 - 1];
+        DinoUiATMTeamButton *button = mTeamButtons[mUnk118 - 1];
         button->mMotion->Play(3, 0);
         MTask *wait = button->mMotion->CreateWaitStopTask();
         MSerialTaskSet *serial = &mSerial;
@@ -456,4 +456,57 @@ void DinoUiATMMenu::MoveTeam(int team) {
     gDinoBackup->SetTeam(team, &moved);
     mTeamInfo->SetTeam(team);
     mSerial.AddTail(MCreateCallTask(this, data_ov007_0218cc38.ExitMoveMode_00));
+}
+
+// Shows the team buttons (lit for the selected team) and, while moving a team, disables the one being moved (and
+// the current team, if it can't move), then links the back button to the enabled ones.
+void DinoUiATMMenu::RefreshButtons() {
+    for (int i = 0; i < 3; i++) {
+        mTeamButtons[i]->Enable();
+        if (mUnk120 == i + 1) {
+            DinoUiATMTeamButton *button = mTeamButtons[i];
+            button->mMotion->Play(1, 0);
+            button->mMotion->Show();
+        } else {
+            DinoUiATMTeamButton *button = mTeamButtons[i];
+            button->mMotion->Play(1, 0);
+            button->mMotion->Hide();
+        }
+    }
+    if (mUnk11C == 1) {
+        int moving = mUnk118 - 1;
+        if (moving / 3 == 0) {
+            mTeamButtons[moving]->Disable();
+            DinoUiATMTeamButton *button = mTeamButtons[mUnk118 - 1];
+            button->mMotion->Play(2, 0);
+            button->mMotion->Show();
+        }
+        if (mUnk124) {
+            mTeamButtons[gDinoBackup->GetUnk34_26() - 1]->Disable();
+        }
+        if (!mTeamButtons[2]->IsEnabled()) {
+            RemoveLink(mBackButton, 4);
+            if (!mTeamButtons[1]->IsEnabled()) {
+                AddLink(mBackButton, 4, mTeamButtons[0]);
+            } else {
+                AddLink(mBackButton, 4, mTeamButtons[1]);
+            }
+        }
+        if (!mTeamButtons[0]->IsEnabled()) {
+            RemoveLink(mBackButton, 2);
+            if (!mTeamButtons[1]->IsEnabled()) {
+                AddLink(mBackButton, 2, mTeamButtons[2]);
+                RemoveLink(mTeamButtons[2], 4);
+                AddLink(mTeamButtons[2], 4, mBackButton);
+            } else {
+                AddLink(mBackButton, 2, mTeamButtons[1]);
+                RemoveLink(mTeamButtons[1], 4);
+                AddLink(mTeamButtons[1], 4, mBackButton);
+            }
+        }
+        if (mTeamButtons[0]->IsEnabled() && !mTeamButtons[1]->IsEnabled()) {
+            RemoveLink(mTeamButtons[2], 4);
+            AddLink(mTeamButtons[2], 4, mTeamButtons[0]);
+        }
+    }
 }

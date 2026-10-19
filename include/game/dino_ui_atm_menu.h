@@ -25,6 +25,7 @@ public:
     virtual void OnDecide(MMenuItem *item);
     void ExitMoveMode();
     void MoveTeam(int team);
+    void RefreshButtons();
     void Leave();
     void RefreshTeams();
     void Unk02173d08();
@@ -45,7 +46,7 @@ public:
     DinoCommonWindowMessage *mMessage;  // 0x10C
     u32 *mResult;       // 0x110
     int mUnk114;        // 0x114
-    u32 mUnk118;        // 0x118
+    int mUnk118;        // 0x118
     u32 mUnk11C;        // 0x11C
     int mUnk120;        // 0x120
     u8 mUnk124;         // 0x124
