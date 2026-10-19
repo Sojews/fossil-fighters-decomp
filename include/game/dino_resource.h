@@ -118,6 +118,8 @@ struct DinoBattleAdjustDefs {
     MFx32 pinchRatio;   // 0x16C: at or below this share of its life, a creature is in a pinch
     u8 unk170;
     u8 debugLog;        // 0x171: show the battle's debug log
+    u8 unk172[2];
+    u32 actionLog;      // 0x174: list the actions in the action info bar
 };
 
 struct DinoRgb {
