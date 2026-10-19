@@ -11,6 +11,7 @@ class DinoCommonYesNoMenuItem;
 
 class DinoCommonYesNoMenu : public MMenu, public DinoHelpBase {
 public:
+    DinoCommonYesNoMenu(const std::string &text, BOOL *result, u32 unkD0, u32 unkD4, u32 unkD8);
     // The game's destructor is inline; its vtable's owner (dino_common_yes_no_menu_item.cpp) emits it out of line.
 #ifdef DINO_COMMON_YES_NO_MENU_OWNER
     virtual ~DinoCommonYesNoMenu();
@@ -25,6 +26,9 @@ public:
     DinoCommonYesNoMenuItem *mYes;  // 0xBC
     std::string mUnkC0;             // 0xC0
     BOOL *mResult;                  // 0xCC
+    u32 mUnkD0;                     // 0xD0
+    u32 mUnkD4;                     // 0xD4
+    u32 mUnkD8;                     // 0xD8
 };
 
 #endif

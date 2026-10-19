@@ -68,6 +68,14 @@ DinoCommonWindowMessageBox::DinoCommonWindowMessageBox(MPoint pos, const std::st
     mUnk98 = TRUE;
 }
 
+DinoCommonWindowMessageBox::DinoCommonWindowMessageBox(MDisplay *display, MPoint pos, const std::string &text,
+                                                       int frames)
+    : MProcess(display), mUnk78(0), mPos(pos), mText(text) {
+    mFrames = frames;
+    mUnk94 = 0;
+    mUnk98 = TRUE;
+}
+
 DinoCommonWindowMessage::DinoCommonWindowMessage(MPoint pos, const std::string &text, int arg3, int arg4)
     : MProcess(NULL), mPos(pos), mText(text), mUnk90(arg3), mUnk94(-1), mUnk98(FALSE), mUnk9C(arg4), mUnkA4(FALSE),
       mUnkA8(0) {

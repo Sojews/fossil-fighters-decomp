@@ -55,6 +55,16 @@ extern "C" struct {
     const char *buttonPath; // 0x04
 } data_020bc3f0;
 
+DinoCommonYesNoMenu::DinoCommonYesNoMenu(const std::string &text, BOOL *result, u32 unkD0, u32 unkD4, u32 unkD8)
+    : MMenu(0), mUnkC0(text) {
+    mResult = result;
+    mUnkD0 = unkD0;
+    mUnkD4 = unkD4;
+    mUnkD8 = unkD8;
+    DinoHelpBase::Disable();
+    SetDeferStart(TRUE);
+}
+
 DinoCommonYesNoMenuItem::DinoCommonYesNoMenuItem(MSmartOam *oam, u8 isYes, u32 textId) {
     mIsYes = isYes;
     mTextId = textId;

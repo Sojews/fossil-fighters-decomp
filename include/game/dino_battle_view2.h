@@ -46,7 +46,6 @@ public:
     virtual void OnFocus(MMenuItem *item);
     virtual void OnDecide(MMenuItem *item);
 
-    u32 unkD0[3];
     MMessageObserver *mTarget; // 0xDC: told the answer
     u32 mUnkE0;     // 0xE0
 };
@@ -58,7 +57,6 @@ public:
     virtual void OnFocus(MMenuItem *item);
     virtual void OnDecide(MMenuItem *item);
 
-    u32 unkD0[3];
     u8 *mGivingUp;  // 0xDC
 };
 
