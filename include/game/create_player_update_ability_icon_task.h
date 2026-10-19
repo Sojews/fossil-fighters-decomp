@@ -122,6 +122,8 @@ public:
     void SetUnk15C();
     MTask *CreateSendAbilityResultTask(MMessageObserver *target);
     MTask *CreateUpdateColorTask(const u32 *ids, u32 count, u32 color);
+    // Has the view update the ability icons, and waits for it.
+    MTask *CreateUpdateAbilityIconTask(u8 flag);
     MTask *CreateMotionEffectTask(u32 a, u32 b, u32 c, u32 d, u32 e);
     MTask *CreateAbilityTask(u32 a, u32 b, u32 c);
     MTask *CreateLcdFadeTask(BOOL clearIcons);
@@ -170,7 +172,9 @@ struct DinoBattleCreatureStatus {
     u8 unk05;           // 0x05
     u8 unk06[0x20 - 0x06];
     u32 unk20;          // 0x20
-    u8 unk24[0x40 - 0x24];
+    u8 unk24[0x2C - 0x24];
+    u32 guardChance;    // 0x2C: percentage, with flag 0x100
+    u8 unk30[0x40 - 0x30];
 };
 
 class DinoBattleModelCreature : public MProcess, public MMessageObserver {
@@ -369,6 +373,11 @@ public:
 
 class UpdateAbilityIconTask : public MTask {
 public:
+    UpdateAbilityIconTask(void *player, MMessageObserver *wait, u8 flag) {
+        mUnk10 = (u32)player;
+        mUnk14 = (u32)wait;
+        mUnk18 = flag;
+    }
     virtual ~UpdateAbilityIconTask();
     virtual void Execute();
 

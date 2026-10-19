@@ -402,7 +402,7 @@ _Z25DinoCreatePostAndWaitTaskI39DinoBattleViewCreaturePlayMotionRequestEP5MTaskP
 _Z25DinoCreatePostAndWaitTaskI33DinoBattleView3DTeamAttackRequestEP5MTaskP16MMessageObserverPT_ kind:function(thumb,size=0xb0) addr:0x02169354
 func_ov000_02169404 kind:function(thumb,size=0xb8) addr:0x02169404
 _ZN21DinoBattleModelPlayer22CreateMotionEffectTaskEmmmmm kind:function(thumb,size=0xec) addr:0x021694bc
-func_ov000_021695a8 kind:function(thumb,size=0xd0) addr:0x021695a8
+_ZN21DinoBattleModelPlayer27CreateUpdateAbilityIconTaskEh kind:function(thumb,size=0xd0) addr:0x021695a8
 _ZN21UpdateAllCreatureTaskC1EP21DinoBattleModelPlayer kind:function(thumb,size=0x1c) addr:0x02169678
 _ZN21UpdateAllCreatureTask4IdleEv kind:function(thumb,size=0x118) addr:0x02169694
 _ZN21DinoBattleModelPlayer27CreateUpdateAllCreatureTaskEv kind:function(thumb,size=0x16) addr:0x021697ac

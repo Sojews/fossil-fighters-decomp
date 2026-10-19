@@ -491,6 +491,46 @@ void DinoBattleModelCreature::SetUnk108(u32 value) {
     mUnk108 = value;
 }
 
+// Whether the target wards off the damage: 1 by its status (taking none of it), 2 by its kind 7 def's chance (taking
+// it scaled down), else 0; out gets what it takes (at least 1).
+// NONMATCHING: 99.9%, the multiplication's two argument copies swap stack slots.
+extern "C" int func_ov000_02162ad8(DinoBattleModelCreature *attacker, DinoBattleModelCreature *target, u32 unk2,
+                                   u32 unk3, u32 unk4, int *damage, int *out, u32 flags) {
+    int result = 0;
+    if (*damage != 0) {
+        if ((flags & 1) && (target->GetStatus()->flags & 0x100)) {
+            DinoBattleModelPlayer *player = attacker->mPlayer;
+            DinoBattleCreatureStatus *status = target->GetStatus();
+            if ((int)status->guardChance >= (int)player->GetRandom()->Next(100)) {
+                result = 1;
+            }
+        }
+        if (result == 0 && (flags & 2) && target->GetDefUnk61() == 7) {
+            DinoBattleModelPlayer *player = attacker->mPlayer;
+            int chance = target->GetDef()->mUnk62;
+            if (chance >= (int)player->GetRandom()->Next(100)) {
+                result = 2;
+            }
+        }
+        if (result != 0) {
+            MFx32 taken = MFx32(*damage);
+            if (result == 2) {
+                MFx32 ratio = gDinoResource->GetBattleAdjustDefs()->unk50;
+                taken = taken * ratio;
+            }
+            int value = MFx32ToInt(taken);
+            if (value < 1) {
+                value = 1;
+            }
+            *out = value;
+            if (result == 1) {
+                *damage = 0;
+            }
+        }
+    }
+    return result;
+}
+
 extern "C" BOOL func_ov000_0216c83c(int value);
 
 // When a creature (with B8 clear, kind 1 and no flag) acts, each of the player's creatures that qualifies may get an
@@ -730,6 +770,16 @@ MTask *DinoBattleModelPlayer::CreateMotionEffectTask(u32 a, u32 b, u32 c, u32 d,
         new DinoBattleViewCreatureMotionEffectRequest((u32)(MMessageObserver *)wait, a, b, c, d, e));
     set->AddTail(wait);
     set->AddTail(post);
+    return set;
+}
+
+// Has the view update the ability icons, and waits for it.
+MTask *DinoBattleModelPlayer::CreateUpdateAbilityIconTask(u8 flag) {
+    MParallelTaskSet *set = new MParallelTaskSet(TRUE);
+    DinoSignalWait *wait = new DinoSignalWait(0x1004A, NULL, NULL, 1);
+    UpdateAbilityIconTask *update = new UpdateAbilityIconTask(this, wait, flag);
+    set->AddTail(wait);
+    set->AddTail(update);
     return set;
 }
 
