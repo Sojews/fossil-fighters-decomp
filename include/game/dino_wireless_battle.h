@@ -33,6 +33,7 @@ public:
     virtual void OnMessage(MMessage *msg);
 
     void ShowText(u32 text);
+    void Start();
     void FadeIn();
     void StateSendLevel();
     void StateWaitLevels();

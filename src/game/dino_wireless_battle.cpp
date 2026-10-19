@@ -36,7 +36,9 @@ extern "C" struct {
     void (DinoWirelessBattle::*StateContinue_08)(); // 0x08
     void (DinoWirelessBattle::*StateResult_10)(); // 0x10
     void (DinoWirelessBattle::*StateFinish_18)(); // 0x18
-    u8 unk20[0x38 - 0x20];
+    u8 unk20[0x28 - 0x20];
+    void (DinoWirelessBattle::*StateSendLevel_28)(); // 0x28
+    u8 unk30[0x38 - 0x30];
     void (DinoWirelessBattle::*StateCloseHub_38)(); // 0x38
     void (DinoWirelessBattle::*StateWaitLevels_40)(); // 0x40
     u8 unk48[0x50 - 0x48];
@@ -48,7 +50,7 @@ extern "C" struct {
 } data_020c0400;
 extern "C" struct {
     void (DinoWirelessBattle::*StateReset_00)(); // 0x00
-    u8 unk08[0x10 - 0x08];
+    void (DinoWirelessBattle::*Failed_08)(); // 0x08
     void (DinoWirelessBattle::*Unk02049f3c_10)(); // 0x10
     u8 unk18[0x20 - 0x18];
     void (DinoWirelessBattle::*StateBeginBattle_20)(); // 0x20
@@ -75,6 +77,31 @@ M_EXTERN_OVERLAY(ov007);
 
 DinoWirelessBattle::DinoWirelessBattle() : MProcess(NULL) {
     mState = data_020c0480.Start_40;
+}
+
+// Takes over the connection from the resources and starts listening to the other console.
+void DinoWirelessBattle::Start() {
+    mUnk2F8 = new MParallelTaskSet();
+    mParallel.AddTail(mUnk2F8);
+    mWins = 0;
+    mLosses = 0;
+    gDinoResource->GetUnk90((u32 *) &mMultiPlay, (u32 *) &mUnkB4);
+    MTask *unkB4 = mUnkB4;
+    MTaskSet *parallel = &mParallel;
+    parallel->AddTail(mMultiPlay);
+    parallel->AddTail(unkB4);
+    if (mMultiPlay->IsFailed()) {
+        mState = data_020c0480.Failed_08;
+        return;
+    }
+    mUnk304 = 1;
+    mUnk305 = mMultiPlay->GetPlayerIndex() != 0 ? 1 : 0;
+    mHub = new MMultiPlayMessageHub(0);
+    mHub->AddObserver(this);
+    mParallel.AddTail(mHub);
+    MI_CpuFill8(mPlayers, 0, sizeof(mPlayers));
+    mSerial.AddTail(new MTimer(10));
+    mState = data_020c0400.StateSendLevel_28;
 }
 
 void DinoWirelessBattle::StateTeamSelect() {
