@@ -1,8 +1,9 @@
-// MIndicator. Not decompiled yet: the template functions.
+// MIndicator, its entry vector and the wide-string compare it uses.
 // NONMATCHING: append_realloc (as everywhere).
 
 #pragma ipa file
 
+#define MSL_STRING_DEFINITIONS
 #include "m/indicator.h"
 #include "m/text_codec.h"
 

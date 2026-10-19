@@ -20,6 +20,7 @@ template <> struct char_traits<char> {
 };
 template <> struct char_traits<wchar_t> {
     static size_t length(const wchar_t *s) { return wcslen(s); }
+    static int compare(const wchar_t *a, const wchar_t *b, size_t n) { return wmemcmp(a, b, n); }
 };
 
 template <class C, class Traits = char_traits<C>, class Alloc = allocator<C> >
