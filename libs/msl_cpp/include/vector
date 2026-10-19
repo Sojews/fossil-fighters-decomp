@@ -21,6 +21,14 @@ namespace std {
         static void throw_length_error();
     };
 
+    // (Defined only in the file the game emits it in.)
+#ifdef MSL_VECTOR_COMMON_DEFINITION
+    template <bool b> void __vector_common<b>::throw_length_error() {
+        printf("vector length error");
+        abort();
+    }
+#endif
+
     template <typename T, class Allocator> class __vec_deleter_helper;
 
     // The capacity, with the (empty) allocator folded into it.

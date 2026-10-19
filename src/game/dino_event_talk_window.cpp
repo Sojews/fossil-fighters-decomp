@@ -4,6 +4,7 @@
 #pragma ipa file
 
 #define MSL_STRING_BASICS
+#define MSL_VECTOR_COMMON_DEFINITION
 #include "m/input.h"
 #include "m/lcd.h"
 #include "m/text_codec.h"
@@ -49,6 +50,7 @@ void DinoEventTalkWindow::Idle() {
 // Emitted in this file in the game (the window starts background loads with MCreateBgCallTask); until the code
 // that makes them is decompiled, the instances are made explicitly.
 template class MBgCallTask0<DinoEventTalkWindow>;
+template void std::__vector_common<true>::throw_length_error();
 template MTask *MCreateBgCallTask(DinoEventTalkWindow *obj, void (DinoEventTalkWindow::*func)(), int thread);
 template class std::__vec_deleter<DinoWindowChoice, std::allocator<DinoWindowChoice> >;
 template class std::__vec_deleter<std::string, std::allocator<std::string> >;
