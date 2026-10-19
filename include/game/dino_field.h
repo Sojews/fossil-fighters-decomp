@@ -469,8 +469,6 @@ struct DinoEventLoopUnkB4 {
     u32 unk0;
     u32 unk4[3];
 };
-struct DinoEventLoopUnkA4Data;
-
 struct DinoEventLoopUnkB8 {
     u32 unk0[2];
     u8 unk8;
@@ -521,7 +519,7 @@ public:
     DinoField *mField;      // 0x80
     std::map<u32, DinoEventEpisode> mEpisodeFiles;  // 0x84
     MResource<DinoEpisodeData> mCommands;  // 0x94: the commands of the episode being run
-    MResource<DinoEventLoopUnkA4Data> mUnkA4;   // 0xA4
+    MResource<DinoMessageData> mMessages;   // 0xA4: the talk messages last looked in
     DinoEventLoopUnkB4 *mUnkB4; // 0xB4
     DinoEventLoopUnkB8 *mUnkB8; // 0xB8
     u8 mCameraUsed;         // 0xBC

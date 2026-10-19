@@ -237,7 +237,7 @@ void DinoEventLoop::ReleasePicture() {
 
 void DinoEventLoop::FinishCommands() {
     ReleasePicture();
-    mUnkA4 = MResource<DinoEventLoopUnkA4Data>();
+    mMessages = MResource<DinoMessageData>();
     if (!mUnkBE) {
         mField->SetUnk258(FALSE);
     }
@@ -247,6 +247,18 @@ void DinoEventLoop::FinishCommands() {
         mField->GetCamera()->SetTracking(TRUE);
     }
     mUnkBD = FALSE;
+}
+
+// The text of the talk message, or "".
+std::string DinoEventLoop::GetTalkText(u32 id) {
+    mMessages = gDinoResource->LoadMessage(gDinoResource->GetTalkMessageMatch(id));
+    for (u32 i = 0; i < ((const u32 *)mMessages.Get())[1]; i++) {
+        if (id == *(const u32 *)DinoEventBlock((const u8 *)mMessages.Get(), 2, i)) {
+            const u8 *entry = DinoEventBlock((const u8 *)mMessages.Get(), 2, i);
+            return std::string((const char *)entry + ((const u32 *)entry)[1]);
+        }
+    }
+    return std::string("");
 }
 
 // Opens the episode's file (looking it up the first time) and keeps it.
@@ -270,7 +282,7 @@ void DinoEventLoop::CloseField(BOOL arg) {
     delete mField;
     MUnloadOverlay(0, M_OVERLAY_ID(ov001));
     ReleasePicture();
-    mUnkA4 = MResource<DinoEventLoopUnkA4Data>();
+    mMessages = MResource<DinoMessageData>();
     mCommands = MResource<DinoEpisodeData>();
     if (arg) {
         ClearEpisodes();
