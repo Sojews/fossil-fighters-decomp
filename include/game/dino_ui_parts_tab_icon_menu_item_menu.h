@@ -11,6 +11,7 @@ class MSmartOam;
 class DinoUiPartsReviverMedalButton;
 class DinoUiStatusMenuItem;
 class MView;
+class DinoCommonWindowMessage;
 class DinoUiPartsTeamTech;
 
 class DinoUiStatusMenu : public DinoHelpBase, public MMenu {
@@ -27,6 +28,8 @@ public:
     void DecideMember(int index);
     void SelectMember(int index);
     void HandleMemberResult();
+    // Starts choosing who takes the member's place.
+    void PickReplacement(int index);
     void ClearItems();
     void CreateItems();
     void RefreshItems();
@@ -44,7 +47,8 @@ public:
     DinoUiPartsReviverMedalButton *mMembers[5];     // 0xD4
     u8 unkE8[0xF4 - 0xE8];
     MView *mMenuBack;           // 0xF4: behind the member menu
-    u8 unkF8[0x108 - 0xF8];
+    u8 unkF8[0x104 - 0xF8];
+    DinoCommonWindowMessage *mMessage;  // 0x104
     MTaskSet *mUnk108;          // 0x108
     u32 mUnk10C;                // 0x10C
     u32 unk110;

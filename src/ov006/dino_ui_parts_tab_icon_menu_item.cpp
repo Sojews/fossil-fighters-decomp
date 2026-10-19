@@ -15,6 +15,7 @@
 #include "m/call_task.h"
 #include "game/dino_sound.h"
 #include "m/lcd.h"
+#include "game/common_window_message.h"
 #include "m/view.h"
 #include "game/dino_resource.h"
 #include "game/dino_common_window_menu_item_flush_task_menu.h"
@@ -383,4 +384,27 @@ void DinoUiStatusMenu::SelectMember(int index) {
     menu->AddChoice(-2, gDinoResource->GetText(data_0208aad4), gDinoResource->GetText(data_0208a878));
     GetSerial()->AddTail(menu, mMenuBack->CreateShowTransfer(),
                          MCreateCallTask(this, &DinoUiStatusMenu::HandleMemberResult));
+}
+
+extern const u32 data_0208aad0;
+
+void DinoUiStatusMenu::HandleMemberResult() {
+    if (mUnk120 == 1) {
+        mMode = 1;
+        mMessage = new DinoCommonWindowMessage(MPoint(128, 96), std::string(gDinoResource->GetText(data_0208aad0)), 4, 0);
+        mParallel.AddTail(mMessage);
+        PickReplacement(mSelected);
+        mMembers[mSelected]->PlayDecided();
+        FocusNearestItem(GetCursor());
+        if (mSelected < 3) {
+            mTech->Hide();
+        }
+    } else if (mUnk120 == 2) {
+        *mResult = mSelected + 4;
+        GetSerial()->AddTail(gLcd->mMain->mBright->CreateFadeOutToBlack(30, 0),
+                             MTaskExitTransfer::Create(&(MTask &)*this));
+    } else if (mUnk120 == -2) {
+        mMembers[mSelected]->PlayFocused();
+    }
+    mUnk120 = 0;
 }
