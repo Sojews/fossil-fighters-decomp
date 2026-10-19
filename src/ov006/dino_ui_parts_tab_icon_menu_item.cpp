@@ -484,3 +484,41 @@ void DinoUiStatusMenu::DecideMember(int index) {
         mHelp->Disable();
     }
 }
+
+extern const u32 data_0208aa3c;
+
+void DinoUiStatusMenu::OnBackDecided() {
+    if (mMode == 1) {
+        mMode = 0;
+        mMessage->Exit();
+        RefreshItems();
+        GetSerial()->AddTail(MTaskSetWaitEmptyTask::Create(&mUnkB8->mSerial),
+                             MCreateCallTask(this, &DinoUiStatusMenu::FinishTab));
+        return;
+    }
+    Disable();
+    *mResult = 9;
+    mSerial.AddTail(new MTimer(data_02089a34));
+    if (DinoTeamDiffers(mTeam, (DinoTeam *)mUnk11C)) {
+        MParallelTaskSet *anims = new MParallelTaskSet(TRUE);
+        for (int i = 0; i < 5; i++) {
+            if (mTeam->slots[i] != 0 && mTeam->slots[i] != ((DinoTeam *)mUnk11C)->slots[i]) {
+                int from = 5;
+                for (int j = 0; j < 5; j++) {
+                    if (mTeam->slots[i] == ((DinoTeam *)mUnk11C)->slots[j]) {
+                        from = j;
+                    }
+                }
+                if (from != 5) {
+                    anims->AddTail(mMembers[i]->CreateFlyInTask(data_ov006_02191000[from]));
+                }
+            }
+        }
+        GetSerial()->AddTail(
+            new DinoCommonWindowMessageBox(MPoint(128, 96), std::string(gDinoResource->GetText(data_0208aa3c)), 4),
+            anims);
+    }
+    GetSerial()->AddTail(MTaskSetWaitEmptyTask::Create(mUnk130),
+                         gLcd->mMain->mBright->CreateFadeOutToBlack(data_02089a30, data_02089a2c),
+                         MTaskExitTransfer::Create(&(MTask &)*this));
+}
