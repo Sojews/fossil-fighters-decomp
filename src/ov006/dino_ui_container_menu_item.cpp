@@ -188,7 +188,7 @@ void DinoUiContainerMenu::OnDecide(MMenuItem *item) {
             SelectTab(i);
         }
     }
-    for (int i = 0; i < (mPage != mLastPage ? 8 : mUnk100.size() - mPage * 8); i++) {
+    for (int i = 0; i < (mPage == mLastPage ? mUnk100.size() - mPage * 8 : 8); i++) {
         if (item == mItems[i]) {
             Decide(i);
             return;
@@ -353,7 +353,7 @@ void DinoUiContainerMenu::OnFocus(MMenuItem *item) {
         mCursorTasks->AddTail(mCursor->CreateMoveTask(mCursor->GetFrame(), frame, 10, -5));
     }
     mCursor->Show();
-    for (int i = 0; i < (mPage != mLastPage ? 8 : mUnk100.size() - mPage * 8); i++) {
+    for (int i = 0; i < (mPage == mLastPage ? mUnk100.size() - mPage * 8 : 8); i++) {
         if (item == mItems[i]) {
             DinoBackupEntry entry;
             gDinoBackup->GetUnk98(mPage * 8 + i, &entry);
