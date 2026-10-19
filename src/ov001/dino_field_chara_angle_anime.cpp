@@ -385,6 +385,12 @@ void DinoFieldChara::FinishBehold() {
     mBeholdTarget = 0;
 }
 
+void DinoFieldChara::IdleNoTask() {
+    if (!mField->IsUnk258()) {
+        Unk02162154();
+    }
+}
+
 void DinoFieldChara::SetFootSe(u32 se) {
     mHasFootSe = TRUE;
     mFootSe = se;
