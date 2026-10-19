@@ -64,6 +64,10 @@ DinoFieldPoint::DinoFieldPoint(const std::string &path, int digits, u32 a, u32 b
     mHideSe = c;
 }
 
+MRect DinoFieldPoint::GetFrame() {
+    return mFrame->GetFrame();
+}
+
 // Redraws the digits that changed.
 // NONMATCHING: the game stores `changed` before loading Format from the vtable.
 void DinoFieldPoint::Idle() {

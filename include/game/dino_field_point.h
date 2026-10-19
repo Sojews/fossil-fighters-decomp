@@ -23,6 +23,8 @@ public:
     virtual void Format(char *buf) = 0;  // the shown value
     MTask *CreateShowTask();
     MTask *CreateHideTask();
+    // The frame's place on the screen.
+    MRect GetFrame();
     // Where the digit's sprite goes.
     static MPoint GetDigitPos(u32 index);
 
