@@ -408,7 +408,6 @@ MTask *DinoField::CreateCharaMoveOffsetTask(u32 chara, MFx32Point offset, u32 a,
     return new DinoFieldCharaMoveOffsetTask(this, chara, offset, a, b, c);
 }
 
-// NONMATCHING: the game spills the register arguments instead of keeping a in r7.
 MTask *DinoField::CreateCharaMoveVectorTask(u32 chara, u16 direction, MFx32 a, u32 b, u32 c, u8 d) {
     return new DinoFieldCharaMoveVectorTask(this, chara, direction, a, b, c, d);
 }

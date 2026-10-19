@@ -110,7 +110,7 @@ void DinoUiOrderSelectBackButton::OnDecide() {
 #pragma auto_inline off
 template MTask *MCreateCallTask(DinoUiOrderSelectMenu *obj, void (DinoHelpBase::*func)());
 template MTask *MCreateCallTask(DinoUiOrderSelectMenu *obj, void (DinoUiOrderSelectMenu::*func)());
-template MTask *MCreateCallTask(DinoUiOrderSelectMenu *obj, void (DinoUiOrderSelectMenu::*func)(bool), bool a1);
+template MTask *MCreateCallTask(DinoUiOrderSelectMenu *obj, void (DinoUiOrderSelectMenu::*func)(u8), u8 a1);
 #pragma auto_inline reset
 
 #pragma auto_inline off
@@ -163,7 +163,7 @@ void DinoUiOrderSelectMenu::PageRight() {
 // The TU's pooled pointer-to-member constants.
 extern "C" struct {
     void (DinoHelpBase::*Enable_00)();
-    void (DinoUiOrderSelectMenu::*SetInfoPage_08)(bool);   // (SetInfoPage, as the call task takes it)
+    void (DinoUiOrderSelectMenu::*SetInfoPage_08)(u8);
 } data_ov006_02197110;
 
 void DinoUiOrderSelectMenu::SetInfoPage(u8 page) {
@@ -367,7 +367,6 @@ void DinoUiOrderSelectMenu::SelectItem(int index) {
     LinkItems();
 }
 
-// NONMATCHING: the game hands the page to the bool call task as it is; ours converts it to a bool.
 void DinoUiOrderSelectMenu::SetPage(u8 page) {
     if (page > 3 || (!mHasFourthTab && page == 3)) {
         return;
@@ -401,7 +400,7 @@ void DinoUiOrderSelectMenu::SetPage(u8 page) {
         SetInfoPage(page);
         return;
     }
-    GetSerial()->AddTail(new MTimer(1), MCreateCallTask(this, data_ov006_02197110.SetInfoPage_08, (bool)page));
+    GetSerial()->AddTail(new MTimer(1), MCreateCallTask(this, data_ov006_02197110.SetInfoPage_08, page));
 }
 
 void DinoUiOrderSelectMenu::FinishPage() {
