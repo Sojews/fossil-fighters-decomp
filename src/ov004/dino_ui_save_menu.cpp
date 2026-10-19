@@ -72,6 +72,27 @@ void DinoUiSaveMenu::StateConfirmed() {
     Exit();
 }
 
+extern const u32 data_0208adc0, data_0208adc4, data_0208adc8, data_0208adcc;
+
+// The help for a yes/no dialog: its message, the two answers, and the window.
+void DinoUiSaveMenu::AddDialogHelp(DinoCommonWindowYesNoDialog *dialog) {
+    if (dialog->mState == STATE_RUN) {
+        dialog->Execute();
+    }
+    DinoHelpDummyItem *window =
+        new DinoHelpDummyItem(gCurrentDisplay, MRect(8, 0x2C, 0x63, 0x39), std::string(gDinoResource->GetText(data_0208adc8)));
+    DinoHelpDummyItem *message = new DinoHelpDummyItem(gCurrentDisplay, MRect(0x40, 0x40, 0xBA, 0x50),
+                                                       std::string(gDinoResource->GetText(data_0208adcc)));
+    DinoHelpDummyItem *yes = new DinoHelpDummyItem(gCurrentDisplay, MRect(0x40, 0x52, 0xBA, 0x63),
+                                                   std::string(gDinoResource->GetText(data_0208adc0)));
+    DinoHelpDummyItem *no = new DinoHelpDummyItem(gCurrentDisplay, MRect(0xD0, 0x34, 0xEE, 0x52),
+                                                  std::string(gDinoResource->GetText(data_0208adc4)));
+    AddEntry((u32)window, 2, (u32)message);
+    AddEntry((u32)no, 2, (u32)yes);
+    AddEntry((u32)yes, 3, 0);
+    dialog->GetParallel()->AddTail(window, message, yes, no);
+}
+
 void DinoUiSaveMenu::StateStart() {
     if (mUnk90) {
         MTextPicture *back = new MTextPicture(data_ov004_021751fc, TRUE, false);
