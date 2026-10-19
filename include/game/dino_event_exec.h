@@ -628,6 +628,7 @@ public:
 class DinoEventKasekiRockGetContainerSelect : public DinoEventCaptureFadeUiTask {
 public:
     virtual ~DinoEventKasekiRockGetContainerSelect();
+    virtual MTask *CreateUi();
 
     u32 mUnk84[2];                      // 0x84
     std::vector<std::string> mUnk8C;    // 0x8C

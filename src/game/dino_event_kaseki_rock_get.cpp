@@ -3,6 +3,7 @@
 
 #pragma ipa file
 
+#include "game/dino_ui_container_drop_menu_page_inc_task_menu.h"
 #include "game/dino_event_exec.h"
 #include "game/dino_backup.h"
 #include "m/lcd.h"
@@ -123,3 +124,7 @@ void DinoEventKasekiRockGet::StateEnd() {
 }
 
 template class std::__vec_deleter<std::string, std::allocator<std::string> >;
+
+MTask *DinoEventKasekiRockGetContainerSelect::CreateUi() {
+    return new DinoUiContainerDropMenu(mUnk84[0], mUnk84[1], std::vector<std::string>(mUnk8C));
+}

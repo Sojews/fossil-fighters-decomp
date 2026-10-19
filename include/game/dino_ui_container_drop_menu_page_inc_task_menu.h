@@ -40,6 +40,7 @@ public:
     u32 mUnk120;                // 0x120
     u8 mStarted;                // 0x124
     int mUnk128;                // 0x128: 1 closes the menu
+    u32 unk12C[2];
 };
 
 class DinoUiContainerDropBackButton : public DinoUiContainerDropMenuItem {
