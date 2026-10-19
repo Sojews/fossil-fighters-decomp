@@ -6,6 +6,8 @@
 
 #include "m/lcd.h"
 #include "m/bright.h"
+#include "game/dino_common_window_message_box.h"
+#include "m/picture.h"
 #include <algorithm>
 #include "game/dino_backup.h"
 #include "game/dino_resource.h"
@@ -224,4 +226,19 @@ void DinoWirelessBattle::FadeIn() {
     gLcd->GetBottomDisplay()->mBright->SetFactor(16);
     gLcd->GetBottomDisplay()->Update();
     mUnk2F8->Clear();
+}
+
+// Whites out both screens and shows the text in a waiting message window.
+void DinoWirelessBattle::ShowText(u32 text) {
+    mUnk2F8->Clear();
+    gLcd->GetTopDisplay()->mBright->Reset();
+    gLcd->GetBottomDisplay()->mBright->Reset();
+    MTextPicture *top = new MTextPicture(gLcd->GetTopDisplay(), "/image/white", TRUE, false);
+    top->SetPriority(3);
+    top->Show();
+    MTextPicture *bottom = new MTextPicture(gLcd->GetBottomDisplay(), "/image/white", TRUE, false);
+    bottom->SetPriority(3);
+    bottom->Show();
+    mUnk2F8->AddTail(top, bottom,
+                     new DinoCommonWindowMessageWait1(gDinoResource->GetText(text), MPoint(128, 96), 4, 0));
 }
