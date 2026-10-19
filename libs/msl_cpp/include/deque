@@ -77,6 +77,16 @@ namespace std {
         class iterator {
         public:
             iterator() {}
+            // The first element (make_iter builds its block iterator with this; begin() goes through the other).
+            explicit iterator(const __cdeque_deleter &d) {
+                T *b = d.data_;
+                T *f = b + d.start_;
+                T *e = b + d.cap();
+                ptr_ = f;
+                beg_ = b;
+                first_ = f;
+                end_ = e;
+            }
             iterator(T *p, const __cdeque_deleter &d) {
                 ptr_ = p;
                 T *b = d.data_;
@@ -379,6 +389,9 @@ namespace std {
 
         // A position: the block's slot and the element in it.
         struct iterator {
+            iterator() {}
+            iterator(const buf_type::iterator &i, T *cur) : i_(i), cur_(cur) {}
+
             buf_type::iterator i_;
             T *cur_;
         };
@@ -458,12 +471,12 @@ namespace std {
 
     template <class T, class Allocator>
     typename __deque_deleter<T, Allocator>::iterator __deque_deleter<T, Allocator>::make_iter(size_type n) {
-        buf_type::iterator i = buf().begin();
-        i += (start_ + n) / __block;
-        iterator r;
-        r.i_ = i;
-        r.cur_ = (buf().empty() ? (T *) 0 : (T *) *i) + (start_ + n) % __block;
-        return r;
+        n += start_;
+        buf_type &b = buf();
+        buf_type::iterator i(b);
+        i += n / __block;
+        buf_type::iterator j = i;   // (copied: the game reads the block pointer through the copy)
+        return iterator(j, (b.empty() ? (T *) 0 : (T *) *j) + n % __block);
     }
 
     template <class T, class Allocator>
