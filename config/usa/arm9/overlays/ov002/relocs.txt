@@ -457,7 +457,7 @@ from:0x02156f94 kind:thumb_call to:0x020531a4 module:main
 from:0x02156f9e kind:thumb_call to:0x02066a50 module:main
 from:0x02156fa8 kind:load to:0x0208a240 module:main
 from:0x02156fac kind:load to:0x02164204 add:0x8 module:overlay(2)
-from:0x02156fb0 kind:load to:0x02164244 module:overlay(2)
+from:0x02156fb0 kind:load to:0x02164204 add:0x40 module:overlay(2)
 from:0x02156fd0 kind:load to:0x020608e5 module:main
 from:0x02156fd8 kind:load to:0x020533a9 module:main
 from:0x02156fec kind:load to:0x020cb978 module:main

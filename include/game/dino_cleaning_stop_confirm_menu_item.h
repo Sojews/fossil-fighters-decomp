@@ -7,6 +7,11 @@
 
 class DinoCleaningStopConfirmMenuItem : public MMenuItem, public DinoHelpItem {
 public:
+    DinoCleaningStopConfirmMenuItem(MMotion *motion, u32 cell, u32 textId) {
+        mMotion = motion;
+        mCell = cell;
+        mTextId = textId;
+    }
     virtual ~DinoCleaningStopConfirmMenuItem();
     virtual MRect GetFrame();
     virtual void OnFocusChanged(BOOL focused);

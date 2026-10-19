@@ -46,6 +46,30 @@ void DinoCleaningSleep::Idle() {
     (this->*mState)();
 }
 
+extern "C" const u32 data_0208a240[5];  // the dialog's sound effects
+
+void DinoCleaningStopConfirmMenu::OnStart() {
+    mOam = new MSmartOam(5, 0, 1);
+    mMotion = new DinoSeMotion(std::string(mUnkB8), mOam, 0, 1);
+    mMotion->SetPosition(128, 96);
+    for (u32 i = 0; i < 5; i++) {
+        mMotion->AddSe(data_0208a240[i]);
+    }
+    mMotion->Show();
+    mMotion->Play(1, 0);
+    mSilentFocus = TRUE;
+    mYesItem = new DinoCleaningStopConfirmMenuItem(mMotion, 3, mYesText);
+    AddItem(mYesItem);
+    mNoItem = new DinoCleaningStopConfirmMenuItem(mMotion, 4, mNoText);
+    AddItem(mNoItem);
+    mNoItem->SetKeys(2);
+    MSmartOam *oam = mOam;
+    MParallelTaskSet *parallel = GetParallel();
+    parallel->AddTail(mMotion);
+    parallel->AddTail(oam);
+    FocusItem(mNoItem);
+}
+
 void DinoCleaningStopConfirmMenu::OnFocus(MMenuItem *item) {
     if (mSilentFocus) {
         mSilentFocus = FALSE;

@@ -455,7 +455,6 @@ data_ov002_021641bc kind:data(any) addr:0x021641bc
 _ZTV27DinoCleaningStopConfirmMenu kind:data(any) addr:0x021641c4
 data_ov002_021641fc kind:data(any) addr:0x021641fc
 _ZTV31DinoCleaningStopConfirmMenuItem kind:data(any) addr:0x02164204
-data_ov002_02164244 kind:data(any) addr:0x02164244
 data_ov002_02164258 kind:data(any) addr:0x02164258
 _ZTI26DinoCleaningTutorialWindow kind:data(any) addr:0x02164288
 data_ov002_021642d8 kind:data(any) addr:0x021642d8
