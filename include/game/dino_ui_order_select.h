@@ -67,6 +67,8 @@ public:
     void LinkItems();
     void FinishPage();
     void FinishTab();
+    // The decide and back buttons: cancels a swap, or (if the team can fight) saves it and leaves, else says why not.
+    void Confirm();
     // The battle's rule text (empty for none).
     std::string GetUnk44Text();
     std::string GetUnk3CText();

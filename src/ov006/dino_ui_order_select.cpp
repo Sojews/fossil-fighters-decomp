@@ -16,6 +16,7 @@
 #include "game/dino_ui_parts_reviver_medal_button.h"
 #include "game/dino_ui_parts_reviver_name.h"
 #include "game/common_window_message.h"
+#include "game/dino_common_window_message_box.h"
 #include <algorithm>
 #include "m/smart_oam.h"
 #include "game/dino_team.h"
@@ -93,18 +94,16 @@ const char *DinoUiOrderSelectMenuItem::GetText() {
     return gDinoResource->GetText(mTextId);
 }
 
-extern "C" void func_ov006_0218d828(void *owner);
-
 void DinoUiOrderSelectDecideButton::OnDecide() {
     mMotion->Play(3, 1);
-    func_ov006_0218d828(mOwner);
+    mOwner->Confirm();
     DinoSoundPlaySe(0x98, 0);
 }
 
 void DinoUiOrderSelectBackButton::OnDecide() {
     mMotion->Play(4, 1);
     mSerial.AddTail(mMotion->CreateWaitStopTask());
-    func_ov006_0218d828(mOwner);
+    mOwner->Confirm();
     DinoSoundPlaySe(0x90, 0);
 }
 
@@ -461,6 +460,62 @@ void DinoUiOrderSelectMenu::FinishTab() {
     RefreshItems();
     FocusItem(mItems[mFocusIndex]);
     RefreshOKButton();
+}
+
+extern "C" struct {
+    void (DinoUiOrderSelectMenu::*FinishTab_00)();
+} data_ov006_02197108;
+extern const u32 data_0208aa44, data_0208aa48, data_0208aa4c;
+
+void DinoUiOrderSelectMenu::Confirm() {
+    if (mUnk1F0 == 1) {
+        mUnk1F0 = 0;
+        mMessage->Exit();
+        ((DinoUiPartsReviverMedalButton *)mItems[mFocusIndex])->PlayNormal();
+        GetSerial()->AddTail(MTaskSetWaitEmptyTask::Create(&mBackButton->mSerial),
+                             MCreateCallTask(this, data_ov006_02197108.FinishTab_00));
+        return;
+    }
+    switch (IsTeamInvalid()) {
+    case 0: {
+        DinoSoundStopBgm(-1, 30);
+        gDinoBackup->SetTeam(mTeamIndex, &mTeam);
+        MTask *fadeMain;
+        MTask *fadeSub;
+        MTask *wait;
+        MTask *exit = CreateExitTransfer();
+        wait = mInfo->CreateWaitModelTask();
+        fadeSub = gLcd->mSub->mBright->CreateFadeOutToWhite(90, 0);
+        fadeMain = gLcd->mMain->mBright->CreateFadeOutToWhite(90, 0);
+        MParallelTaskSet *fades = new MParallelTaskSet(TRUE);
+        fades->AddTail(fadeMain);
+        fades->AddTail(fadeSub);
+        GetSerial()->AddTail(new MTimer(30), fades, wait, exit);
+        break;
+    }
+    case 1: {
+        mSerial.AddTail(new DinoCommonWindowMessageBox(MPoint(0x80, 0x60),
+                                                       std::string(gDinoResource->GetText(data_0208aa4c)), 0x78, 4));
+        break;
+    }
+    case 2: {
+        mSerial.AddTail(new DinoCommonWindowMessageBox(MPoint(0x80, 0x60),
+                                                       std::string(gDinoResource->GetText(data_0208aa48)), 0x78, 4));
+        break;
+    }
+    case 3: {
+        mSerial.AddTail(new DinoCommonWindowMessageBox(MPoint(0x80, 0x60),
+                                                       std::string(gDinoResource->GetText(data_0208aa44)), 0x78, 4));
+    }
+    case 4: {
+        mSerial.AddTail(new DinoCommonWindowMessageBox(MPoint(0x80, 0x60), GetUnk44Text(), 0x78, 4));
+        break;
+    }
+    case 5: {
+        mSerial.AddTail(new DinoCommonWindowMessageBox(MPoint(0x80, 0x60), GetUnk3CText(), 0x78, 4));
+        break;
+    }
+    }
 }
 
 #pragma opt_strength_reduction off
