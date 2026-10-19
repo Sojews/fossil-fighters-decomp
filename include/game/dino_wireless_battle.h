@@ -39,6 +39,7 @@ public:
     void StateTeamSelect();
     // Shows the opponent's team for the player to pick the order in.
     void StateOrderSelect();
+    void StateSendTeam();
     void StateWaitTeams();
     void StateBeginBattle();
     void StateWaitReady();

@@ -3096,26 +3096,33 @@ public:
 class DinoBattlePlayerInfoSignal : public MMessage {
 public:
     DinoBattlePlayerInfoSignal() : MMessage(0x1009D) {}
+    DinoBattlePlayerInfoSignal(u32 player, DinoPlayerData data, DinoTeam team, const DinoCreatureState *creatures)
+        : MMessage(0x1009D) {
+        mPlayer = player;
+        mData = data;
+        mTeam = team;
+        MI_CpuCopy8(creatures, mCreatures, sizeof(mCreatures));
+    }
     virtual u32 GetSize() { return 276; }
     virtual void Write(void *buf) {
         MI_CpuCopy8(&mId, buf, 4);
-        MI_CpuCopy8(&mUnk0C, (u8 *)buf + 4, 4);
-        MI_CpuCopy8(mUnk10, (u8 *)buf + 8, 108);
-        MI_CpuCopy8(mUnk7C, (u8 *)buf + 116, 40);
-        MI_CpuCopy8(mUnkA4, (u8 *)buf + 156, 120);
+        MI_CpuCopy8(&mPlayer, (u8 *)buf + 4, 4);
+        MI_CpuCopy8(&mData, (u8 *)buf + 8, 108);
+        MI_CpuCopy8(&mTeam, (u8 *)buf + 116, 40);
+        MI_CpuCopy8(mCreatures, (u8 *)buf + 156, 120);
     }
     virtual void Read(const void *buf) {
         MI_CpuCopy8(buf, &mId, 4);
-        MI_CpuCopy8((const u8 *)buf + 4, &mUnk0C, 4);
-        MI_CpuCopy8((const u8 *)buf + 8, mUnk10, 108);
-        MI_CpuCopy8((const u8 *)buf + 116, mUnk7C, 40);
-        MI_CpuCopy8((const u8 *)buf + 156, mUnkA4, 120);
+        MI_CpuCopy8((const u8 *)buf + 4, &mPlayer, 4);
+        MI_CpuCopy8((const u8 *)buf + 8, &mData, 108);
+        MI_CpuCopy8((const u8 *)buf + 116, &mTeam, 40);
+        MI_CpuCopy8((const u8 *)buf + 156, mCreatures, 120);
     }
 
-    u32 mUnk0C;
-    u8 mUnk10[0x6C];
-    u8 mUnk7C[0x28];
-    u8 mUnkA4[0x78];
+    u32 mPlayer;                    // 0x0C
+    DinoPlayerData mData;           // 0x10
+    DinoTeam mTeam;                 // 0x7C
+    DinoCreatureState mCreatures[5];    // 0xA4
 };
 
 class DinoBattlePlayerLevelSignal : public MMessage {

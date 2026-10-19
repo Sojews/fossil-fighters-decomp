@@ -53,11 +53,12 @@ extern "C" struct {
     u8 unk18[0x20 - 0x18];
     void (DinoWirelessBattle::*StateBeginBattle_20)(); // 0x20
     void (DinoWirelessBattle::*StateTeamSelect_28)(); // 0x28
-    void (DinoWirelessBattle::*Unk02049ae4_30)(); // 0x30
+    void (DinoWirelessBattle::*StateSendTeam_30)(); // 0x30
     u8 unk38[0x40 - 0x38];
     void (DinoWirelessBattle::*Start_40)(); // 0x40
     void (DinoWirelessBattle::*Failed_48)(); // 0x48
-    u8 unk50[0x60 - 0x50];
+    void (DinoWirelessBattle::*StateWaitTeams_50)(); // 0x50
+    u8 unk58[0x60 - 0x58];
     void (DinoWirelessBattle::*Failed_60)(); // 0x60
     void (DinoWirelessBattle::*StateWaitReady_68)(); // 0x68
     void (DinoWirelessBattle::*Failed_70)(); // 0x70
@@ -84,7 +85,7 @@ void DinoWirelessBattle::StateTeamSelect() {
     }
     mSerial.AddTail(new DinoUiTeamSelect(&mTeam, mUnk304, mUnk305));
     mUnk304 = mUnk305 = 0;
-    mState = data_020c0480.Unk02049ae4_30;
+    mState = data_020c0480.StateSendTeam_30;
 }
 
 void DinoWirelessBattle::StateOrderSelect() {
@@ -103,6 +104,26 @@ void DinoWirelessBattle::StateOrderSelect() {
     }
     mSerial.AddTail(new DinoUiOrderSelect(mTeam, info, 1, 0, 0, 1));
     mState = data_020c0480.StateBeginBattle_20;
+}
+
+// Sends the chosen team (with the creatures in it) to both consoles.
+void DinoWirelessBattle::StateSendTeam() {
+    MUnloadOverlay(0, M_OVERLAY_ID(ov003));
+    MUnloadOverlay(0, M_OVERLAY_ID(ov007));
+    DinoPlayerData player;
+    DinoCreatureState creatures[5];
+    MI_CpuFill8(creatures, 0, sizeof(creatures));
+    gDinoBackup->GetPlayer(&player, 1);
+    DinoTeam team;
+    gDinoBackup->GetTeam(mTeam, &team);
+    for (u32 i = 0; i < 5; i++) {
+        if (team.slots[i]) {
+            gDinoBackup->GetCreature(team.slots[i], &creatures[i]);
+        }
+    }
+    mHub->SendToAll(new DinoBattlePlayerInfoSignal(mMultiPlay->GetPlayerIndex(), player, team, creatures));
+    ShowText(data_0208ad10);
+    mState = data_020c0480.StateWaitTeams_50;
 }
 
 void DinoWirelessBattle::StateBeginBattle() {
