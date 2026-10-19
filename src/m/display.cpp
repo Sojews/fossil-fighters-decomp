@@ -182,6 +182,23 @@ void MDisplay::SetBg0Is3D(BOOL on) {
     }
 }
 
+// Sets the BG mode and moves the layers' visibility (and their blend and window settings) between BG numbers.
+// NONMATCHING: the game keeps the count in its argument slot (and the two bits swap registers).
+void MDisplay::SetBgMode(int mode, const int *from, const int *to, int count) {
+    u32 i;
+    u32 n = count;
+
+    mDispCnt.bgMode = mode;
+    for (i = 0; i < n; i++) {
+        u32 bitA = 1 << (from[i] + 8);
+        u32 bitB = 1 << (to[i] + 8);
+        mDispCnt.raw = (mDispCnt.raw & ~(bitB | bitA)) | ((mDispCnt.raw & bitA) ? bitB : 0) |
+                       ((mDispCnt.raw & bitB) ? bitA : 0);
+    }
+    mBlend->SwapPlanes(mode, from, to, n);
+    mWin->SwapPlanes(mode, from, to, n);
+}
+
 void MDisplay::SetObjTileBoundary(int boundary) {
     mDispCnt.objTileBoundary = boundary;
 }
@@ -354,6 +371,56 @@ MDisplay *MLcd::GetBottomDisplay() {
         return mSub;
     }
     return mMain;
+}
+
+// A bank configuration (0x1C bytes): the MST to map the banks with and the banks to try, in order.
+struct MVramConfig {
+    int mst;            // 0x00: -1: none
+    u32 count;          // 0x04: 0: no banks
+    u32 needed;         // 0x08
+    u32 options[4];     // 0x0C: bank (1 for A), offset << 4, 0x100: give up if it's taken
+};
+
+void MLcd::UseBanks(const void *config, MVramBanks *out) {
+    const MVramConfig *cfg = (const MVramConfig *) config;
+    u32 i;
+
+    if (cfg->mst == -1) {
+        OS_Terminate();
+    }
+    if (cfg->count == 0) {
+        for (i = 0; i < 4; i++) {
+            out->banks[i] = 0;
+        }
+        return;
+    }
+    u32 used = 0;
+    for (u32 j = 0; j < 4; j++) {
+        u32 option = cfg->options[j];
+        int bank = option & 0xF;
+        int offset = (option & 0xF0) >> 4;
+        BOOL required = (option & 0x100) ? TRUE : FALSE;
+        if (bank == 0) {
+            break;
+        }
+        if (IsBankUsed(bank)) {
+            if (!required) {
+                continue;
+            }
+            break;
+        }
+        out->banks[used] = bank;
+        UseBank(bank, cfg->mst, used + offset);
+        used++;
+        if (used >= cfg->needed) {
+            out->count = cfg->count;
+            for (; used < 4; used++) {
+                out->banks[used] = 0;
+            }
+            return;
+        }
+    }
+    OS_Terminate();
 }
 
 void MLcd::FreeBanks(MVramBanks *banks) {
