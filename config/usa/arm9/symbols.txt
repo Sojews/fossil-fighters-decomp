@@ -4911,7 +4911,7 @@ _ZNSt13__vec_deleterIN10MOamCanvasI9MSmartOam13MSmartOamUnitE5PieceESaIS5_EE13su
 _ZNSt13__vec_deleterIN10MOamCanvasI9MSmartOam13MSmartOamUnitE5PieceESaIS5_EED2Ev kind:function(thumb,size=0x26) addr:0x0206459c
 _ZNSt13__vec_deleterIN10MOamCanvasI4MOam8MOamUnitE5PieceESaIS5_EE13sub_push_backERKS5_N10Metrowerks8int2typeILi1EEE kind:function(thumb,size=0x1e) addr:0x020645c4
 _ZNSt13__vec_deleterIN10MOamCanvasI4MOam8MOamUnitE5PieceESaIS5_EED2Ev kind:function(thumb,size=0x26) addr:0x020645e4
-func_0206460c kind:function(thumb,size=0x50) addr:0x0206460c
+_ZNSt13__vec_deleterI5MRectSaIS0_EE5eraseEPS0_13UnkMSLStruct1 kind:function(thumb,size=0x50) addr:0x0206460c
 _ZN13MCanvasWindowD1Ev kind:function(thumb,size=0xc) addr:0x0206465c
 _ZN13MCanvasWindowD0Ev kind:function(thumb,size=0x12) addr:0x02064668
 _ZN19MCanvasCopyTransferD1Ev kind:function(thumb,size=0x2) addr:0x0206467c

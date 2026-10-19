@@ -567,7 +567,7 @@ namespace std {
         } else {
             iterator e = end();
             if (e - pos - 1 != 0) {
-                for (iterator src = pos + 1, dst = pos; src < e; src++, dst++) {
+                for (iterator dst = pos, src = pos + 1; src < e; src++, dst++) {
                     *dst = *src;
                 }
             }
