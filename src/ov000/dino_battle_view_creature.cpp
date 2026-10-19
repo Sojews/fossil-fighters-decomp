@@ -187,6 +187,37 @@ extern "C" int func_ov000_0216f698(int arg0, BOOL arg1, BOOL arg2) {
     return 4;
 }
 
+// Pulses the motion's highlight color while it is marked (mArg: bit 0 and bit 1 for the two colors).
+void CreatureMotion::Execute() {
+    MPalUnit *pal = GetPalette(0);
+    if (mArg != 0 || mUnk84 != 0) {
+        mUnk84 += 8;
+        if (mUnk84 >= 0x1FF) {
+            mUnk84 = 0;
+        }
+        if (mUnk84 == 0) {
+            mUnk80 ^= 1;
+        }
+        if (!(mArg & (1 << mUnk80))) {
+            mUnk80 ^= 1;
+        }
+        u32 level = mUnk84;
+        if (level >= 0x100) {
+            level = 0x1FF - level;
+        }
+        switch (mUnk80) {
+        case 0:
+            mUnk88 = ((level >> 3) << 5) | 0x8000;
+            break;
+        case 1:
+            mUnk88 = (level >> 3) | 0x8000;
+            break;
+        }
+    }
+    pal->LoadColors(&mUnk88, 1, 1);
+    MMotion::Execute();
+}
+
 void CreatureMotion::SetArg(int arg, BOOL flag) {
     mArg = arg | (flag ? 2 : 0);
 }
@@ -212,6 +243,58 @@ void DinoBattleViewCreature::ClearAdvantage() {
 void DinoBattleViewCreature::SetCoord(MPoint pos) {
     mCoord = pos;
     mMotion->SetPosition(mCoord + mCoordOffset);
+}
+
+// Loads the creature's definition and notes which sides its support effects touch.
+extern "C" void func_ov000_0216fcb8(DinoBattleViewCreature *creature, u32 id) {
+    creature->mDef = (DinoBattleCreatureDef *)gDinoResource->GetCreatureDef(id);
+    creature->mSupportSides = 0;
+    for (int i = 0; i < 2; i++) {
+        const s8 *effect = i == 0 ? DinoOffsetPtr<s8>(creature->mDef, creature->mDef->mUnk54)
+                                  : DinoOffsetPtr<s8>(creature->mDef, creature->mDef->mUnk58);
+        if (effect[0] != 0 || effect[1] != 0 || effect[2] != 0 || effect[3] != 0) {
+            creature->mSupportSides |= 1 << i;
+        }
+    }
+}
+
+// Shows the type advantage mark when the advantage changed: pointing at the other side for 1, at its own for 2.
+extern "C" void func_ov000_0216fd74(DinoBattleViewCreature *creature) {
+    if (creature->mAdvantage == creature->mShownAdvantage) {
+        return;
+    }
+    creature->mShownAdvantage = creature->mAdvantage;
+    switch (creature->mShownAdvantage) {
+    case 0:
+        creature->mUnk13C->Clear();
+        if (!creature->mMotion140->IsHidden()) {
+            creature->mUnk13C->AddTail(creature->mMotion140->CreatePlayTransfer(2, 0),
+                                       creature->mMotion140->CreateWaitStopTask(),
+                                       creature->mMotion140->CreateHideTransfer());
+        }
+        break;
+    case 1:
+        creature->mUnk13C->Clear();
+        creature->mMotion140->SetFlip(creature->mUnkB0 == 1, 0);
+        creature->mMotion140->Show();
+        creature->mMotion140->Play(1, 1);
+        break;
+    case 2:
+        creature->mUnk13C->Clear();
+        creature->mMotion140->SetFlip(creature->mUnkB0 == 0, 0);
+        creature->mMotion140->Show();
+        creature->mMotion140->Play(1, 1);
+        break;
+    }
+}
+
+// Sets where the motion goes from the coordinate (mirrored on side 1).
+extern "C" void func_ov000_0216fee0(DinoBattleViewCreature *creature, MPoint offset) {
+    creature->mCoordOffset = offset;
+    if (creature->mUnkB0 == 1) {
+        creature->mCoordOffset.x = -creature->mCoordOffset.x;
+    }
+    creature->SetCoord(creature->mCoord);
 }
 
 MPoint DinoBattleViewCreature::GetCoord() {

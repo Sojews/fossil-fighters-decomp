@@ -93,7 +93,7 @@ public:
     u32 mUnk104;            // 0x104
     u32 mUnk108;            // 0x108
     u32 mUnk10C;            // 0x10C
-    u32 unk110;
+    u32 mSupportSides;      // 0x110: bit 0 its support effect touches its own side, bit 1 the other
     u32 mLevel;             // 0x114
     u32 mUnk118;            // 0x118
     u32 unk11C[2];
@@ -110,7 +110,7 @@ public:
     u8 unk158;
     u8 mUnk159;             // 0x159: set, it can't be chosen in the support modes
     u8 unk15A[2];
-    u32 unk15C;
+    u32 mShownAdvantage;    // 0x15C: what mMotion140 shows
     u32 mAdvantage;         // 0x160: its type advantage over the creature shown
 };
 
