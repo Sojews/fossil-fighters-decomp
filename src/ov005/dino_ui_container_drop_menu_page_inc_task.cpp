@@ -48,16 +48,35 @@ DinoUiContainerDropMenuItem::DinoUiContainerDropMenuItem(DinoUiContainerDropMenu
     mParallel.AddTail(mMotion);
 }
 
+BOOL DinoUiContainerDropMenu::PageRight() {
+    mPage = (mPage + 1) % (mLastPage + 1);
+    ShowPage();
+    return TRUE;
+}
+
 BOOL DinoUiContainerDropMenu::PageLeft() {
     mPage = (mPage + mLastPage) % (mLastPage + 1);
     ShowPage();
     return TRUE;
 }
 
-BOOL DinoUiContainerDropMenu::PageRight() {
-    mPage = (mPage + 1) % (mLastPage + 1);
-    ShowPage();
-    return TRUE;
+extern const u32 data_0208a660, data_0208a664, data_0208a66c, data_0208a674;
+
+// Shows the page: the last page has mUnkC0 and its own help texts.
+void DinoUiContainerDropMenu::ShowPage() {
+    if (mPage == mLastPage) {
+        mUnkC0->Show();
+        mHelp12C->SetText(gDinoResource->GetText(data_0208a664));
+        mHelp130->SetText(gDinoResource->GetText(data_0208a660));
+    } else {
+        mUnkC0->Hide();
+        mHelp12C->SetText(gDinoResource->GetText(data_0208a674));
+        mHelp130->SetText(gDinoResource->GetText(data_0208a66c));
+    }
+    DeleteItems();
+    mFraction->SetNumerator(mPage + 1);
+    CreateItems();
+    FocusNearestItem(GetCursor());
 }
 
 #pragma opt_strength_reduction off
@@ -185,24 +204,7 @@ void DinoUiContainerDropMenu::OnBackDecided() {
     mSerial.AddTail(dialog);
 }
 
-extern const u32 data_0208a660, data_0208a664, data_0208a66c, data_0208a674;
 
-// Shows the page: the last page has mUnkC0 and its own help texts.
-void DinoUiContainerDropMenu::ShowPage() {
-    if (mPage == mLastPage) {
-        mUnkC0->Show();
-        mHelp12C->SetText(gDinoResource->GetText(data_0208a664));
-        mHelp130->SetText(gDinoResource->GetText(data_0208a660));
-    } else {
-        mUnkC0->Hide();
-        mHelp12C->SetText(gDinoResource->GetText(data_0208a674));
-        mHelp130->SetText(gDinoResource->GetText(data_0208a66c));
-    }
-    DeleteItems();
-    mFraction->SetNumerator(mPage + 1);
-    CreateItems();
-    FocusNearestItem(GetCursor());
-}
 
 // Links the items as a grid four wide (ov005's copy; see dino_ui2_parts_kaseki_button.h).
 void DinoUi2LinkKasekiGrid(MMenu *menu, std::vector<MMenuItem *> &items, MMenuItem *below);
