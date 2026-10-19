@@ -148,6 +148,28 @@ void MDisplay::SetBackdrop(u16 color) {
     mBackdrop = color;
 }
 
+// Tells the hooks, then gives up the BG, OBJ and VRAM banks.
+void MDisplay::ResetHooks() {
+    MScopedLock lock(&gLcd->mMutex, TRUE);
+    for (std::vector<MDisplayHook *>::iterator it = mHooks.begin(); it != mHooks.end(); it++) {
+        (*it)->Unk0C();
+    }
+    if (mBg != NULL) {
+        delete mBg;
+        mBg = NULL;
+    }
+    if (mObj != NULL) {
+        delete mObj;
+        mObj = NULL;
+    }
+    mLcd->FreeBanks(&mBanks28);
+    mLcd->FreeBanks(&mBanks50);
+    mLcd->FreeBanks(&mBanks78);
+    mLcd->FreeBanks(&mBanks8C);
+    mLcd->FreeBanks(&mBanks3C);
+    mLcd->FreeBanks(&mBanks64);
+}
+
 volatile u16 *MDisplay::GetBackdropReg() {
     return mRegs->backdrop;
 }
@@ -221,7 +243,7 @@ MLcd::MLcd() : MLooperVSyncTask(FALSE, TRUE) {
 
     OS_InitMutex(&mMutex);
     mPowCnt = REG_POWCNT;
-    mCapture = 0;
+    mCapture.raw = 0;
     mSwapped = FALSE;
     for (i = 0; i < 10; i++) {
         mBankUsed[i] = FALSE;
@@ -243,6 +265,35 @@ void MLcd::VSyncNow() {
         OS_WaitIrq(TRUE, 1);
         VSync();
     }
+}
+
+#define REG_DISPCAPCNT (*(volatile u32 *)0x04000064)
+
+// Writes the banks' settings (a bank being captured into goes to the LCDC), starts a capture, updates both engines
+// and sets the power register.
+void MLcd::VSync() {
+    MScopedLock lock(&mMutex, TRUE);
+    for (u32 i = 1; i < 10; i++) {
+        if (mCapture.enable && mCapture.bank == i - 1) {
+            MVramCnt cnt;
+            cnt.raw = 0;
+            cnt.enable = TRUE;
+            *(u8 *)data_0208b378[i] = cnt.raw;
+        } else {
+            *(u8 *)data_0208b378[i] = mBankCnt[i].raw;
+        }
+    }
+    if (mCapture.enable) {
+        REG_DISPCAPCNT = mCapture.raw;
+        mCapture.enable = FALSE;
+    }
+    mMain->Update();
+    mSub->Update();
+    u16 pow = mPowCnt;
+    if (mSwapped) {
+        pow ^= 0x8000;
+    }
+    REG_POWCNT = (REG_POWCNT & 0x20F) | (pow & ~0x20F);
 }
 
 BOOL MLcd::IsBankUsed(int bank) {
@@ -351,4 +402,22 @@ u32 MLcd::GetBankAddress(int bank) {
 
 void MDisplay::Setup(int a, int c, int e, int f) {
     Setup(a, 0, c, 0, e, f);
+}
+
+// Sets up a capture for the next VBlank (bank: 1 for A to 4 for D).
+void MLcd::StartCapture(int mode, int srcA, int srcB, int size, int readOffset, int bank, int writeOffset, int eva,
+                        int evb) {
+    if (mCapture.enable) {
+        OS_Terminate();
+    }
+    mCapture.enable = TRUE;
+    mCapture.mode = mode;
+    mCapture.readOffset = readOffset;
+    mCapture.srcA = srcA;
+    mCapture.srcB = srcB;
+    mCapture.size = size;
+    mCapture.writeOffset = writeOffset;
+    mCapture.bank = bank - 1;
+    mCapture.eva = eva;
+    mCapture.evb = evb;
 }

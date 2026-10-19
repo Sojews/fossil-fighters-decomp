@@ -18,6 +18,26 @@ union MVramCnt {
     };
 };
 
+// The value of the display capture register.
+union MCaptureCnt {
+    u32 raw;
+    struct {
+        u32 eva : 5;
+        u32 : 3;
+        u32 evb : 5;
+        u32 : 3;
+        u32 bank : 2;
+        u32 writeOffset : 2;
+        u32 size : 2;
+        u32 : 2;
+        u32 srcA : 1;
+        u32 srcB : 1;
+        u32 readOffset : 2;
+        u32 : 1;
+        u32 mode : 2;
+        u32 enable : 1;
+    };
+};
 
 class MLcd : public MLooperVSyncTask {
 public:
@@ -52,7 +72,7 @@ public:
     MVramCnt mBankCnt[10];  // 0x30
     u16 mPowCnt;            // 0x58
     MVramBanks mTexBanks;   // 0x5C
-    u32 mCapture;           // 0x70
+    MCaptureCnt mCapture;   // 0x70: a capture to start at the next VBlank
     u8 mSwapped;            // 0x74
     OSMutex mMutex;         // 0x78
 };
