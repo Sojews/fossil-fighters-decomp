@@ -20,6 +20,7 @@
 #include "game/dino_resource.h"
 #include "game/dino_field_town_map.h"
 #include "game/dino_backup.h"
+#include "game/dino_field_player_control.h"
 struct DinoCharaTask;
 class MScreen;
 class DinoField;
@@ -464,14 +465,11 @@ struct DinoEventEpisode {
     MArchiveFile mFile;     // 0x04
 };
 
-// (Made and deleted by the event loop; nothing is known of them yet.)
-struct DinoEventLoopUnkB4 {
-    u32 unk0;
-    u32 unk4[3];
-};
-struct DinoEventLoopUnkB8 {
-    u32 unk0[2];
-    u8 unk8;
+// What the player's control on the field asks the event loop for (a menu, an event, a warp...).
+struct DinoEventLoopRequest {
+    u32 type;       // 0x00: 0 for nothing
+    u32 arg;        // 0x04
+    MPoint pos;     // 0x08
 };
 
 // Runs the event scripts (the game's class name; the event commands get it as their event).
@@ -499,7 +497,8 @@ public:
     void ClearEpisodes();
     // Makes the field (reading the saved state, if any) and fades it in.
     void Start();
-    void State0203ad00();
+    // Runs what the player's control asked for, or else the episodes that are ready, then hands control back.
+    void StateRun();
     // After an event is cleared: notes the regions the events still open name in their conditions.
     void UpdateRegions();
     BOOL ProcessEpisode(const std::map<u32, DinoEventEpisode>::iterator &it);
@@ -520,8 +519,8 @@ public:
     std::map<u32, DinoEventEpisode> mEpisodeFiles;  // 0x84
     MResource<DinoEpisodeData> mCommands;  // 0x94: the commands of the episode being run
     MResource<DinoMessageData> mMessages;   // 0xA4: the talk messages last looked in
-    DinoEventLoopUnkB4 *mUnkB4; // 0xB4
-    DinoEventLoopUnkB8 *mUnkB8; // 0xB8
+    DinoEventLoopRequest *mRequest;           // 0xB4
+    DinoFieldPlayerControlResult *mControlResult; // 0xB8
     u8 mCameraUsed;         // 0xBC
     u8 mUnkBD;              // 0xBD
     u8 mUnkBE;              // 0xBE

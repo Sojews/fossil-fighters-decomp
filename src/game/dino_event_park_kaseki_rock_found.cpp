@@ -42,7 +42,7 @@ void DinoEventKasekiRockFound::StateFound() {
 }
 
 void DinoEventKasekiRockFound::StateFoundEnd() {
-    if (mUnk80[3] != 0) {
+    if (mUnk8C[0] != 0) {
         mState = data_020bd400.Unk02036bd4_28;
     } else {
         mState = data_020bd380.Unk02036b90_40;

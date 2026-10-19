@@ -5,6 +5,7 @@
 
 class DinoEventDebugMenu : public DinoEventCaptureFadeUiTask {
 public:
+    DinoEventDebugMenu(DinoEventLoop *event) : DinoEventCaptureFadeUiTask(event, 2) {}
     virtual ~DinoEventDebugMenu();
     virtual MTask *CreateUi();
 };

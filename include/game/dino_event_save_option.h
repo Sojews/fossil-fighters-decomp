@@ -8,6 +8,7 @@ class DinoUiSaveOption;
 
 class DinoEventSaveOption : public MProcess {
 public:
+    DinoEventSaveOption(DinoEventLoop *event) : MProcess(NULL), mEvent(event), mStep(0) {}
     virtual ~DinoEventSaveOption();
     virtual void Idle();
 

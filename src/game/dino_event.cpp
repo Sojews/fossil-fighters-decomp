@@ -12,6 +12,15 @@
 #include "game/dino_ui_save_option.h"
 #include "game/dino_backup.h"
 #include "game/dino_event_exec.h"
+#include "game/dino_event_field_menu.h"
+#include "game/dino_event_medal_list.h"
+#include "game/dino_event_debug_menu.h"
+#include "game/dino_event_kaseki_rock_found.h"
+#include "game/dino_event_park_kaseki_rock_found.h"
+
+// The player's control on the field (in the field overlay).
+extern "C" MProcess *func_ov001_021580a0(DinoField *field, u32 request, DinoFieldPlayerControlResult *result,
+                                         u32 regions);
 
 void DinoEventLoop::Idle() {
     (this->*mState)();
@@ -165,7 +174,7 @@ extern "C" struct {
     u32 unk00;
     const char *EpisodePath_04;     // "/episode/%04d"
     u8 unk08[0x20 - 0x08];
-    void (DinoEventLoop::*State0203ad00_20)();
+    void (DinoEventLoop::*StateRun_20)();
     u8 unk28[0x50 - 0x28];
     void (DinoEventLoop::*Start_50)();
 } data_020bd9d0;
@@ -185,10 +194,10 @@ void DinoEventLoop::Start() {
     u32 size = gDinoResource->GetEpisodeCount() * sizeof(FSFileID);
     MI_CpuFill8(mEpisodes, 0, size);
     mEpisodesChanged = FALSE;
-    mUnkB4 = new DinoEventLoopUnkB4;
-    mUnkB4->unk0 = 0;
-    mUnkB8 = new DinoEventLoopUnkB8;
-    mUnkB8->unk8 = 0;
+    mRequest = new DinoEventLoopRequest;
+    mRequest->type = 0;
+    mControlResult = new DinoFieldPlayerControlResult;
+    mControlResult->unk08 = 0;
     mCameraUsed = FALSE;
     mUnkBD = 0;
     mUnkBE = 0;
@@ -200,7 +209,66 @@ void DinoEventLoop::Start() {
         Fade(2, 30);
         mSerial.AddTail(CreateFadeWaitTask());
     }
-    mState = data_020bd9d0.State0203ad00_20;
+    mState = data_020bd9d0.StateRun_20;
+}
+
+// NONMATCHING: ours reloads the iterator for the copy it passes ProcessEpisode (the game reuses the one it compared).
+void DinoEventLoop::StateRun() {
+    u32 type = mRequest->type;
+    if (type == 3) {
+        mSerial.AddTail(new DinoEventFieldMenu(this, mRequest->arg));
+        mRequest->type = 0;
+        mControlResult->unk08 = 0;
+        return;
+    }
+    if (type == 4) {
+        mSerial.AddTail(new DinoEventMedalList(this));
+        mRequest->type = 0;
+        mControlResult->unk08 = 0;
+        return;
+    }
+    if (type == 5) {
+        mSerial.AddTail(new DinoEventSaveOption(this));
+        mRequest->type = 0;
+        mControlResult->unk08 = 0;
+        return;
+    }
+    if (type == 7) {
+        mSerial.AddTail(new DinoEventDebugMenu(this));
+        mRequest->type = 0;
+        mControlResult->unk08 = 0;
+        return;
+    }
+    if (type == 6) {
+        MPoint pos(mRequest->pos.x, mRequest->pos.y);
+        GetSerial()->AddTail(new DinoEventKasekiRockFound(this, mRequest->arg, pos), new DinoEventExecFinish(this));
+        mRequest->type = 0;
+        mControlResult->unk08 = 0;
+        return;
+    }
+    if (type == 9) {
+        GetSerial()->AddTail(new DinoEventParkKasekiRockFound(this, mRequest->arg), new DinoEventExecFinish(this));
+        mRequest->type = 0;
+        mControlResult->unk08 = 0;
+        return;
+    }
+    for (std::map<u32, DinoEventEpisode>::iterator it = mEpisodeFiles.begin(); it != mEpisodeFiles.end(); ++it) {
+        if (ProcessEpisode(std::map<u32, DinoEventEpisode>::iterator(it))) {
+            mRequest->type = 0;
+            mControlResult->unk08 = 0;
+            return;
+        }
+    }
+    if (mField != NULL && mRequest->type == 2 && mRequest->arg != 0) {
+        u32 link = gDinoBackup->GetRegionLink(mRequest->arg);
+        if (link != 0 && gDinoResource->GetRegionMapMatch(link)) {
+            mSerial.AddTail(new DinoEventExecAutoWarp(this, mRequest->pos.x, mRequest->pos.y, link));
+            mControlResult->unk08 = 0;
+        }
+    }
+    mRequest->type = 0;
+    UpdateRegions();
+    mSerial.AddTail(func_ov001_021580a0(mField, (u32)mRequest, mControlResult, (u32)&mRegions));
 }
 
 void DinoEventLoop::UpdateRegions() {

@@ -5,6 +5,7 @@
 
 class DinoEventMedalList : public DinoEventCaptureFadeUiTask {
 public:
+    DinoEventMedalList(DinoEventLoop *event) : DinoEventCaptureFadeUiTask(event, 4) {}
     virtual ~DinoEventMedalList();
     virtual MTask *CreateUi();
 };

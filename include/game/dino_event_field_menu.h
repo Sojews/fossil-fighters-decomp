@@ -5,6 +5,7 @@
 
 class DinoEventFieldMenu : public DinoEventCaptureFadeUiTask {
 public:
+    DinoEventFieldMenu(DinoEventLoop *event, u32 arg) : DinoEventCaptureFadeUiTask(event, 4), mUnk84(arg) {}
     virtual ~DinoEventFieldMenu();
     virtual MTask *CreateUi();
 

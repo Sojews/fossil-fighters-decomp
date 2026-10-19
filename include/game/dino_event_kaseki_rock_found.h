@@ -4,11 +4,13 @@
 
 #include "m/task.h"
 #include "m/archive.h"
+#include "m/geometry.h"
 
 class DinoEventLoop;
 
 class DinoEventKasekiRockFound : public MProcess {
 public:
+    DinoEventKasekiRockFound(DinoEventLoop *event, u32 arg, MPoint pos);
     virtual ~DinoEventKasekiRockFound();
     virtual void Idle();
 
@@ -21,13 +23,16 @@ public:
 
     void (DinoEventKasekiRockFound::*mState)(); // 0x74
     DinoEventLoop *mEvent;      // 0x7C
-    u32 mUnk80[12];         // 0x80
+    MPoint mPos;            // 0x80
+    u32 mArg;               // 0x88
+    u32 mUnk8C[9];          // 0x8C
     MArchivePtr mArchive;   // 0xB0
     MArchiveFile mFile;     // 0xB4
     MArchivePtr mArchive2;  // 0xC0
     MArchiveFile mFile2;    // 0xC4
     u32 unkD0[2];
     int mAnswer;            // 0xD8: the yes/no dialog's
+    u32 unkDC[2];
 };
 
 #endif
