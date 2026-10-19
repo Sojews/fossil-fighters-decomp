@@ -95,6 +95,9 @@ public:
         return p + n;
     }
 
+    const_iterator erase(const_iterator p);
+    const_iterator insert(const_iterator p, C c);
+
     // Replaces [pos, pos + n) with [first, last) (the iterator tag picks the copy loop).
     basic_string &__replace(size_type pos, size_type n, const C *first, const C *last, random_access_iterator_tag);
 
@@ -126,6 +129,20 @@ inline bool operator<(const basic_string<C, Traits, Alloc> &lhs, const basic_str
 template <class C, class Traits, class Alloc>
 inline bool operator==(const basic_string<C, Traits, Alloc> &lhs, const C *rhs) {
     return lhs.compare(rhs) == 0;
+}
+
+// (Emitted wherever they are used.)
+template <class C, class Traits, class Alloc>
+typename basic_string<C, Traits, Alloc>::const_iterator basic_string<C, Traits, Alloc>::erase(const_iterator p) {
+    __replace((const C *)p - data(), 1, 0, 0, random_access_iterator_tag());
+    return p;
+}
+
+template <class C, class Traits, class Alloc>
+typename basic_string<C, Traits, Alloc>::const_iterator basic_string<C, Traits, Alloc>::insert(const_iterator p, C c) {
+    size_type pos = (const C *)p - data();
+    __replace(pos, 0, &c, &c + 1, random_access_iterator_tag());
+    return data() + pos;
 }
 
 // The out-of-line members a file instantiates itself (defined only where MSL_STRING_DEFINITIONS is, so other

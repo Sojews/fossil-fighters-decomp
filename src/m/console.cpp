@@ -151,3 +151,15 @@ void MConsole::Print(const std::wstring &text) {
 template class std::__vec_deleter<MOamCanvas<MOam, MOamUnit>::Piece, std::allocator<MOamCanvas<MOam, MOamUnit>::Piece> >;
 template class std::__vec_deleter<MOamCanvas<MSmartOam, MSmartOamUnit>::Piece,
                                   std::allocator<MOamCanvas<MSmartOam, MSmartOamUnit>::Piece> >;
+
+// The next character to type, taken off the text (for the filters).
+wchar_t MConsole::PopChar() {
+    wchar_t c = *mText.begin();
+    mText.erase(mText.begin());
+    return c;
+}
+
+// Puts a character back in front of the text.
+void MConsole::PushChar(int c) {
+    mText.insert(mText.begin(), c);
+}

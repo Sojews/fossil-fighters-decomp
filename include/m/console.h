@@ -34,6 +34,8 @@ public:
     void SetFilter(MConsoleFilter *filter);
     void Print(const std::string &text);
     void Print(const std::wstring &text);
+    wchar_t PopChar();
+    void PushChar(int c);
 
     MCanvas *mCanvas;           // 0x18
     MFont *mFont;               // 0x1C

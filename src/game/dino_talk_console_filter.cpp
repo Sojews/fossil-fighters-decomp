@@ -101,3 +101,6 @@ void DinoTalkWindow::Skip() {
 BOOL DinoTalkWindow::IsAnimating() {
     return !mAnims->IsEmpty();
 }
+
+// A string member the game emits in this file (made explicitly until the filter code using it is decompiled).
+template std::wstring::const_iterator std::wstring::erase(std::wstring::const_iterator p);
