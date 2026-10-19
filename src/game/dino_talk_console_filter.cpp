@@ -9,6 +9,8 @@
 #include "m/console.h"
 #include "game/dino_resource.h"
 #include "game/dino_sound.h"
+#include "m/seed_generator.h"
+#include "m/view.h"
 
 // The text settings in the resource table.
 struct DinoTalkSettings {
@@ -110,6 +112,42 @@ void DinoTalkWindow::Skip() {
         mConsole->Run();
         mAnims->Clear();
     }
+}
+
+// The TU's pooled data.
+extern "C" struct {
+    u8 unk00[0x38];
+    MPoint mFlipOffset;     // 0x38: the name panel's, on the other side
+} data_020b62f0;
+
+// NONMATCHING: register allocation (the game keeps the flip offset in registers and spills the shake).
+void DinoTalkWindow::StateShow() {
+    if (mUnkF4 && IsPageDone() && !mUnkB0) {
+        mNextMark->Show();
+    } else {
+        mNextMark->Hide();
+    }
+    if (mUnkAC == 0) {
+        return;
+    }
+    mUnkAC--;
+    u32 n = mUnkAC;
+    int y = gDinoResource->GetRandom()->Next(n * 2 + 1) - n;
+    int x = gDinoResource->GetRandom()->Next(n * 2 + 1) - mUnkAC;
+    DinoTalkWindowNamePanel *panel = mNamePanel;
+    if (panel != NULL) {
+        panel->mShake = MPoint(x, y);
+        MPoint flip(0, 0);
+        if (panel->mFlip) {
+            flip = data_020b62f0.mFlipOffset;
+        }
+        panel->mPanel->SetPosition(
+            MPoint(panel->mPos.x + panel->mShake.x + flip.x, panel->mPos.y + panel->mShake.y + flip.y));
+        panel->mName->SetPosition(MPoint(panel->mPos.x + panel->mShake.x + panel->mNameOffset.x + flip.x,
+                                         panel->mPos.y + panel->mShake.y + panel->mNameOffset.y + flip.y));
+    }
+    mFrame->SetPosition(MPoint(mPos.x + x, mPos.y + y));
+    mConsole->SetPosition(MPoint(mConsolePos.x + x, mConsolePos.y + y));
 }
 
 BOOL DinoTalkWindow::IsAnimating() {
