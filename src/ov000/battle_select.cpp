@@ -5,6 +5,8 @@
 #pragma auto_inline on
 
 #include "game/battle_select.h"
+#include "m/input.h"
+#include "m/lcd.h"
 #include "nitro/os.h"
 #include "m/font.h"
 #include "game/dino_resource.h"
@@ -48,6 +50,24 @@ DebugAutoBattle::~DebugAutoBattle() {
 
 void DebugAutoBattle::Idle() {
     Exit();
+}
+
+// NONMATCHING: 99.9%, the canvas size and the position temporaries swap stack slots.
+BattleSelect::BattleSelect(u32 unk74) : MProcess(NULL) {
+    MPoint size;
+    mUnk74 = unk74;
+    mUnk78 = 0;
+    MSingleInputHub *hub = new MSingleInputHub(1);
+    mInput = hub->GetInput(0);
+    mInput->SetRepeat(0xF30, 20, 5);
+    mParallel.AddTail(hub);
+    mIndicator = new MIndicator(new MObjCanvas(gLcd->GetBottomDisplay(), MPoint(0x54, 0xC), gDinoResource->GetUnkTable(),
+                                               TRUE),
+                                gDinoResource->CreateFont12(0, 10, 1), 0);
+    size = mIndicator->GetSize();
+    mIndicator->SetPosition(MPoint((256 - size.x) / 2, (192 - size.y) / 2));
+    mIndicator->Show();
+    mParallel.AddTail(mIndicator);
 }
 
 BattleSelect::~BattleSelect() {

@@ -23,10 +23,19 @@ public:
     std::vector<u32> mUnk78;    // 0x78
 };
 
+class MInput;
+class MIndicator;
+
 class BattleSelect : public MProcess {
 public:
+    BattleSelect(u32 unk74);
     virtual ~BattleSelect();
     virtual void Idle();
+
+    u32 mUnk74;                 // 0x74
+    u32 mUnk78;                 // 0x78
+    MInput *mInput;             // 0x7C
+    MIndicator *mIndicator;     // 0x80
 };
 
 class UseCreatureSelect : public MProcess {
