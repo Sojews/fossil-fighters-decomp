@@ -3,6 +3,7 @@
 
 #include "game/dino_field.h"
 #include "m/font.h"
+#include "game/dino_common_font.h"
 #include "m/file.h"
 #include "m/lcd.h"
 #include "m/bg_new_task.h"
@@ -247,6 +248,20 @@ void DinoEventLoop::FinishCommands() {
         mField->GetCamera()->SetTracking(TRUE);
     }
     mUnkBD = FALSE;
+}
+
+// Loads the talk message's file (in the background, before a talk) and, the first time, the talk window's font and
+// picture.
+void DinoEventLoop::Talk(u32 id) {
+    if (id != 0) {
+        mMessages = gDinoResource->LoadMessage(gDinoResource->GetTalkMessageMatch(id));
+    }
+    if (!mHasPicture) {
+        mHasPicture = TRUE;
+        mFont = new DinoCommonFont(0, 0, 0);
+        mFont->AddRef();
+        mPicture = MPictureFile(std::string("/image/talk_base"), 7);
+    }
 }
 
 // The text of the talk message, or "".
