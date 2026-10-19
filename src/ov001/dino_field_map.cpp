@@ -103,7 +103,26 @@ DinoFieldMapCamera *DinoFieldMap::GetCamera(int index) {
     return (DinoFieldMapCamera *) ((u8 *) data + data->mCameras) + index;
 }
 
-void *DinoFieldMap::GetEntry4C(int index) {
+// The point in fixed point.
+static inline MFx32Point ToFx32Point(MPoint p) {
+    return MFx32Point(MFx32(p.x), MFx32(p.y));
+}
+
+// NONMATCHING: stack slots only (the game's square root result is above the centre).
+int DinoFieldMap::FindCircle(MFx32Point pos) {
+    for (u32 i = 1; i < ((DinoFieldMapData *) mData.mFile.GetData())->mCircleCount; i++) {
+        DinoFieldMapData *data = (DinoFieldMapData *) mData.mFile.GetData();
+        DinoFieldMapCircle *circle =
+            (DinoFieldMapCircle *) ((u8 *) data + ((u32 *) ((u8 *) data + data->mCircles))[i]);
+        MFx32Point center = ToFx32Point(MPoint(circle->x, circle->y));
+        if ((center - pos).Length() <= MFx32(circle->radius)) {
+            return i;
+        }
+    }
+    return 0;
+}
+
+DinoFieldMapCircle *DinoFieldMap::GetCircle(int index) {
     DinoFieldMapData *data = (DinoFieldMapData *) mData.mFile.GetData();
-    return (u8 *) data + ((u32 *) ((u8 *) data + data->mEntries4C))[index];
+    return (DinoFieldMapCircle *) ((u8 *) data + ((u32 *) ((u8 *) data + data->mCircles))[index]);
 }

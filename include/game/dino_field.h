@@ -290,8 +290,8 @@ struct DinoFieldMapData {
     u32 mAreas;         // 0x3C: offset of the areas (0x14 bytes each)
     u32 mCameraCount;   // 0x40: of the camera settings
     u32 mCameras;       // 0x44: offset of the camera settings (DinoFieldMapCamera)
-    u32 unk48;
-    u32 mEntries4C;     // 0x4C: offset of a table of offsets
+    u32 mCircleCount;   // 0x48: of the circles
+    u32 mCircles;       // 0x4C: offset of a table of the circles' offsets (DinoFieldMapCircle)
 };
 
 // A camera setting of the map: a rotation and a scale.
@@ -301,6 +301,15 @@ struct DinoFieldMapCamera {
     u16 z;
     u8 unk06[2];
     MFx32 scale;    // 0x08
+};
+
+// A circle of the map.
+struct DinoFieldMapCircle {
+    u32 unk00;
+    int x;          // 0x04
+    int y;          // 0x08
+    u32 unk0C;
+    int radius;     // 0x10
 };
 
 // The map's area grid: an area index per 2x2 cell.
@@ -339,7 +348,9 @@ public:
     DinoFieldMapCamera *GetCamera(int index);
     // The area at the position (the first one off the grid).
     void *GetArea(MFx32Point pos);
-    void *GetEntry4C(int index);
+    DinoFieldMapCircle *GetCircle(int index);
+    // The first circle (from 1) around the position, or 0.
+    int FindCircle(MFx32Point pos);
     // The camera setting at the position (the nearest cell's, off the grid; 0 if the map has just one).
     int GetCameraIndex(MFx32Point pos);
 
