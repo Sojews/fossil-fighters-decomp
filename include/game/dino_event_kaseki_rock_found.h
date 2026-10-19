@@ -21,7 +21,7 @@ public:
     void Start();
     MTask *CreateFoundMessage();
     // The message (with the argument put into it) in a box.
-    MTask *CreateMessageBox(u32 index, const std::string &arg);
+    MTask *CreateMessageBox(u32 index, const std::string &arg = "");
     // Gives the player the rock.
     void StateGet();
     MTask *CreateYesNo(u32 message);

@@ -4,6 +4,7 @@
 #include "game/dino_event_kaseki_rock_found.h"
 #include "game/dino_field.h"
 #include "m/lcd.h"
+#include "game/dino_resource.h"
 #include "game/dino_common_window_message_box.h"
 #include "nitro/os.h"
 #include <string.h>
@@ -37,6 +38,30 @@ MTask *DinoEventKasekiRockFound::CreateMessageBox(u32 index, const std::string &
     MTask *box = new DinoCommonWindowMessageBox(MPoint(128, 96), std::string(text), 4);
     delete[] text;
     return box;
+}
+
+extern const u32 kBackupEntryUnk2Text;
+// What the found message calls the rock, by its kind (from 2).
+extern "C" const u32 data_0208a348, data_0208a33c, data_0208a344, data_0208a340, data_0208a338;
+
+// Says what was dug up.
+MTask *DinoEventKasekiRockFound::CreateFoundMessage() {
+    if (mEntry.unk10_0 == 1) {
+        return CreateMessageBox(3);
+    }
+    DinoKasekiRockState rock;
+    gDinoBackup->GetKasekiRock(mEntry.id, (u32 *)&rock);
+    if (mEntry.type == 1) {
+        return CreateMessageBox(0, std::string(gDinoResource->GetText(kBackupEntryUnk2Text)));
+    }
+    if (rock.unk10) {
+        return CreateMessageBox(0, gDinoResource->GetKasekiRockName(mEntry.id));
+    }
+    if (mEntry.unk10_0 == 0) {
+        return CreateMessageBox(2);
+    }
+    u32 texts[5] = {data_0208a348, data_0208a33c, data_0208a344, data_0208a340, data_0208a338};
+    return CreateMessageBox(1, std::string(gDinoResource->GetText(texts[mEntry.unk10_0 - 2])));
 }
 
 #pragma auto_inline off
