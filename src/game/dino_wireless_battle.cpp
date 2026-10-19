@@ -6,12 +6,14 @@
 
 #include <algorithm>
 #include "game/dino_backup.h"
+#include "game/dino_resource.h"
 #include "game/dino_sound.h"
 #include "game/dino_wireless_battle.h"
 #include "game/dino_message.h"
 #include "game/dino_ui_team_select.h"
 #include "m/multi_play.h"
 #include "m/overlay.h"
+#include "m/soft_reset.h"
 #include "types.h"
 
 DinoWirelessBattle::~DinoWirelessBattle() {
@@ -26,14 +28,15 @@ extern "C" struct {
     u8 unk00[0x8];
     void (DinoWirelessBattle::*StateContinue_08)(); // 0x08
     void (DinoWirelessBattle::*StateBattleEnd_10)(); // 0x10
-    void (DinoWirelessBattle::*Unk0204a4dc_18)(); // 0x18
+    void (DinoWirelessBattle::*StateFinish_18)(); // 0x18
     u8 unk20[0x38 - 0x20];
     void (DinoWirelessBattle::*StateCloseHub_38)(); // 0x38
     void (DinoWirelessBattle::*StateWaitLevels_40)(); // 0x40
     u8 unk48[0x50 - 0x48];
     void (DinoWirelessBattle::*Unk0204a39c_50)(); // 0x50
     void (DinoWirelessBattle::*Unk02049d30_58)(); // 0x58
-    u8 unk60[0x78 - 0x60];
+    void (DinoWirelessBattle::*StateSoftReset_60)(); // 0x60
+    u8 unk68[0x78 - 0x68];
     void (DinoWirelessBattle::*Failed_78)(); // 0x78
 } data_020c0400;
 extern "C" struct {
@@ -175,5 +178,37 @@ void DinoWirelessBattle::StateReset() {
     MTaskSet &serial = mSerial;
     serial.AddTail(wait);
     serial.AddTail(reset);
-    mState = data_020c0400.Unk0204a4dc_18;
+    mState = data_020c0400.StateFinish_18;
+}
+
+// Keeps the level and team, and leaves the connection to the resources.
+void DinoWirelessBattle::StateFinish() {
+    DinoPlayerData player;
+    gDinoBackup->GetPlayer(&player, 0);
+    player.horiderLevel = mLevel;
+    gDinoBackup->SetPlayer(&player);
+    gDinoBackup->SetTeam(gDinoBackup->GetUnk34_26(), &mTeamData);
+    MTask *unkB4 = mUnkB4;
+    MTaskSet *parallel = &mParallel;
+    parallel->Remove(mMultiPlay);
+    parallel->Remove(unkB4);
+    gDinoResource->SetUnk90((u32)mMultiPlay, (u32)mUnkB4);
+    Exit();
+}
+
+// The connection was lost: closes it, then resets the game.
+void DinoWirelessBattle::Failed() {
+    FadeIn();
+    DinoSoundStopBgm(-1, 10);
+    MTask *timer = new MTimer(10);
+    MTask *finish = mMultiPlay->CreateFinishTask();
+    MParallelTaskSet *tasks = new MParallelTaskSet(TRUE);
+    tasks->AddTail(finish);
+    tasks->AddTail(timer);
+    mSerial.AddTail(tasks);
+    mState = data_020c0400.StateSoftReset_60;
+}
+
+void DinoWirelessBattle::StateSoftReset() {
+    MSoftReset(1);
 }

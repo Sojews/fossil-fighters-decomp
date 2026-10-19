@@ -43,10 +43,13 @@ public:
     void StateBattleEnd();
     void StateContinue();
     void StateReset();
+    void StateFinish();
+    void Failed();
+    void StateSoftReset();
 
     void (DinoWirelessBattle::*mState)(); // 0xA8
     MMultiPlay *mMultiPlay;         // 0xB0
-    u32 unkB4;
+    MTask *mUnkB4;                  // 0xB4
     MMultiPlayMessageHub *mHub;     // 0xB8
     u32 mTeam;                      // 0xBC: the team select's
     DinoWirelessBattlePlayer mPlayers[2];   // 0xC0
