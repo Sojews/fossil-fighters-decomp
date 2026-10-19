@@ -3322,6 +3322,9 @@ public:
 class DinoExchangeKasekiRockSignal : public MMessage {
 public:
     DinoExchangeKasekiRockSignal() : MMessage(0x100A8) {}
+    DinoExchangeKasekiRockSignal(DinoBackupEntry entry) : MMessage(0x100A8) {
+        *(DinoBackupEntry *)mUnk0C = entry;
+    }
     virtual u32 GetSize() { return 24; }
     virtual void Write(void *buf) {
         MI_CpuCopy8(&mId, buf, 4);
@@ -3338,6 +3341,7 @@ public:
 class DinoExchangeDoneSignal : public MMessage {
 public:
     DinoExchangeDoneSignal() : MMessage(0x100AA) {}
+    DinoExchangeDoneSignal(u32 index) : MMessage(0x100AA) { mUnk0C = index; }
     virtual u32 GetSize() { return 8; }
     virtual void Write(void *buf) {
         MI_CpuCopy8(&mId, buf, 4);

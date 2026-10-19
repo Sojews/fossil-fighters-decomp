@@ -109,7 +109,7 @@ template class std::__red_black_tree<DinoMacAddress, DinoMacAddress, std::__iden
 extern "C" struct {
     u8 unk00[0x14];
     void (DinoUiExchange::*State02156acc_14)(); // 0x14
-    u8 unk1C[0x24 - 0x1C];
+    void (DinoUiExchange::*StateExchange_1C)(); // 0x1c
     void (DinoUiExchange::*OnScanMessage_24)(MMessage *msg); // 0x24
     void (DinoUiExchange::*StateRestart_2C)(); // 0x2c
     u8 unk34[0x3C - 0x34];
@@ -117,13 +117,15 @@ extern "C" struct {
     u8 unk44[0x4C - 0x44];
     void (DinoUiExchange::*StateQuit_4C)(); // 0x4c
     void (DinoUiExchange::*StateRestart_54)(); // 0x54
-    u8 unk5C[0x7C - 0x5C];
+    u8 unk5C[0x74 - 0x5C];
+    void (DinoUiExchange::*OnScanMessage_74)(MMessage *msg); // 0x74
     void (DinoUiExchange::*StateCancelled_7C)(); // 0x7c (its second word is in the next block)
 } data_ov004_02171de0;
 extern "C" struct {
-    u8 unk00[0xC];
+    u8 unk00[0x4];
+    void (DinoUiExchange::*OnExchangeMessage_04)(MMessage *msg); // 0x04
     void (DinoUiExchange::*OnNoMessage_0C)(MMessage *msg); // 0x0c
-    u8 unk14[0x1C - 0x14];
+    void (DinoUiExchange::*StateSearch_14)(); // 0x14
     void (DinoUiExchange::*State02156718_1C)(); // 0x1c
     void (DinoUiExchange::*State02156acc_24)(); // 0x24
     void (DinoUiExchange::*StateEnd_2C)(); // 0x2c
@@ -275,6 +277,35 @@ void DinoUiExchange::OnScanMessage(MMessage *msg) {
     }
 }
 
+void DinoUiExchange::StateJoined() {
+    if (mMultiPlay->IsFailed()) {
+        mSerial.AddTail(mMultiPlay->CreateResetTask());
+        Start();
+        mOnMessage = data_ov004_02171de0.OnScanMessage_74;
+        mState = data_ov004_02171e60.StateSearch_14;
+        return;
+    }
+    mHub = new MMultiPlayMessageHub(0);
+    mHub->SetUnk279(TRUE);
+    mHub->AddObserver(this);
+    mParallel.AddTail(mHub);
+    mIsParent = FALSE;
+    MI_CpuFill8(&mRock, 0, sizeof(mRock));
+    MI_CpuFill8(&mProfile, 0, sizeof(mProfile));
+    DinoBackupEntry entry;
+    gDinoBackup->GetUnk14C(0, &entry);
+    mHub->Broadcast(new DinoExchangeKasekiRockSignal(entry));
+    DinoPlayerProfile profile;
+    gDinoBackup->MakeProfile(&profile);
+    if (profile.unk78) {
+        mHub->Broadcast(new DinoExchangeSenryuSignal(profile));
+    }
+    mHub->SendToAll(new DinoExchangeDoneSignal(mMultiPlay->GetPlayerIndex()));
+    mDone[0] = mDone[1] = FALSE;
+    mState = data_ov004_02171de0.StateExchange_1C;
+    mOnMessage = data_ov004_02171e60.OnExchangeMessage_04;
+}
+
 // Cancelled: asks whether to stop exchanging.
 void DinoUiExchange::StateCancelled() {
     mTasks->Clear();
@@ -343,12 +374,12 @@ void DinoUiExchange::StateNone() {
 void DinoUiExchange::StateExchange() {
     Dispatch();
     if (mMultiPlay->IsFailed()) {
-        mUnkBC->Exit();
+        mHub->Exit();
         mState = data_ov004_02171de0.StateRestart_2C;
         return;
     }
     if (mDone[0] && mDone[1]) {
-        AddSerial(this, new MTimer(5), MTaskExitTransfer::Create(mUnkBC), mMultiPlay->CreateResetTask());
+        AddSerial(this, new MTimer(5), MTaskExitTransfer::Create(mHub), mMultiPlay->CreateResetTask());
         mState = data_ov004_02171de0.State02156acc_14;
     }
 }

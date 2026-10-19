@@ -37,6 +37,7 @@ inline bool operator<(const DinoMacAddress &a, const DinoMacAddress &b) {
     return false;
 }
 
+class MMultiPlayMessageHub;
 class DinoUiExchange : public MProcess, public MMessageObserver {
 public:
     DinoUiExchange();
@@ -63,6 +64,8 @@ public:
     void OnExchangeMessage(MMessage *msg);
     void StateNone();
     void StateExchange();
+    // Joined: sends this side's rock, profile and done signals, then exchanges.
+    void StateJoined();
     void Unk02155f24();
     // A random fossil an exchange can give.
     void MakeExchangeEntry(DinoBackupEntry *entry);
@@ -77,7 +80,7 @@ public:
     void (DinoUiExchange::*mState)();               // 0xA8
     void (DinoUiExchange::*mOnMessage)(MMessage *msg); // 0xB0
     MMultiPlay *mMultiPlay;         // 0xB8
-    MTask *mUnkBC;                  // 0xBC
+    MMultiPlayMessageHub *mHub;     // 0xBC: the exchange's messages
     BOOL mAnswer;                   // 0xC0: whether to exchange
     MTaskSet *mTasks;               // 0xC4
     u32 unkC8;
