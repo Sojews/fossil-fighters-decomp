@@ -14,6 +14,7 @@
 #include "m/input.h"
 
 #include "game/dino_ui3_parts_kaseki_button.h"
+#include "game/dino_ui2_parts_kaseki_button.h"
 
 #include "game/dino_ui_container_base_menu_item_menu.h"
 #include "game/dino_ui_container_base_menu_item.h"
@@ -138,11 +139,14 @@ void DinoUiContainerBaseDecideButton::OnFocusChanged(BOOL focused) {
 
 // Pooled file statics: the button corners.
 struct DinoUiContainerBaseStatics {
-    u8 unk00[0x50];
+    u8 unk00[0x10];
+    MPoint mColumn;      // 0x10: from a page button to the next in its row
+    u8 unk18[0x50 - 0x18];
     MPoint mTopLeft;     // 0x50
-    u8 unk58[0x10];
+    u8 unk58[8];
+    MPoint mRow;         // 0x60: to the next row
     MPoint mDecidePos;   // 0x68
-    u8 unk70[8];
+    MPoint mFirst;       // 0x70: the page's first button
     MPoint mBottomRight; // 0x78
 };
 extern "C" DinoUiContainerBaseStatics data_ov005_0216c2e8;
@@ -262,6 +266,41 @@ void DinoUiContainerBaseMenu::HidePageButtons() {
 }
 
 // Entries that can't be marked now (and aren't) are greyed out.
+// Makes the page's buttons (blank past the last entry) and links them in a grid.
+// NONMATCHING: scheduling only (the game works out the entry's index before loading the list's size).
+void DinoUiContainerBaseMenu::RefreshPage2() {
+    for (int i = 0; i < 8; i++) {
+        DinoUi3PartsKasekiButton *button;
+        if (mUnk148.size() > i + mPage * 8) {
+            DinoBackupEntry entry;
+            GetEntry(i + mPage * 8, &entry);
+            button = new DinoUi3PartsKasekiButton(
+                mOam,
+                MPoint(data_ov005_0216c2e8.mFirst.x + data_ov005_0216c2e8.mColumn.x * (i % 4) +
+                           data_ov005_0216c2e8.mRow.x * (i / 4),
+                       data_ov005_0216c2e8.mFirst.y + data_ov005_0216c2e8.mColumn.y * (i % 4) +
+                           data_ov005_0216c2e8.mRow.y * (i / 4)),
+                (const DinoUiKasekiIcon &)mUnk148[i + mPage * 8], GetFlag(i + mPage * 8));
+            button->SetActive(IsMarkable(&entry));
+            button->SetMode(4);
+        } else {
+            button = new DinoUi3PartsKasekiButton(
+                mOam,
+                MPoint(data_ov005_0216c2e8.mFirst.x + data_ov005_0216c2e8.mColumn.x * (i % 4) +
+                           data_ov005_0216c2e8.mRow.x * (i / 4),
+                       data_ov005_0216c2e8.mFirst.y + data_ov005_0216c2e8.mColumn.y * (i % 4) +
+                           data_ov005_0216c2e8.mRow.y * (i / 4)),
+                (const DinoUiKasekiIcon &)DinoUi2GetEmptyKasekiInfo(), 0);
+            button->HideMotion();
+        }
+        mItems.push_back(button);
+        AddItem(button);
+    }
+    DinoUi2LinkKasekiGrid(this, (std::vector<MMenuItem *> &)mItems, mLinkFrom);
+    AddLink(mLinkFrom, 4, (MMenuItem *)mItems[4]);
+    RefreshMarks();
+}
+
 void DinoUiContainerBaseMenu::RefreshMarks() {
     for (int i = 0; i < mItems.size(); i++) {
         DinoBackupEntry entry;
