@@ -329,6 +329,77 @@ basic_string<C, Traits, Alloc>::~basic_string() {
     }
 }
 
+// Makes room for n characters (never fewer than it holds), moving between the in-place buffer and the heap.
+template <class C, class Traits, class Alloc>
+void basic_string<C, Traits, Alloc>::reserve(size_type n) {
+    if (n > 0x7FFFFFFE) {
+        printf("basic_string::reserve length_error");
+        abort();
+    }
+    bool wasLong = is_long();
+    size_type size;
+    size_type cap;
+    if (!wasLong) {
+        size = mShort.size;
+        cap = sizeof(mShort.buf) / sizeof(C);
+    } else {
+        cap = mLong.capacity;
+        size = mLong.size;
+    }
+    if (n < size) {
+        n = size;
+    }
+    if (n + 1 <= sizeof(mShort.buf) / sizeof(C)) {
+        n = sizeof(mShort.buf) / sizeof(C);
+    } else {
+        n = (n + 16 / sizeof(C)) & ~(16 / sizeof(C) - 1);
+    }
+    if (n == cap) {
+        return;
+    }
+    C *from;
+    unsigned long toLong;
+    C *to;
+    if (n == sizeof(mShort.buf) / sizeof(C)) {
+        to = mShort.buf;
+        toLong = 0;
+        from = mLong.data;
+    } else {
+        if (n > cap) {
+            to = (C *)::operator new(n * sizeof(C));
+            if (to == 0) {
+                printf("Memory allocation failure");
+                abort();
+            }
+        } else {
+            to = (C *)::operator new(n * sizeof(C));
+            if (to == 0) {
+                printf("Memory allocation failure");
+                abort();
+            }
+            if (to == 0) {
+                return;
+            }
+        }
+        toLong = 1;
+        from = wasLong ? mLong.data : mShort.buf;
+    }
+    size_type len = (from + size) - from;
+    memmove(to, from, len * sizeof(C));
+    to[len] = 0;
+    if (wasLong) {
+        ::operator delete(from);
+    }
+    mLong.isLong = toLong;
+    if (!toLong) {
+        mShort.size = size;
+    } else {
+        mLong.data = to;
+        mLong.size = size;
+        mLong.capacity = n;
+    }
+}
+
 template <class C, class Traits, class Alloc>
 basic_string<C, Traits, Alloc>::basic_string(const basic_string &other) {
     if (!other.is_long()) {

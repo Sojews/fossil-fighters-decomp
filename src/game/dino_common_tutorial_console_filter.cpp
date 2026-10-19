@@ -12,6 +12,7 @@
 #include "m/input.h"
 #include "m/console.h"
 
+
 DinoCommonTutorialConsoleFilter::~DinoCommonTutorialConsoleFilter() {
 }
 
@@ -131,6 +132,11 @@ template std::wstring &std::wstring::assign(const wchar_t *first, const wchar_t 
 #pragma dont_inline on
 void DinoTutorialFilterWStringAnchor(const wchar_t *text) {
     std::wstring s(text);
+}
+
+// (Likewise reserve, which an explicit instance here would name differently.)
+void DinoTutorialFilterReserveAnchor(std::wstring *s) {
+    s->reserve(0);
 }
 #pragma dont_inline reset
 
