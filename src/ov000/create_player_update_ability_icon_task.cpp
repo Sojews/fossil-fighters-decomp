@@ -5,6 +5,7 @@
 
 #include "game/dino_message.h"
 #include <algorithm>
+#include "game/dino_sound.h"
 #include "m/resource.h"
 #include "game/create_player_update_ability_icon_task.h"
 #include "m/seed_generator.h"
@@ -747,6 +748,20 @@ void DinoBattleModelPlayer::AddAbilitySequence(MTaskSet *set, u32 a, u32 b, u32 
 
 u32 DinoBattleModelPlayer::GetUnkB8() {
     return mUnkB8;
+}
+
+// The TU's pooled constants.
+extern "C" const struct {
+    int unk00;
+    int kasekiPointsMin;    // 0x04
+} data_ov000_021924bc;
+
+// Sets the kaseki points, within the bounds (a sound when they were full and more were added).
+void DinoBattleModelPlayer::SetKasekiPoints(int points) {
+    if (mUnk128 == mUnk14C && points > (int)mUnk14C) {
+        DinoSoundPlaySe(0x564, 0);
+    }
+    mUnk128 = std::max(data_ov000_021924bc.kasekiPointsMin, std::min((int)mUnk14C, points));
 }
 
 int DinoBattleModelPlayer::GetUnk128() {
