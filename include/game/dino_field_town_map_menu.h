@@ -19,6 +19,8 @@ public:
     virtual void Idle();
     virtual void CameraUnk0(u32 map);
     virtual void CameraUnk1(u32 map);
+    // Fades the town map out (to 0) or makes it and fades it in.
+    MTask *CreateModeTask(u32 radarMode, u32 to, u32 frames);
 
     DinoField *mField;      // 0x78
     DinoFieldTownMap *mTownMap;  // 0x7C: while the camera allows it

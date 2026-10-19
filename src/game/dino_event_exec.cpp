@@ -8,6 +8,8 @@
 #include "m/overlay.h"
 #include "m/soft_reset.h"
 #include "game/dino_field_battle_start_effect.h"
+#include "game/dino_field_town_map_menu.h"
+#include "game/dino_field_radar_menu.h"
 #include "game/dino_cleaning.h"
 #include "game/dino_ui_revive_status_menu.h"
 #include "m/bg.h"

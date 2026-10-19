@@ -15,6 +15,7 @@
 #include "m/lcd.h"
 #include "m/obj.h"
 #include "m/smart_oam.h"
+#include "m/bright.h"
 #include "m/call_task.h"
 #include "game/dino_backup.h"
 #include "game/dino_resource.h"
@@ -113,3 +114,26 @@ void DinoFieldRadarManager::CameraUnk0(u32 map) {
 // The radar list's vector members the game emits in this file.
 #pragma auto_inline off
 template class std::__vec_deleter<DinoFieldRadarEntry, std::allocator<DinoFieldRadarEntry> >;
+
+MTask *DinoFieldRadarManager::CreateModeTask(u32 from, u32 to, u32 frames, u8 b) {
+    if (from == 0) {
+        CameraUnk1(mField->GetMap()->GetInfo()->id);
+        if (mRadar != NULL) {
+            return GetDisplay()->mBright->CreateFadeInFromBlack(frames, 0);
+        }
+    } else if (to == 0) {
+        if (mRadar != NULL) {
+            MSerialTaskSet *tasks = new MSerialTaskSet(TRUE);
+            MTask *clear = GetDisplay()->mBright->CreateClearTransfer();
+            MTask *exit = MTaskExitTransfer::Create(mRadar);
+            tasks->AddTail(GetDisplay()->mBright->CreateFadeOutToBlack(frames, 0));
+            tasks->AddTail(exit);
+            tasks->AddTail(clear);
+            mRadar = NULL;
+            return tasks;
+        }
+    } else if (mRadar != NULL) {
+        return mRadar->CreateModeTask(to, frames, b);
+    }
+    return new MSerialTaskSet(TRUE);
+}

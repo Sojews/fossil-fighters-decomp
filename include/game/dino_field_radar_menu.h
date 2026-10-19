@@ -18,6 +18,8 @@ public:
     virtual void Idle();
     virtual void CameraUnk0(u32 map);
     virtual void CameraUnk1(u32 map);
+    // Fades the radar in (from 0), out (to 0) or switches its mode.
+    MTask *CreateModeTask(u32 from, u32 to, u32 frames, u8 b);
 
     DinoField *mField;      // 0x78
     DinoFieldRadar *mRadar;  // 0x7C: while the camera allows it

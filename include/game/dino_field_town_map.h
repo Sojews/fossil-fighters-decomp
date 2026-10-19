@@ -11,7 +11,6 @@ public:
     virtual ~DinoFieldTownMap();
     virtual void Idle();
 
-    MTask *CreateModeTask(u32 radarMode, u32 to, u32 a);
     // Puts the icon at the character's scaled position (or hides it if off).
     void Update(MFx32Point pos, MPoint offset, MFx32 scale);
 

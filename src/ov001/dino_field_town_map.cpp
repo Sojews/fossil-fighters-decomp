@@ -18,6 +18,7 @@
 #include "m/fx32.h"
 #include "game/dino_field_player_control.h"
 #include "m/lcd.h"
+#include "m/bright.h"
 #include "m/motion.h"
 
 DinoFieldTownMap::~DinoFieldTownMap() {
@@ -118,4 +119,25 @@ void DinoFieldTownMapManager::Idle() {
     } else {
         mTownMap->Update(MFx32Point(MFx32(0), MFx32(0)), mOffset, MFx32(1));
     }
+}
+
+MTask *DinoFieldTownMapManager::CreateModeTask(u32 radarMode, u32 to, u32 frames) {
+    if (to == 0) {
+        if (mTownMap != NULL) {
+            MSerialTaskSet *tasks = new MSerialTaskSet(TRUE);
+            MTask *clear = GetDisplay()->mBright->CreateClearTransfer();
+            MTask *exit = MTaskExitTransfer::Create(mTownMap);
+            tasks->AddTail(GetDisplay()->mBright->CreateFadeOutToBlack(frames, 0));
+            tasks->AddTail(exit);
+            tasks->AddTail(clear);
+            mTownMap = NULL;
+            return tasks;
+        }
+    } else {
+        CameraUnk1(mField->GetMap()->GetInfo()->id);
+        if (mTownMap != NULL) {
+            return GetDisplay()->mBright->CreateFadeInFromBlack(frames, 0);
+        }
+    }
+    return new MSerialTaskSet(TRUE);
 }

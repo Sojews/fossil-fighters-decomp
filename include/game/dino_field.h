@@ -222,12 +222,16 @@ struct DinoFieldRadarEntry {
     u32 unk4;
 };
 
+class DinoFieldRadarManager;
+class DinoFieldTownMapManager;
+
 class DinoFieldRadar : public MProcess {
 public:
     DinoFieldRadar(DinoField *field, u32 map);
     virtual ~DinoFieldRadar();
     virtual void Idle();
-    MTask *CreateModeTask(u32 from, u32 to, u32 a, u8 b);
+    // Not decompiled yet: switches the radar to the mode.
+    MTask *CreateModeTask(u32 mode, u32 frames, u8 b);
     void SetPlayer(MFx32Point pos, u16 angle, MFx32 height);
     void SetUnk5A8(u8 value);
     // Beeps and plays the marker's signal motion (unless in mode 1 or already signalling).
@@ -420,8 +424,8 @@ public:
     u32 mUnk238;                // 0x238: for characters with the model flag, the one GetChara returns
     M3DScene *mScene;           // 0x23C
     DinoFieldCamera *mCamera;   // 0x240
-    DinoFieldRadar *mRadar;     // 0x244
-    DinoFieldTownMap *mTownMap; // 0x248
+    DinoFieldRadarManager *mRadar;      // 0x244
+    DinoFieldTownMapManager *mTownMap;  // 0x248
     u32 mUnk24C[1];             // 0x24C
     MTaskSet *mHoles;           // 0x250
     MTaskSet *mRockHoles;       // 0x254
