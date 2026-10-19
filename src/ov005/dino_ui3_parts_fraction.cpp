@@ -12,6 +12,11 @@
 #include "game/dino_resource.h"
 #include <printf.h>
 #include "game/dino_sound.h"
+#include "m/indicator.h"
+#include "m/font.h"
+#include "m/oam_canvas.h"
+#include "m/obj.h"
+#include "m/display.h"
 
 // The TU's pooled constants (see menu.cpp).
 extern "C" struct {
@@ -249,3 +254,17 @@ void DinoUi3PartsFraction::Hide() {
     mNumerator->Hide();
     mDenominator->Hide();
 }
+
+#pragma opt_common_subs off
+DinoUi3PartsRockName::DinoUi3PartsRockName(MPoint pos) : MProcess(NULL) {
+    mFont = gDinoResource->CreateFont12(0, 1, 0);
+    MObjCanvas *canvas = new MObjCanvas(gCurrentDisplay, gCurrentDisplay->mObj->mOam, MPoint(256, 32),
+                                        gDinoResource->GetUnkTable(), TRUE);
+    canvas->GetOamUnit()->SetMode(1);
+    mText = new MIndicator(canvas, mFont, 0);
+    mParallel.AddTail(mText);
+    mText->SetPosition(pos);
+    mText->SetPriority(2);
+    mText->Show();
+}
+#pragma opt_common_subs reset

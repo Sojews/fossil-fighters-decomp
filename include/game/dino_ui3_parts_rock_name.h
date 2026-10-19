@@ -10,6 +10,7 @@ class MFont;
 
 class DinoUi3PartsRockName : public MProcess {
 public:
+    DinoUi3PartsRockName(MPoint pos);
     virtual ~DinoUi3PartsRockName();
     virtual void Idle();
     void SetEntry(const DinoBackupEntry *entry, BOOL selected);
