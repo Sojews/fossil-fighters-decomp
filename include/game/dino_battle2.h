@@ -14,10 +14,17 @@
 class MConsole;
 class MMotion;
 
+class MSmartOam;
+
 class DinoBattleViewFocusLCDFrame : public MProcess {
 public:
+    DinoBattleViewFocusLCDFrame(u32 unk74);
     virtual ~DinoBattleViewFocusLCDFrame();
     virtual void Idle();
+
+    u32 mUnk74;                 // 0x74
+    MSmartOam *mOam;            // 0x78: on the main screen, shifted a screen up
+    MParallelTaskSet *mTasks;   // 0x7C
 };
 
 class DBViewFocusLCDFrameTask : public MTask {

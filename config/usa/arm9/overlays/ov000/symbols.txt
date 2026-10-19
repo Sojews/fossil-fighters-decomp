@@ -1346,7 +1346,7 @@ _ZN21WaitActionInfoBarTaskC1EP27DinoBattleViewActionInfoBar kind:function(thumb,
 _ZN21WaitActionInfoBarTask7ExecuteEv kind:function(thumb,size=0x26) addr:0x0218b824
 _ZN21WaitActionInfoBarTaskD1Ev kind:function(thumb,size=0x2) addr:0x0218b84c
 _ZN21WaitActionInfoBarTaskD0Ev kind:function(thumb,size=0xc) addr:0x0218b850
-func_ov000_0218b85c kind:function(thumb,size=0xc8) addr:0x0218b85c
+_ZN27DinoBattleViewFocusLCDFrameC1Em kind:function(thumb,size=0xc8) addr:0x0218b85c
 _ZN27DinoBattleViewFocusLCDFrame4IdleEv kind:function(thumb,size=0x2) addr:0x0218b924
 func_ov000_0218b928 kind:function(thumb,size=0x2c4) addr:0x0218b928
 _ZN23DBViewFocusLCDFrameTaskC1Emh kind:function(thumb,size=0x28) addr:0x0218bbec

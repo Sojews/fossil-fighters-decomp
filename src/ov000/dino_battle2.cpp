@@ -5,10 +5,21 @@
 #pragma auto_inline on
 
 #include "game/dino_battle2.h"
+#include "m/smart_oam.h"
+#include "m/lcd.h"
 #include "types.h"
 #include "game/dino_static_init.h"
 
 extern "C" void func_ov000_0218b928(void *, u8);
+
+DinoBattleViewFocusLCDFrame::DinoBattleViewFocusLCDFrame(u32 unk74) : MProcess(NULL) {
+    mUnk74 = unk74;
+    mTasks = new MParallelTaskSet(FALSE);
+    mParallel.AddTail(mTasks);
+    mOam = new MSmartOam(gLcd->mMain, 8, 4, 1);
+    mParallel.AddTail(mOam);
+    mOam->SetOffset(MPoint(0, -192));
+}
 
 DinoBattleViewFocusLCDFrame::~DinoBattleViewFocusLCDFrame() {
 }
