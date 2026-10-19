@@ -73,6 +73,8 @@ struct DinoFieldCharaData {
     u8 unk28[0x2C - 0x28];
     u8 mUnk2C;          // 0x2C
     u8 mUnk2D;          // 0x2D
+    u8 unk2E;
+    u8 mUnk2F;          // 0x2F
     MFx32Rect mRect30;  // 0x30: the collision box, around the position
     MRect mRect40;      // 0x40
     MFx32 mUnk50;       // 0x50: -10 = the default
@@ -89,6 +91,39 @@ void DinoFieldChara::ResetState() {
     mMotion = 1;
     mUnk114 = 0;
     MI_CpuFill8(&mTask, 0, sizeof(DinoCharaTask));
+}
+
+// Forgets the models and tasks, then loads the character's data and models again (or stops, with no character).
+// NONMATCHING: the game also zeroes a dead 16-byte stack temporary (at the bottom of the frame) by the INT_MIN chain.
+void DinoFieldChara::Refresh() {
+    mMoveTasks->Clear();
+    mTaskSet->Clear();
+    mBody = NULL;
+    mUnk128 = 0;
+    mHead = NULL;
+    mManpu = NULL;
+    mEffect = NULL;
+    mHasFootSe = FALSE;
+    mMoveSe = mMoveSe2 = 0;
+    mMotionModels.clear();
+    mMotionModelsAlt.clear();
+    mModelResource = M3DModelResource();
+    *(MResource<DinoCharaData> *) &mArchive = MResource<DinoCharaData>();
+    mUnk2D8.x = 0;
+    mUnk2D8.y = 0;
+    mUnk2E0 = 0;
+    mBeholdTarget = 0;
+    mUnk130[3] = mUnk130[4] = mUnk130[5] = 0x80000000;
+    if (mModel.id != 0) {
+        Run();
+        *(MResource<DinoCharaData> *) &mArchive = gDinoResource->LoadChara(mModel.id);
+        mModel.unk05[1] = ((DinoFieldCharaData *) mFile.GetData())->mUnk2F;
+        ApplyBodyModel();
+        ApplyHeadModel();
+        ApplyMotion();
+    } else {
+        Suspend();
+    }
 }
 
 MFx32 DinoFieldChara::GetMoveSpeed() {
