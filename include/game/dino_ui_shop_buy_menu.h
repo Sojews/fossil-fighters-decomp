@@ -28,6 +28,7 @@ public:
     BOOL Buy();
     void FinishBuy();
     void LoadFossils();
+    static void Restock();
     const DinoKasekiDef *GetKasekiDef(u32 id) {
         const DinoKasekiDefs *defs = (const DinoKasekiDefs *)mFile.GetData();
         return (const DinoKasekiDef *)((const u8 *)defs + ((const u32 *)((const u8 *)defs + defs->tableOffset))[id]);

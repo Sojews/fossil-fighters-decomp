@@ -5,6 +5,7 @@
 #pragma auto_inline on
 
 #include "game/dino_common_window_yes_no_dialog.h"
+#include "m/seed_generator.h"
 #include "m/smart_oam.h"
 
 #include "game/dino_ui3_parts_rock_name.h"
@@ -28,6 +29,38 @@
 #include "m/input.h"
 
 #pragma auto_inline off
+
+// How long the shop's stock lasts, in frames.
+extern "C" const u64 data_02089ad4;
+
+// Once that long has passed, restocks the shop with random picks until it is full.
+// NONMATCHING: the entry index gets a second (strength-reduced) counter, as in DinoEventExecShopSet::Transfer.
+void DinoUiShopBuyMenu::Restock() {
+    if (gDinoBackup->GetPlayFrames() - gDinoBackup->GetUnk160() <= data_02089ad4) {
+        return;
+    }
+    MResource<DinoShopData> shop = gDinoResource->LoadShop(gDinoBackup->GetUnk144());
+    while (!gDinoBackup->IsUnk148Full()) {
+        MRandomRef random(gDinoResource->GetRandom());
+        const DinoEntrySource *chosen;
+        for (u32 i = 0; i < shop.Get()->randomCount; i++) {
+            const DinoShopData *data = shop.Get();
+            const DinoEntrySource *source = (const DinoEntrySource *)((const u8 *)data + data->randomOffset) + i;
+            BOOL unsold = TRUE;
+            for (int j = 0; j < 8; j++) {
+                DinoBackupEntry entry;
+                gDinoBackup->GetUnk148(j, &entry);
+                if (entry.id != 0 && entry.id == source->id) {
+                    unsold = FALSE;
+                }
+            }
+            if (unsold && random.Roll()) {
+                chosen = source;
+            }
+        }
+        gDinoBackup->AddUnk148(chosen);
+    }
+}
 
 DinoUiShopBuyMenuItem::DinoUiShopBuyMenuItem(DinoUiShopBuyMenu *owner, const std::string &path, MPoint pos, u32 textId) {
     mOwner = owner;
