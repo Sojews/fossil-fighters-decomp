@@ -6,6 +6,8 @@
 #include <string>
 #include "m/task.h"
 
+class MSingleInputHub;
+
 class DinoCommonWindowMessageBox : public MProcess {
 public:
     DinoCommonWindowMessageBox(MPoint pos, const std::string &text, int frames);
@@ -14,8 +16,8 @@ public:
     virtual ~DinoCommonWindowMessageBox();
     virtual void Idle();
 
-    u32 mUnk74;         // 0x74
-    u32 mUnk78;         // 0x78
+    MSingleInputHub *mInput;    // 0x74
+    u32 mUnk78;         // 0x78: frames until it closes by itself (0: never)
     MPoint mPos;        // 0x7C
     std::string mText;  // 0x84
     int mFrames;        // 0x90

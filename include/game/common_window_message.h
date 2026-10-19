@@ -5,6 +5,8 @@
 #include "m/task.h"
 #include "m/geometry.h"
 
+class MView;
+
 // A message window process.
 class DinoCommonWindowMessage : public MProcess {
 public:
@@ -14,8 +16,12 @@ public:
     DinoCommonWindowMessage(MDisplay *display, MPoint pos, const std::string &text, int arg3, int arg4);
     virtual ~DinoCommonWindowMessage();
     virtual void Idle();
+    // Not decompiled yet: Load makes the window (in the background), Start shows it.
+    void Load();
+    void Start();
 
-    u32 mUnk74[2];      // 0x74
+    MView *mUnk74;      // 0x74
+    MView *mUnk78;      // 0x78: shown and hidden with mUnk74 to blink
     MPoint mPos;        // 0x7C
     std::string mText;  // 0x84
     int mUnk90;         // 0x90
