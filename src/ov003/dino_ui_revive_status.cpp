@@ -96,7 +96,9 @@ extern "C" struct {
     void (DinoUiReviveEffect::*State0215da04_54)(); // 0x54
 
     void (DinoUiReviveEffect::*StateWait_5C)();     // 0x5C
-    u8 unk64[0x84 - 0x64];
+    u8 unk64[0x74 - 0x64];
+    void (DinoUiReviveStatus::*Start_74)();         // 0x74
+    u8 unk7C[0x84 - 0x7C];
     void (DinoUiReviveEffect::*State0215ee24_84)(); // 0x84
     u8 unk8C[0xCC - 0x8C];
     void (DinoUiReviveEffect::*State0215e274_CC)(); // 0xCC
@@ -106,6 +108,11 @@ extern "C" struct {
     u8 unkF4[0x104 - 0xF4];
     void (DinoUiReviveEffect::*State0215f668_104)(); // 0x104
 } data_ov003_02161d20;
+
+DinoUiReviveStatus::DinoUiReviveStatus(MDisplay *display, const DinoCreatureInfo &info, u8 flag)
+    : MProcess(display), mInfo(info), mFlag(flag) {
+    mState = data_ov003_02161d20.Start_74;
+}
 
 // Puts the picture away.
 void DinoUiReviveEffect::State0215e220() {
