@@ -12,16 +12,17 @@ class MInput;
 class MView;
 struct MPalUnit;
 
+struct DinoMessageData;
+
 // The reviving effect (lights and particles).
-// (The data's layout isn't known yet.)
-struct DinoUiReviveEffectData;
 
 class DinoUiReviveEffect : public MProcess {
 public:
-    DinoUiReviveEffect(const DinoCreatureState &creature, const DinoCreatureState &creature2, u32 *result, u32 flag);
+    DinoUiReviveEffect(const DinoCreatureState &creature, const DinoCreatureState &creature2, u32 *result, u8 flag);
     virtual ~DinoUiReviveEffect();
     virtual void Idle();
 
+    void Start();
     void State0215e030();
     void State0215e220();
     void StateScroll();
@@ -51,7 +52,7 @@ public:
     int mScrollFrame;                       // 0x11C
     u32 unk120;
     MView *mUnk124;                         // 0x124
-    MResource<DinoUiReviveEffectData> mUnk128; // 0x128
+    MResource<DinoMessageData> mMessages;   // 0x128: the cleaning messages
     int mTimer;                             // 0x138
     MInput *mInput;                         // 0x13C
     u8 mShowText;                           // 0x140: tell the player the creature's name after the effect

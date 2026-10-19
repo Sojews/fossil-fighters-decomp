@@ -100,7 +100,9 @@ extern "C" struct {
     void (DinoUiReviveStatus::*Start_74)();         // 0x74
     u8 unk7C[0x84 - 0x7C];
     void (DinoUiReviveEffect::*State0215ee24_84)(); // 0x84
-    u8 unk8C[0xCC - 0x8C];
+    u8 unk8C[0x94 - 0x8C];
+    void (DinoUiReviveEffect::*Start_94)();         // 0x94
+    u8 unk9C[0xCC - 0x9C];
     void (DinoUiReviveEffect::*State0215e274_CC)(); // 0xCC
     u8 unkD4[0xE4 - 0xD4];
     void (DinoUiReviveEffect::*State0215ec2c_E4)(); // 0xE4
@@ -108,6 +110,13 @@ extern "C" struct {
     u8 unkF4[0x104 - 0xF4];
     void (DinoUiReviveEffect::*State0215f668_104)(); // 0x104
 } data_ov003_02161d20;
+
+DinoUiReviveEffect::DinoUiReviveEffect(const DinoCreatureState &creature, const DinoCreatureState &creature2,
+                                       u32 *result, u8 flag)
+    : MProcess(NULL), mCreature(creature), mUnk94(creature), mUnkAC(creature2), mResult(result), mShowText(flag) {
+    mMessages = MResource<DinoMessageData>("/msg/msg_cleaning");
+    mState = data_ov003_02161d20.Start_94;
+}
 
 DinoUiReviveStatus::DinoUiReviveStatus(MDisplay *display, const DinoCreatureInfo &info, u8 flag)
     : MProcess(display), mInfo(info), mFlag(flag) {
@@ -149,7 +158,7 @@ void DinoUiReviveEffect::State0215ec2c() {
     serial->AddTail(exit);
     serial->AddTail(timer);
     if (mShowText) {
-        const u8 *data = (const u8 *)mUnk128.Get();
+        const u8 *data = (const u8 *)mMessages.Get();
         const u8 *entry = data + ((const u32 *)(data + ((const u32 *)data)[2]))[15];
         std::string text((const char *)entry + ((const u32 *)entry)[1]);
         text = DinoReplaceTag(text, "%s", gDinoResource->GetCreatureText08(mUnkAC.index));
