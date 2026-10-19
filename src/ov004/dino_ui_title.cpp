@@ -324,6 +324,33 @@ void DinoUiTitleMenu::OnStart() {
     }
 }
 
+// Makes the title menu and the logo picture (in the background), hidden below the screen, then slides them in.
+void DinoUiTitle::LoadLogo() {
+    mUnk8C = new MExtAffinePicture(gLcd->GetBottomDisplay(), std::string("/image/logotype"), 1, FALSE);
+    ((MExtAffinePicture *) mUnk8C)->SetPosition(0, -0xC0);
+    mMenu = new DinoUiTitleMenu(mInput, (int *) &mChoice);
+    if (mMenu->MTask::mState == MTask::STATE_RUN) {
+        mMenu->Execute();
+    }
+    ((DinoUiTitleMenu *) mMenu)->mOam->mHidden = TRUE;
+    MSmartOam *oam = ((DinoUiTitleMenu *) mMenu)->mOam;
+    if (oam->MTask::mState == MTask::STATE_RUN) {
+        oam->Execute();
+    }
+    mMenu->Deactivate();
+    mUnk8C->Show();
+    MMenu *menu = mMenu;
+    MTaskSet &parallel = mParallel;
+    parallel.AddTail(mUnk8C);
+    parallel.AddTail(menu);
+    GetSerial()->AddTail(mUnk8C->CreateShowTransfer(), ((DinoUiTitleMenu *) mMenu)->mOam->CreateShowTransfer(),
+                         (new MParallelTaskSet(TRUE))
+                             ->Add(mUnk8C->CreateCoordAnime(MPoint(0, -0xA0), MPoint(0, 0), 60, 12))
+                             ->Add(mUnk90->CreateCoordAnime(MPoint(0, 0x10), MPoint(0, 0xC0), 60, 12))
+                             ->Add(((DinoUiTitleMenu *) mMenu)->mOam->CreateOffsetAnime(MPoint(0, -0x60), MPoint(0, 0),
+                                                                                        60, 12)));
+}
+
 void DinoUiTitle::StateOpening() {
     mSerial.AddTail(new DinoUiOpening(mInput));
     mState = data_ov004_02172f78.Unk0215e03c_AC;

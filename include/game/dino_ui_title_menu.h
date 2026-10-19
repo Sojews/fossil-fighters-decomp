@@ -11,6 +11,9 @@
 
 class DinoUiTitleMenu : public MMenu, public DinoHelpBase {
 public:
+    DinoUiTitleMenu(MInput *input, int *result) : MMenu(input, 0) {
+        mResult = result;
+    }
     virtual ~DinoUiTitleMenu();
     virtual void OnStart();
     virtual void OnIdle();
