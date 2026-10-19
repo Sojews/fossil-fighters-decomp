@@ -33,6 +33,8 @@ public:
     BOOL HasUnk1EC(u8 id);
     void SetSort(u8 sort);
     void Sort(u8 sort);
+    // The medals of the mUnk1EC creatures (lit at the top level).
+    void CreateUnkF0Items();
 
     MSmartOam *mOam;                    // 0xB4: the items' sprites
     u32 mUnkB8;                         // 0xB8

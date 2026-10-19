@@ -9,7 +9,10 @@
 #include "m/bright.h"
 #include "m/obj.h"
 #include "m/lcd.h"
+#include <algorithm>
 #include "game/dino_ui_medal_menu.h"
+#include "game/dino_backup.h"
+#include "game/dino_ui_parts_reviver_medal_button.h"
 #include "game/dino_ui_field_menu_fraction.h"
 #include "m/display.h"
 #include "m/blend.h"
@@ -153,6 +156,60 @@ DinoUiMedalMenu::DinoUiMedalMenu(u32 *mode, u32 *index, u8 *unk)
     : MMenu(gLcd->mMain, NULL, 0), mUnkBC(0), mResult((int *)mode), mIndex(index), mUnk198(unk), mPage(0), mLastPage(0),
       mSort(*unk), mUnk204(0), mUnk21C(0xFF), mUnk21D(0) {
     mMotions.clear();
+}
+
+// Where the mUnk1EC creatures' medals go.
+extern "C" const MPoint data_ov006_021942f4[5];
+extern const u32 kCreatureLevelLimits[2];
+
+// A creature's experience, up to what the top level needs.
+static inline u32 GetCreatureTotal(const DinoCreatureState &creature) {
+    if (creature.parts[0].level == 0) {
+        return 0;
+    }
+    u32 max, sum;
+    sum = creature.unk0_8 + (creature.parts[0].level + creature.parts[1].level + creature.parts[2].level +
+                                 creature.parts[3].level);
+    max = kCreatureLevelLimits[0] * 11 + 50;
+    return std::min(max, sum);
+}
+
+static inline u32 GetCreatureLevel(const DinoCreatureState &creature) {
+    if (creature.parts[0].level == 0) {
+        return 0;
+    }
+    return (GetCreatureTotal(creature) - 50) / kCreatureLevelLimits[0] + 1;
+}
+
+void DinoUiMedalMenu::CreateUnkF0Items() {
+    for (int i = 0; i < 5; i++) {
+        DinoCreatureState creature;
+        gDinoBackup->GetCreature(mUnk1EC[i], &creature);
+        u8 maxed;
+        if (GetCreatureLevel(creature) == 12) {
+            maxed = TRUE;
+        } else {
+            maxed = FALSE;
+        }
+        mUnkF0[i] = new DinoUiPartsReviverMedalButton(mOam, data_ov006_021942f4[i], mUnk1EC[i], maxed, 0);
+        AddItem(mUnkF0[i]);
+    }
+}
+
+// Loads the motions of the page's slots.
+void DinoUiMedalMenu::LoadPage() {
+    int count;
+    if (mPage == mLastPage) {
+        count = mUnk19C.size() - mPage * 15;
+    } else {
+        count = 15;
+    }
+    mMotions.clear();
+    for (int i = 0; i < count; i++) {
+        char path[0x100];
+        OS_SPrintf(path, "/motion/ui_reviver_medal/reviver_%03d.bin", (u32)mUnk19C[mPage * 15 + i]);
+        mMotions.push_back(MMotionFile(std::string(path), 7));
+    }
 }
 
 void DinoUiMedalMenu::OnDecide(MMenuItem *item) {
