@@ -6,6 +6,7 @@
 #include "game/dino_common_font.h"
 #include "m/file.h"
 #include "m/lcd.h"
+#include "m/bg.h"
 #include "m/bg_new_task.h"
 #include "m/overlay.h"
 #include "game/dino_event_save_option.h"
@@ -184,6 +185,20 @@ DinoEventLoop::DinoEventLoop(u32 *result)
       mHasPicture(FALSE) {
     mScreen = NULL;
     mState = data_020bd9d0.Start_50;
+}
+
+DinoEventLoop::~DinoEventLoop() {
+    if (mScreen != NULL) {
+        gLcd->mSub->mBg->DeleteDirectBitmap((MDirectBitmap *) mScreen);
+    }
+    if (mHasPicture) {
+        mHasPicture = FALSE;
+        mFont->Release();
+        mPicture = MPictureFile();
+    }
+    delete mRequest;
+    delete mControlResult;
+    delete[] mEpisodes;
 }
 
 void DinoEventLoop::Start() {
