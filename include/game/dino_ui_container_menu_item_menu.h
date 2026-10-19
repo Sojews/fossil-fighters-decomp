@@ -37,6 +37,8 @@ public:
     void ClearItems();
     void RefreshPage2();
     void RefreshOKButton();
+    // Throws the chosen entry away, if the player said yes.
+    void FinishDiscard();
 
     MSmartOam *mOam;            // 0xB4: the items' sprites
     u32 mUnkB8;                 // 0xB8
@@ -44,7 +46,8 @@ public:
     MMenuItem *mTabItems[3];    // 0xC0
     u32 mUnkCC;                 // 0xCC
     std::vector<void *> mItems; // 0xD0: this page's items
-    u32 mUnkDC[2];              // 0xDC
+    DinoUiContainerMenuItem *mPageL;    // 0xDC
+    DinoUiContainerMenuItem *mPageR;    // 0xE0
     DinoUiFieldMenuFraction *mFraction; // 0xE4: "page n/m"
     int *mResult;               // 0xE8
     DinoTeam *mOldTeam;         // 0xEC: the team when the menu opened
@@ -54,8 +57,8 @@ public:
     DinoUiPartsRockName *mPanel;    // 0xFC: shows the focused container
     std::vector<s32> mUnk100;   // 0x100
     MResource<void> mUnk10C;    // 0x10C
-    u32 mUnk11C;                // 0x11C
-    u32 mUnk120;                // 0x120
+    u32 mUnk11C;                // 0x11C: the chosen entry
+    u32 mUnk120;                // 0x120: the yes/no window's answer
     int mPage;                  // 0x124
     int mLastPage;              // 0x128
     u8 unk12C[0x130 - 0x12C];

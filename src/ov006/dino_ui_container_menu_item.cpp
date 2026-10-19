@@ -143,6 +143,34 @@ BOOL DinoUiContainerMenu::PageLeft() {
     return TRUE;
 }
 
+extern "C" void func_ov006_021759b8(DinoUiContainerMenu *menu);
+
+void DinoUiContainerMenu::FinishDiscard() {
+    if (mUnk120 == 1) {
+        if (mLastPage > 0) {
+            if (mPage >= 2 && mPage * 8 + 1 == gDinoBackup->FindFreeUnk98()) {
+                mPage--;
+                mFraction->SetNumerator(mPage + 1);
+            } else if (gDinoBackup->FindFreeUnk98() == 9) {
+                mPageL->MMenuItem::Disable();
+                mPageL->mMotion->Hide();
+                mPageR->MMenuItem::Disable();
+                mPageR->mMotion->Hide();
+                mPage = 0;
+                mFraction->SetNumerator(mPage + 1);
+            }
+        }
+        DinoBackupEntry entry;
+        MI_CpuFill8(&entry, 0, sizeof(entry));
+        gDinoBackup->SetUnk98(mUnk11C, &entry);
+        gDinoBackup->CompactUnk98();
+        func_ov006_021759b8(this);
+        ClearItems();
+        RefreshPage2();
+        FocusNearestItem(mCursor->GetPosition());
+    }
+}
+
 void DinoUiContainerMenu::ClearItems() {
     for (int i = 0; i < mItems.size(); i++) {
         RemoveItem((MMenuItem *)mItems[i]);
@@ -310,6 +338,7 @@ DinoUiContainerMenuItem::DinoUiContainerMenuItem(DinoUiContainerMenu *owner, con
 }
 
 // The OK button is usable once the team has a first member.
+
 void DinoUiContainerMenu::RefreshOKButton() {
     if (mOldTeam->slots[0]) {
         mOKButton->mMotion->GetUnit()->SetMode(1);
