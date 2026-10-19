@@ -120,3 +120,6 @@ void ViewStatusEffectIconShowTask::Execute() {
     }
     Exit();
 }
+
+#pragma auto_inline off
+template void std::__vec_deleter<StatusEffectEntry, std::allocator<StatusEffectEntry> >::sub_push_back(const StatusEffectEntry &x, Metrowerks::int2type<true>);

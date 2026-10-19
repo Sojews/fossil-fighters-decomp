@@ -11,6 +11,7 @@
 #include "m/console.h"
 #include "m/display.h"
 #include "m/input.h"
+#include "game/view_status_effect_icon.h"
 
 DinoBattleDebugLog::~DinoBattleDebugLog() {
 }
@@ -34,3 +35,8 @@ DinoBattleDebugLog::DinoBattleDebugLog(MDisplay *display) : MProcess(display) {
         gCurrentDisplay = saved;
     }
 }
+
+#pragma auto_inline off
+// The status effect icon's vector members the game emits in this file.
+template size_t std::__vec_deleter<StatusEffectEntry, std::allocator<StatusEffectEntry> >::grow_by(size_t n);
+template void std::__vec_deleter<StatusEffectEntry, std::allocator<StatusEffectEntry> >::append_realloc(size_t n, const StatusEffectEntry &x);
