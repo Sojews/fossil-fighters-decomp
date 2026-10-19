@@ -17,11 +17,13 @@ public:
 #endif
     // Makes the UI this event shows.
     virtual MTask *CreateUi() = 0;
+    // Fades the field out and closes it, loads the UI's overlays, runs the UI, then brings the field back.
+    virtual void Idle();
 
     DinoEventLoop *mEvent;  // 0x74
-    u32 mArg;               // 0x78
-    MTask *mUi;             // 0x7C
-    u8 mFlag;               // 0x80
+    u32 mArg;               // 0x78: which overlays the UI needs
+    u32 mStep;              // 0x7C
+    u8 mFlag;               // 0x80: fade the other way
 };
 
 #endif

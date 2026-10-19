@@ -365,9 +365,10 @@ template MTask *MCreateBgCallTask(DinoEventCaptureFadeUiTask *obj, void (DinoEve
 DinoEventUiTask::DinoEventUiTask(DinoEventLoop *event, u32 arg, u8 flag) : MProcess(NULL) {
     mEvent = event;
     mArg = arg;
-    mUi = NULL;
+    mStep = 0;
     mFlag = flag;
 }
+
 
 DinoEventCaptureFadeUiTask::DinoEventCaptureFadeUiTask(DinoEventLoop *event, u32 arg) : MProcess(NULL) {
     mEvent = event;
@@ -377,6 +378,67 @@ DinoEventCaptureFadeUiTask::DinoEventCaptureFadeUiTask(DinoEventLoop *event, u32
 
 M_EXTERN_OVERLAY(ov004);
 M_EXTERN_OVERLAY(ov006);
+
+void DinoEventUiTask::Idle() {
+    switch (mStep++) {
+    case 0:
+        mEvent->Fade(mFlag ? 1 : 3, 30);
+        mSerial.AddTail(mEvent->CreateFadeWaitTask());
+        break;
+    case 1:
+        mEvent->CloseField(FALSE);
+        break;
+    case 2:
+        switch (mArg) {
+        case 1:
+            MLoadOverlay(0, M_OVERLAY_ID(ov003));
+            break;
+        case 2:
+            MLoadOverlay(0, M_OVERLAY_ID(ov004));
+            break;
+        case 3:
+            MLoadOverlay(0, M_OVERLAY_ID(ov005));
+            break;
+        case 4:
+            MLoadOverlay(0, M_OVERLAY_ID(ov003));
+            MLoadOverlay(0, M_OVERLAY_ID(ov006));
+            break;
+        case 5:
+            MLoadOverlay(0, M_OVERLAY_ID(ov003));
+            MLoadOverlay(0, M_OVERLAY_ID(ov007));
+            break;
+        }
+        mSerial.AddTail(CreateUi());
+        break;
+    case 3:
+        switch (mArg) {
+        case 1:
+            MUnloadOverlay(0, M_OVERLAY_ID(ov003));
+            break;
+        case 2:
+            MUnloadOverlay(0, M_OVERLAY_ID(ov004));
+            break;
+        case 3:
+            MUnloadOverlay(0, M_OVERLAY_ID(ov005));
+            break;
+        case 4:
+            MUnloadOverlay(0, M_OVERLAY_ID(ov003));
+            MUnloadOverlay(0, M_OVERLAY_ID(ov006));
+            break;
+        case 5:
+            MUnloadOverlay(0, M_OVERLAY_ID(ov003));
+            MUnloadOverlay(0, M_OVERLAY_ID(ov007));
+            break;
+        }
+        mEvent->OpenField(FALSE);
+        mEvent->Fade(mFlag ? 0 : 2, 30);
+        mSerial.AddTail(mEvent->CreateFadeWaitTask());
+        break;
+    case 4:
+        Exit();
+        break;
+    }
+}
 
 void DinoEventCaptureFadeUiTask::LoadUi() {
     mEvent->CloseField(FALSE);
