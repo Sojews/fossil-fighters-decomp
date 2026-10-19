@@ -13,6 +13,7 @@
 
 class DinoUiCanonPutinMenu : public DinoUiContainerBaseMenu {
 public:
+    DinoUiCanonPutinMenu();
     virtual ~DinoUiCanonPutinMenu();
     virtual BOOL TryDecide();
     virtual void Setup();
@@ -20,6 +21,8 @@ public:
     virtual BOOL CanMark();
     virtual BOOL IsMarkable(DinoBackupEntry *entry);
     virtual MTask *CreateUnk2C();
+
+    u32 mUnk158;    // 0x158
 };
 
 class DinoUiCanonTakeoutMenu : public DinoUiContainerBaseMenu {

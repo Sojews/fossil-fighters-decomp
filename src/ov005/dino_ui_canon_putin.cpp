@@ -55,6 +55,26 @@ DinoUiCanonTakeout::DinoUiCanonTakeout() : MProcess(NULL) {
 
 #pragma auto_inline off
 
+// "Put which ... in?" (a text id).
+extern "C" const u32 data_0208a574;
+
+DinoUiCanonPutinMenu::DinoUiCanonPutinMenu() {
+    mUnk101 = 0x40;
+    mUnk104 = data_0208a574;
+}
+
+DinoUiCanonPutin::DinoUiCanonPutin() : MProcess(NULL) {
+    gLcd->mMain->ResetHooks();
+    gLcd->mMain->Setup(5, 3, 4, 1, 0, 0);
+    gLcd->mMain->SetBackdrop(0x8000);
+    gLcd->mMain->mObj->Show();
+    gLcd->SetBottomDisplay(gLcd->mMain);
+    gCurrentDisplay = gLcd->GetBottomDisplay();
+    gLcd->VSyncNow();
+    mSerial.AddTail(new DinoUiCanonPutinMenu());
+    mSerial.AddTail(MTaskExitTransfer::Create(this));
+}
+
 extern const u32 data_0208a98c; // text shown when nothing can be taken out
 extern const u32 data_0208a990; // text shown when nothing can be put in
 
