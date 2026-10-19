@@ -35,16 +35,21 @@ public:
     void Sort(u8 sort);
 
     MSmartOam *mOam;                    // 0xB4: the items' sprites
-    u32 mUnkB8[13];                     // 0xB8
+    u32 mUnkB8;                         // 0xB8
+    u32 mUnkBC;                         // 0xBC
+    u32 mUnkC0;                         // 0xC0
+    MMenuItem *mSortButtons[5];         // 0xC4
+    u32 mUnkD8[5];                      // 0xD8
     MTextPicture *mSortCursor;          // 0xEC
-    u32 mUnkF0[5];                      // 0xF0
+    MMenuItem *mUnkF0[5];               // 0xF0: one per mUnk1EC entry
     MMenuItem *mSlots[15];              // 0x104
     u32 mUnk140[15];                    // 0x140
     u32 mSlotCount;                     // 0x17C
     u32 mUnk180[3];                     // 0x180
     DinoUiFieldMenuFraction *mFraction; // 0x18C: "page n/m"
     int *mResult;                       // 0x190
-    u32 mUnk194[2];
+    u32 *mIndex;                        // 0x194
+    u8 *mUnk198;                        // 0x198
     std::vector<void *> mUnk19C;        // 0x19C
     std::vector<void *> mUnk1A8;        // 0x1A8
     std::vector<void *> mUnk1B4;        // 0x1B4
@@ -57,7 +62,9 @@ public:
     u8 unk1F1[0x13];
     u8 mUnk204;                         // 0x204
     std::vector<MMotionFile> mMotions;  // 0x208
-    u8 unk214[0x220 - 0x214];
+    u8 unk214[0x21C - 0x214];
+    u8 mUnk21C;                         // 0x21C
+    u8 mUnk21D;                         // 0x21D
     MTaskSet *mUnk220;                  // 0x220
 };
 

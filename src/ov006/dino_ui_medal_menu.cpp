@@ -149,6 +149,42 @@ void DinoUiMedalSlotCreateTask::Idle() {
 
 #pragma auto_inline off
 
+DinoUiMedalMenu::DinoUiMedalMenu(u32 *mode, u32 *index, u8 *unk)
+    : MMenu(gLcd->mMain, NULL, 0), mUnkBC(0), mResult((int *)mode), mIndex(index), mUnk198(unk), mPage(0), mLastPage(0),
+      mSort(*unk), mUnk204(0), mUnk21C(0xFF), mUnk21D(0) {
+    mMotions.clear();
+}
+
+void DinoUiMedalMenu::OnDecide(MMenuItem *item) {
+    for (int i = 0; i < 5; i++) {
+        if (item == mSortButtons[i]) {
+            SetSort(i);
+        }
+    }
+    for (int i = 0; i < 5; i++) {
+        if (item == mUnkF0[i]) {
+            if (mUnk1EC[i] && mUnk204) {
+                *mIndex = mPage * 15 + i;
+                *mUnk198 = mSort;
+                OnBackDecided(1);
+                DinoSoundPlaySe(0x98, 0);
+            }
+            return;
+        }
+    }
+    for (int i = 0; i < (int)mSlotCount; i++) {
+        if (item == mSlots[i]) {
+            if (mUnk204) {
+                *mIndex = mPage * 15 + i;
+                *mUnk198 = mSort;
+                OnBackDecided(2);
+                DinoSoundPlaySe(0x98, 0);
+            }
+            return;
+        }
+    }
+}
+
 DinoUiMedalMenuItem::DinoUiMedalMenuItem(DinoUiMedalMenu *owner, const std::string &path, MPoint pos, u32 textId) {
     mOwner = owner;
     mTextId = textId;
