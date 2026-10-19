@@ -25,6 +25,8 @@
 #include <stdio.h>
 #include "game/dino_guide_message.h"
 #include "game/dino_resource.h"
+#include "game/dino_creature_sort.h"
+#include "game/dino_backup.h"
 
 DinoUiMuseumInformationMenu::~DinoUiMuseumInformationMenu() {
 }
@@ -270,6 +272,43 @@ DinoUiMuseumMenu::~DinoUiMuseumMenu() {
     if (mPicture != NULL) {
         delete mPicture;
     }
+}
+
+// The creature lists' sorts and copies are the ones the medal menu and the revive status menu emit.
+namespace std {
+template <>
+void stable_sort(__vec_iterator<u32> first, __vec_iterator<u32> last, DinoCreatureByVoice comp);
+template <>
+void stable_sort(__vec_iterator<u32> first, __vec_iterator<u32> last, DinoCreatureByUnk88 comp);
+template <>
+template <>
+void __vec_deleter<u32, allocator<u32> >::assign(u32 *first, u32 *last, Metrowerks::int2type<true>);
+}  // namespace std
+
+// NONMATCHING: clear()'s tag byte takes another stack slot; the medal menu's identical code matches under
+// `#pragma ipa file`, which this file (likely two of the game's) can't take as a whole.
+void DinoUiMuseumMenu::LoadCreatures() {
+    mCreatures.clear();
+    for (u32 id = 1; id <= gDinoResource->GetCreatureCount() - 1; id++) {
+        DinoCreatureState creature;
+        gDinoBackup->GetCreature(id, &creature);
+        if (creature.parts[0].level != 0) {
+            u32 index = creature.index;
+            mCreatures.push_back(index);
+        }
+    }
+    DinoCreatureByVoice byVoice;
+    std::stable_sort(mCreatures.begin(), mCreatures.end(), byVoice);
+    mByVoice = mCreatures;
+    mByUnk88 = mCreatures;
+    DinoCreatureByUnk88 byUnk88;
+    std::stable_sort(mByUnk88.begin(), mByUnk88.end(), byUnk88);
+    if (mCreatures.size() == 0) {
+        mPageCount = 0;
+    } else {
+        mPageCount = (mCreatures.size() - 1) / 15;
+    }
+    mFraction->SetDenominator(mPageCount + 1);
 }
 
 void DinoUiMuseumMenu::ClearSlots() {

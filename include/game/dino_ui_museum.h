@@ -41,6 +41,8 @@ public:
     void CreateSlot(u32 index);
     void ClearSlots();
     void LoadPageMotions();
+    // Lists the creatures revived (with a head) and sorts them.
+    void LoadCreatures();
     void PageRight();
     void FinishPageRight();
     void PageLeft();
@@ -67,8 +69,8 @@ public:
     DinoUiFieldMenuFraction *mFraction; // 0x16C: "page n/m"
     u8 unk170[0x178 - 0x170];
     std::vector<u32> mCreatures;        // 0x178: one slot each
-    std::vector<MTask *> mUnk184;       // 0x184
-    std::vector<MTask *> mUnk190;       // 0x190
+    std::vector<u32> mByVoice;          // 0x184: mCreatures by their cries
+    std::vector<u32> mByUnk88;          // 0x190
     u32 mPage;                          // 0x19C
     u32 mPageCount;                     // 0x1A0: the last page
     u8 mTab;                            // 0x1A4
