@@ -18,17 +18,26 @@ class MIndicator;
 class DinoBattleViewAbilityMenuBG;
 class DinoBattleViewAbilityTextWindow;
 
+class MRasterWindow;
+
 class CameraWipe : public MProcess {
 public:
-    virtual ~CameraWipe();
-    virtual void Idle();
-
     struct Owner {
         u8 unk00[0x88];
         MScreen *mScreen;   // 0x88
-    } *mOwner;              // 0x74
-    u32 mUnk78;             // 0x78
+    };
+
+    // mode's low half is the wipe; bit 16 also windows the backgrounds.
+    CameraWipe(Owner *owner, u32 mode, u32 duration);
+    virtual ~CameraWipe();
+    virtual void Idle();
+
+    Owner *mOwner;          // 0x74
+    MRasterWindow *mWindow; // 0x78
     int mMode;              // 0x7C
+    u32 mStep;              // 0x80
+    u32 mDuration;          // 0x84
+    int mUnk88;             // 0x88
 };
 
 // Fades the 3D scene in (into the fog) or out of it.

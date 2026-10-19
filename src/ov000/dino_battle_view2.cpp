@@ -199,6 +199,23 @@ void DinoBattleViewGivingUpDialog::OnDecide(MMenuItem *item) {
     mSerial.AddTail(MTaskExitTransfer::Create(this));
 }
 
+// The tutorial's hook first; otherwise START offers to give up.
+void DinoBattleViewUiRootSelect::OnIdle() {
+    MTask *task = func_ov000_0218ec8c(mView->GetUnk12C(), -1, 0);
+    if (task != NULL) {
+        mSerial.AddTail(task);
+        return;
+    }
+    if ((GetInput()->GetPressed() & 8) && ((const u8 *)mView->GetUnk12C())[0xD] == 0) {
+        mGivingUp = FALSE;
+        MenuExitTask *exit = new MenuExitTask(this, &mGivingUp);
+        DinoBattleViewGivingUpMenu *menu = new DinoBattleViewGivingUpMenu(mObserver, &mGivingUp);
+        MSerialTaskSet *serial = GetSerial();
+        serial->AddTail(menu);
+        serial->AddTail(exit);
+    }
+}
+
 void DinoBattleViewUiRootSelect::OnFocus(MMenuItem *item) {
     DinoHelpItem *help = dynamic_cast<DinoHelpItem *>(item);
     if (help != NULL) {

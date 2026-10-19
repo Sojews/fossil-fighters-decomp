@@ -26,6 +26,8 @@ public:
     int mTimer;     // 0x78
 };
 
+class DinoBattleView;
+
 class DinoBattleViewUiRootSelect : public MMenu, public DinoHelpBase {
 public:
     virtual ~DinoBattleViewUiRootSelect();
@@ -34,9 +36,13 @@ public:
     virtual void OnFocus(MMenuItem *item);
     virtual void OnDecide(MMenuItem *item);
 
-    u8 unkB4[0x21];
+    u8 unkB4[0x20];
+    u8 mGivingUp;       // 0xD4: set by the giving-up menu
     u8 mSilentFocus;    // 0xD5
-    u8 unkD6[0x2A];
+    u8 unkD6[2];
+    DinoBattleView *mView;          // 0xD8
+    u8 unkDC[0xFC - 0xDC];
+    MMessageObserver *mObserver;    // 0xFC
     std::vector<void *> mUnk100;    // 0x100
 };
 
@@ -131,6 +137,10 @@ public:
 
 class MenuExitTask : public MTask {
 public:
+    MenuExitTask(MTask *menu, u8 *flag) {
+        mMenu = menu;
+        mFlag = flag;
+    }
     virtual ~MenuExitTask();
     virtual void Execute();
 

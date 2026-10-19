@@ -4,6 +4,7 @@
 #pragma auto_inline on
 
 #include "m/window.h"
+#include "m/raster.h"
 #include "m/lcd.h"
 #include "game/camera_wipe.h"
 #include "types.h"
@@ -11,6 +12,23 @@
 #include "game/dino_resource.h"
 
 extern u8 data_ov000_02197930;
+
+CameraWipe::CameraWipe(Owner *owner, u32 mode, u32 duration) : MProcess(NULL) {
+    mOwner = owner;
+    mMode = mode;
+    mDuration = duration;
+    mUnk88 = 0x1000;
+    mStep = 0x181000 / duration;
+    mMode = (u16)mode;
+    mWindow = new MRasterWindow(-1, gLcd->mMain, 0);
+    mWindow->SetTarget(mode & 0x10000 ? 0x3E : 0);
+    mWindow->SetObjTarget(0x3F);
+    mWindow->SetBlendEnabled(TRUE);
+    mWindow->SetObjBlendEnabled(TRUE);
+    mWindow->Clear();
+    mWindow->Show();
+    mParallel.AddTail(mWindow);
+}
 
 CameraWipe::~CameraWipe() {
     if ((u32)(mMode - 2) <= 1) {
