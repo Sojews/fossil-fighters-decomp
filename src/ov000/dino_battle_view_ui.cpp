@@ -283,6 +283,21 @@ void DinoBattleViewUiRootMenuItem::OnFocusChanged(BOOL focused) {
 }
 
 
+// Marks the focused creature and its type advantages against the other side.
+void DinoBattleViewUiAttackerMenu::OnFocus(MMenuItem *item) {
+    DinoBattleViewUiSelectAreaCommon::OnFocus(item);
+    DinoSoundPlaySe(0x5F, 0);
+    DinoBattleViewUiRootMenuItem *root = dynamic_cast<DinoBattleViewUiRootMenuItem *>(item);
+    if (root != NULL) {
+        DinoBattleViewCreature *creature = GetItemCreature(root);
+        DinoBattleViewPlayer *opponent = ((DinoBattleView *)mUnkEC)->GetUnkE4(mUnkB0)->GetOpponent();
+        creature->SetFlag144(1);
+        for (int i = 0; i < opponent->GetCreatureCount(); i++) {
+            opponent->GetCreature(i)->SetAdvantage(creature);
+        }
+    }
+}
+
 void DinoBattleViewUiAttackerMenu::OnBlur(MMenuItem *item) {
     DinoBattleViewUiRootMenuItem *root = dynamic_cast<DinoBattleViewUiRootMenuItem *>(item);
     if (root != NULL) {
