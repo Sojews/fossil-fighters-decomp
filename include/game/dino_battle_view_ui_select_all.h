@@ -10,8 +10,12 @@
 #include "game/help.h"
 #include "game/dino_field_camera_hook.h"
 
+class DinoBattleView;
+
 class DinoBattleViewUiSelectAllMenu : public MMenu, public DinoHelpBase {
 public:
+    DinoBattleViewUiSelectAllMenu(DinoBattleView *view, int player, MMessageObserver *target, const u32 *ids,
+                                  int count);
     virtual ~DinoBattleViewUiSelectAllMenu();
     virtual void OnStart();
     virtual void OnDecide(MMenuItem *item);

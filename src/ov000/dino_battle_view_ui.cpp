@@ -632,3 +632,60 @@ const char *DinoBattleHelpCreatureInfo::GetText() {
     }
     return gDinoResource->GetText(id);
 }
+
+DinoBattleViewUiSelectAllMenu::DinoBattleViewUiSelectAllMenu(DinoBattleView *view, int player,
+                                                             MMessageObserver *target, const u32 *ids, int count)
+    : MMenu(0), mView((u32)view), mPlayer(player), mTarget(target) {
+    Disable();
+    mCount = count;
+    for (int i = 0; i < mCount; i++) {
+        mIds[i] = ids[i];
+    }
+}
+
+DinoBattleViewUiAttackerMenu::DinoBattleViewUiAttackerMenu(DinoBattleView *view, int player, MMessageObserver *target,
+                                                           const u32 *ids, int count, u32 attacker, u32 arg6)
+    : DinoBattleViewUiSelectAreaCommon(view, player, target, 2, 1, 1), mUnk19C(arg6) {
+    Disable();
+    mSide = ((DinoBattleView *)mUnkEC)->GetUnkE4(mUnkB0)->GetUnkAC();
+    mUnkA8 = mSide ? 8 : 7;
+    mUnk12C = 1;
+    mCount = count;
+    for (int i = 0; i < mCount; i++) {
+        mIds[i] = ids[i];
+        DinoBattleViewCreature *creature = ((DinoBattleView *)mUnkEC)->FindCreatureByAC(mIds[i]);
+        if (attacker == creature->GetUnkAC()) {
+            mUnkAC = creature->GetUnkB4() + creature->GetUnkB0() * 4;
+        }
+    }
+    mSerial.AddTail(new MTimer(1));
+}
+
+// NONMATCHING: the game starts the second loop's offset from the flag's stack slot.
+DinoBattleViewUiDefenderMenu::DinoBattleViewUiDefenderMenu(DinoBattleView *view, int player, MMessageObserver *target,
+                                                           const u32 *ids, int count)
+    : DinoBattleViewUiSelectAreaCommon(view, player, target, 2, 1, 1) {
+    Disable();
+    mCount = count;
+    for (int i = 0; i < mCount; i++) {
+        mIds[i] = ids[i];
+    }
+    mSide = ((DinoBattleView *)mUnkEC)->FindCreatureByAC(mIds[0])->GetUnkB0();
+    mSideC0 = mSide;
+    mUnkBC = mSideC0;
+    BOOL back = FALSE;
+    int i;
+    for (i = 0; i < count; i++) {
+        if (((DinoBattleView *)mUnkEC)->FindCreatureByAC(mIds[i])->GetUnkB4() == 3) {
+            back = TRUE;
+            break;
+        }
+    }
+    if (back) {
+        mUnkA8 = mSide ? 10 : 9;
+    } else {
+        mUnkA8 = mSide ? 6 : 5;
+    }
+    mUnkAC = mSide ? 4 : 0;
+    mUnkE0 += mSide ? MPoint(-0x30, -0x20) : MPoint(0x30, -0x20);
+}

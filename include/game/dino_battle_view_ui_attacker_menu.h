@@ -13,6 +13,8 @@
 
 class DinoBattleViewUiAttackerMenu : public DinoBattleViewUiSelectAreaCommon, public DinoHelpBase {
 public:
+    DinoBattleViewUiAttackerMenu(DinoBattleView *view, int player, MMessageObserver *target, const u32 *ids, int count,
+                                 u32 attacker, u32 arg6);
     virtual ~DinoBattleViewUiAttackerMenu();
     virtual void OnStart();
     virtual void OnFocus(MMenuItem *item);
@@ -20,9 +22,10 @@ public:
     virtual void OnDecide(MMenuItem *item);
     BOOL HasId(u32 id);
 
-    u32 unk188;
+    int mSide;          // 0x188
     u32 mIds[3];        // 0x18C
     int mCount;         // 0x198
+    u32 mUnk19C;        // 0x19C
 };
 
 #endif

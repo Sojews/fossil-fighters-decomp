@@ -13,6 +13,7 @@
 
 class DinoBattleViewUiDefenderMenu : public DinoBattleViewUiSelectAreaCommon, public DinoHelpBase {
 public:
+    DinoBattleViewUiDefenderMenu(DinoBattleView *view, int player, MMessageObserver *target, const u32 *ids, int count);
     virtual ~DinoBattleViewUiDefenderMenu();
     virtual void OnStart();
     virtual void OnFocus(MMenuItem *item);
@@ -20,7 +21,7 @@ public:
     BOOL CanDefend(u32 id);
     void ResetRows();   // (animates the two chosen rows' items back)
 
-    u32 unk188;
+    int mSide;      // 0x188
     u32 mIds[3];    // 0x18C: the creatures that can defend
     int mCount;     // 0x198
 };
