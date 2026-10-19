@@ -4,6 +4,7 @@
 #include <string>
 #include "game/dino_team.h"
 #include "game/dino_resource.h"
+#include "m/resource.h"
 #include "game/dino_ui_parts_kaseki_button.h"
 #include "game/dino_ui_common.h"
 #include "m/blend.h"
@@ -124,3 +125,43 @@ MSerialTaskSet *DinoSerialAddAnchor(MSerialTaskSet *set, MTask *task) {
     return set->Add(task);
 }
 #pragma dont_inline reset
+
+// The battle KP table: entries chosen by the largest minimum not above a value.
+struct DinoBattleKPDef {
+    u32 min;    // 0x00
+    u32 unk4;
+    u32 unk8;   // 0x08
+    u32 unkC;   // 0x0C
+    u32 unk10[2];
+};
+struct DinoBattleKPDefs {
+    u32 unk0;
+    u32 count;      // 0x04
+    u32 entries;    // 0x08: offset of count DinoBattleKPDef
+};
+
+extern "C" const char data_ov003_02161d08[];   // "/etc/btl_kp_defs"
+
+// The KP values for the value (0 and 0 when no entry applies).
+void DinoGetBattleKP(u32 value, u32 *a, u32 *b) {
+    MResource<DinoBattleKPDefs> defs((std::string(data_ov003_02161d08)));
+    const DinoBattleKPDef *best = 0;
+    for (u32 i = 0; i < defs.Get()->count; i++) {
+        const DinoBattleKPDefs *data = defs.Get();
+        const DinoBattleKPDef *def = &((const DinoBattleKPDef *)((const u8 *)data + data->entries))[i];
+        if (value >= def->min) {
+            if (best == 0) {
+                best = def;
+            } else if (best->min < def->min) {
+                best = def;
+            }
+        }
+    }
+    if (best != 0) {
+        *a = best->unkC;
+        *b = best->unk8;
+    } else {
+        *a = 0;
+        *b = 0;
+    }
+}
