@@ -30,13 +30,15 @@ public:
     int mMode;          // 0xEC: 1: parent, else child
     u8 *mResult;        // 0xF0
     MRandom mRandom;    // 0xF4
-    u32 mUnkFC;         // 0xFC
+    MMenuItem *mCancel; // 0xFC
     int mWait;          // 0x100: frames before trying the other side
     u8 mFound;          // 0x104: a partner was found
 };
 
+// The "searching" text scrolling across the bottom screen.
 class DinoMultiPlayScanTelop : public MProcess {
 public:
+    DinoMultiPlayScanTelop(MSmartOam *oam);
     virtual ~DinoMultiPlayScanTelop();
     virtual void Idle();
 

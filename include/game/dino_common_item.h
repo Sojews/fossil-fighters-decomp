@@ -11,6 +11,8 @@
 
 class DinoCommonItem : public MMenuItem, public DinoHelpItem {
 public:
+    // type: the look; label: a text shown on it (0: none); helpText: its help.
+    DinoCommonItem(u32 type, MSmartOam *oam, MPoint pos, u32 unk, u32 label, u32 helpText);
     virtual ~DinoCommonItem();
     virtual MRect GetFrame();
     virtual void OnFocusChanged(BOOL focused);

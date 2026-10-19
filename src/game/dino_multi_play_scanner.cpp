@@ -1,11 +1,16 @@
 // DinoMultiPlayScanner.
-// Only the destructors are decompiled so far.
 
 // Derived destructors have their bases' destructor bodies inlined; auto-inlining the ones defined above does that.
 #pragma auto_inline on
 
 #include "game/dino_multi_play_scanner.h"
 #include "m/multi_message.h"
+#include "m/multi_play.h"
+#include "m/smart_oam.h"
+#include "m/oam_canvas.h"
+#include "m/font.h"
+#include "game/dino_resource.h"
+#include "game/dino_common_item.h"
 #include "types.h"
 
 DinoMultiPlayScanner::~DinoMultiPlayScanner() {
@@ -47,6 +52,44 @@ void DinoMultiPlayScanner::Cancel() {
     *mResult = 0;
     Reset();
     mSerial.AddTail(CreateExitTransfer());
+}
+
+extern "C" const u32 data_0208a43c; // the telop's text
+extern "C" const u32 data_0208a440; // the cancel button's
+
+inline DinoMultiPlayScanTelop::DinoMultiPlayScanTelop(MSmartOam *oam) : MProcess(NULL) {
+    const char *text = gDinoResource->GetText(data_0208a43c);
+    mFont = gDinoResource->CreateFont16(0, 10, 0);
+    mFont->AddRef();
+    MPoint step = mFont->MeasureText(std::string(text), 0, 0);
+    step.x += 16;
+    MPoint size(step.x + 256, step.y);
+    mView = new MSmartObjCanvas(oam->mDisplay, oam, size, gDinoResource->GetUnkTable(), TRUE);
+    mView->Show();
+    for (int x = 0; x < size.x; x += step.x) {
+        ((MCanvas *) mView)->DrawText(mFont, MPoint(x, 0), 0, std::string(text));
+    }
+    mFrom = MPoint(0, 64);
+    mTo = MPoint(-step.x, 64);
+    mParallel.AddTail(mView);
+}
+
+// Starts the connection on a random side, with the telop and a cancel button.
+void DinoMultiPlayScanner::OnStart() {
+    mMultiPlay->AddObserver(this);
+    mSerial.AddTail(mMultiPlay->CreateInitializeTask());
+    mMode = mRandom.Next(2);
+    Start();
+    MSmartOam *oam = new MSmartOam(0x14, 0, TRUE);
+    oam->SetUnk1C(5);
+    MTask *telop = new DinoMultiPlayScanTelop(oam);
+    MParallelTaskSet *parallel = &mParallel;
+    parallel->AddTail(telop);
+    parallel->AddTail(oam);
+    mCancel = new DinoCommonItem(0, oam, MPoint(0xE0, 0xB0), 0, data_0208a440, 0);
+    mCancel->SetNoFocus(TRUE);
+    mCancel->SetKeys(2);
+    AddItem(mCancel);
 }
 
 // Any decide cancels the scan.
