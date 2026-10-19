@@ -333,7 +333,8 @@ void DinoBattleViewUiChangeMenu::OnFocus(MMenuItem *item) {
 
 // The TU's pooled constants.
 extern "C" struct {
-    u8 unk00[0x10];
+    u8 unk00[0xC];
+    const char *markPath;   // 0x0C
     const char *arrowPath;  // 0x10
     u8 unk14[0x1C];
     MPoint unk30;           // 0x30
@@ -808,4 +809,50 @@ void DinoBattleViewUiDefenderMenu::ResetRows() {
     otherView = ((DinoBattleView *)mUnkEC)->mUnkE0->mSlotViewsC0[other];
     mUnkF8->AddTail(Together(sideView->CreateCoordAnime(sideView->GetPosition(), func_ov000_0215f22c(2, side), 8, -2),
                              otherView->CreateCoordAnime(otherView->GetPosition(), func_ov000_0215f22c(3, other), 8, -2)));
+}
+
+#pragma opt_common_subs off
+// Marks every creature that can be chosen, with a frame item over each.
+// NONMATCHING: the game hoists &mParallel into a second loop preheader, copies the offset argument before the
+// GetFrame call and keeps the frame in another temporary (stack slots differ).
+void DinoBattleViewUiSelectAllMenu::OnStart() {
+    MSmartOam *oam = new MSmartOam(3, 0, 1);
+    DinoSoundPlaySe(0x5F, 0);
+    u32 text = data_0208a358;
+    for (u32 i = 0; i < mCount; i++) {
+        DinoBattleViewCreature *creature = ((DinoBattleView *)mView)->FindCreatureByAC(mIds[i]);
+        if (((DinoBattleView *)mView)->GetUnkE4(mPlayer)->GetUnkAC() == creature->GetUnkB0()) {
+            text = data_0208a354;
+            creature->SetFlag144(4);
+        } else {
+            creature->SetFlag144(3);
+        }
+        MSmartOam *creatureOam = creature->mMotion->mOam;
+        MPoint offset(-creatureOam->mOffset.x, -creatureOam->mOffset.y);
+        MRect frame = creature->mMotion->GetFrame();
+        frame.Offset(offset);
+        mMarks[i] = new MMotion(data_ov000_02193ae4.markPath, oam, 0, 1);
+        mMarks[i]->SetPosition(frame.GetCenter());
+        mMarks[i]->Play(1, 0);
+        mMarks[i]->SetPriority(1);
+        mMarks[i]->SetAnchor(0);
+        mMarks[i]->Show();
+        mParallel.AddTail(mMarks[i]);
+        AddItem(new DinoFrameItem(frame));
+    }
+    int side;
+    if (mCount != 0) {
+        side = ((DinoBattleViewPlayer *)((DinoBattleView *)mView)->FindCreatureByAC(mIds[0])->GetUnkDC())->GetUnkAC();
+    } else {
+        side = ((DinoBattleView *)mView)->GetUnkE4(mPlayer)->GetUnkAC();
+    }
+    mParallel.AddTail(new DinoBattleHelpBase(gLcd->GetBottomDisplay(), data_ov000_02193ca0[side], text));
+    mParallel.AddTail(oam);
+    mOkItem = new DinoBattleViewCancelMenuItem();
+    AddItem(mOkItem);
+    FocusNearestItem(MPoint(0x80, 0x60));
+    if (!GetUnk12CFlag((DinoBattleView *)mView)) {
+        DinoHelpBase &help = *this;
+        mSerial.AddTail(DinoHelpBase::CreateEnableTask(&help));
+    }
 }

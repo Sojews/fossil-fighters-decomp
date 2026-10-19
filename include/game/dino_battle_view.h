@@ -107,6 +107,10 @@ public:
 
 class DinoBattleViewCancelMenuItem : public MMenuItem {
 public:
+    DinoBattleViewCancelMenuItem() {
+        SetNoFocus(TRUE);
+        SetKeys(2);
+    }
     virtual ~DinoBattleViewCancelMenuItem();
     virtual MRect GetFrame();
     virtual void OnDecide();
@@ -124,6 +128,7 @@ public:
 
 class DinoFrameItem : public MMenuItem {
 public:
+    DinoFrameItem(MRect frame) : mFrame(frame) {}
     virtual ~DinoFrameItem();
     virtual MRect GetFrame();
 

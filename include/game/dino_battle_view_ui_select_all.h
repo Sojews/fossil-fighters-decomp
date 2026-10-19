@@ -1,6 +1,7 @@
 #ifndef GAME_DINO_BATTLE_VIEW_UI_SELECT_ALL_H
 #define GAME_DINO_BATTLE_VIEW_UI_SELECT_ALL_H
 
+#include "m/motion.h"
 #include "m/menu_item.h"
 #include "m/menu.h"
 #include "m/display.h"
@@ -25,7 +26,7 @@ public:
     MMessageObserver *mTarget; // 0xBC: told the choice
     u32 mIds[3];        // 0xC0: creature ids
     int mCount;         // 0xCC
-    u32 unkD0[3];
+    MMotion *mMarks[3]; // 0xD0: over the creatures
     MMenuItem *mOkItem; // 0xDC
 };
 
