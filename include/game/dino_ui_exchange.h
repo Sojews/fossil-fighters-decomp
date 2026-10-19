@@ -61,6 +61,7 @@ public:
     void StateFinish();
     void OnScanMessage(MMessage *msg);
     void OnExchangeMessage(MMessage *msg);
+    void StateNone();
     void StateExchange();
     void Unk02155f24();
     // A random fossil an exchange can give.

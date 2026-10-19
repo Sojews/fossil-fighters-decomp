@@ -280,6 +280,10 @@ static inline void AddSerial(MProcess *process, MTask *a, MTask *b, MTask *c) {
     serial->AddTail(c);
 }
 
+// Does nothing (what the pools point at while there is nothing to do).
+void DinoUiExchange::StateNone() {
+}
+
 // Waits until both sides are done, then ends the session.
 void DinoUiExchange::StateExchange() {
     Dispatch();
