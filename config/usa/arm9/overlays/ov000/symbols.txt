@@ -17,7 +17,7 @@ _ZN23DinoBattleCpuController14HasAttackUnk14EP23DinoBattleModelCreatureh kind:fu
 _ZN23DinoBattleCpuController20HasCostlyAttackUnk14EP21DinoBattleModelPlayerP23DinoBattleModelCreatureh kind:function(thumb,size=0x4e) addr:0x02156900
 _ZN23DinoBattleCpuController15LeaderHasStatusEP21DinoBattleModelPlayerm kind:function(thumb,size=0x28) addr:0x02156950
 _ZN23DinoBattleCpuController16SupportHasStatusEP21DinoBattleModelPlayerm kind:function(thumb,size=0x4a) addr:0x02156978
-func_ov000_021569c4 kind:function(thumb,size=0xf0) addr:0x021569c4
+_ZN23DinoBattleCpuController14EstimateDamageEP23DinoBattleModelCreatureS1_m kind:function(thumb,size=0xf0) addr:0x021569c4
 func_ov000_02156ab4 kind:function(thumb,size=0x4f8) addr:0x02156ab4
 func_ov000_02156fac kind:function(thumb,size=0x68a) addr:0x02156fac
 func_ov000_02157638 kind:function(thumb,size=0x3dc) addr:0x02157638

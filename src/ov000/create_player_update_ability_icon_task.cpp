@@ -1274,7 +1274,7 @@ MResource<DinoAbilityIconData> DinoAbilityIconDataLoad(std::string path) {
 }
 #pragma dont_inline reset
 
-static MFx32 GetAffinityRatio(DinoBattleModelCreature *creature, DinoBattleModelCreature *other, u32 attack) {
+MFx32 GetAffinityRatio(DinoBattleModelCreature *creature, DinoBattleModelCreature *other, u32 attack) {
     int result = creature->CompareUnkECA0(other, attack);
     if (result == 1) {
         return gDinoResource->GetBattleAdjustDefs()->affinityRatio[0];

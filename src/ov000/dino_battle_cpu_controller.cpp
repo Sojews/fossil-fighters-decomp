@@ -130,6 +130,40 @@ BOOL DinoBattleCpuController::SupportHasStatus(DinoBattleModelPlayer *player, u3
     return FALSE;
 }
 
+// The attack and defense values the damage is figured from (by how the creatures stand).
+extern "C" MFx32 func_ov000_0216e124(DinoBattleModelCreature *attacker, DinoBattleModelCreature *target);
+extern "C" MFx32 func_ov000_0216e2d8(DinoBattleModelCreature *attacker, DinoBattleModelCreature *target);
+extern "C" MFx32 func_ov000_0216e4c0(DinoBattleModelCreature *attacker, DinoBattleModelCreature *target);
+extern "C" MFx32 func_ov000_0216e650(DinoBattleModelCreature *attacker, DinoBattleModelCreature *target);
+MFx32 GetAffinityRatio(DinoBattleModelCreature *creature, DinoBattleModelCreature *other, u32 attack);
+
+int DinoBattleCpuController::EstimateDamage(DinoBattleModelCreature *attacker, DinoBattleModelCreature *target,
+                                            u32 attack) {
+    const DinoAttackDef *def = attacker->GetAttackDef(attack);
+    if (def == NULL) {
+        return 0;
+    }
+    const u16 *cost = DinoOffsetPtr<u16>(def, def->cost);
+    MFx32 power = func_ov000_0216e124(attacker, target);
+    MFx32 guard = func_ov000_0216e2d8(attacker, target);
+    MFx32 defense = attacker->ReduceByDefense(power, guard);
+    MFx32 curveA = func_ov000_0216e4c0(attacker, target);
+    MFx32 curveB = func_ov000_0216e650(attacker, target);
+    MFx32 curve = attacker->CurveRatio(curveA, curveB);    // (unused)
+    MFx32 ratio = MFx32(1);
+    MFx32 affinity = GetAffinityRatio(attacker, target, def->unk00);
+    u8 hit = TRUE;
+    MFx32 damage = attacker->CalcDamage(target, MFx32(cost[1]), defense, &hit);
+    damage = attacker->ApplyRatio(damage, ratio);
+    damage = attacker->ApplyRatio2(damage, affinity);
+    damage = attacker->ApplyPositionRatio(damage, target->GetB8Category());
+    int value = MFx32ToInt(damage);
+    if (value < 1 && hit) {
+        return 1;
+    }
+    return value;
+}
+
 // A move the computer weighs, kept in a multimap by its (fixed-point) score (16 bytes; only its size is known). Its destructor
 // isn't trivial: the game's tree has the header's unused word (see <tree>).
 struct DinoBattleCpuCandidate {

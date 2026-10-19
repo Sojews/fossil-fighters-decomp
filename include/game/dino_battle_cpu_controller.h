@@ -45,6 +45,8 @@ public:
 
     BOOL LeaderHasStatus(DinoBattleModelPlayer *player, u32 bit);
     BOOL SupportHasStatus(DinoBattleModelPlayer *player, u32 bit);
+    // The damage the attack would do (at least 1 if it hits).
+    int EstimateDamage(DinoBattleModelCreature *attacker, DinoBattleModelCreature *target, u32 attack);
     BOOL CanUseAttack(DinoBattleModelPlayer *player, DinoBattleModelCreature *creature, u32 index);
     BOOL HasAttackUnk10(DinoBattleModelCreature *creature, u8 value);
     BOOL HasCostlyAttackUnk10(DinoBattleModelPlayer *player, DinoBattleModelCreature *creature, u8 value);
