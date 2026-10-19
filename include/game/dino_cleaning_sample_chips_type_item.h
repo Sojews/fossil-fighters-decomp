@@ -4,6 +4,8 @@
 #include "m/view.h"
 #include "m/menu_item.h"
 
+class MIndicator;
+
 class DinoCleaningSampleChipsTypeItem : public MMenuItem {
 public:
     virtual ~DinoCleaningSampleChipsTypeItem();
@@ -12,8 +14,8 @@ public:
     virtual void OnFocusChanged(BOOL focused);
     virtual void OnDecide();
 
-    u32 mUnk88;
-    MView *mView;           // 0x8C
+    u32 *mType;             // 0x88: the chosen type
+    MIndicator *mView;      // 0x8C
     MMenuItem *mKeyItemA; // 0x90
     MMenuItem *mKeyItemB; // 0x94
 };

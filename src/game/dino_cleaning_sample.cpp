@@ -6,6 +6,7 @@
 
 #include "m/bright.h"
 #include "m/display.h"
+#include "m/indicator.h"
 #include "m/lcd.h"
 #include "game/dino_backup.h"
 #include "game/dino_resource.h"
@@ -62,6 +63,38 @@ void DinoCleaningSampleKasekiTypeItem::OnDecide() {
 
 void DinoCleaningSample::Idle() {
     (this->*mState)();
+}
+
+// The type names' text ids. In the game they are function-local statics, filled in on first use (the guard words
+// are data_0214d150 and data_0214d154); they live in data this unit can't place, so the guard is written out.
+extern "C" u32 data_0214d150;
+extern "C" u32 data_0214d154;
+extern "C" u32 data_020bcd78[7];
+extern "C" u32 data_020bcc54[2];
+extern "C" const u32 data_0208a3d4, data_0208a3d8, data_0208a3dc, data_0208a3e0, data_0208a3e4, data_0208a3e8,
+    data_0208a3ec, data_0208a3f0, data_0208a3f4;
+
+void DinoCleaningSampleChipsTypeItem::Idle() {
+    if (!(data_0214d150 & 1)) {
+        data_020bcd78[0] = data_0208a3ec;
+        data_020bcd78[1] = data_0208a3e8;
+        data_020bcd78[2] = data_0208a3e4;
+        data_020bcd78[3] = data_0208a3e0;
+        data_020bcd78[4] = data_0208a3dc;
+        data_020bcd78[5] = data_0208a3d8;
+        data_020bcd78[6] = data_0208a3d4;
+        data_0214d150 |= 1;
+    }
+    mView->SetText(gDinoResource->GetText(data_020bcd78[*mType]));
+}
+
+void DinoCleaningSampleKasekiTypeItem::Idle() {
+    if (!(data_0214d154 & 1)) {
+        data_020bcc54[0] = data_0208a3f4;
+        data_020bcc54[1] = data_0208a3f0;
+        data_0214d154 |= 1;
+    }
+    mView->SetText(gDinoResource->GetText(data_020bcc54[*mType]));
 }
 
 void DinoCleaningSampleChipsTypeItem::OnFocusChanged(BOOL focused) {

@@ -7,6 +7,7 @@
 #include "game/dino_resource.h"
 #include <printf.h>
 #include "m/font.h"
+#include "m/indicator.h"
 #include "game/dino_ui_debug_kaseki_rock_get_menu_menu.h"
 #include "game/dino_ui_debug_kaseki_rock_get.h"
 #include "game/dino_ui_debug_kaseki_rock_get_menu_dec_item.h"
@@ -51,6 +52,37 @@ DinoUiDebugKasekiRockGetChipsTypeItem::~DinoUiDebugKasekiRockGetChipsTypeItem() 
 }
 
 DinoUiDebugKasekiRockGetMenuStartItem::~DinoUiDebugKasekiRockGetMenuStartItem() {
+}
+
+// The type names' text ids: function-local statics filled in on first use, as in DinoCleaningSample (see there).
+extern "C" u32 data_ov004_02177288;
+extern "C" u32 data_ov004_0217728c;
+extern "C" u32 data_ov004_02173588[2];
+extern "C" u32 data_ov004_02173658[7];
+extern "C" const u32 data_0208a3d4, data_0208a3d8, data_0208a3dc, data_0208a3e0, data_0208a3e4, data_0208a3e8,
+    data_0208a3ec, data_0208a3f0, data_0208a3f4;
+
+void DinoUiDebugKasekiRockGetChipsTypeItem::Idle() {
+    if (!(data_ov004_0217728c & 1)) {
+        data_ov004_02173658[0] = data_0208a3ec;
+        data_ov004_02173658[1] = data_0208a3e8;
+        data_ov004_02173658[2] = data_0208a3e4;
+        data_ov004_02173658[3] = data_0208a3e0;
+        data_ov004_02173658[4] = data_0208a3dc;
+        data_ov004_02173658[5] = data_0208a3d8;
+        data_ov004_02173658[6] = data_0208a3d4;
+        data_ov004_0217728c |= 1;
+    }
+    mView->SetText(gDinoResource->GetText(data_ov004_02173658[*mType]));
+}
+
+void DinoUiDebugKasekiRockGetKasekiTypeItem::Idle() {
+    if (!(data_ov004_02177288 & 1)) {
+        data_ov004_02173588[0] = data_0208a3f4;
+        data_ov004_02173588[1] = data_0208a3f0;
+        data_ov004_02177288 |= 1;
+    }
+    mView->SetText(gDinoResource->GetText(data_ov004_02173588[*mType]));
 }
 
 void DinoUiDebugKasekiRockGetChipsTypeItem::OnFocusChanged(BOOL focused) {
