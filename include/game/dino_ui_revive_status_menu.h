@@ -44,6 +44,8 @@ public:
     void OnBackDecided();
     void SetPage(u8 page);
     void SetTab(u8 tab);
+    // Fades out (to white, or black) and exits, stopping the music first if it should.
+    void Leave();
 
     u8 unkB3[1];
     MSmartOam *mOam;        // 0xB4: the items' sprites

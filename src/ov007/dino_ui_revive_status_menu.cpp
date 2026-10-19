@@ -234,6 +234,38 @@ extern "C" struct {
 } data_ov007_02191e80;
 extern "C" void func_ov007_02189170(DinoUiReviveStatusMenu *menu);
 
+extern const int data_02089a6c, data_02089a70;
+
+// NONMATCHING: the two fade constants swap registers (as DinoUiKeyboardMenu::OnBackDecided).
+void DinoUiReviveStatusMenu::Leave() {
+    if (mUnk122) {
+        mSerial.AddTail(DinoSoundCreateStopBgmAllTask(30));
+    }
+    if (mFlag) {
+        MTask *exit = CreateExitTransfer();
+        MBright *bright = gLcd->GetBottomDisplay()->mBright;
+        MTask *fadeBottom = bright->CreateFadeOutToWhite(data_02089a70, data_02089a6c);
+        MTask *fadeTop = gLcd->GetTopDisplay()->mBright->CreateFadeOutToWhite(data_02089a70, data_02089a6c);
+        MParallelTaskSet *fades = new MParallelTaskSet(TRUE);
+        fades->AddTail(fadeTop);
+        fades->AddTail(fadeBottom);
+        MSerialTaskSet *serial = &mSerial;
+        serial->AddTail(fades);
+        serial->AddTail(exit);
+    } else {
+        MTask *exit = CreateExitTransfer();
+        MBright *bright = gLcd->GetBottomDisplay()->mBright;
+        MTask *fadeBottom = bright->CreateFadeOutToBlack(data_02089a70, data_02089a6c);
+        MTask *fadeTop = gLcd->GetTopDisplay()->mBright->CreateFadeOutToBlack(data_02089a70, data_02089a6c);
+        MParallelTaskSet *fades = new MParallelTaskSet(TRUE);
+        fades->AddTail(fadeTop);
+        fades->AddTail(fadeBottom);
+        MSerialTaskSet *serial = &mSerial;
+        serial->AddTail(fades);
+        serial->AddTail(exit);
+    }
+}
+
 // Turns to the tab after a frame, and keys the tabs either side of it to L and R.
 void DinoUiReviveStatusMenu::SetTab(u8 tab) {
     if (tab > 3 || mUnk11C == tab) {
