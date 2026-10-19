@@ -12,6 +12,8 @@ class M3DModel;
 
 class M3DScene : public MTask {
 public:
+    // With its textures and palettes in a heap of the size at heap.
+    M3DScene(u32 heap, u32 heapSize);
     virtual ~M3DScene();
     virtual void Execute();
     virtual void Unk0C();

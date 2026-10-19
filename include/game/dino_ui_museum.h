@@ -4,6 +4,8 @@
 #include "game/dino_resource.h"
 #include "m/motion.h"
 #include "m/picture.h"
+#include "m/lcd.h"
+#include "m/blend.h"
 #include <vector>
 #include "m/menu_item.h"
 #include "m/menu.h"
@@ -88,12 +90,29 @@ public:
 
 class MExtAffinePicture;
 
+// The path of the light's picture.
+extern "C" const char data_ov006_02196648[];
+
 class DinoUiMuseumEffectLight : public MProcess {
 public:
+    // On the top screen, translucent, below its place.
+    DinoUiMuseumEffectLight() : MProcess(gLcd->GetTopDisplay()), mAngle(0), mTimer(0) {
+        MDisplayScope scope(GetDisplay());
+        mPicture = new MTextPicture(std::string(data_ov006_02196648), TRUE, false);
+        mPicture->SetPriority(1);
+        mPicture->SetPosition(0, -0x60);
+        mParallel.AddTail(mPicture);
+        gCurrentDisplay->mBlend->SetMode(1);
+        gCurrentDisplay->mBlend->SetAlpha(16, 16);
+        MBlend *blend = gCurrentDisplay->mBlend;
+        blend->SetTarget1(mPicture->GetPlaneMask());
+        gCurrentDisplay->mBlend->SetTarget2(0x3F);
+        mHeight = 0;
+    }
     virtual ~DinoUiMuseumEffectLight();
     virtual void Idle();
 
-    MExtAffinePicture *mPicture;    // 0x74
+    MTextPicture *mPicture;         // 0x74
     u16 mAngle;                     // 0x78: of the bobbing
     int mHeight;                    // 0x7C: risen so far
     u32 mTimer;                     // 0x80: frames left to rise

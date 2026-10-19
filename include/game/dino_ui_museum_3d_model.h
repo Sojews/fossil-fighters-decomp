@@ -14,10 +14,11 @@
 class M3DScene;
 class MAnmModelBase;
 
-class MExtAffinePicture;
+class MTextPicture;
 
 class DinoUiMuseum3DModel : public MProcess {
 public:
+    DinoUiMuseum3DModel();
     virtual ~DinoUiMuseum3DModel();
     virtual void Idle();
 
@@ -32,7 +33,7 @@ public:
     u32 mAngle;         // 0x88: of the camera around the model
     MFx32 mDistance;    // 0x8C: of the camera from the model
     MFx32 mHeight;      // 0x90: of the camera's target
-    MExtAffinePicture *mBackground; // 0x94: slid into place as the model appears
+    MTextPicture *mBackground;  // 0x94: slid into place as the model appears
     int mTimer;         // 0x98: frames since the model changed (up to 60)
 };
 
