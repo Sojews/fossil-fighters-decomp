@@ -33,7 +33,7 @@ public:
     BOOL PageLeft();
     void OnOKDecided();
     void SelectTab(int tab);
-    void Decide();
+    void Decide(int index);
     void ClearItems();
     void RefreshPage2();
     void RefreshOKButton();

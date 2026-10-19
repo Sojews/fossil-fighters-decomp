@@ -11,6 +11,7 @@
 #include "game/dino_ui_container_menu_item_menu.h"
 #include "game/dino_ui_parts_rock_name.h"
 #include "game/dino_ui_container_menu_item.h"
+#include "game/dino_common_window_menu_item_flush_task_menu.h"
 #include "m/bg_new_task.h"
 #include "m/call_task.h"
 #include "game/dino_sound.h"
@@ -122,8 +123,10 @@ void DinoUiContainerOKButton::OnDecide() {
 
 // Template task instances the game emits in this file. Until the code that makes the tasks is decompiled, they are
 // instantiated explicitly.
+#pragma auto_inline off
 template class MCallTask0<DinoUiContainerMenu, DinoUiContainerMenu>;
 template MTask *MCreateCallTask(DinoUiContainerMenu *obj, void (DinoUiContainerMenu::*func)());
+#pragma auto_inline reset
 
 BOOL DinoUiContainerMenu::PageRight() {
     mPage = (mPage + 1) % (mLastPage + 1);
@@ -178,7 +181,7 @@ void DinoUiContainerMenu::ClearItems() {
     }
 }
 
-// NONMATCHING: register allocation only.
+// NONMATCHING: register allocation only (the game keeps the item index in r1, Decide's argument register).
 void DinoUiContainerMenu::OnDecide(MMenuItem *item) {
     for (int i = 0; i < 3; i++) {
         if (item == mTabItems[i]) {
@@ -187,7 +190,7 @@ void DinoUiContainerMenu::OnDecide(MMenuItem *item) {
     }
     for (int i = 0; i < (mPage != mLastPage ? 8 : mUnk100.size() - mPage * 8); i++) {
         if (item == mItems[i]) {
-            Decide();
+            Decide(i);
             return;
         }
     }
@@ -227,6 +230,44 @@ void DinoUiContainerMenu::SelectTab(int tab) {
     }
     }
 }
+
+// Where the entry's menu goes (filled in at start), and the TU's pooled constants around it.
+extern "C" struct {
+    u8 unk00[0x68];
+    int x;      // 0x68: the first entry's
+    int y;      // 0x6C
+    u8 unk70[0x78 - 0x70];
+    int colX;   // 0x78: to the next in a row
+    int colY;   // 0x7C
+} data_ov006_021915d4;
+extern "C" struct {
+    int rowX;   // 0x00: to the next row
+    int rowY;   // 0x04
+    MPoint menuOffset;  // 0x08: of the menu from the entry
+} data_ov006_02191654;
+extern "C" struct {
+    void (DinoUiContainerMenu::*FinishDiscard_00)();
+} data_ov006_02191674;
+extern const u32 data_0208aac4, data_0208a8e0, data_0208aac0, data_0208a8dc;
+
+#pragma auto_inline off
+// Asks whether to discard the entry (index on the page).
+void DinoUiContainerMenu::Decide(int index) {
+    mCursor->Hide();
+    mUnk11C = mPage * 8 + index;
+    mUnk120 = -2;
+    DinoCommonWindowMenu *menu = new DinoCommonWindowMenu(
+        &mUnk120,
+        MPoint(data_ov006_021915d4.x + data_ov006_021915d4.colX * (index % 4) + data_ov006_02191654.rowX * (index / 4),
+               data_ov006_021915d4.y + data_ov006_021915d4.colY * (index % 4) + data_ov006_02191654.rowY * (index / 4)) +
+            data_ov006_02191654.menuOffset,
+        NULL, 0);
+    menu->AddChoice(1, gDinoResource->GetText(data_0208aac4), gDinoResource->GetText(data_0208a8e0));
+    menu->AddChoice(-2, gDinoResource->GetText(data_0208aac0), gDinoResource->GetText(data_0208a8dc));
+    GetSerial()->AddTail(menu, mCursor->CreateShowTransfer(),
+                         MCreateCallTask(this, data_ov006_02191674.FinishDiscard_00));
+}
+#pragma auto_inline reset
 
 extern const int data_02089a34;
 extern const u32 data_0208aa3c; // "the team was changed" text
