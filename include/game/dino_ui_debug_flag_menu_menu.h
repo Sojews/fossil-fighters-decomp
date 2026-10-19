@@ -4,6 +4,7 @@
 #include "m/font.h"
 #include "m/menu_item.h"
 #include "m/menu.h"
+#include "game/dino_backup.h"
 #include "m/display.h"
 #include "m/observer.h"
 #include "m/sleep.h"
@@ -13,6 +14,8 @@
 
 class MTextCanvas;
 class MSmartOam;
+
+class MCanvas;
 
 class DinoUiDebugFlagMenu : public MMenu {
 public:
@@ -40,9 +43,26 @@ public:
     virtual MRect GetFrame();
     virtual void OnDecide();
 
-    u32 mUnk88;         // 0x88
+    BOOL GetValue() {
+        if (mMode == 0) {
+            return gDinoBackup->GetFlag(mId);
+        } else {
+            return gDinoBackup->GetSystemFlag(mId);
+        }
+    }
+    void SetValue(BOOL value) {
+        if (mMode == 0) {
+            gDinoBackup->SetFlag(mId, value);
+        } else {
+            gDinoBackup->SetSystemFlag(mId, value);
+        }
+    }
+
+    MCanvas *mCanvas;   // 0x88
     MFont *mFont;       // 0x8C
     MPoint mPos;        // 0x90
+    u32 mId;            // 0x98
+    int mMode;          // 0x9C: 0 flags, else system flags
 };
 
 #endif
