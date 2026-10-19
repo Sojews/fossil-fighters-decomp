@@ -41,19 +41,45 @@ void M3d::FreePltt(u32 key) {
     mPlttHeap.Free(key, FALSE);
 }
 
-void M3d::QueueE8(const void *src, u32 size) {
+// Takes VRAM for a texture and queues its transfer there (on the given queue); returns the address.
+u32 M3d::AllocTex(const void *src, u32 size, BOOL queue) {
+    size = (size + 3) & ~3;
+    u32 addr = mTexHeap.AllocAddr(size, FALSE, 4, 0, 0, 0);
     M3dTransfer t;
+    t.src = (u32)src;
+    t.dst = addr;
     t.size = size;
+    MScopedLock lock(&gM3dMutex, TRUE);
+    mQueues[queue].push_back(t);
+    return addr;
+}
+
+// Takes palette VRAM and queues the palette's transfer there; returns the address.
+u32 M3d::AllocPltt(const void *src, u32 size) {
+    size = (size + 3) & ~3;
+    u32 addr = mPlttHeap.AllocAddr(size, FALSE, 0x20, 0, 0, 0);
+    M3dTransfer t;
+    t.src = (u32)src;
+    t.dst = addr;
+    t.size = size;
+    MScopedLock lock(&gM3dMutex, TRUE);
+    mQueueD0.push_back(t);
+    return addr;
+}
+
+void M3d::QueueE8(const void *dst, u32 src) {
+    M3dTransfer t;
     t.src = src;
+    t.dst = (u32)dst;
     MScopedLock lock(&gM3dMutex, TRUE);
     mQueueE8.push_back(t);
 }
 
-void M3d::QueueD0(const void *src, u32 size, u32 arg) {
+void M3d::QueueD0(const void *dst, u32 src, u32 size) {
     M3dTransfer t;
-    t.size = size;
     t.src = src;
-    t.arg = arg;
+    t.dst = (u32)dst;
+    t.size = size;
     MScopedLock lock(&gM3dMutex, TRUE);
     mQueueD0.push_back(t);
 }

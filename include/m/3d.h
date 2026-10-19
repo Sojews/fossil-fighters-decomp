@@ -9,9 +9,9 @@
 
 // A queued transfer to VRAM.
 struct M3dTransfer {
-    u32 size;           // 0x0
-    const void *src;    // 0x4
-    u32 arg;            // 0x8
+    u32 src;            // 0x0
+    u32 dst;            // 0x4: VRAM address
+    u32 size;           // 0x8
 };
 
 class M3DVInt;
@@ -22,10 +22,10 @@ public:
     virtual ~M3d();
     virtual void Unk0C();
     BOOL IsTransferComplete();
-    void QueueE8(const void *src, u32 size);
-    u32 AllocTex(const void *src, u32 size, BOOL arg);
+    void QueueE8(const void *dst, u32 src);
+    u32 AllocTex(const void *src, u32 size, BOOL queue);
     u32 AllocPltt(const void *src, u32 size);
-    void QueueD0(const void *src, u32 size, u32 arg);
+    void QueueD0(const void *dst, u32 src, u32 size);
     void FreeTex(u32 key);
     void FreePltt(u32 key);
     MTask *CreateWaitTransferCompleteTask();
@@ -39,7 +39,7 @@ public:
     MHeap mTexHeap;     // 0x30
     MHeap mPlttHeap;    // 0x68
     std::deque<M3dTransfer> mQueues[2]; // 0xA0: transfers still queued
-    std::deque<M3dTransfer> mQueueD0;   // 0xD0
+    std::deque<M3dTransfer> mQueueD0;   // 0xD0: palette transfers
     std::deque<M3dTransfer> mQueueE8;   // 0xE8
     M3DVInt *mVInt;                     // 0x100
 };
