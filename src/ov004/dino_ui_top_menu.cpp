@@ -284,6 +284,34 @@ template MTask *MCreateBgCallTask(DinoUiSaveSlotSelect *obj, void (DinoUiSaveSlo
 
 #pragma auto_inline off
 
+// Lights up (or not) and nudges the label (which sits a little left when focused).
+// NONMATCHING: the game reads the size through a pointer, from other stack slots.
+void DinoUiSaveSlotSelectMenuItem::OnFocusChanged(BOOL focused) {
+    if (focused) {
+        mMotion->Play(2, 0);
+        if (!mUnkA4) {
+            MPoint size = mLabel->GetSize();
+            MPoint pos;
+            pos.y = mPos.y - size.y / 2;
+            pos.x = mPos.x - size.x / 2 - 4;
+            mLabel->SetPosition(pos);
+            mMotion2->Play(2, 0);
+            mMotion3->Play(2, 0);
+        }
+    } else {
+        mMotion->Play(1, 0);
+        if (!mUnkA4) {
+            MPoint size = mLabel->GetSize();
+            MPoint pos;
+            pos.y = mPos.y - size.y / 2;
+            pos.x = mPos.x - size.x / 2 + 4;
+            mLabel->SetPosition(pos);
+            mMotion2->Play(1, 0);
+            mMotion3->Play(1, 0);
+        }
+    }
+}
+
 DinoUiTopMenuItem::DinoUiTopMenuItem(DinoUiTopMenu *owner, const std::string &path, MPoint pos, u32 textId) {
     mOwner = owner;
     mTextId = textId;
