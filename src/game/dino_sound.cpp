@@ -50,7 +50,7 @@ public:
 static void DinoSoundNothing() {
 }
 
-void DinoSoundInit() {
+void DinoSoundInit(u8 arg) {
     DinoSoundLock lock(&sMutex, TRUE);
     if (sInitialized) {
         return;

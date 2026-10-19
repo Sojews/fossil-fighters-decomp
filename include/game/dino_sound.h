@@ -6,7 +6,8 @@
 #include "m/task.h"
 #include "m/looper.h"
 
-void DinoSoundInit();
+// (The argument, from the excavate defs, is unused.)
+void DinoSoundInit(u8 arg);
 void DinoSoundPlayBgm(int bgm, int arg);
 void DinoSoundStopBgm(int bgm, int fadeFrames);
 void DinoSoundStopBgmAll(int fadeFrames);

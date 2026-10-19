@@ -118,6 +118,16 @@ extern "C" struct {
     void (DinoMainLoop::*StateDebugMenu_74)();
 } data_020c00f0;
 extern "C" void (DinoMainLoop::*data_020c016c)(); // LoadResources
+
+void DinoMainLoop::LoadResources() {
+    DinoResource::Create();
+    {
+        MResource<DinoExcavateDefs> defs = gDinoResource->GetExcavateDefs();
+        const DinoExcavateDefs *data = defs.Get();
+        DinoSoundInit(*DinoOffsetPtr<u8>(data, data->soundOffset));
+    }
+    DinoBackup::Create(mSlot, TRUE);
+}
 extern "C" MPoint data_020c003c;                   // (0, 0)
 
 // The help sample menu's text ids (its items' ids too), and which one was chosen.
