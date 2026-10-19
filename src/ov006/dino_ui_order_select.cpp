@@ -14,6 +14,8 @@
 #include "m/obj.h"
 #include "m/bg.h"
 #include "game/dino_ui_parts_reviver_medal_button.h"
+#include "game/dino_ui_parts_reviver_name.h"
+#include "game/common_window_message.h"
 #include <algorithm>
 #include "m/smart_oam.h"
 #include "game/dino_team.h"
@@ -387,6 +389,62 @@ void DinoUiOrderSelectMenu::SetPage(u8 page) {
         return;
     }
     GetSerial()->AddTail(new MTimer(1), MCreateCallTask(this, data_ov006_02197110.SetInfoPage_08, page));
+}
+
+extern "C" struct {
+    void (DinoUiOrderSelectMenu::*FinishPage_00)();
+} data_ov006_02197138;
+extern const u32 data_0208aad0;
+
+// A tab turns the page. A member picks the member to swap (asking with whom); in swap mode a member swaps places with
+// it.
+void DinoUiOrderSelectMenu::OnDecide(MMenuItem *item) {
+    int i;
+    for (i = 0; i < 4; i++) {
+        if (item == mTabs[i]) {
+            SetPage((u8)i);
+        }
+    }
+    if (mUnk1F0 == 1) {
+        for (i = 0; i < 5; i++) {
+            if (item == mItems[i]) {
+                u8 member = mTeam.slots[i];
+                u8 other = mTeam.slots[mFocusIndex];
+                mTeam.slots[mFocusIndex] = member;
+                mTeam.slots[i] = other;
+                ((DinoUiPartsReviverMedalButton *)mItems[i])->PlayDecided();
+                mMessage->mUnk98 = 15;
+                mName->Hide();
+                MParallelTaskSet *moves = new MParallelTaskSet(TRUE);
+                moves->AddTail(((DinoUiPartsReviverMedalButton *)mItems[i])->CreateFlyInTask(data_ov006_02197340[mFocusIndex]));
+                moves->AddTail(((DinoUiPartsReviverMedalButton *)mItems[mFocusIndex])->CreateFlyInTask(data_ov006_02197340[i]));
+                GetSerial()->AddTail(new MTimer(5), moves, MTaskExitTransfer::Create(mMessage),
+                                     MCreateCallTask(this, data_ov006_02197138.FinishPage_00));
+                mUnk1BC->Clear();
+                Disable();
+                return;
+            }
+        }
+        return;
+    }
+    for (i = 0; i < 5; i++) {
+        if (item == mItems[i] && mTeam.slots[i]) {
+            if (!mUnk1F6) {
+                return;
+            }
+            mFocusIndex = i;
+            mUnk1F0 = 1;
+            mMessage = new DinoCommonWindowMessage(MPoint(0x80, 0x60), std::string(gDinoResource->GetText(data_0208aad0)), 4, 0);
+            mParallel.AddTail(mMessage);
+            SelectItem(mFocusIndex);
+            ((DinoUiPartsReviverMedalButton *)mItems[mFocusIndex])->PlayDecided();
+            if (i < 3) {
+                mTech->Hide();
+            }
+            FocusNearestItem(GetCursor());
+            return;
+        }
+    }
 }
 
 void DinoUiOrderSelectMenu::FinishPage() {

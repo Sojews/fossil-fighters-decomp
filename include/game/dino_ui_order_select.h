@@ -38,6 +38,8 @@ class MSmartOam;
 class DinoUiRvInformation;
 class DinoUiOrderSelectMenuItem;
 class DinoUiPartsTeamTech;
+class DinoUiPartsReviverName;
+class DinoCommonWindowMessage;
 class DinoUiOrderSelectMenu : public DinoHelpBase, public MMenu {
 public:
     DinoUiOrderSelectMenu(u32 team, const DinoUiOrderSelectInfo *opponent, u8 hasFourthTab, u8 unk1F7, u32 unk1F8,
@@ -83,9 +85,9 @@ public:
     u8 mHasFourthTab;           // 0x1A8
     u8 unk1A9[0x1B4 - 0x1A9];
     DinoUiRvInformation *mInfo; // 0x1B4
-    u32 unk1B8;
+    DinoUiPartsReviverName *mName;  // 0x1B8: the focused member's
     MTaskSet *mUnk1BC;          // 0x1BC
-    u8 unk1C0[0x1C4 - 0x1C0];
+    DinoCommonWindowMessage *mMessage;  // 0x1C0: "swap with whom?"
     DinoTeam mTeam;             // 0x1C4
     u32 mFocusIndex;            // 0x1EC: the item focused after a tab change
     u32 mUnk1F0;                // 0x1F0
