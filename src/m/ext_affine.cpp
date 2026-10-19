@@ -1,5 +1,4 @@
-// MExtAffine and its transfers. Not decompiled yet: MExtAffineFill::Transfer and the tile map copy with flips
-// (func_0204c5f0).
+// MExtAffine and its transfers. Not decompiled yet: the tile map copy with flips (func_0204c5f0).
 
 #include "m/ext_affine.h"
 
@@ -102,4 +101,53 @@ void MExtAffineTransfer::Transfer() {
 }
 
 MExtAffineFill::~MExtAffineFill() {
+}
+
+// Fills a w x h block of entries from p, in a map that's blocks entries wide.
+#define MEXT_AFFINE_FILL_BLOCK(start, w, h) \
+    { \
+        int i; \
+        u16 *p = start; \
+        for (int j = h; j != 0; j--, p += blocks - (w)) { \
+            for (i = w; i != 0; i--) { \
+                *p++ = entry; \
+            } \
+        } \
+    }
+
+// The fill wraps round the map's edges.
+void MExtAffineFill::Transfer() {
+    int dx = mRect.left;
+    int dy = mRect.top;
+    int w = mRect.GetWidth();
+    int h = mRect.GetHeight();
+    int blocks = MExtAffine::GetDimensions(mDstSize).x >> 3;
+    dx &= blocks - 1;
+    dy &= blocks - 1;
+    u16 entry = mEntry;
+    u16 *base;
+    int size;
+    size = mDstSize;
+    base = (u16 *)mDstBase;
+    if (dx + w < blocks) {
+        if (dy + h < blocks) {
+            MEXT_AFFINE_FILL_BLOCK(MExtAffine::GetEntry(base, size, dx, dy), w, h);
+        } else {
+            MEXT_AFFINE_FILL_BLOCK(MExtAffine::GetEntry(base, size, dx, dy), w, blocks - dy);
+            MEXT_AFFINE_FILL_BLOCK(MExtAffine::GetEntry(base, size, dx, 0), w, h - (blocks - dy));
+        }
+    } else {
+        if (dy + h < blocks) {
+            MEXT_AFFINE_FILL_BLOCK(MExtAffine::GetEntry(base, size, dx, dy), blocks - dx, h);
+        } else {
+            MEXT_AFFINE_FILL_BLOCK(MExtAffine::GetEntry(base, size, dx, dy), blocks - dx, blocks - dy);
+            MEXT_AFFINE_FILL_BLOCK(MExtAffine::GetEntry(base, size, dx, 0), blocks - dx, h - (blocks - dy));
+        }
+        if (dy + h < blocks) {
+            MEXT_AFFINE_FILL_BLOCK(MExtAffine::GetEntry(base, size, 0, dy), w - (blocks - dx), h);
+        } else {
+            MEXT_AFFINE_FILL_BLOCK(MExtAffine::GetEntry(base, size, 0, dy), w - (blocks - dx), blocks - dy);
+            MEXT_AFFINE_FILL_BLOCK(MExtAffine::GetEntry(base, size, 0, 0), w - (blocks - dx), h - (blocks - dy));
+        }
+    }
 }
