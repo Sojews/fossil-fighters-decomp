@@ -8,6 +8,11 @@
 #include "game/dino_ui_order_select.h"
 #include "game/dino_ui_rv_information.h"
 #include "types.h"
+#include "m/display.h"
+#include "m/lcd.h"
+#include "m/bright.h"
+#include "m/obj.h"
+#include "m/bg.h"
 #include "game/dino_ui_parts_reviver_medal_button.h"
 #include <algorithm>
 #include "m/smart_oam.h"
@@ -22,6 +27,26 @@ DinoUiOrderSelect::~DinoUiOrderSelect() {
 DinoUiOrderSelect::DinoUiOrderSelect(u32 team, const DinoUiOrderSelectInfo &info, u8 unk110, u8 unk111, u32 unk114,
                                      u8 unk112)
     : MProcess(NULL), mTeam(team), mInfo(info), mUnk110(unk110), mUnk111(unk111), mUnk112(unk112), mUnk114(unk114) {
+}
+
+// Sets up both screens and opens the menu.
+void DinoUiOrderSelect::Idle() {
+    gLcd->mMain->ResetHooks();
+    gLcd->mMain->Setup(5, 0, 3, 1, 1, 1);
+    gLcd->mMain->mBg->SetBg0Reserved(1);
+    gLcd->mMain->SetBackdrop(0x8000);
+    gLcd->mMain->mObj->Show();
+    gLcd->mSub->ResetHooks();
+    gLcd->mSub->Setup(5, 2, 4, 1, 0, 0);
+    gLcd->mSub->SetBackdrop(0x8000);
+    gLcd->mSub->mObj->Show();
+    gLcd->VSyncNow();
+    gLcd->SetBottomDisplay(gLcd->mSub);
+    gCurrentDisplay = gLcd->GetBottomDisplay();
+    gLcd->GetTopDisplay()->mBright->Reset();
+    gLcd->GetBottomDisplay()->mBright->Reset();
+    GetSerial()->AddTail(new DinoUiOrderSelectMenu(mTeam, &mInfo, mUnk110, mUnk111, mUnk114, mUnk112),
+                         MTaskExitTransfer::Create(this));
 }
 
 DinoUiOrderSelectMenuItem::~DinoUiOrderSelectMenuItem() {

@@ -40,6 +40,7 @@ class DinoUiOrderSelectMenuItem;
 class DinoUiPartsTeamTech;
 class DinoUiOrderSelectMenu : public DinoHelpBase, public MMenu {
 public:
+    DinoUiOrderSelectMenu(u32 team, const DinoUiOrderSelectInfo *info, u8 unk1, u8 unk2, u32 unk3, u8 unk4);
     MSmartOam *GetOam() { return mOam; }
     virtual ~DinoUiOrderSelectMenu();
     virtual void OnStart();
@@ -91,6 +92,7 @@ public:
     u8 unk1FD[0x208 - 0x1FD];
     DinoUiPartsTeamTech *mTech; // 0x208: shown when the team has a technique
     MResource<DinoUiOrderSelectData> mUnk20C;   // 0x20C
+    u8 unk21C[0x264 - 0x21C];
 };
 
 class DinoUiOrderSelect : public MProcess {
