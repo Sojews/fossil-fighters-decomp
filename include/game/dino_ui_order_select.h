@@ -69,6 +69,8 @@ public:
     void FinishTab();
     // The opponent's team's medals (on the right of the four tabs, or of three).
     void CreateOpponentItems();
+    // The player's, the opponent's and the team's names.
+    void CreateNameLabels(const wchar_t *playerName);
     // The decide and back buttons: cancels a swap, or (if the team can fight) saves it and leaves, else says why not.
     void Confirm();
     // The battle's rule text (empty for none).

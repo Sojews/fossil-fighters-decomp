@@ -19,6 +19,9 @@
 #include "game/dino_common_window_message_box.h"
 #include <algorithm>
 #include "m/smart_oam.h"
+#include "m/font.h"
+#include "m/indicator.h"
+#include "m/oam_canvas.h"
 #include "game/dino_team.h"
 #include "game/dino_ui_parts_team_tech.h"
 #include "m/call_task.h"
@@ -190,6 +193,42 @@ void DinoUiOrderSelectMenu::CreateOpponentItems() {
         AddLink(mUnkF8[0], 3, mUnkF8[2]);
         AddLink(mUnkF8[2], 1, mUnkF8[0]);
     }
+}
+
+// Where the names go (the opponent's beside four tabs, or three).
+extern "C" const MPoint data_ov006_02197190, data_ov006_02197158, data_ov006_02197180, data_ov006_02197178;
+
+// NONMATCHING: scheduling only (the game reads gCurrentDisplay after copying each canvas's size).
+void DinoUiOrderSelectMenu::CreateNameLabels(const wchar_t *playerName) {
+    MFont *font = gDinoResource->CreateFont12(0, 10, 1);
+    MObjCanvas *canvas = new MObjCanvas(gCurrentDisplay, MPoint(0xA0, 0x10), gDinoResource->GetUnkTable(), TRUE);
+    canvas->GetOamUnit()->SetMode(1);
+    MIndicator *label = new MIndicator(canvas, font, 0);
+    mParallel.AddTail(label);
+    label->SetPosition(data_ov006_02197190);
+    label->SetPriority(3);
+    label->Show();
+    label->SetText(std::wstring(playerName));
+    canvas = new MObjCanvas(gCurrentDisplay, MPoint(0xA0, 0x10), gDinoResource->GetUnkTable(), TRUE);
+    canvas->GetOamUnit()->SetMode(1);
+    label = new MIndicator(canvas, font, 0);
+    mParallel.AddTail(label);
+    if (mHasFourthTab) {
+        label->SetPosition(data_ov006_02197158);
+    } else {
+        label->SetPosition(data_ov006_02197180);
+    }
+    label->SetPriority(3);
+    label->Show();
+    label->SetText(std::string(mOpponent.name));
+    canvas = new MObjCanvas(gCurrentDisplay, MPoint(0xA0, 0x10), gDinoResource->GetUnkTable(), TRUE);
+    canvas->GetOamUnit()->SetMode(1);
+    label = new MIndicator(canvas, font, 0);
+    mParallel.AddTail(label);
+    label->SetPosition(data_ov006_02197178);
+    label->SetPriority(3);
+    label->Show();
+    label->SetText(std::wstring((const wchar_t *)mTeam.name));
 }
 
 void DinoUiOrderSelectMenu::OnIdle() {
