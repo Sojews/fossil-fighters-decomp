@@ -15,6 +15,7 @@
 #include "m/call_task.h"
 #include "game/dino_sound.h"
 #include "m/lcd.h"
+#include "game/dino_common_window_message_box.h"
 #include "game/common_window_message.h"
 #include "m/view.h"
 #include "game/dino_resource.h"
@@ -433,4 +434,28 @@ void DinoUiStatusMenu::PickReplacement(int index) {
     }
     mHelp = new DinoUiStatusChangeModeHelpTask(mUnkB8->GetFrame());
     mUnk108->AddTail(mHelp);
+}
+
+extern const u32 data_0208aa4c, data_0208aae0;
+extern const int data_02089a2c, data_02089a30, data_02089a34;
+
+void DinoUiStatusMenu::OnOKDecided() {
+    if (mMode) {
+        return;
+    }
+    *mResult = 0;
+    if (mTeam->slots[0]) {
+        if (DinoTeamDiffers(mTeam, (DinoTeam *)mUnk11C)) {
+            mSerial.AddTail(new DinoCommonWindowMessageBox(MPoint(128, 96),
+                                                           std::string(gDinoResource->GetText(data_0208aae0)), 4));
+        } else {
+            mSerial.AddTail(new MTimer(data_02089a34));
+        }
+        GetSerial()->AddTail(MTaskSetWaitEmptyTask::Create(mUnk130),
+                             gLcd->mMain->mBright->CreateFadeOutToBlack(data_02089a30, data_02089a2c),
+                             MTaskExitTransfer::Create(&(MTask &)*this));
+    } else {
+        mSerial.AddTail(
+            new DinoCommonWindowMessageBox(MPoint(128, 96), std::string(gDinoResource->GetText(data_0208aa4c)), 4));
+    }
 }
