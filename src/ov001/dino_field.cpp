@@ -682,7 +682,6 @@ void DinoFieldCharaWaitMoveTask::Idle() {
     }
 }
 
-// NONMATCHING: stack slots of the point temporaries only.
 void DinoFieldCharaMoveOffsetTask::Transfer() {
     DinoFieldChara *chara = mField->GetChara(mChara);
     if (chara) {

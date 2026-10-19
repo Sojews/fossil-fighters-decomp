@@ -111,7 +111,6 @@ void DinoUiCleaningTest::Idle() {
 template class MCallTask0<DinoUiCleaningMenu, DinoUiCleaningMenu>;
 template MTask *MCreateCallTask(DinoUiCleaningMenu *obj, void (DinoUiCleaningMenu::*func)());
 
-// NONMATCHING: the game computes the index before loading the item count; ours loads the count first.
 // Moves the cursor to the item, and shows the fossil's name (marked if it can't be cleaned).
 void DinoUiCleaningMenu::OnFocus(MMenuItem *item) {
     if (item == NULL) {
