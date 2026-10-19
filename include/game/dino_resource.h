@@ -137,7 +137,11 @@ struct DinoBattleAdjustDefs {
     u8 debugLog;        // 0x171: show the battle's debug log
     u8 unk172[2];
     u32 actionLog;      // 0x174: list the actions in the action info bar
-    u8 unk178[0x190 - 0x178];
+    u8 unk178[0x180 - 0x178];
+    int advantageArrowX0;   // 0x180: where the advantage arrow points at the first side
+    int advantageArrowY0;   // 0x184
+    int advantageArrowX1;   // 0x188: and at the second
+    int advantageArrowY1;   // 0x18C
     u8 abilityMenuWrap; // 0x190: the ability menu's cursor wraps around
 };
 

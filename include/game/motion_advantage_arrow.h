@@ -20,10 +20,21 @@ public:
     u8 mUnk7C;  // 0x7C
 };
 
+// The arrow between the players' fields showing who has the advantage.
 class DinoBattleViewAdvantageArrow : public MProcess {
 public:
+    DinoBattleViewAdvantageArrow(u32 unk74, MSmartOam *oam);
     virtual ~DinoBattleViewAdvantageArrow();
     virtual void Idle();
+
+    // Moves the arrow to point at the side (at once while suspended).
+    void PointAt(int side);
+
+    u32 mUnk74;                     // 0x74
+    MSmartOam *mOam;                // 0x78
+    MotionAdvantageArrow *mArrow;   // 0x7C
+    int mUnk80;                     // 0x80
+    MPoint mPoints[2];              // 0x84: per side
 };
 
 class MSmartOam;
