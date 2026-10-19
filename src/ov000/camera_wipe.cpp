@@ -44,6 +44,36 @@ M3DFadeTask::~M3DFadeTask() {
     }
 }
 
+// NONMATCHING: 89%, register choice (the game keeps the density in r0).
+// Steps the fog to the next density (starting from the table's), stopping at either end.
+void M3DFadeTask::Execute() {
+    if (mUnk1C) {
+        mUnk1C = FALSE;
+        // (The game reads the table through the bss block it shares with the flag before it.)
+        mUnk10 = (&data_ov000_02197930)[4] << 12;
+        if (mUnk18 == 0) {
+            mUnk18 = 1;
+        }
+        mUnk14 = (0x7F << 12) / (u32)mUnk18;
+        if (mIn) {
+            mUnk14 = -mUnk14;
+        }
+    }
+    int density = mUnk10 >> 12;
+    mUnk10 += mUnk14;
+    if (density > 127) {
+        Exit();
+        density = 127;
+    } else if (density < 0) {
+        Exit();
+        density = 0;
+    }
+    FillFogTable(density);
+    G3X_SetFog(TRUE, 0, 0, 0);
+    *(vu32 *)0x04000358 = 0x1F << 16;
+    G3X_SetFogTable((const u32 *)data_ov000_02197934);
+}
+
 // NONMATCHING: the game calls std::vector<std::string>'s out-of-line destructor for mLines; ours inlines it into a
 // __vec_deleter call. The bytes are identical, so only callcheck sees it.
 DinoBattleViewActionInfoBar::~DinoBattleViewActionInfoBar() {
