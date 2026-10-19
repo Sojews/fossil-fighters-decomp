@@ -18,6 +18,7 @@ struct DinoFieldPlayerControlResult {
 
 class DinoFieldPlayerControl : public MProcess {
 public:
+    DinoFieldPlayerControl(DinoField *field, u32 arg1, DinoFieldPlayerControlResult *result, u32 arg3);
     virtual ~DinoFieldPlayerControl();
     virtual void Idle();
 

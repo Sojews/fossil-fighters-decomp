@@ -26,6 +26,7 @@
 #include "m/anm_model.h"
 #include "game/dino_field_capture_fade_out_task_menu.h"
 #include "game/dino_field_capture_fade_out_task.h"
+#include "game/dino_field_player_control.h"
 
 void DinoField::CreateEffects(MPolygonChar **effects, u32 count, u32 id) {
     if (effects[0] != NULL) {
@@ -797,3 +798,19 @@ template class MBgCallTask8<DinoField, MDisplay *, MView *, MExtAffinePicture **
 template MTask *MCreateBgCallTask(DinoField *obj, void (DinoField::*func)(MDisplay *, MView *, MExtAffinePicture **, u32, MPoint, u32, u32, long), MDisplay *a1, MView *a2, MExtAffinePicture **a3, u32 a4, MPoint a5, u32 a6, u32 a7, long a8, int thread);
 template class MBgCallTask7<DinoField, MDisplay *, MView *, MExtAffinePicture **, u32, MPoint, u32, long>;
 template MTask *MCreateBgCallTask(DinoField *obj, void (DinoField::*func)(MDisplay *, MView *, MExtAffinePicture **, u32, MPoint, u32, long), MDisplay *a1, MView *a2, MExtAffinePicture **a3, u32 a4, MPoint a5, u32 a6, long a7, int thread);
+
+#pragma auto_inline off
+
+// The field's capture fades.
+extern "C" MProcess *func_ov001_02159cd0(void *field) {
+    return new DinoFieldCaptureFadeOutTask(field);
+}
+
+extern "C" MProcess *func_ov001_02159d3c(void *field) {
+    return new DinoFieldCaptureFadeInTask(field);
+}
+
+// The player's control on the field.
+extern "C" MProcess *func_ov001_021580a0(DinoField *field, u32 arg1, DinoFieldPlayerControlResult *result, u32 arg3) {
+    return new DinoFieldPlayerControl(field, arg1, result, arg3);
+}
