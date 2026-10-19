@@ -172,7 +172,9 @@ struct DinoDemoBattles {
     u32 unk18;          // 0x18: the demo battles watched before the demo stops
 };
 struct DinoExcavateDefs {
-    u8 unk00[0x68];
+    u8 unk00[0x5C];
+    u32 manpus;         // 0x5C: offset of the offsets of the manpu (emotion bubble) entries
+    u8 unk60[0x68 - 0x60];
     u32 levelCount;     // 0x68
     u32 levelOffset;    // 0x6C: DinoExcavateLevel entries
     u8 unk70[0x78 - 0x70];

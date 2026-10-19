@@ -377,6 +377,29 @@ MTask *DinoFieldChara::CreateChangeMotionTask(u32 motion, u8 loop, MFx32 speed) 
     return new DinoFieldCharaModelMotionIdTask(this, motion, loop, speed, TRUE);
 }
 
+// A manpu entry: its motion's name is at the offset in its first word.
+static inline const char *GetManpuName(const DinoExcavateDefs *defs, u32 manpu) {
+    const u8 *entry = (const u8 *)defs + ((const u32 *)((const u8 *)defs + defs->manpus))[manpu];
+    return (const char *)entry + *(const u32 *)entry;
+}
+
+// Shows the emotion bubble over the chara's head, at offset.
+void DinoFieldChara::ShowManpu(u32 manpu, MPoint offset) {
+    HideManpu();
+    MResource<DinoExcavateDefs> defs = gDinoResource->GetExcavateDefs();
+    M3DModel *model = mBody->mModel;
+    MPoint head;
+    model->GetJointScreenPos(model->FindJoint("head"), &head);
+    mUnk2FC[0] = offset.x;
+    mUnk2FC[1] = offset.y;
+    mManpu = new MMotion(std::string("/motion/event/") + GetManpuName(defs.Get(), manpu) + ".bin", mField->GetOam(), 0, 1);
+    mManpu->Play(1, 0);
+    mManpu->SetPosition(MPoint(head.x + offset.x, head.y + offset.y));
+    mManpu->SetPriority(3);
+    mManpu->Show();
+    mTaskSet->AddTail(mManpu);
+}
+
 void DinoFieldChara::HideManpu() {
     if (mManpu) {
         mTaskSet->Remove(mManpu);

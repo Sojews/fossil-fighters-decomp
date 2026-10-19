@@ -220,7 +220,7 @@ public:
     u32 mUnk2E0;                // 0x2E0
     u32 mUnk2E4;                // 0x2E4
     MResource<DinoHeadMaskDefs> mHeadMasks; // 0x2E8: loaded for the player's head mask
-    MTask *mManpu;              // 0x2F8: the emotion bubble shown over the character
+    MMotion *mManpu;            // 0x2F8: the emotion bubble shown over the character
     u32 mUnk2FC[2];             // 0x2FC
     BOOL mHasFootSe;            // 0x304
     u32 mFootSe;                // 0x308
@@ -462,7 +462,7 @@ public:
 
     BOOL IsUnk258();
     u32 GetUnk234();
-    u32 GetUnk26C();
+    MSmartOam *GetOam();
     void SetUnk238(u32 value);
     u32 GetBgm();
     void FadeInPict(MDisplay *display, u32 *id, MExtAffinePicture **pict, u32 newId, MPoint pos, u32 frames, long unk);
@@ -492,7 +492,7 @@ public:
     u8 mUnk264;                 // 0x264
     u8 unk265[3];
     MTaskSet *mFadeTasks;       // 0x268
-    u32 mUnk26C;                // 0x26C
+    MSmartOam *mOam;            // 0x26C: the field's sprites (the manpu bubbles')
     MTaskSet *mPictTasks;       // 0x270
     MExtAffinePicture *mLowerPict;   // 0x274: the event picture on each screen
     MExtAffinePicture *mUpperPict;   // 0x278

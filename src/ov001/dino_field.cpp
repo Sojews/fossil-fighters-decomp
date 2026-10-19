@@ -99,8 +99,8 @@ u32 DinoField::GetUnk234() {
     return mUnk234;
 }
 
-u32 DinoField::GetUnk26C() {
-    return mUnk26C;
+MSmartOam *DinoField::GetOam() {
+    return mOam;
 }
 
 void DinoField::SetUnk258(BOOL value) {
