@@ -1,11 +1,11 @@
 // MIndicator. Not decompiled yet: the template functions.
+// NONMATCHING: append_realloc (as everywhere).
 
 #pragma ipa file
 
 #include "m/indicator.h"
 #include "m/text_codec.h"
 
-// NONMATCHING (also SetText): push_back's two byte temporaries are in swapped stack slots.
 MIndicator::MIndicator(MCanvas *canvas, MFont *font, int spacing)
     : MFixedSizeView(canvas->GetSize()), mCanvas(canvas), mFont(font), mSpacing(spacing) {
     mFont->AddRef();
