@@ -413,3 +413,15 @@ BOOL DinoUiOptionMenu::IsWaiting() {
     }
     return FALSE;
 }
+
+#pragma auto_inline off
+
+DinoUiOptionMenuItem::DinoUiOptionMenuItem(DinoUiOptionMenu *owner, const std::string &path, MPoint pos, u32 textId) {
+    mOwner = owner;
+    mTextId = textId;
+    mMotion = new MMotion(std::string(path), mOwner->GetOam(), 2, 1);
+    mMotion->Play(1, 0);
+    mMotion->SetPosition(pos);
+    mMotion->Hide();
+    mParallel.AddTail(mMotion);
+}

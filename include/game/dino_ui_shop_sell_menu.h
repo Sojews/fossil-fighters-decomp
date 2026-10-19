@@ -9,6 +9,7 @@
 #include "game/help.h"
 #include "game/dino_ui_shop_sell_menu_item.h"
 
+class MSmartOam;
 class DinoUi3PartsMoney;
 class DinoUiShopSellSellButton;
 class DinoUiShopSellPageLButton;
@@ -18,6 +19,7 @@ class DinoUi3PartsRockName;
 
 class DinoUiShopSellMenu : public DinoHelpBase, public MMenu {
 public:
+    MSmartOam *GetOam() { return mOam; }
     DinoUiShopSellMenu();
     virtual ~DinoUiShopSellMenu();
     virtual void OnStart();
@@ -43,7 +45,7 @@ public:
 
     MArchivePtr mArchive;       // 0xB4
     MArchiveFile mFile;         // 0xB8
-    u32 mUnkC4;                 // 0xC4
+    MSmartOam *mOam;            // 0xC4: the items' sprites
     MMenuItem *mBack;           // 0xC8
     DinoUiShopSellSellButton *mLinkFrom; // 0xCC: the sell button, linked to the first page item
     u32 mUnkD0;

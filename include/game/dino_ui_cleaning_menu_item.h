@@ -10,6 +10,7 @@ class DinoUiCleaningMenu;
 
 class DinoUiCleaningMenuItem : public MMenuItem, public DinoHelpItem {
 public:
+    DinoUiCleaningMenuItem(DinoUiCleaningMenu *owner, const std::string &path, MPoint pos, u32 textId);
     virtual ~DinoUiCleaningMenuItem();
     virtual MRect GetFrame();
     virtual void OnFocusChanged(BOOL focused);

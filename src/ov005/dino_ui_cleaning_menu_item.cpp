@@ -214,6 +214,18 @@ DinoUiCleaningMenu::DinoUiCleaningMenu(s32 *result) : MMenu(NULL, 0), mResult(re
 
 #pragma auto_inline off
 
+DinoUiCleaningMenuItem::DinoUiCleaningMenuItem(DinoUiCleaningMenu *owner, const std::string &path, MPoint pos, u32 textId) {
+    mOwner = owner;
+    mTextId = textId;
+    mMotion = new MMotion(std::string(path), mOwner->GetOam(), 2, 1);
+    mMotion->Play(1, 0);
+    mMotion->SetPosition(pos);
+    mMotion->SetPriority(1);
+    mMotion->Show();
+    mMotion->GetUnit()->SetMode(1);
+    mParallel.AddTail(mMotion);
+}
+
 void DinoUiCleaningTest::Finish() {
     mSerial.AddTail(MTaskExitTransfer::Create(this));
 }

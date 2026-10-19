@@ -41,6 +41,7 @@ struct DinoUiOrganizationLayout2 {
 
 class DinoUiOrganizationMenu : public DinoHelpBase, public MMenu {
 public:
+    MSmartOam *GetOam() { return mOam; }
     DinoUiOrganizationMenu(u32 team);
     virtual ~DinoUiOrganizationMenu();
     virtual void OnStart();
@@ -147,6 +148,7 @@ public:
 
 class DinoUiOrganizationMenuItem : public MMenuItem, public DinoHelpItem {
 public:
+    DinoUiOrganizationMenuItem(DinoUiOrganizationMenu *owner, const std::string &path, MPoint pos, u32 textId);
     virtual ~DinoUiOrganizationMenuItem();
     virtual MRect GetFrame();
     virtual MRect GetRect();

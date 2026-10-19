@@ -194,6 +194,18 @@ BOOL DinoUiShopSellMenu::PageLeft() {
 
 #pragma auto_inline off
 
+DinoUiShopSellMenuItem::DinoUiShopSellMenuItem(DinoUiShopSellMenu *owner, const std::string &path, MPoint pos, u32 textId) {
+    mOwner = owner;
+    mTextId = textId;
+    mMotion = new MMotion(std::string(path), mOwner->GetOam(), 2, 1);
+    mMotion->Play(1, 0);
+    mMotion->SetPosition(pos);
+    mMotion->SetPriority(1);
+    mMotion->Show();
+    mMotion->GetUnit()->SetMode(1);
+    mParallel.AddTail(mMotion);
+}
+
 void DinoUiShopSellMenu::ClearItems() {
     RemoveLink(mLinkFrom, 4);
     for (int i = 0; i < mItems.size(); i++) {

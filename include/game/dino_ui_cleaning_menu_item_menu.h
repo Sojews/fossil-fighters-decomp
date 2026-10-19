@@ -10,6 +10,7 @@
 #include "game/help.h"
 #include "game/dino_ui_cleaning_menu_item.h"
 
+class MSmartOam;
 class DinoEventLoop;
 
 class DinoUi3PartsCursor;
@@ -17,6 +18,7 @@ class DinoUi3PartsRockName;
 
 class DinoUiCleaningMenu : public DinoHelpBase, public MMenu {
 public:
+    MSmartOam *GetOam() { return mOam; }
     DinoUiCleaningMenu(s32 *result);
     virtual ~DinoUiCleaningMenu();
     virtual void OnStart();
@@ -36,7 +38,7 @@ public:
     void Decide(int index);
     void FinishDecide();
 
-    u32 mUnkB4;                 // 0xB4
+    MSmartOam *mOam;            // 0xB4: the items' sprites
     MMenuItem *mLinkFrom;       // 0xB8: linked to the first page item
     u32 mUnkBC;
     std::vector<void *> mItems; // 0xC0: this page's items

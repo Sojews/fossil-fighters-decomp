@@ -158,6 +158,18 @@ extern "C" const int data_02089a0c;
 
 #pragma auto_inline off
 
+DinoUiOrganizationMenuItem::DinoUiOrganizationMenuItem(DinoUiOrganizationMenu *owner, const std::string &path, MPoint pos, u32 textId) {
+    mOwner = owner;
+    mTextId = textId;
+    mMotion = new MMotion(std::string(path), mOwner->GetOam(), 2, 1);
+    mMotion->Play(1, 0);
+    mMotion->SetPosition(pos);
+    mMotion->SetPriority(2);
+    mMotion->Show();
+    mParallel.AddTail(mMotion);
+    mMotion->GetUnit()->SetMode(1);
+}
+
 // The call-task makers, instantiated ahead of their users so none directly follows a function that calls it.
 template MTask *MCreateCallTask(DinoUiOrganizationMenu *obj, void (DinoHelpBase::*func)());
 template MTask *MCreateCallTask(DinoUiOrganizationMenu *obj, void (DinoUiOrganizationMenu::*func)());
