@@ -27,6 +27,8 @@ public:
     BOOL PageLeft();
     void Decide(int index);
     void Equip();
+    // Puts the mask on if the player said yes.
+    void FinishEquip();
     void ClearItems();
     void RefreshPage2();
 
@@ -40,7 +42,7 @@ public:
     MIndicator *mName;      // 0xE0: the focused mask's name
     DinoUi3PartsFraction *mFraction; // 0xE4: "page n/m"
     int mChoice;            // 0xE8
-    u32 mUnkEC;
+    u32 mAnswer;            // 0xEC: the yes/no window's
     std::vector<void *> mUnkF0; // 0xF0: the masks (ids)
     int mPage;              // 0xFC
     int mLastPage;          // 0x100

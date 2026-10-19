@@ -19,13 +19,14 @@
 #include "game/dino_ui_mask_equip_menu_item.h"
 #include "m/bg_new_task.h"
 #include "m/call_task.h"
+#include "game/dino_common_window_menu_item_flush_task_menu.h"
 #include "game/dino_sound.h"
 #include "m/lcd.h"
 #include "m/display.h"
 #include "m/bright.h"
 
 #pragma auto_inline off
-DinoUiMaskEquipMenu::DinoUiMaskEquipMenu() : MMenu(NULL, 0), mChoice(-1), mUnkEC(0), mPage(0), mLastPage(0), mUnk104(0) {
+DinoUiMaskEquipMenu::DinoUiMaskEquipMenu() : MMenu(NULL, 0), mChoice(-1), mAnswer(0), mPage(0), mLastPage(0), mUnk104(0) {
 }
 #pragma auto_inline on
 
@@ -131,8 +132,10 @@ void DinoUiMaskEquipMenu::OnBackDecided() {
 
 // Template task instances the game emits in this file. Until the code that makes the tasks is decompiled, they are
 // instantiated explicitly.
+#pragma auto_inline off
 template class MCallTask0<DinoUiMaskEquipMenu, DinoUiMaskEquipMenu>;
 template MTask *MCreateCallTask(DinoUiMaskEquipMenu *obj, void (DinoUiMaskEquipMenu::*func)());
+#pragma auto_inline reset
 
 void DinoUiMaskEquipMaskButton::OnFocusChanged(BOOL focused) {
     if (focused) {
@@ -236,6 +239,39 @@ void DinoUiMaskEquipMenu::ClearItems() {
         delete (MMenuItem *)mItems[i];
     }
     mItems.clear();
+}
+
+// The TU's pooled constants.
+extern "C" struct {
+    MPoint WindowPos_00;                            // 0x00: the yes/no window's
+    u8 unk08[0x10 - 0x08];
+    void (DinoUiMaskEquipMenu::*FinishEquip_10)();  // 0x10
+} data_ov005_0216baa0;
+
+extern "C" const u32 data_0208a9bc, data_0208a9c0;
+
+// Asks whether to put the chosen mask on.
+void DinoUiMaskEquipMenu::Equip() {
+    if (mChoice == -1) {
+        return;
+    }
+    mCursor->Hide();
+    mAnswer = 0;
+    DinoCommonWindowMenu *menu = new DinoCommonWindowMenu(&mAnswer, data_ov005_0216baa0.WindowPos_00, NULL, 0);
+    menu->AddChoice(1, gDinoResource->GetText(data_0208a9c0), gDinoResource->GetText(data_0208a9c0));
+    menu->AddChoice(-2, gDinoResource->GetText(data_0208a9bc), gDinoResource->GetText(data_0208a9bc));
+    GetSerial()->AddTail(menu, MCreateCallTask(this, data_ov005_0216baa0.FinishEquip_10), mCursor->CreateShowTransfer());
+}
+
+void DinoUiMaskEquipMenu::FinishEquip() {
+    if (mAnswer == 1) {
+        DinoPlayerData player;
+        gDinoBackup->GetPlayer(&player, 0);
+        player.unk14_0 = (u32)mUnkF0[mChoice];
+        gDinoBackup->SetPlayer(&player);
+        mChoice = -1;
+        GetSerial()->AddTail(gLcd->mMain->mBright->CreateFadeOutToBlack(30, 0), MTaskExitTransfer::Create(&(MTask &)*this));
+    }
 }
 
 void DinoUiMaskEquipMenu::Decide(int index) {
