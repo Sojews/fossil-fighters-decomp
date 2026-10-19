@@ -1,0 +1,171 @@
+#ifndef _STD_BITVECTOR
+#define _STD_BITVECTOR
+
+// vector<bool>: the bits packed into words, lowest bit first.
+
+#include <algorithm>
+#include <cstddef>
+#include <memory>
+#include <math.h>
+#include <mem.h>
+#include <type_traits.hpp>
+
+namespace std {
+    template <bool> class __bitvector_common {
+    public:
+        static void throw_length_error();
+    };
+
+    template <bool b> void __bitvector_common<b>::throw_length_error() {
+        printf("bitvector length error");
+        abort();
+    }
+
+    // The leading zero bits of a word (by its size).
+    inline int __count_leading_zeros(Metrowerks::int2type<4>, unsigned int x) {
+        return __msl_count_leading_zero32(x);
+    }
+
+    template <class Allocator> class __bitvec_deleter {
+    public:
+        typedef unsigned int word_type;
+        typedef size_t size_type;
+        enum { bits_per_word = 32 };
+
+        // One bit: its word and the word's mask for it.
+        class iterator {
+        public:
+            iterator(word_type *word, word_type mask) : word_(word), mask_(mask) {}
+            iterator(const iterator &x) : word_(x.word_), mask_(x.mask_) {}
+
+            word_type *word_;
+            word_type mask_;
+        };
+
+        // mwcc never inlines a template base class's constructor, so the most-derived class sets these up.
+        void init() {
+            data_ = nullptr;
+            size_ = 0;
+            cap_ = 0;
+        }
+
+        ~__bitvec_deleter();
+
+        iterator end() {
+            return iterator(data_ + size_ / bits_per_word, 1 << (size_ % bits_per_word));
+        }
+
+        bool operator[](size_type n) const {
+            return (data_[n / bits_per_word] & (1 << (n % bits_per_word))) != 0;
+        }
+
+        void set(size_type n) {
+            data_[n / bits_per_word] |= 1 << (n % bits_per_word);
+        }
+
+        size_type size() const {
+            return size_;
+        }
+
+        size_type capacity() const {
+            return cap_ * bits_per_word;
+        }
+
+        size_type max_size() const {
+            return (size_type) -1;
+        }
+
+        bool empty() const {
+            return size_ == 0;
+        }
+
+        void resize(size_type n, bool x);
+
+    protected:
+        size_type recommend(size_type n);
+        void reserve_bits(size_type n);
+        static void fill_n(iterator first, size_type n, const bool &x);
+
+        word_type *data_;
+        size_type size_;    // in bits
+        size_type cap_;     // in words
+    };
+
+    template <class Allocator> __bitvec_deleter<Allocator>::~__bitvec_deleter() {
+        if (data_ != nullptr) {
+            allocator<word_type>().deallocate(data_, cap_);
+        }
+    }
+
+    template <class Allocator> void __bitvec_deleter<Allocator>::resize(size_type n, bool x) {
+        if (n > size_) {
+            size_type cap = capacity();
+            if (n > cap) {
+                reserve_bits(recommend(n - cap));
+            }
+            size_type old = size_;
+            iterator first = end();
+            size_ = n;
+            fill_n(first, n - old, x);
+        } else {
+            size_ = n;
+        }
+    }
+
+    template <class Allocator> typename __bitvec_deleter<Allocator>::size_type
+    __bitvec_deleter<Allocator>::recommend(size_type n) {
+        const size_type cap = capacity();
+        if (n > max_size() - cap) {
+            __bitvector_common<true>::throw_length_error();
+        }
+        return cap + std::max(cap, n);
+    }
+
+    template <class Allocator> void __bitvec_deleter<Allocator>::reserve_bits(size_type n) {
+        size_type words = (n - 1) / bits_per_word + 1;
+        word_type *p = (word_type *) ::operator new(words * sizeof(word_type));
+        if (p == nullptr) {
+            printf("Memory allocation failure");
+            abort();
+        }
+        if (data_ != nullptr) {
+            if (size_ != 0) {
+                word_type *last = data_ + (size_ - 1) / bits_per_word + 1;
+                memmove(p, data_, (last - data_) * sizeof(word_type));
+            }
+            ::operator delete(data_);
+        }
+        data_ = p;
+        cap_ = words;
+    }
+
+    template <class Allocator>
+    void __bitvec_deleter<Allocator>::fill_n(iterator first, size_type n, const bool &x) {
+        if (n != 0) {
+            word_type value = -(word_type) x;
+            int zeros = __count_leading_zeros(Metrowerks::int2type<sizeof(word_type)>(), first.mask_);
+            for (;;) {
+                size_type m = std::min(size_type(zeros + 1), n);
+                word_type mask = ((word_type) -1 << (31 - zeros)) & ((word_type) -1 >> (zeros + 1 - (int) m));
+                *first.word_ &= ~mask;
+                *first.word_ |= value & mask;
+                n -= m;
+                if (n == 0) {
+                    break;
+                }
+                first.word_++;
+                zeros = 31;
+            }
+        }
+    }
+
+    template <class Allocator> class vector<bool, Allocator> : public __bitvec_deleter<Allocator> {
+    public:
+        vector() {
+            this->init();
+        }
+        ~vector() {}
+    };
+} // namespace std
+
+#endif

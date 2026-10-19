@@ -985,6 +985,8 @@ namespace std {
     };
 } // namespace std
 
+#include <bitvector>
+
 template <typename T> class CustomVector : public std::vector<T> {
 public:
 protected:

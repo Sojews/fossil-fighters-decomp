@@ -5,6 +5,7 @@
 #include "m/archive.h"
 #include "m/motion.h"
 #include <algorithm>
+#include <limits.h>
 #include <map>
 #include "m/display.h"
 #include "m/heap.h"
@@ -242,6 +243,85 @@ void *MMotionFile::GetChr(u32 index, MArchiveFile *file) {
     MArchiveFile &f = mData->mChrFiles[index];
     f.Lock();
     return f.GetData();
+}
+
+// The bounds of a chr file's opaque pixels (worked out once; an empty chr's are the point at its center).
+// NONMATCHING: the game keeps the tile size in two late stack temporaries (ours lands higher in the frame) and the
+// resize's int2type tags sit in swapped slots.
+MRect MMotionFile::GetChrBounds(u32 index) {
+    MScopedLock lock(&mData->mMutex.mutex, TRUE);
+    if (mData->mChrBoundsDone.empty()) {
+        mData->mChrBoundsDone.resize(((MMotionHeader *) mData->mFile.GetData())->chrs.count, false);
+        mData->mChrBounds.resize(((MMotionHeader *) mData->mFile.GetData())->chrs.count);
+    }
+    if (!mData->mChrBoundsDone[index]) {
+        mData->mChrBoundsDone.set(index);
+        const MMotionGfxHeader *chr = (const MMotionGfxHeader *) GetChr(index, NULL);
+        // (The chr files keep the OBJ size where the palette files keep extPalette.)
+        MPoint size(gObjTileSizes[0][chr->extPalette].x, gObjTileSizes[0][chr->extPalette].y);
+        MRect rect(INT_MAX, INT_MAX, INT_MIN, INT_MIN);
+        const u8 *pixels = (const u8 *) (chr + 1);
+        const u32 *rows = (const u32 *) (chr + 1);
+        if (chr->mode == 0) {
+            for (int ty = 0; ty < size.y; ty++) {
+                for (int tx = 0; tx < size.x; tx++) {
+                    for (int row = 0; row < 8; row++) {
+                        if (*rows != 0) {
+                            int y = row + ty * 8;
+                            rect.top = std::min(rect.top, y);
+                            rect.bottom = std::max(rect.bottom, y);
+                            int x = tx * 8;
+                            for (u32 i = 0; i < 4; i++) {
+                                u8 pair = pixels[i];
+                                if (pair & 0x0F) {
+                                    rect.left = std::min(rect.left, x);
+                                    rect.right = std::max(rect.right, x);
+                                }
+                                x++;
+                                if (pair & 0xF0) {
+                                    rect.left = std::min(rect.left, x);
+                                    rect.right = std::max(rect.right, x);
+                                }
+                                x++;
+                            }
+                        }
+                        pixels += 4;
+                        rows++;
+                    }
+                }
+            }
+        } else {
+            for (int ty = 0; ty < size.y; ty++) {
+                for (int tx = 0; tx < size.x; tx++) {
+                    for (int row = 0; row < 8; row++) {
+                        if (rows[0] != 0 || rows[1] != 0) {
+                            int y = row + ty * 8;
+                            rect.top = std::min(rect.top, y);
+                            rect.bottom = std::max(rect.bottom, y);
+                            int x = tx * 8;
+                            for (u32 i = 0; i < 8; i++) {
+                                if (pixels[i] != 0) {
+                                    rect.left = std::min(rect.left, x);
+                                    rect.right = std::max(rect.right, x);
+                                }
+                                x++;
+                            }
+                        }
+                        rows += 2;
+                        pixels += 8;
+                    }
+                }
+            }
+        }
+        if (rect.left == INT_MAX && rect.top == INT_MAX && rect.right == INT_MIN && rect.bottom == INT_MIN) {
+            rect = MRect(MPoint(size.x * 8 / 2, size.y * 8 / 2), MPoint(size.x * 8 / 2, size.y * 8 / 2));
+        } else {
+            rect.right++;
+            rect.bottom++;
+        }
+        mData->mChrBounds[index] = rect;
+    }
+    return mData->mChrBounds[index];
 }
 
 u32 MMotionFile::GetUnk18() {

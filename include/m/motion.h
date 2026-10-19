@@ -87,8 +87,8 @@ public:
     MPalUnit **mPals[2];                   // 0x48
     MChrBlock **mChrs[2];                   // 0x50
     MMutex mMutex;                          // 0x58
-    std::vector<u32> mUnk70;                // 0x70
-    std::vector<u32> mUnk7C;                // 0x7C
+    std::vector<MRect> mChrBounds;          // 0x70: per chr file, see MMotionFile::GetChrBounds
+    std::vector<bool> mChrBoundsDone;       // 0x7C
 };
 
 // A shared, reference-counted handle on a loaded motion file.
@@ -111,6 +111,7 @@ public:
     void *GetAnime(int anime, MArchiveFile *file);
     void *GetPalette(u32 index, MArchiveFile *file);
     void *GetChr(u32 index, MArchiveFile *file);
+    MRect GetChrBounds(u32 index);
 
     MMotionData *mData; // 0x00
 };
