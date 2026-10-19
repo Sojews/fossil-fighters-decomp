@@ -248,9 +248,24 @@ void DinoBattleDebugLog::Idle() {
     }
 }
 
+// Adds a line to the log (when the log is on).
+void DinoBattleDebugLog::Print(const char *text) {
+    if (gDinoResource->GetBattleAdjustDefs()->debugLog) {
+        mConsole->Print(std::string(text) + "\n");
+    }
+}
+
 void DinoBattleDebugLog::Clear() {
     if (gDinoResource->GetBattleAdjustDefs()->debugLog) {
         mConsole->ClearText();
         mConsole->Clear();
     }
+}
+
+#pragma auto_inline off
+
+extern "C" const u32 data_0208a394, data_0208a3a0;
+
+DinoBattleViewGivingUpDialog::DinoBattleViewGivingUpDialog(const char *text, u8 *givingUp)
+    : DinoCommonYesNoMenu(std::string(text), NULL, data_0208a394, data_0208a3a0, 1), mGivingUp(givingUp) {
 }

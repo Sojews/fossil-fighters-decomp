@@ -20,6 +20,7 @@ public:
     virtual void Idle();
 
     void Clear();
+    void Print(const char *text);
 
     MConsole *mConsole;     // 0x74
     MInputHub *mInputHub;   // 0x78

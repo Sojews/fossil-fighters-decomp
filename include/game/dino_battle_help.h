@@ -33,6 +33,7 @@ class DinoBattleViewAbilityIcon;
 
 class DinoBattleHelpSupport : public DinoBattleHelpBase {
 public:
+    DinoBattleHelpSupport(DinoBattleViewAbilityIcon *icon, u32 textId);
     virtual ~DinoBattleHelpSupport();
     virtual MRect GetRect();
 

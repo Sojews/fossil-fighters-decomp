@@ -38,3 +38,18 @@ DinoBattleModelPlayer *DinoBattleModel::GetPlayer(int index) {
 u32 DinoBattleModel::GetUnk10C() {
     return mUnk10C;
 }
+
+#pragma auto_inline off
+
+// The creature with the id, on either side.
+DinoBattleModelCreature *DinoBattleModel::FindCreature(u32 id) {
+    for (int side = 0; side < 2; side++) {
+        for (u32 i = 0; i < mPlayers[side]->GetCreatureCount(); i++) {
+            DinoBattleModelCreature *creature = mPlayers[side]->GetCreature(i);
+            if (id == creature->GetUnkB4()) {
+                return creature;
+            }
+        }
+    }
+    return NULL;
+}

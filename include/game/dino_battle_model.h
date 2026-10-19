@@ -9,9 +9,12 @@
 class DinoBattle;
 class DinoBattleModelPlayer;
 
+class DinoBattleModelCreature;
+
 class DinoBattleModel : public MProcess, public MMessageObserver {
 public:
     DinoBattleModelPlayer *GetPlayer(int index);
+    DinoBattleModelCreature *FindCreature(u32 id);
     u32 GetUnk10C();
     void SendLocalMessage(MMessage *msg);
     void SetBattle(DinoBattle *battle);

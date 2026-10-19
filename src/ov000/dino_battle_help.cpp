@@ -37,3 +37,9 @@ DinoBattleHelpBase::DinoBattleHelpBase(MDisplay *display, MRect rect, u32 textId
     mRect = rect;
     mTextId = textId;
 }
+
+#pragma auto_inline off
+
+DinoBattleHelpSupport::DinoBattleHelpSupport(DinoBattleViewAbilityIcon *icon, u32 textId)
+    : DinoBattleHelpBase(icon->GetDisplay(), MRect(0, 0, 0, 0), textId), mIcon(icon) {
+}
