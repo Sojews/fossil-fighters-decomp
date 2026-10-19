@@ -4,6 +4,8 @@
 // Derived destructors have their bases' destructor bodies inlined; auto-inlining the ones defined above does that.
 #pragma auto_inline on
 
+#include "m/lcd.h"
+#include "m/bright.h"
 #include <algorithm>
 #include "game/dino_backup.h"
 #include "game/dino_resource.h"
@@ -211,4 +213,15 @@ void DinoWirelessBattle::Failed() {
 
 void DinoWirelessBattle::StateSoftReset() {
     MSoftReset(1);
+}
+
+// Whitens both screens (for the fade back in) and drops what was showing.
+void DinoWirelessBattle::FadeIn() {
+    gLcd->GetTopDisplay()->mBright->SetMode(1);
+    gLcd->GetTopDisplay()->mBright->SetFactor(16);
+    gLcd->GetTopDisplay()->Update();
+    gLcd->GetBottomDisplay()->mBright->SetMode(1);
+    gLcd->GetBottomDisplay()->mBright->SetFactor(16);
+    gLcd->GetBottomDisplay()->Update();
+    mUnk2F8->Clear();
 }

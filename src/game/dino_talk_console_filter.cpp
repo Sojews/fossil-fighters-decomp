@@ -94,6 +94,14 @@ BOOL DinoTalkWindow::IsPageDone() {
     return done;
 }
 
+// Clears the window for the next page, back at the normal rate.
+void DinoTalkWindow::NextPage() {
+    DinoSoundPlaySe(0xB0, 0);
+    mConsole->SetRate(mRate);
+    mConsole->Clear();
+    mConsole->Run();
+}
+
 // Shows the rest of the page at once.
 void DinoTalkWindow::Skip() {
     DinoSoundPlaySe(0xAF, 0);

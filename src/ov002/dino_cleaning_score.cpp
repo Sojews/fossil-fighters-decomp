@@ -1,6 +1,7 @@
 // DinoCleaningScore.
 // Only the destructors are decompiled so far.
 
+#include "m/picture.h"
 #include "game/dino_cleaning_score.h"
 
 DinoCleaningScore::~DinoCleaningScore() {
@@ -26,4 +27,11 @@ u8 DinoCleaningScore::GetUnk91() {
 
 void DinoCleaningScore::SetUnk9CC() {
     mUnk9CC = TRUE;
+}
+
+// Shows the score's gauge, rising to the score.
+void DinoCleaningScore::Show() {
+    mGauge->SetPosition(1, 0);
+    mGauge->Show();
+    mSerial.AddTail(mGauge->CreateCoordAnime(MPoint(0x80, 0x92), MPoint(0x80, (100 - mScore) * 100 / 100 + 0x2E), 90, -1));
 }
