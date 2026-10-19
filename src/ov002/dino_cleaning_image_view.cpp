@@ -9,6 +9,7 @@
 #include "m/bg.h"
 #include "m/display.h"
 #include "m/pal.h"
+#include "m/seed_generator.h"
 #include "game/dino_cleaning_new_dust.h"
 #include "game/dino_cleaning_last_dust.h"
 #include "game/dino_cleaning_image_view_scale_anime.h"
@@ -20,7 +21,7 @@
 
 DinoCleaningImageView::~DinoCleaningImageView() {
     delete mOamTasks;
-    operator delete(mUnkD9F8);
+    operator delete(mSeed);
     delete mPalTasks;
     for (std::vector<DinoCleaningImage *>::iterator it = mImages.begin(); it != mImages.end(); it++) {
         delete *it;
@@ -139,9 +140,19 @@ void DinoCleaningImage::SetCellLayer(int row, int col, u32 layer) {
 
 // The pooled constants the code reads.
 extern "C" struct {
-    u8 unk00[0x3C];
+    u8 unk00[0x10];
+    const char *mMotionPath;    // 0x10
+    u8 unk14[0x3C - 0x14];
     MPoint mCellOrigin;     // 0x3C: (2, 2)
 } data_ov002_021646e4;
+
+DinoCleaningImageView::DinoCleaningImageView()
+    : MFixedSizeView(MPoint(256, 192)), mKeepPal(FALSE), mDisplay(gCurrentDisplay), mPos(0, 0), mDirtSum(0, 0),
+      mOam(NULL), mMotion(std::string(data_ov002_021646e4.mMotionPath), 7) {
+    mSeed = new u32(SeedGenerator::GenerateSeed());
+    mOamTasks = new MParallelTaskSet(FALSE);
+    mPalTasks = new MParallelTaskSet(FALSE);
+}
 
 // a - b. (Taking a by value and returning it keeps both points on the stack, as the game's code does.)
 static inline MPoint DinoPointSub(MPoint a, const MPoint &b) {

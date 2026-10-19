@@ -7,6 +7,7 @@
 #include "m/affine_screen.h"
 #include "m/fx32.h"
 #include "m/motion.h"
+#include "game/dino_cleaning_status.h"
 
 class DinoCleaningImage;
 class MPalUnit;
@@ -14,6 +15,7 @@ class MSmartOam;
 
 class DinoCleaningImageView : public MFixedSizeView {
 public:
+    DinoCleaningImageView();
     virtual ~DinoCleaningImageView();
     virtual void SetPosition(MPoint pos);
     virtual MPoint GetPosition();
@@ -52,11 +54,11 @@ public:
     MPoint mDirtSum;                            // 0xD9E4: the added dirt's positions, summed
     u32 unkD9EC[2];
     MSmartOam *mOam;                            // 0xD9F4
-    void *mUnkD9F8;                             // 0xD9F8
-    MTaskSet *mOamTasks;                        // 0xD9FC
+    u32 *mSeed;                                 // 0xD9F8
+    MParallelTaskSet *mOamTasks;                // 0xD9FC
     MMotionFile mMotion;                        // 0xDA00
-    std::vector<u16> mUnkDA04;                  // 0xDA04
-    MTaskSet *mPalTasks;                        // 0xDA10
+    std::vector<DinoCleaningStatusEntry> mUnkDA04;  // 0xDA04
+    MParallelTaskSet *mPalTasks;                // 0xDA10
 };
 
 #endif
