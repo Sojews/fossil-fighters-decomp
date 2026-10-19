@@ -25,6 +25,7 @@ public:
     virtual void Idle();
     virtual void OnMessage(MMessage *msg);
 
+    MTask *CreateMotionCallTask();
     u32 GetUnkAC();
     u32 GetUnkB0();
     void SetUnitModes(BOOL on);

@@ -61,6 +61,12 @@ class SetCretureIconTask : public MProcess {
 public:
     virtual ~SetCretureIconTask();
     virtual void Idle();
+
+    MMotion **mMotion;  // 0x74
+    MTaskSet *mTasks;   // 0x78
+    MPoint mPos;        // 0x7C
+    u8 mFlip;           // 0x84
+    int mAnime;         // 0x88
 };
 
 class SetCretureIconPriorityTask : public MTask {

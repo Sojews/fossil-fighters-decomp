@@ -67,10 +67,12 @@ DinoBattleViewCreature::SetCoordTask::~SetCoordTask() {
 
 // Template task instances the game emits in this file. Until the code that makes the tasks is decompiled, they are
 // instantiated explicitly.
+#pragma auto_inline off
 template class MCallTask0<DinoBattleViewCreature, DinoBattleViewCreature>;
 template MTask *MCreateCallTask(DinoBattleViewCreature *obj, void (DinoBattleViewCreature::*func)());
 template class MCallTask1<DinoBattleViewStatusEffectIcon, DinoBattleViewStatusEffectIcon, MPoint>;
 template MTask *MCreateCallTask(DinoBattleViewStatusEffectIcon *obj, void (DinoBattleViewStatusEffectIcon::*func)(MPoint), MPoint a0);
+#pragma auto_inline reset
 
 // The frame around a creature's position (main's data).
 extern "C" const MRect data_020b5aa0;
@@ -183,6 +185,31 @@ void CreateCreatureMotionTask::Execute() {
 #pragma auto_inline off
 
 template MTask *DinoCreatePostAndWaitTask(DinoBattleView *target, DinoBattleViewWaitActionInfoBarRequest *msg);
+
+extern "C" void (DinoBattleViewCreature::*const data_ov000_0219304c)();
+
+// Runs the creature's pending call once its motion stops; returns a task that waits for it too.
+MTask *DinoBattleViewCreature::CreateMotionCallTask() {
+    MTask *wait, *call;
+    call = MCreateCallTask(this, data_ov000_0219304c);
+    wait = mMotion->CreateWaitStopTask();
+    MSerialTaskSet *set = new MSerialTaskSet(TRUE);
+    set->AddTail(wait);
+    set->AddTail(call);
+    mParallel.AddTail(set);
+    return mMotion->CreateWaitStopTask();
+}
+
+void SetCretureIconTask::Idle() {
+    (*mMotion)->SetPriority(2);
+    (*mMotion)->SetAnchor(0);
+    (*mMotion)->Show();
+    (*mMotion)->SetPosition(mPos);
+    (*mMotion)->SetFlip(mFlip, 0);
+    mTasks->AddTail(*mMotion);
+    GetSerial()->AddTail((*mMotion)->CreatePlayTransfer(12, 0), (*mMotion)->CreateWaitStopTask(),
+                         (*mMotion)->CreatePlayTransfer(mAnime, 0), MTaskExitTransfer::Create(this));
+}
 
 void DinoBattleViewCreature::SetUnitModes(BOOL on) {
     mMotion->GetUnit()->SetMode(on ? 1 : 0);
