@@ -1,6 +1,7 @@
 // DinoEventReviveFieldSuspendTask, DinoEventReviveFieldResumeTask, DinoEventReviveContainerSelect, DinoEventReviveDepositSelect, DinoEventReviveCleaning, DinoEventReviveEffect.
 // Only the destructors are decompiled so far.
 
+#include "game/dino_cleaning.h"
 #include "m/bright.h"
 #include "game/dino_event_revive_field_suspend_task.h"
 #include "game/dino_event_revive_field_resume_task.h"
@@ -36,6 +37,25 @@ DinoEventReviveDepositSelect::~DinoEventReviveDepositSelect() {
 }
 
 DinoEventReviveCleaning::~DinoEventReviveCleaning() {
+}
+
+M_EXTERN_OVERLAY(ov002);
+
+// Cleans the rock (in overlay 2), then unloads it.
+void DinoEventReviveCleaning::Idle() {
+    switch (mStep++) {
+    case 0: {
+        MLoadOverlay(0, M_OVERLAY_ID(ov002));
+        DinoBackupEntry entry;
+        gDinoBackup->GetUnk98(mRock, &entry);
+        mSerial.AddTail(new DinoCleaning(entry.id, mResult, entry.unkC_12, entry.unk10_0, 1, mRock));
+        break;
+    }
+    case 1:
+        MUnloadOverlay(0, M_OVERLAY_ID(ov002));
+        Exit();
+        break;
+    }
 }
 
 DinoEventReviveEffect::~DinoEventReviveEffect() {

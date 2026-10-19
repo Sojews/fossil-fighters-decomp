@@ -6,8 +6,13 @@
 class DinoFieldTownMap : public MProcess {
 public:
     virtual ~DinoFieldTownMap();
+    virtual void Idle();
 
     MTask *CreateModeTask(u32 radarMode, u32 to, u32 a);
+
+    u32 mUnk74;         // 0x74: blink while set
+    u32 unk78[2];
+    MTaskSet *mBlinks;  // 0x80
 };
 
 #endif

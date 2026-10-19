@@ -6,6 +6,8 @@
 
 #pragma ipa file
 
+#include "m/display.h"
+#include "m/blend.h"
 #include "game/dino_field_town_map_menu.h"
 #include "game/dino_field_town_map.h"
 #include "game/town_map_icon.h"
@@ -17,6 +19,15 @@
 #include "m/lcd.h"
 
 DinoFieldTownMap::~DinoFieldTownMap() {
+}
+
+// Blinks the sub screen's layers (fading them out and back) while it's on.
+void DinoFieldTownMap::Idle() {
+    if (mUnk74 != 0 && mBlinks->IsEmpty()) {
+        MBlend *blend = gLcd->mSub->mBlend;
+        mBlinks->AddTail(blend->CreateAlphaRatioAnime(0, 0x10, 0x10, 0x10, 30, 0),
+                         blend->CreateAlphaRatioAnime(0x10, 0, 0x10, 0x10, 30, 0));
+    }
 }
 
 TownMapIcon::~TownMapIcon() {
