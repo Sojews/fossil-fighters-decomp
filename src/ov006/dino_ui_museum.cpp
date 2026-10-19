@@ -159,11 +159,10 @@ MRect DinoUiMuseumReviverButton::GetFrame() {
     return mMotion->GetFrame();
 }
 
-extern "C" void func_ov006_0218935c(void *owner);
 
 void DinoUiMuseumBackButton::OnDecide() {
     mMotion->Play(4, 1);
-    func_ov006_0218935c(mOwner);
+    mOwner->OnBackDecided();
     DinoSoundPlaySe(0x90, 0);
 }
 
@@ -250,6 +249,20 @@ void DinoUiMuseumMenu::ClearSlots() {
         delete mSlots[i];
     }
     RemoveLink(mLinkFrom, 2);
+}
+
+// The top row goes up to the tabs, and the rows wrap around.
+void DinoUiMuseumMenu::LinkSlots() {
+    for (int i = 0; i < 5; i++) {
+        AddLink(mSlots[i], 4, mLinkFrom);
+    }
+    AddLink(mSlots[0], 3, mSlots[4]);
+    AddLink(mSlots[5], 3, mSlots[9]);
+    AddLink(mSlots[10], 3, mSlots[14]);
+    AddLink(mSlots[4], 1, mSlots[0]);
+    AddLink(mSlots[9], 1, mSlots[5]);
+    AddLink(mSlots[14], 1, mSlots[10]);
+    AddLink(mLinkFrom, 2, mSlots[0]);
 }
 
 void DinoUiMuseumMenu::CreateSlots() {
@@ -456,12 +469,25 @@ extern "C" struct {
     void (DinoUiMuseum::*OpenInformation_00)();
 } data_ov006_0219621c;
 
+// Fades both screens out to white, then exits.
+void DinoUiMuseumMenu::OnBackDecided() {
+    MTask *main, *sub, *wait, *exit;
+    exit = MTaskExitTransfer::Create(&(MTask &)*this);
+    wait = MTaskSetWaitEmptyTask::Create(&mUnk1B0->mSerial);
+    sub = gLcd->mSub->mBright->CreateFadeOutToWhite(30, 0);
+    main = gLcd->mMain->mBright->CreateFadeOutToWhite(30, 0);
+    MParallelTaskSet *fades = new MParallelTaskSet(TRUE);
+    fades->AddTail(main);
+    fades->AddTail(sub);
+    GetSerial()->AddTail(new MTimer(30), fades, wait, exit);
+}
+
 // Fades out, shows the fossil's information, and fades back in.
 void DinoUiMuseumMenu::ShowInformation() {
     GetSerial()->AddTail(gLcd->mSub->mBright->CreateFadeOutToBlack(5, 0),
                          MCreateCallTask((DinoUiMuseum *)this, data_ov006_021961dc.CloseInformation_00),
                          new DinoUiMuseumInformationMenu((DinoUiMuseumInformationMenu::Info *)&mCreatures,
-                                                         (u32 *)&mSelected, mUnk1B0),
+                                                         (u32 *)&mSelected, (u32)mUnk1B0),
                          MCreateCallTask((DinoUiMuseum *)this, data_ov006_0219621c.OpenInformation_00),
                          gLcd->mSub->mBright->CreateFadeInFromBlack(5, 0));
 }
