@@ -23,6 +23,9 @@
 #include "m/bg.h"
 #include "game/backup_validater.h"
 #include "game/dino_common_window_message_box.h"
+#include "game/dino_resource.h"
+#include "m/text_codec.h"
+#include "game/dino_common_window_yes_no_dialog.h"
 #include "game/dino_ui_parts_team_indicator.h"
 #include "game/dino_ui_parts_team_info.h"
 #include "game/dino_ui_keyboard_menu.h"
@@ -379,6 +382,86 @@ void DinoUiATMMenu::ExitMoveMode() {
     RefreshTeams();
     mUnk11C = 0;
     LinkTeamButtons();
+}
+
+// " " (between the team's name and the message).
+extern "C" const char data_ov007_0218e9e4[];
+extern const u32 data_0208aa80, data_0208aa84, data_0208aa8c, data_0208aa90;
+
+// Leaves (asking first if the teams changed); while a team is moved, stops moving it.
+// NONMATCHING: the exit transfer and the fades' set swap registers (r4/r5).
+void DinoUiATMMenu::OnBackDecided() {
+    if (mUnk11C == 0) {
+        *mResult = mUnk118;
+        mFocusCursor->Hide();
+        u8 changed = FALSE;
+        if (mUnk124) {
+            for (int t = 0; t < 3; t++) {
+                DinoTeam team;
+                DinoTeam saved;
+                gDinoBackup->GetTeam(t + 1, &team);
+                gDinoBackup->GetTeam(t + 4, &saved);
+                for (int i = 0; i < 5; i++) {
+                    if (team.slots[i] != saved.slots[i]) {
+                        changed = TRUE;
+                    }
+                }
+                u32 j;
+                u32 count = 0;
+                for (j = 0; j < 5; j++) {
+                    if (team.slots[j]) {
+                        count++;
+                    }
+                }
+                if (count) {
+                    for (int i = 0; i < 16; i++) {
+                        if (team.name[i] != saved.name[i]) {
+                            changed = TRUE;
+                        }
+                    }
+                }
+            }
+        }
+        if (changed) {
+            mUnk114 = 0;
+            DinoCommonWindowYesNoDialog *dialog =
+                new DinoCommonWindowYesNoDialog(std::string(gDinoResource->GetText(data_0208aa8c)), &mUnk114);
+            dialog->SetLabels2(std::string(gDinoResource->GetText(data_0208aa84)),
+                               std::string(gDinoResource->GetText(data_0208aa80)));
+            mSerial.AddTail(dialog);
+            mSerial.AddTail(MCreateCallTask(this, data_ov007_0218cc38.Leave_08));
+            return;
+        }
+        if (!mUnk124) {
+            DinoTeam team;
+            gDinoBackup->GetTeam(gDinoBackup->GetUnk34_26(), &team);
+            std::string name = MEncodeText(std::wstring((const wchar_t *)team.name), 0);
+            mSerial.AddTail(new DinoCommonWindowMessageBox(
+                MPoint(0x80, 0x60), name + data_ov007_0218e9e4 + gDinoResource->GetText(data_0208aa90), 0x78, 4));
+        }
+        MTask *fadeMain;
+        MTask *fadeSub;
+        MTask *stop;
+        MTask *exit = CreateExitTransfer();
+        stop = DinoSoundCreateStopBgmTask(-1, 30);
+        fadeSub = gLcd->mSub->mBright->CreateFadeOutToBlack(30, 0);
+        fadeMain = gLcd->mMain->mBright->CreateFadeOutToBlack(30, 0);
+        MParallelTaskSet *fades = new MParallelTaskSet(TRUE);
+        fades->AddTail(fadeMain);
+        fades->AddTail(fadeSub);
+        fades->AddTail(stop);
+        MSerialTaskSet *serial = &mSerial;
+        serial->AddTail(fades);
+        serial->AddTail(exit);
+    } else if (mUnk11C == 1) {
+        DinoUiATMBackButton *back = mBackButton;
+        back->mMotion->Show();
+        back->mMotion2->Hide();
+        back->SetMode(4);
+        mUnk11C = 0;
+        LinkTeamButtons();
+        mMessage->Exit();
+    }
 }
 
 #pragma dont_inline on
