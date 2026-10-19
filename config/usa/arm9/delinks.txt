@@ -312,8 +312,13 @@ src/m/3d.cpp:
 src/m/affine_screen.cpp:
     .text       start:0x02059090 end:0x0205937c
 
-src/m/bitmap.cpp:
-    .text       start:0x0205937c end:0x02059abc
+src/m/direct_bitmap.cpp:
+    .text       start:0x0205937c end:0x02059450
+    .init       start:0x020897d4 end:0x02089808
+
+src/m/index_bitmap.cpp:
+    .text       start:0x02059450 end:0x02059abc
+    .init       start:0x02089808 end:0x0208983c
 
 src/m/smart_oam.cpp:
     .text       start:0x0205b5b8 end:0x0205bc1c
