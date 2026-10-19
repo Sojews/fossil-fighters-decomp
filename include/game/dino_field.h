@@ -451,6 +451,13 @@ public:
 
 // A loaded episode file and the archive holding it.
 struct DinoEventEpisode {
+    DinoEventEpisode() {}
+    DinoEventEpisode(FSFileID id) : mArchive(id) {
+        mFile = mArchive.GetFile(0);
+        mFile.Lock();
+        mFile.GetData();
+    }
+
     const void *Get() { return mFile.GetData(); }
 
     MArchivePtr mArchive;   // 0x00
@@ -464,10 +471,6 @@ struct DinoEventLoopUnkB4 {
 };
 struct DinoEventLoopUnkA4Data;
 
-// What the event loop keeps of each episode (nothing is known of it yet).
-struct DinoEventLoopEpisode {
-    u32 unk[2];
-};
 struct DinoEventLoopUnkB8 {
     u32 unk0[2];
     u8 unk8;
@@ -533,7 +536,7 @@ public:
     u32 mUnk108;            // 0x108
     u32 mUnk10C;            // 0x10C
     MScreen *mScreen;       // 0x110: the field's screen
-    DinoEventLoopEpisode *mEpisodes;   // 0x114: one per episode
+    FSFileID *mEpisodes;    // 0x114: each episode's file, once looked up
     u8 mEpisodesChanged;    // 0x118
 };
 

@@ -3,6 +3,7 @@
 
 #include "game/dino_field.h"
 #include "m/font.h"
+#include "m/file.h"
 #include "m/lcd.h"
 #include "m/bg_new_task.h"
 #include "m/overlay.h"
@@ -160,7 +161,9 @@ void DinoEventLoop::RunCommands(const u8 *block) {
 
 // The TU's pooled pointer-to-member constants.
 extern "C" struct {
-    u8 unk00[0x20];
+    u32 unk00;
+    const char *EpisodePath_04;     // "/episode/%04d"
+    u8 unk08[0x20 - 0x08];
     void (DinoEventLoop::*State0203ad00_20)();
     u8 unk28[0x50 - 0x28];
     void (DinoEventLoop::*Start_50)();
@@ -177,8 +180,8 @@ void DinoEventLoop::Start() {
     MTaskSet *parallel = &mParallel;
     parallel->mUseMutex = TRUE;
     MLoadOverlay(0, M_OVERLAY_ID(ov001));
-    mEpisodes = new DinoEventLoopEpisode[gDinoResource->GetEpisodeCount()];
-    u32 size = gDinoResource->GetEpisodeCount() * sizeof(DinoEventLoopEpisode);
+    mEpisodes = new FSFileID[gDinoResource->GetEpisodeCount()];
+    u32 size = gDinoResource->GetEpisodeCount() * sizeof(FSFileID);
     MI_CpuFill8(mEpisodes, 0, size);
     mEpisodesChanged = FALSE;
     mUnkB4 = new DinoEventLoopUnkB4;
@@ -244,6 +247,16 @@ void DinoEventLoop::FinishCommands() {
         mField->GetCamera()->SetTracking(TRUE);
     }
     mUnkBD = FALSE;
+}
+
+// Opens the episode's file (looking it up the first time) and keeps it.
+void DinoEventLoop::AddEpisode(u32 id) {
+    if (mEpisodes[id].arc == NULL) {
+        char path[0x100];
+        OS_SPrintf(path, data_020bd9d0.EpisodePath_04, id);
+        MGetFileID(std::string(path), &mEpisodes[id]);
+    }
+    mEpisodeFiles[id] = DinoEventEpisode(mEpisodes[id]);
 }
 
 void DinoEventLoop::ClearEpisodes() {
