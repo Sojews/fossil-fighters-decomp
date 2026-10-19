@@ -26,6 +26,12 @@ public:
     void Unk0201c098(MRect a, MRect b);
     // Unk0201c098 with the frame inside the window's rect.
     void Unk0201bb5c();
+    // Not decompiled yet: a task that opens the window out of the rect.
+    MTask *CreateOpenTask(MRect from);
+    // Not decompiled yet: draws the rect's row in one of the flash phases.
+    void Flush(MRect rect, u8 phase);
+    // Not decompiled yet: a task that closes the window into the rect.
+    MTask *CreateCloseTask(MRect to);
 
     MDisplay *mDisplay;     // 0x18
     MText *mText;           // 0x1C

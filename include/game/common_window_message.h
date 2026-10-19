@@ -6,6 +6,7 @@
 #include "m/geometry.h"
 
 class MView;
+class DinoCommonWindow;
 
 // A message window process.
 class DinoCommonWindowMessage : public MProcess {
@@ -21,16 +22,16 @@ public:
     void Start();
 
     MView *mUnk74;      // 0x74
-    MView *mUnk78;      // 0x78: shown and hidden with mUnk74 to blink
+    DinoCommonWindow *mWindow;  // 0x78: shown and hidden with mUnk74 to blink
     MPoint mPos;        // 0x7C
     std::string mText;  // 0x84
     int mUnk90;         // 0x90
     int mUnk94;         // 0x94
     u8 mUnk98;          // 0x98
     int mUnk9C;         // 0x9C
-    u32 mUnkA0;         // 0xA0
+    MView *mUnkA0;      // 0xA0: shown last, if any
     u8 mUnkA4;          // 0xA4
-    u32 mUnkA8;         // 0xA8
+    u32 mUnkA8;         // 0xA8: the sound played when it opens (0: none)
 };
 
 #endif

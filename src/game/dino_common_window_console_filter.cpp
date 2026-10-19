@@ -5,6 +5,8 @@
 #include "game/common_window_message.h"
 #include "m/bg_new_task.h"
 #include "m/call_task.h"
+#include "game/dino_sound.h"
+#include "game/dino_common_window.h"
 #include "m/input.h"
 #include "m/view.h"
 #include "m/text_codec.h"
@@ -155,6 +157,18 @@ void DinoCommonWindowMessage::SetUnkA4(u8 value) {
     mUnkA4 = value;
 }
 
+// Opens the window out of its position and shows the text.
+void DinoCommonWindowMessage::Start() {
+    if (mUnkA8 != 0) {
+        DinoSoundPlaySe(mUnkA8, 0);
+    }
+    GetSerial()->AddTail(new MTimer(1), mWindow->CreateShowTransfer(), mWindow->CreateOpenTask(MRect(mPos, mPos)),
+                         mUnk74->CreateShowTransfer());
+    if (mUnkA0 != NULL) {
+        mSerial.AddTail(mUnkA0->CreateShowTransfer());
+    }
+}
+
 // The TU's pooled pointer-to-member constants.
 extern "C" struct {
     void (DinoCommonWindowMessage::*Start_00)();
@@ -184,16 +198,16 @@ void DinoCommonWindowMessage::Idle() {
     if (mUnk98) {
         mUnk94 = (mUnk94 + 1) % (mUnk98 * 2);
         if (mUnk94 == mUnk98 + 1) {
-            mUnk78->Show();
+            mWindow->Show();
             mUnk74->Show();
         }
         if (mUnk94 == 1) {
-            mUnk78->Hide();
+            mWindow->Hide();
             mUnk74->Hide();
         }
     } else if (mUnk94 > 0) {
         mUnk94 = 0;
-        mUnk78->Show();
+        mWindow->Show();
         mUnk74->Show();
     }
 }

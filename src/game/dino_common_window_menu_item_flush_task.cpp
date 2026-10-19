@@ -7,6 +7,8 @@
 #include "game/dino_common_window_menu_item_flush_task_menu.h"
 #include "game/dino_common_window_menu_item_flush_task.h"
 #include "game/help.h"
+#include "game/dino_sound.h"
+#include "game/dino_common_window.h"
 #include "game/dino_common_window_menu_cursor.h"
 #include "m/bg_new_task.h"
 #include "m/call_task.h"
@@ -59,6 +61,45 @@ void DinoCommonWindowMenu::AddEntry(u32 id, MRect rect, const std::string &text)
 }
 
 DinoCommonWindowMenuItemFlushTask::~DinoCommonWindowMenuItemFlushTask() {
+}
+
+// Sets the result, hides the items, flashes the decided one and closes the window.
+#pragma opt_strength_reduction off
+void DinoCommonWindowMenu::OnDecide(MMenuItem *item) {
+    for (u32 i = 0; i < mChoices.size(); i++) {
+        if (item == mUnkC0[i]) {
+            *(u32 *)mUnkE4 = mChoices[i].unk00;
+            DinoSoundPlaySe(0x98, 0);
+            MParallelTaskSet *hides = new MParallelTaskSet(TRUE);
+            for (u32 j = 0; j < mChoices.size(); j++) {
+                hides->AddTail(((DinoCommonWindowMenuItem *)mUnkC0[j])->mUnk94->CreateHideTransfer());
+            }
+            MPoint offset(mPos.x - mUnk100.x, mPos.y - mUnk100.y);
+            MRect rect = MRect(mWidth * 4, 0, mWidth * 4, mUnkBC * 8).Moved(offset);
+            GetSerial()->AddTail(mCursor->mUnk10->CreatePlayTransfer(2, 1),
+                                 new DinoCommonWindowMenuItemFlushTask(this, i), hides,
+                                 mWindow->CreateCloseTask(rect));
+            mSerial.AddTail(CreateExitTransfer());
+            Disable();
+        }
+    }
+}
+#pragma opt_strength_reduction reset
+
+void DinoCommonWindowMenuItemFlushTask::Execute() {
+    if (++mFrame >= 36) {
+        Exit();
+        return;
+    }
+    int phase = mFrame % 6;
+    if (phase == 1) {
+        mMenu->mWindow->Unk0201bb5c();
+    } else if (phase == 4) {
+        int row = mIndex % 4;
+        int height = row < 2 ? 2 : 3;
+        int top = mIndex / 4 + (mIndex * 2 + 1);
+        mMenu->mWindow->Flush(MRect(3, top, mMenu->mWidth - 1, top + height), row);
+    }
 }
 
 DinoCommonWindowMenu::~DinoCommonWindowMenu() {
