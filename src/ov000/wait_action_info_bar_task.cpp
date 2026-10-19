@@ -66,6 +66,37 @@ extern "C" void func_ov000_0218b55c(DinoBattleViewActionInfoBar *bar, const char
     bar->mText->SetText(std::string(text));
 }
 
+// Shows the next line when none is up; fades the window in, and out once the line's time is over.
+void DinoBattleViewActionInfoBar::Idle() {
+    if (mText == NULL && !mLines.empty()) {
+        func_ov000_0218b55c(this, mLines.front().c_str());
+        mLines.erase(mLines.begin());
+    }
+    if (mText != NULL) {
+        mTimer--;
+        if (mTimer <= 0) {
+            if (mFade > 0) {
+                mFade--;
+                if (mFade <= 0) {
+                    mText->Exit();
+                    mText = NULL;
+                    mBg->Exit();
+                    return;
+                }
+                mWindow->SetUnk1C(mFade);
+            }
+        } else if (mFade < 6) {
+            mFade++;
+            mWindow->SetUnk1C(mFade);
+        }
+        if (mFade == 6) {
+            mText->Show();
+        } else {
+            mText->Hide();
+        }
+    }
+}
+
 BOOL DinoBattleViewActionInfoBar::IsIdle() {
     if (mText == NULL) {
         return TRUE;
