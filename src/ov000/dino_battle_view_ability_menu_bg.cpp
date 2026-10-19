@@ -186,8 +186,24 @@ extern "C" BOOL func_ov000_02179aa0(u32 id) {
 extern "C" void func_ov000_0217b838() {
 }
 
-// Moves the bar.
-extern "C" void func_ov000_0217a080(AttackMenuBarMotion *bar, MPoint from, MPoint to, int frames, int ease);
+// Moves the bar (and its parts with it).
+extern "C" MTask *func_ov000_0217a080(AttackMenuBarMotion *bar, MPoint from, MPoint to, int frames, int ease) {
+    MParallelTaskSet *set = new MParallelTaskSet(TRUE);
+    set->AddTail(bar->mMotion->CreateCoordAnime(from, to, frames, ease));
+    set->AddTail(bar->mUnk80->CreateCoordAnime(
+        MPoint(from.x + data_ov000_021947ac.mUnk80Offset.x, from.y + data_ov000_021947ac.mUnk80Offset.y),
+        MPoint(to.x + data_ov000_021947ac.mUnk80Offset.x, to.y + data_ov000_021947ac.mUnk80Offset.y), frames, ease));
+    set->AddTail(bar->mUnk7C->CreateCoordAnime(
+        MPoint(from.x + data_ov000_021947ac.mUnk7COffset.x, from.y + data_ov000_021947ac.mUnk7COffset.y),
+        MPoint(to.x + data_ov000_021947ac.mUnk7COffset.x, to.y + data_ov000_021947ac.mUnk7COffset.y), frames, ease));
+    if (bar->mUnk78 != NULL) {
+        set->AddTail(bar->mUnk78->CreateCoordAnime(
+            MPoint(from.x + data_ov000_0219482c.mUnk78Offset.x, from.y + data_ov000_0219482c.mUnk78Offset.y),
+            MPoint(to.x + data_ov000_0219482c.mUnk78Offset.x, to.y + data_ov000_0219482c.mUnk78Offset.y), frames,
+            ease));
+    }
+    return set;
+}
 
 extern "C" void func_ov000_0217a45c(DinoBattleViewUiAbilityMenuItem *item, MPoint from, MPoint to, int frames,
                                     int ease) {
