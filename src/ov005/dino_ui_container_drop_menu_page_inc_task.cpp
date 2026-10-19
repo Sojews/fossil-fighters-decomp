@@ -44,6 +44,18 @@ BOOL DinoUiContainerDropMenu::PageRight() {
     return TRUE;
 }
 
+#pragma opt_strength_reduction off
+void DinoUiContainerDropMenu::DeleteItems() {
+    for (u32 i = 0; i < mUnkC4.size(); i++) {
+        RemoveLink((MMenuItem *)mUnkC4[i], 2);
+        RemoveLink((MMenuItem *)mUnkC4[i], 3);
+        RemoveLink((MMenuItem *)mUnkC4[i], 1);
+        RemoveItem((MMenuItem *)mUnkC4[i]);
+        delete (MMenuItem *)mUnkC4[i];
+    }
+}
+#pragma opt_strength_reduction reset
+
 #pragma auto_inline on
 
 DinoUiContainerDropMenuPageIncTask::~DinoUiContainerDropMenuPageIncTask() {

@@ -24,6 +24,8 @@ public:
     BOOL PageRight();
     BOOL PageLeft();
     void ShowPage();
+    // Unlinks and deletes the page's items (leaving the list as it is).
+    void DeleteItems();
 
     MSmartOam *mOam;            // 0xB4: the items' sprites
     u32 mUnkB8[3];              // 0xB8
