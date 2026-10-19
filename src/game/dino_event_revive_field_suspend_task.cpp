@@ -21,6 +21,7 @@
 #include "game/dino_sound.h"
 #include "m/display.h"
 #include "m/lcd.h"
+#include "game/dino_event_talk_window.h"
 #include "m/screen.h"
 #include "game/dino_ui_cleaning_leave.h"
 #include "game/dino_ui_revive_effect.h"
@@ -462,3 +463,15 @@ void DinoEventCaptureFadeUiTask::Idle() {
 
 // String members the game emits in this file.
 template std::string &std::string::operator+=(const std::string &str);
+
+// A talk window with the message, its %s filled in with extra.
+MTask *DinoEventRevive::CreateMessage(u32 message, const std::string &extra) {
+    const u8 *data = (const u8 *)mMessages.Get();
+    const u8 *entry = data + ((const u32 *)(data + ((const u32 *)data)[2]))[message];
+    const char *format = (const char *)entry + ((const u32 *)entry)[1];
+    char *text = new char[strlen(format) + extra.size() + 1];
+    OS_SPrintf(text, format, extra.c_str());
+    MTask *window = new DinoEventTalkWindow(GetDisplay(), std::string(text), 0, 0);
+    delete[] text;
+    return window;
+}
