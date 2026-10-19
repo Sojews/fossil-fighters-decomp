@@ -80,4 +80,7 @@ const DinoKasekiDefs *(MResource<DinoKasekiDefs>::*DinoKasekiDefsGetAnchor())() 
 const DinoKasekiDef *DinoKasekiDefsAnchor(const DinoKasekiDefs *defs, u32 id) {
     return defs->GetDef(id);
 }
+MSerialTaskSet *DinoSerialAddAnchor(MSerialTaskSet *set, MTask *task) {
+    return set->Add(task);
+}
 #pragma dont_inline reset

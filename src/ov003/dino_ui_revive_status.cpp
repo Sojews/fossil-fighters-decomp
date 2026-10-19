@@ -323,4 +323,11 @@ u32 DinoReviveStatusCreatureAnchor(const DinoCreatureDef *def) {
 MSmartObjCanvas *DinoReviveStatusCanvasAnchor(MSmartOam *oam, MPoint size, const void *palette) {
     return new MSmartObjCanvas(oam, size, palette, FALSE);
 }
+MParallelTaskSet *DinoReviveStatusSetsAnchor(MTask *task) {
+    new MSerialTaskSet(TRUE);
+    return (new MParallelTaskSet(TRUE))->Add(task);
+}
+void DinoReviveStatusStateAnchor(DinoCreatureState *a, const DinoCreatureState &b) {
+    *a = b;
+}
 #pragma dont_inline reset

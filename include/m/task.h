@@ -139,15 +139,25 @@ public:
 // Runs the first task until it stops running, then the next.
 class MSerialTaskSet : public MTaskSet {
 public:
-    MSerialTaskSet(BOOL exitWhenEmpty = FALSE) { mExitWhenEmpty = exitWhenEmpty; }
+    MSerialTaskSet(u8 exitWhenEmpty = FALSE) { mExitWhenEmpty = exitWhenEmpty; }
     virtual void Execute();
+    // AddTail, for chaining.
+    MSerialTaskSet *Add(MTask *task) {
+        AddTail(task);
+        return this;
+    }
 };
 
 // Runs every task each frame.
 class MParallelTaskSet : public MTaskSet {
 public:
-    MParallelTaskSet(BOOL exitWhenEmpty = FALSE) { mExitWhenEmpty = exitWhenEmpty; }
+    MParallelTaskSet(u8 exitWhenEmpty = FALSE) { mExitWhenEmpty = exitWhenEmpty; }
     virtual void Execute();
+    // AddTail, for chaining.
+    MParallelTaskSet *Add(MTask *task) {
+        AddTail(task);
+        return this;
+    }
 };
 
 // Exits after mFrames + 1 frames.
