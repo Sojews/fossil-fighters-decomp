@@ -149,6 +149,8 @@ public:
     MFx32 GetHeight();
     DinoCharaTask *GetTask() { return &mTask; }
     void ResetState();
+    // Not decompiled yet: clears the tasks and motion state and redraws the character.
+    void Refresh();
     MFx32 GetMoveSpeed();
     u8 GetUnk2C();
     MFx32Rect GetRect30();

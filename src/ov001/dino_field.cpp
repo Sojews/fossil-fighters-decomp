@@ -872,6 +872,37 @@ void DinoField::LoadMap(u32 id) {
 extern "C" void func_ov001_021603d8(DinoFieldChara *chara);
 extern "C" void func_ov001_02157534(DinoField *field);
 
+// Puts the character where the save has it, if it's on this map (else just resets it).
+void DinoField::SyncChara(u32 id) {
+    DinoCharaState state;
+    gDinoBackup->GetChara(id, &state);
+    if (state.unk0 && state.map == mMap->GetInfo()->id) {
+        DinoFieldChara *chara = GetChara(id);
+        if (chara == NULL) {
+            chara = GetChara(0);
+            if (chara == NULL) {
+                return;
+            }
+        }
+        chara->ResetState();
+        chara->GetModel()->id = id;
+        MFx32Point &pos = chara->GetModel()->pos;
+        pos.x = state.x;
+        pos.y = state.y;
+        chara->GetModel()->angle = state.angle;
+        chara->Refresh();
+        DinoCharaTask task;
+        gDinoBackup->GetCharaTask(id, &task);
+        chara->SetTask(task);
+    } else {
+        DinoFieldChara *chara = GetChara(id);
+        if (chara != NULL) {
+            chara->ResetState();
+            chara->Refresh();
+        }
+    }
+}
+
 void DinoField::ReloadMap() {
     mFadeTasks->Clear();
     for (u32 i = 0; i < 100; i++) {
