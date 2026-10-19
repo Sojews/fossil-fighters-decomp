@@ -815,6 +815,26 @@ MTask *DinoBattleModelPlayer::CreateMotionEffectTask(u32 a, u32 b, u32 c, u32 d,
     return set;
 }
 
+// Updates every creature on both sides, waits for them all, and exits.
+// NONMATCHING: 87%, the game spills this and keeps the wait in a register (ours the other way round).
+void UpdateAllCreatureTask::Idle() {
+    int count = mPlayer->GetCreatureCount() + mPlayer->GetOpponent()->GetCreatureCount();
+    MParallelTaskSet *set = new MParallelTaskSet(TRUE);
+    DinoSignalWait *wait = new DinoSignalWait(0x10030, NULL, NULL, count);
+    set->AddTail(wait);
+    DinoBattleModelPlayer *player = mPlayer;
+    for (int side = 0; side < 2; side++) {
+        for (int i = 0; i < player->GetCreatureCount(); i++) {
+            set->AddTail(player->GetCreature(i)->CreateUpdateTask(0, (u32)(MMessageObserver *)wait));
+        }
+        player = player->GetOpponent();
+    }
+    MTask *exit = MTaskExitTransfer::Create(this);
+    MSerialTaskSet *serial = &mSerial;
+    serial->AddTail(set);
+    serial->AddTail(exit);
+}
+
 // Updates every creature on both sides, and waits for them all (NULL with no creatures).
 extern "C" MTask *func_ov000_02166470(DinoBattleModelPlayer *player) {
     int count = player->GetCreatureCount() + player->GetOpponent()->GetCreatureCount();
