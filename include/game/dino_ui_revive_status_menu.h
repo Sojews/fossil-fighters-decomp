@@ -25,6 +25,8 @@ public:
     std::string mText;  // 0x88
 };
 
+class DinoUiRvInformation;
+
 class DinoUiReviveStatusMenu : public DinoHelpBase, public MMenu {
 public:
     MSmartOam *GetOam() { return mOam; }
@@ -33,6 +35,7 @@ public:
     virtual void OnFocus(MMenuItem *item);
     virtual void OnDecide(MMenuItem *item);
     void OnBackDecided();
+    void SetPage(u8 page);
 
     u8 unkB3[1];
     MSmartOam *mOam;        // 0xB4: the items' sprites
@@ -40,7 +43,8 @@ public:
     MMenuItem *mItems[4];   // 0xBC
     MSerialTaskSet *mCursorTasks;   // 0xCC
     DinoUiFieldMenuCursor *mCursor; // 0xD0
-    u8 unkD4[0x50];
+    DinoUiRvInformation *mInfo;     // 0xD4
+    u8 unkD8[0x4C];
     MArchivePtr mArchive;   // 0x124
     MArchiveFile mFile;     // 0x128
 };

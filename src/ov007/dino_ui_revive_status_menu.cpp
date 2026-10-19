@@ -7,6 +7,7 @@
 #include "types.h"
 #include "game/dino_sound.h"
 #include "m/call_task.h"
+#include "game/dino_ui_rv_information.h"
 
 DinoUiReviveStatusMenu::~DinoUiReviveStatusMenu() {
 }
@@ -98,8 +99,10 @@ void DinoUiReviveStatusMenu::OnFocus(MMenuItem *item) {
 }
 
 // DinoUiReviveStatusMenu::OnStart (not decompiled yet) re-enables the help through a call task.
+#pragma auto_inline off
 template MTask *MCreateCallTask(DinoUiReviveStatusMenu *obj, void (DinoHelpBase::*func)());
 template MTask *MCreateCallTask(DinoUiReviveStatusMenu *obj, void (DinoUiReviveStatusMenu::*func)(bool), bool a1);
+#pragma auto_inline reset
 
 #pragma auto_inline off
 
@@ -117,4 +120,19 @@ DinoUiReviveStatusMenuItem::DinoUiReviveStatusMenuItem(DinoUiReviveStatusMenu *o
 DinoUiReviveStatusLoop::DinoUiReviveStatusLoop(u32 a, u32 b) : MProcess(NULL) {
     mUnk74 = a;
     mUnk78 = b;
+}
+
+#pragma auto_inline off
+
+// The TU's pooled pointer-to-member constants.
+extern "C" struct {
+    void (DinoHelpBase::*Enable_00)();
+} data_ov007_02191eb0;
+
+// Turns the information to the page; help comes back once it has.
+void DinoUiReviveStatusMenu::SetPage(u8 page) {
+    mInfo->SetPage(page);
+    GetSerial()->AddTail(MTaskSetWaitEmptyTask::Create(&mInfo->mSerial),
+                         MCreateCallTask(this, data_ov007_02191eb0.Enable_00));
+    Disable();
 }

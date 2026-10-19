@@ -28,10 +28,13 @@ public:
     MSerialTaskSet *mCursorTasks;   // 0xF8
     DinoUiFieldMenuCursor *mCursor; // 0xFC
     DinoUiPartsTeamInfo *mTeamInfo; // 0x100
-    u8 unk104[0xC];
+    int *mResult;           // 0x104
+    u32 unk108;
+    int mUnk10C;            // 0x10C: 1 once a team is chosen
     int mSelected;          // 0x110
 
     void Close();
+    void StateDecided();
 };
 
 class DinoUiTeamSelect : public MProcess {

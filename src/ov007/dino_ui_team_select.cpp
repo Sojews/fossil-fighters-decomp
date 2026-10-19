@@ -107,3 +107,12 @@ void DinoUiTeamSelectMenu::Close() {
     serial.AddTail(fades);
     serial.AddTail(exit);
 }
+
+#pragma dont_inline on
+void DinoUiTeamSelectMenu::StateDecided() {
+    if (mUnk10C == 1) {
+        *mResult = mSelected;
+        Close();
+    }
+}
+#pragma dont_inline reset
