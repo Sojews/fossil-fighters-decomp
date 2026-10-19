@@ -21,6 +21,9 @@
 #include "game/dino_field_spot.h"
 #include "game/dino_field_capture_fade_in_task.h"
 #include "m/bg.h"
+#include "m/blend.h"
+#include "m/affine_screen.h"
+#include "m/ext_affine.h"
 #include "m/bg_new_task.h"
 #include "m/picture.h"
 #include "m/raster.h"
@@ -721,6 +724,70 @@ void DinoFieldCharaMoveToCoordTask::Transfer() {
         }
         chara->MoveTo(coord, mA, mB, mC);
     }
+}
+
+extern "C" struct {
+    void (MBg::*SetMode_00)(bg_mode);
+} data_ov001_021693d4;
+
+// Cross-fades the picture out, then frees it and resets the background mode.
+void DinoField::FadeOutPict(MDisplay *display, MExtAffinePicture **pict, u32 frames, long ease) {
+    if (*pict == NULL) {
+        return;
+    }
+    MTask *reset = MCreateCallTask(display->mBg, data_ov001_021693d4.SetMode_00, (bg_mode)0);
+    MTask *timer = new MTimer(1);
+    MTask *clear = display->mBlend->CreateClearTransfer();
+    MTask *exit = MTaskExitTransfer::Create(*pict);
+    MBlend *blend = display->mBlend;
+    MTask *fade = blend->CreateCrossFadeOutTask((*pict)->GetPlaneMask(), frames, ease);
+    mPictTasks->AddTail(fade, exit, clear, timer, reset);
+    *pict = NULL;
+}
+
+extern "C" struct {
+    void (MBg::*SetMode_00)(bg_mode);
+} data_ov001_0216938c;
+
+// Slides the picture off the screen (0 right, 1 down, 2 left, 3 up), then frees it and resets the background mode.
+// NONMATCHING: sDirs' offset in the TU's data (the game's data before it isn't all emitted here).
+void DinoField::SlideOutPict(MDisplay *display, MExtAffinePicture **pict, u32 dir, u32 frames, long ease) {
+    if (*pict == NULL) {
+        return;
+    }
+    static const MPoint sDirs[4] = {MPoint(256, 0), MPoint(0, 192), MPoint(-256, 0), MPoint(0, -192)};
+    MTask *reset = MCreateCallTask(display->mBg, data_ov001_0216938c.SetMode_00, (bg_mode)0);
+    MTask *timer = new MTimer(1);
+    MTask *exit = MTaskExitTransfer::Create(*pict);
+    MPoint to = (*pict)->GetPosition() + sDirs[dir];
+    MTask *slide = (*pict)->CreateCoordAnime((*pict)->GetPosition(), to, frames, ease);
+    mPictTasks->AddTail(slide, exit, timer, reset);
+    *pict = NULL;
+}
+
+extern "C" struct {
+    void (MBg::*SetMode_00)(bg_mode);
+} data_ov001_02169374;
+
+// Cross-fades the picture out while scaling it from 1 to scale, then frees it and resets the background mode.
+// NONMATCHING: the stack layout of the scale points (and a cached ease).
+void DinoField::ZoomOutPict(MDisplay *display, MExtAffinePicture **pict, MFx32 scale, u32 frames, long ease) {
+    if (*pict == NULL) {
+        return;
+    }
+    MTask *reset = MCreateCallTask(display->mBg, data_ov001_02169374.SetMode_00, (bg_mode)0);
+    MTask *timer = new MTimer(1);
+    MTask *clear = display->mBlend->CreateClearTransfer();
+    MTask *exit = MTaskExitTransfer::Create(*pict);
+    MTask *zoom = (*pict)->GetScreen()->CreateScaleAnime(MFx32Point(MFx32(1), MFx32(1)), MFx32Point(scale, scale),
+                                                         frames, ease);
+    MBlend *blend = display->mBlend;
+    MTask *fade = blend->CreateCrossFadeOutTask((*pict)->GetPlaneMask(), frames, ease);
+    MParallelTaskSet *both = new MParallelTaskSet(TRUE);
+    both->AddTail(fade);
+    both->AddTail(zoom);
+    mPictTasks->AddTail(both, exit, clear, timer, reset);
+    *pict = NULL;
 }
 
 void DinoField::FadeInLowerPict(u32 pict, MPoint pos, u32 frames, long unk) {

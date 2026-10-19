@@ -403,12 +403,12 @@ public:
     u32 GetUnk26C();
     void SetUnk238(u32 value);
     u32 GetBgm();
-    void FadeInPict(MDisplay *display, u32 *id, MTextPicture **pict, u32 newId, MPoint pos, u32 frames, long unk);
-    void FadeOutPict(MDisplay *display, MTextPicture **pict, u32 id, long frames);
-    void SlideInPict(MDisplay *display, u32 *id, MTextPicture **pict, u32 newId, MPoint pos, u32 a, u32 b, long c);
-    void SlideOutPict(MDisplay *display, MTextPicture **pict, u32 id, u32 a, long b);
-    void ZoomInPict(MDisplay *display, u32 *id, MTextPicture **pict, u32 newId, MPoint pos, MFx32 scale, u32 a, long b);
-    void ZoomOutPict(MDisplay *display, MTextPicture **pict, MFx32 scale, u32 a, long b);
+    void FadeInPict(MDisplay *display, u32 *id, MExtAffinePicture **pict, u32 newId, MPoint pos, u32 frames, long unk);
+    void FadeOutPict(MDisplay *display, MExtAffinePicture **pict, u32 id, long frames);
+    void SlideInPict(MDisplay *display, u32 *id, MExtAffinePicture **pict, u32 newId, MPoint pos, u32 a, u32 b, long c);
+    void SlideOutPict(MDisplay *display, MExtAffinePicture **pict, u32 id, u32 a, long b);
+    void ZoomInPict(MDisplay *display, u32 *id, MExtAffinePicture **pict, u32 newId, MPoint pos, MFx32 scale, u32 a, long b);
+    void ZoomOutPict(MDisplay *display, MExtAffinePicture **pict, MFx32 scale, u32 a, long b);
 
     u32 mUnk98;                 // 0x98
     DinoFieldMap *mMap;         // 0x9C
@@ -432,8 +432,8 @@ public:
     MTaskSet *mFadeTasks;       // 0x268
     u32 mUnk26C;                // 0x26C
     MTaskSet *mPictTasks;       // 0x270
-    MTextPicture *mLowerPict;   // 0x274: the event picture on each screen
-    MTextPicture *mUpperPict;   // 0x278
+    MExtAffinePicture *mLowerPict;   // 0x274: the event picture on each screen
+    MExtAffinePicture *mUpperPict;   // 0x278
     MPoint mLowerPos;           // 0x27C
     MPoint mUpperPos;           // 0x284
     u32 mUpperPictId;           // 0x28C
