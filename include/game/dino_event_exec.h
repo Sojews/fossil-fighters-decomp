@@ -608,6 +608,9 @@ public:
     void StateChosen();
     void StateConfirmed();
     void StateSwap();
+    void StateStore();
+    void StateReplace();
+    void StateEnd();
 
     void (DinoEventKasekiRockGet::*mState)(); // 0x74
     DinoEventLoop *mEvent;  // 0x7C
