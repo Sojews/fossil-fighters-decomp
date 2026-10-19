@@ -274,6 +274,38 @@ DinoUiMuseumMenu::~DinoUiMuseumMenu() {
     }
 }
 
+static inline const DinoMuseumDef *GetMuseumDef(const DinoMuseumDefs *defs, u32 id) {
+    return (const DinoMuseumDef *)((const u8 *)defs + defs->tableOffset) + id;
+}
+
+// OnStart's function-local static and its guard come first in the file's .bss (OnStart isn't decompiled yet).
+static u32 sOnStartStatic[2];
+// The museum's definitions, held in a static object (made and freed by the file's static initializer).
+static MResource<DinoMuseumDefs> sMuseumDefs;
+
+// The tabs' orders.
+struct DinoMuseumByUnk0C {
+    static u32 Key(u32 id) { return GetMuseumDef(sMuseumDefs.Get(), id)->unk0C; }
+    bool operator()(const u32 &a, const u32 &b) const {
+        u32 x = Key(a);
+        return x > Key(b);
+    }
+};
+struct DinoMuseumByUnk0A {
+    static u32 Key(u32 id) { return GetMuseumDef(sMuseumDefs.Get(), id)->unk0A; }
+    bool operator()(const u32 &a, const u32 &b) const {
+        u32 x = Key(a);
+        return x < Key(b);
+    }
+};
+struct DinoMuseumByUnk08 {
+    static u32 Key(u32 id) { return GetMuseumDef(sMuseumDefs.Get(), id)->unk08; }
+    bool operator()(const u32 &a, const u32 &b) const {
+        u32 x = Key(a);
+        return x > Key(b);
+    }
+};
+
 // The creature lists' sorts and copies are the ones the medal menu and the revive status menu emit.
 namespace std {
 template <>
@@ -310,6 +342,50 @@ void DinoUiMuseumMenu::LoadCreatures() {
     }
     mFraction->SetDenominator(mPageCount + 1);
 }
+
+// The tab's sort (the game emits the whole stable_sort machinery here).
+// NONMATCHING: std::__inplace_merge (stack layout, and the game elides one argument copy), std::__stable_sort_move
+// (comp and the buffer's owner swap registers), std::__insertion_sort_move (the first few instructions' order).
+template void std::stable_sort(std::vector<u32>::iterator, std::vector<u32>::iterator, DinoMuseumByUnk0C);
+template void std::stable_sort(std::vector<u32>::iterator, std::vector<u32>::iterator, DinoMuseumByUnk0A);
+template void std::stable_sort(std::vector<u32>::iterator, std::vector<u32>::iterator, DinoMuseumByUnk08);
+
+// Lists the creatures in the tab's order: 0 and 1 are kept lists, the rest sort mByVoice.
+void DinoUiMuseumMenu::LoadTab(u8 tab) {
+    if (tab > 4) {
+        return;
+    }
+    switch (tab) {
+    case 0:
+        mCreatures = mByVoice;
+        break;
+    case 1:
+        mCreatures = mByUnk88;
+        break;
+    case 2:
+        mCreatures = mByVoice;
+        {
+            DinoMuseumByUnk08 order;
+            std::stable_sort(mCreatures.begin(), mCreatures.end(), order);
+        }
+        break;
+    case 3:
+        mCreatures = mByVoice;
+        {
+            DinoMuseumByUnk0A order;
+            std::stable_sort(mCreatures.begin(), mCreatures.end(), order);
+        }
+        break;
+    case 4:
+        mCreatures = mByVoice;
+        {
+            DinoMuseumByUnk0C order;
+            std::stable_sort(mCreatures.begin(), mCreatures.end(), order);
+        }
+        break;
+    }
+}
+
 
 void DinoUiMuseumMenu::ClearSlots() {
     for (int i = 0; i < 15; i++) {
@@ -429,10 +505,6 @@ void DinoUiMuseumSlotCreateTask::Idle() {
     mIndex++;
 }
 
-static inline const DinoMuseumDef *GetMuseumDef(const DinoMuseumDefs *defs, u32 id) {
-    return (const DinoMuseumDef *)((const u8 *)defs + defs->tableOffset) + id;
-}
-
 // Shows the page's creature: its number, element, name, description and model.
 void DinoUiMuseumInformationMenu::Refresh() {
     u32 id = mInfo->mCreatures[*mPage];
@@ -528,34 +600,6 @@ void DinoUiMuseum3DModel::SetModel(u32 id) {
         mRequested = id;
     }
 }
-
-// OnStart's function-local static and its guard come first in the file's .bss (OnStart isn't decompiled yet).
-static u32 sOnStartStatic[2];
-// The museum's definitions, held in a static object (made and freed by the file's static initializer).
-static MResource<DinoMuseumDefs> sMuseumDefs;
-
-// The tabs' orders.
-struct DinoMuseumByUnk0C {
-    static u32 Key(u32 id) { return GetMuseumDef(sMuseumDefs.Get(), id)->unk0C; }
-    bool operator()(const u32 &a, const u32 &b) const {
-        u32 x = Key(a);
-        return x > Key(b);
-    }
-};
-struct DinoMuseumByUnk0A {
-    static u32 Key(u32 id) { return GetMuseumDef(sMuseumDefs.Get(), id)->unk0A; }
-    bool operator()(const u32 &a, const u32 &b) const {
-        u32 x = Key(a);
-        return x < Key(b);
-    }
-};
-struct DinoMuseumByUnk08 {
-    static u32 Key(u32 id) { return GetMuseumDef(sMuseumDefs.Get(), id)->unk08; }
-    bool operator()(const u32 &a, const u32 &b) const {
-        u32 x = Key(a);
-        return x > Key(b);
-    }
-};
 
 // Rises into place, bobbing up and down.
 void DinoUiMuseumEffectLight::Idle() {
@@ -667,9 +711,3 @@ void DinoUiMuseumMenu::SelectTab(u8 tab) {
     GetSerial()->AddTail(new DinoUiMuseumSlotCreateTask(this), MCreateCallTask(this, data_ov006_021962a4.Enable_00));
 }
 
-// The tab's sort (the game emits the whole stable_sort machinery here).
-// NONMATCHING: std::__inplace_merge (stack layout, and the game elides one argument copy), std::__stable_sort_move
-// (comp and the buffer's owner swap registers), std::__insertion_sort_move (the first few instructions' order).
-template void std::stable_sort(std::vector<u32>::iterator, std::vector<u32>::iterator, DinoMuseumByUnk0C);
-template void std::stable_sort(std::vector<u32>::iterator, std::vector<u32>::iterator, DinoMuseumByUnk0A);
-template void std::stable_sort(std::vector<u32>::iterator, std::vector<u32>::iterator, DinoMuseumByUnk08);
