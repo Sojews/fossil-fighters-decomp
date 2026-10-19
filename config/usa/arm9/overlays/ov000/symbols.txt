@@ -761,7 +761,7 @@ _ZN32DinoBattleViewUiCreatureInfoMenu8OnDecideEP9MMenuItem kind:function(thumb,s
 _ZN32DinoBattleViewUiCreatureInfoMenu7OnFocusEP9MMenuItem kind:function(thumb,size=0x100) addr:0x02176330
 _ZN32DinoBattleViewUiCreatureInfoMenu6OnIdleEv kind:function(thumb,size=0x24) addr:0x02176430
 func_ov000_02176454 kind:function(thumb,size=0x60) addr:0x02176454
-func_ov000_021764b4 kind:function(thumb,size=0x21c) addr:0x021764b4
+_ZN26DinoBattleViewUiChangeMenuC1EP14DinoBattleViewimP16MMessageObserverPKmiP9MSmartOam kind:function(thumb,size=0x21c) addr:0x021764b4
 _ZN26DinoBattleViewUiChangeMenuD1Ev kind:function(thumb,size=0x34) addr:0x021766d0
 _ZN26DinoBattleViewUiChangeMenuD0Ev kind:function(thumb,size=0x3a) addr:0x02176704
 _ZN26DinoBattleViewUiChangeMenu7OnStartEv kind:function(thumb,size=0x8c) addr:0x02176740
@@ -769,7 +769,7 @@ _ZN26DinoBattleViewUiChangeMenu7OnFocusEP9MMenuItem kind:function(thumb,size=0xb
 _ZN26DinoBattleViewUiChangeMenu5HasIdEm kind:function(thumb,size=0x34) addr:0x02176880
 _ZN26DinoBattleViewUiChangeMenu8OnDecideEP9MMenuItem kind:function(thumb,size=0x28c) addr:0x021768b4
 _ZN26DinoBattleViewUiChangeMenu6OnIdleEv kind:function(thumb,size=0x24) addr:0x02176b40
-func_ov000_02176b64 kind:function(thumb,size=0xf4) addr:0x02176b64
+_ZN32DinoBattleViewUiSelectAreaCommonC1EP14DinoBattleViewiP16MMessageObservermhh kind:function(thumb,size=0xf4) addr:0x02176b64
 _ZN32DinoBattleViewUiSelectAreaCommon7OnStartEv kind:function(thumb,size=0x7a0) addr:0x02176c58
 _Z15MCreateCallTaskI26DinoBattleViewCreatureInfoS0_EP5MTaskPT_MT0_FvvE kind:function(thumb,size=0x38) addr:0x021773f8
 func_ov000_02177430 kind:function(thumb,size=0x66) addr:0x02177430

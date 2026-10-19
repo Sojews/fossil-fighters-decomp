@@ -305,7 +305,7 @@ void DinoBattleViewUiChangeMenu::OnStart() {
 
 // Per side and row of the root menu: where each arrow goes, and which entry it points at.
 struct ChangeMenuArrow {
-    int x, y;
+    MPoint offset;  // from the slot
     u32 unk8;
     u32 id;         // 0x0C
     u32 anime;      // 0x10
@@ -328,6 +328,66 @@ void DinoBattleViewUiChangeMenu::OnFocus(MMenuItem *item) {
                 mArrows[i]->Hide();
             }
         }
+    }
+}
+
+// The TU's pooled constants.
+extern "C" struct {
+    u8 unk00[0x10];
+    const char *arrowPath;  // 0x10
+    u8 unk14[0x1C];
+    MPoint unk30;           // 0x30
+} data_ov000_02193ae4;
+
+DinoBattleViewUiSelectAreaCommon::DinoBattleViewUiSelectAreaCommon(DinoBattleView *view, int player,
+                                                                   MMessageObserver *target, u32 arg3, u8 arg4,
+                                                                   u8 arg5)
+    : MMenu(2), mUnkB0(player), mUnkB4(arg3), mUnkE0(data_ov000_02193ae4.unk30), mUnkE8(0), mUnkEC((u32)view),
+      mTarget(target), mUnkF4(0), mUnkFC(0), mUnk11C(0), mUnk12C(0), mUnk13C(0), mUnk178(1), mUnk179(arg4),
+      mUnk17A(arg5) {
+    SetDeferStart(TRUE);
+    mUnkAC = ((DinoBattleView *)mUnkEC)->GetUnkE4(mUnkB0)->GetUnkAC() ? 4 : 0;
+    mUnkA8 = 2;
+    mSideC0 = ((DinoBattleView *)mUnkEC)->GetUnkE4(mUnkB0)->GetUnkAC();
+    mUnkBC = mSideC0;
+}
+
+// Where a creature slot is on screen.
+extern "C" MPoint func_ov000_02175b40(DinoBattleView *view, u32 slot);
+
+DinoBattleViewUiChangeMenu::DinoBattleViewUiChangeMenu(DinoBattleView *view, int player, u32 arg2,
+                                                       MMessageObserver *target, const u32 *ids, int count,
+                                                       MSmartOam *oam)
+    : DinoBattleViewUiSelectAreaCommon(view, player, target, 0, 1, 1), unk18C(arg2) {
+    Disable();
+    mSide = ((DinoBattleView *)mUnkEC)->GetUnkE4(mUnkB0)->GetUnkAC();
+    mUnkA8 = mSide ? 4 : 3;
+    for (int i = 0; i < 2; i++) {
+        if (view->GetUnkE4(player)->FindCreatureByB4(i + 1) != NULL) {
+            mUnkAC = mSide ? i + 5 : i + 1;
+            break;
+        }
+    }
+    for (int i = 0; i < 3; i++) {
+        mArrows[i] = new MMotion(data_ov000_02193ae4.arrowPath, oam, 0, 1);
+        const ChangeMenuArrow &arrow = data_ov000_02193d20[mSide][i];
+        mArrows[i]->SetPosition(func_ov000_02175b40(view, arrow.unk8) + arrow.offset);
+        if (mSide == 1) {
+            mArrows[i]->SetFlip(1, 0);
+        }
+        mArrows[i]->SetPriority(2);
+        mArrows[i]->SetAnchor(0);
+        mArrows[i]->Show();
+        mParallel.AddTail(mArrows[i]);
+    }
+    mUnkE0.x += view->GetUnkE4(player)->GetUnkAC() == 1 ? -0x30 : 0x30;
+    MTask *task = func_ov000_0218ec8c(view->GetUnk12C(), 0x1A, 0);
+    if (task != NULL) {
+        mSerial.AddTail(task);
+    }
+    mCount = count;
+    for (int i = 0; i < mCount; i++) {
+        mIds[i] = ids[i];
     }
 }
 

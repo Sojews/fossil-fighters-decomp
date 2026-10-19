@@ -14,6 +14,8 @@
 
 class DinoBattleViewUiChangeMenu : public DinoBattleViewUiSelectAreaCommon, public DinoHelpBase {
 public:
+    DinoBattleViewUiChangeMenu(DinoBattleView *view, int player, u32 arg2, MMessageObserver *target, const u32 *ids,
+                               int count, MSmartOam *oam);
     virtual ~DinoBattleViewUiChangeMenu();
     virtual void OnStart();
     virtual void OnIdle();

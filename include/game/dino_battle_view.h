@@ -4,6 +4,7 @@
 #include <map>
 
 class DinoBattleViewCreature;
+class DinoBattleView;
 
 #include "m/menu_item.h"
 #include "m/menu.h"
@@ -35,6 +36,8 @@ public:
 
 class DinoBattleViewUiSelectAreaCommon : public MMenu {
 public:
+    DinoBattleViewUiSelectAreaCommon(DinoBattleView *view, int player, MMessageObserver *target, u32 arg3, u8 arg4,
+                                     u8 arg5);
     virtual ~DinoBattleViewUiSelectAreaCommon();
     virtual void OnStart();
     virtual void OnFocus(MMenuItem *item);
@@ -43,22 +46,33 @@ public:
     DinoBattleViewCreature *GetItemCreature(MMenuItem *item);
     BOOL HandlePageItem(MMenuItem *item);
 
-    u32 unkA8[2];
+    u32 mUnkA8;
+    u32 mUnkAC;
     u32 mUnkB0;     // 0xB0: player index
-    u32 unkB4;
+    u32 mUnkB4;
     u32 mFocusedRow;    // 0xB8
-    u8 unkBC[0x30];
+    int mUnkBC;
+    int mSideC0;        // 0xC0: the player's side
+    u8 unkC4[0x1C];
+    MPoint mUnkE0;
+    u8 mUnkE8;
     u32 mUnkEC;     // 0xEC: DinoBattleView
     MMessageObserver *mTarget;  // 0xF0: told the choice
-    u32 unkF4;
+    u32 mUnkF4;
     MTaskSet *mUnkF8;           // 0xF8: waited on before answering
-    u8 unkFC[0x24];
+    u32 mUnkFC;
+    u8 unk100[0x1C];
+    u32 mUnk11C;
     MMenuItem *mItem120;    // 0x120
     MMenuItem *mItem124;    // 0x124
     MMenuItem *mItem128;    // 0x128
-    u32 unk12C;
+    u32 mUnk12C;
     std::map<u32, void *> mUnk130;  // 0x130
-    u8 unk13C[0x40];
+    u32 mUnk13C;
+    u8 unk140[0x38];
+    u8 mUnk178;
+    u8 mUnk179;
+    u8 mUnk17A;
 };
 
 class DinoBattleViewUiCreatureInfoMenu : public DinoHelpBase, public DinoBattleViewUiSelectAreaCommon {
