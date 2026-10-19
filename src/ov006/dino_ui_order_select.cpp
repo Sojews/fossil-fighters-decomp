@@ -6,6 +6,7 @@
 #include "m/blend.h"
 #include "game/dino_sound.h"
 #include "game/dino_ui_order_select.h"
+#include "game/dino_ui_rv_information.h"
 #include "types.h"
 #include "m/call_task.h"
 #include "m/input.h"
@@ -70,9 +71,11 @@ void DinoUiOrderSelectBackButton::OnDecide() {
 }
 
 // DinoUiOrderSelectMenu's OnStart/OnFocus/OnDecide (not decompiled yet) queue these call tasks.
+#pragma auto_inline off
 template MTask *MCreateCallTask(DinoUiOrderSelectMenu *obj, void (DinoHelpBase::*func)());
 template MTask *MCreateCallTask(DinoUiOrderSelectMenu *obj, void (DinoUiOrderSelectMenu::*func)());
 template MTask *MCreateCallTask(DinoUiOrderSelectMenu *obj, void (DinoUiOrderSelectMenu::*func)(bool), bool a1);
+#pragma auto_inline reset
 
 #pragma auto_inline off
 
@@ -119,6 +122,19 @@ void DinoUiOrderSelectMenu::PageRight() {
     if (mFocusTabs) {
         FocusItem(mTabs[mPage]);
     }
+}
+
+// The TU's pooled pointer-to-member constants.
+extern "C" struct {
+    void (DinoHelpBase::*Enable_00)();
+} data_ov006_02197110;
+
+void DinoUiOrderSelectMenu::SetInfoPage(u8 page) {
+    mInfo->SetPage(page);
+    GetSerial()->AddTail(MTaskSetWaitEmptyTask::Create(&mInfo->mSerial),
+                         MCreateCallTask(this, data_ov006_02197110.Enable_00));
+    mUnk1BC->Clear();
+    Disable();
 }
 
 void DinoUiOrderSelectMenu::FinishPage() {

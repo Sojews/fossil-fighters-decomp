@@ -20,6 +20,7 @@
 struct DinoUiOrderSelectData;
 
 class MSmartOam;
+class DinoUiRvInformation;
 class DinoUiOrderSelectMenu : public DinoHelpBase, public MMenu {
 public:
     MSmartOam *GetOam() { return mOam; }
@@ -30,6 +31,8 @@ public:
     virtual void OnDecide(MMenuItem *item);
 
     void SetPage(u8 page);
+    // Turns the information to the page; help comes back once it has.
+    void SetInfoPage(u8 page);
     void PageLeft();
     void PageRight();
     void ClearItems();
@@ -50,7 +53,11 @@ public:
     std::string mUnk110;        // 0x110
     u8 unk11C[0x1A8 - 0x11C];
     u8 mHasFourthTab;           // 0x1A8
-    u8 unk1A9[0x1EC - 0x1A9];
+    u8 unk1A9[0x1B4 - 0x1A9];
+    DinoUiRvInformation *mInfo; // 0x1B4
+    u32 unk1B8;
+    MTaskSet *mUnk1BC;          // 0x1BC
+    u8 unk1C0[0x1EC - 0x1C0];
     u32 mFocusIndex;            // 0x1EC: the item focused after a tab change
     u32 mUnk1F0;                // 0x1F0
     u8 mPage;                   // 0x1F4
