@@ -52,7 +52,8 @@ public:
     int mMode;                  // 0x128
     u8 unk12C;
     u8 mUnk12D;                 // 0x12D
-    u8 unk12E[0x134 - 0x12E];
+    u8 unk12E[0x130 - 0x12E];
+    MTaskSet *mUnk130;          // 0x130
     DinoUiPartsTeamTech *mTech; // 0x134: shown when the team has a technique
 };
 

@@ -15,6 +15,7 @@
 #include "m/call_task.h"
 #include "game/dino_sound.h"
 #include "m/lcd.h"
+#include "m/bright.h"
 #include "m/smart_oam.h"
 #include "m/motion.h"
 #include "game/dino_backup.h"
@@ -324,4 +325,35 @@ void DinoUiStatusMenu::LinkMembers() {
         AddLink(mUnkB8, 2, mMembers[1]);
     }
     mUnk12D = 1;
+}
+
+extern const int data_02089a20; // fade frames
+extern const int data_02089a88;
+
+void DinoUiStatusMenu::SelectTab(int tab) {
+    if (tab < 0 || tab > 2) {
+        return;
+    }
+    switch (tab) {
+    case 0:
+        break;
+    case 1: {
+        *mResult = 2;
+        MTask &self = *this;
+        MTask *exit = MTaskExitTransfer::Create(&self);
+        MTask *fade = gLcd->mMain->mBright->CreateFadeOutToBlack(data_02089a20, data_02089a88);
+        GetSerial()->AddTail(MTaskSetWaitEmptyTask::Create(mUnk130), fade, exit);
+        DinoSoundPlaySe(0x94, 0);
+        break;
+    }
+    case 2: {
+        *mResult = 3;
+        MTask &self = *this;
+        MTask *exit = MTaskExitTransfer::Create(&self);
+        MTask *fade = gLcd->mMain->mBright->CreateFadeOutToBlack(data_02089a20, data_02089a88);
+        GetSerial()->AddTail(MTaskSetWaitEmptyTask::Create(mUnk130), fade, exit);
+        DinoSoundPlaySe(0x94, 0);
+        break;
+    }
+    }
 }
