@@ -2,13 +2,32 @@
 
 #include "game/dino_cleaning_rock.h"
 #include "game/dino_cleaning_image.h"
+#include "game/dino_cleaning_image_layer.h"
+#include "m/fx32.h"
 
 DinoCleaningRock::DinoCleaningRock(u32 arg0, DinoCleaningImage *image, u32 arg2, fx32 scale) : MProcess(NULL) {
     mUnk74 = arg0;
     mImage = image;
     mUnk7C = arg2;
-    mScale = scale;
+    mScale.v = scale;
 }
+
+// NONMATCHING: the column offset and the output row pointer swap registers (the game keeps the offset on the
+// stack). The game doesn't strength-reduce the row index.
+#pragma opt_strength_reduction off
+void DinoCleaningRock::RefreshHardness() {
+    for (u32 col = 0; col < 28; col++) {
+        for (u32 row = 0; row < 36; row++) {
+            if (mImage->mGrid[row][col] != 0) {
+                mHardness[row][col] =
+                    (mScale * MFx32::FromRaw(mImage->GetLayer(mImage->mGrid[row][col])->mGrid[row][col])).v;
+            } else {
+                mHardness[row][col] = 0;
+            }
+        }
+    }
+}
+#pragma opt_strength_reduction reset
 
 DinoCleaningRock::~DinoCleaningRock() {
 }

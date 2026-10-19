@@ -42,6 +42,23 @@ void DinoFieldRadar::Signal() {
     }
 }
 
+MPoint DinoFieldRadar::GetContainerGaugePos() {
+    if (mMode == 1) {
+        return MPoint(0x80, 0xC2);
+    }
+    DinoPlayerData player;
+    gDinoBackup->GetPlayer(&player, 0);
+    u32 count = 0;
+    for (u32 i = 0; i < 64; i++) {
+        DinoBackupEntry entry;
+        gDinoBackup->GetUnk98(i, &entry);
+        if (entry.id) {
+            count++;
+        }
+    }
+    return MPoint(0x80, 0xC2 - 0x62 * count / (player.containerNum * 8));
+}
+
 void DinoFieldRadar::SetUnk5A8(u8 value) {
     mUnk5A8 = value;
 }

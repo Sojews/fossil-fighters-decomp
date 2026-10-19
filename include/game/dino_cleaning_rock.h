@@ -17,11 +17,14 @@ public:
     BOOL IsCellClear(int row, int col);
     s32 GetCellLayer(int row, int col);
     u8 GetCell(int row, int col);
+    // Works out each cell's hardness: its layer's, scaled.
+    void RefreshHardness();
 
     u32 mUnk74;                 // 0x74
     DinoCleaningImage *mImage;  // 0x78
     u32 mUnk7C;                 // 0x7C
-    fx32 mScale;                // 0x80
+    MFx32 mScale;               // 0x80
+    fx32 mHardness[36][28];     // 0x84
 };
 
 #endif

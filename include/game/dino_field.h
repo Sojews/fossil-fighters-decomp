@@ -221,6 +221,8 @@ public:
     void SetUnk5A8(u8 value);
     // Beeps and plays the marker's signal motion (unless in mode 1 or already signalling).
     void Signal();
+    // Where the container gauge's top is: lower the fuller the containers are.
+    MPoint GetContainerGaugePos();
 
     u32 mUnk74[3];              // 0x74
     MSmartOam *mOam;            // 0x80
