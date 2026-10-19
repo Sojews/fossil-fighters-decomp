@@ -64,6 +64,16 @@ public:
     void Sort(u8 sort);
     // Lists the creatures with any part, in each sort's order, and counts the pages.
     void LoadCreatures();
+    // Puts the list's creature at index into the team as member.
+    void SetMember(u8 index, u8 member);
+    // Swaps the selected member with member, flying their medals across.
+    void SwapMember(int member);
+    // Picks up the page's slot's creature (if it's revived), to put into a member.
+    void PickSlot(int slot);
+    // Puts the page's slot's creature into the selected member (if it's revived).
+    void PlaceSlot(int slot);
+    // Puts the selected slot's creature into the member.
+    void PlaceMember(int member);
     void RemoveListLinks();
     void UpdateDetails(u8 index);
     void TabLeft();

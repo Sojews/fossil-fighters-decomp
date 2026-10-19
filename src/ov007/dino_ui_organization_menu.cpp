@@ -27,6 +27,7 @@
 #include "game/dino_ui_medal_menu.h"
 #include "game/dino_ui_parts_tab_icon_menu_item.h"
 #include "game/dino_creature_sort.h"
+#include "game/dino_ui_parts_reviver_name.h"
 
 DinoUiOrganizationMenu::~DinoUiOrganizationMenu() {
     gCurrentDisplay->mBlend->Reset();
@@ -321,6 +322,71 @@ void DinoUiOrganizationMenu::SetSort(u8 sort) {
 }
 
 // Everything back on, and the links back to how they start.
+void DinoUiOrganizationMenu::SwapMember(int member) {
+    mUnk23C = FALSE;
+    func_ov007_0217fb94(this, 0);
+    mMessage->mUnk98 = 0xF;
+    mName->Hide();
+    MParallelTaskSet *moves = new MParallelTaskSet(TRUE);
+    if (mTeam.slots[member] != 0) {
+        mListItems[member]->PlayDecided();
+        moves->AddTail(mListItems[member]->CreateFlyInTask(data_ov007_0218ef0c[mSelected]));
+    } else {
+        mListItems[member]->PlayNormal();
+    }
+    if (mTeam.slots[mSelected] != 0) {
+        moves->AddTail(mListItems[mSelected]->CreateFlyInTask(data_ov007_0218ef0c[member]));
+    } else {
+        mListItems[mSelected]->PlayNormal();
+    }
+    MTask *exit;
+    MTask *refresh = MCreateCallTask(this, &DinoUiOrganizationMenu::Refresh);
+    exit = MTaskExitTransfer::Create(mMessage);
+    MTask *timer = new MTimer(5);
+    MSerialTaskSet *serial = &mSerial;
+    serial->AddTail(timer);
+    serial->AddTail(moves);
+    serial->AddTail(exit);
+    serial->AddTail(refresh);
+    mUnk230->Clear();
+    Disable();
+    std::swap(mTeam.slots[mSelected], mTeam.slots[member]);
+}
+
+void DinoUiOrganizationMenu::PlaceSlot(int slot) {
+    DinoCreatureState creature;
+    gDinoBackup->GetCreature(mCreatures[mPage * 15 + slot], &creature);
+    if (creature.parts[0].level != 0) {
+        mMessage->mUnk98 = 0xF;
+        mSlots[slot]->PlayDecided();
+        SetMember(slot + mPage * 15, mSelected);
+        mName->Hide();
+    }
+}
+
+void DinoUiOrganizationMenu::PlaceMember(int member) {
+    mMessage->mUnk98 = 0xF;
+    mListItems[member]->PlayDecided();
+    SetMember(mSelected + mPage * 15 - 5, member);
+    mName->Hide();
+}
+
+// Loads the motions of the page's slots.
+void DinoUiOrganizationMenu::LoadPage() {
+    int count;
+    if (mPage == mLastPage) {
+        count = mCreatures.size() - mPage * 15;
+    } else {
+        count = 15;
+    }
+    mMotions.clear();
+    for (int i = 0; i < count; i++) {
+        char path[0x100];
+        OS_SPrintf(path, "/motion/ui_reviver_medal/reviver_%03d.bin", mCreatures[mPage * 15 + i]);
+        mMotions.push_back(MMotionFile(std::string(path), 7));
+    }
+}
+
 void DinoUiOrganizationMenu::LoadCreatures() {
     mCreatures.clear();
     for (u32 id = 1; id <= gDinoResource->GetCreatureCount() - 1; id++) {
@@ -493,6 +559,21 @@ void DinoUiOrganizationMenu::HandleResult() {
         RemoveMember();
     } else if (mResult == -2) {
         mListItems[mSelected]->PlayFocused();
+    }
+}
+
+void DinoUiOrganizationMenu::PickSlot(int slot) {
+    DinoCreatureState creature;
+    gDinoBackup->GetCreature(mCreatures[mPage * 15 + slot], &creature);
+    if (creature.parts[0].level != 0) {
+        mSelected = slot + 5;
+        mUnk23C = TRUE;
+        func_ov007_0217fb94(this, 1);
+        mMessage = new DinoCommonWindowMessage(data_020b5818, gDinoResource->GetText(data_0208aa54), 4, 0);
+        mParallel.AddTail(mMessage);
+        SelectMember(mSelected);
+        FocusItem(mListItems[0]);
+        mSlots[slot]->PlayDecided();
     }
 }
 
