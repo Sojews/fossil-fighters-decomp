@@ -302,6 +302,8 @@ struct DinoFieldStep {
     u8 unk00[0x18];
 };
 
+class DinoFieldHole;
+
 class DinoField : public MProcess, public MSerializer, public DinoHelpBase {
 public:
     DinoField(MScreen **screen, u32 arg1);
@@ -309,6 +311,10 @@ public:
     virtual void Idle();
     void CreateEffects(MPolygonChar **effects, u32 count, u32 id);
     fx32 GetGroundHeight(fx32 x, fx32 y);
+    // The highest of the ground heights around pos (a tile each way), a little above it.
+    fx32 GetMaxGroundHeight(MPoint pos);
+    DinoFieldHole *CreateHole(MPoint pos);
+    void CreateRockHole(MPoint pos, u32 arg);
     BOOL IsWalkable(fx32 x, fx32 y, fx32 *height);
     BOOL IsWalkable(MFx32Point pos, fx32 *height);
     // Where the character ends up moving by move: pushed out of the other characters (and, on the map in the
@@ -394,7 +400,9 @@ public:
     DinoFieldCamera *mCamera;   // 0x240
     DinoFieldRadar *mRadar;     // 0x244
     DinoFieldTownMap *mTownMap; // 0x248
-    u32 mUnk24C[3];             // 0x24C
+    u32 mUnk24C[1];             // 0x24C
+    MTaskSet *mHoles;           // 0x250
+    MTaskSet *mRockHoles;       // 0x254
     u8 mUnk258;                 // 0x258: the player can't move (an event is running)
     u8 unk259[3];
     u32 mUnk25C;                // 0x25C

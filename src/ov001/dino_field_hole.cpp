@@ -1,5 +1,4 @@
 // DinoFieldHole.
-// Only the destructors are decompiled so far.
 
 // Derived destructors have their bases' destructor bodies inlined; auto-inlining the ones defined above does that.
 #pragma auto_inline on
@@ -49,11 +48,18 @@ void DinoFieldHole::ChangeToHole() {
 extern "C" struct {
     u8 unk00[0x4];
     void (DinoFieldHole::*ChangeToHole_04)();
-    u8 unk0C[0x14 - 0xC];
+    void (DinoFieldHole::*StateWait_0C)();
     void (DinoFieldHole::*ChangeToHole_14)();
     u8 unk1C[0x24 - 0x1C];
     void (DinoFieldHole::*Unk0215c418_24)();
 } data_ov001_02169ddc;
+
+DinoFieldHole::DinoFieldHole(DinoField *field, u32 unk80, MPoint pos, u32 unk90, u8 unk118)
+    : MProcess(NULL), mField(field), mUnk80(unk80), mPos(pos), mUnk90(unk90) {
+    mUnk110 = 0;
+    mUnk118 = unk118;
+    mState = data_ov001_02169ddc.StateWait_0C;
+}
 
 void DinoFieldHole::StartChangeToHole() {
     mState = data_ov001_02169ddc.ChangeToHole_14;

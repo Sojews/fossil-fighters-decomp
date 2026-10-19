@@ -29,6 +29,9 @@ public:
         mRot.z = 0;
     }
     void Reset();
+    // Stops the models following their parents, or deactivates them (the game inlines these in DinoField::Step).
+    void DetachModels();
+    void DeactivateModels();
     // Loads a scene script and the model it plays.
     void Load(const char *script, const char *model);
 

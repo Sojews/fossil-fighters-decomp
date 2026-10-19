@@ -24,6 +24,7 @@
 #include "m/call_task.h"
 #include "m/polygon_char.h"
 #include "m/anm_model.h"
+#include "game/dino_field_hole.h"
 #include "game/dino_field_capture_fade_out_task_menu.h"
 #include "game/dino_field_capture_fade_out_task.h"
 #include "game/dino_field_player_control.h"
@@ -348,6 +349,38 @@ fx32 DinoField::GetGroundHeight(fx32 x, fx32 y) {
     }
     return 0;
 }
+
+#pragma opt_common_subs off
+fx32 DinoField::GetMaxGroundHeight(MPoint pos) {
+    fx32 y = pos.y;
+    fx32 h;
+    fx32 height = GetGroundHeight(pos.x, y);
+    if (height == (fx32)0x80000000) {
+        return height;
+    }
+    h = GetGroundHeight(pos.x - FX32_ONE, y);
+    if (h == (fx32)0x80000000) {
+        return h;
+    }
+    height = std::max(h, height);
+    h = GetGroundHeight(pos.x + FX32_ONE, y);
+    if (h == (fx32)0x80000000) {
+        return h;
+    }
+    height = std::max(h, height);
+    h = GetGroundHeight(pos.x, y - FX32_ONE);
+    if (h == (fx32)0x80000000) {
+        return h;
+    }
+    height = std::max(h, height);
+    h = GetGroundHeight(pos.x, y + FX32_ONE);
+    if (h == (fx32)0x80000000) {
+        return h;
+    }
+    height = std::max(h, height);
+    return height + 0.1 * FX32_ONE;
+}
+#pragma opt_common_subs reset
 
 void DinoField::Write(void *buf) {
     MSerializer::Write(buf);
@@ -798,6 +831,16 @@ void DinoField::Quake(u32 a, u32 b, u32 c) {
     mQuakeTime = 0;
 }
 
+DinoFieldHole *DinoField::CreateHole(MPoint pos) {
+    DinoFieldHole *hole = new DinoFieldHole(this, (u32)mScene, pos, GetMaxGroundHeight(pos), 1);
+    mHoles->AddTail(hole);
+    return hole;
+}
+
+void DinoField::CreateRockHole(MPoint pos, u32 arg) {
+    mRockHoles->AddTail(new DinoFieldHole(this, (u32)mScene, pos, arg, 0));
+}
+
 MTask *DinoField::CreatePictWaitTask() {
     return MTaskSetWaitEmptyTask::Create(mPictTasks);
 }
@@ -826,6 +869,19 @@ template MTask *MCreateBgCallTask(DinoField *obj, void (DinoField::*func)(MDispl
 #pragma auto_inline off
 
 // The field's capture fades.
+void MPolygonChar::DetachModels() {
+    mUnkAC = 0;
+    for (MTask *task = mParallel.mHead; task != NULL; task = task->mNext) {
+        ((MAnmModelBase *)task)->mFollowParent = FALSE;
+    }
+}
+
+void MPolygonChar::DeactivateModels() {
+    for (MTask *task = mParallel.mHead; task != NULL; task = task->mNext) {
+        ((MAnmModelBase *)task)->mActive = FALSE;
+    }
+}
+
 extern "C" MProcess *func_ov001_02159cd0(void *field) {
     return new DinoFieldCaptureFadeOutTask(field);
 }

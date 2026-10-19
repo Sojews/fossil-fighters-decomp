@@ -12,9 +12,11 @@
 #include "m/3d_resource.h"
 
 class MAnmModelBase;
+class DinoField;
 
 class DinoFieldHole : public MProcess {
 public:
+    DinoFieldHole(DinoField *field, u32 unk80, MPoint pos, u32 unk90, u8 unk118);
     virtual ~DinoFieldHole();
     virtual void Idle();
 
@@ -27,11 +29,11 @@ public:
     void StateCountdown();
 
     void (DinoFieldHole::*mState)();    // 0x74
-    u32 mUnk7C;                         // 0x7C
+    DinoField *mField;                  // 0x7C
     u32 mUnk80;                         // 0x80
     MAnmModelBase *mUnk84;              // 0x84
     MPoint mPos;                        // 0x88
-    u32 unk90;
+    u32 mUnk90;                         // 0x90
     M3DModelResource mModel;            // 0x94
     u8 unkF8[0x110 - 0xF8];
     u8 mUnk110;                         // 0x110
