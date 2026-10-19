@@ -22,6 +22,8 @@ class DinoUi3PartsRockName;
 
 class DinoUiContainerBaseMenuItem;
 
+class MTextPicture;
+
 class DinoUiContainerBaseMenu : public DinoHelpBase, public MMenu {
 public:
     DinoUiContainerBaseMenu();
@@ -62,7 +64,7 @@ public:
     u32 mUnk104;                // 0x104
     MResource<DinoKasekiDefs> mDefs;    // 0x108: the definitions the entries are looked up in
     MSmartOam *mOam;            // 0x118
-    u32 mUnk11C;                // 0x11C
+    MTextPicture *mBackground;  // 0x11C
     std::vector<void *> mItems; // 0x120: this page's items
     DinoUiContainerBaseMenuItem *mPageL; // 0x12C
     DinoUiContainerBaseMenuItem *mPageR; // 0x130

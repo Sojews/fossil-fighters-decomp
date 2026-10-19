@@ -18,6 +18,9 @@
 #include "game/dino_sound.h"
 #include "game/dino_common_window_yes_no_dialog.h"
 #include "game/dino_common_window_message_box.h"
+#include "game/dino_guide_message.h"
+#include "game/help.h"
+#include "m/picture.h"
 
 DinoUiCanonPutin::~DinoUiCanonPutin() {
 }
@@ -71,6 +74,29 @@ extern "C" const u32 data_0208a560;
 DinoUiCanonTakeoutMenu::DinoUiCanonTakeoutMenu() {
     mUnk101 = 8;
     mUnk104 = data_0208a560;
+}
+
+// "image/bg_container04" (the TU's string literals are pooled data too).
+extern "C" const char data_ov005_0216ca08[];
+extern "C" struct {
+    u32 unk00;
+    const char *decideMotion;   // 0x04
+} data_ov005_0216c718;
+extern "C" const u32 data_0208a56c, data_0208a564, data_0208a568, data_0208a91c;
+
+void DinoUiCanonTakeoutMenu::Setup() {
+    mParallel.AddTail(mBackground = new MTextPicture(data_ov005_0216ca08, TRUE, false));
+    mBackground->Show();
+    mBackground->SetPriority(2);
+    gDinoBackup->CompactUnk14C();
+    mParallel.AddTail(new DinoHelpDummyItem(GetDisplay(), MRect(0x1E, 0xC, 0xE2, 0x6C),
+                                            std::string(gDinoResource->GetText(data_0208a56c))));
+    DinoHelpDummyItem *back;
+    mParallel.AddTail(back = new DinoHelpDummyItem(GetDisplay(), MRect(0x13, 0x90, 0xF1, 0x9F),
+                                                   std::string(gDinoResource->GetText(data_0208a564))));
+    CreateDecideButton(data_ov005_0216c718.decideMotion, data_0208a568);
+    AddHelpEntries((u32)back);
+    mParallel.AddTail(new DinoGuideMessage(std::string(gDinoResource->GetText(data_0208a91c))));
 }
 
 DinoUiCanonPutin::DinoUiCanonPutin() : MProcess(NULL) {
