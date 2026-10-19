@@ -2677,7 +2677,7 @@ _ZNSt13__vec_deleterISsSaISsEE5eraseEPSsS3_13UnkMSLStruct1 kind:function(thumb,s
 _ZNSt13__vec_deleterISsSaISsEE16reallocate_clearEmm kind:function(thumb,size=0x50) addr:0x02035714
 _ZNSt13__vec_deleterISsSaISsEE7grow_byEm kind:function(thumb,size=0x80) addr:0x02035764
 _ZNSt13__vec_deleterISsSaISsEE13sub_push_backERKSsN10Metrowerks8int2typeILi0EEE kind:function(thumb,size=0x1e) addr:0x020357e4
-func_02035804 kind:function(thumb,size=0x20) addr:0x02035804
+_ZNKSs4findERKSsm kind:function(thumb,size=0x20) addr:0x02035804
 _ZNSt13__vec_deleterISsSaISsEE9init_copyEPKSsS4_N10Metrowerks8int2typeILi1EEE kind:function(thumb,size=0x5c) addr:0x02035824
 _ZN22DinoEventKasekiRockGetD1Ev kind:function(thumb,size=0x56) addr:0x02035880
 _ZN22DinoEventKasekiRockGetD0Ev kind:function(thumb,size=0x5c) addr:0x020358d8

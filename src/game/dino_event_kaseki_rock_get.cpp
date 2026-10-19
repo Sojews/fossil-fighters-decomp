@@ -130,6 +130,25 @@ void DinoEventKasekiRockGet::StateEnd() {
 }
 
 template class std::__vec_deleter<std::string, std::allocator<std::string> >;
+// The game keeps this std::string member's one copy here (other files call it).
+namespace std {
+template <class C, class Traits, class Alloc>
+typename basic_string<C, Traits, Alloc>::size_type basic_string<C, Traits, Alloc>::find(const basic_string &str,
+                                                                                        size_type pos) const {
+    const C *s;
+    size_type n;
+    if (!str.is_long()) {
+        s = str.mShort.buf;
+        n = str.mShort.size;
+    } else {
+        s = str.mLong.data;
+        n = str.mLong.size;
+    }
+    return find(s, pos, n);
+}
+template string::size_type string::find(const string &str, string::size_type pos) const;
+}
+
 // NONMATCHING: the game puts the reallocating branch's tail at the end.
 template void std::__vec_deleter<std::string, std::allocator<std::string> >::assign<std::string *>(
     std::string *first, std::string *last, Metrowerks::int2type<true>);
