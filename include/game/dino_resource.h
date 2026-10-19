@@ -191,8 +191,25 @@ struct DinoExcavateDefs {
     u32 rangeOffset;    // 0xC0: DinoExcavateRange entries
 };
 // A map's settings.
+// A town map a map can show: the first one with no flag, or a later one whose flag is set.
+struct DinoMapMTownMap {
+    u32 id;
+    u32 flag;
+};
+
 struct DinoMapMData {
-    u8 unk00[0x34];
+    const DinoMapMTownMap *GetTownMaps() const { return (const DinoMapMTownMap *)((const u8 *)this + townMaps); }
+    MPoint GetTownMapOffset() const { return MPoint(townMapX, townMapY); }
+
+    u8 unk00[0x18];
+    u32 townMapCount;   // 0x18
+    u32 townMaps;       // 0x1C: offset of the DinoMapMTownMap entries
+    u8 townMapCentered; // 0x20
+    u8 unk21[3];
+    int townMapX;       // 0x24
+    int townMapY;       // 0x28
+    MFx32 townMapScale;     // 0x2C
+    u8 unk30[4];
     s32 area;           // 0x34: the area the map is in (for the name panel)
 };
 struct DinoMapData;

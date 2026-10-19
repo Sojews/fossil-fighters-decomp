@@ -6,8 +6,12 @@
 
 class TownMapIcon;
 
+class DinoField;
+
 class DinoFieldTownMap : public MProcess {
 public:
+    // Not decompiled yet.
+    DinoFieldTownMap(DinoField *field, u32 map);
     virtual ~DinoFieldTownMap();
     virtual void Idle();
 
@@ -18,6 +22,7 @@ public:
     TownMapIcon *mIcon; // 0x78: the player's
     u32 unk7C;
     MTaskSet *mBlinks;  // 0x80
+    u32 unk84;
 };
 
 #endif

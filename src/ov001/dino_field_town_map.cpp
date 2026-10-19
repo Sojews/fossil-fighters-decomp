@@ -145,6 +145,35 @@ void DinoFieldTownMapManager::Idle() {
     }
 }
 
+// Makes the town map the map shows, if the player has turned the town map on.
+void DinoFieldTownMapManager::CameraUnk1(u32 map) {
+    if (map == 0) {
+        return;
+    }
+    DinoPlayerData player;
+    gDinoBackup->GetPlayer(&player, 0);
+    if (!player.townMapMode) {
+        return;
+    }
+    MResource<DinoMapMData> data = gDinoResource->LoadMapM(map);
+    u32 townMap = 0;
+    for (u32 i = 0; i < data.Get()->townMapCount; i++) {
+        const DinoMapMTownMap *entry = &data.Get()->GetTownMaps()[i];
+        if (entry->flag == 0 && townMap == 0) {
+            townMap = entry->id;
+        } else if (entry->flag != 0 && gDinoBackup->GetFlag(entry->flag)) {
+            townMap = entry->id;
+        }
+    }
+    if (townMap != 0) {
+        mOffset = data.Get()->GetTownMapOffset();
+        mScale = data.Get()->townMapScale;
+        mCentered = data.Get()->townMapCentered;
+        mTownMap = new DinoFieldTownMap(mField, townMap);
+        mParallel.AddTail(mTownMap);
+    }
+}
+
 MTask *DinoFieldTownMapManager::CreateModeTask(u32 radarMode, u32 to, u32 frames) {
     if (to == 0) {
         if (mTownMap != NULL) {
