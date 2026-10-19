@@ -56,6 +56,10 @@ public:
         mFont->AddRef();
         mCanvas->DrawText(mFont, MPoint(mPos.x + 6, mPos.y - 16), 0,
                           std::string(gDinoResource->GetText(data_0208a34c + mPart)));
+        Update();
+    }
+    // Redraws the part's level, and gives the player a kaseki rock for each part the creature has.
+    void Update() {
         DinoCreatureState state;
         gDinoBackup->GetCreature(mCreature, &state);
         char text[256];

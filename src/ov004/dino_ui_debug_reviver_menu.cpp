@@ -1,5 +1,4 @@
 // DinoUiDebugReviverMenu.
-// Only the destructors are decompiled so far.
 
 // Derived destructors have their bases' destructor bodies inlined; auto-inlining the ones defined above does that.
 #pragma auto_inline on
@@ -33,6 +32,59 @@ void DinoUiDebugReviverMenu::OnStart() {
     mUnkBC = 1;
     GetParallel()->AddTail(mCanvas, mTasks, mCursor, mOam);
     Refresh();
+}
+
+// R and L pick the next or previous creature; up and down raise or lower the focused part's level (it jumps between 0
+// and 50); B leaves.
+// NONMATCHING: stack slots and registers only (the game puts each branch's state below the redraw's, and the item in r6).
+void DinoUiDebugReviverMenu::OnIdle() {
+    if (GetInput()->GetPressed() & 0x100) {
+        mUnkBC++;
+        if (mUnkBC >= gDinoResource->GetCreatureCount()) {
+            mUnkBC = 1;
+        }
+        Refresh();
+        return;
+    }
+    if (GetInput()->GetPressed() & 0x200) {
+        mUnkBC--;
+        if ((int)mUnkBC < 1) {
+            mUnkBC = gDinoResource->GetCreatureCount() - 1;
+        }
+        Refresh();
+        return;
+    }
+    if (GetInput()->GetPressed() & 0x40) {
+        DinoUiDebugReviverMenuItem *item = (DinoUiDebugReviverMenuItem *)GetFocusedItem();
+        DinoCreatureState state;
+        gDinoBackup->GetCreature(item->mCreature, &state);
+        if (state.parts[item->mPart].level < 150) {
+            state.parts[item->mPart].level++;
+            if (state.parts[item->mPart].level < 50) {
+                state.parts[item->mPart].level = 50;
+            }
+            gDinoBackup->SetCreature(item->mCreature, &state);
+            item->Update();
+        }
+        return;
+    }
+    if (GetInput()->GetPressed() & 0x80) {
+        DinoUiDebugReviverMenuItem *item = (DinoUiDebugReviverMenuItem *)GetFocusedItem();
+        DinoCreatureState state;
+        gDinoBackup->GetCreature(item->mCreature, &state);
+        if (state.parts[item->mPart].level) {
+            state.parts[item->mPart].level--;
+            if (state.parts[item->mPart].level < 50) {
+                state.parts[item->mPart].level = 0;
+            }
+            gDinoBackup->SetCreature(item->mCreature, &state);
+            item->Update();
+        }
+        return;
+    }
+    if (GetInput()->GetPressed() & 2) {
+        Exit();
+    }
 }
 
 // Draws the creature's name, and an item for each of its parts.
