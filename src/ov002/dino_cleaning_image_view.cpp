@@ -114,6 +114,29 @@ BOOL DinoCleaningImageView::IsUnkD9E0Zero() {
     return FALSE;
 }
 
+// The pooled constants the code reads.
+extern "C" struct {
+    u8 unk00[0x3C];
+    MPoint mCellOrigin;     // 0x3C: (2, 2)
+} data_ov002_021646e4;
+
+// a - b. (Taking a by value and returning it keeps both points on the stack, as the game's code does.)
+static inline MPoint DinoPointSub(MPoint a, const MPoint &b) {
+    a.x -= b.x;
+    a.y -= b.y;
+    return a;
+}
+
+// Adds dirt to a cell.
+void DinoCleaningImageView::AddDirt(int x, int y) {
+    mCells[x][y]++;
+    mUnkD9E0++;
+    mDirty[x][y] = TRUE;
+    MPoint d = DinoPointSub(MPoint(x, y), data_ov002_021646e4.mCellOrigin);
+    mDirtSum.x += d.x * 8 + (d.y & 1) * 4;
+    mDirtSum.y += d.y * 8;
+}
+
 // How much of the image is still dirty, in percent.
 MFx32 DinoCleaningImageView::GetDirtRatio() {
     int count = 0;
