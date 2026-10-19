@@ -32,6 +32,8 @@ public:
 
 class DinoUiSaveOptionSaveButton : public DinoUiSaveOptionMenuItem {
 public:
+    DinoUiSaveOptionSaveButton(DinoUiSaveOptionMenu *owner, const char *path, const MPoint &pos, u32 textId)
+        : DinoUiSaveOptionMenuItem(owner, std::string(path), pos, textId) {}
     virtual ~DinoUiSaveOptionSaveButton();
     virtual MRect GetFrame();
     virtual void OnDecide();
@@ -39,6 +41,8 @@ public:
 
 class DinoUiSaveOptionOptionButton : public DinoUiSaveOptionMenuItem {
 public:
+    DinoUiSaveOptionOptionButton(DinoUiSaveOptionMenu *owner, const char *path, const MPoint &pos, u32 textId)
+        : DinoUiSaveOptionMenuItem(owner, std::string(path), pos, textId) {}
     virtual ~DinoUiSaveOptionOptionButton();
     virtual MRect GetFrame();
     virtual void OnDecide();
@@ -46,6 +50,12 @@ public:
 
 class DinoUiSaveOptionBackButton : public DinoUiSaveOptionMenuItem {
 public:
+    DinoUiSaveOptionBackButton(DinoUiSaveOptionMenu *owner, const char *path, const MPoint &pos, u32 textId)
+        : DinoUiSaveOptionMenuItem(owner, std::string(path), pos, textId) {
+        SetKeys(2);
+        SetMode(4);
+        mMotion->Play(2, 0);
+    }
     virtual ~DinoUiSaveOptionBackButton();
     virtual void OnFocusChanged(BOOL focused);
     virtual void OnDecide();

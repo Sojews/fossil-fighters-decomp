@@ -47,16 +47,22 @@ DinoUiSaveOptionOptionButton::~DinoUiSaveOptionOptionButton() {
 DinoUiSaveOptionBackButton::~DinoUiSaveOptionBackButton() {
 }
 
-DinoUiSaveOptionMenuItem::DinoUiSaveOptionMenuItem(DinoUiSaveOptionMenu *owner, const std::string &path, MPoint pos,
-                                                   u32 textId) {
-    mOwner = owner;
-    mTextId = textId;
-    mMotion = new MMotion(std::string(path), mOwner->GetOam(), 2, 1);
-    mMotion->Play(1, 0);
-    mMotion->SetPosition(pos);
-    mMotion->Show();
-    mParallel.AddTail(mMotion);
-}
+
+// The TU's pooled constants (see menu.cpp): the buttons' motions and places.
+extern "C" struct {
+    u32 unk00;
+    const char *optionPath; // 0x04
+    const char *savePath;   // 0x08
+    const char *backPath;   // 0x0C
+    u8 unk10[0x20 - 0x10];
+    MPoint optionPos;       // 0x20
+    MPoint savePos;         // 0x28
+    MPoint backPos;         // 0x30
+} data_ov004_02174cb4;
+
+// The buttons' help texts.
+extern "C" const u32 data_0208abbc, data_0208abc0, data_0208abc4;
+
 
 void DinoUiSaveOptionMenu::OnStart() {
     SetLinkFallback(TRUE);
@@ -226,6 +232,40 @@ void DinoUiSaveOption::Idle() {
 }
 
 #pragma auto_inline off
+
+// Adds the buttons, the save one focused if kind is set, else the option one.
+void DinoUiSaveOptionMenu::AppendItem(u8 kind) {
+    mItems[0] = new DinoUiSaveOptionSaveButton(this, data_ov004_02174cb4.savePath, data_ov004_02174cb4.savePos,
+                                               data_0208abc4);
+    MMenu::AddItem(mItems[0]);
+    mItems[1] = new DinoUiSaveOptionOptionButton(this, data_ov004_02174cb4.optionPath, data_ov004_02174cb4.optionPos,
+                                                 data_0208abc0);
+    MMenu::AddItem(mItems[1]);
+    mItems[2] = new DinoUiSaveOptionBackButton(this, data_ov004_02174cb4.backPath, data_ov004_02174cb4.backPos,
+                                               data_0208abbc);
+    MMenu::AddItem(mItems[2]);
+    if (kind) {
+        FocusItem(mItems[0]);
+    } else {
+        FocusItem(mItems[1]);
+    }
+    AddLink(mItems[0], 2, mItems[2]);
+    AddLink(mItems[2], 3, NULL);
+    AddEntry((u32)(DinoHelpItem *)(DinoUiSaveOptionMenuItem *)mItems[0], 2,
+             (u32)(DinoHelpItem *)(DinoUiSaveOptionMenuItem *)mItems[2]);
+    AddEntry((u32)(DinoHelpItem *)(DinoUiSaveOptionMenuItem *)mItems[2], 3, 0);
+}
+
+DinoUiSaveOptionMenuItem::DinoUiSaveOptionMenuItem(DinoUiSaveOptionMenu *owner, const std::string &path, MPoint pos,
+                                                   u32 textId) {
+    mOwner = owner;
+    mTextId = textId;
+    mMotion = new MMotion(std::string(path), mOwner->GetOam(), 2, 1);
+    mMotion->Play(1, 0);
+    mMotion->SetPosition(pos);
+    mMotion->Show();
+    mParallel.AddTail(mMotion);
+}
 
 
 MSmartOam *DinoUiSaveOptionMenu::GetOam() {
