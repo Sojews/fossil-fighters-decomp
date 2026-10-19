@@ -571,7 +571,6 @@ void DinoUiMedalMenu::OnBackDecided(BOOL result) {
 }
 
 // Moves the cursor to the item (offset for the medals), and shows the medal's creature's name by it.
-// NONMATCHING: stack slots (the game puts the offset below the copies Offset makes of it).
 void DinoUiMedalMenu::OnFocus(MMenuItem *item) {
     mUnk204 = FALSE;
     if (item == NULL) {
@@ -581,17 +580,15 @@ void DinoUiMedalMenu::OnFocus(MMenuItem *item) {
     SetSelectedItem(dynamic_cast<DinoHelpItem *>(item));
     MRect frame = item->GetFrame();
     mCursor->SetMode(1);
-    {
-        MPoint offset = data_ov006_021940d8.cursorOffset;
-        for (int i = 0; i < 5; i++) {
-            if (item == mUnkF0[i]) {
-                frame.Offset(offset);
-            }
+    int j;
+    for (j = 0; j < 5; j++) {
+        if (item == mUnkF0[j]) {
+            frame.Offset(data_ov006_021940d8.cursorOffset);
         }
-        for (int i = 0; i < 15; i++) {
-            if (item == mSlots[i]) {
-                frame.Offset(offset);
-            }
+    }
+    for (j = 0; j < 15; j++) {
+        if (item == mSlots[j]) {
+            frame.Offset(data_ov006_021940d8.cursorOffset);
         }
     }
     if (mCursor->IsHidden()) {
