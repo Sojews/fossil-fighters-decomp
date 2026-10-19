@@ -87,6 +87,18 @@ u8 DinoTalkWindow::GetUnkB0() {
     return mUnkB0;
 }
 
+// While the text is still typing, stops it there and carries on after the frames.
+void DinoTalkWindow::Pause(int frames) {
+    if (mConsole->GetSpeed() != MFx32(0)) {
+        mConsole->PushChar(0xC);
+        MTask *run = MTaskRunTransfer::Create(mConsole);
+        MTask *timer = new MTimer(frames);
+        MTaskSet *anims = mAnims;
+        anims->AddTail(timer);
+        anims->AddTail(run);
+    }
+}
+
 // The page is all out (the console waits) and the window is still.
 BOOL DinoTalkWindow::IsPageDone() {
     BOOL done = mConsole->mState == MTask::STATE_SUSPEND;

@@ -24,6 +24,8 @@ public:
     void SetUnkAC(u32 value);
     void SetUnkB0(u8 value);
     u8 GetUnkB0();
+    // While the text is still typing, stops it there and carries on after the frames.
+    void Pause(int frames);
     BOOL IsPageDone();
     void Skip();
     BOOL IsAnimating();
