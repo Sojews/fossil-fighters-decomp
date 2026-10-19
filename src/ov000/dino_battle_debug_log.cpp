@@ -6,6 +6,31 @@
 
 #include "game/dino_battle_debug_log.h"
 #include "types.h"
+#include "game/dino_resource.h"
+#include "m/canvas.h"
+#include "m/console.h"
+#include "m/display.h"
+#include "m/input.h"
 
 DinoBattleDebugLog::~DinoBattleDebugLog() {
+}
+
+#pragma auto_inline off
+
+// A console of the battle's log, when the adjustment data asks for one.
+// NONMATCHING: this and the display swap registers (and the saved display and font).
+DinoBattleDebugLog::DinoBattleDebugLog(MDisplay *display) : MProcess(display) {
+    if (gDinoResource->GetBattleAdjustDefs()->debugLog) {
+        MDisplay *saved = gCurrentDisplay;
+        gCurrentDisplay = display;
+        MFont *font = gDinoResource->CreateFont12(0, 10, 1);
+        mConsole = new MConsole(new MTextCanvas(MPoint(0x100, 0xCC), gDinoResource->GetUnkTable(), 0, TRUE), font,
+                                MPoint(0, 2), MFx32::FromRaw(0x4CD));
+        mConsole->SetUnk3C(MFx32(4));
+        mConsole->Show();
+        mParallel.AddTail(mConsole);
+        mInputHub = new MSingleInputHub(1);
+        mParallel.AddTail(mInputHub);
+        gCurrentDisplay = saved;
+    }
 }

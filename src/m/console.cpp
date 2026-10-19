@@ -30,12 +30,12 @@ MCanvasCopyTransfer::~MCanvasCopyTransfer() {
 }
 
 // NONMATCHING (also SetSpeed, GetSpeed): the game doesn't copy the divisor when dividing by speed.
-MConsole::MConsole(MCanvas *canvas, MFont *font, int spacing, int lineSpacing, MFx32 speed)
+MConsole::MConsole(MCanvas *canvas, MFont *font, MPoint spacing, MFx32 speed)
     : MFixedSizeView(canvas->GetSize()) {
     mCanvas = canvas;
     mFont = font;
-    mSpacing = spacing;
-    mLineSpacing = lineSpacing;
+    mSpacing = spacing.x;
+    mLineSpacing = spacing.y;
     mUnk28 = 0;
     mUnk2C = 0;
     mUnk30 = 0;

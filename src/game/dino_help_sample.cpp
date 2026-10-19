@@ -139,7 +139,7 @@ DinoHelpSampleConsole::DinoHelpSampleConsole(MDisplay *display) : MProcess(displ
                                                sConsoleRect.bottom - sConsoleRect.top),
                                         gDinoResource->GetUnkTable(), TRUE);
     MFont *font = gDinoResource->CreateFont12(0, 10, 1);
-    mConsole = new MConsole(canvas, font, 0, 3, MFx32(3));
+    mConsole = new MConsole(canvas, font, MPoint(0, 3), MFx32(3));
     mConsole->SetPosition(MPoint(sConsoleRect.left, sConsoleRect.top));
     mConsole->Show();
     mParallel.AddTail(mConsole);

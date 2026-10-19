@@ -4926,7 +4926,7 @@ _ZNSt13__vec_deleterIN10MOamCanvasI4MOam8MOamUnitE5PieceERSaIS5_EE8allocateEmN10
 _ZNSt13__vec_deleterIN10MOamCanvasI4MOam8MOamUnitE5PieceERSaIS5_EED2Ev kind:function(thumb,size=0x26) addr:0x02064a00
 _ZNSt13__vec_deleterIN10MOamCanvasI9MSmartOam13MSmartOamUnitE5PieceERSaIS5_EE8allocateEmN10Metrowerks8int2typeILi1EEE kind:function(thumb,size=0x34) addr:0x02064a28
 _ZNSt13__vec_deleterIN10MOamCanvasI9MSmartOam13MSmartOamUnitE5PieceERSaIS5_EED2Ev kind:function(thumb,size=0x26) addr:0x02064a5c
-_ZN8MConsoleC1EP7MCanvasP5MFontii5MFx32 kind:function(thumb,size=0xb8) addr:0x02064a84
+_ZN8MConsoleC1EP7MCanvasP5MFont6MPoint5MFx32 kind:function(thumb,size=0xb8) addr:0x02064a84
 _ZN8MConsoleD1Ev kind:function(thumb,size=0x3c) addr:0x02064b3c
 _ZN8MConsoleD0Ev kind:function(thumb,size=0x44) addr:0x02064b78
 _ZN8MConsole8SetSpeedE5MFx32 kind:function(thumb,size=0x4a) addr:0x02064bbc

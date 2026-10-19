@@ -15,6 +15,7 @@ class MInputHub;
 
 class DinoBattleDebugLog : public MProcess {
 public:
+    DinoBattleDebugLog(MDisplay *display);
     virtual ~DinoBattleDebugLog();
     virtual void Idle();
 

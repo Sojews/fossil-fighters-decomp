@@ -9,7 +9,7 @@
 
 class MConsole : public MFixedSizeView {
 public:
-    MConsole(MCanvas *canvas, MFont *font, int spacing, int lineSpacing, MFx32 speed);
+    MConsole(MCanvas *canvas, MFont *font, MPoint spacing, MFx32 speed);  // spacing: between letters, lines
     virtual ~MConsole();
     virtual void Execute();
     virtual void SetPosition(MPoint pos);
