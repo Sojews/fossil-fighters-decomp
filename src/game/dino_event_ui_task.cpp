@@ -35,6 +35,9 @@
 #include "m/bright.h"
 #include "m/screen.h"
 #include "game/dino_event_ui_task.h"
+#include "nitro/mi.h"
+#include "game/dino_ui_revive_status_menu.h"
+#include "game/dino_ui_revive_effect.h"
 #include "game/dino_ui_shop_buy.h"
 #include "game/dino_ui_shop_sell.h"
 #include "game/dino_ui_mask_buy.h"
@@ -283,4 +286,19 @@ void DinoEventSaveOption::Idle() {
         Exit();
         break;
     }
+}
+
+// NONMATCHING: register allocation only (the game keeps this in r5).
+MTask *DinoEventReviveEffectCaller::CreateUi() {
+    DinoCreatureState revived;
+    MI_CpuFill8(&revived, 0, sizeof(revived));
+    revived.index = mCreature;
+    DinoCreatureState creature;
+    gDinoBackup->GetCreature(mCreature, &creature);
+    MTask *loop = new DinoUiReviveStatusLoop(mCreature, 0);
+    MTask *effect = new DinoUiReviveEffect(revived, creature, &mResult, 0);
+    MSerialTaskSet *tasks = new MSerialTaskSet(TRUE);
+    tasks->AddTail(effect);
+    tasks->AddTail(loop);
+    return tasks;
 }
