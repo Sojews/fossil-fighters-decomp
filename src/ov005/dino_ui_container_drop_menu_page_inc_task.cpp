@@ -226,6 +226,35 @@ void DinoUiContainerDropMenu::OnFocus(MMenuItem *item) {
     mUnk120 = -1;
 }
 
+// The tag the drop message names the rock by.
+extern "C" const char data_ov005_0216b178[];
+extern const u32 data_0208a658, data_0208a65c;
+
+// The back button leaves; a rock's button asks whether to drop it (naming it in mUnkE4[3]).
+void DinoUiContainerDropMenu::OnDecide(MMenuItem *item) {
+    for (int i = 0; i < mItems.size(); i++) {
+        if (item == mItems[i]) {
+            if (!mStarted) {
+                return;
+            }
+            *(u32 *)mUnkDC = i + mPage * 8;
+            if (*(u32 *)mUnkDC == mIcons.size() - 1) {
+                OnBackDecided();
+                return;
+            }
+            DinoBackupEntry entry;
+            gDinoBackup->GetUnk98(*(u32 *)mUnkDC, &entry);
+            std::string text = DinoReplaceTag(mUnkE4[3], data_ov005_0216b178, gDinoBackup->GetEntryName(&entry));
+            DinoCommonWindowYesNoDialog *dialog = new DinoCommonWindowYesNoDialog(text, &mUnk128);
+            dialog->SetLabels(mUnkE4[4], mUnkE4[5]);
+            dialog->SetLabels2(std::string(gDinoResource->GetText(data_0208a65c)),
+                               std::string(gDinoResource->GetText(data_0208a658)));
+            mSerial.AddTail(dialog);
+            return;
+        }
+    }
+}
+
 extern const u32 data_0208a650, data_0208a654;
 
 // Asks whether to leave.
