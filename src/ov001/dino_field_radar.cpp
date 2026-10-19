@@ -69,13 +69,20 @@ DinoFieldRadarManager::DinoFieldRadarManager(DinoField *field) : MProcess(gLcd->
     mRadar = NULL;
 }
 
-// NONMATCHING: the game keeps more MFx32 temporaries on the stack (stack layout and scheduling differ).
+// The point a field position comes to on the radar.
+static inline MPoint DinoRadarToPoint(MFx32Point p) {
+    return MPoint(MFx32ToInt(p.x), MFx32ToInt(p.y));
+}
+
+// Centers the radar's sprites on the player.
 void DinoFieldRadar::SetPlayer(MFx32Point pos, u16 angle, MFx32 height) {
     mPlayerPos = pos;
     mPlayerAngle = angle;
     mPlayerHeight = height;
-    MFx32Point p(pos.x * mScale, pos.y * mScale);
-    mOam->SetOffset(MPoint(MFx32ToInt(p.x) - 128, MFx32ToInt(p.y) - 96));
+    MPoint offset;
+    MPoint q = DinoRadarToPoint(pos * mScale);
+    offset = MPoint(q.x - 128, q.y - 96);
+    mOam->SetOffset(offset);
 }
 
 void DinoFieldRadarManager::Idle() {
