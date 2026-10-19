@@ -11,6 +11,9 @@
 #include "game/dino_ui2_parts_kaseki_button.h"
 #include "game/dino_ui2_field_menu_cursor.h"
 #include "game/dino_sound.h"
+#include "m/obj.h"
+#include "m/oam_canvas.h"
+#include "m/display.h"
 
 DinoUi2PartsRockName::~DinoUi2PartsRockName() {
 }
@@ -48,6 +51,19 @@ MRect DinoUi2PartsKasekiButton::GetFrame() {
 extern "C" const char data_ov004_02176b2c[]; // ""
 
 // The fossil's name, in a color by its state.
+#pragma opt_common_subs off
+DinoUi2PartsRockName::DinoUi2PartsRockName(MPoint pos) : MProcess(NULL) {
+    mFont = gDinoResource->CreateFont12(0, 1, 0);
+    MObjCanvas *canvas = new MObjCanvas(gCurrentDisplay, gCurrentDisplay->mObj->mOam, MPoint(256, 32),
+                                        gDinoResource->GetUnkTable(), TRUE);
+    mText = new MIndicator(canvas, mFont, 0);
+    mParallel.AddTail(mText);
+    mText->SetPosition(pos);
+    mText->SetPriority(2);
+    mText->Show();
+}
+#pragma opt_common_subs reset
+
 void DinoUi2PartsRockName::SetEntry(const DinoBackupEntry *entry, BOOL selected) {
     DinoKasekiRockState rock;
     gDinoBackup->GetKasekiRock(entry->id, (u32 *)&rock);
