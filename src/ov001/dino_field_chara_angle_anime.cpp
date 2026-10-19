@@ -228,6 +228,7 @@ BOOL DinoFieldChara::IsUnk24Reacting() {
 }
 
 // Whether the camera's focus stands within the chara's range (for a chara of kind 2, in an A1 motion).
+// NONMATCHING: stack slots of the subtraction's temporaries only (the game's y temporaries sit above the x ones).
 BOOL DinoFieldChara::IsFocusNear() {
     if (mBody != NULL && ((DinoFieldCharaData *) mFile.GetData())->mUnk20 == 2 && IsUnkA1Motion()) {
         u32 focus = mField->GetCamera()->GetFocus();
