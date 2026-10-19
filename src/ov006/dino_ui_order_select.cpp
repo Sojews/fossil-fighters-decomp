@@ -8,6 +8,8 @@
 #include "game/dino_ui_order_select.h"
 #include "game/dino_ui_rv_information.h"
 #include "types.h"
+#include "game/dino_ui_parts_reviver_medal_button.h"
+#include <algorithm>
 #include "m/smart_oam.h"
 #include "game/dino_team.h"
 #include "game/dino_ui_parts_team_tech.h"
@@ -190,6 +192,56 @@ void DinoUiOrderSelectMenu::RefreshItems() {
         AddLink(mTabs[2], 1, mOKButton);
     }
     LinkItems();
+}
+
+// Where the team's medals go.
+extern "C" const MPoint data_ov006_02197340[5];
+extern const u32 kCreatureLevelLimits[2];
+
+// A creature's experience, up to what the top level needs.
+static inline u32 GetCreatureTotal(const DinoCreatureState &creature) {
+    if (creature.parts[0].level == 0) {
+        return 0;
+    }
+    u32 sum = creature.unk0_8 + (creature.parts[0].level + creature.parts[1].level + creature.parts[2].level +
+                                 creature.parts[3].level);
+    return std::min(kCreatureLevelLimits[0] * 11 + 50, sum);
+}
+
+static inline u32 GetCreatureLevel(const DinoCreatureState &creature) {
+    if (creature.parts[0].level == 0) {
+        return 0;
+    }
+    return (GetCreatureTotal(creature) - 50) / kCreatureLevelLimits[0] + 1;
+}
+
+void DinoUiOrderSelectMenu::CreateItems() {
+    for (int i = 0; i < 5; i++) {
+        if (mTeam.slots[i]) {
+            DinoCreatureState creature;
+            gDinoBackup->GetCreature(mTeam.slots[i], &creature);
+            u8 maxed;
+            if (GetCreatureLevel(creature) == 12) {
+                maxed = TRUE;
+            } else {
+                maxed = FALSE;
+            }
+            mItems[i] = new DinoUiPartsReviverMedalButton(mOam, data_ov006_02197340[i], mTeam.slots[i], maxed, 0);
+            AddItem(mItems[i]);
+        } else {
+            mItems[i] = new DinoUiPartsReviverMedalButton(mOam, data_ov006_02197340[i], 0, 0, 0);
+            AddItem(mItems[i]);
+            mItems[i]->Disable();
+        }
+        AddLink(mItems[i], 2, mTabs[mPage]);
+    }
+    if (mItems[3]->IsEnabled()) {
+        AddLink(mUnkF8[mHasFourthTab ? 3 : 2], 2, mItems[3]);
+    } else if (mItems[2]->IsEnabled()) {
+        AddLink(mUnkF8[mHasFourthTab ? 3 : 2], 2, mItems[2]);
+    } else {
+        AddLink(mUnkF8[mHasFourthTab ? 3 : 2], 2, mItems[4]);
+    }
 }
 
 void DinoUiOrderSelectMenu::FinishPage() {
