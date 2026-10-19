@@ -11,6 +11,9 @@
 #include "game/dino_ui_rv_status_menu_item.h"
 
 class MSmartOam;
+class DinoUiRvInformation;
+class DinoUiFieldMenuFraction4;
+
 class DinoUiRvStatusMenu : public DinoHelpBase, public MMenu {
 public:
     MSmartOam *GetOam() { return mOam; }
@@ -23,18 +26,25 @@ public:
     void PageLeft();
     void ShowPage();
     void SelectTab(u8 tab);
+    // Turns the information to the page; help comes back once it has.
+    void SetInfoPage(u8 page);
+    void RefreshTab();
 
     MSmartOam *mOam;    // 0xB4: the items' sprites
     u32 mUnkB8[3];
     MMenuItem *mTabItems[4]; // 0xC4
     MSerialTaskSet *mCursorTasks;   // 0xD4
     DinoUiFieldMenuCursor *mCursor; // 0xD8
-    u32 mUnkDC[3];
+    DinoUiRvInformation *mInfo;         // 0xDC
+    DinoUiFieldMenuFraction4 *mFraction;    // 0xE0
+    u32 mUnkE4;
     std::vector<void *> mUnkE8; // 0xE8
-    u32 mUnkF4[3];
+    MTaskSet *mUnkF4;   // 0xF4
+    int *mResult;       // 0xF8: gets the page left on
+    u32 mUnkFC;
     int mPage; // 0x100
     int mLastPage; // 0x104
-    u32 mUnk108[1];
+    u8 mTab;            // 0x108
     MArchivePtr mArchive;       // 0x10C
     MArchiveFile mFile;         // 0x110
 };

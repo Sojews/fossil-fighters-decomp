@@ -280,13 +280,13 @@ _ZN18DinoUiRvStatusMenu7OnFocusEP9MMenuItem kind:function(thumb,size=0x12c) addr
 _ZN18DinoUiRvStatusMenu8OnDecideEP9MMenuItem kind:function(thumb,size=0x28) addr:0x0217f218
 _ZN18DinoUiRvStatusMenu9SelectTabEh kind:function(thumb,size=0xf0) addr:0x0217f240
 _Z15MCreateCallTaskI18DinoUiRvStatusMenuS0_hEP5MTaskPT_MT0_FvT1_ES6_ kind:function(thumb,size=0x40) addr:0x0217f330
-func_ov006_0217f370 kind:function(thumb,size=0x64) addr:0x0217f370
+_ZN18DinoUiRvStatusMenu11SetInfoPageEh kind:function(thumb,size=0x64) addr:0x0217f370
 _Z15MCreateCallTaskI18DinoUiRvStatusMenu12DinoHelpBaseEP5MTaskPT_MT0_FvvE kind:function(thumb,size=0x38) addr:0x0217f3d4
 _ZN18DinoUiRvStatusMenu8PageLeftEv kind:function(thumb,size=0x24) addr:0x0217f40c
 _ZN18DinoUiRvStatusMenu9PageRightEv kind:function(thumb,size=0x24) addr:0x0217f430
 _ZN18DinoUiRvStatusMenu8ShowPageEv kind:function(thumb,size=0x98) addr:0x0217f454
 _ZN18DinoUiRvStatusMenu13OnBackDecidedEv kind:function(thumb,size=0xb8) addr:0x0217f4ec
-func_ov006_0217f5a4 kind:function(thumb,size=0x1798) addr:0x0217f5a4
+_ZN18DinoUiRvStatusMenu10RefreshTabEv kind:function(thumb,size=0x1798) addr:0x0217f5a4
 .L_02180d2e kind:label(thumb) addr:0x02180d2e local
 _ZN22DinoUiRvStatusMenuItem7GetRectEv kind:function(thumb,size=0xa) addr:0x02180d3c
 _ZN22DinoUiRvStatusMenuItem8GetFrameEv kind:function(thumb,size=0xe) addr:0x02180d48

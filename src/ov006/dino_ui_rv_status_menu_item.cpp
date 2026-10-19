@@ -13,6 +13,8 @@
 #include "m/lcd.h"
 #include "m/display.h"
 #include "m/bright.h"
+#include "game/dino_ui_field_menu_fraction4.h"
+#include "game/dino_ui_rv_information.h"
 
 #pragma auto_inline off
 
@@ -125,10 +127,12 @@ void DinoUiRvStatusMenu::OnDecide(MMenuItem *item) {
 
 // Template task instances the game emits in this file. Until the code that makes the tasks is decompiled, they are
 // instantiated explicitly.
+#pragma auto_inline off
 template class MCallTask0<DinoUiRvStatusMenu, DinoHelpBase>;
 template MTask *MCreateCallTask(DinoUiRvStatusMenu *obj, void (DinoHelpBase::*func)());
 template class MCallTask1<DinoUiRvStatusMenu, DinoUiRvStatusMenu, u8>;
 template MTask *MCreateCallTask(DinoUiRvStatusMenu *obj, void (DinoUiRvStatusMenu::*func)(u8), u8 a0);
+#pragma auto_inline reset
 
 // Where the cursor sits on each tab.
 extern MPoint data_020b5890[4];
@@ -154,4 +158,50 @@ void DinoUiRvStatusMenu::OnFocus(MMenuItem *item) {
         mCursorTasks->AddTail(mCursor->CreateMoveTask(mCursor->GetFrame(), frame, 10, -5));
     }
     mCursor->Show();
+}
+
+// The TU's pooled pointer-to-member constants.
+extern "C" struct {
+    void (DinoUiRvStatusMenu::*SetInfoPage_00)(u8);
+} data_ov006_021939f0;
+extern "C" struct {
+    void (DinoHelpBase::*Enable_00)();
+} data_ov006_02193a48;
+
+void DinoUiRvStatusMenu::SelectTab(u8 tab) {
+    if (tab > 3 || mTab == tab) {
+        return;
+    }
+    mTab = tab;
+    DinoSoundPlaySe(0x94, 0);
+    GetSerial()->AddTail(new MTimer(1), MCreateCallTask(this, data_ov006_021939f0.SetInfoPage_00, tab));
+    mTabItems[tab % 4]->SetKeys(0);
+    mTabItems[(tab + 1) % 4]->SetKeys(0x400);
+    mTabItems[(tab + 2) % 4]->SetKeys(0);
+    mTabItems[(tab + 3) % 4]->SetKeys(0x800);
+    Disable();
+    RefreshTab();
+}
+
+void DinoUiRvStatusMenu::SetInfoPage(u8 page) {
+    mInfo->SetPage(page);
+    if (page == 3) {
+        mFraction->SetPriority(3);
+    } else {
+        mFraction->SetPriority(2);
+    }
+    GetSerial()->AddTail(MTaskSetWaitEmptyTask::Create(&mInfo->mSerial),
+                         MCreateCallTask(this, data_ov006_02193a48.Enable_00));
+    Disable();
+}
+
+extern const int data_02089a8c, data_02089a90, data_02089a94;
+
+void DinoUiRvStatusMenu::OnBackDecided() {
+    if (mResult != NULL) {
+        *mResult = mPage;
+    }
+    GetSerial()->AddTail(new MTimer(data_02089a94), MTaskSetWaitEmptyTask::Create(mUnkF4),
+                         gLcd->GetBottomDisplay()->mBright->CreateFadeOutToBlack(data_02089a90, data_02089a8c),
+                         mInfo->CreateWaitModelTask(), MTaskExitTransfer::Create(&(MTask &)*this));
 }
