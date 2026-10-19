@@ -6,8 +6,11 @@
 #include "game/help.h"
 #include "m/menu_item.h"
 
+class MSmartOam;
+
 class DinoCommonYesNoMenuItem : public DinoHelpItem, public MMenuItem {
 public:
+    DinoCommonYesNoMenuItem(MSmartOam *oam, u8 isYes, u32 textId);
     virtual ~DinoCommonYesNoMenuItem();
     virtual MRect GetRect();
     virtual MDisplay *GetDisplay();

@@ -40,6 +40,26 @@ DinoCommonYesNoMenuItem::~DinoCommonYesNoMenuItem() {
 DinoCommonYesNoMenu::~DinoCommonYesNoMenu() {
 }
 
+// The TU's pooled constants (see menu.cpp).
+extern "C" struct {
+    u32 unk00;
+    const char *buttonPath; // 0x04
+} data_020bc3f0;
+
+DinoCommonYesNoMenuItem::DinoCommonYesNoMenuItem(MSmartOam *oam, u8 isYes, u32 textId) {
+    mIsYes = isYes;
+    mTextId = textId;
+    mMotion = new MMotion(data_020bc3f0.buttonPath, oam, 0, 1);
+    mMotion->Show();
+    mMotion->SetPriority(0);
+    mMotion->SetPosition(MPoint(mIsYes ? 0x60 : 0xA0, 0x68));
+    mParallel.AddTail(mMotion);
+    OnFocusChanged(FALSE);
+    if (!isYes) {
+        SetKeys(2);
+    }
+}
+
 MRect DinoCommonYesNoMenuItem::GetFrame() {
     return mMotion->GetFrame();
 }
