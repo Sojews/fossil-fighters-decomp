@@ -13,6 +13,7 @@
 
 class AttackMenuBarMotion;
 class DinoBattleViewUiAbilityMenu;
+class DinoBattleView;
 class MSmartOam;
 
 class DinoBattleViewUiAbilityMenuItem : public MMenuItem {
@@ -40,8 +41,15 @@ public:
     MParallelTaskSet *mTasks;   // 0xA0
 };
 
+// What the ability menu is opened with (passed on as is).
+struct DinoBattleViewUiAbilityMenuArgs {
+    u32 unk[6];
+};
+
 class DinoBattleViewUiAbilityMenu : public MMenu, public DinoHelpBase {
 public:
+    DinoBattleViewUiAbilityMenu(u32 arg0, u32 arg1, u32 arg2, u32 arg3, u32 arg4, DinoBattleViewUiAbilityMenuArgs args,
+                                u8 arg6, u32 arg7, DinoBattleView *view);
     virtual ~DinoBattleViewUiAbilityMenu();
     virtual void OnStart();
     virtual void OnIdle();
@@ -51,8 +59,20 @@ public:
     MSmartOam *GetUnkB4();
 
     MSmartOam *mUnkB4;  // 0xB4
-    u8 unkB8[0x4C];
-    void *mUnk104;  // 0x104
+    u32 mUnkB8;     // 0xB8
+    u32 mUnkBC;     // 0xBC
+    u32 mUnkC0;     // 0xC0
+    u32 mUnkC4;     // 0xC4
+    u32 mUnkC8;     // 0xC8
+    u32 mUnkCC;     // 0xCC
+    u32 unkD0;
+    u8 mUnkD4;      // 0xD4
+    u32 mUnkD8;     // 0xD8
+    DinoBattleViewUiAbilityMenuArgs mArgs;  // 0xDC
+    u8 unkF4[0x104 - 0xF4];
+    void *mUnk104;  // 0x104: the DinoBattleView
+    u8 unk108[0x11C - 0x108];
+    u32 mUnk11C;    // 0x11C
 };
 
 class MMotion;

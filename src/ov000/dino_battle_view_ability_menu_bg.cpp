@@ -14,6 +14,7 @@
 #include "game/dino_battle_view_ui_ability_menu_item.h"
 
 extern "C" int data_ov000_021978dc;    // live ability menu BGs
+extern "C" const u32 data_0208a19c;     // frames before the ability menu takes input
 
 DinoBattleViewAbilityMenuBG::~DinoBattleViewAbilityMenuBG() {
     if (mUnk10D4) {
@@ -180,6 +181,22 @@ extern "C" BOOL func_ov000_02179aa0(u32 id) {
         return TRUE;
     }
     return FALSE;
+}
+
+// Clears a side's status effect tasks.
+extern "C" void func_ov000_0217e1ec(void *icons, int side);
+
+DinoBattleViewUiAbilityMenu::DinoBattleViewUiAbilityMenu(u32 arg0, u32 arg1, u32 arg2, u32 arg3, u32 arg4,
+                                                         DinoBattleViewUiAbilityMenuArgs args, u8 arg6, u32 arg7,
+                                                         DinoBattleView *view)
+    : MMenu(gDinoResource->GetBattleAdjustDefs()->abilityMenuWrap ? 2 : 0), mUnkB8(arg0), mUnkBC(arg1),
+      mUnkC0(arg2), mUnkC4(arg3), mUnkC8(arg4), mUnkCC(0), mUnkD4(arg6), mUnkD8(arg7), mArgs(args), mUnk104(view),
+      mUnk11C(0) {
+    func_ov000_0217e1ec(view->mUnkE0->mUnk140, 0);
+    func_ov000_0217e1ec(view->mUnkE0->mUnk140, 1);
+    SetDeferStart(TRUE);
+    mSerial.AddTail(new MTimer(data_0208a19c));
+    Disable();
 }
 
 // (Unreferenced.)

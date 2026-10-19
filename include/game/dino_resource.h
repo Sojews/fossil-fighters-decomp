@@ -120,6 +120,8 @@ struct DinoBattleAdjustDefs {
     u8 debugLog;        // 0x171: show the battle's debug log
     u8 unk172[2];
     u32 actionLog;      // 0x174: list the actions in the action info bar
+    u8 unk178[0x190 - 0x178];
+    u8 abilityMenuWrap; // 0x190: the ability menu's cursor wraps around
 };
 
 struct DinoRgb {
