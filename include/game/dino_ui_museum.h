@@ -39,6 +39,7 @@ public:
     void FinishPageRight();
     void FinishPageLeft();
     void SelectTab(u8 tab);
+    void LoadTab(u8 tab);
     void ShowInformation();
     void CloseInformation();
 
@@ -49,7 +50,7 @@ public:
     MMenuItem *mTabs[5];    // 0xC4
     MPictureFile *mPicture; // 0xD8
     MTask *mInformation;    // 0xDC: the fossil information shown
-    u32 unkE0;
+    MExtAffinePicture *mTabPicture; // 0xE0: scrolled to the tab's part
     MMenuItem *mSlots[15];  // 0xE4
     u8 unk120[0x15C - 0x120];
     u32 mSlotCount;     // 0x15C
@@ -61,7 +62,8 @@ public:
     std::vector<MTask *> mUnk184;       // 0x184
     std::vector<MTask *> mUnk190;       // 0x190
     u32 mPage;                          // 0x19C
-    u8 unk1A0[0x1A8 - 0x1A0];
+    u8 unk1A0[0x1A4 - 0x1A0];
+    u8 mTab;                            // 0x1A4
     int mSelected;  // 0x1A8: the fossil whose information is shown
     u8 mUnk1AC;     // 0x1AC: whether the slots can be chosen
     u8 unk1AD[0x1B4 - 0x1AD];

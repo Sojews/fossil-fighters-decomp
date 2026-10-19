@@ -330,8 +330,10 @@ void DinoUiMuseumMenu::OnIdle() {
 template MTask *MCreateBgCallTask(DinoUiMuseum3DModel *obj, void (DinoUiMuseum3DModel::*func)(), int thread);
 template MTask *MCreateBgCallTask(DinoUiMuseum *obj, void (DinoUiMuseum::*func)(), int thread);
 // DinoUiMuseumMenu::OnFocus (not decompiled yet) re-enables the help through a call task.
+#pragma auto_inline off
 template MTask *MCreateCallTask(DinoUiMuseumMenu *obj, void (DinoHelpBase::*func)());
 template MTask *MCreateCallTask(DinoUiMuseum *obj, void (DinoUiMuseum::*func)());
+#pragma auto_inline reset
 
 void DinoUiMuseum3DModel::LoadModel() {
     char path[0x100];
@@ -391,4 +393,22 @@ void DinoUiMuseumMenu::CloseInformation() {
     mParallel.Remove(mInformation);
     delete mInformation;
     mUnk1C0->Clear();
+}
+
+// The TU's pooled pointer-to-member constants.
+extern "C" struct {
+    void (DinoHelpBase::*Enable_00)();
+} data_ov006_021962a4;
+
+void DinoUiMuseumMenu::SelectTab(u8 tab) {
+    if (tab >= 5 || mTab == tab) {
+        return;
+    }
+    mTab = tab;
+    DinoSoundPlaySe(0x98, 0);
+    mTabPicture->SetPosition(0, tab * -192);
+    ClearSlots();
+    LoadTab(tab);
+    Disable();
+    GetSerial()->AddTail(new DinoUiMuseumSlotCreateTask(this), MCreateCallTask(this, data_ov006_021962a4.Enable_00));
 }
