@@ -17,10 +17,16 @@ template <class T> struct char_traits {};
 template <> struct char_traits<char> {
     static size_t length(const char *s) { return strlen(s); }
     static int compare(const char *a, const char *b, size_t n) { return memcmp(a, b, n); }
+    static void assign(char &c, const char &value) { c = value; }
+    static char *copy(char *dst, const char *src, size_t n) { return (char *)memcpy(dst, src, n); }
+    static char *move(char *dst, const char *src, size_t n) { return (char *)memmove(dst, src, n); }
 };
 template <> struct char_traits<wchar_t> {
     static size_t length(const wchar_t *s) { return wcslen(s); }
     static int compare(const wchar_t *a, const wchar_t *b, size_t n) { return wmemcmp(a, b, n); }
+    static void assign(wchar_t &c, const wchar_t &value) { c = value; }
+    static wchar_t *copy(wchar_t *dst, const wchar_t *src, size_t n) { return wmemcpy(dst, src, n); }
+    static wchar_t *move(wchar_t *dst, const wchar_t *src, size_t n) { return wmemmove(dst, src, n); }
 };
 
 template <class C, class Traits = char_traits<C>, class Alloc = allocator<C> >
@@ -328,6 +334,94 @@ basic_string<C, Traits, Alloc>::~basic_string() {
         ::operator delete(mLong.data);
     }
 }
+
+// (Defined only in the files the game emits it in.)
+#ifdef MSL_STRING_REPLACE_DEFINITION
+// Replaces [pos, pos + n) with [first, last), growing onto the heap when it no longer fits. (A range from inside
+// the string itself is copied out first.)
+// NONMATCHING (both instances, ~99%): the game's TU pool puts the two terminator constants the other way round
+// (char), and numbers the in-place path's registers differently (wchar_t).
+template <class C, class Traits, class Alloc>
+basic_string<C, Traits, Alloc> &basic_string<C, Traits, Alloc>::__replace(size_type pos, size_type n, const C *first,
+                                                                          const C *last, random_access_iterator_tag) {
+    bool wasLong = is_long();
+    C *p;
+    size_type size;
+    size_type cap;
+    if (!wasLong) {
+        p = mShort.buf;
+        size = mShort.size;
+        cap = sizeof(mShort.buf) / sizeof(C);
+    } else {
+        p = mLong.data;
+        size = mLong.size;
+        cap = mLong.capacity;
+    }
+    if (pos > size) {
+        printf("basic_string: out_of_range");
+        abort();
+    }
+    size_type rlen = min(n, size - pos);
+    size_type n2 = distance(first, last);
+    size_type newSize;
+    size_type tail;
+    C *buf;
+    size_type keep;
+    C *dst;
+    if (n2 > 0x7FFFFFFE || (keep = size - rlen) > 0x7FFFFFFE - n2) {
+        printf("basic_string: length_error");
+        abort();
+    }
+    newSize = n2 + keep;
+    tail = size - (pos + rlen);
+    if (newSize >= cap) {
+        cap = (cap + 16 / sizeof(C) - 1) & ~(16 / sizeof(C) - 1);
+        while (cap < newSize + 1) {
+            cap = (cap * 2 + 16 / sizeof(C) - 1) & ~(16 / sizeof(C) - 1);
+        }
+        buf = (C *)::operator new(cap * sizeof(C));
+        if (buf == 0) {
+            printf("Memory allocation failure");
+            abort();
+        }
+        if (pos != 0) {
+            Traits::copy(buf, p, pos);
+        }
+        dst = buf + pos;
+        memmove(dst, first, (last - first) * sizeof(C));
+        if (tail != 0) {
+            Traits::copy(dst + n2, p + pos + rlen, tail);
+        }
+        Traits::assign(buf[newSize], C());
+        if (wasLong) {
+            ::operator delete(p);
+        } else {
+            mLong.isLong = 1;
+        }
+        mLong.data = buf;
+        mLong.size = newSize;
+        mLong.capacity = cap;
+    } else {
+        basic_string copy;
+        if (tail != 0 && p + pos + n2 < last && last <= p + size) {
+            copy.assign(first, last);
+            const basic_string &c = copy;
+            first = c.data();
+        }
+        if (tail != 0) {
+            Traits::move(p + pos + n2, p + pos + rlen, tail);
+        }
+        Traits::move(p + pos, first, n2);
+        Traits::assign(p[newSize], C());
+        if (!wasLong) {
+            mShort.size = newSize;
+        } else {
+            mLong.size = newSize;
+        }
+    }
+    return *this;
+}
+#endif
 
 // Makes room for n characters (never fewer than it holds), moving between the in-place buffer and the heap.
 template <class C, class Traits, class Alloc>

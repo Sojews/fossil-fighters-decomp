@@ -16,6 +16,8 @@ wchar_t *wcscpy(wchar_t *dest, const wchar_t *src);
 wchar_t *wcsncpy(wchar_t *dest, const wchar_t *src, size_t n);
 const wchar_t *wcschr(const wchar_t *str, wchar_t chr);
 int wmemcmp(const wchar_t *pSrc1, const wchar_t *pSrc2, size_t num);
+wchar_t *wmemcpy(wchar_t *pDest, const wchar_t *pSrc, size_t num);
+wchar_t *wmemmove(wchar_t *pDest, const wchar_t *pSrc, size_t num);
 
 #ifdef __cplusplus
 }

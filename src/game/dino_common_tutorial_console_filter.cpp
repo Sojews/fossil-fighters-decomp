@@ -1,8 +1,11 @@
 // DinoCommonTutorialConsoleFilter.
 // Only the destructors are decompiled so far.
 
+#pragma ipa file
+
 #define DINO_COMMON_TUTORIAL_WINDOW_OWNER
 #define MSL_STRING_BASICS
+#define MSL_STRING_REPLACE_DEFINITION
 #include "m/oam_canvas.h"
 #include "game/dino_common_tutorial_console_filter.h"
 #include "game/dino_common_tutorial_window.h"
@@ -134,9 +137,13 @@ void DinoTutorialFilterWStringAnchor(const wchar_t *text) {
     std::wstring s(text);
 }
 
-// (Likewise reserve, which an explicit instance here would name differently.)
+// (Likewise reserve and __replace, which explicit instances here would name differently.)
 void DinoTutorialFilterReserveAnchor(std::wstring *s) {
     s->reserve(0);
+}
+
+void DinoTutorialFilterReplaceAnchor(std::wstring *s, const wchar_t *first, const wchar_t *last) {
+    s->__replace(0, 0, first, last, std::random_access_iterator_tag());
 }
 #pragma dont_inline reset
 

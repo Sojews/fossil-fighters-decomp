@@ -1,6 +1,9 @@
 // Save data checks run before the game reads or writes its save.
 
+#pragma ipa file
+
 #define MSL_STRING_BASICS
+#define MSL_STRING_REPLACE_DEFINITION
 #include <string>
 #include "game/backup_validater.h"
 #include "game/common_window_message.h"
@@ -61,6 +64,12 @@ DinoBackupWriteValidater::DinoBackupWriteValidater(MTask *caller, void *arg)
 }
 
 // String members the game emits in this file.
+// (Calling __replace here first instantiates it with the name the game's callers use.)
+#pragma dont_inline on
+void DinoBackupValidaterReplaceAnchor(std::string *s, const char *first, const char *last) {
+    s->__replace(0, 0, first, last, std::random_access_iterator_tag());
+}
+#pragma dont_inline reset
 template void std::string::reserve(std::string::size_type n);
 template std::string::basic_string(const char *s);
 template std::string::~basic_string();
