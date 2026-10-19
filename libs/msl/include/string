@@ -66,6 +66,7 @@ public:
     basic_string substr(size_type pos = 0, size_type n = npos) const;
     size_type find(const C *s, size_type pos = 0) const;
     size_type find(const basic_string &str, size_type pos = 0) const;
+    size_type find(const C *s, size_type pos, size_type n) const;
     size_type find(C c, size_type pos = 0) const;
     size_type find_first_not_of(const C *s, size_type pos = 0) const;
     size_type find_first_not_of(const C *s, size_type pos, size_type n) const;
@@ -285,6 +286,32 @@ basic_string<C, Traits, Alloc> &basic_string<C, Traits, Alloc>::operator+=(const
 template <class C, class Traits, class Alloc>
 basic_string<C, Traits, Alloc> &basic_string<C, Traits, Alloc>::operator+=(const C *s) {
     return replace(size(), 0, s);
+}
+template <class C, class Traits, class Alloc>
+typename basic_string<C, Traits, Alloc>::size_type basic_string<C, Traits, Alloc>::find(C c, size_type pos) const {
+    const C *p;
+    size_type n;
+    if (!is_long()) {
+        p = mShort.buf;
+        n = mShort.size;
+    } else {
+        p = mLong.data;
+        n = mLong.size;
+    }
+    if (pos < n) {
+        const C *end = p + n;
+        for (const C *q = p + pos; q < end; q++) {
+            if (c == *q) {
+                return q - p;
+            }
+        }
+    }
+    return npos;
+}
+
+template <class C, class Traits, class Alloc>
+typename basic_string<C, Traits, Alloc>::size_type basic_string<C, Traits, Alloc>::find(const C *s, size_type pos) const {
+    return find(s, pos, Traits::length(s));
 }
 #endif
 

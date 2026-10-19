@@ -149,3 +149,6 @@ BOOL DinoCommonWindowMenuCursor::IsHidden() {
 u32 DinoCommonWindowMenuCursor::GetPlaneMask() {
     return 0x10;
 }
+
+// String members the game emits in this file.
+template std::string std::string::substr(std::string::size_type pos, std::string::size_type n) const;
