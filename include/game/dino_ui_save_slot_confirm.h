@@ -9,6 +9,8 @@ public:
     DinoUiSaveSlotConfirm();
     virtual ~DinoUiSaveSlotConfirm();
     virtual void Idle();
+    // Not decompiled yet.
+    void Unk02159590();
 
     DinoUiSaveSlotConfirmMenu *mMenu;   // 0x74
 };
