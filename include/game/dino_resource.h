@@ -170,7 +170,17 @@ struct DinoDanceData;
 struct DinoCharaData;
 struct DinoMessageData;
 struct DinoEpisodeData;
-struct DinoKeyItemDefs;
+// The key items' definitions.
+struct DinoKeyItemDefs {
+    u32 unk00;
+    u32 count;          // 0x04
+    u32 tableOffset;    // 0x08: DinoKeyItemDef[count]
+};
+struct DinoKeyItemDef {
+    u16 nameText;       // 0x00
+    u16 unk02;
+    u32 unk04;          // 0x04
+};
 // The head masks (the player's alternative heads).
 struct DinoHeadMaskDefs {
     u32 unk00;

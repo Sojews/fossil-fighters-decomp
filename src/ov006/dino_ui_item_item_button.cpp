@@ -5,6 +5,7 @@
 #pragma auto_inline on
 
 #include "game/dino_resource.h"
+#include "m/indicator.h"
 #include "m/smart_oam.h"
 #include "game/dino_common_window_message_box.h"
 #include "game/dino_ui_item_item_button_menu.h"
@@ -235,6 +236,24 @@ void DinoUiItemMenu::OnOKDecided() {
 }
 
 #pragma auto_inline off
+
+// Shows the page's items' names.
+void DinoUiItemMenu::RefreshPage() {
+    MResource<DinoKeyItemDefs> defs = gDinoResource->LoadKeyItemDefs();
+    for (int i = 0; i < 5; i++) {
+        u32 index = mPage * 5 + i;
+        if (mKeyItems.size() > index) {
+            u32 id = mKeyItems[index];
+            const DinoKeyItemDefs *data = defs.Get();
+            const DinoKeyItemDef *def = (const DinoKeyItemDef *)((const u8 *)data + data->tableOffset) + id;
+            mLabels[i]->SetText(gDinoResource->GetText(def->nameText));
+            mItems[i]->Enable();
+        } else {
+            mLabels[i]->SetText("");
+            mItems[i]->Enable();
+        }
+    }
+}
 
 DinoUiItemMenuItem::DinoUiItemMenuItem(DinoUiItemMenu *owner, const std::string &path, MPoint pos, u32 textId) {
     mOwner = owner;

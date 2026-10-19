@@ -15,6 +15,8 @@ struct DinoTeam;
 class MSmartOam;
 class DinoUiItemMenuItem;
 
+class MIndicator;
+
 class DinoUiItemMenu : public DinoHelpBase, public MMenu {
 public:
     DinoUiItemMenu(int *choice, DinoTeam *team, DinoTeam *team2);
@@ -35,7 +37,8 @@ public:
     MSmartOam *mOam;            // 0xB4: the items' sprites
     MMenuItem *mUnkB8;          // 0xB8: focused after a page change
     DinoUiItemMenuItem *mOKButton;  // 0xBC
-    u32 mUnkC0[7];
+    u32 mUnkC0[2];
+    MMenuItem *mItems[5];       // 0xC8: the page's item buttons
     MMenuItem *mTabItems[3]; // 0xDC
     u32 mUnkE8;
     int *mResult;               // 0xEC
@@ -43,8 +46,9 @@ public:
     DinoTeam *mTeam;            // 0xF4
     u32 mUnkF8[2];
     DinoUiFieldMenuFraction *mFraction; // 0x100: "page n/m"
-    u32 mUnk104[6];
-    std::vector<void *> mUnk11C; // 0x11C
+    MIndicator *mLabels[5];     // 0x104: the page's item names
+    u32 mUnk118;
+    std::vector<u32> mKeyItems; // 0x11C: the items the player has
     int mPage;                  // 0x128
     int mLastPage;              // 0x12C
 };
