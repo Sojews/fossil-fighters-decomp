@@ -155,6 +155,11 @@ BOOL DinoFieldChara::IsUnkA1Motion() {
     return mModel.unk05[0] && (mMotion == 2 || mMotion == 3);
 }
 
+// Where the chara is on the screen.
+BOOL DinoFieldCharaGetScreenPos(MPoint *pos, DinoFieldChara *chara) {
+    return chara->mBody->mModel->GetJointScreenPos(-1, pos);
+}
+
 // One of the shared motions (1-based), or none.
 void DinoFieldChara::SetCommonMotion(u32 motion) {
     if (motion == 0) {

@@ -52,7 +52,10 @@ public:
     void SetUnk15C(u8 value);
     MFx32 GetUnk148();
     void SetUnk94(u32 a, u32 b, u32 c);
-    void SetUnkD4(u16 a, u16 b, u16 c, u32 d);
+    void SetUnkD4(u16 a, u16 b, u16 c, MFx32 d);
+    // Keeps where a rotation in progress is going (for Write), or clears it (all 0).
+    void SaveRotation(u16 fromX, u16 fromY, u16 fromZ, MFx32 fromScale, u16 toX, u16 toY, u16 toZ, MFx32 toScale,
+                      u32 duration, int ease, u32 frame);
     void AddHook(DinoFieldCameraHook *hook);
     void NotifyHooks0();
     void NotifyHooks1();
@@ -75,7 +78,7 @@ public:
     u32 mUnkDC;                     // 0xDC
     u8 unkE0[0xE4 - 0xE0];
     u32 mFocus;                     // 0xE4: the character followed
-    MTask *mUnkE8;                  // 0xE8
+    MTaskSet *mUnkE8;               // 0xE8: the rotation anime
     s32 mUnkEC;                     // 0xEC
     u32 mUnkF0[2];                  // 0xF0
     u8 mTracking;                   // 0xF8
@@ -213,6 +216,9 @@ public:
     u32 mMoveSe;                // 0x318: the footstep sound when walking
     u32 mMoveSe2;               // 0x31C
 };
+
+// Where the chara is on the screen.
+BOOL DinoFieldCharaGetScreenPos(MPoint *pos, DinoFieldChara *chara);
 
 struct MAfnBlock;
 
