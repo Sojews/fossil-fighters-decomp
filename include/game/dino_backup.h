@@ -121,8 +121,14 @@ struct DinoPlayerProfile {
     u64 unk7C;          // 0x7C
 };
 
+// (The empty constructors are inline everywhere but src/game/dino_backup.cpp, which defines DINO_BACKUP_OWNER and
+// emits the out-of-line copies the save data's arrays are built with.)
 struct DinoCharaState {
+#ifdef DINO_BACKUP_OWNER
+    DinoCharaState();
+#else
     DinoCharaState() {}
+#endif
     u8 unk0;    // 0x00
     u32 bodyModel : 8;  // 0x04
     u32 headModel : 8;
@@ -134,7 +140,11 @@ struct DinoCharaState {
 };
 
 struct DinoBackupEntry {
+#ifdef DINO_BACKUP_OWNER
+    DinoBackupEntry();
+#else
     DinoBackupEntry() {}
+#endif
     u32 unk0;               // 0x00
     u32 unk4;               // 0x04
     u32 unk8;               // 0x08
@@ -238,7 +248,11 @@ struct DinoEntrySource {
 };
 
 struct DinoBackupEntry28 {
+#ifdef DINO_BACKUP_OWNER
+    DinoBackupEntry28();
+#else
     DinoBackupEntry28() {}
+#endif
     u8 used;            // 0x00
     u8 unk1;            // 0x01
     u64 time;           // 0x04

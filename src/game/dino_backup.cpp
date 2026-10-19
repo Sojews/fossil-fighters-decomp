@@ -1,5 +1,6 @@
 // DinoBackup: the save data.
 
+#define DINO_BACKUP_OWNER
 #include "game/dino_backup.h"
 #include <algorithm>
 #include "m/archive.h"
@@ -30,6 +31,135 @@ extern const u64 kBackupRecentFrames;
 extern const u32 kCreatureLevelLimits[2];
 
 #define BACKUP_BLOCK_DATA 480   // what's left of a 512-byte block after the header
+
+// Lays out the header (slot and summaries) and the game data, mounts the storage and reads the header.
+DinoBackup::DinoBackup(u32 extraSize, BOOL useBackup) : MLooperVSyncHook(FALSE, FALSE) {
+    mEnabled = TRUE;
+    mHeaderSerializer = new MSerializer;
+    mHeaderSerializer->Add((s32 *)&mSlot, 1);
+    mSummaries = (DinoSaveSummary *)new u8[2 * sizeof(DinoSaveSummary)];
+    mHeaderSerializer->Add((u8 *)mSummaries, 2 * sizeof(DinoSaveSummary));
+    mHeaderSerializer->Close();
+
+    mSerializer = new MSerializer;
+    MBitVector *bits = new MBitVector(48);
+    mSystemFlags = bits;
+    mSerializer->Add(bits);
+    bits = new MBitVector(gDinoResource->GetFlagCount());
+    mFlags = bits;
+    mSerializer->Add(bits);
+    bits = new MBitVector(gDinoResource->GetKeyItemCount());
+    mKeyItems = bits;
+    mSerializer->Add(bits);
+    bits = new MBitVector(gDinoResource->GetHeadMaskCount());
+    mHeadMasks = bits;
+    mSerializer->Add(bits);
+    bits = new MBitVector(gDinoResource->GetEventCount());
+    mEvents = bits;
+    mSerializer->Add(bits);
+    bits = new MBitVector(gDinoResource->GetEpisodeCount());
+    mEpisodes = bits;
+    mSerializer->Add(bits);
+    mEpisodesSeen = new MBitVector(gDinoResource->GetEpisodeCount());
+    MI_CpuFill8(mEpisodesSeen->mBytes, 0, (mEpisodesSeen->mBits + 7) / 8);
+    mSerializer->Add(mEpisodesSeen);
+    mVars = new s32[gDinoResource->GetVarCount()];
+    mSerializer->Add((u32 *)mVars, gDinoResource->GetVarCount());
+    mRegionLinks = new u16[gDinoResource->GetRegionCount()];
+    mSerializer->Add(mRegionLinks, gDinoResource->GetRegionCount());
+    mPlayer = (DinoPlayerData *)operator new(sizeof(DinoPlayerData));
+    mSerializer->Add((u8 *)mPlayer, sizeof(DinoPlayerData));
+    mCharas = new DinoCharaState[gDinoResource->GetCharaCount()];
+    mSerializer->Add((u8 *)mCharas, gDinoResource->GetCharaCount() * sizeof(DinoCharaState));
+    mCharaTasks = (DinoCharaTask *)new u8[0xF00];
+    mSerializer->Add((u8 *)mCharaTasks, 0xF00);
+    mUnk98 = new DinoBackupEntry[64];
+    mSerializer->Add((u8 *)mUnk98, 64 * sizeof(DinoBackupEntry));
+    mUnk9C = new DinoBackupEntry[64];
+    mSerializer->Add((u8 *)mUnk9C, 64 * sizeof(DinoBackupEntry));
+    mKasekiRocks = new u32[gDinoResource->GetKasekiRockCount()];
+    mSerializer->Add((u8 *)mKasekiRocks, gDinoResource->GetKasekiRockCount() * sizeof(u32));
+    mSerializer->Add(mUnkA4, sizeof(mUnkA4));
+    mRecords = (DinoBackupRecord *)new u8[42 * sizeof(DinoBackupRecord)];
+    mSerializer->Add((u8 *)mRecords, 42 * sizeof(DinoBackupRecord));
+    mTeams = (DinoTeam *)new u8[10 * sizeof(DinoTeam)];
+    mSerializer->Add((u8 *)mTeams, 10 * sizeof(DinoTeam));
+    mCreatures = new DinoCreatureState[gDinoResource->GetCreatureCount()];
+    mSerializer->Add((u8 *)mCreatures, gDinoResource->GetCreatureCount() * sizeof(DinoCreatureState));
+    mUnk134 = new DinoBackupEntry[200];
+    mSerializer->Add((u8 *)mUnk134, 200 * sizeof(DinoBackupEntry));
+    mUnk140Size = extraSize;
+    mUnk140 = new u8[mUnk140Size];
+    mSerializer->Add(mUnk140, mUnk140Size);
+    mSerializer->Add(&mUnk144, 1);
+    mUnk148 = new DinoBackupEntry[8];
+    mSerializer->Add((u8 *)mUnk148, 8 * sizeof(DinoBackupEntry));
+    mUnk14C = new DinoBackupEntry[8];
+    mSerializer->Add((u8 *)mUnk14C, 8 * sizeof(DinoBackupEntry));
+    mUnk150 = new u8[0x780];
+    mSerializer->Add(mUnk150, 0x780);
+    mUnk138 = new DinoBackupEntry28[20];
+    mSerializer->Add((u8 *)mUnk138, 20 * sizeof(DinoBackupEntry28));
+    mSerializer->Add((u32 *)&mFrames, 1);
+    mSerializer->Add(&mPlayFrames, 1);
+    mSerializer->Add(&mUnk160, 1);
+    mSerializer->Add(&mUnk168, 1);
+    mUnk170 = (u8 *)operator new(0x10);
+    mSerializer->Add(mUnk170, 0x10);
+    mUnk180 = 0;
+    mSerializer->Add(&mUnk180, 1);
+    mSerializer->Add(mUnk190, 3);
+    mSerializer->Add(mUnk19C, 3);
+    mSerializer->Add(mUnk1A8, 3);
+    mUnk1B4 = 0;
+    mSerializer->Add(&mUnk1B4, 1);
+    mUnk1B8 = 0;
+    mSerializer->Add(&mUnk1B8, 1);
+    mSerializer->Close();
+
+    mHeaderSize = mHeaderSerializer->GetSize();
+    mDataSize = mSerializer->GetSize();
+    if (useBackup) {
+        mDevice = new MBackupFlash2MBitsDevice;
+        mStorage = new MBackupStorage(mDevice);
+        mStorage->AddFile((mHeaderSize + BACKUP_BLOCK_DATA - 1) / BACKUP_BLOCK_DATA * 512, 8);
+        mStorage->AddFile((mDataSize + BACKUP_BLOCK_DATA - 1) / BACKUP_BLOCK_DATA * 512, 2);
+        mStorage->AddFile((mDataSize + BACKUP_BLOCK_DATA - 1) / BACKUP_BLOCK_DATA * 512, 2);
+        mStorage->Mount();
+        if (!mStorage->IsMounted()) {
+            delete mStorage;
+            mStorage = NULL;
+            mEnabled = FALSE;
+        }
+    } else {
+        mStorage = NULL;
+    }
+
+    u8 *blank = new u8[mHeaderSize];
+    MI_CpuFill8(blank, 0, mHeaderSize);
+    mHeaderSerializer->Read(blank);
+    delete[] blank;
+    if (mStorage != NULL && mStorage->HasFile(0)) {
+        u8 *buf = new u8[(mHeaderSize + BACKUP_BLOCK_DATA - 1) / BACKUP_BLOCK_DATA * BACKUP_BLOCK_DATA];
+        if (Read(0, mHeaderSize, buf)) {
+            mHeaderSerializer->Read(buf);
+        }
+        delete[] buf;
+    }
+    if (mStorage != NULL) {
+        mLoadFailed = mStorage->IsFileDamaged(0) || mStorage->IsFileDamaged(1) || mStorage->IsFileDamaged(2);
+    } else {
+        mLoadFailed = FALSE;
+    }
+    Reset(0);
+    Enable();
+}
+
+inline DinoCharaState::DinoCharaState() {}
+
+inline DinoBackupEntry::DinoBackupEntry() {}
+
+inline DinoBackupEntry28::DinoBackupEntry28() {}
 
 void DinoBackup::Create(u32 extraSize, BOOL useBackup) {
     DinoBackup *backup = new DinoBackup(extraSize, useBackup);
