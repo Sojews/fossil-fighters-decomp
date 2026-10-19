@@ -13,6 +13,14 @@ class MSmartOam;
 struct MPalUnit;
 struct MChrBlock;
 
+// A motion file's list of files: how many, the offset of their indices in the directory and the offset of the
+// directory's path.
+struct MMotionFileList {
+    u32 count;
+    u32 table;
+    u32 path;
+};
+
 // A motion file's header.
 struct MMotionHeader {
     u32 unk00;
@@ -21,15 +29,9 @@ struct MMotionHeader {
     u32 unk0C;
     u32 cellCount;      // 0x10
     u32 cellOffset;     // 0x14: 16-byte cell definitions
-    u32 cellFileCount;  // 0x18
-    u32 cellFileTable;  // 0x1C: offset of their indices in the directory
-    u32 cellFilePath;   // 0x20: offset of the directory's path
-    u32 palCount;       // 0x24
-    u32 palTable;       // 0x28
-    u32 palPath;        // 0x2C
-    u32 chrCount;       // 0x30
-    u32 chrTable;       // 0x34
-    u32 chrPath;        // 0x38
+    MMotionFileList cellFiles;  // 0x18: the animes, one per cell
+    MMotionFileList pals;       // 0x24
+    MMotionFileList chrs;       // 0x30
 };
 
 // A cell's graphics, as the motion file lists them.
@@ -48,8 +50,21 @@ struct MMotionGfxHeader {
     u32 : 8;
 };
 
+// A motion file's archive and the motion file itself (locked).
+class MMotionArchive {
+public:
+    MMotionArchive(FSFileID id) : mArchive(id) {
+        mFile = mArchive.GetFile(0);
+        mFile.Lock();
+        mFile.GetData();
+    }
+
+    MArchivePtr mArchive;                   // 0x00
+    MArchiveFile mFile;                     // 0x04: the motion file
+};
+
 // A loaded motion file and the files it uses, shared by every motion showing it.
-class MMotionData {
+class MMotionData : public MMotionArchive {
 public:
     MMotionData(FSFileID id, int unk);
     ~MMotionData();
@@ -63,8 +78,6 @@ public:
     MPalUnit **AcquirePalettes(MDisplay *display);
     void ReleasePalettes(MDisplay *display);
 
-    MArchivePtr mArchive;                   // 0x00
-    MArchiveFile mFile;                     // 0x04: the motion file
     std::vector<MArchiveFile> mAnimeFiles;   // 0x10
     std::vector<MArchiveFile> mChrFiles;    // 0x1C
     std::vector<MArchiveFile> mPalFiles;    // 0x28
@@ -73,7 +86,7 @@ public:
     int mChrRefs[2];                        // 0x40
     MPalUnit **mPals[2];                   // 0x48
     MChrBlock **mChrs[2];                   // 0x50
-    OSMutex mMutex;                         // 0x58
+    MMutex mMutex;                          // 0x58
     std::vector<u32> mUnk70;                // 0x70
     std::vector<u32> mUnk7C;                // 0x7C
 };

@@ -14,6 +14,34 @@
 static std::map<FSFileID, MMotionData *> sMotionDatas;
 static OSMutex sMotionDatasMutex;
 
+// Opens the files of a list (in the directory it names).
+static inline void OpenFiles(const MArchivePtr &archive, const void *header, const MMotionFileList *list,
+                             std::vector<MArchiveFile> &files) {
+    MArchivePtr dir = archive.Open((const char *) header + list->path);
+    files.reserve(list->count);
+    for (u32 i = 0; i < list->count; i++) {
+        files.push_back(dir.GetFile(((const u32 *) ((const u8 *) header + list->table))[i]));
+    }
+}
+
+// Opens the motion file and every file it uses (unlocked, but for the ones asked for).
+MMotionData::MMotionData(FSFileID id, int unk) : MMotionArchive(id) {
+    mRefCount = 0;
+    for (u32 i = 0; i < 2; i++) {
+        mPalRefs[i] = 0;
+        mChrRefs[i] = 0;
+        mPals[i] = NULL;
+        mChrs[i] = NULL;
+    }
+    MMotionHeader *header = (MMotionHeader *) mFile.GetData();
+    OpenFiles(mArchive, header, &header->cellFiles, mAnimeFiles);
+    header = (MMotionHeader *) mFile.GetData();
+    OpenFiles(mArchive, header, &header->chrs, mChrFiles);
+    header = (MMotionHeader *) mFile.GetData();
+    OpenFiles(mArchive, header, &header->pals, mPalFiles);
+    LockFiles(unk);
+}
+
 MMotionData::~MMotionData() {
 }
 
@@ -36,7 +64,7 @@ void MMotionData::LockFiles(int which) {
 }
 
 MChrBlock **MMotionData::AcquireChrs(MDisplay *display) {
-    MScopedLock lock(&mMutex, TRUE);
+    MScopedLock lock(&mMutex.mutex, TRUE);
     int d = display->GetRegs00();
     LockFiles(1);
     if (mChrRefs[d]++ == 0) {
@@ -47,7 +75,7 @@ MChrBlock **MMotionData::AcquireChrs(MDisplay *display) {
         u32 tiles;
         u32 boundary;
         u32 size;
-        count = ((MMotionHeader *) mFile.GetData())->chrCount;
+        count = ((MMotionHeader *) mFile.GetData())->chrs.count;
         chr = display->mObj->mChr;
         mChrs[d] = new MChrBlock *[count];
         for (i = 0; i < count; i++) {
@@ -66,14 +94,14 @@ MChrBlock **MMotionData::AcquireChrs(MDisplay *display) {
 }
 
 void MMotionData::ReleaseChrs(MDisplay *display) {
-    MScopedLock lock(&mMutex, TRUE);
+    MScopedLock lock(&mMutex.mutex, TRUE);
     int d = display->GetRegs00();
     mChrRefs[d]--;
     if (mChrRefs[d] > 0) {
         return;
     }
     MChr *chr = display->mObj->mChr;
-    u32 count = ((MMotionHeader *) mFile.GetData())->chrCount;
+    u32 count = ((MMotionHeader *) mFile.GetData())->chrs.count;
     for (u32 i = 0; i < count; i++) {
         chr->FreeShared(mChrs[d][i]);
     }
@@ -82,12 +110,12 @@ void MMotionData::ReleaseChrs(MDisplay *display) {
 }
 
 MPalUnit **MMotionData::AcquirePalettes(MDisplay *display) {
-    MScopedLock lock(&mMutex, TRUE);
+    MScopedLock lock(&mMutex.mutex, TRUE);
     LockFiles(2);
     int d = display->GetRegs00();
     if (mPalRefs[d]++ == 0) {
         u32 i;
-        u32 count = ((MMotionHeader *) mFile.GetData())->palCount;
+        u32 count = ((MMotionHeader *) mFile.GetData())->pals.count;
         MPal *pal = display->mObj->mPal;
         MPal *extPal = display->mObj->mExtPal;
         mFile.GetData();
@@ -105,13 +133,13 @@ MPalUnit **MMotionData::AcquirePalettes(MDisplay *display) {
 }
 
 void MMotionData::ReleasePalettes(MDisplay *display) {
-    MScopedLock lock(&mMutex, TRUE);
+    MScopedLock lock(&mMutex.mutex, TRUE);
     int d = display->GetRegs00();
     mPalRefs[d]--;
     if (mPalRefs[d] > 0) {
         return;
     }
-    u32 count = ((MMotionHeader *) mFile.GetData())->palCount;
+    u32 count = ((MMotionHeader *) mFile.GetData())->pals.count;
     for (u32 i = 0; i < count; i++) {
         mPals[d][i]->pal->Free(mPals[d][i]);
     }

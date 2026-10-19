@@ -198,11 +198,15 @@ namespace std {
         void allocate(size_t n, Metrowerks::int2type<true> t);
 
         void optimize_after_moved_from() {
-            optimize_after_moved_from(Metrowerks::int2type<true>());
+            optimize_after_moved_from(Metrowerks::int2type<Metrowerks::has_trivial_copy_ctor<T>::value>());
         }
 
         void optimize_after_moved_from(Metrowerks::int2type<true>) {
             size_ = 0;
+        }
+
+        // (Elements that aren't plain data are left in place.)
+        void optimize_after_moved_from(Metrowerks::int2type<false>) {
         }
 
         bool expand_by(size_t n) {
@@ -273,19 +277,20 @@ namespace std {
             }
         }
 
-        //! TODO: probably a fake match?
-        void reallocate_copy(size_t n) {
-            UnkMSLStruct1 unk = UnkMSLStruct1();
-            UnkMSLStruct1 unk2 = UnkMSLStruct1();
-            __vec_deleter<T, Allocator> tmp;
-            tmp.init();
-            tmp.allocate(n);
-            tmp.move_construct_to_end(begin(), end());
-            optimize_after_moved_from();
-            swap(cap(), tmp.cap());
-            swap(data_, tmp.data_);
-            swap(size_, tmp.size_);
+        void move_construct_to_end_tagged(iterator begin, iterator end) {
+            move_construct_to_end(begin, end, UnkMSLStruct1());
         }
+
+        void move_construct_to_end(iterator begin, iterator end, UnkMSLStruct1) {
+            for (iterator it = this->end(); begin < end; begin++) {
+                new(it) T(*begin);
+                it++;
+                size_++;
+            }
+        }
+
+        // (Out of line: reserve calls it.)
+        void reallocate_copy(size_t n);
 
         void move_construct_to_end_alt(iterator begin, iterator end) {
             move_construct_to_end_alt(begin, end, UnkMSLStruct1());
@@ -325,6 +330,17 @@ namespace std {
         size_t size_;
         __vec_capacity<Allocator> capacity_;
     };
+
+    template <typename T, typename Allocator> void __vec_deleter<T, Allocator>::reallocate_copy(size_t n) {
+        __vec_deleter<T, Allocator> tmp;
+        tmp.init();
+        tmp.allocate(n);
+        tmp.move_construct_to_end_tagged(begin(), end());
+        optimize_after_moved_from();
+        std::swap(cap(), tmp.cap());
+        std::swap(data_, tmp.data_);
+        std::swap(size_, tmp.size_);
+    }
 
     template <typename T, typename Allocator> __vec_deleter<T, Allocator>::~__vec_deleter() {
         if (data_ != nullptr) {
