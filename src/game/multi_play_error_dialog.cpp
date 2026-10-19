@@ -8,6 +8,11 @@
 #include "game/dino_battle.h"
 #include "game/multi_play_error_dialog_menu.h"
 #include "m/multi_play.h"
+#include "m/font.h"
+#include "m/smart_oam.h"
+#include "m/oam_canvas.h"
+#include "m/indicator.h"
+#include "game/dino_resource.h"
 #include "m/ulti_play_error_dialog.h"
 
 MultiPlayErrorDialog::~MultiPlayErrorDialog() {
@@ -78,4 +83,22 @@ void DinoMpGame::StateStart() {
     params.unk1C = mMultiPlay->GetPlayerIndex() == 0 ? TRUE : FALSE;
     mSerial.AddTail(new DinoBattleDebugSelect(params, &mFailed));
     mState = data_020c02fc.Unk_3C;
+}
+
+extern "C" const u32 data_0208a438; // the error's text
+
+void MultiPlayErrorDialog::ErrorStart() {
+    MSmartOam *oam = new MSmartOam(8, 0, TRUE);
+    MFont *font = gDinoResource->CreateFont12(0, 10, 1);
+    u32 text = data_0208a438;
+    MPoint size = font->MeasureText(std::string(gDinoResource->GetText(text)), 0, 0);
+    MIndicator *indicator =
+        new MIndicator(new MSmartObjCanvas(oam->mDisplay, oam, size, gDinoResource->GetUnkTable(), TRUE), font, 0);
+    indicator->SetPosition(MPoint(128 - size.x / 2, 96 - size.y / 2));
+    indicator->Show();
+    indicator->SetText(std::string(gDinoResource->GetText(text)));
+    MTaskSet *parallel = &mParallel;
+    parallel->AddTail(indicator);
+    parallel->AddTail(oam);
+    mState = reinterpret_cast<void (MultiPlayErrorDialog::*)()>(data_020c02fc.StateWaitExit_2C);
 }

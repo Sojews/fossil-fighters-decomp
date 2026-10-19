@@ -9,6 +9,9 @@ public:
     virtual ~MultiPlayErrorDialog();
     virtual void Idle();
 
+    // Shows the error, then waits and ends (the game's wait state is DinoMpGame's, folded with it).
+    void ErrorStart();
+
     void (MultiPlayErrorDialog::*mState)(); // 0x74
 };
 
