@@ -40,7 +40,8 @@ class DinoUiOrderSelectMenuItem;
 class DinoUiPartsTeamTech;
 class DinoUiOrderSelectMenu : public DinoHelpBase, public MMenu {
 public:
-    DinoUiOrderSelectMenu(u32 team, const DinoUiOrderSelectInfo *info, u8 unk1, u8 unk2, u32 unk3, u8 unk4);
+    DinoUiOrderSelectMenu(u32 team, const DinoUiOrderSelectInfo *opponent, u8 hasFourthTab, u8 unk1F7, u32 unk1F8,
+                          u8 unk1FD);
     MSmartOam *GetOam() { return mOam; }
     virtual ~DinoUiOrderSelectMenu();
     virtual void OnStart();
@@ -67,14 +68,12 @@ public:
     DinoUiOrderSelectMenuItem *mBackButton; // 0xB8
     DinoUiOrderSelectMenuItem *mOKButton;   // 0xBC
     MMenuItem *mTabs[4];        // 0xC0
-    u8 unkD0[0xD4 - 0xD0];
+    void *mUnkD0;               // 0xD0
     MPictureFile *mPictures[4]; // 0xD4
     MMenuItem *mItems[5];       // 0xE4
     MMenuItem *mUnkF8[5];       // 0xF8: by tab
-    u8 unk10C[0x110 - 0x10C];
-    std::string mUnk110;        // 0x110
-    DinoUiOrderSelectTab mTabData[5];   // 0x11C
-    u8 unk194[0x1A8 - 0x194];
+    u32 mTeamIndex;             // 0x10C
+    DinoUiOrderSelectInfo mOpponent;    // 0x110
     u8 mHasFourthTab;           // 0x1A8
     u8 unk1A9[0x1B4 - 0x1A9];
     DinoUiRvInformation *mInfo; // 0x1B4
@@ -87,9 +86,13 @@ public:
     u8 mPage;                   // 0x1F4
     u8 mFocusTabs;              // 0x1F5: focus the new page's tab when paging
     u8 mUnk1F6;                 // 0x1F6
-    u8 unk1F7[0x1FC - 0x1F7];
+    u8 mUnk1F7;                 // 0x1F7
+    u32 mUnk1F8;                // 0x1F8
     u8 mItemsLinked;            // 0x1FC
-    u8 unk1FD[0x208 - 0x1FD];
+    u8 mUnk1FD;                 // 0x1FD
+    u8 unk1FE[0x204 - 0x1FE];
+    u8 mUnk204;                 // 0x204
+    u8 mUnk205;                 // 0x205
     DinoUiPartsTeamTech *mTech; // 0x208: shown when the team has a technique
     MResource<DinoUiOrderSelectData> mUnk20C;   // 0x20C
     u8 unk21C[0x264 - 0x21C];

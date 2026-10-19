@@ -202,7 +202,7 @@ void DinoUiOrderSelectMenu::RefreshItems() {
         mItems[i]->Enable();
     }
     for (int j = 0; j < 5; j++) {
-        if (mTabData[j].present) {
+        if (mOpponent.tabs[j].present) {
             mUnkF8[j]->Enable();
         }
     }
@@ -222,6 +222,16 @@ void DinoUiOrderSelectMenu::RefreshItems() {
         AddLink(mTabs[2], 1, mOKButton);
     }
     LinkItems();
+}
+
+DinoUiOrderSelectMenu::DinoUiOrderSelectMenu(u32 team, const DinoUiOrderSelectInfo *opponent, u8 hasFourthTab,
+                                             u8 unk1F7, u32 unk1F8, u8 unk1FD)
+    : MMenu(NULL, 0), mUnkD0(NULL), mTeamIndex(team), mOpponent(*opponent), mHasFourthTab(hasFourthTab),
+      mFocusIndex(0), mUnk1F0(0), mPage(0xFF), mFocusTabs(0), mUnk1F6(0), mUnk1F7(unk1F7), mUnk1F8(unk1F8),
+      mItemsLinked(0), mUnk1FD(unk1FD), mUnk204(0xFF), mUnk205(0) {
+    for (int i = 0; i < 4; i++) {
+        mPictures[i] = NULL;
+    }
 }
 
 // Where the team's medals go.
