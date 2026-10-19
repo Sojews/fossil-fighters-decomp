@@ -110,6 +110,7 @@ public:
     const MMotionCellDef *GetCell(u32 index);
     void *GetAnime(int anime, MArchiveFile *file);
     void *GetPalette(u32 index, MArchiveFile *file);
+    void *GetChr(u32 index, MArchiveFile *file);
 
     MMotionData *mData; // 0x00
 };

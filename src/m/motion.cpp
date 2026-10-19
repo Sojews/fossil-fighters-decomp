@@ -230,6 +230,19 @@ void *MMotionFile::GetPalette(u32 index, MArchiveFile *file) {
     return f.GetData();
 }
 
+// The chr file's data, as for GetPalette.
+void *MMotionFile::GetChr(u32 index, MArchiveFile *file) {
+    if (file != NULL) {
+        MArchiveFile f = mData->mChrFiles[index];
+        f.Lock();
+        *file = f;
+        return f.GetData();
+    }
+    MArchiveFile &f = mData->mChrFiles[index];
+    f.Lock();
+    return f.GetData();
+}
+
 u32 MMotionFile::GetUnk18() {
     return ((u32 *) mData->mFile.GetData())[6];
 }
@@ -819,6 +832,44 @@ void MMotion::SetCellRect(int cell, MRect rect) {
     params[7] = r.top >> 4;
     params[11] = r.right >> 4;
     params[15] = r.bottom >> 4;
+}
+
+// Changes the cell's graphics (and shape), then places it again for the new size.
+// NONMATCHING: register allocation (the game keeps the cell's scaled index in a register and spills the cell).
+void MMotion::SetCellChr(int cell, u32 chr) {
+    MSmartOamCell *entry = &mEntries[mCells[cell].entry];
+    const MMotionGfxHeader *data =
+        (const MMotionGfxHeader *) mFile.GetChr(chr, mUnk78 != NULL ? &mUnk78->animes[cell] : NULL);
+    mCells[cell].unk04 = chr;
+    entry->colors256 = data->mode;
+    if (mFlags & 2) {
+        entry->SetChr(mChrs[cell]);
+        entry->SetShape(data->extPalette);
+        mChrs[cell]->Load(data + 1, 0, data->tiles, 0);
+    } else {
+        entry->SetChr(mChrs[chr]);
+        entry->SetShape(data->extPalette);
+    }
+    int ox = mCells[cell].unk14.x;
+    int oy = mCells[cell].unk14.y;
+    entry = &mEntries[mCells[cell].entry];
+    if (mUnk2B || mUnk2C) {
+        int shape = entry->GetShape();
+        int w = gObjSizes[0][shape].x;
+        int h = gObjSizes[0][shape].y;
+        if (mCells[cell].objMode == 3) {
+            w *= 2;
+            h *= 2;
+        }
+        if (mUnk2B) {
+            ox = w - ox;
+        }
+        if (mUnk2C) {
+            oy = h - oy;
+        }
+    }
+    entry->unk08 = ox;
+    entry->unk0C = oy + mUnk50;
 }
 
 void MMotion::SetCellPalette(int cell, u32 pal) {
