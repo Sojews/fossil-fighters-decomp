@@ -14,6 +14,9 @@
 #include "m/call_task.h"
 #include "game/dino_backup.h"
 #include "game/dino_resource.h"
+#include "game/dino_ui3_parts_cursor.h"
+#include "game/dino_sound.h"
+#include "game/dino_common_window_yes_no_dialog.h"
 #include "game/dino_common_window_message_box.h"
 
 DinoUiCanonPutin::~DinoUiCanonPutin() {
@@ -108,6 +111,31 @@ BOOL DinoUiCanonPutinMenu::IsMarkable(DinoBackupEntry *entry) {
     return TRUE;
 }
 
+extern const u32 data_0208a9dc, data_0208aa08, data_0208aa04, data_0208a9d8, data_0208a9d4;
+
+// Asks whether to put in the marked fossils.
+#pragma dont_inline on
+BOOL DinoUiCanonPutinMenu::TryDecide() {
+    if (mCount == 0) {
+        DinoSoundPlaySe(0xA4, 0);
+        return FALSE;
+    }
+    mCursor->Hide();
+    mUnk158 = FALSE;
+    DinoCommonWindowYesNoDialog *dialog =
+        new DinoCommonWindowYesNoDialog(gDinoResource->GetText(data_0208a9dc), (BOOL *)&mUnk158);
+    dialog->SetLabels(gDinoResource->GetText(data_0208aa08), gDinoResource->GetText(data_0208aa04));
+    dialog->SetLabels2(gDinoResource->GetText(data_0208a9d8), gDinoResource->GetText(data_0208a9d4));
+    MTask *finish = MCreateCallTask(this, &DinoUiCanonPutinMenu::PutIn);
+    MTask *show = mCursor->CreateShowTransfer();
+    MSerialTaskSet *serial = &mSerial;
+    serial->AddTail(dialog);
+    serial->AddTail(show);
+    serial->AddTail(finish);
+    return TRUE;
+}
+#pragma dont_inline reset
+
 void DinoUiCanonPutinMenu::PutIn() {
     if (mUnk158 == 1) {
         for (int i = 0; i < 64; i++) {
@@ -163,6 +191,31 @@ BOOL DinoUiCanonTakeoutMenu::IsMarkable(DinoBackupEntry *entry) {
     return TRUE;
 }
 
+
+extern const u32 data_0208a9d0, data_0208a9cc, data_0208a9c8;
+
+// Asks whether to take out the marked fossils.
+#pragma dont_inline on
+BOOL DinoUiCanonTakeoutMenu::TryDecide() {
+    if (mCount == 0) {
+        DinoSoundPlaySe(0xA4, 0);
+        return FALSE;
+    }
+    mCursor->Hide();
+    mUnk158 = FALSE;
+    DinoCommonWindowYesNoDialog *dialog =
+        new DinoCommonWindowYesNoDialog(gDinoResource->GetText(data_0208a9d0), (BOOL *)&mUnk158);
+    dialog->SetLabels(gDinoResource->GetText(data_0208aa08), gDinoResource->GetText(data_0208aa04));
+    dialog->SetLabels2(gDinoResource->GetText(data_0208a9cc), gDinoResource->GetText(data_0208a9c8));
+    MTask *finish = MCreateCallTask(this, &DinoUiCanonTakeoutMenu::TakeOut);
+    MTask *show = mCursor->CreateShowTransfer();
+    MSerialTaskSet *serial = &mSerial;
+    serial->AddTail(dialog);
+    serial->AddTail(show);
+    serial->AddTail(finish);
+    return TRUE;
+}
+#pragma dont_inline reset
 
 void DinoUiCanonTakeoutMenu::TakeOut() {
     if (mUnk158 == 1) {
