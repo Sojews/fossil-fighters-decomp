@@ -196,3 +196,17 @@ extern "C" void func_ov000_02184da0(DinoBattleView3DDamage *damage, int i) {
         damage->mCsvs[i]->LoadFile(damage->mFiles[i], NULL, 0);
     }
 }
+
+// A model free in the slot (the current one for -1): the last with nothing on it.
+extern "C" Dino3DLoadCsv *func_ov000_02187e68(DinoBattleView3D *view, int slot) {
+    Dino3DLoadCsv *model = NULL;
+    if (slot < 0) {
+        slot = view->mSlot;
+    }
+    for (int i = 0; i < 3; i++) {
+        if (view->mSlotModels[slot * 3 + i] == NULL) {
+            model = view->mModels[i];
+        }
+    }
+    return model;
+}

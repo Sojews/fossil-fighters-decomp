@@ -12,6 +12,8 @@
 
 class DinoBattleView;
 
+class Dino3DLoadCsv;
+
 class DinoBattleView3D : public MProcess, public MMessageObserver {
 public:
     virtual ~DinoBattleView3D();
@@ -30,7 +32,12 @@ public:
     u32 unkB4[3];
     void *mUnkC0;                           // 0xC0
     void (DinoBattleView3D::*mState)();     // 0xC4
-    u8 unkCC[0x180 - 0xCC];
+    u32 unkCC;
+    Dino3DLoadCsv *mModels[3];              // 0xD0
+    u8 unkDC[0x11C - 0xDC];
+    void *mSlotModels[6];                   // 0x11C: what each slot's models show (3 per slot)
+    u32 mSlot;                              // 0x134
+    u8 unk138[0x180 - 0x138];
     u8 mUnk180;                             // 0x180
     u8 unk181[0x19C - 0x181];
     u32 mUnk19C;                            // 0x19C
