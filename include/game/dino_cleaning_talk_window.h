@@ -11,6 +11,9 @@
 
 class MConsole;
 
+class MSmartOam;
+class MView;
+
 class DinoCleaningTalkWindow : public MProcess {
 public:
     void SetUnkD0(u32 value);
@@ -27,7 +30,9 @@ public:
     u32 unkB0;
     MSerialTaskSet *mTasksB4;   // 0xB4
     MParallelTaskSet *mTasksB8; // 0xB8
-    u32 unkBC[3];
+    MView *mFace;           // 0xBC
+    MSmartOam *mOam;        // 0xC0
+    u32 unkC4;
     MConsole *mConsole;     // 0xC8
     u32 mUnkCC;             // 0xCC
     u32 mUnkD0;             // 0xD0
