@@ -52,6 +52,7 @@ public:
     void SetPage(u8 page);
     // Turns the information to the page; help comes back once it has.
     void SetInfoPage(u8 page);
+    void ShowPage(u8 page);
     void PageLeft();
     void PageRight();
     void ClearItems();
@@ -70,7 +71,7 @@ public:
     DinoUiOrderSelectMenuItem *mBackButton; // 0xB8
     DinoUiOrderSelectMenuItem *mOKButton;   // 0xBC
     MMenuItem *mTabs[4];        // 0xC0
-    void *mUnkD0;               // 0xD0
+    MTextPicture *mUnkD0;       // 0xD0: the page's title
     MPictureFile *mPictures[4]; // 0xD4
     MMenuItem *mItems[5];       // 0xE4
     MMenuItem *mUnkF8[5];       // 0xF8: by tab

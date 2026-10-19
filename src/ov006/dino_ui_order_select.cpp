@@ -162,6 +162,7 @@ void DinoUiOrderSelectMenu::PageRight() {
 // The TU's pooled pointer-to-member constants.
 extern "C" struct {
     void (DinoHelpBase::*Enable_00)();
+    void (DinoUiOrderSelectMenu::*SetInfoPage_08)(bool);   // (SetInfoPage, as the call task takes it)
 } data_ov006_02197110;
 
 void DinoUiOrderSelectMenu::SetInfoPage(u8 page) {
@@ -363,6 +364,43 @@ void DinoUiOrderSelectMenu::SelectItem(int index) {
         AddLink(mTabs[2], 1, mBackButton);
     }
     LinkItems();
+}
+
+// NONMATCHING: the game hands the page to the bool call task as it is; ours converts it to a bool.
+void DinoUiOrderSelectMenu::SetPage(u8 page) {
+    if (page > 3 || (!mHasFourthTab && page == 3)) {
+        return;
+    }
+    BOOL first = FALSE;
+    if (mPage == 0xFF) {
+        first = TRUE;
+    }
+    if (mPage == page) {
+        return;
+    }
+    mPage = page;
+    if (!first) {
+        DinoSoundPlaySe(0x94, 0);
+    }
+    if (mUnkD0 != NULL) {
+        mParallel.Remove(mUnkD0);
+        delete mUnkD0;
+    }
+    mUnkD0 = new MTextPicture(*mPictures[page], TRUE, false);
+    mParallel.AddTail(mUnkD0);
+    mUnkD0->Show();
+    mUnkD0->SetPriority(3);
+    for (int i = 0; i < 5; i++) {
+        RemoveLink(mItems[i], 2);
+        AddLink(mItems[i], 2, mTabs[page]);
+    }
+    Disable();
+    ShowPage(0xFF);
+    if (first) {
+        SetInfoPage(page);
+        return;
+    }
+    GetSerial()->AddTail(new MTimer(1), MCreateCallTask(this, data_ov006_02197110.SetInfoPage_08, (bool)page));
 }
 
 void DinoUiOrderSelectMenu::FinishPage() {
