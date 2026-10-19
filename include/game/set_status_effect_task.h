@@ -44,6 +44,18 @@ public:
 
 class DamagedUpdate : public MTask {
 public:
+    DamagedUpdate(DinoBattleModelCreature *creature, MMessageObserver *view, u32 a, u32 b, u32 c, u32 d, u32 e, u8 f,
+                  u8 g) {
+        mCreature = creature;
+        mView = view;
+        mUnk18 = a;
+        mUnk1C = b;
+        mUnk20 = c;
+        mUnk24 = d;
+        mUnk28 = e;
+        mUnk2C = f;
+        mUnk2D = g;
+    }
     virtual ~DamagedUpdate();
     virtual void Execute();
 

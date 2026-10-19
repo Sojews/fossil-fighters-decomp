@@ -254,6 +254,27 @@ void DinoCreatureUpdateTask::Execute() {
 
 #pragma auto_inline off
 
+// The damage update for the creature's view (with its life now: dead or not).
+extern "C" MTask *func_ov000_0216d4b0(DinoBattleModelCreature *creature, u32 a, u32 d, u32 e, u8 g) {
+    return new DamagedUpdate(NULL, creature->mView, a, creature->mUnkB4, creature->mUnkE4, d, e, creature->mUnkE4 == 0,
+                             g);
+}
+
+// The same, reading the creature's life when it runs.
+extern "C" MTask *func_ov000_0216d520(DinoBattleModelCreature *creature, u32 a, u32 d, u32 e, u8 f) {
+    return new DamagedUpdate(creature, creature->mView, a, creature->mUnkB4, 0, d, e, f, 0);
+}
+
+// The creature's attack power (higher in a pinch, for kind 5).
+extern "C" MFx32 func_ov000_0216f028(DinoBattleModelCreature *creature) {
+    MFx32 power = MFx32(creature->mUnkF4);
+    if (creature->IsInPinch() && creature->GetDefUnk61() == 5) {
+        const DinoBattleAdjustDefs *defs = gDinoResource->GetBattleAdjustDefs();
+        power *= defs->pinchBoost.Mul(MFx32(creature->mDef->mUnk62)) * MFx32::FromRaw(0x19A);  // 0.1
+    }
+    return power;
+}
+
 u32 DinoBattleModelCreature::GetUnkB0() {
     return mUnkB0;
 }

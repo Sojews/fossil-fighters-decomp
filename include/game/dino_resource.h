@@ -91,7 +91,9 @@ struct DinoBattleAdjustDefs {
     u32 unk28[2];
     MFx32 affinityRatio[3]; // 0x30: by CompareUnkECA0's result (1, 2, other)
     MFx32 unk3C;            // 0x3C
-    u8 unk040[0x50 - 0x40];
+    u32 unk40;
+    MFx32 pinchBoost;       // 0x44: per point of a pinch creature's def percentage, in tenths
+    u8 unk048[0x50 - 0x48];
     MFx32 unk50;            // 0x50
     u32 unk54;
     // Creature layout, by slot kind (0, 2, 1, 3 in that order): where the slots are with the side's own creatures
