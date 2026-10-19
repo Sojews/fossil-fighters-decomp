@@ -43,7 +43,7 @@ public:
     Dino3DLoadCsv *mModels[3];              // 0xD0
     u8 unkDC[0xE4 - 0xDC];
     MTask *mUnkE4;                          // 0xE4
-    MTask *mUnkE8;                          // 0xE8
+    MTask *mUnkE8;                          // 0xE8: the camera
     u32 mCreatureIds[6];                    // 0xEC: each slot's three creatures
     u8 unk104[0x11C - 0x104];
     void *mSlotModels[6];                   // 0x11C: what each slot's models show (3 per slot)

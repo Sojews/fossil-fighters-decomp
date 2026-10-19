@@ -17,6 +17,8 @@
 #include "m/bg_new_task.h"
 #include "m/call_task.h"
 #include "game/dino_battle_view_3d_move.h"
+#include "game/dino_battle_view_kaseki_point_menu.h"
+#include "m/3d_scene.h"
 
 DinoBattleView3D::~DinoBattleView3D() {
     CancelQueue();
@@ -69,12 +71,53 @@ void B3DStatusViewTask::Idle() {
 
 // The TU's pooled pointer-to-member constants (set up at startup).
 extern "C" struct {
-    u8 unk00[0x6C];
+    u8 unk00[0x4C];
+    void (B3DStatusViewTask::*State_4C)();
+    u8 unk54[0x6C - 0x54];
     void (B3DStatusViewTask::*State_6C)();
     void (B3DStatusViewTask::*State_74)();
     u8 unk7C[0xD4 - 0x7C];
     void (B3DStatusViewTask::*State_D4)();
 } data_ov000_021962e8;
+
+extern "C" MTask *func_ov000_0218abd0(void *camera, int light);
+extern "C" MTask *func_ov000_0218ac04(void *camera, void *arg1, const VecFx32 *arg2, BOOL arg3);
+extern "C" MTask *func_ov000_0218ac40(void *camera, u8 pause);
+extern "C" MTask *func_ov000_0218ac74(void *camera, Dino3DLoadCsv *parent);
+
+// Points the camera at the status's creature and shows it.
+void B3DStatusViewTask::StateShow() {
+    u32 next;
+    mView->GetUnk19C(&mUnk7C, &next);
+    if (next == (u32)-1) {
+        mSerial.AddTail(MTaskExitTransfer::Create(this));
+        return;
+    }
+    if (next != 0 && (next >> 16) == (mUnk80 >> 16)) {
+        mUnk80 = next;
+    }
+    mUnk84 = mView->mView->GetUnkE4(mUnk80 >> 16)->GetUnkAC();
+    int i = (u16)mUnk80 - 1;
+    MTask *unmask, *hide, *pause, *change, *parent, *light, *mask, *show;
+    show = ((M3DScene *)mView->GetUnkB0())->CreateEnableTask(TRUE);
+    mask = new DinoBattleView3DMask((DinoBattleView3DMask::View *)mView, 1 << i);
+    light = func_ov000_0218abd0(mView->mUnkE8, -1);
+    parent = func_ov000_0218ac74(mView->mUnkE8, mView->mModels[i]);
+    change = func_ov000_0218ac04(mView->mUnkE8, (u8 *)mView + 0x1E0, &data_ov000_02190334, mUnk84 == 0);
+    pause = func_ov000_0218ac40(mView->mUnkE8, 0);
+    hide = ((M3DScene *)mView->GetUnkB0())->CreateEnableTask(FALSE);
+    unmask = new DinoBattleView3DMask((DinoBattleView3DMask::View *)mView, 0);
+    MSerialTaskSet *serial = GetSerial();
+    serial->AddTail(unmask);
+    serial->AddTail(hide);
+    serial->AddTail(pause);
+    serial->AddTail(change);
+    serial->AddTail(parent);
+    serial->AddTail(light);
+    serial->AddTail(mask);
+    serial->AddTail(show);
+    mState = data_ov000_021962e8.State_4C;
+}
 
 // Shows the view's current status, then goes on to the next (fading in between different ones).
 void B3DStatusViewTask::StateAdvance() {

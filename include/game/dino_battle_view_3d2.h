@@ -50,6 +50,11 @@ public:
 
 class DinoBattleView3DMask : public MTask {
 public:
+    struct View;
+    DinoBattleView3DMask(View *view, u32 mask) {
+        mView = view;
+        mMask = mask;
+    }
     virtual ~DinoBattleView3DMask();
     virtual void Execute();
 

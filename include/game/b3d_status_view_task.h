@@ -17,12 +17,13 @@ public:
 
     void StateAdvance();
     void StateCheck();
+    void StateShow();
 
     class DinoBattleView3D *mView;      // 0x74
     u32 unk78;
     u32 mUnk7C;                         // 0x7C
     u32 mUnk80;                         // 0x80: -1 when done
-    u32 unk84;
+    u32 mUnk84;                         // 0x84
     void (B3DStatusViewTask::*mState)(); // 0x88
 };
 
