@@ -231,6 +231,7 @@ src/m/pal.cpp:
 
 src/m/input.cpp:
     .text       start:0x02053da8 end:0x02054334
+    .init       start:0x020897b4 end:0x020897c4
 
 src/m/anime.cpp:
     .text       start:0x020534fc end:0x02053da8
