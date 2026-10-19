@@ -14,6 +14,8 @@
 #include "m/blend.h"
 #include "m/window.h"
 #include "m/lcd.h"
+#include "m/obj.h"
+#include "m/display.h"
 #include "m/indicator.h"
 #include "m/motion.h"
 #include "game/dino_backup.h"
@@ -529,4 +531,24 @@ void DinoUiKeyboardMenu::RefreshName() {
     } else {
         mSerial.AddTail(mCursor->CreatePlayTransfer(1, 0));
     }
+}
+
+extern const int data_020899f8, data_02089a84;
+
+void DinoUiSenryuList::Idle() {
+    gLcd->mMain->ResetHooks();
+    gLcd->mMain->Setup(5, 3, 4, 1, 0, 0);
+    gLcd->mMain->SetBackdrop(0x8000);
+    gLcd->mMain->mObj->Show();
+    gLcd->SetBottomDisplay(gLcd->mMain);
+    gCurrentDisplay = gLcd->mMain;
+    gLcd->mMain->mBright->SetMode(2);
+    gLcd->mMain->mBright->SetFactor(16);
+    gLcd->VSyncNow();
+    mParallel.AddTail(gLcd->mMain->mBright->CreateFadeInFromBlack(data_020899f8, data_02089a84));
+    MTask *exit = MTaskExitTransfer::Create(this);
+    MTask *menu = new DinoUiSenryuMenu();
+    MSerialTaskSet *serial = &mSerial;
+    serial->AddTail(menu);
+    serial->AddTail(exit);
 }
