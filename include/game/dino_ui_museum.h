@@ -23,6 +23,8 @@ public:
 };
 
 class DinoUiFieldMenuFraction;
+class DinoUiFieldMenuCursor;
+class DinoUiPartsReviverName;
 class DinoUiMuseum3DModel;
 
 class DinoUiMuseumMenu : public DinoHelpBase, public MMenu {
@@ -63,11 +65,13 @@ public:
     MExtAffinePicture *mTabPicture; // 0xE0: scrolled to the tab's part
     MMenuItem *mSlots[15];  // 0xE4
     u8 unk120[0x15C - 0x120];
-    u32 mSlotCount;     // 0x15C
-    u8 unk160[0x168 - 0x160];
-    MView *mCursor;                     // 0x168
+    int mSlotCount;     // 0x15C
+    u8 unk160[0x164 - 0x160];
+    MTaskSet *mCursorTasks;             // 0x164
+    DinoUiFieldMenuCursor *mCursor;     // 0x168
     DinoUiFieldMenuFraction *mFraction; // 0x16C: "page n/m"
-    u8 unk170[0x178 - 0x170];
+    DinoUiPartsReviverName *mName;      // 0x170: the focused slot's creature
+    MTaskSet *mHelpTasks;               // 0x174
     std::vector<u32> mCreatures;        // 0x178: one slot each
     std::vector<u32> mByVoice;          // 0x184: mCreatures by their cries
     std::vector<u32> mByUnk88;          // 0x190

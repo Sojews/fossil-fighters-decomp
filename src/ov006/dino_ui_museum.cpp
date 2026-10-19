@@ -8,6 +8,9 @@
 #include "game/dino_ui_museum_information_menu.h"
 #include "types.h"
 #include "game/dino_ui_museum.h"
+#include "game/dino_ui_parts_reviver_name_count_check_task.h"
+#include "game/dino_ui_parts_reviver_name.h"
+#include "game/dino_ui_field_menu_cursor.h"
 #include "game/dino_ui_field_menu_fraction.h"
 #include "m/lcd.h"
 #include "m/bright.h"
@@ -577,6 +580,75 @@ void DinoUiMuseumMenu::OnIdle() {
 template MTask *MCreateBgCallTask(DinoUiMuseum3DModel *obj, void (DinoUiMuseum3DModel::*func)(), int thread);
 template MTask *MCreateBgCallTask(DinoUiMuseum *obj, void (DinoUiMuseum::*func)(), int thread);
 // DinoUiMuseumMenu::OnFocus (not decompiled yet) re-enables the help through a call task.
+// The menu's layout (filled in at start).
+struct DinoUiMuseumLayout {
+    u8 unk00[0x34];
+    MPoint column;      // 0x34: from a slot to the next in its row
+    u8 unk3C[0x44 - 0x3C];
+    MPoint row;         // 0x44: to the next row
+    u8 unk4C[0x64 - 0x4C];
+    MPoint first;       // 0x64: the first slot
+    u8 unk6C[0x7C - 0x6C];
+    MPoint nameOffset;  // 0x7C: of the creature's name from its slot
+    u8 unk84[0xB4 - 0x84];
+    MPoint focusOffset; // 0xB4: of the cursor on a slot
+};
+extern DinoUiMuseumLayout data_ov006_02196208;
+extern MPoint data_020b5858[3];
+
+// Moves the cursor to the item; a slot also shows its creature's name (and model) and restarts the help.
+void DinoUiMuseumMenu::OnFocus(MMenuItem *item) {
+    mUnk1AC = FALSE;
+    if (item == NULL) {
+        mCursor->Hide();
+        return;
+    }
+    int i;
+    for (i = 0; i < 5; i++) {
+        if (item == mTabs[i]) {
+            SetSelectedItem(dynamic_cast<DinoHelpItem *>(item));
+        }
+    }
+    if (item == mLinkFrom) {
+        SetSelectedItem(dynamic_cast<DinoHelpItem *>(item));
+    }
+    MRect frame = item->GetFrame();
+    for (i = 0; i < 15; i++) {
+        if (item == mSlots[i]) {
+            frame.Offset(data_ov006_02196208.focusOffset);
+        }
+    }
+    if (mCursor->IsHidden()) {
+        mCursor->Show();
+        mCursor->SetFrame(frame);
+    } else {
+        mCursor->SetMode(1);
+        mCursor->Show();
+        mCursorTasks->Clear();
+        mCursorTasks->AddTail(mCursor->CreateMoveTask(mCursor->GetFrame(), frame, 10, -5));
+    }
+    for (i = 0; i < mSlotCount; i++) {
+        if (item == mSlots[i]) {
+            mName->SetCreature(mCreatures[mPage * 15 + i]);
+            mName->SetPosition(MPoint(data_ov006_02196208.first.x + data_ov006_02196208.column.x * (i % 5) +
+                                          data_ov006_02196208.row.x * (i / 5),
+                                      data_ov006_02196208.first.y + data_ov006_02196208.column.y * (i % 5) +
+                                          data_ov006_02196208.row.y * (i / 5)) +
+                               data_ov006_02196208.nameOffset);
+            Disable();
+            mHelpTasks->Clear();
+            mHelpTasks->AddTail(new DinoUiPartsReviverNameCountCheckTask(mName),
+                                MCreateCallTask(this, &DinoHelpBase::Enable));
+            mModel->SetModel(mCreatures[mPage * 15 + i]);
+            return;
+        }
+    }
+    mName->Hide();
+    mHelpTasks->Clear();
+    Enable();
+    mModel->SetModel(0);
+}
+
 #pragma auto_inline off
 template MTask *MCreateCallTask(DinoUiMuseumMenu *obj, void (DinoHelpBase::*func)());
 template MTask *MCreateCallTask(DinoUiMuseum *obj, void (DinoUiMuseum::*func)());
