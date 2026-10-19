@@ -1,5 +1,5 @@
 // DinoUiRvInformation3DModel, DinoUiRvInformation3DModelRotate.
-// Only the destructors are decompiled so far.
+// Only some functions are decompiled so far.
 
 #pragma ipa file
 
@@ -15,6 +15,44 @@
 #include "m/3d_model.h"
 #include "m/3d_scene.h"
 #include "m/3d.h"
+#include "m/input.h"
+#include "m/window.h"
+
+extern "C" u8 data_ov003_021624d0[];  // the scene's heap
+
+DinoUiRvInformation3DModel::DinoUiRvInformation3DModel() : MProcess(NULL) {
+    mUnk80 = 0;
+    mUnk84 = 0;
+    mUnk88 = 0;
+    mScene = new M3DScene((u32)data_ov003_021624d0, 0xF618);
+    mScene->mUnk14 = 1;
+    mScene->mUnk18 = 300 << FX32_SHIFT;
+    mScene->mM3d->mBgCntBits.priority = 1;
+    mScene->mM3d->Hide();
+    gCurrentDisplay->mWin->GetWindow0()->Hide();
+    gCurrentDisplay->mWin->GetWindow1()->Hide();
+    VecFx32 v;
+    v.x = 0;
+    v.y = 0;
+    v.z = 0;
+    mScene->SetCameraTarget(&v);
+    v.x = 0;
+    v.y = 0;
+    v.z = 19 << FX32_SHIFT;
+    mScene->SetCameraPos(&v);
+    mScene->SetUnk80(-80, 0);
+    mUnk8C = mUnk90 = mUnk94 = 0;
+    mTasks = new MParallelTaskSet(FALSE);
+    mUnk9C = 0;
+    MSingleInputHub *hub = new MSingleInputHub(1);
+    hub->EnableTouch();
+    mInput = hub->GetInput(0);
+    mParallel.AddTail(hub);
+    MParallelTaskSet *parallel = GetParallel();
+    M3DScene *scene = mScene;
+    parallel->AddTail(mTasks);
+    parallel->AddTail(scene);
+}
 
 // Hides the scene's 3D screen when the value changes.
 void DinoUiRvInformation3DModel::SetUnk84(u32 value) {
