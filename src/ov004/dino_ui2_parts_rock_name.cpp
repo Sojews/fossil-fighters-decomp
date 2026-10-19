@@ -174,3 +174,36 @@ BOOL DinoUi2FieldMenuCursor::IsHidden() {
 u32 DinoUi2FieldMenuCursor::GetPlaneMask() {
     return 0x10;
 }
+
+DinoKasekiButtonInfo DinoUi2GetEmptyKasekiInfo() {
+    DinoKasekiButtonInfo info;
+    info.icon = 1;
+    info.color = 0;
+    info.type = 0;
+    info.level = 0;
+    return info;
+}
+
+// NONMATCHING: the stack slots of the items' begin temporaries (the game has one fewer).
+void DinoUi2LinkKasekiGrid(MMenu *menu, std::vector<MMenuItem *> &items, MMenuItem *below) {
+    for (int i = 0; i < items.size(); i++) {
+        if (i + 4 < items.size()) {
+            menu->AddLink(items[i], 2, items[i + 4]);
+        } else {
+            menu->AddLink(items[i], 2, below);
+        }
+        int col = i % 4;
+        if (col != 0) {
+            menu->AddLink(items[i], 3, items[i - 1]);
+        } else if (i + 4 < items.size()) {
+            menu->AddLink(items[i], 3, items[i + 3]);
+        } else {
+            menu->AddLink(items[i], 3, *(items.end() - 1));
+        }
+        if (col == 3 || i == items.size() - 1) {
+            menu->AddLink(items[i], 1, items[i / 4 * 4]);
+        } else {
+            menu->AddLink(items[i], 1, items[i + 1]);
+        }
+    }
+}

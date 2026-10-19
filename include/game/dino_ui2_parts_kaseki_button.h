@@ -7,6 +7,9 @@
 #include "m/motion.h"
 #include "game/help.h"
 #include "game/dino_ui3_parts_kaseki_button.h"
+#include "game/dino_ui_parts_kaseki_button.h"
+#include "m/menu.h"
+#include <vector>
 
 class DinoUi2PartsKasekiButton : public MMenuItem, public DinoHelpItem {
 public:
@@ -30,5 +33,11 @@ public:
     u8 unkA8[20];
     u32 mTextId;        // 0xBC
 };
+
+// What an empty slot's button shows.
+DinoKasekiButtonInfo DinoUi2GetEmptyKasekiInfo();
+// Links the items as a grid four wide: down to the next row (from the last row, to below), and left and right
+// wrapping around each row.
+void DinoUi2LinkKasekiGrid(MMenu *menu, std::vector<MMenuItem *> &items, MMenuItem *below);
 
 #endif
