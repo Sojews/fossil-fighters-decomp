@@ -13,6 +13,8 @@
 #include "m/smart_oam.h"
 #include "m/display.h"
 #include "m/bright.h"
+#include "game/dino_resource.h"
+#include "m/font.h"
 
 static DinoHelpDriver *sHelpDriver;
 static DinoHelpBase *sHelpCurrentBase;
@@ -408,12 +410,15 @@ extern "C" struct {
     u8 unk00[0xC];
     const char *mMotionPath;    // 0x0C
     const char *mCursorPath;    // 0x10
-    u8 unk14[0x5C - 0x14];
+    u8 unk14[0x1C - 0x14];
+    void (DinoHelpStatus::*Scroll_1C)();
+    void (DinoHelpStatus::*OpenStep_24)();
+    u8 unk2C[0x5C - 0x2C];
     void (DinoHelpStatus::*Start_5C)();
 } data_020ba91c;
 
-DinoHelpStatus::DinoHelpStatus(DinoHelpDriver *driver)
-    : MProcess(NULL), mDriver(driver), mCanvas(NULL), mMotion(data_020ba91c.mMotionPath, 2) {
+DinoHelpStatus::DinoHelpStatus(MSmartOam *oam)
+    : MProcess(NULL), mOam(oam), mCanvas(NULL), mMotion(data_020ba91c.mMotionPath, 2) {
     mState = data_020ba91c.Start_5C;
 }
 
@@ -425,10 +430,44 @@ void DinoHelpStatus::Idle() {
     (this->*mState)();
 }
 
+extern const int data_020899ec, data_02089a14, data_02089a80, data_02089a04;
+void SetBlendedMode(MSmartOamUnit *unit);
+
+// Makes the font and the bar's canvas (out of sight above the top screen), then opens it.
+void DinoHelpStatus::Start() {
+    mFont = gDinoResource->CreateFont12(data_020899ec, data_02089a14, data_02089a80);
+    mFont->AddRef();
+    mPosition = 1;
+    mPositions[0] = MPoint(0, 8);
+    mPositions[1] = MPoint(0, data_02089a04 + 0xA8);
+    mCanvas = new MSmartObjCanvas(mOam, MPoint(256, 16), (const u8 *) mMotion.GetPalette(0, NULL) + 4, TRUE);
+    mCanvas->Clear();
+    mCanvas->SetPosition(mPositions[mPosition]);
+    mCanvas->Show();
+    SetBlendedMode(mCanvas->GetOamUnit());
+    mParallel.AddTail(mCanvas);
+    mLines = 0;
+    mState = data_020ba91c.OpenStep_24;
+}
+
 void DinoHelpStatus::OpenStep() {
     mLines++;
     mCanvas->Clear();
     mCanvas->FillRect(MRect(0, 8 - mLines / 2, 256, mLines / 2 + 8), kHelpStatusColor);
+}
+
+extern const MFx32 data_020b5814; // frames per pixel
+
+// NONMATCHING: stack slots (the game spills the fixed-point temporaries and orders the points' slots differently).
+void DinoHelpStatus::Scroll() {
+    if (mCanvas != NULL && mCanvas->GetWidth() > 256) {
+        MFx32 frames = MFx32(mCanvas->GetWidth() - 256);
+        frames *= data_020b5814;
+        int dx = mCanvas->GetWidth() - 256;
+        MPoint to(-dx, mCanvas->GetPosition().y);
+        MPoint from(0, mCanvas->GetPosition().y);
+        mSerial.AddTail(mCanvas->CreateCoordAnime(from, to, MFx32ToInt(frames), 0));
+    }
 }
 
 void DinoHelpStatus::CloseStep() {

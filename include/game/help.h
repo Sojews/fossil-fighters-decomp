@@ -125,15 +125,18 @@ class MSmartOam;
 // The bar on the top screen showing the selected item's help text.
 class DinoHelpStatus : public MProcess {
 public:
-    DinoHelpStatus(class DinoHelpDriver *driver);
+    DinoHelpStatus(MSmartOam *oam);
     virtual ~DinoHelpStatus();
     virtual void Idle();
 
+    void Start();
     void OpenStep();
+    // Scrolls a text wider than the screen across it.
+    void Scroll();
     void CloseStep();
 
     void (DinoHelpStatus::*mState)();   // 0x74
-    class DinoHelpDriver *mDriver;      // 0x7C
+    MSmartOam *mOam;                    // 0x7C
     MFont *mFont;                       // 0x80
     MSmartObjCanvas *mCanvas;           // 0x84
     MMotionFile mMotion;                // 0x88
