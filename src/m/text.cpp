@@ -1,5 +1,4 @@
-// MText and its transfers. Not decompiled yet: MTextFill::Transfer and the tile map copy with flips
-// (func_02056750).
+// MText and its transfers. Not decompiled yet: the tile map copy with flips (func_02056750).
 
 #include "m/text.h"
 #include "m/looper.h"
@@ -198,4 +197,68 @@ void MTextTransfer::Transfer() {
 }
 
 MTextFill::~MTextFill() {
+}
+
+// A text screen's entry: 32x32 entries per screen block.
+#define MTEXT_ENTRY(block, x, y) ((u16 *)(base + (((block) * 32 + (y)) * 32 + (x)) * 2))
+
+// Fills a w x h block of entries from p.
+#define MTEXT_FILL_BLOCK(start, w, h) \
+    { \
+        int i; \
+        u16 *p = start; \
+        for (int j = h; j != 0; j--, p += 32 - (w)) { \
+            for (i = w; i != 0; i--) { \
+                *p++ = entry; \
+            } \
+        } \
+    }
+
+// Picks the screen block the rectangle starts in; a fill crossing a block's right or bottom edge carries on in the
+// next block.
+// NONMATCHING: dy gets the stack slot below the two row-count temporaries in the game.
+void MTextFill::Transfer() {
+    int block;
+    u32 base;
+    int size;
+    int dx;
+    int dy;
+    dx = mRect.left;
+    dy = mRect.top;
+    int w = mRect.GetWidth();
+    int h = mRect.GetHeight();
+    block = 0;
+    if (dx & 0x20) {
+        block = MText::GetRightBlock(mDstSize, block);
+    }
+    if (dy & 0x20) {
+        block = MText::GetDownBlock(mDstSize, block);
+    }
+    dx &= 0x1F;
+    dy &= 0x1F;
+    u16 entry = mEntry;
+    size = mDstSize;
+    base = mDstBase;
+    if (dx + w < 32) {
+        if (dy + h < 32) {
+            MTEXT_FILL_BLOCK(MTEXT_ENTRY(block, dx, dy), w, h);
+        } else {
+            MTEXT_FILL_BLOCK(MTEXT_ENTRY(block, dx, dy), w, 32 - dy);
+            MTEXT_FILL_BLOCK(MTEXT_ENTRY(MText::GetDownBlock(size, block), dx, 0), w, h - (32 - dy));
+        }
+    } else {
+        if (dy + h < 32) {
+            MTEXT_FILL_BLOCK(MTEXT_ENTRY(block, dx, dy), 32 - dx, h);
+        } else {
+            MTEXT_FILL_BLOCK(MTEXT_ENTRY(block, dx, dy), 32 - dx, 32 - dy);
+            MTEXT_FILL_BLOCK(MTEXT_ENTRY(MText::GetDownBlock(size, block), dx, 0), 32 - dx, h - (32 - dy));
+        }
+        int right = MText::GetRightBlock(size, block);
+        if (dy + h < 32) {
+            MTEXT_FILL_BLOCK(MTEXT_ENTRY(right, 0, dy), w - (32 - dx), h);
+        } else {
+            MTEXT_FILL_BLOCK(MTEXT_ENTRY(right, 0, dy), w - (32 - dx), 32 - dy);
+            MTEXT_FILL_BLOCK(MTEXT_ENTRY(MText::GetDownBlock(size, right), 0, 0), w - (32 - dx), h - (32 - dy));
+        }
+    }
 }
