@@ -35,6 +35,7 @@
 #include "game/dino_field_capture_fade_out_task_menu.h"
 #include "game/dino_field_capture_fade_out_task.h"
 #include "game/dino_field_player_control.h"
+#include "m/3d_scene.h"
 
 void DinoField::CreateEffects(MPolygonChar **effects, u32 count, u32 id) {
     if (effects[0] != NULL) {
@@ -101,6 +102,49 @@ u32 DinoField::GetUnk234() {
 
 MSmartOam *DinoField::GetOam() {
     return mOam;
+}
+
+// Fades the field (0/1: black in/out, 2/3: white, 4/5: spot); fading in waits for the 3D scene's loads first.
+void DinoField::Fade(u32 mode, u32 frames) {
+    mFadeTasks->Clear();
+    switch (mode) {
+    case 0: {
+        MTask *fade = new DinoFieldBlackIn(frames);
+        MTask *wait = mScene->CreateWaitTransferCompleteTask();
+        MSerialTaskSet *serial = new MSerialTaskSet(TRUE);
+        serial->AddTail(wait);
+        serial->AddTail(fade);
+        mFadeTasks->AddTail(serial);
+        break;
+    }
+    case 1:
+        mFadeTasks->AddTail(new DinoFieldBlackOut(frames));
+        break;
+    case 2: {
+        MTask *fade = new DinoFieldWhiteIn(frames);
+        MTask *wait = mScene->CreateWaitTransferCompleteTask();
+        MSerialTaskSet *serial = new MSerialTaskSet(TRUE);
+        serial->AddTail(wait);
+        serial->AddTail(fade);
+        mFadeTasks->AddTail(serial);
+        break;
+    }
+    case 3:
+        mFadeTasks->AddTail(new DinoFieldWhiteOut(frames));
+        break;
+    case 4: {
+        MTask *fade = new DinoFieldSpotIn(frames);
+        MTask *wait = mScene->CreateWaitTransferCompleteTask();
+        MSerialTaskSet *serial = new MSerialTaskSet(TRUE);
+        serial->AddTail(wait);
+        serial->AddTail(fade);
+        mFadeTasks->AddTail(serial);
+        break;
+    }
+    case 5:
+        mFadeTasks->AddTail(new DinoFieldSpotOut(frames));
+        break;
+    }
 }
 
 void DinoField::SetUnk258(BOOL value) {
