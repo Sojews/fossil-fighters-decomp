@@ -16,6 +16,8 @@ class MSmartOam;
 class DinoCleaningImageView : public MFixedSizeView {
 public:
     DinoCleaningImageView();
+    // Makes the screen and palettes for the images, and clears the dirt.
+    void CreateScreen();
     virtual ~DinoCleaningImageView();
     virtual void SetPosition(MPoint pos);
     virtual MPoint GetPosition();
@@ -46,13 +48,14 @@ public:
     MPalUnit *mPal;                            // 0x2C
     u32 unk30;
     std::vector<DinoCleaningImage *> mImages;   // 0x34
-    u8 unk40[0x430 - 0x40];
+    u8 mMasked[36][28];                         // 0x40: cells every image masks
     u8 mDirty[36][28];                          // 0x430: cells that have had dirt
-    u8 unk820[0xCA20 - 0x820];
+    u8 mUnk820[0xCA20 - 0x820];                 // 0x820
     u32 mCells[36][28];                         // 0xCA20: the dirt left on each cell
     u32 mUnkD9E0;                               // 0xD9E0: dirt added
     MPoint mDirtSum;                            // 0xD9E4: the added dirt's positions, summed
-    u32 unkD9EC[2];
+    u32 mUnkD9EC;                               // 0xD9EC
+    u32 mPalBytes;                              // 0xD9F0: the images' palettes' size
     MSmartOam *mOam;                            // 0xD9F4
     u32 *mSeed;                                 // 0xD9F8
     MParallelTaskSet *mOamTasks;                // 0xD9FC

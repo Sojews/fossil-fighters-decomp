@@ -9,6 +9,8 @@
 #include "m/bg.h"
 #include "m/display.h"
 #include "m/pal.h"
+#include "m/bitmap.h"
+#include "nitro/mi.h"
 #include "m/seed_generator.h"
 #include "game/dino_cleaning_new_dust.h"
 #include "game/dino_cleaning_last_dust.h"
@@ -136,6 +138,49 @@ void DinoCleaningImage::SetCellLayer(int row, int col, u32 layer) {
         MPoint n = GetNeighbour(MPoint(row, col), i);
         mView->mDirty[n.x][n.y] = TRUE;
     }
+}
+
+// NONMATCHING: 99.9%, the offset point and SetOffset's copy of it swap stack slots.
+void DinoCleaningImageView::CreateScreen() {
+    std::vector<DinoCleaningImage *>::iterator it;
+    u32 count = 0;
+    for (it = mImages.begin(); it != mImages.end(); ++it) {
+        count += (*it)->CountPalettes();
+    }
+    MBg *bg = mDisplay->mBg;
+    mPal = bg->mPal->Alloc(count, NULL, TRUE);
+    MIndexBitmap *screen = bg->CreateIndexBitmap(1, TRUE);
+    mScreen = screen;
+    screen->SetOffset(MPoint(0, 1));
+    u32 start = 0;
+    for (it = mImages.begin(); it != mImages.end(); ++it) {
+        (*it)->Build((u32)mPal, start);
+        start += (*it)->CountPalettes();
+    }
+    mPalBytes = start << 4;
+    mUnkD9EC = 0;
+    MIi_CpuClearFast(0, mUnk820, sizeof(mUnk820));
+    ((MIndexBitmap *)mScreen)->Fill(MRect(0, 0, 256, 256), 0);
+    for (u32 col = 0; col < 28; col++) {
+        for (u32 row = 0; row < 36; row++) {
+            mMasked[row][col] = TRUE;
+            for (it = mImages.begin(); it != mImages.end(); ++it) {
+                if (!(*it)->GetMask(row, col)) {
+                    mMasked[row][col] = FALSE;
+                    break;
+                }
+            }
+        }
+    }
+    for (u32 col = 0; col < 28; col++) {
+        for (u32 row = 0; row < 36; row++) {
+            mDirty[row][col] = mMasked[row][col] ? FALSE : TRUE;
+        }
+    }
+    MI_CpuFill8(mCells, 0, sizeof(mCells));
+    mUnkD9E0 = 0;
+    mDirtSum.x = 0;
+    mDirtSum.y = 0;
 }
 
 // The pooled constants the code reads.
