@@ -1,6 +1,7 @@
 #ifndef GAME_DINO_UI_SHOP_BUY_MENU_H
 #define GAME_DINO_UI_SHOP_BUY_MENU_H
 
+#include "m/resource.h"
 #include <vector>
 #include "m/archive.h"
 #include "m/menu_item.h"
@@ -30,7 +31,7 @@ public:
     void LoadFossils();
     static void Restock();
     const DinoKasekiDef *GetKasekiDef(u32 id) {
-        const DinoKasekiDefs *defs = (const DinoKasekiDefs *)mFile.GetData();
+        const DinoKasekiDefs *defs = mKasekiDefs.Get();
         return (const DinoKasekiDef *)((const u8 *)defs + ((const u32 *)((const u8 *)defs + defs->tableOffset))[id]);
     }
     void ClearItems();
@@ -40,8 +41,7 @@ public:
     void RefreshPage2();
     void RefreshPage3();
 
-    MArchivePtr mArchive;       // 0xB4
-    MArchiveFile mFile;         // 0xB8
+    MResource<DinoKasekiDefs> mKasekiDefs;  // 0xB4
     MSmartOam *GetOam() { return mOam; }
 
     MSmartOam *mOam;            // 0xC4: the items' sprites

@@ -1,6 +1,7 @@
 #ifndef GAME_DINO_UI_SHOP_SELL_MENU_H
 #define GAME_DINO_UI_SHOP_SELL_MENU_H
 
+#include "m/resource.h"
 #include "game/dino_ui3_parts_fraction.h"
 #include <vector>
 #include "m/archive.h"
@@ -38,13 +39,12 @@ public:
     u32 GetPrice(int index);
     void RefreshTotal();
     const DinoKasekiDef *GetKasekiDef(u32 id) {
-        const DinoKasekiDefs *defs = (const DinoKasekiDefs *)mFile.GetData();
+        const DinoKasekiDefs *defs = mKasekiDefs.Get();
         return (const DinoKasekiDef *)((const u8 *)defs + ((const u32 *)((const u8 *)defs + defs->tableOffset))[id]);
     }
     void RefreshPage2();
 
-    MArchivePtr mArchive;       // 0xB4
-    MArchiveFile mFile;         // 0xB8
+    MResource<DinoKasekiDefs> mKasekiDefs;  // 0xB4
     MSmartOam *mOam;            // 0xC4: the items' sprites
     MMenuItem *mBack;           // 0xC8
     DinoUiShopSellSellButton *mLinkFrom; // 0xCC: the sell button, linked to the first page item

@@ -32,6 +32,12 @@
 #include "m/display.h"
 #include "m/bright.h"
 
+DinoUiShopSellMenu::DinoUiShopSellMenu() : MMenu(NULL, 0), mPage(0), mLastPage(0), mCount(0), mSelected(0xFF) {
+    for (int i = 0; i < 0x40; i++) {
+        mFlags[i] = 0;
+    }
+}
+
 DinoUiShopSell::~DinoUiShopSell() {
 }
 

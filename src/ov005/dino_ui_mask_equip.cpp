@@ -24,6 +24,11 @@
 #include "m/display.h"
 #include "m/bright.h"
 
+#pragma auto_inline off
+DinoUiMaskEquipMenu::DinoUiMaskEquipMenu() : MMenu(NULL, 0), mChoice(-1), mUnkEC(0), mPage(0), mLastPage(0), mUnk104(0) {
+}
+#pragma auto_inline on
+
 DinoUiMaskEquip::~DinoUiMaskEquip() {
 }
 

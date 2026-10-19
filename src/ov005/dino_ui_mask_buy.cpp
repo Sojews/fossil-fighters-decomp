@@ -34,6 +34,12 @@
 
 #pragma auto_inline off
 
+DinoUiMaskBuyMenu::DinoUiMaskBuyMenu() : MMenu(NULL, 0), mPage(0), mLastPage(0), mTotal(0), mCount(0), mSelected(0xFF) {
+    for (int i = 0; i < 5; i++) {
+        mFlags[i] = 0;
+    }
+}
+
 DinoUiMaskBuyMenuItem::DinoUiMaskBuyMenuItem(DinoUiMaskBuyMenu *owner, const std::string &path, MPoint pos, u32 textId) {
     mOwner = owner;
     mTextId = textId;

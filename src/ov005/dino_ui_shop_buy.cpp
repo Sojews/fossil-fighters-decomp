@@ -30,6 +30,12 @@
 
 #pragma auto_inline off
 
+DinoUiShopBuyMenu::DinoUiShopBuyMenu() : MMenu(NULL, 0), mPage(0), mLastPage(0), mTotal(0), mCount(0), mSelected(0xFF) {
+    for (int i = 0; i < 8; i++) {
+        mFlags[i] = 0;
+    }
+}
+
 // How long the shop's stock lasts, in frames.
 extern "C" const u64 data_02089ad4;
 
@@ -268,7 +274,7 @@ u32 DinoUiShopBuyMenu::GetPrice(int index) {
     DinoBackupEntry entry;
     gDinoBackup->GetUnk148(index, &entry);
     u32 id = entry.id;
-    const DinoKasekiDefs *defs = (const DinoKasekiDefs *)mFile.GetData();
+    const DinoKasekiDefs *defs = mKasekiDefs.Get();
     return ((const DinoKasekiDef *)((const u8 *)defs + ((const u32 *)((const u8 *)defs + defs->tableOffset))[id]))->price;
 }
 
