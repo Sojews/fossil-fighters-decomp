@@ -905,6 +905,11 @@ void DinoBattleModelPlayer::SetUnk124(u32 value) {
     mUnk124 = value;
 }
 
+DinoBattleModelPlayer::DinoBattleModelPlayer(u32 side, u32 unkB4)
+    : MProcess(NULL), mUnkB4(unkB4), mUnkB8(side), mUnkBC(1), mUnkC0(1), mUnkC8(0), mRandom(NULL), mUnk12C(0),
+      mUnk12D(0), mUnk15C(0) {
+}
+
 DinoBattleModelPlayer::~DinoBattleModelPlayer() {
     delete mRandom;
 }

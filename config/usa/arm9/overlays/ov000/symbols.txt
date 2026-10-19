@@ -332,7 +332,7 @@ _ZN21DinoBattleModelPlayer25CreateUpdateCreaturesTaskEv kind:function(thumb,size
 _Z22DinoAttackHasUnk10Flagm kind:function(thumb,size=0x28) addr:0x02162ab0
 func_ov000_02162ad8 kind:function(thumb,size=0xd0) addr:0x02162ad8
 func_ov000_02162ba8 kind:function(thumb,size=0x428) addr:0x02162ba8
-func_ov000_02162fd0 kind:function(thumb,size=0xc4) addr:0x02162fd0
+_ZN21DinoBattleModelPlayerC1Emm kind:function(thumb,size=0xc4) addr:0x02162fd0
 _ZN21DinoBattleModelPlayerD1Ev kind:function(thumb,size=0x6c) addr:0x02163094
 _ZN21DinoBattleModelPlayerD0Ev kind:function(thumb,size=0x70) addr:0x02163100
 _ZN21DinoBattleModelPlayer9SetBattleEP10DinoBattle kind:function(thumb,size=0x40) addr:0x02163170
@@ -1787,7 +1787,6 @@ _ZTS31DinoCreatureUpdateStateIconTask kind:data(any) addr:0x02192b48
 _ZTS33CreatePlayerUpdateAbilityIconTask kind:data(any) addr:0x02192b6c
 _ZTS34SendModelCreatureAbilityResultTask kind:data(any) addr:0x02192b90
 _ZTV21DinoBattleModelPlayer kind:data(any) addr:0x02192bb8
-data_ov000_02192bdc kind:data(any) addr:0x02192bdc
 _ZTSN23DinoBattleModelCreature16AddLifePointTaskE kind:data(any) addr:0x02192be0
 data_ov000_02192c10 kind:data(any) addr:0x02192c10
 data_ov000_02192c24 kind:data(any) addr:0x02192c24

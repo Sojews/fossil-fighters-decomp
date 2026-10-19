@@ -6,6 +6,8 @@
 #include "m/menu_item.h"
 #include "m/motion.h"
 
+class DinoCleaning;
+
 class DinoCleaningToolMenuItem : public DinoHelpItem, public MMenuItem {
 public:
     virtual ~DinoCleaningToolMenuItem();
@@ -17,9 +19,10 @@ public:
     virtual void OnEnableChanged(BOOL enabled);
     virtual void OnFocusChanged(BOOL focused);
 
-    u8 unk94[0x4];
+    DinoCleaning *mCleaning;    // 0x94
     u32 mTextId;        // 0x98
-    u32 mUnk9C[2];
+    u32 *mSelected;     // 0x9C: gets the tool when it's focused
+    u32 mTool;          // 0xA0: 0-3
     MMotion *mMotion;   // 0xA4
 };
 

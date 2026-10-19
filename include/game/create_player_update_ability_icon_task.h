@@ -74,6 +74,7 @@ template <> struct is_trivial<DinoBattlePlayerEvent> {
 
 class DinoBattleModelPlayer : public MProcess, public MMessageObserver {
 public:
+    DinoBattleModelPlayer(u32 side, u32 unkB4);
     virtual ~DinoBattleModelPlayer();
     virtual void Idle();
     virtual void OnMessage(MMessage *msg);
@@ -133,10 +134,11 @@ public:
     void AddAbilitySequence(MTaskSet *set, u32 a, u32 b, u32 attacker, void *target, u8 recolor);
 
     std::vector<DinoBattlePlayerEvent> mUnkA8; // 0xA8
-    u32 unkB4;
-    u32 mUnkB8;                         // 0xB8
+    u32 mUnkB4;                         // 0xB4
+    u32 mUnkB8;                         // 0xB8: the side
     u32 mUnkBC;                         // 0xBC
-    u32 unkC0[2];
+    u32 mUnkC0;                         // 0xC0
+    u32 unkC4;
     u8 mUnkC8;                          // 0xC8
     MMessageSubject mSubject;           // 0xCC
     MMessageObserver *mUnkF4;           // 0xF4

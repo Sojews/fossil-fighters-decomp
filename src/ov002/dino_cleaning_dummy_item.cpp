@@ -9,6 +9,9 @@
 #include "game/dino_cleaning_dummy_item.h"
 #include "game/dino_cleaning_xray_item.h"
 #include "game/dino_cleaning_tool_menu_item.h"
+#include "game/dino_sound.h"
+#include "game/dino_common_live.h"
+#include "game/dino_cleaning.h"
 
 DinoCleaningDummyItem::~DinoCleaningDummyItem() {
 }
@@ -62,6 +65,40 @@ void DinoCleaningToolMenuItem::OnEnableChanged(BOOL enabled) {
             mMotion->Play(5, 0);
         } else {
             mMotion->Play(4, 0);
+        }
+    }
+}
+
+// Points the commentary at the tool, and lights it up.
+void DinoCleaningToolMenuItem::OnFocusChanged(BOOL focused) {
+    if (MMenuItem::IsEnabled()) {
+        switch (mTool) {
+        case 0:
+        case 1:
+            mCleaning->GetUnkE4()->SetUnkA0(12, focused);
+            break;
+        case 2:
+        case 3:
+            mCleaning->GetUnkE4()->SetUnkA0(14, focused);
+            break;
+        }
+        switch (mTool) {
+        case 0:
+        case 2:
+            mCleaning->GetUnkE4()->SetUnkA0(16, FALSE);
+            break;
+        case 1:
+        case 3:
+            mCleaning->GetUnkE4()->SetUnkA0(16, TRUE);
+            break;
+        }
+        *mSelected = mTool;
+        DinoSoundPlaySe(0x46, 0);
+        if (focused) {
+            mMotion->Play(2, 0);
+            Select();
+        } else {
+            mMotion->Play(3, 0);
         }
     }
 }
