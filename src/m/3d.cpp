@@ -4,12 +4,27 @@
 #include "m/heap.h"
 #include "m/3d.h"
 #include "m/dma.h"
+#include "nitro/mi.h"
 #include "m/3d_wait_transfer_complete_task.h"
 
 extern "C" void G3X_SetClearColor(u16 rgb, int alpha, int depth, int polygonID, BOOL fog);
 extern "C" u32 GX_DisableBankForTex(void);
 extern "C" u32 GX_DisableBankForTexPltt(void);
 extern "C" u32 GX_SetDefaultDMA(u32 dma);
+extern "C" void GX_BeginLoadTex(void);
+extern "C" void GX_LoadTex(const void *src, u32 dst, u32 size);
+extern "C" void GX_EndLoadTex(void);
+extern "C" void GX_BeginLoadTexPltt(void);
+extern "C" void GX_LoadTexPltt(const void *src, u32 dst, u32 size);
+extern "C" void GX_EndLoadTexPltt(void);
+extern "C" BOOL MI_IsDmaBusy(u32 dma);
+extern "C" u32 GXi_DmaId;
+
+// Whether the display is in VBlank (when VRAM can be written).
+static inline BOOL M3dInVBlank() {
+    int line = *(vu16 *)0x04000006;   // REG_VCOUNT
+    return line >= 192 && line <= 211;
+}
 
 M3DVInt::~M3DVInt() {
     MScopedLock lock(&gM3dMutex, TRUE);
@@ -41,6 +56,71 @@ void M3d::FreePltt(u32 key) {
     mPlttHeap.Free(key, FALSE);
 }
 
+// Runs the queued transfers while VBlank lasts: palettes, then textures (a texture too big for the lines left
+// waits once something was loaded), then, once all are done, the queued frees.
+void M3DVInt::OnVSync() {
+    MScopedLock lock(&gM3dMutex, TRUE);
+    BOOL loaded = FALSE;
+    u32 i;
+    if (MI_IsDmaBusy(GXi_DmaId)) {
+        return;
+    }
+    int line = *(vu16 *)0x04000006;
+    if (line < 192 || line > 211) {
+        return;
+    }
+    if (!mM3d->mQueueD0.empty()) {
+        GX_BeginLoadTexPltt();
+        while (M3dInVBlank() && !mM3d->mQueueD0.empty()) {
+            M3dTransfer &t = mM3d->mQueueD0.front();
+            u32 src = t.src;
+            u32 dst = t.dst;
+            u32 size = t.size;
+            mM3d->mQueueD0.pop_front();
+            GX_LoadTexPltt((const void *)src, dst, size);
+            loaded = TRUE;
+        }
+        GX_EndLoadTexPltt();
+    }
+    line = *(vu16 *)0x04000006;
+    if (line < 192 || line > 211) {
+        return;
+    }
+    for (i = 0; i < 2; i++) {
+        std::deque<M3dTransfer> &queue = mM3d->mQueues[i];
+        if (!queue.empty()) {
+            GX_BeginLoadTex();
+            while (M3dInVBlank() && !queue.empty()) {
+                M3dTransfer &t = queue.front();
+                u32 src = t.src;
+                u32 dst = t.dst;
+                u32 size = t.size;
+                if (loaded && (212 - *(vu16 *)0x04000006) * 0x164 < size) {
+                    break;
+                }
+                queue.pop_front();
+                GX_LoadTex((const void *)src, dst, size);
+                loaded = TRUE;
+            }
+            GX_EndLoadTex();
+        }
+    }
+    if (!mM3d->mQueueE8.empty() && mM3d->mQueueD0.empty() && mM3d->mQueues[0].empty() && mM3d->mQueues[1].empty()) {
+        MI_WaitDma(GXi_DmaId);
+        while (!mM3d->mQueueE8.empty()) {
+            M3dTransfer &t = mM3d->mQueueE8.front();
+            u32 addr = t.src;
+            MHeap *heap = (MHeap *)t.dst;
+            mM3d->mQueueE8.pop_front();
+            if (heap != NULL) {
+                heap->Free(addr, FALSE);
+            } else {
+                delete[] (u8 *)addr;
+            }
+        }
+    }
+}
+
 // Takes VRAM for a texture and queues its transfer there (on the given queue); returns the address.
 u32 M3d::AllocTex(const void *src, u32 size, BOOL queue) {
     size = (size + 3) & ~3;
@@ -67,10 +147,10 @@ u32 M3d::AllocPltt(const void *src, u32 size) {
     return addr;
 }
 
-void M3d::QueueE8(const void *dst, u32 src) {
+void M3d::QueueE8(const void *heap, u32 addr) {
     M3dTransfer t;
-    t.src = src;
-    t.dst = (u32)dst;
+    t.src = addr;
+    t.dst = (u32)heap;
     MScopedLock lock(&gM3dMutex, TRUE);
     mQueueE8.push_back(t);
 }

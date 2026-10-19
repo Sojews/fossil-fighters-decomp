@@ -22,7 +22,7 @@ public:
     virtual ~M3d();
     virtual void Unk0C();
     BOOL IsTransferComplete();
-    void QueueE8(const void *dst, u32 src);
+    void QueueE8(const void *heap, u32 addr);   // frees addr (from heap, else delete[]) once transfers are done
     u32 AllocTex(const void *src, u32 size, BOOL queue);
     u32 AllocPltt(const void *src, u32 size);
     void QueueD0(const void *dst, u32 src, u32 size);
@@ -40,7 +40,7 @@ public:
     MHeap mPlttHeap;    // 0x68
     std::deque<M3dTransfer> mQueues[2]; // 0xA0: transfers still queued
     std::deque<M3dTransfer> mQueueD0;   // 0xD0: palette transfers
-    std::deque<M3dTransfer> mQueueE8;   // 0xE8
+    std::deque<M3dTransfer> mQueueE8;   // 0xE8: memory to free (src: the address, dst: its MHeap, or 0)
     M3DVInt *mVInt;                     // 0x100
 };
 
@@ -51,6 +51,8 @@ class M3DVInt : public MLooperVSyncTask {
 public:
     virtual ~M3DVInt();
     virtual void OnVSync();
+
+    M3d *mM3d;      // 0x1C
 };
 
 #endif
