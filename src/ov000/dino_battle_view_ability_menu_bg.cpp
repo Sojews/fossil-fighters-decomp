@@ -12,6 +12,11 @@
 #include "m/pal.h"
 #include "game/dino_battle_view_class.h"
 #include "game/dino_battle_view_ui_ability_menu_item.h"
+#include "game/dino_battle_view_creature.h"
+#include "game/dino_battle_help.h"
+#include "game/dino_sound.h"
+#include "m/indicator.h"
+#include <string.h>
 
 extern "C" int data_ov000_021978dc;    // live ability menu BGs
 extern "C" const u32 data_0208a19c;     // frames before the ability menu takes input
@@ -60,13 +65,19 @@ void AttackMenuBarMotion::SetPriority(int priority) {
 
 // Pooled file statics: the parts' offsets from the bar.
 struct AttackMenuBarStatics {
-    u8 unk00[0x48];
+    u8 unk00[8];
+    const char *noCost;     // 0x08
+    u8 unk0C[0x48 - 0x0C];
     MPoint mUnk7COffset;    // 0x48
     u32 unk50[2];
     MPoint mUnk80Offset;    // 0x58
+    int barX;               // 0x60: the bar's x, unfocused
 };
 struct AttackMenuBarStatics2 {
-    u8 unk00[0x20];
+    int barFocusedFlagX;    // 0x00: focused, with mUnk94 set
+    u8 unk04[0x18 - 0x04];
+    int barFocusedX;        // 0x18: focused (or unfocused with mUnk94 set)
+    u32 unk1C;
     MPoint mUnk78Offset;    // 0x20
 };
 extern "C" AttackMenuBarStatics data_ov000_021947ac;
@@ -186,6 +197,24 @@ extern "C" BOOL func_ov000_02179aa0(u32 id) {
 // Clears a side's status effect tasks.
 extern "C" void func_ov000_0217e1ec(void *icons, int side);
 
+// Points the attack helps at the item and shows its cost.
+void DinoBattleViewUiAbilityMenu::OnFocus(MMenuItem *item) {
+    for (u32 i = 0; i < 3; i++) {
+        mHelps[i]->SetItem(item, ((DinoBattleViewUiAbilityMenuItem *)item)->GetUnk94());
+    }
+    const DinoAttackDef *def = gDinoResource->GetAttackDef(((DinoBattleViewUiAbilityMenuItem *)item)->GetUnk8C());
+    u16 cost = DinoOffsetPtr<u16>(def, def->cost)[1];
+    char text[64];
+    char costText[8];
+    if (cost != 0) {
+        OS_SPrintf(costText, "%d", cost + ((DinoBattleView *)mUnk104)->FindCreatureByAC(mUnkC0)->GetUnkFC());
+    } else {
+        strcpy(costText, data_ov000_021947ac.noCost);
+    }
+    OS_SPrintf(text, gDinoResource->GetAttackText08(((DinoBattleViewUiAbilityMenuItem *)item)->GetUnk8C()), costText);
+    mCostText->SetText(std::string(text));
+}
+
 DinoBattleViewUiAbilityMenu::DinoBattleViewUiAbilityMenu(u32 arg0, u32 arg1, u32 arg2, u32 arg3, u32 arg4,
                                                          DinoBattleViewUiAbilityMenuArgs args, u8 arg6, u32 arg7,
                                                          DinoBattleView *view)
@@ -222,9 +251,26 @@ extern "C" MTask *func_ov000_0217a080(AttackMenuBarMotion *bar, MPoint from, MPo
     return set;
 }
 
-extern "C" void func_ov000_0217a45c(DinoBattleViewUiAbilityMenuItem *item, MPoint from, MPoint to, int frames,
-                                    int ease) {
-    func_ov000_0217a080(item->mUnk98, from, to, frames, ease);
+extern "C" MTask *func_ov000_0217a45c(DinoBattleViewUiAbilityMenuItem *item, MPoint from, MPoint to, int frames,
+                                      int ease) {
+    return func_ov000_0217a080(item->mUnk98, from, to, frames, ease);
+}
+
+// Slides the bar out when focused, back when not.
+void DinoBattleViewUiAbilityMenuItem::OnFocusChanged(BOOL focused) {
+    MPoint pos = mUnk98->GetPosition();
+    MPoint to;
+    if (focused) {
+        to = MPoint(mUnk94 ? data_ov000_0219482c.barFocusedFlagX : data_ov000_0219482c.barFocusedX, pos.y);
+        DinoSoundPlaySe(0x5E, 0);
+    } else {
+        to = MPoint(focused ? data_ov000_0219482c.barFocusedX : data_ov000_021947ac.barX, pos.y);
+    }
+    mTasks->Clear();
+    mTasks->AddTail(func_ov000_0217a45c(this, pos, to, 12, -1));
+    if (!mUnk94) {
+        mUnk98->Play(focused ? 2 : 1);
+    }
 }
 
 #pragma auto_inline on

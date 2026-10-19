@@ -14,6 +14,8 @@
 class AttackMenuBarMotion;
 class DinoBattleViewUiAbilityMenu;
 class DinoBattleView;
+class MIndicator;
+class DinAttackItemHelp;
 class MSmartOam;
 
 class DinoBattleViewUiAbilityMenuItem : public MMenuItem {
@@ -69,10 +71,13 @@ public:
     u8 mUnkD4;      // 0xD4
     u32 mUnkD8;     // 0xD8
     DinoBattleViewUiAbilityMenuArgs mArgs;  // 0xDC
-    u8 unkF4[0x104 - 0xF4];
+    u8 unkF4[0x100 - 0xF4];
+    MIndicator *mCostText;  // 0x100
     void *mUnk104;  // 0x104: the DinoBattleView
     u8 unk108[0x11C - 0x108];
     u32 mUnk11C;    // 0x11C
+    u32 unk120;
+    DinAttackItemHelp *mHelps[3];   // 0x124
 };
 
 class MMotion;
@@ -135,6 +140,14 @@ class DinAttackItemHelp : public DinoBattleHelpBase {
 public:
     virtual ~DinAttackItemHelp();
     virtual MRect GetRect();
+
+    void SetItem(MMenuItem *item, u8 flag) {
+        mItem = item;
+        mFlag = flag;
+    }
+
+    MMenuItem *mItem;   // 0x94: the attack item it explains
+    u8 mFlag;           // 0x98: the item's mUnk94
 };
 
 #endif
