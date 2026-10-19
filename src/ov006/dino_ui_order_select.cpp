@@ -185,20 +185,6 @@ void DinoUiOrderSelectMenu::ClearItems() {
     mItemsLinked = FALSE;
 }
 
-// The OK button lights up when the team can fight; the technique shows when the team has one.
-void DinoUiOrderSelectMenu::RefreshOKButton() {
-    if (!IsTeamInvalid()) {
-        mOKButton->mMotion->GetUnit()->SetMode(1);
-    } else {
-        mOKButton->mMotion->GetUnit()->SetMode(0);
-    }
-    if (DinoTeamHasTech(&mTeam)) {
-        mTech->Show();
-    } else {
-        mTech->Hide();
-    }
-}
-
 void DinoUiOrderSelectMenu::RefreshItems() {
     for (int i = 0; i < 5; i++) {
         mItems[i]->Enable();
@@ -418,6 +404,59 @@ void DinoUiOrderSelectMenu::FinishTab() {
     FocusItem(mItems[mFocusIndex]);
     RefreshOKButton();
 }
+
+#pragma opt_strength_reduction off
+// Why the team can't fight the battle: 1 without a leader, 4 with too few of the creatures the rule names a kind of,
+// 5 without one of the creatures the rule names; 0 if it can.
+BOOL DinoUiOrderSelectMenu::IsTeamInvalid() {
+    u8 members = 0;
+    if (mTeam.slots[0] != 0) {
+        members += 2;
+    }
+    if (members == 0) {
+        return 1;
+    }
+    if (mUnk1F8 != 0) {
+        MResource<DinoBattleData> battle = gDinoResource->LoadBattle(mUnk1F8);
+        if (battle.Get()->unk44 != 0 && battle.Get()->unk48 >= 1 && battle.Get()->unk48 <= 3) {
+            u32 count = 0;
+            for (int i = 0; i < 3; i++) {
+                if (mTeam.slots[i] != 0 &&
+                    gDinoResource->GetCreatureDef(mTeam.slots[i])->unk0D == battle.Get()->GetUnk44()) {
+                    count++;
+                }
+            }
+            if (battle.Get()->unk48 > count) {
+                return 4;
+            }
+        }
+        if (battle.Get()->unk3C != 0) {
+            for (u32 i = 0; i < battle.Get()->unk3C; i++) {
+                if (mTeam.slots[0] != battle.Get()->GetUnk40()[i] && mTeam.slots[1] != battle.Get()->GetUnk40()[i] &&
+                    mTeam.slots[2] != battle.Get()->GetUnk40()[i]) {
+                    return 5;
+                }
+            }
+        }
+    }
+    return 0;
+}
+#pragma opt_strength_reduction reset
+
+// The OK button lights up when the team can fight; the technique shows when the team has one.
+void DinoUiOrderSelectMenu::RefreshOKButton() {
+    if (!IsTeamInvalid()) {
+        mOKButton->mMotion->GetUnit()->SetMode(1);
+    } else {
+        mOKButton->mMotion->GetUnit()->SetMode(0);
+    }
+    if (DinoTeamHasTech(&mTeam)) {
+        mTech->Show();
+    } else {
+        mTech->Hide();
+    }
+}
+
 
 extern const u32 data_0208aae8;
 extern const u32 data_0208aaec;

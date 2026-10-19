@@ -217,6 +217,7 @@ struct DinoMapData;
 struct DinoBattleData {
     // The creatures the rule names.
     const u32 *GetUnk40() const { return (const u32 *)((const u8 *)this + unk40); }
+    u32 GetUnk44() const { return unk44; }
 
     u8 unk00[0x1C];
     u32 unk1C;          // 0x1C: a talk text
