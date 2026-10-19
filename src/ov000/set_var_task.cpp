@@ -8,6 +8,8 @@
 #include "game/dino_battle2.h"
 #include "m/console.h"
 #include "m/motion.h"
+#include "m/blend.h"
+#include "m/lcd.h"
 
 SetVarTask::~SetVarTask() {
 }
@@ -62,6 +64,38 @@ extern "C" void func_ov000_0218c150(DinoBattleTalkWindow *window, u32 face, int 
         window->mFace = face;
     }
     window->mSide = side;
+}
+
+extern "C" MPoint data_ov000_021971d8[2];   // the face, in place
+extern "C" MPoint data_ov000_021971e8[2];   // the face, gone
+
+// The three tasks at once (the arguments are evaluated last to first).
+static inline MTask *Together(MTask *a, MTask *b, MTask *c) {
+    MParallelTaskSet *set = new MParallelTaskSet(TRUE);
+    set->AddTail(a, b, c);
+    return set;
+}
+
+// Closes the window: slides the face, the console and the frame away and clears the screen.
+extern "C" void func_ov000_0218c960(DinoBattleTalkWindow *window) {
+    window->mFace = 0;
+    if (!window->mTasksC4->IsEmpty()) {
+        if (window->mState == 2) {
+        return;
+        }
+        window->mState = 2;
+        window->mTasksC0->Clear();
+        window->mConsole->Suspend();
+        window->mTasksC0->AddTail(
+            Together(window->mFrame->CreateCoordAnime(data_ov000_021971f8[window->mSide],
+                                                      data_ov000_021971f8[window->mSide].Offset(0, 0x28), 20, 2),
+                     window->mConsole->CreateCoordAnime(data_ov000_02197208[window->mSide],
+                                                        data_ov000_02197208[window->mSide].Offset(0, 0x28), 20, 2),
+                     window->mFaceMotion->CreateCoordAnime(data_ov000_021971d8[window->mSide],
+                                                           data_ov000_021971e8[window->mSide], 20, 2)),
+            MTaskSetMakeEmptyTask::Create(window->mTasksC4), gLcd->GetTopDisplay()->mBlend->CreateClearTransfer(),
+            new SetVarTask(&window->mState, 0));
+    }
 }
 
 // Whether the window is done talking (counting down its extra waits first).

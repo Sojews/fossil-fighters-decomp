@@ -84,6 +84,12 @@ public:
         AddTail(b);
         AddTail(c);
     }
+    void AddTail(MTask *a, MTask *b, MTask *c, MTask *d) {
+        AddTail(a);
+        AddTail(b);
+        AddTail(c);
+        AddTail(d);
+    }
     void AddTail(MTask *a, MTask *b, MTask *c, MTask *d, MTask *e) {
         AddTail(a);
         AddTail(b);

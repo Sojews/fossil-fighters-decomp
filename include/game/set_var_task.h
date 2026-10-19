@@ -11,8 +11,10 @@
 #include "game/dino_field_camera_hook.h"
 #include "m/console_filter.h"
 
+// Sets a variable, then exits.
 class SetVarTask : public MTask {
 public:
+    SetVarTask(int *dst, int value) : mDst(dst), mValue(value) {}
     virtual ~SetVarTask();
     virtual void Execute();
 

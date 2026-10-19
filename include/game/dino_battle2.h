@@ -50,6 +50,8 @@ public:
     MConsole *mConsole;     // 0xD0
     u32 unkD4[3];
     MFx32 mRate;            // 0xE0: the console's typing rate
+    u8 unkE4[0x124 - 0xE4];
+    int mState;             // 0x124: 2 while closing
 };
 
 #endif
