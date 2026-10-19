@@ -4,6 +4,7 @@
 #pragma auto_inline on
 
 #include "game/dino_cleaning_image.h"
+#include "game/dino_cleaning_image_layer.h"
 #include "game/dino_cleaning.h"
 #include "game/dino_common_live.h"
 #include "game/dino_sound.h"
@@ -86,6 +87,49 @@ void DinoCleaningImage::LoadPalettes(MPalUnit *block, u32 start) {
             start += 2;
         }
     }
+}
+
+extern "C" void func_ov002_02158b74(DinoCleaningImageLayer *layer, u32 arg, u32 start);
+
+// NONMATCHING: 81%, the game recomputes the layer cell index for every layer (strength-reducing only the mask row).
+void DinoCleaningImage::Build(u32 arg, u32 start) {
+    mUnk08 = TRUE;
+    std::vector<DinoCleaningImageLayer *>::iterator it;
+    for (it = mLayers.begin(); it != mLayers.end(); ++it) {
+        func_ov002_02158b74(*it, arg, start);
+        if (!(*it)->GetUnk800()) {
+            start += 2;
+        }
+    }
+    for (u32 col = 0; col < 28; col++) {
+        for (u32 row = 0; row < 36; row++) {
+            mMask[row][col] = TRUE;
+            for (it = mLayers.begin(); it != mLayers.end(); ++it) {
+                if ((*it)->mHard[row][col] == 0) {
+                    mMask[row][col] = FALSE;
+                    break;
+                }
+            }
+        }
+    }
+    mUnk13FC = 0;
+    for (u32 col = 0; col < 28; col++) {
+        for (u32 row = 0; row < 36; row++) {
+            if (GetMask(row, col)) {
+                mGrid[row][col] = 0;
+            } else {
+                int top = 0;
+                for (it = mLayers.begin(); it != mLayers.end(); ++it) {
+                    if ((*it)->mHard[row][col] == 0 && (*it)->mCells410[row][col] == 0) {
+                        top = it.ptr_ - mLayers.begin().ptr_;
+                        mUnk13FC++;
+                    }
+                }
+                mGrid[row][col] = top;
+            }
+        }
+    }
+    mUnk1400 = mUnk13FC;
 }
 
 void DinoCleaningImage::PlayLayerSounds() {

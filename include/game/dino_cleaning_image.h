@@ -25,6 +25,8 @@ public:
     u8 GetMask(int row, int col);
     u8 GetCell(int row, int col);
     void ClearGrid();
+    // Loads the layers (palettes from start on), works out the mask, each cell's top layer and the count.
+    void Build(u32 arg, u32 start);
     // Lowers (or sets) the cell's layer, counting the cells broken on the way, and marks it and its neighbours dirty.
     void SetCellLayer(int row, int col, u32 layer);
 
