@@ -10,6 +10,7 @@
 #include "game/dino_common_window_message_box.h"
 #include "game/dino_ui_container_menu_item_menu.h"
 #include "game/dino_ui_parts_rock_name.h"
+#include "game/dino_ui_parts_kaseki_button.h"
 #include "game/dino_ui_container_menu_item.h"
 #include "game/dino_common_window_menu_item_flush_task_menu.h"
 #include "m/bg_new_task.h"
@@ -379,6 +380,48 @@ DinoUiContainerMenuItem::DinoUiContainerMenuItem(DinoUiContainerMenu *owner, con
 }
 
 // The OK button is usable once the team has a first member.
+
+void DinoLinkGrid(MMenu *menu, std::vector<MMenuItem *> *items, MMenuItem *below);
+
+// Makes the page's buttons (blank past the last rock) and links them in a grid, the top row to mUnkB8 and the tabs, the
+// OK button and mUnkB8 to the first.
+void DinoUiContainerMenu::RefreshPage2() {
+    mItems.clear();
+    for (int i = 0; i < 8; i++) {
+        DinoUiPartsKasekiButton *button;
+        if (mUnk100.size() > i + mPage * 8) {
+            button = new DinoUiPartsKasekiButton(
+                mOam, MPoint(data_ov006_021915d4.x + data_ov006_021915d4.colX * (i % 4) + data_ov006_02191654.rowX * (i / 4),
+                       data_ov006_021915d4.y + data_ov006_021915d4.colY * (i % 4) + data_ov006_02191654.rowY * (i / 4)),
+                (const DinoKasekiButtonInfo &)mUnk100[i + mPage * 8], 0);
+            mItems.push_back(button);
+            AddItem(button);
+        } else {
+            DinoKasekiButtonInfo empty;
+            empty.icon = 1;
+            empty.color = 0;
+            empty.type = 0;
+            empty.level = 0;
+            button = new DinoUiPartsKasekiButton(
+                mOam, MPoint(data_ov006_021915d4.x + data_ov006_021915d4.colX * (i % 4) + data_ov006_02191654.rowX * (i / 4),
+                       data_ov006_021915d4.y + data_ov006_021915d4.colY * (i % 4) + data_ov006_02191654.rowY * (i / 4)),
+                empty, 0);
+            button->HideMotion();
+            mItems.push_back(button);
+            AddItem(button);
+        }
+    }
+    DinoLinkGrid(this, (std::vector<MMenuItem *> *)&mItems, mTabItems[1]);
+    AddLink((MMenuItem *)mItems[0], 4, (MMenuItem *)mUnkB8);
+    AddLink((MMenuItem *)mItems[1], 4, (MMenuItem *)mUnkB8);
+    AddLink((MMenuItem *)mItems[2], 4, (MMenuItem *)mUnkB8);
+    AddLink((MMenuItem *)mItems[3], 4, (MMenuItem *)mUnkB8);
+    AddLink(mTabItems[0], 2, (MMenuItem *)mItems[0]);
+    AddLink(mTabItems[1], 2, (MMenuItem *)mItems[0]);
+    AddLink(mTabItems[2], 2, (MMenuItem *)mItems[0]);
+    AddLink(mOKButton, 2, (MMenuItem *)mItems[0]);
+    AddLink((MMenuItem *)mUnkB8, 2, (MMenuItem *)mItems[0]);
+}
 
 void DinoUiContainerMenu::RefreshOKButton() {
     if (mOldTeam->slots[0]) {

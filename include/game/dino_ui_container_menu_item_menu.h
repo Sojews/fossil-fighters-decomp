@@ -7,6 +7,7 @@
 #include "game/dino_ui_field_menu_fraction.h"
 #include <string>
 #include <vector>
+#include "game/dino_ui_fossil_entry.h"
 #include "m/archive.h"
 #include "m/menu_item.h"
 #include "m/menu.h"
@@ -55,7 +56,7 @@ public:
     MSerialTaskSet *mCursorTasks;   // 0xF4
     DinoUiFieldMenuCursor *mCursor; // 0xF8
     DinoUiPartsRockName *mPanel;    // 0xFC: shows the focused container
-    std::vector<s32> mUnk100;   // 0x100
+    std::vector<DinoUiFossilEntry> mUnk100;   // 0x100: the containers' rocks
     MResource<void> mUnk10C;    // 0x10C
     u32 mUnk11C;                // 0x11C: the chosen entry
     u32 mUnk120;                // 0x120: the yes/no window's answer
