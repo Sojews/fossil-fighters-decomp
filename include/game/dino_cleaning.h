@@ -44,6 +44,7 @@ public:
     void StateQuit();
     void State02160638();
     void State02160de8();
+    void State0216177c();
     void State02160e78();
     void State02160f54();
     void State021610b0();

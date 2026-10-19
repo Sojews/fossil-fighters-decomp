@@ -248,7 +248,8 @@ extern "C" struct {
     void (DinoCleaningKasekiRock::*StateShake_68)(); // 0x68
 } data_ov002_021657d4;
 extern "C" struct {
-    u8 unk00[0x8];
+    u8 unk00[0x4];
+    MFx32 mChipPower;           // 0x04: what each cell takes when the rock is cleared at once
     const char *mCountFormat;   // 0x08
     u8 unk0C[0x2C - 0xC];
     int mZero_2C;               // 0x2C: (the constant the count's shake is clamped to)
@@ -267,7 +268,7 @@ extern "C" struct {
     u8 unk30[0x40 - 0x30];
     void (DinoCleaning::*Unk021618c8_40)();
     u8 unk48[0x58 - 0x48];
-    void (DinoCleaning::*State021618c8_58)(); // 0x58
+    void (DinoCleaning::*StateCheckDone_58)(); // 0x58
     u8 unk60[0x68 - 0x60];
     void (DinoCleaning::*Unk02161490_68)();
     void (DinoCleaning::*StateWake_70)();
@@ -358,6 +359,27 @@ DinoCleaning::DinoCleaning(u32 unk9C, void *unkA0, u32 unkA8, u32 unkAC, int mod
     mUnk138 = 0;
     mUnk140 = unk140;
     mState = data_ov002_021659ec.State02160638_48;
+}
+
+// Chips at every cell left of the top rock and shakes the rock; once nothing is left, settles it and checks the result.
+void DinoCleaning::State0216177c() {
+    BOOL left = FALSE;
+    DinoHelpBase::Disable();
+    for (int col = 0; col < 28; col++) {
+        for (int row = 0; row < 36; row++) {
+            if (!mKasekiRock->GetRock90()->IsCellClear(row, col)) {
+                left = TRUE;
+                mKasekiRock->GetRock90()->Hit(row, col, data_ov002_021659ec.mChipPower);
+            }
+        }
+    }
+    MFx32 amp = MFx32(6);
+    mKasekiRock->SetOffsetAll(MPoint(MFx32ToInt(amp * mRandom->NextFraction() - amp / MFx32(2)),
+                                     MFx32ToInt(amp * mRandom->NextFraction() - amp / MFx32(2))));
+    if (!left) {
+        mKasekiRock->SetOffsetAll(MPoint(0, 0));
+        mState = data_ov002_02165a6c.StateCheckDone_58;
+    }
 }
 
 // Creates the kaseki rock (and runs it once).
