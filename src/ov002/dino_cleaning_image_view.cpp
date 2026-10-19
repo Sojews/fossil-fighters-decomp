@@ -195,6 +195,6 @@ DinoCleaningImageViewScaleAnime::~DinoCleaningImageViewScaleAnime() {
 // Vector instances the game emits in this file (made explicitly until the code that uses them is decompiled).
 template class std::__vec_deleter<DinoCleaningStatusEntry, std::allocator<DinoCleaningStatusEntry> >;
 // (A vector<DinoCleaningStatusEntry>'s operator= copies with this.)
-template void std::__vec_deleter<DinoCleaningStatusEntry, std::allocator<DinoCleaningStatusEntry> >::assign<const DinoCleaningStatusEntry *>(
-    const DinoCleaningStatusEntry *first, const DinoCleaningStatusEntry *last, Metrowerks::int2type<true>);
+template void std::__vec_deleter<DinoCleaningStatusEntry, std::allocator<DinoCleaningStatusEntry> >::assign<DinoCleaningStatusEntry *>(
+    DinoCleaningStatusEntry *first, DinoCleaningStatusEntry *last, Metrowerks::int2type<true>);
 template class std::__vec_deleter<u32, std::allocator<u32> >;
