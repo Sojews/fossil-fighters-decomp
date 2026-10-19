@@ -723,6 +723,12 @@ namespace std {
                 --ptr_;
                 return *this;
             }
+            iterator operator+(difference_type n) const {
+                return iterator(ptr_ + n);
+            }
+            iterator operator-(difference_type n) const {
+                return iterator(ptr_ - n);
+            }
             bool operator==(const iterator &x) const {
                 return ptr_ == x.ptr_;
             }
@@ -827,6 +833,12 @@ namespace std {
             iterator &operator--() {
                 --ptr_;
                 return *this;
+            }
+            iterator operator+(difference_type n) const {
+                return iterator(ptr_ + n);
+            }
+            iterator operator-(difference_type n) const {
+                return iterator(ptr_ - n);
             }
             bool operator==(const iterator &x) const {
                 return ptr_ == x.ptr_;
