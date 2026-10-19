@@ -25,6 +25,8 @@ public:
     // B focuses the back button, or presses it once it's focused.
     void CheckKeys();
     void OnBackDecided();
+    // The sub menu's choice for the entry: 1 sets the record's flag, 2 clears it.
+    void OnSubMenuChoice(u32 choice, u32 index);
 
     u8 unkB4[0x38];
     MView *mCursor;     // 0xEC
@@ -39,11 +41,12 @@ public:
     MMenuItem *mBackButton; // 0x12C
     u32 mPage;          // 0x130
     u32 mUnk134;        // 0x134
-    u8 unk138[5];
+    u8 unk138[4];
+    u8 mUnk13C;         // 0x13C
     u8 mSilentFocus;    // 0x13D
     std::wstring mUnk140[126];  // 0x140
     std::wstring mUnk728[42];   // 0x728
-    u8 unk920[0x9D0 - 0x920];
+    s32 mEntries[44];   // 0x920: the record index << 8, and flags
 };
 
 #endif

@@ -278,10 +278,9 @@ void SetFocusTask::Execute() {
     Exit();
 }
 
-extern "C" void func_ov007_02186c74(void *owner, u32 value, u32 arg);
 
 void DinoUiSenryuSubMenu::Execute() {
-    func_ov007_02186c74(mOwner, *mValue, mArg);
+    ((DinoUiSenryuMenu *)mOwner)->OnSubMenuChoice(*mValue, mArg);
     Exit();
 }
 
@@ -409,6 +408,38 @@ void DinoUiSenryuMenu::CheckKeys() {
                 }
             }
         }
+    }
+}
+
+void DinoUiSenryuMenu::OnSubMenuChoice(u32 choice, u32 index) {
+    s32 entry = mEntries[index];
+    u32 id = entry >> 8;
+    switch (choice) {
+    case 1: {
+        mEntries[index] = entry | 2;
+        DinoBackupRecord record;
+        gDinoBackup->GetRecord(id, &record);
+        mUnk13C = TRUE;
+        record.unk79 = TRUE;
+        gDinoBackup->SetRecord(id, &record);
+        GetSerial()->AddTail(gLcd->GetBottomDisplay()->mBright->CreateFadeOutToBlack(15, 0), CreateCurChangeTask(index),
+                             gLcd->GetBottomDisplay()->mBright->CreateFadeInFromBlack(15, 0));
+        break;
+    }
+    case 2: {
+        mEntries[index] = entry & ~2;
+        DinoBackupRecord record;
+        gDinoBackup->GetRecord(id, &record);
+        record.unk79 = FALSE;
+        mUnk13C = TRUE;
+        gDinoBackup->SetRecord(id, &record);
+        GetSerial()->AddTail(gLcd->GetBottomDisplay()->mBright->CreateFadeOutToBlack(15, 0), CreateCurChangeTask(index),
+                             gLcd->GetBottomDisplay()->mBright->CreateFadeInFromBlack(15, 0));
+        break;
+    }
+    case 3:
+    case (u32)-2:
+        break;
     }
 }
 
