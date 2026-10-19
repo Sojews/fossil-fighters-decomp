@@ -451,6 +451,8 @@ public:
 
 // A loaded episode file and the archive holding it.
 struct DinoEventEpisode {
+    const void *Get() { return mFile.GetData(); }
+
     MArchivePtr mArchive;   // 0x00
     MArchiveFile mFile;     // 0x04
 };
@@ -476,17 +478,26 @@ public:
     void AddSeenEpisodes();
     void RemoveEpisode(u32 id);
     void ResetEpisode(u32 id);
-    void ProcessEpisode(const std::map<u32, DinoEventEpisode>::iterator &it);
+    BOOL ProcessEpisode(const std::map<u32, DinoEventEpisode>::iterator &it);
+    // TRUE if an entry's conditions hold (all of them, or any, by its mode).
+    BOOL CheckConditions(const u8 *entry);
+    BOOL CheckCondition(const u8 *condition);
+    // Runs a block of commands, then lets the player move again.
+    void RunCommands(const u8 *block);
+    void RunCommand(const u8 *command);
 
     void (DinoEventLoop::*mState)();    // 0x74
     u32 *mResult;           // 0x7C
     DinoField *mField;      // 0x80
     std::map<u32, DinoEventEpisode> mEpisodeFiles;  // 0x84
-    MArchivePtr mArchive;   // 0x94
-    MArchiveFile mFile;     // 0x98
+    MResource<DinoEpisodeData> mCommands;  // 0x94: the commands of the episode being run
     u32 mUnkA4[6];          // 0xA4
     u8 mCameraUsed;         // 0xBC
-    u8 unkBD[0x110 - 0xBD];
+    u8 unkBD[0xCC - 0xBD];
+    u8 mEventCleared;       // 0xCC: an event was just cleared
+    u8 unkCD[0x108 - 0xCD];
+    u32 mUnk108;            // 0x108
+    u32 mUnk10C;            // 0x10C
     MScreen *mScreen;       // 0x110: the field's screen
     void *mEpisodes;        // 0x114
     u8 mEpisodesChanged;    // 0x118
