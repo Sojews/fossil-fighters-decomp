@@ -10,6 +10,11 @@
 #include "m/bg_new_task.h"
 #include "m/call_task.h"
 #include "game/dino_static_init.h"
+#include "m/observer.h"
+#include "game/dino_battle_view_kaseki_point_menu.h"
+#include "game/dino_battle_view_class.h"
+#include "m/smart_oam.h"
+#include "m/picture.h"
 #include "game/dino_sound.h"
 #include "m/bg.h"
 #include "m/display.h"
@@ -85,6 +90,34 @@ void DinoBattleViewEffectTelop::StateStart() {
     }
     mSerial.AddTail(DinoSoundCreatePlaySeTask(0x52, 0));
     mState = data_ov000_0219387c.State_70;
+}
+
+extern "C" MMotion *func_ov000_02173d64(MSmartOam *oam, const std::string &name, u32 arg2, u32 arg3, u8 arg4);
+
+// (In the background.) Loads the telop's picture and, for a player's telop, their name.
+void DinoBattleViewEffectTelop::Load() {
+    mPicture = new MExtAffinePicture(std::string(mUnk80), TRUE, true);
+    mParallel.AddTail(mPicture);
+    if (mUnk9C) {
+        BOOL side = mUnk98 == 2;
+        MSmartOam *oam = new MSmartOam(11, 0, TRUE);
+        mName = func_ov000_02173d64(oam, ((DinoBattleView *)mUnk7C)->GetPlayerByAC(side)->GetUnkC0(), side,
+                                     ((DinoBattleView *)mUnk7C)->GetPlayerByAC(side)->mUnkCC, 0);
+        MTaskSet *parallel = &mParallel;
+        parallel->AddTail(mName);
+        parallel->AddTail(oam);
+    } else {
+        mName = NULL;
+    }
+}
+
+// Takes the telop away, then reports that it's done.
+void DinoBattleViewEffectTelop::StateFinish() {
+    GetSerial()->AddTail(MTaskExitTransfer::Create(mPicture), new MTimer(1), new SetBGModeTask(gLcd->mSub->mBg, 0));
+    if (mUnk8C != 0) {
+        mSerial.AddTail(((MMessageObserver *)mUnk8C)->CreatePostTask((MMessage *)mUnk90));
+    }
+    mSerial.AddTail(MTaskExitTransfer::Create(this));
 }
 
 void SetBGModeTask::Execute() {

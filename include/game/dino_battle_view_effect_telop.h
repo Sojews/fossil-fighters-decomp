@@ -19,19 +19,26 @@ public:
     virtual void Idle();
 
     void StateStart();
+    void Load();
+    void StateFinish();
 
     void (DinoBattleViewEffectTelop::*mState)(); // 0x74
     u32 mUnk7C;                                 // 0x7C
     std::string mUnk80;                         // 0x80
     u32 mUnk8C;                                 // 0x8C
     u32 mUnk90;                                 // 0x90
-    u32 unk94;
+    class MExtAffinePicture *mPicture;          // 0x94
     u32 mUnk98;                                 // 0x98
-    u8 mUnk9C;                                  // 0x9C
+    u8 mUnk9C;                                  // 0x9C: with the player's name
+    class MMotion *mName;                       // 0xA0
 };
 
 class SetBGModeTask : public MTask {
 public:
+    SetBGModeTask(MBg *bg, int mode) {
+        mBg = bg;
+        mMode = mode;
+    }
     virtual ~SetBGModeTask();
     virtual void Execute();
 
