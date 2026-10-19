@@ -80,6 +80,8 @@ extern "C" struct {
     void (B3DStatusViewTask::*State_74)();
     u8 unk7C[0xD4 - 0x7C];
     void (B3DStatusViewTask::*State_D4)();
+    u8 unkDC[0xEC - 0xDC];
+    void (B3DStatusViewTask::*State_EC)();
 } data_ov000_021962e8;
 
 extern "C" MTask *func_ov000_0218abd0(void *camera, int light);
@@ -133,8 +135,28 @@ void B3DStatusViewTask::StateFade() {
     GetSerial()->AddTail(new DinoBattleView3DMask((DinoBattleView3DMask::View *)mView, 1 << i),
                          func_ov000_0218ac04(mView->mUnkE8, (u8 *)mView + 0x1E0, &data_ov000_02190334, mUnk84 == 0),
                          new DinoBattleView3DGroupFade(mView->mUnkE8, (DinoBattleView3DGroupFade::Target *)mView,
-                                                       mUnk84, i));
+                                                       mUnk84, 0, i));
     mState = data_ov000_021962e8.State_5C;
+}
+
+// Goes on to the next status: within the same group the cameras just resume, else the group fades.
+// NONMATCHING: 98%, the fade's duration is loaded later than in the game (scheduling).
+void B3DStatusViewTask::StateNext() {
+    mView->GetUnk19C(&mUnk7C, &mUnk80);
+    if (mUnk80 == (u32)-1) {
+        mSerial.AddTail(MTaskExitTransfer::Create(this));
+        return;
+    }
+    if ((mUnk80 >> 16) == (mUnk7C >> 16)) {
+        GetSerial()->AddTail(func_ov000_0218ac40(mView->mUnkE8, 1), func_ov000_0218ac40(mView->mUnkE4, 1));
+        mState = data_ov000_021962e8.State_EC;
+        return;
+    }
+    mUnk84 = mView->mView->GetUnkE4(mUnk80 >> 16)->GetUnkAC();
+    GetSerial()->AddTail(new DinoBattleView3DGroupFade(mView->mUnkE4, (DinoBattleView3DGroupFade::Target *)mView,
+                                                       mUnk84 == 0, 1, -1),
+                         func_ov000_0218ac40(mView->mUnkE4, 1), func_ov000_0218ac40(mView->mUnkE8, 0));
+    mState = data_ov000_021962e8.State_4C;
 }
 
 // Shows the view's current status, then goes on to the next (fading in between different ones).

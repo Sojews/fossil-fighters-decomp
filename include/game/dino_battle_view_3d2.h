@@ -70,10 +70,10 @@ extern "C" u32 data_0208a0b4, data_0208a0b8;
 class DinoBattleView3DGroupFade : public MProcess {
 public:
     struct Target;
-    DinoBattleView3DGroupFade(void *camera, Target *target, u32 saved, int slot) : MProcess(NULL) {
+    DinoBattleView3DGroupFade(void *camera, Target *target, u32 saved, u32 unk7C, int slot) : MProcess(NULL) {
         mTarget = target;
         mSaved = saved;
-        mUnk7C = 0;
+        mUnk7C = unk7C;
         mSlot = slot;
         mUnk84 = 0;
         mCamera = camera;
