@@ -3,6 +3,7 @@
 
 #define DINO_COMMON_TUTORIAL_WINDOW_OWNER
 #define MSL_STRING_BASICS
+#include "m/oam_canvas.h"
 #include "game/dino_common_tutorial_console_filter.h"
 #include "game/dino_common_tutorial_window.h"
 #include "game/dino_sound.h"
@@ -99,5 +100,12 @@ template std::wstring::~basic_string();
 #pragma dont_inline on
 void DinoTutorialFilterWStringAnchor(const wchar_t *text) {
     std::wstring s(text);
+}
+#pragma dont_inline reset
+
+// (Making one here emits the canvas's destructors, which the game emits in this file.)
+#pragma dont_inline on
+MObjCanvas *DinoTutorialFilterCanvasAnchor(MDisplay *display, MOam *oam, MPoint size, const void *palette) {
+    return new MObjCanvas(display, oam, size, palette, TRUE);
 }
 #pragma dont_inline reset

@@ -3,6 +3,7 @@
 
 #define MSL_STRING_PLUS_DEFINITIONS
 #define MSL_STRING_BASICS
+#include "m/oam_canvas.h"
 #include "game/dino_guide_message.h"
 #include "m/lcd.h"
 
@@ -43,3 +44,10 @@ void DinoGuideMessage::Unk0C() {
 
 // String members the game emits in this file.
 template std::string::basic_string(const std::string &other);
+
+// (Making one here emits the canvas's destructors, which the game emits in this file.)
+#pragma dont_inline on
+MSmartObjCanvas *DinoGuideMessageCanvasAnchor(MDisplay *display, MSmartOam *oam, MPoint size, const void *palette) {
+    return new MSmartObjCanvas(display, oam, size, palette, TRUE);
+}
+#pragma dont_inline reset

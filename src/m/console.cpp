@@ -167,3 +167,10 @@ void MConsole::PushChar(int c) {
 
 // String members the game emits in this file.
 template std::wstring &std::wstring::operator+=(const std::wstring &str);
+
+// (Destroying one here emits the window's destructors, which the game emits in this file.)
+#pragma dont_inline on
+void MConsoleWindowAnchor(MCanvasWindow *window) {
+    window->MCanvasWindow::~MCanvasWindow();
+}
+#pragma dont_inline reset
