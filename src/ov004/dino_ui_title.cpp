@@ -85,12 +85,14 @@ void DinoUiOpening::Idle() {
 
 // Template task instances the game emits in this file. Until the code that makes the tasks is decompiled, they are
 // instantiated explicitly.
+#pragma auto_inline off
 template class MBgCallTask0<DinoUiTitle>;
 template MTask *MCreateBgCallTask(DinoUiTitle *obj, void (DinoUiTitle::*func)(), int thread);
 template class MCallTask1<MBg, MBg, bg_mode>;
 template MTask *MCreateCallTask(MBg *obj, void (MBg::*func)(bg_mode), bg_mode a0);
 template class MBgCallTask0<DinoUiOpening>;
 template MTask *MCreateBgCallTask(DinoUiOpening *obj, void (DinoUiOpening::*func)(), int thread);
+#pragma auto_inline reset
 
 void DinoUiTitleMenu::OnFocus(MMenuItem *item) {
     mIdleTime = 0;
@@ -150,7 +152,9 @@ extern "C" struct {
     u8 unk34[0x3C - 0x34];
     void (DinoUiTitle::*Unk0215ee60_3C)(); // 0x3c
     void (DinoUiTitle::*Unk0215f4ec_44)(); // 0x44
-    u8 unk4C[0x6C - 0x4C];
+    u8 unk4C[0x54 - 0x4C];
+    void (DinoUiTitle::*StateToSaveSlot_54)(); // 0x54
+    u8 unk5C[0x6C - 0x5C];
     void (DinoUiTitle::*Unk0215d818_6C)(); // 0x6c
     void (DinoUiTitle::*StateOpening_74)(); // 0x74
     void (DinoUiTitle::*StateSaveSlot_7C)(); // 0x7c
@@ -176,7 +180,8 @@ extern "C" struct {
     void (DinoUiTitle::*Unk0215d818_13C)(); // 0x13c
     void (DinoUiTitle::*Unk0215e9e4_144)(); // 0x144
     void (DinoUiTitle::*StateWarning_14C)(); // 0x14c
-    u8 unk154[0x164 - 0x154];
+    void (MBg::*SetMode_154)(bg_mode); // 0x154
+    void (DinoUiTitle::*StateSaveSlot_15C)(); // 0x15c
     void (DinoUiTitle::*StateSaveSlotEnd_164)(); // 0x164
 } data_ov004_02172f78;
 
@@ -186,6 +191,16 @@ inline DinoUiOpening::DinoUiOpening(MInput *input) : MProcess(NULL), mInput(inpu
 
 DinoUiTitle::DinoUiTitle(s32 *result) : MProcess(NULL), mResult(result) {
     mState = data_ov004_02172f78.Start_B4;
+}
+
+// Slides the title away and the save slots in, then shows the slot select.
+void DinoUiTitle::StateToSaveSlot() {
+    GetSerial()->AddTail((new MParallelTaskSet(TRUE))
+                             ->Add(mUnk8C->CreateCoordAnime(MPoint(0, 0), MPoint(0, -0xA0), 60, 12))
+                             ->Add(mUnk90->CreateCoordAnime(MPoint(0, 0xC0), MPoint(0, 0x10), 60, 12)),
+                         MTaskExitTransfer::Create(mUnk8C), new MTimer(1),
+                         MCreateCallTask(gLcd->GetBottomDisplay()->mBg, data_ov004_02172f78.SetMode_154, (bg_mode)0));
+    mState = data_ov004_02172f78.StateSaveSlot_15C;
 }
 
 void DinoUiTitleMenu::OnStart() {

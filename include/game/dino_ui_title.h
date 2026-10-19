@@ -27,6 +27,7 @@ public:
     void LoadLogo();
     void StateOpening();
     void StateMenu();
+    void StateToSaveSlot();
     void StateSaveSlot();
     void StateSaveSlotEnd();
     void StateTopMenu();
@@ -37,7 +38,8 @@ public:
     MInput *mInput;                // 0x80
     u8 mSkipped;                   // 0x84
     MSmartOam *mOam;               // 0x88
-    u32 unk8C[2];
+    MView *mUnk8C;                 // 0x8C: slides away for the save slots
+    MView *mUnk90;                 // 0x90: the save slots' panel
     MMenu *mMenu;                  // 0x94: the title menu
     MMotion *mLogo;                // 0x98
     u32 unk9C;
