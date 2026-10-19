@@ -82,6 +82,32 @@ namespace std {
         b       = move(temp);
     }
 
+    template <class ForwardIterator> inline ForwardIterator min_element(ForwardIterator first, ForwardIterator last) {
+        ForwardIterator result = first;
+        if (first != last) {
+            while (++first != last) {
+                if (*first < *result) {
+                    result = first;
+                }
+            }
+        }
+        return result;
+    }
+
+    template <class ForwardIterator, class Compare>
+    inline ForwardIterator min_element(ForwardIterator first, ForwardIterator last, Compare comp) {
+        if (first == last) {
+            return first;
+        }
+        ForwardIterator result = first;
+        while (++first != last) {
+            if (comp(*first, *result)) {
+                result = first;
+            }
+        }
+        return result;
+    }
+
     // stable_sort (Hinnant's): merge sort with a temporary buffer, insertion sort below 21 elements.
 
     // The temporary buffer: its storage, how much of it is constructed.

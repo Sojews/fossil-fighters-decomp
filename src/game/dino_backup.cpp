@@ -1560,3 +1560,35 @@ void DinoBackup::MakeProfile(DinoPlayerProfile *profile) {
         profile->name[i] = mPlayer->name[i];
     }
 }
+
+// The order of the field rocks' entries: free ones first, then by unk1 (highest first), then oldest first.
+inline bool operator<(const DinoBackupEntry28 &a, const DinoBackupEntry28 &b) {
+    {
+        if (a.used < b.used) {
+            return true;
+        }
+        if (a.used > b.used) {
+            return false;
+        }
+        if (a.unk1 > b.unk1) {
+            return true;
+        }
+        if (a.unk1 < b.unk1) {
+            return false;
+        }
+        return a.time < b.time;
+    }
+}
+
+// Selection sort (in the entries' order).
+extern "C" void func_0201b0a4(DinoBackupEntry28 *first, DinoBackupEntry28 *last) {
+    if (first == last) {
+        return;
+    }
+    for (; first != last - 1; first++) {
+        DinoBackupEntry28 *min = std::min_element(first, last);
+        if (min != first) {
+            std::swap(*min, *first);
+        }
+    }
+}
