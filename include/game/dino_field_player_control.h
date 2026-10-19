@@ -2,6 +2,9 @@
 #ifndef GAME_DINO_FIELD_PLAYER_CONTROL_H
 #define GAME_DINO_FIELD_PLAYER_CONTROL_H
 
+#include "m/resource.h"
+#include "game/dino_resource.h"
+
 #include "m/task.h"
 #include "m/archive.h"
 #include "nitro/fx.h"
@@ -18,7 +21,7 @@ struct DinoFieldPlayerControlResult {
 
 class DinoFieldPlayerControl : public MProcess {
 public:
-    DinoFieldPlayerControl(DinoField *field, u32 arg1, DinoFieldPlayerControlResult *result, u32 arg3);
+    DinoFieldPlayerControl(DinoField *field, u32 *arg1, DinoFieldPlayerControlResult *result, u32 arg3);
     virtual ~DinoFieldPlayerControl();
     virtual void Idle();
 
@@ -32,15 +35,19 @@ public:
     }
 
     DinoField *mField;      // 0x74
-    u32 mUnk78;             // 0x78
+    u32 *mUnk78;            // 0x78: cleared at the start
     DinoFieldPlayerControlResult *mResult;  // 0x7C
-    u32 mUnk80[4];          // 0x80
+    u32 mUnk80;             // 0x80: the field's unk234
+    u32 mUnk84;             // 0x84
+    u32 mUnk88;             // 0x88
+    u32 mUnk8C;             // 0x8C
     u16 mUnk90;             // 0x90
     u32 mUnk94;             // 0x94
-    u32 mUnk98[6];          // 0x98
+    u8 mUnk98;              // 0x98
+    u8 unk99[0xAC - 0x99];
+    u32 mUnkAC;             // 0xAC
     MPolygonChar *mEffect;  // 0xB0
-    MArchivePtr mArchive;   // 0xB4
-    MArchiveFile mFile;     // 0xB8
+    MResource<DinoExcavateDefs> mExcavateDefs;  // 0xB4
 };
 
 #endif

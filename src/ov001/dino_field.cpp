@@ -1182,7 +1182,7 @@ extern "C" MProcess *func_ov001_02159d3c(DinoField *field) {
 }
 
 // The player's control on the field.
-extern "C" MProcess *func_ov001_021580a0(DinoField *field, u32 arg1, DinoFieldPlayerControlResult *result, u32 arg3) {
+extern "C" MProcess *func_ov001_021580a0(DinoField *field, u32 *arg1, DinoFieldPlayerControlResult *result, u32 arg3) {
     return new DinoFieldPlayerControl(field, arg1, result, arg3);
 }
 

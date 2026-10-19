@@ -8,6 +8,21 @@
 #include "m/anm_model.h"
 #include "game/dino_field.h"
 
+DinoFieldPlayerControl::DinoFieldPlayerControl(DinoField *field, u32 *arg1, DinoFieldPlayerControlResult *result,
+                                               u32 arg3)
+    : MProcess(NULL), mField(field), mUnk78(arg1), mResult(result), mUnk8C(arg3), mUnk98(0), mUnkAC(0),
+      mExcavateDefs(gDinoResource->GetExcavateDefs()) {
+    mUnk80 = mField->GetUnk234();
+    mUnk88 = 0;
+    mUnk84 = 0;
+    if (mResult->unk08) {
+        mUnk90 = mResult->unk00;
+        mUnk94 = mResult->unk04;
+    }
+    *mUnk78 = 0;
+    mEffect = NULL;
+}
+
 DinoFieldPlayerControl::~DinoFieldPlayerControl() {
     StoreResult();
 }
