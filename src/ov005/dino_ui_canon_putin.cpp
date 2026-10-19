@@ -69,6 +69,34 @@ DinoUiCanonPutinMenu::DinoUiCanonPutinMenu() {
     mUnk104 = data_0208a574;
 }
 
+// "image/bg_container03" (the TU's string literals are pooled data too).
+extern "C" const char data_ov005_0216c9f0[];
+extern "C" struct {
+    u32 unk00;
+    const char *takeoutDecideMotion;    // 0x04
+    const char *putinDecideMotion;      // 0x08
+} data_ov005_0216c718;
+extern "C" const u32 data_0208a580, data_0208a578, data_0208a570, data_0208a57c, data_0208a920;
+
+void DinoUiCanonPutinMenu::Setup() {
+    mParallel.AddTail(mBackground = new MTextPicture(data_ov005_0216c9f0, TRUE, false));
+    mBackground->Show();
+    mBackground->SetPriority(2);
+    gDinoBackup->CompactUnk98();
+    mParallel.AddTail(new DinoHelpDummyItem(GetDisplay(), MRect(0x1E, 0xC, 0xE2, 0x6C),
+                                            std::string(gDinoResource->GetText(data_0208a580))));
+    mParallel.AddTail(new DinoHelpDummyItem(GetDisplay(), MRect(0x13, 0x90, 0xF1, 0x9F),
+                                            std::string(gDinoResource->GetText(data_0208a578))));
+    mParallel.AddTail(new DinoHelpDummyItem(GetDisplay(), MRect(0xE9, 0x5D, 0xF7, 0x6E),
+                                            std::string(gDinoResource->GetText(data_0208a570))));
+    CreateDecideButton(data_ov005_0216c718.putinDecideMotion, data_0208a57c);
+    DinoPlayerData player;
+    gDinoBackup->GetPlayer(&player, 0);
+    mFraction->SetDenominator(player.containerNum);
+    mFraction->Show();
+    mParallel.AddTail(new DinoGuideMessage(std::string(gDinoResource->GetText(data_0208a920))));
+}
+
 extern "C" const u32 data_0208a560;
 
 DinoUiCanonTakeoutMenu::DinoUiCanonTakeoutMenu() {
@@ -76,12 +104,8 @@ DinoUiCanonTakeoutMenu::DinoUiCanonTakeoutMenu() {
     mUnk104 = data_0208a560;
 }
 
-// "image/bg_container04" (the TU's string literals are pooled data too).
+// "image/bg_container04".
 extern "C" const char data_ov005_0216ca08[];
-extern "C" struct {
-    u32 unk00;
-    const char *decideMotion;   // 0x04
-} data_ov005_0216c718;
 extern "C" const u32 data_0208a56c, data_0208a564, data_0208a568, data_0208a91c;
 
 void DinoUiCanonTakeoutMenu::Setup() {
@@ -94,7 +118,7 @@ void DinoUiCanonTakeoutMenu::Setup() {
     DinoHelpDummyItem *back;
     mParallel.AddTail(back = new DinoHelpDummyItem(GetDisplay(), MRect(0x13, 0x90, 0xF1, 0x9F),
                                                    std::string(gDinoResource->GetText(data_0208a564))));
-    CreateDecideButton(data_ov005_0216c718.decideMotion, data_0208a568);
+    CreateDecideButton(data_ov005_0216c718.takeoutDecideMotion, data_0208a568);
     AddHelpEntries((u32)back);
     mParallel.AddTail(new DinoGuideMessage(std::string(gDinoResource->GetText(data_0208a91c))));
 }
