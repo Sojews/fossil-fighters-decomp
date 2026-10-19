@@ -127,7 +127,8 @@ public:
     MTask *CreateLcdFadeTask(BOOL clearIcons);
     DinoBattleModelCreature *GetCreatureInSlot(int slot);
     void ClearEvents();
-    void AddAbilitySequence(MTaskSet *set, u32 a, u32 b, u32 attacker, std::vector<u32> &targets, u8 recolor);
+    void AddAbilitySequence(MTaskSet *set, u32 a, u32 b, u32 attacker, std::vector<void *> &targets, u8 recolor);
+    void AddAbilitySequence(MTaskSet *set, u32 a, u32 b, u32 attacker, void *target, u8 recolor);
 
     std::vector<DinoBattlePlayerEvent> mUnkA8; // 0xA8
     u32 unkB4;

@@ -710,15 +710,24 @@ MTask *DinoBattleModelPlayer::CreateLcdFadeTask(BOOL clearIcons) {
     return set;
 }
 
+// The same with one target (or none: the attacker's own).
+void DinoBattleModelPlayer::AddAbilitySequence(MTaskSet *set, u32 a, u32 b, u32 attacker, void *target, u8 recolor) {
+    std::vector<void *> targets;
+    if ((void *)attacker != target) {
+        targets.push_back(target);
+    }
+    AddAbilitySequence(set, a, b, attacker, targets, recolor);
+}
+
 // Adds the view's side of an ability to set: the attack bar, the ability itself, the fade and the targets'
 // coloring, then undoes them.
 void DinoBattleModelPlayer::AddAbilitySequence(MTaskSet *set, u32 a, u32 b, u32 attacker,
-                                               std::vector<u32> &targets, u8 recolor) {
+                                               std::vector<void *> &targets, u8 recolor) {
     u32 ids[6] = {attacker};
     u32 n = 1;
     for (u32 i = 0; i < targets.size(); i++) {
-        if (attacker != targets[i]) {
-            ids[n++] = targets[i];
+        if (attacker != (u32)targets[i]) {
+            ids[n++] = (u32)targets[i];
         }
     }
     MTask *color;
