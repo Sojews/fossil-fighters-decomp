@@ -252,7 +252,9 @@ extern "C" struct {
     u8 unk00[0x4];
     MFx32 mChipPower;           // 0x04: what each cell takes when the rock is cleared at once
     const char *mCountFormat;   // 0x08
-    u8 unk0C[0x2C - 0xC];
+    u8 unk0C[0x14 - 0xC];
+    const char *mCleanPath;     // 0x14: the picture shown when the rock comes clean
+    u8 unk18[0x2C - 0x18];
     int mZero_2C;               // 0x2C: (the constant the count's shake is clamped to)
     u8 unk30[0x48 - 0x30];
     void (DinoCleaning::*State02160638_48)(); // 0x48
@@ -263,7 +265,8 @@ extern "C" struct {
     void (DinoCleaning::*Unk02161490_78)();
 } data_ov002_021659ec;
 extern "C" struct {
-    u8 unk00[0x10];
+    void (DinoCleaning::*StateEnableToolMenu_00)(); // 0x00
+    u8 unk08[0x10 - 0x8];
     void (DinoCleaning::*State02161164_10)(); // 0x10
     u8 unk18[0x20 - 0x18];
     void (DinoCleaning::*StateQuit_20)(); // 0x20
@@ -494,6 +497,48 @@ static inline void AddSerial(DinoCleaning *process, MTask *a, MTask *b, MTask *c
     serial->AddTail(b);
     serial->AddTail(c);
     serial->AddTail(d);
+}
+
+extern "C" struct {
+    void (DinoHelpBase::*Enable_00)(); // 0x00
+} data_ov002_02165b5c;
+
+static inline void AddSerial(DinoCleaning *process, MTask *a, MTask *b, MTask *c, MTask *d, MTask *e, MTask *f) {
+    MSerialTaskSet *serial = &process->mSerial;
+    serial->AddTail(a);
+    serial->AddTail(b);
+    serial->AddTail(c);
+    serial->AddTail(d);
+    serial->AddTail(e);
+    serial->AddTail(f);
+}
+
+// The rock is clean: stops the x-ray and the status, flashes the picture, then gives back the help.
+void DinoCleaning::State02161260() {
+    mUnkE4->SetUnkA0(0, FALSE);
+    mUnkE4->SetUnkA0(1, TRUE);
+    mUnkE4->SetUnkAC(4);
+    if (mMode != 2) {
+        DinoSoundPlayBgm(0x36, 0);
+    }
+    DinoSoundPlaySe(0x1B, 0);
+    mKasekiRock->StopXray();
+    mStatus->Stop();
+    mToolMenu->FocusFirst();
+    mToolMenu->DisableItem();
+    mTool = mNextTool;
+    MTextPicture *picture = new MTextPicture(std::string(data_ov002_021659ec.mCleanPath), TRUE, false);
+    picture->Show();
+    mParallel.AddTail(picture);
+    MBlend *blend = gCurrentDisplay->mBlend;
+    blend->SetMode(1);
+    blend->SetTarget1(picture->GetPlaneMask());
+    blend->SetTarget2(0x3F);
+    blend->SetAlpha(16, 16);
+    DinoHelpBase::Disable();
+    AddSerial(this, new MTimer(1), blend->CreateAlphaRatioAnime(16, 0, 16, 16, 5, 0), MTaskExitTransfer::Create(picture),
+              blend->CreateClearTransfer(), new MTimer(1), MCreateCallTask(this, data_ov002_02165b5c.Enable_00));
+    mState = data_ov002_02165a6c.StateEnableToolMenu_00;
 }
 
 // Starts the rock and, after a moment, the help and the live commentary.
