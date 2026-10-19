@@ -1069,7 +1069,7 @@ func_ov000_02180860 kind:function(thumb,size=0x2) addr:0x02180860
 _ZN26DinoBattleViewUiRootSelect7OnFocusEP9MMenuItem kind:function(thumb,size=0x50) addr:0x02180864
 _ZN26DinoBattleViewUiRootSelect6OnIdleEv kind:function(thumb,size=0xac) addr:0x021808b4
 _ZN26DinoBattleViewUiRootSelect8OnDecideEP9MMenuItem kind:function(thumb,size=0x35c) addr:0x02180960
-func_ov000_02180cbc kind:function(thumb,size=0x7c) addr:0x02180cbc
+_ZN27DinoBattleViewTurnEndDialogC1EmP16MMessageObserveri kind:function(thumb,size=0x7c) addr:0x02180cbc
 _ZN27DinoBattleViewTurnEndDialog7OnStartEv kind:function(thumb,size=0x28) addr:0x02180d38
 _ZN27DinoBattleViewTurnEndDialog8OnDecideEP9MMenuItem kind:function(thumb,size=0xe8) addr:0x02180d60
 _ZN27DinoBattleViewTurnEndDialog7OnFocusEP9MMenuItem kind:function(thumb,size=0x38) addr:0x02180e48
@@ -2204,9 +2204,7 @@ data_ov000_02195b38 kind:data(any) addr:0x02195b38
 _ZTS32DinoBattleViewCreatureAttackIcon kind:data(any) addr:0x02195b5c
 _ZTV32DinoBattleViewCreatureAttackIcon kind:data(any) addr:0x02195b80
 _ZTV28DinoBattleViewGivingUpDialog kind:data(any) addr:0x02195bac
-data_ov000_02195be4 kind:data(any) addr:0x02195be4
 _ZTV27DinoBattleViewTurnEndDialog kind:data(any) addr:0x02195bec
-data_ov000_02195c24 kind:data(any) addr:0x02195c24
 _ZTV26DinoBattleViewUiRootSelect kind:data(any) addr:0x02195c2c
 data_ov000_02195c64 kind:data(any) addr:0x02195c64
 _ZTV30DinoBattleViewUiRootSelectItem kind:data(any) addr:0x02195c6c

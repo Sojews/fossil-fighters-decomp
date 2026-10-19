@@ -42,6 +42,7 @@ public:
 
 class DinoBattleViewTurnEndDialog : public DinoCommonYesNoMenu {
 public:
+    DinoBattleViewTurnEndDialog(u32 view, MMessageObserver *target, BOOL focusNo);
     virtual ~DinoBattleViewTurnEndDialog();
     virtual void OnStart();
     virtual void OnFocus(MMenuItem *item);

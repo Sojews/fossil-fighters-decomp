@@ -123,6 +123,15 @@ void MenuExitTask::Execute() {
 
 extern "C" MTask *func_ov000_0218ec8c(u32 arg0, int arg1, BOOL *proceed);
 
+extern "C" const u32 data_0208a3a0, data_0208a3a4, data_0208a444;
+
+// NONMATCHING: 99.9%, the game tests the flag with the branch the other way round (beq to the 1).
+DinoBattleViewTurnEndDialog::DinoBattleViewTurnEndDialog(u32 view, MMessageObserver *target, BOOL focusNo)
+    : DinoCommonYesNoMenu(std::string(gDinoResource->GetText(data_0208a444)), NULL, data_0208a3a4, data_0208a3a0,
+                          !focusNo),
+      mTarget(target), mUnkE0(view) {
+}
+
 void DinoBattleViewTurnEndDialog::OnStart() {
     DinoCommonYesNoMenu::OnStart();
     MTask *task = func_ov000_0218ec8c(((DinoBattleView *)mUnkE0)->GetUnk12C(), 0x20, 0);
@@ -264,10 +273,10 @@ void DinoBattleDebugLog::Clear() {
 
 #pragma auto_inline off
 
-extern "C" const u32 data_0208a394, data_0208a3a0;
+extern "C" const u32 data_0208a39c, data_0208a3a0;
 
 DinoBattleViewGivingUpDialog::DinoBattleViewGivingUpDialog(const char *text, u8 *givingUp)
-    : DinoCommonYesNoMenu(std::string(text), NULL, data_0208a394, data_0208a3a0, 1), mGivingUp(givingUp) {
+    : DinoCommonYesNoMenu(std::string(text), NULL, data_0208a39c, data_0208a3a0, 1), mGivingUp(givingUp) {
 }
 
 // (Empty; nothing in the game calls it.)

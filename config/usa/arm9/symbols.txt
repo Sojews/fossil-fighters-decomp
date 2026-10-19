@@ -2475,7 +2475,7 @@ _ZN23DinoCommonYesNoMenuItem8OnDecideEv kind:function(thumb,size=0x20) addr:0x02
 _ZN23DinoCommonYesNoMenuItem7GetRectEv kind:function(thumb,size=0xa) addr:0x02030944
 _ZN23DinoCommonYesNoMenuItem10GetDisplayEv kind:function(thumb,size=0x10) addr:0x02030950
 _ZN23DinoCommonYesNoMenuItem7GetTextEv kind:function(thumb,size=0x18) addr:0x02030960
-_ZN19DinoCommonYesNoMenuC1ERKSsPimmm kind:function(thumb,size=0x68) addr:0x02030978
+_ZN19DinoCommonYesNoMenuC2ERKSsPimmm kind:function(thumb,size=0x68) addr:0x02030978
 _ZN19DinoCommonYesNoMenu7OnStartEv kind:function(thumb,size=0x2a8) addr:0x020309e0
 _ZN19DinoCommonYesNoMenu7OnFocusEP9MMenuItem kind:function(thumb,size=0x30) addr:0x02030c88
 _ZN19DinoCommonYesNoMenu8OnDecideEP9MMenuItem kind:function(thumb,size=0x5c) addr:0x02030cb8
@@ -6727,6 +6727,8 @@ data_0208a384 kind:data(any) addr:0x0208a384
 data_0208a38c kind:data(any) addr:0x0208a38c
 data_0208a390 kind:data(any) addr:0x0208a390
 data_0208a394 kind:data(any) addr:0x0208a394
+data_0208a398 kind:data(any) addr:0x0208a398
+data_0208a39c kind:data(any) addr:0x0208a39c
 data_0208a3a0 kind:data(any) addr:0x0208a3a0
 data_0208a3a4 kind:data(any) addr:0x0208a3a4
 data_0208a3b8 kind:data(any) addr:0x0208a3b8
