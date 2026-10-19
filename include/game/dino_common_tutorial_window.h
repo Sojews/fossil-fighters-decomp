@@ -22,6 +22,7 @@ public:
 
     void ShowLongArrow(MPoint pos, int dir);
     void ShowShortArrow(MPoint pos, int dir);
+    void ShowCorners(MRect rect);
 
     void (DinoCommonTutorialWindow::*mState)(); // 0x74
     std::string mText;  // 0x7C
