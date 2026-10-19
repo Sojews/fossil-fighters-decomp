@@ -17,6 +17,9 @@
 #include "game/dino_battle_view2.h"
 #include "game/dino_battle_view_backdrop.h"
 #include "game/dino_resource.h"
+#include "game/dino_battle_view_creature.h"
+#include "m/lcd.h"
+#include "m/blend.h"
 
 DinoBattleViewWinnerScrollTask::~DinoBattleViewWinnerScrollTask() {
     if (!mUnk78) {
@@ -167,3 +170,88 @@ template void std::__vec_deleter<MMotionFile, std::allocator<MMotionFile> >::era
 template void std::__vec_deleter<MPictureFile, std::allocator<MPictureFile> >::sub_push_back(const MPictureFile &x, Metrowerks::int2type<false>);
 template std::__vec_deleter<MPictureFile, std::allocator<MPictureFile> >::~__vec_deleter();
 template void std::__vec_deleter<MPictureFile, std::allocator<MPictureFile> >::erase_at_end(size_t n, Metrowerks::int2type<false>);
+
+#pragma auto_inline off
+
+// Fades the backdrop over to the table.
+extern "C" void func_ov000_0216147c(DinoBattleViewUnkE0 *field, u32 table) {
+    DinoBattleViewBackdrop *backdrop = field->mBackdrop;
+    if (backdrop != NULL) {
+        backdrop->mFrom = backdrop->mTable;
+        backdrop->mTo = table;
+        backdrop->mDuration = 30;
+        backdrop->mFrame = 0;
+        backdrop->mFading = TRUE;
+    }
+}
+
+extern "C" void func_ov000_021614b4(DinoBattleViewUnkE0 *field) {
+    for (int side = 0; side < 2; side++) {
+        DinoBattleViewPlayer *player = field->mView->GetUnkE4(side);
+        for (int i = 0; i < player->GetCreatureCount(); i++) {
+            DinoBattleViewCreature *creature = player->GetCreature(i);
+            creature->SetUnitModes(FALSE);
+            creature->SetMotionPriority(2);
+            creature->SetMotionAnchor(0);
+        }
+    }
+}
+
+DinoBattleViewLCDFader::DinoBattleViewLCDFader(u32 arg) : MProcess(NULL) {
+    mUnk74 = arg;
+    mDisplays[0] = gLcd->mMain;
+    mDisplays[1] = gLcd->mSub;
+    mRatios[0] = 0;
+    mRatios[1] = 0;
+}
+
+// Fades the screen's blend ratio (screen 1 only).
+extern "C" void func_ov000_02161550(DinoBattleViewLCDFader *fader, int lcd, int ratio, u32 duration, int ease) {
+    if (lcd != 0) {
+        MBlend *blend = fader->mDisplays[lcd]->mBlend;
+        blend->SetMode(3);
+        blend->SetAlpha(16, 0);
+        blend->SetTarget1(0x39);
+        blend->SetTarget2(0x3F);
+        fader->mParallel.AddTail(blend->CreateFadeRatioAnime(fader->mRatios[lcd], ratio, duration, ease));
+        fader->mRatios[lcd] = ratio;
+    }
+}
+
+// Runs the two tasks (ending the ones before).
+extern "C" void func_ov000_021615b4(DinoBattleViewUnkE0 *field, MTask *task, MTask *task2, u32 arg) {
+    if (field->mTask128 != NULL) {
+        field->mTask128->Exit();
+    }
+    field->mTask128 = task;
+    field->mTasksB8->AddTail(field->mTask128);
+    if (field->mTask12C != NULL) {
+        field->mTask12C->Exit();
+    }
+    field->mTask12C = task2;
+    if (field->mTask12C != NULL) {
+        field->mTasksB8->AddTail(field->mTask12C);
+        field->mUnk130 = arg;
+    }
+}
+
+extern "C" void func_ov000_0216170c(DinoBattleViewUnkE0 *field) {
+    if (field->mTask128 != NULL) {
+        field->mTask128->Exit();
+        field->mTask128 = NULL;
+    }
+    if (field->mTask12C != NULL) {
+        field->mTask12C->Exit();
+        field->mTask12C = NULL;
+    }
+}
+
+// Clears every creature's type advantage mark.
+extern "C" void func_ov000_02161748(DinoBattleViewUnkE0 *field) {
+    for (u32 side = 0; side < 2; side++) {
+        DinoBattleViewPlayer *player = field->mView->GetUnkE4(side);
+        for (u32 i = 0; i < player->GetCreatureCount(); i++) {
+            player->GetCreature(i)->ClearAdvantage();
+        }
+    }
+}

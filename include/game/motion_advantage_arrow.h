@@ -45,10 +45,16 @@ public:
     MMotion *mRect;         // 0x84
 };
 
+// Fades the screens (by blend ratio).
 class DinoBattleViewLCDFader : public MProcess {
 public:
+    DinoBattleViewLCDFader(u32 arg);
     virtual ~DinoBattleViewLCDFader();
     virtual void Idle();
+
+    u32 mUnk74;             // 0x74
+    MDisplay *mDisplays[2]; // 0x78: main, sub
+    int mRatios[2];         // 0x80
 };
 
 class TutorialWindowCloseTask : public MTask {

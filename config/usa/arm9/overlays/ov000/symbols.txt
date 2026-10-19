@@ -261,7 +261,7 @@ _ZN19DinoBattleViewField9OnMessageEP8MMessage kind:function(thumb,size=0x15e4) a
 .L_0216144a kind:label(thumb) addr:0x0216144a local
 func_ov000_0216147c kind:function(thumb,size=0x36) addr:0x0216147c
 func_ov000_021614b4 kind:function(thumb,size=0x5e) addr:0x021614b4
-func_ov000_02161514 kind:function(thumb,size=0x3c) addr:0x02161514
+_ZN22DinoBattleViewLCDFaderC1Em kind:function(thumb,size=0x3c) addr:0x02161514
 func_ov000_02161550 kind:function(thumb,size=0x5e) addr:0x02161550
 _ZN22DinoBattleViewLCDFader4IdleEv kind:function(thumb,size=0x2) addr:0x021615b0
 func_ov000_021615b4 kind:function(thumb,size=0x66) addr:0x021615b4

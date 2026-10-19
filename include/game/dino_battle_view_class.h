@@ -12,10 +12,24 @@ class DinoBattleViewPlayer;
 class DinoBattleViewCreature;
 class MSmartOam;
 
+class DinoBattleView;
+class DinoBattleViewBackdrop;
+
 class DinoBattleViewUnkE0 : public MProcess, public MMessageObserver {
 public:
-    u8 unkA8[0xC0 - 0xA8];
-    MView *mSlotViewsC0[0x1E];  // 0xC0: by slot group
+    u32 unkA8;
+    DinoBattleView *mView;      // 0xAC
+    u8 unkB0[0xB8 - 0xB0];
+    MTaskSet *mTasksB8;         // 0xB8
+    u32 unkBC;
+    MView *mSlotViewsC0[2];     // 0xC0: by side
+    u8 unkC8[0x120 - 0xC8];
+    DinoBattleViewBackdrop *mBackdrop;  // 0x120
+    u32 unk124;
+    MTask *mTask128;            // 0x128
+    MTask *mTask12C;            // 0x12C
+    u32 mUnk130;                // 0x130
+    u32 unk134;
     void *mUnk138;  // 0x138
     u8 unk13C[4];
     void *mUnk140;  // 0x140
