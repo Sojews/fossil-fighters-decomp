@@ -62,10 +62,17 @@ public:
     std::vector<MMotionFile> mUnk1B4;   // 0x1B4
 };
 
+class MExtAffinePicture;
+
 class DinoUiMuseumEffectLight : public MProcess {
 public:
     virtual ~DinoUiMuseumEffectLight();
     virtual void Idle();
+
+    MExtAffinePicture *mPicture;    // 0x74
+    u16 mAngle;                     // 0x78: of the bobbing
+    int mHeight;                    // 0x7C: risen so far
+    u32 mTimer;                     // 0x80: frames left to rise
 };
 
 class DinoUiMuseumMenu;

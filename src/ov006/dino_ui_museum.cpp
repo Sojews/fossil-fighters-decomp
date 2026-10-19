@@ -3,6 +3,7 @@
 // Derived destructors have their bases' destructor bodies inlined; auto-inlining the ones defined above does that.
 #pragma auto_inline on
 
+#include "m/picture.h"
 #include "game/dino_ui_museum_information_menu.h"
 #include "types.h"
 #include "game/dino_ui_museum.h"
@@ -353,3 +354,13 @@ void DinoUiMuseum3DModel::SetModel(u32 id) {
 
 // The museum's definitions, held in a static object (made and freed by the file's static initializer).
 static MResource<DinoMuseumDefs> sMuseumDefs;
+
+// Rises into place, bobbing up and down.
+void DinoUiMuseumEffectLight::Idle() {
+    if (mTimer != 0) {
+        mTimer--;
+        mHeight = 0x60 * (60 - mTimer) / 60;
+    }
+    mAngle += 0x190;
+    mPicture->SetPosition(0, MFx32ToInt(MFx32::FromRaw(FX_SinIdx(mAngle)) * MFx32(10)) - mHeight);
+}

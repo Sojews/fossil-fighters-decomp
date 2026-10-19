@@ -266,3 +266,12 @@ u32 DinoGetCreatureLevel(const DinoCreatureState *creature) {
     return (DinoGetCreatureTotal(creature) - 50) / kCreatureLevelLimits[0] + 1;
 }
 
+// Rises into place, bobbing up and down.
+void DinoUiReviveEffectLight::Idle() {
+    if (mTimer != 0) {
+        mTimer--;
+        mHeight = 0x60 * func_ov003_0215b480(0x78 - mTimer) / func_ov003_0215b480(0x78);
+    }
+    mAngle += 0x190;
+    mPicture->SetPosition(0, MFx32ToInt(MFx32::FromRaw(FX_SinIdx(mAngle)) * MFx32(10)) - mHeight);
+}
