@@ -57,20 +57,45 @@ void DinoFieldMap::ClearGradation() {
     mGradation->SetGradation(0, 0, 0, 0, 0, 0);
 }
 
-// NONMATCHING: the game keeps the bounds and the cell in memory (more temporaries; the rect's fields re-read).
+// The point's whole part.
+static inline MPoint ToPoint(MFx32Point p) {
+    return MPoint(MFx32ToInt(p.x), MFx32ToInt(p.y));
+}
+
+// NONMATCHING: stack slots of the division's temporaries only (as GetCameraIndex).
 void *DinoFieldMap::GetArea(MFx32Point pos) {
     MResource<DinoFieldMapGrid> &grid = mGrid;
-    MFx32Point half = pos / MFx32(2);
-    MPoint cell(MFx32ToInt(half.x), MFx32ToInt(half.y));
-    MRect bounds(0, 0, grid.Get()->width, grid.Get()->height);
-    if (!bounds.Contains(cell)) {
+    MPoint cell = ToPoint(pos / MFx32(2));
+    if (!MRect(0, 0, grid.Get()->width, grid.Get()->height).Contains(cell)) {
         DinoFieldMapData *data = (DinoFieldMapData *) mData.mFile.GetData();
         return (u8 *) data + data->mAreas;
     }
-    u32 at = cell.y * grid.Get()->width + cell.x;
-    u8 area = ((const u8 *) grid.Get() + grid.Get()->cells)[at];
+    u32 at = cell.x + cell.y * grid.Get()->width;
+    u8 area = grid.Get()->GetCells()[at];
     DinoFieldMapData *data = (DinoFieldMapData *) mData.mFile.GetData();
     return (u8 *) data + data->mAreas + area * 0x14;
+}
+
+// GetCameraIndex's lowest cell, in this file's data (what is around it is not known).
+extern "C" struct {
+    u32 unk0;
+    int minY;   // 0x4
+    u32 unk8;
+    int minX;   // 0xC
+} data_ov001_0216a134;
+
+// NONMATCHING: stack slots of the division's temporaries only (the game's go the other way round).
+int DinoFieldMap::GetCameraIndex(MFx32Point pos) {
+    DinoFieldMapData *data = (DinoFieldMapData *) mData.mFile.GetData();
+    if (data->mCameraCount <= 1) {
+        return 0;
+    }
+    MResource<DinoFieldMapGrid> &grid = mCameraGrid;
+    MPoint cell = ToPoint(pos / MFx32(2));
+    cell.x = std::min((int) grid.Get()->width - 1, std::max(data_ov001_0216a134.minX, cell.x));
+    cell.y = std::min((int) grid.Get()->height - 1, std::max(data_ov001_0216a134.minY, cell.y));
+    u32 at = cell.x + cell.y * grid.Get()->width;
+    return grid.Get()->GetCells()[at];
 }
 
 void *DinoFieldMap::GetEntry44(int index) {

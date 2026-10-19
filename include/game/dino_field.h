@@ -279,8 +279,8 @@ struct DinoFieldMapData {
     MFx32 mWalkSpeed;   // 0x30: the speed characters' walk motion plays at
     u8 unk34[0x3C - 0x34];
     u32 mAreas;         // 0x3C: offset of the areas (0x14 bytes each)
-    u8 unk40[0x44 - 0x40];
-    u32 mEntries44;     // 0x44: offset of a table of 12-byte entries
+    u32 mCameraCount;   // 0x40: of the camera settings
+    u32 mEntries44;     // 0x44: offset of the camera settings (DinoFieldMapCamera)
     u32 unk48;
     u32 mEntries4C;     // 0x4C: offset of a table of offsets
 };
@@ -292,6 +292,8 @@ struct DinoFieldMapGrid {
     u32 height;         // 0x08
     u32 unk0C;
     u32 cells;          // 0x10: offset of width * height u8 area indexes
+
+    const u8 *GetCells() const { return (const u8 *) this + cells; }
 };
 
 // The field's settings file.
@@ -320,12 +322,14 @@ public:
     // The area at the position (the first one off the grid).
     void *GetArea(MFx32Point pos);
     void *GetEntry4C(int index);
+    // The camera setting at the position (the nearest cell's, off the grid; 0 if the map has just one).
+    int GetCameraIndex(MFx32Point pos);
 
     DinoFieldMapInfo mInfo; // 0x8C
     u32 mUnk90;             // 0x90
     MResource<u8> mData;    // 0x94
     MResource<DinoFieldMapGrid> mGrid;  // 0xA4
-    MResource<u8> mData3;   // 0xB4
+    MResource<DinoFieldMapGrid> mCameraGrid;    // 0xB4: a camera setting index per 2x2 cell
     void *mUnkC4;           // 0xC4: with a gradation behind the map
     MAnmModelBase *mModel;  // 0xC8: the map's model
     DinoGradationBg *mGradation;    // 0xCC
