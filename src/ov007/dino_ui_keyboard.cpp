@@ -14,9 +14,10 @@
 #include "m/blend.h"
 #include "m/window.h"
 #include "m/lcd.h"
+#include "m/picture.h"
 
 DinoUiKeyboardMenu::DinoUiKeyboardMenu(int mode, u32 arg, int flag)
-    : MMenu(NULL, 0), mUnk13C(0), mUnk144(0), mMode(mode), mArg(arg), mUnk190(0x20), mFlag(flag) {
+    : MMenu(NULL, 0), mPagePicture(NULL), mUnk144(0), mMode(mode), mArg(arg), mPage(0x20), mFlag(flag) {
 }
 
 DinoUiKeyboardMenu::~DinoUiKeyboardMenu() {
@@ -24,7 +25,31 @@ DinoUiKeyboardMenu::~DinoUiKeyboardMenu() {
     gLcd->GetBottomDisplay()->mBlend->Reset();
 }
 
-extern "C" void func_ov007_021832f0(void *, u32);
+// The keyboards' pictures: one row per mode, one column per page.
+extern "C" const char *const data_ov007_021911c0[][4];
+
+void DinoUiKeyboardMenu::SetPage(int page) {
+    page %= 3;
+    if (page < 0) {
+        page += 3;
+    }
+    if (page == mPage) {
+        return;
+    }
+    mPage = page;
+    if (mPagePicture) {
+        mParallel.Remove(mPagePicture);
+        delete mPagePicture;
+    }
+    mPagePicture = new MTextPicture(std::string(data_ov007_021911c0[mMode][mPage]), 1, false);
+    mPagePicture->Show();
+    mPagePicture->SetPriority(3);
+    mParallel.AddTail(mPagePicture);
+    if (GetFocusedItem() != mUnkE8) {
+        mUnk1F4 = TRUE;
+    }
+    mSerial.AddTail(CreateSetFocusTask(mUnkE8));
+}
 
 DinoUiKeyboard::~DinoUiKeyboard() {
 }
@@ -129,7 +154,7 @@ DinoUiKeyboard::DinoUiKeyboard(int mode) : MProcess(NULL) {
 }
 
 void PageChangeTask::Execute() {
-    func_ov007_021832f0((void *)mUnk10, mUnk14);
+    ((DinoUiKeyboardMenu *)mUnk10)->SetPage(mUnk14);
     Exit();
 }
 
