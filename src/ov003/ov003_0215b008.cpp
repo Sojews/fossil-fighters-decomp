@@ -10,6 +10,8 @@
 #include "m/blend.h"
 #include "m/display.h"
 #include "m/task.h"
+#include <vector>
+#include "m/menu.h"
 #include "m/fx32.h"
 
 // TRUE if the team's first three members are all set and share a type, which gives the team a technique.
@@ -163,5 +165,33 @@ void DinoGetBattleKP(u32 value, u32 *a, u32 *b) {
     } else {
         *a = 0;
         *b = 0;
+    }
+}
+
+// NONMATCHING: 91%, stack slots (the game's frame has one slot fewer).
+// Links a grid of items four to a row: down (or to below from the last row), left (wrapping to the row's end) and
+// right (wrapping to the row's start).
+void DinoLinkGrid(MMenu *menu, std::vector<MMenuItem *> *items, MMenuItem *below) {
+    for (int i = 0; i < items->size(); i++) {
+        int col;
+        int down = i + 4;
+        if (down < items->size()) {
+            menu->AddLink((*items)[i], 2, (*items)[down]);
+        } else {
+            menu->AddLink((*items)[i], 2, below);
+        }
+        col = i % 4;
+        if (col != 0) {
+            menu->AddLink((*items)[i], 3, (*items)[i - 1]);
+        } else if (down < items->size()) {
+            menu->AddLink((*items)[i], 3, (*items)[i + 3]);
+        } else {
+            menu->AddLink((*items)[i], 3, (MMenuItem *)items->back());
+        }
+        if (col == 3 || i == items->size() - 1) {
+            menu->AddLink((*items)[i], 1, (*items)[i / 4 * 4]);
+        } else {
+            menu->AddLink((*items)[i], 1, (*items)[i + 1]);
+        }
     }
 }
