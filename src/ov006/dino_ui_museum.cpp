@@ -393,6 +393,24 @@ DinoUiMuseumInformationMenu::DinoUiMuseumInformationMenu(Info *info, u32 *page, 
     : MMenu(gLcd->mSub, NULL, 0), mInfo(info), mPage(page), mStartPage(*page), mUnkFC(unkFC) {
 }
 
+// The TU's pooled pointer-to-member constants (typed as the call tasks the game makes of them).
+extern "C" struct {
+    void (DinoUiMuseum::*CloseInformation_00)();
+} data_ov006_021961dc;
+extern "C" struct {
+    void (DinoUiMuseum::*OpenInformation_00)();
+} data_ov006_0219621c;
+
+// Fades out, shows the fossil's information, and fades back in.
+void DinoUiMuseumMenu::ShowInformation() {
+    GetSerial()->AddTail(gLcd->mSub->mBright->CreateFadeOutToBlack(5, 0),
+                         MCreateCallTask((DinoUiMuseum *)this, data_ov006_021961dc.CloseInformation_00),
+                         new DinoUiMuseumInformationMenu((DinoUiMuseumInformationMenu::Info *)&mUnk178,
+                                                         (u32 *)&mSelected, mUnk1B0),
+                         MCreateCallTask((DinoUiMuseum *)this, data_ov006_0219621c.OpenInformation_00),
+                         gLcd->mSub->mBright->CreateFadeInFromBlack(5, 0));
+}
+
 void DinoUiMuseumMenu::CloseInformation() {
     mParallel.Remove(mInformation);
     delete mInformation;

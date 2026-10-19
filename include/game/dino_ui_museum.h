@@ -41,6 +41,7 @@ public:
     void SelectTab(u8 tab);
     void LoadTab(u8 tab);
     void ShowInformation();
+    void OpenInformation();
     void CloseInformation();
 
     u8 unkB3[1];            // members start in MMenu's tail padding
@@ -66,7 +67,8 @@ public:
     u8 mTab;                            // 0x1A4
     int mSelected;  // 0x1A8: the fossil whose information is shown
     u8 mUnk1AC;     // 0x1AC: whether the slots can be chosen
-    u8 unk1AD[0x1B4 - 0x1AD];
+    u8 unk1AD[3];
+    u32 mUnk1B0;        // 0x1B0
     std::vector<MMotionFile> mUnk1B4;   // 0x1B4
     MTaskSet *mUnk1C0;                  // 0x1C0
 };
