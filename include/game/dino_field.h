@@ -537,6 +537,8 @@ public:
     void Start();
     // Shows the time on the digits and keeps it (frames, seconds and hundredths) in the local variables.
     void ShowTime();
+    // The last state: stops, blinks the sprites six times and leaves.
+    void Finish();
 
     void (DinoFieldDance::*mState)(); // 0x74
     DinoField *mField;                // 0x7C
@@ -549,11 +551,14 @@ public:
     std::vector<MTask *> mUnkA4;      // 0xA4
     u32 unkB0[5];
     u32 mTime;                        // 0xC4: in frames
-    u32 unkC8;
+    MSmartOam *mOam;                  // 0xC8
     MMotion *mTimeDigits[4];          // 0xCC: seconds (tens, ones), then hundredths
-    u32 unkDC[3];
+    MTaskSet *mUnkDC;                 // 0xDC
+    MTaskSet *mUnkE0;                 // 0xE0
+    u32 unkE4;
     MResource<DinoDanceData> mUnkE8;  // 0xE8
-    u32 unkF8[2];
+    u32 unkF8;
+    MFont *mFont;                     // 0xFC
     MPictureFile mPicture;            // 0x100
 };
 

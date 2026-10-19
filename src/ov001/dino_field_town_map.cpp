@@ -107,6 +107,16 @@ void DinoFieldDance::ShowTime() {
     gDinoBackup->SetLocalVar(mUnk9C, hundredths);
 }
 
+void DinoFieldDance::Finish() {
+    mUnkDC->Clear();
+    mUnkE0->Clear();
+    mFont->Release();
+    for (u32 i = 0; i < 6; i++) {
+        GetSerial()->AddTail(mOam->CreateHideTransfer(), new MTimer(10), mOam->CreateShowTransfer(), new MTimer(10));
+    }
+    GetSerial()->AddTail(MTaskExitTransfer::Create(this));
+}
+
 DinoFieldTownMapManager::DinoFieldTownMapManager(DinoField *field) : MProcess(gLcd->GetTopDisplay()) {
     mField = field;
     mTownMap = NULL;
