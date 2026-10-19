@@ -24,6 +24,7 @@
 #include "game/dino_ui_mask_buy_menu.h"
 #include "game/dino_ui_mask_buy.h"
 #include "game/dino_ui_mask_buy_mask_button.h"
+#include "game/dino_ui2_parts_kaseki_button.h"
 #include "game/dino_ui_mask_buy_menu_item.h"
 #include "m/bg_new_task.h"
 #include "m/call_task.h"
@@ -176,10 +177,15 @@ void DinoUiMaskBuyMenu::OnBackDecided() {
 
 // Pooled file statics: the button corners.
 struct DinoUiMaskBuyStatics {
-    u8 unk00[0x28];
+    u8 unk00[0x8];
+    MPoint mFirst;       // 0x08: the page's first mask button
+    MPoint mRow;         // 0x10: to the next row
+    u8 unk18[0x28 - 0x18];
     MPoint mTopLeft;     // 0x28
     u8 unk30[0x8];
     MPoint mBottomRight; // 0x38
+    u8 unk40[0x58 - 0x40];
+    MPoint mColumn;      // 0x58: from a mask button to the next in its row
 };
 extern "C" DinoUiMaskBuyStatics data_ov005_0216b200;
 
@@ -408,6 +414,37 @@ void DinoUiMaskBuyMenu::RefreshPage1() {
         delete (MMenuItem *)mUnkC4[i];
     }
     mUnkC4.clear();
+}
+
+// Makes the page's mask buttons (empty past the last mask) and links them in a grid, below the buy button and above
+// the back button.
+// NONMATCHING: the empty slot's path (the masks' table, filled by the TU's static initializer) is read through the
+// TU's data pool in the game (one more literal).
+void DinoUiMaskBuyMenu::RefreshPage2() {
+    mUnkC4.clear();
+    for (int i = 0; i < 8; i++) {
+        DinoUiMaskBuyMaskButton *button;
+        if (i + mPage * 8 < mMasks.size()) {
+            button = new DinoUiMaskBuyMaskButton(
+                mOam, MPoint(data_ov005_0216b200.mFirst.x + data_ov005_0216b200.mColumn.x * (i % 4) + data_ov005_0216b200.mRow.x * (i / 4),
+                       data_ov005_0216b200.mFirst.y + data_ov005_0216b200.mColumn.y * (i % 4) + data_ov005_0216b200.mRow.y * (i / 4)),
+                mMasks[i + mPage * 8], GetFlag(i + mPage * 8));
+        } else {
+            button = new DinoUiMaskBuyMaskButton(
+                mOam, MPoint(data_ov005_0216b200.mFirst.x + data_ov005_0216b200.mColumn.x * (i % 4) + data_ov005_0216b200.mRow.x * (i / 4),
+                       data_ov005_0216b200.mFirst.y + data_ov005_0216b200.mColumn.y * (i % 4) + data_ov005_0216b200.mRow.y * (i / 4)),
+                0, 0);
+        }
+        mUnkC4.push_back(button);
+        AddItem(button);
+    }
+    DinoUi2LinkKasekiGrid(this, (std::vector<MMenuItem *> &)mUnkC4, mBuy);
+    AddLink(mBuy, 4, (MMenuItem *)mUnkC4[4]);
+    AddLink((MMenuItem *)mUnkC4[0], 4, mBack);
+    AddLink((MMenuItem *)mUnkC4[1], 4, mBack);
+    AddLink((MMenuItem *)mUnkC4[2], 4, mBack);
+    AddLink((MMenuItem *)mUnkC4[3], 4, mBack);
+    AddLink(mBack, 2, (MMenuItem *)mUnkC4[0]);
 }
 
 // X jumps to the buy button; B unchooses the selected mask, or goes to (and then presses) the back button.
