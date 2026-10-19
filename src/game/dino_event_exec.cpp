@@ -353,6 +353,29 @@ void DinoEventExecStartWander::Transfer() {
     }
 }
 
+DinoEventExecStartPatrol::DinoEventExecStartPatrol(DinoEventLoop *event, u32 chara, u32 a, u32 b, u32 c,
+                                                   const std::vector<u32> &route)
+    : mEvent(event), mChara(chara), mA(a), mB(b), mC(c), mRoute(route) {
+}
+
+void DinoEventExecStartPatrol::Transfer() {
+    DinoCharaTask task;
+    gDinoBackup->GetCharaTask(mChara, &task);
+    task.unk4 = 3;
+    task.unk8.patrol.w[0] = mA;
+    task.unk8.patrol.w[1] = mB;
+    task.unk8.patrol.w[2] = mC;
+    task.unk8.patrol.count = mRoute.size();
+    for (u32 i = 0; i < mRoute.size(); i++) {
+        task.unk8.patrol.points[i] = mRoute[i];
+    }
+    gDinoBackup->SetCharaTask(mChara, &task);
+    DinoFieldChara *chara = mEvent->GetField()->GetChara(mChara);
+    if (chara != NULL) {
+        chara->SetTask(task);
+    }
+}
+
 DinoEventExecFinishFellow::DinoEventExecFinishFellow(DinoEventLoop *event, u32 chara) {
     mEvent = event;
     mChara = chara;

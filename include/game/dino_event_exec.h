@@ -1227,11 +1227,16 @@ public:
 
 class DinoEventExecStartPatrol : public MTransfer {
 public:
+    DinoEventExecStartPatrol(DinoEventLoop *event, u32 chara, u32 a, u32 b, u32 c, const std::vector<u32> &route);
     virtual ~DinoEventExecStartPatrol();
     virtual void Transfer();
 
-    u32 mUnk10[5];                  // 0x10
-    std::vector<void *> mUnk24;     // 0x24
+    DinoEventLoop *mEvent;          // 0x10
+    u32 mChara;                     // 0x14
+    u32 mA;                         // 0x18
+    u32 mB;                         // 0x1C
+    u32 mC;                         // 0x20
+    std::vector<u32> mRoute;        // 0x24: the points it walks between
 };
 
 #endif
