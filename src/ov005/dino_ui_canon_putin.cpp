@@ -108,6 +108,44 @@ BOOL DinoUiCanonPutinMenu::IsMarkable(DinoBackupEntry *entry) {
     return TRUE;
 }
 
+extern "C" void func_ov005_02162f98(DinoUiContainerBaseMenu *menu);
+
+void DinoUiCanonPutinMenu::PutIn() {
+    if (mUnk158 == 1) {
+        for (int i = 0; i < 64; i++) {
+            if (mFlags[i]) {
+                mFlags[i] = 0;
+                DinoBackupEntry entry;
+                gDinoBackup->GetUnk98(i, &entry);
+                if (!gDinoBackup->IsUnk14CFull()) {
+                    gDinoBackup->SetUnk14C(gDinoBackup->FindFreeUnk14C(), &entry);
+                    MI_CpuFill8(&entry, 0, sizeof(entry));
+                    gDinoBackup->SetUnk98(i, &entry);
+                }
+            }
+        }
+        mCount = 0;
+        gDinoBackup->CompactUnk98();
+        if (mLastPage > 0) {
+            if (gDinoBackup->CountUsedUnk98() <= 8) {
+                HidePageButtons();
+                mPage = 0;
+                mFraction->SetNumerator(mPage + 1);
+            } else {
+                int last = (gDinoBackup->CountUsedUnk98() - 1) / 8;
+                if (mPage > last) {
+                    mPage = last;
+                    mFraction->SetNumerator(mPage + 1);
+                }
+            }
+        }
+        func_ov005_02162f98(this);
+        ClearItems();
+        RefreshPage2();
+        ResetDecideButton();
+    }
+}
+
 MTask *DinoUiCanonPutinMenu::CreateUnk2C() {
     return new DinoCommonWindowMessageBox(MPoint(128, 96), gDinoResource->GetText(data_0208a990), 4);
 }
@@ -125,6 +163,30 @@ BOOL DinoUiCanonTakeoutMenu::CanMark() {
 
 BOOL DinoUiCanonTakeoutMenu::IsMarkable(DinoBackupEntry *entry) {
     return TRUE;
+}
+
+
+void DinoUiCanonTakeoutMenu::TakeOut() {
+    if (mUnk158 == 1) {
+        for (int i = 0; i < 8; i++) {
+            if (mFlags[i]) {
+                mFlags[i] = 0;
+                DinoBackupEntry entry;
+                gDinoBackup->GetUnk14C(i, &entry);
+                if (!gDinoBackup->IsUnk98Full()) {
+                    gDinoBackup->SetUnk98(gDinoBackup->FindFreeUnk98(), &entry);
+                    MI_CpuFill8(&entry, 0, sizeof(entry));
+                    gDinoBackup->SetUnk14C(i, &entry);
+                }
+            }
+        }
+        mCount = 0;
+        gDinoBackup->CompactUnk14C();
+        func_ov005_02162f98(this);
+        ClearItems();
+        RefreshPage2();
+        ResetDecideButton();
+    }
 }
 
 MTask *DinoUiCanonTakeoutMenu::CreateUnk2C() {

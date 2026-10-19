@@ -21,6 +21,8 @@ public:
     virtual BOOL CanMark();
     virtual BOOL IsMarkable(DinoBackupEntry *entry);
     virtual MTask *CreateUnk2C();
+    // Moves the marked entries into the cannon, if the player said yes.
+    void PutIn();
 
     u32 mUnk158;    // 0x158
 };
@@ -35,6 +37,8 @@ public:
     virtual BOOL CanMark();
     virtual BOOL IsMarkable(DinoBackupEntry *entry);
     virtual MTask *CreateUnk2C();
+    // Moves the marked entries into the container, if the player said yes.
+    void TakeOut();
 
     u32 mUnk158;        // 0x158
 };
