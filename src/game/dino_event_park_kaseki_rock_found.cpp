@@ -1,5 +1,4 @@
 // DinoEventParkKasekiRockFound.
-// Only the destructors are decompiled so far.
 
 #include "game/dino_event_park_kaseki_rock_found.h"
 #include "m/bg_new_task.h"
@@ -42,7 +41,7 @@ extern "C" struct {
 extern "C" struct {
     u8 unk00[0x28];
     void (DinoEventKasekiRockFound::*Unk02036bd4_28)();
-    void (DinoEventParkKasekiRockFound::*Unk02037704_30)();
+    void (DinoEventParkKasekiRockFound::*StateFound_30)();
     void (DinoEventParkKasekiRockFound::*StateStart_38)();
 } data_020bd400;
 
@@ -146,7 +145,54 @@ void DinoEventParkKasekiRockFound::StateStart() {
     gDinoBackup->SetUnk138(mIndex, &empty);
     u32 focus = mEvent->GetField()->GetCamera()->GetFocus();
     mChara = mEvent->GetField()->GetChara(focus);
-    mState = data_020bd400.Unk02037704_30;
+    mState = data_020bd400.StateFound_30;
+}
+
+extern "C" const u32 data_0208b2d8[]; // per rock color: the chara's motion
+
+// NONMATCHING: the task locals' stack slots (the game spills them in a different order).
+void DinoEventParkKasekiRockFound::StateFound() {
+    MTask *camera;
+    MTask *motion;
+    MTask *removeRock;
+    MTask *wait10;
+    MTask *se2;
+    MTask *showManpu;
+    MTask *wait30;
+    MTask *turn;
+    MTask *hideManpu;
+    MTask *wait5;
+    MTask *wait15;
+    MTask *get = new DinoEventKasekiRockGet(mEvent, 3, (const DinoBackupEntry *) &mEntry.unk14, &mTaken);
+    MTask *se = DinoSoundCreatePlaySeTask(0x69, 0);
+    MParallelTaskSet *getting = new MParallelTaskSet(TRUE);
+    getting->AddTail(se);
+    getting->AddTail(get);
+    wait15 = new MTimer(15);
+    wait5 = new MTimer(5);
+    hideManpu = mChara->CreateHideManpuTask();
+    turn = mChara->CreateAngleToTask(0x4000, 0x14, 0xC);
+    wait30 = new MTimer(30);
+    showManpu = mChara->CreateShowManpuTask(2, MPoint(0, 0));
+    se2 = DinoSoundCreatePlaySeTask(0xD0, 0);
+    wait10 = new MTimer(10);
+    removeRock = MTaskExitTransfer::Create((MTask *) mEvent->GetField()->GetKasekiRock(mIndex));
+    motion = mChara->CreateSetMotionTask(data_0208b2d8[mEntry.color], 0, MFx32(1));
+    camera = new DinoEventExecCamera(mEvent, 0x400, 0x1B53, 0, 0x2B000, 0x3C, 0xC);
+    MSerialTaskSet *serial = &mSerial;
+    serial->AddTail(camera);
+    serial->AddTail(motion);
+    serial->AddTail(removeRock);
+    serial->AddTail(wait10);
+    serial->AddTail(se2);
+    serial->AddTail(showManpu);
+    serial->AddTail(wait30);
+    serial->AddTail(turn);
+    serial->AddTail(hideManpu);
+    serial->AddTail(wait5);
+    serial->AddTail(wait15);
+    serial->AddTail(getting);
+    mState = data_020bd380.StateEnd_70;
 }
 
 // Template task instances the game emits in this file. Until the code that makes the tasks is decompiled, they are

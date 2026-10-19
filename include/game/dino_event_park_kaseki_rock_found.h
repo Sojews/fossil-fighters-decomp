@@ -14,6 +14,8 @@ public:
     virtual void Idle();
 
     void StateStart();
+    // The chara turns to the rock and takes it out (the rock's get event), with the camera closing in.
+    void StateFound();
     // Puts the rock back in the park (unless it was taken) and ends.
     void StateEnd();
 

@@ -2714,7 +2714,7 @@ _Z15MCreateCallTaskI13DinoFieldHoleS0_EP5MTaskPT_MT0_FvvE kind:function(thumb,si
 _ZN28DinoEventParkKasekiRockFoundC1EP13DinoEventLoopm kind:function(thumb,size=0x30) addr:0x0203763c
 _ZN28DinoEventParkKasekiRockFound4IdleEv kind:function(thumb,size=0x20) addr:0x0203766c
 _ZN28DinoEventParkKasekiRockFound10StateStartEv kind:function(thumb,size=0x78) addr:0x0203768c
-func_02037704 kind:function(thumb,size=0x264) addr:0x02037704
+_ZN28DinoEventParkKasekiRockFound10StateFoundEv kind:function(thumb,size=0x264) addr:0x02037704
 _ZN28DinoEventParkKasekiRockFound8StateEndEv kind:function(thumb,size=0x4c) addr:0x02037968
 _ZN10MCallTask2I12MPolygonCharS0_PKcS2_E4IdleEv kind:function(thumb,size=0x3c) addr:0x020379b4
 _ZN10MCallTask1I13DinoEventLoopS0_bE4IdleEv kind:function(thumb,size=0x36) addr:0x020379f0

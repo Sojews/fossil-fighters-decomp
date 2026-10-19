@@ -431,6 +431,7 @@ public:
     }
     void WalkOnLand0(u32 dir);
     void CreateKasekiRock(u32 index);
+    DinoFieldKasekiRock *GetKasekiRock(u32 index) { return mKasekiRocks[index]; }
     // Makes the kaseki rocks the backup has, if this is their map.
     void CreateKasekiRocks();
     // Clears away the last map's things and loads the map, with its step effects.
