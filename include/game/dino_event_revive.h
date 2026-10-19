@@ -5,20 +5,24 @@
 #include <string>
 #include <vector>
 #include "m/task.h"
-#include "m/archive.h"
+#include "m/resource.h"
 #include "game/dino_event_revive_cleaning.h"
 #include "game/dino_event_revive_effect.h"
 
 class DinoEventLoop;
+struct DinoMessageData;
 
 class DinoEventRevive : public MProcess {
 public:
+    DinoEventRevive(DinoEventLoop *event);
     virtual ~DinoEventRevive();
     virtual void Idle();
 
     MTask *CreateMessage(u32 message, const std::string &extra);
     void AddMessage(u32 message);
     void StateMode();
+    void StateDeposit();
+    void State02037dbc();
     void StateCheckRocks();
     void State02038544();
     void StateLevelMessage();
@@ -37,8 +41,7 @@ public:
     DinoEventReviveResult mResult;          // 0x84: mOutcome is at 0x94
     DinoEventReviveCreature mCreature;      // 0x98
     DinoEventReviveCreature mCreature2;     // 0xB0
-    MArchivePtr mArchive;       // 0xC8
-    MArchiveFile mFile;         // 0xCC
+    MResource<DinoMessageData> mMessages; // 0xC8: the cleaning messages
     u32 mUnkD8;                 // 0xD8
     u32 mEffectDone;            // 0xDC
     std::vector<void *> mUnkE0; // 0xE0

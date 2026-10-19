@@ -145,16 +145,19 @@ extern "C" struct {
     void (DinoEventRevive::*StateMode_6C)();
     u8 unk74[0x7C - 0x74];
     void (DinoEventRevive::*StateStart_7C)();
-    u8 unk84[0x94 - 0x84];
+    u8 unk84[0x8C - 0x84];
+    void (DinoEventRevive::*State02038544_8C)();
     void (DinoEventRevive::*End_94)();
     void (DinoEventRevive::*End_9C)();
-    u8 unkA4[0xBC - 0xA4];
+    void (DinoEventRevive::*State02037dbc_A4)();
+    u8 unkAC[0xBC - 0xAC];
     void (DinoEventRevive::*StateSelected_BC)();
     u8 unkC4[0xCC - 0xC4];
     void (DinoEventRevive::*StateCheckRocks_CC)();
     u8 unkD4[0xDC - 0xD4];
     void (DinoEventRevive::*StateContainerSelect_DC)();
     void (DinoEventRevive::*StateNoneMessage_E4)();
+    void (DinoEventRevive::*StateDeposit_EC)();
 } data_020bd628;
 
 inline void DinoEventRevive::AddMessage(u32 message) {
@@ -175,6 +178,25 @@ void DinoEventRevive::StateCheckRocks() {
         mSerial.AddTail(new DinoEventReviveDepositSelect(mEvent, &mUnkE0));
         mState = data_020bd628.StateMode_6C;
     }
+}
+
+// Moves the rocks chosen to deposit from the bag into storage. Says so the first time storage gets any.
+void DinoEventRevive::StateDeposit() {
+    if (mUnkE0.size() != 0) {
+        for (u32 i = 0; i < mUnkE0.size(); i++) {
+            DinoBackupEntry entry;
+            gDinoBackup->GetUnk98((u32)mUnkE0[i], &entry);
+            gDinoBackup->SetUnk9C(gDinoBackup->FindFreeUnk9C(), &entry);
+            MI_CpuFill8(&entry, 0, sizeof(entry));
+            gDinoBackup->SetUnk98((u32)mUnkE0[i], &entry);
+        }
+        gDinoBackup->CompactUnk98();
+    }
+    if (!gDinoBackup->IsUnk9CEmpty()) {
+        AddMessage(0x13);
+        gDinoBackup->MarkUnk168();
+    }
+    mState = data_020bd628.State02038544_8C;
 }
 
 // What the event was started for: 0 revives, 1 and 2 other messages, 3 the excavation level.
@@ -244,6 +266,11 @@ void DinoEventRevive::StateContainerSelect() {
     DinoSoundPlayBgm(mBgm, 0);
     mSerial.AddTail(new DinoEventReviveContainerSelect(&mRock));
     mState = data_020bd628.StateSelected_BC;
+}
+
+DinoEventRevive::DinoEventRevive(DinoEventLoop *event) : MProcess(gLcd->GetBottomDisplay()), mEvent(event) {
+    mMessages = MResource<DinoMessageData>("/msg/msg_cleaning");
+    mState = data_020bd628.State02037dbc_A4;
 }
 
 void DinoEventRevive::StateSelected() {
