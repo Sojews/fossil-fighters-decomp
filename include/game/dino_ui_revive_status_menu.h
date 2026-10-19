@@ -48,6 +48,8 @@ public:
     // Fades both screens in (from white, or black).
     void FadeIn();
     void Leave();
+    // Says which attacks the revive taught the creature (if any).
+    void ShowLearnedAttacks();
 
     u8 unkB3[1];
     MSmartOam *mOam;        // 0xB4: the items' sprites

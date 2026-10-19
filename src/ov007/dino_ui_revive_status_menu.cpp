@@ -17,6 +17,8 @@
 #include "game/dino_sound.h"
 #include "m/call_task.h"
 #include "game/dino_ui_rv_information.h"
+#include "game/dino_common_window_message_box.h"
+#include <printf.h>
 
 #pragma auto_inline off
 DinoUiReviveStatusMenu::DinoUiReviveStatusMenu(u32 id, u32 *result, u8 flag)
@@ -291,6 +293,64 @@ void DinoUiReviveStatusMenu::Leave() {
         MSerialTaskSet *serial = &mSerial;
         serial->AddTail(fades);
         serial->AddTail(exit);
+    }
+}
+
+// How many of the creature's parts are revived.
+static inline u32 CountRevivedParts(const DinoCreatureState &creature) {
+    u32 count = 0;
+    for (u32 i = 0; i < 4; i++) {
+        if (creature.parts[i].level) {
+            count++;
+        }
+    }
+    return count;
+}
+
+// ", ", then "\n".
+extern "C" const char data_ov007_021922f8[], data_ov007_021922fc[];
+extern const u32 data_0208a4b0, data_0208a4b4, data_0208a4b8;
+
+// NONMATCHING: register allocation and one stack slot (the game keeps the attack's level in r7 and spills i * 4).
+void DinoUiReviveStatusMenu::ShowLearnedAttacks() {
+    if (CountRevivedParts(mCreature2) <= CountRevivedParts(mCreature)) {
+        return;
+    }
+    const DinoCreatureDef *def = gDinoResource->GetCreatureDef(mCreature.index);
+    std::string names;
+    u32 count = 0;
+    u32 learned = 0;
+    u32 known = 0;
+    for (u32 i = 0; i < def->attackCount; i++) {
+        if (CountRevivedParts(mCreature) >= ((const u32 *)((const u8 *)def + def->attackLevels))[i]) {
+            known++;
+        }
+        if (CountRevivedParts(mCreature2) >= ((const u32 *)((const u8 *)def + def->attackLevels))[i]) {
+            learned++;
+        }
+        if (learned > known + count) {
+            if (count) {
+                names += data_ov007_021922fc;
+            }
+            count++;
+            names += gDinoResource->GetAttackName(((const u32 *)((const u8 *)def + def->attackIds))[i]);
+        }
+    }
+    if (known == learned) {
+        if (!gDinoBackup->GetSystemFlag(0x27)) {
+            mSerial.AddTail(new DinoCommonWindowMessageBox(MPoint(0x80, 0x60),
+                                                           std::string(gDinoResource->GetText(data_0208a4b0)), 4));
+        }
+    } else {
+        std::string text;
+        char line[0x80];
+        sprintf(line, gDinoResource->GetText(data_0208a4b8), names.c_str());
+        text += line;
+        if (learned == def->attackCount) {
+            text += data_ov007_021922f8;
+            text += gDinoResource->GetText(data_0208a4b4);
+        }
+        mSerial.AddTail(new DinoCommonWindowMessageBox(MPoint(0x80, 0x60), std::string(text), 4));
     }
 }
 
