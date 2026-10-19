@@ -40,6 +40,7 @@ public:
     void FinishPageLeft();
     void SelectTab(u8 tab);
     void ShowInformation();
+    void CloseInformation();
 
     u8 unkB3[1];            // members start in MMenu's tail padding
     MSmartOam *mOam;        // 0xB4: the items' sprites
@@ -47,7 +48,8 @@ public:
     u8 unkBC[0xC4 - 0xBC];
     MMenuItem *mTabs[5];    // 0xC4
     MPictureFile *mPicture; // 0xD8
-    u8 unkDC[0xE4 - 0xDC];
+    MTask *mInformation;    // 0xDC: the fossil information shown
+    u32 unkE0;
     MMenuItem *mSlots[15];  // 0xE4
     u8 unk120[0x15C - 0x120];
     u32 mSlotCount;     // 0x15C
@@ -64,6 +66,7 @@ public:
     u8 mUnk1AC;     // 0x1AC: whether the slots can be chosen
     u8 unk1AD[0x1B4 - 0x1AD];
     std::vector<MMotionFile> mUnk1B4;   // 0x1B4
+    MTaskSet *mUnk1C0;                  // 0x1C0
 };
 
 class MExtAffinePicture;

@@ -384,3 +384,11 @@ void DinoUiMuseumMenu::OnDecide(MMenuItem *item) {
         }
     }
 }
+
+#pragma auto_inline off
+
+void DinoUiMuseumMenu::CloseInformation() {
+    mParallel.Remove(mInformation);
+    delete mInformation;
+    mUnk1C0->Clear();
+}
