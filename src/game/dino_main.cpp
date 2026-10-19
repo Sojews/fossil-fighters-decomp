@@ -31,6 +31,8 @@
 #include "m/display.h"
 #include "m/font.h"
 #include "m/lcd.h"
+#include "m/picture.h"
+#include "game/dino_common_window_message_box.h"
 #include "m/multi_play.h"
 #include "m/obj.h"
 #include "m/overlay.h"
@@ -151,7 +153,7 @@ extern "C" struct {
     void (DinoMainLoop::*StateDebugMenu_04)();
     void (DinoMainLoop::*State02048398_0C)();
     u8 unk14[0x8];
-    void (DinoMainLoop::*State02047a1c_1C)();
+    void (DinoMainLoop::*StateContinue_1C)();
     void (DinoMainLoop::*StateDebugMenu_24)();
     void (DinoMainLoop::*State02048030_2C)();
     void (DinoMainLoop::*StateTitle_34)();
@@ -227,7 +229,7 @@ void DinoMainLoop::StateTitleEnd() {
         mState = data_020bff70.StateGame_04;
         return;
     case 3:
-        mState = data_020c0170.State02047a1c_1C;
+        mState = data_020c0170.StateContinue_1C;
         return;
     case 5:
         mState = data_020c0170.StateWirelessBattle_74;
@@ -236,6 +238,41 @@ void DinoMainLoop::StateTitleEnd() {
         mState = data_020c0170.StateATM_6C;
         break;
     }
+}
+
+extern "C" const char data_020c02ec[];  // the notices' background picture
+extern "C" const u32 data_0208ab30, data_0208ab2c;
+
+void DinoMainLoop::StateContinue() {
+    DinoPlayerData player;
+    gDinoBackup->GetPlayer(&player, 0);
+    if (player.unk38_2 || player.unk38_3) {
+        MTextPicture *picture = new MTextPicture(gLcd->GetBottomDisplay(), std::string(data_020c02ec), TRUE, false);
+        picture->SetPriority(3);
+        picture->Show();
+        mParallel.AddTail(picture);
+        gLcd->GetBottomDisplay()->mBright->SetMode(0);
+        if (player.unk38_3) {
+            mSerial.AddTail(
+                new DinoCommonWindowMessageBox(MPoint(128, 96), std::string(gDinoResource->GetText(data_0208ab30)), 4));
+        }
+        if (player.unk38_2) {
+            mSerial.AddTail(
+                new DinoCommonWindowMessageBox(MPoint(128, 96), std::string(gDinoResource->GetText(data_0208ab2c)), 4));
+        }
+        player.unk38_2 = 0;
+        player.unk38_3 = 0;
+        gDinoBackup->SetPlayer(&player);
+        MTask *timer = new MTimer(1);
+        MTask *mode = gLcd->GetBottomDisplay()->mBright->CreateModeTransfer(1);
+        MTask *exit = MTaskExitTransfer::Create(picture);
+        MSerialTaskSet *serial = &mSerial;
+        serial->AddTail(exit);
+        serial->AddTail(mode);
+        serial->AddTail(timer);
+    }
+    mSerial.AddTail(new DinoEventLoop(&mUnk9C));
+    mState = data_020c0170.StateVolume_64;
 }
 
 // The title screen's demo: the next battle from the list for how far the save has got.

@@ -19,7 +19,8 @@ public:
     void StateTitle();
     void StateTitleEnd();
     void StateGame();
-    void State02047a1c();
+    // Continues the saved game (after any notices the save holds).
+    void StateContinue();
     void StateVolume();
     void StateWirelessBattle();
     void StateWirelessBattleEnd();

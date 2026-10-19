@@ -74,7 +74,8 @@ struct DinoPlayerData {
     u32 unk34_30 : 2;           // system var 31
     // 0x38
     u32 unk38_0 : 2;            // system var 32
-    u32 unk38_2 : 2;
+    u32 unk38_2 : 1;            // a notice to show on continuing (text 0208ab2c)
+    u32 unk38_3 : 1;            // another (text 0208ab30)
     u32 unk38_4 : 16;           // system var 43
     u32 unk38_20 : 1;           // system flag 0x2F
     u32 unk38_21 : 11;
