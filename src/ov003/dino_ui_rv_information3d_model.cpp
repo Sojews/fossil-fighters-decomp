@@ -13,6 +13,16 @@
 #include "m/display.h"
 #include "m/lcd.h"
 #include "m/3d_model.h"
+#include "m/3d_scene.h"
+#include "m/3d.h"
+
+// Hides the scene's 3D screen when the value changes.
+void DinoUiRvInformation3DModel::SetUnk84(u32 value) {
+    if (mUnk84 != value) {
+        mUnk84 = value;
+        mScene->mM3d->Hide();
+    }
+}
 
 DinoUiRvInformation3DModel::~DinoUiRvInformation3DModel() {
 }
@@ -47,7 +57,6 @@ MTask *DinoUiRvInformation::CreateWaitModelTask() {
 void DinoUiRvInformation::Idle() {
 }
 
-extern "C" void func_ov003_02155a34(DinoUiRvInformation3DModel *model, int arg);
 
 // The TU's pooled pointer-to-member constants.
 extern "C" struct {
@@ -84,7 +93,7 @@ void DinoUiRvInformation::SetPage(u8 page) {
         GetSerial()->AddTail(new MTimer(1), MCreateCallTask(this, data_ov003_021606d4.CreateSubPicture_00));
     }
     if (mPage) {
-        func_ov003_02155a34(mModel, 0);
+        mModel->SetUnk84(0);
     }
     GetSerial()->AddTail(new MTimer(1), MCreateCallTask(this, data_ov003_02160784.Unk02156800_00));
     if (mUnk1B0) {

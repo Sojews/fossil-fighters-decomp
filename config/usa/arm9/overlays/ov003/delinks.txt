@@ -6,7 +6,7 @@
     .bss        start:0x021624c0 end:0x02171b00 kind:bss align:32
 
 src/ov003/dino_ui_rv_information3d_model.cpp:
-    .text       start:0x02155a54 end:0x0215838c
+    .text       start:0x021558a0 end:0x0215838c
 
 src/ov003/dino_ui_field_menu_fraction.cpp:
     .text       start:0x021584d4 end:0x0215b008
