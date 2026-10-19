@@ -14,6 +14,7 @@
 #include "game/dino_battle.h"
 #include "game/dino_battle_controller.h"
 #include "game/dino_battle_live.h"
+#include "m/seed_generator.h"
 
 extern "C" void func_ov000_0215c174(DinoBattleModelField *field, u32 line);
 
@@ -43,6 +44,31 @@ void SendLocalMessageTask::Execute() {
 }
 
 #pragma auto_inline off
+
+// Whether the first side goes first: the side whose creatures' E4 values sum higher (then counting only those with
+// B8 clear), else at random.
+extern "C" u32 func_ov000_0215be2c(DinoBattleModelField *field) {
+    int total[2] = {0, 0};
+    int clear[2] = {0, 0};
+    for (int side = 0; side < 2; side++) {
+        DinoBattleModelPlayer *player = field->mModel->GetPlayer(side);
+        for (int i = 0; i < player->GetCreatureCount(); i++) {
+            DinoBattleModelCreature *creature = player->GetCreature(i);
+            int value = creature->GetUnkE4();
+            if (creature->GetUnkB8() == 0) {
+                clear[side] += value;
+            }
+            total[side] += value;
+        }
+    }
+    if (total[0] != total[1]) {
+        return total[0] > total[1] ? TRUE : FALSE;
+    }
+    if (clear[0] != clear[1]) {
+        return clear[0] > clear[1] ? TRUE : FALSE;
+    }
+    return field->mModel->GetPlayer(0)->GetRandom()->Next(2);
+}
 
 // The sides (bit 0 the second, bit 1 the first) facing a creature of kind 3.
 extern "C" u32 func_ov000_0215bee8(DinoBattleModelField *field) {

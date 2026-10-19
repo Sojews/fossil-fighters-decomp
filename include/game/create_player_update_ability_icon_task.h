@@ -175,6 +175,8 @@ struct DinoBattleCreatureStatus {
 
 class DinoBattleModelCreature : public MProcess, public MMessageObserver {
 public:
+    DinoBattleModelCreature(MMessageObserver *view, DinoBattleModelPlayer *player, u32 id, u32 unkB4, u32 unkB8,
+                            DinoBattleCreatureStats stats, s32 unkFC, u32 unk100, u32 unk178);
     virtual ~DinoBattleModelCreature();
     virtual void Idle();
     virtual void OnMessage(MMessage *msg);

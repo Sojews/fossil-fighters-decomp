@@ -10,7 +10,7 @@ struct DinoBattleCreatureDef {
     u8 unk0E[0x20 - 0x0E];
     u8 mUnk20;          // 0x20
     u8 mUnk21;          // 0x21
-    u8 unk22;
+    u8 mUnk22;          // 0x22: a percentage
     u8 mUnk23;          // 0x23
     u32 mUnk24;         // 0x24: flags
     u8 unk28[0x54 - 0x28];

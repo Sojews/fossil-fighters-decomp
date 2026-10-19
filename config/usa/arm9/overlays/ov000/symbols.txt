@@ -492,7 +492,7 @@ _ZN24PlayerThinkTimeCountTaskD0Ev kind:function(thumb,size=0xc) addr:0x0216c814
 _ZThn116_N24DinoBattleUserController9OnMessageEP8MMessage kind:function(thumb,size=0x1c) addr:0x0216c820
 func_ov000_0216c83c kind:function(thumb,size=0x10) addr:0x0216c83c
 _ZN23DinoBattleModelCreature14RandomFractionEv kind:function(thumb,size=0xc) addr:0x0216c84c
-func_ov000_0216c858 kind:function(thumb,size=0xb4) addr:0x0216c858
+_ZN23DinoBattleModelCreatureC1EP16MMessageObserverP21DinoBattleModelPlayermmm23DinoBattleCreatureStatslmm kind:function(thumb,size=0xb4) addr:0x0216c858
 func_ov000_0216c90c kind:function(thumb,size=0x250) addr:0x0216c90c
 _ZN23DinoBattleModelCreature8AddUnkFCEi kind:function(thumb,size=0x34) addr:0x0216cb5c
 _ZN23DinoBattleModelCreature8GetUnkB0Ev kind:function(thumb,size=0x6) addr:0x0216cb90
@@ -1813,7 +1813,6 @@ _ZTS19SetStatusEffectTask kind:data(any) addr:0x02192fb8
 _ZTS22DinoCreatureUpdateTask kind:data(any) addr:0x02192fd0
 _ZTS23DinoBattleModelCreature kind:data(any) addr:0x02192fec
 _ZTV23DinoBattleModelCreature kind:data(any) addr:0x02193008
-data_ov000_0219302c kind:data(any) addr:0x0219302c
 data_ov000_02193030 kind:data(any) addr:0x02193030
 data_ov000_0219304c kind:data(any) addr:0x0219304c
 data_ov000_0219305c kind:data(any) addr:0x0219305c

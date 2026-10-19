@@ -8,6 +8,7 @@
 #include "game/dino_sound.h"
 #include "m/resource.h"
 #include "game/create_player_update_ability_icon_task.h"
+#include "game/send_local_message_task_menu.h"
 #include "m/seed_generator.h"
 #include "game/dino_resource.h"
 #include "nitro/mi.h"
@@ -488,6 +489,42 @@ u32 DinoBattleModelCreature::GetUnk108() {
 
 void DinoBattleModelCreature::SetUnk108(u32 value) {
     mUnk108 = value;
+}
+
+extern "C" BOOL func_ov000_0216c83c(int value);
+
+// When a creature (with B8 clear, kind 1 and no flag) acts, each of the player's creatures that qualifies may get an
+// event: by chance (its def's 0x22 percentage, plus the actor's 0x62 one for an actor of kind 9), or for certain while
+// the field's flag 8 is set (which this uses up).
+extern "C" void func_ov000_02169404(DinoBattleModelPlayer *player, DinoBattleModelCreature *actor, u32 event, int kind,
+                                    u8 flag) {
+    if (actor->GetUnkB8() == 0 && kind == 1 && !flag) {
+        for (int i = 0; i < player->GetCreatureCount(); i++) {
+            DinoBattleModelCreature *creature = player->GetCreature(i);
+            if (func_ov000_0216c83c(creature->GetUnkB8())) {
+                int chance = creature->GetDef()->mUnk22;
+                if (actor->GetDefUnk61() == 9) {
+                    chance += actor->GetDef()->mUnk62;
+                }
+                if (chance > (int)player->GetRandom()->Next(100) ||
+                    (((DinoBattleModelField *)player->mUnk100)->mUnkD0 & 8)) {
+                    player->PushEvent((u32)creature, event, 0);
+                    ((DinoBattleModelField *)player->mUnk100)->mUnkD0 &= ~8;
+                }
+            }
+        }
+    }
+}
+
+extern "C" void func_ov000_0216c90c(DinoBattleModelCreature *creature, u32 id, BOOL arg);
+
+DinoBattleModelCreature::DinoBattleModelCreature(MMessageObserver *view, DinoBattleModelPlayer *player, u32 id,
+                                                 u32 unkB4, u32 unkB8, DinoBattleCreatureStats stats, s32 unkFC,
+                                                 u32 unk100, u32 unk178)
+    : MProcess(NULL), mView(view), mPlayer(player), mUnkB4(unkB4), mUnkB8(unkB8), mUnkBC(unkB8), mStats(stats),
+      mUnkFC(unkFC), mUnk100(unk100), mUnk178(unk178) {
+    mActing = FALSE;
+    func_ov000_0216c90c(this, id, TRUE);
 }
 
 MFx32 DinoBattleModelCreature::RandomFraction() {

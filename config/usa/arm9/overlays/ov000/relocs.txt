@@ -5062,7 +5062,7 @@ from:0x0216c884 kind:thumb_call to:0x02074800 module:main
 from:0x0216c8f8 kind:thumb_call to:0x0216c90c module:overlay(0)
 from:0x0216c900 kind:load to:0x020b6ef4 add:0x8 module:main
 from:0x0216c904 kind:load to:0x02193008 add:0x8 module:overlay(0)
-from:0x0216c908 kind:load to:0x0219302c module:overlay(0)
+from:0x0216c908 kind:load to:0x02193008 add:0x24 module:overlay(0)
 from:0x0216c924 kind:thumb_call to:0x02011ed4 module:main
 from:0x0216c934 kind:thumb_call to:0x0216d1f8 module:overlay(0)
 from:0x0216c9ac kind:thumb_call to:0x0216f098 module:overlay(0)
