@@ -12,6 +12,7 @@ class DinoEventLoop;
 struct DinoMessageData;
 struct DinoBattleData;
 class DinoFieldHole;
+class DinoFieldChara;
 
 class DinoEventKasekiRockFound : public MProcess {
 public:
@@ -31,6 +32,7 @@ public:
     void StateBattle();
     // After the battle: on a win, what the rival says and on to the rock; on a loss, what they say and the end.
     void StateBattleEnd();
+    void State020374d4();
     MTask *CreateYesNo(u32 message);
     void StateFound();
     void StateFoundEnd();
@@ -44,13 +46,14 @@ public:
     u32 mBattle;            // 0x8C: the battle the rock starts, or 0
     u32 mUnk90;             // 0x90
     DinoBackupEntry mEntry; // 0x94: the rock found
-    u32 mUnkA8;             // 0xA8
+    DinoFieldChara *mChara; // 0xA8: the one who found the rock
     DinoFieldHole *mHole;   // 0xAC: the hole the rock was dug out of
     MResource<DinoMessageData> mMessages;   // 0xB0: the digging messages
     MResource<DinoBattleData> mBattleData;  // 0xC0: the battle's, after it
     u32 unkD0[2];
     int mAnswer;            // 0xD8: the yes/no dialog's
-    u32 unkDC[2];
+    u32 unkDC;
+    u32 mAngle;             // 0xE0: to turn the finder to
 };
 
 #endif

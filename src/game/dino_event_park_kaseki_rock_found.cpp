@@ -9,6 +9,8 @@
 #include "game/dino_event_kaseki_rock_found.h"
 #include "game/dino_field_hole.h"
 #include "game/dino_event_exec.h"
+#include "m/fx32.h"
+#include "game/dino_sound.h"
 #include "m/display.h"
 #include "game/dino_resource.h"
 #include "game/dino_event_talk_window.h"
@@ -42,6 +44,10 @@ extern "C" struct {
     void (DinoEventParkKasekiRockFound::*Unk02037704_30)();
     void (DinoEventParkKasekiRockFound::*StateStart_38)();
 } data_020bd400;
+
+// The rock-found event's strings (in dino_event_kaseki_rock_found.cpp's data).
+extern "C" const char data_020bd5f4[];  // "/msg/msg_dig"
+extern "C" const char data_020bd604[];  // ""
 
 void DinoEventKasekiRockFound::StateFound() {
     mSerial.AddTail(CreateFoundMessage());
@@ -80,9 +86,6 @@ void DinoEventKasekiRockFound::StateBattle() {
     mState = data_020bd380.StateBattleEnd_18;
 }
 
-// The rock-found event's strings (in dino_event_kaseki_rock_found.cpp's data).
-extern "C" const char data_020bd5f4[];  // "/msg/msg_dig"
-extern "C" const char data_020bd604[];  // ""
 
 void DinoEventKasekiRockFound::StateBattleEnd() {
     mMessages = MResource<DinoMessageData>(data_020bd5f4);
@@ -103,6 +106,16 @@ void DinoEventKasekiRockFound::StateBattleEnd() {
     }
     mSerial.AddTail(CreateMessageBox(6, gDinoBackup->GetEntryName(&mEntry)));
     mSerial.AddTail(MTaskExitTransfer::Create(this));
+}
+
+// NONMATCHING: the three speed temporaries get their stack slots in another order.
+void DinoEventKasekiRockFound::State020374d4() {
+    std::string text(data_020bd604);
+    GetSerial()->AddTail(mChara->CreateSetMotionTask(0x26, 1, MFx32(1)), CreateMessageBox(0x11, text),
+                         mChara->CreateSetMotionTask(0x28, 1, MFx32(1)), mChara->CreateAngleToTask(mAngle, 20, 12),
+                         new MTimer(30), DinoSoundCreatePlaySeTask(0x3B8, 0), mChara->CreateWaitStopTask(),
+                         mChara->CreateSetMotionTask(1, 1, MFx32(1)),
+                         MCreateCallTask(mHole, &DinoFieldHole::StartChangeToHole), MTaskExitTransfer::Create(this));
 }
 
 void DinoEventKasekiRockFound::StateAsk() {

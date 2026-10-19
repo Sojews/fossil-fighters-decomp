@@ -105,6 +105,19 @@ public:
         AddTail(e);
         AddTail(f);
     }
+    void AddTail(MTask *a, MTask *b, MTask *c, MTask *d, MTask *e, MTask *f, MTask *g, MTask *h, MTask *i,
+                 MTask *j) {
+        AddTail(a);
+        AddTail(b);
+        AddTail(c);
+        AddTail(d);
+        AddTail(e);
+        AddTail(f);
+        AddTail(g);
+        AddTail(h);
+        AddTail(i);
+        AddTail(j);
+    }
     void Remove(MTask *task);
     void Remove(MTask *a, MTask *b) {
         Remove(a);
