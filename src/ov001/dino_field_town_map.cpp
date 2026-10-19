@@ -18,6 +18,7 @@
 #include "m/fx32.h"
 #include "game/dino_field_player_control.h"
 #include "m/lcd.h"
+#include "m/motion.h"
 
 DinoFieldTownMap::~DinoFieldTownMap() {
 }
@@ -30,6 +31,23 @@ void DinoFieldTownMap::Idle() {
                          blend->CreateAlphaRatioAnime(0x10, 0, 0x10, 0x10, 30, 0));
     }
 }
+
+// The point's whole part.
+static inline MPoint ToPoint(MFx32Point p) {
+    return MPoint(MFx32ToInt(p.x), MFx32ToInt(p.y));
+}
+
+#pragma auto_inline off
+void DinoFieldTownMap::Update(MFx32Point pos, MPoint offset, MFx32 scale) {
+    if (mUnk74) {
+        mIcon->mMotions[0]->Play(2, 0);
+        mIcon->SetPosition(ToPoint(pos * scale) + offset);
+        mIcon->Show();
+    } else {
+        mIcon->Hide();
+    }
+}
+#pragma auto_inline reset
 
 TownMapIcon::~TownMapIcon() {
 }

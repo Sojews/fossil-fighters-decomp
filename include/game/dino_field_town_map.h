@@ -4,16 +4,20 @@
 #include "m/fx32.h"
 #include "m/task.h"
 
+class TownMapIcon;
+
 class DinoFieldTownMap : public MProcess {
 public:
     virtual ~DinoFieldTownMap();
     virtual void Idle();
 
     MTask *CreateModeTask(u32 radarMode, u32 to, u32 a);
-    void Update(MFx32Point pos, MFx32Point offset, MFx32 scale);
+    // Puts the icon at the character's scaled position (or hides it if off).
+    void Update(MFx32Point pos, MPoint offset, MFx32 scale);
 
     u32 mUnk74;         // 0x74: blink while set
-    u32 unk78[2];
+    TownMapIcon *mIcon; // 0x78: the player's
+    u32 unk7C;
     MTaskSet *mBlinks;  // 0x80
 };
 

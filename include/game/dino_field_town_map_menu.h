@@ -22,7 +22,7 @@ public:
 
     DinoField *mField;      // 0x78
     DinoFieldTownMap *mTownMap;  // 0x7C: while the camera allows it
-    MFx32Point mOffset;     // 0x80
+    MPoint mOffset;         // 0x80: of the map on the screen
     MFx32 mScale;           // 0x88
     u8 mCentered;           // 0x8C: show the map's centre instead of the player
 };
