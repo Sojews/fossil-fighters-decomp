@@ -12,6 +12,7 @@ class DinoUiPartsTeamInfo;
 class MIndicator;
 
 class DinoUiATMCursor;
+class DinoUiFieldMenuCursor;
 class DinoCommonWindowMessage;
 
 class DinoUiATMMenu : public DinoHelpBase, public MMenu {
@@ -39,7 +40,9 @@ public:
     DinoUiPartsTeamIndicator *mTeamNames[3]; // 0xCC
     MIndicator *mTeamTexts[3];  // 0xD8
     MView *mEmptyMarks[3];      // 0xE4
-    u32 unkF0[3];       // 0xF0
+    MTaskSet *mFocusTasks;      // 0xF0
+    DinoUiFieldMenuCursor *mFocusCursor;    // 0xF4
+    u32 unkF8;                  // 0xF8
     DinoUiATMCursor *mCursor;   // 0xFC: marks the team being moved
     u32 unk100[2];      // 0x100
     DinoUiPartsTeamInfo *mTeamInfo; // 0x108

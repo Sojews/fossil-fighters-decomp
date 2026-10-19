@@ -10,6 +10,7 @@
 #include "game/dino_sound.h"
 #include "game/dino_ui_atm_menu.h"
 #include "game/dino_ui_atm_cursor.h"
+#include "game/dino_ui_field_menu_cursor.h"
 #include "game/common_window_message.h"
 #include "game/dino_ui_atm.h"
 #include "game/dino_ui_atm_team_button.h"
@@ -229,6 +230,8 @@ extern "C" struct {
     void (DinoUiATM::*Start_18)();
     u8 unk20[0x38 - 0x20];
     MPoint mCursorOffset;   // 0x38: from a team's button
+    u8 unk40[0x48 - 0x40];
+    MPoint mFocusOffset;    // 0x48: from the focused team's frame
 } data_ov007_0218cbe0;
 
 DinoUiATM::DinoUiATM(u8 arg) : MProcess(gLcd->mSub), mUnk7C(arg) {
@@ -509,4 +512,46 @@ void DinoUiATMMenu::RefreshButtons() {
             AddLink(mTeamButtons[2], 4, mTeamButtons[0]);
         }
     }
+}
+
+// Moves the cursor to the item; on a team, shows its info and puts the team cursor by it (gliding there from
+// another team).
+void DinoUiATMMenu::OnFocus(MMenuItem *item) {
+    if (item == NULL) {
+        mFocusCursor->Hide();
+        mCursor->Hide();
+        return;
+    }
+    if (item == mBackButton) {
+        SetSelectedItem(dynamic_cast<DinoHelpItem *>(item));
+    }
+    if (mFocusCursor->IsHidden()) {
+        mFocusCursor->Show();
+        mFocusCursor->SetFrame(item->GetFrame());
+    } else {
+        mFocusTasks->Clear();
+        mFocusTasks->AddTail(mFocusCursor->CreateMoveTask(mFocusCursor->GetFrame(), item->GetFrame(), 10, -5));
+    }
+    for (int i = 0; i < 3; i++) {
+        if (item == mTeamButtons[i]) {
+            mTeamInfo->SetTeam(i + 1);
+            if (mUnk120 < -1) {
+                mCursor->Show();
+                mCursor->SetPosition(item->GetFrame().GetTopLeft() + data_ov007_0218cbe0.mFocusOffset);
+            } else if (mUnk120 < 1) {
+                mCursor->Show();
+                mCursor->SetPosition(item->GetFrame().GetTopLeft() + data_ov007_0218cbe0.mFocusOffset);
+                DinoSoundPlaySe(0x96, 0);
+            } else {
+                mCursor->Show();
+                mFocusTasks->AddTail(mCursor->CreateCoordAnime(
+                    mCursor->GetPosition(), item->GetFrame().GetTopLeft() + data_ov007_0218cbe0.mFocusOffset, 10, -5));
+                DinoSoundPlaySe(0x96, 0);
+            }
+            mUnk120 = i + 1;
+            return;
+        }
+    }
+    mUnk120 = -1;
+    mCursor->Hide();
 }
