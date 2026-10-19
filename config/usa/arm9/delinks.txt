@@ -692,6 +692,9 @@ libs/nitrosdk/src/dgt/hash2.c:
 libs/nitrosdk/src/dgt/hmac.c:
     .text       start:0x02078bd8 end:0x02078ccc
 
+libs/nitrosdk/src/dgt/hash2_arm4.c:
+    .text       start:0x02078ccc end:0x02078f60
+
 libs/nitrosdk/src/cp/cp_context.c:
     complete
     .text       start:0x02078f60 end:0x02078fdc
