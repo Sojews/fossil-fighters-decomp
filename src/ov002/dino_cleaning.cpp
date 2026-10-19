@@ -502,6 +502,16 @@ static inline void AddSerial(DinoCleaning *process, MTask *a, MTask *b, MTask *c
     serial->AddTail(d);
 }
 
+// Starts the rock and, after a moment, the help and the live commentary.
+void DinoCleaning::State02160f54() {
+    mUnk11C->AddTail(mKasekiRock);
+    mKasekiRock->StartDrop();
+    AddSerial(this, new MTimer(60), MCreateCallTask((DinoCleaningLive *)mUnkE4, data_ov002_02165aec.SetUnkA0_80, (u32)3, true),
+              new MTimer(2), MCreateCallTask(this, data_ov002_02165b6c.Enable_18));
+    mUnk110 = 3;
+    mState = data_ov002_02165b6c.State021610b0_20;
+}
+
 extern "C" struct {
     void (DinoHelpBase::*Enable_00)(); // 0x00
 } data_ov002_02165b5c;
@@ -584,16 +594,6 @@ void DinoCleaning::State02161d48() {
               mResultPicture->GetScreen()->CreateRotAnime(0, 0x1000, 20, 2),
               MCreateCallTask((DinoCleaningLive *)mUnkE4, data_ov002_02165b24.SetUnkAC_00, (u32)0x16), new MTimer(120));
     mState = data_ov002_02165aec.State02162cec_28;
-}
-
-// Starts the rock and, after a moment, the help and the live commentary.
-void DinoCleaning::State02160f54() {
-    mUnk11C->AddTail(mKasekiRock);
-    mKasekiRock->StartDrop();
-    AddSerial(this, new MTimer(60), MCreateCallTask((DinoCleaningLive *)mUnkE4, data_ov002_02165aec.SetUnkA0_80, (u32)3, true),
-              new MTimer(2), MCreateCallTask(this, data_ov002_02165b6c.Enable_18));
-    mUnk110 = 3;
-    mState = data_ov002_02165b6c.State021610b0_20;
 }
 
 void DinoCleaning::StateEnableToolMenu() {
