@@ -11,6 +11,8 @@ public:
 
     void StateSetup();
     void StateTeamSelect();
+    // Debug: the order select against four test creatures of rising levels.
+    void StateOrderSelect();
     void StateEnd();
 
     void (DinoNetBattleSample::*mState)(); // 0x74

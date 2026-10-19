@@ -205,7 +205,8 @@ struct DinoTeam {
 
 struct DinoCreaturePart {
     u32 level : 12;
-    u32 rest : 20;
+    u32 unk12 : 7;
+    u32 rest : 13;
 };
 
 struct DinoCreatureState {
