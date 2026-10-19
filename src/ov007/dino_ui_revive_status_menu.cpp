@@ -122,6 +122,12 @@ DinoUiReviveStatusLoop::DinoUiReviveStatusLoop(u32 a, u32 b) : MProcess(NULL) {
     mUnk78 = b;
 }
 
+DinoUiReviveStatusLoopCleaning::DinoUiReviveStatusLoopCleaning(const DinoEventReviveCreature *creature,
+                                                               const DinoEventReviveCreature *creature2, u32 *done,
+                                                               u8 flag)
+    : MProcess(NULL), mCreature(*creature), mCreature2(*creature2), mDone(done), mFlag(flag), mStep(0) {
+}
+
 #pragma auto_inline off
 
 // The TU's pooled pointer-to-member constants.

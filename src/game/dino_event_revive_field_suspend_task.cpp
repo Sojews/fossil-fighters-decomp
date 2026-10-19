@@ -22,6 +22,9 @@
 #include "m/display.h"
 #include "m/lcd.h"
 #include "m/screen.h"
+#include "game/dino_ui_cleaning_leave.h"
+#include "game/dino_ui_revive_effect.h"
+#include "game/dino_ui_revive_status_menu.h"
 
 DinoEventReviveFieldSuspendTask::~DinoEventReviveFieldSuspendTask() {
 }
@@ -36,6 +39,10 @@ DinoEventReviveContainerSelect::~DinoEventReviveContainerSelect() {
 }
 
 DinoEventReviveDepositSelect::~DinoEventReviveDepositSelect() {
+}
+
+MTask *DinoEventReviveDepositSelect::CreateUi() {
+    return new DinoUiCleaningLeave(mList);
 }
 
 DinoEventReviveCleaning::~DinoEventReviveCleaning() {
@@ -123,7 +130,7 @@ void DinoEventReviveContainerSelect::Idle() {
 extern "C" struct {
     u8 unk00[0x4];
     void (DinoEventRevive::*End_04)();
-    u8 unk0C[0x14 - 0xC];
+    void (DinoEventReviveEffect::*LoadStatus_0C)();
     void (DinoEventRevive::*End_14)();
     void (DinoEventRevive::*End_1C)();
     void (DinoEventRevive::*StateLevelMessage_24)();
@@ -283,6 +290,41 @@ void DinoEventRevive::StateEffectEnd() {
     mState = data_020bd628.End_14;
 }
 
+M_EXTERN_OVERLAY(ov003);
+M_EXTERN_OVERLAY(ov007);
+
+// Plays the revive effect while the creature's status loads, then shows the status.
+void DinoEventReviveEffect::Idle() {
+    switch (mStep++) {
+    case 0:
+        MLoadOverlay(0, M_OVERLAY_ID(ov003));
+        MLoadOverlay(0, M_OVERLAY_ID(ov007));
+        mSerial.AddTail(new DinoUiReviveEffect(mCreature, mCreature2, mDone, 1));
+        break;
+    case 1:
+        mSerial.AddTail(MCreateBgCallTask(this, data_020bd628.LoadStatus_0C, 1));
+        break;
+    case 2:
+        mSerial.AddTail(mUi);
+        break;
+    case 3:
+        MUnloadOverlay(0, M_OVERLAY_ID(ov003));
+        MUnloadOverlay(0, M_OVERLAY_ID(ov007));
+        Exit();
+        break;
+    }
+}
+
+void DinoEventReviveEffect::LoadStatus() {
+    mUi = new DinoUiReviveStatusLoopCleaning(&mCreature, &mCreature2, mDone, 0);
+    if (mUi->mState == MTask::STATE_RUN) {
+        mUi->Execute();
+    }
+    if (mUi->mState == MTask::STATE_RUN) {
+        mUi->Execute();
+    }
+}
+
 // Template task instances the game emits in this file. Until the code that makes the tasks is decompiled, they are
 // instantiated explicitly.
 template class MBgCallTask0<DinoEventReviveEffect>;
@@ -305,10 +347,8 @@ DinoEventCaptureFadeUiTask::DinoEventCaptureFadeUiTask(DinoEventLoop *event, u32
     mStep = 0;
 }
 
-M_EXTERN_OVERLAY(ov003);
 M_EXTERN_OVERLAY(ov004);
 M_EXTERN_OVERLAY(ov006);
-M_EXTERN_OVERLAY(ov007);
 
 void DinoEventCaptureFadeUiTask::LoadUi() {
     mEvent->CloseField(FALSE);

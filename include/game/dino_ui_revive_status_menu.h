@@ -59,13 +59,21 @@ public:
     u32 mUnk78;     // 0x78
 };
 
+#include "game/dino_event_revive_effect.h"
+
 class DinoUiReviveStatusLoopCleaning : public MProcess {
 public:
+    DinoUiReviveStatusLoopCleaning(const DinoEventReviveCreature *creature, const DinoEventReviveCreature *creature2,
+                                   u32 *done, u8 flag);
     virtual ~DinoUiReviveStatusLoopCleaning();
     virtual void Idle();
-};
 
-#include "game/dino_event_revive_effect.h"
+    DinoEventReviveCreature mCreature;  // 0x74
+    DinoEventReviveCreature mCreature2; // 0x8C
+    u32 *mDone;                         // 0xA4
+    u8 mFlag;                           // 0xA8
+    u32 mStep;                          // 0xAC
+};
 
 class DinoUiReviveStatusLoopBattle : public MProcess {
 public:

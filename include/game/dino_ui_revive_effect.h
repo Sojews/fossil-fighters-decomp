@@ -18,6 +18,7 @@ struct DinoUiReviveEffectData;
 
 class DinoUiReviveEffect : public MProcess {
 public:
+    DinoUiReviveEffect(const DinoCreatureState &creature, const DinoCreatureState &creature2, u32 *result, u32 flag);
     virtual ~DinoUiReviveEffect();
     virtual void Idle();
 
@@ -54,6 +55,7 @@ public:
     int mTimer;                             // 0x138
     MInput *mInput;                         // 0x13C
     u8 mShowText;                           // 0x140: tell the player the creature's name after the effect
+    u8 unk141[0x150 - 0x141];
 };
 
 #endif

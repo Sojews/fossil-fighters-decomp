@@ -2,11 +2,10 @@
 #define GAME_DINO_EVENT_REVIVE_EFFECT_H
 
 #include "m/task.h"
+#include "game/dino_backup.h"
 
 // What the revive effect shows of a creature.
-struct DinoEventReviveCreature {
-    u32 unk[6];
-};
+typedef DinoCreatureState DinoEventReviveCreature;
 
 class DinoEventReviveEffect : public MProcess {
 public:
@@ -19,7 +18,10 @@ public:
     DinoEventReviveCreature mCreature2; // 0x8C
     u32 *mDone;                         // 0xA4
     u32 mStep;                          // 0xA8
-    u32 unkAC;
+    MTask *mUi;                         // 0xAC
+
+    // Makes the creature's status loop (in the background, while the effect plays).
+    void LoadStatus();
 };
 
 #endif
