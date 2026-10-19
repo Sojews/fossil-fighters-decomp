@@ -22,7 +22,11 @@ public:
     MTask *CreateHideTask();
 
     std::string mText;     // 0x74
-    u32 mUnk80[18];        // 0x80
+    int mDigits;           // 0x80
+    u32 mA;                // 0x84
+    u32 mB;                // 0x88
+    u32 mC;                // 0x8C
+    u32 mUnk90[14];        // 0x90
 };
 
 class DinoFieldMoney : public DinoFieldPoint {

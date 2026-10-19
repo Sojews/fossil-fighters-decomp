@@ -4,6 +4,7 @@
 // Derived destructors have their bases' destructor bodies inlined; auto-inlining the ones defined above does that.
 #pragma auto_inline on
 
+#include "m/lcd.h"
 #include "game/dino_field_point.h"
 #include "types.h"
 #include "game/dino_backup.h"
@@ -38,4 +39,14 @@ void DinoFieldMoney::Format(char *buf) {
 
 void DinoFieldDonate::Format(char *buf) {
     OS_SPrintf(buf, data_ov001_0216ae44, gDinoBackup->GetSystemVar(0x13));
+}
+
+#pragma auto_inline off
+
+DinoFieldPoint::DinoFieldPoint(const std::string &path, int digits, u32 a, u32 b, u32 c)
+    : MProcess(gLcd->GetBottomDisplay()), mText(path) {
+    mDigits = digits;
+    mA = a;
+    mB = b;
+    mC = c;
 }
