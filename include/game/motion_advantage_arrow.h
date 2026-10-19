@@ -13,6 +13,7 @@
 
 class MotionAdvantageArrow : public MMotion {
 public:
+    MotionAdvantageArrow(const std::string &path, MSmartOam *oam);
     virtual ~MotionAdvantageArrow();
     virtual void Unk44(int arg);
 

@@ -1,5 +1,4 @@
 // ViewStatusEffectIcon.
-// Only the destructors are decompiled so far.
 
 // Derived destructors have their bases' destructor bodies inlined; auto-inlining the ones defined above does that.
 #pragma auto_inline on
@@ -123,3 +122,29 @@ void ViewStatusEffectIconShowTask::Execute() {
 
 #pragma auto_inline off
 template void std::__vec_deleter<StatusEffectEntry, std::allocator<StatusEffectEntry> >::sub_push_back(const StatusEffectEntry &x, Metrowerks::int2type<true>);
+
+#pragma auto_inline off
+
+// The status effects' icons: {effect, icon} pairs, ended by icon 0. (The game reads the table from three places.)
+extern "C" const struct {
+    u8 unk00[0x30];
+    u32 firstIcon;  // 0x30
+} data_ov000_021952b4;
+extern "C" const u32 data_ov000_021952e0[];    // the effects, every other word
+extern "C" const u32 data_ov000_021952e4[];    // their icons, every other word
+
+// The icon for the effect (0 for none).
+extern "C" u32 func_ov000_0217e298(const u32 *effect) {
+    int i = 0;
+    if (data_ov000_021952b4.firstIcon != 0) {
+        const u32 *entry = data_ov000_021952e0;
+        do {
+            if (*effect == entry[0]) {
+                return data_ov000_021952e4[i * 2];
+            }
+            entry += 2;
+            i++;
+        } while (entry[1] != 0);
+    }
+    return 0;
+}

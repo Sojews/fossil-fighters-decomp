@@ -38,6 +38,10 @@ void DinoBattleViewTutorialMotion::Hide(int index) {
 void DinoBattleViewAdvantageArrow::Idle() {
 }
 
+MotionAdvantageArrow::MotionAdvantageArrow(const std::string &path, MSmartOam *oam)
+    : MMotion(std::string(path), oam, 0, 1) {
+}
+
 void MotionAdvantageArrow::Unk44(int arg) {
     if (arg == 0x16 && !mUnk7C) {
         DinoSoundPlaySe(0x5C, 0);

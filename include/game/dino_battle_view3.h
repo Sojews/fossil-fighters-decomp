@@ -22,6 +22,8 @@ public:
     virtual ~DinoBattleViewDecideFirstAttackTeam();
     virtual void Idle();
 
+    void StateEnd();
+
     void (DinoBattleViewDecideFirstAttackTeam::*mState)(); // 0x74
     u32 unk7C[3];
     u32 mUnk88;     // 0x88

@@ -1,5 +1,4 @@
 // DinoBattleView3.
-// Only the destructors are decompiled so far.
 
 // Derived destructors have their bases' destructor bodies inlined; auto-inlining the ones defined above does that.
 #pragma auto_inline on
@@ -29,4 +28,12 @@ extern "C" struct {
 DinoBattleViewDecideFirstAttackTeam::DinoBattleViewDecideFirstAttackTeam(u32 unk88, u32 unk8C, u32 unk90, u32 unk94)
     : MProcess(NULL), mUnk88(unk88), mUnk8C(unk8C), mUnk90(unk90), mUnk94(unk94) {
     mState = data_ov000_02197300.Start_34;
+}
+
+#pragma auto_inline off
+
+extern "C" const u32 data_0208a170;     // frames the result stays up
+
+void DinoBattleViewDecideFirstAttackTeam::StateEnd() {
+    GetSerial()->AddTail(new MTimer(data_0208a170), MTaskExitTransfer::Create(this));
 }
