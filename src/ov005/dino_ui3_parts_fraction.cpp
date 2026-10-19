@@ -2,6 +2,7 @@
 // Only the destructors are decompiled so far.
 
 #include "game/dino_ui3_parts_fraction.h"
+#include "m/smart_oam.h"
 #include "game/dino_ui3_parts_rock_name.h"
 #include "game/dino_ui3_parts_mask_name.h"
 #include "game/dino_ui3_parts_kaseki_button.h"
@@ -11,6 +12,30 @@
 #include "game/dino_resource.h"
 #include <printf.h>
 #include "game/dino_sound.h"
+
+// The TU's pooled constants (see menu.cpp).
+extern "C" struct {
+    u8 unk00[0x34];
+    const char *pageNumberPath; // 0x34
+} data_ov005_0216561c;
+
+// "n/m": the two digits sit a little up-left and down-right of pos.
+DinoUi3PartsFraction::DinoUi3PartsFraction(MSmartOam *oam, MPoint pos) : MProcess(NULL) {
+    mNumerator = new MMotion(data_ov005_0216561c.pageNumberPath, oam, 2, 1);
+    mNumerator->Play(1, 0);
+    mNumerator->SetPosition(pos.x - 4, pos.y - 4);
+    mNumerator->SetPriority(2);
+    mNumerator->Show();
+    mNumerator->GetUnit()->SetMode(1);
+    mParallel.AddTail(mNumerator);
+    mDenominator = new MMotion(data_ov005_0216561c.pageNumberPath, oam, 2, 1);
+    mDenominator->Play(1, 0);
+    mDenominator->SetPosition(pos.x + 4, pos.y + 4);
+    mDenominator->SetPriority(2);
+    mDenominator->Show();
+    mDenominator->GetUnit()->SetMode(1);
+    mParallel.AddTail(mDenominator);
+}
 
 DinoUi3PartsFraction::~DinoUi3PartsFraction() {
 }

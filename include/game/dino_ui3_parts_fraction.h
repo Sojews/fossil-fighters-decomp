@@ -4,8 +4,11 @@
 #include "m/motion.h"
 #include "m/task.h"
 
+class MSmartOam;
+
 class DinoUi3PartsFraction : public MProcess {
 public:
+    DinoUi3PartsFraction(MSmartOam *oam, MPoint pos);
     virtual ~DinoUi3PartsFraction();
     virtual void Idle();
     void SetNumerator(u8 n);
