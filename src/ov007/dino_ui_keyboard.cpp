@@ -15,6 +15,10 @@
 #include "m/window.h"
 #include "m/lcd.h"
 
+DinoUiKeyboardMenu::DinoUiKeyboardMenu(int mode, u32 arg, int flag)
+    : MMenu(NULL, 0), mUnk13C(0), mUnk144(0), mMode(mode), mArg(arg), mUnk190(0x20), mFlag(flag) {
+}
+
 DinoUiKeyboardMenu::~DinoUiKeyboardMenu() {
     gLcd->GetBottomDisplay()->mWin->GetWindow0()->Hide();
     gLcd->GetBottomDisplay()->mBlend->Reset();
