@@ -136,7 +136,8 @@ void DinoUiReviveEffect::State0215e220() {
     mState = data_ov003_02161d20.State0215ee24_84;
 }
 
-extern "C" int func_ov003_0215b480(int frames);
+// A duration of the effect, scaled for which version of it plays.
+int DinoReviveFrames(int frames);
 
 // Puts value in place of the first tag in text (unless value has the tag itself).
 std::string DinoReplaceTag(std::string text, std::string tag, std::string value);
@@ -148,10 +149,10 @@ void DinoUiReviveEffect::State0215ec2c() {
     MTask *exit;
     exit = MTaskExitTransfer::Create(mUnk124);
     MBlend *blend = gCurrentDisplay->mBlend;
-    fade = blend->CreateFadeRatioAnime(16, 0, func_ov003_0215b480(60), 0);
+    fade = blend->CreateFadeRatioAnime(16, 0, DinoReviveFrames(60), 0);
     MPoint from(0, 0);
     MPoint to(0, 192);
-    MTask *move = mUnk124->CreateCoordAnime(from, to, func_ov003_0215b480(60), 2);
+    MTask *move = mUnk124->CreateCoordAnime(from, to, DinoReviveFrames(60), 2);
     MParallelTaskSet *anims = new MParallelTaskSet(TRUE);
     anims->AddTail(move);
     anims->AddTail(fade);
@@ -174,11 +175,11 @@ void DinoUiReviveEffect::StateScroll() {
     mScrollFrame++;
     int x = gDinoResource->GetRandom()->Next(mScroller->GetWidth() - 256);
     int height = mScroller->GetHeight();
-    mScroller->SetPosition(-x, mScrollFrame * -(height - 192) / func_ov003_0215b480(360));
-    if (mScrollFrame == func_ov003_0215b480(200)) {
+    mScroller->SetPosition(-x, mScrollFrame * -(height - 192) / DinoReviveFrames(360));
+    if (mScrollFrame == DinoReviveFrames(200)) {
         DinoSoundPlaySe(mUnkAC.index + 0x475, 0);
     }
-    if (mScrollFrame >= func_ov003_0215b480(360)) {
+    if (mScrollFrame >= DinoReviveFrames(360)) {
         mState = data_ov003_02161d20.State0215ec2c_E4;
     }
 }
@@ -187,7 +188,7 @@ extern "C" const int data_020899d0;  // how long the effect waits
 void DinoUiReviveEffect::StartWait() {
     gCurrentDisplay->mBg->SetMode(0);
     if (data_ov003_021624c0) {
-        mTimer = func_ov003_0215b480(0xB4);
+        mTimer = DinoReviveFrames(0xB4);
     } else {
         mTimer = data_020899d0;
     }
@@ -289,7 +290,7 @@ u32 DinoGetCreatureLevel(const DinoCreatureState *creature) {
 void DinoUiReviveEffectLight::Idle() {
     if (mTimer != 0) {
         mTimer--;
-        mHeight = 0x60 * func_ov003_0215b480(0x78 - mTimer) / func_ov003_0215b480(0x78);
+        mHeight = 0x60 * DinoReviveFrames(0x78 - mTimer) / DinoReviveFrames(0x78);
     }
     mAngle += 0x190;
     mPicture->SetPosition(0, MFx32ToInt(MFx32::FromRaw(FX_SinIdx(mAngle)) * MFx32(10)) - mHeight);

@@ -7,6 +7,7 @@
 #include "m/blend.h"
 #include "m/display.h"
 #include "m/task.h"
+#include "m/fx32.h"
 
 // TRUE if the team's first three members are all set and share a type, which gives the team a technique.
 BOOL DinoTeamHasTech(const DinoTeam *team) {
@@ -45,6 +46,16 @@ std::string DinoReplaceTag(std::string text, std::string tag, std::string value)
         }
         text = text.replace(pos, tag.size(), value);
     }
+}
+
+extern "C" u8 data_ov003_021624c0;  // the slow revive effect (which can't be skipped)
+
+// A duration of the revive effect, scaled for which version of it plays.
+int DinoReviveFrames(int frames) {
+    if (data_ov003_021624c0) {
+        return MFx32ToInt(MFx32::FromRaw(0xCCD) * MFx32(frames));
+    }
+    return MFx32ToInt(MFx32::FromRaw(0x548) * MFx32(frames));
 }
 
 #pragma auto_inline off
