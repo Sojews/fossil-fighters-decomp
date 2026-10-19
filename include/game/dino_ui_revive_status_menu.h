@@ -45,6 +45,8 @@ public:
     void SetPage(u8 page);
     void SetTab(u8 tab);
     // Fades out (to white, or black) and exits, stopping the music first if it should.
+    // Fades both screens in (from white, or black).
+    void FadeIn();
     void Leave();
 
     u8 unkB3[1];

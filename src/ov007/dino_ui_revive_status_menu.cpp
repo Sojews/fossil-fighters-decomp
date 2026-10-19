@@ -237,6 +237,31 @@ extern "C" struct {
 } data_ov007_02191e80;
 extern "C" void func_ov007_02189170(DinoUiReviveStatusMenu *menu);
 
+extern const int data_02089a78, data_02089a7c;
+
+void DinoUiReviveStatusMenu::FadeIn() {
+    mUnkE0 = new MParallelTaskSet;
+    mParallel.AddTail(mUnkE0);
+    if (mFlag) {
+        MBright *bright = gLcd->GetBottomDisplay()->mBright;
+        MTask *fadeBottom = bright->CreateFadeInFromWhite(data_02089a7c, data_02089a78);
+        MTask *fadeTop = gLcd->GetTopDisplay()->mBright->CreateFadeInFromWhite(data_02089a7c, data_02089a78);
+        MParallelTaskSet *fades = new MParallelTaskSet(TRUE);
+        fades->AddTail(fadeTop);
+        fades->AddTail(fadeBottom);
+        mUnkE0->AddTail(fades);
+    } else {
+        MBright *bright = gLcd->GetBottomDisplay()->mBright;
+        MTask *fadeBottom = bright->CreateFadeInFromBlack(data_02089a7c, data_02089a78);
+        MTask *fadeTop = gLcd->GetTopDisplay()->mBright->CreateFadeInFromBlack(data_02089a7c, data_02089a78);
+        MParallelTaskSet *fades = new MParallelTaskSet(TRUE);
+        fades->AddTail(fadeTop);
+        fades->AddTail(fadeBottom);
+        mUnkE0->AddTail(fades);
+    }
+    mSerial.AddTail(new MTimer(data_02089a7c));
+}
+
 extern const int data_02089a6c, data_02089a70;
 
 // NONMATCHING: the two fade constants swap registers (as DinoUiKeyboardMenu::OnBackDecided).

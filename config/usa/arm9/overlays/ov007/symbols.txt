@@ -459,7 +459,7 @@ _ZN26DinoUiReviveStatusMenuItemC1EP22DinoUiReviveStatusMenuRKSs6MPointm kind:fun
 _Z15MCreateCallTaskI22DinoUiReviveStatusMenu12DinoHelpBaseEP5MTaskPT_MT0_FvvE kind:function(thumb,size=0x38) addr:0x02187f44
 _ZN22DinoUiReviveStatusMenu7OnFocusEP9MMenuItem kind:function(thumb,size=0x12c) addr:0x02187f7c
 _ZN22DinoUiReviveStatusMenu8OnDecideEP9MMenuItem kind:function(thumb,size=0x28) addr:0x021880a8
-func_ov007_021880d0 kind:function(thumb,size=0x204) addr:0x021880d0
+_ZN22DinoUiReviveStatusMenu6FadeInEv kind:function(thumb,size=0x204) addr:0x021880d0
 _ZN22DinoUiReviveStatusMenu5LeaveEv kind:function(thumb,size=0x1b0) addr:0x021882d4
 func_ov007_02188484 kind:function(thumb,size=0x388) addr:0x02188484
 func_ov007_0218880c kind:function(thumb,size=0x3bc) addr:0x0218880c
