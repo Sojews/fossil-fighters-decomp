@@ -32,9 +32,12 @@ class KasekiPictCache : public MProcess {
 public:
     virtual ~KasekiPictCache();
     virtual void Idle();
+    // Loads the pictures, one path after another, until told to stop (in the background).
+    void Load();
 
-    u32 unk74;
+    const char *const *mPaths;              // 0x74: up to a NULL
     std::vector<MPictureFile> mPictures;    // 0x78
+    u8 mStop;                               // 0x84
 };
 
 class KeyCheckTask : public MTask {

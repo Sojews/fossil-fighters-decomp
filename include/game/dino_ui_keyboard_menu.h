@@ -12,6 +12,7 @@
 #include "game/dino_field_camera_hook.h"
 
 class MTextPicture;
+class KasekiPictCache;
 class MMotion;
 class MIndicator;
 
@@ -46,7 +47,7 @@ public:
     int mMode;                  // 0x188
     u32 mArg;                   // 0x18C
     int mPage;                  // 0x190
-    MProcess *mUnk194;          // 0x194: waited on before exiting (its +0x84 flag is set first)
+    KasekiPictCache *mPictCache;    // 0x194: stopped and waited on before exiting
     u8 unk198[0x19C - 0x198];
     std::wstring mUnk19C;       // 0x19C
     std::wstring mUnk1A8;       // 0x1A8

@@ -100,6 +100,16 @@ void DinoUiKeyboardMenuItem::OnSelectChanged(BOOL value) {
 void DinoUiKeyboardMenuItem::OnFocusChanged(BOOL value) {
 }
 
+void KasekiPictCache::Load() {
+    while (*mPaths != NULL) {
+        if (mStop) {
+            return;
+        }
+        mPictures.push_back(MPictureFile(std::string(*mPaths), 7));
+        mPaths++;
+    }
+}
+
 void KasekiPictCache::Idle() {
 }
 
@@ -487,9 +497,9 @@ void DinoUiKeyboardMenu::OnBackDecided() {
     }
     mUnk158->Exit();
     MTask *exit = MTaskExitTransfer::Create(&(MTask &)*this);
-    MProcess *other = mUnk194;
-    ((u8 *)other)[0x84] = TRUE;
-    MTask *waitTask = MTaskSetWaitEmptyTask::Create(&other->mSerial);
+    KasekiPictCache *cache = mPictCache;
+    cache->mStop = TRUE;
+    MTask *waitTask = MTaskSetWaitEmptyTask::Create(&cache->mSerial);
     GetSerial()->AddTail(new MTimer(data_02089ad0), fades, waitTask, exit);
 }
 
