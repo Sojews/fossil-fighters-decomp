@@ -56,14 +56,14 @@ MRect DinoUiDebugFlagMenuItem::GetFrame() {
 }
 
 // Toggles the flag and redraws it.
-// NONMATCHING: the two strings' stack slots are swapped.
 void DinoUiDebugFlagMenuItem::OnDecide() {
     BOOL value = !GetValue();
     SetValue(value);
     if (!GetValue()) {
         mCanvas->DrawText(mFont, mPos, 0, std::string("0"));
     } else {
-        mCanvas->DrawText(mFont, mPos, 0, std::string("1"));
+        std::string one("1");
+        mCanvas->DrawText(mFont, mPos, 0, one);
     }
 }
 
