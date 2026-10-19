@@ -10,19 +10,20 @@
 #include "game/help.h"
 #include "game/dino_field_camera_hook.h"
 #include "m/3d_resource.h"
+#include "m/fx32.h"
 
 class MAnmModelBase;
 class DinoField;
 
 class DinoFieldHole : public MProcess {
 public:
-    DinoFieldHole(DinoField *field, u32 unk80, MPoint pos, u32 unk90, u8 unk118);
+    DinoFieldHole(DinoField *field, u32 unk80, MFx32Point pos, u32 unk90, u8 unk118);
     virtual ~DinoFieldHole();
     virtual void Idle();
 
     u8 GetUnk110();
     void SetUnk114();
-    MPoint GetPos();
+    MFx32Point GetPos();
     void ChangeToHole();
     void StartChangeToHole();
     void StateWait();
@@ -32,7 +33,7 @@ public:
     DinoField *mField;                  // 0x7C
     u32 mUnk80;                         // 0x80
     MAnmModelBase *mUnk84;              // 0x84
-    MPoint mPos;                        // 0x88
+    MFx32Point mPos;                    // 0x88
     u32 mUnk90;                         // 0x90
     M3DModelResource mModel;            // 0x94
     u8 unkF8[0x110 - 0xF8];

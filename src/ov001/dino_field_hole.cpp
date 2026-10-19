@@ -24,7 +24,7 @@ void DinoFieldHole::SetUnk114() {
     mUnk114 = 0xB1;
 }
 
-MPoint DinoFieldHole::GetPos() {
+MFx32Point DinoFieldHole::GetPos() {
     return mPos;
 }
 
@@ -54,7 +54,7 @@ extern "C" struct {
     void (DinoFieldHole::*Unk0215c418_24)();
 } data_ov001_02169ddc;
 
-DinoFieldHole::DinoFieldHole(DinoField *field, u32 unk80, MPoint pos, u32 unk90, u8 unk118)
+DinoFieldHole::DinoFieldHole(DinoField *field, u32 unk80, MFx32Point pos, u32 unk90, u8 unk118)
     : MProcess(NULL), mField(field), mUnk80(unk80), mPos(pos), mUnk90(unk90) {
     mUnk110 = 0;
     mUnk118 = unk118;

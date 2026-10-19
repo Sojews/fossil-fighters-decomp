@@ -312,9 +312,11 @@ public:
     void CreateEffects(MPolygonChar **effects, u32 count, u32 id);
     fx32 GetGroundHeight(fx32 x, fx32 y);
     // The highest of the ground heights around pos (a tile each way), a little above it.
-    fx32 GetMaxGroundHeight(MPoint pos);
-    DinoFieldHole *CreateHole(MPoint pos);
-    void CreateRockHole(MPoint pos, u32 arg);
+    fx32 GetMaxGroundHeight(MFx32Point pos);
+    DinoFieldHole *CreateHole(MFx32Point pos);
+    void CreateRockHole(MFx32Point pos, u32 arg);
+    // The open rock hole within 1.5 of pos, or NULL.
+    DinoFieldHole *FindRockHole(MFx32Point pos);
     BOOL IsWalkable(fx32 x, fx32 y, fx32 *height);
     BOOL IsWalkable(MFx32Point pos, fx32 *height);
     // Where the character ends up moving by move: pushed out of the other characters (and, on the map in the

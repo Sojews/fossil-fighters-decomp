@@ -351,29 +351,29 @@ fx32 DinoField::GetGroundHeight(fx32 x, fx32 y) {
 }
 
 #pragma opt_common_subs off
-fx32 DinoField::GetMaxGroundHeight(MPoint pos) {
-    fx32 y = pos.y;
+fx32 DinoField::GetMaxGroundHeight(MFx32Point pos) {
+    fx32 y = pos.y.v;
     fx32 h;
-    fx32 height = GetGroundHeight(pos.x, y);
+    fx32 height = GetGroundHeight(pos.x.v, y);
     if (height == (fx32)0x80000000) {
         return height;
     }
-    h = GetGroundHeight(pos.x - FX32_ONE, y);
+    h = GetGroundHeight(pos.x.v - FX32_ONE, y);
     if (h == (fx32)0x80000000) {
         return h;
     }
     height = std::max(h, height);
-    h = GetGroundHeight(pos.x + FX32_ONE, y);
+    h = GetGroundHeight(pos.x.v + FX32_ONE, y);
     if (h == (fx32)0x80000000) {
         return h;
     }
     height = std::max(h, height);
-    h = GetGroundHeight(pos.x, y - FX32_ONE);
+    h = GetGroundHeight(pos.x.v, y - FX32_ONE);
     if (h == (fx32)0x80000000) {
         return h;
     }
     height = std::max(h, height);
-    h = GetGroundHeight(pos.x, y + FX32_ONE);
+    h = GetGroundHeight(pos.x.v, y + FX32_ONE);
     if (h == (fx32)0x80000000) {
         return h;
     }
@@ -831,14 +831,43 @@ void DinoField::Quake(u32 a, u32 b, u32 c) {
     mQuakeTime = 0;
 }
 
-DinoFieldHole *DinoField::CreateHole(MPoint pos) {
+DinoFieldHole *DinoField::CreateHole(MFx32Point pos) {
     DinoFieldHole *hole = new DinoFieldHole(this, (u32)mScene, pos, GetMaxGroundHeight(pos), 1);
     mHoles->AddTail(hole);
     return hole;
 }
 
-void DinoField::CreateRockHole(MPoint pos, u32 arg) {
+void DinoField::CreateRockHole(MFx32Point pos, u32 arg) {
     mRockHoles->AddTail(new DinoFieldHole(this, (u32)mScene, pos, arg, 0));
+}
+
+// Whether a is within the square root of range of b.
+static inline bool IsWithin(MFx32Point a, MFx32Point b, MFx32 range) {
+    MFx32Point d = a - b;
+    return d.x * d.x + d.y * d.y <= range;
+}
+
+static inline bool IsNearHole(DinoFieldHole *hole, MFx32Point pos) {
+    bool near = false;
+    if (hole->GetUnk110()) {
+        MFx32 range;
+        range.v = 0x2400;
+        if (IsWithin(hole->GetPos(), pos, range)) {
+            near = true;
+        }
+    }
+    return near;
+}
+
+// NONMATCHING: stack slots of the point temporaries only.
+DinoFieldHole *DinoField::FindRockHole(MFx32Point pos) {
+    for (DinoFieldHole *hole = (DinoFieldHole *)mRockHoles->mHead; hole != NULL;
+         hole = (DinoFieldHole *)hole->mNext) {
+        if (IsNearHole(hole, pos)) {
+            return hole;
+        }
+    }
+    return NULL;
 }
 
 MTask *DinoField::CreatePictWaitTask() {
