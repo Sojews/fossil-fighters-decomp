@@ -125,6 +125,30 @@ MFx32 DinoCleaningKasekiRock::GetDirtRatio() {
     return mView->GetDirtRatio();
 }
 
+extern "C" MFx32 func_ov002_0215f0ac(DinoCleaningRock *rock, int row, int col, MFx32 power);
+extern "C" void func_ov002_02159990(DinoCleaningImage *image, int row, int col, s32 layer);
+
+// Hits the cell: the top rock takes the power, and what breaks through (less the decay, scaled) hits the rock below;
+// then the images show the new layers.
+// NONMATCHING: 97%, the game's frame has one more temporary (a copy of what's left after the first hit).
+void DinoCleaningKasekiRock::Hit(int row, int col, MFx32 power, MFx32 scale, MFx32 decay) {
+    if (mUnk4B8) {
+        return;
+    }
+    MFx32 left = func_ov002_0215f0ac(mRock90, row, col, power);
+    if (left != power) {
+        left = std::max(MFx32(0), left - decay);
+    }
+    power = left;
+    func_ov002_0215f0ac(mRock8C, row, col, power * scale);
+    if (mUnk4A0 != 1) {
+        func_ov002_02159990(((DinoCleaningImageView *)mUnk88)->GetImage(0), row, col, mRock8C->GetCellLayer(row, col));
+        return;
+    }
+    func_ov002_02159990(((DinoCleaningImageView *)mUnk88)->GetImage(0), row, col, mRock8C->GetCellLayer(row, col));
+    func_ov002_02159990(((DinoCleaningImageView *)mUnk88)->GetImage(1), row, col, mRock90->GetCellLayer(row, col));
+}
+
 void DinoCleaningKasekiRock::CountCells() {
     u32 i;
     int col;

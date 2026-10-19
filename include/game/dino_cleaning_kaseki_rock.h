@@ -53,7 +53,9 @@ public:
     DinoCleaningKasekiRockXrayBlendManager *mXray;  // 0x94
     u32 mUnk98;                                 // 0x98
     u32 mUnk9C;                                 // 0x9C
-    u32 mUnkA0[(0x4A4 - 0xA0) / 4];             // 0xA0
+    u32 mUnkA0[4];                              // 0xA0: cells per layer
+    u8 unkB0[0x4A0 - 0xB0];
+    u32 mUnk4A0;                                // 0x4A0: 1 when both images show the rock's layers
     MSmartOam *mOam;                            // 0x4A4
     MRandom *mRandom;                           // 0x4A8
     MFx32 mDropY;                               // 0x4AC: the view's height while it drops in
