@@ -1,5 +1,5 @@
-// MText and its transfers. MTextTransfer::Transfer and MTextFill::Transfer (tile map copies with flips) aren't
-// decompiled yet.
+// MText and its transfers. Not decompiled yet: MTextFill::Transfer and the tile map copy with flips
+// (func_02056750).
 
 #include "m/text.h"
 #include "m/looper.h"
@@ -140,6 +140,61 @@ void MText::Fill(MRect rect, int tile, int palette, bool hflip, bool vflip) {
 }
 
 MTextTransfer::~MTextTransfer() {
+}
+
+// Copies a w x h block of tile entries from (x, y) of the source to (dx, dy) of a 32x32 screen block, with the flips.
+extern "C" void func_02056750(const u16 *src, int srcWidth, int srcHeight, int x, int y, int w, int h, u32 base,
+                              int size, int block, int dx, int dy, u16 attr, u16 flip);
+
+// Picks the screen block the destination is in; a copy crossing the block's right edge is done in two parts (in the
+// other order when flipped).
+void MTextTransfer::Transfer() {
+    int block = 0;
+    int size;
+    if (mDst.x & 0x20) {
+        block = MText::GetRightBlock(mDstSize, block);
+    }
+    if (mDst.y & 0x20) {
+        block = MText::GetDownBlock(mDstSize, block);
+    }
+    mDst.x &= 0x1F;
+    mDst.y &= 0x1F;
+    const u16 *src;
+    int srcWidth;
+    int srcHeight;
+    int x;
+    int y;
+    u32 base;
+    int dy;
+    u16 attr;
+    int h;
+    int w;
+    dy = mDst.y;
+    u16 flip = mFlip;
+    attr = mAttr;
+    base = mDstBase;
+    int dx = mDst.x;
+    h = mSrcRect.GetHeight();
+    size = mDstSize;
+    w = mSrcRect.GetWidth();
+    y = mSrcRect.top;
+    x = mSrcRect.left;
+    srcHeight = mSrcSize.y;
+    srcWidth = mSrcSize.x;
+    src = mSrc;
+    if (dx + w < 32) {
+        func_02056750(src, srcWidth, srcHeight, x, y, w, h, base, size, block, dx, dy, attr, flip);
+    } else if (!(flip & 0x400)) {
+        int first = 32 - dx;
+        func_02056750(src, srcWidth, srcHeight, x, y, first, h, base, size, block, dx, dy, attr, flip);
+        func_02056750(src, srcWidth, srcHeight, x + 32 - dx, y, w - first, h, base, size,
+                      MText::GetRightBlock(size, block), 0, dy, attr, flip);
+    } else {
+        int first = 32 - dx;
+        func_02056750(src, srcWidth, srcHeight, x + w - first, y, first, h, base, size, block, dx, dy, attr, flip);
+        func_02056750(src, srcWidth, srcHeight, x, y, w - first, h, base, size, MText::GetRightBlock(size, block), 0,
+                      dy, attr, flip);
+    }
 }
 
 MTextFill::~MTextFill() {
