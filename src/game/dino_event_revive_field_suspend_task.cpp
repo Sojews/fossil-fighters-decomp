@@ -21,6 +21,7 @@
 #include "game/dino_sound.h"
 #include "m/display.h"
 #include "m/lcd.h"
+#include "m/screen.h"
 
 DinoEventReviveFieldSuspendTask::~DinoEventReviveFieldSuspendTask() {
 }
@@ -301,7 +302,95 @@ DinoEventUiTask::DinoEventUiTask(DinoEventLoop *event, u32 arg, u8 flag) : MProc
 DinoEventCaptureFadeUiTask::DinoEventCaptureFadeUiTask(DinoEventLoop *event, u32 arg) : MProcess(NULL) {
     mEvent = event;
     mArg = arg;
-    mUi = NULL;
+    mStep = 0;
+}
+
+M_EXTERN_OVERLAY(ov003);
+M_EXTERN_OVERLAY(ov004);
+M_EXTERN_OVERLAY(ov006);
+M_EXTERN_OVERLAY(ov007);
+
+void DinoEventCaptureFadeUiTask::LoadUi() {
+    mEvent->CloseField(FALSE);
+    switch (mArg) {
+    case 1:
+        MLoadOverlay(0, M_OVERLAY_ID(ov003));
+        break;
+    case 2:
+        MLoadOverlay(0, M_OVERLAY_ID(ov004));
+        break;
+    case 3:
+        MLoadOverlay(0, M_OVERLAY_ID(ov005));
+        break;
+    case 4:
+        MLoadOverlay(0, M_OVERLAY_ID(ov003));
+        MLoadOverlay(0, M_OVERLAY_ID(ov006));
+        break;
+    case 5:
+        MLoadOverlay(0, M_OVERLAY_ID(ov003));
+        MLoadOverlay(0, M_OVERLAY_ID(ov007));
+        break;
+    }
+    mUi = CreateUi();
+    if (mUi->mState == MTask::STATE_RUN) {
+        mUi->Execute();
+    }
+    if (mUi->mState == MTask::STATE_RUN) {
+        mUi->Execute();
+    }
+}
+
+// The field's capture fades (in the field overlay).
+extern "C" MProcess *func_ov001_02159cd0(DinoField *field);
+extern "C" MProcess *func_ov001_02159d3c(DinoField *field);
+
+// The TU's pooled pointer-to-member constants.
+extern "C" struct {
+    void (DinoEventCaptureFadeUiTask::*LoadUi_00)();
+} data_020bda10;
+
+// Fades the field out, slides the screen down while the UI loads, runs it, then brings the field back.
+void DinoEventCaptureFadeUiTask::Idle() {
+    switch (mStep++) {
+    case 0:
+        mSerial.AddTail(func_ov001_02159cd0(mEvent->GetField()));
+        break;
+    case 1:
+        gLcd->GetBottomDisplay()->mBright->SetMode(2);
+        gLcd->GetBottomDisplay()->mBright->SetFactor(16);
+        mParallel.AddTail(mEvent->mScreen->CreateOffsetAnime(MPoint(0, -92), MPoint(0, 0), 29, -2));
+        mSerial.AddTail(MCreateBgCallTask(this, data_020bda10.LoadUi_00, 1));
+        break;
+    case 2:
+        mSerial.AddTail(mUi);
+        break;
+    case 3:
+        switch (mArg) {
+        case 1:
+            MUnloadOverlay(0, M_OVERLAY_ID(ov003));
+            break;
+        case 2:
+            MUnloadOverlay(0, M_OVERLAY_ID(ov004));
+            break;
+        case 3:
+            MUnloadOverlay(0, M_OVERLAY_ID(ov005));
+            break;
+        case 4:
+            MUnloadOverlay(0, M_OVERLAY_ID(ov003));
+            MUnloadOverlay(0, M_OVERLAY_ID(ov006));
+            break;
+        case 5:
+            MUnloadOverlay(0, M_OVERLAY_ID(ov003));
+            MUnloadOverlay(0, M_OVERLAY_ID(ov007));
+            break;
+        }
+        mEvent->CreateField();
+        mSerial.AddTail(func_ov001_02159d3c(mEvent->GetField()));
+        break;
+    case 4:
+        Exit();
+        break;
+    }
 }
 
 // String members the game emits in this file.

@@ -18,10 +18,13 @@ public:
     virtual void Idle();
     // Makes the UI this event shows.
     virtual MTask *CreateUi() = 0;
+    // Closes the field, loads the UI's overlays and makes the UI (in the background).
+    void LoadUi();
 
     DinoEventLoop *mEvent;  // 0x74
-    u32 mArg;               // 0x78
-    MTask *mUi;             // 0x7C
+    u32 mArg;               // 0x78: which overlays the UI needs
+    u32 mStep;              // 0x7C
+    MTask *mUi;             // 0x80
 };
 
 #endif

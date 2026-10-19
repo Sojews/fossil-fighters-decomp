@@ -8,7 +8,6 @@ public:
     virtual ~DinoEventFieldMenu();
     virtual MTask *CreateUi();
 
-    u32 mUnk80;     // 0x80
     u32 mUnk84;     // 0x84
 };
 

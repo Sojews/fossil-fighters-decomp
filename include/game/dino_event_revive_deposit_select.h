@@ -11,7 +11,6 @@ public:
     virtual ~DinoEventReviveDepositSelect();
     virtual MTask *CreateUi();
 
-    u32 mUnk80;                 // 0x80
     std::vector<void *> *mList; // 0x84: gets what's chosen
 };
 
