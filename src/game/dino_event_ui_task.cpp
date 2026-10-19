@@ -231,6 +231,15 @@ MTask *DinoEventMedalList::CreateUi() {
 // Vector instances the game emits in this file (made explicitly until the code that uses them is decompiled).
 template class std::__vec_deleter<u32, std::allocator<u32> >;
 
+// The event loop's episode map's members the game emits in this file.
+typedef std::__red_black_tree<u32, std::pair<const u32, DinoEventEpisode>,
+                              std::__select_first<std::pair<const u32, DinoEventEpisode> >, std::less<u32>,
+                              std::allocator<std::pair<const u32, DinoEventEpisode> > >
+    DinoEventEpisodeTree;
+template void DinoEventEpisodeTree::clear();
+template void DinoEventEpisodeTree::destroy(DinoEventEpisodeTree::node_base *n);
+template DinoEventEpisodeTree::iterator DinoEventEpisodeTree::erase(DinoEventEpisodeTree::iterator it);
+
 #pragma auto_inline off
 
 // The field's capture fades (in the field overlay).
