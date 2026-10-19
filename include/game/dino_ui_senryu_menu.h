@@ -25,13 +25,17 @@ public:
 
     u8 unkB4[0x38];
     MView *mCursor;     // 0xEC
-    u8 unkF0[0x30];
+    u8 unkF0[0x18];
+    u32 mUnk108;        // 0x108
+    u32 mUnk10C;        // 0x10C
+    u8 unk110[0x10];
     MFont *mFont120;    // 0x120
     MFont *mFont124;    // 0x124
     MFont *mFont128;    // 0x128
     u32 unk12C;
     u32 mPage;          // 0x130
-    u8 unk134[9];
+    u32 mUnk134;        // 0x134
+    u8 unk138[5];
     u8 mSilentFocus;    // 0x13D
     std::wstring mUnk140[126];  // 0x140
     std::wstring mUnk728[42];   // 0x728

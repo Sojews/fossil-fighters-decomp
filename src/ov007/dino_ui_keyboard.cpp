@@ -356,3 +356,11 @@ MTask *DinoUiKeyboardMenu::CreatePageChangeTask(u32 page) {
 MTask *DinoUiSenryuMenu::CreateCurChangeTask(u32 cur) {
     return new CurChangeTask(this, cur);
 }
+
+#pragma auto_inline off
+
+DinoUiSenryuMenu::DinoUiSenryuMenu() : MMenu(NULL, 0), mCursor(NULL), mPage(99), mUnk134(99) {
+    mUnk108 = 0;
+    mUnk10C = 0;
+    unk12C = 0;
+}
