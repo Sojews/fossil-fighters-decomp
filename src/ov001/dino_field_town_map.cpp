@@ -93,6 +93,20 @@ DinoFieldDance::DinoFieldDance(DinoField *field, u32 a, u32 b, u32 c, u32 d, u32
     mState = data_ov001_0216a814.Start_1C;
 }
 
+void DinoFieldDance::ShowTime() {
+    u32 time = mTime;
+    u32 frames = time % 60;
+    u32 seconds = (time - frames) / 60;
+    u32 hundredths = frames * 100 / 60;
+    mTimeDigits[0]->Play(seconds / 10 + 1, 0);
+    mTimeDigits[1]->Play(seconds % 10 + 1, 0);
+    mTimeDigits[2]->Play(hundredths / 10 + 1, 0);
+    mTimeDigits[3]->Play(hundredths % 10 + 1, 0);
+    gDinoBackup->SetLocalVar(mUnk94, mTime);
+    gDinoBackup->SetLocalVar(mUnk98, seconds);
+    gDinoBackup->SetLocalVar(mUnk9C, hundredths);
+}
+
 DinoFieldTownMapManager::DinoFieldTownMapManager(DinoField *field) : MProcess(gLcd->GetTopDisplay()) {
     mField = field;
     mTownMap = NULL;

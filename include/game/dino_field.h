@@ -535,6 +535,8 @@ public:
     virtual void Idle();
 
     void Start();
+    // Shows the time on the digits and keeps it (frames, seconds and hundredths) in the local variables.
+    void ShowTime();
 
     void (DinoFieldDance::*mState)(); // 0x74
     DinoField *mField;                // 0x7C
@@ -545,7 +547,11 @@ public:
     u32 mUnk9C;                       // 0x9C
     u32 unkA0;
     std::vector<MTask *> mUnkA4;      // 0xA4
-    u32 unkB0[14];
+    u32 unkB0[5];
+    u32 mTime;                        // 0xC4: in frames
+    u32 unkC8;
+    MMotion *mTimeDigits[4];          // 0xCC: seconds (tens, ones), then hundredths
+    u32 unkDC[3];
     MResource<DinoDanceData> mUnkE8;  // 0xE8
     u32 unkF8[2];
     MPictureFile mPicture;            // 0x100
