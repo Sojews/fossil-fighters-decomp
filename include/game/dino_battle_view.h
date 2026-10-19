@@ -73,8 +73,7 @@ public:
     DinoBattleViewCreatureInfo *mInfo;  // 0x118
     int mInfoKind;      // 0x11C
     MMenuItem *mItem120;    // 0x120
-    MMenuItem *mItem124;    // 0x124
-    MMenuItem *mItem128;    // 0x128
+    MMenuItem *mPageItems[2];   // 0x124: page the info left and right
     u32 mUnk12C;
     std::map<u32, void *> mUnk130;  // 0x130
     u32 mUnk13C;

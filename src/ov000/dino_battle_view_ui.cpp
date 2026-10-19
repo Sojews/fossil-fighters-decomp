@@ -249,7 +249,7 @@ void DinoBattleViewUiChangeMenu::OnIdle() {
 // Has the 3D view show the focused creature's status, and marks its type advantages against the other side.
 void DinoBattleViewUiCreatureInfoMenu::OnFocus(MMenuItem *item) {
     DinoBattleViewUiSelectAreaCommon::OnFocus(item);
-    if (item == mItem124 || item == mItem128 || item == mItem120) {
+    if (item == mPageItems[0] || item == mPageItems[1] || item == mItem120) {
         return;
     }
     DinoSoundPlaySe(0x5F, 0);
@@ -567,7 +567,7 @@ void DinoBattleViewUiSelectAreaCommon::OnFocus(MMenuItem *item) {
     if (mUnk178) {
         mUnk178 = FALSE;
     }
-    if (item == mItem124 || item == mItem128 || item == mItem120) {
+    if (item == mPageItems[0] || item == mPageItems[1] || item == mItem120) {
         return;
     }
     DinoBattleViewCreature *creature = GetItemCreature(item);
@@ -749,4 +749,36 @@ void DinoBattleViewUiDefenderMenu::OnStart() {
         DinoHelpBase &help = *this;
         mSerial.AddTail(DinoHelpBase::CreateEnableTask(&help));
     }
+}
+
+#pragma opt_common_subs on
+// Pages the info on a page item: on to the next kind it can show.
+BOOL DinoBattleViewUiSelectAreaCommon::HandlePageItem(MMenuItem *item) {
+    for (int i = 0; i < 2; i++) {
+        if (item == mPageItems[i]) {
+            if (mInfo->mUnkEC) {
+                int old = mInfoKind;
+                if (i != 0) {
+                    do {
+                        mInfoKind = (u32)(mInfoKind + 1) % 5;
+                        mInfo->PlayMotion(1);
+                        DinoSoundPlaySe(0x60, 0);
+                    } while (!func_ov000_02176454(this, mInfoKind, NULL));
+                }
+                if (i == 0) {
+                    do {
+                        mInfoKind = ((u32)(mInfoKind - 1) + 5) % 5;
+                        mInfo->PlayMotion(0);
+                        DinoSoundPlaySe(0x60, 0);
+                    } while (!func_ov000_02176454(this, mInfoKind, NULL));
+                }
+                if (old != mInfoKind) {
+                    mInfo->Update(TRUE, NULL, data_ov000_0218fd1c[mInfoKind].kind, TRUE,
+                                  data_ov000_0218fd1c[mInfoKind].attacks);
+                }
+            }
+            return TRUE;
+        }
+    }
+    return FALSE;
 }
