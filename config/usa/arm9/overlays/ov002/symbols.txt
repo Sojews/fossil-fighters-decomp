@@ -85,7 +85,7 @@ _ZN22DinoCleaningImageLayer14CreatePalAnimeEP8MTaskSetP8MPalUnitmt kind:function
 _ZN22DinoCleaningImageLayer11LoadPaletteEP8MPalUnitm kind:function(thumb,size=0x18) addr:0x021591b4
 _ZN17DinoCleaningImageC1EP12DinoCleaning kind:function(thumb,size=0x44) addr:0x021591cc
 func_ov002_02159210 kind:function(thumb,size=0x2a8) addr:0x02159210
-func_ov002_021594b8 kind:function(thumb,size=0x46) addr:0x021594b8
+_ZNSt13__vec_deleterImSaImEE6assignIPmEEvT_S4_N10Metrowerks8int2typeILi1EEE_ov002 kind:function(thumb,size=0x46) addr:0x021594b8
 _ZN17DinoCleaningImageD1Ev kind:function(thumb,size=0xb8) addr:0x02159500
 _ZN17DinoCleaningImageD0Ev kind:function(thumb,size=0xbc) addr:0x021595b8
 _ZN17DinoCleaningImage8AddLayerEP22DinoCleaningImageLayer kind:function(thumb,size=0x48) addr:0x02159674

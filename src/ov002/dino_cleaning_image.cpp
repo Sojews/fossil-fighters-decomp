@@ -118,3 +118,7 @@ u8 DinoCleaningImage::GetCell(int row, int col) {
 void DinoCleaningImage::ClearGrid() {
     MI_CpuFill8(mGrid, 0, sizeof(mGrid));
 }
+
+#pragma auto_inline off
+// A vector member the game emits in this file (made explicitly until the code that copies the vector is decompiled).
+template void std::__vec_deleter<u32, std::allocator<u32> >::assign<u32 *>(u32 *first, u32 *last, Metrowerks::int2type<true>);

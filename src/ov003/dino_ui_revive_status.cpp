@@ -5,6 +5,7 @@
 #pragma auto_inline on
 
 #include <algorithm>
+#include "m/motion.h"
 #include "game/dino_backup.h"
 
 #include "game/dino_ui_revive_status_menu.h"
@@ -275,3 +276,7 @@ void DinoUiReviveEffectLight::Idle() {
     mAngle += 0x190;
     mPicture->SetPosition(0, MFx32ToInt(MFx32::FromRaw(FX_SinIdx(mAngle)) * MFx32(10)) - mHeight);
 }
+
+#pragma auto_inline off
+// A vector member the game emits in this file (made explicitly until the code that uses it is decompiled).
+template void std::__vec_deleter<MMotionFile, std::allocator<MMotionFile> >::sub_push_back(const MMotionFile &x, Metrowerks::int2type<false>);
