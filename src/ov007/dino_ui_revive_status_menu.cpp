@@ -17,6 +17,11 @@ DinoUiReviveStatusLoop::~DinoUiReviveStatusLoop() {
 DinoUiReviveStatusLoopCleaning::~DinoUiReviveStatusLoopCleaning() {
 }
 
+DinoUiReviveStatusLoopBattle::DinoUiReviveStatusLoopBattle(const DinoEventReviveCreature *creature,
+                                                           const DinoEventReviveCreature *creature2)
+    : MProcess(NULL), mCreature(*creature), mCreature2(*creature2) {
+}
+
 DinoUiReviveStatusLoopBattle::~DinoUiReviveStatusLoopBattle() {
 }
 

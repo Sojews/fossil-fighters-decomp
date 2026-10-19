@@ -61,7 +61,7 @@ public:
     virtual void Idle();
 };
 
-struct DinoEventReviveCreature;
+#include "game/dino_event_revive_effect.h"
 
 class DinoUiReviveStatusLoopBattle : public MProcess {
 public:
@@ -69,7 +69,8 @@ public:
     virtual ~DinoUiReviveStatusLoopBattle();
     virtual void Idle();
 
-    u8 unk74[0xA4 - 0x74];
+    DinoEventReviveCreature mCreature;  // 0x74
+    DinoEventReviveCreature mCreature2; // 0x8C
 };
 
 class DinoUiReviveStatusMenu;

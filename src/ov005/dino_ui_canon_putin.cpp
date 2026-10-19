@@ -63,6 +63,13 @@ DinoUiCanonPutinMenu::DinoUiCanonPutinMenu() {
     mUnk104 = data_0208a574;
 }
 
+extern "C" const u32 data_0208a560;
+
+DinoUiCanonTakeoutMenu::DinoUiCanonTakeoutMenu() {
+    mUnk101 = 8;
+    mUnk104 = data_0208a560;
+}
+
 DinoUiCanonPutin::DinoUiCanonPutin() : MProcess(NULL) {
     gLcd->mMain->ResetHooks();
     gLcd->mMain->Setup(5, 3, 4, 1, 0, 0);
