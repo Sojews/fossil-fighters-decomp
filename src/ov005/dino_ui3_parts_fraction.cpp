@@ -145,6 +145,13 @@ void DinoUi3PartsMoney::SetChange(int change) {
     mChange->SetText(std::string(text));
 }
 
+DinoUi3PartsKasekiButton::DinoUi3PartsKasekiButton(MSmartOam *oam, MPoint pos, DinoUi3KasekiIcon icon, u8 marked) {
+    mPos = pos;
+    Setup(oam, icon);
+    SetMarked(marked);
+    SetMode(2);
+}
+
 void DinoUi3PartsKasekiButton::SetMarked(BOOL marked) {
     if (marked) {
         mMark->Show();
