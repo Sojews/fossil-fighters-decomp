@@ -1,6 +1,7 @@
 // The game's sound interface and its tasks.
 
 #include <algorithm>
+#include <string>
 #include "game/dino_sound.h"
 #include "sound_api.h"
 #include "m/heap.h"
@@ -222,3 +223,6 @@ void DinoSoundMainTask::OnPostLoop() {
     }
     func_020031e8();
 }
+
+// A string member the game emits at the end of this file.
+template std::string &std::string::operator=(const char *s);
