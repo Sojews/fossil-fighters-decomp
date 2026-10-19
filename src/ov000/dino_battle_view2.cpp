@@ -14,6 +14,7 @@
 #include "game/dino_message.h"
 #include "types.h"
 #include "game/dino_battle_view_class.h"
+#include "game/wait_action_info_bar_task.h"
 #include "m/smart_oam.h"
 #include "game/creature_motion.h"
 #include "game/dino_battle_view_creature.h"
@@ -233,9 +234,12 @@ void DinoBattleViewUiRootSelect::OnFocus(MMenuItem *item) {
 extern "C" struct {
     u8 unk00[0xC];
     void (DinoBattleViewGivingUpMenu::*StateDone_0C)();
-    u8 unk14[0x4C - 0x14];
+    void (DinoBattleViewUiRootSelect::*StateIdle_14)();
+    u8 unk1C[0x4C - 0x1C];
     void (DinoBattleViewGivingUpMenu::*StateAsk_4C)();
-    u8 unk54[0x6C - 0x54];
+    u8 unk54[0x5C - 0x54];
+    void (DinoBattleViewUiRootSelect::*StateBegin_5C)();
+    u8 unk64[0x6C - 0x64];
     void (DinoBattleViewGivingUpMenu::*StateAnswered_6C)();
 } data_ov000_0219569c;
 
@@ -296,6 +300,22 @@ DinoBattleViewGivingUpDialog::DinoBattleViewGivingUpDialog(const char *text, u8 
     : DinoCommonYesNoMenu(std::string(text), NULL, data_0208a39c, data_0208a3a0, 1), mGivingUp(givingUp) {
 }
 
-// (Empty; nothing in the game calls it.)
-extern "C" void func_ov000_02180860() {
+void DinoBattleViewUiRootSelect::StateBegin() {
+    mState = data_ov000_0219569c.StateIdle_14;
+}
+
+void DinoBattleViewUiRootSelect::StateIdle() {
+}
+
+DinoBattleViewUiRootSelect::DinoBattleViewUiRootSelect(DinoBattleView *view, MMessageObserver *observer, u32 unkC0,
+                                                       u32 unkC4, u32 unkBC, u32 unkC8, u32 unkCC)
+    : MMenu(NULL, 0), mUnkBC(unkBC), mUnkC0(unkC0), mUnkC4(unkC4), mUnkC8(unkC8), mUnkCC(unkCC), mUnkD0(0),
+      mSilentFocus(TRUE), mView(view), mObserver(observer) {
+    DinoHelpBase::Disable();
+    WaitEnableRootMenu *enable = new WaitEnableRootMenu(mView);
+    MTask *bar = new WaitActionInfoBarTask((DinoBattleViewActionInfoBar *)mView->GetUnk104());
+    MSerialTaskSet *serial = &mSerial;
+    serial->AddTail(bar);
+    serial->AddTail(enable);
+    mState = data_ov000_0219569c.StateBegin_5C;
 }

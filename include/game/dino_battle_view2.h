@@ -30,13 +30,24 @@ class DinoBattleView;
 
 class DinoBattleViewUiRootSelect : public MMenu, public DinoHelpBase {
 public:
+    DinoBattleViewUiRootSelect(DinoBattleView *view, MMessageObserver *observer, u32 unkC0, u32 unkC4, u32 unkBC,
+                               u32 unkC8, u32 unkCC);
     virtual ~DinoBattleViewUiRootSelect();
     virtual void OnStart();
     virtual void OnIdle();
     virtual void OnFocus(MMenuItem *item);
     virtual void OnDecide(MMenuItem *item);
 
-    u8 unkB4[0x20];
+    void StateBegin();
+    void StateIdle();
+
+    void (DinoBattleViewUiRootSelect::*mState)();   // 0xB4
+    u32 mUnkBC;         // 0xBC
+    u32 mUnkC0;         // 0xC0
+    u32 mUnkC4;         // 0xC4
+    u32 mUnkC8;         // 0xC8
+    u32 mUnkCC;         // 0xCC
+    u32 mUnkD0;         // 0xD0
     u8 mGivingUp;       // 0xD4: set by the giving-up menu
     u8 mSilentFocus;    // 0xD5
     u8 unkD6[2];
@@ -150,6 +161,7 @@ public:
 
 class WaitEnableRootMenu : public MTask {
 public:
+    WaitEnableRootMenu(void *menu) { mMenu = menu; }
     virtual ~WaitEnableRootMenu();
     virtual void Execute();
 

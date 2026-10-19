@@ -1061,11 +1061,11 @@ _ZN18DinoBattleDebugLog5ClearEv kind:function(thumb,size=0x2c) addr:0x02180014
 _ZN18DinoBattleDebugLog5PrintEPKc kind:function(thumb,size=0x50) addr:0x02180040
 _ZN17AnyInputTimerWaitC1Ei kind:function(thumb,size=0x44) addr:0x02180090
 _ZN17AnyInputTimerWait4IdleEv kind:function(thumb,size=0x30) addr:0x021800d4
-func_ov000_02180104 kind:function(thumb,size=0x104) addr:0x02180104
+_ZN26DinoBattleViewUiRootSelectC1EP14DinoBattleViewP16MMessageObservermmmmm kind:function(thumb,size=0x104) addr:0x02180104
 _ZN26DinoBattleViewUiRootSelect7OnStartEv kind:function(thumb,size=0x63e) addr:0x02180208
 .L_02180840 kind:label(thumb) addr:0x02180840 local
-func_ov000_02180848 kind:function(thumb,size=0x18) addr:0x02180848
-func_ov000_02180860 kind:function(thumb,size=0x2) addr:0x02180860
+_ZN26DinoBattleViewUiRootSelect10StateBeginEv kind:function(thumb,size=0x18) addr:0x02180848
+_ZN26DinoBattleViewUiRootSelect9StateIdleEv kind:function(thumb,size=0x2) addr:0x02180860
 _ZN26DinoBattleViewUiRootSelect7OnFocusEP9MMenuItem kind:function(thumb,size=0x50) addr:0x02180864
 _ZN26DinoBattleViewUiRootSelect6OnIdleEv kind:function(thumb,size=0xac) addr:0x021808b4
 _ZN26DinoBattleViewUiRootSelect8OnDecideEP9MMenuItem kind:function(thumb,size=0x35c) addr:0x02180960
@@ -2204,7 +2204,6 @@ _ZTV32DinoBattleViewCreatureAttackIcon kind:data(any) addr:0x02195b80
 _ZTV28DinoBattleViewGivingUpDialog kind:data(any) addr:0x02195bac
 _ZTV27DinoBattleViewTurnEndDialog kind:data(any) addr:0x02195bec
 _ZTV26DinoBattleViewUiRootSelect kind:data(any) addr:0x02195c2c
-data_ov000_02195c64 kind:data(any) addr:0x02195c64
 _ZTV30DinoBattleViewUiRootSelectItem kind:data(any) addr:0x02195c6c
 data_ov000_02195cac kind:data(any) addr:0x02195cac
 _ZTV17MotionDisableHelp kind:data(any) addr:0x02195cc0

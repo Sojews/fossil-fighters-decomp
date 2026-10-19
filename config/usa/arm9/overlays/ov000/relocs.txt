@@ -9073,7 +9073,7 @@ from:0x021801c2 kind:thumb_call to:0x0218b800 module:overlay(0)
 from:0x021801d0 kind:thumb_call to:0x020531a4 module:main
 from:0x021801d8 kind:thumb_call to:0x020531a4 module:main
 from:0x021801f4 kind:load to:0x02195c2c add:0x8 module:overlay(0)
-from:0x021801f8 kind:load to:0x02195c64 module:overlay(0)
+from:0x021801f8 kind:load to:0x02195c2c add:0x38 module:overlay(0)
 from:0x021801fc kind:load to:0x020b5b1c add:0x8 module:main
 from:0x02180200 kind:load to:0x02195a04 add:0x8 module:overlay(0)
 from:0x02180204 kind:load to:0x0219569c module:overlay(0)
