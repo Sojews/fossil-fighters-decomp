@@ -24,6 +24,7 @@
 #include "types.h"
 #include "game/dino_cleaning_status.h"
 #include "game/dino_cleaning_score.h"
+#include "game/dino_cleaning_neighbour.h"
 #include "m/ext_affine.h"
 #include "m/picture.h"
 #include "m/menu.h"
@@ -121,6 +122,36 @@ void DinoCleaningKasekiRock::SetOffset(MPoint offset) {
 
 BOOL DinoCleaningKasekiRock::IsViewUnkD9E0Zero() {
     return mView->IsUnkD9E0Zero();
+}
+
+// The rock's playing area.
+extern "C" struct {
+    u8 unk00[0x44];
+    MRect mBounds;      // 0x44
+} data_ov002_02165854;
+extern "C" void func_ov002_0215a7b4(DinoCleaningImageView *view);
+
+// Knocks out the top rock's cells left with no top rock around them (where either rock is through already), then
+// refreshes the view.
+// NONMATCHING: 99.97%, the game's second test branches past the "i = 0" it shares with the first.
+extern "C" void func_ov002_0215fdec(DinoCleaningKasekiRock *rock) {
+    for (int col = data_ov002_02165854.mBounds.left; col < data_ov002_02165854.mBounds.right; col++) {
+        for (int row = data_ov002_02165854.mBounds.top; row < data_ov002_02165854.mBounds.bottom; row++) {
+            if (rock->mRock90->GetCellLayer(col, row) == 0 || rock->mRock8C->GetCellLayer(col, row) == 0) {
+                for (u32 i = 0; i < 6; i++) {
+                    MPoint n = GetNeighbour(MPoint(col, row), i);
+                    if (rock->mRock90->GetCellLayer(n.x, n.y) != 0) {
+                        goto next;
+                    }
+                }
+                rock->mRock90->Hit(col, row, MFx32(1));
+                ((DinoCleaningImageView *)rock->mUnk88)->GetImage(1)->SetCellLayer(col, row,
+                                                                                    rock->mRock90->GetCellLayer(col, row));
+            }
+        next:;
+        }
+    }
+    func_ov002_0215a7b4(rock->mView);
 }
 
 MFx32 DinoCleaningKasekiRock::GetDirtRatio() {
@@ -305,7 +336,6 @@ extern "C" struct {
     void (DinoCleaning::*State021610b0_20)(); // 0x20
 } data_ov002_02165b6c;
 
-extern "C" void func_ov002_0215fdec(DinoCleaningKasekiRock *rock);
 
 // Drops the rock in from above.
 void DinoCleaningKasekiRock::StartDrop() {

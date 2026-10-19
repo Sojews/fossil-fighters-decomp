@@ -119,7 +119,6 @@ BOOL DinoCleaningImageView::IsUnkD9E0Zero() {
     return FALSE;
 }
 
-// NONMATCHING: 96%, the game reloads the column in the neighbour loop (one instruction more).
 void DinoCleaningImage::SetCellLayer(int row, int col, u32 layer) {
     u32 cur = mGrid[row][col];
     if (layer == cur) {

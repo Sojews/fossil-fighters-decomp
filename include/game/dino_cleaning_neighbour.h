@@ -10,8 +10,7 @@ inline MPoint GetNeighbour(MPoint pos, u32 dir) {
         {MPoint(1, 0), MPoint(0, 1), MPoint(-1, 1), MPoint(-1, 0), MPoint(-1, -1), MPoint(0, -1)},
         {MPoint(1, 0), MPoint(1, 1), MPoint(0, 1), MPoint(-1, 0), MPoint(0, -1), MPoint(1, -1)},
     };
-    const MPoint &d = sOffsets[pos.y & 1][dir];
-    return MPoint(pos.x + d.x, pos.y + d.y);
+    return pos + sOffsets[pos.y & 1][dir];
 }
 
 #endif
