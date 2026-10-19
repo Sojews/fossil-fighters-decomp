@@ -244,6 +244,60 @@ void DinoUiOrderSelectMenu::CreateItems() {
     }
 }
 
+// Links the items left and right to the nearest enabled ones (round the row), and the buttons up to the last.
+void DinoUiOrderSelectMenu::LinkItems() {
+    MMenuItem *left[5];
+    MMenuItem *right[5];
+    int i;
+    for (i = 0; i < 5; i++) {
+        left[i] = mItems[(i + 4) % 5];
+        right[i] = mItems[(i + 1) % 5];
+    }
+    int first = 0;
+    for (i = 0; i < 5; i++) {
+        if (mItems[i]->IsEnabled()) {
+            first = i;
+            break;
+        }
+    }
+    for (i = 0; i < 5; i++) {
+        int k = first + i;
+        if (!mItems[k % 5]->IsEnabled()) {
+            left[(k + 1) % 5] = left[k % 5];
+        }
+    }
+    int start = (first + 1) % 5;
+    for (i = 4; i >= 0; i--) {
+        int k = start + i;
+        if (!mItems[k % 5]->IsEnabled()) {
+            right[(k + 4) % 5] = right[k % 5];
+        }
+    }
+    if (mItemsLinked) {
+        RemoveLink(mBackButton, 4);
+        RemoveLink(mOKButton, 4);
+        for (i = 0; i < 5; i++) {
+            RemoveLink(mItems[i], 3);
+            RemoveLink(mItems[i], 1);
+        }
+    }
+    if (mItems[4]->IsEnabled()) {
+        AddLink(mBackButton, 4, mItems[4]);
+        AddLink(mOKButton, 4, mItems[4]);
+    } else if (mItems[3]->IsEnabled()) {
+        AddLink(mBackButton, 4, mItems[3]);
+        AddLink(mOKButton, 4, mItems[3]);
+    } else {
+        AddLink(mBackButton, 4, mItems[2]);
+        AddLink(mOKButton, 4, mItems[2]);
+    }
+    for (i = 0; i < 5; i++) {
+        AddLink(mItems[i], 3, left[i]);
+        AddLink(mItems[i], 1, right[i]);
+    }
+    mItemsLinked = TRUE;
+}
+
 void DinoUiOrderSelectMenu::FinishPage() {
     mUnk1F0 = 0;
     ClearItems();
