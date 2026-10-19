@@ -5,6 +5,17 @@
 #include "m/task.h"
 #include "m/archive.h"
 #include "m/bit_vector.h"
+#include "m/resource.h"
+
+// The commentary data (a count of lines, then their offsets).
+struct DinoCommonLiveData;
+
+// An entry of mUnk94 (12 bytes).
+struct DinoCommonLiveEntry {
+    int unk00;
+    u32 mUnk04;     // 0x04: from the data's line
+    u32 unk08;
+};
 
 class MDisplay;
 
@@ -34,18 +45,17 @@ public:
     u8 GetUnkD2();
     void RefreshEntries();
 
-    MArchivePtr mArchive;               // 0x74
-    MArchiveFile mFile;                 // 0x78
-    MArchivePtr mArchive2;              // 0x84
-    MArchiveFile mFile2;                // 0x88
-    std::vector<unsigned char> mUnk94;  // 0x94: (the element type is a guess, distinct from other modules')
+    MResource<DinoCommonLiveData> mData;    // 0x74
+    MResource<DinoCommonLiveData> mData2;   // 0x84
+    std::vector<DinoCommonLiveEntry> mUnk94;    // 0x94: one per line
     MBitVector mUnkA0;                  // 0xA0
     MBitVector mUnkAC;                  // 0xAC
-    std::vector<void *> mUnkB8;         // 0xB8
-    u32 unkC4;
+    std::vector<u32> mUnkB8;            // 0xB8
+    u8 mUnkC4;                          // 0xC4
     u32 mUnkC8;                         // 0xC8
     u32 mOpen;                          // 0xCC
-    u8 unkD0[2];
+    u8 mUnkD0;                          // 0xD0
+    u8 mUnkD1;                          // 0xD1
     u8 mUnkD2;                          // 0xD2
 };
 

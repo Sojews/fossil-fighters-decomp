@@ -8,7 +8,7 @@ class MBitVector : public MSerializable {
 public:
     MBitVector(u32 bits) {
         mBits = bits;
-        mBytes = new u8[(bits + 7) / 8];
+        mBytes = new u8[(mBits + 7) / 8];
     }
     // Inline in the game (inlined into owners' destructors); src/m/bit_vector.cpp defines MBIT_VECTOR_OWNER and
     // emits the out-of-line copy.

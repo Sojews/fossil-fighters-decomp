@@ -225,6 +225,19 @@ namespace std {
         // Adds n value-initialized elements (out of line).
         void append(size_t n, Metrowerks::int2type<true>);
         void append_realloc(size_t n);
+        // Makes n value-initialized elements (out of line; vector(n)'s work).
+        void init(size_t n);
+        // Makes n copies of value (out of line; vector(n, value)'s work).
+        void init(size_t n, const T &value);
+        void fill_n_at_end(size_t n, const T &value) {
+            UnkMSLStruct1 unk = UnkMSLStruct1();
+            size_t i = n;
+            pointer p = data_ + size_;
+            for (; i; i--) {
+                *p++ = value;
+            }
+            size_ += n;
+        }
         void construct_n_at_end(size_t n) {
             UnkMSLStruct1 unk = UnkMSLStruct1();
             for (pointer p = data_ + size_; n; n--, p++, size_++) {
@@ -340,6 +353,20 @@ namespace std {
         std::swap(cap(), tmp.cap());
         std::swap(data_, tmp.data_);
         std::swap(size_, tmp.size_);
+    }
+
+    template <typename T, typename Allocator> void __vec_deleter<T, Allocator>::init(size_t n) {
+        if (n != 0) {
+            allocate(n);
+            construct_n_at_end(n);
+        }
+    }
+
+    template <typename T, typename Allocator> void __vec_deleter<T, Allocator>::init(size_t n, const T &value) {
+        if (n != 0) {
+            allocate(n);
+            fill_n_at_end(n, value);
+        }
     }
 
     template <typename T, typename Allocator> __vec_deleter<T, Allocator>::~__vec_deleter() {
@@ -798,6 +825,14 @@ namespace std {
 
         vector() {
             this->init();
+        }
+        explicit vector(size_type n) {
+            this->init();
+            this->init(n);
+        }
+        vector(size_type n, const_reference value) {
+            this->init();
+            this->init(n, value);
         }
         vector(const vector &x) {
             this->init();
