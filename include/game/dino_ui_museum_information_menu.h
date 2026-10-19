@@ -14,6 +14,8 @@ class MSmartOam;
 class DinoUiMuseumInformationMenu : public DinoHelpBase, public MMenu {
 public:
     MSmartOam *GetOam() { return mOam; }
+    struct Info;
+    DinoUiMuseumInformationMenu(Info *info, u32 *page, u32 unkFC);
     virtual ~DinoUiMuseumInformationMenu();
     virtual void OnStart();
     virtual void OnIdle();
@@ -29,6 +31,8 @@ public:
         u32 mPageCount;     // 0x04
     } *mInfo;           // 0xF0
     u32 *mPage;         // 0xF4
+    u32 mStartPage;     // 0xF8
+    u32 mUnkFC;         // 0xFC
 };
 
 #endif

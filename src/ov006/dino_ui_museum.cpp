@@ -389,6 +389,10 @@ void DinoUiMuseumMenu::OnDecide(MMenuItem *item) {
 
 #pragma auto_inline off
 
+DinoUiMuseumInformationMenu::DinoUiMuseumInformationMenu(Info *info, u32 *page, u32 unkFC)
+    : MMenu(gLcd->mSub, NULL, 0), mInfo(info), mPage(page), mStartPage(*page), mUnkFC(unkFC) {
+}
+
 void DinoUiMuseumMenu::CloseInformation() {
     mParallel.Remove(mInformation);
     delete mInformation;
