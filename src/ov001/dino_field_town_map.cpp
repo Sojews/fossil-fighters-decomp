@@ -6,6 +6,7 @@
 
 #pragma ipa file
 
+#include "game/dino_resource.h"
 #include "m/display.h"
 #include "m/blend.h"
 #include "game/dino_field_town_map_menu.h"
@@ -60,6 +61,18 @@ void DinoFieldTownMapManager::CameraUnk0(u32 map) {
 }
 
 #pragma auto_inline off
+
+// The TU's pooled pointer-to-member constants (see menu.cpp).
+extern "C" struct {
+    u8 unk00[0x1C];
+    void (DinoFieldDance::*Start_1C)();   // 0x1C
+} data_ov001_0216a814;
+
+DinoFieldDance::DinoFieldDance(DinoField *field, u32 a, u32 b, u32 c, u32 d, u32 e)
+    : MProcess(gLcd->GetBottomDisplay()), mField(field), mUnk80(a), mDance(gDinoResource->LoadDance(b)), mUnk94(c),
+      mUnk98(d), mUnk9C(e) {
+    mState = data_ov001_0216a814.Start_1C;
+}
 
 DinoFieldTownMapManager::DinoFieldTownMapManager(DinoField *field) : MProcess(gLcd->GetTopDisplay()) {
     mField = field;

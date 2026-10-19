@@ -418,10 +418,16 @@ public:
     virtual ~DinoFieldDance();
     virtual void Idle();
 
+    void Start();
+
     void (DinoFieldDance::*mState)(); // 0x74
-    u32 unk7C[2];
+    DinoField *mField;                // 0x7C
+    u32 mUnk80;                       // 0x80
     MResource<DinoDanceData> mDance;  // 0x84
-    u32 unk94[4];
+    u32 mUnk94;                       // 0x94
+    u32 mUnk98;                       // 0x98
+    u32 mUnk9C;                       // 0x9C
+    u32 unkA0;
     std::vector<MTask *> mUnkA4;      // 0xA4
     u32 unkB0[14];
     MResource<DinoDanceData> mUnkE8;  // 0xE8
