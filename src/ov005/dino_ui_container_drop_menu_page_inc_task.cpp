@@ -14,6 +14,9 @@
 #include "game/dino_resource.h"
 #include "game/dino_common_window_yes_no_dialog.h"
 #include "game/dino_ui3_parts_fraction.h"
+#include "game/dino_ui3_parts_cursor.h"
+#include "game/dino_ui3_parts_rock_name.h"
+#include "game/dino_backup.h"
 
 // The text with every tag replaced by the value (unless the value has the tag itself).
 // NONMATCHING: ours keeps an unreachable epilogue after the loop (as ov003's copy).
@@ -33,7 +36,7 @@ std::string DinoReplaceTag(std::string text, std::string tag, std::string value)
 #pragma auto_inline off
 
 DinoUiContainerDropMenu::DinoUiContainerDropMenu(u32 arg0, u32 arg1, const std::vector<std::string> &names)
-    : MMenu(NULL, 0), mUnkDC(arg0), mUnkE0(arg1), mUnkE4(names), mPage(0), mLastPage(0), mUnk120(-1), mStarted(0),
+    : MMenu(NULL, 0), mUnkDC(arg0), mUnkE0((const DinoBackupEntry *)arg1), mUnkE4(names), mPage(0), mLastPage(0), mUnk120(-1), mStarted(0),
       mUnk128(0) {
 }
 
@@ -190,6 +193,38 @@ void DinoUiContainerDropMenu::OnIdle() {
     if (mUnk128) {
         mUnk128 = 0;
     }
+}
+
+// Moves the cursor to the item, and shows its entry's name (the last page's entry is mUnkE0).
+// NONMATCHING: the game reloads the list's size each time round the search loop (as RemoveMember in ov007).
+void DinoUiContainerDropMenu::OnFocus(MMenuItem *item) {
+    mStarted = FALSE;
+    if (item == NULL) {
+        mCursor->Hide();
+        return;
+    }
+    SetSelectedItem(dynamic_cast<DinoHelpItem *>(item));
+    if (mCursor->IsHidden()) {
+        mCursor->Show();
+        mCursor->SetFrame(item->GetFrame());
+    } else {
+        mCursorTasks->Clear();
+        mCursorTasks->AddTail(mCursor->CreateMoveTask(mCursor->GetFrame(), item->GetFrame(), 10, -5));
+    }
+    for (int i = 0; i < mItems.size(); i++) {
+        if (item == mItems[i]) {
+            if (mPage == mLastPage) {
+                mRockName->SetEntry(mUnkE0, FALSE);
+                return;
+            }
+            DinoBackupEntry entry;
+            gDinoBackup->GetUnk98(mPage * 8 + i, &entry);
+            mRockName->SetEntry(&entry, FALSE);
+            return;
+        }
+    }
+    mRockName->Clear();
+    mUnk120 = -1;
 }
 
 extern const u32 data_0208a650, data_0208a654;

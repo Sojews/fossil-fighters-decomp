@@ -14,6 +14,9 @@ class MSmartOam;
 #include "game/dino_ui3_parts_kaseki_button.h"
 
 class DinoUi3PartsFraction;
+class DinoUi3PartsCursor;
+class DinoUi3PartsRockName;
+struct DinoBackupEntry;
 class MView;
 
 class DinoUiContainerDropMenu : public DinoHelpBase, public MMenu {
@@ -42,14 +45,16 @@ public:
     u32 mUnkD0[2];              // 0xD0
     DinoUi3PartsFraction *mFraction;    // 0xD8: "page n/m"
     u32 mUnkDC;                 // 0xDC
-    u32 mUnkE0;                 // 0xE0
+    const DinoBackupEntry *mUnkE0;  // 0xE0: the last page's entry
     std::vector<std::string> mUnkE4; // 0xE4
-    u32 mUnkF0[3];              // 0xF0
+    MSerialTaskSet *mCursorTasks;   // 0xF0
+    DinoUi3PartsCursor *mCursor;    // 0xF4
+    DinoUi3PartsRockName *mRockName;    // 0xF8
     std::vector<DinoUiKasekiIcon> mIcons;   // 0xFC: the listed kaseki
     MResource<void> mUnk108;    // 0x108
     int mPage; // 0x118
     int mLastPage; // 0x11C
-    u32 mUnk120;                // 0x120
+    int mUnk120;                // 0x120
     u8 mStarted;                // 0x124
     int mUnk128;                // 0x128: 1 closes the menu
     DinoHelpDummyItem *mHelp12C;    // 0x12C
