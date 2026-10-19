@@ -102,7 +102,7 @@ _ZN17DinoCleaningImage9ClearGridEv kind:function(thumb,size=0x10) addr:0x0215998
 func_ov002_02159990 kind:function(thumb,size=0x1a4) addr:0x02159990
 func_ov002_02159b34 kind:function(thumb,size=0x158) addr:0x02159b34
 func_ov002_02159c8c kind:function(thumb,size=0x300) addr:0x02159c8c
-func_ov002_02159f8c kind:function(thumb,size=0xe2) addr:0x02159f8c
+_ZNSt13__vec_deleterI23DinoCleaningStatusEntrySaIS0_EE6assignIPKS0_EEvT_S6_N10Metrowerks8int2typeILi1EEE kind:function(thumb,size=0xe2) addr:0x02159f8c
 _ZN21DinoCleaningImageViewD1Ev kind:function(thumb,size=0xa4) addr:0x0215a070
 _ZN21DinoCleaningImageViewD0Ev kind:function(thumb,size=0xac) addr:0x0215a114
 _ZN21DinoCleaningImageView8AddImageEP17DinoCleaningImage kind:function(thumb,size=0x54) addr:0x0215a1c0
@@ -131,7 +131,7 @@ _ZN21DinoCleaningImageView16CreateScaleAnimeE5MFx32S0_ii kind:function(thumb,siz
 _ZN31DinoCleaningImageViewScaleAnime5ApplyEi kind:function(thumb,size=0x18) addr:0x0215ac44
 _ZN20DinoCleaningLastDust4IdleEv kind:function(thumb,size=0xf4) addr:0x0215ac5c
 _ZN19DinoCleaningNewDust4IdleEv kind:function(thumb,size=0x1b8) addr:0x0215ad50
-func_ov002_0215af08 kind:function(thumb,size=0x48) addr:0x0215af08
+_ZNSt13__vec_deleterI23DinoCleaningStatusEntrySaIS0_EE5eraseEPS0_13UnkMSLStruct1 kind:function(thumb,size=0x48) addr:0x0215af08
 _ZNSt13__vec_deleterI23DinoCleaningStatusEntrySaIS0_EE16reallocate_clearEmm kind:function(thumb,size=0x44) addr:0x0215af50
 _ZNSt13__vec_deleterI23DinoCleaningStatusEntrySaIS0_EE7grow_byEm kind:function(thumb,size=0x80) addr:0x0215af94
 _ZNSt13__vec_deleterI23DinoCleaningStatusEntrySaIS0_EE13sub_push_backERKS0_N10Metrowerks8int2typeILi1EEE kind:function(thumb,size=0x1e) addr:0x0215b014
