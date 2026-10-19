@@ -3,6 +3,7 @@
 
 #include "types.h"
 #include "m/resource.h"
+#include "game/dino_battle_cpu_controller.h"
 
 // Resources the file loads (their data types are unknown); until the code that constructs them is decompiled,
 // these keep out-of-line copies of the constructors.
@@ -20,5 +21,15 @@ void DinoOv000DataAFlush() {
 #pragma dont_inline on
 MResource<DinoOv000DataB> DinoOv000DataBLoad(std::string path) {
     return MResource<DinoOv000DataB>(path);
+}
+#pragma dont_inline reset
+
+void DinoOv000DataBFlush() {
+}
+
+// (Destroying a group here emits the file structs' implicit destructors, which the game's code in this file calls.)
+#pragma dont_inline on
+void DinoOv000FileGroupAnchor(DinoBattleFileGroup *group) {
+    group->~DinoBattleFileGroup();
 }
 #pragma dont_inline reset
