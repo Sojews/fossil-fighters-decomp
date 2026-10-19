@@ -242,10 +242,10 @@ DinoUiItemMenuItem::DinoUiItemMenuItem(DinoUiItemMenu *owner, const std::string 
     mMotion = new MMotion(std::string(path), mOwner->GetOam(), 2, 1);
     mMotion->Play(1, 0);
     mMotion->SetPosition(pos);
-    mMotion->SetPriority(1);
+    mMotion->SetPriority(2);
     mMotion->Show();
-    mMotion->GetUnit()->SetMode(1);
     mParallel.AddTail(mMotion);
+    mMotion->GetUnit()->SetMode(1);
 }
 
 // The OK button is usable once the team has a first member.
