@@ -36,13 +36,18 @@ public:
     virtual void Idle();
 
     class MIndicator *CreateIndicator(class MSmartOam *oam, class MFont *font, MPoint size, MPoint pos);
+    void CreateTexts(class MSmartOam *oam, class MFont *font);
 
     void (UseCreatureSelect::*mState)(); // 0x74
     u32 mUnk7C;             // 0x7C
     u32 mUnk80;             // 0x80
     u32 unk84;
     u32 mUnk88;             // 0x88
-    u8 unk8C[0x12C - 0x8C];
+    u8 unk8C[0xFC - 0x8C];
+    class MIndicator *mTitle;       // 0xFC
+    u32 unk100;
+    class MIndicator *mNames[5];    // 0x104
+    class MIndicator *mValues[5];   // 0x118
     void *mParams;          // 0x12C
     u8 *mCancelled;         // 0x130
 };

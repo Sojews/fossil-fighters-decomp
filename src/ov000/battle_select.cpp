@@ -127,6 +127,17 @@ MIndicator *UseCreatureSelect::CreateIndicator(MSmartOam *oam, MFont *font, MPoi
     return indicator;
 }
 
+// The title and the five rows' names and values.
+void UseCreatureSelect::CreateTexts(MSmartOam *oam, MFont *font) {
+    mTitle = CreateIndicator(oam, font, MPoint(32, 16), MPoint(16, 10));
+    mParallel.AddTail(mTitle);
+    for (int i = 0; i < 5; i++) {
+        mNames[i] = CreateIndicator(oam, gDinoResource->CreateFont12(0, 1, 2), MPoint(128, 16), MPoint(24, 32 + i * 30));
+        mValues[i] = CreateIndicator(oam, font, MPoint(64, 32), MPoint(32, 44 + i * 30));
+        GetParallel()->AddTail(mNames[i], mValues[i]);
+    }
+}
+
 // The same, for the level select.
 static MIndicator *CreateLevelIndicator(MSmartOam *oam, MFont *font, MPoint size, MPoint pos) {
     MIndicator *indicator = new MIndicator(new MSmartObjCanvas(oam, size, gDinoResource->GetUnkTable(), TRUE), font, 0);
