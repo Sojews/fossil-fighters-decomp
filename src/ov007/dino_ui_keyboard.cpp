@@ -14,6 +14,7 @@
 #include "m/blend.h"
 #include "m/window.h"
 #include "m/lcd.h"
+#include "game/dino_backup.h"
 #include "m/bright.h"
 #include "m/picture.h"
 
@@ -296,14 +297,14 @@ void DinoUiSenryuMenuItem::OnDecide() {
     }
 }
 
-extern "C" void func_ov007_021841f4(u32 owner);
 
 void DinoKBBackButton::OnDecide() {
     mMotion->Play(4, 1);
     mSerial.AddTail(mMotion->CreateWaitStopTask());
-    func_ov007_021841f4(unkB8);
+    ((DinoUiKeyboardMenu *)unkB8)->OnBackDecided();
     DinoSoundPlaySe(0x90, 0);
 }
+
 
 void DinoSenryuBackButton::OnDecide() {
     mMotion->Play(4, 1);
@@ -426,3 +427,36 @@ DinoUiSenryuMenu::DinoUiSenryuMenu() : MMenu(NULL, 0), mCursor(NULL), mPage(99),
 template void std::__vec_deleter<MPictureFile, std::allocator<MPictureFile> >::sub_push_back(const MPictureFile &x, Metrowerks::int2type<false>);
 template std::wstring std::wstring::substr(std::wstring::size_type pos, std::wstring::size_type n) const;
 template std::wstring &std::wstring::operator=(const wchar_t *s);
+
+extern "C" void func_ov007_02181334(DinoUiKeyboardMenu *menu);
+extern const int data_02089ac8, data_02089acc, data_02089ad0;
+
+// NONMATCHING: the two fade constants swap registers.
+void DinoUiKeyboardMenu::OnBackDecided() {
+    if (mMode == 0) {
+        DinoPlayerData player;
+        gDinoBackup->GetPlayer(&player, 0);
+        std::wstring name((const wchar_t *)player.name);
+        if (name.size() == 0) {
+            player.name[0] = mUnk1B4[0][0x1D];
+            player.name[1] = mUnk1B4[0][0x29];
+            player.name[2] = mUnk1B4[0][0xC];
+            player.name[3] = mUnk1B4[0][8];
+        }
+        mUnk19C = (const wchar_t *)player.name;
+        func_ov007_02181334(this);
+        gDinoBackup->SetPlayer(&player);
+    }
+    MParallelTaskSet *fades = new MParallelTaskSet(TRUE);
+    MBright *bright = gLcd->GetBottomDisplay()->mBright;
+    fades->AddTail(bright->CreateFadeOutToBlack(data_02089acc, data_02089ac8));
+    if (mMode == 0) {
+        fades->AddTail(gLcd->GetTopDisplay()->mBright->CreateFadeOutToBlack(data_02089acc, data_02089ac8));
+    }
+    mUnk158->Exit();
+    MTask *exit = MTaskExitTransfer::Create(&(MTask &)*this);
+    MProcess *other = mUnk194;
+    ((u8 *)other)[0x84] = TRUE;
+    MTask *waitTask = MTaskSetWaitEmptyTask::Create(&other->mSerial);
+    GetSerial()->AddTail(new MTimer(data_02089ad0), fades, waitTask, exit);
+}
