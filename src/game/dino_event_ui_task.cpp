@@ -302,3 +302,8 @@ MTask *DinoEventReviveEffectCaller::CreateUi() {
     tasks->AddTail(loop);
     return tasks;
 }
+
+// (Taking its address emits the vector's reallocating copy the game emits in this file.)
+void (std::__vec_deleter<u32, std::allocator<u32> >::*DinoEventUiReallocAnchor())(size_t) {
+    return &std::__vec_deleter<u32, std::allocator<u32> >::reallocate_copy_alt;
+}

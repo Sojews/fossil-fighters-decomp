@@ -300,7 +300,6 @@ namespace std {
 
         //! TODO: non-matching (stack issues :)))))
         void reallocate_copy_alt(size_t n) {
-            UnkMSLStruct1 unk2 = UnkMSLStruct1();
             __vec_deleter<T, Allocator> tmp;
             tmp.init();
             tmp.allocate(n);
