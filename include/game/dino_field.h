@@ -361,6 +361,8 @@ public:
     void CreateKasekiRocks();
     // Clears away the last map's things and loads the map, with its step effects.
     void LoadMap(u32 id);
+    // Reloads the map the field is on: the charas, the fellows' places (with whom they follow), the kaseki rocks.
+    void ReloadMap();
     void HideUnk2B4();
     void WalkOnLand1(u32 dir);
     void WalkInWater(u32 dir, u32 run);

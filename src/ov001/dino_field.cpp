@@ -746,6 +746,47 @@ void DinoField::LoadMap(u32 id) {
     }
 }
 
+extern "C" void func_ov001_021603d8(DinoFieldChara *chara);
+extern "C" void func_ov001_02157534(DinoField *field);
+
+void DinoField::ReloadMap() {
+    mFadeTasks->Clear();
+    for (u32 i = 0; i < 100; i++) {
+        mCharas[i]->ResetState();
+        func_ov001_021603d8(mCharas[i]);
+    }
+    u32 map = mMap->GetInfo()->id;
+    LoadMap(map);
+    for (u32 i = 1; i < gDinoResource->GetCharaCount(); i++) {
+        DinoCharaState state;
+        gDinoBackup->GetChara(i, &state);
+        if (state.unk0) {
+            DinoCharaTask task;
+            gDinoBackup->GetCharaTask(i, &task);
+            if (task.unk4 == 1) {
+                DinoCharaState target;
+                gDinoBackup->GetChara(task.unk8.fellow.target, &target);
+                if (target.unk0) {
+                    state.map = target.map;
+                    state.x = target.x;
+                    state.y = target.y;
+                    state.angle = target.angle;
+                    gDinoBackup->SetChara(i, &state);
+                }
+            }
+        }
+    }
+    for (u32 i = 1; i < gDinoResource->GetCharaCount(); i++) {
+        DinoCharaState state;
+        gDinoBackup->GetChara(i, &state);
+        if (state.unk0 && state.map == map) {
+            SyncChara(i);
+        }
+    }
+    func_ov001_02157534(this);
+    CreateKasekiRocks();
+}
+
 void DinoField::CreateKasekiRocks() {
     MResource<DinoExcavateDefs> defs = gDinoResource->GetExcavateDefs();
     mKasekiRockTasks->Clear();
