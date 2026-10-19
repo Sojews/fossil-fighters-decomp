@@ -3,8 +3,10 @@
 
 #include "m/menu_item.h"
 
+// The whole screen: touching anywhere (or Start) starts the game.
 class DinoUiTitleMenuGameItem : public MMenuItem {
 public:
+    DinoUiTitleMenuGameItem() { SetKeys(8); }
     virtual ~DinoUiTitleMenuGameItem();
     virtual MRect GetFrame();
 };

@@ -5,6 +5,10 @@
 #pragma auto_inline on
 
 #include "m/font.h"
+#include "game/dino_resource.h"
+#include "m/canvas.h"
+#include "m/smart_oam.h"
+#include "game/dino_common_cursor.h"
 #include "game/dino_ui_debug_flag_menu_menu.h"
 #include "types.h"
 #include "m/input.h"
@@ -14,6 +18,29 @@ DinoUiDebugFlagMenu::DinoUiDebugFlagMenu(int mode) : MMenu(0), mMode(mode) {
 
 DinoUiDebugFlagMenu::~DinoUiDebugFlagMenu() {
     mFont->Release();
+}
+
+// A page of 100 flags (the game's, or 48 for the other mode).
+void DinoUiDebugFlagMenu::OnStart() {
+    GetInput()->SetRepeat(0x3F0, 20, 3);
+    mFont = gDinoResource->CreateFont12(0, 10, 0);
+    mFont->AddRef();
+    mCanvas = new MTextCanvas(MPoint(256, 192), gDinoResource->GetUnkTable(), 0, TRUE);
+    mCanvas->Show();
+    mOam = new MSmartOam(0x28, 0, TRUE);
+    mTasks = new MParallelTaskSet;
+    mCursor = new DinoCommonCursor(mOam);
+    u32 count;
+    if (mMode == 0) {
+        count = gDinoResource->GetFlagCount();
+    } else {
+        count = 0x30;
+    }
+    mPage = 0;
+    mPageCount = (count - 1) / 100 + 1;
+    mLastPageCount = (count - 1) % 100 + 1;
+    GetParallel()->AddTail(mCanvas, mTasks, mCursor, mOam);
+    ShowPage();
 }
 
 DinoUiDebugFlagMenuItem::~DinoUiDebugFlagMenuItem() {

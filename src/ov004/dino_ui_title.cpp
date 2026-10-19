@@ -142,7 +142,8 @@ void DinoUiOpeningCloud::Idle() {
 extern "C" struct {
     u8 unk00[0x8];
     const char *mScreenPaths[3]; // 0x08: the screens before the opening
-    u8 unk14[0x24 - 0x14];
+    const char *mTouchPath; // 0x14: the title menu's "touch" prompt
+    u8 unk18[0x24 - 0x18];
     const char *mLogoPath; // 0x24
     u8 unk28[0x2C - 0x28];
     void (DinoUiTitle::*StateMenu_2C)(); // 0x2c
@@ -185,6 +186,29 @@ inline DinoUiOpening::DinoUiOpening(MInput *input) : MProcess(NULL), mInput(inpu
 
 DinoUiTitle::DinoUiTitle(s32 *result) : MProcess(NULL), mResult(result) {
     mState = data_ov004_02172f78.Start_B4;
+}
+
+void DinoUiTitleMenu::OnStart() {
+    mIdleTime = 0;
+    mSilentFocus = TRUE;
+    DinoSaveSummary summary;
+    for (u32 i = 0; i < 2; i++) {
+        gDinoBackup->GetSummary(i, &summary);
+        if (summary.valid) {
+            break;
+        }
+    }
+    mOam = new MSmartOam(gLcd->GetBottomDisplay(), 0x3C, 0, TRUE);
+    mOam->SetUnk1C(7);
+    mMotion = new MMotion(std::string(data_ov004_02172f78.mTouchPath), mOam, 0, 1);
+    mMotion->SetPosition(128, 96);
+    mMotion->Show();
+    GetParallel()->AddTail(mMotion, mOam);
+    mStartItem = new DinoUiTitleMenuGameItem;
+    AddItem(mStartItem);
+    if (*mResult == 3) {
+        FocusItem(mStartItem);
+    }
 }
 
 void DinoUiTitle::StateOpening() {

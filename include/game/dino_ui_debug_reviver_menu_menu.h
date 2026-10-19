@@ -11,6 +11,9 @@
 #include "game/help.h"
 #include "game/dino_field_camera_hook.h"
 
+class MTextCanvas;
+class MSmartOam;
+
 class DinoUiDebugReviverMenu : public MMenu {
 public:
     DinoUiDebugReviverMenu();
@@ -19,12 +22,15 @@ public:
     virtual void OnIdle();
     virtual void OnFocus(MMenuItem *item);
 
-    u32 mUnkA8[1];      // 0xA8
+    // Not decompiled yet: lists the creatures' items on the page.
+    void Refresh();
+
+    MTextCanvas *mCanvas;   // 0xA8
     MFont *mFont;       // 0xAC
-    u32 mUnkB0[1];
+    MSmartOam *mOam;    // 0xB0
     MTaskSet *mTasks;   // 0xB4: the cursor's moves
     MView *mCursor;     // 0xB8
-    u32 unkBC;
+    u32 mUnkBC;         // 0xBC
 };
 
 class DinoUiDebugReviverMenuItem : public MMenuItem {

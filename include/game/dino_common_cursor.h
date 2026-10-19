@@ -5,8 +5,11 @@
 #include "m/view.h"
 #include "m/task.h"
 
+class MSmartOam;
+
 class DinoCommonCursor : public MView {
 public:
+    DinoCommonCursor(MSmartOam *oam);
     virtual ~DinoCommonCursor();
     virtual void Execute();
     virtual void SetPosition(MPoint pos);
