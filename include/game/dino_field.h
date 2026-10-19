@@ -305,6 +305,7 @@ struct DinoFieldStep {
 };
 
 class DinoFieldHole;
+class MMotion;
 
 class DinoField : public MProcess, public MSerializer, public DinoHelpBase {
 public:
@@ -434,9 +435,9 @@ public:
     u8 mQuake;                  // 0x2A0
     u32 mQuakeArgs[3];          // 0x2A4
     u32 mQuakeTime;             // 0x2B0
-    MView *mUnk2B4;             // 0x2B4
+    MMotion *mUnk2B4;           // 0x2B4
     MTask *mUnk2B8;             // 0x2B8
-    MView *mUnk2BC;             // 0x2BC
+    MMotion *mUnk2BC;           // 0x2BC
     MTask *mUnk2C0;             // 0x2C0
     MTask *mUnk2C4;             // 0x2C4
     BOOL *mUnk2C8;              // 0x2C8

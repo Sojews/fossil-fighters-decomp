@@ -789,6 +789,35 @@ void DinoField::ReloadMap() {
     CreateKasekiRocks();
 }
 
+void DinoField::Read(const void *buf) {
+    MSerializer::Read(buf);
+    if (mUnk258) {
+        mUnk264 = 0;
+        DinoHelpBase::Disable();
+    } else {
+        DinoHelpBase::Enable();
+    }
+    if (mBgmScene) {
+        DinoSoundLoadScene(mBgmScene);
+    }
+    if (mBgm) {
+        DinoSoundPlayBgm(mBgm, 0);
+    }
+    LoadMap(mMap->GetInfo()->id);
+    CreateKasekiRocks();
+    for (u32 i = 0; i < 100; i++) {
+        func_ov001_021603d8(mCharas[i]);
+    }
+    if (!mUnk258 && gDinoBackup->GetSystemFlag(0x1C)) {
+        mUnk2B4->Play(1, 0);
+    }
+    if (!mUnk258 && gDinoBackup->GetSystemFlag(0x20)) {
+        mUnk2BC->Play(1, 0);
+    }
+    DinoFieldNamePanel *panel = mCamera->mNamePanel;
+    panel->SetMode(gDinoBackup->GetUnk180(), 0);
+}
+
 void DinoField::CreateKasekiRocks() {
     MResource<DinoExcavateDefs> defs = gDinoResource->GetExcavateDefs();
     mKasekiRockTasks->Clear();
