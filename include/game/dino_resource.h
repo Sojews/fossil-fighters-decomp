@@ -147,6 +147,11 @@ struct DinoBattleAdjustDefs {
     u8 abilityMenuWrap; // 0x190: the ability menu's cursor wraps around
     u8 unk191[0x1AC - 0x191];
     u32 kpUpDownPoints; // 0x1AC: offset of the KP up/down numbers' positions (MPoint), by side
+    u32 unk1B0;
+    u32 wirelessUnk1B4;     // 0x1B4: the wireless battle's settings
+    u32 wirelessUnk1B8;     // 0x1B8
+    u32 wirelessUnk1BC;     // 0x1BC
+    u32 wirelessUnk1C0;     // 0x1C0
 };
 
 struct DinoRgb {

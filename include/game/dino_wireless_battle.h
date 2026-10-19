@@ -45,6 +45,7 @@ public:
     void StateBeginBattle();
     void StateWaitReady();
     void StateCloseHub();
+    void StateBattle();
     void StateBattleEnd();
     void StateResult();
     void StateContinue();
@@ -60,6 +61,7 @@ public:
     u32 mTeam;                      // 0xBC: the team select's
     DinoWirelessBattlePlayer mPlayers[2];   // 0xC0
     u8 mWon;                        // 0x2E8
+    u8 mUnk2E9;                     // 0x2E9
     u32 mWins;                      // 0x2EC
     u32 mLosses;                    // 0x2F0
     u32 mContinue;                  // 0x2F4

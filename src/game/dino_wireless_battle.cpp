@@ -21,6 +21,7 @@
 #include "m/text_codec.h"
 #include "nitro/mi.h"
 #include "game/dino_ui_result.h"
+#include "game/dino_battle.h"
 #include "types.h"
 
 DinoWirelessBattle::~DinoWirelessBattle() {
@@ -36,7 +37,7 @@ extern "C" struct {
     void (DinoWirelessBattle::*StateContinue_08)(); // 0x08
     void (DinoWirelessBattle::*StateResult_10)(); // 0x10
     void (DinoWirelessBattle::*StateFinish_18)(); // 0x18
-    u8 unk20[0x28 - 0x20];
+    void (DinoWirelessBattle::*StateBattleEnd_20)(); // 0x20
     void (DinoWirelessBattle::*StateSendLevel_28)(); // 0x28
     u8 unk30[0x38 - 0x30];
     void (DinoWirelessBattle::*StateCloseHub_38)(); // 0x38
@@ -51,7 +52,7 @@ extern "C" struct {
 extern "C" struct {
     void (DinoWirelessBattle::*StateReset_00)(); // 0x00
     void (DinoWirelessBattle::*Failed_08)(); // 0x08
-    void (DinoWirelessBattle::*Unk02049f3c_10)(); // 0x10
+    void (DinoWirelessBattle::*StateBattle_10)(); // 0x10
     u8 unk18[0x20 - 0x18];
     void (DinoWirelessBattle::*StateBeginBattle_20)(); // 0x20
     void (DinoWirelessBattle::*StateTeamSelect_28)(); // 0x28
@@ -175,7 +176,54 @@ void DinoWirelessBattle::StateWaitReady() {
 
 void DinoWirelessBattle::StateCloseHub() {
     mHub->Exit();
-    mState = data_020c0480.Unk02049f3c_10;
+    mState = data_020c0480.StateBattle_10;
+}
+
+// Sets up this console's side of the battle (the other's comes over the connection) and runs it.
+void DinoWirelessBattle::StateBattle() {
+    MLoadOverlay(0, M_OVERLAY_ID(ov000));
+    DinoBattleParams params;
+    MI_CpuFill8(&params, 0, sizeof(params));
+    u32 me = mMultiPlay->GetPlayerIndex();
+    params.unk00 = 2;
+    params.unk04 = (u32) mMultiPlay;
+    u32 other = (me + 1) & 1;
+    (&params.unk08)[me] = 0;
+    (&params.unk08)[other] = 1;
+    (&params.unk10)[me] = 0;
+    (&params.unk10)[other] = 1;
+    params.unk18 = 1;
+    params.unk1C = me == 0;
+    params.unk148[3] = gDinoResource->GetBattleAdjustDefs()->wirelessUnk1B4;
+    params.unk20[2] = gDinoResource->GetBattleAdjustDefs()->wirelessUnk1B8;
+    params.unk20[3] = gDinoResource->GetBattleAdjustDefs()->wirelessUnk1BC;
+    params.unk20[1] = gDinoResource->GetBattleAdjustDefs()->wirelessUnk1C0;
+    DinoTeam team;
+    gDinoBackup->GetTeam(mTeam, &team);
+    DinoBattleSide *side = &params.sides[me];
+    DinoPlayerData *player = &mPlayers[me].mData;
+    side->mName = MEncodeUtf8(std::wstring((const wchar_t *) player->name));
+    if (player->unk14_0 != 0) {
+        *(u32 *) &side->unk54[4] = player->unk14_0 + 8;
+    } else {
+        *(u32 *) &side->unk54[4] = player->rank + 1;
+    }
+    for (u32 i = 0; i < 3; i++) {
+        DinoCreatureState *creature = (DinoCreatureState *) &side->mCreatures[i];
+        gDinoBackup->GetCreature(team.slots[i], creature);
+        u32 j;
+        u32 parts = 0;
+        for (j = 0; j < 4; j++) {
+            if (creature->parts[j].level) {
+                parts++;
+            }
+        }
+        side->mLevels[i] = parts;
+    }
+    *(u32 *) side->unk54 = mPlayers[me].mData.horiderLevel;
+    side->unk7C[0xD] = gDinoBackup->GetSystemFlag(0x28);
+    mSerial.AddTail(new DinoBattle(params, (u32) &mWon, 0, &mUnk2E9, NULL));
+    mState = data_020c0400.StateBattleEnd_20;
 }
 
 void DinoWirelessBattle::StateBattleEnd() {
