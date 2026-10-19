@@ -175,4 +175,8 @@ template std::wstring &std::wstring::operator+=(const std::wstring &str);
 void MConsoleWindowAnchor(MCanvasWindow *window) {
     window->MCanvasWindow::~MCanvasWindow();
 }
+
+void MConsoleWindowDeleteAnchor(MCanvasWindow *window) {
+    delete window;
+}
 #pragma dont_inline reset
