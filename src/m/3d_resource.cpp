@@ -289,6 +289,27 @@ M3DModelResource::~M3DModelResource() {
     }
 }
 
+M3DModelResource &M3DModelResource::operator=(const M3DModelResource &other) {
+    if (mModel != NULL) {
+        M3DReleaseModel(mModelFile);
+        M3DReleaseAnim(mAnimFile);
+        M3DReleaseTex(mTexFile);
+        mModel = mAnim = mTex = NULL;
+    }
+    mArchive = other.mArchive;
+    mDinTable = other.mDinTable;
+    mPath = other.mPath;
+    mModelFile = other.mModelFile;
+    mAnimFile = other.mAnimFile;
+    mTexFile = other.mTexFile;
+    if (other.mModel != NULL) {
+        mModel = M3DLoadModel(mModelFile);
+        mAnim = M3DLoadAnim(mAnimFile);
+        mTex = M3DLoadTex(mTexFile);
+    }
+    return *this;
+}
+
 void M3DModelResource::Setup(M3DModel *model, u8 keepPalette) {
     model->SetModelData(mModel, FALSE);
     model->SetAnimData(mAnim);
