@@ -1029,3 +1029,72 @@ DinoBattleViewUiCreatureInfoMenu::DinoBattleViewUiCreatureInfoMenu(DinoBattleVie
     }
     mUnkF8->AddTail(set);
 }
+
+#pragma opt_common_subs on
+// The page items page the info (handled twice over, as the game does); the close item puts everything back.
+// NONMATCHING: the other view, the anime, the loop counter and the wait get other stack slots.
+void DinoBattleViewUiCreatureInfoMenu::OnDecide(MMenuItem *item) {
+    if (HandlePageItem(item)) {
+        return;
+    }
+    for (int i = 0; i < 2; i++) {
+        if (item == mPageItems[i]) {
+            if (mInfo->mUnkEC) {
+                int old = mInfoKind;
+                if (i != 0) {
+                    do {
+                        mInfoKind = (u32)(mInfoKind + 1) % 5;
+                        mInfo->PlayMotion(1);
+                        DinoSoundPlaySe(0x60, 0);
+                    } while (!func_ov000_02176454(&(DinoBattleViewUiSelectAreaCommon &)*this, mInfoKind, NULL));
+                }
+                if (i == 0) {
+                    do {
+                        mInfoKind = ((u32)(mInfoKind - 1) + 5) % 5;
+                        mInfo->PlayMotion(0);
+                        DinoSoundPlaySe(0x60, 0);
+                    } while (!func_ov000_02176454(&(DinoBattleViewUiSelectAreaCommon &)*this, mInfoKind, NULL));
+                }
+                if (old != mInfoKind) {
+                    mInfo->Update(TRUE, NULL, data_ov000_0218fd1c[mInfoKind].kind, TRUE,
+                                  data_ov000_0218fd1c[mInfoKind].attacks);
+                }
+            }
+            return;
+        }
+    }
+    if (mItem120 == item) {
+        DinoSoundPlaySe(0x63, 0);
+        mCursor->Hide();
+        mUnkF8->Clear();
+        int other;
+        int side = mSideC0;
+        other = 1 - side;
+        MView *sideView = ((DinoBattleView *)mUnkEC)->mUnkE0->mSlotViewsC0[side];
+        MView *otherView = ((DinoBattleView *)mUnkEC)->mUnkE0->mSlotViewsC0[other];
+        mUnkF8->AddTail(Together(sideView->CreateCoordAnime(sideView->GetPosition(), func_ov000_0215f22c(2, side), 8, -2),
+                                 otherView->CreateCoordAnime(otherView->GetPosition(), func_ov000_0215f22c(3, other), 8, -2)));
+        int count = 0;
+        u32 i;
+        for (i = 0; i < 2; i++) {
+            count += ((DinoBattleView *)mUnkEC)->GetUnkE4(i)->GetCreatureCount();
+        }
+        if (count != 0) {
+            DinoSignalWait *wait = new DinoSignalWait(0x100A1, NULL, NULL, count);
+            mSerial.AddTail(wait);
+            for (i = 0; i < 2; i++) {
+                DinoBattleViewPlayer *player = ((DinoBattleView *)mUnkEC)->GetUnkE4(i);
+                for (u32 j = 0; j < player->GetCreatureCount(); j++) {
+                    player->GetCreature(j)->Post(new DinoBattleViewCreatureViewInfoMoveRequest(wait, FALSE));
+                }
+            }
+        }
+        func_ov000_02161748(((DinoBattleView *)mUnkEC)->mUnkE0);
+        Disable();
+        GetSerial()->AddTail(MTaskSetWaitEmptyTask::Create(mUnkF8),
+                             mTarget->CreatePostTask(new DinoBattleViewUiCreatureInfoMenuResult()),
+                             MTaskExitTransfer::Create(&(MProcess &)*this));
+        return;
+    }
+    GetItemCreature(item);
+}
