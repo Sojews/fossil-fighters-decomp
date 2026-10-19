@@ -20,6 +20,8 @@ public:
     void SetUnkCC(u32 value);
     void SetRate(MFx32 rate);
     void Reset();
+    // Slides the window out and clears the screen's blending.
+    void Close();
     DinoCleaningTalkWindow(u32 arg);
     virtual ~DinoCleaningTalkWindow();
     virtual void Idle();
@@ -32,7 +34,7 @@ public:
     MParallelTaskSet *mTasksB8; // 0xB8
     MView *mFace;           // 0xBC
     MSmartOam *mOam;        // 0xC0
-    u32 unkC4;
+    MView *mFrame;          // 0xC4
     MConsole *mConsole;     // 0xC8
     u32 mUnkCC;             // 0xCC
     u32 mUnkD0;             // 0xD0

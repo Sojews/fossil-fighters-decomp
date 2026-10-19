@@ -62,6 +62,28 @@ void DinoCleaningTalkWindow::Idle() {
     }
 }
 
+// NONMATCHING: 87%, the points' temporaries take other stack slots.
+void DinoCleaningTalkWindow::Close() {
+    mUnkCC = 0;
+    mUnkD0 = 0;
+    mConsole->Run();
+    MTask *clear = gLcd->GetTopDisplay()->mBlend->CreateClearTransfer();
+    MTask *empty = MTaskSetMakeEmptyTask::Create(mTasksB8);
+    MPoint frameFrom(256, 192);
+    MTask *frame = mFrame->CreateCoordAnime(frameFrom, MPoint(frameFrom.x + 64, frameFrom.y), 20, 2);
+    MTask *window = mConsole->CreateCoordAnime(data_ov002_0216431c.mPos,
+                                               MPoint(data_ov002_0216431c.mPos.x, data_ov002_0216431c.mPos.y + 40), 20, 2);
+    MTask *face = mFace->CreateCoordAnime(MPoint(0, 0), MPoint(0, 40), 20, 2);
+    MParallelTaskSet *set = new MParallelTaskSet(TRUE);
+    set->AddTail(face);
+    set->AddTail(window);
+    set->AddTail(frame);
+    MSerialTaskSet *serial = mTasksB4;
+    serial->AddTail(set);
+    serial->AddTail(empty);
+    serial->AddTail(clear);
+}
+
 #pragma auto_inline off
 
 void DinoCleaningTalkWindow::SetUnkD0(u32 value) {

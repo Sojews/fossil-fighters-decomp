@@ -53,7 +53,7 @@ _ZN22DinoCleaningTalkWindowC1Em kind:function(thumb,size=0x158) addr:0x02157280
 _ZN22DinoCleaningTalkWindow8SetUnkD0Em kind:function(thumb,size=0x6) addr:0x021573d8
 _ZN22DinoCleaningTalkWindow8SetUnkCCEm kind:function(thumb,size=0x6) addr:0x021573e0
 func_ov002_021573e8 kind:function(thumb,size=0x474) addr:0x021573e8
-func_ov002_0215785c kind:function(thumb,size=0x170) addr:0x0215785c
+_ZN22DinoCleaningTalkWindow5CloseEv kind:function(thumb,size=0x170) addr:0x0215785c
 _ZN22DinoCleaningTalkWindow7SetRateE5MFx32 kind:function(thumb,size=0x20) addr:0x021579cc
 _ZN22DinoCleaningTalkWindow5ResetEv kind:function(thumb,size=0x38) addr:0x021579ec
 _ZN22DinoCleaningTalkWindow4IdleEv kind:function(thumb,size=0x190) addr:0x02157a24
@@ -462,7 +462,6 @@ data_ov002_021642d8 kind:data(any) addr:0x021642d8
 _ZTV26DinoCleaningTutorialWindow kind:data(any) addr:0x021642e0
 _ZTS26DinoCleaningTutorialWindow kind:data(any) addr:0x021642fc
 data_ov002_0216431c kind:data(any) addr:0x0216431c
-data_ov002_0216433c kind:data(any) addr:0x0216433c
 _ZTI22DinoCleaningTalkFilter kind:data(any) addr:0x02164370
 _ZTI22DinoCleaningTalkWindow kind:data(any) addr:0x02164394
 data_ov002_0216439c kind:data(any) addr:0x0216439c
