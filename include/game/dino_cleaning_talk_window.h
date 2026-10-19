@@ -2,6 +2,8 @@
 #ifndef GAME_DINO_CLEANING_TALK_WINDOW_H
 #define GAME_DINO_CLEANING_TALK_WINDOW_H
 
+#include "m/picture.h"
+
 #include "m/task.h"
 #include "m/fx32.h"
 #include "m/archive.h"
@@ -20,15 +22,11 @@ public:
     virtual void Idle();
 
     u32 mUnk74;             // 0x74
-    MArchivePtr mArchive;   // 0x78
-    MArchiveFile mFile7C;   // 0x7C
-    MArchiveFile mFile88;   // 0x88
-    MArchiveFile mFile94;   // 0x94
-    MArchiveFile mFileA0;   // 0xA0
+    MPictureFile mPicture;  // 0x78: the window
     MMotionFile mMotion;    // 0xAC
     u32 unkB0;
-    MTaskSet *mTasksB4;     // 0xB4
-    MTaskSet *mTasksB8;     // 0xB8
+    MSerialTaskSet *mTasksB4;   // 0xB4
+    MParallelTaskSet *mTasksB8; // 0xB8
     u32 unkBC[3];
     MConsole *mConsole;     // 0xC8
     u32 mUnkCC;             // 0xCC
