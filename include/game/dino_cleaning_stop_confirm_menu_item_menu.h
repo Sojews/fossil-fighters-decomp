@@ -37,6 +37,7 @@ public:
     void StateAsk();
     void StateDecided();
     void StateAskAgain();
+    void StateLeave();
 
     void (DinoCleaningStopConfirm::*mState)(); // 0x80
     DinoCleaning *mCleaning;    // 0x88
@@ -44,18 +45,21 @@ public:
 };
 
 // Shown after the DS wakes, until the cleaning takes input again.
+class DinoSeMotion;
+
 class DinoCleaningSleep : public MProcess, public DinoHelpBase {
 public:
     DinoCleaningSleep(DinoCleaning *cleaning, u32 *timer);
     virtual ~DinoCleaningSleep();
     virtual void Idle();
 
+    void Start();
     void StateClose();
 
     void (DinoCleaningSleep::*mState)(); // 0x80
     DinoCleaning *mCleaning;    // 0x88
     u32 *mTimer;                // 0x8C: the cleaning's sleep timer
-    MMotion *mMotion;           // 0x90
+    DinoSeMotion *mMotion;      // 0x90
 };
 
 #endif

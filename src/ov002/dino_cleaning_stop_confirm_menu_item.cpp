@@ -4,6 +4,11 @@
 // Derived destructors have their bases' destructor bodies inlined; auto-inlining the ones defined above does that.
 #pragma auto_inline on
 
+#include "m/display.h"
+#include "m/smart_oam.h"
+#include "m/lcd.h"
+#include "m/bright.h"
+#include "game/dino_se_motion.h"
 #include "game/dino_cleaning_stop_confirm_menu_item_menu.h"
 #include "game/dino_cleaning_stop_confirm_menu_item.h"
 
@@ -96,13 +101,15 @@ extern "C" struct {
     u8 unk00[0x4];
     const char *mMotion04;  // 0x04: the questions' motions
     const char *mMotion08;  // 0x08
-    u8 unk0C[0x18 - 0xC];
+    const char *mSleepMotion;   // 0x0C
+    u8 unk10[0x18 - 0x10];
     void (DinoCleaningStopConfirm::*Start_18)();
     u8 unk20[0x38 - 0x20];
-    void (DinoCleaningStopConfirm::*Unk02156b08_38)();
+    void (DinoCleaningStopConfirm::*StateLeave_38)();
     void (DinoCleaningStopConfirm::*StateDecided_40)();
     void (DinoCleaningSleep::*Start_48)();
-    u8 unk50[0x60 - 0x50];
+    void (DinoCleaningSleep::*StateClose_50)();
+    u8 unk58[0x60 - 0x58];
     void (DinoCleaningStopConfirm::*Unk02156a9c_60)();
 } data_ov002_02163f40;
 
@@ -137,9 +144,34 @@ void DinoCleaningStopConfirm::StateAsk() {
 
 void DinoCleaningStopConfirm::StateAskAgain() {
     mSerial.AddTail(new DinoCleaningStopConfirmMenu(data_ov002_02163f40.mMotion08, mResult, data_0208ad18, data_0208ad14));
-    mState = data_ov002_02163f40.Unk02156b08_38;
+    mState = data_ov002_02163f40.StateLeave_38;
+}
+
+void DinoCleaningStopConfirm::StateLeave() {
+    Exit();
 }
 
 DinoCleaningSleep::DinoCleaningSleep(DinoCleaning *cleaning, u32 *timer) : MProcess(NULL), mCleaning(cleaning), mTimer(timer) {
     mState = data_ov002_02163f40.Start_48;
+}
+
+// The sleep motion's sounds.
+extern "C" const u32 data_0208a240[];
+
+void DinoCleaningSleep::Start() {
+    MSmartOam *oam;
+    if (gLcd->GetBottomDisplay()->mBright->GetFactor() == 0) {
+        oam = new MSmartOam(gLcd->GetBottomDisplay(), 5, 0, 1);
+    } else {
+        oam = new MSmartOam(gLcd->GetTopDisplay(), 5, 0, 1);
+    }
+    mMotion = new DinoSeMotion(std::string(data_ov002_02163f40.mSleepMotion), oam, 0, 1);
+    mMotion->SetPosition(0x80, 0x60);
+    for (u32 i = 0; i < 5; i++) {
+        mMotion->AddSe(data_0208a240[i]);
+    }
+    mMotion->Show();
+    mMotion->Play(1, 0);
+    GetParallel()->AddTail(mMotion, oam);
+    mState = data_ov002_02163f40.StateClose_50;
 }
