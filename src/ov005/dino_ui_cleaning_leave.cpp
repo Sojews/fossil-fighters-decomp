@@ -17,6 +17,10 @@
 #include "game/dino_common_window_yes_no_dialog.h"
 #include "game/dino_ui3_parts_cursor.h"
 #include "game/dino_sound.h"
+#include "game/dino_guide_message.h"
+#include "game/help.h"
+#include "m/picture.h"
+#include "game/dino_ui3_parts_fraction.h"
 
 DinoUiCleaningLeave::~DinoUiCleaningLeave() {
 }
@@ -50,6 +54,36 @@ DinoUiCleaningLeaveMenu::DinoUiCleaningLeaveMenu(std::vector<void *> *chosen) {
     mChosen->clear();
     mUnk101 = 0x40;
     mUnk104 = data_0208a628;
+}
+
+// "image/bg_container03" (the TU's string literals are pooled data too).
+extern "C" const char data_ov005_02169170[];
+extern "C" struct {
+    u32 unk00;
+    const char *decideMotion;   // 0x04
+} data_ov005_02168fbc;
+extern "C" const u32 data_0208a634, data_0208a62c, data_0208a624, data_0208a630, data_0208a928;
+
+void DinoUiCleaningLeaveMenu::Setup() {
+    mParallel.AddTail(mBackground = new MTextPicture(data_ov005_02169170, TRUE, false));
+    mBackground->Show();
+    mBackground->SetPriority(2);
+    gDinoBackup->CompactUnk98();
+    DinoHelpDummyItem *list;
+    mParallel.AddTail(list = new DinoHelpDummyItem(GetDisplay(), MRect(0x1E, 0xC, 0xE2, 0x6C),
+                                                   std::string(gDinoResource->GetText(data_0208a634))));
+    mParallel.AddTail(new DinoHelpDummyItem(GetDisplay(), MRect(0x13, 0x90, 0xF1, 0x9F),
+                                            std::string(gDinoResource->GetText(data_0208a62c))));
+    DinoHelpDummyItem *page;
+    mParallel.AddTail(page = new DinoHelpDummyItem(GetDisplay(), MRect(0xE9, 0x5D, 0xF7, 0x6E),
+                                                   std::string(gDinoResource->GetText(data_0208a624))));
+    AddEntry((u32)page, 3, (u32)list);
+    CreateDecideButton(data_ov005_02168fbc.decideMotion, data_0208a630);
+    DinoPlayerData player;
+    gDinoBackup->GetPlayer(&player, 0);
+    mFraction->SetDenominator(player.containerNum);
+    mFraction->Show();
+    mParallel.AddTail(new DinoGuideMessage(std::string(gDinoResource->GetText(data_0208a928))));
 }
 
 extern const u32 data_0208a9a4, data_0208a9a0, data_0208a99c, data_0208a998, data_0208a994;
