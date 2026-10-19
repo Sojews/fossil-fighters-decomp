@@ -2,6 +2,7 @@
 // UTF-8) and wide characters.
 
 #define MSL_STRING_DEFINITIONS
+#define MSL_STRING_PLUS_DEFINITIONS
 #include <set>
 #include "m/text_codec.h"
 #include "nitro/os.h"
@@ -217,3 +218,6 @@ static std::wstring MGetOwnerName() {
 std::string MGetOwnerNameUtf8() {
     return MEncodeUtf8(MGetOwnerName());
 }
+
+// (Used by MMakeRomPath; the game keeps the instance here.)
+template std::string std::operator+(const std::string &lhs, const std::string &rhs);
