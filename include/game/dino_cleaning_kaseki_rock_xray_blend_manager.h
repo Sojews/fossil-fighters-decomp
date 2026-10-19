@@ -3,6 +3,8 @@
 
 #include "m/task.h"
 
+class DinoCleaningImageView;
+
 class DinoCleaningKasekiRockXrayBlendManager : public MProcess {
 public:
     virtual ~DinoCleaningKasekiRockXrayBlendManager();
@@ -12,9 +14,11 @@ public:
     void StateDone();
 
     void (DinoCleaningKasekiRockXrayBlendManager::*mState)(); // 0x74
-    u32 mUnk7C;                                                 // 0x7C
+    DinoCleaningImageView *mImage;                              // 0x7C: the x-ray image
     int mTimer;                                                 // 0x80
     u8 mHidden;                                                 // 0x84: no blending while it's set
+    u32 unk88;
+    MTaskSet *mTasks;                                           // 0x8C
 };
 
 #endif

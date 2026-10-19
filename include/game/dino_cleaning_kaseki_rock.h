@@ -11,14 +11,7 @@ class DinoCleaningImageView;
 class MSmartOam;
 
 // The fossil rock being cleaned: an outer rock layer over the fossil.
-// The x-ray look over the rock.
-class DinoCleaningXrayView : public MProcess {
-public:
-    u32 unk74[2];
-    DinoCleaningImageView *mImage;  // 0x7C
-    u32 unk80[3];
-    MTaskSet *mTasks;               // 0x8C
-};
+class DinoCleaningKasekiRockXrayBlendManager;
 
 class DinoCleaningKasekiRock : public MProcess {
 public:
@@ -52,7 +45,7 @@ public:
     MView *mUnk88;                              // 0x88
     DinoCleaningRock *mRock8C;                  // 0x8C
     DinoCleaningRock *mRock90;                  // 0x90
-    DinoCleaningXrayView *mXray;                // 0x94
+    DinoCleaningKasekiRockXrayBlendManager *mXray;  // 0x94
     u32 mUnk98;                                 // 0x98
     u32 mUnk9C;                                 // 0x9C
     u32 mUnkA0[(0x4A4 - 0xA0) / 4];             // 0xA0

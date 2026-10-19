@@ -213,7 +213,8 @@ void DinoCleaningKasekiRockXrayBlendManager::Idle() {
 extern "C" struct {
     u8 unk00[0x20];
     void (DinoCleaningKasekiRockXrayBlendManager::*StateDone_20)(); // 0x20
-    u8 unk28[0x48 - 0x28];
+    void (DinoCleaningKasekiRockXrayBlendManager::*StateFade_28)(); // 0x28
+    u8 unk30[0x48 - 0x30];
     void (DinoCleaningKasekiRock::*CountCells_48)(); // 0x48
     void (DinoCleaningKasekiRock::*StateDrop_50)(); // 0x50
     u8 unk58[0x68 - 0x58];
@@ -482,8 +483,35 @@ void DinoCleaning::StateQuit() {
 
 #pragma auto_inline off
 
+// Shows the x-ray image: zooming in from white, then fading out.
+void DinoCleaningKasekiRock::StartXray() {
+    ((DinoCleaning *)unk7C)->GetUnkE4()->SetUnkAC(11);
+    DinoCleaningKasekiRockXrayBlendManager *xray = mXray;
+    DinoSoundPlaySe(0x26, 0);
+    xray->mTasks->Clear();
+    MFx32 to;
+    MFx32 from;
+    from = MFx32::FromRaw(0x1B33);
+    to = MFx32(1);
+    MTask *scale = xray->mImage->CreateScaleAnime(from, to, 45, -1);
+    MTask *fade = xray->GetDisplay()->mBright->CreateFadeInFromWhite(60, 0);
+    MParallelTaskSet *set = new MParallelTaskSet(TRUE);
+    set->AddTail(fade);
+    set->AddTail(scale);
+    xray->mTasks->AddTail(set);
+    xray->mImage->Show();
+    MBlend *blend = xray->GetDisplay()->mBlend;
+    blend->SetMode(1);
+    blend->SetAlpha(16, 16);
+    blend->SetTarget1(xray->mImage->GetPlaneMask());
+    blend->SetTarget2(0x3F);
+    xray->mTimer = data_0208a23c;
+    xray->mState = data_ov002_021657d4.StateFade_28;
+    mView->CreatePalAnimes();
+}
+
 void DinoCleaningKasekiRock::StopXray() {
-    DinoCleaningXrayView *xray = mXray;
+    DinoCleaningKasekiRockXrayBlendManager *xray = mXray;
     xray->mTasks->Clear();
     xray->GetDisplay()->mBlend->Reset();
     xray->GetDisplay()->mBright->Reset();
