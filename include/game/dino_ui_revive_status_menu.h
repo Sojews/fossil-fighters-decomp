@@ -43,6 +43,7 @@ public:
     virtual void OnDecide(MMenuItem *item);
     void OnBackDecided();
     void SetPage(u8 page);
+    void SetTab(u8 tab);
 
     u8 unkB3[1];
     MSmartOam *mOam;        // 0xB4: the items' sprites

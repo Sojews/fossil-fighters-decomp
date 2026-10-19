@@ -96,12 +96,10 @@ void DinoUiReviveStatusBackButton::OnDecide() {
     DinoSoundPlaySe(0x90, 0);
 }
 
-extern "C" void func_ov007_02188e00(DinoUiReviveStatusMenu *menu, u8 index);
-
 void DinoUiReviveStatusMenu::OnDecide(MMenuItem *item) {
     for (int i = 0; i < 4; i++) {
         if (item == mItems[i]) {
-            func_ov007_02188e00(this, i);
+            SetTab(i);
         }
     }
 }
@@ -135,7 +133,7 @@ void DinoUiReviveStatusMenu::OnFocus(MMenuItem *item) {
 // DinoUiReviveStatusMenu::OnStart (not decompiled yet) re-enables the help through a call task.
 #pragma auto_inline off
 template MTask *MCreateCallTask(DinoUiReviveStatusMenu *obj, void (DinoHelpBase::*func)());
-template MTask *MCreateCallTask(DinoUiReviveStatusMenu *obj, void (DinoUiReviveStatusMenu::*func)(bool), bool a1);
+template MTask *MCreateCallTask(DinoUiReviveStatusMenu *obj, void (DinoUiReviveStatusMenu::*func)(u8), u8 a1);
 #pragma auto_inline reset
 
 #pragma auto_inline off
@@ -230,6 +228,31 @@ void DinoUiReviveStatusLoopCleaning::Idle() {
 extern "C" struct {
     void (DinoHelpBase::*Enable_00)();
 } data_ov007_02191eb0;
+
+extern "C" struct {
+    void (DinoUiReviveStatusMenu::*SetPage_00)(u8);
+} data_ov007_02191e80;
+extern "C" void func_ov007_02189170(DinoUiReviveStatusMenu *menu);
+
+// Turns to the tab after a frame, and keys the tabs either side of it to L and R.
+void DinoUiReviveStatusMenu::SetTab(u8 tab) {
+    if (tab > 3 || mUnk11C == tab) {
+        return;
+    }
+    mUnk11C = tab;
+    DinoSoundPlaySe(0x94, 0);
+    MTask *setPage = MCreateCallTask(this, data_ov007_02191e80.SetPage_00, tab);
+    MTask *timer = new MTimer(1);
+    MSerialTaskSet *serial = &mSerial;
+    serial->AddTail(timer);
+    serial->AddTail(setPage);
+    Disable();
+    mItems[tab % 4]->SetKeys(0);
+    mItems[(tab + 1) % 4]->SetKeys(0x400);
+    mItems[(tab + 2) % 4]->SetKeys(0);
+    mItems[(tab + 3) % 4]->SetKeys(0x800);
+    func_ov007_02189170(this);
+}
 
 // Turns the information to the page; help comes back once it has.
 void DinoUiReviveStatusMenu::SetPage(u8 page) {
