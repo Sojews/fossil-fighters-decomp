@@ -10,6 +10,8 @@ class MConsole;
 
 class DinoTalkWindow : public MProcess {
 public:
+    // Not decompiled yet.
+    DinoTalkWindow(MDisplay *display, std::string speaker, int arg, BOOL choices, u8 flag);
     void SetUnkF4();
     void ClearUnkF4();
     void SetRate(MFx32 rate);

@@ -5,6 +5,8 @@
 
 #define MSL_STRING_BASICS
 #include "m/input.h"
+#include "m/lcd.h"
+#include "m/text_codec.h"
 #include "game/dino_talk_window.h"
 #include "game/dino_event_talk_window.h"
 #include "m/bg_new_task.h"
@@ -66,6 +68,22 @@ extern "C" struct {
 } data_020b6144;
 
 // Waits for the window to show the page, then asks, chooses or ends.
+// Makes the window (in the background): the text's first line names the speaker, the rest is printed.
+void DinoEventTalkWindow::Load() {
+    std::vector<std::string> lines = MSplitString(mText, '\n');
+    std::string speaker(lines[0]);
+    lines.erase(lines.begin());
+    mText = MJoinStrings(lines, '\n');
+    mWindow = new DinoTalkWindow(gLcd->GetBottomDisplay(), std::string(speaker), mArg,
+                                 (mUnk98 != 0 || mUnk9C != 0) ? TRUE : FALSE, mFlag);
+    mWindow->SetUnkF4();
+    mWindow->Print(std::string(mText));
+    mParallel.AddTail(mWindow);
+    MTask *wait = mWindow->CreateWaitStartTask();
+    GetSerial()->AddTail(new MTimer(1), wait);
+    mUnk90 = 0;
+}
+
 void DinoEventTalkWindow::StatePage() {
     if (mWindow->IsEmpty()) {
         if (mUnk98 != 0) {
