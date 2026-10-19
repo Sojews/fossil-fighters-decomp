@@ -162,7 +162,7 @@ extern "C" struct {
     u8 unk8C[0x94 - 0x8C];
     void (DinoUiTitle::*LoadLogo_94)(); // 0x94
     void (DinoUiTitle::*Unk0215f1e0_9C)(); // 0x9c
-    u8 unkA4[0xAC - 0xA4];
+    void (DinoUiTitle::*StateWarning_A4)(); // 0xa4
     void (DinoUiTitle::*Unk0215e03c_AC)(); // 0xac
     void (DinoUiTitle::*Start_B4)(); // 0xb4
     u8 unkBC[0xC4 - 0xBC];
@@ -176,7 +176,7 @@ extern "C" struct {
     u8 unk11C[0x124 - 0x11C];
     void (DinoUiTitle::*Unk0215e03c_124)(); // 0x124
     void (DinoUiTitle::*Unk0215f420_12C)(); // 0x12c
-    void (DinoUiTitle::*Unk0215d6b4_134)(); // 0x134
+    void (DinoUiTitle::*StateInit_134)(); // 0x134
     void (DinoUiTitle::*Unk0215d818_13C)(); // 0x13c
     void (DinoUiTitle::*Unk0215e9e4_144)(); // 0x144
     void (DinoUiTitle::*StateWarning_14C)(); // 0x14c
@@ -191,6 +191,26 @@ inline DinoUiOpening::DinoUiOpening(MInput *input) : MProcess(NULL), mInput(inpu
 
 DinoUiTitle::DinoUiTitle(s32 *result) : MProcess(NULL), mResult(result) {
     mState = data_ov004_02172f78.Start_B4;
+}
+
+// Sets up both screens (the main one at the bottom) and fades them in from white.
+void DinoUiTitle::StateInit() {
+    mSkipped = FALSE;
+    gLcd->mMain->ResetHooks();
+    gLcd->mSub->ResetHooks();
+    gLcd->mMain->Setup(5, 0, 3, 1, 1, 1);
+    gLcd->mMain->mBg->SetBg0Reserved(1);
+    gLcd->mMain->SetBackdrop(0x8000);
+    gLcd->mSub->Setup(5, 2, 4, 1, 0, 0);
+    gLcd->mSub->SetBackdrop(0x8000);
+    gLcd->mMain->mObj->Show();
+    gLcd->mSub->mObj->Show();
+    gLcd->SetBottomDisplay(gLcd->mMain);
+    SetDisplay(gLcd->mMain);
+    mSerial.AddTail((new MParallelTaskSet(TRUE))
+                        ->Add(gLcd->GetTopDisplay()->mBright->CreateFadeInFromWhite(10, 0))
+                        ->Add(gLcd->GetBottomDisplay()->mBright->CreateFadeInFromWhite(10, 0)));
+    mState = data_ov004_02172f78.StateWarning_A4;
 }
 
 // Slides the title away and the save slots in, then shows the slot select.
@@ -287,7 +307,7 @@ void DinoUiTitle::StateStart() {
     switch (*mResult) {
     case 0:
         mTopResult = 1;
-        mState = data_ov004_02172f78.Unk0215d6b4_134;
+        mState = data_ov004_02172f78.StateInit_134;
         break;
     case 4:
         mTopResult = 1;

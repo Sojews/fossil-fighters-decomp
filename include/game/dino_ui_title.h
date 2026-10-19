@@ -15,6 +15,7 @@ public:
     virtual void Idle();
 
     void StateStart();
+    void StateInit();
     void StateEnd();
     void StateWirelessBattle();
     void StateATM();
