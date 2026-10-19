@@ -144,7 +144,11 @@ public:
     }
     void Clear();
 
-    void SetUseMutex(BOOL use) { mUseMutex = use; }
+    void SetUseMutex(BOOL use) {
+        // (Through an MTask pointer: the game addresses the flag from the set.)
+        MTask *self = this;
+        self->mUseMutex = use;
+    }
     BOOL IsEmpty() {
         MScopedLock lock(&mMutex, mUseMutex);
         return mHead == NULL;

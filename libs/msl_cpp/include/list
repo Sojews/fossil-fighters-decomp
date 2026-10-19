@@ -92,8 +92,9 @@ namespace std {
         // mwcc never inlines a template base class's constructor or destructor, so the most-derived class calls
         // these.
         void init() {
-            size_ = 0;
-            init_tail();
+            __list_imp *self = this;
+            self->size_ = 0;
+            self->init_tail();
         }
         void init_tail() {
             // (Through this: the game forms the list's address before the tail's.)
