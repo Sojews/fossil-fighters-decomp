@@ -9,6 +9,9 @@
 #include "m/irq.h"
 #include "m/lcd.h"
 #include "m/oam_canvas.h"
+#include "m/blend.h"
+#include "m/smart_oam.h"
+#include "m/display.h"
 
 static DinoHelpDriver *sHelpDriver;
 static DinoHelpBase *sHelpCurrentBase;
@@ -455,3 +458,12 @@ template DinoHelpPtrTree::node_base *DinoHelpPtrTree::lower_bound(const u32 &k, 
 template DinoHelpPtrTree::node_base *DinoHelpPtrTree::insert_node_at(node_base *parent, bool left, bool leftmost,
                                                                     const value_type &v);
 template void DinoHelpPtrTree::destroy(node_base *n);
+
+// Makes the unit semi-transparent when its display blends sprites over everything at full strength. (The game
+// emits it first in the file; defined first here, it moves the statics in .bss.)
+void SetBlendedMode(MSmartOamUnit *unit) {
+    MBlend *blend = unit->owner->mDisplay->mBlend;
+    if (blend->GetMode() != 0 && (blend->GetTarget1() & 0x10) && blend->GetEva() == 16 && blend->GetEvb() == 0) {
+        unit->SetMode(1);
+    }
+}
