@@ -112,3 +112,12 @@ template void std::string::push_back(char c);
 // String members the game emits in this file.
 template std::wstring::basic_string(const std::wstring &other);
 template std::wstring &std::wstring::operator=(const std::wstring &str);
+// (Calling these here instantiates them with the names the game's callers use.)
+#pragma dont_inline on
+int DinoTalkFilterCompareAnchor(const std::string &s, const char *text) {
+    return s.compare(text);
+}
+std::wstring &DinoTalkFilterReplaceAnchor(std::wstring &s, const std::wstring &text) {
+    return s.replace(0, 0, text);
+}
+#pragma dont_inline reset
