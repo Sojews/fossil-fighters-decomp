@@ -2,6 +2,7 @@
 // Only the destructors are decompiled so far.
 
 #define MSL_STRING_DEFINITIONS
+#define MSL_STRING_BASICS
 #include "game/dino_talk_console_filter.h"
 #include "game/dino_talk_window_wait_start_task.h"
 #include "game/dino_talk_window.h"
@@ -107,3 +108,7 @@ BOOL DinoTalkWindow::IsAnimating() {
 template std::wstring::const_iterator std::wstring::erase(std::wstring::const_iterator p);
 template void std::wstring::push_back(wchar_t c);
 template void std::string::push_back(char c);
+
+// String members the game emits in this file.
+template std::wstring::basic_string(const std::wstring &other);
+template std::wstring &std::wstring::operator=(const std::wstring &str);

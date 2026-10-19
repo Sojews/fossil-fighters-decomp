@@ -2,6 +2,7 @@
 // Only the destructors are decompiled so far.
 
 #define DINO_COMMON_TUTORIAL_WINDOW_OWNER
+#define MSL_STRING_BASICS
 #include "game/dino_common_tutorial_console_filter.h"
 #include "game/dino_common_tutorial_window.h"
 #include "game/dino_sound.h"
@@ -91,3 +92,6 @@ void DinoCommonTutorialWindow::OnSetActive(BOOL active) {
 void DinoCommonTutorialWindow::ClearArrows() {
     mArrows->Clear();
 }
+
+// String members the game emits in this file.
+template std::wstring::~basic_string();

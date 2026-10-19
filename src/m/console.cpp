@@ -1,5 +1,6 @@
 // MConsole, and MCanvasCopyTransfer (which scrolls it). Not decompiled yet: Execute (the typing itself) and the line vector's template functions.
 
+#define MSL_STRING_BASICS
 #include "m/console.h"
 #include "m/text_codec.h"
 #include "m/canvas_copy_transfer.h"
@@ -163,3 +164,6 @@ wchar_t MConsole::PopChar() {
 void MConsole::PushChar(int c) {
     mText.insert(mText.begin(), c);
 }
+
+// String members the game emits in this file.
+template std::wstring &std::wstring::operator+=(const std::wstring &str);
