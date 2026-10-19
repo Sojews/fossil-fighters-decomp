@@ -1,9 +1,11 @@
 // DinoBackup: the save data.
 
 #define DINO_BACKUP_OWNER
+#define MBIT_VECTOR_OWNER
 #include "game/dino_backup.h"
 #include <algorithm>
 #include "m/archive.h"
+#include "m/menu.h"
 #include "m/backup.h"
 #include "m/irq.h"
 #include "m/heap.h"
@@ -1619,3 +1621,31 @@ void DinoBackup::AddUnk138(const DinoBackupEntry *entry, BOOL arg) {
     mPlayer->unk38_3 = 1;
     *mUnk138 = rock;
 }
+
+// MBitVector's members (the game has them, in reverse order, at the end of this file with the class's vtable).
+MBitVector::~MBitVector() {
+    delete[] mBytes;
+}
+
+int MBitVector::Unk14() {
+    return TRUE;
+}
+
+void MBitVector::Read(const void *buf) {
+    MI_CpuCopy8(buf, mBytes, (mBits + 7) / 8);
+}
+
+void MBitVector::Write(void *buf) {
+    MI_CpuCopy8(mBytes, buf, (mBits + 7) / 8);
+}
+
+u32 MBitVector::GetSize() {
+    return ((mBits + 7) / 8 + 3) & ~3;
+}
+
+// (Destroying one here emits the menu links' tree destructor, which the game keeps at the end of this file.)
+#pragma dont_inline on
+void DinoBackupMenuLinksAnchor(MMenuLinks *links) {
+    links->~MMenuLinks();
+}
+#pragma dont_inline reset
