@@ -43,7 +43,17 @@ void DinoCommonWindow::Draw(MPoint pos, MRect rect) {
     }
 }
 
+extern "C" const MPoint data_020ba57c;
 extern "C" const MRect data_020ba5e8;
+
+void DinoCommonWindow::SetFrame(MRect rect) {
+    mFrame.left = rect.left;
+    mFrame.top = rect.top;
+    mFrame.right = rect.right;
+    mFrame.bottom = rect.bottom;
+    Unk0201be50(data_020ba57c, rect);
+    Unk0201c098(data_020ba5e8, rect.Inflate(-1));
+}
 
 void DinoCommonWindow::Unk0201bb5c() {
     Unk0201c098(data_020ba5e8, mFrame.Inflate(-1));

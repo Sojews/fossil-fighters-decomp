@@ -24,6 +24,10 @@ public:
 
     void Draw(MPoint pos, MRect rect);
     void Unk0201c098(MRect a, MRect b);
+    // Not decompiled yet.
+    void Unk0201be50(MPoint pos, MRect rect);
+    // Sets the window's rect and draws it.
+    void SetFrame(MRect rect);
     // Unk0201c098 with the frame inside the window's rect.
     void Unk0201bb5c();
     // Not decompiled yet: a task that opens the window out of the rect.
