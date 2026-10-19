@@ -82,6 +82,16 @@ void DinoBattleViewStatusEffectIcon::RemoveEntry(u32 id) {
     }
 }
 
+MTask *DinoBattleViewStatusEffectIcon::CreateWaitTask() {
+    MParallelTaskSet *set = new MParallelTaskSet(TRUE);
+    MTask *queue = MTaskSetWaitEmptyTask::Create(mQueue);
+    MTask *second = new ViewStatusEffectIconWaitStop(mSlots[1].mIcon);
+    set->AddTail(new ViewStatusEffectIconWaitStop(mSlots[0].mIcon));
+    set->AddTail(second);
+    set->AddTail(queue);
+    return set;
+}
+
 void DinoBattleViewStatusEffectIcon::ResetIconModes() {
     for (int i = 0; i < 2; i++) {
         if (mSlots[i].mIcon->mMotion != NULL) {

@@ -11,12 +11,43 @@
 #include "game/dino_battle_view_class.h"
 #include "m/picture.h"
 
+// The pooled constants the code reads.
+extern "C" struct {
+    u8 unk00[0x08];
+    const char *mPointerPath;   // 0x08: the tutorial's pointing arrow
+    u8 unk0C[0x28 - 0x0C];
+    const char *mPointerPath2;  // 0x28: its other kind (directions above 4)
+    const char *mArrowPath;     // 0x2C: the advantage arrow
+} data_ov000_02191b1c;
+
 DinoBattleViewTutorialMotion::DinoBattleViewTutorialMotion(MSmartOam *oam) : MProcess(NULL) {
     mOam = oam;
     for (int i = 0; i < 3; i++) {
         mArrows[i] = NULL;
     }
     mRect = NULL;
+}
+
+// Points an arrow (replacing the one there) at pos.
+void DinoBattleViewTutorialMotion::ShowArrow(int index, int dir, MPoint pos) {
+    if (mArrows[index] != NULL) {
+        mArrows[index]->Exit();
+    }
+    MMotion *arrow;
+    if (dir > 4) {
+        DinoSoundPlaySe(0x397, 0);
+        arrow = new MMotion(std::string(data_ov000_02191b1c.mPointerPath2), mOam, 0, 1);
+        dir -= 4;
+    } else {
+        DinoSoundPlaySe(0x397, 0);
+        arrow = new MMotion(std::string(data_ov000_02191b1c.mPointerPath), mOam, 0, 1);
+    }
+    arrow->Show();
+    arrow->SetPosition(pos);
+    arrow->SetPriority(0);
+    arrow->Play(dir, 0);
+    mParallel.AddTail(arrow);
+    mArrows[index] = arrow;
 }
 
 // NONMATCHING: register allocation in the -1 loop (the game reuses the -1 register as the counter) and the
@@ -52,11 +83,6 @@ void MotionAdvantageArrow::Unk44(int arg) {
     }
 }
 
-// The pooled constants the code reads.
-extern "C" struct {
-    u8 unk00[0x2C];
-    const char *mArrowPath;     // 0x2C
-} data_ov000_02191b1c;
 
 // NONMATCHING: 98%, the game halves the sums straight from registers (ours stores them first).
 DinoBattleViewAdvantageArrow::DinoBattleViewAdvantageArrow(u32 unk74, MSmartOam *oam) : MProcess(NULL) {

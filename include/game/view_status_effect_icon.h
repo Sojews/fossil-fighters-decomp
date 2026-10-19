@@ -39,6 +39,8 @@ public:
     void HideIcons();
     void RemoveEntry(u32 id);
     void ResetIconModes();
+    // Waits for both icons' motions and the queue.
+    MTask *CreateWaitTask();
 
     u32 mUnk74;                     // 0x74
     MSmartOam *mOam;                // 0x78
@@ -110,6 +112,7 @@ public:
 
 class ViewStatusEffectIconWaitStop : public MTask {
 public:
+    ViewStatusEffectIconWaitStop(ViewStatusEffectIcon *icon) { mIcon = icon; }
     virtual ~ViewStatusEffectIconWaitStop();
     virtual void Execute();
 
