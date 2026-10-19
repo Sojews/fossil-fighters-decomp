@@ -142,3 +142,9 @@ void DinoCommonYesNoMenuItem::OnDecide() {
 void DinoCommonWindowYesNoDialog::SetUnkBC(u8 value) {
     mUnkBC = value;
 }
+
+#pragma auto_inline off
+
+void DinoCommonWindowYesNoDialog::SetPosition(MPoint pos) {
+    mPos = pos;
+}

@@ -8,6 +8,9 @@
 #include "m/geometry.h"
 
 struct DinoWindowChoice {
+    DinoWindowChoice() {}
+    DinoWindowChoice(u32 id, const std::string &text, const std::string &text2);
+
     u32 unk00;
     std::string unk04;  // 0x04
     std::string unk10;  // 0x10

@@ -87,6 +87,10 @@ DinoEventTalkWindow::DinoEventTalkWindow(MDisplay *display, std::string text, in
 }
 
 #pragma dont_inline on
+DinoWindowChoice::DinoWindowChoice(u32 id, const std::string &text, const std::string &text2)
+    : unk00(id), unk04(text), unk10(text2) {
+}
+
 void DinoEventTalkWindow::StateStart() {
     mInputHub = new MSingleInputHub(1);
     mInputHub->EnableTouch();
