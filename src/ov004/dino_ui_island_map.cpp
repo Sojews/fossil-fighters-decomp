@@ -14,6 +14,10 @@
 #include "game/dino_ui_island_map.h"
 #include "game/draw_font.h"
 #include "m/console.h"
+#include "m/oam_canvas.h"
+#include "m/text_codec.h"
+#include "m/obj.h"
+#include "game/dino_resource.h"
 #include "game/bitmap_move.h"
 #include "game/spot_move.h"
 #include "game/dino_ui_island_map_menu_item.h"
@@ -119,6 +123,28 @@ void DinoUiIslandMapMenuItem::OnSelectChanged(BOOL selected) {
         mMotion->Play(1, 0);
     }
 }
+
+extern "C" const u16 data_ov004_02175b50[]; // the texts DrawFont shows
+
+#pragma opt_common_subs off
+DrawFont::DrawFont(int text) : MProcess(NULL) {
+    gCurrentDisplay = gLcd->GetTopDisplay();
+    MFont *font = gDinoResource->CreateFont12(0, 1, 0);
+    MObjCanvas *canvas = new MObjCanvas(gCurrentDisplay, gCurrentDisplay->mObj->mOam, MPoint(0xE0, 0x30),
+                                        gDinoResource->GetUnkTable(), TRUE);
+    canvas->SetPriority(4);
+    mConsole = new MConsole(canvas, font, MPoint(0, 3), MFx32(1));
+    mConsole->SetUnk44(4);
+    int width = mConsole->GetWidth();
+    int height = mConsole->GetHeight();
+    mConsole->SetPosition((256 - width) / 2, (192 - height) / 2);
+    mConsole->Hide();
+    mConsole->Print(MDecodeUtf8(std::string(gDinoResource->GetText(data_ov004_02175b50[text]))));
+    mConsole->SetSpeed(MFx32(0));
+    mParallel.AddTail(mConsole);
+    gCurrentDisplay = gLcd->GetBottomDisplay();
+}
+#pragma opt_common_subs reset
 
 void DrawFont::Idle() {
 }

@@ -6,8 +6,11 @@
 
 class MConsole;
 
+// A text centred on the top screen.
 class DrawFont : public MProcess {
 public:
+    // text: an index into the island map's texts.
+    DrawFont(int text);
     virtual ~DrawFont();
     virtual void Idle();
     void SetCenter(const MPoint &pos);
