@@ -20,8 +20,8 @@ asm void DGTi_hash2_arm4_small(void *context, const void *source, u32 length) {
     sub sp, sp, #0x84
     str r2, [sp, #0x80]
 @2078cf0:
-    dcd 0xe51f8028 // ldr r8, [pc, #-0x28]
-    dcd 0xe51f7030 // ldr r7, [pc, #-0x30]
+    ldr r8, [pc, #-0x28]
+    ldr r7, [pc, #-0x30]
     mov r6, sp
     mov r5, #0
 @2078d00:
@@ -76,7 +76,7 @@ asm void DGTi_hash2_arm4_small(void *context, const void *source, u32 length) {
     add r7, r7, #4
     cmp r7, #0x10
     blt @2078d60
-    dcd 0xe51f80fc // ldr r8, [pc, #-0xfc]
+    ldr r8, [pc, #-0xfc]
     mov r7, #0
 @2078dd0:
     ldr r2, [r6]
@@ -106,7 +106,7 @@ asm void DGTi_hash2_arm4_small(void *context, const void *source, u32 length) {
     moveq r6, sp
     cmp r7, #0x14
     blt @2078dd0
-    dcd 0xe51f816c // ldr r8, [pc, #-0x16c]
+    ldr r8, [pc, #-0x16c]
     mov r7, #0
 @2078e44:
     ldr r2, [r6]
@@ -138,7 +138,7 @@ asm void DGTi_hash2_arm4_small(void *context, const void *source, u32 length) {
     moveq r6, sp
     cmp r7, #0x14
     blt @2078e44
-    dcd 0xe51f81e4 // ldr r8, [pc, #-0x1e4]
+    ldr r8, [pc, #-0x1e4]
     mov r7, #0
 @2078ec0:
     ldr r2, [r6]
