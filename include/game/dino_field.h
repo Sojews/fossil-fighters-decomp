@@ -21,6 +21,7 @@
 #include "game/dino_field_town_map.h"
 #include "game/dino_backup.h"
 struct DinoCharaTask;
+class MScreen;
 class DinoField;
 class DinoFieldCameraHook;
 class MTextPicture;
@@ -284,7 +285,7 @@ struct DinoFieldStep {
 
 class DinoField : public MProcess, public MSerializer, public DinoHelpBase {
 public:
-    DinoField(void *arg0, u32 arg1);
+    DinoField(MScreen **screen, u32 arg1);
     virtual ~DinoField();
     virtual void Idle();
     void CreateEffects(MPolygonChar **effects, u32 count, u32 id);
@@ -486,7 +487,7 @@ public:
     u32 mUnkA4[6];          // 0xA4
     u8 mCameraUsed;         // 0xBC
     u8 unkBD[0x110 - 0xBD];
-    u32 mUnk110;            // 0x110: handed to the field
+    MScreen *mScreen;       // 0x110: the field's screen
     void *mEpisodes;        // 0x114
     u8 mEpisodesChanged;    // 0x118
 };

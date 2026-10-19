@@ -71,7 +71,7 @@ void DinoEventSaveOption::OpenUi() {
 // Makes the field (without reading its state).
 void DinoEventLoop::CreateField() {
     MLoadOverlay(0, M_OVERLAY_ID(ov001));
-    mField = new DinoField(&mUnk110, 0);
+    mField = new DinoField(&mScreen, 0);
     mParallel.AddTail(mField);
 }
 
@@ -90,7 +90,7 @@ void DinoEventLoop::OpenField(BOOL arg) {
         AddSeenEpisodes();
     }
     MLoadOverlay(0, M_OVERLAY_ID(ov001));
-    mField = new DinoField(&mUnk110, 0);
+    mField = new DinoField(&mScreen, 0);
     mParallel.AddTail(mField);
     mField->Read(gDinoBackup->GetUnk140());
 }

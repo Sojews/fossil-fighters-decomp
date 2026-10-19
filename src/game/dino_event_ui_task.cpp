@@ -30,6 +30,10 @@
 #include "game/dino_event_capture_fade_ui_task.h"
 #include "m/bg_new_task.h"
 #include "m/call_task.h"
+#include "m/overlay.h"
+#include "m/lcd.h"
+#include "m/bright.h"
+#include "m/screen.h"
 #include "game/dino_event_ui_task.h"
 #include "game/dino_ui_shop_buy.h"
 #include "game/dino_ui_shop_sell.h"
@@ -41,6 +45,7 @@
 #include "game/dino_ui_license_card.h"
 #include "game/dino_ui_canon_putin.h"
 #include "game/dino_ui_save_menu.h"
+#include "game/dino_ui_save_option.h"
 #include "game/dino_ui_debug_menu.h"
 #include "game/dino_ui_field_menu.h"
 #include "game/dino_ui_museum.h"
@@ -129,7 +134,9 @@ void SetEpisodeTask::Execute() {
 // Template task instances the game emits in this file. Until the code that makes the tasks is decompiled, they are
 // instantiated explicitly.
 template class MBgCallTask0<DinoEventSaveOption>;
+#pragma auto_inline off
 template MTask *MCreateBgCallTask(DinoEventSaveOption *obj, void (DinoEventSaveOption::*func)(), int thread);
+#pragma auto_inline reset
 template class MBgCallTask1<DinoEventLoop, u32>;
 // (Its creator is in dino_event.cpp; this copy makes mwcc emit the class's virtuals here.)
 template MTask *MCreateBgCallTask(DinoEventLoop *obj, void (DinoEventLoop::*func)(u32), u32 a0, int thread);
@@ -223,3 +230,48 @@ MTask *DinoEventMedalList::CreateUi() {
 #pragma auto_inline off
 // Vector instances the game emits in this file (made explicitly until the code that uses them is decompiled).
 template class std::__vec_deleter<u32, std::allocator<u32> >;
+
+#pragma auto_inline off
+
+// The field's capture fades (in the field overlay).
+extern "C" MProcess *func_ov001_02159cd0(DinoField *field);
+extern "C" MProcess *func_ov001_02159d3c(DinoField *field);
+M_EXTERN_OVERLAY(ov004);
+
+// The TU's pooled pointer-to-member constants.
+extern "C" struct {
+    void (DinoEventSaveOption::*OpenUi_00)();
+} data_020bd9d8;
+
+// Fades the field out, slides the screen down while the save options load, runs them, then brings the field back
+// (or ends the event when the game was quit).
+void DinoEventSaveOption::Idle() {
+    switch (mStep++) {
+    case 0:
+        mSerial.AddTail(func_ov001_02159cd0(mEvent->GetField()));
+        break;
+    case 1:
+        gLcd->GetBottomDisplay()->mBright->SetMode(2);
+        gLcd->GetBottomDisplay()->mBright->SetFactor(16);
+        mParallel.AddTail(mEvent->mScreen->CreateOffsetAnime(MPoint(0, -92), MPoint(0, 0), 29, -2));
+        mSerial.AddTail(MCreateBgCallTask(this, data_020bd9d8.OpenUi_00, 1));
+        break;
+    case 2:
+        mSerial.AddTail(mUi);
+        break;
+    case 3:
+        MUnloadOverlay(0, M_OVERLAY_ID(ov004));
+        if (mResult == 0) {
+            mEvent->CreateField();
+            mSerial.AddTail(func_ov001_02159d3c(mEvent->GetField()));
+        } else {
+            mEvent->SetResult(0);
+            mEvent->Exit();
+            mSerial.AddTail(new MTimer(1));
+        }
+        break;
+    case 4:
+        Exit();
+        break;
+    }
+}

@@ -1,5 +1,5 @@
 _ZN5MFx32C1Ei kind:function(thumb,size=0x6) addr:0x021558a0
-_ZN9DinoFieldC1EPvm kind:function(thumb,size=0xabc) addr:0x021558a8
+_ZN9DinoFieldC1EPP7MScreenm kind:function(thumb,size=0xabc) addr:0x021558a8
 _ZN9DinoFieldD1Ev kind:function(thumb,size=0x128) addr:0x02156364
 _ZN9DinoFieldD0Ev kind:function(thumb,size=0x12c) addr:0x0215648c
 _ZN9DinoField9SetUnk258Ei kind:function(thumb,size=0x74) addr:0x021565b8
