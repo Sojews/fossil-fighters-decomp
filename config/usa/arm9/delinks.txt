@@ -13,6 +13,9 @@ libs/nitrosdk/src/os/svc.c:
 libs/nitrosdk/src/init/crt0.c:
     .text       start:0x02000800 end:0x02000b64
 
+src/game/dino_entry.cpp:
+    .text       start:0x02000ba0 end:0x02000bc0
+
 src/sound/sound_manager.cpp:
     complete
     .text       start:0x02000bc0 end:0x02001c34
