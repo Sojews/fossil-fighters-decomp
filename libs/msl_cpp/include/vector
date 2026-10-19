@@ -502,6 +502,11 @@ namespace std {
         // adapted from https://github.com/matta/sgi-stl/blob/635eaeef4533214ec140fb17411558ad441d2996/stl/stl_vector.h#L420
 
         if (__first != __last) {
+            if (Metrowerks::__vec_relocatable<T>::value) {
+                for (iterator p = __first; p < __last; p++) {
+                    p->~T();
+                }
+            }
             std::memmove(__first, __last, (end() - __last) * sizeof(value_type));
             this->size_ -= __last - __first;
         }
@@ -512,6 +517,9 @@ namespace std {
     template <typename T, typename Allocator>
     __vec_deleter<T, Allocator>::iterator __vec_deleter<T, Allocator>::erase(iterator pos, UnkMSLStruct1) {
         if (Metrowerks::is_trivial<T>::value) {
+            std::memmove(pos, pos + 1, (end() - pos - 1) * sizeof(value_type));
+        } else if (Metrowerks::__vec_relocatable<T>::value) {
+            pos->~T();
             std::memmove(pos, pos + 1, (end() - pos - 1) * sizeof(value_type));
         } else {
             iterator e = end();

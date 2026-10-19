@@ -9,6 +9,7 @@
 #include <string.h>
 #include <wstring.h>
 #include <mem.h>
+#include <msl_unk.hpp>
 
 namespace std {
 
@@ -580,5 +581,11 @@ basic_string<C, Traits, Alloc> operator+(const basic_string<C, Traits, Alloc> &l
                                          const basic_string<C, Traits, Alloc> &rhs);
 
 }  // namespace std
+
+namespace Metrowerks {
+template <class C, class Traits, class Alloc> struct __vec_relocatable<std::basic_string<C, Traits, Alloc> > {
+    static const bool value = true;
+};
+}
 
 #endif
