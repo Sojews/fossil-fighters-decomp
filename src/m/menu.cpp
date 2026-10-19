@@ -301,9 +301,10 @@ MMenuItem *MMenu::HitTest(MPoint pos) {
     return NULL;
 }
 
-// NONMATCHING (FindNearestItem, FindItemInRegion): the game adds the two terms in the other operand order.
 static inline int MDistance(MPoint a, MPoint b) {
-    return labs(a.x - b.x) + labs(a.y - b.y);
+    int dy = labs(a.y - b.y);
+    int dx = labs(a.x - b.x);
+    return dx + dy;
 }
 
 MMenuItem *MMenu::FindNearestItem(MPoint pos) {
@@ -375,11 +376,12 @@ MMenuItem *MMenu::FindItemInDirection(MRect from, int dir) {
 }
 
 static inline bool MIsInside(MPoint p, const MMenuHalfPlane *planes) {
+    const MMenuHalfPlane *plane = planes;
     for (u32 i = 0; i < 3; i++) {
-        if ((p.x - planes->x) * planes->a + (p.y - planes->y) * planes->b < 0) {
+        if ((p.x - plane->x) * plane->a + (p.y - plane->y) * plane->b < 0) {
             return false;
         }
-        planes++;
+        plane++;
     }
     return true;
 }
