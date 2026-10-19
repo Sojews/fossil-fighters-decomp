@@ -592,7 +592,7 @@ from:0x02173e04 kind:thumb_call to:0x020530a0 module:main
 from:0x02173e16 kind:thumb_call to:0x0205d2c4 module:main
 from:0x02173e22 kind:thumb_call to:0x020531a4 module:main
 from:0x02173e2a kind:thumb_call to:0x020531a4 module:main
-from:0x02173e44 kind:thumb_call to:0x021592d0 module:overlays(1,3)
+from:0x02173e44 kind:thumb_call to:0x021592d0 module:overlay(3)
 from:0x02173e54 kind:load to:0x020cb978 module:main
 from:0x02173e58 kind:load to:0x0208aad0 module:main
 from:0x02173e5c kind:load to:0x0214d1b8 module:main

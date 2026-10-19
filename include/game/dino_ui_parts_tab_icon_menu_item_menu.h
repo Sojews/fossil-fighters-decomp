@@ -11,6 +11,7 @@ class MSmartOam;
 class DinoUiPartsReviverMedalButton;
 class DinoUiStatusMenuItem;
 class MView;
+class DinoUiStatusChangeModeHelpTask;
 class DinoCommonWindowMessage;
 class DinoUiPartsTeamTech;
 
@@ -50,7 +51,7 @@ public:
     u8 unkF8[0x104 - 0xF8];
     DinoCommonWindowMessage *mMessage;  // 0x104
     MTaskSet *mUnk108;          // 0x108
-    u32 mUnk10C;                // 0x10C
+    DinoUiStatusChangeModeHelpTask *mHelp;  // 0x10C: while a replacement is picked
     u32 unk110;
     int *mResult;               // 0x114
     DinoTeam *mTeam;            // 0x118

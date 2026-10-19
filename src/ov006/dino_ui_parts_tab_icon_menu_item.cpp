@@ -212,7 +212,7 @@ void DinoUiStatusMenu::RefreshItems() {
         AddLink(mMembers[i], 2, mTabItems[0]);
     }
     mUnk108->Clear();
-    mUnk10C = 0;
+    mHelp = NULL;
 }
 
 // (Data the item positions come from.)
@@ -407,4 +407,30 @@ void DinoUiStatusMenu::HandleMemberResult() {
         mMembers[mSelected]->PlayFocused();
     }
     mUnk120 = 0;
+}
+
+void DinoUiStatusMenu::PickReplacement(int index) {
+    int i;
+    for (i = 0; i < 5; i++) {
+        mMembers[i]->Enable();
+    }
+    if (!mTeam->slots[index]) {
+        for (int j = 0; j < 5; j++) {
+            if (!mTeam->slots[j]) {
+                mMembers[j]->Disable();
+            }
+        }
+    }
+    mMembers[index]->Disable();
+    for (i = 0; i < 3; i++) {
+        mTabItems[i]->Disable();
+    }
+    mOKButton->MMenuItem::Disable();
+    LinkMembers();
+    for (i = 0; i < 5; i++) {
+        RemoveLink(mMembers[i], 2);
+        AddLink(mMembers[i], 2, mUnkB8);
+    }
+    mHelp = new DinoUiStatusChangeModeHelpTask(mUnkB8->GetFrame());
+    mUnk108->AddTail(mHelp);
 }
