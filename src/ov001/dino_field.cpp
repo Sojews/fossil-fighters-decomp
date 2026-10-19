@@ -23,6 +23,7 @@
 #include "m/bg.h"
 #include "m/bg_new_task.h"
 #include "m/picture.h"
+#include "m/raster.h"
 #include "m/call_task.h"
 #include "m/polygon_char.h"
 #include "m/anm_model.h"
@@ -422,14 +423,14 @@ MTask *DinoField::CreateCharaFocusTask(u32 chara) {
 
 DinoFieldLowerSpotIn::DinoFieldLowerSpotIn(int duration) : MProcess(NULL) {
     mDuration = duration;
-    mUnk7C = 0;
-    mUnk80 = 0;
+    mFrame = 0;
+    mStep = 0;
 }
 
 DinoFieldLowerSpotOut::DinoFieldLowerSpotOut(int duration) : MProcess(NULL) {
     mDuration = duration;
-    mUnk7C = 0;
-    mUnk80 = 0;
+    mFrame = 0;
+    mStep = 0;
 }
 
 #pragma auto_inline on
@@ -442,6 +443,59 @@ DinoFieldLowerSpotOut::~DinoFieldLowerSpotOut() {
     gLcd->mMain->mWin->Reset();
     gLcd->mMain->mBright->SetMode(2);
     gLcd->mMain->mBright->SetFactor(16);
+}
+
+void DinoFieldLowerSpotIn::Idle() {
+    switch (mStep) {
+    case 0:
+        gLcd->mMain->mBright->Reset();
+        mBlack = new MTextPicture(gLcd->mMain, "/image/black", TRUE, false);
+        mBlack->Show();
+        mParallel.AddTail(mBlack);
+        mWindow = new MRasterWindow(-1, gLcd->mMain, TRUE);
+        mParallel.AddTail(mWindow);
+        mWindow->SetTarget(mBlack->GetPlaneMask() ^ 0x3F);
+        mWindow->SetObjTarget(mBlack->GetPlaneMask());
+        mWindow->Show();
+        mStep++;
+    case 1:
+        if (++mFrame >= mDuration) {
+            mBlack->Hide();
+            mWindow->Hide();
+            MTask *exit = MTaskExitTransfer::Create(this);
+            MTask *timer = new MTimer(1);
+            MSerialTaskSet *serial = &mSerial;
+            serial->AddTail(timer);
+            serial->AddTail(exit);
+            return;
+        }
+        mWindow->SetCircle(MPoint(128, 96), mFrame * 160 / mDuration);
+        mWindow->SubtractRect(MRect(255, 0, 256, 192));
+        break;
+    }
+}
+
+void DinoFieldLowerSpotOut::Idle() {
+    switch (mStep) {
+    case 0:
+        mBlack = new MTextPicture(gLcd->mMain, "/image/black", TRUE, false);
+        mBlack->Show();
+        mParallel.AddTail(mBlack);
+        mWindow = new MRasterWindow(-1, gLcd->mMain, TRUE);
+        mParallel.AddTail(mWindow);
+        mWindow->SetTarget(mBlack->GetPlaneMask() ^ 0x3F);
+        mWindow->SetObjTarget(mBlack->GetPlaneMask());
+        mWindow->Show();
+        mStep++;
+    case 1:
+        if (++mFrame >= mDuration) {
+            Exit();
+            return;
+        }
+        mWindow->SetCircle(MPoint(128, 96), (mDuration - mFrame) * 160 / mDuration);
+        mWindow->SubtractRect(MRect(255, 0, 256, 192));
+        break;
+    }
 }
 
 #pragma auto_inline off

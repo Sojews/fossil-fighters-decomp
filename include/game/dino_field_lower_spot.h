@@ -10,17 +10,21 @@
 #include "game/help.h"
 #include "game/dino_field_camera_hook.h"
 
+class MRasterWindow;
+class MTextPicture;
+
+// Closes (Out) or opens (In) a spotlight on the bottom screen over a black picture.
 class DinoFieldLowerSpotIn : public MProcess {
 public:
     DinoFieldLowerSpotIn(int duration);
     virtual ~DinoFieldLowerSpotIn();
     virtual void Idle();
 
-    u32 mUnk74;     // 0x74
-    int mDuration;  // 0x78
-    u32 mUnk7C;     // 0x7C
-    u32 mUnk80;     // 0x80
-    u32 mUnk84;     // 0x84
+    MRasterWindow *mWindow;     // 0x74
+    u32 mDuration;              // 0x78
+    u32 mFrame;                 // 0x7C
+    u32 mStep;                  // 0x80
+    MTextPicture *mBlack;       // 0x84
 };
 
 class DinoFieldLowerSpotOut : public MProcess {
@@ -29,11 +33,11 @@ public:
     virtual ~DinoFieldLowerSpotOut();
     virtual void Idle();
 
-    u32 mUnk74;     // 0x74
-    int mDuration;  // 0x78
-    u32 mUnk7C;     // 0x7C
-    u32 mUnk80;     // 0x80
-    u32 mUnk84;     // 0x84
+    MRasterWindow *mWindow;     // 0x74
+    u32 mDuration;              // 0x78
+    u32 mFrame;                 // 0x7C
+    u32 mStep;                  // 0x80
+    MTextPicture *mBlack;       // 0x84
 };
 
 #endif

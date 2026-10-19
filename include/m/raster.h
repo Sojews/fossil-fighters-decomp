@@ -99,6 +99,8 @@ public:
     void Clear();
     void AddRect(MRect rect);
     void SubtractRect(MRect rect);
+    // Clears the window to a disc.
+    void SetCircle(MPoint center, int radius);
     void SubtractSpan(int left, int right, int line);
     template <class Op> inline void ForEachLine(MRect rect, Op op);
 
