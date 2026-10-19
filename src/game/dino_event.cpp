@@ -187,3 +187,28 @@ void DinoEventLoop::Start() {
     }
     mState = data_020bd9d0.State0203ad00_20;
 }
+
+void DinoEventLoop::UpdateRegions() {
+    if (mEventCleared) {
+        mEventCleared = FALSE;
+        MI_CpuFill8(mRegions.mBytes, 0, (mRegions.mBits + 7) / 8);
+        gDinoBackup->GetLinkedRegions(&mRegions);
+        std::map<u32, DinoEventEpisode>::iterator it = mEpisodeFiles.begin();
+        std::map<u32, DinoEventEpisode>::iterator end = mEpisodeFiles.end();
+        for (; it != end; ++it) {
+            for (u32 i = 0; i < ((const u32 *)it->second.Get())[1]; i++) {
+                const u8 *data = (const u8 *)it->second.Get();
+                const u8 *entry = DinoEventBlock(data, 2, i);
+                if (!gDinoBackup->GetEventClear(*(const u32 *)entry)) {
+                    for (u32 j = 0; j < ((const u32 *)entry)[3]; j++) {
+                        const u8 *condition = DinoEventBlock(entry, 4, j);
+                        if (*(const u16 *)condition == 3) {
+                            mRegions.Set(*(const u32 *)(condition + ((const u32 *)condition)[2]));
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

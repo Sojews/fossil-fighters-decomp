@@ -2804,7 +2804,7 @@ _ZN13DinoEventLoop14ProcessEpisodeERKNSt16__red_black_treeImSt4pairIKm16DinoEven
 _ZN13DinoEventLoop5StartEv kind:function(thumb,size=0x118) addr:0x0203abe8
 _ZN13DinoEventLoop13State0203ad00Ev kind:function(thumb,size=0x2b8) addr:0x0203ad00
 _ZN13DinoEventLoop15CheckConditionsEPKh kind:function(thumb,size=0x70) addr:0x0203afb8
-func_0203b028 kind:function(thumb,size=0xe8) addr:0x0203b028
+_ZN13DinoEventLoop13UpdateRegionsEv kind:function(thumb,size=0xe8) addr:0x0203b028
 _ZN13DinoEventLoop14CheckConditionEPKh kind:function(thumb,size=0x6a4) addr:0x0203b110
 _ZN13DinoEventLoop11RunCommandsEPKh kind:function(thumb,size=0x58) addr:0x0203b7b4
 func_0203b80c kind:function(thumb,size=0x108) addr:0x0203b80c

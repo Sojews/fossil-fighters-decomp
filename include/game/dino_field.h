@@ -495,6 +495,8 @@ public:
     // Makes the field (reading the saved state, if any) and fades it in.
     void Start();
     void State0203ad00();
+    // After an event is cleared: notes the regions the events still open name in their conditions.
+    void UpdateRegions();
     BOOL ProcessEpisode(const std::map<u32, DinoEventEpisode>::iterator &it);
     // TRUE if an entry's conditions hold (all of them, or any, by its mode).
     BOOL CheckConditions(const u8 *entry);
@@ -514,7 +516,8 @@ public:
     u8 mCameraUsed;         // 0xBC
     u8 mUnkBD;              // 0xBD
     u8 mUnkBE;              // 0xBE
-    u8 unkBF[0xCC - 0xBF];
+    u8 unkBF;
+    MBitVector mRegions;    // 0xC0: the regions the open events' conditions name, and the linked ones
     u8 mEventCleared;       // 0xCC: an event was just cleared
     u8 unkCD[0x108 - 0xCD];
     u32 mUnk108;            // 0x108
