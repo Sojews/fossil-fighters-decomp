@@ -54,3 +54,12 @@ template class MCallTask1<DinoUiRvInformation, DinoUiRvInformation, DinoCreature
 template MTask *MCreateCallTask(DinoUiRvInformation *obj, void (DinoUiRvInformation::*func)(DinoCreatureInfo), DinoCreatureInfo a0);
 template class MBgCallTask0<DinoUiRvInformation3DModel>;
 template MTask *MCreateBgCallTask(DinoUiRvInformation3DModel *obj, void (DinoUiRvInformation3DModel::*func)(), int thread);
+
+#pragma auto_inline off
+
+extern "C" void func_ov003_02156eac(DinoUiRvInformation3DModel *model, MFx32 angle) {
+    BOOL out = angle < MFx32(0) || MFx32(100) <= angle;
+    if (!out) {
+        model->mAngle = angle;
+    }
+}

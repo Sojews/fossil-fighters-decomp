@@ -4,6 +4,9 @@
 #include <string>
 #include "game/dino_team.h"
 #include "game/dino_resource.h"
+#include "m/blend.h"
+#include "m/display.h"
+#include "m/task.h"
 
 // TRUE if the team's first three members are all set and share a type, which gives the team a technique.
 BOOL DinoTeamHasTech(const DinoTeam *team) {
@@ -42,4 +45,17 @@ std::string DinoReplaceTag(std::string text, std::string tag, std::string value)
         }
         text = text.replace(pos, tag.size(), value);
     }
+}
+
+#pragma auto_inline off
+
+// Dims the screen behind a menu.
+extern "C" void func_ov003_0215b16c() {
+    MBlend *blend = gCurrentDisplay->mBlend;
+    blend->Reset();
+    blend->SetMode(3);
+    blend->SetBrightness(8);
+    blend->SetAlpha(16, 0);
+    blend->SetTarget1(0x10);
+    blend->SetTarget2(0x3F);
 }
