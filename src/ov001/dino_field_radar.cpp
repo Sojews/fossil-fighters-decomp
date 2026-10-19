@@ -6,6 +6,8 @@
 
 #pragma ipa file
 
+#include "m/motion.h"
+#include "game/dino_sound.h"
 #include "game/dino_field_radar_menu.h"
 #include "game/dino_field.h"
 #include "m/bg_new_task.h"
@@ -30,6 +32,15 @@ template class MCallTask1<DinoFieldRadar, DinoFieldRadar, bool>;
 template MTask *MCreateCallTask(DinoFieldRadar *obj, void (DinoFieldRadar::*func)(bool), bool a0);
 
 #pragma auto_inline off
+
+void DinoFieldRadar::Signal() {
+    if (mMode != 1 && !mSignalling) {
+        DinoSoundPlaySe(0x87, 0);
+        mSignalling = TRUE;
+        mSignalTime = 0;
+        mMarker->Play(1, 1);
+    }
+}
 
 void DinoFieldRadar::SetUnk5A8(u8 value) {
     mUnk5A8 = value;

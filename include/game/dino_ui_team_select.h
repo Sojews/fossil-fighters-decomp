@@ -16,6 +16,7 @@
 
 class DinoUiTeamSelectMenu : public DinoHelpBase, public MMenu {
 public:
+    DinoUiTeamSelectMenu(int *result, u8 unk108, u8 unk109);
     virtual ~DinoUiTeamSelectMenu();
     virtual void OnStart();
     virtual void OnIdle();
@@ -29,7 +30,8 @@ public:
     DinoUiFieldMenuCursor *mCursor; // 0xFC
     DinoUiPartsTeamInfo *mTeamInfo; // 0x100
     int *mResult;           // 0x104
-    u32 unk108;
+    u8 mUnk108;             // 0x108
+    u8 mUnk109;             // 0x109
     int mUnk10C;            // 0x10C: 1 once a team is chosen
     int mSelected;          // 0x110
 

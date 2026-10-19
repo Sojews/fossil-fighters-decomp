@@ -14,6 +14,14 @@
 DinoUiTeamSelectMenu::~DinoUiTeamSelectMenu() {
 }
 
+DinoUiTeamSelectMenu::DinoUiTeamSelectMenu(int *result, u8 unk108, u8 unk109) : MMenu(NULL, 0) {
+    mResult = result;
+    mUnk108 = unk108;
+    mUnk109 = unk109;
+    mUnk10C = 0;
+    mSelected = 1;
+}
+
 DinoUiTeamSelect::~DinoUiTeamSelect() {
 }
 

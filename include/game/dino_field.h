@@ -208,14 +208,21 @@ public:
     MTask *CreateModeTask(u32 from, u32 to, u32 a, u8 b);
     void SetPlayer(MFx32Point pos, u16 angle, MFx32 height);
     void SetUnk5A8(u8 value);
+    // Beeps and plays the marker's signal motion (unless in mode 1 or already signalling).
+    void Signal();
 
     u32 mUnk74[3];              // 0x74
     MSmartOam *mOam;            // 0x80
-    u32 mUnk84[7];              // 0x84
+    u32 mUnk84[2];              // 0x84
+    MMotion *mMarker;           // 0x8C
+    u32 mUnk90[4];              // 0x90
     MAfnBlock *mAffine;         // 0xA0
-    u8 unkA4[0x56C - 0xA4];
+    u8 unkA4[0x568 - 0xA4];
+    u32 mMode;                  // 0x568
     MFx32 mScale;               // 0x56C: map units to radar pixels
-    u8 unk570[0x58C - 0x570];
+    u8 unk570[0x584 - 0x570];
+    u32 mSignalTime;            // 0x584
+    u8 mSignalling;             // 0x588
     std::vector<DinoFieldRadarEntry> mEntries;  // 0x58C
     MFx32Point mPlayerPos;      // 0x598
     u16 mPlayerAngle;           // 0x5A0
