@@ -25,6 +25,33 @@ MenuEnableTask::~MenuEnableTask() {
 DinAttackItemHelp::~DinAttackItemHelp() {
 }
 
+// The help sits on the item (two pixels higher for some).
+// NONMATCHING: 97%, the game copies the base rect through a pointer to it.
+MRect DinAttackItemHelp::GetRect() {
+    MRect r;
+    if (mItem != NULL) {
+        MRect frame = mItem->GetFrame();
+        if (mFlag) {
+            int y = frame.top - 2;
+            r = DinoBattleHelpBase::GetRect();
+            r.left += frame.left;
+            r.top += y;
+            r.right += frame.left;
+            r.bottom += y;
+            return r;
+        }
+        int y = frame.top;
+        r = DinoBattleHelpBase::GetRect();
+        r.left += frame.left;
+        r.top += y;
+        r.right += frame.left;
+        r.bottom += y;
+        return r;
+    }
+    r = MRect(0, 0, 0, 0);
+    return r;
+}
+
 void AttackMenuBarMotion::Idle() {
 }
 

@@ -11,6 +11,9 @@
 #include "game/dino_common_live.h"
 #include "game/create_player_update_ability_icon_task.h"
 #include "game/dino_static_init.h"
+#include "game/dino_battle.h"
+#include "game/dino_battle_controller.h"
+#include "game/dino_battle_live.h"
 
 extern "C" void func_ov000_0215c174(DinoBattleModelField *field, u32 line);
 
@@ -84,3 +87,20 @@ static struct SendLocalMessageTaskStaticInit {
         DINO_POOL_WORD(data_ov000_021916e0, 0x24) = 112;
     }
 } sSendLocalMessageTaskStaticInit;
+
+extern "C" const char data_ov000_021918ec[];    // the live commentary's name format
+
+void DinoBattleModelField::SetBattle(DinoBattle *battle) {
+    mBattle = battle;
+    mControllers[0] = (DinoBattleController *)battle->GetUnk1F4(0);
+    mControllers[1] = (DinoBattleController *)battle->GetUnk1F4(1);
+    mModel = (DinoBattleModel *)battle->GetUnk1FC();
+    mUnkB4 = battle->GetUnk200();
+    if (mLive == NULL && ((const u8 *)mModel->mUnk110[0])[0xD] == 0 && battle->mLiveName != NULL) {
+        char name[64];
+        OS_SPrintf(name, data_ov000_021918ec, battle->mLiveName);
+        mLive = new DinoBattleLive(mModel, name);
+        mParallel.AddTail(mLive);
+        mLive->SetUnkD2(FALSE);
+    }
+}

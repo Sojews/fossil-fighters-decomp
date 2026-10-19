@@ -40,7 +40,9 @@ public:
     void StateSetupDisplays();
     void State0215a540();
 
-    u32 mUnk74[12];             // 0x74
+    u32 mUnk74[9];              // 0x74
+    const char *mLiveName;      // 0x98: the commentary's name (none without commentary)
+    u32 mUnk9C[2];              // 0x9C
     DinoBattleSide mSides[2];   // 0xA4
     u32 mUnk1BC[8];             // 0x1BC
     u8 *mUnk1DC;                // 0x1DC: set when the battle ends (if given)

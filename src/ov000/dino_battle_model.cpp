@@ -1,6 +1,7 @@
 // DinoBattleModel.
 // Only the destructor is decompiled so far.
 
+#include "game/send_local_message_task_menu.h"
 #include "game/dino_battle_model.h"
 #include "game/create_player_update_ability_icon_task.h"
 #include "game/dino_static_init.h"
@@ -23,12 +24,10 @@ void DinoBattleModel::SendLocalMessage(MMessage *msg) {
     mSubject2.Notify(msg);
 }
 
-extern "C" void func_ov000_0215c218(void *controller, DinoBattle *battle);
-
 void DinoBattleModel::SetBattle(DinoBattle *battle) {
     mPlayers[0]->SetBattle(battle);
     mPlayers[1]->SetBattle(battle);
-    func_ov000_0215c218((void *) mUnk10C, battle);
+    ((DinoBattleModelField *)mUnk10C)->SetBattle(battle);
     mBattle = battle;
 }
 

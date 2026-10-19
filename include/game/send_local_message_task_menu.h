@@ -12,6 +12,8 @@
 class DinoBattleModel;
 class DinoCommonLive;
 
+class DinoBattle;
+
 class DinoBattleModelField : public MProcess, public MMessageObserver {
 public:
     DinoBattleModelField();
@@ -19,9 +21,13 @@ public:
     virtual void Idle();
     virtual void OnMessage(MMessage *msg);
 
-    u32 unkA8[2];
+    // Takes the battle's controllers, model and live commentary.
+    void SetBattle(DinoBattle *battle);
+
+    MMessageObserver *mControllers[2];  // 0xA8
     DinoBattleModel *mModel;    // 0xB0
-    u32 unkB4[2];
+    MMessageObserver *mUnkB4;   // 0xB4
+    DinoBattle *mBattle;        // 0xB8
     DinoCommonLive *mLive;      // 0xBC: the commentary
     u32 unkC0;
     u32 mUnkC4;                 // 0xC4
