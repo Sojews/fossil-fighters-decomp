@@ -451,3 +451,34 @@ void DinoBattleViewCreature::ClearFlag144(int bit) {
 extern "C" MMotion *func_ov000_02173d64(MSmartOam *oam, const std::string &name, u32 arg2, u32 arg3, u8 arg4) {
     return new DinoBattleViewEffectGameBeginPlayerNamePanel(oam, name, arg2, arg3, arg4);
 }
+
+static inline int DinoLerp(int from, int to, int t, int n) {
+    return from + (to - from) * t / n;
+}
+
+static inline fx32 DinoFxMul(fx32 a, fx16 b) {
+    return (fx32)(((fx64)a * b + 0x800) >> FX32_SHIFT);
+}
+
+// Moves the motion from mFrom to mTo, wobbling around the way (the wobble grows for a second, then shrinks).
+// NONMATCHING: 92%, the game spills the duration (ours spills the start's y).
+void ShuffleMoveTask::Execute() {
+    u32 frame = ++mFrame;
+    if (frame >= mDuration) {
+        mMotion->SetPosition(mTo);
+        Exit();
+        return;
+    }
+    int fromY = mFrom.y;
+    int fromX = mFrom.x;
+    int y = DinoLerp(fromY, mTo.y, frame, mDuration);
+    int x = DinoLerp(fromX, mTo.x, frame, mDuration);
+    if (mRadius != 0 || frame < 60) {
+        mRadius += frame < 60 ? 0xC00 : -0xC00;
+    }
+    fx32 radius = mRadius;
+    fx32 dx = DinoFxMul(radius, FX_CosIdx(mAngle));
+    fx32 dy = DinoFxMul(radius, FX_SinIdx(mAngle));
+    mAngle += ((DinoBattleViewCreature *)mArg)->GetUnkB0() ? 0x400 : -0x400;
+    mMotion->SetPosition(MPoint(x + (dx >> FX32_SHIFT), y + (dy >> FX32_SHIFT)));
+}

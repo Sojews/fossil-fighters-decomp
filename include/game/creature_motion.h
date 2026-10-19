@@ -111,7 +111,7 @@ public:
 class ShuffleMoveTask : public MTask {
 public:
     ShuffleMoveTask(int arg, MMotion *motion, MPoint from, MPoint to)
-        : mArg(arg), mMotion(motion), mFrom(from), mTo(to), mDuration(120), mFrame(0), mAngle(0), mUnk34(0) {
+        : mArg(arg), mMotion(motion), mFrom(from), mTo(to), mDuration(120), mFrame(0), mAngle(0), mRadius(0) {
         mAngle = FX_Atan2Idx(from.y << FX32_SHIFT, from.x << FX32_SHIFT);
     }
     virtual ~ShuffleMoveTask();
@@ -121,10 +121,10 @@ public:
     MMotion *mMotion;   // 0x14
     MPoint mFrom;       // 0x18
     MPoint mTo;         // 0x20
-    int mDuration;      // 0x28
-    int mFrame;         // 0x2C
+    u32 mDuration;      // 0x28
+    u32 mFrame;         // 0x2C
     u16 mAngle;         // 0x30
-    int mUnk34;         // 0x34
+    fx32 mRadius;       // 0x34: of the wobble
 };
 
 #endif
