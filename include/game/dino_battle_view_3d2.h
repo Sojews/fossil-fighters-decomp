@@ -20,6 +20,16 @@ public:
     virtual void Idle();
 
     DinoBattleView3D *mModel;   // 0x74
+    u32 unk78;
+    Dino3DLoadCsv *mCsvs[3];    // 0x7C
+    u32 unk88;
+    struct Defs {
+        u8 unk00[0xA8];
+        const char *mPaths[3];  // 0xA8
+    } *mDefs;                   // 0x8C
+    u8 unk90[0x164 - 0x90];
+    char mNames[3][64];         // 0x164
+    const char *mFiles[3];      // 0x224
 };
 
 class DinoBattleView3DAction : public MProcess {
@@ -28,6 +38,14 @@ public:
     virtual void Idle();
 
     DinoBattleView3D *mModel;   // 0x74
+    void *mUnk78;               // 0x78
+    Dino3DLoadCsv *mCsv;        // 0x7C
+    u32 unk80;
+    void *mUnk84;               // 0x84
+    u32 mUnk88;                 // 0x88
+    u32 mUnk8C;                 // 0x8C
+    u32 unk90[2];
+    u16 mUnk98;                 // 0x98
 };
 
 class DinoBattleView3DMask : public MTask {
@@ -48,10 +66,14 @@ public:
     virtual void Idle();
 
     struct Target {
-        u8 unk00[0x13C];
+        u8 unk00[0xD0];
+        Dino3DLoadCsv *mModels[3];  // 0xD0
+        u8 unkDC[0x13C - 0xDC];
         u32 mUnk13C;    // 0x13C
     } *mTarget;         // 0x74
     u32 mSaved;         // 0x78
+    u32 unk7C[3];
+    char mNames[3][64]; // 0x88
 };
 
 #endif

@@ -169,3 +169,30 @@ template void std::__vec_deleter<DinoBattleView3DRecord, std::allocator<DinoBatt
 // NONMATCHING (both erase_at_end, callcheck only): our vector<string> destructor is inlined into a
 // __vec_deleter<string> D2 call, so the bytes match but the call target differs (see the vector<string> note).
 template class std::__vec_deleter<std::vector<std::string>, std::allocator<std::vector<std::string> > >;
+
+#pragma auto_inline off
+
+// The 3D processes' states (called through pointers to members).
+extern "C" void func_ov000_02184cf0(DinoBattleView3DGroupFade *fade, int i) {
+    fade->mTarget->mModels[i]->LoadByName(fade->mNames[i], TRUE, 0x0FFFFFFF);
+}
+
+extern "C" void func_ov000_02184d14(DinoBattleView3DAction *action) {
+    action->mCsv = new Dino3DLoadCsv(action->mUnk8C + action->mUnk88 * 10, action->mUnk78, action->mUnk98, (void *)5,
+                                     action->mUnk84);
+    action->mParallel.AddTail(action->mCsv);
+}
+
+extern "C" void func_ov000_02184d64(DinoBattleView3DDamage *damage, int i) {
+    damage->mCsvs[i]->LoadByName(damage->mNames[i], TRUE, 0x0FFFFFFF);
+    if (damage->mFiles[i] != NULL) {
+        damage->mCsvs[i]->LoadFile(damage->mFiles[i], NULL, 0);
+    }
+}
+
+extern "C" void func_ov000_02184da0(DinoBattleView3DDamage *damage, int i) {
+    damage->mCsvs[i]->Load(damage->mDefs->mPaths[i], (u32)damage->mNames[i]);
+    if (damage->mFiles[i] != NULL) {
+        damage->mCsvs[i]->LoadFile(damage->mFiles[i], NULL, 0);
+    }
+}
