@@ -503,6 +503,20 @@ struct DinoMuseumByUnk0C {
         return x > Key(b);
     }
 };
+struct DinoMuseumByUnk0A {
+    static u32 Key(u32 id) { return GetMuseumDef(sMuseumDefs.Get(), id)->unk0A; }
+    bool operator()(const u32 &a, const u32 &b) const {
+        u32 x = Key(a);
+        return x < Key(b);
+    }
+};
+struct DinoMuseumByUnk08 {
+    static u32 Key(u32 id) { return GetMuseumDef(sMuseumDefs.Get(), id)->unk08; }
+    bool operator()(const u32 &a, const u32 &b) const {
+        u32 x = Key(a);
+        return x > Key(b);
+    }
+};
 
 // Rises into place, bobbing up and down.
 void DinoUiMuseumEffectLight::Idle() {
@@ -618,3 +632,5 @@ void DinoUiMuseumMenu::SelectTab(u8 tab) {
 // NONMATCHING: std::__inplace_merge (stack layout, and the game elides one argument copy), std::__stable_sort_move
 // (comp and the buffer's owner swap registers), std::__insertion_sort_move (the first few instructions' order).
 template void std::stable_sort(std::vector<u32>::iterator, std::vector<u32>::iterator, DinoMuseumByUnk0C);
+template void std::stable_sort(std::vector<u32>::iterator, std::vector<u32>::iterator, DinoMuseumByUnk0A);
+template void std::stable_sort(std::vector<u32>::iterator, std::vector<u32>::iterator, DinoMuseumByUnk08);

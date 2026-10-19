@@ -237,7 +237,8 @@ struct DinoMuseumDefs {
 struct DinoMuseumDef {
     u32 unk00;
     u32 text;           // 0x04
-    u32 unk08;          // 0x08
+    u16 unk08;          // 0x08
+    u16 unk0A;          // 0x0A
     u32 unk0C;          // 0x0C
 };
 inline const DinoMuseumDef *DinoMuseumDefs::GetDef(u32 id) const {
