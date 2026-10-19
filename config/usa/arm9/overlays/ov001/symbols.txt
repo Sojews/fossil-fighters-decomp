@@ -245,7 +245,7 @@ _ZNSt13__vec_deleterI19DinoFieldRadarEntryRSaIS0_EE8allocateEmN10Metrowerks8int2
 _ZNSt13__vec_deleterI19DinoFieldRadarEntryRSaIS0_EED2Ev kind:function(thumb,size=0x26) addr:0x0215eaf0
 _ZThn116_N21DinoFieldRadarManager10CameraUnk1Em kind:function(thumb,size=0x1c) addr:0x0215eb18
 _ZThn116_N21DinoFieldRadarManager10CameraUnk0Em kind:function(thumb,size=0x1c) addr:0x0215eb34
-func_ov001_0215eb50 kind:function(thumb,size=0xcc) addr:0x0215eb50
+_ZN12DinoFieldMapC1EPv kind:function(thumb,size=0xcc) addr:0x0215eb50
 _ZN12DinoFieldMapD1Ev kind:function(thumb,size=0xae) addr:0x0215ec1c
 _ZN12DinoFieldMapD0Ev kind:function(thumb,size=0xb4) addr:0x0215eccc
 _ZN12DinoFieldMap7GetInfoEv kind:function(thumb,size=0x4) addr:0x0215ed80

@@ -289,7 +289,8 @@ struct DinoFieldDefs {
 
 class DinoFieldMap : public MProcess, public MSerializer {
 public:
-    const u8 *GetMapData() { return (const u8 *)mFile.GetData(); }
+    const u8 *GetMapData() { return (const u8 *)mData.mFile.GetData(); }
+    DinoFieldMap(void *unkC4);
     virtual ~DinoFieldMap();
     virtual void Idle();
     virtual void Read(const void *buf);
@@ -305,15 +306,13 @@ public:
 
     DinoFieldMapInfo mInfo; // 0x8C
     u32 mUnk90;             // 0x90
-    MArchivePtr mArchive;   // 0x94
-    MArchiveFile mFile;     // 0x98
-    MArchivePtr mArchive2;  // 0xA4
-    MArchiveFile mFile2;    // 0xA8
-    MArchivePtr mArchive3;  // 0xB4
-    MArchiveFile mFile3;    // 0xB8
-    void *mUnkC4;           // 0xC4
+    MResource<u8> mData;    // 0x94
+    MResource<u8> mData2;   // 0xA4
+    MResource<u8> mData3;   // 0xB4
+    void *mUnkC4;           // 0xC4: with a gradation behind the map
     MAnmModelBase *mModel;  // 0xC8: the map's model
     DinoGradationBg *mGradation;    // 0xCC
+    u32 mUnkD0;             // 0xD0
 };
 
 class DinoFieldPoint;
