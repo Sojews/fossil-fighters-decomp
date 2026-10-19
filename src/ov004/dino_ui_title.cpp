@@ -240,13 +240,15 @@ void DinoUiTitle::StateInit() {
 }
 
 // Leaves for the game (0, 8) or another mode (2), or opens the save slots (3).
-// NONMATCHING: stack slots only (the game's wait task takes the first slot).
 void DinoUiTitle::StateMenuChosen() {
     mLogo->Play(2, 0);
-    mParallel.AddTail((new MSerialTaskSet(TRUE))
-                          ->Add(mLogo->CreateWaitStopTask())
-                          ->Add(MTaskExitTransfer::Create(mLogo))
-                          ->Add(MTaskExitTransfer::Create(mOam)));
+    MTask *wait;
+    MTask *exitLogo;
+    MTask *exitOam;
+    exitOam = MTaskExitTransfer::Create(mOam);
+    exitLogo = MTaskExitTransfer::Create(mLogo);
+    wait = mLogo->CreateWaitStopTask();
+    mParallel.AddTail((new MSerialTaskSet(TRUE))->Add(wait)->Add(exitLogo)->Add(exitOam));
     switch (mChoice) {
     case 0:
     case 8: {
