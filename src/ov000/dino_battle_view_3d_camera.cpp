@@ -14,13 +14,40 @@ DinoBattleView3DCamera::~DinoBattleView3DCamera() {
 
 // The TU's pooled pointer-to-member constants (see menu.cpp).
 extern "C" struct {
-    u8 unk00[0x34];
+    u8 unk00[0x14];
+    void (DinoBattleView3DMove::*State_14)();
+    u8 unk1C[0x34 - 0x1C];
     void (DinoBattleView3DMove::*Update_34)();
     u8 unk3C[0x4C - 0x3C];
     void (DinoBattleView3DCamera::*Run_4C)();
+    void (DinoBattleView3DMove::*StateIdle_54)();
 } data_ov000_02196cd0;
 // The default camera data.
 extern "C" u8 data_ov000_021903dc[];
+
+DinoBattleView3DMove::DinoBattleView3DMove(const DinoBattleView3DMoveParams *params, u32 unk74, u32 unkB8,
+                                           Dino3DLoadCsv *camera, u32 unk164, u8 unk160)
+    : MProcess(NULL) {
+    mState = data_ov000_02196cd0.State_14;
+    mUnkBC = 0;
+    mUnk74 = unk74;
+    mUnkB8 = unkB8;
+    mUnkEC = params->unk0;
+    mUnkF0 = params->unk4;
+    mUnkFC = params->unk10;
+    mUnkF6 = params->unkA;
+    mUnkF4 = params->unk8;
+    mUnkF8 = params->unkC;
+    mUnkFA = params->unkE;
+    mState = data_ov000_02196cd0.StateIdle_54;
+    mCamera = camera;
+    mUnk164 = unk164;
+    mUnkC8 = 0;
+    mUnk160 = unk160;
+}
+
+DinoBattleView3DMove::~DinoBattleView3DMove() {
+}
 
 DinoBattleView3DCamera::DinoBattleView3DCamera(M3DScene *scene, Dino3DLoadCsv *camera, u32 unk88)
     : MProcess(NULL), mCamera(camera), mScene(scene) {

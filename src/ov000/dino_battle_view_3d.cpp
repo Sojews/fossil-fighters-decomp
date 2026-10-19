@@ -232,9 +232,6 @@ template MTask *MCreateBgCallTask(DinoBattleView3DDamage *obj, void (DinoBattleV
 template class MBgCallTask1<LoadWinnerLoad, int>;
 template MTask *MCreateBgCallTask(LoadWinnerLoad *obj, void (LoadWinnerLoad::*func)(int), int a0, int thread);
 
-DinoBattleView3DMove::~DinoBattleView3DMove() {
-}
-
 // Template task instances the game emits in this file. Until the code that makes the tasks is decompiled, they are
 // instantiated explicitly.
 

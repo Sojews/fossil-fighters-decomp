@@ -13,8 +13,21 @@
 
 class Dino3DLoadCsv;
 
+// How a camera move goes (copied into the move).
+struct DinoBattleView3DMoveParams {
+    u32 unk0;
+    u32 unk4;
+    s16 unk8;
+    u16 unkA;
+    u16 unkC;
+    u16 unkE;
+    u16 unk10;
+};
+
 class DinoBattleView3DMove : public MProcess {
 public:
+    DinoBattleView3DMove(const DinoBattleView3DMoveParams *params, u32 unk74, u32 unkB8, Dino3DLoadCsv *camera,
+                         u32 unk164, u8 unk160);
     virtual ~DinoBattleView3DMove();
     virtual void Idle();
 
@@ -23,9 +36,11 @@ public:
     void Update();
     void StateEnd();
 
-    u8 unk74[0xB0 - 0x74];
+    u32 mUnk74;     // 0x74
+    u8 unk78[0xB0 - 0x78];
     void (DinoBattleView3DMove::*mState)();  // 0xB0
-    u8 unkB8[0xC0 - 0xB8];
+    u32 mUnkB8;     // 0xB8
+    u32 mUnkBC;     // 0xBC
     Dino3DLoadCsv *mCamera; // 0xC0
     u32 unkC4;
     u8 mUnkC8;      // 0xC8
@@ -33,12 +48,20 @@ public:
     int mUnkCC;     // 0xCC
     int mUnkD0;     // 0xD0
     VecFx32 mStep;  // 0xD4
-    u8 unkE0[0xFA - 0xE0];
+    u8 unkE0[0xEC - 0xE0];
+    u32 mUnkEC;     // 0xEC
+    u32 mUnkF0;     // 0xF0
+    s16 mUnkF4;     // 0xF4
+    u16 mUnkF6;     // 0xF6
+    u16 mUnkF8;     // 0xF8
     u16 mUnkFA;     // 0xFA
-    u8 unkFC[0x158 - 0xFC];
+    u16 mUnkFC;     // 0xFC
+    u8 unkFE[0x158 - 0xFE];
     int mUnk158;    // 0x158
     u8 unk15C[0x160 - 0x15C];
     u8 mUnk160;     // 0x160
+    u8 unk161[3];
+    u32 mUnk164;    // 0x164
 };
 
 #endif
