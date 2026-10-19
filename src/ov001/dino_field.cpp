@@ -694,14 +694,12 @@ void DinoFieldCharaMoveOffsetTask::Transfer() {
     }
 }
 
-// NONMATCHING: stack slots of the point temporaries only (as MoveToCoord).
 void DinoFieldCharaMoveToRegionTask::Transfer() {
     DinoFieldChara *chara = mField->GetChara(mChara);
     if (chara) {
         DinoFieldMap *map = mField->mMap;
         if (gDinoResource->GetRegionMapMatch(mRegion) == map->GetInfo()->id) {
-            DinoRegionCenter center = gDinoResource->GetRegionCenter(mRegion);
-            MFx32Point coord(MFx32((int)center.unk00), MFx32((int)center.unk04));
+            MFx32Point coord = RegionPos(gDinoResource->GetRegionCenter(mRegion));
             MFx32Point delta = coord - chara->GetModel()->pos;
             if (!mC) {
                 chara->SetDirection(MFx32Atan2(delta.y, delta.x));

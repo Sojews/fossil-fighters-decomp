@@ -16,6 +16,13 @@ struct DinoRegionCenter {
     u32 unk04;
 };
 
+// The position at a region's center.
+static inline MFx32Point RegionPos(DinoRegionCenter center) {
+    MFx32Point pos;
+    pos.Set(MFx32((int)center.unk00), MFx32((int)center.unk04));
+    return pos;
+}
+
 // A file of strings: an offset table at offset 8 (the format shared by most data files).
 struct DinoTextData {
     u32 unk00;

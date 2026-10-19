@@ -2337,13 +2337,6 @@ DinoEventExecAutoWarp::DinoEventExecAutoWarp(DinoEventLoop *event, u32 unk80, u3
     mState = data_020be144.AutoWarpStart_08;
 }
 
-// The position at a region's center.
-static inline MFx32Point RegionPos(DinoRegionCenter center) {
-    MFx32Point pos;
-    pos.Set(MFx32((int)center.unk00), MFx32((int)center.unk04));
-    return pos;
-}
-
 void DinoEventExecAutoWarp::StateWarp() {
     u32 focus = mEvent->GetField()->GetCamera()->GetFocus();
     DinoCharaState chara;
