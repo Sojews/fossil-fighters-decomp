@@ -19,7 +19,8 @@ public:
     virtual void OnIdle();
     virtual void OnFocus(MMenuItem *item);
 
-    u32 mUnkA8[2];      // 0xA8
+    int mMode;          // 0xA8
+    u32 mUnkAC;
     MFont *mFont;       // 0xB0
     u32 mUnkB4[1];
     MTaskSet *mTasks;   // 0xB8: the cursor's moves

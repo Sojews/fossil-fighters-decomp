@@ -8,6 +8,9 @@
 #include "game/dino_ui_debug_reviver_menu_menu.h"
 #include "types.h"
 
+DinoUiDebugReviverMenu::DinoUiDebugReviverMenu() : MMenu(0) {
+}
+
 DinoUiDebugReviverMenu::~DinoUiDebugReviverMenu() {
     mFont->Release();
 }

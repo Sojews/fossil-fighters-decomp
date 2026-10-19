@@ -8,6 +8,9 @@
 #include "game/dino_ui_debug_flag_menu_menu.h"
 #include "types.h"
 
+DinoUiDebugFlagMenu::DinoUiDebugFlagMenu(int mode) : MMenu(0), mMode(mode) {
+}
+
 DinoUiDebugFlagMenu::~DinoUiDebugFlagMenu() {
     mFont->Release();
 }

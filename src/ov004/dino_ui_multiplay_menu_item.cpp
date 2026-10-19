@@ -35,13 +35,3 @@ template class MCallTask0<DinoUiMultiplayMenu, DinoHelpBase>;
 template MTask *MCreateCallTask(DinoUiMultiplayMenu *obj, void (DinoHelpBase::*func)());
 
 #pragma auto_inline off
-
-DinoUiMultiplayMenuItem::DinoUiMultiplayMenuItem(DinoUiMultiplayMenu *owner, const std::string &path, MPoint pos, u32 textId) {
-    mOwner = owner;
-    mTextId = textId;
-    mMotion = new MMotion(std::string(path), mOwner->GetOam(), 2, 1);
-    mMotion->Play(1, 0);
-    mMotion->SetPosition(pos);
-    mMotion->Show();
-    mParallel.AddTail(mMotion);
-}
