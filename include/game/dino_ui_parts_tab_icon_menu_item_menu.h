@@ -28,6 +28,7 @@ public:
     void ClearItems();
     void CreateItems();
     void RefreshItems();
+    void LinkMembers();
     void RefreshOKButton();
     void FinishPage();
     void FinishTab();
@@ -39,7 +40,10 @@ public:
     MMenuItem *mTabItems[3];    // 0xC0
     u32 mUnkCC[2];              // 0xCC
     DinoUiPartsReviverMedalButton *mMembers[5];     // 0xD4
-    u8 unkE8[0x2C];
+    u8 unkE8[0x108 - 0xE8];
+    MTaskSet *mUnk108;          // 0x108
+    u32 mUnk10C;                // 0x10C
+    u32 unk110;
     int *mResult;               // 0x114
     struct Team {
         u8 unk00[0x22];

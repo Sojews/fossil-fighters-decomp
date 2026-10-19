@@ -189,3 +189,20 @@ void DinoUiStatusMenu::RefreshOKButton() {
         }
     }
 }
+
+void DinoUiStatusMenu::RefreshItems() {
+    for (int i = 0; i < 5; i++) {
+        mMembers[i]->Enable();
+    }
+    for (int j = 0; j < 3; j++) {
+        mTabItems[j]->Enable();
+    }
+    mOKButton->MMenuItem::Enable();
+    LinkMembers();
+    for (int i = 0; i < 5; i++) {
+        RemoveLink(mMembers[i], 2);
+        AddLink(mMembers[i], 2, mTabItems[0]);
+    }
+    mUnk108->Clear();
+    mUnk10C = 0;
+}
