@@ -663,7 +663,7 @@ void DinoEventExecMapSelect::Idle() {
                 unlocked |= 1 << i;
             }
         }
-        mSerial.AddTail(new DinoMapSelectMenu(&mResult, unlocked));
+        mSerial.AddTail(new DinoUiIslandMap(&mResult, unlocked));
         break;
     }
     case 3:

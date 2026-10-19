@@ -448,7 +448,7 @@ void DinoMainLoop::StateMapSelect() {
     s32 result;
     MLoadOverlay(0, M_OVERLAY_ID(ov004));
     result = 8;
-    mSerial.AddTail(new DinoMapSelectMenu(&result, 0x291));
+    mSerial.AddTail(new DinoUiIslandMap(&result, 0x291));
     mState = data_020bff70.StateMapSelectEnd_5C;
 }
 

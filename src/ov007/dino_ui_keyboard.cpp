@@ -169,6 +169,30 @@ DinoUiKeyboard::DinoUiKeyboard(int mode) : MProcess(NULL) {
     mFlag = TRUE;
 }
 
+#pragma dont_inline on
+void DinoUiKeyboard::Idle() {
+    gLcd->mMain->ResetHooks();
+    if (mMode == 0) {
+        gLcd->mSub->ResetHooks();
+        gLcd->mSub->Setup(5, 2, 4, 1, 0, 0);
+        gLcd->mSub->mObj->Hide();
+        gLcd->mSub->mBright->SetMode(2);
+        gLcd->mSub->mBright->SetFactor(16);
+    }
+    gLcd->mMain->Setup(5, 3, 4, 1, 0, 0);
+    gLcd->mMain->mObj->Hide();
+    gLcd->mMain->SetBackdrop(0x8000);
+    gLcd->mMain->mBright->SetMode(2);
+    gLcd->mMain->mBright->SetFactor(16);
+    gLcd->VSyncNow();
+    MTask *exit = MTaskExitTransfer::Create(this);
+    MTask *menu = new DinoUiKeyboardMenu(mMode, mArg, mFlag);
+    MSerialTaskSet *serial = &mSerial;
+    serial->AddTail(menu);
+    serial->AddTail(exit);
+}
+#pragma dont_inline reset
+
 void PageChangeTask::Execute() {
     ((DinoUiKeyboardMenu *)mUnk10)->SetPage(mUnk14);
     Exit();

@@ -240,7 +240,33 @@ void DinoUiIslandMapMenu::CheckKeys() {
     }
 }
 
-DinoMapSelectMenu::DinoMapSelectMenu(s32 *result, u32 unlocked) : MProcess(NULL) {
+DinoUiIslandMap::DinoUiIslandMap(s32 *result, u32 unlocked) : MProcess(NULL) {
     mUnlocked = unlocked;
     mResult = result;
 }
+
+#pragma dont_inline on
+void DinoUiIslandMap::Idle() {
+    gLcd->mMain->ResetHooks();
+    gLcd->mSub->ResetHooks();
+    gLcd->mSub->Setup(5, 0, 4, 1, 0, 0);
+    gLcd->mSub->SetBackdrop(0x8000);
+    gLcd->mSub->mObj->Show();
+    gLcd->mMain->Setup(6, 3, 0, 0);
+    gLcd->mMain->mBg->SetMode(5);
+    gLcd->mMain->SetBackdrop(0x8000);
+    gLcd->mMain->mObj->Show();
+    gLcd->VSyncNow();
+    gLcd->SetBottomDisplay(gLcd->mSub);
+    gCurrentDisplay = gLcd->GetBottomDisplay();
+    gLcd->mMain->mBright->SetMode(2);
+    gLcd->mMain->mBright->SetFactor(16);
+    gLcd->mSub->mBright->SetMode(2);
+    gLcd->mSub->mBright->SetFactor(16);
+    MTask *exit = MTaskExitTransfer::Create(this);
+    MTask *menu = new DinoUiIslandMapMenu((int *)mResult, mUnlocked);
+    MSerialTaskSet *serial = &mSerial;
+    serial->AddTail(menu);
+    serial->AddTail(exit);
+}
+#pragma dont_inline reset

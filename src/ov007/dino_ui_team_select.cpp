@@ -1,5 +1,5 @@
 // DinoUiTeamSelect.
-// Only the destructors are decompiled so far.
+// NONMATCHING: DinoUiTeamSelect::Idle (an extra cmp on the new menu's null check).
 
 // Derived destructors have their bases' destructor bodies inlined; auto-inlining the ones defined above does that.
 #pragma auto_inline on
@@ -97,6 +97,29 @@ template MTask *MCreateCallTask(DinoUiTeamSelectMenu *obj, void (DinoUiTeamSelec
 DinoUiTeamSelect::DinoUiTeamSelect(u32 *result, u8 unk78, u8 unk79)
     : MProcess(NULL), mResult(result), mUnk78(unk78), mUnk79(unk79) {
 }
+
+#pragma dont_inline on
+void DinoUiTeamSelect::Idle() {
+    gLcd->mMain->ResetHooks();
+    gLcd->mMain->Setup(5, 0, 4, 1, 0, 0);
+    gLcd->mMain->SetBackdrop(0x8000);
+    gLcd->mMain->mObj->Show();
+    gLcd->mSub->ResetHooks();
+    gLcd->mSub->Setup(5, 2, 4, 1, 0, 0);
+    gLcd->mSub->SetBackdrop(0x8000);
+    gLcd->mSub->mObj->Show();
+    gLcd->VSyncNow();
+    gLcd->SetBottomDisplay(gLcd->mSub);
+    gCurrentDisplay = gLcd->GetBottomDisplay();
+    gLcd->GetTopDisplay()->mBright->Reset();
+    gLcd->GetBottomDisplay()->mBright->Reset();
+    MTask *exit = MTaskExitTransfer::Create(this);
+    MTask *menu = new DinoUiTeamSelectMenu((int *)mResult, mUnk78, mUnk79);
+    MSerialTaskSet *serial = &mSerial;
+    serial->AddTail(menu);
+    serial->AddTail(exit);
+}
+#pragma dont_inline reset
 
 // Fades both screens out to white and leaves.
 void DinoUiTeamSelectMenu::Close() {

@@ -12,6 +12,7 @@
 #include <map>
 #include "m/task.h"
 #include "game/help.h"
+#include "game/dino_ui_island_map.h"
 #include "m/archive.h"
 #include "m/resource.h"
 #include "m/serializer.h"
@@ -481,16 +482,6 @@ public:
     MPictureFile mPicture;            // 0x100
 };
 
-// The map select menu (in overlay 4).
-class DinoMapSelectMenu : public MProcess {
-public:
-    DinoMapSelectMenu(s32 *result, u32 unlocked);
-    virtual ~DinoMapSelectMenu();
-    virtual void Idle();
-
-    u32 mUnlocked;      // 0x74
-    s32 *mResult;       // 0x78
-};
 
 // A loaded episode file and the archive holding it.
 struct DinoEventEpisode {
