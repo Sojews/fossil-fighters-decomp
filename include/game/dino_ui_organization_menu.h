@@ -20,6 +20,7 @@ class DinoUiPartsTeamTech;
 class DinoUiPartsReviverMedalButton;
 class MSmartOam;
 class MView;
+class MIndicator;
 class DinoCommonWindowMessage;
 
 // Where things go on the screen (filled in at start).
@@ -50,7 +51,7 @@ public:
     virtual void OnDecide(MMenuItem *item);
 
     void CreateSlots();
-    void CreateSlot(u32 index);
+    void CreateSlot(int index);
     void ClearSlots();
     void RemoveSlotLinks();
     void FinishPageRight();
@@ -119,7 +120,7 @@ public:
     MTextPicture *mSortCursor;          // 0x100
     DinoUiPartsReviverMedalButton *mListItems[5]; // 0x104
     DinoUiPartsReviverMedalButton *mSlots[15]; // 0x118
-    u32 mUnk154[15];                    // 0x154
+    MIndicator *mNumbers[15];           // 0x154: the slots' creature numbers
     int mSlotCount;                     // 0x190
     u32 mUnk194[2];                     // 0x194
     MView *mMenuBack;                   // 0x19C: behind the member menu

@@ -27,6 +27,8 @@
 #include "game/dino_ui_medal_menu.h"
 #include "game/dino_ui_parts_tab_icon_menu_item.h"
 #include "game/dino_creature_sort.h"
+#include "m/indicator.h"
+#include <printf.h>
 #include "game/dino_ui_parts_reviver_name.h"
 
 DinoUiOrganizationMenu::~DinoUiOrganizationMenu() {
@@ -791,6 +793,60 @@ void DinoUiOrganizationMenu::PlaceSlots() {
             mSlots[i]->mMotion->GetUnit()->SetMode(1);
         }
         mSlots[i]->Enable();
+    }
+}
+
+// Makes the page's slot (the first clears the numbers and counts the slots; the last links them).
+void DinoUiOrganizationMenu::CreateSlot(int slot) {
+    if (slot == 0) {
+        if (mPage == mLastPage) {
+            mSlotCount = mCreatures.size() - mPage * 15;
+        } else {
+            mSlotCount = 15;
+        }
+        for (int i = 0; i < 15; i++) {
+            mNumbers[i]->SetText(std::string("   "));
+        }
+    }
+    if (slot < mSlotCount) {
+        u32 id = mCreatures[mPage * 15 + slot];
+        DinoCreatureState creature;
+        gDinoBackup->GetCreature(id, &creature);
+        u8 maxed;
+        if (GetCreatureLevel(creature) == 12) {
+            maxed = TRUE;
+        } else {
+            maxed = FALSE;
+        }
+        mSlots[slot] = new DinoUiPartsReviverMedalButton(
+            mOam,
+            MPoint(data_ov007_0218ebec.slotX + data_ov007_0218ebec.slotColumnX * (slot % 5) +
+                       data_ov007_0218ebec.slotRowX * (slot / 5),
+                   data_ov007_0218ebec.slotY + data_ov007_0218ebec.slotColumnY * (slot % 5) +
+                       data_ov007_0218ebec.slotRowY * (slot / 5)),
+            id, maxed, creature.parts[0].level == 0);
+        AddItem(mSlots[slot]);
+        if (InTeam(id)) {
+            mSlots[slot]->mMotion->GetUnit()->SetMode(0);
+        } else {
+            mSlots[slot]->mMotion->GetUnit()->SetMode(1);
+        }
+        mSlots[slot]->Enable();
+        char number[4];
+        sprintf(number, "%03d", gDinoResource->GetCreatureDef(id)->voice);
+        mNumbers[slot]->SetText(std::string(number));
+    } else {
+        mSlots[slot] = new DinoUiPartsReviverMedalButton(
+            mOam,
+            MPoint(data_ov007_0218ebec.slotX + data_ov007_0218ebec.slotColumnX * (slot % 5) +
+                       data_ov007_0218ebec.slotRowX * (slot / 5),
+                   data_ov007_0218ebec.slotY + data_ov007_0218ebec.slotColumnY * (slot % 5) +
+                       data_ov007_0218ebec.slotRowY * (slot / 5)),
+            0xFFFF, TRUE, FALSE);
+        AddItem(mSlots[slot]);
+    }
+    if (slot == 14) {
+        LinkSlots();
     }
 }
 
