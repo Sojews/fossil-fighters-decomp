@@ -8,6 +8,7 @@
 #include "types.h"
 #include "game/info_panel_window.h"
 #include "game/dino_static_init.h"
+#include "game/dino_resource.h"
 
 DinoBattleViewKPUpDown::~DinoBattleViewKPUpDown() {
 }
@@ -25,6 +26,25 @@ void KPUpDownMotion::Idle() {
 }
 
 void DinoBattleViewKPUpDown::Idle() {
+}
+
+static inline const MPoint *DinoKPUpDownPoints() {
+    const DinoBattleAdjustDefs *defs = gDinoResource->GetBattleAdjustDefs();
+    return (const MPoint *)((const u8 *)defs + defs->kpUpDownPoints);
+}
+
+// NONMATCHING: 88%, the game recomputes the point's offset each time (ours steps it) and keeps i in a register.
+DinoBattleViewKPUpDown::DinoBattleViewKPUpDown() : MProcess(NULL) {
+    for (int i = 0; i < 2; i++) {
+        KPUpDownMotion *motion = new KPUpDownMotion(DinoKPUpDownPoints()[i]);
+        mMotions[i] = motion;
+        mParallel.AddTail(motion);
+    }
+}
+
+// Clears a side's queued numbers.
+extern "C" void func_ov000_0217e1ec(DinoBattleViewKPUpDown *view, int side) {
+    view->mMotions[side]->mTasks->Clear();
 }
 
 // Pooled file statics.

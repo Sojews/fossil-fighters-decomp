@@ -145,6 +145,8 @@ struct DinoBattleAdjustDefs {
     int advantageArrowX1;   // 0x188: and at the second
     int advantageArrowY1;   // 0x18C
     u8 abilityMenuWrap; // 0x190: the ability menu's cursor wraps around
+    u8 unk191[0x1AC - 0x191];
+    u32 kpUpDownPoints; // 0x1AC: offset of the KP up/down numbers' positions (MPoint), by side
 };
 
 struct DinoRgb {
