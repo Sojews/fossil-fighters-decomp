@@ -9,6 +9,7 @@
 #include "types.h"
 #include "m/bg_new_task.h"
 #include "m/picture.h"
+#include "m/motion.h"
 #include "game/motion_advantage_arrow.h"
 #include "game/dino_battle_view_field.h"
 #include "game/dino_battle_view_class.h"
@@ -156,3 +157,10 @@ void DinoBattleViewBackdrop::Execute() {
         ab += db;
     }
 }
+
+#pragma auto_inline off
+// Vector instances the game emits in this file (made explicitly until DinoBattleViewField::OnMessage, which uses them,
+// is decompiled).
+template void std::__vec_deleter<MMotionFile, std::allocator<MMotionFile> >::sub_push_back(const MMotionFile &x, Metrowerks::int2type<false>);
+template std::__vec_deleter<MMotionFile, std::allocator<MMotionFile> >::~__vec_deleter();
+template void std::__vec_deleter<MMotionFile, std::allocator<MMotionFile> >::erase_at_end(size_t n, Metrowerks::int2type<false>);
