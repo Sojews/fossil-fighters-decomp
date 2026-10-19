@@ -293,7 +293,7 @@ _ZThn12_N23DinoUiContainerBaseMenu8OnDecideEP9MMenuItem kind:function(thumb,size
 _ZThn12_N23DinoUiContainerBaseMenu7OnFocusEP9MMenuItem kind:function(thumb,size=0x1c) addr:0x0215d3d8
 _ZThn12_N23DinoUiContainerBaseMenu6OnIdleEv kind:function(thumb,size=0x1c) addr:0x0215d3f4
 _ZThn12_N23DinoUiContainerBaseMenu7OnStartEv kind:function(thumb,size=0x1c) addr:0x0215d410
-func_ov005_0215d42c kind:function(thumb,size=0xb0) addr:0x0215d42c
+_ZN23DinoUiContainerDropMenuC1EmmRKSt6vectorISsSaISsEE kind:function(thumb,size=0xb0) addr:0x0215d42c
 _ZN23DinoUiContainerDropMenu7OnStartEv kind:function(thumb,size=0x828) addr:0x0215d4dc
 _ZN27DinoUiContainerDropMenuItemC1EP23DinoUiContainerDropMenuRKSs6MPointm kind:function(thumb,size=0xd0) addr:0x0215dd04
 func_ov005_0215ddd4 kind:function(thumb,size=0x1a4) addr:0x0215ddd4

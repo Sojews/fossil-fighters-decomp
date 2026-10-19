@@ -14,6 +14,11 @@
 
 #pragma auto_inline off
 
+DinoUiContainerDropMenu::DinoUiContainerDropMenu(u32 arg0, u32 arg1, const std::vector<std::string> &names)
+    : MMenu(NULL, 0), mUnkDC(arg0), mUnkE0(arg1), mUnkE4(names), mPage(0), mLastPage(0), mUnk120(-1), mStarted(0),
+      mUnk128(0) {
+}
+
 DinoUiContainerDropMenuItem::DinoUiContainerDropMenuItem(DinoUiContainerDropMenu *owner, const std::string &path, MPoint pos, u32 textId) {
     mOwner = owner;
     mTextId = textId;
