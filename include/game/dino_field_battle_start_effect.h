@@ -5,15 +5,22 @@
 
 class DinoField;
 
+class MRasterWindow;
+
 class DinoFieldBattleStartEffect : public MProcess {
 public:
     DinoFieldBattleStartEffect(DinoField *field);
     virtual ~DinoFieldBattleStartEffect();
     virtual void Idle();
 
+    void Start();
+    // Closes a circle on the bottom screen over 90 frames, then ends.
+    void StateClose();
+
     void (DinoFieldBattleStartEffect::*mState)(); // 0x74
     DinoField *mField;                            // 0x7C
-    u8 unk80[8];
+    MRasterWindow *mWindow;                       // 0x80
+    u32 mFrame;                                   // 0x84
 };
 
 #endif
