@@ -173,6 +173,21 @@ DinoCleaningNewDust::~DinoCleaningNewDust() {
 DinoCleaningLastDust::~DinoCleaningLastDust() {
 }
 
+// NONMATCHING: 97.8%, stack slots only (the game copies the duration once, for the comparison, yet loads it before
+// the frame is advanced).
+void DinoCleaningLastDust::Idle() {
+    MFx32 duration = mDuration;
+    MFx32 frame = mFrame;
+    mFrame += MFx32(1);
+    if (frame >= duration) {
+        Exit();
+        return;
+    }
+    MFx32Point pos = mFrom + (mTo - mFrom) * mFrame / mDuration;
+    MFx32Point p = pos;
+    mMotion->SetPosition(MPoint(MFx32ToInt(p.x), MFx32ToInt(p.y)));
+}
+
 DinoCleaningImageViewScaleAnime::~DinoCleaningImageViewScaleAnime() {
 }
 
