@@ -31,13 +31,22 @@ class DinoGradationBg;
 class MSmartOam;
 class MDisplay;
 
-class DinoFieldNamePanel {
+// The panel that shows the area's name.
+class DinoFieldNamePanel : public MProcess {
 public:
+    // Not decompiled yet.
+    DinoFieldNamePanel();
+    virtual ~DinoFieldNamePanel();
+    virtual void Idle();
     void SetMode(int mode, int arg);
+
+    u8 unk74[0x88 - 0x74];
 };
 
 class DinoFieldCamera : public MProcess, public MSerializer {
 public:
+    // With a name panel unless namePanel is 0.
+    DinoFieldCamera(DinoField *field, u32 namePanel);
     virtual ~DinoFieldCamera();
     virtual void Idle();
     virtual void Read(const void *buf);
@@ -81,7 +90,7 @@ public:
     u16 mUnkD8;                     // 0xD8
     u8 unkDA[0xDC - 0xDA];
     MFx32 mUnkDC;                   // 0xDC
-    u8 unkE0[0xE4 - 0xE0];
+    u32 mUnkE0;                     // 0xE0
     u32 mFocus;                     // 0xE4: the character followed
     MTaskSet *mUnkE8;               // 0xE8: the rotation anime
     s32 mUnkEC;                     // 0xEC
@@ -107,7 +116,7 @@ public:
     u8 unk12E[2];
     u32 mSavedRotateArgs[3];        // 0x130
     s32 mSavedSteps;                // 0x13C
-    u8 unk140[0x144 - 0x140];
+    u32 mUnk140;                    // 0x140
     DinoFieldNamePanel *mNamePanel; // 0x144
     MFx32 mUnk148;                  // 0x148
     u8 mHeightSet;                  // 0x14C

@@ -16,6 +16,46 @@ static u16 LerpAngle(u16 from, u16 to, MFx32 t) {
     return MFx32ToInt(MFx32(from) * t + MFx32(target) * (MFx32(1) - t));
 }
 
+DinoFieldCamera::DinoFieldCamera(DinoField *field, u32 namePanel)
+    : MProcess(NULL), mField(field), mUnk90(namePanel), mFocus(0), mTracking(1), mUnk140(0), mHeightSet(0),
+      mHooksMuted(0) {
+    mUnkD6 = mUnkD8 = 0;
+    mUnkDC.v = 0x4A000;
+    mUnkD4 = 0x3FF;
+    mUnkD6 = 0x1B53;
+    mUnkE0 = 0;
+    mUnkFC = 0;
+    mUnk98 = FX32_ONE;
+    mUnkD0 = FX32_ONE;
+    MI_CpuFill8(&mUnkA0, 0, sizeof(mUnkA0));
+    MI_CpuFill8(&mUnkC4, 0, 12);
+    mSavedSteps = 0;
+    mUnkE8 = new MParallelTaskSet;
+    mParallel.AddTail(mUnkE8);
+    Add((s32 *)&mFocus, 1);
+    Add(&mTracking, 1);
+    Add((u8 *)&mUnkD4, 12);
+    Add((u8 *)&mUnk94, 12);
+    Add((u8 *)&mUnkAC, 12);
+    Add((u8 *)&mUnkA0, 12);
+    Add((u8 *)&mUnkB8, 12);
+    Add((u8 *)&mUnkC4, 12);
+    Add((u8 *)&mUnkD0, 4);
+    Add((u8 *)&mFocusPos, 8);
+    Add((u8 *)&mUnk114, 8);
+    Add((s32 *)&mUnkFC, 1);
+    Add((u8 *)&mSavedD4, 12);
+    Add((u8 *)mSavedRotate, 12);
+    Add((s32 *)&mSavedRotateArgs[1], 1);
+    Add(&mSavedRotateArgs[2], 1);
+    Add(&mSavedSteps, 1);
+    Close();
+    if (mUnk90 != 0) {
+        mNamePanel = new DinoFieldNamePanel;
+        mParallel.AddTail(mNamePanel);
+    }
+}
+
 // Turns the camera from one rotation and scale to another.
 class DinoFieldCameraMoveAnime : public MAnime {
 public:
