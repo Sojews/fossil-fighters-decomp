@@ -11,6 +11,8 @@
 class MSmartOam;
 class DinoUiFieldMenuFraction;
 class MTextPicture;
+class DinoUiPartsReviverMedalButton;
+class MIndicator;
 
 class DinoUiMedalMenu : public DinoHelpBase, public MMenu {
 public:
@@ -29,8 +31,8 @@ public:
     void FinishPageLeft();
     void ClearSlots();
     void CreateSlots();
-    void CreateSlot(u32 index);
-    BOOL HasUnk1EC(u8 id);
+    void CreateSlot(int index);
+    BOOL HasUnk1EC(u32 id);
     void SetSort(u8 sort);
     void Sort(u8 sort);
     // Lists the creatures with any part (by voice and by unk88) and counts the pages.
@@ -47,9 +49,9 @@ public:
     u32 mUnkD8[5];                      // 0xD8
     MTextPicture *mSortCursor;          // 0xEC
     MMenuItem *mUnkF0[5];               // 0xF0: one per mUnk1EC entry
-    MMenuItem *mSlots[15];              // 0x104
-    u32 mUnk140[15];                    // 0x140
-    u32 mSlotCount;                     // 0x17C
+    DinoUiPartsReviverMedalButton *mSlots[15];  // 0x104
+    MIndicator *mNumbers[15];           // 0x140: the slots' creature numbers
+    int mSlotCount;                     // 0x17C
     u32 mUnk180[3];                     // 0x180
     DinoUiFieldMenuFraction *mFraction; // 0x18C: "page n/m"
     int *mResult;                       // 0x190
