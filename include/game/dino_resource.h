@@ -6,6 +6,7 @@
 #include "m/font.h"
 #include "m/resource.h"
 #include "m/fx32.h"
+#include "m/geometry.h"
 
 class MRandom;
 
@@ -92,7 +93,16 @@ struct DinoBattleAdjustDefs {
     MFx32 unk3C;            // 0x3C
     u8 unk040[0x50 - 0x40];
     MFx32 unk50;            // 0x50
-    u8 unk054[0x138 - 0x54];
+    u32 unk54;
+    // Creature layout, by slot kind (0, 2, 1, 3 in that order): where the slots are with the side's own creatures
+    // set and not, slot position extras, and offsets from them.
+    MPoint slotPos[4];          // 0x58
+    MPoint slotPosAlt[4];       // 0x78
+    MPoint slotPos98[4];        // 0x98
+    MPoint slotPosB8[4];        // 0xB8
+    MPoint slotOffset[4];       // 0xD8: from slotPos
+    MPoint slotOffsetAlt[4];    // 0xF8: from slotPosAlt
+    MPoint slotOffsetB8[4];     // 0x118: from slotPosB8
     int kasekiPointX;   // 0x138
     int kasekiPointY;   // 0x13C
     u32 unk140[2];
