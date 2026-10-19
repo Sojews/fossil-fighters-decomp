@@ -165,6 +165,12 @@ struct DinoBattleView3DEntry {
 #pragma auto_inline off
 template class std::__vec_deleter<DinoBattleView3DEntry, std::allocator<DinoBattleView3DEntry> >;
 
+// A 52-byte-element vector the game appends to in this file (the element type is unknown too).
+struct DinoBattleView3DRecord {
+    u32 unk[13];
+};
+template void std::__vec_deleter<DinoBattleView3DRecord, std::allocator<DinoBattleView3DRecord> >::append_realloc(size_t n, const DinoBattleView3DRecord &x);
+
 // A vector of string lists (its elements are destroyed with vector<string>'s out-of-line destructor).
 // NONMATCHING (both erase_at_end, callcheck only): our vector<string> destructor is inlined into a
 // __vec_deleter<string> D2 call, so the bytes match but the call target differs (see the vector<string> note).
