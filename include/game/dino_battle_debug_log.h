@@ -10,10 +10,18 @@
 #include "game/help.h"
 #include "game/dino_field_camera_hook.h"
 
+class MConsole;
+class MInputHub;
+
 class DinoBattleDebugLog : public MProcess {
 public:
     virtual ~DinoBattleDebugLog();
     virtual void Idle();
+
+    void Clear();
+
+    MConsole *mConsole;     // 0x74
+    MInputHub *mInputHub;   // 0x78
 };
 
 #endif

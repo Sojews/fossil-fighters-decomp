@@ -105,6 +105,8 @@ struct DinoBattleAdjustDefs {
     u8 unk168;          // 0x168: whether the support effects apply
     u8 unk169[3];
     MFx32 pinchRatio;   // 0x16C: at or below this share of its life, a creature is in a pinch
+    u8 unk170;
+    u8 debugLog;        // 0x171: show the battle's debug log
 };
 
 struct DinoRgb {

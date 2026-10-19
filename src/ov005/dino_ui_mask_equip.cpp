@@ -4,6 +4,7 @@
 // Derived destructors have their bases' destructor bodies inlined; auto-inlining the ones defined above does that.
 #pragma auto_inline on
 
+#include "game/dino_backup.h"
 #include "game/dino_resource.h"
 
 #include "m/indicator.h"
@@ -256,8 +257,23 @@ void DinoUiMaskEquip::Idle() {
     serial->AddTail(exit);
 }
 
+// Hands out the odd-numbered masks, then opens the equip menu.
+void DinoUiMaskEquipTest::Idle() {
+    for (u32 i = 1; i <= 19; i++) {
+        if (i & 1) {
+            gDinoBackup->SetHeadMask(i, TRUE);
+        }
+    }
+    MTask *exit = MTaskExitTransfer::Create(this);
+    MTask *menu = new DinoUiMaskEquip();
+    MSerialTaskSet *serial = &mSerial;
+    serial->AddTail(menu);
+    serial->AddTail(exit);
+}
+
 DinoUiMaskEquip::DinoUiMaskEquip() : MProcess(NULL) {
 }
+
 
 DinoUiMaskEquipTest::DinoUiMaskEquipTest() : MProcess(NULL) {
 }

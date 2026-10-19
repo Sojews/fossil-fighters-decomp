@@ -4,6 +4,9 @@
 // Derived destructors have their bases' destructor bodies inlined; auto-inlining the ones defined above does that.
 #pragma auto_inline on
 
+#include "m/input.h"
+#include "m/console.h"
+#include "game/dino_battle_debug_log.h"
 #include "game/dino_resource.h"
 #include "m/obj.h"
 #include "game/dino_sound.h"
@@ -226,4 +229,22 @@ void DinoBattleViewGivingUpMenu::StateAnswered() {
         return;
     }
     Exit();
+}
+
+#pragma auto_inline off
+
+// R shows the next page of the log (when the log is on).
+void DinoBattleDebugLog::Idle() {
+    if (gDinoResource->GetBattleAdjustDefs()->debugLog) {
+        if (mInputHub->GetInput(0)->mButtons & 0x400) {
+            Clear();
+        }
+    }
+}
+
+void DinoBattleDebugLog::Clear() {
+    if (gDinoResource->GetBattleAdjustDefs()->debugLog) {
+        mConsole->ClearText();
+        mConsole->Clear();
+    }
 }
