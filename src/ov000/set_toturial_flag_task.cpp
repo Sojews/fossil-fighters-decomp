@@ -8,6 +8,7 @@
 #include "types.h"
 #include "game/dino_battle_tutorial.h"
 #include "game/dino_battle_view_class.h"
+#include "game/dino_message.h"
 
 SetToturialFlagTask::~SetToturialFlagTask() {
 }
@@ -18,6 +19,12 @@ void SetToturialFlagTask::Execute() {
 }
 
 #pragma auto_inline off
+
+// Instances the game emits here (for the tutorial's requests to the battle view); until the code that posts them
+// is decompiled they are made explicitly.
+template MTask *DinoCreatePostAndWaitTask(DinoBattleView *target, DinoBattleViewTutorialSetRectRequest *msg);
+template MTask *DinoCreatePostAndWaitTask(DinoBattleView *target, DinoBattleViewTutorialSetArroeRequest *msg);
+template MTask *DinoCreatePostAndWaitTask(DinoBattleView *target, DinoBattleViewTutorialWindowRequest *msg);
 
 // Gives the tutorial its view, and the view its tutorial.
 void DinoBattleTutorial::SetView(DinoBattleView *view) {

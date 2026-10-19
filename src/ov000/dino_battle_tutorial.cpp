@@ -55,12 +55,6 @@ MResource<DinoBattleTutorialData> DinoBattleTutorialDataLoad(std::string path) {
 
 #pragma auto_inline off
 
-// Instances the game emits here (for the tutorial's requests to the battle view); until the code that posts them
-// is decompiled they are made explicitly.
-template MTask *DinoCreatePostAndWaitTask(DinoBattleView *target, DinoBattleViewTutorialSetRectRequest *msg);
-template MTask *DinoCreatePostAndWaitTask(DinoBattleView *target, DinoBattleViewTutorialSetArroeRequest *msg);
-template MTask *DinoCreatePostAndWaitTask(DinoBattleView *target, DinoBattleViewTutorialWindowRequest *msg);
-
 #pragma auto_inline off
 
 extern "C" void func_ov000_0218e65c(DinoBattleViewTutorialWindow *window);
