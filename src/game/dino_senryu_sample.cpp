@@ -79,3 +79,18 @@ void DinoSenryuSample::StatePages() {
     mSerial.AddTail(menu);
     mState = data_020bd15c.StateEnd_20;
 }
+
+// The text with every tag replaced by the value (unless the value has the tag itself).
+// NONMATCHING: ours keeps an unreachable epilogue after the loop (as ov003's copy).
+std::string DinoReplaceTag(std::string text, std::string tag, std::string value) {
+    if (value.find(tag, 0) != std::string::npos) {
+        return text;
+    }
+    while (true) {
+        std::string::size_type pos = text.find(tag, 0);
+        if (pos == std::string::npos) {
+            return text;
+        }
+        text = text.replace(pos, tag.size(), value);
+    }
+}

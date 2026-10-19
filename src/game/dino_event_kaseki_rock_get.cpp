@@ -7,6 +7,7 @@
 #include "game/dino_event_exec.h"
 #include "game/dino_backup.h"
 #include "m/lcd.h"
+#include "game/dino_common_window_message_box.h"
 
 DinoEventKasekiRockGet::~DinoEventKasekiRockGet() {
 }
@@ -51,6 +52,27 @@ DinoEventKasekiRockGet::DinoEventKasekiRockGet(DinoEventLoop *event, u32 mode, c
     : MProcess(gLcd->GetBottomDisplay()), mEvent(event), mMode(mode), mEntry(*entry), mMessages(data_020bd360),
       mResult(result) {
     mState = data_020bd1f8.StateStart_5C;
+}
+
+// "%new" and "%old", the tags the messages name the rocks by.
+extern "C" const char data_020bd370[], data_020bd378[];
+// Each mode's messages: stored, ask to swap, swapped, left, and two more; -1 for none.
+extern "C" const u32 data_0208b260[][6];
+
+std::string DinoReplaceTag(std::string text, std::string tag, std::string value);
+
+// The message box saying the mode's message (or a one-frame wait if it has none), naming the rocks.
+MTask *DinoEventKasekiRockGet::CreateMessageBox(u32 message) {
+    u32 id = data_0208b260[mMode][message];
+    if (id == (u32)-1) {
+        return new MTimer(1);
+    }
+    const u8 *data = (const u8 *)mMessages.Get();
+    const u8 *entry = data + ((const u32 *)(data + ((const u32 *)data)[2]))[id];
+    std::string text((const char *)entry + ((const u32 *)entry)[1]);
+    text = DinoReplaceTag(text, data_020bd370, mName);
+    text = DinoReplaceTag(text, data_020bd378, mSwapName);
+    return new DinoCommonWindowMessageBox(MPoint(128, 96), std::string(text), 4);
 }
 
 void DinoEventKasekiRockGet::StateStart() {
