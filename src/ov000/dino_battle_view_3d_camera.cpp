@@ -47,3 +47,26 @@ void DinoBattleView3DMove::StateEnd() {
     Exit();
     mUnkD0++;
 }
+
+// Moves the camera a step (slowing over the last steps), then runs the state.
+void DinoBattleView3DMove::Idle() {
+    if (mUnkC8 && mUnk160) {
+        mUnkCC++;
+        int n = mUnkD0;
+        if (n >= 1) {
+            if (n > mUnk158 - 1 && mUnkFA != 0) {
+                n = mUnk158 - n;
+            } else {
+                n = 1;
+            }
+        }
+        VecFx32 step;
+        step.x = mStep.x * n;
+        step.y = mStep.y * n;
+        step.z = mStep.z * n;
+        if (mCamera != NULL) {
+            mCamera->PushVec0(&step);
+        }
+    }
+    (this->*mState)();
+}
