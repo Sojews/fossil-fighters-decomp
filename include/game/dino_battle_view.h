@@ -16,8 +16,11 @@ class DinoBattleView;
 #include "game/dino_field_camera_hook.h"
 #include "game/dino_battle_help.h"
 
+class DinoBattleViewUiSelectAreaCommon;
+
 class DinoBattleViewUiRootMenuItem : public MMenuItem {
 public:
+    DinoBattleViewUiRootMenuItem(DinoBattleViewUiSelectAreaCommon *owner, u32 index, MPoint pos);
     virtual ~DinoBattleViewUiRootMenuItem();
     virtual MRect GetFrame();
     virtual void OnFocusChanged(BOOL focused);
@@ -28,9 +31,9 @@ public:
     void Refresh();     // (empty in the game)
 
     u32 mIndex;     // 0x88: the row
-    u32 unk8C[2];
-    void *mOwner;   // 0x94
-    u8 unk98;
+    MPoint mPos;    // 0x8C: where the cursor goes when no creature is there
+    void *mOwner;   // 0x94: the DinoBattleViewUiSelectAreaCommon
+    u8 mHasCreature;    // 0x98
     u8 mDisabled;   // 0x99
 };
 
@@ -45,6 +48,8 @@ public:
     void Nop();     // (empty in the game)
     DinoBattleViewCreature *GetItemCreature(MMenuItem *item);
     BOOL HandlePageItem(MMenuItem *item);
+    void MoveCursor(MPoint pos, int frames, int arg);
+    void MoveCursorTo(DinoBattleViewUiRootMenuItem *item, int frames, int arg);
 
     u32 mUnkA8;
     u32 mUnkAC;
@@ -60,7 +65,7 @@ public:
     MMessageObserver *mTarget;  // 0xF0: told the choice
     u32 mUnkF4;
     MTaskSet *mUnkF8;           // 0xF8: waited on before answering
-    u32 mUnkFC;
+    MView *mCursor;             // 0xFC
     u8 unk100[0x1C];
     u32 mUnk11C;
     MMenuItem *mItem120;    // 0x120
@@ -69,7 +74,9 @@ public:
     u32 mUnk12C;
     std::map<u32, void *> mUnk130;  // 0x130
     u32 mUnk13C;
-    u8 unk140[0x38];
+    u8 unk140[0x30];
+    MTaskSet *mCursorAnime;     // 0x170
+    u32 unk174;
     u8 mUnk178;
     u8 mUnk179;
     u8 mUnk17A;

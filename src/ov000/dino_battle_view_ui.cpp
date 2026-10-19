@@ -337,13 +337,15 @@ extern "C" struct {
     const char *arrowPath;  // 0x10
     u8 unk14[0x1C];
     MPoint unk30;           // 0x30
+    u8 unk38[0x20];
+    MPoint unk58;           // 0x58
 } data_ov000_02193ae4;
 
 DinoBattleViewUiSelectAreaCommon::DinoBattleViewUiSelectAreaCommon(DinoBattleView *view, int player,
                                                                    MMessageObserver *target, u32 arg3, u8 arg4,
                                                                    u8 arg5)
     : MMenu(2), mUnkB0(player), mUnkB4(arg3), mUnkE0(data_ov000_02193ae4.unk30), mUnkE8(0), mUnkEC((u32)view),
-      mTarget(target), mUnkF4(0), mUnkFC(0), mUnk11C(0), mUnk12C(0), mUnk13C(0), mUnk178(1), mUnk179(arg4),
+      mTarget(target), mUnkF4(0), mCursor(NULL), mUnk11C(0), mUnk12C(0), mUnk13C(0), mUnk178(1), mUnk179(arg4),
       mUnk17A(arg5) {
     SetDeferStart(TRUE);
     mUnkAC = ((DinoBattleView *)mUnkEC)->GetUnkE4(mUnkB0)->GetUnkAC() ? 4 : 0;
@@ -449,4 +451,67 @@ BOOL DinoBattleViewUiAttackerMenu::HasId(u32 id) {
         }
     }
     return FALSE;
+}
+
+// Where each creature slot is: the view group it is in, and its place there.
+struct DinoBattleSlotPlace {
+    u8 place;
+    u8 group;
+};
+extern "C" const DinoBattleSlotPlace data_ov000_0218fd0c[];
+// A place's offset in a view group.
+extern "C" MPoint func_ov000_0216f320(int group, int place, BOOL arg2);
+
+// (The game loads the place before the call, as it does without copy propagation.)
+#pragma opt_propagation off
+extern "C" MPoint func_ov000_02175b40(DinoBattleView *view, u32 slot) {
+    u8 group = data_ov000_0218fd0c[slot].group;
+    u8 place = data_ov000_0218fd0c[slot].place;
+    return func_ov000_0216f320(group, place, TRUE) + view->mUnkE0->mSlotViewsC0[group]->GetPosition();
+}
+#pragma opt_propagation reset
+
+// Where a creature is on screen.
+extern "C" MPoint func_ov000_02175b90(DinoBattleViewCreature *creature) {
+    DinoBattleView *view = ((DinoBattleViewPlayer *)creature->GetUnkDC())->mView;
+    return data_ov000_02193ae4.unk58 +
+           func_ov000_02175b40(view, creature->GetUnkB4() + creature->GetUnkB0() * 4);
+}
+
+// The creature in the slot, on either side.
+extern "C" DinoBattleViewCreature *func_ov000_02177430(DinoBattleViewUiSelectAreaCommon *menu, u32 unkB0, u32 unkB4) {
+    for (int i = 0; i < 2; i++) {
+        DinoBattleViewPlayer *player = ((DinoBattleView *)menu->mUnkEC)->GetUnkE4(i);
+        for (int j = 0; j < player->GetCreatureCount(); j++) {
+            DinoBattleViewCreature *creature = player->GetCreature(j);
+            if (unkB0 == creature->GetUnkB0() && unkB4 == creature->GetUnkB4()) {
+                return creature;
+            }
+        }
+    }
+    return NULL;
+}
+
+DinoBattleViewUiRootMenuItem::DinoBattleViewUiRootMenuItem(DinoBattleViewUiSelectAreaCommon *owner, u32 index,
+                                                           MPoint pos)
+    : mIndex(index), mPos(pos), mOwner(owner), mDisabled(FALSE) {
+    mHasCreature = ((DinoBattleViewUiSelectAreaCommon *)mOwner)->GetItemCreature(this) != NULL ? TRUE : FALSE;
+}
+
+void DinoBattleViewUiSelectAreaCommon::MoveCursor(MPoint pos, int frames, int arg) {
+    mCursorAnime->Clear();
+    if (mCursor != NULL) {
+        if (frames != 0) {
+            mCursorAnime->AddTail(mCursor->CreateCoordAnime(mCursor->GetPosition(), pos, frames, arg));
+        } else {
+            mCursor->SetPosition(pos);
+        }
+    }
+}
+
+// Where the cursor goes for an item.
+extern "C" MPoint func_ov000_02177720(DinoBattleViewUiRootMenuItem *item);
+
+void DinoBattleViewUiSelectAreaCommon::MoveCursorTo(DinoBattleViewUiRootMenuItem *item, int frames, int arg) {
+    MoveCursor(func_ov000_02177720(item) + data_ov000_02193ae4.unk58, frames, arg);
 }

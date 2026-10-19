@@ -14,7 +14,8 @@ class MSmartOam;
 
 class DinoBattleViewUnkE0 : public MProcess, public MMessageObserver {
 public:
-    u8 unkA8[0x138 - 0xA8];
+    u8 unkA8[0xC0 - 0xA8];
+    MView *mSlotViewsC0[0x1E];  // 0xC0: by slot group
     void *mUnk138;  // 0x138
     u8 unk13C[4];
     void *mUnk140;  // 0x140
