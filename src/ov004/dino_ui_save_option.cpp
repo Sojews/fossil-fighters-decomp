@@ -233,6 +233,39 @@ void DinoUiSaveOption::Idle() {
 
 #pragma auto_inline off
 
+// Leaves: to white (and the title) after a save that asked for it, else to black.
+void DinoUiSaveOptionMenu::OnBackDecided() {
+    if (mUnkB4 != 0 && *(u32 *)mUnkB4 == 1) {
+        MTask &self = *this;
+        MTask *exit = MTaskExitTransfer::Create(&self);
+        MTask *mainFade;
+        MTask *subFade;
+        subFade = gLcd->mSub->mBright->CreateFadeOutToWhite(30, 0);
+        mainFade = gLcd->mMain->mBright->CreateFadeOutToWhite(30, 0);
+        MParallelTaskSet *fades = new MParallelTaskSet(TRUE);
+        fades->AddTail(mainFade);
+        fades->AddTail(subFade);
+        MTask *stopBgm = DinoSoundCreateStopBgmTask(-1, 30);
+        MTask *timer = new MTimer(30);
+        MSerialTaskSet *serial = &mSerial;
+        serial->AddTail(timer);
+        serial->AddTail(stopBgm);
+        serial->AddTail(fades);
+        serial->AddTail(exit);
+        return;
+    }
+    MTask &self = *this;
+    MTask *fade;
+    MTask *exit;
+    exit = MTaskExitTransfer::Create(&self);
+    fade = gLcd->mMain->mBright->CreateFadeOutToBlack(30, 0);
+    MTask *timer = new MTimer(30);
+    MSerialTaskSet *serial = &mSerial;
+    serial->AddTail(timer);
+    serial->AddTail(fade);
+    serial->AddTail(exit);
+}
+
 // Adds the buttons, the save one focused if kind is set, else the option one.
 void DinoUiSaveOptionMenu::AppendItem(u8 kind) {
     mItems[0] = new DinoUiSaveOptionSaveButton(this, data_ov004_02174cb4.savePath, data_ov004_02174cb4.savePos,
