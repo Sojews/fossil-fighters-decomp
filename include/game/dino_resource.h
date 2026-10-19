@@ -187,6 +187,10 @@ struct DinoDemoBattles {
     u32 unk18;          // 0x18: the demo battles watched before the demo stops
 };
 struct DinoExcavateDefs {
+    // The rock area's size.
+    int GetRockAreaWidthA4() const { return rockAreaAC - rockAreaA4; }
+    int GetRockAreaWidthA0() const { return rockAreaA8 - rockAreaA0; }
+
     u8 unk00[0x5C];
     u32 manpus;         // 0x5C: offset of the offsets of the manpu (emotion bubble) entries
     u8 unk60[4];
@@ -204,7 +208,11 @@ struct DinoExcavateDefs {
     u32 exchangeRetryWait;  // 0x94: frames before a found partner is taken again
     u8 unk98[0x9C - 0x98];
     u32 kasekiRockMap;  // 0x9C: the map the kaseki rocks are on
-    u8 unkA0[0xB8 - 0xA0];
+    u32 rockAreaA0;     // 0xA0: the area new field rocks are placed in
+    u32 rockAreaA4;     // 0xA4
+    u32 rockAreaA8;     // 0xA8
+    u32 rockAreaAC;     // 0xAC
+    u8 unkB0[0xB8 - 0xB0];
     u32 demoOffset;     // 0xB8: DinoDemoBattles
     u32 rangeCount;     // 0xBC
     u32 rangeOffset;    // 0xC0: DinoExcavateRange entries

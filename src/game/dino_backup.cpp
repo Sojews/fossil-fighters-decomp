@@ -1592,3 +1592,30 @@ extern "C" void func_0201b0a4(DinoBackupEntry28 *first, DinoBackupEntry28 *last)
         }
     }
 }
+
+// The order the field rocks' sort takes (the entries' operator<).
+struct DinoBackupEntry28Less {};
+
+// Sorts the field rocks (not decompiled yet).
+extern "C" void func_0201a260(DinoBackupEntry28 *first, DinoBackupEntry28 *last, DinoBackupEntry28Less less);
+
+// Puts a new field rock somewhere in the rock area, over the least important one.
+void DinoBackup::AddUnk138(const DinoBackupEntry *entry, BOOL arg) {
+    MResource<DinoExcavateDefs> defs = gDinoResource->GetExcavateDefs();
+    DinoBackupEntry28 rock;
+    rock.used = TRUE;
+    rock.unk1 = 0;
+    rock.pos.Set(gDinoResource->GetRandom()->NextFraction() * MFx32(defs.Get()->GetRockAreaWidthA0()) +
+                     MFx32(defs.Get()->rockAreaA0),
+                 gDinoResource->GetRandom()->NextFraction() * MFx32(defs.Get()->GetRockAreaWidthA4()) +
+                     MFx32(defs.Get()->rockAreaA4));
+    {
+        MScopedLock lock(&sBackupMutex.mutex, TRUE);
+        rock.time = mPlayFrames;
+    }
+    *(DinoBackupEntry *)&rock.unk14 = *entry;
+    rock.unk24_3 = 1;
+    func_0201a260(mUnk138, mUnk138 + 20, DinoBackupEntry28Less());
+    mPlayer->unk38_3 = 1;
+    *mUnk138 = rock;
+}

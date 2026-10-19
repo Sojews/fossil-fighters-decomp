@@ -26,8 +26,8 @@ DinoFieldKasekiRock::DinoFieldKasekiRock(DinoField *field, M3DScene *scene, u32 
     mModel->mUnkF4 = 0;
     mModel->mFollowParent = TRUE;
     mParallel.AddTail(mModel);
-    mPos.x = rock.unkC;
-    mPos.z = rock.unk10;
+    mPos.x = rock.pos.x.v;
+    mPos.z = rock.pos.y.v;
     mPos.y = mField->GetGroundHeight(mPos.x, mPos.z) + 0.1 * 4096;
     mModel->SetPosRef(&mPos);
     mRot.x = mRot.y = mRot.z = 0;

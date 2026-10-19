@@ -225,7 +225,7 @@ MFx32Point DinoField::ResolveMove(DinoFieldChara *chara, MFx32Point move) {
             DinoBackupEntry28 rock;
             gDinoBackup->GetUnk138(i, &rock);
             if (rock.used) {
-                MFx32Point d = result - *(MFx32Point *) &rock.unkC;
+                MFx32Point d = result - rock.pos;
                 MFx32 r = chara->GetHeight() + MFx32(1);
                 if (!(d.x * d.x + d.y * d.y >= r * r)) {
                     MFx32 len = d.Length();

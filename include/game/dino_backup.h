@@ -256,8 +256,8 @@ struct DinoBackupEntry28 {
     u8 used;            // 0x00
     u8 unk1;            // 0x01
     u64 time;           // 0x04
-    u32 unkC;           // 0x0C
-    u32 unk10;          // 0x10
+    MFx32Point pos;     // 0x0C: where on the field
+    // 0x14: the rock's DinoBackupEntry
     u32 unk14;          // 0x14
     u32 unk18;          // 0x18
     u32 unk1C;          // 0x1C

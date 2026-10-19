@@ -112,6 +112,12 @@ struct MFx32Point {
         y = y_;
     }
 
+    MFx32Point &operator=(const MFx32Point &o) {
+        x = o.x;
+        y = o.y;
+        return *this;
+    }
+
     MFx32Point &operator+=(const MFx32Point &o) {
         x = o.x + x;
         y = o.y + y;
