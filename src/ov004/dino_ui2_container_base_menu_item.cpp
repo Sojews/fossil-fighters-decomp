@@ -25,6 +25,10 @@
 #include "game/dino_backup.h"
 #include "game/dino_common_window_yes_no_dialog.h"
 #include "game/dino_common_window_message_box.h"
+#include "game/dino_guide_message.h"
+#include "game/help.h"
+#include "m/picture.h"
+#include "game/dino_resource.h"
 
 #pragma auto_inline off
 
@@ -397,6 +401,32 @@ DinoUi2CannonShootMenu::DinoUi2CannonShootMenu(std::vector<void *> *chosen) {
     mChosen = chosen;
     mChosen->clear();
     mUnkFD = 8;
+}
+
+// The background picture's path (the TU's string literals are pooled data too).
+extern "C" const char data_ov004_02177130[];
+extern "C" struct {
+    u32 unk00;
+    const char *decideMotion;   // 0x04
+} data_ov004_02176fb0;
+extern "C" const u32 data_0208a4d8, data_0208a4d0, data_0208a4d4, data_0208a918;
+
+void DinoUi2CannonShootMenu::Setup() {
+    mParallel.AddTail(mBackground = new MTextPicture(data_ov004_02177130, TRUE, false));
+    mBackground->Hide();
+    mBackground->SetPriority(2);
+    MBlend *blend = gCurrentDisplay->mBlend;
+    GetSerial()->AddTail(mBackground->CreateShowTransfer(),
+                         blend->CreateCrossFadeInTask(mBackground->GetPlaneMask(), 5, 0));
+    gDinoBackup->CompactUnk14C();
+    mParallel.AddTail(new DinoHelpDummyItem(GetDisplay(), MRect(0x1E, 0xC, 0xE2, 0x6C),
+                                            std::string(gDinoResource->GetText(data_0208a4d8))));
+    DinoHelpDummyItem *back;
+    mParallel.AddTail(back = new DinoHelpDummyItem(GetDisplay(), MRect(0x13, 0x90, 0xF1, 0x9F),
+                                                   std::string(gDinoResource->GetText(data_0208a4d0))));
+    CreateDecideButton(data_ov004_02176fb0.decideMotion, data_0208a4d4);
+    AddHelpEntries((u32)back);
+    mParallel.AddTail(new DinoGuideMessage(std::string(gDinoResource->GetText(data_0208a918))));
 }
 
 // After the yes/no: hands back the marked entries and leaves.

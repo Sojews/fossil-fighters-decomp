@@ -21,6 +21,8 @@ class DinoUi2PartsRockName;
 
 class DinoUi2ContainerBaseMenuItem;
 
+class MTextPicture;
+
 class DinoUi2ContainerBaseMenu : public DinoHelpBase, public MMenu {
 public:
     DinoUi2ContainerBaseMenu();
@@ -45,7 +47,7 @@ public:
     u8 mUnkFD;                      // 0xFD: the most that can be
     u32 mUnk100;                    // 0x100
     MSmartOam *mOam;                // 0x104
-    u32 mUnk108;                    // 0x108
+    MTextPicture *mBackground;      // 0x108
     std::vector<void *> mItems;     // 0x10C: this page's items
     u32 mUnk118[2];                 // 0x118
     DinoUi2ContainerBaseMenuItem *mBack; // 0x120
