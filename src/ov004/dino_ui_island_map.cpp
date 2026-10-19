@@ -1,5 +1,4 @@
 // DinoUiIslandMap, DrawFont, BitmapMove, SpotMove, DinoUiIslandMapMenuItem, IslandMapKeyCheckTask, GuidMan.
-// Only the destructors are decompiled so far.
 
 // Derived destructors have their bases' destructor bodies inlined; auto-inlining the ones defined above does that.
 #pragma auto_inline on
@@ -21,6 +20,8 @@
 #include "game/bitmap_move.h"
 #include "m/bitmap.h"
 #include "m/anime.h"
+#include "m/raster.h"
+#include "m/blend.h"
 #include "game/spot_move.h"
 #include "game/dino_ui_island_map_menu_item.h"
 #include "game/island_map_key_check_task.h"
@@ -151,6 +152,7 @@ DrawFont::DrawFont(int text) : MProcess(NULL) {
 void DrawFont::Idle() {
 }
 
+#pragma auto_inline off
 // Centres the text on pos.
 void DrawFont::SetCenter(const MPoint &pos) {
     int width = mConsole->GetWidth();
@@ -161,6 +163,7 @@ void DrawFont::SetCenter(const MPoint &pos) {
 void DrawFont::Show() {
     mConsole->Show();
 }
+#pragma auto_inline reset
 
 void DinoMapBackButton::OnFocusChanged(BOOL focused) {
     if (focused) {
@@ -283,6 +286,74 @@ void DinoUiIslandMapMenu::OnFocus(MMenuItem *item) {
     tasks->AddTail(move);
     mScroll.x = scroll.x;
     mScroll.y = sy;
+}
+
+// The name plates' and markers' places (the TU's pooled data, from 0x02175a58).
+extern "C" const struct {
+    u32 unk0;
+    MPoint mNameIn;     // 0x04: the name plate's place (coming in from the left)
+    MPoint mNameInFlip; // 0x0C: (from the right)
+    MPoint mMarkOut;    // 0x14
+    MPoint mMarkIn;     // 0x1C
+} data_ov004_02175a58;
+extern "C" const MPoint data_ov004_02175a44, data_ov004_02175a5c, data_ov004_02175a64, data_ov004_02175a74;
+
+// Fades the top screen in, follows the scroll, then narrows the spotlight while the name plate and marker come in.
+// NONMATCHING: the last centre's x and y load in the other order.
+void SpotMove::Idle() {
+    if (mFrame <= 3) {
+        gLcd->mMain->mBlend->SetBrightness((3 - mFrame) * 2);
+    } else if (mFrames - 15 == mFrame) {
+        gLcd->mMain->mBlend->SetBrightness(8);
+        mRadius = new MValueAnime(256, 32);
+        mParallel.AddTail(mRadius);
+        mRadius->SetDuration(15);
+        mRadius->mEase = -6;
+        if (!mFlip) {
+            mMarkMove = new MPointAnime(data_ov004_02175a6c, data_ov004_02175a58.mMarkIn);
+            MPointAnime *mark = mMarkMove;
+            mNameMove = new MPointAnime(data_ov004_02175a54, data_ov004_02175a58.mNameIn);
+            MParallelTaskSet *tasks = &mParallel;
+            tasks->AddTail(mNameMove);
+            tasks->AddTail(mark);
+        } else {
+            mMarkMove = new MPointAnime(data_ov004_02175a6c, data_ov004_02175a58.mMarkIn);
+            MPointAnime *mark = mMarkMove;
+            mNameMove = new MPointAnime(data_ov004_02175a44, data_ov004_02175a58.mNameInFlip);
+            MParallelTaskSet *tasks = &mParallel;
+            tasks->AddTail(mNameMove);
+            tasks->AddTail(mark);
+        }
+        mMarkMove->SetDuration(15);
+        mMarkMove->mEase = -6;
+        mMark->SetPosition(data_ov004_02175a6c);
+        mMark->Show();
+        mFont->SetCenter(data_ov004_02175a6c);
+        mFont->Show();
+        mNameMove->SetDuration(15);
+        mNameMove->mEase = -6;
+        mName->SetPosition(data_ov004_02175a54);
+        mName->Show();
+    } else if (mFrames <= mFrame) {
+        mWindow->SetCircle(mCenter, 32);
+        if (!mFlip) {
+            mName->SetPosition(data_ov004_02175a5c);
+        } else {
+            mName->SetPosition(data_ov004_02175a64);
+        }
+        mMark->SetPosition(data_ov004_02175a74);
+        mFont->SetCenter(data_ov004_02175a74);
+        Exit();
+    } else if (mFrames - 15 < mFrame) {
+        mWindow->SetCircle(mCenter, mRadius->mValue);
+        MPoint name(mNameMove->mValue.x, mNameMove->mValue.y);
+        mName->SetPosition(name);
+        MPoint mark(mMarkMove->mValue.x, mMarkMove->mValue.y);
+        mMark->SetPosition(mark);
+        MPoint font(mMarkMove->mValue.x, mMarkMove->mValue.y);
+        mFont->SetCenter(font);
+    }
+    mFrame++;
 }
 
 void BitmapMove::Apply(int step) {
