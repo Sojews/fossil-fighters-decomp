@@ -368,3 +368,5 @@ DinoUiSenryuMenu::DinoUiSenryuMenu() : MMenu(NULL, 0), mCursor(NULL), mPage(99),
 #pragma auto_inline off
 // Vector members the game emits in this file (made explicitly until the code that uses them is decompiled).
 template void std::__vec_deleter<MPictureFile, std::allocator<MPictureFile> >::sub_push_back(const MPictureFile &x, Metrowerks::int2type<false>);
+template std::wstring std::wstring::substr(std::wstring::size_type pos, std::wstring::size_type n) const;
+template std::wstring &std::wstring::operator=(const wchar_t *s);

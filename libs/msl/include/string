@@ -4,12 +4,20 @@
 #define MSL_STRING
 
 #include <memory>
+#include <algorithm>
 #include <iterator>
 #include <string.h>
+#include <wstring.h>
 
 namespace std {
 
 template <class T> struct char_traits {};
+template <> struct char_traits<char> {
+    static size_t length(const char *s) { return strlen(s); }
+};
+template <> struct char_traits<wchar_t> {
+    static size_t length(const wchar_t *s) { return wcslen(s); }
+};
 
 template <class C, class Traits = char_traits<C>, class Alloc = allocator<C> >
 class basic_string {
@@ -42,6 +50,9 @@ public:
     basic_string(const C *s);
     basic_string(const C *s, size_type n);
     basic_string(const basic_string &other);
+    basic_string(const basic_string &str, size_type pos, size_type n, const Alloc &a = Alloc());
+    // (The allocator is empty and sits at the start of the string.)
+    const Alloc &get_allocator() const { return *(const Alloc *)this; }
     ~basic_string();
 
     void reserve(size_type n);
@@ -63,6 +74,7 @@ public:
     void push_back(C c);
     basic_string &replace(size_type pos, size_type n, const basic_string &str);
     basic_string &replace(size_type pos, size_type n, const C *s);
+    basic_string &replace(size_type pos1, size_type n1, const basic_string &str, size_type pos2, size_type n2);
     size_type rfind(C c, size_type pos = npos) const;
     int compare(const C *s) const;
     int compare(const basic_string &str) const;
@@ -151,12 +163,51 @@ typename basic_string<C, Traits, Alloc>::const_iterator basic_string<C, Traits, 
 
 template <class C, class Traits, class Alloc>
 basic_string<C, Traits, Alloc> &basic_string<C, Traits, Alloc>::replace(size_type pos, size_type n, const C *s) {
-    return __replace(pos, n, s, s + strlen(s), random_access_iterator_tag());
+    return __replace(pos, n, s, s + Traits::length(s), random_access_iterator_tag());
 }
 
 template <class C, class Traits, class Alloc>
 basic_string<C, Traits, Alloc> &basic_string<C, Traits, Alloc>::operator=(const C *s) {
     return replace(0, size(), s);
+}
+
+template <class C, class Traits, class Alloc>
+basic_string<C, Traits, Alloc>::basic_string(const basic_string &str, size_type pos, size_type n, const Alloc &a) {
+    unsigned long i = 0;
+    unsigned long *words = mWords;
+    for (; i < 3; i++) {
+        *words++ = 0;
+    }
+    size_type size = str.size();
+    reserve(pos <= size ? min(n, size - pos) : 0);
+    replace(0, 0, str, pos, n);
+}
+
+template <class C, class Traits, class Alloc>
+basic_string<C, Traits, Alloc> basic_string<C, Traits, Alloc>::substr(size_type pos, size_type n) const {
+    return basic_string(*this, pos, n, get_allocator());
+}
+
+template <class C, class Traits, class Alloc>
+basic_string<C, Traits, Alloc> &basic_string<C, Traits, Alloc>::replace(size_type pos1, size_type n1,
+                                                                         const basic_string &str, size_type pos2,
+                                                                         size_type n2) {
+    const C *p;
+    size_type size;
+    if (!str.is_long()) {
+        p = str.mShort.buf;
+        size = str.mShort.size;
+    } else {
+        p = str.mLong.data;
+        size = str.mLong.size;
+    }
+    if (pos2 > size) {
+        printf("basic_string: out_of_range");
+        abort();
+    }
+    p += pos2;
+    n2 = min(n2, size - pos2);
+    return __replace(pos1, n1, p, p + n2, random_access_iterator_tag());
 }
 
 // The out-of-line members a file instantiates itself (defined only where MSL_STRING_DEFINITIONS is, so other
