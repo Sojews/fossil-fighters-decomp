@@ -3,6 +3,7 @@
 
 #include "game/dino_field.h"
 #include "m/font.h"
+#include "m/lcd.h"
 #include "m/bg_new_task.h"
 #include "m/overlay.h"
 #include "game/dino_event_save_option.h"
@@ -161,7 +162,16 @@ void DinoEventLoop::RunCommands(const u8 *block) {
 extern "C" struct {
     u8 unk00[0x20];
     void (DinoEventLoop::*State0203ad00_20)();
+    u8 unk28[0x50 - 0x28];
+    void (DinoEventLoop::*Start_50)();
 } data_020bd9d0;
+
+DinoEventLoop::DinoEventLoop(u32 *result)
+    : MProcess(gLcd->mMain), mResult(result), mRegions(gDinoResource->GetRegionCount()), mEventCleared(TRUE),
+      mHasPicture(FALSE) {
+    mScreen = NULL;
+    mState = data_020bd9d0.Start_50;
+}
 
 void DinoEventLoop::Start() {
     MTaskSet *parallel = &mParallel;

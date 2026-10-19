@@ -476,6 +476,7 @@ struct DinoEventLoopUnkB8 {
 // Runs the event scripts (the game's class name; the event commands get it as their event).
 class DinoEventLoop : public MProcess {
 public:
+    DinoEventLoop(u32 *result);
     virtual ~DinoEventLoop();
     virtual void Idle();
     MTask *CreateTalkTask(u32 id);
