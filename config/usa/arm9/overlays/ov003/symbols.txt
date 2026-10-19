@@ -40,7 +40,7 @@ _ZN10MCallTask1I19DinoUiRvInformationS0_16DinoCreatureInfoED0Ev kind:function(th
 _ZN10MCallTask1I19DinoUiRvInformationS0_16DinoCreatureInfoED1Ev kind:function(thumb,size=0x16) addr:0x02158340
 _ZN10MCallTask0I19DinoUiRvInformationS0_ED0Ev kind:function(thumb,size=0x1c) addr:0x02158358
 _ZN10MCallTask0I19DinoUiRvInformationS0_ED1Ev kind:function(thumb,size=0x16) addr:0x02158374
-func_ov003_0215838c kind:function(thumb,size=0xe4) addr:0x0215838c
+_ZN21DinoUiFieldMenuCursorC1EP9MSmartOam kind:function(thumb,size=0xe4) addr:0x0215838c
 _ZN21DinoUiFieldMenuCursorD1Ev kind:function(thumb,size=0x30) addr:0x02158470
 _ZN21DinoUiFieldMenuCursorD0Ev kind:function(thumb,size=0x34) addr:0x021584a0
 _ZN21DinoUiFieldMenuCursor7ExecuteEv kind:function(thumb,size=0x26) addr:0x021584d4

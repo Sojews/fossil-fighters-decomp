@@ -39,4 +39,4 @@ src/ov005/dino_ui_container_base_menu_item.cpp:
     .text       start:0x02162720 end:0x02163ddc
 
 src/ov005/dino_ui3_parts_cursor.cpp:
-    .text       start:0x02156334 end:0x02156380
+    .text       start:0x021562a8 end:0x02156380

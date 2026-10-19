@@ -5,8 +5,11 @@
 #include "m/view.h"
 
 // The field menu's cursor: two views (mMode picks the one shown) kept on one frame.
+class MSmartOam;
+
 class DinoUiFieldMenuCursor : public MView {
 public:
+    DinoUiFieldMenuCursor(MSmartOam *oam);
     virtual ~DinoUiFieldMenuCursor();
     virtual void Execute();
     virtual void SetPosition(MPoint pos);
