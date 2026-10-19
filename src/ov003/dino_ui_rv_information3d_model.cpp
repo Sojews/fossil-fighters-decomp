@@ -12,6 +12,7 @@
 #include "m/picture.h"
 #include "m/display.h"
 #include "m/lcd.h"
+#include "m/3d_model.h"
 
 DinoUiRvInformation3DModel::~DinoUiRvInformation3DModel() {
 }
@@ -140,4 +141,24 @@ extern "C" void func_ov003_02156eac(DinoUiRvInformation3DModel *model, MFx32 ang
     if (!out) {
         model->mAngle = angle;
     }
+}
+
+// The angle's index into the sine table.
+static inline int DinoDegToIdx(fx32 deg) {
+    return (u16)((deg << 4) / 360);
+}
+
+// Turns the model around its pivot by the angles.
+void DinoUiRvInformation3DModelRotate::Execute() {
+    MTX_Identity44(&mMtx);
+    MTX_TransApply44(&mMtx, &mMtx, 0, mPivotY, 0);
+    MtxFx44 rot;
+    MTX_RotX44(&rot, FX_SinIdx(DinoDegToIdx(mRotX)), FX_CosIdx(DinoDegToIdx(mRotX)));
+    MTX_Concat44(&rot, &mMtx, &mMtx);
+    MTX_RotY44(&rot, FX_SinIdx(DinoDegToIdx(mRotY)), FX_CosIdx(DinoDegToIdx(mRotY)));
+    MTX_Concat44(&rot, &mMtx, &mMtx);
+    MTX_RotZ44(&rot, FX_SinIdx(DinoDegToIdx(mRotZ)), FX_CosIdx(DinoDegToIdx(mRotZ)));
+    MTX_Concat44(&rot, &mMtx, &mMtx);
+    MTX_TransApply44(&mMtx, &mMtx, 0, -mPivotY, 0);
+    mOwner->mModel->mUnkC4 = &mMtx;
 }
