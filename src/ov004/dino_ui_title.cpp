@@ -36,6 +36,16 @@ DinoUiTitleSkip::~DinoUiTitleSkip() {
 DinoUiOpeningCloud::~DinoUiOpeningCloud() {
 }
 
+DinoUiOpeningChara::DinoUiOpeningChara(MSmartOam *oam, std::string path, MPoint unk78) : MProcess(NULL) {
+    mUnk78 = unk78;
+    mMotion = new MMotion(std::string(path), oam, 2, 1);
+    mMotion->SetPriority(0);
+    mMotion->SetAnchor(1);
+    mMotion->Play(1, 0);
+    mMotion->Show();
+    mParallel.AddTail(mMotion);
+}
+
 DinoUiOpeningChara::~DinoUiOpeningChara() {
 }
 
