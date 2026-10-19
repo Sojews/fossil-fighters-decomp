@@ -18,6 +18,7 @@
 #include "m/indicator.h"
 #include "game/dino_sound.h"
 #include "game/dino_battle_view2.h"
+#include "game/dino_static_init.h"
 
 DinoBattleViewKasekiPoint::~DinoBattleViewKasekiPoint() {
 }
@@ -376,3 +377,28 @@ void WaitKPCountTask::Execute() {
         Exit();
     }
 }
+
+// The file's static initialization (see dino_static_init.h).
+extern "C" u32 data_ov000_02191980[];
+extern "C" u32 data_ov000_021919ec[];
+extern "C" u32 data_ov000_021919fc[];
+static struct DinoBattleViewKasekiPointStaticInit {
+    DinoBattleViewKasekiPointStaticInit() {
+        DINO_POOL_WORD(data_ov000_02191900, 0x20) = 128;
+        DINO_POOL_WORD(data_ov000_02191900, 0x24) = 176;
+        DINO_POOL_WORD(data_ov000_02191900, 0x38) = 8;
+        DINO_POOL_WORD(data_ov000_02191900, 0x3c) = 150;
+        DINO_POOL_WORD(data_ov000_02191900, 0x30) = 64;
+        DINO_POOL_WORD(data_ov000_02191900, 0x34) = 112;
+        DINO_POOL_WORD(data_ov000_02191900, 0x18) = 48;
+        DINO_POOL_WORD(data_ov000_02191900, 0x1c) = 32;
+        DINO_POOL_WORD(data_ov000_02191980, 0x64) = 24;
+        DINO_POOL_WORD(data_ov000_02191980, 0x68) = 176;
+        DINO_POOL_WORD(data_ov000_021919ec, 0x0) = 231;
+        DINO_POOL_WORD(data_ov000_021919ec, 0x4) = 176;
+        DINO_POOL_WORD(data_ov000_02191980, 0x74) = 48;
+        DINO_POOL_WORD(data_ov000_02191980, 0x78) = 178;
+        DINO_POOL_WORD(data_ov000_021919fc, 0x0) = 240;
+        DINO_POOL_WORD(data_ov000_021919fc, 0x4) = 178;
+    }
+} sDinoBattleViewKasekiPointStaticInit;

@@ -17,6 +17,7 @@
 #include "game/dino_sound.h"
 #include "m/indicator.h"
 #include <string.h>
+#include "game/dino_static_init.h"
 
 extern "C" int data_ov000_021978dc;    // live ability menu BGs
 extern "C" const u32 data_0208a19c;     // frames before the ability menu takes input
@@ -283,3 +284,53 @@ void DinoBattleViewUiAbilityMenu::OnIdle() {
         mSerial.AddTail(task);
     }
 }
+
+// The file's static initialization (see dino_static_init.h).
+extern "C" u32 data_0208a36c[];
+extern "C" u32 data_0208a364[];
+extern "C" u32 data_ov000_0219492c[];
+extern "C" u32 data_ov000_021949ac[];
+extern "C" u32 data_0208a368[];
+static struct DinoBattleViewAbilityMenuBgStaticInit {
+    DinoBattleViewAbilityMenuBgStaticInit() {
+        DINO_POOL_WORD(data_ov000_0219482c, 0x8) = 128;
+        DINO_POOL_WORD(data_ov000_0219482c, 0xc) = 176;
+        DINO_POOL_WORD(data_ov000_021947ac, 0x40) = 8;
+        DINO_POOL_WORD(data_ov000_021947ac, 0x44) = 150;
+        DINO_POOL_WORD(data_ov000_021947ac, 0x28) = 64;
+        DINO_POOL_WORD(data_ov000_021947ac, 0x2c) = 112;
+        DINO_POOL_WORD(data_ov000_021947ac, 0x60) = 128;
+        DINO_POOL_WORD(data_ov000_021947ac, 0x64) = 32;
+        DINO_POOL_WORD(data_ov000_021947ac, 0x30) = 0;
+        DINO_POOL_WORD(data_ov000_021947ac, 0x34) = 24;
+        DINO_POOL_WORD(data_ov000_0219482c, 0x18) = 104;
+        DINO_POOL_WORD(data_ov000_0219482c, 0x1c) = 32;
+        DINO_POOL_WORD(data_ov000_0219482c, 0x0) = 116;
+        DINO_POOL_WORD(data_ov000_0219482c, 0x4) = 32;
+        DINO_POOL_WORD(data_ov000_0219482c, 0x20) = 39;
+        DINO_POOL_WORD(data_ov000_0219482c, 0x24) = 0;
+        DINO_POOL_WORD(data_ov000_021947ac, 0x58) = -91;
+        DINO_POOL_WORD(data_ov000_021947ac, 0x5c) = -6;
+        DINO_POOL_WORD(data_ov000_021947ac, 0x48) = 49;
+        DINO_POOL_WORD(data_ov000_021947ac, 0x4c) = -8;
+        DINO_POOL_WORD(data_ov000_0219492c, 0x74) = DINO_POOL_WORD(data_0208a36c, 0x0);
+        DINO_POOL_WORD(data_ov000_0219492c, 0x78) = 0;
+        DINO_POOL_WORD(data_ov000_0219492c, 0x7c) = 0;
+        DINO_POOL_WORD(data_ov000_021949ac, 0x0) = 127;
+        DINO_POOL_WORD(data_ov000_021949ac, 0x4) = 22;
+        DINO_POOL_WORD(data_ov000_021949ac, 0x8) = DINO_POOL_WORD(data_0208a368, 0x0);
+        DINO_POOL_WORD(data_ov000_021949ac, 0xc) = 123;
+        DINO_POOL_WORD(data_ov000_021949ac, 0x10) = 0;
+        DINO_POOL_WORD(data_ov000_021949ac, 0x14) = 145;
+        DINO_POOL_WORD(data_ov000_021949ac, 0x18) = 22;
+        DINO_POOL_WORD(data_ov000_021949ac, 0x1c) = DINO_POOL_WORD(data_0208a364, 0x0);
+        DINO_POOL_WORD(data_ov000_021949ac, 0x20) = 141;
+        DINO_POOL_WORD(data_ov000_021949ac, 0x24) = 0;
+        DINO_POOL_WORD(data_ov000_021949ac, 0x28) = 189;
+        DINO_POOL_WORD(data_ov000_021949ac, 0x2c) = 22;
+        DINO_POOL_WORD(data_ov000_0219492c, 0x24) = 0;
+        DINO_POOL_WORD(data_ov000_0219492c, 0x28) = 145;
+        DINO_POOL_WORD(data_ov000_0219492c, 0x2c) = 255;
+        DINO_POOL_WORD(data_ov000_0219492c, 0x30) = 164;
+    }
+} sDinoBattleViewAbilityMenuBgStaticInit;

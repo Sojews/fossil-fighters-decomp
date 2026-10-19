@@ -16,6 +16,7 @@
 #include "m/indicator.h"
 #include "m/oam_canvas.h"
 #include "game/dino_battle_view_class.h"
+#include "game/dino_static_init.h"
 
 inline InfoPanelWindow::InfoPanelWindow(MPictureFile *file, MSmartOam *oam) : MProcess(NULL), mOam(oam), mUnk7C(0) {
     mPicture = new MTextPicture(*file, 1, false);
@@ -188,3 +189,72 @@ DinoBattleViewPopNumber::DinoBattleViewPopNumber(DinoBattleView *view, MSmartOam
     }
     GetSerial()->AddTail(new MTimer(60), MTaskExitTransfer::Create(this));
 }
+
+// The file's static initialization (see dino_static_init.h).
+extern "C" u32 data_ov000_02194e0c[];
+extern "C" u32 data_ov000_02194e64[];
+extern "C" u32 data_ov000_02194e6c[];
+extern "C" u32 data_ov000_02194e74[];
+extern "C" u32 data_ov000_02194e8c[];
+extern "C" u32 data_ov000_02194eac[];
+extern "C" u32 data_ov000_02194eb4[];
+extern "C" u32 data_ov000_02194ebc[];
+extern "C" u32 data_ov000_02194ec4[];
+extern "C" u32 data_ov000_02194ecc[];
+extern "C" u32 data_ov000_02194e84[];
+extern "C" u32 data_ov000_02194e94[];
+extern "C" u32 data_ov000_02194e9c[];
+static struct InfoPanelWindowStaticInit {
+    InfoPanelWindowStaticInit() {
+        DINO_POOL_WORD(data_ov000_02194d8c, 0x68) = 128;
+        DINO_POOL_WORD(data_ov000_02194d8c, 0x6c) = 176;
+        DINO_POOL_WORD(data_ov000_02194d8c, 0x38) = 8;
+        DINO_POOL_WORD(data_ov000_02194d8c, 0x3c) = 150;
+        DINO_POOL_WORD(data_ov000_02194d8c, 0x50) = 64;
+        DINO_POOL_WORD(data_ov000_02194d8c, 0x54) = 112;
+        DINO_POOL_WORD(data_ov000_02194d8c, 0x18) = 96;
+        DINO_POOL_WORD(data_ov000_02194d8c, 0x1c) = 32;
+        DINO_POOL_WORD(data_ov000_02194d8c, 0x40) = 0;
+        DINO_POOL_WORD(data_ov000_02194d8c, 0x44) = 0;
+        DINO_POOL_WORD(data_ov000_02194d8c, 0x20) = 32;
+        DINO_POOL_WORD(data_ov000_02194d8c, 0x24) = 16;
+        DINO_POOL_WORD(data_ov000_02194d8c, 0x48) = 22;
+        DINO_POOL_WORD(data_ov000_02194d8c, 0x4c) = 29;
+        DINO_POOL_WORD(data_ov000_02194d8c, 0x60) = 84;
+        DINO_POOL_WORD(data_ov000_02194d8c, 0x64) = 29;
+        DINO_POOL_WORD(data_ov000_02194e0c, 0x50) = 32;
+        DINO_POOL_WORD(data_ov000_02194e0c, 0x54) = 48;
+        DINO_POOL_WORD(data_ov000_02194e64, 0x0) = 96;
+        DINO_POOL_WORD(data_ov000_02194e64, 0x4) = 48;
+        DINO_POOL_WORD(data_ov000_02194e6c, 0x0) = 32;
+        DINO_POOL_WORD(data_ov000_02194e6c, 0x4) = 66;
+        DINO_POOL_WORD(data_ov000_02194e74, 0x0) = 96;
+        DINO_POOL_WORD(data_ov000_02194e74, 0x4) = 66;
+        DINO_POOL_WORD(data_ov000_02194d8c, 0x30) = 24;
+        DINO_POOL_WORD(data_ov000_02194d8c, 0x34) = 6;
+        DINO_POOL_WORD(data_ov000_02194e8c, 0x18) = 34;
+        DINO_POOL_WORD(data_ov000_02194e8c, 0x1c) = 22;
+        DINO_POOL_WORD(data_ov000_02194eac, 0x0) = 105;
+        DINO_POOL_WORD(data_ov000_02194eac, 0x4) = 22;
+        DINO_POOL_WORD(data_ov000_02194eb4, 0x0) = 21;
+        DINO_POOL_WORD(data_ov000_02194eb4, 0x4) = 41;
+        DINO_POOL_WORD(data_ov000_02194ebc, 0x0) = 81;
+        DINO_POOL_WORD(data_ov000_02194ebc, 0x4) = 41;
+        DINO_POOL_WORD(data_ov000_02194ec4, 0x0) = 21;
+        DINO_POOL_WORD(data_ov000_02194ec4, 0x4) = 59;
+        DINO_POOL_WORD(data_ov000_02194ecc, 0x0) = 81;
+        DINO_POOL_WORD(data_ov000_02194ecc, 0x4) = 59;
+        DINO_POOL_WORD(data_ov000_02194e0c, 0x70) = 51;
+        DINO_POOL_WORD(data_ov000_02194e0c, 0x74) = 30;
+        DINO_POOL_WORD(data_ov000_02194e84, 0x0) = 43;
+        DINO_POOL_WORD(data_ov000_02194e84, 0x4) = 49;
+        DINO_POOL_WORD(data_ov000_02194e8c, 0x0) = 103;
+        DINO_POOL_WORD(data_ov000_02194e8c, 0x4) = 49;
+        DINO_POOL_WORD(data_ov000_02194e94, 0x0) = 43;
+        DINO_POOL_WORD(data_ov000_02194e94, 0x4) = 67;
+        DINO_POOL_WORD(data_ov000_02194e9c, 0x0) = 103;
+        DINO_POOL_WORD(data_ov000_02194e9c, 0x4) = 67;
+        DINO_POOL_WORD(data_ov000_02194d8c, 0x28) = 64;
+        DINO_POOL_WORD(data_ov000_02194d8c, 0x2c) = -16;
+    }
+} sInfoPanelWindowStaticInit;

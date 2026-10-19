@@ -5,6 +5,7 @@
 #include "game/dino_battle_view_class.h"
 #include "game/dino_battle_view_kaseki_point_menu.h"
 #include "game/enable_root_select_task.h"
+#include "game/dino_static_init.h"
 
 #pragma auto_inline off
 
@@ -140,3 +141,16 @@ MResource<DinoBattleViewData> DinoBattleViewDataLoad(std::string path) {
     return MResource<DinoBattleViewData>(path);
 }
 #pragma dont_inline reset
+
+// The file's static initialization (see dino_static_init.h).
+extern "C" u32 data_ov000_021914a0[];
+static struct DinoBattleViewStaticInit {
+    DinoBattleViewStaticInit() {
+        DINO_POOL_WORD(data_ov000_021914a0, 0x8) = 128;
+        DINO_POOL_WORD(data_ov000_021914a0, 0xc) = 176;
+        DINO_POOL_WORD(data_ov000_021914a0, 0x20) = 8;
+        DINO_POOL_WORD(data_ov000_021914a0, 0x24) = 150;
+        DINO_POOL_WORD(data_ov000_021914a0, 0x10) = 64;
+        DINO_POOL_WORD(data_ov000_021914a0, 0x14) = 112;
+    }
+} sDinoBattleViewStaticInit;

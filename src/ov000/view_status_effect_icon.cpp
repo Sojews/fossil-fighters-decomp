@@ -7,6 +7,7 @@
 #include "types.h"
 #include "m/smart_oam.h"
 #include "game/dino_resource.h"
+#include "game/dino_static_init.h"
 
 DinoBattleViewStatusEffectIcon::~DinoBattleViewStatusEffectIcon() {
 }
@@ -148,3 +149,26 @@ extern "C" u32 func_ov000_0217e298(const u32 *effect) {
     }
     return 0;
 }
+
+// The file's static initialization (see dino_static_init.h).
+extern "C" u32 data_ov000_02195234[];
+static struct ViewStatusEffectIconStaticInit {
+    ViewStatusEffectIconStaticInit() {
+        DINO_POOL_WORD(data_ov000_02195234, 0x2c) = 128;
+        DINO_POOL_WORD(data_ov000_02195234, 0x30) = 176;
+        DINO_POOL_WORD(data_ov000_02195234, 0x3c) = 8;
+        DINO_POOL_WORD(data_ov000_02195234, 0x40) = 150;
+        DINO_POOL_WORD(data_ov000_02195234, 0x44) = 64;
+        DINO_POOL_WORD(data_ov000_02195234, 0x48) = 112;
+        DINO_POOL_WORD(data_ov000_021952b4, 0x30) = DINO_POOL_WORD(data_ov000_02195234, 0x1c);
+        DINO_POOL_WORD(data_ov000_021952b4, 0x38) = DINO_POOL_WORD(data_ov000_02195234, 0x4);
+        DINO_POOL_WORD(data_ov000_021952b4, 0x40) = DINO_POOL_WORD(data_ov000_02195234, 0x18);
+        DINO_POOL_WORD(data_ov000_021952b4, 0x48) = DINO_POOL_WORD(data_ov000_02195234, 0x8);
+        DINO_POOL_WORD(data_ov000_021952b4, 0x50) = DINO_POOL_WORD(data_ov000_02195234, 0xc);
+        DINO_POOL_WORD(data_ov000_021952b4, 0x58) = DINO_POOL_WORD(data_ov000_02195234, 0x20);
+        DINO_POOL_WORD(data_ov000_021952b4, 0x60) = DINO_POOL_WORD(data_ov000_02195234, 0x24);
+        DINO_POOL_WORD(data_ov000_021952b4, 0x68) = DINO_POOL_WORD(data_ov000_02195234, 0x14);
+        DINO_POOL_WORD(data_ov000_021952b4, 0x70) = DINO_POOL_WORD(data_ov000_02195234, 0x10);
+        DINO_POOL_WORD(data_ov000_021952b4, 0x78) = DINO_POOL_WORD(data_ov000_02195234, 0x28);
+    }
+} sViewStatusEffectIconStaticInit;

@@ -3,6 +3,7 @@
 #include "types.h"
 #include "m/resource.h"
 #include "game/dino_battle_cpu_controller.h"
+#include "game/dino_static_init.h"
 
 // Resources the file loads (their data types are unknown); until the code that constructs them is decompiled,
 // these keep out-of-line copies of the constructors.
@@ -55,3 +56,15 @@ void DinoOv000FileGroupCtorAnchor(void *p) {
     new (p) DinoBattleFileGroup;
 }
 #pragma dont_inline reset
+
+// The file's static initialization (see dino_static_init.h).
+static struct Ov000021558a0StaticInit {
+    Ov000021558a0StaticInit() {
+        DINO_POOL_WORD(data_ov000_02190fa0, 0x34) = 128;
+        DINO_POOL_WORD(data_ov000_02190fa0, 0x38) = 176;
+        DINO_POOL_WORD(data_ov000_02190fa0, 0x14) = 8;
+        DINO_POOL_WORD(data_ov000_02190fa0, 0x18) = 150;
+        DINO_POOL_WORD(data_ov000_02190fa0, 0x24) = 64;
+        DINO_POOL_WORD(data_ov000_02190fa0, 0x28) = 112;
+    }
+} sOv000021558a0StaticInit;

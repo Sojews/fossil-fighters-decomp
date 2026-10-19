@@ -9,6 +9,7 @@
 #include "game/dino_message.h"
 #include "game/dino_battle_view_class.h"
 #include "types.h"
+#include "game/dino_static_init.h"
 
 DinoBattleViewTutorialWindow::~DinoBattleViewTutorialWindow() {
 }
@@ -92,3 +93,18 @@ extern "C" void func_ov000_0218e680(DinoBattleViewTutorialWindow *window) {
 extern "C" MTask *func_ov000_0218e6b0(DinoBattleViewTutorialWindow *window) {
     return new KeyWaitTask(window);
 }
+
+// The file's static initialization (see dino_static_init.h).
+extern "C" u32 data_ov000_02197560[];
+static struct DinoBattleTutorialStaticInit {
+    DinoBattleTutorialStaticInit() {
+        DINO_POOL_WORD(data_ov000_02197560, 0x34) = 216;
+        DINO_POOL_WORD(data_ov000_02197560, 0x38) = 48;
+        DINO_POOL_WORD(data_ov000_02197560, 0x24) = 128;
+        DINO_POOL_WORD(data_ov000_02197560, 0x28) = 176;
+        DINO_POOL_WORD(data_ov000_02197560, 0x14) = 8;
+        DINO_POOL_WORD(data_ov000_02197560, 0x18) = 150;
+        DINO_POOL_WORD(data_ov000_02197560, 0xc) = 64;
+        DINO_POOL_WORD(data_ov000_02197560, 0x10) = 112;
+    }
+} sDinoBattleTutorialStaticInit;

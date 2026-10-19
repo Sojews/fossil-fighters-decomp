@@ -10,6 +10,7 @@
 #include "game/set_live_one_shot_flag_task.h"
 #include "game/dino_common_live.h"
 #include "game/create_player_update_ability_icon_task.h"
+#include "game/dino_static_init.h"
 
 extern "C" void func_ov000_0215c174(DinoBattleModelField *field, u32 line);
 
@@ -70,3 +71,16 @@ extern "C" void func_ov000_0215c174(DinoBattleModelField *field, u32 line) {
 
 DinoBattleModelField::DinoBattleModelField() : MProcess(NULL), mLive(NULL), mUnkC4(0), mUnkD0(0) {
 }
+
+// The file's static initialization (see dino_static_init.h).
+extern "C" u32 data_ov000_021916e0[];
+static struct SendLocalMessageTaskStaticInit {
+    SendLocalMessageTaskStaticInit() {
+        DINO_POOL_WORD(data_ov000_021916e0, 0x8) = 128;
+        DINO_POOL_WORD(data_ov000_021916e0, 0xc) = 176;
+        DINO_POOL_WORD(data_ov000_021916e0, 0x18) = 8;
+        DINO_POOL_WORD(data_ov000_021916e0, 0x1c) = 150;
+        DINO_POOL_WORD(data_ov000_021916e0, 0x20) = 64;
+        DINO_POOL_WORD(data_ov000_021916e0, 0x24) = 112;
+    }
+} sSendLocalMessageTaskStaticInit;

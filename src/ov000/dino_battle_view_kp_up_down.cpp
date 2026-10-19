@@ -7,6 +7,7 @@
 #include "game/dino_battle_view_kp_up_down.h"
 #include "types.h"
 #include "game/info_panel_window.h"
+#include "game/dino_static_init.h"
 
 DinoBattleViewKPUpDown::~DinoBattleViewKPUpDown() {
 }
@@ -50,3 +51,24 @@ void WaitPopNumberTask::Execute() {
         Exit();
     }
 }
+
+// The file's static initialization (see dino_static_init.h).
+extern "C" u32 data_ov000_0219504c[];
+extern "C" u32 data_ov000_021950cc[];
+extern "C" u32 data_ov000_0219510c[];
+static struct DinoBattleViewKpUpDownStaticInit {
+    DinoBattleViewKpUpDownStaticInit() {
+        DINO_POOL_WORD(data_ov000_0219504c, 0x2c) = 128;
+        DINO_POOL_WORD(data_ov000_0219504c, 0x30) = 176;
+        DINO_POOL_WORD(data_ov000_0219504c, 0x1c) = 8;
+        DINO_POOL_WORD(data_ov000_0219504c, 0x20) = 150;
+        DINO_POOL_WORD(data_ov000_0219504c, 0xc) = 64;
+        DINO_POOL_WORD(data_ov000_0219504c, 0x10) = 112;
+        DINO_POOL_WORD(data_ov000_0219504c, 0x14) = 0;
+        DINO_POOL_WORD(data_ov000_0219504c, 0x18) = -12;
+        DINO_POOL_WORD(data_ov000_021950cc, 0x38) = 72;
+        DINO_POOL_WORD(data_ov000_021950cc, 0x3c) = 196;
+        DINO_POOL_WORD(data_ov000_0219510c, 0x0) = 184;
+        DINO_POOL_WORD(data_ov000_0219510c, 0x4) = 196;
+    }
+} sDinoBattleViewKpUpDownStaticInit;

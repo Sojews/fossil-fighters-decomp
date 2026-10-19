@@ -9,6 +9,7 @@
 #include "game/dino_battle_model.h"
 #include "game/dino_battle_view_class.h"
 #include "game/dino_message.h"
+#include "game/dino_static_init.h"
 
 extern "C" BOOL func_ov000_0218c354(void *obj);
 
@@ -42,3 +43,16 @@ BOOL DinoBattleLive::IsBusy() {
     }
     return FALSE;
 }
+
+// The file's static initialization (see dino_static_init.h).
+extern "C" u32 data_ov000_021974ac[];
+static struct DinoBattleLiveStaticInit {
+    DinoBattleLiveStaticInit() {
+        DINO_POOL_WORD(data_ov000_021974ac, 0x14) = 128;
+        DINO_POOL_WORD(data_ov000_021974ac, 0x18) = 176;
+        DINO_POOL_WORD(data_ov000_021974ac, 0x4) = 8;
+        DINO_POOL_WORD(data_ov000_021974ac, 0x8) = 150;
+        DINO_POOL_WORD(data_ov000_021974ac, 0xc) = 64;
+        DINO_POOL_WORD(data_ov000_021974ac, 0x10) = 112;
+    }
+} sDinoBattleLiveStaticInit;

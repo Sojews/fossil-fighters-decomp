@@ -9,6 +9,7 @@
 #include "types.h"
 #include "m/bg_new_task.h"
 #include "m/call_task.h"
+#include "game/dino_static_init.h"
 
 DinoBattleViewEffectTelop::~DinoBattleViewEffectTelop() {
 }
@@ -71,3 +72,15 @@ void SkipTelopTask::Idle() {
         mSerial.AddTail(MTaskExitTransfer::Create(this));
     }
 }
+
+// The file's static initialization (see dino_static_init.h).
+static struct DinoBattleViewEffectTelopStaticInit {
+    DinoBattleViewEffectTelopStaticInit() {
+        DINO_POOL_WORD(data_ov000_0219387c, 0x38) = 128;
+        DINO_POOL_WORD(data_ov000_0219387c, 0x3c) = 176;
+        DINO_POOL_WORD(data_ov000_0219387c, 0x48) = 8;
+        DINO_POOL_WORD(data_ov000_0219387c, 0x4c) = 150;
+        DINO_POOL_WORD(data_ov000_0219387c, 0x68) = 64;
+        DINO_POOL_WORD(data_ov000_0219387c, 0x6c) = 112;
+    }
+} sDinoBattleViewEffectTelopStaticInit;

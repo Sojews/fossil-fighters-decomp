@@ -3,6 +3,7 @@
 
 #include "game/dino_battle_model.h"
 #include "game/create_player_update_ability_icon_task.h"
+#include "game/dino_static_init.h"
 
 DinoBattleModel::~DinoBattleModel() {
 }
@@ -53,3 +54,16 @@ DinoBattleModelCreature *DinoBattleModel::FindCreature(u32 id) {
     }
     return NULL;
 }
+
+// The file's static initialization (see dino_static_init.h).
+extern "C" u32 data_ov000_0219140c[];
+static struct DinoBattleModelStaticInit {
+    DinoBattleModelStaticInit() {
+        DINO_POOL_WORD(data_ov000_0219140c, 0x1c) = 128;
+        DINO_POOL_WORD(data_ov000_0219140c, 0x20) = 176;
+        DINO_POOL_WORD(data_ov000_0219140c, 0x4) = 8;
+        DINO_POOL_WORD(data_ov000_0219140c, 0x8) = 150;
+        DINO_POOL_WORD(data_ov000_0219140c, 0xc) = 64;
+        DINO_POOL_WORD(data_ov000_0219140c, 0x10) = 112;
+    }
+} sDinoBattleModelStaticInit;

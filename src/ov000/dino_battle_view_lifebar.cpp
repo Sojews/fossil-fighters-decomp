@@ -8,6 +8,7 @@
 #include "types.h"
 #include "m/motion.h"
 #include "game/dino_battle_view_creature.h"
+#include "game/dino_static_init.h"
 
 DinoBattleViewLifebar::~DinoBattleViewLifebar() {
 }
@@ -253,3 +254,35 @@ void LifebarCoordAnime::Apply(int step) {
     MPoint pos = mValue;
     mLifebar->SetPosition(pos);
 }
+
+// The file's static initialization (see dino_static_init.h).
+extern "C" u32 data_ov000_021942f0[];
+extern "C" u32 data_ov000_02194370[];
+static struct DinoBattleViewLifebarStaticInit {
+    DinoBattleViewLifebarStaticInit() {
+        DINO_POOL_WORD(data_ov000_02194270, 0x58) = 128;
+        DINO_POOL_WORD(data_ov000_02194270, 0x5c) = 176;
+        DINO_POOL_WORD(data_ov000_02194270, 0x68) = 8;
+        DINO_POOL_WORD(data_ov000_02194270, 0x6c) = 150;
+        DINO_POOL_WORD(data_ov000_02194270, 0x50) = 64;
+        DINO_POOL_WORD(data_ov000_02194270, 0x54) = 112;
+        DINO_POOL_WORD(data_ov000_021942f0, 0x5c) = DINO_POOL_WORD(data_ov000_02194270, 0x20);
+        DINO_POOL_WORD(data_ov000_021942f0, 0x60) = DINO_POOL_WORD(data_ov000_02194270, 0x10);
+        DINO_POOL_WORD(data_ov000_021942f0, 0x64) = DINO_POOL_WORD(data_ov000_02194270, 0x1c);
+        DINO_POOL_WORD(data_ov000_021942f0, 0x68) = DINO_POOL_WORD(data_ov000_02194270, 0x48);
+        DINO_POOL_WORD(data_ov000_021942f0, 0x6c) = DINO_POOL_WORD(data_ov000_02194270, 0x4);
+        DINO_POOL_WORD(data_ov000_021942f0, 0x70) = DINO_POOL_WORD(data_ov000_02194270, 0x24);
+        DINO_POOL_WORD(data_ov000_021942f0, 0x74) = DINO_POOL_WORD(data_ov000_02194270, 0x40);
+        DINO_POOL_WORD(data_ov000_021942f0, 0x78) = DINO_POOL_WORD(data_ov000_02194270, 0x8);
+        DINO_POOL_WORD(data_ov000_021942f0, 0x7c) = DINO_POOL_WORD(data_ov000_02194270, 0x18);
+        DINO_POOL_WORD(data_ov000_02194370, 0x0) = DINO_POOL_WORD(data_ov000_02194270, 0x34);
+        DINO_POOL_WORD(data_ov000_02194370, 0x4) = DINO_POOL_WORD(data_ov000_02194270, 0x30);
+        DINO_POOL_WORD(data_ov000_02194370, 0x8) = DINO_POOL_WORD(data_ov000_02194270, 0x14);
+        DINO_POOL_WORD(data_ov000_02194370, 0xc) = DINO_POOL_WORD(data_ov000_02194270, 0x4c);
+        DINO_POOL_WORD(data_ov000_02194370, 0x10) = DINO_POOL_WORD(data_ov000_02194270, 0x28);
+        DINO_POOL_WORD(data_ov000_02194370, 0x14) = DINO_POOL_WORD(data_ov000_02194270, 0x44);
+        DINO_POOL_WORD(data_ov000_02194370, 0x18) = DINO_POOL_WORD(data_ov000_02194270, 0x3c);
+        DINO_POOL_WORD(data_ov000_02194370, 0x1c) = DINO_POOL_WORD(data_ov000_02194270, 0x2c);
+        DINO_POOL_WORD(data_ov000_02194370, 0x20) = DINO_POOL_WORD(data_ov000_02194270, 0xc);
+    }
+} sDinoBattleViewLifebarStaticInit;

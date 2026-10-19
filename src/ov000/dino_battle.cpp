@@ -16,6 +16,7 @@
 #include "m/bright.h"
 #include "m/display.h"
 #include "m/lcd.h"
+#include "game/dino_static_init.h"
 
 DinoBattle::~DinoBattle() {
     delete mUnk208;
@@ -213,3 +214,15 @@ void DinoBattle::StateSetupDisplays() {
     SetDisplay(gCurrentDisplay = gLcd->GetBottomDisplay());
     mState = data_ov000_021911ac.State0215a540_68;
 }
+
+// The file's static initialization (see dino_static_init.h).
+static struct DinoBattleStaticInit {
+    DinoBattleStaticInit() {
+        DINO_POOL_WORD(data_ov000_0219122c, 0x8) = 128;
+        DINO_POOL_WORD(data_ov000_0219122c, 0xc) = 176;
+        DINO_POOL_WORD(data_ov000_021911ac, 0x40) = 8;
+        DINO_POOL_WORD(data_ov000_021911ac, 0x44) = 150;
+        DINO_POOL_WORD(data_ov000_021911ac, 0x30) = 64;
+        DINO_POOL_WORD(data_ov000_021911ac, 0x34) = 112;
+    }
+} sDinoBattleStaticInit;

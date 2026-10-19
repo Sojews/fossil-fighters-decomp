@@ -8,6 +8,7 @@
 #include "game/dino_battle_view_creature.h"
 #include "game/dino_resource.h"
 #include "types.h"
+#include "game/dino_static_init.h"
 
 DinoBattleViewCreature::~DinoBattleViewCreature() {
 }
@@ -327,3 +328,19 @@ MPoint DinoBattleViewCreature::GetCoord() {
 MPoint DinoBattleViewCreature::GetMotionPosition() {
     return mMotion->GetPosition();
 }
+
+// The file's static initialization (see dino_static_init.h).
+static struct DinoBattleViewCreatureStaticInit {
+    DinoBattleViewCreatureStaticInit() {
+        DINO_POOL_WORD(data_ov000_02193030, 0x24) = 128;
+        DINO_POOL_WORD(data_ov000_02193030, 0x28) = 176;
+        DINO_POOL_WORD(data_ov000_02193030, 0x54) = 8;
+        DINO_POOL_WORD(data_ov000_02193030, 0x58) = 150;
+        DINO_POOL_WORD(data_ov000_02193030, 0x14) = 64;
+        DINO_POOL_WORD(data_ov000_02193030, 0x18) = 112;
+        DINO_POOL_WORD(data_ov000_02193030, 0x5c) = 0;
+        DINO_POOL_WORD(data_ov000_02193030, 0x60) = -18;
+        DINO_POOL_WORD(data_ov000_02193030, 0x4c) = 0;
+        DINO_POOL_WORD(data_ov000_02193030, 0x50) = 12;
+    }
+} sDinoBattleViewCreatureStaticInit;

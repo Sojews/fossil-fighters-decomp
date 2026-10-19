@@ -22,6 +22,7 @@
 #include "game/dino_battle_view_creature_info.h"
 #include "game/dino_battle_view_kaseki_point_menu.h"
 #include "game/dino_battle_view2.h"
+#include "game/dino_static_init.h"
 
 // The tutorial step for an action (or -1): a task to run, and whether the action is blocked.
 extern "C" MTask *func_ov000_0218ec8c(u32 arg0, int arg1, BOOL *blocked);
@@ -1248,3 +1249,46 @@ void DinoBattleViewUiCreatureInfoMenu::OnDecide(MMenuItem *item) {
     }
     GetItemCreature(item);
 }
+
+// The file's static initialization (see dino_static_init.h).
+extern "C" u32 data_ov000_02193c64[];
+extern "C" u32 data_ov000_02193cb0[];
+extern "C" u32 data_ov000_02193be4[];
+extern "C" u32 data_ov000_02193ce4[];
+extern "C" u32 data_ov000_02193d64[];
+static struct DinoBattleViewUiStaticInit {
+    DinoBattleViewUiStaticInit() {
+        DINO_POOL_WORD(data_ov000_02193ae4, 0x48) = 128;
+        DINO_POOL_WORD(data_ov000_02193ae4, 0x4c) = 176;
+        DINO_POOL_WORD(data_ov000_02193ae4, 0x20) = 8;
+        DINO_POOL_WORD(data_ov000_02193ae4, 0x24) = 150;
+        DINO_POOL_WORD(data_ov000_02193ae4, 0x30) = 64;
+        DINO_POOL_WORD(data_ov000_02193ae4, 0x34) = 112;
+        DINO_POOL_WORD(data_ov000_02193c64, 0x3c) = 4;
+        DINO_POOL_WORD(data_ov000_02193c64, 0x40) = 4;
+        DINO_POOL_WORD(data_ov000_02193c64, 0x44) = 124;
+        DINO_POOL_WORD(data_ov000_02193c64, 0x48) = 188;
+        DINO_POOL_WORD(data_ov000_02193cb0, 0x0) = 132;
+        DINO_POOL_WORD(data_ov000_02193cb0, 0x4) = 4;
+        DINO_POOL_WORD(data_ov000_02193cb0, 0x8) = 252;
+        DINO_POOL_WORD(data_ov000_02193cb0, 0xc) = 188;
+        DINO_POOL_WORD(data_ov000_02193be4, 0x2c) = 65;
+        DINO_POOL_WORD(data_ov000_02193be4, 0x30) = 113;
+        DINO_POOL_WORD(data_ov000_02193be4, 0x34) = 190;
+        DINO_POOL_WORD(data_ov000_02193be4, 0x38) = 190;
+        DINO_POOL_WORD(data_ov000_02193ae4, 0x58) = 0;
+        DINO_POOL_WORD(data_ov000_02193ae4, 0x5c) = 0;
+        DINO_POOL_WORD(data_ov000_02193ce4, 0x3c) = 48;
+        DINO_POOL_WORD(data_ov000_02193ce4, 0x40) = 16;
+        DINO_POOL_WORD(data_ov000_02193ce4, 0x58) = 48;
+        DINO_POOL_WORD(data_ov000_02193ce4, 0x5c) = 0;
+        DINO_POOL_WORD(data_ov000_02193ce4, 0x74) = -32;
+        DINO_POOL_WORD(data_ov000_02193ce4, 0x78) = 16;
+        DINO_POOL_WORD(data_ov000_02193d64, 0x10) = -48;
+        DINO_POOL_WORD(data_ov000_02193d64, 0x14) = 16;
+        DINO_POOL_WORD(data_ov000_02193d64, 0x2c) = -48;
+        DINO_POOL_WORD(data_ov000_02193d64, 0x30) = 0;
+        DINO_POOL_WORD(data_ov000_02193d64, 0x48) = 32;
+        DINO_POOL_WORD(data_ov000_02193d64, 0x4c) = 16;
+    }
+} sDinoBattleViewUiStaticInit;
