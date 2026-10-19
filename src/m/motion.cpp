@@ -714,6 +714,40 @@ void MMotion::SetCellOffsetY(int cell, int y) {
     entry->depth = 0x7FFF - posY;
 }
 
+// A cell's entry, without its place in the smart OAM's lists (the low 10 bits of links, and the block).
+static inline void CopyCellEntry(MSmartOamCell &to, const MSmartOamCell &from) {
+    to.attr01 = from.attr01;
+    to.attr2 = from.attr2;
+    to.unk08 = from.unk08;
+    to.unk0C = from.unk0C;
+    to.posX = from.posX;
+    to.posY = from.posY;
+    to.width = from.width;
+    to.height = from.height;
+    to.links = (to.links & 0x3FF) | (from.links & ~0x3FF);
+}
+
+// Reorders the cells' entries: data lists the cells in their new order (the rest keep theirs).
+void MMotion::Command(const char *data, int length) {
+    // (Raw bytes: the entries aren't constructed.)
+    u8 buf[sizeof(MSmartOamCell) * 16];
+    MSmartOamCell *saved = (MSmartOamCell *) buf;
+    u32 i;
+
+    for (i = 0; i < mCellCount; i++) {
+        CopyCellEntry(saved[i], mEntries[mCells[i].entry]);
+    }
+    for (i = 0; i < (u32) length; i++) {
+        mCells[(u8) data[i]].entry = i;
+    }
+    for (; i < mCellCount; i++) {
+        mCells[i].entry = i;
+    }
+    for (i = 0; i < mCellCount; i++) {
+        CopyCellEntry(mEntries[mCells[i].entry], saved[i]);
+    }
+}
+
 void MMotion::SetAnimeState(int index, int a, int b) {
     mUnk64[index].Set(a, b);
 }
