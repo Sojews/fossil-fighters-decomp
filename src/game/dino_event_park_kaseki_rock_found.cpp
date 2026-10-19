@@ -80,8 +80,12 @@ void DinoEventKasekiRockFound::StateBattle() {
     mState = data_020bd380.StateBattleEnd_18;
 }
 
+// The rock-found event's strings (in dino_event_kaseki_rock_found.cpp's data).
+extern "C" const char data_020bd5f4[];  // "/msg/msg_dig"
+extern "C" const char data_020bd604[];  // ""
+
 void DinoEventKasekiRockFound::StateBattleEnd() {
-    mMessages = MResource<DinoMessageData>("/msg/msg_dig");
+    mMessages = MResource<DinoMessageData>(data_020bd5f4);
     mBattleData = gDinoResource->LoadBattle(mBattle);
     if (gDinoBackup->GetFlag(0)) {
         mBattle = 0;
@@ -89,7 +93,7 @@ void DinoEventKasekiRockFound::StateBattleEnd() {
             mSerial.AddTail(new DinoEventTalkWindow(gCurrentDisplay,
                                                     mEvent->GetTalkText(((const u32 *)mBattleData.Get())[8]), 0, 0));
         }
-        mSerial.AddTail(CreateMessageBox(5));
+        mSerial.AddTail(CreateMessageBox(5, data_020bd604));
         mState = data_020bd380.StateFound_50;
         return;
     }
