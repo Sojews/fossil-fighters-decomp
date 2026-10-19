@@ -37,6 +37,7 @@ public:
 
     class MIndicator *CreateIndicator(class MSmartOam *oam, class MFont *font, MPoint size, MPoint pos);
     void CreateTexts(class MSmartOam *oam, class MFont *font);
+    void ShowCreature(u32 creature);
 
     void (UseCreatureSelect::*mState)(); // 0x74
     u32 mUnk7C;             // 0x7C

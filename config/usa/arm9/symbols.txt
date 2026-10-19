@@ -6708,6 +6708,8 @@ data_0208a2ec kind:data(any) addr:0x0208a2ec
 data_0208a2f0 kind:data(any) addr:0x0208a2f0
 data_0208a2fc kind:data(any) addr:0x0208a2fc
 data_0208a300 kind:data(any) addr:0x0208a300
+data_0208a330 kind:data(any) addr:0x0208a330
+data_0208a334 kind:data(any) addr:0x0208a334
 data_0208a338 kind:data(any) addr:0x0208a338
 data_0208a33c kind:data(any) addr:0x0208a33c
 data_0208a340 kind:data(any) addr:0x0208a340

@@ -9588,8 +9588,8 @@ from:0x021828f0 kind:thumb_call to:0x020051dc module:main
 from:0x0218291c kind:load to:0x020cb978 module:main
 from:0x02182920 kind:load to:0x0208a348 module:main
 from:0x02182924 kind:load to:0x02196238 module:overlay(0)
-from:0x02182928 kind:load to:0x0208a300 add:0x30 module:main
-from:0x0218292c kind:load to:0x0208a300 add:0x34 module:main
+from:0x02182928 kind:load to:0x0208a330 module:main
+from:0x0218292c kind:load to:0x0208a334 module:main
 from:0x02182930 kind:load to:0x02196240 module:overlay(0)
 from:0x02182940 kind:thumb_call to:0x0205329c module:main
 from:0x02182978 kind:load to:0x021961c0 add:0x8 module:overlay(0)
