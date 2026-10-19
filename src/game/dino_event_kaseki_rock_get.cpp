@@ -8,6 +8,9 @@
 #include "game/dino_backup.h"
 #include "m/lcd.h"
 #include "game/dino_common_window_message_box.h"
+#include "game/dino_common_window_yes_no_dialog.h"
+#include "game/dino_resource.h"
+#include "m/text_codec.h"
 
 DinoEventKasekiRockGet::~DinoEventKasekiRockGet() {
 }
@@ -73,6 +76,33 @@ MTask *DinoEventKasekiRockGet::CreateMessageBox(u32 message) {
     text = DinoReplaceTag(text, data_020bd370, mName);
     text = DinoReplaceTag(text, data_020bd378, mSwapName);
     return new DinoCommonWindowMessageBox(MPoint(128, 96), std::string(text), 4);
+}
+
+// The dialog's second pair of labels.
+extern "C" const u32 data_0208a67c, data_0208a678;
+
+// The mode's message as a yes/no question (or a one-frame wait if it has none), naming the rocks: its last two lines are
+// the answers.
+// NONMATCHING: the game copies the size before scaling it for the answers' addresses (as KasekiRockFound's).
+MTask *DinoEventKasekiRockGet::CreateYesNo(u32 message) {
+    u32 id = data_0208b260[mMode][message];
+    if (id == (u32)-1) {
+        return new MTimer(1);
+    }
+    const u8 *data = (const u8 *)mMessages.Get();
+    const u8 *entry = data + ((const u32 *)(data + ((const u32 *)data)[2]))[id];
+    std::string text((const char *)entry + ((const u32 *)entry)[1]);
+    text = DinoReplaceTag(text, data_020bd370, mName);
+    text = DinoReplaceTag(text, data_020bd378, mSwapName);
+    std::vector<std::string> lines = MSplitString(text, '\n');
+    std::string yes(*(lines.end() - 2));
+    std::string no(*(lines.end() - 1));
+    lines.erase(lines.end() - 2, lines.end());
+    text = MJoinStrings(lines, '\n');
+    DinoCommonWindowYesNoDialog *dialog = new DinoCommonWindowYesNoDialog(text, &mAnswer);
+    dialog->SetLabels(yes, no);
+    dialog->SetLabels2(std::string(gDinoResource->GetText(data_0208a67c)), std::string(gDinoResource->GetText(data_0208a678)));
+    return dialog;
 }
 
 void DinoEventKasekiRockGet::StateStart() {
