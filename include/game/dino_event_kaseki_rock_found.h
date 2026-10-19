@@ -4,11 +4,13 @@
 
 #include "m/task.h"
 #include "m/resource.h"
+#include "game/dino_backup.h"
 #include "m/geometry.h"
 
 class DinoEventLoop;
 
 struct DinoMessageData;
+class DinoFieldHole;
 
 class DinoEventKasekiRockFound : public MProcess {
 public:
@@ -18,6 +20,10 @@ public:
 
     void Start();
     MTask *CreateFoundMessage();
+    // The message (with the argument put into it) in a box.
+    MTask *CreateMessageBox(u32 index, const std::string &arg);
+    // Gives the player the rock.
+    void StateGet();
     MTask *CreateYesNo(u32 message);
     void StateFound();
     void StateFoundEnd();
@@ -28,7 +34,11 @@ public:
     DinoEventLoop *mEvent;      // 0x7C
     MPoint mPos;            // 0x80
     u32 mArg;               // 0x88
-    u32 mUnk8C[9];          // 0x8C
+    u32 mUnk8C;             // 0x8C
+    u32 mUnk90;             // 0x90
+    DinoBackupEntry mEntry; // 0x94: the rock found
+    u32 mUnkA8;             // 0xA8
+    DinoFieldHole *mHole;   // 0xAC: the hole the rock was dug out of
     MResource<DinoMessageData> mMessages;   // 0xB0: the digging messages
     MResource<DinoMessageData> mUnkC0;      // 0xC0
     u32 unkD0[2];

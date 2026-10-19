@@ -2692,7 +2692,7 @@ _ZNSt13__vec_deleterISsRSaISsEE12erase_at_endEmN10Metrowerks8int2typeILi0EEE_020
 _ZN24DinoEventKasekiRockFoundC1EP13DinoEventLoopm6MPoint kind:function(thumb,size=0x134) addr:0x02035b54
 _ZN24DinoEventKasekiRockFoundD1Ev kind:function(thumb,size=0x8c) addr:0x02035c88
 _ZN24DinoEventKasekiRockFoundD0Ev kind:function(thumb,size=0x94) addr:0x02035d14
-func_02035da8 kind:function(thumb,size=0xa4) addr:0x02035da8
+_ZN24DinoEventKasekiRockFound16CreateMessageBoxEmRKSs kind:function(thumb,size=0xa4) addr:0x02035da8
 _ZN24DinoEventKasekiRockFound18CreateFoundMessageEv kind:function(thumb,size=0x14c) addr:0x02035e4c
 _ZN24DinoEventKasekiRockFound11CreateYesNoEm kind:function(thumb,size=0x120) addr:0x02035f98
 _ZN24DinoEventKasekiRockFound4IdleEv kind:function(thumb,size=0x20) addr:0x020360b8
@@ -2701,7 +2701,7 @@ func_02036738 kind:function(thumb,size=0x3c0) addr:0x02036738
 _Z15MCreateCallTaskI12MPolygonCharS0_PKcS2_EP5MTaskPT_MT0_FvT1_T2_ES8_S9_ kind:function(thumb,size=0x48) addr:0x02036af8
 _ZN24DinoEventKasekiRockFound10StateFoundEv kind:function(thumb,size=0x24) addr:0x02036b40
 _ZN24DinoEventKasekiRockFound13StateFoundEndEv kind:function(thumb,size=0x2c) addr:0x02036b64
-func_02036b90 kind:function(thumb,size=0x44) addr:0x02036b90
+_ZN24DinoEventKasekiRockFound8StateGetEv kind:function(thumb,size=0x44) addr:0x02036b90
 func_02036bd4 kind:function(thumb,size=0x33c) addr:0x02036bd4
 _ZN24DinoEventKasekiRockFound8StateAskEv kind:function(thumb,size=0x2c) addr:0x02036f10
 _ZN24DinoEventKasekiRockFound13StateAnsweredEv kind:function(thumb,size=0x28) addr:0x02036f3c

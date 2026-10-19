@@ -8,6 +8,7 @@
 #include "game/dino_field.h"
 #include "game/dino_event_kaseki_rock_found.h"
 #include "game/dino_field_hole.h"
+#include "game/dino_event_exec.h"
 #include "nitro/mi.h"
 
 DinoEventParkKasekiRockFound::~DinoEventParkKasekiRockFound() {
@@ -22,7 +23,7 @@ extern "C" struct {
     u8 unk00[0x30];
     void (DinoEventKasekiRockFound::*Unk02037064_30)();
     u8 unk38[0x40 - 0x38];
-    void (DinoEventKasekiRockFound::*Unk02036b90_40)();
+    void (DinoEventKasekiRockFound::*StateGet_40)();
     u8 unk48[0x58 - 0x48];
     void (DinoEventKasekiRockFound::*StateAnswered_58)();
     void (DinoEventKasekiRockFound::*Unk02036f64_60)();
@@ -42,11 +43,19 @@ void DinoEventKasekiRockFound::StateFound() {
 }
 
 void DinoEventKasekiRockFound::StateFoundEnd() {
-    if (mUnk8C[0] != 0) {
+    if (mUnk8C != 0) {
         mState = data_020bd400.Unk02036bd4_28;
     } else {
-        mState = data_020bd380.Unk02036b90_40;
+        mState = data_020bd380.StateGet_40;
     }
+}
+
+void DinoEventKasekiRockFound::StateGet() {
+    if (mHole != NULL) {
+        mHole->StartChangeToHole();
+    }
+    MTask *exit = MTaskExitTransfer::Create(this);
+    GetSerial()->AddTail(new DinoEventKasekiRockGet(mEvent, 0, &mEntry, NULL), exit);
 }
 
 void DinoEventKasekiRockFound::StateAsk() {
