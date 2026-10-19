@@ -465,6 +465,7 @@ public:
     void SetResult(u32 result);
     void CloseField(BOOL arg);
     void OpenField(BOOL arg);
+    void CreateField();
     void MarkCameraUsed();
     DinoField *GetField();
     void Fade(u32 a, u32 b);

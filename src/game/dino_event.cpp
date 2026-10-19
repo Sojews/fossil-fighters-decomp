@@ -4,6 +4,8 @@
 #include "game/dino_field.h"
 #include "m/bg_new_task.h"
 #include "m/overlay.h"
+#include "game/dino_event_save_option.h"
+#include "game/dino_ui_save_option.h"
 #include "game/dino_backup.h"
 
 void DinoEventLoop::Idle() {
@@ -51,6 +53,27 @@ MTask *DinoEventLoop::CreateTalkTask(u32 id) {
 #pragma auto_inline off
 
 M_EXTERN_OVERLAY(ov001);
+M_EXTERN_OVERLAY(ov004);
+
+// Closes the field and opens the save option screen, starting it right away.
+void DinoEventSaveOption::OpenUi() {
+    mEvent->CloseField(FALSE);
+    MLoadOverlay(0, M_OVERLAY_ID(ov004));
+    mUi = new DinoUiSaveOption((u32)&mResult);
+    if (mUi->mState == MTask::STATE_RUN) {
+        mUi->Execute();
+    }
+    if (mUi->mState == MTask::STATE_RUN) {
+        mUi->Execute();
+    }
+}
+
+// Makes the field (without reading its state).
+void DinoEventLoop::CreateField() {
+    MLoadOverlay(0, M_OVERLAY_ID(ov001));
+    mField = new DinoField(&mUnk110, 0);
+    mParallel.AddTail(mField);
+}
 
 // Adds every episode the player has seen (from 1).
 void DinoEventLoop::AddSeenEpisodes() {
