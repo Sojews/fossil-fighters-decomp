@@ -30,3 +30,10 @@ MRect DinoBattleHelpBase::GetRect() {
 MRect DinoBattleHelpSupport::GetRect() {
     return mIcon->GetRect();
 }
+
+#pragma auto_inline off
+
+DinoBattleHelpBase::DinoBattleHelpBase(MDisplay *display, MRect rect, u32 textId) : MProcess(display) {
+    mRect = rect;
+    mTextId = textId;
+}

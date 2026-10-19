@@ -6,6 +6,7 @@
 // Derived destructors have their bases' destructor bodies inlined; auto-inlining the ones defined above does that.
 #pragma auto_inline on
 
+#include "m/lcd.h"
 #include "game/dino_sound.h"
 #include "game/dino_message.h"
 #include "game/dino_battle_view_ui_change_menu.h"
@@ -265,6 +266,27 @@ void DinoBattleViewUiCreatureInfoMenu::OnFocus(MMenuItem *item) {
         for (int i = 0; i < player->GetCreatureCount(); i++) {
             player->GetCreature(i)->SetAdvantage(NULL);
         }
+    }
+}
+
+// Where the creature info help is shown, and its text.
+extern "C" const MRect data_ov000_02193c10;
+extern "C" const u32 data_0208a3c4;
+
+static inline u8 GetUnk12CFlag(DinoBattleView *view) {
+    return ((const u8 *)view->GetUnk12C())[0xD];
+}
+
+void DinoBattleViewUiCreatureInfoMenu::OnStart() {
+    mParallel.AddTail(
+        new DinoBattleHelpCreatureInfo(gLcd->GetBottomDisplay(), data_ov000_02193c10, data_0208a3c4, this));
+    DinoBattleViewUiSelectAreaCommon::OnStart();
+    MTask *task = func_ov000_0218ec8c(((DinoBattleView *)mUnkEC)->GetUnk12C(), 0x19, 0);
+    if (task != NULL) {
+        mSerial.AddTail(task);
+    }
+    if (!GetUnk12CFlag((DinoBattleView *)mUnkEC)) {
+        mSerial.AddTail(DinoHelpBase::CreateEnableTask(this));
     }
 }
 

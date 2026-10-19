@@ -88,8 +88,12 @@ public:
 
 class DinoBattleHelpCreatureInfo : public DinoBattleHelpBase {
 public:
+    DinoBattleHelpCreatureInfo(MDisplay *display, MRect rect, u32 textId, DinoBattleViewUiSelectAreaCommon *menu)
+        : DinoBattleHelpBase(display, rect, textId), mMenu(menu) {}
     virtual ~DinoBattleHelpCreatureInfo();
     virtual const char *GetText();
+
+    DinoBattleViewUiSelectAreaCommon *mMenu;    // 0x94
 };
 
 class DinoFrameItem : public MMenuItem {
