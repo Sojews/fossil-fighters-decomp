@@ -471,6 +471,7 @@ public:
     MTask *CreateFadeWaitTask();
     void SetEpisodesChanged();
     void AddEpisode(u32 id);
+    void AddSeenEpisodes();
     void RemoveEpisode(u32 id);
     void ResetEpisode(u32 id);
     void ProcessEpisode(const std::map<u32, DinoEventEpisode>::iterator &it);

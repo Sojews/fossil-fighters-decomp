@@ -50,13 +50,21 @@ MTask *DinoEventLoop::CreateTalkTask(u32 id) {
 
 #pragma auto_inline off
 
-extern "C" void func_0203a4f4(DinoEventLoop *event);
 M_EXTERN_OVERLAY(ov001);
+
+// Adds every episode the player has seen (from 1).
+void DinoEventLoop::AddSeenEpisodes() {
+    for (u32 id = 1; id < gDinoResource->GetEpisodeCount(); id++) {
+        if (gDinoBackup->GetEpisodeSeen(id)) {
+            AddEpisode(id);
+        }
+    }
+}
 
 // Loads the field overlay and makes the field from the saved state.
 void DinoEventLoop::OpenField(BOOL arg) {
     if (arg) {
-        func_0203a4f4(this);
+        AddSeenEpisodes();
     }
     MLoadOverlay(0, M_OVERLAY_ID(ov001));
     mField = new DinoField(&mUnk110, 0);
