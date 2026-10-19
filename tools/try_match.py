@@ -57,7 +57,7 @@ def unit_ranges(src: Path) -> list[tuple[int, int]]:
 def compile_c(src: Path, out_dir: Path) -> Path:
     ninja = (ROOT / "build.ninja").read_text()
     cmd = re.search(r"rule cc\n  command = (.*?) -MD -c", ninja).group(1)
-    edge = re.search(rf"build \S+: cc(?:_partial)? {re.escape(str(src.relative_to(ROOT)))}(?: \|[^\n]*)?\n(?:  .*\n)*?  extra_cflags = (.*)\n", ninja)
+    edge = re.search(rf"build \S+: cc(?:_partial|_named)? {re.escape(str(src.relative_to(ROOT)))}(?: \|[^\n]*)?\n(?:  .*\n)*?  extra_cflags = (.*)\n", ninja)
     cmd = cmd.replace("$extra_cflags", edge.group(1) if edge else "")
     if os.environ.get("OPT"):           # Try other optimization flags: OPT=-O4,s
         cmd = cmd.replace("-O4,p", os.environ["OPT"])

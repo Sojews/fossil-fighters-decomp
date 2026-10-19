@@ -3,6 +3,7 @@
 #include "types.h"
 #include <exception>
 #include "exception_internal.h"
+#include <new>
 
 extern "C" {
 
@@ -453,4 +454,17 @@ void __end__catch(CatchInfo *ci) {
     }
 }
 
+}
+
+// The nothrow forms of new (MSL's new.cpp): a failed allocation gives NULL instead of throwing.
+void *operator new(size_t size, const std::nothrow_t &) throw() {
+    try {
+        return operator new(size);
+    } catch (...) {
+    }
+    return NULL;
+}
+
+void *operator new[](size_t size, const std::nothrow_t &nt) throw() {
+    return operator new(size, nt);
 }

@@ -10,11 +10,19 @@ namespace std {
     extern const nothrow_t nothrow;
 }
 
+// With exceptions on, these (and the predeclared deletes) say they throw nothing.
+#if __option(exceptions)
+#define _MSL_NO_THROW throw()
+#else
+#define _MSL_NO_THROW
+#endif
+
 void *operator new(size_t size);
-void *operator new[](size_t size, const std::nothrow_t &);
+void *operator new(size_t size, const std::nothrow_t &) _MSL_NO_THROW;
+void *operator new[](size_t size, const std::nothrow_t &) _MSL_NO_THROW;
 void *operator new[](size_t size);
-void operator delete(void *ptr);
-void operator delete[](void *ptr);
+void operator delete(void *ptr) _MSL_NO_THROW;
+void operator delete[](void *ptr) _MSL_NO_THROW;
 
 inline void *operator new(size_t length, void *ptr) {
 #pragma unused(length)
