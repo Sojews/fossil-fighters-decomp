@@ -26,6 +26,9 @@ public:
     void StateGet();
     // The rock isn't taken: says so, and fades the field out and back in.
     void StateLeave();
+    // Fights for the rock.
+    void StateBattle();
+    void State02037204();
     MTask *CreateYesNo(u32 message);
     void StateFound();
     void StateFoundEnd();
@@ -36,7 +39,7 @@ public:
     DinoEventLoop *mEvent;      // 0x7C
     MPoint mPos;            // 0x80
     u32 mArg;               // 0x88
-    u32 mUnk8C;             // 0x8C
+    u32 mBattle;            // 0x8C: the battle the rock starts, or 0
     u32 mUnk90;             // 0x90
     DinoBackupEntry mEntry; // 0x94: the rock found
     u32 mUnkA8;             // 0xA8

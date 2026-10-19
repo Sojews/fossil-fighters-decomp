@@ -20,8 +20,10 @@ void DinoEventParkKasekiRockFound::Idle() {
 
 // The TU's pooled pointer-to-member constants (see menu.cpp).
 extern "C" struct {
-    u8 unk00[0x30];
-    void (DinoEventKasekiRockFound::*Unk02037064_30)();
+    u8 unk00[0x18];
+    void (DinoEventKasekiRockFound::*State02037204_18)();
+    u8 unk20[0x30 - 0x20];
+    void (DinoEventKasekiRockFound::*StateBattle_30)();
     u8 unk38[0x40 - 0x38];
     void (DinoEventKasekiRockFound::*StateGet_40)();
     u8 unk48[0x58 - 0x48];
@@ -43,7 +45,7 @@ void DinoEventKasekiRockFound::StateFound() {
 }
 
 void DinoEventKasekiRockFound::StateFoundEnd() {
-    if (mUnk8C != 0) {
+    if (mBattle != 0) {
         mState = data_020bd400.Unk02036bd4_28;
     } else {
         mState = data_020bd380.StateGet_40;
@@ -66,6 +68,14 @@ void DinoEventKasekiRockFound::StateLeave() {
                          new DinoEventExecFade(mEvent, 0, 30, TRUE), MTaskExitTransfer::Create(this));
 }
 
+void DinoEventKasekiRockFound::StateBattle() {
+    mHole = NULL;
+    mMessages = MResource<DinoMessageData>();
+    mUnkC0 = MResource<DinoMessageData>();
+    mSerial.AddTail(new DinoEventExecBattle(mEvent, 0, mBattle, 0, -1));
+    mState = data_020bd380.State02037204_18;
+}
+
 void DinoEventKasekiRockFound::StateAsk() {
     mAnswer = 1;
     mSerial.AddTail(CreateYesNo(0xF));
@@ -76,7 +86,7 @@ void DinoEventKasekiRockFound::StateAnswered() {
     if (mAnswer == 0) {
         mState = data_020bd380.StateLeave_60;
     } else {
-        mState = data_020bd380.Unk02037064_30;
+        mState = data_020bd380.StateBattle_30;
     }
 }
 
