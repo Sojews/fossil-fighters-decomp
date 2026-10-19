@@ -6,6 +6,9 @@
 #include "game/help.h"
 #include "game/dino_ui_save_option_menu_item.h"
 
+class MSmartOam;
+class MTextPicture;
+
 class DinoUiSaveOptionMenu : public DinoHelpBase, public MMenu {
 public:
     DinoUiSaveOptionMenu(u32 arg);
@@ -17,13 +20,13 @@ public:
     void OnBackDecided();
     void OnOptionDecided();
     void OnSaveDecided();
-    u32 GetUnkB8();
+    MSmartOam *GetOam();
 
     u8 unkB3[1];     // members start in MMenu's tail padding
     u32 mUnkB4;      // 0xB4
-    u32 mUnkB8;      // 0xB8
+    MSmartOam *mOam; // 0xB8: the items' sprites
     MMenuItem *mItems[3]; // 0xBC
-    u32 mUnkC8;      // 0xC8
+    MTextPicture *mBg;  // 0xC8
     u8 mSilentFocus; // 0xCC
 };
 

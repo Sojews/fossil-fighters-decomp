@@ -5,6 +5,9 @@
 #pragma auto_inline on
 
 #include "m/obj.h"
+#include "m/picture.h"
+#include "m/smart_oam.h"
+#include "m/bright.h"
 #include "m/display.h"
 #include "m/lcd.h"
 #include "game/disp_blower_menu.h"
@@ -42,6 +45,32 @@ DinoUiSaveOptionOptionButton::~DinoUiSaveOptionOptionButton() {
 }
 
 DinoUiSaveOptionBackButton::~DinoUiSaveOptionBackButton() {
+}
+
+DinoUiSaveOptionMenuItem::DinoUiSaveOptionMenuItem(DinoUiSaveOptionMenu *owner, const std::string &path, MPoint pos,
+                                                   u32 textId) {
+    mOwner = owner;
+    mTextId = textId;
+    mMotion = new MMotion(std::string(path), mOwner->GetOam(), 2, 1);
+    mMotion->Play(1, 0);
+    mMotion->SetPosition(pos);
+    mMotion->Show();
+    mParallel.AddTail(mMotion);
+}
+
+void DinoUiSaveOptionMenu::OnStart() {
+    SetLinkFallback(TRUE);
+    mSilentFocus = TRUE;
+    if (mUnkB4 != 0) {
+        *(u32 *)mUnkB4 = 0;
+    }
+    mParallel.AddTail(mBg = new MTextPicture(std::string("image/save_option_select_bg"), TRUE, false));
+    mBg->Show();
+    mBg->SetPriority(3);
+    mOam = new MSmartOam(0x20, 0, 1);
+    AppendItem(1);
+    mSerial.AddTail(gLcd->mMain->mBright->CreateFadeInFromBlack(30, 0));
+    mParallel.AddTail(mOam);
 }
 
 MRect DinoUiSaveOptionMenuItem::GetRect() {
@@ -199,8 +228,8 @@ void DinoUiSaveOption::Idle() {
 #pragma auto_inline off
 
 
-u32 DinoUiSaveOptionMenu::GetUnkB8() {
-    return mUnkB8;
+MSmartOam *DinoUiSaveOptionMenu::GetOam() {
+    return mOam;
 }
 
 DinoUiSaveOption::DinoUiSaveOption(u32 arg) : MProcess(NULL), mUnk74(arg) {
