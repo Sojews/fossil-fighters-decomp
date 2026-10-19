@@ -71,7 +71,10 @@ extern "C" struct {
     MFx32 mRadius;          // 0x08: the ring's radius
     u8 unk0C[0x10 - 0xC];
     MFx32 mBigRadius;       // 0x10
-    u8 unk14[0x30 - 0x14];
+    u8 unk14[0x1C - 0x14];
+    int mInnerMin;          // 0x1C: the ring's inner edge lags this many frames at least
+    void (DinoCleaningHammerEffect::*StateClear_20)(); // 0x20
+    u8 unk28[0x30 - 0x28];
     void (DinoCleaningHammerEffect::*StateEnd_30)();
     u8 unk38[0x40 - 0x38];
     void (DinoCleaningHammerEffect::*State0215caf8_40)(); // 0x40
@@ -95,6 +98,28 @@ void DinoCleaningHammerEffect::StateStart() {
     mFrame = 0;
     mFrames = MFx32ToInt((mBig ? data_ov002_02164fb8.mBigRadius : data_ov002_02164fb8.mRadius) / mSpeed) - 1;
     mState = data_ov002_02164fb8.State0215caf8_40;
+}
+
+extern "C" fx32 FX_Sqrt(fx32 x);
+extern "C" void func_02068df4(MRasterWindow *window, MPoint center, int radius);  // cuts a disc out of the window
+
+static inline MFx32 DinoFxSqrt(MFx32 x) {
+    return MFx32::FromRaw(FX_Sqrt(x.v));
+}
+
+// The ring grows (fast, then slower): the window is the disc less the inner disc and the right edge.
+// NONMATCHING: 74%, the game divides first and passes the raw quotient to FX_Sqrt after making the multipliers.
+void DinoCleaningHammerEffect::State0215caf8() {
+    MFx32 ratio = MFx32(std::min(mFrame, mFrames - 1)) / MFx32(mFrames);
+    int outer = MFx32ToInt(DinoFxSqrt(ratio) * MFx32(mFrames) * MFx32(8));
+    ratio = MFx32(std::max(mFrame - 2, data_ov002_02164fb8.mInnerMin)) / MFx32(mFrames);
+    MFx32 inner = DinoFxSqrt(ratio) * MFx32(mFrames) * MFx32(8);
+    mWindow->SetCircle(mCenter, outer);
+    func_02068df4(mWindow, mCenter, MFx32ToInt(inner));
+    mWindow->SubtractRect(MRect(255, 0, 256, 192));
+    if (mFrame++ > mFrames + 2) {
+        mState = data_ov002_02164fb8.StateClear_20;
+    }
 }
 
 void DinoCleaningHammerEffect::StateClear() {

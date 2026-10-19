@@ -1476,7 +1476,7 @@ from:0x0215cbd0 kind:thumb_call to:0x0206876c module:main
 from:0x0215cbe4 kind:thumb_call to:0x02068df4 module:main
 from:0x0215cc10 kind:thumb_call to:0x02068698 module:main
 from:0x0215cc44 kind:load to:0x02164fb8 module:overlay(2)
-from:0x0215cc48 kind:load to:0x02164fd4 module:overlay(2)
+from:0x0215cc48 kind:load to:0x02164fb8 add:0x1c module:overlay(2)
 from:0x0215cc54 kind:thumb_call to:0x02052e38 module:main
 from:0x0215cc64 kind:thumb_call to:0x020680d4 module:main
 from:0x0215cc76 kind:thumb_call to:0x02068220 module:main

@@ -17,9 +17,10 @@ public:
     void StateClear();
 
     void (DinoCleaningHammerEffect::*mState)(); // 0x74
-    u8 unk7C[0x88 - 0x7C];
+    u8 unk7C[0x80 - 0x7C];
+    MPoint mCenter;             // 0x80
     u8 mBig;                    // 0x88: the strong hit's ring
-    u32 mFrame;                 // 0x8C
+    int mFrame;                 // 0x8C
     int mFrames;                // 0x90
     MRasterWindow *mWindow;     // 0x94
     u32 unk98;
