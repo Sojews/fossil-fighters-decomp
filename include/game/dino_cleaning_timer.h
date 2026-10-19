@@ -16,6 +16,7 @@ public:
     void Start();
     void Stop();
     void Pause();
+    BOOL IsAtStart();
     int GetSeconds();
     int GetRemainingFrames();
     virtual ~DinoCleaningTimer();

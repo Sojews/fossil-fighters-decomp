@@ -13,6 +13,34 @@ DinoCleaningTimer::~DinoCleaningTimer() {
 
 #pragma auto_inline off
 
+// The TU's pooled pointer-to-member constants (see menu.cpp).
+extern "C" struct {
+    u8 unk00[0x10];
+    void (DinoCleaningTimer::*Stopped_10)();
+    void (DinoCleaningTimer::*Paused_18)();
+    void (DinoCleaningTimer::*Done_20)();
+    u8 unk28[0x48 - 0x28];
+    void (DinoCleaningTimer::*Running_48)();
+} data_ov002_02164c74;
+
+void DinoCleaningTimer::Start() {
+    mState = data_ov002_02164c74.Running_48;
+}
+
+void DinoCleaningTimer::Stop() {
+    DinoSoundPlaySe(0x45, 0);
+    mState = data_ov002_02164c74.Stopped_10;
+}
+
+void DinoCleaningTimer::Pause() {
+    mState = data_ov002_02164c74.Paused_18;
+}
+
+// Whether no time has passed yet.
+BOOL DinoCleaningTimer::IsAtStart() {
+    return mFrames == 0;
+}
+
 int DinoCleaningTimer::GetRemainingFrames() {
     return mLimit - mFrames;
 }
@@ -20,12 +48,6 @@ int DinoCleaningTimer::GetRemainingFrames() {
 int DinoCleaningTimer::GetSeconds() {
     return mFrames / 60;
 }
-
-// The TU's pooled pointer-to-member constants (see menu.cpp).
-extern "C" struct {
-    u8 unk00[0x20];
-    void (DinoCleaningTimer::*Done_20)();
-} data_ov002_02164c74;
 
 // A second more per frame until the time is up.
 void DinoCleaningTimer::StateExtend() {
