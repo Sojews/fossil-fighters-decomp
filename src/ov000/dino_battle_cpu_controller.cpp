@@ -8,6 +8,8 @@
 #include "game/create_player_update_ability_icon_task.h"
 #include "game/dino_resource.h"
 #include "game/dino_common_live.h"
+#include <map>
+#include "m/fx32.h"
 
 #pragma auto_inline off
 
@@ -128,8 +130,35 @@ BOOL DinoBattleCpuController::SupportHasStatus(DinoBattleModelPlayer *player, u3
     return FALSE;
 }
 
-// The list's vector members the game emits in this file.
+// A move the computer weighs, kept in a multimap by its (fixed-point) score (16 bytes; only its size is known). Its destructor
+// isn't trivial: the game's tree has the header's unused word (see <tree>).
+struct DinoBattleCpuCandidate {
+    ~DinoBattleCpuCandidate() {}
+    u32 unk[4];
+};
+typedef std::multimap<MFx32, DinoBattleCpuCandidate> DinoBattleCpuCandidates;
+typedef std::__red_black_tree<MFx32, DinoBattleCpuCandidates::value_type,
+                              std::__select_first<DinoBattleCpuCandidates::value_type>, std::less<MFx32>,
+                              std::allocator<DinoBattleCpuCandidates::value_type> >
+    DinoBattleCpuCandidateTree;
+
+// The list's vector members and the candidate tree's members the game emits in this file.
 #pragma auto_inline off
+template DinoBattleCpuCandidateTree::node_base *DinoBattleCpuCandidateTree::upper_bound(const MFx32 &k, node_base *x,
+                                                                                       node_base *y);
+template DinoBattleCpuCandidateTree::node_base *DinoBattleCpuCandidateTree::lower_bound(const MFx32 &k, node_base *x,
+                                                                                       node_base *y);
+template std::pair<DinoBattleCpuCandidateTree::iterator, DinoBattleCpuCandidateTree::iterator>
+DinoBattleCpuCandidateTree::equal_range(const MFx32 &k);
 template class std::__vec_deleter<DinoBattleCpuEntry, std::allocator<DinoBattleCpuEntry> >;
+template DinoBattleCpuCandidateTree::iterator DinoBattleCpuCandidateTree::insert_equal(const value_type &v);
+template void DinoBattleCpuCandidateTree::clear();
+template DinoBattleCpuCandidateTree::node_base *DinoBattleCpuCandidateTree::insert_node_at(node_base *parent, bool left,
+                                                                                          bool leftmost,
+                                                                                          const value_type &v);
+template void DinoBattleCpuCandidateTree::destroy(node_base *n);
+template DinoBattleCpuCandidateTree::~__red_black_tree();
+template DinoBattleCpuCandidateTree::node_base *
+DinoBattleCpuCandidateTree::find_insert_position(const MFx32 &k, node_base *&last_not_greater, bool &left, bool &leftmost);
 
 template MTask *DinoCreatePostAndWaitTask(MMessageObserver *target, DinoBattleViewWaitActionInfoBarRequest *msg);
