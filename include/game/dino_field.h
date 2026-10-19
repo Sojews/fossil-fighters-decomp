@@ -70,11 +70,22 @@ public:
     u32 mUnkDC;                     // 0xDC
     u8 unkE0[0xE4 - 0xE0];
     u32 mFocus;                     // 0xE4: the character followed
-    u32 mUnkE8;                     // 0xE8
+    MTask *mUnkE8;                  // 0xE8
     s32 mUnkEC;                     // 0xEC
     u32 mUnkF0[2];                  // 0xF0
     u8 mTracking;                   // 0xF8
-    u8 unkF9[0x144 - 0xF9];
+    u8 unkF9[0x11C - 0xF9];
+    // What Write saved of a rotation in progress (Read restarts it).
+    u16 mSavedD4;                   // 0x11C
+    u16 mSavedD6;                   // 0x11E
+    u16 mSavedD8;                   // 0x120
+    u8 unk122[2];
+    u32 mSavedDC;                   // 0x124
+    u16 mSavedRotate[3];            // 0x128
+    u8 unk12E[2];
+    u32 mSavedRotateArgs[3];        // 0x130
+    s32 mSavedSteps;                // 0x13C
+    u8 unk140[0x144 - 0x140];
     DinoFieldNamePanel *mNamePanel; // 0x144
     MFx32 mUnk148;                  // 0x148
     u8 mHeightSet;                  // 0x14C

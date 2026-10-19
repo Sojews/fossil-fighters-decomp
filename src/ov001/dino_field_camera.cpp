@@ -74,3 +74,21 @@ void DinoFieldCamera::SetUnkD4(u16 a, u16 b, u16 c, u32 d) {
 MFx32 DinoFieldCamera::GetUnk148() {
     return mUnk148;
 }
+
+void DinoFieldCamera::Read(const void *buf) {
+    MSerializer::Read(buf);
+    if (mSavedSteps != 0) {
+        mUnkD4 = mSavedD4;
+        mUnkD6 = mSavedD6;
+        mUnkD8 = mSavedD8;
+        mUnkDC = mSavedDC;
+        StartRotate(mSavedRotate[0], mSavedRotate[1], mSavedRotate[2], mSavedRotateArgs[0], mSavedRotateArgs[1],
+                    mSavedRotateArgs[2]);
+        for (s32 i = mSavedSteps; i >= 0; i--) {
+            if (mUnkE8->mState == MTask::STATE_RUN) {
+                mUnkE8->Execute();
+            }
+        }
+    }
+    NotifyHooks1();
+}
