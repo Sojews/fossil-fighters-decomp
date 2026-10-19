@@ -10,6 +10,7 @@ struct DinoTeam;
 class MSmartOam;
 class DinoUiPartsReviverMedalButton;
 class DinoUiStatusMenuItem;
+class MView;
 class DinoUiPartsTeamTech;
 
 class DinoUiStatusMenu : public DinoHelpBase, public MMenu {
@@ -25,6 +26,7 @@ public:
     void SelectTab(int tab);
     void DecideMember(int index);
     void SelectMember(int index);
+    void HandleMemberResult();
     void ClearItems();
     void CreateItems();
     void RefreshItems();
@@ -40,7 +42,9 @@ public:
     MMenuItem *mTabItems[3];    // 0xC0
     u32 mUnkCC[2];              // 0xCC
     DinoUiPartsReviverMedalButton *mMembers[5];     // 0xD4
-    u8 unkE8[0x108 - 0xE8];
+    u8 unkE8[0xF4 - 0xE8];
+    MView *mMenuBack;           // 0xF4: behind the member menu
+    u8 unkF8[0x108 - 0xF8];
     MTaskSet *mUnk108;          // 0x108
     u32 mUnk10C;                // 0x10C
     u32 unk110;

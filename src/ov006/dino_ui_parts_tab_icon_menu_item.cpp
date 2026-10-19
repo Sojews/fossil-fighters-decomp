@@ -15,6 +15,9 @@
 #include "m/call_task.h"
 #include "game/dino_sound.h"
 #include "m/lcd.h"
+#include "m/view.h"
+#include "game/dino_resource.h"
+#include "game/dino_common_window_menu_item_flush_task_menu.h"
 #include "m/bright.h"
 #include "m/smart_oam.h"
 #include "m/motion.h"
@@ -103,10 +106,12 @@ void DinoUiStatusOKButton::OnDecide() {
 
 // Template task instances the game emits in this file. Until the code that makes the tasks is decompiled, they are
 // instantiated explicitly.
+#pragma auto_inline off
 template class MCallTask0<DinoUiStatusMenu, DinoUiStatusMenu>;
 template MTask *MCreateCallTask(DinoUiStatusMenu *obj, void (DinoUiStatusMenu::*func)());
 template class MCallTask0<DinoUiStatusChangeModeHelpTask, DinoHelpBase>;
 template MTask *MCreateCallTask(DinoUiStatusChangeModeHelpTask *obj, void (DinoHelpBase::*func)());
+#pragma auto_inline reset
 
 void DinoUiStatusBackButton::OnDecide() {
     mMotion->Play(4, 1);
@@ -356,4 +361,26 @@ void DinoUiStatusMenu::SelectTab(int tab) {
         break;
     }
     }
+}
+
+// Where things go on the screen (filled in at start).
+struct DinoUiStatusLayout {
+    u8 unk00[0x14];
+    MPoint memberMenuOffset;    // 0x14: from the member's medal
+};
+extern DinoUiStatusLayout data_ov006_02190e9c;
+extern const u32 data_0208aad4, data_0208aad8, data_0208aadc;
+extern const u32 data_0208a878, data_0208a87c, data_0208a880;
+
+// The menu for a team member.
+void DinoUiStatusMenu::SelectMember(int index) {
+    mUnk120 = 0;
+    mMenuBack->Hide();
+    DinoCommonWindowMenu *menu = new DinoCommonWindowMenu(
+        &mUnk120, data_ov006_02191000[index] + data_ov006_02190e9c.memberMenuOffset, NULL, 0);
+    menu->AddChoice(1, gDinoResource->GetText(data_0208aadc), gDinoResource->GetText(data_0208a880));
+    menu->AddChoice(2, gDinoResource->GetText(data_0208aad8), gDinoResource->GetText(data_0208a87c));
+    menu->AddChoice(-2, gDinoResource->GetText(data_0208aad4), gDinoResource->GetText(data_0208a878));
+    GetSerial()->AddTail(menu, mMenuBack->CreateShowTransfer(),
+                         MCreateCallTask(this, &DinoUiStatusMenu::HandleMemberResult));
 }
