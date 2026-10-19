@@ -45,10 +45,7 @@ public:
     u32 mUnk10C;                // 0x10C
     u32 unk110;
     int *mResult;               // 0x114
-    struct Team {
-        u8 unk00[0x22];
-        u8 pickable[5];         // 0x22
-    } *mTeam;                   // 0x118
+    DinoTeam *mTeam;            // 0x118
     u32 mUnk11C;                // 0x11C
     u32 mUnk120;                // 0x120
     int mSelected;              // 0x124

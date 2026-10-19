@@ -4,6 +4,7 @@
 // Derived destructors have their bases' destructor bodies inlined; auto-inlining the ones defined above does that.
 #pragma auto_inline on
 
+#include <algorithm>
 #include "game/dino_ui_parts_reviver_medal_button.h"
 #include "game/dino_ui_parts_tab_icon_menu_item_menu.h"
 #include "game/dino_ui_parts_tab_icon_menu_item.h"
@@ -22,7 +23,7 @@
 
 #pragma auto_inline off
 DinoUiStatusMenu::DinoUiStatusMenu(int *choice, DinoTeam *team, DinoTeam *team2)
-    : MMenu(gLcd->GetBottomDisplay(), NULL, 0), mResult(choice), mTeam((Team *)team), mUnk11C((u32)team2), mUnk120(0),
+    : MMenu(gLcd->GetBottomDisplay(), NULL, 0), mResult(choice), mTeam(team), mUnk11C((u32)team2), mUnk120(0),
       mSelected(0), mMode(0), mUnk12D(0) {
 }
 #pragma auto_inline on
@@ -128,7 +129,7 @@ void DinoUiStatusMenu::OnDecide(MMenuItem *item) {
         if (item == mMembers[i]) {
             if (mMode == 1) {
                 DecideMember(i);
-            } else if (mTeam->pickable[i]) {
+            } else if (mTeam->slots[i]) {
                 mSelected = i;
                 SelectMember(i);
             }
@@ -176,13 +177,13 @@ void DinoUiStatusMenu::ClearItems() {
 
 // The OK button lights up when the first member can be picked; the technique shows when the team has one.
 void DinoUiStatusMenu::RefreshOKButton() {
-    if (mTeam->pickable[0]) {
+    if (mTeam->slots[0]) {
         mOKButton->mMotion->GetUnit()->SetMode(1);
     } else {
         mOKButton->mMotion->GetUnit()->SetMode(0);
     }
     if (!gDinoBackup->GetSystemFlag(2)) {
-        if (DinoTeamHasTech((const DinoTeam *)mTeam)) {
+        if (DinoTeamHasTech(mTeam)) {
             mTech->Show();
         } else {
             mTech->Hide();
@@ -205,4 +206,48 @@ void DinoUiStatusMenu::RefreshItems() {
     }
     mUnk108->Clear();
     mUnk10C = 0;
+}
+
+// (Data the item positions come from.)
+extern "C" const MPoint data_ov006_02191000[5];
+extern const u32 kCreatureLevelLimits[2];
+
+// A creature's experience, up to what the top level needs.
+static inline u32 GetCreatureTotal(const DinoCreatureState &creature) {
+    if (creature.parts[0].level == 0) {
+        return 0;
+    }
+    u32 sum = creature.unk0_8 + (creature.parts[0].level + creature.parts[1].level + creature.parts[2].level +
+                                 creature.parts[3].level);
+    return std::min(kCreatureLevelLimits[0] * 11 + 50, sum);
+}
+
+static inline u32 GetCreatureLevel(const DinoCreatureState &creature) {
+    if (creature.parts[0].level == 0) {
+        return 0;
+    }
+    return (GetCreatureTotal(creature) - 50) / kCreatureLevelLimits[0] + 1;
+}
+
+void DinoUiStatusMenu::CreateItems() {
+    for (int i = 0; i < 5; i++) {
+        DinoCreatureState creature;
+        gDinoBackup->GetCreature(mTeam->slots[i], &creature);
+        u8 maxed;
+        if (GetCreatureLevel(creature) == 12) {
+            maxed = TRUE;
+        } else {
+            maxed = FALSE;
+        }
+        mMembers[i] = new DinoUiPartsReviverMedalButton(mOam, data_ov006_02191000[i], mTeam->slots[i], maxed, 0);
+        AddItem(mMembers[i]);
+        mMembers[i]->SetMode(2);
+        AddLink(mMembers[i], 2, mTabItems[0]);
+        AddLink(mMembers[i], 4, mUnkB8);
+    }
+    AddLink(mTabItems[0], 2, mMembers[0]);
+    AddLink(mTabItems[1], 2, mMembers[0]);
+    AddLink(mTabItems[2], 2, mMembers[0]);
+    AddLink(mOKButton, 2, mMembers[0]);
+    AddLink(mUnkB8, 2, mMembers[0]);
 }
