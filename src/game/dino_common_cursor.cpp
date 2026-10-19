@@ -1,7 +1,26 @@
 // DinoCommonCursor.
-// Only the destructor is decompiled so far.
+// NONMATCHING: the constructor (the game keeps &mCorners[i] in a stack slot across the path string's destructor).
 
 #include "game/dino_common_cursor.h"
+#include "m/motion.h"
+
+// The TU's pooled constants.
+extern "C" struct {
+    u8 unk00[4];
+    const char *mPath;  // 0x04
+} data_020bb288;
+// The corners' animations.
+extern "C" const int data_0208ae20[4];
+
+DinoCommonCursor::DinoCommonCursor(MSmartOam *oam) {
+    mFrame = MRect(0, 0, 0, 0);
+    for (u32 i = 0; i < 4; i++) {
+        mCorners[i] = new MMotion(std::string(data_020bb288.mPath), oam, 0, 1);
+        mCorners[i]->Play(data_0208ae20[i], 0);
+        mCorners[i]->SetAnchor(2);
+        mTasks.AddTail(mCorners[i]);
+    }
+}
 
 DinoCommonCursor::~DinoCommonCursor() {
 }

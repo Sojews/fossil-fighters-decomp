@@ -6,6 +6,7 @@
 #include "m/task.h"
 
 class MSmartOam;
+class MMotion;
 
 class DinoCommonCursor : public MView {
 public:
@@ -24,8 +25,8 @@ public:
     virtual u32 GetPlaneMask();
     void Layout();
 
-    MSerialTaskSet mTasks;  // 0x10
-    MView *mCorners[4];     // 0x40: top left, bottom left, top right, bottom right
+    MParallelTaskSet mTasks;    // 0x10
+    MMotion *mCorners[4];   // 0x40: top left, bottom left, top right, bottom right
     MRect mFrame;           // 0x50
 };
 

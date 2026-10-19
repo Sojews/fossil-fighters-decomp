@@ -11,6 +11,8 @@
 #include "m/lcd.h"
 #include "m/bright.h"
 #include "m/display.h"
+#include "m/bg.h"
+#include "m/obj.h"
 #include "game/dino_sound.h"
 #include "game/dino_ui_museum_3d_model.h"
 #include "m/bg_new_task.h"
@@ -155,6 +157,24 @@ void DinoUiMuseumInformationPageLButton::OnDecide() {
 DinoUiMuseum::DinoUiMuseum() : MProcess(gLcd->mSub) {
 }
 
+void DinoUiMuseum::Idle() {
+    gLcd->mMain->ResetHooks();
+    gLcd->mMain->Setup(5, 0, 3, 1, 1, 1);
+    gLcd->mMain->mBg->SetBg0Reserved(1);
+    gLcd->mMain->SetBackdrop(0x8000);
+    gLcd->mMain->mObj->Show();
+    gLcd->mSub->ResetHooks();
+    gLcd->mSub->Setup(5, 2, 4, 1, 0, 0);
+    gLcd->mSub->SetBackdrop(0x8000);
+    gLcd->mSub->mObj->Show();
+    gLcd->VSyncNow();
+    gLcd->SetBottomDisplay(gLcd->mSub);
+    gCurrentDisplay = gLcd->GetBottomDisplay();
+    gLcd->GetTopDisplay()->mBright->Reset();
+    gLcd->GetBottomDisplay()->mBright->Reset();
+    GetSerial()->AddTail(new DinoUiMuseumMenu, MTaskExitTransfer::Create(this));
+}
+
 DinoUiMuseumReviverButton::~DinoUiMuseumReviverButton() {
 }
 
@@ -238,6 +258,11 @@ DinoUiMuseumMenuItem::DinoUiMuseumMenuItem(DinoUiMuseumMenu *owner, const std::s
     mMotion->SetPriority(2);
     mMotion->Show();
     mParallel.AddTail(mMotion);
+}
+
+DinoUiMuseumMenu::DinoUiMuseumMenu()
+    : MMenu(gLcd->mSub, NULL, 0), mPicture(NULL), mPage(0), mPageCount(0), mTab(0), mSelected(0), mUnk1AC(FALSE) {
+    mMotions.clear();
 }
 
 DinoUiMuseumMenu::~DinoUiMuseumMenu() {

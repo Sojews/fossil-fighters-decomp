@@ -28,6 +28,7 @@ class DinoUiMuseum3DModel;
 class DinoUiMuseumMenu : public DinoHelpBase, public MMenu {
 public:
     MSmartOam *GetOam() { return mOam; }
+    DinoUiMuseumMenu();
     virtual ~DinoUiMuseumMenu();
     virtual void OnStart();
     virtual void OnIdle();
