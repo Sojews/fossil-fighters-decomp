@@ -9,7 +9,13 @@
 // One side of a battle (the game keeps two).
 struct DinoBattleSide {
     std::string mName;  // 0x00
-    u8 unk0C[0x80];
+    struct {
+        u32 mId;        // 0x00: the low byte is the creature
+        u8 unk04[0x14];
+    } mCreatures[3];    // 0x0C
+    u8 unk54[0x70 - 0x54];
+    u32 mLevels[3];     // 0x70
+    u8 unk7C[0x10];
 };
 
 // What a battle is set up with.
@@ -29,6 +35,7 @@ struct DinoBattleParams {
 
 class DinoBattle : public MProcess {
 public:
+    DinoBattle(const DinoBattleParams &params, u32 unk1D4, u32 unk1D8, u8 *unk1DC, u8 *unk1E0);
     virtual ~DinoBattle();
     virtual void Idle();
 
@@ -83,6 +90,7 @@ public:
 
     void StateCreatureSelect();
     void StateLevelSelect();
+    void StateStart();  // (not decompiled yet: func_ov000_0215a05c)
 
     u8 mCancelled;              // 0x74: set by the selects
     DinoBattleParams mParams;   // 0x78

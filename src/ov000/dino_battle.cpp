@@ -70,10 +70,10 @@ extern "C" struct {
     u8 unk00[0x4];
     const char *mDemoPath;  // 0x04: the "demo" sign
     void (DinoBattleAutoDemo::*StateEnd_08)(); // 0x08
-    u8 unk10[0x18 - 0x10];
+    void (DinoBattleDebugSelect::*StateCreatureSelect_10)(); // 0x10
     void (DinoBattleAutoDemo::*StateFadeOut_18)(); // 0x18
     void (DinoBattleDebugSelect::*StateLevelSelect_20)(); // 0x20
-    void (DinoBattleDebugSelect::*Unk0215a05c_28)();
+    void (DinoBattleDebugSelect::*StateStart_28)(); // 0x28
     u8 unk30[0x38 - 0x30];
     void (DinoBattleAutoDemo::*StateWatch_38)(); // 0x38
     void (DinoBattleAutoDemo::*StateEnd_40)(); // 0x40
@@ -107,7 +107,7 @@ void DinoBattleDebugSelect::StateLevelSelect() {
     }
     BOOL unk = mParams.unk00 != 2;
     mSerial.AddTail(new PlayerLevelSelect(&mParams.unk00, unk, 2));
-    mState = data_ov000_021911ac.Unk0215a05c_28;
+    mState = data_ov000_021911ac.StateStart_28;
 }
 
 DinoBattleAutoDemo::DinoBattleAutoDemo(MTask *unk7C, u8 *result) : MProcess(NULL), mUnk7C(unk7C), mResult(result) {

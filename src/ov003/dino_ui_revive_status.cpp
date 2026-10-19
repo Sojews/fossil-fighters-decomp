@@ -286,6 +286,22 @@ u32 DinoGetCreatureLevel(const DinoCreatureState *creature) {
     return (DinoGetCreatureTotal(creature) - 50) / kCreatureLevelLimits[0] + 1;
 }
 
+// The experience a creature still needs for its next level (0 at the top level).
+// NONMATCHING: 98%, the two inlined std::min temporaries swap stack slots.
+u32 DinoGetCreatureExpToNext(const DinoCreatureState *creature) {
+    u32 next;
+    if (creature->parts[0].level == 0) {
+        next = 0;
+    } else {
+        u32 level = DinoGetCreatureLevel(creature);
+        next = level == 12 ? 0 : level + 1;
+    }
+    if (next == 0) {
+        return 0;
+    }
+    return kCreatureLevelLimits[0] * (next - 1) + 50 - DinoGetCreatureTotal(creature);
+}
+
 // Rises into place, bobbing up and down.
 void DinoUiReviveEffectLight::Idle() {
     if (mTimer != 0) {
