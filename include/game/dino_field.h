@@ -69,13 +69,18 @@ public:
     u32 mUnk94;                     // 0x94
     u32 mUnk98;                     // 0x98
     u32 mUnk9C;                     // 0x9C
-    u8 unkA0[0xD0 - 0xA0];
+    VecFx32 mUnkA0;                 // 0xA0
+    VecFx32 mUnkAC;                 // 0xAC
+    VecFx32 mUnkB8;                 // 0xB8
+    u32 mUnkC4;                     // 0xC4
+    u32 mUnkC8;                     // 0xC8
+    u32 mUnkCC;                     // 0xCC
     u32 mUnkD0;                     // 0xD0
     u16 mUnkD4;                     // 0xD4
     u16 mUnkD6;                     // 0xD6
     u16 mUnkD8;                     // 0xD8
     u8 unkDA[0xDC - 0xDA];
-    u32 mUnkDC;                     // 0xDC
+    MFx32 mUnkDC;                   // 0xDC
     u8 unkE0[0xE4 - 0xE0];
     u32 mFocus;                     // 0xE4: the character followed
     MTaskSet *mUnkE8;               // 0xE8: the rotation anime
@@ -84,9 +89,14 @@ public:
     u8 mTracking;                   // 0xF8
     u8 unkF9[0xFC - 0xF9];
     u32 mUnkFC;                     // 0xFC: cleared on a map change
-    u8 unk100[0x10C - 0x100];
+    // The rotation and scale the map's camera setting 0 means.
+    u16 mUnk100;                    // 0x100
+    u16 mUnk102;                    // 0x102
+    u16 mUnk104;                    // 0x104
+    u8 unk106[2];
+    MFx32 mUnk108;                  // 0x108
     MFx32Point mFocusPos;           // 0x10C: where the followed character stands
-    u8 unk114[0x11C - 0x114];
+    MFx32Point mUnk114;             // 0x114: mFocusPos when the setting was last chosen
     // What Write saved of a rotation in progress (Read restarts it).
     u16 mSavedD4;                   // 0x11C
     u16 mSavedD6;                   // 0x11E
@@ -280,9 +290,18 @@ struct DinoFieldMapData {
     u8 unk34[0x3C - 0x34];
     u32 mAreas;         // 0x3C: offset of the areas (0x14 bytes each)
     u32 mCameraCount;   // 0x40: of the camera settings
-    u32 mEntries44;     // 0x44: offset of the camera settings (DinoFieldMapCamera)
+    u32 mCameras;       // 0x44: offset of the camera settings (DinoFieldMapCamera)
     u32 unk48;
     u32 mEntries4C;     // 0x4C: offset of a table of offsets
+};
+
+// A camera setting of the map: a rotation and a scale.
+struct DinoFieldMapCamera {
+    u16 x;
+    u16 y;
+    u16 z;
+    u8 unk06[2];
+    MFx32 scale;    // 0x08
 };
 
 // The map's area grid: an area index per 2x2 cell.
@@ -318,7 +337,7 @@ public:
     void Load();
     MFx32 GetWalkSpeed();
     void ClearGradation();
-    void *GetEntry44(int index);
+    DinoFieldMapCamera *GetCamera(int index);
     // The area at the position (the first one off the grid).
     void *GetArea(MFx32Point pos);
     void *GetEntry4C(int index);

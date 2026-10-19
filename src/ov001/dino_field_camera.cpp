@@ -128,11 +128,51 @@ void DinoFieldCamera::SetUnkD4(u16 a, u16 b, u16 c, MFx32 d) {
     mUnkD4 = a;
     mUnkD8 = c;
     mUnkD6 = b;
-    mUnkDC = d.v;
+    mUnkDC = d;
 }
 
 MFx32 DinoFieldCamera::GetUnk148() {
     return mUnk148;
+}
+
+// After a map change: puts the camera on the ground under the focus, and sets the map's rotation and scale for where
+// the focus stands (or the camera's own when it doesn't track).
+void DinoFieldCamera::IdleUnk1() {
+    fx32 height = mField->GetGroundHeight(mUnk94, mUnk9C);
+    if (height != (fx32) 0x80000000) {
+        mUnk98 = height + mUnkD0;
+    }
+    mUnkB8.x = mUnk94;
+    mUnkB8.y = mUnk98;
+    mUnkB8.z = mUnk9C;
+    {
+        const VecFx32 &src = mUnkB8;
+        mUnkA0.x = src.x;
+        mUnkA0.y = src.y;
+        mUnkA0.z = src.z;
+    }
+    {
+        const VecFx32 &src = mUnkA0;
+        mUnkAC.x = src.x;
+        mUnkAC.y = src.y;
+        mUnkAC.z = src.z;
+    }
+    mUnkC4 = mUnkC8 = mUnkCC = 0;
+    if (mTracking) {
+        mUnkE8->Clear();
+        mUnkEC = mField->mMap->GetCameraIndex(mFocusPos);
+        if (mUnkEC != 0) {
+            DinoFieldMapCamera *camera = mField->GetMap()->GetCamera(mUnkEC);
+            MFx32 scale = camera->scale;
+            SetUnkD4(camera->x, camera->y, camera->z, scale);
+        } else {
+            SetUnkD4(mUnk100, mUnk102, mUnk104, mUnk108);
+        }
+    } else {
+        mUnkE8->Clear();
+        SetUnkD4(mUnkD4, mUnkD6, mUnkD8, mUnkDC);
+    }
+    mUnk114 = mFocusPos;
 }
 
 void DinoFieldCamera::Read(const void *buf) {
@@ -141,7 +181,7 @@ void DinoFieldCamera::Read(const void *buf) {
         mUnkD4 = mSavedD4;
         mUnkD6 = mSavedD6;
         mUnkD8 = mSavedD8;
-        mUnkDC = mSavedDC;
+        mUnkDC.v = mSavedDC;
         StartRotate(mSavedRotate[0], mSavedRotate[1], mSavedRotate[2], mSavedRotateArgs[0], mSavedRotateArgs[1],
                     mSavedRotateArgs[2]);
         for (s32 i = mSavedSteps; i >= 0; i--) {
@@ -226,5 +266,5 @@ void DinoFieldCameraMoveAnime::Apply(int step) {
 // NONMATCHING: register allocation (the game keeps x in a register and spills the scale).
 void DinoFieldCamera::StartRotate(u16 x, u16 y, u16 z, u32 scale, u32 duration, u32 ease) {
     mUnkE8->Clear();
-    mUnkE8->AddTail(new DinoFieldCameraMoveAnime(this, mUnkD4, mUnkD6, mUnkD8, mUnkDC, x, y, z, scale, duration, ease));
+    mUnkE8->AddTail(new DinoFieldCameraMoveAnime(this, mUnkD4, mUnkD6, mUnkD8, mUnkDC.v, x, y, z, scale, duration, ease));
 }

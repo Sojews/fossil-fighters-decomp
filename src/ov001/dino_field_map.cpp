@@ -98,9 +98,9 @@ int DinoFieldMap::GetCameraIndex(MFx32Point pos) {
     return grid.Get()->GetCells()[at];
 }
 
-void *DinoFieldMap::GetEntry44(int index) {
+DinoFieldMapCamera *DinoFieldMap::GetCamera(int index) {
     DinoFieldMapData *data = (DinoFieldMapData *) mData.mFile.GetData();
-    return (u8 *) data + data->mEntries44 + index * 12;
+    return (DinoFieldMapCamera *) ((u8 *) data + data->mCameras) + index;
 }
 
 void *DinoFieldMap::GetEntry4C(int index) {
