@@ -241,6 +241,36 @@ typename basic_string<C, Traits, Alloc>::size_type basic_string<C, Traits, Alloc
 }
 
 template <class C, class Traits, class Alloc>
+typename basic_string<C, Traits, Alloc>::size_type basic_string<C, Traits, Alloc>::find(const C *s, size_type pos,
+                                                                                        size_type n) const {
+    const C *p;
+    size_type size;
+    if (!is_long()) {
+        p = mShort.buf;
+        size = mShort.size;
+    } else {
+        p = mLong.data;
+        size = mLong.size;
+    }
+    if (pos <= size) {
+        size_type remain = size - pos;
+        const C *last = s + n;
+        for (const C *q = p + pos; remain >= n; q++, remain--) {
+            const C *b = q;
+            const C *a = s;
+            for (; a < last; a++, b++) {
+                if (*a != *b) {
+                    goto next;
+                }
+            }
+            return q - p;
+        next:;
+        }
+    }
+    return npos;
+}
+
+template <class C, class Traits, class Alloc>
 int basic_string<C, Traits, Alloc>::compare(size_type pos, size_type n1, const C *s, size_type n2) const {
     const C *p;
     size_type size;

@@ -417,4 +417,7 @@ void MAnmMakeArrays() {
 std::string::size_type MAnmModelFindAnchor(const std::string &s, const char *text) {
     return s.find(text, 0);
 }
+std::string::size_type MAnmModelFind3Anchor(const std::string &s, const char *text) {
+    return s.find(text, 0, 0);
+}
 #pragma dont_inline reset
