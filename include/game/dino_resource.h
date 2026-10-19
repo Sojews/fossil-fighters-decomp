@@ -169,7 +169,9 @@ struct DinoExcavateDefs {
     u32 soundOffset;    // 0x84: the u8 passed to DinoSoundInit
     u8 unk88[0x90 - 0x88];
     u32 exchangeWait;   // 0x90: frames between wireless exchanges
-    u8 unk94[0xB8 - 0x94];
+    u8 unk94[0x9C - 0x94];
+    u32 kasekiRockMap;  // 0x9C: the map the kaseki rocks are on
+    u8 unkA0[0xB8 - 0xA0];
     u32 demoOffset;     // 0xB8: DinoDemoBattles
     u32 rangeCount;     // 0xBC
     u32 rangeOffset;    // 0xC0: DinoExcavateRange entries

@@ -726,6 +726,44 @@ void DinoField::CreateKasekiRock(u32 index) {
     mKasekiRockTasks->AddTail(mKasekiRocks[index]);
 }
 
+void DinoField::LoadMap(u32 id) {
+    mUnk370->Clear();
+    mEffectTasks->Clear();
+    mHoles->Clear();
+    mRockHoles->Clear();
+    MI_CpuFill8(&mSteps[0], 0, sizeof(DinoFieldStep));
+    MI_CpuFill8(&mSteps[1], 0, sizeof(DinoFieldStep));
+    MI_CpuFill8(&mSteps[2], 0, 8 * sizeof(MPolygonChar *));
+    mUnk378 = 0;
+    mUnk37C = 1;
+    mMap->GetInfo()->id = id;
+    mMap->Load();
+    if (mMap->GetMapData()[0x68] == 0) {
+        CreateEffects(mSteps[0].effects, 3, 1);
+        CreateEffects(mSteps[1].effects, 3, 2);
+    } else {
+        CreateEffects(mSteps[2].effects, 8, 0x1D);
+    }
+}
+
+void DinoField::CreateKasekiRocks() {
+    MResource<DinoExcavateDefs> defs = gDinoResource->GetExcavateDefs();
+    mKasekiRockTasks->Clear();
+    u32 map = mMap->GetInfo()->id;
+    if (map != defs.Get()->kasekiRockMap) {
+        return;
+    }
+    for (u32 i = 0; i < 20; i++) {
+        DinoBackupEntry28 entry;
+        gDinoBackup->GetUnk138(i, &entry);
+        if (entry.used) {
+            CreateKasekiRock(i);
+        } else {
+            mKasekiRocks[i] = NULL;
+        }
+    }
+}
+
 void DinoField::HideUnk2B4() {
     mUnk2B4->Hide();
     mUnk2BC->Hide();

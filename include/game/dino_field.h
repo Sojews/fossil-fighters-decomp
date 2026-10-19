@@ -299,7 +299,7 @@ class DinoFieldKasekiRock;
 
 // One of the field's walk animation states.
 struct DinoFieldStep {
-    u8 unk00[0x18];
+    MPolygonChar *effects[6];   // (the last step's run on past it, to 8)
 };
 
 class DinoFieldHole;
@@ -357,6 +357,10 @@ public:
     }
     void WalkOnLand0(u32 dir);
     void CreateKasekiRock(u32 index);
+    // Makes the kaseki rocks the backup has, if this is their map.
+    void CreateKasekiRocks();
+    // Clears away the last map's things and loads the map, with its step effects.
+    void LoadMap(u32 id);
     void HideUnk2B4();
     void WalkOnLand1(u32 dir);
     void WalkInWater(u32 dir, u32 run);
@@ -435,9 +439,10 @@ public:
     DinoFieldKasekiRock *mKasekiRocks[20]; // 0x2CC
     MTaskSet *mKasekiRockTasks; // 0x31C
     DinoFieldStep mSteps[3];    // 0x320: the walk animations
-    u8 unk368[0xC];
+    u8 unk368[0x370 - 0x368];
+    MTaskSet *mUnk370;          // 0x370
     MTaskSet *mEffectTasks;     // 0x374
-    u32 unk378;
+    u32 mUnk378;                // 0x378
     u32 mUnk37C;                // 0x37C: bit 0: running keeps the direction
     MResource<DinoFieldDefs> mDefs; // 0x380
     DinoFieldPoint *mMoney;     // 0x390: the money panel, while shown
