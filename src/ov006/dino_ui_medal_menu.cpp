@@ -15,6 +15,9 @@
 #include "game/dino_ui_rv_status_menu_item_menu.h"
 #include "game/dino_backup.h"
 #include "game/dino_creature_sort.h"
+#include "game/dino_ui_parts_reviver_name.h"
+#include "game/dino_ui_parts_reviver_name_count_check_task.h"
+#include "game/dino_ui_field_menu_cursor.h"
 #include "m/indicator.h"
 #include <printf.h>
 #include "game/dino_ui_parts_reviver_medal_button.h"
@@ -162,6 +165,13 @@ DinoUiMedalMenu::DinoUiMedalMenu(u32 *mode, u32 *index, u8 *unk)
       mSort(*unk), mUnk204(0), mUnk21C(0xFF), mUnk21D(0) {
     mMotions.clear();
 }
+
+// Where the cursor and the name go relative to a medal.
+extern struct {
+    u8 unk00[0x4C];
+    MPoint nameOffset;      // 0x4C
+    MPoint cursorOffset;    // 0x54
+} data_ov006_021940d8;
 
 // Where the mUnk1EC creatures' medals go.
 extern "C" const MPoint data_ov006_021942f4[5];
@@ -557,5 +567,72 @@ void DinoUiMedalMenu::OnBackDecided(BOOL result) {
         MParallelTaskSet *fades = new MParallelTaskSet(TRUE);
         fades->AddTail(fade);
         GetSerial()->AddTail(new MTimer(data_02089aac), MTaskSetWaitEmptyTask::Create(mUnk220), fades, exit);
+    }
+}
+
+// Moves the cursor to the item (offset for the medals), and shows the medal's creature's name by it.
+// NONMATCHING: stack slots (the game puts the offset below the copies Offset makes of it).
+void DinoUiMedalMenu::OnFocus(MMenuItem *item) {
+    mUnk204 = FALSE;
+    if (item == NULL) {
+        mCursor->Hide();
+        return;
+    }
+    SetSelectedItem(dynamic_cast<DinoHelpItem *>(item));
+    MRect frame = item->GetFrame();
+    mCursor->SetMode(1);
+    {
+        MPoint offset = data_ov006_021940d8.cursorOffset;
+        for (int i = 0; i < 5; i++) {
+            if (item == mUnkF0[i]) {
+                frame.Offset(offset);
+            }
+        }
+        for (int i = 0; i < 15; i++) {
+            if (item == mSlots[i]) {
+                frame.Offset(offset);
+            }
+        }
+    }
+    if (mCursor->IsHidden()) {
+        mCursor->SetFrame(frame);
+    } else {
+        mCursorTasks->Clear();
+        mCursorTasks->AddTail(mCursor->CreateMoveTask(mCursor->GetFrame(), frame, 10, -5));
+    }
+    mCursor->Show();
+    int i;
+    for (i = 0; i < 5; i++) {
+        if (item == mUnkF0[i] && mUnk1EC[i] != 0) {
+            mName->SetCreature(mUnk1EC[i]);
+            mName->SetPosition(data_ov006_021942f4[i] + data_ov006_021940d8.nameOffset);
+            Disable();
+            mNameTasks->Clear();
+            mNameTasks->AddTail(new DinoUiPartsReviverNameCountCheckTask(mName),
+                                MCreateCallTask(this, &DinoHelpBase::Enable));
+            break;
+        }
+    }
+    if (i == 5) {
+        for (i = 0; i < mSlotCount; i++) {
+            if (item == mSlots[i]) {
+                mName->SetCreature(mCreatures[mPage * 15 + i]);
+                mName->SetPosition(MPoint(data_ov006_02194058.slotX + data_ov006_02194058.slotColumnX * (i % 5) +
+                                              data_ov006_02194058.slotRowX * (i / 5),
+                                          data_ov006_02194058.slotY + data_ov006_02194058.slotColumnY * (i % 5) +
+                                              data_ov006_02194058.slotRowY * (i / 5)) +
+                                   data_ov006_021940d8.nameOffset);
+                Disable();
+                mNameTasks->Clear();
+                mNameTasks->AddTail(new DinoUiPartsReviverNameCountCheckTask(mName),
+                                    MCreateCallTask(this, &DinoHelpBase::Enable));
+                break;
+            }
+        }
+        if (i == mSlotCount) {
+            mName->Hide();
+            mNameTasks->Clear();
+            Enable();
+        }
     }
 }

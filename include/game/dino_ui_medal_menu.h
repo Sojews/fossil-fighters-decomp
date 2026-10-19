@@ -13,6 +13,8 @@ class DinoUiFieldMenuFraction;
 class MTextPicture;
 class DinoUiPartsReviverMedalButton;
 class MIndicator;
+class DinoUiFieldMenuCursor;
+class DinoUiPartsReviverName;
 
 class DinoUiMedalMenu : public DinoHelpBase, public MMenu {
 public:
@@ -52,7 +54,9 @@ public:
     DinoUiPartsReviverMedalButton *mSlots[15];  // 0x104
     MIndicator *mNumbers[15];           // 0x140: the slots' creature numbers
     int mSlotCount;                     // 0x17C
-    u32 mUnk180[3];                     // 0x180
+    u32 mUnk180;                        // 0x180
+    MTaskSet *mCursorTasks;             // 0x184
+    DinoUiFieldMenuCursor *mCursor;     // 0x188
     DinoUiFieldMenuFraction *mFraction; // 0x18C: "page n/m"
     int *mResult;                       // 0x190
     u32 *mIndex;                        // 0x194
@@ -66,7 +70,11 @@ public:
     u8 unk1C9[3];
     u32 mUnk1CC[8];                     // 0x1CC
     u8 mUnk1EC[5];                      // 0x1EC
-    u8 unk1F1[0x13];
+    u8 unk1F1[3];
+    u32 mUnk1F4;                        // 0x1F4
+    DinoUiPartsReviverName *mName;      // 0x1F8: the focused creature's name
+    MTaskSet *mNameTasks;               // 0x1FC
+    u32 mUnk200;                        // 0x200
     u8 mUnk204;                         // 0x204
     std::vector<MMotionFile> mMotions;  // 0x208
     u8 unk214[0x21C - 0x214];
