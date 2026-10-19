@@ -45,4 +45,12 @@ public:
     u8 *mUnk10;     // 0x10
 };
 
+// Elements of vectors the battle code keeps (the element types are unknown): 16 and 52 bytes.
+struct DinoBattleView3DEntry {
+    u32 unk[4];
+};
+struct DinoBattleView3DRecord {
+    u32 unk[13];
+};
+
 #endif

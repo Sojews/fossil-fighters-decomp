@@ -8,6 +8,7 @@
 #include "types.h"
 #include "m/resource.h"
 #include "game/dino_battle_view2.h"
+#include "game/dino_battle_view_3d.h"
 
 #pragma auto_inline off
 
@@ -100,3 +101,10 @@ PlayerLevelSelect::PlayerLevelSelect(u32 *level, BOOL unk7C, u32 unk80)
     : MProcess(NULL), mUnk7C(unk7C), mUnk80(unk80), mUnk9C(0), mUnkA8(0), mUnkAC(1), mLevel(level) {
     mState = data_ov000_02195e50.Start_48;
 }
+
+#pragma auto_inline off
+// Vector members the game emits in this file (made explicitly until the code that uses them is decompiled).
+template void std::__vec_deleter<DinoBattleView3DRecord, std::allocator<DinoBattleView3DRecord> >::sub_push_back(const DinoBattleView3DRecord &x, Metrowerks::int2type<true>);
+template std::__vec_deleter<DinoBattleView3DRecord, std::allocator<DinoBattleView3DRecord> >::~__vec_deleter();
+template void std::__vec_deleter<DinoBattleView3DEntry, std::allocator<DinoBattleView3DEntry> >::append(size_t n, Metrowerks::int2type<true>);
+template std::__vec_deleter<DinoBattleView3DEntry, std::allocator<DinoBattleView3DEntry> >::~__vec_deleter();
