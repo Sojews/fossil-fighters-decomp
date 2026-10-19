@@ -5,6 +5,9 @@
 
 #include <algorithm>
 #include "m/picture.h"
+#include "nitro/fx.h"
+#include "m/3d_scene.h"
+#include "m/seed_generator.h"
 #include "game/dino_ui_museum_information_menu.h"
 #include "types.h"
 #include "game/dino_ui_museum.h"
@@ -577,7 +580,9 @@ void DinoUiMuseumMenu::OnIdle() {
 }
 
 // DinoUiMuseum3DModel::Idle and DinoUiMuseum's page turns (not decompiled yet) start background loads.
+#pragma auto_inline off
 template MTask *MCreateBgCallTask(DinoUiMuseum3DModel *obj, void (DinoUiMuseum3DModel::*func)(), int thread);
+#pragma auto_inline reset
 template MTask *MCreateBgCallTask(DinoUiMuseum *obj, void (DinoUiMuseum::*func)(), int thread);
 // DinoUiMuseumMenu::OnFocus (not decompiled yet) re-enables the help through a call task.
 // The menu's layout (filled in at start).
@@ -672,6 +677,72 @@ void DinoUiMuseum3DModel::SetModel(u32 id) {
         mRequested = id;
     }
 }
+
+extern "C" struct {
+    void (DinoUiMuseum3DModel::*LoadModel_00)();
+} data_ov006_02196264;
+
+#pragma auto_inline off
+// Loads the model asked for (placing the camera for its size), then circles the camera around it and slides the
+// background in.
+void DinoUiMuseum3DModel::Idle() {
+    if (mCurrent != mRequested) {
+        mCurrent = mRequested;
+        mSerial.AddTail(MTaskSetMakeEmptyTask::Create(mTasks));
+        if (mCurrent == 0) {
+            return;
+        }
+        mTimer = 0;
+        u32 angle = 0xFFFFF000;
+        mAngle = angle;
+        mHeight = MFx32(5);
+        mDistance = MFx32(11);
+        mAngle = angle * 2;
+        switch (mCurrent) {
+        case 0x29:
+        case 0x2C:
+        case 0x2D:
+        case 0x2E:
+        case 0x2F:
+        case 0x30:
+        case 0x31:
+        case 0x32:
+        case 0x55:
+        case 0x56:
+        case 0x57:
+        case 0x58:
+        case 0x59:
+        case 0x69:
+            mDistance = MFx32(15);
+            mHeight = MFx32(7);
+            break;
+        case 0x50:
+        case 0x51:
+        case 0x52:
+        case 0x54:
+            mDistance = MFx32(18);
+            mHeight = MFx32(7);
+            break;
+        }
+        mSerial.AddTail(MCreateBgCallTask(this, data_ov006_02196264.LoadModel_00, 1));
+    }
+    VecFx32 v;
+    v.x = 0;
+    v.y = mHeight.v;
+    v.z = 0;
+    mScene->SetCameraTarget(&v);
+    v.x = (mDistance * MFx32::FromRaw(FX_SinIdx((u16)mAngle))).v;
+    v.y = 0x800;
+    v.z = (mDistance * MFx32::FromRaw(FX_CosIdx((u16)mAngle))).v;
+    mScene->SetCameraPos(&v);
+    mAngle += 0x6D;
+    if (mTimer < 60) {
+        mTimer++;
+    }
+    int x = gDinoResource->GetRandom()->Next(mBackground->GetWidth() - 256);
+    mBackground->SetPosition(-x, -(mBackground->GetHeight() - 192) * mTimer / 60);
+}
+#pragma auto_inline reset
 
 // Rises into place, bobbing up and down.
 void DinoUiMuseumEffectLight::Idle() {
