@@ -29,26 +29,11 @@ void MCanvasCopyTransfer::Transfer() {
 MCanvasCopyTransfer::~MCanvasCopyTransfer() {
 }
 
-// NONMATCHING (also SetSpeed, GetSpeed): the game doesn't copy the divisor when dividing by speed.
 MConsole::MConsole(MCanvas *canvas, MFont *font, MPoint spacing, MFx32 speed)
-    : MFixedSizeView(canvas->GetSize()) {
-    mCanvas = canvas;
-    mFont = font;
-    mSpacing = spacing.x;
-    mLineSpacing = spacing.y;
-    mUnk28 = 0;
-    mUnk2C = 0;
-    mUnk30 = 0;
-    mRate = speed == MFx32(0) ? MFx32(0) : MFx32(font->GetMaxSize().x) / speed;
-    mProgress.v = 0;
-    mUnk3C.v = 0;
-    mUnk40 = 0;
-    mUnk44 = 0;
-    mFilter = NULL;
-    mCursor.x = 0;
-    mCursor.y = 0;
-    mUnk68 = FALSE;
-    mUnk69 = FALSE;
+    : MFixedSizeView(canvas->GetSize()), mCanvas(canvas), mFont(font), mSpacing(spacing.x), mLineSpacing(spacing.y),
+      mUnk28(0), mUnk2C(0), mUnk30(0),
+      mRate(speed == MFx32(0) ? MFx32(0) : MFx32(font->GetMaxSize().x) / speed), mProgress(0), mUnk3C(0), mUnk40(0),
+      mUnk44(0), mFilter(NULL), mCursor(0, 0), mUnk68(FALSE), mUnk69(FALSE) {
     mFont->AddRef();
     mHyphenWidth = mFont->GetGlyphSize('-').x;
 }
@@ -64,8 +49,7 @@ void MConsole::SetSpeed(MFx32 speed) {
 }
 
 MFx32 MConsole::GetSpeed() {
-    MFx32 rate = mRate;
-    return rate == MFx32(0) ? MFx32(0) : MFx32(mFont->GetMaxSize().x) / rate;
+    return mRate == MFx32(0) ? MFx32(0) : MFx32(mFont->GetMaxSize().x) / mRate;
 }
 
 void MConsole::SetRate(MFx32 rate) {
