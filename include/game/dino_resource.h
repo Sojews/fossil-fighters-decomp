@@ -170,7 +170,8 @@ struct DinoExcavateDefs {
     u32 offset7C;       // 0x7C
     u32 offset80;       // 0x80
     u32 soundOffset;    // 0x84: the u8 passed to DinoSoundInit
-    u8 unk88[0x90 - 0x88];
+    u32 exchangeCount;  // 0x88: how many fossils an exchange can give
+    u32 exchangeOffset; // 0x8C: the fossil ids an exchange can give (u32 each)
     u32 exchangeWait;   // 0x90: frames between wireless exchanges
     u8 unk94[0x9C - 0x94];
     u32 kasekiRockMap;  // 0x9C: the map the kaseki rocks are on

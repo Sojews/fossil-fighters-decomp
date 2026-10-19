@@ -35,6 +35,28 @@ void DinoUiExchange::OnMessage(MMessage *msg) {
 
 #pragma auto_inline off
 
+static inline const u32 *ExchangeIds(const DinoExcavateDefs *data) {
+    return (const u32 *)((const u8 *)data + data->exchangeOffset);
+}
+
+static inline u32 RandomExchangeId() {
+    MResource<DinoExcavateDefs> defs = gDinoResource->GetExcavateDefs();
+    MResource<DinoExcavateDefs> defs2 = gDinoResource->GetExcavateDefs();
+    u32 index = gDinoResource->GetRandom()->Next(defs2.Get()->exchangeCount);
+    return ExchangeIds(defs.Get())[index];
+}
+
+// NONMATCHING: the two excavate resources swap stack slots.
+void DinoUiExchange::MakeExchangeEntry(DinoBackupEntry *entry) {
+    u32 id = RandomExchangeId();
+    MResource<DinoKasekiDefs> kaseki = gDinoResource->LoadKasekiDefs();
+    const DinoKasekiDef *def = kaseki.Get()->GetDef(id);
+    MI_CpuFill8(entry, 0, sizeof(DinoBackupEntry));
+    entry->id = id;
+    entry->type = def->unk24;
+    entry->unk10_0 = gDinoResource->GetCreatureUnk0D((id - 1) / 4 + 1);
+}
+
 void DinoUiExchange::InitProfile(DinoPlayerProfile *profile) {
     gDinoBackup->InitProfile(profile);
 }

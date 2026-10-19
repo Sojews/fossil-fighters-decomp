@@ -63,6 +63,8 @@ public:
     void OnExchangeMessage(MMessage *msg);
     void StateExchange();
     void Unk02155f24();
+    // A random fossil an exchange can give.
+    void MakeExchangeEntry(DinoBackupEntry *entry);
     // Sets when the next exchange may happen.
     void SetNextTime() {
         MResource<DinoExcavateDefs> defs = gDinoResource->GetExcavateDefs();
