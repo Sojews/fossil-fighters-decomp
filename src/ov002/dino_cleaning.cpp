@@ -85,7 +85,7 @@ void DinoCleaningKasekiRock::Idle() {
 }
 
 void DinoCleaningKasekiRock::Finish() {
-    mUnk94->Exit();
+    mXray->Exit();
     mUnk88->Exit();
     mUnk88 = NULL;
     mView->DestroyOam();
@@ -478,4 +478,21 @@ void DinoCleaning::StateQuit() {
     serial.AddTail(stopBgm);
     serial.AddTail(fades);
     serial.AddTail(exit);
+}
+
+#pragma auto_inline off
+
+void DinoCleaningKasekiRock::StopXray() {
+    DinoCleaningXrayView *xray = mXray;
+    xray->mTasks->Clear();
+    xray->GetDisplay()->mBlend->Reset();
+    xray->GetDisplay()->mBright->Reset();
+    xray->mImage->Hide();
+    mView->LoadPalettes();
+}
+
+extern "C" void func_ov002_0215a4fc(DinoCleaningImageView *view, MPoint pos);
+
+extern "C" void func_ov002_0215fdd4(DinoCleaningKasekiRock *rock, MPoint pos) {
+    func_ov002_0215a4fc(rock->mView, pos);
 }
