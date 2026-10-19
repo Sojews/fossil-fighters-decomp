@@ -9,6 +9,7 @@
 #include "m/looper.h"
 #include "game/help.h"
 #include "game/dino_field_camera_hook.h"
+#include <deque>
 
 class DinoBattleView;
 
@@ -25,6 +26,8 @@ public:
     u32 GetUnkB0();
     void SetUnk180(u8 value);
     u8 GetUnk180();
+    void CancelQueue();
+    void FlushQueue();
 
     u32 unkA8;
     DinoBattleView *mView;                  // 0xAC
@@ -39,7 +42,8 @@ public:
     u32 mSlot;                              // 0x134
     u8 unk138[0x180 - 0x138];
     u8 mUnk180;                             // 0x180
-    u8 unk181[0x19C - 0x181];
+    u8 unk181[0x184 - 0x181];
+    std::deque<MTask *> mQueue;             // 0x184: tasks waiting to run
     u32 mUnk19C;                            // 0x19C
     u32 mUnk1A0;                            // 0x1A0
 };

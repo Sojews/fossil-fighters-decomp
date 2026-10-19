@@ -23,7 +23,7 @@ public:
     void QueueE8(const void *src, u32 size);
     u32 AllocTex(const void *src, u32 size);
     u32 AllocPltt(const void *src, u32 size);
-    void *QueueD0(const void *src, u32 size, u32 arg);
+    void QueueD0(const void *src, u32 size, u32 arg);
     void FreeTex(u32 key);
     void FreePltt(u32 key);
     MTask *CreateWaitTransferCompleteTask();

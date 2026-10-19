@@ -18,6 +18,7 @@
 #include "game/dino_battle_view_3d_move.h"
 
 DinoBattleView3D::~DinoBattleView3D() {
+    CancelQueue();
 }
 
 B3DStatusViewTask::~B3DStatusViewTask() {
@@ -219,3 +220,29 @@ extern "C" void func_ov000_021858ac(u32 *p) {
     p[1] = 0;
     p[2] = 0;
 }
+
+// Deletes the tasks waiting to run.
+void DinoBattleView3D::CancelQueue() {
+    while (!mQueue.empty()) {
+        MTask *task = mQueue.front();
+        mQueue.pop_front();
+        delete task;
+    }
+    mUnk19C = -1;
+    mUnk1A0 = -1;
+}
+
+// Hands the tasks waiting to run to the task set.
+void DinoBattleView3D::FlushQueue() {
+    while (!mQueue.empty()) {
+        MTask *task = mQueue.front();
+        mQueue.pop_front();
+        ((MTaskSet *)mUnkC0)->AddTail(task);
+    }
+}
+
+// The queue's members the game emits in this file.
+template std::deque<MTask *>::~deque();
+template std::deque<MTask *>::iterator std::deque<MTask *>::make_iter(size_t n);
+template void std::deque<MTask *>::push_back(MTask *const &x, Metrowerks::int2type<true>);
+template void std::deque<MTask *>::erase_front(size_t n, Metrowerks::int2type<true>);

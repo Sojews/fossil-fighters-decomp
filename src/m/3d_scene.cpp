@@ -59,8 +59,8 @@ u32 M3DScene::AllocPltt(const void *src, u32 size) {
     return mM3d->AllocPltt(src, size);
 }
 
-void *M3DScene::QueueD0(const void *src, u32 size, u32 arg) {
-    return mM3d->QueueD0(src, size, arg);
+void M3DScene::QueueD0(const void *src, u32 size, u32 arg) {
+    mM3d->QueueD0(src, size, arg);
 }
 
 void M3DScene::FreeTex(u32 key) {

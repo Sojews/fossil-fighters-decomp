@@ -30,6 +30,23 @@ void M3d::FreePltt(u32 key) {
     mPlttHeap.Free(key, FALSE);
 }
 
+void M3d::QueueE8(const void *src, u32 size) {
+    M3dTransfer t;
+    t.size = size;
+    t.src = src;
+    MScopedLock lock(&gM3dMutex, TRUE);
+    mQueueE8.push_back(t);
+}
+
+void M3d::QueueD0(const void *src, u32 size, u32 arg) {
+    M3dTransfer t;
+    t.size = size;
+    t.src = src;
+    t.arg = arg;
+    MScopedLock lock(&gM3dMutex, TRUE);
+    mQueueD0.push_back(t);
+}
+
 MTask *M3d::CreateWaitTransferCompleteTask() {
     return new M3dWaitTransferCompleteTask(this);
 }
@@ -58,4 +75,4 @@ template class std::__cdeque_deleter<void *, std::allocator<void *> &>;
 template std::deque<M3dTransfer>::~deque();
 template std::deque<M3dTransfer>::iterator std::deque<M3dTransfer>::make_iter(size_t n);
 template void std::deque<M3dTransfer>::push_back(const M3dTransfer &x, Metrowerks::int2type<true>);
-template void std::deque<M3dTransfer>::erase_front(size_t n);
+template void std::deque<M3dTransfer>::erase_front(size_t n, Metrowerks::int2type<true>);

@@ -152,6 +152,9 @@ namespace std {
         reference front() {
             return data_[start_];
         }
+        reference operator[](size_t n) {
+            return data_[(start_ + n) % cap()];
+        }
         reference back() {
             return data_[(start_ + size_ - 1) % cap()];
         }
@@ -183,7 +186,9 @@ namespace std {
             size_ = 0;
         }
         void pop_front() {
-            Metrowerks::int2type<true> t;
+            pop_front(Metrowerks::int2type<true>());
+        }
+        void pop_front(Metrowerks::int2type<true>) {
             if (++start_ == cap()) {
                 start_ = 0;
             }
@@ -381,7 +386,7 @@ namespace std {
         deque() {
             start_ = 0;
             size_ = 0;
-            buf_.init();
+            buf().init();
         }
         ~deque();
 
@@ -395,7 +400,13 @@ namespace std {
             push_back(x, Metrowerks::int2type<true>());
         }
         void push_back(const T &x, Metrowerks::int2type<true>);
-        void erase_front(size_type n);
+        void erase_front(size_type n, Metrowerks::int2type<true>);
+        void pop_front() {
+            erase_front(1, Metrowerks::int2type<true>());
+        }
+        reference front() {
+            return ((T *) buf()[start_ / __block])[start_ % __block];
+        }
         void erase_at_end(size_type n, Metrowerks::int2type<true>) {
             size_ -= n;
         }
@@ -405,6 +416,14 @@ namespace std {
         }
         iterator make_iter(size_type n);
         void add_back_capacity(size_type n);
+
+        // (The game reaches the block map through an accessor: MSL keeps it in a compressed pair.)
+        buf_type &buf() {
+            return buf_;
+        }
+        const buf_type &buf() const {
+            return buf_;
+        }
 
         size_type start_;   // 0x0
         size_type size_;    // 0x4
@@ -425,16 +444,24 @@ namespace std {
 
     template <class T, class Allocator> deque<T, Allocator>::~deque() {
         erase_at_end(size_, Metrowerks::int2type<true>());
-        buf_.free_all();
+        buf_type &b = buf();
+        if (!b.empty()) {
+            buf_type::iterator e = b.end();
+            for (buf_type::iterator i = b.begin(); i != e; ++i) {
+                if (*i != 0) {
+                    ::operator delete(*i);
+                }
+            }
+        }
     }
 
     template <class T, class Allocator>
     typename deque<T, Allocator>::iterator deque<T, Allocator>::make_iter(size_type n) {
-        buf_type::iterator i = buf_.begin();
+        buf_type::iterator i = buf().begin();
         i += (start_ + n) / __block;
         iterator r;
         r.i_ = i;
-        r.cur_ = (buf_.size_ == 0 ? (T *) 0 : (T *) *i) + (start_ + n) % __block;
+        r.cur_ = (buf().size_ == 0 ? (T *) 0 : (T *) *i) + (start_ + n) % __block;
         return r;
     }
 
@@ -448,13 +475,14 @@ namespace std {
         ++size_;
     }
 
-    template <class T, class Allocator> void deque<T, Allocator>::erase_front(size_type n) {
+    template <class T, class Allocator> void deque<T, Allocator>::erase_front(size_type n, Metrowerks::int2type<true>) {
         if (n != 0) {
+            buf_type &b = buf();
             size_ -= n;
             start_ += n;
             while (start_ >= 2 * __block) {
-                ::operator delete(buf_.front());
-                buf_.pop_front();
+                ::operator delete(b.front());
+                b.pop_front();
                 start_ -= __block;
             }
             if (size_ == 0) {

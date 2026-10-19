@@ -9,8 +9,8 @@
 
 // A queued transfer to VRAM.
 struct M3dTransfer {
-    const void *src;    // 0x0
-    u32 size;           // 0x4
+    u32 size;           // 0x0
+    const void *src;    // 0x4
     u32 arg;            // 0x8
 };
 
@@ -23,7 +23,7 @@ public:
     void QueueE8(const void *src, u32 size);
     u32 AllocTex(const void *src, u32 size, BOOL arg);
     u32 AllocPltt(const void *src, u32 size);
-    void *QueueD0(const void *src, u32 size, u32 arg);
+    void QueueD0(const void *src, u32 size, u32 arg);
     void FreeTex(u32 key);
     void FreePltt(u32 key);
     MTask *CreateWaitTransferCompleteTask();
