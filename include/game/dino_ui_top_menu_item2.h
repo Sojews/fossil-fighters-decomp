@@ -11,6 +11,8 @@ class DinoUiTopMenu;
 // The other kind of top menu button.
 class DinoUiTopMenuItem2 : public MMenuItem, public DinoHelpItem {
 public:
+    DinoUiTopMenuItem2(DinoUiTopMenu *owner, const std::string &path, const std::string &path2, MPoint pos,
+                       u32 textId);
     virtual ~DinoUiTopMenuItem2();
     virtual MRect GetFrame();
     virtual void OnFocusChanged(BOOL focused);
