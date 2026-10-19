@@ -4,6 +4,18 @@
 #include "game/dino_field_camera_hook.h"
 #include "m/anime.h"
 
+// The angle t of the way back from `to` to `from`, turning the short way round.
+static u16 LerpAngle(u16 from, u16 to, MFx32 t) {
+    int d = to - from;
+    int target;
+    if (d < 0x8000) {
+        target = from + d;
+    } else {
+        target = from - (0x10000 - d);
+    }
+    return MFx32ToInt(MFx32(from) * t + MFx32(target) * (MFx32(1) - t));
+}
+
 // Turns the camera from one rotation and scale to another.
 class DinoFieldCameraMoveAnime : public MAnime {
 public:
