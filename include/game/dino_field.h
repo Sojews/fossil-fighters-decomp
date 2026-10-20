@@ -528,12 +528,13 @@ public:
     u8 unk368[0x370 - 0x368];
     MTaskSet *mUnk370;          // 0x370
     MTaskSet *mEffectTasks;     // 0x374
-    u32 mUnk378;                // 0x378
+    MFx32 mUnk378;              // 0x378: walk frames, against the step length
     u32 mUnk37C;                // 0x37C: bit 0: running keeps the direction
     MResource<DinoFieldDefs> mDefs; // 0x380
     DinoFieldPoint *mMoney;     // 0x390: the money panel, while shown
     DinoFieldPoint *mDonate;    // 0x394
-    u8 unk398[0x30];
+    u8 unk398[0x2C];
+    u32 mUnk3C4;                // 0x3C4: no step effects from 90 on
     u8 mUnk3C8;                 // 0x3C8
 };
 

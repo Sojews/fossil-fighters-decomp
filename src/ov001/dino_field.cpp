@@ -1388,6 +1388,66 @@ void MPolygonChar::DeactivateModels() {
     }
 }
 
+// The whole part.
+static inline MFx32 MFx32Floor(MFx32 x) {
+    MFx32 r;
+    r.v = x.v & ~0xFFF;
+    return r;
+}
+
+// A footstep: every (frames / walk speed) frames of walking, the next of the step's a effects plays where the
+// character stands, facing its way, and is put away again after a * frames / walk speed frames.
+// NONMATCHING: the game builds MFx32(1) straight into operator+='s parameter (ours keeps a temporary, which moves
+// the slots by 4), and stores the rotation after working out its y.
+void DinoField::Step(u32 dir, DinoFieldStep *step, int a, int frames, int c) {
+    DinoFieldChara *chara = (DinoFieldChara *) dir;
+    if (mUnk3C4 >= 90) {
+        return;
+    }
+    MFx32 speed = mMap->GetWalkSpeed();
+    if ((mUnk378 += MFx32(1)) < MFx32Floor(MFx32(frames) / speed)) {
+        return;
+    }
+    mUnk378 -= MFx32Floor(MFx32(frames) / speed);
+    CreateEffects(step->effects, a, c);
+    mUnk37C = (mUnk37C + 1) % a;
+    MPolygonChar *e = step->effects[mUnk37C];
+    fx32 z = chara->GetModel()->pos.y.v;
+    fx32 y = chara->mUnk114;
+    e->SetPosition(chara->GetModel()->pos.x.v, y, z);
+    for (MAnmModelBase *anm = (MAnmModelBase *) e->mParallel.mHead; anm != NULL; anm = (MAnmModelBase *) anm->mNext) {
+        anm->mPosRef = &e->mPos;
+        anm->mUnk11B = TRUE;
+    }
+    int angle = (u16) (0x4000 - chara->GetModel()->angle);
+    e->SetRotation(0, angle * 360 / 16, 0);
+    for (MAnmModelBase *anm = (MAnmModelBase *) e->mParallel.mHead; anm != NULL; anm = (MAnmModelBase *) anm->mNext) {
+        anm->mRotRef = &e->mRot;
+        anm->mUnk11B = TRUE;
+    }
+    for (MAnmModelBase *anm = (MAnmModelBase *) e->mParallel.mHead; anm != NULL; anm = (MAnmModelBase *) anm->mNext) {
+        anm->Unk10();
+        anm->mFrame = 0;
+        anm->mLoopEnd = 0;
+        anm->mSpeed = 0x10;
+        anm->Run();
+        anm->mActive = TRUE;
+        anm->mFollowParent = TRUE;
+    }
+    for (MAnmModelBase *anm = (MAnmModelBase *) e->mParallel.mHead; anm != NULL; anm = (MAnmModelBase *) anm->mNext) {
+        anm->mActive = TRUE;
+    }
+    e->mUnkAC = 1;
+    for (MAnmModelBase *anm = (MAnmModelBase *) e->mParallel.mHead; anm != NULL; anm = (MAnmModelBase *) anm->mNext) {
+        anm->mFollowParent = TRUE;
+    }
+    mUnk370->AddTail((new MSerialTaskSet(TRUE))
+                         ->Add(new MTimer(MFx32ToInt(MFx32(frames * a) / speed) - 2))
+                         ->Add(MCreateCallTask(e, &MPolygonChar::DetachModels))
+                         ->Add(new MTimer(1))
+                         ->Add(MCreateCallTask(e, &MPolygonChar::DeactivateModels)));
+}
+
 extern "C" MProcess *func_ov001_02159cd0(void *field) {
     return new DinoFieldCaptureFadeOutTask(field);
 }
