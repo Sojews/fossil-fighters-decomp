@@ -34,11 +34,18 @@ struct DinoUiOrganizationLayout {
     int slotColumnY;    // 0x4C
     int slotRowX;       // 0x50: to the next row
     int slotRowY;       // 0x54
+    MPoint numberOffset;    // 0x58: of a slot's number
+    u8 unk60[0x78 - 0x60];
+    MPoint sortPos;     // 0x78: the first sort button
 };
 
 // More of the screen's positions (filled in at start).
 struct DinoUiOrganizationLayout2 {
-    u8 unk00[0x30];
+    MPoint sortStep;            // 0x00: to the next sort button
+    MPoint buttonPos;           // 0x08: the back and OK buttons' (one at a time)
+    MPoint pageLPos;            // 0x10
+    MPoint pageRPos;            // 0x18
+    u8 unk20[0x30 - 0x20];
     MPoint memberMenuOffset;    // 0x30: from the member's medal
     MPoint nameOffset;          // 0x38: of the creature's name from its medal or slot
     MPoint cursorOffset;        // 0x40: of the cursor's frame on a medal or slot
@@ -188,6 +195,7 @@ public:
 
 class DinoUiOrganizationOKButton : public DinoUiOrganizationMenuItem {
 public:
+    DinoUiOrganizationOKButton(DinoUiOrganizationMenu *owner);
     virtual ~DinoUiOrganizationOKButton();
     virtual void OnFocusChanged(BOOL focused);
     virtual void OnDecide();
@@ -195,6 +203,7 @@ public:
 
 class DinoUiOrganizationBackButton : public DinoUiOrganizationMenuItem {
 public:
+    DinoUiOrganizationBackButton(DinoUiOrganizationMenu *owner);
     virtual ~DinoUiOrganizationBackButton();
     virtual void OnFocusChanged(BOOL focused);
     virtual void OnDecide();
@@ -202,12 +211,14 @@ public:
 
 class DinoUiOrganizationPageLButton : public DinoUiOrganizationMenuItem {
 public:
+    DinoUiOrganizationPageLButton(DinoUiOrganizationMenu *owner);
     virtual ~DinoUiOrganizationPageLButton();
     virtual void OnDecide();
 };
 
 class DinoUiOrganizationPageRButton : public DinoUiOrganizationMenuItem {
 public:
+    DinoUiOrganizationPageRButton(DinoUiOrganizationMenu *owner);
     virtual ~DinoUiOrganizationPageRButton();
     virtual void OnDecide();
 };

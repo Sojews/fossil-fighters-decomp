@@ -70,7 +70,7 @@ inline DinoUiTeamSelectTeamButton::DinoUiTeamSelectTeamButton(DinoUiTeamSelectMe
 
 // The three saved teams (a name, a button and an empty mark each), the current team's mark, the cursor, the team
 // details and, for a battle, the horider level's message.
-// NONMATCHING: stack slots only (the game's hoisted &mParallel is below the loop's spills; our block-local is above).
+// NONMATCHING: stack slots only (the game's hoisted &mParallel is below the loop's two spills; ours is one above).
 static inline MTaskSet *TeamSelectParallel(DinoUiTeamSelectMenu *menu) {
     return &menu->mParallel;
 }
