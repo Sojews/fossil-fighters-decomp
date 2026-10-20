@@ -2219,7 +2219,7 @@ from:0x0217ed5a kind:thumb_call to:0x02052e38 module:main
 from:0x0217ed70 kind:thumb_call to:0x021588e0 module:overlay(3)
 from:0x0217ed84 kind:thumb_call to:0x020531a4 module:main
 from:0x0217ed9a kind:thumb_call to:0x02158b1c module:overlay(3)
-from:0x0217edb0 kind:thumb_call to:0x02158b60 module:overlays(2,3)
+from:0x0217edb0 kind:thumb_call to:0x02158b60 module:overlay(3)
 from:0x0217edb6 kind:thumb_call to:0x02052e38 module:main
 from:0x0217edd8 kind:thumb_call to:0x02074800 module:main
 from:0x0217ee0c kind:thumb_call to:0x02052e38 module:main

@@ -34,6 +34,7 @@ struct DinoUiRvInformationData;
 
 class DinoUiRvInformation : public MProcess {
 public:
+    DinoUiRvInformation(u8 hasTenPictures);
     virtual ~DinoUiRvInformation();
     virtual void Idle();
 
@@ -79,6 +80,7 @@ public:
     u32 mUnk1AC;                        // 0x1AC
     u8 mUnk1B0;                         // 0x1B0: set once the page's parts are hidden
     u8 mUnk1B1;                         // 0x1B1
+    u32 unk1B4;
 };
 
 #endif

@@ -17,8 +17,145 @@
 #include "game/dino_ui_field_menu_fraction4.h"
 #include "game/dino_ui_rv_information.h"
 #include "game/dino_static_init.h"
+#include "game/dino_ui_field_menu_cursor.h"
+#include "game/dino_ui_parts_tab_icon_menu_item.h"
+#include "m/input.h"
+#include "m/smart_oam.h"
+#include "m/blend.h"
 
 #pragma auto_inline off
+
+// The TU's pooled statics (paths and positions; the positions are set by the static initialization below).
+extern "C" struct {
+    u8 unk00[0x4];
+    const char *mPageLPath;     // 0x04
+    const char *mPageRPath;     // 0x08
+    u8 unk0C[0x10 - 0xC];
+    const char *mBackPath;      // 0x10
+    u8 unk14[0x24 - 0x14];
+    MPoint mBackPos;            // 0x24
+    MPoint mFraction3Pos;       // 0x2C
+    MPoint mPageLPos;           // 0x34
+    u8 unk3C[0x5C - 0x3C];
+    MPoint mPageRPos;           // 0x5C
+    MPoint mFraction1Pos;       // 0x64
+} data_ov006_021939d4;
+extern "C" u32 data_ov006_02193a54[];
+extern "C" u32 data_ov006_02193ad4;
+extern "C" u32 data_ov006_02199180;
+
+extern const u32 data_0208a82c, data_0208a828, data_0208a824;
+extern const u32 data_0208a86c, data_0208a868, data_0208a864;
+extern const u32 data_0208a83c, data_0208a838, data_0208a834, data_0208a830;
+extern const int data_02089aa0, data_02089a9c, data_02089a98;
+// The help areas, and the tabs' frames.
+extern MRect data_020b5920, data_020b5930, data_020b5940;
+extern MRect data_020b58e0[4];
+
+inline DinoUiRvStatusBackButton::DinoUiRvStatusBackButton(DinoUiRvStatusMenu *owner)
+    : DinoUiRvStatusMenuItem(owner, data_ov006_021939d4.mBackPath, data_ov006_021939d4.mBackPos, data_0208a82c) {
+    SetKeys(2);
+    SetMode(4);
+    mMotion->Play(2, 0);
+}
+
+inline DinoUiRvStatusPageLButton::DinoUiRvStatusPageLButton(DinoUiRvStatusMenu *owner)
+    : DinoUiRvStatusMenuItem(owner, data_ov006_021939d4.mPageLPath, data_ov006_021939d4.mPageLPos, data_0208a828) {
+    SetKeys(0x200);
+    SetNoFocus(TRUE);
+}
+
+inline DinoUiRvStatusPageRButton::DinoUiRvStatusPageRButton(DinoUiRvStatusMenu *owner)
+    : DinoUiRvStatusMenuItem(owner, data_ov006_021939d4.mPageRPath, data_ov006_021939d4.mPageRPos, data_0208a824) {
+    SetKeys(0x100);
+    SetNoFocus(TRUE);
+}
+
+// The excavation settings' section at offset7C (the input repeat is at 0x1C and 0x20).
+static inline const int *GetExcavate7C(MResource<DinoExcavateDefs> &defs) {
+    const DinoExcavateDefs *d = defs.Get();
+    if (d->offset7C == 0) {
+        return NULL;
+    }
+    return (const int *)((const u8 *)d + d->offset7C);
+}
+
+void DinoUiRvStatusMenu::OnStart() {
+    DinoCreatureState creature;
+    SetLinkFallback(1);
+    {
+        MResource<DinoExcavateDefs> delayDefs = gDinoResource->GetExcavateDefs();
+        MResource<DinoExcavateDefs> intervalDefs = gDinoResource->GetExcavateDefs();
+        GetInput()->SetRepeat(0xF0, GetExcavate7C(delayDefs)[7], GetExcavate7C(intervalDefs)[8]);
+    }
+    gLcd->mMain->mBlend->Reset();
+    mKasekiDefs = gDinoResource->LoadKasekiDefs();
+    mOam = new MSmartOam(0x14, 0, TRUE);
+    mBack = new DinoUiRvStatusBackButton(this);
+    AddItem(mBack);
+    if (mLastPage > 0) {
+        mPageL = new DinoUiRvStatusPageLButton(this);
+        AddItem(mPageL);
+        mPageR = new DinoUiRvStatusPageRButton(this);
+        AddItem(mPageR);
+    }
+    mUnkE4 = new MParallelTaskSet();
+    mParallel.AddTail(mUnkE4);
+    mParallel.AddTail(mHelp11C = new DinoHelpDummyItem(GetDisplay(), data_020b5920,
+                                                       std::string(gDinoResource->GetText(data_0208a86c))));
+    mParallel.AddTail(
+        new DinoHelpDummyItem(GetDisplay(), data_020b5930, std::string(gDinoResource->GetText(data_0208a868))));
+    mParallel.AddTail(mHelp120 = new DinoHelpDummyItem(GetDisplay(), data_020b5940,
+                                                       std::string(gDinoResource->GetText(data_0208a864))));
+    // A local static the game fills in on the first call.
+    u32 guard = data_ov006_02199180;
+    if (!(guard & 1)) {
+        DINO_POOL_WORD(data_ov006_02193a54, 0x74) = data_0208a83c;
+        DINO_POOL_WORD(data_ov006_02193a54, 0x78) = data_0208a838;
+        DINO_POOL_WORD(data_ov006_02193a54, 0x7c) = data_0208a834;
+        DINO_POOL_WORD(data_ov006_02193ad4, 0) = data_0208a830;
+        DINO_POOL_WORD(data_ov006_02199180, 0) = guard | 1;
+    }
+    int i = 0;
+    const MRect *frames = data_020b58e0;
+    const u32 *texts = (const u32 *)&data_ov006_02193a54[0x74 / 4];
+    for (; i < 4; i++) {
+        mTabItems[i] = new DinoUiPartsTabIconMenuItem(*texts, *frames);
+        AddItem(mTabItems[i]);
+        texts++;
+        frames++;
+    }
+    AddLink(mTabItems[0], 3, mBack);
+    AddLink(mBack, 1, mTabItems[0]);
+    RefreshTab();
+    if (mUnk10A) {
+        mFraction = new DinoUiFieldMenuFraction4(mOam, data_ov006_021939d4.mFraction3Pos, 3);
+        mParallel.AddTail(mFraction);
+    } else {
+        mFraction = new DinoUiFieldMenuFraction4(mOam, data_ov006_021939d4.mFraction1Pos, 1);
+        mParallel.AddTail(mFraction);
+    }
+    mFraction->SetNumerator(mPage + 1);
+    mFraction->SetDenominator(mLastPage + 1);
+    mCursorTasks = new MParallelTaskSet();
+    mCursor = new DinoUiFieldMenuCursor(mOam);
+    mParallel.AddTail(mCursor);
+    mCursor->SetPriority(0);
+    mCursor->Hide();
+    mParallel.AddTail(mCursorTasks);
+    mParallel.AddTail(mOam);
+    mInfo = new DinoUiRvInformation(mUnk10A);
+    mParallel.AddTail(mInfo);
+    gDinoBackup->GetCreature(mCreatures[mPage], &creature);
+    mInfo->Unk02156ee8(*(DinoCreatureInfo *)&creature);
+    FocusItem(mTabItems[0]);
+    mTabItems[1]->SetKeys(0x400);
+    mTabItems[3]->SetKeys(0x800);
+    mUnkF4 = new MParallelTaskSet();
+    mParallel.AddTail(mUnkF4);
+    mUnkF4->AddTail(gLcd->GetBottomDisplay()->mBright->CreateFadeInFromBlack(data_02089aa0, data_02089a9c));
+    mSerial.AddTail(new MTimer(data_02089a98));
+}
 
 DinoUiRvStatusMenuItem::DinoUiRvStatusMenuItem(DinoUiRvStatusMenu *owner, const std::string &path, MPoint pos, u32 textId) {
     mOwner = owner;
@@ -225,8 +362,6 @@ void DinoUiRvStatusMenu::OnBackDecided() {
 }
 
 // The file's static initialization (see dino_static_init.h).
-extern "C" u32 data_ov006_021939d4[];
-extern "C" u32 data_ov006_02193a54[];
 static struct DinoUiRvStatusMenuItemStaticInit {
     DinoUiRvStatusMenuItemStaticInit() {
         DINO_POOL_WORD(data_ov006_021939d4, 0x6c) = 128;

@@ -38,13 +38,15 @@ public:
     void RefreshTab();
 
     MSmartOam *mOam;    // 0xB4: the items' sprites
-    u32 mUnkB8[3];
+    DinoUiRvStatusMenuItem *mBack;  // 0xB8
+    DinoUiRvStatusMenuItem *mPageL; // 0xBC: (only with more than one page)
+    DinoUiRvStatusMenuItem *mPageR; // 0xC0
     MMenuItem *mTabItems[4]; // 0xC4
-    MSerialTaskSet *mCursorTasks;   // 0xD4
+    MParallelTaskSet *mCursorTasks; // 0xD4
     DinoUiFieldMenuCursor *mCursor; // 0xD8
     DinoUiRvInformation *mInfo;         // 0xDC
     DinoUiFieldMenuFraction4 *mFraction;    // 0xE0
-    u32 mUnkE4;
+    MParallelTaskSet *mUnkE4;   // 0xE4
     std::vector<u32> mCreatures;    // 0xE8: a page each
     MTaskSet *mUnkF4;   // 0xF4
     int *mResult;       // 0xF8: gets the page left on
@@ -54,15 +56,15 @@ public:
     u8 mTab;            // 0x108
     u8 mUnk109;
     u8 mUnk10A;
-    struct {
-        MArchivePtr archive;
-        MArchiveFile file;
-    } mArchive;                 // 0x10C
-    u8 unk11C[0x148 - 0x11C];
+    MResource<DinoKasekiDefs> mKasekiDefs; // 0x10C
+    DinoHelpDummyItem *mHelp11C;    // 0x11C
+    DinoHelpDummyItem *mHelp120;    // 0x120
+    u8 unk124[0x148 - 0x124];
 };
 
 class DinoUiRvStatusBackButton : public DinoUiRvStatusMenuItem {
 public:
+    DinoUiRvStatusBackButton(DinoUiRvStatusMenu *owner);
     virtual ~DinoUiRvStatusBackButton();
     virtual void OnFocusChanged(BOOL focused);
     virtual void OnDecide();
@@ -70,12 +72,14 @@ public:
 
 class DinoUiRvStatusPageLButton : public DinoUiRvStatusMenuItem {
 public:
+    DinoUiRvStatusPageLButton(DinoUiRvStatusMenu *owner);
     virtual ~DinoUiRvStatusPageLButton();
     virtual void OnDecide();
 };
 
 class DinoUiRvStatusPageRButton : public DinoUiRvStatusMenuItem {
 public:
+    DinoUiRvStatusPageRButton(DinoUiRvStatusMenu *owner);
     virtual ~DinoUiRvStatusPageRButton();
     virtual void OnDecide();
 };

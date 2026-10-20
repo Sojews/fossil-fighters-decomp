@@ -7,6 +7,10 @@
 
 class DinoUiPartsTabIconMenuItem : public MMenuItem, public DinoHelpItem {
 public:
+    DinoUiPartsTabIconMenuItem(const u32 &textId, MRect frame) {
+        mTextId = textId;
+        mFrame = frame;
+    }
     virtual ~DinoUiPartsTabIconMenuItem();
     virtual MRect GetFrame();
     virtual void OnFocusChanged(BOOL focused);
