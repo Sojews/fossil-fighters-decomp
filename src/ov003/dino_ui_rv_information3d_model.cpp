@@ -123,6 +123,72 @@ extern "C" struct {
     void (DinoUiRvInformation::*Unk02156ee8_00)(DinoCreatureInfo info);
 } data_ov003_02160774;
 
+extern "C" const char data_ov003_02160c2c[];
+extern "C" const char data_ov003_02160c3c[];
+extern "C" const char data_ov003_02160c40[];
+extern "C" const char data_ov003_02160c44[];
+extern "C" const char data_ov003_02160c48[];  // a one-digit value's format
+extern "C" const char data_ov003_02160c50[];  // a two-digit value's format
+// A zero value's text (copied as a whole, from a non-const object).
+struct DinoUiRvBlankValue {
+    char text[5];
+};
+extern "C" DinoUiRvBlankValue data_ov003_02160c58;
+
+void DinoUiRvInformation::ShowSupportEffects() {
+    const DinoCreatureDef *def = gDinoResource->GetCreatureDef(mInfo.state.index);
+    if (mInfo.state.unk14 & 2) {
+        ((MIndicator *)mViewD8)->SetText(std::string(data_ov003_02160c2c));
+        for (int i = 0; i < 4; i++) {
+            ((MIndicator *)mViewsDC[i])->SetText(std::string(data_ov003_02160c3c));
+        }
+        return;
+    }
+    ((MIndicator *)mViewD8)->SetText(std::string(data_ov003_02160c40));
+    for (int i = 0; i < 4; i++) {
+        ((MIndicator *)mViewsDC[i])->SetText(std::string(data_ov003_02160c44));
+    }
+    for (int side = 0; side < 2; side++) {
+        const s8 *effects;
+        if (side == 0) {
+            effects = def->unk54 == 0 ? NULL : (const s8 *)def + def->unk54;
+        } else {
+            effects = def->unk58 == 0 ? NULL : (const s8 *)def + def->unk58;
+        }
+        if (effects[0] == 0 && effects[1] == 0 && effects[2] == 0 && effects[3] == 0) {
+            continue;
+        }
+        ((MIndicator *)mViewD8)->SetText(std::string(gDinoResource->GetCreatureText0C(side)));
+        int values[4] = {effects[0], effects[1], effects[2], effects[3]};
+        for (int i = 0; i < 4; i++) {
+            char text[16];
+            int value = values[i];
+            if (value != 0) {
+                int sign = 0x40;
+                if (value < 0) {
+                    sign = 0x20;
+                    value = -value;
+                }
+                if (value < 10) {
+                    sprintf(text, data_ov003_02160c48, value);
+                    text[1] += sign;
+                    text[2] += sign;
+                    text[3] += sign;
+                } else {
+                    sprintf(text, data_ov003_02160c50, value);
+                    text[0] += sign;
+                    text[1] += sign;
+                    text[2] += sign;
+                    text[3] += sign;
+                }
+            } else {
+                *(DinoUiRvBlankValue *)text = data_ov003_02160c58;
+            }
+            ((MIndicator *)mViewsDC[i])->SetText(std::string(text));
+        }
+    }
+}
+
 void DinoUiRvInformation::SetPage(u8 page) {
     if (page > 3 || mPage == page) {
         return;
