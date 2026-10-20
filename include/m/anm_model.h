@@ -113,7 +113,7 @@ public:
     u8 mUnk11C;                         // 0x11C
     const VecFx32 *mPosRef;             // 0x120: a position to follow
     const VecFx32 *mRotRef;             // 0x124: a rotation to follow
-    u32 unk128[3];
+    VecFx32 mPos;                       // 0x128: the transform track position (plus the position followed)
     u32 mUnk134;                        // 0x134
     u16 mUnk138;                        // 0x138
     u32 mUnk13C;                        // 0x13C
