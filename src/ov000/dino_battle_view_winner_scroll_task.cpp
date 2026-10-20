@@ -257,6 +257,44 @@ extern "C" void func_ov000_02161748(DinoBattleViewUnkE0 *field) {
     }
 }
 
+extern "C" void func_ov000_021728d4(DinoBattleViewCreature *view, int arg);
+extern "C" MPoint func_ov000_0215f22c(int kind, int side);
+
+// Sets a side's creatures back to their idle motion.
+static inline void ResetCreatures(DinoBattleViewPlayer *player) {
+    for (u32 i = 0; i < player->GetCreatureCount(); i++) {
+        DinoBattleViewCreature *creature = player->GetCreature(i);
+        creature->ClearFlag144(5);
+        func_ov000_021728d4(creature, 1);
+        creature->PlayMotion3();
+    }
+}
+
+// Without the scroll, resets the second side's creatures and exits; otherwise slides both sides' slots away.
+// NONMATCHING: the task set and the slot swap stack slots.
+void DinoBattleViewWinnerScrollTask::Idle() {
+    MParallelTaskSet *tasks;
+    if (!mUnk78) {
+        for (int side = 0; side < 2; side++) {
+            DinoBattleViewFieldSlot *slot = ((DinoBattleViewUnkE0 *)mUnk74)->mSlotViewsC0[side];
+            if (side == 1) {
+                ResetCreatures(slot->mPlayer);
+            }
+        }
+        Exit();
+        return;
+    }
+    tasks = new MParallelTaskSet(TRUE);
+    for (int side = 0; side < 2; side++) {
+        DinoBattleViewFieldSlot *slot = ((DinoBattleViewUnkE0 *)mUnk74)->mSlotViewsC0[side];
+        if (side == 0) {
+            ResetCreatures(slot->mPlayer);
+        }
+        tasks->AddTail(slot->CreateCoordAnime(slot->GetPosition(), func_ov000_0215f22c(side == 0 ? 4 : 5, side), 120, -1));
+    }
+    GetSerial()->AddTail(tasks, MTaskExitTransfer::Create(this));
+}
+
 // The file's static initialization (see dino_static_init.h).
 extern "C" u32 data_ov000_02191b1c[];
 extern "C" u32 data_ov000_02191b9c[];
