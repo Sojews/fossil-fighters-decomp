@@ -7,6 +7,8 @@
 // The title screen's top menu.
 class MSmartOam;
 
+class DinoUiTopMenuItem;
+class DinoUiTopMenuItem2;
 class DinoUiTopMenu : public DinoHelpBase, public MMenu {
 public:
     DinoUiTopMenu(int *result);
@@ -22,7 +24,10 @@ public:
 
     u8 unkB3[1];     // members start in MMenu's tail padding
     MSmartOam *mOam;    // 0xB4: the items' sprites
-    u8 unkB8[0x10];
+    DinoUiTopMenuItem *mSingle;     // 0xB8
+    DinoUiTopMenuItem *mMulti;      // 0xBC
+    DinoUiTopMenuItem2 *mPass;      // 0xC0
+    DinoUiTopMenuItem2 *mOption;    // 0xC4
     int *mResult;    // 0xC8: which button was chosen
     u8 mSilentFocus; // 0xCC
 };

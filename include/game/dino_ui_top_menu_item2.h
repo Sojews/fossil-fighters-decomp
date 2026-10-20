@@ -28,18 +28,21 @@ public:
 
 class DinoUiTopMenuPassButton : public DinoUiTopMenuItem2 {
 public:
+    DinoUiTopMenuPassButton(DinoUiTopMenu *owner);
     virtual ~DinoUiTopMenuPassButton();
     virtual void OnDecide();
 };
 
 class DinoUiTopMenuPassDarkButton : public DinoUiTopMenuItem2 {
 public:
+    DinoUiTopMenuPassDarkButton(DinoUiTopMenu *owner);
     virtual ~DinoUiTopMenuPassDarkButton();
     virtual void OnDecide();
 };
 
 class DinoUiTopMenuOptionButton : public DinoUiTopMenuItem2 {
 public:
+    DinoUiTopMenuOptionButton(DinoUiTopMenu *owner);
     virtual ~DinoUiTopMenuOptionButton();
     virtual void OnDecide();
 };

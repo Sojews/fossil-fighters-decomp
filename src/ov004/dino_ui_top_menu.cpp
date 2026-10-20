@@ -13,6 +13,8 @@
 #include "game/dino_ui_top_menu_loop.h"
 #include "game/dino_backup.h"
 #include "game/help.h"
+#include "game/dino_guide_message.h"
+#include "m/smart_oam.h"
 #include "game/dino_ui_top_menu.h"
 #include "m/bg_new_task.h"
 #include "m/call_task.h"
@@ -40,17 +42,34 @@ DinoUiTopMenuLoop::~DinoUiTopMenuLoop() {
 
 // Pooled file statics: the items' corners relative to their motions.
 struct DinoUiTopMenuStatics {
-    u8 unk00[0x2C];
+    u8 unk00[4];
+    const char *mMultiPath;     // 0x04
+    const char *mPassDarkTopPath;   // 0x08
+    const char *mSinglePath;    // 0x0C
+    const char *mLogoPath;      // 0x10
+    const char *mTitlePath;     // 0x14
+    const char *mMultiDarkPath; // 0x18
+    const char *mOptionTopPath; // 0x1C
+    const char *mBackPath;      // 0x20
+    const char *mPassTopPath;   // 0x24
+    const char *mItem2Path;     // 0x28: under the item2 buttons' tops
     void (DinoUiTopMenuLoop::*mTopMenu_2C)();       // 0x2C: (pooled pointer-to-member constants, see menu.cpp)
     void (DinoUiTopMenuLoop::*mTopMenu_34)();       // 0x34
-    u8 unk3C[0x44 - 0x3C];
+    MPoint mPassPos;            // 0x3C
     void (DinoUiTopMenuLoop::*mMultiplayEnd_44)();  // 0x44
     void (DinoUiTopMenuLoop::*mMultiplay_4C)();     // 0x4C
     void (DinoUiTopMenuLoop::*mTopMenuEnd_54)();    // 0x54
-    u8 unk5C[0x64 - 0x5C];
+    MPoint mSinglePos;          // 0x5C
     MPoint mItemTopLeft;        // 0x64
     void (DinoUiTopMenuLoop::*mMultiplay_6C)();     // 0x6C
     MPoint mItem2BottomRight;   // 0x74
+    // (The rest overlaps DinoUiTopMenuStatics2, the pool's next anchor.)
+    MPoint mOptionPos;          // 0x7C
+    u8 unk84[0xD4 - 0x84];
+    MPoint mBackPos;            // 0xD4
+    MPoint mTitlePos;           // 0xDC
+    u8 unkE4[0xEC - 0xE4];
+    MPoint mMultiPos;           // 0xEC
 };
 struct DinoUiTopMenuStatics2 {
     u8 unk00[0x14];
@@ -180,6 +199,116 @@ DinoUiTopMenu::DinoUiTopMenu(int *result) : MMenu(0) {
     mResult = result;
     mSilentFocus = TRUE;
     SetDeferStart(TRUE);
+}
+
+// Text ids.
+extern "C" const u32 data_0208a4e8, data_0208a4ec, data_0208a4f0, data_0208a4f4, data_0208a4f8, data_0208a90c;
+
+inline DinoUiTopMenuSingleButton::DinoUiTopMenuSingleButton(DinoUiTopMenu *owner)
+    : DinoUiTopMenuItem(owner, data_ov004_0217206c.mSinglePath, data_ov004_0217206c.mSinglePos, data_0208a4f8) {
+}
+
+inline DinoUiTopMenuMultiButton::DinoUiTopMenuMultiButton(DinoUiTopMenu *owner)
+    : DinoUiTopMenuItem(owner, data_ov004_0217206c.mMultiPath, data_ov004_0217206c.mMultiPos, data_0208a4f4) {
+}
+
+inline DinoUiTopMenuMultiDarkButton::DinoUiTopMenuMultiDarkButton(DinoUiTopMenu *owner)
+    : DinoUiTopMenuItem(owner, data_ov004_0217206c.mMultiDarkPath, data_ov004_0217206c.mMultiPos, data_0208a4f4) {
+}
+
+inline DinoUiTopMenuPassButton::DinoUiTopMenuPassButton(DinoUiTopMenu *owner)
+    : DinoUiTopMenuItem2(owner, data_ov004_0217206c.mPassTopPath, data_ov004_0217206c.mItem2Path,
+                         data_ov004_0217206c.mPassPos, data_0208a4f0) {
+}
+
+inline DinoUiTopMenuPassDarkButton::DinoUiTopMenuPassDarkButton(DinoUiTopMenu *owner)
+    : DinoUiTopMenuItem2(owner, data_ov004_0217206c.mPassDarkTopPath, data_ov004_0217206c.mItem2Path,
+                         data_ov004_0217206c.mPassPos, data_0208a4f0) {
+}
+
+inline DinoUiTopMenuOptionButton::DinoUiTopMenuOptionButton(DinoUiTopMenu *owner)
+    : DinoUiTopMenuItem2(owner, data_ov004_0217206c.mOptionTopPath, data_ov004_0217206c.mItem2Path,
+                         data_ov004_0217206c.mOptionPos, data_0208a4ec) {
+}
+
+inline DinoUiTopMenuBackButton::DinoUiTopMenuBackButton(DinoUiTopMenu *owner)
+    : DinoUiTopMenuItem(owner, data_ov004_0217206c.mBackPath, data_ov004_0217206c.mBackPos, data_0208a4e8) {
+    mMotion->Play(2, 0);
+    SetKeys(2);
+    SetMode(4);
+}
+
+// The excavation settings' section at offset7C (the input repeat is at 0x1C and 0x20).
+static inline const int *GetExcavate7C(const MResource<DinoExcavateDefs> &defs) {
+    const DinoExcavateDefs *d = const_cast<MResource<DinoExcavateDefs> &>(defs).Get();
+    if (d->offset7C == 0) {
+        return NULL;
+    }
+    return (const int *)((const u8 *)d + d->offset7C);
+}
+
+void DinoUiTopMenu::OnStart() {
+    mOam = new MSmartOam(0x5A, 0, TRUE);
+    mOam->mHidden = TRUE;
+    mSerial.AddTail(mOam->CreateShowTransfer());
+    Disable();
+    mSingle = new DinoUiTopMenuSingleButton(this);
+    AddItem(mSingle);
+    if (gDinoBackup->GetSystemFlag(0x1E)) {
+        mMulti = new DinoUiTopMenuMultiButton(this);
+        AddItem(mMulti);
+        mPass = new DinoUiTopMenuPassButton(this);
+        AddItem(mPass);
+    } else {
+        mMulti = new DinoUiTopMenuMultiDarkButton(this);
+        AddItem(mMulti);
+        mPass = new DinoUiTopMenuPassDarkButton(this);
+        AddItem(mPass);
+    }
+    mOption = new DinoUiTopMenuOptionButton(this);
+    AddItem(mOption);
+    DinoUiTopMenuBackButton *back = new DinoUiTopMenuBackButton(this);
+    AddItem(back);
+    MMotion *title = new MMotion(std::string(data_ov004_0217206c.mTitlePath), mOam, 2, 1);
+    title->Play(1, 0);
+    title->SetPosition(data_ov004_0217206c.mTitlePos);
+    title->Show();
+    mParallel.AddTail(title);
+    MMotion *logo = new MMotion(std::string(data_ov004_0217206c.mLogoPath), mOam, 2, 1);
+    logo->Play(1, 0);
+    logo->SetPosition(data_ov004_0217206c.mTitlePos);
+    logo->Show();
+    mParallel.AddTail(logo);
+    mParallel.AddTail(mOam);
+    mParallel.AddTail(new DinoGuideMessage(std::string(gDinoResource->GetText(data_0208a90c))));
+    switch (*mResult) {
+    case 2:
+        FocusItem(mMulti);
+        break;
+    case 3:
+        FocusItem(mPass);
+        break;
+    case 4:
+        FocusItem(mOption);
+        break;
+    default:
+        FocusItem(mSingle);
+        break;
+    }
+    GetInput()->SetRepeat(0xF0, GetExcavate7C(gDinoResource->GetExcavateDefs())[7],
+                          GetExcavate7C(gDinoResource->GetExcavateDefs())[8]);
+    SetLinkFallback(1);
+    AddLink(mOption, 1, NULL);
+    AddLink(mOption, 2, back);
+    AddLink(back, 4, mOption);
+    AddLink(back, 3, NULL);
+    AddLink(mMulti, 4, back);
+    AddLink(back, 2, mMulti);
+    AddLink(mPass, 1, NULL);
+    AddEntry((u32)(DinoHelpItem *)mPass, 1, 0);
+    AddEntry((u32)(DinoHelpItem *)back, 4, (u32)(DinoHelpItem *)mOption);
+    AddEntry((u32)(DinoHelpItem *)back, 3, (u32)(DinoHelpItem *)mOption);
+    mSerial.AddTail(MCreateCallTask(this, &DinoHelpBase::Enable));
 }
 
 void DinoUiTopMenu::OnFocus(MMenuItem *item) {

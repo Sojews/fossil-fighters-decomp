@@ -26,6 +26,7 @@ public:
 
 class DinoUiTopMenuBackButton : public DinoUiTopMenuItem {
 public:
+    DinoUiTopMenuBackButton(DinoUiTopMenu *owner);
     virtual ~DinoUiTopMenuBackButton();
     virtual MRect GetFrame();
     virtual void OnFocusChanged(BOOL focused);
@@ -34,18 +35,21 @@ public:
 
 class DinoUiTopMenuSingleButton : public DinoUiTopMenuItem {
 public:
+    DinoUiTopMenuSingleButton(DinoUiTopMenu *owner);
     virtual ~DinoUiTopMenuSingleButton();
     virtual void OnDecide();
 };
 
 class DinoUiTopMenuMultiButton : public DinoUiTopMenuItem {
 public:
+    DinoUiTopMenuMultiButton(DinoUiTopMenu *owner);
     virtual ~DinoUiTopMenuMultiButton();
     virtual void OnDecide();
 };
 
 class DinoUiTopMenuMultiDarkButton : public DinoUiTopMenuItem {
 public:
+    DinoUiTopMenuMultiDarkButton(DinoUiTopMenu *owner);
     virtual ~DinoUiTopMenuMultiDarkButton();
     virtual void OnDecide();
 };
