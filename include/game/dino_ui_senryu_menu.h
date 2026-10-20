@@ -33,7 +33,8 @@ public:
     u8 unkF0[0x18];
     u32 mUnk108;        // 0x108
     u32 mUnk10C;        // 0x10C
-    u8 unk110[0x11C - 0x110];
+    u8 unk110[0x118 - 0x110];
+    MTaskSet *mUnk118;  // 0x118
     MTask *mUnk11C;     // 0x11C
     MFont *mFont120;    // 0x120
     MFont *mFont124;    // 0x124
@@ -41,12 +42,14 @@ public:
     MMenuItem *mBackButton; // 0x12C
     u32 mPage;          // 0x130
     u32 mUnk134;        // 0x134
-    u8 unk138[4];
+    u32 mChoice;        // 0x138: the sub menu's answer
     u8 mUnk13C;         // 0x13C
     u8 mSilentFocus;    // 0x13D
     std::wstring mUnk140[126];  // 0x140
     std::wstring mUnk728[42];   // 0x728
-    s32 mEntries[44];   // 0x920: the record index << 8, and flags
+    s32 mEntries[42];   // 0x920: the record index << 8, and flags
+    u32 mCount;         // 0x9C8: how many entries
+    u32 unk9CC;
 };
 
 #endif

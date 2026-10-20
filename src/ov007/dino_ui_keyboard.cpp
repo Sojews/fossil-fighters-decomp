@@ -21,6 +21,7 @@
 #include "game/dino_backup.h"
 #include "m/bright.h"
 #include "m/picture.h"
+#include "game/dino_common_window_menu_item_flush_task_menu.h"
 
 DinoUiKeyboardMenu::DinoUiKeyboardMenu(int mode, u32 arg, int flag)
     : MMenu(NULL, 0), mPagePicture(NULL), mFocusFrame(0), mMode(mode), mArg(arg), mPage(0x20), mFlag(flag) {
@@ -475,6 +476,79 @@ void DinoUiSenryuMenu::CheckKeys() {
                 }
             }
         }
+    }
+}
+
+extern "C" const char data_ov007_02191e74[];
+extern const u32 data_0208ac74, data_0208ac34, data_0208ac78, data_0208ac38, data_0208ac70, data_0208ac30;
+
+// A poem: asks whether to mark it (or unmark it) or read it; the arrows turn the page.
+// NONMATCHING: the game adds the page offset and the item's index the other way round.
+void DinoUiSenryuMenu::OnDecide(MMenuItem *item) {
+    if (item == NULL) {
+        return;
+    }
+    u32 id = ((SenryuMenuItem *)item)->mIndex;
+    if (id < 0xF0 && id != 4 && id != 5) {
+        mUnk118->Clear();
+    }
+    switch (((SenryuMenuItem *)item)->mIndex) {
+    case 0:
+    case 1:
+    case 2: {
+        u32 index = mPage * 3 + ((SenryuMenuItem *)item)->mIndex;
+        mSerial.AddTail(CreateCurChangeTask(index));
+        if (!(mEntries[index] & 0x80)) {
+            break;
+        }
+        if (!(mEntries[index] & 2)) {
+            u32 marked = 0;
+            for (int i = 0; i < 42; i++) {
+                if ((mEntries[i] & 0x82) == 0x82) {
+                    marked++;
+                }
+            }
+            if (marked >= 41) {
+                break;
+            }
+        }
+        mChoice = 1;
+        DinoCommonWindowMenu *menu = new DinoCommonWindowMenu(gLcd->GetBottomDisplay(), &mChoice,
+                                                              MPoint(0x90, (((SenryuMenuItem *)item)->mIndex - 1) * 0x3A + 0x40), NULL, 0);
+        if (mEntries[index] & 2) {
+            menu->AddChoice(2, std::string(gDinoResource->GetText(data_0208ac74)), std::string(gDinoResource->GetText(data_0208ac34)));
+        } else {
+            menu->AddChoice(1, std::string(gDinoResource->GetText(data_0208ac78)), std::string(gDinoResource->GetText(data_0208ac38)));
+        }
+        menu->AddChoice(3, std::string(data_ov007_02191e74) + gDinoResource->GetText(data_0208ac70),
+                        std::string(gDinoResource->GetText(data_0208ac30)));
+        GetSerial()->AddTail(menu, new DinoUiSenryuSubMenu(this, &mChoice, index));
+        break;
+    }
+    case 4: {
+        DinoSoundPlaySe(0x93, 0);
+        u32 cur;
+        if (mPage != 0) {
+            cur = (mPage - 1) * 3;
+        } else {
+            cur = ((mCount - 1) / 3) * 3;
+        }
+        GetSerial()->AddTail(gLcd->GetBottomDisplay()->mBright->CreateFadeOutToBlack(15, 0), CreateCurChangeTask(cur),
+                             gLcd->GetBottomDisplay()->mBright->CreateFadeInFromBlack(15, 0));
+        break;
+    }
+    case 5: {
+        DinoSoundPlaySe(0x93, 0);
+        u32 cur = mPage;
+        if (cur == (mCount - 1) / 3) {
+            cur = 0;
+        } else {
+            cur = (cur + 1) * 3;
+        }
+        GetSerial()->AddTail(gLcd->GetBottomDisplay()->mBright->CreateFadeOutToBlack(15, 0), CreateCurChangeTask(cur),
+                             gLcd->GetBottomDisplay()->mBright->CreateFadeInFromBlack(15, 0));
+        break;
+    }
     }
 }
 

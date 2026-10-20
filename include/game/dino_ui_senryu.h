@@ -74,6 +74,7 @@ public:
 
 class DinoUiSenryuSubMenu : public MTask {
 public:
+    DinoUiSenryuSubMenu(void *owner, u32 *value, u32 arg) : mOwner(owner), mValue(value), mArg(arg) {}
     virtual ~DinoUiSenryuSubMenu();
     virtual void Execute();
 
