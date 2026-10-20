@@ -6537,7 +6537,7 @@ __sinit_text_codec.cpp kind:function(thumb,size=0x50) addr:0x020895ac
 __sinit_text_codec_globals.cpp kind:function(thumb,size=0x8c) addr:0x020895fc
 __sinit_file.cpp kind:function(thumb,size=0x94) addr:0x02089688
 __sinit_archive.cpp kind:function(thumb,size=0x38) addr:0x0208971c
-__sinit_02089754 kind:function(thumb,size=0x38) addr:0x02089754
+__sinit_sleep.cpp kind:function(thumb,size=0x38) addr:0x02089754
 __sinit_multi_message.cpp kind:function(thumb,size=0x28) addr:0x0208978c
 __sinit_input.cpp kind:function(thumb,size=0x10) addr:0x020897b4
 __sinit_3d.cpp kind:function(thumb,size=0x10) addr:0x020897c4
@@ -7456,7 +7456,7 @@ dp_l kind:data(any) addr:0x02092f9c
 .p__sinit_020895fc kind:data(word) addr:0x02093024
 .p__sinit_02089688 kind:data(word) addr:0x02093028
 .p__sinit_0208971c kind:data(word) addr:0x0209302c
-.p__sinit_02089754 kind:data(word) addr:0x02093030
+.p__sinit_sleep.cpp kind:data(word) addr:0x02093030
 .p__sinit_0208978c kind:data(word) addr:0x02093034
 .p__sinit_020897b4 kind:data(word) addr:0x02093038
 .p__sinit_020897c4 kind:data(word) addr:0x0209303c
