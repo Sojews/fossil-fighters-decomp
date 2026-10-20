@@ -557,6 +557,8 @@ public:
     void Finish();
     // Counts the time down and steps the dance on each press (or by itself), running the talk window.
     void StatePlay();
+    // Shows a talk message (the first line is the speaker) unless one with a higher priority is still showing.
+    void ShowMessage(u32 priority, u32 id);
 
     void (DinoFieldDance::*mState)(); // 0x74
     DinoField *mField;                // 0x7C
@@ -578,8 +580,8 @@ public:
     MTaskSet *mUnkDC;                 // 0xDC
     MTaskSet *mUnkE0;                 // 0xE0
     class DinoTalkWindow *mTalk;      // 0xE4
-    MResource<DinoDanceData> mUnkE8;  // 0xE8
-    u32 unkF8;
+    MResource<DinoMessageData> mMessages; // 0xE8: the talk messages last shown
+    u32 mPriority;                    // 0xF8: the message showing's
     MFont *mFont;                     // 0xFC
     MPictureFile mPicture;            // 0x100
 };

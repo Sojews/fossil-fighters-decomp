@@ -25,6 +25,7 @@
 #include "m/picture.h"
 #include "m/smart_oam.h"
 #include "game/dino_talk_window.h"
+#include "m/text_codec.h"
 #include "game/dino_sound.h"
 #include "m/input.h"
 
@@ -164,7 +165,6 @@ struct DinoDanceFile {
     u32 eventCount;     // 0x1C
     u32 eventOffset;    // 0x20: (time, event) pairs
 };
-extern "C" void func_ov001_02166d08(DinoFieldDance *dance, u32 kind, u32 event);
 
 DinoFieldDance::DinoFieldDance(DinoField *field, u32 a, u32 b, u32 c, u32 d, u32 e)
     : MProcess(gLcd->GetBottomDisplay()), mField(field), mUnk80(a), mDance(gDinoResource->LoadDance(b)), mUnk94(c),
@@ -186,6 +186,34 @@ void DinoFieldDance::ShowTime() {
     gDinoBackup->SetLocalVar(mUnk9C, hundredths);
 }
 
+void DinoFieldDance::ShowMessage(u32 priority, u32 id) {
+    if (!mUnkE0->IsEmpty() && priority < mPriority) {
+        return;
+    }
+    mPriority = priority;
+    mUnkDC->Clear();
+    mUnkE0->Clear();
+    std::string text;
+    mMessages = gDinoResource->LoadMessage(gDinoResource->GetTalkMessageMatch(id));
+    for (u32 i = 0; i < ((const u32 *)mMessages.Get())[1]; i++) {
+        const u8 *data = (const u8 *)mMessages.Get();
+        if (id == *(const u32 *)(data + ((const u32 *)(data + ((const u32 *)data)[2]))[i])) {
+            const u8 *data2 = (const u8 *)mMessages.Get();
+            const u8 *entry = data2 + ((const u32 *)(data2 + ((const u32 *)data2)[2]))[i];
+            text = (const char *)entry + ((const u32 *)entry)[1];
+            break;
+        }
+    }
+    std::vector<std::string> lines = MSplitString(text, '\n');
+    std::string speaker(lines[0]);
+    lines.erase(lines.begin());
+    text = MJoinStrings(lines, '\n');
+    mTalk = new DinoTalkWindow(gLcd->GetBottomDisplay(), speaker, 0, 0, 0);
+    mTalk->Print(std::string(text));
+    mUnkE0->AddTail(mTalk);
+    mUnkDC->AddTail(mTalk->CreateWaitStartTask());
+}
+
 void DinoFieldDance::StatePlay() {
     mTime--;
     ShowTime();
@@ -197,7 +225,7 @@ void DinoFieldDance::StatePlay() {
         const DinoDanceFile *file = (const DinoDanceFile *)mDance.Get();
         if (mTime == ((const u32 *)((const u8 *)file + file->eventOffset))[i * 2]) {
             const DinoDanceFile *file2 = (const DinoDanceFile *)mDance.Get();
-            func_ov001_02166d08(this, 2, ((const u32 *)((const u8 *)file2 + file2->eventOffset))[i * 2 + 1]);
+            ShowMessage(2, ((const u32 *)((const u8 *)file2 + file2->eventOffset))[i * 2 + 1]);
         }
     }
     u32 step;
@@ -219,7 +247,7 @@ void DinoFieldDance::StatePlay() {
                 ((DinoFieldChara *)*it)->ChangeMotion(9, 0, MFx32::FromRaw(mCurStep->tempo));
             }
             if (mCurStep->event != 0) {
-                func_ov001_02166d08(this, 1, mCurStep->event);
+                ShowMessage(1, mCurStep->event);
             }
         } else if (mHold == 0 && mUnk80 == 0) {
             mHold = mStepFrames - mFrame;
