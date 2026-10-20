@@ -30,6 +30,7 @@ public:
 };
 
 class Dino3DLoadCsv;
+class DinoUiOpeningChara;
 
 class DinoUiOpening : public MProcess {
 public:
@@ -42,10 +43,13 @@ public:
     void StateNextScene();
     void StateShowScene();
     void StateWaitScene();
+    // Slides the characters and the logo away, fades out to white and exits (quickly if skipped).
+    void End();
 
     MInput *mInput;     // 0x74
     void (DinoUiOpening::*mState)(); // 0x78
-    u8 unk80[0x8C - 0x80];
+    u8 unk80[0x88 - 0x80];
+    MSmartOam *mOam;    // 0x88
     void *mUnk8C;       // 0x8C
     u32 unk90;
     Dino3DLoadCsv *mLoad;   // 0x94: the scene loaded next
@@ -56,7 +60,8 @@ public:
     std::vector<void *> mUnkA8; // 0xA8
     u32 mSceneCount;    // 0xB4
     int mSceneFrames;   // 0xB8
-    u8 unkBC[0xC4 - 0xBC];
+    DinoUiOpeningChara *mChara1;    // 0xBC
+    DinoUiOpeningChara *mChara2;    // 0xC0: (may be missing)
 };
 
 #endif

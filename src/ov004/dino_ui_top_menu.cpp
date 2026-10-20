@@ -28,6 +28,8 @@
 #include "m/bg.h"
 #include "m/display.h"
 #include "m/lcd.h"
+#include "game/dino_ui_opening_chara.h"
+#include "m/bright.h"
 #include "game/dino_resource.h"
 #include "game/dino_ui_save_slot_confirm.h"
 #include "game/dino_ui_save_slot_select_menu_confirm_delete_task.h"
@@ -514,6 +516,57 @@ void DinoUiSaveSlotSelectMenuItem::OnFocusChanged(BOOL focused) {
 
 
 // Starts loading the next scene of the opening (a battle field model, its camera and sounds).
+// Slides a character off to the left.
+static inline void DinoSlideOutChara(DinoUiOpeningChara *chara) {
+    chara->mSerial.Clear();
+    chara->mSerial.AddTail(
+        chara->mMotion->CreateCoordAnime(chara->mMotion->GetPosition(), chara->mMotion->GetPosition().Offset(-200, 0), 120, 0));
+}
+
+void DinoUiOpening::End() {
+    // (Declared in this order for the game's register and stack slot choices.)
+    MPoint to;
+    MTask *slide;
+    MTask *wait;
+    MTask *stop;
+    MTask *fadeTop;
+    MTask *fadeBottom;
+    MTask *exit;
+    if (!mSkipped) {
+        DinoSlideOutChara(mChara1);
+        if (mChara2 != NULL) {
+            DinoSlideOutChara(mChara2);
+        }
+    }
+    exit = MTaskExitTransfer::Create(this);
+    MBright *bright = gLcd->GetBottomDisplay()->mBright;
+    fadeBottom = bright->CreateFadeOutToWhite(mSkipped ? 15 : 60, 0);
+    bright = gLcd->GetTopDisplay()->mBright;
+    fadeTop = bright->CreateFadeOutToWhite(mSkipped ? 15 : 60, 0);
+    MParallelTaskSet *fades = new MParallelTaskSet(TRUE);
+    fades->AddTail(fadeTop);
+    fades->AddTail(fadeBottom);
+    stop = DinoSoundCreateStopBgmTask(-1, mSkipped ? 15 : 60);
+    wait = new MTimer(mSkipped ? 1 : 60);
+    MSerialTaskSet *serial = new MSerialTaskSet(TRUE);
+    serial->AddTail(wait);
+    serial->AddTail(stop);
+    serial->AddTail(fades);
+    if (mSkipped) {
+        slide = new MTimer(1);
+    } else {
+        MPoint from(mOam->mOffset.x, mOam->mOffset.y);
+        to = MPoint(0, -80);
+        slide = mOam->CreateOffsetAnime(from, to, 120, 2);
+    }
+    MParallelTaskSet *all = new MParallelTaskSet(TRUE);
+    all->AddTail(slide);
+    all->AddTail(serial);
+    MSerialTaskSet *self = &mSerial;
+    self->AddTail(all);
+    self->AddTail(exit);
+}
+
 void DinoUiOpening::LoadScene() {
     u32 id = (u32)mUnkA8[mScene++];
     char path[256];
