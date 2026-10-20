@@ -14,7 +14,7 @@ _Z15MCreateCallTaskI19DinoUiRvInformationS0_hEP5MTaskPT_MT0_FvT1_ES6_ kind:funct
 _ZN19DinoUiRvInformation11Unk021571bcEv kind:function(thumb,size=0x1a8) addr:0x021571bc
 _ZN19DinoUiRvInformation14ShowStatusPageEv kind:function(thumb,size=0x320) addr:0x02157364
 _Z18DinoUiRvAttackFlagm kind:function(thumb,size=0x78) addr:0x02157684
-func_ov003_021576fc kind:function(thumb,size=0x474) addr:0x021576fc
+_ZN19DinoUiRvInformation14ShowAttackPageEv kind:function(thumb,size=0x474) addr:0x021576fc
 _ZN19DinoUiRvInformation18ShowSupportEffectsEv kind:function(thumb,size=0x21c) addr:0x02157b70
 _ZN19DinoUiRvInformation7SetPageEh kind:function(thumb,size=0x23c) addr:0x02157d8c
 _Z15MCreateCallTaskI19DinoUiRvInformationS0_16DinoCreatureInfoEP5MTaskPT_MT0_FvT1_ES7_ kind:function(thumb,size=0x48) addr:0x02157fc8

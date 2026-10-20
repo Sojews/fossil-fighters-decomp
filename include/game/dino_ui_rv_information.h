@@ -54,6 +54,9 @@ public:
     void ShowSupportEffects();
     // (Page 0) The creature's name, description, life, level and stats, then its support effects.
     void ShowStatusPage();
+    // (Pages 1 and 2) Three of the creature's attacks (the ones its parts' levels allow, then its special attack
+    // where it's shown): name, description, cost and power.
+    void ShowAttackPage();
 
     MPictureFile *mPictures[10];        // 0x74
     MTextPicture *mPagePicture;         // 0x9C

@@ -31,6 +31,7 @@
 #include "m/anm_model.h"
 #include "game/dino_static_init.h"
 #include "game/dino_creature_sort.h"
+#include "game/dino_backup.h"
 #include "m/console.h"
 
 extern "C" u8 data_ov003_021624d0[];  // the scene's heap
@@ -256,6 +257,116 @@ void DinoUiRvInformation::ShowStatusPage() {
     }
 }
 
+BOOL DinoUiRvAttackFlag(u32 id);
+
+// How many of the creature's parts have a level.
+static inline u32 DinoCountLevelledParts(const DinoCreatureBody *body) {
+    u32 n = 0;
+    for (u32 j = 0; j < 4; j++) {
+        if (body->parts[j].level != 0) {
+            n++;
+        }
+    }
+    return n;
+}
+
+// NONMATCHING: the attack loops are strength-reduced here and the row search keeps n on the stack.
+void DinoUiRvInformation::ShowAttackPage() {
+    if (mInfo.state.unk14 & 2) {
+        for (int i = 0; i < 3; i++) {
+            mViewsF0[i]->Show();
+            mViews104[i]->Show();
+            mViews118[i]->Show();
+            mNumbers12C[i]->Show();
+            mNumbers140[i]->Show();
+            ((MIndicator *)mViews104[i])->SetText(std::string(data_ov003_02160c2c));
+            ((MConsole *)mViews118[i])->Clear();
+            ((MConsole *)mViews118[i])->Print(std::string(data_ov003_02160c38));
+            mNumbers140[i]->SetValue(0xFFFD);
+            mNumbers12C[i]->SetValue(0xFFFD);
+            ((MMotion *)mViewsF0[i])->Play(2, 0);
+        }
+        return;
+    }
+    const DinoCreatureDef *def = gDinoResource->GetCreatureDef(mInfo.state.index);
+    const DinoCreatureBody *body = (const DinoCreatureBody *)&mInfo.unk00[1];
+    u32 count = 0;
+    for (u32 i = 0; i < def->attackCount; i++) {
+        if (((const u32 *)((const u8 *)def + def->attackLevels))[i] <= DinoCountLevelledParts(body)) {
+            count++;
+        }
+    }
+    BOOL special = FALSE;
+    u32 specialAttack = def->specialAttack;
+    if ((mUnk1AC == 0 && gDinoBackup->GetSystemFlag(0x28)) || mUnk1AC == 1 || mUnk1AC == 3) {
+        if (specialAttack != 0 && def->specialAttackLevel <= DinoCountLevelledParts(body)) {
+            count++;
+            special = TRUE;
+        }
+    }
+    for (int row = 0; row < 3; row++) {
+        u32 n = (mPage - 1) * 3 + row;
+        if (n < count) {
+            mViewsF0[row]->Show();
+            mViews104[row]->Show();
+            mViews118[row]->Show();
+            mNumbers12C[row]->Show();
+            mNumbers140[row]->Show();
+            u32 attack;
+            if (special && n == count - 1) {
+                attack = specialAttack;
+            } else {
+                attack = 0;
+                u32 attacks = def->attackCount;
+                for (u32 i = 0; i < attacks; i++) {
+                    if (((const u32 *)((const u8 *)def + def->attackLevels))[i] <= DinoCountLevelledParts(body)) {
+                        if (n-- == 0) {
+                            attack = ((const u32 *)((const u8 *)def + def->attackIds))[i];
+                            break;
+                        }
+                    }
+                }
+            }
+            ((MIndicator *)mViews104[row])->SetText(std::string(gDinoResource->GetAttackName(attack)));
+            ((MConsole *)mViews118[row])->Clear();
+            ((MConsole *)mViews118[row])->Print(std::string(gDinoResource->GetCreatureText1C(attack)));
+            const DinoAttackDef *attackDef = gDinoResource->GetAttackDef(attack);
+            mNumbers140[row]->SetValue(DinoOffsetPtr<u16>(attackDef, attackDef->cost)[0]);
+            u16 power = DinoOffsetPtr<u16>(attackDef, attackDef->cost)[1];
+            if (power != 0) {
+                DinoCreatureStatsInput info;
+                info.levels[0] = info.levels[1] = info.levels[2] = info.levels[3] = 0;
+                MI_CpuFill8(&info, 0, sizeof(info));
+                info.id = mInfo.state.index;
+                info.rank = GetCreatureLevel(*(const DinoCreatureState *)&mInfo);
+                info.levels[4] = (*(const DinoCreatureState *)&mInfo).unk0_8;
+                const DinoCreatureBody *parts = (const DinoCreatureBody *)&mInfo.unk00[1];
+                for (int i = 0; i < 4; i++) {
+                    info.bonus[i] = parts->parts[i].unk12;
+                    info.levels[i] = parts->parts[i].level;
+                }
+                DinoCreatureStats stats = func_02030f38(&info, FALSE, 0);
+                mNumbers12C[row]->SetValue((u16)(power + stats.stats[0]));
+            } else {
+                mNumbers12C[row]->SetValue(0xFFFF);
+            }
+            if (attack == specialAttack) {
+                ((MMotion *)mViewsF0[row])->Play(3, 0);
+            } else if (DinoUiRvAttackFlag(attack)) {
+                ((MMotion *)mViewsF0[row])->Play(1, 0);
+            } else {
+                ((MMotion *)mViewsF0[row])->Play(2, 0);
+            }
+        } else {
+            mViewsF0[row]->Hide();
+            mViews104[row]->Hide();
+            mViews118[row]->Hide();
+            mNumbers12C[row]->Hide();
+            mNumbers140[row]->Hide();
+        }
+    }
+}
+
 void DinoUiRvInformation::SetPage(u8 page) {
     if (page > 3 || mPage == page) {
         return;
@@ -296,7 +407,6 @@ extern "C" struct {
     int anime;
 } data_ov003_021601e0[6];
 extern "C" const char data_ov003_02160c24[];   // the number's format
-extern "C" void func_ov003_021576fc(DinoUiRvInformation *info);
 
 // Shows a creature: its number, type and name, and the page's details (reloading the page when the picture
 // changes).
@@ -355,7 +465,7 @@ void DinoUiRvInformation::Unk02156ee8(DinoCreatureInfo info) {
         return;
     case 1:
     case 2:
-        func_ov003_021576fc(this);
+        ShowAttackPage();
         return;
     case 3:
         mUnk16C->Clear();

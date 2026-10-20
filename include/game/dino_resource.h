@@ -59,6 +59,8 @@ struct DinoCreatureDef {
 
     // The hit points by rank, from rank 1 (u16 each).
     const u16 *GetHpTable() const { return (const u16 *)((const u8 *)this + hpTable); }
+    // The level the attack needs.
+    u32 GetAttackLevel(u32 i) const { return ((const u32 *)((const u8 *)this + attackLevels))[i]; }
 
     u8 unk00[0xD];
     u8 unk0D;
