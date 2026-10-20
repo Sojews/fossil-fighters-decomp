@@ -462,6 +462,12 @@ class DinoEventExecChoice2 : public MProcess {
 public:
     virtual ~DinoEventExecChoice2();
     virtual void Idle();
+
+    DinoEventLoop *mEvent;  // 0x74
+    u32 mVar;           // 0x78: the local variable that gets the choice
+    u32 mText;          // 0x7C: the title, then the choices, one per line
+    u32 mStep;          // 0x80
+    u32 mResult;        // 0x84
 };
 
 class DinoEventExecYesNo : public MProcess {

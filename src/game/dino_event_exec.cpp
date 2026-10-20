@@ -3,6 +3,8 @@
 #pragma ipa file
 
 #include "game/dino_event_exec.h"
+#include "game/common_window_message.h"
+#include "game/dino_common_window_menu_item_flush_task_menu.h"
 #include "game/dino_field_area_panel.h"
 #include "game/dino_battle.h"
 #include "nitro/mi.h"
@@ -945,6 +947,44 @@ void DinoEventExecTalk::Idle() {
         mSerial.AddTail(MTaskExitTransfer::Create(this));
         break;
     }
+    }
+}
+
+extern "C" const char data_020bff48[]; // ""
+
+// Asks with a window of choices (the text's first line titles it) and keeps the answer in a local variable.
+// (The game calls vector<string>'s destructor out of line here; ours inlines it to the base's, same instructions.)
+void DinoEventExecChoice2::Idle() {
+    switch (mStep++) {
+    case 0: {
+        MDisplayScope scope(gLcd->GetBottomDisplay());
+        mResult = gDinoBackup->GetLocalVar(mVar);
+        std::vector<DinoWindowChoice> choices;
+        std::vector<std::string> lines = MSplitString(mEvent->GetTalkText(mText), '\n');
+        std::string title(lines[0]);
+        lines.erase(lines.begin());
+        int y = 0x60 - lines.size() * 16 / 2;
+        for (u32 i = 0; i < lines.size(); i++) {
+            choices.push_back(DinoWindowChoice(i, std::string(lines[i]), std::string(data_020bff48)));
+        }
+        DinoCommonWindowMessage *message = new DinoCommonWindowMessage(MPoint(0x80, y), std::string(title), 6, 0);
+        DinoCommonWindowMenu *menu = new DinoCommonWindowMenu(&mResult, MPoint(0x80, y), &choices, 5);
+        mParallel.AddTail(message);
+        MTask *exit = MTaskExitTransfer::Create(message);
+        MTask *ask = menu;
+        MTask *wait = MTaskSetWaitEmptyTask::Create(&message->mSerial);
+        MTask *timer = new MTimer(1);
+        MSerialTaskSet *serial = &mSerial;
+        serial->AddTail(timer);
+        serial->AddTail(wait);
+        serial->AddTail(ask);
+        serial->AddTail(exit);
+        break;
+    }
+    case 2:
+        gDinoBackup->SetLocalVar(mVar, mResult);
+        Exit();
+        break;
     }
 }
 
