@@ -8,7 +8,6 @@
 #include "game/dino_multi_play_icon.h"
 #include "m/lcd.h"
 
-// NONMATCHING: the two MPoint temporaries get each other's stack slots.
 DinoMultiPlayIcon::DinoMultiPlayIcon() : MProcess(NULL) {
     GetParallel()->AddTail(new DinoMultiPlayIconHook(gLcd->GetTopDisplay(), MPoint(236, 4)),
                            new DinoMultiPlayIconHook(gLcd->GetBottomDisplay(), MPoint(236, 4)));
