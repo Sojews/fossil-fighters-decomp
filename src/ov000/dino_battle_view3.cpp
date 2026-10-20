@@ -8,6 +8,8 @@
 #include "game/dino_static_init.h"
 #include "m/motion.h"
 #include <string>
+#include "game/dino_sound.h"
+#include "nitro/os.h"
 
 // The TU's pooled statics: the panel's motion paths and pointer-to-member constants (see menu.cpp).
 extern "C" struct {
@@ -37,6 +39,49 @@ DinoBattleViewLPCountPanel::DinoBattleViewLPCountPanel(MSmartOam *oam, u32 side,
     }
     mUnk80 = new MMotion(std::string(data_ov000_02197300.unk0CPath), oam, 0, 1);
     mParallel.AddTail(mUnk80);
+}
+
+extern "C" const char data_ov000_021974a8[];   // the count's format
+extern "C" const int data_0208a180;            // frames the count stays up
+
+// (Takes the frames by reference: the game reads them after the timer's vtable is set.)
+static inline MTimer *NewTimer(const int &frames) {
+    return new MTimer(frames);
+}
+
+// Shows the count digit by digit from the last, then (with mUnk9C) plays the panel's finish.
+extern "C" MTask *func_ov000_0218d318(DinoBattleViewLPCountPanel *panel, int delay) {
+    MSerialTaskSet *tasks = new MSerialTaskSet(TRUE);
+    tasks->AddTail(new MTimer(delay));
+    char text[8];
+    OS_SPrintf(text, data_ov000_021974a8, panel->mUnk98);
+    for (int i = 3; i >= 0; i--) {
+        if (text[i] != ' ') {
+            tasks->AddTail(panel->mDigits[i]->CreatePlayTransfer(text[i] - '0' + 1, 0));
+            if (!panel->mUnk9C) {
+                tasks->AddTail(DinoSoundCreatePlaySeTask(100, 0));
+            }
+        }
+        tasks->AddTail(new MTimer(4));
+    }
+    tasks->AddTail(NewTimer(data_0208a180));
+    if (panel->mUnk9C) {
+        panel->mUnk80->Show();
+        MTask *play;
+        MTask *timer;
+        MTask *se;
+        MTask *wait;
+        wait = panel->mPanel->CreateWaitStopTask();
+        se = DinoSoundCreatePlaySeTask(0x65, 0);
+        timer = new MTimer(8);
+        play = panel->mPanel->CreatePlayTransfer(2, 0);
+        tasks->AddTail(panel->mUnk80->CreatePlayTransfer(3, 0));
+        tasks->AddTail(play);
+        tasks->AddTail(timer);
+        tasks->AddTail(se);
+        tasks->AddTail(wait);
+    }
+    return tasks;
 }
 #pragma auto_inline on
 
