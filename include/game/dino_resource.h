@@ -116,7 +116,8 @@ struct DinoBattleAdjustDefs {
     MFx32 unk10;            // 0x10: divides the damage
 
     MFx32 unk14;            // 0x14
-    u32 unk18[2];
+    MFx32 criticalMin;      // 0x18: the range of the critical hit factor (func_ov000_0216ea64)
+    MFx32 criticalMax;      // 0x1C
     MFx32 randomMin;        // 0x20: the range of the random damage factor
     MFx32 randomMax;        // 0x24
     u32 unk28[2];

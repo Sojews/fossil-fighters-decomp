@@ -1731,6 +1731,58 @@ extern "C" MFx32 func_ov000_0216e918(DinoBattleModelCreature *creature, MFx32 ch
     return min + (max - min) * creature->RandomFraction();
 }
 
+extern "C" const u32 data_0208a414;
+
+// Rolls an attack's hit: within chance it's a critical hit by the def's rate (a factor between the adjust table's
+// critical bounds, kind 3) or a normal hit (kind 2); past it, a miss by the table's chance (0, kind 0) or a normal hit.
+extern "C" MFx32 func_ov000_0216ea64(DinoBattleModelCreature *creature, DinoBattleModelCreature *target, MFx32 chance,
+                                     u8 *critical, u8 *missed, int *kind, u32 arg) {
+    MFx32 result;
+    const MFx32 unused0 = gDinoResource->GetBattleAdjustDefs()->unk14;
+    const MFx32 unused1 = gDinoResource->GetBattleAdjustDefs()->unk14;
+    const MFx32 unused2 = gDinoResource->GetBattleAdjustDefs()->unk14;
+    const MFx32 unused3 = gDinoResource->GetBattleAdjustDefs()->unk14;
+    const MFx32 min = gDinoResource->GetBattleAdjustDefs()->criticalMin;
+    const MFx32 max = gDinoResource->GetBattleAdjustDefs()->criticalMax;
+    *missed = FALSE;
+    if (chance >= creature->RandomFraction()) {
+        if (creature->GetDefUnk20(creature->CompareUnkECA0(target, arg) == 1) >
+            (int)creature->mPlayer->GetRandom()->Next(100)) {
+            char text[256];
+            sprintf(text, gDinoResource->GetText(data_0208a414), 0);
+            data_ov000_021978c0->Print(text);
+            result = min + (max - min) * creature->RandomFraction();
+            *critical = TRUE;
+            *kind = 3;
+            return result;
+        }
+        char text[256];
+        sprintf(text, gDinoResource->GetText(data_0208a410), 0);
+        data_ov000_021978c0->Print(text);
+        result = creature->RandomDamageFactor();
+        *critical = FALSE;
+        *kind = 2;
+        return result;
+    }
+    if (MFx32(gDinoResource->GetBattleAdjustDefs()->unk4C) >= creature->RandomFraction()) {
+        char text[256];
+        sprintf(text, gDinoResource->GetText(data_0208a40c), 0);
+        data_ov000_021978c0->Print(text);
+        *missed = TRUE;
+        *kind = 0;
+        result = MFx32(0);
+    } else {
+        char text[256];
+        sprintf(text, gDinoResource->GetText(data_0208a410), 0);
+        data_ov000_021978c0->Print(text);
+        result = creature->RandomDamageFactor();
+        *critical = FALSE;
+        *kind = 2;
+    }
+    *critical = FALSE;
+    return result;
+}
+
 // A vector member the game emits in this file (made explicitly until the code that uses it is decompiled).
 // NONMATCHING: its two int2type temporaries swap stack slots (they match with `#pragma ipa file`, which this file
 // can't take yet: three other functions stop matching).
