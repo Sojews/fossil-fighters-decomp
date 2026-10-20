@@ -86,7 +86,8 @@ extern "C" struct {
     void (DinoBattleAutoDemo::*StateWatch_38)(); // 0x38
     void (DinoBattleAutoDemo::*StateEnd_40)(); // 0x40
     void (DinoBattleAutoDemo::*StateEnd_48)(); // 0x48
-    u8 unk50[0x68 - 0x50];
+    u8 unk50[0x60 - 0x50];
+    void (DinoBattle::*StateSetupDisplays_60)(); // 0x60
     void (DinoBattle::*State0215a540_68)(); // 0x68
     u8 unk70[0x78 - 0x70];
     void (DinoBattle::*StateSoftReset_78)(); // 0x78
@@ -96,6 +97,19 @@ extern "C" struct {
     u8 unk08[0x10 - 0x8];
     void (DinoBattleAutoDemo::*Start_10)();
 } data_ov000_0219122c;
+
+DinoBattle::DinoBattle(const DinoBattleParams &params, u32 unk1D4, u32 unk1D8, u8 *unk1DC, u8 *unk1E0)
+    : MProcess(NULL), mParams(params) {
+    mUnk1DC = (u8 *)unk1D4;
+    mUnk1E0 = (u8 *)unk1D8;
+    mUnk1E4[0] = (u32)unk1DC;
+    mUnk1E4[1] = (u32)unk1E0;
+    mTutorial = new DinoBattleTutorial(mParams.mTutorialId);
+    if (mUnk1E0) {
+        *mUnk1E0 = 0;
+    }
+    mState = data_ov000_021911ac.StateSetupDisplays_60;
+}
 
 // Clears both screens and the music and opens the creature select.
 void DinoBattleDebugSelect::StateCreatureSelect() {
@@ -261,25 +275,25 @@ extern "C" DinoBattleDebugLog *data_ov000_021978c0;
 
 // Builds the battle: the view, the model, both sides' controllers and the debug log, and fades in.
 void DinoBattle::State0215a540() {
-    DinoSoundLoadScene(mScene);
-    mView = new DinoBattleView((const DinoBattleParams *)&mMode);
-    mModel = new DinoBattleModel((const DinoBattleParams *)&mMode, mTutorial);
+    DinoSoundLoadScene(mParams.mScene);
+    mView = new DinoBattleView(&mParams);
+    mModel = new DinoBattleModel(&mParams, mTutorial);
     mTutorial->SetView(mView);
     mTutorial->SetUnk24((u32)mModel);
     for (int i = 0; i < 2; i++) {
-        switch (mControllerKinds[i]) {
+        switch ((&mParams.unk08)[i]) {
         case 1:
             mControllers[i] = new DinoBattleDummyController(i);
             break;
         case 0:
-            if (i == 1 && mMode == 2) {
-                mControllers[i] = new DinoBattleUserController(&mMode, i, 1);
+            if (i == 1 && mParams.unk00 == 2) {
+                mControllers[i] = new DinoBattleUserController(&mParams, i, 1);
             } else {
-                mControllers[i] = new DinoBattleUserController(&mMode, i, 0);
+                mControllers[i] = new DinoBattleUserController(&mParams, i, 0);
             }
             break;
         case 2:
-            mControllers[i] = new DinoBattleCpuController(&mMode, i);
+            mControllers[i] = new DinoBattleCpuController(&mParams, i);
             break;
         }
     }
@@ -287,7 +301,7 @@ void DinoBattle::State0215a540() {
     mControllers[1]->Setup(this);
     mModel->SetBattle(this);
     GetParallel()->AddTail(mControllers[0], mControllers[1], mModel, mView);
-    if (mPostGameBegin) {
+    if (mParams.unk1C) {
         mModel->Post(new DinoBattleModelGameBeginSignal());
     }
     mParallel.AddTail(data_ov000_021978c0 = new DinoBattleDebugLog(gLcd->mMain));
@@ -298,7 +312,7 @@ void DinoBattle::State0215a540() {
 
 // Once a wireless battle has failed and no screen is mid-fade, ends the connection under a fade to white.
 void DinoBattle::StateRun() {
-    if (mMultiPlay == NULL || !mMultiPlay->IsFailed()) {
+    if (GetMultiPlay() == NULL || !GetMultiPlay()->IsFailed()) {
         return;
     }
     if ((gLcd->GetTopDisplay()->mBright->GetMode() == 0 || gLcd->GetTopDisplay()->mBright->GetFactor() == 0) &&
@@ -310,7 +324,7 @@ void DinoBattle::StateRun() {
         MTask *finish, *fadeMain, *fadeSub;
         fadeSub = gLcd->mSub->mBright->CreateFadeOutToWhite(15, 0);
         fadeMain = gLcd->mMain->mBright->CreateFadeOutToWhite(15, 0);
-        finish = mMultiPlay->CreateFinishTask();
+        finish = GetMultiPlay()->CreateFinishTask();
         MParallelTaskSet *tasks = new MParallelTaskSet(TRUE);
         tasks->AddTail(finish, fadeMain, fadeSub);
         mSerial.AddTail(tasks);

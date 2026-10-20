@@ -231,19 +231,19 @@ void DinoWirelessBattle::StateBattle() {
     (&params.unk10)[other] = 1;
     params.unk18 = 1;
     params.unk1C = me == 0;
-    params.unk148[3] = gDinoResource->GetBattleAdjustDefs()->wirelessUnk1B4;
-    params.unk20[2] = gDinoResource->GetBattleAdjustDefs()->wirelessUnk1B8;
-    params.unk20[3] = gDinoResource->GetBattleAdjustDefs()->wirelessUnk1BC;
-    params.unk20[1] = gDinoResource->GetBattleAdjustDefs()->wirelessUnk1C0;
+    params.unk154 = gDinoResource->GetBattleAdjustDefs()->wirelessUnk1B4;
+    params.mScene = gDinoResource->GetBattleAdjustDefs()->wirelessUnk1B8;
+    params.unk2C = gDinoResource->GetBattleAdjustDefs()->wirelessUnk1BC;
+    params.mLiveName = (const char *) gDinoResource->GetBattleAdjustDefs()->wirelessUnk1C0;
     DinoTeam team;
     gDinoBackup->GetTeam(mTeam, &team);
     DinoBattleSide *side = &params.sides[me];
     DinoPlayerData *player = &mPlayers[me].mData;
     side->mName = MEncodeUtf8(std::wstring((const wchar_t *) player->name));
     if (player->unk14_0 != 0) {
-        *(u32 *) &side->unk54[4] = player->unk14_0 + 8;
+        side->unk58 = player->unk14_0 + 8;
     } else {
-        *(u32 *) &side->unk54[4] = player->rank + 1;
+        side->unk58 = player->rank + 1;
     }
     for (u32 i = 0; i < 3; i++) {
         DinoCreatureState *creature = (DinoCreatureState *) &side->mCreatures[i];
@@ -257,8 +257,8 @@ void DinoWirelessBattle::StateBattle() {
         }
         side->mLevels[i] = parts;
     }
-    *(u32 *) side->unk54 = mPlayers[me].mData.horiderLevel;
-    side->unk7C[0xD] = gDinoBackup->GetSystemFlag(0x28);
+    side->unk54 = mPlayers[me].mData.horiderLevel;
+    side->unk89 = gDinoBackup->GetSystemFlag(0x28);
     mSerial.AddTail(new DinoBattle(params, (u32) &mWon, 0, &mUnk2E9, NULL));
     mState = data_020c0400.StateBattleEnd_20;
 }

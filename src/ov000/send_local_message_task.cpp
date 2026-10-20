@@ -122,9 +122,9 @@ void DinoBattleModelField::SetBattle(DinoBattle *battle) {
     mControllers[1] = (DinoBattleController *)battle->GetUnk1F4(1);
     mModel = (DinoBattleModel *)battle->GetUnk1FC();
     mUnkB4 = battle->GetUnk200();
-    if (mLive == NULL && ((const u8 *)mModel->mUnk110[0])[0xD] == 0 && battle->mLiveName != NULL) {
+    if (mLive == NULL && ((const u8 *)mModel->mUnk110[0])[0xD] == 0 && battle->mParams.mLiveName != NULL) {
         char name[64];
-        OS_SPrintf(name, data_ov000_021918ec, battle->mLiveName);
+        OS_SPrintf(name, data_ov000_021918ec, battle->mParams.mLiveName);
         mLive = new DinoBattleLive(mModel, name);
         mParallel.AddTail(mLive);
         mLive->SetUnkD2(FALSE);
