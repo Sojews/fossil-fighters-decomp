@@ -2,6 +2,7 @@
 // file paths, pooled together, and caches made at startup) aren't all here, so code that loads them can't match.
 
 #define MSL_STRING_BASICS
+#pragma ipa file
 #include "game/dino_resource.h"
 #include "m/seed_generator.h"
 #include "nitro/fs.h"
@@ -134,15 +135,15 @@ extern "C" struct {
 
 // The order here gives the game's layout (see tools/static_order.py).
 // static_order: begin
+DinoResource *gDinoResource;
 static OSMutex sMutex;
 static DinoFileCache sTalkMessageMatch(sEtcTalkMsgMatchPath);
-static DinoFileCache sRegionMapMatch(sEtcRegionMapMatchPath);
 static DinoFileCache sMapSceneMatch(sEtcMapSceneMatchPath);
+static DinoFileCache sMapBgmMatch(sEtcMapBgmMatchPath);
 static DinoFileCache sRegionCenterMatch(sEtcRegionCenterMatchPath);
 static DinoFileCache sMapExcavateMatch(sEtcMapExcavateMatchPath);
-static DinoFileCache sMapBgmMatch(sEtcMapBgmMatchPath);
+static DinoFileCache sRegionMapMatch(sEtcRegionMapMatchPath);
 static const u16 sUnkTable[14] = {0, Rgb(0, 0, 0), Rgb(0, 18, 0), Rgb(30, 2, 2), Rgb(22, 11, 0), Rgb(9, 15, 27), Rgb(31, 12, 25), Rgb(26, 0, 12), Rgb(10, 15, 23), Rgb(31, 18, 0), Rgb(31, 31, 31), Rgb(16, 16, 16), Rgb(31, 18, 20), 0};
-DinoResource *gDinoResource;
 // static_order: end
 
 inline void DinoFileCache::Read(u32 offset, void *dest, u32 size) {
