@@ -61,6 +61,10 @@ namespace std {
         Allocator *alloc;
     };
 
+    template <class T> inline void __msl_assign(T &d, const T &s, Metrowerks::int2type<true>) {
+        d = s;
+    }
+
     template <typename T, class Allocator> class __vec_deleter {
     public:
         typedef const Allocator &allocator_param;
@@ -254,6 +258,14 @@ namespace std {
         }
         // Copies [first, last) into an empty vector (out of line; the copy constructor's work).
         void init_copy(const T *first, const T *last, Metrowerks::int2type<true>);
+        // Fills an empty vector from [first, last) (out of line; the range constructor's work).
+        template <class It> void init(It first, It last, Metrowerks::int2type<false>);
+        template <class It> void move_range_at_end(It first, It last) {
+            UnkMSLStruct1 unk = UnkMSLStruct1();
+            for (pointer p = data_ + size_; first != last; ++first, ++p) {
+                __msl_assign<T>(*p, *first, Metrowerks::int2type<true>());
+            }
+        }
         // Copies plain data in one move (an inline of its own, so the length is worked out again).
         static void copy_trivial(const T *first, const T *last, T *dest) {
             memmove(dest, first, (last - first) * sizeof(T));
@@ -376,6 +388,38 @@ namespace std {
             fill_n_at_end(n, value);
         }
     }
+
+    template <typename T, typename Allocator>
+    template <class It>
+    void __vec_deleter<T, Allocator>::init(It first, It last, Metrowerks::int2type<false>) {
+        size_t n = last.base() - first.base();
+        if (n != 0) {
+            allocate(n);
+            move_range_at_end(first, last);
+            size_ += n;
+        }
+    }
+
+    // An iterator whose elements are moved rather than copied (for plain data, the same thing): it reads by value.
+    template <class It> struct __msl_move_iter {
+        __msl_move_iter(It i) : it_(i) {}
+        It base() const {
+            return it_;
+        }
+        typename iterator_traits<It>::value_type operator*() const {
+            return *it_;
+        }
+        __msl_move_iter &operator++() {
+            ++it_;
+            return *this;
+        }
+        bool operator!=(const __msl_move_iter &x) const {
+            return it_ != x.it_;
+        }
+
+        It it_;
+        Metrowerks::int2type<true> unk_;
+    };
 
     template <typename T, typename Allocator> __vec_deleter<T, Allocator>::~__vec_deleter() {
         if (data_ != nullptr) {
@@ -841,6 +885,11 @@ namespace std {
         vector(size_type n, const_reference value) {
             this->init();
             this->init(n, value);
+        }
+        template <class It> vector(It first, It last) {
+            this->init();
+            Metrowerks::int2type<false> t;
+            this->init(first, last, t);
         }
         vector(const vector &x) {
             this->init();

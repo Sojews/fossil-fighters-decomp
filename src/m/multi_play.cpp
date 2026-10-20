@@ -1107,6 +1107,21 @@ void MMultiPlayMessageHub::SendToAll(MMessage *msg) {
     SendTo(0xFFFF, msg);
 }
 
+// Serializes msg and queues it for the consoles in mask. NONMATCHING: the game spills mask and msg (and keeps the
+// buffer in r7); so does the vector's range init, which goes through a char temporary on the stack.
+void MMultiPlayMessageHub::SendTo(u32 mask, MMessage *msg) {
+    msg->AddRef();
+    u32 size = msg->GetSize();
+    u8 *buf = new u8[size];
+    msg->Write(buf);
+    MMultiPlayHubOutgoing out;
+    out.data = new std::vector<char>(std::__msl_move_iter<u8 *>(buf), std::__msl_move_iter<u8 *>(buf + size));
+    out.mask = mask;
+    mOutgoing.push_back(out);
+    delete[] buf;
+    msg->Release();
+}
+
 void MMultiPlayMessageHub::OnVSync() {
     if (!sMultiPlay.instance->IsFailed()) {
         mRunning = WM_StepDataSharing(sMultiPlay.instance->mDataSharing[3].info, mSendData, &mReceived) == WM_ERRCODE_SUCCESS;
