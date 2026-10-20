@@ -1855,6 +1855,43 @@ MFx32 GetAffinityRatio(DinoBattleModelCreature *creature, DinoBattleModelCreatur
     return gDinoResource->GetBattleAdjustDefs()->affinityRatio[2];
 }
 
+// The target's unkF0 with the support effects and statuses applied: those of the attacker's side against it and
+// those of its own side for it.
+// NONMATCHING: the operator+/- parameter copies swap stack slots, as in CalcUnkEC.
+extern "C" MFx32 func_ov000_0216e2d8(DinoBattleModelCreature *attacker, DinoBattleModelCreature *target) {
+    const MFx32 pinch = gDinoResource->GetBattleAdjustDefs()->unk40;
+    MFx32 base(target->GetUnkF0());
+    MFx32 result = base;
+    if (target->GetDefUnk61() != 8) {
+        if (target->GetUnkB8() == 0) {
+            for (int i = 0; i < 2; i++) {
+                DinoBattleModelCreature *ally = attacker->mPlayer->FindCreature(i ? 2 : 1);
+                DinoBattleModelCreature *enemy = attacker->mPlayer->GetOpponent()->FindCreature(i ? 2 : 1);
+                if (ally != NULL && (ally->GetUnk108() & 2)) {
+                    DinoBattleCreatureDef *def = ally->GetDef();
+                    const s8 *support = def->mUnk58 == 0 ? NULL : (const s8 *)def + def->mUnk58;
+                    result = result + MFx32(support[1]) * base / MFx32(100);
+                }
+                if (enemy != NULL && (enemy->GetUnk108() & 1)) {
+                    DinoBattleCreatureDef *def = enemy->GetDef();
+                    const s8 *support = def->mUnk54 == 0 ? NULL : (const s8 *)def + def->mUnk54;
+                    result = result + MFx32(support[1]) * base / MFx32(100);
+                }
+            }
+        }
+        if (target->mStatus.flags & 0x400) {
+            result = result + MFx32(target->mStatus.unk38);
+        }
+        if (target->mStatus.flags & 0x200) {
+            result = result - MFx32(target->mStatus.unk34);
+        }
+    }
+    if (target->IsInPinch() && target->GetDefUnk61() == 5) {
+        result = result * (pinch * MFx32(target->GetDef()->mUnk62) * MFx32::FromRaw(0x19A));
+    }
+    return result;
+}
+
 MFx32 DinoBattleModelCreature::ReduceByDefense(MFx32 damage, MFx32 defense) {
     return damage - gDinoResource->GetBattleAdjustDefs()->unk14.Mul(defense);
 }
