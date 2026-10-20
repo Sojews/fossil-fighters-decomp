@@ -34,11 +34,15 @@ public:
     void OnBackDecided();
     // Shows the name (each character over its reading) and moves the cursor to its place.
     void RefreshName();
+    // B deletes the character before the cursor (or, on a blank name, goes to the back button), Y and X move the
+    // cursor, START goes to the OK button.
+    void CheckKeys();
 
     MSmartOam *mOam;            // 0xB4
-    u8 unkB8[0xE8 - 0xB8];
+    u8 unkB8[0xE4 - 0xB8];
+    MMenuItem *mOkButton;       // 0xE4: START goes to it
     MMenuItem *mUnkE8;          // 0xE8: focused after a page change
-    u32 unkEC;
+    MMenuItem *mBackButton;     // 0xEC: B goes to it while the name is blank
     MIndicator *mChars[19];     // 0xF0: the name's characters
     MTextPicture *mPagePicture; // 0x13C
     u32 unk140;

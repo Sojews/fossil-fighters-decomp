@@ -297,10 +297,8 @@ void CurChangeTask::Execute() {
     Exit();
 }
 
-extern "C" void func_ov007_02183558(void *owner);
-
 void KeyCheckTask::Execute() {
-    func_ov007_02183558(mOwner);
+    ((DinoUiKeyboardMenu *)mOwner)->CheckKeys();
 }
 
 void SenryuKeyCheckTask::Execute() {
@@ -411,6 +409,61 @@ void DinoUiSenryuMenu::OnFocus(MMenuItem *item) {
 extern "C" const char *const data_ov007_02191120[4];
 
 // Frames a focused function key.
+void DinoUiKeyboardMenu::CheckKeys() {
+    MSerialTaskSet *serial = &mSerial;
+    if (!serial->IsEmpty()) {
+        return;
+    }
+    if (GetInput()->GetPressed() & 2) {
+        if (mCursorPos == 0) {
+            BOOL blank = TRUE;
+            for (int i = 0; i < mMaxLength; i++) {
+                if (mUnk19C[i] != mUnk1B4[2][29]) {
+                    blank = FALSE;
+                }
+            }
+            if (blank && mFlag) {
+                if (mBackButton != NULL) {
+                    if (mBackButton->IsFocused()) {
+                        mBackButton->Decide();
+                    } else {
+                        mSerial.AddTail(CreateSetFocusTask(mBackButton));
+                    }
+                }
+                return;
+            }
+        }
+        for (int i = mCursorPos; i < mMaxLength; i++) {
+            if (i > 0) {
+                mUnk19C[i - 1] = mUnk19C[i];
+                mUnk1A8[i - 1] = mUnk1A8[i];
+            }
+        }
+        mUnk19C[mMaxLength - 1] = mUnk1B4[2][29];
+        mUnk1A8[mMaxLength - 1] = mUnk1B4[2][29];
+        mCursorPos--;
+        DinoSoundPlaySe(0x9A, 0);
+        RefreshName();
+    }
+    if (GetInput()->GetPressed() & 0x800) {
+        mCursorPos--;
+        DinoSoundPlaySe(0x96, 0);
+        RefreshName();
+    }
+    if (GetInput()->GetPressed() & 0x400) {
+        mCursorPos++;
+        DinoSoundPlaySe(0x96, 0);
+        RefreshName();
+    }
+    if (GetInput()->GetPressed() & 8) {
+        if (mOkButton->IsFocused()) {
+            mOkButton->Decide();
+        } else {
+            mOkButton->Focus();
+        }
+    }
+}
+
 void DinoUiKeyboardMenu::OnFocus(MMenuItem *item) {
     KeyboardMenuItem *key = static_cast<KeyboardMenuItem *>(item);
     if (key != NULL && key->mIndex < 0xF0) {

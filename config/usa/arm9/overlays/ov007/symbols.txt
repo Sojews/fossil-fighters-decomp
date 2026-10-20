@@ -297,7 +297,7 @@ _Z17MCreateBgCallTaskI18DinoUiKeyboardMenuEP5MTaskPT_MS3_FvvEi kind:function(thu
 func_ov007_02182020 kind:function(thumb,size=0x12ce) addr:0x02182020
 _ZN18DinoUiKeyboardMenu7SetPageEi kind:function(thumb,size=0xe8) addr:0x021832f0
 _ZN18DinoUiKeyboardMenu6OnIdleEv kind:function(thumb,size=0x180) addr:0x021833d8
-func_ov007_02183558 kind:function(thumb,size=0x2c4) addr:0x02183558
+_ZN18DinoUiKeyboardMenu9CheckKeysEv kind:function(thumb,size=0x2c4) addr:0x02183558
 _ZN18DinoUiKeyboardMenu7OnFocusEP9MMenuItem kind:function(thumb,size=0x128) addr:0x0218381c
 _ZN18DinoUiKeyboardMenu8OnDecideEP9MMenuItem kind:function(thumb,size=0x540) addr:0x02183944
 _ZN18DinoUiKeyboardMenu18CreateSetFocusTaskEP9MMenuItem kind:function(thumb,size=0x34) addr:0x02183e84
