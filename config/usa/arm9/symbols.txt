@@ -6782,6 +6782,15 @@ data_0208a3fc kind:data(any) addr:0x0208a3fc
 data_0208a400 kind:data(any) addr:0x0208a400
 data_0208a404 kind:data(any) addr:0x0208a404
 data_0208a408 kind:data(any) addr:0x0208a408
+data_0208a40c kind:data(any) addr:0x0208a40c
+data_0208a410 kind:data(any) addr:0x0208a410
+data_0208a414 kind:data(any) addr:0x0208a414
+data_0208a418 kind:data(any) addr:0x0208a418
+data_0208a41c kind:data(any) addr:0x0208a41c
+data_0208a420 kind:data(any) addr:0x0208a420
+data_0208a424 kind:data(any) addr:0x0208a424
+data_0208a428 kind:data(any) addr:0x0208a428
+data_0208a42c kind:data(any) addr:0x0208a42c
 data_0208a430 kind:data(any) addr:0x0208a430
 data_0208a434 kind:data(any) addr:0x0208a434
 data_0208a438 kind:data(any) addr:0x0208a438

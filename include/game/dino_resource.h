@@ -124,7 +124,8 @@ struct DinoBattleAdjustDefs {
     MFx32 unk3C;            // 0x3C
     u32 unk40;
     MFx32 pinchBoost;       // 0x44: per point of a pinch creature's def percentage, in tenths
-    u8 unk048[0x50 - 0x48];
+    u32 unk48;
+    MFx32 unk4C;            // 0x4C: the chance of the second roll (func_ov000_0216e918)
     MFx32 unk50;            // 0x50
     u32 unk54;
     // Creature layout, by slot kind (0, 2, 1, 3 in that order): where the slots are with the side's own creatures

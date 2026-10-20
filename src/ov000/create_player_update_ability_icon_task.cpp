@@ -19,6 +19,8 @@
 #include "game/dino_battle_user_controller.h"
 #include "game/set_status_effect_task.h"
 #include "game/dino_static_init.h"
+#include "game/dino_battle_debug_log.h"
+#include <stdio.h>
 
 
 
@@ -1694,6 +1696,39 @@ MFx32 DinoBattleModelCreature::CurveRatio(MFx32 a, MFx32 b) {
         ratio = MFx32(1);
     }
     return ratio;
+}
+
+extern "C" DinoBattleDebugLog *data_ov000_021978c0;
+extern "C" const u32 data_0208a40c; // debug log texts
+extern "C" const u32 data_0208a410;
+
+// Rolls a hit against chance: a hit gives a random factor (kind 2). A miss rolls again against the adjust table's
+// chance, which gives 0 and sets *flag (kind 0); otherwise a random factor again.
+extern "C" MFx32 func_ov000_0216e918(DinoBattleModelCreature *creature, MFx32 chance, u8 *flag, int *kind) {
+    if (chance >= creature->RandomFraction()) {
+        char text[256];
+        sprintf(text, gDinoResource->GetText(data_0208a410), 0);
+        data_ov000_021978c0->Print(text);
+        const MFx32 min = gDinoResource->GetBattleAdjustDefs()->randomMin;
+        const MFx32 max = gDinoResource->GetBattleAdjustDefs()->randomMax;
+        *kind = 2;
+        return min + (max - min) * creature->RandomFraction();
+    }
+    if (MFx32(gDinoResource->GetBattleAdjustDefs()->unk4C) >= creature->RandomFraction()) {
+        char text[256];
+        sprintf(text, gDinoResource->GetText(data_0208a40c), 0);
+        data_ov000_021978c0->Print(text);
+        *kind = 0;
+        *flag = TRUE;
+        return MFx32(0);
+    }
+    char text[256];
+    sprintf(text, gDinoResource->GetText(data_0208a410), 0);
+    data_ov000_021978c0->Print(text);
+    const MFx32 min = gDinoResource->GetBattleAdjustDefs()->randomMin;
+    const MFx32 max = gDinoResource->GetBattleAdjustDefs()->randomMax;
+    *kind = 2;
+    return min + (max - min) * creature->RandomFraction();
 }
 
 // A vector member the game emits in this file (made explicitly until the code that uses it is decompiled).
