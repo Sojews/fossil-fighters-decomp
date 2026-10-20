@@ -13202,5 +13202,5 @@ data_02155660 kind:bss addr:0x02155660
 data_02155760 kind:bss addr:0x02155760
 errno kind:bss addr:0x02155860
 signal_funcs kind:bss addr:0x02155864
-data_02155880 kind:bss addr:0x02155880
+_ZSt7nothrow kind:bss addr:0x02155880
 __global_destructor_chain kind:bss addr:0x02155884
