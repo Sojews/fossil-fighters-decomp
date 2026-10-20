@@ -66,7 +66,7 @@ public:
     MTextPicture *mInformation; // 0xDC: the fossil information shown
     MExtAffinePicture *mTabPicture; // 0xE0: scrolled to the tab's part
     MMenuItem *mSlots[15];  // 0xE4
-    u8 unk120[0x15C - 0x120];
+    class MIndicator *mVoices[15];   // 0x120: each slot's cry number
     int mSlotCount;     // 0x15C
     u8 unk160[0x164 - 0x160];
     MTaskSet *mCursorTasks;             // 0x164
@@ -209,13 +209,15 @@ public:
 
 class DinoUiMuseumReviverButton : public MMenuItem {
 public:
+    // The creature's slot (creature 0: an empty one, hidden).
+    DinoUiMuseumReviverButton(DinoUiMuseumMenu *owner, MPoint pos, u32 creature);
     virtual ~DinoUiMuseumReviverButton();
     virtual MRect GetFrame();
     virtual void OnFocusChanged(BOOL focused);
 
     MMotion *mMotion;   // 0x88
-    u32 mUnk8C;         // 0x8C
-    u8 mBaseAnime;      // 0x90
+    DinoUiMuseumMenu *mOwner;   // 0x8C
+    u8 mBaseAnime;      // 0x90: 0 at the top level, else 1
 };
 
 #endif

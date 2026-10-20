@@ -606,6 +606,75 @@ struct DinoUiMuseumLayout {
 extern DinoUiMuseumLayout data_ov006_02196208;
 extern MPoint data_020b5858[3];
 
+inline DinoUiMuseumReviverButton::DinoUiMuseumReviverButton(DinoUiMuseumMenu *owner, MPoint pos, u32 creature) {
+    char path[256];
+    mOwner = owner;
+    if (creature == 0) {
+        mBaseAnime = 0;
+        OS_SPrintf(path, "/motion/ui_reviver_medal/reviver_001.bin");
+    } else {
+        DinoCreatureState state;
+        gDinoBackup->GetCreature(creature, &state);
+        if (GetCreatureLevel(state) == 12) {
+            mBaseAnime = 0;
+        } else {
+            mBaseAnime = 1;
+        }
+        OS_SPrintf(path, "/motion/ui_reviver_medal/reviver_%03d.bin", creature);
+    }
+    mMotion = new MMotion(std::string(path), mOwner->GetOam(), 2, 1);
+    mMotion->Play(mBaseAnime + 1, 0);
+    mMotion->SetPosition(pos);
+    mMotion->SetPriority(2);
+    if (creature == 0) {
+        mMotion->Hide();
+    } else {
+        mMotion->Show();
+    }
+    mParallel.AddTail(mMotion);
+}
+
+// The page's slot (an empty one past the last creature), with its cry number; the first clears the numbers and
+// counts the page's slots, the last links them.
+void DinoUiMuseumMenu::CreateSlot(u32 index) {
+    if (index == 0) {
+        if (mPage == mPageCount) {
+            mSlotCount = mCreatures.size() - mPage * 15;
+        } else {
+            mSlotCount = 15;
+        }
+        for (int i = 0; i < 15; i++) {
+            mVoices[i]->SetText(std::string("   "));
+        }
+    }
+    if ((int)index < mSlotCount) {
+        u32 creature = mCreatures[index + mPage * 15];
+        mSlots[index] = new DinoUiMuseumReviverButton(
+            this,
+            MPoint(data_ov006_02196208.first.x + data_ov006_02196208.column.x * ((int)index % 5) +
+                       data_ov006_02196208.row.x * ((int)index / 5),
+                   data_ov006_02196208.first.y + data_ov006_02196208.column.y * ((int)index % 5) +
+                       data_ov006_02196208.row.y * ((int)index / 5)),
+            creature);
+        AddItem(mSlots[index]);
+        char number[4];
+        sprintf(number, "%03d", gDinoResource->GetCreatureDef(creature)->voice);
+        mVoices[index]->SetText(std::string(number));
+    } else {
+        mSlots[index] = new DinoUiMuseumReviverButton(
+            this,
+            MPoint(data_ov006_02196208.first.x + data_ov006_02196208.column.x * ((int)index % 5) +
+                       data_ov006_02196208.row.x * ((int)index / 5),
+                   data_ov006_02196208.first.y + data_ov006_02196208.column.y * ((int)index % 5) +
+                       data_ov006_02196208.row.y * ((int)index / 5)),
+            0);
+        AddItem(mSlots[index]);
+    }
+    if (index == 14) {
+        LinkSlots();
+    }
+}
+
 // Moves the cursor to the item; a slot also shows its creature's name (and model) and restarts the help.
 void DinoUiMuseumMenu::OnFocus(MMenuItem *item) {
     mUnk1AC = FALSE;
