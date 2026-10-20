@@ -3,6 +3,7 @@
 
 #include "game/dino_resource.h"
 #include "m/motion.h"
+#include "nitro/g2.h"
 #include <vector>
 #include "m/menu_item.h"
 #include "m/menu.h"
@@ -27,6 +28,8 @@ public:
 };
 
 class DinoBattleView;
+class MIndicator;
+struct MSmartOamUnit;
 
 class DinoBattleViewUiRootSelect : public MMenu, public DinoHelpBase {
 public:
@@ -184,11 +187,14 @@ public:
     MMotion *mMotion;       // 0x74
     MSmartOam *mOam;        // 0x78
     MAfnBlock *mAffine;     // 0x7C
-    u32 unk80[9];
+    MIndicator *mTexts[4];  // 0x80: by ability
+    MSmartOamUnit *mUnits[4]; // 0x90: by ability
+    GXOamAffine *mOamAffine; // 0xA0: the counting abilities' scale
     u32 mMask;              // 0xA4
     int mTarget[4];         // 0xA8
     int mValue[4];          // 0xB8: counts toward mTarget
-    u32 unkC8;
+    u8 mWasCounting;        // 0xC8
+    u8 mCounting;           // 0xC9
 };
 
 #endif

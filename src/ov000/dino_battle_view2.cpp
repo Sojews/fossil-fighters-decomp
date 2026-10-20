@@ -19,6 +19,9 @@
 #include "game/creature_motion.h"
 #include "game/dino_battle_view_creature.h"
 #include "game/dino_static_init.h"
+#include <string>
+#include "m/indicator.h"
+#include "m/oam_canvas.h"
 
 AnyInputTimerWait::~AnyInputTimerWait() {
 }
@@ -321,9 +324,44 @@ DinoBattleViewUiRootSelect::DinoBattleViewUiRootSelect(DinoBattleView *view, MMe
     mState = data_ov000_0219569c.StateBegin_5C;
 }
 
+extern "C" struct {
+    MtxFx22 mtx;    // 0x00: the ability icons' scale
+    MtxFx22 counting;   // 0x10: their scale while counting
+} data_ov000_021978e8;
+extern "C" u32 data_ov000_02195d24[];   // the view's pooled statics (+0x04: the ability icon's motion)
+extern "C" u32 data_ov000_02195da4[];   // the ability counters' offsets, by ability (MPoint)
+
+// Sets up the ability icon and its four counters, shown at half size.
+// NONMATCHING (92%): the game hoists the matrix's zero entries' affine values into their own stack slot (from a
+// register that happens to hold 0); ours folds them, so every later slot moves.
+DinoBattleViewAbilityIcon::DinoBattleViewAbilityIcon(DinoBattleView *view, u32 oam, MPoint pos)
+    : MProcess(NULL), mOam((MSmartOam *)oam), mMask(0), mWasCounting(0), mCounting(0) {
+    mMotion = new MMotion(std::string(((const char **)data_ov000_02195d24)[1]), (MSmartOam *)oam, 0, 1);
+    mMotion->SetPosition(pos);
+    mMotion->SetPriority(2);
+    mMotion->SetAnchor(3);
+    mMotion->Hide();
+    mAffine = GetDisplay()->mObj->mAfn->Alloc(1, TRUE);
+    mOamAffine = (GXOamAffine *)mAffine->addr;
+    MFont *font = view->GetUnk124();
+    for (int i = 0; i < 4; i++) {
+        MSmartObjCanvas *canvas = new MSmartObjCanvas(mOam, MPoint(0x20, 0x10), view->GetUnk11CPalette(), TRUE);
+        canvas->SetAnchor(1);
+        mTexts[i] = new MIndicator(canvas, font, 0);
+        mTexts[i]->SetPosition(MPoint(pos.x + ((const MPoint *)data_ov000_02195da4)[i].x - 12,
+                                      pos.y + ((const MPoint *)data_ov000_02195da4)[i].y - 8));
+        mTexts[i]->SetPriority(2);
+        GetParallel()->AddTail(mTexts[i]);
+        mUnits[i] = canvas->GetOamUnit();
+        mUnits[i]->SetObjMode(1);
+        mUnits[i]->SetAffineParam(mAffine->index);
+        MTX_Scale22(&data_ov000_021978e8.mtx, 0x800, 0x800);
+        G2_SetOBJAffine(mOamAffine, &data_ov000_021978e8.mtx);
+    }
+    mParallel.AddTail(mMotion);
+}
+
 // The file's static initialization (see dino_static_init.h).
-extern "C" u32 data_ov000_02195d24[];
-extern "C" u32 data_ov000_02195da4[];
 extern "C" u32 data_ov000_02195dac[];
 extern "C" u32 data_ov000_02195db4[];
 extern "C" u32 data_ov000_02195dbc[];
