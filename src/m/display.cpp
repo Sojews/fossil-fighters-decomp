@@ -471,6 +471,67 @@ void MDisplay::Setup(int a, int c, int e, int f) {
     Setup(a, 0, c, 0, e, f);
 }
 
+extern "C" {
+extern MBg::ExtPalettes data_0208ba1c[];   // the BG extended palettes, by count and first bank
+extern u8 data_0208b338[];                 // (pooled .data: no extended palettes at +0x1C)
+}
+
+// Gives the engine its VRAM banks (configurations: a BG, b BG extended palettes, c OBJ, d OBJ extended palettes,
+// e and f the BG's other areas), then makes the BG and OBJ managers and tells the hooks.
+void MDisplay::Setup(int a, int b, int c, int d, int e, int f) {
+    MScopedLock lock(&gLcd->mMutex, TRUE);
+    mWin->Reset();
+    mBlend->Reset();
+    mLcd->UseBanks(mRegs->unk54 + c * 0x1C, &mBanks50);
+    mLcd->UseBanks(mRegs->unk4C + a * 0x1C, &mBanks28);
+    mLcd->UseBanks(mRegs->unk5C + e * 0x1C, &mBanks78);
+    mLcd->UseBanks(mRegs->unk60 + f * 0x1C, &mBanks8C);
+    mLcd->UseBanks(mRegs->unk50 + b * 0x1C, &mBanks3C);
+    mLcd->UseBanks(mRegs->unk58 + d * 0x1C, &mBanks64);
+    mDispCnt.bgExtPalette = b != 0 ? TRUE : FALSE;
+    mDispCnt.objExtPalette = d != 0 ? TRUE : FALSE;
+    MBg::ExtPalettes ext;
+    if (b != 0) {
+        int i;
+        for (i = 0; i < 5; i++) {
+            if (b == data_0208ba1c[i].unk00 && mBanks3C.banks[0] == (u32)data_0208ba1c[i].entries[0].palette) {
+                break;
+            }
+        }
+        ext = data_0208ba1c[i];
+    } else {
+        ext = *(MBg::ExtPalettes *)(data_0208b338 + 0x1C);
+    }
+    u32 objExtBase = 0;
+    void *objExtPalette = NULL;
+    if (d != 0) {
+        switch (mBanks64.banks[0]) {
+        default:
+            OS_Terminate();
+            break;
+        case 6:
+            objExtBase = 0x06890000;
+            break;
+        case 7:
+            objExtBase = 0x06894000;
+            break;
+        case 9:
+            objExtBase = 0x068A0000;
+            break;
+        }
+        objExtPalette = (void *)mBanks64.banks[0];
+    }
+    if (c != 0) {
+        mObj = new MObj(this, mRegs->unk48, mRegs->unk44, mBanks50.count, mRegs->unk3C, objExtBase, objExtPalette);
+    }
+    if (a != 0) {
+        mBg = new MBg(this, mRegs->unk40, mBanks28.count, (u32)mRegs->backdrop, ext, mBanks78.count, mBanks8C.count);
+    }
+    for (std::vector<MDisplayHook *>::iterator it = mHooks.begin(); it != mHooks.end(); it++) {
+        (*it)->Unk08();
+    }
+}
+
 // Sets up a capture for the next VBlank (bank: 1 for A to 4 for D).
 void MLcd::StartCapture(int mode, int srcA, int srcB, int size, int readOffset, int bank, int writeOffset, int eva,
                         int evb) {

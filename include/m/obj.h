@@ -122,6 +122,7 @@ public:
     MAfn *mAfn;         // 0x14
     u8 *mShadow;        // 0x18: OAM as it will be next frame
     u32 mOamAddr;       // 0x1C
+    u32 mUnk20;         // 0x20 (MDisplay::Setup allocates 0x24 bytes)
 };
 
 #endif
