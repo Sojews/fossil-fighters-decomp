@@ -154,6 +154,26 @@ void ViewStatusEffectIcon::SetPriorityTask::Execute() {
     Exit();
 }
 
+// Plays the icon's erase anime: 12 for the kinds that end on 2, 5, 14, 17 or 23, else 10 (both 12 later for the
+// second set of animes, from 13).
+void ViewStatusEffectIcon::PlayEraseMotionTask::Execute() {
+    mIcon->SetMotionPriority(1);
+    BOOL second = mIcon->GetMotionAnime() >= 13;
+    switch (mIcon->GetMotionAnime()) {
+    case 2:
+    case 5:
+    case 14:
+    case 17:
+    case 23:
+        mIcon->PlayAnime((second ? 12 : 0) + 12);
+        break;
+    default:
+        mIcon->PlayAnime((second ? 12 : 0) + 10);
+        break;
+    }
+    Exit();
+}
+
 #pragma auto_inline on
 
 ViewStatusEffectIcon::PlayEraseMotionTask::~PlayEraseMotionTask() {

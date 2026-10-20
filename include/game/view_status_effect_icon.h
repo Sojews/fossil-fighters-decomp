@@ -70,6 +70,8 @@ public:
     public:
         virtual ~PlayEraseMotionTask();
         virtual void Execute();
+
+        ViewStatusEffectIcon *mIcon;    // 0x10
     };
 
     class SetPriorityTask : public MTask {
@@ -110,6 +112,29 @@ public:
     void SetMotionPriority(int priority) {
         if (mMotion != NULL) {
             mMotion->SetPriority(priority);
+        }
+    }
+    u32 GetMotionAnime() {
+        return mMotion != NULL ? mMotion->GetAnime() : 0;
+    }
+    // Plays the anime (none for -1) in front, except the low ones, then drops behind again when it stops.
+    void PlayAnime(int anime) {
+        if (mMotion != NULL && anime != -1) {
+            mTasks->Clear();
+            mMotion->Play(anime, 1);
+            BOOL front = TRUE;
+            switch (anime) {
+            case 1:
+            case 2:
+            case 3:
+            case 13:
+            case 14:
+            case 15:
+                front = FALSE;
+                break;
+            }
+            mMotion->SetPriority(front ? 1 : 2);
+            mTasks->AddTail(new MTimer(1), mMotion->CreateWaitStopTask(), new SetPriorityTask(this, 2));
         }
     }
 };
