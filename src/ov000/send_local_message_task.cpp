@@ -16,6 +16,7 @@
 #include "game/dino_battle_controller.h"
 #include "game/dino_battle_live.h"
 #include "m/seed_generator.h"
+#include "game/dino_sound.h"
 
 extern "C" void func_ov000_0215c174(DinoBattleModelField *field, u32 line);
 
@@ -83,6 +84,52 @@ extern "C" u32 func_ov000_0215bee8(DinoBattleModelField *field) {
         }
     }
     return sides;
+}
+
+// Moves the creatures of the given sides (bit n for side n) to random distinct positions, one of them the front:
+// a task set that waits for all of them to arrive.
+extern "C" MParallelTaskSet *func_ov000_0215bf44(DinoBattleModelField *field, u32 sides) {
+    u32 side;
+    MParallelTaskSet *set = new MParallelTaskSet(TRUE);
+    for (side = 0; (int)side < 2; side++) {
+        if (!(sides & (1 << side))) {
+            continue;
+        }
+        DinoBattleModelPlayer *player = field->mModel->GetPlayer(side);
+        for (u32 i = 0; i < player->GetCreatureCount(); i++) {
+            player->GetCreature(i)->SetUnk108(0);
+        }
+        u32 used;
+        u32 positions[8];
+        do {
+            used = 0;
+            for (int i = 0; i < player->GetCreatureCount(); i++) {
+                player->GetCreature(i);
+                u32 pos;
+                do {
+                    pos = player->GetRandom()->Next(4);
+                } while (used & (1 << pos));
+                used |= 1 << pos;
+                positions[i] = pos;
+            }
+        } while (!(used & 1));
+        DinoSoundPlaySe(0x56F, 0);
+        for (int i = 0; i < player->GetCreatureCount(); i++) {
+            DinoBattleModelCreature *creature = player->GetCreature(i);
+            DinoSignalWait *wait = new DinoSignalWait(0x10013, NULL, NULL, 1);
+            set->AddTail(wait);
+            creature->Post(new DinoBattleModelCreatureMoveRequest((u32)(MMessageObserver *)wait, side,
+                                                                  creature->GetUnkB4(), creature->GetUnkB8(),
+                                                                  positions[i], 1, 0));
+            creature->SetUnkB8(positions[i]);
+        }
+        DinoBattleModelPlayer *other = field->mModel->GetPlayer(1 - side);
+        for (u32 i = 0; i < other->GetCreatureCount(); i++) {
+            DinoBattleModelCreature *creature = other->GetCreature(i);
+            creature->SetUnk108(creature->GetUnk108() & 1);
+        }
+    }
+    return set;
 }
 
 // Has the commentary say the line now (once, not from inside itself).
