@@ -351,7 +351,6 @@ data_ov003_02160f28 kind:data(any) addr:0x02160f28
 _ZTI22DinoUiPartsReviverName kind:data(any) addr:0x02160f40
 data_ov003_02160f60 kind:data(any) addr:0x02160f60
 data_ov003_02160f88 kind:data(any) addr:0x02160f88
-data_ov003_02160fa0 kind:data(any) addr:0x02160fa0
 data_ov003_02160fb0 kind:data(any) addr:0x02160fb0
 data_ov003_02160fd8 kind:data(any) addr:0x02160fd8
 data_ov003_02160fe0 kind:data(any) addr:0x02160fe0

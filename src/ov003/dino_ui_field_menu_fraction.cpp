@@ -150,7 +150,7 @@ void DinoUiFieldMenuNumber::SetValue(int value) {
 }
 
 #pragma opt_common_subs off
-// (Not auto-inlined: the team info calls it.)
+// (Not auto-inlined: the team info calls it, as it does SetPriority.)
 #pragma auto_inline off
 DinoUiFieldMenuNumber3::DinoUiFieldMenuNumber3(MPoint pos) : MProcess(NULL) {
     MFontSet *font = new MFontSet(std::string("/font/btl_fontset_8x16"), 0, 0, 0);
@@ -184,9 +184,11 @@ void DinoUiFieldMenuNumber3::SetValue(u32 value) {
     mText->SetText(std::string(text));
 }
 
+#pragma auto_inline off
 void DinoUiFieldMenuNumber3::SetPriority(int priority) {
     mText->SetPriority(priority);
 }
+#pragma auto_inline reset
 
 void DinoUiFieldMenuNumber3::Show() {
     mText->Show();
@@ -232,12 +234,13 @@ static int GetKindLook(int kind) {
 
 extern const char data_ov003_02161cd8[];      // the team info's background
 extern const MPoint data_ov003_02160d7c;      // the team's name
-extern const MPoint data_ov003_02160fa0[2];   // rows 3 and 4's icons
+extern const MPoint data_ov003_02160f88[5];   // by member: the icons
 extern const MPoint data_ov003_02160fd8[10];  // the members' numbers
 extern const MPoint data_ov003_02160f28[];    // the team tech's positions
 
 // The team's name (two styles), the members' names and numbers, the icons of rows 3 and 4, and the team's tech.
-// NONMATCHING: the game keeps the second font in r7; we spill it (one more stack slot).
+// (opt_common_subs off: the game reads gCurrentDisplay again after copying each canvas's size.)
+#pragma opt_common_subs off
 DinoUiPartsTeamInfo::DinoUiPartsTeamInfo() : MProcess(NULL) {
     gCurrentDisplay = gLcd->mMain;
     MTextPicture *bg;
@@ -276,7 +279,7 @@ DinoUiPartsTeamInfo::DinoUiPartsTeamInfo() : MProcess(NULL) {
     }
     for (int i = 3; i < 5; i++) {
         mMotions[i] = new MMotion(std::string(data_ov003_02160c60[4]), mOam, 2, 1);
-        mMotions[i]->SetPosition(data_ov003_02160fa0[i - 3]);
+        mMotions[i]->SetPosition(data_ov003_02160f88[i]);
         mMotions[i]->SetPriority(3);
         mMotions[i]->Hide();
         mMotionTasks->AddTail(mMotions[i]);
@@ -287,6 +290,7 @@ DinoUiPartsTeamInfo::DinoUiPartsTeamInfo() : MProcess(NULL) {
     mTech->Hide();
     gCurrentDisplay = gLcd->mSub;
 }
+#pragma opt_common_subs reset
 
 // What the creature stats are worked out from, and the stats (main's func_02030f38).
 struct DinoCreatureStatsInput {
@@ -300,7 +304,6 @@ struct DinoCreatureStats {
     int stats[5];   // 0x04
 };
 extern "C" DinoCreatureStats func_02030f38(const DinoCreatureStatsInput *info, BOOL fixed, fx32 fraction);
-extern const MPoint data_ov003_02160f88[5];   // by member: the icons
 
 // NONMATCHING: stack layout (the game's frame is one word bigger and puts the team below the creature).
 void DinoUiPartsTeamInfo::SetTeam(u32 index) {
