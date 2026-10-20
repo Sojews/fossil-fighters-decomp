@@ -1254,6 +1254,11 @@ public:
 class DinoBattleViewCreatureEndRequest : public MMessage {
 public:
     DinoBattleViewCreatureEndRequest() : MMessage(0x10033) {}
+    DinoBattleViewCreatureEndRequest(u32 reply, u32 side, u32 creature) : MMessage(0x10033) {
+        mUnk0C = reply;
+        mUnk10 = side;
+        mUnk14 = creature;
+    }
     virtual u32 GetSize() { return 16; }
     virtual void Write(void *buf) {
         MI_CpuCopy8(&mId, buf, 4);
@@ -1288,6 +1293,11 @@ public:
 class DinoBattleModelGameEndSignal : public MMessage {
 public:
     DinoBattleModelGameEndSignal() : MMessage(0x10035) {}
+    DinoBattleModelGameEndSignal(u32 winner, u8 a, u8 b) : MMessage(0x10035) {
+        mUnk0C = winner;
+        mUnk10 = a;
+        mUnk11 = b;
+    }
     virtual u32 GetSize() { return 12; }
     virtual void Write(void *buf) {
         MI_CpuCopy8(&mId, buf, 4);

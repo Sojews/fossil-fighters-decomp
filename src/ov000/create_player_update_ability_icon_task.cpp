@@ -181,11 +181,11 @@ void ModelCretureAddLifeTask::Execute() {
     Exit();
 }
 
-extern "C" MTask *func_ov000_02166620(u32 arg0, u32 arg1);
+extern "C" MTask *func_ov000_02166620(DinoBattleModelPlayer *player, u32 id);
 
 void ExecCreatureEndTask::Idle() {
     MTask *exit = MTaskExitTransfer::Create(this);
-    MTask *task = func_ov000_02166620(mUnk74, mUnk78);
+    MTask *task = func_ov000_02166620((DinoBattleModelPlayer *)mUnk74, mUnk78);
     MSerialTaskSet *serial = &mSerial;
     serial->AddTail(task);
     serial->AddTail(exit);
@@ -1159,6 +1159,42 @@ void DinoBattleModelCreature::ResetUnk108() {
     if (GetUnkB8() == 0) {
         ClearOthersUnk108();
     }
+}
+
+// Takes the creature off the field: the view ends it, then the game ends (the other side winning) when the side has
+// no creatures left, or else the side gets the kaseki points for it; then the icons and creatures update.
+extern "C" MTask *func_ov000_02166620(DinoBattleModelPlayer *player, u32 id) {
+    DinoBattleModelCreature *creature = player->FindCreatureByB4(id);
+    creature->UpdateMarks();
+    if (creature->GetUnkB8() == 0) {
+        player->SendUpdateStateIcon(creature, 0);
+    }
+    player->SendUpdateAbilityIconRequest(TRUE, 0);
+    player->mCreatures.erase(std::find(player->mCreatures.begin(), player->mCreatures.end(), creature));
+    player->mSubject.RemoveObserver(creature);
+    player->mParallel.Remove(creature);
+    delete creature;
+    MSerialTaskSet *serial = new MSerialTaskSet(TRUE);
+    MParallelTaskSet *end = new MParallelTaskSet(TRUE);
+    DinoSignalWait *wait = new DinoSignalWait(0x10034, NULL, NULL, 1);
+    MTask *post = player->mUnkF4->CreatePostTask(
+        new DinoBattleViewCreatureEndRequest((u32)(MMessageObserver *)wait, player->mUnkB8, id));
+    end->AddTail(wait);
+    end->AddTail(post);
+    BOOL over = FALSE;
+    DinoBattleParams *params = &player->mBattle->mParams;
+    if (player->GetCreatureCount() == 0 || (params->unk158 && (&params->unk08)[player->mUnkB8] == 0)) {
+        over = TRUE;
+    }
+    if (over) {
+        ((DinoBattleModel *)player->mBattle->GetUnk1FC())->mUnkA8 = TRUE;
+        serial->AddTail(((DinoBattleModel *)player->mUnk100)
+                            ->CreatePostTask(new DinoBattleModelGameEndSignal(1 - player->mUnkB8, FALSE, FALSE)));
+    } else {
+        serial->AddTail(player->CreateAddKasekiPointCreatureDie());
+    }
+    serial->AddTail(end, player->CreateUpdateAllCreatureTask(), player->CreateUpdateAbilityIconTask(TRUE));
+    return serial;
 }
 
 BOOL DinoBattleModelCreature::IsUnkD244() {
