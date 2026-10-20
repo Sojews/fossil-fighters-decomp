@@ -164,7 +164,6 @@ extern "C" const u32 data_ov007_02191f9c[4];
 // "%d"-style format of the creature's number.
 extern "C" const char data_ov007_021922d4[];
 extern "C" void func_ov007_02188484(DinoUiReviveStatusMenu *menu);
-extern "C" void func_ov007_0218880c(DinoUiReviveStatusMenu *menu);
 
 extern const u32 data_0208a498;
 extern const u32 data_0208a86c, data_0208a868, data_0208a864;
@@ -267,7 +266,7 @@ void DinoUiReviveStatusMenu::OnStart() {
         } else {
             DinoSoundPlaySe(data_02089a44, 0);
         }
-        func_ov007_0218880c(this);
+        ShowStatChanges();
         ShowLearnedAttacks();
         Disable();
         MTask *focus = CreateFocusItemTransfer(mItems[0]);
@@ -449,6 +448,95 @@ extern "C" const char data_ov007_021922f8[], data_ov007_021922fc[];
 extern const u32 data_0208a4b0, data_0208a4b4, data_0208a4b8;
 
 // NONMATCHING: register allocation and one stack slot (the game keeps the attack's level in r7 and spills i * 4).
+// What the creature stats are worked out from, and the stats (main's func_02030f38).
+struct DinoReviveStatsInput {
+    u32 id;         // 0x00
+    int rank;       // 0x04
+    int bonus[4];   // 0x08: by part
+    int levels[5];  // 0x18: the parts', then the creature's own
+};
+struct DinoReviveStats {
+    int hp;         // 0x00
+    int stats[5];   // 0x04
+};
+extern "C" DinoReviveStats func_02030f38(const DinoReviveStatsInput *info, bool fixed, MFx32 fraction);
+
+static inline void ReviveStatsInput(DinoReviveStatsInput &info, const DinoCreatureState &creature) {
+    MI_CpuFill8(&info, 0, sizeof(info));
+    info.id = creature.index;
+    info.rank = ReviveLevel(creature);
+    info.levels[4] = creature.unk0_8;
+    for (int i = 0; i < 4; i++) {
+        info.bonus[i] = creature.parts[i].unk12;
+        info.levels[i] = creature.parts[i].level;
+    }
+}
+
+// The stat texts ("HP +%d" and so on), and what goes between them.
+extern const u32 data_0208a4bc, data_0208a4c0, data_0208a4c4, data_0208a4c8, data_0208a4cc;
+extern "C" const char data_ov007_021922f8[];
+extern const int data_02089a50;
+
+// The stats of what info holds. (Three inline levels deep, the game's second call puts its fraction temporary below
+// the level temporaries; a direct call doesn't.)
+static inline DinoReviveStats ReviveStatsOf0(const DinoReviveStatsInput &info) {
+    return func_02030f38(&info, false, MFx32::FromRaw(0));
+}
+static inline DinoReviveStats ReviveStatsOf1(const DinoReviveStatsInput &info) {
+    return ReviveStatsOf0(info);
+}
+static inline DinoReviveStats ReviveStatsOf2(const DinoReviveStatsInput &info) {
+    return ReviveStatsOf1(info);
+}
+
+// After a revival: a message box with how much each stat went up.
+void DinoUiReviveStatusMenu::ShowStatChanges() {
+    DinoReviveStatsInput info;
+    info.levels[0] = info.levels[1] = info.levels[2] = info.levels[3] = 0;
+    ReviveStatsInput(info, mCreature);
+    DinoReviveStats before = func_02030f38(&info, false, MFx32::FromRaw(0));
+    ReviveStatsInput(info, mCreature2);
+    DinoReviveStats after = ReviveStatsOf2(info);
+    std::string text;
+    char line[0x80];
+    int diff;
+    if ((diff = after.hp - before.hp) != 0) {
+        sprintf(line, gDinoResource->GetText(data_0208a4cc), diff);
+        text += line;
+    }
+    if ((diff = after.stats[0] - before.stats[0]) != 0) {
+        sprintf(line, gDinoResource->GetText(data_0208a4c8), diff);
+        if (text.size() != 0) {
+            text += data_ov007_021922f8;
+        }
+        text += line;
+    }
+    if ((diff = after.stats[1] - before.stats[1]) != 0) {
+        sprintf(line, gDinoResource->GetText(data_0208a4c4), diff);
+        if (text.size() != 0) {
+            text += data_ov007_021922f8;
+        }
+        text += line;
+    }
+    if ((diff = after.stats[2] - before.stats[2]) != 0) {
+        sprintf(line, gDinoResource->GetText(data_0208a4c0), diff);
+        if (text.size() != 0) {
+            text += data_ov007_021922f8;
+        }
+        text += line;
+    }
+    if ((diff = after.stats[3] - before.stats[3]) != 0) {
+        sprintf(line, gDinoResource->GetText(data_0208a4bc), diff);
+        if (text.size() != 0) {
+            text += data_ov007_021922f8;
+        }
+        text += line;
+    }
+    if (text.size() != 0) {
+        mSerial.AddTail(new MTimer(data_02089a50), new DinoCommonWindowMessageBox(MPoint(0x80, 0x60), std::string(text), 4));
+    }
+}
+
 void DinoUiReviveStatusMenu::ShowLearnedAttacks() {
     if (CountRevivedParts(mCreature2) <= CountRevivedParts(mCreature)) {
         return;

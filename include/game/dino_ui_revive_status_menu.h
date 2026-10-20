@@ -54,6 +54,7 @@ public:
     void FadeIn();
     void Leave();
     // Says which attacks the revive taught the creature (if any).
+    void ShowStatChanges();
     void ShowLearnedAttacks();
 
     u8 unkB3[1];
