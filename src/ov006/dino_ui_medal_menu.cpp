@@ -29,6 +29,14 @@
 #include "m/bg_new_task.h"
 #include "m/picture.h"
 #include "game/dino_static_init.h"
+#include "game/dino_team.h"
+#include "game/dino_ui_common.h"
+#include "game/dino_guide_message.h"
+#include "game/dino_ui_parts_team_tech.h"
+#include "m/font.h"
+#include "m/oam_canvas.h"
+#include "m/input.h"
+#include "m/smart_oam.h"
 
 DinoUiMedalMenu::~DinoUiMedalMenu() {
     gCurrentDisplay->mBlend->Reset();
@@ -162,31 +170,257 @@ void DinoUiMedalSlotCreateTask::Idle() {
 #pragma auto_inline off
 
 DinoUiMedalMenu::DinoUiMedalMenu(u32 *mode, u32 *index, u8 *unk)
-    : MMenu(gLcd->mMain, NULL, 0), mUnkBC(0), mResult((int *)mode), mIndex(index), mUnk198(unk), mPage(0), mLastPage(0),
+    : MMenu(gLcd->mMain, NULL, 0), mPageL(NULL), mResult((int *)mode), mIndex(index), mUnk198(unk), mPage(0), mLastPage(0),
       mSort(*unk), mUnk204(0), mUnk21C(0xFF), mUnk21D(0) {
     mMotions.clear();
 }
 
-// Where the cursor and the name go relative to a medal.
+// Where the cursor and the name go relative to a medal, and the buttons' places.
 extern struct {
-    u8 unk00[0x4C];
+    u8 unk00[0xC];
+    MPoint sortPos;         // 0x0C: the first sort button
+    MPoint sortStep;        // 0x14: to the next
+    MPoint backPos;         // 0x1C
+    MPoint pageLPos;        // 0x24
+    MPoint pageRPos;        // 0x2C
+    u8 unk34[0x4C - 0x34];
     MPoint nameOffset;      // 0x4C
     MPoint cursorOffset;    // 0x54
 } data_ov006_021940d8;
+
+// The TU's pooled paths, and the slots' numbers' layout.
+extern "C" u32 data_ov006_02193f58[];
+extern "C" u32 data_ov006_02193fd8[];
+// The buttons' graphics, in the path pool.
+static inline const char *DinoUiMedalPath(int i) {
+    return ((const char **)data_ov006_02193fd8)[i];
+}
+struct DinoUiMedalLayout {
+    u8 unk00[0x54];
+    int slotX;          // 0x54: the first slot
+    int slotY;          // 0x58
+    int slotColumnX;    // 0x5C: to the next slot in a row
+    int slotColumnY;    // 0x60
+    int slotRowX;       // 0x64: to the next row
+    int slotRowY;       // 0x68
+    MPoint numberOffset;    // 0x6C: of a slot's number
+};
+extern DinoUiMedalLayout data_ov006_02194058;
+extern "C" const MPoint data_ov006_0219410c;    // the page fraction's place
+extern "C" const MPoint data_ov006_021940cc;    // the team name's place
+extern "C" const MPoint data_ov006_0219427c;    // the team tech's place
+extern "C" const char data_ov006_02196114[], data_ov006_02196128[];    // the sort cursor and the background
+extern "C" const char data_ov006_02196140[];    // the numbers' font
+// OnStart's function-local static: the sort buttons' help texts (from 0x10), set on the first call.
+extern "C" u32 data_ov006_02194258[];
+extern "C" u32 data_ov006_02194268[5];   // (the texts, as the loop reads them)
+extern "C" u32 data_ov006_02199184;
+extern const u32 data_0208a468, data_0208a46c, data_0208a470, data_0208a474, data_0208a478, data_0208a47c, data_0208a480,
+    data_0208a484, data_0208a488, data_0208a48c, data_0208a490, data_0208a494;
+extern const u32 data_0208a904;
+extern const int data_02089abc, data_02089ac0, data_02089ac4;
+extern const u32 data_0208aa34;
+
+inline DinoUiMedalPageLButton::DinoUiMedalPageLButton(DinoUiMedalMenu *owner)
+    : DinoUiMedalMenuItem(owner, DinoUiMedalPath(8), data_ov006_021940d8.pageLPos, data_0208aa34) {
+    SetKeys(0x200);
+    SetNoFocus(TRUE);
+    DinoHelpItem::Disable();
+}
+
+inline DinoUiMedalPageRButton::DinoUiMedalPageRButton(DinoUiMedalMenu *owner)
+    : DinoUiMedalMenuItem(owner, DinoUiMedalPath(14), data_ov006_021940d8.pageRPos, data_0208aa34) {
+    SetKeys(0x100);
+    SetNoFocus(TRUE);
+    DinoHelpItem::Disable();
+}
+
+inline DinoUiMedalBackButton::DinoUiMedalBackButton(DinoUiMedalMenu *owner)
+    : DinoUiMedalMenuItem(owner, ((const char **)data_ov006_02193f58)[9], data_ov006_021940d8.backPos, data_0208a468) {
+    SetKeys(2);
+    SetMode(4);
+    mMotion->Play(2, 0);
+}
+
+// The excavation settings' section at offset7C (the input repeat is at 0x1C and 0x20).
+static inline const int *GetExcavate7C(MResource<DinoExcavateDefs> &defs) {
+    const DinoExcavateDefs *d = defs.Get();
+    if (d->offset7C == 0) {
+        return NULL;
+    }
+    return (const int *)((const u8 *)d + d->offset7C);
+}
+
+#pragma opt_common_subs off
+// The page fraction, page and back buttons, the pictures, the help areas, the sort buttons, the team's name, the
+// cursor, the slots' numbers and the name; then the sorted slots, focusing the creature the list was left on.
+// NONMATCHING: stack slots only: the game puts the numbers loop's &mParallel below the numbers' font and the help
+// areas (ours above them); declaration order doesn't move it.
+void DinoUiMedalMenu::OnStart() {
+    u32 guard = data_ov006_02199184;
+    if (!(guard & 1)) {
+        DINO_POOL_WORD(data_ov006_02194258, 0x10) = data_0208a47c;
+        DINO_POOL_WORD(data_ov006_02194258, 0x14) = data_0208a478;
+        DINO_POOL_WORD(data_ov006_02194258, 0x18) = data_0208a474;
+        DINO_POOL_WORD(data_ov006_02194258, 0x1c) = data_0208a470;
+        DINO_POOL_WORD(data_ov006_02194258, 0x20) = data_0208a46c;
+        DINO_POOL_WORD(data_ov006_02199184, 0) = guard | 1;
+    }
+    SetLinkFallback(1);
+    {
+        MResource<DinoExcavateDefs> delayDefs = gDinoResource->GetExcavateDefs();
+        MResource<DinoExcavateDefs> intervalDefs = gDinoResource->GetExcavateDefs();
+        GetInput()->SetRepeat(0xF0, GetExcavate7C(delayDefs)[7], GetExcavate7C(intervalDefs)[8]);
+    }
+    mPage = *mIndex / 15;
+    gDinoBackup->GetTeam(gDinoBackup->GetUnk34_26(), &mTeam);
+    mOam = new MSmartOam(0x31, 0, TRUE);
+    mFraction = new DinoUiFieldMenuFraction(mOam, data_ov006_0219410c);
+    mParallel.AddTail(mFraction);
+    mFraction->SetNumerator(mPage + 1);
+    mFraction->SetPriority(2);
+    LoadCreatures();
+    if ((int)mLastPage > 0) {
+        mPageL = new DinoUiMedalPageLButton(this);
+        AddItem(mPageL);
+        mPageR = new DinoUiMedalPageRButton(this);
+        AddItem(mPageR);
+    }
+    mParallel.AddTail(mSortCursor = new MTextPicture(std::string(data_ov006_02196114), TRUE, false));
+    mSortCursor->Show();
+    mSortCursor->SetPriority(2);
+    MTextPicture *background = new MTextPicture(std::string(data_ov006_02196128), TRUE, false);
+    background->Show();
+    background->SetPriority(3);
+    mParallel.AddTail(background);
+    mUnk214 = new MParallelTaskSet();
+    mParallel.AddTail(mUnk214);
+    mUnk218 = new MParallelTaskSet();
+    mParallel.AddTail(mUnk218);
+    DinoHelpDummyItem *title, *list, *tabs, *info, *medals;
+    mParallel.AddTail(title = new DinoHelpDummyItem(GetDisplay(), MRect(0x26, 3, 0x9C, 0x10),
+                                                    std::string(gDinoResource->GetText(data_0208a494))));
+    mParallel.AddTail(list = new DinoHelpDummyItem(GetDisplay(), MRect(0x1C, 0x16, 0x47, 0x3A),
+                                                   std::string(gDinoResource->GetText(data_0208a490))));
+    mParallel.AddTail(new DinoHelpDummyItem(GetDisplay(), MRect(0x4A, 0x16, 0x9B, 0x3A),
+                                            std::string(gDinoResource->GetText(data_0208a48c))));
+    mParallel.AddTail(tabs = new DinoHelpDummyItem(GetDisplay(), MRect(0xA4, 0x16, 0xEE, 0x3A),
+                                                   std::string(gDinoResource->GetText(data_0208a488))));
+    mParallel.AddTail(info = new DinoHelpDummyItem(GetDisplay(), MRect(0xF, 0x41, 0xEE, 0x9E),
+                                                   std::string(gDinoResource->GetText(data_0208a484))));
+    mParallel.AddTail(medals = new DinoHelpDummyItem(GetDisplay(), MRect(0xEF, 0x8B, 0xFD, 0x9D),
+                                                     std::string(gDinoResource->GetText(data_0208a480))));
+    mUnkB8 = new DinoUiMedalBackButton(this);
+    AddItem(mUnkB8);
+    for (int i = 0; i < 5; i++) {
+        mSortButtons[i] = new DinoUiSortMenuItem(data_ov006_02194268[i], MPoint(data_ov006_021940d8.sortPos.x + data_ov006_021940d8.sortStep.x * i,
+                                                                data_ov006_021940d8.sortPos.y + data_ov006_021940d8.sortStep.y * i));
+        AddItem(mSortButtons[i]);
+    }
+    AddEntry((u32)title, 2, (u32)list);
+    AddEntry((u32)title, 3, 0);
+    AddEntry((u32)title, 1, 0);
+    AddEntry((u32)list, 4, (u32)title);
+    AddEntry((u32)tabs, 4, (u32)title);
+    AddEntry((u32)list, 2, (u32)info);
+    AddEntry((u32)tabs, 2, (u32)info);
+    AddEntry((u32)medals, 4, (u32)info);
+    AddEntry((u32)medals, 3, (u32)info);
+    AddEntry((u32)(DinoHelpItem *)mSortButtons[0], 4, (u32)info);
+    AddEntry((u32)(DinoHelpItem *)mSortButtons[4], 4, (u32)info);
+    AddEntry((u32)(DinoHelpItem *)mSortButtons[0], 2, (u32)(DinoHelpItem *)mUnkB8);
+    AddEntry((u32)(DinoHelpItem *)mSortButtons[1], 2, (u32)(DinoHelpItem *)mUnkB8);
+    AddEntry((u32)(DinoHelpItem *)mSortButtons[2], 2, (u32)(DinoHelpItem *)mUnkB8);
+    AddEntry((u32)(DinoHelpItem *)mSortButtons[3], 2, (u32)(DinoHelpItem *)mUnkB8);
+    AddEntry((u32)(DinoHelpItem *)mSortButtons[4], 1, (u32)(DinoHelpItem *)mUnkB8);
+    AddEntry((u32)(DinoHelpItem *)mUnkB8, 3, (u32)(DinoHelpItem *)mSortButtons[4]);
+    MFont *font = gDinoResource->CreateFont12(0, 10, 11);
+    MObjCanvas *canvas = new MObjCanvas(gCurrentDisplay, MPoint(0xA0, 0x10), gDinoResource->GetUnkTable(), TRUE);
+    canvas->GetOamUnit()->SetMode(1);
+    MIndicator *teamName = new MIndicator(canvas, font, 0);
+    mParallel.AddTail(teamName);
+    teamName->SetPosition(data_ov006_021940cc);
+    teamName->SetPriority(2);
+    teamName->Show();
+    teamName->SetText(std::wstring((const wchar_t *)mTeam.name));
+    mCursorTasks = new MParallelTaskSet();
+    mParallel.AddTail(mCursorTasks);
+    mCursor = new DinoUiFieldMenuCursor(mOam);
+    mParallel.AddTail(mCursor);
+    mCursor->SetPriority(0);
+    mCursor->mUnk10->GetUnit()->SetMode(1);
+    mCursor->mUnk14->GetUnit()->SetMode(1);
+    mCursor->Hide();
+    MFontSet *numbers = new MFontSet(std::string(data_ov006_02196140), 0, 0, 0);
+    for (int i = 0; i < 15; i++) {
+        MTaskSet *tasks = &mParallel;
+        MObjCanvas *slotCanvas = new MObjCanvas(gCurrentDisplay, MPoint(0x20, 0x10), numbers->GetPalette(), TRUE);
+        slotCanvas->GetOamUnit()->SetMode(1);
+        mNumbers[i] = new MIndicator(slotCanvas, numbers, 0);
+        tasks->AddTail(mNumbers[i]);
+        int row = i / 5;
+        int column = i % 5;
+        mNumbers[i]->SetPosition(MPoint(data_ov006_02194058.slotX + data_ov006_02194058.slotColumnX * column +
+                                            data_ov006_02194058.slotRowX * row,
+                                        data_ov006_02194058.slotY + data_ov006_02194058.slotColumnY * column +
+                                            data_ov006_02194058.slotRowY * row) +
+                                 data_ov006_02194058.numberOffset);
+        mNumbers[i]->SetPriority(2);
+        mNumbers[i]->Show();
+    }
+    mParallel.AddTail(mOam);
+    mName = new DinoUiPartsReviverName();
+    mParallel.AddTail(mName);
+    mName->Hide();
+    mNameTasks = new MSerialTaskSet();
+    mParallel.AddTail(mNameTasks);
+    mParallel.AddTail(new DinoGuideMessage(std::string(gDinoResource->GetText(data_0208a904))));
+    mSortCursor->SetPosition(0, mSort * -0xC0);
+    Sort(mSort);
+    if (!gDinoBackup->GetSystemFlag(2)) {
+        CreateUnkF0Items();
+        if (DinoTeamHasTech(&mTeam)) {
+            mParallel.AddTail(new DinoUiPartsTeamTech(&data_ov006_0219427c));
+        }
+    }
+    CreateSlots();
+    LinkItems();
+    if (!gDinoBackup->GetSystemFlag(2) && *mResult == 1) {
+        FocusItem(mUnkF0[*mIndex % 15]);
+    } else {
+        FocusItem(mSlots[*mIndex % 15]);
+    }
+    DinoDimScreen();
+    mUnk220 = new MParallelTaskSet();
+    mParallel.AddTail(mUnk220);
+    MTask *fade = gLcd->GetBottomDisplay()->mBright->CreateFadeInFromBlack(data_02089ac4, data_02089ac0);
+    MParallelTaskSet *fadeSet = new MParallelTaskSet(TRUE);
+    fadeSet->AddTail(fade);
+    mUnk220->AddTail(fadeSet);
+    mSerial.AddTail(new MTimer(data_02089abc));
+    mCursor->Hide();
+    MTask *show = mCursor->CreateShowTransfer();
+    MTask *play = mCursor->CreatePlayTask();
+    MParallelTaskSet *cursorSet = new MParallelTaskSet(TRUE);
+    cursorSet->AddTail(play);
+    cursorSet->AddTail(show);
+    mSerial.AddTail(cursorSet);
+}
+#pragma opt_common_subs reset
 
 // Where the mUnk1EC creatures' medals go.
 extern "C" const MPoint data_ov006_021942f4[5];
 void DinoUiMedalMenu::CreateUnkF0Items() {
     for (int i = 0; i < 5; i++) {
         DinoCreatureState creature;
-        gDinoBackup->GetCreature(mUnk1EC[i], &creature);
+        gDinoBackup->GetCreature(mTeam.slots[i], &creature);
         u8 maxed;
         if (GetCreatureLevel(creature) == 12) {
             maxed = TRUE;
         } else {
             maxed = FALSE;
         }
-        mUnkF0[i] = new DinoUiPartsReviverMedalButton(mOam, data_ov006_021942f4[i], mUnk1EC[i], maxed, 0);
+        mUnkF0[i] = new DinoUiPartsReviverMedalButton(mOam, data_ov006_021942f4[i], mTeam.slots[i], maxed, 0);
         AddItem(mUnkF0[i]);
     }
 }
@@ -233,7 +467,7 @@ void DinoUiMedalMenu::OnDecide(MMenuItem *item) {
     }
     for (int i = 0; i < 5; i++) {
         if (item == mUnkF0[i]) {
-            if (mUnk1EC[i] && mUnk204) {
+            if (mTeam.slots[i] && mUnk204) {
                 *mIndex = mPage * 15 + i;
                 *mUnk198 = mSort;
                 OnBackDecided(1);
@@ -301,7 +535,7 @@ DinoUiMedalSlotCreateTask::DinoUiMedalSlotCreateTask(DinoUiMedalMenu *menu) : MP
 }
 
 BOOL DinoUiMedalMenu::HasUnk1EC(u32 id) {
-    if (id == mUnk1EC[0] || id == mUnk1EC[1] || id == mUnk1EC[2] || id == mUnk1EC[3] || id == mUnk1EC[4]) {
+    if (id == mTeam.slots[0] || id == mTeam.slots[1] || id == mTeam.slots[2] || id == mTeam.slots[3] || id == mTeam.slots[4]) {
         return TRUE;
     }
     return FALSE;
@@ -408,16 +642,6 @@ void DinoUiMedalMenu::Sort(u8 sort) {
 }
 
 // Where the page's slots go.
-struct DinoUiMedalLayout {
-    u8 unk00[0x54];
-    int slotX;          // 0x54: the first slot
-    int slotY;          // 0x58
-    int slotColumnX;    // 0x5C: to the next slot in a row
-    int slotColumnY;    // 0x60
-    int slotRowX;       // 0x64: to the next row
-    int slotRowY;       // 0x68
-};
-extern DinoUiMedalLayout data_ov006_02194058;
 
 // Makes the page's slot (the first clears the numbers and counts the slots; the last links them).
 void DinoUiMedalMenu::CreateSlot(int slot) {
@@ -617,8 +841,8 @@ void DinoUiMedalMenu::OnFocus(MMenuItem *item) {
     mCursor->Show();
     int i;
     for (i = 0; i < 5; i++) {
-        if (item == mUnkF0[i] && mUnk1EC[i] != 0) {
-            mName->SetCreature(mUnk1EC[i]);
+        if (item == mUnkF0[i] && mTeam.slots[i] != 0) {
+            mName->SetCreature(mTeam.slots[i]);
             mName->SetPosition(data_ov006_021942f4[i] + data_ov006_021940d8.nameOffset);
             Disable();
             mNameTasks->Clear();

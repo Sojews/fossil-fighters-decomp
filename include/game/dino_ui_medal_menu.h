@@ -3,6 +3,7 @@
 #define GAME_DINO_UI_MEDAL_MENU_H
 
 #include "game/dino_resource.h"
+#include "game/dino_backup.h"
 #include <vector>
 #include "m/menu.h"
 #include "m/motion.h"
@@ -15,6 +16,9 @@ class DinoUiPartsReviverMedalButton;
 class MIndicator;
 class DinoUiFieldMenuCursor;
 class DinoUiPartsReviverName;
+
+class DinoUiMedalBackButton;
+class DinoUiSortMenuItem;
 
 class DinoUiMedalMenu : public DinoHelpBase, public MMenu {
 public:
@@ -39,18 +43,18 @@ public:
     void Sort(u8 sort);
     // Lists the creatures with any part (by voice and by unk88) and counts the pages.
     void LoadCreatures();
-    // The medals of the mUnk1EC creatures (lit at the top level).
+    // The medals of the team's creatures (lit at the top level).
     void CreateUnkF0Items();
     void LinkItems();
 
     MSmartOam *mOam;                    // 0xB4: the items' sprites
-    MMenuItem *mUnkB8;                  // 0xB8
-    u32 mUnkBC;                         // 0xBC
-    u32 mUnkC0;                         // 0xC0
-    MMenuItem *mSortButtons[5];         // 0xC4
+    DinoUiMedalBackButton *mUnkB8;      // 0xB8
+    MMenuItem *mPageL;                  // 0xBC
+    MMenuItem *mPageR;                  // 0xC0
+    DinoUiSortMenuItem *mSortButtons[5]; // 0xC4
     u32 mUnkD8[5];                      // 0xD8
     MTextPicture *mSortCursor;          // 0xEC
-    MMenuItem *mUnkF0[5];               // 0xF0: one per mUnk1EC entry
+    MMenuItem *mUnkF0[5];               // 0xF0: one per team member
     DinoUiPartsReviverMedalButton *mSlots[15];  // 0x104
     MIndicator *mNumbers[15];           // 0x140: the slots' creature numbers
     int mSlotCount;                     // 0x17C
@@ -67,17 +71,17 @@ public:
     u32 mPage;                          // 0x1C0
     u32 mLastPage;                      // 0x1C4
     u8 mSort;                           // 0x1C8
-    u8 unk1C9[3];
-    u32 mUnk1CC[8];                     // 0x1CC
-    u8 mUnk1EC[5];                      // 0x1EC
-    u8 unk1F1[3];
+    u8 unk1C9;
+    DinoTeam mTeam;                     // 0x1CA: the player's team
+    u8 unk1F2[2];
     u32 mUnk1F4;                        // 0x1F4
     DinoUiPartsReviverName *mName;      // 0x1F8: the focused creature's name
     MTaskSet *mNameTasks;               // 0x1FC
     u32 mUnk200;                        // 0x200
     u8 mUnk204;                         // 0x204
     std::vector<MMotionFile> mMotions;  // 0x208
-    u8 unk214[0x21C - 0x214];
+    MTaskSet *mUnk214;                  // 0x214
+    MTaskSet *mUnk218;                  // 0x218
     u8 mUnk21C;                         // 0x21C
     u8 mUnk21D;                         // 0x21D
     MTaskSet *mUnk220;                  // 0x220
@@ -85,6 +89,7 @@ public:
 
 class DinoUiSortMenuItem : public MMenuItem, public DinoHelpItem {
 public:
+    DinoUiSortMenuItem(const u32 &textId, MPoint pos) : mTextId(textId), mPos(pos) {}
     virtual ~DinoUiSortMenuItem();
     virtual MRect GetFrame();
     virtual void OnFocusChanged(BOOL focused);
@@ -133,6 +138,7 @@ public:
 
 class DinoUiMedalBackButton : public DinoUiMedalMenuItem {
 public:
+    DinoUiMedalBackButton(DinoUiMedalMenu *owner);
     virtual ~DinoUiMedalBackButton();
     virtual void OnFocusChanged(BOOL focused);
     virtual void OnDecide();
@@ -140,12 +146,14 @@ public:
 
 class DinoUiMedalPageLButton : public DinoUiMedalMenuItem {
 public:
+    DinoUiMedalPageLButton(DinoUiMedalMenu *owner);
     virtual ~DinoUiMedalPageLButton();
     virtual void OnDecide();
 };
 
 class DinoUiMedalPageRButton : public DinoUiMedalMenuItem {
 public:
+    DinoUiMedalPageRButton(DinoUiMedalMenu *owner);
     virtual ~DinoUiMedalPageRButton();
     virtual void OnDecide();
 };
