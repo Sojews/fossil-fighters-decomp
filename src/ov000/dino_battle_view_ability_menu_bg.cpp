@@ -23,6 +23,8 @@
 #include "m/chr.h"
 #include "m/lcd.h"
 #include "nitro/mi.h"
+#include "game/dino_battle_view_ability_text_window.h"
+#include "game/dino_message.h"
 
 extern "C" int data_ov000_021978dc;    // live ability menu BGs
 extern "C" const u32 data_0208a19c;     // frames before the ability menu takes input
@@ -325,6 +327,40 @@ void DinoBattleViewUiAbilityMenu::OnIdle() {
     if (task != NULL) {
         mSerial.AddTail(task);
     }
+}
+
+extern "C" const u32 data_0208a194;    // the close slide's length
+
+// NONMATCHING: the loop guard shares the zero-length branch's trampoline in the game; locals' slots differ.
+void DinoBattleViewUiAbilityMenu::Close() {
+    Disable();
+    MParallelTaskSet *slides = NULL;
+    u32 frames = data_0208a194;
+    if (frames != 0) {
+        slides = new MParallelTaskSet(TRUE);
+        for (int i = 0; i < (int)mUnkCC; i++) {
+            MPoint pos = mItems[i]->GetBarPosition();
+            MSerialTaskSet *seq = new MSerialTaskSet(TRUE);
+            MTask *slide = func_ov000_0217a45c(mItems[i], pos, MPoint(pos.x, pos.y - 192), 20, -1);
+            seq->AddTail(new MTimer(frames / 7 * i), slide);
+            slides->AddTail(seq);
+        }
+    }
+    mTextWindow->Hide();
+    mCostText->Hide();
+    MPoint to(0, -192);
+    MPoint from = mBG->mUnk10D4 ? mBG->mText->GetOffset() : mBG->mOffset;
+    if (mBG->mUnk10D4) {
+        mParallel.AddTail(mBG->mText->CreateOffsetAnime(from, to, frames, 1));
+    } else {
+        mParallel.AddTail(new MTimer(1));
+    }
+    if (slides != NULL) {
+        mSerial.AddTail(slides);
+    }
+    MTask *exit = MTaskExitTransfer::Create(this);
+    GetSerial()->AddTail(((MMessageObserver *)mUnkB8)->CreatePostTask(new DinoBattleViewUiAbilityMenuResult(mUnkC0, 0, TRUE)),
+                         exit);
 }
 
 // The file's static initialization (see dino_static_init.h).

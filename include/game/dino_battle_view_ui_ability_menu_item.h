@@ -59,6 +59,8 @@ public:
     virtual void OnDecide(MMenuItem *item);
 
     MSmartOam *GetUnkB4();
+    // Slides the item bars and the BG off (up a screen), then reports the menu's result and exits.
+    void Close();
 
     MSmartOam *mUnkB4;  // 0xB4
     u32 mUnkB8;     // 0xB8
@@ -71,10 +73,12 @@ public:
     u8 mUnkD4;      // 0xD4
     u32 mUnkD8;     // 0xD8
     DinoBattleViewUiAbilityMenuArgs mArgs;  // 0xDC
-    u8 unkF4[0x100 - 0xF4];
+    class DinoBattleViewAbilityMenuBG *mBG;         // 0xF4
+    u32 unkF8;
+    class DinoBattleViewAbilityTextWindow *mTextWindow; // 0xFC
     MIndicator *mCostText;  // 0x100
     void *mUnk104;  // 0x104: the DinoBattleView
-    u8 unk108[0x11C - 0x108];
+    DinoBattleViewUiAbilityMenuItem *mItems[5];     // 0x108
     u32 mUnk11C;    // 0x11C
     u32 unk120;
     DinAttackItemHelp *mHelps[3];   // 0x124
