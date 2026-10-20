@@ -1735,6 +1735,57 @@ BOOL DinoAttackHasUnk10Flag(u32 id) {
     return FALSE;
 }
 
+// Opens the root menu for the player (on the given item, or one chosen from what it can do with -1), or, with
+// nothing to do and ending allowed, ends the turn.
+extern "C" void func_ov000_0216b6c0(DinoBattleUserController *controller, int menu, u8 canEnd) {
+    if (((DinoBattleModel *)controller->mUnkAC)->mUnkA8) {
+        return;
+    }
+    u32 flags = 0;
+    DinoBattleModelPlayer *player = ((DinoBattleModel *)controller->mUnkAC)->GetPlayer(controller->mUnkA8);
+    DinoBattleModelCreature *front = player->FindCreature(0);
+    u32 mask = 0;
+    for (u32 i = 0; i < player->GetCreatureCount(); i++) {
+        if (player->GetCreature(i)->IsUnkD244()) {
+            mask |= 1 << player->GetCreature(i)->GetUnkB8();
+        }
+    }
+    if (front != NULL) {
+        if (!player->AnyCreatureUnkD244()) {
+            flags |= 8;
+        }
+        if (!player->IsUnk2163978()) {
+            flags |= 4;
+        }
+    } else {
+        flags |= 0xC;
+    }
+    if (menu == -1) {
+        if (flags == 0xC) {
+            if (canEnd) {
+                controller->GetSerial()->AddTail(
+                    player->CreateFieldEffectWaitTask(), DinoBattleViewPopNumber::CreateWaitTask(),
+                    controller->mUnkB0->CreatePostTask(new DinoBattleViewClearAttackBarRequest(0)),
+                    DinoCreatePostAndWaitTask(controller->mUnkB0, new DinoBattleViewWaitActionInfoBarRequest(0)),
+                    controller->mUnkB0->CreatePostTask(new DinoBattleViewUiTurnEndRequest(
+                        (u32)(MMessageObserver *)controller, controller->mUnkA8, TRUE)));
+                return;
+            }
+            menu = 0;
+        } else if (!(flags & 8)) {
+            menu = 3;
+        } else {
+            menu = 1;
+        }
+    }
+    controller->mSerial.AddTail(controller->mUnkB0->CreatePostTask(new DinoBattleViewUiRootMenuRequest(
+        (u32)(MMessageObserver *)controller, controller->mUnkA8, flags, menu, mask, controller->GetCreatureMask(player))));
+    if (((DinoBattleModelField *)((DinoBattleModel *)controller->mUnkAC)->GetUnk10C())->mLive != NULL) {
+        controller->mParallel.AddTail(
+            ((DinoBattleModel *)controller->mUnkAC)->CreatePostTask(new DinoBattleModelLiveEventSignal(TRUE)));
+    }
+}
+
 DinoBattleUserController::DinoBattleUserController(void *unkBC, u32 arg, u8 unkB8) : DinoBattleController(arg) {
     mUnkB8 = unkB8;
     mUnkBC = unkBC;

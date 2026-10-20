@@ -300,6 +300,15 @@ public:
 class DinoBattleViewUiRootMenuRequest : public MMessage {
 public:
     DinoBattleViewUiRootMenuRequest() : MMessage(0x10010) {}
+    DinoBattleViewUiRootMenuRequest(u32 reply, u32 side, u32 flags, u32 menu, u32 mask, u32 creatures)
+        : MMessage(0x10010) {
+        mUnk0C = reply;
+        mUnk10 = side;
+        mUnk14 = flags;
+        mUnk18 = menu;
+        mUnk1C = mask;
+        mUnk20 = creatures;
+    }
     virtual u32 GetSize() { return 28; }
     virtual void Write(void *buf) {
         MI_CpuCopy8(&mId, buf, 4);
@@ -1695,6 +1704,11 @@ public:
 class DinoBattleViewUiTurnEndRequest : public MMessage {
 public:
     DinoBattleViewUiTurnEndRequest() : MMessage(0x1004B) {}
+    DinoBattleViewUiTurnEndRequest(u32 reply, u32 side, u8 arg) : MMessage(0x1004B) {
+        mUnk0C = reply;
+        mUnk10 = side;
+        mUnk14 = arg;
+    }
     virtual u32 GetSize() { return 16; }
     virtual void Write(void *buf) {
         MI_CpuCopy8(&mId, buf, 4);
@@ -3219,6 +3233,9 @@ public:
 class DinoBattleModelLiveEventSignal : public MMessage {
 public:
     DinoBattleModelLiveEventSignal() : MMessage(0x1009F) {}
+    DinoBattleModelLiveEventSignal(u8 arg) : MMessage(0x1009F) {
+        mUnk0C = arg;
+    }
     virtual u32 GetSize() { return 8; }
     virtual void Write(void *buf) {
         MI_CpuCopy8(&mId, buf, 4);
