@@ -34,8 +34,6 @@ DinoFieldRadarManager::~DinoFieldRadarManager() {
 template class MCallTask1<DinoFieldRadar, DinoFieldRadar, bool>;
 
 #pragma auto_inline off
-// (Not inlined by the mode task, so instantiated here, after auto-inlining is off.)
-template MTask *MCreateCallTask(DinoFieldRadar *obj, void (DinoFieldRadar::*func)(bool), bool a0);
 
 void DinoFieldRadar::Signal() {
     if (mMode != 1 && !mSignalling) {
@@ -71,7 +69,7 @@ void DinoFieldRadar::SetUnk5A8(bool value) {
 MTask *DinoFieldRadar::CreateModeTask(u32 mode, u32 frames, u8 b) {
     mMode = mode;
     if (mode == 1) {
-        return (new MParallelTaskSet(TRUE))
+        return (new MSerialTaskSet(TRUE))
             ->Add(b ? DinoSoundCreatePlaySeTask(0x86, 0) : (MTask *) new MTimer(0))
             ->Add(MCreateCallTask(this, &DinoFieldRadar::SetUnk5A8, false))
             ->Add(mMotion90->CreatePlayTransfer(2, 1))
@@ -83,7 +81,7 @@ MTask *DinoFieldRadar::CreateModeTask(u32 mode, u32 frames, u8 b) {
             ->Add(mOam->CreateHideTransfer())
             ->Add(mOam88->CreateHideTransfer());
     }
-    return (new MParallelTaskSet(TRUE))
+    return (new MSerialTaskSet(TRUE))
         ->Add(b ? DinoSoundCreatePlaySeTask(0x85, 0) : (MTask *) new MTimer(0))
         ->Add(mOam->CreateShowTransfer())
         ->Add(mOam88->CreateShowTransfer())
@@ -95,6 +93,9 @@ MTask *DinoFieldRadar::CreateModeTask(u32 mode, u32 frames, u8 b) {
                   ->Add(GetDisplay()->mBlend->CreateAlphaRatioAnime(0, 16, 16, 16, 60, 0)))
         ->Add(MCreateCallTask(this, &DinoFieldRadar::SetUnk5A8, true));
 }
+
+// (After auto-inlining is off: the mode task calls it.)
+template MTask *MCreateCallTask(DinoFieldRadar *obj, void (DinoFieldRadar::*func)(bool), bool a0);
 
 DinoFieldRadarManager::DinoFieldRadarManager(DinoField *field) : MProcess(gLcd->GetTopDisplay()) {
     mField = field;
