@@ -441,8 +441,8 @@ void DinoUiMaskEquipMenu::RefreshPage2() {
 }
 
 // The excavation settings' section at offset7C (the input repeat is at 0x1C and 0x20).
-static inline const int *GetExcavate7C(MResource<DinoExcavateDefs> &defs) {
-    const DinoExcavateDefs *d = defs.Get();
+static inline const int *GetExcavate7C(const MResource<DinoExcavateDefs> &defs) {
+    const DinoExcavateDefs *d = const_cast<MResource<DinoExcavateDefs> &>(defs).Get();
     if (d->offset7C == 0) {
         return NULL;
     }
@@ -451,21 +451,20 @@ static inline const int *GetExcavate7C(MResource<DinoExcavateDefs> &defs) {
 
 // The masks the player has, eight a page, with the help, the back and page buttons, the cursor and the page
 // fraction.
-// NONMATCHING: the game keeps the mask loop's counter in memory (for push_back) with a register copy; ours reloads it
-// (as in DinoUiMaskBuyMenu::LoadMasks).
+// (The mask loop indexes the table through a copy of the counter: the counter itself is pushed by reference.)
+// NONMATCHING: the name canvas reads gCurrentDisplay before copying its size (opt_common_subs off fixes that but
+// loses the loop's register copy).
 void DinoUiMaskEquipMenu::OnStart() {
     SetLinkFallback(1);
-    {
-        MResource<DinoExcavateDefs> delayDefs = gDinoResource->GetExcavateDefs();
-        MResource<DinoExcavateDefs> intervalDefs = gDinoResource->GetExcavateDefs();
-        GetInput()->SetRepeat(0xF0, GetExcavate7C(delayDefs)[7], GetExcavate7C(intervalDefs)[8]);
-    }
+    GetInput()->SetRepeat(0xF0, GetExcavate7C(gDinoResource->GetExcavateDefs())[7],
+                          GetExcavate7C(gDinoResource->GetExcavateDefs())[8]);
     mUnkF0.clear();
     MResource<DinoHeadMaskDefs> defs = gDinoResource->LoadHeadMaskDefs();
     for (u32 i = 1; i < gDinoResource->GetHeadMaskCount(); i++) {
+        u32 id = i;
         const u8 *base = (const u8 *)defs.Get();
         const DinoHeadMaskDef *def =
-            (const DinoHeadMaskDef *)(base + ((const u32 *)(base + ((const DinoHeadMaskDefs *)base)->tableOffset))[i]);
+            (const DinoHeadMaskDef *)(base + ((const u32 *)(base + ((const DinoHeadMaskDefs *)base)->tableOffset))[id]);
         if (def->nameText != 0 && gDinoBackup->GetHeadMask(i) == 1) {
             mUnkF0.push_back((void *&)i);
         }
