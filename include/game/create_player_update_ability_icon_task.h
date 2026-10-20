@@ -16,6 +16,11 @@
 
 class CreatePlayerUpdateAbilityIconTask : public MTask {
 public:
+    CreatePlayerUpdateAbilityIconTask(u8 flag, u32 arg, u32 player) {
+        mUnk10 = flag;
+        mUnk14 = arg;
+        mUnk18 = player;
+    }
     virtual ~CreatePlayerUpdateAbilityIconTask();
     virtual void Execute();
 
@@ -152,7 +157,7 @@ public:
     std::vector<DinoBattleModelCreature *> mCreatures; // 0x104
     MRandom *mRandom;                   // 0x110
     std::string mUnk114;                // 0x114
-    u32 unk120;
+    u32 mUnk120;                        // 0x120
     u32 mUnk124;                        // 0x124
     int mUnk128;                        // 0x128: kaseki points
     u8 mUnk12C;                         // 0x12C

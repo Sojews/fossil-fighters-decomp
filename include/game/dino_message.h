@@ -3092,6 +3092,9 @@ public:
 class DinoBattleViewCreatureActionUpdateSignal : public MMessage {
 public:
     DinoBattleViewCreatureActionUpdateSignal() : MMessage(0x10099) {}
+    DinoBattleViewCreatureActionUpdateSignal(u32 creature) : MMessage(0x10099) {
+        mUnk0C = creature;
+    }
     virtual u32 GetSize() { return 8; }
     virtual void Write(void *buf) {
         MI_CpuCopy8(&mId, buf, 4);

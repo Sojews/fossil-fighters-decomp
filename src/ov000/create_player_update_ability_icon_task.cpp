@@ -1313,6 +1313,35 @@ void UpdateAllCreatureTask::Idle() {
     serial->AddTail(exit);
 }
 
+extern "C" MTask *func_ov000_02166470(DinoBattleModelPlayer *player);
+
+// Swaps two of the player's creatures (the first moving to the escape area, position 3): a task set that waits for
+// both moves and then signals reply with msg.
+// NONMATCHING: other, iconWait and the converted wait take each other's stack slots.
+extern "C" void func_ov000_021661b4(DinoBattleModelPlayer *player, MMessageObserver *reply, MMessage *msg, u32 id,
+                                    u32 otherId) {
+    player->SetUnk124(player->GetUnk124() | 2);
+    player->mUnk120 = 0;
+    MParallelTaskSet *set = new MParallelTaskSet(TRUE);
+    DinoSignalWait *wait = new DinoSignalWait(0x10013, reply, msg, 2);
+    set->AddTail(wait);
+    DinoBattleModelCreature *creature = player->FindCreatureByB4(id);
+    creature->ResetStatus();
+    MParallelTaskSet *icons = new MParallelTaskSet(TRUE);
+    DinoSignalWait *iconWait = new DinoSignalWait(0x10047, NULL, NULL, 1);
+    icons->AddTail(iconWait, player->CreateUpdateStateIconTask((u32)creature, (u32)(MMessageObserver *)iconWait));
+    player->mSerial.AddTail(icons);
+    creature->BeginAction();
+    set->AddTail(creature->CreatePostTask(new DinoBattleModelCreatureMoveRequest(
+        (u32)(MMessageObserver *)wait, player->mUnkB8, id, creature->GetUnkB8(), 3, 0, (u32)&player->mUnk120)));
+    DinoBattleModelCreature *other = player->FindCreatureByB4(otherId);
+    set->AddTail(other->CreatePostTask(new DinoBattleModelCreatureMoveRequest(
+        (u32)(MMessageObserver *)wait, player->mUnkB8, otherId, other->GetUnkB8(), 0, 0, (u32)&player->mUnk120)));
+    player->GetSerial()->AddTail(set, func_ov000_02166470(player),
+                                 new CreatePlayerUpdateAbilityIconTask(TRUE, 0, (u32)player),
+                                 player->mUnkF4->CreatePostTask(new DinoBattleViewCreatureActionUpdateSignal(id)));
+}
+
 // Updates every creature on both sides, and waits for them all (NULL with no creatures).
 extern "C" MTask *func_ov000_02166470(DinoBattleModelPlayer *player) {
     int count = player->GetCreatureCount() + player->GetOpponent()->GetCreatureCount();
