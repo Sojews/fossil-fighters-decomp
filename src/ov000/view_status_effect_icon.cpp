@@ -8,6 +8,7 @@
 #include "m/smart_oam.h"
 #include "game/dino_resource.h"
 #include "game/dino_static_init.h"
+#include "game/dino_battle_view_creature.h"
 
 DinoBattleViewStatusEffectIcon::~DinoBattleViewStatusEffectIcon() {
 }
@@ -107,6 +108,32 @@ int StatusEffectEntry::GetAnime() {
     int anime = mCount <= 1 ? 2 : 3;
     anime += offset;
     return anime;
+}
+
+extern "C" u32 func_ov000_0217e298(const u32 *effect);
+
+// Keeps the icons on the creature; once neither is playing, every 60 frames each icon with several effects shows
+// the next one.
+// NONMATCHING: the new motion's string-temp flag and the wait-stop task swap stack slots.
+void DinoBattleViewStatusEffectIcon::Idle() {
+    for (int i = 0; i < 2; i++) {
+        mSlots[i].mIcon->SetPosition(mOffsets[i] + ((DinoBattleViewCreature *)mUnk74)->GetMotionPosition());
+        if (mSlots[i].mIcon->IsPlaying()) {
+            mTimer = 60;
+            return;
+        }
+    }
+    if (--mTimer > 0) {
+        return;
+    }
+    mTimer = 60;
+    for (int i = 0; i < 2; i++) {
+        if (mSlots[i].mEntries.size() >= 2) {
+            mShown[i] = (mShown[i] + 1) % mSlots[i].mEntries.size();
+            StatusEffectEntry *entry = &mSlots[i].mEntries[mShown[i]];
+            mSlots[i].mIcon->LoadMotion((const char *)func_ov000_0217e298(&entry->mId), entry->GetAnime());
+        }
+    }
 }
 
 void DinoBattleViewStatusEffectIcon::HideIcons() {

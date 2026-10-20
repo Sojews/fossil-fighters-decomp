@@ -46,7 +46,9 @@ public:
     MSmartOam *mOam;                // 0x78
     MParallelTaskSet *mIcons;       // 0x7C
     StatusEffectSlot mSlots[2];     // 0x80
-    u32 unkA8[5];
+    u32 unkA8;
+    u32 mShown[2];                  // 0xAC: the entry each icon shows
+    u32 unkB4[2];
     u32 mSide;                      // 0xBC
     int mTimer;                     // 0xC0
     MPoint mOffsets[2];             // 0xC4
@@ -112,6 +114,50 @@ public:
     void SetMotionPriority(int priority) {
         if (mMotion != NULL) {
             mMotion->SetPriority(priority);
+        }
+    }
+    // Replaces the motion (keeping whether it was shown) and plays the anime.
+    void LoadMotion(const char *path, int anime) {
+        BOOL hidden = TRUE;
+        if (mMotion != NULL) {
+            mTasks->Clear();
+            hidden = mMotion->IsHidden();
+            mParallel.Remove(mMotion);
+            delete mMotion;
+        }
+        mMotion = new MMotion(std::string(path), mOam, 2, 1);
+        mMotion->SetPosition(*(MPoint *)&mUnk7C);
+        mMotion->SetPriority(2);
+        mMotion->SetAnchor(1);
+        if (!hidden) {
+            mMotion->Show();
+        }
+        mParallel.AddTail(mMotion);
+        if (mMotion != NULL && anime != -1) {
+            mTasks->Clear();
+            mMotion->Play(anime, 1);
+            BOOL front = TRUE;
+            switch (anime) {
+            case 1:
+            case 2:
+            case 3:
+            case 13:
+            case 14:
+            case 15:
+                front = FALSE;
+                break;
+            }
+            mMotion->SetPriority(front ? 1 : 2);
+            MTask *priority = new SetPriorityTask(this, 2);
+            MTask *wait = mMotion->CreateWaitStopTask();
+            mTasks->AddTail(new MTimer(1), wait, priority);
+        }
+    }
+    void SetPosition(MPoint pos) {
+        mUnk7C = pos.x;
+        mUnk80 = pos.y;
+        if (mMotion != NULL) {
+            mMotion->SetPosition(pos);
         }
     }
     u32 GetMotionAnime() {
