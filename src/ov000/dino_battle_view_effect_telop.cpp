@@ -96,7 +96,7 @@ void DinoBattleViewEffectTelop::StateStart() {
     mState = data_ov000_0219387c.State_70;
 }
 
-extern "C" MMotion *func_ov000_02173d64(MSmartOam *oam, const std::string &name, u32 arg2, u32 arg3, u8 arg4);
+extern "C" MMotion *func_ov000_02173d64(MSmartOam *oam, const std::string &name, u32 arg2, u32 arg3, bool arg4);
 
 // (In the background.) Loads the telop's picture and, for a player's telop, their name.
 void DinoBattleViewEffectTelop::Load() {

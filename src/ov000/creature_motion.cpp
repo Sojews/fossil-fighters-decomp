@@ -24,6 +24,7 @@
 #include "game/dino_battle_view_effect_game_begin.h"
 #include "m/oam_canvas.h"
 #include "m/font.h"
+#include "m/picture.h"
 #include "game/info_panel_window.h"
 
 CreatureMotion::~CreatureMotion() {
@@ -135,7 +136,8 @@ DinoBattleViewEffectGameBegin::~DinoBattleViewEffectGameBegin() {
 
 // The TU's pooled pointer-to-member constants (see menu.cpp).
 extern "C" struct {
-    u8 unk00[0x08];
+    u8 unk00[0x04];
+    const char *mBackPath;      // 0x04
     const char *mFontPath;      // 0x08
     const char *mMarkPath2;     // 0x0C: (side 1)
     const char *mMarkPath;      // 0x10: (side 0)
@@ -144,6 +146,7 @@ extern "C" struct {
     void (DinoBattleViewEffectGameBegin::*State_38)();
     u8 unk40[0x48 - 0x40];
     void (DinoBattleViewEffectGameBegin::*Start_48)();
+    void (DinoBattleViewEffectGameBegin::*StateFadeIn_50)();
 } data_ov000_02193668;
 
 extern "C" u8 data_ov000_02193690[];  // the name's palette
@@ -151,7 +154,7 @@ extern "C" u8 data_ov000_02193690[];  // the name's palette
 // A player's name panel: the panel, the name drawn on a canvas and the side's mark.
 DinoBattleViewEffectGameBeginPlayerNamePanel::DinoBattleViewEffectGameBeginPlayerNamePanel(MSmartOam *oam,
                                                                                          std::string name, u32 arg2,
-                                                                                         u32 arg3, u8 arg4)
+                                                                                         u32 arg3, bool arg4)
     : MMotion(std::string(data_ov000_02193668.mPanelPath), oam, 0, 1) {
     mUnk88 = arg2;
     mUnk8C = arg4;
@@ -294,6 +297,24 @@ void DinoSplitDamage(int *out, u32 attack, int total) {
 }
 
 // Both screens fade in from white.
+// Shows the "VS" mark and both players' name panels over the backdrop, then fades in.
+// NONMATCHING: the hoisted &mParallel sits at sp+0x18 where the game has it at sp+0x10 (below two temporaries).
+void DinoBattleViewEffectGameBegin::Start() {
+    mOam = new MSmartOam(22, 0, TRUE);
+    mVs = new MMotion(std::string(data_ov000_02193668.mPanelPath), mOam, 0, 1);
+    mVs->SetPosition(0x80, 0x60);
+    MParallelTaskSet *parallel = &mParallel;
+    for (int i = 0; i < 2; i++) {
+        mPanels[i] = new DinoBattleViewEffectGameBeginPlayerNamePanel(
+            mOam, mNames[i], i, ((DinoBattleView *)mUnk7C)->GetPlayerByAC(i)->GetUnkCC(), i ? true : false);
+        parallel->AddTail(mPanels[i]);
+        mPanels[i]->SetPriority(0);
+    }
+    mBack = new MTextPicture(std::string(data_ov000_02193668.mBackPath), 1, false);
+    GetParallel()->AddTail(mVs, mBack, mOam);
+    mState = data_ov000_02193668.StateFadeIn_50;
+}
+
 void DinoBattleViewEffectGameBegin::StateFadeIn() {
     MTask *top, *bottom;
     bottom = gLcd->GetBottomDisplay()->mBright->CreateFadeInFromWhite(30, 0);
@@ -607,7 +628,7 @@ void DinoBattleViewCreature::ClearFlag144(int bit) {
 #pragma auto_inline off
 
 // A player name panel for the game's opening.
-extern "C" MMotion *func_ov000_02173d64(MSmartOam *oam, const std::string &name, u32 arg2, u32 arg3, u8 arg4) {
+extern "C" MMotion *func_ov000_02173d64(MSmartOam *oam, const std::string &name, u32 arg2, u32 arg3, bool arg4) {
     return new DinoBattleViewEffectGameBeginPlayerNamePanel(oam, name, arg2, arg3, arg4);
 }
 

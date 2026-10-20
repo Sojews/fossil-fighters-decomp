@@ -14,7 +14,7 @@
 
 class DinoBattleViewEffectGameBeginPlayerNamePanel : public MMotion {
 public:
-    DinoBattleViewEffectGameBeginPlayerNamePanel(MSmartOam *oam, std::string name, u32 arg2, u32 arg3, u8 arg4);
+    DinoBattleViewEffectGameBeginPlayerNamePanel(MSmartOam *oam, std::string name, u32 arg2, u32 arg3, bool arg4);
     virtual ~DinoBattleViewEffectGameBeginPlayerNamePanel();
     virtual void Execute();
     virtual MRect GetFrame();
@@ -37,11 +37,16 @@ public:
     virtual ~DinoBattleViewEffectGameBegin();
     virtual void Idle();
 
+    void Start();
     void StateFadeIn();
 
     void (DinoBattleViewEffectGameBegin::*mState)(); // 0x74
-    u32 mUnk7C;             // 0x7C
+    u32 mUnk7C;             // 0x7C: the DinoBattleView
     std::string mNames[2];  // 0x80
+    DinoBattleViewEffectGameBeginPlayerNamePanel *mPanels[2];   // 0x98
+    MSmartOam *mOam;        // 0xA0
+    MMotion *mVs;           // 0xA4
+    class MTextPicture *mBack;  // 0xA8
 };
 
 #endif

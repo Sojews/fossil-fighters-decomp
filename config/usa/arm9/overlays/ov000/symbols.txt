@@ -706,8 +706,8 @@ _ZThn116_N22DinoBattleViewCreature9OnMessageEP8MMessage kind:function(thumb,size
 _ZN29DinoBattleViewEffectGameBeginC1EmSsSs kind:function(thumb,size=0x5c) addr:0x02173474
 _ZNSsC1Ev kind:function(thumb,size=0x10) addr:0x021734d0
 _ZN29DinoBattleViewEffectGameBegin4IdleEv kind:function(thumb,size=0x20) addr:0x021734e0
-func_ov000_02173500 kind:function(thumb,size=0x17c) addr:0x02173500
-_ZN44DinoBattleViewEffectGameBeginPlayerNamePanelC1EP9MSmartOamSsmmh kind:function(thumb,size=0x1a0) addr:0x0217367c
+_ZN29DinoBattleViewEffectGameBegin5StartEv kind:function(thumb,size=0x17c) addr:0x02173500
+_ZN44DinoBattleViewEffectGameBeginPlayerNamePanelC1EP9MSmartOamSsmmb kind:function(thumb,size=0x1a0) addr:0x0217367c
 _ZN29DinoBattleViewEffectGameBegin11StateFadeInEv kind:function(thumb,size=0xbc) addr:0x0217381c
 func_ov000_021738d8 kind:function(thumb,size=0x48c) addr:0x021738d8
 func_ov000_02173d64 kind:function(thumb,size=0x48) addr:0x02173d64

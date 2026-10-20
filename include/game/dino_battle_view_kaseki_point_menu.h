@@ -29,6 +29,7 @@ public:
     DinoBattleView *GetView() { return mView; }
     DinoBattleViewAbilityIcon *GetUnk108();
     u32 GetUnkAC();
+    u32 GetUnkCC() { return mUnkCC; }
     std::string GetUnkC0();
     void SetMotions(MMotion *motion, MTask *task);
     void TakeMotions(MMotion **motion, MTask **task);
