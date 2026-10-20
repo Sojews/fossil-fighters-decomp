@@ -2016,6 +2016,8 @@ public:
 class DinoBattleModelCreatureReleaseStatusEffectRequest : public MMessage {
 public:
     DinoBattleModelCreatureReleaseStatusEffectRequest() : MMessage(0x1005B) {}
+    DinoBattleModelCreatureReleaseStatusEffectRequest(MMessageObserver *reply, u32 mask)
+        : MMessage(0x1005B), mUnk0C((u32)reply), mUnk10(mask) {}
     virtual u32 GetSize() { return 12; }
     virtual void Write(void *buf) {
         MI_CpuCopy8(&mId, buf, 4);

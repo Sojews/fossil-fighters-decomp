@@ -151,6 +151,163 @@ void SetLifePointTask::Execute() {
     Exit();
 }
 
+extern "C" MTask *func_ov000_0216dec4(DinoBattleModelCreature *creature);
+extern "C" void func_ov000_0216c90c(DinoBattleModelCreature *creature, u32 id, BOOL resetStatus, BOOL fullLife);
+extern "C" MTask *func_ov000_0216d4b0(DinoBattleModelCreature *creature, u32 a, u32 d, u32 e, u8 g);
+extern "C" MParallelTaskSet *func_ov000_0215bf44(DinoBattleModelField *field, u32 sides);
+extern "C" const u32 data_0208a0c8, data_0208a0e0, data_0208a0e4;   // timer frames
+
+// Adds four tasks (the arguments are evaluated last to first), keeping the set in one register.
+static inline void DinoAddTail4(MTaskSet *set, MTask *a, MTask *b, MTask *c, MTask *d) {
+    MTaskSet *self = set;
+    self->AddTail(a);
+    self->AddTail(b);
+    self->AddTail(c);
+    self->AddTail(d);
+}
+
+static inline void DinoAddTail9(MTaskSet *set, MTask *a, MTask *b, MTask *c, MTask *d, MTask *e, MTask *f, MTask *g,
+                                MTask *h, MTask *i) {
+    MTaskSet *self = set;
+    self->AddTail(a);
+    self->AddTail(b);
+    self->AddTail(c);
+    self->AddTail(d);
+    self->AddTail(e);
+    self->AddTail(f);
+    self->AddTail(g);
+    self->AddTail(h);
+    self->AddTail(i);
+}
+
+// Carries out a special attack's effect by its kind, then ends.
+void ExecSpecialAttackTask::Idle() {
+    switch (mKind) {
+    case 7: {
+        DinoBattleModelCreature *creature = (DinoBattleModelCreature *)mTarget;
+        mSerial.AddTail(func_ov000_0216dec4(creature), creature->mPlayer->CreateFieldEffectWaitTask(),
+                        MTaskExitTransfer::Create(this));
+        return;
+    }
+    case 16: {
+        DinoBattleModelCreature *creature = (DinoBattleModelCreature *)mTarget;
+        DinoBattleModelField *field = (DinoBattleModelField *)creature->mPlayer->mUnk100;
+        mSerial.AddTail(func_ov000_0215bf44(field, 1 << creature->mPlayer->GetOpponent()->GetUnkB8()));
+        mSerial.AddTail(creature->mPlayer->CreateUpdateCreaturesTask(), creature->mPlayer->CreateUpdateAbilityIconTask(1),
+                        MTaskExitTransfer::Create(this));
+        return;
+    }
+    case 15: {
+        DinoBattleModelCreature *creature = (DinoBattleModelCreature *)mTarget;
+        DinoSignalWait *wait = new DinoSignalWait(0x1005C, NULL, NULL, 1);
+        creature->Post(new DinoBattleModelCreatureReleaseStatusEffectRequest(wait, 0xFC));
+        DinoSoundPlaySe(0x51, 0);
+        mSerial.AddTail(wait, MTaskExitTransfer::Create(this));
+        return;
+    }
+    case 9: {
+        s32 amount = mValue;
+        DinoBattleModelCreature *creature = (DinoBattleModelCreature *)mTarget;
+        MTask *add = new DinoBattleModelCreature::AddLifePointTask(creature, amount, TRUE);
+        DinoAddTail4(&mSerial, add, creature->CreateUpdateTask(1, 0), DinoSoundCreatePlaySeTask(0x51, 0),
+                     MTaskExitTransfer::Create(this));
+        return;
+    }
+    case 10: {
+        DinoBattleModelPlayer *player = (DinoBattleModelPlayer *)mTarget;
+        u32 ids[6] = {0, 0, 0, 0, 0, 0};
+        u32 count = player->GetCreatureCount();
+        for (u32 j = 0; j < count; j++) {
+            ids[j] = player->GetCreature(j)->GetUnkB4();
+        }
+        mSerial.AddTail(player->CreateUpdateColorTask(ids, count, 0x20));
+        u32 i = 0;
+        if (i < count) {
+            MSerialTaskSet *serial = &mSerial;
+            for (; i < count; i++) {
+                DinoBattleModelCreature *creature = player->GetCreature(i);
+                serial->AddTail(new AddLifePointTask(creature, mValue, TRUE), DinoSoundCreatePlaySeTask(0x51, 0),
+                                creature->CreateUpdateTask(1, 0), new MTimer(data_0208a0c8));
+            }
+        }
+        mSerial.AddTail(MTaskExitTransfer::Create(this));
+        return;
+    }
+    case 11: {
+        DinoBattleModelPlayer *player = (DinoBattleModelPlayer *)mTarget;
+        DinoBattleModelCreature *user = mUser;
+        int count = player->GetCreatureCount();
+        if (count > 1) {
+            mSerial.AddTail(new MTimer(data_0208a0e0));
+            int heal = (mValue - 1) / (count - 1);
+            BOOL healed = FALSE;
+            for (u32 i = 0; i < (u32)count; i++) {
+                DinoBattleModelCreature *creature = player->GetCreature(i);
+                if (creature != user) {
+                    creature->AddLife(heal, TRUE);
+                    mSerial.AddTail(creature->CreateUpdateTask(1, 0));
+                    healed = TRUE;
+                }
+            }
+            if (healed) {
+                DinoSoundPlaySe(0x3B2, 0);
+            }
+            MTask *wait;
+            MTask *post;
+            MTask *exit = MTaskExitTransfer::Create(this);
+            MMessageObserver *view = player->mUnkF4;
+            post = view->CreatePostTask(new DinoBattleViewSetCreaturePriorityRequest(0));
+            wait = player->CreateFieldEffectWaitTask();
+            DinoAddTail4(&mSerial, new MTimer(10), wait, post, exit);
+            return;
+        }
+        break;
+    }
+    case 12: {
+        DinoBattleModelPlayer *player = (DinoBattleModelPlayer *)mTarget;
+        DinoBattleModelCreature *user = mUser;
+        int count = player->GetCreatureCount();
+        int best = 0;
+        DinoBattleModelCreature *target = NULL;
+        if (count > 1) {
+            for (u32 i = 0; i < (u32)count; i++) {
+                DinoBattleModelCreature *creature = player->GetCreature(i);
+                if (creature != user && best < (int)creature->GetUnkE4()) {
+                    best = creature->GetUnkE4();
+                    target = creature;
+                }
+            }
+            int amount = best - 1;
+            if (target != NULL) {
+                target->AddLife(-amount, 0);
+                u32 ids[6] = {0, 0, 0, 0, 0, 0};
+                ids[0] = target->GetUnkB4();
+                ids[1] = user->GetUnkB4();
+                MMessageObserver *view = player->mUnkF4;
+                mSerial.AddTail(view->CreatePostTask(new DinoBattleViewCreatureSetBlendRequest(0, 2, ids, TRUE)));
+                ids[1] = 0;
+                mSerial.AddTail(player->CreateUpdateColorTask(ids, 1, 0x20));
+                DinoAddTail9(&mSerial, func_ov000_0216d4b0(target, 0, amount, 2, 0), new MTimer(data_0208a0e4),
+                                new DinoBattleModelCreature::AddLifePointTask(user, amount, TRUE),
+                                user->CreateUpdateTask(1, 0), DinoSoundCreatePlaySeTask(0x3B2, 0), new MTimer(1),
+                                DinoBattleViewPopNumber::CreateWaitTask(), player->CreateUpdateColorTask(ids, 1, 0),
+                                MTaskExitTransfer::Create(this));
+                return;
+            }
+        }
+        break;
+    }
+    case 2: {
+        DinoBattleModelCreature *creature = (DinoBattleModelCreature *)mTarget;
+        func_ov000_0216c90c(creature, mValue, FALSE, TRUE);
+        mSerial.AddTail(creature->mPlayer->CreateUpdateCreaturesTask(), creature->mPlayer->CreateUpdateAbilityIconTask(1),
+                        MTaskExitTransfer::Create(this));
+        return;
+    }
+    }
+    Exit();
+}
+
 void AddLifePointTask::Execute() {
     ((DinoBattleModelCreature *)mUnk10)->AddLife(mUnk14, mUnk18);
     Exit();

@@ -269,6 +269,11 @@ public:
 
     class AddLifePointTask : public MTask {
     public:
+        AddLifePointTask(DinoBattleModelCreature *creature, int amount, u8 effect) {
+            mUnk10 = (u32)creature;
+            mUnk14 = amount;
+            mUnk18 = effect;
+        }
         virtual ~AddLifePointTask();
         virtual void Execute();
 
@@ -326,6 +331,11 @@ public:
 
 class AddLifePointTask : public MTask {
 public:
+    AddLifePointTask(DinoBattleModelCreature *creature, int amount, u8 effect) {
+        mUnk10 = (u32)creature;
+        mUnk14 = amount;
+        mUnk18 = effect;
+    }
     virtual ~AddLifePointTask();
     virtual void Execute();
 
@@ -338,6 +348,11 @@ class ExecSpecialAttackTask : public MProcess {
 public:
     virtual ~ExecSpecialAttackTask();
     virtual void Idle();
+
+    void *mTarget;                      // 0x74: the creature, or for kinds 10-12 the player
+    DinoBattleModelCreature *mUser;     // 0x78: the creature using it (kinds 11-12)
+    u32 mKind;                          // 0x7C
+    s32 mValue;                         // 0x80
 };
 
 class SendModelCreatureAbilityResultTask : public MTask {
