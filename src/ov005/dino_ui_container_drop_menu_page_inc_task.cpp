@@ -467,3 +467,6 @@ static struct DinoUiContainerDropMenuPageIncTaskStaticInit {
         DINO_POOL_WORD(data_ov005_02169388, 0x70) = 149;
     }
 } sDinoUiContainerDropMenuPageIncTaskStaticInit;
+
+// (Off at the end of the file, where template members are instantiated: the game calls them out of line.)
+#pragma auto_inline off

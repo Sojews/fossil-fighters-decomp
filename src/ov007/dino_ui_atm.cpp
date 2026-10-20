@@ -818,3 +818,6 @@ static struct DinoUiAtmStaticInit {
         DINO_POOL_WORD(data_ov007_0218cbe0, 0x54) = -4;
     }
 } sDinoUiAtmStaticInit;
+
+// (Off at the end of the file, where template members are instantiated: the game calls them out of line.)
+#pragma auto_inline off

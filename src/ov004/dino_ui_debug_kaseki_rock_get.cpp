@@ -214,3 +214,6 @@ void DinoUiDebugKasekiRockGet::Idle() {
 
 DinoUiDebugKasekiRockGet::DinoUiDebugKasekiRockGet() : MProcess(NULL) {
 }
+
+// (Off at the end of the file, where template members are instantiated: the game calls them out of line.)
+#pragma auto_inline off

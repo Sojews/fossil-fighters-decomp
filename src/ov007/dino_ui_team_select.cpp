@@ -246,3 +246,6 @@ static struct DinoUiTeamSelectStaticInit {
         DINO_POOL_WORD(data_ov007_02192318, 0x70) = -4;
     }
 } sDinoUiTeamSelectStaticInit;
+
+// (Off at the end of the file, where template members are instantiated: the game calls them out of line.)
+#pragma auto_inline off

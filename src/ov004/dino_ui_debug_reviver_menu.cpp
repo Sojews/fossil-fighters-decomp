@@ -129,3 +129,6 @@ void DinoUiDebugReviverMenu::OnFocus(MMenuItem *item) {
         mTasks->AddTail(mCursor->CreateFrameAnime(mCursor->GetFrame(), item->GetFrame(), 5, -2));
     }
 }
+
+// (Off at the end of the file, where template members are instantiated: the game calls them out of line.)
+#pragma auto_inline off

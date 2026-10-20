@@ -287,3 +287,6 @@ static struct DinoCommonWindowMenuItemFlushTaskStaticInit {
         DINO_POOL_WORD(data_020bbd1c, 0x1c) = 7;
     }
 } sDinoCommonWindowMenuItemFlushTaskStaticInit;
+
+// (Off at the end of the file, where template members are instantiated: the game calls them out of line.)
+#pragma auto_inline off

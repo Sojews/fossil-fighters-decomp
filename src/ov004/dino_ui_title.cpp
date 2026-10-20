@@ -600,3 +600,6 @@ void DinoUiTitleSkip::Idle() {
     MTaskSet &serial = mSerial;
     serial.AddTail(exit);
 }
+
+// (Off at the end of the file, where template members are instantiated: the game calls them out of line.)
+#pragma auto_inline off

@@ -251,3 +251,6 @@ static struct DinoUiRvStatusMenuItemStaticInit {
         DINO_POOL_WORD(data_ov006_021939d4, 0x30) = 24;
     }
 } sDinoUiRvStatusMenuItemStaticInit;
+
+// (Off at the end of the file, where template members are instantiated: the game calls them out of line.)
+#pragma auto_inline off
