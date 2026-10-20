@@ -28,6 +28,9 @@
 #include "m/bg_new_task.h"
 #include "m/picture.h"
 #include "m/raster.h"
+#include "m/bitmap.h"
+#include "m/smart_oam.h"
+#include "m/3d.h"
 #include "m/call_task.h"
 #include "m/polygon_char.h"
 #include "m/anm_model.h"
@@ -1537,6 +1540,105 @@ extern "C" MProcess *func_ov001_02159cd0(void *field) {
 
 extern "C" MProcess *func_ov001_02159d3c(DinoField *field) {
     return new DinoFieldCaptureFadeInTask(field);
+}
+
+// The TU's pooled strings.
+extern "C" struct {
+    u32 unk00;
+    const char *mBlackPath;     // 0x04: "/motion/common/black.bin"
+} data_ov001_02169360;
+
+// Captures the bottom screen, fades it into the top one, then closes a circle on the bottom screen and removes the
+// field's sprites.
+// NONMATCHING: the game works out the blend target (1 << bg) before fetching the bottom display, and keeps the
+// smart OAM in r6 (ours r7).
+void DinoFieldCaptureFadeOutTask::Idle() {
+    switch (mStep++) {
+    case 0:
+        mField->HideUnk2B4();
+        return;
+    case 1:
+        ((MTask *) mField->mUnk24C[0])->Suspend();
+        if (mField->mLowerPict != NULL) {
+            mField->mParallel.Remove(mField->mLowerPict);
+            delete mField->mLowerPict;
+            mField->mLowerPict = NULL;
+        }
+        if (mField->mUpperPict != NULL) {
+            mField->mParallel.Remove(mField->mUpperPict);
+            delete mField->mUpperPict;
+            mField->mUpperPict = NULL;
+        }
+        gLcd->GetBottomDisplay()->mBg->SetMode(3);
+        mBitmap = gLcd->GetBottomDisplay()->mBg->CreateDirectBitmap(1, 1);
+        mBitmap->Capture(0);
+        mSerial.AddTail(new MTimer(1));
+        return;
+    case 2: {
+        mBitmap->Show();
+        gLcd->GetBottomDisplay()->mBlend->Reset();
+        gLcd->GetBottomDisplay()->mBlend->SetMode(1);
+        gLcd->GetBottomDisplay()->mBlend->SetTarget1(1 << mBitmap->mBg);
+        gLcd->GetBottomDisplay()->mBlend->SetTarget2(0x3F);
+        mSerial.AddTail((new MParallelTaskSet(TRUE))
+                            ->Add(gLcd->GetTopDisplay()->mBright->CreateFadeOutToBlack(10, 0))
+                            ->Add(gLcd->GetBottomDisplay()->mBlend->CreateAlphaRatioAnime(0, 16, 16, 16, 10, 0)));
+        return;
+    }
+    case 3: {
+        mField->GetCamera()->NotifyHooks0();
+        gLcd->GetTopDisplay()->ResetHooks();
+        gLcd->GetTopDisplay()->Setup(5, 1, 0, 0);
+        gLcd->GetTopDisplay()->mBg->SetMode(3);
+        gLcd->GetTopDisplay()->Update();
+        gLcd->GetTopDisplay()->mBright->Reset();
+        mTopBitmap = gLcd->GetTopDisplay()->mBg->CreateDirectBitmap(1, 1);
+        *(MDirectBitmap **) mField->mUnk2C8 = mTopBitmap;
+        MIi_CpuCopyFast((void *) mBitmap->mBase, (void *) mTopBitmap->mBase, 0x18000);
+        MIi_CpuClearFast(0, (void *) (mBitmap->mBase + 0x18000), 0x8000);
+        mTopBitmap->Show();
+        MSmartOam *oam = new MSmartOam(gLcd->GetBottomDisplay(), 4, 0, 1);
+        MMotion *black = new MMotion(std::string(data_ov001_02169360.mBlackPath), oam, 0, 1);
+        black->Play(1, 0);
+        black->SetPosition(128, 96);
+        black->SetPriority(1);
+        black->Show();
+        GetParallel()->AddTail(black, oam);
+        mRaster = new MRasterWindow(-1, gLcd->GetBottomDisplay(), 1);
+        mRaster->SetTarget(0x2F);
+        mRaster->SetObjTarget(0x3F);
+        mRaster->SetBlendEnabled(1);
+        mRaster->SetObjBlendEnabled(1);
+        mRaster->AddRect(MRect(0, 0, 256, 192));
+        mRaster->Show();
+        mParallel.AddTail(mRaster);
+        mWipe = 29;
+        mParallel.AddTail((new MParallelTaskSet(TRUE))
+                              ->Add(mTopBitmap->CreateOffsetAnime(MPoint(0, -192), MPoint(0, -96), 30, 2))
+                              ->Add(mBitmap->CreateOffsetAnime(MPoint(0, 0), MPoint(0, 96), 30, 2))
+                              ->Add(gLcd->GetBottomDisplay()->mBlend->CreateAlphaRatioAnime(16, 0, 16, 16, 30, 0)));
+        return;
+    }
+    case 4:
+        if (--mWipe != 0) {
+            mRaster->SetCircle(MPoint(128, 96), mWipe * 160 / 30);
+            mStep--;
+            return;
+        }
+        mRaster->Exit();
+    case 5: {
+        mField->mScene->mM3d->Hide();
+        mField->GetMap()->ClearGradation();
+        gLcd->GetBottomDisplay()->mBg->DeleteDirectBitmap(mBitmap);
+        gLcd->GetBottomDisplay()->mObj->Hide();
+        MTask *tasks = &mParallel;
+        if (tasks->mState == MTask::STATE_RUN) {
+            tasks->Execute();
+        }
+        Exit();
+        return;
+    }
+    }
 }
 
 // The player's control on the field.
