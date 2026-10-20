@@ -1,6 +1,8 @@
 // DinoCleaningTalkFilter.
 // Only the destructors are decompiled so far.
 
+#pragma ipa file
+
 #include "game/dino_cleaning_talk_filter.h"
 #include "game/dino_cleaning_talk_window.h"
 #include "m/blend.h"
@@ -42,7 +44,6 @@ static inline int DinoCleaningReadNumber(MConsole *console) {
 extern "C" const char data_ov002_02164404[];   // "-+0123456789."
 extern "C" double atof(const char *s);
 
-// NONMATCHING: the player name's two reverse-iterator pairs take each other's stack slots.
 BOOL DinoCleaningTalkFilter::Filter(MConsole *console, int c) {
     if (c != '$') {
         return FALSE;

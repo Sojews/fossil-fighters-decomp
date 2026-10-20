@@ -4,6 +4,8 @@
 // Derived destructors have their bases' destructor bodies inlined; auto-inlining the ones defined above does that.
 #pragma auto_inline on
 
+#pragma ipa file
+
 #include "game/dino_sound.h"
 #include "game/dino_battle_view_winner_scroll_task.h"
 #include "types.h"
