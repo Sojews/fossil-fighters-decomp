@@ -1,17 +1,13 @@
 // MIndexBitmap and the indexed bitmap transfers. MIndexBitmapLoadTransfer::Transfer isn't decompiled yet.
-// NONMATCHING: the static initializer (the game pools the size table after the type infos, at +0x58).
 
 #include "m/bitmap.h"
+#include "game/dino_static_init.h"
 #include "m/lcd.h"
 #include "m/looper.h"
 #include "m/transfer.h"
 
-static MPoint sIndexBitmapSizes[4] = {
-    MPoint(128, 128),
-    MPoint(256, 256),
-    MPoint(512, 256),
-    MPoint(512, 512),
-};
+// The sizes: (128, 128), (256, 256), (512, 256), (512, 512), set by the file's static initialization.
+extern "C" MPoint sIndexBitmapSizes[4];
 
 u32 MIndexBitmap::GetVramSize(int size) {
     return sIndexBitmapSizes[size].x * sIndexBitmapSizes[size].y;
@@ -52,3 +48,21 @@ void MIndexBitmapFillTransfer::Transfer() {
 
 MIndexBitmapLoadTransfer::~MIndexBitmapLoadTransfer() {
 }
+
+// The file's static initialization (see dino_static_init.h): element 0 through the pool, the others directly.
+extern "C" u32 data_020c2620[];
+static struct IndexBitmapStaticInit {
+    IndexBitmapStaticInit() {
+        DINO_POOL_WORD(data_020c2620, 0x58) = 128;
+        DINO_POOL_WORD(data_020c2620, 0x5c) = 128;
+        volatile MPoint *p = &sIndexBitmapSizes[1];
+        p->x = 256;
+        p->y = 256;
+        p = &sIndexBitmapSizes[2];
+        p->x = 512;
+        p->y = 256;
+        p = &sIndexBitmapSizes[3];
+        p->x = 512;
+        p->y = 512;
+    }
+} sIndexBitmapStaticInit;
