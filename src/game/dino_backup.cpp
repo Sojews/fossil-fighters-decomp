@@ -15,6 +15,7 @@
 #include "m/sleep.h"
 #include "m/soft_reset.h"
 #include "m/task.h"
+#include "m/text_codec.h"
 #include "game/dino_resource.h"
 #include "game/dino_sound.h"
 #include "nitro/mi.h"
@@ -31,6 +32,7 @@ extern const u32 kBackupEntryUnknownText;
 extern const u32 kBackupEntryUnk2Text;
 extern const u64 kBackupRecentFrames;
 extern const u32 kCreatureLevelLimits[2];
+extern "C" const u32 data_0208ac7c;   // the senryu sample's text
 
 #define BACKUP_BLOCK_DATA 480   // what's left of a 512-byte block after the header
 
@@ -1551,6 +1553,25 @@ void DinoBackup::SetPlayerUnk58(const DinoPlayerUnk58 *value) {
 
 void DinoBackup::GetPlayerUnk58(DinoPlayerUnk58 *value) {
     *value = *mPlayer->GetUnk58();
+}
+
+// A fresh profile: cleared, with a random senryu's name (at most 8 characters) and message (at most 100).
+void DinoBackup::InitProfile(DinoPlayerProfile *profile) {
+    MResource<DinoSenryuDefs> defs = gDinoResource->LoadSenryuDefs();
+    std::wstring text = MDecodeUtf8(gDinoResource->GetText(data_0208ac7c));
+    MI_CpuFill8(profile, 0, sizeof(DinoPlayerProfile));
+    profile->unk78 = 1;
+    u32 index = gDinoResource->GetRandom()->Next(defs.Get()->count);
+    const u8 *base = (const u8 *)defs.Get();
+    const u32 *entry = (const u32 *)(base + ((const u32 *)(base + ((const u32 *)base)[2]))[index]);
+    std::wstring name = MDecodeUtf8((const char *)entry + entry[0]);
+    for (u32 i = 0; i < std::min(name.size(), *(const u32 *)&sLimits[12]); i++) {
+        profile->name[i] = name[i];
+    }
+    std::string message((const char *)entry + entry[1]);
+    for (u32 i = 0; i < std::min(message.size(), *(const u32 *)&sLimits[11]); i++) {
+        profile->unk00[i] = message[i];
+    }
 }
 
 void DinoBackup::MakeProfile(DinoPlayerProfile *profile) {
