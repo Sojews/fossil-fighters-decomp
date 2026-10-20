@@ -8,6 +8,8 @@
 class DinoCleaningImageLayer {
 public:
     DinoCleaningImageLayer(u32 unk1C44, std::string name, u8 unk800, u32 sound, u32 unk1C40);
+    // A layer sharing the other's pixels.
+    DinoCleaningImageLayer(const DinoCleaningImageLayer &other);
     virtual ~DinoCleaningImageLayer();
 
     void SetUnk14(u8 value);
@@ -28,7 +30,12 @@ public:
     u8 mCells[36][28];      // 0x801
     s32 mGrid[36][28];      // 0xBF4
     MPictureFile mPicture;  // 0x1BB4
-    u16 mPalette[42];       // 0x1BE8
+    u16 mPalette[32];       // 0x1BE8
+    u32 mUnk1C28;           // 0x1C28
+    u32 mUnk1C2C;           // 0x1C2C
+    u32 mUnk1C30;           // 0x1C30
+    u32 mUnk1C34;           // 0x1C34
+    u32 mUnk1C38;           // 0x1C38
     u32 mUnk1C3C;           // 0x1C3C: a sound effect
     u32 mUnk1C40;           // 0x1C40
     u32 mUnk1C44;           // 0x1C44
