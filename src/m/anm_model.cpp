@@ -770,6 +770,7 @@ MPolygonChar::MPolygonChar(void *unk80, u16 unkA4, void *unk84, void *unk88) : M
     Reset();
 }
 
+#pragma opt_propagation off
 void MPolygonChar::Reset() {
     MProcessPause pause(this, &mMutex, &mPauseCount);
     mUnkA8 = 0;
@@ -780,6 +781,7 @@ void MPolygonChar::Reset() {
     mUnk7C = NULL;
     mParallel.Clear();
 }
+#pragma opt_propagation reset
 
 MPolygonChar::~MPolygonChar() {
 }
