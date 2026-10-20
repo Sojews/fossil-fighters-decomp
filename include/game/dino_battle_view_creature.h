@@ -64,6 +64,8 @@ public:
     MPoint GetCoord();
     // Moves back to its place (in its own group or the other), with its life bar.
     void MoveHome(BOOL own);
+    // Colors the creature for its strongest status (again, if force).
+    void UpdateStatusColor(BOOL force);
     MPoint GetMotionPosition();
     void SetCoord(MPoint pos);
 
@@ -106,10 +108,11 @@ public:
     DinoBattleViewStatusEffectIcon *mStatusIcons; // 0x138
     MTaskSet *mUnk13C;      // 0x13C
     MMotion *mMotion140;    // 0x140
-    u32 mFlags144;          // 0x144
-    u32 unk148;
+    u32 mFlags144;          // 0x144: statuses shown
+    u32 mMask148;           // 0x148: statuses not shown
     u32 mFlags14C;          // 0x14C: 8 while it can't be attacked
-    u32 unk150[2];
+    int mColor;             // 0x150: the status color shown (0 none)
+    class MPalAnime *mBlend;    // 0x154: its palette animation
     u8 unk158;
     u8 mUnk159;             // 0x159: set, it can't be chosen in the support modes
     u8 unk15A[2];

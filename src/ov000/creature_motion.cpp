@@ -190,12 +190,11 @@ MRect DinoBattleViewEffectGameBeginPlayerNamePanel::GetFrame() {
     return r;
 }
 
-extern "C" void func_ov000_021728d4(DinoBattleViewCreature *view, int arg);
 extern "C" void func_ov000_0216fd74(DinoBattleViewCreature *view);
 
 void DinoBattleViewCreature::Idle() {
     MMessageObserver::Dispatch();
-    func_ov000_021728d4(this, 0);
+    UpdateStatusColor(FALSE);
     func_ov000_0216fd74(this);
 }
 
@@ -247,7 +246,7 @@ void SetColorMaskTask::Execute() {
 void CreateCreatureMotionTask::Execute() {
     (*mSlot)->Exit();
     *mSlot = new CreatureMotion(mPath.c_str(), mOam, mArg);
-    func_ov000_021728d4(mView, 1);
+    mView->UpdateStatusColor(TRUE);
     Exit();
 }
 
@@ -342,6 +341,75 @@ void DinoBattleViewCreature::MoveHome(BOOL own) {
     }
     mMotion->Play(func_ov000_0216f698(mUnkB4, own, mUnk159), 0);
     mCoord = home;
+}
+
+// The status colors and their blends' weights and lengths.
+extern "C" const u16 data_020b5a90, data_020b5a92, data_020b5a94, data_020b5a96, data_020b5a98, data_020b5a9a;
+extern "C" const u32 data_0208a124, data_0208a1ac, data_0208a1b0, data_0208a1b8, data_0208a1c4, data_0208a1cc,
+    data_0208a1d4, data_0208a1dc;
+
+void DinoBattleViewCreature::UpdateStatusColor(BOOL force) {
+    int color = 0;
+    u32 flags = mFlags144 & ~mMask148;
+    if ((flags & 0x14) == 0x14) {
+        color = 6;
+    } else if (flags & 0x10) {
+        color = 4;
+    } else if (flags & 8) {
+        color = 3;
+    } else if (flags & 4) {
+        color = 2;
+    } else if (flags & 0x20) {
+        color = 5;
+    } else if (flags & 2) {
+        color = 1;
+    } else if (flags & 0x80) {
+        color = 7;
+    }
+    if (mColor == color && !force) {
+        return;
+    }
+    mColor = color;
+    if (mBlend != NULL) {
+        mParallel.Remove(mBlend);
+        delete mBlend;
+        mBlend = NULL;
+    }
+    MMotionFile *file = &mMotion->mFile;
+    MPalUnit *palette = mMotion->GetPalette(0);
+    switch (mColor) {
+    case 0:
+        palette->LoadColors((const u8 *)file->GetPalette(0, NULL) + 8, 2, 0xFE);
+        return;
+    case 1:
+        mBlend = CreatePalBlend(FALSE, data_020b5a94, (u16)data_0208a1cc, 30);
+        mParallel.AddTail(mBlend);
+        return;
+    case 2:
+        mBlend = CreatePalBlend(TRUE, data_020b5a98, (u16)data_0208a124, data_0208a1c4);
+        mParallel.AddTail(mBlend);
+        return;
+    case 3:
+        mBlend = CreatePalBlend(FALSE, data_020b5a96, (u16)data_0208a1d4, 30);
+        mParallel.AddTail(mBlend);
+        return;
+    case 4:
+        mBlend = CreatePalBlend(FALSE, data_020b5a9a, (u16)data_0208a1dc, 30);
+        mParallel.AddTail(mBlend);
+        return;
+    case 5:
+        mBlend = CreatePalBlend(FALSE, data_020b5a92, (u16)data_0208a1b8, 30);
+        mParallel.AddTail(mBlend);
+        return;
+    case 6:
+        mBlend = CreatePalBlend(TRUE, data_020b5a9a, (u16)data_0208a1dc, 30);
+        mParallel.AddTail(mBlend);
+        return;
+    case 7:
+        mBlend = CreatePalBlend(TRUE, data_020b5a90, (u16)data_0208a1ac, data_0208a1b0);
+        mParallel.AddTail(mBlend);
+        break;
+    }
 }
 
 void DinoBattleViewCreature::SetUnitModes(BOOL on) {

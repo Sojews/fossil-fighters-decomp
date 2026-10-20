@@ -10232,6 +10232,11 @@ data_020b5a60 kind:data(any) addr:0x020b5a60
 data_020b5a70 kind:data(any) addr:0x020b5a70
 data_020b5a80 kind:data(any) addr:0x020b5a80
 data_020b5a90 kind:data(any) addr:0x020b5a90
+data_020b5a92 kind:data(any) addr:0x020b5a92
+data_020b5a94 kind:data(any) addr:0x020b5a94
+data_020b5a96 kind:data(any) addr:0x020b5a96
+data_020b5a98 kind:data(any) addr:0x020b5a98
+data_020b5a9a kind:data(any) addr:0x020b5a9a
 data_020b5aa0 kind:data(any) addr:0x020b5aa0
 data_020b5ab0 kind:data(any) addr:0x020b5ab0
 data_020b5ab4 kind:data(any) addr:0x020b5ab4

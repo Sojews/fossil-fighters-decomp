@@ -257,7 +257,6 @@ extern "C" void func_ov000_02161748(DinoBattleViewUnkE0 *field) {
     }
 }
 
-extern "C" void func_ov000_021728d4(DinoBattleViewCreature *view, int arg);
 extern "C" MPoint func_ov000_0215f22c(int kind, int side);
 
 // Sets a side's creatures back to their idle motion.
@@ -265,7 +264,7 @@ static inline void ResetCreatures(DinoBattleViewPlayer *player) {
     for (u32 i = 0; i < player->GetCreatureCount(); i++) {
         DinoBattleViewCreature *creature = player->GetCreature(i);
         creature->ClearFlag144(5);
-        func_ov000_021728d4(creature, 1);
+        creature->UpdateStatusColor(TRUE);
         creature->PlayMotion3();
     }
 }
