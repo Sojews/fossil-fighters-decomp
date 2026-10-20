@@ -35,6 +35,7 @@ public:
     void State0215f668();
     void State0215da04();
     void State0215dc30();
+    void State0215e9e8();
     void StateWait();
     void Leave();
 
@@ -47,11 +48,12 @@ public:
     MPictureFile mPicture;                  // 0xCC
     MIndexBitmap *mBitmap;                  // 0x100
     MPalUnit *mPalBlock;                   // 0x104
-    u32 unk108[3];
+    class DinoUiReviveStatus *mStatus;      // 0x108
+    u32 unk10C[2];
     u8 mUnk114;                             // 0x114
     MExtAffinePicture *mScroller;           // 0x118: scrolled up over the effect
     int mScrollFrame;                       // 0x11C
-    u32 unk120;
+    class DinoUiReviveEffectLight *mLight;  // 0x120
     MView *mUnk124;                         // 0x124
     MResource<DinoMessageData> mMessages;   // 0x128: the cleaning messages
     int mTimer;                             // 0x138

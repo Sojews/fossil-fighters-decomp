@@ -93,7 +93,11 @@ extern "C" u8 data_ov003_021624c0;
 
 // The TU's pooled pointer-to-member constants (see menu.cpp).
 extern "C" struct {
-    u8 unk00[0x34];
+    u8 unk00[0x10];
+    const char *mSparkPath;                         // 0x10
+    u8 unk14[0x28 - 0x14];
+    const char *mParticlePath;                      // 0x28
+    u8 unk2C[0x34 - 0x2C];
     void (DinoUiReviveEffect::*CheckSkip_34)();     // 0x34
     u8 unk3C[0x4C - 0x3C];
     void (DinoUiReviveEffect::*Leave_4C)();         // 0x4C
@@ -105,7 +109,7 @@ extern "C" struct {
     void (DinoUiReviveStatus::*Start_74)();         // 0x74
     u8 unk7C[0x84 - 0x7C];
     void (DinoUiReviveEffect::*State0215ee24_84)(); // 0x84
-    u8 unk8C[0x94 - 0x8C];
+    void (DinoUiReviveEffect::*StateScroll_8C)();   // 0x8C
     void (DinoUiReviveEffect::*Start_94)();         // 0x94
     void (DinoUiReviveEffect::*StartWait_9C)();     // 0x9C
     u8 unkA4[0xAC - 0xA4];
@@ -241,6 +245,80 @@ void DinoUiReviveEffect::State0215dc30() {
     mBitmap->Load((const u8 *)mPicture.GetChr(), MPoint(256, 192), MPoint(0, 0), mPalBlock->index, def->flip, false);
     mEffectTasks->AddTail(mBitmap->CreateOffsetAnime(MPoint(0, -192), MPoint(0, 192), DinoReviveFrames(180), 0));
     mState = data_ov003_02161d20.State0215e030_AC;
+}
+
+inline DinoUiReviveEffectParticle::DinoUiReviveEffectParticle() : MProcess(NULL) {
+    mParallel.AddTail(mTasks = new MParallelTaskSet());
+    mOam = new MSmartOam(gLcd->GetTopDisplay(), 50, 0, TRUE);
+    mOam->SetUnk1C(7);
+    mMotion = new MMotion(std::string(data_ov003_02161d20.mParticlePath), mOam, 0, 1);
+    mMotion->Play(1, 0);
+    mMotion->SetPriority(2);
+    mMotion->SetAnchor(1);
+    mMotion->SetPosition(0x80, 0x60);
+    mMotion->Show();
+    mParallel.AddTail(mMotion);
+    mParallel.AddTail(mOam);
+    mTimer = DinoReviveFrames(48);
+}
+
+// Sends a spark up the screen from a random place along the bottom; after enough of them, waits for the last.
+void DinoUiReviveEffectParticle::Idle() {
+    MMotion *spark = new MMotion(std::string(data_ov003_02161d20.mSparkPath), mOam, 0, 1);
+    spark->Play(gDinoResource->GetRandom()->Next(3) + 1, 0);
+    spark->SetPriority(2);
+    spark->Show();
+    int x = gDinoResource->GetRandom()->Next(256);
+    int frames = gDinoResource->GetRandom()->Next(30) + 60;
+    MTask *exit = MTaskExitTransfer::Create(spark);
+    MPoint from(x, 200);
+    MPoint to(x, -8);
+    MTask *move = spark->CreateCoordAnime(from, to, DinoReviveFrames(frames), 0);
+    MSerialTaskSet *serial = new MSerialTaskSet(TRUE);
+    serial->AddTail(move);
+    serial->AddTail(exit);
+    MParallelTaskSet *tasks = mTasks;
+    tasks->AddTail(serial);
+    tasks->AddTail(spark);
+    mTimer--;
+    if (mTimer != 0) {
+        mSerial.AddTail(new MTimer(5));
+        return;
+    }
+    GetSerial()->AddTail(MTaskSetWaitEmptyTask::Create(mTasks), MTaskExitTransfer::Create(this));
+}
+
+// Shows the creature's new numbers under a burst of particles, waiting for the particles to finish.
+void DinoUiReviveEffect::State0215f668() {
+    mStatus->SetCreature(mUnk94);
+    MParallelTaskSet *effects = new MParallelTaskSet();
+    mParallel.AddTail(effects);
+    DinoUiReviveEffectParticle *particle = new DinoUiReviveEffectParticle();
+    effects->AddTail(particle);
+    MSmartOam *oam = new MSmartOam(10, 0, TRUE);
+    MMotion *motion = new MMotion(std::string(data_ov003_02161d20.mParticlePath), oam, 0, 1);
+    motion->Play(1, 0);
+    motion->SetPosition(0x80, 0x60);
+    motion->Show();
+    particle->GetParallel()->AddTail(motion, oam);
+    MTask *exit = MTaskExitTransfer::Create(effects);
+    MTask *wait = MTaskSetWaitEmptyTask::Create(effects);
+    MSerialTaskSet *serial = new MSerialTaskSet(TRUE);
+    serial->AddTail(wait);
+    serial->AddTail(exit);
+    mEffectTasks->AddTail(serial);
+    mState = data_ov003_02161d20.CheckSkip_34;
+}
+
+// Raises the light and shows the creature's new numbers under the particles, then scrolls.
+void DinoUiReviveEffect::State0215e9e8() {
+    mScrollFrame = 0;
+    DinoUiReviveEffectLight *light = mLight;
+    light->mPicture->Show();
+    light->mTimer = DinoReviveFrames(120);
+    mStatus->SetCreature(mUnk94);
+    mParallel.AddTail(new DinoUiReviveEffectParticle());
+    mState = data_ov003_02161d20.StateScroll_8C;
 }
 
 // Puts the picture away.
