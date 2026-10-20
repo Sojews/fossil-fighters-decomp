@@ -51,6 +51,9 @@ public:
     // Builds the screen: the two sides' creature rows (name, level, id), the cursor and the first creature's
     // attacks.
     void Start();
+    // Handles the keys: up/down pick a row, left/right (and X/Y by ten) change its creature, R1/L1 its level, R/L
+    // its unk5C value; start writes the rows into the battle's parameters, B cancels.
+    void Select();
 
     void (UseCreatureSelect::*mState)(); // 0x74
     u32 mUnk7C;             // 0x7C: both sides (six rows, else three)
