@@ -727,6 +727,91 @@ void DinoFieldChara::ClearMotionCache() {
     mMotionModelsAlt.clear();
 }
 
+// Makes the body model again (and the shadow, if the data has one), first choosing the motion: for kinds 1 and 2,
+// standing near the camera's focus switches to motion 2 (kind 1, with a sound) or 3.
+void DinoFieldChara::ApplyBodyModel() {
+    if (mBody != NULL) {
+        mTaskSet->Remove(mBody);
+        delete mBody;
+        mBody = NULL;
+        if (mUnk128 != NULL) {
+            mTaskSet->Remove(mUnk128);
+        }
+        delete mUnk128;
+        mUnk128 = NULL;
+        mMotionModels.clear();
+        mMotionModelsAlt.clear();
+    }
+    u32 loop = TRUE;
+    switch (((DinoFieldCharaData *) mData.mFile.GetData())->mUnk20) {
+    case 0:
+        mMotion = 1;
+        CacheMotion(1);
+        break;
+    case 1:
+    case 2:
+        if (mModel.unk05[0]) {
+            loop = FALSE;
+            if (IsUnkA1Motion()) {
+                mMotion = 2;
+            } else {
+                mMotion = 1;
+            }
+        } else {
+            mModel.unk05[0] = TRUE;
+            u32 focus = mField->GetCamera()->GetFocus();
+            if (focus == 0) {
+                break;
+            }
+            DinoFieldChara *chara = mField->GetChara(focus);
+            if (chara == NULL) {
+                break;
+            }
+            MFx32 len;
+            MFx32 range;
+            len = (chara->mModel.pos - mModel.pos).Length();
+            range = ((DinoFieldCharaData *) mData.mFile.GetData())->mNearRange;
+            if (len > range) {
+                mMotion = 1;
+            } else if (((DinoFieldCharaData *) mData.mFile.GetData())->mUnk20 == 1) {
+                mMotion = 2;
+                if (((DinoFieldCharaData *) mData.mFile.GetData())->mUnk24 == 1 ||
+                    ((DinoFieldCharaData *) mData.mFile.GetData())->mUnk24 == 2) {
+                    GetSerial()->AddTail(new MTimer(1), DinoSoundCreatePlaySeTask(0xBC, 0));
+                }
+            } else {
+                mMotion = 3;
+                DinoSoundPlaySe(0xBE, 0);
+            }
+            loop = FALSE;
+        }
+        break;
+    }
+    const char *path = GetMotionModelPath(mMotion);
+    if (path == NULL) {
+        return;
+    }
+    mMotionModels[mMotion] = M3DModelResource(std::string(path));
+    mBody = new MAnmModel(mScene);
+    mBody->unk100 = 0x20;
+    mBody->SetFrames(0, 0x40000000);
+    mBody->Load(path, 0);
+    mBody->Run();
+    mBody->mUnkF4 = loop;
+    mBody->mFollowParent = TRUE;
+    mTaskSet->AddTail(mBody);
+    if (((DinoFieldCharaData *) mData.mFile.GetData())->unk2E) {
+        mUnk128 = new MAnmModel(mScene);
+        mUnk128->unk100 = 0x21;
+        mUnk128->SetFrames(0, 0x40000000);
+        mUnk128->Load("/model/fieldchar/cha_shadow", 0);
+        mUnk128->Run();
+        mUnk128->mUnkF4 = 0;
+        mUnk128->mFollowParent = TRUE;
+        mTaskSet->AddTail(mUnk128);
+    }
+}
+
 void DinoFieldChara::ApplyHeadModel() {
     if (mHead != NULL) {
         mTaskSet->Remove(mHead);
