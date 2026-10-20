@@ -142,6 +142,7 @@ src/ov000/dino_battle_view_ui.cpp:
 
 src/ov000/create_player_update_ability_icon_task.cpp:
     .text       start:0x02162694 end:0x0216f294
+    .init       start:0x02190634 end:0x02190654
 
 src/ov000/dino_battle_cpu_controller.cpp:
     .text       start:0x02156380 end:0x02159a34

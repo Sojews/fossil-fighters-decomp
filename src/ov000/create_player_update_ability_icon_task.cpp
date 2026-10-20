@@ -18,6 +18,7 @@
 #include "game/dino_battle_cpu_controller.h"
 #include "game/dino_battle_user_controller.h"
 #include "game/set_status_effect_task.h"
+#include "game/dino_static_init.h"
 
 
 
@@ -1467,3 +1468,15 @@ MFx32 DinoBattleModelCreature::CurveRatio(MFx32 a, MFx32 b) {
 #pragma auto_inline off
 template void std::__vec_deleter<DinoBattlePlayerEvent, std::allocator<DinoBattlePlayerEvent> >::reallocate_clear(
     size_t n, size_t max);
+
+// The file's static initialization (see dino_static_init.h).
+static struct CreatePlayerUpdateAbilityIconTaskStaticInit {
+    CreatePlayerUpdateAbilityIconTaskStaticInit() {
+        DINO_POOL_WORD(data_ov000_021924bc, 0x18) = 128;
+        DINO_POOL_WORD(data_ov000_021924bc, 0x1c) = 176;
+        DINO_POOL_WORD(data_ov000_021924bc, 0x30) = 8;
+        DINO_POOL_WORD(data_ov000_021924bc, 0x34) = 150;
+        DINO_POOL_WORD(data_ov000_021924bc, 0x28) = 64;
+        DINO_POOL_WORD(data_ov000_021924bc, 0x2c) = 112;
+    }
+} sCreatePlayerUpdateAbilityIconTaskStaticInit;
