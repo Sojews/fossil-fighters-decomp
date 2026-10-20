@@ -22,6 +22,8 @@
 #include "m/motion.h"
 #include "game/dino_battle_view_lifebar.h"
 #include "game/dino_battle_view_effect_game_begin.h"
+#include "m/oam_canvas.h"
+#include "m/font.h"
 
 CreatureMotion::~CreatureMotion() {
 }
@@ -100,11 +102,40 @@ DinoBattleViewEffectGameBegin::~DinoBattleViewEffectGameBegin() {
 
 // The TU's pooled pointer-to-member constants (see menu.cpp).
 extern "C" struct {
-    u8 unk00[0x38];
+    u8 unk00[0x08];
+    const char *mFontPath;      // 0x08
+    const char *mMarkPath2;     // 0x0C: (side 1)
+    const char *mMarkPath;      // 0x10: (side 0)
+    const char *mPanelPath;     // 0x14
+    u8 unk18[0x38 - 0x18];
     void (DinoBattleViewEffectGameBegin::*State_38)();
     u8 unk40[0x48 - 0x40];
     void (DinoBattleViewEffectGameBegin::*Start_48)();
 } data_ov000_02193668;
+
+extern "C" u8 data_ov000_02193690[];  // the name's palette
+
+// A player's name panel: the panel, the name drawn on a canvas and the side's mark.
+DinoBattleViewEffectGameBeginPlayerNamePanel::DinoBattleViewEffectGameBeginPlayerNamePanel(MSmartOam *oam,
+                                                                                         std::string name, u32 arg2,
+                                                                                         u32 arg3, u8 arg4)
+    : MMotion(std::string(data_ov000_02193668.mPanelPath), oam, 0, 1) {
+    mUnk88 = arg2;
+    mUnk8C = arg4;
+    Play(arg2 == 0 ? 3 : 4, 0);
+    mFont = new MFontSet(std::string(data_ov000_02193668.mFontPath), 0, 1, 3);
+    mFont->AddRef();
+    MPoint size = mFont->MeasureText(std::string(name.c_str()), 0, 0);
+    if ((u32)size.x > 128) {
+        size.x = 128;
+    }
+    mUnk90 = size.x;
+    mUnk80 = new MSmartObjCanvas(oam, size, data_ov000_02193690, TRUE);
+    mUnk80->DrawText(mFont, MPoint(0, 0), 0, std::string(name.c_str()));
+    mUnk84 = new MMotion(std::string(arg2 == 0 ? data_ov000_02193668.mMarkPath : data_ov000_02193668.mMarkPath2), oam,
+                         3, 1);
+    mUnk84->Play(arg3, 0);
+}
 
 DinoBattleViewEffectGameBegin::DinoBattleViewEffectGameBegin(u32 unk7C, std::string name, std::string name2)
     : MProcess(NULL), mUnk7C(unk7C) {

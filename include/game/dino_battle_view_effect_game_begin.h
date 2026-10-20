@@ -24,7 +24,7 @@ public:
     virtual void Hide();
 
     MFont *mFont;       // 0x7C
-    MMotion *mUnk80;    // 0x80
+    class MSmartObjCanvas *mUnk80;  // 0x80: the name
     MMotion *mUnk84;    // 0x84
     BOOL mUnk88;        // 0x88
     u8 mUnk8C;          // 0x8C
