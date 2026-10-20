@@ -41,6 +41,15 @@ public:
     void SetUnkAC(u32 index);
     void SetUnkA0(u32 index, BOOL value);
     void SetUnkB8(int index, void *value);
+    // Whether either flag vector has the flag.
+    BOOL IsFlagSet(u32 flag) {
+        u32 mask = 1 << (flag & 7);
+        u32 i = flag >> 3;
+        return (mUnkA0.mBytes[i] & mask) || (mUnkAC.mBytes[i] & mask);
+    }
+    // Whether a line's condition holds: two variables compared (0-5), a variable and a constant (6-11), or the
+    // flags (12: all set, 13: any set, 14: none set, 15: not all set).
+    BOOL CheckCondition(const struct DinoCommonLiveCondition *cond);
     void SetUnkD2(u8 value);
     u8 GetUnkD2();
     void RefreshEntries();

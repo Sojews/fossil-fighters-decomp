@@ -53,6 +53,84 @@ DinoCommonLive::~DinoCommonLive() {
 
 #pragma auto_inline off
 
+// A line's condition: its kind, then count operands at offset.
+struct DinoCommonLiveCondition {
+    u32 kind;       // 0x00
+    u32 count;      // 0x04
+    u32 offset;     // 0x08: the operands (u32 each)
+
+    const u32 *GetArgs() const { return (const u32 *)((const u8 *)this + offset); }
+};
+
+// NONMATCHING: the flag loops step a pointer through the operands (the game indexes them), and the flag test is
+// materialized rather than kept as TRUE-then-cleared.
+BOOL DinoCommonLive::CheckCondition(const DinoCommonLiveCondition *cond) {
+    switch (cond->kind) {
+    default:
+        return FALSE;
+    case 0:
+        return mUnkB8[cond->GetArgs()[0]] == mUnkB8[cond->GetArgs()[1]] ? TRUE : FALSE;
+    case 1:
+        return mUnkB8[cond->GetArgs()[0]] != mUnkB8[cond->GetArgs()[1]] ? TRUE : FALSE;
+    case 2:
+        return (int)mUnkB8[cond->GetArgs()[0]] < (int)mUnkB8[cond->GetArgs()[1]] ? TRUE : FALSE;
+    case 3:
+        return (int)mUnkB8[cond->GetArgs()[0]] <= (int)mUnkB8[cond->GetArgs()[1]] ? TRUE : FALSE;
+    case 4:
+        return (int)mUnkB8[cond->GetArgs()[0]] > (int)mUnkB8[cond->GetArgs()[1]] ? TRUE : FALSE;
+    case 5:
+        return (int)mUnkB8[cond->GetArgs()[0]] >= (int)mUnkB8[cond->GetArgs()[1]] ? TRUE : FALSE;
+    case 6:
+        return mUnkB8[cond->GetArgs()[0]] == cond->GetArgs()[1] ? TRUE : FALSE;
+    case 7:
+        return mUnkB8[cond->GetArgs()[0]] != cond->GetArgs()[1] ? TRUE : FALSE;
+    case 8:
+        return (int)mUnkB8[cond->GetArgs()[0]] < (int)cond->GetArgs()[1] ? TRUE : FALSE;
+    case 9:
+        return (int)mUnkB8[cond->GetArgs()[0]] <= (int)cond->GetArgs()[1] ? TRUE : FALSE;
+    case 10:
+        return (int)mUnkB8[cond->GetArgs()[0]] > (int)cond->GetArgs()[1] ? TRUE : FALSE;
+    case 11:
+        return (int)mUnkB8[cond->GetArgs()[0]] >= (int)cond->GetArgs()[1] ? TRUE : FALSE;
+    case 12:
+        for (u32 i = 0; i < cond->count; i++) {
+            u32 flag = cond->GetArgs()[i];
+            BOOL set = IsFlagSet(flag);
+            if (!set) {
+                return FALSE;
+            }
+        }
+        return TRUE;
+    case 13:
+        for (u32 i = 0; i < cond->count; i++) {
+            u32 flag = cond->GetArgs()[i];
+            BOOL set = IsFlagSet(flag);
+            if (set) {
+                return TRUE;
+            }
+        }
+        return FALSE;
+    case 14:
+        for (u32 i = 0; i < cond->count; i++) {
+            u32 flag = cond->GetArgs()[i];
+            BOOL set = IsFlagSet(flag);
+            if (set) {
+                return FALSE;
+            }
+        }
+        return TRUE;
+    case 15:
+        for (u32 i = 0; i < cond->count; i++) {
+            u32 flag = cond->GetArgs()[i];
+            BOOL set = IsFlagSet(flag);
+            if (!set) {
+                return TRUE;
+            }
+        }
+        return FALSE;
+    }
+}
+
 void DinoCommonLive::Signal(u32 id) {
 }
 
