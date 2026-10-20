@@ -19,6 +19,7 @@
 #include "game/dino_battle_user_controller.h"
 #include "game/set_status_effect_task.h"
 #include "game/dino_static_init.h"
+#include "game/info_panel_window.h"
 #include "game/dino_battle_debug_log.h"
 #include <stdio.h>
 
@@ -266,6 +267,188 @@ extern "C" MTask *func_ov000_0216d4b0(DinoBattleModelCreature *creature, u32 a, 
 // The same, reading the creature's life when it runs.
 extern "C" MTask *func_ov000_0216d520(DinoBattleModelCreature *creature, u32 a, u32 d, u32 e, u8 f) {
     return new DamagedUpdate(creature, creature->mView, a, creature->mUnkB4, 0, d, e, f, 0);
+}
+
+// The statuses that wear off, with their turn counters (filled in with the creature's).
+struct DinoBattleStatusCountdown {
+    u32 status;
+    s8 *turns;
+};
+
+struct DinoBattleStatusCountdownTable {
+    DinoBattleStatusCountdown entries[11];
+};
+
+extern "C" const DinoBattleStatusCountdownTable data_ov000_0218fbdc;
+extern "C" const u32 data_0208a27c;   // a status wearing off, by status (opponent side)
+extern "C" const u32 data_0208a280;   // (own side)
+extern "C" const u32 data_0208a294;   // the status's damage (opponent side)
+extern "C" const u32 data_0208a298;   // (own side)
+extern "C" const u32 data_0208a29c;   // statuses released (opponent side)
+extern "C" const u32 data_0208a2a0;   // (own side)
+
+// (Byte-exact; the report keeps it at 99.99% because the game's call to ChangeUnkB8, defined right after, resolves
+// inside this function's range in the delinked object.)
+void DinoBattleModelCreature::OnMessage(MMessage *msg) {
+    switch (msg->mId) {
+    case 0x1003A: {
+        DinoBattleModelCreatureTurnBeginRequest *req = (DinoBattleModelCreatureTurnBeginRequest *)msg;
+        if (req->mUnk10 != mPlayer->GetUnkB8()) {
+            return;
+        }
+        SendUpdate(0, 0);
+        SetUnkC0(GetUnkB8());
+        ClearUnkC4();
+        if (req->mUnk0C != 0) {
+            ((MMessageObserver *)req->mUnk0C)->Post(new DinoBattleModelCreatureTurnBeginResult());
+        }
+        break;
+    }
+    case 0x10025: {
+        DinoBattleModelCreatureAbilityRequest *req = (DinoBattleModelCreatureAbilityRequest *)msg;
+        if (req->mUnk14 == mUnkB4) {
+            return;
+        }
+        break;
+    }
+    case 0x10015: {
+        DinoBattleModelTurnEndRequest *req = (DinoBattleModelTurnEndRequest *)msg;
+        if (req->mUnk10 != mPlayer->GetUnkB8()) {
+            return;
+        }
+        EndAction();
+        (*(int *)req->mUnk14)++;
+        if (mStatus.flags & 4) {
+            mSerial.AddTail(mView->CreatePostTask(new DinoBattleViewActionInfoBarUpdateRequest(
+                mPlayer->mUnkB4 == 0 ? data_0208a298 : data_0208a294)));
+            int damage = (int)(GetUnkE8() * mStatus.unk1C) / 100;
+            if (damage == 0) {
+                damage = 1;
+            }
+            AddLife(-damage, 0);
+            GetSerial()->AddTail(func_ov000_0216d4b0(this, 0, damage, 2, 0), DinoSoundCreatePlaySeTask(0x5B, 0),
+                                 new MTimer(10), DinoBattleViewPopNumber::CreateWaitTask());
+        }
+        if (GetUnkE4() != 0) {
+            DinoBattleStatusCountdownTable table = data_ov000_0218fbdc;
+            table.entries[0].turns = &mStatus.unk04[0];
+            table.entries[1].turns = &mStatus.unk04[1];
+            table.entries[2].turns = &mStatus.unk04[2];
+            table.entries[3].turns = &mStatus.unk04[3];
+            table.entries[4].turns = &mStatus.unk04[5];
+            table.entries[5].turns = &mStatus.unk04[6];
+            table.entries[6].turns = &mStatus.unk04[7];
+            table.entries[7].turns = &mStatus.unk04[4];
+            table.entries[8].turns = &mStatus.unk04[8];
+            table.entries[9].turns = &mStatus.unk04[9];
+            for (int i = 0; table.entries[i].turns != NULL; i++) {
+                DinoBattleStatusCountdown *entry = &table.entries[i];
+                u32 bit = mStatus.flags & (1 << entry->status);
+                if (bit == 0 || (mUnkC4 & bit)) {
+                    continue;
+                }
+                (*entry->turns)--;
+                MParallelTaskSet *tasks = new MParallelTaskSet(TRUE);
+                DinoSignalWait *wait = new DinoSignalWait(0x10047, NULL, NULL, 1);
+                MTask *icon = mPlayer->CreateUpdateStateIconTask((u32)this, (u32)(MMessageObserver *)wait);
+                tasks->AddTail(wait);
+                tasks->AddTail(icon);
+                GetSerial()->AddTail(tasks);
+                if (*entry->turns > 0) {
+                    continue;
+                }
+                mStatus.flags &= ~bit;
+                *entry->turns = 0;
+                GetSerial()->AddTail(DinoCreatePostAndWaitTask(mView, new DinoBattleViewWaitActionInfoBarRequest(0)),
+                                mView->CreatePostTask(new DinoBattleViewActionInfoBarUpdateRequest(
+                                    i + (mPlayer->mUnkB4 == 0 ? data_0208a280 : data_0208a27c))));
+                MParallelTaskSet *tasks2 = new MParallelTaskSet(TRUE);
+                DinoSignalWait *wait2 = new DinoSignalWait(0x1006C, NULL, NULL, 1);
+                MTask *post = mView->CreatePostTask(
+                    new DinoBattleViewWaitActionInfoBarRequest((u32)(MMessageObserver *)wait2));
+                tasks2->AddTail(wait2);
+                tasks2->AddTail(post);
+                GetSerial()->AddTail(tasks2);
+            }
+        }
+        mSerial.AddTail(((MMessageObserver *)req->mUnk0C)->CreatePostTask(new DinoBattleModelTurnEndResult()));
+        break;
+    }
+    case 0x1005B: {
+        DinoBattleModelCreatureReleaseStatusEffectRequest *req = (DinoBattleModelCreatureReleaseStatusEffectRequest *)msg;
+        mStatus.flags &= ~req->mUnk10;
+        MParallelTaskSet *tasks = new MParallelTaskSet(TRUE);
+        DinoSignalWait *wait = new DinoSignalWait(0x10047, NULL, NULL, 1);
+        MTask *icon = mPlayer->CreateUpdateStateIconTask((u32)this, (u32)(MMessageObserver *)wait);
+        tasks->AddTail(wait);
+        tasks->AddTail(icon);
+        GetSerial()->AddTail(mPlayer->CreateMotionEffectTask(GetUnkB4(), 4, 0, 0, -1),
+                             mView->CreatePostTask(new DinoBattleViewActionInfoBarUpdateRequest(
+                                 mPlayer->mUnkB4 == 0 ? data_0208a2a0 : data_0208a29c)),
+                             tasks, CreateUpdateTask(0, 0));
+        if (req->mUnk0C != 0) {
+            mSerial.AddTail(((MMessageObserver *)req->mUnk0C)
+                                ->CreatePostTask(new DinoBattleModelCreatureReleaseStatusEffectResult()));
+        }
+        break;
+    }
+    case 0x1004F: {
+        DinoBattleModelCreatureSupportEffectRequest *req = (DinoBattleModelCreatureSupportEffectRequest *)msg;
+        if (req->mUnk10 == mUnkB4) {
+            SetUnk108(req->mUnk14);
+            DinoSignalWait *wait = new DinoSignalWait(0x10052, (MMessageObserver *)req->mUnk0C,
+                                                      new DinoBattleModelCreatureSupportEffectResult(), 1);
+            mSerial.AddTail(wait);
+            mView->Post(new DinoBattleViewCreatureSupportEffectRequest((u32)(MMessageObserver *)wait, req->mUnk10,
+                                                                       req->mUnk14));
+        }
+        break;
+    }
+    case 0x10012: {
+        DinoBattleModelCreatureMoveRequest *req = (DinoBattleModelCreatureMoveRequest *)msg;
+        if (req->mUnk14 == mUnkB4) {
+            mMoveReply = (MMessageObserver *)req->mUnk0C;
+            mView->Post(new DinoBattleViewCreatureMoveRequest((u32)(MMessageObserver *)this, req->mUnk10, req->mUnk14,
+                                                              req->mUnk18, req->mUnk1C, req->mUnk20));
+        }
+        break;
+    }
+    case 0x10022: {
+        DinoBattleViewCreatureMoveResult *res = (DinoBattleViewCreatureMoveResult *)msg;
+        ChangeUnkB8(res->mUnk0C);
+        SendUpdate(0, 0);
+        if (res->mUnk0C == 0) {
+            DinoBattleModelCreature *front = mPlayer->FindCreature(0);
+            if (front != NULL) {
+                mPlayer->SendUpdateStateIcon(front, 0);
+            }
+        }
+        if (mMoveReply != NULL) {
+            mMoveReply->Post(new DinoBattleModelCreatureMoveResult());
+        }
+        mPlayer->SendUpdateAbilityIconRequest(1, 0);
+        break;
+    }
+    case 0x1003E: {
+        DinoBattleModelCreatureSpecialLifeRecoveryRequest *req = (DinoBattleModelCreatureSpecialLifeRecoveryRequest *)msg;
+        if (req->mUnk10 == mPlayer->GetUnkB8() && GetDefUnk61() == 6) {
+            AddLife((MFx32(mUnkE8) * MFx32(mDef->mUnk62) * MFx32::FromRaw(0x29)).v >> FX32_SHIFT, 0);
+            SendUpdate(1, 0);
+            DinoSoundPlaySe(0x51, 0);
+            if (req->mUnk0C != 0) {
+                ((MMessageObserver *)req->mUnk0C)->Post(new DinoBattleModelCreatureSpecialLifeRecoveryResult());
+            }
+        }
+        break;
+    }
+    }
+}
+
+void DinoBattleModelCreature::ChangeUnkB8(u32 value) {
+    ResetUnk108();
+    ResetStatus();
+    mPlayer->SendUpdateStateIcon(this, 0);
+    mUnkB8 = value;
 }
 
 // The creature's attack power (higher in a pinch, for kind 5).
@@ -757,7 +940,7 @@ void DinoBattleModelCreature::RollUnk10C() {
 struct DinoBattleStatusEntry {
     BOOL unk00;
     u32 status;
-    u8 *unk08;
+    s8 *unk08;
     u8 *unk0C;
 };
 
@@ -898,13 +1081,6 @@ void DinoBattleModelCreature::ResetUnk108() {
     if (GetUnkB8() == 0) {
         ClearOthersUnk108();
     }
-}
-
-void DinoBattleModelCreature::ChangeUnkB8(u32 value) {
-    ResetUnk108();
-    ResetStatus();
-    mPlayer->SendUpdateStateIcon(this, 0);
-    mUnkB8 = value;
 }
 
 BOOL DinoBattleModelCreature::IsUnkD244() {

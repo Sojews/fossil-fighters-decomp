@@ -175,7 +175,7 @@ struct DinoBattleCreatureStats {
 // A creature's status effects.
 struct DinoBattleCreatureStatus {
     u32 flags;          // 0x00: bit n set while status n is active
-    u8 unk04[12];       // 0x04
+    s8 unk04[12];       // 0x04: turns left, by status
     u8 unk10[12];       // 0x10
     u32 unk1C;          // 0x1C: status 2
     u32 unk20;          // 0x20: status 4, mask of sealed attacks
@@ -296,7 +296,8 @@ public:
     u32 unk110[4];
     std::vector<void *> mUnk120;    // 0x120
     DinoBattleCreatureStatus mStatus;   // 0x12C
-    u8 unk16C[0x174 - 0x16C];
+    MMessageObserver *mMoveReply;   // 0x16C: answered when the view's move is done
+    u32 unk170;
     u8 mActing;                     // 0x174
     u32 mUnk178;                    // 0x178
 };
