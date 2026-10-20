@@ -1486,8 +1486,6 @@ data_ov000_0219034c kind:data(any) addr:0x0219034c
 data_ov000_02190364 kind:data(any) addr:0x02190364
 data_ov000_021903dc kind:data(any) addr:0x021903dc
 data_ov000_021903e8 kind:data(any) addr:0x021903e8
-data_ov000_021903ec kind:data(any) addr:0x021903ec
-data_ov000_021903f0 kind:data(any) addr:0x021903f0
 data_ov000_02190460 kind:data(any) addr:0x02190460
 data_ov000_02190480 kind:data(any) addr:0x02190480
 data_ov000_02190498 kind:data(any) addr:0x02190498

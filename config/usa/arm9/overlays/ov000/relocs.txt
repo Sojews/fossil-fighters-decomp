@@ -10972,9 +10972,9 @@ from:0x0218a76a kind:thumb_call_arm to:0x020863ac module:main
 from:0x0218a786 kind:thumb_call_arm to:0x020863ac module:main
 from:0x0218a7a2 kind:thumb_call_arm to:0x020863ac module:main
 from:0x0218a7c8 kind:thumb_call to:0x0202b2a8 module:main
-from:0x0218a7d0 kind:load to:0x021903f0 module:overlay(0)
+from:0x0218a7d0 kind:load to:0x021903e8 add:0x8 module:overlay(0)
 from:0x0218a7d4 kind:load to:0x021903e8 module:overlay(0)
-from:0x0218a7d8 kind:load to:0x021903ec module:overlay(0)
+from:0x0218a7d8 kind:load to:0x021903e8 add:0x4 module:overlay(0)
 from:0x0218a7dc kind:load to:0x02196cd0 module:overlay(0)
 from:0x0218a808 kind:thumb_call to:0x0205329c module:main
 from:0x0218a832 kind:thumb_call to:0x0218a8f0 module:overlay(0)

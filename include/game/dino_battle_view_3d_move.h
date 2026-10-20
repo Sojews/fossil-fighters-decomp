@@ -56,7 +56,10 @@ public:
     u16 mUnkF8;     // 0xF8
     u16 mUnkFA;     // 0xFA
     u16 mUnkFC;     // 0xFC
-    u8 unkFE[0x158 - 0xFE];
+    u8 unkFE[2];
+    VecFx32 mTarget;    // 0x100
+    VecFx32 mDelta;     // 0x10C: per frame
+    u8 unk118[0x158 - 0x118];
     int mUnk158;    // 0x158
     u8 unk15C[0x160 - 0x15C];
     u8 mUnk160;     // 0x160

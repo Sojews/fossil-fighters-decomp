@@ -16,7 +16,9 @@ DinoBattleView3DCamera::~DinoBattleView3DCamera() {
 extern "C" struct {
     u8 unk00[0x14];
     void (DinoBattleView3DMove::*State_14)();
-    u8 unk1C[0x34 - 0x1C];
+    u8 unk1C[0x24 - 0x1C];
+    void (DinoBattleView3DMove::*StateEnd_24)();
+    u8 unk2C[0x34 - 0x2C];
     void (DinoBattleView3DMove::*Update_34)();
     u8 unk3C[0x4C - 0x3C];
     void (DinoBattleView3DCamera::*Run_4C)();
@@ -68,6 +70,29 @@ void DinoBattleView3DMove::Start() {
     mState = data_ov000_02196cd0.Update_34;
     mUnkD0 = 0;
     mUnkCC = 0;
+}
+
+// The camera positions moves go between (by mUnkF6/mUnkF8: the group in the high bits, the place in the low 3).
+extern "C" VecFx32 data_ov000_021903e8[][5];
+
+// Takes the move's length, start and end, and steps toward the end.
+void DinoBattleView3DMove::Update() {
+    if (mUnkFA == 0) {
+        mUnk158 = ((Dino3DLoadCsv *)mUnkBC)->GetFrameCount();
+    } else {
+        mUnk158 = mUnkFA;
+    }
+    mStep.x = data_ov000_021903e8[mUnkF6 >> 3][mUnkF6 & 7].x;
+    mStep.y = data_ov000_021903e8[mUnkF6 >> 3][mUnkF6 & 7].y;
+    mStep.z = data_ov000_021903e8[mUnkF6 >> 3][mUnkF6 & 7].z;
+    mTarget.x = data_ov000_021903e8[mUnkF8 >> 3][mUnkF8 & 7].x;
+    mTarget.y = data_ov000_021903e8[mUnkF8 >> 3][mUnkF8 & 7].y;
+    mTarget.z = data_ov000_021903e8[mUnkF8 >> 3][mUnkF8 & 7].z;
+    mDelta.x = (mTarget.x - mStep.x) / mUnk158;
+    mDelta.y = (mTarget.y - mStep.y) / mUnk158;
+    mDelta.z = (mTarget.z - mStep.z) / mUnk158;
+    mState = data_ov000_02196cd0.StateEnd_24;
+    mModel->PushVec3(&mTarget);
 }
 
 void DinoBattleView3DMove::StateEnd() {
