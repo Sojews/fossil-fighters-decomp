@@ -843,8 +843,7 @@ namespace std {
         if (nb == 0) {
             return;
         }
-        size_type x = nb * __block;
-        if (x > max_size() || capacity() > max_size() - x) {
+        if (nb * __block > max_size() || capacity() > max_size() - nb * __block) {
             __deque_common<true>::throw_length_error("deque::add_back_capacity length error");
         }
         if (b.size_ + nb <= b.capacity()) {
