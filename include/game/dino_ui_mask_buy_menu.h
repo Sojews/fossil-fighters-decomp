@@ -51,7 +51,7 @@ public:
     DinoUi3PartsMaskName *mMaskName; // 0xE0
     DinoUi3PartsMoney *mMoney;  // 0xE4
     u8 mFlags[8];           // 0xE8: the page's chosen masks
-    std::vector<u32> mMasks;    // 0xF0: the masks for sale
+    std::vector<void *> mMasks; // 0xF0: the masks for sale (ids)
     int mPage; // 0xFC
     int mLastPage; // 0x100
     u32 mFunds;             // 0x104

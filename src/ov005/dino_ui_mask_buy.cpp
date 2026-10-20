@@ -370,7 +370,7 @@ u8 DinoUiMaskBuyMenu::GetFlag(int index) {
 
 u32 DinoUiMaskBuyMenu::GetPrice(int index) {
     MResource<DinoHeadMaskDefs> defs = gDinoResource->LoadHeadMaskDefs();
-    u32 id = mMasks[index];
+    u32 id = (u32)mMasks[index];
     const DinoHeadMaskDefs *data = defs.Get();
     return ((const DinoHeadMaskDef *)((const u8 *)data + ((const u32 *)((const u8 *)data + data->tableOffset))[id]))
         ->price;
@@ -430,9 +430,9 @@ void DinoUiMaskBuyMenu::OnFocus(MMenuItem *item) {
                 continue;
             }
             if (!GetFlag(index) && mTotal + GetPrice(mPage * 8 + i) > mFunds) {
-                mMaskName->SetMask(mMasks[mPage * 8 + i], TRUE);
+                mMaskName->SetMask((u32)mMasks[mPage * 8 + i], TRUE);
             } else {
-                mMaskName->SetMask(mMasks[mPage * 8 + i], FALSE);
+                mMaskName->SetMask((u32)mMasks[mPage * 8 + i], FALSE);
             }
             mMoney->SetPrice(GetPrice(mPage * 8 + i));
             mSelected = mPage * 8 + i;
@@ -478,7 +478,7 @@ void DinoUiMaskBuyMenu::FinishBuy() {
                 if (price <= mFunds) {
                     mFunds -= price;
                     gDinoBackup->SetSystemVar(3, mFunds);
-                    gDinoBackup->SetHeadMask(mMasks[i], TRUE);
+                    gDinoBackup->SetHeadMask((u32)mMasks[i], TRUE);
                 }
             }
         }
@@ -544,7 +544,7 @@ void DinoUiMaskBuyMenu::RefreshPage2() {
             button = new DinoUiMaskBuyMaskButton(
                 mOam, MPoint(data_ov005_0216b200.mFirst.x + data_ov005_0216b200.mColumn.x * (i % 4) + data_ov005_0216b200.mRow.x * (i / 4),
                        data_ov005_0216b200.mFirst.y + data_ov005_0216b200.mColumn.y * (i % 4) + data_ov005_0216b200.mRow.y * (i / 4)),
-                mMasks[i + mPage * 8], GetFlag(i + mPage * 8));
+                (u32)mMasks[i + mPage * 8], GetFlag(i + mPage * 8));
         } else {
             button = new DinoUiMaskBuyMaskButton(
                 mOam, MPoint(data_ov005_0216b200.mFirst.x + data_ov005_0216b200.mColumn.x * (i % 4) + data_ov005_0216b200.mRow.x * (i / 4),
@@ -564,6 +564,27 @@ void DinoUiMaskBuyMenu::RefreshPage2() {
 }
 
 // X jumps to the buy button; B unchooses the selected mask, or goes to (and then presses) the back button.
+extern "C" const u32 data_ov005_02164ba0[]; // the flags that put the masks on sale, in order
+
+// The masks for sale: those with a name and a price, while their flag is set, that the player hasn't got yet.
+// NONMATCHING: the game keeps the index in memory (it is pushed by reference) yet compares a register copy.
+void DinoUiMaskBuyMenu::LoadMasks() {
+    mMasks.clear();
+    int k = 0;
+    MResource<DinoHeadMaskDefs> defs = gDinoResource->LoadHeadMaskDefs();
+    for (u32 i = 1; i < gDinoResource->GetHeadMaskCount(); i++) {
+        const u8 *base = (const u8 *)defs.Get();
+        const DinoHeadMaskDef *def =
+            (const DinoHeadMaskDef *)(base + ((const u32 *)(base + ((const DinoHeadMaskDefs *)base)->tableOffset))[i]);
+        if (def->nameText != 0 && def->price != 0 && k < 5 && gDinoBackup->GetSystemFlag(data_ov005_02164ba0[k++]) == TRUE &&
+            gDinoBackup->GetHeadMask(i) == 0) {
+            mMasks.push_back((void *)i);
+        }
+    }
+    mLastPage = mMasks.size() != 0 ? (mMasks.size() - 1) / 8 : 0;
+    mPage = 0;
+}
+
 void DinoUiMaskBuyMenu::OnIdle() {
     if (GetInput()->GetPressed() & 8) {
         FocusItem(mBuy);
