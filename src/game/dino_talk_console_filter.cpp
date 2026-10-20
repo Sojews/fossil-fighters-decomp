@@ -175,6 +175,17 @@ void DinoTalkWindow::Skip() {
 }
 
 
+// Moves the name panel by shake (on the other side if flipped).
+static inline void DinoTalkShakePanel(DinoTalkWindowNamePanel *panel, MPoint shake) {
+    panel->mShake = shake;
+    MPoint flip(0, 0);
+    if (panel->mFlip) {
+        flip = data_020b62f0.mFlipOffset;
+    }
+    panel->mPanel->SetPosition(panel->mPos + panel->mShake + flip);
+    panel->mName->SetPosition(panel->mPos + panel->mShake + panel->mNameOffset + flip);
+}
+
 // NONMATCHING: register allocation (the game keeps the flip offset in registers and spills the shake).
 void DinoTalkWindow::StateShow() {
     if (mUnkF4 && IsPageDone() && !mUnkB0) {
@@ -191,15 +202,7 @@ void DinoTalkWindow::StateShow() {
     int x = gDinoResource->GetRandom()->Next(n * 2 + 1) - mUnkAC;
     DinoTalkWindowNamePanel *panel = mNamePanel;
     if (panel != NULL) {
-        panel->mShake = MPoint(x, y);
-        MPoint flip(0, 0);
-        if (panel->mFlip) {
-            flip = data_020b62f0.mFlipOffset;
-        }
-        panel->mPanel->SetPosition(
-            MPoint(panel->mPos.x + panel->mShake.x + flip.x, panel->mPos.y + panel->mShake.y + flip.y));
-        panel->mName->SetPosition(MPoint(panel->mPos.x + panel->mShake.x + panel->mNameOffset.x + flip.x,
-                                         panel->mPos.y + panel->mShake.y + panel->mNameOffset.y + flip.y));
+        DinoTalkShakePanel(panel, MPoint(x, y));
     }
     mFrame->SetPosition(MPoint(mPos.x + x, mPos.y + y));
     mConsole->SetPosition(MPoint(mConsolePos.x + x, mConsolePos.y + y));
@@ -346,6 +349,44 @@ DinoTalkWindowNamePanel::DinoTalkWindowNamePanel(DinoTalkWindow *owner, std::wst
     mShake.y = 0;
     GetParallel()->AddTail(mName, mPanel, mOam);
     GetSerial()->AddTail(new MTimer(1), mName->CreateShowTransfer());
+}
+
+// NONMATCHING: this and the zero swap registers (r5/r6), and the position temporaries' stack slots.
+MTask *DinoTalkWindow::CreateCloseTask() {
+    mUnkF4 = FALSE;
+    mUnkAC = 0;
+    mConsole->SetPosition(mConsolePos);
+    mFrame->SetPosition(mPos);
+    if (mNamePanel != NULL) {
+        DinoTalkShakePanel(mNamePanel, MPoint(0, 0));
+    }
+    MParallelTaskSet *set = new MParallelTaskSet(TRUE);
+    set->AddTail(DinoSoundCreatePlaySeTask(0xA9, 0));
+    if (!mFlip) {
+        set->AddTail(mFrame->CreateCoordAnime(mFrame->GetPosition(), mFrame->GetPosition().Offset(0, 0x60), 0x14, 2),
+                     mConsole->CreateCoordAnime(mConsole->GetPosition(), mConsole->GetPosition().Offset(0, 0x60), 0x14, 2));
+        DinoTalkWindowNamePanel *panel = mNamePanel;
+        if (panel != NULL) {
+            MPoint name = panel->mPos + panel->mNameOffset;
+            MTask *nameAnime = panel->mName->CreateCoordAnime(name, name.Offset(0, 0x60), 0x14, 2);
+            MTask *panelAnime = panel->mPanel->CreateCoordAnime(panel->mPos, panel->mPos.Offset(0, 0x60), 0x14, 2);
+            MParallelTaskSet *anims = new MParallelTaskSet(TRUE);
+            anims->AddTail(panelAnime, nameAnime);
+            set->AddTail(anims);
+        }
+    } else {
+        mConsole->Hide();
+        if (mNamePanel != NULL) {
+            set->AddTail(MTaskExitTransfer::Create(mNamePanel));
+        }
+        MSerialTaskSet *slide = new MSerialTaskSet(TRUE);
+        slide->AddTail(mFrame->CreateCoordTransfer(-0x300, mOffset.y + 0x70), new MTimer(3),
+                       mFrame->CreateCoordTransfer(-0x200, mOffset.y + 0x70), new MTimer(3),
+                       mFrame->CreateCoordTransfer(-0x100, mOffset.y + 0x70), new MTimer(3),
+                       mFrame->CreateCoordTransfer(0, mOffset.y + 0x70), new MTimer(3));
+        set->AddTail(slide);
+    }
+    return set;
 }
 
 // The file's static initialization (see dino_static_init.h).
