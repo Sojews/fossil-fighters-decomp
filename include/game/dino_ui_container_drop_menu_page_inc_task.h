@@ -7,6 +7,7 @@ class DinoUiContainerDropMenu;
 
 class DinoUiContainerDropMenuPageIncTask : public MTask {
 public:
+    DinoUiContainerDropMenuPageIncTask(DinoUiContainerDropMenu *owner) : mOwner(owner) {}
     virtual ~DinoUiContainerDropMenuPageIncTask();
     virtual void Execute();
 
