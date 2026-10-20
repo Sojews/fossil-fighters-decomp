@@ -10,6 +10,7 @@
 #include "game/dino_sound.h"
 #include "game/dino_ui_organization_menu.h"
 #include "game/dino_ui_field_menu_fraction.h"
+#include "game/dino_ui_field_menu_cursor.h"
 #include "m/display.h"
 #include "m/blend.h"
 #include "m/call_task.h"
@@ -321,6 +322,103 @@ void DinoUiOrganizationMenu::SetSort(u8 sort) {
         serial->AddTail(create);
         serial->AddTail(enable);
     }
+}
+
+extern DinoUiOrganizationLayout data_ov007_0218ebec;
+extern DinoUiOrganizationLayout2 data_ov007_0218ec6c;
+// Where the cursor sits on each tab.
+extern MPoint data_020b5890[4];
+// (The pooled method pointers this function's call tasks read.)
+extern "C" struct {
+    void (DinoHelpBase::*Enable)();
+} data_ov007_0218ecd4, data_ov007_0218ed4c;
+
+// Moves the cursor to the item. A team member or a page's slot also shows its creature's name, information and
+// details (and raises the team tech's member); an empty one hides them.
+void DinoUiOrganizationMenu::OnFocus(MMenuItem *item) {
+    int i;
+    mUnk23E = FALSE;
+    mFocusTabs = FALSE;
+    if (item == NULL) {
+        mCursor->Hide();
+        return;
+    }
+    SetSelectedItem(dynamic_cast<DinoHelpItem *>(item));
+    MRect frame = item->GetFrame();
+    mCursor->SetMode(1);
+    for (i = 0; i < 4; i++) {
+        if (item == mTabs[i]) {
+            frame.MoveTo(data_020b5890[i]);
+            mCursor->SetMode(2);
+            mFocusTabs = TRUE;
+        }
+    }
+    for (i = 0; i < 5; i++) {
+        if (item == mListItems[i]) {
+            frame.Offset(data_ov007_0218ec6c.cursorOffset);
+        }
+    }
+    for (i = 0; i < 15; i++) {
+        if (item == mSlots[i]) {
+            frame.Offset(data_ov007_0218ec6c.cursorOffset);
+        }
+    }
+    if (mCursor->IsHidden()) {
+        mCursor->SetFrame(frame);
+    } else {
+        mCursorTasks->Clear();
+        mCursorTasks->AddTail(mCursor->CreateMoveTask(mCursor->GetFrame(), frame, 10, -5));
+    }
+    mCursor->Show();
+    mTeamTech->Lower();
+    for (i = 0; i < 5; i++) {
+        if (item == mListItems[i]) {
+            if (mTeam.slots[i] != 0) {
+                mName->SetCreature(mTeam.slots[i]);
+                mName->SetPosition(data_ov007_0218ef0c[i] + data_ov007_0218ec6c.nameOffset);
+                DinoCreatureState creature;
+                gDinoBackup->GetCreature(mTeam.slots[i], &creature);
+                mInfo->Unk02156ee8(*(DinoCreatureInfo *)&creature);
+                MTask *enable = MCreateCallTask(this, data_ov007_0218ecd4.Enable);
+                mSerial.AddTail(MTaskSetWaitEmptyTask::Create(&mInfo->mSerial), enable);
+                Disable();
+                UpdateDetails(mTeam.slots[i]);
+                if (i < 3) {
+                    mTeamTech->Raise((u8)i);
+                }
+            } else {
+                mName->Hide();
+                mInfo->Unk021571bc();
+                UpdateDetails(1);
+            }
+            return;
+        }
+    }
+    for (i = 0; i < 15; i++) {
+        if (item == mSlots[i]) {
+            if (i < mSlotCount) {
+                mName->SetCreature(mCreatures[mPage * 15 + i]);
+                mName->SetPosition(MPoint(data_ov007_0218ebec.slotX + data_ov007_0218ebec.slotColumnX * (i % 5) +
+                                              data_ov007_0218ebec.slotRowX * (i / 5),
+                                          data_ov007_0218ebec.slotY + data_ov007_0218ebec.slotColumnY * (i % 5) +
+                                              data_ov007_0218ebec.slotRowY * (i / 5)) +
+                                   data_ov007_0218ec6c.nameOffset);
+                DinoCreatureState creature;
+                gDinoBackup->GetCreature(mCreatures[mPage * 15 + i], &creature);
+                mInfo->Unk02156ee8(*(DinoCreatureInfo *)&creature);
+                MTask *enable = MCreateCallTask(this, data_ov007_0218ed4c.Enable);
+                mSerial.AddTail(MTaskSetWaitEmptyTask::Create(&mInfo->mSerial), enable);
+                Disable();
+                UpdateDetails(mCreatures[mPage * 15 + i]);
+            } else {
+                mName->Hide();
+                mInfo->Unk021571bc();
+                UpdateDetails(1);
+            }
+            return;
+        }
+    }
+    mName->Hide();
 }
 
 // Everything back on, and the links back to how they start.
@@ -675,13 +773,13 @@ extern const u32 data_0208a694, data_0208a698, data_0208a69c, data_0208a6a0;
 // The menu for a team member: change and remove, or just add for an empty place.
 void DinoUiOrganizationMenu::OpenMemberMenu(int member) {
     mResult = 0;
-    mMenuBack->Hide();
+    mCursor->Hide();
     MPoint pos = data_ov007_0218ef0c[member] + data_ov007_0218ec6c.memberMenuOffset;
     if (member == 4) {
         pos.x -= 16;
     }
     DinoCommonWindowMenu *menu = new DinoCommonWindowMenu(&mResult, pos, NULL, 0);
-    MTask *show = mMenuBack->CreateShowTransfer();
+    MTask *show = mCursor->CreateShowTransfer();
     MTask *blend = new DinoUiOrganizationMenuBlendResetTask;
     MTask *task = menu;
     MSerialTaskSet *serial = &mSerial;
@@ -1005,19 +1103,19 @@ void DinoUiOrganizationMenu::Confirm() {
         gDinoBackup->GetTeam(mTeamIndex, &saved);
         if (DinoTeamDiffers(&mTeam, &saved)) {
             gDinoBackup->SetTeam(mTeamIndex, &mTeam);
-            mMenuBack->Hide();
+            mCursor->Hide();
             mSerial.AddTail(
                 new DinoCommonWindowMessageBox(MPoint(0x80, 0x60), gDinoResource->GetText(data_0208aa40), 0x78, 4));
             Leave();
         } else {
-            mMenuBack->Hide();
+            mCursor->Hide();
             Leave();
         }
     } else {
         mSerial.AddTail(
             new DinoCommonWindowMessageBox(MPoint(0x80, 0x60), gDinoResource->GetText(data_0208aa4c), 0x78, 4));
-        mMenuBack->Hide();
-        mSerial.AddTail(mMenuBack->CreateShowTransfer());
+        mCursor->Hide();
+        mSerial.AddTail(mCursor->CreateShowTransfer());
     }
 }
 
@@ -1038,7 +1136,7 @@ void DinoUiOrganizationMenu::Back() {
         return;
     }
     Disable();
-    mMenuBack->Hide();
+    mCursor->Hide();
     if (mUnk23D) {
         mSerial.AddTail(new DinoCommonWindowMessageBox(MPoint(0x80, 0x60), gDinoResource->GetText(data_0208aa38), 4));
     } else {

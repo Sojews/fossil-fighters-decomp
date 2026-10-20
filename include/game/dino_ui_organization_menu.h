@@ -12,6 +12,7 @@
 #include "game/help.h"
 
 class DinoUiFieldMenuFraction;
+class DinoUiFieldMenuCursor;
 class DinoUiRvInformation;
 class MTextPicture;
 class DinoUiOrganizationMenuItem;
@@ -38,6 +39,8 @@ struct DinoUiOrganizationLayout {
 struct DinoUiOrganizationLayout2 {
     u8 unk00[0x30];
     MPoint memberMenuOffset;    // 0x30: from the member's medal
+    MPoint nameOffset;          // 0x38: of the creature's name from its medal or slot
+    MPoint cursorOffset;        // 0x40: of the cursor's frame on a medal or slot
 };
 
 class DinoUiOrganizationMenu : public DinoHelpBase, public MMenu {
@@ -122,8 +125,9 @@ public:
     DinoUiPartsReviverMedalButton *mSlots[15]; // 0x118
     MIndicator *mNumbers[15];           // 0x154: the slots' creature numbers
     int mSlotCount;                     // 0x190
-    u32 mUnk194[2];                     // 0x194
-    MView *mMenuBack;                   // 0x19C: behind the member menu
+    u32 mUnk194;                        // 0x194
+    MTaskSet *mCursorTasks;             // 0x198: the cursor's moves
+    DinoUiFieldMenuCursor *mCursor;     // 0x19C: hidden while the member menu is open
     DinoUiFieldMenuFraction *mFraction; // 0x1A0: "page n/m"
     u32 mTeamIndex;                     // 0x1A4: the saved team being edited
     int mResult;                        // 0x1A8
