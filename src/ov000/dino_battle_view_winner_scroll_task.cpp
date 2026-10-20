@@ -20,6 +20,7 @@
 #include "game/dino_battle_view_creature.h"
 #include "m/lcd.h"
 #include "m/blend.h"
+#include "game/dino_static_init.h"
 
 DinoBattleViewWinnerScrollTask::~DinoBattleViewWinnerScrollTask() {
     if (!mUnk78) {
@@ -255,3 +256,25 @@ extern "C" void func_ov000_02161748(DinoBattleViewUnkE0 *field) {
         }
     }
 }
+
+// The file's static initialization (see dino_static_init.h).
+extern "C" u32 data_ov000_02191b1c[];
+extern "C" u32 data_ov000_02191b9c[];
+extern "C" u32 data_ov000_02191d9c[];
+extern "C" u32 data_ov000_02191dcc[];
+// NONMATCHING: the game loads the last two anchors' addresses together, before the first group's stores.
+static struct DinoBattleViewWinnerScrollTaskStaticInit {
+    DinoBattleViewWinnerScrollTaskStaticInit() {
+        DINO_POOL_WORD(data_ov000_02191b1c, 0x70) = 128;
+        DINO_POOL_WORD(data_ov000_02191b1c, 0x74) = 176;
+        DINO_POOL_WORD(data_ov000_02191b9c, 0x10) = 8;
+        DINO_POOL_WORD(data_ov000_02191b9c, 0x14) = 150;
+        DINO_POOL_WORD(data_ov000_02191b1c, 0x78) = 64;
+        DINO_POOL_WORD(data_ov000_02191b1c, 0x7c) = 112;
+        DINO_POOL_WORD(data_ov000_02191d9c, 0x28) = 64;
+        DINO_POOL_WORD(data_ov000_02191d9c, 0x2c) = 96;
+        volatile s32 *p = (volatile s32 *)data_ov000_02191dcc;
+        p[0] = 112 * 4;
+        p[1] = 96;
+    }
+} sDinoBattleViewWinnerScrollTaskStaticInit;

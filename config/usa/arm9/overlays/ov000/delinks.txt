@@ -129,6 +129,7 @@ src/ov000/dino_battle_help.cpp:
 
 src/ov000/dino_battle_view_winner_scroll_task.cpp:
     .text       start:0x0215fe8c end:0x02162694
+    .init       start:0x021905f4 end:0x02190634
 
 src/ov000/creature_motion.cpp:
     .text       start:0x021700fc end:0x02173fa8
