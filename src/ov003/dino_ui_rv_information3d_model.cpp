@@ -175,6 +175,102 @@ DinoUiRvInformation::~DinoUiRvInformation() {
     }
 }
 
+extern "C" MPoint data_ov003_0216072c;        // the name's position
+extern "C" MPoint data_ov003_02160734;        // the description's
+extern "C" MPoint data_ov003_0216074c;
+extern "C" MPoint data_ov003_02160874[4];     // the part levels', by part
+extern "C" MPoint data_ov003_021608bc[6];     // the numbers', (page 0)
+extern "C" MPoint data_ov003_0216085c[3];     // the attack rows', (pages 1 and 2)
+extern "C" const char data_ov003_02160c0c[];  // the part levels' font
+extern "C" u32 data_ov003_02160760[];
+
+// Makes the page's parts, hidden.
+#pragma opt_common_subs off
+void DinoUiRvInformation::Unk02156800() {
+    gCurrentDisplay = gLcd->mMain;
+    switch (mPage) {
+    case 0: {
+        MFontSet *font = gDinoResource->CreateFont12(0, 1, 0);
+        mViewD4 = new MIndicator(new MObjCanvas(gCurrentDisplay, MPoint(0x90, 0x10), gDinoResource->GetUnkTable(), TRUE),
+                                 font, 0);
+        mViewD4->SetPosition(data_ov003_0216072c);
+        mViewD4->SetPriority(3);
+        mViewD4->Hide();
+        mPictureTasks->AddTail(mViewD4);
+        mViewEC = new MConsole(new MObjCanvas(gCurrentDisplay, MPoint(0xF8, 0x30), gDinoResource->GetUnkTable(), TRUE),
+                               font, MPoint(0, 3), 0);
+        mViewEC->SetUnk44(6);
+        mViewEC->SetPosition(data_ov003_02160734);
+        mViewEC->SetPriority(3);
+        mViewEC->Hide();
+        mPictureTasks->AddTail(mViewEC);
+        mViewD8 = new MIndicator(new MObjCanvas(gCurrentDisplay, MPoint(0x80, 0x10), gDinoResource->GetUnkTable(), TRUE),
+                                 font, 0);
+        mPictureTasks->AddTail(mViewD8);
+        mViewD8->SetPosition(data_ov003_0216074c);
+        mViewD8->SetPriority(3);
+        mViewD8->Hide();
+        MFontSet *levelFont = new MFontSet(std::string(data_ov003_02160c0c), 0, 0, 0);
+        for (int i = 0; i < 4; i++) {
+            mViewsDC[i] = new MIndicator(new MObjCanvas(gCurrentDisplay, MPoint(0x40, 0x10), levelFont->GetPalette(), TRUE),
+                                         levelFont, 0);
+            mPictureTasks->AddTail(mViewsDC[i]);
+            mViewsDC[i]->SetPosition(data_ov003_02160874[i]);
+            mViewsDC[i]->SetPriority(3);
+            mViewsDC[i]->Hide();
+        }
+        for (int i = 0; i < 6; i++) {
+            mNumbersBC[i] = new DinoUiFieldMenuNumber3(data_ov003_021608bc[i]);
+            mNumbersBC[i]->SetPriority(3);
+            mPictureTasks->AddTail(mNumbersBC[i]);
+        }
+        break;
+    }
+    case 1:
+    case 2: {
+        MSmartOam *oam = new MSmartOam(0xC, 0, TRUE);
+        MFontSet *font = gDinoResource->CreateFont12(0, 10, 1);
+        for (int i = 0; i < 3; i++) {
+            mViewsF0[i] = new MMotion(std::string(((const char **)&data_ov003_02160660)[4]), oam, 2, 1);
+            mViewsF0[i]->SetPosition(data_ov003_0216085c[i]);
+            mViewsF0[i]->SetPriority(3);
+            ((MMotion *)mViewsF0[i])->Play(1, 0);
+            mViewsF0[i]->Hide();
+            mPictureTasks->AddTail(mViewsF0[i]);
+            mViews104[i] = new MIndicator(
+                new MObjCanvas(gCurrentDisplay, MPoint(0x80, 0x20), gDinoResource->GetUnkTable(), TRUE), font, 0);
+            mPictureTasks->AddTail(mViews104[i]);
+            mViews104[i]->SetPosition(data_ov003_0216085c[i] + DINO_POOL(MPoint, data_ov003_02160760, 0xC));
+            mViews104[i]->SetPriority(3);
+            mViews104[i]->Hide();
+            mViews118[i] = new MConsole(
+                new MObjCanvas(gCurrentDisplay, MPoint(0x80, 0x20), gDinoResource->GetUnkTable(), TRUE), font,
+                MPoint(0, 3), 0);
+            mViews118[i]->SetUnk44(6);
+            mViews118[i]->SetPosition(data_ov003_0216085c[i] + DINO_POOL(MPoint, data_ov003_02160760, 0x4));
+            mViews118[i]->SetPriority(3);
+            mViews118[i]->Hide();
+            mPictureTasks->AddTail(mViews118[i]);
+            mNumbers12C[i] =
+                new DinoUiFieldMenuNumber3(data_ov003_0216085c[i] + DINO_POOL(MPoint, data_ov003_02160660, 0x6C));
+            mNumbers12C[i]->SetPriority(3);
+            mPictureTasks->AddTail(mNumbers12C[i]);
+            mNumbers140[i] =
+                new DinoUiFieldMenuNumber3(data_ov003_0216085c[i] + DINO_POOL(MPoint, data_ov003_02160660, 0x64));
+            mNumbers140[i]->SetPriority(3);
+            mPictureTasks->AddTail(mNumbers140[i]);
+            mNumbers12C[i]->Hide();
+            mNumbers140[i]->Hide();
+        }
+        mPictureTasks->AddTail(oam);
+        break;
+    }
+    case 3:
+        break;
+    }
+}
+#pragma opt_common_subs reset
+
 void DinoUiRvInformation::SetUnk1B1(u8 value) {
     mUnk1B1 = value;
 }

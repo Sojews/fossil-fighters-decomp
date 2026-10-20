@@ -9,6 +9,7 @@
 class DinoUiRvInformation3DModel;
 class DinoUiFieldMenuNumber3;
 class MView;
+class MConsole;
 
 // A creature's details as the information screen shows them (passed by value).
 // (As a creature's state: copied member by member.)
@@ -69,10 +70,10 @@ public:
     MView *mViewD4;                     // 0xD4
     MView *mViewD8;                     // 0xD8
     MView *mViewsDC[4];                 // 0xDC
-    MView *mViewEC;                     // 0xEC
+    MConsole *mViewEC;                  // 0xEC: the description
     MView *mViewsF0[5];                 // 0xF0: (pages 1 and 2, by row)
     MView *mViews104[5];                // 0x104
-    MView *mViews118[5];                // 0x118
+    MConsole *mViews118[5];             // 0x118
     DinoUiFieldMenuNumber3 *mNumbers12C[5]; // 0x12C
     DinoUiFieldMenuNumber3 *mNumbers140[5]; // 0x140
     u8 unk154[0x164 - 0x154];
