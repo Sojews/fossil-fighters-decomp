@@ -311,6 +311,42 @@ void DinoUiTopMenu::OnStart() {
     mSerial.AddTail(MCreateCallTask(this, &DinoHelpBase::Enable));
 }
 
+
+#pragma auto_inline off
+
+DinoUiTopMenuItem::DinoUiTopMenuItem(DinoUiTopMenu *owner, const std::string &path, MPoint pos, u32 textId) {
+    mOwner = owner;
+    mTextId = textId;
+    mMotion = new MMotion(std::string(path), mOwner->GetOam(), 2, 1);
+    mMotion->Play(1, 0);
+    mMotion->SetPosition(pos);
+    mMotion->Show();
+    mParallel.AddTail(mMotion);
+}
+
+DinoUiTopMenuItem2::DinoUiTopMenuItem2(DinoUiTopMenu *owner, const std::string &path, const std::string &path2,
+                                       MPoint pos, u32 textId) {
+    mOwner = owner;
+    mTextId = textId;
+    mMotion2 = new MMotion(std::string(path2), mOwner->GetOam(), 2, 1);
+    mMotion2->Play(1, 0);
+    mMotion2->SetPosition(pos);
+    mMotion2->Show();
+    mParallel.AddTail(mMotion2);
+    mMotion = new MMotion(std::string(path), mOwner->GetOam(), 2, 1);
+    mMotion->Play(1, 0);
+    mMotion->SetPosition(pos);
+    mMotion->Show();
+    mParallel.AddTail(mMotion);
+}
+
+#pragma auto_inline on
+
+// Template task instances the game emits in this file. Until the code that makes the tasks is decompiled, they are
+// instantiated explicitly.
+template class MCallTask0<DinoUiTopMenu, DinoHelpBase>;
+template MTask *MCreateCallTask(DinoUiTopMenu *obj, void (DinoHelpBase::*func)());
+
 void DinoUiTopMenu::OnFocus(MMenuItem *item) {
     SetSelectedItem(dynamic_cast<DinoHelpItem *>(item));
     if (!mSilentFocus) {
@@ -318,11 +354,6 @@ void DinoUiTopMenu::OnFocus(MMenuItem *item) {
     }
     mSilentFocus = FALSE;
 }
-
-// Template task instances the game emits in this file. Until the code that makes the tasks is decompiled, they are
-// instantiated explicitly.
-template class MCallTask0<DinoUiTopMenu, DinoHelpBase>;
-template MTask *MCreateCallTask(DinoUiTopMenu *obj, void (DinoHelpBase::*func)());
 
 void DinoUiTopMenu::OnBackDecided() {
     MTask &self = *this;
@@ -452,21 +483,6 @@ template MTask *MCreateBgCallTask(DinoUiSaveSlotSelect *obj, void (DinoUiSaveSlo
 
 #pragma auto_inline off
 
-DinoUiTopMenuItem2::DinoUiTopMenuItem2(DinoUiTopMenu *owner, const std::string &path, const std::string &path2,
-                                       MPoint pos, u32 textId) {
-    mOwner = owner;
-    mTextId = textId;
-    mMotion2 = new MMotion(std::string(path2), mOwner->GetOam(), 2, 1);
-    mMotion2->Play(1, 0);
-    mMotion2->SetPosition(pos);
-    mMotion2->Show();
-    mParallel.AddTail(mMotion2);
-    mMotion = new MMotion(std::string(path), mOwner->GetOam(), 2, 1);
-    mMotion->Play(1, 0);
-    mMotion->SetPosition(pos);
-    mMotion->Show();
-    mParallel.AddTail(mMotion);
-}
 
 // Lights up (or not) and nudges the label (which sits a little left when focused).
 // NONMATCHING: the game reads the size through a pointer, from other stack slots.
@@ -496,15 +512,6 @@ void DinoUiSaveSlotSelectMenuItem::OnFocusChanged(BOOL focused) {
     }
 }
 
-DinoUiTopMenuItem::DinoUiTopMenuItem(DinoUiTopMenu *owner, const std::string &path, MPoint pos, u32 textId) {
-    mOwner = owner;
-    mTextId = textId;
-    mMotion = new MMotion(std::string(path), mOwner->GetOam(), 2, 1);
-    mMotion->Play(1, 0);
-    mMotion->SetPosition(pos);
-    mMotion->Show();
-    mParallel.AddTail(mMotion);
-}
 
 // Starts loading the next scene of the opening (a battle field model, its camera and sounds).
 void DinoUiOpening::LoadScene() {
