@@ -209,16 +209,16 @@ inline MFx32Rect operator+(const MFx32Rect &a, MFx32Point b) {
 inline bool MFx32Circle::Overlaps(const MFx32Rect &rect) const {
     MFx32 d = 0;
     if (x < rect.left) {
-        d = d + (rect.left - x) * (rect.left - x);
+        d += (rect.left - x) * (rect.left - x);
     }
     if (x > rect.right) {
-        d = d + (x - rect.right) * (x - rect.right);
+        d += (x - rect.right) * (x - rect.right);
     }
     if (y < rect.top) {
-        d = d + (rect.top - y) * (rect.top - y);
+        d += (rect.top - y) * (rect.top - y);
     }
     if (y > rect.bottom) {
-        d = d + (y - rect.bottom) * (y - rect.bottom);
+        d += (y - rect.bottom) * (y - rect.bottom);
     }
     return d < r * r;
 }
