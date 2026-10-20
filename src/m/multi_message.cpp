@@ -9,9 +9,13 @@
 
 MMessage *CreateMultiMessage(const void *data);
 
-// NONMATCHING: in the game this vector comes before its destructor-chain entry in .bss, so the two functions
-// that use it load it at a different offset.
 std::vector<MMessageFactory> gMessageFactories;
+// A stand-in for 12 bytes of the TU's .bss we don't have yet: with it, mwcc lays the vector out before its
+// destructor-chain entry, as the game does. (This unit links the game's own data, so it isn't emitted.)
+static u8 sUnknownBss[12];
+void *MultiMessageUnknownBss() {
+    return sUnknownBss;
+}
 
 void RegisterMultiMessages() {
     AddMessageFactory(CreateMultiMessage);
