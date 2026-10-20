@@ -15,8 +15,8 @@ class MFontSet;
 
 class DinoTalkWindow : public MProcess {
 public:
-    // Not decompiled yet.
-    DinoTalkWindow(MDisplay *display, std::string speaker, int arg, BOOL choices, u8 flag);
+    // oam: the sprites to draw the text on (a text layer canvas if 0); flip: the name panel on the other side.
+    DinoTalkWindow(MDisplay *display, std::string speaker, int oam, int priority, u8 flip);
     void SetUnkF4();
     void ClearUnkF4();
     void SetRate(MFx32 rate);
@@ -43,8 +43,8 @@ public:
 
     void (DinoTalkWindow::*mState)(); // 0x74
     std::wstring mText; // 0x7C
-    MView *mFrame;      // 0x88
-    u32 unk8C;
+    MView *mFrame;      // 0x88: an MTextPicture
+    u32 mUnk8C;         // 0x8C
     class DinoTalkWindowNamePanel *mNamePanel;  // 0x90
     MConsole *mConsole; // 0x94
     u8 mStarted;        // 0x98
@@ -53,20 +53,24 @@ public:
     u32 mUnkAC;         // 0xAC: frames left shaking
     u8 mUnkB0;          // 0xB0
     MTaskSet *mAnims;   // 0xB4: the window's own animations
-    u8 unkB8[0xCC - 0xB8];
+    MTaskSet *mConsoleTasks;    // 0xB8
+    int mOam;           // 0xBC: (an MSmartOam *)
+    u8 mFlip;           // 0xC0
+    MPoint mOffset;     // 0xC4: where the window is moved to (when flipped)
     MFx32 mRate;        // 0xCC
-    u8 unkD0[0xF0 - 0xD0];
+    u16 mColors[3];     // 0xD0: the speaker's name colors
+    u8 unkD6[0xF0 - 0xD6];
     MView *mNextMark;   // 0xF0
     u8 mUnkF4;          // 0xF4: the next-page mark is wanted
 };
 
 class DinoTalkWindowNamePanel : public MProcess {
 public:
-    DinoTalkWindowNamePanel(u32 unk, const std::wstring &text, int priority, u8 flip, const void *palette);
+    DinoTalkWindowNamePanel(DinoTalkWindow *owner, std::wstring text, int priority, u8 flip, const void *palette);
     virtual ~DinoTalkWindowNamePanel();
     virtual void Idle();
 
-    u32 mUnk74;         // 0x74
+    DinoTalkWindow *mOwner; // 0x74
     std::wstring mText; // 0x78
     MSmartOam *mOam;    // 0x84
     MConsole *mName;    // 0x88

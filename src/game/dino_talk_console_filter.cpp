@@ -12,63 +12,59 @@
 #include "m/seed_generator.h"
 #include "m/view.h"
 #include "game/dino_static_init.h"
+#include "game/dino_common_font.h"
+#include "game/dino_backup.h"
+#include "m/picture.h"
+#include "m/canvas.h"
+#include "m/text_codec.h"
 #include "m/pal.h"
 #include "m/oam_canvas.h"
 #include "m/font.h"
 #include "m/motion.h"
 #include "m/smart_oam.h"
 
-// The text settings in the resource table.
+// A speaker's entry in the text settings (offsets from the entry).
+struct DinoTalkSpeaker {
+    u32 mName;      // 0x00
+    u32 mColor;     // 0x04: the name panel's colors (r, g, b)
+    u32 mColor2;    // 0x08
+    u32 mSe;        // 0x0C: the typing sound
+
+    const char *GetName() const { return (const char *) this + mName; }
+    const u8 *GetColor() const { return mColor == 0 ? NULL : (const u8 *) this + mColor; }
+    const u8 *GetColor2() const { return mColor2 == 0 ? NULL : (const u8 *) this + mColor2; }
+};
+
+// The text settings in the resource table (offsets from the table).
 struct DinoTalkSettings {
-    u8 unk00[0x10];
-    MFx32 mRate;    // 0x10: characters per frame
+    u32 mSpeakerCount;  // 0x00
+    u32 mSpeakers;      // 0x04: the speaker entries' offsets
+    u32 unk08;
+    u32 mRates;         // 0x0C: the text speeds, by the option
+    MFx32 mRate;        // 0x10: characters per frame
+
+    const DinoTalkSpeaker *GetSpeaker(u32 i) const {
+        return (const DinoTalkSpeaker *) ((const u8 *) this + ((const u32 *) ((const u8 *) this + mSpeakers))[i]);
+    }
+    MFx32 GetRate(u32 i) const { return ((const MFx32 *) ((const u8 *) this + mRates))[i]; }
 };
 
 // The TU's pooled data.
 extern "C" struct {
     u8 unk00[0x08];
     const char *mPanelPath; // 0x08: the name panel's motion
-    u8 unk0C[0x04];
+    const char *mNextMarkPath;  // 0x0C
     s32 unk10;
-    u8 unk14[4];
-    MPoint unk18;   // centered in 256x64 under unk40
+    const char *mFramePath; // 0x14
+    MPoint unk18;   // the console's position: centered in 256x64 under unk40
     u8 unk20[8];
     MPoint unk28;
     u8 unk30[8];
     MPoint mFlipOffset;     // 0x38: the name panel's, on the other side
-    MPoint unk40;   // y derived from unk48's (mwcc reuses the stored value)
-    MPoint unk48;
+    MPoint unk40;   // the console's size; y derived from unk48's (mwcc reuses the stored value)
+    MPoint unk48;   // the console's letter and line spacing
+    void (DinoTalkWindow::*mFirstState)();  // 0x50
 } data_020b62f0;
-
-DinoTalkWindowNamePanel::DinoTalkWindowNamePanel(u32 unk, const std::wstring &text, int priority, u8 flip,
-                                                 const void *palette)
-    : MProcess(NULL), mUnk74(unk), mText(text), mPos(0, 0), mFlip(flip) {
-    mOam = new MSmartOam(0x14, 0, TRUE);
-    mOam->SetUnk1C(7);
-    mFont = gDinoResource->CreateFont12(0, 1, 0);
-    mWidth = mFont->MeasureText(std::wstring(mText), 0, 0).x;
-    mPanelWidth = (mWidth + 7) & ~7;
-    mNameOffset.x = ((mPanelWidth - mWidth) >> 1) + 8;
-    mNameOffset.y = 6;
-    mName = new MConsole(new MSmartObjCanvas(mOam, MPoint(mWidth, 12), gDinoResource->GetUnkTable(), TRUE), mFont,
-                         MPoint(0, 0), MFx32(0));
-    mName->SetPriority(priority);
-    mName->SetFilter(new DinoTalkConsoleFilter(mUnk74));
-    mPanel = new MMotion(data_020b62f0.mPanelPath, mOam, 0, 1);
-    mPanel->SetPriority(priority);
-    mPanel->SetAnchor(1);
-    mPanel->Play(1, 0);
-    mPanel->Hide();
-    if (palette != NULL) {
-        mPanel->GetPalette(0)->LoadColors(palette, 0, 3);
-    }
-    mTiles = mPanelWidth >> 3;
-    mUnkAC = 0;
-    mShake.x = 0;
-    mShake.y = 0;
-    GetParallel()->AddTail(mName, mPanel, mOam);
-    GetSerial()->AddTail(new MTimer(1), mName->CreateShowTransfer());
-}
 
 DinoTalkConsoleFilter::~DinoTalkConsoleFilter() {
 }
@@ -233,6 +229,124 @@ std::wstring &DinoTalkFilterReplaceAnchor(std::wstring &s, const std::wstring &t
     return s.replace(0, 0, text);
 }
 #pragma dont_inline reset
+
+// An opaque 15-bit color from 8-bit components.
+#define DINO_TALK_RGB(r, g, b) (0x8000 | ((u32) (r) >> 3) | (((u32) (g) >> 3) << 5) | (((u32) (b) >> 3) << 10))
+
+// NONMATCHING: the game reloads `colored` after its first store, and allocates the color pointers differently.
+DinoTalkWindow::DinoTalkWindow(MDisplay *display, std::string speaker, int oam, int priority, u8 flip)
+    : MProcess(display), mText(MDecodeUtf8(speaker)), mUnkB0(0), mOam(oam), mFlip(flip) {
+    u32 option = gDinoBackup->GetUnk34_16();
+    mRate = ((const DinoTalkSettings *) gDinoResource->GetExcavate7C())->GetRate(option);
+    mUnkF4 = FALSE;
+    if (mFlip) {
+        mOffset.x = data_020b62f0.mFlipOffset.x;
+        mOffset.y = data_020b62f0.mFlipOffset.y;
+    } else {
+        mOffset.x = 0;
+        mOffset.y = 0;
+    }
+    BOOL colored;
+    mStarted = colored = FALSE;
+    u32 se = mText.size() == 0 ? 0xAE : 0xAA;
+    const DinoTalkSettings *settings = (const DinoTalkSettings *) gDinoResource->GetExcavate7C();
+    for (u32 i = 0; i < settings->mSpeakerCount; i++) {
+        const DinoTalkSpeaker *entry = settings->GetSpeaker(i);
+        if (speaker == entry->GetName()) {
+            mColors[1] = DINO_TALK_RGB(entry->GetColor()[0], entry->GetColor()[1], entry->GetColor()[2]);
+            mColors[2] = DINO_TALK_RGB(entry->GetColor2()[0], entry->GetColor2()[1], entry->GetColor2()[2]);
+            se = entry->mSe;
+            colored = TRUE;
+            break;
+        }
+    }
+    mAnims = new MSerialTaskSet;
+    GetParallel()->AddTail(mAnims);
+    if (mText.size() == 0) {
+        mNamePanel = NULL;
+    } else {
+        mNamePanel = new DinoTalkWindowNamePanel(this, mText, priority, mFlip, colored ? mColors : NULL);
+        GetParallel()->AddTail(mNamePanel);
+    }
+    DinoCommonFont *font = new DinoCommonFont(0, 1, 0);
+    MCanvas *canvas;
+    if (mOam != 0) {
+        canvas = new MSmartObjCanvas((MSmartOam *) mOam, data_020b62f0.unk40, gDinoResource->GetUnkTable(), TRUE);
+    } else {
+        canvas = new MTextCanvas(data_020b62f0.unk40, gDinoResource->GetUnkTable(), 0, TRUE);
+    }
+    canvas->Clear();
+    if (canvas->mState == 0) {
+        canvas->Execute();
+    }
+    mConsole = new MConsole(canvas, font, data_020b62f0.unk48, MFx32(0));
+    mConsole->SetRate(mRate);
+    mConsole->SetPriority(priority);
+    mConsole->SetPosition(MPoint(data_020b62f0.unk18.x + mOffset.x, data_020b62f0.unk18.y + mOffset.y));
+    mConsole->SetUnk44(12);
+    mConsole->SetFilter(new DinoTalkConsoleFilter(font, this, se));
+    mConsoleTasks = new MSerialTaskSet;
+    GetParallel()->AddTail(mConsoleTasks);
+    mConsoleTasks->AddTail(mConsole);
+    mConsoleTasks->mState = 1;
+    mFrame = new MTextPicture(data_020b62f0.mFramePath, TRUE, TRUE);
+    mFrame->SetPriority(priority);
+    if (colored) {
+        ((MTextPicture *) mFrame)->GetPalBlock()->LoadColors(mColors, 0, 3);
+    }
+    GetParallel()->AddTail(mFrame);
+    mUnkAC = 0;
+    mSerial.AddTail(DinoSoundCreatePlaySeTask(0xA8, 0));
+    if (!mFlip) {
+        GetSerial()->AddTail(new MTimer(1), mFrame->CreateShowTransfer(), mConsole->CreateShowTransfer(),
+                             mFrame->CreateCoordTransfer(0, 0x60), new MTimer(5), mFrame->CreateCoordTransfer(-0x100, 0x60),
+                             new MTimer(5), mFrame->CreateCoordTransfer(-0x200, 0x60), new MTimer(5),
+                             mFrame->CreateCoordTransfer(-0x300, 0x60));
+    } else {
+        GetSerial()->AddTail(new MTimer(1), mFrame->CreateShowTransfer(), mConsole->CreateShowTransfer(),
+                             mFrame->CreateCoordTransfer(0, mOffset.y + 0x70), new MTimer(5),
+                             mFrame->CreateCoordTransfer(-0x100, mOffset.y + 0x70), new MTimer(5),
+                             mFrame->CreateCoordTransfer(-0x200, mOffset.y + 0x70), new MTimer(5),
+                             mFrame->CreateCoordTransfer(-0x300, mOffset.y + 0x70));
+    }
+    mUnk8C = 0;
+    MSmartOam *markOam = new MSmartOam(1, 0, TRUE);
+    mNextMark = new MMotion(data_020b62f0.mNextMarkPath, markOam, 0, 1);
+    ((MMotion *) mNextMark)->SetPosition(0x80, mOffset.y + 0x60);
+    ((MMotion *) mNextMark)->Play(1, 0);
+    GetParallel()->AddTail(mNextMark, markOam);
+    mState = data_020b62f0.mFirstState;
+}
+
+DinoTalkWindowNamePanel::DinoTalkWindowNamePanel(DinoTalkWindow *owner, std::wstring text, int priority, u8 flip,
+                                                 const void *palette)
+    : MProcess(NULL), mOwner(owner), mText(text), mPos(0, 0), mFlip(flip) {
+    mOam = new MSmartOam(0x14, 0, TRUE);
+    mOam->SetUnk1C(7);
+    mFont = gDinoResource->CreateFont12(0, 1, 0);
+    mWidth = mFont->MeasureText(std::wstring(mText), 0, 0).x;
+    mPanelWidth = (mWidth + 7) & ~7;
+    mNameOffset.x = ((mPanelWidth - mWidth) >> 1) + 8;
+    mNameOffset.y = 6;
+    mName = new MConsole(new MSmartObjCanvas(mOam, MPoint(mWidth, 12), gDinoResource->GetUnkTable(), TRUE), mFont,
+                         MPoint(0, 0), MFx32(0));
+    mName->SetPriority(priority);
+    mName->SetFilter(new DinoTalkConsoleFilter(mOwner));
+    mPanel = new MMotion(data_020b62f0.mPanelPath, mOam, 0, 1);
+    mPanel->SetPriority(priority);
+    mPanel->SetAnchor(1);
+    mPanel->Play(1, 0);
+    mPanel->Hide();
+    if (palette != NULL) {
+        mPanel->GetPalette(0)->LoadColors(palette, 0, 3);
+    }
+    mTiles = mPanelWidth >> 3;
+    mUnkAC = 0;
+    mShake.x = 0;
+    mShake.y = 0;
+    GetParallel()->AddTail(mName, mPanel, mOam);
+    GetSerial()->AddTail(new MTimer(1), mName->CreateShowTransfer());
+}
 
 // The file's static initialization (see dino_static_init.h).
 static struct DinoTalkConsoleFilterStaticInit {
