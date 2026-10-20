@@ -1588,6 +1588,38 @@ BOOL DinoBackup::GetSystemFlag(u32 id) {
     }
 }
 
+// Counts a tick of counter index; TRUE every mUnk1A8[index] ticks. The period is drawn again when the rate changes.
+// NONMATCHING: same size; the game keeps this on the stack (register allocation and the MFx32 temporaries).
+extern "C" BOOL func_0201b19c(DinoBackup *backup, u32 index, s32 rate) {
+    if (backup->mUnk190[index] == 0 || rate != backup->mUnk19C[index]) {
+        backup->mUnk19C[index] = rate;
+        if (rate == 0) {
+            return FALSE;
+        }
+        MFx32 step = MFx32(100) / MFx32(rate);
+        u32 max = MFx32ToInt(MFx32(2) / step + MFx32(1)) - 1;
+        MFx32 chance = (MFx32(1) / step - MFx32(1)) / MFx32((int)max);
+        u32 period = 1;
+        MFx32 r;
+        for (u32 i = 0; i < max; i++) {
+            r = gDinoResource->GetRandom()->NextFraction();
+            if (r <= chance) {
+                period++;
+            }
+        }
+        backup->mUnk1A8[index] = period;
+    }
+    if (backup->mUnk19C[index] == 0) {
+        return FALSE;
+    }
+    backup->mUnk190[index]++;
+    if ((u32)backup->mUnk190[index] >= (u32)backup->mUnk1A8[index]) {
+        backup->mUnk190[index] = 0;
+        return TRUE;
+    }
+    return FALSE;
+}
+
 void DinoBackup::SetPlayerUnk58(const DinoPlayerUnk58 *value) {
     *mPlayer->GetUnk58() = *value;
 }
