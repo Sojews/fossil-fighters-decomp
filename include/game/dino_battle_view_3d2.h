@@ -37,15 +37,23 @@ public:
     virtual ~DinoBattleView3DAction();
     virtual void Idle();
 
+    // (On the background thread.)
+    void LoadCsv();
+
     DinoBattleView3D *mModel;   // 0x74
-    void *mUnk78;               // 0x78
+    void *mUnk78;               // 0x78: (a CameraWipe::Owner; 0x144: set while the action plays)
     Dino3DLoadCsv *mCsv;        // 0x7C
-    u32 unk80;
+    class DinoBattleView3DCamera *mCamera;  // 0x80
     void *mUnk84;               // 0x84
     u32 mUnk88;                 // 0x88
     u32 mUnk8C;                 // 0x8C
     u32 unk90[2];
     u16 mUnk98;                 // 0x98
+    int mFrame;                 // 0x9C
+    u32 mStep;                  // 0xA0
+    u8 unkA4[0xE4 - 0xA4];
+    u8 mUnkE4;                  // 0xE4: fade the 3D scene out (else wipe)
+    class MInputHub *mInputHub; // 0xE8
 };
 
 class DinoBattleView3DMask : public MTask {

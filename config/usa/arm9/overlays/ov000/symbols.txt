@@ -1180,7 +1180,7 @@ _ZNSt13__vec_deleterI22DinoBattleView3DRecordRSaIS0_EED2Ev kind:function(thumb,s
 _ZNSt13__vec_deleterI22DinoBattleView3DRecordRSaIS0_EE8allocateEmN10Metrowerks8int2typeILi1EEE kind:function(thumb,size=0x34) addr:0x02184c94
 _ZNSt13__vec_deleterI21DinoBattleView3DEntryRSaIS0_EED2Ev kind:function(thumb,size=0x26) addr:0x02184cc8
 func_ov000_02184cf0 kind:function(thumb,size=0x24) addr:0x02184cf0
-func_ov000_02184d14 kind:function(thumb,size=0x50) addr:0x02184d14
+_ZN22DinoBattleView3DAction7LoadCsvEv kind:function(thumb,size=0x50) addr:0x02184d14
 func_ov000_02184d64 kind:function(thumb,size=0x3c) addr:0x02184d64
 func_ov000_02184da0 kind:function(thumb,size=0x40) addr:0x02184da0
 _ZN14LoadWinnerLoad9LoadModelEi kind:function(thumb,size=0xc0) addr:0x02184de0

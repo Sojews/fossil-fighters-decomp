@@ -11,6 +11,9 @@
 #include "game/dino_3d_load_csv.h"
 #include "game/dino_battle_view_class.h"
 #include "types.h"
+#include "game/dino_battle_view_3d_camera.h"
+#include "m/input.h"
+#include "game/camera_wipe.h"
 #include "game/b3d_status_view_task.h"
 #include "game/dino_battle_view_3d2.h"
 #include "game/black_in_task.h"
@@ -205,6 +208,13 @@ DinoBattleView3DAction::~DinoBattleView3DAction() {
     }
 }
 
+// Loads the action's motion.
+void DinoBattleView3DAction::LoadCsv() {
+    mCsv = new Dino3DLoadCsv(mUnk8C + mUnk88 * 10, mUnk78, mUnk98, (void *)5, mUnk84);
+    mParallel.AddTail(mCsv);
+}
+
+
 DinoBattleView3DMask::~DinoBattleView3DMask() {
 }
 
@@ -224,6 +234,7 @@ MValChange::~MValChange() {
 
 // Template task instances the game emits in this file. Until the code that makes the tasks is decompiled, they are
 // instantiated explicitly.
+#pragma auto_inline off
 template class MBgCallTask0<DinoBattleView3DAction>;
 template MTask *MCreateBgCallTask(DinoBattleView3DAction *obj, void (DinoBattleView3DAction::*func)(), int thread);
 template class MBgCallTask1<DinoBattleView3DGroupFade, int>;
@@ -232,6 +243,63 @@ template class MBgCallTask1<DinoBattleView3DDamage, int>;
 template MTask *MCreateBgCallTask(DinoBattleView3DDamage *obj, void (DinoBattleView3DDamage::*func)(int), int a0, int thread);
 template class MBgCallTask1<LoadWinnerLoad, int>;
 template MTask *MCreateBgCallTask(LoadWinnerLoad *obj, void (LoadWinnerLoad::*func)(int), int a0, int thread);
+#pragma auto_inline reset
+
+extern "C" struct {
+    void (DinoBattleView3DAction::*LoadCsv_00)();
+} data_ov000_0219634c;
+extern const u32 kCreatureLevelLimits[2];
+extern "C" MTask *func_ov000_0218ae50(u32 arg);
+extern "C" MTask *func_ov000_0218addc(u32 arg);
+
+// Loads and plays the action's motion until it ends (or a button skips it), then wipes or fades it out.
+// NONMATCHING: the game reads the fade length (the word after kCreatureLevelLimits) as its own object.
+#pragma auto_inline off
+void DinoBattleView3DAction::Idle() {
+    switch (mStep) {
+    case 0:
+        ((u8 *)mUnk78)[0x144] = 0;
+        mModel->SetUnk180(0);
+        mStep++;
+        break;
+    case 1:
+        if (mUnk88 == 0) {
+            Exit();
+            return;
+        }
+        mSerial.AddTail(MCreateBgCallTask(this, data_ov000_0219634c.LoadCsv_00, 1));
+        mFrame = 0;
+        mStep++;
+        break;
+    case 2:
+        mCsv->Push19(0x4B00);
+        mParallel.AddTail(func_ov000_0218ae50(kCreatureLevelLimits[1]));
+        mStep++;
+        break;
+    case 3:
+        ((u8 *)mUnk78)[0x144] = 1;
+        if ((mInputHub->GetInput(0)->mButtons & 3) || (mInputHub->GetInput(0)->mButtons & 0x1000)) {
+            mModel->SetUnk180(1);
+        }
+        if (mCsv->IsStopped() || mFrame > 300 || mCsv->IsUnk74Done() || mModel->GetUnk180()) {
+            mStep++;
+            if (mUnkE4) {
+                GetSerial()->AddTail(new MTimer(15), func_ov000_0218addc(15));
+            } else {
+                GetSerial()->AddTail(new MTimer(15), new CameraWipe((CameraWipe::Owner *)mUnk78, mUnk84 ? 2 : 3, 15));
+            }
+        }
+        mFrame++;
+        break;
+    case 4:
+        mCsv->Push11();
+        mCamera->Resume();
+        mCsv->Reset();
+        Exit();
+        break;
+    }
+}
+#pragma auto_inline reset
 
 // Template task instances the game emits in this file. Until the code that makes the tasks is decompiled, they are
 // instantiated explicitly.
@@ -240,9 +308,6 @@ void MValChange::Execute() {
     *mDst = mValue;
     Exit();
 }
-
-extern "C" MTask *func_ov000_0218ae50(u32 arg);
-extern "C" MTask *func_ov000_0218addc(u32 arg);
 
 void BlackInTask::Idle() {
     MTask *exit = MTaskExitTransfer::Create(this);
