@@ -7,7 +7,7 @@
 
 void _dadd(void);
 void func_020847c8(void);
-void func_020848cc(void);
+void _dfix(void);
 void _ll_ufrom_d(void);
 void _dflt(void);
 void _dfltu(void);

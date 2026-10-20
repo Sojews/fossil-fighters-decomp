@@ -210,9 +210,11 @@ public:
     M3DScene *mScene;           // 0x11C
     MAnmModelBase *mBody;       // 0x120
     MAnmModelBase *mHead;       // 0x124: on the body's head joint
-    u32 mUnk128;                // 0x128
+    MAnmModelBase *mUnk128;     // 0x128: a model over the character (at mUnk130)
     MPolygonChar *mEffect;      // 0x12C
-    u32 mUnk130[9];             // 0x130
+    VecFx32 mUnk130;            // 0x130: over the character (x, a height above the ground, y)
+    VecFx32 mBodyPos;           // 0x13C: where the body is drawn (x, the ground height, y)
+    VecFx32 mBodyRot;           // 0x148: its rotation
     std::map<u32, M3DModelResource> mMotionModels;      // 0x154: by motion, cached ahead
     std::map<u32, M3DModelResource> mMotionModelsAlt;   // 0x164: (when the field's unk258 is set)
     M3DModelResource mModelResource;                    // 0x174

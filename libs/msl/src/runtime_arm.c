@@ -7,7 +7,7 @@
 
 void _dadd(void);
 void func_020847c8(void);
-void func_020848cc(void);
+void _dfix(void);
 void _ll_ufrom_d(void);
 void _dflt(void);
 void _dfltu(void);
@@ -340,7 +340,7 @@ asm void func_020847c8(void) {
     bx lr
 }
 
-asm void func_020848cc(void) {
+asm void _dfix(void) {
     bic r3, r1, #0x80000000
     ldr r2, =0x41e
     subs r2, r2, r3, lsr #20

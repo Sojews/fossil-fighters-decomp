@@ -23,7 +23,7 @@ DinoFieldChara::DinoFieldChara(DinoField *field, M3DScene *scene)
     : MProcess(NULL), mUnk114(0), mField(field), mScene(scene) {
     mUnk310 = 0;
     mBody = NULL;
-    mUnk128 = 0;
+    mUnk128 = NULL;
     mHead = NULL;
     mManpu = NULL;
     mEffect = NULL;
@@ -122,7 +122,7 @@ void DinoFieldChara::Refresh() {
     mMoveTasks->Clear();
     mTaskSet->Clear();
     mBody = NULL;
-    mUnk128 = 0;
+    mUnk128 = NULL;
     mHead = NULL;
     mManpu = NULL;
     mEffect = NULL;
@@ -136,7 +136,7 @@ void DinoFieldChara::Refresh() {
     mUnk2D8.y = 0;
     mUnk2E0 = 0;
     mBeholdTarget = 0;
-    mUnk130[3] = mUnk130[4] = mUnk130[5] = 0x80000000;
+    mBodyPos.x = mBodyPos.y = mBodyPos.z = 0x80000000;
     if (mModel.id != 0) {
         Run();
         mData = gDinoResource->LoadChara(mModel.id);
@@ -523,6 +523,58 @@ void DinoFieldChara::ChangeMotion(u32 motion, u8 loop, MFx32 speed) {
         }
     }
     mBody->SetSpeed(speed.v);
+}
+
+// Puts the models where the character stands: on the ground (when it moved), facing its angle.
+void DinoFieldChara::ApplyMotion() {
+    if (mBody == NULL) {
+        return;
+    }
+    if (mBodyPos.x != mModel.pos.x.v || mBodyPos.y != mModel.pos.y.v) {
+        fx32 height = mField->GetGroundHeight(mModel.pos.x.v, mModel.pos.y.v);
+        if (height != (fx32)0x80000000) {
+            mUnk114 = height;
+        }
+        fx32 top = mField->GetMaxGroundHeight(mModel.pos);
+        if (top != (fx32)0x80000000) {
+            mUnk130.y = std::min((fx32)mUnk114 + FX32_ONE * 0.4, top + FX32_ONE * 0.05);
+        } else {
+            mUnk130.y = (fx32)mUnk114 + FX32_ONE * 0.15;
+        }
+    }
+    fx32 x = mModel.pos.x.v;
+    mBodyPos.x = x;
+    mUnk130.x = x;
+    mBodyPos.y = mUnk114;
+    mBodyPos.z = mModel.pos.y.v;
+    mUnk130.z = mBodyPos.z;
+    mBody->SetPosRef(&mBodyPos);
+    int angle = (u16)(0x4000 - mModel.angle);
+    mBodyRot.x = 0;
+    mBodyRot.y = ((u16)angle * 360) >> 4;
+    mBodyRot.z = 0;
+    mBody->SetRotRef(&mBodyRot);
+    if (mUnk128 != NULL) {
+        mUnk128->SetPosRef(&mUnk130);
+    }
+    if (mEffect != NULL) {
+        fx32 z = mModel.pos.y.v;
+        fx32 y = mUnk114;
+        MPolygonChar *e = mEffect;
+        e->SetPosition(mModel.pos.x.v, y, z);
+        for (MAnmModelBase *anm = (MAnmModelBase *) e->mParallel.mHead; anm != NULL;
+             anm = (MAnmModelBase *) anm->mNext) {
+            anm->mPosRef = &e->mPos;
+            anm->mUnk11B = TRUE;
+        }
+        e = mEffect;
+        e->SetAngle(angle);
+        for (MAnmModelBase *anm = (MAnmModelBase *) e->mParallel.mHead; anm != NULL;
+             anm = (MAnmModelBase *) anm->mNext) {
+            anm->mRotRef = &e->mRot;
+            anm->mUnk11B = TRUE;
+        }
+    }
 }
 
 void DinoFieldChara::StartBehold(u32 target) {
