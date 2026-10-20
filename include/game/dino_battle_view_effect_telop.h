@@ -21,6 +21,7 @@ public:
     void StateStart();
     void Load();
     void StateFinish();
+    void StateLose();
 
     void (DinoBattleViewEffectTelop::*mState)(); // 0x74
     u32 mUnk7C;                                 // 0x7C
@@ -49,8 +50,11 @@ public:
 class MInput;
 
 // Waits for a telop's tasks to finish, or for the player to skip it.
+class DinoBattleView;
+
 class SkipTelopTask : public MProcess {
 public:
+    inline SkipTelopTask(MTask *task, u8 noSkip);   // (defined where it's used)
     virtual ~SkipTelopTask();
     virtual void Idle();
     virtual void OnFinished() = 0;
@@ -74,6 +78,7 @@ public:
 
 class SkipLoseTelopTask : public SkipTelopTask {
 public:
+    inline SkipLoseTelopTask(DinoBattleView *view, MView *picture, MTask *task);
     virtual ~SkipLoseTelopTask();
     virtual void OnFinished();
     virtual void OnSkipped();

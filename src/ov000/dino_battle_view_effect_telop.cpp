@@ -10,6 +10,8 @@
 #include "m/bg_new_task.h"
 #include "m/call_task.h"
 #include "game/dino_static_init.h"
+#include "m/blend.h"
+#include <algorithm>
 #include "m/observer.h"
 #include "game/dino_battle_view_kaseki_point_menu.h"
 #include "game/dino_battle_view_class.h"
@@ -50,7 +52,9 @@ extern "C" struct {
     u8 unk00[0x10];
     void (DinoBattleViewEffectTelop::*Load_10)();
     void (DinoBattleViewEffectTelop::*State_18)();
-    u8 unk20[0x40 - 0x20];
+    u8 unk20[0x30 - 0x20];
+    void (DinoBattleViewEffectTelop::*State_30)();
+    u8 unk38[0x40 - 0x38];
     void (DinoBattleViewEffectTelop::*Start_40)();
     u8 unk48[0x58 - 0x48];
     void (DinoBattleViewEffectTelop::*State_58)();
@@ -122,6 +126,51 @@ void DinoBattleViewEffectTelop::StateFinish() {
         mSerial.AddTail(((MMessageObserver *)mUnk8C)->CreatePostTask((MMessage *)mUnk90));
     }
     mSerial.AddTail(MTaskExitTransfer::Create(this));
+}
+
+extern "C" const int data_0208a120;   // frames before a telop can be skipped
+
+// Runs task (the telop), letting a press skip it.
+inline SkipTelopTask::SkipTelopTask(MTask *task, u8 noSkip)
+    : MProcess(NULL), mDelay(data_0208a120), mUnk80(0), mNoSkip(noSkip) {
+    MSingleInputHub *hub = new MSingleInputHub(1);
+    mInput = hub->GetInput(0);
+    mParallel.AddTail(hub);
+    hub->EnableTouch();
+    mTasks = new MSerialTaskSet();
+    mParallel.AddTail(mTasks);
+    mTasks->AddTail(task);
+}
+
+inline SkipLoseTelopTask::SkipLoseTelopTask(DinoBattleView *view, MView *picture, MTask *task)
+    : SkipTelopTask(task, view->GetUnk138()) {
+    mView = picture;
+    mView3D = (DinoBattleView3D *)view;
+}
+
+// The lost telop: slides the picture in from above with a bounce, fades the screen behind it, and waits (skippable).
+// NONMATCHING (98%): the game keeps the blend in the lowest stack slot (ours: above the animations), and takes the
+// frames' address from its own literal.
+void DinoBattleViewEffectTelop::StateLose() {
+    int least = 0xDC;
+    int frames = std::max(*(const int *)((const u8 *)&data_ov000_0219387c + 8), least);
+    mPicture->Show();
+    mPicture->SetPosition(MPoint(0, -mPicture->GetHeight()));
+    mParallel.AddTail(mPicture);
+    mState = data_ov000_0219387c.State_30;
+    MBlend *blend = gLcd->mSub->mBlend;
+    blend->SetMode(3);
+    blend->SetTarget1(~mPicture->GetPlaneMask() & 0x3F);
+    blend->SetTarget2(0);
+    MSerialTaskSet *tasks = new MSerialTaskSet(TRUE);
+    tasks->AddTail(blend->CreateFadeRatioAnime(0, 8, 30, 0), new MTimer(90),
+                   mPicture->CreateCoordAnime(MPoint(0, -mPicture->GetHeight()), MPoint(0, 0), 90, -2), new MTimer(30),
+                   mPicture->CreateCoordAnime(MPoint(0, 0), MPoint(0, -10), 20, 2),
+                   mPicture->CreateCoordAnime(MPoint(0, -10), MPoint(0, -20), 20, -2), new MTimer(frames));
+    MParallelTaskSet *skip = new MParallelTaskSet();
+    mParallel.AddTail(skip);
+    skip->AddTail(new SkipLoseTelopTask((DinoBattleView *)mUnk7C, mPicture, tasks));
+    mSerial.AddTail(MTaskSetWaitEmptyTask::Create(skip));
 }
 
 void SetBGModeTask::Execute() {
