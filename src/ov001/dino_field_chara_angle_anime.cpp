@@ -481,6 +481,50 @@ void DinoFieldChara::SetMotion(u32 motion, u8 loop, MFx32 speed) {
     }
 }
 
+// Plays a motion: its model comes from the caches or is loaded (and cached, but for motions 0x15-0x1A), the head
+// goes back on the body's head joint, and the speed goes into the body's speed track.
+// NONMATCHING: the empty tag temporaries of SetSpeed's clear and push_back get the stack bytes in reverse order.
+void DinoFieldChara::ChangeMotion(u32 motion, u8 loop, MFx32 speed) {
+    if (mBody == NULL) {
+        return;
+    }
+    mMotion = motion;
+    mUnk314 = 0;
+    std::map<u32, M3DModelResource>::iterator alt = mMotionModelsAlt.find(motion);
+    if (alt != mMotionModelsAlt.end()) {
+        mModelResource = mMotionModelsAlt[motion];
+    } else {
+        std::map<u32, M3DModelResource>::iterator it = mMotionModels.find(motion);
+        if (it != mMotionModels.end()) {
+            mModelResource = mMotionModels[motion];
+        } else {
+            const char *path = GetMotionModelPath(mMotion);
+            if (path == NULL) {
+                return;
+            }
+            mModelResource = M3DModelResource(std::string(path));
+            if (mMotion < 0x15 || mMotion > 0x1A) {
+                if (mField->IsUnk258()) {
+                    mMotionModelsAlt[mMotion] = mModelResource;
+                } else {
+                    mMotionModels[mMotion] = mModelResource;
+                }
+            }
+        }
+    }
+    mBody->mUnkF4 = loop;
+    mModelResource.Setup(mBody->mModel, 0);
+    mBody->SetFrame(0);
+    mBody->ClearTransformTracks();
+    if (mHead != NULL) {
+        int joint = mBody->mModel->FindJoint("head");
+        if (joint != -1) {
+            mHead->SetParent(mBody, joint);
+        }
+    }
+    mBody->SetSpeed(speed.v);
+}
+
 void DinoFieldChara::StartBehold(u32 target) {
     mBeholdTarget = target;
 }

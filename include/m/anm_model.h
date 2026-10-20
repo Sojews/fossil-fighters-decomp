@@ -70,6 +70,15 @@ public:
         mUnk145 = 1;
         mUnk11B = TRUE;
     }
+    // Plays at a fixed speed (the speed track, 10, holds one key).
+    void SetSpeed(fx32 speed) {
+        MAnmKey key;
+        key.mFrame = 1;
+        key.mMin = key.mMax = speed;
+        mTracks[10].clear();
+        mTracks[10].push_back(key);
+        mUnk11A = TRUE;
+    }
 
     void Init();
     void Load(const char *path, u8 keepPalette);
