@@ -287,11 +287,12 @@ int MTextCanvas::GetPixel(int x, int y) {
     return (row >> ((x & 7) * 4)) & 0xF;
 }
 
+// NONMATCHING: the game loads the tile block's fields later (scheduling).
 void MTextCanvas::SetPixel(int x, int y, int color) {
     MChrBlock *tiles = mTiles;
-    u32 *row = (u32 *)(tiles->addr + tiles->unitSize * ((x >> 3) + mTileSize.x * (y >> 3)) + (y & 7) * 4);
+    u32 *row = (u32 *)(tiles->addr + tiles->unitSize * ((x >> 3) + mTileSize.x * (y >> 3))) + (y & 7);
     int shift = (x & 7) * 4;
-    *row = (color << shift) | (*row & ~(0xF << shift));
+    *row = (*row & ~(0xF << shift)) | (color << shift);
 }
 
 void MTextCanvas::GetLine(int y, void *dest) {
