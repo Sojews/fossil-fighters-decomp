@@ -50,30 +50,6 @@ MRect DinoBattleViewUiAbilityMenuItem::GetFrame() {
 
 #pragma auto_inline off
 
-AttackMenuBarMotion::AttackMenuBarMotion(void *owner, MSmartOam *oam, u32 flags) : MProcess(NULL) {
-    mOwner = owner;
-    mFlags = flags;
-    bool flag1 = (flags & 0x10000) ? true : false;
-    bool flag2 = (flags & 0x20000) ? true : false;
-    Init(oam, (u16)flags, flag1, flag2, false, false);
-}
-
-AttackMenuBarMotion::AttackMenuBarMotion(void *owner, MSmartOam *oam, u32 attack, bool flag1, bool flag2, bool flag3, bool flag4)
-    : MProcess(NULL) {
-    mOwner = owner;
-    mFlags = (u16)attack | (flag1 ? 0x10000 : 0) | (flag2 ? 0x20000 : 0);
-    Init(oam, attack, flag1, flag2, flag3, flag4);
-}
-
-void AttackMenuBarMotion::SetPriority(int priority) {
-    mMotion->SetPriority(priority);
-    mUnk80->SetPriority(priority);
-    mUnk7C->SetPriority(priority);
-    if (mUnk78 != NULL) {
-        mUnk78->SetPriority(priority);
-    }
-}
-
 // Pooled file statics: the parts' offsets from the bar.
 struct AttackMenuBarStatics {
     u32 unk00;
@@ -102,6 +78,22 @@ struct AttackMenuBarStatics2 {
 };
 extern "C" AttackMenuBarStatics data_ov000_021947ac;
 extern "C" AttackMenuBarStatics2 data_ov000_0219482c;
+
+
+AttackMenuBarMotion::AttackMenuBarMotion(void *owner, MSmartOam *oam, u32 flags) : MProcess(NULL) {
+    mOwner = owner;
+    mFlags = flags;
+    bool flag1 = (flags & 0x10000) ? true : false;
+    bool flag2 = (flags & 0x20000) ? true : false;
+    Init(oam, (u16)flags, flag1, flag2, false, false);
+}
+
+AttackMenuBarMotion::AttackMenuBarMotion(void *owner, MSmartOam *oam, u32 attack, bool flag1, bool flag2, bool flag3, bool flag4)
+    : MProcess(NULL) {
+    mOwner = owner;
+    mFlags = (u16)attack | (flag1 ? 0x10000 : 0) | (flag2 ? 0x20000 : 0);
+    Init(oam, attack, flag1, flag2, flag3, flag4);
+}
 
 extern "C" BOOL func_ov000_02179aa0(u32 id);
 
@@ -164,6 +156,16 @@ void AttackMenuBarMotion::Init(MSmartOam *oam, u32 attack, bool flag1, bool flag
     }
     SetPosition(MPoint(0, 0));
     SetPriority(0);
+}
+
+
+void AttackMenuBarMotion::SetPriority(int priority) {
+    mMotion->SetPriority(priority);
+    mUnk80->SetPriority(priority);
+    mUnk7C->SetPriority(priority);
+    if (mUnk78 != NULL) {
+        mUnk78->SetPriority(priority);
+    }
 }
 
 void AttackMenuBarMotion::SetPosition(MPoint pos) {
