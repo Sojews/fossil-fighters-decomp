@@ -3243,6 +3243,7 @@ public:
 class DinoBattleView3DGameSetMotionCancelRequest : public MMessage {
 public:
     DinoBattleView3DGameSetMotionCancelRequest() : MMessage(0x100A2) {}
+    DinoBattleView3DGameSetMotionCancelRequest(u32 unk0C) : MMessage(0x100A2), mUnk0C(unk0C) {}
     virtual u32 GetSize() { return 8; }
     virtual void Write(void *buf) {
         MI_CpuCopy8(&mId, buf, 4);

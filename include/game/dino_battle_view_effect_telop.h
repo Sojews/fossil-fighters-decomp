@@ -61,6 +61,8 @@ public:
     u32 mDelay;         // 0x7C: before it can be skipped
     u8 mUnk80;          // 0x80
     u8 mNoSkip;         // 0x81
+    MView *mView;       // 0x84: the telop's picture
+    class DinoBattleView3D *mView3D;    // 0x88
 };
 
 class SkipWinTelopTask : public SkipTelopTask {

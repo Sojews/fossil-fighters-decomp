@@ -19,6 +19,10 @@
 #include "m/bg.h"
 #include "m/display.h"
 #include "m/lcd.h"
+#include "m/view.h"
+#include "m/bright.h"
+#include "game/dino_message.h"
+#include "game/dino_battle_view_3d.h"
 
 DinoBattleViewEffectTelop::~DinoBattleViewEffectTelop() {
 }
@@ -139,6 +143,68 @@ void SkipTelopTask::Idle() {
         OnSkipped();
         mSerial.AddTail(MTaskExitTransfer::Create(this));
     }
+}
+
+// (Sound settings in main.)
+extern "C" int data_0208a144;
+extern "C" const int data_0208a0ec;
+
+// (Takes the frames by reference: the game reads them after the timer's vtable is set.)
+static inline MTimer *NewTimer(const int &frames) {
+    return new MTimer(frames);
+}
+
+// Slides the picture away, cancels the 3D view's motion and fades out to black.
+void SkipLoseTelopTask::OnSkipped() {
+    mTasks->AddTail(mView->CreateCoordAnime(MPoint(0, -20), MPoint(0, mView->GetHeight()), 120, 1));
+    mParallel.AddTail((new MSerialTaskSet(TRUE))
+                          ->Add(new MTimer(110))
+                          ->Add(mView3D->CreatePostTask(new DinoBattleView3DGameSetMotionCancelRequest(0))));
+    mSerial.AddTail((new MParallelTaskSet(TRUE))
+                        ->Add(gLcd->mMain->mBright->CreateFadeOutToBlack(125, 0))
+                        ->Add(gLcd->mSub->mBright->CreateFadeOutToBlack(125, 0))
+                        ->Add((new MSerialTaskSet(TRUE))
+                                  ->Add(NewTimer(data_0208a0ec))
+                                  ->Add(DinoSoundCreateStopSeTask(0x74, data_0208a144))));
+}
+
+// Slides the picture away and fades out to black.
+void SkipLoseTelopTask::OnFinished() {
+    MSerialTaskSet *stopSe = (new MSerialTaskSet(TRUE))
+                                 ->Add(NewTimer(data_0208a0ec))
+                                 ->Add(DinoSoundCreateStopSeTask(0x74, data_0208a144));
+    mSerial.AddTail((new MParallelTaskSet(TRUE))
+                        ->Add(mView->CreateCoordAnime(MPoint(0, -20), MPoint(0, mView->GetHeight()), 120, 1))
+                        ->Add(gLcd->mMain->mBright->CreateFadeOutToBlack(125, 0))
+                        ->Add(gLcd->mSub->mBright->CreateFadeOutToBlack(125, 0))
+                        ->Add(stopSe));
+}
+
+// Slides the picture away, cancels the 3D view's motion and fades out to white.
+void SkipWinTelopTask::OnSkipped() {
+    mTasks->AddTail(mView->CreateCoordAnime(MPoint(0, 40), MPoint(0, -mView->GetHeight()), 90, 2));
+    mSerial.AddTail(mView3D->CreatePostTask(new DinoBattleView3DGameSetMotionCancelRequest(0)));
+    mParallel.AddTail((new MSerialTaskSet(TRUE))
+                          ->Add(new MTimer(65))
+                          ->Add(mView3D->CreatePostTask(new DinoBattleView3DGameSetMotionCancelRequest(0))));
+    mSerial.AddTail((new MParallelTaskSet(TRUE))
+                        ->Add(gLcd->mMain->mBright->CreateFadeOutToWhite(80, 0))
+                        ->Add(gLcd->mSub->mBright->CreateFadeOutToWhite(80, 0))
+                        ->Add((new MSerialTaskSet(TRUE))
+                                  ->Add(NewTimer(data_0208a0ec))
+                                  ->Add(DinoSoundCreateStopSeTask(0x73, data_0208a144))));
+}
+
+// Slides the picture away and fades out to white.
+void SkipWinTelopTask::OnFinished() {
+    MSerialTaskSet *stopSe = (new MSerialTaskSet(TRUE))
+                                 ->Add(NewTimer(data_0208a0ec))
+                                 ->Add(DinoSoundCreateStopSeTask(0x73, data_0208a144));
+    mSerial.AddTail((new MParallelTaskSet(TRUE))
+                        ->Add(mView->CreateCoordAnime(MPoint(0, 40), MPoint(0, -mView->GetHeight()), 90, 2))
+                        ->Add(gLcd->mMain->mBright->CreateFadeOutToWhite(80, 0))
+                        ->Add(gLcd->mSub->mBright->CreateFadeOutToWhite(80, 0))
+                        ->Add(stopSe));
 }
 
 // The file's static initialization (see dino_static_init.h).
