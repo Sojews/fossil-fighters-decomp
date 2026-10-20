@@ -19,6 +19,12 @@
 #include "game/dino_ui_rv_information.h"
 #include "game/dino_common_window_message_box.h"
 #include <printf.h>
+#include "game/dino_creature_sort.h"
+#include "game/dino_ui_parts_tab_icon_menu_item.h"
+#include "game/dino_ui_field_menu_cursor.h"
+#include "m/input.h"
+#include "m/smart_oam.h"
+#include "m/picture.h"
 
 #pragma auto_inline off
 DinoUiReviveStatusMenu::DinoUiReviveStatusMenu(u32 id, u32 *result, u8 flag)
@@ -142,6 +148,139 @@ template MTask *MCreateCallTask(DinoUiReviveStatusMenu *obj, void (DinoUiReviveS
 #pragma auto_inline reset
 
 #pragma auto_inline off
+
+// The TU's pooled statics (the back button's path and position).
+extern "C" struct {
+    u8 unk00[0x4];
+    const char *mBackPath;      // 0x04
+    u8 unk08[0x18 - 0x8];
+    MPoint mBackPos;            // 0x18
+} data_ov007_02191e78;
+extern "C" struct {
+    void (DinoHelpBase::*Enable_00)();
+} data_ov007_02191ef8;
+// The tabs' help texts.
+extern "C" const u32 data_ov007_02191f9c[4];
+// "%d"-style format of the creature's number.
+extern "C" const char data_ov007_021922d4[];
+extern "C" void func_ov007_02188484(DinoUiReviveStatusMenu *menu);
+extern "C" void func_ov007_02189170(DinoUiReviveStatusMenu *menu);
+extern "C" void func_ov007_0218880c(DinoUiReviveStatusMenu *menu);
+
+extern const u32 data_0208a498;
+extern const u32 data_0208a86c, data_0208a868, data_0208a864;
+extern const int data_02089a4c, data_02089a44;
+// The help areas, and the tabs' frames.
+extern MRect data_020b5920, data_020b5930, data_020b5940;
+extern MRect data_020b58e0[4];
+
+inline DinoUiReviveStatusBackButton::DinoUiReviveStatusBackButton(DinoUiReviveStatusMenu *owner)
+    : DinoUiReviveStatusMenuItem(owner, data_ov007_02191e78.mBackPath, data_ov007_02191e78.mBackPos, data_0208a498) {
+    SetKeys(2);
+    SetMode(4);
+    mMotion->Play(2, 0);
+}
+
+// The excavation settings' section at offset7C (the input repeat is at 0x1C and 0x20).
+static inline const int *GetExcavate7C(MResource<DinoExcavateDefs> &defs) {
+    const DinoExcavateDefs *d = defs.Get();
+    if (d->offset7C == 0) {
+        return NULL;
+    }
+    return (const int *)((const u8 *)d + d->offset7C);
+}
+
+static inline u32 ReviveTotal(const DinoCreatureState &creature) {
+    if (creature.parts[0].level == 0) {
+        return 0;
+    }
+    u32 sum = creature.unk0_8 + (creature.parts[0].level + creature.parts[1].level + creature.parts[2].level +
+                                 creature.parts[3].level);
+    return std::min(kCreatureLevelLimits[0] * 11 + 50, sum);
+}
+
+static inline u32 ReviveLevel(const DinoCreatureState &creature) {
+    if (creature.parts[0].level == 0) {
+        return 0;
+    }
+    return (ReviveTotal(creature) - 50) / kCreatureLevelLimits[0] + 1;
+}
+
+void DinoUiReviveStatusMenu::OnStart() {
+    char number[0x100];
+    SetLinkFallback(1);
+    {
+        MResource<DinoExcavateDefs> delayDefs = gDinoResource->GetExcavateDefs();
+        MResource<DinoExcavateDefs> intervalDefs = gDinoResource->GetExcavateDefs();
+        GetInput()->SetRepeat(0xF0, GetExcavate7C(delayDefs)[7], GetExcavate7C(intervalDefs)[8]);
+    }
+    mKasekiDefs = gDinoResource->LoadKasekiDefs();
+    mOam = new MSmartOam(0xA, 0, TRUE);
+    mUnkDC = new MParallelTaskSet();
+    mParallel.AddTail(mUnkDC);
+    mParallel.AddTail(mHelp134 = new DinoHelpDummyItem(GetDisplay(), data_020b5920,
+                                                       std::string(gDinoResource->GetText(data_0208a86c))));
+    mParallel.AddTail(
+        new DinoHelpDummyItem(GetDisplay(), data_020b5930, std::string(gDinoResource->GetText(data_0208a868))));
+    mParallel.AddTail(mHelp138 = new DinoHelpDummyItem(GetDisplay(), data_020b5940,
+                                                       std::string(gDinoResource->GetText(data_0208a864))));
+    mBack = new DinoUiReviveStatusBackButton(this);
+    AddItem(mBack);
+    int i = 0;
+    const MRect *frames = data_020b58e0;
+    const u32 *texts = data_ov007_02191f9c;
+    for (; i < 4; i++) {
+        mItems[i] = new DinoUiPartsTabIconMenuItem(*texts, *frames);
+        AddItem(mItems[i]);
+        texts++;
+        frames++;
+    }
+    func_ov007_02189170(this);
+    AddLink(mItems[0], 3, mBack);
+    AddLink(mBack, 1, mItems[0]);
+    mCursorTasks = new MParallelTaskSet();
+    mCursor = new DinoUiFieldMenuCursor(mOam);
+    mParallel.AddTail(mCursor);
+    mCursor->SetPriority(2);
+    mCursor->Hide();
+    mParallel.AddTail(mCursorTasks);
+    mParallel.AddTail(mOam);
+    mInfo = new DinoUiRvInformation(0);
+    mParallel.AddTail(mInfo);
+    if (mUnk118) {
+        mInfo->Unk02156ee8(*(DinoCreatureInfo *)&mCreature2);
+    } else {
+        mInfo->Unk02156ee8(*(DinoCreatureInfo *)&mCreature);
+    }
+    gCurrentDisplay = gLcd->GetTopDisplay();
+    sprintf(number, data_ov007_021922d4, mCreature.index);
+    mParallel.AddTail(mNumber = new MTextPicture(std::string(number), TRUE, false));
+    mNumber->Show();
+    mNumber->SetPriority(2);
+    gCurrentDisplay = gLcd->GetBottomDisplay();
+    mItems[1]->SetKeys(0x400);
+    mItems[3]->SetKeys(0x800);
+    if (mUnk118) {
+        FadeIn();
+        if (ReviveLevel(mCreature2) > ReviveLevel(mCreature)) {
+            func_ov007_02188484(this);
+            DinoSoundPlaySe(data_02089a4c, 0);
+        } else {
+            DinoSoundPlaySe(data_02089a44, 0);
+        }
+        func_ov007_0218880c(this);
+        ShowLearnedAttacks();
+        Disable();
+        MTask *focus = CreateFocusItemTransfer(mItems[0]);
+        MTask *enable = MCreateCallTask(this, data_ov007_02191ef8.Enable_00);
+        MSerialTaskSet *serial = &mSerial;
+        serial->AddTail(enable);
+        serial->AddTail(focus);
+    } else {
+        FocusItem(mItems[0]);
+        FadeIn();
+    }
+}
 
 DinoUiReviveStatusMenuItem::DinoUiReviveStatusMenuItem(DinoUiReviveStatusMenu *owner, const std::string &path, MPoint pos, u32 textId) {
     mOwner = owner;

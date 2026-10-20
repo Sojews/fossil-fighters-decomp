@@ -18,6 +18,8 @@
 #include "game/dino_field_camera_hook.h"
 
 class MSmartOam;
+class MTextPicture;
+class DinoUiReviveStatusMenuItem;
 class DinoUiReviveStatusParts : public MProcess {
 public:
     virtual ~DinoUiReviveStatusParts();
@@ -53,12 +55,13 @@ public:
 
     u8 unkB3[1];
     MSmartOam *mOam;        // 0xB4: the items' sprites
-    u8 unkB8[4];
+    DinoUiReviveStatusMenuItem *mBack;  // 0xB8
     MMenuItem *mItems[4];   // 0xBC
-    MSerialTaskSet *mCursorTasks;   // 0xCC
+    MParallelTaskSet *mCursorTasks; // 0xCC
     DinoUiFieldMenuCursor *mCursor; // 0xD0
     DinoUiRvInformation *mInfo;     // 0xD4
-    u8 unkD8[0xE0 - 0xD8];
+    MTextPicture *mNumber;  // 0xD8: the creature's number (top screen)
+    MParallelTaskSet *mUnkDC;   // 0xDC
     MTaskSet *mUnkE0;       // 0xE0: waited on before leaving
     DinoCreatureState mCreature;    // 0xE4
     DinoCreatureState mCreature2;   // 0xFC
@@ -68,8 +71,10 @@ public:
     u8 mUnk120;             // 0x120
     u8 mFlag;               // 0x121
     u8 mUnk122;             // 0x122
-    MResource<DinoMessageData> mMessages;   // 0x124
-    u8 unk134[0x160 - 0x134];
+    MResource<DinoKasekiDefs> mKasekiDefs;  // 0x124
+    DinoHelpDummyItem *mHelp134;    // 0x134
+    DinoHelpDummyItem *mHelp138;    // 0x138
+    u8 unk13C[0x160 - 0x13C];
 };
 
 class DinoUiReviveStatusLoop : public MProcess {
@@ -126,6 +131,7 @@ public:
 
 class DinoUiReviveStatusBackButton : public DinoUiReviveStatusMenuItem {
 public:
+    DinoUiReviveStatusBackButton(DinoUiReviveStatusMenu *owner);
     virtual ~DinoUiReviveStatusBackButton();
     virtual void OnFocusChanged(BOOL focused);
     virtual void OnDecide();
