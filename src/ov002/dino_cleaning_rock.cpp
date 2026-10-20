@@ -4,6 +4,7 @@
 #include "game/dino_cleaning_image.h"
 #include "game/dino_cleaning_image_layer.h"
 #include "m/fx32.h"
+#include "game/dino_static_init.h"
 
 DinoCleaningRock::DinoCleaningRock(u32 arg0, DinoCleaningImage *image, u32 arg2, fx32 scale) : MProcess(NULL) {
     mUnk74 = arg0;
@@ -92,3 +93,12 @@ MFx32 DinoCleaningRock::Hit(int row, int col, MFx32 power) {
     mHardness[row][col] = MFx32(0);
     return power;
 }
+
+// The file's static initialization (see dino_static_init.h).
+extern "C" u32 data_ov002_02165730[];
+#pragma always_inline on
+static struct DinoCleaningRockStaticInit {
+    DinoCleaningRockStaticInit() {
+        DINO_COMMON_LAYOUT_INIT(data_ov002_02165730, 0x0, 0x38, 0x18, 0x10, 0x48, 0x58, 0x60, 0x68);
+    }
+} sDinoCleaningRockStaticInit;

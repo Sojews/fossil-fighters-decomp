@@ -12,6 +12,7 @@
 #include "game/dino_common_window_message_box.h"
 #include "m/lcd.h"
 #include <string.h>
+#include "game/dino_static_init.h"
 
 DinoCleaningReport::~DinoCleaningReport() {
 }
@@ -75,3 +76,11 @@ void DinoCleaningReport::State02156808() {
     ((u32 *)((DinoCleaning *)mUnk7C)->mUnkA0)[4] = mAnswer == 1 ? 3 : 4;
     Exit();
 }
+
+// The file's static initialization (see dino_static_init.h).
+#pragma always_inline on
+static struct DinoCleaningReportStaticInit {
+    DinoCleaningReportStaticInit() {
+        DINO_COMMON_LAYOUT_INIT(data_ov002_02163e60, 0xc, 0x74, 0x24, 0x2c, 0x84, 0x54, 0x5c, 0x64);
+    }
+} sDinoCleaningReportStaticInit;

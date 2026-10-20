@@ -12,6 +12,7 @@
 #include "game/dino_sound.h"
 #include "game/dino_common_live.h"
 #include "game/dino_cleaning.h"
+#include "game/dino_static_init.h"
 
 DinoCleaningDummyItem::~DinoCleaningDummyItem() {
 }
@@ -155,3 +156,14 @@ void DinoCleaningToolMenu::DisableItem() {
 DinoCleaningToolMenu::DinoCleaningToolMenu(u32 arg0, u32 arg1, u32 arg2)
     : MMenu(0), mUnkA8(arg0), mUnkAC(arg1), mUnkB0(arg2) {
 }
+
+// The file's static initialization (see dino_static_init.h).
+// NONMATCHING: scheduling. The game hoists the screen rect's zero half (past the pool's 0x80 anchor) above the
+// screen size's stores; mwcc treats our pool accesses as one object and keeps them in order.
+extern "C" u32 data_ov002_02165418[];
+#pragma always_inline on
+static struct DinoCleaningDummyItemStaticInit {
+    DinoCleaningDummyItemStaticInit() {
+        DINO_COMMON_LAYOUT_INIT(data_ov002_02165418, 0x18, 0x8c, 0x38, 0x30, 0x7c, 0x9c, 0xa4, 0xac);
+    }
+} sDinoCleaningDummyItemStaticInit;

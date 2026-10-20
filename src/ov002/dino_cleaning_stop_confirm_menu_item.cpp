@@ -11,6 +11,7 @@
 #include "game/dino_se_motion.h"
 #include "game/dino_cleaning_stop_confirm_menu_item_menu.h"
 #include "game/dino_cleaning_stop_confirm_menu_item.h"
+#include "game/dino_static_init.h"
 
 DinoCleaningStopConfirmMenuItem::~DinoCleaningStopConfirmMenuItem() {
 }
@@ -199,3 +200,13 @@ void DinoCleaningSleep::Start() {
     GetParallel()->AddTail(mMotion, oam);
     mState = data_ov002_02163f40.StateClose_50;
 }
+
+// The file's static initialization (see dino_static_init.h).
+// NONMATCHING: scheduling. The game hoists the screen rect's zero half (past the pool's 0x80 anchor) above the
+// screen size's stores; mwcc treats our pool accesses as one object and keeps them in order.
+#pragma always_inline on
+static struct DinoCleaningStopConfirmMenuItemStaticInit {
+    DinoCleaningStopConfirmMenuItemStaticInit() {
+        DINO_COMMON_LAYOUT_INIT(data_ov002_02163f40, 0x30, 0x94, 0x28, 0x58, 0xa4, 0xb4, 0xbc, 0xc4);
+    }
+} sDinoCleaningStopConfirmMenuItemStaticInit;

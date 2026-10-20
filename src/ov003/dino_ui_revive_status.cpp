@@ -31,6 +31,7 @@
 #include "game/dino_resource.h"
 #include "game/dino_sound.h"
 #include "game/dino_event_talk_window.h"
+#include "game/dino_static_init.h"
 
 DinoUiReviveStatus::~DinoUiReviveStatus() {
 }
@@ -568,3 +569,11 @@ void DinoReviveStatusStateAnchor(DinoCreatureState *a, const DinoCreatureState &
 // (Empty; nothing in the game calls it.)
 extern "C" void func_ov003_0215cf1c() {
 }
+
+// The file's static initialization (see dino_static_init.h).
+#pragma always_inline on
+static struct DinoUiReviveStatusStaticInit {
+    DinoUiReviveStatusStaticInit() {
+        DINO_COMMON_LAYOUT_INIT(data_ov003_02161d20, 0x7c, 0x1e4, 0x44, 0xb4, 0x1f4, 0x214, 0x21c, 0x204);
+    }
+} sDinoUiReviveStatusStaticInit;

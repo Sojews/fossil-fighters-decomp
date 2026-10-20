@@ -6,6 +6,7 @@
 #include "game/dino_common_live.h"
 #include "game/dino_sound.h"
 #include "m/input.h"
+#include "game/dino_static_init.h"
 
 extern "C" void func_ov002_0215fdec(DinoCleaningKasekiRock *rock);
 
@@ -50,3 +51,12 @@ void DinoCleaningBlower::Idle() {
         func_ov002_0215fdec(mCleaning->GetKasekiRock());
     }
 }
+
+// The file's static initialization (see dino_static_init.h).
+extern "C" u32 data_ov002_02164da4[];
+#pragma always_inline on
+static struct DinoCleaningBlowerStaticInit {
+    DinoCleaningBlowerStaticInit() {
+        DINO_COMMON_LAYOUT_INIT(data_ov002_02164da4, 0x0, 0x38, 0x18, 0x10, 0x48, 0x58, 0x60, 0x68);
+    }
+} sDinoCleaningBlowerStaticInit;

@@ -19,6 +19,7 @@ src/ov003/ov003_0215b008.cpp:
 
 src/ov003/dino_ui_revive_status.cpp:
     .text       start:0x0215b98c end:0x021601e0
+    .init       start:0x021605c0 end:0x02160638
 
 src/ov003/dino_ui_field_menu_cursor.cpp:
     .text       start:0x0215838c end:0x021584d4

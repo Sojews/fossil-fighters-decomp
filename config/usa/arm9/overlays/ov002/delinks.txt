@@ -20,9 +20,11 @@ src/ov002/dino_cleaning_score.cpp:
 
 src/ov002/dino_cleaning_blower.cpp:
     .text       start:0x0215c86c end:0x0215c998
+    .init       start:0x021639c4 end:0x02163a28
 
 src/ov002/dino_cleaning_xray.cpp:
     .text       start:0x0215c9fc end:0x0215caac
+    .init       start:0x02163a8c end:0x02163af8
 
 src/ov002/dino_cleaning_hammer.cpp:
     .text       start:0x0215caac end:0x0215d82c
@@ -32,27 +34,34 @@ src/ov002/dino_cleaning_drill.cpp:
 
 src/ov002/dino_cleaning_dummy_item.cpp:
     .text       start:0x0215e370 end:0x0215efc8
+    .init       start:0x02163c40 end:0x02163cac
 
 src/ov002/dino_cleaning_rock.cpp:
     .text       start:0x0215efc8 end:0x0215f218
+    .init       start:0x02163cac end:0x02163d10
 
 src/ov002/dino_cleaning_stop_confirm_menu_item.cpp:
     .text       start:0x021568c4 end:0x021571e0
+    .init       start:0x021635e0 end:0x0216364c
 
 src/ov002/dino_cleaning_report.cpp:
     .text       start:0x021558a0 end:0x021568c4
+    .init       start:0x02163574 end:0x021635e0
 
 src/ov002/dino_cleaning_tutorial_window.cpp:
     .text       start:0x021571e0 end:0x02157280
+    .init       start:0x0216364c end:0x021636b8
 
 src/ov002/dino_cleaning_timer.cpp:
     .text       start:0x0215c2f8 end:0x0215c86c
 
 src/ov002/dino_cleaning_tool.cpp:
     .text       start:0x0215c998 end:0x0215c9fc
+    .init       start:0x02163a28 end:0x02163a8c
 
 src/ov002/dino_cleaning_live_task.cpp:
     .text       start:0x02158018 end:0x02158230
+    .init       start:0x02163730 end:0x0216379c
 
 src/ov002/dino_cleaning_image_layer.cpp:
     .text       start:0x02158448 end:0x02158b5c

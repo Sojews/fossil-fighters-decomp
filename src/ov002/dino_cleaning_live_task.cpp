@@ -6,6 +6,7 @@
 #include "game/dino_cleaning_live_task.h"
 #include "game/dino_cleaning_talk_window.h"
 #include "game/dino_cleaning_tutorial_window.h"
+#include "game/dino_static_init.h"
 
 extern "C" void func_ov002_021573e8(DinoCleaningTalkWindow *window);
 extern "C" void func_ov002_0215785c(DinoCleaningTalkWindow *window);
@@ -35,3 +36,12 @@ void DinoCleaningLive::Close() {
 
 DinoCleaningLive::~DinoCleaningLive() {
 }
+
+// The file's static initialization (see dino_static_init.h).
+extern "C" u32 data_ov002_021644b4[];
+#pragma always_inline on
+static struct DinoCleaningLiveTaskStaticInit {
+    DinoCleaningLiveTaskStaticInit() {
+        DINO_COMMON_LAYOUT_INIT(data_ov002_021644b4, 0x14, 0x5c, 0x1c, 0x4, 0x6c, 0x7c, 0x84, 0x8c);
+    }
+} sDinoCleaningLiveTaskStaticInit;
