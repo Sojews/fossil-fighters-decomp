@@ -225,5 +225,7 @@ void DinoSoundMainTask::OnPostLoop() {
     func_020031e8();
 }
 
+// (It calls the replace in dino_resource.cpp.)
+template <> std::string &std::string::replace(std::string::size_type pos, std::string::size_type n, const char *s);
 // A string member the game emits at the end of this file.
 template std::string &std::string::operator=(const char *s);

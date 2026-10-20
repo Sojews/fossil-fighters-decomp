@@ -1081,6 +1081,8 @@ void MMotionWaitStopTask::Execute() {
 
 #pragma auto_inline off
 // Vector members the game emits at the end of this file (made explicitly until the code using them is decompiled).
+// (append calls region.cpp's grow_by.)
+template <> size_t std::__vec_deleter<MRect, std::allocator<MRect> >::grow_by(size_t n);
 template void std::__vec_deleter<MRect, std::allocator<MRect> >::append(size_t n, Metrowerks::int2type<true>);
 template void std::__vec_deleter<MRect, std::allocator<MRect> >::append_realloc(size_t n);
 template void std::__vec_deleter<MArchiveFile, std::allocator<MArchiveFile> >::append_realloc(size_t n, const MArchiveFile &x);

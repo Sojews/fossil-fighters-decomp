@@ -10,6 +10,10 @@
 #include "m/archive.h"
 #include "nitro/pm.h"
 
+// (The game calls help.cpp's copy.)
+template <> std::__list_imp<void *, std::allocator<void *> >::iterator
+std::__list_imp<void *, std::allocator<void *> >::erase(iterator first, iterator last);
+
 #define HW_BOOT_TYPE (*(volatile u16 *) 0x027FFC40)
 #define HW_BUTTON_XY (*(volatile u16 *) 0x027FFFA8)
 #define BOOT_TYPE_DOWNLOAD 2

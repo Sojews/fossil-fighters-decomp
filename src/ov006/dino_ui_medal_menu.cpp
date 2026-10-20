@@ -330,6 +330,22 @@ void DinoUiMedalMenu::SetSort(u8 sort) {
     }
 }
 
+// The creature lists' sorts and their push_back are the ones ov006_02178b80.cpp emits.
+namespace std {
+template <>
+void stable_sort(__vec_iterator<u32> first, __vec_iterator<u32> last, DinoCreatureByVoice comp);
+template <>
+void stable_sort(__vec_iterator<u32> first, __vec_iterator<u32> last, DinoCreatureByUnk88 comp);
+template <>
+void stable_sort(__vec_iterator<u32> first, __vec_iterator<u32> last, DinoCreatureByLevel comp);
+template <>
+void stable_sort(__vec_iterator<u32> first, __vec_iterator<u32> last, DinoCreatureByUnk0D comp);
+template <>
+void stable_sort(__vec_iterator<u32> first, __vec_iterator<u32> last, DinoCreatureByUnk02031104 comp);
+template <>
+void __vec_deleter<u32, allocator<u32> >::sub_push_back(const u32 &x, Metrowerks::int2type<true>);
+}  // namespace std
+
 void DinoUiMedalMenu::LoadCreatures() {
     mCreatures.clear();
     for (u32 id = 1; id <= gDinoResource->GetCreatureCount() - 1; id++) {
@@ -492,7 +508,7 @@ void DinoUiMedalMenu::FinishPageLeft() {
 
 #pragma auto_inline off
 // Vector instances the game emits in this file (made explicitly until the code that uses them is decompiled).
-template class std::__vec_deleter<u32, std::allocator<u32> >;
+template void std::__vec_deleter<u32, std::allocator<u32> >::reallocate_clear(std::__vec_deleter<u32, std::allocator<u32> >::size_type, std::__vec_deleter<u32, std::allocator<u32> >::size_type);
 template void std::__vec_deleter<MMotionFile, std::allocator<MMotionFile> >::sub_push_back(const MMotionFile &x, Metrowerks::int2type<false>);
 template void std::__vec_deleter<u32, std::allocator<u32> >::assign<u32 *>(u32 *first, u32 *last, Metrowerks::int2type<true>);
 

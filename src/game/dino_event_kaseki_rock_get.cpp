@@ -12,6 +12,9 @@
 #include "game/dino_resource.h"
 #include "m/text_codec.h"
 
+// (The game calls dino_resource.cpp's copy.)
+template <> MResource<DinoMessageData>::MResource(std::string path);
+
 DinoEventKasekiRockGet::~DinoEventKasekiRockGet() {
 }
 

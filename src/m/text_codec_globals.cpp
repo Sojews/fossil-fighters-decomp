@@ -7,6 +7,9 @@
 #include <string>
 #include <vector>
 
+// (The game calls dino_se_motion.cpp's copy.)
+template <> std::__vec_deleter<void *, std::allocator<void *> >::~__vec_deleter();
+
 // (The element types' names are made up; nothing reads them.)
 struct MUnusedEntry10 {
     u32 unk0;

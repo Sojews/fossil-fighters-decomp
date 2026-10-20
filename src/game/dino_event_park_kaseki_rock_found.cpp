@@ -15,6 +15,9 @@
 #include "game/dino_event_talk_window.h"
 #include "nitro/mi.h"
 
+// (The game calls dino_resource.cpp's copy.)
+template <> MResource<DinoMessageData>::MResource(std::string path);
+
 DinoEventParkKasekiRockFound::~DinoEventParkKasekiRockFound() {
 }
 

@@ -321,6 +321,11 @@ void stable_sort(__vec_iterator<u32> first, __vec_iterator<u32> last, DinoCreatu
 template <>
 template <>
 void __vec_deleter<u32, allocator<u32> >::assign(u32 *first, u32 *last, Metrowerks::int2type<true>);
+// (ov006_02178b80.cpp's and the medal menu's copies.)
+template <>
+pair<u32 *, ptrdiff_t> get_temporary_buffer<u32>(ptrdiff_t len);
+template <>
+void __vec_deleter<MMotionFile, allocator<MMotionFile> >::erase_at_end(size_t n, Metrowerks::int2type<false>);
 }  // namespace std
 
 // NONMATCHING: clear()'s tag byte takes another stack slot; the medal menu's identical code matches under
