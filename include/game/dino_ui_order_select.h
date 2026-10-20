@@ -115,7 +115,7 @@ public:
     MResource<DinoKasekiDefs> mKasekiDefs;      // 0x20C
     DinoHelpDummyItem *mHelp21C;    // 0x21C: help areas on the top screen
     DinoHelpDummyItem *mHelp220;    // 0x220
-    u8 unk224[0x248 - 0x224];
+    DinoHelpDummyItem *mPageHelps[9];   // 0x224: the information page's help areas
     DinoHelpDummyItem *mHelps[7];   // 0x248
 };
 
