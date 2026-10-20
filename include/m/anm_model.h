@@ -148,6 +148,10 @@ public:
     virtual void Unk10();
 
     M3DModel *mParticles[32];           // 0x1A8
+    fx32 mBirthFrames[32];              // 0x228
+    int mSpeeds[32];                    // 0x2A8: how far each particle moves along its z axis a frame
+    MtxFx44 mMatrices[32];              // 0x328: the emitter's matrix when each was emitted
+    u32 mNext;                          // 0xB28: the next particle to emit (mod 32)
 };
 
 class MAnmTargetCamera : public MAnmModelBase {

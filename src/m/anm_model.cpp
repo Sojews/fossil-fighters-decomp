@@ -381,6 +381,105 @@ MAnmModelBase::~MAnmModelBase() {
 }
 #pragma auto_inline reset
 
+// Emits a particle (a copy of the model, placed by the transform tracks) every so often, and moves the live ones
+// along their z axes.
+// NONMATCHING: the game loads a particle's speed before the particle (r1/r0 swapped).
+void MAnmEmit::Unk0C() {
+    if (!mLoaded) {
+        return;
+    }
+    if (mFrame >= mStartFrame) {
+        int emitted = -1;
+        PlaySounds(mFrame - mStartFrame);
+        mUnk140 = (u32)(mFrame - mStartFrame) % (mModel->GetFrameCount() << 4);
+        if (mLoopEnd <= mFrame) {
+            emitted = mNext & 31;
+            mNext++;
+            M3DModel *model = mModel;
+            M3DModel *particle = mParticles[emitted];
+            particle->mUnkDC = model->mUnkDC;
+            particle->mTexKey = model->mTexKey;
+            particle->mPlttKey = model->mPlttKey;
+            particle->Unk08((void *)model->mModelRes, (void *)model->mAnimRes, TRUE);
+            mParticles[emitted]->SetUnk10(mFollowParent);
+            mBirthFrames[emitted] = mFrame;
+            mPos.x = mPos.y = mPos.z = 0;
+            if (mTracks[0].size() != 0) {
+                mPos.x = GetValue(0, mFrame - mStartFrame);
+            }
+            if (mTracks[1].size() != 0) {
+                mPos.y = GetValue(1, mFrame - mStartFrame);
+            }
+            if (mTracks[2].size() != 0) {
+                mPos.z = GetValue(2, mFrame - mStartFrame);
+            }
+            if (mPosRef != NULL) {
+                mPos.x += mPosRef->x;
+                mPos.y += mPosRef->y;
+                mPos.z += mPosRef->z;
+            }
+            mModel->SetTranslation(&mPos);
+            VecFx32 v;
+            v.x = v.y = v.z = 0;
+            if (mTracks[3].size() != 0) {
+                v.x = (u16)(GetValue(3, mFrame - mStartFrame) * 16 / 360);
+            }
+            if (mTracks[4].size() != 0) {
+                v.y = (u16)(GetValue(4, mFrame - mStartFrame) * 16 / 360);
+            }
+            if (mTracks[5].size() != 0) {
+                v.z = (u16)(GetValue(5, mFrame - mStartFrame) * 16 / 360);
+            }
+            mParticles[emitted]->SetRotation(&v);
+            mModel->SetRotation(&v);
+            v.x = v.y = v.z = FX32_ONE;
+            mParticles[emitted]->SetScale(&v);
+            mModel->SetScale(&v);
+            mPos.x = mModel->GetMatrix()->_30;
+            mPos.y = mModel->GetMatrix()->_31;
+            mPos.z = mModel->GetMatrix()->_32;
+            mParticles[emitted]->SetTranslation(&mPos);
+            MtxFx44 *matrix = &mMatrices[emitted];
+            MI_CpuCopy32(&mMatrix, matrix, sizeof(MtxFx44));
+            mParticles[emitted]->mUnkC4 = matrix;
+            if (mTracks[6].size() != 0) {
+                mParticles[emitted]->SetUnk1C(GetValue(6, mFrame - mStartFrame));
+            }
+            mSpeeds[emitted] = 0x100;
+            if (mTracks[8].size() != 0) {
+                mSpeeds[emitted] = GetValue(8, mFrame - mStartFrame);
+            }
+            mParticles[emitted]->SetPolygonId(unk100 + emitted);
+            mLoopEnd = mFrame + 16;
+            if (mTracks[7].size() != 0) {
+                mLoopEnd = mFrame + (GetValue(7, mFrame - mStartFrame) >> 8);
+            }
+            MAnmSetModelFrame(mParticles[emitted], 0);
+        }
+        for (int i = 0; i < 32; i++) {
+            if (mParticles[i]->GetUnk10()) {
+                mParticles[i]->SetUnk10(mFollowParent);
+                if (emitted != i) {
+                    int speed = mSpeeds[i];
+                    M3DModel *particle = mParticles[i];
+                    particle->mTrans.x += particle->mMatrix._20 * speed >> FX32_SHIFT;
+                    particle->mTrans.y += particle->mMatrix._21 * speed >> FX32_SHIFT;
+                    particle->mTrans.z += particle->mMatrix._22 * speed >> FX32_SHIFT;
+                    particle->mMatrixValid = FALSE;
+                    particle = mParticles[i];
+                    particle->mFrame += 16;
+                    if (particle->IsAnimDone()) {
+                        particle->mFrame = (((const u32 *)particle->mModelRes)[8] - 1) * 16;
+                    }
+                }
+                if (mParticles[i]->IsAnimDone()) {
+                    mParticles[i]->SetUnk10(mVisible);
+                }
+            }
+        }
+    }
+}
+
 // NONMATCHING: the game keeps the sine table's address in a register and works out both angles' indices first.
 // Aims the scene's camera: orbits the target (tracks 3, 4: angles, 6: distance), smoothed (11), with the field of
 // view (7) and a sway (8, 9: amounts, 10: period).
