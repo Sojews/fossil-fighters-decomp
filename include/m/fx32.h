@@ -164,8 +164,9 @@ inline MFx32Point operator/(const MFx32Point &a, MFx32 b) {
 inline MFx32 MFx32Point::Length() const {
     MFx32 r;
     s64 xx = x.v;
+    s64 yy = y.v;
     *(vu16 *) 0x040002B0 = 1;
-    *(vu64 *) 0x040002B8 = (s64) y.v * y.v + 0x1000 + xx * xx;
+    *(u64 *) 0x040002B8 = yy * yy + 0x1000 + xx * xx;
     while (*(vu16 *) 0x040002B0 & 0x8000) {
     }
     r.v = *(vu32 *) 0x040002B4;
