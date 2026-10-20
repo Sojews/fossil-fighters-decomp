@@ -46,6 +46,8 @@ public:
     void *mUnk138;  // 0x138
     u8 unk13C[4];
     void *mUnk140;  // 0x140
+    u32 unk144[3];
+    int mUnk150;    // 0x150
 };
 
 struct DinoBattleParams;

@@ -57,6 +57,8 @@ public:
 
     void SetView(class DinoBattleView *view);
     void SetUnk24(u32 value);
+    // A number a tutorial text shows (by kind: the creatures' life, points, attack costs, ...).
+    u32 GetValue(u32 kind);
 
     u32 mId;                                    // 0x04
     u32 mUnk08;                                 // 0x08

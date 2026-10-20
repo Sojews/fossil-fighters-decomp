@@ -1417,7 +1417,7 @@ _Z25DinoCreatePostAndWaitTaskI14DinoBattleView37DinoBattleViewTutorialSetArroeRe
 _Z25DinoCreatePostAndWaitTaskI14DinoBattleView35DinoBattleViewTutorialWindowRequestEP5MTaskPT_PT0_ kind:function(thumb,size=0xb0) addr:0x0218f52c
 _ZN18DinoBattleTutorial7SetViewEP14DinoBattleView kind:function(thumb,size=0x10) addr:0x0218f5dc
 _ZN18DinoBattleTutorial8SetUnk24Em kind:function(thumb,size=0x4) addr:0x0218f5ec
-func_ov000_0218f5f0 kind:function(thumb,size=0x18c) addr:0x0218f5f0
+_ZN18DinoBattleTutorial8GetValueEm kind:function(thumb,size=0x18c) addr:0x0218f5f0
 _ZN19SetToturialFlagTask7ExecuteEv kind:function(thumb,size=0x1e) addr:0x0218f77c
 _ZN19SetToturialFlagTaskD1Ev kind:function(thumb,size=0x2) addr:0x0218f79c
 _ZN19SetToturialFlagTaskD0Ev kind:function(thumb,size=0xc) addr:0x0218f7a0
