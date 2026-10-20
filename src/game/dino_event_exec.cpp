@@ -3,6 +3,7 @@
 #pragma ipa file
 
 #include "game/dino_event_exec.h"
+#include "game/dino_field_point.h"
 #include "game/common_window_message.h"
 #include "game/dino_common_window_menu_item_flush_task_menu.h"
 #include "game/dino_field_area_panel.h"
@@ -951,6 +952,53 @@ void DinoEventExecTalk::Idle() {
 }
 
 extern "C" const char data_020bff48[]; // ""
+
+extern "C" const u32 data_0208adac, data_0208adb0; // the help for the donation and money panels
+
+// Asks with the text's lines as choices, in a menu or under a talk window's question, and keeps the answer in a local
+// variable.
+// NONMATCHING: the game gets the field (for a panel's frame) before the bottom display, and swaps r4/r5 for the window.
+void DinoEventExecChoice::Idle() {
+    switch (mStep++) {
+    case 0:
+        break;
+    case 1: {
+        MDisplayScope scope(gLcd->GetBottomDisplay());
+        mUnk88 = gDinoBackup->GetLocalVar(mUnk78);
+        std::vector<DinoWindowChoice> choices;
+        std::vector<std::string> lines = MSplitString(mEvent->GetTalkText(mUnk7C), '\n');
+        for (u32 i = 0; i < lines.size(); i++) {
+            choices.push_back(DinoWindowChoice(i, std::string(lines[i]), std::string(data_020bff48)));
+        }
+        if (mUnk80 == 0) {
+            mSerial.AddTail(new DinoCommonWindowMenu(&mUnk88, MPoint(0xF0, 0x10), &choices, 1));
+        } else {
+            DinoEventTalkWindow *window = new DinoEventTalkWindow(gCurrentDisplay, mEvent->GetTalkText(mUnk80),
+                                                                  (int)mEvent->GetField()->GetOam(), 0);
+            window->SetChoices((u32)&mUnk88, MPoint(0xFE, 0x8E), choices, 3);
+            if (mUnk8C) {
+                window->AddEntry((u32)gLcd->GetTopDisplay(), MRect(0, 0, 256, 192),
+                                 std::string(gDinoResource->GetText(mUnk8C)));
+            }
+            if (mEvent->GetField()->mMoney) {
+                window->AddEntry((u32)gLcd->GetBottomDisplay(), mEvent->GetField()->mMoney->GetFrame(),
+                                 std::string(gDinoResource->GetText(data_0208adb0)));
+            }
+            if (mEvent->GetField()->mDonate) {
+                window->AddEntry((u32)gLcd->GetBottomDisplay(), mEvent->GetField()->mDonate->GetFrame(),
+                                 std::string(gDinoResource->GetText(data_0208adac)));
+            }
+            mSerial.AddTail(window);
+        }
+        break;
+    }
+    case 2:
+        gDinoBackup->SetLocalVar(mUnk78, mUnk88);
+        Exit();
+        break;
+    }
+}
+
 
 // Asks with a window of choices (the text's first line titles it) and keeps the answer in a local variable.
 // (The game calls vector<string>'s destructor out of line here; ours inlines it to the base's, same instructions.)
