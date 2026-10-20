@@ -100,13 +100,17 @@ extern "C" struct {
     void (DinoUiReviveEffect::*State0215da04_54)(); // 0x54
 
     void (DinoUiReviveEffect::*StateWait_5C)();     // 0x5C
-    u8 unk64[0x74 - 0x64];
+    void (DinoUiReviveEffect::*State0215dc30_64)(); // 0x64
+    u8 unk6C[0x74 - 0x6C];
     void (DinoUiReviveStatus::*Start_74)();         // 0x74
     u8 unk7C[0x84 - 0x7C];
     void (DinoUiReviveEffect::*State0215ee24_84)(); // 0x84
     u8 unk8C[0x94 - 0x8C];
     void (DinoUiReviveEffect::*Start_94)();         // 0x94
-    u8 unk9C[0xCC - 0x9C];
+    void (DinoUiReviveEffect::*StartWait_9C)();     // 0x9C
+    u8 unkA4[0xAC - 0xA4];
+    void (DinoUiReviveEffect::*State0215e030_AC)(); // 0xAC
+    u8 unkB4[0xCC - 0xB4];
     void (DinoUiReviveEffect::*State0215e274_CC)(); // 0xCC
     u8 unkD4[0xE4 - 0xD4];
     void (DinoUiReviveEffect::*State0215ec2c_E4)(); // 0xE4
@@ -160,6 +164,83 @@ void DinoUiReviveEffect::State0215e030() {
     if (mEffectTasks->IsEmpty()) {
         mState = data_ov003_02161d20.State0215e220_FC;
     }
+}
+
+std::string DinoReplaceTag(std::string text, std::string tag, std::string value);
+int DinoReviveFrames(int frames);
+
+// The bits of a creature part that tell whether it changed.
+struct DinoRevivePartBits {
+    u32 level : 12;
+    u32 unk12 : 7;
+    u32 unk19 : 1;
+    u32 rest : 12;
+};
+
+extern const u32 gKasekiRockSizeText;
+
+// Finds the next part that changed and takes it on; past the first, says so.
+void DinoUiReviveEffect::State0215da04() {
+    for (mUnkC8 = 0; mUnkC8 < mPartCount; mUnkC8++) {
+        const DinoRevivePartBits &has = (const DinoRevivePartBits &)mUnkAC.parts[mUnkC8];
+        const DinoRevivePartBits &had = (const DinoRevivePartBits &)mUnk94.parts[mUnkC8];
+        if (had.level != has.level || had.unk12 != has.unk12 || had.unk19 != has.unk19) {
+            break;
+        }
+    }
+    if (mUnkC8 == mPartCount) {
+        mState = data_ov003_02161d20.StartWait_9C;
+        return;
+    }
+    mUnk94.parts[mUnkC8] = mUnkAC.parts[mUnkC8];
+    mUnk94.unk0_8 = mUnkAC.unk0_8;
+    if (mShowText && mUnk114 && mUnkC8 != 0) {
+        data_ov003_021624c0 = 0;
+        gDinoBackup->SetSystemVar(0x12, mUnkAC.parts[mUnkC8].level);
+        std::string text;
+        if (gDinoBackup->GetSystemFlag(0x2E)) {
+            const u8 *data = (const u8 *)mMessages.Get();
+            const u8 *entry = data + ((const u32 *)(data + ((const u32 *)data)[2]))[16];
+            text = (const char *)entry + ((const u32 *)entry)[1];
+        } else {
+            gDinoBackup->SetSystemFlag(0x2E, TRUE);
+            const u8 *data = (const u8 *)mMessages.Get();
+            const u8 *entry = data + ((const u32 *)(data + ((const u32 *)data)[2]))[38];
+            text = (const char *)entry + ((const u32 *)entry)[1];
+        }
+        text = DinoReplaceTag(text, "%s", gDinoResource->GetText(gKasekiRockSizeText + mUnkC8));
+        mSerial.AddTail(new DinoEventTalkWindow(gCurrentDisplay, text, 0, 0));
+    }
+    mState = data_ov003_02161d20.State0215dc30_64;
+}
+
+// What the next function reads of a fossil's definition.
+struct DinoRevivePictureDef {
+    u8 unk00;
+    bool flip;      // 0x01
+    u8 unk02[0x08 - 0x02];
+    u32 picture;    // 0x08
+};
+
+extern "C" const char data_ov003_02162484[];
+
+// Loads the part's fossil picture and slides it up into view.
+void DinoUiReviveEffect::State0215dc30() {
+    u32 id = mUnkC8 + (mUnk94.index - 1) * 4 + 1;
+    MResource<DinoKasekiDefs> defs = gDinoResource->LoadKasekiDefs();
+    const DinoRevivePictureDef *def = (const DinoRevivePictureDef *)defs.Get()->GetDef(id);
+    char path[256];
+    OS_SPrintf(path, data_ov003_02162484, def->picture, 1,
+               ((const DinoRevivePartBits &)mUnkAC.parts[mUnkC8]).unk19 ? 'b' : 'a');
+    mPicture = MPictureFile(std::string(path), 0);
+    MPal *pal = gCurrentDisplay->mBg->mPal;
+    mPalBlock = pal->Alloc(mPicture.GetPaletteSize(), mPicture.GetPalette(), TRUE);
+    mBitmap = gCurrentDisplay->mBg->CreateIndexBitmap(1, TRUE);
+    mBitmap->Show();
+    mBitmap->Fill(MRect(0, 0, 256, 256), 0);
+    mBitmap->Load((const u8 *)mPicture.GetChr(), MPoint(256, 192), MPoint(0, 0), mPalBlock->index, def->flip, false);
+    mEffectTasks->AddTail(mBitmap->CreateOffsetAnime(MPoint(0, -192), MPoint(0, 192), DinoReviveFrames(180), 0));
+    mState = data_ov003_02161d20.State0215e030_AC;
 }
 
 // Puts the picture away.

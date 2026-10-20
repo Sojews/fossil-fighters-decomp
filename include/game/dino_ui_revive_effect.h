@@ -34,6 +34,7 @@ public:
     void CheckSkip2();
     void State0215f668();
     void State0215da04();
+    void State0215dc30();
     void StateWait();
     void Leave();
 
@@ -57,7 +58,8 @@ public:
     MInput *mInput;                         // 0x13C
     u8 mShowText;                           // 0x140: tell the player the creature's name after the effect
     MTaskSet *mEffectTasks;                 // 0x144
-    u8 unk148[0x150 - 0x148];
+    u32 unk148;
+    u32 mPartCount;                         // 0x14C: how many parts to check
 };
 
 #endif
