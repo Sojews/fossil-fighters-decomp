@@ -317,6 +317,33 @@ void SetCretureIconTask::Idle() {
                          (*mMotion)->CreatePlayTransfer(mAnime, 0), MTaskExitTransfer::Create(this));
 }
 
+extern "C" MPoint func_ov000_0216f320(int side, u32 kind, BOOL own);
+extern "C" MPoint func_ov000_0216f4c0(int side, u32 kind, BOOL own);
+extern "C" int func_ov000_0216f698(int arg0, BOOL arg1, BOOL arg2);
+extern "C" MTask *func_ov000_0216ff18(DinoBattleViewCreature *creature, MPoint from, MPoint to, int frames, int ease,
+                                       BOOL shuffle, int arg);
+
+void DinoBattleViewCreature::MoveHome(BOOL own) {
+    MPoint home = func_ov000_0216f320(mUnkB0, mUnkB4, own);
+    if (own) {
+        MPoint coord = GetCoord();
+        mParallel.AddTail(func_ov000_0216ff18(this, coord, home, 40, -1, FALSE, 0));
+        DinoBattleViewLifebar *lifebar = (DinoBattleViewLifebar *)mUnkE0;
+        MPoint from = lifebar->GetPosition();
+        MPoint to = func_ov000_0216f4c0(mUnkB0, mUnkB4, TRUE);
+        mParallel.AddTail(((DinoBattleViewLifebar *)mUnkE0)->CreateCoordAnime(from, to, 40, -1));
+    } else {
+        MPoint coord = GetCoord();
+        mParallel.AddTail(func_ov000_0216ff18(this, coord, home, 40, -1, FALSE, 0));
+        DinoBattleViewLifebar *lifebar = (DinoBattleViewLifebar *)mUnkE0;
+        MPoint from = lifebar->GetPosition();
+        MPoint to = func_ov000_0216f4c0(mUnkB0, mUnkB4, FALSE);
+        mParallel.AddTail(((DinoBattleViewLifebar *)mUnkE0)->CreateCoordAnime(from, to, 40, -1));
+    }
+    mMotion->Play(func_ov000_0216f698(mUnkB4, own, mUnk159), 0);
+    mCoord = home;
+}
+
 void DinoBattleViewCreature::SetUnitModes(BOOL on) {
     mMotion->GetUnit()->SetMode(on ? 1 : 0);
     mMotion140->GetUnit()->SetMode(on ? 1 : 0);

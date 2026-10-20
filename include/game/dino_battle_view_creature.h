@@ -62,6 +62,8 @@ public:
     void ClearAdvantage();
     void SetAdvantage(DinoBattleViewCreature *other);
     MPoint GetCoord();
+    // Moves back to its place (in its own group or the other), with its life bar.
+    void MoveHome(BOOL own);
     MPoint GetMotionPosition();
     void SetCoord(MPoint pos);
 
