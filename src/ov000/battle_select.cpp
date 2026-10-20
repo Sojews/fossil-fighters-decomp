@@ -25,6 +25,10 @@
 
 #pragma auto_inline off
 
+extern "C" const u32 data_ov000_02190298[4][2];    // by ability: the effect's appear and disappear animes
+extern "C" const u32 data_0208a14c;     // frames the appear effect shows
+extern "C" u32 data_ov000_02195d24[];   // the view's pooled statics (+0x08: the ability effect's motion)
+extern "C" char data_ov000_02195e40[];  // ""
 extern "C" const int data_0208a1a8;   // the counters' step per frame
 extern "C" char data_ov000_02195e44[];  // "AB%d"
 extern "C" char data_ov000_02195e4c[];  // " []"
@@ -38,6 +42,64 @@ static inline MFx32 DinoFx32Abs(MFx32 x) {
         return x;
     }
     return -x;
+}
+
+// Sets the shown abilities and their counters' targets; abilities that appear or go play an effect over the icon
+// (the new ones' counters start from 0).
+void DinoBattleViewAbilityIcon::Update(u32 mask, int *values) {
+    u32 old = mMask;
+    mMask = mask;
+    if (values != NULL) {
+        MI_CpuCopy32(values, mTarget, sizeof(mTarget));
+    } else {
+        MIi_CpuClear32(0, mTarget, sizeof(mTarget));
+    }
+    u32 changed = old ^ mMask;
+    if (changed & mMask) {
+        MParallelTaskSet *effects = new MParallelTaskSet(TRUE);
+        for (int i = 0; i < 4; i++) {
+            if (!((changed & mMask) & (1 << i))) {
+                continue;
+            }
+            MSerialTaskSet *tasks = new MSerialTaskSet(TRUE);
+            MMotion *effect = new MMotion(std::string(((const char **)data_ov000_02195d24)[2]), mOam, 0, 1);
+            effect->SetPosition(mMotion->GetPosition());
+            effect->SetPriority(2);
+            effect->SetAnchor(2);
+            mParallel.AddTail(effect);
+            mTexts[i]->Show();
+            mTexts[i]->SetText(std::string(data_ov000_02195e40));
+            mValue[i] = 0;
+            tasks->AddTail(effect->CreateShowTransfer(), effect->CreatePlayTransfer(data_ov000_02190298[i][0], 0),
+                           new MTimer(data_0208a14c), MTaskExitTransfer::Create(effect));
+            effects->AddTail(tasks);
+        }
+        GetSerial()->AddTail(DinoSoundCreatePlaySeTask(0x388, 0), effects);
+    }
+    if (mMask != 0) {
+        GetSerial()->AddTail(mMotion->CreateShowTransfer(), mMotion->CreatePlayTransfer(mMask, 0));
+    } else {
+        GetSerial()->AddTail(mMotion->CreateHideTransfer());
+    }
+    if (changed & old) {
+        MParallelTaskSet *effects = new MParallelTaskSet(TRUE);
+        for (int i = 0; i < 4; i++) {
+            if (!((changed & old) & (1 << i))) {
+                continue;
+            }
+            MSerialTaskSet *tasks = new MSerialTaskSet(TRUE);
+            MMotion *effect = new MMotion(std::string(((const char **)data_ov000_02195d24)[2]), mOam, 0, 1);
+            effect->SetPosition(mMotion->GetPosition());
+            effect->SetPriority(2);
+            effect->SetAnchor(3);
+            mParallel.AddTail(effect);
+            tasks->AddTail(effect->CreateShowTransfer(), effect->CreatePlayTransfer(data_ov000_02190298[i][1], 0),
+                           effect->CreateWaitStopTask(), MTaskExitTransfer::Create(effect));
+            effects->AddTail(tasks);
+            mTexts[i]->Hide();
+        }
+        GetSerial()->AddTail(DinoSoundCreatePlaySeTask(0x389, 0), effects);
+    }
 }
 
 // Counts each shown ability's value a step toward its target, redrawing the counter (enlarged while it counts),
