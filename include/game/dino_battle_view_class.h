@@ -36,7 +36,8 @@ class DinoBattleViewUnkE0 : public MProcess, public MMessageObserver {
 public:
     u32 unkA8;
     DinoBattleView *mView;      // 0xAC
-    u8 unkB0[0xB8 - 0xB0];
+    u32 unkB0;
+    MTaskSet *mTasksB4;         // 0xB4
     MTaskSet *mTasksB8;         // 0xB8
     u32 unkBC;
     DinoBattleViewFieldSlot *mSlotViewsC0[2]; // 0xC0: by side

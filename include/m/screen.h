@@ -20,6 +20,7 @@ public:
     void SetBg(int bg);
 
     void SetOffset(MPoint offset) { mOffset = offset; }
+    MPoint GetOffset() { return mOffset; }
 
     MTask *CreateShowTransfer();
     MTask *CreateHideTransfer();

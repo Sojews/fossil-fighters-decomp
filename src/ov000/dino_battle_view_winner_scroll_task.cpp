@@ -21,6 +21,9 @@
 #include "m/lcd.h"
 #include "m/blend.h"
 #include "game/dino_static_init.h"
+#include "m/screen.h"
+#include "game/dino_battle_view_ui_ability_menu_item.h"
+#include "game/dino_battle_view_ability_menu_bg.h"
 
 DinoBattleViewWinnerScrollTask::~DinoBattleViewWinnerScrollTask() {
     if (!mUnk78) {
@@ -236,6 +239,31 @@ extern "C" void func_ov000_021615b4(DinoBattleViewUnkE0 *field, MTask *task, MTa
     }
 }
 
+extern "C" u32 data_ov000_02191b1c[];   // the TU's pooled statics (+0x70: the attack bars' x)
+extern "C" MTask *func_ov000_0217a080(AttackMenuBarMotion *bar, MPoint from, MPoint to, int frames, int ease);
+
+// Slides the attack bar to y and the ability menu's BG with it.
+extern "C" void func_ov000_0216161c(DinoBattleViewUnkE0 *field, int y, int frames, int ease) {
+    AttackMenuBarMotion *bar = (AttackMenuBarMotion *)field->mTask128;
+    MPoint from = bar->GetPosition();
+    MPoint to(((const int *)data_ov000_02191b1c)[0x70 / 4], y);
+    MPoint scrollFrom;
+    MPoint scrollTo(0, field->mUnk130 - y);
+    DinoBattleViewAbilityMenuBG *bg = (DinoBattleViewAbilityMenuBG *)field->mTask12C;
+    scrollFrom = bg->mUnk10D4 ? ((MScreen *)bg->mText)->GetOffset() : bg->mOffset;
+    MTask *scroll;
+    if (((DinoBattleViewAbilityMenuBG *)field->mTask12C)->mUnk10D4) {
+        scroll = ((MScreen *)((DinoBattleViewAbilityMenuBG *)field->mTask12C)->mText)
+                     ->CreateOffsetAnime(scrollFrom, scrollTo, frames, ease);
+    } else {
+        scroll = new MTimer(1);
+    }
+    MTask *move = func_ov000_0217a080((AttackMenuBarMotion *)field->mTask128, from, to, frames, ease);
+    MTaskSet *tasks = field->mTasksB4;
+    tasks->AddTail(scroll);
+    tasks->AddTail(move);
+}
+
 extern "C" void func_ov000_0216170c(DinoBattleViewUnkE0 *field) {
     if (field->mTask128 != NULL) {
         field->mTask128->Exit();
@@ -295,7 +323,6 @@ void DinoBattleViewWinnerScrollTask::Idle() {
 }
 
 // The file's static initialization (see dino_static_init.h).
-extern "C" u32 data_ov000_02191b1c[];
 extern "C" u32 data_ov000_02191b9c[];
 extern "C" u32 data_ov000_02191d9c[];
 extern "C" u32 data_ov000_02191dcc[];
