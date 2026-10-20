@@ -1,5 +1,5 @@
 // The 3D resources: the 3D heap, the model, animation and texture caches, and M3DModelResource.
-// Not decompiled yet: the M3DGrid functions that build and search it.
+// Not decompiled yet: M3DGrid::Load.
 
 #include <ctype.h>
 #include <map>
@@ -89,6 +89,95 @@ M3DGrid::~M3DGrid() {
         if (z0 * x2 - x0 * z2 > 0) goto miss;                                                                   \
         if (x1 * z2 - x2 * z1 > 0) goto miss;                                                                   \
     }
+
+// The height of the highest triangle under (x, z), or the lowest fx32 if there's none.
+// NONMATCHING: register allocation and the order of the loop's spill slots.
+fx32 M3DGrid::GetHeight(fx32 px, fx32 pz) {
+    int best;
+    std::vector<u16> *tris;
+    int i;
+    int ya, yb, za, zb;
+    int x0, y0, z0, x1, y1, z1, x2, y2, z2;
+    int x, z;
+    int cx, cz;
+    int h;
+    best = -0x8000;
+    x = px >> mShiftX;
+    z = pz >> mShiftZ;
+    cx = (x >> 11) + 16;
+    cz = (z >> 11) + 16;
+    if (cx < 0) {
+        return best;
+    }
+    if (cx >= mDim) {
+        return best;
+    }
+    if (cz < 0) {
+        return best;
+    }
+    if (cz >= mDim) {
+        return best;
+    }
+    tris = &mCells[cx + cz * mDim];
+    for (i = 0; i < tris->size(); i += 3) {
+        x0 = mVerts[(*tris)[i]].x - x;
+        y0 = mVerts[(*tris)[i]].y;
+        z0 = mVerts[(*tris)[i]].z - z;
+        x1 = mVerts[(*tris)[i + 1]].x - x;
+        y1 = mVerts[(*tris)[i + 1]].y;
+        z1 = mVerts[(*tris)[i + 1]].z - z;
+        x2 = mVerts[(*tris)[i + 2]].x - x;
+        y2 = mVerts[(*tris)[i + 2]].y;
+        z2 = mVerts[(*tris)[i + 2]].z - z;
+        if (x0 < 0 && x1 < 0 && x2 < 0) continue;
+        if (x0 > 0 && x1 > 0 && x2 > 0) continue;
+        if (z0 < 0 && z1 < 0 && z2 < 0) continue;
+        if (z0 > 0 && z1 > 0 && z2 > 0) continue;
+        if (x0 * z1 - x1 * z0 > 0) continue;
+        if (z0 * x2 - x0 * z2 > 0) continue;
+        if (x1 * z2 - x2 * z1 > 0) continue;
+        if (x0 == x1 && x0 == x2) {
+            h = y0 + -x0 * (y1 - y0) / (z1 - z0);
+        } else {
+            int a = x1 - x0;
+            if (a < 0) {
+                a = -a;
+            }
+            int b = x2 - x0;
+            if (b < 0) {
+                b = -b;
+            }
+            int c = x2 - x1;
+            if (c < 0) {
+                c = -c;
+            }
+            if (a > c && b > c) {
+                ya = y0 + -x0 * (y1 - y0) / (x1 - x0);
+                yb = y0 + -x0 * (y2 - y0) / (x2 - x0);
+                za = z0 + -x0 * (z1 - z0) / (x1 - x0);
+                zb = z0 + -x0 * (z2 - z0) / (x2 - x0);
+            } else if (b > a && c > a) {
+                ya = y2 + -x2 * (y1 - y2) / (x1 - x2);
+                yb = y2 + -x2 * (y0 - y2) / (x0 - x2);
+                za = z2 + -x2 * (z1 - z2) / (x1 - x2);
+                zb = z2 + -x2 * (z0 - z2) / (x0 - x2);
+            } else {
+                ya = y1 + -x1 * (y0 - y1) / (x0 - x1);
+                yb = y1 + -x1 * (y2 - y1) / (x2 - x1);
+                za = z1 + -x1 * (z0 - z1) / (x0 - x1);
+                zb = z1 + -x1 * (z2 - z1) / (x2 - x1);
+            }
+            h = ya + -za * (yb - ya) / (zb - za);
+        }
+        if (best < h) {
+            best = h;
+        }
+    }
+    if (best == -0x8000) {
+        return best << 16;
+    }
+    return best << mShiftX;
+}
 
 // Whether (x, z) is on a triangle of the grid; hint caches the last hit (cell << 16 | first index).
 // NONMATCHING: register allocation (the game keeps this in r6 and the cell on the stack).
