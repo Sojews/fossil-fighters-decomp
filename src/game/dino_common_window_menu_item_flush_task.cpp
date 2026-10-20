@@ -70,7 +70,8 @@ void DinoCommonWindowMenu::AddEntry(u32 id, MRect rect, const std::string &text)
 }
 
 // A choice: its text in an indicator (hidden until shown) at pos, and its frame the given width.
-// NONMATCHING: ours loads gCurrentDisplay before the size argument's copy (into ip) and swaps this/canvas registers.
+// (No common subexpressions: the game reads gCurrentDisplay after copying the size argument.)
+#pragma opt_common_subs off
 DinoCommonWindowMenuItem::DinoCommonWindowMenuItem(MFont *font, MPoint pos, std::string text, std::string name,
                                                    int width)
     : mText(name) {
@@ -84,6 +85,7 @@ DinoCommonWindowMenuItem::DinoCommonWindowMenuItem(MFont *font, MPoint pos, std:
     ((MIndicator *) mUnk94)->SetText(std::string(text));
     mFrame = MRect(pos, MPoint(pos.x + width, pos.y + 14));
 }
+#pragma opt_common_subs reset
 
 DinoCommonWindowMenuItemFlushTask::~DinoCommonWindowMenuItemFlushTask() {
 }

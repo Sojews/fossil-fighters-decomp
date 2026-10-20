@@ -198,7 +198,8 @@ void DinoUiOrderSelectMenu::CreateOpponentItems() {
 // Where the names go (the opponent's beside four tabs, or three).
 extern "C" const MPoint data_ov006_02197190, data_ov006_02197158, data_ov006_02197180, data_ov006_02197178;
 
-// NONMATCHING: scheduling only (the game reads gCurrentDisplay after copying each canvas's size).
+// (No common subexpressions: the game reads gCurrentDisplay again after copying each canvas's size.)
+#pragma opt_common_subs off
 void DinoUiOrderSelectMenu::CreateNameLabels(const wchar_t *playerName) {
     MFont *font = gDinoResource->CreateFont12(0, 10, 1);
     MObjCanvas *canvas = new MObjCanvas(gCurrentDisplay, MPoint(0xA0, 0x10), gDinoResource->GetUnkTable(), TRUE);
@@ -230,6 +231,7 @@ void DinoUiOrderSelectMenu::CreateNameLabels(const wchar_t *playerName) {
     label->Show();
     label->SetText(std::wstring((const wchar_t *)mTeam.name));
 }
+#pragma opt_common_subs reset
 
 void DinoUiOrderSelectMenu::OnIdle() {
     mUnk1F6 = TRUE;
