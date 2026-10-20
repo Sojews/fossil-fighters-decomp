@@ -573,6 +573,12 @@ namespace std {
         if (n != 0) {
             allocate(n, Metrowerks::int2type<true>());
             UnkMSLStruct1 unk = UnkMSLStruct1();
+            if (is_scalar<T>::value) {
+                // (Scalars are moved in one go.)
+                copy_trivial(first, last, data_ + size_);
+                size_ += last - first;
+                return;
+            }
             for (pointer p = data_ + size_; first != last; first++, p++, size_++) {
                 alloc().construct(p, *first);
             }
