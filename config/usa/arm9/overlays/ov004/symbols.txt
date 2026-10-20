@@ -1105,11 +1105,8 @@ _ZTV25DinoUiSaveSlotConfirmMenu kind:data(any) addr:0x02172d4c
 _ZTV24DinoUiSaveSlotSelectMenu kind:data(any) addr:0x02172d7c
 data_ov004_02172db4 kind:data(any) addr:0x02172db4
 _ZTV34DinoUiSaveSlotSelectMenuCancelItem kind:data(any) addr:0x02172dbc
-data_ov004_02172dfc kind:data(any) addr:0x02172dfc
 _ZTV34DinoUiSaveSlotSelectMenuDeleteItem kind:data(any) addr:0x02172e10
-data_ov004_02172e50 kind:data(any) addr:0x02172e50
 _ZTV28DinoUiSaveSlotSelectMenuItem kind:data(any) addr:0x02172e64
-data_ov004_02172ea4 kind:data(any) addr:0x02172ea4
 data_ov004_02172eb8 kind:data(any) addr:0x02172eb8
 _ZTI12DinoUiEnding kind:data(any) addr:0x02172ee8
 _ZTS12DinoUiEnding kind:data(any) addr:0x02172ef4
