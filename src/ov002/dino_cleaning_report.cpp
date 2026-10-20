@@ -8,6 +8,10 @@
 #include "game/dino_cleaning.h"
 #include "game/dino_backup.h"
 #include "types.h"
+#include "game/dino_event_talk_window.h"
+#include "game/dino_common_window_message_box.h"
+#include "m/lcd.h"
+#include <string.h>
 
 DinoCleaningReport::~DinoCleaningReport() {
 }
@@ -27,6 +31,28 @@ extern "C" struct {
 DinoCleaningReport::DinoCleaningReport(u32 arg) : MProcess(NULL), mUnk7C(arg) {
     mMessages = MResource<DinoMessageData>("/msg/msg_cleaning");
     mState = data_ov002_02163e60.State02155b28_14;
+}
+
+// A message box when the text starts a new line; otherwise a talk window with the choices.
+void DinoCleaningReport::ShowMessage(u32 id, const std::string &arg, u32 *result, const std::string &a,
+                                     const std::string &b, const std::string &c, const std::string &d) {
+    const u8 *data = (const u8 *)mMessages.Get();
+    u32 format;
+    const u8 *entry = data + ((const u32 *)(data + ((const u32 *)data)[2]))[id];
+    format = ((const u32 *)entry)[1];
+    char *text = new char[strlen((const char *)entry + format) + arg.size() + 1];
+    OS_SPrintf(text, (const char *)entry + format, arg.c_str());
+    if (text[0] == '\n') {
+        MTask *box = new DinoCommonWindowMessageBox(gLcd->GetBottomDisplay(), MPoint(128, 96), std::string(text), 4);
+        mSerial.AddTail(box);
+    } else {
+        DinoEventTalkWindow *window =
+            new DinoEventTalkWindow(gLcd->GetBottomDisplay(), std::string(text), ((DinoCleaning *)mUnk7C)->mUnkD4, 0);
+        window->SetYesNo((u32)result, MPoint(254, 142), 3, std::string(a), std::string(b), std::string(c),
+                         std::string(d));
+        mSerial.AddTail(window);
+    }
+    delete[] text;
 }
 
 extern const u32 data_0208acc8, data_0208ad24, data_0208ad28;
