@@ -140,15 +140,24 @@ void DinoUiContainerBaseDecideButton::OnFocusChanged(BOOL focused) {
 
 // Pooled file statics: the button corners.
 struct DinoUiContainerBaseStatics {
-    u8 unk00[0x10];
+    u8 unk00[4];
+    const char *mBackPath;      // 0x04
+    const char *mPageRPath;     // 0x08
+    const char *mPageLPath;     // 0x0C
     MPoint mColumn;      // 0x10: from a page button to the next in its row
-    u8 unk18[0x50 - 0x18];
+    u8 unk18[0x20 - 0x18];
+    MPoint mBackPos;     // 0x20
+    MPoint mRockNamePos; // 0x28
+    MPoint mFractionPos; // 0x30
+    MPoint mPageLPos;    // 0x38
+    u8 unk40[0x50 - 0x40];
     MPoint mTopLeft;     // 0x50
     u8 unk58[8];
     MPoint mRow;         // 0x60: to the next row
     MPoint mDecidePos;   // 0x68
     MPoint mFirst;       // 0x70: the page's first button
     MPoint mBottomRight; // 0x78
+    MPoint mPageRPos;    // 0x80
 };
 extern "C" DinoUiContainerBaseStatics data_ov005_0216c2e8;
 
@@ -199,6 +208,88 @@ void DinoUiContainerBaseMenu::ClearItems() {
 
 static inline const DinoUiFossilEntry &AsFossilEntry(const DinoKasekiButtonInfo &info) {
     return *(const DinoUiFossilEntry *)&info;
+}
+
+extern "C" const u32 data_0208aacc; // the page buttons' help text
+
+inline DinoUiContainerBaseBackButton::DinoUiContainerBaseBackButton(DinoUiContainerBaseMenu *owner, u32 textId)
+    : DinoUiContainerBaseMenuItem(owner, data_ov005_0216c2e8.mBackPath, data_ov005_0216c2e8.mBackPos, textId) {
+    mMotion->Play(2, 0);
+}
+
+inline DinoUiContainerBasePageLButton::DinoUiContainerBasePageLButton(DinoUiContainerBaseMenu *owner)
+    : DinoUiContainerBaseMenuItem(owner, data_ov005_0216c2e8.mPageLPath, data_ov005_0216c2e8.mPageLPos, data_0208aacc) {
+    SetKeys(0x200);
+    SetNoFocus(TRUE);
+    DinoHelpItem::Disable();
+}
+
+inline DinoUiContainerBasePageRButton::DinoUiContainerBasePageRButton(DinoUiContainerBaseMenu *owner)
+    : DinoUiContainerBaseMenuItem(owner, data_ov005_0216c2e8.mPageRPath, data_ov005_0216c2e8.mPageRPos, data_0208aacc) {
+    SetKeys(0x100);
+    SetNoFocus(TRUE);
+    DinoHelpItem::Disable();
+}
+
+// The excavation settings' section at offset7C (the input repeat is at 0x1C and 0x20).
+static inline const int *GetExcavate7C(MResource<DinoExcavateDefs> &defs) {
+    const DinoExcavateDefs *d = defs.Get();
+    if (d->offset7C == 0) {
+        return NULL;
+    }
+    return (const int *)((const u8 *)d + d->offset7C);
+}
+
+void DinoUiContainerBaseMenu::OnStart() {
+    DinoBackupEntry entry;
+    SetLinkFallback(1);
+    {
+        MResource<DinoExcavateDefs> delayDefs = gDinoResource->GetExcavateDefs();
+        MResource<DinoExcavateDefs> intervalDefs = gDinoResource->GetExcavateDefs();
+        GetInput()->SetRepeat(0xF0, GetExcavate7C(delayDefs)[7], GetExcavate7C(intervalDefs)[8]);
+    }
+    mDefs = gDinoResource->LoadKasekiDefs();
+    mOam = new MSmartOam(0x54, 0, TRUE);
+    mBack = new DinoUiContainerBaseBackButton(this, mUnk104);
+    AddItem(mBack);
+    int count = 0;
+    for (int i = 0; i < mUnk101; i++) {
+        GetEntry(i, &entry);
+        if (entry.id) {
+            count++;
+        }
+    }
+    mLastPage = count != 0 ? (u32)(count - 1) / 8 : 0;
+    if (mLastPage > 0) {
+        mPageL = new DinoUiContainerBasePageLButton(this);
+        AddItem(mPageL);
+        mPageR = new DinoUiContainerBasePageRButton(this);
+        AddItem(mPageR);
+    }
+    mFraction = new DinoUi3PartsFraction(mOam, data_ov005_0216c2e8.mFractionPos);
+    mParallel.AddTail(mFraction);
+    mFraction->SetNumerator(mPage + 1);
+    mFraction->SetDenominator(mLastPage + 1);
+    mFraction->Hide();
+    Setup();
+    mCursorTasks = new MParallelTaskSet();
+    mCursor = new DinoUi3PartsCursor(mOam);
+    mParallel.AddTail(mCursor);
+    mCursor->SetPriority(1);
+    mParallel.AddTail(mCursorTasks);
+    mParallel.AddTail(mOam);
+    mRockName = new DinoUi3PartsRockName(data_ov005_0216c2e8.mRockNamePos);
+    mParallel.AddTail(mRockName);
+    RefreshEntries();
+    RefreshPage2();
+    if (mItems.size() == 0) {
+        FocusItem(mBack);
+    } else {
+        FocusItem((MMenuItem *)mItems[0]);
+    }
+    AddLink(mBack, 4, mLinkFrom);
+    DinoDimScreen();
+    mSerial.AddTail(gLcd->mMain->mBright->CreateFadeInFromBlack(30, 0));
 }
 
 // NONMATCHING: the game addresses the button info and the resource copy from one stack base register.
