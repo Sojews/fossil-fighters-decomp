@@ -7,6 +7,9 @@
 #include "m/call_task.h"
 #include "game/dino_static_init.h"
 #include "m/fx32.h"
+#include "game/dino_cleaning_neighbour.h"
+#include "game/dino_cleaning_kaseki_rock.h"
+#include <algorithm>
 
 #pragma auto_inline off
 // The TU's pooled constants.
@@ -56,6 +59,39 @@ void DinoCleaningDrill::SetGuidePos(MPoint pos) {
     mRowGuide->SetPosition(0, pos.y);
     mColumnGuide->SetPosition(pos.x, 0);
     mMark->SetPosition(pos);
+}
+
+void DinoCleaningDrill::MarkCell(int x, int y) {
+    DinoCleaningKasekiRock *rock = GetCleaning()->GetKasekiRock();
+    if (mUnk878 == 0) {
+        if (rock->GetCellLayer(x, y) != 0) {
+            mMarks[x][y] = 1;
+        }
+        return;
+    }
+    u32 layer = rock->GetCellLayer(x, y);
+    u32 deepest = layer;
+    u32 count = 0;
+    for (u32 i = 0; i < 6; i++) {
+        MPoint n = GetNeighbour(MPoint(x, y), i);
+        u32 l = rock->GetCellLayer(n.x, n.y);
+        if (l >= layer) {
+            count++;
+            deepest = std::max(deepest, l);
+        }
+    }
+    if (count >= 3) {
+        layer = deepest;
+    }
+    if (layer <= (u32)rock->GetCellLayer(x, y)) {
+        mMarks[x][y] = 1;
+    }
+    for (u32 i = 0; i < 6; i++) {
+        MPoint n = GetNeighbour(MPoint(x, y), i);
+        if (layer <= (u32)rock->GetCellLayer(n.x, n.y)) {
+            mMarks[n.x][n.y] = 1;
+        }
+    }
 }
 #pragma auto_inline on
 
