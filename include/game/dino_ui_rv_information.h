@@ -31,6 +31,8 @@ struct DinoCreatureInfo {
 
 // (The data's layout isn't known yet.)
 struct DinoUiRvInformationData;
+struct DinoKasekiDefs;
+class MSmartOam;
 
 class DinoUiRvInformation : public MProcess {
 public:
@@ -52,7 +54,7 @@ public:
     MTextPicture *mPagePicture;         // 0x9C
     u8 unkA0[4];
     MTextPicture *mSubPicture;          // 0xA4
-    u32 unkA8;
+    MSmartOam *mOam;                    // 0xA8
     MView *mViewsAC[3];                 // 0xAC
     u32 unkB8;
     DinoUiFieldMenuNumber3 *mNumbersBC[6];  // 0xBC: (page 0)
@@ -76,11 +78,11 @@ public:
     u8 mHasTenPictures;                 // 0x194: else 7
     u8 mUnk195;                         // 0x195
     u32 mUnk198;                        // 0x198
-    MResource<DinoUiRvInformationData> mUnk19C; // 0x19C
+    MResource<DinoKasekiDefs> mUnk19C;  // 0x19C
     u32 mUnk1AC;                        // 0x1AC
     u8 mUnk1B0;                         // 0x1B0: set once the page's parts are hidden
     u8 mUnk1B1;                         // 0x1B1
-    u32 unk1B4;
+    MFx32 mUnk1B4;                      // 0x1B4
 };
 
 #endif

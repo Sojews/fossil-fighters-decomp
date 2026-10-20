@@ -22,6 +22,11 @@
 #include "m/3d.h"
 #include "m/input.h"
 #include "m/window.h"
+#include <string>
+#include "nitro/mi.h"
+#include "m/font.h"
+#include "m/smart_oam.h"
+#include "m/oam_canvas.h"
 #include "m/irq.h"
 #include "m/anm_model.h"
 #include "game/dino_static_init.h"
@@ -318,6 +323,69 @@ void DinoUiRvInformation3DModel::LoadModel() {
     mRotate = new DinoUiRvInformation3DModelRotate(mAnm, data_02089ce8[mUnk80]);
     MIrqLock lock;
     mTasks->AddTail(mAnm, mRotate);
+}
+
+extern "C" u32 data_ov003_02160660[];           // the TU's pooled statics
+extern "C" const char data_ov003_02160bfc[];    // the name font
+extern "C" const char *const data_ov003_02160894[]; // the pictures, by page
+
+// Sets up the information panel: the name and its plate, the pictures (ten with the extra page) and the 3D model.
+// NONMATCHING (96.5%): the game loads gCurrentDisplay for the two canvases after copying their size (also with an
+// MObjCanvas(size, palette, fromEnd) on the current display); ours loads it first.
+DinoUiRvInformation::DinoUiRvInformation(u8 hasTenPictures)
+    : MProcess(gLcd->mMain), mUnk164(NULL), mPage(0), mHasTenPictures(hasTenPictures), mUnk195(0), mUnk198(0),
+      mUnk1AC(0), mUnk1B0(1), mUnk1B1(0), mUnk1B4(1) {
+    MI_CpuFill8(&mInfo, 0, sizeof(mInfo));
+    mUnk19C = gDinoResource->LoadKasekiDefs();
+    gCurrentDisplay = gLcd->mMain;
+    MFontSet *font = gDinoResource->CreateFont12(0, 1, 0);
+    MFontSet *nameFont = new MFontSet(std::string(data_ov003_02160bfc), 0, 0, 0);
+    mViewsAC[0] = new MIndicator(new MObjCanvas(gCurrentDisplay, MPoint(0x40, 0x20), gDinoResource->GetUnkTable(), TRUE),
+                                 nameFont, 0);
+    mParallel.AddTail(mViewsAC[0]);
+    mViewsAC[0]->SetPosition(DINO_POOL(MPoint, data_ov003_02160660, 0x34));
+    mViewsAC[0]->SetPriority(2);
+    mViewsAC[0]->Show();
+    mOam = new MSmartOam(1, 0, TRUE);
+    mViewsAC[1] = new MMotion(std::string(((const char **)data_ov003_02160660)[3]), mOam, 2, 1);
+    mViewsAC[1]->SetPosition(DINO_POOL(MPoint, data_ov003_02160660, 0x44));
+    mViewsAC[1]->SetPriority(2);
+    mViewsAC[1]->Show();
+    mParallel.AddTail(mViewsAC[1]);
+    mParallel.AddTail(mOam);
+    mViewsAC[2] = new MIndicator(new MObjCanvas(gCurrentDisplay, MPoint(0xA0, 0x20), gDinoResource->GetUnkTable(), TRUE),
+                                 font, 0);
+    mParallel.AddTail(mViewsAC[2]);
+    mViewsAC[2]->SetPosition(DINO_POOL(MPoint, data_ov003_02160660, 0x1C));
+    mViewsAC[2]->SetPriority(2);
+    mViewsAC[2]->Show();
+    mPictureTasks = new MParallelTaskSet();
+    mParallel.AddTail(mPictureTasks);
+    mUnk16C = new MParallelTaskSet();
+    mParallel.AddTail(mUnk16C);
+    mModel = new DinoUiRvInformation3DModel();
+    mParallel.AddTail(mModel);
+    if (mHasTenPictures) {
+        for (int i = 0; i < 10; i++) {
+            mPictures[i] = new MPictureFile(std::string(data_ov003_02160894[i]), 7);
+        }
+    } else {
+        for (int i = 0; i < 7; i++) {
+            mPictures[i] = new MPictureFile(std::string(data_ov003_02160894[i]), 7);
+        }
+    }
+    mPagePicture = new MTextPicture(*mPictures[0], TRUE, false);
+    mPictureTasks->AddTail(mPagePicture);
+    mPagePicture->Show();
+    mPagePicture->SetPriority(3);
+    if (mHasTenPictures) {
+        mSubPicture = new MTextPicture(*mPictures[7], TRUE, false);
+        mPictureTasks->AddTail(mSubPicture);
+        mSubPicture->Hide();
+        mSubPicture->SetPriority(2);
+    }
+    Unk02156800();
+    gCurrentDisplay = gLcd->mSub;
 }
 
 #pragma auto_inline off
