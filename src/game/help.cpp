@@ -113,10 +113,8 @@ void DinoHelpDriver::AddHook(DinoHelpHook *hook) {
 }
 
 void DinoHelpDriver::RemoveHook(DinoHelpHook *hook) {
-    OSMutex *mutex = &sHelpMutex.mutex;
-    OS_LockMutex(mutex);
+    MScopedLock lock(&sHelpMutex.mutex, TRUE);
     mHooks.erase(std::find(mHooks.begin(), mHooks.end(), hook));
-    OS_UnlockMutex(mutex);
 }
 
 void DinoHelpDriver::NotifyOpen() {
