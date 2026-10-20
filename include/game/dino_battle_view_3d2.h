@@ -94,6 +94,10 @@ public:
     virtual ~DinoBattleView3DGroupFade();
     virtual void Idle();
 
+    // (The target is the 3D view, the camera a DinoBattleView3DCamera.)
+    class DinoBattleView3D *GetView() { return (class DinoBattleView3D *)mTarget; }
+    class DinoBattleView3DCamera *GetCamera() { return (class DinoBattleView3DCamera *)mCamera; }
+
     struct Target {
         u8 unk00[0xD0];
         Dino3DLoadCsv *mModels[3];  // 0xD0
@@ -105,9 +109,9 @@ public:
     int mSlot;          // 0x80
     u32 mUnk84;         // 0x84
     char mNames[3][64]; // 0x88
-    void *mCamera;      // 0x148
+    void *mCamera;      // 0x148: a DinoBattleView3DCamera
     u32 mDuration;      // 0x14C
-    u32 unk150[3];
+    int mUnk150[3];     // 0x150: each model's unkB0 before the group was loaded
 };
 
 #endif

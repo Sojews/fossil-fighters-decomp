@@ -306,6 +306,93 @@ void DinoBattleView3DAction::Idle() {
 // Template task instances the game emits in this file. Until the code that makes the tasks is decompiled, they are
 // instantiated explicitly.
 
+// The TU's pooled pointer-to-member constant for the group's model loads.
+extern "C" struct {
+    void (DinoBattleView3DGroupFade::*LoadModel_00)(int i);
+} data_ov000_0219637c;
+extern "C" const char data_ov000_021965a0[];    // a creature's model name format
+extern "C" const VecFx32 data_ov000_02190364[];  // the slot positions
+extern "C" Dino3DLoadCsv *func_ov000_02187e68(DinoBattleView3D *view, int slot);
+
+// Fades a side's group of three creatures out (unk7C 1) or in with the given models (unk7C 0), the camera
+// following the group.
+void DinoBattleView3DGroupFade::Idle() {
+    switch (mUnk84) {
+    case 0:
+        if (mSaved != 0 && mSaved != 1) {
+            Exit();
+            return;
+        }
+        if (mUnk7C == 0) {
+            for (int i = 0; i < 3; i++) {
+                GetView()->mModels[i]->Push11();
+            }
+        }
+        mUnk84++;
+        break;
+    case 1:
+        if (mUnk7C == 0) {
+            mSerial.AddTail(((M3DScene *)GetView()->mUnkB0)->CreateEnableTask(0));
+            MSerialTaskSet *serial = &mSerial;
+            int i = 0;
+            char *name = mNames[0];
+            for (; i < 3; i++) {
+                sprintf(name, data_ov000_021965a0, GetView()->mCreatureIds[mSaved * 3 + i], 7);
+                mUnk150[i] = GetView()->mModels[i]->GetUnkB0();
+                serial->AddTail(MCreateBgCallTask(this, data_ov000_0219637c.LoadModel_00, i, 1));
+                name += 64;
+            }
+        } else {
+            mSerial.AddTail(func_ov000_0218addc(mDuration));
+        }
+        mUnk84 = 4;
+        break;
+    case 4:
+        GetView()->SetGroupShown(mSaved, mUnk7C == 0);
+        if (mUnk7C == 0) {
+            for (int i = 0; i < 3; i++) {
+                if (GetView()->mUnk14A[mSaved * 3 + i] == 0) {
+                    GetView()->mModels[i]->Push11();
+                } else {
+                    GetView()->mModels[i]->Push12();
+                }
+                GetView()->mModels[i]->PushVec3(&data_ov000_02190364[(u32)GetView()->mSlotModels[mSaved * 3 + i]]);
+                GetView()->mModels[i]->PushVec2(&data_ov000_0219034c);
+                if (GetView()->mUnk150[mSaved * 3 + i] & 4) {
+                    GetView()->mModels[i]->Push8(0);
+                } else {
+                    GetView()->mModels[i]->Push8(1);
+                }
+                GetView()->mModels[i]->Push7(mUnk150[i]);
+            }
+            if (mSlot == -1) {
+                GetCamera()->Follow(func_ov000_02187e68(GetView(), mSaved));
+            } else {
+                GetCamera()->Follow(GetView()->mModels[mSlot]);
+            }
+            mSerial.AddTail(((M3DScene *)GetView()->mUnkB0)->CreateEnableTask(1));
+            mSerial.AddTail(func_ov000_0218ae50(mDuration));
+            ((M3DScene *)GetView()->mUnkB0)->mM3d->Show();
+        } else {
+            GetCamera()->Follow(NULL);
+            for (int i = 0; i < 3; i++) {
+                GetView()->mModels[i]->Push11();
+            }
+        }
+        mUnk84++;
+        break;
+    case 5:
+        if (mUnk7C == 1) {
+            GetView()->mModels[0]->Reset();
+            GetView()->mModels[1]->Reset();
+            GetView()->mModels[2]->Reset();
+            GetCamera()->Follow(NULL);
+        }
+        Exit();
+        break;
+    }
+}
+
 void MValChange::Execute() {
     *mDst = mValue;
     Exit();

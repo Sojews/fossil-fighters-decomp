@@ -58,7 +58,7 @@ DinoBattleView3DCamera::DinoBattleView3DCamera(M3DScene *scene, Dino3DLoadCsv *c
     mUnk88 = unk88;
     Reset();
     mLight = -1;
-    unk80 = 0;
+    mParent = 0;
 }
 
 #pragma auto_inline off

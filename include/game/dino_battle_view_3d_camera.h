@@ -10,7 +10,7 @@
 #include "game/help.h"
 #include "game/dino_field_camera_hook.h"
 
-class Dino3DLoadCsv;
+#include "game/dino_3d_load_csv.h"
 class M3DScene;
 
 class DinoBattleView3DCamera : public MProcess {
@@ -25,10 +25,15 @@ public:
     void Reset();
     void SetLight(int light);
     void Load(const char *path, int light);
+    // Has the camera follow the model (none for NULL).
+    void Follow(Dino3DLoadCsv *parent) {
+        mParent = parent;
+        mCamera->SetParent(mParent);
+    }
 
     void (DinoBattleView3DCamera::*mState)(); // 0x74
     Dino3DLoadCsv *mCamera;                     // 0x7C
-    u32 unk80;
+    Dino3DLoadCsv *mParent;                     // 0x80: what the camera follows
     M3DScene *mScene;                           // 0x84
     u32 mUnk88;                                 // 0x88
     u32 mUnk8C;                                 // 0x8C

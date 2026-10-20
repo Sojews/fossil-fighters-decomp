@@ -37,6 +37,7 @@ public:
     // Loads the scene's parts (the field, the battle's background, the creature models, the two cameras), then
     // runs the queue.
     void StateLoad();
+    void SetGroupShown(u32 slot, u8 shown) { mUnk148[slot] = shown; }
 
     u32 unkA8;
     DinoBattleView *mView;                  // 0xAC
@@ -54,9 +55,11 @@ public:
     u8 unk104[0x11C - 0x104];
     void *mSlotModels[6];                   // 0x11C: what each slot's models show (3 per slot)
     u32 mSlot;                              // 0x134
-    u8 unk138[0x14A - 0x138];
+    u8 unk138[0x148 - 0x138];
+    u8 mUnk148[2];                          // 0x148: by slot, whether its group is shown
     u8 mUnk14A[6];                          // 0x14A: by slot and creature
-    u8 unk150[0x174 - 0x150];
+    u32 mUnk150[6];                         // 0x150: by slot and creature, flags
+    u8 unk168[0x174 - 0x168];
     u32 mUnk174;                            // 0x174
 
     MRandom mRandom;                        // 0x178

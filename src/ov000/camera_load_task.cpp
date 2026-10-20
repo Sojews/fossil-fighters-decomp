@@ -179,7 +179,7 @@ extern "C" void func_ov000_0218a9f8(DinoBattleView3DCamera *camera) {
             camera->mCamera->Load(path.c_str(), 0);
         }
         camera->mCamera->PushVec0((const VecFx32 *)camera->mUnk9C);
-        camera->mCamera->SetParent((Dino3DLoadCsv *)camera->unk80);
+        camera->mCamera->SetParent(camera->mParent);
         camera->mUnk94 = camera->mUnk8C;
         camera->mUnk8C++;
     }
