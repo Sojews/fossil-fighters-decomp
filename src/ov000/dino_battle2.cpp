@@ -12,8 +12,9 @@
 #include "game/dino_resource.h"
 #include "game/dino_common_font.h"
 #include <string>
+#include "m/motion.h"
 
-extern "C" void func_ov000_0218b928(void *, u8);
+extern "C" void func_ov000_0218b928(DinoBattleViewFocusLCDFrame *frame, u8 top);
 
 DinoBattleViewFocusLCDFrame::DinoBattleViewFocusLCDFrame(u32 unk74) : MProcess(NULL) {
     mUnk74 = unk74;
@@ -61,11 +62,54 @@ DinoBattleTalkWindow::DinoBattleTalkWindow(u32 unkD8)
     GetParallel()->AddTail(mTasksC0, mTasksC4, mOam);
 }
 
+// The focus frame's timings (the delay, the slide's duration and its ease), for the top screen and the bottom.
+extern "C" const u32 data_0208a108, data_0208a104, data_0208a100;
+extern "C" const u32 data_0208a0c4;
+extern "C" const u32 data_0208a0f0[];
+// The TU's pooled frame corner path (word 1) and corner positions.
+extern "C" u32 data_ov000_02197054[];
+extern "C" const MPoint data_ov000_02197088[4];
+
+// Slides the frame's four corners on both screens in (to the top screen, or back down to the bottom one).
+// NONMATCHING: the game loads data_0208a0f0's second and third words through their own pool addresses.
+extern "C" void func_ov000_0218b928(DinoBattleViewFocusLCDFrame *frame, u8 top) {
+    if (!gDinoResource->GetBattleAdjustDefs()->unk170) {
+        return;
+    }
+    frame->mTasks->Clear();
+    u32 timings[2][3] = {
+        {data_0208a108, data_0208a104, data_0208a100},
+        {data_0208a0c4, data_0208a0f0[2], data_0208a0f0[1]},
+    };
+    const u32 *timing = timings[top == 0 ? 1 : 0];
+    for (int i = 0; i < 2; i++) {
+        MSmartOam *oam = i ? (MSmartOam *)frame->mUnk74 : frame->mOam;
+        for (int j = 0; j < 4; j++) {
+            MMotion *motion = new MMotion(std::string(((const char **)data_ov000_02197054)[1]), oam, 0, 1);
+            motion->Show();
+            motion->SetPriority(0);
+            motion->SetPosition(MPoint(data_ov000_02197088[j].x, data_ov000_02197088[j].y + (top ? 0 : -192)));
+            motion->SetFlip(j & 1 ? true : false, j & 2 ? true : false);
+            motion->GetUnit()->SetMode(1);
+            frame->mTasks->AddTail(motion);
+            MSerialTaskSet *slide = new MSerialTaskSet(TRUE);
+            slide->AddTail(new MTimer(timing[0]), motion->CreatePlayTransfer(2, 0), motion->CreateWaitStopTask(),
+                           motion->CreateCoordAnime(motion->GetPosition(),
+                                                    MPoint(data_ov000_02197088[j].x,
+                                                           (top ? -192 : 0) + data_ov000_02197088[j].y),
+                                                    timing[1], timing[2]),
+                           motion->CreatePlayTransfer(3, 0), motion->CreateWaitStopTask(),
+                           MTaskExitTransfer::Create(motion));
+            frame->mTasks->AddTail(slide);
+        }
+    }
+}
+
 void DinoBattleViewFocusLCDFrame::Idle() {
 }
 
 void DBViewFocusLCDFrameTask::Execute() {
-    func_ov000_0218b928((void *)mUnk10, mUnk14);
+    func_ov000_0218b928((DinoBattleViewFocusLCDFrame *)mUnk10, mUnk14);
     Exit();
 }
 
