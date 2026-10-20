@@ -418,6 +418,10 @@ libs/msl/src/string.c:
 libs/msl/src/strtold.c:
     .text       start:0x02080094 end:0x02080c70
 
+libs/msl/src/strtoul.c:
+    complete
+    .text       start:0x02080c70 end:0x0208114c
+
 libs/msl/src/mbstring.c:
     complete
     .text       start:0x0207d7e4 end:0x0207d8e4

@@ -6244,8 +6244,8 @@ __strtold kind:function(thumb,size=0xb44) addr:0x02080094
 .L_02080116 kind:label(thumb) addr:0x02080116
 strtod kind:function(thumb,size=0x8c) addr:0x02080bd8
 atof kind:function(thumb,size=0xc) addr:0x02080c64
-func_02080c70 kind:function(thumb,size=0x24c) addr:0x02080c70
-func_02080ebc kind:function(thumb,size=0x290) addr:0x02080ebc
+__strtoul kind:function(thumb,size=0x24c) addr:0x02080c70
+__strtoull kind:function(thumb,size=0x290) addr:0x02080ebc
 fwide kind:function(thumb,size=0x54) addr:0x0208114c
 wmemcpy kind:function(thumb,size=0xc) addr:0x020811a0
 wmemmove kind:function(thumb,size=0xc) addr:0x020811ac
@@ -7409,8 +7409,8 @@ fsi_default_command kind:data(any) addr:0x0209298c
 fsi_def_digest_key kind:data(any) addr:0x020929b0
 data_020929f0 kind:data(any) addr:0x020929f0
 __lower_mapC kind:data(any) addr:0x02092a44
-data_02092ac4 kind:data(any) addr:0x02092ac4
-data_02092b44 kind:data(any) addr:0x02092b44
+__upper_mapC kind:data(any) addr:0x02092ac4
+__ctype_mapC kind:data(any) addr:0x02092b44
 data_02092c44 kind:data(any) addr:0x02092c44
 data_02092c6c kind:data(any) addr:0x02092c6c
 data_02092c71 kind:data(any) addr:0x02092c71
