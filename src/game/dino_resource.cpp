@@ -179,6 +179,11 @@ void DinoResource::Create() {
     gDinoResource = new DinoResource();
 }
 
+// (Out of line, unlike the rest of MArchivePtr: every caller calls this copy.)
+MArchiveFile MArchivePtr::GetFile(u32 index) const {
+    return MArchiveFile(mArchive, index);
+}
+
 // NONMATCHING: see above.
 DinoResource::DinoResource() {
     mRandom = new MRandom();

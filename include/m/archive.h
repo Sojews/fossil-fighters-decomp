@@ -143,7 +143,8 @@ public:
     ~MArchivePtr();
     MArchivePtr &operator=(const MArchivePtr &other);
     BOOL IsValid();
-    MArchiveFile GetFile(u32 index) const { return MArchiveFile(mArchive, index); }
+    // (Out of line: the game's copy is in dino_resource.cpp.)
+    MArchiveFile GetFile(u32 index) const;
     // The archive at a path relative to this one's directory (this one, if the path is empty).
     MArchivePtr Open(const char *path) const;
     MArchiveFile GetFile(const char *path, u32 index) const;
