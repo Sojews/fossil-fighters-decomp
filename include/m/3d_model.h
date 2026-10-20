@@ -75,10 +75,14 @@ public:
     u16 mUnk2F4;                // 0x2F4
     u32 mUnk2F8;                // 0x2F8
     u8 *mModelData;             // 0x2FC
-    u32 mUnk300;                // 0x300
-    u8 unk304[0x318 - 0x304];
-    VecFx32 mUnk318;            // 0x318
-    u32 unk324;
+    u32 mUnk300;                // 0x300: mModelData's size
+    u32 unk304;
+    const u16 *mUnk308;         // 0x308: the model data's tag 0x51 block
+    const u16 *mUnk30C;         // 0x30C: the model data's tag 0x50 block
+    u32 mUnk310;                // 0x310: the tag 0x51 block's size, in 8-byte units
+    u32 mUnk314;                // 0x314: the tag 0x50 block's size, in 8-byte units
+    s16 mBox[6];                // 0x318: a bounding box (min x, y, z, max x, y, z)
+    u32 mUnk324;                // 0x324
     u8 mOwnsModelData;          // 0x328
     u8 mUnk329;                 // 0x329
     u8 mUnk32A;                 // 0x32A

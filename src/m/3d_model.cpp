@@ -1,5 +1,5 @@
 // M3DModel.
-// Not decompiled yet: SetModelData and Draw. (Unk08, IsAnimDone and GetFrameCount are in m3d_scene_enable_task.cpp.)
+// Not decompiled yet: Draw. (Unk08, IsAnimDone and GetFrameCount are in m3d_scene_enable_task.cpp.)
 // NONMATCHING: LoadGrid (the game indexes the chunk lengths as cmds[i + 3] and cmds[i + 2] from scratch; ours folds
 // them into one address).
 
@@ -41,7 +41,7 @@ M3DModel::M3DModel() {
     mFlags = 0;
     mGrid = NULL;
     mUnk2E = 0;
-    MI_CpuCopy32(&data_0214c180, &mUnk318, sizeof(VecFx32));
+    MI_CpuCopy32(&data_0214c180, mBox, sizeof(mBox));
     mOwnsModelData = FALSE;
 }
 
@@ -224,6 +224,80 @@ BOOL M3DModel::GetJointMatrix(int joint, MtxFx44 *mtx, u8 withRotation) {
         }
     }
     return FALSE;
+}
+
+// Takes the model resource and reads the tagged blocks after its header, up to 0xFFF. Unless the resource says
+// otherwise (flag 0x100), the model data block is copied (when own is set).
+// NONMATCHING: the game indexes the blocks as script + (i + n) * 2 where ours folds n into the load, and it
+// loads the resource before setting mUnk32A.
+void M3DModel::SetModelData(void *data, BOOL own) {
+    mModelRes = data;
+    mFlags &= ~0x101;
+    ReleaseModelData();
+    if (((const u32 *)mModelRes)[6] & 0x100) {
+        own = FALSE;
+    }
+    mOwnsModelData = own;
+    mUnk32A = 1;
+    const u16 *script = (const u16 *)((const u8 *)mModelRes + 0x28);
+    u32 i = 0;
+    if (script[0] != 0xFFF) {
+        do {
+            switch (script[i]) {
+            case 0x50:
+                mUnk314 = script[i + 2];
+                mUnk314 |= script[i + 3] << 16;
+                i += 4;
+                mUnk30C = &script[i];
+                i += mUnk314 >> 1;
+                mUnk314 >>= 3;
+                break;
+            case 0x51:
+                mUnk310 = script[i + 2];
+                mUnk310 |= script[i + 3] << 16;
+                i += 4;
+                mUnk308 = &script[i];
+                i += mUnk310 >> 1;
+                mUnk310 >>= 3;
+                break;
+            case 0x53: {
+                mUnk324 = script[i + 1] + 1;
+                MI_CpuCopy32(&script[i + 2], mBox, sizeof(mBox));
+                s16 size = mBox[3];
+                if (size < mBox[4]) {
+                    size = mBox[4];
+                }
+                if (size < mBox[5]) {
+                    size = mBox[5];
+                }
+                i += 8;
+                mBox[3] = mBox[4] = mBox[5] = size;
+                mBox[0] = mBox[1] = mBox[2] = -size >> 1;
+                mFlags |= 0x100;
+                break;
+            }
+            case 0x52:
+                mUnk300 = script[i + 2];
+                mUnk300 |= script[i + 3] << 16;
+                i += 4;
+                if (mOwnsModelData) {
+                    mModelData = new u8[mUnk300 & ~1];
+                    MI_CpuCopy32(&script[i], mModelData, mUnk300);
+                } else {
+                    mModelData = (u8 *)&script[i];
+                }
+                i += mUnk300 >> 1;
+                break;
+            default:
+                mUnk32A = 0;
+                mUnk2F4 = 0x7820;
+                goto done;
+            }
+        } while (script[i] != 0xFFF);
+    }
+done:
+    mFlags |= 1;
+    mUnk329 = 0;
 }
 
 void M3DModel::SetAnimData(void *data) {
