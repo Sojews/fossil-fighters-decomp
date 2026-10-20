@@ -18,6 +18,15 @@
 #include "m/display.h"
 #include "m/bright.h"
 #include "game/dino_static_init.h"
+#include "m/input.h"
+#include "game/dino_backup.h"
+#include "m/resource.h"
+#include "game/dino_ui_parts_tab_icon_menu_item.h"
+#include "m/picture.h"
+#include "game/dino_guide_message.h"
+#include "game/dino_ui_common.h"
+#include "m/oam_canvas.h"
+#include "m/obj.h"
 
 #pragma auto_inline off
 DinoUiItemMenu::DinoUiItemMenu(int *choice, DinoTeam *team, DinoTeam *team2)
@@ -252,7 +261,7 @@ void DinoUiItemMenu::RefreshPage() {
     for (int i = 0; i < 5; i++) {
         u32 index = mPage * 5 + i;
         if (mKeyItems.size() > index) {
-            u32 id = mKeyItems[index];
+            u32 id = (u32)mKeyItems[index];
             const DinoKeyItemDefs *data = defs.Get();
             const DinoKeyItemDef *def = (const DinoKeyItemDef *)((const u8 *)data + data->tableOffset) + id;
             mLabels[i]->SetText(gDinoResource->GetText(def->nameText));
@@ -263,6 +272,200 @@ void DinoUiItemMenu::RefreshPage() {
         }
     }
 }
+
+
+static inline const DinoKeyItemDef *GetKeyItemDef(const DinoKeyItemDefs *defs, u32 id) {
+    return (const DinoKeyItemDef *)((const u8 *)defs + defs->tableOffset) + id;
+}
+
+// OnStart's pooled layout (see the static initializer below): path pointers and positions.
+extern "C" u32 data_ov006_021934b4[];
+extern "C" u32 data_ov006_02193534[];
+#define DINO_UI_ITEM_PATH(i) (((const char **)data_ov006_021934b4)[i])
+#define DINO_UI_ITEM_POINT(pool, off) (*(const MPoint *)((const u8 *)(pool) + (off)))
+extern MPoint data_ov006_021934dc;      // the page fraction's place
+extern MPoint data_ov006_02193524;      // the description's place
+extern const MRect data_020b58b0, data_020b58c0, data_020b58d0;     // the tabs' frames
+extern "C" const char data_ov006_021939bc[], data_ov006_021939d0[];   // the background picture, ""
+extern const u32 data_0208a8bc, data_0208a8c0, data_0208a8c4, data_0208a8c8, data_0208a8cc, data_0208a8d0,
+    data_0208a8d4, data_0208a8d8, data_0208a960, data_0208aabc;
+extern const int data_02089a24, data_02089a28;
+
+// The excavation settings' section at offset7C (the input repeat is at 0x1C and 0x20).
+static inline const int *GetExcavate7C(const MResource<DinoExcavateDefs> &defs) {
+    const DinoExcavateDefs *d = const_cast<MResource<DinoExcavateDefs> &>(defs).Get();
+    if (d->offset7C == 0) {
+        return NULL;
+    }
+    return (const int *)((const u8 *)d + d->offset7C);
+}
+
+inline DinoUiItemBackButton::DinoUiItemBackButton(DinoUiItemMenu *owner)
+    : DinoUiItemMenuItem(owner, DINO_UI_ITEM_PATH(5), DINO_UI_ITEM_POINT(data_ov006_02193534, 8), data_0208a8bc) {
+    SetKeys(2);
+    SetMode(4);
+    mMotion->Play(2, 0);
+}
+
+inline DinoUiItemOKButton::DinoUiItemOKButton(DinoUiItemMenu *owner)
+    : DinoUiItemMenuItem(owner, DINO_UI_ITEM_PATH(1), DINO_UI_ITEM_POINT(data_ov006_021934b4, 0x18), data_0208a8c0) {
+    SetKeys(8);
+    mMotion->Play(2, 0);
+}
+
+inline DinoUiItemPageLButton::DinoUiItemPageLButton(DinoUiItemMenu *owner)
+    : DinoUiItemMenuItem(owner, DINO_UI_ITEM_PATH(4), DINO_UI_ITEM_POINT(data_ov006_021934b4, 0x30), data_0208aabc) {
+    SetKeys(0x200);
+    SetNoFocus(TRUE);
+    DinoHelpItem::Disable();
+}
+
+inline DinoUiItemPageRButton::DinoUiItemPageRButton(DinoUiItemMenu *owner)
+    : DinoUiItemMenuItem(owner, DINO_UI_ITEM_PATH(3), DINO_UI_ITEM_POINT(data_ov006_021934b4, 0x48), data_0208aabc) {
+    SetKeys(0x100);
+    SetNoFocus(TRUE);
+    DinoHelpItem::Disable();
+}
+
+inline DinoUiItemItemButton::DinoUiItemItemButton(DinoUiItemMenu *owner, MPoint pos) {
+    mOwner = owner;
+    mPos = pos;
+    mView = new MMotion(std::string(DINO_UI_ITEM_PATH(2)), mOwner->GetOam(), 2, 1);
+    mView->Play(1, 0);
+    mView->SetPosition(pos);
+    mView->SetPriority(2);
+    mView->Hide();
+    mParallel.AddTail(mView);
+    mView->GetUnit()->SetMode(1);
+}
+
+// &mParallel through a non-member inline: the label loop hoists it into the frame's lowest slot, as the game does.
+static inline MTaskSet *ItemParallel(DinoUiItemMenu *menu) {
+    return &menu->mParallel;
+}
+
+// The key items the player has; the background, the back and OK (and page) buttons, the tabs, the help areas, the
+// page fraction, the cursor, the page's labels and item buttons and the description; focuses the third tab.
+#pragma opt_common_subs off
+void DinoUiItemMenu::OnStart() {
+    SetLinkFallback(1);
+    GetInput()->SetRepeat(0xF0, GetExcavate7C(gDinoResource->GetExcavateDefs())[7],
+                          GetExcavate7C(gDinoResource->GetExcavateDefs())[8]);
+    DinoDimScreen();
+    mKeyItems.clear();
+    MResource<DinoKeyItemDefs> defs = gDinoResource->LoadKeyItemDefs();
+    u32 i = 1;
+    for (u32 id = i; id < gDinoResource->GetKeyItemCount(); id = ++i) {
+        if (GetKeyItemDef(defs.Get(), id)->nameText != 0 && gDinoBackup->GetKeyItem(i) == 1) {
+            mKeyItems.push_back((void *&)i);
+        }
+    }
+    if (mKeyItems.size() == 0) {
+        mLastPage = 0;
+    } else {
+        mLastPage = (mKeyItems.size() - 1) / 5;
+    }
+    mParallel.AddTail(mBackground = new MTextPicture(std::string(data_ov006_021939bc), TRUE, false));
+    mBackground->Show();
+    mBackground->SetPriority(2);
+    mOam = new MSmartOam(0x3C, 0, TRUE);
+    mUnkB8 = new DinoUiItemBackButton(this);
+    AddItem(mUnkB8);
+    mOKButton = new DinoUiItemOKButton(this);
+    AddItem(mOKButton);
+    RefreshOKButton();
+    if (mLastPage > 0) {
+        mPageL = new DinoUiItemPageLButton(this);
+        AddItem(mPageL);
+        mPageR = new DinoUiItemPageRButton(this);
+        AddItem(mPageR);
+    }
+    mTabItems[0] = new DinoUiPartsTabIconMenuItem(data_0208a8cc, data_020b58b0);
+    AddItem(mTabItems[0]);
+    mTabItems[1] = new DinoUiPartsTabIconMenuItem(data_0208a8c8, data_020b58c0);
+    AddItem(mTabItems[1]);
+    mTabItems[2] = new DinoUiPartsTabIconMenuItem(data_0208a8c4, data_020b58d0);
+    AddItem(mTabItems[2]);
+    mParallel.AddTail(new DinoHelpDummyItem(GetDisplay(), MRect(0x19, 0x1C, 0xE6, 0x7C),
+                                            std::string(gDinoResource->GetText(data_0208a8d8))));
+    mParallel.AddTail(new DinoHelpDummyItem(GetDisplay(), MRect(0xE7, 0x65, 0xFA, 0x7B),
+                                            std::string(gDinoResource->GetText(data_0208a8d4))));
+    DinoHelpDummyItem *help;
+    mParallel.AddTail(help = new DinoHelpDummyItem(GetDisplay(), MRect(0xF, 0x84, 0xF1, 0xAA),
+                                                   std::string(gDinoResource->GetText(data_0208a8d0))));
+    AddEntry((u32)help, 3, 0);
+    AddEntry((u32)help, 1, 0);
+    AddEntry((u32)help, 2, (u32)(DinoHelpItem *)(DinoUiPartsTabIconMenuItem *)mTabItems[2]);
+    AddEntry((u32)(DinoHelpItem *)(DinoUiPartsTabIconMenuItem *)mTabItems[0], 4, (u32)help);
+    AddEntry((u32)(DinoHelpItem *)(DinoUiPartsTabIconMenuItem *)mTabItems[1], 4, (u32)help);
+    AddEntry((u32)(DinoHelpItem *)(DinoUiPartsTabIconMenuItem *)mTabItems[2], 4, (u32)help);
+    AddEntry((u32)(DinoHelpItem *)(DinoUiPartsTabIconMenuItem *)mTabItems[2], 1, (u32)(DinoHelpItem *)mOKButton);
+    mFraction = new DinoUiFieldMenuFraction(mOam, data_ov006_021934dc);
+    mParallel.AddTail(mFraction);
+    mFraction->SetNumerator(mPage + 1);
+    mFraction->SetDenominator(mLastPage + 1);
+    mCursorTasks = new MParallelTaskSet();
+    mCursor = new DinoUiFieldMenuCursor(mOam);
+    mParallel.AddTail(mCursor);
+    mCursor->SetPriority(1);
+    mCursor->Hide();
+    mParallel.AddTail(mCursorTasks);
+    mParallel.AddTail(mOam);
+    MFont *font = gDinoResource->CreateFont12(0, 1, 0);
+    for (int i = 0; i < 5; i++) {
+        MTaskSet *tasks = ItemParallel(this);
+        MObjCanvas *canvas = new MObjCanvas(gCurrentDisplay, MPoint(0xA0, 0x10), gDinoResource->GetUnkTable(), TRUE);
+        canvas->GetOamUnit()->SetMode(1);
+        mLabels[i] = new MIndicator(canvas, font, 0);
+        tasks->AddTail(mLabels[i]);
+        mLabels[i]->SetPosition(MPoint(DINO_UI_ITEM_POINT(data_ov006_02193534, 0x18).x +
+                                           DINO_UI_ITEM_POINT(data_ov006_02193534, 0).x * i,
+                                       DINO_UI_ITEM_POINT(data_ov006_02193534, 0x18).y +
+                                           DINO_UI_ITEM_POINT(data_ov006_02193534, 0).y * i));
+        mLabels[i]->SetPriority(2);
+        mLabels[i]->Show();
+        u32 index = mPage * 5 + i;
+        if (mKeyItems.size() > index) {
+            u32 id = (u32)mKeyItems[index];
+            mLabels[i]->SetText(std::string(gDinoResource->GetText(GetKeyItemDef(defs.Get(), id)->nameText)));
+        } else {
+            mLabels[i]->SetText(std::string(data_ov006_021939d0));
+        }
+        mItems[i] = new DinoUiItemItemButton(this, MPoint(DINO_UI_ITEM_POINT(data_ov006_021934b4, 0x50).x +
+                                                              DINO_UI_ITEM_POINT(data_ov006_02193534, 0).x * i,
+                                                          DINO_UI_ITEM_POINT(data_ov006_021934b4, 0x50).y +
+                                                              DINO_UI_ITEM_POINT(data_ov006_02193534, 0).y * i));
+        AddItem(mItems[i]);
+    }
+    AddLink(mTabItems[2], 1, mOKButton);
+    AddLink(mTabItems[0], 3, mUnkB8);
+    AddLink(mUnkB8, 1, mTabItems[0]);
+    AddLink(mItems[0], 4, mUnkB8);
+    AddLink(mTabItems[0], 4, mItems[4]);
+    AddLink(mTabItems[0], 2, mItems[0]);
+    AddLink(mTabItems[1], 2, mItems[0]);
+    AddLink(mTabItems[2], 2, mItems[0]);
+    AddLink(mOKButton, 2, mItems[0]);
+    AddLink(mUnkB8, 2, mItems[0]);
+    AddLink(mItems[4], 2, mTabItems[2]);
+    AddLink(mItems[4], 3, NULL);
+    AddLink(mItems[3], 3, NULL);
+    AddLink(mItems[4], 1, NULL);
+    AddLink(mItems[3], 1, NULL);
+    mConsole = new MConsole(new MObjCanvas(gCurrentDisplay, MPoint(0xD8, 0x20), gDinoResource->GetUnkTable(), TRUE),
+                            font, MPoint(0, 3), MFx32(0));
+    mConsole->SetUnk44(0);
+    mConsole->SetPosition(data_ov006_02193524);
+    mConsole->Show();
+    mParallel.AddTail(mConsole);
+    mParallel.AddTail(new DinoGuideMessage(std::string(gDinoResource->GetText(data_0208a960))));
+    mTabItems[1]->SetKeys(0x800);
+    mTabItems[0]->SetKeys(0x400);
+    FocusItem(mTabItems[2]);
+    *mResult = 0;
+    mSerial.AddTail(gLcd->mMain->mBright->CreateFadeInFromBlack(data_02089a28, data_02089a24));
+}
+#pragma opt_common_subs reset
 
 DinoUiItemMenuItem::DinoUiItemMenuItem(DinoUiItemMenu *owner, const std::string &path, MPoint pos, u32 textId) {
     mOwner = owner;
@@ -278,9 +481,6 @@ DinoUiItemMenuItem::DinoUiItemMenuItem(DinoUiItemMenu *owner, const std::string 
 
 extern MPoint data_020b5858[3];
 
-static inline const DinoKeyItemDef *GetKeyItemDef(const DinoKeyItemDefs *defs, u32 id) {
-    return (const DinoKeyItemDef *)((const u8 *)defs + defs->tableOffset) + id;
-}
 
 // Moves the cursor to the item (a tab, or an item button), and shows the item's description.
 void DinoUiItemMenu::OnFocus(MMenuItem *item) {
@@ -318,7 +518,7 @@ void DinoUiItemMenu::OnFocus(MMenuItem *item) {
     for (i = 0; i < (mPage == mLastPage ? mKeyItems.size() - mPage * 5 : 5); i++) {
         if (item == mItems[i]) {
             MResource<DinoKeyItemDefs> defs = gDinoResource->LoadKeyItemDefs();
-            u32 id = mKeyItems[mPage * 5 + i];
+            u32 id = (u32)mKeyItems[mPage * 5 + i];
             const DinoKeyItemDefs *data = defs.Get();
             const DinoKeyItemDef *def = (const DinoKeyItemDef *)((const u8 *)data + data->tableOffset) + id;
             mConsole->Print(std::string(gDinoResource->GetText(def->descText)));

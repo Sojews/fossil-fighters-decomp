@@ -19,6 +19,7 @@ class MIndicator;
 
 class DinoUiFieldMenuCursor;
 class MConsole;
+class MTextPicture;
 
 class DinoUiItemMenu : public DinoHelpBase, public MMenu {
 public:
@@ -40,10 +41,11 @@ public:
     MSmartOam *mOam;            // 0xB4: the items' sprites
     MMenuItem *mUnkB8;          // 0xB8: focused after a page change
     DinoUiItemMenuItem *mOKButton;  // 0xBC
-    u32 mUnkC0[2];
+    DinoUiItemMenuItem *mPageL; // 0xC0: (only with more than one page)
+    DinoUiItemMenuItem *mPageR; // 0xC4
     MMenuItem *mItems[5];       // 0xC8: the page's item buttons
     MMenuItem *mTabItems[3]; // 0xDC
-    u32 mUnkE8;
+    MTextPicture *mBackground;  // 0xE8
     int *mResult;               // 0xEC
     DinoTeam *mOldTeam;         // 0xF0: the team when the menu opened
     DinoTeam *mTeam;            // 0xF4
@@ -52,13 +54,14 @@ public:
     DinoUiFieldMenuFraction *mFraction; // 0x100: "page n/m"
     MIndicator *mLabels[5];     // 0x104: the page's item names
     MConsole *mConsole;         // 0x118: the focused item's description
-    std::vector<u32> mKeyItems; // 0x11C: the items the player has
+    std::vector<void *> mKeyItems; // 0x11C: the items the player has (ids)
     int mPage;                  // 0x128
     int mLastPage;              // 0x12C
 };
 
 class DinoUiItemBackButton : public DinoUiItemMenuItem {
 public:
+    DinoUiItemBackButton(DinoUiItemMenu *owner);
     virtual ~DinoUiItemBackButton();
     virtual void OnFocusChanged(BOOL focused);
     virtual void OnDecide();
@@ -66,6 +69,7 @@ public:
 
 class DinoUiItemOKButton : public DinoUiItemMenuItem {
 public:
+    DinoUiItemOKButton(DinoUiItemMenu *owner);
     virtual ~DinoUiItemOKButton();
     virtual void OnFocusChanged(BOOL focused);
     virtual void OnDecide();
@@ -73,12 +77,14 @@ public:
 
 class DinoUiItemPageLButton : public DinoUiItemMenuItem {
 public:
+    DinoUiItemPageLButton(DinoUiItemMenu *owner);
     virtual ~DinoUiItemPageLButton();
     virtual void OnDecide();
 };
 
 class DinoUiItemPageRButton : public DinoUiItemMenuItem {
 public:
+    DinoUiItemPageRButton(DinoUiItemMenu *owner);
     virtual ~DinoUiItemPageRButton();
     virtual void OnDecide();
 };
