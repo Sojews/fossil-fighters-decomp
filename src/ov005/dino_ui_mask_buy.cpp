@@ -536,8 +536,35 @@ void DinoUiMaskBuyMenu::RefreshPage1() {
 
 // Makes the page's mask buttons (empty past the last mask) and links them in a grid, below the buy button and above
 // the back button.
-// NONMATCHING: the empty slot's path (the masks' table, filled by the TU's static initializer) is read through the
-// TU's data pool in the game (one more literal).
+extern "C" u32 data_ov005_0216b300[]; // the pool the masks' table (data_ov005_0216b320) is in, at 0x20
+
+inline DinoUiMaskBuyMaskButton::DinoUiMaskBuyMaskButton(MSmartOam *oam, MPoint pos) : mPos(pos) {
+    SetMode(2);
+    mMotion = new MMotion(std::string(((const char *const *)data_ov005_0216b300)[8]), oam, 2, 1);
+    mMotion->Play(1, 0);
+    mMotion->SetPosition(pos);
+    mMotion->SetPriority(1);
+    mMotion->Show();
+    mMotion->GetUnit()->SetMode(1);
+    mParallel.AddTail(mMotion);
+    mView = new MMotion(std::string(data_ov005_0216b180[22]), oam, 2, 1);
+    mView->Play(1, 0);
+    mView->SetPosition(pos);
+    mView->SetPriority(1);
+    mView->Hide();
+    mView->GetUnit()->SetMode(1);
+    mParallel.AddTail(mView);
+    mMark = new MMotion(std::string(data_ov005_0216b180[22]), oam, 2, 1);
+    mMark->Play(2, 0);
+    mMark->SetPosition(pos);
+    mMark->SetPriority(1);
+    mMark->GetUnit()->SetMode(1);
+    mParallel.AddTail(mMark);
+    mMark->Hide();
+    mMotion->Hide();
+    mMark->Hide();
+}
+
 void DinoUiMaskBuyMenu::RefreshPage2() {
     mUnkC4.clear();
     for (int i = 0; i < 8; i++) {
@@ -550,8 +577,7 @@ void DinoUiMaskBuyMenu::RefreshPage2() {
         } else {
             button = new DinoUiMaskBuyMaskButton(
                 mOam, MPoint(data_ov005_0216b200.mFirst.x + data_ov005_0216b200.mColumn.x * (i % 4) + data_ov005_0216b200.mRow.x * (i / 4),
-                       data_ov005_0216b200.mFirst.y + data_ov005_0216b200.mColumn.y * (i % 4) + data_ov005_0216b200.mRow.y * (i / 4)),
-                0, 0);
+                       data_ov005_0216b200.mFirst.y + data_ov005_0216b200.mColumn.y * (i % 4) + data_ov005_0216b200.mRow.y * (i / 4)));
         }
         mUnkC4.push_back(button);
         AddItem(button);

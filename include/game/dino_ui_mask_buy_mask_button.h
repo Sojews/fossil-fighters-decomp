@@ -46,6 +46,8 @@ public:
             mMark->Hide();
         }
     }
+    // An empty slot (mask 0, no mark); its path is read through the file's data pool.
+    DinoUiMaskBuyMaskButton(MSmartOam *oam, MPoint pos);
     virtual ~DinoUiMaskBuyMaskButton();
     virtual MRect GetFrame();
     virtual void OnFocusChanged(BOOL focused);
