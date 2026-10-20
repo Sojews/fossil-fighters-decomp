@@ -13,6 +13,7 @@
 #include "game/create_player_update_ability_icon_task.h"
 #include "game/dino_resource.h"
 #include "game/dino_backup.h"
+#include "game/dino_static_init.h"
 
 SetToturialFlagTask::~SetToturialFlagTask() {
 }
@@ -118,3 +119,16 @@ u32 DinoBattleTutorial::GetValue(u32 kind) {
     }
     return value;
 }
+
+// The file's static initialization (see dino_static_init.h).
+extern "C" u32 data_ov000_021976ec[];
+static struct SetToturialFlagTaskStaticInit {
+    SetToturialFlagTaskStaticInit() {
+        DINO_POOL_WORD(data_ov000_021976ec, 0x4) = 128;
+        DINO_POOL_WORD(data_ov000_021976ec, 0x8) = 176;
+        DINO_POOL_WORD(data_ov000_021976ec, 0x24) = 8;
+        DINO_POOL_WORD(data_ov000_021976ec, 0x28) = 150;
+        DINO_POOL_WORD(data_ov000_021976ec, 0xc) = 64;
+        DINO_POOL_WORD(data_ov000_021976ec, 0x10) = 112;
+    }
+} sSetToturialFlagTaskStaticInit;

@@ -13,6 +13,7 @@
 #include <vector>
 #include "m/menu.h"
 #include "m/fx32.h"
+#include "game/dino_static_init.h"
 
 // TRUE if the team's first three members are all set and share a type, which gives the team a technique.
 BOOL DinoTeamHasTech(const DinoTeam *team) {
@@ -195,3 +196,16 @@ void DinoLinkGrid(MMenu *menu, std::vector<MMenuItem *> *items, MMenuItem *below
         }
     }
 }
+
+// The file's static initialization (see dino_static_init.h).
+extern "C" u32 data_ov003_02161cec[];
+static struct Ov0030215b008StaticInit {
+    Ov0030215b008StaticInit() {
+        DINO_POOL_WORD(data_ov003_02161cec, 0x4) = 128;
+        DINO_POOL_WORD(data_ov003_02161cec, 0x8) = 176;
+        DINO_POOL_WORD(data_ov003_02161cec, 0xc) = 8;
+        DINO_POOL_WORD(data_ov003_02161cec, 0x10) = 150;
+        DINO_POOL_WORD(data_ov003_02161cec, 0x14) = 64;
+        DINO_POOL_WORD(data_ov003_02161cec, 0x18) = 112;
+    }
+} sOv0030215b008StaticInit;

@@ -1520,7 +1520,7 @@ __sinit_ov000_02190dcc kind:function(thumb,size=0x94) addr:0x02190dcc
 __sinit_dino_battle_view3.cpp kind:function(thumb,size=0x4c) addr:0x02190e60
 __sinit_dino_battle_live.cpp kind:function(thumb,size=0x20) addr:0x02190eac
 __sinit_dino_battle_tutorial.cpp kind:function(thumb,size=0x28) addr:0x02190ecc
-__sinit_ov000_02190ef4 kind:function(thumb,size=0x20) addr:0x02190ef4
+__sinit_set_toturial_flag_task.cpp kind:function(thumb,size=0x20) addr:0x02190ef4
 .p__sinit_ov000_021904d4 kind:data(word) addr:0x02190f14
 .p__sinit_ov000_021904f4 kind:data(word) addr:0x02190f18
 .p__sinit_ov000_0219051c kind:data(word) addr:0x02190f1c

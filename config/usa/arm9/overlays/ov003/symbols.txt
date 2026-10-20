@@ -249,7 +249,7 @@ data_ov003_02160210 kind:data(any) addr:0x02160210
 data_ov003_02160214 kind:data(any) addr:0x02160214
 __sinit_dino_ui_rv_information3d_model.cpp kind:function(thumb,size=0x164) addr:0x02160240
 __sinit_dino_ui_field_menu_fraction.cpp kind:function(thumb,size=0x1fc) addr:0x021603a4
-__sinit_ov003_021605a0 kind:function(thumb,size=0x20) addr:0x021605a0
+__sinit_ov003_0215b008.cpp kind:function(thumb,size=0x20) addr:0x021605a0
 __sinit_ov003_021605c0 kind:function(thumb,size=0x78) addr:0x021605c0
 .p__sinit_ov003_02160240 kind:data(word) addr:0x02160638
 .p__sinit_ov003_021603a4 kind:data(word) addr:0x0216063c
