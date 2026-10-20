@@ -248,6 +248,128 @@ void MAnmModelBase::ClearTransformTracks() {
     mTracks[2].clear();
 }
 
+// Sets the model's animation frame (in 1/16ths), held at its last frame.
+static inline void MAnmSetModelFrame(M3DModel *model, u32 frame) {
+    if (frame >= ((const u32 *)model->mModelRes)[8] * 16) {
+        frame = (((const u32 *)model->mModelRes)[8] - 1) * 16;
+    }
+    model->mFrame = frame;
+}
+
+// Raises last to the track's last key's frame.
+static inline void MAnmLastFrame(std::vector<MAnmKey> &track, u32 &last) {
+    if (track.size() != 0) {
+        u32 frame = track[track.size() - 1].mFrame;
+        if (frame > last) {
+            last = frame;
+        }
+    }
+}
+
+// Plays the model's animation and follows the transform, color and speed tracks (only while they change, or when
+// something was set).
+void MAnmModel::Unk0C() {
+    if (!mLoaded) {
+        return;
+    }
+    if (mFrame >= mStartFrame) {
+        int frames = mModel->GetFrameCount() << 4;
+        if (mUnkF4 == 0 && frames <= mFrame - mStartFrame) {
+            MAnmSetModelFrame(mModel, mFrame - mStartFrame);
+            mModel->SetUnk10(mVisible);
+            if (!mVisible) {
+                Suspend();
+                return;
+            }
+            mFrame = mStartFrame + frames - 16;
+        }
+        if (frames > 0) {
+            mUnk140 = (u32)(mFrame - mStartFrame) % frames;
+            MAnmSetModelFrame(mModel, mUnk140);
+        }
+        mModel->SetUnk10(mFollowParent && mUnk134);
+        mModel->SetPolygonId(unk100);
+        PlaySounds(mFrame - mStartFrame);
+        if (mUnk11A) {
+            mUnk13C = 0;
+            MAnmLastFrame(mTracks[0], mUnk13C);
+            MAnmLastFrame(mTracks[1], mUnk13C);
+            MAnmLastFrame(mTracks[2], mUnk13C);
+            MAnmLastFrame(mTracks[3], mUnk13C);
+            MAnmLastFrame(mTracks[4], mUnk13C);
+            MAnmLastFrame(mTracks[5], mUnk13C);
+            MAnmLastFrame(mTracks[6], mUnk13C);
+            MAnmLastFrame(mTracks[7], mUnk13C);
+            MAnmLastFrame(mTracks[8], mUnk13C);
+            MAnmLastFrame(mTracks[9], mUnk13C);
+            MAnmLastFrame(mTracks[10], mUnk13C);
+        }
+        if (mUnk11A || mUnk11B || mFrame <= mUnk13C + mStartFrame) {
+            mPos.x = mPos.y = mPos.z = 0;
+            if (mTracks[0].size() != 0) {
+                mPos.x = GetValue(0, mFrame - mStartFrame);
+            }
+            if (mTracks[1].size() != 0) {
+                mPos.y = GetValue(1, mFrame - mStartFrame);
+            }
+            if (mTracks[2].size() != 0) {
+                mPos.z = GetValue(2, mFrame - mStartFrame);
+            }
+            if (mPosRef != NULL) {
+                mPos.x += mPosRef->x;
+                mPos.y += mPosRef->y;
+                mPos.z += mPosRef->z;
+            }
+            mModel->SetTranslation(&mPos);
+            VecFx32 v;
+            v.x = v.y = v.z = 0;
+            if (mTracks[3].size() != 0) {
+                v.x = (u16)(GetValue(3, mFrame - mStartFrame) * 16 / 360);
+            }
+            if (mTracks[4].size() != 0) {
+                v.y = (u16)(GetValue(4, mFrame - mStartFrame) * 16 / 360);
+            }
+            if (mTracks[5].size() != 0) {
+                v.z = (u16)(GetValue(5, mFrame - mStartFrame) * 16 / 360);
+            }
+            if (mRotRef != NULL) {
+                v.x += mRotRef->x * 16 / 360;
+                v.y += mRotRef->y * 16 / 360;
+                v.z += mRotRef->z * 16 / 360;
+                v.x = (u16)v.x;
+                v.y = (u16)v.y;
+                v.z = (u16)v.z;
+            }
+            mModel->SetRotation(&v);
+            v.x = v.y = v.z = FX32_ONE;
+            if (mTracks[6].size() != 0) {
+                v.x = GetValue(6, mFrame - mStartFrame);
+            }
+            if (mTracks[7].size() != 0) {
+                v.y = GetValue(7, mFrame - mStartFrame);
+            }
+            if (mTracks[8].size() != 0) {
+                v.z = GetValue(8, mFrame - mStartFrame);
+            }
+            mModel->SetScale(&v);
+            u32 alpha;
+            if (mTracks[9].size() != 0) {
+                alpha = GetValue(9, mFrame - mStartFrame) * (int)mUnk134 >> FX32_SHIFT;
+            } else {
+                alpha = mUnk134;
+            }
+            u16 color = mUnk138;
+            mModel->SetUnk1C(alpha);
+            mModel->SetUnk2F4(color);
+            mSpeed = 16;
+            if (mTracks[10].size() != 0) {
+                mSpeed = GetValue(10, mFrame - mStartFrame) >> 8;
+            }
+        }
+        mUnk11A = mUnk11B = FALSE;
+    }
+}
+
 // The kinds' destructors have this one's body inlined.
 #pragma auto_inline on
 MAnmModelBase::~MAnmModelBase() {
@@ -258,14 +380,6 @@ MAnmModelBase::~MAnmModelBase() {
     Unload();
 }
 #pragma auto_inline reset
-
-// Sets the model's animation frame (in 1/16ths), held at its last frame.
-static inline void MAnmSetModelFrame(M3DModel *model, u32 frame) {
-    if (frame >= ((const u32 *)model->mModelRes)[8] * 16) {
-        frame = (((const u32 *)model->mModelRes)[8] - 1) * 16;
-    }
-    model->mFrame = frame;
-}
 
 // The shadow: plays the model's animation and follows the transform tracks, on the ground.
 void MAnmModelSh::Unk0C() {
