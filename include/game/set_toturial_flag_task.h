@@ -12,6 +12,10 @@
 
 class SetToturialFlagTask : public MTask {
 public:
+    SetToturialFlagTask(u32 tutorial, u32 flag) {
+        mTutorial = (Tutorial *)tutorial;
+        mFlag = flag;
+    }
     virtual ~SetToturialFlagTask();
     virtual void Execute();
 

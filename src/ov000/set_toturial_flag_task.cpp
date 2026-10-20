@@ -1,5 +1,4 @@
 // SetToturialFlagTask.
-// Only the destructors are decompiled so far.
 
 // Derived destructors have their bases' destructor bodies inlined; auto-inlining the ones defined above does that.
 #pragma auto_inline on
@@ -25,8 +24,229 @@ void SetToturialFlagTask::Execute() {
 
 #pragma auto_inline off
 
-// Instances the game emits here (for the tutorial's requests to the battle view); until the code that posts them
-// is decompiled they are made explicitly.
+// A tutorial script command's parameters (the first is its type).
+static inline const s32 *DinoTutorialParams(const u8 *entry) {
+    return (const s32 *)(entry + ((const u32 *)entry)[1]);
+}
+// The script's command at index i.
+static inline const u8 *DinoTutorialEntry(DinoBattleTutorial *tutorial, u32 i) {
+    const u8 *data = (const u8 *)tutorial->mData.Get();
+    return data + ((const u32 *)(data + ((const u32 *)data)[2]))[i];
+}
+
+// Runs the tutorial's script on an event: first the conditions at the current position pick where to go (1-2: on
+// this event, 3-4: on a comparison; 2 and 4 also stop the script when they fail), then the commands from there make
+// the tasks (pointers, rects, the window, ...) until the next condition. Returns NULL when there is nothing to show.
+// NONMATCHING: in the two pointer (SetArroe) commands the game schedules the position temporaries' stores and the
+// parameter loads differently (ctor forms tried: by value, by reference, x/y, an MPoint member, 1-based index).
+#pragma opt_strength_reduction off
+extern "C" MTask *func_ov000_0218ec8c(DinoBattleTutorial *tutorial, int event, BOOL *proceed) {
+    if (tutorial->mUnk0C) {
+        return NULL;
+    }
+    u32 i = tutorial->mUnk08;
+    MSerialTaskSet *tasks;
+    BOOL window;
+    BOOL again = TRUE;
+    do {
+        int type = DinoTutorialParams(DinoTutorialEntry(tutorial, i))[0];
+        switch (type) {
+        case 1:
+        case 2:
+            if (event == DinoTutorialParams(DinoTutorialEntry(tutorial, i))[1]) {
+                int next = DinoTutorialParams(DinoTutorialEntry(tutorial, i))[2];
+                if (next == -1) {
+                    for (;;) {
+                        const u8 *data = (const u8 *)tutorial->mData.Get();
+                        u32 n = i + 1;
+                        int nextType = DinoTutorialParams(data + ((const u32 *)(data + ((const u32 *)data)[2]))[n])[0];
+                        if (nextType < 1 || nextType > 4) {
+                            break;
+                        }
+                        i = n;
+                    }
+                    tutorial->mUnk08 = i;
+                } else {
+                    tutorial->mUnk08 = next - 1;
+                }
+                again = FALSE;
+            } else {
+                if (type == 2 || type == 4) {
+                    return NULL;
+                }
+                i++;
+            }
+            break;
+        case 3:
+        case 4: {
+            int args[3];
+            int j = 0;
+            int *arg = args;
+            while (j < 3) {
+                *arg++ = DinoTutorialParams(DinoTutorialEntry(tutorial, i))[++j];
+            }
+            j = 0;
+            arg = args;
+            for (; j < 2; j++, arg++) {
+                if (args[1] & (1 << j)) {
+                    *arg = tutorial->GetValue(*arg);
+                }
+            }
+            BOOL holds = FALSE;
+            switch (args[1] >> 2) {
+            case 0:
+                if (args[0] > args[2]) {
+                    holds = TRUE;
+                }
+                break;
+            case 1:
+                if (args[0] >= args[2]) {
+                    holds = TRUE;
+                }
+                break;
+            case 2:
+                if (args[0] < args[2]) {
+                    holds = TRUE;
+                }
+                break;
+            case 3:
+                if (args[0] <= args[2]) {
+                    holds = TRUE;
+                }
+                break;
+            case 4:
+                if (args[0] == args[2]) {
+                    holds = TRUE;
+                }
+                break;
+            case 5:
+                if (args[0] != args[2]) {
+                    holds = TRUE;
+                }
+                break;
+            }
+            again = FALSE;
+            if (holds) {
+                int next = DinoTutorialParams(DinoTutorialEntry(tutorial, i))[4];
+                tutorial->mUnk08 = next == -1 ? i : next - 1;
+            } else {
+                if (type == 4) {
+                    return NULL;
+                }
+                i++;
+            }
+            break;
+        }
+        default:
+            return NULL;
+        }
+    } while (again);
+    tasks = NULL;
+    window = FALSE;
+
+    for (;;) {
+        u32 n = ++tutorial->mUnk08;
+        const u8 *entry = DinoTutorialEntry(tutorial, n);
+        int type = DinoTutorialParams(entry)[0];
+        switch (type) {
+        case 1:
+        case 2:
+        case 3:
+        case 4:
+            if (window) {
+                tasks->AddTail(DinoCreatePostAndWaitTask(tutorial->mView, new DinoBattleViewTutorialWindowRequest(0)));
+            }
+            return tasks;
+        case 11:
+            tutorial->mUnk08 = DinoTutorialParams(entry)[1] - 1;
+            break;
+        case 19:
+            tutorial->mUnk0C = TRUE;
+            if (window) {
+                tasks->AddTail(DinoCreatePostAndWaitTask(tutorial->mView, new DinoBattleViewTutorialWindowRequest(0)));
+            }
+            return tasks;
+        case 7:
+            if (tasks == NULL) {
+                tasks = new MSerialTaskSet(TRUE);
+            }
+            tasks->AddTail(DinoCreatePostAndWaitTask(
+                tutorial->mView,
+                new DinoBattleViewTutorialSetArroeRequest(DinoTutorialParams(entry)[1] - 1, DinoTutorialParams(entry)[2],
+                                                          MPoint(DinoTutorialParams(entry)[3], DinoTutorialParams(entry)[4]))));
+            break;
+        case 8:
+            if (tasks == NULL) {
+                tasks = new MSerialTaskSet(TRUE);
+            }
+            tasks->AddTail(DinoCreatePostAndWaitTask(
+                tutorial->mView, new DinoBattleViewTutorialSetArroeRequest(DinoTutorialParams(entry)[1] - 1, 0, MPoint(0, 0))));
+            break;
+        case 9:
+            if (tasks == NULL) {
+                tasks = new MSerialTaskSet(TRUE);
+            }
+            tasks->AddTail(DinoCreatePostAndWaitTask(
+                tutorial->mView,
+                new DinoBattleViewTutorialSetRectRequest(MPoint(DinoTutorialParams(entry)[1], DinoTutorialParams(entry)[2]),
+                                                         MPoint(DinoTutorialParams(entry)[3], DinoTutorialParams(entry)[4]))));
+            break;
+        case 5:
+            window = TRUE;
+            if (tasks == NULL) {
+                tasks = new MSerialTaskSet(TRUE);
+            }
+            tasks->AddTail(DinoCreatePostAndWaitTask(tutorial->mView,
+                                                     new DinoBattleViewTutorialWindowRequest(DinoTutorialParams(entry)[1])));
+            break;
+        case 12:
+            if (proceed != NULL) {
+                *proceed = DinoTutorialParams(entry)[1];
+            }
+            break;
+        case 18: {
+            if (tasks == NULL) {
+                tasks = new MSerialTaskSet(TRUE);
+            }
+            MTask *end = ((DinoBattleModel *)tutorial->mUnk24)->CreatePostTask(new DinoBattleModelTutorialGameEndSignal());
+            tasks->AddTail(DinoCreatePostAndWaitTask(tutorial->mView, new DinoBattleViewTutorialWindowRequest(0)));
+            tasks->AddTail(end);
+            tutorial->mUnk0C = TRUE;
+            ((DinoBattleModel *)tutorial->mUnk24)->mUnkA8 = TRUE;
+            return tasks;
+        }
+        case 13:
+            if (tasks == NULL) {
+                tasks = new MSerialTaskSet(TRUE);
+            }
+            tasks->AddTail(new SetToturialFlagTask(((DinoBattleModel *)tutorial->mUnk24)->GetUnk10C(),
+                                                   DinoTutorialParams(entry)[1]));
+            break;
+        case 14:
+        case 15:
+            for (int k = 0; k < 2; k++) {
+                if (((DinoBattleModel *)tutorial->mUnk24)->GetPlayer(k)->mUnkB4 == 0) {
+                    ((DinoBattleModel *)tutorial->mUnk24)->GetPlayer(k)->SetUnkC8(type == 14);
+                    break;
+                }
+            }
+            break;
+        case 16:
+        case 17:
+            for (int k = 0; k < 2; k++) {
+                if (((DinoBattleModel *)tutorial->mUnk24)->GetPlayer(k)->mUnkB4 == 1) {
+                    ((DinoBattleModel *)tutorial->mUnk24)->GetPlayer(k)->SetUnkC8(type == 16);
+                    break;
+                }
+            }
+            break;
+        }
+    }
+}
+
+#pragma opt_strength_reduction reset
+
+// Instances the game emits here (for the tutorial's requests to the battle view).
 template MTask *DinoCreatePostAndWaitTask(DinoBattleView *target, DinoBattleViewTutorialSetRectRequest *msg);
 template MTask *DinoCreatePostAndWaitTask(DinoBattleView *target, DinoBattleViewTutorialSetArroeRequest *msg);
 template MTask *DinoCreatePostAndWaitTask(DinoBattleView *target, DinoBattleViewTutorialWindowRequest *msg);

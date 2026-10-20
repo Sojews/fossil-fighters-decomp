@@ -4,6 +4,7 @@
 
 #include "m/message.h"
 #include "m/observer.h"
+#include "m/geometry.h"
 #include "game/dino_backup.h"
 
 class DinoDummyMessage : public MMessage {
@@ -2753,6 +2754,7 @@ public:
 class DinoBattleViewTutorialWindowRequest : public MMessage {
 public:
     DinoBattleViewTutorialWindowRequest() : MMessage(0x10085) {}
+    DinoBattleViewTutorialWindowRequest(u32 unk10) : MMessage(0x10085), mUnk0C(0), mUnk10(unk10) {}
     virtual u32 GetSize() { return 12; }
     virtual void Write(void *buf) {
         MI_CpuCopy8(&mId, buf, 4);
@@ -2784,6 +2786,10 @@ public:
 class DinoBattleViewTutorialSetArroeRequest : public MMessage {
 public:
     DinoBattleViewTutorialSetArroeRequest() : MMessage(0x10087) {}
+    DinoBattleViewTutorialSetArroeRequest(u32 unk10, u32 unk14, MPoint pos)
+        : MMessage(0x10087), mUnk0C(0), mUnk10(unk10), mUnk14(unk14) {
+        *(MPoint *)mUnk18 = pos;
+    }
     virtual u32 GetSize() { return 24; }
     virtual void Write(void *buf) {
         MI_CpuCopy8(&mId, buf, 4);
@@ -2821,6 +2827,10 @@ public:
 class DinoBattleViewTutorialSetRectRequest : public MMessage {
 public:
     DinoBattleViewTutorialSetRectRequest() : MMessage(0x10089) {}
+    DinoBattleViewTutorialSetRectRequest(MPoint a, MPoint b) : MMessage(0x10089), mUnk0C(0) {
+        *(MPoint *)mUnk10 = a;
+        *(MPoint *)mUnk18 = b;
+    }
     virtual u32 GetSize() { return 24; }
     virtual void Write(void *buf) {
         MI_CpuCopy8(&mId, buf, 4);
