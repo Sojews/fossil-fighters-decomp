@@ -65,13 +65,12 @@ DinoBattleTalkWindow::DinoBattleTalkWindow(u32 unkD8)
 // The focus frame's timings (the delay, the slide's duration and its ease), for the top screen and the bottom.
 extern "C" const u32 data_0208a108, data_0208a104, data_0208a100;
 extern "C" const u32 data_0208a0c4;
-extern "C" const u32 data_0208a0f0[];
+extern "C" const u32 data_0208a0f4, data_0208a0f8;
 // The TU's pooled frame corner path (word 1) and corner positions.
 extern "C" u32 data_ov000_02197054[];
 extern "C" const MPoint data_ov000_02197088[4];
 
 // Slides the frame's four corners on both screens in (to the top screen, or back down to the bottom one).
-// NONMATCHING: the game loads data_0208a0f0's second and third words through their own pool addresses.
 extern "C" void func_ov000_0218b928(DinoBattleViewFocusLCDFrame *frame, u8 top) {
     if (!gDinoResource->GetBattleAdjustDefs()->unk170) {
         return;
@@ -79,7 +78,7 @@ extern "C" void func_ov000_0218b928(DinoBattleViewFocusLCDFrame *frame, u8 top) 
     frame->mTasks->Clear();
     u32 timings[2][3] = {
         {data_0208a108, data_0208a104, data_0208a100},
-        {data_0208a0c4, data_0208a0f0[2], data_0208a0f0[1]},
+        {data_0208a0c4, data_0208a0f8, data_0208a0f4},
     };
     const u32 *timing = timings[top == 0 ? 1 : 0];
     for (int i = 0; i < 2; i++) {
