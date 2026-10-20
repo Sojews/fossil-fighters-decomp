@@ -11,6 +11,7 @@ class DinoCommonFont;
 // $c shadow color).
 class DinoCleaningTalkFilter : public MConsoleFilter {
 public:
+    DinoCleaningTalkFilter(DinoCleaningTalkWindow *window, DinoCommonFont *font) : mWindow(window), mFont(font) {}
     virtual ~DinoCleaningTalkFilter();
     virtual BOOL Filter(MConsole *console, int c);
 

@@ -15,6 +15,11 @@
 #include "game/dino_static_init.h"
 #include "game/dino_backup.h"
 #include "game/dino_common_font.h"
+#include "game/dino_cleaning.h"
+#include "m/motion.h"
+#include "m/picture.h"
+#include "m/oam_canvas.h"
+#include "m/task.h"
 #include <string>
 #include <string.h>
 #include <stdlib.h>
@@ -197,6 +202,61 @@ void DinoCleaningTalkWindow::SetUnkD0(u32 value) {
 
 void DinoCleaningTalkWindow::SetUnkCC(u32 value) {
     mUnkCC = value;
+}
+
+// Says text: opens the window (the face, the frame with a random motion and the console, sliding in) or, when it's
+// open, puts it back in place and replaces the text.
+// NONMATCHING: the slide-in points' temporaries and two task spills take other stack slots.
+extern "C" void func_ov002_021573e8(DinoCleaningTalkWindow *window, const char *text) {
+    window->mRate = MFx32::FromRaw(((const s32 *)gDinoResource->GetExcavate7C())[5]);
+    if (!window->mTasksB8->IsEmpty()) {
+        u32 motion;
+        do {
+            motion = ((DinoCleaning *)window->mUnk74)->GetRandom()->Next(window->mMotion.GetUnk18() - 1) + 1;
+        } while (motion == window->unkB0);
+        window->mTasksB4->Clear();
+        window->mFace->SetPosition(0, 0);
+        ((MMotion *)window->mFrame)->SetPosition(256, 192);
+        window->mConsole->SetRate(window->mRate);
+        window->mConsole->SetPosition(data_ov002_0216431c.mPos);
+        window->mConsole->Clear();
+        window->mConsole->ClearText();
+        window->mConsole->Print(std::string(text));
+        return;
+    }
+    window->mOam = new MSmartOam(gLcd->GetTopDisplay(), 0x14, 0, 1);
+    window->mFace = new MTextPicture(gLcd->GetTopDisplay(), window->mPicture, TRUE, false);
+    window->mFace->Show();
+    DinoCommonFont *font = new DinoCommonFont(0, 10, 11);
+    window->mConsole = new MConsole(new MSmartObjCanvas(window->mOam, DINO_POOL(MPoint, data_ov002_0216431c, 0x30),
+                                                        gDinoResource->GetUnkTable(), TRUE),
+                                    font, MPoint(0, 4), MFx32(2));
+    window->mConsole->SetRate(window->mRate);
+    window->mConsole->SetFilter(new DinoCleaningTalkFilter(window, font));
+    window->mConsole->Show();
+    window->mConsole->Print(std::string(text));
+    window->mConsole->Suspend();
+    window->unkB0 = ((DinoCleaning *)window->mUnk74)->GetRandom()->Next(window->mMotion.GetUnk18() - 1) + 1;
+    window->mFrame = new MMotion(MMotionFile(window->mMotion), window->mOam, 0, 1);
+    window->mFrame->Show();
+    ((MMotion *)window->mFrame)->Play(window->unkB0, 0);
+    MBlend *blend = gLcd->GetTopDisplay()->mBlend;
+    blend->SetMode(1);
+    blend->SetTarget1(window->mFace->GetPlaneMask());
+    blend->SetTarget2(0x3F);
+    blend->SetAlpha(12, 4);
+    window->mTasksB8->AddTail(window->mFace, window->mConsole, window->mFrame, window->mOam);
+    MTask *face;
+    MTask *console;
+    MTask *frame;
+    MTask *run = MTaskRunTransfer::Create(window->mConsole);
+    frame = window->mFrame->CreateCoordAnime(MPoint(320, 192), MPoint(256, 192), 10, 12);
+    console = window->mConsole->CreateCoordAnime(
+        MPoint(data_ov002_0216431c.mPos.x, data_ov002_0216431c.mPos.y + 40), data_ov002_0216431c.mPos, 10, 12);
+    face = window->mFace->CreateCoordAnime(MPoint(0, 40), MPoint(0, 0), 10, 12);
+    MParallelTaskSet *set = new MParallelTaskSet(TRUE);
+    set->AddTail(face, console, frame);
+    window->mTasksB4->AddTail(set, run);
 }
 
 void DinoCleaningTalkWindow::SetRate(MFx32 rate) {
