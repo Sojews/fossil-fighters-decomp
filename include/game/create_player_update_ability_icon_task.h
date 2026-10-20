@@ -122,6 +122,8 @@ public:
     u8 GetUnk15C();
     void SetUnk15C();
     MTask *CreateSendAbilityResultTask(MMessageObserver *target);
+    // Asks the view to wait for the field's effects, waiting for its signal (after a frame).
+    MTask *CreateFieldEffectWaitTask();
     MTask *CreateUpdateColorTask(const u32 *ids, u32 count, u32 color);
     // Has the view update the ability icons, and waits for it.
     MTask *CreateUpdateAbilityIconTask(u8 flag);

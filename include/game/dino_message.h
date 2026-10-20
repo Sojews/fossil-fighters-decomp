@@ -1865,6 +1865,7 @@ public:
 class DinoBattleViewFieldEffectWaitRequest : public MMessage {
 public:
     DinoBattleViewFieldEffectWaitRequest() : MMessage(0x10055) {}
+    DinoBattleViewFieldEffectWaitRequest(MMessageObserver *reply) : MMessage(0x10055), mUnk0C((u32)reply) {}
     virtual u32 GetSize() { return 8; }
     virtual void Write(void *buf) {
         MI_CpuCopy8(&mId, buf, 4);

@@ -1341,6 +1341,13 @@ void DinoBattleModelPlayer::SetUnk15C() {
     mUnk15C = 1;
 }
 
+MTask *DinoBattleModelPlayer::CreateFieldEffectWaitTask() {
+    MParallelTaskSet *wait = new MParallelTaskSet(TRUE);
+    DinoSignalWait *signal = new DinoSignalWait(0x10056, NULL, NULL, 1);
+    wait->AddTail(signal, mUnkF4->CreatePostTask(new DinoBattleViewFieldEffectWaitRequest(signal)));
+    return (new MSerialTaskSet(TRUE))->Add(new MTimer(1))->Add(wait);
+}
+
 MTask *DinoBattleModelPlayer::CreateSendAbilityResultTask(MMessageObserver *target) {
     return new SendModelCreatureAbilityResultTask(mUnkF4, target);
 }
