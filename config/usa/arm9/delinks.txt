@@ -97,7 +97,8 @@ src/game/dino_backup.cpp:
     .init       start:0x02088f10 end:0x02088f20
 
 src/game/dino_common_window.cpp:
-    .text       start:0x0201b574 end:0x0201be50
+    .text       start:0x0201b574 end:0x0201c68c
+    .init       start:0x02088f20 end:0x02088f88
 
 src/game/dino_common_label.cpp:
     .text       start:0x0201c68c end:0x0201c9e4

@@ -23,18 +23,19 @@ public:
     virtual void SetPosition(int x, int y);
 
     void Draw(MPoint pos, MRect rect);
+    // Tiles b with the a rect of the window graphics.
     void Unk0201c098(MRect a, MRect b);
-    // Not decompiled yet.
+    // Draws rect's border with the frame tiles at pos.
     void Unk0201be50(MPoint pos, MRect rect);
     // Sets the window's rect and draws it.
     void SetFrame(MRect rect);
     // Unk0201c098 with the frame inside the window's rect.
     void Unk0201bb5c();
-    // Not decompiled yet: a task that opens the window out of the rect.
+    // A task that opens the window out of the rect.
     MTask *CreateOpenTask(MRect from);
-    // Not decompiled yet: draws the rect's row in one of the flash phases.
+    // Draws the rect's rows in one of the flash phases.
     void Flush(MRect rect, u8 phase);
-    // Not decompiled yet: a task that closes the window into the rect.
+    // A task that closes the window into the rect.
     MTask *CreateCloseTask(MRect to);
 
     MDisplay *mDisplay;     // 0x18
