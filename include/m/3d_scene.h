@@ -55,7 +55,7 @@ public:
     } mLights[4];               // 0x1E
     u8 unk46[2];
     std::list<M3DModel *> mModels; // 0x48
-    u32 unk54;
+    u32 mLightMask;             // 0x54: the lights on (bit per light)
     VecFx32 mCameraPos;         // 0x58
     VecFx32 mCameraTarget;      // 0x64
     VecFx32 mCameraUp;          // 0x70
@@ -65,14 +65,16 @@ public:
     M3d *mM3d;                  // 0x88
     MtxFx43 mCamera;            // 0x8C: the view matrix
     MtxFx44 mProjection;        // 0xBC
-    u8 unkFC[0x144 - 0xFC];
+    MtxFx33 mCameraRot;         // 0xFC: the view matrix's rotation, transposed
+    u8 unk120[0x144 - 0x120];
     u8 mEnabled;                // 0x144
     u32 mUnk148;                // 0x148
     u32 mUnk14C;                // 0x14C
     u32 mUnk150;                // 0x150
     u32 mUnk154;                // 0x154
     u32 mUnk158;                // 0x158
-    u32 unk15C[2];
+    u32 mFrames;                // 0x15C: frames drawn
+    u32 mPrevFrames;            // 0x160
     u32 mUnk164;                // 0x164
     u32 mUnk168;                // 0x168
     M3DHeap *mHeap;             // 0x16C

@@ -10,7 +10,7 @@ public:
     virtual ~M3DRyusen();
     virtual int GetFrameCount();
     virtual BOOL IsAnimDone();
-    virtual void Draw();
+    virtual void Draw(u32 lights);
 
     void SetQuad(const VecFx32 *origin, const VecFx32 *a, const VecFx32 *b, const VecFx32 *c);
 

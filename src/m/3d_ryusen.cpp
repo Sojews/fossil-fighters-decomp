@@ -25,7 +25,7 @@ void M3DRyusen::SetQuad(const VecFx32 *origin, const VecFx32 *a, const VecFx32 *
 }
 
 // A translucent quad from the origin.
-void M3DRyusen::Draw() {
+void M3DRyusen::Draw(u32 lights) {
     int id = mPolygonId & 0x3F;
     if (mUnk1C == 0) {
         return;

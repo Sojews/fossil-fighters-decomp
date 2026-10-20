@@ -18,7 +18,7 @@ public:
     virtual void SetAnimData(void *data);
     virtual int GetFrameCount();
     virtual BOOL IsAnimDone();
-    virtual void Draw();
+    virtual void Draw(u32 lights);
 
     fx32 GetGroundHeight(fx32 x, fx32 z);
     BOOL IsOnGround(fx32 x, fx32 z, fx32 *height);
@@ -63,6 +63,7 @@ public:
     u32 mTexKey;                // 0xC8
     u32 mPlttKey;               // 0xCC
     u8 mHasTexture;             // 0xD0
+    u8 mUnkD1;                  // 0xD1: set unless the scene's mUnk10 is 1
     const void *mAnimRes;       // 0xD4: the joint animation resource
     const void *mModelRes;      // 0xD8: the model resource (its joint names)
     u32 mUnkDC;                 // 0xDC
