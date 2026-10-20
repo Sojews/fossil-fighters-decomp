@@ -27,6 +27,7 @@ public:
     void ChangeToHole();
     void StartChangeToHole();
     void StateWait();
+    void StateAppear();
     void StateCountdown();
 
     void (DinoFieldHole::*mState)();    // 0x74
@@ -36,7 +37,8 @@ public:
     MFx32Point mPos;                    // 0x88
     u32 mUnk90;                         // 0x90
     M3DModelResource mModel;            // 0x94
-    u8 unkF8[0x110 - 0xF8];
+    VecFx32 mModelPos;                  // 0xF8: followed by the model (x, mUnk90, y)
+    VecFx32 mModelRot;                  // 0x104
     u8 mUnk110;                         // 0x110
     u32 mUnk114;                        // 0x114
     u8 mUnk118;                         // 0x118

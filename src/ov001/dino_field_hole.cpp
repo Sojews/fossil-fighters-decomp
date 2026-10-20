@@ -51,8 +51,10 @@ extern "C" struct {
     void (DinoFieldHole::*StateWait_0C)();
     void (DinoFieldHole::*ChangeToHole_14)();
     u8 unk1C[0x24 - 0x1C];
-    void (DinoFieldHole::*Unk0215c418_24)();
+    void (DinoFieldHole::*StateAppear_24)();
+    void (DinoFieldHole::*StateCountdown_2C)();
 } data_ov001_02169ddc;
+extern "C" const char data_ov001_02169e50[];  // the hole's model
 
 DinoFieldHole::DinoFieldHole(DinoField *field, u32 unk80, MFx32Point pos, u32 unk90, u8 unk118)
     : MProcess(NULL), mField(field), mUnk80(unk80), mPos(pos), mUnk90(unk90) {
@@ -67,7 +69,31 @@ void DinoFieldHole::StartChangeToHole() {
 
 void DinoFieldHole::StateWait() {
     mSerial.AddTail(new MTimer(30));
-    mState = data_ov001_02169ddc.Unk0215c418_24;
+    mState = data_ov001_02169ddc.StateAppear_24;
+}
+
+// Makes the hole's model and starts the countdown.
+void DinoFieldHole::StateAppear() {
+    mUnk110 = TRUE;
+    mUnk84 = new MAnmModel((M3DScene *)mUnk80);
+    mUnk84->unk100 = 0x22;
+    mUnk84->SetFrames(0, 0x40000000);
+    mUnk84->Load(data_ov001_02169e50, FALSE);
+    mUnk84->Run();
+    mUnk84->mUnkF4 = 0;
+    mUnk84->mFollowParent = TRUE;
+    if (mUnk84->mState == MTask::STATE_RUN) {
+        mUnk84->Execute();
+    }
+    mModelPos.x = mPos.x.v;
+    mModelPos.z = mPos.y.v;
+    mModelPos.y = mUnk90;
+    mUnk84->SetPosRef(&mModelPos);
+    mModelRot.x = mModelRot.y = mModelRot.z = 0;
+    mUnk84->SetRotRef(&mModelRot);
+    mParallel.AddTail(mUnk84);
+    mUnk114 = 0x93;
+    mState = data_ov001_02169ddc.StateCountdown_2C;
 }
 
 void DinoFieldHole::StateCountdown() {
