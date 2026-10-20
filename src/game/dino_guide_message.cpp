@@ -72,6 +72,21 @@ void DinoGuideMessage::Restart() {
     mState = data_020b5c40.Scroll_08;
 }
 
+extern "C" const MFx32 data_020b5814;   // frames per pixel of the scroll
+
+// Scrolls a strip wider than the screen across it.
+// NONMATCHING: the duration's temporaries take the slots just above it in the game (ours: the top of the frame).
+void DinoGuideMessage::Scroll() {
+    MScopedLock lock(&mMutex, TRUE);
+    if (mCanvas != NULL && mCanvas->GetWidth() > 256) {
+        MFx32 frames;
+        frames = MFx32(mCanvas->GetWidth() - 256) * data_020b5814;
+        int dist = mCanvas->GetWidth() - 256;
+        mSerial.AddTail(mCanvas->CreateCoordAnime(MPoint(0, mCanvas->GetPosition().y),
+                                                  MPoint(-dist, mCanvas->GetPosition().y), MFx32ToInt(frames), 0));
+    }
+}
+
 void DinoGuideMessage::Unk08() {
     MScopedLock lock(&mMutex, TRUE);
     mFont->Release();

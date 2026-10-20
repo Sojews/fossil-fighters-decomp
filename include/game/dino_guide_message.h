@@ -16,6 +16,7 @@ public:
     virtual void Unk08();
     virtual void Unk0C();
     void Restart();
+    void Scroll();
 
     void (DinoGuideMessage::*mState)(); // 0x7C
     std::string mText;      // 0x84
