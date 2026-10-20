@@ -35,9 +35,12 @@ public:
     virtual void Idle();
 
     void StateEnd();
+    // Slides both sides' life point panels in, counts them up and drops the losing side's panel.
+    void StateStart();
 
     void (DinoBattleViewDecideFirstAttackTeam::*mState)(); // 0x74
-    u32 unk7C[3];
+    DinoBattleViewLPCountPanel *mPanels[2]; // 0x7C: by side
+    MSmartOam *mOam;                        // 0x84
     u32 mUnk88;     // 0x88
     u32 mUnk8C;     // 0x8C
     u32 mUnk90;     // 0x90

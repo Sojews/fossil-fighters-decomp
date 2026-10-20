@@ -10,6 +10,9 @@
 #include <string>
 #include "game/dino_sound.h"
 #include "nitro/os.h"
+#include "m/smart_oam.h"
+#include "game/dino_battle_view_kaseki_point_menu.h"
+#include "game/dino_battle_view_class.h"
 
 // The TU's pooled statics: the panel's motion paths and pointer-to-member constants (see menu.cpp).
 extern "C" struct {
@@ -17,7 +20,8 @@ extern "C" struct {
     const char *panelPaths[2];  // 0x04: by side
     const char *unk0CPath;      // 0x0C
     const char *digitPath;      // 0x10
-    u8 unk14[0x34 - 0x14];
+    void (DinoBattleViewDecideFirstAttackTeam::*StateEnd_14)(); // 0x14
+    u8 unk1C[0x34 - 0x1C];
     void (DinoBattleViewDecideFirstAttackTeam::*Start_34)();
 } data_ov000_02197300;
 
@@ -107,6 +111,45 @@ DinoBattleViewDecideFirstAttackTeam::DinoBattleViewDecideFirstAttackTeam(u32 unk
 #pragma auto_inline off
 
 extern "C" const u32 data_0208a170;     // frames the result stays up
+
+// Where each panel slides in from and to (by its place), and the drop's start (the place's end point).
+struct DinoLPPanelSlide {
+    MPoint from;
+    MPoint to;
+};
+extern "C" const DinoLPPanelSlide data_ov000_02197368[];
+extern "C" u32 data_ov000_02197370[];
+extern "C" const s32 data_ov000_02197374[];
+extern "C" const u32 data_0208a174, data_0208a178, data_0208a17c, data_0208a184, data_0208a188, data_0208a1bc;
+extern "C" MTask *func_ov000_0218d504(DinoBattleViewLPCountPanel *panel, MPoint from, MPoint to, int frames, int ease);
+
+// NONMATCHING: the drop's end point stores its y before its x in the game.
+void DinoBattleViewDecideFirstAttackTeam::StateStart() {
+    u32 place;
+    MTask *drop;
+    mOam = new MSmartOam(20, 0, 1);
+    MParallelTaskSet *slides = new MParallelTaskSet();
+    mParallel.AddTail(slides);
+    MParallelTaskSet *parallel = &mParallel;
+    for (int i = 0; i < 2; i++) {
+        place = ((DinoBattleView *)mUnk88)->GetUnkE4(i)->GetUnkAC();
+        mPanels[i] = new DinoBattleViewLPCountPanel(mOam, place, (&mUnk90)[i], mUnk8C == i);
+        parallel->AddTail(mPanels[i]);
+        slides->AddTail(func_ov000_0218d504(mPanels[i], data_ov000_02197368[place].from, data_ov000_02197368[place].to,
+                                            data_0208a1bc, data_0208a188));
+    }
+    mParallel.AddTail(mOam);
+    GetSerial()->AddTail(DinoSoundCreatePlaySeTask(0x38B, 0), new MTimer(data_0208a1bc));
+    MParallelTaskSet *counts = new MParallelTaskSet(TRUE);
+    counts->AddTail(func_ov000_0218d318(mPanels[0], data_0208a184), func_ov000_0218d318(mPanels[1], data_0208a184));
+    int loser = 1 - mUnk8C;
+    place = ((DinoBattleView *)mUnk88)->GetUnkE4(loser)->GetUnkAC();
+    drop = func_ov000_0218d504(mPanels[loser], *(const MPoint *)&data_ov000_02197370[place * 4],
+                               MPoint((s32)data_ov000_02197370[place * 4], data_ov000_02197374[place * 4] + 128),
+                               data_0208a178, data_0208a174);
+    GetSerial()->AddTail(counts, new MTimer(data_0208a17c), drop);
+    mState = data_ov000_02197300.StateEnd_14;
+}
 
 void DinoBattleViewDecideFirstAttackTeam::StateEnd() {
     GetSerial()->AddTail(new MTimer(data_0208a170), MTaskExitTransfer::Create(this));
