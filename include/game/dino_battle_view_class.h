@@ -19,7 +19,11 @@ class DinoBattleViewActionInfoBar;
 class DinoBattleViewFocusLCDFrame;
 class DinoBattleView3D;
 class KasekiPointPalette;
-struct DinoBattleViewData;
+// The battle view's data file.
+struct DinoBattleViewData {
+    u32 unk00[2];
+    u32 creatureOffsets;    // 0x08: offset of the creatures' MPoint offsets, by creature
+};
 
 // What the field shows for each side.
 class DinoBattleViewFieldSlot : public MView {

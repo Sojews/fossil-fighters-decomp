@@ -13,14 +13,19 @@
 #include "m/looper.h"
 #include "game/help.h"
 #include "game/dino_field_camera_hook.h"
+#include "game/dino_battle.h"
 
 class MMotion;
 
 class DinoBattleViewStatusEffectIcon;
 class MPalAnime;
 
+class DinoBattleViewPlayer;
+
 class DinoBattleViewCreature : public MProcess, public MMessageObserver {
 public:
+    DinoBattleViewCreature(u8 id, DinoBattleViewPlayer *player, u32 unkAC, u32 unkB0, u32 unkB4,
+                           DinoBattleSide::Creature entry, u32 unk1, u32 unk2);
     virtual ~DinoBattleViewCreature();
     virtual void Idle();
     virtual void OnMessage(MMessage *msg);

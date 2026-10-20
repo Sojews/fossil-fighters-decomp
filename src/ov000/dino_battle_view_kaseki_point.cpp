@@ -19,6 +19,9 @@
 #include "game/dino_sound.h"
 #include "game/dino_battle_view2.h"
 #include "game/dino_static_init.h"
+#include <algorithm>
+#include "game/dino_message.h"
+#include "nitro/os.h"
 
 DinoBattleViewKasekiPoint::~DinoBattleViewKasekiPoint() {
 }
@@ -268,6 +271,142 @@ void DinoBattleViewPlayer::TakeMotions(MMotion **motion, MTask **task) {
         *motion = mMotion;
         *task = mMotionTask;
         mMotion = NULL;
+    }
+}
+
+extern "C" void func_ov000_0216fee0(DinoBattleViewCreature *creature, MPoint offset);
+extern "C" void func_ov000_0218b4dc(DinoBattleViewActionInfoBar *bar, const char *text);
+extern "C" const u32 data_0208a2ec;   // a creature down (the player's side)
+extern "C" const u32 data_0208a2f0;   // (the other side)
+
+// Adds and removes the side's creatures, sets up the side, updates its kaseki point and ability icon; anything
+// else goes to the creatures.
+// NONMATCHING (98%): the byte temporaries of the inlined vector push_back/erase take rotated stack slots, and the
+// begin signal's flag test reuses a nearby branch stub where the game makes its own.
+void DinoBattleViewPlayer::OnMessage(MMessage *msg) {
+    switch (msg->mId) {
+    default:
+        mSubject.Notify(msg);
+        break;
+    case 0x10007: {
+        DinoBattleViewCreatureBeginSignal *req = (DinoBattleViewCreatureBeginSignal *)msg;
+        if (req->mUnk0C != mUnkA8) {
+            break;
+        }
+        DinoBattleViewCreature *creature = new DinoBattleViewCreature(
+            *(u32 *)req->mUnk18, this, req->mUnk10, mUnkAC, req->mUnk14, *(DinoBattleSide::Creature *)req->mUnk18,
+            req->mUnk30, mUnkB0);
+        u8 id = *(u32 *)req->mUnk18;
+        const DinoBattleViewData *data =
+            (const DinoBattleViewData *)mView->mData.mFile.archive->GetData(mView->mData.mFile.index);
+        MPoint offset = ((const MPoint *)((const u8 *)data + data->creatureOffsets))[id];
+        func_ov000_0216fee0(creature, offset);
+        creature->GetUnkB4();
+        mCreatures.push_back(creature);
+        mSubject.AddObserver(creature);
+        mParallel.AddTail(creature);
+        break;
+    }
+    case 0x10008: {
+        DinoBattleViewPlayerBeginSignal *req = (DinoBattleViewPlayerBeginSignal *)msg;
+        if (req->mUnk0C != mUnkA8) {
+            break;
+        }
+        if (mKasekiPoint != NULL) {
+            mKasekiPoint->mUnk78 = req->mUnk30;
+        }
+        mUnkC0 = (const char *)req->mUnk10;
+        u32 count = req->mUnk34;
+        if (count == 0) {
+            count = 1;
+        }
+        mUnkCC = count;
+        if (req->mUnk38) {
+            mUnk114 = TRUE;
+        }
+        break;
+    }
+    case 0x10033: {
+        DinoBattleViewCreatureEndRequest *req = (DinoBattleViewCreatureEndRequest *)msg;
+        if (req->mUnk10 != mUnkA8) {
+            break;
+        }
+        DinoBattleViewCreature *creature = FindCreatureByAC(req->mUnk14);
+        if (creature->GetUnkB4() == 0 && mUnk108 != NULL) {
+            mUnk108->Update(0, NULL);
+        }
+        const char *format = gDinoResource->GetText(mUnkAC == 1 ? data_0208a2ec : data_0208a2f0);
+        char text[64];
+        OS_SPrintf(text, format, gDinoResource->GetCreatureText08(creature->GetUnkA8()));
+        func_ov000_0218b4dc((DinoBattleViewActionInfoBar *)mView->GetUnk104(), text);
+        mCreatures.erase(std::find(mCreatures.begin(), mCreatures.end(), creature));
+        mSubject.RemoveObserver(creature);
+        mSerial.AddTail(creature->CreateMotionCallTask());
+        if (req->mUnk0C != 0) {
+            mSerial.AddTail(((MMessageObserver *)req->mUnk0C)->CreatePostTask(new DinoBattleViewCreatureEndResult()));
+        }
+        break;
+    }
+    case 0x10038: {
+        DinoBattleViewPlayerUpdateRequest *req = (DinoBattleViewPlayerUpdateRequest *)msg;
+        if (req->mUnk10 != mUnkA8) {
+            break;
+        }
+        if (mKasekiPoint != NULL) {
+            mKasekiPoint->SetValue(req->mUnk14);
+        }
+        if (req->mUnk0C != 0) {
+            ((MMessageObserver *)req->mUnk0C)->Post(new DinoBattleViewPlayerUpdateResult());
+        }
+        break;
+    }
+    case 0x10049: {
+        DinoBattleViewPlayerUpdateAbilityIconRequest *req = (DinoBattleViewPlayerUpdateAbilityIconRequest *)msg;
+        if (req->mUnk10 != mUnkA8 && !req->mUnk14) {
+            break;
+        }
+        UpdateUnk108();
+        if (req->mUnk0C != 0 && req->mUnk10 == mUnkA8) {
+            ((MMessageObserver *)req->mUnk0C)->Post(new DinoBattleViewPlayerUpdateAbilityIconResult());
+        }
+        break;
+    }
+    case 0x10092: {
+        DinoBattleViewPlayerWaitKPCountStopRequest *req = (DinoBattleViewPlayerWaitKPCountStopRequest *)msg;
+        if (req->mUnk10 != mUnkA8) {
+            break;
+        }
+        MTask *post = ((MMessageObserver *)req->mUnk0C)->CreatePostTask(new DinoBattleViewPlayerWaitKPCountStopResult());
+        WaitKPCountTask *wait = new WaitKPCountTask(mKasekiPoint);
+        MSerialTaskSet *tasks = new MSerialTaskSet(TRUE);
+        tasks->AddTail(wait);
+        tasks->AddTail(post);
+        mSerial.AddTail(tasks);
+        break;
+    }
+    case 0x10029:
+    case 0x1002D:
+        if (mMotion != NULL) {
+            MTask *task = mMotionTask;
+            mParallel.Remove(mMotion);
+            mParallel.Remove(task);
+            delete mMotion;
+            delete mMotionTask;
+            mMotion = NULL;
+        }
+        mSubject.Notify(msg);
+        break;
+    case 0x10036:
+        if (mUnk108 != NULL) {
+            mUnk108->Exit();
+            mUnk108 = NULL;
+        }
+        if (mKasekiPoint != NULL) {
+            mKasekiPoint->Exit();
+            mKasekiPoint = NULL;
+        }
+        mSubject.Notify(msg);
+        break;
     }
 }
 
