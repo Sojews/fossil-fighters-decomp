@@ -72,6 +72,62 @@ M3DGrid::~M3DGrid() {
     delete[] mCells;
 }
 
+// Whether (x, z) is inside the triangle tris[i], tris[i + 1], tris[i + 2].
+#define M3D_GRID_IN_TRIANGLE(verts, tris, i, x, z, miss)                                                         \
+    {                                                                                                           \
+        int x0 = verts[tris[i]].x - x;                                                                          \
+        int z0 = verts[tris[i]].z - z;                                                                          \
+        int x1 = verts[tris[i + 1]].x - x;                                                                      \
+        int z1 = verts[tris[i + 1]].z - z;                                                                      \
+        int x2 = verts[tris[i + 2]].x - x;                                                                      \
+        int z2 = verts[tris[i + 2]].z - z;                                                                      \
+        if (x0 < 0 && x1 < 0 && x2 < 0) goto miss;                                                              \
+        if (x0 > 0 && x1 > 0 && x2 > 0) goto miss;                                                              \
+        if (z0 < 0 && z1 < 0 && z2 < 0) goto miss;                                                              \
+        if (z0 > 0 && z1 > 0 && z2 > 0) goto miss;                                                              \
+        if (x0 * z1 - x1 * z0 > 0) goto miss;                                                                   \
+        if (z0 * x2 - x0 * z2 > 0) goto miss;                                                                   \
+        if (x1 * z2 - x2 * z1 > 0) goto miss;                                                                   \
+    }
+
+// Whether (x, z) is on a triangle of the grid; hint caches the last hit (cell << 16 | first index).
+// NONMATCHING: register allocation (the game keeps this in r6 and the cell on the stack).
+BOOL M3DGrid::IsOnGround(fx32 x, fx32 z, fx32 *hint) {
+    x >>= mShiftX;
+    z >>= mShiftZ;
+    int cx = (x >> 11) + 16;
+    int cz = (z >> 11) + 16;
+    if (cx < 0) {
+        return FALSE;
+    }
+    if (cx >= mDim) {
+        return FALSE;
+    }
+    if (cz < 0) {
+        return FALSE;
+    }
+    if (cz >= mDim) {
+        return FALSE;
+    }
+    u32 cell = cx + cz * mDim;
+    if (*(u32 *) hint >> 16 == cell) {
+        u32 i = *(u32 *) hint & 0xFFFF;
+        std::vector<u16> &tris = mCells[*(u32 *) hint >> 16];
+        M3D_GRID_IN_TRIANGLE(mVerts, tris, i, x, z, scan);
+        *(u32 *) hint = (u16) i | (cell << 16);
+        return TRUE;
+    }
+scan:
+    std::vector<u16> &tris = mCells[cell];
+    for (u32 i = 0; i < tris.size(); i += 3) {
+        M3D_GRID_IN_TRIANGLE(mVerts, tris, i, x, z, next);
+        *(u32 *) hint = (u16) i | (cell << 16);
+        return TRUE;
+    next:;
+    }
+    return FALSE;
+}
+
 inline bool operator<(const MArchiveFile &a, const MArchiveFile &b) {
     if (&b == &a) {
         return false;

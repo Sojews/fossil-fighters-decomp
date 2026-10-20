@@ -24,7 +24,8 @@ public:
     M3DGrid();
     ~M3DGrid();
     fx32 GetHeight(fx32 x, fx32 z);
-    BOOL IsOnGround(fx32 x, fx32 z, fx32 *height);
+    // Whether (x, z) is on a triangle; hint caches the last hit (cell << 16 | index).
+    BOOL IsOnGround(fx32 x, fx32 z, fx32 *hint);
     void Load(const void *data);
 
     std::vector<M3DVec16> mVerts;   // 0x00
