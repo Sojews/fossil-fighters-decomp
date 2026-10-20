@@ -10,6 +10,7 @@
 #include "m/lcd.h"
 #include "game/dino_backup.h"
 #include "game/dino_resource.h"
+#include "game/dino_static_init.h"
 #include <printf.h>
 #include "game/dino_cleaning_sample_menu.h"
 #include "game/dino_cleaning_sample.h"
@@ -227,3 +228,27 @@ void DinoCleaningSample::StateMenu() {
     mSerial.AddTail(new DinoCleaningSampleMenu(&mUnk7C, &mUnk80, &mUnk84));
     mState = data_020bcc24.StateCleaning_40;
 }
+
+// The file's static initialization (see dino_static_init.h): the common layout header.
+// NONMATCHING: the game stores the screen rect's zero half before the screen size.
+// (The menu links' tree destructor is instantiated first, so that always_inline doesn't reach it.)
+typedef std::__red_black_tree<MMenuItem *, std::pair<MMenuItem *const, std::pair<int, MMenuItem *> >,
+                              std::__select_first<std::pair<MMenuItem *const, std::pair<int, MMenuItem *> > >,
+                              std::less<MMenuItem *>, std::allocator<std::pair<MMenuItem *const, std::pair<int, MMenuItem *> > > >
+    DinoCleaningSampleLinkTree;
+template DinoCleaningSampleLinkTree::~__red_black_tree();
+template void DinoCleaningSampleLinkTree::destroy(DinoCleaningSampleLinkTree::node_base *);
+#pragma always_inline on
+
+static struct DinoCleaningSampleStaticInit {
+    DinoCleaningSampleStaticInit() {
+        DINO_POOL(MPoint, data_020bcc24, 0x10) = MPoint(256, 192);
+        DINO_POOL(MRect, data_020bcc24, 0x134) = DinoSizeRect(DINO_POOL(MPoint, data_020bcc24, 0x10));
+        DINO_POOL(MPoint, data_020bcc24, 0x20) = MPoint(2, 2);
+        DINO_POOL(MPoint, data_020bcc24, 0x18) = MPoint(36, 28);
+        DINO_POOL(MRect, data_020bcc24, 0x144) = DinoSizeRect(DINO_POOL(MPoint, data_020bcc24, 0x18));
+        DINO_POOL(MPoint, data_020bcc24, 0x124) = MPoint(0, 24);
+        DINO_POOL(MPoint, data_020bcc24, 0x12c) = MPoint(256, 192);
+        DINO_POOL(MRect, data_020bcc24, 0x114) = MRect(0, 0, 256, 24);
+    }
+} sDinoCleaningSampleStaticInit;

@@ -286,6 +286,7 @@ src/game/dino_help_sample.cpp:
 
 src/game/dino_cleaning_sample.cpp:
     .text       start:0x02032590 end:0x02033d98
+    .init       start:0x02089230 end:0x0208929c
 
 src/game/dino_atm_sample.cpp:
     .text       start:0x02033d98 end:0x02033fe8
