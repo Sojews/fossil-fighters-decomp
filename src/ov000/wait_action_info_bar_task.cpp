@@ -45,7 +45,8 @@ extern "C" struct {
 } data_ov000_02196f64;
 
 // Shows a line (making the text and its window the first time).
-// NONMATCHING: the game loads gCurrentDisplay for the canvas after copying the size (as elsewhere with MObjCanvas).
+// (opt_common_subs off: the game loads gCurrentDisplay for the canvas after copying the size.)
+#pragma opt_common_subs off
 extern "C" void func_ov000_0218b55c(DinoBattleViewActionInfoBar *bar, const char *text) {
     bar->mTimer = gDinoResource->GetBattleAdjustDefs()->actionLog;
     MPoint size = bar->mFont->MeasureText(std::string(text), 0, 0);
@@ -66,6 +67,7 @@ extern "C" void func_ov000_0218b55c(DinoBattleViewActionInfoBar *bar, const char
     }
     bar->mText->SetText(std::string(text));
 }
+#pragma opt_common_subs reset
 
 // Shows the next line when none is up; fades the window in, and out once the line's time is over.
 void DinoBattleViewActionInfoBar::Idle() {

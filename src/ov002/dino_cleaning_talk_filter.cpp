@@ -144,7 +144,8 @@ DinoCleaningTalkWindow::DinoCleaningTalkWindow(u32 arg)
 }
 
 // Resumes the text once the wait is over (while B8 runs and B4 doesn't); shakes the window while a shake is left.
-// NONMATCHING: 96%, the shake's range and first offset swap registers.
+// NONMATCHING: the offset's -y goes through a register copy (opt_common_subs off fixes the rest).
+#pragma opt_common_subs off
 void DinoCleaningTalkWindow::Idle() {
     if (mUnkD0 != 0) {
         mUnkD0--;
@@ -164,6 +165,7 @@ void DinoCleaningTalkWindow::Idle() {
         }
     }
 }
+#pragma opt_common_subs reset
 
 // NONMATCHING: 87%, the points' temporaries take other stack slots.
 void DinoCleaningTalkWindow::Close() {
