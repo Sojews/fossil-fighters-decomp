@@ -6,8 +6,11 @@
 
 class MMotion;
 
+class MSmartOam;
+
 class TownMapIcon : public MProcess {
 public:
+    inline TownMapIcon(MSmartOam *oam);
     virtual ~TownMapIcon();
     virtual void Idle();
 

@@ -21,13 +21,68 @@
 #include "m/bright.h"
 #include "m/motion.h"
 #include "game/dino_static_init.h"
+#include "game/help.h"
+#include "m/picture.h"
+#include "m/smart_oam.h"
+
+// The TU's pooled strings.
+extern "C" struct {
+    u32 unk00;
+    const char *mMapPath;   // 0x04
+    const char *mIconPath;  // 0x08
+} data_ov001_0216a8e4;
+extern "C" const u32 data_0208ad9c;     // the town map's help text
+
+inline TownMapIcon::TownMapIcon(MSmartOam *oam) : MProcess(NULL) {
+    for (int i = 0; i < 2; i++) {
+        MMotion *&motion = (mMotions[i] = new MMotion(std::string(data_ov001_0216a8e4.mIconPath), oam, 0, 1));
+        motion->Show();
+        mMotions[i]->SetPriority(3);
+        mMotions[i]->SetAnchor(i);
+        mMotions[i]->Play(i ? 4 : 2, 0);
+        GetParallel()->AddTail(mMotions[i]);
+    }
+    mMotions[1]->GetUnit()->SetMode(1);
+}
+
+// NONMATCHING: in the icon's loop the game keeps this + i * 4 (not &mMotions[i]) across the path string's destructor.
+DinoFieldTownMap::DinoFieldTownMap(DinoField *field, u32 map) : MProcess(gLcd->GetTopDisplay()) {
+    mPicture = NULL;
+    mField = field;
+    MDisplayScope scope(GetDisplay());
+    DinoHelpDummyItem *help = new DinoHelpDummyItem(gCurrentDisplay, MRect(0, 0, 256, 192).Inflate(-16),
+                                                    std::string(gDinoResource->GetText(data_0208ad9c)));
+    mParallel.AddTail(help);
+    mField->AddEntry((u32) help, 2, (u32) mField->mUnk2C0);
+    if (map != 0) {
+        char path[64];
+        OS_SPrintf(path, data_ov001_0216a8e4.mMapPath, map);
+        mPicture = new MTextPicture(std::string(path), 1, TRUE);
+        mPicture->SetPriority(3);
+        mPicture->Show();
+        mParallel.AddTail(mPicture);
+        mIcons = new MParallelTaskSet();
+        MSmartOam *oam = new MSmartOam(4, 0, 1);
+        oam->SetUnk1C(1);
+        mIcon = new TownMapIcon(oam);
+        mIcons->AddTail(mIcon);
+        mBlinks = new MParallelTaskSet();
+        mParallel.AddTail(mIcons, mBlinks, oam);
+        MBlend *blend = gLcd->mSub->mBlend;
+        blend->SetMode(1);
+        blend->SetAlpha(16, 16);
+        blend->SetTarget1(0);
+        blend->SetTarget2(0x3F);
+        blend->SetBrightness(0);
+    }
+}
 
 DinoFieldTownMap::~DinoFieldTownMap() {
 }
 
 // Blinks the sub screen's layers (fading them out and back) while it's on.
 void DinoFieldTownMap::Idle() {
-    if (mUnk74 != 0 && mBlinks->IsEmpty()) {
+    if (mPicture != NULL && mBlinks->IsEmpty()) {
         MBlend *blend = gLcd->mSub->mBlend;
         mBlinks->AddTail(blend->CreateAlphaRatioAnime(0, 0x10, 0x10, 0x10, 30, 0),
                          blend->CreateAlphaRatioAnime(0x10, 0, 0x10, 0x10, 30, 0));
@@ -41,7 +96,7 @@ static inline MPoint ToPoint(MFx32Point p) {
 
 #pragma auto_inline off
 void DinoFieldTownMap::Update(MFx32Point pos, MPoint offset, MFx32 scale) {
-    if (mUnk74) {
+    if (mPicture != NULL) {
         mIcon->mMotions[0]->Play(2, 0);
         mIcon->SetPosition(ToPoint(pos * scale) + offset);
         mIcon->Show();

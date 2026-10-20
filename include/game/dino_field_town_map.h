@@ -5,12 +5,14 @@
 #include "m/task.h"
 
 class TownMapIcon;
+class MTextPicture;
+class MParallelTaskSet;
 
 class DinoField;
 
 class DinoFieldTownMap : public MProcess {
 public:
-    // Not decompiled yet.
+    // With the map's picture and the player's icon, when there is a town map.
     DinoFieldTownMap(DinoField *field, u32 map);
     virtual ~DinoFieldTownMap();
     virtual void Idle();
@@ -18,11 +20,11 @@ public:
     // Puts the icon at the character's scaled position (or hides it if off).
     void Update(MFx32Point pos, MPoint offset, MFx32 scale);
 
-    u32 mUnk74;         // 0x74: blink while set
+    MTextPicture *mPicture; // 0x74: the map (none: no town map)
     TownMapIcon *mIcon; // 0x78: the player's
-    u32 unk7C;
+    MParallelTaskSet *mIcons;   // 0x7C
     MTaskSet *mBlinks;  // 0x80
-    u32 unk84;
+    DinoField *mField;  // 0x84
 };
 
 #endif
