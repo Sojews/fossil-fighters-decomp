@@ -11,6 +11,11 @@
 #include "m/lcd.h"
 #include "game/dino_common_window_menu_item_flush_task_menu.h"
 #include "game/common_window_message.h"
+#include "m/font.h"
+#include "m/smart_oam.h"
+#include "m/oam_canvas.h"
+#include "m/indicator.h"
+#include "game/dino_common_window.h"
 
 DinoCommonWindowYesNoDialog::~DinoCommonWindowYesNoDialog() {
 }
@@ -65,6 +70,46 @@ DinoCommonYesNoMenu::DinoCommonYesNoMenu(const std::string &text, BOOL *result, 
     mUnkD8 = unkD8;
     DinoHelpBase::Disable();
     SetDeferStart(TRUE);
+}
+
+// NONMATCHING: the game stores the dead copy of pos (MoveTo's argument) before the rect's temporaries.
+void DinoCommonYesNoMenu::OnStart() {
+    MSmartOam *oam = new MSmartOam(8, 0, TRUE);
+    oam->mHidden = TRUE;
+    mSerial.AddTail(oam->CreateShowTransfer());
+    MPoint size(0x12, 8);
+    MPoint pos((0x20 - size.x) / 2, (0x18 - size.y) / 2);
+    MRect rect(MPoint(0, 0), size);
+    rect.MoveTo(pos);
+    mWindow = new DinoCommonWindow(0, TRUE, FALSE);
+    mWindow->SetFrame(rect);
+    mWindow->SetPriority(0);
+    mWindow->SetPosition(MPoint(0, 0));
+    mParallel.AddTail(mWindow);
+    mSerial.AddTail(mWindow->CreateShowTransfer());
+    MFontSet *font = gDinoResource->CreateFont12(0, 1, 10);
+    if (mUnkC0.size() != 0) {
+        MPoint textSize = font->MeasureText(std::string(mUnkC0), 0, 0);
+        MIndicator *text = new MIndicator(new MSmartObjCanvas(oam, textSize, gDinoResource->GetUnkTable(), TRUE), font, 0);
+        text->SetPosition(0x80 - textSize.x / 2, pos.y * 8 + 8);
+        text->SetPriority(0);
+        text->SetText(std::string(mUnkC0));
+        text->Show();
+        mParallel.AddTail(text);
+    }
+    for (int i = 0; i < 2; i++) {
+        mItems[i] = new DinoCommonYesNoMenuItem(oam, i == 0, i == 0 ? mUnkD0 : mUnkD4);
+        AddItem(mItems[i]);
+    }
+    if (mResult != NULL) {
+        FocusItem(mItems[*mResult]);
+    } else {
+        FocusItem(mItems[mUnkD8]);
+    }
+    mParallel.AddTail(oam);
+    if (mUnkD0 != 0 && mUnkD4 != 0) {
+        mSerial.AddTail(DinoHelpBase::CreateEnableTask(&static_cast<DinoHelpBase &>(*this)));
+    }
 }
 
 DinoCommonYesNoMenuItem::DinoCommonYesNoMenuItem(MSmartOam *oam, u8 isYes, u32 textId) {
@@ -129,7 +174,7 @@ void DinoCommonYesNoMenu::OnDecide(MMenuItem *item) {
     mSerial.AddTail(decided->GetMotion()->CreateWaitStopTask());
     Disable();
     if (mResult) {
-        *mResult = item == mYes;
+        *mResult = item == mItems[1];
         mSerial.AddTail(MTaskExitTransfer::Create(this));
     }
 }
