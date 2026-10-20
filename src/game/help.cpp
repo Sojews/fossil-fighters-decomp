@@ -570,6 +570,76 @@ void DinoHelp::OnIdle() {
     serial->AddTail(exit);
 }
 
+// Moves the panels' frames onto the focused item and shows its help text. When the item is on the other screen, the
+// labels and marks move over too (and the menu waits for the moves).
+void DinoHelp::OnFocus(MMenuItem *item) {
+    if (mUnkE4) {
+        mUnkE4 = FALSE;
+    } else {
+        DinoSoundPlaySe(0x96, 0);
+    }
+    MRect frame = item->GetFrame();
+    mTasks->Clear();
+    int duration;
+    BOOL moved = FALSE;
+    if (mUnkE0 == 0) {
+        mUnkE0 = (u32)((DinoHelpSign *)item)->GetItem()->GetDisplay();
+        duration = 10;
+    } else if (mUnkE0 != (u32)((DinoHelpSign *)item)->GetItem()->GetDisplay()) {
+        mUnkE0 = (u32)((DinoHelpSign *)item)->GetItem()->GetDisplay();
+        duration = 30;
+        moved = TRUE;
+    } else {
+        duration = 10;
+    }
+    if (moved) {
+        mUnkAC->Clear();
+    }
+    u32 position = mUnkE0 != mUnkD0[0] ? 1 : 0;
+    for (u32 i = 0; i < 2; i++) {
+        mStatus[i]->SetText(position, ((DinoHelpSign *)item)->GetItem()->GetText());
+        mTasks->AddTail(mPanels[i]->CreateFrameAnime(mPanels[i]->GetFrame(), frame, duration, -2));
+        if (moved) {
+            MPoint to;
+            if (mUnkE0 == (u32)gLcd->GetTopDisplay()) {
+                to = MPoint(0x80, 0xC0);
+            } else {
+                to = MPoint(0x80, kHelpTopScreenOffset + 0xC0);
+            }
+            mUnkAC->AddTail(mLabels[i]->CreateCoordAnime(mLabels[i]->GetPosition(), to, duration, -2));
+            u32 id = mUnkD0[i];
+            if (id == mUnkE0) {
+                MTask *open;
+                MTask *wait;
+                MTask *close;
+                MTask *wait2;
+                wait2 = mMarks[i]->CreateWaitStopTask();
+                close = mMarks[i]->CreatePlayTransfer(2, 0);
+                wait = mMarks[i]->CreateWaitStopTask();
+                open = mMarks[i]->CreatePlayTransfer(3, 0);
+                MSerialTaskSet *serial = new MSerialTaskSet(TRUE);
+                serial->AddTail(open, wait, close, wait2);
+                mUnkAC->AddTail(serial);
+            } else {
+                MTask *open;
+                MTask *wait;
+                MTask *close;
+                MTask *wait2;
+                wait2 = mMarks[i]->CreateWaitStopTask();
+                close = mMarks[i]->CreatePlayTransfer(1, 0);
+                wait = mMarks[i]->CreateWaitStopTask();
+                open = mMarks[i]->CreatePlayTransfer(4, 0);
+                MSerialTaskSet *serial = new MSerialTaskSet(TRUE);
+                serial->AddTail(open, wait, close, wait2);
+                mUnkAC->AddTail(serial);
+            }
+        }
+    }
+    if (moved) {
+        mSerial.AddTail(MTaskSetWaitEmptyTask::Create(mTasks));
+    }
+}
+
 void DinoHelpDriver::Idle() {
     MScopedLock lock(&sHelpMutex.mutex, TRUE);
     if (mTasks->IsEmpty()) {
