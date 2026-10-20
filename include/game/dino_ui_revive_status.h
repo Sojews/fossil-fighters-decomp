@@ -7,6 +7,9 @@
 struct DinoCreatureState;
 class DinoUiReviveStatusParts;
 class DinoUiReviveStatusDigit;
+class MSmartOam;
+class MIndicator;
+class MMotion;
 
 class DinoUiReviveStatus : public MProcess {
 public:
@@ -18,14 +21,20 @@ public:
     // Shows the creature's numbers, each counting up after its own delay.
     void SetCreature(const DinoCreatureState &creature);
 
+    void Start();
+
     void (DinoUiReviveStatus::*mState)(); // 0x74
     DinoCreatureInfo mInfo;     // 0x7C: (a DinoCreatureState)
-    u8 unk94[0x98 - 0x94];
+    MSmartOam *mOam;            // 0x94
     DinoUiReviveStatusParts *mParts[4];   // 0x98: head, body, arms, legs
     DinoUiReviveStatusDigit *mDigits[4];  // 0xA8
-    u8 unkB8[0xC4 - 0xB8];
-    u8 mFlag;                   // 0xC4
-    u8 unkC5[0xD0 - 0xC5];
+    MIndicator *mName;          // 0xB8
+    MIndicator *mVoice;         // 0xBC
+    MMotion *mMotion;           // 0xC0
+    u8 mFlag;                   // 0xC4: shows the picture, the name and the voice
+    u8 mUncleanable;            // 0xC5: the creature's fossil is one piece
+    u32 mUnkC8;                 // 0xC8
+    u32 mPartCount;             // 0xCC
 };
 
 #endif

@@ -1,10 +1,10 @@
 // DinoUiReviveStatus, DinoUiReviveStatusDigit, DinoUiReviveEffectLight, DinoUiReviveEffectParticle.
-// Only the destructors are decompiled so far.
 
 // Derived destructors have their bases' destructor bodies inlined; auto-inlining the ones defined above does that.
 #pragma auto_inline on
 
 #include <algorithm>
+#include <new>
 #include "m/motion.h"
 #include "game/dino_backup.h"
 
@@ -20,6 +20,8 @@
 #include "game/dino_ui_revive_effect.h"
 #include "m/blend.h"
 #include "m/oam_canvas.h"
+#include "m/indicator.h"
+#include "m/font.h"
 #include "m/smart_oam.h"
 #include "m/bright.h"
 #include "m/display.h"
@@ -140,6 +142,144 @@ DinoUiReviveStatus::DinoUiReviveStatus(MDisplay *display, const DinoCreatureInfo
     mState = data_ov003_02161d20.Start_74;
 }
 
+// The first word of a part's state, with its flag.
+struct DinoRevivePartBits {
+    u32 level : 12;
+    u32 unk12 : 7;
+    u32 unk19 : 1;
+    u32 rest : 12;
+};
+
+u32 DinoGetCreatureTotal(const DinoCreatureState *creature);
+u32 DinoGetCreatureLevel(const DinoCreatureState *creature);
+u32 DinoGetCreatureExpToNext(const DinoCreatureState *creature);
+
+
+extern "C" const char *const data_ov003_02161e70[];   // the single-piece fossils' pictures, by unk38
+extern "C" const char data_ov003_0216241c[];           // the voice font
+extern "C" const char data_ov003_0216242c[];           // the voice's format
+// The function's local statics, each set up on first use (bit 0 of their guard words).
+struct DinoReviveStatusGuards {
+    u32 unk00;
+    u32 offsetsGuard;   // 0x04
+    u32 motionsGuard;   // 0x08
+};
+#define DINO_REVIVE_GUARDS (*(DinoReviveStatusGuards *)&data_ov003_021624c0)
+extern "C" struct {
+    u8 unk00[0x40];
+    const char *motions[6]; // 0x40: by the creature's unk0D (from 1)
+} data_ov003_02161f20;
+extern "C" const char *data_ov003_02161f5c[];  // (motions - 1)
+extern "C" MPoint data_ov003_02161f78, data_ov003_02161f80, data_ov003_02161f88, data_ov003_02161f90;
+extern "C" struct {
+    u8 unk00[0x5C];
+    void (DinoUiReviveStatus::*State_5C)();    // 0x5C
+} data_ov003_02161da0;
+
+// MPoint::MPoint(int, int) by its linker name: constructs the game's local statics at their known addresses (placement
+// new would add a null check).
+extern "C" void _ZN6MPointC1Eii(MPoint *point, int x, int y);
+
+// Shows the creature's picture, name, voice and motion, its parts and its four numbers.
+// (Instruction-exact. objdiff scores it 99.99%: the game's call to IsUncleanable, which directly follows this function,
+// resolves 4 bytes back onto this function's last literal, and ours calls a copy in its own section.)
+#pragma dont_inline on
+void DinoUiReviveStatus::Start() {
+    MResource<DinoKasekiDefs> defs = gDinoResource->LoadKasekiDefs();
+    u32 first = (((DinoCreatureState *)&mInfo)->index - 1) * 4;
+    mUncleanable = defs.Get()->GetDef(first + 1)->IsUncleanable();
+    mUnkC8 = defs.Get()->GetDef(first + 1)->GetUnk38();
+    mPartCount = mUncleanable ? 1 : 4;
+    if (mFlag) {
+        MTextPicture *picture = new MTextPicture(
+            std::string(mUncleanable ? data_ov003_02161e70[mUnkC8] : DINO_POOL(const char *, data_ov003_02161d20, 0x4)),
+            FALSE, false);
+        picture->SetPriority(3);
+        picture->Show();
+        ((MSerialTaskSet *)GetParallel())->Add(picture);
+    }
+    mOam = new MSmartOam(0xB4, 0x28, TRUE);
+    mOam->SetUnk1C(5);
+    if (mFlag) {
+        MFontSet *font = gDinoResource->CreateFont12(0, 1, 0);
+        const char *name = gDinoResource->GetCreatureText08(((DinoCreatureState *)&mInfo)->index);
+        MSmartObjCanvas *canvas = new MSmartObjCanvas(mOam, font->MeasureText(std::string(name), 0, 0),
+                                                      gDinoResource->GetUnkTable(), TRUE);
+        canvas->SetAnchor(3);
+        mName = new MIndicator(canvas, font, 0);
+        mName->SetText(std::string(name));
+        mName->SetPriority(3);
+        mName->SetPosition(0x5C, 5);
+        mName->Show();
+        ((MSerialTaskSet *)GetParallel())->Add(mName);
+
+        MFontSet *voiceFont = new MFontSet(std::string(data_ov003_0216241c), 0, 0, 0);
+        char voice[0x10];
+        OS_SPrintf(voice, data_ov003_0216242c,
+                   gDinoResource->GetCreatureDef(((DinoCreatureState *)&mInfo)->index)->GetVoice());
+        canvas = new MSmartObjCanvas(mOam, voiceFont->MeasureText(std::string(voice), 0, 0),
+                                     gDinoResource->GetUnkTable(), TRUE);
+        canvas->SetAnchor(3);
+        mVoice = new MIndicator(canvas, voiceFont, 0);
+        mVoice->SetText(std::string(voice));
+        mVoice->SetPriority(3);
+        mVoice->SetPosition(0x2D, 6);
+        mVoice->Show();
+        ((MSerialTaskSet *)GetParallel())->Add(mVoice);
+
+        u32 guard = DINO_REVIVE_GUARDS.motionsGuard;
+        if (!(guard & 1)) {
+            data_ov003_02161f20.motions[0] = DINO_POOL(const char *, data_ov003_02161d20, 0x18);
+            data_ov003_02161f20.motions[1] = DINO_POOL(const char *, data_ov003_02161d20, 0x24);
+            data_ov003_02161f20.motions[2] = DINO_POOL(const char *, data_ov003_02161d20, 0x2C);
+            data_ov003_02161f20.motions[3] = DINO_POOL(const char *, data_ov003_02161d20, 0xC);
+            data_ov003_02161f20.motions[4] = DINO_POOL(const char *, data_ov003_02161d20, 0x14);
+            data_ov003_02161f20.motions[5] = DINO_POOL(const char *, data_ov003_02161d20, 0x20);
+            DINO_REVIVE_GUARDS.motionsGuard = guard | 1;
+        }
+        mMotion = new MMotion(
+            std::string(data_ov003_02161f5c[gDinoResource->GetCreatureDef(((DinoCreatureState *)&mInfo)->index)->GetUnk0D()]),
+            mOam, 0, 1);
+        mMotion->Play(1, 0);
+        mMotion->SetPosition(0x80, 0x60);
+        mMotion->SetPriority(3);
+        mMotion->SetAnchor(3);
+        mMotion->Show();
+        ((MSerialTaskSet *)GetParallel())->Add(mMotion);
+    }
+    if (mUnkC8 != 3) {
+        for (u32 i = 0; i < mPartCount; i++) {
+            if (!(DINO_REVIVE_GUARDS.offsetsGuard & 1)) {
+                _ZN6MPointC1Eii(&data_ov003_02161f78, -0x5C, 0x10);
+                _ZN6MPointC1Eii(&data_ov003_02161f80, -0x1D, 0x10);
+                _ZN6MPointC1Eii(&data_ov003_02161f88, 0x21, 0x10);
+                _ZN6MPointC1Eii(&data_ov003_02161f90, 0x5F, 0x10);
+                DINO_REVIVE_GUARDS.offsetsGuard |= 1;
+            }
+            mParts[i] = new DinoUiReviveStatusParts(
+                mOam, MPoint(0x80, 0x60) + (mUncleanable ? MPoint(4, 0x10) : (&data_ov003_02161f78)[i]),
+                ((DinoRevivePartBits *)&mInfo.state.parts[i])->unk19 != 0,
+                ((DinoRevivePartBits *)&mInfo.state.parts[i])->level, (((DinoCreatureState *)&mInfo)->index - 1) * 4 + i + 1);
+            ((MSerialTaskSet *)GetParallel())->Add(mParts[i]);
+        }
+    }
+    mDigits[0] = new DinoUiReviveStatusDigit(mOam, MPoint(0x80, 0x60) + MPoint(0x2B, 0x17), 0,
+                                             ((DinoCreatureState *)&mInfo)->unk0_8, 1, 0, 1);
+    ((MSerialTaskSet *)GetParallel())->Add(mDigits[0]);
+    mDigits[1] = new DinoUiReviveStatusDigit(mOam, MPoint(0x80, 0x60) + MPoint(0x36, 0x29), 0,
+                                             DinoGetCreatureTotal((DinoCreatureState *)&mInfo), 1, 0, 0);
+    ((MSerialTaskSet *)GetParallel())->Add(mDigits[1]);
+    mDigits[2] = new DinoUiReviveStatusDigit(mOam, MPoint(0x80, 0x60) + MPoint(0x36, 0x38), 0,
+                                             DinoGetCreatureLevel((DinoCreatureState *)&mInfo), 1, 0, 0);
+    ((MSerialTaskSet *)GetParallel())->Add(mDigits[2]);
+    mDigits[3] = new DinoUiReviveStatusDigit(mOam, MPoint(0x80, 0x60) + MPoint(0x36, 0x47), 0,
+                                             DinoGetCreatureExpToNext((DinoCreatureState *)&mInfo), 1, 0, 0);
+    ((MSerialTaskSet *)GetParallel())->Add(mDigits[3]);
+    ((MSerialTaskSet *)GetParallel())->Add(mOam);
+    mState = data_ov003_02161da0.State_5C;
+}
+#pragma dont_inline reset
+
 extern "C" const int data_020899fc;
 extern "C" const int data_02089a48;
 // (The pointer-to-member constants of the next function, pooled apart.)
@@ -178,12 +318,6 @@ std::string DinoReplaceTag(std::string text, std::string tag, std::string value)
 int DinoReviveFrames(int frames);
 
 // The bits of a creature part that tell whether it changed.
-struct DinoRevivePartBits {
-    u32 level : 12;
-    u32 unk12 : 7;
-    u32 unk19 : 1;
-    u32 rest : 12;
-};
 
 extern const u32 gKasekiRockSizeText;
 
