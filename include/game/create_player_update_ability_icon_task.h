@@ -179,9 +179,11 @@ struct DinoBattleCreatureStatus {
     u8 unk05;           // 0x05
     u8 unk06[0x20 - 0x06];
     u32 unk20;          // 0x20
-    u8 unk24[0x2C - 0x24];
+    s32 unk24;          // 0x24: added to unkEC with flag 0x80
+    u32 unk28;
     u32 guardChance;    // 0x2C: percentage, with flag 0x100
-    u8 unk30[0x40 - 0x30];
+    s32 unk30;          // 0x30: added to unkEC with flag 0x200
+    u8 unk34[0x40 - 0x34];
 };
 
 class DinoBattleModelCreature : public MProcess, public MMessageObserver {
@@ -241,6 +243,8 @@ public:
     u32 GetStatusUnk20();
     void RollUnk10C();
     MFx32 RandomFraction();
+    // unkEC with the support effects and statuses applied.
+    MFx32 CalcUnkEC(DinoBattleModelCreature *target);
     BOOL IsUnkCE50();
     int GetUnkCE7C(u32 attack);
     int CompareUnkECA0(DinoBattleModelCreature *other, u32 attack);

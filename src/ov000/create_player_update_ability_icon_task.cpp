@@ -571,6 +571,41 @@ MFx32 DinoBattleModelCreature::RandomFraction() {
     return mPlayer->RandomFraction();
 }
 
+// NONMATCHING: each operator+'s two by-value parameter copies take each other's stack slots (also under -ipa file).
+MFx32 DinoBattleModelCreature::CalcUnkEC(DinoBattleModelCreature *target) {
+    MFx32 base(mUnkEC);
+    MFx32 result = base;
+    const MFx32 pinch = gDinoResource->GetBattleAdjustDefs()->unk3C;
+    if (GetDefUnk61() != 8) {
+        if (GetUnkB8() == 0) {
+            for (int i = 0; i < 2; i++) {
+                DinoBattleModelCreature *ally = mPlayer->FindCreature(i ? 2 : 1);
+                DinoBattleModelCreature *enemy = mPlayer->GetOpponent()->FindCreature(i ? 2 : 1);
+                if (ally != NULL && (ally->GetUnk108() & 1)) {
+                    DinoBattleCreatureDef *def = ally->GetDef();
+                    const s8 *support = def->mUnk54 == 0 ? NULL : (const s8 *)def + def->mUnk54;
+                    result = result + MFx32(support[0]) * base / MFx32(100);
+                }
+                if (enemy != NULL && (enemy->GetUnk108() & 2)) {
+                    DinoBattleCreatureDef *def = enemy->GetDef();
+                    const s8 *support = def->mUnk58 == 0 ? NULL : (const s8 *)def + def->mUnk58;
+                    result = result + MFx32(support[0]) * base / MFx32(100);
+                }
+            }
+        }
+        if (mStatus.flags & 0x80) {
+            result = result + MFx32(mStatus.unk24);
+        }
+        if (mStatus.flags & 0x200) {
+            result = result + MFx32(mStatus.unk30);
+        }
+    }
+    if (IsInPinch() && GetDefUnk61() == 5) {
+        result = result * (pinch * MFx32(mDef->mUnk62) * MFx32::FromRaw(0x19A));
+    }
+    return result;
+}
+
 extern "C" BOOL func_ov000_0216ce04(DinoBattleModelCreature *creature);
 extern "C" BOOL func_ov000_0216f13c(DinoBattleModelCreature *creature);
 // Which type each type beats, and which beats it.

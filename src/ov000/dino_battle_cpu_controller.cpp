@@ -131,7 +131,6 @@ BOOL DinoBattleCpuController::SupportHasStatus(DinoBattleModelPlayer *player, u3
 }
 
 // The attack and defense values the damage is figured from (by how the creatures stand).
-extern "C" MFx32 func_ov000_0216e124(DinoBattleModelCreature *attacker, DinoBattleModelCreature *target);
 extern "C" MFx32 func_ov000_0216e2d8(DinoBattleModelCreature *attacker, DinoBattleModelCreature *target);
 extern "C" MFx32 func_ov000_0216e4c0(DinoBattleModelCreature *attacker, DinoBattleModelCreature *target);
 extern "C" MFx32 func_ov000_0216e650(DinoBattleModelCreature *attacker, DinoBattleModelCreature *target);
@@ -144,7 +143,7 @@ int DinoBattleCpuController::EstimateDamage(DinoBattleModelCreature *attacker, D
         return 0;
     }
     const u16 *cost = DinoOffsetPtr<u16>(def, def->cost);
-    MFx32 power = func_ov000_0216e124(attacker, target);
+    MFx32 power = attacker->CalcUnkEC(target);
     MFx32 guard = func_ov000_0216e2d8(attacker, target);
     MFx32 defense = attacker->ReduceByDefense(power, guard);
     MFx32 curveA = func_ov000_0216e4c0(attacker, target);
