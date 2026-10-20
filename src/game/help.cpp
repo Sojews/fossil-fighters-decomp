@@ -1,6 +1,7 @@
 // The help system.
 
 #define MSL_STRING_PLUS_DEFINITIONS
+#pragma ipa file
 #include <algorithm>
 #include "game/help.h"
 #include "game/dino_help_sign.h"
@@ -17,8 +18,8 @@
 #include "game/dino_resource.h"
 #include "m/font.h"
 
-static DinoHelpDriver *sHelpDriver;
 static DinoHelpBase *sHelpCurrentBase;
+static DinoHelpDriver *sHelpDriver;
 static MMutex sHelpMutex;
 
 DinoHelpHook::DinoHelpHook() {
