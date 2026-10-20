@@ -1024,7 +1024,7 @@ from:0x0215b15e kind:thumb_call to:0x02163528 module:overlay(0)
 from:0x0215b18a kind:thumb_call to:0x0216a798 module:overlay(0)
 from:0x0215b194 kind:load to:0x020b6ef4 add:0x8 module:main
 from:0x0215b198 kind:load to:0x02191478 add:0x8 module:overlay(0)
-from:0x0215b19c kind:load to:0x0219149c module:overlay(0)
+from:0x0215b19c kind:load to:0x02191478 add:0x24 module:overlay(0)
 from:0x0215b1a0 kind:load to:0x020c0fa0 add:0x8 module:main
 from:0x0215b1a4 kind:load to:0x020cc00c module:main
 from:0x0215b1ac kind:thumb_call to:0x02014734 module:main

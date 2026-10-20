@@ -1593,7 +1593,6 @@ data_ov000_0219140c kind:data(any) addr:0x0219140c
 _ZTI15DinoBattleModel kind:data(any) addr:0x02191444
 _ZTS15DinoBattleModel kind:data(any) addr:0x02191464
 _ZTV15DinoBattleModel kind:data(any) addr:0x02191478
-data_ov000_0219149c kind:data(any) addr:0x0219149c
 data_ov000_021914a0 kind:data(any) addr:0x021914a0
 _ZTI20EnableRootSelectTask kind:data(any) addr:0x021914d0
 _ZTI14DinoBattleView kind:data(any) addr:0x021914e8

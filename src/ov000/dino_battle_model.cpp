@@ -5,6 +5,49 @@
 #include "game/dino_battle_model.h"
 #include "game/create_player_update_ability_icon_task.h"
 #include "game/dino_static_init.h"
+#include "game/dino_battle_multi_play_message_hub.h"
+#include "game/dino_backup.h"
+
+// Sets up both players and the field (and the wireless message hub), copying the parameters.
+DinoBattleModel::DinoBattleModel(const DinoBattleParams *params, DinoBattleTutorial *tutorial)
+    : MProcess(NULL), mUnkA8(0), mTutorial(tutorial), mParams(*params) {
+    switch (params->unk18) {
+    case 0:
+        break;
+    case 1: {
+        DinoBattleMultiPlayMessageHub *hub = new DinoBattleMultiPlayMessageHub(&mSubject2);
+        mSubject.AddObserver(hub);
+        mParallel.AddTail(hub);
+        break;
+    }
+    }
+    mUnkFC = params->unk04;
+    mPlayers[0] = new DinoBattleModelPlayer(0, params->unk10);
+    mPlayers[1] = new DinoBattleModelPlayer(1, params->unk14);
+    mField = new DinoBattleModelField();
+    mPlayers[0]->SetUnkC8(params->sides[0].unk88);
+    mPlayers[1]->SetUnkC8(params->sides[1].unk88);
+    for (u32 i = 0; i < 2; i++) {
+        switch ((&params->unk08)[i]) {
+        case 2:
+            if (params->unk164) {
+                mPlayers[i]->SetUnk15C();
+            }
+            break;
+        case 1:
+            break;
+        case 0:
+            if (gDinoBackup->GetSystemFlag(0x28)) {
+                mPlayers[i]->SetUnk15C();
+            }
+            break;
+        }
+    }
+    mSubject2.AddObserver(mPlayers[0]);
+    mSubject2.AddObserver(mPlayers[1]);
+    mSubject2.AddObserver(mField);
+    GetParallel()->AddTail(mPlayers[0], mPlayers[1], mField);
+}
 
 DinoBattleModel::~DinoBattleModel() {
 }
@@ -27,7 +70,7 @@ void DinoBattleModel::SendLocalMessage(MMessage *msg) {
 void DinoBattleModel::SetBattle(DinoBattle *battle) {
     mPlayers[0]->SetBattle(battle);
     mPlayers[1]->SetBattle(battle);
-    ((DinoBattleModelField *)mUnk10C)->SetBattle(battle);
+    mField->SetBattle(battle);
     mBattle = battle;
 }
 
@@ -36,7 +79,7 @@ DinoBattleModelPlayer *DinoBattleModel::GetPlayer(int index) {
 }
 
 u32 DinoBattleModel::GetUnk10C() {
-    return mUnk10C;
+    return (u32)mField;
 }
 
 #pragma auto_inline off

@@ -160,6 +160,7 @@ public:
     u32 mKasekiPoint;                   // 0x154
     u32 unk158;
     u8 mUnk15C;                         // 0x15C
+    u32 unk160;
 };
 
 

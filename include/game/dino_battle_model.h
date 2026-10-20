@@ -25,16 +25,15 @@ public:
     virtual void Idle();
     virtual void OnMessage(MMessage *msg);
 
-    u32 mUnkA8;                 // 0xA8
+    u8 mUnkA8;                  // 0xA8
     MMessageSubject mSubject;   // 0xAC
     MMessageSubject mSubject2;  // 0xD4
     u32 mUnkFC;                 // 0xFC
     DinoBattle *mBattle;        // 0x100
     DinoBattleModelPlayer *mPlayers[2]; // 0x104
-    u32 mUnk10C;                // 0x10C
-    u32 mUnk110[13];            // 0x110
-    DinoBattleSide mSides[2];   // 0x144
-    u8 unk25C[0x27C - 0x25C];
+    class DinoBattleModelField *mField; // 0x10C
+    DinoBattleTutorial *mTutorial;      // 0x110
+    DinoBattleParams mParams;           // 0x114
 };
 
 #endif

@@ -12,6 +12,7 @@
 #include "game/create_player_update_ability_icon_task.h"
 #include "game/dino_static_init.h"
 #include "game/dino_battle.h"
+#include "game/dino_battle_tutorial.h"
 #include "game/dino_battle_controller.h"
 #include "game/dino_battle_live.h"
 #include "m/seed_generator.h"
@@ -122,7 +123,7 @@ void DinoBattleModelField::SetBattle(DinoBattle *battle) {
     mControllers[1] = (DinoBattleController *)battle->GetUnk1F4(1);
     mModel = (DinoBattleModel *)battle->GetUnk1FC();
     mUnkB4 = battle->GetUnk200();
-    if (mLive == NULL && ((const u8 *)mModel->mUnk110[0])[0xD] == 0 && battle->mParams.mLiveName != NULL) {
+    if (mLive == NULL && mModel->mTutorial->mUnk0D == 0 && battle->mParams.mLiveName != NULL) {
         char name[64];
         OS_SPrintf(name, data_ov000_021918ec, battle->mParams.mLiveName);
         mLive = new DinoBattleLive(mModel, name);
