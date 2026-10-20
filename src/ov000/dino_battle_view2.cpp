@@ -355,9 +355,15 @@ extern "C" const DinoU32x4 data_ov000_02190068;         // the help directions
 extern "C" const u32 data_ov000_02190078[17][4][2];     // the help slots each slot leads to, by direction
 extern "C" const u32 data_0208a398, data_0208a374, data_0208a388;
 
+// (A non-member inline: the loop-hoisted temp then takes the lowest spill slot, as in the game.)
+static inline MTaskSet *DinoRootParallel(DinoBattleViewUiRootSelect *menu) {
+    return &menu->mParallel;
+}
+
 // Makes the attack icons, the help areas and the four commands, and links them.
-// NONMATCHING: stack slots. The game gives the help loop's &mParallel the lowest spill slot (0x34), and keeps the
-// guard's first text id in r1 for the loop's own check; ours spills it above the loop counters, shifting the rest.
+// NONMATCHING: the help loop's guard. The game loads the table pointer after the guard and hoists &mParallel between
+// the guard and the loop's own check (the slots are right now: &mParallel through a non-member inline, the peer's
+// find).
 void DinoBattleViewUiRootSelect::OnStart() {
     mOam = new MSmartOam(4, 0, 1);
     for (u32 i = 0; i < 3; i++) {
@@ -375,10 +381,11 @@ void DinoBattleViewUiRootSelect::OnStart() {
     DinoBattleHelpBase *help = new DinoBattleHelpBase(gLcd->GetTopDisplay(), MRect(4, 4, 0xFC, 0xBC), data_0208a398);
     mParallel.AddTail(help);
     helps[0] = help;
-    if (data_ov000_021958dc.helps[0].textId != 0) {
-        MParallelTaskSet *parallel = &mParallel;
-        for (DinoBattleRootHelpDef *def = data_ov000_021958dc.helps; def->textId != 0; def++) {
+    DinoBattleRootHelpDef *def = data_ov000_021958dc.helps;
+    if (def->textId != 0) {
+        for (; def->textId != 0; def++) {
             help = new DinoBattleHelpBase(gLcd->GetBottomDisplay(), def->rect, def->textId);
+            MTaskSet *parallel = DinoRootParallel(this);
             parallel->AddTail(help);
             helps[def->slot] = help;
         }
