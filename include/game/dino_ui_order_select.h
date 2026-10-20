@@ -89,7 +89,9 @@ public:
     u32 mTeamIndex;             // 0x10C
     DinoUiOrderSelectInfo mOpponent;    // 0x110
     u8 mHasFourthTab;           // 0x1A8
-    u8 unk1A9[0x1B4 - 0x1A9];
+    u8 unk1A9[0x1AC - 0x1A9];
+    MTaskSet *mCursorTasks;     // 0x1AC: the cursor's moves
+    class DinoUiFieldMenuCursor *mCursor;   // 0x1B0
     DinoUiRvInformation *mInfo; // 0x1B4
     DinoUiPartsReviverName *mName;  // 0x1B8: the focused member's
     MTaskSet *mUnk1BC;          // 0x1BC

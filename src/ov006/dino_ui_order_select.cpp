@@ -7,6 +7,7 @@
 #include "game/dino_sound.h"
 #include "game/dino_ui_order_select.h"
 #include "game/dino_ui_rv_information.h"
+#include "game/dino_ui_field_menu_cursor.h"
 #include "types.h"
 #include "m/display.h"
 #include "m/lcd.h"
@@ -470,6 +471,123 @@ extern "C" struct {
     void (DinoUiOrderSelectMenu::*FinishPage_00)();
 } data_ov006_02197138;
 extern const u32 data_0208aad0;
+
+// Where the cursor sits on each tab.
+extern MPoint data_020b5890[4];
+// (The TU's pooled offsets and the method pointers this function's call tasks read.)
+extern "C" struct {
+    u8 unk00[0x5C];
+    MPoint nameOffset;      // 0x5C: of the creature's name from its medal
+} data_ov006_021970cc;
+extern "C" struct {
+    u8 unk00[0x54];
+    MPoint cursorOffset;    // 0x54: of the cursor's frame on a medal
+} data_ov006_0219714c;
+extern "C" struct {
+    void (DinoHelpBase::*Enable)();
+} data_ov006_021970f8, data_ov006_02197148;
+extern "C" void func_ov003_02156eac(DinoUiRvInformation *info, MFx32 value);
+
+// Moves the cursor to the item. A member of either team also shows its creature's information, page and name (the
+// player's also raise the team tech's member); an empty place hides them.
+void DinoUiOrderSelectMenu::OnFocus(MMenuItem *item) {
+    int i;
+    mUnk1F6 = FALSE;
+    mFocusTabs = FALSE;
+    if (item == NULL) {
+        mCursor->Hide();
+        return;
+    }
+    MRect frame = item->GetFrame();
+    mCursor->SetMode(1);
+    for (i = 0; i < 4; i++) {
+        if (item == mTabs[i]) {
+            frame.MoveTo(data_020b5890[i]);
+            mCursor->SetMode(2);
+            mFocusTabs = TRUE;
+        }
+    }
+    for (i = 0; i < 5; i++) {
+        if (item == mItems[i] || item == mUnkF8[i]) {
+            frame.Offset(data_ov006_0219714c.cursorOffset);
+            break;
+        }
+    }
+    if (i == 5) {
+        SetSelectedItem(dynamic_cast<DinoHelpItem *>(item));
+    }
+    if (mCursor->IsHidden()) {
+        mCursor->SetFrame(frame);
+    } else {
+        mCursorTasks->Clear();
+        mCursorTasks->AddTail(mCursor->CreateMoveTask(mCursor->GetFrame(), frame, 10, -5));
+    }
+    mCursor->Show();
+    mTech->Lower();
+    for (i = 0; i < 5; i++) {
+        if (item == mItems[i]) {
+            if (mTeam.slots[i] != 0) {
+                if (!mHasFourthTab) {
+                    mInfo->SetUnk1AC(0);
+                }
+                DinoCreatureState creature;
+                gDinoBackup->GetCreature(mTeam.slots[i], &creature);
+                mInfo->SetUnk1B1(0);
+                mInfo->Unk02156ee8(*(DinoCreatureInfo *)&creature);
+                MTask *enable = MCreateCallTask(this, data_ov006_021970f8.Enable);
+                mSerial.AddTail(MTaskSetWaitEmptyTask::Create(&mInfo->mSerial), enable);
+                Disable();
+                ShowPage(mTeam.slots[i]);
+                if (i < 3) {
+                    mTech->Raise((u8)i);
+                }
+                mName->SetCreature(mTeam.slots[i]);
+                mName->SetPosition(data_ov006_02197340[i] + data_ov006_021970cc.nameOffset);
+            } else {
+                mInfo->Unk021571bc();
+                ShowPage(1);
+                mName->Hide();
+            }
+            return;
+        }
+    }
+    for (i = 0; i < 5; i++) {
+        if (item == mUnkF8[i]) {
+            if (mOpponent.creatures[i].index != 0) {
+                if (!mHasFourthTab) {
+                    mInfo->SetUnk1AC(2);
+                    if (mUnk1F8 != 0) {
+                        MResource<DinoBattleData> battle = gDinoResource->LoadBattle(mUnk1F8);
+                        if (((const u8 *)battle.Get())[0x58] != 0) {
+                            mInfo->SetUnk1AC(1);
+                        }
+                    }
+                }
+                if (!mHasFourthTab) {
+                    mInfo->SetUnk1B1(1);
+                    func_ov003_02156eac(mInfo, mOpponent.unk84[i]);
+                }
+                mInfo->Unk02156ee8(*(DinoCreatureInfo *)&mOpponent.creatures[i]);
+                MTask *enable = MCreateCallTask(this, data_ov006_02197148.Enable);
+                mSerial.AddTail(MTaskSetWaitEmptyTask::Create(&mInfo->mSerial), enable);
+                Disable();
+                ShowPage(mOpponent.creatures[i].index);
+                mName->SetCreature(mOpponent.creatures[i].index);
+                if (mHasFourthTab) {
+                    mName->SetPosition(data_ov006_02197318[i] + data_ov006_021970cc.nameOffset);
+                } else {
+                    mName->SetPosition(data_ov006_021972f0[i] + data_ov006_021970cc.nameOffset);
+                }
+            } else {
+                mInfo->Unk021571bc();
+                ShowPage(1);
+                mName->Hide();
+            }
+            return;
+        }
+    }
+    mName->Hide();
+}
 
 // A tab turns the page. A member picks the member to swap (asking with whom); in swap mode a member swaps places with
 // it.
