@@ -10,6 +10,7 @@
 #include "m/seed_generator.h"
 #include "m/smart_oam.h"
 #include "game/dino_resource.h"
+#include "game/dino_static_init.h"
 
 DinoCleaningTalkFilter::~DinoCleaningTalkFilter() {
 }
@@ -106,3 +107,14 @@ void DinoCleaningTalkWindow::Reset() {
     mTasksB8->Clear();
     gLcd->GetTopDisplay()->mBlend->Reset();
 }
+
+// The file's static initialization (see dino_static_init.h).
+// NONMATCHING: scheduling, as in dino_cleaning_stop_confirm_menu_item.cpp (the screen rect lies past the 0x80 anchor).
+#pragma always_inline on
+static struct DinoCleaningTalkFilterStaticInit {
+    DinoCleaningTalkFilterStaticInit() {
+        DINO_COMMON_LAYOUT_INIT(data_ov002_0216431c, 0x28, 0xb8, 0x18, 0x10, 0xa8, 0xc8, 0xd0, 0xd8);
+        DINO_POOL(MPoint, data_ov002_0216431c, 0x30) = MPoint(216, 28);
+        DINO_POOL(MPoint, data_ov002_0216431c, 0x20) = MPoint(8, 158);
+    }
+} sDinoCleaningTalkFilterStaticInit;

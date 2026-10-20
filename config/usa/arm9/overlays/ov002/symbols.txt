@@ -394,12 +394,12 @@ data_ov002_0216355c kind:data(any) addr:0x0216355c
 __sinit_dino_cleaning_report.cpp kind:function(thumb,size=0x6c) addr:0x02163574
 __sinit_dino_cleaning_stop_confirm_menu_item.cpp kind:function(thumb,size=0x6c) addr:0x021635e0
 __sinit_dino_cleaning_tutorial_window.cpp kind:function(thumb,size=0x6c) addr:0x0216364c
-__sinit_ov002_021636b8 kind:function(thumb,size=0x78) addr:0x021636b8
+__sinit_dino_cleaning_talk_filter.cpp kind:function(thumb,size=0x78) addr:0x021636b8
 __sinit_dino_cleaning_live_task.cpp kind:function(thumb,size=0x6c) addr:0x02163730
 __sinit_dino_cleaning_paper.cpp kind:function(thumb,size=0x20) addr:0x0216379c
 __sinit_ov002_021637bc kind:function(thumb,size=0x80) addr:0x021637bc
 __sinit_ov002_0216383c kind:function(thumb,size=0xf8) addr:0x0216383c
-__sinit_ov002_02163934 kind:function(thumb,size=0x90) addr:0x02163934
+__sinit_dino_cleaning_timer.cpp kind:function(thumb,size=0x90) addr:0x02163934
 __sinit_dino_cleaning_blower.cpp kind:function(thumb,size=0x64) addr:0x021639c4
 __sinit_dino_cleaning_tool.cpp kind:function(thumb,size=0x64) addr:0x02163a28
 __sinit_dino_cleaning_xray.cpp kind:function(thumb,size=0x6c) addr:0x02163a8c
@@ -407,7 +407,7 @@ __sinit_ov002_02163af8 kind:function(thumb,size=0xc0) addr:0x02163af8
 __sinit_ov002_02163bb8 kind:function(thumb,size=0x88) addr:0x02163bb8
 __sinit_dino_cleaning_dummy_item.cpp kind:function(thumb,size=0x6c) addr:0x02163c40
 __sinit_dino_cleaning_rock.cpp kind:function(thumb,size=0x64) addr:0x02163cac
-__sinit_ov002_02163d10 kind:function(thumb,size=0x70) addr:0x02163d10
+__sinit_dino_cleaning.cpp kind:function(thumb,size=0x70) addr:0x02163d10
 __sinit_ov002_02163d80 kind:function(thumb,size=0x80) addr:0x02163d80
 .p__sinit_ov002_02163574 kind:data(word) addr:0x02163e00
 .p__sinit_ov002_021635e0 kind:data(word) addr:0x02163e04

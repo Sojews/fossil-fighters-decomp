@@ -12,6 +12,7 @@
 #include "game/dino_cleaning.h"
 #include "game/dino_common_live.h"
 #include <algorithm>
+#include "game/dino_static_init.h"
 
 DinoCleaningTimer::~DinoCleaningTimer() {
 }
@@ -147,3 +148,15 @@ void DinoCleaningTimerMessagesAnchor(std::string path) {
 // Stopped, paused or done.
 void DinoCleaningTimer::StateIdle() {
 }
+
+// The file's static initialization (see dino_static_init.h).
+extern "C" u32 data_ov002_02164d2c[];
+#pragma always_inline on
+static struct DinoCleaningTimerStaticInit {
+    DinoCleaningTimerStaticInit() {
+        DINO_COMMON_LAYOUT_INIT(data_ov002_02164c74, 0x40, 0x70, 0x30, 0x28, 0x80, 0x90, 0x98, 0xa0);
+        DINO_POOL(MPoint, data_ov002_02164c74, 0xb0) = MPoint(15, -80);
+        DINO_POOL(MPoint, data_ov002_02164d2c, 0) = MPoint(-7, -80);
+        DINO_POOL(MRect, data_ov002_02164c74, 0xc0) = MRect(106, 0, 149, 33);
+    }
+} sDinoCleaningTimerStaticInit;

@@ -7,6 +7,7 @@
 
 src/ov002/dino_cleaning_talk_filter.cpp:
     .text       start:0x02157280 end:0x02158018
+    .init       start:0x021636b8 end:0x02163730
 
 src/ov002/dino_cleaning_paper.cpp:
     .text       start:0x02158230 end:0x02158448
@@ -54,6 +55,7 @@ src/ov002/dino_cleaning_tutorial_window.cpp:
 
 src/ov002/dino_cleaning_timer.cpp:
     .text       start:0x0215c2f8 end:0x0215c86c
+    .init       start:0x02163934 end:0x021639c4
 
 src/ov002/dino_cleaning_tool.cpp:
     .text       start:0x0215c998 end:0x0215c9fc
@@ -71,6 +73,7 @@ src/ov002/dino_cleaning_image.cpp:
 
 src/ov002/dino_cleaning.cpp:
     .text       start:0x0215f218 end:0x021632c4
+    .init       start:0x02163d10 end:0x02163d80
 
 src/ov002/dino_cleaning_image_view.cpp:
     .text       start:0x02159990 end:0x0215b118

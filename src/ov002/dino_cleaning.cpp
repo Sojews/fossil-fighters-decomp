@@ -31,6 +31,7 @@
 #include "m/seed_generator.h"
 #include "m/window.h"
 #include <stdio.h>
+#include "game/dino_static_init.h"
 
 #pragma auto_inline off
 
@@ -772,3 +773,14 @@ extern "C" void func_ov002_0215a4fc(DinoCleaningImageView *view, MPoint pos);
 extern "C" void func_ov002_0215fdd4(DinoCleaningKasekiRock *rock, MPoint pos) {
     func_ov002_0215a4fc(rock->mView, pos);
 }
+
+// The file's static initialization (see dino_static_init.h).
+// NONMATCHING: scheduling, as in dino_cleaning_stop_confirm_menu_item.cpp (the screen rect lies past the 0x80 anchor).
+#pragma always_inline on
+static struct DinoCleaningStaticInit {
+    DinoCleaningStaticInit() {
+        DINO_COMMON_LAYOUT_INIT(data_ov002_021657d4, 0x18, 0x94, 0x58, 0x40, 0xc4, 0xa4, 0xac, 0xb4);
+        DINO_POOL_WORD(data_ov002_021657d4, 0xc) = 4096;
+        DINO_POOL_WORD(data_ov002_021657d4, 0x8) = 4096;
+    }
+} sDinoCleaningStaticInit;
