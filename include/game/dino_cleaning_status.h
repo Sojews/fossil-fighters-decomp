@@ -5,7 +5,7 @@
 
 // The element of an 8-byte-element vector the cleaning files share (the real type is unknown).
 struct DinoCleaningStatusEntry {
-    // (A user default constructor: the game's vector of these assigns element by element.)
+    // (A user default constructor makes it non-trivial: the game's vector of these erases element by element.)
     DinoCleaningStatusEntry() {}
     u32 unk0;
     u32 unk4;
