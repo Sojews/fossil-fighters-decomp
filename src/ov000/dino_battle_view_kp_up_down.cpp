@@ -9,6 +9,12 @@
 #include "game/info_panel_window.h"
 #include "game/dino_static_init.h"
 #include "game/dino_resource.h"
+#include <string>
+#include <string.h>
+#include "game/dino_sound.h"
+#include "nitro/os.h"
+#include "m/smart_oam.h"
+#include "m/motion.h"
 
 DinoBattleViewKPUpDown::~DinoBattleViewKPUpDown() {
 }
@@ -43,6 +49,58 @@ DinoBattleViewKPUpDown::DinoBattleViewKPUpDown() : MProcess(NULL) {
 }
 
 // Clears a side's queued numbers.
+extern "C" const char data_ov000_02195114[];   // the change's format ("%+d")
+extern "C" u32 data_ov000_0219504c[];           // the TU's pooled statics (+0x04: the loss digits, +0x08: the gain)
+
+// Shows a side's kaseki point change, one digit after another.
+// NONMATCHING: the spilled locals (the length, the digit set, the oam) take other stack slots.
+extern "C" void func_ov000_0217df4c(DinoBattleViewKPUpDown *view, int value, int side) {
+    MPoint pos;
+    char text[8];
+    KPUpDownMotion *motion;
+    MParallelTaskSet *digits;
+    int i;
+    int len;
+    MSmartOam *oam;
+    const char *c;
+    if (value == 0) {
+        return;
+    }
+    motion = view->mMotions[side];
+    OS_SPrintf(text, data_ov000_02195114, value < 0 ? -value : value);
+    len = strlen(text);
+    motion->mTasks->Clear();
+    MSerialTaskSet *tasks = new MSerialTaskSet(TRUE);
+    digits = new MParallelTaskSet();
+    oam = new MSmartOam(len, 0, TRUE);
+    motion->mTasks->AddTail(tasks);
+    pos = MPoint(motion->mPos.x - len * 16 / 2 + 8, motion->mPos.y);
+    if (value > 0) {
+        DinoSoundPlaySe(0x56, 0);
+    } else {
+        DinoSoundPlaySe(0x57, 0);
+    }
+    c = text;
+    for (i = 0; i < len; i++) {
+        MMotion *digit = new MMotion(
+            std::string(value >= 0 ? ((const char **)data_ov000_0219504c)[2] : ((const char **)data_ov000_0219504c)[1]),
+            oam, 2, 1);
+        digit->SetPriority(2);
+        digit->SetAnchor(3);
+        digit->Show();
+        digit->SetPosition(pos);
+        digit->GetUnit()->SetMode(1);
+        digits->AddTail(digit);
+        pos.x += 16;
+        int anime = *c == '+' ? 11 : *c - '0' + 1;
+        tasks->AddTail(digit->CreatePlayTransfer(anime, 0), new MTimer(3));
+        c++;
+    }
+    tasks->AddTail(new MTimer(60), MTaskExitTransfer::Create(digits));
+    digits->AddTail(oam);
+    motion->mTasks->AddTail(digits);
+}
+
 extern "C" void func_ov000_0217e1ec(DinoBattleViewKPUpDown *view, int side) {
     view->mMotions[side]->mTasks->Clear();
 }
