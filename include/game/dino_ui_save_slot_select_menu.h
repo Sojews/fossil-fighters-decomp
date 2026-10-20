@@ -37,6 +37,6 @@ public:
     virtual ~DinoUiSaveSlotConfirmMenu();
     virtual void OnStart();
 
-    u32 mUnkA8;     // 0xA8
+    MSmartOam *mOam;    // 0xA8
 };
 #endif

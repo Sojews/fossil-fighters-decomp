@@ -38,6 +38,12 @@
 #include "game/dino_ui_save_slot_select_menu.h"
 #include "game/common_window_message.h"
 #include "game/dino_static_init.h"
+#include "m/indicator.h"
+#include "m/oam_canvas.h"
+#include "m/text_codec.h"
+#include "nitro/os.h"
+#include "nitro/mi.h"
+#include <algorithm>
 
 DinoUiTopMenuLoop::~DinoUiTopMenuLoop() {
 }
@@ -486,28 +492,28 @@ template MTask *MCreateBgCallTask(DinoUiSaveSlotSelect *obj, void (DinoUiSaveSlo
 #pragma auto_inline off
 
 
+// Where the label goes: centred on pos, dx to the right.
+static inline MPoint DinoSaveSlotLabelPos(const MPoint &pos, const MPoint &size, int dx) {
+    MPoint p;
+    p.y = pos.y - size.y / 2;
+    p.x = pos.x - size.x / 2 + dx;
+    return p;
+}
+
 // Lights up (or not) and nudges the label (which sits a little left when focused).
-// NONMATCHING: the game reads the size through a pointer, from other stack slots.
+// NONMATCHING: the game reads the size through a pointer kept in a register.
 void DinoUiSaveSlotSelectMenuItem::OnFocusChanged(BOOL focused) {
     if (focused) {
         mMotion->Play(2, 0);
         if (!mUnkA4) {
-            MPoint size = mLabel->GetSize();
-            MPoint pos;
-            pos.y = mPos.y - size.y / 2;
-            pos.x = mPos.x - size.x / 2 - 4;
-            mLabel->SetPosition(pos);
+            mLabel->SetPosition(DinoSaveSlotLabelPos(mPos, mLabel->GetSize(), -4));
             mMotion2->Play(2, 0);
             mMotion3->Play(2, 0);
         }
     } else {
         mMotion->Play(1, 0);
         if (!mUnkA4) {
-            MPoint size = mLabel->GetSize();
-            MPoint pos;
-            pos.y = mPos.y - size.y / 2;
-            pos.x = mPos.x - size.x / 2 + 4;
-            mLabel->SetPosition(pos);
+            mLabel->SetPosition(DinoSaveSlotLabelPos(mPos, mLabel->GetSize(), 4));
             mMotion2->Play(1, 0);
             mMotion3->Play(1, 0);
         }
@@ -857,6 +863,119 @@ void DinoUiSaveSlotConfirm::Idle() {
     mMenu = new DinoUiSaveSlotConfirmMenu();
     mSerial.AddTail(mMenu);
 }
+
+// The save slots' graphics (a pool; [3] a saved slot's frame, [5] an empty one's) and the longest play time shown.
+extern "C" const char *const data_ov004_02172858[];
+extern "C" const u64 data_ov004_021728a0;
+// The rank badges' kinds.
+struct DinoSaveSlotKinds {
+    const char *names[3];
+};
+extern "C" const DinoSaveSlotKinds data_ov004_02171804;
+extern "C" const char data_ov004_02172c24[], data_ov004_02172c4c[];   // the badges' path formats
+extern "C" const u32 data_0208a97c, data_0208a980, data_0208a984;
+
+inline DinoUiSaveSlotSelectMenuItem::DinoUiSaveSlotSelectMenuItem(MSmartOam *oam, u32 slot, DinoSaveSummary summary,
+                                                                  MPoint pos)
+    : mOam(oam), mSlot(slot) {
+    mPos = pos;
+    mUnkA4 = summary.valid == 0;
+    if (mUnkA4) {
+        mMotion = new MMotion(data_ov004_02172858[5], oam, 0, 1);
+        mMotion->Play(1, 0);
+        mMotion->SetPriority(3);
+        mMotion->SetAnchor(3);
+        mMotion->Show();
+        mMotion->SetPosition(mPos);
+        mParallel.AddTail(mMotion);
+    } else {
+        mMotion = new MMotion(data_ov004_02172858[3], oam, 0, 1);
+        mMotion->Play(1, 0);
+        mMotion->SetPriority(3);
+        mMotion->SetAnchor(3);
+        mMotion->Show();
+        mMotion->SetPosition(mPos);
+        mParallel.AddTail(mMotion);
+        DinoSaveSlotKinds kinds = data_ov004_02171804;
+        char path[0x100];
+        OS_SPrintf(path, data_ov004_02172c4c, kinds.names[summary.unk14_14], summary.rank + 'a');
+        mMotion2 = new MMotion(path, oam, 0, 1);
+        mMotion2->Play(1, 0);
+        mMotion2->SetPriority(3);
+        mMotion2->Show();
+        mMotion2->SetPosition(mPos);
+        mParallel.AddTail(mMotion2);
+        OS_SPrintf(path, data_ov004_02172c24, summary.horiderLevel);
+        mMotion3 = new MMotion(path, oam, 0, 1);
+        mMotion3->Play(1, 0);
+        mMotion3->SetPriority(3);
+        if (summary.flag2f) {
+            mMotion3->Show();
+        }
+        mMotion3->SetPosition(mPos);
+        mParallel.AddTail(mMotion3);
+        mLabel = new MSmartObjCanvas(oam->mDisplay, oam, MPoint(0x100, 0x40), gDinoResource->GetUnkTable(), TRUE);
+        mLabel->SetPriority(3);
+        MPoint size = mLabel->GetSize();
+        MPoint labelPos;
+        labelPos.y = mPos.y - size.y / 2;
+        labelPos.x = mPos.x - size.x / 2 + 4;
+        mLabel->SetPosition(labelPos);
+        mLabel->Show();
+        mParallel.AddTail(mLabel);
+        MFont *font = gDinoResource->CreateFont12(0, 10, 0);
+        MIndicator *name = new MIndicator(mLabel->CreateWindow(MRect(0, 0, 0x30, 0xC).Shift(0x25, 5)), font, 0);
+        name->SetText(std::wstring((const wchar_t *)summary.name));
+        name->Show();
+        mParallel.AddTail(name);
+        if (summary.unk9 != 0) {
+            MIndicator *title = new MIndicator(mLabel->CreateWindow(MRect(0, 0, 0xB4, 0xC).Shift(0x46, 0x2D)), font, 0);
+            title->SetText(std::string(gDinoResource->GetText(summary.unk9)));
+            title->Show();
+            mParallel.AddTail(title);
+        }
+        u64 frames = std::min(summary.playFrames, data_ov004_021728a0);
+        std::wstring time;
+        if (frames == 0) {
+            time = MDecodeUtf8(gDinoResource->GetText(data_0208a980));
+        } else {
+            u64 seconds = (frames - frames % 60) / 60;
+            u64 minutes = (seconds - seconds % 60) / 60;
+            u32 minute = minutes % 60;
+            u32 hours = (minutes - minute) / 60;
+            OS_SPrintf(path, gDinoResource->GetText(data_0208a984), hours, minute);
+            time = MDecodeUtf8(path);
+        }
+        MIndicator *clock = new MIndicator(mLabel->CreateWindow(MRect(0, 0, 0x78, 0xC).Shift(0x46, 0x1B)), font, 0);
+        clock->SetText(std::wstring(time));
+        clock->Show();
+        mParallel.AddTail(clock);
+    }
+}
+
+// The slot about to be saved over (or a fresh one, for a new save), shown alone.
+// NONMATCHING: the label's size is read through a pointer (as in OnFocusChanged), and the play time limit's pool
+// literals and branches differ.
+#pragma inline_max_size(2000)
+void DinoUiSaveSlotConfirmMenu::OnStart() {
+    mOam = new MSmartOam(0x28, 0, TRUE);
+    mOam->SetUnk1C(7);
+    mParallel.AddTail(mOam);
+    DinoSaveSummary summary;
+    gDinoBackup->GetSummary(gDinoBackup->GetSlot(), &summary);
+    if (!summary.valid) {
+        MI_CpuFill8(&summary, 0, sizeof(summary));
+        gDinoBackup->MakeSummary(&summary);
+        summary.playFrames = 0;
+        summary.unk9 = data_0208a97c;
+    }
+    DinoUiSaveSlotSelectMenuItem *item = new DinoUiSaveSlotSelectMenuItem(mOam, 0, summary, MPoint(0x80, 0x48));
+    item->DinoHelpItem::Disable();
+    AddItem(item);
+    FocusItem(item);
+    Deactivate();
+}
+#pragma inline_max_size reset
 
 extern u8 data_ov004_02177280;      // set when the screen saves rather than loads
 extern const u32 data_0208ad88;
