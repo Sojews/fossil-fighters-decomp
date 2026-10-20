@@ -197,10 +197,26 @@ namespace std {
         return result;
     }
 
+    // (Between plain arrays the game's loop compares the pointers' order.)
+    template <class T> inline T *copy(T *first, T *last, T *result) {
+        for (; first < last; ++first, ++result) {
+            *result = *first;
+        }
+        return result;
+    }
+
     template <class BidirectionalIterator1, class BidirectionalIterator2>
     inline BidirectionalIterator2 copy_backward(BidirectionalIterator1 first, BidirectionalIterator1 last,
                                                 BidirectionalIterator2 result) {
         while (last != first) {
+            *--result = *--last;
+        }
+        return result;
+    }
+
+    // (Between plain arrays the game's loop compares the pointers' order.)
+    template <class T> inline T *copy_backward(T *first, T *last, T *result) {
+        while (last > first) {
             *--result = *--last;
         }
         return result;
