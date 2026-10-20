@@ -59,10 +59,12 @@ void DinoUiReviveStatusParts::Idle() {
 
 // Template task instances the game emits in this file. Until the code that makes the tasks is decompiled, they are
 // instantiated explicitly.
+#pragma auto_inline off
 template class MCallTask1<MBg, MBg, MIndexBitmap *>;
 template MTask *MCreateCallTask(MBg *obj, void (MBg::*func)(MIndexBitmap *), MIndexBitmap * a0);
 template class MCallTask0<MPalUnit, MPalUnit>;
 template MTask *MCreateCallTask(MPalUnit *obj, void (MPalUnit::*func)());
+#pragma auto_inline reset
 
 // Gives the palettes back (as a task: see State0215e030).
 void MPalUnit::Free() {
@@ -109,7 +111,8 @@ extern "C" struct {
     u8 unkD4[0xE4 - 0xD4];
     void (DinoUiReviveEffect::*State0215ec2c_E4)(); // 0xE4
     void (DinoUiReviveEffect::*State0215da04_EC)(); // 0xEC
-    u8 unkF4[0x104 - 0xF4];
+    u8 unkF4[0xFC - 0xF4];
+    void (DinoUiReviveEffect::*State0215e220_FC)(); // 0xFC
     void (DinoUiReviveEffect::*State0215f668_104)(); // 0x104
 } data_ov003_02161d20;
 
@@ -123,6 +126,40 @@ DinoUiReviveEffect::DinoUiReviveEffect(const DinoCreatureState &creature, const 
 DinoUiReviveStatus::DinoUiReviveStatus(MDisplay *display, const DinoCreatureInfo &info, u8 flag)
     : MProcess(display), mInfo(info), mFlag(flag) {
     mState = data_ov003_02161d20.Start_74;
+}
+
+extern "C" const int data_020899fc;
+extern "C" const int data_02089a48;
+// (The pointer-to-member constants of the next function, pooled apart.)
+extern "C" void (MBg::*data_ov003_02161dc4)(MIndexBitmap *);
+extern "C" void (MPalUnit::*data_ov003_02161ddc)();
+
+// Waits for the effect's tasks; a button skips it, putting the picture away under a fade out.
+void DinoUiReviveEffect::State0215e030() {
+    if (!data_ov003_021624c0 && (mInput->GetPressed() & 0x1003)) {
+        MTask *mainFade;
+        MTask *subFade;
+        MTask *deleteBitmap;
+        MTask *freePal;
+        MTask *exit;
+        exit = MTaskExitTransfer::Create(this);
+        freePal = MCreateCallTask(mPalBlock, data_ov003_02161ddc);
+        deleteBitmap = MCreateCallTask(gCurrentDisplay->mBg, data_ov003_02161dc4, mBitmap);
+        subFade = gLcd->mSub->mBright->CreateFadeOutToBlack(data_02089a48, data_020899fc);
+        mainFade = gLcd->mMain->mBright->CreateFadeOutToBlack(data_02089a48, data_020899fc);
+        MParallelTaskSet *fades = new MParallelTaskSet(TRUE);
+        fades->AddTail(mainFade);
+        fades->AddTail(subFade);
+        MSerialTaskSet *serial = &mSerial;
+        serial->AddTail(fades);
+        serial->AddTail(deleteBitmap);
+        serial->AddTail(freePal);
+        serial->AddTail(exit);
+        return;
+    }
+    if (mEffectTasks->IsEmpty()) {
+        mState = data_ov003_02161d20.State0215e220_FC;
+    }
 }
 
 // Puts the picture away.
@@ -204,9 +241,6 @@ void DinoUiReviveEffect::StateWait() {
     }
     mState = data_ov003_02161d20.Leave_4C;
 }
-
-extern "C" const int data_020899fc;
-extern "C" const int data_02089a48;
 
 // A button skips the rest of the effect.
 void DinoUiReviveEffect::CheckSkip() {
