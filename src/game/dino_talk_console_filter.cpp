@@ -11,6 +11,7 @@
 #include "game/dino_sound.h"
 #include "m/seed_generator.h"
 #include "m/view.h"
+#include "game/dino_static_init.h"
 
 // The text settings in the resource table.
 struct DinoTalkSettings {
@@ -128,8 +129,16 @@ void DinoTalkWindow::Skip() {
 
 // The TU's pooled data.
 extern "C" struct {
-    u8 unk00[0x38];
+    u8 unk00[0x10];
+    s32 unk10;
+    u8 unk14[4];
+    MPoint unk18;   // centered in 256x64 under unk40
+    u8 unk20[8];
+    MPoint unk28;
+    u8 unk30[8];
     MPoint mFlipOffset;     // 0x38: the name panel's, on the other side
+    MPoint unk40;   // y derived from unk48's (mwcc reuses the stored value)
+    MPoint unk48;
 } data_020b62f0;
 
 // NONMATCHING: register allocation (the game keeps the flip offset in registers and spills the shake).
@@ -186,3 +195,20 @@ std::wstring &DinoTalkFilterReplaceAnchor(std::wstring &s, const std::wstring &t
     return s.replace(0, 0, text);
 }
 #pragma dont_inline reset
+
+// The file's static initialization (see dino_static_init.h).
+static struct DinoTalkConsoleFilterStaticInit {
+    DinoTalkConsoleFilterStaticInit() {
+        data_020b62f0.unk10 = 3 << 14;
+        data_020b62f0.unk48.x = 0;
+        data_020b62f0.unk48.y = 4;
+        data_020b62f0.unk40.x = 216;
+        data_020b62f0.unk40.y = data_020b62f0.unk48.y * 2 + 36;
+        data_020b62f0.unk18.x = (256 - data_020b62f0.unk40.x) / 2;
+        data_020b62f0.unk18.y = (64 - data_020b62f0.unk40.y) / 2 + 134;
+        data_020b62f0.unk28.x = 96;
+        data_020b62f0.unk28.y = 12;
+        data_020b62f0.mFlipOffset.x = 0;
+        data_020b62f0.mFlipOffset.y = -64;
+    }
+} sDinoTalkConsoleFilterStaticInit;

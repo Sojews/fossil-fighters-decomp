@@ -689,7 +689,7 @@ _ZThn136_N29DinoUiOrderSelectDecideButtonD1Ev kind:function(thumb,size=0x1c) add
 data_ov006_02190040 kind:data(any) addr:0x02190040
 __sinit_dino_ui_field_menu.cpp kind:function(thumb,size=0x20) addr:0x0219004c
 __sinit_dino_ui_parts_tab_icon_menu_item.cpp kind:function(thumb,size=0xcc) addr:0x0219006c
-__sinit_ov006_02190138 kind:function(thumb,size=0x2d0) addr:0x02190138
+__sinit_dino_ui_container_menu_item.cpp kind:function(thumb,size=0x2d0) addr:0x02190138
 __sinit_dino_ui_item_item_button.cpp kind:function(thumb,size=0x70) addr:0x02190408
 __sinit_dino_ui_rv_status_menu_item.cpp kind:function(thumb,size=0x54) addr:0x02190478
 __sinit_dino_ui_medal_menu.cpp kind:function(thumb,size=0x354) addr:0x021904cc

@@ -259,6 +259,7 @@ src/game/dino_event_talk_window.cpp:
 
 src/game/dino_talk_console_filter.cpp:
     .text       start:0x02008f60 end:0x0200a34c
+    .init       start:0x02088de4 end:0x02088e34
 
 src/game/dino_multi_play_icon.cpp:
     .text       start:0x0200a34c end:0x0200a5bc
