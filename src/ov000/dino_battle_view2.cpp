@@ -18,6 +18,7 @@
 #include "m/smart_oam.h"
 #include "game/creature_motion.h"
 #include "game/dino_battle_view_creature.h"
+#include "game/dino_static_init.h"
 
 AnyInputTimerWait::~AnyInputTimerWait() {
 }
@@ -319,3 +320,28 @@ DinoBattleViewUiRootSelect::DinoBattleViewUiRootSelect(DinoBattleView *view, MMe
     serial->AddTail(enable);
     mState = data_ov000_0219569c.StateBegin_5C;
 }
+
+// The file's static initialization (see dino_static_init.h).
+extern "C" u32 data_ov000_02195d24[];
+extern "C" u32 data_ov000_02195da4[];
+extern "C" u32 data_ov000_02195dac[];
+extern "C" u32 data_ov000_02195db4[];
+extern "C" u32 data_ov000_02195dbc[];
+static struct DinoBattleView2StaticInit {
+    DinoBattleView2StaticInit() {
+        DINO_POOL_WORD(data_ov000_02195d24, 0x24) = 128;
+        DINO_POOL_WORD(data_ov000_02195d24, 0x28) = 176;
+        DINO_POOL_WORD(data_ov000_02195d24, 0x1c) = 8;
+        DINO_POOL_WORD(data_ov000_02195d24, 0x20) = 150;
+        DINO_POOL_WORD(data_ov000_02195d24, 0xc) = 64;
+        DINO_POOL_WORD(data_ov000_02195d24, 0x10) = 112;
+        DINO_POOL_WORD(data_ov000_02195da4, 0x0) = -16;
+        DINO_POOL_WORD(data_ov000_02195da4, 0x4) = 0;
+        DINO_POOL_WORD(data_ov000_02195dac, 0x0) = 8;
+        DINO_POOL_WORD(data_ov000_02195dac, 0x4) = 0;
+        DINO_POOL_WORD(data_ov000_02195db4, 0x0) = -16;
+        DINO_POOL_WORD(data_ov000_02195db4, 0x4) = 24;
+        DINO_POOL_WORD(data_ov000_02195dbc, 0x0) = 8;
+        DINO_POOL_WORD(data_ov000_02195dbc, 0x4) = 24;
+    }
+} sDinoBattleView2StaticInit;

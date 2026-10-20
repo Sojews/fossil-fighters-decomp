@@ -86,6 +86,7 @@ src/ov000/dino_battle_debug_log.cpp:
 
 src/ov000/dino_battle_view2.cpp:
     .text       start:0x0217ffdc end:0x021817fc
+    .init       start:0x02190bf0 end:0x02190c40
 
 src/ov000/battle_select.cpp:
     .text       start:0x021817fc end:0x02184908
