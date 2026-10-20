@@ -216,7 +216,7 @@ DinoCreatureUpdateTask::~DinoCreatureUpdateTask() {
 DamagedUpdate::~DamagedUpdate() {
 }
 
-extern "C" BOOL func_ov000_0216cfac(DinoBattleModelCreature *creature, u32 a, u32 b, u32 c, u32 d, u8 e);
+extern "C" BOOL func_ov000_0216cfac(DinoBattleModelCreature *creature, u32 status, u32 a, int b, u32 c, u8 d);
 
 SetStatusEffectTask::SetStatusEffectTask(DinoBattleModelCreature *creature, u32 a, u32 b, u32 c, u32 d, u8 e,
                                          MMessageObserver *view) {
@@ -706,9 +706,114 @@ void DinoBattleModelCreature::RollUnk10C() {
     mUnk10C = mPlayer->GetRandom()->Next(5) + 1;
 }
 
+struct DinoBattleStatusEntry {
+    BOOL unk00;
+    u32 status;
+    u8 *unk08;
+    u8 *unk0C;
+};
+
+struct DinoBattleStatusTable {
+    DinoBattleStatusEntry entries[11];
+};
+
+extern "C" const DinoBattleStatusTable data_ov000_0218fc34;
+extern "C" const u32 data_0208a284;  // first status text, opponent side
+extern "C" const u32 data_0208a288;  // first status text, own side
+
+extern "C" BOOL func_ov000_0216cfac(DinoBattleModelCreature *creature, u32 status, u32 a, int b, u32 c, u8 d) {
+    BOOL result = FALSE;
+    if (creature->GetDefUnk61() == 8) {
+        return FALSE;
+    }
+    DinoBattleStatusTable table = data_ov000_0218fc34;
+    table.entries[0].unk08 = &creature->mStatus.unk04[0];
+    table.entries[0].unk0C = &creature->mStatus.unk10[0];
+    table.entries[1].unk08 = &creature->mStatus.unk04[1];
+    table.entries[1].unk0C = &creature->mStatus.unk10[1];
+    table.entries[2].unk08 = &creature->mStatus.unk04[2];
+    table.entries[2].unk0C = &creature->mStatus.unk10[2];
+    table.entries[3].unk08 = &creature->mStatus.unk04[3];
+    table.entries[3].unk0C = &creature->mStatus.unk10[3];
+    table.entries[4].unk08 = &creature->mStatus.unk04[5];
+    table.entries[4].unk0C = &creature->mStatus.unk10[5];
+    table.entries[5].unk08 = &creature->mStatus.unk04[6];
+    table.entries[5].unk0C = &creature->mStatus.unk10[6];
+    table.entries[6].unk08 = &creature->mStatus.unk04[7];
+    table.entries[6].unk0C = &creature->mStatus.unk10[7];
+    table.entries[7].unk08 = &creature->mStatus.unk04[4];
+    table.entries[7].unk0C = &creature->mStatus.unk10[4];
+    table.entries[8].unk08 = &creature->mStatus.unk04[8];
+    table.entries[8].unk0C = &creature->mStatus.unk10[8];
+    table.entries[9].unk08 = &creature->mStatus.unk04[9];
+    table.entries[9].unk0C = &creature->mStatus.unk10[9];
+
+    u32 text = data_0208a288;
+    if (creature->mPlayer->mUnkB4 == 0) {
+        text = data_0208a284;
+    }
+    creature->mView->Post(new DinoBattleViewActionInfoBarUpdateRequest(text + status - 2));
+
+    u32 old = creature->mStatus.flags;
+    u32 bit = 1 << status;
+    creature->mStatus.flags = old | bit;
+    for (int i = 0; table.entries[i].unk08 != NULL; i++) {
+        if (status == table.entries[i].status) {
+            if (table.entries[i].unk00) {
+                creature->mUnkC4 |= bit;
+            }
+            if (old & bit) {
+                result = TRUE;
+            }
+            *table.entries[i].unk08 = a;
+            *table.entries[i].unk0C = d;
+            switch (status) {
+            case 2:
+                creature->mStatus.unk1C = b;
+                break;
+            case 4: {
+                creature->mStatus.unk20 = 0;
+                int count = creature->CountAttacks();
+                if (b >= count) {
+                    creature->mStatus.unk20 = (1 << count) - 1;
+                } else {
+                    while (b != 0) {
+                        u32 mask = 1 << creature->mPlayer->GetRandom()->Next(count);
+                        if (!(creature->mStatus.unk20 & mask)) {
+                            b--;
+                            creature->mStatus.unk20 |= mask;
+                        }
+                    }
+                }
+                break;
+            }
+            case 7:
+                creature->mStatus.unk24 = b;
+                creature->mStatus.unk28 = c;
+                break;
+            case 8:
+                creature->mStatus.guardChance = b;
+                break;
+            case 9:
+                creature->mStatus.unk30 = b;
+                creature->mStatus.unk34 = c;
+                break;
+            case 10:
+                creature->mStatus.unk38 = b;
+                break;
+            case 11:
+                creature->mStatus.unk3C = b;
+                break;
+            }
+            break;
+        }
+    }
+    return result;
+}
+
 void DinoBattleModelCreature::ClearStatus8() {
     mStatus.flags &= ~8;
-    mStatus.unk05 = 0;
+    mStatus.unk04[1] = 0;
 }
 
 void DinoBattleModelCreature::ResetStatus() {

@@ -174,16 +174,18 @@ struct DinoBattleCreatureStats {
 
 // A creature's status effects.
 struct DinoBattleCreatureStatus {
-    u32 flags;          // 0x00
-    u8 unk04;
-    u8 unk05;           // 0x05
-    u8 unk06[0x20 - 0x06];
-    u32 unk20;          // 0x20
+    u32 flags;          // 0x00: bit n set while status n is active
+    u8 unk04[12];       // 0x04
+    u8 unk10[12];       // 0x10
+    u32 unk1C;          // 0x1C: status 2
+    u32 unk20;          // 0x20: status 4, mask of sealed attacks
     s32 unk24;          // 0x24: added to unkEC with flag 0x80
     u32 unk28;
     u32 guardChance;    // 0x2C: percentage, with flag 0x100
     s32 unk30;          // 0x30: added to unkEC with flag 0x200
-    u8 unk34[0x40 - 0x34];
+    u32 unk34;
+    u32 unk38;          // 0x38: status 10
+    u32 unk3C;          // 0x3C: status 11
 };
 
 class DinoBattleModelCreature : public MProcess, public MMessageObserver {

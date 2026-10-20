@@ -2117,6 +2117,7 @@ public:
 class DinoBattleViewActionInfoBarUpdateRequest : public MMessage {
 public:
     DinoBattleViewActionInfoBarUpdateRequest() : MMessage(0x10063) {}
+    DinoBattleViewActionInfoBarUpdateRequest(u32 value) : MMessage(0x10063), mUnk0C(0), mUnk10(value) {}
     virtual u32 GetSize() { return 12; }
     virtual void Write(void *buf) {
         MI_CpuCopy8(&mId, buf, 4);
