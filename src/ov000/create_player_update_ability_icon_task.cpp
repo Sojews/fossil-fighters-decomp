@@ -20,6 +20,7 @@
 #include "game/set_status_effect_task.h"
 #include "game/dino_static_init.h"
 #include "game/info_panel_window.h"
+#include "game/dino_battle_view_class.h"
 #include "game/dino_battle_debug_log.h"
 #include <stdio.h>
 
@@ -1784,6 +1785,49 @@ BOOL MoveCreatureFromEscape::IsNeeded() {
         return TRUE;
     }
     return FALSE;
+}
+
+// Moves the creature in the escape area back to the front (with no other creature) or to the first free position,
+// then has the user's menu come back up.
+void MoveCreatureFromEscape::Idle() {
+    DinoBattleController *controller = (DinoBattleController *)static_cast<DinoBattleView *>(
+        ((DinoBattleModelField *)mPlayer->mUnk100)->mUnkB4)->GetUnkEC();
+    DinoBattleModelCreature *escaped = mPlayer->FindCreature(3);
+    if (escaped != NULL && escaped->GetUnkC0() == 3) {
+        if (mPlayer->GetCreatureCount() <= 1) {
+            MParallelTaskSet *set = new MParallelTaskSet(TRUE);
+            DinoSignalWait *wait = new DinoSignalWait(0x10013, NULL, NULL, 1);
+            MTask *move = escaped->CreatePostTask(new DinoBattleModelCreatureMoveRequest(
+                (u32)(MMessageObserver *)wait, mPlayer->GetUnkB8(), escaped->GetUnkB4(), escaped->GetUnkB8(), 0, 0, 0));
+            set->AddTail(wait);
+            set->AddTail(move);
+            mSerial.AddTail(set);
+            if (controller != NULL) {
+                mSerial.AddTail(
+                    controller->CreatePostTask(new DinoBattleViewUiRootMenuRequest(0, mPlayer->GetUnkB8(), 0, 0, 0, 0)));
+            }
+        } else {
+            for (int i = 0; i < 2; i++) {
+                u32 pos = i + 1;
+                if (mPlayer->FindCreature(pos) == NULL) {
+                    MParallelTaskSet *set = new MParallelTaskSet(TRUE);
+                    DinoSignalWait *wait = new DinoSignalWait(0x10013, NULL, NULL, 1);
+                    MTask *move = escaped->CreatePostTask(new DinoBattleModelCreatureMoveRequest(
+                        (u32)(MMessageObserver *)wait, mPlayer->GetUnkB8(), escaped->GetUnkB4(), escaped->GetUnkB8(),
+                        pos, 0, 0));
+                    set->AddTail(wait);
+                    set->AddTail(move);
+                    mSerial.AddTail(set);
+                    if (controller != NULL) {
+                        mSerial.AddTail(controller->CreatePostTask(
+                            new DinoBattleViewUiRootMenuRequest(0, mPlayer->GetUnkB8(), 0, 0, 0, 0)));
+                    }
+                    break;
+                }
+            }
+        }
+    }
+    mSerial.AddTail(MTaskExitTransfer::Create(this));
 }
 
 
