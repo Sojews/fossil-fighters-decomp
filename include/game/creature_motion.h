@@ -81,6 +81,11 @@ public:
 
 class UpdateLifeBarTask : public MTask {
 public:
+    UpdateLifeBarTask(DinoBattleViewLifebar *lifebar, int life, int maxLife) {
+        mLifebar = lifebar;
+        mLife = life;
+        mMaxLife = maxLife;
+    }
     virtual ~UpdateLifeBarTask();
     virtual void Execute();
 
@@ -89,10 +94,16 @@ public:
     int mMaxLife;                       // 0x18
 };
 
+class DinoBattleViewCreature;
+
 class UpdateLifePointTask : public MProcess {
 public:
     virtual ~UpdateLifePointTask();
     virtual void Idle();
+
+    DinoBattleViewCreature *mCreature;  // 0x74
+    int mValue;                         // 0x78: the damage shown
+    u32 mKind;                          // 0x7C: 0 damage, 1 a miss
 };
 
 class SetColorMaskTask : public MTask {

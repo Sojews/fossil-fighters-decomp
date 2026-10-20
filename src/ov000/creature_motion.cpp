@@ -24,6 +24,7 @@
 #include "game/dino_battle_view_effect_game_begin.h"
 #include "m/oam_canvas.h"
 #include "m/font.h"
+#include "game/info_panel_window.h"
 
 CreatureMotion::~CreatureMotion() {
 }
@@ -47,6 +48,38 @@ UpdateLifeBarTask::~UpdateLifeBarTask() {
 }
 
 UpdateLifePointTask::~UpdateLifePointTask() {
+}
+
+// Pops the damage (or the miss) and the life left over the creature, then updates its life bar.
+void UpdateLifePointTask::Idle() {
+    DinoBattleViewPlayer *player = (DinoBattleViewPlayer *)mCreature->GetUnkDC();
+    const DinoBattleAdjustDefs *defs = gDinoResource->GetBattleAdjustDefs();
+    MPoint pos(defs->unk140[0], defs->unk140[1]);
+    if (player->GetUnkAC() == 1) {
+        pos.x = -pos.x;
+    }
+    pos += mCreature->GetMotion()->GetPosition();
+    switch (mKind) {
+    case 0: {
+        MTask *life = new DinoBattleViewPopNumber(((DinoBattleViewPlayer *)mCreature->GetUnkDC())->GetView(),
+                                                  (MSmartOam *)mCreature->GetUnkD8(), pos, mCreature->GetUnkF8(), 0, 3);
+        MTask *damage = new DinoBattleViewPopNumber(((DinoBattleViewPlayer *)mCreature->GetUnkDC())->GetView(),
+                                                    (MSmartOam *)mCreature->GetUnkD8(), pos, mValue, 0, 0);
+        player->AddTimedTask(damage, life);
+        break;
+    }
+    case 1: {
+        MTask *life = new DinoBattleViewPopNumber(((DinoBattleViewPlayer *)mCreature->GetUnkDC())->GetView(),
+                                                  (MSmartOam *)mCreature->GetUnkD8(), pos, mCreature->GetUnkF8(), 0, 3);
+        MTask *miss = new DinoBattleViewPopNumber(((DinoBattleViewPlayer *)mCreature->GetUnkDC())->GetView(),
+                                                  (MSmartOam *)mCreature->GetUnkD8(), pos, 0, 1, 0);
+        player->AddTimedTask(miss, life);
+        break;
+    }
+    }
+    GetSerial()->AddTail(new UpdateLifeBarTask((DinoBattleViewLifebar *)mCreature->GetUnkE0(), mCreature->GetUnkF8(),
+                                          mCreature->GetUnkF4()),
+                    MTaskExitTransfer::Create(this));
 }
 
 SetColorMaskTask::~SetColorMaskTask() {

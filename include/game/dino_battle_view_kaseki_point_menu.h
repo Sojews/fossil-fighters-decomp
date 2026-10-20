@@ -26,6 +26,7 @@ public:
 
     DinoBattleViewKasekiPoint *GetKasekiPoint();
     void AddTimedTask(MTask *task, MTask *old);
+    DinoBattleView *GetView() { return mView; }
     DinoBattleViewAbilityIcon *GetUnk108();
     u32 GetUnkAC();
     std::string GetUnkC0();
