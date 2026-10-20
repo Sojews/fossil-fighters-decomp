@@ -28,66 +28,121 @@ static inline u16 Rgb(int r, int g, int b) {
     return 0x8000 | (b << 10) | (g << 5) | r;
 }
 
+// The file's path statics, in its size-sorted .data pool (two anchors: the game loads each through the one in reach).
+extern "C" struct {
+    const char *mUnk00;                      // 0x00
+    const char *mFont16;                     // 0x04: "/font/font16"
+    const char *mEtcTalkMsgMatch;            // 0x08: "/etc/talk_msg_match"
+    const char *mEpisodeDir;                 // 0x0C: "/episode/%04d"
+    const char *mEtcMapExcavateMatch;        // 0x10: "/etc/map_excavate_match"
+    const char *mEtcRegionMapMatch;          // 0x14: "/etc/region_map_match"
+    const char *mEventMaxId;                 // 0x18: "/etc/event_maxid"
+    const char *mEtcRegionCenterMatch;       // 0x1C: "/etc/region_center_match"
+    const char *mEpisode;                    // 0x20: "/episode/e%04d"
+    const char *mCharaMaxId;                 // 0x24: "/etc/chara_maxid"
+    const char *mFontFont10;                 // 0x28: "/font/font10"
+    const char *mShop;                       // 0x2C: "/shop/%04d"
+    const char *mFontFont24f;                // 0x30: "/font/font24f"
+    const char *mEtcMapSceneMatch;           // 0x34: "/etc/map_scene_match"
+    const char *mMessage;                    // 0x38: "/msg/msg_%04d"
+    const char *mBattleMaxId;                // 0x3C: "/etc/battle_maxid"
+    const char *mSenryuDefs;                 // 0x40: "/etc/senryu_defs"
+    const char *mChara;                      // 0x44: "/chara/%04d"
+    const char *mKasekiDefs;                 // 0x48: "/etc/kaseki_defs"
+    const char *mKasekiRockMaxId;            // 0x4C: "/etc/kasekirock_maxid"
+    const char *mDance;                      // 0x50: "/dance/%04d"
+    const char *mMapG;                       // 0x54: "/map/g/%04d"
+    const char *mEpisodeMaxId;               // 0x58: "/etc/episode_maxid"
+    const char *mFont24;                     // 0x5C: "/font/font24"
+    const char *mMapE;                       // 0x60: "/map/e/%04d"
+    const char *mMapMaxId;                   // 0x64: "/etc/map_maxid"
+    const char *mMapM;                       // 0x68: "/map/m/%04d"
+    const char *mBattleCreatureMotion;       // 0x6C: "/motion/battle_creature/creature_%03d.bin"
+    const char *mCreatureDefs;               // 0x70: "/etc/creature_defs"
+    const char *mFlagMaxId;                  // 0x74: "/etc/flag_maxid"
+    const char *mMapC;                       // 0x78: "/map/c/%04d"
+    const char *mMuseumDefs;                 // 0x7C: "/etc/museum_defs"
+} data_020b9fc4;
+extern "C" struct {
+    const char *mExcavateDefs;               // 0x00: "/etc/excavate_defs"
+    const char *mKeyItemMaxId;               // 0x04: "/etc/keyitem_maxid"
+    const char *mBattle;                     // 0x08: "/battle/%04d"
+    const char *mBattleAdjustDefs;           // 0x0C: "/etc/btl_adjust_defs"
+    const char *mBattleBgDefs;               // 0x10: "/etc/btl_bg_defs"
+    const char *mText;                       // 0x14: "/text/japanese"
+    const char *mFont12;                     // 0x18: "/font/font12"
+    const char *mEtcMapBgmMatch;             // 0x1C: "/etc/map_bgm_match"
+    const char *mRegionMaxId;                // 0x20: "/etc/region_maxid"
+    const char *mVarMaxId;                   // 0x24: "/etc/var_maxid"
+    const char *mHeadMaskMaxId;              // 0x28: "/etc/headmask_maxid"
+    const char *mHeadMaskDefs;               // 0x2C: "/etc/headmask_defs"
+    const char *mMapR;                       // 0x30: "/map/r/%04d"
+    const char *mAttackDefs;                 // 0x34: "/etc/attack_defs"
+    const char *mFontFont8;                  // 0x38: "/font/font8"
+    const char *mKeyItemDefs;                // 0x3C: "/etc/keyitem_defs"
+    const char *mEtcBattleAttackType;        // 0x40: "/etc/battle_attack_type"
+} data_020ba044;
+#define sUnk00Path (data_020b9fc4.mUnk00)
+#define sFont16Path (data_020b9fc4.mFont16)
+#define sEtcTalkMsgMatchPath (data_020b9fc4.mEtcTalkMsgMatch)
+#define sEpisodeDirPath (data_020b9fc4.mEpisodeDir)
+#define sEtcMapExcavateMatchPath (data_020b9fc4.mEtcMapExcavateMatch)
+#define sEtcRegionMapMatchPath (data_020b9fc4.mEtcRegionMapMatch)
+#define sEventMaxIdPath (data_020b9fc4.mEventMaxId)
+#define sEtcRegionCenterMatchPath (data_020b9fc4.mEtcRegionCenterMatch)
+#define sEpisodePath (data_020b9fc4.mEpisode)
+#define sCharaMaxIdPath (data_020b9fc4.mCharaMaxId)
+#define sFontFont10Path (data_020b9fc4.mFontFont10)
+#define sShopPath (data_020b9fc4.mShop)
+#define sFontFont24fPath (data_020b9fc4.mFontFont24f)
+#define sEtcMapSceneMatchPath (data_020b9fc4.mEtcMapSceneMatch)
+#define sMessagePath (data_020b9fc4.mMessage)
+#define sBattleMaxIdPath (data_020b9fc4.mBattleMaxId)
+#define sSenryuDefsPath (data_020b9fc4.mSenryuDefs)
+#define sCharaPath (data_020b9fc4.mChara)
+#define sKasekiDefsPath (data_020b9fc4.mKasekiDefs)
+#define sKasekiRockMaxIdPath (data_020b9fc4.mKasekiRockMaxId)
+#define sDancePath (data_020b9fc4.mDance)
+#define sMapGPath (data_020b9fc4.mMapG)
+#define sEpisodeMaxIdPath (data_020b9fc4.mEpisodeMaxId)
+#define sFont24Path (data_020b9fc4.mFont24)
+#define sMapEPath (data_020b9fc4.mMapE)
+#define sMapMaxIdPath (data_020b9fc4.mMapMaxId)
+#define sMapMPath (data_020b9fc4.mMapM)
+#define sBattleCreatureMotionPath (data_020b9fc4.mBattleCreatureMotion)
+#define sCreatureDefsPath (data_020b9fc4.mCreatureDefs)
+#define sFlagMaxIdPath (data_020b9fc4.mFlagMaxId)
+#define sMapCPath (data_020b9fc4.mMapC)
+#define sMuseumDefsPath (data_020b9fc4.mMuseumDefs)
+#define sExcavateDefsPath (data_020ba044.mExcavateDefs)
+#define sKeyItemMaxIdPath (data_020ba044.mKeyItemMaxId)
+#define sBattlePath (data_020ba044.mBattle)
+#define sBattleAdjustDefsPath (data_020ba044.mBattleAdjustDefs)
+#define sBattleBgDefsPath (data_020ba044.mBattleBgDefs)
+#define sTextPath (data_020ba044.mText)
+#define sFont12Path (data_020ba044.mFont12)
+#define sEtcMapBgmMatchPath (data_020ba044.mEtcMapBgmMatch)
+#define sRegionMaxIdPath (data_020ba044.mRegionMaxId)
+#define sVarMaxIdPath (data_020ba044.mVarMaxId)
+#define sHeadMaskMaxIdPath (data_020ba044.mHeadMaskMaxId)
+#define sHeadMaskDefsPath (data_020ba044.mHeadMaskDefs)
+#define sMapRPath (data_020ba044.mMapR)
+#define sAttackDefsPath (data_020ba044.mAttackDefs)
+#define sFontFont8Path (data_020ba044.mFontFont8)
+#define sKeyItemDefsPath (data_020ba044.mKeyItemDefs)
+#define sEtcBattleAttackTypePath (data_020ba044.mEtcBattleAttackType)
+
 // The order here gives the game's layout (see tools/static_order.py).
 // static_order: begin
-static const char *sEtcBattleAttackTypePath = "/etc/battle_attack_type";
-static const char *sKeyItemDefsPath = "/etc/keyitem_defs";
-static const char *sFontFont8Path = "/font/font8";
-static const char *sAttackDefsPath = "/etc/attack_defs";
-static const char *sMapRPath = "/map/r/%04d";
-static const char *sHeadMaskDefsPath = "/etc/headmask_defs";
-static const char *sHeadMaskMaxIdPath = "/etc/headmask_maxid";
-static const char *sVarMaxIdPath = "/etc/var_maxid";
-static const char *sRegionMaxIdPath = "/etc/region_maxid";
-static const char *sFont12Path = "/font/font12";
-static const char *sMapMaxIdPath = "/etc/map_maxid";
-static const char *sTextPath = "/text/japanese";
-static const char *sBattleBgDefsPath = "/etc/btl_bg_defs";
-static const char *sBattleAdjustDefsPath = "/etc/btl_adjust_defs";
-static const char *sEtcMapBgmMatchPath = "/etc/map_bgm_match";
-static const char *sBattlePath = "/battle/%04d";
-static const char *sKeyItemMaxIdPath = "/etc/keyitem_maxid";
-static const char *sExcavateDefsPath = "/etc/excavate_defs";
-static const char *sMuseumDefsPath = "/etc/museum_defs";
-static const char *sMapCPath = "/map/c/%04d";
-static const char *sFlagMaxIdPath = "/etc/flag_maxid";
-static const char *sCreatureDefsPath = "/etc/creature_defs";
-static const char *sBattleCreatureMotionPath = "/motion/battle_creature/creature_%03d.bin";
-static const char *sMapMPath = "/map/m/%04d";
-static const char *sMapEPath = "/map/e/%04d";
-static const char *sFont24Path = "/font/font24";
-static const char *sMapGPath = "/map/g/%04d";
-static const char *sEpisodeMaxIdPath = "/etc/episode_maxid";
-static const char *sDancePath = "/dance/%04d";
-static const char *sKasekiRockMaxIdPath = "/etc/kasekirock_maxid";
-static const char *sEtcMapSceneMatchPath = "/etc/map_scene_match";
-static const char *sEpisodePath = "/episode/e%04d";
-static const char *sCharaPath = "/chara/%04d";
-static const char *sKasekiDefsPath = "/etc/kaseki_defs";
-static const char *sSenryuDefsPath = "/etc/senryu_defs";
-static const char *sBattleMaxIdPath = "/etc/battle_maxid";
-static const char *sMessagePath = "/msg/msg_%04d";
-static const char *sFontFont24fPath = "/font/font24f";
-static const char *sFontFont10Path = "/font/font10";
-static const char *sCharaMaxIdPath = "/etc/chara_maxid";
-static const char *sShopPath = "/shop/%04d";
-static const char *sEtcRegionCenterMatchPath = "/etc/region_center_match";
-static const char *sEventMaxIdPath = "/etc/event_maxid";
-static const char *sEtcRegionMapMatchPath = "/etc/region_map_match";
-static const char *sEtcMapExcavateMatchPath = "/etc/map_excavate_match";
-static const char *sEpisodeDirPath = "/episode/%04d";
-static const char *sEtcTalkMsgMatchPath = "/etc/talk_msg_match";
-static const char *sFont16Path = "/font/font16";
-static const char *sUnk00Path = 0;
+static OSMutex sMutex;
+static DinoFileCache sTalkMessageMatch(sEtcTalkMsgMatchPath);
+static DinoFileCache sRegionMapMatch(sEtcRegionMapMatchPath);
+static DinoFileCache sMapSceneMatch(sEtcMapSceneMatchPath);
+static DinoFileCache sRegionCenterMatch(sEtcRegionCenterMatchPath);
+static DinoFileCache sMapExcavateMatch(sEtcMapExcavateMatchPath);
+static DinoFileCache sMapBgmMatch(sEtcMapBgmMatchPath);
 static const u16 sUnkTable[14] = {0, Rgb(0, 0, 0), Rgb(0, 18, 0), Rgb(30, 2, 2), Rgb(22, 11, 0), Rgb(9, 15, 27), Rgb(31, 12, 25), Rgb(26, 0, 12), Rgb(10, 15, 23), Rgb(31, 18, 0), Rgb(31, 31, 31), Rgb(16, 16, 16), Rgb(31, 18, 20), 0};
 DinoResource *gDinoResource;
-static OSMutex sMutex;
-static DinoFileCache sMapBgmMatch(sEtcMapBgmMatchPath);
-static DinoFileCache sMapSceneMatch(sEtcMapSceneMatchPath);
-static DinoFileCache sRegionMapMatch(sEtcRegionMapMatchPath);
-static DinoFileCache sRegionCenterMatch(sEtcRegionCenterMatchPath);
-static DinoFileCache sTalkMessageMatch(sEtcTalkMsgMatchPath);
-static DinoFileCache sMapExcavateMatch(sEtcMapExcavateMatchPath);
 // static_order: end
 
 inline void DinoFileCache::Read(u32 offset, void *dest, u32 size) {
@@ -110,7 +165,7 @@ inline void DinoFileCache::Read(u32 offset, void *dest, u32 size) {
 }
 
 
-static const u32 sLanguageTextId = 1;
+extern "C" const u32 sLanguageTextId;  // 1 (the game reads it from .rodata)
 
 // Text IDs defined elsewhere.
 extern const u32 gKasekiRockNameText;

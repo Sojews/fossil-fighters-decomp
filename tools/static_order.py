@@ -30,6 +30,8 @@ def compile_cmd(src: Path, real: Path, out: Path):
     m = re.search(r"build \S+: \w+ " + re.escape(str(real.relative_to(ROOT) if real.is_absolute() else real))
                   + r"[^\n]*\n(?:  .*\n)*?  extra_cflags = ([^\n]*)", ninja)
     cmd = cmd.replace("$extra_cflags", m.group(1) if m else "")
+    cc = re.search(r"^cc = (\S+)", ninja, re.M)  # the default compiler (files can pick another)
+    cmd = cmd.replace("$cc", cc.group(1) if cc else "")
     return cmd.split() + ["-c", str(src), "-o", str(out.parent)]
 
 
