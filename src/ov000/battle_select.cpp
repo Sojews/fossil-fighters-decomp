@@ -285,13 +285,9 @@ struct DinoAbilityIconData {
 
 extern "C" const u32 data_0208a420;     // the level select's title
 static MIndicator *CreateLevelIndicator(MSmartOam *oam, MFont *font, MPoint size, MPoint pos);
-extern "C" const struct {
-    u32 unk0;
-    u32 cursorText;     // 0x04: the level select's cursor
-} data_0208addc;
+extern "C" const u32 data_0208ade0;     // the level select's cursor
 
-// NONMATCHING: the game keeps the two loops' &mParallel below the oam on the stack, and loads the cursor text id
-// through its own data_0208addc+4 literal.
+// NONMATCHING: the game keeps the two loops' &mParallel below the oam on the stack.
 void PlayerLevelSelect::Start() {
     mCounts[0] = mLevel->sides[1].unk68;
     mCounts[1] = mLevel->sides[1].unk6C;
@@ -329,7 +325,7 @@ void PlayerLevelSelect::Start() {
         mTexts[i] = text;
     }
     mCursor = new MIndicator(new MSmartObjCanvas(oam, MPoint(128, 16), gDinoResource->GetUnkTable(), TRUE), font, 0);
-    ((MIndicator *)mCursor)->SetText(std::string(gDinoResource->GetText(data_0208addc.cursorText)));
+    ((MIndicator *)mCursor)->SetText(std::string(gDinoResource->GetText(data_0208ade0)));
     const MPoint &pos = data_ov000_02195fa8[mRow];
     mCursor->SetPosition(MPoint(pos.x + data_ov000_02195e50.cursorOffset.x, pos.y + data_ov000_02195e50.cursorOffset.y));
     mCursor->SetPriority(0);

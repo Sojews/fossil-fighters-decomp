@@ -7367,6 +7367,7 @@ data_0208add0 kind:data(any) addr:0x0208add0
 data_0208add4 kind:data(any) addr:0x0208add4
 data_0208add8 kind:data(any) addr:0x0208add8
 data_0208addc kind:data(any) addr:0x0208addc
+data_0208ade0 kind:data(any) addr:0x0208ade0
 sLanguageTextId kind:data(any) addr:0x0208ade4
 sCreatureUnk0DValues kind:data(any) addr:0x0208ade8
 data_0208ae00 kind:data(any) addr:0x0208ae00
