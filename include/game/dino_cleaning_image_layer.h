@@ -7,6 +7,7 @@
 // One layer of a cleaning image.
 class DinoCleaningImageLayer {
 public:
+    DinoCleaningImageLayer(u32 unk1C44, std::string name, u8 unk800, u32 sound, u32 unk1C40);
     virtual ~DinoCleaningImageLayer();
 
     void SetUnk14(u8 value);
@@ -20,7 +21,7 @@ public:
     std::string mName;      // 0x08
     u8 mUnk14;              // 0x14
     u8 *mPixels;            // 0x18
-    u8 unk1C[0x20 - 0x1C];
+    u8 *mUnk1C;             // 0x1C: past the first 0x100 bytes
     u8 mHard[36][28];       // 0x20: cells the tools can't break
     u8 mCells410[36][28];   // 0x410
     u8 mUnk800;             // 0x800
@@ -29,7 +30,8 @@ public:
     MPictureFile mPicture;  // 0x1BB4
     u16 mPalette[42];       // 0x1BE8
     u32 mUnk1C3C;           // 0x1C3C: a sound effect
-    u32 unk1C40[2];
+    u32 mUnk1C40;           // 0x1C40
+    u32 mUnk1C44;           // 0x1C44
     u8 mUnk1C48;            // 0x1C48
 };
 
