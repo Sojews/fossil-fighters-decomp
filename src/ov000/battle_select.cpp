@@ -5,6 +5,9 @@
 #pragma auto_inline on
 
 #include "game/battle_select.h"
+#include "game/dino_battle.h"
+#include "m/file.h"
+#include "m/text_codec.h"
 #include "m/input.h"
 #include "m/lcd.h"
 #include "nitro/os.h"
@@ -234,10 +237,22 @@ MResource<DinoBattleSelectData> DinoBattleSelectLoadData(std::string path) {
 
 // The TU's pooled pointer-to-member constants (see menu.cpp).
 extern "C" struct {
-    u8 unk00[0x38];
+    u8 unk00[0x0C];
+    const char *tutorialPath;   // 0x0C: "/btl_tutorial/btl_tuto_%03d"
+    u32 unk10;
+    const char *valueFormat;    // 0x14: "%s%d:%d"
+    u32 unk18;
+    int minValue;               // 0x1C: 1
+    u32 unk20;
+    const char *livePath;       // 0x24: "/live/live_battle_%03d"
+    u8 unk28[0x38 - 0x28];
     void (UseCreatureSelect::*Start_38)();
     u8 unk40[0x48 - 0x40];
     void (PlayerLevelSelect::*Start_48)();
+    u8 unk50[0x58 - 0x50];
+    MPoint cursorOffset;        // 0x58
+    u8 unk60[0x68 - 0x60];
+    void (PlayerLevelSelect::*StateSelect_68)();
 } data_ov000_02195e50;
 
 UseCreatureSelect::UseCreatureSelect(void *params, u32 unk7C, u32 unk80, u8 *cancelled)
@@ -247,7 +262,7 @@ UseCreatureSelect::UseCreatureSelect(void *params, u32 unk7C, u32 unk80, u8 *can
 }
 
 PlayerLevelSelect::PlayerLevelSelect(u32 *level, BOOL unk7C, u32 unk80)
-    : MProcess(NULL), mUnk7C(unk7C), mUnk80(unk80), mUnk9C(0), mUnkA8(0), mUnkAC(1), mLevel(level) {
+    : MProcess(NULL), mUnk7C(unk7C), mUnk80(unk80), mRow(0), mUnkA8(0), mUnkAC(1), mLevel((DinoBattleParams *)level) {
     mState = data_ov000_02195e50.Start_48;
 }
 
@@ -257,6 +272,100 @@ template void std::__vec_deleter<DinoBattleView3DRecord, std::allocator<DinoBatt
 template std::__vec_deleter<DinoBattleView3DRecord, std::allocator<DinoBattleView3DRecord> >::~__vec_deleter();
 template void std::__vec_deleter<DinoBattleView3DEntry, std::allocator<DinoBattleView3DEntry> >::append(size_t n, Metrowerks::int2type<true>);
 template std::__vec_deleter<DinoBattleView3DEntry, std::allocator<DinoBattleView3DEntry> >::~__vec_deleter();
+
+extern "C" const MPoint data_ov000_02195fa8[4]; // by row: the cursor's position
+extern "C" const u32 data_0208a418, data_0208a41c;  // the rows' labels
+
+void PlayerLevelSelect::StateSelect() {
+    static const int sMaxCount = 10;
+    MInput *input = mInputHub->GetInput(0);
+    u32 key = input->GetPressed() & 0x3FFF;
+    switch (key) {
+    case 0x40:  // up
+        mRow = (mRow - 1 + 4u) % 4u;
+        break;
+    case 0x80:  // down
+        mRow = (mRow + 1) % 4u;
+        break;
+    case 0x400: {   // R: the next tutorial (none past the last)
+        char path[64];
+        OS_SPrintf(path, data_ov000_02195e50.tutorialPath, ++mUnkA8);
+        MFile file((std::string(path)));
+        if (!file.IsUnk10()) {
+            mUnkA8 = 0;
+        }
+        if (mUnkA8 != 0) {
+            mUnkAC = 0;
+        }
+        break;
+    }
+    case 0x800: {   // L: the next commentary
+        char path[64];
+        OS_SPrintf(path, data_ov000_02195e50.livePath, ++mUnkAC);
+        MFile file((std::string(path)));
+        if (!file.IsUnk10()) {
+            mUnkAC = 0;
+        }
+        if (mUnkAC != 0) {
+            mUnkA8 = 0;
+        }
+        break;
+    }
+    case 0x10:  // right
+    case 0x20: {    // left
+        int step = key == 0x20 ? -1 : 1;
+        switch (mRow) {
+        case 0:
+        case 1:
+            mValues[mRow] += step;
+            break;
+        case 2:
+        case 3:
+        {
+            int &count = mCounts[mRow - 2];
+            count = std::max(data_ov000_02195e50.minValue, std::min(sMaxCount, step + count));
+        }
+            break;
+        }
+        break;
+    }
+    case 0x8:   // start
+        mLevel->sides[0].unk54 = mValues[0];
+        mLevel->sides[1].unk54 = mValues[1];
+        mLevel->mTutorialId = mUnkA8;
+        *(int *)&mLevel->mLiveName = mUnkAC;
+        if (mUnk7C) {
+            mLevel->sides[0].mName = "Player1";
+            mLevel->sides[1].mName = "Player2";
+            for (u32 i = 0; i < 2; i++) {
+                (&mLevel->sides[1].unk68)[i] = mCounts[i];
+            }
+        } else {
+            mLevel->sides[0].mName = MGetOwnerNameUtf8();
+            mLevel->sides[1].mName = "Dummy";
+        }
+        Exit();
+        return;
+    }
+    mValues[mRow] = std::max(mMin, std::min(mMax, mValues[mRow]));
+    const MPoint &pos = data_ov000_02195fa8[mRow];
+    mCursor->SetPosition(MPoint(pos.x + data_ov000_02195e50.cursorOffset.x, pos.y + data_ov000_02195e50.cursorOffset.y));
+    for (int i = 0; i <= mUnk7C; i++) {
+        char text[64];
+        OS_SPrintf(text, "%s %d", gDinoResource->GetText(data_0208a418), mValues[i]);
+        mTexts[i]->SetText(std::string(text));
+    }
+    for (int i = 2; i <= 3; i++) {
+        char text[64];
+        OS_SPrintf(text, data_ov000_02195e50.valueFormat, gDinoResource->GetText(data_0208a41c), i - 1, mValues[i]);
+        mTexts[i]->SetText(std::string(text));
+    }
+    char line[64];
+    OS_SPrintf(line, "tutorial : %d", mUnkA8);
+    mTutorialText->SetText(std::string(line));
+    OS_SPrintf(line, "live : %d", mUnkAC);
+    mLiveText->SetText(std::string(line));
+}
 
 // A debug switch, always off.
 extern "C" BOOL func_ov000_0218472c(int flag) {

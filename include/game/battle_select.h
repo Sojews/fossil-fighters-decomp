@@ -68,16 +68,27 @@ public:
     virtual ~PlayerLevelSelect();
     virtual void Idle();
 
+    // Handles the menu's keys: up/down pick a row, left/right change it, L/R step the tutorial or commentary, start
+    // writes the choices into the battle's parameters.
+    void StateSelect();
+
     void (PlayerLevelSelect::*mState)(); // 0x74
-    BOOL mUnk7C;            // 0x7C
+    int mUnk7C;             // 0x7C: the last level row (0 or 1)
     u32 mUnk80;             // 0x80
-    u32 unk84[6];
-    u32 mUnk9C;             // 0x9C
-    u32 unkA0[2];
-    u32 mUnkA8;             // 0xA8
-    u32 mUnkAC;             // 0xAC
-    u32 unkB0[8];
-    u32 *mLevel;            // 0xD0
+    int mValues[2];         // 0x84: the sides' levels (indexed by row, the rows past them reach mCounts)
+    int mCounts[2];         // 0x8C: rows 2 and 3 (1 to 10)
+    u32 unk94[2];
+    int mRow;               // 0x9C: 0 to 3
+    int mMin;               // 0xA0: the levels' range
+    int mMax;               // 0xA4
+    int mUnkA8;             // 0xA8: the tutorial (0 for none)
+    int mUnkAC;             // 0xAC: the commentary (0 for none)
+    class MIndicator *mTexts[4];    // 0xB0: by row
+    class MView *mCursor;           // 0xC0
+    class MIndicator *mTutorialText;    // 0xC4
+    class MIndicator *mLiveText;        // 0xC8
+    class MInputHub *mInputHub;         // 0xCC
+    struct DinoBattleParams *mLevel;    // 0xD0
 };
 
 class IncValTask : public MTask {

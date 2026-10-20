@@ -9729,7 +9729,7 @@ from:0x02183dd6 kind:thumb_call to:0x020051dc module:main
 from:0x02183df8 kind:thumb_call to:0x02011dc8 module:main
 from:0x02183e0c kind:load to:0x02195e50 module:overlay(0)
 from:0x02183e10 kind:load to:0x021902b8 module:overlay(0)
-from:0x02183e14 kind:load to:0x02195e6c module:overlay(0)
+from:0x02183e14 kind:load to:0x02195e50 add:0x1c module:overlay(0)
 from:0x02183e18 kind:load to:0x02196280 module:overlay(0)
 from:0x02183e1c kind:load to:0x02196288 module:overlay(0)
 from:0x02183e20 kind:load to:0x02196290 module:overlay(0)

@@ -1145,7 +1145,7 @@ func_ov000_02182f10 kind:function(thumb,size=0x610) addr:0x02182f10
 _ZN17PlayerLevelSelectC1EPmim kind:function(thumb,size=0x50) addr:0x02183520
 _ZN17PlayerLevelSelect4IdleEv kind:function(thumb,size=0x20) addr:0x02183570
 func_ov000_02183590 kind:function(thumb,size=0x540) addr:0x02183590
-func_ov000_02183ad0 kind:function(thumb,size=0x3f4) addr:0x02183ad0
+_ZN17PlayerLevelSelect11StateSelectEv kind:function(thumb,size=0x3f4) addr:0x02183ad0
 _ZN15DebugAutoBattleC1Ev kind:function(thumb,size=0x6a4) addr:0x02183ec4
 _ZN9MResourceI20DinoBattleSelectDataEC1ESs kind:function(thumb,size=0xae) addr:0x02184568
 _ZN15DebugAutoBattleD1Ev kind:function(thumb,size=0x3c) addr:0x02184618
@@ -2218,7 +2218,6 @@ data_ov000_02195e40 kind:data(any) addr:0x02195e40
 data_ov000_02195e44 kind:data(any) addr:0x02195e44
 data_ov000_02195e4c kind:data(any) addr:0x02195e4c
 data_ov000_02195e50 kind:data(any) addr:0x02195e50
-data_ov000_02195e6c kind:data(any) addr:0x02195e6c
 _ZTI17UseCreatureSelect kind:data(any) addr:0x02195ec8
 _ZTI12BattleSelect kind:data(any) addr:0x02195ed4
 _ZTI15BattleDebugMode kind:data(any) addr:0x02195ef8
