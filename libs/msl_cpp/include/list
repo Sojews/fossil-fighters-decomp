@@ -264,7 +264,9 @@ namespace std {
             this->init();
         }
         ~list() {
-            this->clear();
+            // (Not this->clear(): through the base's own iterators, the two temporaries take the game's slots
+            // with and without -ipa file.)
+            _Base::erase(_Base::begin(), _Base::end());
         }
 
         iterator begin() {
