@@ -44,6 +44,7 @@
 #include "m/file.h"
 #include "m/dma.h"
 #include "game/dino_message.h"
+#include "game/dino_common_label.h"
 
 M_EXTERN_OVERLAY(ov000);
 M_EXTERN_OVERLAY(ov003);
@@ -337,6 +338,51 @@ void DinoMainLoop::StateATMEnd() {
     MUnloadOverlay(0, M_OVERLAY_ID(ov007));
     mTitleResult = 6;
     mState = data_020c0170.StateTitle_34;
+}
+
+void func_02052e34();
+extern "C" const char *data_020c0754;  // the build's label
+extern "C" const u32 data_0208ad00, data_0208acfc, data_0208acf8, data_0208acf4, data_0208acf0, data_0208acec,
+    data_0208ace8, data_0208acbc;
+
+// Where a view of the size goes to be centered on the screen.
+static inline MPoint DinoCenterOnScreen(const MPoint &size) {
+    return MPoint((256 - size.x) / 2, (192 - size.y) / 2);
+}
+
+// The debug menu.
+void DinoMainLoop::StateDebugMenu() {
+    MDumpArchives();
+    gLcd->mMain->ResetHooks();
+    gLcd->mSub->ResetHooks();
+    func_02052e34();
+    gLcd->mMain->Setup(5, 4, 0, 0);
+    gLcd->mSub->Setup(5, 4, 0, 0);
+    gLcd->VSyncNow();
+    gLcd->mMain->SetBackdrop(0x8000);
+    gLcd->mSub->SetBackdrop(0x8000);
+    gLcd->mMain->mObj->Show();
+    gLcd->mSub->mObj->Show();
+    gLcd->SetBottomDisplay(gLcd->mSub);
+    gCurrentDisplay = gLcd->GetBottomDisplay();
+    gLcd->GetTopDisplay()->mBright->Reset();
+    gLcd->GetBottomDisplay()->mBright->Reset();
+    MSimpleMenu *menu = new MSimpleMenu(&mMenuChoice, gDinoResource->CreateFont12(0, 0, 0), NULL, mMenuChoice);
+    menu->AddItem(0, std::string(gDinoResource->GetText(data_0208ad00)));
+    menu->AddItem(1, std::string(gDinoResource->GetText(data_0208acfc)));
+    menu->AddItem(2, std::string(gDinoResource->GetText(data_0208acf8)));
+    menu->AddItem(3, std::string(gDinoResource->GetText(data_0208acf4)));
+    menu->AddItem(4, std::string(gDinoResource->GetText(data_0208acf0)));
+    menu->AddItem(5, std::string(gDinoResource->GetText(data_0208acec)));
+    menu->AddItem(6, std::string(gDinoResource->GetText(data_0208ace8)));
+    menu->AddItem(-2, std::string(gDinoResource->GetText(data_0208acbc)));
+    DinoCommonLabel *label = new DinoCommonLabel(gLcd->GetTopDisplay(), gDinoResource->CreateFont12(1, 10, 1),
+                                                 gDinoResource->GetUnkTable(), std::string(data_020c0754), MPoint(0, 0));
+    label->SetPosition(DinoCenterOnScreen(label->GetSize()));
+    label->Show();
+    menu->mParallel.AddTail(label);
+    mSerial.AddTail(menu);
+    mState = data_020c0170.State02048030_2C;
 }
 
 // The second debug menu's choices.

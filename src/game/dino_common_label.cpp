@@ -20,8 +20,8 @@ DinoCommonLabel::DinoCommonLabel(MSmartOam *oam, MFont *font, const void *palett
 }
 
 DinoCommonLabel::DinoCommonLabel(MDisplay *display, MFont *font, const void *palette, const std::string &text,
-                                 int spacing, int lineSpacing)
-    : MFixedSizeView(MPoint(0, 0)), mFont(font), mText(text), mSpacing(spacing), mLineSpacing(lineSpacing) {
+                                 MPoint spacing)
+    : MFixedSizeView(MPoint(0, 0)), mFont(font), mText(text), mSpacing(spacing.x), mLineSpacing(spacing.y) {
     mCanvas = new MObjCanvas(display, display->mObj->mOam, font->MeasureText(text, mSpacing, mLineSpacing), palette,
                              TRUE);
     mSmartCanvas = NULL;
