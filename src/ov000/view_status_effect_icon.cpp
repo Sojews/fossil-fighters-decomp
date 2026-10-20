@@ -21,6 +21,48 @@ ViewStatusEffectIconWaitStop::~ViewStatusEffectIconWaitStop() {
 ViewStatusEffectIconLoadMotionTask::~ViewStatusEffectIconLoadMotionTask() {
 }
 
+// Replaces the icon's motion (keeping whether it was shown) and plays the anime, raising the priority after.
+void ViewStatusEffectIconLoadMotionTask::Execute() {
+    ViewStatusEffectIcon *icon;
+    int anime = mAnime;
+    const char *path = mUnk14.c_str();
+    icon = (ViewStatusEffectIcon *)mUnk10;
+    BOOL hidden = TRUE;
+    if (icon->mMotion != NULL) {
+        icon->mTasks->Clear();
+        hidden = icon->mMotion->IsHidden();
+        icon->mParallel.Remove(icon->mMotion);
+        delete icon->mMotion;
+    }
+    icon->mMotion = new MMotion(std::string(path), icon->mOam, 2, 1);
+    icon->mMotion->SetPosition(*(MPoint *)&icon->mUnk7C);
+    icon->mMotion->SetPriority(2);
+    icon->mMotion->SetAnchor(1);
+    if (!hidden) {
+        icon->mMotion->Show();
+    }
+    icon->mParallel.AddTail(icon->mMotion);
+    if (icon->mMotion != NULL && anime != -1) {
+        icon->mTasks->Clear();
+        icon->mMotion->Play(anime, 1);
+        BOOL front = TRUE;
+        switch (anime) {
+        case 1:
+        case 2:
+        case 3:
+        case 13:
+        case 14:
+        case 15:
+            front = FALSE;
+            break;
+        }
+        icon->mMotion->SetPriority(front ? 1 : 2);
+        icon->mTasks->AddTail(new MTimer(1), icon->mMotion->CreateWaitStopTask(),
+                              new ViewStatusEffectIcon::SetPriorityTask(icon, 2));
+    }
+    Exit();
+}
+
 ViewStatusEffectIconShowTask::~ViewStatusEffectIconShowTask() {
 }
 

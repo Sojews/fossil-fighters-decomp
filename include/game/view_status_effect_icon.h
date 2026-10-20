@@ -74,6 +74,10 @@ public:
 
     class SetPriorityTask : public MTask {
     public:
+        SetPriorityTask(ViewStatusEffectIcon *icon, int priority) {
+            mIcon = icon;
+            mPriority = priority;
+        }
         virtual ~SetPriorityTask();
         virtual void Execute();
 
@@ -124,8 +128,9 @@ public:
     virtual ~ViewStatusEffectIconLoadMotionTask();
     virtual void Execute();
 
-    u32 mUnk10;             // 0x10
-    std::string mUnk14;     // 0x14
+    u32 mUnk10;             // 0x10: the ViewStatusEffectIcon
+    std::string mUnk14;     // 0x14: the motion's path
+    int mAnime;             // 0x20: to play (-1 for none)
 };
 
 class ViewStatusEffectIconShowTask : public MTask {
