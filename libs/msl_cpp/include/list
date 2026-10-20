@@ -101,7 +101,7 @@ namespace std {
             __list_imp *self = this;
             node_base *t = &self->tail_;
             t->next_ = t;
-            self->tail_.prev_ = t;
+            t->prev_ = t;
         }
 
         iterator begin() {
