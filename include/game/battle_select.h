@@ -68,6 +68,8 @@ public:
     virtual ~PlayerLevelSelect();
     virtual void Idle();
 
+    // Builds the menu (title, rows, cursor, tutorial and commentary lines) and takes the level range from the KP defs.
+    void Start();
     // Handles the menu's keys: up/down pick a row, left/right change it, L/R step the tutorial or commentary, start
     // writes the choices into the battle's parameters.
     void StateSelect();

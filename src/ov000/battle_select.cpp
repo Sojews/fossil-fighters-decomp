@@ -276,6 +276,86 @@ template std::__vec_deleter<DinoBattleView3DEntry, std::allocator<DinoBattleView
 extern "C" const MPoint data_ov000_02195fa8[4]; // by row: the cursor's position
 extern "C" const u32 data_0208a418, data_0208a41c;  // the rows' labels
 
+// The KP defs (the debug level select reads the levels from them).
+struct DinoAbilityIconData {
+    u32 unk0;
+    u32 count;      // 0x04
+    u32 entries;    // 0x08: offset of count 0x18-byte entries, each starting with a level
+};
+
+extern "C" const u32 data_0208a420;     // the level select's title
+static MIndicator *CreateLevelIndicator(MSmartOam *oam, MFont *font, MPoint size, MPoint pos);
+extern "C" const struct {
+    u32 unk0;
+    u32 cursorText;     // 0x04: the level select's cursor
+} data_0208addc;
+
+// NONMATCHING: the game keeps the two loops' &mParallel below the oam on the stack, and loads the cursor text id
+// through its own data_0208addc+4 literal.
+void PlayerLevelSelect::Start() {
+    mCounts[0] = mLevel->sides[1].unk68;
+    mCounts[1] = mLevel->sides[1].unk6C;
+    MSmartOam *oam = new MSmartOam(100, 0, 1);
+    MFontSet *font = gDinoResource->CreateFont12(0, 10, 1);
+    mInputHub = new MSingleInputHub(1);
+    mParallel.AddTail(mInputHub);
+    MIndicator *title = new MIndicator(new MSmartObjCanvas(oam, MPoint(128, 16), gDinoResource->GetUnkTable(), TRUE), font, 0);
+    title->SetText(std::string(gDinoResource->GetText(data_0208a420)));
+    title->SetPosition(MPoint(64, 8));
+    title->SetPriority(0);
+    title->Show();
+    mParallel.AddTail(title);
+    int i = 0;
+    if (i <= mUnk7C) {
+    MParallelTaskSet *parallel = &mParallel;
+    for (; i <= mUnk7C; i++) {
+        char text[64];
+        OS_SPrintf(text, "%s %d", gDinoResource->GetText(data_0208a418), mValues[i]);
+        mTexts[i] = new MIndicator(new MSmartObjCanvas(oam, MPoint(192, 16), gDinoResource->GetUnkTable(), TRUE), font, 0);
+        mTexts[i]->SetText(std::string(text));
+        mTexts[i]->SetPosition(data_ov000_02195fa8[i]);
+        mTexts[i]->SetPriority(0);
+        mTexts[i]->Show();
+        parallel->AddTail(mTexts[i]);
+    }
+    }
+    MParallelTaskSet *rows = &mParallel;
+    for (int i = 2; i <= 3; i++) {
+        MIndicator *text = CreateLevelIndicator(oam, font, MPoint(96, 16), data_ov000_02195fa8[i]);
+        char line[64];
+        OS_SPrintf(line, data_ov000_02195e50.valueFormat, gDinoResource->GetText(data_0208a41c), i - 1, mValues[i]);
+        text->SetText(std::string(line));
+        rows->AddTail(text);
+        mTexts[i] = text;
+    }
+    mCursor = new MIndicator(new MSmartObjCanvas(oam, MPoint(128, 16), gDinoResource->GetUnkTable(), TRUE), font, 0);
+    ((MIndicator *)mCursor)->SetText(std::string(gDinoResource->GetText(data_0208addc.cursorText)));
+    const MPoint &pos = data_ov000_02195fa8[mRow];
+    mCursor->SetPosition(MPoint(pos.x + data_ov000_02195e50.cursorOffset.x, pos.y + data_ov000_02195e50.cursorOffset.y));
+    mCursor->SetPriority(0);
+    mCursor->Show();
+    mTutorialText = CreateLevelIndicator(oam, font, MPoint(128, 16), MPoint(32, 128));
+    mLiveText = CreateLevelIndicator(oam, font, MPoint(64, 16), MPoint(32, 144));
+    mTutorialText->SetText(std::string("tutorial : 0"));
+    mLiveText->SetText(std::string("live : 1"));
+    GetParallel()->AddTail(mCursor, mTutorialText, mLiveText, oam);
+    MResource<DinoAbilityIconData> defs((std::string("/etc/btl_kp_defs")));
+    for (u32 i = 0; i < defs.Get()->count; i++) {
+        const DinoAbilityIconData *data = defs.Get();
+        int level = *(const int *)((const u8 *)data + data->entries + i * 0x18);
+        if (i == 0) {
+            mMin = mMax = 1;
+        } else if (mMax < level) {
+            mMax = level;
+        }
+    }
+    mValues[0] = mLevel->sides[0].unk54;
+    mValues[1] = mLevel->sides[1].unk54;
+    mUnkA8 = mLevel->mTutorialId;
+    mUnkAC = (int)mLevel->mLiveName;
+    mState = data_ov000_02195e50.StateSelect_68;
+}
+
 void PlayerLevelSelect::StateSelect() {
     static const int sMaxCount = 10;
     MInput *input = mInputHub->GetInput(0);
