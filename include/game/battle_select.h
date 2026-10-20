@@ -48,12 +48,23 @@ public:
     void CreateTexts(class MSmartOam *oam, class MFont *font);
     void ShowCreature(u32 creature);
 
+    // Builds the screen: the two sides' creature rows (name, level, id), the cursor and the first creature's
+    // attacks.
+    void Start();
+
     void (UseCreatureSelect::*mState)(); // 0x74
-    u32 mUnk7C;             // 0x7C
-    u32 mUnk80;             // 0x80
-    u32 unk84;
-    u32 mUnk88;             // 0x88
-    u8 unk8C[0xFC - 0x8C];
+    u32 mUnk7C;             // 0x7C: both sides (six rows, else three)
+    u32 mUnk80;             // 0x80: by side, rows that show their unk5C value
+    int mCount;             // 0x84: the rows
+    u32 mUnk88;             // 0x88: the row the cursor is on
+    u32 mIds[6];            // 0x8C: by row, the creature
+    u32 mUnkA4[6];          // 0xA4: by row, the side's unk5C value
+    u32 mLevels[6];         // 0xBC: by row
+    class MIndicator *mHeader;      // 0xD4
+    class MIndicator *mRows[6];     // 0xD8
+    class MIndicator *mCursor;      // 0xF0
+    class MInputHub *mInputHub;     // 0xF4
+    u32 unkF8;
     class MIndicator *mTitle;       // 0xFC
     u32 unk100;
     class MIndicator *mNames[5];    // 0x104

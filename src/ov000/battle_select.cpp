@@ -237,17 +237,18 @@ MResource<DinoBattleSelectData> DinoBattleSelectLoadData(std::string path) {
 
 // The TU's pooled pointer-to-member constants (see menu.cpp).
 extern "C" struct {
-    u8 unk00[0x0C];
+    u8 unk00[0x08];
+    const char *rowFormat;      // 0x08: with the unk5C value
     const char *tutorialPath;   // 0x0C: "/btl_tutorial/btl_tuto_%03d"
     u32 unk10;
     const char *valueFormat;    // 0x14: "%s%d:%d"
     u32 unk18;
     int minValue;               // 0x1C: 1
-    u32 unk20;
+    const char *rowFormatShort; // 0x20
     const char *livePath;       // 0x24: "/live/live_battle_%03d"
     u8 unk28[0x38 - 0x28];
     void (UseCreatureSelect::*Start_38)();
-    u8 unk40[0x48 - 0x40];
+    void (UseCreatureSelect::*Select_40)();
     void (PlayerLevelSelect::*Start_48)();
     u8 unk50[0x58 - 0x50];
     MPoint cursorOffset;        // 0x58
@@ -525,6 +526,110 @@ void UseCreatureSelect::ShowCreature(u32 creature) {
             mValues[i]->Show();
         }
     }
+}
+
+extern "C" const u32 data_0208a424, data_0208a428;
+extern const u32 kCreatureLevelLimits[2];
+extern "C" const MPoint data_ov000_02195f88[2];    // by mUnk7C: the first row's position
+extern "C" const MPoint data_ov000_02195f98[2];    // by mUnk7C: the step between rows
+
+// A side's creature as packed bits (DinoBattleSide::Creature).
+struct DinoBattleSelectCreature {
+    u32 id : 8;
+    u32 points : 10;    // the bits above the id
+    u32 : 14;
+    u32 base : 12;      // 0x04: none without it
+    u32 : 20;
+    u32 bonus1 : 12;    // 0x08
+    u32 : 20;
+    u32 bonus2 : 12;    // 0x0C
+    u32 : 20;
+    u32 bonus3 : 12;    // 0x10
+    u32 : 20;
+    u32 unk14;
+};
+
+static inline const DinoBattleSelectCreature *DinoBattleSelectCreatureAt(void *params, int side, int slot) {
+    return (const DinoBattleSelectCreature *)&((DinoBattleParams *)params)->sides[side].mCreatures[slot];
+}
+
+// A creature's points, capped at the top level's.
+static inline u32 DinoBattleSelectCreatureTotal(const DinoBattleSelectCreature *creature) {
+    if (creature->base == 0) {
+        return 0;
+    }
+    u32 sum = creature->points + (creature->bonus3 + (creature->bonus2 + (creature->base + creature->bonus1)));
+    return std::min(kCreatureLevelLimits[0] * 11 + 50, sum);
+}
+
+static inline u32 DinoBattleSelectCreatureLevel(const DinoBattleSelectCreature *creature) {
+    return (DinoBattleSelectCreatureTotal(creature) - 50) / kCreatureLevelLimits[0] + 1;
+}
+
+// The row's position.
+static inline MPoint DinoRowPos(u32 both, int row) {
+    const MPoint &base = data_ov000_02195f88[both];
+    const MPoint &step = data_ov000_02195f98[both];
+    return MPoint(base.x + step.x * row, base.y + step.y * row);
+}
+
+// NONMATCHING: the game loads the row tables' entries in another order (step before base) and some stack slots differ.
+void UseCreatureSelect::Start() {
+    mInputHub = new MSingleInputHub(1);
+    mInputHub->GetInput(0)->SetRepeat(0xF0, 20, 3);
+    mParallel.AddTail(mInputHub);
+    MSmartOam *top = new MSmartOam(gLcd->mMain, 100, 0, TRUE);
+    MSmartOam *oam = new MSmartOam(gLcd->mSub, 100, 0, TRUE);
+    MFontSet *font = gDinoResource->CreateFont12(0, 10, 1);
+    CreateTexts(top, font);
+    mParallel.AddTail(top);
+    mCount = mUnk7C ? 6 : 3;
+    mHeader = new MIndicator(new MSmartObjCanvas(oam, MPoint(192, 16), gDinoResource->GetUnkTable(), TRUE), font, 0);
+    mHeader->SetPosition(32, 8);
+    mHeader->SetPriority(0);
+    mHeader->Show();
+    mHeader->SetText(std::string(gDinoResource->GetText(data_0208a428)));
+    mParallel.AddTail(mHeader);
+    MIndicator *label = CreateIndicator(oam, font, MPoint(96, 32), MPoint(32, 24));
+    label->SetText(std::string(gDinoResource->GetText(data_0208a424)));
+    mParallel.AddTail(label);
+    for (int i = 0; i < mCount; i++) {
+        int slot = i % 3;
+        int side = i / 3;
+        mIds[i] = DinoBattleSelectCreatureAt(mParams, side, slot)->id;
+        mLevels[i] = DinoBattleSelectCreatureAt(mParams, side, slot)->base == 0
+                         ? 0
+                         : DinoBattleSelectCreatureLevel(DinoBattleSelectCreatureAt(mParams, side, slot));
+        mUnkA4[i] = ((DinoBattleParams *)mParams)->sides[side].unk5C[slot];
+    }
+    int i = 0;
+    if (i < mCount) {
+    MParallelTaskSet *parallel = &mParallel;
+    for (; i < mCount; i++) {
+        char text[64];
+        if (mUnk80 & (1 << (i / 3))) {
+            OS_SPrintf(text, data_ov000_02195e50.rowFormat, mLevels[i], mIds[i], gDinoResource->GetCreatureName(mIds[i]),
+                       mUnkA4[i]);
+        } else {
+            OS_SPrintf(text, data_ov000_02195e50.rowFormatShort, mLevels[i], mIds[i],
+                       gDinoResource->GetCreatureName(mIds[i]));
+        }
+        mRows[i] = new MIndicator(new MSmartObjCanvas(oam, MPoint(192, 16), gDinoResource->GetUnkTable(), TRUE), font, 0);
+        mRows[i]->SetText(std::string(text));
+        mRows[i]->SetPosition(DinoRowPos(mUnk7C, i));
+        mRows[i]->SetPriority(0);
+        mRows[i]->Show();
+        parallel->AddTail(mRows[i]);
+    }
+    }
+    mCursor = new MIndicator(new MSmartObjCanvas(oam, MPoint(128, 16), gDinoResource->GetUnkTable(), TRUE), font, 0);
+    mCursor->SetText(std::string(gDinoResource->GetText(data_0208ade0)));
+    mCursor->SetPosition(DinoRowPos(mUnk7C, mUnk88) + data_ov000_02195e50.cursorOffset);
+    mCursor->SetPriority(0);
+    mCursor->Show();
+    mParallel.AddTail(mCursor, oam);
+    ShowCreature(mIds[mUnk88]);
+    mState = data_ov000_02195e50.Select_40;
 }
 
 // The same, for the level select.
