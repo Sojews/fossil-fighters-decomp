@@ -302,6 +302,30 @@ u32 DinoGetCreatureExpToNext(const DinoCreatureState *creature) {
     return kCreatureLevelLimits[0] * (next - 1) + 50 - DinoGetCreatureTotal(creature);
 }
 
+DinoUiReviveStatusParts *DinoUiReviveStatus::GetParts(int i) {
+    return mParts[i];
+}
+
+#pragma dont_inline on
+void DinoUiReviveStatus::SetCreature(const DinoCreatureState &creature) {
+    *(DinoCreatureState *)&mInfo = creature;
+    MTask *wait3 = new MTimer(50);
+    MSerialTaskSet *serial3 = new MSerialTaskSet(TRUE);
+    MTask *wait2 = new MTimer(30);
+    MSerialTaskSet *serial2 = new MSerialTaskSet(TRUE);
+    MTask *wait1 = new MTimer(10);
+    MSerialTaskSet *serial1 = new MSerialTaskSet(TRUE);
+    MTask *wait0 = new MTimer(10);
+    MSerialTaskSet *serial0 = new MSerialTaskSet(TRUE);
+    MParallelTaskSet *counts = new MParallelTaskSet(TRUE);
+    GetParallel()->Add(
+        counts->Add(serial0->Add(wait0)->Add(mDigits[0]->CreateCountTask(((DinoCreatureState *)&mInfo)->unk0_8, 0, 0)))
+            ->Add(serial1->Add(wait1)->Add(mDigits[1]->CreateCountTask(DinoGetCreatureTotal((DinoCreatureState *)&mInfo), 0, 0)))
+            ->Add(serial2->Add(wait2)->Add(mDigits[2]->CreateCountTask(DinoGetCreatureLevel((DinoCreatureState *)&mInfo), 0, 0)))
+            ->Add(serial3->Add(wait3)->Add(mDigits[3]->CreateCountTask(DinoGetCreatureExpToNext((DinoCreatureState *)&mInfo), 0, 0))));
+}
+#pragma dont_inline reset
+
 // Rises into place, bobbing up and down.
 void DinoUiReviveEffectLight::Idle() {
     if (mTimer != 0) {
