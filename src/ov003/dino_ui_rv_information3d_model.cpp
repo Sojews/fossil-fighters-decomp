@@ -59,7 +59,7 @@ DinoUiRvInformation3DModel::DinoUiRvInformation3DModel() : MProcess(NULL) {
     mScene->SetUnk80(-80, 0);
     mUnk8C = mUnk90 = mUnk94 = 0;
     mTasks = new MParallelTaskSet(FALSE);
-    mUnk9C = 0;
+    mDragging = 0;
     MSingleInputHub *hub = new MSingleInputHub(1);
     hub->EnableTouch();
     mInput = hub->GetInput(0);
@@ -70,11 +70,81 @@ DinoUiRvInformation3DModel::DinoUiRvInformation3DModel() : MProcess(NULL) {
     parallel->AddTail(scene);
 }
 
+extern "C" void G3X_Reset();
+#define DINO_TOUCH_BUTTON 0x1000   // the touch screen in MInput's buttons
+#define REG_G3_SWAP_BUFFERS (*(volatile u32 *) 0x04000540)
+extern "C" u32 data_ov003_021607e0[];           // the TU's pooled statics (+0x6C: the model's touch area)
+extern "C" u32 data_ov003_02160660[];           // the TU's pooled statics (+0x04/+0x08: the Y turn speed's limits,
+                                                // +0x14/+0x18: the X turn speed's)
+extern "C" const fx32 data_02089b04[];          // by creature: the camera's distance
+extern "C" struct {
+    void (DinoUiRvInformation3DModel::*LoadModel_00)();
+} data_ov003_021606dc;
+
 // Hides the scene's 3D screen when the value changes.
 void DinoUiRvInformation3DModel::SetUnk84(u32 value) {
     if (mUnk84 != value) {
         mUnk84 = value;
         mScene->mM3d->Hide();
+    }
+}
+
+// Turns the model with drags on it (easing off after), and loads the model again when the creature changes.
+// NONMATCHING: register allocation around the touch checks, and the game takes the turn limits' addresses from
+// their own literals (pooled statics) where we add to the pool's base.
+void DinoUiRvInformation3DModel::Idle() {
+    if (!mTasks->IsEmpty()) {
+        if (gCurrentDisplay == gLcd->GetBottomDisplay() && (mInput->GetPressed() & DINO_TOUCH_BUTTON) &&
+            DINO_POOL(MRect, data_ov003_021607e0, 0x6C).Contains(mInput->GetTouchPos())) {
+            mTouch = mInput->GetTouchPos();
+            mDragging = TRUE;
+            mUnkA8 = mUnkAC = 0;
+        } else if ((mInput->mButtons & DINO_TOUCH_BUTTON) && mDragging) {
+            MPoint touch = mInput->GetTouchPos();
+            mUnkA8 += (touch.x - mTouch.x) << FX32_SHIFT;
+            mUnkAC += (touch.y - mTouch.y) << FX32_SHIFT;
+            mTouch.x = touch.x;
+            mTouch.y = touch.y;
+        } else if (mInput->mPrevButtons & (mInput->mButtons ^ mInput->mPrevButtons) & DINO_TOUCH_BUTTON) {
+            mDragging = FALSE;
+        }
+        mUnkA8 = std::min(std::max(mUnkA8, ((const fx32 *)data_ov003_02160660)[2]), ((const fx32 *)data_ov003_02160660)[1]);
+        mUnkA8 = mUnkA8 * 4 / 5;
+        mUnkAC = std::min(std::max(mUnkAC, ((const fx32 *)data_ov003_02160660)[5]), ((const fx32 *)data_ov003_02160660)[6]);
+        mUnkAC = mUnkAC * 2 / 3;
+        mUnk90 += mUnkA8;
+        mUnk90 = (mUnk90 + (360 << FX32_SHIFT)) % (360 << FX32_SHIFT);
+        mUnk94 += mUnkAC;
+        if (mUnk94 < -60 << FX32_SHIFT) {
+            mUnk94 = -60 << FX32_SHIFT;
+            mUnkAC = -mUnkAC / 3;
+        }
+        if (mUnk94 > 60 << FX32_SHIFT) {
+            mUnk94 = 60 << FX32_SHIFT;
+            mUnkAC = -mUnkAC / 3;
+        }
+        DinoUiRvInformation3DModelRotate *rotate = mRotate;
+        rotate->mRotZ = mUnk8C;
+        rotate->mRotY = mUnk90;
+        rotate->mRotX = mUnk94;
+    }
+    if (mUnk80 != mUnk84) {
+        mUnk80 = mUnk84;
+        GetSerial()->AddTail(MTaskSetMakeEmptyTask::Create(mTasks));
+        if (mUnk80 != 0) {
+            VecFx32 pos;
+            pos.x = 0;
+            pos.y = 0;
+            pos.z = data_02089b04[mUnk80];
+            mScene->SetCameraPos(&pos);
+            M3DScene *scene = mScene;
+            G3X_Reset();
+            REG_G3_SWAP_BUFFERS = scene->mUnk10 | (scene->mUnk14 << 1);
+            GetSerial()->AddTail(scene->mM3d->CreateHideTransfer());
+            GetSerial()->AddTail(mScene->CreateEnableTask(0), MCreateBgCallTask(this, data_ov003_021606dc.LoadModel_00, 1),
+                                 mScene->CreateEnableTask(1));
+            GetSerial()->AddTail(mScene->mM3d->CreateShowTransfer());
+        }
     }
 }
 
@@ -560,7 +630,7 @@ void DinoUiRvInformation3DModel::LoadModel() {
     mUnk8C = mUnk94 = 0;
     mUnk90 = data_02089ecc[mUnk80];
     mUnk94 = 0xA000;
-    mUnk9C = 0;
+    mDragging = FALSE;
     mUnkA8 = mUnkAC = 0;
     mRotate = new DinoUiRvInformation3DModelRotate(mAnm, data_02089ce8[mUnk80]);
     MIrqLock lock;

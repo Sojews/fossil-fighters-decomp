@@ -3,6 +3,7 @@
 
 #include "m/task.h"
 #include "m/fx32.h"
+#include "m/geometry.h"
 
 class M3DModel;
 class M3DScene;
@@ -25,14 +26,15 @@ public:
     u32 mUnk80;         // 0x80
     u32 mUnk84;         // 0x84
     u8 mUnk88;          // 0x88
-    u32 mUnk8C;         // 0x8C
-    u32 mUnk90;         // 0x90
-    u32 mUnk94;         // 0x94
+    fx32 mUnk8C;        // 0x8C: the model's turn, degrees (Z)
+    fx32 mUnk90;        // 0x90: (Y), 0 to 360
+    fx32 mUnk94;        // 0x94: (X), -60 to 60
     MInput *mInput;     // 0x98
-    u8 mUnk9C;          // 0x9C
-    u8 unk9D[0xA8 - 0x9D];
-    u32 mUnkA8;         // 0xA8
-    u32 mUnkAC;         // 0xAC
+    u8 mDragging;       // 0x9C: a drag started on the model
+    u8 unk9D[0xA0 - 0x9D];
+    MPoint mTouch;      // 0xA0: the drag's last touch
+    fx32 mUnkA8;        // 0xA8: the Y turn's speed
+    fx32 mUnkAC;        // 0xAC: the X turn's speed
     class DinoUiRvInformation3DModelRotate *mRotate;    // 0xB0
     u8 unkB4[0x108 - 0xB4];
     M3DModel *mModel;   // 0x108
