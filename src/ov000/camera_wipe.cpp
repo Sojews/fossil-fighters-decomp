@@ -8,6 +8,7 @@
 #include "m/lcd.h"
 #include "game/camera_wipe.h"
 #include "types.h"
+#include "game/dino_sound.h"
 #include "m/seed_generator.h"
 #include "game/dino_resource.h"
 
@@ -38,6 +39,92 @@ CameraWipe::~CameraWipe() {
         data_ov000_02197930 = FALSE;
     }
     gLcd->mMain->mWin->Reset();
+}
+
+extern u32 data_ov000_02197954[256];    // random fog values (0 to 127)
+
+// Wipes the main screen's window line by line, with a ragged edge; at the end it resets the window and exits.
+// NONMATCHING: the loops' counter and table cursor swap r5/r6.
+void CameraWipe::Idle() {
+    if (mUnk88 == 0x1000 && (u32)(mMode - 2) <= 1) {
+        DinoSoundPlaySe(0x387, 0);
+    }
+    if (mUnk88 >= 0x181000) {
+        if ((u32)(mMode - 2) <= 1) {
+            mOwner->mScreen->Hide();
+        }
+        gLcd->mMain->mWin->Reset();
+        GetSerial()->AddTail(new MTimer(1), MTaskExitTransfer::Create(this));
+        return;
+    }
+    mOwner->mScreen->Show();
+    mWindow->Clear();
+    MRect rect;
+    int y;
+    switch (mMode) {
+    case 0:
+        rect.left = 0;
+        for (y = 0; y < 192; y++) {
+            rect.bottom = y + 1;
+            rect.top = y;
+            rect.right = 256 - (mUnk88 >> 12) + data_ov000_02197954[y];
+            if (rect.right > 256) {
+                rect.right = 256;
+            }
+            if (rect.right < 0) {
+                rect.right = 0;
+            }
+            mWindow->AddRect(rect);
+        }
+        break;
+    case 1:
+        rect.right = 256;
+        for (y = 0; y < 192; y++) {
+            rect.bottom = y + 1;
+            rect.top = y;
+            rect.left = (mUnk88 >> 12) - data_ov000_02197954[y];
+            if (rect.left < 0) {
+                rect.left = 0;
+            }
+            if (rect.left > 256) {
+                rect.left = 256;
+            }
+            mWindow->AddRect(rect);
+        }
+        break;
+    case 2:
+        rect.left = 0;
+        for (y = 0; y < 192; y++) {
+            rect.bottom = y + 1;
+            rect.top = y;
+            rect.right = (mUnk88 >> 12) - data_ov000_02197954[y];
+            if (rect.right > 256) {
+                rect.right = 256;
+            }
+            if (rect.right < 0) {
+                rect.right = 0;
+            }
+            mWindow->AddRect(rect);
+        }
+        break;
+    case 3:
+        rect.right = 256;
+        for (y = 0; y < 192; y++) {
+            rect.bottom = y + 1;
+            rect.top = y;
+            rect.left = 256 - (mUnk88 >> 12) + data_ov000_02197954[y];
+            if (rect.left < 0) {
+                rect.left = 0;
+            }
+            if (rect.left > 256) {
+                rect.left = 256;
+            }
+            mWindow->AddRect(rect);
+        }
+        break;
+    }
+    mUnk88 += mStep;
+    mWindow->Flip();
 }
 
 extern "C" void G3X_SetFog(BOOL enable, int fogMode, int fogSlope, int fogOffset);
@@ -99,8 +186,6 @@ DinoBattleViewActionInfoBar::~DinoBattleViewActionInfoBar() {
 }
 
 #pragma auto_inline off
-
-extern u32 data_ov000_02197954[256];    // random fog values (0 to 127)
 
 extern "C" void func_ov000_0218ada0() {
     MRandom random;

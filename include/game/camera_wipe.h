@@ -37,7 +37,7 @@ public:
     int mMode;              // 0x7C
     u32 mStep;              // 0x80
     u32 mDuration;          // 0x84
-    int mUnk88;             // 0x88
+    u32 mUnk88;             // 0x88: the wipe's progress (fixed point, 1.0 to 385.0)
 };
 
 // Fades the 3D scene in (into the fog) or out of it.
