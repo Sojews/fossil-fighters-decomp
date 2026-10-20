@@ -23,7 +23,6 @@ MDirectBitmap::MDirectBitmap(MDisplay *display, u32 screenBase, u32 base, int si
     mBmpCntBits.bitmap = TRUE;
 }
 
-// NONMATCHING: the bank compare's operands are swapped.
 // Captures the screen into this bitmap, which must be 256x256 and in one of VRAM banks A-D.
 void MDirectBitmap::Capture(int srcA) {
     u32 bank;
@@ -33,7 +32,8 @@ void MDirectBitmap::Capture(int srcA) {
     }
     for (bank = 1; bank <= 4; bank++) {
         u32 base = mBase;
-        if (base == gLcd->GetBankAddress(bank)) {
+        u32 addr = gLcd->GetBankAddress(bank);
+        if (addr == base) {
             goto found;
         }
     }
