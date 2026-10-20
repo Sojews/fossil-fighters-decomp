@@ -13,6 +13,8 @@ class DinoCleaningImageView;
 class DinoCleaningImage {
 public:
     DinoCleaningImage(DinoCleaning *cleaning);
+    // A copy with copies of the layers (sharing their pixels).
+    DinoCleaningImage(const DinoCleaningImage &other);
     virtual ~DinoCleaningImage();
 
     void AddLayer(DinoCleaningImageLayer *layer);

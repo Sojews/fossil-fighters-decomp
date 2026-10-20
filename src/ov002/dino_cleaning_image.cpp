@@ -44,6 +44,32 @@ DinoCleaningImage::DinoCleaningImage(DinoCleaning *cleaning)
     : mCleaning(cleaning), mUnk08(FALSE), mPicture(std::string(""), 0) {
 }
 
+// (Arrays copy as wholes, element by element.)
+template <class T> static inline void DinoCopyBlock(T &dst, const T &src) {
+    struct Block {
+        T a;
+    };
+    *(Block *)&dst = *(const Block *)&src;
+}
+
+DinoCleaningImage::DinoCleaningImage(const DinoCleaningImage &other) {
+    mCleaning = other.mCleaning;
+    mUnk08 = other.mUnk08;
+    *(std::vector<u32> *)&mLayers = *(const std::vector<u32> *)&other.mLayers;
+    mPicture = other.mPicture;
+    DinoCopyBlock(mGrid, other.mGrid);
+    DinoCopyBlock(mMask, other.mMask);
+    mUnk13FC = other.mUnk13FC;
+    mUnk1400 = other.mUnk1400;
+    mView = other.mView;
+    mLayers.clear();
+    for (std::vector<DinoCleaningImageLayer *>::iterator it =
+             const_cast<std::vector<DinoCleaningImageLayer *> &>(other.mLayers).begin();
+         it != const_cast<std::vector<DinoCleaningImageLayer *> &>(other.mLayers).end(); ++it) {
+        mLayers.push_back(new DinoCleaningImageLayer(**it));
+    }
+}
+
 #pragma auto_inline on
 
 DinoCleaningImage::~DinoCleaningImage() {
