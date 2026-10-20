@@ -59,7 +59,7 @@ public:
     MResource<DinoKasekiDefs> mKasekiDefs; // 0x10C
     DinoHelpDummyItem *mHelp11C;    // 0x11C
     DinoHelpDummyItem *mHelp120;    // 0x120
-    u8 unk124[0x148 - 0x124];
+    DinoHelpDummyItem *mPageHelps[9];   // 0x124: the page's help areas
 };
 
 class DinoUiRvStatusBackButton : public DinoUiRvStatusMenuItem {
