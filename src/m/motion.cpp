@@ -897,6 +897,69 @@ void MMotion::HideCell(int cell) {
     mEntries[mCells[cell].entry].objMode = 2;
 }
 
+// Switches the cell between normal (4: attr's low bits flip it) and affine (8) or double-size affine (0x10) modes.
+// NONMATCHING: register allocation (as in SetCellOffset, whose placement code this repeats).
+void MMotion::SetCellAttr(int cell, int attr) {
+    if (attr & 4) {
+        if (mUnk2A && mAffines[cell] != NULL) {
+            mDisplay->mObj->mAfn->Free(mAffines[cell]);
+            mAffines[cell] = NULL;
+        }
+        mCells[cell].objMode = 0;
+        bool vflip = ((attr & 2) ? 1 : 0) ^ mUnk2C;
+        bool hflip = ((attr & 1) ? 1 : 0) ^ mUnk2B;
+        MSmartOamCell *entry = &mEntries[mCells[cell].entry];
+        entry->hflip = hflip;
+        entry->vflip = vflip;
+    } else if (attr & 8) {
+        if (mUnk2A && mAffines[cell] == NULL && (mFile.GetUnk04() & (1 << cell))) {
+            mAffines[cell] = mDisplay->mObj->mAfn->Alloc(1, TRUE);
+        }
+        mCells[cell].objMode = 1;
+        mEntries[mCells[cell].entry].affineParam = mAffines[cell]->index;
+    } else if (attr & 0x10) {
+        if (mUnk2A && mAffines[cell] == NULL && (mFile.GetUnk04() & (1 << cell))) {
+            mAffines[cell] = mDisplay->mObj->mAfn->Alloc(1, TRUE);
+        }
+        mCells[cell].objMode = 3;
+        mEntries[mCells[cell].entry].affineParam = mAffines[cell]->index;
+    }
+    if (!mHidden && mCells[cell].visible) {
+        int mode = mCells[cell].objMode;
+        MSmartOamCell *entry = &mEntries[mCells[cell].entry];
+        entry->objMode = mode;
+        if (mode != 3) {
+            int shape = entry->GetShape();
+            entry->width = gObjSizes[0][shape].x;
+            entry->height = gObjSizes[0][shape].y;
+        } else {
+            int shape = entry->GetShape();
+            entry->width = gObjSizes[0][shape].x * 2;
+            entry->height = gObjSizes[0][shape].y * 2;
+        }
+    }
+    MSmartOamCell *entry = &mEntries[mCells[cell].entry];
+    int ox = mCells[cell].unk14.x;
+    int oy = mCells[cell].unk14.y;
+    if (mUnk2B || mUnk2C) {
+        int shape = entry->GetShape();
+        int w = gObjSizes[0][shape].x;
+        int h = gObjSizes[0][shape].y;
+        if (mCells[cell].objMode == 3) {
+            w *= 2;
+            h *= 2;
+        }
+        if (mUnk2B) {
+            ox = w - ox;
+        }
+        if (mUnk2C) {
+            oy = h - oy;
+        }
+    }
+    entry->unk08 = ox;
+    entry->unk0C = oy + mUnk50;
+}
+
 void MMotion::SetCellRect(int cell, MRect rect) {
     MRect r = rect;
     MRect *p = &r;
