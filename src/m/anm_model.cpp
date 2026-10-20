@@ -460,7 +460,7 @@ void MAnmEmit::Unk0C() {
             if (mParticles[i]->GetUnk10()) {
                 mParticles[i]->SetUnk10(mFollowParent);
                 if (emitted != i) {
-                    int speed = mSpeeds[i];
+                    fx32 speed = mSpeeds[i];
                     M3DModel *particle = mParticles[i];
                     particle->mTrans.x += particle->mMatrix._20 * speed >> FX32_SHIFT;
                     particle->mTrans.y += particle->mMatrix._21 * speed >> FX32_SHIFT;
