@@ -2,6 +2,7 @@
 // NONMATCHING: AddModel (the list insert's two iterator temporaries in swapped stack slots) and RemoveModel
 // (the game keeps the mutex offset in a register and has 8 more bytes of temporaries).
 
+#pragma ipa file
 #include "m/3d_scene.h"
 #include "m/3d.h"
 #include "m/3d_scene_enable_task.h"

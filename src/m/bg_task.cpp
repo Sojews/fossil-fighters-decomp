@@ -1,5 +1,6 @@
 // MBgTask and MBgTaskManager.
 
+#pragma ipa file
 #include <algorithm>
 #include "m/bg_task.h"
 #include "m/display.h"
