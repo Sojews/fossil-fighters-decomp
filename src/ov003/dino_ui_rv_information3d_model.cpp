@@ -22,6 +22,8 @@
 #include "m/3d.h"
 #include "m/input.h"
 #include "m/window.h"
+#include "m/irq.h"
+#include "m/anm_model.h"
 
 extern "C" u8 data_ov003_021624d0[];  // the scene's heap
 
@@ -293,6 +295,29 @@ template class MCallTask1<DinoUiRvInformation, DinoUiRvInformation, DinoCreature
 template MTask *MCreateCallTask(DinoUiRvInformation *obj, void (DinoUiRvInformation::*func)(DinoCreatureInfo), DinoCreatureInfo a0);
 template class MBgCallTask0<DinoUiRvInformation3DModel>;
 template MTask *MCreateBgCallTask(DinoUiRvInformation3DModel *obj, void (DinoUiRvInformation3DModel::*func)(), int thread);
+
+extern "C" const char data_ov003_02160be0[];   // the model's path
+extern "C" const u32 data_02089ecc[];          // by creature
+extern "C" const fx32 data_02089ce8[];         // by creature: the height the model turns around
+
+void DinoUiRvInformation3DModel::LoadModel() {
+    char path[0x100];
+    OS_SPrintf(path, data_ov003_02160be0, mUnk80);
+    mAnm = new MAnmModel(mScene);
+    mAnm->SetFrames(0, 0x40000000);
+    mAnm->Load(path, 0);
+    mAnm->Run();
+    mAnm->mUnkF4 = 1;
+    mAnm->mFollowParent = TRUE;
+    mUnk8C = mUnk94 = 0;
+    mUnk90 = data_02089ecc[mUnk80];
+    mUnk94 = 0xA000;
+    mUnk9C = 0;
+    mUnkA8 = mUnkAC = 0;
+    mRotate = new DinoUiRvInformation3DModelRotate(mAnm, data_02089ce8[mUnk80]);
+    MIrqLock lock;
+    mTasks->AddTail(mAnm, mRotate);
+}
 
 #pragma auto_inline off
 
