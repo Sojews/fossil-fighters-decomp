@@ -1279,11 +1279,8 @@ _ZTV25DinoUiMaskEquipMaskButton kind:data(any) addr:0x0216c100
 _ZTV19DinoUiMaskEquipMenu kind:data(any) addr:0x0216c12c
 data_ov005_0216c154 kind:data(any) addr:0x0216c154
 _ZTV26DinoUiMaskEquipPageRButton kind:data(any) addr:0x0216c17c
-data_ov005_0216c1bc kind:data(any) addr:0x0216c1bc
 _ZTV26DinoUiMaskEquipPageLButton kind:data(any) addr:0x0216c1d0
-data_ov005_0216c210 kind:data(any) addr:0x0216c210
 _ZTV25DinoUiMaskEquipBackButton kind:data(any) addr:0x0216c224
-data_ov005_0216c264 kind:data(any) addr:0x0216c264
 _ZTV23DinoUiMaskEquipMenuItem kind:data(any) addr:0x0216c278
 data_ov005_0216c2b8 kind:data(any) addr:0x0216c2b8
 data_ov005_0216c2cc kind:data(any) addr:0x0216c2cc

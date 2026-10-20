@@ -25,6 +25,11 @@
 #include "m/display.h"
 #include "m/bright.h"
 #include "game/dino_static_init.h"
+#include "game/dino_guide_message.h"
+#include "m/input.h"
+#include "m/oam_canvas.h"
+#include "m/picture.h"
+#include "m/smart_oam.h"
 
 #pragma auto_inline off
 DinoUiMaskEquipMenu::DinoUiMaskEquipMenu() : MMenu(NULL, 0), mChoice(-1), mAnswer(0), mPage(0), mLastPage(0), mUnk104(0) {
@@ -243,7 +248,7 @@ void DinoUiMaskEquipMenu::ClearItems() {
 // The TU's pooled constants.
 extern "C" struct {
     MPoint WindowPos_00;                            // 0x00: the yes/no window's
-    u8 unk08[0x10 - 0x08];
+    MPoint NamePos_08;                              // 0x08: the focused mask's name
     void (DinoUiMaskEquipMenu::*FinishEquip_10)();  // 0x10
 } data_ov005_0216baa0;
 
@@ -320,6 +325,116 @@ DinoUiMaskEquipTest::DinoUiMaskEquipTest() : MProcess(NULL) {
 
 #pragma auto_inline off
 
+// The file's static initialization (see dino_static_init.h) fills in parts of these pools.
+extern "C" u32 data_ov005_0216ba34[];
+extern "C" u32 data_ov005_0216bbb4[];
+extern "C" u32 data_ov005_0216bab4[];
+extern "C" u32 data_ov005_0216bc34[];
+extern "C" const MPoint data_ov005_0216bb20;   // the page fraction's position
+extern "C" const char data_ov005_0216c2cc[];    // the background picture
+extern "C" const u32 data_0208a5c8, data_0208a5cc, data_0208a5d0, data_0208a5d4, data_0208a930, data_0208aacc;
+
+// The buttons' graphics, in the path pool.
+static inline const char *DinoUiMaskEquipPath(int i) {
+    return ((const char *const *)data_ov005_0216ba34)[i];
+}
+static inline const MPoint &DinoUiMaskEquipPoint(u32 offset) {
+    return *(const MPoint *)((const u8 *)data_ov005_0216bab4 + offset);
+}
+
+inline DinoUiMaskEquipBackButton::DinoUiMaskEquipBackButton(DinoUiMaskEquipMenu *owner)
+    : DinoUiMaskEquipMenuItem(owner, DinoUiMaskEquipPath(5), DinoUiMaskEquipPoint(0x4), data_0208a5cc) {
+    SetKeys(2);
+    SetMode(4);
+    mMotion->Play(2, 0);
+}
+
+inline DinoUiMaskEquipPageLButton::DinoUiMaskEquipPageLButton(DinoUiMaskEquipMenu *owner)
+    : DinoUiMaskEquipMenuItem(owner, DinoUiMaskEquipPath(8), DinoUiMaskEquipPoint(0x34), data_0208aacc) {
+    SetKeys(0x200);
+    SetNoFocus(TRUE);
+    DinoHelpItem::Disable();
+}
+
+inline DinoUiMaskEquipPageRButton::DinoUiMaskEquipPageRButton(DinoUiMaskEquipMenu *owner)
+    : DinoUiMaskEquipMenuItem(owner, DinoUiMaskEquipPath(12), DinoUiMaskEquipPoint(0x14), data_0208aacc) {
+    SetKeys(0x100);
+    SetNoFocus(TRUE);
+    DinoHelpItem::Disable();
+}
+
+// The excavation settings' section at offset7C (the input repeat is at 0x1C and 0x20).
+static inline const int *GetExcavate7C(MResource<DinoExcavateDefs> &defs) {
+    const DinoExcavateDefs *d = defs.Get();
+    if (d->offset7C == 0) {
+        return NULL;
+    }
+    return (const int *)((const u8 *)d + d->offset7C);
+}
+
+// The masks the player has, eight a page, with the help, the back and page buttons, the cursor and the page
+// fraction.
+// NONMATCHING: the game keeps the mask loop's counter in memory (for push_back) with a register copy; ours reloads it
+// (as in DinoUiMaskBuyMenu::LoadMasks).
+void DinoUiMaskEquipMenu::OnStart() {
+    SetLinkFallback(1);
+    {
+        MResource<DinoExcavateDefs> delayDefs = gDinoResource->GetExcavateDefs();
+        MResource<DinoExcavateDefs> intervalDefs = gDinoResource->GetExcavateDefs();
+        GetInput()->SetRepeat(0xF0, GetExcavate7C(delayDefs)[7], GetExcavate7C(intervalDefs)[8]);
+    }
+    mUnkF0.clear();
+    MResource<DinoHeadMaskDefs> defs = gDinoResource->LoadHeadMaskDefs();
+    for (u32 i = 1; i < gDinoResource->GetHeadMaskCount(); i++) {
+        const u8 *base = (const u8 *)defs.Get();
+        const DinoHeadMaskDef *def =
+            (const DinoHeadMaskDef *)(base + ((const u32 *)(base + ((const DinoHeadMaskDefs *)base)->tableOffset))[i]);
+        if (def->nameText != 0 && gDinoBackup->GetHeadMask(i) == 1) {
+            mUnkF0.push_back((void *&)i);
+        }
+    }
+    mLastPage = mUnkF0.size() == 0 ? 0 : (mUnkF0.size() - 1) / 8;
+    mParallel.AddTail(mBackground = new MTextPicture(std::string(data_ov005_0216c2cc), TRUE, false));
+    mBackground->Show();
+    mBackground->SetPriority(2);
+    mOam = new MSmartOam(0x1E, 0, TRUE);
+    mParallel.AddTail(new DinoHelpDummyItem(GetDisplay(), MRect(0x1E, 0xC, 0xE2, 0x6C),
+                                            std::string(gDinoResource->GetText(data_0208a5d4))));
+    mParallel.AddTail(new DinoHelpDummyItem(GetDisplay(), MRect(0x13, 0x90, 0xF1, 0x9F),
+                                            std::string(gDinoResource->GetText(data_0208a5d0))));
+    mParallel.AddTail(new DinoHelpDummyItem(GetDisplay(), MRect(0xE9, 0x5D, 0xF7, 0x6E),
+                                            std::string(gDinoResource->GetText(data_0208a5c8))));
+    mLinkFrom = new DinoUiMaskEquipBackButton(this);
+    AddItem(mLinkFrom);
+    if (mLastPage > 0) {
+        mPageL = new DinoUiMaskEquipPageLButton(this);
+        AddItem(mPageL);
+        mPageR = new DinoUiMaskEquipPageRButton(this);
+        AddItem(mPageR);
+    }
+    RefreshPage2();
+    mCursorTasks = new MParallelTaskSet();
+    mCursor = new DinoUi3PartsCursor(mOam);
+    mParallel.AddTail(mCursor);
+    mCursor->SetPriority(1);
+    mParallel.AddTail(mCursorTasks);
+    mFraction = new DinoUi3PartsFraction(mOam, data_ov005_0216bb20);
+    mParallel.AddTail(mFraction);
+    mFraction->SetNumerator(mPage + 1);
+    mFraction->SetDenominator(mLastPage + 1);
+    mParallel.AddTail(mOam);
+    MFont *font = gDinoResource->CreateFont12(0, 1, 0);
+    mName = new MIndicator(new MObjCanvas(gCurrentDisplay, MPoint(0xA0, 0x10), gDinoResource->GetUnkTable(), TRUE),
+                           font, 0);
+    mParallel.AddTail(mName);
+    mName->SetPosition(data_ov005_0216baa0.NamePos_08);
+    mName->SetPriority(2);
+    mName->Show();
+    mParallel.AddTail(new DinoGuideMessage(std::string(gDinoResource->GetText(data_0208a930))));
+    FocusItem((MMenuItem *)mItems[0]);
+    mSerial.AddTail(gLcd->mMain->mBright->CreateFadeInFromBlack(30, 0));
+}
+
 DinoUiMaskEquipMenuItem::DinoUiMaskEquipMenuItem(DinoUiMaskEquipMenu *owner, const std::string &path, MPoint pos, u32 textId) {
     mOwner = owner;
     mTextId = textId;
@@ -332,10 +447,6 @@ DinoUiMaskEquipMenuItem::DinoUiMaskEquipMenuItem(DinoUiMaskEquipMenu *owner, con
 }
 
 // The file's static initialization (see dino_static_init.h).
-extern "C" u32 data_ov005_0216ba34[];
-extern "C" u32 data_ov005_0216bbb4[];
-extern "C" u32 data_ov005_0216bab4[];
-extern "C" u32 data_ov005_0216bc34[];
 // NONMATCHING: register choice/scheduling of the pooled stores.
 static struct DinoUiMaskEquipStaticInit {
     DinoUiMaskEquipStaticInit() {

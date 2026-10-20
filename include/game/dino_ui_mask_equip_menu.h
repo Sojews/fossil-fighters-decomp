@@ -12,6 +12,7 @@
 class MSmartOam;
 class DinoUi3PartsCursor;
 class MIndicator;
+class MTextPicture;
 
 class DinoUiMaskEquipMenu : public DinoHelpBase, public MMenu {
 public:
@@ -34,9 +35,11 @@ public:
 
     MSmartOam *mOam;        // 0xB4: the items' sprites
     MMenuItem *mLinkFrom;   // 0xB8: linked to the first page item
-    u32 mUnkBC;
+    MTextPicture *mBackground;  // 0xBC
     std::vector<void *> mItems; // 0xC0: this page's items
-    u32 mUnkCC[3];          // 0xCC
+    MMenuItem *mPageL;      // 0xCC
+    MMenuItem *mPageR;      // 0xD0
+    u32 mUnkD4;
     MTaskSet *mCursorTasks; // 0xD8
     DinoUi3PartsCursor *mCursor; // 0xDC
     MIndicator *mName;      // 0xE0: the focused mask's name
@@ -51,6 +54,7 @@ public:
 
 class DinoUiMaskEquipBackButton : public DinoUiMaskEquipMenuItem {
 public:
+    DinoUiMaskEquipBackButton(DinoUiMaskEquipMenu *owner);
     virtual ~DinoUiMaskEquipBackButton();
     virtual void OnFocusChanged(BOOL focused);
     virtual void OnDecide();
@@ -58,12 +62,14 @@ public:
 
 class DinoUiMaskEquipPageLButton : public DinoUiMaskEquipMenuItem {
 public:
+    DinoUiMaskEquipPageLButton(DinoUiMaskEquipMenu *owner);
     virtual ~DinoUiMaskEquipPageLButton();
     virtual void OnDecide();
 };
 
 class DinoUiMaskEquipPageRButton : public DinoUiMaskEquipMenuItem {
 public:
+    DinoUiMaskEquipPageRButton(DinoUiMaskEquipMenu *owner);
     virtual ~DinoUiMaskEquipPageRButton();
     virtual void OnDecide();
 };

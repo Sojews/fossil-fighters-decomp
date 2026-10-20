@@ -2839,13 +2839,13 @@ from:0x021613fc kind:thumb_call to:0x02066a50 module:main
 from:0x02161404 kind:load to:0x0208a5cc module:main
 from:0x02161408 kind:load to:0x0216bab4 module:overlay(5)
 from:0x0216140c kind:load to:0x0216c224 add:0x8 module:overlay(5)
-from:0x02161410 kind:load to:0x0216c264 module:overlay(5)
+from:0x02161410 kind:load to:0x0216c224 add:0x40 module:overlay(5)
 from:0x02161414 kind:load to:0x0216ba34 module:overlay(5)
 from:0x02161418 kind:load to:0x0208aacc module:main
 from:0x0216141c kind:load to:0x0216c1d0 add:0x8 module:overlay(5)
-from:0x02161420 kind:load to:0x0216c210 module:overlay(5)
+from:0x02161420 kind:load to:0x0216c1d0 add:0x40 module:overlay(5)
 from:0x02161424 kind:load to:0x0216c17c add:0x8 module:overlay(5)
-from:0x02161428 kind:load to:0x0216c1bc module:overlay(5)
+from:0x02161428 kind:load to:0x0216c17c add:0x40 module:overlay(5)
 from:0x0216142c kind:load to:0x020b5b1c add:0x8 module:main
 from:0x02161430 kind:load to:0x020c1a14 add:0x8 module:main
 from:0x02161434 kind:load to:0x020c1a3c add:0x8 module:main
