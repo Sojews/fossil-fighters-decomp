@@ -1,5 +1,7 @@
 // DinoBackup: the save data.
 
+#pragma ipa file
+
 #define DINO_BACKUP_OWNER
 #define MBIT_VECTOR_OWNER
 #include "game/dino_backup.h"
@@ -23,9 +25,10 @@
 DinoBackup *gDinoBackup;
 static MMutex sBackupMutex;
 
-static const s32 sLimits[] = {
-    0,  -4, 0, 99999, 5184000, 99999999, -4, -4, -4, 9999, -4, 100, 8, 0, -4,
-};
+// The game data's limits, at the start of this file's .data (declared, not defined, so its loads go through the
+// game's own symbol rather than a pool of ours): 0, -4, 0, 99999, 5184000, 99999999, -4, -4, -4, 9999, -4, 100, 8,
+// 0, -4.
+extern s32 sLimits[];
 
 // Text IDs.
 extern const u32 kBackupEntryUnknownText;

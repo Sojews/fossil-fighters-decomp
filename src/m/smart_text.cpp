@@ -1,5 +1,7 @@
 // MSmartText: a text layer that redraws its contents as it scrolls.
 
+#pragma ipa file
+
 #include "m/smart_text.h"
 #include "m/bg.h"
 #include "m/display.h"
