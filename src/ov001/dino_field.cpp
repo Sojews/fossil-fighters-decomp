@@ -1104,7 +1104,6 @@ void DinoField::LoadMap(u32 id) {
     }
 }
 
-extern "C" void func_ov001_021603d8(DinoFieldChara *chara);
 
 // Puts the character where the save has it, if it's on this map (else just resets it).
 void DinoField::SyncChara(u32 id) {
@@ -1234,7 +1233,7 @@ void DinoField::ReloadMap() {
     mFadeTasks->Clear();
     for (u32 i = 0; i < 100; i++) {
         mCharas[i]->ResetState();
-        func_ov001_021603d8(mCharas[i]);
+        mCharas[i]->Refresh();
     }
     u32 map = mMap->GetInfo()->id;
     LoadMap(map);
@@ -1285,7 +1284,7 @@ void DinoField::Read(const void *buf) {
     LoadMap(mMap->GetInfo()->id);
     CreateKasekiRocks();
     for (u32 i = 0; i < 100; i++) {
-        func_ov001_021603d8(mCharas[i]);
+        mCharas[i]->Refresh();
     }
     if (!mUnk258 && gDinoBackup->GetSystemFlag(0x1C)) {
         mUnk2B4->Play(1, 0);
