@@ -2,6 +2,8 @@
 // NONMATCHING (several functions): mostly register allocation and loop strength reduction; the game reloads the
 // piece count every iteration of the piece loops.
 
+#pragma ipa file
+
 #include "m/oam_canvas.h"
 #include "m/display.h"
 #include "m/looper.h"
