@@ -11,8 +11,11 @@ class DinoBattleModelPlayer;
 
 class DinoBattleModelCreature;
 
+class DinoBattleTutorial;
+
 class DinoBattleModel : public MProcess, public MMessageObserver {
 public:
+    DinoBattleModel(const DinoBattleParams *params, DinoBattleTutorial *tutorial);
     DinoBattleModelPlayer *GetPlayer(int index);
     DinoBattleModelCreature *FindCreature(u32 id);
     u32 GetUnk10C();
@@ -31,6 +34,7 @@ public:
     u32 mUnk10C;                // 0x10C
     u32 mUnk110[13];            // 0x110
     DinoBattleSide mSides[2];   // 0x144
+    u8 unk25C[0x27C - 0x25C];
 };
 
 #endif

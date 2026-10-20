@@ -40,6 +40,7 @@ class DinoBattleModelCreature;
 
 class DinoBattleCpuController : public DinoBattleController {
 public:
+    DinoBattleCpuController(void *params, u32 index);
     virtual ~DinoBattleCpuController();
     virtual void OnMessage(MMessage *msg);
 

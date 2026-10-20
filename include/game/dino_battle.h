@@ -9,7 +9,7 @@
 // One side of a battle (the game keeps two).
 struct DinoBattleSide {
     std::string mName;  // 0x00
-    struct {
+    struct Creature {
         u32 mId;        // 0x00: the low byte is the creature
         u8 unk04[0x14];
     } mCreatures[3];    // 0x0C
@@ -33,6 +33,11 @@ struct DinoBattleParams {
     u32 unk148[8];              // 0x148
 };
 
+class MMultiPlay;
+class DinoBattleModel;
+class DinoBattleView;
+class DinoBattleTutorial;
+
 class DinoBattle : public MProcess {
 public:
     DinoBattle(const DinoBattleParams &params, u32 unk1D4, u32 unk1D8, u8 *unk1DC, u8 *unk1E0);
@@ -46,21 +51,30 @@ public:
     void SetUnk1E0(u8 value);
     void StateSetupDisplays();
     void State0215a540();
+    void StateRun();
+    void StateSoftReset();
 
-    u32 mUnk74[9];              // 0x74
+    // 0x74-0x1DC: a copy of the DinoBattleParams.
+    u32 mMode;                  // 0x74
+    MMultiPlay *mMultiPlay;     // 0x78: (wireless battles)
+    u32 mControllerKinds[2];    // 0x7C: 0 the player, 1 nobody, 2 the CPU
+    u32 mUnk84[3];              // 0x84
+    u8 mPostGameBegin;          // 0x90: post the game-begin signal to the model at the start
+    u32 mUnk94;                 // 0x94
     const char *mLiveName;      // 0x98: the commentary's name (none without commentary)
-    u32 mUnk9C[2];              // 0x9C
+    u32 mScene;                 // 0x9C: the sound scene
+    u32 mUnkA0;                 // 0xA0
     DinoBattleSide mSides[2];   // 0xA4
     u32 mUnk1BC[8];             // 0x1BC
     u8 *mUnk1DC;                // 0x1DC: set when the battle ends (if given)
     u8 *mUnk1E0;                // 0x1E0
     u32 mUnk1E4[2];             // 0x1E4
     void (DinoBattle::*mState)();   // 0x1EC
-    u32 mUnk1F4[2];             // 0x1F4
-    u32 mUnk1FC;                // 0x1FC
-    DinoBattleController *mUnk200;  // 0x200
+    DinoBattleController *mControllers[2];  // 0x1F4
+    DinoBattleModel *mModel;    // 0x1FC
+    DinoBattleView *mView;      // 0x200
     u32 mUnk204;                // 0x204
-    MTask *mUnk208;             // 0x208
+    DinoBattleTutorial *mTutorial;  // 0x208
 };
 
 class MInput;
@@ -90,11 +104,11 @@ public:
 
     void StateCreatureSelect();
     void StateLevelSelect();
-    void StateStart();  // (not decompiled yet: func_ov000_0215a05c)
+    void StateStart();
 
     u8 mCancelled;              // 0x74: set by the selects
     DinoBattleParams mParams;   // 0x78
-    u32 mUnk1E0;                // 0x1E0
+    u8 mUnk1E0;                 // 0x1E0: the battle's result
     void (DinoBattleDebugSelect::*mState)(); // 0x1E4
 };
 

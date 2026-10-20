@@ -34,6 +34,8 @@ public:
     virtual ~DinoBattleDummyController();
     virtual BOOL Unk10();
     virtual void OnMessage(MMessage *msg);
+
+    u32 mUnkB4;                     // 0xB4
 };
 
 #endif

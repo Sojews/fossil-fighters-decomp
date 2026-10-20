@@ -35,8 +35,11 @@ public:
     void *mUnk140;  // 0x140
 };
 
+struct DinoBattleParams;
+
 class DinoBattleView : public MProcess, public MMessageObserver {
 public:
+    DinoBattleView(const DinoBattleParams *params);
     virtual ~DinoBattleView();
     virtual void Idle();
     virtual void OnMessage(MMessage *msg);

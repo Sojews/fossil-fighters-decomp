@@ -27,6 +27,7 @@ public:
     u8 mUnkB8;                              // 0xB8
     void *mUnkBC;                           // 0xBC
     PlayerThinkTimeCountTask *mThinkTimer;  // 0xC0
+    u32 mUnkC4[2];                          // 0xC4
 };
 
 class PlayerThinkTimeCountTask : public MTask {
