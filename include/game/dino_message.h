@@ -1932,6 +1932,7 @@ public:
 class DinoBattleViewFreeCoordEffectRequest : public MMessage {
 public:
     DinoBattleViewFreeCoordEffectRequest() : MMessage(0x10059) {}
+    DinoBattleViewFreeCoordEffectRequest(u32 a, u32 b) : MMessage(0x10059), mUnk0C(0), mUnk10(a), mUnk14(b) {}
     virtual u32 GetSize() { return 16; }
     virtual void Write(void *buf) {
         MI_CpuCopy8(&mId, buf, 4);

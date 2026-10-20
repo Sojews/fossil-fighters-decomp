@@ -694,6 +694,52 @@ BOOL DinoBattleModelCreature::GetUnkD298() {
     return FALSE;
 }
 
+extern "C" const int data_0208a10c;
+extern "C" const int data_0208a114;
+
+static inline MTimer *NewTimer(const int &frames) {
+    return new MTimer(frames);
+}
+
+// Evens out both players' kaseki points, with an effect and a sound for each side that changes.
+// NONMATCHING: block order of the side flag (the game puts the FALSE arm first).
+extern "C" MTask *func_ov000_0216dec4(DinoBattleModelCreature *creature) {
+    int points[2];
+    int average = 0;
+    for (int i = 0; i < 2; i++) {
+        int p = (i != 0 ? creature->mPlayer->GetOpponent() : creature->mPlayer)->GetUnk128();
+        average += p;
+        points[i] = p;
+    }
+    average /= 2;
+    MSerialTaskSet *tasks = new MSerialTaskSet(TRUE);
+    if (points[0] == average && points[1] == average) {
+        tasks->AddTail(NewTimer(data_0208a114));
+    } else {
+        for (int i = 0; i < 2; i++) {
+            DinoBattleModelPlayer *player = i != 0 ? creature->mPlayer->GetOpponent() : creature->mPlayer;
+            tasks->AddTail(player->CreateSetKasekiPointTask(average));
+            if (average != points[i]) {
+                BOOL side = player->mUnkB4 == 0 ? FALSE : TRUE;
+                if (average > points[i]) {
+                    MTask *post = creature->mView->CreatePostTask(new DinoBattleViewFreeCoordEffectRequest(side, 0));
+                    tasks->AddTail(DinoSoundCreatePlaySeTask(0x51, 0));
+                    tasks->AddTail(post);
+                } else {
+                    MTask *post = creature->mView->CreatePostTask(new DinoBattleViewFreeCoordEffectRequest(side, 1));
+                    tasks->AddTail(DinoSoundCreatePlaySeTask(0x4e, 0));
+                    tasks->AddTail(post);
+                }
+            }
+            tasks->AddTail(player->CreateUpdateTask(0));
+            if (i == 0) {
+                tasks->AddTail(NewTimer(data_0208a10c));
+            }
+        }
+    }
+    return tasks;
+}
+
 BOOL DinoBattleModelCreature::RollDefUnk23() {
     u8 chance = mDef->mUnk23;
     if (chance >= (int)mPlayer->GetRandom()->Next(100)) {
