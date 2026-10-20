@@ -947,6 +947,8 @@ inline DinoUiSaveSlotSelectMenuItem::DinoUiSaveSlotSelectMenuItem(MSmartOam *oam
 extern "C" struct {
     void (DinoBackup::*WriteHeader_00)();
 } data_ov004_02172878;
+// (The game calls the copy in dino_ui_exchange.cpp.)
+template <> MTask *MCreateBgCallTask(DinoBackup *obj, void (DinoBackup::*func)(), int thread);
 
 // Clears the slot's save and puts a fresh (empty) item in its place, relinks the items (without delete, if nothing
 // is saved now) and writes the header.
