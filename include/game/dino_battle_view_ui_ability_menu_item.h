@@ -124,9 +124,9 @@ public:
     };
 
     MMotion *mMotion;   // 0x74
-    MView *mUnk78;      // 0x78: optional
-    MView *mUnk7C;      // 0x7C
-    MView *mUnk80;      // 0x80
+    MMotion *mUnk78;    // 0x78: optional, the hit count
+    MIndicator *mUnk7C; // 0x7C: the cost
+    MIndicator *mUnk80; // 0x80: the name
     void *mOwner;       // 0x84
     u32 mFlags;         // 0x88: attack id, flag1 << 16, flag2 << 17
 };

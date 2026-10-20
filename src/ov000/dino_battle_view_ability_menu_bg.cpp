@@ -16,6 +16,9 @@
 #include "game/dino_battle_help.h"
 #include "game/dino_sound.h"
 #include "m/indicator.h"
+#include "m/oam_canvas.h"
+#include "m/font.h"
+#include "m/smart_oam.h"
 #include <string.h>
 #include "game/dino_static_init.h"
 #include <string>
@@ -73,11 +76,14 @@ void AttackMenuBarMotion::SetPriority(int priority) {
 
 // Pooled file statics: the parts' offsets from the bar.
 struct AttackMenuBarStatics {
-    u8 unk00[8];
+    u32 unk00;
+    const char *barPath;    // 0x04: the bar
     const char *noCost;     // 0x08
-    u8 unk0C[0x14 - 0x0C];
+    const char *hitsPath;   // 0x0C: the hit count
+    u32 unk10;
     const char *bgPath;     // 0x14: the ability menu's BG
-    u8 unk18[0x20 - 0x18];
+    const char *barPath1;   // 0x18: the bar, for attacks on several creatures
+    const char *barPath2;   // 0x1C: the bar, with flag1
     void (DinoBattleViewAbilityMenuBG::*StateHidden_20)();
     u8 unk28[0x48 - 0x28];
     MPoint mUnk7COffset;    // 0x48
@@ -96,6 +102,69 @@ struct AttackMenuBarStatics2 {
 };
 extern "C" AttackMenuBarStatics data_ov000_021947ac;
 extern "C" AttackMenuBarStatics2 data_ov000_0219482c;
+
+extern "C" BOOL func_ov000_02179aa0(u32 id);
+
+// Builds the bar: its motion (by kind), the attack's name and cost, and the hit count when it has several.
+void AttackMenuBarMotion::Init(MSmartOam *oam, u32 attack, bool flag1, bool flag2, bool flag3, bool flag4) {
+    const DinoAttackDef *def = gDinoResource->GetAttackDef(attack);
+    const u8 *range = DinoOffsetPtr<u8>(def, def->unk10);
+    int kind = flag1 ? 2 : 0;
+    if (kind == 0 && func_ov000_02179aa0(attack)) {
+        kind = 1;
+    }
+    int anchor = flag4 ? 3 : 0;
+    switch (kind) {
+    case 1:
+        mMotion = new MMotion(std::string(data_ov000_021947ac.barPath1), oam, anchor, 1);
+        break;
+    case 2:
+        mMotion = new MMotion(std::string(data_ov000_021947ac.barPath2), oam, flag4, 1);
+        break;
+    case 0:
+    default:
+        mMotion = new MMotion(std::string(data_ov000_021947ac.barPath), oam, flag4, 1);
+        break;
+    }
+    mMotion->Show();
+    mMotion->Play(flag2 ? (flag3 ? 4 : 3) : 1, 0);
+    mMotion->SetAnchor(1);
+    mMotion->GetUnit()->SetMode(1);
+    MFontSet *font = gDinoResource->CreateFont12(0, flag2 ? 12 : 10, 1);
+    MSmartObjCanvas *canvas = new MSmartObjCanvas(
+        oam, MPoint(font->MeasureText(std::string(gDinoResource->GetAttackName(attack)), 0, 0).x, flag4 ? 16 : 32),
+        gDinoResource->GetUnkTable(), TRUE);
+    mUnk80 = new MIndicator(canvas, font, 0);
+    canvas->GetOamUnit()->SetMode(1);
+    mUnk80->SetText(std::string(gDinoResource->GetAttackName(attack)));
+    mUnk80->Show();
+    char cost[16];
+    OS_SPrintf(cost, "%3d", *DinoOffsetPtr<u16>(def, def->cost));
+    if (flag2) {
+        for (char *c = cost; *c != 0; c++) {
+            *c += 0x20;
+        }
+    }
+    MFont *costFont = ((DinoBattleView *)mOwner)->GetUnk120();
+    canvas = new MSmartObjCanvas(oam, MPoint(24, 16), ((DinoBattleView *)mOwner)->GetUnk11CPalette(), TRUE);
+    mUnk7C = new MIndicator(canvas, costFont, 0);
+    canvas->GetOamUnit()->SetMode(1);
+    mUnk7C->SetText(std::string(cost));
+    mUnk7C->Show();
+    GetParallel()->AddTail(mMotion, mUnk80, mUnk7C);
+    if (range[3] > 1) {
+        mUnk78 = new MMotion(std::string(data_ov000_021947ac.hitsPath), oam, flag4, 1);
+        mUnk78->Show();
+        mUnk78->Play(range[3] - 1, 0);
+        mUnk78->SetAnchor(0);
+        mUnk78->GetUnit()->SetMode(1);
+        mParallel.AddTail(mUnk78);
+    } else {
+        mUnk78 = NULL;
+    }
+    SetPosition(MPoint(0, 0));
+    SetPriority(0);
+}
 
 void AttackMenuBarMotion::SetPosition(MPoint pos) {
     mMotion->SetPosition(pos);
