@@ -33,6 +33,7 @@ extern const u32 kBackupEntryUnk2Text;
 extern const u64 kBackupRecentFrames;
 extern const u32 kCreatureLevelLimits[2];
 extern "C" const u32 data_0208ac7c;   // the senryu sample's text
+extern "C" const u32 data_0208aab0;   // the first team's name
 
 #define BACKUP_BLOCK_DATA 480   // what's left of a 512-byte block after the header
 
@@ -359,6 +360,46 @@ s32 DinoBackup::GetUnk180() {
 void DinoBackup::ApplyVolume() {
     DinoSoundSetTargetVolume(mPlayer->targetVolume * 127 / 10);
     DinoSoundSetVolume(mPlayer->volume * 127 / 10);
+}
+
+// A new game: the game data cleared, the creatures numbered, the first team named and the player's settings.
+// NONMATCHING: the game spills applyVolume before loading the mutex's address.
+void DinoBackup::Reset(BOOL applyVolume) {
+    MScopedLock lock(&sBackupMutex.mutex, TRUE);
+    mLoaded = FALSE;
+    u8 *buf = new u8[mSerializer->GetSize()];
+    MI_CpuFill8(buf, 0, mSerializer->GetSize());
+    mSerializer->Read(buf);
+    delete[] buf;
+    SetSystemFlag(1, TRUE);
+    for (u32 i = 1; i < gDinoResource->GetCreatureCount(); i++) {
+        mCreatures[i].index = i;
+    }
+    std::wstring name = MDecodeUtf8(gDinoResource->GetText(data_0208aab0));
+    u32 i;
+    for (i = 0; i < name.size(); i++) {
+        mTeams[1].name[i] = name[i];
+    }
+    mTeams[1].name[name.size()] = 0;
+    mPlayer->horiderLevel = 1;
+    mPlayer->license = 0;
+    mPlayer->unk14_14 = gDinoResource->GetRandom()->Next(3);
+    mPlayer->containerNum = 1;
+    mPlayer->townMapMode = 1;
+    mPlayer->radarMode = 2;
+    mPlayer->unk34_28 = 1;
+    mPlayer->unk34_30 = 1;
+    mPlayer->unk38_0 = 1;
+    SetEpisodeSeen(1, TRUE);
+    mPlayer->targetVolume = 8;
+    mPlayer->volume = 8;
+    mPlayer->unk34_16 = 1;
+    mPlayer->unk34_26 = 1;
+    mPlayer->unk38_4 = 100;
+    if (applyVolume) {
+        ApplyVolume();
+    }
+    mLoaded = FALSE;
 }
 
 void DinoBackup::WriteHeader() {
