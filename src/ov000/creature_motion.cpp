@@ -26,6 +26,7 @@
 #include "m/font.h"
 #include "m/picture.h"
 #include "game/info_panel_window.h"
+#include "game/dino_sound.h"
 
 CreatureMotion::~CreatureMotion() {
 }
@@ -342,6 +343,59 @@ extern "C" MPoint func_ov000_0216f4c0(int side, u32 kind, BOOL own);
 extern "C" int func_ov000_0216f698(int arg0, BOOL arg1, BOOL arg2);
 extern "C" MTask *func_ov000_0216ff18(DinoBattleViewCreature *creature, MPoint from, MPoint to, int frames, int ease,
                                        BOOL shuffle, int arg);
+
+extern "C" const u32 data_0208a2b0;    // the action bar's pinch text
+extern "C" const u32 data_0208a2b8[];  // (word 2) its leaving-the-pinch text
+// The TU's pooled pinch mark path (word 1).
+extern "C" const char *const data_ov000_02193030[];
+
+inline MTask *DinoBattleView::CreateWaitActionInfoBarTask() {
+    return DinoCreatePostAndWaitTask(this, new DinoBattleViewWaitActionInfoBarRequest(0));
+}
+
+inline MTask *DinoBattleView::CreateActionInfoBarUpdateTask(u32 text) {
+    return CreatePostTask(new DinoBattleViewActionInfoBarUpdateRequest(text));
+}
+
+// NONMATCHING: the game reads the creature's side for the bar text after allocating the request (here before).
+void DinoBattleViewCreature::SetLife(int life) {
+    if (mUnkF8 == 0 || life == 0) {
+        mUnkF8 = life;
+        return;
+    }
+    BOOL pinch = IsInPinch();
+    mUnkF8 = life;
+    if (GetDefUnk61() != 5 || pinch == IsInPinch()) {
+        return;
+    }
+    u32 text = *(pinch ? &data_0208a2b0 : &data_0208a2b8[2]);
+    MSerialTaskSet *set = new MSerialTaskSet(TRUE);
+    ((DinoBattleViewPlayer *)mUnkDC)->mView->IncUnk13C();
+    MTask *enable = ((DinoBattleViewPlayer *)mUnkDC)->mView->CreateEnableRootSelectTask();
+    MTask *wait = ((DinoBattleViewPlayer *)mUnkDC)->mView->CreateWaitActionInfoBarTask();
+    MTask *post = ((DinoBattleViewPlayer *)mUnkDC)->mView->CreateActionInfoBarUpdateTask(text + (mUnkB0 == 1 ? 1 : 0));
+    set->AddTail(DinoBattleViewPopNumber::CreateWaitTask(), post, wait, enable);
+    if (!pinch) {
+        MSmartOam *oam = new MSmartOam(10, 5, TRUE);
+        oam->SetOffset(((MSmartOam *)mUnkD8)->GetOffset());
+        MMotion *mark = new MMotion(std::string(data_ov000_02193030[1]), oam, 0, 1);
+        mark->SetPosition(func_ov000_0216f320(mUnkB0, mUnkB4, FALSE));
+        mark->SetPriority(1);
+        mark->Show();
+        mark->GetUnit()->SetMode(1);
+        MTaskSet *tasks = ((DinoBattleViewPlayer *)mUnkDC)->mView->mUnkE0->mTasksBC;
+        tasks->AddTail(mark);
+        tasks->AddTail(oam);
+        MTask *exitOam = MTaskExitTransfer::Create(oam);
+        MTask *exitMark = MTaskExitTransfer::Create(mark);
+        MTask *se = DinoSoundCreatePlaySeTask(0x56C, 0);
+        GetSerial()->AddTail(mark->CreatePlayTransfer(6, 0), se, set, exitMark, exitOam);
+        SetFlag144(7);
+    } else {
+        mSerial.AddTail(set);
+        ClearFlag144(7);
+    }
+}
 
 void DinoBattleViewCreature::MoveHome(BOOL own) {
     MPoint home = func_ov000_0216f320(mUnkB0, mUnkB4, own);

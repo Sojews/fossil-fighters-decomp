@@ -62,6 +62,9 @@ public:
     void SetMotionAnchor(int anchor);
     void PlayMotion3();
     void SetFlag144(int bit);
+    // Sets the life; a pinch-ability creature going into or out of a pinch says so on the action bar, and going in
+    // flashes the pinch mark.
+    void SetLife(int life);
     void ClearFlag144(int bit);
     BOOL IsUnkCC2();
     void ClearAdvantage();

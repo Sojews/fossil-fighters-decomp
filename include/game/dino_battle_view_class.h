@@ -39,7 +39,7 @@ public:
     u32 unkB0;
     MTaskSet *mTasksB4;         // 0xB4
     MTaskSet *mTasksB8;         // 0xB8
-    u32 unkBC;
+    MTaskSet *mTasksBC;         // 0xBC
     DinoBattleViewFieldSlot *mSlotViewsC0[2]; // 0xC0: by side
     u8 unkC8[0x120 - 0xC8];
     DinoBattleViewBackdrop *mBackdrop;  // 0x120
@@ -86,6 +86,9 @@ public:
     DinoBattleViewPlayer *GetPlayerByAC(u32 id);
     int GetUnk140();
     MTask *CreateEnableRootSelectTask();
+    // (Inline, defined where used.) Waits for the action bar; shows the text on it.
+    inline MTask *CreateWaitActionInfoBarTask();
+    inline MTask *CreateActionInfoBarUpdateTask(u32 text);
 
     MResource<DinoBattleViewData> mData;    // 0xA8
     MMessageSubject mSubject;   // 0xB8

@@ -626,7 +626,7 @@ _ZN22DinoBattleViewCreature9GetMotionEv kind:function(thumb,size=0x6) addr:0x021
 _ZN22DinoBattleViewCreature9GetUnk118Ev kind:function(thumb,size=0x8) addr:0x021701d4
 _ZN22DinoBattleViewCreature9SetUnk118Em kind:function(thumb,size=0x8) addr:0x021701dc
 _ZN22DinoBattleViewCreature4IdleEv kind:function(thumb,size=0x1a) addr:0x021701e4
-func_ov000_02170200 kind:function(thumb,size=0x2c8) addr:0x02170200
+_ZN22DinoBattleViewCreature7SetLifeEi kind:function(thumb,size=0x2c8) addr:0x02170200
 _Z25DinoCreatePostAndWaitTaskI14DinoBattleView38DinoBattleViewWaitActionInfoBarRequestEP5MTaskPT_PT0_ kind:function(thumb,size=0xb0) addr:0x021704c8
 _ZN22DinoBattleViewCreature9OnMessageEP8MMessage kind:function(thumb,size=0x1f5c) addr:0x02170578
 .L_02170f46 kind:label(thumb) addr:0x02170f46 local
