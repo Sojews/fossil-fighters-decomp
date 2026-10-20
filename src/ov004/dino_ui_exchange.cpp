@@ -25,6 +25,7 @@
 #include <printf.h>
 #include <algorithm>
 #include "game/dino_static_init.h"
+#include "game/dino_multi_play_icon.h"
 
 DinoUiExchange::~DinoUiExchange() {
     GetDisplay()->mBlend->Reset();
@@ -114,7 +115,8 @@ template class std::__red_black_tree<DinoMacAddress, DinoMacAddress, std::__iden
 extern "C" struct {
     u8 unk00[0x8];
     u32 maxCount_08;    // 0x08: the most exchanges counted
-    u8 unk0C[0x14 - 0xC];
+    const char *bgPath_0C;      // 0x0c: the waiting screen's background
+    const char *pointPath_10;   // 0x10: its points
     void (DinoUiExchange::*StateSave_14)(); // 0x14
     void (DinoUiExchange::*StateExchange_1C)(); // 0x1c
     void (DinoUiExchange::*OnScanMessage_24)(MMessage *msg); // 0x24
@@ -143,7 +145,8 @@ extern "C" struct {
     void (DinoUiExchange::*StateRestart_44)(); // 0x44
     void (DinoUiExchange::*OnNoMessage_4C)(MMessage *msg); // 0x4c
     void (DinoUiExchange::*StateCheck_54)(); // 0x54
-    u8 unk5C[0x6C - 0x5C];
+    void (DinoUiExchange::*StateWait_5C)(); // 0x5c
+    u8 unk64[0x6C - 0x64];
     void (DinoUiExchange::*StateStart_6C)(); // 0x6c
     void (DinoUiExchange::*StateSearch_74)(); // 0x74
     void (DinoUiExchange::*StateFinish_7C)(); // 0x7c (its second word is in the next block)
@@ -447,6 +450,57 @@ void DinoUiExchange::OnExchangeMessage(MMessage *msg) {
         mDone[((DinoExchangeDoneSignal *)msg)->mUnk0C] = TRUE;
         break;
     }
+}
+
+extern const u32 data_0208ab48;
+// MTaskSet::AddTail(a, b, c, d) with the set held in a register (as the 2- and 3-task forms do).
+static inline void DinoUiExchangeAddTail(MTaskSet *set, MTask *a, MTask *b, MTask *c, MTask *d) {
+    MTaskSet *self = set;
+    self->AddTail(a);
+    self->AddTail(b);
+    self->AddTail(c);
+    self->AddTail(d);
+}
+
+// The waiting screen (a background and two points), the player's name in the beacon, and the wireless start.
+void DinoUiExchange::Unk02155f24() {
+    DinoSoundPlayBgm(0x79, 0);
+    mCount = 0;
+    mOam = new MSmartOam(10, 0, TRUE);
+    mBackground = new MMotion(std::string(data_ov004_02171de0.bgPath_0C), mOam, 0, 1);
+    mBackground->SetPosition(0x80, 0x60);
+    mBackground->SetPriority(3);
+    mBackground->Play(1, 0);
+    mBackground->Show();
+    mOnes = new MMotion(std::string(data_ov004_02171de0.pointPath_10), mOam, 0, 1);
+    mOnes->SetPosition(0x88, 0x60);
+    mOnes->Play(1, 0);
+    mOnes->SetPriority(3);
+    mOnes->Show();
+    mTens = new MMotion(std::string(data_ov004_02171de0.pointPath_10), mOam, 0, 1);
+    mTens->SetPosition(0x78, 0x60);
+    mTens->Play(1, 0);
+    mTens->SetPriority(3);
+    mTens->Show();
+    DinoUiExchangeAddTail(&mParallel, mBackground, mOnes, mTens, mOam);
+    mSenryu = gDinoResource->LoadSenryuDefs();
+    DinoPlayerData player;
+    gDinoBackup->GetPlayer(&player, TRUE);
+    MIi_CpuCopy16(player.name, &mBeacon[4], sizeof(player.name));
+    mTasks = new MParallelTaskSet();
+    mParallel.AddTail(mTasks);
+    MDisableSoftReset();
+    MDisableSleep();
+    mMultiPlay = new MMultiPlay(0x400869, 2, 4, 0x10000, -1, -1);
+    mMultiPlay->AddObserver(this);
+    mParallel.AddTail(mMultiPlay);
+    mSerial.AddTail(mMultiPlay->CreateInitializeTask());
+    mMode = gDinoResource->GetRandom()->Next(2);
+    mParallel.AddTail(new DinoMultiPlayIcon);
+    MTask *box = new DinoCommonWindowMessageBox(data_ov004_02171e60.mMessagePos,
+                                                std::string(gDinoResource->GetText(data_0208ab48)), 4);
+    mSerial.AddTail(box);
+    mState = data_ov004_02171e60.StateWait_5C;
 }
 
 void DinoUiExchange::StateWait() {

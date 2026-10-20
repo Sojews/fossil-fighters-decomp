@@ -88,7 +88,7 @@ public:
     MTaskSet *mTasks;               // 0xC4
     u32 unkC8;
     MSmartOam *mOam;                // 0xCC: the count's
-    u32 unkD0;
+    MMotion *mBackground;           // 0xD0: the waiting screen's
     MMotion *mOnes;                 // 0xD4: the count's digits
     MMotion *mTens;                 // 0xD8
     u32 mCount;                     // 0xDC
@@ -107,7 +107,7 @@ public:
     DinoUiWirelessCancel *mCancel;  // 0x138
     u8 mCancelled;                  // 0x13C
     u8 unk13D[3];
-    MResource<void> mResource;      // 0x140
+    MResource<DinoSenryuDefs> mSenryu;  // 0x140
     DinoBackupEntry mRock;          // 0x150: the partner's
     DinoPlayerProfile mProfile;     // 0x164: the partner's
     u8 mIsParent;                   // 0x1E8: this side found the partner
