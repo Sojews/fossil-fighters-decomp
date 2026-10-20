@@ -72,7 +72,6 @@ void DinoCommonItem::OnEnableChanged(BOOL enabled) {
 extern "C" const MRect data_020ba7d0[];
 extern "C" const char *data_020ba7a0[];
 
-// NONMATCHING: the label's size is read through a pointer and swaps slots with the label's spacing.
 DinoCommonItem::DinoCommonItem(u32 type, MSmartOam *oam, MPoint pos, u32 priority, u32 label, u32 helpText) {
     mOam = oam;
     mTextId = helpText;
@@ -80,8 +79,11 @@ DinoCommonItem::DinoCommonItem(u32 type, MSmartOam *oam, MPoint pos, u32 priorit
     if (label) {
         MFont *font = gDinoResource->CreateFont12(0, 1, 10);
         mView = new DinoCommonLabel(oam, font, gDinoResource->GetUnkTable(), label, MPoint(0, 2));
-        MPoint size = mView->GetSize();
-        mPos = MPoint(pos.x - size.x / 2, pos.y - size.y / 2);
+        MPoint half = mView->GetSize() / 2;
+        MPoint p;
+        p.y = pos.y - half.y;
+        p.x = pos.x - half.x;
+        mPos = p;
         mView->SetPriority(priority);
         mView->SetPosition(mPos);
         mView->Show();
