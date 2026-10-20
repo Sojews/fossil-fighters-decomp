@@ -500,8 +500,9 @@ u16 DinoResource::GetMapSceneMatch(u32 id) {
 }
 
 std::string DinoResource::GetKasekiRockName(u32 id) {
-    u32 sub = (id - 1) & 3;
-    u32 group = ((id - 1) >> 2) + 1;
+    // (The game keeps both in memory, reading them at each use.)
+    volatile u32 group = ((id - 1) >> 2) + 1;
+    volatile u32 sub = (id - 1) & 3;
     if (group == 0 || group >= mKasekiRockCount) {
         return std::string("");
     }

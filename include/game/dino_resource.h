@@ -12,6 +12,7 @@ class MRandom;
 
 // The record at a position in a file of fixed-size records.
 struct DinoRegionCenter {
+    DinoRegionCenter() {}
     u32 unk00;
     u32 unk04;
 };
