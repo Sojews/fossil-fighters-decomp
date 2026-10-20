@@ -1,5 +1,6 @@
 // Sleep mode.
 
+#pragma ipa file
 #include <algorithm>
 #include <list>
 #include "m/sleep.h"
@@ -12,10 +13,12 @@
 #define HW_BUTTON_XY (*(volatile u16 *) 0x027FFFA8)
 #define BOOT_TYPE_DOWNLOAD 2
 
-static MFoldSleepHandler *sFoldSleepHandler;
-static std::list<MSleepHook *> sSleepHooks;
+// static_order: begin
 static int sSleepEnableCount;
 static OSMutex sSleepHooksMutex;
+static MFoldSleepHandler *sFoldSleepHandler;
+static std::list<MSleepHook *> sSleepHooks;
+// static_order: end
 
 // Download Play children have no card to wake on.
 static inline BOOL IsDownloadPlayChild() {
