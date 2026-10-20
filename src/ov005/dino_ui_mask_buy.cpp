@@ -33,6 +33,11 @@
 #include "m/display.h"
 #include "m/bright.h"
 #include "game/dino_static_init.h"
+#include "game/dino_ui_common.h"
+#include "m/motion.h"
+#include "game/dino_guide_message.h"
+#include "game/help.h"
+#include "m/picture.h"
 
 #pragma auto_inline off
 
@@ -40,6 +45,129 @@ DinoUiMaskBuyMenu::DinoUiMaskBuyMenu() : MMenu(NULL, 0), mPage(0), mLastPage(0),
     for (int i = 0; i < 5; i++) {
         mFlags[i] = 0;
     }
+}
+
+// Pooled file statics: the buttons' graphics (data_ov005_0216b180, the path table, is declared with the mask button)
+// and corners.
+static inline const MPoint &DinoUiMaskBuyPoint(u32 offset) {
+    return *(const MPoint *)((const u8 *)data_ov005_0216b180 + offset);
+}
+struct DinoUiMaskBuyStatics {
+    MPoint mPageRPos;    // 0x00
+    MPoint mFirst;       // 0x08: the page's first mask button
+    MPoint mRow;         // 0x10: to the next row
+    u8 unk18[0x28 - 0x18];
+    MPoint mTopLeft;     // 0x28
+    u8 unk30[0x8];
+    MPoint mBottomRight; // 0x38
+    u8 unk40[0x48 - 0x40];
+    MPoint mBackPos;     // 0x48
+    MPoint mMaskNamePos; // 0x50
+    MPoint mColumn;      // 0x58: from a mask button to the next in its row
+};
+extern "C" DinoUiMaskBuyStatics data_ov005_0216b200;
+// "/image/..." (the background; the TU's string literals are pooled data too).
+extern "C" const char data_ov005_0216ba1c[];
+// Help rects.
+extern const MRect data_020b5838, data_020b5848;
+// Text ids.
+extern "C" const u32 data_0208a5d8, data_0208a5dc, data_0208a5e0, data_0208a5e4, data_0208a5e8, data_0208a5ec,
+    data_0208a934, data_0208aacc;
+
+inline DinoUiMaskBuyBackButton::DinoUiMaskBuyBackButton(DinoUiMaskBuyMenu *owner)
+    : DinoUiMaskBuyMenuItem(owner, data_ov005_0216b180[17], data_ov005_0216b200.mBackPos, data_0208a5d8) {
+    mMotion->Play(2, 0);
+}
+
+inline DinoUiMaskBuyPageLButton::DinoUiMaskBuyPageLButton(DinoUiMaskBuyMenu *owner)
+    : DinoUiMaskBuyMenuItem(owner, data_ov005_0216b180[20], DinoUiMaskBuyPoint(0x78), data_0208aacc) {
+    SetKeys(0x200);
+    SetNoFocus(TRUE);
+    DinoHelpItem::Disable();
+}
+
+inline DinoUiMaskBuyPageRButton::DinoUiMaskBuyPageRButton(DinoUiMaskBuyMenu *owner)
+    : DinoUiMaskBuyMenuItem(owner, data_ov005_0216b180[1], data_ov005_0216b200.mPageRPos, data_0208aacc) {
+    SetKeys(0x100);
+    SetNoFocus(TRUE);
+    DinoHelpItem::Disable();
+}
+
+inline DinoUiMaskBuyBuyButton::DinoUiMaskBuyBuyButton(DinoUiMaskBuyMenu *owner)
+    : DinoUiMaskBuyMenuItem(owner, data_ov005_0216b180[12], DinoUiMaskBuyPoint(0x68), data_0208a5e8) {
+}
+
+// The excavation settings' section at offset7C (the input repeat is at 0x1C and 0x20).
+static inline const int *GetExcavate7C(MResource<DinoExcavateDefs> &defs) {
+    const DinoExcavateDefs *d = defs.Get();
+    if (d->offset7C == 0) {
+        return NULL;
+    }
+    return (const int *)((const u8 *)d + d->offset7C);
+}
+
+// NONMATCHING: the list and money help items swap spill slots.
+void DinoUiMaskBuyMenu::OnStart() {
+    SetLinkFallback(1);
+    {
+        MResource<DinoExcavateDefs> delayDefs = gDinoResource->GetExcavateDefs();
+        MResource<DinoExcavateDefs> intervalDefs = gDinoResource->GetExcavateDefs();
+        GetInput()->SetRepeat(0xF0, GetExcavate7C(delayDefs)[7], GetExcavate7C(intervalDefs)[8]);
+    }
+    DinoDimScreen();
+    LoadMasks();
+    mParallel.AddTail(mBackground = new MTextPicture(std::string(data_ov005_0216ba1c), TRUE, false));
+    mBackground->Show();
+    mBackground->SetPriority(2);
+    mOam = new MSmartOam(0x28, 0, TRUE);
+    DinoHelpDummyItem *money, *list, *total;
+    mParallel.AddTail(new DinoHelpDummyItem(GetDisplay(), MRect(0x1E, 0xC, 0xE2, 0x6C),
+                                            std::string(gDinoResource->GetText(data_0208a5ec))));
+    mParallel.AddTail(list = new DinoHelpDummyItem(GetDisplay(), MRect(0x13, 0x90, 0xF1, 0x9F),
+                                                   std::string(gDinoResource->GetText(data_0208a5e4))));
+    mParallel.AddTail(money = new DinoHelpDummyItem(GetDisplay(), data_020b5848,
+                                                    std::string(gDinoResource->GetText(data_0208a5e0))));
+    mParallel.AddTail(total = new DinoHelpDummyItem(GetDisplay(), data_020b5838,
+                                                    std::string(gDinoResource->GetText(data_0208a5dc))));
+    mBack = new DinoUiMaskBuyBackButton(this);
+    AddItem(mBack);
+    if (mLastPage > 0) {
+        mPageL = new DinoUiMaskBuyPageLButton(this);
+        AddItem(mPageL);
+        mPageR = new DinoUiMaskBuyPageRButton(this);
+        AddItem(mPageR);
+    }
+    mBuy = new DinoUiMaskBuyBuyButton(this);
+    AddItem(mBuy);
+    AddEntry((u32)(DinoHelpItem *)mBuy, 1, 0);
+    AddEntry((u32)list, 3, 0);
+    AddEntry((u32)list, 1, 0);
+    AddEntry((u32)money, 4, (u32)list);
+    AddEntry((u32)money, 1, (u32)total);
+    AddEntry((u32)total, 2, 0);
+    AddEntry((u32)total, 3, (u32)money);
+    AddEntry((u32)(DinoHelpItem *)mBack, 4, (u32)list);
+    RefreshPage2();
+    mCursorTasks = new MParallelTaskSet();
+    mCursor = new DinoUi3PartsCursor(mOam);
+    mParallel.AddTail(mCursor);
+    mCursor->SetPriority(1);
+    mParallel.AddTail(mCursorTasks);
+    mParallel.AddTail(mOam);
+    mMaskName = new DinoUi3PartsMaskName(data_ov005_0216b200.mMaskNamePos);
+    mParallel.AddTail(mMaskName);
+    mMoney = new DinoUi3PartsMoney();
+    mParallel.AddTail(mMoney);
+    mFunds = gDinoBackup->GetSystemVar(3);
+    RefreshPage3();
+    mParallel.AddTail(new DinoGuideMessage(std::string(gDinoResource->GetText(data_0208a934))));
+    AddLink(mBuy, 3, NULL);
+    AddLink(mBuy, 1, NULL);
+    AddLink(mBuy, 2, mBack);
+    AddLink(mBack, 4, mBuy);
+    AddLink(mBack, 3, NULL);
+    FocusItem((MMenuItem *)mUnkC4[0]);
+    mSerial.AddTail(gLcd->mMain->mBright->CreateFadeInFromBlack(30, 0));
 }
 
 DinoUiMaskBuyMenuItem::DinoUiMaskBuyMenuItem(DinoUiMaskBuyMenu *owner, const std::string &path, MPoint pos, u32 textId) {
@@ -176,19 +304,6 @@ void DinoUiMaskBuyMenu::OnBackDecided() {
     serial->AddTail(exit);
 }
 
-// Pooled file statics: the button corners.
-struct DinoUiMaskBuyStatics {
-    u8 unk00[0x8];
-    MPoint mFirst;       // 0x08: the page's first mask button
-    MPoint mRow;         // 0x10: to the next row
-    u8 unk18[0x28 - 0x18];
-    MPoint mTopLeft;     // 0x28
-    u8 unk30[0x8];
-    MPoint mBottomRight; // 0x38
-    u8 unk40[0x58 - 0x40];
-    MPoint mColumn;      // 0x58: from a mask button to the next in its row
-};
-extern "C" DinoUiMaskBuyStatics data_ov005_0216b200;
 
 MRect DinoUiMaskBuyBuyButton::GetFrame() {
     return MRect(data_ov005_0216b200.mTopLeft, data_ov005_0216b200.mBottomRight);

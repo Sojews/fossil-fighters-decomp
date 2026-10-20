@@ -11,6 +11,8 @@
 class MSmartOam;
 class DinoUi3PartsMoney;
 class DinoUiMaskBuyBuyButton;
+class MTextPicture;
+class DinoUiMaskBuyMenuItem;
 class DinoUi3PartsCursor;
 class DinoUi3PartsMaskName;
 
@@ -38,11 +40,12 @@ public:
     MSmartOam *GetOam() { return mOam; }
 
     MSmartOam *mOam;        // 0xB4: the items' sprites
-    MMenuItem *mBack;       // 0xB8
+    DinoUiMaskBuyMenuItem *mBack;   // 0xB8
     DinoUiMaskBuyBuyButton *mBuy; // 0xBC
-    u32 mUnkC0;             // 0xC0
+    MTextPicture *mBackground;  // 0xC0
     std::vector<void *> mUnkC4; // 0xC4: the page's mask buttons
-    u32 mUnkD0[2];          // 0xD0
+    DinoUiMaskBuyMenuItem *mPageL;  // 0xD0
+    DinoUiMaskBuyMenuItem *mPageR;  // 0xD4
     MTaskSet *mCursorTasks; // 0xD8
     DinoUi3PartsCursor *mCursor; // 0xDC
     DinoUi3PartsMaskName *mMaskName; // 0xE0
@@ -60,6 +63,7 @@ public:
 
 class DinoUiMaskBuyBackButton : public DinoUiMaskBuyMenuItem {
 public:
+    DinoUiMaskBuyBackButton(DinoUiMaskBuyMenu *owner);
     virtual ~DinoUiMaskBuyBackButton();
     virtual void OnFocusChanged(BOOL focused);
     virtual void OnDecide();
@@ -67,18 +71,21 @@ public:
 
 class DinoUiMaskBuyPageLButton : public DinoUiMaskBuyMenuItem {
 public:
+    DinoUiMaskBuyPageLButton(DinoUiMaskBuyMenu *owner);
     virtual ~DinoUiMaskBuyPageLButton();
     virtual void OnDecide();
 };
 
 class DinoUiMaskBuyPageRButton : public DinoUiMaskBuyMenuItem {
 public:
+    DinoUiMaskBuyPageRButton(DinoUiMaskBuyMenu *owner);
     virtual ~DinoUiMaskBuyPageRButton();
     virtual void OnDecide();
 };
 
 class DinoUiMaskBuyBuyButton : public DinoUiMaskBuyMenuItem {
 public:
+    DinoUiMaskBuyBuyButton(DinoUiMaskBuyMenu *owner);
     virtual ~DinoUiMaskBuyBuyButton();
     virtual MRect GetFrame();
     virtual void OnFocusChanged(BOOL focused);
