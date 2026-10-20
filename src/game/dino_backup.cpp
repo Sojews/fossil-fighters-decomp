@@ -1596,14 +1596,12 @@ extern "C" BOOL func_0201b19c(DinoBackup *backup, u32 index, s32 rate) {
         if (rate == 0) {
             return FALSE;
         }
-        MFx32 step = MFx32(100) / MFx32(rate);
+        MFx32 step = MFx32(rate) / MFx32(100);
         u32 max = MFx32ToInt(MFx32(2) / step + MFx32(1)) - 1;
         MFx32 chance = (MFx32(1) / step - MFx32(1)) / MFx32((int)max);
         u32 period = 1;
-        MFx32 r;
         for (u32 i = 0; i < max; i++) {
-            r = gDinoResource->GetRandom()->NextFraction();
-            if (r <= chance) {
+            if (gDinoResource->GetRandom()->NextFraction() <= chance) {
                 period++;
             }
         }

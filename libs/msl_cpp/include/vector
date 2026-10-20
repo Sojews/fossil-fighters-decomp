@@ -503,12 +503,15 @@ namespace std {
         }
         size_t n = last - first;
         size_t c = cap();
+        size_t m;
         if (n > c) {
             UnkMSLStruct1 unk = UnkMSLStruct1();
-            reallocate_clear(n, grow_by(n - c));
-            construct_range_at_end(first, last);
-        } else {
-            const T *mid = first + std::min(n, size_);
+            m = grow_by(n - c);
+            goto grow;
+        }
+        {
+            const T *mid = first;
+            mid += std::min(n, size_);
             T *d = data_;
             for (; first < mid; first++, d++) {
                 *d = *first;
@@ -519,6 +522,10 @@ namespace std {
                 construct_range_at_end(mid, last);
             }
         }
+        return;
+    grow:
+        reallocate_clear(n, m);
+        construct_range_at_end(first, last);
     }
 
     template <typename T, typename Allocator> void __vec_deleter<T, Allocator>::reallocate_clear(size_t n, size_t max) {
