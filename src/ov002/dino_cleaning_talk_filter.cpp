@@ -11,11 +11,112 @@
 #include "m/smart_oam.h"
 #include "game/dino_resource.h"
 #include "game/dino_static_init.h"
+#include "game/dino_backup.h"
+#include "game/dino_common_font.h"
+#include <string>
+#include <string.h>
+#include <stdlib.h>
 
 DinoCleaningTalkFilter::~DinoCleaningTalkFilter() {
 }
 
 DinoCleaningTalkWindow::~DinoCleaningTalkWindow() {
+}
+
+// Reads a decimal number from the console (pushing back the character after it).
+static inline int DinoCleaningReadNumber(MConsole *console) {
+    int n = 0;
+    while (!console->IsEmpty()) {
+        u32 c = console->PopChar();
+        if (c >= '0' && c <= '9') {
+            n *= 10;
+            n += c - '0';
+        } else {
+            console->PushChar(c);
+            break;
+        }
+    }
+    return n;
+}
+
+extern "C" const char data_ov002_02164404[];   // "-+0123456789."
+extern "C" double atof(const char *s);
+
+// NONMATCHING: the player name's two reverse-iterator pairs take each other's stack slots.
+BOOL DinoCleaningTalkFilter::Filter(MConsole *console, int c) {
+    if (c != '$') {
+        return FALSE;
+    }
+    if (console->IsEmpty()) {
+        return TRUE;
+    }
+    switch ((u32)console->PopChar()) {
+    case 'p': {
+        DinoPlayerData player;
+        gDinoBackup->GetPlayer(&player, FALSE);
+        std::wstring name((const wchar_t *)player.name);
+        for (std::wstring::const_reverse_iterator it = name.rbegin(); it != name.rend(); ++it) {
+            console->PushChar(*it);
+        }
+        break;
+    }
+    case 't':
+        mWindow->SetUnkD0(DinoCleaningReadNumber(console));
+        console->PushChar(12);
+        break;
+    case 'f':
+        console->Clear();
+        break;
+    case 'w': {
+        MFx32 rate;
+        {
+            std::string text;
+            while (!console->IsEmpty()) {
+                u32 ch = console->PopChar();
+                if (ch > 0x100 || strchr(data_ov002_02164404, ch) == NULL) {
+                    console->PushChar(ch);
+                    break;
+                }
+                text.push_back((char)ch);
+            }
+            double value = atof(text.c_str());
+            rate = MFx32::FromRaw((fx32)((float)value > 0 ? (float)value * 4096.0f + 0.5f
+                                                            : (float)value * 4096.0f - 0.5f));
+        }
+        mWindow->SetRate(rate);
+        break;
+    }
+    case 'n':
+        if (mFont != NULL) {
+            mFont->Select(DinoCleaningReadNumber(console));
+        }
+        break;
+    case 'q':
+        mWindow->SetUnkCC(DinoCleaningReadNumber(console));
+        break;
+    case 'c':
+        if (!console->IsEmpty()) {
+            u32 color = console->PopChar();
+            if (color >= '0' && color <= '9') {
+                color -= '0';
+            } else if (color >= 'a' && color <= 'f') {
+                color -= 'a' - 10;
+            } else if (color >= 'A' && color <= 'F') {
+                color -= 'A' - 5;
+            } else {
+                color = 0;
+            }
+            color++;
+            if (color == 1) {
+                color = 10;
+            }
+            if (mFont != NULL) {
+                mFont->SetShadowColor(color);
+            }
+        }
+        break;
+    }
+    return TRUE;
 }
 
 // The pooled constants the code reads.
