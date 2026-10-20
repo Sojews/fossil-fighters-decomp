@@ -223,7 +223,7 @@ void MSimpleMenu::Update() {
         if ((mInput->GetPressed() & 0x40) && mCursor != 0) {
             cursor--;
         }
-        if ((mInput->GetPressed() & 0x80) && mEntries.size() - 1 > mCursor) {
+        if ((mInput->GetPressed() & 0x80) && mCursor < mEntries.size() - 1) {
             cursor++;
         }
         if (cursor != mCursor) {

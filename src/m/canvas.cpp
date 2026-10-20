@@ -20,7 +20,7 @@ MCanvasWindow::MCanvasWindow(MCanvas *canvas, MRect rect)
 }
 
 void MCanvasWindow::DrawChar(MFont *font, MPoint pos, u32 code) {
-    mCanvas->DrawChar(font, MPoint(pos.x + mRect.left, pos.y + mRect.top), code);
+    mCanvas->DrawChar(font, pos + MPoint(mRect.left, mRect.top), code);
 }
 
 void MCanvasWindow::SetPosition(MPoint pos) {
