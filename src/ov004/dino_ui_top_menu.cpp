@@ -38,6 +38,7 @@
 #include "game/dino_ui_save_slot_select_menu.h"
 #include "game/common_window_message.h"
 #include "game/dino_static_init.h"
+#include "game/backup_validater.h"
 #include "m/indicator.h"
 #include "m/oam_canvas.h"
 #include "m/text_codec.h"
@@ -941,6 +942,79 @@ inline DinoUiSaveSlotSelectMenuItem::DinoUiSaveSlotSelectMenuItem(MSmartOam *oam
         mParallel.AddTail(clock);
     }
 }
+
+// The save's header writer, as a pooled pointer-to-member (in the slot graphics' pool).
+extern "C" struct {
+    void (DinoBackup::*WriteHeader_00)();
+} data_ov004_02172878;
+
+// Clears the slot's save and puts a fresh (empty) item in its place, relinks the items (without delete, if nothing
+// is saved now) and writes the header.
+#pragma inline_max_size(2000)
+void DinoUiSaveSlotSelectMenu::DeleteSlot(u32 slot) {
+    DinoSaveSummary summary;
+    MI_CpuFill8(&summary, 0, sizeof(summary));
+    gDinoBackup->SetSummary(slot, &summary);
+    gDinoBackup->SetSlot((slot + 1) & 1);
+    mSlots[0]->MMenuItem::Enable();
+    mSlots[1]->MMenuItem::Enable();
+    FocusItem(NULL);
+    mDeleting = FALSE;
+    data_ov004_02177280 = 0;
+    mParallel.Remove(mMessage);
+    delete mMessage;
+    RemoveItem(mSlots[slot]);
+    delete mSlots[slot];
+    mSlots[slot] = new DinoUiSaveSlotSelectMenuItem(mOam, slot, summary, slot == 0 ? MPoint(0x7C, 0x40) : MPoint(0x7C, 0x80));
+    AddItem(mSlots[slot]);
+    FocusItem(mSlots[slot]);
+    AddLink(mSlots[slot], 1, NULL);
+    if (slot == 1) {
+        AddEntry((u32)(DinoHelpItem *)mSlots[slot], 1, 0);
+        AddEntry((u32)(DinoHelpItem *)mCancel, 4, (u32)(DinoHelpItem *)mSlots[1]);
+    }
+    RemoveLink(mSlots[0], 4);
+    RemoveLink(mSlots[1], 2);
+    RemoveLink(mSlots[0], 2);
+    RemoveLink(mSlots[1], 4);
+    RemoveLink(mCancel, 4);
+    AddLink(mCancel, 4, mSlots[1]);
+    RemoveLink(mCancel, 2);
+    AddLink(mCancel, 2, mSlots[0]);
+    RemoveEntry((u32)(DinoHelpItem *)mCancel, 3);
+    BOOL empty = TRUE;
+    for (u32 i = 0; i < 2; i++) {
+        gDinoBackup->GetSummary(i, &summary);
+        if (summary.valid) {
+            empty = FALSE;
+        }
+    }
+    if (empty) {
+        RemoveItem(mDelete);
+        delete mDelete;
+        AddLink(mSlots[0], 4, mCancel);
+        AddLink(mSlots[1], 2, mCancel);
+        if (!mSlots[1]->MMenuItem::IsEnabled()) {
+            AddLink(mSlots[0], 2, mCancel);
+            RemoveLink(mCancel, 4);
+            AddLink(mCancel, 4, mSlots[0]);
+        }
+        if (!mSlots[0]->MMenuItem::IsEnabled()) {
+            AddLink(mSlots[1], 4, mCancel);
+            RemoveLink(mCancel, 2);
+            AddLink(mCancel, 2, mSlots[1]);
+        }
+        AddEntry((u32)(DinoHelpItem *)mCancel, 3, 0);
+    } else {
+        mDelete->MMenuItem::Enable();
+        mDelete->DinoHelpItem::Enable();
+        AddLink(mSlots[0], 4, mDelete);
+        AddLink(mDelete, 2, mSlots[0]);
+    }
+    mSerial.AddTail(new DinoBackupWriteValidater(NULL, NULL), MCreateBgCallTask(gDinoBackup, data_ov004_02172878.WriteHeader_00, 1),
+                    new DinoBackupWriteValidater(NULL, NULL));
+}
+#pragma inline_max_size reset
 
 // Shows the game about to be saved in the slot (a summary of it now) and presses it.
 // NONMATCHING: the game puts the summary below the inlined item's locals on the stack (and swaps the item/oam
