@@ -855,6 +855,134 @@ void DinoUiMuseumMenu::OnStart() {
 #pragma opt_common_subs reset
 #pragma auto_inline reset
 
+extern "C" const MPoint data_ov006_02196214;    // the element icon's place
+extern "C" const MPoint data_ov006_021961c4, data_ov006_021961f4, data_ov006_0219628c;  // number, name, text
+extern "C" const char data_ov006_02196eac[];    // the background
+extern "C" const char data_ov006_02196ebc[];    // the number's font
+// OnStart's function-local static: the element icons' paths, set on the first call (4 into data_ov006_02196408).
+extern "C" const char *data_ov006_0219640c[6];
+extern const u32 data_0208a584, data_0208a588, data_0208a58c, data_0208a590, data_0208a594, data_0208a598,
+    data_0208a59c, data_0208a5a0, data_0208a910;
+
+inline DinoUiMuseumInformationPageLButton::DinoUiMuseumInformationPageLButton(DinoUiMuseumInformationMenu *owner)
+    : DinoUiMuseumInformationMenuItem(owner, ((const char **)data_ov006_02196188)[2], DinoUiMuseumPoint(0x5C),
+                                      data_0208a590) {
+    SetKeys(0x200);
+    SetNoFocus(TRUE);
+}
+
+inline DinoUiMuseumInformationPageRButton::DinoUiMuseumInformationPageRButton(DinoUiMuseumInformationMenu *owner)
+    : DinoUiMuseumInformationMenuItem(owner, ((const char **)data_ov006_02196188)[4], DinoUiMuseumPoint(0x74),
+                                      data_0208a58c) {
+    SetKeys(0x100);
+    SetNoFocus(TRUE);
+}
+
+inline DinoUiMuseumInformationBackButton::DinoUiMuseumInformationBackButton(DinoUiMuseumInformationMenu *owner)
+    : DinoUiMuseumInformationMenuItem(owner, ((const char **)data_ov006_02196188)[3], data_ov006_02196288.backPos,
+                                      data_0208a584) {
+    SetKeys(2);
+    SetMode(4);
+    SetNoFocus(TRUE);
+    mMotion->Play(2, 0);
+}
+
+inline DinoUiMuseumInformationVoiceButton::DinoUiMuseumInformationVoiceButton(DinoUiMuseumInformationMenu *owner)
+    : DinoUiMuseumInformationMenuItem(owner, ((const char **)data_ov006_02196188)[10], DinoUiMuseumPoint(0x44),
+                                      data_0208a588) {
+    SetKeys(0x800);
+    SetNoFocus(TRUE);
+}
+
+#pragma auto_inline off
+// The help areas, the page, back and cry buttons, the element icons, the number, name and description, then the
+// page; fades the top screen in.
+// NONMATCHING: stack slots only: the element loop's hoisted &mParallel takes the game's lowest slot but our highest
+// (the same issue as DinoUiMuseumMenu::OnStart; every mwcc 2.0 build up to sp2 does this).
+void DinoUiMuseumInformationMenu::OnStart() {
+    SetLinkFallback(1);
+    {
+        MResource<DinoExcavateDefs> delayDefs = gDinoResource->GetExcavateDefs();
+        MResource<DinoExcavateDefs> intervalDefs = gDinoResource->GetExcavateDefs();
+        GetInput()->SetRepeat(0xF0, GetExcavate7C(delayDefs)[7], GetExcavate7C(intervalDefs)[8]);
+    }
+    mOam = new MSmartOam(10, 0, TRUE);
+    DinoHelpDummyItem *number, *element, *text;
+    mParallel.AddTail(new DinoHelpDummyItem(gLcd->GetTopDisplay(), MRect(0xC, 0xC, 0xF4, 0xB4),
+                                            std::string(gDinoResource->GetText(data_0208a5a4))));
+    mParallel.AddTail(number = new DinoHelpDummyItem(GetDisplay(), MRect(0x1C, 3, 0x42, 0x13),
+                                                     std::string(gDinoResource->GetText(data_0208a5a0))));
+    mParallel.AddTail(element = new DinoHelpDummyItem(GetDisplay(), MRect(0x44, 3, 0x53, 0x13),
+                                                      std::string(gDinoResource->GetText(data_0208a59c))));
+    mParallel.AddTail(new DinoHelpDummyItem(GetDisplay(), MRect(0x58, 3, 0xEC, 0x13),
+                                            std::string(gDinoResource->GetText(data_0208a598))));
+    mParallel.AddTail(text = new DinoHelpDummyItem(GetDisplay(), MRect(0x22, 0x25, 0xE0, 0x9D),
+                                                   std::string(gDinoResource->GetText(data_0208a594))));
+    if (mInfo->mPageCount > 1) {
+        mPageL = new DinoUiMuseumInformationPageLButton(this);
+        AddItem(mPageL);
+        mPageR = new DinoUiMuseumInformationPageRButton(this);
+        AddItem(mPageR);
+    }
+    mBack = new DinoUiMuseumInformationBackButton(this);
+    AddItem(mBack);
+    mVoice = new DinoUiMuseumInformationVoiceButton(this);
+    AddItem(mVoice);
+    AddEntry((u32)number, 2, (u32)text);
+    AddEntry((u32)element, 2, (u32)text);
+    AddEntry((u32)(DinoHelpItem *)mVoice, 4, (u32)text);
+    AddEntry((u32)(DinoHelpItem *)(DinoUiMuseumInformationBackButton *)mBack, 4, (u32)text);
+    AddEntry((u32)(DinoHelpItem *)mVoice, 1, (u32)(DinoHelpItem *)(DinoUiMuseumInformationBackButton *)mBack);
+    AddEntry((u32)(DinoHelpItem *)(DinoUiMuseumInformationBackButton *)mBack, 3, (u32)(DinoHelpItem *)mVoice);
+    u32 guard = DINO_POOL_WORD(data_ov006_02199188, 4);
+    if (!(guard & 1)) {
+        DINO_POOL_WORD(data_ov006_02196408, 0x4) = DINO_POOL_WORD(data_ov006_02196188, 0x18);
+        DINO_POOL_WORD(data_ov006_02196408, 0x8) = DINO_POOL_WORD(data_ov006_02196188, 0x38);
+        DINO_POOL_WORD(data_ov006_02196408, 0xc) = DINO_POOL_WORD(data_ov006_02196188, 0x14);
+        DINO_POOL_WORD(data_ov006_02196408, 0x10) = DINO_POOL_WORD(data_ov006_02196188, 0x1c);
+        DINO_POOL_WORD(data_ov006_02196408, 0x14) = DINO_POOL_WORD(data_ov006_02196188, 0x4);
+        DINO_POOL_WORD(data_ov006_02196408, 0x18) = DINO_POOL_WORD(data_ov006_02196188, 0x2c);
+        DINO_POOL_WORD(data_ov006_02199188, 4) = guard | 1;
+    }
+    for (int i = 0; i < 6; i++) {
+        mTypes[i] = new MMotion(std::string(data_ov006_0219640c[i]), mOam, 2, 1);
+        mTypes[i]->SetPosition(data_ov006_02196214);
+        mTypes[i]->SetPriority(0);
+        mTypes[i]->Hide();
+        ((MMotion *)mTypes[i])->Play(1, 0);
+        mParallel.AddTail(mTypes[i]);
+    }
+    mParallel.AddTail(mOam);
+    mParallel.AddTail(mBackground = new MTextPicture(std::string(data_ov006_02196eac), TRUE, false));
+    mBackground->Show();
+    mBackground->SetPriority(0);
+    MFontSet *numberFont = new MFontSet(std::string(data_ov006_02196ebc), 0, 0, 0);
+    mNumber = new MIndicator(new MObjCanvas(gCurrentDisplay, MPoint(0x40, 0x10), gDinoResource->GetUnkTable(), TRUE),
+                             numberFont, 0);
+    mParallel.AddTail(mNumber);
+    mNumber->SetPosition(data_ov006_021961c4);
+    mNumber->SetPriority(0);
+    mNumber->Show();
+    MFont *font = gDinoResource->CreateFont12(0, 1, 0);
+    mName = new MIndicator(new MObjCanvas(gCurrentDisplay, MPoint(0xA0, 0x10), gDinoResource->GetUnkTable(), TRUE),
+                           font, 0);
+    mParallel.AddTail(mName);
+    mName->SetPosition(data_ov006_021961f4);
+    mName->SetPriority(0);
+    mName->Show();
+    mDescription = new MConsole(new MObjCanvas(gCurrentDisplay, MPoint(0xB6, 0x80), gDinoResource->GetUnkTable(), TRUE),
+                                font, MPoint(0, 2), MFx32(0));
+    mDescription->SetUnk44(0);
+    mDescription->SetPriority(0);
+    mDescription->SetPosition(data_ov006_0219628c);
+    mDescription->Show();
+    mParallel.AddTail(mDescription);
+    mParallel.AddTail(new DinoGuideMessage(std::string(gDinoResource->GetText(data_0208a910))));
+    Refresh();
+    mSerial.AddTail(gLcd->mSub->mBright->CreateFadeInFromBlack(5, 0));
+}
+#pragma auto_inline reset
+
 // Moves the cursor to the item; a slot also shows its creature's name (and model) and restarts the help.
 void DinoUiMuseumMenu::OnFocus(MMenuItem *item) {
     mUnk1AC = FALSE;

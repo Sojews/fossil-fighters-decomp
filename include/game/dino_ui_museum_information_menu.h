@@ -30,7 +30,11 @@ public:
     void Refresh();
 
     MSmartOam *mOam;    // 0xB4: the items' sprites
-    u8 unkB8[0xCC - 0xB8];
+    MMenuItem *mBack;           // 0xB8
+    MMenuItem *mPageL;          // 0xBC
+    MMenuItem *mPageR;          // 0xC0
+    class DinoUiMuseumInformationVoiceButton *mVoice;   // 0xC4: plays the creature's cry
+    class MTextPicture *mBackground;    // 0xC8
     MIndicator *mNumber;        // 0xCC
     MView *mTypes[6];           // 0xD0: one shown, for the creature's element
     MIndicator *mName;          // 0xE8

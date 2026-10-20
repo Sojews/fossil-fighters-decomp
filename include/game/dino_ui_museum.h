@@ -188,6 +188,7 @@ public:
 
 class DinoUiMuseumInformationBackButton : public DinoUiMuseumInformationMenuItem {
 public:
+    DinoUiMuseumInformationBackButton(DinoUiMuseumInformationMenu *owner);
     virtual ~DinoUiMuseumInformationBackButton();
     virtual void OnFocusChanged(BOOL focused);
     virtual void OnDecide();
@@ -195,18 +196,21 @@ public:
 
 class DinoUiMuseumInformationPageLButton : public DinoUiMuseumInformationMenuItem {
 public:
+    DinoUiMuseumInformationPageLButton(DinoUiMuseumInformationMenu *owner);
     virtual ~DinoUiMuseumInformationPageLButton();
     virtual void OnDecide();
 };
 
 class DinoUiMuseumInformationPageRButton : public DinoUiMuseumInformationMenuItem {
 public:
+    DinoUiMuseumInformationPageRButton(DinoUiMuseumInformationMenu *owner);
     virtual ~DinoUiMuseumInformationPageRButton();
     virtual void OnDecide();
 };
 
 class DinoUiMuseumInformationVoiceButton : public DinoUiMuseumInformationMenuItem {
 public:
+    DinoUiMuseumInformationVoiceButton(DinoUiMuseumInformationMenu *owner);
     virtual ~DinoUiMuseumInformationVoiceButton();
     virtual void OnDecide();
 };
