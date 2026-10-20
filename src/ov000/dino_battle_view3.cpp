@@ -121,7 +121,22 @@ extern "C" const DinoLPPanelSlide data_ov000_02197368[];
 extern "C" u32 data_ov000_02197370[];
 extern "C" const s32 data_ov000_02197374[];
 extern "C" const u32 data_0208a174, data_0208a178, data_0208a17c, data_0208a184, data_0208a188, data_0208a1bc;
-extern "C" MTask *func_ov000_0218d504(DinoBattleViewLPCountPanel *panel, MPoint from, MPoint to, int frames, int ease);
+// Slides the panel and its digits from one point to another (the digits sit 10 lower, 20 apart around the middle).
+extern "C" MTask *func_ov000_0218d504(DinoBattleViewLPCountPanel *panel, MPoint from, MPoint to, u32 frames, int ease) {
+    panel->mUnk80->SetPosition(to);
+    MParallelTaskSet *tasks = new MParallelTaskSet(TRUE);
+    tasks->AddTail(panel->mPanel->CreateCoordAnime(from, to, frames, ease));
+    MPoint digitTo = to;
+    MPoint digitFrom = from;
+    digitTo.y += 10;
+    digitFrom.y += 10;
+    for (int i = 0; i < 4; i++) {
+        int dx = (i - 2) * 20 + 8;
+        tasks->AddTail(panel->mDigits[i]->CreateCoordAnime(MPoint(digitFrom.x + dx, digitFrom.y),
+                                                           MPoint(digitTo.x + dx, digitTo.y), frames, ease));
+    }
+    return tasks;
+}
 
 // NONMATCHING: the drop's end point stores its y before its x in the game.
 void DinoBattleViewDecideFirstAttackTeam::StateStart() {
