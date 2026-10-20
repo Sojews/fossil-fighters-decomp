@@ -50,9 +50,15 @@ src/ov000/dino_battle_view_field.cpp:
 src/ov000/ov000_02190654.cpp:
     .init       start:0x02190654 end:0x02190674
 
+src/ov000/ov000_02190674.cpp:
+    .init       start:0x02190674 end:0x02190694
+
 src/ov000/dino_battle_view_creature.cpp:
     .text       start:0x0216f294 end:0x021700fc
     .init       start:0x02190694 end:0x021906c4
+
+src/ov000/ov000_021906c4.cpp:
+    .init       start:0x021906c4 end:0x021906f8
 
 src/ov000/dino_battle_view_effect_telop.cpp:
     .text       start:0x02173fa8 end:0x02175b40
