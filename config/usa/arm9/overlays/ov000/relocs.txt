@@ -10764,7 +10764,7 @@ from:0x021890ec kind:thumb_call to:0x0202b3f0 module:main
 from:0x021890f6 kind:thumb_call to:0x0218a93c module:overlay(0)
 from:0x021890fc kind:thumb_call to:0x0202aa54 module:main
 from:0x02189110 kind:load to:0x0219634c module:overlay(0)
-from:0x02189114 kind:load to:0x0208a0d4 add:0x4 module:main
+from:0x02189114 kind:load to:0x0208a0d8 module:main
 from:0x02189118 kind:load to:0x020b5b1c add:0x8 module:main
 from:0x0218911c kind:load to:0x020c1b54 add:0x8 module:main
 from:0x0218912c kind:thumb_call to:0x02053244 module:main

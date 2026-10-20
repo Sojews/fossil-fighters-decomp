@@ -248,12 +248,11 @@ template MTask *MCreateBgCallTask(LoadWinnerLoad *obj, void (LoadWinnerLoad::*fu
 extern "C" struct {
     void (DinoBattleView3DAction::*LoadCsv_00)();
 } data_ov000_0219634c;
-extern const u32 kCreatureLevelLimits[2];
+extern "C" const u32 data_0208a0d8;  // the action's fade length
 extern "C" MTask *func_ov000_0218ae50(u32 arg);
 extern "C" MTask *func_ov000_0218addc(u32 arg);
 
 // Loads and plays the action's motion until it ends (or a button skips it), then wipes or fades it out.
-// NONMATCHING: the game reads the fade length (the word after kCreatureLevelLimits) as its own object.
 #pragma auto_inline off
 void DinoBattleView3DAction::Idle() {
     switch (mStep) {
@@ -273,7 +272,7 @@ void DinoBattleView3DAction::Idle() {
         break;
     case 2:
         mCsv->Push19(0x4B00);
-        mParallel.AddTail(func_ov000_0218ae50(kCreatureLevelLimits[1]));
+        mParallel.AddTail(func_ov000_0218ae50(data_0208a0d8));
         mStep++;
         break;
     case 3:
