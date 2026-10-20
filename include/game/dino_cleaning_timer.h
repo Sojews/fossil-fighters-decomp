@@ -13,8 +13,12 @@
 #include "game/help.h"
 #include "game/dino_field_camera_hook.h"
 
+class DinoCleaning;
+class MSmartOam;
+
 class DinoCleaningTimer : public MProcess {
 public:
+    DinoCleaningTimer(DinoCleaning *cleaning, u32 planes, MSmartOam *oam, u32 frames);
     void Start();
     void Stop();
     void Pause();

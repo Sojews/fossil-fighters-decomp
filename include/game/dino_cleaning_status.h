@@ -14,8 +14,12 @@ class DinoCleaningScore;
 
 class MSmartOam;
 
+class DinoCleaning;
+class MTextPicture;
+
 class DinoCleaningStatus : public MProcess {
 public:
+    DinoCleaningStatus(DinoCleaning *cleaning, u32 frames, u32 unk, u8 flag);
     virtual ~DinoCleaningStatus();
     virtual void Idle();
 
@@ -23,12 +27,14 @@ public:
     DinoCleaningScore *GetScore();
     void Start();
     void Stop();
+    void StateIdle();
     void StatePause();
     // Blinks while paused.
     void StatePaused();
 
     void (DinoCleaningStatus::*mState)(); // 0x74
-    u32 unk7C[2];
+    MTextPicture *mFrame;                 // 0x7C
+    MTextPicture *mTimerFrame;            // 0x80
     DinoCleaningTimer *mTimer;            // 0x84
     DinoCleaningScore *mScore;            // 0x88
     MSmartOam *mOam;                      // 0x8C

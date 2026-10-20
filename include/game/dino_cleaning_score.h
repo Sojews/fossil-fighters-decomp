@@ -6,8 +6,12 @@
 
 class MExtAffinePicture;
 
+class DinoCleaning;
+class MSmartOam;
+
 class DinoCleaningScore : public MProcess {
 public:
+    DinoCleaningScore(DinoCleaning *cleaning, MSmartOam *oam, u32 unk, u8 flag);
     void Show();
     void SetUnk9CC();
     virtual ~DinoCleaningScore();
