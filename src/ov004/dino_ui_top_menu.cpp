@@ -977,6 +977,103 @@ void DinoUiSaveSlotConfirmMenu::OnStart() {
 }
 #pragma inline_max_size reset
 
+inline DinoUiSaveSlotSelectMenuCancelItem::DinoUiSaveSlotSelectMenuCancelItem(MSmartOam *oam) {
+    SetKeys(2);
+    SetMode(4);
+    mMotion = new MMotion(data_ov004_02172858[7], oam, 0, 1);
+    mMotion->SetPriority(3);
+    mMotion->SetPosition(0x80, 0x60);
+    mMotion->Play(2, 0);
+    mMotion->Show();
+    mParallel.AddTail(mMotion);
+}
+
+inline DinoUiSaveSlotSelectMenuDeleteItem::DinoUiSaveSlotSelectMenuDeleteItem(MSmartOam *oam) {
+    mMotion = new MMotion(data_ov004_02172858[4], oam, 0, 1);
+    mMotion->Play(1, 0);
+    mMotion->SetPriority(3);
+    mMotion->Show();
+    mMotion->SetPosition(0x80, 0x60);
+    mParallel.AddTail(mMotion);
+}
+
+// The title, the two save slots, cancel and (if there's a save to delete) delete, linked up for the cursor.
+// NONMATCHING: as the confirm menu's OnStart (the slot item's label size pointer and play time limit), and the
+// hoisted badge kinds.
+#pragma inline_max_size(2000)
+void DinoUiSaveSlotSelectMenu::OnStart() {
+    gDinoBackup->SetTargetVolume(8);
+    gDinoBackup->SetVolume(8);
+    mDeleting = FALSE;
+    mSilentFocus = TRUE;
+    data_ov004_02177280 = 0;
+    DinoHelpBase::Disable();
+    SetLinkFallback(1);
+    {
+        MResource<DinoExcavateDefs> delayDefs = gDinoResource->GetExcavateDefs();
+        MResource<DinoExcavateDefs> intervalDefs = gDinoResource->GetExcavateDefs();
+        GetInput()->SetRepeat(0xF0, GetExcavate7C(delayDefs)[7], GetExcavate7C(intervalDefs)[8]);
+    }
+    mOam = new MSmartOam(0x3C, 0, TRUE);
+    mOam->SetUnk1C(7);
+    MMotion *motion = new MMotion(data_ov004_02172858[6], mOam, 0, 1);
+    motion->Play(1, 0);
+    motion->SetPriority(3);
+    motion->SetAnchor(3);
+    motion->SetPosition(0x80, 0x10);
+    motion->Show();
+    mParallel.AddTail(motion);
+    motion = new MMotion(data_ov004_02172858[2], mOam, 0, 1);
+    motion->Play(1, 0);
+    motion->SetPriority(3);
+    motion->SetAnchor(2);
+    motion->SetPosition(0x80, 0x10);
+    motion->Show();
+    mParallel.AddTail(motion);
+    BOOL empty = TRUE;
+    for (u32 i = 0; i < 2; i++) {
+        DinoSaveSummary summary;
+        gDinoBackup->GetSummary(i, &summary);
+        if (summary.valid) {
+            empty = FALSE;
+        }
+        mSlots[i] = new DinoUiSaveSlotSelectMenuItem(mOam, i, summary, i == 0 ? MPoint(0x7C, 0x40) : MPoint(0x7C, 0x80));
+        AddItem(mSlots[i]);
+    }
+    mCancel = new DinoUiSaveSlotSelectMenuCancelItem(mOam);
+    AddItem(mCancel);
+    if (!empty) {
+        mDelete = new DinoUiSaveSlotSelectMenuDeleteItem(mOam);
+        AddItem(mDelete);
+        AddLink(mSlots[0], 4, mDelete);
+        AddLink(mDelete, 2, mSlots[0]);
+    } else {
+        AddLink(mSlots[0], 4, mCancel);
+        AddLink(mSlots[1], 2, mCancel);
+        if (!mSlots[1]->MMenuItem::IsEnabled()) {
+            AddLink(mSlots[0], 2, mCancel);
+            RemoveLink(mCancel, 4);
+            AddLink(mCancel, 4, mSlots[0]);
+        }
+        if (!mSlots[0]->MMenuItem::IsEnabled()) {
+            AddLink(mSlots[1], 4, mCancel);
+            RemoveLink(mCancel, 2);
+            AddLink(mCancel, 2, mSlots[1]);
+        }
+        AddEntry((u32)(DinoHelpItem *)mCancel, 3, 0);
+    }
+    FocusItem(mSlots[gDinoBackup->GetSlot()]);
+    mParallel.AddTail(mOam);
+    AddLink(mCancel, 4, mSlots[1]);
+    AddLink(mCancel, 2, mSlots[0]);
+    AddLink(mSlots[0], 1, NULL);
+    AddLink(mSlots[1], 1, NULL);
+    AddEntry((u32)(DinoHelpItem *)mSlots[1], 1, 0);
+    AddEntry((u32)(DinoHelpItem *)mCancel, 4, (u32)(DinoHelpItem *)mSlots[1]);
+    DinoHelpBase::Enable();
+}
+#pragma inline_max_size reset
+
 extern u8 data_ov004_02177280;      // set when the screen saves rather than loads
 extern const u32 data_0208ad88;
 extern const u32 data_0208ad90;

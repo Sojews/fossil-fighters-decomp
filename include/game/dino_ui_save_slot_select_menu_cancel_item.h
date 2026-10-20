@@ -5,8 +5,10 @@
 #include "m/menu_item.h"
 #include "game/help.h"
 
+class MSmartOam;
 class DinoUiSaveSlotSelectMenuCancelItem : public MMenuItem, public DinoHelpItem {
 public:
+    DinoUiSaveSlotSelectMenuCancelItem(MSmartOam *oam);
     virtual ~DinoUiSaveSlotSelectMenuCancelItem();
     virtual MRect GetFrame();
     virtual void OnFocusChanged(BOOL focused);

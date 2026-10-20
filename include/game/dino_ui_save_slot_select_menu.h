@@ -4,6 +4,7 @@
 #include "m/menu.h"
 #include "game/help.h"
 
+class MSmartOam;
 class DinoUiSaveSlotSelectMenuItem;
 class DinoUiSaveSlotSelectMenuCancelItem;
 class DinoUiSaveSlotSelectMenuDeleteItem;
@@ -23,7 +24,7 @@ public:
     void DeleteSlot(u32 slot);
 
     u32 *mResult;   // 0xB4
-    u32 mUnkB8;     // 0xB8
+    MSmartOam *mOam;    // 0xB8
     DinoUiSaveSlotSelectMenuItem *mSlots[2];    // 0xBC
     DinoUiSaveSlotSelectMenuCancelItem *mCancel; // 0xC4
     DinoUiSaveSlotSelectMenuDeleteItem *mDelete; // 0xC8
