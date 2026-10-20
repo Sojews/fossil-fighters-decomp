@@ -1,5 +1,5 @@
 // DinoCleaningDummyItem.
-// Only the destructors are decompiled so far.
+// Also the cleaning tool menu, its X-ray and tool items.
 
 // Derived destructors have their bases' destructor bodies inlined; auto-inlining the ones defined above does that.
 #pragma auto_inline on
@@ -13,6 +13,7 @@
 #include "game/dino_common_live.h"
 #include "game/dino_cleaning.h"
 #include "game/dino_static_init.h"
+#include "game/dino_backup.h"
 
 DinoCleaningDummyItem::~DinoCleaningDummyItem() {
 }
@@ -130,13 +131,13 @@ MRect DinoCleaningXrayItem::GetFrame() {
 // Focuses the first tool unless something has the focus.
 void DinoCleaningToolMenu::FocusFirst() {
     if (GetFocusedItem() == NULL) {
-        FocusItem((MMenuItem *)mUnkB8.front());
+        FocusItem((MMenuItem *)mTools.front());
     }
 }
 
 // Disables every tool and takes the focus away.
 void DinoCleaningToolMenu::DisableAll() {
-    for (std::vector<void *>::iterator it = mUnkB8.begin(); it != mUnkB8.end(); ++it) {
+    for (std::vector<void *>::iterator it = mTools.begin(); it != mTools.end(); ++it) {
         ((MMenuItem *)*it)->Disable();
     }
     Deactivate();
@@ -144,23 +145,45 @@ void DinoCleaningToolMenu::DisableAll() {
 }
 
 void DinoCleaningToolMenu::EnableItem() {
-    mItemB4->Enable();
+    mXrayItem->Enable();
 }
 
 void DinoCleaningToolMenu::DisableItem() {
-    mItemB4->Disable();
+    mXrayItem->Disable();
 }
 
 #pragma auto_inline off
 
 DinoCleaningToolMenu::DinoCleaningToolMenu(u32 arg0, u32 arg1, u32 arg2)
-    : MMenu(0), mUnkA8(arg0), mUnkAC(arg1), mUnkB0(arg2) {
+    : MMenu(0), mCleaning((DinoCleaning *)arg0), mOam((MSmartOam *)arg1), mSelected((u32 *)arg2) {
+}
+
+extern const u32 data_0208ad3c, data_0208ad40, data_0208ad44, data_0208ad48; // the tools' texts
+
+// Makes the items: a dummy that takes the keys, the X-ray, and the tools the player has.
+void DinoCleaningToolMenu::OnStart() {
+    const char **motions = (const char **)data_ov002_02165418;
+    AddItem(new DinoCleaningDummyItem());
+    mXrayItem = new DinoCleaningXrayItem(mCleaning, mOam);
+    AddItem(mXrayItem);
+    MMenuItem *item;
+    AddItem(item = new DinoCleaningToolMenuItem(mCleaning, mOam, motions[4], mSelected, data_0208ad48, 2));
+    mTools.push_back(item);
+    if (gDinoBackup->GetSystemFlag(0x22)) {
+        AddItem(item = new DinoCleaningToolMenuItem(mCleaning, mOam, motions[1], mSelected, data_0208ad44, 3));
+        mTools.push_back(item);
+    }
+    AddItem(item = new DinoCleaningToolMenuItem(mCleaning, mOam, motions[5], mSelected, data_0208ad40, 0));
+    mTools.push_back(item);
+    if (gDinoBackup->GetSystemFlag(0x21)) {
+        AddItem(item = new DinoCleaningToolMenuItem(mCleaning, mOam, motions[3], mSelected, data_0208ad3c, 1));
+        mTools.push_back(item);
+    }
 }
 
 // The file's static initialization (see dino_static_init.h).
 // NONMATCHING: scheduling. The game hoists the screen rect's zero half (past the pool's 0x80 anchor) above the
 // screen size's stores; mwcc treats our pool accesses as one object and keeps them in order.
-extern "C" u32 data_ov002_02165418[];
 #pragma always_inline on
 static struct DinoCleaningDummyItemStaticInit {
     DinoCleaningDummyItemStaticInit() {

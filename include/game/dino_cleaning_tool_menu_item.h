@@ -4,12 +4,26 @@
 #include "game/dino_resource.h"
 #include "game/help.h"
 #include "m/menu_item.h"
+#include <string>
 #include "m/motion.h"
+#include "game/dino_se_motion.h"
 
 class DinoCleaning;
 
 class DinoCleaningToolMenuItem : public DinoHelpItem, public MMenuItem {
 public:
+    DinoCleaningToolMenuItem(DinoCleaning *cleaning, MSmartOam *oam, const char *motion, u32 *selected,
+                             const u32 &textId, u32 tool)
+        : mCleaning(cleaning), mTextId(textId), mSelected(selected), mTool(tool) {
+        mMotion = new DinoSeMotion(std::string(motion), oam, 0, 1);
+        ((DinoSeMotion *)mMotion)->AddSe(0x42);
+        mMotion->Play(1, 0);
+        mMotion->SetPriority(1);
+        mMotion->SetAnchor(3);
+        mMotion->SetPosition(0x80, 0x60);
+        mMotion->Show();
+        mParallel.AddTail(mMotion);
+    }
     virtual ~DinoCleaningToolMenuItem();
     virtual MRect GetRect();
     virtual MDisplay *GetDisplay();
