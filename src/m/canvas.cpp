@@ -190,18 +190,27 @@ void MDummyCanvas::Execute() {
 
 // Reads one row of pixels (4 bytes a tile) across a canvas's tiles.
 void MCanvas::ReadRow(MChrBlock *chr, int start, int tilesWide, int y, u32 *dest) {
-    const u32 *src = (const u32 *)(chr->addr + (start + (y >> 3) * tilesWide) * chr->unitSize) + (y & 7);
-    for (; tilesWide > 0; tilesWide--) {
-        *dest++ = *src;
-        src += 8;
+    int row = y >> 3;
+    int index = start + row * tilesWide;
+    u8 *p = (u8 *)chr->addr + index * chr->unitSize + ((y & 7) << 2);
+    while (tilesWide > 0) {
+        *dest++ = *(u32 *)p;
+        p += 32;
+        tilesWide--;
     }
 }
 
 void MCanvas::WriteRow(MChrBlock *chr, int start, int tilesWide, int y, const u32 *src) {
-    u32 *dest = (u32 *)(chr->addr + (start + (y >> 3) * tilesWide) * chr->unitSize) + (y & 7);
-    for (; tilesWide > 0; tilesWide--) {
-        *dest = *src++;
-        dest += 8;
+    u8 *base = (u8 *)chr->addr;
+    int row = y >> 3;
+    int col = y & 7;
+    int index = start + row * tilesWide;
+    u8 *p = base + index * chr->unitSize + col * 4;
+    while (tilesWide > 0) {
+        *(u32 *)p = *src;
+        p += 0x20;
+        src++;
+        tilesWide--;
     }
 }
 

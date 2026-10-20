@@ -351,10 +351,11 @@ void __unexpected(CatchInfo *catchinfo) {
 }
 
 // The thrown type broke an exception specification: unwind to it and run its unexpected handler.
-// NONMATCHING: the game copies the action argument into r2 before saving the context pointer (two moves swapped).
+// (exception_terminate: no exit edges during the unwind, as in the runtime source.)
 void func_020878e8(ThrowContext *context, ExceptionInfo *info, ExceptionSpecification *spec, u8 *action) {
     CatchInfo *ci;
 
+#pragma exception_terminate
     func_0208714c(context, info, action);
     ci = (CatchInfo *)(context->frame + spec->unk8);
     ci->location = context->location;
