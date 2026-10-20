@@ -15,6 +15,7 @@ public:
     }
     MFx32 Mul(MFx32 b) const;
     MFx32 &operator+=(MFx32 b);
+    MFx32 &operator-=(MFx32 b);
     MFx32 &operator*=(MFx32 b);
     MFx32 &operator/=(MFx32 b);
 
@@ -84,6 +85,11 @@ inline MFx32 &MFx32::operator+=(MFx32 b) {
     return *this;
 }
 
+inline MFx32 &MFx32::operator-=(MFx32 b) {
+    *this = *this - b;
+    return *this;
+}
+
 inline MFx32 &MFx32::operator*=(MFx32 b) {
     *this = *this * b;
     return *this;
@@ -119,13 +125,13 @@ struct MFx32Point {
     }
 
     MFx32Point &operator+=(const MFx32Point &o) {
-        x = o.x + x;
-        y = o.y + y;
+        x += o.x;
+        y += o.y;
         return *this;
     }
     MFx32Point &operator-=(const MFx32Point &o) {
-        x = x - o.x;
-        y = y - o.y;
+        x -= o.x;
+        y -= o.y;
         return *this;
     }
     // (With the hardware square root.)
