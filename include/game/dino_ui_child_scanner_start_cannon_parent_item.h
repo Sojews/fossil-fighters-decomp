@@ -7,6 +7,7 @@
 
 class DinoUiChildScannerStartCannonParentItem : public MMenuItem, public DinoHelpItem {
 public:
+    DinoUiChildScannerStartCannonParentItem(MSmartOam *oam);
     virtual ~DinoUiChildScannerStartCannonParentItem();
     virtual MRect GetFrame();
     virtual void OnFocusChanged(BOOL focused);

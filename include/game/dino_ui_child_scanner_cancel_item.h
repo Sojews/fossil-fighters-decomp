@@ -7,6 +7,7 @@
 
 class DinoUiChildScannerCancelItem : public MMenuItem, public DinoHelpItem {
 public:
+    DinoUiChildScannerCancelItem(MSmartOam *oam);
     virtual ~DinoUiChildScannerCancelItem();
     virtual MRect GetFrame();
     virtual void OnFocusChanged(BOOL focused);

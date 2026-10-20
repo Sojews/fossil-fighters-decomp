@@ -43,6 +43,7 @@ public:
 
 class DinoUiChildScannerParentItem : public MMenuItem {
 public:
+    DinoUiChildScannerParentItem(MSmartOam *oam, u32 index);
     virtual ~DinoUiChildScannerParentItem();
     virtual MRect GetFrame();
     virtual void OnFocusChanged(BOOL focused);
@@ -82,12 +83,13 @@ public:
     u32 *mChosen;               // 0xEC: set when a partner was chosen
     u32 *mChoice;               // 0xF0
     u8 mSilentFocus;            // 0xF4
-    u8 unkF5[7];
+    u8 unkF5[3];
+    MSmartOam *mOam;            // 0xF8
     DinoUiChildScannerParentItem *mParents[9]; // 0xFC: the consoles found
     MMenuItem *mStartBattleItem;    // 0x120
     MMenuItem *mStartCannonItem;    // 0x124
     MMenuItem *mCancelItem;         // 0x128
-    DinoHelpItem *mParentHelp;  // 0x12C: help shown for every parent item
+    DinoHelpDummyItem *mParentHelp; // 0x12C: help shown for every parent item
     void Rescan();
 };
 

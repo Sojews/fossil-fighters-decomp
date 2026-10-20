@@ -51,6 +51,15 @@ struct MRect {
         bottom += p.y;
     }
 
+    // Moves the rect by (dx, dy) in place (returning it).
+    MRect &Shift(int dx, int dy) {
+        left += dx;
+        top += dy;
+        right += dx;
+        bottom += dy;
+        return *this;
+    }
+
     void MoveTo(MPoint p) {
         right += p.x - left;
         bottom += p.y - top;

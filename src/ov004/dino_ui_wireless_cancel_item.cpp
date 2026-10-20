@@ -38,6 +38,8 @@ template <class T> MTask *MCreateBgCallTask(T *obj, void (T::*func)(), int threa
 #include "game/dino_common_window_yes_no_dialog.h"
 #include <stdio.h>
 #include "game/dino_static_init.h"
+#include "game/dino_guide_message.h"
+#include "m/input.h"
 
 DinoUiWirelessCancelItem::~DinoUiWirelessCancelItem() {
 }
@@ -269,14 +271,17 @@ void DinoUiCannonParentScanner::ShowCount() {
 // points to).
 typedef void (DinoUiWirelessMatch::*DinoUiWirelessMatchState)();
 extern "C" struct {
-    u8 unk00[0x10];
+    u8 unk00[0x8];
+    const char *mStartCannonPath;   // 0x08
+    const char *mTitlePath2;    // 0x0C: (the scan screen's second picture)
     const char *mDigitPath;     // 0x10: the count's digits
     const char *mParentPath2;   // 0x14: the parent items' motions, by mode
     u32 mMaxRockCount;          // 0x18
     const char *mParentPath0;   // 0x1c
     const char *mCancelPath;    // 0x20
     const char *mParentPath1;   // 0x24
-    u8 unk28[0x30 - 0x28];
+    const char *mStartBattlePath;   // 0x28
+    const char *mTitlePath;     // 0x2C: (the scan screen's first picture)
     const char *mCountFramePath; // 0x30
     DinoUiWirelessMatchState StateAfterReset; // 0x34
     void (DinoUiCannonChild::*Leave_3C)(); // 0x3c
@@ -306,6 +311,7 @@ extern "C" struct {
     void (DinoUiCannonParentScanner::*StateWaitChildren_64)(); // 0x64
     MPoint mParentNameFocusedOffset; // 0x6c
     void (DinoUiCannonParentScanner::*OnConnectMessage_74)(MMessage *msg); // 0x74
+    MPoint mStartCannonPos; // 0x7c (its y is in the next block)
 } data_ov004_02174150;
 extern "C" struct {
     u8 unk00[0x4];
@@ -361,7 +367,7 @@ extern "C" struct {
     void (DinoUiCannonChild::*ChildStart_5C)(); // 0x5c
     u8 unk64[0x6C - 0x64];
     void (DinoUiChildScannerBattleConnect::*BattleStart_6C)(); // 0x6c
-    u8 unk74[0x7C - 0x74];
+    MPoint mStartBattlePos; // 0x74
     void (DinoUiChildScannerBattleConnect::*StateCancel_7C)(); // 0x7c (its second word is in the next block)
 } data_ov004_021742d0;
 extern "C" struct {
@@ -557,6 +563,128 @@ void DinoUiChildScannerParentItem::SetParent(u32 mode, const std::wstring &name)
         mName = NULL;
     }
     OnFocusChanged(IsFocused());
+}
+
+extern const u32 data_0208ad84, data_0208acd0;
+
+inline DinoUiChildScannerParentItem::DinoUiChildScannerParentItem(MSmartOam *oam, u32 index)
+    : mOam(oam), mUnk8C(index) {
+    mMode = 0;
+    mName = NULL;
+    mPos.x = (index % 3 - 1) * 0x54 + 0x80;
+    mPos.y = (index / 3 - 1) * 0x20 + 0x50;
+    mMotion = new MMotion(data_ov004_021740d0.mParentPath0, oam, 0, 1);
+    mMotion->SetPosition(mPos);
+    mMotion->SetPriority(3);
+    mMotion->Play(1, 0);
+    mMotion->Show();
+    mParallel.AddTail(mMotion);
+}
+
+inline DinoUiChildScannerStartBattleParentItem::DinoUiChildScannerStartBattleParentItem(MSmartOam *oam) {
+    mMotion = new MMotion(data_ov004_021740d0.mStartBattlePath, oam, 0, 1);
+    mMotion->SetPosition(data_ov004_021742d0.mStartBattlePos);
+    mMotion->SetPriority(3);
+    mMotion->Play(1, 0);
+    mMotion->Show();
+    mParallel.AddTail(mMotion);
+}
+
+inline DinoUiChildScannerStartCannonParentItem::DinoUiChildScannerStartCannonParentItem(MSmartOam *oam) {
+    mMotion = new MMotion(data_ov004_021740d0.mStartCannonPath, oam, 0, 1);
+    mMotion->SetPosition(data_ov004_02174150.mStartCannonPos);
+    mMotion->SetPriority(3);
+    mMotion->Play(1, 0);
+    mMotion->Show();
+    mParallel.AddTail(mMotion);
+}
+
+inline DinoUiChildScannerCancelItem::DinoUiChildScannerCancelItem(MSmartOam *oam) {
+    SetKeys(2);
+    SetMode(4);
+    mMotion = new MMotion(data_ov004_021740d0.mCancelPath, oam, 0, 1);
+    mMotion->SetPosition(0x80, 0x60);
+    mMotion->SetPriority(3);
+    mMotion->Play(2, 0);
+    mMotion->Show();
+    mParallel.AddTail(mMotion);
+}
+
+// The excavation settings' section at offset7C (the input repeat is at 0x1C and 0x20).
+static inline const int *GetExcavate7C(const MResource<DinoExcavateDefs> &defs) {
+    const DinoExcavateDefs *d = const_cast<MResource<DinoExcavateDefs> &>(defs).Get();
+    if (d->offset7C == 0) {
+        return NULL;
+    }
+    return (const int *)((const u8 *)d + d->offset7C);
+}
+
+void DinoUiChildScanner::OnStart() {
+    mSilentFocus = TRUE;
+    DinoHelpBase::Disable();
+    mParentHelp = new DinoHelpDummyItem(gCurrentDisplay, MRect(5, 0x20, 0xF8, 0x79).Shift(0, 4),
+                                        std::string(gDinoResource->GetText(data_0208ad84)));
+    mParallel.AddTail(mParentHelp);
+    DinoSoundPlayBgm(0x78, 0);
+    mMultiPlay->AddObserver(this);
+    mParallel.AddTail(new DinoGuideMessage(std::string(gDinoResource->GetText(data_0208acd0))));
+    GetInput()->SetRepeat(0xF0, GetExcavate7C(gDinoResource->GetExcavateDefs())[7],
+                          GetExcavate7C(gDinoResource->GetExcavateDefs())[8]);
+    mOam = new MSmartOam(0x50, 0, 1);
+    mOam->SetUnk1C(7);
+    mOam->mHidden = TRUE;
+    MMotion *title = new MMotion(data_ov004_021740d0.mTitlePath, mOam, 0, 1);
+    title->SetPriority(3);
+    title->SetAnchor(3);
+    title->SetPosition(MPoint(0x80, 0x10));
+    title->Play(1, 0);
+    title->Show();
+    mParallel.AddTail(title);
+    MMotion *title2 = new MMotion(data_ov004_021740d0.mTitlePath2, mOam, 0, 1);
+    title2->SetPriority(3);
+    title2->SetAnchor(3);
+    title2->SetPosition(MPoint(0x80, 0x10));
+    title2->Play(1, 0);
+    title2->Show();
+    mParallel.AddTail(title2);
+    mParallel.AddTail(mOam);
+    for (u32 i = 0; i < 9; i++) {
+        mParents[i] = new DinoUiChildScannerParentItem(mOam, i);
+        AddItem(mParents[i]);
+    }
+    mStartBattleItem = new DinoUiChildScannerStartBattleParentItem(mOam);
+    AddItem(mStartBattleItem);
+    mStartCannonItem = new DinoUiChildScannerStartCannonParentItem(mOam);
+    AddItem(mStartCannonItem);
+    mCancelItem = new DinoUiChildScannerCancelItem(mOam);
+    AddItem(mCancelItem);
+    SetLinkFallback(1);
+    for (u32 i = 0; i < 9; i += 3) {
+        AddLink(mParents[i], 3, mParents[i + 2]);
+        AddLink(mParents[i + 2], 1, mParents[i]);
+    }
+    for (u32 i = 6; i < 9; i++) {
+        AddLink(mParents[i], 2, mStartBattleItem);
+    }
+    AddLink(mStartBattleItem, 4, mParents[6]);
+    AddLink(mStartBattleItem, 1, mCancelItem);
+    AddLink(mStartBattleItem, 3, mCancelItem);
+    AddLink(mStartCannonItem, 1, mCancelItem);
+    AddLink(mStartCannonItem, 3, mCancelItem);
+    AddLink(mStartCannonItem, 2, mParents[0]);
+    RemoveLink(mParents[8], 2);
+    AddLink(mParents[8], 2, mCancelItem);
+    AddLink(mParents[0], 4, mStartCannonItem);
+    AddLink(mParents[1], 4, mStartCannonItem);
+    AddLink(mParents[2], 4, mCancelItem);
+    AddLink(mCancelItem, 3, mStartCannonItem);
+    AddLink(mCancelItem, 1, mStartCannonItem);
+    AddLink(mCancelItem, 4, mParents[8]);
+    AddLink(mCancelItem, 2, mParents[2]);
+    FocusItem(mStartBattleItem);
+    mSerial.AddTail(mMultiPlay->CreateStartScanTask());
+    DinoHelpBase::Enable();
+    mSerial.AddTail(mOam->CreateShowTransfer());
 }
 
 // Forgets the consoles found and scans again.
