@@ -36,6 +36,11 @@
 #include "game/dino_field_capture_fade_out_task.h"
 #include "game/dino_field_player_control.h"
 #include "m/3d_scene.h"
+#include "m/looper.h"
+#include "m/motion.h"
+#include "game/help.h"
+#include "game/dino_backup.h"
+#include "game/dino_resource.h"
 
 void DinoField::CreateEffects(MPolygonChar **effects, u32 count, u32 id) {
     if (effects[0] != NULL) {
@@ -152,8 +157,7 @@ void DinoField::SetUnk258(BOOL value) {
         return;
     }
     mUnk258 = value;
-    mUnk25C = 0;
-    mUnk260 = 0;
+    mFrames = 0;
     if (mUnk258) {
         mUnk264 = FALSE;
         Disable();
@@ -1222,6 +1226,85 @@ void DinoField::HideUnk2B4() {
     mCamera->mNamePanel->SetMode(0, 1);
 }
 
+// Each frame: measures the CPU load, shakes the screen while quaking, then (from the second frame) starts the
+// two menu sprites' animations and enables the help that goes with them.
+void DinoField::Idle() {
+    mLoad[mLoadIndex] = gLooper->GetVCountMargin() * 100 / 262;
+    mLoadIndex = (mLoadIndex + 1) % 10;
+    mLoadAverage = 0;
+    for (u32 i = 0; i < 10; i++) {
+        mLoadAverage += mLoad[i];
+    }
+    mLoadAverage /= 10;
+    if (mQuake) {
+        mQuakeTime++;
+        if ((int) mQuakeTime >= (int) mQuakeArgs[2]) {
+            mQuake = FALSE;
+            mScene->SetUnk164(0, 0);
+            if (mUpperPict != NULL) {
+                mUpperPict->SetPosition(mUpperPos);
+            }
+            if (mLowerPict != NULL) {
+                mLowerPict->SetPosition(mLowerPos);
+            }
+        } else {
+            int amp = mQuakeArgs[0] + (int) (mQuakeArgs[1] - mQuakeArgs[0]) * (int) mQuakeTime / (int) mQuakeArgs[2];
+            int x;
+            int y;
+            int half = amp / 2;
+            y = gDinoResource->GetRandom()->Next(amp) - half;
+            x = gDinoResource->GetRandom()->Next(amp) - half;
+            mScene->SetUnk164((x << 12) / 256, (y << 12) / 256);
+            if (mUpperPict != NULL) {
+                mUpperPict->SetPosition(MPoint(mUpperPos.x - x, mUpperPos.y - y));
+            }
+            if (mLowerPict != NULL) {
+                mLowerPict->SetPosition(MPoint(mLowerPos.x - x, mLowerPos.y - y));
+            }
+        }
+    }
+    mFrames++;
+    if (mFrames > 1) {
+        if (mUnk264) {
+            mUnk264 = FALSE;
+            DinoHelpBase::Enable();
+        }
+        if (mUnk258) {
+            if (gDinoBackup->GetSystemFlag(0x1C) && mUnk2B4->GetAnime() != 3 && mUnk2B4->GetAnime() != -1) {
+                mUnk2B4->Play(3, 0);
+            }
+        } else {
+            if (gDinoBackup->GetSystemFlag(0x1C) && mUnk2B4->GetAnime() != 1 && mUnk2B4->GetAnime() != 2) {
+                mUnk2B4->Play(1, 0);
+            }
+        }
+        if (mUnk258) {
+            if (gDinoBackup->GetSystemFlag(0x20) && mUnk2BC->GetAnime() != 3 && mUnk2BC->GetAnime() != -1) {
+                mUnk2BC->Play(3, 0);
+            }
+        } else {
+            if (gDinoBackup->GetSystemFlag(0x20) && mUnk2BC->GetAnime() != 1 && mUnk2BC->GetAnime() != 2) {
+                mUnk2BC->Play(1, 0);
+            }
+        }
+    }
+    if (mUnk2B4->GetAnime() == 1 || mUnk2B4->GetAnime() == 2) {
+        mUnk2B8->Enable();
+    } else {
+        mUnk2B8->Disable();
+    }
+    if (mUnk2BC->GetAnime() == 1 || mUnk2BC->GetAnime() == 2) {
+        mUnk2C0->Enable();
+    } else {
+        mUnk2C0->Disable();
+    }
+    if (!mUnk2B8->IsEnabled() && !mUnk2C0->IsEnabled()) {
+        mUnk2C4->Enable();
+    } else {
+        mUnk2C4->Disable();
+    }
+}
+
 // NONMATCHING (and WalkOnLand1): the game keeps the run test even with run 0 (movs r2, #0; bne).
 void DinoField::WalkOnLand0(u32 dir) {
     if (mMap->GetMapData()[0x68] == 0) {
@@ -1401,7 +1484,7 @@ static inline MFx32 MFx32Floor(MFx32 x) {
 // the slots by 4), and stores the rotation after working out its y.
 void DinoField::Step(u32 dir, DinoFieldStep *step, int a, int frames, int c) {
     DinoFieldChara *chara = (DinoFieldChara *) dir;
-    if (mUnk3C4 >= 90) {
+    if (mLoadAverage >= 90) {
         return;
     }
     MFx32 speed = mMap->GetWalkSpeed();

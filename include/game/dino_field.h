@@ -497,8 +497,7 @@ public:
     MTaskSet *mRockHoles;       // 0x254
     u8 mUnk258;                 // 0x258: the player can't move (an event is running)
     u8 unk259[3];
-    u32 mUnk25C;                // 0x25C
-    u32 mUnk260;                // 0x260
+    u64 mFrames;                // 0x25C: frames run
     u8 mUnk264;                 // 0x264
     u8 unk265[3];
     MTaskSet *mFadeTasks;       // 0x268
@@ -517,10 +516,10 @@ public:
     u32 mQuakeArgs[3];          // 0x2A4
     u32 mQuakeTime;             // 0x2B0
     MMotion *mUnk2B4;           // 0x2B4
-    MTask *mUnk2B8;             // 0x2B8
+    DinoHelpItem *mUnk2B8;      // 0x2B8: help while mUnk2B4 plays anime 1 or 2
     MMotion *mUnk2BC;           // 0x2BC
-    MTask *mUnk2C0;             // 0x2C0
-    MTask *mUnk2C4;             // 0x2C4
+    DinoHelpItem *mUnk2C0;      // 0x2C0: help while mUnk2BC plays anime 1 or 2
+    DinoHelpItem *mUnk2C4;      // 0x2C4: help while neither does
     BOOL *mUnk2C8;              // 0x2C8
     DinoFieldKasekiRock *mKasekiRocks[20]; // 0x2CC
     MTaskSet *mKasekiRockTasks; // 0x31C
@@ -533,8 +532,9 @@ public:
     MResource<DinoFieldDefs> mDefs; // 0x380
     DinoFieldPoint *mMoney;     // 0x390: the money panel, while shown
     DinoFieldPoint *mDonate;    // 0x394
-    u8 unk398[0x2C];
-    u32 mUnk3C4;                // 0x3C4: no step effects from 90 on
+    int mLoad[10];              // 0x398: the last frames' CPU load, in percent
+    u32 mLoadIndex;             // 0x3C0
+    u32 mLoadAverage;           // 0x3C4: no step effects from 90 on
     u8 mUnk3C8;                 // 0x3C8
 };
 
