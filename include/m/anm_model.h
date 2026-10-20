@@ -156,6 +156,8 @@ public:
     virtual void Unk0C();
 
     VecFx32 mTarget;                    // 0x1A8
+    VecFx32 mPrev;                      // 0x1B4: last frame's target, for smoothing
+    int mSwayPhase;                     // 0x1C0
 };
 
 class MAnmSE : public MAnmModelBase {

@@ -381,6 +381,112 @@ MAnmModelBase::~MAnmModelBase() {
 }
 #pragma auto_inline reset
 
+// NONMATCHING: the game keeps the sine table's address in a register and works out both angles' indices first.
+// Aims the scene's camera: orbits the target (tracks 3, 4: angles, 6: distance), smoothed (11), with the field of
+// view (7) and a sway (8, 9: amounts, 10: period).
+void MAnmTargetCamera::Unk0C() {
+    if (mFrame < mStartFrame) {
+        return;
+    }
+    int pitch = (u16)(GetValue(3, mFrame - mStartFrame) * 16 / 360);
+    int yaw = (u16)(GetValue(4, mFrame - mStartFrame) * 16 / 360);
+    fx32 distance = GetValue(6, mFrame - mStartFrame);
+    mPos.x = mPos.y = mPos.z = 0;
+    if (mTracks[0].size() != 0) {
+        mPos.x = GetValue(0, mFrame - mStartFrame);
+    }
+    if (mTracks[1].size() != 0) {
+        mPos.y = GetValue(1, mFrame - mStartFrame);
+    }
+    if (mTracks[2].size() != 0) {
+        mPos.z = GetValue(2, mFrame - mStartFrame);
+    }
+    mPos.x += mTarget.x + mMatrix._30;
+    mPos.y += mTarget.y + mMatrix._31;
+    mPos.z += mTarget.z + mMatrix._32;
+    int smooth = 0;
+    if (mTracks[11].size() != 0) {
+        smooth = GetValue(11, mFrame - mStartFrame);
+    }
+    smooth >>= 4;
+    if (smooth > 0) {
+        int x = (mPos.x * (0x100 - smooth) + mPrev.x * smooth) >> 8;
+        int y = (mPos.y * (0x100 - smooth) + mPrev.y * smooth) >> 8;
+        int z = (mPos.z * (0x100 - smooth) + mPrev.z * smooth) >> 8;
+        if (x != mPrev.x) {
+            mPos.x = x;
+        }
+        if (y != mPrev.y) {
+            mPos.y = y;
+        }
+        if (z != mPrev.z) {
+            mPos.z = z;
+        }
+    }
+    mPrev.x = mPos.x;
+    mPrev.y = mPos.y;
+    mPrev.z = mPos.z;
+    const fx16 *table = FX_SinCosTable_;
+    int p = ((u16)pitch >> 4) * 2;
+    int y = ((u16)yaw >> 4) * 2;
+    VecFx32 v;
+    v.x = distance * table[p + 1] >> FX32_SHIFT;
+    v.y = distance * table[p] >> FX32_SHIFT;
+    v.z = v.x;
+    fx16 sinYaw = table[y];
+    v.x = mPos.x + (sinYaw * v.z >> FX32_SHIFT);
+    v.y += mPos.y;
+    fx16 cosYaw = table[y + 1];
+    v.z = mPos.z + (v.z * cosYaw >> FX32_SHIFT);
+    mScene->SetCameraPos(&v);
+    mScene->SetCameraTarget(&mPos);
+    fx16 sin0 = table[0];
+    v.x = FX_Mul(sin0, cosYaw);
+    v.y = table[1];
+    v.z = -FX_Mul(sin0, sinYaw);
+    mScene->SetCameraUp(&v);
+    if (mTracks[7].size() != 0) {
+        int fov = GetValue(7, mFrame - mStartFrame) * 16 / 360;
+        mScene->SetFov((u16)(fov / 2));
+    }
+    mPos.x = mPos.y = mPos.z = 0;
+    if (mTracks[8].size() != 0) {
+        mPos.x = GetValue(8, mFrame - mStartFrame);
+    }
+    if (mTracks[9].size() != 0) {
+        mPos.y = GetValue(9, mFrame - mStartFrame);
+    }
+    int period;
+    if (mTracks[10].size() != 0) {
+        period = GetValue(10, mFrame - mStartFrame);
+    }
+    mPos.x >>= FX32_SHIFT;
+    mPos.y >>= FX32_SHIFT;
+    period >>= FX32_SHIFT;
+    if (mPos.x == 0 && mPos.y == 0) {
+        mSwayPhase = 0;
+    } else if (period > 0) {
+        int wave;
+        switch ((mSwayPhase >> 10) & 3) {
+        case 0:
+            wave = mSwayPhase & 0x3FF;
+            break;
+        case 1:
+            wave = 0x400 - (mSwayPhase & 0x3FF);
+            break;
+        case 2:
+            wave = -(mSwayPhase & 0x3FF);
+            break;
+        case 3:
+            wave = -(0x400 - (mSwayPhase & 0x3FF));
+            break;
+        }
+        mScene->SetUnk164((mPos.x * wave >> 10 << 12) / 256, (mPos.y * wave >> 10 << 12) / 0xC0);
+        mSwayPhase += 0x1000 / period;
+    }
+    PlaySounds(mFrame - mStartFrame);
+}
+
 // The shadow: plays the model's animation and follows the transform tracks, on the ground.
 void MAnmModelSh::Unk0C() {
     if (!mLoaded) {
