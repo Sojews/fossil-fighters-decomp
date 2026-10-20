@@ -13,6 +13,50 @@
 #include "m/console.h"
 #include "game/dino_common_font.h"
 #include "m/fx32.h"
+#include <string>
+#include "game/dino_resource.h"
+#include "m/motion.h"
+#include "m/smart_oam.h"
+#include "m/blend.h"
+#include "m/oam_canvas.h"
+#include "m/lcd.h"
+
+// The TU's pooled statics.
+extern "C" struct {
+    u32 unk00;
+    const char *cursorPath;     // 0x04
+    const char *windowPath;     // 0x08
+    u8 unk0C[0x34 - 0x0C];
+    MPoint canvasSize;          // 0x34: the console's
+} data_ov000_02197560;
+
+DinoBattleViewTutorialWindow::DinoBattleViewTutorialWindow()
+    : MProcess(NULL), mPicture(std::string(data_ov000_02197560.windowPath), 7) {
+    gLcd->GetTopDisplay()->mBlend->Reset();
+    DinoCommonFont *font = new DinoCommonFont(0, 1, 0);
+    mFrame = new MTextPicture(gLcd->GetTopDisplay(), mPicture, TRUE, false);
+    mFrame->SetPosition(0, 0x1C);
+    mFrame->SetPriority(1);
+    mParallel.AddTail(mFrame);
+    mFrame->Exit();
+    mFrame = new MTextPicture(gLcd->GetTopDisplay(), mPicture, TRUE, false);
+    mFrame->SetPosition(0, 0x80);
+    mFrame->SetPriority(1);
+    mParallel.AddTail(mFrame);
+    mConsole = new MConsole(new MObjCanvas(gLcd->GetTopDisplay(), data_ov000_02197560.canvasSize,
+                                           gDinoResource->GetUnkTable(), TRUE),
+                            font, MPoint(0, 4), MFx32(2));
+    mConsole->SetFilter(new DinoBattleTutorialConsoleFilter(font, this));
+    mConsole->SetPosition(MPoint(0x10, 0x8A));
+    mConsole->SetPriority(0);
+    mConsole->Hide();
+    mParallel.AddTail(mConsole);
+    MSmartOam *oam = new MSmartOam(gLcd->GetTopDisplay(), 1, 0, 1);
+    mCursor = new MMotion(std::string(data_ov000_02197560.cursorPath), oam, 0, 1);
+    mCursor->SetPosition(MPoint(0x86, 0x5C));
+    ((MMotion *)mCursor)->Play(1, 0);
+    GetParallel()->AddTail(mCursor, oam);
+}
 
 DinoBattleViewTutorialWindow::~DinoBattleViewTutorialWindow() {
 }
@@ -186,7 +230,6 @@ extern "C" MTask *func_ov000_0218e6b0(DinoBattleViewTutorialWindow *window) {
 }
 
 // The file's static initialization (see dino_static_init.h).
-extern "C" u32 data_ov000_02197560[];
 static struct DinoBattleTutorialStaticInit {
     DinoBattleTutorialStaticInit() {
         DINO_POOL_WORD(data_ov000_02197560, 0x34) = 216;

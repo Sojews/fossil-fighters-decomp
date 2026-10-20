@@ -18,6 +18,7 @@
 
 class DinoBattleViewTutorialWindow : public MProcess {
 public:
+    DinoBattleViewTutorialWindow();
     virtual ~DinoBattleViewTutorialWindow();
     virtual void Idle();
 
@@ -47,13 +48,16 @@ class DinoCommonFont;
 
 class DinoBattleTutorialConsoleFilter : public MConsoleFilter {
 public:
+    DinoBattleTutorialConsoleFilter(DinoCommonFont *font, DinoBattleViewTutorialWindow *window)
+        : mFont(font), mWindow(window), mUnk10(1), mUnk11(0) {}
     virtual ~DinoBattleTutorialConsoleFilter();
     // Handles a '$' escape (W: quiet, s: sound, f: clear, wN: rate, nN: font size, cX: color); other characters
     // play the typing sounds and are printed.
     virtual BOOL Filter(MConsole *console, int c);
 
     DinoCommonFont *mFont;  // 0x04
-    u32 unk08[2];
+    DinoBattleViewTutorialWindow *mWindow;  // 0x08
+    u32 unk0C;
     u8 mUnk10;              // 0x10: the high typing sound
     u8 mUnk11;              // 0x11: the speed sound
 };

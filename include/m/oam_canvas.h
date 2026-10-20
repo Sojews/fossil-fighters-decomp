@@ -63,7 +63,7 @@ public:
     MObjCanvas(MDisplay *display, MOam *oam, MPoint size, const void *palette, BOOL fromEnd)
         : MOamCanvas<MOam, MOamUnit>(display, oam, size, palette, fromEnd) {}
     // With the display's sprites.
-    MObjCanvas(MDisplay *display, MPoint size, const void *palette, BOOL fromEnd)
+    MObjCanvas(MDisplay *display, const MPoint &size, const void *palette, BOOL fromEnd)
         : MOamCanvas<MOam, MOamUnit>(display, display->mObj->mOam, size, palette, fromEnd) {}
     virtual ~MObjCanvas() {}
 };
