@@ -3,6 +3,7 @@
 
 #define MSL_STRING_DEFINITIONS
 #define MSL_STRING_BASICS
+#pragma ipa file
 #include "game/dino_talk_console_filter.h"
 #include "game/dino_talk_window_wait_start_task.h"
 #include "game/dino_talk_window.h"

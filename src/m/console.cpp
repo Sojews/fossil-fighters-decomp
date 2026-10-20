@@ -1,6 +1,7 @@
 // MConsole, and MCanvasCopyTransfer (which scrolls it). Not decompiled yet: Execute (the typing itself) and the line vector's template functions.
 
 #define MSL_STRING_BASICS
+#pragma ipa file
 #include "m/console.h"
 #include "m/text_codec.h"
 #include "m/canvas_copy_transfer.h"

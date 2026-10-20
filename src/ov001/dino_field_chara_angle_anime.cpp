@@ -1,6 +1,7 @@
 // DinoFieldCharaAngleAnime, DinoFieldCharaWaitStopTask, DinoFieldCharaAngleToTask, DinoFieldCharaMoveToTask, DinoFieldCharaShowManpuTask, DinoFieldCharaHideManpuTask, DinoFieldCharaModelMotionIdTask.
 // Also DinoFieldChara's members here: models, motions, movement.
 
+#pragma ipa file
 #include "game/dino_field.h"
 #include "game/dino_sound.h"
 #include "m/file.h"
@@ -286,7 +287,6 @@ BOOL DinoFieldChara::IsUnk24Reacting() {
 }
 
 // Whether the camera's focus stands within the chara's range (for a chara of kind 2, in an A1 motion).
-// NONMATCHING: stack slots of the subtraction's temporaries only (the game's y temporaries sit above the x ones).
 BOOL DinoFieldChara::IsFocusNear() {
     if (mBody != NULL && ((DinoFieldCharaData *) mData.mFile.GetData())->mUnk20 == 2 && IsUnkA1Motion()) {
         u32 focus = mField->GetCamera()->GetFocus();
@@ -483,7 +483,6 @@ void DinoFieldChara::SetMotion(u32 motion, u8 loop, MFx32 speed) {
 
 // Plays a motion: its model comes from the caches or is loaded (and cached, but for motions 0x15-0x1A), the head
 // goes back on the body's head joint, and the speed goes into the body's speed track.
-// NONMATCHING: the empty tag temporaries of SetSpeed's clear and push_back get the stack bytes in reverse order.
 void DinoFieldChara::ChangeMotion(u32 motion, u8 loop, MFx32 speed) {
     if (mBody == NULL) {
         return;
