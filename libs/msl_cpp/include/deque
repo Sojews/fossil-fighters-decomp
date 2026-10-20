@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <cstddef>
 #include <iterator>
+#include <limits>
 #include <memory>
 
 #include <mem.h>
@@ -76,6 +77,8 @@ namespace std {
         // A position: the slot, and the buffer it wraps around in (its first slot, its first element and its end).
         class iterator {
         public:
+            typedef ptrdiff_t difference_type;
+            typedef T value_type;
             iterator() {}
             // The first element (make_iter builds its block iterator with this; begin() goes through the other).
             explicit iterator(const __cdeque_deleter &d) {
@@ -87,6 +90,7 @@ namespace std {
                 first_ = f;
                 end_ = e;
             }
+            iterator(const iterator &x) : ptr_(x.ptr_), beg_(x.beg_), first_(x.first_), end_(x.end_) {}
             iterator(T *p, const __cdeque_deleter &d) {
                 ptr_ = p;
                 T *b = d.data_;
@@ -105,6 +109,21 @@ namespace std {
             }
             iterator &operator+=(difference_type n);
             difference_type operator-(const iterator &x) const;
+            iterator &operator--() {
+                if (ptr_ == beg_) {
+                    ptr_ = end_;
+                }
+                --ptr_;
+                return *this;
+            }
+            iterator operator+(difference_type n) const {
+                iterator tmp(*this);
+                return tmp += n;
+            }
+            iterator operator-(difference_type n) const {
+                iterator tmp(*this);
+                return tmp += -n;
+            }
             bool operator==(const iterator &x) const {
                 return ptr_ == x.ptr_;
             }
@@ -116,6 +135,41 @@ namespace std {
             T *beg_;
             T *first_;
             T *end_;
+        };
+
+        class const_iterator {
+        public:
+            typedef ptrdiff_t difference_type;
+            const_iterator(const T *p, const __cdeque_deleter &d) {
+                ptr_ = p;
+                const T *b = d.data_;
+                beg_ = b;
+                first_ = b + d.start_;
+                end_ = b + d.cap();
+            }
+            const T &operator*() const {
+                return *ptr_;
+            }
+            const_iterator &operator++() {
+                if (++ptr_ == end_) {
+                    ptr_ = beg_;
+                }
+                return *this;
+            }
+            const_iterator &operator+=(difference_type n);
+            difference_type operator-(const const_iterator &x) const;
+            const_iterator operator+(difference_type n) const {
+                const_iterator tmp(*this);
+                return tmp += n;
+            }
+            bool operator!=(const const_iterator &x) const {
+                return ptr_ != x.ptr_;
+            }
+
+            const T *ptr_;
+            const T *beg_;
+            const T *first_;
+            const T *end_;
         };
 
         void init() {
@@ -158,6 +212,12 @@ namespace std {
         }
         iterator end() {
             return iterator(data_ + (cap() != 0 ? (start_ + size_) % cap() : 0), *this);
+        }
+        const_iterator begin() const {
+            return const_iterator(data_ + start_, *this);
+        }
+        const_iterator end() const {
+            return const_iterator(data_ + (cap() != 0 ? (start_ + size_) % cap() : 0), *this);
         }
         reference front() {
             return data_[start_];
@@ -227,6 +287,14 @@ namespace std {
         }
         template <class It> void construct_at_front(const It &first, const It &last, Metrowerks::int2type<true>);
         template <class It> void construct_at_end(const It &first, const It &last, Metrowerks::int2type<true>);
+        // Fills an empty buffer with a copy of [first, last).
+        template <class It> void init_copy(It first, const It &last, Metrowerks::int2type<true>);
+        template <class It> void copy_at_end(const It &first, const It &last, Metrowerks::int2type<true>);
+        template <class It> void copy_at_end(const It &first, const It &last) {
+            copy_at_end(first, last, Metrowerks::int2type<true>());
+        }
+        // Inserts [first, last) (forward iterators) before pos.
+        template <class It> void insert(const iterator &pos, It first, It last, Metrowerks::int2type<true>);
 
         T *data_;                               // 0x0
         size_t start_;                          // 0x4
@@ -272,6 +340,173 @@ namespace std {
             d += end_ - beg_;
         }
         return d;
+    }
+
+    template <class T, class Allocator>
+    typename __cdeque_deleter<T, Allocator>::const_iterator &__cdeque_deleter<T, Allocator>::const_iterator::operator+=(
+        difference_type n) {
+        difference_type c = end_ - beg_;
+        difference_type i = (ptr_ - beg_) + n;
+        if (i < 0) {
+            i += c;
+        } else if (i >= c) {
+            i -= c;
+        }
+        ptr_ = beg_ + i;
+        return *this;
+    }
+
+    template <class T, class Allocator>
+    typename __cdeque_deleter<T, Allocator>::difference_type
+    __cdeque_deleter<T, Allocator>::const_iterator::operator-(const const_iterator &x) const {
+        const T *f = first_;
+        difference_type d = ptr_ - x.ptr_;
+        if (ptr_ >= f) {
+            if (x.ptr_ < f) {
+                d -= end_ - beg_;
+            }
+        } else if (x.ptr_ >= f) {
+            d += end_ - beg_;
+        }
+        return d;
+    }
+
+    // (The block map is handed to insert through this: the buffer's iterator and one more byte.)
+    template <class It> struct __cdeque_move_iter : public It {
+        __cdeque_move_iter(It i) : It(i) {}
+        typename It::value_type operator*() const {
+            return *this->ptr_;
+        }
+        __cdeque_move_iter &operator+=(typename It::difference_type n) {
+            It::operator+=(n);
+            return *this;
+        }
+        __cdeque_move_iter operator+(typename It::difference_type n) const {
+            __cdeque_move_iter tmp(*this);
+            tmp += n;
+            return tmp;
+        }
+        Metrowerks::int2type<true> unk_;
+    };
+
+    template <class T> inline void __cdeque_construct(T *p, const T &x, Metrowerks::int2type<true>) {
+        ::new (p) T(x);
+    }
+    template <class T> inline void __cdeque_assign(T &d, const T &s, Metrowerks::int2type<true>) {
+        d = s;
+    }
+    template <class It, class T> inline T *__cdeque_copy_elems(It first, It last, T *result) {
+        for (; first != last; ++first, ++result) {
+            __cdeque_assign(*result, *first, Metrowerks::int2type<true>());
+        }
+        return result;
+    }
+
+    template <class It>
+    inline typename It::difference_type __cdeque_distance2(It first, It last, random_access_iterator_tag) {
+        return last - first;
+    }
+    template <class It> inline typename It::difference_type __cdeque_distance(It first, It last) {
+        return __cdeque_distance2(first, last, random_access_iterator_tag());
+    }
+
+    template <class T> inline T *__cdeque_copy_ptr(const T *first, const T *last, T *result) {
+        size_t n = (size_t)(last - first) * sizeof(T);
+        memmove(result, first, n);
+        return (T *) ((char *) result + n);
+    }
+
+    template <class T> inline T *__cdeque_copy_backward_ptr(const T *first, const T *last, T *result) {
+        size_t n = (size_t)(last - first) * sizeof(T);
+        result = (T *) ((char *) result - n);
+        memmove(result, first, n);
+        return result;
+    }
+
+    // Copies [first, last) to raw memory, a contiguous run at a time.
+    template <class T, class It> T *__cdeque_copy_out(It first, It last, T *result) {
+        while (first.ptr_ != last.ptr_) {
+            ptrdiff_t n;
+            if ((first.ptr_ >= first.first_) == (last.ptr_ >= last.first_)) {
+                n = last.ptr_ - first.ptr_;
+            } else {
+                n = first.end_ - first.ptr_;
+            }
+            result = __cdeque_copy_ptr((T *) first.ptr_, (T *) first.ptr_ + n, result);
+            first.ptr_ += n - 1;
+            ++first;
+        }
+        return result;
+    }
+
+    // Copies [first, last) over result's elements, a contiguous run of each at a time.
+    template <class Iterator>
+    Iterator __cdeque_copy(Iterator &first, Iterator &last, Iterator &result) {
+        while (first != last) {
+            ptrdiff_t c = result.end_ - result.ptr_;
+            ptrdiff_t n;
+            if ((first.ptr_ >= first.first_) == (last.ptr_ >= last.first_)) {
+                n = std::min(last.ptr_ - first.ptr_, c);
+            } else {
+                n = std::min(first.end_ - first.ptr_, c);
+            }
+            __cdeque_copy_ptr(first.ptr_, first.ptr_ + n, result.ptr_);
+            first.ptr_ += n - 1;
+            ++first;
+            result.ptr_ += n - 1;
+            ++result;
+        }
+        return result;
+    }
+
+    template <class Iterator>
+    Iterator __cdeque_copy_backward(Iterator &first, Iterator &last, Iterator &result) {
+        while (first != last) {
+            --last;
+            --result;
+            ptrdiff_t c = result.ptr_ - (result.ptr_ >= result.first_ ? result.first_ : result.beg_);
+            ptrdiff_t n;
+            if ((first.ptr_ >= first.first_) == (last.ptr_ >= last.first_)) {
+                n = std::min(last.ptr_ - first.ptr_, c);
+            } else {
+                n = std::min(last.ptr_ - (last.ptr_ >= last.first_ ? last.first_ : last.beg_), c);
+            }
+            last.ptr_ -= n;
+            __cdeque_copy_backward_ptr(last.ptr_, last.ptr_ + (n + 1), result.ptr_ + 1);
+            result.ptr_ -= n;
+        }
+        return result;
+    }
+
+    // Copies [first, last) (any forward iterators) over result's elements, one run of result at a time.
+    template <class It, class Iterator> Iterator __cdeque_copy_in(It &first, It &last, Iterator &result) {
+        if (first != last) {
+            ptrdiff_t n = last - first;
+            for (;;) {
+                ptrdiff_t m = std::min(n, ptrdiff_t(result.end_ - result.ptr_));
+                It mid = first + m;
+                __cdeque_copy_elems(first, mid, result.ptr_);
+                n -= m;
+                result.ptr_ += m - 1;
+                ++result;
+                if (n == 0) {
+                    break;
+                }
+                first = mid;
+            }
+        }
+        return result;
+    }
+
+    template <class Iterator> inline Iterator __cdeque_copy_i(Iterator first, Iterator last, Iterator result) {
+        return __cdeque_copy(first, last, result);
+    }
+    template <class Iterator>
+    inline Iterator __cdeque_copy_backward_i(Iterator first, Iterator last, Iterator result) {
+        return __cdeque_copy_backward(first, last, result);
+    }
+    template <class It, class Iterator> inline Iterator __cdeque_copy_in_i(It first, It last, Iterator result) {
+        return __cdeque_copy_in(first, last, result);
     }
 
     template <class T, class Allocator> __cdeque_deleter<T, Allocator>::~__cdeque_deleter() {
@@ -377,6 +612,87 @@ namespace std {
         }
     }
 
+    template <class T, class Allocator>
+    template <class It>
+    void __cdeque_deleter<T, Allocator>::init_copy(It first, const It &last, Metrowerks::int2type<true>) {
+        size_t n = __cdeque_distance(first, last);
+        if (n != 0) {
+            allocate(n);
+            copy_at_end(first, last);
+        }
+    }
+
+    template <class T, class Allocator>
+    template <class It>
+    void __cdeque_deleter<T, Allocator>::copy_at_end(const It &first, const It &last, Metrowerks::int2type<true>) {
+        T *d = data_;
+        if (d != nullptr) {
+            d += (start_ + size_) % cap();
+            difference_type n = last - first;
+            difference_type left = n;
+            difference_type m = (data_ + cap()) - d;
+            m = std::min(m, left);
+            size_ += n;
+            __cdeque_copy_out(first, first + m, d);
+            left -= m;
+            if (left != 0) {
+                __cdeque_copy_out(first + m, last, data_);
+            }
+        }
+    }
+
+    template <class T, class Allocator>
+    template <class It>
+    void __cdeque_deleter<T, Allocator>::insert(const iterator &pos, It first, It last, Metrowerks::int2type<true>) {
+        size_t n = __cdeque_distance(first, last);
+        if (n == 0) {
+            return;
+        }
+        T *b = data_ + start_;
+        size_t pi = pos.ptr_ - b;
+        if (pos.ptr_ < b) {
+            pi += cap();
+        }
+        size_t c = capacity();
+        if (n <= c && size_ <= c - n) {
+            iterator ob(b, *this);
+            iterator i = ob;
+            size_t back = size_ - pi;
+            if (pi < back) {
+                i += -(difference_type) n;
+                start_ = i.ptr_ - data_;
+                size_ += n;
+                if (pi != 0) {
+                    i = __cdeque_copy_i(ob, ob + pi, i);
+                }
+            } else {
+                size_ += n;
+                i = end();
+                if (back != 0) {
+                    i = __cdeque_copy_backward_i(i - (n + back), i - n, i);
+                }
+                i += -(difference_type) n;
+            }
+            __cdeque_copy_in_i(first, last, i);
+            return;
+        }
+        __cdeque_deleter_helper<T, typename remove_reference<Allocator>::type &> tmp(alloc_ref());
+        tmp.allocate(size_ + n, grow_by(n));
+        tmp.start_ = pi;
+        T *p = tmp.data_ + pi;
+        for (; n != 0; --n, ++p, ++first) {
+            __cdeque_construct(p, *first, Metrowerks::int2type<true>());
+            ++tmp.size_;
+        }
+        tmp.construct_at_end(pos, end());
+        tmp.construct_at_front(begin(), pos);
+        optimize_after_moved_from();
+        std::swap(data_, tmp.data_);
+        std::swap(start_, tmp.start_);
+        std::swap(size_, tmp.size_);
+        std::swap(cap(), tmp.cap());
+    }
+
     // A deque's storage: blocks of __block elements; start_ is the first element's index in the first block.
     template <class T, class Allocator> class __deque_deleter {
     public:
@@ -431,6 +747,13 @@ namespace std {
         }
         iterator make_iter(size_type n);
         void add_back_capacity(size_type n);
+        size_type max_size() const {
+            static const size_type max = numeric_limits<size_type>::max() - __block;
+            return max;
+        }
+        size_type capacity() const {
+            return buf_.size_ == 0 ? 0 : (buf_.size_ - 1) * __block;
+        }
 
         // (The game reaches the block map through an accessor: MSL keeps it in a compressed pair.)
         buf_type &buf() {
@@ -505,6 +828,61 @@ namespace std {
             }
         }
     }
+    template <class T, class Allocator> void __deque_deleter<T, Allocator>::add_back_capacity(size_type n) {
+        buf_type &b = buf();
+        size_type nb = n / __block + (n % __block != 0);
+        // Reuse the blocks in front of the first element.
+        while (nb != 0 && start_ >= __block) {
+            void *blk = b.front();
+            b.pop_front();
+            b.back() = blk;
+            b.push_back(0);
+            --nb;
+            start_ -= __block;
+        }
+        if (nb == 0) {
+            return;
+        }
+        size_type x = nb * __block;
+        if (x > max_size() || capacity() > max_size() - x) {
+            __deque_common<true>::throw_length_error("deque::add_back_capacity length error");
+        }
+        if (b.size_ + nb <= b.capacity()) {
+            for (; nb != 0; --nb) {
+                b.back() = allocator<T>().allocate(__block);
+                b.push_back(0);
+            }
+            return;
+        }
+        __deque_deleter tmp;
+        tmp.init();
+        buf_type &tb = tmp.buf();
+        {
+            buf_type e;
+            e.init();
+            const buf_type &ce = e;
+            Metrowerks::int2type<true> a;
+            tb.init_copy(ce.begin(), ce.end(), a);
+        }
+        tb.reserve(std::max(2 * b.capacity(), b.size_ + nb + 1));
+        tb.push_back(0);
+        for (; nb != 0; --nb) {
+            tb.back() = allocator<T>().allocate(__block);
+            tb.push_back(0);
+        }
+        if (b.size_ != 0) {
+            buf_type::iterator last = b.end();
+            last += -1;
+            tb.insert(tb.begin(), __cdeque_move_iter<buf_type::iterator>(b.begin()),
+                      __cdeque_move_iter<buf_type::iterator>(last), Metrowerks::int2type<true>());
+        }
+        std::swap(b.data_, tb.data_);
+        std::swap(b.start_, tb.start_);
+        std::swap(b.size_, tb.size_);
+        std::swap(b.cap(), tb.cap());
+        tb.clear();
+    }
+
     template <class T, class Allocator = allocator<T> > class deque : public __deque_deleter<T, Allocator> {
     public:
         deque() {

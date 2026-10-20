@@ -265,7 +265,7 @@ void M3d::SetViewport(int x1, int y1, int x2, int y2) {
 template class std::__cdeque_deleter<void *, std::allocator<void *> >;
 template class std::__cdeque_deleter<void *, std::allocator<void *> &>;
 template class std::__cdeque_deleter<void *, std::allocator<void *> >::iterator;
-template class std::__cdeque_deleter<void *, std::allocator<void *> &>::iterator;
+template class std::__cdeque_deleter<void *, std::allocator<void *> >::const_iterator;
 template class std::__deque_common<true>;
 template std::__deque_deleter<M3dTransfer, std::allocator<M3dTransfer> >::~__deque_deleter();
 template std::__deque_deleter<M3dTransfer, std::allocator<M3dTransfer> >::iterator std::__deque_deleter<M3dTransfer, std::allocator<M3dTransfer> >::make_iter(size_t n);
