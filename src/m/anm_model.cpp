@@ -1,5 +1,5 @@
 // The animated 3D objects (MAnmModelBase and its kinds) and MPolygonChar, which plays them from a scene script.
-// Not decompiled yet: TintPalette, the Unk0C updates, MPolygonChar::Load (the script reader) and the
+// Not decompiled yet: TintPalette, most of the Unk0C updates, MPolygonChar::Load (the script reader) and the
 // node data reader.
 
 #include "m/anm_model.h"
@@ -421,6 +421,69 @@ MAnmRyusen::~MAnmRyusen() {
         mScene->RemoveModel(&mTrails[i]);
     }
     delete[] mTrails;
+}
+
+// Adds the target's joints' positions to the trail and lays the trail's quads along it, fading out to its end.
+void MAnmRyusen::Unk0C() {
+    MtxFx44 joint;
+    MtxFx43 mtx;
+    int length;
+    fx32 red, green, blue, alpha;
+    if (!mTarget->mModel->GetUnk10()) {
+        Unk10();
+        return;
+    }
+    if (mFrame >= mStartFrame) {
+        PlaySounds(mFrame - mStartFrame);
+        MTX_Copy44To43_(mTarget->mModel->GetMatrix(), &mtx);
+        if (mJointA >= 0 && mTarget->mModel->GetJointMatrix(mJointA, &joint, 0)) {
+            MTX_MultVec43((const VecFx32 *)&joint._30, &mtx, &mPointsA[mHead]);
+        }
+        if (mJointB >= 0 && mTarget->mModel->GetJointMatrix(mJointB, &joint, 0)) {
+            MTX_MultVec43((const VecFx32 *)&joint._30, &mtx, &mPointsB[mHead]);
+        }
+        alpha = FX32_ONE;
+        blue = FX32_ONE;
+        green = FX32_ONE;
+        red = FX32_ONE;
+        if (mTracks[0].size() != 0) {
+            red = GetValue(0, mFrame - mStartFrame);
+        }
+        if (mTracks[1].size() != 0) {
+            green = GetValue(1, mFrame - mStartFrame);
+        }
+        if (mTracks[2].size() != 0) {
+            blue = GetValue(2, mFrame - mStartFrame);
+        }
+        if (mTracks[3].size() != 0) {
+            alpha = GetValue(3, mFrame - mStartFrame);
+        }
+        length = 60;
+        if (mTracks[4].size() != 0) {
+            length = GetValue(4, mFrame - mStartFrame) * 60 >> FX32_SHIFT;
+        }
+        mAge++;
+        int i;
+        for (i = 0; i < length; i++) {
+            int back = (mHead + 179 - i) % 180;
+            int front = (mHead + 180 - i) % 180;
+            mTrails[i].SetQuad(&mPointsA[front], &mPointsB[front], &mPointsA[back], &mPointsB[back]);
+            if (mAge > i) {
+                mTrails[i].SetUnk10(TRUE);
+            } else {
+                mTrails[i].SetUnk10(FALSE);
+            }
+            mTrails[i].SetUnk2F4((u32)(blue * 31) >> FX32_SHIFT << 10 |
+                                 ((u32)(red * 31) >> FX32_SHIFT | (u32)(green * 31) >> FX32_SHIFT << 5));
+            mTrails[i].SetUnk1C((u32)((alpha * 31) * (length - i)) / length >> FX32_SHIFT);
+        }
+        for (; i < 180; i++) {
+            mTrails[i].SetUnk10(FALSE);
+        }
+        mHead = (mHead + 1) % 180;
+    } else {
+        mAge = 0;
+    }
 }
 
 void MAnmRyusen::Unk10() {

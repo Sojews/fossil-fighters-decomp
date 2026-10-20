@@ -172,8 +172,15 @@ public:
     virtual void Unk0C();
     virtual void Unk10();
 
-    u8 unk1A8[0x1290 - 0x1A8];
+    u8 unk1A8[0x1B0 - 0x1A8];
+    VecFx32 mPointsA[180];              // 0x1B0: the trail's edges, a ring from mHead
+    VecFx32 mPointsB[180];              // 0xA20
     M3DRyusen *mTrails;                 // 0x1290: 180 of them
+    int mHead;                          // 0x1294
+    MAnmModelBase *mTarget;             // 0x1298: whose joints the trail follows
+    int mJointA;                        // 0x129C
+    int mJointB;                        // 0x12A0
+    u32 mAge;                           // 0x12A4: frames since the trail started
 };
 
 class MAnmModelSh : public MAnmModelBase {

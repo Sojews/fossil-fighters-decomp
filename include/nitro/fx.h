@@ -63,6 +63,8 @@ void MTX_Concat44(const MtxFx44 *a, const MtxFx44 *b, MtxFx44 *ab);
 void MTX_TransApply44(const MtxFx44 *pSrc, MtxFx44 *pDst, fx32 x, fx32 y, fx32 z);
 void MTX_ScaleApply44(const MtxFx44 *pSrc, MtxFx44 *pDst, fx32 x, fx32 y, fx32 z);
 void MTX_Copy43To44_(const MtxFx43 *pSrc, MtxFx44 *pDst);
+void MTX_Copy44To43_(const MtxFx44 *pSrc, MtxFx43 *pDst);
+void MTX_MultVec43(const VecFx32 *vec, const MtxFx43 *m, VecFx32 *dst);
 void MTX_RotX44_(MtxFx44 *pDst, fx32 sinVal, fx32 cosVal);
 void MTX_RotY44_(MtxFx44 *pDst, fx32 sinVal, fx32 cosVal);
 void MTX_RotZ44_(MtxFx44 *pDst, fx32 sinVal, fx32 cosVal);
