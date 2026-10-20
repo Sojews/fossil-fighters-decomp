@@ -7,6 +7,7 @@
 #include "m/heap.h"
 #include "m/irq.h"
 #include "m/task.h"
+#include "m/archive.h"
 #include "nitro/pm.h"
 
 #define HW_BOOT_TYPE (*(volatile u16 *) 0x027FFC40)
@@ -15,7 +16,7 @@
 
 // static_order: begin
 static int sSleepEnableCount;
-static OSMutex sSleepHooksMutex;
+static MMutex sSleepHooksMutex;
 static MFoldSleepHandler *sFoldSleepHandler;
 static std::list<MSleepHook *> sSleepHooks;
 // static_order: end
@@ -48,7 +49,7 @@ void MDisableSleep() {
 }
 
 void MSleep() {
-    MScopedLock lock(&sSleepHooksMutex, TRUE);
+    MScopedLock lock(&sSleepHooksMutex.mutex, TRUE);
     for (std::list<MSleepHook *>::iterator it = sSleepHooks.begin(); it != sSleepHooks.end(); it++) {
         (*it)->OnSleep();
     }
@@ -76,7 +77,7 @@ MSleepHook::~MSleepHook() {
 void MSleepHook::Register() {
     if (!mRegistered) {
         mRegistered = TRUE;
-        MScopedLock lock(&sSleepHooksMutex, TRUE);
+        MScopedLock lock(&sSleepHooksMutex.mutex, TRUE);
         sSleepHooks.push_back(this);
     }
 }
@@ -84,7 +85,7 @@ void MSleepHook::Register() {
 void MSleepHook::Unregister() {
     if (mRegistered) {
         mRegistered = FALSE;
-        OSMutex *mutex = &sSleepHooksMutex;
+        OSMutex *mutex = &sSleepHooksMutex.mutex;
         OS_LockMutex(mutex);
         sSleepHooks.erase(std::find(sSleepHooks.begin(), sSleepHooks.end(), this));
         OS_UnlockMutex(mutex);

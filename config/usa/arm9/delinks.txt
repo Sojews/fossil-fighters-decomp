@@ -202,6 +202,7 @@ src/m/soft_reset.cpp:
 
 src/m/sleep.cpp:
     .text       start:0x02050b44 end:0x02050e28
+    .init       start:0x02089754 end:0x0208978c
 
 src/m/looper.cpp:
     .text       start:0x02050e28 end:0x02051a4c
