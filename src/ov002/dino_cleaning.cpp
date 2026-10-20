@@ -24,6 +24,8 @@
 #include "types.h"
 #include "game/dino_cleaning_status.h"
 #include "game/dino_cleaning_score.h"
+#include "game/dino_cleaning_timer.h"
+#include "m/input.h"
 #include "game/dino_cleaning_neighbour.h"
 #include "m/ext_affine.h"
 #include "m/picture.h"
@@ -294,17 +296,18 @@ extern "C" struct {
     void (DinoCleaning::*State02160638_48)(); // 0x48
     u8 unk50[0x58 - 0x50];
     void (DinoCleaning::*State02160de8_58)(); // 0x58
-    u8 unk60[0x70 - 0x60];
+    u8 unk60[0x68 - 0x60];
+    void (DinoCleaning::*State0216177c_68)(); // 0x68
     void (DinoCleaning::*State02161d48_70)(); // 0x70
-    void (DinoCleaning::*Unk02161490_78)();
+    void (DinoCleaning::*StatePlay_78)(); // 0x78
 } data_ov002_021659ec;
 extern "C" struct {
     void (DinoCleaning::*StateEnableToolMenu_00)(); // 0x00
     u8 unk08[0x10 - 0x8];
     void (DinoCleaning::*State02161164_10)(); // 0x10
-    u8 unk18[0x20 - 0x18];
+    void (DinoCleaning::*StateCheckDone_18)(); // 0x18
     void (DinoCleaning::*StateQuit_20)(); // 0x20
-    void (DinoCleaning::*State02161490_28)(); // 0x28
+    void (DinoCleaning::*StatePlay_28)(); // 0x28
     u8 unk30[0x38 - 0x30];
     void (DinoCleaning::*State02162544_38)(); // 0x38
     void (DinoCleaning::*State021618c8_40)(); // 0x40
@@ -312,7 +315,7 @@ extern "C" struct {
     void (DinoCleaning::*State02161d48_50)(); // 0x50
     void (DinoCleaning::*StateCheckDone_58)(); // 0x58
     void (DinoCleaning::*State02161f9c_60)(); // 0x60
-    void (DinoCleaning::*Unk02161490_68)();
+    void (DinoCleaning::*StatePlay_68)(); // 0x68
     void (DinoCleaning::*StateWake_70)();
     void (DinoCleaning::*State02160f54_78)(); // 0x78
 } data_ov002_02165a6c;
@@ -323,7 +326,10 @@ extern "C" struct {
     u8 unk18[0x20 - 0x18];
     void (DinoCleaning::*StateStopAnswered_20)();
     void (DinoCleaning::*State02162cec_28)(); // 0x28
-    u8 unk30[0x60 - 0x30];
+    u8 unk30[0x48 - 0x30];
+    void (DinoCleaning::*State0216177c_48)(); // 0x48
+    void (DinoCleaning::*StateSwitchTool_50)(); // 0x50
+    u8 unk58[0x60 - 0x58];
     void (DinoCleaning::*StateStopTool_60)();
     u8 unk68[0x78 - 0x68];
     void (DinoCleaning::*State021610b0_78)();
@@ -636,7 +642,89 @@ void DinoCleaning::StateEnableToolMenu() {
 void DinoCleaning::StateStopTool() {
     mTools[mTool]->Unk18();
     mUnk124 = 0;
-    mState = data_ov002_021659ec.Unk02161490_78;
+    mState = data_ov002_021659ec.StatePlay_78;
+}
+
+// Whether the rock is clean (only without a target).
+inline BOOL DinoCleaning::IsRockClean() {
+    BOOL done = FALSE;
+    if (!mUnkC9) {
+        if (mKasekiRock->GetRatio() == MFx32(100)) {
+            done = TRUE;
+        }
+    }
+    return done;
+}
+
+// Whether the target is reached (only with one).
+inline BOOL DinoCleaning::IsTargetReached() {
+    BOOL done = FALSE;
+    if (mUnkC9) {
+        if (mStatus->GetScore()->GetUnk80() >= MFx32(mUnk130)) {
+            done = TRUE;
+        }
+    }
+    return done;
+}
+
+// Whether too much was broken or the time is up.
+inline BOOL DinoCleaning::IsOver() {
+    BOOL done = TRUE;
+    if (!(mStatus->GetScore()->GetUnk84() > MFx32(100 - mUnk130))) {
+        if (!mStatus->GetTimer()->IsAtStart()) {
+            done = FALSE;
+        }
+    }
+    return done;
+}
+
+// NONMATCHING: the ratios' MFx32ToInt copies and the checks' temporaries take each other's stack slots.
+// The cleaning itself: updates the commentary's numbers, switches tools when asked, and ends once the rock is clean,
+// the target is reached or the time is up (else runs the tool, the stop confirmation or sleep).
+void DinoCleaning::StatePlay() {
+    if (mUnkDC->mButtons & 0x3FFF) {
+        mUnk124 = 0;
+    } else {
+        mUnk124++;
+    }
+    mUnkE4->SetUnkB8(4, (void *)((int)mUnk124 / 60));
+    mUnkE4->SetUnkB8(6, (void *)MFx32ToInt(mKasekiRock->GetDirtRatio()));
+    mUnkE4->SetUnkB8(5, (void *)MFx32ToInt(mKasekiRock->GetRock90()->GetRatio()));
+    mUnkE4->SetUnkB8(11, (void *)MFx32ToInt(mKasekiRock->GetRatio(2)));
+    mUnkE4->SetUnkB8(12, (void *)MFx32ToInt(mKasekiRock->GetRatio(1)));
+    if (mTool != mNextTool) {
+        mState = data_ov002_02165aec.StateSwitchTool_50;
+        return;
+    }
+    if (IsRockClean()) {
+        DinoSoundPlaySe(0x1F, 0);
+        mStatus->StatePause();
+        mTools[mTool]->Unk1C();
+        mState = data_ov002_02165aec.State0216177c_48;
+        return;
+    }
+    if (IsTargetReached()) {
+        DinoSoundPlaySe(0x1F, 0);
+        mStatus->StatePause();
+        mTools[mTool]->Unk1C();
+        mState = data_ov002_021659ec.State0216177c_68;
+        return;
+    }
+    if (IsOver()) {
+        DinoSoundPlaySe(0x1F, 0);
+        mStatus->StatePause();
+        mTools[mTool]->Unk1C();
+        mState = data_ov002_02165a6c.StateCheckDone_18;
+        return;
+    }
+    mTools[mTool]->Unk20();
+    if ((mUnkDC->mButtons & 8) && mMode != 2 && gLcd->GetBottomDisplay()->mBright->GetFactor() == 0) {
+        StateStopConfirm();
+        return;
+    }
+    if (mSleepTimer != 0) {
+        StateSleep();
+    }
 }
 
 void DinoCleaning::StateSwitchTool() {
@@ -664,7 +752,7 @@ void DinoCleaning::StateSleep() {
 
 void DinoCleaning::StateWake() {
     DinoSoundResume();
-    mState = data_ov002_02165a6c.Unk02161490_68;
+    mState = data_ov002_02165a6c.StatePlay_68;
 }
 
 void DinoCleaning::StateStopConfirm() {
@@ -691,7 +779,7 @@ void DinoCleaning::StateStopAnswered() {
     DinoSoundResume();
     if (!mStop) {
         mUnkE4->SetUnkA0(0x19, FALSE);
-        mState = data_ov002_02165a6c.State02161490_28;
+        mState = data_ov002_02165a6c.StatePlay_28;
         return;
     }
     DinoSoundPlaySe(0x1F, 0);
