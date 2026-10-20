@@ -17,6 +17,7 @@
 #include "game/dino_ui_mask_equip_test.h"
 #include "game/dino_ui_mask_equip_mask_button.h"
 #include "game/dino_ui_mask_equip_menu_item.h"
+#include "game/dino_ui2_parts_kaseki_button.h"
 #include "m/bg_new_task.h"
 #include "m/call_task.h"
 #include "game/dino_common_window_menu_item_flush_task_menu.h"
@@ -361,6 +362,82 @@ inline DinoUiMaskEquipPageRButton::DinoUiMaskEquipPageRButton(DinoUiMaskEquipMen
     SetKeys(0x100);
     SetNoFocus(TRUE);
     DinoHelpItem::Disable();
+}
+
+extern "C" const char *data_ov005_0216bc1c[]; // the masks' pictures, by id % 20
+
+inline DinoUiMaskEquipMaskButton::DinoUiMaskEquipMaskButton(DinoUiMaskEquipMenu *owner, MPoint pos, u32 id) {
+    mOwner = owner;
+    mPos = pos;
+    mMask = new MMotion(std::string(data_ov005_0216bc1c[id % 20]), mOwner->GetOam(), 2, 1);
+    mMask->Play(1, 0);
+    mMask->SetPosition(pos);
+    mMask->SetPriority(1);
+    if (id != 0) {
+        mMask->Show();
+    } else {
+        mMask->Hide();
+    }
+    mParallel.AddTail(mMask);
+    mMotion = new MMotion(std::string(DinoUiMaskEquipPath(20)), mOwner->GetOam(), 2, 1);
+    mMotion->SetPosition(pos);
+    mMotion->SetPriority(1);
+    mParallel.AddTail(mMotion);
+    mMotion->Play(1, 0);
+    mMotion->Hide();
+}
+
+inline DinoUiMaskEquipMaskButton::DinoUiMaskEquipMaskButton(DinoUiMaskEquipMenu *owner, MPoint pos) {
+    mOwner = owner;
+    mPos = pos;
+    mMask = new MMotion(std::string(((const char *const *)data_ov005_0216bbb4)[26]), mOwner->GetOam(), 2, 1);
+    mMask->Play(1, 0);
+    mMask->SetPosition(pos);
+    mMask->SetPriority(1);
+    mMask->Hide();
+    mParallel.AddTail(mMask);
+    mMotion = new MMotion(std::string(DinoUiMaskEquipPath(20)), mOwner->GetOam(), 2, 1);
+    mMotion->SetPosition(pos);
+    mMotion->SetPriority(1);
+    mParallel.AddTail(mMotion);
+    mMotion->Play(1, 0);
+    mMotion->Hide();
+}
+
+// The mask buttons' grid, in the point pool.
+struct DinoUiMaskEquipGrid {
+    u8 unk0[0x4c];
+    MPoint mFirst;  // 0x4C: the first button's center
+    MPoint mColumn; // 0x54: from a button to the next in its row
+    MPoint mRow;    // 0x5C: from a row to the next
+};
+// (Read through a pointer cast: an inline accessor returning a reference allocates differently.)
+#define DINO_UI_MASK_EQUIP_GRID ((const DinoUiMaskEquipGrid *)data_ov005_0216bab4)
+
+// This page's eight mask buttons (empty past the last mask), linked in a grid with the back button.
+void DinoUiMaskEquipMenu::RefreshPage2() {
+    mItems.clear();
+    for (int i = 0; i < 8; i++) {
+        DinoUiMaskEquipMaskButton *button;
+        if (mUnkF0.size() > i + mPage * 8) {
+            button = new DinoUiMaskEquipMaskButton(
+                this, MPoint(DINO_UI_MASK_EQUIP_GRID->mFirst.x + DINO_UI_MASK_EQUIP_GRID->mColumn.x * (i % 4) + DINO_UI_MASK_EQUIP_GRID->mRow.x * (i / 4),
+                             DINO_UI_MASK_EQUIP_GRID->mFirst.y + DINO_UI_MASK_EQUIP_GRID->mColumn.y * (i % 4) + DINO_UI_MASK_EQUIP_GRID->mRow.y * (i / 4)),
+                (u32)mUnkF0[i + mPage * 8]);
+        } else {
+            button = new DinoUiMaskEquipMaskButton(
+                this, MPoint(DINO_UI_MASK_EQUIP_GRID->mFirst.x + DINO_UI_MASK_EQUIP_GRID->mColumn.x * (i % 4) + DINO_UI_MASK_EQUIP_GRID->mRow.x * (i / 4),
+                             DINO_UI_MASK_EQUIP_GRID->mFirst.y + DINO_UI_MASK_EQUIP_GRID->mColumn.y * (i % 4) + DINO_UI_MASK_EQUIP_GRID->mRow.y * (i / 4)));
+        }
+        mItems.push_back(button);
+        AddItem(button);
+    }
+    DinoUi2LinkKasekiGrid(this, (std::vector<MMenuItem *> &)mItems, mLinkFrom);
+    AddLink((MMenuItem *)mItems[0], 4, mLinkFrom);
+    AddLink((MMenuItem *)mItems[1], 4, mLinkFrom);
+    AddLink((MMenuItem *)mItems[2], 4, mLinkFrom);
+    AddLink((MMenuItem *)mItems[3], 4, mLinkFrom);
+    AddLink(mLinkFrom, 2, (MMenuItem *)mItems[0]);
 }
 
 // The excavation settings' section at offset7C (the input repeat is at 0x1C and 0x20).

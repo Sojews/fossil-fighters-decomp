@@ -4,17 +4,21 @@
 #include "m/menu_item.h"
 #include "m/motion.h"
 
+class DinoUiMaskEquipMenu;
+
 class DinoUiMaskEquipMaskButton : public MMenuItem {
 public:
+    DinoUiMaskEquipMaskButton(DinoUiMaskEquipMenu *owner, MPoint pos, u32 id);
+    DinoUiMaskEquipMaskButton(DinoUiMaskEquipMenu *owner, MPoint pos);
     virtual ~DinoUiMaskEquipMaskButton();
     virtual MRect GetFrame();
     virtual void OnFocusChanged(BOOL focused);
     virtual void OnDecide();
 
-    u32 mUnk88;
+    DinoUiMaskEquipMenu *mOwner; // 0x88
     MPoint mPos;        // 0x8C: the center
-    u32 mUnk94;
-    MMotion *mMotion;   // 0x98
+    MMotion *mMask;     // 0x94: the mask's picture
+    MMotion *mMotion;   // 0x98: the highlight
 };
 
 #endif
