@@ -1679,3 +1679,6 @@ static struct DinoUiWirelessCancelItemStaticInit {
         DINO_POOL_WORD(data_ov004_02174350, 0x20) = 64;
     }
 } sDinoUiWirelessCancelItemStaticInit;
+
+// (Off at the end of the file, where the vectors' members are instantiated: the game calls the helper's destructor.)
+#pragma auto_inline off
