@@ -32,6 +32,8 @@ public:
     void SetPage(int page);
     // Keeps the name (a default one if it's empty) and fades out.
     void OnBackDecided();
+    // Keeps the name (without trailing blanks) and fades out.
+    void Finish();
     // Shows the name (each character over its reading) and moves the cursor to its place.
     void RefreshName();
     // B deletes the character before the cursor (or, on a blank name, goes to the back button), Y and X move the

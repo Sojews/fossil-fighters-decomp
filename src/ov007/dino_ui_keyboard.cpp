@@ -495,8 +495,6 @@ void DinoUiKeyboardMenu::OnFocus(MMenuItem *item) {
 template std::wstring &std::wstring::operator=(const wchar_t *s);
 #pragma auto_inline reset
 
-extern "C" void func_ov007_02183eec(DinoUiKeyboardMenu *menu);
-
 // A key: types its character (capitalizing a name's first letter), a blank or a delete, finishes the name
 // (unless it's blank), turns the page or moves the cursor.
 void DinoUiKeyboardMenu::OnDecide(MMenuItem *item) {
@@ -569,7 +567,7 @@ void DinoUiKeyboardMenu::OnDecide(MMenuItem *item) {
             }
             if (!blank) {
                 DinoSoundPlaySe(0x99, 0);
-                func_ov007_02183eec(this);
+                Finish();
             } else {
                 DinoSoundPlaySe(0x90, 0);
             }
@@ -620,6 +618,67 @@ MTask *DinoUiKeyboardMenu::CreateSetFocusTask(MMenuItem *item) {
 
 MTask *DinoUiKeyboardMenu::CreatePageChangeTask(u32 page) {
     return new PageChangeTask(this, page);
+}
+
+extern const int data_02089ac8, data_02089acc, data_02089ad0;
+
+// Keeps the name, without its trailing blanks, as the player's or the team's (a team's first name also fades the top
+// screen out), and fades out.
+// NONMATCHING: the two fade constants swap registers, as in OnBackDecided.
+void DinoUiKeyboardMenu::Finish() {
+    BOOL fadeTop = FALSE;
+    for (int i = mUnk19C.size() - 1; i >= 0; i--) {
+        if (mUnk19C[i] != mUnk1B4[2][29]) {
+            break;
+        }
+        mUnk19C = mUnk19C.substr(0, i);
+    }
+    if (mUnk19C.size() != 0) {
+        switch (mMode) {
+        case 0: {
+            DinoPlayerData player;
+            gDinoBackup->GetPlayer(&player, 0);
+            for (u32 i = 0; i <= mUnk19C.size(); i++) {
+                player.name[i] = mUnk19C[i];
+            }
+            gDinoBackup->SetPlayer(&player);
+            break;
+        }
+        case 1: {
+            DinoTeam team;
+            gDinoBackup->GetTeam(mArg, &team);
+            u32 i;
+            int members = 0;
+            for (i = 0; i < 5; i++) {
+                if (team.slots[i]) {
+                    members++;
+                }
+            }
+            if (members == 0) {
+                fadeTop = TRUE;
+            }
+            for (u32 i = 0; i <= mUnk19C.size(); i++) {
+                team.name[i] = mUnk19C[i];
+            }
+            gDinoBackup->SetTeam(mArg, &team);
+            break;
+        }
+        }
+    }
+    MParallelTaskSet *fades = new MParallelTaskSet(TRUE);
+    MBright *bright = gLcd->GetBottomDisplay()->mBright;
+    fades->AddTail(bright->CreateFadeOutToBlack(data_02089acc, data_02089ac8));
+    if (mMode == 0) {
+        fades->AddTail(gLcd->GetTopDisplay()->mBright->CreateFadeOutToBlack(data_02089acc, data_02089ac8));
+    } else if (fadeTop) {
+        fades->AddTail(gLcd->GetTopDisplay()->mBright->CreateFadeOutToBlack(data_02089acc, data_02089ac8));
+    }
+    mUnk158->Exit();
+    MTask *exit = MTaskExitTransfer::Create(&(MTask &)*this);
+    KasekiPictCache *cache = mPictCache;
+    cache->mStop = TRUE;
+    MTask *waitTask = MTaskSetWaitEmptyTask::Create(&cache->mSerial);
+    GetSerial()->AddTail(new MTimer(data_02089ad0), fades, waitTask, exit);
 }
 
 void DinoUiSenryuMenu::CheckKeys() {
