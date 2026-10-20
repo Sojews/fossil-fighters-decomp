@@ -1570,6 +1570,10 @@ public:
 class DinoBattleViewPlayerUpdateStateIconRequest : public MMessage {
 public:
     DinoBattleViewPlayerUpdateStateIconRequest() : MMessage(0x10046) {}
+    DinoBattleViewPlayerUpdateStateIconRequest(u32 reply, u32 side, u32 creature, u32 count, const u8 *icons)
+        : MMessage(0x10046), mUnk0C(reply), mUnk10(side), mUnk14(creature), mUnk18(count) {
+        MI_CpuCopy8(icons, mUnk1C, sizeof(mUnk1C));
+    }
     virtual u32 GetSize() { return 32; }
     virtual void Write(void *buf) {
         MI_CpuCopy8(&mId, buf, 4);

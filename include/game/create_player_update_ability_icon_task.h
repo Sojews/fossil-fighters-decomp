@@ -118,6 +118,8 @@ public:
     void CollectCreaturesNearB8(int pos, u32 *ids, int *count);
     void SendUpdateRequest(u32 arg);
     void SendUpdateAbilityIconRequest(u8 a, u32 b);
+    // Sends the view the creature's status icons (none without a creature).
+    void SendUpdateStateIcon(DinoBattleModelCreature *creature, u32 reply);
     BOOL IsCpu();
     u8 GetUnk15C();
     void SetUnk15C();

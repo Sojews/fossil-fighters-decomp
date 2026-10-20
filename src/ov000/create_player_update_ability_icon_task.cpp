@@ -23,7 +23,6 @@
 
 
 
-extern "C" void func_ov000_02163258(void *, u32, u32);
 
 
 
@@ -134,7 +133,7 @@ void UpdateAbilityIconTask::Execute() {
 }
 
 void DinoCreatureUpdateStateIconTask::Execute() {
-    func_ov000_02163258((void *)mUnk10, mUnk14, mUnk18);
+    ((DinoBattleModelPlayer *)mUnk10)->SendUpdateStateIcon((DinoBattleModelCreature *)mUnk14, mUnk18);
     Exit();
 }
 
@@ -716,7 +715,7 @@ void DinoBattleModelCreature::ResetUnk108() {
 void DinoBattleModelCreature::ChangeUnkB8(u32 value) {
     ResetUnk108();
     ResetStatus();
-    func_ov000_02163258(mPlayer, (u32)this, 0);
+    mPlayer->SendUpdateStateIcon(this, 0);
     mUnkB8 = value;
 }
 
@@ -1339,6 +1338,48 @@ u8 DinoBattleModelPlayer::GetUnk15C() {
 
 void DinoBattleModelPlayer::SetUnk15C() {
     mUnk15C = 1;
+}
+
+// A status: its bit in the flags, its level and whether it's lasting.
+struct DinoStatusIconSource {
+    u32 kind;
+    int bit;
+    const s8 *level;
+    const s8 *lasting;
+};
+
+// NONMATCHING: the bit counter and the table's bit swap r3/r5.
+void DinoBattleModelPlayer::SendUpdateStateIcon(DinoBattleModelCreature *creature, u32 reply) {
+    u8 icons[12] = {0};
+    int count = 0;
+    if (creature != NULL) {
+        DinoBattleCreatureStatus *status = creature->GetStatus();
+        const s8 *p = (const s8 *)status;
+        DinoStatusIconSource sources[] = {
+            {0, 2, &p[0x04], &p[0x10]}, {0, 3, &p[0x05], &p[0x11]}, {0, 4, &p[0x06], &p[0x12]},
+            {0, 5, &p[0x07], &p[0x13]}, {0, 6, &p[0x09], &p[0x15]}, {0, 7, &p[0x0A], &p[0x16]},
+            {1, 8, &p[0x0B], &p[0x17]}, {1, 9, &p[0x08], &p[0x14]}, {1, 10, &p[0x0C], &p[0x18]},
+            {1, 11, &p[0x0D], &p[0x19]}, {0, 0, NULL, NULL},
+        };
+        for (int bit = 2; bit < 12; bit++) {
+            if (!(status->flags & (1 << bit))) {
+                continue;
+            }
+            for (int i = 0; sources[i].level != NULL; i++) {
+                if (bit == sources[i].bit) {
+                    u8 icon = bit;
+                    if (*sources[i].lasting) {
+                        icon |= 0x80;
+                    }
+                    icons[count++] = icon | (*sources[i].level << 5);
+                    break;
+                }
+            }
+        }
+    }
+    mUnkF4->Post(new DinoBattleViewPlayerUpdateStateIconRequest(reply, mUnkB8, creature ? creature->GetUnkB4() : 0,
+                                                                count, icons));
+    SendUpdateAbilityIconRequest(1, 0);
 }
 
 MTask *DinoBattleModelPlayer::CreateFieldEffectWaitTask() {
