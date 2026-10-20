@@ -604,8 +604,8 @@ namespace std {
         // Only made with a reference allocator (append_realloc's temporary).
         __vec_deleter_helper(typename remove_reference<Allocator>::type &a) {
             this->init();
-            start_ = 0;
             this->capacity_.alloc = &a;
+            start_ = 0;
         }
 
         ~__vec_deleter_helper();
