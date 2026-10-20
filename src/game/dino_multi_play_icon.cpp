@@ -10,11 +10,8 @@
 
 // NONMATCHING: the two MPoint temporaries get each other's stack slots.
 DinoMultiPlayIcon::DinoMultiPlayIcon() : MProcess(NULL) {
-    DinoMultiPlayIconHook *bottom = new DinoMultiPlayIconHook(gLcd->GetBottomDisplay(), MPoint(236, 4));
-    DinoMultiPlayIconHook *top = new DinoMultiPlayIconHook(gLcd->GetTopDisplay(), MPoint(236, 4));
-    MParallelTaskSet *parallel = &mParallel;
-    parallel->AddTail(top);
-    parallel->AddTail(bottom);
+    GetParallel()->AddTail(new DinoMultiPlayIconHook(gLcd->GetTopDisplay(), MPoint(236, 4)),
+                           new DinoMultiPlayIconHook(gLcd->GetBottomDisplay(), MPoint(236, 4)));
 }
 
 DinoMultiPlayIcon::~DinoMultiPlayIcon() {
