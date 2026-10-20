@@ -23,6 +23,9 @@
 #include "game/dino_cleaning_sample_chips_type_item.h"
 #include "game/dino_cleaning_sample_menu_start_item.h"
 #include "game/dino_cleaning_sample_menu_random_item.h"
+#include "game/dino_weighted_random.h"
+#include "m/seed_generator.h"
+#include "m/menu.h"
 
 DinoCleaningSample::~DinoCleaningSample() {
 }
@@ -152,6 +155,68 @@ MRect DinoCleaningSampleMenuIncItem::GetFrame() {
     return mView->GetFrame().Inflate(8);
 }
 
+// A field of the excavation settings (not named in DinoExcavateDefs yet).
+static inline u32 DinoExcavateWord(MResource<DinoExcavateDefs> &defs, u32 offset) {
+    return *(const u32 *)((const u8 *)defs.Get() + offset);
+}
+
+// One of the excavation settings' tables (count at offset, the table's offset after it).
+static inline u32 DinoExcavateTableEntry(MResource<DinoExcavateDefs> &defs, u32 offset, u32 i) {
+    const u8 *data = (const u8 *)defs.Get();
+    return ((const u32 *)(data + *(const u32 *)(data + offset + 4)))[i];
+}
+
+// Picks a fossil (and how it is cleaned) at random.
+void DinoCleaningSampleMenuRandomItem::OnDecide() {
+    MResource<DinoKasekiDefs> kaseki = gDinoResource->LoadKasekiDefs();
+    MResource<DinoExcavateDefs> excavate = gDinoResource->GetExcavateDefs();
+    MRandom *random = gDinoResource->GetRandom();
+    std::vector<void *> ids;   // (u32 ids)
+    for (u32 id = 0; id < kaseki.Get()->count; id++) {
+        if (*(const u8 *)kaseki.Get()->GetDef(id) != 0 && id >= 1 && id <= 400) {
+            ids.push_back(*(void **)&id);
+        }
+    }
+    if ((int)random->Next(100) <= (int)DinoExcavateWord(excavate, 0x20)) {
+        DinoWeightedRandom weights(random);
+        const u8 *data = (const u8 *)excavate.Get();
+        weights.Add(((const u32 *)(data + *(const u32 *)(data + 0x30)))[2]);
+        data = (const u8 *)excavate.Get();
+        weights.Add(((const u32 *)(data + *(const u32 *)(data + 0x30)))[0]);
+        data = (const u8 *)excavate.Get();
+        weights.Add(((const u32 *)(data + *(const u32 *)(data + 0x30)))[1]);
+        *mUnk94 = 1;
+        switch (weights.Pick()) {
+        case 0:
+            *mUnk90 = 1;
+            *mKaseki = (u32)ids[random->Next(ids.size())];
+            break;
+        case 1:
+            *mUnk90 = 0;
+            *mKaseki = DinoExcavateTableEntry(excavate, 0x40, random->Next(DinoExcavateWord(excavate, 0x40)));
+            break;
+        case 2:
+            *mUnk90 = 0;
+            *mKaseki = DinoExcavateTableEntry(excavate, 0x48, random->Next(DinoExcavateWord(excavate, 0x48)));
+            break;
+        }
+    } else if ((int)random->Next(100) >= 10) {
+        *mKaseki = (u32)ids[random->Next(ids.size())];
+        *mUnk94 = gDinoResource->GetCreatureUnk0D((*mKaseki - 1) / 4 + 1);
+        if (random->Next() <= DinoExcavateWord(excavate, 0x24)) {
+            *mUnk90 = 1;
+        } else {
+            *mUnk90 = 0;
+        }
+    } else {
+        *mUnk90 = 0;
+        *mKaseki = DinoExcavateTableEntry(excavate, 0x40, random->Next(DinoExcavateWord(excavate, 0x40)));
+        *mUnk94 = 0;
+    }
+    GetMenu()->mParallel.Suspend();
+    GetMenu()->Exit();
+}
+
 MRect DinoCleaningSampleMenuRandomItem::GetFrame() {
     return mView->GetFrame().Inflate(8);
 }
@@ -238,6 +303,11 @@ typedef std::__red_black_tree<MMenuItem *, std::pair<MMenuItem *const, std::pair
     DinoCleaningSampleLinkTree;
 template DinoCleaningSampleLinkTree::~__red_black_tree();
 template void DinoCleaningSampleLinkTree::destroy(DinoCleaningSampleLinkTree::node_base *);
+// (So are the random item's vector members, which the game calls out of line.)
+#pragma auto_inline off
+template class std::__vec_deleter<void *, std::allocator<void *> &>;
+template class std::__vec_deleter<void *, std::allocator<void *> >;
+#pragma auto_inline reset
 #pragma always_inline on
 
 static struct DinoCleaningSampleStaticInit {
