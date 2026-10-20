@@ -1105,7 +1105,6 @@ void DinoField::LoadMap(u32 id) {
 }
 
 extern "C" void func_ov001_021603d8(DinoFieldChara *chara);
-extern "C" void func_ov001_02157534(DinoField *field);
 
 // Puts the character where the save has it, if it's on this map (else just resets it).
 void DinoField::SyncChara(u32 id) {
@@ -1133,6 +1132,99 @@ void DinoField::SyncChara(u32 id) {
         DinoFieldChara *chara = GetChara(id);
         if (chara != NULL) {
             chara->ResetState();
+            chara->Refresh();
+        }
+    }
+}
+
+// The characters a map places (map M's 0x58/0x5C): a group per kind.
+struct DinoMapMCharaGroup {
+    u32 flag;           // 0x00: placed only with this flag set (0 for always)
+    u32 count;          // 0x04
+    u32 id;             // 0x08: the character id
+    u16 angle;          // 0x0C
+    u32 fixedCount;     // 0x10: the first ones go to fixed places,
+    u32 fixedOffset;    // 0x14: these (x, y) pairs; the rest to random cells of the group's kind
+};
+struct DinoMapMCharas {
+    const DinoMapMCharaGroup *GetGroup(u32 i) const {
+        return (const DinoMapMCharaGroup *)((const u8 *)this + ((const u32 *)((const u8 *)this + groupOffset))[i]);
+    }
+
+    u8 unk00[0x58];
+    u32 groupCount;     // 0x58
+    u32 groupOffset;    // 0x5C: offsets of the DinoMapMCharaGroup entries
+};
+// Map G: a kind per cell (row-major, width cells to a row).
+struct DinoMapGCells {
+    u32 unk00;
+    u32 width;          // 0x04
+    u32 unk08;
+    u32 cellCount;      // 0x0C
+    u32 cellOffset;     // 0x10: a u8 kind per cell
+
+    u8 GetCell(u32 i) const {
+        const u8 *cells = (const u8 *)this + cellOffset;
+        return cells[i];
+    }
+};
+
+// (The game's push goes one inline level deeper than vector<void *>'s own: its tags land in the other order.)
+static inline void DinoPushCell(std::vector<void *> &cells, void *const &cell) {
+    cells.push_back(cell);
+}
+
+// Places the map's characters: each group's fixed ones, then the rest on random cells of the group's kind.
+void DinoField::PlaceCharas() {
+    int map = mMap->GetInfo()->id;
+    if (map == 0) {
+        return;
+    }
+    MResource<DinoMapMData> m = gDinoResource->LoadMapM(map);
+    if (((const DinoMapMCharas *)m.Get())->groupCount == 0) {
+        return;
+    }
+    mUnk238 = -1;
+    MRandom *random = gDinoResource->GetRandom();
+    MResource<DinoMapData> g = gDinoResource->LoadMapG(map);
+    std::vector<void *> cells;
+    for (u32 kind = 1; kind < ((const DinoMapMCharas *)m.Get())->groupCount; kind++) {
+        const DinoMapMCharaGroup *group = ((const DinoMapMCharas *)m.Get())->GetGroup(kind);
+        if (group->flag != 0 && !gDinoBackup->GetFlag(group->flag)) {
+            continue;
+        }
+        cells.clear();
+        for (u32 i = 0; i < ((const DinoMapGCells *)g.Get())->cellCount; i++) {
+            if (kind == ((const DinoMapGCells *)g.Get())->GetCell(i)) {
+                DinoPushCell(cells, *(void **)&i);
+            }
+        }
+        for (u32 j = 0; j < group->count; j++) {
+            MFx32Point p;
+            if (j < group->fixedCount) {
+                const MFx32Point *fixed = (const MFx32Point *)((const u8 *)group + group->fixedOffset);
+                p.x = fixed[j].x;
+                p.y = fixed[j].y;
+            } else {
+                u32 n = random->Next(cells.size());
+                u32 cell = (u32)cells[n];
+                cells.erase(cells.begin() + n);
+                p = MFx32Point(MFx32((int)(cell % ((const DinoMapGCells *)g.Get())->width * 2 + 1)),
+                               MFx32((int)(cell / ((const DinoMapGCells *)g.Get())->width * 2 + 1)));
+            }
+            DinoFieldChara *chara = GetChara(0);
+            if (chara == NULL) {
+                return;
+            }
+            chara->ResetState();
+            u32 id = group->id;
+            chara->GetModel()->id = id;
+            chara->GetModel()->unk04 = TRUE;
+            MFx32Point &pos = chara->GetModel()->pos;
+            pos.x = p.x;
+            pos.y = p.y;
+            u32 angle = group->angle;
+            chara->GetModel()->angle = angle;
             chara->Refresh();
         }
     }
@@ -1172,7 +1264,7 @@ void DinoField::ReloadMap() {
             SyncChara(i);
         }
     }
-    func_ov001_02157534(this);
+    PlaceCharas();
     CreateKasekiRocks();
 }
 

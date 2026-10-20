@@ -415,6 +415,7 @@ public:
     void Quake(u32 a, u32 b, u32 c);
     void SetUnk258(BOOL value);
     void SyncChara(u32 id);
+    void PlaceCharas();
     MTask *CreateCharaAngleTask(u32 chara, u32 angle, u32 a, u32 b);
     MTask *CreateCharaMoveToRegionTask(u32 chara, u32 region, u32 a, u32 b, u8 c);
     MTask *CreateCharaMoveToCoordTask(u32 chara, MFx32Point coord, u32 a, u32 b, u8 c);
