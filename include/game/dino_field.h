@@ -253,10 +253,10 @@ public:
     DinoFieldRadar(DinoField *field, u32 map);
     virtual ~DinoFieldRadar();
     virtual void Idle();
-    // Not decompiled yet: switches the radar to the mode.
+    // Switches the radar to the mode.
     MTask *CreateModeTask(u32 mode, u32 frames, u8 b);
     void SetPlayer(MFx32Point pos, u16 angle, MFx32 height);
-    void SetUnk5A8(u8 value);
+    void SetUnk5A8(bool value);
     // Beeps and plays the marker's signal motion (unless in mode 1 or already signalling).
     void Signal();
     // Where the container gauge's top is: lower the fuller the containers are.
@@ -264,9 +264,12 @@ public:
 
     u32 mUnk74[3];              // 0x74
     MSmartOam *mOam;            // 0x80
-    u32 mUnk84[2];              // 0x84
+    u32 mUnk84;                 // 0x84
+    MSmartOam *mOam88;          // 0x88
     MMotion *mMarker;           // 0x8C
-    u32 mUnk90[4];              // 0x90
+    MMotion *mMotion90;         // 0x90
+    MMotion *mMotion94;         // 0x94
+    u32 mUnk98[2];              // 0x98
     MAfnBlock *mAffine;         // 0xA0
     u8 unkA4[0x568 - 0xA4];
     u32 mMode;                  // 0x568

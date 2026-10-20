@@ -16,6 +16,7 @@
 #include "m/obj.h"
 #include "m/smart_oam.h"
 #include "m/bright.h"
+#include "m/blend.h"
 #include "m/call_task.h"
 #include "game/dino_backup.h"
 #include "game/dino_resource.h"
@@ -31,9 +32,10 @@ DinoFieldRadarManager::~DinoFieldRadarManager() {
 // Template task instances the game emits in this file. Until the code that makes the tasks is decompiled, they are
 // instantiated explicitly.
 template class MCallTask1<DinoFieldRadar, DinoFieldRadar, bool>;
-template MTask *MCreateCallTask(DinoFieldRadar *obj, void (DinoFieldRadar::*func)(bool), bool a0);
 
 #pragma auto_inline off
+// (Not inlined by the mode task, so instantiated here, after auto-inlining is off.)
+template MTask *MCreateCallTask(DinoFieldRadar *obj, void (DinoFieldRadar::*func)(bool), bool a0);
 
 void DinoFieldRadar::Signal() {
     if (mMode != 1 && !mSignalling) {
@@ -61,8 +63,37 @@ MPoint DinoFieldRadar::GetContainerGaugePos() {
     return MPoint(0x80, 0xC2 - 0x62 * count / (player.containerNum * 8));
 }
 
-void DinoFieldRadar::SetUnk5A8(u8 value) {
+void DinoFieldRadar::SetUnk5A8(bool value) {
     mUnk5A8 = value;
+}
+
+// Switches the radar to the mode: 1 hides it (fading the blend out), anything else shows it again.
+MTask *DinoFieldRadar::CreateModeTask(u32 mode, u32 frames, u8 b) {
+    mMode = mode;
+    if (mode == 1) {
+        return (new MParallelTaskSet(TRUE))
+            ->Add(b ? DinoSoundCreatePlaySeTask(0x86, 0) : (MTask *) new MTimer(0))
+            ->Add(MCreateCallTask(this, &DinoFieldRadar::SetUnk5A8, false))
+            ->Add(mMotion90->CreatePlayTransfer(2, 1))
+            ->Add(mMotion94->CreatePlayTransfer(1, 1))
+            ->Add((new MParallelTaskSet(TRUE))
+                      ->Add(GetDisplay()->mBlend->CreateFadeRatioAnime(0, 10, frames, 0))
+                      ->Add(GetDisplay()->mBlend->CreateAlphaRatioAnime(16, 0, 16, 16, frames, 0)))
+            ->Add(GetDisplay()->mBlend->CreateAlphaTransfer(16, 0))
+            ->Add(mOam->CreateHideTransfer())
+            ->Add(mOam88->CreateHideTransfer());
+    }
+    return (new MParallelTaskSet(TRUE))
+        ->Add(b ? DinoSoundCreatePlaySeTask(0x85, 0) : (MTask *) new MTimer(0))
+        ->Add(mOam->CreateShowTransfer())
+        ->Add(mOam88->CreateShowTransfer())
+        ->Add(GetDisplay()->mBlend->CreateAlphaTransfer(16, 16))
+        ->Add(mMotion90->CreatePlayTransfer(1, 1))
+        ->Add(mMotion94->CreatePlayTransfer(1, 1))
+        ->Add((new MParallelTaskSet(TRUE))
+                  ->Add(GetDisplay()->mBlend->CreateFadeRatioAnime(10, 0, frames, 0))
+                  ->Add(GetDisplay()->mBlend->CreateAlphaRatioAnime(0, 16, 16, 16, 60, 0)))
+        ->Add(MCreateCallTask(this, &DinoFieldRadar::SetUnk5A8, true));
 }
 
 DinoFieldRadarManager::DinoFieldRadarManager(DinoField *field) : MProcess(gLcd->GetTopDisplay()) {
