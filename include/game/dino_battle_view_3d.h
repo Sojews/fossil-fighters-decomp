@@ -20,6 +20,7 @@ class Dino3DLoadCsv;
 
 class DinoBattleView3D : public MProcess, public MMessageObserver {
 public:
+    DinoBattleView3D(class DinoBattleView *view);
     virtual ~DinoBattleView3D();
     virtual void Idle();
     virtual void OnMessage(MMessage *msg);

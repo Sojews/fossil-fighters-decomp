@@ -25,6 +25,7 @@ public:
     u32 mUnk74;                 // 0x74
     MSmartOam *mOam;            // 0x78: on the main screen, shifted a screen up
     MParallelTaskSet *mTasks;   // 0x7C
+    u8 unk80[0xA0 - 0x80];
 };
 
 class DBViewFocusLCDFrameTask : public MTask {

@@ -238,7 +238,7 @@ _ZN25DinoBattleViewPlayerField4HideEv kind:function(thumb,size=0xe) addr:0x0215f
 _ZN25DinoBattleViewPlayerField8IsHiddenEv kind:function(thumb,size=0x12) addr:0x0215f204
 _ZN25DinoBattleViewPlayerField12GetPlaneMaskEv kind:function(thumb,size=0x12) addr:0x0215f218
 func_ov000_0215f22c kind:function(thumb,size=0xd0) addr:0x0215f22c
-func_ov000_0215f2fc kind:function(thumb,size=0x9d0) addr:0x0215f2fc
+_ZN19DinoBattleViewFieldC1EP14DinoBattleViewP9MSmartOamm kind:function(thumb,size=0x9d0) addr:0x0215f2fc
 _ZN19DinoBattleViewFieldD1Ev kind:function(thumb,size=0xdc) addr:0x0215fccc
 _ZN19DinoBattleViewFieldD0Ev kind:function(thumb,size=0xe2) addr:0x0215fda8
 _ZN19DinoBattleViewField4IdleEv kind:function(thumb,size=0xc) addr:0x0215fe8c
@@ -1189,7 +1189,7 @@ _ZN17B3DStatusViewTask9StateShowEv kind:function(thumb,size=0x1a0) addr:0x02184f
 _ZN17B3DStatusViewTask9StateFadeEv kind:function(thumb,size=0x14c) addr:0x021850d4
 _ZN17B3DStatusViewTask9StateNextEv kind:function(thumb,size=0x158) addr:0x02185220
 _ZN17B3DStatusViewTask10StateCheckEv kind:function(thumb,size=0x90) addr:0x02185378
-func_ov000_02185408 kind:function(thumb,size=0x4a4) addr:0x02185408
+_ZN16DinoBattleView3DC1EP14DinoBattleView kind:function(thumb,size=0x4a4) addr:0x02185408
 func_ov000_021858ac kind:function(thumb,size=0xa) addr:0x021858ac
 _ZNSt6vectorIS_ISsSaISsEESaIS2_EED1Ev kind:function(thumb,size=0xc) addr:0x021858b8
 _ZN16DinoBattleView3DD1Ev kind:function(thumb,size=0xc4) addr:0x021858c4
@@ -1601,7 +1601,6 @@ _ZTV20EnableRootSelectTask kind:data(any) addr:0x0219151c
 _ZTS20EnableRootSelectTask kind:data(any) addr:0x02191530
 data_ov000_02191548 kind:data(any) addr:0x02191548
 _ZTV14DinoBattleView kind:data(any) addr:0x02191564
-data_ov000_02191588 kind:data(any) addr:0x02191588
 data_ov000_0219158c kind:data(any) addr:0x0219158c
 data_ov000_021915a4 kind:data(any) addr:0x021915a4
 data_ov000_021915bc kind:data(any) addr:0x021915bc

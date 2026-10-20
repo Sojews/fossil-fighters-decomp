@@ -7,6 +7,7 @@
 #include "m/view.h"
 #include "m/archive.h"
 #include "m/font.h"
+#include "m/resource.h"
 
 class DinoBattleViewPlayer;
 class DinoBattleViewCreature;
@@ -14,6 +15,18 @@ class MSmartOam;
 
 class DinoBattleView;
 class DinoBattleViewBackdrop;
+class DinoBattleViewActionInfoBar;
+class DinoBattleViewFocusLCDFrame;
+class DinoBattleView3D;
+class KasekiPointPalette;
+struct DinoBattleViewData;
+
+// What the field shows for each side.
+class DinoBattleViewFieldSlot : public MView {
+public:
+    u32 unk10;
+    DinoBattleViewPlayer *mPlayer;  // 0x14
+};
 
 class DinoBattleViewUnkE0 : public MProcess, public MMessageObserver {
 public:
@@ -22,7 +35,7 @@ public:
     u8 unkB0[0xB8 - 0xB0];
     MTaskSet *mTasksB8;         // 0xB8
     u32 unkBC;
-    MView *mSlotViewsC0[2];     // 0xC0: by side
+    DinoBattleViewFieldSlot *mSlotViewsC0[2]; // 0xC0: by side
     u8 unkC8[0x120 - 0xC8];
     DinoBattleViewBackdrop *mBackdrop;  // 0x120
     u32 unk124;
@@ -67,18 +80,17 @@ public:
     int GetUnk140();
     MTask *CreateEnableRootSelectTask();
 
-    MArchivePtr mArchive;       // 0xA8
-    MArchiveFile mFile;         // 0xAC
+    MResource<DinoBattleViewData> mData;    // 0xA8
     MMessageSubject mSubject;   // 0xB8
-    DinoBattleViewUnkE0 *mUnkE0; // 0xE0
+    DinoBattleViewUnkE0 *mUnkE0; // 0xE0: (a DinoBattleViewField)
     DinoBattleViewPlayer *mUnkE4[2]; // 0xE4: players
-    u32 mUnkEC;                 // 0xEC
+    DinoBattleView3D *mUnkEC;   // 0xEC: (only with the 3D view on)
     u32 unkF0[4];
-    u8 *mUnk100;                // 0x100
-    u32 mUnk104;                // 0x104
-    u32 mUnk108;                // 0x108
+    KasekiPointPalette *mUnk100;    // 0x100
+    DinoBattleViewActionInfoBar *mUnk104;   // 0x104
+    DinoBattleViewFocusLCDFrame *mUnk108;   // 0x108
     MSmartOam *mUnk10C;         // 0x10C
-    u32 unk110[2];
+    MSmartOam *mPlayerOams[2];  // 0x110
     MFont *mUnk118;             // 0x118
     MFont *mUnk11C;             // 0x11C
     MFont *mUnk120;             // 0x120
