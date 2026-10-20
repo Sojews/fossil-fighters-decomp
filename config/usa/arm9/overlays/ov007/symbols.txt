@@ -468,7 +468,7 @@ _ZN22DinoUiReviveStatusMenu6SetTabEh kind:function(thumb,size=0xf0) addr:0x02188
 _Z15MCreateCallTaskI22DinoUiReviveStatusMenuS0_hEP5MTaskPT_MT0_FvT1_ES6_ kind:function(thumb,size=0x40) addr:0x02188ef0
 _ZN22DinoUiReviveStatusMenu7SetPageEh kind:function(thumb,size=0x44) addr:0x02188f30
 _ZN22DinoUiReviveStatusMenu13OnBackDecidedEv kind:function(thumb,size=0x1fc) addr:0x02188f74
-func_ov007_02189170 kind:function(thumb,size=0x13ce) addr:0x02189170
+_ZN22DinoUiReviveStatusMenu10RefreshTabEv kind:function(thumb,size=0x13ce) addr:0x02189170
 .L_0218a538 kind:label(thumb) addr:0x0218a538 local
 _ZN22DinoUiReviveStatusLoopC1Emm kind:function(thumb,size=0x20) addr:0x0218a540
 _ZN22DinoUiReviveStatusLoop4IdleEv kind:function(thumb,size=0xe8) addr:0x0218a560

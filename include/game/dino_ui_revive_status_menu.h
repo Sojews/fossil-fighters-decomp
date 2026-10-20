@@ -48,6 +48,7 @@ public:
     void OnBackDecided();
     void SetPage(u8 page);
     void SetTab(u8 tab);
+    void RefreshTab();
     // Fades out (to white, or black) and exits, stopping the music first if it should.
     // Fades both screens in (from white, or black).
     void FadeIn();
@@ -76,7 +77,7 @@ public:
     MResource<DinoKasekiDefs> mKasekiDefs;  // 0x124
     DinoHelpDummyItem *mHelp134;    // 0x134
     DinoHelpDummyItem *mHelp138;    // 0x138
-    u8 unk13C[0x160 - 0x13C];
+    DinoHelpDummyItem *mPageHelps[9];   // 0x13C: the page's help areas
 };
 
 class DinoUiReviveStatusLoop : public MProcess {
