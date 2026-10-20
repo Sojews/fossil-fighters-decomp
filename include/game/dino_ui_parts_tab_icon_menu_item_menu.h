@@ -46,12 +46,14 @@ public:
     MMenuItem *mUnkB8;          // 0xB8
     DinoUiStatusMenuItem *mOKButton;    // 0xBC
     MMenuItem *mTabItems[3];    // 0xC0
-    u32 mUnkCC[2];              // 0xCC
+    class MTextPicture *mBackground;    // 0xCC
+    MMotion *mRank;             // 0xD0: the player's rank
     DinoUiPartsReviverMedalButton *mMembers[5];     // 0xD4
-    u8 unkE8[0xF0 - 0xE8];
+    class DinoUiFieldMenuNumber *mKP[2];    // 0xE8: the KP and its limit
     MTaskSet *mCursorTasks;     // 0xF0
     DinoUiFieldMenuCursor *mCursor; // 0xF4
-    u8 unkF8[0x100 - 0xF8];
+    class MIndicator *mPlayerName;  // 0xF8
+    class MIndicator *mTeamName;    // 0xFC
     DinoUiPartsReviverName *mName;      // 0x100
     DinoCommonWindowMessage *mMessage;  // 0x104
     MTaskSet *mUnk108;          // 0x108
@@ -72,12 +74,14 @@ public:
 
 class DinoUiStatusBackButton : public DinoUiStatusMenuItem {
 public:
+    DinoUiStatusBackButton(DinoUiStatusMenu *owner);
     virtual ~DinoUiStatusBackButton();
     virtual void OnDecide();
 };
 
 class DinoUiStatusOKButton : public DinoUiStatusMenuItem {
 public:
+    DinoUiStatusOKButton(DinoUiStatusMenu *owner);
     virtual ~DinoUiStatusOKButton();
     virtual void OnDecide();
 };

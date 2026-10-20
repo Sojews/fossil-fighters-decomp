@@ -30,6 +30,16 @@
 #include "game/dino_team.h"
 #include "game/dino_ui_parts_team_tech.h"
 #include "game/dino_static_init.h"
+#include "game/dino_ui_field_menu_number.h"
+#include "game/dino_ui_parts_number8.h"
+#include "game/dino_ui_common.h"
+#include "game/dino_guide_message.h"
+#include "m/font.h"
+#include "m/oam_canvas.h"
+#include "m/input.h"
+#include "m/picture.h"
+#include "m/indicator.h"
+#include "m/display.h"
 
 #pragma auto_inline off
 DinoUiStatusMenu::DinoUiStatusMenu(int *choice, DinoTeam *team, DinoTeam *team2)
@@ -114,19 +124,204 @@ void DinoUiStatusOKButton::OnDecide() {
 // instantiated explicitly.
 // Where things go on the screen (filled in at start).
 struct DinoUiStatusLayout {
-    u8 unk00[0x14];
+    u8 unk00[0xC];
+    MPoint backPos;             // 0x0C
     MPoint memberMenuOffset;    // 0x14: from the member's medal
     u8 unk1C[0x2C - 0x1C];
     MPoint memberFocusOffset;   // 0x2C: of the cursor on a member's medal
 };
 extern DinoUiStatusLayout data_ov006_02190e9c;
 struct DinoUiStatusLayout2 {
-    u8 unk00[0x54];
+    u8 unk00[0x8];
+    const char *okPath;         // 0x08
+    u8 unk0C[0x14 - 0xC];
+    const char *backPath;       // 0x14
+    const char *rankPath;       // 0x18
+    u8 unk1C[0x2C - 0x1C];
+    MPoint okPos;               // 0x2C
+    u8 unk34[0x54 - 0x34];
     MPoint nameOffset;          // 0x54: of the member's name from its medal
 };
 extern DinoUiStatusLayout2 data_ov006_02190e1c;
 extern "C" const MPoint data_ov006_02191000[5];
 extern MPoint data_020b5858[3];
+
+// The TU's pooled statics OnStart reads.
+extern "C" const MPoint data_ov006_02190e68, data_ov006_02190e50;   // the player's and the team's names
+extern "C" const MPoint data_ov006_02190eb8, data_ov006_02190e78;   // the two KP numbers
+extern "C" const MPoint data_ov006_02190e98;    // the money
+extern "C" const MPoint data_ov006_02190f68[];  // the team tech's places
+extern "C" const char data_ov006_021913b8[];    // the background
+extern MRect data_020b58b0, data_020b58c0, data_020b58d0;   // the tabs' frames
+extern const u32 data_0208a884, data_0208a888, data_0208a88c, data_0208a890, data_0208a894, data_0208a898,
+    data_0208a89c, data_0208a8a0, data_0208a8a4, data_0208a8a8, data_0208a8ac, data_0208a8b0, data_0208a8b4,
+    data_0208a8b8, data_0208a968, data_0208aa4c;
+extern const int data_02089a10, data_02089a24, data_02089a28, data_02089a38, data_02089a3c, data_02089a40;
+extern "C" void func_ov006_02174478(DinoUiStatusMenu *menu);
+void DinoGetBattleKP(u32 rank, u32 *a, u32 *b);
+
+inline DinoUiStatusBackButton::DinoUiStatusBackButton(DinoUiStatusMenu *owner)
+    : DinoUiStatusMenuItem(owner, data_ov006_02190e1c.backPath, data_ov006_02190e9c.backPos, data_0208a884) {
+    SetKeys(2);
+    SetMode(4);
+}
+
+inline DinoUiStatusOKButton::DinoUiStatusOKButton(DinoUiStatusMenu *owner)
+    : DinoUiStatusMenuItem(owner, data_ov006_02190e1c.okPath, data_ov006_02190e1c.okPos, data_0208a888) {
+    SetKeys(8);
+}
+
+// The excavation settings' section at offset7C (the input repeat is at 0x1C and 0x20).
+static inline const int *GetExcavate7C(MResource<DinoExcavateDefs> &defs) {
+    const DinoExcavateDefs *d = defs.Get();
+    if (d->offset7C == 0) {
+        return NULL;
+    }
+    return (const int *)((const u8 *)d + d->offset7C);
+}
+
+#pragma opt_common_subs off
+#pragma auto_inline off
+// The background, the help areas, the back and OK buttons and the tabs, the team (unless it's the tutorial), the
+// player's and the team's names, the rank, the KP and the money, the cursor and the name; then the fade in (and, for
+// an empty team at a battle, a message).
+void DinoUiStatusMenu::OnStart() {
+    SetLinkFallback(1);
+    {
+        MResource<DinoExcavateDefs> delayDefs = gDinoResource->GetExcavateDefs();
+        MResource<DinoExcavateDefs> intervalDefs = gDinoResource->GetExcavateDefs();
+        GetInput()->SetRepeat(0xF0, GetExcavate7C(delayDefs)[7], GetExcavate7C(intervalDefs)[8]);
+    }
+    DinoPlayerData player;
+    gDinoBackup->GetPlayer(&player, FALSE);
+    mUnk108 = new MParallelTaskSet();
+    mParallel.AddTail(mUnk108);
+    mHelp = NULL;
+    mParallel.AddTail(mBackground = new MTextPicture(std::string(data_ov006_021913b8), TRUE, false));
+    mBackground->Show();
+    mBackground->SetPriority(3);
+    mOam = new MSmartOam(0x28, 0, TRUE);
+    DinoHelpDummyItem *player1, *player2, *player3, *player4, *player5, *team, *tab1, *tab3;
+    mParallel.AddTail(player1 = new DinoHelpDummyItem(GetDisplay(), MRect(8, 8, 0x62, 0x15),
+                                                      std::string(gDinoResource->GetText(data_0208a8b8))));
+    mParallel.AddTail(player2 = new DinoHelpDummyItem(GetDisplay(), MRect(0xC, 0x15, 0xB2, 0x37),
+                                                      std::string(gDinoResource->GetText(data_0208a8b4))));
+    mParallel.AddTail(player3 = new DinoHelpDummyItem(GetDisplay(), MRect(0xC, 0x39, 0xB2, 0x47),
+                                                      std::string(gDinoResource->GetText(data_0208a8b0))));
+    mParallel.AddTail(player4 = new DinoHelpDummyItem(GetDisplay(), MRect(0xC, 0x49, 0xB2, 0x57),
+                                                      std::string(gDinoResource->GetText(data_0208a8ac))));
+    mParallel.AddTail(player5 = new DinoHelpDummyItem(GetDisplay(), MRect(0xC, 0x59, 0xB2, 0x68),
+                                                      std::string(gDinoResource->GetText(data_0208a8a8))));
+    mParallel.AddTail(team = new DinoHelpDummyItem(GetDisplay(), MRect(8, 0x72, 0x8F, 0x7F),
+                                                   std::string(gDinoResource->GetText(data_0208a8a4))));
+    mParallel.AddTail(tab1 = new DinoHelpDummyItem(GetDisplay(), MRect(0x15, 0x83, 0x43, 0xAB),
+                                                   std::string(gDinoResource->GetText(data_0208a8a0))));
+    mParallel.AddTail(new DinoHelpDummyItem(GetDisplay(), MRect(0x45, 0x83, 0x99, 0xAB),
+                                            std::string(gDinoResource->GetText(data_0208a89c))));
+    mParallel.AddTail(tab3 = new DinoHelpDummyItem(GetDisplay(), MRect(0x9D, 0x83, 0xEA, 0xAB),
+                                                   std::string(gDinoResource->GetText(data_0208a898))));
+    mUnkB8 = new DinoUiStatusBackButton(this);
+    AddItem(mUnkB8);
+    mOKButton = new DinoUiStatusOKButton(this);
+    AddItem(mOKButton);
+    mTabItems[0] = new DinoUiPartsTabIconMenuItem(data_0208a894, data_020b58b0);
+    AddItem(mTabItems[0]);
+    mTabItems[1] = new DinoUiPartsTabIconMenuItem(data_0208a890, data_020b58c0);
+    AddItem(mTabItems[1]);
+    mTabItems[2] = new DinoUiPartsTabIconMenuItem(data_0208a88c, data_020b58d0);
+    AddItem(mTabItems[2]);
+    AddLink(mUnkB8, 3, mOKButton);
+    AddLink(mOKButton, 1, mUnkB8);
+    AddLink(mOKButton, 3, mTabItems[2]);
+    AddLink(mTabItems[2], 1, mOKButton);
+    AddLink(mTabItems[0], 3, mUnkB8);
+    AddLink(mUnkB8, 1, mTabItems[0]);
+    AddEntry((u32)player1, 1, 0);
+    AddEntry((u32)player2, 3, 0);
+    AddEntry((u32)player3, 1, 0);
+    AddEntry((u32)player4, 1, 0);
+    AddEntry((u32)player5, 1, 0);
+    AddEntry((u32)team, 1, 0);
+    AddEntry((u32)tab1, 2, (u32)(DinoHelpItem *)(DinoUiPartsTabIconMenuItem *)mTabItems[0]);
+    AddEntry((u32)tab3, 4, (u32)team);
+    if (!gDinoBackup->GetSystemFlag(2)) {
+        CreateItems();
+        RefreshItems();
+    }
+    MFont *font = gDinoResource->CreateFont12(0, 10, 1);
+    MObjCanvas *canvas = new MObjCanvas(gCurrentDisplay, MPoint(0xA0, 0x10), gDinoResource->GetUnkTable(), TRUE);
+    canvas->GetOamUnit()->SetMode(1);
+    mPlayerName = new MIndicator(canvas, font, 0);
+    mParallel.AddTail(mPlayerName);
+    mPlayerName->SetPosition(data_ov006_02190e68);
+    mPlayerName->SetPriority(3);
+    mPlayerName->Show();
+    mPlayerName->SetText(std::wstring((const wchar_t *)player.name));
+    canvas = new MObjCanvas(gCurrentDisplay, MPoint(0xA0, 0x10), gDinoResource->GetUnkTable(), TRUE);
+    canvas->GetOamUnit()->SetMode(1);
+    mTeamName = new MIndicator(canvas, font, 0);
+    mParallel.AddTail(mTeamName);
+    mTeamName->SetPosition(data_ov006_02190e50);
+    mTeamName->SetPriority(3);
+    mTeamName->Show();
+    mTeamName->SetText(std::wstring((const wchar_t *)mTeam->name));
+    mRank = new MMotion(std::string(data_ov006_02190e1c.rankPath), mOam, 2, 1);
+    mRank->Play(player.horiderLevel, 0);
+    mRank->SetPosition(0x84, 0x60);
+    mRank->SetPriority(3);
+    mRank->Show();
+    mParallel.AddTail(mRank);
+    mRank->GetUnit()->SetMode(1);
+    u32 kp, maxKP;
+    DinoGetBattleKP(player.horiderLevel, &kp, &maxKP);
+    mKP[0] = new DinoUiFieldMenuNumber(mOam, data_ov006_02190eb8);
+    mKP[0]->SetValue(kp);
+    mParallel.AddTail(mKP[0]);
+    mKP[1] = new DinoUiFieldMenuNumber(mOam, data_ov006_02190e78);
+    mKP[1]->SetValue(maxKP);
+    mParallel.AddTail(mKP[1]);
+    DinoUiPartsNumber8 *money = new DinoUiPartsNumber8(data_ov006_02190e98);
+    money->SetValue(player.money);
+    mParallel.AddTail(money);
+    mCursorTasks = new MParallelTaskSet();
+    mCursor = new DinoUiFieldMenuCursor(mOam);
+    mParallel.AddTail(mCursor);
+    mCursor->SetPriority(0);
+    mCursor->Hide();
+    mParallel.AddTail(mCursorTasks);
+    mParallel.AddTail(mOam);
+    mName = new DinoUiPartsReviverName();
+    mParallel.AddTail(mName);
+    mName->Hide();
+    mParallel.AddTail(new DinoGuideMessage(std::string(gDinoResource->GetText(data_0208a968))));
+    mUnk110 = new MSerialTaskSet();
+    mParallel.AddTail(mUnk110);
+    mTech = new DinoUiPartsTeamTech(data_ov006_02190f68);
+    mParallel.AddTail(mTech);
+    mTech->Hide();
+    func_ov006_02174478(this);
+    FocusItem(mTabItems[0]);
+    mTabItems[1]->SetKeys(0x400);
+    mTabItems[2]->SetKeys(0x800);
+    RefreshOKButton();
+    DinoDimScreen();
+    mUnk130 = new MParallelTaskSet();
+    mParallel.AddTail(mUnk130);
+    if (*mResult == 99) {
+        mUnk130->AddTail(gLcd->mMain->mBright->CreateFadeInFromBlack(data_02089a40, data_02089a3c));
+        mCursor->Hide();
+        mSerial.AddTail(new MTimer(data_02089a38), mCursor->CreateShowTransfer(), mCursor->CreatePlayTask());
+    } else {
+        mSerial.AddTail(gLcd->mMain->mBright->CreateFadeInFromBlack(data_02089a28, data_02089a24));
+    }
+    if (*mResult == 98 && mTeam->slots[0] == 0) {
+        mSerial.AddTail(new DinoCommonWindowMessageBox(MPoint(0x80, 0x60), std::string(gDinoResource->GetText(data_0208aa4c)),
+                                                       data_02089a10, 4));
+    }
+    *mResult = 0;
+}
+#pragma opt_common_subs reset
+#pragma auto_inline reset
 
 // Moves the cursor to the item; a member's medal also shows the member's name and (in the team view) raises its
 // technique, or (while a replacement is picked) restarts the help.
