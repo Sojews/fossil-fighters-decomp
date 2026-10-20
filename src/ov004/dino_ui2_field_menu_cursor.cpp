@@ -34,8 +34,8 @@ static struct DinoUi2FieldMenuCursorStaticInit {
         DINO_POOL_WORD(data_ov004_021762a0, 0x40) = 150;
         DINO_POOL_WORD(data_ov004_021762a0, 0x14) = 64;
         DINO_POOL_WORD(data_ov004_021762a0, 0x18) = 112;
-        DINO_POOL_WORD(data_ov004_02176320, 0x68) = DINO_POOL_WORD(data_ov004_02176220, 0x20);
-        DINO_POOL_WORD(data_ov004_02176320, 0x6c) = DINO_POOL_WORD(data_ov004_02176220, 0x20);
+        DINO_POOL_WORD(data_ov004_02176320, 0x68) = ((s32 *) &data_ov004_02176220)[0x20 / 4];
+        DINO_POOL_WORD(data_ov004_02176320, 0x6c) = ((s32 *) &data_ov004_02176220)[0x20 / 4];
         DINO_POOL_WORD(data_ov004_02176320, 0x70) = DINO_POOL_WORD(data_ov004_02176220, 0x78);
         DINO_POOL_WORD(data_ov004_02176320, 0x74) = DINO_POOL_WORD(data_ov004_02176220, 0x10);
         DINO_POOL_WORD(data_ov004_02176320, 0x78) = DINO_POOL_WORD(data_ov004_02176220, 0x3c);

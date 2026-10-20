@@ -310,11 +310,10 @@ extern "C" u32 data_ov005_02169588[];
 extern "C" u32 data_ov005_02169608[];
 extern "C" u32 data_ov005_02169688[];
 extern "C" u32 data_ov005_02169488[];
-// NONMATCHING: register choice/scheduling of the pooled stores.
 static struct DinoUiContainerDropMenuPageIncTaskStaticInit {
     DinoUiContainerDropMenuPageIncTaskStaticInit() {
-        DINO_POOL_WORD(data_ov005_02169508, 0x10) = DINO_POOL_WORD(data_ov005_02169388, 0x8);
-        DINO_POOL_WORD(data_ov005_02169508, 0x14) = DINO_POOL_WORD(data_ov005_02169388, 0x8);
+        DINO_POOL_WORD(data_ov005_02169508, 0x10) = ((s32 *) &data_ov005_02169388)[0x8 / 4];
+        DINO_POOL_WORD(data_ov005_02169508, 0x14) = ((s32 *) &data_ov005_02169388)[0x8 / 4];
         DINO_POOL_WORD(data_ov005_02169508, 0x18) = DINO_POOL_WORD(data_ov005_02169208, 0x20);
         DINO_POOL_WORD(data_ov005_02169508, 0x1c) = DINO_POOL_WORD(data_ov005_02169188, 0x2c);
         DINO_POOL_WORD(data_ov005_02169508, 0x20) = DINO_POOL_WORD(data_ov005_02169308, 0x58);
@@ -420,8 +419,8 @@ static struct DinoUiContainerDropMenuPageIncTaskStaticInit {
         DINO_POOL_WORD(data_ov005_02169688, 0x30) = DINO_POOL_WORD(data_ov005_02169208, 0x30);
         DINO_POOL_WORD(data_ov005_02169688, 0x34) = DINO_POOL_WORD(data_ov005_02169288, 0x7c);
         DINO_POOL_WORD(data_ov005_02169688, 0x38) = DINO_POOL_WORD(data_ov005_02169208, 0x40);
-        DINO_POOL_WORD(data_ov005_02169488, 0x18) = DINO_POOL_WORD(data_ov005_02169308, 0x20);
-        DINO_POOL_WORD(data_ov005_02169488, 0x1c) = DINO_POOL_WORD(data_ov005_02169308, 0x20);
+        DINO_POOL_WORD(data_ov005_02169488, 0x18) = ((s32 *) &data_ov005_02169308)[0x20 / 4];
+        DINO_POOL_WORD(data_ov005_02169488, 0x1c) = ((s32 *) &data_ov005_02169308)[0x20 / 4];
         DINO_POOL_WORD(data_ov005_02169488, 0x20) = DINO_POOL_WORD(data_ov005_02169208, 0x4c);
         DINO_POOL_WORD(data_ov005_02169488, 0x24) = DINO_POOL_WORD(data_ov005_02169188, 0x60);
         DINO_POOL_WORD(data_ov005_02169488, 0x28) = DINO_POOL_WORD(data_ov005_02169208, 0x58);

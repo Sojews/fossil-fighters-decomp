@@ -471,11 +471,10 @@ template void std::__vec_deleter<DinoUiFossilEntry, std::allocator<DinoUiFossilE
 extern "C" u32 data_ov005_02165f78[];
 extern "C" u32 data_ov005_021660f8[];
 extern "C" u32 data_ov005_02166178[];
-// NONMATCHING: register choice/scheduling of the pooled stores.
 static struct DinoUiShopSellStaticInit {
     DinoUiShopSellStaticInit() {
-        DINO_POOL_WORD(data_ov005_021660f8, 0x34) = DINO_POOL_WORD(data_ov005_02165f78, 0x4);
-        DINO_POOL_WORD(data_ov005_021660f8, 0x38) = DINO_POOL_WORD(data_ov005_02165f78, 0x4);
+        DINO_POOL_WORD(data_ov005_021660f8, 0x34) = ((s32 *) &data_ov005_02165f78)[0x4 / 4];
+        DINO_POOL_WORD(data_ov005_021660f8, 0x38) = ((s32 *) &data_ov005_02165f78)[0x4 / 4];
         DINO_POOL_WORD(data_ov005_021660f8, 0x3c) = DINO_POOL_WORD(data_ov005_02165f78, 0x34);
         DINO_POOL_WORD(data_ov005_021660f8, 0x40) = DINO_POOL_WORD(data_ov005_02165ff8, 0x0);
         DINO_POOL_WORD(data_ov005_021660f8, 0x44) = DINO_POOL_WORD(data_ov005_02165f78, 0x24);

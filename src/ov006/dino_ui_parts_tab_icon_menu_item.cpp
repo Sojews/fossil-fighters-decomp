@@ -602,12 +602,14 @@ extern "C" u32 data_ov006_02190f1c[];
 // NONMATCHING: register choice/scheduling of the pooled stores.
 static struct DinoUiPartsTabIconMenuItemStaticInit {
     DinoUiPartsTabIconMenuItemStaticInit() {
-        DINO_POOL_WORD(data_ov006_02190e1c, 0x44) = 128;
-        DINO_POOL_WORD(data_ov006_02190e1c, 0x48) = 176;
-        DINO_POOL_WORD(data_ov006_02190e1c, 0x6c) = 8;
-        DINO_POOL_WORD(data_ov006_02190e1c, 0x70) = 150;
-        DINO_POOL_WORD(data_ov006_02190e9c, 0x4) = 64;
-        DINO_POOL_WORD(data_ov006_02190e9c, 0x8) = 112;
+        volatile s32 *p = (volatile s32 *) &data_ov006_02190e1c;
+        p[0x44 / 4] = 128;
+        p[0x48 / 4] = 176;
+        p[0x6c / 4] = 8;
+        p[0x70 / 4] = 150;
+        p = (volatile s32 *) &data_ov006_02190e9c;
+        p[0x4 / 4] = 64;
+        p[0x8 / 4] = 112;
         DINO_POOL_WORD(data_ov006_02190e1c, 0x4c) = 27;
         DINO_POOL_WORD(data_ov006_02190e1c, 0x50) = 10;
         DINO_POOL_WORD(data_ov006_02190e1c, 0x34) = 36;
@@ -622,14 +624,16 @@ static struct DinoUiPartsTabIconMenuItemStaticInit {
         DINO_POOL_WORD(data_ov006_02190e1c, 0x30) = 96;
         DINO_POOL_WORD(data_ov006_02190e9c, 0xc) = 128;
         DINO_POOL_WORD(data_ov006_02190e9c, 0x10) = 96;
-        DINO_POOL_WORD(data_ov006_02190f9c, 0x64) = 46;
-        DINO_POOL_WORD(data_ov006_02190f9c, 0x68) = 152;
+        p = (volatile s32 *) &data_ov006_02190f9c;
+        p[0x64 / 4] = 46;
+        p[0x68 / 4] = 152;
         DINO_POOL_WORD(data_ov006_02191008, 0x0) = 91;
         DINO_POOL_WORD(data_ov006_02191008, 0x4) = 152;
         DINO_POOL_WORD(data_ov006_02191010, 0x0) = 128;
         DINO_POOL_WORD(data_ov006_02191010, 0x4) = 152;
-        DINO_POOL_WORD(data_ov006_02191018, 0x0) = 178;
-        DINO_POOL_WORD(data_ov006_02191018, 0x4) = 152;
+        p = (volatile s32 *) &data_ov006_02191018;
+        p[0x0 / 4] = 178;
+        p[0x4 / 4] = 152;
         DINO_POOL_WORD(data_ov006_02191020, 0x0) = 214;
         DINO_POOL_WORD(data_ov006_02191020, 0x4) = 152;
         DINO_POOL_WORD(data_ov006_02190e9c, 0x14) = -40;

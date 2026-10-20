@@ -397,11 +397,10 @@ extern "C" u32 data_ov005_02167384[];
 extern "C" u32 data_ov005_02167404[];
 extern "C" u32 data_ov005_02167484[];
 extern "C" u32 data_ov005_02167284[];
-// NONMATCHING: register choice/scheduling of the pooled stores.
 static struct DinoUiCleaningMenuItemStaticInit {
     DinoUiCleaningMenuItemStaticInit() {
-        DINO_POOL_WORD(data_ov005_02167304, 0x44) = DINO_POOL_WORD(data_ov005_02167184, 0x24);
-        DINO_POOL_WORD(data_ov005_02167304, 0x48) = DINO_POOL_WORD(data_ov005_02167184, 0x24);
+        DINO_POOL_WORD(data_ov005_02167304, 0x44) = ((s32 *) &data_ov005_02167184)[0x24 / 4];
+        DINO_POOL_WORD(data_ov005_02167304, 0x48) = ((s32 *) &data_ov005_02167184)[0x24 / 4];
         DINO_POOL_WORD(data_ov005_02167304, 0x4c) = DINO_POOL_WORD(data_ov005_02166f84, 0x1c);
         DINO_POOL_WORD(data_ov005_02167304, 0x50) = DINO_POOL_WORD(data_ov005_02167084, 0x68);
         DINO_POOL_WORD(data_ov005_02167304, 0x54) = DINO_POOL_WORD(data_ov005_02167004, 0x7c);
@@ -507,8 +506,8 @@ static struct DinoUiCleaningMenuItemStaticInit {
         DINO_POOL_WORD(data_ov005_02167484, 0x64) = DINO_POOL_WORD(data_ov005_02167084, 0x3c);
         DINO_POOL_WORD(data_ov005_02167484, 0x68) = DINO_POOL_WORD(data_ov005_02166f84, 0x70);
         DINO_POOL_WORD(data_ov005_02167484, 0x6c) = DINO_POOL_WORD(data_ov005_02167004, 0x2c);
-        DINO_POOL_WORD(data_ov005_02167284, 0x4c) = DINO_POOL_WORD(data_ov005_02167004, 0x68);
-        DINO_POOL_WORD(data_ov005_02167284, 0x50) = DINO_POOL_WORD(data_ov005_02167004, 0x68);
+        DINO_POOL_WORD(data_ov005_02167284, 0x4c) = ((s32 *) &data_ov005_02167004)[0x68 / 4];
+        DINO_POOL_WORD(data_ov005_02167284, 0x50) = ((s32 *) &data_ov005_02167004)[0x68 / 4];
         DINO_POOL_WORD(data_ov005_02167284, 0x54) = DINO_POOL_WORD(data_ov005_02167004, 0x3c);
         DINO_POOL_WORD(data_ov005_02167284, 0x58) = DINO_POOL_WORD(data_ov005_02167104, 0x28);
         DINO_POOL_WORD(data_ov005_02167284, 0x5c) = DINO_POOL_WORD(data_ov005_02167004, 0x4c);

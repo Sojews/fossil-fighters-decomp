@@ -215,7 +215,6 @@ extern "C" u32 data_ov007_02192398[];
 extern "C" u32 data_ov007_02192418[];
 extern "C" u32 data_ov007_0219241c[];
 extern "C" u32 data_ov007_02192424[];
-// NONMATCHING: register choice/scheduling of the pooled stores.
 static struct DinoUiTeamSelectStaticInit {
     DinoUiTeamSelectStaticInit() {
         DINO_POOL_WORD(data_ov007_02192318, 0x54) = 128;
@@ -234,8 +233,9 @@ static struct DinoUiTeamSelectStaticInit {
         DINO_POOL_WORD(data_ov007_02192318, 0x50) = 138;
         DINO_POOL_WORD(data_ov007_02192398, 0x7c) = 50;
         DINO_POOL_WORD(data_ov007_02192418, 0x0) = 46;
-        DINO_POOL_WORD(data_ov007_0219241c, 0x0) = 50;
-        DINO_POOL_WORD(data_ov007_0219241c, 0x4) = 85;
+        volatile s32 *p = (volatile s32 *) &data_ov007_0219241c;
+        p[0x0 / 4] = 50;
+        p[0x4 / 4] = 85;
         DINO_POOL_WORD(data_ov007_02192424, 0x0) = 50;
         DINO_POOL_WORD(data_ov007_02192424, 0x4) = 124;
         DINO_POOL_WORD(data_ov007_02192318, 0x5c) = 78;

@@ -653,7 +653,6 @@ extern "C" u32 data_ov007_0218cd60[];
 extern "C" u32 data_ov007_0218cce0[];
 extern "C" u32 data_ov007_0218cd18[];
 extern "C" u32 data_ov007_0218cd20[];
-// NONMATCHING: register choice/scheduling of the pooled stores.
 static struct DinoUiAtmStaticInit {
     DinoUiAtmStaticInit() {
         DINO_POOL_WORD(data_ov007_0218cbe0, 0x20) = 128;
@@ -662,8 +661,8 @@ static struct DinoUiAtmStaticInit {
         DINO_POOL_WORD(data_ov007_0218cbe0, 0x2c) = 150;
         DINO_POOL_WORD(data_ov007_0218cbe0, 0x68) = 64;
         DINO_POOL_WORD(data_ov007_0218cbe0, 0x6c) = 112;
-        DINO_POOL_WORD(data_ov007_0218cde0, 0x0) = DINO_POOL_WORD(data_ov007_0218cb60, 0x4);
-        DINO_POOL_WORD(data_ov007_0218cde0, 0x4) = DINO_POOL_WORD(data_ov007_0218cb60, 0x4);
+        DINO_POOL_WORD(data_ov007_0218cde0, 0x0) = ((s32 *) &data_ov007_0218cb60)[0x4 / 4];
+        DINO_POOL_WORD(data_ov007_0218cde0, 0x4) = ((s32 *) &data_ov007_0218cb60)[0x4 / 4];
         DINO_POOL_WORD(data_ov007_0218cde0, 0x8) = DINO_POOL_WORD(data_ov007_0218cb60, 0x14);
         DINO_POOL_WORD(data_ov007_0218cde0, 0xc) = DINO_POOL_WORD(data_ov007_0218cb60, 0x24);
         DINO_POOL_WORD(data_ov007_0218cde0, 0x10) = DINO_POOL_WORD(data_ov007_0218cae0, 0x7c);
@@ -769,8 +768,8 @@ static struct DinoUiAtmStaticInit {
         DINO_POOL_WORD(data_ov007_0218cf60, 0x20) = DINO_POOL_WORD(data_ov007_0218c9e0, 0x5c);
         DINO_POOL_WORD(data_ov007_0218cf60, 0x24) = DINO_POOL_WORD(data_ov007_0218c9e0, 0x58);
         DINO_POOL_WORD(data_ov007_0218cf60, 0x28) = DINO_POOL_WORD(data_ov007_0218ca60, 0x28);
-        DINO_POOL_WORD(data_ov007_0218cd60, 0x8) = DINO_POOL_WORD(data_ov007_0218c960, 0x18);
-        DINO_POOL_WORD(data_ov007_0218cd60, 0xc) = DINO_POOL_WORD(data_ov007_0218c960, 0x18);
+        DINO_POOL_WORD(data_ov007_0218cd60, 0x8) = ((s32 *) &data_ov007_0218c960)[0x18 / 4];
+        DINO_POOL_WORD(data_ov007_0218cd60, 0xc) = ((s32 *) &data_ov007_0218c960)[0x18 / 4];
         DINO_POOL_WORD(data_ov007_0218cd60, 0x10) = DINO_POOL_WORD(data_ov007_0218c960, 0x1c);
         DINO_POOL_WORD(data_ov007_0218cd60, 0x14) = DINO_POOL_WORD(data_ov007_0218ca60, 0x38);
         DINO_POOL_WORD(data_ov007_0218cd60, 0x18) = DINO_POOL_WORD(data_ov007_0218ca60, 0xc);
@@ -803,10 +802,12 @@ static struct DinoUiAtmStaticInit {
         DINO_POOL_WORD(data_ov007_0218cbe0, 0x34) = 96;
         DINO_POOL_WORD(data_ov007_0218cce0, 0x30) = 50;
         DINO_POOL_WORD(data_ov007_0218cce0, 0x34) = 46;
-        DINO_POOL_WORD(data_ov007_0218cd18, 0x0) = 50;
-        DINO_POOL_WORD(data_ov007_0218cd18, 0x4) = 85;
-        DINO_POOL_WORD(data_ov007_0218cd20, 0x0) = 50;
-        DINO_POOL_WORD(data_ov007_0218cd20, 0x4) = 124;
+        volatile s32 *p = (volatile s32 *) &data_ov007_0218cd18;
+        p[0x0 / 4] = 50;
+        p[0x4 / 4] = 85;
+        p = (volatile s32 *) &data_ov007_0218cd20;
+        p[0x0 / 4] = 50;
+        p[0x4 / 4] = 124;
         DINO_POOL_WORD(data_ov007_0218cbe0, 0x38) = 78;
         DINO_POOL_WORD(data_ov007_0218cbe0, 0x3c) = 8;
         DINO_POOL_WORD(data_ov007_0218cbe0, 0x40) = 78;

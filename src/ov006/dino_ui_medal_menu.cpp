@@ -652,7 +652,6 @@ extern "C" u32 data_ov006_02194314[];
 extern "C" u32 data_ov006_02194258[];
 extern "C" u32 data_ov006_02194284[];
 extern "C" u32 data_ov006_0219428c[];
-// NONMATCHING: register choice/scheduling of the pooled stores.
 static struct DinoUiMedalMenuStaticInit {
     DinoUiMedalMenuStaticInit() {
         DINO_POOL_WORD(data_ov006_02194058, 0x3c) = 128;
@@ -661,8 +660,8 @@ static struct DinoUiMedalMenuStaticInit {
         DINO_POOL_WORD(data_ov006_02194058, 0x48) = 150;
         DINO_POOL_WORD(data_ov006_02194058, 0x4c) = 64;
         DINO_POOL_WORD(data_ov006_02194058, 0x50) = 112;
-        DINO_POOL_WORD(data_ov006_02194358, 0x3c) = DINO_POOL_WORD(data_ov006_02193f58, 0x34);
-        DINO_POOL_WORD(data_ov006_02194358, 0x40) = DINO_POOL_WORD(data_ov006_02193f58, 0x34);
+        DINO_POOL_WORD(data_ov006_02194358, 0x3c) = ((s32 *) &data_ov006_02193f58)[0x34 / 4];
+        DINO_POOL_WORD(data_ov006_02194358, 0x40) = ((s32 *) &data_ov006_02193f58)[0x34 / 4];
         DINO_POOL_WORD(data_ov006_02194358, 0x44) = DINO_POOL_WORD(data_ov006_02193fd8, 0xc);
         DINO_POOL_WORD(data_ov006_02194358, 0x48) = DINO_POOL_WORD(data_ov006_02193e58, 0x64);
         DINO_POOL_WORD(data_ov006_02194358, 0x4c) = DINO_POOL_WORD(data_ov006_02193e58, 0x30);
@@ -768,8 +767,8 @@ static struct DinoUiMedalMenuStaticInit {
         DINO_POOL_WORD(data_ov006_021944d8, 0x5c) = DINO_POOL_WORD(data_ov006_02194058, 0x4);
         DINO_POOL_WORD(data_ov006_021944d8, 0x60) = DINO_POOL_WORD(data_ov006_02194058, 0xc);
         DINO_POOL_WORD(data_ov006_021944d8, 0x64) = DINO_POOL_WORD(data_ov006_02194058, 0x1c);
-        DINO_POOL_WORD(data_ov006_021942d8, 0x44) = DINO_POOL_WORD(data_ov006_02194058, 0x24);
-        DINO_POOL_WORD(data_ov006_021942d8, 0x48) = DINO_POOL_WORD(data_ov006_02194058, 0x24);
+        DINO_POOL_WORD(data_ov006_021942d8, 0x44) = ((s32 *) &data_ov006_02194058)[0x24 / 4];
+        DINO_POOL_WORD(data_ov006_021942d8, 0x48) = ((s32 *) &data_ov006_02194058)[0x24 / 4];
         DINO_POOL_WORD(data_ov006_021942d8, 0x4c) = DINO_POOL_WORD(data_ov006_02194058, 0x30);
         DINO_POOL_WORD(data_ov006_021942d8, 0x50) = DINO_POOL_WORD(data_ov006_02193e58, 0x8);
         DINO_POOL_WORD(data_ov006_021942d8, 0x54) = DINO_POOL_WORD(data_ov006_02193ed8, 0x44);
@@ -832,10 +831,12 @@ static struct DinoUiMedalMenuStaticInit {
         DINO_POOL_WORD(data_ov006_021942fc, 0x4) = 41;
         DINO_POOL_WORD(data_ov006_02194304, 0x0) = 133;
         DINO_POOL_WORD(data_ov006_02194304, 0x4) = 41;
-        DINO_POOL_WORD(data_ov006_0219430c, 0x0) = 183;
-        DINO_POOL_WORD(data_ov006_0219430c, 0x4) = 41;
-        DINO_POOL_WORD(data_ov006_02194314, 0x0) = 219;
-        DINO_POOL_WORD(data_ov006_02194314, 0x4) = 41;
+        volatile s32 *p = (volatile s32 *) &data_ov006_0219430c;
+        p[0x0 / 4] = 183;
+        p[0x4 / 4] = 41;
+        p = (volatile s32 *) &data_ov006_02194314;
+        p[0x0 / 4] = 219;
+        p[0x4 / 4] = 41;
         DINO_POOL_WORD(data_ov006_021940d8, 0x44) = -40;
         DINO_POOL_WORD(data_ov006_021940d8, 0x48) = 28;
         DINO_POOL_WORD(data_ov006_021940d8, 0x4c) = -32;

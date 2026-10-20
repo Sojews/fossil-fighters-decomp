@@ -288,11 +288,10 @@ DinoUi3PartsRockName::DinoUi3PartsRockName(MPoint pos) : MProcess(NULL) {
 extern "C" u32 data_ov005_0216571c[];
 extern "C" u32 data_ov005_0216569c[];
 extern "C" u32 data_ov005_0216579c[];
-// NONMATCHING: register choice/scheduling of the pooled stores.
 static struct DinoUi3PartsFractionStaticInit {
     DinoUi3PartsFractionStaticInit() {
-        DINO_POOL_WORD(data_ov005_0216571c, 0x30) = DINO_POOL_WORD(data_ov005_0216561c, 0x18);
-        DINO_POOL_WORD(data_ov005_0216571c, 0x34) = DINO_POOL_WORD(data_ov005_0216561c, 0x18);
+        DINO_POOL_WORD(data_ov005_0216571c, 0x30) = ((s32 *) &data_ov005_0216561c)[0x18 / 4];
+        DINO_POOL_WORD(data_ov005_0216571c, 0x34) = ((s32 *) &data_ov005_0216561c)[0x18 / 4];
         DINO_POOL_WORD(data_ov005_0216571c, 0x38) = DINO_POOL_WORD(data_ov005_0216569c, 0x8);
         DINO_POOL_WORD(data_ov005_0216571c, 0x3c) = DINO_POOL_WORD(data_ov005_0216561c, 0x60);
         DINO_POOL_WORD(data_ov005_0216571c, 0x40) = DINO_POOL_WORD(data_ov005_0216561c, 0x7c);
