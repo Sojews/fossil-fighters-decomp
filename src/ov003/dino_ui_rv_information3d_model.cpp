@@ -74,8 +74,16 @@ extern "C" void G3X_Reset();
 #define DINO_TOUCH_BUTTON 0x1000   // the touch screen in MInput's buttons
 #define REG_G3_SWAP_BUFFERS (*(volatile u32 *) 0x04000540)
 extern "C" u32 data_ov003_021607e0[];           // the TU's pooled statics (+0x6C: the model's touch area)
-extern "C" u32 data_ov003_02160660[];           // the TU's pooled statics (+0x04/+0x08: the Y turn speed's limits,
-                                                // +0x14/+0x18: the X turn speed's)
+// The TU's pooled statics.
+extern "C" struct DinoRvInformation3DModelStatics {
+    u32 unk00;
+    fx32 maxTurnY;      // 0x04: the Y turn speed's limits
+    fx32 minTurnY;      // 0x08
+    u32 unk0C[2];
+    fx32 minTurnX;      // 0x14: the X turn speed's limits
+    fx32 maxTurnX;      // 0x18
+    u32 unk1C[(0x74 - 0x1C) / 4];
+} data_ov003_02160660;
 extern "C" const fx32 data_02089b04[];          // by creature: the camera's distance
 extern "C" struct {
     void (DinoUiRvInformation3DModel::*LoadModel_00)();
@@ -90,8 +98,7 @@ void DinoUiRvInformation3DModel::SetUnk84(u32 value) {
 }
 
 // Turns the model with drags on it (easing off after), and loads the model again when the creature changes.
-// NONMATCHING: register allocation around the touch checks, and the game takes the turn limits' addresses from
-// their own literals (pooled statics) where we add to the pool's base.
+// NONMATCHING: register allocation around the touch checks (the game loads the buttons again for the release test).
 void DinoUiRvInformation3DModel::Idle() {
     if (!mTasks->IsEmpty()) {
         if (gCurrentDisplay == gLcd->GetBottomDisplay() && (mInput->GetPressed() & DINO_TOUCH_BUTTON) &&
@@ -108,9 +115,9 @@ void DinoUiRvInformation3DModel::Idle() {
         } else if (mInput->mPrevButtons & (mInput->mButtons ^ mInput->mPrevButtons) & DINO_TOUCH_BUTTON) {
             mDragging = FALSE;
         }
-        mUnkA8 = std::min(std::max(mUnkA8, ((const fx32 *)data_ov003_02160660)[2]), ((const fx32 *)data_ov003_02160660)[1]);
+        mUnkA8 = std::min(std::max(mUnkA8, data_ov003_02160660.minTurnY), data_ov003_02160660.maxTurnY);
         mUnkA8 = mUnkA8 * 4 / 5;
-        mUnkAC = std::min(std::max(mUnkAC, ((const fx32 *)data_ov003_02160660)[5]), ((const fx32 *)data_ov003_02160660)[6]);
+        mUnkAC = std::min(std::max(mUnkAC, data_ov003_02160660.minTurnX), data_ov003_02160660.maxTurnX);
         mUnkAC = mUnkAC * 2 / 3;
         mUnk90 += mUnkA8;
         mUnk90 = (mUnk90 + (360 << FX32_SHIFT)) % (360 << FX32_SHIFT);
@@ -637,7 +644,6 @@ void DinoUiRvInformation3DModel::LoadModel() {
     mTasks->AddTail(mAnm, mRotate);
 }
 
-extern "C" u32 data_ov003_02160660[];           // the TU's pooled statics
 extern "C" const char data_ov003_02160bfc[];    // the name font
 extern "C" const char *const data_ov003_02160894[]; // the pictures, by page
 
@@ -659,7 +665,7 @@ DinoUiRvInformation::DinoUiRvInformation(u8 hasTenPictures)
     mViewsAC[0]->SetPriority(2);
     mViewsAC[0]->Show();
     mOam = new MSmartOam(1, 0, TRUE);
-    mViewsAC[1] = new MMotion(std::string(((const char **)data_ov003_02160660)[3]), mOam, 2, 1);
+    mViewsAC[1] = new MMotion(std::string(((const char **)&data_ov003_02160660)[3]), mOam, 2, 1);
     mViewsAC[1]->SetPosition(DINO_POOL(MPoint, data_ov003_02160660, 0x44));
     mViewsAC[1]->SetPriority(2);
     mViewsAC[1]->Show();
@@ -752,7 +758,6 @@ void DinoUiRvInformation3DModelRotate::Execute() {
 // The file's static initialization (see dino_static_init.h).
 extern "C" u32 data_ov003_021606e0[];
 extern "C" u32 data_ov003_02160760[];
-extern "C" u32 data_ov003_02160660[];
 extern "C" u32 data_ov003_02160860[];
 extern "C" u32 data_ov003_021608e0[];
 extern "C" u32 data_ov003_021607e0[];
