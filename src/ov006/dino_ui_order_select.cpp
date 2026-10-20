@@ -543,7 +543,6 @@ static inline const int *GetExcavate7C(const MResource<DinoExcavateDefs> &defs) 
 #pragma auto_inline off
 // The help areas, the back (hidden) and decide buttons, the tabs, both teams, the cursor, the name, the information,
 // the pages' pictures and the first page; then fades in from white, and shows the battle's rules if it has any.
-// NONMATCHING: only r6/r7 swap in the fade, cursor and battle-message task sets.
 void DinoUiOrderSelectMenu::OnStart() {
     SetLinkFallback(1);
     GetInput()->SetRepeat(0xF0, GetExcavate7C(gDinoResource->GetExcavateDefs())[7],
@@ -659,15 +658,19 @@ void DinoUiOrderSelectMenu::OnStart() {
     FocusItem(mItems[0]);
     SetSelectedItem((DinoUiPartsTabIconMenuItem *)mTabs[0]);
     DinoDimScreen();
-    MTask *sub = gLcd->mSub->mBright->CreateFadeInFromWhite(30, 0);
-    MTask *main = gLcd->mMain->mBright->CreateFadeInFromWhite(30, 0);
+    MTask *main;
+    MTask *sub;
+    sub = gLcd->mSub->mBright->CreateFadeInFromWhite(30, 0);
+    main = gLcd->mMain->mBright->CreateFadeInFromWhite(30, 0);
     MParallelTaskSet *fades = new MParallelTaskSet(TRUE);
     fades->AddTail(main);
     fades->AddTail(sub);
     mSerial.AddTail(fades);
     mCursor->Hide();
-    MTask *show = mCursor->CreateShowTransfer();
-    MTask *play = mCursor->CreatePlayTask();
+    MTask *play;
+    MTask *show;
+    show = mCursor->CreateShowTransfer();
+    play = mCursor->CreatePlayTask();
     MParallelTaskSet *cursor = new MParallelTaskSet(TRUE);
     cursor->AddTail(play);
     cursor->AddTail(show);
@@ -679,12 +682,12 @@ void DinoUiOrderSelectMenu::OnStart() {
     if (mUnk1F8 != 0) {
         MResource<DinoBattleData> battle = gDinoResource->LoadBattle(mUnk1F8);
         if (battle.Get()->unk44 != 0) {
-            mSerial.AddTail(MCreateCallTask(this, data_ov006_02197198.Enable),
+            GetSerial()->AddTail(MCreateCallTask(this, data_ov006_02197198.Enable),
                             new DinoCommonWindowMessageBox(MPoint(0x80, 0x60), GetUnk44Text(), 0xB4, 4),
                             MCreateCallTask(this, data_ov006_021971a8.Disable));
         }
         if (battle.Get()->unk3C != 0) {
-            mSerial.AddTail(MCreateCallTask(this, data_ov006_021971b0.Enable),
+            GetSerial()->AddTail(MCreateCallTask(this, data_ov006_021971b0.Enable),
                             new DinoCommonWindowMessageBox(MPoint(0x80, 0x60), GetUnk3CText(), 0xB4, 4),
                             MCreateCallTask(this, data_ov006_021971b8.Disable));
         }
