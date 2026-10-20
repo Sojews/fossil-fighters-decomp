@@ -40,6 +40,7 @@ class DinoUiOrderSelectMenuItem;
 class DinoUiPartsTeamTech;
 class DinoUiPartsReviverName;
 class DinoCommonWindowMessage;
+class DinoHelpDummyItem;
 class DinoUiOrderSelectMenu : public DinoHelpBase, public MMenu {
 public:
     DinoUiOrderSelectMenu(u32 team, const DinoUiOrderSelectInfo *opponent, u8 hasFourthTab, u8 unk1F7, u32 unk1F8,
@@ -106,12 +107,16 @@ public:
     u32 mUnk1F8;                // 0x1F8
     u8 mItemsLinked;            // 0x1FC
     u8 mUnk1FD;                 // 0x1FD
-    u8 unk1FE[0x204 - 0x1FE];
+    u8 unk1FE[2];
+    MTaskSet *mUnk200;          // 0x200
     u8 mUnk204;                 // 0x204
     u8 mUnk205;                 // 0x205
     DinoUiPartsTeamTech *mTech; // 0x208: shown when the team has a technique
-    MResource<DinoUiOrderSelectData> mUnk20C;   // 0x20C
-    u8 unk21C[0x264 - 0x21C];
+    MResource<DinoKasekiDefs> mKasekiDefs;      // 0x20C
+    DinoHelpDummyItem *mHelp21C;    // 0x21C: help areas on the top screen
+    DinoHelpDummyItem *mHelp220;    // 0x220
+    u8 unk224[0x248 - 0x224];
+    DinoHelpDummyItem *mHelps[7];   // 0x248
 };
 
 class DinoUiOrderSelect : public MProcess {
@@ -147,6 +152,7 @@ public:
 
 class DinoUiOrderSelectBackButton : public DinoUiOrderSelectMenuItem {
 public:
+    DinoUiOrderSelectBackButton(DinoUiOrderSelectMenu *owner);
     virtual ~DinoUiOrderSelectBackButton();
     virtual void OnFocusChanged(BOOL focused);
     virtual void OnDecide();
@@ -154,6 +160,7 @@ public:
 
 class DinoUiOrderSelectDecideButton : public DinoUiOrderSelectMenuItem {
 public:
+    DinoUiOrderSelectDecideButton(DinoUiOrderSelectMenu *owner);
     virtual ~DinoUiOrderSelectDecideButton();
     virtual void OnDecide();
 };
