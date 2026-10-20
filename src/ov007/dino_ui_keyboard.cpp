@@ -22,6 +22,12 @@
 #include "m/bright.h"
 #include "m/picture.h"
 #include "game/dino_common_window_menu_item_flush_task_menu.h"
+#include "game/dino_common_window_message_box.h"
+#include "game/dino_guide_message.h"
+#include "game/dino_resource.h"
+#include "m/oam_canvas.h"
+#include "m/smart_oam.h"
+#include "m/text_codec.h"
 
 DinoUiKeyboardMenu::DinoUiKeyboardMenu(int mode, u32 arg, int flag)
     : MMenu(NULL, 0), mPagePicture(NULL), mFocusFrame(0), mMode(mode), mArg(arg), mPage(0x20), mFlag(flag) {
@@ -593,8 +599,144 @@ void DinoUiKeyboardMenu::OnDecide(MMenuItem *item) {
     RefreshName();
 }
 
-// DinoUiKeyboardMenu::OnStart (not decompiled yet) starts a background load.
-template MTask *MCreateBgCallTask(DinoUiKeyboardMenu *obj, void (DinoUiKeyboardMenu::*func)(), int thread);
+extern "C" struct {
+    void (KasekiPictCache::*Load_00)();
+} data_ov007_02190fe4;
+
+inline KasekiPictCache::KasekiPictCache(const char *const *paths) : MProcess(NULL), mPaths(paths), mStop(FALSE) {
+    mSerial.AddTail(MCreateBgCallTask(this, data_ov007_02190fe4.Load_00, 1));
+}
+
+extern "C" void func_ov007_02182020(DinoUiKeyboardMenu *menu);
+extern const int data_020899bc, data_020899c8, data_020899e0;
+extern const u32 data_0208aa78, data_0208ac28, data_0208ac2c, data_0208ac58, data_0208ac68, data_0208ac6c, data_0208ac7c,
+    data_0208ac80, data_0208ac84, data_0208ac88;
+// The motions' paths (the cursor's is [8]) and the name's caption.
+extern "C" const char *const data_ov007_02190fa0[];
+extern "C" const char data_ov007_02191854[];
+extern "C" const MPoint data_ov007_021911f0[][18];
+
+// Builds the keyboard for a player's name (mode 0) or a team's (mode 1): the name, padded with blanks to its
+// length, a character each, the cursor and the help, then starts loading the keyboard pictures.
+// NONMATCHING: scheduling only (the game reads gCurrentDisplay after copying each canvas's size).
+void DinoUiKeyboardMenu::OnStart() {
+    if (mMode == 0) {
+        gLcd->GetTopDisplay()->mObj->Show();
+        mParallel.AddTail(gLcd->GetTopDisplay()->mBright->CreateFadeInFromBlack(data_020899e0, data_020899c8));
+    }
+    gLcd->GetBottomDisplay()->mObj->Show();
+    mParallel.AddTail(gLcd->GetBottomDisplay()->mBright->CreateFadeInFromBlack(data_020899e0, data_020899c8));
+    mParallel.AddTail(mUnk150 = new MParallelTaskSet(), mFocusTasks = new MParallelTaskSet(),
+                      mUnk154 = new MSerialTaskSet());
+    mOam = new MSmartOam(0x55, 0, TRUE);
+    mParallel.AddTail(mOam);
+    mUnk1B4[0] = MDecodeUtf8(gDinoResource->GetText(data_0208ac88));
+    mUnk1B4[1] = MDecodeUtf8(gDinoResource->GetText(data_0208ac84));
+    mUnk1B4[2] = MDecodeUtf8(gDinoResource->GetText(data_0208ac80));
+    mUnk1D8 = MDecodeUtf8(gDinoResource->GetText(data_0208ac7c));
+    mUnk19C.clear();
+    mUnk1A8.clear();
+    DinoHelpDummyItem *help =
+        new DinoHelpDummyItem(gCurrentDisplay, MRect(9, 0x54, 0xF6, 0xAA), gDinoResource->GetText(data_0208ac68));
+    mKeysHelp = help;
+    help->Enable();
+    mParallel.AddTail(help);
+    MFont *font;
+    int dx, dy;
+    switch (mMode) {
+    case 0: {
+        mParallel.AddTail(new DinoGuideMessage(gDinoResource->GetText(data_0208ac2c)));
+        help = new DinoHelpDummyItem(gCurrentDisplay, MRect(9, 10, 0xF6, 0x35), gDinoResource->GetText(data_0208ac6c));
+        mHelp = help;
+        mMaxLength = 8;
+        mCursor = new MMotion(data_ov007_02190fa0[8], mOam, 2, 1);
+        font = gDinoResource->CreateFont24(0, 10, 1);
+        dx = 6;
+        dy = 12;
+        DinoPlayerData player;
+        gDinoBackup->GetPlayer(&player, FALSE);
+        if (mFlag) {
+            mUnk19C = (const wchar_t *)player.name;
+        } else {
+            mUnk19C.clear();
+        }
+        MTextPicture *caption = new MTextPicture(gLcd->GetTopDisplay(), data_ov007_02191854, TRUE, false);
+        caption->Show();
+        caption->SetPriority(3);
+        mParallel.AddTail(caption);
+        break;
+    }
+    case 1: {
+        mParallel.AddTail(new DinoGuideMessage(gDinoResource->GetText(data_0208ac28)));
+        help = new DinoHelpDummyItem(gCurrentDisplay, MRect(9, 10, 0xF6, 0x35), gDinoResource->GetText(data_0208ac58));
+        mHelp = help;
+        mCursor = new MMotion(data_ov007_02190fa0[8], mOam, 2, 1);
+        mMaxLength = 0x10;
+        font = gDinoResource->CreateFont24(0, 10, 1);
+        dx = 6;
+        dy = 12;
+        DinoTeam team;
+        gDinoBackup->GetTeam(mArg, &team);
+        mUnk19C = (const wchar_t *)team.name;
+        if (team.slots[0] == 0) {
+            mSerial.AddTail(new DinoCommonWindowMessageBox(MPoint(0x80, 0x60), gDinoResource->GetText(data_0208aa78), 4));
+        }
+        break;
+    }
+    }
+    help->Enable();
+    mParallel.AddTail(help);
+    // Drops the trailing NULs.
+    for (int i = mUnk19C.size() - 1; i >= 0; i--) {
+        if (mUnk19C[i] != 0) {
+            break;
+        }
+        mUnk19C = mUnk19C.substr(0, i);
+    }
+    for (int i = mUnk1A8.size() - 1; i >= 0; i--) {
+        if (mUnk1A8[i] != 0) {
+            break;
+        }
+        mUnk1A8 = mUnk1A8.substr(0, i);
+    }
+    if (mUnk19C.size() > mMaxLength) {
+        mUnk19C = mUnk19C.substr(0, mMaxLength);
+    }
+    mCursorPos = mUnk19C.size();
+    while (mUnk19C.size() < mMaxLength) {
+        mUnk19C += mUnk1B4[2].substr(29, 1);
+    }
+    while (mUnk1A8.size() < mMaxLength) {
+        mUnk1A8 += mUnk1B4[2].substr(29, 1);
+    }
+    for (int i = 0; i < mMaxLength; i++) {
+        MTaskSet *tasks = &mParallel;
+        mChars[i] = new MIndicator(
+            new MObjCanvas(gCurrentDisplay, MPoint(0x18, 0x18), gDinoResource->GetUnkTable(), TRUE), font, 0);
+        tasks->AddTail(mChars[i]);
+        const MPoint &pos = data_ov007_021911f0[mMode][i];
+        mChars[i]->SetPosition(MPoint(pos.x - dx, pos.y - dy));
+        mChars[i]->SetPriority(3);
+        mChars[i]->Show();
+    }
+    mCursor->Play(1, 0);
+    mCursor->SetPriority(2);
+    mCursor->Show();
+    mUnk150->AddTail(mCursor);
+    RefreshName();
+    func_ov007_02182020(this);
+    SetPage(2);
+    KeyCheckTask *keys = new KeyCheckTask(this);
+    keys->mState = 1;
+    mParallel.AddTail(keys);
+    GetInput()->SetRepeat(0xF0, 0x1E, 10);
+    mSerial.AddTail(new MTimer(data_020899bc), MTaskRunTransfer::Create(keys));
+    mUnk158 = keys;
+    mPictCache = new KasekiPictCache(data_ov007_021911c0[mMode]);
+    mParallel.AddTail(mPictCache);
+}
+
+template MTask *MCreateBgCallTask(KasekiPictCache *obj, void (KasekiPictCache::*func)(), int thread);
 
 MRect DinoUiKeyboardHideMenuItem::GetRect() {
     return GetFrame();

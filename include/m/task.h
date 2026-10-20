@@ -76,13 +76,15 @@ public:
     void AddTail(MTask *task);
     // Several at once (the arguments are evaluated last to first).
     void AddTail(MTask *a, MTask *b) {
-        AddTail(a);
-        AddTail(b);
+        MTaskSet *self = this;
+        self->AddTail(a);
+        self->AddTail(b);
     }
     void AddTail(MTask *a, MTask *b, MTask *c) {
-        AddTail(a);
-        AddTail(b);
-        AddTail(c);
+        MTaskSet *self = this;
+        self->AddTail(a);
+        self->AddTail(b);
+        self->AddTail(c);
     }
     void AddTail(MTask *a, MTask *b, MTask *c, MTask *d) {
         AddTail(a);

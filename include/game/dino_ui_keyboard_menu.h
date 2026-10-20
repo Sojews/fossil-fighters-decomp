@@ -51,10 +51,13 @@ public:
     MMotion *mFocusFrame;       // 0x144: around the focused function key
     MMotion *mCursor;           // 0x148
     MTaskSet *mFocusTasks;      // 0x14C
-    u32 unk150;
+    MTaskSet *mUnk150;          // 0x150
     MTaskSet *mUnk154;          // 0x154
     MTask *mUnk158;             // 0x158
-    u8 unk15C[0x180 - 0x15C];
+    DinoHelpDummyItem *mHelp;   // 0x15C: the help for the name (the player's or the team's)
+    u32 unk160;
+    DinoHelpDummyItem *mKeysHelp;   // 0x164: the help for the keys
+    u8 unk168[0x180 - 0x168];
     MPoint mFocusPos;           // 0x180
     int mMode;                  // 0x188
     u32 mArg;                   // 0x18C

@@ -30,6 +30,8 @@ public:
 
 class KasekiPictCache : public MProcess {
 public:
+    // Starts loading the pictures in the background.
+    KasekiPictCache(const char *const *paths);
     virtual ~KasekiPictCache();
     virtual void Idle();
     // Loads the pictures, one path after another, until told to stop (in the background).
@@ -42,6 +44,7 @@ public:
 
 class KeyCheckTask : public MTask {
 public:
+    KeyCheckTask(void *owner) { mOwner = owner; }
     virtual ~KeyCheckTask();
     virtual void Execute();
 
