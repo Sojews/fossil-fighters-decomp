@@ -13,6 +13,13 @@
 #include "game/dino_backup.h"
 #include "game/dino_common_window_menu_item_flush_task_menu.h"
 #include "game/dino_static_init.h"
+#include "m/input.h"
+#include "game/dino_common_window_message_box.h"
+#include "game/dino_guide_message.h"
+#include "m/oam_canvas.h"
+#include "m/picture.h"
+#include "m/smart_oam.h"
+#include <printf.h>
 
 DinoUiTeamSelectMenu::~DinoUiTeamSelectMenu() {
 }
@@ -27,6 +34,116 @@ DinoUiTeamSelectMenu::DinoUiTeamSelectMenu(int *result, u8 unk108, u8 unk109) : 
 
 DinoUiTeamSelect::~DinoUiTeamSelect() {
 }
+
+// Where the teams are, and the menu's offset from them.
+extern MPoint data_ov007_02192414[3];
+extern struct {
+    const char *paths[5];   // 0x00: [2] the current team's mark, [3] a button's focus, [4] an empty team's mark
+    u8 unk14[0x5C - 0x14];
+    MPoint buttonOffset;    // 0x5C
+    u8 unk64[0x6C - 0x64];
+    MPoint labelOffset;     // 0x6C
+    MPoint menuOffset;      // 0x74
+} data_ov007_02192318;
+extern const u32 data_0208a944, data_0208aa7c, data_0208ab1c, data_0208ab20;
+extern const u16 data_020b5870[];   // a palette
+extern "C" const char data_ov007_02192614[];
+void DinoGetBattleKP(u32 value, u32 *a, u32 *b);
+
+static inline const int *GetExcavate7C(MResource<DinoExcavateDefs> &defs) {
+    const DinoExcavateDefs *d = defs.Get();
+    if (d->offset7C == 0) {
+        return NULL;
+    }
+    return (const int *)((const u8 *)d + d->offset7C);
+}
+
+inline DinoUiTeamSelectTeamButton::DinoUiTeamSelectTeamButton(DinoUiTeamSelectMenu *owner, MPoint pos, u32 textId)
+    : mOwner(owner), mPos(pos), mTextId(textId) {
+    mView = new MMotion(data_ov007_02192318.paths[3], mOwner->GetOam(), 2, 1);
+    mView->SetPosition(pos);
+    mView->Play(1, 0);
+    mView->SetPriority(3);
+    mView->Hide();
+    mParallel.AddTail(mView);
+}
+
+// The three saved teams (a name, a button and an empty mark each), the current team's mark, the cursor, the team
+// details and, for a battle, the horider level's message.
+// NONMATCHING: stack slots only (the game's hoisted &mParallel is below the loop's spills; our block-local is above).
+#pragma opt_common_subs off
+void DinoUiTeamSelectMenu::OnStart() {
+    SetLinkFallback(1);
+    {
+        MResource<DinoExcavateDefs> delayDefs = gDinoResource->GetExcavateDefs();
+        MResource<DinoExcavateDefs> intervalDefs = gDinoResource->GetExcavateDefs();
+        GetInput()->SetRepeat(0xF0, GetExcavate7C(delayDefs)[7], GetExcavate7C(intervalDefs)[8]);
+    }
+    mOam = new MSmartOam(0x32, 0, TRUE);
+    MFont *nameFont = gDinoResource->CreateFont24(0, 2, 1);
+    MFont *labelFont = gDinoResource->CreateFont24(0, 3, 0);
+    for (int i = 0; i < 3; i++) {
+        MTaskSet *tasks = &mParallel;
+        mNames[i] = new DinoUiPartsTeamIndicator(data_ov007_02192414[i] + data_ov007_02192318.labelOffset, nameFont);
+        tasks->AddTail(mNames[i]);
+        mLabels[i] = new MIndicator(new MObjCanvas(gCurrentDisplay, MPoint(0xC0, 0x20), data_020b5870, TRUE),
+                                    labelFont, 0);
+        tasks->AddTail(mLabels[i]);
+        mLabels[i]->SetPosition(data_ov007_02192414[i] + data_ov007_02192318.labelOffset);
+        mLabels[i]->SetPriority(3);
+        mTeams[i] = new DinoUiTeamSelectTeamButton(this, data_ov007_02192414[i] + data_ov007_02192318.buttonOffset,
+                                                   data_0208aa7c);
+        AddItem(mTeams[i]);
+        mUnkEC[i] = new MMotion(data_ov007_02192318.paths[4], mOam, 2, 1);
+        mUnkEC[i]->SetPosition(data_ov007_02192414[i] + data_ov007_02192318.buttonOffset);
+        mUnkEC[i]->SetPriority(3);
+        mUnkEC[i]->Play(1, 0);
+        mUnkEC[i]->Hide();
+        tasks->AddTail(mUnkEC[i]);
+    }
+    RefreshTeams();
+    MMotion *mark = new MMotion(data_ov007_02192318.paths[2], mOam, 0, 1);
+    mark->SetPosition(data_ov007_02192414[gDinoBackup->GetUnk34_26() - 1] + data_ov007_02192318.buttonOffset);
+    mark->SetPriority(2);
+    mark->Play(1, 0);
+    mark->Show();
+    mParallel.AddTail(mark);
+    mCursorTasks = new MParallelTaskSet();
+    mParallel.AddTail(mCursorTasks);
+    mCursor = new DinoUiFieldMenuCursor(mOam);
+    mParallel.AddTail(mCursor);
+    mCursor->SetPriority(1);
+    mParallel.AddTail(mOam);
+    mTeamInfo = new DinoUiPartsTeamInfo();
+    mParallel.AddTail(mTeamInfo);
+    mParallel.AddTail(mTitle = new MTextPicture(data_ov007_02192614, TRUE, false));
+    mTitle->Show();
+    mTitle->SetPriority(3);
+    mParallel.AddTail(new DinoGuideMessage(gDinoResource->GetText(data_0208a944)));
+    FocusNearestItem(MPoint(10, 10));
+    MTask *main;
+    MTask *sub = gLcd->mSub->mBright->CreateFadeInFromWhite(30, 0);
+    main = gLcd->mMain->mBright->CreateFadeInFromWhite(30, 0);
+    MParallelTaskSet *fades = new MParallelTaskSet(TRUE);
+    fades->AddTail(main);
+    fades->AddTail(sub);
+    mSerial.AddTail(fades);
+    if (mUnk108) {
+        char text[0x100];
+        DinoPlayerData player;
+        gDinoBackup->GetPlayer(&player, FALSE);
+        u32 a, b;
+        DinoGetBattleKP(player.horiderLevel, &a, &b);
+        u32 level = player.horiderLevel;
+        if (level == 7) {
+            sprintf(text, gDinoResource->GetText(data_0208ab1c), a, b);
+        } else {
+            sprintf(text, gDinoResource->GetText(data_0208ab20), level, a, b);
+        }
+        mSerial.AddTail(new DinoCommonWindowMessageBox(MPoint(0x80, 0x60), text, 4));
+    }
+}
+#pragma opt_common_subs reset
 
 DinoUiTeamSelectTeamButton::~DinoUiTeamSelectTeamButton() {
 }
@@ -89,12 +206,6 @@ void DinoUiTeamSelectMenu::RefreshTeams() {
     }
 }
 
-// Where the teams are, and the menu's offset from them.
-extern MPoint data_ov007_02192414[3];
-extern struct {
-    u8 unk00[0x74];
-    MPoint menuOffset;  // 0x74
-} data_ov007_02192318;
 extern const u32 data_0208ab24;
 extern const u32 data_0208ab28;
 

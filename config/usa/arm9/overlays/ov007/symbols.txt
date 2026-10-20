@@ -1208,7 +1208,6 @@ data_ov007_02192548 kind:data(any) addr:0x02192548
 _ZTV20DinoUiTeamSelectMenu kind:data(any) addr:0x02192570
 data_ov007_02192598 kind:data(any) addr:0x02192598
 _ZTV26DinoUiTeamSelectTeamButton kind:data(any) addr:0x021925c0
-data_ov007_02192600 kind:data(any) addr:0x02192600
 data_ov007_02192614 kind:data(any) addr:0x02192614
 data_ov007_02192628 kind:data(any) addr:0x02192628
 data_ov007_0219262c kind:data(any) addr:0x0219262c

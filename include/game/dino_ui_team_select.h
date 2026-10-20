@@ -14,7 +14,11 @@
 #include "game/dino_ui_parts_team_info.h"
 #include "game/dino_ui_parts_team_indicator.h"
 #include "m/indicator.h"
+#include "m/motion.h"
 #include "game/dino_field_camera_hook.h"
+
+class MSmartOam;
+class MTextPicture;
 
 class DinoUiTeamSelectMenu : public DinoHelpBase, public MMenu {
 public:
@@ -25,12 +29,15 @@ public:
     virtual void OnFocus(MMenuItem *item);
     virtual void OnDecide(MMenuItem *item);
 
-    u8 unkB3[0x15];
+    u8 unkB3;
+    MSmartOam *mOam;            // 0xB4
+    u8 unkB8[0xC4 - 0xB8];
+    MTextPicture *mTitle;       // 0xC4
     MMenuItem *mTeams[3];   // 0xC8
     DinoUiPartsTeamIndicator *mNames[3];    // 0xD4: the saved teams' names
     MIndicator *mLabels[3];     // 0xE0
-    MView *mUnkEC[3];           // 0xEC
-    MSerialTaskSet *mCursorTasks;   // 0xF8
+    MMotion *mUnkEC[3];         // 0xEC: shown over an empty team
+    MParallelTaskSet *mCursorTasks; // 0xF8
     DinoUiFieldMenuCursor *mCursor; // 0xFC
     DinoUiPartsTeamInfo *mTeamInfo; // 0x100
     int *mResult;           // 0x104
@@ -39,6 +46,7 @@ public:
     int mUnk10C;            // 0x10C: 1 once a team is chosen
     int mSelected;          // 0x110
 
+    MSmartOam *GetOam() { return mOam; }
     void Close();
     void StateDecided();
     // Opens the menu to choose the team with (or not).
@@ -60,6 +68,7 @@ public:
 
 class DinoUiTeamSelectTeamButton : public MMenuItem, public DinoHelpItem {
 public:
+    DinoUiTeamSelectTeamButton(DinoUiTeamSelectMenu *owner, MPoint pos, u32 textId);
     virtual ~DinoUiTeamSelectTeamButton();
     virtual MRect GetFrame();
     virtual void OnFocusChanged(BOOL focused);
@@ -68,9 +77,9 @@ public:
     virtual MDisplay *GetDisplay();
     virtual const char *GetText();
 
-    u32 unk94;
+    DinoUiTeamSelectMenu *mOwner;   // 0x94
     MPoint mPos;        // 0x98
-    MView *mView;       // 0xA0
+    MMotion *mView;     // 0xA0: shown while focused
     u32 mTextId;        // 0xA4
 };
 

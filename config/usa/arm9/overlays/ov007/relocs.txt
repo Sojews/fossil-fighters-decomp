@@ -5006,7 +5006,7 @@ from:0x0218b160 kind:load to:0x020b5870 module:main
 from:0x0218b164 kind:load to:0x0214d1bc module:main
 from:0x0218b168 kind:load to:0x020b6088 add:0x8 module:main
 from:0x0218b16c kind:load to:0x021925c0 add:0x8 module:overlay(7)
-from:0x0218b170 kind:load to:0x02192600 module:overlay(7)
+from:0x0218b170 kind:load to:0x021925c0 add:0x40 module:overlay(7)
 from:0x0218b178 kind:thumb_call to:0x02005198 module:main
 from:0x0218b18c kind:thumb_call to:0x0205ffec module:main
 from:0x0218b198 kind:thumb_call to:0x020051dc module:main
