@@ -12,12 +12,63 @@
 #include "m/seed_generator.h"
 #include "m/view.h"
 #include "game/dino_static_init.h"
+#include "m/pal.h"
+#include "m/oam_canvas.h"
+#include "m/font.h"
+#include "m/motion.h"
+#include "m/smart_oam.h"
 
 // The text settings in the resource table.
 struct DinoTalkSettings {
     u8 unk00[0x10];
     MFx32 mRate;    // 0x10: characters per frame
 };
+
+// The TU's pooled data.
+extern "C" struct {
+    u8 unk00[0x08];
+    const char *mPanelPath; // 0x08: the name panel's motion
+    u8 unk0C[0x04];
+    s32 unk10;
+    u8 unk14[4];
+    MPoint unk18;   // centered in 256x64 under unk40
+    u8 unk20[8];
+    MPoint unk28;
+    u8 unk30[8];
+    MPoint mFlipOffset;     // 0x38: the name panel's, on the other side
+    MPoint unk40;   // y derived from unk48's (mwcc reuses the stored value)
+    MPoint unk48;
+} data_020b62f0;
+
+DinoTalkWindowNamePanel::DinoTalkWindowNamePanel(u32 unk, const std::wstring &text, int priority, u8 flip,
+                                                 const void *palette)
+    : MProcess(NULL), mUnk74(unk), mText(text), mPos(0, 0), mFlip(flip) {
+    mOam = new MSmartOam(0x14, 0, TRUE);
+    mOam->SetUnk1C(7);
+    mFont = gDinoResource->CreateFont12(0, 1, 0);
+    mWidth = mFont->MeasureText(std::wstring(mText), 0, 0).x;
+    mPanelWidth = (mWidth + 7) & ~7;
+    mNameOffset.x = ((mPanelWidth - mWidth) >> 1) + 8;
+    mNameOffset.y = 6;
+    mName = new MConsole(new MSmartObjCanvas(mOam, MPoint(mWidth, 12), gDinoResource->GetUnkTable(), TRUE), mFont,
+                         MPoint(0, 0), MFx32(0));
+    mName->SetPriority(priority);
+    mName->SetFilter(new DinoTalkConsoleFilter(mUnk74));
+    mPanel = new MMotion(data_020b62f0.mPanelPath, mOam, 0, 1);
+    mPanel->SetPriority(priority);
+    mPanel->SetAnchor(1);
+    mPanel->Play(1, 0);
+    mPanel->Hide();
+    if (palette != NULL) {
+        mPanel->GetPalette(0)->LoadColors(palette, 0, 3);
+    }
+    mTiles = mPanelWidth >> 3;
+    mUnkAC = 0;
+    mShake.x = 0;
+    mShake.y = 0;
+    GetParallel()->AddTail(mName, mPanel, mOam);
+    GetSerial()->AddTail(new MTimer(1), mName->CreateShowTransfer());
+}
 
 DinoTalkConsoleFilter::~DinoTalkConsoleFilter() {
 }
@@ -127,19 +178,6 @@ void DinoTalkWindow::Skip() {
     }
 }
 
-// The TU's pooled data.
-extern "C" struct {
-    u8 unk00[0x10];
-    s32 unk10;
-    u8 unk14[4];
-    MPoint unk18;   // centered in 256x64 under unk40
-    u8 unk20[8];
-    MPoint unk28;
-    u8 unk30[8];
-    MPoint mFlipOffset;     // 0x38: the name panel's, on the other side
-    MPoint unk40;   // y derived from unk48's (mwcc reuses the stored value)
-    MPoint unk48;
-} data_020b62f0;
 
 // NONMATCHING: register allocation (the game keeps the flip offset in registers and spills the shake).
 void DinoTalkWindow::StateShow() {

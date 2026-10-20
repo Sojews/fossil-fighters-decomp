@@ -9,6 +9,9 @@
 
 class MConsole;
 class MView;
+class MSmartOam;
+class MMotion;
+class MFontSet;
 
 class DinoTalkWindow : public MProcess {
 public:
@@ -59,19 +62,22 @@ public:
 
 class DinoTalkWindowNamePanel : public MProcess {
 public:
+    DinoTalkWindowNamePanel(u32 unk, const std::wstring &text, int priority, u8 flip, const void *palette);
     virtual ~DinoTalkWindowNamePanel();
     virtual void Idle();
 
     u32 mUnk74;         // 0x74
     std::wstring mText; // 0x78
-    u32 unk84;
-    MView *mName;       // 0x88
-    MView *mPanel;      // 0x8C
-    u8 unk90[0x98 - 0x90];
+    MSmartOam *mOam;    // 0x84
+    MConsole *mName;    // 0x88
+    MMotion *mPanel;    // 0x8C
+    u32 mWidth;         // 0x90: of the name's text
+    u32 mPanelWidth;    // 0x94: mWidth rounded up to tiles
     MPoint mNameOffset; // 0x98: of the name in the panel
-    u8 unkA0[0xA4 - 0xA0];
+    MFontSet *mFont;    // 0xA0
     MPoint mPos;        // 0xA4
-    u8 unkAC[0xB4 - 0xAC];
+    u32 mUnkAC;         // 0xAC
+    u32 mTiles;         // 0xB0: mPanelWidth in tiles
     MPoint mShake;      // 0xB4
     u8 mFlip;           // 0xBC: on the other side
 };
