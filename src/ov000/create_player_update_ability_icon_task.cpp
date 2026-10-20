@@ -2084,6 +2084,146 @@ extern "C" BOOL func_ov000_0216c83c(int value) {
 
 #pragma auto_inline off
 
+// The status effects a support creature's kind (2-7) clears from its leader.
+struct DinoSupportCure {
+    u32 mask;   // 0x00: 0 ends the table
+    u32 kind;   // 0x04
+};
+extern "C" const DinoSupportCure data_ov000_0218faa4[];
+extern "C" const u32 data_0208a2b8, data_0208a2b4;  // the cure's info bar texts (ours, theirs)
+extern "C" const u32 data_0208a300, data_0208a2fc;  // the support effect's (on ours, on theirs)
+extern "C" const u32 data_0208a150;                 // the support motion's last argument
+
+// The support creatures' turn-start effects: each cures its leader's status effects (kinds 2-9) and gives its
+// support to a leader, then the ability icons and the support animations are updated.
+extern "C" MSerialTaskSet *func_ov000_02169fb8(MMessageObserver *view, DinoBattleModelPlayer *player,
+                                               DinoBattleModelPlayer *other) {
+    MSerialTaskSet *tasks = new MSerialTaskSet(TRUE);
+    DinoBattleModelCreature *leader = player->FindCreature(0);
+    u32 status[2] = {0, 0};
+    status[0] = leader->GetStatus()->flags;
+    DinoBattleModelCreature *otherLeader = other->FindCreature(0);
+    if (otherLeader != NULL) {
+        status[1] = otherLeader->GetStatus()->flags;
+    }
+    for (int k = 0; k < 2; k++) {
+        DinoBattleModelCreature *support = player->FindCreature(k + 1);
+        if (support != NULL) {
+            u8 kind = ((u8 *)support->GetDef())[0x5C];
+            switch (kind) {
+            case 0:
+            case 1:
+                break;
+            case 2:
+            case 3:
+            case 4:
+            case 5:
+            case 6:
+            case 7: {
+                int index = -1;
+                int j = 0;
+                const DinoSupportCure *cure = data_ov000_0218faa4;
+                do {
+                    if (kind == cure->kind) {
+                        index = j;
+                        break;
+                    }
+                    cure++;
+                    j++;
+                } while (cure->mask != 0);
+                if (index == -1) {
+                    break;
+                }
+                u32 mask = data_ov000_0218faa4[index].mask;
+                if (!(status[0] & mask)) {
+                    break;
+                }
+                tasks->AddTail(player->CreateMotionEffectTask(support->GetUnkB4(), 2, 0, 0, -1));
+                MParallelTaskSet *release = new MParallelTaskSet(TRUE);
+                DinoSignalWait *wait = new DinoSignalWait(0x1005C, NULL, NULL, 1);
+                release->AddTail(wait, leader->CreatePostTask(new DinoBattleModelCreatureReleaseStatusEffectRequest(wait, mask)));
+                tasks->AddTail(view->CreatePostTask(new DinoBattleViewActionInfoBarUpdateRequest(
+                                   player->mUnkB4 == 0 ? data_0208a2b8 : data_0208a2b4)),
+                               release);
+                status[0] &= ~mask;
+                break;
+            }
+            case 8:
+            case 9: {
+                int sides = 1;
+                u32 any = status[0];
+                if (kind == 9) {
+                    any |= status[1];
+                    sides = 2;
+                }
+                if (any == 0) {
+                    break;
+                }
+                MParallelTaskSet *release = new MParallelTaskSet(TRUE);
+                for (int j = 0; j < sides; j++) {
+                    u32 *s = &status[j];
+                    if (*s & 0xFC) {
+                        DinoBattleModelCreature *target = (j ? other : player)->FindCreature(0);
+                        if (target != NULL) {
+                            DinoSignalWait *wait = new DinoSignalWait(0x1005C, NULL, NULL, 1);
+                            release->AddTail(wait, target->CreatePostTask(new DinoBattleModelCreatureReleaseStatusEffectRequest(wait, 0xFC)));
+                        }
+                        *s &= ~0xFC;
+                    }
+                }
+                tasks->AddTail(player->CreateMotionEffectTask(support->GetUnkB4(), 2, 0, 0, -1),
+                               view->CreatePostTask(new DinoBattleViewActionInfoBarUpdateRequest(
+                                   player->mUnkB4 == 0 ? data_0208a2b8 : data_0208a2b4)),
+                               release);
+                break;
+            }
+            }
+
+            u32 effect = support->GetUnk108();
+            effect |= support->unk110[0] ^ 3;
+            int side = 0;
+            if (!(effect & 1)) {
+                effect |= 1;
+                side = 1;
+            }
+            if (side == 0 && !(effect & 2) && player->GetOpponent()->FindCreature(0) != NULL) {
+                side = 2;
+                effect |= 2;
+            }
+            if (side != 0) {
+                DinoBattleModelCreature *target = (side == 1 ? player : player->GetOpponent())->FindCreature(0);
+                tasks->AddTail(view->CreatePostTask(
+                    new DinoBattleView3DSupportEffectRequest(support->GetUnkB4(), target->GetUnkB4(), TRUE)));
+                MParallelTaskSet *give = new MParallelTaskSet(TRUE);
+                DinoSignalWait *wait = new DinoSignalWait(0x10050, NULL, NULL, 1);
+                give->AddTail(wait, support->CreatePostTask(
+                                        new DinoBattleModelCreatureSupportEffectRequest(wait, support->GetUnkB4(), effect)));
+                tasks->AddTail(give);
+                int motion = target->GetDefUnk61() == 8 ? 1 : 3;
+                int flags = 0;
+                if (target->GetDefUnk61() != 8) {
+                    flags = 8;
+                }
+                u32 text = side == 1 ? data_0208a300 : data_0208a2fc;
+                if (player->mUnkB4 == 0) {
+                    text++;
+                }
+                tasks->AddTail(view->CreatePostTask(new DinoBattleViewActionInfoBarUpdateRequest(text)),
+                               player->CreateMotionEffectTask(target->GetUnkB4(), motion, flags, 0, data_0208a150));
+            }
+        }
+        MParallelTaskSet *icons = new MParallelTaskSet(TRUE);
+        DinoSignalWait *iconWait = new DinoSignalWait(0x1004A, NULL, NULL, 1);
+        icons->AddTail(iconWait, new CreatePlayerUpdateAbilityIconTask(TRUE, (u32)(MMessageObserver *)iconWait, (u32)player));
+        tasks->AddTail(icons);
+        MParallelTaskSet *anime = new MParallelTaskSet(TRUE);
+        DinoSignalWait *animeWait = new DinoSignalWait(0x10062, NULL, NULL, 1);
+        anime->AddTail(animeWait, view->CreatePostTask(new DinoBattleViewWaitUpdateSupportEffectAnimeRequest(animeWait)));
+        tasks->AddTail(anime);
+    }
+    return tasks;
+}
+
 BOOL DinoBattleModelPlayer::IsCpu() {
     if (dynamic_cast<DinoBattleCpuController *>((DinoBattleController *)mBattle->GetUnk1F4(mUnkB8)) != NULL) {
         return TRUE;
