@@ -98,6 +98,10 @@ DinoBattleViewStatusEffectIcon::DinoBattleViewStatusEffectIcon(MSmartOam *oam, u
     mParallel.AddTail(mQueue);
 }
 
+// Called with the icon and the creature's coordinate when the creature moves; the icon doesn't follow.
+extern "C" void func_ov000_0217e590(DinoBattleViewStatusEffectIcon *icon, MPoint coord) {
+}
+
 int StatusEffectEntry::GetAnime() {
     int offset = mFlag ? 12 : 0;
     int anime = mCount <= 1 ? 2 : 3;
