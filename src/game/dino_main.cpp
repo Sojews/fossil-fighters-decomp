@@ -45,6 +45,8 @@
 #include "m/dma.h"
 #include "game/dino_message.h"
 #include "game/dino_common_label.h"
+#include "game/dino_cleaning_sample.h"
+#include "game/dino_senryu_sample.h"
 
 M_EXTERN_OVERLAY(ov000);
 M_EXTERN_OVERLAY(ov003);
@@ -88,6 +90,7 @@ extern "C" struct {
     void (DinoMainLoop::*State02048a1c_64)();
     void (DinoMainLoop::*StateDebugMenu_6C)();
     void (DinoMainLoop::*StateDebugMenu_74)();
+    void (DinoMainLoop::*StateTitle_7C)();
 } data_020bfff0;
 extern "C" struct {
     u8 unk00[0x4];
@@ -153,7 +156,7 @@ extern "C" struct {
     u8 unk00[0x4];
     void (DinoMainLoop::*StateDebugMenu_04)();
     void (DinoMainLoop::*State02048398_0C)();
-    u8 unk14[0x8];
+    void (DinoMainLoop::*State02048b90_14)();
     void (DinoMainLoop::*StateContinue_1C)();
     void (DinoMainLoop::*StateDebugMenu_24)();
     void (DinoMainLoop::*State02048030_2C)();
@@ -383,6 +386,72 @@ void DinoMainLoop::StateDebugMenu() {
     menu->mParallel.AddTail(label);
     mSerial.AddTail(menu);
     mState = data_020c0170.State02048030_2C;
+}
+
+extern "C" const u32 data_0208a434;    // the second menu's first text
+extern "C" const u32 data_0208acac, data_0208aca8, data_0208aca4, data_0208aca0, data_0208ac9c, data_0208ac98,
+    data_0208ac94, data_0208ac90, data_0208ac8c;
+
+// The debug menu's choices.
+void DinoMainLoop::State02048030() {
+    mState = data_020c0170.StateDebugMenu_24;
+    switch (mMenuChoice) {
+    default:
+        if (mMenuChoice == -2) {
+            mTitleResult = 0;
+            mState = data_020bfff0.StateTitle_7C;
+        }
+        return;
+    case 0:
+        mState = data_020c0170.State02048b90_14;
+        return;
+    case 1: {
+        MSimpleMenu *menu = new MSimpleMenu(&mMenuChoice, gDinoResource->CreateFont12(0, 0, 0), NULL, 0);
+        for (int i = 0; i < 4; i++) {
+            if (i != 2) {
+                menu->AddItem(i + 17, std::string(gDinoResource->GetText(data_0208a434 + i)));
+            }
+        }
+        mSerial.AddTail(menu);
+        mState = data_020c0170.State02048398_0C;
+        return;
+    }
+    case 2:
+        mSerial.AddTail(new DinoCleaningSample);
+        mState = data_020c0170.StateDebugMenu_04;
+        return;
+    case 3:
+        mSerial.AddTail(new DinoSenryuSample);
+        mState = data_020bfff0.StateDebugMenu_6C;
+        return;
+    case 4:
+        gDinoBackup->Reset(1);
+        gDinoBackup->SetSystemFlag(0x17, TRUE);
+        mSerial.AddTail(new DinoEventLoop(NULL));
+        mState = data_020c00f0.StateDebugMenu_74;
+        return;
+    case 5:
+        gDinoBackup->Load();
+        gDinoBackup->SetSystemFlag(0x17, TRUE);
+        mSerial.AddTail(new DinoEventLoop(NULL));
+        mState = data_020c00f0.StateDebugMenu_6C;
+        return;
+    case 6: {
+        MSimpleMenu *menu = new MSimpleMenu(&mMenuChoice, gDinoResource->CreateFont12(0, 0, 0), NULL, 0);
+        menu->AddItem(8, std::string(gDinoResource->GetText(data_0208acac)));
+        menu->AddItem(9, std::string(gDinoResource->GetText(data_0208aca8)));
+        menu->AddItem(10, std::string(gDinoResource->GetText(data_0208aca4)));
+        menu->AddItem(11, std::string(gDinoResource->GetText(data_0208aca0)));
+        menu->AddItem(12, std::string(gDinoResource->GetText(data_0208ac9c)));
+        menu->AddItem(13, std::string(gDinoResource->GetText(data_0208ac98)));
+        menu->AddItem(14, std::string(gDinoResource->GetText(data_0208ac94)));
+        menu->AddItem(15, std::string(gDinoResource->GetText(data_0208ac90)));
+        menu->AddItem(16, std::string(gDinoResource->GetText(data_0208ac8c)));
+        mSerial.AddTail(menu);
+        mState = data_020bfff0.State020483fc_5C;
+        return;
+    }
+    }
 }
 
 // The second debug menu's choices.
