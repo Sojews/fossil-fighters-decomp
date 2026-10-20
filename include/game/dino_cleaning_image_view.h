@@ -16,6 +16,9 @@ class MSmartOam;
 class DinoCleaningImageView : public MFixedSizeView {
 public:
     DinoCleaningImageView();
+    // A copy with copies of the images, its own seed, task sets and screen (the palette stays the other's).
+    DinoCleaningImageView(const DinoCleaningImageView &other);
+    void Assign(const DinoCleaningImageView &src);
     // Makes the screen and palettes for the images, and clears the dirt.
     void CreateScreen();
     virtual ~DinoCleaningImageView();
@@ -46,7 +49,7 @@ public:
     MPoint mPos;                                // 0x20
     MAffineScreen *mScreen;                     // 0x28
     MPalUnit *mPal;                            // 0x2C
-    u32 unk30;
+    u8 mUnk30;                                  // 0x30
     std::vector<DinoCleaningImage *> mImages;   // 0x34
     u8 mMasked[36][28];                         // 0x40: cells every image masks
     u8 mDirty[36][28];                          // 0x430: cells that have had dirt

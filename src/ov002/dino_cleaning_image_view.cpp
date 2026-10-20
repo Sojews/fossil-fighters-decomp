@@ -198,6 +198,64 @@ DinoCleaningImageView::DinoCleaningImageView()
     mPalTasks = new MParallelTaskSet(FALSE);
 }
 
+// (Arrays copy as wholes, element by element.)
+template <class T> static inline void DinoCopyBlock(T &dst, const T &src) {
+    struct Block {
+        T a;
+    };
+    *(Block *)&dst = *(const Block *)&src;
+}
+
+// (Vectors of pointers copy as vectors of words.)
+template <class T> static inline void DinoCopyVector(std::vector<T *> &dst, const std::vector<T *> &src) {
+    *(std::vector<u32> *)&dst = *(const std::vector<u32> *)&src;
+}
+
+inline void DinoCleaningImageView::Assign(const DinoCleaningImageView &src) {
+    MView::operator=(src);
+    mSize = src.mSize;
+    mKeepPal = src.mKeepPal;
+    mDisplay = src.mDisplay;
+    mPos = src.mPos;
+    mScreen = src.mScreen;
+    mPal = src.mPal;
+    mUnk30 = src.mUnk30;
+    DinoCopyVector(mImages, src.mImages);
+    DinoCopyBlock(mMasked, src.mMasked);
+    DinoCopyBlock(mDirty, src.mDirty);
+    DinoCopyBlock(mUnk820, src.mUnk820);
+    DinoCopyBlock(mCells, src.mCells);
+    mUnkD9E0 = src.mUnkD9E0;
+    mDirtSum = src.mDirtSum;
+    mUnkD9EC = src.mUnkD9EC;
+    mPalBytes = src.mPalBytes;
+    mOam = src.mOam;
+    mSeed = src.mSeed;
+    mOamTasks = src.mOamTasks;
+    mMotion = src.mMotion;
+    mUnkDA04 = src.mUnkDA04;
+    mPalTasks = src.mPalTasks;
+}
+
+// NONMATCHING: scheduling, the game stores the offset and rect temporaries in another order.
+DinoCleaningImageView::DinoCleaningImageView(const DinoCleaningImageView &other) : mMotion(other.mMotion) {
+    Assign(other);
+    mKeepPal = TRUE;
+    mSeed = new u32(SeedGenerator::GenerateSeed());
+    mOamTasks = new MParallelTaskSet(FALSE);
+    mPalTasks = new MParallelTaskSet(FALSE);
+    mImages.clear();
+    for (std::vector<DinoCleaningImage *>::iterator it =
+             const_cast<std::vector<DinoCleaningImage *> &>(other.mImages).begin();
+         it != const_cast<std::vector<DinoCleaningImage *> &>(other.mImages).end(); ++it) {
+        AddImage(new DinoCleaningImage(**it));
+    }
+    MIndexBitmap *screen = mDisplay->mBg->CreateIndexBitmap(1, TRUE);
+    mScreen = screen;
+    screen->SetOffset(MPoint(0, 1));
+    ((MIndexBitmap *)mScreen)->Fill(MRect(0, 0, 256, 256), 0);
+}
+
 // a - b. (Taking a by value and returning it keeps both points on the stack, as the game's code does.)
 static inline MPoint DinoPointSub(MPoint a, const MPoint &b) {
     a.x -= b.x;
