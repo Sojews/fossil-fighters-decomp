@@ -52,6 +52,8 @@ public:
     // (Page 0) The support effects' texts: for the creature's own side and the other side, each of the four
     // values signed with a fixed-width sign.
     void ShowSupportEffects();
+    // (Page 0) The creature's name, description, life, level and stats, then its support effects.
+    void ShowStatusPage();
 
     MPictureFile *mPictures[10];        // 0x74
     MTextPicture *mPagePicture;         // 0x9C

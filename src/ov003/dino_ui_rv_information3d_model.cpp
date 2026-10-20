@@ -30,6 +30,8 @@
 #include "m/irq.h"
 #include "m/anm_model.h"
 #include "game/dino_static_init.h"
+#include "game/dino_creature_sort.h"
+#include "m/console.h"
 
 extern "C" u8 data_ov003_021624d0[];  // the scene's heap
 
@@ -189,6 +191,71 @@ void DinoUiRvInformation::ShowSupportEffects() {
     }
 }
 
+// What the creature stats are worked out from, and the stats (main's func_02030f38).
+struct DinoCreatureStatsInput {
+    u32 id;         // 0x00
+    int rank;       // 0x04
+    int bonus[4];   // 0x08: by part
+    int levels[5];  // 0x18: the parts', then the creature's own
+};
+struct DinoCreatureStats {
+    int hp;         // 0x00
+    int stats[5];   // 0x04
+};
+extern "C" DinoCreatureStats func_02030f38(const DinoCreatureStatsInput *info, BOOL fixed, fx32 fraction);
+extern "C" const char data_ov003_02160c38[];
+
+void DinoUiRvInformation::ShowStatusPage() {
+    u32 index = mInfo.state.index;
+    ((MConsole *)mViewEC)->Clear();
+    if (mInfo.state.unk14 & 2) {
+        ((MIndicator *)mViewD4)->SetText(std::string(data_ov003_02160c2c));
+        ((MConsole *)mViewEC)->Print(std::string(data_ov003_02160c38));
+        mNumbersBC[0]->SetValue(0xFFFD);
+        mNumbersBC[1]->SetValue(0xFFFC);
+        mNumbersBC[2]->SetValue(0xFFFC);
+        mNumbersBC[3]->SetValue(0xFFFC);
+        mNumbersBC[4]->SetValue(0xFFFC);
+        mNumbersBC[5]->SetValue(0xFFFC);
+    } else {
+        ((MIndicator *)mViewD4)->SetText(std::string(gDinoResource->GetCreatureText24(index)));
+        ((MConsole *)mViewEC)->Print(std::string(gDinoResource->GetCreatureText20(index)));
+        DinoCreatureStatsInput info;
+        info.levels[0] = info.levels[1] = info.levels[2] = info.levels[3] = 0;
+        MI_CpuFill8(&info, 0, sizeof(info));
+        info.id = index;
+        info.rank = GetCreatureLevel((*(const DinoCreatureState *)&mInfo));
+        info.levels[4] = (*(const DinoCreatureState *)&mInfo).unk0_8;
+        const DinoCreatureBody *body = (const DinoCreatureBody *)&mInfo.unk00[1];
+        for (int i = 0; i < 4; i++) {
+            info.bonus[i] = body->parts[i].unk12;
+            info.levels[i] = body->parts[i].level;
+        }
+        DinoCreatureStats stats = func_02030f38(&info, mUnk1B1, mUnk1B4.v);
+        mNumbersBC[0]->SetValue((u16)stats.hp);
+        mNumbersBC[1]->SetValue((u16)GetCreatureLevel(*(const DinoCreatureState *)&mInfo));
+        mNumbersBC[2]->SetValue((u16)stats.stats[0]);
+        mNumbersBC[3]->SetValue((u16)stats.stats[1]);
+        mNumbersBC[4]->SetValue((u16)stats.stats[2]);
+        mNumbersBC[5]->SetValue((u16)stats.stats[3]);
+    }
+    for (int i = 0; i < 6; i++) {
+        mNumbersBC[i]->Show();
+    }
+    ShowSupportEffects();
+    mViewD4->Show();
+    mViewEC->Show();
+    mViewD8->Show();
+    for (int i = 0; i < 4; i++) {
+        mViewsDC[i]->Show();
+    }
+    if (mInfo.state.parts[0].level) {
+        mModel->SetUnk84(index);
+    } else {
+        mModel->SetUnk84(0);
+    }
+}
+
 void DinoUiRvInformation::SetPage(u8 page) {
     if (page > 3 || mPage == page) {
         return;
@@ -229,7 +296,6 @@ extern "C" struct {
     int anime;
 } data_ov003_021601e0[6];
 extern "C" const char data_ov003_02160c24[];   // the number's format
-extern "C" void func_ov003_02157364(DinoUiRvInformation *info);
 extern "C" void func_ov003_021576fc(DinoUiRvInformation *info);
 
 // Shows a creature: its number, type and name, and the page's details (reloading the page when the picture
@@ -285,7 +351,7 @@ void DinoUiRvInformation::Unk02156ee8(DinoCreatureInfo info) {
     }
     switch (mPage) {
     case 0:
-        func_ov003_02157364(this);
+        ShowStatusPage();
         return;
     case 1:
     case 2:
