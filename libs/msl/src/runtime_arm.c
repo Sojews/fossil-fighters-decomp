@@ -6,7 +6,7 @@
 #include <errno.h>
 
 void _dadd(void);
-void func_020847c8(void);
+void _d2f(void);
 void _dfix(void);
 void _ll_ufrom_d(void);
 void _dflt(void);
@@ -15,22 +15,22 @@ void _dmul(void);
 void sqrt(void);
 void func_02084f20(void);
 void _dsub(void);
-void func_020852ec(void);
+void _fadd(void);
 void func_02085508(void);
 void _dgr(void);
 void _dleq(void);
 void _dls(void);
 void _deq(void);
 void _dneq(void);
-void func_02085800(void);
+void _fgr(void);
 void func_0208585c(void);
 void func_02085868(void);
 void _f2d(void);
-void func_02085ca4(void);
+void _ffix(void);
 void func_02085cd8(void);
-void func_02085d20(void);
+void _fmul(void);
 void func_02085f00(void);
-void func_02085f0c(void);
+void _fsub(void);
 void func_02086184(void);
 void _ll_sdiv(void);
 void _ll_udiv(void);
@@ -265,7 +265,7 @@ asm void _dadd(void) {
     bx lr
 }
 
-asm void func_020847c8(void) {
+asm void _d2f(void) {
     and r2, r1, #0x80000000
     mov ip, r1, lsr #0x14
     bics ip, ip, #0x800
@@ -1068,7 +1068,7 @@ asm void _dsub(void) {
     bx lr
 }
 
-asm void func_020852ec(void) {
+asm void _fadd(void) {
     eors r2, r0, r1
     eormi r1, r1, #0x80000000
     dcd 0x4a000307 // bmi 0x2085f18
@@ -1457,7 +1457,7 @@ asm void _dneq(void) {
     b @2085788
 }
 
-asm void func_02085800(void) {
+asm void _fgr(void) {
     mov r3, #0xff000000
     cmp r3, r0, lsl #1
     cmphs r3, r1, lsl #1
@@ -1791,7 +1791,7 @@ asm void _f2d(void) {
     bx lr
 }
 
-asm void func_02085ca4(void) {
+asm void _ffix(void) {
     bic r1, r0, #0x80000000
     mov r2, #0x9e
     subs r2, r2, r1, lsr #23
@@ -1829,7 +1829,7 @@ asm void func_02085cd8(void) {
     bx lr
 }
 
-asm void func_02085d20(void) {
+asm void _fmul(void) {
     eor r2, r0, r1
     and r2, r2, #0x80000000
     mov ip, #0xff
@@ -1975,7 +1975,7 @@ asm void func_02085f00(void) {
     eor r0, r0, r1
 }
 
-asm void func_02085f0c(void) {
+asm void _fsub(void) {
     eors r2, r0, r1
     eormi r1, r1, #0x80000000
     dcd 0x4afffcf7 // bmi 0x20852f8

@@ -6,7 +6,7 @@
 #include <errno.h>
 
 void _dadd(void);
-void func_020847c8(void);
+void _d2f(void);
 void _dfix(void);
 void _ll_ufrom_d(void);
 void _dflt(void);
@@ -15,22 +15,22 @@ void _dmul(void);
 void sqrt(void);
 void func_02084f20(void);
 void _dsub(void);
-void func_020852ec(void);
+void _fadd(void);
 void func_02085508(void);
 void _dgr(void);
 void _dleq(void);
 void _dls(void);
 void _deq(void);
 void _dneq(void);
-void func_02085800(void);
+void _fgr(void);
 void func_0208585c(void);
 void func_02085868(void);
 void _f2d(void);
-void func_02085ca4(void);
+void _ffix(void);
 void func_02085cd8(void);
-void func_02085d20(void);
+void _fmul(void);
 void func_02085f00(void);
-void func_02085f0c(void);
+void _fsub(void);
 void func_02086184(void);
 void _ll_sdiv(void);
 void _ll_udiv(void);
