@@ -11,6 +11,11 @@ struct MPoint {
     }
 
     MPoint operator+(const MPoint &o) const { return MPoint(x + o.x, y + o.y); }
+    MPoint operator-(const MPoint &o) const { return MPoint(x - o.x, y - o.y); }
+    MPoint operator/(int d) const {
+        MPoint p(x / d, y / d);
+        return p;
+    }
     MPoint &operator+=(const MPoint &o) {
         x += o.x;
         y += o.y;

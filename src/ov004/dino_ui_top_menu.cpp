@@ -492,28 +492,19 @@ template MTask *MCreateBgCallTask(DinoUiSaveSlotSelect *obj, void (DinoUiSaveSlo
 #pragma auto_inline off
 
 
-// Where the label goes: centred on pos, dx to the right.
-static inline MPoint DinoSaveSlotLabelPos(const MPoint &pos, const MPoint &size, int dx) {
-    MPoint p;
-    p.y = pos.y - size.y / 2;
-    p.x = pos.x - size.x / 2 + dx;
-    return p;
-}
-
 // Lights up (or not) and nudges the label (which sits a little left when focused).
-// NONMATCHING: the game reads the size through a pointer kept in a register.
 void DinoUiSaveSlotSelectMenuItem::OnFocusChanged(BOOL focused) {
     if (focused) {
         mMotion->Play(2, 0);
         if (!mUnkA4) {
-            mLabel->SetPosition(DinoSaveSlotLabelPos(mPos, mLabel->GetSize(), -4));
+            mLabel->SetPosition(mPos - mLabel->GetSize() / 2 + MPoint(-4, 0));
             mMotion2->Play(2, 0);
             mMotion3->Play(2, 0);
         }
     } else {
         mMotion->Play(1, 0);
         if (!mUnkA4) {
-            mLabel->SetPosition(DinoSaveSlotLabelPos(mPos, mLabel->GetSize(), 4));
+            mLabel->SetPosition(mPos - mLabel->GetSize() / 2 + MPoint(4, 0));
             mMotion2->Play(1, 0);
             mMotion3->Play(1, 0);
         }
@@ -864,7 +855,8 @@ void DinoUiSaveSlotConfirm::Idle() {
     mSerial.AddTail(mMenu);
 }
 
-// The save slots' graphics (a pool; [3] a saved slot's frame, [5] an empty one's) and the longest play time shown.
+// The save slots' graphics (a pool; [3] a saved slot's frame, [5] an empty one's; the longest play time shown is at
+// 0x48, which the game also reaches through its own symbol).
 extern "C" const char *const data_ov004_02172858[];
 extern "C" const u64 data_ov004_021728a0;
 // The rank badges' kinds.
@@ -916,11 +908,7 @@ inline DinoUiSaveSlotSelectMenuItem::DinoUiSaveSlotSelectMenuItem(MSmartOam *oam
         mParallel.AddTail(mMotion3);
         mLabel = new MSmartObjCanvas(oam->mDisplay, oam, MPoint(0x100, 0x40), gDinoResource->GetUnkTable(), TRUE);
         mLabel->SetPriority(3);
-        MPoint size = mLabel->GetSize();
-        MPoint labelPos;
-        labelPos.y = mPos.y - size.y / 2;
-        labelPos.x = mPos.x - size.x / 2 + 4;
-        mLabel->SetPosition(labelPos);
+        mLabel->SetPosition(mPos - mLabel->GetSize() / 2 + MPoint(4, 0));
         mLabel->Show();
         mParallel.AddTail(mLabel);
         MFont *font = gDinoResource->CreateFont12(0, 10, 0);
@@ -934,16 +922,17 @@ inline DinoUiSaveSlotSelectMenuItem::DinoUiSaveSlotSelectMenuItem(MSmartOam *oam
             title->Show();
             mParallel.AddTail(title);
         }
-        u64 frames = std::min(summary.playFrames, data_ov004_021728a0);
+        const u64 &limit = *(const u64 *)((const u8 *)data_ov004_02172858 + 0x48) < summary.playFrames ? data_ov004_021728a0 : summary.playFrames;
+        u64 frames = limit;
         std::wstring time;
         if (frames == 0) {
             time = MDecodeUtf8(gDinoResource->GetText(data_0208a980));
         } else {
-            u64 seconds = (frames - frames % 60) / 60;
-            u64 minutes = (seconds - seconds % 60) / 60;
+            u64 seconds = (frames - (u32)(frames % 60)) / 60;
+            u64 minutes = (seconds - (u32)(seconds % 60)) / 60;
             u32 minute = minutes % 60;
-            u32 hours = (minutes - minute) / 60;
-            OS_SPrintf(path, gDinoResource->GetText(data_0208a984), hours, minute);
+            minutes = (minutes - minute) / 60;
+            OS_SPrintf(path, gDinoResource->GetText(data_0208a984), (u32)minutes, minute);
             time = MDecodeUtf8(path);
         }
         MIndicator *clock = new MIndicator(mLabel->CreateWindow(MRect(0, 0, 0x78, 0xC).Shift(0x46, 0x1B)), font, 0);
@@ -954,8 +943,7 @@ inline DinoUiSaveSlotSelectMenuItem::DinoUiSaveSlotSelectMenuItem(MSmartOam *oam
 }
 
 // The slot about to be saved over (or a fresh one, for a new save), shown alone.
-// NONMATCHING: the label's size is read through a pointer (as in OnFocusChanged), and the play time limit's pool
-// literals and branches differ.
+// (Its inlined item constructor is past mwcc's default inline size.)
 #pragma inline_max_size(2000)
 void DinoUiSaveSlotConfirmMenu::OnStart() {
     mOam = new MSmartOam(0x28, 0, TRUE);
