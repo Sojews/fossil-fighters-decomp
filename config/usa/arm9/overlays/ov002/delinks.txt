@@ -32,6 +32,7 @@ src/ov002/dino_cleaning_hammer.cpp:
 
 src/ov002/dino_cleaning_drill.cpp:
     .text       start:0x0215d82c end:0x0215e370
+    .init       start:0x02163bb8 end:0x02163c40
 
 src/ov002/dino_cleaning_dummy_item.cpp:
     .text       start:0x0215e370 end:0x0215efc8
