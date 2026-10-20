@@ -29,6 +29,8 @@ public:
     void RefreshButtons();
     void Leave();
     void RefreshTeams();
+    // Opens the team's menu (by its button) of what can be done with it.
+    void OpenTeamMenu(int team);
     void Unk02173d08();
     void ClearTeam();
     void LinkTeamButtons();

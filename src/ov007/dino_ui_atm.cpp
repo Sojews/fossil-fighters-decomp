@@ -31,6 +31,7 @@
 #include "game/dino_ui_keyboard_menu.h"
 #include "game/dino_ui_organization_menu.h"
 #include "game/dino_static_init.h"
+#include "game/dino_common_window_menu_item_flush_task_menu.h"
 
 DinoUiATMMenu::DinoUiATMMenu(u32 *result, u8 arg1, DinoUiPartsTeamInfo *teamInfo, u8 arg3) : MMenu(NULL, 0) {
     mTeamInfo = teamInfo;
@@ -58,7 +59,6 @@ DinoUiATMMenu::~DinoUiATMMenu() {
 void DinoUiATMMenu::OnIdle() {
 }
 
-extern "C" void func_ov007_02173694(DinoUiATMMenu *menu, int team);
 void DinoUiATMMenu::OnDecide(MMenuItem *item) {
     for (int i = 0; i < 3; i++) {
         if (item == mTeamButtons[i]) {
@@ -83,7 +83,7 @@ void DinoUiATMMenu::OnDecide(MMenuItem *item) {
                     serial->AddTail(fades);
                     serial->AddTail(exit);
                 } else {
-                    func_ov007_02173694(this, i + 1);
+                    OpenTeamMenu(i + 1);
                 }
             } else if (mUnk11C == 1) {
                 MoveTeam(i + 1);
@@ -125,6 +125,7 @@ extern "C" struct {
     void (DinoUiATMMenu::*Leave_08)();
     u8 unk10[0x8];
     void (DinoBackup::*Save_18)();
+    void (DinoUiATMMenu::*OnTeamMenuDecided_20)();
 } data_ov007_0218cc38;
 extern const u32 data_0208ab54;
 
@@ -234,7 +235,7 @@ extern "C" struct {
     void (DinoUiATM::*Start_18)();
     u8 unk20[0x38 - 0x20];
     MPoint mCursorOffset;   // 0x38: from a team's button
-    u8 unk40[0x48 - 0x40];
+    MPoint mMenuOffset;     // 0x40: of a team's menu from its button
     MPoint mFocusOffset;    // 0x48: from the focused team's frame
 } data_ov007_0218cbe0;
 
@@ -383,6 +384,49 @@ void DinoUiATMMenu::ExitMoveMode() {
     RefreshTeams();
     mUnk11C = 0;
     LinkTeamButtons();
+}
+
+// How many members the team has.
+static inline int DinoCountTeamMembers(const DinoTeam &team) {
+    int count = 0;
+    for (u32 i = 0; i < 5; i++) {
+        if (team.slots[i] != 0) {
+            count++;
+        }
+    }
+    return count;
+}
+
+extern const MPoint data_ov007_0218cd10[3];
+extern const u32 data_0208aaac, data_0208a790, data_0208aaa8, data_0208a78c, data_0208aaa4, data_0208a788,
+    data_0208aaa0, data_0208a784, data_0208aa9c, data_0208a780, data_0208aa98, data_0208a77c;
+
+void DinoUiATMMenu::OpenTeamMenu(int team) {
+    DinoTeam members;
+    gDinoBackup->GetTeam(team, &members);
+    mUnk114 = 0;
+    mFocusCursor->Hide();
+    MPoint pos = data_ov007_0218cd10[team - 1] + data_ov007_0218cbe0.mMenuOffset;
+    if (team >= 2) {
+        pos.y -= 0x40;
+    }
+    DinoCommonWindowMenu *menu = new DinoCommonWindowMenu(&mUnk114, pos, NULL, 0);
+    if (!mUnk124 && team != gDinoBackup->GetUnk34_26() && DinoCountTeamMembers(members) != 0) {
+        menu->AddChoice(11, std::string(gDinoResource->GetText(data_0208aaac)), std::string(gDinoResource->GetText(data_0208a790)));
+    }
+    if (!mUnk124 || team != gDinoBackup->GetUnk34_26()) {
+        menu->AddChoice(12, std::string(gDinoResource->GetText(data_0208aaa8)), std::string(gDinoResource->GetText(data_0208a78c)));
+    }
+    menu->AddChoice(13, std::string(gDinoResource->GetText(data_0208aaa4)), std::string(gDinoResource->GetText(data_0208a788)));
+    if (DinoCountTeamMembers(members) != 0) {
+        menu->AddChoice(14, std::string(gDinoResource->GetText(data_0208aaa0)), std::string(gDinoResource->GetText(data_0208a784)));
+    }
+    if (team != gDinoBackup->GetUnk34_26() && DinoCountTeamMembers(members) != 0) {
+        menu->AddChoice(15, std::string(gDinoResource->GetText(data_0208aa9c)), std::string(gDinoResource->GetText(data_0208a780)));
+    }
+    menu->AddChoice(-2, std::string(gDinoResource->GetText(data_0208aa98)), std::string(gDinoResource->GetText(data_0208a77c)));
+    GetSerial()->AddTail(menu, mFocusCursor->CreateShowTransfer(),
+                         MCreateCallTask(this, data_ov007_0218cc38.OnTeamMenuDecided_20));
 }
 
 // " " (between the team's name and the message).
