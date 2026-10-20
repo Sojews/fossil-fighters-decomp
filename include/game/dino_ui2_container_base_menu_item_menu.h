@@ -49,7 +49,8 @@ public:
     MSmartOam *mOam;                // 0x104
     MTextPicture *mBackground;      // 0x108
     std::vector<void *> mItems;     // 0x10C: this page's items
-    u32 mUnk118[2];                 // 0x118
+    DinoUi2ContainerBaseMenuItem *mPageL;   // 0x118
+    DinoUi2ContainerBaseMenuItem *mPageR;   // 0x11C
     DinoUi2ContainerBaseMenuItem *mBack; // 0x120
     DinoUi2ContainerBaseMenuItem *mLinkFrom; // 0x124: the decide button, linked to the first page item
     MTaskSet *mCursorTasks;         // 0x128

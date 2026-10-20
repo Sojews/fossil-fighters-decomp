@@ -25,6 +25,7 @@ public:
 
 class DinoUi2ContainerBaseBackButton : public DinoUi2ContainerBaseMenuItem {
 public:
+    DinoUi2ContainerBaseBackButton(DinoUi2ContainerBaseMenu *owner);
     virtual ~DinoUi2ContainerBaseBackButton();
     virtual void OnFocusChanged(BOOL focused);
     virtual void OnDecide();
@@ -32,12 +33,14 @@ public:
 
 class DinoUi2ContainerBasePageLButton : public DinoUi2ContainerBaseMenuItem {
 public:
+    DinoUi2ContainerBasePageLButton(DinoUi2ContainerBaseMenu *owner);
     virtual ~DinoUi2ContainerBasePageLButton();
     virtual void OnDecide();
 };
 
 class DinoUi2ContainerBasePageRButton : public DinoUi2ContainerBaseMenuItem {
 public:
+    DinoUi2ContainerBasePageRButton(DinoUi2ContainerBaseMenu *owner);
     virtual ~DinoUi2ContainerBasePageRButton();
     virtual void OnDecide();
 };

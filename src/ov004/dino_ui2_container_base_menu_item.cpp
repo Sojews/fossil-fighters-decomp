@@ -160,11 +160,20 @@ void DinoUi2ContainerBaseDecideButton::OnFocusChanged(BOOL focused) {
 
 // Pooled file statics: the button corners.
 struct DinoUi2ContainerBaseStatics {
-    u8 unk00[0x28];
+    u8 unk00[4];
+    const char *mBackPath;      // 0x04
+    const char *mPageRPath;     // 0x08
+    const char *mPageLPath;     // 0x0C
+    MPoint mPageRPos;           // 0x10
+    u8 unk18[0x20 - 0x18];
+    MPoint mBackPos;            // 0x20
     MPoint mRow;                // 0x28: from a page button to the next row's
-    u8 unk30[0x50 - 0x30];
+    u8 unk30[0x38 - 0x30];
+    MPoint mPageLPos;           // 0x38
+    u8 unk40[0x50 - 0x40];
     MPoint mDecideTopLeft;      // 0x50
-    u8 unk58[0x10];
+    u8 unk58[0x60 - 0x58];
+    MPoint mRockNamePos;        // 0x60
     MPoint mDecidePos;          // 0x68
     MPoint mColumn;             // 0x70: from a page button to the next in its row
     MPoint mDecideBottomRight;  // 0x78
@@ -262,6 +271,76 @@ DinoUi2ContainerBaseMenu::DinoUi2ContainerBaseMenu()
 void DinoUi2ContainerBaseMenu::AddHelpEntries(u32 backText) {
     AddEntry((u32)(DinoHelpItem *)mLinkFrom, 1, 0);
     AddEntry((u32)(DinoHelpItem *)mBack, 4, backText);
+}
+
+extern "C" const u32 data_0208a574; // the back button's help text
+extern "C" const u32 data_0208aacc; // the page buttons' help text
+
+inline DinoUi2ContainerBaseBackButton::DinoUi2ContainerBaseBackButton(DinoUi2ContainerBaseMenu *owner)
+    : DinoUi2ContainerBaseMenuItem(owner, data_ov004_02176b44.mBackPath, data_ov004_02176b44.mBackPos, data_0208a574) {
+    mMotion->Play(2, 0);
+}
+
+inline DinoUi2ContainerBasePageLButton::DinoUi2ContainerBasePageLButton(DinoUi2ContainerBaseMenu *owner)
+    : DinoUi2ContainerBaseMenuItem(owner, data_ov004_02176b44.mPageLPath, data_ov004_02176b44.mPageLPos, data_0208aacc) {
+    SetKeys(0x200);
+    SetNoFocus(TRUE);
+    DinoHelpItem::Disable();
+}
+
+inline DinoUi2ContainerBasePageRButton::DinoUi2ContainerBasePageRButton(DinoUi2ContainerBaseMenu *owner)
+    : DinoUi2ContainerBaseMenuItem(owner, data_ov004_02176b44.mPageRPath, data_ov004_02176b44.mPageRPos, data_0208aacc) {
+    SetKeys(0x100);
+    SetNoFocus(TRUE);
+    DinoHelpItem::Disable();
+}
+
+// The excavation settings' section at offset7C (the input repeat is at 0x1C and 0x20).
+static inline const int *GetExcavate7C(MResource<DinoExcavateDefs> &defs) {
+    const DinoExcavateDefs *d = defs.Get();
+    if (d->offset7C == 0) {
+        return NULL;
+    }
+    return (const int *)((const u8 *)d + d->offset7C);
+}
+
+void DinoUi2ContainerBaseMenu::OnStart() {
+    Disable();
+    SetLinkFallback(1);
+    {
+        MResource<DinoExcavateDefs> delayDefs = gDinoResource->GetExcavateDefs();
+        MResource<DinoExcavateDefs> intervalDefs = gDinoResource->GetExcavateDefs();
+        GetInput()->SetRepeat(0xF0, GetExcavate7C(delayDefs)[7], GetExcavate7C(intervalDefs)[8]);
+    }
+    mOam = new MSmartOam(0x54, 0, TRUE);
+    mOam->mHidden = TRUE;
+    mBack = new DinoUi2ContainerBaseBackButton(this);
+    AddItem(mBack);
+    RefreshEntries();
+    if (mLastPage > 0) {
+        mPageL = new DinoUi2ContainerBasePageLButton(this);
+        AddItem(mPageL);
+        mPageR = new DinoUi2ContainerBasePageRButton(this);
+        AddItem(mPageR);
+    }
+    Setup();
+    mCursorTasks = new MParallelTaskSet();
+    mCursor = new DinoUi2FieldMenuCursor(mOam);
+    mParallel.AddTail(mCursor);
+    mCursor->SetPriority(1);
+    mParallel.AddTail(mCursorTasks);
+    mParallel.AddTail(mOam);
+    mRockName = new DinoUi2PartsRockName(data_ov004_02176b44.mRockNamePos);
+    mParallel.AddTail(mRockName);
+    RefreshPage2();
+    if (mItems.size() == 0) {
+        FocusItem(mBack);
+    } else {
+        FocusItem((MMenuItem *)mItems[0]);
+    }
+    AddLink(mBack, 4, mLinkFrom);
+    mSerial.AddTail(mOam->CreateShowTransfer());
+    Enable();
 }
 
 void DinoUi2ContainerBaseMenu::ResetDecideButton() {
