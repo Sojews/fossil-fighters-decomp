@@ -29,6 +29,7 @@
 #include "game/help.h"
 #include "m/picture.h"
 #include "game/dino_resource.h"
+#include "game/dino_static_init.h"
 
 #pragma auto_inline off
 
@@ -530,3 +531,34 @@ void DinoUi2ContainerBaseMenu::RefreshEntries() {
 }
 
 template void std::__vec_deleter<DinoUiFossilEntry, std::allocator<DinoUiFossilEntry> >::sub_push_back(const DinoUiFossilEntry &x, Metrowerks::int2type<true>);
+
+// The file's static initialization (see dino_static_init.h).
+// NONMATCHING: register choice/scheduling of the pooled stores.
+static struct DinoUi2ContainerBaseMenuItemStaticInit {
+    DinoUi2ContainerBaseMenuItemStaticInit() {
+        DINO_POOL_WORD(data_ov004_02176b44, 0x20) = 128;
+        DINO_POOL_WORD(data_ov004_02176b44, 0x24) = 96;
+        DINO_POOL_WORD(data_ov004_02176b44, 0x38) = 128;
+        DINO_POOL_WORD(data_ov004_02176b44, 0x3c) = 96;
+        DINO_POOL_WORD(data_ov004_02176b44, 0x10) = 128;
+        DINO_POOL_WORD(data_ov004_02176b44, 0x14) = 96;
+        DINO_POOL_WORD(data_ov004_02176bc4, 0x0) = 53;
+        DINO_POOL_WORD(data_ov004_02176bc4, 0x4) = 35;
+        DINO_POOL_WORD(data_ov004_02176b44, 0x70) = 50;
+        DINO_POOL_WORD(data_ov004_02176b44, 0x74) = 0;
+        DINO_POOL_WORD(data_ov004_02176b44, 0x28) = 0;
+        DINO_POOL_WORD(data_ov004_02176b44, 0x2c) = 50;
+        DINO_POOL_WORD(data_ov004_02176b44, 0x18) = -32;
+        DINO_POOL_WORD(data_ov004_02176b44, 0x1c) = 4;
+        DINO_POOL_WORD(data_ov004_02176b44, 0x30) = 241;
+        DINO_POOL_WORD(data_ov004_02176b44, 0x34) = 103;
+        DINO_POOL_WORD(data_ov004_02176b44, 0x68) = 128;
+        DINO_POOL_WORD(data_ov004_02176b44, 0x6c) = 96;
+        DINO_POOL_WORD(data_ov004_02176b44, 0x60) = 24;
+        DINO_POOL_WORD(data_ov004_02176b44, 0x64) = 144;
+        DINO_POOL_WORD(data_ov004_02176b44, 0x50) = 54;
+        DINO_POOL_WORD(data_ov004_02176b44, 0x54) = 115;
+        DINO_POOL_WORD(data_ov004_02176b44, 0x78) = 202;
+        DINO_POOL_WORD(data_ov004_02176b44, 0x7c) = 139;
+    }
+} sDinoUi2ContainerBaseMenuItemStaticInit;

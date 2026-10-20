@@ -17,6 +17,7 @@
 #include "m/oam_canvas.h"
 #include "m/obj.h"
 #include "m/display.h"
+#include "game/dino_static_init.h"
 
 // The TU's pooled constants (see menu.cpp).
 extern "C" struct {
@@ -282,3 +283,43 @@ DinoUi3PartsRockName::DinoUi3PartsRockName(MPoint pos) : MProcess(NULL) {
     mText->Show();
 }
 #pragma opt_common_subs reset
+
+// The file's static initialization (see dino_static_init.h).
+extern "C" u32 data_ov005_0216571c[];
+extern "C" u32 data_ov005_0216569c[];
+extern "C" u32 data_ov005_0216579c[];
+// NONMATCHING: register choice/scheduling of the pooled stores.
+static struct DinoUi3PartsFractionStaticInit {
+    DinoUi3PartsFractionStaticInit() {
+        DINO_POOL_WORD(data_ov005_0216571c, 0x30) = DINO_POOL_WORD(data_ov005_0216561c, 0x18);
+        DINO_POOL_WORD(data_ov005_0216571c, 0x34) = DINO_POOL_WORD(data_ov005_0216561c, 0x18);
+        DINO_POOL_WORD(data_ov005_0216571c, 0x38) = DINO_POOL_WORD(data_ov005_0216569c, 0x8);
+        DINO_POOL_WORD(data_ov005_0216571c, 0x3c) = DINO_POOL_WORD(data_ov005_0216561c, 0x60);
+        DINO_POOL_WORD(data_ov005_0216571c, 0x40) = DINO_POOL_WORD(data_ov005_0216561c, 0x7c);
+        DINO_POOL_WORD(data_ov005_0216571c, 0x44) = DINO_POOL_WORD(data_ov005_0216561c, 0x28);
+        DINO_POOL_WORD(data_ov005_0216571c, 0x48) = DINO_POOL_WORD(data_ov005_0216561c, 0x2c);
+        DINO_POOL_WORD(data_ov005_0216571c, 0x4c) = DINO_POOL_WORD(data_ov005_0216561c, 0x30);
+        DINO_POOL_WORD(data_ov005_0216571c, 0x50) = DINO_POOL_WORD(data_ov005_0216561c, 0x64);
+        DINO_POOL_WORD(data_ov005_0216571c, 0x54) = DINO_POOL_WORD(data_ov005_0216561c, 0x54);
+        DINO_POOL_WORD(data_ov005_0216571c, 0x58) = DINO_POOL_WORD(data_ov005_0216561c, 0x20);
+        DINO_POOL_WORD(data_ov005_0216571c, 0x5c) = DINO_POOL_WORD(data_ov005_0216561c, 0x8);
+        DINO_POOL_WORD(data_ov005_0216571c, 0x60) = DINO_POOL_WORD(data_ov005_0216561c, 0x5c);
+        DINO_POOL_WORD(data_ov005_0216571c, 0x64) = DINO_POOL_WORD(data_ov005_0216561c, 0x6c);
+        DINO_POOL_WORD(data_ov005_0216571c, 0x68) = DINO_POOL_WORD(data_ov005_0216561c, 0x70);
+        DINO_POOL_WORD(data_ov005_0216571c, 0x6c) = DINO_POOL_WORD(data_ov005_0216561c, 0x10);
+        DINO_POOL_WORD(data_ov005_0216571c, 0x70) = DINO_POOL_WORD(data_ov005_0216561c, 0x44);
+        DINO_POOL_WORD(data_ov005_0216571c, 0x74) = DINO_POOL_WORD(data_ov005_0216561c, 0x50);
+        DINO_POOL_WORD(data_ov005_0216571c, 0x78) = DINO_POOL_WORD(data_ov005_0216561c, 0x1c);
+        DINO_POOL_WORD(data_ov005_0216571c, 0x7c) = DINO_POOL_WORD(data_ov005_0216569c, 0x4);
+        DINO_POOL_WORD(data_ov005_0216579c, 0x0) = DINO_POOL_WORD(data_ov005_0216561c, 0x4c);
+        DINO_POOL_WORD(data_ov005_0216579c, 0x4) = DINO_POOL_WORD(data_ov005_0216561c, 0x24);
+        DINO_POOL_WORD(data_ov005_0216579c, 0x8) = DINO_POOL_WORD(data_ov005_0216561c, 0x68);
+        DINO_POOL_WORD(data_ov005_0216579c, 0xc) = DINO_POOL_WORD(data_ov005_0216561c, 0x78);
+        DINO_POOL_WORD(data_ov005_0216579c, 0x10) = DINO_POOL_WORD(data_ov005_0216561c, 0x38);
+        DINO_POOL_WORD(data_ov005_0216579c, 0x14) = DINO_POOL_WORD(data_ov005_0216561c, 0x3c);
+        DINO_POOL_WORD(data_ov005_0216579c, 0x18) = DINO_POOL_WORD(data_ov005_0216561c, 0x74);
+        DINO_POOL_WORD(data_ov005_0216579c, 0x1c) = DINO_POOL_WORD(data_ov005_0216569c, 0x0);
+        DINO_POOL_WORD(data_ov005_0216579c, 0x20) = DINO_POOL_WORD(data_ov005_0216561c, 0xc);
+        DINO_POOL_WORD(data_ov005_0216579c, 0x24) = DINO_POOL_WORD(data_ov005_0216561c, 0x58);
+    }
+} sDinoUi3PartsFractionStaticInit;

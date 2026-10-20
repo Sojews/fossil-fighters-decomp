@@ -6,6 +6,7 @@
 
 src/ov007/dino_ui_atm.cpp:
     .text       start:0x02171ca8 end:0x02174ad8
+    .init       start:0x0218bdc0 end:0x0218c090
 
 src/ov007/dino_ui_atm_cursor.cpp:
     .text       start:0x02171b00 end:0x02171ca8
@@ -15,6 +16,7 @@ src/ov007/dino_ui_organization_menu.cpp:
 
 src/ov007/dino_ui_team_select.cpp:
     .text       start:0x0218ad84 end:0x0218bdc0
+    .init       start:0x0218c8a4 end:0x0218c928
 
 src/ov007/dino_ui_keyboard.cpp:
     .text       start:0x02180f98 end:0x0218746c

@@ -687,12 +687,12 @@ _ZThn136_N25DinoUiOrderSelectMenuItem10GetDisplayEv kind:function(thumb,size=0x1
 _ZThn136_N25DinoUiOrderSelectMenuItem7GetRectEv kind:function(thumb,size=0x1c) addr:0x02190008
 _ZThn136_N29DinoUiOrderSelectDecideButtonD1Ev kind:function(thumb,size=0x1c) addr:0x02190024
 data_ov006_02190040 kind:data(any) addr:0x02190040
-__sinit_ov006_0219004c kind:function(thumb,size=0x20) addr:0x0219004c
-__sinit_ov006_0219006c kind:function(thumb,size=0xcc) addr:0x0219006c
+__sinit_dino_ui_field_menu.cpp kind:function(thumb,size=0x20) addr:0x0219004c
+__sinit_dino_ui_parts_tab_icon_menu_item.cpp kind:function(thumb,size=0xcc) addr:0x0219006c
 __sinit_ov006_02190138 kind:function(thumb,size=0x2d0) addr:0x02190138
-__sinit_ov006_02190408 kind:function(thumb,size=0x70) addr:0x02190408
-__sinit_ov006_02190478 kind:function(thumb,size=0x54) addr:0x02190478
-__sinit_ov006_021904cc kind:function(thumb,size=0x354) addr:0x021904cc
+__sinit_dino_ui_item_item_button.cpp kind:function(thumb,size=0x70) addr:0x02190408
+__sinit_dino_ui_rv_status_menu_item.cpp kind:function(thumb,size=0x54) addr:0x02190478
+__sinit_dino_ui_medal_menu.cpp kind:function(thumb,size=0x354) addr:0x021904cc
 __sinit_ov006_02190820 kind:function(thumb,size=0xcc) addr:0x02190820
 __sinit_ov006_021908ec kind:function(thumb,size=0x48e) addr:0x021908ec
 .p__sinit_ov006_0219004c kind:data(word) addr:0x02190d7c

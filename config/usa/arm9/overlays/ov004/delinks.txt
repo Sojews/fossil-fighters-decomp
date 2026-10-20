@@ -19,12 +19,15 @@ src/ov004/dino_ui_multiplay_menu.cpp:
 
 src/ov004/dino_ui_multiplay_loop.cpp:
     .text       start:0x02162b0c end:0x02162ffc
+    .init       start:0x02171880 end:0x021718cc
 
 src/ov004/dino_ui_wireless_cancel_item.cpp:
     .text       start:0x02163404 end:0x02168b20
+    .init       start:0x021718cc end:0x02171934
 
 src/ov004/dino_ui_save_option.cpp:
     .text       start:0x02168b20 end:0x021698c8
+    .init       start:0x02171934 end:0x02171954
 
 src/ov004/disp_blower.cpp:
     .text       start:0x0216a104 end:0x0216c954
@@ -43,6 +46,7 @@ src/ov004/dino_ui_save_menu.cpp:
 
 src/ov004/dino_ui2_container_base_menu_item.cpp:
     .text       start:0x0216f3fc end:0x02171074
+    .init       start:0x02171d20 end:0x02171d84
 
 src/ov004/dino_ui_debug_reviver_menu.cpp:
     .text       start:0x021612d8 end:0x02161b50
@@ -52,12 +56,16 @@ src/ov004/dino_ui_debug_flag_menu.cpp:
 
 src/ov004/dino_ui2_field_menu_cursor.cpp:
     .text       start:0x0216e65c end:0x0216e788
+    .init       start:0x02171c50 end:0x02171d20
 
 src/ov004/dino_ui_result.cpp:
     .text       start:0x02171074 end:0x02171804
+    .init       start:0x02171d84 end:0x02171d9c
 
 src/ov004/dino_ui_exchange.cpp:
     .text       start:0x021558a0 end:0x02157268
+    .init       start:0x02171810 end:0x02171820
 
 src/ov004/dino_ui_top_menu.cpp:
     .text       start:0x02157268 end:0x0215cc98
+    .init       start:0x02171820 end:0x02171880

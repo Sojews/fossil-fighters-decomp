@@ -24,6 +24,7 @@
 #include "m/lcd.h"
 #include "m/display.h"
 #include "m/bright.h"
+#include "game/dino_static_init.h"
 
 DinoUiContainerBaseMenuItem::~DinoUiContainerBaseMenuItem() {
 }
@@ -412,3 +413,34 @@ void DinoUiContainerBaseMenu::OnDecide(MMenuItem *item) {
         }
     }
 }
+
+// The file's static initialization (see dino_static_init.h).
+extern "C" u32 data_ov005_0216c368[];
+static struct DinoUiContainerBaseMenuItemStaticInit {
+    DinoUiContainerBaseMenuItemStaticInit() {
+        DINO_POOL_WORD(data_ov005_0216c2e8, 0x20) = 128;
+        DINO_POOL_WORD(data_ov005_0216c2e8, 0x24) = 96;
+        DINO_POOL_WORD(data_ov005_0216c2e8, 0x38) = 128;
+        DINO_POOL_WORD(data_ov005_0216c2e8, 0x3c) = 96;
+        DINO_POOL_WORD(data_ov005_0216c368, 0x0) = 128;
+        DINO_POOL_WORD(data_ov005_0216c368, 0x4) = 96;
+        DINO_POOL_WORD(data_ov005_0216c2e8, 0x70) = 53;
+        DINO_POOL_WORD(data_ov005_0216c2e8, 0x74) = 35;
+        DINO_POOL_WORD(data_ov005_0216c2e8, 0x10) = 50;
+        DINO_POOL_WORD(data_ov005_0216c2e8, 0x14) = 0;
+        DINO_POOL_WORD(data_ov005_0216c2e8, 0x60) = 0;
+        DINO_POOL_WORD(data_ov005_0216c2e8, 0x64) = 50;
+        DINO_POOL_WORD(data_ov005_0216c2e8, 0x18) = -32;
+        DINO_POOL_WORD(data_ov005_0216c2e8, 0x1c) = 4;
+        DINO_POOL_WORD(data_ov005_0216c2e8, 0x30) = 241;
+        DINO_POOL_WORD(data_ov005_0216c2e8, 0x34) = 103;
+        DINO_POOL_WORD(data_ov005_0216c2e8, 0x68) = 128;
+        DINO_POOL_WORD(data_ov005_0216c2e8, 0x6c) = 96;
+        DINO_POOL_WORD(data_ov005_0216c2e8, 0x28) = 24;
+        DINO_POOL_WORD(data_ov005_0216c2e8, 0x2c) = 144;
+        DINO_POOL_WORD(data_ov005_0216c2e8, 0x50) = 54;
+        DINO_POOL_WORD(data_ov005_0216c2e8, 0x54) = 115;
+        DINO_POOL_WORD(data_ov005_0216c2e8, 0x78) = 202;
+        DINO_POOL_WORD(data_ov005_0216c2e8, 0x7c) = 139;
+    }
+} sDinoUiContainerBaseMenuItemStaticInit;

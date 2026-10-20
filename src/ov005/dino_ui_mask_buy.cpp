@@ -32,6 +32,7 @@
 #include "m/lcd.h"
 #include "m/display.h"
 #include "m/bright.h"
+#include "game/dino_static_init.h"
 
 #pragma auto_inline off
 
@@ -466,3 +467,54 @@ void DinoUiMaskBuyMenu::OnIdle() {
         }
     }
 }
+
+// The file's static initialization (see dino_static_init.h).
+extern "C" u32 data_ov005_0216b300[];
+static struct DinoUiMaskBuyStaticInit {
+    DinoUiMaskBuyStaticInit() {
+        DINO_POOL_WORD(data_ov005_0216b300, 0x20) = DINO_POOL_WORD(data_ov005_0216b180, 0x1c);
+        DINO_POOL_WORD(data_ov005_0216b300, 0x24) = DINO_POOL_WORD(data_ov005_0216b180, 0x38);
+        DINO_POOL_WORD(data_ov005_0216b300, 0x28) = DINO_POOL_WORD(data_ov005_0216b180, 0x14);
+        DINO_POOL_WORD(data_ov005_0216b300, 0x2c) = DINO_POOL_WORD(data_ov005_0216b180, 0x60);
+        DINO_POOL_WORD(data_ov005_0216b300, 0x30) = DINO_POOL_WORD(data_ov005_0216b180, 0x10);
+        DINO_POOL_WORD(data_ov005_0216b300, 0x34) = DINO_POOL_WORD(data_ov005_0216b180, 0x8);
+        DINO_POOL_WORD(data_ov005_0216b300, 0x38) = DINO_POOL_WORD(data_ov005_0216b180, 0x4c);
+        DINO_POOL_WORD(data_ov005_0216b300, 0x3c) = DINO_POOL_WORD(data_ov005_0216b180, 0x3c);
+        DINO_POOL_WORD(data_ov005_0216b300, 0x40) = DINO_POOL_WORD(data_ov005_0216b180, 0x40);
+        DINO_POOL_WORD(data_ov005_0216b300, 0x44) = DINO_POOL_WORD(data_ov005_0216b180, 0x20);
+        DINO_POOL_WORD(data_ov005_0216b300, 0x48) = DINO_POOL_WORD(data_ov005_0216b180, 0x2c);
+        DINO_POOL_WORD(data_ov005_0216b300, 0x4c) = DINO_POOL_WORD(data_ov005_0216b180, 0x18);
+        DINO_POOL_WORD(data_ov005_0216b300, 0x50) = DINO_POOL_WORD(data_ov005_0216b180, 0x48);
+        DINO_POOL_WORD(data_ov005_0216b300, 0x54) = DINO_POOL_WORD(data_ov005_0216b180, 0x24);
+        DINO_POOL_WORD(data_ov005_0216b300, 0x58) = DINO_POOL_WORD(data_ov005_0216b180, 0x54);
+        DINO_POOL_WORD(data_ov005_0216b300, 0x5c) = DINO_POOL_WORD(data_ov005_0216b180, 0x64);
+        DINO_POOL_WORD(data_ov005_0216b300, 0x60) = DINO_POOL_WORD(data_ov005_0216b180, 0x34);
+        DINO_POOL_WORD(data_ov005_0216b300, 0x64) = DINO_POOL_WORD(data_ov005_0216b180, 0xc);
+        DINO_POOL_WORD(data_ov005_0216b300, 0x68) = DINO_POOL_WORD(data_ov005_0216b180, 0x5c);
+        DINO_POOL_WORD(data_ov005_0216b300, 0x6c) = DINO_POOL_WORD(data_ov005_0216b180, 0x28);
+        DINO_POOL_WORD(data_ov005_0216b200, 0x48) = 128;
+        DINO_POOL_WORD(data_ov005_0216b200, 0x4c) = 96;
+        DINO_POOL_WORD(data_ov005_0216b180, 0x78) = 128;
+        DINO_POOL_WORD(data_ov005_0216b180, 0x7c) = 96;
+        DINO_POOL_WORD(data_ov005_0216b200, 0x0) = 128;
+        DINO_POOL_WORD(data_ov005_0216b200, 0x4) = 96;
+        DINO_POOL_WORD(data_ov005_0216b200, 0x8) = 53;
+        DINO_POOL_WORD(data_ov005_0216b200, 0xc) = 35;
+        DINO_POOL_WORD(data_ov005_0216b200, 0x58) = 50;
+        DINO_POOL_WORD(data_ov005_0216b200, 0x5c) = 0;
+        DINO_POOL_WORD(data_ov005_0216b200, 0x10) = 0;
+        DINO_POOL_WORD(data_ov005_0216b200, 0x14) = 50;
+        DINO_POOL_WORD(data_ov005_0216b200, 0x20) = -32;
+        DINO_POOL_WORD(data_ov005_0216b200, 0x24) = 4;
+        DINO_POOL_WORD(data_ov005_0216b200, 0x18) = 241;
+        DINO_POOL_WORD(data_ov005_0216b200, 0x1c) = 128;
+        DINO_POOL_WORD(data_ov005_0216b180, 0x68) = 128;
+        DINO_POOL_WORD(data_ov005_0216b180, 0x6c) = 96;
+        DINO_POOL_WORD(data_ov005_0216b200, 0x50) = 24;
+        DINO_POOL_WORD(data_ov005_0216b200, 0x54) = 144;
+        DINO_POOL_WORD(data_ov005_0216b200, 0x28) = 54;
+        DINO_POOL_WORD(data_ov005_0216b200, 0x2c) = 115;
+        DINO_POOL_WORD(data_ov005_0216b200, 0x38) = 202;
+        DINO_POOL_WORD(data_ov005_0216b200, 0x3c) = 139;
+    }
+} sDinoUiMaskBuyStaticInit;

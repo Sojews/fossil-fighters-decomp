@@ -11,6 +11,7 @@
 #include "m/motion.h"
 #include "m/smart_oam.h"
 #include "game/dino_sound.h"
+#include "game/dino_static_init.h"
 
 DinoFieldPoint::~DinoFieldPoint() {
 }
@@ -149,3 +150,22 @@ MTask *DinoFieldPoint::CreateHideTask() {
     tasks->AddTail(exit);
     return tasks;
 }
+
+// The file's static initialization (see dino_static_init.h).
+extern "C" u32 data_ov001_0216abc0[];
+static struct DinoFieldPointStaticInit {
+    DinoFieldPointStaticInit() {
+        DINO_POOL_WORD(data_ov001_0216ab40, 0x3c) = 13;
+        DINO_POOL_WORD(data_ov001_0216ab40, 0x40) = 16;
+        DINO_POOL_WORD(data_ov001_0216ab40, 0x74) = DINO_POOL_WORD(data_ov001_0216ab40, 0xc);
+        DINO_POOL_WORD(data_ov001_0216ab40, 0x78) = DINO_POOL_WORD(data_ov001_0216ab40, 0x20);
+        DINO_POOL_WORD(data_ov001_0216ab40, 0x7c) = DINO_POOL_WORD(data_ov001_0216ab40, 0x2c);
+        DINO_POOL_WORD(data_ov001_0216abc0, 0x0) = DINO_POOL_WORD(data_ov001_0216ab40, 0x18);
+        DINO_POOL_WORD(data_ov001_0216abc0, 0x4) = DINO_POOL_WORD(data_ov001_0216ab40, 0x1c);
+        DINO_POOL_WORD(data_ov001_0216abc0, 0x8) = DINO_POOL_WORD(data_ov001_0216ab40, 0x14);
+        DINO_POOL_WORD(data_ov001_0216abc0, 0xc) = DINO_POOL_WORD(data_ov001_0216ab40, 0x28);
+        DINO_POOL_WORD(data_ov001_0216abc0, 0x10) = DINO_POOL_WORD(data_ov001_0216ab40, 0x24);
+        DINO_POOL_WORD(data_ov001_0216abc0, 0x14) = DINO_POOL_WORD(data_ov001_0216ab40, 0x30);
+        DINO_POOL_WORD(data_ov001_0216abc0, 0x18) = DINO_POOL_WORD(data_ov001_0216ab40, 0x4);
+    }
+} sDinoFieldPointStaticInit;

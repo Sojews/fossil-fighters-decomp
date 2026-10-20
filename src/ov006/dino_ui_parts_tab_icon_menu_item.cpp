@@ -29,6 +29,7 @@
 #include "game/dino_backup.h"
 #include "game/dino_team.h"
 #include "game/dino_ui_parts_team_tech.h"
+#include "game/dino_static_init.h"
 
 #pragma auto_inline off
 DinoUiStatusMenu::DinoUiStatusMenu(int *choice, DinoTeam *team, DinoTeam *team2)
@@ -590,3 +591,58 @@ void DinoUiStatusMenu::OnBackDecided() {
                          gLcd->mMain->mBright->CreateFadeOutToBlack(data_02089a30, data_02089a2c),
                          MTaskExitTransfer::Create(&(MTask &)*this));
 }
+
+// The file's static initialization (see dino_static_init.h).
+extern "C" u32 data_ov006_02190f9c[];
+extern "C" u32 data_ov006_02191008[];
+extern "C" u32 data_ov006_02191010[];
+extern "C" u32 data_ov006_02191018[];
+extern "C" u32 data_ov006_02191020[];
+extern "C" u32 data_ov006_02190f1c[];
+// NONMATCHING: register choice/scheduling of the pooled stores.
+static struct DinoUiPartsTabIconMenuItemStaticInit {
+    DinoUiPartsTabIconMenuItemStaticInit() {
+        DINO_POOL_WORD(data_ov006_02190e1c, 0x44) = 128;
+        DINO_POOL_WORD(data_ov006_02190e1c, 0x48) = 176;
+        DINO_POOL_WORD(data_ov006_02190e1c, 0x6c) = 8;
+        DINO_POOL_WORD(data_ov006_02190e1c, 0x70) = 150;
+        DINO_POOL_WORD(data_ov006_02190e9c, 0x4) = 64;
+        DINO_POOL_WORD(data_ov006_02190e9c, 0x8) = 112;
+        DINO_POOL_WORD(data_ov006_02190e1c, 0x4c) = 27;
+        DINO_POOL_WORD(data_ov006_02190e1c, 0x50) = 10;
+        DINO_POOL_WORD(data_ov006_02190e1c, 0x34) = 36;
+        DINO_POOL_WORD(data_ov006_02190e1c, 0x38) = 115;
+        DINO_POOL_WORD(data_ov006_02190e9c, 0x1c) = 117;
+        DINO_POOL_WORD(data_ov006_02190e9c, 0x20) = 65;
+        DINO_POOL_WORD(data_ov006_02190e1c, 0x5c) = 117;
+        DINO_POOL_WORD(data_ov006_02190e1c, 0x60) = 81;
+        DINO_POOL_WORD(data_ov006_02190e1c, 0x7c) = 89;
+        DINO_POOL_WORD(data_ov006_02190e9c, 0x0) = 89;
+        DINO_POOL_WORD(data_ov006_02190e1c, 0x2c) = 128;
+        DINO_POOL_WORD(data_ov006_02190e1c, 0x30) = 96;
+        DINO_POOL_WORD(data_ov006_02190e9c, 0xc) = 128;
+        DINO_POOL_WORD(data_ov006_02190e9c, 0x10) = 96;
+        DINO_POOL_WORD(data_ov006_02190f9c, 0x64) = 46;
+        DINO_POOL_WORD(data_ov006_02190f9c, 0x68) = 152;
+        DINO_POOL_WORD(data_ov006_02191008, 0x0) = 91;
+        DINO_POOL_WORD(data_ov006_02191008, 0x4) = 152;
+        DINO_POOL_WORD(data_ov006_02191010, 0x0) = 128;
+        DINO_POOL_WORD(data_ov006_02191010, 0x4) = 152;
+        DINO_POOL_WORD(data_ov006_02191018, 0x0) = 178;
+        DINO_POOL_WORD(data_ov006_02191018, 0x4) = 152;
+        DINO_POOL_WORD(data_ov006_02191020, 0x0) = 214;
+        DINO_POOL_WORD(data_ov006_02191020, 0x4) = 152;
+        DINO_POOL_WORD(data_ov006_02190e9c, 0x14) = -40;
+        DINO_POOL_WORD(data_ov006_02190e9c, 0x18) = -88;
+        DINO_POOL_WORD(data_ov006_02190e1c, 0x54) = -32;
+        DINO_POOL_WORD(data_ov006_02190e1c, 0x58) = 8;
+        DINO_POOL_WORD(data_ov006_02190e9c, 0x2c) = -6;
+        DINO_POOL_WORD(data_ov006_02190e9c, 0x30) = 12;
+        DINO_POOL_WORD(data_ov006_02190f1c, 0x4c) = DINO_POOL_WORD(data_ov006_02190f9c, 0x64);
+        DINO_POOL_WORD(data_ov006_02190f1c, 0x50) = DINO_POOL_WORD(data_ov006_02190f9c, 0x68);
+        DINO_POOL_WORD(data_ov006_02190f1c, 0x54) = DINO_POOL_WORD(data_ov006_02190f9c, 0x6c);
+        DINO_POOL_WORD(data_ov006_02190f1c, 0x58) = DINO_POOL_WORD(data_ov006_02190f9c, 0x70);
+        DINO_POOL_WORD(data_ov006_02190f1c, 0x5c) = DINO_POOL_WORD(data_ov006_02190f9c, 0x74);
+        DINO_POOL_WORD(data_ov006_02190f1c, 0x60) = DINO_POOL_WORD(data_ov006_02190f9c, 0x78);
+    }
+} sDinoUiPartsTabIconMenuItemStaticInit;

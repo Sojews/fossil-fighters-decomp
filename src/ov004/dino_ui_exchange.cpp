@@ -24,6 +24,7 @@
 #include "m/text_codec.h"
 #include <printf.h>
 #include <algorithm>
+#include "game/dino_static_init.h"
 
 DinoUiExchange::~DinoUiExchange() {
     GetDisplay()->mBlend->Reset();
@@ -464,3 +465,11 @@ void DinoUiExchange::StateEnd() {
         mState = data_ov004_02171e60.Unk02155f24_34;
     }
 }
+
+// The file's static initialization (see dino_static_init.h).
+static struct DinoUiExchangeStaticInit {
+    DinoUiExchangeStaticInit() {
+        DINO_POOL_WORD(data_ov004_02171e60, 0x3c) = 128;
+        DINO_POOL_WORD(data_ov004_02171e60, 0x40) = 64;
+    }
+} sDinoUiExchangeStaticInit;

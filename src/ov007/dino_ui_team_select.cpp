@@ -12,6 +12,7 @@
 #include "m/call_task.h"
 #include "game/dino_backup.h"
 #include "game/dino_common_window_menu_item_flush_task_menu.h"
+#include "game/dino_static_init.h"
 
 DinoUiTeamSelectMenu::~DinoUiTeamSelectMenu() {
 }
@@ -208,3 +209,40 @@ void DinoUiTeamSelectMenu::StateDecided() {
     }
 }
 #pragma dont_inline reset
+
+// The file's static initialization (see dino_static_init.h).
+extern "C" u32 data_ov007_02192398[];
+extern "C" u32 data_ov007_02192418[];
+extern "C" u32 data_ov007_0219241c[];
+extern "C" u32 data_ov007_02192424[];
+// NONMATCHING: register choice/scheduling of the pooled stores.
+static struct DinoUiTeamSelectStaticInit {
+    DinoUiTeamSelectStaticInit() {
+        DINO_POOL_WORD(data_ov007_02192318, 0x54) = 128;
+        DINO_POOL_WORD(data_ov007_02192318, 0x58) = 176;
+        DINO_POOL_WORD(data_ov007_02192318, 0x14) = 8;
+        DINO_POOL_WORD(data_ov007_02192318, 0x18) = 150;
+        DINO_POOL_WORD(data_ov007_02192318, 0x64) = 64;
+        DINO_POOL_WORD(data_ov007_02192318, 0x68) = 112;
+        DINO_POOL_WORD(data_ov007_02192318, 0x34) = 128;
+        DINO_POOL_WORD(data_ov007_02192318, 0x38) = 96;
+        DINO_POOL_WORD(data_ov007_02192318, 0x44) = 123;
+        DINO_POOL_WORD(data_ov007_02192318, 0x48) = 120;
+        DINO_POOL_WORD(data_ov007_02192318, 0x24) = 133;
+        DINO_POOL_WORD(data_ov007_02192318, 0x28) = 120;
+        DINO_POOL_WORD(data_ov007_02192318, 0x4c) = 246;
+        DINO_POOL_WORD(data_ov007_02192318, 0x50) = 138;
+        DINO_POOL_WORD(data_ov007_02192398, 0x7c) = 50;
+        DINO_POOL_WORD(data_ov007_02192418, 0x0) = 46;
+        DINO_POOL_WORD(data_ov007_0219241c, 0x0) = 50;
+        DINO_POOL_WORD(data_ov007_0219241c, 0x4) = 85;
+        DINO_POOL_WORD(data_ov007_02192424, 0x0) = 50;
+        DINO_POOL_WORD(data_ov007_02192424, 0x4) = 124;
+        DINO_POOL_WORD(data_ov007_02192318, 0x5c) = 78;
+        DINO_POOL_WORD(data_ov007_02192318, 0x60) = 8;
+        DINO_POOL_WORD(data_ov007_02192318, 0x74) = 78;
+        DINO_POOL_WORD(data_ov007_02192318, 0x78) = -8;
+        DINO_POOL_WORD(data_ov007_02192318, 0x6c) = -10;
+        DINO_POOL_WORD(data_ov007_02192318, 0x70) = -4;
+    }
+} sDinoUiTeamSelectStaticInit;

@@ -37,6 +37,7 @@ template <class T> MTask *MCreateBgCallTask(T *obj, void (T::*func)(), int threa
 #include "game/dino_common_window_message_box.h"
 #include "game/dino_common_window_yes_no_dialog.h"
 #include <stdio.h>
+#include "game/dino_static_init.h"
 
 DinoUiWirelessCancelItem::~DinoUiWirelessCancelItem() {
 }
@@ -1654,3 +1655,27 @@ void DinoUiChildScannerBattleConnect::StateRescan() {
 // calls them.)
 template class MCallTask0<DinoUiBattleParentScanner, MMessageObserver>;
 template MTask *MCreateCallTask(DinoUiBattleParentScanner *obj, void (MMessageObserver::*func)());
+
+// The file's static initialization (see dino_static_init.h).
+extern "C" u32 data_ov004_021744d0[];
+// NONMATCHING: register choice/scheduling of the pooled stores.
+static struct DinoUiWirelessCancelItemStaticInit {
+    DinoUiWirelessCancelItemStaticInit() {
+        DINO_POOL_WORD(data_ov004_021742d0, 0x74) = 112;
+        DINO_POOL_WORD(data_ov004_02174150, 0x7c) = 112;
+        DINO_POOL_WORD(data_ov004_021742d0, 0x78) = 144;
+        DINO_POOL_WORD(data_ov004_021741d0, 0x0) = 176;
+        DINO_POOL_WORD(data_ov004_021742d0, 0x4c) = 128;
+        DINO_POOL_WORD(data_ov004_021742d0, 0x50) = 96;
+        DINO_POOL_WORD(data_ov004_021744d0, 0x4) = -40;
+        DINO_POOL_WORD(data_ov004_021744d0, 0x8) = -16;
+        DINO_POOL_WORD(data_ov004_021744d0, 0xc) = 40;
+        DINO_POOL_WORD(data_ov004_021744d0, 0x10) = 16;
+        DINO_POOL_WORD(data_ov004_021741d0, 0x1c) = -15;
+        DINO_POOL_WORD(data_ov004_021741d0, 0x20) = -6;
+        DINO_POOL_WORD(data_ov004_02174150, 0x6c) = -17;
+        DINO_POOL_WORD(data_ov004_02174150, 0x70) = -8;
+        DINO_POOL_WORD(data_ov004_02174350, 0x1c) = 128;
+        DINO_POOL_WORD(data_ov004_02174350, 0x20) = 64;
+    }
+} sDinoUiWirelessCancelItemStaticInit;

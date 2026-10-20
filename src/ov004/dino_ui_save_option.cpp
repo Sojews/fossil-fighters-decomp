@@ -19,6 +19,7 @@
 #include "game/dino_ui_save_option_menu_item.h"
 #include "game/dino_sound.h"
 #include "game/dino_ui_save_menu.h"
+#include "game/dino_static_init.h"
 
 #pragma auto_inline off
 DinoUiSaveOptionMenu::DinoUiSaveOptionMenu(u32 arg) : MMenu(0), mUnkB4(arg) {
@@ -312,3 +313,15 @@ MSmartOam *DinoUiSaveOptionMenu::GetOam() {
 
 DinoUiSaveOption::DinoUiSaveOption(u32 arg) : MProcess(NULL), mUnk74(arg) {
 }
+
+// The file's static initialization (see dino_static_init.h).
+static struct DinoUiSaveOptionStaticInit {
+    DinoUiSaveOptionStaticInit() {
+        DINO_POOL_WORD(data_ov004_02174cb4, 0x28) = 72;
+        DINO_POOL_WORD(data_ov004_02174cb4, 0x2c) = 104;
+        DINO_POOL_WORD(data_ov004_02174cb4, 0x20) = 184;
+        DINO_POOL_WORD(data_ov004_02174cb4, 0x24) = 104;
+        DINO_POOL_WORD(data_ov004_02174cb4, 0x30) = 128;
+        DINO_POOL_WORD(data_ov004_02174cb4, 0x34) = 96;
+    }
+} sDinoUiSaveOptionStaticInit;

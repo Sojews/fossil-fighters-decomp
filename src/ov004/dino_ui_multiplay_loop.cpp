@@ -11,6 +11,7 @@
 #include "game/dino_ui_multiplay_menu_item.h"
 #include "game/dino_ui_multiplay_menu_item_menu.h"
 #include "game/dino_sound.h"
+#include "game/dino_static_init.h"
 
 DinoUiMultiplayLoop::~DinoUiMultiplayLoop() {
 }
@@ -213,3 +214,25 @@ void DinoUiMultiplayLoop::StateMenuEnd() {
     }
     mState = data_ov004_02173bf0.StateMenu_2C;
 }
+
+// The file's static initialization (see dino_static_init.h).
+static struct DinoUiMultiplayLoopStaticInit {
+    DinoUiMultiplayLoopStaticInit() {
+        DINO_POOL_WORD(data_ov004_02173b70, 0x1c) = 128;
+        DINO_POOL_WORD(data_ov004_02173b70, 0x20) = 75;
+        DINO_POOL_WORD(data_ov004_02173b70, 0x34) = 128;
+        DINO_POOL_WORD(data_ov004_02173b70, 0x38) = 16;
+        DINO_POOL_WORD(data_ov004_02173bf0, 0x1c) = 128;
+        DINO_POOL_WORD(data_ov004_02173bf0, 0x20) = 146;
+        DINO_POOL_WORD(data_ov004_02173b70, 0x7c) = 128;
+        DINO_POOL_WORD(data_ov004_02173bf0, 0x0) = 96;
+        DINO_POOL_WORD(data_ov004_02173b70, 0x6c) = -56;
+        DINO_POOL_WORD(data_ov004_02173b70, 0x70) = -40;
+        DINO_POOL_WORD(data_ov004_02173bf0, 0xc) = 56;
+        DINO_POOL_WORD(data_ov004_02173bf0, 0x10) = 40;
+        DINO_POOL_WORD(data_ov004_02173b70, 0x2c) = -104;
+        DINO_POOL_WORD(data_ov004_02173b70, 0x30) = -12;
+        DINO_POOL_WORD(data_ov004_02173b70, 0x74) = 104;
+        DINO_POOL_WORD(data_ov004_02173b70, 0x78) = 12;
+    }
+} sDinoUiMultiplayLoopStaticInit;

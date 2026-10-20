@@ -11,6 +11,7 @@
 #include "game/dino_ui_field_menu.h"
 #include "game/dino_ui_rv_status_menu_item_menu.h"
 #include "m/bright.h"
+#include "game/dino_static_init.h"
 
 DinoUiFieldMenu::~DinoUiFieldMenu() {
 }
@@ -107,3 +108,15 @@ void DinoUiFieldMenu::StateChoose() {
         break;
     }
 }
+
+// The file's static initialization (see dino_static_init.h).
+static struct DinoUiFieldMenuStaticInit {
+    DinoUiFieldMenuStaticInit() {
+        DINO_POOL_WORD(data_ov006_02190da0, 0x20) = 128;
+        DINO_POOL_WORD(data_ov006_02190da0, 0x24) = 176;
+        DINO_POOL_WORD(data_ov006_02190da0, 0x28) = 8;
+        DINO_POOL_WORD(data_ov006_02190da0, 0x2c) = 150;
+        DINO_POOL_WORD(data_ov006_02190da0, 0x0) = 64;
+        DINO_POOL_WORD(data_ov006_02190da0, 0x4) = 112;
+    }
+} sDinoUiFieldMenuStaticInit;

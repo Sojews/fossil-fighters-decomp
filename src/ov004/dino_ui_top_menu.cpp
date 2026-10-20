@@ -33,6 +33,7 @@
 #include "game/dino_ui_save_slot_select_menu_cancel_item.h"
 #include "game/dino_ui_save_slot_select_menu.h"
 #include "game/common_window_message.h"
+#include "game/dino_static_init.h"
 
 DinoUiTopMenuLoop::~DinoUiTopMenuLoop() {
 }
@@ -834,3 +835,30 @@ void DinoUiOpening::StateWaitScene() {
         mState = data_ov004_02172f78.StateNextScene_4C;
     }
 }
+
+// The file's static initialization (see dino_static_init.h).
+// NONMATCHING: register choice/scheduling of the pooled stores.
+static struct DinoUiTopMenuStaticInit {
+    DinoUiTopMenuStaticInit() {
+        DINO_POOL_WORD(data_ov004_021720ec, 0x54) = 128;
+        DINO_POOL_WORD(data_ov004_021720ec, 0x58) = 96;
+        DINO_POOL_WORD(data_ov004_021720ec, 0x6c) = 193;
+        DINO_POOL_WORD(data_ov004_021720ec, 0x70) = 72;
+        DINO_POOL_WORD(data_ov004_0217206c, 0x5c) = 63;
+        DINO_POOL_WORD(data_ov004_0217206c, 0x60) = 72;
+        DINO_POOL_WORD(data_ov004_021720ec, 0x5c) = 128;
+        DINO_POOL_WORD(data_ov004_021720ec, 0x60) = 16;
+        DINO_POOL_WORD(data_ov004_0217206c, 0x3c) = 128;
+        DINO_POOL_WORD(data_ov004_0217206c, 0x40) = 130;
+        DINO_POOL_WORD(data_ov004_0217206c, 0x7c) = 128;
+        DINO_POOL_WORD(data_ov004_021720ec, 0x0) = 158;
+        DINO_POOL_WORD(data_ov004_0217206c, 0x64) = -56;
+        DINO_POOL_WORD(data_ov004_0217206c, 0x68) = -40;
+        DINO_POOL_WORD(data_ov004_021720ec, 0x4c) = 56;
+        DINO_POOL_WORD(data_ov004_021720ec, 0x50) = 40;
+        DINO_POOL_WORD(data_ov004_021720ec, 0x64) = -104;
+        DINO_POOL_WORD(data_ov004_021720ec, 0x68) = -14;
+        DINO_POOL_WORD(data_ov004_0217206c, 0x74) = 104;
+        DINO_POOL_WORD(data_ov004_0217206c, 0x78) = 14;
+    }
+} sDinoUiTopMenuStaticInit;

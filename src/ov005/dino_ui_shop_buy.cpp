@@ -28,6 +28,7 @@
 #include "game/dino_backup.h"
 #include "nitro/mi.h"
 #include "m/input.h"
+#include "game/dino_static_init.h"
 
 #pragma auto_inline off
 
@@ -484,3 +485,29 @@ void DinoUiShopBuyMenu::OnIdle() {
         }
     }
 }
+
+// The file's static initialization (see dino_static_init.h).
+static struct DinoUiShopBuyStaticInit {
+    DinoUiShopBuyStaticInit() {
+        DINO_POOL_WORD(data_ov005_02166ac8, 0x3c) = 128;
+        DINO_POOL_WORD(data_ov005_02166ac8, 0x40) = 96;
+        DINO_POOL_WORD(data_ov005_02166ac8, 0x2c) = 128;
+        DINO_POOL_WORD(data_ov005_02166ac8, 0x30) = 96;
+        DINO_POOL_WORD(data_ov005_02166ac8, 0x24) = 128;
+        DINO_POOL_WORD(data_ov005_02166ac8, 0x28) = 96;
+        DINO_POOL_WORD(data_ov005_02166ac8, 0x54) = 53;
+        DINO_POOL_WORD(data_ov005_02166ac8, 0x58) = 35;
+        DINO_POOL_WORD(data_ov005_02166ac8, 0x5c) = 50;
+        DINO_POOL_WORD(data_ov005_02166ac8, 0x60) = 0;
+        DINO_POOL_WORD(data_ov005_02166ac8, 0x1c) = 0;
+        DINO_POOL_WORD(data_ov005_02166ac8, 0x20) = 50;
+        DINO_POOL_WORD(data_ov005_02166ac8, 0x74) = 128;
+        DINO_POOL_WORD(data_ov005_02166ac8, 0x78) = 96;
+        DINO_POOL_WORD(data_ov005_02166ac8, 0x6c) = 24;
+        DINO_POOL_WORD(data_ov005_02166ac8, 0x70) = 144;
+        DINO_POOL_WORD(data_ov005_02166ac8, 0x34) = 54;
+        DINO_POOL_WORD(data_ov005_02166ac8, 0x38) = 115;
+        DINO_POOL_WORD(data_ov005_02166ac8, 0x14) = 202;
+        DINO_POOL_WORD(data_ov005_02166ac8, 0x18) = 139;
+    }
+} sDinoUiShopBuyStaticInit;

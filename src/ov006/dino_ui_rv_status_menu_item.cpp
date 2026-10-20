@@ -16,6 +16,7 @@
 #include "m/bright.h"
 #include "game/dino_ui_field_menu_fraction4.h"
 #include "game/dino_ui_rv_information.h"
+#include "game/dino_static_init.h"
 
 #pragma auto_inline off
 
@@ -222,3 +223,31 @@ void DinoUiRvStatusMenu::OnBackDecided() {
                          gLcd->GetBottomDisplay()->mBright->CreateFadeOutToBlack(data_02089a90, data_02089a8c),
                          mInfo->CreateWaitModelTask(), MTaskExitTransfer::Create(&(MTask &)*this));
 }
+
+// The file's static initialization (see dino_static_init.h).
+extern "C" u32 data_ov006_021939d4[];
+extern "C" u32 data_ov006_02193a54[];
+static struct DinoUiRvStatusMenuItemStaticInit {
+    DinoUiRvStatusMenuItemStaticInit() {
+        DINO_POOL_WORD(data_ov006_021939d4, 0x6c) = 128;
+        DINO_POOL_WORD(data_ov006_021939d4, 0x70) = 176;
+        DINO_POOL_WORD(data_ov006_021939d4, 0x44) = 8;
+        DINO_POOL_WORD(data_ov006_021939d4, 0x48) = 150;
+        DINO_POOL_WORD(data_ov006_021939d4, 0x14) = 64;
+        DINO_POOL_WORD(data_ov006_021939d4, 0x18) = 112;
+        DINO_POOL_WORD(data_ov006_02193a54, 0xc) = 19;
+        DINO_POOL_WORD(data_ov006_02193a54, 0x10) = 179;
+        DINO_POOL_WORD(data_ov006_021939d4, 0x54) = 27;
+        DINO_POOL_WORD(data_ov006_021939d4, 0x58) = 0;
+        DINO_POOL_WORD(data_ov006_021939d4, 0x34) = 128;
+        DINO_POOL_WORD(data_ov006_021939d4, 0x38) = 96;
+        DINO_POOL_WORD(data_ov006_021939d4, 0x5c) = 128;
+        DINO_POOL_WORD(data_ov006_021939d4, 0x60) = 96;
+        DINO_POOL_WORD(data_ov006_021939d4, 0x24) = 128;
+        DINO_POOL_WORD(data_ov006_021939d4, 0x28) = 98;
+        DINO_POOL_WORD(data_ov006_021939d4, 0x64) = 246;
+        DINO_POOL_WORD(data_ov006_021939d4, 0x68) = 24;
+        DINO_POOL_WORD(data_ov006_021939d4, 0x2c) = 230;
+        DINO_POOL_WORD(data_ov006_021939d4, 0x30) = 24;
+    }
+} sDinoUiRvStatusMenuItemStaticInit;

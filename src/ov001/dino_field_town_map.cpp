@@ -20,6 +20,7 @@
 #include "m/lcd.h"
 #include "m/bright.h"
 #include "m/motion.h"
+#include "game/dino_static_init.h"
 
 DinoFieldTownMap::~DinoFieldTownMap() {
 }
@@ -194,3 +195,21 @@ MTask *DinoFieldTownMapManager::CreateModeTask(u32 radarMode, u32 to, u32 frames
     }
     return new MSerialTaskSet(TRUE);
 }
+
+// The file's static initialization (see dino_static_init.h).
+extern "C" u32 data_ov001_0216a868[];
+extern "C" u32 data_ov001_0216a870[];
+extern "C" u32 data_ov001_0216a878[];
+// NONMATCHING: register choice/scheduling of the pooled stores.
+static struct DinoFieldTownMapStaticInit {
+    DinoFieldTownMapStaticInit() {
+        DINO_POOL_WORD(data_ov001_0216a814, 0x4c) = -31;
+        DINO_POOL_WORD(data_ov001_0216a814, 0x50) = -80;
+        DINO_POOL_WORD(data_ov001_0216a868, 0x0) = -9;
+        DINO_POOL_WORD(data_ov001_0216a868, 0x4) = -80;
+        DINO_POOL_WORD(data_ov001_0216a870, 0x0) = 17;
+        DINO_POOL_WORD(data_ov001_0216a870, 0x4) = -80;
+        DINO_POOL_WORD(data_ov001_0216a878, 0x0) = 39;
+        DINO_POOL_WORD(data_ov001_0216a878, 0x4) = -80;
+    }
+} sDinoFieldTownMapStaticInit;

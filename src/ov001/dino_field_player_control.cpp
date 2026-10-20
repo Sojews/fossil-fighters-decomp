@@ -7,6 +7,7 @@
 #include "m/polygon_char.h"
 #include "m/anm_model.h"
 #include "game/dino_field.h"
+#include "game/dino_static_init.h"
 
 DinoFieldPlayerControl::DinoFieldPlayerControl(DinoField *field, u32 *arg1, DinoFieldPlayerControlResult *result,
                                                u32 arg3)
@@ -59,3 +60,11 @@ void DinoFieldPlayerControl::SetEffect(VecFx32 pos, u16 angle, u32 effect) {
         anm->mActive = TRUE;
     }
 }
+
+// The file's static initialization (see dino_static_init.h).
+extern "C" u32 data_ov001_0216a6b4[];
+static struct DinoFieldPlayerControlStaticInit {
+    DinoFieldPlayerControlStaticInit() {
+        DINO_POOL_WORD(data_ov001_0216a6b4, 0x0) = 8192;
+    }
+} sDinoFieldPlayerControlStaticInit;

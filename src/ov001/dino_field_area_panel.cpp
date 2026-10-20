@@ -9,6 +9,7 @@
 #include "m/indicator.h"
 #include "m/font.h"
 #include <algorithm>
+#include "game/dino_static_init.h"
 
 // This file's data.
 extern "C" struct {
@@ -75,3 +76,11 @@ void DinoFieldAreaPanel::Idle() {
 
 DinoFieldAreaPanel::~DinoFieldAreaPanel() {
 }
+
+// The file's static initialization (see dino_static_init.h).
+static struct DinoFieldAreaPanelStaticInit {
+    DinoFieldAreaPanelStaticInit() {
+        DINO_POOL_WORD(data_ov001_0216aa14, 0x10) = 2;
+        DINO_POOL_WORD(data_ov001_0216aa14, 0x14) = 2;
+    }
+} sDinoFieldAreaPanelStaticInit;

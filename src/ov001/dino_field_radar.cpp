@@ -19,6 +19,7 @@
 #include "m/call_task.h"
 #include "game/dino_backup.h"
 #include "game/dino_resource.h"
+#include "game/dino_static_init.h"
 
 DinoFieldRadar::~DinoFieldRadar() {
     GetDisplay()->mObj->mAfn->Free(mAffine);
@@ -144,3 +145,11 @@ MTask *DinoFieldRadarManager::CreateModeTask(u32 from, u32 to, u32 frames, u8 b)
     }
     return new MSerialTaskSet(TRUE);
 }
+
+// The file's static initialization (see dino_static_init.h).
+extern "C" u32 data_ov001_02169e80[];
+static struct DinoFieldRadarStaticInit {
+    DinoFieldRadarStaticInit() {
+        DINO_POOL_WORD(data_ov001_02169e80, 0x8) = 8192;
+    }
+} sDinoFieldRadarStaticInit;

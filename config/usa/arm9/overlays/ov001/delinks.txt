@@ -16,18 +16,22 @@ src/ov001/dino_field_chara_angle_anime.cpp:
 
 src/ov001/dino_field_town_map.cpp:
     .text       start:0x02166980 end:0x0216845c
+    .init       start:0x021692bc end:0x021692f4
 
 src/ov001/dino_field_area_panel.cpp:
     .text       start:0x0216845c end:0x02168964
+    .init       start:0x021692f4 end:0x02169304
 
 src/ov001/dino_field_battle_start_effect.cpp:
     .text       start:0x02168964 end:0x02168c08
 
 src/ov001/dino_field_radar.cpp:
     .text       start:0x0215c6ec end:0x0215eb50
+    .init       start:0x0216929c end:0x021692ac
 
 src/ov001/dino_field_point.cpp:
     .text       start:0x02168c08 end:0x02169298
+    .init       start:0x02169304 end:0x02169344
 
 src/ov001/dino_field_camera.cpp:
     .text       start:0x021634a8 end:0x02164b58
@@ -37,6 +41,7 @@ src/ov001/dino_field_map.cpp:
 
 src/ov001/dino_field_player_control.cpp:
     .text       start:0x02164b58 end:0x02166980
+    .init       start:0x021692ac end:0x021692bc
 
 src/ov001/dino_field_hole.cpp:
     .text       start:0x0215c2d0 end:0x0215c6ec

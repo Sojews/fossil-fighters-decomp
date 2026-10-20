@@ -17,6 +17,7 @@
 #include "m/lcd.h"
 #include "m/display.h"
 #include "m/bright.h"
+#include "game/dino_static_init.h"
 
 #pragma auto_inline off
 DinoUiItemMenu::DinoUiItemMenu(int *choice, DinoTeam *team, DinoTeam *team2)
@@ -333,3 +334,39 @@ void DinoUiItemMenu::RefreshOKButton() {
         mOKButton->mMotion->GetUnit()->SetMode(0);
     }
 }
+
+// The file's static initialization (see dino_static_init.h).
+extern "C" u32 data_ov006_021934b4[];
+extern "C" u32 data_ov006_02193534[];
+static struct DinoUiItemItemButtonStaticInit {
+    DinoUiItemItemButtonStaticInit() {
+        DINO_POOL_WORD(data_ov006_021934b4, 0x58) = 128;
+        DINO_POOL_WORD(data_ov006_021934b4, 0x5c) = 176;
+        DINO_POOL_WORD(data_ov006_021934b4, 0x40) = 8;
+        DINO_POOL_WORD(data_ov006_021934b4, 0x44) = 150;
+        DINO_POOL_WORD(data_ov006_021934b4, 0x60) = 64;
+        DINO_POOL_WORD(data_ov006_021934b4, 0x64) = 112;
+        DINO_POOL_WORD(data_ov006_021934b4, 0x38) = 19;
+        DINO_POOL_WORD(data_ov006_021934b4, 0x3c) = 179;
+        DINO_POOL_WORD(data_ov006_021934b4, 0x78) = 27;
+        DINO_POOL_WORD(data_ov006_021934b4, 0x7c) = 0;
+        DINO_POOL_WORD(data_ov006_021934b4, 0x50) = 128;
+        DINO_POOL_WORD(data_ov006_021934b4, 0x54) = 40;
+        DINO_POOL_WORD(data_ov006_02193534, 0x18) = 51;
+        DINO_POOL_WORD(data_ov006_02193534, 0x1c) = 34;
+        DINO_POOL_WORD(data_ov006_02193534, 0x0) = 0;
+        DINO_POOL_WORD(data_ov006_02193534, 0x4) = 18;
+        DINO_POOL_WORD(data_ov006_021934b4, 0x70) = 20;
+        DINO_POOL_WORD(data_ov006_021934b4, 0x74) = 137;
+        DINO_POOL_WORD(data_ov006_02193534, 0x8) = 128;
+        DINO_POOL_WORD(data_ov006_02193534, 0xc) = 96;
+        DINO_POOL_WORD(data_ov006_021934b4, 0x18) = 128;
+        DINO_POOL_WORD(data_ov006_021934b4, 0x1c) = 96;
+        DINO_POOL_WORD(data_ov006_021934b4, 0x30) = 128;
+        DINO_POOL_WORD(data_ov006_021934b4, 0x34) = 96;
+        DINO_POOL_WORD(data_ov006_021934b4, 0x48) = 128;
+        DINO_POOL_WORD(data_ov006_021934b4, 0x4c) = 96;
+        DINO_POOL_WORD(data_ov006_021934b4, 0x28) = 241;
+        DINO_POOL_WORD(data_ov006_021934b4, 0x2c) = 114;
+    }
+} sDinoUiItemItemButtonStaticInit;

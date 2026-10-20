@@ -462,11 +462,11 @@ _ZN14DinoFieldMoneyD0Ev kind:function(thumb,size=0x24) addr:0x02169230
 _ZN15DinoFieldDonateD1Ev kind:function(thumb,size=0x1e) addr:0x02169254
 _ZN15DinoFieldDonateD0Ev kind:function(thumb,size=0x24) addr:0x02169274
 data_ov001_02169298 kind:data(any) addr:0x02169298
-__sinit_ov001_0216929c kind:function(thumb,size=0x10) addr:0x0216929c
-__sinit_ov001_021692ac kind:function(thumb,size=0x10) addr:0x021692ac
-__sinit_ov001_021692bc kind:function(thumb,size=0x38) addr:0x021692bc
-__sinit_ov001_021692f4 kind:function(thumb,size=0x10) addr:0x021692f4
-__sinit_ov001_02169304 kind:function(thumb,size=0x40) addr:0x02169304
+__sinit_dino_field_radar.cpp kind:function(thumb,size=0x10) addr:0x0216929c
+__sinit_dino_field_player_control.cpp kind:function(thumb,size=0x10) addr:0x021692ac
+__sinit_dino_field_town_map.cpp kind:function(thumb,size=0x38) addr:0x021692bc
+__sinit_dino_field_area_panel.cpp kind:function(thumb,size=0x10) addr:0x021692f4
+__sinit_dino_field_point.cpp kind:function(thumb,size=0x40) addr:0x02169304
 .p__sinit_ov001_0216929c kind:data(word) addr:0x02169344
 .p__sinit_ov001_021692ac kind:data(word) addr:0x02169348
 .p__sinit_ov001_021692bc kind:data(word) addr:0x0216934c
