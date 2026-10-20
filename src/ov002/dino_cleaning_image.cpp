@@ -11,6 +11,8 @@
 #include "m/pal.h"
 #include "nitro/mi.h"
 #include "types.h"
+#include "m/fx32.h"
+#include "game/dino_static_init.h"
 
 #pragma auto_inline off
 
@@ -166,3 +168,15 @@ void DinoCleaningImage::ClearGrid() {
 #pragma auto_inline off
 // A vector member the game emits in this file (made explicitly until the code that copies the vector is decompiled).
 template void std::__vec_deleter<u32, std::allocator<u32> >::assign<u32 *>(u32 *first, u32 *last, Metrowerks::int2type<true>);
+
+// The file's static initialization (see dino_static_init.h), with the screen center and a half.
+// NONMATCHING: the dead stack copies of the layout and the center take other slots.
+extern "C" u32 data_ov002_021646e4[];
+#pragma always_inline on
+static struct DinoCleaningImageStaticInit {
+    DinoCleaningImageStaticInit() {
+        DINO_COMMON_LAYOUT_INIT(data_ov002_021646e4, 0x34, 0xb8, 0x3c, 0x1c, 0xc8, 0xe8, 0xf0, 0xd8);
+        DINO_POOL(MFx32Point, data_ov002_021646e4, 0x14).Set(MFx32(128), MFx32(96));
+        DINO_POOL(MFx32, data_ov002_021646e4, 0x4) = MFx32::FromRaw(0x800);
+    }
+} sDinoCleaningImageStaticInit;
