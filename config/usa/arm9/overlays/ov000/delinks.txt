@@ -47,6 +47,9 @@ src/ov000/ov000_0215ef04.cpp:
 src/ov000/dino_battle_view_field.cpp:
     .text       start:0x0215f22c end:0x0215fe8c
 
+src/ov000/ov000_02190654.cpp:
+    .init       start:0x02190654 end:0x02190674
+
 src/ov000/dino_battle_view_creature.cpp:
     .text       start:0x0216f294 end:0x021700fc
     .init       start:0x02190694 end:0x021906c4
