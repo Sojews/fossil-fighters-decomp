@@ -30,6 +30,10 @@
 #include "game/dino_ui_field_menu_fraction4.h"
 #include "game/dino_ui_field_menu_cursor.h"
 #include "m/display.h"
+#include "nitro/os.h"
+#include "nitro/mi.h"
+#include "game/dino_team.h"
+#include "game/dino_creature_sort.h"
 #include "m/indicator.h"
 #include "m/smart_oam.h"
 #include "m/motion.h"
@@ -282,6 +286,101 @@ DinoUiPartsTeamInfo::DinoUiPartsTeamInfo() : MProcess(NULL) {
     mParallel.AddTail(mTech);
     mTech->Hide();
     gCurrentDisplay = gLcd->mSub;
+}
+
+// What the creature stats are worked out from, and the stats (main's func_02030f38).
+struct DinoCreatureStatsInput {
+    u32 id;         // 0x00
+    int rank;       // 0x04: the creature's level
+    int bonus[4];   // 0x08: by part
+    int levels[5];  // 0x18: the parts', then the creature's own
+};
+struct DinoCreatureStats {
+    int hp;         // 0x00
+    int stats[5];   // 0x04
+};
+extern "C" DinoCreatureStats func_02030f38(const DinoCreatureStatsInput *info, BOOL fixed, fx32 fraction);
+extern const MPoint data_ov003_02160f88[5];   // by member: the icons
+
+// NONMATCHING: stack layout (the game's frame is one word bigger and puts the team below the creature).
+void DinoUiPartsTeamInfo::SetTeam(u32 index) {
+    DinoTeam team;
+    gDinoBackup->GetTeam(index, &team);
+    u32 i;
+    u32 count = 0;
+    for (i = 0; i < 5; i++) {
+        if (team.slots[i] != 0) {
+            count++;
+        }
+    }
+    if (count == 0) {
+        mName->Hide();
+        mOtherName->Hide();
+    } else if (index == gDinoBackup->GetUnk34_26()) {
+        mOtherName->Hide();
+        mName->SetText(std::wstring((const wchar_t *)team.name));
+        mName->Show();
+    } else {
+        mName->Hide();
+        mOtherName->SetText(std::wstring((const wchar_t *)team.name));
+        mOtherName->Show();
+    }
+    for (int i = 0; i < 5; i++) {
+        mTexts[i]->SetText(std::string(gDinoResource->GetCreatureText08(team.slots[i])));
+        const DinoCreatureDef *def;
+        DinoCreatureState creature;
+        if (team.slots[i] != 0) {
+            def = gDinoResource->GetCreatureDef(team.slots[i]);
+            gDinoBackup->GetCreature(team.slots[i], &creature);
+            DinoCreatureStatsInput info;
+            info.levels[0] = info.levels[1] = info.levels[2] = info.levels[3] = 0;
+            MI_CpuFill8(&info, 0, sizeof(info));
+            info.id = team.slots[i];
+            info.rank = GetCreatureLevel(creature);
+            info.levels[4] = creature.unk0_8;
+            for (int j = 0; j < 4; j++) {
+                info.bonus[j] = creature.parts[j].unk12;
+                info.levels[j] = creature.parts[j].level;
+            }
+            DinoCreatureStats stats = func_02030f38(&info, FALSE, 0);
+            mNumbers[i]->SetValue((u16)stats.hp);
+            mNumbers[5 + i]->SetValue((u16)GetCreatureLevel(creature));
+        } else {
+            mNumbers[i]->SetValue(0xFFFF);
+            mNumbers[5 + i]->SetValue(0xFFFE);
+        }
+        if (i < 3) {
+            if (mMotions[i] != NULL) {
+                mMotionTasks->Remove(mMotions[i]);
+                delete mMotions[i];
+                mMotions[i] = NULL;
+            }
+            if (team.slots[i] != 0) {
+                char path[256];
+                OS_SPrintf(path, "/motion/ui_reviver_medal/reviver_%03d.bin", team.slots[i]);
+                mMotions[i] = new MMotion(std::string(path), mOam, 2, 1);
+                if (GetCreatureLevel(creature) == 12) {
+                    mMotions[i]->Play(1, 0);
+                } else {
+                    mMotions[i]->Play(2, 0);
+                }
+                mMotions[i]->SetPosition(data_ov003_02160f88[i]);
+                mMotions[i]->SetPriority(3);
+                mMotions[i]->Show();
+                mMotionTasks->AddTail(mMotions[i]);
+            }
+        } else if (team.slots[i] == 0) {
+            mMotions[i]->Hide();
+        } else {
+            mMotions[i]->Play(GetKindLook(def->unk0D), 0);
+            mMotions[i]->Show();
+        }
+    }
+    if (DinoTeamHasTech(&team)) {
+        mTech->Show();
+    } else {
+        mTech->Hide();
+    }
 }
 
 DinoUiPartsTeamTech::DinoUiPartsTeamTech(const MPoint *positions) : MProcess(NULL) {
