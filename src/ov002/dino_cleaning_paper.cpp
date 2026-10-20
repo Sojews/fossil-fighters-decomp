@@ -3,6 +3,7 @@
 #include "game/dino_cleaning_paper.h"
 #include "m/motion.h"
 #include "m/seed_generator.h"
+#include "game/dino_static_init.h"
 
 extern const char *data_ov002_021645cc[];   // the sheets' motion files
 
@@ -53,3 +54,16 @@ void DinoCleaningPaper::Idle() {
     MSerialTaskSet *serial = &mSerial;
     serial->AddTail(timer);
 }
+
+// The file's static initialization (see dino_static_init.h).
+extern "C" u32 data_ov002_02164590[];
+static struct DinoCleaningPaperStaticInit {
+    DinoCleaningPaperStaticInit() {
+        DINO_POOL_WORD(data_ov002_02164590, 0x3c) = DINO_POOL_WORD(data_ov002_02164590, 0x8);
+        DINO_POOL_WORD(data_ov002_02164590, 0x40) = DINO_POOL_WORD(data_ov002_02164590, 0x18);
+        DINO_POOL_WORD(data_ov002_02164590, 0x44) = DINO_POOL_WORD(data_ov002_02164590, 0x4);
+        DINO_POOL_WORD(data_ov002_02164590, 0x48) = DINO_POOL_WORD(data_ov002_02164590, 0x10);
+        DINO_POOL_WORD(data_ov002_02164590, 0x4c) = DINO_POOL_WORD(data_ov002_02164590, 0x14);
+        DINO_POOL_WORD(data_ov002_02164590, 0x50) = DINO_POOL_WORD(data_ov002_02164590, 0xc);
+    }
+} sDinoCleaningPaperStaticInit;

@@ -10,6 +10,7 @@
 #include "game/dino_battle_view_ability_text_window.h"
 #include "m/indicator.h"
 #include "m/oam_canvas.h"
+#include "game/dino_static_init.h"
 
 WaitActionInfoBarTask::WaitActionInfoBarTask(DinoBattleViewActionInfoBar *bar) {
     mBar = bar;
@@ -111,3 +112,17 @@ void WaitActionInfoBarTask::Execute() {
         Exit();
     }
 }
+
+// The file's static initialization (see dino_static_init.h).
+static struct WaitActionInfoBarTaskStaticInit {
+    WaitActionInfoBarTaskStaticInit() {
+        DINO_POOL_WORD(data_ov000_02196f64, 0x14) = 128;
+        DINO_POOL_WORD(data_ov000_02196f64, 0x18) = 176;
+        DINO_POOL_WORD(data_ov000_02196f64, 0x4) = 8;
+        DINO_POOL_WORD(data_ov000_02196f64, 0x8) = 150;
+        DINO_POOL_WORD(data_ov000_02196f64, 0xc) = 64;
+        DINO_POOL_WORD(data_ov000_02196f64, 0x10) = 112;
+        DINO_POOL_WORD(data_ov000_02196f64, 0x24) = 128;
+        DINO_POOL_WORD(data_ov000_02196f64, 0x28) = 160;
+    }
+} sWaitActionInfoBarTaskStaticInit;
