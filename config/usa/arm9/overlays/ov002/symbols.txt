@@ -362,7 +362,7 @@ _ZN12DinoCleaning13State02161d48Ev kind:function(thumb,size=0x214) addr:0x02161d
 _Z15MCreateCallTaskI16DinoCleaningLive14DinoCommonLivemEP5MTaskPT_MT0_FvT1_ES7_ kind:function(thumb,size=0x40) addr:0x02161f5c
 func_ov002_02161f9c kind:function(thumb,size=0x5a8) addr:0x02161f9c
 func_ov002_02162544 kind:function(thumb,size=0x7a8) addr:0x02162544
-func_ov002_02162cec kind:function(thumb,size=0x304) addr:0x02162cec
+_ZN12DinoCleaning13State02162cecEv kind:function(thumb,size=0x304) addr:0x02162cec
 _ZN12MBgCallTask0I12DinoCleaningED1Ev kind:function(thumb,size=0x1c) addr:0x02162ff0
 _ZN12MBgCallTask0I12DinoCleaningED0Ev kind:function(thumb,size=0x20) addr:0x0216300c
 _ZN12MBgCallTask0I12DinoCleaningE3RunEv kind:function(thumb,size=0x22) addr:0x0216302c
@@ -651,7 +651,6 @@ data_ov002_02165988 kind:data(any) addr:0x02165988
 data_ov002_021659a4 kind:data(any) addr:0x021659a4
 _ZTS38DinoCleaningKasekiRockXrayBlendManager kind:data(any) addr:0x021659c0
 data_ov002_021659ec kind:data(any) addr:0x021659ec
-data_ov002_02165a14 kind:data(any) addr:0x02165a14
 data_ov002_02165a18 kind:data(any) addr:0x02165a18
 data_ov002_02165a44 kind:data(any) addr:0x02165a44
 data_ov002_02165a6c kind:data(any) addr:0x02165a6c

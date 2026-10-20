@@ -65,8 +65,8 @@ public:
 
     void (DinoCleaning::*mState)(); // 0x94
     u32 mUnk9C;                     // 0x9C
-    void *mUnkA0;                   // 0xA0
-    u32 unkA4;
+    void *mUnkA0;                   // 0xA0: the result (a DinoCleaningResult), or NULL
+    u32 mUnkA4;                     // 0xA4
     u32 mUnkA8;                     // 0xA8
     u32 mUnkAC;                     // 0xAC
     int mMode;                      // 0xB0
@@ -97,11 +97,12 @@ public:
     u32 mUnk120;                    // 0x120
     u32 mUnk124;                    // 0x124
     u8 mUnk128;                     // 0x128: a tool task runs instead of the scene
-    u8 unk129[0x130 - 0x129];
+    u8 unk129[0x12C - 0x129];
+    u32 mUnk12C;                    // 0x12C: seconds the time bonus starts after
     int mUnk130;                    // 0x130: a percentage
     MExtAffinePicture *mResultPicture;  // 0x134
-    u32 mUnk138;                    // 0x138
-    u32 unk13C;
+    class DinoCleaningPaper *mPaper;    // 0x138
+    MTaskSet *mUnk13C;              // 0x13C
     u32 mUnk140;                    // 0x140
     MTaskSet *mUnk144;              // 0x144: tasks run instead of the scene while mUnk128 is set
     u8 mStop;                       // 0x148: the answer to the stop confirmation

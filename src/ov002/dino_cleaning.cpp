@@ -16,6 +16,8 @@
 #include "m/display.h"
 #include "m/smart_oam.h"
 #include "m/blend.h"
+#include "game/dino_cleaning_paper.h"
+#include "game/dino_cleaning_report.h"
 #include "m/bright.h"
 #include "game/dino_cleaning_kaseki_rock_xray_blend_manager.h"
 #include "game/help.h"
@@ -290,7 +292,8 @@ extern "C" struct {
     u8 unk0C[0x10 - 0xC];
     const char *mFailPath;      // 0x10: the picture of a failed cleaning
     const char *mCleanPath;     // 0x14: the picture shown when the rock comes clean
-    u8 unk18[0x2C - 0x18];
+    u8 unk18[0x28 - 0x18];
+    u32 mMaxBonus;              // 0x28: the most the time bonus gives
     int mZero_2C;               // 0x2C: (the constant the count's shake is clamped to)
     u8 unk30[0x48 - 0x30];
     void (DinoCleaning::*State02160638_48)(); // 0x48
@@ -404,7 +407,7 @@ DinoCleaning::DinoCleaning(u32 unk9C, void *unkA0, u32 unkA8, u32 unkAC, int mod
     mUnkAC = unkAC;
     mMode = mode;
     mUnk128 = FALSE;
-    mUnk138 = 0;
+    mPaper = NULL;
     mUnk140 = unk140;
     mState = data_ov002_021659ec.State02160638_48;
 }
@@ -801,6 +804,88 @@ void DinoCleaning::StateStopAnswered() {
 }
 
 // Quits: fades both screens and the music out.
+// What the cleaning reports back.
+struct DinoCleaningResult {
+    u32 score;      // 0x00: in percent
+    u32 bonus;      // 0x04: the time bonus
+    u32 frames;     // 0x08: left on the timer
+    u32 unk0C;
+};
+
+extern "C" const u8 data_0208a230;    // whether the time bonus always counts
+
+// Fills in the result (with the time bonus for a full score or always with data_0208a230), then fades out to the
+// report (mode 1) or straight out.
+void DinoCleaning::State02162cec() {
+    if (mUnkA0 != NULL) {
+        ((DinoCleaningResult *)mUnkA0)->frames = mStatus->GetTimer()->GetRemainingFrames();
+        ((DinoCleaningResult *)mUnkA0)->bonus = 0;
+        if ((((DinoCleaningResult *)mUnkA0)->score == 100 || data_0208a230) && mUnkA4 == 0 && mMode != 0) {
+            u32 seconds = mStatus->GetTimer()->GetSeconds();
+            if (seconds > mUnk12C) {
+                u32 bonus = seconds - mUnk12C;
+                ((DinoCleaningResult *)mUnkA0)->bonus = std::min(data_ov002_021659ec.mMaxBonus, bonus);
+                ((DinoCleaningResult *)mUnkA0)->score += ((DinoCleaningResult *)mUnkA0)->bonus;
+            }
+        }
+        if (mUnkA8 == 1) {
+            ((DinoCleaningResult *)mUnkA0)->score += 25;
+        }
+    }
+    if (mPaper != NULL) {
+        mPaper->SetDone();
+    }
+    if (mMode != 1) {
+        MTask *fadeTop;
+        MTask *fadeBottom;
+        MTask *exit;
+        exit = CreateExitTransfer();
+        fadeBottom = gLcd->GetBottomDisplay()->mBright->CreateFadeOutToBlack(60, 0);
+        fadeTop = gLcd->GetTopDisplay()->mBright->CreateFadeOutToBlack(60, 0);
+        MParallelTaskSet *fades = new MParallelTaskSet(TRUE);
+        fades->AddTail(fadeTop);
+        fades->AddTail(fadeBottom);
+        MTaskSet &serial = mSerial;
+        serial.AddTail(fades);
+        serial.AddTail(exit);
+        return;
+    }
+    MTask *empty;
+    MTask *pictureOut;
+    MTask *exitPicture;
+    MTask *timer;
+    MTask *report;
+    MTask *stopBgm;
+    MParallelTaskSet *fades;
+    MTask *fadeTop;
+    MTask *fadeBottom;
+    MTask *exit;
+    MBlend *blend = gLcd->GetBottomDisplay()->mBlend;
+    exit = CreateExitTransfer();
+    fadeBottom = gLcd->GetBottomDisplay()->mBright->CreateFadeOutToBlack(60, 0);
+    fadeTop = gLcd->GetTopDisplay()->mBright->CreateFadeOutToBlack(60, 0);
+    fades = new MParallelTaskSet(TRUE);
+    fades->AddTail(fadeTop);
+    fades->AddTail(fadeBottom);
+    stopBgm = DinoSoundCreateStopBgmTask(-1, 60);
+    report = new DinoCleaningReport((u32)this);
+    timer = new MTimer(30);
+    exitPicture = MTaskExitTransfer::Create(mResultPicture);
+    pictureOut = blend->CreateCrossFadeOutTask(mResultPicture->GetPlaneMask(), 30, 0);
+    empty = MTaskSetMakeEmptyTask::Create(mUnk13C);
+    MTask *fadeOut = blend->CreateCrossFadeOutTask(0, 30, 0);
+    MTaskSet &serial = mSerial;
+    serial.AddTail(fadeOut);
+    serial.AddTail(empty);
+    serial.AddTail(pictureOut);
+    serial.AddTail(exitPicture);
+    serial.AddTail(timer);
+    serial.AddTail(report);
+    serial.AddTail(stopBgm);
+    serial.AddTail(fades);
+    serial.AddTail(exit);
+}
+
 void DinoCleaning::StateQuit() {
     MTask *fadeTop;
     MTask *fadeBottom;
