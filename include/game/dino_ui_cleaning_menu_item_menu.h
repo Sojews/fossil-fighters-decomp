@@ -12,6 +12,7 @@
 #include "game/dino_ui_cleaning_menu_item.h"
 
 class MSmartOam;
+class MTextPicture;
 class DinoEventLoop;
 
 class DinoUi3PartsCursor;
@@ -41,9 +42,10 @@ public:
 
     MSmartOam *mOam;            // 0xB4: the items' sprites
     MMenuItem *mLinkFrom;       // 0xB8: linked to the first page item
-    u32 mUnkBC;
+    MTextPicture *mBackground;  // 0xBC
     std::vector<void *> mItems; // 0xC0: this page's items
-    u32 mUnkCC[2];              // 0xCC
+    MMenuItem *mPageL;          // 0xCC
+    MMenuItem *mPageR;          // 0xD0
     DinoUi3PartsFraction *mFraction; // 0xD4: "page n/m"
     s32 *mResult;               // 0xD8: the rock chosen, or -1
     MTaskSet *mCursorTasks;     // 0xDC
@@ -60,6 +62,7 @@ public:
 
 class DinoUiCleaningBackButton : public DinoUiCleaningMenuItem {
 public:
+    DinoUiCleaningBackButton(DinoUiCleaningMenu *owner);
     virtual ~DinoUiCleaningBackButton();
     virtual void OnFocusChanged(BOOL focused);
     virtual void OnDecide();
@@ -67,12 +70,14 @@ public:
 
 class DinoUiCleaningPageLButton : public DinoUiCleaningMenuItem {
 public:
+    DinoUiCleaningPageLButton(DinoUiCleaningMenu *owner);
     virtual ~DinoUiCleaningPageLButton();
     virtual void OnDecide();
 };
 
 class DinoUiCleaningPageRButton : public DinoUiCleaningMenuItem {
 public:
+    DinoUiCleaningPageRButton(DinoUiCleaningMenu *owner);
     virtual ~DinoUiCleaningPageRButton();
     virtual void OnDecide();
 };

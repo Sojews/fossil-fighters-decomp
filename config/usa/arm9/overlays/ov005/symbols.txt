@@ -948,13 +948,10 @@ data_ov005_02168dcc kind:data(any) addr:0x02168dcc
 _ZTV18DinoUiCleaningMenu kind:data(any) addr:0x02168dfc
 data_ov005_02168e24 kind:data(any) addr:0x02168e24
 _ZTV24DinoUiCleaningBackButton kind:data(any) addr:0x02168e4c
-data_ov005_02168e8c kind:data(any) addr:0x02168e8c
 _ZTV22DinoUiCleaningMenuItem kind:data(any) addr:0x02168ea0
 data_ov005_02168ee0 kind:data(any) addr:0x02168ee0
 _ZTV25DinoUiCleaningPageRButton kind:data(any) addr:0x02168ef4
-data_ov005_02168f34 kind:data(any) addr:0x02168f34
 _ZTV25DinoUiCleaningPageLButton kind:data(any) addr:0x02168f48
-data_ov005_02168f88 kind:data(any) addr:0x02168f88
 data_ov005_02168f9c kind:data(any) addr:0x02168f9c
 data_ov005_02168fac kind:data(any) addr:0x02168fac
 data_ov005_02168fbc kind:data(any) addr:0x02168fbc

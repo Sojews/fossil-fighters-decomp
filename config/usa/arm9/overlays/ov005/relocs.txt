@@ -1451,12 +1451,12 @@ from:0x0215b8c0 kind:load to:0x02167104 module:overlay(5)
 from:0x0215b8c4 kind:load to:0x0208a640 module:main
 from:0x0215b8c8 kind:load to:0x02167184 module:overlay(5)
 from:0x0215b8cc kind:load to:0x02168e4c add:0x8 module:overlay(5)
-from:0x0215b8d0 kind:load to:0x02168e8c module:overlay(5)
+from:0x0215b8d0 kind:load to:0x02168e4c add:0x40 module:overlay(5)
 from:0x0215b8d4 kind:load to:0x0208aacc module:main
 from:0x0215b8d8 kind:load to:0x02168f48 add:0x8 module:overlay(5)
-from:0x0215b8dc kind:load to:0x02168f88 module:overlay(5)
+from:0x0215b8dc kind:load to:0x02168f48 add:0x40 module:overlay(5)
 from:0x0215b8e0 kind:load to:0x02168ef4 add:0x8 module:overlay(5)
-from:0x0215b8e4 kind:load to:0x02168f34 module:overlay(5)
+from:0x0215b8e4 kind:load to:0x02168ef4 add:0x40 module:overlay(5)
 from:0x0215b8e8 kind:load to:0x020cc00c module:main
 from:0x0215b8ec kind:load to:0x021671f0 module:overlay(5)
 from:0x0215b8f0 kind:load to:0x020b5b1c add:0x8 module:main

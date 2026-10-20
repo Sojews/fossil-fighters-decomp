@@ -23,6 +23,14 @@
 #include "m/bright.h"
 #include "game/dino_common_window_menu_item_flush_task_menu.h"
 #include "game/dino_static_init.h"
+#include "game/dino_guide_message.h"
+#include "game/dino_resource.h"
+#include "game/dino_ui_common.h"
+#include "game/dino_ui3_parts_fraction.h"
+#include "m/input.h"
+#include "m/obj.h"
+#include "m/picture.h"
+#include "m/smart_oam.h"
 
 DinoUiCleaningMenuItem::~DinoUiCleaningMenuItem() {
 }
@@ -205,7 +213,10 @@ BOOL DinoUiCleaningMenu::PageLeft() {
 // The page's button grid (its first button, and the steps to the next in a row and to the next row); the confirmation
 // window opens by the decided button.
 extern "C" struct {
-    u8 unk00[0x4C];
+    u8 unk00[0x34];
+    MPoint mBackPos;        // 0x34
+    MPoint mPageLPos;       // 0x3C
+    MPoint mPageRPos;       // 0x44
     MPoint mWindowBase;     // 0x4C: the first button
     MPoint mWindowColStep;  // 0x54
     MPoint mWindowRowStep;  // 0x5C
@@ -257,6 +268,129 @@ DinoUiCleaningMenu::DinoUiCleaningMenu(s32 *result) : MMenu(NULL, 0), mResult(re
     mPage = 0;
     mLastPage = 0;
 }
+
+// The buttons' graphics, a path table.
+extern "C" u32 data_ov005_02167104[];
+static inline const char *DinoUiCleaningPath(int i) {
+    return ((const char *const *)data_ov005_02167104)[i];
+}
+extern "C" const MPoint data_ov005_021671f0, data_ov005_021671f8;  // the fraction's and the rock name's places
+extern "C" const char data_ov005_02168f9c[], data_ov005_02168fac[]; // the pictures
+extern "C" const u32 data_0208a640, data_0208a644, data_0208a648, data_0208a64c, data_0208a92c, data_0208aacc;
+extern "C" void func_ov005_0215baf0(DinoUiCleaningMenu *menu);    // lists the rocks
+
+inline DinoUiCleaningBackButton::DinoUiCleaningBackButton(DinoUiCleaningMenu *owner)
+    : DinoUiCleaningMenuItem(owner, DinoUiCleaningPath(15), data_ov005_02167184.mBackPos, data_0208a640) {
+    SetKeys(2);
+    SetMode(4);
+    mMotion->Play(2, 0);
+}
+
+inline DinoUiCleaningPageLButton::DinoUiCleaningPageLButton(DinoUiCleaningMenu *owner)
+    : DinoUiCleaningMenuItem(owner, DinoUiCleaningPath(30), data_ov005_02167184.mPageLPos, data_0208aacc) {
+    SetKeys(0x200);
+    SetNoFocus(TRUE);
+    DinoHelpItem::Disable();
+}
+
+inline DinoUiCleaningPageRButton::DinoUiCleaningPageRButton(DinoUiCleaningMenu *owner)
+    : DinoUiCleaningMenuItem(owner, DinoUiCleaningPath(14), data_ov005_02167184.mPageRPos, data_0208aacc) {
+    SetKeys(0x100);
+    SetNoFocus(TRUE);
+    DinoHelpItem::Disable();
+}
+
+// The excavation settings' section at offset7C (the input repeat is at 0x1C and 0x20).
+static inline const int *GetExcavate7C(MResource<DinoExcavateDefs> &defs) {
+    const DinoExcavateDefs *d = defs.Get();
+    if (d->offset7C == 0) {
+        return NULL;
+    }
+    return (const int *)((const u8 *)d + d->offset7C);
+}
+
+// Sets the screens up and builds the rocks' pages (back where the player left off), the help, the cursor, the page
+// fraction and the rock name.
+#pragma opt_common_subs off
+void DinoUiCleaningMenu::OnStart() {
+    DinoPlayerData player;
+    gLcd->mMain->ResetHooks();
+    gLcd->mMain->Setup(5, 0, 4, 0, 0, 0);
+    gLcd->mSub->ResetHooks();
+    gLcd->mSub->Setup(5, 2, 4, 1, 0, 0);
+    gLcd->VSyncNow();
+    gLcd->mSub->SetBackdrop(0x8000);
+    gLcd->mSub->mObj->Show();
+    gLcd->SetBottomDisplay(gLcd->mSub);
+    gCurrentDisplay = gLcd->GetBottomDisplay();
+    SetLinkFallback(1);
+    {
+        MResource<DinoExcavateDefs> delayDefs = gDinoResource->GetExcavateDefs();
+        MResource<DinoExcavateDefs> intervalDefs = gDinoResource->GetExcavateDefs();
+        GetInput()->SetRepeat(0xF0, GetExcavate7C(delayDefs)[7], GetExcavate7C(intervalDefs)[8]);
+    }
+    DinoDimScreen();
+    mKasekiDefs = gDinoResource->LoadKasekiDefs();
+    gDinoBackup->GetPlayer(&player, FALSE);
+    gDinoBackup->CompactUnk98();
+    func_ov005_0215baf0(this);
+    mParallel.AddTail(mBackground = new MTextPicture(std::string(data_ov005_02168f9c), TRUE, false));
+    mBackground->Show();
+    mBackground->SetPriority(2);
+    mParallel.AddTail(mBackground = new MTextPicture(gLcd->GetTopDisplay(), std::string(data_ov005_02168fac), TRUE, false));
+    mBackground->Show();
+    mBackground->SetPriority(2);
+    mOam = new MSmartOam(0x50, 0, TRUE);
+    DinoHelpDummyItem *team, *panel;
+    mParallel.AddTail(team = new DinoHelpDummyItem(GetDisplay(), MRect(0x19, 0x20, 0xE6, 0x89),
+                                                   std::string(gDinoResource->GetText(data_0208a64c))));
+    mParallel.AddTail(panel = new DinoHelpDummyItem(GetDisplay(), MRect(0xE7, 0x73, 0xFA, 0x8A),
+                                                    std::string(gDinoResource->GetText(data_0208a648))));
+    mParallel.AddTail(new DinoHelpDummyItem(GetDisplay(), MRect(0xF, 0x92, 0xF0, 0xA4),
+                                            std::string(gDinoResource->GetText(data_0208a644))));
+    AddEntry((u32)panel, 3, (u32)team);
+    mLinkFrom = new DinoUiCleaningBackButton(this);
+    AddItem(mLinkFrom);
+    if (mLastPage != 0) {
+        mPageL = new DinoUiCleaningPageLButton(this);
+        AddItem(mPageL);
+        mPageR = new DinoUiCleaningPageRButton(this);
+        AddItem(mPageR);
+    }
+    mPage = gDinoBackup->GetSystemVar(0x2D);
+    if (mPage < 0) {
+        mPage = 0;
+    }
+    int last = mLastPage;
+    if (mPage > last) {
+        mPage = last;
+    }
+    mFraction = new DinoUi3PartsFraction(mOam, data_ov005_021671f0);
+    mParallel.AddTail(mFraction);
+    mFraction->SetNumerator(mPage + 1);
+    mFraction->SetDenominator(player.containerNum);
+    RefreshPage2();
+    mCursorTasks = new MParallelTaskSet();
+    mCursor = new DinoUi3PartsCursor(mOam);
+    mParallel.AddTail(mCursor);
+    mCursor->SetPriority(1);
+    mParallel.AddTail(mCursorTasks);
+    mParallel.AddTail(mOam);
+    mRockName = new DinoUi3PartsRockName(data_ov005_021671f8);
+    mParallel.AddTail(mRockName);
+    mParallel.AddTail(new DinoGuideMessage(std::string(gDinoResource->GetText(data_0208a92c))));
+    if (mItems.size() == 0) {
+        FocusItem(mLinkFrom);
+    } else {
+        FocusItem((MMenuItem *)mItems[0]);
+    }
+    *mResult = -1;
+    MParallelTaskSet *fades;
+    (fades = new MParallelTaskSet(TRUE))->AddTail(gLcd->mMain->mBright->CreateFadeInFromBlack(30, 0),
+                                                 gLcd->mSub->mBright->CreateFadeInFromBlack(30, 0));
+    mSerial.AddTail(fades);
+}
+#pragma opt_common_subs reset
 
 #pragma auto_inline off
 
