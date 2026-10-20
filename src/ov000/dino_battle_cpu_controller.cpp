@@ -222,6 +222,121 @@ int DinoBattleCpuController::EstimateDamage(DinoBattleModelCreature *attacker, D
     return value;
 }
 
+
+// A condition of the computer's scores and the score it adds (both u16; 8 bytes).
+struct DinoBattleCpuCondition {
+    u16 kind;
+    u16 unk2;
+    u16 score;
+    u16 unk6;
+};
+
+struct DinoBattleCpuConditions {
+    u32 unk0;
+    u32 count;
+    u32 entries;    // offset of the conditions
+};
+
+// NONMATCHING: in case 1 the operator+ parameter copies swap stack slots, as in CalcUnkEC.
+MFx32 DinoBattleCpuController::ScoreConditions(DinoBattleModelPlayer *player, DinoBattleModelCreature *creature,
+                                               DinoBattleModelCreature *target, DinoBattleFile file) {
+    if (!file.mArchive.IsValid()) {
+        return MFx32(0);
+    }
+    DinoBattleModelPlayer *opponent = player->GetOpponent();
+    MFx32 total = MFx32(0);
+    for (u32 i = 0; i < ((DinoBattleCpuConditions *)file.mFile.GetData())->count; i++) {
+        DinoBattleCpuConditions *data = (DinoBattleCpuConditions *)file.mFile.GetData();
+        const DinoBattleCpuCondition *conditions = (const DinoBattleCpuCondition *)((u8 *)data + data->entries);
+        MFx32 score = MFx32(conditions[i].score);
+        switch (conditions[i].kind) {
+        default:
+            OS_Terminate();
+            break;
+        case 0:
+            total = total + score;
+            break;
+        case 1:
+            total = total + score * player->GetRandom()->NextFraction();
+            break;
+        case 0x8B:
+            if ((int)creature->GetUnkE4() > (int)target->GetUnkE4()) {
+                total = total + score;
+            }
+            break;
+        case 0x8C:
+            if ((int)creature->GetUnkEC() > (int)target->GetUnkEC()) {
+                total = total + score;
+            }
+            break;
+        case 0x8D:
+            if ((int)creature->GetUnkF0() > (int)target->GetUnkF0()) {
+                total = total + score;
+            }
+            break;
+        case 0x8E:
+            if ((int)creature->GetUnkF4() > (int)target->GetUnkF4()) {
+                total = total + score;
+            }
+            break;
+        case 0x8F:
+            if ((int)creature->GetUnkF8() > (int)target->GetUnkF8()) {
+                total = total + score;
+            }
+            break;
+        case 0x90:
+            if (creature->GetDefUnk61() == 7) {
+                total = total + score;
+            }
+            break;
+        case 0x91:
+            if (creature->GetDefUnk61() == 9) {
+                total = total + score;
+            }
+            break;
+        case 0x92:
+            if (creature->GetDefUnk61() == 6) {
+                total = total + score;
+            }
+            break;
+        case 0x93:
+            for (int j = 0; j < 3; j++) {
+                const DinoAttackDef *def = creature->GetAttackDef(j);
+                if (def != NULL && *DinoOffsetPtr<u8>(def, def->unk10) > 1) {
+                    total = total + score;
+                    break;
+                }
+            }
+            break;
+        case 0x94:
+            for (int j = 0; j < 3; j++) {
+                const DinoAttackDef *def = creature->GetAttackDef(j);
+                if (def != NULL && *DinoOffsetPtr<u8>(def, def->unk14) > 1) {
+                    total = total + score;
+                    break;
+                }
+            }
+            break;
+        case 0x95:
+            if (creature->CompareUnkED0C(opponent->FindCreature(0)) > 0) {
+                total = total + score;
+            }
+            break;
+        case 0x96:
+            if (creature->CompareUnkED0C(opponent->FindCreature(0)) == 0) {
+                total = total + score;
+            }
+            break;
+        case 0x97:
+            if (creature == player->GetCreatureInSlot(0)) {
+                total = total + score;
+            }
+            break;
+        }
+    }
+    return total;
+}
+
 // A move the computer weighs, kept in a multimap by its (fixed-point) score (16 bytes; only its size is known). Its destructor
 // isn't trivial: the game's tree has the header's unused word (see <tree>).
 struct DinoBattleCpuCandidate {

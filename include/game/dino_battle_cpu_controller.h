@@ -7,6 +7,7 @@
 #include "m/archive.h"
 #include "game/dino_battle.h"
 #include "game/dino_battle_controller.h"
+#include "m/fx32.h"
 
 // A loaded file and the archive holding it.
 struct DinoBattleFile {
@@ -53,6 +54,9 @@ public:
     BOOL HasCostlyAttackUnk10(DinoBattleModelPlayer *player, DinoBattleModelCreature *creature, u8 value);
     BOOL HasAttackUnk14(DinoBattleModelCreature *creature, u8 value);
     BOOL HasCostlyAttackUnk14(DinoBattleModelPlayer *player, DinoBattleModelCreature *creature, u8 value);
+    // The score of the file's conditions that hold for the creature (against the target).
+    MFx32 ScoreConditions(DinoBattleModelPlayer *player, DinoBattleModelCreature *creature,
+                          DinoBattleModelCreature *target, DinoBattleFile file);
 
     u32 mUnkB4;                         // 0xB4
     DinoBattleFileGroup mGroups[3];     // 0xB8
