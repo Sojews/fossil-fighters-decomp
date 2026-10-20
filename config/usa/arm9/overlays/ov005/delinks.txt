@@ -7,6 +7,7 @@
 
 src/ov005/dino_ui_license_card.cpp:
     .text       start:0x021558a0 end:0x02155f94
+    .init       start:0x02164bb4 end:0x02164bcc
 
 src/ov005/ov005_02155f94.cpp:
     .text       start:0x02155f94 end:0x021562a8

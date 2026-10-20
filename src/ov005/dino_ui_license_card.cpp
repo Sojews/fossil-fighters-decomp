@@ -1,6 +1,7 @@
 // DinoUiLicenseCard.
 // Only the destructors are decompiled so far.
 
+#include "game/dino_static_init.h"
 #include "m/bright.h"
 #include "m/display.h"
 #include "m/input.h"
@@ -38,3 +39,11 @@ void DinoUiLicenseCard::StateWait() {
         mState = data_ov005_021654e0.Close_20;
     }
 }
+
+// The file's static initialization (see dino_static_init.h).
+static struct DinoUiLicenseCardStaticInit {
+    DinoUiLicenseCardStaticInit() {
+        *(u16 *)((u8 *)&data_ov005_021654e0 + 0x12) = 0xFFFF;
+        *(u16 *)((u8 *)&data_ov005_021654e0 + 0x14) = 0x996E;
+    }
+} sDinoUiLicenseCardStaticInit;

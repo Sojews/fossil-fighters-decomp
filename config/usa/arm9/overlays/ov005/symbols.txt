@@ -588,7 +588,7 @@ _ZThn12_N20DinoUiCanonPutinMenuD1Ev kind:function(thumb,size=0x1c) addr:0x02164b
 _ZThn12_N22DinoUiCanonTakeoutMenuD0Ev kind:function(thumb,size=0x1c) addr:0x02164b68
 _ZThn12_N22DinoUiCanonTakeoutMenuD1Ev kind:function(thumb,size=0x1c) addr:0x02164b84
 data_ov005_02164ba0 kind:data(any) addr:0x02164ba0
-__sinit_ov005_02164bb4 kind:function(thumb,size=0x18) addr:0x02164bb4
+__sinit_dino_ui_license_card.cpp kind:function(thumb,size=0x18) addr:0x02164bb4
 __sinit_dino_ui3_parts_fraction.cpp kind:function(thumb,size=0x90) addr:0x02164bcc
 __sinit_dino_ui_shop_sell.cpp kind:function(thumb,size=0xe4) addr:0x02164c5c
 __sinit_dino_ui_shop_buy.cpp kind:function(thumb,size=0x4c) addr:0x02164d40
