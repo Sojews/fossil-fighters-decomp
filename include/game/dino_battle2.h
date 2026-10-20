@@ -10,11 +10,14 @@
 #include "game/help.h"
 #include "game/dino_field_camera_hook.h"
 #include "m/fx32.h"
+#include "m/picture.h"
+#include "m/motion.h"
 
 class MConsole;
 class MMotion;
 
 class MSmartOam;
+class DinoCommonFont;
 
 class DinoBattleViewFocusLCDFrame : public MProcess {
 public:
@@ -40,6 +43,7 @@ public:
 
 class DinoBattleTalkWindow : public MProcess {
 public:
+    DinoBattleTalkWindow(u32 unkD8);
     virtual ~DinoBattleTalkWindow();
     virtual void Idle();
 
@@ -50,15 +54,21 @@ public:
     u32 unk7C;
     int mTimer;     // 0x80: frames until the console goes on
     u32 mUnk84;     // 0x84: extra waits before the window counts as done
-    u8 unk88[0xC0 - 0x88];
+    u32 unk88;
+    MPictureFile mPicture;  // 0x8C: the window
     MTaskSet *mTasksC0;     // 0xC0
     MTaskSet *mTasksC4;     // 0xC4
     MView *mFrame;          // 0xC8: the window frame
     MMotion *mFaceMotion;   // 0xCC
     MConsole *mConsole;     // 0xD0
-    u32 unkD4[3];
+    MSmartOam *mOam;        // 0xD4
+    u32 mUnkD8;             // 0xD8
+    u32 unkDC;
     MFx32 mRate;            // 0xE0: the console's typing rate
-    u8 unkE4[0x124 - 0xE4];
+    MMotionFile mFaceFile;  // 0xE4
+    MPictureFile mPicture2; // 0xE8
+    DinoCommonFont *mFont;  // 0x11C
+    u32 mUnk120;            // 0x120
     int mState;             // 0x124: 2 while closing
 };
 

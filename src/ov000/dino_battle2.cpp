@@ -9,6 +9,9 @@
 #include "m/lcd.h"
 #include "types.h"
 #include "game/dino_static_init.h"
+#include "game/dino_resource.h"
+#include "game/dino_common_font.h"
+#include <string>
 
 extern "C" void func_ov000_0218b928(void *, u8);
 
@@ -33,6 +36,29 @@ DBViewFocusLCDFrameTask::~DBViewFocusLCDFrameTask() {
 }
 
 DinoBattleTalkWindow::~DinoBattleTalkWindow() {
+    mFont->Release();
+}
+
+// The TU's pooled paths.
+extern "C" struct {
+    u32 unk00;
+    const char *facePath;   // 0x04
+    const char *windowPath; // 0x08
+} data_ov000_02197138;
+
+DinoBattleTalkWindow::DinoBattleTalkWindow(u32 unkD8)
+    : MProcess(NULL), mFace(0), mSide(0), unk7C(0), mPicture(std::string(data_ov000_02197138.windowPath), 7),
+      mUnkD8(unkD8), mRate(*(const MFx32 *)((const u8 *)gDinoResource->GetExcavate7C() + 0x18)),
+      mFaceFile(std::string(data_ov000_02197138.facePath), 7),
+      mPicture2(std::string(data_ov000_02197138.windowPath), 7) {
+    mUnk120 = 0;
+    mState = 0;
+    mTasksC0 = new MSerialTaskSet();
+    mTasksC4 = new MParallelTaskSet();
+    mOam = new MSmartOam(gLcd->GetTopDisplay(), 1, 0, 1);
+    mFont = new DinoCommonFont(0, 10, 11);
+    mFont->AddRef();
+    GetParallel()->AddTail(mTasksC0, mTasksC4, mOam);
 }
 
 void DinoBattleViewFocusLCDFrame::Idle() {
