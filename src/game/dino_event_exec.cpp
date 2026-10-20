@@ -3,6 +3,7 @@
 #pragma ipa file
 
 #include "game/dino_event_exec.h"
+#include "m/blend.h"
 #include "game/dino_field_point.h"
 #include "game/common_window_message.h"
 #include "game/dino_common_window_menu_item_flush_task_menu.h"
@@ -1061,6 +1062,62 @@ void DinoEventExecYesNo::Idle() {
     }
     case 2:
         gDinoBackup->SetFlag(mFlag, mResult ? TRUE : FALSE);
+        Exit();
+        break;
+    }
+}
+
+extern "C" const u32 data_0208aa0c, data_0208aa10, data_0208aa14, data_0208aa18, data_0208aa1c, data_0208aa20;
+extern "C" const u32 data_0208b310[]; // the flags that put the masks on sale, in order
+
+// The shop's menu: what it offers depends on what is for sale.
+// NONMATCHING: the game zeroes masks before loading gDinoResource's address (scheduling).
+void DinoEventExecShopChoice::Idle() {
+    switch (mStep++) {
+    case 0: {
+        mUnk88 = 0;
+        DinoCommonWindowMenu *menu = new DinoCommonWindowMenu(gLcd->GetBottomDisplay(), &mUnk88, MPoint(0x90, 0x40), NULL, 0);
+        DinoPlayerData player;
+        gDinoBackup->GetPlayer(&player, 0);
+        u32 text = data_0208aa20;
+        menu->AddChoice(1, std::string(gDinoResource->GetText(text)), std::string(gDinoResource->GetText(text)));
+        text = data_0208aa1c;
+        menu->AddChoice(2, std::string(gDinoResource->GetText(text)), std::string(gDinoResource->GetText(text)));
+        BOOL masks = FALSE;
+        int k = 0;
+        MResource<DinoHeadMaskDefs> defs = gDinoResource->LoadHeadMaskDefs();
+        for (u32 i = 1; i < gDinoResource->GetHeadMaskCount(); i++) {
+            const u8 *base = (const u8 *)defs.Get();
+            const DinoHeadMaskDef *def =
+                (const DinoHeadMaskDef *)(base + ((const u32 *)(base + ((const DinoHeadMaskDefs *)base)->tableOffset))[i]);
+            if (def->nameText != 0 && def->price != 0 && k < 5 && gDinoBackup->GetSystemFlag(data_0208b310[k++]) == TRUE &&
+                gDinoBackup->GetHeadMask(i) == 0) {
+                masks = TRUE;
+            }
+        }
+        if (masks) {
+            text = data_0208aa18;
+            menu->AddChoice(3, std::string(gDinoResource->GetText(text)), std::string(gDinoResource->GetText(text)));
+        }
+        if (gDinoBackup->GetVarFlag(mVar)) {
+            text = data_0208aa14;
+            menu->AddChoice(4, std::string(gDinoResource->GetText(text)), std::string(gDinoResource->GetText(text)));
+        }
+        if (gDinoBackup->GetSystemFlag(0x1F) == TRUE) {
+            text = data_0208aa10;
+            menu->AddChoice(5, std::string(gDinoResource->GetText(text)), std::string(gDinoResource->GetText(text)));
+        }
+        text = data_0208aa0c;
+        menu->AddChoice(-2, std::string(gDinoResource->GetText(text)), std::string(gDinoResource->GetText(text)));
+        mSerial.AddTail(menu);
+        break;
+    }
+    case 1:
+        if (mUnk88 == -2) {
+            mUnk88 = 0;
+        }
+        gDinoBackup->SetLocalVar(mUnk78, mUnk88);
+        gLcd->GetBottomDisplay()->mBlend->Reset();
         Exit();
         break;
     }
