@@ -439,7 +439,7 @@ libs/msl/src/math/w_pow.c:
     .text       start:0x020836b4 end:0x020836bc
 
 libs/msl/src/ansi_fp.c:
-    .text       start:0x020836bc end:0x02083f84
+    .text       start:0x020836bc end:0x02084368
 
 libs/msl/src/math_api.c:
     complete

@@ -10,7 +10,7 @@ void func_020847c8(void);
 void func_020848cc(void);
 void _ll_ufrom_d(void);
 void _dflt(void);
-void func_020849e4(void);
+void _dfltu(void);
 void _dmul(void);
 void sqrt(void);
 void func_02084f20(void);
