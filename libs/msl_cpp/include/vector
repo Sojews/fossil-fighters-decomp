@@ -489,7 +489,8 @@ namespace std {
     template <typename T, typename Allocator>
     template <class It>
     void __vec_deleter<T, Allocator>::assign(It first, It last, Metrowerks::int2type<true>) {
-        if (Metrowerks::has_trivial_copy_ctor<T>::value && Metrowerks::has_trivial_assignment<T>::value) {
+        // (Only fully trivial types are moved in one go: MRect, with its own default constructor, isn't.)
+        if (Metrowerks::is_trivial<T>::value) {
             // Plain data: room for all of it, then one move.
             size_t n = last - first;
             size_t c = cap();

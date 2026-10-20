@@ -44,15 +44,6 @@ struct MRect {
         bottom = bottomRight.y;
     }
 
-    // (Written out: the game's MRect has no trivial assignment, so vector<MRect> assigns element by element.)
-    MRect &operator=(const MRect &r) {
-        left = r.left;
-        top = r.top;
-        right = r.right;
-        bottom = r.bottom;
-        return *this;
-    }
-
     void Offset(MPoint p) {
         left += p.x;
         top += p.y;
