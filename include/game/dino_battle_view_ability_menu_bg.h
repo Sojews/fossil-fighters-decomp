@@ -40,7 +40,7 @@ public:
     u16 mScreen[64][32];        // 0xC8: built here, then transferred
     std::vector<void *> mUnk10C8; // 0x10C8
     u8 mUnk10D4;                // 0x10D4: owns the BG resources
-    u8 unk10D5[0x10E0 - 0x10D5];
+    MPoint mOffset;             // 0x10D8: its screen offset, when it doesn't own the BG
 
     class SetPriorityTask : public MTask {
     public:

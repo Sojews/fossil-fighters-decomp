@@ -18,6 +18,11 @@
 #include "m/indicator.h"
 #include <string.h>
 #include "game/dino_static_init.h"
+#include <string>
+#include "m/picture.h"
+#include "m/chr.h"
+#include "m/lcd.h"
+#include "nitro/mi.h"
 
 extern "C" int data_ov000_021978dc;    // live ability menu BGs
 extern "C" const u32 data_0208a19c;     // frames before the ability menu takes input
@@ -68,11 +73,17 @@ void AttackMenuBarMotion::SetPriority(int priority) {
 struct AttackMenuBarStatics {
     u8 unk00[8];
     const char *noCost;     // 0x08
-    u8 unk0C[0x48 - 0x0C];
+    u8 unk0C[0x14 - 0x0C];
+    const char *bgPath;     // 0x14: the ability menu's BG
+    u8 unk18[0x20 - 0x18];
+    void (DinoBattleViewAbilityMenuBG::*StateHidden_20)();
+    u8 unk28[0x48 - 0x28];
     MPoint mUnk7COffset;    // 0x48
     u32 unk50[2];
     MPoint mUnk80Offset;    // 0x58
     int barX;               // 0x60: the bar's x, unfocused
+    u8 unk64[0x70 - 0x64];
+    void (DinoBattleViewAbilityMenuBG::*StateShow_70)();
 };
 struct AttackMenuBarStatics2 {
     int barFocusedFlagX;    // 0x00: focused, with mUnk94 set
@@ -231,6 +242,37 @@ DinoBattleViewUiAbilityMenu::DinoBattleViewUiAbilityMenu(u32 arg0, u32 arg1, u32
 
 // (Unreferenced.)
 extern "C" void func_ov000_0217b838() {
+}
+
+
+// Only the first two menus at a time load the BG; the others share it.
+// NONMATCHING (99%): the scheduling of the Transfer call's point arguments.
+DinoBattleViewAbilityMenuBG::DinoBattleViewAbilityMenuBG() : MProcess(NULL) {
+    if (data_ov000_021978dc >= 2) {
+        mUnk10D4 = FALSE;
+        mOffset.x = 0;
+        mOffset.y = 0;
+        mState = data_ov000_021947ac.StateHidden_20;
+    } else {
+        mUnk10D4 = TRUE;
+        MI_CpuFill8(mScreen, 0, sizeof(mScreen));
+        unk78 = (u32)gLcd->mSub;
+        mPicture = MPictureFile(std::string(data_ov000_021947ac.bgPath), 0);
+        mBg = gCurrentDisplay->mBg;
+        mText = mBg->CreateText(2, TRUE);
+        mText->mTextCntBits.colors256 = mPicture.IsUnk04();
+        MPal *pal = mBg->mPal;
+        mPalBlock = pal->Alloc(mPicture.GetPaletteSize(), NULL, TRUE);
+        mPalBlock->Load(mPicture.GetPalette(), 0, -1);
+        mChr = mBg->CreateChr(mPicture.IsUnk04(), mPicture.GetChrSize(), TRUE);
+        mChrBlock = mChr->Alloc(mPicture.GetChrSize(), TRUE);
+        mChrBlock->Load(mPicture.GetChr(), 0, 0x7FFF, mPalBlock->index);
+        mText->SetChr(mChr);
+        mText->Transfer(&mScreen[0][0], MPoint(0x20, 0x40), MPoint(0, 0), mChrBlock->index, mPalBlock->index, false,
+                        false);
+        mState = data_ov000_021947ac.StateShow_70;
+    }
+    data_ov000_021978dc++;
 }
 
 // Moves the bar (and its parts with it).
