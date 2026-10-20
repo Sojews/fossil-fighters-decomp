@@ -27,6 +27,8 @@ public:
     void Load();
     void StatePage();
     void StateChoose();
+    // Asks yes or no (the texts default to the game's yes and no).
+    void StateYesNo();
     void StateWait();
     void StateEnd();
 

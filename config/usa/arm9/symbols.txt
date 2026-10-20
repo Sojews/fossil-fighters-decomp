@@ -402,7 +402,7 @@ _Z17MCreateBgCallTaskI19DinoEventTalkWindowEP5MTaskPT_MS3_FvvEi kind:function(th
 _ZN19DinoEventTalkWindow4LoadEv kind:function(thumb,size=0x148) addr:0x020074a8
 _ZN19DinoEventTalkWindow9StatePageEv kind:function(thumb,size=0x58) addr:0x020075f0
 _ZN19DinoEventTalkWindow9StateWaitEv kind:function(thumb,size=0xc4) addr:0x02007648
-func_0200770c kind:function(thumb,size=0x2d4) addr:0x0200770c
+_ZN19DinoEventTalkWindow10StateYesNoEv kind:function(thumb,size=0x2d4) addr:0x0200770c
 _ZN16DinoWindowChoiceC1EmRKSsS2_ kind:function(thumb,size=0x1e) addr:0x020079e0
 _ZN19DinoEventTalkWindow11StateChooseEv kind:function(thumb,size=0xb4) addr:0x02007a00
 _ZN19DinoEventTalkWindow8StateEndEv kind:function(thumb,size=0x68) addr:0x02007ab4

@@ -8,6 +8,7 @@
 #include "m/input.h"
 #include "m/lcd.h"
 #include "m/text_codec.h"
+#include "game/dino_resource.h"
 #include "game/dino_talk_window.h"
 #include "game/dino_event_talk_window.h"
 #include "m/bg_new_task.h"
@@ -63,8 +64,8 @@ extern "C" struct {
     void (DinoEventTalkWindow::*StateEnd_0C)();
     void (DinoEventTalkWindow::*StateWait_14)();
     void (DinoEventTalkWindow::*StateStart_1C)();
-    u8 unk24[0x2C - 0x24];
-    void (DinoEventTalkWindow::*Unk0200770c_2C)();
+    void (DinoEventTalkWindow::*StateEnd_24)();
+    void (DinoEventTalkWindow::*StateYesNo_2C)();
     void (DinoEventTalkWindow::*StateChoose_34)();
     void (DinoEventTalkWindow::*StateEnd_3C)();
 } data_020b6144;
@@ -89,7 +90,7 @@ void DinoEventTalkWindow::Load() {
 void DinoEventTalkWindow::StatePage() {
     if (mWindow->IsEmpty()) {
         if (mUnk98 != 0) {
-            mState = data_020b6144.Unk0200770c_2C;
+            mState = data_020b6144.StateYesNo_2C;
         } else if (mUnk9C != 0) {
             mState = data_020b6144.StateChoose_34;
         } else {
@@ -104,6 +105,18 @@ void DinoEventTalkWindow::StatePage() {
 DinoEventTalkWindow::DinoEventTalkWindow(MDisplay *display, std::string text, int arg, u8 flag)
     : MProcess(display), mText(text), mArg(arg), mUnk98(0), mUnk9C(0), mFlag(flag) {
     mState = data_020b6144.StateStart_1C;
+}
+
+extern "C" const u32 data_0208accc, data_0208acc8;   // "yes", "no"
+
+void DinoEventTalkWindow::StateYesNo() {
+    mWindow->ClearUnkF4();
+    mChoices.push_back(DinoWindowChoice(0, std::string(mUnkBC.size() == 0 ? std::string(gDinoResource->GetText(data_0208accc)) : mUnkBC),
+                                        std::string(mUnkD4.size() == 0 ? std::string(gDinoResource->GetText(data_0208accc)) : mUnkD4)));
+    mChoices.push_back(DinoWindowChoice(1, std::string(mUnkC8.size() == 0 ? std::string(gDinoResource->GetText(data_0208acc8)) : mUnkC8),
+                                        std::string(mUnkE0.size() == 0 ? std::string(gDinoResource->GetText(data_0208acc8)) : mUnkE0)));
+    mSerial.AddTail(new DinoCommonWindowMenu((void *)mUnk98, mPos, &mChoices, mUnkB4));
+    mState = data_020b6144.StateEnd_24;
 }
 
 #pragma dont_inline on
