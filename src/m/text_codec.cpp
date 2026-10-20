@@ -10,7 +10,12 @@
 // How many bytes follow a UTF-8 sequence's first byte, by its top four bits.
 static const int sUtf8TrailBytes[16] = {0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 2, 2};
 
-static int sDefaultEncoding = MTEXT_SJIS;
+// The default encoding (MTEXT_SJIS), in the TU's .data pool.
+extern "C" struct {
+    u32 unk00[2];
+    int mDefaultEncoding;   // 0x08
+} data_020c09c4;
+#define sDefaultEncoding (data_020c09c4.mDefaultEncoding)
 static std::set<wchar_t> sUnkTextChars;
 static std::set<wchar_t> sUnkChars;
 static OSOwnerInfo *sOwnerInfo;

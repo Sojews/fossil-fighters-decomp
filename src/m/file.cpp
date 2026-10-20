@@ -46,7 +46,12 @@ inline void swap(MPathCacheEntry &a, MPathCacheEntry &b) {
     a.path.swap(b.path);
 }
 
-static u32 sMaxReadSize = 0xFFFFFFFF;
+// The most bytes read at once (0xFFFFFFFF), in the TU's .data pool.
+extern "C" struct {
+    u32 unk00[2];
+    u32 mMaxReadSize;   // 0x08
+} data_020c0a10;
+#define sMaxReadSize (data_020c0a10.mMaxReadSize)
 FSArchive *gRomArchive;
 static MMutex sPathCacheMutex;
 static MPathCacheEntry sPathCache[10];
