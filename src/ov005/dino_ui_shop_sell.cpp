@@ -33,6 +33,10 @@
 #include "m/display.h"
 #include "m/bright.h"
 #include "game/dino_static_init.h"
+#include "game/dino_guide_message.h"
+#include "game/dino_resource.h"
+#include "game/dino_ui_common.h"
+#include "m/picture.h"
 
 DinoUiShopSellMenu::DinoUiShopSellMenu() : MMenu(NULL, 0), mPage(0), mLastPage(0), mCount(0), mSelected(0xFF) {
     for (int i = 0; i < 0x40; i++) {
@@ -139,16 +143,146 @@ void DinoUiShopSellMenu::OnBackDecided() {
 
 // Pooled file statics: the button corners.
 struct DinoUiShopSellStatics {
-    u8 unk00[0x8];
+    const char *mPaths[2];  // 0x00: the path table's last two ([1] page right)
     MPoint mTopLeft;     // 0x08
-    u8 unk10[0x28 - 0x10];
+    MPoint mSellPos;     // 0x10
+    u8 unk18[0x28 - 0x18];
     MPoint mColumn;      // 0x28: from a page button to the next in its row
     MPoint mRow;         // 0x30: to the next row
-    u8 unk38[0x50 - 0x38];
+    u8 unk38[0x40 - 0x38];
+    MPoint mPageRPos;    // 0x40
+    u8 unk48[0x50 - 0x48];
     MPoint mFirst;       // 0x50: the page's first button
     MPoint mBottomRight; // 0x58
+    MPoint mBackPos;     // 0x60
+    u8 unk68[0x70 - 0x68];
+    MPoint mPageLPos;    // 0x70
 };
 extern "C" DinoUiShopSellStatics data_ov005_02165ff8;
+
+// The buttons' graphics (the path table, which runs on into the statics above).
+extern "C" const char *const data_ov005_02165f78[];
+extern "C" const MPoint data_ov005_02166018, data_ov005_02166040;  // the fraction's and the rock name's places
+extern "C" const char data_ov005_02166ab0[];    // the background
+extern const MRect data_020b5838, data_020b5848; // help rects
+extern "C" const u32 data_0208a5f0, data_0208a5f4, data_0208a5f8, data_0208a5fc, data_0208a600, data_0208a604,
+    data_0208a608, data_0208a938, data_0208aacc;
+
+inline DinoUiShopSellBackButton::DinoUiShopSellBackButton(DinoUiShopSellMenu *owner)
+    : DinoUiShopSellMenuItem(owner, data_ov005_02165f78[17], data_ov005_02165ff8.mBackPos, data_0208a5f4) {
+    mMotion->Play(2, 0);
+}
+
+inline DinoUiShopSellPageLButton::DinoUiShopSellPageLButton(DinoUiShopSellMenu *owner)
+    : DinoUiShopSellMenuItem(owner, data_ov005_02165f78[21], data_ov005_02165ff8.mPageLPos, data_0208aacc) {
+    SetKeys(0x200);
+    SetNoFocus(TRUE);
+    DinoHelpItem::Disable();
+}
+
+inline DinoUiShopSellPageRButton::DinoUiShopSellPageRButton(DinoUiShopSellMenu *owner)
+    : DinoUiShopSellMenuItem(owner, data_ov005_02165ff8.mPaths[1], data_ov005_02165ff8.mPageRPos, data_0208aacc) {
+    SetKeys(0x100);
+    SetNoFocus(TRUE);
+    DinoHelpItem::Disable();
+}
+
+inline DinoUiShopSellSellButton::DinoUiShopSellSellButton(DinoUiShopSellMenu *owner)
+    : DinoUiShopSellMenuItem(owner, data_ov005_02165f78[23], data_ov005_02165ff8.mSellPos, data_0208a604) {
+}
+
+// The excavation settings' section at offset7C (the input repeat is at 0x1C and 0x20).
+static inline const int *GetExcavate7C(MResource<DinoExcavateDefs> &defs) {
+    const DinoExcavateDefs *d = defs.Get();
+    if (d->offset7C == 0) {
+        return NULL;
+    }
+    return (const int *)((const u8 *)d + d->offset7C);
+}
+
+// Lists the containers' fossils (a page per container) and builds the page, the help, the cursor, the page
+// fraction, the rock name and the money.
+#pragma opt_common_subs off
+void DinoUiShopSellMenu::OnStart() {
+    SetLinkFallback(1);
+    {
+        MResource<DinoExcavateDefs> delayDefs = gDinoResource->GetExcavateDefs();
+        MResource<DinoExcavateDefs> intervalDefs = gDinoResource->GetExcavateDefs();
+        GetInput()->SetRepeat(0xF0, GetExcavate7C(delayDefs)[7], GetExcavate7C(intervalDefs)[8]);
+    }
+    DinoDimScreen();
+    mKasekiDefs = gDinoResource->LoadKasekiDefs();
+    DinoPlayerData player;
+    gDinoBackup->GetPlayer(&player, FALSE);
+    mLastPage = player.containerNum - 1;
+    mParallel.AddTail(mBackground = new MTextPicture(std::string(data_ov005_02166ab0), TRUE, false));
+    mBackground->Show();
+    mBackground->SetPriority(2);
+    mOam = new MSmartOam(0x50, 0, TRUE);
+    DinoHelpDummyItem *top, *list, *money, *total, *rocks;
+    mParallel.AddTail(top = new DinoHelpDummyItem(GetDisplay(), MRect(0x1E, 0xC, 0xE2, 0x6C),
+                                                  std::string(gDinoResource->GetText(data_0208a608))));
+    mParallel.AddTail(list = new DinoHelpDummyItem(GetDisplay(), MRect(0x13, 0x90, 0xF1, 0x9F),
+                                                   std::string(gDinoResource->GetText(data_0208a600))));
+    mParallel.AddTail(money = new DinoHelpDummyItem(GetDisplay(), data_020b5848,
+                                                    std::string(gDinoResource->GetText(data_0208a5fc))));
+    mParallel.AddTail(total = new DinoHelpDummyItem(GetDisplay(), data_020b5838,
+                                                    std::string(gDinoResource->GetText(data_0208a5f8))));
+    mParallel.AddTail(rocks = new DinoHelpDummyItem(GetDisplay(), MRect(0xE9, 0x5D, 0xF7, 0x6E),
+                                                    std::string(gDinoResource->GetText(data_0208a5f0))));
+    mBack = new DinoUiShopSellBackButton(this);
+    AddItem(mBack);
+    gDinoBackup->CompactUnk98();
+    LoadFossils();
+    if (mLastPage > 0) {
+        mPageL = new DinoUiShopSellPageLButton(this);
+        AddItem(mPageL);
+        mPageR = new DinoUiShopSellPageRButton(this);
+        AddItem(mPageR);
+    }
+    mLinkFrom = new DinoUiShopSellSellButton(this);
+    AddItem(mLinkFrom);
+    AddEntry((u32)(DinoHelpItem *)mLinkFrom, 1, (u32)rocks);
+    AddEntry((u32)list, 3, 0);
+    AddEntry((u32)list, 1, 0);
+    AddEntry((u32)money, 4, (u32)list);
+    AddEntry((u32)money, 1, (u32)total);
+    AddEntry((u32)total, 2, 0);
+    AddEntry((u32)total, 3, (u32)money);
+    AddEntry((u32)(DinoHelpItem *)mBack, 4, (u32)list);
+    AddEntry((u32)rocks, 3, (u32)top);
+    AddEntry((u32)money, 1, (u32)total);
+    AddEntry((u32)total, 3, (u32)money);
+    AddEntry((u32)(DinoHelpItem *)mBack, 4, (u32)list);
+    mFraction = new DinoUi3PartsFraction(mOam, data_ov005_02166018);
+    mParallel.AddTail(mFraction);
+    mFraction->SetNumerator(mPage + 1);
+    mFraction->SetDenominator(player.containerNum);
+    RefreshPage2();
+    mCursorTasks = new MParallelTaskSet();
+    mCursor = new DinoUi3PartsCursor(mOam);
+    mParallel.AddTail(mCursor);
+    mCursor->SetPriority(1);
+    mParallel.AddTail(mCursorTasks);
+    mParallel.AddTail(mOam);
+    mRockName = new DinoUi3PartsRockName(data_ov005_02166040);
+    mParallel.AddTail(mRockName);
+    mMoney = new DinoUi3PartsMoney();
+    mParallel.AddTail(mMoney);
+    mParallel.AddTail(new DinoGuideMessage(std::string(gDinoResource->GetText(data_0208a938))));
+    AddLink(mLinkFrom, 3, NULL);
+    AddLink(mLinkFrom, 1, NULL);
+    AddLink(mLinkFrom, 2, mBack);
+    AddLink(mBack, 4, mLinkFrom);
+    AddLink(mBack, 3, NULL);
+    if (mItems.size() == 0) {
+        FocusItem(mBack);
+    } else {
+        FocusItem((MMenuItem *)mItems[0]);
+    }
+    mSerial.AddTail(gLcd->mMain->mBright->CreateFadeInFromBlack(30, 0));
+}
+#pragma opt_common_subs reset
 
 MRect DinoUiShopSellSellButton::GetFrame() {
     return MRect(data_ov005_02165ff8.mTopLeft, data_ov005_02165ff8.mBottomRight);
@@ -468,13 +602,12 @@ void DinoUiShopSellMenu::OnIdle() {
 template void std::__vec_deleter<DinoUiFossilEntry, std::allocator<DinoUiFossilEntry> >::sub_push_back(const DinoUiFossilEntry &x, Metrowerks::int2type<true>);
 
 // The file's static initialization (see dino_static_init.h).
-extern "C" u32 data_ov005_02165f78[];
 extern "C" u32 data_ov005_021660f8[];
 extern "C" u32 data_ov005_02166178[];
 static struct DinoUiShopSellStaticInit {
     DinoUiShopSellStaticInit() {
-        DINO_POOL_WORD(data_ov005_021660f8, 0x34) = ((s32 *) &data_ov005_02165f78)[0x4 / 4];
-        DINO_POOL_WORD(data_ov005_021660f8, 0x38) = ((s32 *) &data_ov005_02165f78)[0x4 / 4];
+        DINO_POOL_WORD(data_ov005_021660f8, 0x34) = ((s32 *) data_ov005_02165f78)[0x4 / 4];
+        DINO_POOL_WORD(data_ov005_021660f8, 0x38) = ((s32 *) data_ov005_02165f78)[0x4 / 4];
         DINO_POOL_WORD(data_ov005_021660f8, 0x3c) = DINO_POOL_WORD(data_ov005_02165f78, 0x34);
         DINO_POOL_WORD(data_ov005_021660f8, 0x40) = DINO_POOL_WORD(data_ov005_02165ff8, 0x0);
         DINO_POOL_WORD(data_ov005_021660f8, 0x44) = DINO_POOL_WORD(data_ov005_02165f78, 0x24);

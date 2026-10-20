@@ -12,6 +12,8 @@
 #include "game/dino_ui_fossil_entry.h"
 
 class MSmartOam;
+class MTextPicture;
+class DinoUiShopSellBackButton;
 class DinoUi3PartsMoney;
 class DinoUiShopSellSellButton;
 class DinoUiShopSellPageLButton;
@@ -47,9 +49,9 @@ public:
 
     MResource<DinoKasekiDefs> mKasekiDefs;  // 0xB4
     MSmartOam *mOam;            // 0xC4: the items' sprites
-    MMenuItem *mBack;           // 0xC8
+    DinoUiShopSellBackButton *mBack;    // 0xC8
     DinoUiShopSellSellButton *mLinkFrom; // 0xCC: the sell button, linked to the first page item
-    u32 mUnkD0;
+    MTextPicture *mBackground;  // 0xD0
     std::vector<void *> mItems; // 0xD4: this page's items
     DinoUiShopSellPageLButton *mPageL; // 0xE0
     DinoUiShopSellPageRButton *mPageR; // 0xE4
@@ -70,6 +72,7 @@ public:
 
 class DinoUiShopSellBackButton : public DinoUiShopSellMenuItem {
 public:
+    DinoUiShopSellBackButton(DinoUiShopSellMenu *owner);
     virtual ~DinoUiShopSellBackButton();
     virtual void OnFocusChanged(BOOL focused);
     virtual void OnDecide();
@@ -77,18 +80,21 @@ public:
 
 class DinoUiShopSellPageLButton : public DinoUiShopSellMenuItem {
 public:
+    DinoUiShopSellPageLButton(DinoUiShopSellMenu *owner);
     virtual ~DinoUiShopSellPageLButton();
     virtual void OnDecide();
 };
 
 class DinoUiShopSellPageRButton : public DinoUiShopSellMenuItem {
 public:
+    DinoUiShopSellPageRButton(DinoUiShopSellMenu *owner);
     virtual ~DinoUiShopSellPageRButton();
     virtual void OnDecide();
 };
 
 class DinoUiShopSellSellButton : public DinoUiShopSellMenuItem {
 public:
+    DinoUiShopSellSellButton(DinoUiShopSellMenu *owner);
     virtual ~DinoUiShopSellSellButton();
     virtual MRect GetFrame();
     virtual void OnFocusChanged(BOOL focused);

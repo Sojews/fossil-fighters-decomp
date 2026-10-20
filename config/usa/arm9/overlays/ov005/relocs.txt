@@ -511,16 +511,16 @@ from:0x02157a24 kind:load to:0x02165f78 module:overlay(5)
 from:0x02157a28 kind:load to:0x0208a5f4 module:main
 from:0x02157a2c kind:load to:0x02165ff8 module:overlay(5)
 from:0x02157a30 kind:load to:0x0216690c add:0x8 module:overlay(5)
-from:0x02157a34 kind:load to:0x0216694c module:overlay(5)
+from:0x02157a34 kind:load to:0x0216690c add:0x40 module:overlay(5)
 from:0x02157a38 kind:load to:0x020cc00c module:main
 from:0x02157a3c kind:load to:0x0208aacc module:main
 from:0x02157a40 kind:load to:0x02166a5c add:0x8 module:overlay(5)
-from:0x02157a44 kind:load to:0x02166a9c module:overlay(5)
+from:0x02157a44 kind:load to:0x02166a5c add:0x40 module:overlay(5)
 from:0x02157a48 kind:load to:0x02166a08 add:0x8 module:overlay(5)
-from:0x02157a4c kind:load to:0x02166a48 module:overlay(5)
+from:0x02157a4c kind:load to:0x02166a08 add:0x40 module:overlay(5)
 from:0x02157a50 kind:load to:0x0208a604 module:main
 from:0x02157a54 kind:load to:0x021669b4 add:0x8 module:overlay(5)
-from:0x02157a58 kind:load to:0x021669f4 module:overlay(5)
+from:0x02157a58 kind:load to:0x021669b4 add:0x40 module:overlay(5)
 from:0x02157a5c kind:load to:0x02166018 module:overlay(5)
 from:0x02157a64 kind:thumb_call to:0x021564dc module:overlay(5)
 from:0x02157a78 kind:thumb_call to:0x020531a4 module:main

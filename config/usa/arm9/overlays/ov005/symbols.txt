@@ -738,15 +738,11 @@ data_ov005_0216688c kind:data(any) addr:0x0216688c
 _ZTV18DinoUiShopSellMenu kind:data(any) addr:0x021668bc
 data_ov005_021668e4 kind:data(any) addr:0x021668e4
 _ZTV24DinoUiShopSellBackButton kind:data(any) addr:0x0216690c
-data_ov005_0216694c kind:data(any) addr:0x0216694c
 _ZTV22DinoUiShopSellMenuItem kind:data(any) addr:0x02166960
 data_ov005_021669a0 kind:data(any) addr:0x021669a0
 _ZTV24DinoUiShopSellSellButton kind:data(any) addr:0x021669b4
-data_ov005_021669f4 kind:data(any) addr:0x021669f4
 _ZTV25DinoUiShopSellPageRButton kind:data(any) addr:0x02166a08
-data_ov005_02166a48 kind:data(any) addr:0x02166a48
 _ZTV25DinoUiShopSellPageLButton kind:data(any) addr:0x02166a5c
-data_ov005_02166a9c kind:data(any) addr:0x02166a9c
 data_ov005_02166ab0 kind:data(any) addr:0x02166ab0
 data_ov005_02166ac8 kind:data(any) addr:0x02166ac8
 data_ov005_02166b0c kind:data(any) addr:0x02166b0c
