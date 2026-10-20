@@ -43,6 +43,43 @@ DinoUi3PartsFraction::DinoUi3PartsFraction(MSmartOam *oam, MPoint pos) : MProces
     mParallel.AddTail(mDenominator);
 }
 
+extern "C" const char data_ov005_02165f5c[]; // the digits' font
+extern "C" const char data_ov005_02165f58[]; // ""
+extern "C" const char data_ov005_02165f74[]; // the number format
+extern const MPoint data_020b5820, data_020b5828, data_020b5830; // the price's, change's and money's places
+
+// The price, the player's money and the change, each its own line of digits.
+// NONMATCHING: the game loads gCurrentDisplay for each canvas after copying its size (scheduling).
+DinoUi3PartsMoney::DinoUi3PartsMoney() : MProcess(NULL) {
+    MFontSet *font = new MFontSet(std::string(data_ov005_02165f5c), 0, 0, 0);
+    MObjCanvas *canvas = new MObjCanvas(gCurrentDisplay, MPoint(0x40, 0x10), font->GetPalette(), TRUE);
+    canvas->GetOamUnit()->SetMode(1);
+    mPrice = new MIndicator(canvas, font, 0);
+    mParallel.AddTail(mPrice);
+    mPrice->SetPosition(data_020b5820);
+    mPrice->SetPriority(2);
+    mPrice->Show();
+    mPrice->SetText(std::string(data_ov005_02165f58));
+    canvas = new MObjCanvas(gCurrentDisplay, MPoint(0x40, 0x10), font->GetPalette(), TRUE);
+    canvas->GetOamUnit()->SetMode(1);
+    mMoney = new MIndicator(canvas, font, 0);
+    mParallel.AddTail(mMoney);
+    mMoney->SetPosition(data_020b5830);
+    mMoney->SetPriority(2);
+    mMoney->Show();
+    char text[12];
+    sprintf(text, data_ov005_02165f74, gDinoBackup->GetSystemVar(3));
+    mMoney->SetText(std::string(text));
+    canvas = new MObjCanvas(gCurrentDisplay, MPoint(0x40, 0x10), font->GetPalette(), TRUE);
+    canvas->GetOamUnit()->SetMode(1);
+    mChange = new MIndicator(canvas, font, 0);
+    mParallel.AddTail(mChange);
+    mChange->SetPosition(data_020b5828);
+    mChange->SetPriority(2);
+    mChange->Show();
+    SetChange(0);
+}
+
 DinoUi3PartsFraction::~DinoUi3PartsFraction() {
 }
 
