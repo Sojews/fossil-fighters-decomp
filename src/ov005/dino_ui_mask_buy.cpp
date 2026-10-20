@@ -106,7 +106,8 @@ static inline const int *GetExcavate7C(MResource<DinoExcavateDefs> &defs) {
     return (const int *)((const u8 *)d + d->offset7C);
 }
 
-// NONMATCHING: the list and money help items swap spill slots.
+// (No common subexpressions, as the game's spill slots show.)
+#pragma opt_common_subs off
 void DinoUiMaskBuyMenu::OnStart() {
     SetLinkFallback(1);
     {
@@ -169,6 +170,7 @@ void DinoUiMaskBuyMenu::OnStart() {
     FocusItem((MMenuItem *)mUnkC4[0]);
     mSerial.AddTail(gLcd->mMain->mBright->CreateFadeInFromBlack(30, 0));
 }
+#pragma opt_common_subs reset
 
 DinoUiMaskBuyMenuItem::DinoUiMaskBuyMenuItem(DinoUiMaskBuyMenu *owner, const std::string &path, MPoint pos, u32 textId) {
     mOwner = owner;

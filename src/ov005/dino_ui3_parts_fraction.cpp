@@ -49,7 +49,8 @@ extern "C" const char data_ov005_02165f74[]; // the number format
 extern const MPoint data_020b5820, data_020b5828, data_020b5830; // the price's, change's and money's places
 
 // The price, the player's money and the change, each its own line of digits.
-// NONMATCHING: the game loads gCurrentDisplay for each canvas after copying its size (scheduling).
+// (No common subexpressions: the game reads gCurrentDisplay for each canvas after copying its size.)
+#pragma opt_common_subs off
 DinoUi3PartsMoney::DinoUi3PartsMoney() : MProcess(NULL) {
     MFontSet *font = new MFontSet(std::string(data_ov005_02165f5c), 0, 0, 0);
     MObjCanvas *canvas = new MObjCanvas(gCurrentDisplay, MPoint(0x40, 0x10), font->GetPalette(), TRUE);
@@ -79,6 +80,7 @@ DinoUi3PartsMoney::DinoUi3PartsMoney() : MProcess(NULL) {
     mChange->Show();
     SetChange(0);
 }
+#pragma opt_common_subs reset
 
 DinoUi3PartsFraction::~DinoUi3PartsFraction() {
 }
