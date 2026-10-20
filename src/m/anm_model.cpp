@@ -1,5 +1,5 @@
 // The animated 3D objects (MAnmModelBase and its kinds) and MPolygonChar, which plays them from a scene script.
-// Not decompiled yet: GetValue, TintPalette, the Unk0C updates, MPolygonChar::Load (the script reader) and the
+// Not decompiled yet: TintPalette, the Unk0C updates, MPolygonChar::Load (the script reader) and the
 // node data reader.
 
 #include "m/anm_model.h"
@@ -157,6 +157,43 @@ void MAnmModelBase::Unk0C() {
 }
 
 #pragma opt_strength_reduction off
+// A track's value at a frame: random between the keys' bounds, interpolated between the keys around the frame
+// (the last key's bounds after the last key, the first key's before the first).
+// NONMATCHING: the game reloads the track's size in the search loop and recomputes the track's address at each use,
+// and keeps the 64-bit operands on the stack.
+int MAnmModelBase::GetValue(int track, int frame) {
+    u32 count = mTracks[track].size();
+    if (count == 0) {
+        return 0;
+    }
+    u32 i;
+    for (i = 0; i < mTracks[track].size(); i++) {
+        if (frame + 0x10 < mTracks[track][i].mFrame) {
+            break;
+        }
+    }
+    if (i == count || count == 1) {
+        MAnmKey *key = &mTracks[track][mTracks[track].size() - 1];
+        return key->mMin + mRandom.Next(key->mMax - key->mMin);
+    }
+    if (i == 0) {
+        MAnmKey *key = &mTracks[track][0];
+        return key->mMin + mRandom.Next(key->mMax - key->mMin);
+    }
+    MAnmKey *a = &mTracks[track][i - 1];
+    MAnmKey *b = &mTracks[track][i];
+    s64 span = (s64)b->mFrame - a->mFrame;
+    frame += 0x10;
+    s64 t = (s64)frame - a->mFrame;
+    s64 u = span - t;
+    if (span == 0) {
+        return a->mMin + mRandom.Next(a->mMax - a->mMin);
+    }
+    int lo = ((s64)a->mMin * u + (s64)b->mMin * t) / span;
+    int hi = ((s64)a->mMax * u + (s64)b->mMax * t) / span;
+    return lo + mRandom.Next(hi - lo);
+}
+
 void MAnmModelBase::PlaySounds(int frame) {
     if (mSounds.size() != 0) {
         for (u32 i = 0; i < mSounds.size(); i++) {
