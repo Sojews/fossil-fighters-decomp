@@ -118,10 +118,9 @@ public:
 
     MParallelTaskSet *mTasks;   // 0xA8: the screens' moves
     MTaskSet *mUnkAC;           // 0xAC
-    MSmartOam *mOam;            // 0xB0
-    u32 mUnkB4;                 // 0xB4
-    MView *mPanels[2];          // 0xB8: per screen
-    MView *mLabels[2];          // 0xC0
+    MSmartOam *mOams[2];        // 0xB0: per screen (top, bottom)
+    class DinoHelpCursor *mPanels[2];   // 0xB8
+    MMotion *mLabels[2];        // 0xC0
     MMotion *mMarks[2];         // 0xC8
     u32 mUnkD0[2];              // 0xD0
     class DinoHelpStatus *mStatus[2];   // 0xD8

@@ -407,7 +407,8 @@ extern const int kHelpStatusColor;
 
 // The TU's pooled constants (see menu.cpp).
 extern "C" struct {
-    u8 unk00[0xC];
+    u8 unk00[0x8];
+    const char *mLabelPath;     // 0x08
     const char *mMotionPath;    // 0x0C
     const char *mCursorPath;    // 0x10
     u8 unk14[0x1C - 0x14];
@@ -534,6 +535,99 @@ DinoHelp::DinoHelp(MInput *input) : MMenu(input, 0) {
 
 DinoHelp::~DinoHelp() {
     DinoSoundResume();
+}
+
+typedef std::map<u32, void *> DinoHelpPtrMap;
+typedef std::__red_black_tree<u32, std::pair<const u32, void *>, std::__select_first<std::pair<const u32, void *> >,
+                              std::less<u32>, std::allocator<std::pair<const u32, void *> > >
+    DinoHelpPtrTree;
+
+// The excavation settings' section at offset7C (the input repeat is at 0x1C and 0x20).
+static inline const int *GetExcavate7C(const MResource<DinoExcavateDefs> &defs) {
+    const DinoExcavateDefs *d = const_cast<MResource<DinoExcavateDefs> &>(defs).Get();
+    if (d->offset7C == 0) {
+        return NULL;
+    }
+    return (const int *)((const u8 *)d + d->offset7C);
+}
+
+// A help entry (key, then direction and target) as the links loop reads it.
+typedef std::pair<u32, std::pair<u32, u32> > DinoHelpLinkEntry;
+
+// Whether the map has the key (as a count).
+static inline u32 DinoHelpHas(DinoHelpPtrMap &map, const u32 &key) {
+    DinoHelpPtrMap::iterator it = map.find(key);
+    return it != map.end();
+}
+
+// Each screen gets its sprites, a panel framing the focused item, a label, a mark and a status bar; each enabled
+// item of the current base gets a sign, linked as the driver's entries say. Focuses the base's selected item (or the
+// one nearest the top panel) after a moment.
+void DinoHelp::OnStart() {
+    GetInput()->SetRepeat(0xF0, GetExcavate7C(gDinoResource->GetExcavateDefs())[7],
+                          GetExcavate7C(gDinoResource->GetExcavateDefs())[8]);
+    mTasks = new MParallelTaskSet();
+    mUnkAC = new MParallelTaskSet();
+    mParallel.AddTail(mTasks, mUnkAC);
+    mUnkD0[0] = (u32)gLcd->GetTopDisplay();
+    mUnkD0[1] = (u32)gLcd->GetBottomDisplay();
+    for (u32 i = 0; i < 2; i++) {
+        mOams[i] = new MSmartOam((MDisplay *)mUnkD0[i], 0x52, 0x12, 0);
+        mOams[i]->SetUnk1C(7);
+        mPanels[i] = new DinoHelpCursor(mOams[i]);
+        mPanels[i]->SetFrame(0x80, 0xD2, 0x80, 0xD2);
+        mPanels[i]->SetAnchor(0);
+        mPanels[i]->Show();
+        mLabels[i] = new MMotion(std::string(data_020ba91c.mLabelPath), mOams[i], 0, 1);
+        mLabels[i]->Show();
+        mLabels[i]->SetPosition(0x80, kHelpTopScreenOffset + 0xC0);
+        mLabels[i]->SetAnchor(3);
+        mLabels[i]->Play(1, 0);
+        SetBlendedMode(mLabels[i]->GetUnit());
+        mMarks[i] = new MMotion(std::string(data_020ba91c.mMotionPath), mOams[i], 0, 1);
+        mMarks[i]->Play(i == 0 ? 1 : 2, 0);
+        mMarks[i]->SetPosition(i == 0 ? MPoint(0x80, kHelpTopScreenOffset + 0x60) : MPoint(0x80, 0x60));
+        mMarks[i]->SetAnchor(3);
+        mMarks[i]->Show();
+        SetBlendedMode(mMarks[i]->GetUnit());
+        mStatus[i] = new DinoHelpStatus(mOams[i]);
+        MTaskSet *tasks = &mParallel;
+        tasks->AddTail(mPanels[i], mLabels[i], mMarks[i], mStatus[i], mOams[i]);
+    }
+    MSmartOam *top = mOams[0];
+    DinoHelpSign *focus = NULL;
+    top->mOffset.x = 0;
+    top->mOffset.y = kHelpTopScreenOffset;
+    mUnkE0 = 0;
+    DinoHelpPtrMap signs;
+    for (std::list<DinoHelpItem *>::iterator it = sHelpDriver->mItems.begin(); it != sHelpDriver->mItems.end(); it++) {
+        if ((*it)->mBase == sHelpCurrentBase && (*it)->IsEnabled() && (*it)->GetText() != NULL &&
+            (*it)->GetText()[0] != '\0') {
+            DinoHelpSign *sign = new DinoHelpSign(*it);
+            AddItem(sign);
+            signs[(u32 &)*it] = sign;
+            if (*it == sHelpCurrentBase->mSelectedItem) {
+                focus = sign;
+            }
+        }
+    }
+    for (std::multimap<u32, std::pair<u32, u32> >::iterator it = sHelpDriver->mEntries.begin();
+         it != sHelpDriver->mEntries.end(); it++) {
+        // (The target is read through a pair with a non-const key; the entry's own type folds the offsets.)
+        if (DinoHelpHas(signs, it->first) && DinoHelpHas(signs, ((const DinoHelpLinkEntry *)&*it)->second.second)) {
+            AddLink((MMenuItem *)signs[it->first], it->second.first,
+                    (MMenuItem *)signs[((const DinoHelpLinkEntry *)&*it)->second.second]);
+        } else if (DinoHelpHas(signs, it->first) && it->second.second == 0) {
+            AddLink((MMenuItem *)signs[it->first], it->second.first, NULL);
+        }
+    }
+    SetLinkFallback(1);
+    mSerial.AddTail(new MTimer(30));
+    if (focus != NULL) {
+        mSerial.AddTail(CreateFocusItemTransfer(focus));
+    } else {
+        mSerial.AddTail(CreateFocusNearestItemTransfer(mPanels[0]->GetPosition()));
+    }
 }
 
 // Select closes help: the panels slide off their screens, then the menu exits.
@@ -668,10 +762,6 @@ void DinoHelpDriver::Idle() {
     }
 }
 
-typedef std::map<u32, void *> DinoHelpPtrMap;
-typedef std::__red_black_tree<u32, std::pair<const u32, void *>, std::__select_first<std::pair<const u32, void *> >,
-                              std::less<u32>, std::allocator<std::pair<const u32, void *> > >
-    DinoHelpPtrTree;
 template DinoHelpPtrMap::value_type &DinoHelpPtrMap::find_or_insert(const u32 &k);
 template DinoHelpPtrTree::node_base *DinoHelpPtrTree::find_insert_position(const u32 &k, node_base *&last_not_greater,
                                                                           bool &left, bool &leftmost);
