@@ -737,11 +737,17 @@ static inline const int *GetExcavate7C(MResource<DinoExcavateDefs> &defs) {
 }
 
 #pragma opt_common_subs off
+// &mParallel through non-member inlines: the loops hoist it into the frame's lowest slot, as the game does (see
+// DinoUiMedalMenu::OnStart).
+static inline MTaskSet *MuseumParallel(DinoUiMuseumMenu *menu) {
+    return &menu->mParallel;
+}
+static inline MTaskSet *MuseumInfoParallel(DinoUiMuseumInformationMenu *menu) {
+    return &menu->mParallel;
+}
 #pragma auto_inline off
 // The help areas, the page fraction and buttons, the tab picture and tabs, the cursor, the slots' cry numbers, the
 // name, the information picture and the 3D model; then the slots, and a fade in from white.
-// NONMATCHING: stack slots only (as DinoUiMedalMenu::OnStart): the game hoists the numbers loop's &mParallel before
-// its argument pointer and gives it the lowest slot.
 void DinoUiMuseumMenu::OnStart() {
     u32 guard = data_ov006_02199188;
     if (!(guard & 1)) {
@@ -803,7 +809,7 @@ void DinoUiMuseumMenu::OnStart() {
     mCursor->Hide();
     MFontSet *numbers = new MFontSet(std::string(data_ov006_02196e54), 0, 0, 0);
     for (int i = 0; i < 15; i++) {
-        MTaskSet *tasks = &mParallel;
+        MTaskSet *tasks = MuseumParallel(this);
         MObjCanvas *canvas = new MObjCanvas(gCurrentDisplay, MPoint(0x20, 0x10), numbers->GetPalette(), TRUE);
         mVoices[i] = new MIndicator(canvas, numbers, 0);
         tasks->AddTail(mVoices[i]);
@@ -846,8 +852,10 @@ void DinoUiMuseumMenu::OnStart() {
     } else {
         FocusItem(mSlots[0]);
     }
-    MTask *sub = gLcd->mSub->mBright->CreateFadeInFromWhite(30, 0);
-    MTask *main = gLcd->mMain->mBright->CreateFadeInFromWhite(30, 0);
+    MTask *main;
+    MTask *sub;
+    sub = gLcd->mSub->mBright->CreateFadeInFromWhite(30, 0);
+    main = gLcd->mMain->mBright->CreateFadeInFromWhite(30, 0);
     MParallelTaskSet *fades = new MParallelTaskSet(TRUE);
     fades->AddTail(main, sub);
     mSerial.AddTail(fades);
@@ -897,8 +905,7 @@ inline DinoUiMuseumInformationVoiceButton::DinoUiMuseumInformationVoiceButton(Di
 #pragma auto_inline off
 // The help areas, the page, back and cry buttons, the element icons, the number, name and description, then the
 // page; fades the top screen in.
-// NONMATCHING: stack slots only: the element loop's hoisted &mParallel takes the game's lowest slot but our highest
-// (the same issue as DinoUiMuseumMenu::OnStart; every mwcc 2.0 build up to sp2 does this).
+#pragma opt_common_subs off
 void DinoUiMuseumInformationMenu::OnStart() {
     SetLinkFallback(1);
     {
@@ -950,7 +957,8 @@ void DinoUiMuseumInformationMenu::OnStart() {
         mTypes[i]->SetPriority(0);
         mTypes[i]->Hide();
         ((MMotion *)mTypes[i])->Play(1, 0);
-        mParallel.AddTail(mTypes[i]);
+        MTaskSet *tasks = MuseumInfoParallel(this);
+        tasks->AddTail(mTypes[i]);
     }
     mParallel.AddTail(mOam);
     mParallel.AddTail(mBackground = new MTextPicture(std::string(data_ov006_02196eac), TRUE, false));
@@ -981,6 +989,7 @@ void DinoUiMuseumInformationMenu::OnStart() {
     Refresh();
     mSerial.AddTail(gLcd->mSub->mBright->CreateFadeInFromBlack(5, 0));
 }
+#pragma opt_common_subs reset
 #pragma auto_inline reset
 
 // Moves the cursor to the item; a slot also shows its creature's name (and model) and restarts the help.
