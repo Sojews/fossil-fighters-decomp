@@ -16,6 +16,7 @@
 
 struct DinoTeam;
 class MSmartOam;
+class MTextPicture;
 class DinoUiPartsRockName;
 
 class DinoUiContainerMenuItem;
@@ -42,10 +43,10 @@ public:
     void FinishDiscard();
 
     MSmartOam *mOam;            // 0xB4: the items' sprites
-    u32 mUnkB8;                 // 0xB8
+    DinoUiContainerMenuItem *mBack;     // 0xB8
     DinoUiContainerMenuItem *mOKButton; // 0xBC
     MMenuItem *mTabItems[3];    // 0xC0
-    u32 mUnkCC;                 // 0xCC
+    MTextPicture *mTitle;       // 0xCC
     std::vector<void *> mItems; // 0xD0: this page's items
     DinoUiContainerMenuItem *mPageL;    // 0xDC
     DinoUiContainerMenuItem *mPageR;    // 0xE0
@@ -53,11 +54,11 @@ public:
     int *mResult;               // 0xE8
     DinoTeam *mOldTeam;         // 0xEC: the team when the menu opened
     DinoTeam *mTeam;            // 0xF0
-    MSerialTaskSet *mCursorTasks;   // 0xF4
+    MParallelTaskSet *mCursorTasks; // 0xF4
     DinoUiFieldMenuCursor *mCursor; // 0xF8
     DinoUiPartsRockName *mPanel;    // 0xFC: shows the focused container
     std::vector<DinoUiFossilEntry> mUnk100;   // 0x100: the containers' rocks
-    MResource<void> mUnk10C;    // 0x10C
+    MResource<DinoKasekiDefs> mKasekiDefs;  // 0x10C
     u32 mUnk11C;                // 0x11C: the chosen entry
     u32 mUnk120;                // 0x120: the yes/no window's answer
     int mPage;                  // 0x124
@@ -67,6 +68,7 @@ public:
 
 class DinoUiContainerBackButton : public DinoUiContainerMenuItem {
 public:
+    DinoUiContainerBackButton(DinoUiContainerMenu *owner);
     virtual ~DinoUiContainerBackButton();
     virtual void OnFocusChanged(BOOL focused);
     virtual void OnDecide();
@@ -74,6 +76,7 @@ public:
 
 class DinoUiContainerOKButton : public DinoUiContainerMenuItem {
 public:
+    DinoUiContainerOKButton(DinoUiContainerMenu *owner);
     virtual ~DinoUiContainerOKButton();
     virtual void OnFocusChanged(BOOL focused);
     virtual void OnDecide();
@@ -81,12 +84,14 @@ public:
 
 class DinoUiContainerPageLButton : public DinoUiContainerMenuItem {
 public:
+    DinoUiContainerPageLButton(DinoUiContainerMenu *owner);
     virtual ~DinoUiContainerPageLButton();
     virtual void OnDecide();
 };
 
 class DinoUiContainerPageRButton : public DinoUiContainerMenuItem {
 public:
+    DinoUiContainerPageRButton(DinoUiContainerMenu *owner);
     virtual ~DinoUiContainerPageRButton();
     virtual void OnDecide();
 };
