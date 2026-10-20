@@ -332,8 +332,6 @@ extern "C" u32 data_ov000_02195d24[];   // the view's pooled statics (+0x04: the
 extern "C" u32 data_ov000_02195da4[];   // the ability counters' offsets, by ability (MPoint)
 
 // Sets up the ability icon and its four counters, shown at half size.
-// NONMATCHING (92%): the game hoists the matrix's zero entries' affine values into their own stack slot (from a
-// register that happens to hold 0); ours folds them, so every later slot moves.
 DinoBattleViewAbilityIcon::DinoBattleViewAbilityIcon(DinoBattleView *view, u32 oam, MPoint pos)
     : MProcess(NULL), mOam((MSmartOam *)oam), mMask(0), mWasCounting(0), mCounting(0) {
     mMotion = new MMotion(std::string(((const char **)data_ov000_02195d24)[1]), (MSmartOam *)oam, 0, 1);

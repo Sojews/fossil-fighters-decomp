@@ -18,8 +18,68 @@
 #include "game/dino_battle_view2.h"
 #include "game/dino_battle_view_3d.h"
 #include "game/dino_static_init.h"
+#include "game/dino_sound.h"
+#include "m/fx32.h"
+#include "nitro/fx.h"
+#include "nitro/g2.h"
 
 #pragma auto_inline off
+
+extern "C" const int data_0208a1a8;   // the counters' step per frame
+extern "C" char data_ov000_02195e44[];  // "AB%d"
+extern "C" char data_ov000_02195e4c[];  // " []"
+extern "C" struct {
+    MtxFx22 mtx;    // 0x00: the ability icons' scale
+    MtxFx22 counting;   // 0x10: their scale while counting
+} data_ov000_021978e8;
+
+static inline MFx32 DinoFx32Abs(MFx32 x) {
+    if (x.v >= 0) {
+        return x;
+    }
+    return -x;
+}
+
+// Counts each shown ability's value a step toward its target, redrawing the counter (enlarged while it counts),
+// and plays the count sound when counting starts.
+void DinoBattleViewAbilityIcon::Idle() {
+    mWasCounting = mCounting;
+    mCounting = FALSE;
+    int step = data_0208a1a8;
+    for (int i = 0; i < 4; i++) {
+        if (!(mMask & (1 << i)) || mValue[i] == mTarget[i]) {
+            continue;
+        }
+        mCounting = TRUE;
+        if (DinoFx32Abs(MFx32(mValue[i] - mTarget[i])) <= MFx32(step)) {
+            mValue[i] = mTarget[i];
+        } else {
+            mValue[i] += mValue[i] > mTarget[i] ? -step : step;
+        }
+        char text[8];
+        if (mValue[i] < 0) {
+            OS_SPrintf(text, data_ov000_02195e44, -mValue[i]);
+            for (char *c = text; *c != 0; c++) {
+                *c += 0x20;
+            }
+        } else {
+            OS_SPrintf(text, mValue[i] != 0 ? data_ov000_02195e44 : data_ov000_02195e4c, mValue[i]);
+        }
+        if (mValue[i] == mTarget[i]) {
+            mUnits[i]->SetObjMode(0);
+            mUnits[i]->SetFlip(FALSE, FALSE);
+        } else {
+            mUnits[i]->SetObjMode(1);
+            mUnits[i]->SetAffineParam(mAffine->index);
+            MTX_Scale22(&data_ov000_021978e8.counting, 0xCCD, 0xCCD);
+            G2_SetOBJAffine(mOamAffine, &data_ov000_021978e8.counting);
+        }
+        mTexts[i]->SetText(std::string(text));
+    }
+    if (mWasCounting != mCounting && mCounting) {
+        DinoSoundPlaySe(0x38A, 0);
+    }
+}
 
 BOOL DinoBattleViewAbilityIcon::IsAnimating() {
     for (int i = 0; i < 4; i++) {

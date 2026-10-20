@@ -57,10 +57,9 @@ void MTX_Rot22_(MtxFx22 *pDst, fx32 sinVal, fx32 cosVal);
 void MTX_ScaleApply22(const MtxFx22 *pSrc, MtxFx22 *pDst, fx32 x, fx32 y);
 
 static inline void MTX_Scale22(MtxFx22 *pDst, fx32 x, fx32 y) {
-    pDst->_00 = x;
-    pDst->_01 = 0;
-    pDst->_10 = 0;
     pDst->_11 = y;
+    pDst->_00 = x;
+    pDst->_01 = pDst->_10 = 0;
 }
 void MTX_Identity33_(MtxFx33 *pDst);
 void MTX_ScaleApply33(const MtxFx33 *pSrc, MtxFx33 *pDst, fx32 x, fx32 y, fx32 z);
