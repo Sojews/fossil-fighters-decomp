@@ -1748,6 +1748,138 @@ u32 DinoBattleModelPlayer::NextUnkId() {
     return (mUnkB8 << 16) | id;
 }
 
+extern "C" void func_ov000_02166904(DinoBattleModelPlayer *player, MMessageObserver *reply, u32 side, u32 id,
+                                    u32 targetId, u32 attack, u32 unk);
+extern "C" void func_ov000_021661b4(DinoBattleModelPlayer *player, MMessageObserver *reply, MMessage *msg, u32 id,
+                                    u32 otherId);
+extern "C" const u32 data_0208a290, data_0208a28c;  // the confusion's info bar texts (ours, theirs)
+
+// A confused leader's turn: it may lose the turn, use a random attack on a random target, or swap with a support
+// creature. reply (if any) gets the confusion's result.
+// NONMATCHING: the attack count and the swap target take each other's spill slots.
+extern "C" void func_ov000_02165bd0(DinoBattleModelPlayer *player, MMessageObserver *reply) {
+    DinoBattleModelCreature *creature = player->FindCreature(0);
+    player->mBattle->GetUnk1FC();
+    if (creature == NULL || !(creature->GetStatus()->flags & 0x40)) {
+        return;
+    }
+    player->mSerial.AddTail(player->mUnkF4->CreatePostTask(new DinoBattleViewActionInfoBarUpdateRequest(
+                                player->mUnkB4 == 0 ? data_0208a290 : data_0208a28c)),
+                            DinoCreatePostAndWaitTask(player->mUnkF4, new DinoBattleViewWaitActionInfoBarRequest(0)));
+    DinoBattleModelCreature *other;
+    u32 attack;
+    u32 count = creature->CountAttacks();
+    u32 blocked = 0;
+    for (u32 i = 0; i < count; i++) {
+        const DinoAttackDef *def = gDinoResource->GetAttackDef(creature->GetAttack(i, NULL));
+        int cost = *DinoOffsetPtr<u16>(def, def->cost);
+        if (player->GetUnk128() < cost) {
+            blocked |= 1 << i;
+        }
+    }
+    BOOL allBlocked = FALSE;
+    if ((creature->GetStatus()->flags & 0x10) || blocked != 0) {
+        blocked |= creature->GetStatusUnk20();
+        allBlocked = TRUE;
+        for (u32 i = 0; i < count; i++) {
+            if (!((1 << i) & blocked)) {
+                allBlocked = FALSE;
+                break;
+            }
+        }
+    }
+    if (!(creature->IsUnkD244() && !allBlocked) && !(creature->IsUnkD274() && creature->mPlayer->IsUnk2163978())) {
+        creature->BeginAction();
+        MTask *post = player->mUnkF4->CreatePostTask(new DinoBattleViewSetActionedSignal());
+        player->mSerial.AddTail(DinoCreatePostAndWaitTask(player->mUnkF4, new DinoBattleViewWaitActionInfoBarRequest(0)),
+                                post);
+        if (reply == NULL) {
+            return;
+        }
+        player->mSerial.AddTail(reply->CreatePostTask(new DinoBattleModelPlayerConfusionExecResult()));
+        return;
+    }
+    int action;
+    do {
+        action = player->GetRandom()->Next(2);
+        if (action == 0) {
+            if (!creature->IsUnkD244()) {
+                action = -1;
+            }
+            attack = player->GetRandom()->Next(creature->CountAttacks());
+            const DinoAttackDef *def = creature->GetAttackDef(attack);
+            if (*DinoOffsetPtr<u8>(def, def->unk14) == 14 && player->GetCreatureCount() == 1) {
+                action = -1;
+            }
+            if (blocked & (1 << attack)) {
+                action = -1;
+            }
+        }
+        if (action == 1) {
+            if (!creature->IsUnkD274() || !creature->mPlayer->IsUnk2163978()) {
+                action = -1;
+            }
+        }
+    } while (action == -1);
+    switch (action) {
+    case 0: {
+        DinoSignalWait *wait;
+        if (reply != NULL) {
+            wait = new DinoSignalWait(0x10026, reply, new DinoBattleModelPlayerConfusionExecResult(), 1);
+        } else {
+            wait = new DinoSignalWait(0x10026, NULL, NULL, 1);
+        }
+        MSerialTaskSet *seq = new MSerialTaskSet(TRUE);
+        seq->AddTail(wait, player->mUnkF4->CreatePostTask(new DinoBattleViewSetCreaturePriorityRequest(0)));
+        const DinoAttackDef *def = creature->GetAttackDef(attack);
+        DinoBattleModelCreature *target;
+        if (*DinoOffsetPtr<u8>(def, def->unk14) == 9 || *DinoOffsetPtr<u8>(def, def->unk14) == 2 ||
+            *DinoOffsetPtr<u8>(def, def->unk10) == 8) {
+            target = creature;
+        } else if (*DinoOffsetPtr<u8>(def, def->unk14) == 15) {
+            target = player->FindCreature(0);
+        } else if (*DinoOffsetPtr<u8>(def, def->unk14) == 13 || *DinoOffsetPtr<u8>(def, def->unk10) == 9 ||
+                   *DinoOffsetPtr<u8>(def, def->unk10) == 10 || *DinoOffsetPtr<u8>(def, def->unk10) == 11) {
+            do {
+                target = player->GetCreature(player->GetRandom()->Next(player->GetCreatureCount()));
+            } while (target->GetUnkB8() == 3);
+        } else if (*DinoOffsetPtr<u8>(def, def->unk14) == 14) {
+            do {
+                target = player->GetCreature(player->GetRandom()->Next(player->GetCreatureCount()));
+            } while (target == creature);
+        } else {
+            do {
+                DinoBattleModelPlayer *opponent = player->GetOpponent();
+                target = opponent->GetCreature(player->GetRandom()->Next(player->GetOpponent()->GetCreatureCount()));
+            } while (target->GetUnkB8() == 3);
+        }
+        creature->BeginAction();
+        player->mParallel.AddTail(seq);
+        func_ov000_02166904(player, wait, player->GetUnkB8(), creature->GetUnkB4(), target->GetUnkB4(), attack, 1);
+        break;
+    }
+    case 1: {
+        int first = player->GetRandom()->Next(2);
+        for (int j = 0; j < 2; j++) {
+            other = player->FindCreature(j == first ? 1 : 2);
+            if (other != NULL) {
+                break;
+            }
+        }
+        if (other != NULL) {
+            if (reply != NULL) {
+                func_ov000_021661b4(player, reply, new DinoBattleModelPlayerConfusionExecResult(), creature->GetUnkB4(),
+                                    other->GetUnkB4());
+            } else {
+                func_ov000_021661b4(player, NULL, NULL, creature->GetUnkB4(), other->GetUnkB4());
+            }
+        }
+        break;
+    }
+    }
+    player->mUnk124 |= 3;
+}
+
 void DinoBattleModelPlayer::CollectCreaturesNearB8(int pos, u32 *ids, int *count) {
     *count = 0;
     for (int i = 0; i < GetCreatureCount(); i++) {
