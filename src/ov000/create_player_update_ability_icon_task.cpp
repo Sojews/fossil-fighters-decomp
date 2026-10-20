@@ -741,7 +741,7 @@ extern "C" void func_ov000_02169404(DinoBattleModelPlayer *player, DinoBattleMod
     }
 }
 
-extern "C" void func_ov000_0216c90c(DinoBattleModelCreature *creature, u32 id, BOOL arg);
+extern "C" void func_ov000_0216c90c(DinoBattleModelCreature *creature, u32 id, BOOL resetStatus, BOOL fullLife);
 
 DinoBattleModelCreature::DinoBattleModelCreature(MMessageObserver *view, DinoBattleModelPlayer *player, u32 id,
                                                  u32 unkB4, u32 unkB8, DinoBattleCreatureStats stats, s32 unkFC,
@@ -749,7 +749,85 @@ DinoBattleModelCreature::DinoBattleModelCreature(MMessageObserver *view, DinoBat
     : MProcess(NULL), mView(view), mPlayer(player), mUnkB4(unkB4), mUnkB8(unkB8), mUnkBC(unkB8), mStats(stats),
       mUnkFC(unkFC), mUnk100(unk100), mUnk178(unk178) {
     mActing = FALSE;
-    func_ov000_0216c90c(this, id, TRUE);
+    func_ov000_0216c90c(this, id, TRUE, FALSE);
+}
+
+// What the creature stats are worked out from, and the stats (main's func_02030f38).
+struct DinoCreatureStatsInput {
+    u32 id;         // 0x00
+    int rank;       // 0x04
+    int bonus[4];   // 0x08: by part
+    int levels[5];  // 0x18: the parts', then the creature's own
+};
+struct DinoCreatureStats {
+    int hp;         // 0x00
+    int stats[5];   // 0x04
+};
+extern "C" DinoCreatureStats func_02030f38(const DinoCreatureStatsInput *info, BOOL fixed, fx32 fraction);
+
+// Sets the creature up as creature id: its definition, the sides its support effects touch, its attacks' element
+// masks and its stats (with full life, or the life its rank's experience gives).
+// NONMATCHING (94%): the game loads all the stats before storing them, and spills fullLife on entry.
+extern "C" void func_ov000_0216c90c(DinoBattleModelCreature *creature, u32 id, BOOL resetStatus, BOOL fullLife) {
+    creature->mUnkB0 = id;
+    creature->mDef = (DinoBattleCreatureDef *)gDinoResource->GetCreatureDef(id);
+    if (resetStatus) {
+        creature->ResetStatus();
+    }
+    creature->unk110[0] = 0;
+    for (int i = 0; i < 2; i++) {
+        const s8 *effect = i == 0 ? DinoOffsetPtr<s8>(creature->mDef, creature->mDef->mUnk54)
+                                  : DinoOffsetPtr<s8>(creature->mDef, creature->mDef->mUnk58);
+        if (effect[0] != 0 || effect[1] != 0 || effect[2] != 0 || effect[3] != 0) {
+            creature->unk110[0] |= 1 << i;
+        }
+    }
+    creature->unk110[1] = 0;
+    creature->unk110[2] = 0;
+    for (u32 i = 0; i < creature->CountAttacks(); i++) {
+        const DinoAttackDef *def = gDinoResource->GetAttackDef(creature->GetAttack(i, NULL));
+        creature->unk110[1] |= 1 << *DinoOffsetPtr<u8>(def, def->unk10);
+        int kind = *DinoOffsetPtr<u8>(def, def->unk14);
+        if (kind > 1) {
+            creature->unk110[2] |= 0x800 << (kind - 2);
+        }
+    }
+    u32 special = creature->GetSpecialAttack();
+    if (special != 0) {
+        const DinoAttackDef *def = gDinoResource->GetAttackDef(special);
+        creature->unk110[1] |= 1 << *DinoOffsetPtr<u8>(def, def->unk10);
+        int kind = *DinoOffsetPtr<u8>(def, def->unk14);
+        if (kind > 1 && kind != 3) {
+            creature->unk110[2] |= 0x800 << (kind - 2);
+        }
+    }
+    int unk61 = creature->GetDefUnk61();
+    if (unk61 > 1) {
+        creature->unk110[2] |= 1 << (unk61 - 2);
+    }
+    DinoCreatureStatsInput info;
+    info.levels[0] = info.levels[1] = info.levels[2] = info.levels[3] = 0;
+    MI_CpuFill8(&info, 0, sizeof(info));
+    info.id = id;
+    info.rank = creature->mUnkFC;
+    const DinoCreatureBody *body = (const DinoCreatureBody *)&creature->mStats.v[1];
+    info.levels[4] = ((const DinoCreatureState *)&creature->mStats)->unk0_8;
+    for (int i = 0; i < 4; i++) {
+        info.bonus[i] = body->parts[i].unk12;
+        info.levels[i] = body->parts[i].level;
+    }
+    const DinoCreatureStats &stats = func_02030f38(&info, creature->mPlayer->IsCpu(), creature->mUnk178);
+    int life = stats.hp;
+    creature->mUnkEC = stats.stats[0];
+    creature->mUnkF0 = stats.stats[1];
+    creature->mUnkF4 = stats.stats[2];
+    creature->mUnkF8 = stats.stats[3];
+    creature->unk104 = stats.stats[4];
+    if (fullLife) {
+        life = ((const DinoCreatureDef *)creature->mDef)->GetHpTable()[creature->mUnkFC - 1];
+    }
+    creature->mUnkE8 = creature->mUnkE4 = life;
+    creature->mUnk108 = 0;
 }
 
 MFx32 DinoBattleModelCreature::RandomFraction() {
