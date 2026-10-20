@@ -295,7 +295,7 @@ void DinoBattleViewPlayer::OnMessage(MMessage *msg) {
         }
         DinoBattleViewCreature *creature = new DinoBattleViewCreature(
             *(u32 *)req->mUnk18, this, req->mUnk10, mUnkAC, req->mUnk14, *(DinoBattleSide::Creature *)req->mUnk18,
-            req->mUnk30, mUnkB0);
+            req->mUnk30, (MSmartOam *)mUnkB0);
         u8 id = *(u32 *)req->mUnk18;
         const DinoBattleViewData *data =
             (const DinoBattleViewData *)mView->mData.mFile.archive->GetData(mView->mData.mFile.index);

@@ -25,7 +25,7 @@ class DinoBattleViewPlayer;
 class DinoBattleViewCreature : public MProcess, public MMessageObserver {
 public:
     DinoBattleViewCreature(u8 id, DinoBattleViewPlayer *player, u32 unkAC, u32 unkB0, u32 unkB4,
-                           DinoBattleSide::Creature entry, u32 unk1, u32 unk2);
+                           DinoBattleSide::Creature entry, u32 level, MSmartOam *oam);
     virtual ~DinoBattleViewCreature();
     virtual void Idle();
     virtual void OnMessage(MMessage *msg);
@@ -87,8 +87,7 @@ public:
     u32 mUnkAC;             // 0xAC
     u32 mUnkB0;             // 0xB0
     u32 mUnkB4;             // 0xB4
-    u32 unkB8[5];
-    u32 mUnkCC;             // 0xCC
+    DinoBattleSide::Creature mEntry;    // 0xB8: the side's entry (unk14 at 0xCC: flags)
     CreatureMotion *mMotion;    // 0xD0
     u32 unkD4;
     u32 mUnkD8;             // 0xD8
@@ -106,10 +105,10 @@ public:
     u32 mSupportSides;      // 0x110: bit 0 its support effect touches its own side, bit 1 the other
     u32 mLevel;             // 0x114
     u32 mUnk118;            // 0x118
-    u32 unk11C[2];
+    MParallelTaskSet *mTasks11C[2]; // 0x11C
     MPoint mCoord;          // 0x124
     MPoint mCoordOffset;    // 0x12C: added to the coordinate to place the motion
-    u32 unk134;
+    u8 unk134;
     DinoBattleViewStatusEffectIcon *mStatusIcons; // 0x138
     MTaskSet *mUnk13C;      // 0x13C
     MMotion *mMotion140;    // 0x140

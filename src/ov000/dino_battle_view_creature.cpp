@@ -9,6 +9,9 @@
 #include "game/dino_resource.h"
 #include "types.h"
 #include "game/dino_static_init.h"
+#include "m/smart_oam.h"
+#include "game/view_status_effect_icon.h"
+#include "game/dino_battle_view_lifebar.h"
 
 DinoBattleViewCreature::~DinoBattleViewCreature() {
 }
@@ -24,6 +27,8 @@ void CreatureMotion::Unk44(int arg) {
     }
 }
 
+#pragma auto_inline off
+
 CreatureMotion::CreatureMotion(const char *path, MSmartOam *oam, int arg) : MMotion(std::string(path), oam, 3, 1) {
     mArg = arg;
     mUnk80 = 0;
@@ -31,8 +36,6 @@ CreatureMotion::CreatureMotion(const char *path, MSmartOam *oam, int arg) : MMot
     mUnk88 = 0;
     mOam = oam;
 }
-
-#pragma auto_inline off
 
 // The adjust defs' layout points.
 #define DINO_ADJUST_POINT(name, field)                                          \
@@ -223,7 +226,65 @@ void CreatureMotion::SetArg(int arg, BOOL flag) {
 }
 
 BOOL DinoBattleViewCreature::IsUnkCC2() {
-    return (mUnkCC & 2) ? TRUE : FALSE;
+    return (mEntry.unk14 & 2) ? TRUE : FALSE;
+}
+
+// The TU's pooled constants.
+extern "C" struct {
+    u8 unk00[0x0C];
+    const char *markPath;   // 0x0C: the advantage mark's motion
+    u8 unk10[0x4C - 0x10];
+    MPoint markOffset;  // 0x4C: of the advantage mark from the creature
+} data_ov000_02193030;
+
+extern "C" const u32 data_ov000_0218fce4[];   // frames before it appears, by kind
+extern "C" MPoint func_ov000_0216f294(int side, u32 kind);
+extern "C" MPoint func_ov000_0216f4c0(int side, u32 kind, BOOL own);
+extern "C" void func_ov000_0216fcb8(DinoBattleViewCreature *creature, u32 id);
+
+// Sets up the creature's motions (the creature, its advantage mark), status icons, life bar and appearance.
+// NONMATCHING (97%): the game keeps a copy of unkB0 on the stack for the status icons (its frame is 8 bytes bigger).
+DinoBattleViewCreature::DinoBattleViewCreature(u8 id, DinoBattleViewPlayer *player, u32 unkAC, u32 unkB0, u32 unkB4,
+                                               DinoBattleSide::Creature entry, u32 level, MSmartOam *oam)
+    : MProcess(NULL), mUnkA8(id), mUnkAC(unkAC), mUnkB0(unkB0), mUnkB4(unkB4), mEntry(entry), mUnkD8((u32)oam),
+      mUnkDC((u32)player), mUnkF8(0), mLevel(level) {
+    mCoordOffset.x = 0;
+    mCoordOffset.y = 0;
+    unk134 = 0;
+    mFlags144 = 0;
+    mMask148 = 0;
+    mColor = 0;
+    mBlend = NULL;
+    unk158 = 0;
+    mUnk159 = 0;
+    func_ov000_0216fcb8(this, id);
+    mAdvantage = mShownAdvantage = 0;
+    mUnk13C = new MSerialTaskSet();
+    mMotion140 = new MMotion(std::string(data_ov000_02193030.markPath), oam, 0, 1);
+    mMotion140->SetPosition(data_ov000_02193030.markOffset + func_ov000_0216f294(mUnkB0, mUnkB4));
+    mMotion140->SetPriority(2);
+    mMotion140->SetAnchor(0);
+    mMotion140->Hide();
+    GetParallel()->AddTail(mUnk13C, mMotion140);
+    mMotion = new CreatureMotion(gDinoResource->GetBattleCreatureMotionPath(id).c_str(), oam, 0);
+    mMotion->SetPriority(2);
+    mMotion->SetAnchor(3);
+    mMotion->Show();
+    if (unkB0 == 1) {
+        mMotion->SetFlip(1, 0);
+    }
+    mStatusIcons = new DinoBattleViewStatusEffectIcon(oam, unkB0, (u32)this);
+    mParallel.AddTail(mStatusIcons);
+    mTasks11C[0] = new MParallelTaskSet();
+    mParallel.AddTail(mTasks11C[0]);
+    mTasks11C[1] = new MParallelTaskSet();
+    mParallel.AddTail(mTasks11C[1]);
+    mTasks11C[1]->AddTail(mMotion);
+    SetCoord(func_ov000_0216f294(mUnkB0, mUnkB4));
+    mSerial.AddTail(new MTimer(data_ov000_0218fce4[mUnkB4]), mMotion->CreatePlayTransfer(1, 0), new MTimer(30),
+                    mMotion->CreateWaitStopTask());
+    mUnkE0 = (u32) new DinoBattleViewLifebar(this, oam, func_ov000_0216f4c0(mUnkB0, mUnkB4, unk134), 100, 100);
+    mParallel.AddTail((MTask *)mUnkE0);
 }
 
 int DinoGetTypeAdvantage(int type, int other); // 1: type beats other, 2: other beats type
@@ -288,11 +349,6 @@ extern "C" void func_ov000_0216fd74(DinoBattleViewCreature *creature) {
     }
 }
 
-// The TU's pooled constants.
-extern "C" struct {
-    u8 unk00[0x4C];
-    MPoint markOffset;  // 0x4C: of the advantage mark from the creature
-} data_ov000_02193030;
 
 // Moves the creature (shuffling over, or sliding) and its advantage mark from one coordinate to another.
 // NONMATCHING: the game loads the mark offset first and keeps to.y in a register for the new coordinate.
