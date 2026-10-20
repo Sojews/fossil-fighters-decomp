@@ -18,6 +18,29 @@
 #include "game/dino_field_chara_hide_manpu_task.h"
 #include "game/dino_field_chara_model_motion_id_task.h"
 
+// NONMATCHING: the two dead MPoint temporaries of SetUnk2D8Pos are stored in a different order.
+DinoFieldChara::DinoFieldChara(DinoField *field, M3DScene *scene)
+    : MProcess(NULL), mUnk114(0), mField(field), mScene(scene) {
+    mUnk310 = 0;
+    mBody = NULL;
+    mUnk128 = 0;
+    mHead = NULL;
+    mManpu = NULL;
+    mEffect = NULL;
+    SetUnk2D8Pos(MPoint(0, 0));
+    mUnk2E0 = 0;
+    ResetState();
+    Add((u8 *) &mModel, 0x2C);
+    Add(&mUnk114, 1);
+    Close();
+    mAngleTasks = new MSerialTaskSet;
+    GetParallel()->AddTail(mAngleTasks);
+    mMoveTasks = new MSerialTaskSet;
+    GetParallel()->AddTail(mMoveTasks);
+    mTaskSet = new MSerialTaskSet;
+    GetParallel()->AddTail(mTaskSet);
+}
+
 DinoFieldCharaAngleAnime::~DinoFieldCharaAngleAnime() {
 }
 
@@ -108,7 +131,7 @@ void DinoFieldChara::Refresh() {
     mMotionModels.clear();
     mMotionModelsAlt.clear();
     mModelResource = M3DModelResource();
-    *(MResource<DinoCharaData> *) &mArchive = MResource<DinoCharaData>();
+    mData = MResource<DinoCharaData>();
     mUnk2D8.x = 0;
     mUnk2D8.y = 0;
     mUnk2E0 = 0;
@@ -116,8 +139,8 @@ void DinoFieldChara::Refresh() {
     mUnk130[3] = mUnk130[4] = mUnk130[5] = 0x80000000;
     if (mModel.id != 0) {
         Run();
-        *(MResource<DinoCharaData> *) &mArchive = gDinoResource->LoadChara(mModel.id);
-        mModel.unk05[1] = ((DinoFieldCharaData *) mFile.GetData())->mUnk2F;
+        mData = gDinoResource->LoadChara(mModel.id);
+        mModel.unk05[1] = ((DinoFieldCharaData *) mData.mFile.GetData())->mUnk2F;
         ApplyBodyModel();
         ApplyHeadModel();
         ApplyMotion();
@@ -130,7 +153,7 @@ MFx32 DinoFieldChara::GetMoveSpeed() {
     if (mTask.unk4 == 1) {
         return data_020b5ac8;
     }
-    MFx32 speed = ((DinoFieldCharaData *) mFile.GetData())->mMoveSpeed;
+    MFx32 speed = ((DinoFieldCharaData *) mData.mFile.GetData())->mMoveSpeed;
     if (!(speed != MFx32(-1))) {
         return data_020b5ab8;
     }
@@ -138,25 +161,25 @@ MFx32 DinoFieldChara::GetMoveSpeed() {
 }
 
 u8 DinoFieldChara::GetUnk2C() {
-    return ((DinoFieldCharaData *) mFile.GetData())->mUnk2C;
+    return ((DinoFieldCharaData *) mData.mFile.GetData())->mUnk2C;
 }
 
 MFx32Rect DinoFieldChara::GetRect30() {
-    const DinoFieldCharaData *data = (const DinoFieldCharaData *) mFile.GetData();
+    const DinoFieldCharaData *data = (const DinoFieldCharaData *) mData.mFile.GetData();
     return data->mRect30;
 }
 
 u8 DinoFieldChara::GetUnk2D() {
-    return ((DinoFieldCharaData *) mFile.GetData())->mUnk2D;
+    return ((DinoFieldCharaData *) mData.mFile.GetData())->mUnk2D;
 }
 
 MRect DinoFieldChara::GetRect40() {
-    const DinoFieldCharaData *data = (const DinoFieldCharaData *) mFile.GetData();
+    const DinoFieldCharaData *data = (const DinoFieldCharaData *) mData.mFile.GetData();
     return data->mRect40;
 }
 
 MFx32 DinoFieldChara::GetUnk50() {
-    MFx32 v = ((DinoFieldCharaData *) mFile.GetData())->mUnk50;
+    MFx32 v = ((DinoFieldCharaData *) mData.mFile.GetData())->mUnk50;
     if (!(v != MFx32(-10))) {
         return data_020b5abc;
     }
@@ -183,7 +206,7 @@ void DinoFieldChara::StopWalking() {
 }
 
 BOOL DinoFieldChara::IsUnk20Two() {
-    return ((DinoFieldCharaData *) mFile.GetData())->mUnk20 == 2 ? TRUE : FALSE;
+    return ((DinoFieldCharaData *) mData.mFile.GetData())->mUnk20 == 2 ? TRUE : FALSE;
 }
 
 BOOL DinoFieldChara::IsUnkA1Motion() {
@@ -229,18 +252,18 @@ void DinoFieldChara::PlayReaction() {
     if (mBody != NULL && IsAnimDone(mBody)) {
         if (IsUnkA1Motion()) {
             SetMotion(4, 0, MFx32(1));
-            if (((DinoFieldCharaData *) mFile.GetData())->mUnk20 == 2) {
+            if (((DinoFieldCharaData *) mData.mFile.GetData())->mUnk20 == 2) {
                 DinoSoundPlaySe(0xBF, 0);
-            } else if (((DinoFieldCharaData *) mFile.GetData())->mUnk24 == 2) {
+            } else if (((DinoFieldCharaData *) mData.mFile.GetData())->mUnk24 == 2) {
                 DinoSoundPlaySe(0xC1, 0);
             } else {
                 DinoSoundPlaySe(0xBD, 0);
             }
         } else {
             SetMotion(3, 0, MFx32(1));
-            if (((DinoFieldCharaData *) mFile.GetData())->mUnk20 == 2) {
+            if (((DinoFieldCharaData *) mData.mFile.GetData())->mUnk20 == 2) {
                 DinoSoundPlaySe(0xBE, 0);
-            } else if (((DinoFieldCharaData *) mFile.GetData())->mUnk24 == 2) {
+            } else if (((DinoFieldCharaData *) mData.mFile.GetData())->mUnk24 == 2) {
                 DinoSoundPlaySe(0xC0, 0);
             } else {
                 DinoSoundPlaySe(0xBB, 0);
@@ -250,12 +273,12 @@ void DinoFieldChara::PlayReaction() {
 }
 
 static inline BOOL IsUnk20One(DinoFieldChara *chara) {
-    return chara->mBody != NULL && ((DinoFieldCharaData *) chara->mFile.GetData())->mUnk20 == 1;
+    return chara->mBody != NULL && ((DinoFieldCharaData *) chara->mData.mFile.GetData())->mUnk20 == 1;
 }
 
 static inline BOOL IsUnk24Kind(DinoFieldChara *chara) {
-    return IsUnk20One(chara) && (((DinoFieldCharaData *) chara->mFile.GetData())->mUnk24 == 1 ||
-                                 ((DinoFieldCharaData *) chara->mFile.GetData())->mUnk24 == 2);
+    return IsUnk20One(chara) && (((DinoFieldCharaData *) chara->mData.mFile.GetData())->mUnk24 == 1 ||
+                                 ((DinoFieldCharaData *) chara->mData.mFile.GetData())->mUnk24 == 2);
 }
 
 BOOL DinoFieldChara::IsUnk24Reacting() {
@@ -265,7 +288,7 @@ BOOL DinoFieldChara::IsUnk24Reacting() {
 // Whether the camera's focus stands within the chara's range (for a chara of kind 2, in an A1 motion).
 // NONMATCHING: stack slots of the subtraction's temporaries only (the game's y temporaries sit above the x ones).
 BOOL DinoFieldChara::IsFocusNear() {
-    if (mBody != NULL && ((DinoFieldCharaData *) mFile.GetData())->mUnk20 == 2 && IsUnkA1Motion()) {
+    if (mBody != NULL && ((DinoFieldCharaData *) mData.mFile.GetData())->mUnk20 == 2 && IsUnkA1Motion()) {
         u32 focus = mField->GetCamera()->GetFocus();
         if (focus == 0) {
             return FALSE;
@@ -277,7 +300,7 @@ BOOL DinoFieldChara::IsFocusNear() {
         MFx32 len;
         MFx32 range;
         len = (chara->mModel.pos - mModel.pos).Length();
-        range = ((DinoFieldCharaData *) mFile.GetData())->mNearRange;
+        range = ((DinoFieldCharaData *) mData.mFile.GetData())->mNearRange;
         if (len <= range) {
             return TRUE;
         }
@@ -295,7 +318,7 @@ MFx32 DinoFieldChara::GetHeight() {
         zero.v = 0;
         return zero;
     }
-    return ((DinoFieldCharaData *) mFile.GetData())->mHeight;
+    return ((DinoFieldCharaData *) mData.mFile.GetData())->mHeight;
 }
 
 inline DinoFieldCharaAngleAnime::DinoFieldCharaAngleAnime(DinoFieldChara *chara, u32 angle, u32 frames, int ease) {
@@ -555,7 +578,7 @@ const char *DinoFieldChara::GetHeadModelPath() {
     }
     DinoCharaState state;
     gDinoBackup->GetChara(mModel.id, &state);
-    if (state.headModel >= ((DinoFieldCharaData *) mFile.GetData())->mHeadModelCount) {
+    if (state.headModel >= ((DinoFieldCharaData *) mData.mFile.GetData())->mHeadModelCount) {
         return NULL;
     }
     if (mModel.id == 1 && gDinoBackup->GetSystemVar(4) != 0) {
@@ -566,7 +589,7 @@ const char *DinoFieldChara::GetHeadModelPath() {
         mMoveSe2 = GetHeadMask(this, gDinoBackup->GetSystemVar(4))->moveSe2;
     } else {
         u32 head = state.headModel;
-        const u8 *data = (const u8 *) mFile.GetData();
+        const u8 *data = (const u8 *) mData.mFile.GetData();
         const u32 *names = (const u32 *) (data + ((const DinoFieldCharaData *) data)->mHeadModelNames);
         OS_SPrintf(mMotionModelPath, data_ov001_0216a20c[2], data + names[head]);
     }
@@ -580,12 +603,12 @@ const char *DinoFieldChara::GetHeadModelPath() {
 const char *DinoFieldChara::GetMotionModelPath(u32 motion) {
     DinoCharaState state;
     gDinoBackup->GetChara(mModel.id, &state);
-    u32 count = ((DinoFieldCharaData *) mFile.GetData())->mBodyModelCount;
+    u32 count = ((DinoFieldCharaData *) mData.mFile.GetData())->mBodyModelCount;
     u32 body = state.bodyModel;
     if (body >= count) {
         return NULL;
     }
-    const u8 *data = (const u8 *) mFile.GetData();
+    const u8 *data = (const u8 *) mData.mFile.GetData();
     const u32 *names = (const u32 *) (data + ((const DinoFieldCharaData *) data)->mBodyModelNames);
     OS_SPrintf(mMotionModelPath, data_ov001_0216a20c[1], data + names[body], motion);
     if (!MFileExists(std::string(mMotionModelPath))) {

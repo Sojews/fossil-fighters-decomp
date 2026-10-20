@@ -125,12 +125,14 @@ struct DinoFieldCharaModel {
     u16 angle;          // 0x16
 };
 
+struct DinoCharaData;
 class M3DScene;
 class MAnmModelBase;
 class MPolygonChar;
 
 class DinoFieldChara : public MProcess, public MSerializer {
 public:
+    DinoFieldChara(DinoField *field, M3DScene *scene);
     virtual ~DinoFieldChara();
     virtual void Read(const void *buf);
 
@@ -192,8 +194,7 @@ public:
     MTask *CreateSetMotionTask(u32 motion, u8 loop, MFx32 speed);
     MTask *CreateChangeMotionTask(u32 motion, u8 loop, MFx32 speed);
 
-    MArchivePtr mArchive;       // 0x8C
-    MArchiveFile mFile;         // 0x90
+    MResource<DinoCharaData> mData; // 0x8C: the character's data file
     DinoFieldCharaModel mModel; // 0x9C
     u32 mMotion;                // 0xB4: the motion playing
     MFx32 mHomeX;               // 0xB8: where the character was placed
