@@ -555,6 +555,8 @@ public:
     void ShowTime();
     // The last state: stops, blinks the sprites six times and leaves.
     void Finish();
+    // Counts the time down and steps the dance on each press (or by itself), running the talk window.
+    void StatePlay();
 
     void (DinoFieldDance::*mState)(); // 0x74
     DinoField *mField;                // 0x7C
@@ -563,15 +565,19 @@ public:
     u32 mUnk94;                       // 0x94
     u32 mUnk98;                       // 0x98
     u32 mUnk9C;                       // 0x9C
-    u32 unkA0;
-    std::vector<MTask *> mUnkA4;      // 0xA4
-    u32 unkB0[5];
+    MInput *mInput;                   // 0xA0
+    std::vector<MTask *> mUnkA4;      // 0xA4: the dancers (DinoFieldChara)
+    u32 mFrame;                       // 0xB0: frames into the step
+    u32 mHold;                        // 0xB4: frames the step was held past its length (the press came early)
+    u32 mStepFrames;                  // 0xB8: the step's length
+    u32 mStep;                        // 0xBC: the next step
+    const struct DinoDanceStep *mCurStep; // 0xC0
     u32 mTime;                        // 0xC4: in frames
     MSmartOam *mOam;                  // 0xC8
     MMotion *mTimeDigits[4];          // 0xCC: seconds (tens, ones), then hundredths
     MTaskSet *mUnkDC;                 // 0xDC
     MTaskSet *mUnkE0;                 // 0xE0
-    u32 unkE4;
+    class DinoTalkWindow *mTalk;      // 0xE4
     MResource<DinoDanceData> mUnkE8;  // 0xE8
     u32 unkF8;
     MFont *mFont;                     // 0xFC

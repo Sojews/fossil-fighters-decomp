@@ -24,6 +24,9 @@
 #include "game/help.h"
 #include "m/picture.h"
 #include "m/smart_oam.h"
+#include "game/dino_talk_window.h"
+#include "game/dino_sound.h"
+#include "m/input.h"
 
 // The TU's pooled strings.
 extern "C" struct {
@@ -139,9 +142,29 @@ void DinoFieldTownMapManager::CameraUnk0(u32 map) {
 
 // The TU's pooled pointer-to-member constants (see menu.cpp).
 extern "C" struct {
-    u8 unk00[0x1C];
+    u8 unk00[0xC];
+    void (DinoFieldDance::*TimeUp_0C)();  // 0x0C
+    void (DinoFieldDance::*Done_14)();    // 0x14
     void (DinoFieldDance::*Start_1C)();   // 0x1C
 } data_ov001_0216a814;
+
+// A step of the dance: its tempo, its sound and an event to run (0 for none).
+struct DinoDanceStep {
+    fx32 tempo;     // 0x00
+    u32 se;         // 0x04
+    u32 event;      // 0x08
+};
+// The dance's file: steps and timed events.
+struct DinoDanceFile {
+    u8 unk00[8];
+    u32 beat;           // 0x08
+    u8 unk0C[0x14 - 0xC];
+    u32 stepCount;      // 0x14
+    u32 stepOffset;     // 0x18: DinoDanceStep entries
+    u32 eventCount;     // 0x1C
+    u32 eventOffset;    // 0x20: (time, event) pairs
+};
+extern "C" void func_ov001_02166d08(DinoFieldDance *dance, u32 kind, u32 event);
 
 DinoFieldDance::DinoFieldDance(DinoField *field, u32 a, u32 b, u32 c, u32 d, u32 e)
     : MProcess(gLcd->GetBottomDisplay()), mField(field), mUnk80(a), mDance(gDinoResource->LoadDance(b)), mUnk94(c),
@@ -161,6 +184,59 @@ void DinoFieldDance::ShowTime() {
     gDinoBackup->SetLocalVar(mUnk94, mTime);
     gDinoBackup->SetLocalVar(mUnk98, seconds);
     gDinoBackup->SetLocalVar(mUnk9C, hundredths);
+}
+
+void DinoFieldDance::StatePlay() {
+    mTime--;
+    ShowTime();
+    if (mTime == 0) {
+        mState = data_ov001_0216a814.TimeUp_0C;
+        return;
+    }
+    for (u32 i = 0; i < ((const DinoDanceFile *)mDance.Get())->eventCount; i++) {
+        const DinoDanceFile *file = (const DinoDanceFile *)mDance.Get();
+        if (mTime == ((const u32 *)((const u8 *)file + file->eventOffset))[i * 2]) {
+            const DinoDanceFile *file2 = (const DinoDanceFile *)mDance.Get();
+            func_ov001_02166d08(this, 2, ((const u32 *)((const u8 *)file2 + file2->eventOffset))[i * 2 + 1]);
+        }
+    }
+    u32 step;
+    if ((step = mStep) >= ((const DinoDanceFile *)mDance.Get())->stepCount) {
+        if (mFrame >= mStepFrames) {
+            mState = data_ov001_0216a814.Done_14;
+            return;
+        }
+    } else if (mUnk80 == 1 || (mUnk80 == 0 && (mInput->GetPressed() & 0x1001)) || mHold != 0) {
+        if (mFrame >= mStepFrames + mHold) {
+            mStep++;
+            const DinoDanceFile *file = (const DinoDanceFile *)mDance.Get();
+            mCurStep = (const DinoDanceStep *)((const u8 *)file + file->stepOffset) + step;
+            mFrame = 0;
+            mHold = 0;
+            mStepFrames = MFx32ToInt(MFx32((int)((const DinoDanceFile *)mDance.Get())->beat) / MFx32::FromRaw(mCurStep->tempo));
+            DinoSoundPlaySe(mCurStep->se, 0);
+            for (std::vector<MTask *>::iterator it = mUnkA4.begin(); it != mUnkA4.end(); ++it) {
+                ((DinoFieldChara *)*it)->ChangeMotion(9, 0, MFx32::FromRaw(mCurStep->tempo));
+            }
+            if (mCurStep->event != 0) {
+                func_ov001_02166d08(this, 1, mCurStep->event);
+            }
+        } else if (mHold == 0 && mUnk80 == 0) {
+            mHold = mStepFrames - mFrame;
+        }
+    }
+    if (!mUnkE0->IsEmpty() && mUnkDC->IsEmpty() && !mTalk->IsAnimating() && mTalk->IsPageDone()) {
+        if (mTalk->IsEmpty()) {
+            MTask *exit = MTaskExitTransfer::Create(mTalk);
+            MTask *close = mTalk->CreateCloseTask();
+            MTaskSet *tasks = mUnkDC;
+            tasks->AddTail(close);
+            tasks->AddTail(exit);
+        } else {
+            mTalk->NextPage();
+        }
+    }
+    mFrame++;
 }
 
 void DinoFieldDance::Finish() {
