@@ -274,7 +274,7 @@ data_ov003_02160760 kind:data(any) addr:0x02160760
 data_ov003_02160774 kind:data(any) addr:0x02160774
 data_ov003_02160784 kind:data(any) addr:0x02160784
 data_ov003_02160794 kind:data(any) addr:0x02160794
-data_ov003_021607a4 kind:data(any) addr:0x021607a4
+_ZTI12MBgCallTask0I26DinoUiRvInformation3DModelE kind:data(any) addr:0x021607a4
 _ZTI32DinoUiRvInformation3DModelRotate kind:data(any) addr:0x021607bc
 _ZTI26DinoUiRvInformation3DModel kind:data(any) addr:0x021607e0
 _ZTI19DinoUiRvInformation kind:data(any) addr:0x021607ec
@@ -301,7 +301,7 @@ _ZTV19DinoUiRvInformation kind:data(any) addr:0x021609c8
 data_ov003_021609e8 kind:data(any) addr:0x021609e8
 data_ov003_02160a00 kind:data(any) addr:0x02160a00
 data_ov003_02160a18 kind:data(any) addr:0x02160a18
-data_ov003_02160a30 kind:data(any) addr:0x02160a30
+_ZTV12MBgCallTask0I26DinoUiRvInformation3DModelE kind:data(any) addr:0x02160a28
 data_ov003_02160a40 kind:data(any) addr:0x02160a40
 data_ov003_02160a5c kind:data(any) addr:0x02160a5c
 data_ov003_02160a78 kind:data(any) addr:0x02160a78
@@ -311,7 +311,7 @@ _ZTS32DinoUiRvInformation3DModelRotate kind:data(any) addr:0x02160ad8
 data_ov003_02160afc kind:data(any) addr:0x02160afc
 data_ov003_02160b24 kind:data(any) addr:0x02160b24
 data_ov003_02160b4c kind:data(any) addr:0x02160b4c
-data_ov003_02160b74 kind:data(any) addr:0x02160b74
+_ZTS12MBgCallTask0I26DinoUiRvInformation3DModelE kind:data(any) addr:0x02160b74
 data_ov003_02160ba4 kind:data(any) addr:0x02160ba4
 data_ov003_02160be0 kind:data(any) addr:0x02160be0
 data_ov003_02160bfc kind:data(any) addr:0x02160bfc
@@ -469,6 +469,7 @@ _ZTI23DinoUiReviveEffectLight kind:data(any) addr:0x02161e8c
 _ZTI23DinoUiReviveStatusDigit kind:data(any) addr:0x02161e98
 data_ov003_02161ea0 kind:data(any) addr:0x02161ea0
 data_ov003_02161eb0 kind:data(any) addr:0x02161eb0
+_ZTI12MBgCallTask0I23DinoUiReviveStatusCacheE kind:data(any) addr:0x02161ec8
 _ZTI18DinoUiReviveEffect kind:data(any) addr:0x02161ee0
 _ZTI18DinoUiReviveStatus kind:data(any) addr:0x02161ef8
 data_ov003_02161f20 kind:data(any) addr:0x02161f20
@@ -519,7 +520,7 @@ data_ov003_02162328 kind:data(any) addr:0x02162328
 data_ov003_02162350 kind:data(any) addr:0x02162350
 data_ov003_02162378 kind:data(any) addr:0x02162378
 data_ov003_021623a0 kind:data(any) addr:0x021623a0
-data_ov003_021623c8 kind:data(any) addr:0x021623c8
+_ZTS12MBgCallTask0I23DinoUiReviveStatusCacheE kind:data(any) addr:0x021623c8
 data_ov003_021623f4 kind:data(any) addr:0x021623f4
 data_ov003_0216241c kind:data(any) addr:0x0216241c
 data_ov003_0216242c kind:data(any) addr:0x0216242c
