@@ -1062,8 +1062,8 @@ _ZN18DinoBattleDebugLog5PrintEPKc kind:function(thumb,size=0x50) addr:0x02180040
 _ZN17AnyInputTimerWaitC1Ei kind:function(thumb,size=0x44) addr:0x02180090
 _ZN17AnyInputTimerWait4IdleEv kind:function(thumb,size=0x30) addr:0x021800d4
 _ZN26DinoBattleViewUiRootSelectC1EP14DinoBattleViewP16MMessageObservermmmmm kind:function(thumb,size=0x104) addr:0x02180104
-_ZN26DinoBattleViewUiRootSelect7OnStartEv kind:function(thumb,size=0x63e) addr:0x02180208
-.L_02180840 kind:label(thumb) addr:0x02180840 local
+_ZN26DinoBattleViewUiRootSelect7OnStartEv kind:function(thumb,size=0x638) addr:0x02180208
+_ZN26DinoBattleViewUiRootSelect6GetOamEv kind:function(thumb,size=0x6) addr:0x02180840
 _ZN26DinoBattleViewUiRootSelect10StateBeginEv kind:function(thumb,size=0x18) addr:0x02180848
 _ZN26DinoBattleViewUiRootSelect9StateIdleEv kind:function(thumb,size=0x2) addr:0x02180860
 _ZN26DinoBattleViewUiRootSelect7OnFocusEP9MMenuItem kind:function(thumb,size=0x50) addr:0x02180864
@@ -2176,7 +2176,6 @@ _ZTI26DinoBattleViewUiRootSelect kind:data(any) addr:0x02195850
 data_ov000_02195870 kind:data(any) addr:0x02195870
 data_ov000_0219589c kind:data(any) addr:0x0219589c
 data_ov000_021958dc kind:data(any) addr:0x021958dc
-data_ov000_021958f0 kind:data(any) addr:0x021958f0
 data_ov000_0219591c kind:data(any) addr:0x0219591c
 data_ov000_0219595c kind:data(any) addr:0x0219595c
 data_ov000_0219599c kind:data(any) addr:0x0219599c

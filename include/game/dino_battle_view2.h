@@ -31,6 +31,9 @@ class DinoBattleView;
 class MIndicator;
 struct MSmartOamUnit;
 
+class DinoBattleViewUiRootSelectItem;
+class DinoBattleViewCreatureAttackIcon;
+
 class DinoBattleViewUiRootSelect : public MMenu, public DinoHelpBase {
 public:
     DinoBattleViewUiRootSelect(DinoBattleView *view, MMessageObserver *observer, u32 unkC0, u32 unkC4, u32 unkBC,
@@ -43,6 +46,7 @@ public:
 
     void StateBegin();
     void StateIdle();
+    MSmartOam *GetOam();
 
     void (DinoBattleViewUiRootSelect::*mState)();   // 0xB4
     u32 mUnkBC;         // 0xBC
@@ -55,7 +59,9 @@ public:
     u8 mSilentFocus;    // 0xD5
     u8 unkD6[2];
     DinoBattleView *mView;          // 0xD8
-    u8 unkDC[0xFC - 0xDC];
+    MSmartOam *mOam;                // 0xDC
+    DinoBattleViewUiRootSelectItem *mItems[4]; // 0xE0
+    DinoBattleViewCreatureAttackIcon *mIcons[3]; // 0xF0: by creature slot
     MMessageObserver *mObserver;    // 0xFC
     std::vector<void *> mUnk100;    // 0x100
 };
@@ -123,6 +129,10 @@ class DinoBattleViewCreature;
 
 class DinoBattleViewCreatureAttackIcon : public MMenuItem {
 public:
+    DinoBattleViewCreatureAttackIcon(DinoBattleViewCreature *creature) {
+        mCreature = creature;
+        SetNoFocus(TRUE);
+    }
     virtual ~DinoBattleViewCreatureAttackIcon();
     virtual MRect GetFrame();
     virtual void OnFocusChanged(BOOL focused);
@@ -133,6 +143,8 @@ public:
 
 class DinoBattleViewUiRootSelectItem : public MMenuItem, public DinoHelpItem {
 public:
+    inline DinoBattleViewUiRootSelectItem(DinoBattleViewUiRootSelect *menu, int index, u32 textId, int focusAnime,
+                                          int blurAnime, int unkAC, int unkB0);
     virtual ~DinoBattleViewUiRootSelectItem();
     virtual MRect GetFrame();
     virtual void OnFocusChanged(BOOL focused);
@@ -141,12 +153,14 @@ public:
     virtual MDisplay *GetDisplay();
     virtual const char *GetText();
 
-    u8 unk94[0x4];
+    DinoBattleViewUiRootSelect *mMenu; // 0x94
     MMotion *mMotion;   // 0x98
-    u8 unk9C[0x4];
+    int mIndex;         // 0x9C
     u32 mTextId;        // 0xA0
     int mFocusAnime;    // 0xA4
     int mBlurAnime;     // 0xA8
+    int mUnkAC;         // 0xAC
+    int mUnkB0;         // 0xB0
 };
 
 class MenuExitTask : public MTask {

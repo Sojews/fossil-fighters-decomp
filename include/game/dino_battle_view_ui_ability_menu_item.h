@@ -133,6 +133,10 @@ public:
 
 class MenuEnableTask : public MTask {
 public:
+    MenuEnableTask(MMenu *menu, BOOL enable) {
+        mMenu = menu;
+        mEnable = enable;
+    }
     virtual ~MenuEnableTask();
     virtual void Execute();
 
