@@ -178,6 +178,7 @@ src/m/display.cpp:
 
 src/m/ext_affine.cpp:
     .text       start:0x0204c258 end:0x0204d164
+    .init       start:0x02089578 end:0x020895ac
 
 src/m/serializer.cpp:
     .text       start:0x0204d164 end:0x0204d5ec
@@ -271,12 +272,15 @@ src/game/m3d_scene_enable_task.cpp:
 
 src/game/dino_common_window_menu_item_flush_task.cpp:
     .text       start:0x0202d67c end:0x0202f204
+    .init       start:0x0208912c end:0x02089140
 
 src/game/dino_common_window_console_filter.cpp:
     .text       start:0x0202f204 end:0x0203047c
+    .init       start:0x02089140 end:0x0208915c
 
 src/game/dino_help_sample.cpp:
     .text       start:0x02031760 end:0x02032590
+    .init       start:0x02089218 end:0x02089230
 
 src/game/dino_cleaning_sample.cpp:
     .text       start:0x02032590 end:0x02033d98
@@ -304,6 +308,7 @@ src/game/dino_main.cpp:
 
 src/game/multi_play_error_dialog.cpp:
     .text       start:0x02049004 end:0x02049388
+    .init       start:0x02089528 end:0x02089550
 
 src/m/screen.cpp:
     .text       start:0x0205601c end:0x0205622c
@@ -372,6 +377,7 @@ src/m/motion.cpp:
 
 src/m/simple_menu.cpp:
     .text       start:0x02065a4c end:0x0206665c
+    .init       start:0x020899a4 end:0x020899bc
 
 src/m/menu.cpp:
     .text       start:0x0206665c end:0x02067988
@@ -390,6 +396,7 @@ src/m/multi_play.cpp:
 
 src/game/dino_common_item.cpp:
     .text       start:0x0201c9e4 end:0x0201ce08
+    .init       start:0x02088f88 end:0x02088fe8
 
 src/game/dino_common_yes_no_menu_item.cpp:
     .text       start:0x0203047c end:0x02030e7c
@@ -964,6 +971,7 @@ src/game/dino_multi_play_scanner.cpp:
 
 src/game/dino_wireless_battle.cpp:
     .text       start:0x02049388 end:0x0204a6d0
+    .init       start:0x02089550 end:0x02089578
 
 src/game/dino_se_motion.cpp:
     .text       start:0x0200a5bc end:0x0200a948

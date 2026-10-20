@@ -1,13 +1,10 @@
 // MExtAffine and its transfers. Not decompiled yet: the tile map copy with flips (func_0204c5f0).
 
 #include "m/ext_affine.h"
+#include "game/dino_static_init.h"
 
-static MPoint sSizes[4] = {
-    MPoint(128, 128),
-    MPoint(256, 256),
-    MPoint(512, 512),
-    MPoint(1024, 1024),
-};
+// The screen sizes: (128, 128), (256, 256), (512, 512), (1024, 1024), set by the file's static initialization.
+extern "C" MPoint sSizes[4];
 
 u32 MExtAffine::GetVramSize(int size) {
     return sSizes[size].x * sSizes[size].y / 64 * 2;
@@ -151,3 +148,24 @@ void MExtAffineFill::Transfer() {
         }
     }
 }
+
+// The file's static initialization (see dino_static_init.h).
+extern "C" u32 data_020c0838[];
+extern "C" u32 data_020c0874[];
+extern "C" u32 data_020c087c[];
+extern "C" u32 data_020c0884[];
+static struct ExtAffineStaticInit {
+    ExtAffineStaticInit() {
+        DINO_POOL_WORD(data_020c0838, 0x34) = 128;
+        DINO_POOL_WORD(data_020c0838, 0x38) = 128;
+        volatile MPoint *p = (volatile MPoint *) data_020c0874;
+        p->x = 256;
+        p->y = 256;
+        p = (volatile MPoint *) data_020c087c;
+        p->x = 512;
+        p->y = 512;
+        p = (volatile MPoint *) data_020c0884;
+        p->x = 1024;
+        p->y = 1024;
+    }
+} sExtAffineStaticInit;

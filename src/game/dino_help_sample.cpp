@@ -14,6 +14,7 @@
 #include "m/smart_oam.h"
 #include "game/dino_common_label.h"
 #include "game/dino_resource.h"
+#include "game/dino_static_init.h"
 
 #define PAD_BUTTON_START 0x0008
 
@@ -30,7 +31,6 @@ static const char *sFiles[] = {
     "/motion/common/sample_button_no.bin",
 };
 
-static MRect sConsoleRect(40, 52, 216, 146);
 
 // Text IDs.
 extern const u32 kHelpSampleNoText;
@@ -261,3 +261,13 @@ void DinoHelpSample::Idle() {
     serial->AddTail(menu);
     serial->AddTail(exit);
 }
+
+// The file's static initialization (see dino_static_init.h).
+static struct DinoHelpSampleStaticInit {
+    DinoHelpSampleStaticInit() {
+        DINO_POOL_WORD(data_020bc804, 0x2c) = 40;
+        DINO_POOL_WORD(data_020bc804, 0x30) = 52;
+        DINO_POOL_WORD(data_020bc804, 0x34) = 216;
+        DINO_POOL_WORD(data_020bc804, 0x38) = 146;
+    }
+} sDinoHelpSampleStaticInit;

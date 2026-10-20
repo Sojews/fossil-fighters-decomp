@@ -19,6 +19,7 @@
 #include "m/display.h"
 #include "m/oam_canvas.h"
 #include "m/indicator.h"
+#include "game/dino_static_init.h"
 
 static const char *sCursorMotions[] = {NULL, "/motion/ui_cursor/shovel.bin"};
 
@@ -278,3 +279,11 @@ std::string::size_type DinoFlushTaskFindAnchor(const std::string &s, char c) {
     return s.find(c, 0);
 }
 #pragma dont_inline reset
+
+// The file's static initialization (see dino_static_init.h).
+static struct DinoCommonWindowMenuItemFlushTaskStaticInit {
+    DinoCommonWindowMenuItemFlushTaskStaticInit() {
+        DINO_POOL_WORD(data_020bbd1c, 0x18) = -9;
+        DINO_POOL_WORD(data_020bbd1c, 0x1c) = 7;
+    }
+} sDinoCommonWindowMenuItemFlushTaskStaticInit;

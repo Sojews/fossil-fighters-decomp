@@ -14,6 +14,7 @@
 #include "m/indicator.h"
 #include "game/dino_resource.h"
 #include "m/ulti_play_error_dialog.h"
+#include "game/dino_static_init.h"
 
 MultiPlayErrorDialog::~MultiPlayErrorDialog() {
 }
@@ -102,3 +103,17 @@ void MultiPlayErrorDialog::ErrorStart() {
     parallel->AddTail(oam);
     mState = reinterpret_cast<void (MultiPlayErrorDialog::*)()>(data_020c02fc.StateWaitExit_2C);
 }
+
+// The file's static initialization (see dino_static_init.h).
+static struct MultiPlayErrorDialogStaticInit {
+    MultiPlayErrorDialogStaticInit() {
+        DINO_POOL_WORD(data_020c02fc, 0x34) = 128;
+        DINO_POOL_WORD(data_020c02fc, 0x38) = 176;
+        DINO_POOL_WORD(data_020c02fc, 0x1c) = 8;
+        DINO_POOL_WORD(data_020c02fc, 0x20) = 150;
+        DINO_POOL_WORD(data_020c02fc, 0xc) = 64;
+        DINO_POOL_WORD(data_020c02fc, 0x10) = 112;
+        DINO_POOL_WORD(data_020c02fc, 0x14) = 240;
+        DINO_POOL_WORD(data_020c02fc, 0x18) = 176;
+    }
+} sMultiPlayErrorDialogStaticInit;

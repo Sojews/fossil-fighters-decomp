@@ -13,6 +13,7 @@
 #include "m/lcd.h"
 #include "m/obj.h"
 #include "m/oam_canvas.h"
+#include "game/dino_static_init.h"
 
 // For fonts without a palette: black on white.
 static const u16 sPalette[2] = {0x0000, 0x7FFF};
@@ -234,3 +235,13 @@ void MSimpleMenu::Update() {
 
 #pragma auto_inline off
 template class std::__vec_deleter<MSimpleMenu::Entry, std::allocator<MSimpleMenu::Entry> >;
+
+// The file's static initialization (see dino_static_init.h).
+static struct SimpleMenuStaticInit {
+    SimpleMenuStaticInit() {
+        DINO_POOL_WORD(data_020c45f8, 0x70) = 0;
+        DINO_POOL_WORD(data_020c45f8, 0x74) = 0;
+        DINO_POOL_WORD(data_020c45f8, 0x78) = 256;
+        DINO_POOL_WORD(data_020c45f8, 0x7c) = 192;
+    }
+} sSimpleMenuStaticInit;

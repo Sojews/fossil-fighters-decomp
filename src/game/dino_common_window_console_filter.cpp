@@ -11,6 +11,7 @@
 #include "m/view.h"
 #include "m/text_codec.h"
 #include "game/dino_common_window_message_box.h"
+#include "game/dino_static_init.h"
 
 DinoCommonWindowMessage::~DinoCommonWindowMessage() {
     mSerial.Clear();
@@ -211,3 +212,19 @@ void DinoCommonWindowMessage::Idle() {
         mUnk74->Show();
     }
 }
+
+// The file's static initialization (see dino_static_init.h).
+extern "C" struct {
+    u8 unk00[0x14];
+    MPoint unk14;   // (0, 4)
+    u8 unk1C[0x28];
+    MPoint unk44;   // (216, 44): derived from unk14 (mwcc reuses the stored 4)
+} data_020bc024;
+static struct DinoCommonWindowConsoleFilterStaticInit {
+    DinoCommonWindowConsoleFilterStaticInit() {
+        data_020bc024.unk14.x = 0;
+        data_020bc024.unk14.y = 4;
+        data_020bc024.unk44.x = 216;
+        data_020bc024.unk44.y = data_020bc024.unk14.y * 2 + 36;
+    }
+} sDinoCommonWindowConsoleFilterStaticInit;

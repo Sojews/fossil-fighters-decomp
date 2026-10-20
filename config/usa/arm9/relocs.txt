@@ -23143,9 +23143,9 @@ from:0x0208954c kind:load to:0x020c02fc module:main
 from:0x02089570 kind:load to:0x020c0480 module:main
 from:0x02089574 kind:load to:0x020c0400 module:main
 from:0x0208959c kind:load to:0x020c0838 module:main
-from:0x020895a0 kind:load to:0x020c086c add:0x8 module:main
-from:0x020895a4 kind:load to:0x020c086c add:0x10 module:main
-from:0x020895a8 kind:load to:0x020c086c add:0x18 module:main
+from:0x020895a0 kind:load to:0x020c0874 module:main
+from:0x020895a4 kind:load to:0x020c087c module:main
+from:0x020895a8 kind:load to:0x020c0884 module:main
 from:0x020895c0 kind:thumb_call to:0x02088084 module:main
 from:0x020895d6 kind:thumb_call to:0x02088084 module:main
 from:0x020895dc kind:load to:0x0214d1d4 module:main

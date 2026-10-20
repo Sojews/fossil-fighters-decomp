@@ -5,6 +5,7 @@
 
 #include "game/dino_common_item_menu.h"
 #include "game/dino_common_item.h"
+#include "game/dino_static_init.h"
 
 DinoCommonItem::~DinoCommonItem() {
 }
@@ -99,3 +100,38 @@ DinoCommonItem::DinoCommonItem(u32 type, MSmartOam *oam, MPoint pos, u32 priorit
         DinoHelpItem::Enable();
     }
 }
+
+// The file's static initialization (see dino_static_init.h).
+extern "C" u32 data_020ba764[];
+extern "C" u32 data_020ba7e0[];
+extern "C" u32 data_020ba7f0[];
+extern "C" u32 data_020ba800[];
+// NONMATCHING: scheduling (mwcc hoists the second rect's address load above the first rect's last stores).
+static struct DinoCommonItemStaticInit {
+    DinoCommonItemStaticInit() {
+        volatile s32 *p = (volatile s32 *) data_020ba764;
+        p[0x6c / 4] = -32;
+        p[0x70 / 4] = -16;
+        p[0x74 / 4] = 32;
+        p[0x78 / 4] = 16;
+        volatile s32 *q = (volatile s32 *) data_020ba7e0;
+        q[0] = -32;
+        q[1] = -8;
+        q[2] = 32;
+        q[3] = 8;
+        q = (volatile s32 *) data_020ba7f0;
+        q[0] = -8;
+        q[1] = -8;
+        q[2] = 8;
+        q[3] = 8;
+        q = (volatile s32 *) data_020ba800;
+        q[0] = -8;
+        q[1] = -8;
+        q[2] = 8;
+        q[3] = 8;
+        p[0x3c / 4] = p[0x10 / 4];
+        p[0x40 / 4] = p[0x0c / 4];
+        p[0x44 / 4] = p[0x08 / 4];
+        p[0x48 / 4] = p[0x04 / 4];
+    }
+} sDinoCommonItemStaticInit;

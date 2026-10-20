@@ -23,6 +23,7 @@
 #include "game/dino_ui_result.h"
 #include "game/dino_battle.h"
 #include "types.h"
+#include "game/dino_static_init.h"
 
 DinoWirelessBattle::~DinoWirelessBattle() {
 }
@@ -447,3 +448,15 @@ void DinoWirelessBattle::ShowText(u32 text) {
     mUnk2F8->AddTail(top, bottom,
                      new DinoCommonWindowMessageWait1(gDinoResource->GetText(text), MPoint(128, 96), 4, 0));
 }
+
+// The file's static initialization (see dino_static_init.h).
+static struct DinoWirelessBattleStaticInit {
+    DinoWirelessBattleStaticInit() {
+        DINO_POOL_WORD(data_020c0480, 0x38) = 128;
+        DINO_POOL_WORD(data_020c0480, 0x3c) = 176;
+        DINO_POOL_WORD(data_020c0400, 0x30) = 8;
+        DINO_POOL_WORD(data_020c0400, 0x34) = 150;
+        DINO_POOL_WORD(data_020c0480, 0x58) = 64;
+        DINO_POOL_WORD(data_020c0480, 0x5c) = 112;
+    }
+} sDinoWirelessBattleStaticInit;
