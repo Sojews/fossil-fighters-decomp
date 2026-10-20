@@ -25,6 +25,7 @@ public:
     DinoUiReviveStatusDigit *mDigits[4];  // 0xA8
     u8 unkB8[0xC4 - 0xB8];
     u8 mFlag;                   // 0xC4
+    u8 unkC5[0xD0 - 0xC5];
 };
 
 #endif

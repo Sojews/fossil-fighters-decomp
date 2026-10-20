@@ -245,7 +245,6 @@ _ZNSt13__vec_deleterI11MMotionFileRSaIS0_EE8allocateEmN10Metrowerks8int2typeILi1
 _ZNSt13__vec_deleterI11MMotionFileRSaIS0_EED2Ev_ov003 kind:function(thumb,size=0x2a) addr:0x02160190
 _ZNSt13__vec_deleterI11MMotionFileRSaIS0_EE12erase_at_endEmN10Metrowerks8int2typeILi0EEE_ov003 kind:function(thumb,size=0x22) addr:0x021601bc
 data_ov003_021601e0 kind:data(any) addr:0x021601e0
-data_ov003_021601e4 kind:data(any) addr:0x021601e4
 data_ov003_02160210 kind:data(any) addr:0x02160210
 data_ov003_02160214 kind:data(any) addr:0x02160214
 __sinit_ov003_02160240 kind:function(thumb,size=0x164) addr:0x02160240

@@ -11,8 +11,22 @@ class DinoUiFieldMenuNumber3;
 class MView;
 
 // A creature's details as the information screen shows them (passed by value).
+// (As a creature's state: copied member by member.)
+struct DinoCreatureInfoState {
+    u32 index : 8;      // 0x00
+    u32 unk00_8 : 24;
+    struct {
+        u32 level : 12;
+        u32 rest : 20;
+    } parts[4];         // 0x04: head, body, arms, legs
+    u32 unk14;          // 0x14
+};
+
 struct DinoCreatureInfo {
-    u32 unk00[6];
+    union {
+        u32 unk00[6];
+        DinoCreatureInfoState state;
+    };
 };
 
 // (The data's layout isn't known yet.)
@@ -50,7 +64,8 @@ public:
     MView *mViews118[5];                // 0x118
     DinoUiFieldMenuNumber3 *mNumbers12C[5]; // 0x12C
     DinoUiFieldMenuNumber3 *mNumbers140[5]; // 0x140
-    u8 unk154[0x168 - 0x154];
+    u8 unk154[0x164 - 0x154];
+    MTask *mUnk164;                     // 0x164: (page 3) the revive status
     MTaskSet *mPictureTasks;            // 0x168
     MTaskSet *mUnk16C;                  // 0x16C
     u8 unk170[0x174 - 0x170];

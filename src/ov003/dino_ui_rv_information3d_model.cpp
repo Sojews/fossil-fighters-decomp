@@ -8,6 +8,10 @@
 #include "m/bg_new_task.h"
 #include "m/call_task.h"
 #include "game/dino_ui_rv_information.h"
+#include <stdio.h>
+#include "m/indicator.h"
+#include "m/motion.h"
+#include "game/dino_ui_revive_status.h"
 #include "game/dino_ui_field_menu_number3.h"
 #include "game/dino_resource.h"
 #include "m/picture.h"
@@ -139,6 +143,85 @@ void DinoUiRvInformation::SetPage(u8 page) {
         GetSerial()->AddTail(new MTimer(1), MCreateCallTask(this, data_ov003_0216069c.Unk021571bc_00));
     } else {
         GetSerial()->AddTail(new MTimer(1), MCreateCallTask(this, data_ov003_02160774.Unk02156ee8_00, mInfo));
+    }
+}
+
+extern "C" struct {
+    void (DinoUiRvInformation::*SetPage_00)(u8 page);
+} data_ov003_02160794;
+// The creature type's mark: the first entry with the type (or -1) gives the anime.
+extern "C" struct {
+    int type;
+    int anime;
+} data_ov003_021601e0[6];
+extern "C" const char data_ov003_02160c24[];   // the number's format
+extern "C" void func_ov003_02157364(DinoUiRvInformation *info);
+extern "C" void func_ov003_021576fc(DinoUiRvInformation *info);
+
+// Shows a creature: its number, type and name, and the page's details (reloading the page when the picture
+// changes).
+void DinoUiRvInformation::Unk02156ee8(DinoCreatureInfo info) {
+    u32 index = info.state.index;
+    if (index == 0 || index > gDinoResource->GetCreatureCount()) {
+        return;
+    }
+    mInfo.state = info.state;
+    mUnk1B0 = 0;
+    u32 old = mUnk198;
+    u32 id = (mInfo.state.index - 1) * 4 + 1;
+    {
+        const u8 *data = (const u8 *)mUnk19C.Get();
+        mUnk195 = (data + ((const u32 *)(data + ((const u32 *)data)[2]))[id])[4];
+    }
+    {
+        const u8 *data = (const u8 *)mUnk19C.Get();
+        mUnk198 = *(const u32 *)(data + ((const u32 *)(data + ((const u32 *)data)[2]))[id] + 0x38);
+    }
+    const DinoCreatureDef *def = gDinoResource->GetCreatureDef(index);
+    {
+        char number[4];
+        sprintf(number, data_ov003_02160c24, def->voice);
+        ((MIndicator *)mViewsAC[0])->SetText(std::string(number));
+    }
+    u8 type = def->unk0D;
+    for (u32 i = 0; i < 6; i++) {
+        int t = data_ov003_021601e0[i].type;
+        if (t == type || t == -1) {
+            ((MMotion *)mViewsAC[1])->Play(data_ov003_021601e0[i].anime, 0);
+            break;
+        }
+    }
+    ((MIndicator *)mViewsAC[2])->SetText(std::string(gDinoResource->GetCreatureText08(index)));
+    mViewsAC[0]->Show();
+    mViewsAC[1]->Show();
+    mViewsAC[2]->Show();
+    if (mUnk198 != old && mPage == 3) {
+        GetSerial()->AddTail(new MTimer(1), MCreateCallTask(this, data_ov003_02160794.SetPage_00, mPage));
+        mPage = 0xFF;
+        return;
+    }
+    if (mHasTenPictures && mPage < 3) {
+        if (info.state.parts[0].level != 0) {
+            mPagePicture->Show();
+            mSubPicture->Hide();
+        } else {
+            mPagePicture->Hide();
+            mSubPicture->Show();
+        }
+    }
+    switch (mPage) {
+    case 0:
+        func_ov003_02157364(this);
+        return;
+    case 1:
+    case 2:
+        func_ov003_021576fc(this);
+        return;
+    case 3:
+        mUnk16C->Clear();
+        mUnk164 = new DinoUiReviveStatus(gLcd->mMain, mInfo, 0);
+        mUnk16C->AddTail(mUnk164);
+        break;
     }
 }
 
