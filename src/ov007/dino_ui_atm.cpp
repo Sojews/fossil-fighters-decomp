@@ -126,6 +126,7 @@ extern "C" struct {
     u8 unk10[0x8];
     void (DinoBackup::*Save_18)();
     void (DinoUiATMMenu::*OnTeamMenuDecided_20)();
+    void (DinoUiATMMenu::*Unk02173d08_28)();
 } data_ov007_0218cc38;
 extern const u32 data_0208ab54;
 
@@ -427,6 +428,61 @@ void DinoUiATMMenu::OpenTeamMenu(int team) {
     menu->AddChoice(-2, std::string(gDinoResource->GetText(data_0208aa98)), std::string(gDinoResource->GetText(data_0208a77c)));
     GetSerial()->AddTail(menu, mFocusCursor->CreateShowTransfer(),
                          MCreateCallTask(this, data_ov007_0218cc38.OnTeamMenuDecided_20));
+}
+
+extern const u32 data_0208aa94, data_0208aa70, data_0208aa08, data_0208aa04, data_0208aa6c, data_0208aa68;
+
+void DinoUiATMMenu::OnTeamMenuDecided() {
+    if (mUnk114 == 12) {
+        // (Declared in reverse order for the game's register choice.)
+        MTask *fadeMain;
+        MTask *fadeSub;
+        MTask *exit;
+        *mResult = mUnk118 + 200;
+        exit = CreateExitTransfer();
+        fadeSub = gLcd->mSub->mBright->CreateFadeOutToBlack(30, 0);
+        fadeMain = gLcd->mMain->mBright->CreateFadeOutToBlack(30, 0);
+        MParallelTaskSet *fades = new MParallelTaskSet(TRUE);
+        fades->AddTail(fadeMain);
+        fades->AddTail(fadeSub);
+        MSerialTaskSet *serial = &mSerial;
+        serial->AddTail(fades);
+        serial->AddTail(exit);
+    } else if (mUnk114 == 13) {
+        *mResult = mUnk118 + 100;
+        MTask *exit = CreateExitTransfer();
+        MTask *fade = gLcd->mSub->mBright->CreateFadeOutToBlack(30, 0);
+        MSerialTaskSet *serial = &mSerial;
+        serial->AddTail(fade);
+        serial->AddTail(exit);
+    } else if (mUnk114 == 11) {
+        mCursor->Hide();
+        gDinoBackup->SetUnk34_26(mUnk118);
+        mCurrentMark->SetPosition(data_ov007_0218cd10[mUnk118 - 1] + data_ov007_0218cbe0.mCursorOffset);
+        mCurrentMark->Play(2, 1);
+        mSerial.AddTail(mCurrentMark->CreateWaitStopTask());
+        RefreshTeams();
+    } else if (mUnk114 == 14) {
+        mUnk11C = 1;
+        DinoUiATMBackButton *back = mBackButton;
+        back->mMotion->Hide();
+        back->mMotion2->Show();
+        back->SetMode(0);
+        RefreshButtons();
+        FocusNearestItem(GetCursor());
+        mMessage = new DinoCommonWindowMessage(MPoint(0x80, 0x60), std::string(gDinoResource->GetText(data_0208aa94)), 4, 0);
+        mParallel.AddTail(mMessage);
+        DinoSoundPlaySe(0x9F, 0);
+    } else if (mUnk114 == 15) {
+        mUnk114 = 0;
+        DinoCommonWindowYesNoDialog *dialog =
+            new DinoCommonWindowYesNoDialog(std::string(gDinoResource->GetText(data_0208aa70)), (BOOL *)&mUnk114);
+        dialog->SetLabels(std::string(gDinoResource->GetText(data_0208aa08)), std::string(gDinoResource->GetText(data_0208aa04)));
+        dialog->SetLabels2(std::string(gDinoResource->GetText(data_0208aa6c)), std::string(gDinoResource->GetText(data_0208aa68)));
+        mFocusCursor->Hide();
+        GetSerial()->AddTail(dialog, mFocusCursor->CreateShowTransfer(),
+                             MCreateCallTask(this, data_ov007_0218cc38.Unk02173d08_28));
+    }
 }
 
 // " " (between the team's name and the message).

@@ -31,6 +31,8 @@ public:
     void RefreshTeams();
     // Opens the team's menu (by its button) of what can be done with it.
     void OpenTeamMenu(int team);
+    // What was chosen on a team's menu: edit or rename it (leaving the menu), make it current, move it or clear it.
+    void OnTeamMenuDecided();
     void Unk02173d08();
     void ClearTeam();
     void LinkTeamButtons();
@@ -46,7 +48,8 @@ public:
     DinoUiFieldMenuCursor *mFocusCursor;    // 0xF4
     u32 unkF8;                  // 0xF8
     DinoUiATMCursor *mCursor;   // 0xFC: marks the team being moved
-    u32 unk100[2];      // 0x100
+    u32 unk100;         // 0x100
+    MMotion *mCurrentMark;  // 0x104: by the current team's button
     DinoUiPartsTeamInfo *mTeamInfo; // 0x108
     DinoCommonWindowMessage *mMessage;  // 0x10C
     u32 *mResult;       // 0x110
