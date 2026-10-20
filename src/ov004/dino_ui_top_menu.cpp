@@ -942,6 +942,24 @@ inline DinoUiSaveSlotSelectMenuItem::DinoUiSaveSlotSelectMenuItem(MSmartOam *oam
     }
 }
 
+// Shows the game about to be saved in the slot (a summary of it now) and presses it.
+// NONMATCHING: the game puts the summary below the inlined item's locals on the stack (and swaps the item/oam
+// registers).
+#pragma inline_max_size(2000)
+void DinoUiSaveSlotConfirm::Unk02159590() {
+    DinoUiSaveSlotConfirmMenu *menu = mMenu;
+    menu->ClearItems();
+    DinoSaveSummary summary;
+    MI_CpuFill8(&summary, 0, sizeof(summary));
+    gDinoBackup->MakeSummary(&summary);
+    DinoUiSaveSlotSelectMenuItem *item = new DinoUiSaveSlotSelectMenuItem(menu->mOam, 0, summary, MPoint(0x80, 0x48));
+    item->DinoHelpItem::Disable();
+    menu->AddItem(item);
+    menu->FocusItem(item);
+    menu->DecideItem(item);
+}
+#pragma inline_max_size reset
+
 // The slot about to be saved over (or a fresh one, for a new save), shown alone.
 // (Its inlined item constructor is past mwcc's default inline size.)
 #pragma inline_max_size(2000)

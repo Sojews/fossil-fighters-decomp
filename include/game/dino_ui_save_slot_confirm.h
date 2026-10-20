@@ -9,7 +9,7 @@ public:
     DinoUiSaveSlotConfirm();
     virtual ~DinoUiSaveSlotConfirm();
     virtual void Idle();
-    // Not decompiled yet.
+    // Shows the game about to be saved in the slot and presses it.
     void Unk02159590();
 
     DinoUiSaveSlotConfirmMenu *mMenu;   // 0x74
