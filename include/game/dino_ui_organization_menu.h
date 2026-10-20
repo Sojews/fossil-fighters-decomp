@@ -81,6 +81,7 @@ public:
     void PlaceMember(int member);
     void RemoveListLinks();
     void UpdateDetails(u8 index);
+    void SetHelpMode(int mode);
     void TabLeft();
     void TabRight();
     BOOL InTeam(u32 id);
@@ -157,7 +158,7 @@ public:
     u8 unk23F;
     std::vector<MMotionFile> mMotions;  // 0x240
     MTaskSet *mUnk24C;                  // 0x24C: the details' help areas
-    u32 mUnk250;                        // 0x250
+    MTaskSet *mUnk250;                  // 0x250: the buttons' help areas
     u8 mUnk254;                         // 0x254
     u8 mUnk255;                         // 0x255
     u8 unk256[2];

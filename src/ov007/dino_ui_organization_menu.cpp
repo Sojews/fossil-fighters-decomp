@@ -183,7 +183,6 @@ template MTask *MCreateCallTask(DinoUiOrganizationMenu *obj, void (DinoUiOrganiz
 template MTask *MCreateBgCallTask(DinoUiOrganizationMenu *obj, void (DinoUiOrganizationMenu::*func)(), int thread);
 template MTask *MCreateCallTask(DinoUiOrganizationMenu *obj, void (DinoUiOrganizationMenu::*func)(u8), u8 a1);
 
-extern "C" void func_ov007_0217fb94(DinoUiOrganizationMenu *menu, int a1);
 // Where the team's medals go.
 extern MPoint data_ov007_0218ef0c[5];
 
@@ -480,7 +479,7 @@ void DinoUiOrganizationMenu::OnDecide(MMenuItem *item) {
 
 void DinoUiOrganizationMenu::SwapMember(int member) {
     mUnk23C = FALSE;
-    func_ov007_0217fb94(this, 0);
+    SetHelpMode(0);
     mMessage->mUnk98 = 0xF;
     mName->Hide();
     MParallelTaskSet *moves = new MParallelTaskSet(TRUE);
@@ -709,7 +708,7 @@ extern const MPoint data_020b5818;
 void DinoUiOrganizationMenu::HandleResult() {
     if (mResult == 11) {
         mUnk23C = TRUE;
-        func_ov007_0217fb94(this, 1);
+        SetHelpMode(1);
         mMessage = new DinoCommonWindowMessage(data_020b5818, gDinoResource->GetText(data_0208aa54), 4, 0);
         mParallel.AddTail(mMessage);
         SelectMember(mSelected);
@@ -731,7 +730,7 @@ void DinoUiOrganizationMenu::PickSlot(int slot) {
     if (creature.parts[0].level != 0) {
         mSelected = slot + 5;
         mUnk23C = TRUE;
-        func_ov007_0217fb94(this, 1);
+        SetHelpMode(1);
         mMessage = new DinoCommonWindowMessage(data_020b5818, gDinoResource->GetText(data_0208aa54), 4, 0);
         mParallel.AddTail(mMessage);
         SelectMember(mSelected);
@@ -745,7 +744,7 @@ extern const u32 data_0208aa50;
 void DinoUiOrganizationMenu::HandleMemberResult() {
     if (mResult == 11) {
         mUnk23C = TRUE;
-        func_ov007_0217fb94(this, 2);
+        SetHelpMode(2);
         mMessage = new DinoCommonWindowMessage(data_020b5818, gDinoResource->GetText(data_0208aa50), 4, 0);
         mParallel.AddTail(mMessage);
         SelectMember(mSelected);
@@ -858,7 +857,7 @@ void DinoUiOrganizationMenu::ClearList() {
 }
 
 void DinoUiOrganizationMenu::RestoreFocus() {
-    func_ov007_0217fb94(this, 0);
+    SetHelpMode(0);
     EnableAll();
     if (mSelected < 5) {
         mListItems[mSelected]->PlayNormal();
@@ -976,7 +975,7 @@ void DinoUiOrganizationMenu::RemoveMember() {
 
 void DinoUiOrganizationMenu::SetMember(u8 index, u8 member) {
     mUnk23C = FALSE;
-    func_ov007_0217fb94(this, 0);
+    SetHelpMode(0);
     u8 old = mTeam.slots[member];
     int i = FindCreature(old);
     mTeam.slots[member] = mCreatures[index];
@@ -1177,6 +1176,58 @@ void DinoUiOrganizationMenu::UpdateDetails(u8 page) {
         AddEntry((u32)mPageHelps[3], 1, 0);
         AddEntry((u32)mPageHelps[4], 3, 0);
         AddEntry((u32)mPageHelps[4], 1, 0);
+        break;
+    }
+}
+
+extern const u32 data_0208a680, data_0208a684, data_0208a688, data_0208a68c, data_0208a690, data_0208a70c, data_0208a738, data_0208a73c, data_0208a740, data_0208a744;
+
+// Swaps the help areas for the mode: the list (0), a member menu (1) or a slot menu (2).
+void DinoUiOrganizationMenu::SetHelpMode(int mode) {
+    RemoveEntry((u32)(DinoHelpItem *)(DinoUiOrganizationMenuItem *)mButtons[3], 2);
+    RemoveEntry((u32)(DinoHelpItem *)(DinoUiOrganizationMenuItem *)mButtons[0], 1);
+    RemoveEntry((u32)(DinoHelpItem *)(DinoUiOrganizationMenuItem *)mUnkB8, 3);
+    mUnk250->Clear();
+    switch (mode) {
+    case 0:
+        mUnk250->AddTail(mHelps[1] = new DinoHelpDummyItem(GetDisplay(), MRect(0x1C, 0x16, 0x47, 0x3A), std::string(gDinoResource->GetText(data_0208a744))));
+        mUnk250->AddTail(new DinoHelpDummyItem(GetDisplay(), MRect(0x4A, 0x16, 0x9B, 0x3A), std::string(gDinoResource->GetText(data_0208a740))));
+        mUnk250->AddTail(mHelps[3] = new DinoHelpDummyItem(GetDisplay(), MRect(0xA4, 0x16, 0xEE, 0x3A), std::string(gDinoResource->GetText(data_0208a73c))));
+        mUnk250->AddTail(mHelps[4] = new DinoHelpDummyItem(GetDisplay(), MRect(0xF, 0x41, 0xEE, 0x9E), std::string(gDinoResource->GetText(data_0208a738))));
+        AddEntry((u32)mHelps[1], 2, (u32)mHelps[4]);
+        AddEntry((u32)mHelps[3], 4, (u32)mHelps[0]);
+        AddEntry((u32)mHelps[3], 2, (u32)mHelps[4]);
+        AddEntry((u32)mHelps[5], 3, (u32)mHelps[4]);
+        AddEntry((u32)(DinoHelpItem *)(DinoUiOrganizationMenuItem *)mButtons[0], 4, (u32)mHelps[4]);
+        AddEntry((u32)(DinoHelpItem *)(DinoUiOrganizationMenuItem *)mButtons[4], 4, (u32)mHelps[4]);
+        ((DinoUiOrganizationMenuItem *)mUnkB8)->mTextId = data_0208a70c;
+        mUnkBC->DinoHelpItem::Enable();
+        break;
+    case 1:
+        mUnk250->AddTail(mHelps[1] = new DinoHelpDummyItem(GetDisplay(), MRect(0x1B, 0x15, 0xEF, 0x3C), std::string(gDinoResource->GetText(data_0208a690))));
+        mUnk250->AddTail(mHelps[2] = new DinoHelpDummyItem(GetDisplay(), MRect(0xE, 0x42, 0xEE, 0x9F), std::string(gDinoResource->GetText(data_0208a68c))));
+        AddEntry((u32)mHelps[1], 4, (u32)mHelps[0]);
+        AddEntry((u32)mHelps[5], 3, (u32)mHelps[2]);
+        AddEntry((u32)(DinoHelpItem *)(DinoUiOrganizationMenuItem *)mButtons[0], 4, (u32)mHelps[2]);
+        AddEntry((u32)(DinoHelpItem *)(DinoUiOrganizationMenuItem *)mButtons[4], 4, (u32)mHelps[2]);
+        AddEntry((u32)(DinoHelpItem *)(DinoUiOrganizationMenuItem *)mButtons[3], 2, (u32)(DinoHelpItem *)(DinoUiOrganizationMenuItem *)mUnkB8);
+        AddEntry((u32)(DinoHelpItem *)(DinoUiOrganizationMenuItem *)mButtons[0], 1, (u32)(DinoHelpItem *)(DinoUiOrganizationMenuItem *)mUnkB8);
+        AddEntry((u32)(DinoHelpItem *)(DinoUiOrganizationMenuItem *)mUnkB8, 3, (u32)(DinoHelpItem *)(DinoUiOrganizationMenuItem *)mButtons[0]);
+        ((DinoUiOrganizationMenuItem *)mUnkB8)->mTextId = data_0208a688;
+        mUnkBC->DinoHelpItem::Disable();
+        break;
+    case 2:
+        mUnk250->AddTail(mHelps[1] = new DinoHelpDummyItem(GetDisplay(), MRect(0x1B, 0x15, 0xEF, 0x3C), std::string(gDinoResource->GetText(data_0208a684))));
+        mUnk250->AddTail(mHelps[2] = new DinoHelpDummyItem(GetDisplay(), MRect(0xE, 0x42, 0xEE, 0x9F), std::string(gDinoResource->GetText(data_0208a680))));
+        AddEntry((u32)mHelps[1], 4, (u32)mHelps[0]);
+        AddEntry((u32)mHelps[5], 3, (u32)mHelps[2]);
+        AddEntry((u32)(DinoHelpItem *)(DinoUiOrganizationMenuItem *)mButtons[0], 4, (u32)mHelps[2]);
+        AddEntry((u32)(DinoHelpItem *)(DinoUiOrganizationMenuItem *)mButtons[4], 4, (u32)mHelps[2]);
+        AddEntry((u32)(DinoHelpItem *)(DinoUiOrganizationMenuItem *)mButtons[3], 2, (u32)(DinoHelpItem *)(DinoUiOrganizationMenuItem *)mUnkB8);
+        AddEntry((u32)(DinoHelpItem *)(DinoUiOrganizationMenuItem *)mButtons[0], 1, (u32)(DinoHelpItem *)(DinoUiOrganizationMenuItem *)mUnkB8);
+        AddEntry((u32)(DinoHelpItem *)(DinoUiOrganizationMenuItem *)mUnkB8, 3, (u32)(DinoHelpItem *)(DinoUiOrganizationMenuItem *)mButtons[0]);
+        ((DinoUiOrganizationMenuItem *)mUnkB8)->mTextId = data_0208a688;
+        mUnkBC->DinoHelpItem::Disable();
         break;
     }
 }

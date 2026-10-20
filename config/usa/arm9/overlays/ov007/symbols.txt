@@ -189,7 +189,7 @@ _ZN22DinoUiOrganizationMenu15RemoveSlotLinksEv kind:function(thumb,size=0x78) ad
 _ZN22DinoUiOrganizationMenu9LinkSlotsEv kind:function(thumb,size=0x94) addr:0x0217e7d4
 _ZN22DinoUiOrganizationMenu13UpdateDetailsEh kind:function(thumb,size=0x132a) addr:0x0217e868
 .L_0217fb8c kind:label(thumb) addr:0x0217fb8c local
-func_ov007_0217fb94 kind:function(thumb,size=0x6c0) addr:0x0217fb94
+_ZN22DinoUiOrganizationMenu11SetHelpModeEi kind:function(thumb,size=0x6c0) addr:0x0217fb94
 _ZN22DinoUiOrganizationMenu14UpdateTeamTechEv kind:function(thumb,size=0x60) addr:0x02180254
 _ZN36DinoUiOrganizationMenuBlendResetTask7ExecuteEv kind:function(thumb,size=0x4c) addr:0x021802b4
 _ZN26DinoUiOrganizationMenuItem7GetRectEv kind:function(thumb,size=0xa) addr:0x02180300
