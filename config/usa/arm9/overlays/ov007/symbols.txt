@@ -575,7 +575,7 @@ data_ov007_0218cc40 kind:data(any) addr:0x0218cc40
 data_ov007_0218cc50 kind:data(any) addr:0x0218cc50
 data_ov007_0218cc58 kind:data(any) addr:0x0218cc58
 data_ov007_0218cc60 kind:data(any) addr:0x0218cc60
-data_ov007_0218cc98 kind:data(any) addr:0x0218cc98
+_ZTI12MBgCallTask0I10DinoBackupE_ov007 kind:data(any) addr:0x0218cc98
 data_ov007_0218ccb0 kind:data(any) addr:0x0218ccb0
 _ZTI19DinoUiATMTeamButton kind:data(any) addr:0x0218ccc8
 _ZTI15DinoUiATMCursor kind:data(any) addr:0x0218ccd4
@@ -597,11 +597,11 @@ _ZTS13DinoUiATMMenu kind:data(any) addr:0x0218cf98
 _ZTS15DinoUiATMCursor kind:data(any) addr:0x0218cfa8
 _ZTS19DinoUiATMTeamButton kind:data(any) addr:0x0218cfbc
 _ZTS19DinoUiATMBackButton kind:data(any) addr:0x0218cfd4
-data_ov007_0218cff4 kind:data(any) addr:0x0218cff4
+_ZTV12MBgCallTask0I10DinoBackupE_ov007 kind:data(any) addr:0x0218cfec
 data_ov007_0218d00c kind:data(any) addr:0x0218d00c
 _ZTV9DinoUiATM kind:data(any) addr:0x0218d01c
 data_ov007_0218d034 kind:data(any) addr:0x0218d034
-data_ov007_0218d050 kind:data(any) addr:0x0218d050
+_ZTS12MBgCallTask0I10DinoBackupE_ov007 kind:data(any) addr:0x0218d050
 data_ov007_0218d070 kind:data(any) addr:0x0218d070
 data_ov007_0218d090 kind:data(any) addr:0x0218d090
 data_ov007_0218d0b0 kind:data(any) addr:0x0218d0b0
@@ -776,7 +776,7 @@ data_ov007_0218ed2c kind:data(any) addr:0x0218ed2c
 data_ov007_0218ed34 kind:data(any) addr:0x0218ed34
 data_ov007_0218ed3c kind:data(any) addr:0x0218ed3c
 data_ov007_0218ed4c kind:data(any) addr:0x0218ed4c
-data_ov007_0218ed6c kind:data(any) addr:0x0218ed6c
+_ZTI10MCallTask0I22DinoUiOrganizationMenu12DinoHelpBaseE kind:data(any) addr:0x0218ed6c
 _ZTI36DinoUiOrganizationMenuBlendResetTask kind:data(any) addr:0x0218ed78
 _ZTI29DinoUiOrganizationPageRButton kind:data(any) addr:0x0218ed9c
 _ZTI29DinoUiOrganizationPageLButton kind:data(any) addr:0x0218edb4
@@ -784,7 +784,7 @@ _ZTI26DinoUiOrganizationOKButton kind:data(any) addr:0x0218edcc
 _ZTI28DinoUiOrganizationBackButton kind:data(any) addr:0x0218ede4
 data_ov007_0218edec kind:data(any) addr:0x0218edec
 data_ov007_0218ee08 kind:data(any) addr:0x0218ee08
-data_ov007_0218ee20 kind:data(any) addr:0x0218ee20
+_ZTI12MBgCallTask0I22DinoUiOrganizationMenuE kind:data(any) addr:0x0218ee20
 _ZTI32DinoUiOrganizationSlotCreateTask kind:data(any) addr:0x0218ee2c
 data_ov007_0218ee38 kind:data(any) addr:0x0218ee38
 data_ov007_0218ee50 kind:data(any) addr:0x0218ee50
@@ -812,10 +812,10 @@ data_ov007_0218f16c kind:data(any) addr:0x0218f16c
 _ZTV36DinoUiOrganizationMenuBlendResetTask kind:data(any) addr:0x0218f188
 _ZTS18DinoUiSortMenuItem_ov007 kind:data(any) addr:0x0218f19c
 data_ov007_0218f1bc kind:data(any) addr:0x0218f1bc
-data_ov007_0218f1d4 kind:data(any) addr:0x0218f1d4
+_ZTV12MBgCallTask0I22DinoUiOrganizationMenuE kind:data(any) addr:0x0218f1cc
 _ZTV32DinoUiOrganizationSlotCreateTask kind:data(any) addr:0x0218f1e4
 data_ov007_0218f204 kind:data(any) addr:0x0218f204
-data_ov007_0218f21c kind:data(any) addr:0x0218f21c
+_ZTV10MCallTask0I22DinoUiOrganizationMenu12DinoHelpBaseE kind:data(any) addr:0x0218f214
 data_ov007_0218f22c kind:data(any) addr:0x0218f22c
 _ZTS22DinoUiOrganizationMenu kind:data(any) addr:0x0218f248
 data_ov007_0218f264 kind:data(any) addr:0x0218f264
@@ -921,7 +921,7 @@ data_ov007_021902bc kind:data(any) addr:0x021902bc
 data_ov007_021902e8 kind:data(any) addr:0x021902e8
 data_ov007_02190314 kind:data(any) addr:0x02190314
 data_ov007_02190340 kind:data(any) addr:0x02190340
-data_ov007_0219036c kind:data(any) addr:0x0219036c
+_ZTS12MBgCallTask0I22DinoUiOrganizationMenuE kind:data(any) addr:0x0219036c
 data_ov007_02190398 kind:data(any) addr:0x02190398
 data_ov007_021903c4 kind:data(any) addr:0x021903c4
 data_ov007_021903f0 kind:data(any) addr:0x021903f0
@@ -969,7 +969,7 @@ data_ov007_02190b60 kind:data(any) addr:0x02190b60
 data_ov007_02190b90 kind:data(any) addr:0x02190b90
 data_ov007_02190bc0 kind:data(any) addr:0x02190bc0
 data_ov007_02190bf0 kind:data(any) addr:0x02190bf0
-data_ov007_02190c20 kind:data(any) addr:0x02190c20
+_ZTS10MCallTask0I22DinoUiOrganizationMenu12DinoHelpBaseE kind:data(any) addr:0x02190c20
 _ZTV22DinoUiOrganizationMenu kind:data(any) addr:0x02190c58
 data_ov007_02190c80 kind:data(any) addr:0x02190c80
 _ZTV29DinoUiOrganizationPageRButton kind:data(any) addr:0x02190ca8
@@ -1001,7 +1001,7 @@ data_ov007_02190fe4 kind:data(any) addr:0x02190fe4
 data_ov007_02191020 kind:data(any) addr:0x02191020
 _ZTI12KeyCheckTask kind:data(any) addr:0x02191054
 _ZTI12SetFocusTask kind:data(any) addr:0x0219106c
-data_ov007_02191078 kind:data(any) addr:0x02191078
+_ZTI12MBgCallTask0I15KasekiPictCacheE kind:data(any) addr:0x02191078
 _ZTI26DinoUiKeyboardHideMenuItem kind:data(any) addr:0x0219109c
 _ZTI16KeyboardMenuItem kind:data(any) addr:0x021910c0
 _ZTI15KasekiPictCache kind:data(any) addr:0x021910cc
@@ -1062,7 +1062,7 @@ _ZTV12SetFocusTask kind:data(any) addr:0x021914d8
 _ZTV12KeyCheckTask kind:data(any) addr:0x021914ec
 _ZTV14PageChangeTask kind:data(any) addr:0x02191500
 _ZTS18DinoUiKeyboardMenu kind:data(any) addr:0x02191514
-data_ov007_02191534 kind:data(any) addr:0x02191534
+_ZTV12MBgCallTask0I15KasekiPictCacheE kind:data(any) addr:0x0219152c
 _ZTV15KasekiPictCache kind:data(any) addr:0x02191544
 _ZTV14DinoUiKeyboard kind:data(any) addr:0x0219155c
 _ZTS22DinoUiKeyboardMenuItem kind:data(any) addr:0x02191574
@@ -1071,7 +1071,7 @@ _ZTS26DinoUiKeyboardHideMenuItem kind:data(any) addr:0x021915ac
 data_ov007_021915cc kind:data(any) addr:0x021915cc
 data_ov007_021915ec kind:data(any) addr:0x021915ec
 data_ov007_0219160c kind:data(any) addr:0x0219160c
-data_ov007_0219162c kind:data(any) addr:0x0219162c
+_ZTS12MBgCallTask0I15KasekiPictCacheE kind:data(any) addr:0x0219162c
 data_ov007_02191650 kind:data(any) addr:0x02191650
 data_ov007_02191674 kind:data(any) addr:0x02191674
 data_ov007_021916a0 kind:data(any) addr:0x021916a0
@@ -1153,7 +1153,7 @@ _ZTI28DinoUiReviveStatusLoopBattle kind:data(any) addr:0x02191f1c
 _ZTI30DinoUiReviveStatusLoopCleaning kind:data(any) addr:0x02191f28
 _ZTI22DinoUiReviveStatusLoop kind:data(any) addr:0x02191f34
 data_ov007_02191f4c kind:data(any) addr:0x02191f4c
-data_ov007_02191f58 kind:data(any) addr:0x02191f58
+_ZTI10MCallTask0I22DinoUiReviveStatusMenu12DinoHelpBaseE kind:data(any) addr:0x02191f58
 _ZTI28DinoUiReviveStatusBackButton kind:data(any) addr:0x02191f70
 data_ov007_02191f78 kind:data(any) addr:0x02191f78
 data_ov007_02191f9c kind:data(any) addr:0x02191f9c
@@ -1163,7 +1163,7 @@ _ZTV28DinoUiReviveStatusLoopBattle kind:data(any) addr:0x0219202c
 _ZTV30DinoUiReviveStatusLoopCleaning kind:data(any) addr:0x02192044
 _ZTV22DinoUiReviveStatusLoop kind:data(any) addr:0x0219205c
 data_ov007_0219207c kind:data(any) addr:0x0219207c
-data_ov007_02192094 kind:data(any) addr:0x02192094
+_ZTV10MCallTask0I22DinoUiReviveStatusMenu12DinoHelpBaseE kind:data(any) addr:0x0219208c
 _ZTS22DinoUiReviveStatusLoop kind:data(any) addr:0x021920a4
 _ZTS22DinoUiReviveStatusMenu kind:data(any) addr:0x021920c0
 data_ov007_021920dc kind:data(any) addr:0x021920dc
@@ -1172,7 +1172,7 @@ _ZTS28DinoUiReviveStatusLoopBattle kind:data(any) addr:0x02192118
 _ZTS28DinoUiReviveStatusBackButton kind:data(any) addr:0x02192138
 _ZTS30DinoUiReviveStatusLoopCleaning kind:data(any) addr:0x02192158
 data_ov007_0219217c kind:data(any) addr:0x0219217c
-data_ov007_021921a8 kind:data(any) addr:0x021921a8
+_ZTS10MCallTask0I22DinoUiReviveStatusMenu12DinoHelpBaseE kind:data(any) addr:0x021921a8
 _ZTV22DinoUiReviveStatusMenu kind:data(any) addr:0x021921e0
 data_ov007_02192204 kind:data(any) addr:0x02192204
 _ZTV28DinoUiReviveStatusBackButton kind:data(any) addr:0x0219222c

@@ -1,12 +1,14 @@
 #!/usr/bin/env python3
 """Names destructors and RTTI data from the game's RTTI: type-name string -> typeinfo -> vtable -> D1/D0 entries.
 
-Usage: python3 tools/rtti_names.py [--apply]
+Usage: python3 tools/rtti_names.py [--apply] [--modules main,ov001,...]
 Prints one line per class (module, vtable, base class, destructors) for the main program and each overlay. With
 --apply, renames the destructors in symbols.txt to their mangled names and names the type-name strings (_ZTS),
 typeinfos (_ZTI) and vtables (_ZTV). A vtable symbol starts at its offset-to-top word, 8 bytes before the address
 the code loads, as mwcc emits it. A vtable's first two entries are taken as the complete (D1) and deleting (D0)
 destructors only if the D0 candidate calls operator delete and the D1 candidate doesn't.
+--modules limits the renaming to the given modules' symbols.txt and relocs.txt; a vtable's entry symbol that
+relocations in another module still point at is kept.
 """
 import re
 import struct
@@ -19,6 +21,8 @@ EX = ROOT / "extract/usa"
 OP_DELETE = 0x02052e48
 # vtables (+8) of __cxxabiv1::__class_type_info, __si_class_type_info and __vmi_class_type_info
 TYPEINFO_VTABLES = {0x020c608c, 0x020c607c, 0x020c606c}
+# config directories whose files may be rewritten (all of them unless --modules is given)
+WRITABLE = None
 
 
 class Module:
@@ -62,27 +66,55 @@ def modules():
     return mods
 
 
+BUILTIN_TYPES = "vwbcahstijlmxyfde"
+
+
+def _source_name(s: str, i: int):
+    """Index after the <length><identifier> at s[i], or None."""
+    m = re.match(r"([1-9]\d*)", s[i:])
+    if not m:
+        return None
+    j = i + len(m.group(1))
+    n = int(m.group(1))
+    name = s[j:j + n]
+    if len(name) != n or len(name) < 3 or not re.fullmatch(r"[A-Za-z_]\w*", name):
+        return None
+    return j + n
+
+
+def _class_name(s: str, i: int):
+    """Index after a class name with optional template arguments (12MBgCallTask0I12DinoMainLoopE), or None."""
+    j = _source_name(s, i)
+    if j is None or j >= len(s) or s[j] != "I":
+        return j
+    j += 1
+    while j is not None and j < len(s) and s[j] != "E":
+        j = _type(s, j)
+    return j + 1 if j is not None and j < len(s) else None
+
+
+def _type(s: str, i: int):
+    """Index after one mangled type (a builtin, a pointer/const to a type, or a class name), or None."""
+    if s[i] in BUILTIN_TYPES:
+        return i + 1
+    if s[i] in "PK":
+        return _type(s, i + 1) if i + 1 < len(s) else None
+    return _class_name(s, i)
+
+
 def is_mangled_name(s: str) -> bool:
-    """Whether s is a whole mangled class name: 5MTask, St9type_info or N10__cxxabiv117__class_type_infoE."""
-    nested = s.startswith("N")
-    if nested:
+    """Whether s is a whole mangled class name: 5MTask, St9type_info, N10__cxxabiv117__class_type_infoE or a
+    template instance such as 12MBgCallTask0I12DinoMainLoopE."""
+    if s.startswith("N"):
         if not s.endswith("E"):
             return False
-        s = s[1:-1]
-    elif s.startswith("St"):
-        s = s[2:]
-    parts = 0
-    while s:
-        m = re.match(r"(\d+)", s)
-        if not m or m.group(1).startswith("0"):
-            return False
-        n = int(m.group(1))
-        name = s[len(m.group(1)):len(m.group(1)) + n]
-        if len(name) != n or len(name) < 3 or not re.fullmatch(r"[A-Za-z_]\w*", name):
-            return False
-        s = s[len(m.group(1)) + n:]
-        parts += 1
-    return parts == 1 or (nested and parts > 1)
+        i, parts = 1, 0
+        while i is not None and i < len(s) - 1:
+            i = _class_name(s, i)
+            parts += 1
+        return i == len(s) - 1 and parts > 1
+    i = 2 if s.startswith("St") else 0
+    return _class_name(s, i) == len(s)
 
 
 def find_typeinfos(mod):
@@ -175,6 +207,8 @@ def rewrite_vtable_relocs(mod, entries: set[int]) -> None:
     """Points relocations to a vtable's entries at the vtable symbol plus 8."""
     label = re.escape(mod.label)
     for path in CFG.rglob("relocs.txt"):
+        if WRITABLE is not None and path.parent not in WRITABLE:
+            continue
         text = path.read_text()
 
         def sub(m):
@@ -183,6 +217,14 @@ def rewrite_vtable_relocs(mod, entries: set[int]) -> None:
         new = re.sub(rf"to:(0x[0-9a-f]+) module:{label}", sub, text)
         if new != text:
             path.write_text(new)
+
+
+def referenced_from_readonly(mod, addr: int) -> bool:
+    """Whether a relocs.txt we may not rewrite points at addr in mod."""
+    if WRITABLE is None:
+        return False
+    pat = re.compile(rf"to:{addr:#010x} module:{re.escape(mod.label)}\b")
+    return any(pat.search(p.read_text()) for p in CFG.rglob("relocs.txt") if p.parent not in WRITABLE)
 
 
 def apply_data_names(mod, lines, data_names, seen):
@@ -197,7 +239,8 @@ def apply_data_names(mod, lines, data_names, seen):
     for addr, name in data_names.items():
         if name.startswith("_ZTV"):
             i = by_addr.get(addr + 8)
-            if i is not None and lines[i].split(" ", 1)[0].startswith("data_"):
+            if i is not None and lines[i].split(" ", 1)[0].startswith("data_") \
+                    and not referenced_from_readonly(mod, addr + 8):
                 drop.add(i)
     n = 0
     for addr, name in sorted(data_names.items()):
@@ -220,13 +263,19 @@ def apply_data_names(mod, lines, data_names, seen):
 
 
 def main() -> None:
+    global WRITABLE
     apply = "--apply" in sys.argv
     mods = modules()
+    if "--modules" in sys.argv:
+        want = sys.argv[sys.argv.index("--modules") + 1].split(",")
+        WRITABLE = {CFG if w == "main" else CFG / "overlays" / w for w in want}
     main_typeinfo = find_typeinfos(mods[0])
     names = {}
     for mod in mods:
         names[mod.label] = {l.split(" ", 1)[0] for l in (mod.cfg / "symbols.txt").read_text().splitlines()}
     for mod in mods:
+        if WRITABLE is not None and mod.cfg not in WRITABLE:
+            continue
         others = set().union(*(v for k, v in names.items() if k != mod.label))
         result = process(mod, main_typeinfo, apply, others)
         if result:
