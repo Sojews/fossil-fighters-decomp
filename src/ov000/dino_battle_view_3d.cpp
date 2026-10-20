@@ -574,12 +574,6 @@ extern "C" void func_ov000_02184cf0(DinoBattleView3DGroupFade *fade, int i) {
     fade->mTarget->mModels[i]->LoadByName(fade->mNames[i], TRUE, 0x0FFFFFFF);
 }
 
-extern "C" void func_ov000_02184d14(DinoBattleView3DAction *action) {
-    action->mCsv = new Dino3DLoadCsv(action->mUnk8C + action->mUnk88 * 10, action->mUnk78, action->mUnk98, (void *)5,
-                                     action->mUnk84);
-    action->mParallel.AddTail(action->mCsv);
-}
-
 extern "C" void func_ov000_02184d64(DinoBattleView3DDamage *damage, int i) {
     damage->mCsvs[i]->LoadByName(damage->mNames[i], TRUE, 0x0FFFFFFF);
     if (damage->mFiles[i] != NULL) {

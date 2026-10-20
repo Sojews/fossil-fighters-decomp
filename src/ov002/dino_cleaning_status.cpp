@@ -83,6 +83,3 @@ void DinoCleaningStatus::StatePaused() {
     GetSerial()->AddTail(mOam->CreateHideTransfer(), new MTimer(15), mOam->CreateShowTransfer(), new MTimer(15));
 }
 
-// (Empty; nothing in the game calls it.)
-extern "C" void func_ov002_0215b4bc() {
-}
