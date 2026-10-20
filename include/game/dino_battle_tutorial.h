@@ -42,9 +42,20 @@ public:
     MInputHub *mHub;                        // 0x78
 };
 
+class MConsole;
+class DinoCommonFont;
+
 class DinoBattleTutorialConsoleFilter : public MConsoleFilter {
 public:
     virtual ~DinoBattleTutorialConsoleFilter();
+    // Handles a '$' escape (W: quiet, s: sound, f: clear, wN: rate, nN: font size, cX: color); other characters
+    // play the typing sounds and are printed.
+    virtual BOOL Filter(MConsole *console, int c);
+
+    DinoCommonFont *mFont;  // 0x04
+    u32 unk08[2];
+    u8 mUnk10;              // 0x10: the high typing sound
+    u8 mUnk11;              // 0x11: the speed sound
 };
 
 struct DinoBattleTutorialData;

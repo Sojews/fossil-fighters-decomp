@@ -10,11 +10,93 @@
 #include "game/dino_battle_view_class.h"
 #include "types.h"
 #include "game/dino_static_init.h"
+#include "m/console.h"
+#include "game/dino_common_font.h"
+#include "m/fx32.h"
 
 DinoBattleViewTutorialWindow::~DinoBattleViewTutorialWindow() {
 }
 
 DinoBattleTutorialConsoleFilter::~DinoBattleTutorialConsoleFilter() {
+}
+
+// Reads a decimal number from the console (pushing back the character after it).
+static inline int DinoReadNumber(MConsole *console) {
+    int n = 0;
+    u32 c;
+    for (;;) {
+        c = console->PopChar();
+        if (c < '0' || c > '9') {
+            break;
+        }
+        n *= 10;
+        n += c - '0';
+    }
+    console->PushChar(c);
+    return n;
+}
+
+BOOL DinoBattleTutorialConsoleFilter::Filter(MConsole *console, int c) {
+    if (c != '$') {
+        if (console->GetSpeed() != MFx32(0)) {
+            if (mUnk11) {
+                DinoSoundPlaySe(0xAE, 0);
+            }
+        }
+        if (mUnk10) {
+            DinoSoundPlaySe(0xAA, 0);
+        } else {
+            DinoSoundPlaySe(0xAB, 0);
+        }
+        return FALSE;
+    }
+    if (console->IsEmpty()) {
+        return TRUE;
+    }
+    switch ((u32)console->PopChar()) {
+    case 'W':
+        mUnk10 = FALSE;
+        break;
+    case 's':
+        mUnk11 = TRUE;
+        break;
+    case 'f':
+        console->Clear();
+        break;
+    case 'w': {
+        int n = DinoReadNumber(console);
+        if (n == 0) {
+            n = 1;
+        }
+        MFx32 rate = MFx32(12) / MFx32(n);
+        console->SetRate(rate);
+        break;
+    }
+    case 'n':
+        if (mFont != NULL) {
+            int n = DinoReadNumber(console);
+            mFont->Select(n);
+        }
+        break;
+    case 'c':
+        if (!console->IsEmpty()) {
+            u32 color = console->PopChar();
+            if (color >= '0' && color <= '9') {
+                color -= '0';
+            } else if (color >= 'a' && color <= 'f') {
+                color -= 'a' - 10;
+            } else if (color >= 'A' && color <= 'F') {
+                color -= 'A' - 5;
+            } else {
+                color = 0;
+            }
+            if (mFont != NULL) {
+                mFont->SetShadowColor(color + 1);
+            }
+        }
+        break;
+    }
+    return TRUE;
 }
 
 KeyWaitTask::~KeyWaitTask() {
