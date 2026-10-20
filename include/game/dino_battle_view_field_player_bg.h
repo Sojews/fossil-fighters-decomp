@@ -10,6 +10,7 @@ class DinoBattleView;
 struct DinoBattleBgDef {
     u32 battle;     // 0x00: the battle it's for
     u32 path;       // 0x04: offset of the picture's path
+    u32 csvPath;    // 0x08: offset of the 3D background's csv path
 };
 struct DinoBattleBgDefs {
     u32 unk0;

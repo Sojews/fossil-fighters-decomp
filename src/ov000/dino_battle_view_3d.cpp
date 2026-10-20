@@ -23,6 +23,9 @@
 #include "game/camera_load_task.h"
 #include "game/dino_battle_view_kaseki_point_menu.h"
 #include "m/3d_scene.h"
+#include "game/dino_battle_view_field_player_bg.h"
+#include "game/dino_resource.h"
+#include "m/3d.h"
 
 DinoBattleView3D::~DinoBattleView3D() {
     CancelQueue();
@@ -479,6 +482,53 @@ MTask *DinoBattleView3D::CreateMove(int unkA, u32 shown, int slot) {
         return set;
     }
     return new MTimer(1);
+}
+
+// The TU's pooled pointer-to-member constants.
+extern "C" struct {
+    u8 unk00[0x3C];
+    void (DinoBattleView3D::*RunNextQueued_3C)();
+} data_ov000_02196368;
+extern "C" const char data_ov000_02196c78[];   // the field's csv
+extern "C" const char data_ov000_02196c94[];   // the default background's csv
+extern "C" const VecFx32 data_ov000_02190340;
+
+void DinoBattleView3D::StateLoad() {
+    mState = data_ov000_02196368.RunNextQueued_3C;
+    mField = new Dino3DLoadCsv(data_ov000_02196c78, (void *)mUnkB0, 0x7FFF, (void *)4, NULL, 0);
+    mUnkCC->AddTail(mField);
+    std::string path;
+    const DinoBattleBgDefs *defs = gDinoResource->GetBattleBgDefs();
+    for (u32 i = 0; i < defs->count; i++) {
+        u32 battle = defs->Get(i)->battle;
+        u32 current = mView->GetUnk134();
+        if (current == battle) {
+            const DinoBattleBgDef *def = defs->Get(i);
+            path = (const char *)def + def->csvPath;
+            break;
+        }
+    }
+    if (path.empty()) {
+        path = data_ov000_02196c94;
+    }
+    mBackground = new Dino3DLoadCsv(path.c_str(), (void *)mUnkB0, 0x7FFF, (void *)2, NULL, 0x3F);
+    mBackground->Push7(0x1000);
+    mBackground->PushVec3(&data_ov000_02190340);
+    mBackground->Push21(0);
+    mUnkCC->AddTail(mBackground);
+    for (int i = 0; i < 3; i++) {
+        mModels[i] = new Dino3DLoadCsv((void *)mUnkB0, 0x7FFF, (void *)1, NULL);
+        mUnkCC->AddTail(mModels[i]);
+    }
+    SetUnk180(0);
+    mUnkE4 = new DinoBattleView3DCamera((M3DScene *)mUnkB0, mField, (u32)mUnk1A4);
+    mParallel.AddTail(mUnkE4);
+    mUnkE8 = new DinoBattleView3DCamera((M3DScene *)mUnkB0, mField, (u32)mUnk1A4);
+    mParallel.AddTail(mUnkE8);
+    ((DinoBattleView3DCamera *)mUnkE8)->Stop();
+    mUnk174 = 6;
+    ((M3DScene *)mUnkB0)->mM3d->Show();
+    ((M3DScene *)mUnkB0)->mUnk10 = 1;
 }
 
 // Starts the next waiting task once the task set is idle.

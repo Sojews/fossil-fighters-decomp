@@ -1211,7 +1211,7 @@ _ZN16DinoBattleView3D9OnMessageEP8MMessage kind:function(thumb,size=0x1fa4) addr
 .L_0218799e kind:label(thumb) addr:0x0218799e local
 .L_02187a10 kind:label(thumb) addr:0x02187a10 local
 .L_02187a16 kind:label(thumb) addr:0x02187a16 local
-func_ov000_02187a44 kind:function(thumb,size=0x238) addr:0x02187a44
+_ZN16DinoBattleView3D9StateLoadEv kind:function(thumb,size=0x238) addr:0x02187a44
 _ZN16DinoBattleView3D13RunNextQueuedEv kind:function(thumb,size=0x8e) addr:0x02187c7c
 _ZN16DinoBattleView3D10CreateMoveEimi kind:function(thumb,size=0x15c) addr:0x02187d0c
 func_ov000_02187e68 kind:function(thumb,size=0x38) addr:0x02187e68

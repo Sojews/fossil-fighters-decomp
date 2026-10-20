@@ -34,6 +34,9 @@ public:
     void FlushQueue();
     void RunNextQueued();
     MTask *CreateMove(int unkA, u32 shown, int slot);
+    // Loads the scene's parts (the field, the battle's background, the creature models, the two cameras), then
+    // runs the queue.
+    void StateLoad();
 
     u32 unkA8;
     DinoBattleView *mView;                  // 0xAC
@@ -43,7 +46,8 @@ public:
     void (DinoBattleView3D::*mState)();     // 0xC4
     MTaskSet *mUnkCC;                       // 0xCC
     Dino3DLoadCsv *mModels[3];              // 0xD0
-    u8 unkDC[0xE4 - 0xDC];
+    Dino3DLoadCsv *mField;                  // 0xDC
+    Dino3DLoadCsv *mBackground;             // 0xE0
     MTask *mUnkE4;                          // 0xE4
     MTask *mUnkE8;                          // 0xE8: the camera
     u32 mCreatureIds[6];                    // 0xEC: each slot's three creatures
@@ -52,7 +56,9 @@ public:
     u32 mSlot;                              // 0x134
     u8 unk138[0x14A - 0x138];
     u8 mUnk14A[6];                          // 0x14A: by slot and creature
-    u8 unk150[0x178 - 0x150];
+    u8 unk150[0x174 - 0x150];
+    u32 mUnk174;                            // 0x174
+
     MRandom mRandom;                        // 0x178
     u8 mUnk180;                             // 0x180
     u8 unk181[0x184 - 0x181];
