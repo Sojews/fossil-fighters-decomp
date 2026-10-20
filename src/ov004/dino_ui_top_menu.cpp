@@ -857,7 +857,7 @@ void DinoUiSaveSlotConfirm::Idle() {
 
 // The save slots' graphics (a pool; [3] a saved slot's frame, [5] an empty one's; the longest play time shown is at
 // 0x48, which the game also reaches through its own symbol).
-extern "C" const char *const data_ov004_02172858[];
+extern "C" const char *data_ov004_02172858[];
 extern "C" const u64 data_ov004_021728a0;
 // The rank badges' kinds.
 struct DinoSaveSlotKinds {
@@ -986,10 +986,9 @@ inline DinoUiSaveSlotSelectMenuDeleteItem::DinoUiSaveSlotSelectMenuDeleteItem(MS
 }
 
 // The title, the two save slots, cancel and (if there's a save to delete) delete, linked up for the cursor.
-// NONMATCHING: as the confirm menu's OnStart (the slot item's label size pointer and play time limit), and the
-// hoisted badge kinds.
 #pragma inline_max_size(2000)
 void DinoUiSaveSlotSelectMenu::OnStart() {
+    DinoSaveSummary summary;
     gDinoBackup->SetTargetVolume(8);
     gDinoBackup->SetVolume(8);
     mDeleting = FALSE;
@@ -1020,7 +1019,6 @@ void DinoUiSaveSlotSelectMenu::OnStart() {
     mParallel.AddTail(motion);
     BOOL empty = TRUE;
     for (u32 i = 0; i < 2; i++) {
-        DinoSaveSummary summary;
         gDinoBackup->GetSummary(i, &summary);
         if (summary.valid) {
             empty = FALSE;
