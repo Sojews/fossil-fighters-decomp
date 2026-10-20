@@ -181,7 +181,7 @@ public:
     void SetUnk2D8Pos(MPoint pos) { mUnk2D8 = pos; }
     BOOL IsUnk20Two();
     // Not decompiled yet: what a character with no task does (unless the field's unk258 is set).
-    void Unk02162154();
+    BOOL Unk02162154();
     // The idle step of each task kind (DinoCharaTask::unk4).
     void IdleNoTask();
     void MoveTo(MFx32Point coord, u32 frames, u32 ease, u8 silent);
