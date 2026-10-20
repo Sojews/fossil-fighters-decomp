@@ -53,10 +53,10 @@ from:0x02155d7c kind:load to:0x0214d1b8 module:main
 from:0x02155d80 kind:load to:0x0214d1bc module:main
 from:0x02155d84 kind:load to:0x021607e0 module:overlay(3)
 from:0x02155d88 kind:load to:0x02160660 module:overlay(3)
-from:0x02155d8c kind:load to:0x02160668 module:overlay(3)
-from:0x02155d90 kind:load to:0x02160664 module:overlay(3)
-from:0x02155d94 kind:load to:0x02160674 module:overlay(3)
-from:0x02155d98 kind:load to:0x02160678 module:overlay(3)
+from:0x02155d8c kind:load to:0x02160660 add:0x8 module:overlay(3)
+from:0x02155d90 kind:load to:0x02160660 add:0x4 module:overlay(3)
+from:0x02155d94 kind:load to:0x02160660 add:0x14 module:overlay(3)
+from:0x02155d98 kind:load to:0x02160660 add:0x18 module:overlay(3)
 from:0x02155da0 kind:load to:0x02089b04 module:main
 from:0x02155da8 kind:load to:0x021606dc module:overlay(3)
 from:0x02155db6 kind:thumb_call to:0x02052e38 module:main

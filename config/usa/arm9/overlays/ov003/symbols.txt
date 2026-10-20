@@ -256,10 +256,6 @@ __sinit_dino_ui_revive_status.cpp kind:function(thumb,size=0x78) addr:0x021605c0
 .p__sinit_ov003_021605a0 kind:data(word) addr:0x02160640
 .p__sinit_ov003_021605c0 kind:data(word) addr:0x02160644
 data_ov003_02160660 kind:data(any) addr:0x02160660
-data_ov003_02160664 kind:data(any) addr:0x02160664
-data_ov003_02160668 kind:data(any) addr:0x02160668
-data_ov003_02160674 kind:data(any) addr:0x02160674
-data_ov003_02160678 kind:data(any) addr:0x02160678
 data_ov003_0216067c kind:data(any) addr:0x0216067c
 data_ov003_02160694 kind:data(any) addr:0x02160694
 data_ov003_0216069c kind:data(any) addr:0x0216069c
