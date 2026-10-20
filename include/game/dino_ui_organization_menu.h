@@ -9,6 +9,7 @@
 #include "m/input.h"
 #include "m/motion.h"
 #include "m/archive.h"
+#include "m/resource.h"
 #include "game/help.h"
 
 class DinoUiFieldMenuFraction;
@@ -155,16 +156,17 @@ public:
     u8 mUnk23E;                         // 0x23E
     u8 unk23F;
     std::vector<MMotionFile> mMotions;  // 0x240
-    u32 mUnk24C[2];                     // 0x24C
+    MTaskSet *mUnk24C;                  // 0x24C: the details' help areas
+    u32 mUnk250;                        // 0x250
     u8 mUnk254;                         // 0x254
     u8 mUnk255;                         // 0x255
     u8 unk256[2];
     DinoUiPartsTeamTech *mTeamTech;     // 0x258
-    struct {
-        MArchivePtr archive;
-        MArchiveFile file;
-    } mArchive;                         // 0x25C
-    u8 unk26C[0x2B0 - 0x26C];
+    MResource<DinoKasekiDefs> mKasekiDefs;  // 0x25C
+    DinoHelpDummyItem *mHelp26C;        // 0x26C: help areas on the top screen
+    DinoHelpDummyItem *mHelp270;        // 0x270
+    DinoHelpDummyItem *mPageHelps[9];   // 0x274: the details page's help areas
+    DinoHelpDummyItem *mHelps[6];       // 0x298
     u8 mListLinked;                     // 0x2B0
     u8 mSlotsLinked;                    // 0x2B1
 };

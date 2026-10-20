@@ -1046,6 +1046,141 @@ void DinoUiOrganizationMenu::LinkSlots() {
     mSlotsLinked = TRUE;
 }
 
+extern const u32 data_0208a6a4, data_0208a6a8, data_0208a6ac, data_0208a6b0, data_0208a6b4, data_0208a6b8, data_0208a6bc, data_0208a6c0, data_0208a6c4, data_0208a6c8, data_0208a6cc, data_0208a6d0, data_0208a6d4, data_0208a6d8, data_0208a6dc, data_0208a6e0, data_0208a6e4, data_0208a6e8, data_0208a6ec, data_0208a6f0, data_0208a6f4, data_0208a6f8, data_0208a6fc, data_0208a700, data_0208a704, data_0208a74c, data_0208a750, data_0208a754, data_0208a758, data_0208a75c, data_0208a760, data_0208a764, data_0208a768, data_0208a76c;
+extern MRect data_020b5950, data_020b5960, data_020b5970, data_020b5980, data_020b5990, data_020b59a0, data_020b59b0, data_020b59c0, data_020b59d0, data_020b59e0, data_020b59f0, data_020b5a00, data_020b5a10, data_020b5a20, data_020b5a30, data_020b5a40, data_020b5a50, data_020b5a60, data_020b5a70, data_020b5a80;
+
+// The help areas of the top screen's details panel, by what it shows (as DinoUiOrderSelectMenu::ShowPage).
+void DinoUiOrganizationMenu::UpdateDetails(u8 page) {
+    u8 mode;
+    if (page == 0) {
+        return;
+    }
+    if (page != 0xFF) {
+        mUnk255 = page;
+    }
+    mode = 0;
+    switch (mTab) {
+    case 0:
+        mode = 0;
+        break;
+    case 1:
+    case 2:
+        mode = 1;
+        break;
+    case 3:
+        if (mUnk255 != 0) {
+            int index = (mUnk255 - 1) * 4 + 1;
+            u8 uncleanable = mKasekiDefs.Get()->GetDef(index)->IsUncleanable();
+            u32 part = mKasekiDefs.Get()->GetDef(index)->GetUnk38();
+            if (uncleanable) {
+                mode = part + 2;
+            } else {
+                mode = 2;
+            }
+        } else {
+            mode = 2;
+        }
+        break;
+    }
+    if (mUnk254 == mode) {
+        return;
+    }
+    mUnk254 = mode;
+    mUnk24C->Clear();
+    switch (mUnk254) {
+    case 0:
+        mUnk24C->AddTail(mPageHelps[0] = new DinoHelpDummyItem(gLcd->GetTopDisplay(), data_020b5950, std::string(gDinoResource->GetText(data_0208a76c))));
+        mUnk24C->AddTail(mPageHelps[1] = new DinoHelpDummyItem(gLcd->GetTopDisplay(), data_020b5960, std::string(gDinoResource->GetText(data_0208a768))));
+        mUnk24C->AddTail(mPageHelps[2] = new DinoHelpDummyItem(gLcd->GetTopDisplay(), data_020b5970, std::string(gDinoResource->GetText(data_0208a764))));
+        mUnk24C->AddTail(new DinoHelpDummyItem(gLcd->GetTopDisplay(), data_020b5980, std::string(gDinoResource->GetText(data_0208a760))));
+        mUnk24C->AddTail(mPageHelps[4] = new DinoHelpDummyItem(gLcd->GetTopDisplay(), data_020b5990, std::string(gDinoResource->GetText(data_0208a75c))));
+        mUnk24C->AddTail(mPageHelps[5] = new DinoHelpDummyItem(gLcd->GetTopDisplay(), data_020b59a0, std::string(gDinoResource->GetText(data_0208a758))));
+        mUnk24C->AddTail(mPageHelps[6] = new DinoHelpDummyItem(gLcd->GetTopDisplay(), data_020b59b0, std::string(gDinoResource->GetText(data_0208a754))));
+        mUnk24C->AddTail(mPageHelps[7] = new DinoHelpDummyItem(gLcd->GetTopDisplay(), data_020b59c0, std::string(gDinoResource->GetText(data_0208a750))));
+        mUnk24C->AddTail(mPageHelps[8] = new DinoHelpDummyItem(gLcd->GetTopDisplay(), data_020b59d0, std::string(gDinoResource->GetText(data_0208a74c))));
+        AddEntry((u32)mHelp26C, 2, (u32)mPageHelps[0]);
+        AddEntry((u32)mHelp270, 2, (u32)mPageHelps[0]);
+        AddEntry((u32)mPageHelps[0], 2, (u32)mPageHelps[1]);
+        AddEntry((u32)mPageHelps[0], 3, 0);
+        AddEntry((u32)mPageHelps[0], 1, 0);
+        AddEntry((u32)mPageHelps[1], 4, (u32)mPageHelps[0]);
+        AddEntry((u32)mPageHelps[1], 1, (u32)mPageHelps[2]);
+        AddEntry((u32)mPageHelps[2], 1, 0);
+        AddEntry((u32)mPageHelps[4], 1, 0);
+        AddEntry((u32)mPageHelps[5], 2, (u32)mPageHelps[7]);
+        AddEntry((u32)mPageHelps[6], 1, 0);
+        AddEntry((u32)mPageHelps[7], 3, 0);
+        AddEntry((u32)mPageHelps[7], 1, 0);
+        AddEntry((u32)mPageHelps[8], 3, 0);
+        AddEntry((u32)mPageHelps[8], 1, 0);
+        break;
+    case 1:
+        mUnk24C->AddTail(new DinoHelpDummyItem(gLcd->GetTopDisplay(), data_020b59e0, std::string(gDinoResource->GetText(data_0208a704))));
+        mUnk24C->AddTail(mPageHelps[1] = new DinoHelpDummyItem(gLcd->GetTopDisplay(), data_020b59f0, std::string(gDinoResource->GetText(data_0208a700))));
+        AddEntry((u32)mPageHelps[1], 2, (u32)mHelps[0]);
+        break;
+    case 2:
+        mUnk24C->AddTail(mPageHelps[0] = new DinoHelpDummyItem(gLcd->GetTopDisplay(), data_020b5a00, std::string(gDinoResource->GetText(data_0208a6fc))));
+        mUnk24C->AddTail(new DinoHelpDummyItem(gLcd->GetTopDisplay(), data_020b5a10, std::string(gDinoResource->GetText(data_0208a6f8))));
+        mUnk24C->AddTail(new DinoHelpDummyItem(gLcd->GetTopDisplay(), data_020b5a20, std::string(gDinoResource->GetText(data_0208a6f4))));
+        mUnk24C->AddTail(mPageHelps[3] = new DinoHelpDummyItem(gLcd->GetTopDisplay(), data_020b5a30, std::string(gDinoResource->GetText(data_0208a6f0))));
+        mUnk24C->AddTail(mPageHelps[4] = new DinoHelpDummyItem(gLcd->GetTopDisplay(), data_020b5a40, std::string(gDinoResource->GetText(data_0208a6e0))));
+        mUnk24C->AddTail(mPageHelps[5] = new DinoHelpDummyItem(gLcd->GetTopDisplay(), data_020b5a50, std::string(gDinoResource->GetText(data_0208a6ec))));
+        mUnk24C->AddTail(mPageHelps[6] = new DinoHelpDummyItem(gLcd->GetTopDisplay(), data_020b5a60, std::string(gDinoResource->GetText(data_0208a6e8))));
+        mUnk24C->AddTail(mPageHelps[7] = new DinoHelpDummyItem(gLcd->GetTopDisplay(), data_020b5a70, std::string(gDinoResource->GetText(data_0208a6e4))));
+        AddEntry((u32)mPageHelps[0], 2, (u32)mPageHelps[4]);
+        AddEntry((u32)mPageHelps[3], 2, (u32)mPageHelps[4]);
+        AddEntry((u32)mPageHelps[4], 4, (u32)mPageHelps[0]);
+        AddEntry((u32)mPageHelps[4], 3, 0);
+        AddEntry((u32)mPageHelps[4], 1, 0);
+        AddEntry((u32)mPageHelps[5], 3, 0);
+        AddEntry((u32)mPageHelps[5], 1, 0);
+        AddEntry((u32)mPageHelps[6], 3, 0);
+        AddEntry((u32)mPageHelps[6], 1, 0);
+        AddEntry((u32)mPageHelps[7], 3, 0);
+        AddEntry((u32)mPageHelps[7], 1, 0);
+        break;
+    case 3:
+    case 4:
+    case 5:
+        switch (mUnk254) {
+        case 3:
+            mUnk24C->AddTail(mPageHelps[0] = new DinoHelpDummyItem(gLcd->GetTopDisplay(), data_020b5a80, std::string(gDinoResource->GetText(data_0208a6dc))));
+            mUnk24C->AddTail(mPageHelps[1] = new DinoHelpDummyItem(gLcd->GetTopDisplay(), data_020b5a40, std::string(gDinoResource->GetText(data_0208a6cc))));
+            mUnk24C->AddTail(mPageHelps[2] = new DinoHelpDummyItem(gLcd->GetTopDisplay(), data_020b5a50, std::string(gDinoResource->GetText(data_0208a6d8))));
+            mUnk24C->AddTail(mPageHelps[3] = new DinoHelpDummyItem(gLcd->GetTopDisplay(), data_020b5a60, std::string(gDinoResource->GetText(data_0208a6d4))));
+            mUnk24C->AddTail(mPageHelps[4] = new DinoHelpDummyItem(gLcd->GetTopDisplay(), data_020b5a70, std::string(gDinoResource->GetText(data_0208a6d0))));
+            break;
+        case 4:
+            mUnk24C->AddTail(mPageHelps[0] = new DinoHelpDummyItem(gLcd->GetTopDisplay(), data_020b5a80, std::string(gDinoResource->GetText(data_0208a6c8))));
+            mUnk24C->AddTail(mPageHelps[1] = new DinoHelpDummyItem(gLcd->GetTopDisplay(), data_020b5a40, std::string(gDinoResource->GetText(data_0208a6c4))));
+            mUnk24C->AddTail(mPageHelps[2] = new DinoHelpDummyItem(gLcd->GetTopDisplay(), data_020b5a50, std::string(gDinoResource->GetText(data_0208a6c0))));
+            mUnk24C->AddTail(mPageHelps[3] = new DinoHelpDummyItem(gLcd->GetTopDisplay(), data_020b5a60, std::string(gDinoResource->GetText(data_0208a6bc))));
+            mUnk24C->AddTail(mPageHelps[4] = new DinoHelpDummyItem(gLcd->GetTopDisplay(), data_020b5a70, std::string(gDinoResource->GetText(data_0208a6b8))));
+            break;
+        case 5:
+            mUnk24C->AddTail(mPageHelps[0] = new DinoHelpDummyItem(gLcd->GetTopDisplay(), data_020b5a80, std::string(gDinoResource->GetText(data_0208a6b4))));
+            mUnk24C->AddTail(mPageHelps[1] = new DinoHelpDummyItem(gLcd->GetTopDisplay(), data_020b5a40, std::string(gDinoResource->GetText(data_0208a6b0))));
+            mUnk24C->AddTail(mPageHelps[2] = new DinoHelpDummyItem(gLcd->GetTopDisplay(), data_020b5a50, std::string(gDinoResource->GetText(data_0208a6ac))));
+            mUnk24C->AddTail(mPageHelps[3] = new DinoHelpDummyItem(gLcd->GetTopDisplay(), data_020b5a60, std::string(gDinoResource->GetText(data_0208a6a8))));
+            mUnk24C->AddTail(mPageHelps[4] = new DinoHelpDummyItem(gLcd->GetTopDisplay(), data_020b5a70, std::string(gDinoResource->GetText(data_0208a6a4))));
+            break;
+        }
+        AddEntry((u32)mHelp26C, 2, (u32)mPageHelps[0]);
+        AddEntry((u32)mPageHelps[0], 3, 0);
+        AddEntry((u32)mPageHelps[0], 1, 0);
+        AddEntry((u32)mPageHelps[1], 3, 0);
+        AddEntry((u32)mPageHelps[1], 1, 0);
+        AddEntry((u32)mPageHelps[2], 3, 0);
+        AddEntry((u32)mPageHelps[2], 1, 0);
+        AddEntry((u32)mPageHelps[3], 3, 0);
+        AddEntry((u32)mPageHelps[3], 1, 0);
+        AddEntry((u32)mPageHelps[4], 3, 0);
+        AddEntry((u32)mPageHelps[4], 1, 0);
+        break;
+    }
+}
+
 void DinoUiOrganizationMenu::UpdateTeamTech() {
     if (mTeam.slots[0] != 0) {
         mUnkBC->mMotion->GetUnit()->SetMode(1);
