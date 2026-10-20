@@ -587,9 +587,6 @@ void DinoBattleViewUiAttackerMenu::OnBlur(MMenuItem *item) {
 
 #pragma auto_inline off
 
-void DinoBattleViewUiSelectAreaCommon::OnFocusCreature(DinoBattleViewCreature *creature, MMenuItem *item) {
-}
-
 BOOL DinoBattleViewUiChangeMenu::HasId(u32 id) {
     for (int i = 0; i < mCount; i++) {
         if (id == mIds[i]) {
@@ -743,6 +740,9 @@ void DinoBattleViewUiSelectAreaCommon::OnFocus(MMenuItem *item) {
         mUnkBC = creature->GetUnkB0();
     }
     OnFocusCreature(creature, item);
+}
+
+void DinoBattleViewUiSelectAreaCommon::OnFocusCreature(DinoBattleViewCreature *creature, MMenuItem *item) {
 }
 
 // NONMATCHING: the game keeps the side in a register and the slot on the stack (it inlines func_ov000_02177430).
