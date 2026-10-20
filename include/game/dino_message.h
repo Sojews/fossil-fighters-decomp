@@ -48,6 +48,7 @@ public:
 class DinoBattleControllerInitResult : public MMessage {
 public:
     DinoBattleControllerInitResult() : MMessage(0x10004) {}
+    DinoBattleControllerInitResult(u32 a) : MMessage(0x10004), mUnk0C(a) {}
     virtual u32 GetSize() { return 8; }
     virtual void Write(void *buf) {
         MI_CpuCopy8(&mId, buf, 4);
@@ -64,6 +65,13 @@ public:
 class DinoBattleModelPlayerBeginSignal : public MMessage {
 public:
     DinoBattleModelPlayerBeginSignal() : MMessage(0x10005) {}
+    DinoBattleModelPlayerBeginSignal(u32 side, u32 seed, const char *name, u32 unk2C, u32 unk30)
+        : MMessage(0x10005), mUnk0C(side), mUnk10(seed) {
+        MI_CpuCopy8(name, mUnk14, sizeof(mUnk14));
+        mUnk2C = unk2C;
+        mUnk30 = unk30;
+        mUnk34 = 0;
+    }
     virtual u32 GetSize() { return 48; }
     virtual void Write(void *buf) {
         MI_CpuCopy8(&mId, buf, 4);
@@ -96,6 +104,14 @@ public:
 class DinoBattleModelCreatureBeginSignal : public MMessage {
 public:
     DinoBattleModelCreatureBeginSignal() : MMessage(0x10006) {}
+    // (Takes a side's 0x18-byte creature entry, DinoBattleSide::Creature.)
+    template <class C>
+    DinoBattleModelCreatureBeginSignal(u32 side, u32 slot, C creature, u32 unk2C, u32 unk30)
+        : MMessage(0x10006), mUnk0C(side), mUnk10(slot) {
+        *(C *)mUnk14 = creature;
+        mUnk2C = unk2C;
+        mUnk30 = unk30;
+    }
     virtual u32 GetSize() { return 44; }
     virtual void Write(void *buf) {
         MI_CpuCopy8(&mId, buf, 4);
@@ -116,7 +132,7 @@ public:
 
     u32 mUnk0C;
     u32 mUnk10;
-    u8 mUnk14[0x18];
+    u32 mUnk14[6];      // 0x14: the side's creature entry
     u32 mUnk2C;
     u32 mUnk30;
 };

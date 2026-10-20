@@ -7,6 +7,10 @@ class DinoCommonLive;
 
 class SetLiveEventCheckTask : public MTask {
 public:
+    SetLiveEventCheckTask(DinoCommonLive *live, u8 check) {
+        mLive = live;
+        mCheck = check;
+    }
     virtual ~SetLiveEventCheckTask();
     virtual void Execute();
 

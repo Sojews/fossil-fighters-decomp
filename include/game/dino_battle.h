@@ -11,7 +11,8 @@ struct DinoBattleSide {
     std::string mName;  // 0x00
     struct Creature {
         u32 mId;        // 0x00: the low byte is the creature
-        u8 unk04[0x14];
+        u32 unk04[4];   // 0x04
+        u32 unk14;      // 0x14
     } mCreatures[3];    // 0x0C
     u32 unk54;          // 0x54: (the horider level, in wireless battles)
     u32 unk58;          // 0x58

@@ -10,8 +10,67 @@
 #include "game/dino_common_live.h"
 #include <map>
 #include "m/fx32.h"
+#include "nitro/os.h"
+#include "game/send_local_message_task_menu.h"
+#include "m/seed_generator.h"
+#include "game/dino_battle.h"
+#include "game/dino_battle_model.h"
 
 #pragma auto_inline off
+
+extern "C" const u32 data_ov000_0218fa08[3];    // the creature slots, by entry
+extern "C" void func_ov000_02158b50(DinoBattleCpuController *controller, u32 arg);
+
+// Starts the CPU side (its player and creatures), and clears the attack bar when its turn ends.
+// NONMATCHING (98.6%): the game stores each creature's unk7C value twice (one dead copy), shifting the creature
+// copy's stack slot; ours keeps one.
+void DinoBattleCpuController::OnMessage(MMessage *msg) {
+    switch (msg->mId) {
+    default:
+        OS_Terminate();
+        break;
+    case 0x10003: {
+        ((DinoBattleModel *)mUnkAC)
+            ->Post(new DinoBattleModelPlayerBeginSignal(mUnkA8, SeedGenerator::GenerateSeed(),
+                                                        mSides[mUnkA8].mName.c_str(), mSides[mUnkA8].unk54,
+                                                        mSides[mUnkA8].unk58));
+        for (int i = 0; i < 3; i++) {
+            if ((u8)mSides[mUnkA8].mCreatures[i].mId != 0) {
+                ((DinoBattleModel *)mUnkAC)
+                    ->Post(new DinoBattleModelCreatureBeginSignal(mUnkA8, data_ov000_0218fa08[i],
+                                                                  mSides[mUnkA8].mCreatures[i],
+                                                                  mSides[mUnkA8].mLevels[i],
+                                                                  (&mSides[mUnkA8].unk7C)[i]));
+            }
+        }
+        ((DinoBattleModel *)mUnkAC)->Post(new DinoBattleControllerInitResult(mUnkA8));
+        break;
+    }
+    case 0x1000D:
+        if (!((DinoBattleModel *)mUnkAC)->mUnkA8) {
+            GetSerial()->AddTail(mUnkB0->CreatePostTask(new DinoBattleViewClearAttackBarRequest(0)),
+                                 DinoCreatePostAndWaitTask(mUnkB0, new DinoBattleViewWaitActionInfoBarRequest(0)));
+            func_ov000_02158b50(this, 1);
+        }
+        break;
+    case 0x10026: {
+        DinoBattleModel *model = (DinoBattleModel *)mUnkAC;
+        ((DinoBattleModelField *)model->GetUnk10C())->mUnkD0 = 0;
+        mUnkB0->Post(new DinoBattleViewSetCreaturePriorityRequest(0));
+        GetSerial()->AddTail(
+            new SetLiveEventCheckTask(((DinoBattleModelField *)((DinoBattleModel *)mUnkAC)->GetUnk10C())->mLive, 0),
+            mUnkB0->CreatePostTask(new DinoBattleViewClearAttackBarRequest(0)),
+            DinoCreatePostAndWaitTask(mUnkB0, new DinoBattleViewWaitActionInfoBarRequest(0)));
+        func_ov000_02158b50(this, 0);
+        break;
+    }
+    case 0x10020:
+        GetSerial()->AddTail(mUnkB0->CreatePostTask(new DinoBattleViewClearAttackBarRequest(0)),
+                             DinoCreatePostAndWaitTask(mUnkB0, new DinoBattleViewWaitActionInfoBarRequest(0)));
+        func_ov000_02158b50(this, 0);
+        break;
+    }
+}
 
 BOOL DinoBattleController::Unk10() {
     return FALSE;
