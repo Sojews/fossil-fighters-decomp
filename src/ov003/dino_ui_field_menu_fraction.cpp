@@ -30,6 +30,10 @@
 #include "game/dino_ui_field_menu_fraction4.h"
 #include "game/dino_ui_field_menu_cursor.h"
 #include "m/display.h"
+#include "m/indicator.h"
+#include "m/smart_oam.h"
+#include "m/motion.h"
+#include "m/picture.h"
 #include "m/lcd.h"
 #include "m/font.h"
 #include "m/obj.h"
@@ -142,6 +146,8 @@ void DinoUiFieldMenuNumber::SetValue(int value) {
 }
 
 #pragma opt_common_subs off
+// (Not auto-inlined: the team info calls it.)
+#pragma auto_inline off
 DinoUiFieldMenuNumber3::DinoUiFieldMenuNumber3(MPoint pos) : MProcess(NULL) {
     MFontSet *font = new MFontSet(std::string("/font/btl_fontset_8x16"), 0, 0, 0);
     mText = new MIndicator(new MObjCanvas(gCurrentDisplay, gCurrentDisplay->mObj->mOam, MPoint(0x20, 0x10),
@@ -152,6 +158,7 @@ DinoUiFieldMenuNumber3::DinoUiFieldMenuNumber3(MPoint pos) : MProcess(NULL) {
     mText->SetPriority(2);
     mText->Show();
 }
+#pragma auto_inline reset
 #pragma opt_common_subs reset
 
 void DinoUiFieldMenuNumber3::SetValue(u32 value) {
@@ -218,6 +225,64 @@ static int GetKindLook(int kind) {
     return 1;
 }
 #pragma auto_inline reset
+
+extern const char data_ov003_02161cd8[];      // the team info's background
+extern const MPoint data_ov003_02160d7c;      // the team's name
+extern const MPoint data_ov003_02160fa0[2];   // rows 3 and 4's icons
+extern const MPoint data_ov003_02160fd8[10];  // the members' numbers
+extern const MPoint data_ov003_02160f28[];    // the team tech's positions
+
+// The team's name (two styles), the members' names and numbers, the icons of rows 3 and 4, and the team's tech.
+// NONMATCHING: the game keeps the second font in r7; we spill it (one more stack slot).
+DinoUiPartsTeamInfo::DinoUiPartsTeamInfo() : MProcess(NULL) {
+    gCurrentDisplay = gLcd->mMain;
+    MTextPicture *bg;
+    mParallel.AddTail(bg = new MTextPicture(std::string(data_ov003_02161cd8), TRUE, false));
+    bg->Show();
+    bg->SetPriority(3);
+    MFontSet *font = gDinoResource->CreateFont12(0, 10, 1);
+    mName = new MIndicator(new MObjCanvas(gCurrentDisplay, gCurrentDisplay->mObj->mOam, MPoint(128, 32), gDinoResource->GetUnkTable(), TRUE), font, 0);
+    mParallel.AddTail(mName);
+    mName->SetPosition(data_ov003_02160d7c);
+    mName->SetPriority(3);
+    mName->Hide();
+    MFontSet *font2 = gDinoResource->CreateFont12(0, 1, 0);
+    mOtherName = new MIndicator(new MObjCanvas(gCurrentDisplay, gCurrentDisplay->mObj->mOam, MPoint(128, 32), gDinoResource->GetUnkTable(), TRUE), font2, 0);
+    mParallel.AddTail(mOtherName);
+    mOtherName->SetPosition(data_ov003_02160d7c);
+    mOtherName->SetPriority(3);
+    mOtherName->Hide();
+    for (int i = 0; i < 5; i++) {
+        mTexts[i] = new MIndicator(new MObjCanvas(gCurrentDisplay, gCurrentDisplay->mObj->mOam, MPoint(128, 32), gDinoResource->GetUnkTable(), TRUE), font, 0);
+        mParallel.AddTail(mTexts[i]);
+        mTexts[i]->SetPosition(((const MPoint *)data_ov003_02160f60)[i]);
+        mTexts[i]->SetPriority(3);
+        mTexts[i]->Show();
+    }
+    for (int i = 0; i < 10; i++) {
+        mNumbers[i] = new DinoUiFieldMenuNumber3(data_ov003_02160fd8[i]);
+        mNumbers[i]->SetPriority(3);
+        mParallel.AddTail(mNumbers[i]);
+    }
+    mOam = new MSmartOam(10, 0, TRUE);
+    mMotionTasks = new MParallelTaskSet(FALSE);
+    mParallel.AddTail(mMotionTasks);
+    for (int i = 0; i < 3; i++) {
+        mMotions[i] = NULL;
+    }
+    for (int i = 3; i < 5; i++) {
+        mMotions[i] = new MMotion(std::string(data_ov003_02160c60[4]), mOam, 2, 1);
+        mMotions[i]->SetPosition(data_ov003_02160fa0[i - 3]);
+        mMotions[i]->SetPriority(3);
+        mMotions[i]->Hide();
+        mMotionTasks->AddTail(mMotions[i]);
+    }
+    mParallel.AddTail(mOam);
+    mTech = new DinoUiPartsTeamTech(data_ov003_02160f28);
+    mParallel.AddTail(mTech);
+    mTech->Hide();
+    gCurrentDisplay = gLcd->mSub;
+}
 
 DinoUiPartsTeamTech::DinoUiPartsTeamTech(const MPoint *positions) : MProcess(NULL) {
     for (int i = 0; i < 3; i++) {
