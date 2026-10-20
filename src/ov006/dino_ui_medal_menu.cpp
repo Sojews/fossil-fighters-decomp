@@ -251,11 +251,14 @@ static inline const int *GetExcavate7C(MResource<DinoExcavateDefs> &defs) {
     return (const int *)((const u8 *)d + d->offset7C);
 }
 
+// &mParallel through a non-member inline: the numbers loop hoists it into the frame's lowest slot, as the game does
+// (taken directly, it lands in the highest).
+static inline MTaskSet *MedalParallel(DinoUiMedalMenu *menu) {
+    return &menu->mParallel;
+}
 #pragma opt_common_subs off
 // The page fraction, page and back buttons, the pictures, the help areas, the sort buttons, the team's name, the
 // cursor, the slots' numbers and the name; then the sorted slots, focusing the creature the list was left on.
-// NONMATCHING: stack slots only: the game puts the numbers loop's &mParallel below the numbers' font and the help
-// areas (ours above them); declaration order doesn't move it.
 void DinoUiMedalMenu::OnStart() {
     u32 guard = data_ov006_02199184;
     if (!(guard & 1)) {
@@ -353,7 +356,7 @@ void DinoUiMedalMenu::OnStart() {
     mCursor->Hide();
     MFontSet *numbers = new MFontSet(std::string(data_ov006_02196140), 0, 0, 0);
     for (int i = 0; i < 15; i++) {
-        MTaskSet *tasks = &mParallel;
+        MTaskSet *tasks = MedalParallel(this);
         MObjCanvas *slotCanvas = new MObjCanvas(gCurrentDisplay, MPoint(0x20, 0x10), numbers->GetPalette(), TRUE);
         slotCanvas->GetOamUnit()->SetMode(1);
         mNumbers[i] = new MIndicator(slotCanvas, numbers, 0);
@@ -399,8 +402,10 @@ void DinoUiMedalMenu::OnStart() {
     mUnk220->AddTail(fadeSet);
     mSerial.AddTail(new MTimer(data_02089abc));
     mCursor->Hide();
-    MTask *show = mCursor->CreateShowTransfer();
-    MTask *play = mCursor->CreatePlayTask();
+    MTask *play;
+    MTask *show;
+    show = mCursor->CreateShowTransfer();
+    play = mCursor->CreatePlayTask();
     MParallelTaskSet *cursorSet = new MParallelTaskSet(TRUE);
     cursorSet->AddTail(play);
     cursorSet->AddTail(show);
