@@ -54,7 +54,7 @@ public:
     virtual MRect GetFrame();
 
     u32 mIndex;     // 0x88: below 4 a function key, 0xF0 and up not a key
-    u32 unk8C;
+    u32 mArg;       // 0x8C: a character key's place in its page; the cursor place (0xF0, 0xF1) or page (0xF2)
     MPoint mPos;    // 0x90
     u32 unk98;
     MRect mFrame;   // 0x9C

@@ -490,6 +490,111 @@ void DinoUiKeyboardMenu::OnFocus(MMenuItem *item) {
     }
 }
 
+// (Instantiated ahead of OnDecide, whose size() call would otherwise change how mwcc names it.)
+#pragma auto_inline off
+template std::wstring &std::wstring::operator=(const wchar_t *s);
+#pragma auto_inline reset
+
+extern "C" void func_ov007_02183eec(DinoUiKeyboardMenu *menu);
+
+// A key: types its character (capitalizing a name's first letter), a blank or a delete, finishes the name
+// (unless it's blank), turns the page or moves the cursor.
+void DinoUiKeyboardMenu::OnDecide(MMenuItem *item) {
+    KeyboardMenuItem *key = static_cast<KeyboardMenuItem *>(item);
+    if (key == NULL) {
+        return;
+    }
+    if (key->mIndex < 0xF0 && key->mIndex != 4 && key->mIndex != 5) {
+        mUnk154->Clear();
+        mFocusTasks->Clear();
+        if (key->mIndex < 4) {
+            mFocusFrame = new MMotion(std::string(data_ov007_02191120[key->mIndex]), mOam, 0, 1);
+            mFocusFrame->Play(2, 0);
+            mFocusFrame->SetPosition(MPoint(key->mPos.x, key->mPos.y));
+            mFocusFrame->SetPriority(2);
+            mFocusFrame->Show();
+            mFocusTasks->AddTail(mFocusFrame);
+            MTask *play = mFocusFrame->CreatePlayTransfer(1, 0);
+            MTask *wait = mFocusFrame->CreateWaitStopTask();
+            MTaskSet *tasks = mUnk154;
+            tasks->AddTail(wait);
+            tasks->AddTail(play);
+            mFocusPos = MPoint(key->mPos.x, key->mPos.y);
+        }
+    }
+    switch (key->mIndex) {
+    case 0:
+        if (mCursorPos < mMaxLength) {
+            mUnk19C[mCursorPos] = mUnk1B4[mPage][key->mArg];
+            if (mCursorPos == 0 && mMode == 0 && mUnk19C[mCursorPos] >= 'a' && mUnk19C[mCursorPos] <= 'z') {
+                mUnk19C[mCursorPos] = mUnk19C[mCursorPos] - 0x20;
+            }
+            mCursorPos++;
+            if (mMaxLength == mCursorPos) {
+                mSerial.AddTail(CreateSetFocusTask(mOkButton));
+            }
+            DinoSoundPlaySe(0x98, 0);
+        }
+        break;
+    case 1:
+        if (mCursorPos < mMaxLength) {
+            mUnk19C[mCursorPos] = mUnk1B4[2][29];
+            mUnk1A8[mCursorPos] = mUnk1B4[2][29];
+            mCursorPos++;
+            if (mMaxLength == mCursorPos) {
+                mSerial.AddTail(CreateSetFocusTask(mOkButton));
+            }
+            DinoSoundPlaySe(0x98, 0);
+        }
+        break;
+    case 2:
+        for (int i = mCursorPos; i < mMaxLength; i++) {
+            if (i > 0) {
+                mUnk19C[i - 1] = mUnk19C[i];
+                mUnk1A8[i - 1] = mUnk1A8[i];
+            }
+        }
+        mUnk19C[mMaxLength - 1] = mUnk1B4[2][29];
+        mUnk1A8[mMaxLength - 1] = mUnk1B4[2][29];
+        mCursorPos--;
+        DinoSoundPlaySe(0x9A, 0);
+        break;
+    case 3:
+        if (mUnk19C.size() != 0) {
+            BOOL blank = TRUE;
+            for (int i = 0; i < mMaxLength; i++) {
+                if (mUnk19C[i] != mUnk1B4[2][29]) {
+                    blank = FALSE;
+                }
+            }
+            if (!blank) {
+                DinoSoundPlaySe(0x99, 0);
+                func_ov007_02183eec(this);
+            } else {
+                DinoSoundPlaySe(0x90, 0);
+            }
+        }
+        break;
+    case 4:
+        DinoSoundPlaySe(0x93, 0);
+        mSerial.AddTail(CreatePageChangeTask(mPage - 1));
+        break;
+    case 5:
+        DinoSoundPlaySe(0x93, 0);
+        mSerial.AddTail(CreatePageChangeTask(mPage + 1));
+        break;
+    case 0xF0:
+    case 0xF1:
+        mCursorPos = key->mArg;
+        break;
+    case 0xF2:
+        DinoSoundPlaySe(0x93, 0);
+        mSerial.AddTail(CreatePageChangeTask(key->mArg));
+        break;
+    }
+    RefreshName();
+}
+
 // DinoUiKeyboardMenu::OnStart (not decompiled yet) starts a background load.
 template MTask *MCreateBgCallTask(DinoUiKeyboardMenu *obj, void (DinoUiKeyboardMenu::*func)(), int thread);
 
@@ -653,7 +758,6 @@ DinoUiSenryuMenu::DinoUiSenryuMenu() : MMenu(NULL, 0), mCursor(NULL), mPage(99),
 // Vector members the game emits in this file (made explicitly until the code that uses them is decompiled).
 template void std::__vec_deleter<MPictureFile, std::allocator<MPictureFile> >::sub_push_back(const MPictureFile &x, Metrowerks::int2type<false>);
 template std::wstring std::wstring::substr(std::wstring::size_type pos, std::wstring::size_type n) const;
-template std::wstring &std::wstring::operator=(const wchar_t *s);
 
 extern const int data_02089ac8, data_02089acc, data_02089ad0;
 
