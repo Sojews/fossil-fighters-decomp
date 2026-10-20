@@ -48,13 +48,14 @@ public:
     virtual void OnFocusChanged(BOOL focused);
     virtual void OnDecide();
 
-    u32 mUnkA0;
+    MMotion *mMotionA0;     // 0xA0: the "speak" prompt
     MMotion *mMotionA4;     // 0xA4
     MMotion *mMotionA8;     // 0xA8
     MMotion *mMeter;        // 0xAC
     MTaskSet *mTasks;       // 0xB0
-    u32 mUnkB4[2];          // 0xB4
-    u8 mLevels[0x40];       // 0xBC
+    MTaskSet *mMessages;    // 0xB4: the "wait" message while the mic starts
+    u32 mCount;             // 0xB8: samples taken
+    u8 mLevels[0x40];       // 0xBC: the last samples' strengths
 };
 
 class DinoUiOptionBackButton : public DinoUiOptionMenuItem {

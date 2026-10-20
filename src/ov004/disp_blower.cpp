@@ -1,5 +1,5 @@
 // DispBlower, OptionKeyCheckTask.
-// Only the destructors are decompiled so far.
+// Mostly the destructors so far.
 
 // Derived destructors have their bases' destructor bodies inlined; auto-inlining the ones defined above does that.
 #pragma auto_inline on
@@ -15,10 +15,67 @@
 #include "game/help.h"
 #include "m/bg_new_task.h"
 #include "m/call_task.h"
+#include "game/dino_common_window_message_box.h"
+#include "game/dino_resource.h"
+#include "m/motion.h"
 
 extern const char *data_ov004_0217520c[]; // motion file paths
 
 DispBlower::~DispBlower() {
+}
+
+extern "C" const u32 data_0208abb8; // "please wait"
+
+// NONMATCHING: the wait message's position temporary sits lower on the stack in the game.
+void DispBlower::Execute() {
+    MicTestButton *button = mButton;
+    button->mLevels[button->mCount++ & 0x3F] = button->mOwner->GetMicStrength();
+    if (button->IsFocused()) {
+        if (button->mOwner->IsWaiting()) {
+            if (button->mMessages->IsEmpty()) {
+                for (int i = 0; i < 0x40; i++) {
+                    button->mLevels[i] = 0;
+                }
+                button->mTasks->Clear();
+                button->mMeter->Play(1, 1);
+                button->mMeter->Hide();
+                button->mMessages->AddTail(new DinoCommonWindowMessageWait1(
+                    std::string(gDinoResource->GetText(data_0208abb8)), MPoint(0x80, 0x60), 4, 0));
+            }
+            button->mMotionA0->Hide();
+        } else {
+            button->mMessages->Clear();
+            button->mMotionA0->Play(1, 0);
+            button->mMotionA0->Show();
+        }
+    } else {
+        button->mMessages->Clear();
+        button->mMotionA0->Hide();
+    }
+    if (button->mTasks->IsEmpty() && button->mMessages->IsEmpty()) {
+        if (button->IsFocused()) {
+            u8 level = 0;
+            for (int i = 0; i < 0x40; i++) {
+                if (button->mLevels[i] > level) {
+                    level = button->mLevels[i];
+                }
+            }
+            if (level) {
+                button->mMeter->Play(level, 0);
+                button->mMeter->Show();
+                if (level == 4) {
+                    button->mMotionA8->Play(5, 0);
+                    button->mTasks->AddTail(new MTimer(0x5A));
+                } else {
+                    button->mMotionA8->Play(4, 0);
+                }
+            } else {
+                button->mMeter->Hide();
+            }
+        } else {
+            button->mMeter->Hide();
+        }
+    }
 }
 
 OptionKeyCheckTask::~OptionKeyCheckTask() {
