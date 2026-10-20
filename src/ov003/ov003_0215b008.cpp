@@ -1,7 +1,12 @@
 // Helpers between the field menu fraction and the revive status: team checks and text tags.
 // Only some functions are decompiled so far.
 
+#pragma ipa file
+
 #include <string>
+#include "m/motion.h"
+#include "m/file.h"
+#include "nitro/os.h"
 #include "game/dino_team.h"
 #include "game/dino_resource.h"
 #include "m/resource.h"
@@ -193,6 +198,55 @@ void DinoLinkGrid(MMenu *menu, std::vector<MMenuItem *> *items, MMenuItem *below
             menu->AddLink((*items)[i], 1, (*items)[i / 4 * 4]);
         } else {
             menu->AddLink((*items)[i], 1, (*items)[i + 1]);
+        }
+    }
+}
+
+// What the revive screen's motion preload works on (its owner isn't known yet).
+struct DinoReviveMotionLoad {
+    u8 unk00[0x74];
+    std::vector<MMotionFile> mFiles;    // 0x74
+    u8 mCancel;                         // 0x80: stop between fossils
+};
+
+// The revive screen's pooled statics (see dino_ui_revive_status.cpp).
+extern "C" struct {
+    u8 unk00[0x08];
+    const char *path08;     // 0x08: "/motion/ui_revive/attribute_blue.bin"
+    const char *path0C;     // 0x0C
+    u8 unk10[0x14 - 0x10];
+    const char *path14;     // 0x14
+    const char *path18;     // 0x18
+    const char *path1C;     // 0x1C: "/motion/ui_revive/bone_effect.bin"
+    const char *path20;     // 0x20
+    const char *path24;     // 0x24
+    u8 unk28[0x2C - 0x28];
+    const char *path2C;     // 0x2C
+} data_ov003_02161d20;
+
+// Loads the revive screen's motions (on the background thread), then each cleanable fossil's that exists.
+extern "C" void func_ov003_0215b540(DinoReviveMotionLoad *load) {
+    load->mFiles.push_back(MMotionFile(std::string(data_ov003_02161d20.path1C), 7));
+    load->mFiles.push_back(MMotionFile(std::string(data_ov003_02161d20.path08), 7));
+    load->mFiles.push_back(MMotionFile(std::string(data_ov003_02161d20.path18), 7));
+    load->mFiles.push_back(MMotionFile(std::string(data_ov003_02161d20.path0C), 7));
+    load->mFiles.push_back(MMotionFile(std::string(data_ov003_02161d20.path24), 7));
+    load->mFiles.push_back(MMotionFile(std::string(data_ov003_02161d20.path2C), 7));
+    load->mFiles.push_back(MMotionFile(std::string(data_ov003_02161d20.path14), 7));
+    load->mFiles.push_back(MMotionFile(std::string(data_ov003_02161d20.path20), 7));
+    MResource<DinoKasekiDefs> defs = gDinoResource->LoadKasekiDefs();
+    for (u32 i = 1; i < defs.Get()->count; i++) {
+        if (load->mCancel) {
+            return;
+        }
+        const DinoKasekiDef *def = defs.Get()->GetDef(i);
+        u32 motion = *(const u32 *)((const u8 *)def + 0x08);
+        if (motion != 0 && def->unk24 == 0) {
+            char path[256];
+            OS_SPrintf(path, "/motion/ui_revive/kaseki_%03d_01a.bin", motion);
+            if (MFileExists(std::string(path))) {
+                load->mFiles.push_back(MMotionFile(std::string(path), 7));
+            }
         }
     }
 }
