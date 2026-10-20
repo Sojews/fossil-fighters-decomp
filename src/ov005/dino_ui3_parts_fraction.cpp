@@ -218,9 +218,10 @@ DinoUi3PartsKasekiButton::DinoUi3PartsKasekiButton(MSmartOam *oam, MPoint pos, D
     SetMode(2);
 }
 
+static inline MTaskSet *KasekiButtonParallel(DinoUi3PartsKasekiButton *button) {
+    return &button->mParallel;
+}
 // The fossil's motion, its focus highlight and mark, and its badge or value.
-// NONMATCHING: in the digit loop the game spills &mParallel below the string temp's flag (slots 0xC/0x10 swapped);
-// declaration order, ipa and the opt pragmas don't move it.
 void DinoUi3PartsKasekiButton::Setup(MSmartOam *oam, DinoUiKasekiIcon icon) {
     mMotion = new MMotion(std::string(data_ov005_0216574c[icon.unk00 % 30]), oam, 2, 1);
     mMotion->Play(icon.unk01 + 1, 0);
@@ -256,7 +257,7 @@ void DinoUi3PartsKasekiButton::Setup(MSmartOam *oam, DinoUiKasekiIcon icon) {
         mParallel.AddTail(mBadge);
     } else if (icon.kind == 1 || icon.kind == 2 || icon.kind == 5) {
         for (int i = 0; i < 4; i++) {
-            MTaskSet *tasks = &mParallel;
+            MTaskSet *tasks = KasekiButtonParallel(this);
             mDigits[i] = new MMotion(std::string(data_ov005_0216561c.digitPath), oam, 0, 1);
             mDigits[i]->SetPosition(MPoint(mPos.x + (i * 8 - 14), mPos.y + 16));
             mDigits[i]->SetPriority(2);

@@ -28,9 +28,10 @@ public:
 
     MPoint mPos;        // 0x94: the center
     MMotion *mMotion;   // 0x9C
-    MView *mView;       // 0xA0: the focus highlight
-    MView *mMark;       // 0xA4
-    u8 unkA8[20];
+    MMotion *mView;     // 0xA0: the focus highlight
+    MMotion *mMark;     // 0xA4
+    MMotion *mDigits[4]; // 0xA8: the value's three digits, and its unit
+    MMotion *mBadge;    // 0xB8
     u32 mTextId;        // 0xBC
 };
 
