@@ -338,7 +338,7 @@ static void SingleWaveDisposeCallback(void *mem, u32 size, u32 data1, u32 data2)
 
 static BOOL LoadSingleWave(SNDWaveArc *waveArc, u32 index, u32 fileId, NNSSndHeapHandle heap) {
     u32 waveCount;
-    const u32 *offsetTable;
+    const u32 *entry;
     u32 offset;
     u32 size;
     void *mem;
@@ -346,9 +346,11 @@ static BOOL LoadSingleWave(SNDWaveArc *waveArc, u32 index, u32 fileId, NNSSndHea
         return TRUE;
     }
     waveCount = SND_GetWaveDataCount(waveArc);
-    offsetTable = &waveArc->waveOffset[waveArc->waveCount];
-    offset = offsetTable[index];
-    size = (index < waveCount - 1 ? offsetTable[index + 1] : waveArc->fileHeader.fileSize) - offset;
+    // entry[15] is waveOffset[waveCount + index] (the offset table follows the wave count's slots); the game
+    // addresses it from the start of the archive.
+    entry = (const u32 *)((u8 *)waveArc + ((waveArc->waveCount + index) << 2));
+    offset = entry[15];
+    size = (index < waveCount - 1 ? entry[16] : waveArc->fileHeader.fileSize) - offset;
     if (heap == NULL) {
         return FALSE;
     }

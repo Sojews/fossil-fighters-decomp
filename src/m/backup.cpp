@@ -200,18 +200,22 @@ void MBackupStorage::AddFile(u32 size, u32 copies) {
     mFiles.push_back(file);
 }
 
+// The game reads the region count through a volatile access (twice), and calls GetPageSize three times.
 u32 MBackupStorage::AllocRegion(u32 size) {
+    Region region;
     u32 offset;
+    u32 index;
     if (mRegions.size() == 0) {
         offset = 0;
     } else {
-        Region &last = mRegions[mRegions.size() - 1];
-        offset = mDevice->GetPageSize() * ((last.offset + last.size + mDevice->GetPageSize() - 1) / mDevice->GetPageSize());
+        Region &last = mRegions[*(volatile u32 *)&mRegions.size_ - 1];
+        u32 pageSize = mDevice->GetPageSize();
+        u32 pageSize2 = mDevice->GetPageSize();
+        offset = pageSize * ((pageSize2 + (last.offset + last.size) - 1) / mDevice->GetPageSize());
     }
-    Region region;
-    region.size = size;
     region.offset = offset;
-    u32 index = mRegions.size();
+    region.size = size;
+    index = *(volatile u32 *)&mRegions.size_;
     mRegions.push_back(region);
     return index;
 }
