@@ -982,15 +982,15 @@ from:0x02159a84 kind:thumb_call to:0x02052e38 module:main
 from:0x02159a94 kind:load to:0x02166ac8 module:overlay(5)
 from:0x02159a98 kind:load to:0x0208a60c module:main
 from:0x02159a9c kind:load to:0x02166dc8 add:0x8 module:overlay(5)
-from:0x02159aa0 kind:load to:0x02166e08 module:overlay(5)
+from:0x02159aa0 kind:load to:0x02166dc8 add:0x40 module:overlay(5)
 from:0x02159aa4 kind:load to:0x0208aacc module:main
 from:0x02159aa8 kind:load to:0x02166f18 add:0x8 module:overlay(5)
-from:0x02159aac kind:load to:0x02166f58 module:overlay(5)
+from:0x02159aac kind:load to:0x02166f18 add:0x40 module:overlay(5)
 from:0x02159ab0 kind:load to:0x02166ec4 add:0x8 module:overlay(5)
-from:0x02159ab4 kind:load to:0x02166f04 module:overlay(5)
+from:0x02159ab4 kind:load to:0x02166ec4 add:0x40 module:overlay(5)
 from:0x02159ab8 kind:load to:0x0208a61c module:main
 from:0x02159abc kind:load to:0x02166e70 add:0x8 module:overlay(5)
-from:0x02159ac0 kind:load to:0x02166eb0 module:overlay(5)
+from:0x02159ac0 kind:load to:0x02166e70 add:0x40 module:overlay(5)
 from:0x02159ac4 kind:load to:0x020cc00c module:main
 from:0x02159ac8 kind:load to:0x020b5b1c add:0x8 module:main
 from:0x02159acc kind:load to:0x020c1a14 add:0x8 module:main

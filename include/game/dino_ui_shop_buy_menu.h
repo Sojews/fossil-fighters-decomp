@@ -11,8 +11,10 @@
 #include "game/dino_ui_shop_buy_menu_item.h"
 
 class MSmartOam;
+class MTextPicture;
 class DinoUi3PartsMoney;
 class DinoUiShopBuyBuyButton;
+class DinoUiShopBuyBackButton;
 class DinoUi3PartsCursor;
 class DinoUi3PartsRockName;
 
@@ -30,7 +32,7 @@ public:
     BOOL Buy();
     void FinishBuy();
     void LoadFossils();
-    static void Restock();
+    void Restock();
     const DinoKasekiDef *GetKasekiDef(u32 id) {
         const DinoKasekiDefs *defs = mKasekiDefs.Get();
         return (const DinoKasekiDef *)((const u8 *)defs + ((const u32 *)((const u8 *)defs + defs->tableOffset))[id]);
@@ -46,11 +48,12 @@ public:
     MSmartOam *GetOam() { return mOam; }
 
     MSmartOam *mOam;            // 0xC4: the items' sprites
-    MMenuItem *mUnkC8;          // 0xC8: the back button
+    DinoUiShopBuyBackButton *mUnkC8;    // 0xC8: the back button
     DinoUiShopBuyBuyButton *mLinkFrom; // 0xCC: the buy button, linked to the first page item
-    u32 mUnkD0;                 // 0xD0
+    MTextPicture *mBackground;  // 0xD0
     std::vector<void *> mItems; // 0xD4: this page's items
-    u32 mUnkE0[2];              // 0xE0
+    MMenuItem *mPageL;          // 0xE0
+    MMenuItem *mPageR;          // 0xE4
     std::vector<DinoUiFossilEntry> mUnkE8;    // 0xE8: the fossils for sale
     MTaskSet *mCursorTasks;     // 0xF4
     DinoUi3PartsCursor *mCursor; // 0xF8
@@ -68,6 +71,7 @@ public:
 
 class DinoUiShopBuyBackButton : public DinoUiShopBuyMenuItem {
 public:
+    DinoUiShopBuyBackButton(DinoUiShopBuyMenu *owner);
     virtual ~DinoUiShopBuyBackButton();
     virtual void OnFocusChanged(BOOL focused);
     virtual void OnDecide();
@@ -75,18 +79,21 @@ public:
 
 class DinoUiShopBuyPageLButton : public DinoUiShopBuyMenuItem {
 public:
+    DinoUiShopBuyPageLButton(DinoUiShopBuyMenu *owner);
     virtual ~DinoUiShopBuyPageLButton();
     virtual void OnDecide();
 };
 
 class DinoUiShopBuyPageRButton : public DinoUiShopBuyMenuItem {
 public:
+    DinoUiShopBuyPageRButton(DinoUiShopBuyMenu *owner);
     virtual ~DinoUiShopBuyPageRButton();
     virtual void OnDecide();
 };
 
 class DinoUiShopBuyBuyButton : public DinoUiShopBuyMenuItem {
 public:
+    DinoUiShopBuyBuyButton(DinoUiShopBuyMenu *owner);
     virtual ~DinoUiShopBuyBuyButton();
     virtual MRect GetFrame();
     virtual void OnFocusChanged(BOOL focused);

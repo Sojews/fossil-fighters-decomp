@@ -29,6 +29,10 @@
 #include "nitro/mi.h"
 #include "m/input.h"
 #include "game/dino_static_init.h"
+#include "game/dino_guide_message.h"
+#include "game/dino_resource.h"
+#include "game/dino_ui_common.h"
+#include "m/picture.h"
 
 #pragma auto_inline off
 
@@ -212,16 +216,132 @@ void DinoUiShopBuyMenu::OnBackDecided() {
 
 // Pooled file statics: the button corners.
 struct DinoUiShopBuyStatics {
-    u8 unk00[0x14];
+    const char *mPaths[5];  // 0x00: [1] page right, [2] back, [3] page left, [4] buy
     MPoint mBottomRight; // 0x14
     MPoint mRow;         // 0x1C: to the next row
-    u8 unk24[0x34 - 0x24];
+    MPoint mPageRPos;    // 0x24
+    MPoint mPageLPos;    // 0x2C
     MPoint mTopLeft;     // 0x34
-    u8 unk3C[0x54 - 0x3C];
+    MPoint mBackPos;     // 0x3C
+    u8 unk44[0x54 - 0x44];
     MPoint mFirst;       // 0x54: the page's first button
     MPoint mColumn;      // 0x5C: from a page button to the next in its row
+    u8 unk64[0x74 - 0x64];
+    MPoint mBuyPos;      // 0x74
 };
 extern "C" DinoUiShopBuyStatics data_ov005_02166ac8;
+
+extern "C" const MPoint data_ov005_02166b34;   // the rock name's position (in the pool, at 0x6C)
+extern "C" const char data_ov005_02166f6c[];    // the background
+extern const MRect data_020b5838, data_020b5848; // help rects
+extern "C" const u32 data_0208a60c, data_0208a610, data_0208a614, data_0208a618, data_0208a61c, data_0208a620,
+    data_0208a93c, data_0208aacc;
+
+inline DinoUiShopBuyBackButton::DinoUiShopBuyBackButton(DinoUiShopBuyMenu *owner)
+    : DinoUiShopBuyMenuItem(owner, data_ov005_02166ac8.mPaths[2], data_ov005_02166ac8.mBackPos, data_0208a60c) {
+    mMotion->Play(2, 0);
+}
+
+inline DinoUiShopBuyPageLButton::DinoUiShopBuyPageLButton(DinoUiShopBuyMenu *owner)
+    : DinoUiShopBuyMenuItem(owner, data_ov005_02166ac8.mPaths[3], data_ov005_02166ac8.mPageLPos, data_0208aacc) {
+    SetKeys(0x200);
+    SetNoFocus(TRUE);
+    DinoHelpItem::Disable();
+}
+
+inline DinoUiShopBuyPageRButton::DinoUiShopBuyPageRButton(DinoUiShopBuyMenu *owner)
+    : DinoUiShopBuyMenuItem(owner, data_ov005_02166ac8.mPaths[1], data_ov005_02166ac8.mPageRPos, data_0208aacc) {
+    SetKeys(0x100);
+    SetNoFocus(TRUE);
+    DinoHelpItem::Disable();
+}
+
+inline DinoUiShopBuyBuyButton::DinoUiShopBuyBuyButton(DinoUiShopBuyMenu *owner)
+    : DinoUiShopBuyMenuItem(owner, data_ov005_02166ac8.mPaths[4], data_ov005_02166ac8.mBuyPos, data_0208a61c) {
+}
+
+// The excavation settings' section at offset7C (the input repeat is at 0x1C and 0x20).
+static inline const int *GetExcavate7C(MResource<DinoExcavateDefs> &defs) {
+    const DinoExcavateDefs *d = defs.Get();
+    if (d->offset7C == 0) {
+        return NULL;
+    }
+    return (const int *)((const u8 *)d + d->offset7C);
+}
+
+// Restocks, lists the fossils for sale and builds the page, the help, the cursor, the rock name and the money.
+#pragma opt_common_subs off
+void DinoUiShopBuyMenu::OnStart() {
+    SetLinkFallback(1);
+    {
+        MResource<DinoExcavateDefs> delayDefs = gDinoResource->GetExcavateDefs();
+        MResource<DinoExcavateDefs> intervalDefs = gDinoResource->GetExcavateDefs();
+        GetInput()->SetRepeat(0xF0, GetExcavate7C(delayDefs)[7], GetExcavate7C(intervalDefs)[8]);
+    }
+    DinoDimScreen();
+    mKasekiDefs = gDinoResource->LoadKasekiDefs();
+    mLastPage = 0;
+    mParallel.AddTail(mBackground = new MTextPicture(std::string(data_ov005_02166f6c), TRUE, false));
+    mBackground->Show();
+    mBackground->SetPriority(2);
+    mOam = new MSmartOam(0x50, 0, TRUE);
+    DinoHelpDummyItem *money, *list, *total;
+    mParallel.AddTail(new DinoHelpDummyItem(GetDisplay(), MRect(0x1E, 0xC, 0xE2, 0x6C),
+                                            std::string(gDinoResource->GetText(data_0208a620))));
+    mParallel.AddTail(list = new DinoHelpDummyItem(GetDisplay(), MRect(0x13, 0x90, 0xF1, 0x9F),
+                                                   std::string(gDinoResource->GetText(data_0208a618))));
+    mParallel.AddTail(money = new DinoHelpDummyItem(GetDisplay(), data_020b5848,
+                                                    std::string(gDinoResource->GetText(data_0208a614))));
+    mParallel.AddTail(total = new DinoHelpDummyItem(GetDisplay(), data_020b5838,
+                                                    std::string(gDinoResource->GetText(data_0208a610))));
+    mUnkC8 = new DinoUiShopBuyBackButton(this);
+    AddItem(mUnkC8);
+    if (mLastPage > 0) {
+        mPageL = new DinoUiShopBuyPageLButton(this);
+        AddItem(mPageL);
+        mPageR = new DinoUiShopBuyPageRButton(this);
+        AddItem(mPageR);
+    }
+    mLinkFrom = new DinoUiShopBuyBuyButton(this);
+    AddItem(mLinkFrom);
+    AddEntry((u32)(DinoHelpItem *)mLinkFrom, 1, 0);
+    AddEntry((u32)list, 3, 0);
+    AddEntry((u32)list, 1, 0);
+    AddEntry((u32)money, 4, (u32)list);
+    AddEntry((u32)money, 1, (u32)total);
+    AddEntry((u32)total, 2, 0);
+    AddEntry((u32)total, 3, (u32)money);
+    AddEntry((u32)(DinoHelpItem *)mUnkC8, 4, (u32)list);
+    gDinoBackup->CompactUnk148();
+    Restock();
+    LoadFossils();
+    RefreshPage2();
+    mCursorTasks = new MParallelTaskSet();
+    mCursor = new DinoUi3PartsCursor(mOam);
+    mParallel.AddTail(mCursor);
+    mCursor->SetPriority(1);
+    mParallel.AddTail(mCursorTasks);
+    mParallel.AddTail(mOam);
+    mRockName = new DinoUi3PartsRockName(data_ov005_02166b34);
+    mParallel.AddTail(mRockName);
+    mMoney = new DinoUi3PartsMoney();
+    mParallel.AddTail(mMoney);
+    mFunds = gDinoBackup->GetSystemVar(3);
+    RefreshPage3();
+    mParallel.AddTail(new DinoGuideMessage(std::string(gDinoResource->GetText(data_0208a93c))));
+    AddLink(mLinkFrom, 3, NULL);
+    AddLink(mLinkFrom, 1, NULL);
+    AddLink(mLinkFrom, 2, mUnkC8);
+    AddLink(mUnkC8, 4, mLinkFrom);
+    AddLink(mUnkC8, 3, NULL);
+    if (mItems.size() == 0) {
+        FocusItem(mUnkC8);
+    } else {
+        FocusItem((MMenuItem *)mItems[0]);
+    }
+    mSerial.AddTail(gLcd->mMain->mBright->CreateFadeInFromBlack(30, 0));
+}
+#pragma opt_common_subs reset
 
 MRect DinoUiShopBuyBuyButton::GetFrame() {
     return MRect(data_ov005_02166ac8.mTopLeft, data_ov005_02166ac8.mBottomRight);
