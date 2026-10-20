@@ -99,6 +99,7 @@ void DinoUiRvInformation3DModel::SetUnk84(u32 value) {
 
 // Turns the model with drags on it (easing off after), and loads the model again when the creature changes.
 // NONMATCHING: register allocation around the touch checks (the game loads the buttons again for the release test).
+#pragma opt_common_subs off
 void DinoUiRvInformation3DModel::Idle() {
     if (!mTasks->IsEmpty()) {
         if (gCurrentDisplay == gLcd->GetBottomDisplay() && (mInput->GetPressed() & DINO_TOUCH_BUTTON) &&
@@ -135,7 +136,7 @@ void DinoUiRvInformation3DModel::Idle() {
         rotate->mRotY = mUnk90;
         rotate->mRotX = mUnk94;
     }
-    if (mUnk80 != mUnk84) {
+    if (mUnk84 != mUnk80) {
         mUnk80 = mUnk84;
         GetSerial()->AddTail(MTaskSetMakeEmptyTask::Create(mTasks));
         if (mUnk80 != 0) {
@@ -154,6 +155,7 @@ void DinoUiRvInformation3DModel::Idle() {
         }
     }
 }
+#pragma opt_common_subs reset
 
 DinoUiRvInformation3DModel::~DinoUiRvInformation3DModel() {
 }
