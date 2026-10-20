@@ -1623,9 +1623,9 @@ void DinoBackup::MakeProfile(DinoPlayerProfile *profile) {
     }
 }
 
-// The order of the field rocks' entries: free ones first, then by unk1 (highest first), then oldest first.
-inline bool operator<(const DinoBackupEntry28 &a, const DinoBackupEntry28 &b) {
-    {
+// The order the field rocks' sort takes (the sort is at the end of the file).
+struct DinoEntry28Order {
+    bool operator()(const DinoBackupEntry28 &a, const DinoBackupEntry28 &b) const {
         if (a.used < b.used) {
             return true;
         }
@@ -1640,26 +1640,8 @@ inline bool operator<(const DinoBackupEntry28 &a, const DinoBackupEntry28 &b) {
         }
         return a.time < b.time;
     }
-}
-
-// Selection sort (in the entries' order).
-extern "C" void func_0201b0a4(DinoBackupEntry28 *first, DinoBackupEntry28 *last) {
-    if (first == last) {
-        return;
-    }
-    for (; first != last - 1; first++) {
-        DinoBackupEntry28 *min = std::min_element(first, last);
-        if (min != first) {
-            std::swap(*min, *first);
-        }
-    }
-}
-
-// The order the field rocks' sort takes (the entries' operator<).
-struct DinoBackupEntry28Less {};
-
-// Sorts the field rocks (not decompiled yet).
-extern "C" void func_0201a260(DinoBackupEntry28 *first, DinoBackupEntry28 *last, DinoBackupEntry28Less less);
+};
+template <class It, class Compare, int Tag> void DinoSortImpl(It first, It last, Compare comp);
 
 // Puts a new field rock somewhere in the rock area, over the least important one.
 void DinoBackup::AddUnk138(const DinoBackupEntry *entry, BOOL arg) {
@@ -1677,7 +1659,7 @@ void DinoBackup::AddUnk138(const DinoBackupEntry *entry, BOOL arg) {
     }
     *(DinoBackupEntry *)&rock.unk14 = *entry;
     rock.unk24_3 = 1;
-    func_0201a260(mUnk138, mUnk138 + 20, DinoBackupEntry28Less());
+    DinoSortImpl<DinoBackupEntry28 *, DinoEntry28Order, 0>(mUnk138, mUnk138 + 20, DinoEntry28Order());
     mPlayer->unk38_3 = 1;
     *mUnk138 = rock;
 }
@@ -1827,9 +1809,9 @@ template <class It, class Compare, int Tag> void DinoSortImpl(It first, It last,
         if (i == first) {
             // Nothing sorts before the pivot: put it first and split off the run equal to it.
             DinoSortSwap(*i, *pivot);
-            j = last - 1;
+            j = last;
             ++i;
-            if (!comp(*first, *j)) {
+            if (!comp(*first, *--j)) {
                 while (i != last && !comp(*first, *i)) {
                     ++i;
                 }
@@ -1899,3 +1881,7 @@ struct DinoRecordByUnk78Unk79Time {
 
 template void DinoSortImpl<DinoBackupRecord *, DinoRecordByUnk78Time, 0>(DinoBackupRecord *first, DinoBackupRecord *last, DinoRecordByUnk78Time comp);
 template void DinoSortImpl<DinoBackupRecord *, DinoRecordByUnk78Unk79Time, 0>(DinoBackupRecord *first, DinoBackupRecord *last, DinoRecordByUnk78Unk79Time comp);
+
+
+template void DinoSortImpl<DinoBackupEntry28 *, DinoEntry28Order, 0>(DinoBackupEntry28 *first, DinoBackupEntry28 *last,
+                                                                      DinoEntry28Order comp);
