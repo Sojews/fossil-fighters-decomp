@@ -518,7 +518,63 @@ void DinoUiReviveStatus::SetCreature(const DinoCreatureState &creature) {
             ->Add(serial2->Add(wait2)->Add(mDigits[2]->CreateCountTask(DinoGetCreatureLevel((DinoCreatureState *)&mInfo), 0, 0)))
             ->Add(serial3->Add(wait3)->Add(mDigits[3]->CreateCountTask(DinoGetCreatureExpToNext((DinoCreatureState *)&mInfo), 0, 0))));
 }
+
 #pragma dont_inline reset
+// A creature's top experience (the state isn't looked at).
+static inline u32 DinoMaxCreatureTotal(const DinoCreatureState &) {
+    return kCreatureLevelLimits[0] * 11 + 50;
+}
+
+// (Through one more inline: the game's copy of the blank state sits lower in the frame.)
+static inline u32 DinoMaxCreatureTotalOfBlank() {
+    return DinoMaxCreatureTotal(DinoCreatureState());
+}
+
+extern "C" const char data_ov003_02161fa0[];    // zero's format
+extern "C" const char data_ov003_02161f98[];    // the value's format
+
+// Shows the value's digits (or, at the top value, the motion instead), each digit popping up after the last.
+MTask *DinoUiReviveStatusDigit::CreateCountTask(u32 value, u8 unk88, u8 unk) {
+    mValue = value;
+    mUnk88 = unk88;
+    MSerialTaskSet *set = new MSerialTaskSet(TRUE);
+    u32 max;
+    if (mUnk91) {
+        max = 12;
+    } else if (mUnk92) {
+        max = DinoMaxCreatureTotalOfBlank();
+    } else if (mUnk90) {
+        max = DinoMaxCreatureTotal(DinoCreatureState());
+    } else {
+        max = 125;
+    }
+    if (mValue >= max) {
+        for (u32 i = 0; i < 3; i++) {
+            set->AddTail(mDigits[i]->CreateHideTransfer());
+        }
+        set->AddTail(mMotion->CreatePlayTransfer(mUnk90 ? 2 : 1, 1), mMotion->CreateShowTransfer(),
+                     mMotion->CreateWaitStopTask(), new MTimer(30));
+    } else {
+        char text[16];
+        if (mValue == 0) {
+            OS_SPrintf(text, data_ov003_02161fa0, mValue);
+        } else {
+            OS_SPrintf(text, data_ov003_02161f98, mValue);
+        }
+        for (int i = 2; i >= 0; i--) {
+            if (text[i] == ' ') {
+                set->AddTail(mDigits[i]->CreateHideTransfer());
+                continue;
+            }
+            MTimer *timer = new MTimer(12);
+            set->AddTail(mDigits[i]->CreateShowTransfer(),
+                         mDigits[i]->CreatePlayTransfer(text[i] == '-' ? 11 : text[i] + (unk88 ? 23 : 1) - '0', 1),
+                         timer);
+        }
+    }
+    return set;
+}
+
 
 // Rises into place, bobbing up and down.
 void DinoUiReviveEffectLight::Idle() {
