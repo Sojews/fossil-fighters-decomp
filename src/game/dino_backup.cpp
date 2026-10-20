@@ -781,6 +781,65 @@ void DinoBackup::GetRecord(u32 index, DinoBackupRecord *record) {
     *record = mRecords[index];
 }
 
+template <class It, class Compare, int Tag> void DinoSortImpl(It first, It last, Compare comp);
+// By unk78, highest first, then latest first.
+struct DinoRecordByUnk78Time {
+    bool operator()(const DinoBackupRecord &a, const DinoBackupRecord &b) const {
+        if (a.unk78 > b.unk78) {
+            return true;
+        }
+        if (a.unk78 < b.unk78) {
+            return false;
+        }
+        return a.time > b.time;
+    }
+};
+
+// By unk78, then unk79, then time, lowest first.
+struct DinoRecordByUnk78Unk79Time {
+    bool operator()(const DinoBackupRecord &a, const DinoBackupRecord &b) const {
+        if (a.unk78 < b.unk78) {
+            return true;
+        }
+        if (a.unk78 > b.unk78) {
+            return false;
+        }
+        if (a.unk79 < b.unk79) {
+            return true;
+        }
+        if (a.unk79 > b.unk79) {
+            return false;
+        }
+        return a.time < b.time;
+    }
+};
+
+// Keeps a profile met in multiplayer (unless it's kept already) over the least important record, and sorts them.
+// NONMATCHING: register allocation (the game keeps the records in a register through the search and `this` on the stack).
+void DinoBackup::AddProfile(const DinoPlayerProfile *profile, int arg) {
+    DinoPlayerProfile record = *profile;
+    record.unk7A = 0;
+    {
+        MScopedLock lock(&sBackupMutex.mutex, TRUE);
+        record.unk7C = mPlayFrames;
+    }
+    DinoBackupRecord *records = mRecords;
+    DinoBackupRecord *r = records;
+    for (u32 i = 0; i < 42; i++, r++) {
+        if (r->unk78 && memcmp(&records[i], &record, 0x65) == 0) {
+            return;
+        }
+    }
+    DinoSortImpl<DinoBackupRecord *, DinoRecordByUnk78Unk79Time, 0>(records, records + 42,
+                                                                    DinoRecordByUnk78Unk79Time());
+    if (mRecords[0].unk78 && mRecords[0].unk79) {
+        return;
+    }
+    mPlayer->unk38_2 = 1;
+    mRecords[0] = *(DinoBackupRecord *)&record;
+    DinoSortImpl<DinoBackupRecord *, DinoRecordByUnk78Time, 0>(mRecords, mRecords + 42, DinoRecordByUnk78Time());
+}
+
 void DinoBackup::SetTeam(u32 index, const DinoTeam *team) {
     mTeams[index] = *team;
 }
@@ -1876,38 +1935,6 @@ template <class It, class Compare, int Tag> void DinoSortImpl(It first, It last,
         }
     }
 }
-
-// By unk78, highest first, then latest first.
-struct DinoRecordByUnk78Time {
-    bool operator()(const DinoBackupRecord &a, const DinoBackupRecord &b) const {
-        if (a.unk78 > b.unk78) {
-            return true;
-        }
-        if (a.unk78 < b.unk78) {
-            return false;
-        }
-        return a.time > b.time;
-    }
-};
-
-// By unk78, then unk79, then time, lowest first.
-struct DinoRecordByUnk78Unk79Time {
-    bool operator()(const DinoBackupRecord &a, const DinoBackupRecord &b) const {
-        if (a.unk78 < b.unk78) {
-            return true;
-        }
-        if (a.unk78 > b.unk78) {
-            return false;
-        }
-        if (a.unk79 < b.unk79) {
-            return true;
-        }
-        if (a.unk79 > b.unk79) {
-            return false;
-        }
-        return a.time < b.time;
-    }
-};
 
 template void DinoSortImpl<DinoBackupRecord *, DinoRecordByUnk78Time, 0>(DinoBackupRecord *first, DinoBackupRecord *last, DinoRecordByUnk78Time comp);
 template void DinoSortImpl<DinoBackupRecord *, DinoRecordByUnk78Unk79Time, 0>(DinoBackupRecord *first, DinoBackupRecord *last, DinoRecordByUnk78Unk79Time comp);
