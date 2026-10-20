@@ -24,7 +24,7 @@ void DinoCleaningTimer::Idle() {
     int limit = mLimit;
     int left = (limit - mFrames) / 60;
     u8 *back = mRaster->mBack;
-    u8 *data = (u8 *)mFile.archive->GetData(mFile.index);
+    u8 *data = (u8 *)mBar.mFile.archive->GetData(mBar.mFile.index);
     u32 *frames = (u32 *)(data + *(u32 *)(data + 8));
     u8 *frame = data + frames[left + (90 - limit / 60)];
     MI_CpuCopy32(frame + *(u32 *)(frame + 4), back, 0x300);
@@ -36,15 +36,44 @@ void DinoCleaningTimer::Idle() {
 
 // The TU's pooled pointer-to-member constants (see menu.cpp).
 extern "C" struct {
-    u8 unk00[0x8];
+    u8 unk00[0x4];
+    const char *mDigitPath;                             // 0x04
     int mZero;                                          // 0x08: what the countdown stops at
-    u8 unk0C[0x10 - 0xC];
+    const char *mBarPath;                               // 0x0C
     void (DinoCleaningTimer::*StateCountdown_10)();
     void (DinoCleaningTimer::*StateIdle_18)();
     void (DinoCleaningTimer::*StateIdle_20)();
     u8 unk28[0x48 - 0x28];
     void (DinoCleaningTimer::*StateExtend_48)();
+    void (DinoCleaningTimer::*StateIdle_50)();
 } data_ov002_02164c74;
+extern "C" const MPoint data_ov002_02164d24[2];   // the digits' offsets from the screen's center
+extern "C" const MRect data_ov002_02164d34;       // the help's area
+extern "C" const u32 data_0208ad30;               // the help's text
+
+DinoCleaningTimer::DinoCleaningTimer(DinoCleaning *cleaning, u32 planes, MSmartOam *oam, u32 frames)
+    : MProcess(NULL), mOwner(cleaning), mFrames(0), mLimit(frames),
+      mBar(std::string(data_ov002_02164c74.mBarPath)) {
+    mRaster = new MRasterWindow(-1, NULL, TRUE);
+    mRaster->SetBlendEnabled(TRUE);
+    mRaster->SetObjBlendEnabled(TRUE);
+    mRaster->SetTarget(0x3F);
+    mRaster->SetObjTarget(0x3F ^ planes);
+    mRaster->Show();
+    for (u32 i = 0; i < 2; i++) {
+        mDigits[i] = new MMotion(std::string(data_ov002_02164c74.mDigitPath), oam, 0, 1);
+        mDigits[i]->SetPriority(2);
+        mDigits[i]->SetAnchor(1);
+        mDigits[i]->SetPosition(MPoint(data_ov002_02164d24[i].x + 128, data_ov002_02164d24[i].y + 96));
+        mDigits[i]->Show();
+        mParallel.AddTail(mDigits[i]);
+    }
+    mOwner->GetUnkE4()->SetUnkB8(1, (void *)(mLimit / 60));
+    mOwner->GetUnkE4()->SetUnkB8(0, NULL);
+    GetParallel()->AddTail(mRaster, new DinoHelpDummyItem(gCurrentDisplay, data_ov002_02164d34,
+                                                         std::string(gDinoResource->GetText(data_0208ad30))));
+    mState = data_ov002_02164c74.StateIdle_50;
+}
 
 void DinoCleaningTimer::Start() {
     mState = data_ov002_02164c74.StateExtend_48;

@@ -2,6 +2,7 @@
 #define GAME_DINO_CLEANING_TIMER_H
 
 #include "m/archive.h"
+#include "m/resource.h"
 #include "m/raster.h"
 #include "m/motion.h"
 #include "m/menu_item.h"
@@ -36,9 +37,8 @@ public:
     class DinoCleaning *mOwner; // 0x7C
     int mFrames;            // 0x80
     int mLimit;             // 0x84: frames allowed
-    MRasterIO *mRaster;     // 0x88: the timer bar
-    MArchivePtr mArchive;   // 0x8C
-    MArchiveFile mFile;     // 0x90: the bar's frames
+    MRasterWindow *mRaster; // 0x88: the timer bar
+    MResource<struct DinoMessageData> mBar; // 0x8C: the bar's frames
     MMotion *mDigits[2];    // 0x9C: elapsed seconds, ones and tens
 };
 
