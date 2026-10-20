@@ -21,9 +21,16 @@
 
 // The TU's pooled constants (see menu.cpp).
 extern "C" struct {
-    u8 unk00[0x34];
+    u8 unk00[0x4];
+    const char *digitPath;      // 0x04
+    u8 unk08[0x14 - 0x8];
+    const char *badgePath;      // 0x14
+    u8 unk18[0x34 - 0x18];
     const char *pageNumberPath; // 0x34
+    u8 unk38[0x48 - 0x38];
+    const char *buttonPath;     // 0x48
 } data_ov005_0216561c;
+extern "C" const char *data_ov005_0216574c[]; // the fossils' motions (30), filled by the static initializer
 
 // "n/m": the two digits sit a little up-left and down-right of pos.
 DinoUi3PartsFraction::DinoUi3PartsFraction(MSmartOam *oam, MPoint pos) : MProcess(NULL) {
@@ -209,6 +216,65 @@ DinoUi3PartsKasekiButton::DinoUi3PartsKasekiButton(MSmartOam *oam, MPoint pos, D
     Setup(oam, icon);
     SetMarked(marked);
     SetMode(2);
+}
+
+// The fossil's motion, its focus highlight and mark, and its badge or value.
+// NONMATCHING: in the digit loop the game spills &mParallel below the string temp's flag (slots 0xC/0x10 swapped);
+// declaration order, ipa and the opt pragmas don't move it.
+void DinoUi3PartsKasekiButton::Setup(MSmartOam *oam, DinoUiKasekiIcon icon) {
+    mMotion = new MMotion(std::string(data_ov005_0216574c[icon.unk00 % 30]), oam, 2, 1);
+    mMotion->Play(icon.unk01 + 1, 0);
+    mMotion->SetPosition(mPos);
+    mMotion->SetPriority(2);
+    mMotion->GetUnit()->SetMode(1);
+    mMotion->Show();
+    mParallel.AddTail(mMotion);
+    mView = new MMotion(std::string(data_ov005_0216561c.buttonPath), oam, 2, 1);
+    mView->Play(1, 0);
+    mView->SetPosition(mPos);
+    mView->SetPriority(2);
+    mView->GetUnit()->SetMode(1);
+    mView->Hide();
+    mParallel.AddTail(mView);
+    mMark = new MMotion(std::string(data_ov005_0216561c.buttonPath), oam, 2, 1);
+    mMark->Play(2, 0);
+    mMark->SetPosition(mPos);
+    mMark->SetPriority(2);
+    mMark->GetUnit()->SetMode(1);
+    mParallel.AddTail(mMark);
+    if (icon.kind == 3 || ((icon.kind == 1 || icon.kind == 2) && icon.value >= 125)) {
+        mBadge = new MMotion(std::string(data_ov005_0216561c.badgePath), oam, 0, 1);
+        if (icon.kind == 3) {
+            mBadge->Play(3, 0);
+        } else {
+            mBadge->Play(4, 0);
+        }
+        mBadge->SetPosition(MPoint(mPos.x - 3, mPos.y + 15));
+        mBadge->SetPriority(2);
+        mBadge->GetUnit()->SetMode(1);
+        mBadge->Show();
+        mParallel.AddTail(mBadge);
+    } else if (icon.kind == 1 || icon.kind == 2 || icon.kind == 5) {
+        for (int i = 0; i < 4; i++) {
+            MTaskSet *tasks = &mParallel;
+            mDigits[i] = new MMotion(std::string(data_ov005_0216561c.digitPath), oam, 0, 1);
+            mDigits[i]->SetPosition(MPoint(mPos.x + (i * 8 - 14), mPos.y + 16));
+            mDigits[i]->SetPriority(2);
+            mDigits[i]->GetUnit()->SetMode(1);
+            mDigits[i]->Show();
+            tasks->AddTail(mDigits[i]);
+        }
+        mDigits[3]->SetPosition(MPoint(mPos.x + 9, mPos.y + 15));
+        int value = icon.value;
+        mDigits[0]->Play(value / 100 % 10 + 3, 0);
+        mDigits[1]->Play(value / 10 % 10 + 3, 0);
+        mDigits[2]->Play(value % 10 + 3, 0);
+        if (icon.kind == 5) {
+            mDigits[3]->Play(2, 0);
+        } else {
+            mDigits[3]->Play(1, 0);
+        }
+    }
 }
 
 void DinoUi3PartsKasekiButton::SetMarked(BOOL marked) {

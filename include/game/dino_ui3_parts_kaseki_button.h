@@ -11,8 +11,11 @@ class MSmartOam;
 struct DinoUiKasekiIcon {
     u8 unk00;       // /30: which motion
     u8 unk01;       // the anime, less one
-    u16 unk02;
-    u16 unk04;
+    u8 kind : 4;    // 3 = badge; 1, 2 and 5 show the value (125 and up: badge)
+    u8 unk02 : 4;
+    u8 unk03;
+    u16 value : 12;
+    u16 unk04 : 4;
 };
 
 class DinoUi3PartsKasekiButton : public MMenuItem {
@@ -29,9 +32,10 @@ public:
 
     MPoint mPos;        // 0x88: the center
     MMotion *mMotion;   // 0x90
-    MView *mView;       // 0x94: the focus highlight
-    MView *mMark;       // 0x98
-    u8 unk9C[0xB0 - 0x9C];
+    MMotion *mView;     // 0x94: the focus highlight
+    MMotion *mMark;     // 0x98
+    MMotion *mDigits[4]; // 0x9C: the value's three digits, and its unit
+    MMotion *mBadge;    // 0xAC
 };
 
 #endif
