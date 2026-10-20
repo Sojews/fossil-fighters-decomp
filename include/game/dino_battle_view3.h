@@ -10,10 +10,22 @@
 #include "game/help.h"
 #include "game/dino_field_camera_hook.h"
 
+class MMotion;
+class MSmartOam;
+
 class DinoBattleViewLPCountPanel : public MProcess {
 public:
+    DinoBattleViewLPCountPanel(MSmartOam *oam, u32 side, u32 unk98, bool unk9C);
     virtual ~DinoBattleViewLPCountPanel();
     virtual void Idle();
+
+    u32 unk74[2];
+    MMotion *mPanel;        // 0x7C
+    MMotion *mUnk80;        // 0x80
+    MMotion *mDigits[4];    // 0x84
+    u32 mSide;              // 0x94
+    u32 mUnk98;             // 0x98
+    bool mUnk9C;            // 0x9C
 };
 
 class DinoBattleViewDecideFirstAttackTeam : public MProcess {

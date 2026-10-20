@@ -6,6 +6,39 @@
 #include "game/dino_battle_view3.h"
 #include "types.h"
 #include "game/dino_static_init.h"
+#include "m/motion.h"
+#include <string>
+
+// The TU's pooled statics: the panel's motion paths and pointer-to-member constants (see menu.cpp).
+extern "C" struct {
+    u32 unk00;
+    const char *panelPaths[2];  // 0x04: by side
+    const char *unk0CPath;      // 0x0C
+    const char *digitPath;      // 0x10
+    u8 unk14[0x34 - 0x14];
+    void (DinoBattleViewDecideFirstAttackTeam::*Start_34)();
+} data_ov000_02197300;
+
+#pragma auto_inline off
+DinoBattleViewLPCountPanel::DinoBattleViewLPCountPanel(MSmartOam *oam, u32 side, u32 unk98, bool unk9C)
+    : MProcess(NULL) {
+    mSide = side;
+    mUnk98 = unk98;
+    mUnk9C = unk9C;
+    mPanel = new MMotion(std::string(mSide == 0 ? data_ov000_02197300.panelPaths[0] : data_ov000_02197300.panelPaths[1]),
+                         oam, 0, 1);
+    mPanel->Show();
+    mPanel->Play(1, 0);
+    mParallel.AddTail(mPanel);
+    for (int i = 0; i < 4; i++) {
+        mDigits[i] = new MMotion(std::string(data_ov000_02197300.digitPath), oam, 0, 1);
+        mDigits[i]->Show();
+        mParallel.AddTail(mDigits[i]);
+    }
+    mUnk80 = new MMotion(std::string(data_ov000_02197300.unk0CPath), oam, 0, 1);
+    mParallel.AddTail(mUnk80);
+}
+#pragma auto_inline on
 
 DinoBattleViewLPCountPanel::~DinoBattleViewLPCountPanel() {
 }
@@ -20,11 +53,6 @@ void DinoBattleViewDecideFirstAttackTeam::Idle() {
     (this->*mState)();
 }
 
-// The TU's pooled pointer-to-member constants (see menu.cpp).
-extern "C" struct {
-    u8 unk00[0x34];
-    void (DinoBattleViewDecideFirstAttackTeam::*Start_34)();
-} data_ov000_02197300;
 
 DinoBattleViewDecideFirstAttackTeam::DinoBattleViewDecideFirstAttackTeam(u32 unk88, u32 unk8C, u32 unk90, u32 unk94)
     : MProcess(NULL), mUnk88(unk88), mUnk8C(unk8C), mUnk90(unk90), mUnk94(unk94) {
