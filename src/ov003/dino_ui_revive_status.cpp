@@ -96,9 +96,12 @@ extern "C" u8 data_ov003_021624c0;
 extern "C" struct {
     u8 unk00[0x10];
     const char *mSparkPath;                         // 0x10
-    u8 unk14[0x28 - 0x14];
+    u8 unk14[0x1C - 0x14];
+    const char *mDigitPath;                         // 0x1C: a number digit
+    u8 unk20[0x28 - 0x20];
     const char *mParticlePath;                      // 0x28
-    u8 unk2C[0x34 - 0x2C];
+    u8 unk2C[0x30 - 0x2C];
+    const char *mMaxPath;                           // 0x30: the top value's mark
     void (DinoUiReviveEffect::*CheckSkip_34)();     // 0x34
     u8 unk3C[0x4C - 0x3C];
     void (DinoUiReviveEffect::*Leave_4C)();         // 0x4C
@@ -532,6 +535,78 @@ static inline u32 DinoMaxCreatureTotalOfBlank() {
 
 extern "C" const char data_ov003_02161fa0[];    // zero's format
 extern "C" const char data_ov003_02161f98[];    // the value's format
+
+extern "C" const char data_ov003_02161f9c[];    // zero's format (the mark)
+extern "C" const char data_ov003_02161fa4[];    // the value's format (the mark)
+
+// Three digits of a number and the mark shown in their place at the top value.
+// NONMATCHING: the game keeps the loop counter, the digit slot and pos on the stack (and the offsets static is
+// named by address there).
+DinoUiReviveStatusDigit::DinoUiReviveStatusDigit(MSmartOam *oam, MPoint pos, u8 unk88, u32 value, u8 unk90, u8 unk91,
+                                                 u8 unk92)
+    : MProcess(NULL) {
+    mOam = oam;
+    mUnk90 = unk90;
+    mUnk91 = unk91;
+    mUnk92 = unk92;
+    mMotion = new MMotion(std::string(data_ov003_02161d20.mMaxPath), mOam, 0, 1);
+    mMotion->SetPosition(pos);
+    mMotion->SetPriority(3);
+    mMotion->SetAnchor(3);
+    mParallel.AddTail(mMotion);
+    for (u32 i = 0; i < 3; i++) {
+        static const MPoint sOffsets[3] = {MPoint(-12, 0), MPoint(-4, 0), MPoint(4, 0)};
+        mDigits[i] = new MMotion(std::string(data_ov003_02161d20.mDigitPath), mOam, 0, 1);
+        mDigits[i]->SetPriority(3);
+        mDigits[i]->SetAnchor(3);
+        mDigits[i]->SetPosition(MPoint(pos.x + sOffsets[i].x, pos.y + sOffsets[i].y));
+        mDigits[i]->Show();
+        mParallel.AddTail(mDigits[i]);
+    }
+    mValue = value;
+    mUnk88 = unk88;
+    if (mValue == 0) {
+        for (u32 i = 0; i < 3; i++) {
+            mDigits[i]->Play(0x16, 0);
+        }
+        return;
+    }
+    u32 max;
+    if (mUnk91) {
+        max = 12;
+    } else if (mUnk92) {
+        max = DinoMaxCreatureTotal(DinoCreatureState());
+    } else if (mUnk90) {
+        max = DinoMaxCreatureTotal(DinoCreatureState());
+    } else {
+        max = 125;
+    }
+    if (mValue >= max) {
+        if (mUnk92) {
+            mMotion->Play(12, 0);
+        } else if (mUnk90) {
+            mMotion->Play(4, 0);
+        } else {
+            mMotion->Play(3, 0);
+        }
+        mMotion->Show();
+    } else {
+        char text[16];
+        if (mValue == 0) {
+            OS_SPrintf(text, data_ov003_02161f9c, mValue);
+        } else {
+            OS_SPrintf(text, data_ov003_02161fa4, mValue);
+        }
+        for (u32 i = 0; i < 3; i++) {
+            if (text[i] == ' ') {
+                mDigits[i]->Hide();
+            } else {
+                mDigits[i]->Show();
+                mDigits[i]->Play(text[i] + (mUnk88 ? 0x21 : 0xC) - '0', 0);
+            }
+        }
+    }
+}
 
 // Shows the value's digits (or, at the top value, the motion instead), each digit popping up after the last.
 MTask *DinoUiReviveStatusDigit::CreateCountTask(u32 value, u8 unk88, u8 unk) {

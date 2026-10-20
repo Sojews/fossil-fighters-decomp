@@ -4,15 +4,18 @@
 #include "m/task.h"
 #include "m/motion.h"
 
+class MSmartOam;
+
 class DinoUiReviveStatusDigit : public MProcess {
 public:
+    DinoUiReviveStatusDigit(MSmartOam *oam, MPoint pos, u8 unk88, u32 value, u8 unk90, u8 unk91, u8 unk92);
     virtual ~DinoUiReviveStatusDigit();
     virtual void Idle();
 
     // Counts the number up to the value.
     MTask *CreateCountTask(u32 value, u8 unk88, u8 unk);
 
-    u32 unk74;
+    MSmartOam *mOam;        // 0x74
     MMotion *mMotion;       // 0x78: shown in place of the digits at the top value
     MMotion *mDigits[3];    // 0x7C
     u8 mUnk88;              // 0x88
