@@ -8,6 +8,7 @@
 #include "m/bg_new_task.h"
 #include "m/call_task.h"
 #include "game/dino_ui_rv_information.h"
+#include "game/dino_ui_field_menu_number3.h"
 #include "game/dino_resource.h"
 #include "m/picture.h"
 #include "m/display.h"
@@ -139,6 +140,55 @@ void DinoUiRvInformation::SetPage(u8 page) {
     } else {
         GetSerial()->AddTail(new MTimer(1), MCreateCallTask(this, data_ov003_02160774.Unk02156ee8_00, mInfo));
     }
+}
+
+// Hides the page's parts (on the last page, puts its picture back up).
+void DinoUiRvInformation::Unk021571bc() {
+    mUnk1B0 = 1;
+    mViewsAC[0]->Hide();
+    mViewsAC[1]->Hide();
+    mViewsAC[2]->Hide();
+    if (mHasTenPictures && mPage < 3) {
+        mPagePicture->Show();
+        mSubPicture->Hide();
+    }
+    switch (mPage) {
+    case 0:
+        mViewD4->Hide();
+        mViewEC->Hide();
+        mViewD8->Hide();
+        for (int i = 0; i < 4; i++) {
+            mViewsDC[i]->Hide();
+        }
+        for (int i = 0; i < 6; i++) {
+            mNumbersBC[i]->Hide();
+        }
+        mModel->SetUnk84(0);
+        break;
+    case 1:
+    case 2:
+        for (int i = 0; i < 3; i++) {
+            mViewsF0[i]->Hide();
+            mViews104[i]->Hide();
+            mViews118[i]->Hide();
+            mNumbers12C[i]->Hide();
+            mNumbers140[i]->Hide();
+        }
+        break;
+    case 3:
+        mUnk16C->Clear();
+        if (mUnk195) {
+            gCurrentDisplay = gLcd->mMain;
+            mPictureTasks->Clear();
+            mPagePicture = new MTextPicture(*mPictures[mPage], FALSE, false);
+            mPictureTasks->AddTail(mPagePicture);
+            mPagePicture->Show();
+            mPagePicture->SetPriority(3);
+        }
+        break;
+    }
+    mUnk195 = 0;
+    mUnk198 = 0;
 }
 
 void DinoUiRvInformation::CreateSubPicture() {

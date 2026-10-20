@@ -7,6 +7,8 @@
 #include "m/task.h"
 
 class DinoUiRvInformation3DModel;
+class DinoUiFieldMenuNumber3;
+class MView;
 
 // A creature's details as the information screen shows them (passed by value).
 struct DinoCreatureInfo {
@@ -35,7 +37,20 @@ public:
     MTextPicture *mPagePicture;         // 0x9C
     u8 unkA0[4];
     MTextPicture *mSubPicture;          // 0xA4
-    u8 unkA8[0x168 - 0xA8];
+    u32 unkA8;
+    MView *mViewsAC[3];                 // 0xAC
+    u32 unkB8;
+    DinoUiFieldMenuNumber3 *mNumbersBC[6];  // 0xBC: (page 0)
+    MView *mViewD4;                     // 0xD4
+    MView *mViewD8;                     // 0xD8
+    MView *mViewsDC[4];                 // 0xDC
+    MView *mViewEC;                     // 0xEC
+    MView *mViewsF0[5];                 // 0xF0: (pages 1 and 2, by row)
+    MView *mViews104[5];                // 0x104
+    MView *mViews118[5];                // 0x118
+    DinoUiFieldMenuNumber3 *mNumbers12C[5]; // 0x12C
+    DinoUiFieldMenuNumber3 *mNumbers140[5]; // 0x140
+    u8 unk154[0x168 - 0x154];
     MTaskSet *mPictureTasks;            // 0x168
     MTaskSet *mUnk16C;                  // 0x16C
     u8 unk170[0x174 - 0x170];
@@ -47,7 +62,7 @@ public:
     u32 mUnk198;                        // 0x198
     MResource<DinoUiRvInformationData> mUnk19C; // 0x19C
     u32 mUnk1AC;                        // 0x1AC
-    u8 mUnk1B0;                         // 0x1B0
+    u8 mUnk1B0;                         // 0x1B0: set once the page's parts are hidden
     u8 mUnk1B1;                         // 0x1B1
 };
 
