@@ -61,7 +61,6 @@ from:0x02155bea kind:thumb_call to:0x020051dc module:main
 from:0x02155bf0 kind:thumb_call to:0x020051dc module:main
 from:0x02155bf6 kind:thumb_call to:0x020051dc module:main
 from:0x02155bfc kind:thumb_call to:0x020051dc module:main
-from:0x02155c00 kind:thumb_call to:0x02156526 module:overlay(2)
 from:0x02155c10 kind:thumb_call to:0x02005198 module:main
 from:0x02155c18 kind:thumb_call to:0x02005198 module:main
 from:0x02155c20 kind:thumb_call to:0x02005198 module:main
