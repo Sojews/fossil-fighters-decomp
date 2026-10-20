@@ -15,10 +15,24 @@
 extern "C" struct {
     u8 unk00[0x08];
     const char *mPointerPath;   // 0x08: the tutorial's pointing arrow
-    u8 unk0C[0x28 - 0x0C];
+    u8 unk0C[0x20 - 0x0C];
+    const char *mCornerPath;    // 0x20: the rectangle's corner mark
+    u8 unk24[0x28 - 0x24];
     const char *mPointerPath2;  // 0x28: its other kind (directions above 4)
     const char *mArrowPath;     // 0x2C: the advantage arrow
 } data_ov000_02191b1c;
+
+inline DinoBattleViewTutorialRect::DinoBattleViewTutorialRect(MSmartOam *oam, MRect rect) : MProcess(NULL), mRect(rect) {
+    mParallel.AddTail(mTasks = new MParallelTaskSet());
+    for (int i = 0; i < 4; i++) {
+        MMotion *corner = new MMotion(std::string(data_ov000_02191b1c.mCornerPath), oam, 0, 1);
+        corner->Show();
+        corner->SetPosition((i & 2) ? mRect.right : mRect.left, (i & 1) ? mRect.bottom : mRect.top);
+        corner->SetPriority(0);
+        corner->Play(i + 1, 0);
+        mTasks->AddTail(corner);
+    }
+}
 
 DinoBattleViewTutorialMotion::DinoBattleViewTutorialMotion(MSmartOam *oam) : MProcess(NULL) {
     mOam = oam;
@@ -48,6 +62,20 @@ void DinoBattleViewTutorialMotion::ShowArrow(int index, int dir, MPoint pos) {
     arrow->Play(dir, 0);
     mParallel.AddTail(arrow);
     mArrows[index] = arrow;
+}
+
+// Marks the rectangle's corners (none for an empty one), replacing any marked before.
+void DinoBattleViewTutorialMotion::SetRect(MRect rect) {
+    if (mRect != NULL) {
+        mRect->Exit();
+        mRect = NULL;
+    }
+    if (rect.left == rect.right && rect.top == rect.bottom) {
+        return;
+    }
+    DinoSoundPlaySe(0x3B0, 0);
+    mRect = new DinoBattleViewTutorialRect(mOam, rect);
+    mParallel.AddTail(mRect);
 }
 
 // NONMATCHING: register allocation in the -1 loop (the game reuses the -1 register as the counter) and the

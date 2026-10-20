@@ -54,7 +54,7 @@ public:
 
     MSmartOam *mOam;        // 0x74
     MMotion *mArrows[3];    // 0x78
-    MMotion *mRect;         // 0x84
+    class DinoBattleViewTutorialRect *mRect;   // 0x84
 };
 
 // Fades the screens (by blend ratio).
@@ -88,10 +88,15 @@ public:
     DinoBattleView *mView;  // 0x10
 };
 
+// Four corner marks around a rectangle.
 class DinoBattleViewTutorialRect : public MProcess {
 public:
+    DinoBattleViewTutorialRect(MSmartOam *oam, MRect rect);
     virtual ~DinoBattleViewTutorialRect();
     virtual void Idle();
+
+    MRect mRect;                // 0x74
+    MParallelTaskSet *mTasks;   // 0x84: the marks
 };
 
 class SetTutorialMotionArrorTask : public MTask {
