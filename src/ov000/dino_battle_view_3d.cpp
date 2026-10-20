@@ -23,6 +23,8 @@
 #include "game/camera_load_task.h"
 #include "game/dino_battle_view_kaseki_point_menu.h"
 #include "m/3d_scene.h"
+#include "m/lcd.h"
+#include "m/display.h"
 #include "game/dino_battle_view_field_player_bg.h"
 #include "game/dino_resource.h"
 #include "m/3d.h"
@@ -388,6 +390,90 @@ void DinoBattleView3DGroupFade::Idle() {
             GetView()->mModels[2]->Reset();
             GetCamera()->Follow(NULL);
         }
+        Exit();
+        break;
+    }
+}
+
+// The TU's pooled pointer-to-member constant for the winner's model load.
+extern "C" struct {
+    void (LoadWinnerLoad::*LoadModel_00)(int i);
+} data_ov000_0219636c;
+extern "C" const u32 data_0208a1d8;    // the pose's length
+
+// Finds the winning side's creature with the slot model being looked for, loads its winner model and has the
+// camera show it posing (with its cry) until the pose ends or the view is skipped.
+void LoadWinnerLoad::Idle() {
+    switch (mStep) {
+    case 0:
+        mWinner = -1;
+        for (int i = 0; i < 3; i++) {
+            if (mUnk84 == (int)mView->mSlotModels[mSlot * 3 + i] && mView->mUnk14A[mSlot * 3 + i] == 1) {
+                mWinner = i;
+                mStep++;
+            }
+        }
+        mUnk84++;
+        if (mUnk84 > 4) {
+            mStep = 7;
+            mSerial.AddTail(new CameraWipe((CameraWipe::Owner *)mView->mUnkB0, 0x10000 | (mSlot ? 2 : 3), 15));
+        } else if (mWinner != -1) {
+            mSerial.AddTail(new CameraWipe((CameraWipe::Owner *)mView->mUnkB0, 0x10000 | (mSlot ? 2 : 3), 15));
+            mSerial.AddTail(func_ov000_0218ac74(mView->mUnkE4, NULL));
+            mSerial.AddTail(((M3DScene *)mView->mUnkB0)->CreateEnableTask(0));
+        }
+        if (mSlot) {
+            gLcd->mMain->SetBackdrop(0x8000);
+        } else {
+            gLcd->mMain->SetBackdrop(0xFFFF);
+        }
+        break;
+    case 1:
+        mStep++;
+        break;
+    case 2:
+        mSerial.AddTail(MCreateBgCallTask(this, data_ov000_0219636c.LoadModel_00, mWinner, 1));
+        mStep++;
+        break;
+    case 3: {
+        MTask *follow;
+        MTask *light;
+        MTask *enable;
+        ((DinoBattleView3DCamera *)mView->mUnkE4)->SetLight(mSlot == 0);
+        mView->mModels[mWinner]->Push4(0);
+        enable = ((M3DScene *)mView->mUnkB0)->CreateEnableTask(1);
+        light = func_ov000_0218abd0(mView->mUnkE4, -1);
+        follow = func_ov000_0218ac74(mView->mUnkE4, mView->mModels[mWinner]);
+        GetSerial()->AddTail(func_ov000_0218ac04(mView->mUnkE4, &mView->mUnk1A4[1], &data_ov000_02190334, mSlot == 0),
+                             follow, light, enable);
+        mSerial.AddTail(new CameraWipe((CameraWipe::Owner *)mView->mUnkB0, 0x10000 | (mSlot ? 1 : 0), 15));
+        mStep++;
+        break;
+    }
+    case 4:
+        mStep++;
+        break;
+    case 5: {
+        MTask *cry = DinoSoundCreatePlaySeTask(
+            (gDinoResource->GetCreatureDef(mView->mCreatureIds[mSlot * 3 + mWinner])->voice - 1) * 3 + 0x14F, 0);
+        GetSerial()->AddTail(new MTimer(15), cry);
+        mStep++;
+        mTimer = data_0208a1d8 - 45;
+        mView->SetUnk180(0);
+        break;
+    }
+    case 6:
+        if (--mTimer <= 0) {
+            mStep = 0;
+            return;
+        }
+        if (mView->GetUnk180()) {
+            DinoSoundFunc_0201feb4(0);
+            mStep = 0;
+            mUnk84 = 3;
+        }
+        break;
+    case 7:
         Exit();
         break;
     }

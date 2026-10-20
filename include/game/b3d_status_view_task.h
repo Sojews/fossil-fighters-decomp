@@ -38,6 +38,10 @@ public:
 
     class DinoBattleView3D *mView;  // 0x74
     int mSlot;                      // 0x78
+    int mWinner;                    // 0x7C: the model of the creature that poses (-1 for none)
+    u32 mStep;                      // 0x80
+    int mUnk84;                     // 0x84: the slot model to look for (tried 0-4)
+    int mTimer;                     // 0x88
 };
 
 #endif
