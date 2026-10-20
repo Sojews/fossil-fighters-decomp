@@ -1709,3 +1709,193 @@ void DinoBackupMenuLinksAnchor(MMenuLinks *links) {
     links->~MMenuLinks();
 }
 #pragma dont_inline reset
+
+#pragma auto_inline off
+// The records' sorts: the game's std::sort (a quicksort whose two pivot guesses move by a counter kept per
+// instance, the median of three of them, and a selection sort for short runs).
+template <class T> static inline void DinoSortSwap(T &a, T &b) {
+    T tmp(a);
+    a = b;
+    b = tmp;
+}
+
+template <class It, class Compare> static inline It DinoSortMin(It first, It last, Compare comp) {
+    if (first != last) {
+        It i = first;
+        while (++i != last) {
+            if (comp(*i, *first)) {
+                first = i;
+            }
+        }
+    }
+    return first;
+}
+
+template <class It, class Compare> void DinoSelectionSort(It first, It last, Compare comp) {
+    if (first == last || first == last - 1) {
+        return;
+    }
+    do {
+        It m = DinoSortMin(first, last, comp);
+        if (m != first) {
+            DinoSortSwap(*m, *first);
+        }
+    } while (++first != last - 1);
+}
+
+template <class It, class Compare> void DinoSort3(It a, It b, It c, Compare comp) {
+    bool ca = !comp(*c, *a);
+    bool bc = !comp(*b, *c);
+    if (ca && bc) {
+        return;
+    }
+    if (!ca && !bc) {
+        DinoSortSwap(*a, *b);
+        return;
+    }
+    if (comp(*b, *a)) {
+        DinoSortSwap(*a, *b);
+    }
+    if (ca) {
+        DinoSortSwap(*b, *c);
+    } else {
+        DinoSortSwap(*a, *c);
+    }
+}
+
+// The comparison's reference type.
+template <class T> struct DinoSortRef {
+    typedef T &type;
+};
+template <class T> struct DinoSortRef<T &> {
+    typedef T &type;
+};
+
+// std::sort (Tag 0, taking the comparison by value) and the __sort it recurses through (Tag 1): a copy of the
+// body each, with a pivot counter each. (NONMATCHING for the unk78/unk79 sort's Tag 0: one compare's operands are
+// the other way round.)
+template <class It, class Compare, int Tag> void DinoSortImpl(It first, It last, Compare comp) {
+    typedef typename DinoSortRef<Compare>::type Ref;
+    static int sPivotShift = -4;
+    while (true) {
+        int len = last - first;
+        if (len <= 1) {
+            return;
+        }
+        if (len <= 20) {
+            DinoSelectionSort<It, Ref>(first, last, comp);
+            return;
+        }
+        It m1 = first + (len / 4 + sPivotShift % 5);
+        if (++sPivotShift >= 5) {
+            sPivotShift = -4;
+        }
+        int q = len * 3 / 4;
+        It m2 = first + (q + sPivotShift % 5);
+        if (++sPivotShift >= 5) {
+            sPivotShift = -4;
+        }
+        It pivot = last - 1;
+        DinoSort3<It, Ref>(m1, m2, pivot, comp);
+        It i = first;
+        It j = pivot;
+        while (comp(*i, *pivot)) {
+            ++i;
+        }
+        do {
+            if (i == --j) {
+                break;
+            }
+        } while (!comp(*j, *pivot));
+        if (i < j) {
+            DinoSortSwap(*i, *j);
+            ++i;
+            while (true) {
+                while (comp(*i, *pivot)) {
+                    ++i;
+                }
+                do {
+                    --j;
+                } while (!comp(*j, *pivot));
+                if (i >= j) {
+                    break;
+                }
+                DinoSortSwap(*i, *j);
+                ++i;
+            }
+        }
+        if (i == first) {
+            // Nothing sorts before the pivot: put it first and split off the run equal to it.
+            DinoSortSwap(*i, *pivot);
+            j = last - 1;
+            ++i;
+            if (!comp(*first, *j)) {
+                while (i != last && !comp(*first, *i)) {
+                    ++i;
+                }
+                if (i < j) {
+                    DinoSortSwap(*i, *j);
+                }
+            }
+            if (i < j) {
+                while (true) {
+                    while (!comp(*first, *i)) {
+                        ++i;
+                    }
+                    do {
+                        --j;
+                    } while (comp(*first, *j));
+                    if (i >= j) {
+                        break;
+                    }
+                    DinoSortSwap(*i, *j);
+                    ++i;
+                }
+            }
+            first = i;
+            continue;
+        }
+        if (i - first < last - i) {
+            DinoSortImpl<It, Ref, 1>(first, i, comp);
+            first = i;
+        } else {
+            DinoSortImpl<It, Ref, 1>(i, last, comp);
+            last = i;
+        }
+    }
+}
+
+// By unk78, highest first, then latest first.
+struct DinoRecordByUnk78Time {
+    bool operator()(const DinoBackupRecord &a, const DinoBackupRecord &b) const {
+        if (a.unk78 > b.unk78) {
+            return true;
+        }
+        if (a.unk78 < b.unk78) {
+            return false;
+        }
+        return a.time > b.time;
+    }
+};
+
+// By unk78, then unk79, then time, lowest first.
+struct DinoRecordByUnk78Unk79Time {
+    bool operator()(const DinoBackupRecord &a, const DinoBackupRecord &b) const {
+        if (a.unk78 < b.unk78) {
+            return true;
+        }
+        if (a.unk78 > b.unk78) {
+            return false;
+        }
+        if (a.unk79 < b.unk79) {
+            return true;
+        }
+        if (a.unk79 > b.unk79) {
+            return false;
+        }
+        return a.time < b.time;
+    }
+};
+
+template void DinoSortImpl<DinoBackupRecord *, DinoRecordByUnk78Time, 0>(DinoBackupRecord *first, DinoBackupRecord *last, DinoRecordByUnk78Time comp);
+template void DinoSortImpl<DinoBackupRecord *, DinoRecordByUnk78Unk79Time, 0>(DinoBackupRecord *first, DinoBackupRecord *last, DinoRecordByUnk78Unk79Time comp);
