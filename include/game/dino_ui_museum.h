@@ -60,11 +60,12 @@ public:
     u8 unkB3[1];            // members start in MMenu's tail padding
     MSmartOam *mOam;        // 0xB4: the items' sprites
     MMenuItem *mLinkFrom;   // 0xB8: linked down to the slots
-    u8 unkBC[0xC4 - 0xBC];
-    MMenuItem *mTabs[5];    // 0xC4
+    MMenuItem *mPageL;      // 0xBC
+    MMenuItem *mPageR;      // 0xC0
+    class DinoUiSortMenuItem *mTabs[5]; // 0xC4
     MPictureFile *mPicture; // 0xD8
     MTextPicture *mInformation; // 0xDC: the fossil information shown
-    MExtAffinePicture *mTabPicture; // 0xE0: scrolled to the tab's part
+    MTextPicture *mTabPicture;  // 0xE0: scrolled to the tab's part
     MMenuItem *mSlots[15];  // 0xE4
     class MIndicator *mVoices[15];   // 0x120: each slot's cry number
     int mSlotCount;     // 0x15C
@@ -137,6 +138,7 @@ public:
 
 class DinoUiMuseumBackButton : public DinoUiMuseumMenuItem {
 public:
+    DinoUiMuseumBackButton(DinoUiMuseumMenu *owner);
     virtual ~DinoUiMuseumBackButton();
     virtual void OnFocusChanged(BOOL focused);
     virtual void OnDecide();
@@ -144,12 +146,14 @@ public:
 
 class DinoUiMuseumPageLButton : public DinoUiMuseumMenuItem {
 public:
+    DinoUiMuseumPageLButton(DinoUiMuseumMenu *owner);
     virtual ~DinoUiMuseumPageLButton();
     virtual void OnDecide();
 };
 
 class DinoUiMuseumPageRButton : public DinoUiMuseumMenuItem {
 public:
+    DinoUiMuseumPageRButton(DinoUiMuseumMenu *owner);
     virtual ~DinoUiMuseumPageRButton();
     virtual void OnDecide();
 };
