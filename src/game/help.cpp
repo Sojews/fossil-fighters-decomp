@@ -75,7 +75,11 @@ void DinoHelpDriver::RemoveBase(DinoHelpBase *base) {
         OS_Terminate();
     }
     mBases.erase(it);
-    sHelpCurrentBase = mBases.size() == 0 ? NULL : mBases.back();
+    if (mBases.size() == 0) {
+        sHelpCurrentBase = NULL;
+    } else {
+        sHelpCurrentBase = mBases.back();
+    }
 }
 
 BOOL DinoHelpDriver::HasBase(DinoHelpBase *base) {
