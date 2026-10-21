@@ -133,8 +133,8 @@ static inline MTaskSet *ATMParallel(DinoUiATMMenu *menu) {
 
 // The help areas, the back button, each team's name, text, button and empty mark, the cursors and the current
 // team's mark; focuses the team last chosen. Coming in fresh to the battle ATM, a message explains it.
-// NONMATCHING: stack slots only: the team loop's hoisted &mParallel goes below the team button's new/oam temporaries
-// in the game, above them here (as DinoUiTeamSelectMenu::OnStart).
+// (The loop's last AddTail goes through a block-local declared late: that puts the hoisted &mParallel below the team
+// button's temporaries, as in the game.)
 #pragma opt_common_subs off
 void DinoUiATMMenu::OnStart() {
     SetLinkFallback(1);
@@ -167,12 +167,11 @@ void DinoUiATMMenu::OnStart() {
     MFont *nameFont = gDinoResource->CreateFont24(0, 2, 1);
     MFont *textFont = gDinoResource->CreateFont24(0, 3, 0);
     for (int i = 0; i < 3; i++) {
-        MTaskSet *tasks = ATMParallel(this);
         mTeamNames[i] = new DinoUiPartsTeamIndicator(data_ov007_0218cd10[i] + data_ov007_0218cbe0.mNameOffset, nameFont);
-        tasks->AddTail(mTeamNames[i]);
+        ATMParallel(this)->AddTail(mTeamNames[i]);
         mTeamTexts[i] = new MIndicator(new MObjCanvas(gCurrentDisplay, MPoint(0xC0, 0x20), data_020b5870, TRUE),
                                        textFont, 0);
-        tasks->AddTail(mTeamTexts[i]);
+        ATMParallel(this)->AddTail(mTeamTexts[i]);
         mTeamTexts[i]->SetPosition(data_ov007_0218cd10[i] + data_ov007_0218cbe0.mNameOffset);
         mTeamTexts[i]->SetPriority(3);
         mTeamButtons[i] = new DinoUiATMTeamButton(this, data_ov007_0218cd10[i] + data_ov007_0218cbe0.mCursorOffset);
@@ -182,6 +181,7 @@ void DinoUiATMMenu::OnStart() {
         mEmptyMarks[i]->SetPriority(3);
         ((MMotion *)mEmptyMarks[i])->Play(1, 0);
         mEmptyMarks[i]->Hide();
+        MTaskSet *tasks = ATMParallel(this);
         tasks->AddTail(mEmptyMarks[i]);
     }
     BOOL fresh = FALSE;
