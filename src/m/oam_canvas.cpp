@@ -182,12 +182,13 @@ void MOamCanvas<TOam, TUnit>::Execute() {
 
 template <class TOam, class TUnit>
 void MOamCanvas<TOam, TUnit>::AddPiece(MRect rect, int shape) {
-    int h = rect.bottom - rect.top;
-    int w = rect.right - rect.left;
-    int sw = gObjSizes[0][shape].x;
-    int sh = gObjSizes[0][shape].y;
+    int h = rect.GetHeight();
+    int w = rect.GetWidth();
+    MPoint size = gObjSizes[0][shape];
+    int sw = size.x;
+    int sh = size.y;
     Piece piece;
-    piece.rect = MRect(MPoint(rect.left, rect.top), MPoint(rect.left + sw, rect.top + sh));
+    piece.rect = MRect(rect.GetTopLeft(), rect.GetTopLeft() + size);
     piece.shape = shape;
     mPieces.push_back(piece);
     if (w <= sw && h > sh) {
@@ -204,16 +205,16 @@ template <class TOam, class TUnit>
 void MOamCanvas<TOam, TUnit>::Layout(MRect rect) {
     mRects.push_back(rect);
     while (mRects.size() != 0) {
-        MRect r = mRects.back();
-        mRects.erase(std::vector<MRect>::iterator(&mRects.back()));
-        int h = r.bottom - r.top;
-        int w = r.right - r.left;
+        rect = *(mRects.end() - 1);
+        mRects.erase(mRects.end() - 1);
+        int h = rect.bottom - rect.top;
+        int w = rect.right - rect.left;
         int best = -1;
         int fitting = -1;
         int bestArea = 0x80000000;
         int fittingArea = 0x80000000;
         if (MPoint(w, h) == MPoint(8, 8)) {
-            AddPiece(r, 0);
+            AddPiece(rect, 0);
         } else {
             int i;
             const MPoint *size = &gObjSizes[3][2];
@@ -223,7 +224,7 @@ void MOamCanvas<TOam, TUnit>::Layout(MRect rect) {
                     continue;
                 }
                 if (s.x == w && s.y == h) {
-                    AddPiece(r, i);
+                    AddPiece(rect, i);
                     goto next;
                 }
                 int area = s.x * s.y;
@@ -238,9 +239,9 @@ void MOamCanvas<TOam, TUnit>::Layout(MRect rect) {
                 }
             }
             if (best == -1) {
-                AddPiece(r, fitting);
+                AddPiece(rect, fitting);
             } else {
-                AddPiece(r, best);
+                AddPiece(rect, best);
             }
         }
     next:;
