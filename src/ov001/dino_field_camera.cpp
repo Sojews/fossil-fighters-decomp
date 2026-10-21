@@ -176,6 +176,82 @@ MFx32 DinoFieldCamera::GetUnk148() {
     return mUnk148;
 }
 
+// The point in fixed point.
+static inline MFx32Point ToFx32Point(MPoint p) {
+    return MFx32Point(MFx32(p.x), MFx32(p.y));
+}
+
+// The camera setting a circle of the map has, if any.
+static inline DinoFieldMapCamera *GetCircleCamera(DinoFieldMapCircle *circle) {
+    if (circle->unk00 == 0) {
+        return NULL;
+    }
+    return (DinoFieldMapCamera *) ((u8 *) circle + circle->unk00);
+}
+
+// Without tracking: the map's default camera setting, or the setting of the circle the focus is in, blended out to the
+// default between the circle's inner and outer radius.
+// NONMATCHING: the game's frame has 32 more bytes of temporaries, and reads the first distance after the radius.
+void DinoFieldCamera::IdleUnk0() {
+    DinoFieldMapCamera *first = mField->GetMap()->GetCamera(0);
+    DinoFieldMapCamera def;
+    def.x = first->x;
+    def.y = first->y;
+    def.z = first->z;
+    def.scale = first->scale;
+    MFx32 outer;
+    MFx32 inner;
+    MFx32Point center;
+    DinoFieldMapCamera camera;
+    MFx32 len;
+    if (mUnkFC != 0) {
+        DinoFieldMapCircle *circle = mField->GetMap()->GetCircle(mUnkFC);
+        MFx32Point c = ToFx32Point(MPoint(circle->x, circle->y));
+        MFx32 d = (mFocusPos - c).Length();
+        if (d > MFx32(circle->radius)) {
+            mUnkFC = mField->GetMap()->FindCircle(mFocusPos);
+        }
+    } else {
+        mUnkFC = mField->GetMap()->FindCircle(mFocusPos);
+    }
+    if (mUnkFC == 0) {
+        mUnk100 = def.x;
+        mUnk102 = def.y;
+        mUnk104 = def.z;
+        mUnk108 = def.scale;
+        return;
+    }
+    DinoFieldMapCircle *circle = mField->GetMap()->GetCircle(mUnkFC);
+    camera.x = GetCircleCamera(circle)->x;
+    camera.y = GetCircleCamera(circle)->y;
+    camera.z = GetCircleCamera(circle)->z;
+    camera.scale = GetCircleCamera(circle)->scale;
+    center = ToFx32Point(MPoint(circle->x, circle->y));
+    inner = MFx32((int) circle->unk0C);
+    outer = MFx32(circle->radius);
+    len = (mFocusPos - center).Length();
+    if (len <= inner) {
+        mUnk100 = camera.x;
+        mUnk102 = camera.y;
+        mUnk104 = camera.z;
+        mUnk108 = camera.scale;
+        return;
+    }
+    if (len > outer) {
+        mUnk100 = def.x;
+        mUnk102 = def.y;
+        mUnk104 = def.z;
+        mUnk108 = def.scale;
+        return;
+    }
+    MFx32 s = MFx32(1) - (len - inner) / (outer - inner);
+    MFx32 t = MFx32(1) - s * s;
+    mUnk100 = LerpAngle(def.x, camera.x, t);
+    mUnk102 = LerpAngle(def.y, camera.y, t);
+    mUnk104 = LerpAngle(def.z, camera.z, t);
+    mUnk108 = camera.scale * (MFx32(1) - t) + def.scale * t;
+}
+
 // After a map change: puts the camera on the ground under the focus, and sets the map's rotation and scale for where
 // the focus stands (or the camera's own when it doesn't track).
 void DinoFieldCamera::IdleUnk1() {
