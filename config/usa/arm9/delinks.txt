@@ -144,6 +144,7 @@ libs/msl/src/math/s_ldexp.c:
 
 src/game/dino_resource.cpp:
     .text       start:0x02011154 end:0x020133e0
+    .init       start:0x02088e34 end:0x02088f10
 
 src/m/3d_scene.cpp:
     .text       start:0x02021620 end:0x02021ddc

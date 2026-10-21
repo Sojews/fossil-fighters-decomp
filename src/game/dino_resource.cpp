@@ -134,9 +134,11 @@ extern "C" struct {
 #define sEtcBattleAttackTypePath (data_020ba044.mEtcBattleAttackType)
 
 // The order here gives the game's layout (see tools/static_order.py).
+// NONMATCHING (__sinit): the game constructs the table, the mutex, then the caches region map, region center, talk,
+// excavate, bgm, scene; declaring them in that order gives that code but breaks the layout the readers need.
 // static_order: begin
 DinoResource *gDinoResource;
-static OSMutex sMutex;
+static MMutex sMutex;
 static DinoFileCache sTalkMessageMatch(sEtcTalkMsgMatchPath);
 static DinoFileCache sMapSceneMatch(sEtcMapSceneMatchPath);
 static DinoFileCache sMapBgmMatch(sEtcMapBgmMatchPath);
@@ -152,7 +154,7 @@ inline void DinoFileCache::Read(u32 offset, void *dest, u32 size) {
         mBlock = -1;
         mOpened = TRUE;
     }
-    MScopedLock lock(&sMutex, TRUE);
+    MScopedLock lock(&sMutex.mutex, TRUE);
     if (offset >> 8 != mBlock) {
         mBlock = offset >> 8;
         FSFile file;
