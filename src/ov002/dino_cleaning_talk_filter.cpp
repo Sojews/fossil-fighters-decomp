@@ -210,7 +210,7 @@ void DinoCleaningTalkWindow::SetUnkCC(u32 value) {
 
 // Says text: opens the window (the face, the frame with a random motion and the console, sliding in) or, when it's
 // open, puts it back in place and replaces the text.
-// NONMATCHING: the slide-in points' temporaries and two task spills take other stack slots.
+// NONMATCHING: two task spills take each other's stack slots, and 256 and 320 are made the other way round.
 extern "C" void func_ov002_021573e8(DinoCleaningTalkWindow *window, const char *text) {
     window->mRate = MFx32::FromRaw(((const s32 *)gDinoResource->GetExcavate7C())[5]);
     if (!window->mTasksB8->IsEmpty()) {
@@ -250,17 +250,14 @@ extern "C" void func_ov002_021573e8(DinoCleaningTalkWindow *window, const char *
     blend->SetTarget2(0x3F);
     blend->SetAlpha(12, 4);
     window->mTasksB8->AddTail(window->mFace, window->mConsole, window->mFrame, window->mOam);
-    MTask *face;
-    MTask *console;
-    MTask *frame;
     MTask *run = MTaskRunTransfer::Create(window->mConsole);
-    frame = window->mFrame->CreateCoordAnime(MPoint(320, 192), MPoint(256, 192), 10, 12);
-    console = window->mConsole->CreateCoordAnime(
-        MPoint(data_ov002_0216431c.mPos.x, data_ov002_0216431c.mPos.y + 40), data_ov002_0216431c.mPos, 10, 12);
-    face = window->mFace->CreateCoordAnime(MPoint(0, 40), MPoint(0, 0), 10, 12);
-    MParallelTaskSet *set = new MParallelTaskSet(TRUE);
-    set->AddTail(face, console, frame);
-    window->mTasksB4->AddTail(set, run);
+    window->mTasksB4->AddTail(
+        DinoTalkParallel(window->mFace->CreateCoordAnime(MPoint(0, 40), MPoint(0, 0), 10, 12),
+                         window->mConsole->CreateCoordAnime(MPoint(data_ov002_0216431c.mPos.x,
+                                                                   data_ov002_0216431c.mPos.y + 40),
+                                                            data_ov002_0216431c.mPos, 10, 12),
+                         window->mFrame->CreateCoordAnime(MPoint(320, 192), MPoint(256, 192), 10, 12)),
+        run);
 }
 
 void DinoCleaningTalkWindow::SetRate(MFx32 rate) {
