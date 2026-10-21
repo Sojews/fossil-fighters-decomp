@@ -192,23 +192,29 @@ inline SkipTelopTask::SkipTelopTask(MTask *task, u8 noSkip)
     mTasks->AddTail(task);
 }
 
-inline SkipLoseTelopTask::SkipLoseTelopTask(DinoBattleView *view, MView *picture, MTask *task)
+// (The picture first: the game loads the view before it.)
+inline SkipLoseTelopTask::SkipLoseTelopTask(MView *picture, DinoBattleView *view, MTask *task)
     : SkipTelopTask(task, view->GetUnk138()) {
     mView = picture;
     mView3D = (DinoBattleView3D *)view;
 }
 
 // The lost telop: slides the picture in from above with a bounce, fades the screen behind it, and waits (skippable).
-// NONMATCHING (98%): the game keeps the blend in the lowest stack slot (ours: above the animations), and takes the
-// frames' address from its own literal.
+extern "C" const int data_ov000_02193884;   // (the frames' own label: the game takes their address from it)
+
+// (Through a non-member inline, the game's blend gets the lowest stack slot.)
+static inline MBlend *DinoSubBlend() {
+    return gLcd->mSub->mBlend;
+}
+
 void DinoBattleViewEffectTelop::StateLose() {
     int least = 0xDC;
-    int frames = std::max(*(const int *)((const u8 *)&data_ov000_0219387c + 8), least);
+    int frames = *(*(const int *)((const u8 *)&data_ov000_0219387c + 8) < least ? &least : &data_ov000_02193884);
     mPicture->Show();
     mPicture->SetPosition(MPoint(0, -mPicture->GetHeight()));
     mParallel.AddTail(mPicture);
     mState = data_ov000_0219387c.State_30;
-    MBlend *blend = gLcd->mSub->mBlend;
+    MBlend *blend = DinoSubBlend();
     blend->SetMode(3);
     blend->SetTarget1(~mPicture->GetPlaneMask() & 0x3F);
     blend->SetTarget2(0);
@@ -219,7 +225,7 @@ void DinoBattleViewEffectTelop::StateLose() {
                    mPicture->CreateCoordAnime(MPoint(0, -10), MPoint(0, -20), 20, -2), new MTimer(frames));
     MParallelTaskSet *skip = new MParallelTaskSet();
     mParallel.AddTail(skip);
-    skip->AddTail(new SkipLoseTelopTask((DinoBattleView *)mUnk7C, mPicture, tasks));
+    skip->AddTail(new SkipLoseTelopTask(mPicture, (DinoBattleView *)mUnk7C, tasks));
     mSerial.AddTail(MTaskSetWaitEmptyTask::Create(skip));
 }
 

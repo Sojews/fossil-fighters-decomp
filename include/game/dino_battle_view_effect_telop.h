@@ -79,7 +79,7 @@ public:
 
 class SkipLoseTelopTask : public SkipTelopTask {
 public:
-    inline SkipLoseTelopTask(DinoBattleView *view, MView *picture, MTask *task);
+    inline SkipLoseTelopTask(MView *picture, DinoBattleView *view, MTask *task);
     virtual ~SkipLoseTelopTask();
     virtual void OnFinished();
     virtual void OnSkipped();
