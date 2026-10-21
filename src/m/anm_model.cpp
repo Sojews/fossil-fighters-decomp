@@ -2,6 +2,8 @@
 // Not decompiled yet: TintPalette, most of the Unk0C updates, MPolygonChar::Load (the script reader) and the
 // node data reader.
 
+#pragma ipa file
+
 #include "m/anm_model.h"
 #include "m/3d_model.h"
 #include "m/3d_resource.h"
@@ -703,7 +705,7 @@ struct MAnmName {
 #pragma force_active on
 
 // Makes a key from a script line's values if it has a value (flags[1]), and a maximum (flags[2]).
-static BOOL MAnmMakeKey(MAnmKey *key, int frame, const u8 *flags, const int *values) {
+BOOL MAnmMakeKey(MAnmKey *key, int frame, const u8 *flags, const int *values) {
     if (flags[1] == 1) {
         key->mFrame = frame;
         key->mMin = values[1];
@@ -717,7 +719,7 @@ static BOOL MAnmMakeKey(MAnmKey *key, int frame, const u8 *flags, const int *val
     return FALSE;
 }
 
-static int MAnmStrCaseCmp(const char *s1, const char *s2) {
+int MAnmStrCaseCmp(const char *s1, const char *s2) {
     while (*s1 != 0 && *s2 != 0) {
         char c1 = *s1;
         char c2 = *s2;
@@ -736,7 +738,7 @@ static int MAnmStrCaseCmp(const char *s1, const char *s2) {
     return *s1 - *s2;
 }
 
-static int MAnmLookup(const char *name, const MAnmName *table) {
+int MAnmLookup(const char *name, const MAnmName *table) {
     while (table->mValue != -1) {
         if (MAnmStrCaseCmp(table->mName, name) == 0) {
             break;
@@ -915,6 +917,8 @@ void MAnmMakeArrays() {
 }
 #pragma dont_inline reset
 
+template std::string::size_type std::string::find(const char *s, std::string::size_type pos,
+                                                  std::string::size_type n) const;
 // (Calling find here instantiates it with the name the game's callers use.)
 #pragma dont_inline on
 std::string::size_type MAnmModelFindAnchor(const std::string &s, const char *text) {
