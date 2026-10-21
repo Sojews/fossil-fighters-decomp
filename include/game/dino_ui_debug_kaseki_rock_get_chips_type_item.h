@@ -6,8 +6,13 @@
 
 class MIndicator;
 
+class MSmartOam;
+class MFont;
+class MMenu;
+
 class DinoUiDebugKasekiRockGetChipsTypeItem : public MMenuItem {
 public:
+    DinoUiDebugKasekiRockGetChipsTypeItem(MMenu *menu, u32 *type, MSmartOam *oam, MFont *font, MPoint center);
     virtual ~DinoUiDebugKasekiRockGetChipsTypeItem();
     virtual void Idle();
     virtual MRect GetFrame();

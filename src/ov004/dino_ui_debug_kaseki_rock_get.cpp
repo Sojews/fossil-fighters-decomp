@@ -1,5 +1,4 @@
 // DinoUiDebugKasekiRockGet, DinoUiDebugKasekiRockGetMenuDecItem, DinoUiDebugKasekiRockGetMenuIncItem, DinoUiDebugKasekiRockGetKasekiTypeItem, DinoUiDebugKasekiRockGetChipsTypeItem, DinoUiDebugKasekiRockGetMenuStartItem.
-// Only the destructors and empty overrides are decompiled so far.
 
 // Derived destructors have their bases' destructor bodies inlined; auto-inlining the ones defined above does that.
 #pragma auto_inline on
@@ -16,6 +15,11 @@
 #include "game/dino_ui_debug_kaseki_rock_get_kaseki_type_item.h"
 #include "game/dino_ui_debug_kaseki_rock_get_chips_type_item.h"
 #include "game/dino_ui_debug_kaseki_rock_get_menu_start_item.h"
+#include "game/dino_common_label.h"
+#include "game/dino_common_cursor.h"
+#include "m/smart_oam.h"
+#include "m/input.h"
+#include "m/oam_canvas.h"
 
 DinoUiDebugKasekiRockGetMenu::~DinoUiDebugKasekiRockGetMenu() {
     mFont->Release();
@@ -203,6 +207,121 @@ void DinoUiDebugKasekiRockGetMenu::OnFocus(MMenuItem *item) {
         mTasks->AddTail(mCursor->CreateFrameAnime(mCursor->GetFrame(), item->GetFrame(), 5, -2));
     }
 }
+
+extern "C" const u32 data_0208a400; // "-"
+extern "C" const u32 data_0208a404; // "+"
+extern "C" const u32 data_0208acbc; // "back"
+extern "C" const u32 data_0208acd4; // "start"
+
+inline DinoUiDebugKasekiRockGetMenuDecItem::DinoUiDebugKasekiRockGetMenuDecItem(int *value, int min, int max, MSmartOam *oam, MFont *font, MPoint center) {
+    mValue = value;
+    mMin = min;
+    mMax = max;
+    SetNoFocus(TRUE);
+    mView = new DinoCommonLabel(oam, font, gDinoResource->GetUnkTable(), data_0208a400, MPoint(0, 0));
+    MPoint half = mView->GetSize() / 2;
+    mView->SetPosition(MPoint(center.x - half.x, center.y - half.y));
+    mView->Show();
+    mParallel.AddTail(mView);
+}
+
+inline DinoUiDebugKasekiRockGetMenuIncItem::DinoUiDebugKasekiRockGetMenuIncItem(int *value, int min, int max, MSmartOam *oam, MFont *font, MPoint center) {
+    mValue = value;
+    mMin = min;
+    mMax = max;
+    SetNoFocus(TRUE);
+    mView = new DinoCommonLabel(oam, font, gDinoResource->GetUnkTable(), data_0208a404, MPoint(0, 0));
+    MPoint half = mView->GetSize() / 2;
+    mView->SetPosition(MPoint(center.x - half.x, center.y - half.y));
+    mView->Show();
+    mParallel.AddTail(mView);
+}
+
+inline DinoUiDebugKasekiRockGetMenuKasekiRockIdItem::DinoUiDebugKasekiRockGetMenuKasekiRockIdItem(MMenu *menu, u32 *value, MSmartOam *oam, MFont *font, MPoint center)
+    : mValue(value), mDefs(std::string(data_ov004_02173580.mDefsPath)) {
+    mView = new MIndicator(new MSmartObjCanvas(oam, MPoint(0x50, 0x10), gDinoResource->GetUnkTable(), TRUE), font, 0);
+    MPoint half = mView->GetSize() / 2;
+    mView->SetPosition(MPoint(center.x - half.x, center.y - half.y));
+    mView->Show();
+    mParallel.AddTail(mView);
+    mBuffer = new u32[mDefs.Get()->count];
+    mCount = 0;
+    mIndex = 0;
+    for (u32 i = 0; i < mDefs.Get()->count; i++) {
+        if (*(const u8 *)mDefs.Get()->GetDef(i)) {
+            if (*mValue == i) {
+                mIndex = mCount;
+            }
+            mBuffer[mCount++] = i;
+        }
+    }
+    mKeyItemA = new DinoUiDebugKasekiRockGetMenuDecItem((int *)&mIndex, 0, mCount - 1, oam, font, MPoint(center.x - 0x40, center.y));
+    menu->AddItem(mKeyItemA);
+    mKeyItemB = new DinoUiDebugKasekiRockGetMenuIncItem((int *)&mIndex, 0, mCount - 1, oam, font, MPoint(center.x + 0x40, center.y));
+    menu->AddItem(mKeyItemB);
+}
+
+inline DinoUiDebugKasekiRockGetKasekiTypeItem::DinoUiDebugKasekiRockGetKasekiTypeItem(MMenu *menu, u32 *type, MSmartOam *oam, MFont *font, MPoint center) {
+    mType = type;
+    mView = new MIndicator(new MSmartObjCanvas(oam, MPoint(0x50, 0x10), gDinoResource->GetUnkTable(), TRUE), font, 0);
+    MPoint half = mView->GetSize() / 2;
+    mView->SetPosition(MPoint(center.x - half.x, center.y - half.y));
+    mView->Show();
+    mParallel.AddTail(mView);
+    mKeyItemA = new DinoUiDebugKasekiRockGetMenuDecItem((int *)mType, 0, 1, oam, font, MPoint(center.x - 0x40, center.y));
+    menu->AddItem(mKeyItemA);
+    mKeyItemB = new DinoUiDebugKasekiRockGetMenuIncItem((int *)mType, 0, 1, oam, font, MPoint(center.x + 0x40, center.y));
+    menu->AddItem(mKeyItemB);
+}
+
+inline DinoUiDebugKasekiRockGetChipsTypeItem::DinoUiDebugKasekiRockGetChipsTypeItem(MMenu *menu, u32 *type, MSmartOam *oam, MFont *font, MPoint center) {
+    mType = type;
+    mView = new MIndicator(new MSmartObjCanvas(oam, MPoint(0x50, 0x10), gDinoResource->GetUnkTable(), TRUE), font, 0);
+    MPoint half = mView->GetSize() / 2;
+    mView->SetPosition(MPoint(center.x - half.x, center.y - half.y));
+    mView->Show();
+    mParallel.AddTail(mView);
+    mKeyItemA = new DinoUiDebugKasekiRockGetMenuDecItem((int *)mType, 0, 6, oam, font, MPoint(center.x - 0x40, center.y));
+    menu->AddItem(mKeyItemA);
+    mKeyItemB = new DinoUiDebugKasekiRockGetMenuIncItem((int *)mType, 0, 6, oam, font, MPoint(center.x + 0x40, center.y));
+    menu->AddItem(mKeyItemB);
+}
+
+inline DinoUiDebugKasekiRockGetMenuStartItem::DinoUiDebugKasekiRockGetMenuStartItem(MSmartOam *oam, MFont *font, u32 textId, MPoint center) {
+    SetKeys(8);
+    mView = new DinoCommonLabel(oam, font, gDinoResource->GetUnkTable(), textId, MPoint(0, 0));
+    MPoint half = mView->GetSize() / 2;
+    mView->SetPosition(MPoint(center.x - half.x, center.y - half.y));
+    mView->Show();
+    mParallel.AddTail(mView);
+}
+
+// The rock id (only the ids of fossils that exist), fossil type and chips type, each with - and + items, then start
+// and back.
+// NONMATCHING: register and stack slot choices in the item ctors (the centring halves, the type items' oam).
+#pragma inline_max_size(2000)
+void DinoUiDebugKasekiRockGetMenu::OnStart() {
+    mKaseki = 1;
+    mUnkAC = 0;
+    mUnkB0 = 0;
+    mOam = new MSmartOam(0x50, 0, TRUE);
+    GetInput()->SetRepeat(0x1030, 0x14, 2);
+    mFont = gDinoResource->CreateFont16(0, 10, 0);
+    mFont->AddRef();
+    AddItem(new DinoUiDebugKasekiRockGetMenuKasekiRockIdItem(this, &mKaseki, mOam, mFont, MPoint(0x80, 0x20)));
+    AddItem(new DinoUiDebugKasekiRockGetKasekiTypeItem(this, &mUnkAC, mOam, mFont, MPoint(0x80, 0x40)));
+    AddItem(new DinoUiDebugKasekiRockGetChipsTypeItem(this, &mUnkB0, mOam, mFont, MPoint(0x80, 0x60)));
+    mStartItem = new DinoUiDebugKasekiRockGetMenuStartItem(mOam, mFont, data_0208acd4, MPoint(0x80, 0x80));
+    AddItem(mStartItem);
+    mBackItem = new DinoUiDebugKasekiRockGetMenuStartItem(mOam, mFont, data_0208acbc, MPoint(0x80, 0xA0));
+    mBackItem->SetKeys(2);
+    AddItem(mBackItem);
+    mTasks = new MParallelTaskSet;
+    mCursor = new DinoCommonCursor(mOam);
+    mParallel.AddTail(mTasks, mCursor, mOam);
+    FocusNearestItem(MPoint(0, 0));
+}
+#pragma inline_max_size reset
 
 void DinoUiDebugKasekiRockGet::Idle() {
     MTask *exit = MTaskExitTransfer::Create(this);

@@ -4,8 +4,13 @@
 #include "m/view.h"
 #include "m/menu_item.h"
 
+class MSmartOam;
+class MFont;
+class MMenu;
+
 class DinoUiDebugKasekiRockGetMenuStartItem : public MMenuItem {
 public:
+    DinoUiDebugKasekiRockGetMenuStartItem(MSmartOam *oam, MFont *font, u32 textId, MPoint center);
     virtual ~DinoUiDebugKasekiRockGetMenuStartItem();
     virtual MRect GetFrame();
     virtual void OnDecide();
