@@ -449,3 +449,8 @@ static struct DinoCommonWindowMenuItemFlushTaskStaticInit {
 
 // (Off at the end of the file, where template members are instantiated: the game calls them out of line.)
 #pragma auto_inline off
+
+// The entry list's growth, emitted ahead of the push it serves.
+template size_t std::__vec_deleter<DinoCommonWindowMenuEntry, std::allocator<DinoCommonWindowMenuEntry> >::grow_by(size_t n);
+template void std::__vec_deleter<DinoCommonWindowMenuEntry, std::allocator<DinoCommonWindowMenuEntry> >::append_realloc(size_t n, const DinoCommonWindowMenuEntry &x);
+template void std::__vec_deleter<DinoCommonWindowMenuEntry, std::allocator<DinoCommonWindowMenuEntry> >::sub_push_back(const DinoCommonWindowMenuEntry &x, Metrowerks::int2type<false>);

@@ -120,3 +120,8 @@ void MIndicator::SetText(const std::wstring &text) {
         mPending.push_back(blank);
     }
 }
+
+// The pending list's growth, emitted ahead of the push it serves.
+template size_t std::__vec_deleter<MIndicator::Entry, std::allocator<MIndicator::Entry> >::grow_by(size_t n);
+template void std::__vec_deleter<MIndicator::Entry, std::allocator<MIndicator::Entry> >::append_realloc(size_t n, const MIndicator::Entry &x);
+template void std::__vec_deleter<MIndicator::Entry, std::allocator<MIndicator::Entry> >::sub_push_back(const MIndicator::Entry &x, Metrowerks::int2type<true>);

@@ -81,3 +81,8 @@ void MSerializer::Read(const void *buf) {
         }
     }
 }
+
+// (The reallocation helper's deleter destructor goes ahead of the helper's, and the entries' deleter ahead of the
+// serializer's destructor, as in the game.)
+template std::__vec_deleter<MSerializer::Entry, std::allocator<MSerializer::Entry> &>::~__vec_deleter();
+template std::__vec_deleter<MSerializer::Entry, std::allocator<MSerializer::Entry> >::~__vec_deleter();

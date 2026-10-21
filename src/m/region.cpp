@@ -111,3 +111,8 @@ bool MRegion::IsEmpty() const {
 void MRegion::Clear() {
     mRects.clear();
 }
+
+// The vector members, in the order the game emits them.
+template void std::__vec_deleter<MRect, std::allocator<MRect> >::reallocate_clear(size_t n, size_t max);
+template size_t std::__vec_deleter<MRect, std::allocator<MRect> >::grow_by(size_t n);
+template void std::__vec_deleter<MRect, std::allocator<MRect> >::sub_push_back(const MRect &x, Metrowerks::int2type<true>);

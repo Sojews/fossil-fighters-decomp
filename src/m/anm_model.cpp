@@ -905,6 +905,7 @@ MAnmSE::~MAnmSE() {
 
 #pragma auto_inline off
 template class std::__vec_deleter<MAnmKey, std::allocator<MAnmKey> >;
+template std::__vec_deleter<MAnmKey, std::allocator<MAnmKey> &>::~__vec_deleter();
 // (The script reader makes arrays of key vectors and trail models; until it is decompiled, this keeps the
 // constructors it uses out of line.)
 #pragma dont_inline on
@@ -923,3 +924,6 @@ std::string::size_type MAnmModelFind3Anchor(const std::string &s, const char *te
     return s.find(text, 0, 0);
 }
 #pragma dont_inline reset
+
+// (The reallocation helper's allocate goes ahead of its deleter's destructor, as in the game.)
+template void std::__vec_deleter<MAnmKey, std::allocator<MAnmKey> &>::allocate(size_t n, Metrowerks::int2type<true>);

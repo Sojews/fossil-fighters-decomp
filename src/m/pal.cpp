@@ -246,3 +246,6 @@ void MPalLoadTask::Transfer() {
 
 MPalLoadTask::~MPalLoadTask() {
 }
+
+// (The reallocation helper's deleter destructor goes ahead of the helper's, as in the game.)
+template std::__vec_deleter<MPalAnime::Frame, std::allocator<MPalAnime::Frame> &>::~__vec_deleter();

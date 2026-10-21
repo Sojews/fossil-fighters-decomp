@@ -638,3 +638,4 @@ void Dino3DClearSoundNames() {
 
 #pragma auto_inline off
 template class std::__vec_deleter<Dino3DSoundName, std::allocator<Dino3DSoundName> >;
+template std::__vec_deleter<Dino3DSoundName, std::allocator<Dino3DSoundName> &>::~__vec_deleter();

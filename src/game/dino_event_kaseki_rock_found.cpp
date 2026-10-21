@@ -85,3 +85,4 @@ MTask *DinoEventKasekiRockFound::CreateYesNo(u32 message) {
 #pragma auto_inline off
 // Vector instances the game emits in this file (made explicitly until the code that uses them is decompiled).
 template class std::__vec_deleter<std::string, std::allocator<std::string> >;
+template std::__vec_deleter<std::string, std::allocator<std::string> &>::~__vec_deleter();

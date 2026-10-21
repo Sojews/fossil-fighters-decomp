@@ -989,6 +989,11 @@ void DinoFieldChara::SetEffect(u32 effect) {
 }
 
 #pragma auto_inline off
+// (clear and insert_node_at go ahead of destroy, as in the game.)
+template void DinoFieldCharaCacheTree::clear();
+template DinoFieldCharaCacheTree::node_base *DinoFieldCharaCacheTree::insert_node_at(node_base *parent, bool left,
+                                                                                  bool leftmost,
+                                                                                  const value_type &v);
 template DinoFieldCharaCacheTree::node_base *DinoFieldCharaCacheTree::find_insert_position(const u32 &k,
                                                                                         node_base *&last_not_greater,
                                                                                         bool &left, bool &leftmost);
