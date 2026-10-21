@@ -222,7 +222,12 @@ void DinoFieldDance::ShowMessage(u32 priority, u32 id) {
     mUnkDC->AddTail(mTalk->CreateWaitStartTask());
 }
 
-// NONMATCHING: push_back's two flag bytes swap stack slots, and the loops' spills land in other slots.
+// (Casting inside an inline keeps push_back's two flag bytes in the game's slots.)
+static inline void DinoDancePush(std::vector<MTask *> &v, DinoFieldChara *const &chara) {
+    v.push_back((MTask *const &)chara);
+}
+
+// NONMATCHING: the game spills the time digits loop's &mParallel to the lowest slot (ours, the highest).
 // Sets the dance up: its dancers, the time display and a blinking start.
 void DinoFieldDance::Start() {
     mFont = new DinoCommonFont(0, 0, 0);
@@ -232,7 +237,7 @@ void DinoFieldDance::Start() {
         const DinoDanceFile *file = (const DinoDanceFile *)mDance.Get();
         DinoFieldChara *chara = mField->GetChara(((const u32 *)((const u8 *)file + file->dancerOffset))[i]);
         if (chara != NULL) {
-            mUnkA4.push_back((MTask *const &)chara);
+            DinoDancePush(mUnkA4, chara);
             chara->CacheMotion(9);
         }
     }
