@@ -36,7 +36,6 @@ LifeMotion::LifeMotion(const char *path, MSmartOam *oam, u8 flip, MPoint pos) : 
     SetMotion(path);
 }
 
-// NONMATCHING: `shown` and the new-expression's constructed flag get r6/r7 swapped
 void LifeMotion::SetMotion(const char *path) {
     if (mPath == path) {
         return;
@@ -46,9 +45,7 @@ void LifeMotion::SetMotion(const char *path) {
     BOOL shown = FALSE;
     if (mMotion != NULL) {
         pos = mMotion->GetPosition();
-        if (!mMotion->IsHidden()) {
-            shown = TRUE;
-        }
+        shown = !mMotion->IsHidden();
         mParallel.Remove(mMotion);
         delete mMotion;
     }
