@@ -141,6 +141,10 @@ void DinoEventKasekiRockGet::StateAnswered() {
     }
 }
 
+// NONMATCHING: the game puts the reallocating branch's tail at the end.
+template void std::__vec_deleter<std::string, std::allocator<std::string> >::assign<std::string *>(
+    std::string *first, std::string *last, Metrowerks::int2type<true>);
+
 // Lets the player choose the stored rock to swap out, with the mode's two questions.
 void DinoEventKasekiRockGet::StateChooseSwap() {
     mSwapIndex = 0;
@@ -250,9 +254,6 @@ typename basic_string<C, Traits, Alloc>::size_type basic_string<C, Traits, Alloc
 template string::size_type string::find(const string &str, string::size_type pos) const;
 }
 
-// NONMATCHING: the game puts the reallocating branch's tail at the end.
-template void std::__vec_deleter<std::string, std::allocator<std::string> >::assign<std::string *>(
-    std::string *first, std::string *last, Metrowerks::int2type<true>);
 
 MTask *DinoEventKasekiRockGetContainerSelect::CreateUi() {
     return new DinoUiContainerDropMenu(mArg0, mArg1, std::vector<std::string>(mNames));
