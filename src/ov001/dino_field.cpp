@@ -85,17 +85,12 @@ extern "C" u8 data_ov001_0216ae68[];
 // The buttons' help texts.
 extern const u32 data_0208adb4, data_0208adb8, data_0208adbc;
 
-// The excavation defs, read as the field's.
-static inline const MResource<DinoFieldDefs> &DinoAsFieldDefs(const MResource<DinoExcavateDefs> &defs) {
-    return (const MResource<DinoFieldDefs> &)defs;
-}
-
 // Makes the field: its screens (unless it only holds a saved state), characters, map, camera, radar and town map,
 // the buttons and their help, and what it saves.
 DinoField::DinoField(MScreen **screen, u32 arg1)
     : MProcess(NULL), mUnk264(FALSE), mUnk2C8((BOOL *)screen), mUnk3C8(arg1) {
     if (!mUnk3C8) {
-        mDefs = DinoAsFieldDefs(MResource<DinoExcavateDefs>(std::string(data_ov001_02169360.mDefsPath)));
+        mDefs = MResource<DinoExcavateDefs>(std::string(data_ov001_02169360.mDefsPath));
     }
     GetParallel()->SetUseMutex(TRUE);
     DinoHelpBase::Disable();

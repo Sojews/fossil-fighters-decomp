@@ -16,6 +16,12 @@ public:
     }
 
     const T *Get() { return (const T *)mFile.GetData(); }
+    // Takes another type's resource (the same file, read as a T).
+    template <class U> MResource &operator=(const MResource<U> &o) {
+        mArchive = o.mArchive;
+        mFile = o.mFile;
+        return *this;
+    }
 
     MArchivePtr mArchive;   // 0x00
     MArchiveFile mFile;     // 0x04
