@@ -1008,6 +1008,13 @@ void DinoEventExecChoice::Idle() {
 }
 
 
+DinoEventExecChoice2::DinoEventExecChoice2(DinoEventLoop *event, u32 var, u32 text) : MProcess(NULL) {
+    mEvent = event;
+    mVar = var;
+    mText = text;
+    mStep = 0;
+}
+
 // Asks with a window of choices (the text's first line titles it) and keeps the answer in a local variable.
 // (The game calls vector<string>'s destructor out of line here; ours inlines it to the base's, same instructions.)
 void DinoEventExecChoice2::Idle() {

@@ -5,6 +5,7 @@
 
 class DinoEventSave : public DinoEventUiTask {
 public:
+    DinoEventSave(DinoEventLoop *event) : DinoEventUiTask(event, 2, 1) {}
     virtual ~DinoEventSave();
     virtual MTask *CreateUi();
 

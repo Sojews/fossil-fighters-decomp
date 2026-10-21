@@ -2,9 +2,13 @@
 #define GAME_DINO_EVENT_CANON_PUTIN_H
 
 #include "game/dino_event_capture_fade_ui_task.h"
+#include "game/dino_backup.h"
 
 class DinoEventCanonPutin : public DinoEventCaptureFadeUiTask {
 public:
+    DinoEventCanonPutin(DinoEventLoop *event) : DinoEventCaptureFadeUiTask(event, 3) {
+        mCount = gDinoBackup->CountUsedUnk14C();
+    }
     virtual ~DinoEventCanonPutin();
     virtual MTask *CreateUi();
 

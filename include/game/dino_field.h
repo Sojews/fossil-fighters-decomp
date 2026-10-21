@@ -698,8 +698,7 @@ public:
     u8 mHasPicture;         // 0xCD: the font and the picture below are loaded
     MFont *mFont;           // 0xD0
     MPictureFile mPicture;  // 0xD4
-    u32 mUnk108;            // 0x108
-    u32 mUnk10C;            // 0x10C
+    MPoint mPictPos;        // 0x108: where the next picture command shows its picture
     MScreen *mScreen;       // 0x110: the field's screen
     FSFileID *mEpisodes;    // 0x114: each episode's file, once looked up
     u8 mEpisodesChanged;    // 0x118

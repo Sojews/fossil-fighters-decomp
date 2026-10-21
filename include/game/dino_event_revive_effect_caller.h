@@ -6,6 +6,9 @@
 // Plays the revive effect for a creature from storage, then shows its status.
 class DinoEventReviveEffectCaller : public DinoEventUiTask {
 public:
+    DinoEventReviveEffectCaller(DinoEventLoop *event, u32 creature) : DinoEventUiTask(event, 5, 1) {
+        mCreature = creature;
+    }
     virtual ~DinoEventReviveEffectCaller();
     virtual MTask *CreateUi();
 

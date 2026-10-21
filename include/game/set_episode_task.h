@@ -6,6 +6,11 @@
 
 class SetEpisodeTask : public MTask {
 public:
+    SetEpisodeTask(DinoEventLoop *event, u32 id, u8 seen) {
+        mEvent = event;
+        mId = id;
+        mSeen = seen;
+    }
     virtual ~SetEpisodeTask();
     virtual void Execute();
 

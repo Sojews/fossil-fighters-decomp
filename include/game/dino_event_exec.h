@@ -469,6 +469,7 @@ public:
 
 class DinoEventExecChoice2 : public MProcess {
 public:
+    DinoEventExecChoice2(DinoEventLoop *event, u32 var, u32 text);
     virtual ~DinoEventExecChoice2();
     virtual void Idle();
 

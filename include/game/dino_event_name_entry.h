@@ -5,6 +5,9 @@
 
 class DinoEventNameEntry : public DinoEventUiTask {
 public:
+    DinoEventNameEntry(DinoEventLoop *event, u8 unk81) : DinoEventUiTask(event, 5, 1) {
+        mUnk81 = unk81;
+    }
     virtual ~DinoEventNameEntry();
     virtual MTask *CreateUi();
 

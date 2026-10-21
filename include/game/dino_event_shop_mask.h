@@ -5,6 +5,7 @@
 
 class DinoEventShopMask : public DinoEventCaptureFadeUiTask {
 public:
+    DinoEventShopMask(DinoEventLoop *event) : DinoEventCaptureFadeUiTask(event, 3) {}
     virtual ~DinoEventShopMask();
     virtual MTask *CreateUi();
 };

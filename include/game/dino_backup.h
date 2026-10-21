@@ -176,6 +176,15 @@ struct DinoKasekiRockState {
 };
 
 struct DinoCharaWatch {
+    DinoCharaWatch() {}
+    DinoCharaWatch(u32 a, u32 b, u32 c, u32 d, u32 e) {
+        w[0] = a;
+        w[1] = b;
+        w[2] = c;
+        w[3] = d;
+        w[4] = e;
+    }
+
     u32 w[5];
 };
 

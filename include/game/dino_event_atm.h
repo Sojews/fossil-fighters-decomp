@@ -5,6 +5,7 @@
 
 class DinoEventATM : public DinoEventUiTask {
 public:
+    DinoEventATM(DinoEventLoop *event) : DinoEventUiTask(event, 5, 1) {}
     virtual ~DinoEventATM();
     virtual MTask *CreateUi();
 };

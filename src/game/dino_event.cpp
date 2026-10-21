@@ -19,6 +19,25 @@
 #include "game/dino_event_debug_menu.h"
 #include "game/dino_event_kaseki_rock_found.h"
 #include "game/dino_event_park_kaseki_rock_found.h"
+#include "game/set_episode_task.h"
+#include "game/dino_common_window_message_box.h"
+#include "game/dino_sound.h"
+#include "game/dino_event_atm.h"
+#include "game/dino_event_shop_buy.h"
+#include "game/dino_event_shop_sell.h"
+#include "game/dino_event_shop_mask.h"
+#include "game/dino_event_mask_equip.h"
+#include "game/dino_event_canon_putin.h"
+#include "game/dino_event_canon_takeout.h"
+#include "game/dino_event_name_entry.h"
+#include "game/dino_event_senryu_entry.h"
+#include "game/dino_event_senryu_list_entry.h"
+#include "game/dino_event_license_card.h"
+#include "game/dino_event_ending.h"
+#include "game/dino_event_save.h"
+#include "game/dino_event_museum.h"
+#include "game/dino_event_revive_effect_caller.h"
+#include "game/dino_event_revive.h"
 
 // The player's control on the field (in the field overlay).
 extern "C" MProcess *func_ov001_021580a0(DinoField *field, u32 request, DinoFieldPlayerControlResult *result,
@@ -162,8 +181,8 @@ BOOL DinoEventLoop::CheckConditions(const u8 *entry) {
 }
 
 void DinoEventLoop::RunCommands(const u8 *block) {
-    mUnk108 = 0;
-    mUnk10C = 0;
+    mPictPos.x = 0;
+    mPictPos.y = 0;
     for (int i = 0; i < ((const u32 *)block)[0]; i++) {
         RunCommand(DinoEventBlock(block, 1, i));
     }
@@ -640,3 +659,641 @@ static struct DinoEventStaticInit {
         DINO_POOL_NV(MRect, data_020bdb50, 0x54) = MRect(0, 0, 256, 24);
     }
 } sDinoEventStaticInit;
+
+extern "C" void _ZNSt13__vec_deleterImSaImEE19reallocate_copy_altEm(void *vector, size_t n);
+extern "C" void _ZNSt13__vec_deleterImSaImEE9init_copyEPKmS3_N10Metrowerks8int2typeILi1EEE(void *vector, const u32 *first,
+                                                                                        const u32 *last, u8 tag);
+
+// (vector::reserve and the copy constructor, through the u32 vector's out-of-line members the game calls here; see
+// dino_ui_title.cpp.)
+static inline void DinoEventReservePoints(std::vector<void *> &points, size_t n) {
+    if (n > points.capacity()) {
+        _ZNSt13__vec_deleterImSaImEE19reallocate_copy_altEm(&points, n);
+    }
+}
+
+// Degrees as an angle (0x10000 a turn).
+static inline s32 DinoEventDegree(u32 degrees) {
+    return (s32)(degrees << 16) / 360;
+}
+
+// Runs one command: almost all of them queue the matching task on the serial set, from the command's arguments.
+// NONMATCHING
+void DinoEventLoop::RunCommand(const u8 *command) {
+    const DinoEventCondition *cmd = (const DinoEventCondition *)command;
+    MFx32Point pos7;
+    MFx32Point posB;
+    switch (cmd->type) {
+    case 0x7: {
+        pos7.x.v = DinoEventArg(command, 2);
+        pos7.y.v = DinoEventArg(command, 3);
+        mSerial.AddTail(new DinoEventExecAppendCharaRegion(this, DinoEventArg(command, 0), DinoEventArg(command, 1), pos7, DinoEventDegree(DinoEventArg(command, 4)), 0));
+        break;
+    }
+    case 0xb: {
+        posB.x.v = DinoEventArg(command, 2);
+        posB.y.v = DinoEventArg(command, 3);
+        mSerial.AddTail(new DinoEventExecAppendCharaRegion(this, DinoEventArg(command, 0), DinoEventArg(command, 1), posB, 0x4000, DinoEventArg(command, 4)));
+        break;
+    }
+    case 0x8:
+        mSerial.AddTail(new DinoEventExecAppendCharaRegion(this, DinoEventArg(command, 0), DinoEventArg(command, 1), 0x4000, 0));
+        break;
+    case 0xc:
+        mSerial.AddTail(new DinoEventExecAppendCharaRegion(this, DinoEventArg(command, 0), DinoEventArg(command, 1), 0x4000, DinoEventArg(command, 2)));
+        break;
+    case 0x9:
+        mSerial.AddTail(new DinoEventExecAppendCharaRegion(this, DinoEventArg(command, 0), DinoEventArg(command, 1), DinoEventDegree(DinoEventArg(command, 2)), 0));
+        break;
+    case 0xa:
+        mSerial.AddTail(new DinoEventExecAppendCharaChara(this, DinoEventArg(command, 0), DinoEventArg(command, 1)));
+        break;
+    case 0xe:
+        mSerial.AddTail(new DinoEventExecRemoveChara(this, DinoEventArg(command, 0)));
+        break;
+    case 0x10:
+        mSerial.AddTail(new DinoEventExecMapConnect((u32)this, DinoEventArg(command, 0), DinoEventArg(command, 1)));
+        break;
+    case 0x11:
+        mSerial.AddTail(new DinoEventExecMapConnectDirectional((u32)this, DinoEventArg(command, 0), DinoEventArg(command, 1)));
+        break;
+    case 0x12:
+        mSerial.AddTail(new DinoEventExecMapDisconnect((u32)this, DinoEventArg(command, 0), DinoEventArg(command, 1)));
+        break;
+    case 0x13:
+        mSerial.AddTail(new DinoEventExecMapDisconnectDirectional((u32)this, DinoEventArg(command, 0), DinoEventArg(command, 1)));
+        break;
+    case 0x1:
+        mSerial.AddTail(new DinoEventExecTalk(this, DinoEventArg(command, 0), 0));
+        break;
+    case 0x2:
+        mSerial.AddTail(new DinoEventExecTalk(this, DinoEventArg(command, 0), 1));
+        break;
+    case 0x22:
+        mSerial.AddTail(new DinoEventExecCharaAngle(this, DinoEventArg(command, 0), DinoEventDegree(DinoEventArg(command, 1)), 1, 0));
+        break;
+    case 0x23:
+        mSerial.AddTail(new DinoEventExecCharaAngle(this, DinoEventArg(command, 0), DinoEventDegree(DinoEventArg(command, 1)), DinoEventArg(command, 2), DinoEventArg(command, 3)));
+        break;
+    case 0x24:
+        mSerial.AddTail(new DinoEventExecCharaAngleToChara(this, DinoEventArg(command, 0), DinoEventArg(command, 1), DinoEventArg(command, 2), DinoEventArg(command, 3)));
+        break;
+    case 0x25:
+        mSerial.AddTail(new DinoEventExecCharaAngleOffset(this, DinoEventArg(command, 0), DinoEventDegree(DinoEventArg(command, 1)), DinoEventArg(command, 2), DinoEventArg(command, 3)));
+        break;
+    case 0x26:
+        mSerial.AddTail(new DinoEventExecCharaAngleOffsetToChara(this, DinoEventArg(command, 0), DinoEventArg(command, 1), DinoEventDegree(DinoEventArg(command, 2)), DinoEventArg(command, 3), DinoEventArg(command, 4)));
+        break;
+    case 0x27:
+        mSerial.AddTail(new DinoEventExecCharaMoveToChara(this, DinoEventArg(command, 0), DinoEventArg(command, 1), DinoEventArg(command, 2), DinoEventArg(command, 3), 0));
+        break;
+    case 0x28:
+        mSerial.AddTail(new DinoEventExecCharaMoveToChara(this, DinoEventArg(command, 0), DinoEventArg(command, 1), DinoEventArg(command, 2), DinoEventArg(command, 3), 1));
+        break;
+    case 0x29:
+        mSerial.AddTail(new DinoEventExecCharaMoveToRegion(this, DinoEventArg(command, 0), DinoEventArg(command, 1), DinoEventArg(command, 2), DinoEventArg(command, 3), 0));
+        break;
+    case 0x2a:
+        mSerial.AddTail(new DinoEventExecCharaMoveToRegion(this, DinoEventArg(command, 0), DinoEventArg(command, 1), DinoEventArg(command, 2), DinoEventArg(command, 3), 1));
+        break;
+    case 0x2b:
+        mSerial.AddTail(new DinoEventExecCharaMoveToCoord(this, DinoEventArg(command, 0), MFx32Point(MFx32::FromRaw(DinoEventArg(command, 1)), MFx32::FromRaw(DinoEventArg(command, 2))), DinoEventArg(command, 3), DinoEventArg(command, 4), 0));
+        break;
+    case 0x2c:
+        mSerial.AddTail(new DinoEventExecCharaMoveToCoord(this, DinoEventArg(command, 0), MFx32Point(MFx32::FromRaw(DinoEventArg(command, 1)), MFx32::FromRaw(DinoEventArg(command, 2))), DinoEventArg(command, 3), DinoEventArg(command, 4), 1));
+        break;
+    case 0x2d:
+        mSerial.AddTail(new DinoEventExecCharaMoveOffset(this, DinoEventArg(command, 0), MFx32Point(MFx32::FromRaw(DinoEventArg(command, 1)), MFx32::FromRaw(DinoEventArg(command, 2))), DinoEventArg(command, 3), DinoEventArg(command, 4), 0));
+        break;
+    case 0x2e:
+        mSerial.AddTail(new DinoEventExecCharaMoveOffset(this, DinoEventArg(command, 0), MFx32Point(MFx32::FromRaw(DinoEventArg(command, 1)), MFx32::FromRaw(DinoEventArg(command, 2))), DinoEventArg(command, 3), DinoEventArg(command, 4), 1));
+        break;
+    case 0x2f:
+        mSerial.AddTail(new DinoEventExecCharaMoveVector(this, DinoEventArg(command, 0), DinoEventDegree(DinoEventArg(command, 1)), DinoEventArg(command, 2), DinoEventArg(command, 3), DinoEventArg(command, 4), 0));
+        break;
+    case 0x30:
+        mSerial.AddTail(new DinoEventExecCharaMoveVector(this, DinoEventArg(command, 0), DinoEventDegree(DinoEventArg(command, 1)), DinoEventArg(command, 2), DinoEventArg(command, 3), DinoEventArg(command, 4), 1));
+        break;
+    case 0x32:
+        mSerial.AddTail(new DinoEventExecCharaWaitMove(this, DinoEventArg(command, 0)));
+        break;
+    case 0x38:
+        mSerial.AddTail(new MTimer(DinoEventArg(command, 0)));
+        break;
+    case 0x33:
+        mSerial.AddTail(new DinoEventExecCharaFocus(this, DinoEventArg(command, 0)));
+        break;
+    case 0x14:
+        mSerial.AddTail(new DinoEventExecFade(this, 1, DinoEventArg(command, 0), 0));
+        break;
+    case 0x15:
+        mSerial.AddTail(new DinoEventExecFade(this, 0, DinoEventArg(command, 0), 0));
+        break;
+    case 0x16:
+        mSerial.AddTail(new DinoEventExecFade(this, 3, DinoEventArg(command, 0), 0));
+        break;
+    case 0x17:
+        mSerial.AddTail(new DinoEventExecFade(this, 2, DinoEventArg(command, 0), 0));
+        break;
+    case 0x18:
+        mSerial.AddTail(new DinoEventExecFade(this, 5, DinoEventArg(command, 0), 0));
+        break;
+    case 0x19:
+        mSerial.AddTail(new DinoEventExecFade(this, 4, DinoEventArg(command, 0), 0));
+        break;
+    case 0x5:
+        for (u32 i = 0; i < cmd->count; i++) {
+            MTaskSet *serial = &mSerial;
+            serial->AddTail(new DinoEventExecFlagSet((u32)this, DinoEventPackedVar(DinoEventArg(command, i)), 1));
+        }
+        break;
+    case 0x6:
+        for (u32 i = 0; i < cmd->count; i++) {
+            MTaskSet *serial = &mSerial;
+            serial->AddTail(new DinoEventExecFlagSet((u32)this, DinoEventPackedVar(DinoEventArg(command, i)), 0));
+        }
+        break;
+    case 0x46: case 0x47: case 0x48: case 0x49: case 0x4a:
+        mSerial.AddTail(new DinoEventExecVarValue(cmd->type, DinoEventPackedVar(DinoEventArg(command, 0)), DinoEventArg(command, 1)));
+        break;
+    case 0x4b: case 0x4c: case 0x4d: case 0x4e: case 0x4f:
+        mSerial.AddTail(new DinoEventExecVarVar(cmd->type, DinoEventPackedVar(DinoEventArg(command, 0)), DinoEventPackedVar(DinoEventArg(command, 1))));
+        break;
+    case 0x3:
+        mSerial.AddTail(new DinoEventExecEventClear((u32)this, DinoEventArg(command, 0), 1));
+        break;
+    case 0x4:
+        mSerial.AddTail(new DinoEventExecEventClear((u32)this, DinoEventArg(command, 0), 0));
+        mEventCleared = TRUE;
+        break;
+    case 0x1a:
+        {
+            SetEpisodeTask *seen = new SetEpisodeTask(this, DinoEventArg(command, 0), 0);
+            mSerial.AddTail(new DinoEventExecSetEpisodeClear((u32)this, DinoEventArg(command, 0), 1), seen);
+        }
+        break;
+    case 0x1b:
+        mSerial.AddTail(new SetEpisodeTask(this, DinoEventArg(command, 0), 1));
+        mEventCleared = TRUE;
+        break;
+    case 0x20:
+        {
+            MTask *box = new DinoCommonWindowMessageBox(gLcd->GetBottomDisplay(), MPoint(0x80, 0x60), GetTalkText(DinoEventArg(command, 0)), 4);
+            mSerial.AddTail(box);
+        }
+        break;
+    case 0x21:
+        mSerial.AddTail(new DinoEventExecYesNo(this, DinoEventArg(command, 0), DinoEventArg(command, 1)));
+        break;
+    case 0x3a:
+        mSerial.AddTail(new DinoEventExecCleaning(this, DinoEventArg(command, 0), DinoEventArg(command, 1), 0, 0));
+        break;
+    case 0x3b:
+        mSerial.AddTail(new DinoEventExecCleaning(this, DinoEventArg(command, 0), DinoEventArg(command, 1), 1, 0));
+        break;
+    case 0x3c:
+        mSerial.AddTail(new DinoEventExecCleaning(this, DinoEventArg(command, 0), DinoEventArg(command, 1), 0, 1));
+        break;
+    case 0x39:
+        {
+            u32 arg2 = 0;
+            if (cmd->count >= 3) {
+                arg2 = DinoEventArg(command, 2);
+            }
+            mSerial.AddTail(new DinoEventExecBattle(this, DinoEventArg(command, 0), DinoEventArg(command, 1), arg2, -1));
+        }
+        break;
+    case 0x3d:
+        mSerial.AddTail(new DinoEventExecCamera(this, (s32)(DinoEventArg(command, 0) << 4) / 360, (s32)(DinoEventArg(command, 1) << 4) / 360, (s32)(DinoEventArg(command, 2) << 4) / 360, DinoEventArg(command, 3), DinoEventArg(command, 4), DinoEventArg(command, 5)));
+        break;
+    case 0x3e:
+        mSerial.AddTail(new DinoEventExecProhibitCameraRelease(&mUnkBD));
+        break;
+    case 0x3f:
+        mSerial.AddTail(new DinoEventExecProhibitCameraRelease(&mUnkBE));
+        break;
+    case 0x50:
+        mSerial.AddTail(new DinoEventExecStartFellow(this, DinoEventArg(command, 0), DinoEventArg(command, 1)));
+        break;
+    case 0x52:
+        mSerial.AddTail(new DinoEventExecStartWander(this, DinoEventArg(command, 0), DinoEventArg(command, 1), DinoEventArg(command, 2), DinoEventArg(command, 3), DinoEventArg(command, 4)));
+        break;
+    case 0x54:
+        {
+            u32 count = cmd->count - 4;
+            if (count == 0) {
+                OS_Terminate();
+            }
+            if (count > 8) {
+                OS_Terminate();
+            }
+            std::vector<void *> points;
+            DinoEventReservePoints(points, count);
+            for (u32 i = 0; i < count; i++) {
+                points.push_back((void *)(cmd->GetArgs() + 4)[i]);
+            }
+            mSerial.AddTail(new DinoEventExecStartPatrol(this, DinoEventArg(command, 0), DinoEventArg(command, 1),
+                                                         DinoEventArg(command, 2), DinoEventArg(command, 3),
+                                                         std::vector<u32>(*(const std::vector<u32> *)&points)));
+        }
+        break;
+    case 0x51: case 0x53: case 0x55:
+        mSerial.AddTail(new DinoEventExecFinishFellow(this, DinoEventArg(command, 0)));
+        break;
+    case 0x56:
+        mSerial.AddTail(new DinoEventExecStartWatch(this, DinoEventArg(command, 0), DinoCharaWatch(DinoEventArg(command, 1), DinoEventArg(command, 2), DinoEventArg(command, 3), DinoEventArg(command, 4), cmd->count == 5 ? 60 : DinoEventArg(command, 5))));
+        break;
+    case 0x57:
+        mSerial.AddTail(new DinoEventExecFinishWatch(this, DinoEventArg(command, 0)));
+        break;
+    case 0xc8:
+        mSerial.AddTail(new DinoEventExecStartBehold(this, DinoEventArg(command, 0), DinoEventArg(command, 1)));
+        break;
+    case 0xc9:
+        mSerial.AddTail(new DinoEventExecFinishBehold(this, DinoEventArg(command, 0)));
+        break;
+    case 0x34:
+        mSerial.AddTail(new DinoEventExecChoice(this, DinoEventArg(command, 0), DinoEventArg(command, 1), 0, 0));
+        break;
+    case 0x35:
+        mSerial.AddTail(new DinoEventExecChoice2(this, DinoEventArg(command, 0), DinoEventArg(command, 1)));
+        break;
+    case 0x90:
+        mSerial.AddTail(new DinoEventExecChoice(this, DinoEventArg(command, 1), DinoEventArg(command, 2), DinoEventArg(command, 0), 0));
+        break;
+    case 0x91:
+        mSerial.AddTail(new DinoEventExecChoice(this, DinoEventArg(command, 1), DinoEventArg(command, 2), DinoEventArg(command, 0), DinoEventArg(command, 3)));
+        break;
+    case 0x36:
+        mSerial.AddTail(new DinoEventExecShopChoice(this, DinoEventArg(command, 0), DinoEventPackedVar(DinoEventArg(command, 1))));
+        break;
+    case 0x37:
+        mSerial.AddTail(new DinoEventExecShopChoice2(this, DinoEventArg(command, 0), DinoEventPackedVar(DinoEventArg(command, 1)), DinoEventArg(command, 2)));
+        break;
+    case 0x58:
+        mSerial.AddTail(new DinoEventExecLicenseGet(1));
+        break;
+    case 0x59:
+        mSerial.AddTail(new DinoEventExecLicenseGet(2));
+        break;
+    case 0x5c:
+        mSerial.AddTail(new DinoEventATM(this));
+        break;
+    case 0x5d:
+        mSerial.AddTail(new DinoEventRevive(this));
+        break;
+    case 0x5a:
+        mSerial.AddTail(new DinoEventExecHoriderLevel(DinoEventArg(command, 0)));
+        break;
+    case 0x5b:
+        mSerial.AddTail(new DinoEventExecContainerNum(DinoEventArg(command, 0)));
+        break;
+    case 0x5e:
+        mSerial.AddTail(new DinoEventExecSystemFlag(1, 1));
+        break;
+    case 0x5f:
+        mSerial.AddTail(new DinoEventExecSystemFlag(1, 0));
+        break;
+    case 0x63:
+        mSerial.AddTail(new DinoEventExecSystemFlag(2, 1));
+        break;
+    case 0x64:
+        mSerial.AddTail(new DinoEventExecSystemFlag(2, 0));
+        break;
+    case 0x60:
+        mSerial.AddTail(new DinoEventExecReviverSet(DinoEventArg(command, 0), DinoEventArg(command, 1), DinoEventArg(command, 2), DinoEventArg(command, 3), DinoEventArg(command, 4), 1));
+        break;
+    case 0x61:
+        mSerial.AddTail(new DinoEventExecReviverSet(DinoEventArg(command, 0), DinoEventArg(command, 1), DinoEventArg(command, 2), DinoEventArg(command, 3), DinoEventArg(command, 4), 0));
+        break;
+    case 0x62:
+        mSerial.AddTail(new DinoEventExecMedalChange(DinoEventArg(command, 0), DinoEventArg(command, 1)));
+        // (No break: the medal change also sets the battle points.)
+    case 0xce:
+        mSerial.AddTail(new DinoEventExecBattlePointSet(DinoEventArg(command, 0), DinoEventArg(command, 1)));
+        break;
+    case 0x69:
+        mSerial.AddTail(new DinoEventExecShopSet(DinoEventArg(command, 0)));
+        break;
+    case 0x66:
+        mSerial.AddTail(new DinoEventShopBuy(this));
+        break;
+    case 0x67:
+        mSerial.AddTail(new DinoEventShopSell(this));
+        break;
+    case 0x68:
+        mSerial.AddTail(new DinoEventShopMask(this));
+        break;
+    case 0x6a:
+        mSerial.AddTail(new DinoEventMaskEquip(this));
+        break;
+    case 0xc4:
+        mSerial.AddTail(new DinoEventCanonPutin(this));
+        break;
+    case 0xc5:
+        mSerial.AddTail(new DinoEventCanonTakeout(this));
+        break;
+    case 0x6b:
+        mSerial.AddTail(new DinoEventExecKasekiRockGet(this, 0, DinoEventArg(command, 0), DinoEventArg(command, 1), DinoEventArg(command, 2), 0));
+        break;
+    case 0x6c:
+        mSerial.AddTail(new DinoEventExecKasekiRockGet(this, 0, DinoEventArg(command, 0), DinoEventArg(command, 1), DinoEventArg(command, 2), 1));
+        break;
+    case 0xc0:
+        mSerial.AddTail(new DinoEventExecKasekiRockGet(this, DinoEventArg(command, 0), DinoEventArg(command, 1), DinoEventArg(command, 2), DinoEventArg(command, 3), 0));
+        break;
+    case 0x6d:
+        mSerial.AddTail(new DinoEventExecKasekiRockShot(this, DinoEventArg(command, 0), DinoEventArg(command, 1), DinoEventArg(command, 2)));
+        break;
+    case 0x72:
+        mSerial.AddTail(new DinoEventExecCharaBodyModelIndex(this, DinoEventArg(command, 0), DinoEventArg(command, 1)));
+        break;
+    case 0x73:
+        mSerial.AddTail(new DinoEventExecCharaHeadModelIndex(this, DinoEventArg(command, 0), DinoEventArg(command, 1)));
+        break;
+    case 0x70:
+        mSerial.AddTail(new DinoEventExecCharaMotionSet(this, DinoEventArg(command, 0), DinoEventArg(command, 1), 0));
+        break;
+    case 0x71:
+        mSerial.AddTail(new DinoEventExecCharaMotionSet(this, DinoEventArg(command, 0), DinoEventArg(command, 1), 1));
+        break;
+    case 0x6e:
+        mSerial.AddTail(new DinoEventExecCharaMotionCache(this, DinoEventArg(command, 0), DinoEventArg(command, 1)));
+        break;
+    case 0x6f:
+        mSerial.AddTail(new DinoEventExecCharaMotionCacheClear(this, DinoEventArg(command, 0)));
+        break;
+    case 0x75:
+        mSerial.AddTail(new DinoEventExecBgmPlay(this, DinoEventArg(command, 0), 0, 0));
+        break;
+    case 0x79:
+        mSerial.AddTail(new DinoEventExecBgmPlay(this, DinoEventArg(command, 0), DinoEventArg(command, 1), 0));
+        break;
+    case 0x77:
+        mSerial.AddTail(new DinoEventExecBgmPlay(this, DinoEventArg(command, 0), 0, 1));
+        break;
+    case 0x7b:
+        mSerial.AddTail(new DinoEventExecBgmPlay(this, DinoEventArg(command, 0), DinoEventArg(command, 1), 1));
+        break;
+    case 0x76:
+        mSerial.AddTail(new DinoEventExecMapBgmPlay(this, 0));
+        break;
+    case 0x7a:
+        mSerial.AddTail(new DinoEventExecMapBgmPlay(this, DinoEventArg(command, 0)));
+        break;
+    case 0x78:
+        mSerial.AddTail(new DinoEventExecBgmStop(this, 0));
+        break;
+    case 0x7c:
+        mSerial.AddTail(new DinoEventExecBgmStop(this, DinoEventArg(command, 0)));
+        break;
+    case 0x7d:
+        mSerial.AddTail(DinoSoundCreatePlaySeTask(DinoEventArg(command, 0), 0));
+        break;
+    case 0x7f:
+        mSerial.AddTail(DinoSoundCreatePlaySeTask(DinoEventArg(command, 0), DinoEventArg(command, 1)));
+        break;
+    case 0x7e:
+        mSerial.AddTail(DinoSoundCreateStopSeTask(DinoEventArg(command, 0), 0));
+        break;
+    case 0x80:
+        mSerial.AddTail(DinoSoundCreateStopSeTask(DinoEventArg(command, 0), DinoEventArg(command, 1)));
+        break;
+    case 0x81:
+        mSerial.AddTail(new DinoEventExecManpuShow(this, DinoEventArg(command, 0), DinoEventArg(command, 1), MPoint(0, 0)));
+        break;
+    case 0x82:
+        mSerial.AddTail(new DinoEventExecManpuShow(this, DinoEventArg(command, 0), DinoEventArg(command, 1), MPoint(DinoEventArg(command, 2), DinoEventArg(command, 3))));
+        break;
+    case 0x83:
+        mSerial.AddTail(new DinoEventExecManpuHide(this, DinoEventArg(command, 0)));
+        break;
+    case 0x84:
+        mSerial.AddTail(new DinoEventExecPictShow(this, DinoEventArg(command, 0)));
+        break;
+    case 0x85:
+        mSerial.AddTail(new DinoEventExecPictHide(this));
+        break;
+    case 0x87:
+        mSerial.AddTail(new DinoEventExecCmnMotion(this, DinoEventArg(command, 0), DinoEventArg(command, 1)));
+        break;
+    case 0x88:
+        mSerial.AddTail(new DinoEventExecChrEffect(this, DinoEventArg(command, 0), DinoEventArg(command, 1)));
+        break;
+    case 0x89:
+        mSerial.AddTail(new DinoEventExecChrEffect(this, DinoEventArg(command, 0), 0));
+        break;
+    case 0x86:
+        mSerial.AddTail(new DinoEventExecKeyWait());
+        break;
+    case 0x8a:
+        mSerial.AddTail(new DinoEventExecQuake(this, DinoEventArg(command, 0), DinoEventArg(command, 1), DinoEventArg(command, 2)));
+        break;
+    case 0x8b:
+        mSerial.AddTail(new DinoEventExecDance(this, 0, DinoEventArg(command, 0), DinoEventArg(command, 1), DinoEventArg(command, 2), DinoEventArg(command, 3)));
+        break;
+    case 0x8c:
+        mSerial.AddTail(new DinoEventExecDance(this, 1, DinoEventArg(command, 0), DinoEventArg(command, 1), DinoEventArg(command, 2), DinoEventArg(command, 3)));
+        break;
+    case 0x8d:
+        mSerial.AddTail(new DinoEventExecMapSelect(this, DinoEventArg(command, 0)));
+        break;
+    case 0x8e:
+        mSerial.AddTail(new DinoEventNameEntry(this, 1));
+        break;
+    case 0x8f:
+        mSerial.AddTail(new DinoEventNameEntry(this, 0));
+        break;
+    case 0xc6:
+        mSerial.AddTail(new DinoEventSenryuEntry(this));
+        break;
+    case 0xc7:
+        mSerial.AddTail(new DinoEventSenryuListEntry(this));
+        break;
+    case 0x93:
+        mSerial.AddTail(new DinoEventExecEraseAllExcrement((u32)this));
+        break;
+    case 0x94:
+        mSerial.AddTail(new DinoEventExecEraseExcrement((u32)this, DinoEventPackedVar(DinoEventArg(command, 0))));
+        break;
+    case 0x95:
+        mSerial.AddTail(new DinoEventExecGameOver(this));
+        break;
+    case 0xbd:
+        mSerial.AddTail(new DinoEventExecExit(this));
+        break;
+    case 0x96:
+        mSerial.AddTail(new DinoEventLicenseCard(this));
+        break;
+    case 0x97:
+        mSerial.AddTail(new DinoEventExecFieldName(this, DinoEventArg(command, 0)));
+        break;
+    case 0x98:
+        mPictPos = MPoint(DinoEventArg(command, 0), DinoEventArg(command, 1));
+        break;
+    case 0x99:
+        mSerial.AddTail(new DinoEventExecLowerPictFadeIn(this, DinoEventArg(command, 0), mPictPos, DinoEventArg(command, 1), DinoEventArg(command, 2), 1));
+        mPictPos.x = 0;
+        mPictPos.y = 0;
+        break;
+    case 0x9a:
+        mSerial.AddTail(new DinoEventExecLowerPictFadeOut(this, DinoEventArg(command, 0), DinoEventArg(command, 1), 1));
+        break;
+    case 0x9b:
+        mSerial.AddTail(new DinoEventExecLowerPictSlideIn(this, DinoEventArg(command, 0), mPictPos, DinoEventArg(command, 1), DinoEventArg(command, 2), DinoEventArg(command, 3), 1));
+        mPictPos.x = 0;
+        mPictPos.y = 0;
+        break;
+    case 0x9c:
+        mSerial.AddTail(new DinoEventExecLowerPictSlideOut(this, DinoEventArg(command, 0), DinoEventArg(command, 1), DinoEventArg(command, 2), 1));
+        break;
+    case 0x9d:
+        mSerial.AddTail(new DinoEventExecLowerPictZoomIn(this, DinoEventArg(command, 0), mPictPos, MFx32::FromRaw(DinoEventArg(command, 1)), DinoEventArg(command, 2), DinoEventArg(command, 3), 1));
+        mPictPos.x = 0;
+        mPictPos.y = 0;
+        break;
+    case 0x9e:
+        mSerial.AddTail(new DinoEventExecLowerPictZoomOut(this, MFx32::FromRaw(DinoEventArg(command, 0)), DinoEventArg(command, 1), DinoEventArg(command, 2), 1));
+        break;
+    case 0x9f:
+        mSerial.AddTail(new DinoEventExecUpperPictFadeIn(this, DinoEventArg(command, 0), mPictPos, DinoEventArg(command, 1), DinoEventArg(command, 2), 1));
+        mPictPos.x = 0;
+        mPictPos.y = 0;
+        break;
+    case 0xa0:
+        mSerial.AddTail(new DinoEventExecUpperPictFadeOut(this, DinoEventArg(command, 0), DinoEventArg(command, 1), 1));
+        break;
+    case 0xa1:
+        mSerial.AddTail(new DinoEventExecUpperPictSlideIn(this, DinoEventArg(command, 0), mPictPos, DinoEventArg(command, 1), DinoEventArg(command, 2), DinoEventArg(command, 3), 1));
+        mPictPos.x = 0;
+        mPictPos.y = 0;
+        break;
+    case 0xa2:
+        mSerial.AddTail(new DinoEventExecUpperPictSlideOut(this, DinoEventArg(command, 0), DinoEventArg(command, 1), DinoEventArg(command, 2), 1));
+        break;
+    case 0xa3:
+        mSerial.AddTail(new DinoEventExecUpperPictZoomIn(this, DinoEventArg(command, 0), mPictPos, MFx32::FromRaw(DinoEventArg(command, 1)), DinoEventArg(command, 2), DinoEventArg(command, 3), 1));
+        mPictPos.x = 0;
+        mPictPos.y = 0;
+        break;
+    case 0xa4:
+        mSerial.AddTail(new DinoEventExecUpperPictZoomOut(this, MFx32::FromRaw(DinoEventArg(command, 0)), DinoEventArg(command, 1), DinoEventArg(command, 2), 1));
+        break;
+    case 0xa5:
+        mSerial.AddTail(new DinoEventExecLowerPictFadeIn(this, DinoEventArg(command, 0), mPictPos, DinoEventArg(command, 1), DinoEventArg(command, 2), 0));
+        mPictPos.x = 0;
+        mPictPos.y = 0;
+        break;
+    case 0xa6:
+        mSerial.AddTail(new DinoEventExecLowerPictFadeOut(this, DinoEventArg(command, 0), DinoEventArg(command, 1), 0));
+        break;
+    case 0xa7:
+        mSerial.AddTail(new DinoEventExecLowerPictSlideIn(this, DinoEventArg(command, 0), mPictPos, DinoEventArg(command, 1), DinoEventArg(command, 2), DinoEventArg(command, 3), 0));
+        mPictPos.x = 0;
+        mPictPos.y = 0;
+        break;
+    case 0xa8:
+        mSerial.AddTail(new DinoEventExecLowerPictSlideOut(this, DinoEventArg(command, 0), DinoEventArg(command, 1), DinoEventArg(command, 2), 0));
+        break;
+    case 0xa9:
+        mSerial.AddTail(new DinoEventExecLowerPictZoomIn(this, DinoEventArg(command, 0), mPictPos, MFx32::FromRaw(DinoEventArg(command, 1)), DinoEventArg(command, 2), DinoEventArg(command, 3), 0));
+        mPictPos.x = 0;
+        mPictPos.y = 0;
+        break;
+    case 0xaa:
+        mSerial.AddTail(new DinoEventExecLowerPictZoomOut(this, MFx32::FromRaw(DinoEventArg(command, 0)), DinoEventArg(command, 1), DinoEventArg(command, 2), 0));
+        break;
+    case 0xab:
+        mSerial.AddTail(new DinoEventExecUpperPictFadeIn(this, DinoEventArg(command, 0), mPictPos, DinoEventArg(command, 1), DinoEventArg(command, 2), 0));
+        mPictPos.x = 0;
+        mPictPos.y = 0;
+        break;
+    case 0xac:
+        mSerial.AddTail(new DinoEventExecUpperPictFadeOut(this, DinoEventArg(command, 0), DinoEventArg(command, 1), 0));
+        break;
+    case 0xad:
+        mSerial.AddTail(new DinoEventExecUpperPictSlideIn(this, DinoEventArg(command, 0), mPictPos, DinoEventArg(command, 1), DinoEventArg(command, 2), DinoEventArg(command, 3), 0));
+        mPictPos.x = 0;
+        mPictPos.y = 0;
+        break;
+    case 0xae:
+        mSerial.AddTail(new DinoEventExecUpperPictSlideOut(this, DinoEventArg(command, 0), DinoEventArg(command, 1), DinoEventArg(command, 2), 0));
+        break;
+    case 0xaf:
+        mSerial.AddTail(new DinoEventExecUpperPictZoomIn(this, DinoEventArg(command, 0), mPictPos, MFx32::FromRaw(DinoEventArg(command, 1)), DinoEventArg(command, 2), DinoEventArg(command, 3), 0));
+        mPictPos.x = 0;
+        mPictPos.y = 0;
+        break;
+    case 0xb0:
+        mSerial.AddTail(new DinoEventExecUpperPictZoomOut(this, MFx32::FromRaw(DinoEventArg(command, 0)), DinoEventArg(command, 1), DinoEventArg(command, 2), 0));
+        break;
+    case 0xb2:
+        mSerial.AddTail(new DinoEventExecDelAreaNamePanel(this));
+        break;
+    case 0xb3:
+        mSerial.AddTail(new DinoEventExecRadarMode(this, 0, cmd->count == 0 ? 60 : DinoEventArg(command, 0), 1));
+        break;
+    case 0xb5:
+        mSerial.AddTail(new DinoEventExecRadarMode(this, 2, cmd->count == 0 ? 60 : DinoEventArg(command, 0), 1));
+        break;
+    case 0xb4:
+        mSerial.AddTail(new DinoEventExecRadarMode(this, 1, cmd->count == 0 ? 60 : DinoEventArg(command, 0), 1));
+        break;
+    case 0xb6:
+        mSerial.AddTail(new DinoEventExecRadarMode(this, 0, cmd->count == 0 ? 60 : DinoEventArg(command, 0), 0));
+        break;
+    case 0xb8:
+        mSerial.AddTail(new DinoEventExecRadarMode(this, 2, cmd->count == 0 ? 60 : DinoEventArg(command, 0), 0));
+        break;
+    case 0xb7:
+        mSerial.AddTail(new DinoEventExecRadarMode(this, 1, cmd->count == 0 ? 60 : DinoEventArg(command, 0), 0));
+        break;
+    case 0xb9:
+        mSerial.AddTail(new DinoEventExecTownMapMode(this, 0, cmd->count == 0 ? 60 : DinoEventArg(command, 0)));
+        break;
+    case 0xba:
+        mSerial.AddTail(new DinoEventExecTownMapMode(this, 1, cmd->count == 0 ? 60 : DinoEventArg(command, 0)));
+        break;
+    case 0x74:
+        mSerial.AddTail(DinoSoundCreateLoadSceneTask(DinoEventArg(command, 0)));
+        break;
+    case 0xbb:
+        mSerial.AddTail(new DinoEventEnding(this));
+        break;
+    case 0xbc:
+        mSerial.AddTail(new DinoEventSave(this));
+        break;
+    case 0xbe:
+        mSerial.AddTail(new DinoEventMuseum(this));
+        break;
+    case 0xbf:
+        mSerial.AddTail(new DinoEventReviveEffectCaller(this, DinoEventArg(command, 0)));
+        break;
+    case 0xc1:
+        mSerial.AddTail(new DinoEventExecHeightReset(this));
+        break;
+    case 0xc2:
+        mSerial.AddTail(new DinoEventExecCharaFootSeOff(this, DinoEventArg(command, 0)));
+        break;
+    case 0xc3:
+        mSerial.AddTail(new DinoEventExecCharaFootSePreserve(this, DinoEventArg(command, 0), DinoEventArg(command, 1)));
+        break;
+    case 0xca:
+        mSerial.AddTail(new DinoEventExecMoneyShow(this));
+        break;
+    case 0xcb:
+        mSerial.AddTail(new DinoEventExecMoneyHide(this));
+        break;
+    case 0xcc:
+        mSerial.AddTail(new DinoEventExecDonateShow(this));
+        break;
+    case 0xcd:
+        mSerial.AddTail(new DinoEventExecDonateHide(this));
+        break;
+    case 0xcf:
+        mSerial.AddTail(new DinoEventExecProhibitNisReset());
+        break;
+    case 0x0:
+        break;
+    }
+}

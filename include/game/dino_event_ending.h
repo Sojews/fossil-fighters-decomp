@@ -5,6 +5,7 @@
 
 class DinoEventEnding : public DinoEventUiTask {
 public:
+    DinoEventEnding(DinoEventLoop *event) : DinoEventUiTask(event, 2, 1) {}
     virtual ~DinoEventEnding();
     virtual MTask *CreateUi();
 };

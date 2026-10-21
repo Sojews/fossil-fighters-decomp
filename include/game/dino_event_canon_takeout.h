@@ -2,9 +2,13 @@
 #define GAME_DINO_EVENT_CANON_TAKEOUT_H
 
 #include "game/dino_event_capture_fade_ui_task.h"
+#include "game/dino_backup.h"
 
 class DinoEventCanonTakeout : public DinoEventCaptureFadeUiTask {
 public:
+    DinoEventCanonTakeout(DinoEventLoop *event) : DinoEventCaptureFadeUiTask(event, 3) {
+        mCount = gDinoBackup->CountUsedUnk14C();
+    }
     virtual ~DinoEventCanonTakeout();
     virtual MTask *CreateUi();
 
