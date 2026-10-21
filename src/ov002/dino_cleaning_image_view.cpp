@@ -35,11 +35,15 @@ DinoCleaningImageView::~DinoCleaningImageView() {
     }
 }
 
-// NONMATCHING (with the file built ipa, as its vector instances need): push_back's tag temporaries swap stack
-// slots.
+// (The push through a static inline taking the pointer by const reference gives push_back's tag temporaries the
+// game's stack slots.)
+static inline void DinoPushImage(std::vector<DinoCleaningImage *> &v, DinoCleaningImage *const &image) {
+    v.push_back(image);
+}
+
 void DinoCleaningImageView::AddImage(DinoCleaningImage *image) {
     image->mView = this;
-    mImages.push_back(image);
+    DinoPushImage(mImages, image);
 }
 
 DinoCleaningImage *DinoCleaningImageView::GetImage(int index) {
