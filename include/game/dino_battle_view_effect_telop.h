@@ -22,6 +22,7 @@ public:
     void Load();
     void StateSlide();
     void StateFinish();
+    void StateWin();
     void StateLose();
 
     void (DinoBattleViewEffectTelop::*mState)(); // 0x74
@@ -72,6 +73,7 @@ public:
 
 class SkipWinTelopTask : public SkipTelopTask {
 public:
+    inline SkipWinTelopTask(MView *picture, DinoBattleView *view, MTask *task);
     virtual ~SkipWinTelopTask();
     virtual void OnFinished();
     virtual void OnSkipped();

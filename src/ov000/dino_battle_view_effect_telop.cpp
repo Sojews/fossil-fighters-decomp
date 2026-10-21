@@ -17,6 +17,9 @@
 #include "game/dino_battle_view_class.h"
 #include "m/smart_oam.h"
 #include "m/picture.h"
+#include "m/ext_affine.h"
+#include "m/file.h"
+#include "m/seed_generator.h"
 #include "game/dino_sound.h"
 #include "m/bg.h"
 #include "m/display.h"
@@ -49,7 +52,10 @@ void NopWaitTask::Execute() {
 
 // The TU's pooled pointer-to-member constants (see menu.cpp).
 extern "C" struct {
-    u8 unk00[0x10];
+    u32 unk00;
+    const char *countPath;          // 0x04: the win count's picture (by count)
+    int loseFrames;                 // 0x08: the least the lost telop stays up
+    int winFrames;                  // 0x0C: the least the won telop stays up
     void (DinoBattleViewEffectTelop::*Load_10)();
     void (DinoBattleViewEffectTelop::*State_18)();
     u8 unk20[0x28 - 0x20];
@@ -57,7 +63,8 @@ extern "C" struct {
     void (DinoBattleViewEffectTelop::*State_30)();
     u8 unk38[0x40 - 0x38];
     void (DinoBattleViewEffectTelop::*Start_40)();
-    u8 unk48[0x58 - 0x48];
+    u8 unk48[0x50 - 0x48];
+    void (DinoBattleViewEffectTelop::*State_50)();
     void (DinoBattleViewEffectTelop::*State_58)();
     u8 unk60[0x70 - 0x60];
     void (DinoBattleViewEffectTelop::*State_70)();
@@ -190,6 +197,75 @@ inline SkipTelopTask::SkipTelopTask(MTask *task, u8 noSkip)
     mTasks = new MSerialTaskSet();
     mParallel.AddTail(mTasks);
     mTasks->AddTail(task);
+}
+
+inline SkipWinTelopTask::SkipWinTelopTask(MView *picture, DinoBattleView *view, MTask *task)
+    : SkipTelopTask(task, view->GetUnk138()) {
+    mView = picture;
+    mView3D = (DinoBattleView3D *)view;
+}
+
+extern "C" const int data_ov000_02193888;   // (the won frames' own label: the game takes their address from it)
+extern "C" const int data_0208a128, data_0208a12c;    // the win count's slide out: ease, frames
+extern "C" const int data_0208a130;                    // frames before it slides out
+extern "C" const int data_0208a134, data_0208a138;    // its slide in: ease, frames
+extern "C" const int data_0208a13c;                    // frames before it shows
+
+// The won telop: zooms the picture in from the corner, shakes it less and less, settles it with a hop and waits
+// (skippable); the player's win count slides up from below meanwhile.
+// NONMATCHING: the game has the frames' least below the random generator on the stack (ours: above it).
+void DinoBattleViewEffectTelop::StateWin() {
+    int least = 0xFE;
+    int frames = *(data_ov000_0219387c.winFrames < least ? &least : &data_ov000_02193888);
+    mPicture->Show();
+    mParallel.AddTail(mPicture);
+    mState = data_ov000_0219387c.State_50;
+    MTask *wait = NULL;
+    int count = ((DinoBattleView *)mUnk7C)->GetUnk140();
+    if (count >= 0) {
+        if (count > 99) {
+            count = 99;
+        }
+        char path[256];
+        OS_SPrintf(path, data_ov000_0219387c.countPath, count);
+        if (!MFileExists(std::string(path))) {
+            OS_SPrintf(path, data_ov000_0219387c.countPath, 1);
+        }
+        MTextPicture *text = new MTextPicture(std::string(path), TRUE, false);
+        text->Show();
+        text->SetPriority(1);
+        text->SetPosition(MPoint(0, 192));
+        MSerialTaskSet *slide = new MSerialTaskSet(TRUE);
+        wait = new NopWaitTask();
+        slide->AddTail(new MTimer(data_0208a13c), text->CreateShowTransfer(),
+                       text->CreateCoordAnime(MPoint(0, 192), MPoint(0, 0), data_0208a138, data_0208a134), wait,
+                       new MTimer(data_0208a130),
+                       text->CreateCoordAnime(MPoint(0, 0), MPoint(0, 192), data_0208a12c, data_0208a128));
+        MTaskSet *parallel = &mParallel;
+        parallel->AddTail(slide);
+        parallel->AddTail(text);
+    }
+    MRandom random;
+    MSerialTaskSet *tasks = new MSerialTaskSet(TRUE);
+    tasks->AddTail(DinoTelopParallel(mPicture->GetScreen()->CreateScaleAnime(MFx32Point(MFx32(2), MFx32(2)),
+                                                                             MFx32Point(MFx32(1), MFx32(1)), 20, 1),
+                                     mPicture->CreateCoordAnime(MPoint(-128, -96), MPoint(0, 0), 20, 1)));
+    for (int i = 0; i < 16; i++) {
+        int shake = i / 4 + 1;
+        int dx = random.Next(shake * 2 + 1) - shake;
+        int dy = random.Next(shake * 2 + 1) - shake;
+        tasks->AddTail(mPicture->CreateCoordTransfer(MPoint(dx, dy)), new MTimer(1));
+    }
+    tasks->AddTail(mPicture->CreateCoordTransfer(MPoint(0, 0)), new MTimer(frames += 30));
+    if (wait != NULL) {
+        tasks->AddTail(MTaskExitTransfer::Create(wait));
+    }
+    tasks->AddTail(mPicture->CreateCoordAnime(MPoint(0, 0), MPoint(0, 20), 30, 2),
+                   mPicture->CreateCoordAnime(MPoint(0, 20), MPoint(0, 40), 30, -2));
+    MParallelTaskSet *skip = new MParallelTaskSet();
+    mParallel.AddTail(skip);
+    skip->AddTail(new SkipWinTelopTask(mPicture, (DinoBattleView *)mUnk7C, tasks));
+    mSerial.AddTail(MTaskSetWaitEmptyTask::Create(skip));
 }
 
 // (The picture first: the game loads the view before it.)
