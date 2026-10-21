@@ -18,8 +18,7 @@ public:
     virtual ~DinoEventRevive();
     virtual void Idle();
 
-    MTask *CreateMessage(u32 message, const std::string &extra);
-    void AddMessage(u32 message);
+    MTask *CreateMessage(u32 message, const std::string &extra = "");
     void StateMode();
     void StateDeposit();
     void State02037dbc();

@@ -151,7 +151,8 @@ extern "C" struct {
     void (DinoEventRevive::*End_94)();
     void (DinoEventRevive::*End_9C)();
     void (DinoEventRevive::*State02037dbc_A4)();
-    u8 unkAC[0xBC - 0xAC];
+    u8 unkAC[0xB4 - 0xAC];
+    void (DinoEventRevive::*StateCleaned_B4)();
     void (DinoEventRevive::*StateSelected_BC)();
     u8 unkC4[0xCC - 0xC4];
     void (DinoEventRevive::*StateCheckRocks_CC)();
@@ -161,23 +162,53 @@ extern "C" struct {
     void (DinoEventRevive::*StateDeposit_EC)();
 } data_020bd628;
 
-inline void DinoEventRevive::AddMessage(u32 message) {
-    mSerial.AddTail(CreateMessage(message, ""));
+// The texts of the revival menu's choices.
+extern const u32 data_0208a9a8;
+extern const u32 data_0208a9ac;
+extern const u32 data_0208a9b0;
+extern const u32 data_0208a9b4;
+extern const u32 data_0208a9b8;
+
+// The message's text.
+static inline const char *DinoReviveMessageText(MResource<DinoMessageData> &messages, u32 i) {
+    const u8 *data = (const u8 *)messages.Get();
+    const u8 *entry = data + ((const u32 *)(data + ((const u32 *)data)[2]))[i];
+    return (const char *)entry + ((const u32 *)entry)[1];
+}
+
+// NONMATCHING: the game allocates each push_back's two flag bytes together (ours puts the fast-path ones first).
+// Asks what to do: revive, the stored rocks (when there are some and the level allows), the creature parts (when there
+// are some), another choice, or leave (-2).
+void DinoEventRevive::State02038544() {
+    DinoEventTalkWindow *window =
+        new DinoEventTalkWindow(gCurrentDisplay, std::string(DinoReviveMessageText(mMessages, 2)), 0, 0);
+    std::vector<DinoWindowChoice> choices;
+    choices.push_back(DinoWindowChoice(0, std::string(gDinoResource->GetText(data_0208a9b8))));
+    if (gDinoBackup->GetExcavateLevelUnk0() && gDinoBackup->IsUnk9CEmpty()) {
+        choices.push_back(DinoWindowChoice(1, std::string(gDinoResource->GetText(data_0208a9b4))));
+    }
+    if (gDinoBackup->CountCreatureParts()) {
+        choices.push_back(DinoWindowChoice(2, std::string(gDinoResource->GetText(data_0208a9b0))));
+    }
+    choices.push_back(DinoWindowChoice(3, std::string(gDinoResource->GetText(data_0208a9ac))));
+    choices.push_back(DinoWindowChoice(-2, std::string(gDinoResource->GetText(data_0208a9a8))));
+    window->SetChoices((u32)&mUnkD8, MPoint(0xFE, 0x8E), choices, 3);
+    mSerial.AddTail(window);
+    mState = data_020bd628.StateMode_6C;
 }
 
 // Nothing to revive (the flag is set, or no rock is left), or choose the rocks to put in.
-// NONMATCHING: the game's messages share one stack slot for their temporary string (see StateLevelMessage).
 void DinoEventRevive::StateCheckRocks() {
     if (gDinoBackup->GetSystemFlag(12)) {
-        AddMessage(0x14);
-        mState = data_020bd628.StateCleaned_34;
+        mSerial.AddTail(CreateMessage(0x14));
+        mState = data_020bd628.StateCleaned_B4;
     } else if (!gDinoBackup->HasUnrevealedUnk98()) {
-        AddMessage(3);
+        mSerial.AddTail(CreateMessage(3));
         mState = data_020bd628.State02038544_64;
     } else {
         mUnkE0.clear();
         mSerial.AddTail(new DinoEventReviveDepositSelect(mEvent, &mUnkE0));
-        mState = data_020bd628.StateMode_6C;
+        mState = data_020bd628.StateDeposit_EC;
     }
 }
 
@@ -194,7 +225,7 @@ void DinoEventRevive::StateDeposit() {
         gDinoBackup->CompactUnk98();
     }
     if (!gDinoBackup->IsUnk9CEmpty()) {
-        AddMessage(0x13);
+        mSerial.AddTail(CreateMessage(0x13));
         gDinoBackup->MarkUnk168();
     }
     mState = data_020bd628.State02038544_8C;
@@ -229,17 +260,16 @@ void DinoEventRevive::StateMode() {
 
 // Shows a message (no extra text).
 
-// NONMATCHING: the game's messages share one stack slot for their temporary string.
 void DinoEventRevive::StateLevelMessage() {
     u32 level = gDinoBackup->GetExcavateLevelUnk0();
     if (gDinoBackup->GetSystemVar(0x19) == 0) {
-        AddMessage(0x22);
+        mSerial.AddTail(CreateMessage(0x22));
     } else if (level == 0) {
-        AddMessage(0x1D);
+        mSerial.AddTail(CreateMessage(0x1D));
     } else if (level == gDinoBackup->GetMaxExcavateLevelUnk0()) {
-        AddMessage(0x1A);
+        mSerial.AddTail(CreateMessage(0x1A));
     } else {
-        AddMessage(0x15);
+        mSerial.AddTail(CreateMessage(0x15));
     }
     mState = data_020bd628.End_4C;
 }

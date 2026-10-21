@@ -9,7 +9,7 @@
 
 struct DinoWindowChoice {
     DinoWindowChoice() {}
-    DinoWindowChoice(u32 id, const std::string &text, const std::string &text2);
+    DinoWindowChoice(u32 id, const std::string &text, const std::string &text2 = "");
 
     u32 unk00;
     std::string unk04;  // 0x04
