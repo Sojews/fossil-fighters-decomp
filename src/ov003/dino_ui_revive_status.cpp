@@ -798,6 +798,8 @@ void DinoUiReviveEffectLight::Idle() {
 #pragma auto_inline off
 // A vector member the game emits in this file (made explicitly until the code that uses it is decompiled).
 template void std::__vec_deleter<MMotionFile, std::allocator<MMotionFile> >::sub_push_back(const MMotionFile &x, Metrowerks::int2type<false>);
+// (append_realloc's temporary's base, emitted ahead of the temporary's destructor.)
+template std::__vec_deleter<MMotionFile, std::allocator<MMotionFile> &>::~__vec_deleter();
 
 // (Calling these here emits the out-of-line copies of inline functions the game emits in this file.)
 #pragma dont_inline on

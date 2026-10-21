@@ -176,6 +176,8 @@ template void std::__vec_deleter<MMotionFile, std::allocator<MMotionFile> >::era
 template void std::__vec_deleter<MPictureFile, std::allocator<MPictureFile> >::sub_push_back(const MPictureFile &x, Metrowerks::int2type<false>);
 template std::__vec_deleter<MPictureFile, std::allocator<MPictureFile> >::~__vec_deleter();
 template void std::__vec_deleter<MPictureFile, std::allocator<MPictureFile> >::erase_at_end(size_t n, Metrowerks::int2type<false>);
+// (append_realloc's temporary, emitted ahead of the growth that uses it.)
+template std::__vec_deleter_helper<MPictureFile, std::allocator<MPictureFile> &>::~__vec_deleter_helper();
 
 #pragma auto_inline off
 
