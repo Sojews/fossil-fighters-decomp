@@ -415,7 +415,6 @@ void MMenu::Idle() {
     (this->*mState)();
 }
 
-// NONMATCHING (99.97%, instructions identical): the report docks the call to MCreateBgCallTask<MMenu>.
 void MMenu::Init() {
     if (mInput == NULL) {
         MSingleInputHub *hub = new MSingleInputHub(1);
