@@ -6,6 +6,8 @@
 class MFont;
 
 class MInput;
+class MTextPicture;
+class MSmartOam;
 
 class DinoUiLicenseCard : public MProcess {
 public:
@@ -13,12 +15,14 @@ public:
     virtual ~DinoUiLicenseCard();
     virtual void Idle();
     void Close();
+    void StateStart();
     void StateWait();
 
     void (DinoUiLicenseCard::*mState)(); // 0x74
     u8 mUnk7C;                           // 0x7C
     MInput *mInput;                      // 0x80
-    u8 unk84[0x8C - 0x84];
+    MTextPicture *mPicture;              // 0x84: the horider level
+    MSmartOam *mOam;                     // 0x88
     MFont *mFont;                        // 0x8C
 };
 

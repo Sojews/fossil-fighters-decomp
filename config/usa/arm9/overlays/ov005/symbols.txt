@@ -1,6 +1,6 @@
 _ZN17DinoUiLicenseCardC1Eh kind:function(thumb,size=0x34) addr:0x021558a0
 _ZN17DinoUiLicenseCard4IdleEv kind:function(thumb,size=0x20) addr:0x021558d4
-func_ov005_021558f4 kind:function(thumb,size=0x608) addr:0x021558f4
+_ZN17DinoUiLicenseCard10StateStartEv kind:function(thumb,size=0x608) addr:0x021558f4
 _ZN17DinoUiLicenseCard9StateWaitEv kind:function(thumb,size=0x48) addr:0x02155efc
 _ZN17DinoUiLicenseCard5CloseEv kind:function(thumb,size=0x1a) addr:0x02155f44
 _ZN17DinoUiLicenseCardD1Ev kind:function(thumb,size=0x16) addr:0x02155f60
