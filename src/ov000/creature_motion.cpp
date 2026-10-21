@@ -297,17 +297,20 @@ void DinoSplitDamage(int *out, u32 attack, int total) {
     }
 }
 
-// Both screens fade in from white.
+// (Through a non-member inline, the game keeps &mParallel in its lowest stack slot.)
+static inline MParallelTaskSet *DinoParallelOf(DinoBattleViewEffectGameBegin *effect) {
+    return &effect->mParallel;
+}
+
 // Shows the "VS" mark and both players' name panels over the backdrop, then fades in.
-// NONMATCHING: the hoisted &mParallel sits at sp+0x18 where the game has it at sp+0x10 (below two temporaries).
 void DinoBattleViewEffectGameBegin::Start() {
     mOam = new MSmartOam(22, 0, TRUE);
     mVs = new MMotion(std::string(data_ov000_02193668.mPanelPath), mOam, 0, 1);
     mVs->SetPosition(0x80, 0x60);
-    MParallelTaskSet *parallel = &mParallel;
     for (int i = 0; i < 2; i++) {
         mPanels[i] = new DinoBattleViewEffectGameBeginPlayerNamePanel(
             mOam, mNames[i], i, ((DinoBattleView *)mUnk7C)->GetPlayerByAC(i)->GetUnkCC(), i ? true : false);
+        MParallelTaskSet *parallel = DinoParallelOf(this);
         parallel->AddTail(mPanels[i]);
         mPanels[i]->SetPriority(0);
     }
@@ -316,6 +319,7 @@ void DinoBattleViewEffectGameBegin::Start() {
     mState = data_ov000_02193668.StateFadeIn_50;
 }
 
+// Both screens fade in from white.
 void DinoBattleViewEffectGameBegin::StateFadeIn() {
     MTask *top, *bottom;
     bottom = gLcd->GetBottomDisplay()->mBright->CreateFadeInFromWhite(30, 0);
