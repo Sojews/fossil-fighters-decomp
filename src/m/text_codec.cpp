@@ -1,11 +1,21 @@
 // Trimming, splitting and joining strings, and converting text between the game's encodings (Shift-JIS and
 // UTF-8) and wide characters.
 
+#pragma ipa file
+
 #define MSL_STRING_DEFINITIONS
 #define MSL_STRING_PLUS_DEFINITIONS
 #include <set>
 #include "m/text_codec.h"
 #include "nitro/os.h"
+
+// (Callees instantiated ahead of their callers, so that none is followed by its callee in our object.)
+template std::string::size_type std::string::find_first_not_of(const char *s, std::string::size_type pos,
+                                                               std::string::size_type n) const;
+template std::string::size_type std::string::find_last_not_of(const char *s, std::string::size_type pos,
+                                                              std::string::size_type n) const;
+template void std::__red_black_tree<wchar_t, wchar_t, std::__identity<wchar_t>, std::less<wchar_t>,
+                                    std::allocator<wchar_t> >::destroy(std::__red_black_tree_common<true>::node_base *);
 
 // How many bytes follow a UTF-8 sequence's first byte, by its top four bits.
 static const int sUtf8TrailBytes[16] = {0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 2, 2};
