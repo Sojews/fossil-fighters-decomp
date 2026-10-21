@@ -263,7 +263,7 @@ public:
 
 class DinoEventExecCharaMoveVector : public MProcess {
 public:
-    DinoEventExecCharaMoveVector(DinoEventLoop *event, u32 chara, u16 direction, u32 a, u32 b, u32 c, u8 d);
+    DinoEventExecCharaMoveVector(DinoEventLoop *event, u32 chara, u16 direction, MFx32 a, u32 b, u32 c, u8 d);
     virtual ~DinoEventExecCharaMoveVector();
     virtual void Idle();
 
@@ -401,7 +401,7 @@ public:
 
 class DinoEventExecStartWander : public MTransfer {
 public:
-    DinoEventExecStartWander(DinoEventLoop *event, u32 chara, u32 a, u32 b, u32 c, u32 d);
+    DinoEventExecStartWander(DinoEventLoop *event, u32 chara, u32 a, u32 b, MFx32 c, MFx32 d);
     virtual ~DinoEventExecStartWander();
     virtual void Transfer();
 
@@ -412,7 +412,7 @@ public:
 
 class DinoEventExecStartWatch : public MTransfer {
 public:
-    DinoEventExecStartWatch(DinoEventLoop *event, u32 chara, DinoCharaWatch watch);
+    DinoEventExecStartWatch(DinoEventLoop *event, u32 chara, MFx32 a, MFx32 b, MFx32 c, MFx32 d, u32 e);
     virtual ~DinoEventExecStartWatch();
     virtual void Transfer();
 

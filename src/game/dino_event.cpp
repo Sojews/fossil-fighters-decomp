@@ -769,10 +769,10 @@ void DinoEventLoop::RunCommand(const u8 *command) {
         mSerial.AddTail(new DinoEventExecCharaMoveOffset(this, DinoEventArg(command, 0), MFx32Point(MFx32::FromRaw(DinoEventArg(command, 1)), MFx32::FromRaw(DinoEventArg(command, 2))), DinoEventArg(command, 3), DinoEventArg(command, 4), 1));
         break;
     case 0x2f:
-        mSerial.AddTail(new DinoEventExecCharaMoveVector(this, DinoEventArg(command, 0), DinoEventDegree(DinoEventArg(command, 1)), DinoEventArg(command, 2), DinoEventArg(command, 3), DinoEventArg(command, 4), 0));
+        mSerial.AddTail(new DinoEventExecCharaMoveVector(this, DinoEventArg(command, 0), DinoEventDegree(DinoEventArg(command, 1)), MFx32::FromRaw(DinoEventArg(command, 2)), DinoEventArg(command, 3), DinoEventArg(command, 4), 0));
         break;
     case 0x30:
-        mSerial.AddTail(new DinoEventExecCharaMoveVector(this, DinoEventArg(command, 0), DinoEventDegree(DinoEventArg(command, 1)), DinoEventArg(command, 2), DinoEventArg(command, 3), DinoEventArg(command, 4), 1));
+        mSerial.AddTail(new DinoEventExecCharaMoveVector(this, DinoEventArg(command, 0), DinoEventDegree(DinoEventArg(command, 1)), MFx32::FromRaw(DinoEventArg(command, 2)), DinoEventArg(command, 3), DinoEventArg(command, 4), 1));
         break;
     case 0x32:
         mSerial.AddTail(new DinoEventExecCharaWaitMove(this, DinoEventArg(command, 0)));
@@ -876,7 +876,7 @@ void DinoEventLoop::RunCommand(const u8 *command) {
         mSerial.AddTail(new DinoEventExecStartFellow(this, DinoEventArg(command, 0), DinoEventArg(command, 1)));
         break;
     case 0x52:
-        mSerial.AddTail(new DinoEventExecStartWander(this, DinoEventArg(command, 0), DinoEventArg(command, 1), DinoEventArg(command, 2), DinoEventArg(command, 3), DinoEventArg(command, 4)));
+        mSerial.AddTail(new DinoEventExecStartWander(this, DinoEventArg(command, 0), DinoEventArg(command, 1), DinoEventArg(command, 2), MFx32::FromRaw(DinoEventArg(command, 3)), MFx32::FromRaw(DinoEventArg(command, 4))));
         break;
     case 0x54:
         {
@@ -901,7 +901,7 @@ void DinoEventLoop::RunCommand(const u8 *command) {
         mSerial.AddTail(new DinoEventExecFinishFellow(this, DinoEventArg(command, 0)));
         break;
     case 0x56:
-        mSerial.AddTail(new DinoEventExecStartWatch(this, DinoEventArg(command, 0), DinoCharaWatch(DinoEventArg(command, 1), DinoEventArg(command, 2), DinoEventArg(command, 3), DinoEventArg(command, 4), cmd->count == 5 ? 60 : DinoEventArg(command, 5))));
+        mSerial.AddTail(new DinoEventExecStartWatch(this, DinoEventArg(command, 0), MFx32::FromRaw(DinoEventArg(command, 1)), MFx32::FromRaw(DinoEventArg(command, 2)), MFx32::FromRaw(DinoEventArg(command, 3)), MFx32::FromRaw(DinoEventArg(command, 4)), cmd->count == 5 ? 60 : DinoEventArg(command, 5)));
         break;
     case 0x57:
         mSerial.AddTail(new DinoEventExecFinishWatch(this, DinoEventArg(command, 0)));

@@ -343,13 +343,13 @@ void DinoEventExecStartFellow::Transfer() {
     }
 }
 
-DinoEventExecStartWander::DinoEventExecStartWander(DinoEventLoop *event, u32 chara, u32 a, u32 b, u32 c, u32 d) {
+DinoEventExecStartWander::DinoEventExecStartWander(DinoEventLoop *event, u32 chara, u32 a, u32 b, MFx32 c, MFx32 d) {
     mEvent = event;
     mChara = chara;
     mArgs[0] = a;
     mArgs[1] = b;
-    mArgs[2] = c;
-    mArgs[3] = d;
+    mArgs[2] = c.v;
+    mArgs[3] = d.v;
 }
 
 void DinoEventExecStartWander::Transfer() {
@@ -406,14 +406,15 @@ void DinoEventExecFinishFellow::Transfer() {
     }
 }
 
-DinoEventExecStartWatch::DinoEventExecStartWatch(DinoEventLoop *event, u32 chara, DinoCharaWatch watch) {
+DinoEventExecStartWatch::DinoEventExecStartWatch(DinoEventLoop *event, u32 chara, MFx32 a, MFx32 b, MFx32 c, MFx32 d,
+                                                 u32 e) {
     mEvent = event;
     mChara = chara;
-    mWatch.w[0] = watch.w[0];
-    mWatch.w[1] = watch.w[1];
-    mWatch.w[2] = watch.w[2];
-    mWatch.w[3] = watch.w[3];
-    mWatch.w[4] = watch.w[4];
+    mWatch.w[0] = a.v;
+    mWatch.w[1] = b.v;
+    mWatch.w[2] = c.v;
+    mWatch.w[3] = d.v;
+    mWatch.w[4] = e;
 }
 
 void DinoEventExecStartWatch::Transfer() {
@@ -1935,11 +1936,11 @@ void DinoEventExecCharaMoveOffset::Idle() {
     serial->AddTail(exit);
 }
 
-DinoEventExecCharaMoveVector::DinoEventExecCharaMoveVector(DinoEventLoop *event, u32 chara, u16 direction, u32 a, u32 b, u32 c, u8 d) : MProcess(NULL) {
+DinoEventExecCharaMoveVector::DinoEventExecCharaMoveVector(DinoEventLoop *event, u32 chara, u16 direction, MFx32 a, u32 b, u32 c, u8 d) : MProcess(NULL) {
     mEvent = event;
     mChara = chara;
     mDirection = direction;
-    mA.v = a;
+    mA = a;
     mB = b;
     mC = c;
     mD = d;
