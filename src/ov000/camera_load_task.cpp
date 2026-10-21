@@ -11,6 +11,7 @@
 #include "m/seed_generator.h"
 #include <string>
 #include "game/dino_battle_view_3d_camera.h"
+#include "game/dino_static_init.h"
 
 extern "C" void func_ov000_0218a8ac(void *, u32, u32, u32);
 
@@ -210,4 +211,20 @@ extern "C" MTask *func_ov000_0218ac74(CameraSetDefParentTask::Camera *camera, Di
 
 // (Empty; nothing in the game calls it.)
 extern "C" void func_ov000_0218ab68() {
+}
+
+// The file's static initialization (see dino_static_init.h).
+static struct CameraLoadTaskStaticInit {
+    CameraLoadTaskStaticInit() {
+        DINO_POOL_WORD(data_ov000_02196cd0, 0x4) = 128;
+        DINO_POOL_WORD(data_ov000_02196cd0, 0x8) = 176;
+        DINO_POOL_WORD(data_ov000_02196cd0, 0x1c) = 8;
+        DINO_POOL_WORD(data_ov000_02196cd0, 0x20) = 150;
+        DINO_POOL_WORD(data_ov000_02196cd0, 0xc) = 64;
+        DINO_POOL_WORD(data_ov000_02196cd0, 0x10) = 112;
+    }
+} sCameraLoadTaskStaticInit;
+// The cameras' random numbers (constructed after the pooled constants).
+extern "C" {
+MRandom data_ov000_0219791c;
 }

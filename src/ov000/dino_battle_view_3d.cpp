@@ -30,6 +30,7 @@
 #include "m/3d.h"
 #include "m/smart_oam.h"
 #include "m/file.h"
+#include "game/dino_static_init.h"
 
 DinoBattleView3D::~DinoBattleView3D() {
     CancelQueue();
@@ -786,3 +787,28 @@ template std::__deque_deleter<MTask *, std::allocator<MTask *> >::~__deque_delet
 template std::__deque_deleter<MTask *, std::allocator<MTask *> >::iterator std::__deque_deleter<MTask *, std::allocator<MTask *> >::make_iter(size_t n);
 template void std::__deque_deleter<MTask *, std::allocator<MTask *> >::push_back(MTask *const &x, Metrowerks::int2type<true>);
 template void std::__deque_deleter<MTask *, std::allocator<MTask *> >::erase_front(size_t n, Metrowerks::int2type<true>);
+
+// The file's static initialization (see dino_static_init.h).
+extern "C" u32 data_ov000_021964e8[];
+extern "C" u32 data_ov000_021963a8[];
+static struct DinoBattleView3dStaticInit {
+    DinoBattleView3dStaticInit() {
+        DINO_POOL_WORD(data_ov000_02196368, 0x5c) = 128;
+        DINO_POOL_WORD(data_ov000_02196368, 0x60) = 176;
+        DINO_POOL_WORD(data_ov000_02196368, 0xc) = 8;
+        DINO_POOL_WORD(data_ov000_02196368, 0x10) = 150;
+        DINO_POOL_WORD(data_ov000_02196368, 0x64) = 64;
+        DINO_POOL_WORD(data_ov000_02196368, 0x68) = 112;
+        DINO_POOL_WORD(data_ov000_021964e8, 0x2c) = DINO_POOL_WORD(data_ov000_021962e8, 0x34);
+        DINO_POOL_WORD(data_ov000_021964e8, 0x30) = DINO_POOL_WORD(data_ov000_021962e8, 0x14);
+        DINO_POOL_WORD(data_ov000_021964e8, 0x34) = DINO_POOL_WORD(data_ov000_021962e8, 0x10);
+        DINO_POOL_WORD(data_ov000_021964e8, 0x38) = DINO_POOL_WORD(data_ov000_021962e8, 0x4);
+        DINO_POOL_WORD(data_ov000_021964e8, 0x3c) = DINO_POOL_WORD(data_ov000_021962e8, 0x2c);
+        DINO_POOL_WORD(data_ov000_021964e8, 0x40) = DINO_POOL_WORD(data_ov000_021962e8, 0x3c);
+        ((volatile u16 *)data_ov000_021963a8)[0x34 / 2] = 0x801f;
+        ((volatile u16 *)data_ov000_021963a8)[0x36 / 2] = 0xe475;
+        ((volatile u16 *)data_ov000_021963a8)[0x38 / 2] = 0xfe08;
+        ((volatile u16 *)data_ov000_021963a8)[0x3a / 2] = 0x83ff;
+        ((volatile u16 *)data_ov000_021963a8)[0x3c / 2] = 0x83e0;
+    }
+} sDinoBattleView3dStaticInit;

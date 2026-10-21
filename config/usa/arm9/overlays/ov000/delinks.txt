@@ -106,6 +106,7 @@ src/ov000/dino_battle_view_3d_camera.cpp:
 
 src/ov000/camera_load_task.cpp:
     .text       start:0x0218a8ac end:0x0218ada0
+    .init       start:0x02190d34 end:0x02190d74
 
 src/ov000/camera_wipe.cpp:
     .text       start:0x0218ada0 end:0x0218b4c0
@@ -149,6 +150,7 @@ src/ov000/creature_motion.cpp:
 
 src/ov000/dino_battle_view_3d.cpp:
     .text       start:0x02184908 end:0x0218a4d8
+    .init       start:0x02190cc4 end:0x02190d34
 
 src/ov000/dino_battle_view_ui.cpp:
     .text       start:0x02175b40 end:0x021791f8
