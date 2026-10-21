@@ -1,5 +1,5 @@
 // The animated 3D objects (MAnmModelBase and its kinds) and MPolygonChar, which plays them from a scene script.
-// Not decompiled yet: TintPalette, most of the Unk0C updates and the node data reader.
+// Not decompiled yet: TintPalette and most of the Unk0C updates.
 
 #pragma ipa file
 
@@ -807,10 +807,14 @@ extern "C" const MAnmName data_0208afc0[];  // an emitter's
 extern "C" const MAnmName data_0208b010[];  // a camera target's
 extern "C" const MAnmName data_0208af88[];  // a trail's
 extern "C" const VecFx32 data_0208af70;     // the camera target's rotation (none)
+extern "C" {
 char *ReadLine(char **p);
 fx32 ParseFx32(char **p);
 void ReadField(char **p, char *out);
 BOOL SkipComma(char **p);
+s32 ParseInt(char **p);
+void SkipWhitespace(char **p);
+}
 
 // NONMATCHING (99.8%): the game keeps the (unused) line counter in an ordinary stack slot; ours drops it unless it is
 // volatile, which moves it to the top of the frame.
@@ -1136,6 +1140,242 @@ void MPolygonChar::Idle() {
                 mUnk7C->Run();
             }
         }
+    }
+}
+
+extern "C" const char data_020bb948[];  // "<node_scale_data"
+extern "C" const char data_020bb95c[];  // "<node_rotate_data"
+extern "C" const char data_020bb970[];  // "<node_translate_data"
+extern "C" const char data_020bb988[];  // "</"
+extern "C" const char data_020bb98c[];  // "<scale_x"
+extern "C" const char data_020bb998[];  // "data_size=\""
+extern "C" const char data_020bb9a4[];  // "data_head=\""
+extern "C" const char data_020bb9b0[];  // "<scale_y"
+extern "C" const char data_020bb9bc[];  // "<scale_z"
+extern "C" const char data_020bb9c8[];  // "<rotate_x"
+extern "C" const char data_020bb9d4[];  // "<rotate_y"
+extern "C" const char data_020bb9e0[];  // "<rotate_z"
+extern "C" const char data_020bb9ec[];  // "<translate_x"
+extern "C" const char data_020bb9fc[];  // "<translate_y"
+extern "C" const char data_020bba0c[];  // "<translate_z"
+
+// NONMATCHING (99.3%): each push_back's two flag bytes are the other way round (as with vector<void *> pushes in the
+// other ipa files).
+// Loads a node animation file (XML-like): the node's scale, rotate and translate value lists, then for each axis
+// its keys (data_size values from data_head, one every 16 frames) into the transform tracks.
+void MAnmLoadTracks(const char *path, MAnmModelBase *model) {
+    MFile file;
+    std::vector<void *> scales;
+    std::vector<void *> rotates;
+    std::vector<void *> translates;
+    if (file.Open(std::string(path))) {
+        char *text = new char[file.GetLength() + 1];
+        text[file.GetLength()] = 0;
+        file.Read(text, file.GetLength());
+        file.Close();
+        char *cursor = text;
+        int mode = 0;
+        model->mTracks[6].clear();
+        model->mUnk11A = TRUE;
+        model->mTracks[7].clear();
+        model->mUnk11A = TRUE;
+        model->mTracks[8].clear();
+        model->mUnk11A = TRUE;
+        model->mTracks[3].clear();
+        model->mUnk11A = TRUE;
+        model->mTracks[4].clear();
+        model->mUnk11A = TRUE;
+        model->mTracks[5].clear();
+        model->mUnk11A = TRUE;
+        model->mTracks[0].clear();
+        model->mUnk11A = TRUE;
+        model->mTracks[1].clear();
+        model->mUnk11A = TRUE;
+        model->mTracks[2].clear();
+        model->mUnk11A = TRUE;
+        char *line;
+        void *value;
+        MAnmKey key;
+        for (line = ReadLine(&cursor); line != NULL; line = ReadLine(&cursor)) {
+            SkipWhitespace(&line);
+            switch (mode) {
+            case 1:
+                do {
+                    SkipWhitespace(&line);
+                    value = (void *)ParseFx32(&line);
+                    if (value != (void *)0x7fffffff) {
+                        scales.push_back(value);
+                    }
+                } while (value != (void *)0x7fffffff);
+                break;
+            case 2:
+                do {
+                    SkipWhitespace(&line);
+                    value = (void *)ParseFx32(&line);
+                    if (value != (void *)0x7fffffff) {
+                        rotates.push_back(value);
+                    }
+                } while (value != (void *)0x7fffffff);
+                break;
+            case 3:
+                do {
+                    SkipWhitespace(&line);
+                    value = (void *)ParseFx32(&line);
+                    if (value != (void *)0x7fffffff) {
+                        translates.push_back(value);
+                    }
+                } while (value != (void *)0x7fffffff);
+                break;
+            }
+            if (strncmp(data_020bb948, line, 10) == 0) {
+                mode = 1;
+            }
+            if (strncmp(data_020bb95c, line, 10) == 0) {
+                mode = 2;
+            }
+            if (strncmp(data_020bb970, line, 10) == 0) {
+                mode = 3;
+            }
+            if (strncmp(data_020bb988, line, 2) == 0) {
+                mode = 0;
+            }
+            if (strncmp(data_020bb98c, line, 8) == 0) {
+                std::string tag(line);
+                char *p = (char *)tag.c_str();
+                p += tag.find(data_020bb998, 0) + strlen(data_020bb998);
+                int size = ParseInt(&p);
+                p = (char *)tag.c_str();
+                p += tag.find(data_020bb9a4, 0) + strlen(data_020bb9a4);
+                int head = ParseInt(&p);
+                for (int i = 0; i < size; i++) {
+                    key.mFrame = (i + 1) << 4;
+                    key.mMin = (int)scales[head + i];
+                    key.mMax = (int)scales[head + i];
+                    model->mTracks[6].push_back(key);
+                }
+            }
+            if (strncmp(data_020bb9b0, line, 8) == 0) {
+                std::string tag(line);
+                char *p = (char *)tag.c_str();
+                p += tag.find(data_020bb998, 0) + strlen(data_020bb998);
+                int size = ParseInt(&p);
+                p = (char *)tag.c_str();
+                p += tag.find(data_020bb9a4, 0) + strlen(data_020bb9a4);
+                int head = ParseInt(&p);
+                for (int i = 0; i < size; i++) {
+                    key.mFrame = (i + 1) << 4;
+                    key.mMin = (int)scales[head + i];
+                    key.mMax = (int)scales[head + i];
+                    model->mTracks[7].push_back(key);
+                }
+            }
+            if (strncmp(data_020bb9bc, line, 8) == 0) {
+                std::string tag(line);
+                char *p = (char *)tag.c_str();
+                p += tag.find(data_020bb998, 0) + strlen(data_020bb998);
+                int size = ParseInt(&p);
+                p = (char *)tag.c_str();
+                p += tag.find(data_020bb9a4, 0) + strlen(data_020bb9a4);
+                int head = ParseInt(&p);
+                for (int i = 0; i < size; i++) {
+                    key.mFrame = (i + 1) << 4;
+                    key.mMin = (int)scales[head + i];
+                    key.mMax = (int)scales[head + i];
+                    model->mTracks[8].push_back(key);
+                }
+            }
+            if (strncmp(data_020bb9c8, line, 9) == 0) {
+                std::string tag(line);
+                char *p = (char *)tag.c_str();
+                p += tag.find(data_020bb998, 0) + strlen(data_020bb998);
+                int size = ParseInt(&p);
+                p = (char *)tag.c_str();
+                p += tag.find(data_020bb9a4, 0) + strlen(data_020bb9a4);
+                int head = ParseInt(&p);
+                for (int i = 0; i < size; i++) {
+                    key.mFrame = (i + 1) << 4;
+                    key.mMin = (int)rotates[head + i];
+                    key.mMax = (int)rotates[head + i];
+                    model->mTracks[3].push_back(key);
+                }
+            }
+            if (strncmp(data_020bb9d4, line, 9) == 0) {
+                std::string tag(line);
+                char *p = (char *)tag.c_str();
+                p += tag.find(data_020bb998, 0) + strlen(data_020bb998);
+                int size = ParseInt(&p);
+                p = (char *)tag.c_str();
+                p += tag.find(data_020bb9a4, 0) + strlen(data_020bb9a4);
+                int head = ParseInt(&p);
+                for (int i = 0; i < size; i++) {
+                    key.mFrame = (i + 1) << 4;
+                    key.mMin = (int)rotates[head + i];
+                    key.mMax = (int)rotates[head + i];
+                    model->mTracks[4].push_back(key);
+                }
+            }
+            if (strncmp(data_020bb9e0, line, 9) == 0) {
+                std::string tag(line);
+                char *p = (char *)tag.c_str();
+                p += tag.find(data_020bb998, 0) + strlen(data_020bb998);
+                int size = ParseInt(&p);
+                p = (char *)tag.c_str();
+                p += tag.find(data_020bb9a4, 0) + strlen(data_020bb9a4);
+                int head = ParseInt(&p);
+                for (int i = 0; i < size; i++) {
+                    key.mFrame = (i + 1) << 4;
+                    key.mMin = (int)rotates[head + i];
+                    key.mMax = (int)rotates[head + i];
+                    model->mTracks[5].push_back(key);
+                }
+            }
+            if (strncmp(data_020bb9ec, line, 12) == 0) {
+                std::string tag(line);
+                char *p = (char *)tag.c_str();
+                p += tag.find(data_020bb998, 0) + strlen(data_020bb998);
+                int size = ParseInt(&p);
+                p = (char *)tag.c_str();
+                p += tag.find(data_020bb9a4, 0) + strlen(data_020bb9a4);
+                int head = ParseInt(&p);
+                for (int i = 0; i < size; i++) {
+                    key.mFrame = (i + 1) << 4;
+                    key.mMin = (int)translates[head + i];
+                    key.mMax = (int)translates[head + i];
+                    model->mTracks[0].push_back(key);
+                }
+            }
+            if (strncmp(data_020bb9fc, line, 12) == 0) {
+                std::string tag(line);
+                char *p = (char *)tag.c_str();
+                p += tag.find(data_020bb998, 0) + strlen(data_020bb998);
+                int size = ParseInt(&p);
+                p = (char *)tag.c_str();
+                p += tag.find(data_020bb9a4, 0) + strlen(data_020bb9a4);
+                int head = ParseInt(&p);
+                for (int i = 0; i < size; i++) {
+                    key.mFrame = (i + 1) << 4;
+                    key.mMin = (int)translates[head + i];
+                    key.mMax = (int)translates[head + i];
+                    model->mTracks[1].push_back(key);
+                }
+            }
+            if (strncmp(data_020bba0c, line, 12) == 0) {
+                std::string tag(line);
+                char *p = (char *)tag.c_str();
+                p += tag.find(data_020bb998, 0) + strlen(data_020bb998);
+                int size = ParseInt(&p);
+                p = (char *)tag.c_str();
+                p += tag.find(data_020bb9a4, 0) + strlen(data_020bb9a4);
+                int head = ParseInt(&p);
+                for (int i = 0; i < size; i++) {
+                    key.mFrame = (i + 1) << 4;
+                    key.mMin = (int)translates[head + i];
+                    key.mMax = (int)translates[head + i];
+                    model->mTracks[2].push_back(key);
+                }
+            }
+        }
+        delete[] text;
     }
 }
 
