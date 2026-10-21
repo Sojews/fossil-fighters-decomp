@@ -3,11 +3,12 @@
 
 #include <string>
 #include "m/picture.h"
+#include "m/fx32.h"
 
 // One layer of a cleaning image.
 class DinoCleaningImageLayer {
 public:
-    DinoCleaningImageLayer(u32 unk1C44, std::string name, u8 unk800, u32 sound, u32 unk1C40);
+    DinoCleaningImageLayer(u32 unk1C44, std::string name, u8 unk800, u32 sound, MFx32 unk1C40);
     // A layer sharing the other's pixels.
     DinoCleaningImageLayer(const DinoCleaningImageLayer &other);
     virtual ~DinoCleaningImageLayer();
@@ -37,7 +38,7 @@ public:
     u32 mUnk1C34;           // 0x1C34
     u32 mUnk1C38;           // 0x1C38
     u32 mUnk1C3C;           // 0x1C3C: a sound effect
-    u32 mUnk1C40;           // 0x1C40
+    MFx32 mUnk1C40;         // 0x1C40
     u32 mUnk1C44;           // 0x1C44
     u8 mUnk1C48;            // 0x1C48
 };

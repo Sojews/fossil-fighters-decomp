@@ -3,6 +3,7 @@
 #define GAME_DINO_CLEANING_IMAGE_VIEW_H
 
 #include "m/view.h"
+class MRandom;
 #include <vector>
 #include "m/affine_screen.h"
 #include "m/fx32.h"
@@ -22,6 +23,7 @@ public:
     // Makes the screen and palettes for the images, and clears the dirt.
     void CreateScreen();
     virtual ~DinoCleaningImageView();
+    virtual void Execute();  // (in ITCM: func_01ff9a4c)
     virtual void SetPosition(MPoint pos);
     virtual MPoint GetPosition();
     virtual void SetPriority(int priority);
@@ -36,7 +38,7 @@ public:
     void CreatePalAnimes();
     void LoadPalettes();
     void Move(int x, int y);
-    void CreateOam();
+    void CreateOam(MRandom *random);
     void DestroyOam();
     BOOL IsUnkD9E0Zero();
     MFx32 GetDirtRatio();

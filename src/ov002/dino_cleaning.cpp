@@ -139,6 +139,7 @@ BOOL DinoCleaningKasekiRock::IsViewUnkD9E0Zero() {
 extern "C" struct {
     u8 unk00[0x44];
     MRect mBounds;      // 0x44
+    MFx32 mChipsScales[2][3];   // 0x54: the ctor's function-local static, set on the first call
 } data_ov002_02165854;
 extern "C" void func_ov002_0215a7b4(DinoCleaningImageView *view);
 
@@ -282,10 +283,17 @@ void DinoCleaningKasekiRockXrayBlendManager::Idle() {
 
 // The scene's pooled pointer-to-member constants (see menu.cpp).
 extern "C" struct {
-    u8 unk00[0x20];
+    u8 unk00[0x4];
+    const char *mBlankLayerPath;    // 0x04
+    u8 unk08[0x10 - 0x8];
+    const char *mKasekiLayerFormat; // 0x10: the fossil's layers (number, layer, variant)
+    const char *mChipsLayerFormat;  // 0x14: the rock's layers
+    u8 unk18[0x20 - 0x18];
     void (DinoCleaningKasekiRockXrayBlendManager::*StateDone_20)(); // 0x20
     void (DinoCleaningKasekiRockXrayBlendManager::*StateFade_28)(); // 0x28
-    u8 unk30[0x48 - 0x30];
+    void (DinoCleaningKasekiRockXrayBlendManager::*StateDone_30)(); // 0x30
+    void (DinoCleaningKasekiRock::*CountCells_38)(); // 0x38
+    u8 unk40[0x48 - 0x40];
     void (DinoCleaningKasekiRock::*CountCells_48)(); // 0x48
     void (DinoCleaningKasekiRock::*StateDrop_50)(); // 0x50
     u8 unk58[0x68 - 0x58];
@@ -394,6 +402,114 @@ void DinoCleaningKasekiRockXrayBlendManager::StateFade() {
 }
 
 void DinoCleaningKasekiRockXrayBlendManager::StateDone() {
+}
+
+extern "C" const u32 data_0208ad2c;  // the help text over the rock
+extern "C" u32 data_ov002_02165fa4;  // the guard of the ctor's static
+extern "C" MFx32 data_ov002_021658a8[2][3];
+
+inline DinoCleaningKasekiRockXrayBlendManager::DinoCleaningKasekiRockXrayBlendManager(DinoCleaningImageView *image)
+    : MProcess(NULL) {
+    mState = data_ov002_021657d4.StateDone_30;
+    mImage = image;
+    mTimer = 0;
+    mHidden = FALSE;
+    unk88 = new MParallelTaskSet;
+    mTasks = new MParallelTaskSet;
+    mParallel.AddTail(unk88, mTasks);
+}
+
+// Builds the rock: the fossil's image (a blank layer and three fossil layers) over the chips' image (a blank layer
+// and three rock layers), a rock for each, the view and its x-ray copy, then counts the fossil's visible cells.
+// NONMATCHING: 99.45%, the per-iteration scale table sits below the layer table (the game has it above), and the
+// loop counter's store is scheduled after the table copies.
+DinoCleaningKasekiRock::DinoCleaningKasekiRock(DinoCleaning *cleaning, u32 view, u32 number, u32 kasekiScale,
+                                               u32 kasekiVariant, u8 unk14, u32 chipsNumber, u32 chipsScale,
+                                               u32 chipsVariant, u8 unk4B8, BOOL unk19C, u32 scale0, u32 scale1)
+    : MProcess(NULL) {
+    unk7C = (u32)cleaning;
+    mUnk4A0 = chipsVariant;
+    mOam = (MSmartOam *)cleaning->GetUnkD4();
+    mRandom = cleaning->GetRandom();
+    mUnk4B8 = unk4B8;
+    mParallel.AddTail(new DinoHelpDummyItem(gLcd->GetBottomDisplay(), MRect(0x1c, 0x25, 0xe5, 0xb0),
+                                            std::string(gDinoResource->GetText(data_0208ad2c))));
+    mUnk80 = (MView *)view;
+    MIndexBitmap *bitmap = gCurrentDisplay->mBg->CreateIndexBitmap(1, TRUE);
+    mView = new DinoCleaningImageView;
+    mView->CreateOam(cleaning->GetRandom());
+
+    char path[0x80];
+    DinoCleaningImage *kaseki = new DinoCleaningImage(cleaning);
+    kaseki->AddLayer(new DinoCleaningImageLayer(0, std::string(data_ov002_021657d4.mBlankLayerPath), 1, 0, MFx32(1)));
+    u32 sounds[2][3] = {{0x2a, 0x2a, 0x2b}, {0, 0x2a, 0x2b}};
+    u32 layers[3] = {1, 3, 2};
+    fx32 s0 = scale0;
+    fx32 s1 = scale1;
+    for (u32 i = 3; i > 0; i--) {
+        MFx32 scales[2][3] = {{MFx32::FromRaw(s0), MFx32::FromRaw(s1), MFx32(1)},
+                              {MFx32::FromRaw(s0), MFx32::FromRaw(s1), MFx32(20)}};
+        OS_SPrintf(path, data_ov002_021657d4.mKasekiLayerFormat, number, layers[i - 1],
+                   (i < 3 ? kasekiVariant : 0) + 'a');
+        DinoCleaningImageLayer *layer = new DinoCleaningImageLayer((u32)cleaning->GetRandom(), std::string(path), 0,
+                                                                   sounds[unk19C == 0 ? 1 : 0][i - 1],
+                                                                   scales[unk19C == 0 ? 1 : 0][i - 1]);
+        layer->SetUnk14(unk14);
+        kaseki->AddLayer(layer);
+    }
+    mRock8C = new DinoCleaningRock((u32)cleaning, kaseki, (u32)cleaning->GetRandom(), kasekiScale);
+    mView->AddImage(kaseki);
+
+    DinoCleaningImage *chips = new DinoCleaningImage(cleaning);
+    chips->AddLayer(new DinoCleaningImageLayer(0, std::string(data_ov002_021657d4.mBlankLayerPath), 1, 0, MFx32(1)));
+    static const u32 chipsSounds[3] = {0x27, 0x28, 0x29};
+    for (u32 i = 3; i > 0; i--) {
+        if (!(data_ov002_02165fa4 & 1)) {
+            data_ov002_02165854.mChipsScales[0][0] = MFx32(1);
+            data_ov002_02165854.mChipsScales[0][1] = MFx32(1);
+            data_ov002_02165854.mChipsScales[0][2] = MFx32(1);
+            data_ov002_02165854.mChipsScales[1][0] = MFx32(1);
+            data_ov002_02165854.mChipsScales[1][1] = MFx32(2);
+            data_ov002_02165854.mChipsScales[1][2] = MFx32(1);
+            data_ov002_02165fa4 |= 1;
+        }
+        OS_SPrintf(path, data_ov002_021657d4.mChipsLayerFormat, chipsNumber, i, (i == 1 ? chipsVariant : 0) + 'a');
+        chips->AddLayer(new DinoCleaningImageLayer((u32)cleaning->GetRandom(), std::string(path), 0,
+                                                   chipsSounds[i - 1],
+                                                   data_ov002_021658a8[chipsVariant == 1 ? 1 : 0][i - 1]));
+    }
+    mRock90 = new DinoCleaningRock((u32)cleaning, chips, (u32)cleaning->GetRandom(), chipsScale);
+    mView->AddImage(chips);
+    mView->CreateScreen();
+    mRock8C->RefreshHardness();
+    mRock90->RefreshHardness();
+    gCurrentDisplay->mBg->DeleteIndexBitmap(bitmap);
+
+    mUnk88 = new DinoCleaningImageView(*mView);
+    if (mUnk4A0 != 1) {
+        ((DinoCleaningImageView *)mUnk88)->GetImage(1)->ClearGrid();
+    }
+    mView->Move(0, 0xc0);
+    mView->SetPriority(2);
+    mView->Show();
+    mUnk88->SetPriority(2);
+    mXray = new DinoCleaningKasekiRockXrayBlendManager((DinoCleaningImageView *)mUnk88);
+    mParallel.AddTail(mXray, mRock8C, mRock90, mView, mUnk88);
+
+    mUnk98 = 0;
+    mUnk9C = 0;
+    for (u32 i = 0; i < 4; i++) {
+        mUnkA0[i] = 0;
+    }
+    for (int col = 0; col < 28; col++) {
+        for (int row = 0; row < 36; row++) {
+            if (mRock8C->GetImage()->GetMask(row, col) == 0 &&
+                mRock8C->GetImage()->GetLayer(1)->mCells410[row][col] == 0) {
+                mUnk98++;
+            }
+        }
+    }
+    mState = data_ov002_021657d4.CountCells_38;
 }
 
 // Shakes the landed rock, less and less, then counts its cells.

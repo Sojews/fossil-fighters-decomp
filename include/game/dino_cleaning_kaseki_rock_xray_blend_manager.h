@@ -7,6 +7,7 @@ class DinoCleaningImageView;
 
 class DinoCleaningKasekiRockXrayBlendManager : public MProcess {
 public:
+    DinoCleaningKasekiRockXrayBlendManager(DinoCleaningImageView *image);
     virtual ~DinoCleaningKasekiRockXrayBlendManager();
     virtual void Idle();
 
@@ -17,7 +18,7 @@ public:
     DinoCleaningImageView *mImage;                              // 0x7C: the x-ray image
     int mTimer;                                                 // 0x80
     u8 mHidden;                                                 // 0x84: no blending while it's set
-    u32 unk88;
+    MTaskSet *unk88;                                            // 0x88
     MTaskSet *mTasks;                                           // 0x8C
 };
 

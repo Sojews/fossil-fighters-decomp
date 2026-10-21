@@ -106,7 +106,7 @@ u32 DinoCleaningImageView::GetPlaneMask() {
     return 1 << mScreen->mBg;
 }
 
-void DinoCleaningImageView::CreateOam() {
+void DinoCleaningImageView::CreateOam(MRandom *random) {
     mOam = new MSmartOam(300, 50, TRUE);
     mOamTasks->AddTail(mOam);
 }
