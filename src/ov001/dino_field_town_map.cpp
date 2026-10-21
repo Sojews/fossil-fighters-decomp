@@ -28,6 +28,7 @@
 #include "m/text_codec.h"
 #include "game/dino_sound.h"
 #include "m/input.h"
+#include "game/dino_common_font.h"
 
 // The TU's pooled strings.
 extern "C" struct {
@@ -143,11 +144,16 @@ void DinoFieldTownMapManager::CameraUnk0(u32 map) {
 
 // The TU's pooled pointer-to-member constants (see menu.cpp).
 extern "C" struct {
-    u8 unk00[0xC];
+    u8 unk00[0x4];
+    const char *mDigitPath;     // 0x04
+    const char *mPicturePath;   // 0x08
     void (DinoFieldDance::*TimeUp_0C)();  // 0x0C
     void (DinoFieldDance::*Done_14)();    // 0x14
     void (DinoFieldDance::*Start_1C)();   // 0x1C
+    void (DinoFieldDance::*StatePlay_24)(); // 0x24
 } data_ov001_0216a814;
+// The time digits' positions (from the screen's centre).
+extern "C" const MPoint data_ov001_0216a860[4];
 
 // A step of the dance: its tempo, its sound and an event to run (0 for none).
 struct DinoDanceStep {
@@ -157,9 +163,11 @@ struct DinoDanceStep {
 };
 // The dance's file: steps and timed events.
 struct DinoDanceFile {
-    u8 unk00[8];
+    u32 unk00;
+    u32 time;           // 0x04: the time allowed, in frames
     u32 beat;           // 0x08
-    u8 unk0C[0x14 - 0xC];
+    u32 dancerCount;    // 0x0C
+    u32 dancerOffset;   // 0x10: the dancers' chara ids
     u32 stepCount;      // 0x14
     u32 stepOffset;     // 0x18: DinoDanceStep entries
     u32 eventCount;     // 0x1C
@@ -212,6 +220,50 @@ void DinoFieldDance::ShowMessage(u32 priority, u32 id) {
     mTalk->Print(std::string(text));
     mUnkE0->AddTail(mTalk);
     mUnkDC->AddTail(mTalk->CreateWaitStartTask());
+}
+
+// NONMATCHING: push_back's two flag bytes swap stack slots, and the loops' spills land in other slots.
+// Sets the dance up: its dancers, the time display and a blinking start.
+void DinoFieldDance::Start() {
+    mFont = new DinoCommonFont(0, 0, 0);
+    mFont->AddRef();
+    mPicture = MPictureFile(std::string(data_ov001_0216a814.mPicturePath), 0);
+    for (u32 i = 0; i < ((const DinoDanceFile *)mDance.Get())->dancerCount; i++) {
+        const DinoDanceFile *file = (const DinoDanceFile *)mDance.Get();
+        DinoFieldChara *chara = mField->GetChara(((const u32 *)((const u8 *)file + file->dancerOffset))[i]);
+        if (chara != NULL) {
+            mUnkA4.push_back((MTask *const &)chara);
+            chara->CacheMotion(9);
+        }
+    }
+    MInputHub *hub = new MSingleInputHub(1);
+    hub->EnableTouch();
+    mParallel.AddTail(hub);
+    mInput = hub->GetInput(0);
+    mOam = new MSmartOam(gLcd->GetBottomDisplay(), 5, 0, 1);
+    for (u32 i = 0; i < 4; i++) {
+        mTimeDigits[i] = new MMotion(std::string(data_ov001_0216a814.mDigitPath), mOam, 0, 1);
+        mTimeDigits[i]->SetPriority(2);
+        mTimeDigits[i]->SetAnchor(1);
+        mTimeDigits[i]->SetPosition(data_ov001_0216a860[i] + MPoint(128, 96));
+        mTimeDigits[i]->Show();
+        mParallel.AddTail(mTimeDigits[i]);
+    }
+    mParallel.AddTail(mOam);
+    mUnkDC = new MSerialTaskSet;
+    mUnkE0 = new MParallelTaskSet;
+    GetParallel()->AddTail(mUnkDC, mUnkE0);
+    mStep = 0;
+    mFrame = 0;
+    mHold = 0;
+    mStepFrames = 0;
+    mTime = ((const DinoDanceFile *)mDance.Get())->time;
+    mPriority = 0;
+    ShowTime();
+    for (u32 i = 0; i < 6; i++) {
+        GetSerial()->AddTail(mOam->CreateHideTransfer(), new MTimer(10), mOam->CreateShowTransfer(), new MTimer(10));
+    }
+    mState = data_ov001_0216a814.StatePlay_24;
 }
 
 void DinoFieldDance::StatePlay() {
