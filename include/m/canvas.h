@@ -132,10 +132,8 @@ public:
         mPattern = color | (color << 4);
         mBase = base;
         mTiles = tiles;
-        mSize.x = rect.right - rect.left;
-        mSize.y = rect.bottom - rect.top;
-        mOrigin.x = rect.left;
-        mOrigin.y = rect.top;
+        mSize = rect.GetSize();
+        mOrigin = rect.GetTopLeft();
     }
     virtual ~MChr16Fill();
     virtual void Transfer();

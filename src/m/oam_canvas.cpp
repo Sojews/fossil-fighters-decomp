@@ -114,20 +114,17 @@ void MOamCanvas<TOam, TUnit>::ClearRect(MRect rect) {
     FillRect(rect, 0);
 }
 
+// The address of a tile of the block.
+static inline u32 MOamCanvasChrAddr(MChrBlock *block, u32 tile) { return block->addr + tile * block->unitSize; }
+
 template <class TOam, class TUnit>
 void MOamCanvas<TOam, TUnit>::FillRect(MRect rect, int color) {
     for (u32 i = 0; i < mPieces.size(); i++) {
-        MRect r = mPieces[i].rect;
-        if (r.right > rect.left && rect.right > r.left && r.bottom > rect.top && rect.bottom > r.top) {
-            Piece &piece = mPieces[i];
-            MPoint tiles((piece.rect.right - piece.rect.left) / 8, (piece.rect.bottom - piece.rect.top) / 8);
-            MPoint origin(-piece.rect.left, -piece.rect.top);
-            MRect p = piece.rect;
-            MRect clip(rect.left > p.left ? rect.left : p.left, rect.top > p.top ? rect.top : p.top,
-                       rect.right < p.right ? rect.right : p.right, rect.bottom < p.bottom ? rect.bottom : p.bottom);
-            clip.Offset(origin);
-            gLooper->AddTransferTask(
-                new MChr16Fill(color, mChrBlock->addr + mChrBlock->unitSize * piece.chrOffset, tiles, clip));
+        if (rect.Intersects(mPieces[i].rect)) {
+            gLooper->AddTransferTask(new MChr16Fill(
+                color, MOamCanvasChrAddr(mChrBlock, mPieces[i].chrOffset),
+                mPieces[i].rect.GetSize() / 8,
+                rect.Intersection(mPieces[i].rect).Moved(MPoint(0, 0) - mPieces[i].rect.GetTopLeft())));
         }
     }
 }
