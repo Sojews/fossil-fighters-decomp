@@ -745,11 +745,12 @@ void DinoBattleViewUiSelectAreaCommon::OnFocus(MMenuItem *item) {
 void DinoBattleViewUiSelectAreaCommon::OnFocusCreature(DinoBattleViewCreature *creature, MMenuItem *item) {
 }
 
-// NONMATCHING: the game keeps the side in a register and the slot on the stack (it inlines func_ov000_02177430).
+// (Declared slot first: the game keeps the side in a register and the slot on the stack.)
 DinoBattleViewCreature *DinoBattleViewUiSelectAreaCommon::GetItemCreature(MMenuItem *item) {
     u32 row = ((DinoBattleViewUiRootMenuItem *)item)->mIndex;
-    u32 side = data_ov000_0218fec4[row].unk0;
-    u32 slot = data_ov000_0218fec4[row].unk4;
+    u32 slot, side;
+    side = data_ov000_0218fec4[row].unk0;
+    slot = data_ov000_0218fec4[row].unk4;
     for (int i = 0; i < 2; i++) {
         DinoBattleViewPlayer *player = ((DinoBattleView *)mUnkEC)->GetUnkE4(i);
         for (int j = 0; j < player->GetCreatureCount(); j++) {
