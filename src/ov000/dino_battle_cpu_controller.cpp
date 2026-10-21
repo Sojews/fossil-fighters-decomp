@@ -19,7 +19,6 @@
 #pragma auto_inline off
 
 extern "C" const u32 data_ov000_0218fa08[3];    // the creature slots, by entry
-extern "C" void func_ov000_02158b50(DinoBattleCpuController *controller, u32 arg);
 
 // Starts the CPU side (its player and creatures), and clears the attack bar when its turn ends.
 // NONMATCHING (98.6%): the game stores each creature's unk7C value twice (one dead copy), shifting the creature
@@ -50,7 +49,7 @@ void DinoBattleCpuController::OnMessage(MMessage *msg) {
         if (!((DinoBattleModel *)mUnkAC)->mUnkA8) {
             GetSerial()->AddTail(mUnkB0->CreatePostTask(new DinoBattleViewClearAttackBarRequest(0)),
                                  DinoCreatePostAndWaitTask(mUnkB0, new DinoBattleViewWaitActionInfoBarRequest(0)));
-            func_ov000_02158b50(this, 1);
+            DecideAction(1);
         }
         break;
     case 0x10026: {
@@ -61,13 +60,13 @@ void DinoBattleCpuController::OnMessage(MMessage *msg) {
             new SetLiveEventCheckTask(((DinoBattleModelField *)((DinoBattleModel *)mUnkAC)->GetUnk10C())->mLive, 0),
             mUnkB0->CreatePostTask(new DinoBattleViewClearAttackBarRequest(0)),
             DinoCreatePostAndWaitTask(mUnkB0, new DinoBattleViewWaitActionInfoBarRequest(0)));
-        func_ov000_02158b50(this, 0);
+        DecideAction(0);
         break;
     }
     case 0x10020:
         GetSerial()->AddTail(mUnkB0->CreatePostTask(new DinoBattleViewClearAttackBarRequest(0)),
                              DinoCreatePostAndWaitTask(mUnkB0, new DinoBattleViewWaitActionInfoBarRequest(0)));
-        func_ov000_02158b50(this, 0);
+        DecideAction(0);
         break;
     }
 }
@@ -561,15 +560,182 @@ MFx32 DinoBattleCpuController::ScoreConditions(DinoBattleModelPlayer *player, Di
 
 // A move the computer weighs, kept in a multimap by its (fixed-point) score (16 bytes; only its size is known). Its destructor
 // isn't trivial: the game's tree has the header's unused word (see <tree>).
-struct DinoBattleCpuCandidate {
+struct DinoBattleCpuCandidate : public DinoBattleCpuEntry {
+    DinoBattleCpuCandidate(u32 k) { kind = k; }
+    DinoBattleCpuCandidate(u32 k, DinoBattleModelCreature *c, u32 a) {
+        kind = k;
+        creature = c;
+        attack = a;
+    }
+    DinoBattleCpuCandidate(u32 k, DinoBattleModelCreature *c, DinoBattleModelCreature *t, u32 a) {
+        kind = k;
+        creature = c;
+        target = t;
+        attack = a;
+    }
     ~DinoBattleCpuCandidate() {}
-    u32 unk[4];
 };
 typedef std::multimap<MFx32, DinoBattleCpuCandidate> DinoBattleCpuCandidates;
 typedef std::__red_black_tree<MFx32, DinoBattleCpuCandidates::value_type,
                               std::__select_first<DinoBattleCpuCandidates::value_type>, std::less<MFx32>,
                               std::allocator<DinoBattleCpuCandidates::value_type> >
     DinoBattleCpuCandidateTree;
+
+extern "C" MFx32 func_ov000_02156fac(DinoBattleCpuController *controller, DinoBattleModelPlayer *player,
+                                     DinoBattleModelCreature *creature, DinoBattleFile file);
+extern "C" MFx32 func_ov000_02157a14(DinoBattleCpuController *controller, DinoBattleModelPlayer *player,
+                                     DinoBattleModelCreature *creature, DinoBattleFile file, u32 attack);
+extern "C" MFx32 func_ov000_0215829c(DinoBattleCpuController *controller, DinoBattleModelPlayer *player,
+                                     DinoBattleModelCreature *creature, DinoBattleModelCreature *target,
+                                     DinoBattleFile file, u32 attack);
+extern "C" u32 func_ov000_0216d2cc(DinoBattleModelCreature *creature, BOOL check);
+extern "C" MTask *func_ov000_0218ec8c(u32 tutorial, int kind, BOOL *proceed);
+extern "C" const u32 data_0208a1a0, data_0208a1a4;  // the CPU's wait before its first move, and before the others
+
+// NONMATCHING (98.9%): the game keeps each target's score in a stack slot (ours in a register), which shifts the
+// frame by a word.
+void DinoBattleCpuController::DecideAction(u32 first) {
+    mSerial.AddTail(new MTimer(first ? data_0208a1a0 : data_0208a1a4));
+    DinoBattleModel *model = (DinoBattleModel *)mUnkAC;
+    if (((DinoBattleModelField *)model->GetUnk10C())->mUnkD0 & 0x20) {
+        ((DinoBattleModelField *)((DinoBattleModel *)mUnkAC)->GetUnk10C())->mUnkD0 &= ~0x20;
+        mSerial.AddTail(((DinoBattleModel *)mUnkAC)->CreatePostTask(new DinoBattleModelTurnChangeSignal()));
+        return;
+    }
+    if (!gDinoResource->GetBattleAdjustDefs()->cpuActs) {
+        mSerial.AddTail(((DinoBattleModel *)mUnkAC)->CreatePostTask(new DinoBattleModelTurnChangeSignal()));
+        return;
+    }
+    DinoBattleCpuCandidates candidates;
+    DinoBattleModelPlayer *player = ((DinoBattleModel *)mUnkAC)->GetPlayer(mUnkA8);
+    if (player->GetOpponent()->FindCreature(0) == NULL) {
+        return;
+    }
+    for (u32 i = 0; i < player->GetCreatureCount(); i++) {
+        DinoBattleModelCreature *creature = player->GetCreature(i);
+        DinoBattleFileGroup &group = mAi.mGroups[creature->GetUnkBC()];
+        MFx32 end;
+        end = func_ov000_02156fac(this, player, creature, group.mDataA);
+        if (end != MFx32(0)) {
+            candidates.insert(DinoBattleCpuCandidates::value_type(end, DinoBattleCpuCandidate(1)));
+        }
+        MFx32 swap;
+        swap = ScoreCreatureConditions(player, creature, group.mDataB);
+        if (swap != MFx32(0)) {
+            candidates.insert(DinoBattleCpuCandidates::value_type(swap, DinoBattleCpuCandidate(2)));
+        }
+        u32 usable = func_ov000_0216d2cc(creature, TRUE);
+        u32 count = creature->CountAttacks();
+        for (u32 a = 0; a <= count; a++) {
+            if (!(usable & (1 << a))) {
+                continue;
+            }
+            int set = 0;
+            if (a >= count) {
+                set = 4;
+            } else {
+                creature->GetAttack(a, &set);
+            }
+            MFx32 attack;
+            attack = func_ov000_02157a14(this, player, creature, group.mSets[set], a);
+            if (attack != MFx32(0)) {
+                if (a < count || player->AllCreaturesShareDefFlag()) {
+                    candidates.insert(
+                        DinoBattleCpuCandidates::value_type(attack, DinoBattleCpuCandidate(0, creature, a)));
+                }
+            }
+        }
+    }
+    if (candidates.empty()) {
+        mSerial.AddTail(((DinoBattleModel *)mUnkAC)->CreatePostTask(new DinoBattleModelTurnChangeSignal()));
+        return;
+    }
+    DinoBattleCpuCandidates::iterator last = candidates.end();
+    --last;
+    std::pair<DinoBattleCpuCandidates::iterator, DinoBattleCpuCandidates::iterator> range =
+        candidates.equal_range(last->first);
+    std::vector<DinoBattleCpuEntry> best;
+    for (DinoBattleCpuCandidates::iterator it = range.first; it != range.second; ++it) {
+        best.push_back(it->second);
+    }
+    DinoBattleCpuEntry pick = best[player->GetRandom()->Next(best.size())];
+    switch (pick.kind) {
+    case 2:
+        mSerial.AddTail(((DinoBattleModel *)mUnkAC)->CreatePostTask(new DinoBattleModelTurnChangeSignal()));
+        return;
+    case 1: {
+        DinoBattleModelCreature *leader = player->FindCreature(0);
+        DinoBattleModelCreature *support = player->FindCreature(1);
+        DinoBattleModelCreature *other = player->FindCreature(2);
+        if (support != NULL && other == NULL) {
+        } else if (support == NULL && other != NULL) {
+            support = other;
+        } else {
+            MFx32 a = ScoreConditions(player, support, other, mAi.mFiles[0]);
+            MFx32 b = ScoreConditions(player, other, support, mAi.mFiles[1]);
+            if (a > b) {
+            } else if (a < b) {
+                support = other;
+            } else if (player->GetRandom()->Next(2) != 0) {
+                support = other;
+            }
+        }
+        mSerial.AddTail(((DinoBattleModel *)mUnkAC)
+                            ->CreatePostTask(new DinoBattleModelGoEscapeAreaRequest(
+                                (u32)(MMessageObserver *)this, mUnkA8, leader->GetUnkB4(), support->GetUnkB4())));
+        return;
+    }
+    case 0: {
+        DinoBattleModelCreature *attacker = pick.creature;
+        u32 attack = pick.attack;
+        CollectTargets(player, attacker, attack);
+        candidates.clear();
+        for (u32 t = 0; t < mTargets.size(); t++) {
+            DinoBattleModelCreature *target = mTargets[t];
+            MFx32 score;
+            if (target->GetUnkB8() == 3) {
+                score = MFx32(0);
+            } else {
+                u32 pos = target->GetUnkB8();
+                if (target->mPlayer == player) {
+                    pos += 3;
+                }
+                DinoBattleFileGroup &group = mAi.mGroups[attacker->GetUnkBC()];
+                int set = attack;
+                if (attack >= attacker->CountAttacks()) {
+                    set = 4;
+                } else {
+                    attacker->GetAttack(attack, &set);
+                }
+                score = func_ov000_0215829c(this, player, attacker, target, group.mSets[set].mFiles[pos], attack);
+            }
+            DinoBattleCpuCandidate candidate(0, attacker, attack);
+            candidate.target = mTargets[t];
+            candidates.insert(DinoBattleCpuCandidates::value_type(score, candidate));
+        }
+        DinoBattleCpuCandidates::iterator top = candidates.end();
+        --top;
+        range = candidates.equal_range(top->first);
+        best.clear();
+        for (DinoBattleCpuCandidates::iterator it = range.first; it != range.second; ++it) {
+            best.push_back(it->second);
+        }
+        DinoBattleCpuEntry chosen = best[player->GetRandom()->Next(best.size())];
+        MTask *tutorial = func_ov000_0218ec8c((u32)((DinoBattleModel *)mUnkAC)->mTutorial, 0x1B, 0);
+        if (tutorial != NULL) {
+            mSerial.AddTail(tutorial);
+        }
+        mSerial.AddTail(((DinoBattleModel *)mUnkAC)
+                            ->CreatePostTask(new DinoBattleModelCreatureAbilityRequest(
+                                (u32)(MMessageObserver *)this, mUnkA8, chosen.creature->GetUnkB4(),
+                                chosen.target->GetUnkB4(), chosen.attack, 3)));
+        return;
+    }
+    default:
+        OS_Terminate();
+        return;
+    }
+}
 
 // The list's vector members and the candidate tree's members the game emits in this file.
 #pragma auto_inline off

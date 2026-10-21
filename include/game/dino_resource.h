@@ -174,7 +174,8 @@ struct DinoBattleAdjustDefs {
     u8 unk1A8[0x1AC - 0x1A8];
     u32 kpUpDownPoints; // 0x1AC: offset of the KP up/down numbers' positions (MPoint), by side
     u8 unk1B0;          // 0x1B0: team attacks (attack kind 3) take the team-attack path
-    u8 unk1B1[3];
+    u8 cpuActs;         // 0x1B1: the computer side picks moves (else it just ends its turns)
+    u8 unk1B2[2];
     u32 wirelessUnk1B4;     // 0x1B4: the wireless battle's settings
     u32 wirelessUnk1B8;     // 0x1B8
     u32 wirelessUnk1BC;     // 0x1BC

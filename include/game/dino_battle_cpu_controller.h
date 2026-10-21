@@ -21,16 +21,15 @@ struct DinoBattleFile {
     MArchiveFile mFile;     // 0x04
 };
 
-struct DinoBattleFileSet {
+// An AI set: its own file (0x00) and six more.
+struct DinoBattleFileSet : public DinoBattleFile {
     template <class U> DinoBattleFileSet &operator=(const MResource<U> &o) {
         mArchive = o.mArchive;
         mFile = o.mFile;
         return *this;
     }
 
-    MArchivePtr mArchive;       // 0x00
-    MArchiveFile mFile;         // 0x04
-    DinoBattleFile mFiles[6];   // 0x10
+    DinoBattleFile mFiles[6];   // 0x10: by target position (the opponent's three, then the side's own)
 };
 
 struct DinoOv000DataA;
@@ -38,18 +37,23 @@ struct DinoOv000DataB;
 
 struct DinoBattleFileGroup {
     DinoBattleFileSet mSets[5];             // 0x000
-    MResource<DinoOv000DataA> mDataA;       // 0x230
-    MResource<DinoOv000DataB> mDataB;       // 0x240
-};
-
-// A 16-byte entry of a list the computer player keeps (only its size is known; not mTargets, whose deleter the
-// destructor shares with main's vector<void *>).
-struct DinoBattleCpuEntry {
-    u32 unk[4];
+    DinoBattleFile mDataA;                  // 0x230: weighs ending the turn
+    DinoBattleFile mDataB;                  // 0x240: weighs swapping the leader
 };
 
 class DinoBattleModelPlayer;
 class DinoBattleModelCreature;
+
+// A move the computer weighs: attack (0, with the creature, the target and the attack), swap the leader (1) or end
+// the turn (2).
+struct DinoBattleCpuEntry {
+    u32 kind;                               // 0x0
+    struct {
+        DinoBattleModelCreature *creature;  // 0x4
+        DinoBattleModelCreature *target;    // 0x8
+        u32 attack;                         // 0xC
+    };                                      // (copied as one)
+};
 
 class DinoBattleCpuController : public DinoBattleController {
 public:
@@ -66,6 +70,9 @@ public:
     BOOL HasCostlyAttackUnk10(DinoBattleModelPlayer *player, DinoBattleModelCreature *creature, u8 value);
     BOOL HasAttackUnk14(DinoBattleModelCreature *creature, u8 value);
     BOOL HasCostlyAttackUnk14(DinoBattleModelPlayer *player, DinoBattleModelCreature *creature, u8 value);
+    // Picks the side's move: weighs ending the turn, swapping the leader and each usable attack by the AI files,
+    // then each target of a best-scoring attack, and posts one of the best (after the side's wait).
+    void DecideAction(u32 first);
     // Lists the creatures the creature's attack would target (none if it can't use it).
     void CollectTargets(DinoBattleModelPlayer *player, DinoBattleModelCreature *creature, u32 attack);
     // The score of the file's conditions on the creature alone (its attacks, its position, the player's data).
