@@ -172,35 +172,30 @@ void DinoCleaningTalkWindow::Idle() {
 }
 #pragma opt_common_subs reset
 
-// NONMATCHING: 94.7%, the frame and face points' temporaries take each other's stack slots (the deeper inline on the first
-// call fixed the window's).
-// (A deeper inline: its point temporaries take lower stack slots, as in the game.)
-static inline MTask *DinoTalkAnime1(MView *view, MPoint from, MPoint to) {
-    return view->CreateCoordAnime(from, to, 20, 2);
-}
-static inline MTask *DinoTalkAnime2(MView *view, MPoint from, MPoint to) {
-    return DinoTalkAnime1(view, from, to);
+
+static inline MTask *DinoTalkParallel(MTask *a, MTask *b, MTask *c) {
+    MParallelTaskSet *set = new MParallelTaskSet(TRUE);
+    set->AddTail(a);
+    set->AddTail(b);
+    set->AddTail(c);
+    return set;
 }
 
+// One expression, so the points' temporaries get the game's stack slots (in source order).
+// NONMATCHING: the clear and window tasks' spill slots are swapped, and 320 is made differently.
 void DinoCleaningTalkWindow::Close() {
     mUnkCC = 0;
     mUnkD0 = 0;
     mConsole->Run();
     MTask *clear = gLcd->GetTopDisplay()->mBlend->CreateClearTransfer();
     MTask *empty = MTaskSetMakeEmptyTask::Create(mTasksB8);
-    MPoint frameFrom(256, 192);
-    MTask *frame = DinoTalkAnime2(mFrame, frameFrom, MPoint(frameFrom.x + 64, frameFrom.y));
-    MTask *window = mConsole->CreateCoordAnime(data_ov002_0216431c.mPos,
-                                               MPoint(data_ov002_0216431c.mPos.x, data_ov002_0216431c.mPos.y + 40), 20, 2);
-    MTask *face = mFace->CreateCoordAnime(MPoint(0, 0), MPoint(0, 40), 20, 2);
-    MParallelTaskSet *set = new MParallelTaskSet(TRUE);
-    set->AddTail(face);
-    set->AddTail(window);
-    set->AddTail(frame);
-    MSerialTaskSet *serial = mTasksB4;
-    serial->AddTail(set);
-    serial->AddTail(empty);
-    serial->AddTail(clear);
+    mTasksB4->AddTail(
+        DinoTalkParallel(mFace->CreateCoordAnime(MPoint(0, 0), MPoint(0, 40), 20, 2),
+                         mConsole->CreateCoordAnime(data_ov002_0216431c.mPos,
+                                                    MPoint(data_ov002_0216431c.mPos.x, data_ov002_0216431c.mPos.y + 40),
+                                                    20, 2),
+                         mFrame->CreateCoordAnime(MPoint(256, 192), MPoint(320, 192), 20, 2)),
+        empty, clear);
 }
 
 #pragma auto_inline off
