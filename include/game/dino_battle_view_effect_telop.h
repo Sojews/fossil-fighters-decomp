@@ -20,6 +20,7 @@ public:
 
     void StateStart();
     void Load();
+    void StateSlide();
     void StateFinish();
     void StateLose();
 

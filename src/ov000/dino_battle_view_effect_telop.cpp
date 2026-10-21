@@ -52,7 +52,8 @@ extern "C" struct {
     u8 unk00[0x10];
     void (DinoBattleViewEffectTelop::*Load_10)();
     void (DinoBattleViewEffectTelop::*State_18)();
-    u8 unk20[0x30 - 0x20];
+    u8 unk20[0x28 - 0x20];
+    void (DinoBattleViewEffectTelop::*StateFinish_28)();
     void (DinoBattleViewEffectTelop::*State_30)();
     u8 unk38[0x40 - 0x38];
     void (DinoBattleViewEffectTelop::*Start_40)();
@@ -117,6 +118,55 @@ void DinoBattleViewEffectTelop::Load() {
     } else {
         mName = NULL;
     }
+}
+
+extern "C" const int data_0208a158, data_0208a15c;    // the slide out's ease and frames
+extern "C" const int data_0208a160;                    // frames the telop stays up
+extern "C" const int data_0208a164, data_0208a168;    // the slide in's ease and frames
+
+// The two at once.
+static inline MTask *DinoTelopParallel(MTask *a, MTask *b) {
+    MParallelTaskSet *set = new MParallelTaskSet(TRUE);
+    set->AddTail(a);
+    set->AddTail(b);
+    return set;
+}
+
+static inline MPoint DinoNeg(const MPoint &p) {
+    return MPoint(-p.x, -p.y);
+}
+
+// Slides the telop in from the side its kind picks (with the player's name), holds it, and slides it back out.
+// (One expression: the game gives its temporaries stack slots in this order.)
+void DinoBattleViewEffectTelop::StateSlide() {
+    mPicture->Show();
+    if (mUnk9C) {
+        mName->Show();
+    }
+    MPoint offsets[4] = {MPoint(0, mPicture->GetHeight()), MPoint(0, -mPicture->GetHeight()),
+                         MPoint(mPicture->GetWidth(), 0), MPoint(-mPicture->GetWidth(), 0)};
+    mPicture->SetPriority(0);
+    if (!mUnk9C) {
+        mSerial.AddTail(mPicture->CreateCoordAnime(offsets[mUnk98], MPoint(0, 0), data_0208a168, data_0208a164),
+                        new MTimer(data_0208a160),
+                        mPicture->CreateCoordAnime(MPoint(0, 0), DinoNeg(offsets[mUnk98]),
+                                                   data_0208a15c, data_0208a158));
+    } else {
+        mSerial.AddTail(
+            DinoTelopParallel(mPicture->CreateCoordAnime(offsets[mUnk98], MPoint(0, 0), data_0208a168, data_0208a164),
+                              mName->CreateCoordAnime(mUnk98 == 3 ? offsets[mUnk98] + MPoint(8, 0)
+                                                                  : offsets[mUnk98] + MPoint(248 - mName->GetWidth(), 0),
+                                                      mUnk98 == 3 ? MPoint(8, 0) : MPoint(248 - mName->GetWidth(), 0),
+                                                      data_0208a168, data_0208a164)),
+            new MTimer(data_0208a160),
+            DinoTelopParallel(mPicture->CreateCoordAnime(MPoint(0, 0), DinoNeg(offsets[mUnk98]), data_0208a15c,
+                                                         data_0208a158),
+                              mName->CreateCoordAnime(mUnk98 == 3 ? MPoint(8, 0) : MPoint(248 - mName->GetWidth(), 0),
+                                                      mUnk98 == 3 ? MPoint(8, -128)
+                                                                  : MPoint(248 - mName->GetWidth(), -128),
+                                                      data_0208a15c, data_0208a158)));
+    }
+    mState = data_ov000_0219387c.StateFinish_28;
 }
 
 // Takes the telop away, then reports that it's done.
