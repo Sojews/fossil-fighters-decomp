@@ -320,8 +320,8 @@ void DinoCommonTutorialWindow::ClearArrows() {
     mArrows->Clear();
 }
 
-// String members the game emits in this file.
-// (Constructing one here instantiates the constructor with the name the game's callers use.)
+// String members the game emits in this file, implicitly instantiated so they come out in its order (C1, D1,
+// reserve, __replace, assign). (Constructing one here instantiates the constructor with the name the game's callers use.)
 #pragma dont_inline on
 void DinoTutorialFilterWStringAnchor(const wchar_t *text) {
     std::wstring s(text);
