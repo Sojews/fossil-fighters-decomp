@@ -271,11 +271,11 @@ void MTextCanvas::Clear() {
 }
 
 void MTextCanvas::ClearRect(MRect rect) {
-    gLooper->AddTransferTask(new MChr16Fill(mBackColor, mTiles->addr, mTileSize, rect));
+    gLooper->AddTransferTask(new MChr16Fill(mBackColor, mTiles->GetTileAddr(0), mTileSize, rect));
 }
 
 void MTextCanvas::FillRect(MRect rect, int color) {
-    gLooper->AddTransferTask(new MChr16Fill(color, mTiles->addr, mTileSize, rect));
+    gLooper->AddTransferTask(new MChr16Fill(color, mTiles->GetTileAddr(0), mTileSize, rect));
 }
 
 int MTextCanvas::GetPixel(int x, int y) {

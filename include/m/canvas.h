@@ -132,7 +132,8 @@ public:
         mPattern = color | (color << 4);
         mBase = base;
         mTiles = tiles;
-        mSize = rect.GetSize();
+        int h = rect.GetHeight();
+        mSize = MPoint(rect.GetWidth(), h);
         mOrigin = rect.GetTopLeft();
     }
     virtual ~MChr16Fill();
