@@ -89,10 +89,8 @@ void MSleepHook::Register() {
 void MSleepHook::Unregister() {
     if (mRegistered) {
         mRegistered = FALSE;
-        OSMutex *mutex = &sSleepHooksMutex.mutex;
-        OS_LockMutex(mutex);
+        MScopedLock lock(&sSleepHooksMutex.mutex, TRUE);
         sSleepHooks.erase(std::find(sSleepHooks.begin(), sSleepHooks.end(), this));
-        OS_UnlockMutex(mutex);
     }
 }
 
