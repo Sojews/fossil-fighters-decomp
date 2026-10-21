@@ -213,11 +213,24 @@ struct DinoDemoBattles {
     u32 unk18;          // 0x18: the demo battles watched before the demo stops
 };
 struct DinoExcavateDefs {
+    const int *GetRockKindWeights() const { return (const int *)((const u8 *)this + rockKindWeights); }
+    const u32 *GetRockSet1() const { return (const u32 *)((const u8 *)this + rockSet1); }
+    const u32 *GetRockSet2() const { return (const u32 *)((const u8 *)this + rockSet2); }
     // The rock area's size.
     int GetRockAreaWidthA4() const { return rockAreaAC - rockAreaA4; }
     int GetRockAreaWidthA0() const { return rockAreaA8 - rockAreaA0; }
 
-    u8 unk00[0x5C];
+    u8 unk00[0x20];
+    int superRockChance;    // 0x20: percent of rocks that are super rocks (license 2)
+    u32 emptyChance;    // 0x24: a dig spot stays empty when MRandom::Next() is at most this
+    u8 unk28[0x30 - 0x28];
+    u32 rockKindWeights;    // 0x30: offset of the weights of the three rock kinds
+    u8 unk34[0x40 - 0x34];
+    u32 rockSet1Count;  // 0x40: the rocks of kind 1
+    u32 rockSet1;       // 0x44: (u32 each)
+    u32 rockSet2Count;  // 0x48: the rocks of kind 2
+    u32 rockSet2;       // 0x4C
+    u8 unk50[0x5C - 0x50];
     u32 manpus;         // 0x5C: offset of the offsets of the manpu (emotion bubble) entries
     u8 unk60[4];
     u32 picts;          // 0x64: offset of the offsets of the event picture entries
@@ -264,8 +277,41 @@ struct DinoMapMData {
     MFx32 townMapScale;     // 0x2C
     u8 unk30[4];
     s32 area;           // 0x34: the area the map is in (for the name panel)
+    u8 unk38[0x50 - 0x38];
+    const struct DinoMapDigArea *GetDigArea(u32 i) const {
+        return (const DinoMapDigArea *)((const u8 *)this + ((const u32 *)((const u8 *)this + digAreas))[i]);
+    }
+
+    u32 digAreaCount;   // 0x50
+    u32 digAreas;       // 0x54: offset of the offsets of the DinoMapDigArea entries
 };
-struct DinoMapData;
+// A map's dig area (in its M file): which cells are in it and the fossils its rocks hold.
+struct DinoMapDigArea {
+    const u32 *GetFossil(u32 i) const {
+        return (const u32 *)((const u8 *)this + ((const u32 *)((const u8 *)this + fossils))[i]);
+    }
+
+    u32 unk00;
+    u32 cellArea;       // 0x04: the cells with this area value belong to it
+    u32 flag;           // 0x08: the flag it needs (0 none)
+    u32 rockCount;      // 0x0C
+    u8 unk10[0x28 - 0x10];
+    u32 fossilCount;    // 0x28
+    u32 fossils;        // 0x2C: offset of the offsets of {u32 id, int weight}
+};
+// A map's cells (its E file): each cell's dig area.
+struct DinoMapData {
+    u8 GetCell(u32 i) const {
+        const u8 *p = (const u8 *)this + cells;
+        return p[i];
+    }
+
+    u32 unk00;
+    u32 width;          // 0x04: cells per row
+    u32 unk08;
+    u32 cellCount;      // 0x0C
+    u32 cells;          // 0x10: offset of the cells' u8 area values
+};
 // A battle's settings.
 // A battle side's creature.
 struct DinoBattleCreatureData {
