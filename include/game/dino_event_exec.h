@@ -1229,6 +1229,9 @@ public:
     void StateLoadOverlays();
     void StateReviveStatus();
     void StateResetDisplays();
+    // Shows the next creature that levelled up (its image grows in from white with a message), or stops the bgm
+    // when there are none left.
+    void StateLevelUp();
     void StateOpenField();
     void StateFadeOut();
     // Restarts the game into the demo battle's follow-up (after a demo battle).

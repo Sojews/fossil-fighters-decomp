@@ -28,6 +28,9 @@
 #include "m/anime.h"
 #include "m/bg_new_task.h"
 #include "m/call_task.h"
+#include "m/ext_affine.h"
+#include "game/dino_common_window_message_box.h"
+#include "game/dino_creature_sort.h"
 #include <algorithm>
 
 #define PAD_BUTTON_A 0x0001
@@ -2308,14 +2311,15 @@ void DinoEventExecBattle::Idle() {
 extern "C" struct {
     u8 unk00[0x8];
     void (DinoEventExecAutoWarp::*StateStart_08)();
-    u8 unk10[0x20 - 0x10];
+    u8 unk10[0x18 - 0x10];
+    void (DinoEventExecBattle::*StateOpenField_18)();
     void (DinoEventExecBattle::*Battle02041644_20)();
     u8 unk28[0x38 - 0x28];
     void (DinoEventExecCleaning::*Cleaning0203ff38_38)();
     u8 unk40[0x48 - 0x40];
     void (DinoEventExecCleaning::*StateEnd_48)();
     u8 unk50[0x78 - 0x50];
-    void (DinoEventExecBattle::*Battle02041748_78)();
+    void (DinoEventExecBattle::*StateLevelUp_78)();
 } data_020be144;
 extern "C" struct {
     void (DinoEventExecCleaning::*CleaningStart_00)(); // 0x00
@@ -2452,7 +2456,63 @@ void DinoEventExecBattle::StateResetDisplays() {
     gLcd->mMain->mBg->SetMode(3);
     gLcd->SetBottomDisplay(gLcd->mMain);
     gLcd->VSyncNow();
-    mState = data_020be144.Battle02041748_78;
+    mState = data_020be144.StateLevelUp_78;
+}
+
+// The level-ups' creature images and messages, one per state (then the field opens).
+extern const u32 data_0208a1e4;
+extern const u32 data_0208a1e8;
+extern const u32 data_0208a1ec;
+extern const u32 data_0208a1f0;
+extern const u32 data_0208a1f8;
+extern const u32 data_0208a4ac;
+extern MFx32 data_020b5ab0;
+extern MFx32 data_020b5ab4;
+
+// The point (s, s).
+static inline MFx32Point DinoUniform(const MFx32 &s) {
+    MFx32Point p;
+    p.x = s;
+    p.y = s;
+    return p;
+}
+
+// A parallel set of a and b that exits when both have.
+static inline MTask *DinoParallel(MTask *a, MTask *b) {
+    MParallelTaskSet *set = new MParallelTaskSet(TRUE);
+    set->AddTail(a, b);
+    return set;
+}
+
+// NONMATCHING: the game spills the tasks it builds for the serial set to other stack slots.
+void DinoEventExecBattle::StateLevelUp() {
+    if (mUnk198.size() == 0) {
+        mState = data_020be144.StateOpenField_18;
+        mSerial.AddTail(DinoSoundCreateStopBgmTask(-1, 10), new MTimer(10));
+        return;
+    }
+    u32 i = (u32)mUnk198.front();
+    mUnk198.erase(mUnk198.begin());
+    char buf[0x100];
+    OS_SPrintf(buf, "/image/bg%03d", mCreatures2[i].index);
+    MExtAffinePicture *picture = new MExtAffinePicture(gLcd->GetBottomDisplay(), std::string(buf), TRUE, false);
+    picture->GetScreen()->SetCenter(0x80, 0x60);
+    picture->SetPriority(3);
+    picture->Show();
+    mParallel.AddTail(picture);
+    DinoEventReviveCreature *creatures = mCreatures2;
+    OS_SPrintf(buf, gDinoResource->GetText(data_0208a4ac), gDinoResource->GetCreatureText08(creatures[i].index),
+               func_02031104(&creatures[i]) - func_02031104(&mCreatures[i]));
+    GetSerial()->AddTail(
+        DinoParallel(gLcd->GetBottomDisplay()->mBright->CreateFadeInFromWhite(data_0208a1f0, data_0208a1ec),
+                     picture->GetScreen()->CreateScaleAnime(DinoUniform(data_020b5ab4), MFx32Point(MFx32(1), MFx32(1)),
+                                                            data_0208a1f0, data_0208a1ec)),
+        new MTimer(data_0208a1f8), DinoSoundCreatePlaySeTask(0x458, 0),
+        new DinoCommonWindowMessageBox(gLcd->GetBottomDisplay(), MPoint(0x80, 0x60), std::string(buf), 4),
+        DinoParallel(gLcd->GetBottomDisplay()->mBright->CreateFadeOutToWhite(data_0208a1e4, data_0208a1e8),
+                     picture->GetScreen()->CreateScaleAnime(MFx32Point(MFx32(1), MFx32(1)), DinoUniform(data_020b5ab0),
+                                                            data_0208a1e4, data_0208a1e8)),
+        picture->CreateExitTransfer());
 }
 
 void DinoEventExecBattle::StateFadeOut() {
