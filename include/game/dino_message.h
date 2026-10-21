@@ -73,6 +73,13 @@ public:
         mUnk30 = unk30;
         mUnk34 = 0;
     }
+    DinoBattleModelPlayerBeginSignal(u32 side, u32 seed, const char *name, u32 unk2C, u32 unk30, u8 unk34)
+        : MMessage(0x10005), mUnk0C(side), mUnk10(seed) {
+        MI_CpuCopy8(name, mUnk14, sizeof(mUnk14));
+        mUnk2C = unk2C;
+        mUnk30 = unk30;
+        mUnk34 = unk34;
+    }
     virtual u32 GetSize() { return 48; }
     virtual void Write(void *buf) {
         MI_CpuCopy8(&mId, buf, 4);
@@ -468,6 +475,11 @@ public:
 class DinoBattleViewUiChangeMenuRequest : public MMessage {
 public:
     DinoBattleViewUiChangeMenuRequest() : MMessage(0x1001B) {}
+    DinoBattleViewUiChangeMenuRequest(u32 reply, u32 side, u32 unk14, const u32 *ids, u32 count)
+        : MMessage(0x1001B), mUnk0C(reply), mUnk10(side), mUnk14(unk14) {
+        MI_CpuCopy8(ids, mUnk18, sizeof(mUnk18));
+        mUnk24 = count;
+    }
     virtual u32 GetSize() { return 32; }
     virtual void Write(void *buf) {
         MI_CpuCopy8(&mId, buf, 4);
@@ -520,6 +532,7 @@ public:
 class DinoBattleViewUiCreatureInfoMenuRequest : public MMessage {
 public:
     DinoBattleViewUiCreatureInfoMenuRequest() : MMessage(0x1001D) {}
+    DinoBattleViewUiCreatureInfoMenuRequest(u32 reply, u32 side) : MMessage(0x1001D), mUnk0C(reply), mUnk10(side) {}
     virtual u32 GetSize() { return 12; }
     virtual void Write(void *buf) {
         MI_CpuCopy8(&mId, buf, 4);
@@ -551,6 +564,8 @@ public:
 class DinoBattleModelGoEscapeAreaRequest : public MMessage {
 public:
     DinoBattleModelGoEscapeAreaRequest() : MMessage(0x1001F) {}
+    DinoBattleModelGoEscapeAreaRequest(u32 reply, u32 side, u32 unk14, u32 unk18)
+        : MMessage(0x1001F), mUnk0C(reply), mUnk10(side), mUnk14(unk14), mUnk18(unk18) {}
     virtual u32 GetSize() { return 20; }
     virtual void Write(void *buf) {
         MI_CpuCopy8(&mId, buf, 4);
@@ -636,6 +651,13 @@ public:
 class DinoBattleViewUiAttackerMenuRequest : public MMessage {
 public:
     DinoBattleViewUiAttackerMenuRequest() : MMessage(0x10017) {}
+    DinoBattleViewUiAttackerMenuRequest(u32 reply, u32 side, const u32 *ids, u32 count, u32 unk24, u32 unk28)
+        : MMessage(0x10017), mUnk0C(reply), mUnk10(side) {
+        MI_CpuCopy8(ids, mUnk14, sizeof(mUnk14));
+        mUnk20 = count;
+        mUnk24 = unk24;
+        mUnk28 = unk28;
+    }
     virtual u32 GetSize() { return 36; }
     virtual void Write(void *buf) {
         MI_CpuCopy8(&mId, buf, 4);
@@ -687,6 +709,12 @@ public:
 class DinoBattleViewUiDefenderMenuRequest : public MMessage {
 public:
     DinoBattleViewUiDefenderMenuRequest() : MMessage(0x10019) {}
+    DinoBattleViewUiDefenderMenuRequest(u32 reply, u32 side, const u32 *ids, u32 count, u8 unk24)
+        : MMessage(0x10019), mUnk0C(reply), mUnk10(side) {
+        MI_CpuCopy8(ids, mUnk14, sizeof(mUnk14));
+        mUnk20 = count;
+        mUnk24 = unk24;
+    }
     virtual u32 GetSize() { return 32; }
     virtual void Write(void *buf) {
         MI_CpuCopy8(&mId, buf, 4);
@@ -739,6 +767,15 @@ public:
 class DinoBattleViewUiAbilityMenuRequest : public MMessage {
 public:
     DinoBattleViewUiAbilityMenuRequest() : MMessage(0x10023) {}
+    // (Takes the creature's 0x18-byte stats, DinoBattleCreatureStats.)
+    template <class S>
+    DinoBattleViewUiAbilityMenuRequest(u32 reply, u32 side, u32 creature, u32 unk18, u32 unk1C, S stats, u8 unk38,
+                                       u32 unk3C)
+        : MMessage(0x10023), mUnk0C(reply), mUnk10(side), mUnk14(creature), mUnk18(unk18), mUnk1C(unk1C) {
+        *(S *)mUnk20 = stats;
+        mUnk38 = unk38;
+        mUnk3C = unk3C;
+    }
     virtual u32 GetSize() { return 56; }
     virtual void Write(void *buf) {
         MI_CpuCopy8(&mId, buf, 4);
@@ -804,6 +841,8 @@ public:
 class DinoBattleModelCreatureAbilityRequest : public MMessage {
 public:
     DinoBattleModelCreatureAbilityRequest() : MMessage(0x10025) {}
+    DinoBattleModelCreatureAbilityRequest(u32 reply, u32 side, u32 unk14, u32 unk18, u32 unk1C, u32 unk20)
+        : MMessage(0x10025), mUnk0C(reply), mUnk10(side), mUnk14(unk14), mUnk18(unk18), mUnk1C(unk1C), mUnk20(unk20) {}
     virtual u32 GetSize() { return 28; }
     virtual void Write(void *buf) {
         MI_CpuCopy8(&mId, buf, 4);

@@ -40,6 +40,20 @@ public:
     virtual ~PlayerThinkTimeCountTask();
     virtual void Execute();
 
+    struct Player;
+    // Stops counting and clears the shown think time.
+    void Reset() {
+        mCount = 0;
+        mActive = FALSE;
+        if (mPlayer != NULL) {
+            mPlayer->mModel->mThinkTime = 0;
+        }
+    }
+    void Start(Player *player) {
+        mPlayer = player;
+        mActive = TRUE;
+    }
+
     struct Player {
         u8 unk00[0xE0];
         struct Model {

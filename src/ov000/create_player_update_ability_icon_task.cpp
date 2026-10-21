@@ -2197,6 +2197,256 @@ DinoBattleUserController::DinoBattleUserController(void *unkBC, u32 arg, u8 unkB
     mParallel.AddTail(mThinkTimer);
 }
 
+extern "C" const u32 data_ov000_0218fb8c[3];    // the creature slots, by entry
+extern "C" MTask *func_ov000_0218ec8c(u32 tutorial, int kind, BOOL *proceed);
+
+// The player's side: sends its player and creatures at the start, and turns the UI's answers into the model's
+// requests (or the next menu).
+// NONMATCHING: same calls; mwcc's switch tree differs (the game's root is 0x10018 with the jump table over
+// 0x1001A-0x10026; ours roots at 0x10011 and tables 0x10018-0x10026), which also moves the literal pools.
+void DinoBattleUserController::OnMessage(MMessage *msg) {
+    switch (msg->mId) {
+    default:
+        OS_Terminate();
+        break;
+    case 0x10003: {
+        u32 side = mUnkA8;
+        std::string name = ((DinoBattleParams *)mUnkBC)->sides[side].mName;
+        ((DinoBattleModel *)mUnkAC)
+            ->Post(new DinoBattleModelPlayerBeginSignal(mUnkA8, SeedGenerator::GenerateSeed(), name.c_str(),
+                                                        ((DinoBattleParams *)mUnkBC)->sides[side].unk54,
+                                                        ((DinoBattleParams *)mUnkBC)->sides[side].unk58,
+                                                        ((DinoBattleParams *)mUnkBC)->sides[side].unk89));
+        for (int i = 0; i < 3; i++) {
+            if ((u8)((DinoBattleParams *)mUnkBC)->sides[side].mCreatures[i].mId != 0) {
+                ((DinoBattleModel *)mUnkAC)
+                    ->Post(new DinoBattleModelCreatureBeginSignal(
+                        mUnkA8, data_ov000_0218fb8c[i], ((DinoBattleParams *)mUnkBC)->sides[side].mCreatures[i],
+                        ((DinoBattleParams *)mUnkBC)->sides[mUnkA8].mLevels[i], 0));
+            }
+        }
+        ((DinoBattleModel *)mUnkAC)->Post(new DinoBattleControllerInitResult(mUnkA8));
+        break;
+    }
+    case 0x1000D:
+        func_ov000_0216b6c0(this, 3, 0);
+        mThinkTimer->Reset();
+        mThinkTimer->Start((PlayerThinkTimeCountTask::Player *)static_cast<DinoBattleView *>(mUnkB0));
+        break;
+    case 0x10011: {
+        DinoBattleViewUiRootMenuResult *res = (DinoBattleViewUiRootMenuResult *)msg;
+        u32 leaderId = 0;
+        DinoBattleModelPlayer *player = ((DinoBattleModel *)mUnkAC)->GetPlayer(mUnkA8);
+        DinoBattleModelCreature *leader = player->FindCreature(0);
+        if (leader != NULL) {
+            leaderId = leader->GetUnkB4();
+        }
+        switch (res->mUnk0C) {
+        case 0:
+            if (res->mUnk10 == 12) {
+                ((DinoBattleModel *)mUnkAC)->Post(new DinoBattleModelTurnChangeSignal());
+            } else {
+                mUnkB0->Post(new DinoBattleViewUiTurnEndRequest((u32)(MMessageObserver *)this, mUnkA8, TRUE));
+            }
+            break;
+        case 1:
+            mUnkB0->Post(new DinoBattleViewUiCreatureInfoMenuRequest((u32)(MMessageObserver *)this, mUnkA8));
+            break;
+        case 2: {
+            u32 ids[3];
+            int count;
+            player->CollectCreaturesB8In12(ids, &count);
+            mUnkB0->Post(new DinoBattleViewUiChangeMenuRequest((u32)(MMessageObserver *)this, mUnkA8, leaderId, ids, count));
+            break;
+        }
+        case 3: {
+            u32 ids[3];
+            int count;
+            player->CollectCreaturesUnkD244(ids, &count);
+            int best = 0x7FFFFFFF;
+            u32 attacker = leader->GetUnkB4();
+            for (u32 i = 0; i < count; i++) {
+                if (player->FindCreatureByB4(ids[i])->IsUnkD244() && best > (int)player->FindCreatureByB4(ids[i])->GetUnkB8()) {
+                    best = player->FindCreatureByB4(ids[i])->GetUnkB8();
+                    attacker = ids[i];
+                }
+            }
+            if (res->mUnk14 != 0) {
+                attacker = res->mUnk14;
+            }
+            mUnkB0->Post(new DinoBattleViewUiAttackerMenuRequest((u32)(MMessageObserver *)this, mUnkA8, ids, count, attacker,
+                                                                 GetCreatureMask(player)));
+            break;
+        }
+        case 4:
+            ((DinoBattleModel *)mUnkAC)->Post(new DinoBattleModelGameEndSignal(mUnkA8, TRUE, FALSE));
+            break;
+        case 5:
+            ((DinoBattleModel *)mUnkAC)->Post(new DinoBattleModelGameEndSignal(1 - mUnkA8, TRUE, FALSE));
+            break;
+        }
+        break;
+    }
+    case 0x1004C: {
+        DinoBattleViewUiTurnEndResult *res = (DinoBattleViewUiTurnEndResult *)msg;
+        if (res->mUnk0C) {
+            if (((DinoBattleModelField *)((DinoBattleModel *)mUnkAC)->GetUnk10C())->mLive != NULL) {
+                mParallel.AddTail(((DinoBattleModel *)mUnkAC)->CreatePostTask(new DinoBattleModelLiveEventSignal(FALSE)));
+            }
+            mSerial.AddTail(((DinoBattleModel *)mUnkAC)->CreatePostTask(new DinoBattleModelTurnChangeSignal()));
+            mThinkTimer->mActive = FALSE;
+        } else {
+            func_ov000_0216b6c0(this, 0, 0);
+        }
+        break;
+    }
+    case 0x1001E:
+        func_ov000_0216b6c0(this, 1, 0);
+        break;
+    case 0x1001C: {
+        DinoBattleViewUiChangeMenuResult *res = (DinoBattleViewUiChangeMenuResult *)msg;
+        if (res->mUnk0C) {
+            func_ov000_0216b6c0(this, 2, 0);
+        } else {
+            ((DinoBattleModel *)mUnkAC)
+                ->Post(new DinoBattleModelGoEscapeAreaRequest((u32)(MMessageObserver *)this, mUnkA8, res->mUnk10,
+                                                              res->mUnk14));
+        }
+        break;
+    }
+    case 0x10020: {
+        MTask *tutorial = func_ov000_0218ec8c((u32)((DinoBattleModel *)mUnkAC)->mTutorial, 0x1C, NULL);
+        if (tutorial != NULL) {
+            mSerial.AddTail(tutorial);
+        }
+        func_ov000_0216b6c0(this, -1, 1);
+        break;
+    }
+    case 0x10018: {
+        DinoBattleViewUiAttackerMenuResult *res = (DinoBattleViewUiAttackerMenuResult *)msg;
+        if (res->mUnk10) {
+            mSerial.AddTail(mUnkB0->CreatePostTask(new DinoBattleViewClearAttackBarRequest(0)));
+            func_ov000_0216b6c0(this, 3, 0);
+            break;
+        }
+        mUnkC4[0] = res->mUnk0C;
+        u32 id = res->mUnk0C;
+        DinoBattleModelPlayer *player = ((DinoBattleModel *)mUnkAC)->GetPlayer(mUnkA8);
+        DinoBattleModelCreature *creature = player->FindCreatureByB4(id);
+        mUnkB0->Post(new DinoBattleViewUiAbilityMenuRequest((u32)(MMessageObserver *)this, mUnkA8, id,
+                                                            func_ov000_0216d2cc(creature, TRUE), creature->GetStatusUnk20(),
+                                                            creature->GetStats(), player->AllCreaturesShareDefFlag(), 0));
+        break;
+    }
+    case 0x10024: {
+        DinoBattleViewUiAbilityMenuResult *res = (DinoBattleViewUiAbilityMenuResult *)msg;
+        if (res->mUnk14) {
+            DinoBattleModelPlayer *player = ((DinoBattleModel *)mUnkAC)->GetPlayer(mUnkA8);
+            u32 ids[3];
+            int count;
+            player->CollectCreaturesUnkD244(ids, &count);
+            mSerial.AddTail(mUnkB0->CreatePostTask(new DinoBattleViewUiAttackerMenuRequest(
+                (u32)(MMessageObserver *)this, mUnkA8, ids, count, mUnkC4[0], GetCreatureMask(player))));
+            break;
+        }
+        mUnkC4[0] = res->mUnk0C;
+        mUnkC4[1] = res->mUnk10;
+        DinoBattleModelCreature *creature = ((DinoBattleModel *)mUnkAC)->FindCreature(mUnkC4[0]);
+        u32 attack = mUnkC4[1];
+        const DinoAttackDef *def = gDinoResource->GetAttackDef(attack < creature->CountAttacks()
+                                                                  ? creature->GetAttack(attack, NULL)
+                                                                  : creature->GetSpecialAttack());
+        u8 all = FALSE;
+        if (*DinoOffsetPtr<u8>(def, def->unk14) == 3 || *DinoOffsetPtr<u8>(def, def->unk14) == 10 ||
+            *DinoOffsetPtr<u8>(def, def->unk14) == 11 || *DinoOffsetPtr<u8>(def, def->unk14) == 12 ||
+            *DinoOffsetPtr<u8>(def, def->unk14) == 7) {
+            all = TRUE;
+        }
+        DinoBattleModelPlayer *player = ((DinoBattleModel *)mUnkAC)->GetPlayer(mUnkA8);
+        int category = player->FindCreatureByB4(mUnkC4[0])->GetB8Category();
+        DinoBattleModelPlayer *side;
+        if (*DinoOffsetPtr<u8>(def, def->unk14) == 10 || *DinoOffsetPtr<u8>(def, def->unk14) == 11 ||
+            *DinoOffsetPtr<u8>(def, def->unk14) == 12) {
+            side = player;
+        } else {
+            side = player->GetOpponent();
+        }
+        if (all) {
+            category = 0;
+        }
+        u32 ids[3];
+        int count;
+        if (*DinoOffsetPtr<u8>(def, def->unk14) == 9 || *DinoOffsetPtr<u8>(def, def->unk14) == 2 ||
+            *DinoOffsetPtr<u8>(def, def->unk10) == 8) {
+            all = TRUE;
+            count = 1;
+            ids[0] = mUnkC4[0];
+        } else if (*DinoOffsetPtr<u8>(def, def->unk14) == 15) {
+            all = TRUE;
+            count = 1;
+            ids[0] = creature->mPlayer->FindCreature(0)->GetUnkB4();
+        } else if (*DinoOffsetPtr<u8>(def, def->unk10) == 9 || *DinoOffsetPtr<u8>(def, def->unk10) == 10 ||
+                   *DinoOffsetPtr<u8>(def, def->unk10) == 11) {
+            player->CollectCreaturesNearB8(0, ids, &count);
+        } else if (*DinoOffsetPtr<u8>(def, def->unk14) == 13 || *DinoOffsetPtr<u8>(def, def->unk14) == 10) {
+            count = 0;
+            for (u32 i = 0; i < player->GetCreatureCount(); i++) {
+                ids[count++] = player->GetCreature(i)->GetUnkB4();
+            }
+        } else if (*DinoOffsetPtr<u8>(def, def->unk14) == 14 || *DinoOffsetPtr<u8>(def, def->unk14) == 11 ||
+                   *DinoOffsetPtr<u8>(def, def->unk14) == 12) {
+            count = 0;
+            for (int i = 0; i < player->GetCreatureCount(); i++) {
+                if (mUnkC4[0] != player->GetCreature(i)->GetUnkB4()) {
+                    ids[count++] = player->GetCreature(i)->GetUnkB4();
+                }
+            }
+        } else if (*DinoOffsetPtr<u8>(def, def->unk14) == 16 || *DinoOffsetPtr<u8>(def, def->unk14) == 7) {
+            all = TRUE;
+            count = side->GetCreatureCount();
+            for (int i = 0; i < count; i++) {
+                ids[i] = side->GetCreature(i)->GetUnkB4();
+            }
+        } else {
+            side->CollectCreaturesNearB8(category, ids, &count);
+        }
+        mUnkB0->Post(new DinoBattleViewUiDefenderMenuRequest((u32)(MMessageObserver *)this, mUnkA8, ids, count, all));
+        break;
+    }
+    case 0x1001A: {
+        DinoBattleViewUiDefenderMenuResult *res = (DinoBattleViewUiDefenderMenuResult *)msg;
+        if (res->mUnk10) {
+            DinoBattleModelPlayer *player = ((DinoBattleModel *)mUnkAC)->GetPlayer(mUnkA8);
+            DinoBattleModelCreature *creature = player->FindCreatureByB4(mUnkC4[0]);
+            mSerial.AddTail(mUnkB0->CreatePostTask(new DinoBattleViewClearAttackBarRequest(0)),
+                                 mUnkB0->CreatePostTask(new DinoBattleViewUiAbilityMenuRequest(
+                                     (u32)(MMessageObserver *)this, mUnkA8, mUnkC4[0], func_ov000_0216d2cc(creature, TRUE),
+                                     creature->GetStatusUnk20(), creature->GetStats(), player->AllCreaturesShareDefFlag(),
+                                     mUnkC4[1])));
+            break;
+        }
+        DinoBattleModelPlayer *player = ((DinoBattleModel *)mUnkAC)->GetPlayer(mUnkA8);
+        player->SetUnk124(((DinoBattleModel *)mUnkAC)->GetPlayer(mUnkA8)->GetUnk124() | 1);
+        mSerial.AddTail(((DinoBattleModel *)mUnkAC)
+                                 ->CreatePostTask(new DinoBattleModelCreatureAbilityRequest(
+                                     (u32)(MMessageObserver *)this, mUnkA8, mUnkC4[0], res->mUnk0C, mUnkC4[1],
+                                     1 << (1 - mUnkA8))));
+        break;
+    }
+    case 0x10026: {
+        ((DinoBattleModelField *)((DinoBattleModel *)mUnkAC)->GetUnk10C())->mUnkD0 = 0;
+        MTask *tutorial = func_ov000_0218ec8c((u32)((DinoBattleModel *)mUnkAC)->mTutorial, 9, NULL);
+        if (tutorial != NULL) {
+            mSerial.AddTail(tutorial);
+        }
+        mSerial.AddTail(mUnkB0->CreatePostTask(new DinoBattleViewClearAttackBarRequest(0)),
+                             mUnkB0->CreatePostTask(new DinoBattleViewSetCreaturePriorityRequest(0)));
+        func_ov000_0216b6c0(this, -1, 1);
+        break;
+    }
+    }
+}
+
 u32 DinoBattleUserController::GetCreatureMask(DinoBattleModelPlayer *player) {
     u32 mask = 0;
     u32 i;
