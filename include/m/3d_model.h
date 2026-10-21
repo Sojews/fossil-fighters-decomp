@@ -58,7 +58,7 @@ public:
     VecFx32 mRotation;          // 0x3C: angles, 16 bits each
     VecFx32 mScale;             // 0x48
     MtxFx44 mMatrix;            // 0x54: translation * rotation (x, y, z) * scale
-    u8 unk94[0xC4 - 0x94];
+    MtxFx43 mMatrix43;          // 0x94: the matrix the model was last drawn with (camera applied)
     const MtxFx44 *mUnkC4;      // 0xC4: a matrix to apply
     u32 mTexKey;                // 0xC8
     u32 mPlttKey;               // 0xCC

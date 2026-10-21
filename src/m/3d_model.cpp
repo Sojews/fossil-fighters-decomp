@@ -1,5 +1,5 @@
 // M3DModel.
-// Not decompiled yet: Draw. (Unk08, IsAnimDone and GetFrameCount are in m3d_scene_enable_task.cpp.)
+// (Unk08, IsAnimDone and GetFrameCount are in m3d_scene_enable_task.cpp.)
 // NONMATCHING: LoadGrid (the game indexes the chunk lengths as cmds[i + 3] and cmds[i + 2] from scratch; ours folds
 // them into one address).
 
@@ -111,6 +111,285 @@ void M3DModel::ReleaseTexture() {
 
 void M3DModel::SetUnk2F4(u16 value) {
     mUnk2F4 = value;
+}
+
+// A texture entry of the model's texture table (mUnkDC), 0x1C bytes.
+struct M3DTexEntry {
+    u8 unk00[0x1C];
+};
+
+#define M3D_TEX_PLTT_OFFSET(tex) (*(const u32 *) ((const u8 *) (tex) + 0x20))
+#define M3D_TEX_IMAGE_PARAM(tex) (*(const s32 *) ((const u8 *) (tex) + 0x24))
+
+extern "C" void G3_LoadTexMtxTexCoord(const MtxFx44 *m);
+
+#define REG_G3_MTX_IDENTITY (*(volatile u32 *) 0x04000454)
+#define REG_G3_MTX_SCALE (*(volatile u32 *) 0x0400046C)
+#define REG_G3_TEXCOORD (*(volatile u32 *) 0x04000488)
+#define REG_G3_PLTT_BASE (*(volatile u32 *) 0x040004AC)
+#define REG_G3_DIF_AMB (*(volatile u32 *) 0x040004C0)
+#define REG_G3_SPE_EMI (*(volatile u32 *) 0x040004C4)
+#define REG_G3_BOX_TEST (*(volatile u32 *) 0x040005C0)
+
+extern "C" {
+void MTX_Identity43_(MtxFx43 *pDst);
+void MTX_TransApply43(const MtxFx43 *pSrc, MtxFx43 *pDst, fx32 x, fx32 y, fx32 z);
+void MTX_ScaleApply43(const MtxFx43 *pSrc, MtxFx43 *pDst, fx32 x, fx32 y, fx32 z);
+void MTX_Concat43(const MtxFx43 *a, const MtxFx43 *b, MtxFx43 *ab);
+BOOL G3X_GetBoxTestResult(s32 *in);
+void G3_Shininess(const u32 *table);
+void DC_StoreAll(void);
+void MI_SendGXCommand(u32 dmaNo, const void *src, u32 size);
+}
+extern u32 GXi_DmaId;
+
+void M3DModelPatchDisplayList(M3DModel *model, const u32 *tags, u32 count);
+const s16 *M3DModelGetMorphVertices(M3DModel *model);
+
+static inline void M3DScale(fx32 s) {
+    REG_G3_MTX_SCALE = s;
+    REG_G3_MTX_SCALE = s;
+    REG_G3_MTX_SCALE = s;
+}
+
+static inline void M3DMaterialColorDiffAmb(u16 diffuse, u16 ambient, BOOL setVtxColor) {
+    REG_G3_DIF_AMB = diffuse | (ambient << 16) | (setVtxColor << 15);
+}
+
+static inline void M3DMaterialColorSpecEmi(u16 specular, u16 emission, BOOL shininess) {
+    REG_G3_SPE_EMI = specular | (emission << 16) | (shininess << 15);
+}
+
+static inline void M3DResetTexMtx() {
+    REG_G3_MTX_MODE = 3;
+    REG_G3_MTX_IDENTITY = 0;
+    REG_G3_MTX_MODE = 2;
+}
+
+// Draws the model: culled by its box when asked, then either its display list (patched for the frame and sent by
+// DMA) or its command list run here.
+// NONMATCHING (95.8%): register choices in the material command (the game re-materializes each field mask and keeps
+// the alpha on the stack), and two scheduling differences.
+void M3DModel::Draw(u32 lights) {
+    if ((mFlags & 3) != 3) {
+        return;
+    }
+    G3_MtxMode(GX_MTXMODE_POSITION_VECTOR);
+    G3_PushMtx();
+    if (mUnkC4 != NULL) {
+        G3_MultMtx44(mUnkC4);
+    }
+    if (mUnkC == 1) {
+        G3_MultMtx44(GetMatrix());
+    } else {
+        G3_MultMtx44(&mMatrix);
+    }
+    if (mFlags & 0x100) {
+        M3DScale(FX32_ONE << mUnk324);
+        REG_G3_BOX_TEST = ((const u32 *)mBox)[0];
+        REG_G3_BOX_TEST = ((const u32 *)mBox)[1];
+        REG_G3_BOX_TEST = ((const u32 *)mBox)[2];
+        MTX_Copy44To43_(&mMatrix, &mMatrix43);
+        if (mUnkC4 != NULL) {
+            MtxFx43 m;
+            MTX_Copy44To43_(mUnkC4, &m);
+            MTX_Concat43(&mMatrix43, &m, &mMatrix43);
+        }
+        s32 in;
+        while (G3X_GetBoxTestResult(&in)) {
+        }
+        if (in == 0) {
+            G3_PopMtx(1);
+            return;
+        }
+    } else {
+        MTX_Copy44To43_(&mMatrix, &mMatrix43);
+        if (mUnkC4 != NULL) {
+            MtxFx43 m;
+            MTX_Copy44To43_(mUnkC4, &m);
+            MTX_Concat43(&mMatrix43, &m, &mMatrix43);
+        }
+    }
+    u32 billboard = ((const u32 *)mModelRes)[6];
+    if ((billboard & 3) == 1) {
+        MtxFx43 m;
+        MTX_Identity43_(&m);
+        MTX_TransApply43(&m, &m, mMatrix43._30, mMatrix43._31, mMatrix43._32);
+        MTX_ScaleApply43(&m, &m, mScale.x, mScale.y, mScale.z);
+        MTX_Concat43(&m, &mScene->mCamera, &mMatrix43);
+        MTX_Concat33(&mScene->mCameraRot, (const MtxFx33 *)&mMatrix43, (MtxFx33 *)&mMatrix43);
+    } else if ((billboard & 2) == 2) {
+        u16 angle = FX_Atan2Idx(mScene->mCameraRot._22, mScene->mCameraRot._02) - 0x4000;
+        MtxFx33 m;
+        MTX_Identity33_(&m);
+        int idx = (angle >> 4) * 2;
+        m._00 = m._22 = FX_SinCosTable_[idx + 1];
+        m._20 = FX_SinCosTable_[idx];
+        m._02 = -m._20;
+        MTX_Concat43(&mMatrix43, &mScene->mCamera, &mMatrix43);
+        MTX_Concat33(&m, (const MtxFx33 *)&mMatrix43, (MtxFx33 *)&mMatrix43);
+    } else {
+        MTX_Concat43(&mMatrix43, &mScene->mCamera, &mMatrix43);
+    }
+    if (mUnk1C == 0) {
+        return;
+    }
+    if (mUnk32A) {
+        const u32 *res = (const u32 *)mModelRes;
+        const u32 *anim;
+        if (res[3] != 0 && (anim = (const u32 *)mAnimRes)[5] != 0) {
+            u32 offset = anim[4] + (anim[3] + (anim[1] + anim[2]));
+            u32 frame = (mFrame >> 4) % ((const u32 *)((const u8 *)anim + offset))[1];
+            offset += 8;
+            unk2E0 = (u32)((const u8 *)anim + offset) +
+                     *(const u32 *)((const u8 *)res + (res[1] + res[2])) * frame * 0x30;
+        } else {
+            unk2E0 = 0;
+        }
+        M3DModelPatchDisplayList(this, (const u32 *)mUnk30C, mUnk314);
+        mUnk329 = TRUE;
+        G3_MtxMode(GX_MTXMODE_POSITION_VECTOR);
+        G3_PushMtx();
+        G3_LoadMtx43(&mMatrix43);
+        M3DModelPatchDisplayList(this, (const u32 *)mUnk308, mUnk310);
+        DC_FlushRange(mModelData, mUnk300);
+        MI_SendGXCommand(GXi_DmaId, mModelData, mUnk300);
+    } else {
+        u32 i = 0;
+        BOOL identity = FALSE;
+        u32 frame = mFrame >> 4;
+        DC_StoreAll();
+        const u16 *cmds = (const u16 *)((const u8 *)mModelRes + 0x28);
+        M3DResetTexMtx();
+        M3DMaterialColorDiffAmb(mColors[0], mColors[1], mUnk2C ? TRUE : FALSE);
+        M3DMaterialColorSpecEmi(mColors[2], mColors[3], mUnk2C ? TRUE : FALSE);
+        if (mUnk2C) {
+            u8 table[128];
+            u8 *p = table;
+            for (u8 k = 0; k < 127; k++) {
+                s64 x = 2 * k + 1;
+                p[k] = (x * x * x * x) >> 24;
+            }
+            p += 127;
+            *p = 0xFF;
+            G3_Shininess((const u32 *)table);
+        }
+        const u32 *res = (const u32 *)mModelRes;
+        const u32 *texWords;
+        if (res[5] & 0xC) {
+            const u8 *anim = (const u8 *)mAnimRes;
+            texWords = (const u32 *)(anim + (((const u32 *)anim)[1] + ((const u32 *)anim)[2])) +
+                       frame * ((const u32 *)anim)[9];
+        } else {
+            const u8 *anim = (const u8 *)mAnimRes;
+            texWords = (const u32 *)(anim + (((const u32 *)anim)[1] + ((const u32 *)anim)[2]));
+        }
+        M3DScale(FX32_ONE << res[7]);
+        const s16 *verts = M3DModelGetMorphVertices(this);
+        G3_Color(mUnk2F4);
+        if (cmds[i] != 0xFFF) {
+            u32 frameOffset = frame * 0x30;
+            do {
+                switch (cmds[i++]) {
+                case 0:
+                    G3_End();
+                    break;
+                case 1:
+                    G3_Begin(3);
+                    break;
+                case 2:
+                    G3_Begin(2);
+                    break;
+                case 3:
+                    G3_Begin(1);
+                    break;
+                case 4:
+                    G3_Begin(0);
+                    break;
+                case 0x10: {
+                    const s16 *v = verts + cmds[i++] * 3;
+                    G3_Vtx(v[0], v[1], v[2]);
+                    break;
+                }
+                case 0x17:
+                    {
+                        fx16 x = cmds[i++];
+                        fx16 y = cmds[i++];
+                        fx16 z = cmds[i++];
+                        G3_Vtx(x, y, z);
+                    }
+                    break;
+                case 0x11:
+                    REG_G3_TEXCOORD = cmds[i] | (cmds[i + 1] << 16);
+                    i += 2;
+                    break;
+                case 0x12:
+                    G3_Color(cmds[i++]);
+                    break;
+                case 0x18: {
+                    u16 material = cmds[i++];
+                    u32 t = texWords[material];
+                    u32 a = (t >> 8) & 0x1F;
+                    u32 tex = (t >> 24) & 0x3F;
+                    u32 pltt = (t >> 16) & 0x3F;
+                    u32 id = (material + mPolygonId) & 0x3F;
+                    int alpha = (int)(a * mUnk1C) >> 12;
+                    if (alpha <= 0) {
+                        alpha = 0x1F;
+                        t &= ~0xC0;
+                    }
+                    if (alpha > 0x1F) {
+                        alpha = 0x1F;
+                    }
+                    G3_TexImageParam((M3D_TEX_IMAGE_PARAM((const M3DTexEntry *)mUnkDC + tex) | ((t << 28) >> 12)) +
+                                     (mTexKey >> 3));
+                    const M3DTexEntry *entries = (const M3DTexEntry *)mUnkDC;
+                    int shift = ((M3D_TEX_IMAGE_PARAM(entries + tex) >> 26) & 7) == 2 ? 1 : 0;
+                    REG_G3_PLTT_BASE = (mPlttKey + M3D_TEX_PLTT_OFFSET(entries + pltt)) >> (4 - shift);
+                    REG_G3_POLYGON_ATTR = (id << 24) | ((alpha << 16) | (t & 0xF0)) | 0x3000;
+                    if (t & 0x8000) {
+                        if (mJointFrames[material] != NULL) {
+                            MtxFx44 mtx;
+                            MTX_Copy43To44_((const MtxFx43 *)((const u8 *)mJointFrames[material] + frameOffset), &mtx);
+                            REG_G3_MTX_MODE = 3;
+                            G3_LoadTexMtxTexCoord(&mtx);
+                            REG_G3_MTX_MODE = 2;
+                            identity = FALSE;
+                        } else {
+                            M3DResetTexMtx();
+                            identity = TRUE;
+                        }
+                    } else if (!identity) {
+                        M3DResetTexMtx();
+                        identity = TRUE;
+                    }
+                    break;
+                }
+                case 0x40: {
+                    s16 box[6];
+                    box[0] = cmds[i++];
+                    box[1] = cmds[i++];
+                    box[2] = cmds[i++];
+                    box[3] = cmds[i++];
+                    box[4] = cmds[i++];
+                    box[5] = cmds[i++];
+                    REG_G3_BOX_TEST = ((const u32 *)box)[0];
+                    REG_G3_BOX_TEST = ((const u32 *)box)[1];
+                    REG_G3_BOX_TEST = ((const u32 *)box)[2];
+                    u16 skip = cmds[i++];
+                    s32 in;
+                    while (G3X_GetBoxTestResult(&in)) {
+                    }
+                    if (in == 0) {
+                        i += skip;
+                    }
+                    break;
+                }
+                }
+            } while (cmds[i] != 0xFFF);
+        }
+    }
+    G3_PopMtx(1);
 }
 
 BOOL M3DModel::SetFlag100(BOOL on) {
@@ -490,15 +769,6 @@ const s16 *M3DModelGetMorphVertices(M3DModel *model) {
     return data_0214c18c;
 }
 
-// A texture entry of the model's texture table (mUnkDC), 0x1C bytes.
-struct M3DTexEntry {
-    u8 unk00[0x1C];
-};
-
-#define M3D_TEX_PLTT_OFFSET(tex) (*(const u32 *) ((const u8 *) (tex) + 0x20))
-#define M3D_TEX_IMAGE_PARAM(tex) (*(const s32 *) ((const u8 *) (tex) + 0x24))
-
-extern "C" void G3_LoadTexMtxTexCoord(const MtxFx44 *m);
 extern "C" void G3_MultMtx43(const MtxFx43 *m);
 
 // Patches the model's display list for this frame at each of the tags' offsets: vertex positions, texture and
