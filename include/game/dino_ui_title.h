@@ -16,6 +16,7 @@ public:
 
     void StateStart();
     void StateInit();
+    void StateTitle();
     void StateEnd();
     void StateWirelessBattle();
     void StateATM();

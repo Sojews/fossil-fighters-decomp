@@ -23,6 +23,9 @@
 #include "game/dino_ui_title.h"
 #include "game/dino_ui_title_skip.h"
 #include "game/dino_ui_opening_cloud.h"
+#include "game/dino_gradation_bg.h"
+#include "m/blend.h"
+#include "m/obj.h"
 #include "game/dino_ui_opening_chara.h"
 #include "game/dino_ui_title_menu_game_item.h"
 #include "m/bg.h"
@@ -148,7 +151,7 @@ extern "C" struct {
     const char *mTouchPath; // 0x14: the title menu's "touch" prompt
     u8 unk18[0x24 - 0x18];
     const char *mLogoPath; // 0x24
-    u8 unk28[0x2C - 0x28];
+    const char *mCloudPath; // 0x28
     void (DinoUiTitle::*StateMenu_2C)(); // 0x2c
     u8 unk34[0x3C - 0x34];
     void (DinoUiTitle::*Unk0215ee60_3C)(); // 0x3c
@@ -157,7 +160,7 @@ extern "C" struct {
     void (DinoUiTitle::*StateToSaveSlot_54)(); // 0x54
     void (DinoUiTitle::*LoadBackup_5C)(); // 0x5c
     u8 unk64[0x6C - 0x64];
-    void (DinoUiTitle::*Unk0215d818_6C)(); // 0x6c
+    void (DinoUiTitle::*StateTitle_6C)(); // 0x6c
     void (DinoUiTitle::*StateOpening_74)(); // 0x74
     void (DinoUiTitle::*StateSaveSlot_7C)(); // 0x7c
     void (DinoUiTitle::*StateTopMenuEnd_84)(); // 0x84
@@ -168,8 +171,9 @@ extern "C" struct {
     void (DinoUiTitle::*Unk0215e03c_AC)(); // 0xac
     void (DinoUiTitle::*Start_B4)(); // 0xb4
     u8 unkBC[0xC4 - 0xBC];
-    void (DinoUiTitle::*Unk0215d818_C4)(); // 0xc4
-    u8 unkCC[0xE4 - 0xCC];
+    void (DinoUiTitle::*StateTitle_C4)(); // 0xc4
+    u8 unkCC[0xDC - 0xCC];
+    void (DinoUiTitle::*StatePrepareBackup_DC)(); // 0xdc
     void (DinoUiTitle::*StateAdvice2_E4)(); // 0xe4
     void (DinoUiTitle::*Unk0215e03c_EC)(); // 0xec
     void (DinoUiTitle::*Unk0215f5ac_F4)(); // 0xf4
@@ -179,7 +183,7 @@ extern "C" struct {
     void (DinoUiTitle::*Unk0215e03c_124)(); // 0x124
     void (DinoUiTitle::*Unk0215f420_12C)(); // 0x12c
     void (DinoUiTitle::*StateInit_134)(); // 0x134
-    void (DinoUiTitle::*Unk0215d818_13C)(); // 0x13c
+    void (DinoUiTitle::*StateTitle_13C)(); // 0x13c
     void (DinoUiTitle::*StateMenuChosen_144)(); // 0x144
     void (DinoUiTitle::*StateWarning_14C)(); // 0x14c
     void (MBg::*SetMode_154)(bg_mode); // 0x154
@@ -416,18 +420,18 @@ void DinoUiTitle::StateStart() {
         break;
     case 4:
         mTopResult = 1;
-        mState = data_ov004_02172f78.Unk0215d818_13C;
+        mState = data_ov004_02172f78.StateTitle_13C;
         break;
     case 7:
         mSerial.AddTail(new DinoBackupReadValidater(NULL, NULL));
     case 5:
         mTopResult = 2;
-        mState = data_ov004_02172f78.Unk0215d818_C4;
+        mState = data_ov004_02172f78.StateTitle_C4;
         break;
     case 6:
         DinoSoundPlayBgm(0x77, 0);
         mTopResult = 3;
-        mState = data_ov004_02172f78.Unk0215d818_6C;
+        mState = data_ov004_02172f78.StateTitle_6C;
         break;
     }
 }
@@ -449,6 +453,88 @@ void DinoUiTitle::StateShowLogo() {
     mState = data_ov004_02172f78.StateMenu_2C;
 }
 #pragma dont_inline reset
+
+extern MTextPicture *data_ov004_02177284; // the bottom screen's backdrop (kept for the menus' cross-fades)
+extern "C" const char data_ov004_0217354c[], data_ov004_0217355c[], data_ov004_02173570[];
+
+inline DinoUiOpeningCloud::DinoUiOpeningCloud(MDisplay *display) : MProcess(display) {
+    mCloud = new MTextPicture(display, data_ov004_02172f78.mCloudPath, TRUE, false);
+    mCloud->SetPriority(3);
+    mCloud->Show();
+    mParallel.AddTail(mCloud);
+    display->mBlend->SetMode(1);
+    display->mBlend->SetAlpha(16, 16);
+    MBlend *blend = display->mBlend;
+    blend->SetTarget1(mCloud->GetPlaneMask());
+    display->mBlend->SetTarget2(0x3F);
+    if (display == gLcd->GetBottomDisplay()) {
+        mSerial.AddTail(mCloud->CreateCoordAnime(MPoint(-256, 0), MPoint(0, 0), 300, 0));
+    }
+}
+
+// The title screen: the clouds, the backdrops, the gradation and the title picture; fades in (from white after the
+// opening or the wireless menus, else from black), then prepares the backup.
+void DinoUiTitle::StateTitle() {
+    if (gDinoBackup == NULL) {
+        return;
+    }
+    if (*mResult != 5) {
+        DinoSoundLoadScene(1);
+    }
+    mChoice = 3;
+    gLcd->mMain->ResetHooks();
+    gLcd->mSub->ResetHooks();
+    gLcd->mMain->ResetHooks();
+    gLcd->mMain->Setup(5, 3, 4, 1, 0, 0);
+    gLcd->mMain->mBg->SetMode(0);
+    gLcd->mSub->Setup(5, 2, 4, 1, 0, 0);
+    gLcd->mSub->SetBackdrop(0x8000);
+    gLcd->mSub->mBg->SetMode(3);
+    gLcd->mMain->mObj->Show();
+    gLcd->mSub->mObj->Show();
+    gLcd->SetBottomDisplay(gLcd->mMain);
+    SetDisplay(gLcd->mMain);
+    gLcd->VSyncNow();
+    mParallel.AddTail(new DinoUiOpeningCloud(gLcd->GetTopDisplay()));
+    MTextPicture *backdrop = data_ov004_02177284 =
+        new MTextPicture(gLcd->GetBottomDisplay(), data_ov004_0217354c, TRUE, false);
+    backdrop->SetPosition(-32, -32);
+    backdrop->SetPriority(3);
+    backdrop->Show();
+    mParallel.AddTail(backdrop);
+    MTextPicture *topBackdrop = new MTextPicture(gLcd->GetTopDisplay(), data_ov004_0217355c, TRUE, false);
+    topBackdrop->SetPosition(-32, -32);
+    topBackdrop->SetPriority(2);
+    topBackdrop->Show();
+    mParallel.AddTail(topBackdrop);
+    DinoGradationBg *gradation = new DinoGradationBg(gLcd->GetTopDisplay());
+    gradation->SetGradation(7, 0x4E, 0xFF, 0x59, 0x92, 0xFD);
+    mParallel.AddTail(gradation);
+    mUnk90 = new MExtAffinePicture(gLcd->GetTopDisplay(), data_ov004_02173570, TRUE, false);
+    mUnk90->SetPosition(0, 0x10);
+    mUnk90->Show();
+    mParallel.AddTail(mUnk90);
+    if (*mResult != 5 && *mResult != 7) {
+        MTask *top;
+        MTask *bottom;
+        bottom = gLcd->GetBottomDisplay()->mBright->CreateFadeInFromBlack(60, 0);
+        top = gLcd->GetTopDisplay()->mBright->CreateFadeInFromBlack(60, 0);
+        MParallelTaskSet *fades = new MParallelTaskSet(TRUE);
+        fades->AddTail(top);
+        fades->AddTail(bottom);
+        mSerial.AddTail(fades);
+    } else {
+        MTask *top;
+        MTask *bottom;
+        bottom = gLcd->GetBottomDisplay()->mBright->CreateFadeInFromWhite(30, 0);
+        top = gLcd->GetTopDisplay()->mBright->CreateFadeInFromWhite(30, 0);
+        MParallelTaskSet *fades = new MParallelTaskSet(TRUE);
+        fades->AddTail(top);
+        fades->AddTail(bottom);
+        mSerial.AddTail(fades);
+    }
+    mState = data_ov004_02172f78.StatePrepareBackup_DC;
+}
 
 // The health and safety warning (and the backup check).
 void DinoUiTitle::StateWarning() {
