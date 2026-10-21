@@ -15,6 +15,9 @@ struct MChrBlock : public MHeapBlock {
     u32 tile;           // 0x18: the first tile number, in units of the tile boundary
     int refCount;       // 0x1C
 
+    // The address of a tile of the block.
+    u32 GetTileAddr(u32 tile) const { return addr + tile * unitSize; }
+
     MTask *CreateLoadTask(const void *src, u32 start, u32 count, int palette);
     void Load(const void *src, u32 start, u32 count, int palette);
     void Load(MArchiveFile *file, u32 offset, u32 start, u32 unused, u32 count, int palette);

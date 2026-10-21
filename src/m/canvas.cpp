@@ -57,15 +57,11 @@ void MCanvasWindow::Clear() {
 }
 
 void MCanvasWindow::ClearRect(MRect rect) {
-    MRect r = rect;
-    r.Offset(MPoint(mRect.left, mRect.top));
-    mCanvas->ClearRect(r);
+    mCanvas->ClearRect(rect.Moved(mRect.GetTopLeft()));
 }
 
 void MCanvasWindow::FillRect(MRect rect, int color) {
-    MRect r = rect;
-    r.Offset(MPoint(mRect.left, mRect.top));
-    mCanvas->FillRect(r, color);
+    mCanvas->FillRect(rect.Moved(mRect.GetTopLeft()), color);
 }
 
 int MCanvasWindow::GetPixel(int x, int y) {
@@ -190,7 +186,7 @@ void MDummyCanvas::Execute() {
 
 // Reads one row of pixels (4 bytes a tile) across a canvas's tiles.
 void MCanvas::ReadRow(MChrBlock *chr, int start, int tilesWide, int y, u32 *dest) {
-    const u32 *src = (const u32 *)(chr->addr + (start + (y >> 3) * tilesWide) * chr->unitSize) + (y & 7);
+    const u32 *src = (const u32 *)chr->GetTileAddr(start + (y >> 3) * tilesWide) + (y & 7);
     for (; tilesWide > 0; tilesWide--) {
         *dest++ = *src;
         src += 8;
@@ -198,10 +194,11 @@ void MCanvas::ReadRow(MChrBlock *chr, int start, int tilesWide, int y, u32 *dest
 }
 
 void MCanvas::WriteRow(MChrBlock *chr, int start, int tilesWide, int y, const u32 *src) {
-    u32 *dest = (u32 *)(chr->addr + (start + (y >> 3) * tilesWide) * chr->unitSize) + (y & 7);
+    u32 *dest = (u32 *)chr->GetTileAddr(start + (y >> 3) * tilesWide) + (y & 7);
     for (; tilesWide > 0; tilesWide--) {
-        *dest = *src++;
+        *dest = *src;
         dest += 8;
+        src++;
     }
 }
 
@@ -282,15 +279,12 @@ void MTextCanvas::FillRect(MRect rect, int color) {
 }
 
 int MTextCanvas::GetPixel(int x, int y) {
-    MChrBlock *tiles = mTiles;
-    u32 row = *(u32 *)(tiles->addr + tiles->unitSize * ((x >> 3) + mTileSize.x * (y >> 3)) + (y & 7) * 4);
+    u32 row = ((u32 *)mTiles->GetTileAddr((x >> 3) + (y >> 3) * mTileSize.x))[y & 7];
     return (row >> ((x & 7) * 4)) & 0xF;
 }
 
-// NONMATCHING: the game loads the tile block's fields later (scheduling).
 void MTextCanvas::SetPixel(int x, int y, int color) {
-    MChrBlock *tiles = mTiles;
-    u32 *row = (u32 *)(tiles->addr + tiles->unitSize * ((x >> 3) + mTileSize.x * (y >> 3))) + (y & 7);
+    u32 *row = (u32 *)mTiles->GetTileAddr((x >> 3) + (y >> 3) * mTileSize.x) + (y & 7);
     int shift = (x & 7) * 4;
     *row = (*row & ~(0xF << shift)) | (color << shift);
 }

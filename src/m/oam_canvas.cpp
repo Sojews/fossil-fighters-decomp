@@ -107,15 +107,12 @@ void MOamCanvas<TOam, TUnit>::ClearRect(MRect rect) {
     FillRect(rect, 0);
 }
 
-// The address of a tile of the block.
-static inline u32 MOamCanvasChrAddr(MChrBlock *block, u32 tile) { return block->addr + tile * block->unitSize; }
-
 template <class TOam, class TUnit>
 void MOamCanvas<TOam, TUnit>::FillRect(MRect rect, int color) {
     for (u32 i = 0; i < mPieces.size(); i++) {
         if (rect.Intersects(mPieces[i].rect)) {
             gLooper->AddTransferTask(new MChr16Fill(
-                color, MOamCanvasChrAddr(mChrBlock, mPieces[i].chrOffset),
+                color, mChrBlock->GetTileAddr(mPieces[i].chrOffset),
                 mPieces[i].rect.GetSize() / 8,
                 rect.Intersection(mPieces[i].rect).Moved(MPoint(0, 0) - mPieces[i].rect.GetTopLeft())));
         }
@@ -130,7 +127,7 @@ int MOamCanvas<TOam, TUnit>::GetPixel(int x, int y) {
             int py = y - mPieces[i].rect.top;
             int px = x - mPieces[i].rect.left;
             u32 tile = mPieces[i].chrOffset + ((px >> 3) + (py >> 3) * ((mPieces[i].rect.right - mPieces[i].rect.left) >> 3));
-            u32 row = ((u32 *)MOamCanvasChrAddr(mChrBlock, tile))[py & 7];
+            u32 row = ((u32 *)mChrBlock->GetTileAddr(tile))[py & 7];
             return (row >> ((px & 7) * 4)) & 0xF;
         }
     }
@@ -147,7 +144,7 @@ void MOamCanvas<TOam, TUnit>::SetPixel(int x, int y, int color) {
             int py = y - piece.rect.top;
             int px = x - piece.rect.left;
             u32 tile = piece.chrOffset + (px >> 3) + (py >> 3) * ((right - left) >> 3);
-            u32 *row = (u32 *)MOamCanvasChrAddr(mChrBlock, tile) + (py & 7);
+            u32 *row = (u32 *)mChrBlock->GetTileAddr(tile) + (py & 7);
             int shift = (px & 7) * 4;
             *row = (*row & ~(0xF << shift)) | (color << shift);
         }
