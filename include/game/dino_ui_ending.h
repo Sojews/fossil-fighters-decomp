@@ -12,6 +12,7 @@ public:
     virtual ~DinoUiEnding();
     virtual void Idle();
 
+    void StateStart();
     void StateEnd();
 
     // A picture on each screen.

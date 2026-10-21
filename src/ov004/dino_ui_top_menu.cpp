@@ -25,6 +25,10 @@
 #include "game/dino_ui_save_slot_select_menu_delete_item.h"
 #include "game/dino_ui_ending.h"
 #include "m/pal.h"
+#include "m/bitmap.h"
+#include "m/picture.h"
+#include "m/motion.h"
+#include "m/blend.h"
 #include "m/bg.h"
 #include "m/display.h"
 #include "m/lcd.h"
@@ -1189,12 +1193,109 @@ DinoUiTopMenuLoop::DinoUiTopMenuLoop(int *result) : MProcess(NULL), mResult(resu
 
 // The ending's pooled pointer-to-member constant (see menu.cpp).
 extern "C" struct {
-    u8 unk00[0x1C];
+    u8 unk00[0x4];
+    const char *mPicturePath;   // 0x04: the closing picture
+    const char *mLogoPath;      // 0x08
+    void (DinoUiEnding::*StateEnd_0C)(); // 0x0c
+    u8 unk14[0x1C - 0x14];
     void (DinoUiEnding::*Start_1C)();
 } data_ov004_02172eb8;
 
 DinoUiEnding::DinoUiEnding() : MProcess(NULL) {
     mState = data_ov004_02172eb8.Start_1C;
+}
+
+extern "C" const char data_ov004_02172f58[], data_ov004_02172f68[];   // the ending's picture (with and without...)
+
+// (Through an inline: the blend is read before its argument's virtual call, as in the game.)
+static inline MBlend *DinoEndingBlend(MDisplay *display) {
+    return display->mBlend;
+}
+
+static inline MRect DinoEndingStrip(int top, int bottom, MPoint pos) {
+    MRect rect(0, top, 0x100, bottom);
+    rect.Offset(pos);
+    return rect;
+}
+
+// (Likewise for the palette manager.)
+static inline MPal *DinoEndingPal(MDisplay *display) {
+    return display->mBg->mPal;
+}
+
+// (MTaskSet::AddTail for eleven tasks; the arguments are evaluated last to first.)
+static inline void DinoEndingAddTail(MTaskSet *set, MTask *a, MTask *b, MTask *c, MTask *d, MTask *e, MTask *f,
+                                     MTask *g, MTask *h, MTask *i, MTask *j, MTask *k) {
+    MTaskSet *self = set;
+    self->AddTail(a);
+    self->AddTail(b);
+    self->AddTail(c);
+    self->AddTail(d);
+    self->AddTail(e);
+    self->AddTail(f);
+    self->AddTail(g);
+    self->AddTail(h);
+    self->AddTail(i);
+    self->AddTail(j);
+    self->AddTail(k);
+}
+
+// The ending: the tall picture split over both screens (each screen two strips), scrolling up for 480 frames, then
+// the closing picture cross-fades in, the logo plays with its sound and everything fades out.
+// NONMATCHING: scheduling only (the game loads the strip's position before storing the rect's constants).
+void DinoUiEnding::StateStart() {
+    mPicture = MPictureFile(std::string(gDinoBackup->GetSystemFlag(0x1A) ? data_ov004_02172f58 : data_ov004_02172f68), 7);
+    gLcd->mMain->ResetHooks();
+    gLcd->mSub->ResetHooks();
+    gLcd->mMain->Setup(6, 1, 3, 0, 0, 0);
+    gLcd->mMain->mBg->SetMode(5);
+    gLcd->mSub->Setup(5, 0, 0, 0);
+    gLcd->mSub->mBg->SetMode(5);
+    gLcd->SetTopDisplay(gLcd->mMain);
+    gLcd->VSyncNow();
+    int scroll = mPicture.GetHeight() - 0x180;
+    MParallelTaskSet *scrolls = new MParallelTaskSet(TRUE);
+    for (u32 i = 0; i < 2; i++) {
+        MDisplay *display = i == 0 ? gLcd->mMain : gLcd->mSub;
+        MPoint pos = i == 0 ? MPoint(0, 0) : MPoint(0, mPicture.GetHeight() - 0x200);
+        MPoint to = i == 0 ? MPoint(0, 0) : MPoint(-pos.x, 0xC0 - pos.y);
+        mScreens[i].palette = DinoEndingPal(display)->Alloc(mPicture.GetPaletteSize(), mPicture.GetPalette(), 1);
+        mScreens[i].bitmap = display->mBg->CreateIndexBitmap(1, 1);
+        mScreens[i].bitmap->mBgCntBits.priority = 3;
+        mScreens[i].bitmap->Load((const u8 *)mPicture.GetChr(), mPicture.CalcSize(), DinoEndingStrip(0, 0x100, pos), MPoint(0, 0),
+                                 mScreens[i].palette->index, false, false);
+        mScreens[i].bitmap->SetOffset(MPoint(to.x, scroll + to.y));
+        mScreens[i].bitmap->Show();
+        scrolls->AddTail(mScreens[i].bitmap->CreateOffsetAnime(mScreens[i].bitmap->GetOffset(), to, 480, 0));
+        mScreens[i].bitmap2 = display->mBg->CreateIndexBitmap(1, 1);
+        mScreens[i].bitmap2->mBgCntBits.priority = 3;
+        mScreens[i].bitmap2->Load((const u8 *)mPicture.GetChr(), mPicture.CalcSize(), DinoEndingStrip(0x100, 0x200, pos), MPoint(0, 0),
+                                  mScreens[i].palette->index, false, false);
+        mScreens[i].bitmap2->SetOffset(MPoint(to.x, scroll + to.y - 0x100));
+        mScreens[i].bitmap2->Show();
+        scrolls->AddTail(
+            mScreens[i].bitmap2->CreateOffsetAnime(mScreens[i].bitmap2->GetOffset(), MPoint(to.x, to.y - 0x100), 480, 0));
+    }
+    MTextPicture *closing = new MTextPicture(gLcd->GetTopDisplay(), data_ov004_02172eb8.mPicturePath, TRUE, false);
+    mParallel.AddTail(closing);
+    MSmartOam *oam = new MSmartOam(gLcd->GetTopDisplay(), 10, 0, TRUE);
+    MMotion *logo = new MMotion(data_ov004_02172eb8.mLogoPath, oam, 0, 1);
+    logo->SetPosition(0x80, 0x60);
+    logo->SetPriority(1);
+    logo->Show();
+    mParallel.AddTail(logo, oam);
+    DinoEndingAddTail(&mSerial,
+                      (new MParallelTaskSet(TRUE))
+                          ->Add(gLcd->GetTopDisplay()->mBright->CreateFadeInFromBlack(120, 0))
+                          ->Add(gLcd->GetBottomDisplay()->mBright->CreateFadeInFromBlack(120, 0)),
+                      new MTimer(120), scrolls, new MTimer(120), closing->CreateShowTransfer(),
+                      DinoEndingBlend(gLcd->GetTopDisplay())->CreateCrossFadeInTask(closing->GetPlaneMask(), 120, 0),
+                      new MTimer(120), logo->CreatePlayTransfer(1, 0), DinoSoundCreatePlaySeTask(0x568, 0),
+                      new MTimer(780),
+                      (new MParallelTaskSet(TRUE))
+                          ->Add(gLcd->GetTopDisplay()->mBright->CreateFadeOutToBlack(120, 0))
+                          ->Add(gLcd->GetBottomDisplay()->mBright->CreateFadeOutToBlack(120, 0)));
+    mState = data_ov004_02172eb8.StateEnd_0C;
 }
 
 
