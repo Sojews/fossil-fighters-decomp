@@ -1,5 +1,4 @@
 // The 3D resources: the 3D heap, the model, animation and texture caches, and M3DModelResource.
-// Not decompiled yet: M3DGrid::Load.
 
 #include <ctype.h>
 #include <map>
@@ -71,6 +70,287 @@ M3DGrid::~M3DGrid() {
     }
     mVerts.clear();
     delete[] mCells;
+}
+
+// Widens the cell bounds to the last n vertices'.
+#define M3D_GRID_BOUND(n, minX, minZ, maxX, maxZ)                                                               \
+    for (int v = count - (n); v < count; v++) {                                                                 \
+        int vx = mVerts[v].x >> 11;                                                                             \
+        int vz = mVerts[v].z >> 11;                                                                             \
+        if (minX > vx) {                                                                                        \
+            minX = vx;                                                                                          \
+        }                                                                                                       \
+        if (minZ > vz) {                                                                                        \
+            minZ = vz;                                                                                          \
+        }                                                                                                       \
+        if (maxX < vx) {                                                                                        \
+            maxX = vx;                                                                                          \
+        }                                                                                                       \
+        if (maxZ < vz) {                                                                                        \
+            maxZ = vz;                                                                                          \
+        }                                                                                                       \
+    }
+
+// The cell (x, z), from (-16, -16).
+#define M3D_GRID_CELL(x, z) mCells[(x) + 16 + ((z) + 16) * mDim]
+
+// Builds the grid from a display list: the vertices it draws (scaled up as far as they fit in 16 bits) and, in each
+// cell, the triangles over it. The list ends at its first matrix pop.
+// NONMATCHING (99.1%): which zero the game reuses for the flags (the rescale flag, then each command's vertex flag
+// from it), the list pointer's spill, and register choices in the bounds and the 10-bit vertex.
+void M3DGrid::Load(const void *data) {
+    int minZ = 0;
+    int minY = 0;
+    int minX = 0;
+    int maxZ = 0;
+    int maxY = 0;
+    int shift = 0;
+    int shiftZ = 0;
+    int maxX = 0;
+    int x, y, z;
+    BOOL again;
+    do {
+        const u8 *cmds = (const u8 *)data;
+        const u32 *p = (const u32 *)data;
+        u32 cells = mDim * mDim;
+        for (u32 i = 0; i < cells; i++) {
+            mCells[i].clear();
+        }
+        mVerts.clear();
+        int strip = 0;
+        int count = 0;
+        int type = -1;
+        p++;
+        again = FALSE;
+        for (;;) {
+            for (int c = 0; c < 4; c++) {
+                BOOL vertex = FALSE;
+                switch (cmds[c]) {
+                case 0x00:
+                case 0x11:
+                case 0x15:
+                case 0x41:
+                    break;
+                case 0x10:
+                case 0x13:
+                case 0x14:
+                case 0x20:
+                case 0x21:
+                case 0x22:
+                case 0x29:
+                case 0x2A:
+                case 0x2B:
+                case 0x30:
+                case 0x31:
+                case 0x32:
+                case 0x33:
+                case 0x50:
+                case 0x60:
+                case 0x72:
+                    p += 1;
+                    break;
+                case 0x34:
+                    p += 32;
+                    break;
+                case 0x16:
+                case 0x18:
+                    p += 16;
+                    break;
+                case 0x17:
+                case 0x19:
+                    p += 12;
+                    break;
+                case 0x1A:
+                    p += 9;
+                    break;
+                case 0x1C:
+                case 0x70:
+                    p += 3;
+                    break;
+                case 0x1B: {
+                    u32 scale = *p;
+                    for (int k = 0; k < 12; k++) {
+                        if (1 << (k + 12) == scale) {
+                            mShiftX = k - shift;
+                            mShiftZ = k - shiftZ;
+                            break;
+                        }
+                    }
+                    p += 3;
+                    break;
+                }
+                case 0x71:
+                    p += 2;
+                    break;
+                case 0x12:  // (the list's end)
+                    goto done;
+                case 0x23:
+                    vertex = TRUE;
+                    x = ((const s16 *)p)[0];
+                    y = ((const s16 *)p)[1];
+                    z = ((const s16 *)p)[2];
+                    p += 2;
+                    break;
+                case 0x24:
+                    vertex = TRUE;
+                    x = (s16)((s32)(*p << 22) >> 16);
+                    y = (s16)((s32)(*p << 12) >> 16);
+                    z = (s16)((s32)(*p << 2) >> 16);
+                    p += 1;
+                    break;
+                case 0x25:
+                    vertex = TRUE;
+                    x = ((const s16 *)p)[0];
+                    y = ((const s16 *)p)[1];
+                    p += 1;
+                    break;
+                case 0x26:
+                    vertex = TRUE;
+                    x = ((const s16 *)p)[0];
+                    z = ((const s16 *)p)[1];
+                    p += 1;
+                    break;
+                case 0x27:
+                    vertex = TRUE;
+                    y = ((const s16 *)p)[0];
+                    z = ((const s16 *)p)[1];
+                    p += 1;
+                    break;
+                case 0x28:
+                    vertex = TRUE;
+                    x = (s16)(x + ((s32)(*p << 22) >> 22));
+                    y = (s16)(y + ((s32)(*p << 12) >> 22));
+                    z = (s16)(z + ((s32)(*p << 2) >> 22));
+                    p += 1;
+                    break;
+                case 0x40:
+                    type = *p & 3;
+                    strip = 0;
+                    p += 1;
+                    break;
+                }
+                if (!vertex) {
+                    continue;
+                }
+                M3DVec16 vec;
+                vec.x = x << shift;
+                vec.y = y << shift;
+                vec.z = z << shiftZ;
+                mVerts.push_back(vec);
+                if (minX > vec.x) {
+                    minX = vec.x;
+                }
+                if (minY > vec.y) {
+                    minY = vec.y;
+                }
+                if (minZ > vec.z) {
+                    minZ = vec.z;
+                }
+                if (maxX < vec.x) {
+                    maxX = vec.x;
+                }
+                if (maxY < vec.y) {
+                    maxY = vec.y;
+                }
+                if (maxZ < vec.z) {
+                    maxZ = vec.z;
+                }
+                count++;
+                strip++;
+                switch (type) {
+                case 0:
+                    if (strip >= 3) {
+                        int minCZ = 32;
+                        int minCX = 32;
+                        int maxCZ = -32;
+                        int maxCX = -32;
+                        strip = 0;
+                        M3D_GRID_BOUND(3, minCX, minCZ, maxCX, maxCZ);
+                        for (; minCZ <= maxCZ; minCZ++) {
+                            for (int cx = minCX; cx <= maxCX; cx++) {
+                                M3D_GRID_CELL(cx, minCZ).push_back(count - 3);
+                                M3D_GRID_CELL(cx, minCZ).push_back(count - 2);
+                                M3D_GRID_CELL(cx, minCZ).push_back(count - 1);
+                            }
+                        }
+                    }
+                    break;
+                case 1:
+                    if (strip >= 4) {
+                        int minCZ = 32;
+                        int minCX = 32;
+                        int maxCZ = -32;
+                        int maxCX = -32;
+                        strip = 0;
+                        M3D_GRID_BOUND(4, minCX, minCZ, maxCX, maxCZ);
+                        for (; minCZ <= maxCZ; minCZ++) {
+                            for (int cx = minCX; cx <= maxCX; cx++) {
+                                M3D_GRID_CELL(cx, minCZ).push_back(count - 4);
+                                M3D_GRID_CELL(cx, minCZ).push_back(count - 3);
+                                M3D_GRID_CELL(cx, minCZ).push_back(count - 1);
+                                M3D_GRID_CELL(cx, minCZ).push_back(count - 1);
+                                M3D_GRID_CELL(cx, minCZ).push_back(count - 3);
+                                M3D_GRID_CELL(cx, minCZ).push_back(count - 2);
+                            }
+                        }
+                    }
+                    break;
+                case 2:
+                    if (strip >= 3) {
+                        int minCZ = 32;
+                        int minCX = 32;
+                        int maxCZ = -32;
+                        int maxCX = -32;
+                        M3D_GRID_BOUND(3, minCX, minCZ, maxCX, maxCZ);
+                        for (; minCZ <= maxCZ; minCZ++) {
+                            for (int cx = minCX; cx <= maxCX; cx++) {
+                                if (strip & 1) {
+                                    M3D_GRID_CELL(cx, minCZ).push_back(count - 3);
+                                    M3D_GRID_CELL(cx, minCZ).push_back(count - 2);
+                                    M3D_GRID_CELL(cx, minCZ).push_back(count - 1);
+                                } else {
+                                    M3D_GRID_CELL(cx, minCZ).push_back(count - 3);
+                                    M3D_GRID_CELL(cx, minCZ).push_back(count - 1);
+                                    M3D_GRID_CELL(cx, minCZ).push_back(count - 2);
+                                }
+                            }
+                        }
+                    }
+                    break;
+                case 3:
+                    if (strip >= 4 && !(strip & 1)) {
+                        int minCZ = 32;
+                        int minCX = 32;
+                        int maxCZ = -32;
+                        int maxCX = -32;
+                        M3D_GRID_BOUND(4, minCX, minCZ, maxCX, maxCZ);
+                        for (; minCZ <= maxCZ; minCZ++) {
+                            for (int cx = minCX; cx <= maxCX; cx++) {
+                                M3D_GRID_CELL(cx, minCZ).push_back(count - 4);
+                                M3D_GRID_CELL(cx, minCZ).push_back(count - 3);
+                                M3D_GRID_CELL(cx, minCZ).push_back(count - 1);
+                                M3D_GRID_CELL(cx, minCZ).push_back(count - 4);
+                                M3D_GRID_CELL(cx, minCZ).push_back(count - 1);
+                                M3D_GRID_CELL(cx, minCZ).push_back(count - 2);
+                            }
+                        }
+                    }
+                    break;
+                }
+            }
+            cmds = (const u8 *)p;
+            p++;
+        }
+    done:
+        if (maxX < 0x3FFF && minX > -0x3FFF && maxY < 0x3FFF && minY > -0x3FFF) {
+            shift++;
+            again = TRUE;
+        }
+        if (maxZ < 0x3FFF && minZ > -0x3FFF) {
+            shiftZ++;
+            again = TRUE;
+        }
+    } while (again);
 }
 
 // Whether (x, z) is inside the triangle tris[i], tris[i + 1], tris[i + 2].
