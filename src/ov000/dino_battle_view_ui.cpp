@@ -949,7 +949,11 @@ static inline MTask *Together(MTask *a, MTask *b) {
     return set;
 }
 
-// NONMATCHING: the other view and the other anime swap stack slots.
+// A side's slot view. (Through a non-member inline, the other side's view gets the game's lower stack slot.)
+static inline MView *DinoSlotView(u32 view, int side) {
+    return ((DinoBattleView *)view)->mUnkE0->mSlotViewsC0[side];
+}
+
 void DinoBattleViewUiDefenderMenu::ResetRows() {
     if (mUnkBC == mSideC0) {
         return;
@@ -960,7 +964,7 @@ void DinoBattleViewUiDefenderMenu::ResetRows() {
     int other = mUnkBC;
     MView *otherView;
     MView *sideView = ((DinoBattleView *)mUnkEC)->mUnkE0->mSlotViewsC0[side];
-    otherView = ((DinoBattleView *)mUnkEC)->mUnkE0->mSlotViewsC0[other];
+    otherView = DinoSlotView(mUnkEC, other);
     mUnkF8->AddTail(Together(sideView->CreateCoordAnime(sideView->GetPosition(), func_ov000_0215f22c(2, side), 8, -2),
                              otherView->CreateCoordAnime(otherView->GetPosition(), func_ov000_0215f22c(3, other), 8, -2)));
 }
