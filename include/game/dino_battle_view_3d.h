@@ -42,7 +42,9 @@ public:
     u32 unkA8;
     DinoBattleView *mView;                  // 0xAC
     u32 mUnkB0;                             // 0xB0
-    u32 unkB4[3];
+    u32 mUnkB4;                             // 0xB4
+    class MSmartOam *mOam;                  // 0xB8
+    MTaskSet *mUnkBC;                       // 0xBC
     MTaskSet *mUnkC0;                       // 0xC0
     void (DinoBattleView3D::*mState)();     // 0xC4
     MTaskSet *mUnkCC;                       // 0xCC
@@ -55,11 +57,16 @@ public:
     u8 unk104[0x11C - 0x104];
     void *mSlotModels[6];                   // 0x11C: what each slot's models show (3 per slot)
     u32 mSlot;                              // 0x134
-    u8 unk138[0x148 - 0x138];
+    s32 mUnk138;                            // 0x138
+    s32 mUnk13C;                            // 0x13C
+    u32 mUnk140;                            // 0x140
+    u32 mUnk144;                            // 0x144
     u8 mUnk148[2];                          // 0x148: by slot, whether its group is shown
     u8 mUnk14A[6];                          // 0x14A: by slot and creature
     u32 mUnk150[6];                         // 0x150: by slot and creature, flags
-    u8 unk168[0x174 - 0x168];
+    u32 unk168;
+    s32 mUnk16C;                            // 0x16C
+    u32 mUnk170;                            // 0x170
     u32 mUnk174;                            // 0x174
 
     MRandom mRandom;                        // 0x178

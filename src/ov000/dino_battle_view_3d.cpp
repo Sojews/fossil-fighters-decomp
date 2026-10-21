@@ -28,6 +28,8 @@
 #include "game/dino_battle_view_field_player_bg.h"
 #include "game/dino_resource.h"
 #include "m/3d.h"
+#include "m/smart_oam.h"
+#include "m/file.h"
 
 DinoBattleView3D::~DinoBattleView3D() {
     CancelQueue();
@@ -602,11 +604,79 @@ extern "C" Dino3DLoadCsv *func_ov000_02187e68(DinoBattleView3D *view, int slot) 
     return model;
 }
 
-// Zeroes three words (nothing in the game calls it).
-extern "C" void func_ov000_021858ac(u32 *p) {
-    p[0] = 0;
-    p[1] = 0;
-    p[2] = 0;
+
+// The TU's pooled pointer-to-member constants.
+extern "C" struct {
+    u8 unk00[0x1C];
+    void (DinoBattleView3D::*StateLoad_1C)();
+    u8 unk24[0x3C - 0x24];
+    void (DinoBattleView3D::*RunNextQueued_3C)();
+} data_ov000_02196368;
+extern "C" void func_ov000_0218ada0();
+extern "C" const char *const data_ov000_02196514[6];    // each kind's motion file name format (by id, number)
+
+// Sets up the scene and the task sets, and for each kind lists the motion files present for each id (0x61-0x67, up
+// to ten numbers each).
+// NONMATCHING: 99.4%, two of the inlined vector byte temporaries take each other's stack slots (the copied names'
+// init_copy tag and the slow push's tag).
+DinoBattleView3D::DinoBattleView3D(DinoBattleView *view) : MProcess(NULL), mView(view) {
+    int i;
+    func_ov000_0218ada0();
+    mUnkCC = new MParallelTaskSet();
+    mParallel.AddTail(mUnkCC);
+    mUnkC0 = new MSerialTaskSet();
+    mParallel.AddTail(mUnkC0);
+    mUnkB0 = (u32)new M3DScene();
+    mParallel.AddTail((M3DScene *)mUnkB0);
+    ((M3DScene *)mUnkB0)->mM3d->mBgCntBits.priority = 3;
+    Dino3DClearSoundNames();
+    for (i = 0; i < 5; i++) {
+        mModels[i] = NULL;
+    }
+    for (i = 0; i < 6; i++) {
+        mCreatureIds[i] = 0;
+        mSlotModels[i] = NULL;
+    }
+    for (i = 0; i < 6; i++) {
+        mUnk14A[i] = 0;
+        mUnk150[i] = 0;
+    }
+    for (i = 0; i < 2; i++) {
+        mUnk148[i] = 0;
+    }
+    mUnkB4 = 0;
+    mSlot = -1;
+    mUnk138 = -1;
+    mUnk13C = -1;
+    mUnk16C = -1;
+    mUnk144 = 0;
+    mUnk170 = 0;
+    mUnkE4 = NULL;
+    mUnkE8 = NULL;
+    mUnk140 = 0;
+    mUnk19C = -1;
+    mUnk1A0 = -1;
+    for (int k = 0; k < 6; k++) {
+        mUnk1A4[k].clear();
+        for (int id = 0x61; id <= 0x67; id++) {
+            char buf[0x40];
+            std::vector<std::string> names;
+            for (int n = 0; n < 10; n++) {
+                OS_SPrintf(buf, data_ov000_02196514[k], id, n);
+                std::string path(buf);
+                if (MFileExists(path)) {
+                    names.push_back(path);
+                }
+            }
+            if (names.size() != 0) {
+                mUnk1A4[k].push_back(names);
+            }
+        }
+    }
+    mOam = new MSmartOam(gLcd->mMain, 0x10, 0, TRUE);
+    mUnkBC = new MParallelTaskSet();
+    mParallel.AddTail(mUnkBC, mOam);
+    mState = data_ov000_02196368.StateLoad_1C;
 }
 
 // Deletes the tasks waiting to run.
@@ -651,11 +721,6 @@ MTask *DinoBattleView3D::CreateMove(int unkA, u32 shown, int slot) {
     return new MTimer(1);
 }
 
-// The TU's pooled pointer-to-member constants.
-extern "C" struct {
-    u8 unk00[0x3C];
-    void (DinoBattleView3D::*RunNextQueued_3C)();
-} data_ov000_02196368;
 extern "C" const char data_ov000_02196c78[];   // the field's csv
 extern "C" const char data_ov000_02196c94[];   // the default background's csv
 extern "C" const VecFx32 data_ov000_02190340;
