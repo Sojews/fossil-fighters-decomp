@@ -172,7 +172,16 @@ void DinoCleaningTalkWindow::Idle() {
 }
 #pragma opt_common_subs reset
 
-// NONMATCHING: 87%, the points' temporaries take other stack slots.
+// NONMATCHING: 94.7%, the frame and face points' temporaries take each other's stack slots (the deeper inline on the first
+// call fixed the window's).
+// (A deeper inline: its point temporaries take lower stack slots, as in the game.)
+static inline MTask *DinoTalkAnime1(MView *view, MPoint from, MPoint to) {
+    return view->CreateCoordAnime(from, to, 20, 2);
+}
+static inline MTask *DinoTalkAnime2(MView *view, MPoint from, MPoint to) {
+    return DinoTalkAnime1(view, from, to);
+}
+
 void DinoCleaningTalkWindow::Close() {
     mUnkCC = 0;
     mUnkD0 = 0;
@@ -180,7 +189,7 @@ void DinoCleaningTalkWindow::Close() {
     MTask *clear = gLcd->GetTopDisplay()->mBlend->CreateClearTransfer();
     MTask *empty = MTaskSetMakeEmptyTask::Create(mTasksB8);
     MPoint frameFrom(256, 192);
-    MTask *frame = mFrame->CreateCoordAnime(frameFrom, MPoint(frameFrom.x + 64, frameFrom.y), 20, 2);
+    MTask *frame = DinoTalkAnime2(mFrame, frameFrom, MPoint(frameFrom.x + 64, frameFrom.y));
     MTask *window = mConsole->CreateCoordAnime(data_ov002_0216431c.mPos,
                                                MPoint(data_ov002_0216431c.mPos.x, data_ov002_0216431c.mPos.y + 40), 20, 2);
     MTask *face = mFace->CreateCoordAnime(MPoint(0, 0), MPoint(0, 40), 20, 2);
