@@ -9,6 +9,7 @@
 #include "m/smart_oam.h"
 #include "nitro/pxi.h"
 #include <algorithm>
+#include <string.h>
 
 // (The game keeps these two together, addressed from one base.)
 static struct {
@@ -1125,6 +1126,59 @@ void MMultiPlayMessageHub::SendTo(u32 mask, MMessage *msg) {
 void MMultiPlayMessageHub::OnVSync() {
     if (!sMultiPlay.instance->IsFailed()) {
         mRunning = WM_StepDataSharing(sMultiPlay.instance->mDataSharing[3].info, mSendData, &mReceived) == WM_ERRCODE_SUCCESS;
+    }
+}
+
+// The game's std::copy of chars (a memmove).
+static inline char *MMultiPlayCopyChars(std::__vec_iterator<char> first, std::__vec_iterator<char> last, char *out) {
+    memmove(out, &*first, &*last - &*first);
+    return out + (&*last - &*first);
+}
+
+// Fills this frame's share of the send buffer: a message's header (its size and the consoles it's for) and then as
+// much of it as fits, going on to the next message while there's room.
+void MMultiPlayMessageHub::SendPending() {
+    if (mUnk26C != mConnectedAids) {
+        return;
+    }
+    char *out = (char *)mSendData;
+    u32 left = sMultiPlay.instance->GetSharedDataSize();
+    while (left >= 4) {
+        if (mSending == NULL) {
+            if (mOutgoing.size() == 0) {
+                break;
+            }
+            std::vector<MMultiPlayHubOutgoing>::iterator next = mOutgoing.begin();
+            mSending = next->data;
+            u16 mask = next->mask;
+            mOutgoing.erase(next);
+            struct {
+                u16 size;
+                u16 mask;
+            } header;
+            header.size = mSending->size();
+            header.mask = mask;
+            MI_CpuCopy8(&header, out, 4);
+            out += 4;
+            left -= 4;
+        } else {
+            u32 n = std::min(left, (u32)mSending->size());
+            MMultiPlayCopyChars(mSending->begin(), mSending->begin() + n, out);
+            out += n;
+            left -= n;
+            if (n == mSending->size()) {
+                delete mSending;
+                mSending = NULL;
+                if (!mUnk279) {
+                    break;
+                }
+            } else {
+                mSending->erase(mSending->begin(), mSending->begin() + n);
+            }
+        }
+    }
+    if (left != 0) {
+        *(u16 *)out = 0;
     }
 }
 
