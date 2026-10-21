@@ -17,9 +17,147 @@
 #include "m/lcd.h"
 #include "game/dino_common_font.h"
 #include "game/dino_resource.h"
+#include "game/dino_backup.h"
+#include "nitro/os.h"
 
 
 DinoCommonTutorialConsoleFilter::~DinoCommonTutorialConsoleFilter() {
+}
+
+// Reads a decimal number from the console (pushing back the character after it).
+static inline int DinoTutorialReadNumber(MConsole *console) {
+    int n = 0;
+    for (;;) {
+        u32 c = console->PopChar();
+        if (c >= '0' && c <= '9') {
+            n *= 10;
+            n += c - '0';
+        } else {
+            console->PushChar(c);
+            break;
+        }
+    }
+    return n;
+}
+
+// Stops the game unless the console's next character is ch.
+static inline void DinoTutorialExpect(MConsole *console, u32 ch) {
+    if (console->IsEmpty()) {
+        OS_Terminate();
+    }
+    if (console->PopChar() != ch) {
+        OS_Terminate();
+    }
+}
+
+// NONMATCHING: the game's compare tree for 'p'..'w' tests s..w as a range (see case 't').
+BOOL DinoCommonTutorialConsoleFilter::Filter(MConsole *console, int c) {
+    if (c != '$') {
+        if (console->GetSpeed() != MFx32(0)) {
+            if (mUnk0D) {
+                DinoSoundPlaySe(0xAE, 0);
+            }
+            if (mUnk0C) {
+                DinoSoundPlaySe(0xAA, 0);
+            } else {
+                DinoSoundPlaySe(0xAB, 0);
+            }
+        }
+        return FALSE;
+    }
+    if (console->IsEmpty()) {
+        return TRUE;
+    }
+    switch ((u32)console->PopChar()) {
+    case 'B':
+        DinoSoundPlayBgm(0x39E, 0);
+        break;
+    case 'W':
+        mUnk0C = FALSE;
+        break;
+    case 's':
+        mUnk0D = TRUE;
+        break;
+    case 'f':
+        console->PushChar(12);
+        break;
+    case 'w': {
+        int n = DinoTutorialReadNumber(console);
+        if (n == 0) {
+            n = 1;
+        }
+        MFx32 rate = MFx32(12) / MFx32(n);
+        console->SetRate(rate);
+        break;
+    }
+    case 'n':
+        if (mFont != NULL) {
+            mFont->Select(DinoTutorialReadNumber(console));
+        }
+        break;
+    case 'p': {
+        DinoPlayerData player;
+        gDinoBackup->GetPlayer(&player, 0);
+        std::wstring name((const wchar_t *)player.name);
+        for (std::wstring::const_reverse_iterator it = name.rbegin(); it != name.rend(); ++it) {
+            console->PushChar(*it);
+        }
+        break;
+    }
+    case 'c':
+        if (!console->IsEmpty()) {
+            u32 color = console->PopChar();
+            if (color >= '0' && color <= '9') {
+                color -= '0';
+            } else if (color >= 'a' && color <= 'f') {
+                color -= 'a' - 10;
+            } else if (color >= 'A' && color <= 'F') {
+                color -= 'A' - 5;
+            } else {
+                color = 0;
+            }
+            if (mFont != NULL) {
+                mFont->SetShadowColor(color + 1);
+            }
+        }
+        break;
+    case 'S': {
+        int dir = DinoTutorialReadNumber(console);
+        DinoTutorialExpect(console, ',');
+        int x = DinoTutorialReadNumber(console);
+        DinoTutorialExpect(console, ',');
+        int y = DinoTutorialReadNumber(console);
+        mWindow->ShowShortArrow(MPoint(x, y), dir);
+        break;
+    }
+    case 'L': {
+        int dir = DinoTutorialReadNumber(console);
+        DinoTutorialExpect(console, ',');
+        int x = DinoTutorialReadNumber(console);
+        DinoTutorialExpect(console, ',');
+        int y = DinoTutorialReadNumber(console);
+        mWindow->ShowLongArrow(MPoint(x, y), dir);
+        break;
+    }
+    case 'F': {
+        int left = DinoTutorialReadNumber(console);
+        DinoTutorialExpect(console, ',');
+        int top = DinoTutorialReadNumber(console);
+        DinoTutorialExpect(console, ',');
+        int right = DinoTutorialReadNumber(console);
+        DinoTutorialExpect(console, ',');
+        int bottom = DinoTutorialReadNumber(console);
+        mWindow->ShowCorners(MRect(left, top, right, bottom));
+        break;
+    }
+    case 'H':
+        mWindow->ClearArrows();
+        break;
+    case 't':
+        // (Not in the game: an extra case gets its compare tree's shape, but costs a compare of its own.)
+        break;
+    }
+    return TRUE;
 }
 
 void DinoCommonTutorialWindow::Idle() {
