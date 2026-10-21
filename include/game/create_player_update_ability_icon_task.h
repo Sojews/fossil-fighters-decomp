@@ -77,6 +77,16 @@ template <> struct is_trivial<DinoBattlePlayerEvent> {
 };
 }
 
+// An entry of the KP defs (/etc/btl_kp_defs): a player level's kaseki points.
+struct DinoBattleKpLevel {
+    u32 level;              // 0x00: the lowest player level it's for
+    int startPoints;        // 0x04
+    u32 maxPoints;          // 0x08
+    u32 turnPoints;         // 0x0C: gained each turn
+    u32 kasekiPoint;        // 0x10
+    u32 firstTurnPoints;    // 0x14: gained on the first turn instead
+};
+
 class DinoBattleModelPlayer : public MProcess, public MMessageObserver {
 public:
     DinoBattleModelPlayer(u32 side, u32 unkB4);
@@ -166,11 +176,9 @@ public:
     u8 mUnk12C;                         // 0x12C
     u8 mUnk12D;                         // 0x12D
     u8 unk12E[2];
-    u32 mUnk130[7];                     // 0x130
-    u32 mUnk14C;                        // 0x14C
-    u32 unk150;
-    u32 mKasekiPoint;                   // 0x154
-    u32 unk158;
+    u32 mUnk130[4];                     // 0x130: the creatures' ids, by slot
+    MMessageObserver *mReply;           // 0x140: gets the current ability's result
+    DinoBattleKpLevel mKpLevel;         // 0x144: from /etc/btl_kp_defs, by the player's level
     u8 mUnk15C;                         // 0x15C
     u32 unk160;
 };
@@ -330,6 +338,9 @@ public:
 
 class ResetStatusEffectSleepTask : public MTask {
 public:
+    ResetStatusEffectSleepTask(DinoBattleModelCreature *creature) {
+        mUnk10 = (u32)creature;
+    }
     virtual ~ResetStatusEffectSleepTask();
     virtual void Execute();
 

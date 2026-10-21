@@ -172,7 +172,8 @@ struct DinoBattleAdjustDefs {
     fx32 rankScaleLow;      // 0x19C
     u8 unk1A0[0x1AC - 0x1A0];
     u32 kpUpDownPoints; // 0x1AC: offset of the KP up/down numbers' positions (MPoint), by side
-    u32 unk1B0;
+    u8 unk1B0;          // 0x1B0: team attacks (attack kind 3) take the team-attack path
+    u8 unk1B1[3];
     u32 wirelessUnk1B4;     // 0x1B4: the wireless battle's settings
     u32 wirelessUnk1B8;     // 0x1B8
     u32 wirelessUnk1BC;     // 0x1BC

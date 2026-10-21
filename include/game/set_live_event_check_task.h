@@ -11,6 +11,11 @@ public:
         mLive = live;
         mCheck = check;
     }
+    // (The same, with the arguments evaluated live first.)
+    SetLiveEventCheckTask(u8 check, DinoCommonLive *live) {
+        mLive = live;
+        mCheck = check;
+    }
     virtual ~SetLiveEventCheckTask();
     virtual void Execute();
 

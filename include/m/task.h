@@ -87,84 +87,107 @@ public:
         self->AddTail(c);
     }
     void AddTail(MTask *a, MTask *b, MTask *c, MTask *d) {
-        AddTail(a);
-        AddTail(b);
-        AddTail(c);
-        AddTail(d);
+        MTaskSet *self = this;
+        self->AddTail(a);
+        self->AddTail(b);
+        self->AddTail(c);
+        self->AddTail(d);
     }
     void AddTail(MTask *a, MTask *b, MTask *c, MTask *d, MTask *e) {
-        AddTail(a);
-        AddTail(b);
-        AddTail(c);
-        AddTail(d);
-        AddTail(e);
+        MTaskSet *self = this;
+        self->AddTail(a);
+        self->AddTail(b);
+        self->AddTail(c);
+        self->AddTail(d);
+        self->AddTail(e);
     }
     void AddTail(MTask *a, MTask *b, MTask *c, MTask *d, MTask *e, MTask *f) {
-        AddTail(a);
-        AddTail(b);
-        AddTail(c);
-        AddTail(d);
-        AddTail(e);
-        AddTail(f);
+        MTaskSet *self = this;
+        self->AddTail(a);
+        self->AddTail(b);
+        self->AddTail(c);
+        self->AddTail(d);
+        self->AddTail(e);
+        self->AddTail(f);
     }
     void AddTail(MTask *a, MTask *b, MTask *c, MTask *d, MTask *e, MTask *f, MTask *g) {
-        AddTail(a);
-        AddTail(b);
-        AddTail(c);
-        AddTail(d);
-        AddTail(e);
-        AddTail(f);
-        AddTail(g);
+        MTaskSet *self = this;
+        self->AddTail(a);
+        self->AddTail(b);
+        self->AddTail(c);
+        self->AddTail(d);
+        self->AddTail(e);
+        self->AddTail(f);
+        self->AddTail(g);
     }
     void AddTail(MTask *a, MTask *b, MTask *c, MTask *d, MTask *e, MTask *f, MTask *g, MTask *h) {
-        AddTail(a);
-        AddTail(b);
-        AddTail(c);
-        AddTail(d);
-        AddTail(e);
-        AddTail(f);
-        AddTail(g);
-        AddTail(h);
+        MTaskSet *self = this;
+        self->AddTail(a);
+        self->AddTail(b);
+        self->AddTail(c);
+        self->AddTail(d);
+        self->AddTail(e);
+        self->AddTail(f);
+        self->AddTail(g);
+        self->AddTail(h);
     }
     void AddTail(MTask *a, MTask *b, MTask *c, MTask *d, MTask *e, MTask *f, MTask *g, MTask *h, MTask *i) {
-        AddTail(a);
-        AddTail(b);
-        AddTail(c);
-        AddTail(d);
-        AddTail(e);
-        AddTail(f);
-        AddTail(g);
-        AddTail(h);
-        AddTail(i);
+        MTaskSet *self = this;
+        self->AddTail(a);
+        self->AddTail(b);
+        self->AddTail(c);
+        self->AddTail(d);
+        self->AddTail(e);
+        self->AddTail(f);
+        self->AddTail(g);
+        self->AddTail(h);
+        self->AddTail(i);
     }
     void AddTail(MTask *a, MTask *b, MTask *c, MTask *d, MTask *e, MTask *f, MTask *g, MTask *h, MTask *i,
                  MTask *j) {
-        AddTail(a);
-        AddTail(b);
-        AddTail(c);
-        AddTail(d);
-        AddTail(e);
-        AddTail(f);
-        AddTail(g);
-        AddTail(h);
-        AddTail(i);
-        AddTail(j);
+        MTaskSet *self = this;
+        self->AddTail(a);
+        self->AddTail(b);
+        self->AddTail(c);
+        self->AddTail(d);
+        self->AddTail(e);
+        self->AddTail(f);
+        self->AddTail(g);
+        self->AddTail(h);
+        self->AddTail(i);
+        self->AddTail(j);
+    }
+    void AddTail(MTask *a, MTask *b, MTask *c, MTask *d, MTask *e, MTask *f, MTask *g, MTask *h, MTask *i,
+                 MTask *j, MTask *k) {
+        MTaskSet *self = this;
+        self->AddTail(a);
+        self->AddTail(b);
+        self->AddTail(c);
+        self->AddTail(d);
+        self->AddTail(e);
+        self->AddTail(f);
+        self->AddTail(g);
+        self->AddTail(h);
+        self->AddTail(i);
+        self->AddTail(j);
+        self->AddTail(k);
     }
     void AddTail(MTask *a, MTask *b, MTask *c, MTask *d, MTask *e, MTask *f, MTask *g, MTask *h, MTask *i,
                  MTask *j, MTask *k, MTask *l, MTask *m) {
-        AddTail(a);
-        AddTail(b);
-        AddTail(c);
-        AddTail(d);
-        AddTail(e);
-        AddTail(f);
-        AddTail(g);
-        AddTail(h);
-        AddTail(i);
-        AddTail(j);
-        AddTail(k);
-        AddTail(l);
-        AddTail(m);
+        MTaskSet *self = this;
+        self->AddTail(a);
+        self->AddTail(b);
+        self->AddTail(c);
+        self->AddTail(d);
+        self->AddTail(e);
+        self->AddTail(f);
+        self->AddTail(g);
+        self->AddTail(h);
+        self->AddTail(i);
+        self->AddTail(j);
+        self->AddTail(k);
+        self->AddTail(l);
+        self->AddTail(m);
     }
     void Remove(MTask *task);
     void Remove(MTask *a, MTask *b) {

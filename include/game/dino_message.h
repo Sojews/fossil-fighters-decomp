@@ -148,6 +148,13 @@ public:
 class DinoBattleViewCreatureBeginSignal : public MMessage {
 public:
     DinoBattleViewCreatureBeginSignal() : MMessage(0x10007) {}
+    // (Takes the creature's 0x18-byte state, like DinoBattleModelCreatureBeginSignal.)
+    template <class C>
+    DinoBattleViewCreatureBeginSignal(u32 side, u32 id, u32 slot, C creature, u32 unk30)
+        : MMessage(0x10007), mUnk0C(side), mUnk10(id), mUnk14(slot) {
+        *(C *)mUnk18 = creature;
+        mUnk30 = unk30;
+    }
     virtual u32 GetSize() { return 44; }
     virtual void Write(void *buf) {
         MI_CpuCopy8(&mId, buf, 4);
@@ -176,6 +183,13 @@ public:
 class DinoBattleViewPlayerBeginSignal : public MMessage {
 public:
     DinoBattleViewPlayerBeginSignal() : MMessage(0x10008) {}
+    DinoBattleViewPlayerBeginSignal(u32 side, const void *name, u32 kasekiPoints, u32 unk34, u8 unk38)
+        : MMessage(0x10008), mUnk0C(side) {
+        MI_CpuCopy8(name, mUnk10, sizeof(mUnk10));
+        mUnk30 = kasekiPoints;
+        mUnk34 = unk34;
+        mUnk38 = unk38;
+    }
     virtual u32 GetSize() { return 52; }
     virtual void Write(void *buf) {
         MI_CpuCopy8(&mId, buf, 4);
@@ -1535,6 +1549,7 @@ public:
 class DinoBattleModelCreatureSpecialLifeRecoveryRequest : public MMessage {
 public:
     DinoBattleModelCreatureSpecialLifeRecoveryRequest() : MMessage(0x1003E) {}
+    DinoBattleModelCreatureSpecialLifeRecoveryRequest(u32 a, u32 b) : MMessage(0x1003E), mUnk0C(a), mUnk10(b) {}
     virtual u32 GetSize() { return 12; }
     virtual void Write(void *buf) {
         MI_CpuCopy8(&mId, buf, 4);
@@ -2464,6 +2479,8 @@ public:
 class DinoBattleViewShowAttackNameBarRequest : public MMessage {
 public:
     DinoBattleViewShowAttackNameBarRequest() : MMessage(0x1006F) {}
+    DinoBattleViewShowAttackNameBarRequest(u32 a, u32 attack, u8 c, u8 d)
+        : MMessage(0x1006F), mUnk0C(a), mUnk10(attack), mUnk14(c), mUnk15(d) {}
     virtual u32 GetSize() { return 16; }
     virtual void Write(void *buf) {
         MI_CpuCopy8(&mId, buf, 4);
@@ -3065,6 +3082,7 @@ public:
 class DinoBattleViewPlayerWaitKPCountStopRequest : public MMessage {
 public:
     DinoBattleViewPlayerWaitKPCountStopRequest() : MMessage(0x10092) {}
+    DinoBattleViewPlayerWaitKPCountStopRequest(u32 a, u32 b) : MMessage(0x10092), mUnk0C(a), mUnk10(b) {}
     virtual u32 GetSize() { return 12; }
     virtual void Write(void *buf) {
         MI_CpuCopy8(&mId, buf, 4);
