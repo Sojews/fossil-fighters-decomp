@@ -112,7 +112,6 @@ void MotionAdvantageArrow::Unk44(int arg) {
 }
 
 
-// NONMATCHING: 98%, the game halves the sums straight from registers (ours stores them first).
 DinoBattleViewAdvantageArrow::DinoBattleViewAdvantageArrow(u32 unk74, MSmartOam *oam) : MProcess(NULL) {
     mUnk74 = unk74;
     mOam = oam;
@@ -122,12 +121,7 @@ DinoBattleViewAdvantageArrow::DinoBattleViewAdvantageArrow(u32 unk74, MSmartOam 
     defs = gDinoResource->GetBattleAdjustDefs();
     mPoints[1] = MPoint(defs->advantageArrowX1, defs->advantageArrowY1);
     mArrow = new MotionAdvantageArrow(std::string(data_ov000_02191b1c.mArrowPath), mOam);
-    MPoint mid;
-    mid.y = mPoints[0].y + mPoints[1].y;
-    mid.x = mPoints[0].x + mPoints[1].x;
-    mid.x /= 2;
-    mid.y /= 2;
-    mArrow->SetPosition(mid);
+    mArrow->SetPosition((mPoints[0] + mPoints[1]) / 2);
     mArrow->SetPriority(2);
     mArrow->SetAnchor(0);
     mArrow->Hide();
