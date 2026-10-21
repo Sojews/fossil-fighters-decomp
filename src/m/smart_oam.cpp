@@ -1,4 +1,4 @@
-// MSmartOam and its blocks, transfers and animation. MSmartOam::Execute (in ITCM) isn't decompiled yet.
+// MSmartOam and its blocks, transfers and animation.
 
 #include "m/smart_oam.h"
 #include "m/display.h"
@@ -258,3 +258,69 @@ void MSmartOamShowTransfer::Transfer() {
 void MSmartOamOffsetTransfer::Transfer() {
     mOam->SetOffset(mOffset);
 }
+
+// Places the entries into the real OAM block every frame: sorted first if asked (by anchor, depth and/or link),
+// offset, clipped to the screen; the block's remaining entries are hidden.
+// NONMATCHING: register allocation (the game keeps the sort mask in r5 and the cell loop's counters in r9/lr).
+#pragma section ITCM begin
+#pragma thumb off
+void MSmartOam::Execute() {
+    MScopedLock lock(&mHeap->mMutex, TRUE);
+    if (mHidden) {
+        mOamBlock->Hide();
+        return;
+    }
+    if (mUnk1C != 0) {
+        u32 mask = 0;
+        if (mUnk1C & 1) {
+            mask |= 0xc0000000;
+        }
+        if (mUnk1C & 2) {
+            mask |= 0x3fffc000;
+        }
+        if (mUnk1C & 4) {
+            mask |= 0x3ff;
+        }
+        for (u32 i = 2; i <= mCount; i++) {
+            int index = mOrder[i];
+            u32 key = mEntries[index].links & mask;
+            u32 j = i;
+            while ((mEntries[mOrder[j - 1]].links & mask) > key) {
+                mOrder[j] = mOrder[j - 1];
+                j--;
+            }
+            mOrder[j] = index;
+        }
+    }
+    MOamCell *dst = mOamBlock->GetEntries();
+    int left = mUnk3C;
+    int top = mUnk40;
+    int right = mClipWidth;
+    int bottom = mClipHeight;
+    u32 i = 1;
+    u32 used = 0;
+    for (; i <= mCount && used < mOamCount; i++) {
+        MSmartOamCell *cell = &mEntries[mOrder[i]];
+        if (cell->objMode == 2) {
+            continue;
+        }
+        MPoint origin;
+        origin.x = cell->posX - cell->unk08;
+        origin.y = cell->posY - cell->unk0C;
+        MPoint pos = origin - mOffset;
+        if (pos.x + cell->width < left || pos.x >= right || pos.y + cell->height < top || pos.y >= bottom) {
+            continue;
+        }
+        dst->attr01 = cell->attr01;
+        dst->attr2 = cell->attr2;
+        dst->SetCoord(pos);
+        dst++;
+        used++;
+    }
+    for (; used < mOamCount; used++) {
+        dst->objMode = 2;
+        dst++;
+    }
+}
+#pragma thumb reset
+#pragma section ITCM end

@@ -343,6 +343,7 @@ src/m/index_bitmap.cpp:
 
 src/m/smart_oam.cpp:
     .text       start:0x0205b5b8 end:0x0205bc1c
+    .itcm       start:0x01ff9258 end:0x01ff94dc
 
 src/m/text_codec_globals.cpp:
     .text       start:0x0204e19c end:0x0204e2a0
