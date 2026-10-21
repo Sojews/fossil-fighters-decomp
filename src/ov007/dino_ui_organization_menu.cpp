@@ -1511,7 +1511,6 @@ void DinoUiOrganizationMenu::Refresh() {
     FocusNearestItem(GetCursor());
 }
 
-extern "C" MTask *func_ov007_0217d1c0(DinoUiOrganizationMenu *menu, DinoTeam *saved);
 extern const u32 data_0208aa38, data_0208aa3c;
 
 // Fades out and exits once the 3D model is done.
@@ -1583,10 +1582,87 @@ void DinoUiOrganizationMenu::Back() {
         if (DinoTeamDiffers(&mTeam, &saved)) {
             mSerial.AddTail(
                 new DinoCommonWindowMessageBox(MPoint(0x80, 0x60), gDinoResource->GetText(data_0208aa3c), 4));
-            mSerial.AddTail(func_ov007_0217d1c0(this, &saved));
+            mSerial.AddTail(CreateRevertTasks(&saved));
         }
     }
     Leave();
+}
+
+// Where a list slot is on the page.
+static inline MPoint DinoOrgSlotPos(int slot) {
+    int row = slot / 5;
+    int column = slot % 5;
+    MPoint pos;
+    pos.x = data_ov007_0218ebec.slotX + data_ov007_0218ebec.slotColumnX * column + data_ov007_0218ebec.slotRowX * row;
+    pos.y = data_ov007_0218ebec.slotY + data_ov007_0218ebec.slotColumnY * column + data_ov007_0218ebec.slotRowY * row;
+    return pos;
+}
+
+// Backing out of changes: each changed member flies back to the list (or to the slot it came from), and each saved
+// member flies back into its slot (a medal made for it if its page isn't showing).
+MTask *DinoUiOrganizationMenu::CreateRevertTasks(DinoTeam *saved) {
+    MParallelTaskSet *moves = new MParallelTaskSet(TRUE);
+    for (int i = 0; i < 5; i++) {
+        if (mTeam.slots[i] == saved->slots[i]) {
+            continue;
+        }
+        if (mTeam.slots[i] != 0) {
+            int j = 5;
+            for (int k = 0; k < 5; k++) {
+                if (mTeam.slots[i] == saved->slots[k]) {
+                    j = k;
+                }
+            }
+            if (j != 5) {
+                moves->AddTail(mListItems[i]->CreateFlyInTask(data_ov007_0218ef0c[j]));
+            } else {
+                int index = std::find(mCreatures.begin(), mCreatures.end(), mTeam.slots[i]) - mCreatures.begin();
+                if (index / 15 < mPage) {
+                    moves->AddTail(mListItems[i]->CreateFlyInTask(data_ov007_0218ecbc));
+                } else if (index / 15 > mPage) {
+                    moves->AddTail(mListItems[i]->CreateFlyInTask(data_ov007_0218ecc4));
+                } else {
+                    moves->AddTail(mListItems[i]->CreateFlyInTask(DinoOrgSlotPos(index % 15)));
+                }
+            }
+        }
+        u8 old = saved->slots[i];
+        if (old == 0) {
+            continue;
+        }
+        int k, j;
+        j = 5;
+        for (k = 0; k < 5; k++) {
+            if (old == mTeam.slots[k]) {
+                j = k;
+            }
+        }
+        if (j != 5) {
+            continue;
+        }
+        int index = std::find(mCreatures.begin(), mCreatures.end(), saved->slots[i]) - mCreatures.begin();
+        if (index / 15 == mPage) {
+            moves->AddTail(mSlots[index % 15]->CreateFlyInTask(data_ov007_0218ef0c[i]));
+            continue;
+        }
+        DinoCreatureState creature;
+        gDinoBackup->GetCreature(old, &creature);
+        u8 maxed;
+        if (GetCreatureLevel(creature) == 12) {
+            maxed = TRUE;
+        } else {
+            maxed = FALSE;
+        }
+        DinoUiPartsReviverMedalButton *button;
+        if (index / 15 < mPage) {
+            button = new DinoUiPartsReviverMedalButton(mOam, data_ov007_0218ecbc, saved->slots[i], maxed, 0);
+        } else {
+            button = new DinoUiPartsReviverMedalButton(mOam, data_ov007_0218ecc4, saved->slots[i], maxed, 0);
+        }
+        AddItem(button);
+        moves->AddTail(button->CreateFlyInTask(data_ov007_0218ef0c[i]));
+    }
+    return moves;
 }
 
 void DinoUiOrganizationMenu::CreateSlots() {

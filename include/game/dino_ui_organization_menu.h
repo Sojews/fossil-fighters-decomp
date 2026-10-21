@@ -106,6 +106,7 @@ public:
     void Leave();
     void SelectMember(int index);
     void RemoveMember();
+    MTask *CreateRevertTasks(DinoTeam *saved);
     // Where the creature is in the list (the list's size if it isn't there).
     int FindCreature(u8 id) {
         int i;
