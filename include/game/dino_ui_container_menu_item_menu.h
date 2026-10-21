@@ -37,6 +37,7 @@ public:
     void SelectTab(int tab);
     void Decide(int index);
     void ClearItems();
+    void RefreshEntries();
     void RefreshPage2();
     void RefreshOKButton();
     // Throws the chosen entry away, if the player said yes.

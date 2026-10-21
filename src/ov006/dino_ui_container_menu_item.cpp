@@ -155,7 +155,28 @@ BOOL DinoUiContainerMenu::PageLeft() {
     return TRUE;
 }
 
-extern "C" void func_ov006_021759b8(DinoUiContainerMenu *menu);
+static inline const DinoUiFossilEntry &AsFossilEntry(const DinoKasekiButtonInfo &info) {
+    return *(const DinoUiFossilEntry *)&info;
+}
+
+// Lists the rocks in the containers.
+// NONMATCHING: as DinoUiContainerBaseMenu::RefreshEntries, the game addresses the button info and the resource
+// copy from one stack base register.
+void DinoUiContainerMenu::RefreshEntries() {
+    mUnk100.clear();
+    for (int i = 0; i < 0x40; i++) {
+        DinoBackupEntry entry;
+        gDinoBackup->GetUnk98(i, &entry);
+        if (entry.id) {
+            mUnk100.push_back(AsFossilEntry(DinoGetKasekiButtonInfo(&entry, mKasekiDefs)));
+        }
+    }
+    if (mUnk100.size() == 0) {
+        mLastPage = 0;
+    } else {
+        mLastPage = (mUnk100.size() - 1) / 8;
+    }
+}
 
 void DinoUiContainerMenu::FinishDiscard() {
     if (mUnk120 == 1) {
@@ -176,7 +197,7 @@ void DinoUiContainerMenu::FinishDiscard() {
         MI_CpuFill8(&entry, 0, sizeof(entry));
         gDinoBackup->SetUnk98(mUnk11C, &entry);
         gDinoBackup->CompactUnk98();
-        func_ov006_021759b8(this);
+        RefreshEntries();
         ClearItems();
         RefreshPage2();
         FocusNearestItem(mCursor->GetPosition());
@@ -482,7 +503,7 @@ void DinoUiContainerMenu::OnStart() {
     mKasekiDefs = gDinoResource->LoadKasekiDefs();
     gDinoBackup->CompactUnk98();
     gDinoBackup->GetPlayer(&player, 0);
-    func_ov006_021759b8(this);
+    RefreshEntries();
     if (mLastPage > 0) {
         mPageL = new DinoUiContainerPageLButton(this);
         AddItem(mPageL);
