@@ -461,6 +461,8 @@ extern "C" struct {
     void (DinoUiMuseum::*FinishPageLeft_00)();
 } data_ov006_0219627c;
 
+template MTask *MCreateBgCallTask(DinoUiMuseum *obj, void (DinoUiMuseum::*func)(), int thread);
+
 // Turns to the next page (wrapping around), loading its motions in the background.
 void DinoUiMuseumMenu::PageRight() {
     if (mPage == mPageCount) {
@@ -594,7 +596,6 @@ void DinoUiMuseumMenu::OnIdle() {
 #pragma auto_inline off
 template MTask *MCreateBgCallTask(DinoUiMuseum3DModel *obj, void (DinoUiMuseum3DModel::*func)(), int thread);
 #pragma auto_inline reset
-template MTask *MCreateBgCallTask(DinoUiMuseum *obj, void (DinoUiMuseum::*func)(), int thread);
 // DinoUiMuseumMenu::OnFocus (not decompiled yet) re-enables the help through a call task.
 // The menu's layout (filled in at start).
 struct DinoUiMuseumLayout {
