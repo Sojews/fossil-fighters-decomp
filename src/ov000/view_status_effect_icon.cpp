@@ -37,7 +37,7 @@ void ViewStatusEffectIconLoadMotionTask::Execute() {
         delete icon->mMotion;
     }
     icon->mMotion = new MMotion(std::string(path), icon->mOam, 2, 1);
-    icon->mMotion->SetPosition(*(MPoint *)&icon->mUnk7C);
+    icon->mMotion->SetPosition(icon->mPos);
     icon->mMotion->SetPriority(2);
     icon->mMotion->SetAnchor(1);
     if (!hidden) {

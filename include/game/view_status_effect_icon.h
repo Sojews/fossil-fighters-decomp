@@ -74,8 +74,8 @@ public:
     ViewStatusEffectIcon(MSmartOam *oam) : MProcess(NULL) {
         mMotion = NULL;
         mOam = oam;
-        mUnk7C = 0;
-        mUnk80 = 0;
+        mPos.x = 0;
+        mPos.y = 0;
         mTasks = new MSerialTaskSet();
         mParallel.AddTail(mTasks);
     }
@@ -106,8 +106,7 @@ public:
 
     MMotion *mMotion;           // 0x74
     MSmartOam *mOam;            // 0x78
-    u32 mUnk7C;                 // 0x7C
-    u32 mUnk80;                 // 0x80
+    MPoint mPos;                // 0x7C
     MSerialTaskSet *mTasks;     // 0x84
 
     BOOL IsPlaying() {
@@ -141,7 +140,7 @@ public:
             delete mMotion;
         }
         mMotion = new MMotion(std::string(path), mOam, 2, 1);
-        mMotion->SetPosition(*(MPoint *)&mUnk7C);
+        mMotion->SetPosition(mPos);
         mMotion->SetPriority(2);
         mMotion->SetAnchor(1);
         if (!hidden) {
@@ -169,8 +168,7 @@ public:
         }
     }
     void SetPosition(MPoint pos) {
-        mUnk7C = pos.x;
-        mUnk80 = pos.y;
+        mPos = pos;
         if (mMotion != NULL) {
             mMotion->SetPosition(pos);
         }

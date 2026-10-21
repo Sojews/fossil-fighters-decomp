@@ -101,6 +101,10 @@ struct DinoFieldCharaData {
     MFx32Rect mRect30;  // 0x30: the collision box, around the position
     MRect mRect40;      // 0x40
     MFx32 mUnk50;       // 0x50: -10 = the default
+    u32 mWalkStepCount; // 0x54: the frames of the walk motion with a footstep
+    u32 mWalkSteps;     // 0x58: offset of them (u16s)
+    u32 mRunStepCount;  // 0x5C: the same for the run motion
+    u32 mRunSteps;      // 0x60
 };
 
 // Defaults in main's data.
@@ -578,6 +582,109 @@ void DinoFieldChara::StartBehold(u32 target) {
 
 void DinoFieldChara::FinishBehold() {
     mBeholdTarget = 0;
+}
+
+// The direction of the vector, as an angle index.
+static inline u16 MFx32PointAngle(MFx32Point v) {
+    return MFx32Atan2(v.y, v.x);
+}
+
+// Each frame: the footstep sound on the motion's step frames, the manpu over the head, turning to the character
+// beheld; then (outside the field's unk258 mode) the reaction to the camera's focus or the task's step, and the walk.
+void DinoFieldChara::Idle() {
+    if (mModel.id == 0) {
+        return;
+    }
+    if (mUnk310 != 0) {
+        if (mBody != NULL) {
+            u32 frame = mBody->mUnk140 >> 4;
+            if (frame != mUnk314) {
+                mUnk314 = frame;
+                switch (mMotion) {
+                case 2:
+                    for (u32 i = 0; i < ((DinoFieldCharaData *) mData.mFile.GetData())->mWalkStepCount; i++) {
+                        DinoFieldCharaData *data = (DinoFieldCharaData *) mData.mFile.GetData();
+                        if (frame == ((u16 *) ((u8 *) data + data->mWalkSteps))[i]) {
+                            DinoSoundPlaySe(mUnk310, 0);
+                            break;
+                        }
+                    }
+                    break;
+                case 3:
+                    for (u32 i = 0; i < ((DinoFieldCharaData *) mData.mFile.GetData())->mRunStepCount; i++) {
+                        DinoFieldCharaData *data = (DinoFieldCharaData *) mData.mFile.GetData();
+                        if (frame == ((u16 *) ((u8 *) data + data->mRunSteps))[i]) {
+                            DinoSoundPlaySe(mUnk310, 0);
+                            break;
+                        }
+                    }
+                    break;
+                }
+            }
+        }
+        mUnk310 = 0;
+    }
+    if (mManpu != NULL) {
+        M3DModel *model = mBody->mModel;
+        MPoint head;
+        model->GetJointScreenPos(model->FindJoint("head"), &head);
+        mManpu->SetPosition(MPoint(head.x + mUnk2FC[0], head.y + mUnk2FC[1]));
+    }
+    if (mBeholdTarget != 0) {
+        DinoFieldChara *chara = mField->GetChara(mBeholdTarget);
+        if (chara != NULL) {
+            mModel.angle = MFx32PointAngle(chara->mModel.pos - mModel.pos);
+            ApplyMotion();
+        }
+    }
+    if (mField->IsUnk258()) {
+        return;
+    }
+    if (((DinoFieldCharaData *) mData.mFile.GetData())->mUnk20 == 1) {
+        u32 focus = mField->GetCamera()->GetFocus();
+        if (focus == 0) {
+            return;
+        }
+        DinoFieldChara *chara = mField->GetChara(focus);
+        if (chara == NULL) {
+            return;
+        }
+        DinoFieldCharaData *data = (DinoFieldCharaData *) mData.mFile.GetData();
+        MFx32Point d = chara->mModel.pos - mModel.pos;
+        BOOL near = d.x * d.x + d.y * d.y <= MFx32::FromRaw(FX_Mul(data->mNearRange.v, data->mNearRange.v));
+        if (near != IsUnkA1Motion()) {
+            PlayReaction();
+        }
+        ApplyMotion();
+        return;
+    }
+    if (((DinoFieldCharaData *) mData.mFile.GetData())->mUnk20 == 2) {
+        ApplyMotion();
+        return;
+    }
+    switch (mTask.unk4) {
+    case 0:
+        IdleNoTask();
+        break;
+    case 1:
+        IdleFollow();
+        break;
+    case 2:
+        IdleWander();
+        break;
+    case 3:
+        IdlePatrol();
+        break;
+    }
+    if (mUnk2E0 != 0) {
+        SetMotion(mUnk2E0, 1, mUnk2E4);
+        mUnk2E0 = 0;
+        if (mUnk2D8.x != MFx32(0) || mUnk2D8.y != MFx32(0)) {
+            mModel.angle = MFx32Atan2(mUnk2D8.y, mUnk2D8.x);
+            mModel.pos = mField->ResolveMove(this, mUnk2D8);
+        }
+        ApplyMotion();
+    }
 }
 
 // The following settings in the excavation settings' block at offset78.
