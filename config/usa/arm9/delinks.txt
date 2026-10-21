@@ -309,6 +309,7 @@ src/game/dino_event_exec.cpp:
 
 src/game/dino_main.cpp:
     .text       start:0x0204760c end:0x02049004
+    .init       start:0x02089484 end:0x02089528
 
 src/game/multi_play_error_dialog.cpp:
     .text       start:0x02049004 end:0x02049388
