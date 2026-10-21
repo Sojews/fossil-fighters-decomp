@@ -29,9 +29,11 @@ public:
     MMessageObserver *mUnkB4;   // 0xB4
     DinoBattle *mBattle;        // 0xB8
     DinoCommonLive *mLive;      // 0xBC: the commentary
-    u32 unkC0;
+    u8 mControllerReady[2];     // 0xC0: by side, set when its controller has initialized
+    u8 unkC2[2];
     u32 mUnkC4;                 // 0xC4
-    u32 unkC8[2];
+    u32 mUnkC8;                 // 0xC8: the side that moved first
+    u32 mUnkCC;                 // 0xCC: turn-end replies still awaited
     u32 mUnkD0;                 // 0xD0
 };
 

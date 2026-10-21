@@ -8,6 +8,10 @@ class DinoBattleModel;
 
 class SendLocalMessageTask : public MTask {
 public:
+    SendLocalMessageTask(MMessage *msg, DinoBattleModel *model) {
+        mMessage = msg;
+        mModel = model;
+    }
     virtual ~SendLocalMessageTask();
     virtual void Execute();
 

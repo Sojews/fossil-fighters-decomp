@@ -165,7 +165,9 @@ struct DinoBattleAdjustDefs {
     int advantageArrowX1;   // 0x188: and at the second
     int advantageArrowY1;   // 0x18C
     u8 abilityMenuWrap; // 0x190: the ability menu's cursor wraps around
-    u8 unk191[0x198 - 0x191];
+    u8 unk191;
+    u8 unk192;          // 0x192: (with unk170) the 3D view shows the game-set effect
+    u8 unk193[0x198 - 0x193];
     fx32 rankScaleHigh;     // 0x198
     fx32 rankScaleLow;      // 0x19C
     u8 unk1A0[0x1AC - 0x1A0];

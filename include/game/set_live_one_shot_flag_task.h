@@ -5,6 +5,10 @@
 
 class SetLiveOneShotFlagTask : public MTask {
 public:
+    SetLiveOneShotFlagTask(void *field, u32 flag) {
+        mUnk10 = (u32)field;
+        mUnk14 = flag;
+    }
     virtual ~SetLiveOneShotFlagTask();
     virtual void Execute();
 

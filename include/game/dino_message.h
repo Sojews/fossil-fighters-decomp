@@ -205,6 +205,7 @@ public:
 class DinoBattleViewEffectGameBeginRequest : public MMessage {
 public:
     DinoBattleViewEffectGameBeginRequest() : MMessage(0x10009) {}
+    DinoBattleViewEffectGameBeginRequest(u32 a) : MMessage(0x10009), mUnk0C(a) {}
     virtual u32 GetSize() { return 8; }
     virtual void Write(void *buf) {
         MI_CpuCopy8(&mId, buf, 4);
@@ -233,6 +234,7 @@ public:
 class DinoBattleViewEffectTurnBeginRequest : public MMessage {
 public:
     DinoBattleViewEffectTurnBeginRequest() : MMessage(0x1000B) {}
+    DinoBattleViewEffectTurnBeginRequest(u32 a, u32 b) : MMessage(0x1000B), mUnk0C(a), mUnk10(b) {}
     virtual u32 GetSize() { return 12; }
     virtual void Write(void *buf) {
         MI_CpuCopy8(&mId, buf, 4);
@@ -277,6 +279,7 @@ public:
 class DinoBattleModelPlayerTurnBeginRequst : public MMessage {
 public:
     DinoBattleModelPlayerTurnBeginRequst() : MMessage(0x1000E) {}
+    DinoBattleModelPlayerTurnBeginRequst(u32 a, u32 b) : MMessage(0x1000E), mUnk0C(a), mUnk10(b) {}
     virtual u32 GetSize() { return 12; }
     virtual void Write(void *buf) {
         MI_CpuCopy8(&mId, buf, 4);
@@ -442,6 +445,7 @@ public:
 class DinoBattleModelTurnEndRequest : public MMessage {
 public:
     DinoBattleModelTurnEndRequest() : MMessage(0x10015) {}
+    DinoBattleModelTurnEndRequest(u32 a, u32 b, u32 c) : MMessage(0x10015), mUnk0C(a), mUnk10(b), mUnk14(c) {}
     virtual u32 GetSize() { return 16; }
     virtual void Write(void *buf) {
         MI_CpuCopy8(&mId, buf, 4);
@@ -1284,6 +1288,7 @@ public:
 class DinoBattleModelCreatureEndRequest : public MMessage {
 public:
     DinoBattleModelCreatureEndRequest() : MMessage(0x10031) {}
+    DinoBattleModelCreatureEndRequest(u32 a, u32 b, u32 c) : MMessage(0x10031), mUnk0C(a), mUnk10(b), mUnk14(c) {}
     virtual u32 GetSize() { return 16; }
     virtual void Write(void *buf) {
         MI_CpuCopy8(&mId, buf, 4);
@@ -1385,6 +1390,7 @@ public:
 class DinoBattleViewEffectGameEndRequest : public MMessage {
 public:
     DinoBattleViewEffectGameEndRequest() : MMessage(0x10036) {}
+    DinoBattleViewEffectGameEndRequest(u32 a, u32 b) : MMessage(0x10036), mUnk0C(a), mUnk10(b) {}
     virtual u32 GetSize() { return 12; }
     virtual void Write(void *buf) {
         MI_CpuCopy8(&mId, buf, 4);
@@ -1455,6 +1461,7 @@ public:
 class DinoBattleModelCreatureTurnBeginRequest : public MMessage {
 public:
     DinoBattleModelCreatureTurnBeginRequest() : MMessage(0x1003A) {}
+    DinoBattleModelCreatureTurnBeginRequest(u32 a, u32 b) : MMessage(0x1003A), mUnk0C(a), mUnk10(b) {}
     virtual u32 GetSize() { return 12; }
     virtual void Write(void *buf) {
         MI_CpuCopy8(&mId, buf, 4);
@@ -1825,6 +1832,7 @@ public:
 class DinoBattleModelPlayerConfusionExecRequest : public MMessage {
 public:
     DinoBattleModelPlayerConfusionExecRequest() : MMessage(0x1004D) {}
+    DinoBattleModelPlayerConfusionExecRequest(u32 a, u32 b) : MMessage(0x1004D), mUnk0C(a), mUnk10(b) {}
     virtual u32 GetSize() { return 12; }
     virtual void Write(void *buf) {
         MI_CpuCopy8(&mId, buf, 4);
@@ -2109,6 +2117,7 @@ public:
 class DinoBattleViewCreatureTurnBeginSignal : public MMessage {
 public:
     DinoBattleViewCreatureTurnBeginSignal() : MMessage(0x1005D) {}
+    DinoBattleViewCreatureTurnBeginSignal(u32 a, u8 b) : MMessage(0x1005D), mUnk0C(a), mUnk10(b) {}
     virtual u32 GetSize() { return 12; }
     virtual void Write(void *buf) {
         MI_CpuCopy8(&mId, buf, 4);
@@ -2129,6 +2138,7 @@ public:
 class DinoBattleViewCreatureTurnEndSignal : public MMessage {
 public:
     DinoBattleViewCreatureTurnEndSignal() : MMessage(0x1005E) {}
+    DinoBattleViewCreatureTurnEndSignal(u32 a) : MMessage(0x1005E), mUnk0C(a) {}
     virtual u32 GetSize() { return 8; }
     virtual void Write(void *buf) {
         MI_CpuCopy8(&mId, buf, 4);
@@ -2629,6 +2639,7 @@ public:
 class DinoBattleView3DPreTurnEndRequest : public MMessage {
 public:
     DinoBattleView3DPreTurnEndRequest() : MMessage(0x10079) {}
+    DinoBattleView3DPreTurnEndRequest(u32 a, u32 b) : MMessage(0x10079), mUnk0C(a), mUnk10(b) {}
     virtual u32 GetSize() { return 12; }
     virtual void Write(void *buf) {
         MI_CpuCopy8(&mId, buf, 4);
@@ -2660,6 +2671,7 @@ public:
 class DinoBattleView3DTurnEndRequest : public MMessage {
 public:
     DinoBattleView3DTurnEndRequest() : MMessage(0x1007B) {}
+    DinoBattleView3DTurnEndRequest(u32 a, u32 b) : MMessage(0x1007B), mUnk0C(a), mUnk10(b) {}
     virtual u32 GetSize() { return 12; }
     virtual void Write(void *buf) {
         MI_CpuCopy8(&mId, buf, 4);
@@ -2931,6 +2943,7 @@ public:
 class DinoBattleView3DGameSetRequest : public MMessage {
 public:
     DinoBattleView3DGameSetRequest() : MMessage(0x1008B) {}
+    DinoBattleView3DGameSetRequest(u32 a, u32 b) : MMessage(0x1008B), mUnk0C(a), mUnk10(b) {}
     virtual u32 GetSize() { return 12; }
     virtual void Write(void *buf) {
         MI_CpuCopy8(&mId, buf, 4);
@@ -2981,6 +2994,9 @@ public:
 class DinoBattleViewDecideFirstAttackTeamRequest : public MMessage {
 public:
     DinoBattleViewDecideFirstAttackTeamRequest() : MMessage(0x1008E) {}
+    DinoBattleViewDecideFirstAttackTeamRequest(u32 a, u32 b, const void *points) : MMessage(0x1008E), mUnk0C(a), mUnk10(b) {
+        MI_CpuCopy8(points, mUnk14, sizeof(mUnk14));
+    }
     virtual u32 GetSize() { return 20; }
     virtual void Write(void *buf) {
         MI_CpuCopy8(&mId, buf, 4);
