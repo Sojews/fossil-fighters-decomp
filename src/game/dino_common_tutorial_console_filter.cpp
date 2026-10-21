@@ -20,6 +20,9 @@
 #include "game/dino_backup.h"
 #include "nitro/os.h"
 
+// (wstring::assign comes out ahead of the others, so that __replace isn't followed by its callee in our object.)
+template std::wstring &std::wstring::assign(const wchar_t *first, const wchar_t *last);
+
 
 DinoCommonTutorialConsoleFilter::~DinoCommonTutorialConsoleFilter() {
 }
