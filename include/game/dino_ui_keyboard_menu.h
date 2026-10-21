@@ -57,7 +57,10 @@ public:
     DinoHelpDummyItem *mHelp;   // 0x15C: the help for the name (the player's or the team's)
     u32 unk160;
     DinoHelpDummyItem *mKeysHelp;   // 0x164: the help for the keys
-    u8 unk168[0x180 - 0x168];
+    class DinoHelpItem *mPageHelp;  // 0x168
+    class DinoHelpItem *mOkHelp;    // 0x16C
+    class DinoHelpItem *mBackHelp;  // 0x170
+    u8 unk174[0x180 - 0x174];
     MPoint mFocusPos;           // 0x180
     int mMode;                  // 0x188
     u32 mArg;                   // 0x18C

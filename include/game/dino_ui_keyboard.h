@@ -53,6 +53,12 @@ public:
 
 class KeyboardMenuItem : public MMenuItem {
 public:
+    KeyboardMenuItem(u32 index, u32 arg, MPoint pos, DinoUiKeyboardMenu *menu) {
+        mIndex = index;
+        mArg = arg;
+        mPos = pos;
+        unk98 = (u32)menu;
+    }
     virtual ~KeyboardMenuItem();
     virtual MRect GetFrame();
 
@@ -65,6 +71,10 @@ public:
 
 class DinoUiKeyboardMenuItem : public KeyboardMenuItem, public DinoHelpItem {
 public:
+    // A character key.
+    DinoUiKeyboardMenuItem(u32 index, u32 arg, MPoint pos, DinoUiKeyboardMenu *menu);
+    // A function key: its frame's half size and its help.
+    DinoUiKeyboardMenuItem(u32 index, u32 arg, MPoint pos, DinoUiKeyboardMenu *menu, MPoint halfSize, u32 textId);
     virtual ~DinoUiKeyboardMenuItem();
     virtual void OnFocusChanged(BOOL focused);
     virtual void OnSelectChanged(BOOL selected);
@@ -80,6 +90,21 @@ public:
 
 class DinoUiKeyboardHideMenuItem : public KeyboardMenuItem {
 public:
+    DinoUiKeyboardHideMenuItem(u32 index, u32 arg, MPoint pos, DinoUiKeyboardMenu *menu)
+        : KeyboardMenuItem(index, arg, pos, menu) {
+        if (mIndex == 0xF2) {
+            mFrame.left = mPos.x;
+            mFrame.top = mPos.y;
+            mFrame.right = mPos.x + 0x40;
+            mFrame.bottom = mPos.y + 0xC;
+        } else {
+            int half = mIndex == 0xF0 ? 6 : 0xC;
+            mFrame.left = mPos.x - half;
+            mFrame.top = mPos.y - half;
+            mFrame.right = mPos.x + half;
+            mFrame.bottom = mPos.y + half;
+        }
+    }
     virtual ~DinoUiKeyboardHideMenuItem();
     virtual void OnFocusChanged(BOOL focused);
     virtual void OnSelectChanged(BOOL selected);
@@ -90,6 +115,7 @@ public:
 
 class DinoKBBackButton : public KeyboardMenuItem, public DinoHelpItem {
 public:
+    DinoKBBackButton(DinoUiKeyboardMenu *menu, MSmartOam *oam, MPoint pos, u32 textId);
     virtual ~DinoKBBackButton();
     virtual MRect GetFrame();
     virtual void OnFocusChanged(BOOL focused);

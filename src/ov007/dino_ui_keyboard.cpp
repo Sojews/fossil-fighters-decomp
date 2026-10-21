@@ -735,6 +735,246 @@ void DinoUiKeyboardMenu::OnStart() {
 }
 #pragma opt_common_subs reset
 
+// The keyboard's layout: the motions' paths, then the places of the back button and the page key.
+struct DinoUiKeyboardLayout {
+    const char *mPaths[13];     // 0x00: [4]/[7] the page arrows, [6] the back button, [8] the cursor
+    MPoint mBackPos;            // 0x34
+    u8 unk3C[0x54 - 0x3C];
+    MPoint mPageSize;           // 0x54: the page key's half size
+    u8 unk5C[0x64 - 0x5C];
+    MPoint mPagePos;            // 0x64
+};
+struct DinoUiKeyboardOkLayout {
+    u32 unk00;
+    MPoint mOkSize;             // 0x04: the OK key's half size
+    u8 unk0C[0x2C - 0x0C];
+    MPoint mOkPos;              // 0x2C
+};
+extern "C" const DinoUiKeyboardOkLayout data_ov007_02191020;
+extern "C" const MPoint data_ov007_02190fd4;      // the back button's place
+extern "C" const MPoint data_ov007_02191130[3];   // each group of character keys' first place
+extern const u32 data_0208ac5c, data_0208ac50;    // the back button's help (player name, team name)
+extern const u32 data_0208ac64;                   // the page key's help
+extern const u32 data_0208ac60, data_0208ac54;    // the OK key's help (player name, team name)
+
+inline DinoKBBackButton::DinoKBBackButton(DinoUiKeyboardMenu *menu, MSmartOam *oam, MPoint pos, u32 textId)
+    : KeyboardMenuItem(6, 0, pos, menu) {
+    unkB8 = (u32)menu;
+    mTextId = textId;
+    mMotion = new MMotion(std::string(((const DinoUiKeyboardLayout *)data_ov007_02190fa0)->mPaths[6]), oam, 2, 1);
+    mMotion->Play(2, 0);
+    mMotion->SetPosition(data_ov007_02190fd4);
+    mMotion->SetPriority(3);
+    mMotion->Show();
+    mParallel.AddTail(mMotion);
+    DinoHelpItem::Enable();
+}
+
+#define DINO_KB_ARROW_MOTIONS()                                                                                  \
+    switch (mIndex) {                                                                                            \
+    case 4:                                                                                                      \
+        mMotion = new MMotion(std::string(((const DinoUiKeyboardLayout *)data_ov007_02190fa0)->mPaths[4]),       \
+                              ((DinoUiKeyboardMenu *)unk98)->mOam, 2, 1);                                         \
+        mMotion->Play(1, 0);                                                                                     \
+        mMotion->SetPosition(mPos);                                                                              \
+        mMotion->SetPriority(2);                                                                                 \
+        mMotion->Show();                                                                                         \
+        mFrame = mMotion->GetFrame();                                                                            \
+        mParallel.AddTail(mMotion);                                                                              \
+        mTasks = new MSerialTaskSet(FALSE);                                                                      \
+        mParallel.AddTail(mTasks);                                                                               \
+        break;                                                                                                   \
+    case 5:                                                                                                      \
+        mMotion = new MMotion(std::string(((const DinoUiKeyboardLayout *)data_ov007_02190fa0)->mPaths[7]),       \
+                              ((DinoUiKeyboardMenu *)unk98)->mOam, 2, 1);                                         \
+        mMotion->Play(1, 0);                                                                                     \
+        mMotion->SetPosition(mPos);                                                                              \
+        mMotion->SetPriority(2);                                                                                 \
+        mMotion->Show();                                                                                         \
+        mFrame = mMotion->GetFrame();                                                                            \
+        mParallel.AddTail(mMotion);                                                                              \
+        mTasks = new MSerialTaskSet(FALSE);                                                                      \
+        mParallel.AddTail(mTasks);                                                                               \
+        break;                                                                                                   \
+    }                                                                                                            \
+    switch (mIndex) {                                                                                            \
+    case 1:                                                                                                      \
+    case 2:                                                                                                      \
+    case 3:                                                                                                      \
+    case 6:                                                                                                      \
+        DinoHelpItem::Enable();                                                                                  \
+        break;                                                                                                   \
+    default:                                                                                                     \
+        DinoHelpItem::Disable();                                                                                 \
+        break;                                                                                                   \
+    }
+
+inline DinoUiKeyboardMenuItem::DinoUiKeyboardMenuItem(u32 index, u32 arg, MPoint pos, DinoUiKeyboardMenu *menu)
+    : KeyboardMenuItem(index, arg, pos, menu) {
+    mTextId = 0;
+    mFrame.left = mPos.x - 7;
+    mFrame.top = mPos.y - 7;
+    mFrame.right = mPos.x + 6;
+    mFrame.bottom = mPos.y + 6;
+    mMotion = NULL;
+    DINO_KB_ARROW_MOTIONS()
+}
+
+inline DinoUiKeyboardMenuItem::DinoUiKeyboardMenuItem(u32 index, u32 arg, MPoint pos, DinoUiKeyboardMenu *menu,
+                                                      MPoint halfSize, u32 textId)
+    : KeyboardMenuItem(index, arg, pos, menu) {
+    mTextId = textId;
+    mFrame.left = mPos.x - halfSize.x;
+    mFrame.top = mPos.y - halfSize.y;
+    mFrame.right = mPos.x + halfSize.x;
+    mFrame.bottom = mPos.y + halfSize.y;
+    mMotion = NULL;
+    DINO_KB_ARROW_MOTIONS()
+}
+
+// Rebuilds the keyboard's menu items: the back button (for the mode), the character keys (three groups of 6 rows
+// of 5), the page and OK keys, the name's places, then the help's and the items' links.
+#pragma inline_max_size(2000)
+// NONMATCHING
+extern "C" void func_ov007_02182020(DinoUiKeyboardMenu *menu) {
+    u32 okText = 0;
+    MMenuItem *back = NULL;
+    menu->ClearItems();
+    menu->mBackButton = NULL;
+    menu->mUnkE8 = NULL;
+    const DinoUiKeyboardLayout *layout = (const DinoUiKeyboardLayout *)data_ov007_02190fa0;
+    switch (menu->mMode) {
+    case 0:
+        if (menu->mFlag == 1) {
+            menu->mBackButton = new DinoKBBackButton(menu, menu->mOam, layout->mBackPos, data_0208ac5c);
+            back = menu->mBackButton;
+            menu->AddItem(back);
+        }
+        break;
+    case 1:
+        menu->mBackButton = new DinoKBBackButton(menu, menu->mOam, layout->mBackPos, data_0208ac50);
+        back = menu->mBackButton;
+        menu->AddItem(back);
+        break;
+    }
+    menu->mBackHelp = static_cast<DinoKBBackButton *>(menu->mBackButton);
+    MMenuItem *keys[6][15];
+    for (int group = 0; group < 3; group++) {
+        for (int row = 0; row < 6; row++) {
+            for (int col = 0; col < 5; col++) {
+                keys[row][group * 5 + col] = new DinoUiKeyboardMenuItem(0, col + row * 5 + group * 30,
+                                                  MPoint(data_ov007_02191130[group].x + col * 14,
+                                                         data_ov007_02191130[group].y + row * 14),
+                                                  menu);
+                if (menu->mUnkE8 == NULL) {
+                    menu->mUnkE8 = keys[row][group * 5 + col];
+                }
+                menu->AddItem(keys[row][group * 5 + col]);
+            }
+        }
+    }
+    DinoUiKeyboardMenuItem *page =
+        new DinoUiKeyboardMenuItem(2, 0, layout->mPagePos, menu, layout->mPageSize, data_0208ac64);
+    menu->AddItem(page);
+    menu->mPageHelp = page;
+    switch (menu->mMode) {
+    case 0:
+        okText = data_0208ac60;
+        break;
+    case 1:
+        okText = data_0208ac54;
+        break;
+    }
+    menu->mOkButton = new DinoUiKeyboardMenuItem(3, 0, data_ov007_02191020.mOkPos, menu, data_ov007_02191020.mOkSize,
+                                                 okText);
+    menu->AddItem(menu->mOkButton);
+    menu->mOkHelp = static_cast<DinoUiKeyboardMenuItem *>(menu->mOkButton);
+    for (int i = 0; i < menu->mMaxLength; i++) {
+        DinoUiKeyboardHideMenuItem *place = new DinoUiKeyboardHideMenuItem(
+            menu->mMode == 2 ? 0xF0 : 0xF1, i, data_ov007_021911f0[menu->mMode][i], menu);
+        place->SetNoFocus(TRUE);
+        menu->AddItem(place);
+    }
+    menu->AddEntry((u32)menu->mHelp, 4, 0);
+    menu->AddEntry((u32)menu->mHelp, 2, (u32)menu->mKeysHelp);
+    menu->AddEntry((u32)menu->mHelp, 3, 0);
+    menu->AddEntry((u32)menu->mHelp, 1, 0);
+    menu->AddEntry((u32)menu->mKeysHelp, 4, (u32)menu->mHelp);
+    menu->AddEntry((u32)menu->mKeysHelp, 2, (u32)menu->mOkHelp);
+    menu->AddEntry((u32)menu->mKeysHelp, 3, 0);
+    menu->AddEntry((u32)menu->mKeysHelp, 1, 0);
+    menu->AddEntry((u32)menu->mPageHelp, 4, (u32)menu->mKeysHelp);
+    menu->AddEntry((u32)menu->mPageHelp, 2, 0);
+    menu->AddEntry((u32)menu->mPageHelp, 3, 0);
+    menu->AddEntry((u32)menu->mPageHelp, 1, (u32)menu->mOkHelp);
+    menu->AddEntry((u32)menu->mOkHelp, 4, (u32)menu->mKeysHelp);
+    menu->AddEntry((u32)menu->mOkHelp, 2, 0);
+    menu->AddEntry((u32)menu->mOkHelp, 3, (u32)menu->mPageHelp);
+    if (menu->mBackHelp != NULL) {
+        menu->AddEntry((u32)menu->mOkHelp, 1, (u32)menu->mBackHelp);
+    }
+    if (menu->mBackHelp != NULL) {
+        menu->AddEntry((u32)menu->mBackHelp, 4, (u32)menu->mKeysHelp);
+        menu->AddEntry((u32)menu->mBackHelp, 2, 0);
+        menu->AddEntry((u32)menu->mBackHelp, 3, (u32)menu->mOkHelp);
+        menu->AddEntry((u32)menu->mBackHelp, 1, 0);
+    }
+    for (int row = 0; row < 5; row++) {
+        for (int col = 0; col < 14; col++) {
+            menu->AddLink(keys[row][col], 1, keys[row][col + 1]);
+            menu->AddLink(keys[row][col], 2, keys[row + 1][col]);
+            menu->AddLink(keys[row][col + 1], 3, keys[row][col]);
+            menu->AddLink(keys[row + 1][col], 4, keys[row][col]);
+            menu->AddLink(keys[row + 1][col], 1, keys[row + 1][col + 1]);
+            menu->AddLink(keys[row + 1][col + 1], 3, keys[row + 1][col]);
+            menu->AddLink(keys[row][col + 1], 2, keys[row + 1][col + 1]);
+            menu->AddLink(keys[row + 1][col + 1], 4, keys[row][col + 1]);
+        }
+    }
+    for (int row = 0; row < 6; row++) {
+        menu->AddLink(keys[row][0], 3, keys[row][14]);
+        menu->AddLink(keys[row][14], 1, keys[row][0]);
+    }
+    menu->AddLink(keys[5][0], 2, page);
+    menu->AddLink(keys[5][1], 2, page);
+    menu->AddLink(keys[5][2], 2, page);
+    menu->AddLink(keys[5][3], 2, page);
+    menu->AddLink(page, 2, keys[0][0]);
+    for (int col = 4; col < 10; col++) {
+        menu->AddLink(keys[0][col], 4, menu->mOkButton);
+        menu->AddLink(keys[5][col], 2, menu->mOkButton);
+    }
+    menu->AddLink(menu->mOkButton, 2, keys[0][7]);
+    menu->AddLink(menu->mOkButton, 4, keys[5][7]);
+    menu->AddLink(keys[0][0], 4, page);
+    menu->AddLink(keys[0][1], 4, page);
+    menu->AddLink(keys[0][2], 4, page);
+    menu->AddLink(keys[0][3], 4, page);
+    menu->AddLink(page, 4, keys[5][0]);
+    menu->AddLink(page, 1, menu->mOkButton);
+    menu->AddLink(menu->mOkButton, 3, page);
+    if (back != NULL) {
+        for (int col = 10; col < 15; col++) {
+            menu->AddLink(keys[0][col], 4, back);
+            menu->AddLink(keys[5][col], 2, back);
+        }
+        menu->AddLink(menu->mOkButton, 1, back);
+        menu->AddLink(page, 3, back);
+        menu->AddLink(back, 1, page);
+        menu->AddLink(back, 3, menu->mOkButton);
+        menu->AddLink(back, 4, keys[5][14]);
+        menu->AddLink(back, 2, keys[0][14]);
+    } else {
+        for (int col = 10; col < 15; col++) {
+            menu->AddLink(keys[0][col], 4, menu->mOkButton);
+            menu->AddLink(keys[5][col], 2, menu->mOkButton);
+        }
+        menu->AddLink(menu->mOkButton, 1, page);
+        menu->AddLink(page, 3, menu->mOkButton);
+    }
+}
+#pragma inline_max_size reset
+
 template MTask *MCreateBgCallTask(KasekiPictCache *obj, void (KasekiPictCache::*func)(), int thread);
 
 MRect DinoUiKeyboardHideMenuItem::GetRect() {
