@@ -102,7 +102,10 @@ static void CARDi_SetCardDma(void) {
     CARDiCommon *const c = &cardi_common;
     CARDRomStat *const p = &rom_stat;
     MIi_CardDmaCopy32(c->dma, (const void *) &reg_CARD_DATA, (void *) c->dst, CARD_ROM_PAGE_SIZE);
-    CARDi_SetRomOp((u32) (MROMOP_G_READ_PAGE | (c->src >> 8)), (u32) (c->src << 24));
+    {
+        u32 src = c->src;
+        CARDi_SetRomOp((u32) (MROMOP_G_READ_PAGE | (src >> 8)), (u32) (src << 24));
+    }
     reg_CARD_CNT = p->ctrl;
 }
 
