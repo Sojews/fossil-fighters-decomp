@@ -24,7 +24,7 @@ DinoBattleLive::DinoBattleLive(DinoBattleModel *model, const char *name) : DinoC
 DinoBattleLive::~DinoBattleLive() {
 }
 
-void DinoBattleLive::Open() {
+void DinoBattleLive::Open(const char *text) {
 }
 
 void DinoBattleLive::ShowTutorial(MDisplay *display, const char *text) {

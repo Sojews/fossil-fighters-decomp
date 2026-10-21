@@ -4,6 +4,10 @@
 #include "game/dino_common_live.h"
 #include "m/resource.h"
 #include "nitro/mi.h"
+#include "game/dino_resource.h"
+#include "m/seed_generator.h"
+#include "m/lcd.h"
+#include <string.h>
 
 // The TU's pooled data (from 0x020bb324).
 extern "C" struct {
@@ -129,6 +133,115 @@ BOOL DinoCommonLive::CheckCondition(const DinoCommonLiveCondition *cond) {
         }
         return FALSE;
     }
+}
+
+// The data's line (a table of offsets after the header).
+static inline u8 *DinoLiveLine(MResource<DinoCommonLiveData> &res, u32 i) {
+    u8 *data = (u8 *)res.mFile.GetData();
+    return data + ((u32 *)(data + ((u32 *)data)[2]))[i];
+}
+
+void DinoCommonLive::Idle() {
+    u8 found = FALSE;
+    u32 priority = mUnkC8;
+    u32 pick = found;
+    std::vector<void *> ties;
+    if (mUnkD2) {
+        for (u32 i = found; i < ((u32 *)mData.mFile.GetData())[1]; i++) {
+            DinoCommonLiveEntry *entry = &mUnk94[i];
+            if (entry->mUnk04 == 0) {
+                continue;
+            }
+            if (entry->unk08 != 0 && --entry->unk08 != 0) {
+                continue;
+            }
+            u8 *line = DinoLiveLine(mData, i);
+            if (mUnkD1) {
+                if (priority > *(u32 *)(line + 0x10) || mUnkC8 >= *(u32 *)(line + 0x10)) {
+                    continue;
+                }
+            } else if (priority >= *(u32 *)(line + 0x10)) {
+                continue;
+            }
+            BOOL ok = TRUE;
+            for (u32 j = 0; j < *(u32 *)line; j++) {
+                if (!CheckCondition(
+                        (const DinoCommonLiveCondition *)(line + ((u32 *)(line + *(u32 *)(line + 4)))[j]))) {
+                    ok = FALSE;
+                    break;
+                }
+            }
+            if (!ok) {
+                continue;
+            }
+            if (mUnkD1) {
+                if (priority < *(u32 *)(line + 0x10)) {
+                    ties.clear();
+                }
+                ties.push_back((void *const &)i);
+            }
+            found = TRUE;
+            priority = *(u32 *)(line + 0x10);
+            pick = i;
+        }
+    }
+    if (found) {
+        u32 count;
+        if (mUnkD1 && (count = ties.size()) != 0) {
+            pick = (u32)ties[gDinoResource->GetRandom()->Next(count)];
+        }
+        u8 *data = (u8 *)mData.mFile.GetData();
+        u8 *line = data + ((u32 *)(data + ((u32 *)data)[2]))[pick];
+        u32 variant;
+        if (*(u32 *)(line + 8) == 1) {
+            variant = 0;
+        } else {
+            do {
+                variant = gDinoResource->GetRandom()->Next(*(u32 *)(line + 8));
+            } while (variant == mUnk94[pick].unk00);
+        }
+        mUnk94[pick].unk00 = variant;
+        u32 message = ((u32 *)(line + *(u32 *)(line + 0xC)))[variant];
+        mUnkC8 = priority;
+        mUnk94[pick].unk08 = *(u32 *)(line + 0x14);
+        mUnk94[pick].mUnk04--;
+        if (mUnkD0) {
+            Signal(message);
+            mOpen = 200;
+        } else {
+            mMessages = gDinoResource->LoadMessage(gDinoResource->GetTalkMessageMatch(message));
+            const char *text = "";
+            for (u32 i = 0; i < ((u32 *)mMessages.mFile.GetData())[1]; i++) {
+                u8 *messages = (u8 *)mMessages.mFile.GetData();
+                if (message == *(u32 *)(messages + ((u32 *)(messages + ((u32 *)messages)[2]))[i])) {
+                    u8 *messages2 = (u8 *)mMessages.mFile.GetData();
+                    u8 *entry = messages2 + ((u32 *)(messages2 + ((u32 *)messages2)[2]))[i];
+                    text = (const char *)(entry + ((u32 *)entry)[1]);
+                    break;
+                }
+            }
+            if (strncmp((char *)text, "$upper", 6) == 0) {
+                ShowTutorial(gLcd->GetTopDisplay(), text + 6);
+                mUnkC8 = 0;
+                mOpen = 0;
+            } else if (strncmp((char *)text, "$lower", 6) == 0) {
+                ShowTutorial(gLcd->GetBottomDisplay(), text + 6);
+                mUnkC8 = 0;
+                mOpen = 0;
+            } else {
+                Open(text);
+                mOpen = 180;
+            }
+        }
+    }
+    if (mOpen != 0 && IsBusy()) {
+        mOpen++;
+    }
+    if (mOpen != 0 && --mOpen == 0) {
+        Close();
+        mUnkC8 = 0;
+    }
+    MI_CpuFill8(mUnkAC.mBytes, 0, (mUnkAC.mBits + 7) >> 3);
 }
 
 void DinoCommonLive::Signal(u32 id) {

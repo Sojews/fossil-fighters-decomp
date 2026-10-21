@@ -10,7 +10,7 @@ public:
     DinoCleaningLive(u32 arg, const std::string &name);
     virtual ~DinoCleaningLive();
 
-    virtual void Open();
+    virtual void Open(const char *text);
     virtual void Close();
     virtual void ShowTutorial(MDisplay *display, const char *text);
 

@@ -28,8 +28,10 @@ public:
 #else
     virtual ~DinoCommonLive() {}
 #endif
+    // Says the highest-priority line whose conditions hold (a random one of the ties if mUnkD1), then counts down
+    // until it closes.
     virtual void Idle();
-    virtual void Open() = 0;
+    virtual void Open(const char *text) = 0;
     virtual void Signal(u32 id);
     virtual void Close() = 0;
     virtual void ShowTutorial(MDisplay *display, const char *text) = 0;
@@ -55,7 +57,7 @@ public:
     void RefreshEntries();
 
     MResource<DinoCommonLiveData> mData;    // 0x74
-    MResource<DinoCommonLiveData> mData2;   // 0x84
+    MResource<struct DinoMessageData> mMessages; // 0x84: the messages of the line last said
     std::vector<DinoCommonLiveEntry> mUnk94;    // 0x94: one per line
     MBitVector mUnkA0;                  // 0xA0
     MBitVector mUnkAC;                  // 0xAC

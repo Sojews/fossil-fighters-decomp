@@ -25,7 +25,7 @@ public:
     DinoBattleLive(DinoBattleModel *model, const char *name);
     virtual ~DinoBattleLive();
     virtual void Idle();
-    virtual void Open();
+    virtual void Open(const char *text);
     virtual void Signal(u32 id);
     virtual void Close();
     virtual void ShowTutorial(MDisplay *display, const char *text);
