@@ -7,6 +7,7 @@
 #include "m/task.h"
 #include <algorithm>
 #include "m/geometry.h"
+#include "m/display.h"
 
 class MDisplay;
 class MWin;
@@ -51,6 +52,8 @@ public:
 class MRasterPal : public MRasterIO {
 public:
     MRasterPal(u32 dma, MDisplay *display);
+    // On the current display.
+    MRasterPal(u32 dma) : MRasterIO(dma, gCurrentDisplay->GetBackdropReg(), 2) { mUnk3C = (u32)gCurrentDisplay; }
     virtual ~MRasterPal() {}
 
     u32 mUnk3C;     // 0x3C
