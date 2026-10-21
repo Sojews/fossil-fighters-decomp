@@ -10,6 +10,8 @@ class DinoUiATMTeamButton;
 class DinoUiPartsTeamIndicator;
 class DinoUiPartsTeamInfo;
 class MIndicator;
+class MSmartOam;
+class MTextPicture;
 
 class DinoUiATMCursor;
 class DinoUiFieldMenuCursor;
@@ -19,6 +21,7 @@ class DinoUiATMMenu : public DinoHelpBase, public MMenu {
 public:
     DinoUiATMMenu(u32 *result, u8 arg1, DinoUiPartsTeamInfo *teamInfo, u8 arg3);
     virtual ~DinoUiATMMenu();
+    MSmartOam *GetOam() { return mOam; }
     void OnBackDecided();
     virtual void OnStart();
     virtual void OnIdle();
@@ -37,9 +40,9 @@ public:
     void ClearTeam();
     void LinkTeamButtons();
 
-    u32 unkB4;          // 0xB4
+    MSmartOam *mOam;    // 0xB4
     DinoUiATMBackButton *mBackButton; // 0xB8
-    u32 unkBC;          // 0xBC
+    MTextPicture *mTitle;   // 0xBC
     DinoUiATMTeamButton *mTeamButtons[3]; // 0xC0
     DinoUiPartsTeamIndicator *mTeamNames[3]; // 0xCC
     MIndicator *mTeamTexts[3];  // 0xD8

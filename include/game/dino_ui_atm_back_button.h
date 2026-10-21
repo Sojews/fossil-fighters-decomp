@@ -10,6 +10,7 @@ class DinoUiATMMenu;
 
 class DinoUiATMBackButton : public MMenuItem, public DinoHelpItem {
 public:
+    DinoUiATMBackButton(DinoUiATMMenu *owner, const u32 &textId);
     virtual ~DinoUiATMBackButton();
     virtual MRect GetFrame();
     virtual void OnFocusChanged(BOOL focused);
