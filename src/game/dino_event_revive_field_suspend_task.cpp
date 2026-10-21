@@ -21,6 +21,7 @@
 #include "m/overlay.h"
 #include "game/dino_ui_cleaning_menu_item_menu.h"
 #include "game/dino_backup.h"
+#include "m/seed_generator.h"
 #include "game/dino_sound.h"
 #include "m/display.h"
 #include "m/lcd.h"
@@ -166,7 +167,7 @@ extern "C" struct {
     void (DinoEventRevive::*StateContainerSelect_5C)();
     void (DinoEventRevive::*State02038544_64)();
     void (DinoEventRevive::*StateMode_6C)();
-    u8 unk74[0x7C - 0x74];
+    void (DinoEventRevive::*State02038544_74)();
     void (DinoEventRevive::*StateStart_7C)();
     u8 unk84[0x8C - 0x84];
     void (DinoEventRevive::*State02038544_8C)();
@@ -196,6 +197,153 @@ static inline const char *DinoReviveMessageText(MResource<DinoMessageData> &mess
     const u8 *data = (const u8 *)messages.Get();
     const u8 *entry = data + ((const u32 *)(data + ((const u32 *)data)[2]))[i];
     return (const char *)entry + ((const u32 *)entry)[1];
+}
+
+// How long the stored rocks wait before they are revived over time.
+extern "C" const u64 data_0208a204;
+
+// The first state: notes the field's sound; once enough time has passed since the rocks were stored, revives each
+// stored rock with a random score (by the excavation level's tiers; a perfect one may get a bonus), keeping the
+// better score, and tells which parts got better.
+void DinoEventRevive::State02037dbc() {
+    mUnkD8 = 0;
+    mScene = mEvent->GetField()->mBgmScene;
+    mBgm = mEvent->GetField()->GetBgm();
+    if (!gDinoBackup->IsUnk9CEmpty()) {
+        if (gDinoBackup->GetPlayFrames() - gDinoBackup->GetUnk168() < data_0208a204) {
+            mSerial.AddTail(CreateMessage(0));
+        } else {
+            MResource<DinoExcavateDefs> defs = gDinoResource->GetExcavateDefs();
+            u32 improved = 0;
+            u32 kept = 0;
+            u32 keptRange = 0;
+            u32 failed = 0;
+            u32 sold = 0;
+            u32 soldMoney = 0;
+            const DinoExcavateLevel *level = gDinoBackup->GetExcavateLevel();
+            MFx32 chance1 = MFx32::FromRaw(level->tier1Chance);
+            MFx32 chance2 = MFx32::FromRaw(level->tier2Chance) + chance1;
+            MResource<DinoKasekiDefs> kaseki = gDinoResource->LoadKasekiDefs();
+            u32 *weights = new u32[defs.Get()->bonusCount];
+            // (Declared ahead of the total: that orders their stack slots as in the game.)
+            u32 i;
+            u32 bonus;
+            u32 total = 0;
+            for (u32 i = 0; i < defs.Get()->bonusCount; i++) {
+                total += defs.Get()->GetBonuses()[i].weight;
+                weights[i] = total;
+            }
+            std::string text;
+            for (i = 0; i < 64; i++) {
+                DinoBackupEntry entry;
+                gDinoBackup->GetUnk9C(i, &entry);
+                if (entry.id == 0) {
+                    continue;
+                }
+                MFx32 roll = gDinoResource->GetRandom()->NextFraction();
+                u32 score;
+                if (roll.v <= chance1.v) {
+                    MFx32 t = gDinoResource->GetRandom()->NextFraction();
+                    score = MFx32ToInt(MFx32::FromRaw(level->tier1Max) * t +
+                                       MFx32::FromRaw(level->tier1Min) * (MFx32(1) - t));
+                } else if (roll.v <= chance2.v) {
+                    MFx32 t = gDinoResource->GetRandom()->NextFraction();
+                    score = MFx32ToInt(MFx32::FromRaw(level->tier2Max) * t +
+                                       MFx32::FromRaw(level->tier2Min) * (MFx32(1) - t));
+                } else {
+                    MFx32 t = gDinoResource->GetRandom()->NextFraction();
+                    score = MFx32ToInt(MFx32::FromRaw(level->unkC.v) * t + MFx32::FromRaw(level->unk10.v) * (MFx32(1) - t));
+                }
+                if (score < 50) {
+                    failed++;
+                } else if (entry.type == 1) {
+                    u32 price = kaseki.Get()->GetDef(entry.id)->sellPrice;
+                    if (score < 100) {
+                        price = price * 75 / 100;
+                        price = ((price * score / 99 + 99) / 100) * 100;
+                    }
+                    soldMoney += price;
+                    sold++;
+                } else {
+                    bonus = 0;
+                    if (score == 100) {
+                        if (gDinoResource->GetRandom()->NextFraction() <= MFx32::FromRaw(defs.Get()->bonusChance)) {
+                            u32 pick = gDinoResource->GetRandom()->Next(total);
+                            for (u32 j = 0; j < defs.Get()->bonusCount; j++) {
+                                if (pick < weights[j]) {
+                                    bonus = defs.Get()->GetBonuses()[j].value;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                    score += bonus;
+                    if (entry.unkC_12) {
+                        score += 25;
+                    }
+                    DinoKasekiRock rock;
+                    gDinoBackup->GetKasekiRock(entry.id, (u32 *)&rock);
+                    u32 best = rock.level;
+                    if (best >= score) {
+                        kept++;
+                        keptRange += gDinoResource->FindExcavateRange(score);
+                    } else {
+                        rock.level = score;
+                        gDinoBackup->SetKasekiRock(entry.id, (u32 *)&rock);
+                        u32 part = entry.id - 1;
+                        DinoCreatureState creature;
+                        gDinoBackup->GetCreature(part / 4 + 1, &creature);
+                        creature.parts[part % 4].level = score;
+                        creature.parts[part % 4].unk19 = entry.unkC_12;
+                        gDinoBackup->SetCreature(part / 4 + 1, &creature);
+                        if (creature.parts[0].level == 0) {
+                            kept++;
+                            keptRange += gDinoResource->FindExcavateRange(best);
+                        } else {
+                            improved++;
+                            if (text.size() == 0) {
+                                text = DinoReviveMessageText(mMessages, 30);
+                            }
+                            std::string line;
+                            if (entry.unkC_12) {
+                                line = DinoReviveMessageText(mMessages, 32);
+                            } else {
+                                line = DinoReviveMessageText(mMessages, 31);
+                            }
+                            line = DinoReplaceTag(line, "%s", gDinoResource->GetKasekiRockName(entry.id));
+                            char number[256];
+                            OS_SPrintf(number, "%d", best);
+                            line = DinoReplaceTag(line, "$V17", number);
+                            OS_SPrintf(number, "%d", score);
+                            line = DinoReplaceTag(line, "$V18", number);
+                            text += line;
+                        }
+                    }
+                }
+                MI_CpuFill8(&entry, 0, sizeof(entry));
+                gDinoBackup->SetUnk9C(i, &entry);
+            }
+            if (sold) {
+                mSerial.AddTail(CreateMessage(0x23));
+            } else {
+                mSerial.AddTail(CreateMessage(1));
+            }
+            if (text.size() != 0) {
+                text += DinoReviveMessageText(mMessages, 33);
+                mSerial.AddTail(new DinoEventTalkWindow(GetDisplay(), std::string(text), 0, 0));
+            }
+            gDinoBackup->SetSystemVar(0x10, failed);
+            gDinoBackup->SetSystemVar(0xF, kept);
+            gDinoBackup->SetSystemVar(0x2E, keptRange);
+            gDinoBackup->SetSystemVar(0xE, improved);
+            gDinoBackup->SetSystemVar(0x1C, sold);
+            gDinoBackup->SetSystemVar(0x1D, soldMoney);
+            gDinoBackup->SetSystemVar(0x13, keptRange + gDinoBackup->GetSystemVar(0x13));
+            gDinoBackup->SetSystemVar(3, soldMoney + gDinoBackup->GetSystemVar(3));
+            delete[] weights;
+        }
+    }
+    mState = data_020bd628.State02038544_74;
 }
 
 // NONMATCHING: the game allocates each push_back's two flag bytes together (ours puts the fast-path ones first).

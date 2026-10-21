@@ -199,7 +199,12 @@ struct DinoExcavateLevel {
     u32 unk8;           // 0x08
     MFx32 unkC;         // 0x0C
     MFx32 unk10;        // 0x10
-    u8 unk14[0x2C - 0x14];
+    fx32 tier1Chance;   // 0x14: a stored rock revived over time is in the first tier when the roll is at most this
+    fx32 tier1Max;      // 0x18: and its score is between these
+    fx32 tier1Min;      // 0x1C
+    fx32 tier2Chance;   // 0x20: (added to the first)
+    fx32 tier2Max;      // 0x24
+    fx32 tier2Min;      // 0x28
 };
 
 // The battles the title screen's demo picks from, by how far the save has got: lists of battle ids.
@@ -212,7 +217,13 @@ struct DinoDemoBattles {
     u32 midOffset;      // 0x14
     u32 unk18;          // 0x18: the demo battles watched before the demo stops
 };
+struct DinoExcavateBonus {
+    u32 value;
+    u32 weight;
+};
+
 struct DinoExcavateDefs {
+    const DinoExcavateBonus *GetBonuses() const { return (const DinoExcavateBonus *)((const u8 *)this + bonusOffset); }
     const int *GetRockKindWeights() const { return (const int *)((const u8 *)this + rockKindWeights); }
     const u32 *GetRockSet1() const { return (const u32 *)((const u8 *)this + rockSet1); }
     const u32 *GetRockSet2() const { return (const u32 *)((const u8 *)this + rockSet2); }
@@ -242,7 +253,8 @@ struct DinoExcavateDefs {
     u32 picts;          // 0x64: offset of the offsets of the event picture entries
     u32 levelCount;     // 0x68
     u32 levelOffset;    // 0x6C: DinoExcavateLevel entries
-    u8 unk70[0x78 - 0x70];
+    u32 bonusCount;     // 0x70: score bonuses for a perfect revival
+    u32 bonusOffset;    // 0x74: (DinoExcavateBonus each)
     u32 offset78;       // 0x78
     u32 offset7C;       // 0x7C
     u32 offset80;       // 0x80
@@ -251,7 +263,7 @@ struct DinoExcavateDefs {
     u32 exchangeOffset; // 0x8C: the fossil ids an exchange can give (u32 each)
     u32 exchangeWait;   // 0x90: frames between wireless exchanges
     u32 exchangeRetryWait;  // 0x94: frames before a found partner is taken again
-    u8 unk98[0x9C - 0x98];
+    fx32 bonusChance;   // 0x98: a perfect revival gets a bonus when the roll is at most this
     u32 kasekiRockMap;  // 0x9C: the map the kaseki rocks are on
     u32 rockAreaA0;     // 0xA0: the area new field rocks are placed in
     u32 rockAreaA4;     // 0xA4
