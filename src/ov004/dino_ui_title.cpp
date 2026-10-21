@@ -224,6 +224,13 @@ inline DinoUiOpeningCloud::DinoUiOpeningCloud(MDisplay *display) : MProcess(disp
 
 extern "C" void _ZNSt13__vec_deleterImSaImEE19reallocate_copy_altEm(void *vector, size_t n);
 
+// (vector::reserve, through the u32 vector's out-of-line reallocating copy the game calls here.)
+static inline void DinoReserveScenes(std::vector<void *> &scenes, size_t n) {
+    if (n > scenes.capacity()) {
+        _ZNSt13__vec_deleterImSaImEE19reallocate_copy_altEm(&scenes, n);
+    }
+}
+
 // The opening's start: the scenes in a shuffled order, the gradations, the clouds, the logo and the characters (the
 // second depends on how far the save has got), the 3D scene and a fade in from white, then the logo slides down.
 void DinoUiOpening::OpeningStart() {
@@ -237,10 +244,7 @@ void DinoUiOpening::OpeningStart() {
     const DinoOpeningDefs *defs = (const DinoOpeningDefs *)gDinoResource->GetExcavate80();
     mSceneCount = defs->sceneCount;
     mSceneFrames = defs->sceneFrames;
-    if (mUnkA8.capacity() < defs->count) {
-        // (The game reserves through the u32 vector's out-of-line reallocating copy.)
-        _ZNSt13__vec_deleterImSaImEE19reallocate_copy_altEm(&mUnkA8, defs->count);
-    }
+    DinoReserveScenes(mUnkA8, defs->count);
     for (u32 i = 0; i < defs->count; i++) {
         void *scene = (void *)((const u32 *)((const u8 *)defs + defs->scenesOffset))[i];
         mUnkA8.push_back(scene);
