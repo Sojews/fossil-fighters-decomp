@@ -157,6 +157,7 @@ src/m/3d_ryusen.cpp:
 
 src/m/3d_resource.cpp:
     .text       start:0x020230bc end:0x02026478
+    .init       start:0x020890ac end:0x0208912c
 
 src/m/anm_model.cpp:
     .text       start:0x02026478 end:0x0202a7f0

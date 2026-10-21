@@ -44,6 +44,7 @@ typedef std::map<MArchiveFile, M3DCacheEntry> M3DCache;
 typedef std::map<MArchiveFile, M3DTexEntry> M3DTexCache;
 
 static MHeap *sHeap;
+// NONMATCHING (__sinit): the game constructs the model cache, the anim cache, then the texture cache (in this layout).
 static M3DTexCache sTexCache;
 static M3DCache sModelCache;
 static M3DCache sAnimCache;
