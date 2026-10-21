@@ -27,13 +27,11 @@ void MBgTaskManager::Add(MBgTask *task) {
 }
 
 void MBgTaskManager::Remove(MBgTask *task) {
-    OSMutex *mutex = &mMutex;
-    OS_LockMutex(mutex);
+    MScopedLock lock(&mMutex, TRUE);
     std::list<MBgTask *>::iterator it = std::find(mTasks.begin(), mTasks.end(), task);
     if (it != mTasks.end()) {
         mTasks.erase(it);
     }
-    OS_UnlockMutex(mutex);
 }
 
 void MBgTaskManager::OnPostLoop() {

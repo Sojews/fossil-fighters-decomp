@@ -287,10 +287,9 @@ void M3DScene::AddModel(M3DModel *model) {
 }
 
 void M3DScene::RemoveModel(M3DModel *model) {
-    OS_LockMutex(&mMutex);
+    MScopedLock lock(&mMutex, TRUE);
     std::list<M3DModel *>::iterator it = std::find(mModels.begin(), mModels.end(), model);
     if (it != mModels.end()) {
         mModels.erase(it);
     }
-    OS_UnlockMutex(&mMutex);
 }
