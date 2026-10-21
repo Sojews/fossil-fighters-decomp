@@ -77,6 +77,8 @@ public:
     void CollectTargets(DinoBattleModelPlayer *player, DinoBattleModelCreature *creature, u32 attack);
     // The score for swapping the leader out (0 unless the creature leads and can leave).
     MFx32 ScoreEscape(DinoBattleModelPlayer *player, DinoBattleModelCreature *creature, DinoBattleFile file);
+    // The score for using the attack (0 unless it can be used and has targets).
+    MFx32 ScoreAttack(DinoBattleModelPlayer *player, DinoBattleModelCreature *creature, DinoBattleFile file, u32 attack);
     // The score of the file's conditions on the creature alone (its attacks, its position, the player's data).
     MFx32 ScoreCreatureConditions(DinoBattleModelPlayer *player, DinoBattleModelCreature *creature,
                                   DinoBattleFile file);

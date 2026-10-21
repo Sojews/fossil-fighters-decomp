@@ -15,6 +15,7 @@
 #include "m/seed_generator.h"
 #include "game/dino_battle.h"
 #include "game/dino_battle_model.h"
+#include "game/dino_backup.h"
 
 #pragma auto_inline off
 
@@ -479,6 +480,298 @@ MFx32 DinoBattleCpuController::ScoreEscape(DinoBattleModelPlayer *player, DinoBa
     return total;
 }
 
+// NONMATCHING: as in ScoreCreatureConditions, the game puts each compound score's copy above the total's.
+MFx32 DinoBattleCpuController::ScoreAttack(DinoBattleModelPlayer *player, DinoBattleModelCreature *creature,
+                                           DinoBattleFile file, u32 attack) {
+    if (!file.mArchive.IsValid()) {
+        return MFx32(0);
+    }
+    const DinoAttackDef *def = creature->GetAttackDef(attack);
+    if (def == NULL) {
+        return MFx32(0);
+    }
+    u16 cost = *DinoOffsetPtr<u16>(def, def->cost);
+    if (cost > player->GetUnk128()) {
+        return MFx32(0);
+    }
+    if (!player->AnyCreatureUnkD244() || !creature->IsUnkD244()) {
+        return MFx32(0);
+    }
+    if (creature->GetStatusUnk20() & (1 << attack)) {
+        return MFx32(0);
+    }
+    CollectTargets(player, creature, attack);
+    if (mTargets.size() == 0) {
+        return MFx32(0);
+    }
+    DinoBattleModelPlayer *opponent = player->GetOpponent();
+    MFx32 total = MFx32(0);
+    for (u32 i = 0; i < ((DinoBattleCpuConditions *)file.mFile.GetData())->count; i++) {
+        DinoBattleCpuConditions *data = (DinoBattleCpuConditions *)file.mFile.GetData();
+        const DinoBattleCpuCondition *conditions = (const DinoBattleCpuCondition *)((u8 *)data + data->entries);
+        MFx32 score = MFx32(conditions[i].score);
+        switch (conditions[i].kind) {
+        default:
+            OS_Terminate();
+            break;
+        case 0:
+            total = total + score;
+            break;
+        case 1:
+            total = total + score * player->GetRandom()->NextFraction();
+            break;
+        case 5:
+            for (u32 t = 0; t < mTargets.size(); t++) {
+                if (EstimateDamage(creature, mTargets[t], attack) >= (int)mTargets[t]->GetUnkE4()) {
+                    total = total + score;
+                    break;
+                }
+            }
+            break;
+        case 6:
+            if (creature->CompareUnkED0C(opponent->FindCreature(0)) > 0) {
+                total = total + score;
+            }
+            break;
+        case 2:
+            if (opponent->FindCreature(3) != NULL) {
+                total = total + score;
+            }
+            break;
+        case 7:
+            total = total + score * MFx32((int)creature->GetUnkE4()) / MFx32((int)creature->GetUnkE8());
+            break;
+        case 8:
+            total = total + score * (MFx32(1) - MFx32(1) * MFx32((int)creature->GetUnkE4()) /
+                                                   MFx32((int)creature->GetUnkE8()));
+            break;
+        case 3:
+            if (player->GetUnk128() < opponent->GetUnk128()) {
+                total = total + score;
+            }
+            break;
+        case 4:
+            if (player->GetUnk128() > opponent->GetUnk128()) {
+                total = total + score;
+            }
+            break;
+        case 0x9:
+            if (!LeaderHasStatus(player, 8)) {
+                total = total + score;
+            }
+            break;
+        case 0xA:
+            if (!LeaderHasStatus(player, 9)) {
+                total = total + score;
+            }
+            break;
+        case 0xB:
+            if (!LeaderHasStatus(player, 10)) {
+                total = total + score;
+            }
+            break;
+        case 0xC:
+            if (!LeaderHasStatus(player, 11)) {
+                total = total + score;
+            }
+            break;
+        case 0xD:
+            if (!SupportHasStatus(player, 8)) {
+                total = total + score;
+            }
+            break;
+        case 0xE:
+            if (!SupportHasStatus(player, 9)) {
+                total = total + score;
+            }
+            break;
+        case 0xF:
+            if (!SupportHasStatus(player, 10)) {
+                total = total + score;
+            }
+            break;
+        case 0x10:
+            if (!SupportHasStatus(player, 11)) {
+                total = total + score;
+            }
+            break;
+        case 0x11:
+            if (!(creature->GetStatus()->flags & 0x100)) {
+                total = total + score;
+            }
+            break;
+        case 0x12:
+            if (creature->GetUnkB8() == 0) {
+                total = total + score;
+            }
+            break;
+        case 0x13:
+            if (func_ov000_0216c83c(creature->GetUnkB8())) {
+                total = total + score;
+            }
+            break;
+        case 0x14:
+            for (u32 c = 0; c < player->GetCreatureCount(); c++) {
+                if (player->GetCreature(c) != creature &&
+                    (int)player->GetCreature(c)->GetUnkE4() <= (int)player->GetCreature(c)->GetUnkE8() / 2) {
+                    total = total + score;
+                    break;
+                }
+            }
+            break;
+        case 0x15:
+            for (u32 c = 0; c < player->GetCreatureCount(); c++) {
+                if (player->GetCreature(c) != creature &&
+                    (int)player->GetCreature(c)->GetUnkE4() <= (int)player->GetCreature(c)->GetUnkE8() / 4) {
+                    total = total + score;
+                    break;
+                }
+            }
+            break;
+        case 0x16:
+            if (*DinoOffsetPtr<u8>(def, def->unk14) == 2) {
+                u16 cost = *DinoOffsetPtr<u16>(def, def->cost);
+                if (cost <= player->GetUnk128()) {
+                    total = total + score;
+                }
+            }
+            break;
+        case 0x17:
+            total = total + score * MFx32(opponent->GetUnk128()) / MFx32((int)opponent->GetUnk14C());
+            break;
+        case 0x18:
+            if (opponent->FindCreature(0) == opponent->GetCreatureInSlot(0)) {
+                total = total + score;
+            }
+            break;
+        case 0x19:
+            if (LeaderHasStatus(player, 2)) {
+                total = total + score;
+            }
+            break;
+        case 0x1A:
+            if (LeaderHasStatus(player, 4)) {
+                total = total + score;
+            }
+            break;
+        case 0x1B:
+            if (LeaderHasStatus(player, 6)) {
+                total = total + score;
+            }
+            break;
+        case 0x1C:
+            if (LeaderHasStatus(player, 7)) {
+                total = total + score;
+            }
+            break;
+        case 0x1D:
+            if (SupportHasStatus(player, 2)) {
+                total = total + score;
+            }
+            break;
+        case 0x1E:
+            if (SupportHasStatus(player, 4)) {
+                total = total + score;
+            }
+            break;
+        case 0x1F:
+            if (SupportHasStatus(player, 6)) {
+                total = total + score;
+            }
+            break;
+        case 0x20:
+            if (SupportHasStatus(player, 7)) {
+                total = total + score;
+            }
+            break;
+        case 0x21:
+            if (LeaderHasStatus(opponent, 2)) {
+                total = total + score;
+            }
+            break;
+        case 0x22:
+            if (LeaderHasStatus(opponent, 4)) {
+                total = total + score;
+            }
+            break;
+        case 0x23:
+            if (LeaderHasStatus(opponent, 6)) {
+                total = total + score;
+            }
+            break;
+        case 0x24:
+            if (LeaderHasStatus(opponent, 7)) {
+                total = total + score;
+            }
+            break;
+        case 0x25:
+            if (LeaderHasStatus(opponent, 3)) {
+                total = total + score;
+            }
+            break;
+        case 0x26:
+            if (LeaderHasStatus(opponent, 5)) {
+                total = total + score;
+            }
+            break;
+        case 0x27:
+            if (!LeaderHasStatus(opponent, 2)) {
+                total = total + score;
+            }
+            break;
+        case 0x28:
+            if (!LeaderHasStatus(opponent, 4)) {
+                total = total + score;
+            }
+            break;
+        case 0x29:
+            if (!LeaderHasStatus(opponent, 6)) {
+                total = total + score;
+            }
+            break;
+        case 0x2A:
+            if (!LeaderHasStatus(opponent, 7)) {
+                total = total + score;
+            }
+            break;
+        case 0x2B:
+            if (!LeaderHasStatus(opponent, 3)) {
+                total = total + score;
+            }
+            break;
+        case 0x2C:
+            if (!LeaderHasStatus(opponent, 5)) {
+                total = total + score;
+            }
+            break;
+        case 0x2D: {
+            DinoPlayerData data;
+            gDinoBackup->GetPlayer(&data, FALSE);
+            if (data.unk1c_7 == 1) {
+                total = total + score;
+            }
+            break;
+        }
+        case 0x61: {
+            DinoPlayerData data;
+            gDinoBackup->GetPlayer(&data, FALSE);
+            if (data.unk1c_7 >= 1 && data.unk1c_7 <= 3) {
+                total = total + score;
+            }
+            break;
+        }
+        case 0x2F:
+            if (opponent->GetCreatureCount() > 1 && !LeaderHasStatus(opponent, 2) && !LeaderHasStatus(opponent, 4) &&
+                !LeaderHasStatus(opponent, 6) && !LeaderHasStatus(opponent, 7) && !LeaderHasStatus(opponent, 5) &&
+                !LeaderHasStatus(opponent, 3)) {
+                total = total + score * player->GetRandom()->NextFraction();
+            }
+            break;
+        }
+    }
+    return total;
+}
+
 // NONMATCHING: in case 1 the operator+ parameter copies swap stack slots, as in ScoreConditions (casting either
 // operand fixes the order but costs a stack slot).
 MFx32 DinoBattleCpuController::ScoreCreatureConditions(DinoBattleModelPlayer *player, DinoBattleModelCreature *creature,
@@ -772,8 +1065,6 @@ typedef std::__red_black_tree<MFx32, DinoBattleCpuCandidates::value_type,
                               std::allocator<DinoBattleCpuCandidates::value_type> >
     DinoBattleCpuCandidateTree;
 
-extern "C" MFx32 func_ov000_02157a14(DinoBattleCpuController *controller, DinoBattleModelPlayer *player,
-                                     DinoBattleModelCreature *creature, DinoBattleFile file, u32 attack);
 extern "C" MFx32 func_ov000_0215829c(DinoBattleCpuController *controller, DinoBattleModelPlayer *player,
                                      DinoBattleModelCreature *creature, DinoBattleModelCreature *target,
                                      DinoBattleFile file, u32 attack);
@@ -826,7 +1117,7 @@ void DinoBattleCpuController::DecideAction(u32 first) {
                 creature->GetAttack(a, &set);
             }
             MFx32 attack;
-            attack = func_ov000_02157a14(this, player, creature, group.mSets[set], a);
+            attack = ScoreAttack(player, creature, group.mSets[set], a);
             if (attack != MFx32(0)) {
                 if (a < count || player->AllCreaturesShareDefFlag()) {
                     candidates.insert(
