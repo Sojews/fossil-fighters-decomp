@@ -1242,9 +1242,9 @@ int __wpformatter(void *(*WriteProc)(void *, const wchar_t *, size_t), void *Wri
         field_width = num_chars;
 
         if (format.justification_options != left_justification) {
-            fill_char = (format.justification_options == zero_fill) ? '0' : ' ';
+            fill_char = (format.justification_options == zero_fill) ? L'0' : L' ';
 
-            if (((*buff_ptr == L'+') || (*buff_ptr == L'-') || (*buff_ptr == L' ')) && (fill_char == '0')) {
+            if (((*buff_ptr == L'+') || (*buff_ptr == L'-') || (*buff_ptr == L' ')) && (fill_char == L'0')) {
                 if ((*WriteProc)(WriteProcArg, buff_ptr, 1) == 0) {
                     return -1;
                 }
