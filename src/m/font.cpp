@@ -335,6 +335,102 @@ MFontSet::MFontSet(std::string path, int color, int shadow, int back) : mResourc
     SetColors(color, shadow, back);
 }
 
+// A glyph row's four pixels per halfword, read as a word (the glyph data is only halfword aligned).
+static inline u32 MReadGlyphWord(const u32 *src) {
+    return ((const u16 *) src)[0] | (((const u16 *) src)[1] << 16);
+}
+
+// Draws a 4-bit glyph into 4-bit tiles at a pixel position, clipped to the destination; with its own colors, the
+// glyph's zero pixels are transparent.
+// NONMATCHING: the game hoists `words - 1` and the masks' complements out of the row loop (ours recomputes them each
+// row), which also shifts its register and stack choices.
+void MChr16FontTransfer::Transfer() {
+    const u32 *src = (const u32 *) mSrc;
+    int srcWords = (mGlyphSize.x + 7) >> 3;
+    if (mPos.y < 0) {
+        src += -mPos.y * srcWords;
+        mGlyphSize.y += mPos.y;
+        mPos.y = 0;
+    }
+    int over = mPos.y + mGlyphSize.y - mSize.y * 8;
+    if (over > 0) {
+        mGlyphSize.y -= over;
+    }
+    int rows = mGlyphSize.y;
+    int width = mSize.x;
+    u32 *dst = (u32 *) ((u8 *) mDest + ((mPos.x >> 3) + (mPos.y >> 3) * width) * 32 + (mPos.y & 7) * 4);
+    int shift = mPos.x & 7;
+    u32 firstMask = ~((1 << (shift * 4)) - 1);
+    int end = shift + mGlyphSize.x;
+    int endShift = end & 7;
+    u32 lastMask = (1 << (endShift * 4)) - 1;
+    if (endShift == 0) {
+        lastMask = 1 - 2;
+    }
+    u32 words = (end + 7) >> 3;
+    int nextRow = -words * 8 + 1;
+    int nextTileRow = nextRow + (width - 1) * 8;
+    u32 first = mPos.x < 0 ? -(mPos.x >> 3) : 0;
+    int overX = mPos.x + mGlyphSize.x - width * 8;
+    u32 last = overX > 0 ? words - ((overX + 7) >> 3) : words;
+    shift *= 4;
+    if (!mOwnColors) {
+        while (rows != 0) {
+            u32 carry = 0;
+            for (u32 i = 0; i < words; i++) {
+                u32 word = MReadGlyphWord(src);
+                u32 out = (word << shift) | (carry >> (32 - shift));
+                if (i >= first && i < last) {
+                    if (i == 0 && i == words - 1) {
+                        *dst = (*dst & ~(lastMask & firstMask)) | (out & (lastMask & firstMask));
+                    } else if (i == 0) {
+                        *dst = (*dst & ~firstMask) | (out & firstMask);
+                    } else if (i == words - 1) {
+                        *dst = (*dst & ~lastMask) | (out & lastMask);
+                    } else {
+                        *dst = out;
+                    }
+                }
+                carry = word;
+                src++;
+                dst += 8;
+            }
+            src -= words - srcWords;
+            dst = (u32 *) ((u8 *) dst + ((((u8 *) dst - (u8 *) mDest) & 0x1F) == 0x1C ? nextTileRow * 4 : nextRow * 4));
+            rows--;
+        }
+    } else {
+        while (rows != 0) {
+            u32 carry = 0;
+            for (u32 i = 0; i < words; i++) {
+                u32 word = MReadGlyphWord(src);
+                u32 out = (word << shift) | (carry >> (32 - shift));
+                // A nibble mask of the nonzero pixels.
+                u32 mask = (((((~out >> 1) & 0x77777777) + out) & 0x88888888) >> 3) + 0x77777777;
+                mask ^= 0x77777777;
+                if (i >= first && i < last) {
+                    if (i == 0 && i == words - 1) {
+                        mask &= lastMask & firstMask;
+                        *dst = (*dst & ~mask) | (out & mask);
+                    } else if (i == 0) {
+                        *dst = (*dst & ~(firstMask & mask)) | (firstMask & out & mask);
+                    } else if (i == words - 1) {
+                        *dst = (*dst & ~(lastMask & mask)) | (lastMask & out & mask);
+                    } else {
+                        *dst = (*dst & ~mask) | (out & mask);
+                    }
+                }
+                carry = word;
+                src++;
+                dst += 8;
+            }
+            src -= words - srcWords;
+            dst = (u32 *) ((u8 *) dst + ((((u8 *) dst - (u8 *) mDest) & 0x1F) == 0x1C ? nextTileRow * 4 : nextRow * 4));
+            rows--;
+        }
+    }
+}
+
 MChr16BinFontTransfer::~MChr16BinFontTransfer() {
 }
 
