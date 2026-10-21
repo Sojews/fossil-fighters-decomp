@@ -1228,6 +1228,7 @@ public:
     void StateCloseField();
     void StateUnloadOverlays();
     void StateBattle();
+    void StateResult();
     void StateLoadOverlays();
     void StateReviveStatus();
     void StateResetDisplays();

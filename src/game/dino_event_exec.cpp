@@ -23,6 +23,7 @@
 #include "m/picture.h"
 #include "m/seed_generator.h"
 #include "m/text_codec.h"
+#include "m/window.h"
 #include "m/lcd.h"
 #include "m/bright.h"
 #include "m/anime.h"
@@ -2362,15 +2363,17 @@ void DinoEventExecBattle::Idle() {
 extern "C" struct {
     u8 unk00[0x8];
     void (DinoEventExecAutoWarp::*StateStart_08)();
-    u8 unk10[0x18 - 0x10];
+    void (DinoEventExecBattle::*StateLoadOverlays_10)();
     void (DinoEventExecBattle::*StateOpenField_18)();
     void (DinoEventExecBattle::*Battle02041644_20)();
-    void (DinoEventExecBattle::*Battle0204108c_28)();
+    void (DinoEventExecBattle::*StateResult_28)();
     u8 unk30[0x38 - 0x30];
     void (DinoEventExecCleaning::*Cleaning0203ff38_38)();
     u8 unk40[0x48 - 0x40];
     void (DinoEventExecCleaning::*StateEnd_48)();
-    u8 unk50[0x78 - 0x50];
+    u8 unk50[0x58 - 0x50];
+    void (DinoEventExecBattle::*SoftReset_58)();
+    u8 unk60[0x78 - 0x60];
     void (DinoEventExecBattle::*StateLevelUp_78)();
 } data_020be144;
 extern "C" struct {
@@ -2379,12 +2382,15 @@ extern "C" struct {
     u8 unk10[0x20 - 0x10];
     void (DinoEventExecAutoWarp::*StateWarp_20)(); // 0x20
     void (DinoEventExecCleaning::*StateCloseField_28)(); // 0x28
-    u8 unk30[0x40 - 0x30];
+    u8 unk30[0x38 - 0x30];
+    void (DinoEventExecBattle::*StateResetDisplays_38)(); // 0x38
     void (DinoEventExecCleaning::*Unk02159b38_40)(); // 0x40
     void (DinoEventExecCleaning::*StateOpenField_48)(); // 0x48
     u8 unk50[0x58 - 0x50];
     void (DinoEventExecBattle::*Battle020401b0_58)(); // 0x58
-    u8 unk60[0x78 - 0x60];
+    u8 unk60[0x68 - 0x60];
+    void (DinoEventExecBattle::*StateOpenField_68)(); // 0x68
+    u8 unk70[0x78 - 0x70];
     void (DinoEventExecBattle::*Battle02041b24_78)(); // 0x78
 } data_020be1c4;
 extern "C" struct {
@@ -2678,7 +2684,96 @@ void DinoEventExecBattle::StateBattle() {
     } else {
         mSerial.AddTail(task);
     }
-    mState = data_020be144.Battle0204108c_28;
+    mState = data_020be144.StateResult_28;
+}
+
+// Lists an index in a vector of void *s. (Casting inside an inline keeps push_back's two flag bytes in the game's
+// slots; a cast at the call gives them each other's.)
+static inline void DinoPushIndex(std::vector<void *> &v, const u32 &i) {
+    v.push_back((void *const &)i);
+}
+
+// After the battle: a demo battle restarts the game (fading back in if it was lost), losing a battle that has to be
+// won is game over, and otherwise the result is saved and the team gets the experience, noting which creatures
+// levelled up (and which otherwise changed).
+// NONMATCHING: the game keeps the tag's argument address (sp - 4) in r7 and spills the creature copy's pointers
+// (its frame is 8 bytes bigger); ours spills the former.
+void DinoEventExecBattle::StateResult() {
+    MUnloadOverlay(0, M_OVERLAY_ID(ov000));
+    if (mDemo != -1) {
+        if (mUnk8C == 0) {
+            gLcd->GetBottomDisplay()->mBlend->Reset();
+            gLcd->GetBottomDisplay()->mWin->Reset();
+            gLcd->GetTopDisplay()->SetBackdrop(0xffff);
+            gLcd->GetBottomDisplay()->SetBackdrop(0xffff);
+            MTask *bottom = gLcd->GetBottomDisplay()->mBright->CreateFadeInFromBlack(30, 0);
+            MTask *top = gLcd->GetTopDisplay()->mBright->CreateFadeInFromBlack(30, 0);
+            MParallelTaskSet *fades = new MParallelTaskSet(TRUE);
+            fades->AddTail(top);
+            fades->AddTail(bottom);
+            mSerial.AddTail(fades);
+        }
+        mState = data_020be144.SoftReset_58;
+        return;
+    }
+    if (mUnk8C == 0 && mUnk8D != 0) {
+        gLcd->GetBottomDisplay()->mBlend->Reset();
+        gLcd->GetBottomDisplay()->mWin->Reset();
+        mEvent->SetResult(0);
+        MTextPicture *picture = new MTextPicture(gLcd->GetBottomDisplay(), "/image/gameover", TRUE, false);
+        picture->Show();
+        mParallel.AddTail(picture);
+        MTask *fadeOut;
+        MTask *exit;
+        MTask *wait = new MTimer(1);
+        exit = MTaskExitTransfer::Create(mEvent);
+        fadeOut = gLcd->GetBottomDisplay()->mBright->CreateFadeOutToBlack(60, 0);
+        MTask *hold = new MTimer(120);
+        MTask *fadeIn = gLcd->GetBottomDisplay()->mBright->CreateFadeInFromBlack(120, 0);
+        MTask *bgm = DinoSoundCreatePlayBgmTask(0x39f, 0);
+        MSerialTaskSet *serial = &mSerial;
+        serial->AddTail(bgm);
+        serial->AddTail(fadeIn);
+        serial->AddTail(hold);
+        serial->AddTail(fadeOut);
+        serial->AddTail(exit);
+        serial->AddTail(wait);
+        return;
+    }
+    gDinoBackup->SetFlag(mUnk80, mUnk8C);
+    if (mUnk88 != 0) {
+        gDinoBackup->SetFlag(mUnk88, mUnk8E);
+    }
+    DinoTeam team;
+    gDinoBackup->GetTeam(gDinoBackup->GetUnk34_26(), &team);
+    for (u32 i = 0; i < 5; i++) {
+        if (team.slots[i] != 0) {
+            gDinoBackup->GetCreature(team.slots[i], &mCreatures2[i]);
+            mCreatures[i] = mCreatures2[i];
+            u32 max, exp;
+            exp = mUnk90[0] + mCreatures2[i].unk0_8;
+            DinoCreatureState zero = DinoCreatureState();  // (the game zeroes such an unused temporary here)
+            max = kCreatureLevelLimits[0] * 11 + 50;
+            mCreatures2[i].unk0_8 = std::min(max, exp);
+            gDinoBackup->SetCreature(mCreatures2[i].index, &mCreatures2[i]);
+            if (GetCreatureLevel(mCreatures[i]) != GetCreatureLevel(mCreatures2[i])) {
+                DinoPushIndex(mUnk18C, i);
+            } else if (func_02031104(&mCreatures[i]) != func_02031104(&mCreatures2[i])) {
+                DinoPushIndex(mUnk198, i);
+            }
+        }
+    }
+    if (mUnk18C.size() != 0) {
+        mState = data_020be144.StateLoadOverlays_10;
+        DinoSoundLoadScene(0x20);
+        DinoSoundPlayBgm(0x456, 30);
+    } else if (mUnk198.size() != 0) {
+        mState = data_020be1c4.StateResetDisplays_38;
+        DinoSoundLoadScene(0x20);
+        DinoSoundPlayBgm(0x456, 30);
+    } else {
+        mState = data_020be1c4.StateOpenField_68;
+    }
 }
 
 void DinoEventExecBattle::StateLoadOverlays() {
