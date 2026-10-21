@@ -1,5 +1,5 @@
-func_01ff8000 kind:function(arm,size=0x1ec) addr:0x01ff8000
-func_01ff81ec kind:function(arm,size=0x39c) addr:0x01ff81ec
+_Z24M3DModelGetMorphVerticesP8M3DModel kind:function(arm,size=0x1ec) addr:0x01ff8000
+_Z24M3DModelPatchDisplayListP8M3DModelPKmm kind:function(arm,size=0x39c) addr:0x01ff81ec
 MemAlloc kind:function(thumb,size=0x54) addr:0x01ff8588
 MemFree kind:function(thumb,size=0x50) addr:0x01ff85dc
 malloc_init_state kind:function(thumb,size=0x58) addr:0x01ff862c

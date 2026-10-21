@@ -393,3 +393,231 @@ BOOL M3DModel::GetJointScreenPos(int joint, MPoint *pos) {
     }
     return TRUE;
 }
+
+// A morph animation: frames of every vertex's position, each after its time in frames.
+struct M3DMorphAnim {
+    u8 unk00[0x1C];
+    int frameCount;     // 0x1C
+    int vertexCount;    // 0x20
+    u8 unk24[4];
+    s16 frames[1];      // 0x28: per frame, the time (u16) and a pad, then the vertices' x, y, z
+};
+
+// The vertices blended between the current animation frame's two keys.
+extern "C" s16 data_0214c18c[];
+
+#define REG_CP_DIVCNT (*(volatile u16 *) 0x04000280)
+#define REG_CP_DIV_NUMER_L (*(volatile s32 *) 0x04000290)
+#define REG_CP_DIV_DENOM (*(volatile u64 *) 0x04000298)
+#define REG_CP_DIV_RESULT_L (*(volatile s32 *) 0x040002a0)
+
+// The hardware divider, as the SDK's CP functions use it.
+static inline void M3DSetDiv32_32(u32 numer, u32 denom) {
+    REG_CP_DIVCNT = 0;
+    REG_CP_DIV_NUMER_L = numer;
+    REG_CP_DIV_DENOM = denom;
+}
+
+static inline s32 M3DGetDivResult32() {
+    while (REG_CP_DIVCNT & 0x8000) {
+    }
+    return REG_CP_DIV_RESULT_L;
+}
+
+#pragma section ITCM begin
+#pragma thumb off
+
+// The model's vertices at its animation frame: a key's own when the frame is on it, else the two keys around it
+// blended (by the CPU and the hardware divider in turn).
+// NONMATCHING: register allocation (the game spills the count and the divider's zero high word to the stack).
+const s16 *M3DModelGetMorphVertices(M3DModel *model) {
+    const M3DMorphAnim *anim = (const M3DMorphAnim *) model->mAnimRes;
+    int count = anim->vertexCount;
+    if (count == 0) {
+        return data_0214c18c;
+    }
+    int w1 = 0;
+    u32 flags = ((const u32 *) model->mModelRes)[5];
+    const s16 *prev = anim->frames;
+    const s16 *next = prev;
+    u32 t1 = 0;
+    u32 t0 = 0;
+    u32 frame = model->mFrame;
+    s16 *out = data_0214c18c;
+    int w0;
+    int d;
+    if (flags & 2) {
+        for (; w1 < anim->frameCount; ) {
+            t1 = *(const u16 *) next;
+            if (t1 > frame >> 4) {
+                break;
+            }
+            w1++;
+            prev = next;
+            t0 = t1;
+            next += anim->vertexCount * 3 + 2;
+        }
+        int dt = t1 - t0;
+        w1 = frame - (t0 << 4);
+        d = dt << 4;
+        w0 = (dt << 4) - w1;
+    }
+    prev += 2;
+    next += 2;
+    if (t0 == t1 || w1 == 0) {
+        return prev;
+    }
+    if (count >= 650) {
+        return prev;
+    }
+    if (count & 1) {
+        out[0] = (prev[0] * w0 + next[0] * w1) / d;
+        out[1] = (prev[1] * w0 + next[1] * w1) / d;
+        out[2] = (prev[2] * w0 + next[2] * w1) / d;
+        next += 3;
+        prev += 3;
+        out += 3;
+    }
+    int n = (count >> 1) * 3;
+    for (int i = 0; i < n; i++) {
+        M3DSetDiv32_32(prev[0] * w0 + next[0] * w1, d);
+        out[1] = (prev[1] * w0 + next[1] * w1) / d;
+        next += 2;
+        prev += 2;
+        *out = M3DGetDivResult32();
+        out += 2;
+    }
+    return data_0214c18c;
+}
+
+// A texture entry of the model's texture table (mUnkDC), 0x1C bytes.
+struct M3DTexEntry {
+    u8 unk00[0x1C];
+};
+
+#define M3D_TEX_PLTT_OFFSET(tex) (*(const u32 *) ((const u8 *) (tex) + 0x20))
+#define M3D_TEX_IMAGE_PARAM(tex) (*(const s32 *) ((const u8 *) (tex) + 0x24))
+
+extern "C" void G3_LoadTexMtxTexCoord(const MtxFx44 *m);
+extern "C" void G3_MultMtx43(const MtxFx43 *m);
+
+// Patches the model's display list for this frame at each of the tags' offsets: vertex positions, texture and
+// palette bases, polygon attributes, matrices.
+// NONMATCHING: a few register choices, and the game masks the polygon id before the mirror test.
+void M3DModelPatchDisplayList(M3DModel *model, const u32 *tags, u32 count) {
+    const s16 *verts = M3DModelGetMorphVertices(model);
+    u32 frame = model->mFrame >> 4;
+    const u32 *texWords;
+    if (((const u32 *) model->mModelRes)[5] & 0xC) {
+        const u8 *anim = (const u8 *) model->mAnimRes;
+        texWords = (const u32 *) (anim + (((const u32 *) anim)[1] + ((const u32 *) anim)[2])) +
+                   frame * ((const u32 *) anim)[9];
+    } else {
+        const u8 *anim = (const u8 *) model->mAnimRes;
+        texWords = (const u32 *) (anim + (((const u32 *) anim)[1] + ((const u32 *) anim)[2]));
+    }
+    u32 i = 0;
+    if (i >= count) {
+        return;
+    }
+    u32 frameOffset = frame * 0x30;
+    do {
+        u32 word = tags[i * 2];
+        u32 offset = word & 0x0FFFFFFF;
+        u32 type = word >> 28;
+        u32 arg = tags[i * 2 + 1];
+        if (model->mUnk300 >= offset) {
+            switch (type) {
+            case 0: {
+                u16 x = verts[arg];
+                const s16 *v = verts + arg;
+                u32 at = offset & ~1;
+                *(u32 *) (model->mModelData + at) = x | (v[1] << 16);
+                *(s16 *) (model->mModelData + at + 4) = v[2];
+                break;
+            }
+            case 1: {
+                u32 t = texWords[arg];
+                const M3DTexEntry *tex = (const M3DTexEntry *) model->mUnkDC + ((t >> 24) & 0x7F);
+                u32 param = (M3D_TEX_IMAGE_PARAM(tex) | ((t << 28) >> 12)) + (model->mTexKey >> 3);
+                u32 at = offset & ~1;
+                *(u16 *) (model->mModelData + at) = param;
+                *(u16 *) (model->mModelData + at + 2) = param >> 16;
+                break;
+            }
+            case 2: {
+                u32 t = texWords[arg];
+                const M3DTexEntry *tex = (const M3DTexEntry *) model->mUnkDC + ((t >> 24) & 0x7F);
+                const M3DTexEntry *pltt = (const M3DTexEntry *) model->mUnkDC + ((t >> 16) & 0x7F);
+                int shift = 4 - (((M3D_TEX_IMAGE_PARAM(tex) >> 26) & 7) == 2 ? 1 : 0);
+                u32 base = (model->mPlttKey + M3D_TEX_PLTT_OFFSET(pltt)) >> shift;
+                u32 at = offset & ~1;
+                *(u16 *) (model->mModelData + at) = base;
+                *(u16 *) (model->mModelData + at + 2) = base >> 16;
+                break;
+            }
+            case 3: {
+                u32 t = texWords[arg];
+                int alpha = (int) (((t >> 8) & 0x1F) * model->mUnk1C) >> 12;
+                u32 id = model->mPolygonId + (model->mUnkD1 & arg);
+                if (alpha <= 0) {
+                    t &= ~0xC0;
+                    alpha = 0x1F;
+                }
+                if (model->mUnk2E != 0) {
+                    alpha = 0;
+                }
+                id &= 0x3F;
+                if (model->mScene->mUnk7C) {
+                    u32 x = (t ^ (t >> 1)) & 0x40;
+                    x |= x << 1;
+                    t ^= x;
+                }
+                if (alpha > 0x1F) {
+                    alpha = 0x1F;
+                }
+                u32 attr = (t & 0xF0) | (alpha << 16) | (id << 24) | 0xB000;
+                u32 at = offset & ~1;
+                *(u16 *) (model->mModelData + at) = attr;
+                *(u16 *) (model->mModelData + at + 2) = attr >> 16;
+                break;
+            }
+            case 4: {
+                MtxFx44 mtx;
+                REG_G3_MTX_MODE = 3;
+                MTX_Copy43To44_((const MtxFx43 *) ((const u8 *) model->mJointFrames[arg] + frameOffset), &mtx);
+                G3_LoadTexMtxTexCoord(&mtx);
+                u32 slot = (arg & 0xF) + 0xF;
+                *(volatile u32 *) 0x0400044C = slot;
+                *(u16 *) (model->mModelData + (offset & ~1)) = slot;
+                REG_G3_MTX_MODE = 2;
+                break;
+            }
+            case 5: {
+                const u8 *anim = (const u8 *) model->mAnimRes;
+                const u8 *mtx = anim + (((const u32 *) anim)[3] + (((const u32 *) anim)[1] + ((const u32 *) anim)[2]));
+                u32 n = arg >> 8;
+                while (n--) {
+                    mtx += 4 + ((const u32 *) anim)[6] * 0x30;
+                }
+                MIi_CpuCopy32(mtx + 4 + frameOffset, model->mModelData + (offset & ~1), 0x30);
+                break;
+            }
+            case 8:
+                *(u16 *) (model->mModelData + (offset & ~1)) = model->mUnk2F4;
+                break;
+            case 10:
+                if (model->unk2E0 != 0) {
+                    REG_G3_MTX_PUSH = 0;
+                    G3_MultMtx43((const MtxFx43 *) (model->unk2E0 + arg * 0x30));
+                    *(volatile u32 *) 0x0400044C = offset + 5;
+                    REG_G3_MTX_POP = 1;
+                }
+                break;
+            }
+        }
+    } while (++i < count);
+}
+
+#pragma thumb reset
+#pragma section ITCM end
