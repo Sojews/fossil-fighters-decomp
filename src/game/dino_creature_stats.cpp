@@ -5,6 +5,7 @@
 #include <algorithm>
 #include "game/dino_backup.h"
 #include "game/dino_resource.h"
+#include "game/dino_static_init.h"
 
 // How far towards the high value a stat is at each rank, along each curve (by curve, then rank).
 extern "C" const MFx32 data_020bc5b4[4][8];
@@ -126,3 +127,47 @@ extern "C" u32 func_02031104(const DinoCreatureState *creature) {
     }
     return func_02030f38(&info, false, MFx32::FromRaw(0)).hp;
 }
+
+// The file's static initialization (see dino_static_init.h): three points, and the curves (in sevenths, as fx32).
+extern "C" u8 data_020bc59c[];
+extern "C" u8 data_020bc61c[];
+
+static struct DinoCreatureStatsStaticInit {
+    DinoCreatureStatsStaticInit() {
+        DINO_POOL(MPoint, data_020bc59c, 0x14) = MPoint(128, 176);
+        DINO_POOL(MPoint, data_020bc59c, 0xc) = MPoint(8, 150);
+        DINO_POOL(MPoint, data_020bc59c, 4) = MPoint(64, 112);
+        DINO_POOL_WORD(data_020bc59c, 0x1c) = 0x0;
+        DINO_POOL_WORD(data_020bc59c, 0x20) = 0x249;
+        DINO_POOL_WORD(data_020bc59c, 0x24) = 0x492;
+        DINO_POOL_WORD(data_020bc59c, 0x28) = 0x6db;
+        DINO_POOL_WORD(data_020bc59c, 0x2c) = 0x925;
+        DINO_POOL_WORD(data_020bc59c, 0x30) = 0xb6e;
+        DINO_POOL_WORD(data_020bc59c, 0x34) = 0xdb7;
+        DINO_POOL_WORD(data_020bc59c, 0x38) = 0x1000;
+        DINO_POOL_WORD(data_020bc59c, 0x3c) = 0x0;
+        DINO_POOL_WORD(data_020bc59c, 0x40) = 0x43f;
+        DINO_POOL_WORD(data_020bc59c, 0x44) = 0x7d6;
+        DINO_POOL_WORD(data_020bc59c, 0x48) = 0xac7;
+        DINO_POOL_WORD(data_020bc59c, 0x4c) = 0xd10;
+        DINO_POOL_WORD(data_020bc59c, 0x50) = 0xeb2;
+        DINO_POOL_WORD(data_020bc59c, 0x54) = 0xfac;
+        DINO_POOL_WORD(data_020bc59c, 0x58) = 0x1000;
+        DINO_POOL_WORD(data_020bc59c, 0x5c) = 0x0;
+        DINO_POOL_WORD(data_020bc59c, 0x60) = 0x54;
+        DINO_POOL_WORD(data_020bc59c, 0x64) = 0x14e;
+        DINO_POOL_WORD(data_020bc59c, 0x68) = 0x2f0;
+        DINO_POOL_WORD(data_020bc59c, 0x6c) = 0x539;
+        DINO_POOL_WORD(data_020bc59c, 0x70) = 0x82a;
+        DINO_POOL_WORD(data_020bc59c, 0x74) = 0xbc1;
+        DINO_POOL_WORD(data_020bc59c, 0x78) = 0x1000;
+        DINO_POOL_WORD(data_020bc59c, 0x7c) = 0x0;
+        DINO_POOL_WORD(data_020bc61c, 0x0) = 0x249;
+        DINO_POOL_WORD(data_020bc61c, 0x4) = 0x249;
+        DINO_POOL_WORD(data_020bc61c, 0x8) = 0x6db;
+        DINO_POOL_WORD(data_020bc61c, 0xc) = 0x6db;
+        DINO_POOL_WORD(data_020bc61c, 0x10) = 0xb6e;
+        DINO_POOL_WORD(data_020bc61c, 0x14) = 0xb6e;
+        DINO_POOL_WORD(data_020bc61c, 0x18) = 0x1000;
+    }
+} sDinoCreatureStatsStaticInit;
