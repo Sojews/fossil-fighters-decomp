@@ -69,6 +69,162 @@ void DinoCommonWindowMenu::AddEntry(u32 id, MRect rect, const std::string &text)
     mEntries.push_back(entry);
 }
 
+extern "C" struct {
+    void (DinoHelpBase::*Enable)();
+} data_020bbd44;
+
+// The excavation settings' section at offset7C (the input repeat is at 0x1C and 0x20).
+static inline const int *GetExcavate7C(MResource<DinoExcavateDefs> &defs) {
+    const DinoExcavateDefs *d = defs.Get();
+    if (d->offset7C == 0) {
+        return NULL;
+    }
+    return (const int *)((const u8 *)d + d->offset7C);
+}
+
+// Sizes the window to the widest choice and the count, then a menu item per choice ("*" marks the cancel choice;
+// "text:name" gives the help a name), help areas for the entries, the cursor, and opens the window. With no choices,
+// just exits.
+// NONMATCHING: stack layout (the game's frame is 0x1C smaller: fewer string/point temporaries) and the width/height
+// stores' order.
+#pragma opt_strength_reduction off
+#pragma auto_inline off
+template MTask *MCreateCallTask(DinoCommonWindowMenu *obj, void (DinoHelpBase::*func)());
+void DinoCommonWindowMenu::OnStart() {
+    if (mChoices.size() == 0) {
+        Exit();
+        return;
+    }
+    SetLinkFallback(1);
+    MFont *font = gDinoResource->CreateFont12(0, 1, 0);
+    int width = 0x18;
+    for (u32 i = 0; i < mChoices.size(); i++) {
+        std::string text = mChoices[i].unk04;
+        if (text.size() != 0 && text[0] == '*') {
+            text = text.substr(1);
+        }
+        u32 colon = text.find(':', 0);
+        if (colon != std::string::npos) {
+            text = text.substr(0, colon);
+        }
+        MPoint size = font->MeasureText(text, 0, 0);
+        if (size.x > width) {
+            width = size.x;
+        }
+    }
+    mUnkBC = (mChoices.size() + 1) / 4 + mChoices.size() * 2 + 2;
+    mWidth = (width + 7) / 8 + 4;
+    switch (mUnkFC) {
+    case 0:
+        mUnk100 = MPoint(0, 0);
+        break;
+    case 1:
+        mUnk100 = MPoint(mWidth * 8, 0);
+        break;
+    case 2:
+        mUnk100 = MPoint(0, mUnkBC * 8);
+        break;
+    case 3:
+        mUnk100 = MPoint(mWidth * 8, mUnkBC * 8);
+        break;
+    case 4:
+        mUnk100 = MPoint(mWidth * 4, mUnkBC * 4);
+        break;
+    case 5:
+        mUnk100 = MPoint(mWidth * 4, 0);
+        break;
+    case 6:
+        mUnk100 = MPoint(mWidth * 4, mUnkBC * 8);
+        break;
+    }
+    mWindow = new DinoCommonWindow(0, false, false);
+    mWindow->SetFrame(MRect(MPoint(0, 0), MPoint(mWidth, mUnkBC)));
+    mWindow->SetPriority(0);
+    mWindow->SetPosition(mPos - mUnk100);
+    mParallel.AddTail(mWindow);
+    MParallelTaskSet *shows = new MParallelTaskSet(TRUE);
+    MMenuItem *focus = NULL;
+    mCancelItem = NULL;
+    int y = 8;
+    for (u32 i = 0; i < mChoices.size(); i++) {
+        std::string text;
+        std::string name;
+        BOOL cancel = FALSE;
+        if (mChoices[i].unk00 == (u32)-2) {
+            cancel = TRUE;
+        }
+        text = mChoices[i].unk04;
+        name = mChoices[i].unk10;
+        if (text.size() != 0 && text[0] == '*') {
+            cancel = TRUE;
+            text = text.substr(1);
+        }
+        u32 colon = text.find(':', 0);
+        if (colon != std::string::npos) {
+            name = text.substr(colon + 1);
+            text = text.substr(0, colon);
+        }
+        mUnkC0.push_back(new DinoCommonWindowMenuItem(font, (mPos - mUnk100).Offset(0x18, y), text, name, width));
+        AddItem((MMenuItem *)mUnkC0[i]);
+        DinoHelpBase::AddEntry((u32)(DinoHelpItem *)(DinoCommonWindowMenuItem *)mUnkC0[i], 1, 0);
+        DinoHelpBase::AddEntry((u32)(DinoHelpItem *)(DinoCommonWindowMenuItem *)mUnkC0[i], 3, 0);
+        shows->AddTail(((DinoCommonWindowMenuItem *)mUnkC0[i])->mUnk94->CreateShowTransfer());
+        if (*(u32 *)mUnkE4 == mChoices[i].unk00) {
+            focus = (MMenuItem *)mUnkC0[i];
+        }
+        if (cancel) {
+            mCancelItem = (MMenuItem *)mUnkC0[i];
+        }
+        y += 0x12;
+    }
+    AddLink((MMenuItem *)mUnkC0[0], 4, (MMenuItem *)mUnkC0[mUnkC0.size() - 1]);
+    AddLink((MMenuItem *)mUnkC0[mUnkC0.size() - 1], 2, (MMenuItem *)mUnkC0[0]);
+    DinoHelpDummyItem *prev = NULL;
+    for (u32 i = 0; i < mEntries.size(); i++) {
+        DinoCommonWindowMenuEntry *entry = &mEntries[i];
+        DinoHelpDummyItem *help = new DinoHelpDummyItem((MDisplay *)entry->id, entry->rect, std::string(entry->text));
+        mParallel.AddTail(help);
+        if (prev != NULL) {
+            DinoHelpBase::AddEntry((u32)prev, 2, (u32)help);
+        }
+        DinoHelpBase::AddEntry((u32)help, 4, (u32)prev);
+        DinoHelpBase::AddEntry((u32)help, 1, 0);
+        DinoHelpBase::AddEntry((u32)help, 3, 0);
+        prev = help;
+    }
+    if (prev != NULL) {
+        DinoHelpBase::AddEntry((u32)prev, 2, (u32)(DinoHelpItem *)(DinoCommonWindowMenuItem *)mUnkC0[0]);
+        DinoHelpBase::AddEntry((u32)(DinoHelpItem *)(DinoCommonWindowMenuItem *)mUnkC0[0], 4, (u32)prev);
+    }
+    MSmartOam *oam = new MSmartOam(1, 0, TRUE);
+    mCursor = new DinoCommonWindowMenuCursor(oam);
+    mParallel.AddTail(mCursor);
+    mCursor->SetPriority(0);
+    mCursorTasks = new MParallelTaskSet();
+    mParallel.AddTail(mCursorTasks);
+    mParallel.AddTail(oam);
+    if (focus == NULL) {
+        focus = (MMenuItem *)mUnkC0[0];
+    }
+    FocusItem(focus);
+    mCursor->Hide();
+    MTask *play = mCursor->mUnk10->CreatePlayTransfer(1, 1);
+    shows->AddTail(mCursor->CreateShowTransfer());
+    shows->AddTail(play);
+    DinoSoundPlaySe(0x95, 0);
+    {
+        MResource<DinoExcavateDefs> delayDefs = gDinoResource->GetExcavateDefs();
+        MResource<DinoExcavateDefs> intervalDefs = gDinoResource->GetExcavateDefs();
+        GetInput()->SetRepeat(0xF0, GetExcavate7C(delayDefs)[7], GetExcavate7C(intervalDefs)[8]);
+    }
+    MTask *enable = MCreateCallTask(this, data_020bbd44.Enable);
+    MTask *open = mWindow->CreateOpenTask(MRect(mPos, mPos));
+    MTask *show = mWindow->CreateShowTransfer();
+    mSerial.AddTail(new MTimer(1), show, open, shows, enable);
+}
+#pragma auto_inline reset
+#pragma opt_strength_reduction reset
+
 // A choice: its text in an indicator (hidden until shown) at pos, and its frame the given width.
 // (No common subexpressions: the game reads gCurrentDisplay after copying the size argument.)
 #pragma opt_common_subs off
@@ -216,7 +372,6 @@ const char *DinoCommonWindowMenuItem::GetText() {
 // Template task instances the game emits in this file. Until the code that makes the tasks is decompiled, they are
 // instantiated explicitly.
 template class MCallTask0<DinoCommonWindowMenu, DinoHelpBase>;
-template MTask *MCreateCallTask(DinoCommonWindowMenu *obj, void (DinoHelpBase::*func)());
 
 MRect DinoCommonWindowMenuItem::GetFrame() {
     return mFrame;
