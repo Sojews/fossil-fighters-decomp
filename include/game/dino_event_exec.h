@@ -330,6 +330,9 @@ public:
     // then plays a sound for the first chara reacting and the first one near the focus.
     void StateStart();
     void StateWarp();
+    // Plays the region's bgm, fades in (by the area's kind) and walks the focus out of the area it arrived in (its
+    // followers placed behind), then exits.
+    void StateArrive();
 
     void (DinoEventExecAutoWarp::*mState)(); // 0x74
     DinoEventLoop *mEvent;  // 0x7C

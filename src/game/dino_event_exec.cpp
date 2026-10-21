@@ -2336,7 +2336,7 @@ extern "C" struct {
     void (DinoEventExecBattle::*Battle020416d0_30)();
     u8 unk38[0x50 - 0x38];
     void (DinoEventExecBattle::*Battle0204079c_50)();
-    void (DinoEventExecAutoWarp::*AutoWarp02042014_58)();
+    void (DinoEventExecAutoWarp::*StateArrive_58)();
     u8 unk60[0x70 - 0x60];
     void (DinoEventExecBattle::*BattleStart_70)();
     void (DinoEventExecBattle::*DemoStart_78)();
@@ -2546,7 +2546,76 @@ void DinoEventExecAutoWarp::StateWarp() {
     chara.x = pos.x;
     chara.y = pos.y;
     gDinoBackup->SetChara(focus, &chara);
-    mState = data_020be244.AutoWarp02042014_58;
+    mState = data_020be244.StateArrive_58;
+}
+
+// An area of a field map (DinoFieldMap::GetArea).
+struct DinoFieldMapArea {
+    u32 id;         // 0x00
+    u8 unk04[0xC - 0x4];
+    u32 exitAngle;  // 0x0C: the way out of a warp (-1: none)
+    u32 fade;       // 0x10: how it fades in
+};
+
+struct DinoWarpDefs {
+    MFx32 GetUnk24() const { return unk24; }
+
+    u8 unk00[0x24];
+    MFx32 unk24;
+};
+
+// NONMATCHING: the game spills tasks, the move, the wait and the angle in the opposite order and stores the 10 and 2
+// before it takes the length.
+void DinoEventExecAutoWarp::StateArrive() {
+    if ((mNewBgm != 0 && mScene != mNewScene) || mBgm != mNewBgm) {
+        DinoSoundLoadScene(mNewScene);
+        mEvent->GetField()->PlayBgm(mNewBgm, 0);
+    }
+    MParallelTaskSet *tasks = new MParallelTaskSet(TRUE);
+    MFx32Point pos = mEvent->GetField()->GetChara(mEvent->GetField()->GetCamera()->GetFocus())->GetModel()->pos;
+    DinoFieldMapArea *area = (DinoFieldMapArea *)mEvent->GetField()->GetMap()->GetArea(pos);
+    switch (area->fade) {
+    case 0:
+        tasks->AddTail(new DinoEventExecFade(mEvent, 0, 30, 1));
+        break;
+    case 1:
+        tasks->AddTail(new DinoEventExecFade(mEvent, 4, 30, 1));
+        break;
+    }
+    u32 angle = area->exitAngle;
+    if (angle != (u32)-1) {
+        const DinoWarpDefs *defs = (const DinoWarpDefs *)gDinoResource->GetExcavate78();
+        MFx32 walk = mEvent->GetField()->GetMap()->GetWalkSpeed();
+        MFx32 speed = defs->GetUnk24() * walk;
+        MFx32Point step =
+            MFx32Point(MFx32::FromRaw(FX_CosIdx((u16)angle)), MFx32::FromRaw(FX_SinIdx((u16)angle))) / MFx32(4);
+        MFx32Point offset = step * MFx32(8);
+        do {
+            offset += step;
+        } while (((DinoFieldMapArea *)mEvent->GetField()->GetMap()->GetArea(pos + offset))->id == area->id);
+        MTask *wait = mEvent->GetField()->CreateCharaWaitMoveTask(mEvent->GetField()->GetCamera()->GetFocus());
+        MTask *move = mEvent->GetField()->CreateCharaMoveOffsetTask(
+            mEvent->GetField()->GetCamera()->GetFocus(), offset, MFx32ToInt(offset.Length() / MFx32(2) * MFx32(10)),
+            0, 0);
+        MTimer *timer = new MTimer(10);
+        MTask *turn = mEvent->GetField()->CreateCharaAngleTask(mEvent->GetField()->GetCamera()->GetFocus(), angle, 1, 0);
+        MSerialTaskSet *serial = new MSerialTaskSet(TRUE);
+        serial->AddTail(turn, timer, move, wait);
+        tasks->AddTail(serial);
+        for (int i = 0; i < 100u; i++) {
+            DinoFieldChara *chara = mEvent->GetField()->GetCharaSlot(i);
+            DinoFieldCharaModel *model = chara->GetModel();
+            if (model->id != 0 && chara->GetTask()->unk4 == 1) {
+                model->pos = pos - step * MFx32(15);
+                model->angle = angle;
+                chara->ApplyMotion();
+            }
+        }
+    }
+    MTask *exit = MTaskExitTransfer::Create(this);
+    MSerialTaskSet *serial = &mSerial;
+    serial->AddTail(tasks);
+    serial->AddTail(exit);
 }
 
 // (A battle side made here emits its implicit constructor and destructor, which the game's code in this file calls.)
