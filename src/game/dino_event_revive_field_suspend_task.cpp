@@ -1,6 +1,8 @@
 // DinoEventReviveFieldSuspendTask, DinoEventReviveFieldResumeTask, DinoEventReviveContainerSelect, DinoEventReviveDepositSelect, DinoEventReviveCleaning, DinoEventReviveEffect.
 // Only the destructors are decompiled so far.
 
+#pragma ipa file
+
 #define MSL_STRING_BASICS
 #include "game/dino_static_init.h"
 #include "game/dino_cleaning.h"
@@ -27,6 +29,7 @@
 #include "game/dino_ui_cleaning_leave.h"
 #include "game/dino_ui_revive_effect.h"
 #include "game/dino_ui_revive_status_menu.h"
+
 
 // String members the game emits in this file (+= first: instantiated after replace, mwcc mangles it long-hand).
 template std::string &std::string::operator+=(const std::string &str);
@@ -317,6 +320,14 @@ void DinoEventRevive::StateContainerSelect() {
     mSerial.AddTail(new DinoEventReviveContainerSelect(&mRock));
     mState = data_020bd628.StateSelected_BC;
 }
+
+// (Making one here puts the message resource constructor's copy ahead of DinoEventRevive's constructor, which calls
+// it; the game's copy lives elsewhere.)
+#pragma dont_inline on
+void DinoReviveMessagesAnchor(MResource<DinoMessageData> *messages) {
+    *messages = MResource<DinoMessageData>("/msg/msg_cleaning");
+}
+#pragma dont_inline reset
 
 DinoEventRevive::DinoEventRevive(DinoEventLoop *event) : MProcess(gLcd->GetBottomDisplay()), mEvent(event) {
     mMessages = MResource<DinoMessageData>("/msg/msg_cleaning");
