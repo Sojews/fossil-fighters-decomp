@@ -1,5 +1,7 @@
 // Save memory devices.
 
+#pragma ipa file
+
 #include <string.h>
 #include "m/backup.h"
 #include "nitro/mi.h"
@@ -190,6 +192,7 @@ MBackupStorage::~MBackupStorage() {
     delete mDevice;
 }
 
+// NONMATCHING since the file went to #pragma ipa file: the inlined resize's tag temporary takes the other byte slot.
 void MBackupStorage::AddFile(u32 size, u32 copies) {
     File file;
     file.size = size;
@@ -215,6 +218,14 @@ u32 MBackupStorage::AllocRegion(u32 size) {
     mRegions.push_back(region);
     return index;
 }
+
+// The storage's vector members, in the game's order.
+template void std::__vec_deleter<MBackupStorage::Region, std::allocator<MBackupStorage::Region> >::sub_push_back(
+    const MBackupStorage::Region &x, Metrowerks::int2type<true>);
+template std::__vec_deleter<MBackupStorage::Region, std::allocator<MBackupStorage::Region> >::~__vec_deleter();
+template void std::__vec_deleter<MBackupStorage::File, std::allocator<MBackupStorage::File> >::sub_push_back(
+    const MBackupStorage::File &x, Metrowerks::int2type<false>);
+template std::__vec_deleter<MBackupStorage::File, std::allocator<MBackupStorage::File> >::~__vec_deleter();
 
 void MBackupStorage::Mount() {
     mMountTried = TRUE;
