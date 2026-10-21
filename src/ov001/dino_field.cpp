@@ -1639,6 +1639,77 @@ extern "C" struct {
     const char *mBlackPath;     // 0x04: "/motion/common/black.bin"
 } data_ov001_02169360;
 
+// The TU's pooled pointer-to-member constants.
+extern "C" struct {
+    void (DinoFieldCaptureFadeInTask::*LoadField_00)();
+} data_ov001_021693bc;
+
+// NONMATCHING: the game works out the blend target (1 << bg) before fetching the bottom display (as the fade-out).
+// Brings the field back: the capture left on the top screen moves to the bottom screen and shrinks away while the field
+// reloads in the background, then the top screen fades in from black.
+void DinoFieldCaptureFadeInTask::Idle() {
+    switch (mUnk7C++) {
+    case 0: {
+        mField->Suspend();
+        mTasks = new MSerialTaskSet;
+        mParallel.AddTail(mTasks);
+        mTopBitmap = *(MDirectBitmap **) mField->mUnk2C8;
+        *(MDirectBitmap **) mField->mUnk2C8 = NULL;
+        gLcd->GetBottomDisplay()->mBright->Reset();
+        gLcd->GetBottomDisplay()->mBg->SetMode(3);
+        mBitmap = gLcd->GetBottomDisplay()->mBg->CreateDirectBitmap(1, 1);
+        mBitmap->SetCenter(MPoint(128, 96));
+        mBitmap->Show();
+        MIi_CpuCopyFast((void *) mTopBitmap->mBase, (void *) mBitmap->mBase, 0x18000);
+        MIi_CpuClearFast(0, (void *) (mBitmap->mBase + 0x18000), 0x8000);
+        MSmartOam *oam = new MSmartOam(gLcd->GetBottomDisplay(), 4, 0, 1);
+        MMotion *black = (mBlack = new MMotion(std::string(data_ov001_02169360.mBlackPath), oam, 0, 1));
+        black->Play(1, 0);
+        black->SetPosition(128, 96);
+        black->SetPriority(1);
+        black->Show();
+        GetParallel()->AddTail(black, oam);
+        mSerial.AddTail(new MTimer(1), (new MParallelTaskSet(TRUE))
+                                           ->Add(new MTimer(60))
+                                           ->Add(MCreateBgCallTask(this, data_ov001_021693bc.LoadField_00, 1)));
+        mTasks->AddTail((new MParallelTaskSet(TRUE))
+                            ->Add(mTopBitmap->CreateOffsetAnime(MPoint(0, 0), MPoint(0, -256), 60, 12))
+                            ->Add(mBitmap->CreateOffsetAnime(MPoint(0, 256), MPoint(0, 0), 60, 12))
+                            ->Add(mBitmap->CreateScaleAnime(
+                                MFx32Point(MFx32::FromRaw(0x1333), MFx32::FromRaw(0x1333)),
+                                MFx32Point(MFx32::FromRaw(0xB33), MFx32::FromRaw(0xB33)), 300, 0)));
+        return;
+    }
+    case 1: {
+        gLcd->GetTopDisplay()->mBg->DeleteDirectBitmap(mTopBitmap);
+        gLcd->GetTopDisplay()->ResetHooks();
+        gLcd->GetTopDisplay()->Setup(5, 2, 1, 0, 0, 0);
+        gLcd->GetTopDisplay()->SetBackdrop(0x8000);
+        gLcd->GetTopDisplay()->mObj->Show();
+        mField->Run();
+        mField->GetCamera()->SetUnk15C(0);
+        mField->GetCamera()->NotifyHooks1();
+        gLcd->GetBottomDisplay()->mBlend->Reset();
+        gLcd->GetBottomDisplay()->mBlend->SetMode(1);
+        gLcd->GetBottomDisplay()->mBlend->SetTarget1(1 << mBitmap->mBg);
+        gLcd->GetBottomDisplay()->mBlend->SetTarget2(0x3F);
+        mBlack->Hide();
+        mSerial.AddTail(mField->mScene->CreateWaitTransferCompleteTask(),
+                        (new MParallelTaskSet(TRUE))
+                            ->Add(gLcd->GetTopDisplay()->mBright->CreateFadeInFromBlack(10, 0))
+                            ->Add(gLcd->GetBottomDisplay()->mBlend->CreateAlphaRatioAnime(16, 0, 16, 16, 10, 0)),
+                        MTaskSetMakeEmptyTask::Create(mTasks));
+        return;
+    }
+    case 2:
+        gLcd->GetBottomDisplay()->mBlend->Reset();
+        gLcd->GetBottomDisplay()->mBg->DeleteDirectBitmap(mBitmap);
+        gLcd->GetBottomDisplay()->mBg->SetMode(0);
+        Exit();
+        return;
+    }
+}
+
 // Captures the bottom screen, fades it into the top one, then closes a circle on the bottom screen and removes the
 // field's sprites.
 // NONMATCHING: the game works out the blend target (1 << bg) before fetching the bottom display, and keeps the
