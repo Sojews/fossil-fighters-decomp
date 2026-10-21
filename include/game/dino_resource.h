@@ -264,19 +264,71 @@ struct DinoMapMData {
 };
 struct DinoMapData;
 // A battle's settings.
+// A battle side's creature.
+struct DinoBattleCreatureData {
+    u32 id;             // 0x00
+    s32 level;          // 0x04: 1-12
+    u32 unk08;          // 0x08
+};
+// One side of a battle (the counts are of the u32s at the offsets after them).
+struct DinoBattleSideData {
+    const DinoBattleCreatureData *GetCreatures() const {
+        return (const DinoBattleCreatureData *)((const u8 *)this + creatureOffset);
+    }
+    const DinoBattleCreatureData &GetCreature(u32 i) const { return GetCreatures()[i]; }
+    const u32 *GetUnk14() const { return (const u32 *)((const u8 *)this + unk14); }
+    const u32 *GetUnk1C() const { return (const u32 *)((const u8 *)this + unk1C); }
+    const u32 *GetUnk24() const { return (const u32 *)((const u8 *)this + unk24); }
+    const u32 *GetUnk2C() const { return (const u32 *)((const u8 *)this + unk2C); }
+
+    u32 creatureCount;  // 0x00
+    u32 creatureOffset; // 0x04
+    u32 nameText;       // 0x08: 0 for the player's own name
+    u32 unk0C;          // 0x0C
+    u32 unk10;          // 0x10
+    u32 unk14;          // 0x14
+    u32 unk18;          // 0x18
+    u32 unk1C;          // 0x1C
+    u32 unk20;          // 0x20
+    u32 unk24;          // 0x24
+    u32 unk28;          // 0x28
+    u32 unk2C;          // 0x2C
+    u32 unk30;          // 0x30
+    u8 unk34;           // 0x34
+};
 struct DinoBattleData {
     // The creatures the rule names.
     const u32 *GetUnk40() const { return (const u32 *)((const u8 *)this + unk40); }
     u32 GetUnk44() const { return unk44; }
+    const DinoBattleSideData *GetPlayer() const {
+        return playerOffset == 0 ? NULL : (const DinoBattleSideData *)((const u8 *)this + playerOffset);
+    }
+    const DinoBattleSideData *GetEnemy() const {
+        return enemyOffset == 0 ? NULL : (const DinoBattleSideData *)((const u8 *)this + enemyOffset);
+    }
 
-    u8 unk00[0x1C];
+    u32 unk00;
+    u32 playerOffset;   // 0x04: 0 for the player's team
+    u32 enemyOffset;    // 0x08
+    u32 unk0C;          // 0x0C
+    u32 scene;          // 0x10
+    u8 unk14;           // 0x14
+    u32 unk18;          // 0x18
     u32 unk1C;          // 0x1C: a talk text
     u32 unk20;          // 0x20: a talk text
-    u8 unk24[0x3C - 0x24];
+    u32 tutorialId;     // 0x24
+    u32 liveName;       // 0x28
+    u32 unk2C;          // 0x2C
+    u32 unk30;          // 0x30
+    u8 unk34[0x3C - 0x34];
     u32 unk3C;          // 0x3C: 1-3
     u32 unk40;          // 0x40: offset of unk3C creature ids
     u32 unk44;          // 0x44: 1-5, or 0 for none
     u32 unk48;          // 0x48: 1-3
+    u32 unk4C;          // 0x4C
+    u32 unk50;          // 0x50
+    s32 unk54;          // 0x54: a percentage, or -1
+    u8 unk58;           // 0x58
 };
 // A shop's stock: entries always sold, then entries picked from at random.
 struct DinoShopData {

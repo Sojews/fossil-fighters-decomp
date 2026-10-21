@@ -643,6 +643,7 @@ void DinoEventExecDance::Idle() {
     serial->AddTail(exit);
 }
 
+M_EXTERN_OVERLAY(ov000);
 M_EXTERN_OVERLAY(ov002);
 M_EXTERN_OVERLAY(ov003);
 M_EXTERN_OVERLAY(ov004);
@@ -2364,7 +2365,8 @@ extern "C" struct {
     u8 unk10[0x18 - 0x10];
     void (DinoEventExecBattle::*StateOpenField_18)();
     void (DinoEventExecBattle::*Battle02041644_20)();
-    u8 unk28[0x38 - 0x28];
+    void (DinoEventExecBattle::*Battle0204108c_28)();
+    u8 unk30[0x38 - 0x30];
     void (DinoEventExecCleaning::*Cleaning0203ff38_38)();
     u8 unk40[0x48 - 0x40];
     void (DinoEventExecCleaning::*StateEnd_48)();
@@ -2478,6 +2480,205 @@ void DinoEventExecBattle::StateUnloadOverlays() {
     MUnloadOverlay(0, M_OVERLAY_ID(ov003));
     MUnloadOverlay(0, M_OVERLAY_ID(ov006));
     mState = data_020be244.Battle0204079c_50;
+}
+
+// Gives a creature the part levels of the given level (1-12).
+static inline void DinoBattleSetLevel(DinoCreatureState *creature, int level) {
+    if (level > 12) {
+        level = 12;
+    }
+    DinoCreaturePart *parts = creature->parts;
+    for (u32 j = 0; j < 4; j++) {
+        parts[j].level = 0;
+        parts[j].unk12 = 0;
+    }
+    switch (level) {
+    case 12:
+        parts[3].level += kCreatureLevelLimits[0];
+    case 11:
+        parts[3].level += kCreatureLevelLimits[0];
+    case 10:
+        parts[3].level += kCreatureLevelLimits[0];
+    case 9:
+        parts[2].level += kCreatureLevelLimits[0];
+    case 8:
+        parts[2].level += kCreatureLevelLimits[0];
+    case 7:
+        parts[2].level += kCreatureLevelLimits[0];
+    case 6:
+        parts[1].level += kCreatureLevelLimits[0];
+    case 5:
+        parts[1].level += kCreatureLevelLimits[0];
+    case 4:
+        parts[1].level += kCreatureLevelLimits[0];
+    case 3:
+        parts[0].level += kCreatureLevelLimits[0];
+    case 2:
+        parts[0].level += kCreatureLevelLimits[0];
+    case 1:
+        parts[0].level += 50;
+    }
+}
+
+// Sets the battle up from its data (the player's side from the player's own team where the data has none) and
+// runs it, watched by the auto demo for a demo battle.
+void DinoEventExecBattle::StateBattle() {
+    MLoadOverlay(0, M_OVERLAY_ID(ov000));
+    mUnk8C = 0;
+    MResource<DinoBattleData> battle = gDinoResource->LoadBattle(mBattle);
+    MI_CpuFill8(mCreatures2, 0, sizeof(mCreatures2));
+    mUnk8D = battle.Get()->unk14;
+    DinoBattleParams params;
+    MI_CpuFill8(&params, 0, sizeof(params));
+    params.unk00 = 1;
+    params.unk08 = 0;
+    params.unk0C = 2;
+    params.unk10 = 0;
+    params.unk14 = 1;
+    params.unk1C = 1;
+    params.unk2C = battle.Get()->unk0C;
+    params.mScene = battle.Get()->scene;
+    params.unk154 = battle.Get()->unk30;
+    params.mTutorialId = battle.Get()->tutorialId;
+    params.mLiveName = (const char *)battle.Get()->liveName;
+    params.unk148 = battle.Get()->unk18;
+    params.unk14C = battle.Get()->unk1C;
+    params.unk150 = battle.Get()->unk20;
+    s32 rate = battle.Get()->unk54;
+    BOOL flag = gDinoBackup->GetSystemFlag(0x2c);
+    if (flag | (rate == -1)) {
+        params.unk160 = -1;
+    } else {
+        rate = battle.Get()->unk54;
+        params.unk160 = rate * gDinoBackup->GetSystemVar(0x2b) / 100;
+    }
+    const DinoBattleSideData *enemy = battle.Get()->GetEnemy();
+    params.sides[1].mName = gDinoResource->GetText(enemy->nameText);
+    params.sides[1].unk54 = enemy->unk0C;
+    params.sides[1].unk58 = enemy->unk30;
+    params.sides[1].unk88 = enemy->unk34;
+    for (u32 i = 0; i < enemy->creatureCount; i++) {
+        const DinoBattleCreatureData &entry = enemy->GetCreature(i);
+        DinoCreatureState *creature = (DinoCreatureState *)&params.sides[1].mCreatures[i];
+        creature->index = entry.id;
+        DinoBattleSetLevel(creature, entry.level);
+        params.sides[1].mCreatures[i].unk14 = entry.unk08;
+    }
+    params.unk158 = battle.Get()->unk4C != 0;
+    params.unk15C = battle.Get()->unk50;
+    for (u32 i = 0; i < enemy->unk10; i++) {
+        params.sides[1].unk5C[i] = enemy->GetUnk14()[i];
+    }
+    for (u32 i = 0; i < enemy->unk28; i++) {
+        (&params.sides[1].unk68)[i] = enemy->GetUnk2C()[i];
+    }
+    for (u32 i = 0; i < enemy->unk18; i++) {
+        (&params.sides[1].unk7C)[i] = enemy->GetUnk1C()[i];
+    }
+    for (u32 i = 0; i < enemy->unk20; i++) {
+        params.sides[1].mLevels[i] = enemy->GetUnk24()[i];
+    }
+    params.unk164 = battle.Get()->unk58;
+    const DinoBattleSideData *player = battle.Get()->GetPlayer();
+    if (player != NULL) {
+        DinoPlayerData data;
+        gDinoBackup->GetPlayer(&data, 0);
+        params.sides[0].unk88 = player->unk34;
+        if (player->nameText != 0) {
+            params.sides[0].mName = gDinoResource->GetText(player->nameText);
+        } else {
+            params.sides[0].mName = MEncodeText(std::wstring((const wchar_t *)data.name), 0);
+        }
+        if (player->unk0C != 0) {
+            params.sides[0].unk54 = player->unk0C;
+        } else {
+            params.sides[0].unk54 = data.horiderLevel;
+        }
+        if (player->unk30 != 0) {
+            params.sides[0].unk58 = player->unk30;
+        } else if (data.unk14_0 != 0) {
+            params.sides[0].unk58 = data.unk14_0 + 8;
+        } else {
+            params.sides[0].unk58 = data.rank + 1;
+        }
+        for (u32 i = 0; i < player->unk18; i++) {
+            (&params.sides[0].unk7C)[i] = player->GetUnk1C()[i];
+        }
+        for (u32 i = 0; i < player->unk20; i++) {
+            params.sides[0].mLevels[i] = player->GetUnk24()[i];
+        }
+        if (player->creatureCount != 0) {
+            for (u32 i = 0; i < player->creatureCount; i++) {
+                const DinoBattleCreatureData &entry = player->GetCreature(i);
+                DinoCreatureState *creature = (DinoCreatureState *)&params.sides[0].mCreatures[i];
+                creature->index = entry.id;
+                DinoBattleSetLevel(creature, entry.level);
+                params.sides[0].mCreatures[i].unk14 = entry.unk08;
+            }
+        } else {
+            DinoTeam team;
+            gDinoBackup->GetTeam(gDinoBackup->GetUnk34_26(), &team);
+            for (u32 i = 0; i < 3; i++) {
+                if (team.slots[i] != 0) {
+                    DinoCreatureState *creature = (DinoCreatureState *)&params.sides[0].mCreatures[i];
+                    gDinoBackup->GetCreature(team.slots[i], creature);
+                    u32 j;
+                    u32 parts = 0;
+                    for (j = 0; j < 4; j++) {
+                        if (creature->parts[j].level) {
+                            parts++;
+                        }
+                    }
+                    params.sides[0].mLevels[i] = parts;
+                }
+            }
+        }
+        if (player->unk10 != 0) {
+            params.unk08 = 2;
+            for (u32 i = 0; i < player->unk10; i++) {
+                params.sides[0].unk5C[i] = player->GetUnk14()[i];
+            }
+            for (u32 i = 0; i < player->unk28; i++) {
+                (&params.sides[0].unk68)[i] = player->GetUnk2C()[i];
+            }
+        }
+    } else {
+        DinoPlayerData data;
+        gDinoBackup->GetPlayer(&data, 0);
+        DinoTeam team;
+        gDinoBackup->GetTeam(gDinoBackup->GetUnk34_26(), &team);
+        params.sides[0].mName = MEncodeText(std::wstring((const wchar_t *)data.name), 0);
+        params.sides[0].unk54 = data.GetHoriderLevel();
+        if (data.unk14_0 != 0) {
+            params.sides[0].unk58 = data.unk14_0 + 8;
+        } else {
+            params.sides[0].unk58 = data.rank + 1;
+        }
+        for (u32 i = 0; i < 3; i++) {
+            if (team.slots[i] != 0) {
+                DinoCreatureState *creature = (DinoCreatureState *)&params.sides[0].mCreatures[i];
+                gDinoBackup->GetCreature(team.slots[i], creature);
+                u32 j;
+                u32 parts = 0;
+                for (j = 0; j < 4; j++) {
+                    if (creature->parts[j].level) {
+                        parts++;
+                    }
+                }
+                params.sides[0].mLevels[i] = parts;
+            }
+        }
+    }
+    for (u32 i = 0; i < 3; i++) {
+        mUnk90[i] = 0;
+    }
+    MTask *task = new DinoBattle(params, (u32)&mUnk8C, (u32)&mUnk8E, NULL, (u8 *)mUnk90);
+    if (mDemo != -1) {
+        mSerial.AddTail(new DinoBattleAutoDemo(task, (u8 *)mDemo));
+    } else {
+        mSerial.AddTail(task);
+    }
+    mState = data_020be144.Battle0204108c_28;
 }
 
 void DinoEventExecBattle::StateLoadOverlays() {

@@ -1227,6 +1227,7 @@ public:
     void StateStartEffect();
     void StateCloseField();
     void StateUnloadOverlays();
+    void StateBattle();
     void StateLoadOverlays();
     void StateReviveStatus();
     void StateResetDisplays();
@@ -1243,8 +1244,9 @@ public:
     u32 mUnk80;                     // 0x80: 0 shows the battle start effect
     u32 mBattle;                    // 0x84
     u32 mUnk88;                     // 0x88
-    u8 mUnk8C;                      // 0x8C
-    u8 unk8D[3];
+    u8 mUnk8C;                      // 0x8C: the battle's result
+    u8 mUnk8D;                      // 0x8D
+    u8 mUnk8E;                      // 0x8E
     u32 mUnk90[3];
     DinoEventReviveCreature mCreatures[5];  // 0x9C
     DinoEventReviveCreature mCreatures2[5]; // 0x114

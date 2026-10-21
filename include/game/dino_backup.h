@@ -31,6 +31,9 @@ struct DinoPlayerUnk58 {
 };
 
 struct DinoPlayerData {
+    // (Read through this where the game reloads the word for the next field.)
+    u32 GetHoriderLevel() const { return horiderLevel; }
+
     u16 name[9];                // 0x00
     // 0x14
     u32 unk14_0 : 6;            // system var 4
