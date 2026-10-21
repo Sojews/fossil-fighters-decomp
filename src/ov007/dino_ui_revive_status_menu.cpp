@@ -25,6 +25,8 @@
 #include "m/input.h"
 #include "m/smart_oam.h"
 #include "m/picture.h"
+#include "m/ext_affine.h"
+#include "m/blend.h"
 
 #pragma auto_inline off
 DinoUiReviveStatusMenu::DinoUiReviveStatusMenu(u32 id, u32 *result, u8 flag)
@@ -163,7 +165,6 @@ extern "C" struct {
 extern "C" const u32 data_ov007_02191f9c[4];
 // "%d"-style format of the creature's number.
 extern "C" const char data_ov007_021922d4[];
-extern "C" void func_ov007_02188484(DinoUiReviveStatusMenu *menu);
 
 extern const u32 data_0208a498;
 extern const u32 data_0208a86c, data_0208a868, data_0208a864;
@@ -261,7 +262,7 @@ void DinoUiReviveStatusMenu::OnStart() {
     if (mUnk118) {
         FadeIn();
         if (ReviveLevel(mCreature2) > ReviveLevel(mCreature)) {
-            func_ov007_02188484(this);
+            PlayLevelUpEffect();
             DinoSoundPlaySe(data_02089a4c, 0);
         } else {
             DinoSoundPlaySe(data_02089a44, 0);
@@ -430,6 +431,62 @@ void DinoUiReviveStatusMenu::Leave() {
         serial->AddTail(fades);
         serial->AddTail(exit);
     }
+}
+
+extern "C" const char data_ov007_021922e4[]; // the level up picture
+extern const int data_02089a68, data_02089a58, data_02089a54, data_02089a5c, data_020899dc, data_02089a64,
+    data_02089a60;
+
+// (The blend is loaded before the cross fade's arguments.)
+static inline MBlend *DinoReviveBlendOf(MDisplay *display) {
+    return display->mBlend;
+}
+
+// Tasks into a new set that exits once they're done.
+static inline MTask *DinoReviveParallel(MTask *a, MTask *b) {
+    MParallelTaskSet *set = new MParallelTaskSet(TRUE);
+    set->AddTail(a, b);
+    return set;
+}
+static inline MTask *DinoReviveSerial(MTask *a, MTask *b, MTask *c, MTask *d, MTask *e, MTask *f, MTask *g, MTask *h,
+                                      MTask *i, MTask *j, MTask *k) {
+    MSerialTaskSet *set = new MSerialTaskSet(TRUE);
+    MTaskSet *self = set;
+    self->AddTail(a);
+    self->AddTail(b);
+    self->AddTail(c);
+    self->AddTail(d);
+    self->AddTail(e);
+    self->AddTail(f);
+    self->AddTail(g);
+    self->AddTail(h);
+    self->AddTail(i);
+    self->AddTail(j);
+    self->AddTail(k);
+    return set;
+}
+
+// The rank going up: the "level up" picture drops in, shakes, then zooms away fading out.
+void DinoUiReviveStatusMenu::PlayLevelUpEffect() {
+    MExtAffinePicture *picture = new MExtAffinePicture(std::string(data_ov007_021922e4), TRUE, false);
+    picture->GetScreen()->SetCenter(0x80, 0x60);
+    picture->SetPosition(0, 0);
+    mParallel.AddTail(picture);
+    mSerial.AddTail(new MTimer(data_02089a68));
+    mSerial.AddTail(DinoReviveSerial(
+        picture->CreateShowTransfer(),
+        DinoReviveParallel(DinoReviveBlendOf(gCurrentDisplay)->CreateCrossFadeInTask(picture->GetPlaneMask(),
+                                                                                  (u32)data_02089a64 / 2, 0),
+                           picture->GetScreen()->CreateScaleAnime(MFx32Point(MFx32(2), MFx32(2)),
+                                                                  MFx32Point(MFx32(1), MFx32(1)), data_02089a64,
+                                                                  data_02089a60)),
+        DinoSoundCreatePlaySeTask(data_020899dc, 0), picture->CreateCoordAnime(MPoint(0, 0), MPoint(-5, 0), 1, 0),
+        picture->CreateCoordAnime(MPoint(-5, 0), MPoint(5, 0), 2, 0),
+        picture->CreateCoordAnime(MPoint(5, 0), MPoint(-5, 0), 2, 0),
+        picture->CreateCoordAnime(MPoint(-5, 0), MPoint(5, 0), 2, 0),
+        picture->CreateCoordAnime(MPoint(5, 0), MPoint(0, 0), 1, 0), new MTimer(data_02089a5c),
+        picture->CreateCoordAnime(MPoint(0, 0), MPoint(0, -0xC0), data_02089a58, data_02089a54),
+        MTaskExitTransfer::Create(picture)));
 }
 
 // How many of the creature's parts are revived.

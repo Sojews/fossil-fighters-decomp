@@ -54,6 +54,7 @@ public:
     void FadeIn();
     void Leave();
     // Says which attacks the revive taught the creature (if any).
+    void PlayLevelUpEffect();
     void ShowStatChanges();
     void ShowLearnedAttacks();
 
