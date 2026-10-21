@@ -69,10 +69,6 @@ void DinoBattle::Idle() {
     (this->*mState)();
 }
 
-void DinoBattleDebugSelect::Idle() {
-    (this->*mState)();
-}
-
 // The TU's pooled pointer-to-member constants (see menu.cpp).
 extern "C" struct {
     u8 unk00[0x4];
@@ -86,12 +82,105 @@ extern "C" struct {
     void (DinoBattleAutoDemo::*StateWatch_38)(); // 0x38
     void (DinoBattleAutoDemo::*StateEnd_40)(); // 0x40
     void (DinoBattleAutoDemo::*StateEnd_48)(); // 0x48
-    u8 unk50[0x60 - 0x50];
+    void (DinoBattleDebugSelect::*StateCreatureSelect_50)(); // 0x50
+    u8 unk58[0x60 - 0x58];
     void (DinoBattle::*StateSetupDisplays_60)(); // 0x60
     void (DinoBattle::*State0215a540_68)(); // 0x68
     u8 unk70[0x78 - 0x70];
     void (DinoBattle::*StateSoftReset_78)(); // 0x78
 } data_ov000_021911ac;
+
+extern const u32 kCreatureLevelLimits[2];
+extern "C" const u8 data_0208a0b0;
+
+// A creature at the level, its parts' levels and bonus cleared first.
+static inline void DinoBattleSetDebugLevel(DinoCreatureState *creature, int level) {
+    if (level > 12) {
+        level = 12;
+    }
+    DinoCreaturePart *parts = creature->parts;
+    for (u32 j = 0; j < 4; j++) {
+        parts[j].level = 0;
+        parts[j].unk12 = 0;
+    }
+    switch (level) {
+    case 12:
+        parts[3].level += kCreatureLevelLimits[0];
+    case 11:
+        parts[3].level += kCreatureLevelLimits[0];
+    case 10:
+        parts[3].level += kCreatureLevelLimits[0];
+    case 9:
+        parts[2].level += kCreatureLevelLimits[0];
+    case 8:
+        parts[2].level += kCreatureLevelLimits[0];
+    case 7:
+        parts[2].level += kCreatureLevelLimits[0];
+    case 6:
+        parts[1].level += kCreatureLevelLimits[0];
+    case 5:
+        parts[1].level += kCreatureLevelLimits[0];
+    case 4:
+        parts[1].level += kCreatureLevelLimits[0];
+    case 3:
+        parts[0].level += kCreatureLevelLimits[0];
+    case 2:
+        parts[0].level += kCreatureLevelLimits[0];
+    case 1:
+        parts[0].level += 50;
+    }
+}
+
+// Sets up both screens and a default battle (three level-8 creature 1s a side) and opens the battle select.
+DinoBattleDebugSelect::DinoBattleDebugSelect(const DinoBattleParams &params, u8 *result)
+    : MProcess(NULL), mParams(params) {
+    mUnk1E0 = result != NULL;
+    gLcd->mMain->ResetHooks();
+    gLcd->mSub->ResetHooks();
+    gLcd->mMain->Setup(1, 3, 2, 1);
+    gLcd->mSub->Setup(5, 2, 4, 1, 0, 0);
+    gLcd->mMain->mBg->SetMode(0);
+    gLcd->VSyncNow();
+    gLcd->mMain->SetBackdrop(0x8000);
+    gLcd->mSub->SetBackdrop(0x8000);
+    gLcd->mMain->mObj->Show();
+    gLcd->mSub->mObj->Show();
+    gLcd->SetBottomDisplay(gLcd->mSub);
+    SetDisplay(gCurrentDisplay = gLcd->GetBottomDisplay());
+    mParams.mTutorialId = 0;
+    mParams.mLiveName = (const char *) 1;
+    mParams.mScene = 0x10;
+    mParams.unk2C = 0x6C;
+    mParams.sides[0].unk54 = 7;
+    mParams.sides[1].unk54 = 7;
+    for (u32 i = 0; i < 3; i++) {
+        DinoCreatureState *creature = (DinoCreatureState *) &mParams.sides[0].mCreatures[i];
+        creature->index = 1;
+        DinoBattleSetDebugLevel(creature, 8);
+        mParams.sides[0].unk5C[i] = 0;
+        mParams.sides[0].mLevels[i] = 0;
+        (&mParams.sides[0].unk7C)[i] = 0;
+        creature = (DinoCreatureState *) &mParams.sides[1].mCreatures[i];
+        creature->index = 1;
+        DinoBattleSetDebugLevel(creature, 8);
+        mParams.sides[1].unk5C[i] = 1;
+        mParams.sides[1].mLevels[i] = 0;
+        (&mParams.sides[1].unk7C)[i] = 0;
+    }
+    mParams.sides[0].unk68 = 0;
+    mParams.sides[0].unk6C = 0;
+    mParams.sides[1].unk68 = 5;
+    mParams.sides[1].unk6C = 5;
+    mParams.unk164 = 1;
+    gDinoBackup->SetSystemFlag(0x28, data_0208a0b0);
+    mSerial.AddTail(new BattleSelect((u32) &mParams));
+    mState = data_ov000_021911ac.StateCreatureSelect_50;
+}
+
+void DinoBattleDebugSelect::Idle() {
+    (this->*mState)();
+}
+
 extern "C" struct {
     void (DinoBattle::*StateRun_00)();
     u8 unk08[0x10 - 0x8];
