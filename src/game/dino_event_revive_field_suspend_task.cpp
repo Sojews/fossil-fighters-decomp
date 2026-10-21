@@ -28,6 +28,24 @@
 #include "game/dino_ui_revive_effect.h"
 #include "game/dino_ui_revive_status_menu.h"
 
+// String members the game emits in this file (+= first: instantiated after replace, mwcc mangles it long-hand).
+template std::string &std::string::operator+=(const std::string &str);
+
+// Replaces every from in str with to (str is left as it is when to holds from, which would never end). NONMATCHING:
+// mwcc leaves an unreachable epilogue after the loop that the game doesn't have.
+std::string DinoReplaceAll(std::string &str, const std::string &from, const std::string &to) {
+    if (to.find(from, 0) != std::string::npos) {
+        return str;
+    }
+    for (;;) {
+        std::string::size_type pos = str.find(from, 0);
+        if (pos == std::string::npos) {
+            return str;
+        }
+        str = str.replace(pos, from.size(), to);
+    }
+}
+
 DinoEventReviveFieldSuspendTask::~DinoEventReviveFieldSuspendTask() {
 }
 
@@ -556,8 +574,6 @@ void DinoEventCaptureFadeUiTask::Idle() {
     }
 }
 
-// String members the game emits in this file.
-template std::string &std::string::operator+=(const std::string &str);
 
 // A talk window with the message, its %s filled in with extra.
 MTask *DinoEventRevive::CreateMessage(u32 message, const std::string &extra) {
