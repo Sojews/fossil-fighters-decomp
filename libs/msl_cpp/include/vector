@@ -354,6 +354,20 @@ namespace std {
             }
         }
 
+        // reallocate_copy_alt, out of line (vector::reserve calls it).
+        void reallocate_copy_trivial(size_t n);
+
+        // Inserts [first, last) before pos (out of line; vector::insert's work).
+        template <class It> void insert(iterator pos, It first, It last, Metrowerks::int2type<false>);
+        // Moves the old elements around the n inserted at off into the new buffer and frees the old one (out of
+        // line; the reallocating insert's tail).
+        iterator insert_realloc_finish(pointer old, size_t off, size_t n, size_t old_cap);
+        template <class It> static void copy_range(It first, It last, pointer p) {
+            for (; first != last; ++first, ++p) {
+                __msl_assign<T>(*p, *first, Metrowerks::int2type<true>());
+            }
+        }
+
         bool empty() const {
             return size_ == 0;
         }
@@ -373,6 +387,59 @@ namespace std {
         std::swap(cap(), tmp.cap());
         std::swap(data_, tmp.data_);
         std::swap(size_, tmp.size_);
+    }
+
+    template <typename T, typename Allocator> void __vec_deleter<T, Allocator>::reallocate_copy_trivial(size_t n) {
+        __vec_deleter<T, Allocator> tmp;
+        tmp.init();
+        tmp.allocate(n);
+        tmp.move_construct_to_end_alt(begin(), end());
+        optimize_after_moved_from();
+        swap(cap(), tmp.cap());
+        swap(data_, tmp.data_);
+        swap(size_, tmp.size_);
+    }
+
+    template <typename T, typename Allocator>
+    template <class It>
+    void __vec_deleter<T, Allocator>::insert(iterator pos, It first, It last, Metrowerks::int2type<false>) {
+        size_t n = last.base() - first.base();
+        if (n == 0) {
+            return;
+        }
+        size_t c = cap();
+        if (n > c || size_ > c - n) {
+            if (!expand_by(size_ + n - c)) {
+                pointer old = data_;
+                size_t old_cap = cap();
+                size_t off = pos - old;
+                allocate(grow_by(size_ + n - old_cap));
+                copy_range(first, last, data_ + off);
+                insert_realloc_finish(old, off, n, old_cap);
+            }
+            return;
+        }
+        pointer e = end();
+        size_t tail = e - pos;
+        size_ += n;
+        e += n;
+        if (tail != 0) {
+            e = __copy_backward_trivial(e - n - tail, e - n, e);
+        }
+        copy_range(first, last, e - n);
+    }
+
+    template <typename T, typename Allocator>
+    __vec_deleter<T, Allocator>::iterator __vec_deleter<T, Allocator>::insert_realloc_finish(pointer old, size_t off,
+                                                                                               size_t n, size_t old_cap) {
+        if (old != nullptr) {
+            pointer d = data_;
+            __copy_trivial(old, old + off, d);
+            __copy_trivial(old + off, old + size_, d + off + n);
+            alloc().deallocate(old, old_cap);
+        }
+        size_ += n;
+        return data_ + off;
     }
 
     template <typename T, typename Allocator> void __vec_deleter<T, Allocator>::init(size_t n) {
@@ -935,6 +1002,23 @@ namespace std {
             _Constructor::push_back(x);
         }
 
+        template <class It> void insert(iterator pos, It first, It last) {
+            UnkMSLStruct1 a = UnkMSLStruct1();
+            UnkMSLStruct1 b = UnkMSLStruct1();
+            _Deleter::insert(pos.base(), first, last, Metrowerks::int2type<false>());
+        }
+
+        void reserve(size_t n) {
+            if (n > this->cap()) {
+                // (Scalars are moved with one copy.)
+                if (is_scalar<T>::value) {
+                    this->reallocate_copy_trivial(n);
+                } else {
+                    this->reallocate_copy(n);
+                }
+            }
+        }
+
         void clear() {
             this->erase_at_end(this->size_);
         }
@@ -961,6 +1045,7 @@ namespace std {
             return iterator(_Deleter::erase(pos.ptr_, UnkMSLStruct1()));
         }
     };
+
 
 
     // Vectors of pointers share the vector<void *> code.

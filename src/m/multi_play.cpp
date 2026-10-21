@@ -1182,6 +1182,69 @@ void MMultiPlayMessageHub::SendPending() {
     }
 }
 
+// Reads what each console shared this frame: message headers and pieces, put back together per console; a finished
+// message for this console is sent to the observers. Until everyone is in step, the shared data is only compared
+// with what this console sends. NONMATCHING: the game's stack slots for the insert's iterators and tag bytes differ
+// (and so does one branch that then reaches); the vector insert it calls keeps a char temporary on the stack.
+void MMultiPlayMessageHub::ReceivePending() {
+    u32 index = 0;
+    for (u32 aid = 0; aid < mMaxPlayers; aid++) {
+        u32 bit = 1 << aid;
+        if (!(mConnectedAids & bit)) {
+            continue;
+        }
+        u32 i = index++;
+        u8 *data = (u8 *)WM_GetSharedDataAddress(sMultiPlay.instance->mDataSharing[3].info, &mReceived, aid);
+        if (data == NULL) {
+            continue;
+        }
+        u32 left = sMultiPlay.instance->GetSharedDataSize();
+        if (mConnectedAids != mUnk26C) {
+            if (memcmp(data, mSendData, left) == 0) {
+                mUnk26C |= bit;
+            }
+            continue;
+        }
+        if (left == 0) {
+            continue;
+        }
+        do {
+            if (mIncoming[i].unk8 == 0) {
+                if (!mUnk279 && left != sMultiPlay.instance->GetSharedDataSize()) {
+                    break;
+                }
+                struct {
+                    u16 size;
+                    u16 mask;
+                } header;
+                MI_CpuCopy8(data, &header, 4);
+                if (header.size == 0) {
+                    break;
+                }
+                mIncoming[i].unk8 = header.size;
+                mIncoming[i].unk4 = header.mask;
+                mIncoming[i].data->clear();
+                mIncoming[i].data->reserve(header.size);
+                data += 4;
+                left -= 4;
+            } else {
+                u32 n = std::min(mIncoming[i].unk8, left);
+                std::vector<char> *v = mIncoming[i].data;
+                v->insert(v->end(), std::__msl_move_iter<u8 *>(data), std::__msl_move_iter<u8 *>(data + n));
+                mIncoming[i].unk8 -= n;
+                data += n;
+                left -= n;
+                if (mIncoming[i].unk8 == 0 && (mIncoming[i].unk4 & (1 << mSelf))) {
+                    char *buf = new char[mIncoming[i].data->size()];
+                    MMultiPlayCopyChars(mIncoming[i].data->begin(), mIncoming[i].data->end(), buf);
+                    Notify(CreateMessage(buf));
+                    delete[] buf;
+                }
+            }
+        } while (left != 0);
+    }
+}
+
 void MMultiPlayMessageHub::Execute() {
     if (!sMultiPlay.instance->IsFailed() && mRunning) {
         SendPending();
