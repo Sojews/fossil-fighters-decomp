@@ -143,7 +143,7 @@ public:
 
 class MAnmEmit : public MAnmModelBase {
 public:
-    inline MAnmEmit(M3DScene *scene);  // (defined where used)
+    inline MAnmEmit(M3DScene *scene);  // (in m/anm_model_kinds.h)
     virtual ~MAnmEmit();
     virtual void Unk0C();
     virtual void Unk10();
@@ -157,7 +157,7 @@ public:
 
 class MAnmTargetCamera : public MAnmModelBase {
 public:
-    inline MAnmTargetCamera(M3DScene *scene);  // (defined where used)
+    inline MAnmTargetCamera(M3DScene *scene);  // (in m/anm_model_kinds.h)
     virtual ~MAnmTargetCamera();
     virtual void Unk0C();
 
@@ -177,7 +177,7 @@ class M3DRyusen;
 
 class MAnmRyusen : public MAnmModelBase {
 public:
-    inline MAnmRyusen(M3DScene *scene, MAnmModelBase *target, int jointA, int jointB);    // (defined where used)
+    inline MAnmRyusen(M3DScene *scene, MAnmModelBase *target, int jointA, int jointB);    // (in m/anm_model_kinds.h)
     virtual ~MAnmRyusen();
     virtual void Unk0C();
     virtual void Unk10();
@@ -195,6 +195,7 @@ public:
 
 class MAnmModelSh : public MAnmModelBase {
 public:
+    MAnmModelSh(M3DScene *scene) : MAnmModelBase(scene) {}
     virtual ~MAnmModelSh();
     virtual void Unk0C();
     virtual void Unk10();

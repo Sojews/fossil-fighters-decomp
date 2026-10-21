@@ -2335,7 +2335,7 @@ _Z20Dino3DInitSoundNamesv kind:function(thumb,size=0x34) addr:0x0202bb40
 _Z23Dino3DDestroySoundNamesv kind:function(thumb,size=0x34) addr:0x0202bb74
 _Z21Dino3DClearSoundNamesv kind:function(thumb,size=0x44) addr:0x0202bba8
 _ZN13Dino3DLoadCsv14LoadSoundNamesEPKc kind:function(thumb,size=0x450) addr:0x0202bbec
-_ZN13Dino3DLoadCsv11ParseScriptEPcPvPKcmm kind:function(thumb,size=0x1228) addr:0x0202c03c
+_ZN13Dino3DLoadCsv11ParseScriptEPcPvPKcS3_m kind:function(thumb,size=0x1228) addr:0x0202c03c
 .L_0202c0dc kind:label(thumb) addr:0x0202c0dc
 .L_0202d1fe kind:label(thumb) addr:0x0202d1fe local
 .L_0202d204 kind:label(thumb) addr:0x0202d204 local

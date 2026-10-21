@@ -61,7 +61,7 @@ public:
     void LoadFile(const char *path, void *unk84, u32 arg);
     void LoadByName(const char *name, BOOL alt, u32 variant);
     void LoadSoundNames(const char *dir);
-    void ParseScript(char *text, void *unk84, const char *dir, u32 arg, u32 arg2);
+    void ParseScript(char *text, void *unk84, const char *dir, const char *model, u32 shift);
     BOOL IsStopped();
     int GetFrameCount();
     int GetUnkB0();
@@ -109,7 +109,7 @@ public:
     char mParentName[16];           // 0x441
     char mJointName[16];            // 0x451
     Dino3DLoadCsv *mUnk464;         // 0x464
-    u32 mUnk468;                    // 0x468
+    int mUnk468;                    // 0x468: (hashed into each object's unk100)
     std::list<Dino3DCommand> mCommands; // 0x46C
     OSMutex mPauseMutex;            // 0x478
     OSMutex mCommandMutex;          // 0x490
