@@ -404,7 +404,11 @@ struct DinoShopData {
     u32 randomOffset;   // 0x10: DinoEntrySource[randomCount]
 };
 struct DinoDanceData;
-struct DinoCharaData;
+// A field character's data file (only what the radar reads so far).
+struct DinoCharaData {
+    u8 unk00[0x28];
+    u32 unk28;          // 0x28: 0: the radar marks the character red
+};
 struct DinoMessageData;
 struct DinoEpisodeData;
 // The key items' definitions.
