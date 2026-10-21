@@ -1,6 +1,7 @@
 // DinoEventLoop: runs the event scripts.
 // Only a few small methods are decompiled so far.
 
+#include "game/dino_static_init.h"
 #include "game/dino_field.h"
 #include "m/font.h"
 #include "game/dino_common_font.h"
@@ -621,3 +622,21 @@ void DinoEventLoop::CloseField(bool arg) {
         AddSeenEpisodes();
     }
 }
+
+// The file's static initialization (see dino_static_init.h): the common layout header.
+// NONMATCHING: the game schedules the stores differently.
+extern "C" u8 data_020bdb50[];
+#pragma always_inline on
+
+static struct DinoEventStaticInit {
+    DinoEventStaticInit() {
+        DINO_POOL_NV(MPoint, data_020bd9d0, 0x10) = MPoint(256, 192);
+        DINO_POOL_NV(MRect, data_020bdb50, 0x64) = DinoSizeRect(DINO_POOL_NV(MPoint, data_020bd9d0, 0x10));
+        DINO_POOL_NV(MPoint, data_020bd9d0, 0x28) = MPoint(2, 2);
+        DINO_POOL_NV(MPoint, data_020bd9d0, 0x48) = MPoint(36, 28);
+        DINO_POOL_NV(MRect, data_020bdb50, 0x34) = DinoSizeRect(DINO_POOL_NV(MPoint, data_020bd9d0, 0x48));
+        DINO_POOL_NV(MPoint, data_020bdb50, 0x44) = MPoint(0, 24);
+        DINO_POOL_NV(MPoint, data_020bdb50, 0x4c) = MPoint(256, 192);
+        DINO_POOL_NV(MRect, data_020bdb50, 0x54) = MRect(0, 0, 256, 24);
+    }
+} sDinoEventStaticInit;

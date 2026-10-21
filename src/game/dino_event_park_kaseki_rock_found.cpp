@@ -1,5 +1,6 @@
 // DinoEventParkKasekiRockFound.
 
+#include "game/dino_static_init.h"
 #include "game/dino_event_park_kaseki_rock_found.h"
 #include "m/bg_new_task.h"
 #include "m/call_task.h"
@@ -222,3 +223,21 @@ void DinoEventParkKasekiRockFound::StateEnd() {
     mEvent->GetField()->SetUnk258(FALSE);
     Exit();
 }
+
+// The file's static initialization (see dino_static_init.h): the common layout header.
+// NONMATCHING: the game schedules the stores differently.
+extern "C" u8 data_020bd480[];
+#pragma always_inline on
+
+static struct DinoEventParkKasekiRockFoundStaticInit {
+    DinoEventParkKasekiRockFoundStaticInit() {
+        DINO_POOL_NV(MPoint, data_020bd400, 0x10) = MPoint(256, 192);
+        DINO_POOL_NV(MRect, data_020bd480, 0x10) = DinoSizeRect(DINO_POOL_NV(MPoint, data_020bd400, 0x10));
+        DINO_POOL_NV(MPoint, data_020bd380, 0x20) = MPoint(2, 2);
+        DINO_POOL_NV(MPoint, data_020bd400, 0x8) = MPoint(36, 28);
+        DINO_POOL_NV(MRect, data_020bd480, 0x20) = DinoSizeRect(DINO_POOL_NV(MPoint, data_020bd400, 0x8));
+        DINO_POOL_NV(MPoint, data_020bd480, 0x30) = MPoint(0, 24);
+        DINO_POOL_NV(MPoint, data_020bd480, 0x38) = MPoint(256, 192);
+        DINO_POOL_NV(MRect, data_020bd480, 0x40) = MRect(0, 0, 256, 24);
+    }
+} sDinoEventParkKasekiRockFoundStaticInit;

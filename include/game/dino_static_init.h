@@ -14,6 +14,8 @@
 #define DINO_POOL_WORD_8(sym, off) (((volatile s8 *)&(sym))[(off)])
 // A pooled object of type T at the anchor plus off.
 #define DINO_POOL(T, sym, off) (*(T *)&DINO_POOL_WORD(sym, off))
+// The same without volatile, for files whose stores the game schedules freely across several anchors.
+#define DINO_POOL_NV(T, sym, off) (*(T *)((u8 *)&(sym) + (off)))
 
 // A common header's layout constants (the cleaning and revive files): the screen size and rect, an icon margin, the
 // icon size and rect, and the top bar. Each rect is built as `static const MRect kRect = DinoSizeRect(kSize);`; the

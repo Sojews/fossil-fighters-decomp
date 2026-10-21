@@ -2,6 +2,7 @@
 // Only the destructors are decompiled so far.
 
 #define MSL_STRING_BASICS
+#include "game/dino_static_init.h"
 #include "game/dino_cleaning.h"
 #include "m/bright.h"
 #include "game/dino_event_revive_field_suspend_task.h"
@@ -569,3 +570,23 @@ MTask *DinoEventRevive::CreateMessage(u32 message, const std::string &extra) {
     delete[] text;
     return window;
 }
+
+// The file's static initialization (see dino_static_init.h): the common layout header.
+// NONMATCHING: the game schedules the stores differently.
+extern "C" u8 data_020bd6a8[];
+extern "C" u8 data_020bd728[];
+extern "C" u8 data_020bd7a8[];
+#pragma always_inline on
+
+static struct DinoEventReviveStaticInit {
+    DinoEventReviveStaticInit() {
+        DINO_POOL_NV(MPoint, data_020bd6a8, 0x2c) = MPoint(256, 192);
+        DINO_POOL_NV(MRect, data_020bd728, 0x78) = DinoSizeRect(DINO_POOL_NV(MPoint, data_020bd6a8, 0x2c));
+        DINO_POOL_NV(MPoint, data_020bd6a8, 0x54) = MPoint(2, 2);
+        DINO_POOL_NV(MPoint, data_020bd6a8, 0x44) = MPoint(36, 28);
+        DINO_POOL_NV(MRect, data_020bd7a8, 0x8) = DinoSizeRect(DINO_POOL_NV(MPoint, data_020bd6a8, 0x44));
+        DINO_POOL_NV(MPoint, data_020bd7a8, 0x20) = MPoint(256, 192);
+        DINO_POOL_NV(MPoint, data_020bd7a8, 0x18) = MPoint(0, 24);
+        DINO_POOL_NV(MRect, data_020bd7a8, 0x28) = MRect(0, 0, 256, 24);
+    }
+} sDinoEventReviveStaticInit;
