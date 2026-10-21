@@ -26,6 +26,7 @@
 #include "m/fx32.h"
 #include "nitro/fx.h"
 #include "nitro/g2.h"
+#include <printf.h>
 
 #pragma auto_inline off
 
@@ -195,6 +196,140 @@ BattleSelect::BattleSelect(u32 unk74) : MProcess(NULL) {
     mIndicator->SetPosition(MPoint((256 - size.x) / 2, (192 - size.y) / 2));
     mIndicator->Show();
     mParallel.AddTail(mIndicator);
+}
+
+extern "C" const u32 data_0208a42c;          // the battle number text
+extern "C" const char data_ov000_0219622c[]; // "%s%d"-like format
+extern const u32 kCreatureLevelLimits[2];
+
+// Picks a battle by number (left/right by one, Y/X by ten, L/R by a hundred, wrapping round the battle count) and
+// starts it: A or start fills the battle parameters from the battle's data (for number 0, the parameters as they
+// are) and exits.
+void BattleSelect::Idle() {
+    if (mInput->GetPressed() & 0x20) {
+        if (--mUnk78 < 0) {
+            mUnk78 = gDinoResource->GetBattleCount() - 1;
+        }
+    }
+    if (mInput->GetPressed() & 0x10) {
+        if (++mUnk78 >= gDinoResource->GetBattleCount()) {
+            mUnk78 = 0;
+        }
+    }
+    if (mInput->GetPressed() & 0x800) {
+        if ((mUnk78 -= 10) < 0) {
+            mUnk78 = gDinoResource->GetBattleCount() - 1;
+        }
+    }
+    if (mInput->GetPressed() & 0x400) {
+        mUnk78 += 10;
+        if (mUnk78 >= gDinoResource->GetBattleCount()) {
+            mUnk78 = 0;
+        }
+    }
+    if (mInput->GetPressed() & 0x200) {
+        if ((mUnk78 -= 100) < 0) {
+            mUnk78 = gDinoResource->GetBattleCount() - 1;
+        }
+    }
+    if (mInput->GetPressed() & 0x100) {
+        mUnk78 += 100;
+        if (mUnk78 >= gDinoResource->GetBattleCount()) {
+            mUnk78 = 0;
+        }
+    }
+    char text[0x100];
+    sprintf(text, data_ov000_0219622c, gDinoResource->GetText(data_0208a42c), mUnk78);
+    mIndicator->SetText(std::string(text));
+    if (!(mInput->GetPressed() & 9)) {
+        return;
+    }
+    if (mUnk78 != 0) {
+        MResource<DinoBattleData> battle = gDinoResource->LoadBattle(mUnk78);
+        ((DinoBattleParams *) mUnk74)->unk2C = battle.Get()->unk0C;
+        ((DinoBattleParams *) mUnk74)->mScene = battle.Get()->scene;
+        ((DinoBattleParams *) mUnk74)->unk154 = battle.Get()->unk30;
+        ((DinoBattleParams *) mUnk74)->mTutorialId = battle.Get()->tutorialId;
+        ((DinoBattleParams *) mUnk74)->mLiveName = (const char *) battle.Get()->liveName;
+        ((DinoBattleParams *) mUnk74)->unk148 = battle.Get()->unk18;
+        ((DinoBattleParams *) mUnk74)->unk14C = battle.Get()->unk1C;
+        ((DinoBattleParams *) mUnk74)->unk150 = battle.Get()->unk20;
+        ((DinoBattleParams *) mUnk74)->unk158 = battle.Get()->unk4C != 0;
+        ((DinoBattleParams *) mUnk74)->unk15C = battle.Get()->unk50;
+        if (gDinoBackup->GetSystemFlag(0x2C) || battle.Get()->unk54 == -1) {
+            ((DinoBattleParams *) mUnk74)->unk160 = -1;
+        } else {
+            ((DinoBattleParams *) mUnk74)->unk160 = battle.Get()->unk54;
+        }
+        const DinoBattleSideData *enemy = battle.Get()->GetEnemy();
+        ((DinoBattleParams *) mUnk74)->sides[1].mName = gDinoResource->GetText(enemy->nameText);
+        ((DinoBattleParams *) mUnk74)->sides[1].unk54 = enemy->unk0C;
+        ((DinoBattleParams *) mUnk74)->sides[1].unk58 = enemy->unk30;
+        ((DinoBattleParams *) mUnk74)->sides[1].unk88 = enemy->unk34;
+        u32 i;
+        for (i = 0; i < enemy->creatureCount; i++) {
+            const DinoBattleCreatureData &entry = enemy->GetCreature(i);
+            ((DinoCreatureState *) &((DinoBattleParams *) mUnk74)->sides[1].mCreatures[i])->index = entry.id;
+            int level = entry.level;
+            DinoCreaturePart *parts =
+                ((DinoCreatureState *) &((DinoBattleParams *) mUnk74)->sides[1].mCreatures[i])->parts;
+            if (level > 12) {
+                level = 12;
+            }
+            for (u32 j = 0; j < 4; j++) {
+                parts[j].level = 0;
+                parts[j].unk12 = 0;
+            }
+            switch (level) {
+            case 12:
+                parts[3].level += kCreatureLevelLimits[0];
+            case 11:
+                parts[3].level += kCreatureLevelLimits[0];
+            case 10:
+                parts[3].level += kCreatureLevelLimits[0];
+            case 9:
+                parts[2].level += kCreatureLevelLimits[0];
+            case 8:
+                parts[2].level += kCreatureLevelLimits[0];
+            case 7:
+                parts[2].level += kCreatureLevelLimits[0];
+            case 6:
+                parts[1].level += kCreatureLevelLimits[0];
+            case 5:
+                parts[1].level += kCreatureLevelLimits[0];
+            case 4:
+                parts[1].level += kCreatureLevelLimits[0];
+            case 3:
+                parts[0].level += kCreatureLevelLimits[0];
+            case 2:
+                parts[0].level += kCreatureLevelLimits[0];
+            case 1:
+                parts[0].level += 50;
+            }
+            ((DinoBattleParams *) mUnk74)->sides[1].mCreatures[i].unk14 = entry.unk08;
+        }
+        for (; i < 3; i++) {
+            ((DinoCreatureState *) &((DinoBattleParams *) mUnk74)->sides[1].mCreatures[i])->index = 0;
+        }
+        for (u32 i = 0; i < enemy->unk10; i++) {
+            ((DinoBattleParams *) mUnk74)->sides[1].unk5C[i] = enemy->GetUnk14()[i];
+        }
+        for (u32 i = 0; i < enemy->unk28; i++) {
+            (&((DinoBattleParams *) mUnk74)->sides[1].unk68)[i] = enemy->GetUnk2C()[i];
+        }
+        for (u32 i = 0; i < enemy->unk18; i++) {
+            (&((DinoBattleParams *) mUnk74)->sides[1].unk7C)[i] = enemy->GetUnk1C()[i];
+        }
+        for (u32 i = 0; i < enemy->unk20; i++) {
+            ((DinoBattleParams *) mUnk74)->sides[1].mLevels[i] = enemy->GetUnk24()[i];
+        }
+        ((DinoBattleParams *) mUnk74)->unk164 = battle.Get()->unk58;
+    }
+    MTask *exit = MTaskExitTransfer::Create(this);
+    MTask *timer = new MTimer(1);
+    MTaskSet &serial = mSerial;
+    serial.AddTail(timer);
+    serial.AddTail(exit);
 }
 
 BattleSelect::~BattleSelect() {
