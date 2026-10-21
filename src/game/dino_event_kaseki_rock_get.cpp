@@ -45,12 +45,12 @@ extern "C" struct {
     void (DinoEventKasekiRockGet::*StateSwap_0C)();
     u8 unk14[0x1C - 0x14];
     void (DinoEventKasekiRockGet::*StateReplace_1C)();
-    void (DinoEventKasekiRockGet::*Unk02034ed8_24)();
-    void (DinoEventKasekiRockGet::*Unk02034ed8_2C)();
+    void (DinoEventKasekiRockGet::*StateAnswered_24)();
+    void (DinoEventKasekiRockGet::*StateConfirmed_2C)();
     u8 unk34[0x3C - 0x34];
     void (DinoEventKasekiRockGet::*StateEnd_3C)();
-    u8 unk44[0x4C - 0x44];
-    void (DinoEventKasekiRockGet::*Unk02034ed8_4C)();
+    void (DinoEventKasekiRockGet::*StateChosen_44)();
+    void (DinoEventKasekiRockGet::*StateChooseSwap_4C)();
     void (DinoEventKasekiRockGet::*StateEnd_54)();
     void (DinoEventKasekiRockGet::*StateStart_5C)();
     void (DinoEventKasekiRockGet::*StateStore_64)();
@@ -131,15 +131,56 @@ void DinoEventKasekiRockGet::StateAskSwap() {
         mSerial.AddTail(CreateMessageBox(0));
     }
     mSerial.AddTail(CreateYesNo(1));
-    mState = data_020bd1f8.Unk02034ed8_24;
+    mState = data_020bd1f8.StateAnswered_24;
 }
 
 void DinoEventKasekiRockGet::StateAnswered() {
     if (mAnswer != 0) {
-        mState = data_020bd1f8.Unk02034ed8_4C;
+        mState = data_020bd1f8.StateChooseSwap_4C;
     } else {
         mState = data_020bd1f8.StateEnd_54;
     }
+}
+
+// NONMATCHING: the game copies the size before scaling it for the answers' addresses (as CreateYesNo).
+// Lets the player choose the stored rock to swap out, with the mode's two questions.
+void DinoEventKasekiRockGet::StateChooseSwap() {
+    mSwapIndex = 0;
+    std::vector<std::string> texts;
+    texts.clear();
+    std::vector<std::string> lines;
+    std::string text;
+    std::string yes;
+    std::string no;
+    u32 id = data_0208b260[mMode][4];
+    const u8 *data = (const u8 *)mMessages.Get();
+    const u8 *entry = data + ((const u32 *)(data + ((const u32 *)data)[2]))[id];
+    text = (const char *)entry + ((const u32 *)entry)[1];
+    text = DinoReplaceTag(text, data_020bd370, mName);
+    lines = MSplitString(text, '\n');
+    yes = *(lines.end() - 2);
+    no = *(lines.end() - 1);
+    lines.erase(lines.end() - 2, lines.end());
+    text = MJoinStrings(lines, '\n');
+    texts.push_back(text);
+    texts.push_back(yes);
+    texts.push_back(no);
+    id = data_0208b260[mMode][5];
+    data = (const u8 *)mMessages.Get();
+    entry = data + ((const u32 *)(data + ((const u32 *)data)[2]))[id];
+    text = (const char *)entry + ((const u32 *)entry)[1];
+    text = DinoReplaceTag(text, data_020bd370, mName);
+    lines = MSplitString(text, '\n');
+    yes = *(lines.end() - 2);
+    no = *(lines.end() - 1);
+    lines.erase(lines.end() - 2, lines.end());
+    text = MJoinStrings(lines, '\n');
+    texts.push_back(text);
+    texts.push_back(yes);
+    texts.push_back(no);
+    mSerial.AddTail(new DinoEventKasekiRockGetContainerSelect(mEvent, (u32)&mSwapIndex, (u32)&mEntry,
+                                                              std::vector<std::string>(texts)));
+    mState = data_020bd1f8.StateChosen_44;
 }
 
 void DinoEventKasekiRockGet::StateChosen() {
@@ -154,7 +195,7 @@ void DinoEventKasekiRockGet::StateConfirmed() {
     if (mAnswer != 0) {
         mState = data_020bd1f8.StateEnd_04;
     } else {
-        mState = data_020bd1f8.Unk02034ed8_2C;
+        mState = data_020bd1f8.StateConfirmed_2C;
     }
 }
 

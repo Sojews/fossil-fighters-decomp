@@ -621,6 +621,7 @@ public:
     void StateStart();
     void StateAskSwap();
     void StateAnswered();
+    void StateChooseSwap();
     void StateChosen();
     void StateConfirmed();
     void StateSwap();
