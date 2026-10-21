@@ -111,7 +111,7 @@ char *strcat(char *dest, const char *src) {
     return dest;
 }
 
-int strcmp(char *str1, char *str2) {
+int strcmp(const char *str1, const char *str2) {
     register unsigned char *left  = (unsigned char *) str1;
     register unsigned char *right = (unsigned char *) str2;
     unsigned int k1, k2, align, l1, r1, x;
