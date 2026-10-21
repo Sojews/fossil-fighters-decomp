@@ -12,6 +12,7 @@
 
 class B3DStatusViewTask : public MProcess {
 public:
+    inline B3DStatusViewTask(class DinoBattleView3D *view);
     virtual ~B3DStatusViewTask();
     virtual void Idle();
 
@@ -31,6 +32,7 @@ public:
 
 class LoadWinnerLoad : public MProcess {
 public:
+    inline LoadWinnerLoad(class DinoBattleView3D *view, int slot);
     virtual ~LoadWinnerLoad();
     virtual void Idle();
 

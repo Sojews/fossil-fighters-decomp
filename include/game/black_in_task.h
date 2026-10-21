@@ -17,6 +17,9 @@ public:
     BlackInTask() : MProcess(NULL) {
         mUnk74 = data_0208a0b8;
     }
+    BlackInTask(u32 duration) : MProcess(NULL) {
+        mUnk74 = duration;
+    }
     virtual ~BlackInTask();
     virtual void Idle();
 
@@ -25,6 +28,9 @@ public:
 
 class BlackOutTask : public MProcess {
 public:
+    BlackOutTask(u32 duration) : MProcess(NULL) {
+        mUnk74 = duration;
+    }
     virtual ~BlackOutTask();
     virtual void Idle();
 
@@ -33,6 +39,10 @@ public:
 
 class MValChange : public MTask {
 public:
+    MValChange(int *dst, int value) {
+        mDst = dst;
+        mValue = value;
+    }
     virtual ~MValChange();
     virtual void Execute();
 

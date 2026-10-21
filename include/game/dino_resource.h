@@ -505,7 +505,16 @@ struct DinoSenryuDefs {
     u32 unk00;
     u32 count;          // 0x04
 };
-struct DinoBattleAttackType;
+// The attack types: by attack kind and number, the hits of each (s8 each, 0 for none).
+struct DinoBattleAttackType {
+    u32 unk00;
+    u32 unk04;
+    u32 hits;           // 0x08: offset of the hit table
+    s8 GetHit(int i) const {
+        const s8 *p = (const s8 *)this;
+        return p[hits + i];
+    }
+};
 
 // A file holding one number: how many of something there are.
 struct DinoMaxId {

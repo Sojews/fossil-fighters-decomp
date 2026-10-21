@@ -31,6 +31,7 @@
 #include "m/smart_oam.h"
 #include "m/file.h"
 #include "game/dino_static_init.h"
+#include "game/dino_message.h"
 
 DinoBattleView3D::~DinoBattleView3D() {
     CancelQueue();
@@ -83,14 +84,20 @@ void B3DStatusViewTask::Idle() {
 
 // The TU's pooled pointer-to-member constants (set up at startup).
 extern "C" struct {
-    u8 unk00[0x18];
+    u8 unk00[0x8];
+    const char *mDamageTwo_08;      // the damage cameras' name formats, by hits
+    const char *mDamageThree_0C;
+    u8 unk10[0x18 - 0x10];
     const char *mHitMotion2_18;     // the hit marks' motions
-    u8 unk1C[0x20 - 0x1C];
+    const char *mDamageOne_1C;
     const char *mHitMotion0_20;
     const char *mMarkMotion_24;     // an extra mark's
-    u8 unk28[0x40 - 0x28];
+    u8 unk28[0x30 - 0x28];
+    const char *mLineMotion_30;     // the ability's lines
+    u8 unk34[0x40 - 0x34];
     const char *mHitMotion1_40;
-    u8 unk44[0x4C - 0x44];
+    u8 unk44[0x48 - 0x44];
+    const char *mDamageMiss_48;
     void (B3DStatusViewTask::*State_4C)();
     u8 unk54[0x5C - 0x54];
     void (B3DStatusViewTask::*State_5C)();
@@ -754,6 +761,652 @@ u32 DinoBattleView3D::GetUnkB0() {
     return mUnkB0;
 }
 
+// The TU's pooled pointer-to-member constants.
+extern "C" struct {
+    u8 unk00[0x1C];
+    void (DinoBattleView3D::*StateLoad_1C)();
+    u8 unk24[0x2C - 0x24];
+    void (B3DStatusViewTask::*StateCheck_2C)();
+    u8 unk34[0x3C - 0x34];
+    void (DinoBattleView3D::*RunNextQueued_3C)();
+} data_ov000_02196368;
+
+extern "C" u32 data_0208a0c0;
+extern "C" const u32 data_0208a0e8;    // the ability's group fade length
+extern "C" const u32 data_0208a118;    // how long a hit that knocks down is held
+extern "C" const u32 data_0208a0bc;    // the turn end's length
+extern "C" const u32 data_0208a0cc[2]; // [1]: its fades' length
+extern "C" const u32 data_0208a1e0, data_0208a0dc;  // before the winner's pose, by creatures left (1, 2; 3 is [0] above)
+extern "C" const char *const data_ov000_0219654c[];  // the hit models, by hit (three each)
+
+inline B3DStatusViewTask::B3DStatusViewTask(DinoBattleView3D *view) : MProcess(NULL) {
+    mView = view;
+    unk78 = 0;
+    mState = data_ov000_02196368.StateCheck_2C;
+}
+
+inline LoadWinnerLoad::LoadWinnerLoad(DinoBattleView3D *view, int slot) : MProcess(NULL) {
+    mView = view;
+    mSlot = slot;
+    mWinner = -1;
+    mStep = 0;
+    mUnk84 = 0;
+    int shown = 0;
+    for (int i = 0; i < 3; i++) {
+        if (mView->mUnk14A[mSlot * 3 + i] == 1) {
+            shown++;
+        }
+    }
+    switch (shown) {
+    case 1:
+        mSerial.AddTail(new MTimer(data_0208a1e0));
+        break;
+    case 2:
+        mSerial.AddTail(new MTimer(data_0208a0dc));
+        break;
+    case 3:
+        mSerial.AddTail(new MTimer(data_0208a0cc[0]));
+        break;
+    }
+}
+
+// Whether the hit at the attack type's index is its last (the third, or the next is none).
+static inline BOOL IsLastHit(int at, int i) {
+    return i == 2 || gDinoResource->LoadBattleAttackType().Get()->GetHit(at + 1) == 0;
+}
+
+typedef DinoBattleView3DDamage::Defs DinoBattleView3DDamageDefs;
+#define GROUP_FADE_TARGET (DinoBattleView3DGroupFade::Target *)this
+
+// Queues the 3D scene's response to each battle message (abilities and team attacks with their damage
+// cameras and marks, turns, status views, the winner's pose) and answers the sender when it asks.
+// NONMATCHING (94%): the game's message dispatch tree and the hit sound switch (a jump table for 0-9) have other
+// shapes, and in the ability's hit loop the game keeps &paths[i] in a register (our temporaries' flags take it).
+void DinoBattleView3D::OnMessage(MMessage *msg) {
+    switch (msg->mId) {
+    case 0x10007: {
+        DinoBattleViewCreatureBeginSignal *m = (DinoBattleViewCreatureBeginSignal *)msg;
+        int i = (u16)m->mUnk10 - 1;
+        int slot = mView->GetUnkE4(m->mUnk0C)->GetUnkAC();
+        mCreatureIds[i + slot * 3] = (u8)*(u32 *)m->mUnk18;
+        mUnk104[i + slot * 3] = (u8)*(u32 *)m->mUnk18;
+        mSlotModels[i + slot * 3] = (void *)m->mUnk14;
+        (mUnk14A + i)[slot * 3] = TRUE;
+        if (mUnk174 != 0) {
+            mUnkC0->AddTail(func_ov000_0218ac04(mUnkE4, &mUnk1A4[0], &data_ov000_02190334, -1));
+        }
+        mUnk174 = 0;
+        break;
+    }
+    case 0x1000B: {
+        DinoBattleViewEffectTurnBeginRequest *m = (DinoBattleViewEffectTurnBeginRequest *)msg;
+        u32 side = mView->GetUnkE4(m->mUnk10)->GetUnkAC();
+        mSlot = mUnk138 = side;
+        CancelQueue();
+        if (mUnk174 == 0) {
+            mUnkC0->AddTail(func_ov000_0218addc(30));
+        }
+        mUnkC0->AddTail(new MValChange((int *)&mUnk140, 1),
+                        func_ov000_0218ac04(mUnkE4, &mUnk1A4[2], &data_ov000_02190334, side == 0),
+                        new DinoBattleView3DGroupFade(mUnkE4, GROUP_FADE_TARGET, side, 0, -1, -1),
+                        new MValChange((int *)&mUnk140, 0));
+        mUnk174 = 1;
+        break;
+    }
+    case 0x1001D:
+        break;
+    case 0x10021: {
+        DinoBattleViewCreatureMoveRequest *m = (DinoBattleViewCreatureMoveRequest *)msg;
+        int i = (u16)m->mUnk14 - 1 + mView->GetUnkE4((s32)m->mUnk14 >> 16)->GetUnkAC() * 3;
+        mUnkC0->AddTail(CreateMove(m->mUnk18, m->mUnk1C, i));
+        if (m->mUnk18 != 3 || (m->mUnk1C != 1 && m->mUnk1C != 2)) {
+            mUnkC0->AddTail(func_ov000_0218ac04(mUnkE4, &mUnk1A4[3], &data_ov000_02190334, mSlot == 0));
+        }
+        if (mUnk174 == 3) {
+            mUnkC0->AddTail(func_ov000_0218ae50(data_0208a0c0));
+        }
+        mUnk174 = 3;
+        break;
+    }
+    case 0x1002B: {
+        DinoBattleViewCreatureAbility3DRequest *m = (DinoBattleViewCreatureAbility3DRequest *)msg;
+        MMotion *line = NULL;
+        int attacker = (u16)m->mUnk14 - 1 + mView->GetUnkE4((s32)m->mUnk14 >> 16)->GetUnkAC() * 3;
+        int target = (u16)m->mUnk1C - 1 + mView->GetUnkE4((s32)m->mUnk1C >> 16)->GetUnkAC() * 3;
+        SetUnk180(0);
+        CancelQueue();
+        if (mUnk174 == 3) {
+            mUnkC0->AddTail(func_ov000_0218ae50(data_0208a0c0));
+        }
+        u32 kind = mUnk104[attacker];
+        mUnk104[attacker] = mCreatureIds[attacker];
+        u32 targetId = mCreatureIds[target];
+        u32 number = ((m->mUnk18 - 1) & 7) + 1;
+        mView->GetUnkE4((s32)m->mUnk14 >> 16)->GetUnkAC();
+        mView->GetUnkE4((s32)m->mUnk1C >> 16)->GetUnkAC();
+        BOOL marks = TRUE;
+        u32 hits = 0;
+        u32 camera = 0;
+        DinoBattleView3DDamageDefs *defs = new DinoBattleView3DDamageDefs;
+        defs->mType = 0xFFFF;
+        defs->mCount = 0;
+        int i = 0;
+        defs->mPaths[0] = defs->mPaths[1] = defs->mPaths[2] = defs->mPaths[3] = NULL;
+        defs->mUnkB8 = targetId;
+        const char *paths[4];
+        paths[0] = paths[1] = paths[2] = paths[3] = NULL;
+        if ((u16)m->mUnk14 != 0) {
+            int base = (kind - 1) * 20 + (number - 1) * 3 + 2;
+            for (i = 0; i < 3; i++) {
+                s8 hit = gDinoResource->LoadBattleAttackType().Get()->GetHit(base + i);
+                if (hit == 0) {
+                    break;
+                }
+                hits++;
+                defs->mCount++;
+                defs->mSes[i] = 0;
+                defs->mSes2[i] = 0;
+                int h = (hit - 1) * 3;
+                if (m->mUnk20 == 0) {
+                    camera = 7;
+                    defs->mType = 0;
+                    defs->mPaths[i] = paths[i];
+                    defs->mUnkBC[i] = camera;
+                    defs->mSes2[i] = 0x2DD;
+                    break;
+                }
+                defs->mSes[i] = (gDinoResource->GetCreatureDef(targetId)->voice - 1) * 3 + 0x150;
+                if (m->mUnk38 && IsLastHit(base + i, i)) {
+                    defs->mSes[i] = (gDinoResource->GetCreatureDef(targetId)->voice - 1) * 3 + 0x151;
+                }
+                switch (m->mUnk20) {
+                case 1:
+                    camera = 5;
+                    defs->mSes2[i] = 0x2D7;
+                    paths[i] = m->mUnk38 ? data_ov000_0219654c[h + 2] : data_ov000_0219654c[h];
+                    defs->mType = 1;
+                    if (m->mUnk38 && IsLastHit(base + i, i)) {
+                        camera = 6;
+                    }
+                    break;
+                case 2:
+                    camera = 5;
+                    defs->mSes2[i] = 0x2D6;
+                    paths[i] = data_ov000_0219654c[h + 1];
+                    defs->mType = 1;
+                    if (m->mUnk38 && IsLastHit(base + i, i)) {
+                        camera = 6;
+                    }
+                    break;
+                case 3:
+                    if (IsLastHit(base + i, i)) {
+                        camera = 6;
+                        defs->mSes2[i] = 0x2D5;
+                        paths[i] = data_ov000_0219654c[h + 2];
+                        defs->mType = 2;
+                    } else {
+                        camera = 5;
+                        defs->mSes2[i] = 0x2D6;
+                        paths[i] = data_ov000_0219654c[h + 1];
+                        defs->mType = 1;
+                    }
+                    break;
+                case 5:
+                    camera = 5;
+                    defs->mSes2[i] = 0x2D6;
+                    defs->mType = 1;
+                    break;
+                case 4:
+                    camera = 5;
+                    defs->mSes2[i] = 0x2D6;
+                    marks = FALSE;
+                    break;
+                case 6:
+                    camera = 0;
+                    marks = FALSE;
+                    break;
+                default:
+                    marks = FALSE;
+                    break;
+                }
+                defs->mPaths[i] = paths[i];
+                defs->mUnkBC[i] = camera;
+                switch (h) {
+                case 0:
+                case 3:
+                    break;
+                case 6:
+                    defs->mSes2[i] = 0x2D9;
+                    break;
+                case 9:
+                    defs->mSes2[i] = 0x2DB;
+                    break;
+                case 12:
+                    defs->mSes2[i] = 0x2DC;
+                    break;
+                case 15:
+                    defs->mSes2[i] = 0x2DA;
+                    break;
+                case 18:
+                    defs->mSes2[i] = 0x2D8;
+                    break;
+                }
+            }
+        }
+        defs->mOam = mOam;
+        defs->mTasks = mUnkBC;
+        defs->mUnkA0 = 0;
+        defs->mUnkA4 = 0;
+        if (marks) {
+            // (A hit of no damage takes one from another.)
+            switch (hits) {
+            case 1:
+                break;
+            case 2:
+                if (m->mUnk2C[1] == 0 && m->mUnk2C[0] != 0) {
+                    m->mUnk2C[1]++;
+                    m->mUnk2C[0]--;
+                }
+                break;
+            case 3:
+                if (m->mUnk2C[1] == 0 && m->mUnk2C[0] != 0) {
+                    m->mUnk2C[1]++;
+                    m->mUnk2C[0]--;
+                }
+                if (m->mUnk2C[2] == 0) {
+                    if (m->mUnk2C[0] != 0) {
+                        m->mUnk2C[2]++;
+                        m->mUnk2C[0]--;
+                    } else if (m->mUnk2C[1] != 0) {
+                        m->mUnk2C[2]++;
+                        m->mUnk2C[1]--;
+                    }
+                }
+                break;
+            }
+            // Each hit's damage digits, lowest first.
+            for (u32 j = 0; j < hits; j++) {
+                u32 damage = m->mUnk2C[j];
+                defs->mMarks[j] = 4;
+                for (int d = 0; d < 4; d++) {
+                    if (damage == 0) {
+                        defs->mMarks[j] = d;
+                        break;
+                    }
+                    defs->mAnimes[j * 4 + d] = damage % 10 + 1;
+                    damage /= 10;
+                }
+                switch (defs->mMarks[j]) {
+                case 0:
+                    defs->mMarks[j] = 1;
+                    defs->mAnimes[j * 4] = 1;
+                    defs->mOffsets[j * 4] = 0;
+                    break;
+                case 1:
+                    defs->mOffsets[j * 4] = 0;
+                    break;
+                case 2:
+                    defs->mOffsets[j * 4] = 8;
+                    defs->mOffsets[j * 4 + 1] = -8;
+                    break;
+                case 3:
+                    defs->mOffsets[j * 4] = 16;
+                    defs->mOffsets[j * 4 + 1] = 0;
+                    defs->mOffsets[j * 4 + 2] = -16;
+                    break;
+                case 4:
+                    defs->mOffsets[j * 4] = 24;
+                    defs->mOffsets[j * 4 + 1] = 8;
+                    defs->mOffsets[j * 4 + 2] = -8;
+                    defs->mOffsets[j * 4 + 3] = -24;
+                    break;
+                }
+            }
+        }
+        if (m->mUnk45) {
+            if (m->mUnk4C == 1) {
+                line = new MMotion(std::string(data_ov000_021962e8.mLineMotion_30), mOam, 0, 1);
+                line->SetPosition(128, 96);
+                line->Play(1, 0);
+                line->Hide();
+                line->Suspend();
+                mUnkBC->AddTail(line);
+                defs->mUnkA0 = 1;
+            }
+            if (m->mUnk50 > 1) {
+                defs->mUnkA4 = 1;
+            }
+            mUnkC0->AddTail(((M3DScene *)mUnkB0)->mM3d->CreateShowTransfer(),
+                            new DinoBattleView3DGroupFade(mUnkE4, GROUP_FADE_TARGET, mSlot, 1, -1, data_0208a0e8),
+                            func_ov000_0218ac40(mUnkE4, 1));
+            if (m->mUnk4C == 1) {
+                mUnkC0->AddTail(MTaskRunTransfer::Create(line), line->CreateShowTransfer());
+            }
+            mUnkC0->AddTail(new DinoBattleView3DAction(this, (void *)mUnkB0, mSlot, mUnkE4, camera == 0, kind, number));
+        }
+        if (camera != 0) {
+            s8 type = gDinoResource->LoadBattleAttackType().Get()->GetHit((targetId - 1) * 20);
+            char name[64];
+            if (m->mUnk20 == 0) {
+                sprintf(name, data_ov000_021962e8.mDamageMiss_48, type);
+                defs->mSes[0] = 0;
+                defs->mSes2[0] = 0x2DD;
+                defs->mMarks[0] = 0;
+            } else {
+                switch (hits) {
+                case 0:
+                    sprintf(name, data_ov000_021962e8.mDamageMiss_48, type);
+                    break;
+                case 1:
+                    sprintf(name, data_ov000_021962e8.mDamageOne_1C, type);
+                    break;
+                case 2:
+                    sprintf(name, data_ov000_021962e8.mDamageTwo_08, type);
+                    break;
+                case 3:
+                    sprintf(name, data_ov000_021962e8.mDamageThree_0C, type);
+                    break;
+                }
+            }
+            mUnkC0->AddTail(new DinoBattleView3DDamage(this, (void *)mUnkB0, mSlot, mUnkE4, defs, name, TRUE,
+                                                       m->mUnk38 ? data_0208a118 : 0),
+                            new DelDmgMotionTask(defs));
+        } else {
+            delete defs;
+        }
+        if (line != NULL) {
+            mUnkC0->AddTail(MTaskExitTransfer::Create(line));
+        }
+        mUnkC0->AddTail(((MMessageObserver *)m->mUnk0C)->CreatePostTask(new DinoBattleViewCreatureAbility3DResult()));
+        mUnkC0->AddTail(func_ov000_0218ac40(mUnkE4, 0));
+        mUnkC0->AddTail(func_ov000_0218abd0(mUnkE4, mSlot == 0),
+                        new DinoBattleView3DGroupFade(mUnkE4, GROUP_FADE_TARGET, mSlot, 0, -1, -1));
+        mUnk174 = 4;
+        break;
+    }
+    case 0x1002D: {
+        DinoBattleView3DTeamAttackRequest *m = (DinoBattleView3DTeamAttackRequest *)msg;
+        SetUnk180(0);
+        CancelQueue();
+        if (mUnk174 == 3) {
+            mUnkC0->AddTail(func_ov000_0218ae50(data_0208a0c0));
+        }
+        int attacker = (u16)m->mUnk14 - 1 + mView->GetUnkE4((s32)m->mUnk14 >> 16)->GetUnkAC() * 3;
+        u32 kind = mUnk104[attacker];
+        mUnk104[attacker] = mCreatureIds[attacker];
+        u32 number = ((m->mUnk18 - 1) & 7) + 1;
+        mUnkC0->AddTail(((M3DScene *)mUnkB0)->mM3d->CreateShowTransfer(),
+                        new DinoBattleView3DGroupFade(mUnkE4, GROUP_FADE_TARGET, mSlot, 1, -1, data_0208a0e8),
+                        func_ov000_0218ac40(mUnkE4, 1),
+                        new DinoBattleView3DAction(this, (void *)mUnkB0, mSlot, mUnkE4, FALSE, kind, number));
+        for (int t = 0; t < (int)m->mUnk1C; t++) {
+            int hit = gDinoResource->LoadBattleAttackType().Get()->GetHit((kind - 1) * 20 + (number - 1) * 3 + 2);
+            u32 target = m->mUnk20[t];
+            u32 targetId = mCreatureIds[(u16)target - 1 + mView->GetUnkE4((s32)target >> 16)->GetUnkAC() * 3];
+            if (hit == 0) {
+                hit++;
+            }
+            int h = (hit - 1) * 3;
+            DinoBattleView3DDamageDefs *defs = new DinoBattleView3DDamageDefs;
+            defs->mSes[0] = 0;
+            defs->mSes2[0] = 0;
+            const char *path = NULL;
+            u32 camera = 0;
+            defs->mType = 0xFFFF;
+            defs->mOam = mOam;
+            BOOL marks = TRUE;
+            defs->mTasks = mUnkBC;
+            if (m->mUnk44[t]) {
+                defs->mSes[0] = (gDinoResource->GetCreatureDef(targetId)->voice - 1) * 3 + 0x151;
+            } else {
+                defs->mSes[0] = (gDinoResource->GetCreatureDef(targetId)->voice - 1) * 3 + 0x150;
+            }
+            switch (m->mUnk2C[t]) {
+            case 0:
+                camera = 7;
+                defs->mType = 0;
+                defs->mSes2[0] = 0x2DD;
+                break;
+            case 1:
+                camera = 5;
+                path = data_ov000_0219654c[h];
+                defs->mType = 1;
+                defs->mSes2[0] = 0x2D7;
+                break;
+            case 2:
+                camera = 5;
+                path = data_ov000_0219654c[h + 1];
+                defs->mType = 1;
+                defs->mSes2[0] = 0x2D6;
+                break;
+            case 3:
+                camera = 6;
+                path = data_ov000_0219654c[h + 2];
+                defs->mType = 2;
+                defs->mSes2[0] = 0x2D5;
+                break;
+            case 5:
+                camera = 5;
+                defs->mType = 1;
+                defs->mSes2[0] = 0x2D6;
+                break;
+            case 4:
+                camera = 5;
+                defs->mSes2[0] = 0x2D6;
+                marks = FALSE;
+                break;
+            case 6:
+                marks = FALSE;
+                camera = 0;
+                break;
+            default:
+                marks = FALSE;
+                break;
+            }
+            switch (h) {
+            case 0:
+            case 3:
+                break;
+            case 6:
+                defs->mSes2[0] = 0x2D9;
+                break;
+            case 9:
+                defs->mSes2[0] = 0x2DB;
+                break;
+            case 12:
+                defs->mSes2[0] = 0x2DC;
+                break;
+            case 15:
+                defs->mSes2[0] = 0x2DA;
+                break;
+            case 18:
+                defs->mSes2[0] = 0x2D8;
+                break;
+            }
+            if (m->mUnk2C[t] == 0) {
+                defs->mSes[0] = 0;
+                defs->mSes2[0] = 0x2DD;
+            }
+            if (marks) {
+                u32 damage = m->mUnk38[t];
+                defs->mMarks[0] = 4;
+                for (int d = 0; d < 4; d++) {
+                    if (damage == 0) {
+                        defs->mMarks[0] = d;
+                        break;
+                    }
+                    defs->mAnimes[d] = damage % 10 + 1;
+                    damage /= 10;
+                }
+                switch (defs->mMarks[0]) {
+                case 0:
+                    defs->mMarks[0] = 1;
+                    defs->mAnimes[0] = 1;
+                    defs->mOffsets[0] = 0;
+                    break;
+                case 1:
+                    defs->mOffsets[0] = 0;
+                    break;
+                case 2:
+                    defs->mOffsets[0] = 8;
+                    defs->mOffsets[1] = -8;
+                    break;
+                case 3:
+                    defs->mOffsets[0] = 16;
+                    defs->mOffsets[1] = 0;
+                    defs->mOffsets[2] = -16;
+                    break;
+                case 4:
+                    defs->mOffsets[0] = 24;
+                    defs->mOffsets[1] = 8;
+                    defs->mOffsets[2] = -8;
+                    defs->mOffsets[3] = -24;
+                    break;
+                }
+            }
+            if (camera != 0) {
+                defs->mUnkB8 = targetId;
+                defs->mUnkBC[0] = camera;
+                s8 type = gDinoResource->LoadBattleAttackType().Get()->GetHit((targetId - 1) * 20);
+                char name[64];
+                if (m->mUnk2C[t] == 0) {
+                    sprintf(name, data_ov000_021962e8.mDamageMiss_48, type);
+                    defs->mMarks[0] = 0;
+                } else {
+                    sprintf(name, data_ov000_021962e8.mDamageOne_1C, type);
+                }
+                defs->mPaths[0] = path;
+                defs->mCount = 1;
+                defs->mUnkA0 = 0;
+                defs->mUnkA4 = 0;
+                mUnkC0->AddTail(new DinoBattleView3DDamage(this, (void *)mUnkB0, mSlot, mUnkE4, defs, name,
+                                                           t == m->mUnk1C - 1, m->mUnk44[t] ? data_0208a118 : 0),
+                                new DelDmgMotionTask(defs));
+            } else {
+                delete defs;
+            }
+        }
+        mUnkC0->AddTail(((MMessageObserver *)m->mUnk0C)->CreatePostTask(new DinoBattleView3DTeamAttackResult()));
+        mUnkC0->AddTail(func_ov000_0218ac40(mUnkE4, 0));
+        mUnkC0->AddTail(func_ov000_0218abd0(mUnkE4, mSlot == 0),
+                        new DinoBattleView3DGroupFade(mUnkE4, GROUP_FADE_TARGET, mSlot, 0, -1, -1));
+        mUnk174 = 4;
+        break;
+    }
+    case 0x10033: {
+        DinoBattleViewCreatureEndRequest *m = (DinoBattleViewCreatureEndRequest *)msg;
+        CancelQueue();
+        mUnk14A[(u16)m->mUnk14 - 1 + mView->GetUnkE4((s32)m->mUnk14 >> 16)->GetUnkAC() * 3] = FALSE;
+        if (mSlot != mView->GetUnkE4((s32)m->mUnk14 >> 16)->GetUnkAC()) {
+            break;
+        }
+        mUnkC0->AddTail(new BlackOutTask(15), new DinoBattleView3DGroupFade(mUnkE4, GROUP_FADE_TARGET, mSlot, 0, -1, -1));
+        break;
+    }
+    case 0x1002F: {
+        DinoBattleViewCreatureUpdateRequest *m = (DinoBattleViewCreatureUpdateRequest *)msg;
+        mUnk150[(u16)m->mUnk10 - 1 + mView->GetUnkE4((s32)m->mUnk10 >> 16)->GetUnkAC() * 3] = m->mUnk38;
+        break;
+    }
+    case 0x10010:
+        if (mUnk174 != 2 && mUnk174 != 4 && mUnk174 != 3 && mUnk174 != 1 && mUnk174 != 5) {
+            mUnkC0->AddTail(func_ov000_0218ac04(mUnkE4, &mUnk1A4[2], &data_ov000_02190334, -1));
+        }
+        if (mUnk174 == 5) {
+            CancelQueue();
+            mUnkC0->AddTail(new DinoBattleView3DGroupFade(mUnkE8, GROUP_FADE_TARGET, mUnk138, 1, -1, -1));
+            mUnkC0->AddTail(func_ov000_0218ac40(mUnkE4, 0),
+                            new DinoBattleView3DMask((DinoBattleView3DMask::View *)this, 7),
+                            func_ov000_0218ac40(mUnkE8, 1));
+            mUnkC0->AddTail(new DinoBattleView3DGroupFade(mUnkE4, GROUP_FADE_TARGET, mSlot, 0, -1, -1));
+            mUnk138 = mSlot;
+        }
+        mUnkC0->AddTail(func_ov000_0218ae50(data_0208a0c0));
+        mUnk174 = 2;
+        break;
+    case 0x10077: {
+        DinoBattleView3DPoisonDamageRequest *m = (DinoBattleView3DPoisonDamageRequest *)msg;
+        mUnkC0->AddTail(new MTimer(10));
+        if (m->mUnk0C == 0) {
+            break;
+        }
+        mUnkC0->AddTail(((MMessageObserver *)m->mUnk0C)->CreatePostTask(new DinoBattleView3DPoisonDamageResult()));
+        break;
+    }
+    case 0x1007B: {
+        DinoBattleView3DTurnEndRequest *m = (DinoBattleView3DTurnEndRequest *)msg;
+        int side = mView->GetUnkE4(m->mUnk10)->GetUnkAC();
+        FlushQueue();
+        if (mUnk140 == 0) {
+            mUnkC0->AddTail(func_ov000_0218ae50(data_0208a0c0));
+            mUnkC0->AddTail(new BlackOutTask(data_0208a0cc[1]),
+                            func_ov000_0218ac04(mUnkE4, &mUnk1A4[4], &data_ov000_02190334, side == 0),
+                            new BlackInTask(data_0208a0cc[1]), new MTimer(data_0208a0bc - data_0208a0cc[1]));
+        }
+        mUnkC0->AddTail(new DinoBattleView3DGroupFade(mUnkE4, GROUP_FADE_TARGET, mSlot, 1, -1, -1));
+        if (m->mUnk0C != 0) {
+            mUnkC0->AddTail(((MMessageObserver *)m->mUnk0C)->CreatePostTask(new DinoBattleView3DTurnEndResult()));
+        }
+        break;
+    }
+    case 0x10073: {
+        DinoBattleView3DSupportEffectRequest *m = (DinoBattleView3DSupportEffectRequest *)msg;
+        if (m->mUnk0C == 0) {
+            break;
+        }
+        mUnkC0->AddTail(((MMessageObserver *)m->mUnk0C)->CreatePostTask(new DinoBattleView3DSupportEffectResult()));
+        break;
+    }
+    case 0x10075: {
+        DinoBattleView3DWatchStatusRequest *m = (DinoBattleView3DWatchStatusRequest *)msg;
+        mView->GetUnkE4((s32)m->mUnk10 >> 16)->GetUnkAC();
+        if (mUnk174 != 5) {
+            mUnk19C = -1;
+            mUnk1A0 = -1;
+        }
+        mUnk1A0 = m->mUnk10;
+        if (m->mUnk10 != 0) {
+            if (mQueue.empty()) {
+                mQueue.push_back(new B3DStatusViewTask(this));
+            }
+        } else {
+            mUnkC0->AddTail(new BlackInTask(),
+                            func_ov000_0218ac04(mUnkE4, &mUnk1A4[2], &data_ov000_02190334, mSlot == 0));
+        }
+        if (m->mUnk0C != 0) {
+            mUnkC0->AddTail(((MMessageObserver *)m->mUnk0C)->CreatePostTask(new DinoBattleView3DWatchStatusResult()));
+        }
+        mUnk174 = 5;
+        break;
+    }
+    case 0x1008B: {
+        DinoBattleView3DGameSetRequest *m = (DinoBattleView3DGameSetRequest *)msg;
+        int side = mView->GetUnkE4(m->mUnk10)->GetUnkAC();
+        CancelQueue();
+        mUnkC0->AddTail(new LoadWinnerLoad(this, side));
+        if (m->mUnk0C == 0) {
+            break;
+        }
+        mParallel.AddTail(((MMessageObserver *)m->mUnk0C)->CreatePostTask(new DinoBattleView3DGameSetResult()));
+        break;
+    }
+    case 0x10090: {
+        DinoBattleView3DRevolutionSetRequest *m = (DinoBattleView3DRevolutionSetRequest *)msg;
+        int i = (u16)m->mUnk10 - 1 + mView->GetUnkE4((s32)m->mUnk10 >> 16)->GetUnkAC() * 3;
+        mUnk104[i] = mCreatureIds[i];
+        mCreatureIds[i] = m->mUnk14;
+        if (m->mUnk0C == 0) {
+            break;
+        }
+        mUnkC0->AddTail(((MMessageObserver *)m->mUnk0C)->CreatePostTask(new DinoBattleView3DRevolutionSetResult()));
+        break;
+    }
+    case 0x100A2:
+        SetUnk180(1);
+        break;
+    }
+}
+
 DelDmgMotionTask::~DelDmgMotionTask() {
     delete mUnk10;
 }
@@ -825,14 +1478,6 @@ extern "C" Dino3DLoadCsv *func_ov000_02187e68(DinoBattleView3D *view, int slot) 
     return model;
 }
 
-
-// The TU's pooled pointer-to-member constants.
-extern "C" struct {
-    u8 unk00[0x1C];
-    void (DinoBattleView3D::*StateLoad_1C)();
-    u8 unk24[0x3C - 0x24];
-    void (DinoBattleView3D::*RunNextQueued_3C)();
-} data_ov000_02196368;
 extern "C" void func_ov000_0218ada0();
 extern "C" const char *const data_ov000_02196514[6];    // each kind's motion file name format (by id, number)
 

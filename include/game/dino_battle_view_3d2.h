@@ -9,6 +9,8 @@
 #include "m/looper.h"
 #include "game/help.h"
 #include "game/dino_field_camera_hook.h"
+#include "m/input.h"
+#include <string.h>
 
 class Dino3DLoadCsv;
 
@@ -16,6 +18,27 @@ class DinoBattleView3D;
 
 class DinoBattleView3DDamage : public MProcess {
 public:
+    struct Defs;
+    DinoBattleView3DDamage(DinoBattleView3D *model, void *owner, u32 side, MTask *camera, Defs *defs, const char *name,
+                           u8 fade, int hold)
+        : MProcess(NULL) {
+        mModel = model;
+        mOwner = owner;
+        mCamera = (class DinoBattleView3DCamera *)camera;
+        mDefs = defs;
+        mHold = hold;
+        mSide = side;
+        mFade = fade;
+        mShowMarks = TRUE;
+        mStepFrames = 60;
+        mStep = 0;
+        mIndex = 0;
+        strcpy(mName, name);
+        mCsvs[0] = mCsvs[1] = mCsvs[2] = NULL;
+        mInputHub = new MSingleInputHub(1);
+        mInputHub->EnableTouch();
+        mParallel.AddTail(mInputHub);
+    }
     virtual ~DinoBattleView3DDamage();
     virtual void Idle();
 
@@ -31,8 +54,7 @@ public:
         u32 mCount;             // 0x9C: steps
         u32 mUnkA0;             // 0xA0: (the last step loads a file)
         u32 mUnkA4;             // 0xA4: (the last step loads another file and plays SE 0x2DF)
-        const char *mPaths[3];  // 0xA8
-        u32 unkB4;
+        const char *mPaths[4];  // 0xA8: by step, its hit model
         u32 mUnkB8;             // 0xB8: the model name's arguments
         u32 mUnkBC[3];          // 0xBC
         u32 unkC8;
@@ -63,10 +85,30 @@ public:
     class MInputHub *mInputHub; // 0x160
     char mNames[3][64];         // 0x164
     const char *mFiles[3];      // 0x224
+    u32 unk230[2];
 };
 
 class DinoBattleView3DAction : public MProcess {
 public:
+    DinoBattleView3DAction(DinoBattleView3D *model, void *owner, u32 slot, MTask *camera, u8 fade, u32 kind, u32 index)
+        : MProcess(NULL) {
+        mModel = model;
+        mUnk78 = owner;
+        mCsv = NULL;
+        mCamera = (class DinoBattleView3DCamera *)camera;
+        mUnk84 = (void *)slot;
+        mUnkE4 = fade;
+        MTaskSet *parallel = &mParallel;
+        parallel->mUseMutex = TRUE;
+        mCsv = NULL;
+        mUnk88 = kind;
+        mUnk8C = index;
+        mUnk98 = 0x7FFF;
+        mStep = 0;
+        mInputHub = new MSingleInputHub(1);
+        mInputHub->EnableTouch();
+        mParallel.AddTail(mInputHub);
+    }
     virtual ~DinoBattleView3DAction();
     virtual void Idle();
 
@@ -119,6 +161,19 @@ public:
         mUnk84 = 0;
         mCamera = camera;
         u32 duration = data_0208a0b8;
+        mDuration = duration;
+        if (duration == (u32)-1) {
+            mDuration = data_0208a0b4;
+        }
+    }
+    DinoBattleView3DGroupFade(void *camera, Target *target, u32 saved, u32 unk7C, int slot, u32 duration)
+        : MProcess(NULL) {
+        mTarget = target;
+        mSaved = saved;
+        mUnk7C = unk7C;
+        mSlot = slot;
+        mUnk84 = 0;
+        mCamera = camera;
         mDuration = duration;
         if (duration == (u32)-1) {
             mDuration = data_0208a0b4;

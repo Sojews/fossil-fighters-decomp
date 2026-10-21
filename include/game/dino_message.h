@@ -1110,10 +1110,10 @@ public:
     u32 mUnk14;
     u32 mUnk18;
     u32 mUnk1C;
-    u8 mUnk20[0xC];
-    u8 mUnk2C[0xC];
-    u8 mUnk38[0xC];
-    u8 mUnk44[0x3];
+    u32 mUnk20[3];      // the targets
+    u32 mUnk2C[3];      // the kind of each hit
+    u32 mUnk38[3];      // the damage of each
+    u8 mUnk44[0x3];     // whether each goes down
     u8 mPad47[0x1];
 };
 
@@ -1268,7 +1268,7 @@ public:
     u8 mUnk24;
     u8 mPad25[0x3];
     u32 mUnk28;
-    u8 mUnk2C[0xC];
+    int mUnk2C[3];      // the damage of each hit
     u8 mUnk38;
     u8 mPad39[0x3];
     u32 mUnk3C;

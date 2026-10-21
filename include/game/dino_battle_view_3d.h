@@ -54,7 +54,7 @@ public:
     MTask *mUnkE4;                          // 0xE4
     MTask *mUnkE8;                          // 0xE8: the camera
     u32 mCreatureIds[6];                    // 0xEC: each slot's three creatures
-    u8 unk104[0x11C - 0x104];
+    u32 mUnk104[6];                         // 0x104: by slot and creature, the creature before the last change
     void *mSlotModels[6];                   // 0x11C: what each slot's models show (3 per slot)
     u32 mSlot;                              // 0x134
     s32 mUnk138;                            // 0x138
@@ -80,6 +80,7 @@ public:
 
 class DelDmgMotionTask : public MTask {
 public:
+    DelDmgMotionTask(void *defs) { mUnk10 = (u8 *)defs; }
     virtual ~DelDmgMotionTask();
     virtual void Execute();
 
