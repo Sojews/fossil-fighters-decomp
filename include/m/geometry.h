@@ -83,11 +83,12 @@ struct MRect {
     }
     // This rect moved by p.
     MRect Moved(MPoint p) const {
+        int x = p.x, y = p.y;
         MRect r = *this;
-        r.left += p.x;
-        r.top += p.y;
-        r.right += p.x;
-        r.bottom += p.y;
+        r.left += x;
+        r.top += y;
+        r.right += x;
+        r.bottom += y;
         return r;
     }
     // This rect moved by p.

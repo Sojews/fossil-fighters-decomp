@@ -65,7 +65,6 @@ DinoBattleViewAbilityIcon::~DinoBattleViewAbilityIcon() {
 void DinoBattleViewUiRootSelectItem::OnDecide() {
 }
 
-// NONMATCHING: the frame copy loads the offset's y before x (register order only).
 MRect DinoBattleViewCreatureAttackIcon::GetFrame() {
     CreatureMotion *motion = (CreatureMotion *) mCreature->mMotion;
     MSmartOam *oam = motion->mOam;

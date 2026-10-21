@@ -103,15 +103,11 @@ void DinoBattleViewCancelMenuItem::OnDecide() {
 }
 
 // The view's frame, moved; off the screen while it's hidden.
-// NONMATCHING: the game offsets the frame in the return slot (and needs no copy of the offset).
 MRect DinoBattleViewInfoLRItem::GetFrame() {
     if (mView->IsHidden()) {
         return MRect(0x140, 0x140, 0x140, 0x140);
     }
-    MPoint offset = mOffset;
-    MRect frame = mView->GetFrame();
-    frame.Offset(offset);
-    return frame;
+    return mView->GetFrame().Moved(mOffset);
 }
 
 void DinoBattleViewInfoLRItem::OnDecide() {
