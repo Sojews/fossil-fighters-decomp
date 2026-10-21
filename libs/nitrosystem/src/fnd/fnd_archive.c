@@ -23,11 +23,11 @@ static BOOL IsValidArchiveBinary(NNSiFndArchiveHeader *header) {
 }
 
 BOOL NNS_FndMountArchive(NNSFndArchive *archive, const char *arcName, void *arcBinary) {
+    NNSiFndArchiveBlockHeader *fimg = NULL;
     NNSiFndArchiveBlockHeader *fat = NULL;
     NNSiFndArchiveBlockHeader *fnt = NULL;
-    NNSiFndArchiveBlockHeader *fimg = NULL;
-    NNSiFndArchiveBlockHeader *block;
     int i;
+    NNSiFndArchiveBlockHeader *block;
 
     if (!IsValidArchiveBinary(arcBinary)) {
         return FALSE;
