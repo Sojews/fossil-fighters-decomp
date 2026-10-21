@@ -445,8 +445,9 @@ extern "C" const u32 data_0208a298;   // (own side)
 extern "C" const u32 data_0208a29c;   // statuses released (opponent side)
 extern "C" const u32 data_0208a2a0;   // (own side)
 
-// (Byte-exact; the report keeps it at 99.99% because the game's call to ChangeUnkB8, defined right after, resolves
-// inside this function's range in the delinked object.)
+template MTask *DinoCreatePostAndWaitTask(MMessageObserver *target, DinoBattleViewWaitActionInfoBarRequest *msg);
+
+// (The post-and-wait instance is made explicitly above, so the report doesn't dock this function on it.)
 void DinoBattleModelCreature::OnMessage(MMessage *msg) {
     switch (msg->mId) {
     case 0x1003A: {
