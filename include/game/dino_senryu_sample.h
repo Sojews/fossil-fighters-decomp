@@ -17,6 +17,7 @@ public:
     void StatePages();
     void StateEnd();
     void StateMenu();
+    void StateFillRecords();
 
     void (DinoSenryuSample::*mState)(); // 0x74
     std::wstring mText;     // 0x7C

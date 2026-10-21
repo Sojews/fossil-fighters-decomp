@@ -1,5 +1,4 @@
 // DinoSenryuSample.
-// Only the destructors are decompiled so far.
 
 #include "nitro/os.h"
 #include "m/bright.h"
@@ -12,6 +11,9 @@
 #include "game/dino_senryu_sample.h"
 #include "game/dino_ui_senryu_menu.h"
 #include "m/overlay.h"
+#include "game/dino_backup.h"
+#include "nitro/mi.h"
+#include <algorithm>
 
 DinoSenryuSample::~DinoSenryuSample() {
 }
@@ -25,12 +27,16 @@ M_EXTERN_OVERLAY(ov007);
 
 // The TU's pooled pointer-to-member constants (see menu.cpp).
 extern "C" struct {
-    u8 unk00[0x18];
+    u8 unk00[8];
+    u32 mNameMax;       // 0x08: characters of a poet's name kept
+    u32 mTextMax;       // 0x0C: bytes of a poem kept
+    u8 unk10[8];
     void (DinoSenryuSample::*StatePages_18)();
     void (DinoSenryuSample::*StateEnd_20)();
-    void (DinoSenryuSample::*Unk0203467c_28)();
+    void (DinoSenryuSample::*StateFillRecords_28)();
     void (DinoSenryuSample::*Start_30)();
-    void (DinoSenryuSample::*Unk02034564_38)();
+    void (DinoSenryuSample::*StatePages_38)();
+    void (DinoSenryuSample::*StateMenu_40)();
 } data_020bd15c;
 // "PAGE%d", "CANCEL" (the TU's string literals are pooled data too), the title's text id.
 extern "C" const char data_020bd1e8[];
@@ -48,12 +54,40 @@ void DinoSenryuSample::StateEnd() {
         Exit();
         return;
     }
-    mState = data_020bd15c.Unk0203467c_28;
+    mState = data_020bd15c.StateFillRecords_28;
+}
+
+// Fills the records with the chosen page's sample poems (marked and shown), clears the rest, then shows the menu.
+void DinoSenryuSample::StateFillRecords() {
+    u32 i = 0;
+    for (u32 j = mResult * 42; i < 42 && j < mDefs.Get()->count; i++, j++) {
+        DinoBackupRecord record;
+        MI_CpuFill8(&record, 0, sizeof(record));
+        record.unk78 = 1;
+        record.unk7a = 1;
+        const u8 *data = (const u8 *)mDefs.Get();
+        const u32 *entry = (const u32 *)(data + ((const u32 *)(data + ((const u32 *)data)[2]))[j]);
+        std::wstring name = MDecodeUtf8(std::string((const char *)entry + entry[0]));
+        for (u32 k = 0; k < std::min(name.size(), data_020bd15c.mNameMax); k++) {
+            record.name[k] = name[k];
+        }
+        std::string text((const char *)entry + entry[1]);
+        for (u32 k = 0; k < std::min(text.size(), data_020bd15c.mTextMax); k++) {
+            record.data[k] = text[k];
+        }
+        gDinoBackup->SetRecord(i, &record);
+    }
+    for (; i < 42; i++) {
+        DinoBackupRecord empty;
+        MI_CpuFill8(&empty, 0, sizeof(empty));
+        gDinoBackup->SetRecord(i, &empty);
+    }
+    mState = data_020bd15c.StateMenu_40;
 }
 
 void DinoSenryuSample::StateMenu() {
     mSerial.AddTail(new DinoUiSenryuMenu);
-    mState = data_020bd15c.Unk02034564_38;
+    mState = data_020bd15c.StatePages_38;
 }
 
 void DinoSenryuSample::StateStart() {
