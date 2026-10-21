@@ -201,10 +201,16 @@ void DinoCleaningHammerBaseHit::StateStart() {
 
 extern "C" void func_ov002_0215fdec(DinoCleaningKasekiRock *rock);
 
+// a - b, b by reference (no copy of it on the stack, unlike operator-).
+static inline MFx32 DinoFxSub(MFx32 a, const MFx32 &b) {
+    MFx32 r;
+    r.v = a.v - b.v;
+    return r;
+}
+
 // Shakes the rock, less and less.
-// NONMATCHING: the fixed-point temporaries sit in other stack slots.
 void DinoCleaningHammerBaseHit::State0215d0c4() {
-    mRadius = mRadius - data_ov002_02164fb8.mShakeDecay;
+    mRadius = DinoFxSub(mRadius, data_ov002_02164fb8.mShakeDecay);
     func_ov002_0215fdec(mRock);
     MFx32 amp = std::max(MFx32(0), mRadius * MFx32(3));
     mRock->SetOffset(MPoint(MFx32ToInt(amp * mUnk80->NextFraction() - amp / MFx32(2)),
