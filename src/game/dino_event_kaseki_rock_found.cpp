@@ -1,5 +1,4 @@
 // DinoEventKasekiRockFound.
-// Only the destructors are decompiled so far.
 
 #include "game/dino_event_kaseki_rock_found.h"
 #include "game/dino_field.h"
@@ -10,6 +9,12 @@
 #include "game/dino_common_window_message_box.h"
 #include "nitro/os.h"
 #include <string.h>
+#include "game/dino_field_hole.h"
+#include "game/dino_event_exec.h"
+#include "game/dino_sound.h"
+#include "m/polygon_char.h"
+#include "m/anm_model.h"
+#include "m/call_task.h"
 
 DinoEventKasekiRockFound::~DinoEventKasekiRockFound() {
     mEvent->GetField()->SetUnk258(FALSE);
@@ -21,7 +26,13 @@ void DinoEventKasekiRockFound::Idle() {
 
 // The TU's pooled pointer-to-member constants.
 extern "C" struct {
-    u8 unk00[0x68];
+    u8 unk00[0x10];
+    void (DinoEventKasekiRockFound::*StateFound_10)();
+    u8 unk18[0x38 - 0x18];
+    void (DinoEventKasekiRockFound::*State020374d4_38)();
+    u8 unk40[0x48 - 0x40];
+    void (MPolygonChar::*Load_48)(const char *, const char *);
+    u8 unk50[0x68 - 0x50];
     void (DinoEventKasekiRockFound::*Start_68)();
 } data_020bd380;
 
@@ -86,3 +97,62 @@ MTask *DinoEventKasekiRockFound::CreateYesNo(u32 message) {
 // Vector instances the game emits in this file (made explicitly until the code that uses them is decompiled).
 template class std::__vec_deleter<std::string, std::allocator<std::string> >;
 template std::__vec_deleter<std::string, std::allocator<std::string> &>::~__vec_deleter();
+
+// The finder's digging motion for each kind of rock.
+extern const u32 data_0208b2f4[8];
+extern const u32 data_0208a1fc;
+extern const u32 data_0208a200;
+
+// NONMATCHING: the game keeps the effect's z and height in r6 and r4 the other way round.
+void DinoEventKasekiRockFound::StateDig() {
+    u32 focus = mEvent->GetField()->GetCamera()->GetFocus();
+    mChara = mEvent->GetField()->GetChara(focus);
+    u32 motion = data_0208b2f4[mEntry.unk10_0];
+    if (mUnkDC) {
+        motion = 0x1C;
+    }
+    mHole = mEvent->GetField()->CreateHole(*(MFx32Point *)&mPos);
+    mAngle = mChara->GetModel()->angle;
+    mEffect = new MPolygonChar(mEvent->GetField()->mScene, 0x7FFF, NULL, NULL);
+    MPolygonChar *e;
+    (e = mEffect)->SetPosition(mHole->GetPos().x.v, mHole->mUnk90, mHole->GetPos().y.v);
+    for (MAnmModelBase *anm = (MAnmModelBase *)e->mParallel.mHead; anm != NULL; anm = (MAnmModelBase *)anm->mNext) {
+        anm->mPosRef = &e->mPos;
+        anm->mUnk11B = TRUE;
+    }
+    int angle = (u16)(0x4000 - mChara->GetModel()->angle) * 360 / 16;
+    e = mEffect;
+    e->mRot.x = 0;
+    e->mRot.y = angle;
+    e->mRot.z = 0;
+    for (MAnmModelBase *anm = (MAnmModelBase *)e->mParallel.mHead; anm != NULL; anm = (MAnmModelBase *)anm->mNext) {
+        anm->mRotRef = &e->mRot;
+        anm->mUnk11B = TRUE;
+    }
+    for (MAnmModelBase *anm = (MAnmModelBase *)mEffect->mParallel.mHead; anm != NULL;
+         anm = (MAnmModelBase *)anm->mNext) {
+        anm->mActive = TRUE;
+    }
+    e = mEffect;
+    e->mUnkAC = 1;
+    for (MAnmModelBase *anm = (MAnmModelBase *)e->mParallel.mHead; anm != NULL; anm = (MAnmModelBase *)anm->mNext) {
+        anm->mFollowParent = TRUE;
+    }
+    mParallel.AddTail(mEffect);
+    mChara->ClearUnk2E0();
+    mChara->SetMotion(4, 0, MFx32(1));
+    GetSerial()->AddTail(new MTimer(0x1E),
+                    MCreateCallTask(mEffect, data_020bd380.Load_48, "/model/fieldchar/effect03.csv", (const char *)NULL),
+                    DinoSoundCreatePlaySeTask(0xCA, 0),
+                    new DinoEventExecCamera(mEvent, 0x400, 0x1B53, 0, 0x2B000, 0x3C, 0xC),
+                    DinoSoundCreatePlaySeTask(!mUnkDC ? data_0208a200 : data_0208a1fc, 0),
+                    mChara->CreateSetMotionTask(motion, 0, MFx32(1)), new MTimer(10),
+                    mChara->CreateShowManpuTask(2, MPoint(0, 0)), new MTimer(0x1E),
+                    mChara->CreateAngleToTask(0x4000, 0x14, 0xC), mChara->CreateHideManpuTask(), new MTimer(0x14),
+                    MTaskExitTransfer::Create(mEffect));
+    if (!mUnkDC) {
+        mState = data_020bd380.StateFound_10;
+    } else {
+        mState = data_020bd380.State020374d4_38;
+    }
+}

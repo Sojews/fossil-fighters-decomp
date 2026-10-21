@@ -13,6 +13,7 @@ struct DinoMessageData;
 struct DinoBattleData;
 class DinoFieldHole;
 class DinoFieldChara;
+class MPolygonChar;
 
 class DinoEventKasekiRockFound : public MProcess {
 public:
@@ -38,6 +39,8 @@ public:
     void StateFoundEnd();
     void StateAsk();
     void StateAnswered();
+    // The finder digs the rock out (its effect playing over the hole), turns to the camera and shows a mark.
+    void StateDig();
 
     void (DinoEventKasekiRockFound::*mState)(); // 0x74
     DinoEventLoop *mEvent;      // 0x7C
@@ -50,9 +53,11 @@ public:
     DinoFieldHole *mHole;   // 0xAC: the hole the rock was dug out of
     MResource<DinoMessageData> mMessages;   // 0xB0: the digging messages
     MResource<DinoBattleData> mBattleData;  // 0xC0: the battle's, after it
-    u32 unkD0[2];
+    u32 unkD0;
+    MPolygonChar *mEffect;  // 0xD4: the digging effect
     int mAnswer;            // 0xD8: the yes/no dialog's
-    u32 unkDC;
+    u8 mUnkDC;              // 0xDC
+    u8 unkDD[3];
     u32 mAngle;             // 0xE0: to turn the finder to
 };
 
