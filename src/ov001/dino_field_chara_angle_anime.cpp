@@ -584,11 +584,6 @@ void DinoFieldChara::FinishBehold() {
     mBeholdTarget = 0;
 }
 
-// The direction of the vector, as an angle index.
-static inline u16 MFx32PointAngle(MFx32Point v) {
-    return MFx32Atan2(v.y, v.x);
-}
-
 // Each frame: the footstep sound on the motion's step frames, the manpu over the head, turning to the character
 // beheld; then (outside the field's unk258 mode) the reaction to the camera's focus or the task's step, and the walk.
 void DinoFieldChara::Idle() {
@@ -786,7 +781,7 @@ void DinoFieldChara::IdleFollow() {
     const DinoFollowDefs *defs = (const DinoFollowDefs *)gDinoResource->GetExcavate78();
     MFx32 speed;
     u32 mode;
-    if (len >= defs->start || (len >= defs->keep && !(mUnk2D8 == MFx32Point(MFx32(0), MFx32(0))))) {
+    if (len >= defs->start || (len >= defs->keep && (mUnk2D8.x != MFx32(0) || mUnk2D8.y != MFx32(0)))) {
         speed = len * defs->factor * walk;
         if (speed >= defs->run * walk) {
             mode = 3;
@@ -799,8 +794,7 @@ void DinoFieldChara::IdleFollow() {
         speed = 0;
         mode = 1;
     }
-    MFx32Point v = d / d.Length() * speed;
-    SetUnk2D8(v, mode, walk);
+    SetUnk2D8(d / d.Length() * speed, mode, walk);
 }
 
 static inline MFx32Point AngleToDir(u16 angle) {

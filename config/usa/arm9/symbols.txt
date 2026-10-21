@@ -2701,7 +2701,7 @@ _Z15MCreateCallTaskI12MPolygonCharS0_PKcS2_EP5MTaskPT_MT0_FvT1_T2_ES8_S9_ kind:f
 _ZN24DinoEventKasekiRockFound10StateFoundEv kind:function(thumb,size=0x24) addr:0x02036b40
 _ZN24DinoEventKasekiRockFound13StateFoundEndEv kind:function(thumb,size=0x2c) addr:0x02036b64
 _ZN24DinoEventKasekiRockFound8StateGetEv kind:function(thumb,size=0x44) addr:0x02036b90
-func_02036bd4 kind:function(thumb,size=0x33c) addr:0x02036bd4
+_ZN24DinoEventKasekiRockFound10StateRivalEv kind:function(thumb,size=0x33c) addr:0x02036bd4
 _ZN24DinoEventKasekiRockFound8StateAskEv kind:function(thumb,size=0x2c) addr:0x02036f10
 _ZN24DinoEventKasekiRockFound13StateAnsweredEv kind:function(thumb,size=0x28) addr:0x02036f3c
 _ZN24DinoEventKasekiRockFound10StateLeaveEv kind:function(thumb,size=0xc0) addr:0x02036f64

@@ -6,6 +6,7 @@
 #include "m/resource.h"
 #include "game/dino_backup.h"
 #include "m/geometry.h"
+#include "m/fx32.h"
 
 class DinoEventLoop;
 
@@ -37,6 +38,8 @@ public:
     MTask *CreateYesNo(u32 message);
     void StateFound();
     void StateFoundEnd();
+    // The battle's rival walks up beside the rock (when it has one) and speaks, then the yes/no.
+    void StateRival();
     void StateAsk();
     void StateAnswered();
     // The finder digs the rock out (its effect playing over the hole), turns to the camera and shows a mark.
@@ -44,7 +47,7 @@ public:
 
     void (DinoEventKasekiRockFound::*mState)(); // 0x74
     DinoEventLoop *mEvent;      // 0x7C
-    MPoint mPos;            // 0x80
+    MFx32Point mPos;        // 0x80: where the rock was found
     u32 mArg;               // 0x88
     u32 mBattle;            // 0x8C: the battle the rock starts, or 0
     u32 mUnk90;             // 0x90
@@ -53,7 +56,7 @@ public:
     DinoFieldHole *mHole;   // 0xAC: the hole the rock was dug out of
     MResource<DinoMessageData> mMessages;   // 0xB0: the digging messages
     MResource<DinoBattleData> mBattleData;  // 0xC0: the battle's, after it
-    u32 unkD0;
+    DinoFieldChara *mRival; // 0xD0: the one who wants the rock too (the battle's chara), or NULL
     MPolygonChar *mEffect;  // 0xD4: the digging effect
     int mAnswer;            // 0xD8: the yes/no dialog's
     u8 mUnkDC;              // 0xDC

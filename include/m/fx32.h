@@ -266,4 +266,9 @@ inline u16 MFx32Atan2(MFx32 y, MFx32 x) {
     return FX_Atan2Idx(y.v, x.v);
 }
 
+// The angle of the vector.
+inline u16 MFx32PointAngle(MFx32Point v) {
+    return MFx32Atan2(v.y, v.x);
+}
+
 #endif

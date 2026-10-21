@@ -43,7 +43,7 @@ extern "C" struct {
 } data_020bd380;
 
 DinoEventKasekiRockFound::DinoEventKasekiRockFound(DinoEventLoop *event, u32 arg, MPoint pos)
-    : MProcess(gLcd->GetBottomDisplay()), mEvent(event), mPos(pos), mArg(arg) {
+    : MProcess(gLcd->GetBottomDisplay()), mEvent(event), mPos(*(MFx32Point *)&pos), mArg(arg) {
     mMessages = MResource<DinoMessageData>("/msg/msg_dig");
     mState = data_020bd380.Start_68;
 }
@@ -296,7 +296,7 @@ void DinoEventKasekiRockFound::StateDig() {
     if (mUnkDC) {
         motion = 0x1C;
     }
-    mHole = mEvent->GetField()->CreateHole(*(MFx32Point *)&mPos);
+    mHole = mEvent->GetField()->CreateHole(mPos);
     mAngle = mChara->GetModel()->angle;
     mEffect = new MPolygonChar(mEvent->GetField()->mScene, 0x7FFF, NULL, NULL);
     MPolygonChar *e;

@@ -35,7 +35,9 @@ void DinoEventParkKasekiRockFound::Idle() {
 
 // The TU's pooled pointer-to-member constants (see menu.cpp).
 extern "C" struct {
-    u8 unk00[0x18];
+    u8 unk00[0x8];
+    void (DinoEventKasekiRockFound::*StateAsk_08)();
+    u8 unk10[0x18 - 0x10];
     void (DinoEventKasekiRockFound::*StateBattleEnd_18)();
     u8 unk20[0x30 - 0x20];
     void (DinoEventKasekiRockFound::*StateBattle_30)();
@@ -51,7 +53,7 @@ extern "C" struct {
 } data_020bd380;
 extern "C" struct {
     u8 unk00[0x28];
-    void (DinoEventKasekiRockFound::*Unk02036bd4_28)();
+    void (DinoEventKasekiRockFound::*StateRival_28)();
     void (DinoEventParkKasekiRockFound::*StateFound_30)();
     void (DinoEventParkKasekiRockFound::*StateStart_38)();
 } data_020bd400;
@@ -67,7 +69,7 @@ void DinoEventKasekiRockFound::StateFound() {
 
 void DinoEventKasekiRockFound::StateFoundEnd() {
     if (mBattle != 0) {
-        mState = data_020bd400.Unk02036bd4_28;
+        mState = data_020bd400.StateRival_28;
     } else {
         mState = data_020bd380.StateGet_40;
     }
@@ -79,6 +81,40 @@ void DinoEventKasekiRockFound::StateGet() {
     }
     MTask *exit = MTaskExitTransfer::Create(this);
     GetSerial()->AddTail(new DinoEventKasekiRockGet(mEvent, 0, &mEntry, NULL), exit);
+}
+
+// The battle's rival (its data's chara, when it has one) appears at the rock, walks a tile out of it facing the
+// finder, and the finder turns to the rock; then the rival's message and talk, and the yes/no.
+// NONMATCHING: same code; the MFx32 temporaries take other stack slots.
+void DinoEventKasekiRockFound::StateRival() {
+    if (((const u32 *)mBattleData.Get())[11] != 0) {
+        DinoSoundPlaySe(0xCF, 0);
+        MFx32PointAngle(mChara->GetModel()->pos - mPos);
+        MFx32Point rock = mPos;
+        mRival = mEvent->GetField()->GetChara(0);
+        mRival->ResetState();
+        u32 id = ((const u32 *)mBattleData.Get())[11];
+        mRival->GetModel()->id = id;
+        mRival->GetModel()->pos = mPos;
+        mRival->GetModel()->angle = MFx32PointAngle(mChara->GetModel()->pos - rock);
+        mRival->Refresh();
+        mRival->SetCommonMotion(12);
+        mRival->GetModel()->id = 0;
+        MFx32Point offset = MFx32Point(MFx32::FromRaw(FX_SinCosTable_[(mRival->GetModel()->angle >> 4) * 2 + 1]),
+                                       MFx32::FromRaw(FX_SinCosTable_[(mRival->GetModel()->angle >> 4) * 2])) *
+                            MFx32(1);
+        mRival->MoveTo(rock - offset, 30, 0, TRUE);
+        mSerial.AddTail(new MTimer(30), mChara->CreateAngleToTask(MFx32PointAngle(rock - mChara->GetModel()->pos), 10, 12),
+                        new MTimer(30));
+    } else {
+        mRival = NULL;
+    }
+    mSerial.AddTail(CreateMessageBox(4, data_020bd604));
+    if (((const u32 *)mBattleData.Get())[6] != 0) {
+        mSerial.AddTail(new DinoEventTalkWindow(gCurrentDisplay,
+                                                mEvent->GetTalkText(((const u32 *)mBattleData.Get())[6]), 0, 0));
+    }
+    mState = data_020bd380.StateAsk_08;
 }
 
 void DinoEventKasekiRockFound::StateLeave() {
