@@ -261,6 +261,25 @@ src/game/dino_common_tutorial_console_filter.cpp:
 src/game/dino_event_talk_window.cpp:
     .text       start:0x02007014 end:0x020082b0
 
+src/game/dino_menu_layout.cpp:
+    .init       start:0x02088a54 end:0x02088d6c
+    .ctor       start:0x02092fb8 end:0x02092fbc
+
+src/game/dino_battle_colors.cpp:
+    complete
+    .init       start:0x02088d6c end:0x02088dac
+    .ctor       start:0x02092fbc end:0x02092fc0
+
+src/game/dino_event_zoom_scale.cpp:
+    complete
+    .init       start:0x02088dac end:0x02088dbc
+    .ctor       start:0x02092fc0 end:0x02092fc4
+
+src/game/dino_field_chara_speeds.cpp:
+    complete
+    .init       start:0x02088dbc end:0x02088de4
+    .ctor       start:0x02092fc4 end:0x02092fc8
+
 src/game/dino_talk_console_filter.cpp:
     .text       start:0x0200843c end:0x0200a34c
     .init       start:0x02088de4 end:0x02088e34
