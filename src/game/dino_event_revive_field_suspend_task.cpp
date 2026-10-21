@@ -31,18 +31,18 @@
 // String members the game emits in this file (+= first: instantiated after replace, mwcc mangles it long-hand).
 template std::string &std::string::operator+=(const std::string &str);
 
-// Replaces every from in str with to (str is left as it is when to holds from, which would never end). NONMATCHING:
-// mwcc leaves an unreachable epilogue after the loop that the game doesn't have.
-std::string DinoReplaceAll(std::string &str, const std::string &from, const std::string &to) {
-    if (to.find(from, 0) != std::string::npos) {
-        return str;
+// The text with every tag replaced by the value (unless the value has the tag itself).
+// NONMATCHING: ours keeps an unreachable epilogue after the loop (as the other copies).
+std::string DinoReplaceTag(std::string text, std::string tag, std::string value) {
+    if (value.find(tag, 0) != std::string::npos) {
+        return text;
     }
-    for (;;) {
-        std::string::size_type pos = str.find(from, 0);
+    while (true) {
+        std::string::size_type pos = text.find(tag, 0);
         if (pos == std::string::npos) {
-            return str;
+            return text;
         }
-        str = str.replace(pos, from.size(), to);
+        text = text.replace(pos, tag.size(), value);
     }
 }
 
