@@ -71,6 +71,7 @@ public:
 
 class TutorialWindowCloseTask : public MTask {
 public:
+    TutorialWindowCloseTask(u32 window) { mUnk10 = window; }
     virtual ~TutorialWindowCloseTask();
     virtual void Execute();
 
@@ -82,6 +83,7 @@ class DinoBattleView;
 // Waits until both players' ability icons stop counting.
 class WaitUpdateSupportEffectAnimeTask : public MTask {
 public:
+    WaitUpdateSupportEffectAnimeTask(DinoBattleView *view) { mView = view; }
     virtual ~WaitUpdateSupportEffectAnimeTask();
     virtual void Execute();
 
@@ -101,6 +103,12 @@ public:
 
 class SetTutorialMotionArrorTask : public MTask {
 public:
+    SetTutorialMotionArrorTask(DinoBattleViewTutorialMotion *motion, int index, int dir, MPoint pos) {
+        mMotion = motion;
+        mIndex = index;
+        mDir = dir;
+        mPos = pos;
+    }
     virtual ~SetTutorialMotionArrorTask();
     virtual void Execute();
 
@@ -112,6 +120,11 @@ public:
 
 class SetTutorialMotionRectTask : public MTask {
 public:
+    SetTutorialMotionRectTask(DinoBattleViewTutorialMotion *motion, MPoint topLeft, MPoint bottomRight) {
+        mMotion = motion;
+        mTopLeft = topLeft;
+        mBottomRight = bottomRight;
+    }
     virtual ~SetTutorialMotionRectTask();
     virtual void Execute();
 

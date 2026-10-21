@@ -41,15 +41,17 @@ public:
     MTaskSet *mTasksB8;         // 0xB8
     MTaskSet *mTasksBC;         // 0xBC
     DinoBattleViewFieldSlot *mSlotViewsC0[2]; // 0xC0: by side
-    u8 unkC8[0x120 - 0xC8];
+    u8 unkC8[0x118 - 0xC8];
+    class DinoBattleViewFieldPlayerBG *mPlayerBG;   // 0x118
+    class DinoBattleViewAdvantageArrow *mArrow;     // 0x11C
     DinoBattleViewBackdrop *mBackdrop;  // 0x120
-    u32 unk124;
+    class DinoBattleViewLCDFader *mFader;   // 0x124
     MTask *mTask128;            // 0x128
     MTask *mTask12C;            // 0x12C
     u32 mUnk130;                // 0x130
-    u32 unk134;
-    void *mUnk138;  // 0x138
-    u8 unk13C[4];
+    class DinoBattleViewTutorialMotion *mTutorialMotion;    // 0x134
+    void *mUnk138;  // 0x138: the talk window
+    class DinoBattleViewTutorialWindow *mTutorialWindow;    // 0x13C
     void *mUnk140;  // 0x140
     u32 unk144[3];
     int mUnk150;    // 0x150
