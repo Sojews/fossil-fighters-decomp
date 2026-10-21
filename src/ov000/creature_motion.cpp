@@ -327,6 +327,56 @@ void DinoBattleViewEffectGameBegin::StateFadeIn() {
     mState = data_ov000_02193668.State_38;
 }
 
+// The four in a row.
+static inline MTask *DinoGameBeginSerial(MTask *a, MTask *b, MTask *c, MTask *d) {
+    MSerialTaskSet *set = new MSerialTaskSet(TRUE);
+    set->AddTail(a);
+    set->AddTail(b);
+    set->AddTail(c);
+    set->AddTail(d);
+    return set;
+}
+
+// The three at once.
+static inline MTask *DinoGameBeginParallel(MTask *a, MTask *b, MTask *c) {
+    MParallelTaskSet *set = new MParallelTaskSet(TRUE);
+    set->AddTail(a);
+    set->AddTail(b);
+    set->AddTail(c);
+    return set;
+}
+
+// Shows "VS": the players' names fly in from the sides and hold, then slide away (the top one up, the bottom one
+// down) with the backdrop. (One expression: the game gives the points' temporaries stack slots in this order.)
+void DinoBattleViewEffectGameBegin::StateNames() {
+    mVs->Show();
+    mVs->Play(1, 0);
+    int topY = 48 - mPanels[0]->GetHeight() / 2;
+    int topX = 128 - mPanels[0]->GetWidth() / 2;
+    int bottomY = 144 - mPanels[1]->GetHeight() / 2;
+    int bottomX = 128 - mPanels[1]->GetWidth() / 2;
+    mPanels[0]->Hide();
+    mPanels[1]->Hide();
+    mSerial.AddTail(
+        new MTimer(10),
+        DinoGameBeginParallel(
+            DinoGameBeginSerial(mBack->CreateShowTransfer(),
+                                mBack->CreateCoordAnime(MPoint(0, 192), MPoint(0, 0), 20, -2), new MTimer(80),
+                                mBack->CreateCoordAnime(MPoint(0, 0), MPoint(0, -192), 20, 2)),
+            DinoGameBeginSerial(mPanels[0]->CreateShowTransfer(),
+                                mPanels[0]->CreateCoordAnime(MPoint(topX - 304, topY), MPoint(topX - 64, topY), 20, -2),
+                                mPanels[0]->CreateCoordAnime(MPoint(topX - 64, topY), MPoint(topX - 32, topY), 80, 0),
+                                mPanels[0]->CreateCoordAnime(MPoint(topX - 32, topY), MPoint(topX - 32, topY - 128), 20,
+                                                             2)),
+            DinoGameBeginSerial(
+                mPanels[1]->CreateShowTransfer(),
+                mPanels[1]->CreateCoordAnime(MPoint(bottomX + 304, bottomY), MPoint(bottomX + 64, bottomY), 20, -2),
+                mPanels[1]->CreateCoordAnime(MPoint(bottomX + 64, bottomY), MPoint(bottomX + 32, bottomY), 80, 0),
+                mPanels[1]->CreateCoordAnime(MPoint(bottomX + 32, bottomY), MPoint(bottomX + 32, bottomY + 128), 20,
+                                             2))),
+        MTaskExitTransfer::Create(this));
+}
+
 void SetCretureIconTask::Idle() {
     (*mMotion)->SetPriority(2);
     (*mMotion)->SetAnchor(0);

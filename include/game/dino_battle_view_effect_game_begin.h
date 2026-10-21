@@ -39,6 +39,7 @@ public:
 
     void Start();
     void StateFadeIn();
+    void StateNames();
 
     void (DinoBattleViewEffectGameBegin::*mState)(); // 0x74
     u32 mUnk7C;             // 0x7C: the DinoBattleView
