@@ -187,6 +187,7 @@ public:
     void IdleNoTask();
     void IdleFollow();
     void IdleWander();
+    void IdlePatrol();
     void MoveTo(MFx32Point coord, u32 frames, u32 ease, u8 silent);
     MTask *CreateWaitMoveTask();
     MTask *CreateWaitStopTask();

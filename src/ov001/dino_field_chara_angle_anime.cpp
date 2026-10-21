@@ -702,7 +702,7 @@ static inline MFx32Point AngleToDir(u16 angle) {
 
 // Wandering (mTask.unk8.wander): waits w[0] to w[1] frames, then walks at w[2] per second to a random point within
 // w[3] of where the backup has the character.
-// NONMATCHING: the game keeps the speed in a stack slot (and the random distance across the Next call).
+// NONMATCHING: the game keeps the random distance in its own stack slot across the Next call.
 void DinoFieldChara::IdleWander() {
     if (mField->IsUnk258() || Unk02162154()) {
         return;
@@ -721,12 +721,49 @@ void DinoFieldChara::IdleWander() {
     MFx32Point d = mHome - mModel.pos;
     MFx32 speed = MFx32::FromRaw(mTask.unk8.wander.w[2] / 60);
     MFx32 len = d.Length();
-    if (len <= speed * MFx32(10)) {
+    if (len <= speed.Times(MFx32(10))) {
         SetMotion(1, 1, MFx32(1));
         mUnkC0 = mTask.unk8.wander.w[0] + MFx32ToInt(MFx32(mTask.unk8.wander.w[1] - mTask.unk8.wander.w[0]) *
                                                      gDinoResource->GetRandom()->NextFraction());
     } else {
         SetUnk2D8(d / len * speed, 2, MFx32(1));
+    }
+}
+
+static inline MFx32Point RegionCenterFx(DinoRegionCenter p) {
+    return MFx32Point(MFx32(p.unk00), MFx32(p.unk04));
+}
+
+// Patrolling (mTask.unk8.patrol): waits w[0] to w[1] frames, then walks at w[2] per second to the center of the next
+// region in its list.
+// NONMATCHING: the game squares d.y before d.x in the first Length (ours flips them, with the sum shared by both).
+void DinoFieldChara::IdlePatrol() {
+    if (mField->IsUnk258() || Unk02162154()) {
+        return;
+    }
+    if (mUnkC0 != 0) {
+        if (--mUnkC0 != 0) {
+            return;
+        }
+        u32 i;
+        for (i = 0; i < mTask.unk8.patrol.count; i++) {
+            if (mUnkC4 == mTask.unk8.patrol.points[i]) {
+                i++;
+                break;
+            }
+        }
+        i %= mTask.unk8.patrol.count;
+        mUnkC4 = mTask.unk8.patrol.points[i];
+        mHome = RegionCenterFx(gDinoResource->GetRegionCenter(mUnkC4));
+    }
+    MFx32Point d = mHome - mModel.pos;
+    MFx32 speed = MFx32::FromRaw(mTask.unk8.patrol.w[2] / 60);
+    if (d.Length() <= speed.Times(MFx32(10))) {
+        SetMotion(1, 1, MFx32(1));
+        mUnkC0 = mTask.unk8.patrol.w[0] + MFx32ToInt(MFx32(mTask.unk8.patrol.w[1] - mTask.unk8.patrol.w[0]) *
+                                                     gDinoResource->GetRandom()->NextFraction());
+    } else {
+        SetUnk2D8(d / d.Length() * speed, 2, MFx32(1));
     }
 }
 

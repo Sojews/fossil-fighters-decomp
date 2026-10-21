@@ -14,6 +14,8 @@ public:
         return r;
     }
     MFx32 Mul(MFx32 b) const;
+    // (As a member: the left operand stays in memory.)
+    MFx32 Times(MFx32 b) const;
     MFx32 &operator+=(MFx32 b);
     MFx32 &operator-=(MFx32 b);
     MFx32 &operator*=(MFx32 b);
@@ -78,6 +80,10 @@ inline MFx32 MFx32::Mul(MFx32 b) const {
     MFx32 r;
     r.v = FX_Mul(v, b.v);
     return r;
+}
+
+inline MFx32 MFx32::Times(MFx32 b) const {
+    return *this * b;
 }
 
 inline MFx32 &MFx32::operator+=(MFx32 b) {
