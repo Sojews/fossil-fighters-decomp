@@ -7,6 +7,7 @@ class DinoUiOptionMenu;
 
 class OptionKeyCheckTask : public MTask {
 public:
+    OptionKeyCheckTask(DinoUiOptionMenu *menu) { mMenu = menu; }
     virtual ~OptionKeyCheckTask();
     virtual void Execute();
 

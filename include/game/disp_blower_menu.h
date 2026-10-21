@@ -12,6 +12,7 @@
 
 class DinoUiOptionSpeedMenuItem : public DinoUiOptionMenuItem {
 public:
+    DinoUiOptionSpeedMenuItem(DinoUiOptionMenu *owner, u8 speed);
     virtual ~DinoUiOptionSpeedMenuItem();
     virtual MRect GetFrame();
     virtual void OnDecide();
@@ -21,6 +22,7 @@ public:
 
 class BGMVolumeButton : public DinoUiOptionMenuItem {
 public:
+    BGMVolumeButton(DinoUiOptionMenu *owner, u8 level, u32 textId);
     virtual ~BGMVolumeButton();
     virtual MRect GetFrame();
     virtual void OnFocusChanged(BOOL focused);
@@ -32,6 +34,7 @@ public:
 
 class SEVolumeButton : public DinoUiOptionMenuItem {
 public:
+    SEVolumeButton(DinoUiOptionMenu *owner, int level, u32 textId);
     virtual ~SEVolumeButton();
     virtual MRect GetFrame();
     virtual void OnFocusChanged(BOOL focused);
@@ -43,6 +46,7 @@ public:
 
 class MicTestButton : public DinoUiOptionMenuItem {
 public:
+    MicTestButton(DinoUiOptionMenu *owner, u32 textId);
     virtual ~MicTestButton();
     virtual MRect GetFrame();
     virtual void OnFocusChanged(BOOL focused);
@@ -60,6 +64,7 @@ public:
 
 class DinoUiOptionBackButton : public DinoUiOptionMenuItem {
 public:
+    DinoUiOptionBackButton(DinoUiOptionMenu *owner, u32 textId);
     virtual ~DinoUiOptionBackButton();
     virtual void OnFocusChanged(BOOL focused);
     virtual void OnDecide();
@@ -67,6 +72,7 @@ public:
 
 class DinoUiOptionOkButton : public DinoUiOptionMenuItem {
 public:
+    DinoUiOptionOkButton(DinoUiOptionMenu *owner, u32 textId);
     virtual ~DinoUiOptionOkButton();
     virtual void OnFocusChanged(BOOL focused);
     virtual void OnDecide();
@@ -74,9 +80,11 @@ public:
 
 class DinoUiOptionMenu;
 class DinoBlower2;
+class MTextPicture;
 
 class DinoUiOptionPower : public MTask, public MSleepHook {
 public:
+    DinoUiOptionPower(DinoUiOptionMenu *menu);
     virtual ~DinoUiOptionPower();
     virtual void Execute();
     virtual void OnSleep();
@@ -112,13 +120,14 @@ public:
     MMenuItem *mUnk128;         // 0x128
     MMenuItem *mBackButton;     // 0x12C: B goes to it
     MicTestButton *mMicTest;    // 0x130: the item under the SE volume row
-    u32 mUnk134;                // 0x134
+    MTextPicture *mUnk134;      // 0x134: the title
     DinoBlower2 *mBlower;       // 0x138: the microphone
     MTask *mUnk13C;             // 0x13C
-    MView *mSpeedMarks[3];      // 0x140
+    MMotion *mSpeedMarks[3];    // 0x140
     MMotion *mBgmMotion;        // 0x14C: shows the BGM volume
     MMotion *mSeMotion;         // 0x150
-    u8 unk154[0x24];            // 0x154
+    u8 unk154[4];               // 0x154
+    DinoHelpItem *mHelps[8];    // 0x158: speed items, top-screen areas, OK, back
     u8 mSpeed;                  // 0x178
     u8 mBgmVolume;              // 0x179
     u8 mSeVolume;               // 0x17A
