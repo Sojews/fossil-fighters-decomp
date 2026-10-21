@@ -618,7 +618,7 @@ extern "C" const MPoint data_ov007_021911f0[][18];
 
 // Builds the keyboard for a player's name (mode 0) or a team's (mode 1): the name, padded with blanks to its
 // length, a character each, the cursor and the help, then starts loading the keyboard pictures.
-// NONMATCHING: scheduling only (the game reads gCurrentDisplay after copying each canvas's size).
+#pragma opt_common_subs off
 void DinoUiKeyboardMenu::OnStart() {
     if (mMode == 0) {
         gLcd->GetTopDisplay()->mObj->Show();
@@ -642,7 +642,7 @@ void DinoUiKeyboardMenu::OnStart() {
     help->Enable();
     mParallel.AddTail(help);
     MFont *font;
-    int dx, dy;
+    MPoint offset;
     switch (mMode) {
     case 0: {
         mParallel.AddTail(new DinoGuideMessage(gDinoResource->GetText(data_0208ac2c)));
@@ -651,8 +651,7 @@ void DinoUiKeyboardMenu::OnStart() {
         mMaxLength = 8;
         mCursor = new MMotion(data_ov007_02190fa0[8], mOam, 2, 1);
         font = gDinoResource->CreateFont24(0, 10, 1);
-        dx = 6;
-        dy = 12;
+        offset = MPoint(6, 12);
         DinoPlayerData player;
         gDinoBackup->GetPlayer(&player, FALSE);
         if (mFlag) {
@@ -673,8 +672,7 @@ void DinoUiKeyboardMenu::OnStart() {
         mCursor = new MMotion(data_ov007_02190fa0[8], mOam, 2, 1);
         mMaxLength = 0x10;
         font = gDinoResource->CreateFont24(0, 10, 1);
-        dx = 6;
-        dy = 12;
+        offset = MPoint(6, 12);
         DinoTeam team;
         gDinoBackup->GetTeam(mArg, &team);
         mUnk19C = (const wchar_t *)team.name;
@@ -715,7 +713,7 @@ void DinoUiKeyboardMenu::OnStart() {
             new MObjCanvas(gCurrentDisplay, MPoint(0x18, 0x18), gDinoResource->GetUnkTable(), TRUE), font, 0);
         tasks->AddTail(mChars[i]);
         const MPoint &pos = data_ov007_021911f0[mMode][i];
-        mChars[i]->SetPosition(MPoint(pos.x - dx, pos.y - dy));
+        mChars[i]->SetPosition(pos - offset);
         mChars[i]->SetPriority(3);
         mChars[i]->Show();
     }
@@ -735,6 +733,7 @@ void DinoUiKeyboardMenu::OnStart() {
     mPictCache = new KasekiPictCache(data_ov007_021911c0[mMode]);
     mParallel.AddTail(mPictCache);
 }
+#pragma opt_common_subs reset
 
 template MTask *MCreateBgCallTask(KasekiPictCache *obj, void (KasekiPictCache::*func)(), int thread);
 
