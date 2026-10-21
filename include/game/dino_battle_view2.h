@@ -106,6 +106,8 @@ public:
 
 class MotionDisableHelp : public MMotion, public DinoHelpBase {
 public:
+    MotionDisableHelp(const char *path, MSmartOam *oam, int flags, int fromEnd)
+        : MMotion(std::string(path), oam, flags, fromEnd) {}
     virtual ~MotionDisableHelp();
     // slot unk3 0x2060710 _ZN7MMotion11SetPositionE6MPoint
     // slot unk4 0x2060770 _ZN7MMotion11GetPositionEv

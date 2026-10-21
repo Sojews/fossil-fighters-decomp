@@ -104,7 +104,7 @@ void DinoBattleViewGivingUpMenu::StateDone() {
     if (mGaveUp) {
         *mResult = TRUE;
         MTask *exit = MTaskExitTransfer::Create(this);
-        MTask *post = mView->CreatePostTask(new DinoBattleViewUiRootMenuResult(5, 0, 0));
+        MTask *post = mView->CreatePostTask(new DinoBattleViewUiRootMenuResult(0, 0, 5));
         MSerialTaskSet *serial = &mSerial;
         serial->AddTail(post);
         serial->AddTail(exit);
@@ -150,11 +150,14 @@ void DinoBattleViewTurnEndDialog::OnStart() {
     }
 }
 
+// (Called, not inlined, by the root menu's OnDecide.)
+#pragma auto_inline off
 AnyInputTimerWait::AnyInputTimerWait(int frames) : MProcess(NULL), mTimer(frames) {
     MSingleInputHub *hub = new MSingleInputHub(1);
     mParallel.AddTail(hub);
     mInput = hub->GetInput(0);
 }
+#pragma auto_inline on
 
 void AnyInputTimerWait::Idle() {
     if (mInput->GetPressed() & 0x1003) {
@@ -241,7 +244,8 @@ void DinoBattleViewUiRootSelect::OnFocus(MMenuItem *item) {
 
 // The TU's pooled pointer-to-member constants (see menu.cpp).
 extern "C" struct {
-    u8 unk00[0x8];
+    u32 unk00;
+    const char *disableHelpMotion;  // 0x04
     const char *rootItemMotion;     // 0x08
     void (DinoBattleViewGivingUpMenu::*StateDone_0C)();
     void (DinoBattleViewUiRootSelect::*StateIdle_14)();
@@ -469,6 +473,107 @@ void DinoBattleViewUiRootSelect::OnStart() {
             serial->AddTail(task);
             serial->AddTail(enable);
         }
+    }
+}
+
+extern "C" const int data_0208a140;    // frames the disabled-attack help stays up
+
+static inline void DinoAddTail5(MTaskSet *set, MTask *a, MTask *b, MTask *c, MTask *d, MTask *e) {
+    MTaskSet *self = set;
+    self->AddTail(a);
+    self->AddTail(b);
+    self->AddTail(c);
+    self->AddTail(d);
+    self->AddTail(e);
+}
+
+// A creature's attack icon decides the attack item for that creature. Past the tutorial's hook, a disabled attack
+// shows the help for a while; anything else plays the items' decide animes and posts the choice.
+void DinoBattleViewUiRootSelect::OnDecide(MMenuItem *item) {
+    DinoBattleViewCreature *creature = NULL;
+    for (u32 i = 0; i < 3; i++) {
+        if (item == mIcons[i]) {
+            creature = mView->GetUnkE4(mUnkC0)->FindCreatureByB4(i);
+            mUnkD0 = creature->GetUnkAC();
+            item = mItems[3];
+            break;
+        }
+    }
+    DinoBattleViewUiRootSelectItem *selected = (DinoBattleViewUiRootSelectItem *)item;
+    int index = selected->mIndex;
+    if (mUnkC4 & (1 << index)) {
+        return;
+    }
+    int event;
+    switch (index) {
+    case 0:
+        event = 6;
+        break;
+    case 2:
+        event = 5;
+        break;
+    case 3:
+        event = 4;
+        break;
+    case 1:
+    default:
+        event = 3;
+        break;
+    }
+    BOOL proceed = TRUE;
+    MTask *task = func_ov000_0218ec8c(mView->GetUnk12C(), event, &proceed);
+    if (task != NULL) {
+        mSerial.AddTail(task);
+    }
+    if (!proceed) {
+        return;
+    }
+    u32 usable = mUnkCC;
+    if (creature != NULL) {
+        usable &= 1 << creature->GetUnkB4();
+    }
+    if (selected->mIndex == 3 && usable == 0) {
+        DinoSoundPlaySe(0x62, 0);
+        MParallelTaskSet *set = new MParallelTaskSet(TRUE);
+        MSmartOam *oam = new MSmartOam(4, 0, 1);
+        MotionDisableHelp *help = new MotionDisableHelp(data_ov000_0219569c.disableHelpMotion, oam, 0, 1);
+        help->SetPosition(MPoint(128, 96));
+        help->Show();
+        help->SetPriority(0);
+        set->AddTail(help);
+        set->AddTail(oam);
+        mParallel.AddTail(set);
+        DinoAddTail5(&mSerial, help->CreatePlayTransfer(1, 0), new AnyInputTimerWait(data_0208a140),
+                     help->CreatePlayTransfer(2, 0), help->CreateWaitStopTask(), MTaskExitTransfer::Create(set));
+        return;
+    }
+    for (int i = 0; i < mUnk100.size(); i++) {
+        DinoBattleViewUiRootSelectItem *other = (DinoBattleViewUiRootSelectItem *)mUnk100[i];
+        if (other == selected) {
+            other->mMotion->Play(other->mUnkAC, 0);
+        } else {
+            other->mMotion->Play(other->mUnkB0, 0);
+        }
+    }
+    MMessage *result = NULL;
+    DinoBattleViewCreature *first = mView->GetUnkE4(mUnkC0)->FindCreatureByB4(0);
+    if (first != NULL) {
+        first->GetUnkAC();
+    }
+    switch (selected->mIndex) {
+    case 0:
+    case 1:
+    case 2:
+    case 3:
+        DinoSoundPlaySe(0x61, 0);
+        result = new DinoBattleViewUiRootMenuResult(mUnkC4, mUnkD0, selected->mIndex);
+        break;
+    }
+    if (result != NULL) {
+        DinoHelpBase::Disable();
+        MTask *exit = MTaskExitTransfer::Create(this);
+        MTask *post = mObserver->CreatePostTask(result);
+        mSerial.AddTail(selected->mMotion->CreateWaitStopTask(), post, exit);
     }
 }
 
