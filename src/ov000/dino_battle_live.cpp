@@ -77,14 +77,18 @@ extern "C" const DinoBattleLiveSlotFlags data_ov000_02190498[3];
 extern "C" u32 func_ov000_0216d2cc(DinoBattleModelCreature *creature, BOOL check);
 int DinoGetTypeAdvantage(int type, int other); // 1: type beats other, 2: other beats type
 
+// The side the commentary speaks for. (Through a non-member inline, the side gets the game's lowest stack slot.)
+static inline int DinoLiveSide(void *source) {
+    return ((u32 *)source)[0xC4 / 4];
+}
+
 // Sets the commentary's flags from both sides' creatures, then runs the commentary.
-// NONMATCHING: stack slots. The game spills the side index to the lowest slot and our player to the highest; ours swaps
-// them (declaration order and types don't change it).
 void DinoBattleLive::Idle() {
     ClearUnkA0();
     DinoBattleModelPlayer *us;
     int side;
-    us = mModel->GetPlayer(side = ((u32 *)mSource)[0xC4 / 4]);
+    side = DinoLiveSide(mSource);
+    us = mModel->GetPlayer(side);
     SetUnkA0(3, us->mUnkB4 == 0);
     DinoBattleLiveSide sides[2];
     MI_CpuFill8(sides, 0, sizeof(sides));
