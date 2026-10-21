@@ -26,6 +26,8 @@
 #include "game/dino_gradation_bg.h"
 #include "m/affine_screen.h"
 #include "m/ext_affine.h"
+#include "m/3d_scene.h"
+#include "m/3d.h"
 #include "m/blend.h"
 #include "m/obj.h"
 #include "game/dino_ui_opening_chara.h"
@@ -148,10 +150,13 @@ void DinoUiOpeningCloud::Idle() {
 // The TU's pooled pointer-to-member constants (see menu.cpp). The game's pool is one block; dsd splits it every 0x80
 // bytes (data_ov004_02172ff8, data_ov004_02173078), and tools/anon_names.py maps the offsets back.
 extern "C" struct {
-    u8 unk00[0x8];
+    u8 unk00[0x4];
+    const char *mLaterCharaPath; // 0x04: the opening's second character, later in the game
     const char *mScreenPaths[3]; // 0x08: the screens before the opening
     const char *mTouchPath; // 0x14: the title menu's "touch" prompt
-    u8 unk18[0x24 - 0x18];
+    const char *mMidCharaPath; // 0x18: the opening's second character, mid-game
+    const char *mCharaPath; // 0x1c: the opening's first character
+    const char *mOpeningLogoPath; // 0x20
     const char *mLogoPath; // 0x24
     const char *mCloudPath; // 0x28
     void (DinoUiTitle::*StateMenu_2C)(); // 0x2c
@@ -182,7 +187,7 @@ extern "C" struct {
     void (DinoUiTitle::*Unk0215f5ac_F4)(); // 0xf4
     u8 unkFC[0x114 - 0xFC];
     void (DinoUiOpening::*OpeningStart_114)(); // 0x114
-    u8 unk11C[0x124 - 0x11C];
+    void (DinoUiOpening::*StateWaitScene_11C)(); // 0x11c
     void (DinoUiTitle::*StateTitleIntro_124)(); // 0x124
     void (DinoUiTitle::*Unk0215f420_12C)(); // 0x12c
     void (DinoUiTitle::*StateInit_134)(); // 0x134
@@ -198,6 +203,11 @@ extern "C" struct {
 extern MTextPicture *data_ov004_02177284; // the bottom screen's backdrop (kept for the menus' cross-fades)
 extern "C" const char data_ov004_0217354c[], data_ov004_0217355c[], data_ov004_02173570[];
 
+// (Through an inline: the blend is read before its argument's virtual call, as in the game.)
+static inline MBlend *DinoBlendOf(MDisplay *display) {
+    return display->mBlend;
+}
+
 inline DinoUiOpeningCloud::DinoUiOpeningCloud(MDisplay *display) : MProcess(display) {
     mCloud = new MTextPicture(display, data_ov004_02172f78.mCloudPath, TRUE, false);
     mCloud->SetPriority(3);
@@ -205,12 +215,86 @@ inline DinoUiOpeningCloud::DinoUiOpeningCloud(MDisplay *display) : MProcess(disp
     mParallel.AddTail(mCloud);
     display->mBlend->SetMode(1);
     display->mBlend->SetAlpha(16, 16);
-    MBlend *blend = display->mBlend;
-    blend->SetTarget1(mCloud->GetPlaneMask());
+    DinoBlendOf(display)->SetTarget1(mCloud->GetPlaneMask());
     display->mBlend->SetTarget2(0x3F);
     if (display == gLcd->GetBottomDisplay()) {
         mSerial.AddTail(mCloud->CreateCoordAnime(MPoint(-256, 0), MPoint(0, 0), 300, 0));
     }
+}
+
+extern "C" void _ZNSt13__vec_deleterImSaImEE19reallocate_copy_altEm(void *vector, size_t n);
+
+// The opening's start: the scenes in a shuffled order, the gradations, the clouds, the logo and the characters (the
+// second depends on how far the save has got), the 3D scene and a fade in from white, then the logo slides down.
+void DinoUiOpening::OpeningStart() {
+    if (gDinoBackup == NULL) {
+        return;
+    }
+    mSerial.SetUseMutex(TRUE);
+    mParallel.SetUseMutex(TRUE);
+    DinoSoundLoadScene(1);
+    DinoSoundPlayBgm(0x76, 0);
+    const DinoOpeningDefs *defs = (const DinoOpeningDefs *)gDinoResource->GetExcavate80();
+    mSceneCount = defs->sceneCount;
+    mSceneFrames = defs->sceneFrames;
+    if (mUnkA8.capacity() < defs->count) {
+        // (The game reserves through the u32 vector's out-of-line reallocating copy.)
+        _ZNSt13__vec_deleterImSaImEE19reallocate_copy_altEm(&mUnkA8, defs->count);
+    }
+    for (u32 i = 0; i < defs->count; i++) {
+        void *scene = (void *)((const u32 *)((const u8 *)defs + defs->scenesOffset))[i];
+        mUnkA8.push_back(scene);
+    }
+    mScene = 0;
+    for (u32 i = 0; i < mUnkA8.size() - 1; i++) {
+        u32 j = i + gDinoResource->GetRandom()->Next(mUnkA8.size() - i);
+        std::swap(mUnkA8[i], mUnkA8[j]);
+    }
+    mSkipped = FALSE;
+    mShowTasks = new MSerialTaskSet();
+    mParallel.AddTail(mShowTasks);
+    mTopGradation = new DinoGradationBg(gLcd->GetTopDisplay());
+    mBottomGradation = new DinoGradationBg(gLcd->GetBottomDisplay());
+    mTopGradation->SetGradation(7, 0x4E, 0xFF, 0x59, 0x92, 0xFD);
+    mBottomGradation->SetGradation(0x5A, 0x92, 0xFD, 0xB3, 0xDB, 0xFB);
+    mParallel.AddTail(mTopGradation, mBottomGradation);
+    DinoUiOpeningCloud *bottomCloud = new DinoUiOpeningCloud(gLcd->GetBottomDisplay());
+    mParallel.AddTail(new DinoUiOpeningCloud(gLcd->GetTopDisplay()), bottomCloud);
+    mOam = new MSmartOam(0x3C, 0, TRUE);
+    mOam->SetUnk1C(7);
+    MMotion *logo = new MMotion(data_ov004_02172f78.mOpeningLogoPath, mOam, 0, 1);
+    logo->Play(1, 0);
+    logo->Show();
+    logo->SetPosition(0x80, 0x60);
+    logo->SetPriority(0);
+    mParallel.AddTail(logo);
+    DinoSaveSummary summary;
+    gDinoBackup->GetSummary(gDinoBackup->GetSlot(), &summary);
+    mParallel.AddTail(mChara1 = new DinoUiOpeningChara(mOam, data_ov004_02172f78.mCharaPath, MPoint(0xC5, 0x90)));
+    if (summary.valid && summary.flag19 && summary.flag1a) {
+        mParallel.AddTail(mChara2 = new DinoUiOpeningChara(mOam, data_ov004_02172f78.mMidCharaPath, MPoint(0xEA, 0x90)));
+    } else if (summary.valid && summary.flag19 && summary.flag1b) {
+        mParallel.AddTail(mChara2 =
+                              new DinoUiOpeningChara(mOam, data_ov004_02172f78.mLaterCharaPath, MPoint(0xEA, 0x90)));
+    } else {
+        mChara2 = NULL;
+    }
+    mParallel.AddTail(mOam);
+    MSmartOam *oam = mOam;
+    oam->mOffset.x = 0;
+    oam->mOffset.y = -0x50;
+    mLoadTasks = new MParallelTaskSet();
+    mUnk8C = new M3DScene();
+    ((M3DScene *)mUnk8C)->mUnk14 = 1;
+    ((M3DScene *)mUnk8C)->mUnk18 = 0x12C000;
+    ((M3DScene *)mUnk8C)->mM3d->mBgCntBits.priority = 2;
+    mParallel.AddTail(mLoadTasks, (M3DScene *)mUnk8C);
+    mSerial.AddTail((new MParallelTaskSet(TRUE))
+                        ->Add(gLcd->GetTopDisplay()->mBright->CreateFadeInFromWhite(60, 0))
+                        ->Add(gLcd->GetBottomDisplay()->mBright->CreateFadeInFromWhite(60, 0)));
+    mShowTasks->AddTail(new MTimer(60), mOam->CreateOffsetAnime(MPoint(0, -0x50), MPoint(0, 0), 120, -2),
+                        new MTimer(30));
+    mState = data_ov004_02172f78.StateWaitScene_11C;
 }
 
 inline DinoUiOpening::DinoUiOpening(MInput *input) : MProcess(NULL), mInput(input) {

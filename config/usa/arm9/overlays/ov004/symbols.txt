@@ -218,7 +218,7 @@ _ZN13DinoUiOpening14StateShowSceneEv kind:function(thumb,size=0x90) addr:0x0215c
 _ZN13DinoUiOpening14StateNextSceneEv kind:function(thumb,size=0x4c) addr:0x0215cbac
 _ZN13DinoUiOpening14StateWaitSceneEv kind:function(thumb,size=0x68) addr:0x0215cbf8
 _Z17MCreateBgCallTaskI13DinoUiOpeningEP5MTaskPT_MS3_FvvEi kind:function(thumb,size=0x38) addr:0x0215cc60
-func_ov004_0215cc98 kind:function(thumb,size=0x864) addr:0x0215cc98
+_ZN13DinoUiOpening12OpeningStartEv kind:function(thumb,size=0x864) addr:0x0215cc98
 .L_0215d4e8 kind:label(thumb) addr:0x0215d4e8
 _ZN18DinoUiOpeningCharaC1EP9MSmartOamSs6MPoint kind:function(thumb,size=0x94) addr:0x0215d4fc
 _ZN11DinoUiTitleC1EPl kind:function(thumb,size=0x28) addr:0x0215d590

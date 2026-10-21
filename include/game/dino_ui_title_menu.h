@@ -30,6 +30,15 @@ public:
 };
 
 class Dino3DLoadCsv;
+class DinoGradationBg;
+
+// The opening's settings (excavation section 0x80).
+struct DinoOpeningDefs {
+    u32 count;          // 0x00: of scenes
+    u32 scenesOffset;   // 0x04
+    u32 sceneCount;     // 0x08: shown each time
+    int sceneFrames;    // 0x0C
+};
 class DinoUiOpeningChara;
 
 class DinoUiOpening : public MProcess {
@@ -39,6 +48,7 @@ public:
     virtual void Execute();
     virtual void Idle();
 
+    void OpeningStart();
     void LoadScene();
     void StateNextScene();
     void StateShowScene();
@@ -48,7 +58,8 @@ public:
 
     MInput *mInput;     // 0x74
     void (DinoUiOpening::*mState)(); // 0x78
-    u8 unk80[0x88 - 0x80];
+    DinoGradationBg *mTopGradation;     // 0x80
+    DinoGradationBg *mBottomGradation;  // 0x84
     MSmartOam *mOam;    // 0x88
     void *mUnk8C;       // 0x8C
     u32 unk90;
@@ -57,7 +68,7 @@ public:
     MTaskSet *mLoadTasks;   // 0x9C
     MTaskSet *mShowTasks;   // 0xA0
     u8 mSkipped;        // 0xA4
-    std::vector<void *> mUnkA8; // 0xA8
+    std::vector<void *> mUnkA8; // 0xA8: the scenes (ids), shuffled
     u32 mSceneCount;    // 0xB4
     int mSceneFrames;   // 0xB8
     DinoUiOpeningChara *mChara1;    // 0xBC
