@@ -6224,7 +6224,7 @@ printf kind:function(thumb,size=0xb0) addr:0x0207f088
 vsnprintf kind:function(thumb,size=0x3c) addr:0x0207f138
 sprintf kind:function(thumb,size=0x1e) addr:0x0207f174
 rand kind:function(thumb,size=0x28) addr:0x0207f194
-func_0207f1bc kind:function(thumb,size=0x336) addr:0x0207f1bc
+parse_format kind:function(thumb,size=0x336) addr:0x0207f1bc local
 __sformatter kind:function(thumb,size=0x84e) addr:0x0207f4f4
 .L_0207f51e kind:label(thumb) addr:0x0207f51e local
 .L_0207fd22 kind:label(thumb) addr:0x0207fd22 local
