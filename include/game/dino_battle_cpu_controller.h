@@ -11,11 +11,23 @@
 
 // A loaded file and the archive holding it.
 struct DinoBattleFile {
+    template <class U> DinoBattleFile &operator=(const MResource<U> &o) {
+        mArchive = o.mArchive;
+        mFile = o.mFile;
+        return *this;
+    }
+
     MArchivePtr mArchive;   // 0x00
     MArchiveFile mFile;     // 0x04
 };
 
 struct DinoBattleFileSet {
+    template <class U> DinoBattleFileSet &operator=(const MResource<U> &o) {
+        mArchive = o.mArchive;
+        mFile = o.mFile;
+        return *this;
+    }
+
     MArchivePtr mArchive;       // 0x00
     MArchiveFile mFile;         // 0x04
     DinoBattleFile mFiles[6];   // 0x10
@@ -64,11 +76,11 @@ public:
                           DinoBattleModelCreature *target, DinoBattleFile file);
 
     u32 mUnkB4;                         // 0xB4
-    DinoBattleFileGroup mGroups[3];     // 0xB8
-    DinoBattleFile mFiles[2];           // 0x7A8
-    u32 mUnk7C8[12];                    // 0x7C8
-    DinoBattleSide mSides[2];           // 0x7F8
-    u32 mUnk910[8];                     // 0x910
+    struct Ai {
+        DinoBattleFileGroup mGroups[3]; // 0xB8
+        DinoBattleFile mFiles[2];       // 0x7A8
+    } mAi;
+    DinoBattleParams mParams;           // 0x7C8
     std::vector<DinoBattleModelCreature *> mTargets;    // 0x930: see CollectTargets
 };
 

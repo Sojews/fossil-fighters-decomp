@@ -32,15 +32,15 @@ void DinoBattleCpuController::OnMessage(MMessage *msg) {
     case 0x10003: {
         ((DinoBattleModel *)mUnkAC)
             ->Post(new DinoBattleModelPlayerBeginSignal(mUnkA8, SeedGenerator::GenerateSeed(),
-                                                        mSides[mUnkA8].mName.c_str(), mSides[mUnkA8].unk54,
-                                                        mSides[mUnkA8].unk58));
+                                                        mParams.sides[mUnkA8].mName.c_str(), mParams.sides[mUnkA8].unk54,
+                                                        mParams.sides[mUnkA8].unk58));
         for (int i = 0; i < 3; i++) {
-            if ((u8)mSides[mUnkA8].mCreatures[i].mId != 0) {
+            if ((u8)mParams.sides[mUnkA8].mCreatures[i].mId != 0) {
                 ((DinoBattleModel *)mUnkAC)
                     ->Post(new DinoBattleModelCreatureBeginSignal(mUnkA8, data_ov000_0218fa08[i],
-                                                                  mSides[mUnkA8].mCreatures[i],
-                                                                  mSides[mUnkA8].mLevels[i],
-                                                                  (&mSides[mUnkA8].unk7C)[i]));
+                                                                  mParams.sides[mUnkA8].mCreatures[i],
+                                                                  mParams.sides[mUnkA8].mLevels[i],
+                                                                  (&mParams.sides[mUnkA8].unk7C)[i]));
             }
         }
         ((DinoBattleModel *)mUnkAC)->Post(new DinoBattleControllerInitResult(mUnkA8));
