@@ -1,5 +1,8 @@
 // DinoCommonWindowConsoleFilter.
 
+#pragma ipa file
+
+
 #include "game/dino_common_window_console_filter.h"
 #include "game/dino_help_disabler_task.h"
 #include "game/common_window_message.h"
@@ -12,6 +15,11 @@
 #include "m/text_codec.h"
 #include "game/dino_common_window_message_box.h"
 #include "game/dino_static_init.h"
+#include "game/dino_backup.h"
+#include "game/dino_common_font.h"
+#include "m/console.h"
+#include "nitro/os.h"
+#include <string.h>
 
 DinoCommonWindowMessage::~DinoCommonWindowMessage() {
     mSerial.Clear();
@@ -66,6 +74,96 @@ void DinoCommonWindowMessageWait2::Idle() {
         mUnk80++;
     }
 }
+
+// Reads a decimal number from the console (pushing back the character after it).
+static inline int DinoWindowReadNumber(MConsole *console) {
+    int n = 0;
+    for (;;) {
+        u32 c = console->PopChar();
+        if (c >= '0' && c <= '9') {
+            n *= 10;
+            n += c - '0';
+        } else {
+            console->PushChar(c);
+            break;
+        }
+    }
+    return n;
+}
+
+// (The game keeps each "%d" separately.)
+#pragma dont_reuse_strings on
+BOOL DinoCommonWindowConsoleFilter::Filter(MConsole *console, int c) {
+    if (c != '$') {
+        return FALSE;
+    }
+    if (console->IsEmpty()) {
+        return TRUE;
+    }
+    switch ((u32)console->PopChar()) {
+    case 'p': {
+        DinoPlayerData player;
+        gDinoBackup->GetPlayer(&player, 0);
+        std::wstring name((const wchar_t *)player.name);
+        for (std::wstring::const_reverse_iterator it = name.rbegin(); it != name.rend(); ++it) {
+            console->PushChar(*it);
+        }
+        break;
+    }
+    case 'N': {
+        DinoPlayerUnk58 rock;
+        gDinoBackup->GetPlayerUnk58(&rock);
+        std::wstring name = MDecodeUtf8(gDinoBackup->GetEntryName((const DinoBackupEntry *)&rock));
+        for (std::wstring::const_reverse_iterator it = name.rbegin(); it != name.rend(); ++it) {
+            console->PushChar(*it);
+        }
+        break;
+    }
+    case 'f':
+        console->PushChar(12);
+        break;
+    case 'n':
+        if (mFont != NULL) {
+            mFont->Select(DinoWindowReadNumber(console));
+        }
+        break;
+    case 'v': {
+        char buf[0x100];
+        OS_SPrintf(buf, "%d", gDinoBackup->GetLocalVar(DinoWindowReadNumber(console)));
+        for (int i = strlen(buf) - 1; i >= 0; i--) {
+            console->PushChar(buf[i]);
+        }
+        break;
+    }
+    case 'V': {
+        char buf[0x100];
+        OS_SPrintf(buf, "%d", gDinoBackup->GetSystemVar(DinoWindowReadNumber(console)));
+        for (int i = strlen(buf) - 1; i >= 0; i--) {
+            console->PushChar(buf[i]);
+        }
+        break;
+    }
+    case 'c':
+        if (!console->IsEmpty()) {
+            u32 color = console->PopChar();
+            if (color >= '0' && color <= '9') {
+                color -= '0';
+            } else if (color >= 'a' && color <= 'f') {
+                color -= 'a' - 10;
+            } else if (color >= 'A' && color <= 'F') {
+                color -= 'A' - 5;
+            } else {
+                color = 0;
+            }
+            if (mFont != NULL) {
+                mFont->SetShadowColor(color + 1);
+            }
+        }
+        break;
+    }
+    return TRUE;
+}
+#pragma dont_reuse_strings reset
 
 DinoCommonWindowMessageWait1::~DinoCommonWindowMessageWait1() {
 }
