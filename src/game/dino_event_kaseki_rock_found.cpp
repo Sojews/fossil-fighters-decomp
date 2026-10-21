@@ -15,6 +15,10 @@
 #include "m/polygon_char.h"
 #include "m/anm_model.h"
 #include "m/call_task.h"
+#include <algorithm>
+#include "nitro/mi.h"
+#include "m/seed_generator.h"
+#include "game/dino_weighted_random.h"
 
 DinoEventKasekiRockFound::~DinoEventKasekiRockFound() {
     mEvent->GetField()->SetUnk258(FALSE);
@@ -26,7 +30,9 @@ void DinoEventKasekiRockFound::Idle() {
 
 // The TU's pooled pointer-to-member constants.
 extern "C" struct {
-    u8 unk00[0x10];
+    u8 unk00[0x4];
+    s32 mZero_04;   // 0x04: (std::max's 0)
+    u8 unk08[0x10 - 0x8];
     void (DinoEventKasekiRockFound::*StateFound_10)();
     u8 unk18[0x38 - 0x18];
     void (DinoEventKasekiRockFound::*State020374d4_38)();
@@ -98,6 +104,186 @@ template class std::__vec_deleter<std::string, std::allocator<std::string> >;
 template std::__vec_deleter<std::string, std::allocator<std::string> &>::~__vec_deleter();
 
 // The finder's digging motion for each kind of rock.
+// A dig spot's settings (in the map's M data).
+struct DinoDigSpot {
+    const u8 *GetRock(u32 id) const { return (const u8 *)this + ((const u32 *)((const u8 *)this + rockOffset))[id]; }
+    const u32 *GetGroup(u32 i) const {
+        return (const u32 *)((const u8 *)this + ((const u32 *)((const u8 *)this + groupOffset))[i]);
+    }
+    const u32 *GetLevels() const { return (const u32 *)((const u8 *)this + levelOffset); }
+
+    u8 unk00[0x10];
+    s32 battleRate;     // 0x10: the chance of a battle (-1: the default)
+    s32 unk14;          // 0x14: (-1: the default)
+    u32 levelCount;     // 0x18
+    u32 levelOffset;    // 0x1C: by the system var 0x20
+    u32 groupCount;     // 0x20
+    u32 groupOffset;    // 0x24: each a flag, a count and the offset of that many battle ids
+    u32 unk28;
+    u32 rockOffset;     // 0x2C
+};
+
+// One of the excavation settings' tables of weights (by index).
+static inline const s32 *DinoExcavateWeights(MResource<DinoExcavateDefs> &defs, u32 offset, u32 i) {
+    const u8 *data = (const u8 *)defs.Get();
+    const u8 *entry = data + ((const u32 *)(data + *(const u32 *)(data + offset)))[i];
+    return (const s32 *)(entry + ((const u32 *)entry)[1]);
+}
+
+static inline u32 DinoExcavateWord(MResource<DinoExcavateDefs> &defs, u32 offset) {
+    return *(const u32 *)((const u8 *)defs.Get() + offset);
+}
+
+// A table of words at the offset in the word at offset.
+static inline u32 DinoTableEntry(const void *data, u32 offset, u32 i) {
+    return ((const u32 *)((const u8 *)data + *(const u32 *)((const u8 *)data + offset)))[i];
+}
+
+// The map's dig spot.
+static inline const DinoDigSpot *DinoGetDigSpot(const DinoMapMData *map, u32 i) {
+    const u8 *data = (const u8 *)map;
+    return (const DinoDigSpot *)(data + ((const u32 *)(data + *(const u32 *)(data + 0x54)))[i]);
+}
+
+// Lists a value in a vector of void *s.
+static inline void DinoPushValue(std::vector<void *> &v, const u32 &value) {
+    v.push_back((void *const &)value);
+}
+
+extern "C" BOOL func_0201b19c(DinoBackup *backup, u32 index, s32 rate);
+extern "C" struct {
+    u8 unk00[0x20];
+    void (DinoEventKasekiRockFound::*StateDig_20)();
+} data_020bd400;
+
+// Works out what was found: the saved rock (or, for an unknown one, a rock of the spot's kind at a level weighted by
+// the player's settings and team), whether a battle comes first (and whether a battle gives another rock), and
+// whether something else happens.
+void DinoEventKasekiRockFound::Start() {
+    DinoPlayerData player;
+    DinoBackupEntry found;
+    DinoBackupEntry entry;
+    mEvent->GetField()->SetUnk258(TRUE);
+    gDinoBackup->GetPlayer(&player, 0);
+    gDinoBackup->GetUnk134(mArg, &entry);
+    MI_CpuFill8(&found, 0, sizeof(found));
+    MResource<DinoExcavateDefs> excavate = gDinoResource->GetExcavateDefs();
+    MResource<DinoMapMData> map = gDinoResource->LoadMapM(entry.map);
+    const DinoDigSpot *spot = DinoGetDigSpot(map.Get(), entry.spot);
+    MRandom *random = gDinoResource->GetRandom();
+    if (entry.type != 0) {
+        found = entry;
+    } else {
+        s32 weights[4];
+        const u8 *rock = spot->GetRock(entry.id);
+        for (u32 i = 0; i < 4; i++) {
+            const s32 *rates = (const s32 *)(rock + ((const u32 *)rock)[3]);
+            if (rates[i] >= 0) {
+                u32 j = i;
+                if (j != 0) {
+                    j = (i + 2 + player.unk14_14) % 3 + 1;
+                }
+                weights[i] = rates[j];
+            } else {
+                weights[i] = DinoExcavateWeights(excavate, 8, player.unk14_14)[i];
+            }
+        }
+        DinoTeam team;
+        gDinoBackup->GetTeam(gDinoBackup->GetUnk34_26(), &team);
+        for (u32 i = 0; i < 5; i++) {
+            u8 slot = team.slots[i];
+            if (slot != 0) {
+                for (u32 j = 0; j < 4; j++) {
+                    weights[j] += DinoExcavateWeights(excavate, 0x3c, slot)[j];
+                }
+            }
+        }
+        for (u32 j = 0; j < 4; j++) {
+            weights[j] = std::max(weights[j], data_020bd380.mZero_04);
+        }
+        u32 level;
+        if ((int)random->Next(100) < weights[0]) {
+            level = 0;
+        } else {
+            DinoWeightedRandom pick(random);
+            pick.Add(weights[1]);
+            pick.Add(weights[2]);
+            pick.Add(weights[3]);
+            level = pick.Pick() + 1;
+        }
+        found = entry;
+        found.id = (*(const u32 *)rock - 1) * 4 + level + 1;
+    }
+    MI_CpuFill8(&entry, 0, sizeof(entry));
+    gDinoBackup->SetUnk134(mArg, &entry);
+    s32 rate;
+    if (!gDinoBackup->GetSystemFlag(1)) {
+        rate = 0;
+    } else if (found.unk10_0 == 1) {
+        rate = 0;
+    } else {
+        rate = spot->battleRate;
+        if (rate < 0) {
+            rate = DinoExcavateWord(excavate, 0x34);
+        }
+    }
+    s32 fightRate = spot->unk14;
+    if (fightRate < 0) {
+        fightRate = DinoExcavateWord(excavate, 0x28);
+    }
+    u32 battle = 0;
+    if (func_0201b19c(gDinoBackup, 1, rate)) {
+        std::vector<void *> battles;
+        for (u32 i = 0; i < spot->groupCount; i++) {
+            const u32 *group = spot->GetGroup(i);
+            if (gDinoBackup->GetFlag(group[0])) {
+                for (u32 j = 0; j < group[1]; j++) {
+                    DinoPushValue(battles, (u32)((const u32 *)((const u8 *)group + group[2]))[j]);
+                }
+            }
+        }
+        if (battles.size() != 0) {
+            battle = (u32)battles[random->Next(battles.size())];
+            found.unkC_12 = (int)random->Next(100) < fightRate ? 1 : 0;
+        }
+    }
+    mBattle = battle;
+    mEntry = found;
+    if (mBattle != 0) {
+        mBattleData = gDinoResource->LoadBattle(mBattle);
+        if (mBattleData.Get()->rockCount != 0) {
+            std::vector<void *> bounds;
+            u32 total = 0;
+            for (u32 i = 0; i < mBattleData.Get()->rockCount; i++) {
+                total += mBattleData.Get()->GetRocks()[i].weight;
+                DinoPushValue(bounds, total);
+            }
+            u32 r = gDinoResource->GetRandom()->Next(100);
+            for (u32 i = 0; i < mBattleData.Get()->rockCount; i++) {
+                if (r < (u32)bounds[i]) {
+                    MI_CpuFill8(&mEntry, 0, sizeof(mEntry));
+                    mEntry.id = mBattleData.Get()->GetRock(i).id;
+                    mEntry.type = 1;
+                    break;
+                }
+            }
+        }
+    }
+    mUnkDC = 0;
+    if (mBattle == 0) {
+        u32 chance;
+        if (spot->levelCount != 0) {
+            chance = DinoTableEntry(spot, 0x1c, gDinoBackup->GetSystemVar(0x20) - 1);
+        } else {
+            chance = DinoTableEntry(excavate.Get(), 0xb4, gDinoBackup->GetSystemVar(0x20) - 1);
+        }
+        if (func_0201b19c(gDinoBackup, 0, chance)) {
+            mUnkDC = 1;
+        }
+    }
+    mState = data_020bd400.StateDig_20;
+}
+
 extern const u32 data_0208b2f4[8];
 extern const u32 data_0208a1fc;
 extern const u32 data_0208a200;

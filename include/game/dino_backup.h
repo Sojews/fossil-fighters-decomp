@@ -150,7 +150,10 @@ struct DinoBackupEntry {
 #endif
     u32 unk0;               // 0x00
     u32 unk4;               // 0x04
-    u32 unk8;               // 0x08
+    // 0x08
+    u32 map : 20;           // where it was found: the map
+    u32 spot : 8;           // and its dig spot
+    u32 unk8_28 : 4;
     // 0x0C
     u32 id : 10;
     u32 type : 2;

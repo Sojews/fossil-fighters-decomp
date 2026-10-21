@@ -296,7 +296,14 @@ struct DinoBattleSideData {
     u32 unk30;          // 0x30
     u8 unk34;           // 0x34
 };
+// A rock a battle can give, and its weight.
+struct DinoBattleRock {
+    u32 weight;         // 0x00: out of 100
+    u32 id;             // 0x04
+};
 struct DinoBattleData {
+    const DinoBattleRock *GetRocks() const { return (const DinoBattleRock *)((const u8 *)this + rockOffset); }
+    const DinoBattleRock &GetRock(u32 i) const { return GetRocks()[i]; }
     // The creatures the rule names.
     const u32 *GetUnk40() const { return (const u32 *)((const u8 *)this + unk40); }
     u32 GetUnk44() const { return unk44; }
@@ -322,7 +329,8 @@ struct DinoBattleData {
     u32 liveName;       // 0x28
     u32 unk2C;          // 0x2C
     u32 unk30;          // 0x30
-    u8 unk34[0x3C - 0x34];
+    u32 rockCount;      // 0x34: the rocks the battle can give instead
+    u32 rockOffset;     // 0x38: DinoBattleRock[rockCount]
     u32 unk3C;          // 0x3C: 1-3
     u32 unk40;          // 0x40: offset of unk3C creature ids
     u32 unk44;          // 0x44: 1-5, or 0 for none
