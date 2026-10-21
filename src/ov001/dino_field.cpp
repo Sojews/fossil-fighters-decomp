@@ -1296,6 +1296,12 @@ void DinoField::Read(const void *buf) {
     panel->SetMode(gDinoBackup->GetUnk180(), 0);
 }
 
+void DinoField::HideUnk2B4() {
+    mUnk2B4->Hide();
+    mUnk2BC->Hide();
+    mCamera->mNamePanel->SetMode(0, 1);
+}
+
 void DinoField::CreateKasekiRocks() {
     MResource<DinoExcavateDefs> defs = gDinoResource->GetExcavateDefs();
     mKasekiRockTasks->Clear();
@@ -1312,12 +1318,6 @@ void DinoField::CreateKasekiRocks() {
             mKasekiRocks[i] = NULL;
         }
     }
-}
-
-void DinoField::HideUnk2B4() {
-    mUnk2B4->Hide();
-    mUnk2BC->Hide();
-    mCamera->mNamePanel->SetMode(0, 1);
 }
 
 // Each frame: measures the CPU load, shakes the screen while quaking, then (from the second frame) starts the

@@ -760,6 +760,30 @@ void DinoUiStatusMenu::HandleMemberResult() {
     mUnk120 = 0;
 }
 
+extern const u32 data_0208aa4c, data_0208aae0;
+extern const int data_02089a2c, data_02089a30, data_02089a34;
+
+void DinoUiStatusMenu::OnOKDecided() {
+    if (mMode) {
+        return;
+    }
+    *mResult = 0;
+    if (mTeam->slots[0]) {
+        if (DinoTeamDiffers(mTeam, (DinoTeam *)mUnk11C)) {
+            mSerial.AddTail(new DinoCommonWindowMessageBox(MPoint(128, 96),
+                                                           std::string(gDinoResource->GetText(data_0208aae0)), 4));
+        } else {
+            mSerial.AddTail(new MTimer(data_02089a34));
+        }
+        GetSerial()->AddTail(MTaskSetWaitEmptyTask::Create(mUnk130),
+                             gLcd->mMain->mBright->CreateFadeOutToBlack(data_02089a30, data_02089a2c),
+                             MTaskExitTransfer::Create(&(MTask &)*this));
+    } else {
+        mSerial.AddTail(
+            new DinoCommonWindowMessageBox(MPoint(128, 96), std::string(gDinoResource->GetText(data_0208aa4c)), 4));
+    }
+}
+
 void DinoUiStatusMenu::PickReplacement(int index) {
     int i;
     for (i = 0; i < 5; i++) {
@@ -784,30 +808,6 @@ void DinoUiStatusMenu::PickReplacement(int index) {
     }
     mHelp = new DinoUiStatusChangeModeHelpTask(mUnkB8->GetFrame());
     mUnk108->AddTail(mHelp);
-}
-
-extern const u32 data_0208aa4c, data_0208aae0;
-extern const int data_02089a2c, data_02089a30, data_02089a34;
-
-void DinoUiStatusMenu::OnOKDecided() {
-    if (mMode) {
-        return;
-    }
-    *mResult = 0;
-    if (mTeam->slots[0]) {
-        if (DinoTeamDiffers(mTeam, (DinoTeam *)mUnk11C)) {
-            mSerial.AddTail(new DinoCommonWindowMessageBox(MPoint(128, 96),
-                                                           std::string(gDinoResource->GetText(data_0208aae0)), 4));
-        } else {
-            mSerial.AddTail(new MTimer(data_02089a34));
-        }
-        GetSerial()->AddTail(MTaskSetWaitEmptyTask::Create(mUnk130),
-                             gLcd->mMain->mBright->CreateFadeOutToBlack(data_02089a30, data_02089a2c),
-                             MTaskExitTransfer::Create(&(MTask &)*this));
-    } else {
-        mSerial.AddTail(
-            new DinoCommonWindowMessageBox(MPoint(128, 96), std::string(gDinoResource->GetText(data_0208aa4c)), 4));
-    }
 }
 
 // Swaps the picked member with the one decided on.

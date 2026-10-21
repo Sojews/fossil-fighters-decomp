@@ -198,13 +198,6 @@ void DinoUiContainerMenu::FinishDiscard() {
     }
 }
 
-void DinoUiContainerMenu::ClearItems() {
-    for (int i = 0; i < mItems.size(); i++) {
-        RemoveItem((MMenuItem *)mItems[i]);
-        delete (MMenuItem *)mItems[i];
-    }
-}
-
 void DinoUiContainerMenu::OnDecide(MMenuItem *item) {
     int i;
     for (i = 0; i < 3; i++) {
@@ -217,6 +210,13 @@ void DinoUiContainerMenu::OnDecide(MMenuItem *item) {
             Decide(i);
             return;
         }
+    }
+}
+
+void DinoUiContainerMenu::ClearItems() {
+    for (int i = 0; i < mItems.size(); i++) {
+        RemoveItem((MMenuItem *)mItems[i]);
+        delete (MMenuItem *)mItems[i];
     }
 }
 

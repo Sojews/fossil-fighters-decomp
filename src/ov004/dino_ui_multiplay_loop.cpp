@@ -118,16 +118,6 @@ void DinoUiMultiplayOrganizationButton::OnDecide() {
     mOwner->Decide(2);
 }
 
-void DinoUiMultiplayMenu::Decide(int choice) {
-    *mResult = choice;
-    MTask &self = *this;
-    MTask *exit = MTaskExitTransfer::Create(&self);
-    MTask *timer = new MTimer(30);
-    MSerialTaskSet *serial = &mSerial;
-    serial->AddTail(timer);
-    serial->AddTail(exit);
-}
-
 // The TU's pooled pointer-to-member constants (see menu.cpp).
 extern "C" struct {
     u8 unk00[0x3c];
@@ -148,6 +138,16 @@ extern "C" struct {
 
 DinoUiMultiplayLoop::DinoUiMultiplayLoop(int *result) : MProcess(NULL), mResult(result) {
     mState = data_ov004_02173b70.Start_3C;
+}
+
+void DinoUiMultiplayMenu::Decide(int choice) {
+    *mResult = choice;
+    MTask &self = *this;
+    MTask *exit = MTaskExitTransfer::Create(&self);
+    MTask *timer = new MTimer(30);
+    MSerialTaskSet *serial = &mSerial;
+    serial->AddTail(timer);
+    serial->AddTail(exit);
 }
 
 void DinoUiMultiplayLoop::StateMenu() {

@@ -249,6 +249,20 @@ void DinoUiOrderSelectMenu::OnIdle() {
     }
 }
 
+// The TU's pooled pointer-to-member constants.
+extern "C" struct {
+    void (DinoHelpBase::*Enable_00)();
+    void (DinoUiOrderSelectMenu::*SetInfoPage_08)(u8);
+} data_ov006_02197110;
+
+void DinoUiOrderSelectMenu::SetInfoPage(u8 page) {
+    mInfo->SetPage(page);
+    GetSerial()->AddTail(MTaskSetWaitEmptyTask::Create(&mInfo->mSerial),
+                         MCreateCallTask(this, data_ov006_02197110.Enable_00));
+    mUnk1BC->Clear();
+    Disable();
+}
+
 void DinoUiOrderSelectMenu::PageLeft() {
     u8 count = mHasFourthTab ? 4 : 3;
     SetPage((mPage + count - 1) % count);
@@ -263,20 +277,6 @@ void DinoUiOrderSelectMenu::PageRight() {
     if (mFocusTabs) {
         FocusItem(mTabs[mPage]);
     }
-}
-
-// The TU's pooled pointer-to-member constants.
-extern "C" struct {
-    void (DinoHelpBase::*Enable_00)();
-    void (DinoUiOrderSelectMenu::*SetInfoPage_08)(u8);
-} data_ov006_02197110;
-
-void DinoUiOrderSelectMenu::SetInfoPage(u8 page) {
-    mInfo->SetPage(page);
-    GetSerial()->AddTail(MTaskSetWaitEmptyTask::Create(&mInfo->mSerial),
-                         MCreateCallTask(this, data_ov006_02197110.Enable_00));
-    mUnk1BC->Clear();
-    Disable();
 }
 
 void DinoUiOrderSelectMenu::ClearItems() {

@@ -358,16 +358,6 @@ void DinoSenryuBackButton::OnDecide() {
 
 extern const int data_020899d4, data_020899e8, data_02089a1c;
 
-// Fades out and leaves.
-void DinoUiSenryuMenu::OnBackDecided() {
-    Deactivate();
-    mUnk11C->Exit();
-    MTask *fade, *exit;
-    exit = MTaskExitTransfer::Create(&(MTask &)*this);
-    fade = gLcd->mMain->mBright->CreateFadeOutToBlack(data_020899e8, data_020899d4);
-    GetSerial()->AddTail(new MTimer(data_02089a1c), fade, exit);
-}
-
 void DinoUiKeyboardMenuItem::OnDecide() {
     if (mMotion != NULL) {
         mTasks->Clear();
@@ -381,6 +371,15 @@ void DinoUiKeyboardMenuItem::OnDecide() {
     }
 }
 
+// Fades out and leaves.
+void DinoUiSenryuMenu::OnBackDecided() {
+    Deactivate();
+    mUnk11C->Exit();
+    MTask *fade, *exit;
+    exit = MTaskExitTransfer::Create(&(MTask &)*this);
+    fade = gLcd->mMain->mBright->CreateFadeOutToBlack(data_020899e8, data_020899d4);
+    GetSerial()->AddTail(new MTimer(data_02089a1c), fade, exit);
+}
 
 void DinoUiSenryuMenu::OnFocus(MMenuItem *item) {
     if (item != NULL) {

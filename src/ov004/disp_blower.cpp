@@ -480,6 +480,15 @@ DinoUiOptionMenu::DinoUiOptionMenu() : MLooperPreLoopHook(FALSE, 0), MMenu(NULL,
     MLooperPreLoopHook::Enable();
 }
 
+BOOL DinoUiOptionMenu::IsWaiting() {
+    if (mDelay) {
+        return TRUE;
+    }
+    return FALSE;
+}
+
+// (IsWaiting stays a call.)
+#pragma dont_inline on
 u8 DinoUiOptionMenu::GetMicStrength() {
     if (IsWaiting()) {
         return 0;
@@ -487,12 +496,7 @@ u8 DinoUiOptionMenu::GetMicStrength() {
     return mBlower->GetStrength();
 }
 
-BOOL DinoUiOptionMenu::IsWaiting() {
-    if (mDelay) {
-        return TRUE;
-    }
-    return FALSE;
-}
+#pragma dont_inline reset
 
 #pragma auto_inline off
 
