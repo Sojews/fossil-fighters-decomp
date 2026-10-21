@@ -1,5 +1,4 @@
 // DinoCommonTutorialConsoleFilter.
-// Only the destructors are decompiled so far.
 
 #pragma ipa file
 
@@ -14,6 +13,10 @@
 #include "m/view.h"
 #include "m/input.h"
 #include "m/console.h"
+#include "m/picture.h"
+#include "m/lcd.h"
+#include "game/dino_common_font.h"
+#include "game/dino_resource.h"
 
 
 DinoCommonTutorialConsoleFilter::~DinoCommonTutorialConsoleFilter() {
@@ -36,11 +39,62 @@ extern "C" struct {
     const char *shortArrowPath;     // 0x18
     u8 unk1C[0x24 - 0x1C];
     void (DinoCommonTutorialWindow::*StateClose_24)();
-    void (DinoCommonTutorialWindow::*Start_2C)();
+    void (DinoCommonTutorialWindow::*StateStart_2C)();
+    u8 unk34[0x3C - 0x34];
+    void (DinoCommonTutorialWindow::*StateRead_3C)();
 } data_020b5e5c;
 
 DinoCommonTutorialWindow::DinoCommonTutorialWindow(MDisplay *display, std::string text) : MProcess(display), mText(text) {
-    mState = data_020b5e5c.Start_2C;
+    mState = data_020b5e5c.StateStart_2C;
+}
+
+static inline MPoint operator*(const MPoint &p, int k) {
+    return MPoint(p.x * k, p.y * k);
+}
+
+// NONMATCHING: the game multiplies the margin by a -2 it builds at run time ((1 + 1) * (1 - 2)), loads gCurrentDisplay
+// after copying the canvas size and swaps r4/r5.
+void DinoCommonTutorialWindow::StateStart() {
+    DinoSoundPlaySe(0xA8, 0);
+    SetActive(TRUE);
+    MInputHub *hub = new MSingleInputHub(1);
+    hub->EnableTouch();
+    mInput = hub->GetInput(0);
+    mParallel.AddTail(hub);
+    MDisplay *display;
+    MRect rect;
+    if (gCurrentDisplay == gLcd->GetTopDisplay()) {
+        display = gLcd->GetBottomDisplay();
+        rect = MRect(0, 0, 0x100, 0x40);
+    } else {
+        display = gLcd->GetTopDisplay();
+        rect = MRect(0, 0x80, 0x100, 0xC0);
+    }
+    {
+        MDisplayScope scope(display);
+        MTextPicture *frame = new MTextPicture(std::string(data_020b5e5c.bgPath), TRUE, false);
+        frame->SetPosition(rect.GetTopLeft());
+        frame->Show();
+        mParallel.AddTail(frame);
+        DinoCommonFont *font = new DinoCommonFont(0, 1, 0);
+        mConsole = new MConsole(new MObjCanvas(gCurrentDisplay, rect.GetSize() - MPoint(0x10, 0xA) * 2,
+                                               gDinoResource->GetUnkTable(), TRUE),
+                                font, MPoint(0, 4), MFx32(2));
+        mConsole->Print(std::string(mText));
+        mConsole->SetFilter(new DinoCommonTutorialConsoleFilter(this, font));
+        mConsole->SetPosition(rect.GetTopLeft() + MPoint(0x10, 0xA));
+        mConsole->Show();
+        mParallel.AddTail(mConsole);
+        MSmartOam *oam = new MSmartOam(1, 0, 1);
+        mNextMark = new MMotion(std::string(data_020b5e5c.cursorPath), oam, 0, 1);
+        mNextMark->SetPosition((gCurrentDisplay == gLcd->GetTopDisplay() ? MPoint(0, 0) : MPoint(0, -0x80)).Offset(0x86, 0x5C));
+        ((MMotion *)mNextMark)->Play(1, 0);
+        GetParallel()->AddTail(mNextMark, oam);
+    }
+    mArrows = new MParallelTaskSet;
+    mOam = new MSmartOam(4, 0, 1);
+    GetParallel()->AddTail(mArrows, mOam);
+    mState = data_020b5e5c.StateRead_3C;
 }
 
 void DinoCommonTutorialWindow::StateRead() {

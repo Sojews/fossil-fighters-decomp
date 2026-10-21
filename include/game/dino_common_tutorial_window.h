@@ -29,6 +29,8 @@ public:
     void ShowLongArrow(MPoint pos, int dir);
     void ShowShortArrow(MPoint pos, int dir);
     void ShowCorners(MRect rect);
+    // Opens on the screen the current display isn't: its frame, the console printing the text and the page mark.
+    void StateStart();
     // Pages through the text: A, B or the debug buttons hurry it up, then turn the page (or close at the end).
     void StateRead();
     void StateClose();
