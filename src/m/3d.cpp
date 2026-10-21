@@ -1,6 +1,8 @@
 // M3d (the 3D engine's layer), M3DVInt, M3dWaitTransferCompleteTask.
 // Only the destructors are decompiled so far.
 
+#pragma ipa file
+
 #include "m/heap.h"
 #include "m/3d.h"
 #include "m/dma.h"
