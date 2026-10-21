@@ -1473,9 +1473,13 @@ void UpdateAllCreatureTask::Idle() {
 
 extern "C" MTask *func_ov000_02166470(DinoBattleModelPlayer *player);
 
+// (Through a non-member inline, the found creature gets the game's stack slot.)
+static inline DinoBattleModelCreature *DinoFindByB4(DinoBattleModelPlayer *player, u32 id) {
+    return player->FindCreatureByB4(id);
+}
+
 // Swaps two of the player's creatures (the first moving to the escape area, position 3): a task set that waits for
 // both moves and then signals reply with msg.
-// NONMATCHING: other, iconWait and the converted wait take each other's stack slots.
 extern "C" void func_ov000_021661b4(DinoBattleModelPlayer *player, MMessageObserver *reply, MMessage *msg, u32 id,
                                     u32 otherId) {
     player->SetUnk124(player->GetUnk124() | 2);
@@ -1492,7 +1496,7 @@ extern "C" void func_ov000_021661b4(DinoBattleModelPlayer *player, MMessageObser
     creature->BeginAction();
     set->AddTail(creature->CreatePostTask(new DinoBattleModelCreatureMoveRequest(
         (u32)(MMessageObserver *)wait, player->mUnkB8, id, creature->GetUnkB8(), 3, 0, (u32)&player->mUnk120)));
-    DinoBattleModelCreature *other = player->FindCreatureByB4(otherId);
+    DinoBattleModelCreature *other = DinoFindByB4(player, otherId);
     set->AddTail(other->CreatePostTask(new DinoBattleModelCreatureMoveRequest(
         (u32)(MMessageObserver *)wait, player->mUnkB8, otherId, other->GetUnkB8(), 0, 0, (u32)&player->mUnk120)));
     player->GetSerial()->AddTail(set, func_ov000_02166470(player),
