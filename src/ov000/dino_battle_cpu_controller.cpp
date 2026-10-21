@@ -771,6 +771,260 @@ MFx32 DinoBattleCpuController::ScoreAttack(DinoBattleModelPlayer *player, DinoBa
     }
     return total;
 }
+// NONMATCHING: as in ScoreCreatureConditions, the game puts each compound score's copy above the total's.
+MFx32 DinoBattleCpuController::ScoreTarget(DinoBattleModelPlayer *player, DinoBattleModelCreature *creature,
+                                           DinoBattleModelCreature *target, DinoBattleFile file, u32 attack) {
+    if (!file.mArchive.IsValid()) {
+        return MFx32(0);
+    }
+    DinoBattleModelPlayer *opponent = player->GetOpponent();
+    MFx32 total = MFx32(0);
+    for (u32 i = 0; i < ((DinoBattleCpuConditions *)file.mFile.GetData())->count; i++) {
+        DinoBattleCpuConditions *data = (DinoBattleCpuConditions *)file.mFile.GetData();
+        const DinoBattleCpuCondition *conditions = (const DinoBattleCpuCondition *)((u8 *)data + data->entries);
+        MFx32 score = MFx32(conditions[i].score);
+        switch (conditions[i].kind) {
+        default:
+            OS_Terminate();
+            break;
+        case 0:
+            total = total + score;
+            break;
+        case 1:
+            total = total + score * player->GetRandom()->NextFraction();
+            break;
+        case 0x62:
+            if ((int)target->GetUnkE4() <= EstimateDamage(creature, target, attack)) {
+                total = total + score;
+            }
+            break;
+        case 2:
+            if (opponent->FindCreature(3) != NULL) {
+                total = total + score;
+            }
+            break;
+        case 0x63:
+            if (target == opponent->GetCreatureInSlot(0)) {
+                total = total + score;
+            }
+            break;
+        case 0x64:
+            if (target == opponent->GetCreatureInSlot(1)) {
+                total = total + score;
+            }
+            break;
+        case 0x65:
+            if (target == opponent->GetCreatureInSlot(2)) {
+                total = total + score;
+            }
+            break;
+        case 0x66:
+            if (HasAttackUnk10(target, 2)) {
+                total = total + score;
+            }
+            break;
+        case 0x67:
+            if (HasAttackUnk10(target, 3)) {
+                total = total + score;
+            }
+            break;
+        case 0x68:
+            if (HasAttackUnk10(target, 4)) {
+                total = total + score;
+            }
+            break;
+        case 0x69:
+            if (HasAttackUnk10(target, 5)) {
+                total = total + score;
+            }
+            break;
+        case 0x6A:
+            if (HasAttackUnk10(target, 6)) {
+                total = total + score;
+            }
+            break;
+        case 0x6B:
+            if (HasAttackUnk10(target, 7)) {
+                total = total + score;
+            }
+            break;
+        case 0x6C:
+            if (HasAttackUnk10(target, 8)) {
+                total = total + score;
+            }
+            break;
+        case 0x6D:
+            if (HasAttackUnk10(target, 9)) {
+                total = total + score;
+            }
+            break;
+        case 0x6E:
+            if (HasAttackUnk10(target, 0xA)) {
+                total = total + score;
+            }
+            break;
+        case 0x6F:
+            if (HasAttackUnk10(target, 0xB)) {
+                total = total + score;
+            }
+            break;
+        case 0x70:
+            if (HasAttackUnk14(target, 2)) {
+                total = total + score;
+            }
+            break;
+        case 0x71:
+            if (HasAttackUnk14(target, 4)) {
+                total = total + score;
+            }
+            break;
+        case 0x72:
+            if (HasAttackUnk14(target, 5)) {
+                total = total + score;
+            }
+            break;
+        case 0x73:
+            if (HasAttackUnk14(target, 6)) {
+                total = total + score;
+            }
+            break;
+        case 0x74:
+            if (HasAttackUnk14(target, 7)) {
+                total = total + score;
+            }
+            break;
+        case 0x75:
+            if (HasAttackUnk14(target, 8)) {
+                total = total + score;
+            }
+            break;
+        case 0x76:
+            if (HasAttackUnk14(target, 9)) {
+                total = total + score;
+            }
+            break;
+        case 0x77:
+            if (HasAttackUnk14(target, 0xA)) {
+                total = total + score;
+            }
+            break;
+        case 0x78:
+            if (HasAttackUnk14(target, 0xB)) {
+                total = total + score;
+            }
+            break;
+        case 0x79:
+            if (HasAttackUnk14(target, 0xC)) {
+                total = total + score;
+            }
+            break;
+        case 0x7A:
+            if (HasAttackUnk14(target, 0xD)) {
+                total = total + score;
+            }
+            break;
+        case 0x7B:
+            if (HasAttackUnk14(target, 0xE)) {
+                total = total + score;
+            }
+            break;
+        case 0x7C:
+            if (HasAttackUnk14(target, 0x10)) {
+                total = total + score;
+            }
+            break;
+        case 0x7D:
+            if (HasAttackUnk14(target, 0xF)) {
+                total = total + score;
+            }
+            break;
+        case 0x7E:
+            if (target->GetDefUnk61() == 4) {
+                total = total + score;
+            }
+            break;
+        case 0x7F:
+            if (target->GetDefUnk61() == 5) {
+                total = total + score;
+            }
+            break;
+        case 0x80:
+            if (target->GetDefUnk61() == 6) {
+                total = total + score;
+            }
+            break;
+        case 0x81:
+            if (target->GetDefUnk61() == 7) {
+                total = total + score;
+            }
+            break;
+        case 0x82:
+            if (target->GetDefUnk61() == 8) {
+                total = total + score;
+            }
+            break;
+        case 0x83:
+            if (target->GetDefUnk61() == 9) {
+                total = total + score;
+            }
+            break;
+        case 0x84: {
+            const DinoBattleCreatureDef *def = target->GetDef();
+            const s8 *effect = DinoOffsetPtr<s8>(def, def->mUnk58);
+            MFx32 value = score * MFx32(effect[0] + effect[1] + effect[2] + effect[3]) / MFx32(-400);
+            if (value > MFx32(0)) {
+                total = total + value;
+            }
+            break;
+        }
+        case 0x85: {
+            const DinoBattleCreatureDef *def = target->GetDef();
+            const s8 *effect = DinoOffsetPtr<s8>(def, def->mUnk54);
+            MFx32 value = score * MFx32(effect[0] + effect[1] + effect[2] + effect[3]) / MFx32(400);
+            if (value > MFx32(0)) {
+                total = total + value;
+            }
+            break;
+        }
+        case 0x86: {
+            DinoBattleModelPlayer *owner = target->mPlayer;
+            int lowest = 0x7FFFFFFF;
+            DinoBattleModelCreature *weakest = NULL;
+            for (u32 c = 0; c < owner->GetCreatureCount(); c++) {
+                if ((int)owner->GetCreature(c)->GetUnkE4() < lowest) {
+                    weakest = owner->GetCreature(c);
+                    lowest = weakest->GetUnkE4();
+                }
+            }
+            if (weakest == target) {
+                total = total + score;
+            }
+            break;
+        }
+        case 0x87:
+            total = total + score * (MFx32(1) - MFx32(1) * MFx32((int)target->GetUnkE4()) /
+                                                   MFx32((int)target->GetUnkE8()));
+            break;
+        case 0x88:
+            if ((int)target->GetUnkE4() <= (int)target->GetUnkE8() / 2) {
+                total = total + score;
+            }
+            break;
+        case 0x89:
+            if (target == creature) {
+                total = total + score;
+            }
+            break;
+        case 0x8A:
+            if (target != creature) {
+                total = total + score;
+            }
+            break;
+        }
+    }
+    return total;
+}
+
 
 // NONMATCHING: in case 1 the operator+ parameter copies swap stack slots, as in ScoreConditions (casting either
 // operand fixes the order but costs a stack slot).
@@ -1065,9 +1319,6 @@ typedef std::__red_black_tree<MFx32, DinoBattleCpuCandidates::value_type,
                               std::allocator<DinoBattleCpuCandidates::value_type> >
     DinoBattleCpuCandidateTree;
 
-extern "C" MFx32 func_ov000_0215829c(DinoBattleCpuController *controller, DinoBattleModelPlayer *player,
-                                     DinoBattleModelCreature *creature, DinoBattleModelCreature *target,
-                                     DinoBattleFile file, u32 attack);
 extern "C" u32 func_ov000_0216d2cc(DinoBattleModelCreature *creature, BOOL check);
 extern "C" MTask *func_ov000_0218ec8c(u32 tutorial, int kind, BOOL *proceed);
 extern "C" const u32 data_0208a1a0, data_0208a1a4;  // the CPU's wait before its first move, and before the others
@@ -1187,7 +1438,7 @@ void DinoBattleCpuController::DecideAction(u32 first) {
                 } else {
                     attacker->GetAttack(attack, &set);
                 }
-                score = func_ov000_0215829c(this, player, attacker, target, group.mSets[set].mFiles[pos], attack);
+                score = ScoreTarget(player, attacker, target, group.mSets[set].mFiles[pos], attack);
             }
             DinoBattleCpuCandidate candidate(0, attacker, attack);
             candidate.target = mTargets[t];

@@ -79,6 +79,9 @@ public:
     MFx32 ScoreEscape(DinoBattleModelPlayer *player, DinoBattleModelCreature *creature, DinoBattleFile file);
     // The score for using the attack (0 unless it can be used and has targets).
     MFx32 ScoreAttack(DinoBattleModelPlayer *player, DinoBattleModelCreature *creature, DinoBattleFile file, u32 attack);
+    // The score for attacking the target with the attack.
+    MFx32 ScoreTarget(DinoBattleModelPlayer *player, DinoBattleModelCreature *creature, DinoBattleModelCreature *target,
+                      DinoBattleFile file, u32 attack);
     // The score of the file's conditions on the creature alone (its attacks, its position, the player's data).
     MFx32 ScoreCreatureConditions(DinoBattleModelPlayer *player, DinoBattleModelCreature *creature,
                                   DinoBattleFile file);
