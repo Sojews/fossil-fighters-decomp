@@ -1074,7 +1074,6 @@ extern "C" const u32 data_0208aa0c, data_0208aa10, data_0208aa14, data_0208aa18,
 extern "C" const u32 data_0208b310[]; // the flags that put the masks on sale, in order
 
 // The shop's menu: what it offers depends on what is for sale.
-// NONMATCHING: the game zeroes masks before loading gDinoResource's address (scheduling).
 void DinoEventExecShopChoice::Idle() {
     switch (mStep++) {
     case 0: {
@@ -1086,7 +1085,7 @@ void DinoEventExecShopChoice::Idle() {
         menu->AddChoice(1, std::string(gDinoResource->GetText(text)), std::string(gDinoResource->GetText(text)));
         text = data_0208aa1c;
         menu->AddChoice(2, std::string(gDinoResource->GetText(text)), std::string(gDinoResource->GetText(text)));
-        BOOL masks = FALSE;
+        u8 masks = FALSE;
         int k = 0;
         MResource<DinoHeadMaskDefs> defs = gDinoResource->LoadHeadMaskDefs();
         for (u32 i = 1; i < gDinoResource->GetHeadMaskCount(); i++) {
@@ -2098,6 +2097,58 @@ DinoEventExecShopChoice2::DinoEventExecShopChoice2(DinoEventLoop *event, u32 a, 
     mVar = var;
     mUnk84 = b;
     mStep = 0;
+}
+
+extern "C" const u32 data_0208b324[]; // the flags that put the masks on sale, in order
+
+// The shop's question under a talk window: what it offers depends on what is for sale.
+void DinoEventExecShopChoice2::Idle() {
+    switch (mStep++) {
+    case 0: {
+        MDisplayScope scope(gLcd->GetBottomDisplay());
+        mUnk8C = 0;
+        std::vector<DinoWindowChoice> choices;
+        DinoPlayerData player;
+        gDinoBackup->GetPlayer(&player, 0);
+        choices.push_back(DinoWindowChoice(1, std::string(gDinoResource->GetText(data_0208aa20))));
+        choices.push_back(DinoWindowChoice(2, std::string(gDinoResource->GetText(data_0208aa1c))));
+        u8 masks = FALSE;
+        int k = 0;
+        MResource<DinoHeadMaskDefs> defs = gDinoResource->LoadHeadMaskDefs();
+        for (u32 i = 1; i < gDinoResource->GetHeadMaskCount(); i++) {
+            const u8 *base = (const u8 *)defs.Get();
+            const DinoHeadMaskDef *def =
+                (const DinoHeadMaskDef *)(base + ((const u32 *)(base + ((const DinoHeadMaskDefs *)base)->tableOffset))[i]);
+            if (def->nameText != 0 && def->price != 0 && k < 5 && gDinoBackup->GetSystemFlag(data_0208b324[k++]) == TRUE &&
+                gDinoBackup->GetHeadMask(i) == 0) {
+                masks = TRUE;
+            }
+        }
+        if (masks) {
+            choices.push_back(DinoWindowChoice(3, std::string(gDinoResource->GetText(data_0208aa18))));
+        }
+        if (gDinoBackup->GetVarFlag(mVar)) {
+            choices.push_back(DinoWindowChoice(4, std::string(gDinoResource->GetText(data_0208aa14))));
+        }
+        if (gDinoBackup->GetSystemFlag(0x1F) == TRUE) {
+            choices.push_back(DinoWindowChoice(5, std::string(gDinoResource->GetText(data_0208aa10))));
+        }
+        choices.push_back(DinoWindowChoice(-2, std::string(gDinoResource->GetText(data_0208aa0c))));
+        DinoEventTalkWindow *window = new DinoEventTalkWindow(gCurrentDisplay, mEvent->GetTalkText(mUnk84),
+                                                              (int)mEvent->GetField()->GetOam(), 0);
+        window->SetChoices((u32)&mUnk8C, MPoint(0xFE, 0x8E), choices, 3);
+        mSerial.AddTail(window);
+        break;
+    }
+    case 1:
+        if (mUnk8C == -2) {
+            mUnk8C = 0;
+        }
+        gDinoBackup->SetLocalVar(mUnk78, mUnk8C);
+        gLcd->GetBottomDisplay()->mBlend->Reset();
+        Exit();
+        break;
+    }
 }
 
 DinoEventExecChoice::~DinoEventExecChoice() {
