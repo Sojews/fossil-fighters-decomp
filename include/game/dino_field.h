@@ -294,14 +294,27 @@ struct DinoFieldMapInfo {
 
 // The map file's header.
 struct DinoFieldMapData {
-    u8 unk00[0x30];
+    u32 unk00;
+    u32 mModelName;     // 0x04: offset of the model's name
+    u32 mGridName;      // 0x08: offset of the walk grid's model name
+    u32 mRockSet;       // 0x0C: which kaseki rocks the map has (0: none)
+    u8 unk10[0x30 - 0x10];
     MFx32 mWalkSpeed;   // 0x30: the speed characters' walk motion plays at
-    u8 unk34[0x3C - 0x34];
+    u8 unk34[0x38 - 0x34];
+    u32 mHasGrid;       // 0x38: the map has an area grid
     u32 mAreas;         // 0x3C: offset of the areas (0x14 bytes each)
     u32 mCameraCount;   // 0x40: of the camera settings
     u32 mCameras;       // 0x44: offset of the camera settings (DinoFieldMapCamera)
     u32 mCircleCount;   // 0x48: of the circles
     u32 mCircles;       // 0x4C: offset of a table of the circles' offsets (DinoFieldMapCircle)
+    u8 unk50[0x60 - 0x50];
+    u32 mGradTop;       // 0x60: offset of the gradation's top colour (0: none)
+    u32 mGradBottom;    // 0x64: and bottom colour
+    u8 mFog;            // 0x68
+    u8 mRaster;         // 0x69
+
+    const u8 *GetGradTop() const { return mGradTop == 0 ? NULL : (const u8 *)this + mGradTop; }
+    const u8 *GetGradBottom() const { return mGradBottom == 0 ? NULL : (const u8 *)this + mGradBottom; }
 };
 
 // A camera setting of the map: a rotation and a scale.
