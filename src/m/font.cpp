@@ -431,6 +431,173 @@ void MChr16FontTransfer::Transfer() {
     }
 }
 
+extern "C" const u32 data_0208cccc[256];    // each byte's bits spread to nibbles (bit 7 to the top nibble's 1)
+
+// Draws a 1-bit glyph into 4-bit tiles at a pixel position, clipped to the destination: the glyph's pixels in
+// mShadowColor (shifted up by mUnk3C), the rest of its box in mColor (kept for -1), and, unless mColor is mBackColor,
+// a shadow one pixel down and right in mBackColor.
+// NONMATCHING (74%): the instructions follow the game's, but its registers differ (the game spills each row's kept
+// pixel mask where ours spills the glyph's pixels, and keeps a 1 in a register in the setup), as in the 4-bit
+// transfer.
+void MChr16BinFontTransfer::Transfer() {
+    const u8 *src = mSrc;
+    int srcBytes = (mGlyphSize.x + 7) >> 3;
+    if (mPos.y < 0) {
+        src += srcBytes * -mPos.y;
+        mGlyphSize.y += mPos.y;
+        mPos.y = 0;
+    }
+    int over = mPos.y + mGlyphSize.y - mSize.y * 8;
+    if (over > 0) {
+        mGlyphSize.y -= over;
+    }
+    int rows = mGlyphSize.y;
+    int width = mSize.x;
+    u32 *dst = (u32 *) ((u8 *) mDest + ((mPos.x >> 3) + (mPos.y >> 3) * width) * 32 + (mPos.y & 7) * 4);
+    int shift = mPos.x & 7;
+    u32 mask = (1 << mGlyphSize.x) - 1;
+    int overX = mPos.x + mGlyphSize.x - width * 8;
+    if (overX > 0) {
+        mask &= ~((1 << overX) - 1);
+    }
+    mask <<= 32 - mGlyphSize.x - shift;
+    if (mPos.x < 0) {
+        mask &= (1 << ((mPos.x >> 3) + 4) * 8) - 1;
+    }
+    u32 words = (shift + mGlyphSize.x + 7) >> 3;
+    int nextRow = -words * 8 + 1;
+    int nextTileRow = nextRow + (width - 1) * 8;
+    const u32 *spread = data_0208cccc;
+    if (mColor == mBackColor) {
+        while (rows != 0) {
+            u32 bits = 0;
+            switch (srcBytes) {
+            case 1:
+                bits = src[0] << 24;
+                src += 1;
+                break;
+            case 2:
+                bits = (src[0] << 24) | (src[1] << 16);
+                src += 2;
+                break;
+            case 3:
+                bits = (src[0] << 24) | (src[1] << 16) | (src[2] << 8);
+                src += 3;
+                break;
+            }
+            u32 glyph = mask & ((bits >> shift) << mUnk3C);
+            u32 fill = mask & ~glyph;
+            u32 keep = ~mask;
+            if (mColor == -1) {
+                keep |= fill;
+                fill = 0;
+            }
+            switch (words) {
+            case 1:
+                dst[0] = (dst[0] & spread[(u8) (keep >> 24)] * 0xF) | spread[(u8) (glyph >> 24)] * mShadowColor |
+                         spread[(u8) (fill >> 24)] * mColor;
+                dst += 8;
+                break;
+            case 2:
+                dst[0] = (dst[0] & spread[(u8) (keep >> 24)] * 0xF) | spread[(u8) (glyph >> 24)] * mShadowColor |
+                         spread[(u8) (fill >> 24)] * mColor;
+                dst[8] = (dst[8] & spread[(u8) (keep >> 16)] * 0xF) | spread[(u8) (glyph >> 16)] * mShadowColor |
+                         spread[(u8) (fill >> 16)] * mColor;
+                dst += 16;
+                break;
+            case 3:
+                dst[0] = (dst[0] & spread[(u8) (keep >> 24)] * 0xF) | spread[(u8) (glyph >> 24)] * mShadowColor |
+                         spread[(u8) (fill >> 24)] * mColor;
+                dst[8] = (dst[8] & spread[(u8) (keep >> 16)] * 0xF) | spread[(u8) (glyph >> 16)] * mShadowColor |
+                         spread[(u8) (fill >> 16)] * mColor;
+                dst[16] = (dst[16] & spread[(u8) (keep >> 8)] * 0xF) | spread[(u8) (glyph >> 8)] * mShadowColor |
+                          spread[(u8) (fill >> 8)] * mColor;
+                dst += 24;
+                break;
+            case 4:
+                dst[0] = (dst[0] & spread[(u8) (keep >> 24)] * 0xF) | spread[(u8) (glyph >> 24)] * mShadowColor |
+                         spread[(u8) (fill >> 24)] * mColor;
+                dst[8] = (dst[8] & spread[(u8) (keep >> 16)] * 0xF) | spread[(u8) (glyph >> 16)] * mShadowColor |
+                         spread[(u8) (fill >> 16)] * mColor;
+                dst[16] = (dst[16] & spread[(u8) (keep >> 8)] * 0xF) | spread[(u8) (glyph >> 8)] * mShadowColor |
+                          spread[(u8) (fill >> 8)] * mColor;
+                dst[24] = (dst[24] & spread[(u8) keep] * 0xF) | spread[(u8) glyph] * mShadowColor |
+                          spread[(u8) fill] * mColor;
+                dst += 32;
+                break;
+            }
+            dst = (u32 *) ((u8 *) dst + ((((u8 *) dst - (u8 *) mDest) & 0x1F) == 0x1C ? nextTileRow * 4 : nextRow * 4));
+            rows--;
+        }
+    } else {
+        u32 shadow = 0;
+        u32 bits = 0;
+        while (rows != 0) {
+            u32 prev = shadow;
+            switch (srcBytes) {
+            case 1:
+                bits = src[0] << 24;
+                src += 1;
+                break;
+            case 2:
+                bits = (src[0] << 24) | (src[1] << 16);
+                src += 2;
+                break;
+            case 3:
+                bits = (src[0] << 24) | (src[1] << 16) | (src[2] << 8);
+                src += 3;
+                break;
+            }
+            u32 row = (bits >> shift) << mUnk3C;
+            shadow = row >> 1;
+            u32 glyph = mask & row;
+            u32 drop = prev & (mask & ~glyph);
+            u32 fill = mask & ~(glyph | drop);
+            u32 keep = ~mask;
+            if (mColor == -1) {
+                keep |= fill;
+                fill = 0;
+            }
+            switch (words) {
+            case 1:
+                dst[0] = (dst[0] & spread[(u8) (keep >> 24)] * 0xF) | spread[(u8) (glyph >> 24)] * mShadowColor |
+                         spread[(u8) (fill >> 24)] * mColor | spread[(u8) (drop >> 24)] * mBackColor;
+                dst += 8;
+                break;
+            case 2:
+                dst[0] = (dst[0] & spread[(u8) (keep >> 24)] * 0xF) | spread[(u8) (glyph >> 24)] * mShadowColor |
+                         spread[(u8) (fill >> 24)] * mColor | spread[(u8) (drop >> 24)] * mBackColor;
+                dst[8] = (dst[8] & spread[(u8) (keep >> 16)] * 0xF) | spread[(u8) (glyph >> 16)] * mShadowColor |
+                         spread[(u8) (fill >> 16)] * mColor | spread[(u8) (drop >> 16)] * mBackColor;
+                dst += 16;
+                break;
+            case 3:
+                dst[0] = (dst[0] & spread[(u8) (keep >> 24)] * 0xF) | spread[(u8) (glyph >> 24)] * mShadowColor |
+                         spread[(u8) (fill >> 24)] * mColor | spread[(u8) (drop >> 24)] * mBackColor;
+                dst[8] = (dst[8] & spread[(u8) (keep >> 16)] * 0xF) | spread[(u8) (glyph >> 16)] * mShadowColor |
+                         spread[(u8) (fill >> 16)] * mColor | spread[(u8) (drop >> 16)] * mBackColor;
+                dst[16] = (dst[16] & spread[(u8) (keep >> 8)] * 0xF) | spread[(u8) (glyph >> 8)] * mShadowColor |
+                          spread[(u8) (fill >> 8)] * mColor | spread[(u8) (drop >> 8)] * mBackColor;
+                dst += 24;
+                break;
+            case 4:
+                dst[0] = (dst[0] & spread[(u8) (keep >> 24)] * 0xF) | spread[(u8) (glyph >> 24)] * mShadowColor |
+                         spread[(u8) (fill >> 24)] * mColor | spread[(u8) (drop >> 24)] * mBackColor;
+                dst[8] = (dst[8] & spread[(u8) (keep >> 16)] * 0xF) | spread[(u8) (glyph >> 16)] * mShadowColor |
+                         spread[(u8) (fill >> 16)] * mColor | spread[(u8) (drop >> 16)] * mBackColor;
+                dst[16] = (dst[16] & spread[(u8) (keep >> 8)] * 0xF) | spread[(u8) (glyph >> 8)] * mShadowColor |
+                          spread[(u8) (fill >> 8)] * mColor | spread[(u8) (drop >> 8)] * mBackColor;
+                dst[24] = (dst[24] & spread[(u8) keep] * 0xF) | spread[(u8) glyph] * mShadowColor |
+                          spread[(u8) fill] * mColor | spread[(u8) drop] * mBackColor;
+                dst += 32;
+                break;
+            }
+            dst = (u32 *) ((u8 *) dst + ((((u8 *) dst - (u8 *) mDest) & 0x1F) == 0x1C ? nextTileRow * 4 : nextRow * 4));
+            rows--;
+        }
+    }
+}
+
 MChr16BinFontTransfer::~MChr16BinFontTransfer() {
 }
 
