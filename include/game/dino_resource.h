@@ -170,7 +170,8 @@ struct DinoBattleAdjustDefs {
     u8 unk193[0x198 - 0x193];
     fx32 rankScaleHigh;     // 0x198
     fx32 rankScaleLow;      // 0x19C
-    u8 unk1A0[0x1AC - 0x1A0];
+    MPoint damagePos;   // 0x1A0: where a hit's mark shows
+    u8 unk1A8[0x1AC - 0x1A8];
     u32 kpUpDownPoints; // 0x1AC: offset of the KP up/down numbers' positions (MPoint), by side
     u8 unk1B0;          // 0x1B0: team attacks (attack kind 3) take the team-attack path
     u8 unk1B1[3];

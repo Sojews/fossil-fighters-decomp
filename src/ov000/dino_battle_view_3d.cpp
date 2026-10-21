@@ -83,7 +83,14 @@ void B3DStatusViewTask::Idle() {
 
 // The TU's pooled pointer-to-member constants (set up at startup).
 extern "C" struct {
-    u8 unk00[0x4C];
+    u8 unk00[0x18];
+    const char *mHitMotion2_18;     // the hit marks' motions
+    u8 unk1C[0x20 - 0x1C];
+    const char *mHitMotion0_20;
+    const char *mMarkMotion_24;     // an extra mark's
+    u8 unk28[0x40 - 0x28];
+    const char *mHitMotion1_40;
+    u8 unk44[0x4C - 0x44];
     void (B3DStatusViewTask::*State_4C)();
     u8 unk54[0x5C - 0x54];
     void (B3DStatusViewTask::*State_5C)();
@@ -259,6 +266,219 @@ extern "C" struct {
 extern "C" const u32 data_0208a0d8;  // the action's fade length
 extern "C" MTask *func_ov000_0218ae50(u32 arg);
 extern "C" MTask *func_ov000_0218addc(u32 arg);
+
+// The TU's pooled pointer-to-member constants for the hit's model loads.
+extern "C" struct {
+    void (DinoBattleView3DDamage::*LoadPath_00)(int i);
+} data_ov000_02196364;
+extern "C" struct {
+    void (DinoBattleView3DDamage::*LoadName_00)(int i);
+} data_ov000_0219633c;
+extern "C" const char data_ov000_021965d0[];    // a hit model's name format
+extern "C" const char data_ov000_02196800[], data_ov000_021967e4[];
+extern "C" MTask *func_ov000_0218ab8c(DinoBattleView3DCamera *camera, const char *name, int light);
+extern "C" const int data_0208a1d0;     // the held motion's fade-in length
+extern "C" const u32 data_020b5a9c;     // (in the shared battle pool at data_020b5a90)
+
+// Loads the hit's models, then plays them one step at a time with the hit marks (a button skips to the end), and
+// wipes or fades out.
+// NONMATCHING: 99.98%, the wipe-in mode's branches are the other way round, and the extra marks' x is spilled to
+// the last stack slot instead of the first.
+void DinoBattleView3DDamage::Idle() {
+    switch (mStep) {
+    case 0:
+        mModel->SetUnk180(0);
+        ((u8 *)mOwner)[0x144] = 0;
+        mStep++;
+        mMotionCount = 0;
+        break;
+    case 1:
+        for (u32 i = 0; i < mDefs->mCount; i++) {
+            sprintf(mNames[i], data_ov000_021965d0, mDefs->mUnkB8, mDefs->mUnkBC[i]);
+            mCsvs[i] = new Dino3DLoadCsv(mOwner, 0x7FFF, (void *)0x81, (void *)mSide);
+            mFiles[i] = NULL;
+            if (i == mDefs->mCount - 1) {
+                if (mDefs->mUnkA0) {
+                    mFiles[i] = data_ov000_02196800;
+                }
+                if (mDefs->mUnkA4) {
+                    mFiles[i] = data_ov000_021967e4;
+                }
+            }
+            if (mDefs->mPaths[i] != NULL) {
+                mSerial.AddTail(MCreateBgCallTask(this, data_ov000_02196364.LoadPath_00, (int)i, 1));
+            } else {
+                mSerial.AddTail(MCreateBgCallTask(this, data_ov000_0219633c.LoadName_00, (int)i, 1));
+            }
+        }
+        mFrame = 0;
+        mStep = 11;
+        break;
+    case 11:
+        ((u8 *)mOwner)[0x144] = 1;
+        mParallel.AddTail(new CameraWipe((CameraWipe::Owner *)mOwner, mSide ? 1 : 0, 15));
+        mStep = 2;
+        break;
+    case 2:
+        if (mFrame == 0) {
+            mParallel.AddTail(func_ov000_0218ab8c(mCamera, mName, mSide));
+        }
+        mStep++;
+        mFrame = 0;
+        if (mShowMarks && mDefs->mType < 15) {
+            mMotionCount = mDefs->mMarks[mIndex] + 1;
+            switch (mDefs->mType) {
+            case 0:
+                mMotions[0] = new MMotion(std::string(data_ov000_021962e8.mHitMotion0_20), mDefs->mOam, 0, 1);
+                mMarkDelay = 0;
+                break;
+            case 1:
+                mMotions[0] = new MMotion(std::string(data_ov000_021962e8.mHitMotion1_40), mDefs->mOam, 0, 1);
+                mMarkDelay = 1;
+                break;
+            case 2:
+                mMotions[0] = new MMotion(std::string(data_ov000_021962e8.mHitMotion2_18), mDefs->mOam, 0, 1);
+                mMarkDelay = 2;
+                break;
+            }
+            const DinoBattleAdjustDefs *adjust = gDinoResource->GetBattleAdjustDefs();
+            MPoint pos(adjust->damagePos.x, adjust->damagePos.y);
+            int dx = mSide ? -40 : 40;
+            pos.x += dx + (gDinoResource->GetRandom()->Next(80) - 40);
+            pos.y += gDinoResource->GetRandom()->Next(56) + 8;
+            mMotions[0]->SetPosition(pos);
+            mMotions[0]->SetPriority(2);
+            mMotions[0]->SetAnchor(2);
+            mMotions[0]->Play(1, 0);
+            mMotions[0]->Run();
+            mMotions[0]->Hide();
+            mDefs->mTasks->AddTail(mMotions[0]);
+            mShown = 1;
+            for (u32 i = 1; i < mMotionCount; i++) {
+                mMotions[i] = new MMotion(std::string(data_ov000_021962e8.mMarkMotion_24), mDefs->mOam, 0, 1);
+                mMotions[i]->SetPosition(pos.x + mDefs->mOffsets[(int)i - 1 + mIndex * 4], pos.y);
+                mMotions[i]->SetPriority(2);
+                mMotions[i]->SetAnchor(4);
+                mDefs->mTasks->AddTail(mMotions[i]);
+            }
+        }
+        if (mIndex != 0 && mDefs->mSes[mIndex - 1] != 0) {
+            DinoSoundStopSe(mDefs->mSes[mIndex - 1], 0);
+        }
+        if (mDefs->mSes[mIndex] != 0) {
+            DinoSoundPlaySe(mDefs->mSes[mIndex], 0);
+        }
+        if (mDefs->mSes2[mIndex] != 0) {
+            DinoSoundPlaySe(mDefs->mSes2[mIndex], 0);
+        }
+        if (mIndex == mDefs->mCount - 1 && mDefs->mUnkA4) {
+            DinoSoundPlaySe(0x2DF, 0);
+        }
+        if (mIndex != 0) {
+            mCsvs[mIndex - 1]->Push11();
+        }
+        mCsvs[mIndex]->Push12();
+        break;
+    case 3: {
+        mCamera->mCamera->SetUnk464(mCsvs[mIndex]);
+        mCamera->mCamera->SetParent(mCsvs[mIndex]);
+        if ((mInputHub->GetInput(0)->mButtons & 3) || (mInputHub->GetInput(0)->mButtons & 0x1000)) {
+            mModel->SetUnk180(1);
+        }
+        if (mIndex != 0) {
+            mCsvs[mIndex - 1]->Reset();
+        }
+        mCamera->mCamera->Push19(0x4B00);
+        mMotions[0]->Show();
+        Dino3DLoadCsv *csv = mCsvs[mIndex];
+        if (csv != NULL && csv->mState == MTask::STATE_RUN) {
+            csv->Execute();
+        }
+        if (mFrame > mStepFrames - 2 + (mIndex + 1 == mDefs->mCount) * 20 || (mModel->GetUnk180() && mFrame > 15)) {
+            mIndex++;
+            for (u32 i = 0; i < mMotionCount; i++) {
+                mMotions[i]->Exit();
+            }
+            if (mIndex == mDefs->mCount || mModel->GetUnk180()) {
+                if (mHold == 0 || mModel->GetUnk180()) {
+                    if (mFade) {
+                        mSerial.AddTail(func_ov000_0218addc(15));
+                    } else {
+                        mSerial.AddTail(new CameraWipe((CameraWipe::Owner *)mOwner, mSide ? 2 : 3, 15));
+                    }
+                    mStep++;
+                    return;
+                }
+                mStep = 10;
+                mFrame = 0;
+                return;
+            }
+            if (mIndex < 3) {
+                mCsvs[mIndex]->Push12();
+            }
+            mStep = 2;
+            return;
+        }
+        if (mShown < mMotionCount) {
+            if (mMarkDelay <= 0) {
+                mMotions[mShown]->Show();
+                mMotions[mShown]->Run();
+                mMotions[mShown]->Play(mDefs->mAnimes[mShown - 1 + mIndex * 4], 0);
+                mMarkDelay = 5;
+                mShown++;
+            }
+            mMarkDelay--;
+        }
+        mFrame++;
+        break;
+    }
+    case 4:
+        for (u32 i = 0; i < mDefs->mCount; i++) {
+            if (mCsvs[i] != NULL) {
+                mCsvs[i]->Push11();
+                if (mCsvs[i]->mState == MTask::STATE_RUN) {
+                    mCsvs[i]->Execute();
+                }
+                mCsvs[i]->Reset();
+                delete mCsvs[i];
+            }
+        }
+        mCamera->mCamera->SetParent(NULL);
+        Exit();
+        break;
+    case 10:
+        if ((mInputHub->GetInput(0)->mButtons & 3) || (mInputHub->GetInput(0)->mButtons & 0x1000)) {
+            mModel->SetUnk180(1);
+        }
+        mFrame++;
+        if (mFrame > mHold || mModel->GetUnk180()) {
+            if (mFade) {
+                mSerial.AddTail(func_ov000_0218addc(15));
+            } else {
+                mSerial.AddTail(new MTimer(15), new CameraWipe((CameraWipe::Owner *)mOwner, mSide ? 2 : 3, 15));
+            }
+            mStep = 4;
+            return;
+        }
+        u32 in, out;
+        if (mFrame < data_0208a1d0) {
+            in = (mFrame << 12) / data_0208a1d0;
+            out = 0x1000;
+        } else {
+            in = 0x1000;
+            out = 0x1000 - ((mFrame - data_0208a1d0) << 12) / (mHold - data_0208a1d0);
+        }
+        if (mCsvs[mIndex - 1] != NULL) {
+            mCsvs[mIndex - 1]->Push15();
+            mCsvs[mIndex - 1]->Push22(data_020b5a9c, in);
+            mCsvs[mIndex - 1]->Push20(0x7FFF, out);
+            if (mCsvs[mIndex - 1]->mState == MTask::STATE_RUN) {
+                mCsvs[mIndex - 1]->Execute();
+            }
+        }
+        break;
+    }
+}
 
 // Loads and plays the action's motion until it ends (or a button skips it), then wipes or fades it out.
 #pragma auto_inline off
