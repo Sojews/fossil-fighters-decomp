@@ -8,6 +8,7 @@ class DinoCommonFont;
 
 class DinoCommonWindowConsoleFilter : public MConsoleFilter {
 public:
+    DinoCommonWindowConsoleFilter(DinoCommonFont *font) : mFont(font) {}
     virtual ~DinoCommonWindowConsoleFilter();
     // Handles a '$' escape (p/N: the player's or the rock's name, f: clear, n: font size, v/V: a local or system
     // variable, c: color).

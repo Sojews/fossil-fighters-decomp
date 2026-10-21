@@ -17,7 +17,7 @@ public:
     DinoCommonWindowMessage(MDisplay *display, MPoint pos, const std::string &text, int arg3, int arg4);
     virtual ~DinoCommonWindowMessage();
     virtual void Idle();
-    // Not decompiled yet: Load makes the window (in the background), Start shows it.
+    // Load makes the window (in the background), Start shows it.
     void Load();
     void Start();
 
