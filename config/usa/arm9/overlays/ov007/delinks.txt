@@ -20,6 +20,7 @@ src/ov007/dino_ui_team_select.cpp:
 
 src/ov007/dino_ui_keyboard.cpp:
     .text       start:0x02180f98 end:0x0218746c
+    .init       start:0x0218c710 end:0x0218c7d0
 
 src/ov007/dino_ui_revive_status_menu.cpp:
     .text       start:0x0218746c end:0x0218ad84

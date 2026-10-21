@@ -3,6 +3,7 @@
 // Derived destructors have their bases' destructor bodies inlined; auto-inlining the ones defined above does that.
 #pragma auto_inline on
 
+#include "game/dino_static_init.h"
 #include "m/input.h"
 #include "game/dino_sound.h"
 #include "game/dino_ui_keyboard_menu.h"
@@ -1202,3 +1203,36 @@ void DinoUiKeyboardMenu::OnIdle() {
     gLcd->GetBottomDisplay()->mWin->GetObjWindow()->SetTarget(0x1F);
     gLcd->GetBottomDisplay()->mWin->GetObjWindow()->Show();
 }
+
+// The file's static initialization (see dino_static_init.h).
+// NONMATCHING: scheduling (the game folds none of the origin subtractions and stores the origin later).
+extern "C" u32 data_ov007_02191980[];
+extern "C" u32 data_ov007_021919bc[];
+extern "C" u32 data_ov007_02191a00[];
+extern "C" u32 data_ov007_02191a4c[];
+extern "C" u32 data_ov007_02191a5c[];
+#pragma always_inline on
+static struct DinoUiKeyboardStaticInit {
+    DinoUiKeyboardStaticInit() {
+        DINO_POOL_NV(MPoint, data_ov007_02191880, 0x4c) = MPoint(128, 96);
+        DINO_POOL_NV(MPoint, data_ov007_02191880, 0x44) = MPoint(123, 120);
+        DINO_POOL_NV(MPoint, data_ov007_02191880, 0x54) = MPoint(133, 120);
+        DINO_POOL_NV(MPoint, data_ov007_02191880, 0x64) = MPoint(188, 43);
+        DINO_POOL_NV(MPoint, data_ov007_02191880, 0x3c) = MPoint(242, 16);
+        DINO_POOL_NV(MPoint, data_ov007_02191880, 0x34) = MPoint(0, 0);
+        DINO_POOL_NV(MPoint, data_ov007_02191980, 0x2c) =
+            DINO_POOL_NV(MPoint, data_ov007_02191880, 0x34) - MPoint(0, 2);
+        *(MPoint *) &data_ov007_021919b4 = MPoint(0, 56);
+        DINO_POOL_NV(MPoint, data_ov007_021919bc, 0) = MPoint(0, 114);
+        DINO_POOL_NV(MPoint, data_ov007_02191980, 0x44) = MPoint(34, 17) - DINO_POOL_NV(MPoint, data_ov007_02191880, 0x34);
+        DINO_POOL_NV(MPoint, data_ov007_02191980, 0x4c) = MPoint(34, 31) - DINO_POOL_NV(MPoint, data_ov007_02191880, 0x34);
+        DINO_POOL_NV(MPoint, data_ov007_02191980, 0x54) = MPoint(34, 45) - DINO_POOL_NV(MPoint, data_ov007_02191880, 0x34);
+        DINO_POOL_NV(MRect, data_ov007_02191a00, 0x3c) = MRect(21, 6, 249, 62);
+        DINO_POOL_NV(MRect, data_ov007_02191a4c, 0) = MRect(21, 64, 249, 120);
+        DINO_POOL_NV(MRect, data_ov007_02191a5c, 0) = MRect(21, 122, 249, 178);
+        DINO_POOL_NV(u32, data_ov007_02191980, 0x1c) = DINO_POOL_NV(u32, data_ov007_02191880, 0x1c);
+        DINO_POOL_NV(u32, data_ov007_02191980, 0x20) = DINO_POOL_NV(u32, data_ov007_02191880, 0x28);
+        DINO_POOL_NV(u32, data_ov007_02191980, 0x24) = DINO_POOL_NV(u32, data_ov007_02191880, 0x28);
+        DINO_POOL_NV(u32, data_ov007_02191980, 0x28) = DINO_POOL_NV(u32, data_ov007_02191880, 0x18);
+    }
+} sDinoUiKeyboardStaticInit;
