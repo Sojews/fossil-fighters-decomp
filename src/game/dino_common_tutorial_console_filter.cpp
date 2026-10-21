@@ -321,8 +321,6 @@ void DinoCommonTutorialWindow::ClearArrows() {
 }
 
 // String members the game emits in this file.
-template std::wstring::~basic_string();
-template std::wstring &std::wstring::assign(const wchar_t *first, const wchar_t *last);
 // (Constructing one here instantiates the constructor with the name the game's callers use.)
 #pragma dont_inline on
 void DinoTutorialFilterWStringAnchor(const wchar_t *text) {
