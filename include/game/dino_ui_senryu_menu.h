@@ -10,6 +10,10 @@
 #include "m/sleep.h"
 #include "m/looper.h"
 #include "game/help.h"
+
+class MSmartOam;
+class MIndicator;
+class MMotion;
 #include "game/dino_field_camera_hook.h"
 
 class DinoUiSenryuMenu : public DinoHelpBase, public MMenu {
@@ -28,12 +32,17 @@ public:
     // The sub menu's choice for the entry: 1 sets the record's flag, 2 clears it.
     void OnSubMenuChoice(u32 choice, u32 index);
 
-    u8 unkB4[0x38];
+    MSmartOam *mOam;            // 0xB4
+    MIndicator *mLines[3][3];   // 0xB8: three lines per poem on the page
+    MIndicator *mNames[3];      // 0xDC: each poem's author
+    MIndicator *mPageText;      // 0xE8
     MView *mCursor;     // 0xEC
-    u8 unkF0[0x18];
+    MMotion *mFrames[3];        // 0xF0
+    MMotion *mMarks[3];         // 0xFC
     u32 mUnk108;        // 0x108
     u32 mUnk10C;        // 0x10C
-    u8 unk110[0x118 - 0x110];
+    MTaskSet *mUnk110;  // 0x110
+    MTaskSet *mUnk114;  // 0x114
     MTaskSet *mUnk118;  // 0x118
     MTask *mUnk11C;     // 0x11C
     MFont *mFont120;    // 0x120

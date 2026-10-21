@@ -85,6 +85,7 @@ public:
 
 class SenryuKeyCheckTask : public MTask {
 public:
+    SenryuKeyCheckTask(void *owner) { mOwner = owner; }
     virtual ~SenryuKeyCheckTask();
     virtual void Execute();
 

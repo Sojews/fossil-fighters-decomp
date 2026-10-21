@@ -822,6 +822,144 @@ void DinoUiKeyboardMenu::Finish() {
     GetSerial()->AddTail(new MTimer(data_02089ad0), fades, waitTask, exit);
 }
 
+// The poem list's pooled layout (anchor data_ov007_02191880).
+extern "C" struct {
+    u8 unk00[8];
+    const char *mFramePath;     // 0x08
+    const char *mMarkPath;      // 0x0C
+    u8 unk10[4];
+    const char *mCursorPath;    // 0x14
+    u8 unk18[0x3C - 0x18];
+    MPoint mMarkOffset;         // 0x3C
+    u8 unk44[0x64 - 0x44];
+    MPoint mNameOffset;         // 0x64
+} data_ov007_02191880;
+extern "C" const MPoint data_ov007_021919ac[3];   // each poem's place
+extern "C" const MPoint data_ov007_021919c4[3];   // each line's place in a poem
+extern "C" const MRect data_ov007_02191a3c[3];    // each poem's frame
+extern "C" const MPoint data_ov007_021919b4;      // the cursor's place
+extern "C" const char data_ov007_02191e3c[];      // the title picture
+extern "C" const char data_ov007_02191e50[];      // the page number's font
+extern const u32 data_0208ac24, data_0208ac40, data_0208ac44;
+extern const int data_02089a18;
+
+// The poems saved in the records (three lines each, with the author and its flags), their labels, frames and
+// marks, the page number, the cursor and the help.
+// NONMATCHING: the game reads gCurrentDisplay for the canvases after copying their size (as elsewhere), and its
+// spill slots differ.
+void DinoUiSenryuMenu::OnStart() {
+    mParallel.AddTail(mUnk114 = new MParallelTaskSet, mUnk110 = new MParallelTaskSet, mUnk118 = new MSerialTaskSet);
+    mOam = new MSmartOam(0x28, 0, TRUE);
+    mParallel.AddTail(mOam);
+    MTextPicture *title = new MTextPicture(std::string(data_ov007_02191e3c), TRUE, false);
+    title->Show();
+    title->SetPriority(3);
+    mParallel.AddTail(title);
+    mParallel.AddTail(new DinoGuideMessage(std::string(gDinoResource->GetText(data_0208ac24))));
+    DinoHelpDummyItem *help = new DinoHelpDummyItem(gCurrentDisplay, MRect(0x15, 5, 0xF9, 0xA9),
+                                                    std::string(gDinoResource->GetText(data_0208ac44)));
+    help->Enable();
+    mParallel.AddTail(help);
+    help = new DinoHelpDummyItem(gCurrentDisplay, MRect(0x73, 0xB4, 0x8D, 0xBF),
+                                 std::string(gDinoResource->GetText(data_0208ac40)));
+    help->Enable();
+    mParallel.AddTail(help);
+    mFont120 = gDinoResource->CreateFont12(0, 1, 0);
+    mFont124 = gDinoResource->CreateFont12(0, 1, 0);
+    mFont128 = gDinoResource->CreateFont12(0, 1, 0);
+    mFont120->AddRef();
+    mFont124->AddRef();
+    mFont128->AddRef();
+    mCount = 0;
+    for (int j = 0; j < 42; j++) {
+        mEntries[j] = 0;
+    }
+    s32 index = 0;
+    for (int i = 0; i < 42; index += 0x100, i++) {
+        DinoBackupRecord record;
+        gDinoBackup->GetRecord(i, &record);
+        if (record.unk78) {
+            std::wstring text = MDecodeUtf8(std::string((const char *)record.data));
+            int line = 0;
+            for (int c = 0; c < text.size(); c++) {
+                if (text[c] == L'\n') {
+                    line++;
+                } else {
+                    (mUnk140 + mCount * 3)[line].push_back(text[c]);
+                }
+                if (line == 3) {
+                    break;
+                }
+            }
+            mUnk728[mCount] = (const wchar_t *)record.name;
+            mEntries[mCount] = index | ((record.unk79 ? 2 : 0) | record.unk7a | 0x80);
+            mCount++;
+        }
+    }
+    if (mCount == 0) {
+        mCount = 1;
+    }
+    for (int o = 0; o < 3; o++) {
+        for (int j = 0; j < 3; j++) {
+            mLines[o][j] = new MIndicator(
+                new MObjCanvas(gCurrentDisplay, MPoint(0xCC, 0xC),
+                               gDinoResource->GetUnkTable(), TRUE),
+                (&mFont120)[o], 0);
+            mParallel.AddTail(mLines[o][j]);
+            mLines[o][j]->SetPosition(MPoint(data_ov007_021919c4[j].x - 6 + data_ov007_021919ac[o].x,
+                                                  data_ov007_021919c4[j].y - 6 + data_ov007_021919ac[o].y));
+            mLines[o][j]->SetPriority(3);
+            mLines[o][j]->Show();
+        }
+        mNames[o] = new MIndicator(new MObjCanvas(gCurrentDisplay, MPoint(0x30, 0xC),
+                                                  gDinoResource->GetUnkTable(), TRUE),
+                                   (&mFont120)[o], 0);
+        mParallel.AddTail(mNames[o]);
+        mNames[o]->SetPosition(MPoint(data_ov007_02191880.mNameOffset.x + data_ov007_021919ac[o].x,
+                                      data_ov007_02191880.mNameOffset.y + data_ov007_021919ac[o].y));
+        mNames[o]->SetPriority(3);
+        mNames[o]->Hide();
+        mMarks[o] = new MMotion(std::string(data_ov007_02191880.mMarkPath), mOam, 0, 1);
+        mMarks[o]->Play(1, 0);
+        mMarks[o]->SetPosition(MPoint(data_ov007_02191880.mMarkOffset.x + data_ov007_021919ac[o].x,
+                                      data_ov007_02191880.mMarkOffset.y + data_ov007_021919ac[o].y));
+        mMarks[o]->SetPriority(2);
+        mMarks[o]->Hide();
+        mUnk110->AddTail(mMarks[o]);
+        mFrames[o] = new MMotion(std::string(data_ov007_02191880.mFramePath), mOam, 0, 1);
+        mFrames[o]->Play(1, 0);
+        mFrames[o]->SetPosition(MPoint((data_ov007_02191a3c[o].right + data_ov007_02191a3c[o].left) / 2 - 6,
+                                       (data_ov007_02191a3c[o].bottom + data_ov007_02191a3c[o].top) / 2 + 4));
+        mFrames[o]->SetPriority(2);
+        mFrames[o]->Hide();
+        mUnk110->AddTail(mFrames[o]);
+    }
+    MFontSet *font = new MFontSet(std::string(data_ov007_02191e50), 0, 0, 0);
+    font->AddRef();
+    mPageText = new MIndicator(
+        new MObjCanvas(gCurrentDisplay, MPoint(0x20, 8), font->GetPalette(), TRUE), font,
+        0);
+    mParallel.AddTail(mPageText);
+    mPageText->SetPosition(MPoint(0x73, 0xB6));
+    mPageText->SetPriority(3);
+    mPageText->Show();
+    font->Release();
+    mCursor = new MMotion(std::string(data_ov007_02191880.mCursorPath), mOam, 0, 1);
+    ((MMotion *)mCursor)->Play(1, 0);
+    mCursor->SetPosition(data_ov007_021919b4);
+    mCursor->SetPriority(2);
+    mCursor->Show();
+    mUnk110->AddTail(mCursor);
+    func_ov007_02185d28(this, 0);
+    GetInput()->SetRepeat(0xF0, 0x1E, 10);
+    mSerial.AddTail(new MTimer(data_02089a18));
+    SenryuKeyCheckTask *keys = new SenryuKeyCheckTask(this);
+    keys->Suspend();
+    mParallel.AddTail(keys);
+    mSerial.AddTail(MTaskRunTransfer::Create(keys));
+    mUnk11C = keys;
+}
+
 void DinoUiSenryuMenu::CheckKeys() {
     MSerialTaskSet *serial = &mSerial;
     if (serial->IsEmpty()) {
