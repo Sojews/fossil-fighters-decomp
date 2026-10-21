@@ -631,7 +631,6 @@ void DinoHelp::OnStart() {
 }
 
 // Select closes help: the panels slide off their screens, then the menu exits.
-// NONMATCHING: the panel's and the label's point temporaries swap stack slots.
 void DinoHelp::OnIdle() {
     if (!(GetInput()->GetPressed() & (PAD_BUTTON_SELECT | 0x2000))) {
         return;
@@ -641,15 +640,13 @@ void DinoHelp::OnIdle() {
     mUnkAC->Clear();
     for (u32 i = 0; i < 2; i++) {
         mStatus[i]->SetText(0, NULL);
-        MTask *panelMove = mPanels[i]->CreateCoordAnime(
-            mPanels[i]->GetPosition(),
-            mPanels[i]->GetPosition() + (mPanels[i]->GetFrame().GetCenter().x <= 128 ? MPoint(-256, 0) : MPoint(256, 0)),
-            30, 2);
-        MTask *labelMove =
-            mLabels[i]->CreateCoordAnime(mLabels[i]->GetPosition(), mLabels[i]->GetPosition().Offset(-256, 0), 30, 2);
-        MParallelTaskSet *tasks = mTasks;
-        tasks->AddTail(labelMove);
-        tasks->AddTail(panelMove);
+        mTasks->AddTail(
+            mLabels[i]->CreateCoordAnime(mLabels[i]->GetPosition(), mLabels[i]->GetPosition().Offset(-256, 0), 30, 2),
+            mPanels[i]->CreateCoordAnime(mPanels[i]->GetPosition(),
+                                         mPanels[i]->GetPosition() + (mPanels[i]->GetFrame().GetCenter().x <= 128
+                                                                          ? MPoint(-256, 0)
+                                                                          : MPoint(256, 0)),
+                                         30, 2));
         u32 id = mUnkD0[i];
         if (id == mUnkE0) {
             mTasks->AddTail(mMarks[i]->CreatePlayTransfer(4, 0));
