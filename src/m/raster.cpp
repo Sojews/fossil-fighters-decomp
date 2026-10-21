@@ -219,6 +219,8 @@ struct SubtractSpanOp {
     MRasterWindow *mWindow;
 };
 
+// (The span adder is big; the game inlines it anyway.)
+#pragma inline_max_size(2000)
 void MRasterWindow::AddRect(MRect rect) {
     ForEachLine(rect, AddSpanOp(this));
 }
@@ -266,4 +268,65 @@ void MRasterWindow::SubtractSpan(int left, int right, int line) {
 
 void MRasterWindow::SubtractRect(MRect rect) {
     ForEachLine(rect, SubtractSpanOp(this));
+}
+
+// The screen's width, which spans are clipped to.
+static const int sRasterWidth = 256;
+
+// Calls op for the lines of a disc, four at a time (midpoint circle), with each line's clipped left and right edges.
+template <class Op> inline void MRasterWindow::ForEachCircleLine(MPoint center, int radius, Op op) {
+    if (mAutoFlip && !mChanged) {
+        Clear();
+    }
+    if (radius == 0) {
+        return;
+    }
+    MRect rect(center.x - radius, center.y - radius, center.x + radius, center.y + radius);
+    int bottom = center.y + radius;
+    if (!MRect(0, 0, 256, M_RASTER_LINES).Intersects(rect)) {
+        return;
+    }
+    int err = radius;
+    int y = radius;
+    int below = center.y;
+    for (int x = 0; y >= x; x++) {
+        int left = std::min(sRasterWidth, std::max(0, center.x - y));
+        int right = std::min(sRasterWidth, std::max(0, center.x + y));
+        int line = center.y - x;
+        if (line >= 0 && line < M_RASTER_LINES) {
+            op(left, right, line);
+        }
+        line = below - 1;
+        if (line >= 0 && line < M_RASTER_LINES) {
+            op(left, right, line);
+        }
+        left = std::min(sRasterWidth, std::max(0, center.x - x));
+        right = std::min(sRasterWidth, std::max(0, center.x + x));
+        line = center.y - y;
+        if (line >= 0 && line < M_RASTER_LINES) {
+            op(left, right, line);
+        }
+        line = bottom - 1;
+        if (line >= 0 && line < M_RASTER_LINES) {
+            op(left, right, line);
+        }
+        err -= 2 * x - 1;
+        if (err < 0) {
+            err += (y - 1) * 2;
+            y--;
+            bottom--;
+        }
+        below++;
+    }
+}
+
+// NONMATCHING: stack slots, and the inlined span adds differ (as in AddRect).
+void MRasterWindow::SetCircle(MPoint center, int radius) {
+    ForEachCircleLine(center, radius, AddSpanOp(this));
+}
+
+// NONMATCHING: the game swaps the stack slots of the rect and its copy for Intersects, and keeps the window in a
+// register from later.
+void MRasterWindow::SubtractCircle(MPoint center, int radius) {
+    ForEachCircleLine(center, radius, SubtractSpanOp(this));
 }

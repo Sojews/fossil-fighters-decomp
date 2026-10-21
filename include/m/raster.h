@@ -99,10 +99,13 @@ public:
     void Clear();
     void AddRect(MRect rect);
     void SubtractRect(MRect rect);
-    // Clears the window to a disc.
+    // Adds a disc to the window.
     void SetCircle(MPoint center, int radius);
     void SubtractSpan(int left, int right, int line);
+    // Takes a disc out of the window.
+    void SubtractCircle(MPoint center, int radius);
     template <class Op> inline void ForEachLine(MRect rect, Op op);
+    template <class Op> inline void ForEachCircleLine(MPoint center, int radius, Op op);
 
     MWin *mWin;             // 0x3C
     MRasterSpan *mSpans;    // 0x40: two per line
