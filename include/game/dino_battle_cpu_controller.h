@@ -54,6 +54,9 @@ public:
     BOOL HasCostlyAttackUnk10(DinoBattleModelPlayer *player, DinoBattleModelCreature *creature, u8 value);
     BOOL HasAttackUnk14(DinoBattleModelCreature *creature, u8 value);
     BOOL HasCostlyAttackUnk14(DinoBattleModelPlayer *player, DinoBattleModelCreature *creature, u8 value);
+    // The score of the file's conditions on the creature alone (its attacks, its position, the player's data).
+    MFx32 ScoreCreatureConditions(DinoBattleModelPlayer *player, DinoBattleModelCreature *creature,
+                                  DinoBattleFile file);
     // The score of the file's conditions that hold for the creature (against the target).
     MFx32 ScoreConditions(DinoBattleModelPlayer *player, DinoBattleModelCreature *creature,
                           DinoBattleModelCreature *target, DinoBattleFile file);

@@ -237,6 +237,176 @@ struct DinoBattleCpuConditions {
     u32 entries;    // offset of the conditions
 };
 
+// NONMATCHING: in case 1 the operator+ parameter copies swap stack slots, as in ScoreConditions (casting either
+// operand fixes the order but costs a stack slot).
+MFx32 DinoBattleCpuController::ScoreCreatureConditions(DinoBattleModelPlayer *player, DinoBattleModelCreature *creature,
+                                                       DinoBattleFile file) {
+    if (!file.mArchive.IsValid()) {
+        return MFx32(0);
+    }
+    MFx32 total = MFx32(0);
+    for (u32 i = 0; i < ((DinoBattleCpuConditions *)file.mFile.GetData())->count; i++) {
+        DinoBattleCpuConditions *data = (DinoBattleCpuConditions *)file.mFile.GetData();
+        const DinoBattleCpuCondition *conditions = (const DinoBattleCpuCondition *)((u8 *)data + data->entries);
+        MFx32 score = MFx32(conditions[i].score);
+        switch (conditions[i].kind) {
+        default:
+            OS_Terminate();
+            break;
+        case 0:
+            total = total + score;
+            break;
+        case 1:
+            total = total + score * player->GetRandom()->NextFraction();
+            break;
+        case 0x46:
+            if (HasCostlyAttackUnk10(player, creature, 2)) {
+                total = total + score;
+            }
+            break;
+        case 0x47:
+            if (HasCostlyAttackUnk10(player, creature, 3)) {
+                total = total + score;
+            }
+            break;
+        case 0x48:
+            if (HasCostlyAttackUnk10(player, creature, 4)) {
+                total = total + score;
+            }
+            break;
+        case 0x49:
+            if (HasCostlyAttackUnk10(player, creature, 5)) {
+                total = total + score;
+            }
+            break;
+        case 0x4A:
+            if (HasCostlyAttackUnk10(player, creature, 6)) {
+                total = total + score;
+            }
+            break;
+        case 0x4B:
+            if (HasCostlyAttackUnk10(player, creature, 7)) {
+                total = total + score;
+            }
+            break;
+        case 0x4C:
+            if (HasCostlyAttackUnk10(player, creature, 8)) {
+                total = total + score;
+            }
+            break;
+        case 0x4D:
+            if (HasCostlyAttackUnk10(player, creature, 9)) {
+                total = total + score;
+            }
+            break;
+        case 0x4E:
+            if (HasCostlyAttackUnk10(player, creature, 10)) {
+                total = total + score;
+            }
+            break;
+        case 0x4F:
+            if (HasCostlyAttackUnk10(player, creature, 11)) {
+                total = total + score;
+            }
+            break;
+        case 0x50:
+            if (HasCostlyAttackUnk14(player, creature, 2)) {
+                total = total + score;
+            }
+            break;
+        case 0x51:
+            if (HasCostlyAttackUnk14(player, creature, 3)) {
+                total = total + score;
+            }
+            break;
+        case 0x52:
+            if (HasCostlyAttackUnk14(player, creature, 4)) {
+                total = total + score;
+            }
+            break;
+        case 0x53:
+            if (HasCostlyAttackUnk14(player, creature, 5)) {
+                total = total + score;
+            }
+            break;
+        case 0x54:
+            if (HasCostlyAttackUnk14(player, creature, 6)) {
+                total = total + score;
+            }
+            break;
+        case 0x55:
+            if (HasCostlyAttackUnk14(player, creature, 7)) {
+                total = total + score;
+            }
+            break;
+        case 0x56:
+            if (HasCostlyAttackUnk14(player, creature, 8)) {
+                total = total + score;
+            }
+            break;
+        case 0x57:
+            if (HasCostlyAttackUnk14(player, creature, 9)) {
+                total = total + score;
+            }
+            break;
+        case 0x58:
+            if (HasCostlyAttackUnk14(player, creature, 10)) {
+                total = total + score;
+            }
+            break;
+        case 0x59:
+            if (HasCostlyAttackUnk14(player, creature, 11)) {
+                total = total + score;
+            }
+            break;
+        case 0x5A:
+            if (HasCostlyAttackUnk14(player, creature, 12)) {
+                total = total + score;
+            }
+            break;
+        case 0x5B:
+            if (HasCostlyAttackUnk14(player, creature, 13)) {
+                total = total + score;
+            }
+            break;
+        case 0x5C:
+            if (HasCostlyAttackUnk14(player, creature, 14)) {
+                total = total + score;
+            }
+            break;
+        case 0x5D:
+            if (HasCostlyAttackUnk14(player, creature, 16)) {
+                total = total + score;
+            }
+            break;
+        case 0x5E:
+            if (HasCostlyAttackUnk14(player, creature, 15)) {
+                total = total + score;
+            }
+            break;
+        case 0x12:
+            if (creature->GetUnkB8() == 0) {
+                total = total + score;
+            }
+            break;
+        case 0x13:
+            if (creature->GetUnkB8() == 1 || creature->GetUnkB8() == 2) {
+                total = total + score;
+            }
+            break;
+        case 0x61: {
+            DinoPlayerData data;
+            gDinoBackup->GetPlayer(&data, FALSE);
+            if (data.unk1c_7 >= 1 && data.unk1c_7 <= 3) {
+                total = total + score;
+            }
+            break;
+        }
+        }
+    }
+    return total;
+}
+
 // NONMATCHING: in case 1 the operator+ parameter copies swap stack slots, as in CalcUnkEC.
 MFx32 DinoBattleCpuController::ScoreConditions(DinoBattleModelPlayer *player, DinoBattleModelCreature *creature,
                                                DinoBattleModelCreature *target, DinoBattleFile file) {
