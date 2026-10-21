@@ -784,18 +784,18 @@ extern "C" u8 data_020c01f0[];
 
 static struct DinoMainStaticInit {
     DinoMainStaticInit() {
-        DINO_POOL_NV(MPoint, data_020bff70, 0x24) = MPoint(128, 176);
-        DINO_POOL_NV(MPoint, data_020bfff0, 0x44) = MPoint(16, 0);
-        DINO_POOL_NV(MRect, data_020c01f0, 0x48) = DinoSizeRect(DINO_POOL_NV(MPoint, data_020bff70, 0x34));
-        DINO_POOL_NV(MPoint, data_020bfff0, 0x4c) = MPoint(240, 176);
-        DINO_POOL_NV(MPoint, data_020c00f0, 0x5c) = MPoint(8, 150);
-        DINO_POOL_NV(MPoint, data_020bfff0, 0x1c) = MPoint(256, 192);
-        DINO_POOL_NV(MRect, data_020c01f0, 0x38) = DinoSizeRect(DINO_POOL_NV(MPoint, data_020bfff0, 0x1c));
-        DINO_POOL_NV(MRect, data_020c01f0, 0x68) = MRect(0, 0, 256, 24);
-        DINO_POOL_NV(MPoint, data_020bff70, 0x34) = MPoint(36, 28);
-        DINO_POOL_NV(MPoint, data_020c0070, 0x4c) = MPoint(64, 112);
-        DINO_POOL_NV(MPoint, data_020c01f0, 0x58) = MPoint(0, 24);
-        DINO_POOL_NV(MPoint, data_020c01f0, 0x60) = MPoint(256, 192);
-        DINO_POOL_NV(MPoint, data_020bfff0, 0x14) = MPoint(2, 2);
+        DINO_POOL(MPoint, data_020bff70, 0x24) = MPoint(128, 176);
+        DINO_POOL(MPoint, data_020c00f0, 0x5c) = MPoint(8, 150);
+        DINO_POOL(MPoint, data_020c0070, 0x4c) = MPoint(64, 112);
+        DINO_POOL(MPoint, data_020bfff0, 0x4c) = MPoint(240, 176);
+        DINO_POOL(MPoint, data_020bfff0, 0x44) = MPoint(16, 0);
+        DINO_POOL(MPoint, data_020bfff0, 0x1c) = MPoint(256, 192);
+        DINO_POOL(MRect, data_020c01f0, 0x38) = DinoSizeRect(DINO_POOL(MPoint, data_020bfff0, 0x1c));
+        DINO_POOL(MPoint, data_020bfff0, 0x14) = MPoint(2, 2);
+        DINO_POOL(MPoint, data_020bff70, 0x34) = MPoint(36, 28);
+        DINO_POOL(MRect, data_020c01f0, 0x48) = DinoSizeRect(DINO_POOL(MPoint, data_020bff70, 0x34));
+        DINO_POOL(MPoint, data_020c01f0, 0x58) = MPoint(0, 24);
+        DINO_POOL(MPoint, data_020c01f0, 0x60) = MPoint(256, 192);
+        DINO_POOL(MRect, data_020c01f0, 0x68) = MRect(0, 0, 256, 24);
     }
 } sDinoMainStaticInit;
