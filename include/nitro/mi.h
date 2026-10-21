@@ -11,6 +11,13 @@ extern "C" {
 void MI_CpuCopy8(const void *src, void *dest, u32 size);
 void MI_Copy64B(const void *pSrc, void *pDest);
 void MIi_CpuCopy16(const void *src, void *dest, u32 size);
+void MI_UncompressRL8(const void *srcp, void *destp);
+void MI_UncompressRL16(const void *srcp, void *destp);
+void MI_UncompressLZ8(const void *srcp, void *destp);
+void MI_UncompressLZ16(const void *srcp, void *destp);
+void MI_UncompressHuffman(const void *srcp, void *destp);
+void MI_UnfilterDiff8(const void *srcp, void *destp);
+void MI_UnfilterDiff16(const void *srcp, void *destp);
 void MIi_CpuCopy32(const void *src, void *dest, u32 size);
 void MIi_CpuCopyFast(const void *src, void *dest, u32 size);
 void MIi_CpuClear16(u16 data, void *dest, u32 size);
