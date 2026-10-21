@@ -184,6 +184,7 @@ public:
     BOOL Unk02162154();
     // The idle step of each task kind (DinoCharaTask::unk4).
     void IdleNoTask();
+    void IdleFollow();
     void MoveTo(MFx32Point coord, u32 frames, u32 ease, u8 silent);
     MTask *CreateWaitMoveTask();
     MTask *CreateWaitStopTask();

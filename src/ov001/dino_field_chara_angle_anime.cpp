@@ -584,6 +584,16 @@ void DinoFieldChara::FinishBehold() {
     mBeholdTarget = 0;
 }
 
+// The following settings in the excavation settings' block at offset78.
+struct DinoFollowDefs {
+    u8 unk00[0x2C];
+    MFx32 trot;     // 0x2C: (times the walk speed) the speed from which it trots
+    MFx32 run;      // 0x30: and runs
+    MFx32 start;    // 0x34: how far the target must be to start following
+    MFx32 keep;     // 0x38: and to keep following
+    MFx32 factor;   // 0x3C: the speed per distance
+};
+
 // Watching (mTask.unk28): turns to the camera's focus when it comes within range (w[0] around its height),
 // follows it at w[2] per second until it strays w[1] from home, waits w[4] frames, then walks home at w[3].
 // NONMATCHING: the frame is 8 bytes smaller (the game doesn't keep the factors of (height + range)^2 on the stack).
@@ -654,6 +664,40 @@ void DinoFieldChara::IdleNoTask() {
     if (!mField->IsUnk258()) {
         Unk02162154();
     }
+}
+
+// Following (mTask.unk8.fellow): walks after its target, faster the further it is (and only once it's far enough,
+// or a little nearer while already walking).
+// NONMATCHING: the game keeps more dead copies of the MFx32 temporaries and squares y first in Length.
+void DinoFieldChara::IdleFollow() {
+    if (mField->IsUnk258()) {
+        return;
+    }
+    DinoFieldChara *chara = mField->GetChara(mTask.unk8.fellow.target);
+    if (chara == NULL) {
+        return;
+    }
+    MFx32Point d = chara->GetModel()->pos - mModel.pos;
+    MFx32 len = d.Length();
+    MFx32 walk = mField->GetMap()->GetWalkSpeed();
+    const DinoFollowDefs *defs = (const DinoFollowDefs *)gDinoResource->GetExcavate78();
+    MFx32 speed;
+    u32 mode;
+    if (len >= defs->start || (len >= defs->keep && !((const MFx32Point &)mUnk2D8 == MFx32Point(MFx32(0), MFx32(0))))) {
+        speed = len * defs->factor * walk;
+        if (speed >= defs->run * walk) {
+            mode = 3;
+        } else if (speed >= defs->trot * walk) {
+            mode = 2;
+        } else {
+            mode = 1;
+        }
+    } else {
+        speed = 0;
+        mode = 1;
+    }
+    MFx32Point v = d / d.Length() * speed;
+    SetUnk2D8(MPoint(v.x.v, v.y.v), mode, walk.v);
 }
 
 void DinoFieldChara::SetFootSe(u32 se) {
