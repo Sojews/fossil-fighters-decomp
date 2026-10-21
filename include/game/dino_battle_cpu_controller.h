@@ -30,7 +30,7 @@ struct DinoBattleFileGroup {
     MResource<DinoOv000DataB> mDataB;       // 0x240
 };
 
-// A 16-byte entry of a list the computer player keeps (only its size is known; not mUnk930, whose deleter the
+// A 16-byte entry of a list the computer player keeps (only its size is known; not mTargets, whose deleter the
 // destructor shares with main's vector<void *>).
 struct DinoBattleCpuEntry {
     u32 unk[4];
@@ -54,6 +54,8 @@ public:
     BOOL HasCostlyAttackUnk10(DinoBattleModelPlayer *player, DinoBattleModelCreature *creature, u8 value);
     BOOL HasAttackUnk14(DinoBattleModelCreature *creature, u8 value);
     BOOL HasCostlyAttackUnk14(DinoBattleModelPlayer *player, DinoBattleModelCreature *creature, u8 value);
+    // Lists the creatures the creature's attack would target (none if it can't use it).
+    void CollectTargets(DinoBattleModelPlayer *player, DinoBattleModelCreature *creature, u32 attack);
     // The score of the file's conditions on the creature alone (its attacks, its position, the player's data).
     MFx32 ScoreCreatureConditions(DinoBattleModelPlayer *player, DinoBattleModelCreature *creature,
                                   DinoBattleFile file);
@@ -67,7 +69,7 @@ public:
     u32 mUnk7C8[12];                    // 0x7C8
     DinoBattleSide mSides[2];           // 0x7F8
     u32 mUnk910[8];                     // 0x910
-    std::vector<void *> mUnk930;        // 0x930
+    std::vector<DinoBattleModelCreature *> mTargets;    // 0x930: see CollectTargets
 };
 
 #endif
