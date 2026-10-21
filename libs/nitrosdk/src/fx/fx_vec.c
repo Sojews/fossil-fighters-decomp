@@ -31,7 +31,9 @@ void VEC_Normalize(const VecFx32 *pSrc, VecFx32 *pDst) {
     fx64 t;
     s32 sqrt;
 
-    t = (fx64) pSrc->x * pSrc->x + (fx64) pSrc->y * pSrc->y + (fx64) pSrc->z * pSrc->z;
+    t = (fx64) pSrc->x * pSrc->x;
+    t += (fx64) pSrc->y * pSrc->y;
+    t += (fx64) pSrc->z * pSrc->z;
     REG_DIVCNT = 2;
     REG_DIV_NUMER = (fx64) 1 << 56;
     REG_DIV_DENOM = t;
