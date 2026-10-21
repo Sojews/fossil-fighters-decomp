@@ -2307,7 +2307,7 @@ void DinoEventExecBattle::Idle() {
 // The TU's pooled pointer-to-member constants (see menu.cpp).
 extern "C" struct {
     u8 unk00[0x8];
-    void (DinoEventExecAutoWarp::*AutoWarpStart_08)();
+    void (DinoEventExecAutoWarp::*StateStart_08)();
     u8 unk10[0x20 - 0x10];
     void (DinoEventExecBattle::*Battle02041644_20)();
     u8 unk28[0x38 - 0x28];
@@ -2320,7 +2320,8 @@ extern "C" struct {
 extern "C" struct {
     void (DinoEventExecCleaning::*CleaningStart_00)(); // 0x00
     void (DinoEventExecBattle::*StateCloseField_08)(); // 0x08
-    u8 unk10[0x28 - 0x10];
+    u8 unk10[0x20 - 0x10];
+    void (DinoEventExecAutoWarp::*StateWarp_20)(); // 0x20
     void (DinoEventExecCleaning::*StateCloseField_28)(); // 0x28
     u8 unk30[0x40 - 0x30];
     void (DinoEventExecCleaning::*Unk02159b38_40)(); // 0x40
@@ -2480,7 +2481,60 @@ void DinoEventExecBattle::StateOpenField() {
 
 DinoEventExecAutoWarp::DinoEventExecAutoWarp(DinoEventLoop *event, u32 unk80, u32 unk84, u32 unk88)
     : MProcess(NULL), mEvent(event), mUnk80(unk80), mUnk84(unk84), mUnk88(unk88) {
-    mState = data_020be144.AutoWarpStart_08;
+    mState = data_020be144.StateStart_08;
+}
+
+void DinoEventExecAutoWarp::StateStart() {
+    mBgm = mEvent->GetField()->GetBgm();
+    mScene = DinoSoundGetScene();
+    mNewBgm = gDinoResource->GetMapBgmMatch(gDinoResource->GetRegionMapMatch(mUnk88));
+    mNewScene = gDinoResource->GetMapSceneMatch(gDinoResource->GetRegionMapMatch(mUnk88));
+    if (mEvent->GetField()->IsBgmChanging()) {
+        mBgm = mNewBgm = 0;
+    }
+    if (mBgm != 0 && (mScene != mNewScene || mBgm != mNewBgm)) {
+        mEvent->GetField()->StopBgm(30);
+    }
+    MParallelTaskSet *tasks = new MParallelTaskSet(TRUE);
+    switch (mUnk84) {
+    case 0:
+        tasks->AddTail(new DinoEventExecFade(mEvent, 1, 30, 1));
+        break;
+    case 1:
+        tasks->AddTail(new DinoEventExecFade(mEvent, 5, 30, 1));
+        break;
+    }
+    if (mUnk80 != (u32)-1) {
+        u16 angle = mUnk80 + 0x8000;
+        MFx32Point offset = MFx32Point(MFx32::FromRaw(FX_CosIdx(angle)), MFx32::FromRaw(FX_SinIdx(angle))) * MFx32(1);
+        tasks->AddTail(mEvent->GetField()->CreateCharaMoveOffsetTask(mEvent->GetField()->GetCamera()->GetFocus(),
+                                                                     offset, 30, 0, 0));
+    }
+    mSerial.AddTail(tasks);
+    int i;
+    for (i = 0; i < mEvent->GetField()->GetCharaSlotCount(); i++) {
+        if (mEvent->GetField()->GetCharaSlot(i)->IsUnk24Reacting()) {
+            MTask *se = DinoSoundCreatePlaySeTask(0x13C, 0);
+            MTimer *wait = new MTimer(1);
+            MSerialTaskSet *serial = new MSerialTaskSet(TRUE);
+            serial->AddTail(wait);
+            serial->AddTail(se);
+            mParallel.AddTail(serial);
+            break;
+        }
+    }
+    for (i = 0; i < mEvent->GetField()->GetCharaSlotCount(); i++) {
+        if (mEvent->GetField()->GetCharaSlot(i)->IsFocusNear()) {
+            MTask *se = DinoSoundCreatePlaySeTask(0xBF, 0);
+            MTimer *wait = new MTimer(0x23);
+            MSerialTaskSet *serial = new MSerialTaskSet(TRUE);
+            serial->AddTail(wait);
+            serial->AddTail(se);
+            mParallel.AddTail(serial);
+            break;
+        }
+    }
+    mState = data_020be1c4.StateWarp_20;
 }
 
 void DinoEventExecAutoWarp::StateWarp() {

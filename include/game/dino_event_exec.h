@@ -326,14 +326,20 @@ public:
     virtual ~DinoEventExecAutoWarp();
     virtual void Idle();
 
+    // Fades the bgm out if the region's differs, fades out (mUnk84) while the focus steps back (unless mUnk80 is -1),
+    // then plays a sound for the first chara reacting and the first one near the focus.
+    void StateStart();
     void StateWarp();
 
     void (DinoEventExecAutoWarp::*mState)(); // 0x74
     DinoEventLoop *mEvent;  // 0x7C
-    u32 mUnk80;             // 0x80
+    u32 mUnk80;             // 0x80: the direction the focus steps in
     u32 mUnk84;             // 0x84
-    u32 mUnk88;             // 0x88
-    u8 unk8C[0x9C - 0x8C];
+    u32 mUnk88;             // 0x88: the region
+    u32 mBgm;               // 0x8C
+    u32 mNewBgm;            // 0x90
+    u32 mScene;             // 0x94
+    u32 mNewScene;          // 0x98
 };
 
 class DinoEventExecCamera : public MTransfer {

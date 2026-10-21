@@ -474,6 +474,8 @@ public:
     MSmartOam *GetOam();
     void SetUnk238(u32 value);
     u32 GetBgm();
+    u32 GetCharaSlotCount() { return 100; }
+    DinoFieldChara *GetCharaSlot(u32 i) { return mCharas[i]; }
     void FadeInPict(MDisplay *display, u32 *id, MExtAffinePicture **pict, u32 newId, MPoint pos, u32 frames, long unk);
     // Loads the picture in the background and cross-fades it in over the old one (FadeInPict's task).
     void LoadFadeInPict(MDisplay *display, MView *old, MExtAffinePicture **pict, u32 id, MPoint pos, u32 frames, long unk);
