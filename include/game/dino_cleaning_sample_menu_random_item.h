@@ -4,8 +4,13 @@
 #include "m/view.h"
 #include "m/menu_item.h"
 
+class MSmartOam;
+class MFont;
+class MMenu;
+
 class DinoCleaningSampleMenuRandomItem : public MMenuItem {
 public:
+    DinoCleaningSampleMenuRandomItem(MSmartOam *oam, MFont *font, u32 *kaseki, u32 *unk90, u32 *unk94, MPoint pos);
     virtual ~DinoCleaningSampleMenuRandomItem();
     virtual MRect GetFrame();
     virtual void OnDecide();

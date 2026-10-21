@@ -6,8 +6,13 @@
 
 class MIndicator;
 
+class MSmartOam;
+class MFont;
+class MMenu;
+
 class DinoCleaningSampleChipsTypeItem : public MMenuItem {
 public:
+    DinoCleaningSampleChipsTypeItem(MMenu *menu, MSmartOam *oam, MFont *font, u32 *type, MPoint pos);
     virtual ~DinoCleaningSampleChipsTypeItem();
     virtual void Idle();
     virtual MRect GetFrame();

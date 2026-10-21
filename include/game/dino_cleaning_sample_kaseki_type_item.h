@@ -6,8 +6,13 @@
 
 class MIndicator;
 
+class MSmartOam;
+class MFont;
+class MMenu;
+
 class DinoCleaningSampleKasekiTypeItem : public MMenuItem {
 public:
+    DinoCleaningSampleKasekiTypeItem(MMenu *menu, MSmartOam *oam, MFont *font, u32 *type, MPoint pos);
     virtual ~DinoCleaningSampleKasekiTypeItem();
     virtual void Idle();
     virtual MRect GetFrame();

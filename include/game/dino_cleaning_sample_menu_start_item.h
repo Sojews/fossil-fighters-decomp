@@ -4,8 +4,13 @@
 #include "m/view.h"
 #include "m/menu_item.h"
 
+class MSmartOam;
+class MFont;
+class MMenu;
+
 class DinoCleaningSampleMenuStartItem : public MMenuItem {
 public:
+    DinoCleaningSampleMenuStartItem(MSmartOam *oam, MFont *font, MPoint pos);
     virtual ~DinoCleaningSampleMenuStartItem();
     virtual MRect GetFrame();
     virtual void OnDecide();

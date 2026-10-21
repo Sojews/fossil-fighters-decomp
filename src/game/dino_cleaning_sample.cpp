@@ -26,6 +26,11 @@
 #include "game/dino_weighted_random.h"
 #include "m/seed_generator.h"
 #include "m/menu.h"
+#include "m/input.h"
+#include "m/smart_oam.h"
+#include "m/oam_canvas.h"
+#include "game/dino_common_cursor.h"
+#include "game/dino_common_label.h"
 
 DinoCleaningSample::~DinoCleaningSample() {
 }
@@ -263,7 +268,8 @@ M_EXTERN_OVERLAY(ov002);
 
 // The TU's pooled pointer-to-member constants (see menu.cpp).
 extern "C" struct {
-    u8 unk00[0x8];
+    u8 unk00[0x4];
+    const char *mKasekiDefsPath_04;     // 0x04
     void (DinoCleaningSample::*Unk_08)();
     u8 unk10[0x28 - 0x10];
     void (DinoCleaningSample::*Start_28)();
@@ -271,6 +277,135 @@ extern "C" struct {
     void (DinoCleaningSample::*StateCleaning_40)();
 } data_020bcc24;
 extern "C" u8 data_0214d158[];
+
+// The menu's labels' text ids.
+extern "C" const u32 data_0208a400;    // "<"
+extern "C" const u32 data_0208a404;    // ">"
+extern "C" const u32 data_0208a3f8;    // random
+extern "C" const u32 data_0208a3fc;    // start
+
+inline DinoCleaningSampleMenuDecItem::DinoCleaningSampleMenuDecItem(int *value, int min, int max, MSmartOam *oam,
+                                                                    MFont *font, MPoint pos) {
+    mValue = value;
+    mMin = min;
+    mMax = max;
+    SetNoFocus(TRUE);
+    mView = new DinoCommonLabel(oam, font, gDinoResource->GetUnkTable(), data_0208a400, MPoint(0, 0));
+    MPoint half = mView->GetSize() / 2;
+    mView->SetPosition(MPoint(pos.x - half.x, pos.y - half.y));
+    mView->Show();
+    mParallel.AddTail(mView);
+}
+
+inline DinoCleaningSampleMenuIncItem::DinoCleaningSampleMenuIncItem(int *value, int min, int max, MSmartOam *oam,
+                                                                    MFont *font, MPoint pos) {
+    mValue = value;
+    mMin = min;
+    mMax = max;
+    SetNoFocus(TRUE);
+    mView = new DinoCommonLabel(oam, font, gDinoResource->GetUnkTable(), data_0208a404, MPoint(0, 0));
+    MPoint half = mView->GetSize() / 2;
+    mView->SetPosition(MPoint(pos.x - half.x, pos.y - half.y));
+    mView->Show();
+    mParallel.AddTail(mView);
+}
+
+inline DinoCleaningSampleMenuKasekiRockIdItem::DinoCleaningSampleMenuKasekiRockIdItem(MMenu *menu, MSmartOam *oam,
+                                                                                      MFont *font, u32 *value,
+                                                                                      MPoint pos)
+    : mValue(value), mDefs(std::string(data_020bcc24.mKasekiDefsPath_04)) {
+    mView = new MIndicator(new MSmartObjCanvas(oam, MPoint(0x50, 0x10), gDinoResource->GetUnkTable(), TRUE), font, 0);
+    MPoint half = mView->GetSize() / 2;
+    mView->SetPosition(MPoint(pos.x - half.x, pos.y - half.y));
+    mView->Show();
+    mParallel.AddTail(mView);
+    mBuffer = new u32[mDefs.Get()->count];
+    mCount = 0;
+    mIndex = 0;
+    for (u32 i = 0; i < mDefs.Get()->count; i++) {
+        if (*(const u8 *)mDefs.Get()->GetDef(i) != 0) {
+            if (*mValue == i) {
+                mIndex = mCount;
+            }
+            mBuffer[mCount++] = i;
+        }
+    }
+    mKeyItemA = new DinoCleaningSampleMenuDecItem((int *)&mIndex, 0, mCount - 1, oam, font, MPoint(pos.x - 0x40, pos.y));
+    menu->AddItem(mKeyItemA);
+    mKeyItemB = new DinoCleaningSampleMenuIncItem((int *)&mIndex, 0, mCount - 1, oam, font, MPoint(pos.x + 0x40, pos.y));
+    menu->AddItem(mKeyItemB);
+}
+
+inline DinoCleaningSampleKasekiTypeItem::DinoCleaningSampleKasekiTypeItem(MMenu *menu, MSmartOam *oam, MFont *font,
+                                                                          u32 *type, MPoint pos) {
+    mType = type;
+    mView = new MIndicator(new MSmartObjCanvas(oam, MPoint(0x50, 0x10), gDinoResource->GetUnkTable(), TRUE), font, 0);
+    MPoint half = mView->GetSize() / 2;
+    mView->SetPosition(MPoint(pos.x - half.x, pos.y - half.y));
+    mView->Show();
+    mParallel.AddTail(mView);
+    mKeyItemA = new DinoCleaningSampleMenuDecItem((int *)mType, 0, 1, oam, font, MPoint(pos.x - 0x40, pos.y));
+    menu->AddItem(mKeyItemA);
+    mKeyItemB = new DinoCleaningSampleMenuIncItem((int *)mType, 0, 1, oam, font, MPoint(pos.x + 0x40, pos.y));
+    menu->AddItem(mKeyItemB);
+}
+
+inline DinoCleaningSampleChipsTypeItem::DinoCleaningSampleChipsTypeItem(MMenu *menu, MSmartOam *oam, MFont *font,
+                                                                        u32 *type, MPoint pos) {
+    mType = type;
+    mView = new MIndicator(new MSmartObjCanvas(oam, MPoint(0x50, 0x10), gDinoResource->GetUnkTable(), TRUE), font, 0);
+    MPoint half = mView->GetSize() / 2;
+    mView->SetPosition(MPoint(pos.x - half.x, pos.y - half.y));
+    mView->Show();
+    mParallel.AddTail(mView);
+    mKeyItemA = new DinoCleaningSampleMenuDecItem((int *)mType, 0, 6, oam, font, MPoint(pos.x - 0x40, pos.y));
+    menu->AddItem(mKeyItemA);
+    mKeyItemB = new DinoCleaningSampleMenuIncItem((int *)mType, 0, 6, oam, font, MPoint(pos.x + 0x40, pos.y));
+    menu->AddItem(mKeyItemB);
+}
+
+inline DinoCleaningSampleMenuRandomItem::DinoCleaningSampleMenuRandomItem(MSmartOam *oam, MFont *font, u32 *kaseki,
+                                                                          u32 *unk90, u32 *unk94, MPoint pos) {
+    mKaseki = kaseki;
+    mUnk90 = unk90;
+    mUnk94 = unk94;
+    SetKeys(0x100);
+    mView = new DinoCommonLabel(oam, font, gDinoResource->GetUnkTable(), data_0208a3f8, MPoint(0, 0));
+    MPoint half = mView->GetSize() / 2;
+    mView->SetPosition(MPoint(pos.x - half.x, pos.y - half.y));
+    mView->Show();
+    mParallel.AddTail(mView);
+}
+
+inline DinoCleaningSampleMenuStartItem::DinoCleaningSampleMenuStartItem(MSmartOam *oam, MFont *font, MPoint pos) {
+    SetKeys(8);
+    mView = new DinoCommonLabel(oam, font, gDinoResource->GetUnkTable(), data_0208a3fc, MPoint(0, 0));
+    MPoint half = mView->GetSize() / 2;
+    mView->SetPosition(MPoint(pos.x - half.x, pos.y - half.y));
+    mView->Show();
+    mParallel.AddTail(mView);
+}
+
+// The debug cleaning menu: the rock (by id), its type and the chips' type, a random pick, and start.
+// NONMATCHING: the game inlines the items' constructors with their own inline calls (MPoint, the resource, the
+// key items' constructors), which needs `#pragma ipa file` (this file then breaks its destructors). Under ipa only each
+// centering's two MPoint temporaries swap stack slots.
+void DinoCleaningSampleMenu::OnStart() {
+    mOam = new MSmartOam(0x50, 0, 1);
+    GetInput()->SetRepeat(0x1030, 0x14, 2);
+    mFont = gDinoResource->CreateFont16(0, 10, 0);
+    mFont->AddRef();
+    AddItem(new DinoCleaningSampleMenuKasekiRockIdItem(this, mOam, mFont, mRock, MPoint(0x80, 0x40)));
+    AddItem(new DinoCleaningSampleKasekiTypeItem(this, mOam, mFont, mUnkAC, MPoint(0x80, 0x58)));
+    AddItem(new DinoCleaningSampleChipsTypeItem(this, mOam, mFont, mUnkB0, MPoint(0x80, 0x70)));
+    AddItem(new DinoCleaningSampleMenuRandomItem(mOam, mFont, mRock, mUnkAC, mUnkB0, MPoint(0x80, 0x88)));
+    AddItem(new DinoCleaningSampleMenuStartItem(mOam, mFont, MPoint(0x80, 0xa0)));
+    mTasks = new MParallelTaskSet();
+    mCursor = new DinoCommonCursor(mOam);
+    GetParallel()->AddTail(mTasks, mCursor, mOam);
+    FocusNearestItem(MPoint(0, 0));
+}
+
 
 DinoCleaningSample::DinoCleaningSample() : MProcess(NULL) {
     mState = data_020bcc24.Start_28;
