@@ -311,6 +311,236 @@ void DinoEventLoop::UpdateRegions() {
     }
 }
 
+// An event condition: its type, and its arguments (count words at the offset).
+struct DinoEventCondition {
+    const u32 *GetArgs() const { return (const u32 *)((const u8 *)this + argOffset); }
+
+    u16 type;           // 0x00
+    u16 unk02;
+    u32 count;          // 0x04
+    u32 argOffset;      // 0x08
+};
+
+static inline u32 DinoEventArg(const u8 *data, int i) {
+    return ((const u32 *)(data + ((const u32 *)data)[2]))[i];
+}
+
+// A variable packed in a word: its type in the top byte, its index below.
+static inline DinoEventVar DinoEventPackedVar(u32 packed) {
+    DinoEventVar var;
+    var.type = packed >> 24;
+    var.index = packed & 0xffffff;
+    return var;
+}
+
+// Whether an event condition holds: the field's request, an episode cleared, variables against each other or
+// values, characters met, creatures revived, flags and clears, a full container, a creature in the team.
+// NONMATCHING: in the team case the game loads the argument inside the loop (ours hoists it).
+BOOL DinoEventLoop::CheckCondition(const u8 *data) {
+    const DinoEventCondition *condition = (const DinoEventCondition *)data;
+    switch (condition->type) {
+    case 1:
+        return TRUE;
+    case 2:
+        if (mField != NULL && mRequest->type == 1 && mRequest->arg == condition->GetArgs()[0]) {
+            return TRUE;
+        }
+        return FALSE;
+    case 5:
+        if (mField != NULL && mRequest->type == 8 && mRequest->arg == condition->GetArgs()[0]) {
+            return TRUE;
+        }
+        return FALSE;
+    case 6:
+        if (mField != NULL && mRequest->type == 10 && mRequest->arg == condition->GetArgs()[0]) {
+            return TRUE;
+        }
+        return FALSE;
+    case 3:
+        if (mField != NULL && mRequest->type == 2 && mRequest->arg == condition->GetArgs()[0]) {
+            return TRUE;
+        }
+        return FALSE;
+    case 4:
+        return gDinoBackup->GetEpisodeClear(condition->GetArgs()[0]);
+    case 7:
+        if (gDinoBackup->GetVar(DinoEventPackedVar(condition->GetArgs()[0])) ==
+            gDinoBackup->GetVar(DinoEventPackedVar(condition->GetArgs()[1]))) {
+            return TRUE;
+        }
+        return FALSE;
+    case 8:
+        if (gDinoBackup->GetVar(DinoEventPackedVar(condition->GetArgs()[0])) !=
+            gDinoBackup->GetVar(DinoEventPackedVar(condition->GetArgs()[1]))) {
+            return TRUE;
+        }
+        return FALSE;
+    case 9:
+        if (gDinoBackup->GetVar(DinoEventPackedVar(condition->GetArgs()[0])) <
+            gDinoBackup->GetVar(DinoEventPackedVar(condition->GetArgs()[1]))) {
+            return TRUE;
+        }
+        return FALSE;
+    case 10:
+        if (gDinoBackup->GetVar(DinoEventPackedVar(condition->GetArgs()[0])) <=
+            gDinoBackup->GetVar(DinoEventPackedVar(condition->GetArgs()[1]))) {
+            return TRUE;
+        }
+        return FALSE;
+    case 11:
+        if (gDinoBackup->GetVar(DinoEventPackedVar(condition->GetArgs()[0])) >
+            gDinoBackup->GetVar(DinoEventPackedVar(condition->GetArgs()[1]))) {
+            return TRUE;
+        }
+        return FALSE;
+    case 12:
+        if (gDinoBackup->GetVar(DinoEventPackedVar(condition->GetArgs()[0])) >=
+            gDinoBackup->GetVar(DinoEventPackedVar(condition->GetArgs()[1]))) {
+            return TRUE;
+        }
+        return FALSE;
+    case 13:
+        {
+        s32 value = condition->GetArgs()[1];
+        s32 var = gDinoBackup->GetVar(DinoEventPackedVar(condition->GetArgs()[0]));
+        if (var == value) {
+            return TRUE;
+        }
+        return FALSE;
+    }
+    case 14:
+        {
+        s32 value = condition->GetArgs()[1];
+        s32 var = gDinoBackup->GetVar(DinoEventPackedVar(condition->GetArgs()[0]));
+        if (var != value) {
+            return TRUE;
+        }
+        return FALSE;
+    }
+    case 15:
+        {
+        s32 value = condition->GetArgs()[1];
+        if (gDinoBackup->GetVar(DinoEventPackedVar(condition->GetArgs()[0])) < value) {
+            return TRUE;
+        }
+        return FALSE;
+    }
+    case 16:
+        {
+        s32 value = condition->GetArgs()[1];
+        if (gDinoBackup->GetVar(DinoEventPackedVar(condition->GetArgs()[0])) <= value) {
+            return TRUE;
+        }
+        return FALSE;
+    }
+    case 17:
+        {
+        s32 value = condition->GetArgs()[1];
+        if (gDinoBackup->GetVar(DinoEventPackedVar(condition->GetArgs()[0])) > value) {
+            return TRUE;
+        }
+        return FALSE;
+    }
+    case 18:
+        {
+        s32 value = condition->GetArgs()[1];
+        if (gDinoBackup->GetVar(DinoEventPackedVar(condition->GetArgs()[0])) >= value) {
+            return TRUE;
+        }
+        return FALSE;
+    }
+    case 23: {
+        DinoCharaState chara;
+        for (u32 i = 0; i < condition->count; i++) {
+            gDinoBackup->GetChara(DinoEventArg(data, i), &chara);
+            if (!*(const u8 *)&chara) {
+                return FALSE;
+            }
+        }
+        return TRUE;
+    }
+    case 42: {
+        DinoCreatureState creature;
+        for (u32 i = 0; i < condition->count; i++) {
+            gDinoBackup->GetCreature(DinoEventArg(data, i), &creature);
+            if (creature.parts[0].level == 0) {
+                return FALSE;
+            }
+        }
+        return TRUE;
+    }
+    case 36:
+        for (u32 i = 0; i < condition->count; i++) {
+            if (!gDinoBackup->GetVarClear(DinoEventPackedVar(DinoEventArg(data, i)))) {
+                return FALSE;
+            }
+        }
+        return TRUE;
+    case 37:
+        for (u32 i = 0; i < condition->count; i++) {
+            if (gDinoBackup->GetVarClear(DinoEventPackedVar(DinoEventArg(data, i)))) {
+                return TRUE;
+            }
+        }
+        return FALSE;
+    case 38:
+        for (u32 i = 0; i < condition->count; i++) {
+            if (gDinoBackup->GetVarClear(DinoEventPackedVar(DinoEventArg(data, i)))) {
+                return FALSE;
+            }
+        }
+        return TRUE;
+    case 39:
+        for (u32 i = 0; i < condition->count; i++) {
+            if (!gDinoBackup->GetVarClear(DinoEventPackedVar(DinoEventArg(data, i)))) {
+                return TRUE;
+            }
+        }
+        return FALSE;
+    case 19:
+        for (u32 i = 0; i < condition->count; i++) {
+            if (!gDinoBackup->GetVarFlag(DinoEventPackedVar(DinoEventArg(data, i)))) {
+                return FALSE;
+            }
+        }
+        return TRUE;
+    case 20:
+        for (u32 i = 0; i < condition->count; i++) {
+            if (gDinoBackup->GetVarFlag(DinoEventPackedVar(DinoEventArg(data, i)))) {
+                return TRUE;
+            }
+        }
+        return FALSE;
+    case 21:
+        for (u32 i = 0; i < condition->count; i++) {
+            if (gDinoBackup->GetVarFlag(DinoEventPackedVar(DinoEventArg(data, i)))) {
+                return FALSE;
+            }
+        }
+        return TRUE;
+    case 22:
+        for (u32 i = 0; i < condition->count; i++) {
+            if (!gDinoBackup->GetVarFlag(DinoEventPackedVar(DinoEventArg(data, i)))) {
+                return TRUE;
+            }
+        }
+        break;
+    case 40:
+        return gDinoBackup->IsUnk98Full();
+    case 41: {
+        DinoTeam team;
+        gDinoBackup->GetTeam(gDinoBackup->GetUnk34_26(), &team);
+        for (u32 i = 0; i < 5; i++) {
+            if (team.slots[i] == condition->GetArgs()[0]) {
+                return TRUE;
+            }
+        }
+        return FALSE;
+    }
+    }
+    return FALSE;
+}
+
 void DinoEventLoop::ReleasePicture() {
     if (mHasPicture) {
         mHasPicture = FALSE;
