@@ -629,6 +629,10 @@ libs/nitrosdk/src/os/os_irq.c:
     .text       start:0x020732a8 end:0x02073588
     .bss        start:0x02151860 end:0x021518c4
 
+libs/nitrosdk/src/os/os_irqHandler.c:
+    complete
+    .itcm       start:0x01ff94dc end:0x01ff9690
+
 libs/nitrosdk/src/snd/snd_interface.c:
     complete
     .text       start:0x02075fb4 end:0x0207629c
@@ -781,6 +785,7 @@ libs/nitrosdk/src/os/os_mutex.c:
 libs/nitrosdk/src/mi/mi_dma.c:
     complete
     .text       start:0x020753d0 end:0x0207580c
+    .itcm       start:0x01ff9924 end:0x01ff9a4c
 
 libs/nitrosdk/src/os/os_cache.c:
     complete
@@ -810,6 +815,7 @@ libs/nitrosdk/src/os/os_system.c:
 libs/nitrosdk/src/os/os_reset.c:
     complete
     .text       start:0x02075068 end:0x02075198
+    .itcm       start:0x01ff9690 end:0x01ff9924
     .bss        start:0x02151c00 end:0x02151c04
 
 libs/nitrosdk/src/mi/mi_memory.c:

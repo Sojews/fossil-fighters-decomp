@@ -1,6 +1,7 @@
 // NitroSDK MI: DMA transfers (copies and fills, synchronous, asynchronous and H-blank).
 
 #include "nitro/mi.h"
+#include "nitro/section.h"
 #include "nitro/os.h"
 
 typedef void (*MIDmaCallback)(void *arg);
@@ -238,3 +239,90 @@ void MI_HBlankDmaCopy16(u32 dmaNo, const void *src, void *dest, u32 size) {
     MI_WaitDma(dmaNo);
     MIi_DmaSetParams(dmaNo, (u32) src, (u32) dest, MI_CNT_HBCOPY16(size));
 }
+
+// The register setters (in ITCM, so a DMA can run while main memory is busy), and the geometry command sender.
+#define MIi_DUMMY_CNT 0x81400001
+#define REG_GXFIFO_ADDR 0x04000400
+#define MIi_GX_LENGTH_ONCE (118 * sizeof(u32))
+#define MI_CNT_SEND32(size) (0x84400000 | ((size) >> 2))
+
+#pragma section ITCM begin
+void MIi_DmaSetParams(u32 dmaNo, u32 src, u32 dest, u32 ctrl) {
+    OSIntrMode enabled = OS_DisableInterrupts();
+    vu32 *p = (vu32 *) ((u32) REG_DMA0SAD_ADDR + dmaNo * 12);
+    *p = (vu32) src;
+    *(p + 1) = (vu32) dest;
+    *(p + 2) = (vu32) ctrl;
+    (void) OS_RestoreInterrupts(enabled);
+}
+
+void MIi_DmaSetParams_wait(u32 dmaNo, u32 src, u32 dest, u32 ctrl) {
+    OSIntrMode enabled = OS_DisableInterrupts();
+    vu32 *p = (vu32 *) ((u32) REG_DMA0SAD_ADDR + dmaNo * 12);
+    *p = (vu32) src;
+    *(p + 1) = (vu32) dest;
+    *(p + 2) = (vu32) ctrl;
+    {
+        u32 dummy = *(vu32 *) REG_DMA0SAD_ADDR;
+    }
+    {
+        u32 dummy = *(vu32 *) REG_DMA0SAD_ADDR;
+    }
+    if (dmaNo == 0) {
+        *p = (vu32) 0;
+        *(p + 1) = (vu32) 0;
+        *(p + 2) = (vu32) MIi_DUMMY_CNT;
+    }
+    (void) OS_RestoreInterrupts(enabled);
+}
+
+void MIi_DmaSetParams_noInt(u32 dmaNo, u32 src, u32 dest, u32 ctrl) {
+    vu32 *p = (vu32 *) ((u32) REG_DMA0SAD_ADDR + dmaNo * 12);
+    *p = (vu32) src;
+    *(p + 1) = (vu32) dest;
+    *(p + 2) = (vu32) ctrl;
+}
+
+void MIi_DmaSetParams_wait_noInt(u32 dmaNo, u32 src, u32 dest, u32 ctrl) {
+    vu32 *p = (vu32 *) ((u32) REG_DMA0SAD_ADDR + dmaNo * 12);
+    *p = (vu32) src;
+    *(p + 1) = (vu32) dest;
+    *(p + 2) = (vu32) ctrl;
+    {
+        u32 dummy = *(vu32 *) REG_DMA0SAD_ADDR;
+    }
+    {
+        u32 dummy = *(vu32 *) REG_DMA0SAD_ADDR;
+    }
+    if (dmaNo == 0) {
+        *p = (vu32) 0;
+        *(p + 1) = (vu32) 0;
+        *(p + 2) = (vu32) MIi_DUMMY_CNT;
+    }
+    {
+        u32 dummy = *(vu32 *) REG_DMA0SAD_ADDR;
+    }
+    {
+        u32 dummy = *(vu32 *) REG_DMA0SAD_ADDR;
+    }
+}
+
+void MI_SendGXCommand(u32 dmaNo, const void *src, u32 commandLength) {
+    vu32 *dmaCntp;
+    u32 leftLength = commandLength;
+    u32 currentSrc = (u32) src;
+    if (leftLength == 0) {
+        return;
+    }
+    MIi_CheckDma0SourceAddress(dmaNo, currentSrc, leftLength, MI_DMA_SRC_INC);
+    dmaCntp = &((vu32 *) REG_DMA0SAD_ADDR)[dmaNo * 3 + 2];
+    MIi_WAIT_DMA(dmaCntp);
+    while (leftLength > 0) {
+        u32 length = (leftLength > MIi_GX_LENGTH_ONCE) ? MIi_GX_LENGTH_ONCE : leftLength;
+        MIi_DmaSetParams(dmaNo, currentSrc, (u32) REG_GXFIFO_ADDR, MI_CNT_SEND32(length));
+        leftLength -= length;
+        currentSrc += length;
+    }
+    MIi_WAIT_DMA(dmaCntp);
+}
+#pragma section ITCM end
