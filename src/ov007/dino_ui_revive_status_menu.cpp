@@ -3,6 +3,7 @@
 // Derived destructors have their bases' destructor bodies inlined; auto-inlining the ones defined above does that.
 #pragma auto_inline on
 
+#include "game/dino_static_init.h"
 #include "game/dino_ui_revive_status_menu.h"
 #include "m/resource.h"
 #include "game/dino_resource.h"
@@ -157,6 +158,12 @@ extern "C" struct {
     const char *mBackPath;      // 0x04
     u8 unk08[0x18 - 0x8];
     MPoint mBackPos;            // 0x18
+    u8 unk20[0x48 - 0x20];
+    MPoint mIconSize;           // 0x48: the common layout's
+    u8 unk50[0x58 - 0x50];
+    MPoint mIconMargin;         // 0x58
+    u8 unk60[0x68 - 0x60];
+    MPoint mScreenSize;         // 0x68
 } data_ov007_02191e78;
 extern "C" struct {
     void (DinoHelpBase::*Enable_00)();
@@ -841,3 +848,49 @@ void DinoUiReviveStatusMenu::RefreshTab() {
         break;
     }
 }
+
+// NONMATCHING: the game interleaves the screen rect's stores with the size's and keeps one copy of each size.
+// The file's static initialization (see dino_static_init.h): the common layout, the button and panel positions and the
+// tabs' texts.
+extern "C" struct {
+    u8 unk00[0x4];
+    MPoint mBarPos;     // 0x04
+    MPoint mBarSize;    // 0x0C
+    MRect mBarRect;     // 0x14
+    u8 unk24[0x34 - 0x24];
+    MRect mScreenRect;  // 0x34
+    MRect mIconRect;    // 0x44
+} data_ov007_02191f78;
+static inline MRect DinoBarRect(MPoint size) {
+    return MRect(0, 0, size.x, 24);
+}
+extern const u32 data_0208a830, data_0208a834, data_0208a838, data_0208a83c;
+#pragma always_inline on
+static struct DinoUiReviveStatusMenuStaticInit {
+    DinoUiReviveStatusMenuStaticInit() {
+        MPoint screen(256, 192);
+        data_ov007_02191e78.mScreenSize = screen;
+        data_ov007_02191f78.mScreenRect = MRect(0, 0, 256, 192);
+        data_ov007_02191e78.mIconMargin = MPoint(2, 2);
+        MPoint icon(36, 28);
+        data_ov007_02191e78.mIconSize = icon;
+        data_ov007_02191f78.mIconRect = DinoSizeRect(icon);
+        data_ov007_02191f78.mBarPos = MPoint(0, 24);
+        MPoint bar(256, 192);
+        data_ov007_02191f78.mBarSize = bar;
+        data_ov007_02191f78.mBarRect = DinoBarRect(bar);
+        DINO_POOL(MPoint, data_ov007_02191e78, 0x28) = MPoint(128, 176);
+        DINO_POOL(MPoint, data_ov007_02191e78, 0x60) = MPoint(8, 150);
+        DINO_POOL(MPoint, data_ov007_02191e78, 0x40) = MPoint(64, 112);
+        DINO_POOL(MPoint, data_ov007_02191e78, 0x70) = MPoint(19, 179);
+        DINO_POOL(MPoint, data_ov007_02191e78, 0x30) = MPoint(27, 0);
+        DINO_POOL(MPoint, data_ov007_02191e78, 0x78) = MPoint(128, 96);
+        DINO_POOL(MPoint, data_ov007_02191ef8, 0x10) = MPoint(128, 96);
+        DINO_POOL(MPoint, data_ov007_02191e78, 0x18) = MPoint(128, 98);
+        DINO_POOL(MPoint, data_ov007_02191e78, 0x20) = MPoint(246, 28);
+        DINO_POOL_WORD(data_ov007_02191f78, 0x24) = data_0208a83c;
+        DINO_POOL_WORD(data_ov007_02191f78, 0x28) = data_0208a838;
+        DINO_POOL_WORD(data_ov007_02191f78, 0x2c) = data_0208a834;
+        DINO_POOL_WORD(data_ov007_02191f78, 0x30) = data_0208a830;
+    }
+} sDinoUiReviveStatusMenuStaticInit;

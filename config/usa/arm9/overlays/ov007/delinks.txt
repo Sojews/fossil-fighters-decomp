@@ -23,3 +23,4 @@ src/ov007/dino_ui_keyboard.cpp:
 
 src/ov007/dino_ui_revive_status_menu.cpp:
     .text       start:0x0218746c end:0x0218ad84
+    .init       start:0x0218c7d0 end:0x0218c8a4

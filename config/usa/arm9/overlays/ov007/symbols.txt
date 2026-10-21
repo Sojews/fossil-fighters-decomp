@@ -554,13 +554,13 @@ __sinit_dino_ui_atm.cpp kind:function(thumb,size=0x2d0) addr:0x0218bdc0
 __sinit_ov007_0218c090 kind:function(thumb,size=0x3e8) addr:0x0218c090
 __sinit_ov007_0218c478 kind:function(thumb,size=0x298) addr:0x0218c478
 __sinit_ov007_0218c710 kind:function(thumb,size=0xc0) addr:0x0218c710
-__sinit_ov007_0218c7d0 kind:function(thumb,size=0xd4) addr:0x0218c7d0
+__sinit_dino_ui_revive_status_menu.cpp kind:function(thumb,size=0xd4) addr:0x0218c7d0
 __sinit_dino_ui_team_select.cpp kind:function(thumb,size=0x84) addr:0x0218c8a4
 .p__sinit_ov007_0218bdc0 kind:data(word) addr:0x0218c928
 .p__sinit_ov007_0218c090 kind:data(word) addr:0x0218c92c
 .p__sinit_ov007_0218c478 kind:data(word) addr:0x0218c930
 .p__sinit_ov007_0218c710 kind:data(word) addr:0x0218c934
-.p__sinit_ov007_0218c7d0 kind:data(word) addr:0x0218c938
+.p__sinit_dino_ui_revive_status_menu.cpp kind:data(word) addr:0x0218c938
 .p__sinit_ov007_0218c8a4 kind:data(word) addr:0x0218c93c
 data_ov007_0218c960 kind:data(any) addr:0x0218c960
 data_ov007_0218c9e0 kind:data(any) addr:0x0218c9e0
