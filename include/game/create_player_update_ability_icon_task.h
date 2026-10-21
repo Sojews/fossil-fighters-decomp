@@ -463,6 +463,10 @@ public:
 
 class ExecCreatureEndTask : public MProcess {
 public:
+    ExecCreatureEndTask(void *player, u32 creature) : MProcess(NULL) {
+        mUnk74 = (u32)player;
+        mUnk78 = creature;
+    }
     virtual ~ExecCreatureEndTask();
     virtual void Idle();
 

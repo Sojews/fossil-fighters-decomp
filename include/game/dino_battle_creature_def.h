@@ -25,6 +25,8 @@ struct DinoBattleCreatureDef {
     s32 mUnk68;         // 0x68: offset of a byte table
     s32 mUnk6C;         // 0x6C
     s32 mUnk70;         // 0x70
+    u32 unk74;
+    u32 mUnk78;         // 0x78: offset of its attacks' 3D view indexes (u8)
 };
 
 #endif

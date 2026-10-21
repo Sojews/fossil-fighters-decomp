@@ -918,6 +918,7 @@ public:
 class DinoBattleViewCreatureCpuArrowUpdateSignal : public MMessage {
 public:
     DinoBattleViewCreatureCpuArrowUpdateSignal() : MMessage(0x10028) {}
+    DinoBattleViewCreatureCpuArrowUpdateSignal(u32 a, u32 b) : MMessage(0x10028), mUnk0C(a), mUnk10(b) {}
     virtual u32 GetSize() { return 12; }
     virtual void Write(void *buf) {
         MI_CpuCopy8(&mId, buf, 4);
@@ -1071,6 +1072,14 @@ public:
 class DinoBattleView3DTeamAttackRequest : public MMessage {
 public:
     DinoBattleView3DTeamAttackRequest() : MMessage(0x1002D) {}
+    DinoBattleView3DTeamAttackRequest(u32 a, u32 side, u32 id, u32 index, u32 count, const void *targets,
+                                      const void *kinds, const void *damages, const void *downs)
+        : MMessage(0x1002D), mUnk0C(a), mUnk10(side), mUnk14(id), mUnk18(index), mUnk1C(count) {
+        MI_CpuCopy8(targets, mUnk20, sizeof(mUnk20));
+        MI_CpuCopy8(kinds, mUnk2C, sizeof(mUnk2C));
+        MI_CpuCopy8(damages, mUnk38, sizeof(mUnk38));
+        MI_CpuCopy8(downs, mUnk44, sizeof(mUnk44));
+    }
     virtual u32 GetSize() { return 64; }
     virtual void Write(void *buf) {
         MI_CpuCopy8(&mId, buf, 4);
@@ -2031,6 +2040,7 @@ public:
 class DinoBattleViewCreaturePlayMotionRequest : public MMessage {
 public:
     DinoBattleViewCreaturePlayMotionRequest() : MMessage(0x10057) {}
+    DinoBattleViewCreaturePlayMotionRequest(u32 a, u32 b, u32 c) : MMessage(0x10057), mUnk0C(a), mUnk10(b), mUnk14(c) {}
     virtual u32 GetSize() { return 16; }
     virtual void Write(void *buf) {
         MI_CpuCopy8(&mId, buf, 4);
@@ -2289,6 +2299,7 @@ public:
 class DinoBattleViewFocusLCDFrameRequest : public MMessage {
 public:
     DinoBattleViewFocusLCDFrameRequest() : MMessage(0x10065) {}
+    DinoBattleViewFocusLCDFrameRequest(u32 a, u8 b) : MMessage(0x10065), mUnk0C(a), mUnk10(b) {}
     virtual u32 GetSize() { return 12; }
     virtual void Write(void *buf) {
         MI_CpuCopy8(&mId, buf, 4);
