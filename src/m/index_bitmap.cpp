@@ -1,4 +1,4 @@
-// MIndexBitmap and the indexed bitmap transfers. MIndexBitmapLoadTransfer::Transfer isn't decompiled yet.
+// MIndexBitmap and the indexed bitmap transfers.
 
 #include "m/bitmap.h"
 #include "game/dino_static_init.h"
@@ -47,6 +47,135 @@ void MIndexBitmapFillTransfer::Transfer() {
 }
 
 MIndexBitmapLoadTransfer::~MIndexBitmapLoadTransfer() {
+}
+
+// A pixel pair with the palette's offset added to the pixels that aren't 0.
+#define MINDEX_BITMAP_PIXEL(px) \
+    if ((u8)px != 0) { \
+        px += lo; \
+    } \
+    if (px & 0xFF00) { \
+        px += hi; \
+    }
+
+// Copies the source rect to the bitmap row by row, flipped as asked; with a palette, a pixel pair at a time (four to
+// a loop), adding the palette's offset to each pixel that isn't 0.
+// NONMATCHING: the game loads each rect width's left edge before its right one (and the first early return goes
+// through a long branch).
+void MIndexBitmapLoadTransfer::Transfer() {
+    int srcSkip = mSrcSize.x;
+    if (srcSkip == 0 || mSrcSize.y == 0) {
+        return;
+    }
+    u16 lo = mPalette << 4;
+    u16 hi = lo << 8;
+    const u16 *src;
+    int width;
+    if (!mVFlip) {
+        src = (const u16 *) (mSrc + mSrcRect.left + srcSkip * mSrcRect.top);
+        width = mSrcRect.GetWidth();
+        srcSkip -= width;
+    } else {
+        src = (const u16 *) (mSrc + mSrcRect.left + srcSkip * (mSrcRect.bottom - 1));
+        width = mSrcRect.GetWidth();
+        srcSkip = -(srcSkip + width);
+    }
+    srcSkip >>= 1;
+    if (!mHFlip) {
+        u16 *dst = (u16 *) (mDstBase + mDst.x + mDstSize.x * mDst.y);
+        int dstSkip = (mDstSize.x - width) >> 1;
+        int pairs = width >> 1;
+        int rows = mSrcRect.GetHeight();
+        if (rows == 0) {
+            return;
+        }
+        do {
+            if (mPalette == 0) {
+                MCopy(src, dst, pairs * 2);
+                src += pairs;
+                dst += pairs;
+            } else {
+                int n = (pairs + 3) >> 2;
+                switch (pairs & 3) {
+                case 0:
+                    do {
+                        u16 px;
+                        px = *src;
+                        MINDEX_BITMAP_PIXEL(px);
+                        *dst = px;
+                        src++;
+                        dst++;
+                case 3:
+                        px = *src;
+                        MINDEX_BITMAP_PIXEL(px);
+                        *dst = px;
+                        src++;
+                        dst++;
+                case 2:
+                        px = *src;
+                        MINDEX_BITMAP_PIXEL(px);
+                        *dst = px;
+                        src++;
+                        dst++;
+                case 1:
+                        px = *src;
+                        MINDEX_BITMAP_PIXEL(px);
+                        *dst = px;
+                        src++;
+                        dst++;
+                    } while (--n != 0);
+                }
+            }
+            src += srcSkip;
+            dst += dstSkip;
+        } while (--rows != 0);
+    } else {
+        u16 *dst = (u16 *) (mDstBase + mDst.x + width - 1 + mDstSize.x * mDst.y);
+        int dstSkip = (mDstSize.x + width) >> 1;
+        int pairs = width >> 1;
+        int rows = mSrcRect.GetHeight();
+        if (rows == 0) {
+            return;
+        }
+        do {
+            int n = (pairs + 3) >> 2;
+            switch (pairs & 3) {
+            case 0:
+                do {
+                    u16 px;
+                    px = *src;
+                    px = (px >> 8) | (u16)(px << 8);
+                    MINDEX_BITMAP_PIXEL(px);
+                    *dst = px;
+                    src++;
+                    dst--;
+            case 3:
+                    px = *src;
+                    px = (px >> 8) | (u16)(px << 8);
+                    MINDEX_BITMAP_PIXEL(px);
+                    *dst = px;
+                    src++;
+                    dst--;
+            case 2:
+                    px = *src;
+                    px = (px >> 8) | (u16)(px << 8);
+                    MINDEX_BITMAP_PIXEL(px);
+                    *dst = px;
+                    src++;
+                    dst--;
+            case 1:
+                    px = *src;
+                    px = (px >> 8) | (u16)(px << 8);
+                    MINDEX_BITMAP_PIXEL(px);
+                    *dst = px;
+                    src++;
+                    dst--;
+                } while (--n != 0);
+            }
+            src += srcSkip;
+            dst += dstSkip;
+        } while (--rows != 0);
+    }
 }
 
 // The file's static initialization (see dino_static_init.h): element 0 through the pool, the others directly.
