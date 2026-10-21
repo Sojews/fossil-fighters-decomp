@@ -19,6 +19,7 @@
 #include "game/dino_ui_revive_status_menu.h"
 #include "m/bg.h"
 #include "game/dino_resource.h"
+#include "game/dino_ui_order_select.h"
 #include "game/dino_sound.h"
 #include "m/picture.h"
 #include "m/seed_generator.h"
@@ -2382,19 +2383,21 @@ extern "C" struct {
     u8 unk10[0x20 - 0x10];
     void (DinoEventExecAutoWarp::*StateWarp_20)(); // 0x20
     void (DinoEventExecCleaning::*StateCloseField_28)(); // 0x28
-    u8 unk30[0x38 - 0x30];
+    void (DinoEventExecBattle::*StateBattle_30)(); // 0x30
     void (DinoEventExecBattle::*StateResetDisplays_38)(); // 0x38
     void (DinoEventExecCleaning::*Unk02159b38_40)(); // 0x40
     void (DinoEventExecCleaning::*StateOpenField_48)(); // 0x48
     u8 unk50[0x58 - 0x50];
-    void (DinoEventExecBattle::*Battle020401b0_58)(); // 0x58
+    void (DinoEventExecBattle::*StateOrderSelect_58)(); // 0x58
     u8 unk60[0x68 - 0x60];
     void (DinoEventExecBattle::*StateOpenField_68)(); // 0x68
     u8 unk70[0x78 - 0x70];
     void (DinoEventExecBattle::*Battle02041b24_78)(); // 0x78
 } data_020be1c4;
 extern "C" struct {
-    u8 unk00[0x30];
+    u8 unk00[0x10];
+    void (DinoEventExecBattle::*StateUnloadOverlays_10)();
+    u8 unk18[0x30 - 0x18];
     void (DinoEventExecBattle::*Battle020416d0_30)();
     u8 unk38[0x50 - 0x38];
     void (DinoEventExecBattle::*Battle0204079c_50)();
@@ -2479,17 +2482,12 @@ void DinoEventExecBattle::StateStartEffect() {
 
 void DinoEventExecBattle::StateCloseField() {
     mEvent->CloseField(TRUE);
-    mState = data_020be1c4.Battle020401b0_58;
+    mState = data_020be1c4.StateOrderSelect_58;
 }
 
-void DinoEventExecBattle::StateUnloadOverlays() {
-    MUnloadOverlay(0, M_OVERLAY_ID(ov003));
-    MUnloadOverlay(0, M_OVERLAY_ID(ov006));
-    mState = data_020be244.Battle0204079c_50;
-}
-
-// Gives a creature the part levels of the given level (1-12).
-static inline void DinoBattleSetLevel(DinoCreatureState *creature, int level) {
+// Gives a creature the part levels of the given level (1-12): with a part count, the level's total is shared
+// between that many parts (the first taking what doesn't divide).
+static inline void DinoBattleSetLevel(DinoCreatureState *creature, int level, s32 count = 0) {
     if (level > 12) {
         level = 12;
     }
@@ -2498,32 +2496,85 @@ static inline void DinoBattleSetLevel(DinoCreatureState *creature, int level) {
         parts[j].level = 0;
         parts[j].unk12 = 0;
     }
-    switch (level) {
-    case 12:
-        parts[3].level += kCreatureLevelLimits[0];
-    case 11:
-        parts[3].level += kCreatureLevelLimits[0];
-    case 10:
-        parts[3].level += kCreatureLevelLimits[0];
-    case 9:
-        parts[2].level += kCreatureLevelLimits[0];
-    case 8:
-        parts[2].level += kCreatureLevelLimits[0];
-    case 7:
-        parts[2].level += kCreatureLevelLimits[0];
-    case 6:
-        parts[1].level += kCreatureLevelLimits[0];
-    case 5:
-        parts[1].level += kCreatureLevelLimits[0];
-    case 4:
-        parts[1].level += kCreatureLevelLimits[0];
-    case 3:
-        parts[0].level += kCreatureLevelLimits[0];
-    case 2:
-        parts[0].level += kCreatureLevelLimits[0];
-    case 1:
-        parts[0].level += 50;
+    if (count == 0) {
+        switch (level) {
+        case 12:
+            parts[3].level += kCreatureLevelLimits[0];
+        case 11:
+            parts[3].level += kCreatureLevelLimits[0];
+        case 10:
+            parts[3].level += kCreatureLevelLimits[0];
+        case 9:
+            parts[2].level += kCreatureLevelLimits[0];
+        case 8:
+            parts[2].level += kCreatureLevelLimits[0];
+        case 7:
+            parts[2].level += kCreatureLevelLimits[0];
+        case 6:
+            parts[1].level += kCreatureLevelLimits[0];
+        case 5:
+            parts[1].level += kCreatureLevelLimits[0];
+        case 4:
+            parts[1].level += kCreatureLevelLimits[0];
+        case 3:
+            parts[0].level += kCreatureLevelLimits[0];
+        case 2:
+            parts[0].level += kCreatureLevelLimits[0];
+        case 1:
+            parts[0].level += 50;
+        }
+    } else {
+        s32 total = kCreatureLevelLimits[0] * (level - 1) + 50;
+        s32 each = total / count;
+        for (int j = 0; j < count; j++) {
+            parts[j].level += each;
+            total -= each;
+        }
+        parts[0].level += total;
     }
+}
+
+// A battle without the player's side set lets the player choose the order against the opponent's team (shown in a
+// random order); one with it goes straight to the battle.
+void DinoEventExecBattle::StateOrderSelect() {
+    MResource<DinoBattleData> battle = gDinoResource->LoadBattle(mBattle);
+    if (battle.Get()->GetPlayer() != NULL) {
+        mState = data_020be1c4.StateBattle_30;
+        return;
+    }
+    MLoadOverlay(0, M_OVERLAY_ID(ov003));
+    MLoadOverlay(0, M_OVERLAY_ID(ov006));
+    DinoUiOrderSelectInfo info;
+    MI_CpuFill8(&info, 0, sizeof(info));
+    const DinoBattleSideData *enemy = battle.Get()->GetEnemy();
+    info.name = gDinoResource->GetText(enemy->nameText);
+    for (u32 i = 0; i < enemy->creatureCount; i++) {
+        const DinoBattleCreatureData &entry = enemy->GetCreature(i);
+        DinoCreatureState *creature = &info.creatures[i];
+        creature->index = entry.id;
+        if (i < enemy->unk20) {
+            DinoBattleSetLevel(creature, entry.level, enemy->GetUnk24()[i]);
+        } else {
+            DinoBattleSetLevel(creature, entry.level);
+        }
+        info.creatures[i].unk14 = entry.unk08;
+    }
+    for (u32 i = 0; i < enemy->unk18; i++) {
+        info.unk84[i] = MFx32::FromRaw(enemy->GetUnk1C()[i]);
+    }
+    for (u32 i = 0; i < enemy->creatureCount - 1; i++) {
+        u32 j = i + gDinoResource->GetRandom()->Next(enemy->creatureCount - i);
+        std::swap(info.creatures[i], info.creatures[j]);
+        std::swap(info.unk84[i], info.unk84[j]);
+    }
+    mSerial.AddTail(new DinoUiOrderSelect(gDinoBackup->GetUnk34_26(), info, 0, battle.Get()->unk16, mBattle, 0));
+    mState = data_020be244.StateUnloadOverlays_10;
+}
+
+void DinoEventExecBattle::StateUnloadOverlays() {
+    MUnloadOverlay(0, M_OVERLAY_ID(ov003));
+    MUnloadOverlay(0, M_OVERLAY_ID(ov006));
+    mState = data_020be244.Battle0204079c_50;
 }
 
 // Sets the battle up from its data (the player's side from the player's own team where the data has none) and

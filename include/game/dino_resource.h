@@ -313,6 +313,8 @@ struct DinoBattleData {
     u32 unk0C;          // 0x0C
     u32 scene;          // 0x10
     u8 unk14;           // 0x14
+    u8 unk15;           // 0x15
+    u8 unk16;           // 0x16
     u32 unk18;          // 0x18
     u32 unk1C;          // 0x1C: a talk text
     u32 unk20;          // 0x20: a talk text

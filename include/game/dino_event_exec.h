@@ -1226,6 +1226,7 @@ public:
 
     void StateStartEffect();
     void StateCloseField();
+    void StateOrderSelect();
     void StateUnloadOverlays();
     void StateBattle();
     void StateResult();
