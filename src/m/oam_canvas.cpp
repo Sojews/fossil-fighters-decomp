@@ -27,16 +27,11 @@ MOamCanvas<TOam, TUnit>::~MOamCanvas() {
 
 template <class TOam, class TUnit>
 void MOamCanvas<TOam, TUnit>::DrawChar(MFont *font, MPoint pos, u32 code) {
-    MPoint size = font->GetGlyphSize(code);
-    MRect glyph(pos, pos + size);
+    MRect glyph(pos, pos + font->GetGlyphSize(code));
     for (u32 i = 0; i < mPieces.size(); i++) {
-        Piece &piece = mPieces[i];
-        MRect rect = piece.rect;
-        if (rect.right > glyph.left && glyph.right > rect.left && rect.bottom > glyph.top &&
-            glyph.bottom > rect.top) {
-            font->Draw(mChrBlock, piece.chrOffset,
-                       MPoint((piece.rect.right - piece.rect.left) / 8, (piece.rect.bottom - piece.rect.top) / 8),
-                       MPoint(pos.x - piece.rect.left, pos.y - piece.rect.top), code);
+        if (glyph.Intersects(mPieces[i].rect)) {
+            font->Draw(mChrBlock, mPieces[i].chrOffset, mPieces[i].rect.GetSize() / 8,
+                       pos - mPieces[i].rect.GetTopLeft(), code);
         }
     }
 }
@@ -60,9 +55,7 @@ template <class TOam, class TUnit>
 void MOamCanvas<TOam, TUnit>::SetPosition(MPoint pos) {
     mPos = pos;
     for (u32 i = 0; i < mPieces.size(); i++) {
-        MPoint p(pos.x + mPieces[i].rect.left, pos.y + mPieces[i].rect.top);
-        typename TUnit::Entry *entry = &mUnit->GetEntries()[i];
-        entry->SetCoord(p);
+        mUnit->GetEntries()[i].SetCoord(pos + mPieces[i].rect.GetTopLeft());
     }
 }
 
@@ -134,11 +127,10 @@ int MOamCanvas<TOam, TUnit>::GetPixel(int x, int y) {
     for (u32 i = 0; i < mPieces.size(); i++) {
         MRect &r = mPieces[i].rect;
         if (r.left <= x && x < r.right && r.top <= y && y < r.bottom) {
-            Piece &piece = mPieces[i];
-            int py = y - piece.rect.top;
-            int px = x - piece.rect.left;
-            u32 tile = piece.chrOffset + ((px >> 3) + (py >> 3) * ((piece.rect.right - piece.rect.left) >> 3));
-            u32 row = ((u32 *)(mChrBlock->addr + mChrBlock->unitSize * tile))[py & 7];
+            int py = y - mPieces[i].rect.top;
+            int px = x - mPieces[i].rect.left;
+            u32 tile = mPieces[i].chrOffset + ((px >> 3) + (py >> 3) * ((mPieces[i].rect.right - mPieces[i].rect.left) >> 3));
+            u32 row = ((u32 *)MOamCanvasChrAddr(mChrBlock, tile))[py & 7];
             return (row >> ((px & 7) * 4)) & 0xF;
         }
     }
@@ -152,10 +144,10 @@ void MOamCanvas<TOam, TUnit>::SetPixel(int x, int y, int color) {
         int left = piece.rect.left;
         int right = piece.rect.right;
         if (left <= x && x < right && piece.rect.top <= y && y < piece.rect.bottom) {
-            int px = x - piece.rect.left;
             int py = y - piece.rect.top;
-            u32 tile = piece.chrOffset + (px >> 3) + ((right - left) >> 3) * (py >> 3);
-            u32 *row = (u32 *)(mChrBlock->addr + mChrBlock->unitSize * tile + (py & 7) * 4);
+            int px = x - piece.rect.left;
+            u32 tile = piece.chrOffset + (px >> 3) + (py >> 3) * ((right - left) >> 3);
+            u32 *row = (u32 *)MOamCanvasChrAddr(mChrBlock, tile) + (py & 7);
             int shift = (px & 7) * 4;
             *row = (*row & ~(0xF << shift)) | (color << shift);
         }

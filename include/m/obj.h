@@ -53,7 +53,7 @@ struct MOamCell {
     }
     void SetCoord(MPoint pos) {
         x = pos.x;
-        y = pos.y;
+        y = (u8)pos.y;
     }
     // shape: size * 4 + shape
     int GetShape() const { return shape | (size << 2); }
