@@ -21,11 +21,10 @@ DinoBattleDebugLog::~DinoBattleDebugLog() {
 #pragma auto_inline off
 
 // A console of the battle's log, when the adjustment data asks for one.
-// NONMATCHING: this and the display swap registers (and the saved display and font).
+// NONMATCHING: the game loads the speed argument straight from its stack slot (ours through its address).
 DinoBattleDebugLog::DinoBattleDebugLog(MDisplay *display) : MProcess(display) {
     if (gDinoResource->GetBattleAdjustDefs()->debugLog) {
-        MDisplay *saved = gCurrentDisplay;
-        gCurrentDisplay = display;
+        MDisplayScope scope(display);
         MFont *font = gDinoResource->CreateFont12(0, 10, 1);
         mConsole = new MConsole(new MTextCanvas(MPoint(0x100, 0xCC), gDinoResource->GetUnkTable(), 0, TRUE), font,
                                 MPoint(0, 2), MFx32::FromRaw(0x4CD));
@@ -34,7 +33,6 @@ DinoBattleDebugLog::DinoBattleDebugLog(MDisplay *display) : MProcess(display) {
         mParallel.AddTail(mConsole);
         mInputHub = new MSingleInputHub(1);
         mParallel.AddTail(mInputHub);
-        gCurrentDisplay = saved;
     }
 }
 
