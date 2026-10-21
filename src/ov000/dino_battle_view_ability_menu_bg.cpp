@@ -77,7 +77,9 @@ struct AttackMenuBarStatics {
 };
 struct AttackMenuBarStatics2 {
     int barFocusedFlagX;    // 0x00: focused, with mUnk94 set
-    u8 unk04[0x18 - 0x04];
+    u32 unk04;
+    MPoint chosenBarPos;    // 0x08: where the chosen attack's bar goes
+    u8 unk10[0x18 - 0x10];
     int barFocusedX;        // 0x18: focused (or unfocused with mUnk94 set)
     u32 unk1C;
     MPoint mUnk78Offset;    // 0x20
@@ -545,6 +547,81 @@ void DinoBattleViewUiAbilityMenu::OnStart() {
         mSerial.AddTail(DinoHelpBase::CreateEnableTask());
     }
     mParallel.AddTail(mUnkB4);
+}
+
+extern "C" const u32 data_0208a1b4;     // the chosen bar's slide length
+extern "C" const MPoint data_ov000_02194834;
+extern "C" void func_ov000_021615b4(DinoBattleViewUnkE0 *field, AttackMenuBarMotion *bar,
+                                    DinoBattleViewAbilityMenuBG *bg, int y);
+
+// Cancel closes the menu; an attack (when usable) slides the other bars off, moves the chosen one down with the BG,
+// hands a copy of its bar to the field and reports the choice.
+// NONMATCHING: the two GetOffset() temporaries' slots are swapped, and mUnk104 is loaded before GetBar() for the
+// bar copy (the game loads it after).
+void DinoBattleViewUiAbilityMenu::OnDecide(MMenuItem *menuItem) {
+    DinoBattleViewUiAbilityMenuItem *item = (DinoBattleViewUiAbilityMenuItem *) menuItem;
+    if (menuItem == (MMenuItem *) unk120) {
+        BOOL proceed = TRUE;
+        MTask *tutorial = func_ov000_0218ec8c(((DinoBattleView *) mUnk104)->GetUnk12C(), 14, &proceed);
+        if (tutorial != NULL) {
+            mSerial.AddTail(tutorial);
+        }
+        if (proceed) {
+            DinoSoundPlaySe(0x63, 0);
+            Close();
+        }
+    } else if (!item->GetUnk94()) {
+        BOOL proceed = TRUE;
+        MTask *tutorial =
+            func_ov000_0218ec8c(((DinoBattleView *) mUnk104)->GetUnk12C(), item->GetUnk90() + 15, &proceed);
+        if (tutorial != NULL) {
+            mSerial.AddTail(tutorial);
+        }
+        if (proceed) {
+            DinoHelpBase::Disable();
+            MParallelTaskSet *slides = new MParallelTaskSet(TRUE);
+            for (int i = 0; i < (int) mUnkCC; i++) {
+                if (mItems[i] != item) {
+                    MPoint pos = mItems[i]->GetBarPosition();
+                    slides->AddTail(func_ov000_0217a45c(mItems[i], pos, MPoint(368, pos.y), 20, 1));
+                }
+            }
+            slides->AddTail(DinoSoundCreatePlaySeTask(0x61, 0));
+            u32 row = unkD0 * 3 + item->GetUnk90() * 3;
+            ((DinoBattleViewAbilityTextWindow *) unkF8)
+                ->StartAnime(((DinoBattleViewAbilityTextWindow *) unkF8)->GetRect(), MRect(-1, row + 2, 32, row + 5),
+                             4, 0);
+            mTextWindow->Hide();
+            mCostText->Hide();
+            mSerial.AddTail(slides);
+
+            MParallelTaskSet *move = new MParallelTaskSet(TRUE);
+            MPoint to(0, mBG->GetOffset().y + item->GetBarPosition().y - data_ov000_0219482c.chosenBarPos.y);
+            MPoint from = mBG->GetOffset();
+            MTask *bgSlide = mBG->CreateOffsetAnime(from, to, data_0208a1b4, -1);
+            MTask *barSlide = func_ov000_0217a45c(item, item->GetBarPosition(), data_ov000_0219482c.chosenBarPos,
+                                                  data_0208a1b4, -1);
+            move->AddTail(bgSlide);
+            move->AddTail(barSlide);
+
+            item->GetBar();
+            AttackMenuBarMotion *bar = new AttackMenuBarMotion(
+                (DinoBattleView *) mUnk104, ((DinoBattleView *) mUnk104)->mUnk10C, item->GetBar()->mFlags);
+            bar->Play(2);
+            bar->Hide();
+            bar->SetPosition(data_ov000_02194834);
+            mParallel.Remove(mBG);
+            DinoBattleViewUnkE0 *field = ((DinoBattleView *) mUnk104)->mUnkE0;
+            func_ov000_021615b4(field, bar, mBG, item->GetBarPosition().y);
+            mSerial.AddTail(move, bar->CreateShowTask(), mBG->CreateSetPriorityTask(1),
+                            new AttackMenuBarMotion::SetPriorityTask(bar, 1),
+                            ((MMessageObserver *) mUnkB8)
+                                ->CreatePostTask(new DinoBattleViewUiAbilityMenuResult(mUnkC0, item->GetUnk90(), FALSE)),
+                            MTaskExitTransfer::Create(this));
+        }
+    } else {
+        DinoSoundPlaySe(0x62, 0);
+    }
 }
 
 #pragma auto_inline on

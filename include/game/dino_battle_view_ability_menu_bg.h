@@ -36,6 +36,7 @@ public:
             mOffset = offset;
         }
     }
+    MPoint GetOffset() { return mUnk10D4 ? mText->GetOffset() : mOffset; }
     // Slides the BG (a one-frame wait when it doesn't own it).
     MTask *CreateOffsetAnime(MPoint from, MPoint to, int duration, int ease) {
         if (mUnk10D4) {
@@ -43,6 +44,7 @@ public:
         }
         return new MTimer(1);
     }
+    MTask *CreateSetPriorityTask(int priority) { return new SetPriorityTask(this, priority); }
     void StateShow();
     void StateUpdate();
 
@@ -61,6 +63,10 @@ public:
 
     class SetPriorityTask : public MTask {
     public:
+        SetPriorityTask(DinoBattleViewAbilityMenuBG *bg, int priority) {
+            mBG = bg;
+            mPriority = priority;
+        }
         virtual ~SetPriorityTask();
         virtual void Execute();
 

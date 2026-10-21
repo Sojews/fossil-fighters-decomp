@@ -116,6 +116,10 @@ public:
 
     class SetPriorityTask : public MTask {
     public:
+        SetPriorityTask(AttackMenuBarMotion *bar, int priority) {
+            mBar = bar;
+            mPriority = priority;
+        }
         virtual ~SetPriorityTask();
         virtual void Execute();
 
