@@ -18,6 +18,9 @@
 #include "game/dino_battle_view_kaseki_point_menu.h"
 #include "game/dino_battle_view_creature.h"
 #include <string>
+#include <string.h>
+#include "m/text_codec.h"
+#include "m/seed_generator.h"
 
 SetVarTask::~SetVarTask() {
 }
@@ -212,6 +215,160 @@ extern "C" void func_ov000_0218cb80(DinoBattleTalkWindow *window) {
     if (!window->mTasksC4->IsEmpty()) {
         window->mConsole->Clear();
     }
+}
+
+// Reads a decimal number from the console (pushing back the character after it).
+static inline int DinoBattleReadNumber(MConsole *console) {
+    int n = 0;
+    while (!console->IsEmpty()) {
+        u32 c = console->PopChar();
+        if (c >= '0' && c <= '9') {
+            n *= 10;
+            n += c - '0';
+        } else {
+            console->PushChar(c);
+            break;
+        }
+    }
+    return n;
+}
+
+
+// Which creature id a "$d"/"$o" number names: {number, creature slot}.
+struct DinoBattleLiveCreatureTag {
+    int number;
+    int slot;
+};
+extern "C" const DinoBattleLiveCreatureTag data_ov000_02190460[4];
+extern "C" const char data_ov000_02197228[];   // a rate's characters
+extern "C" double atof(const char *s);
+
+// Reads a typing rate (a decimal fraction) from the console.
+static inline MFx32 DinoBattleReadRate(MConsole *console) {
+    std::string text;
+    while (!console->IsEmpty()) {
+        u32 ch = console->PopChar();
+        if (ch > 0x100 || strchr(data_ov000_02197228, ch) == NULL) {
+            console->PushChar(ch);
+            break;
+        }
+        text.push_back((char)ch);
+    }
+    double value = atof(text.c_str());
+    return MFx32::FromRaw((fx32)((float)value > 0 ? (float)value * 4096.0f + 0.5f : (float)value * 4096.0f - 0.5f));
+}
+
+// $x closes, $d/$o names a creature (or the player) of the side talking or the other, $l/$r a face, $e/$f clears,
+// $t waits, $w sets the rate, $n the font, $c the shadow color and $p a player's name.
+// NONMATCHING: for $d/$o the game loads the field's side before testing the command (ours after).
+BOOL DinoBattleLiveConsoleFilter::Filter(MConsole *console, int c) {
+    if (c != '$') {
+        return FALSE;
+    }
+    if (console->IsEmpty()) {
+        return TRUE;
+    }
+    switch ((u32)(c = console->PopChar())) {
+    case 'x':
+        mWindow->SetUnk84(DinoBattleReadNumber(console) + 20);
+        func_ov000_0218c960(mWindow);
+        break;
+    case 'd':
+    case 'o': {
+        int side = ((DinoBattleView *)mView)->mUnkE0->unkA8 ^ (c == 'd');
+        DinoBattleViewPlayer *player = ((DinoBattleView *)mView)->GetUnkE4(side);
+        int number = DinoBattleReadNumber(console);
+        std::string name;
+        if (number == 0) {
+            name = player->GetUnkC0();
+        } else {
+            const DinoBattleLiveCreatureTag *tag = data_ov000_02190460;
+            for (u32 i = 0; i < 4; i++) {
+                u32 id;
+                if (number == tag[i].number && (id = mCreatures[side][tag[i].slot]) != 0) {
+                    name = gDinoResource->GetCreatureText08(id);
+                    break;
+                }
+            }
+        }
+        if (name.size() != 0) {
+            std::wstring text = MDecodeText(name, 0);
+            for (int i = (int)text.size() - 1; i >= 0; i--) {
+                console->PushChar(text.c_str()[i]);
+            }
+        }
+        break;
+    }
+    case 'l':
+    case 'r': {
+        BOOL side = c == 'r';
+        u32 face;
+        u32 kind = console->PopChar();
+        switch (kind) {
+        case 'a':
+            face = gDinoResource->GetRandom()->Next(5) + 1;
+            break;
+        case 'c':
+            face = gDinoResource->GetRandom()->Next(5) + 6;
+            break;
+        default:
+            console->PushChar(kind);
+            face = DinoBattleReadNumber(console);
+            break;
+        }
+        func_ov000_0218c150(mWindow, face, side);
+        break;
+    }
+    case 'e':
+    case 'f':
+        func_ov000_0218cb80(mWindow);
+        break;
+    case 't':
+        mWindow->mTimer = DinoBattleReadNumber(console);
+        console->PushChar(12);
+        break;
+    case 'w':
+        func_ov000_0218cb5c(mWindow, DinoBattleReadRate(console));
+        break;
+    case 'n':
+        if (mFont != NULL) {
+            mFont->Select(DinoBattleReadNumber(console));
+        }
+        break;
+    case 'c':
+        if (!console->IsEmpty()) {
+            u32 color = console->PopChar();
+            if (color >= '0' && color <= '9') {
+                color -= '0';
+            } else if (color >= 'a' && color <= 'f') {
+                color -= 'a' - 10;
+            } else if (color >= 'A' && color <= 'F') {
+                color -= 'A' - 5;
+            } else {
+                color = 0;
+            }
+            if (mFont != NULL) {
+                mFont->SetShadowColor(color + 1);
+            }
+        }
+        break;
+    case 'p': {
+        std::string name;
+        if (DinoBattleReadNumber(console) != 0) {
+            name = ((DinoBattleView *)mView)->GetPlayerByAC(1)->GetUnkC0();
+        } else {
+            name = ((DinoBattleView *)mView)->GetPlayerByAC(0)->GetUnkC0();
+        }
+        if (name.size() != 0) {
+            std::wstring text = MDecodeText(name, 0);
+            for (int i = (int)text.size() - 1; i >= 0; i--) {
+                console->PushChar(text.c_str()[i]);
+            }
+        }
+        break;
+    }
+    }
+    return TRUE;
 }
 
 // Starts the console once the timer runs out, when the window has tasks and the others are done.

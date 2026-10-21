@@ -24,6 +24,7 @@ public:
 
 class DinoCommonFont;
 class DinoBattleTalkWindow;
+class MConsole;
 
 // The battle talk window's console filter: knows the creatures on both sides.
 class DinoBattleLiveConsoleFilter : public MConsoleFilter {
@@ -34,6 +35,8 @@ public:
         mView = view;
     }
     virtual ~DinoBattleLiveConsoleFilter();
+    // Handles the window's $ commands.
+    virtual BOOL Filter(MConsole *console, int c);
     // Takes in each side's creatures (by their B4 id).
     inline void Refresh();
 
