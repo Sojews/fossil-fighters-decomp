@@ -1,5 +1,7 @@
 // DinoCleaningHammer, DinoCleaningHammerEffect, DinoCleaningHammerTask, DinoCleaningHammerBaseHit.
-// Only the destructors are decompiled so far.
+
+// (The game's -ipa file build: Unk20 inlines the tasks' constructors and what they inline.)
+#pragma ipa file
 
 #include "game/dino_cleaning_neighbour.h"
 #include "game/dino_cleaning_hammer.h"
@@ -17,6 +19,11 @@
 #include "nitro/mi.h"
 #include "m/raster.h"
 #include "m/window.h"
+#include "m/input.h"
+#include "game/dino_common_live.h"
+#include "game/dino_sound.h"
+#include "game/dino_static_init.h"
+#include <typeinfo>
 
 // Done: frees the window and resets the display's windows.
 void DinoCleaningHammerEffect::StateEnd() {
@@ -76,9 +83,9 @@ extern "C" struct {
     void (DinoCleaningHammerEffect::*StateClear_20)(); // 0x20
     u8 unk28[0x30 - 0x28];
     void (DinoCleaningHammerEffect::*StateEnd_30)();
-    u8 unk38[0x40 - 0x38];
+    MPoint mCellOrigin;     // 0x38: the rock's first cell, in cells from the screen's corner
     void (DinoCleaningHammerEffect::*State0215caf8_40)(); // 0x40
-    u8 unk48[0x50 - 0x48];
+    void (DinoCleaningHammerEffect::*StateStart_48)(); // 0x48
     void (DinoCleaningHammerTask::*StateStart_50)(); // 0x50
     u8 unk58[0x60 - 0x58];
     void (DinoCleaningHammerBaseHit::*StateStart_60)(); // 0x60
@@ -222,4 +229,102 @@ DinoCleaningDrill::DinoCleaningDrill(DinoCleaning *cleaning, u8 arg1) : DinoClea
 void DinoCleaningDrill::Unk18() {
     MTask *task = MCreateBgCallTask(this, data_ov002_0216523c.LoadGuides_00, 1);
     GetCleaning()->GetSerial()->AddTail(task);
+}
+
+extern "C" const MFx32 data_ov002_02164fbc;     // the ring's speed
+extern "C" const MFx32 data_ov002_02164fd0;     // (the strong hit's)
+
+// The file's .data pool starts with the task's typeinfo; the hammer's touch area is pooled after it.
+#define DINO_HAMMER_POOL(T, off) (*(const T *)((const u8 *)&typeid(DinoCleaningHammerTask) + (off)))
+
+// The cell under a touch point (every other row is half a cell along).
+static inline MPoint DinoHammerTouchCell(MPoint pos) {
+    return MPoint((pos.x - ((pos.y & 8) >> 1)) >> 3, pos.y >> 3) + data_ov002_02164fb8.mCellOrigin;
+}
+
+// The screen point of a cell's corner.
+static inline MPoint DinoHammerCellPos(MPoint cell) {
+    cell.x -= data_ov002_02164fb8.mCellOrigin.x;
+    cell.y -= data_ov002_02164fb8.mCellOrigin.y;
+    return MPoint(cell.x * 8 + (cell.y & 1) * 4, cell.y * 8);
+}
+
+inline DinoCleaningHammerBaseHit::DinoCleaningHammerBaseHit(DinoCleaningKasekiRock *rock, MRandom *random, u8 big)
+    : MProcess(NULL) {
+    mRock = rock;
+    mUnk80 = random;
+    mBig = big;
+    mState = data_ov002_02164fb8.StateStart_60;
+}
+
+inline DinoCleaningHammerEffect::DinoCleaningHammerEffect(DinoCleaningKasekiRock *rock, MPoint center, u8 big)
+    : MProcess(NULL) {
+    mState = data_ov002_02164fb8.StateStart_48;
+    mRock = rock;
+    mCenter = center;
+    mBig = big;
+    mSpeed = mBig ? data_ov002_02164fd0 : data_ov002_02164fbc;
+}
+
+// Starts at the deepest of the cell and its neighbours, after a few frames.
+inline DinoCleaningHammerTask::DinoCleaningHammerTask(DinoCleaningKasekiRock *kasekiRock, DinoCleaningRock *rock,
+                                                      MRandom *random, MPoint cell, u8 big)
+    : MProcess(NULL) {
+    mState = data_ov002_02164fb8.StateStart_50;
+    mKasekiRock = kasekiRock;
+    mRock = rock;
+    mRandom = random;
+    mBig = big;
+    mDecay = mBig ? data_ov002_02164fd0 : data_ov002_02164fbc;
+    u32 deepest = kasekiRock->GetCellLayer(cell.x, cell.y);
+    MPoint at = cell;
+    for (u32 i = 0; i < 6; i++) {
+        MPoint n = GetNeighbour(cell, i);
+        u32 layer = kasekiRock->GetCellLayer(n.x, n.y);
+        if (layer > deepest) {
+            at = n;
+            deepest = layer;
+        }
+    }
+    mRow = at.x;
+    mCol = at.y;
+    mSerial.AddTail(new MTimer(4));
+}
+
+// A tap on the rock: a hit on a cleared cell knocks the base; otherwise the ring goes out and the hit breaks cells.
+void DinoCleaningHammer::Unk20() {
+    MInput *input = GetCleaning()->GetUnkDC();
+    if (!(input->GetPressed() & 0x1000)) {
+        return;
+    }
+    if (!DINO_HAMMER_POOL(MRect, 0x68).Contains(input->GetTouchPos())) {
+        return;
+    }
+    MPoint cell = DinoHammerTouchCell(input->GetTouchPos());
+    u8 big = mUnk80;
+    if (GetCleaning()->GetKasekiRock()->IsCellClear(cell.x, cell.y)) {
+        GetCleaning()->GetUnkE4()->SetUnkAC(0x11);
+        DinoSoundPlaySe(0x24, 0);
+        DinoCleaningHammerBaseHit *hit =
+            new DinoCleaningHammerBaseHit(GetCleaning()->GetKasekiRock(), GetCleaning()->GetRandom(), big);
+        GetCleaning()->GetSerial()->AddTail(hit);
+        return;
+    }
+    GetCleaning()->GetUnkE4()->SetUnkAC(0xF);
+    if (GetCleaning()->GetKasekiRock()->GetUnk4B8()) {
+        DinoSoundPlaySe(0x25, 0);
+    } else if (mUnk80) {
+        DinoSoundPlaySe(0x23, 0);
+    } else {
+        DinoSoundPlaySe(0x22, 0);
+    }
+    DinoCleaningHammerEffect *effect =
+        new DinoCleaningHammerEffect(GetCleaning()->GetKasekiRock(), DinoHammerCellPos(cell), big);
+    DinoCleaningHammerTask *task =
+        new DinoCleaningHammerTask(GetCleaning()->GetKasekiRock(), GetCleaning()->GetKasekiRock()->GetTopRock(cell.x, cell.y),
+                                   GetCleaning()->GetRandom(), cell, big);
+    MParallelTaskSet *set = new MParallelTaskSet(TRUE);
+    set->AddTail(task);
+    set->AddTail(effect);
+    GetCleaning()->GetSerial()->AddTail(set);
 }

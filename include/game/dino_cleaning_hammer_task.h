@@ -10,6 +10,8 @@ class MRandom;
 
 class DinoCleaningHammerTask : public MProcess {
 public:
+    DinoCleaningHammerTask(DinoCleaningKasekiRock *kasekiRock, DinoCleaningRock *rock, MRandom *random, MPoint cell,
+                           u8 big);
     virtual ~DinoCleaningHammerTask();
     virtual void Idle();
 

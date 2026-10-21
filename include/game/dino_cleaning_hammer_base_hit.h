@@ -9,6 +9,7 @@ class DinoCleaningKasekiRock;
 
 class DinoCleaningHammerBaseHit : public MProcess {
 public:
+    DinoCleaningHammerBaseHit(DinoCleaningKasekiRock *rock, MRandom *random, u8 big);
     virtual ~DinoCleaningHammerBaseHit();
     virtual void Idle();
 

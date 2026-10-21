@@ -9,6 +9,7 @@ public:
     virtual ~DinoCleaningHammer();
     virtual void Unk18();
     virtual void Unk1C();
+    virtual void Unk20();
 
     u32 mUnk78;     // 0x78
     u32 mUnk7C;     // 0x7C
