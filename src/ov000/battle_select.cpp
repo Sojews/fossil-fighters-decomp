@@ -157,10 +157,11 @@ BOOL DinoBattleViewAbilityIcon::IsAnimating() {
     return FALSE;
 }
 
-// NONMATCHING: the game keeps the position on the stack below the offset point; ours swaps the two slots.
 MRect DinoBattleViewAbilityIcon::GetRect() {
+    MPoint p;
     MPoint pos = mMotion->GetPosition();
-    MPoint p(pos.x - mOam->mOffset.x, pos.y - mOam->mOffset.y);
+    p.x = pos.x - mOam->mOffset.x;
+    p.y = pos.y - mOam->mOffset.y;
     MRect r(-20, -20, 18, 18);
     r.Offset(p);
     return r;
