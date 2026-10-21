@@ -62,8 +62,8 @@ public:
     MMotion *mFaceMotion;   // 0xCC
     MConsole *mConsole;     // 0xD0
     MSmartOam *mOam;        // 0xD4
-    u32 mUnkD8;             // 0xD8
-    u32 unkDC;
+    u32 mUnkD8;             // 0xD8: the DinoBattleView
+    class DinoBattleLiveConsoleFilter *mFilter; // 0xDC
     MFx32 mRate;            // 0xE0: the console's typing rate
     MMotionFile mFaceFile;  // 0xE4
     MPictureFile mPicture2; // 0xE8
