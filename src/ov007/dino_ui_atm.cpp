@@ -133,6 +133,8 @@ static inline MTaskSet *ATMParallel(DinoUiATMMenu *menu) {
 
 // The help areas, the back button, each team's name, text, button and empty mark, the cursors and the current
 // team's mark; focuses the team last chosen. Coming in fresh to the battle ATM, a message explains it.
+// NONMATCHING: stack slots only: the team loop's hoisted &mParallel goes below the team button's new/oam temporaries
+// in the game, above them here (as DinoUiTeamSelectMenu::OnStart).
 #pragma opt_common_subs off
 void DinoUiATMMenu::OnStart() {
     SetLinkFallback(1);
