@@ -937,7 +937,11 @@ static inline const char *GetPictName(const DinoExcavateDefs *defs, u32 pict) {
 
 // Loads the picture over the old one (still hidden, below it), then shows it and cross-fades it in, and frees the old
 // one.
-// NONMATCHING: stack slots only (the game puts the priority transfer below the path temporary's destroy flag).
+// (The blend is loaded before the cross fade's arguments.)
+static inline MBlend *DinoFieldBlendOf(MDisplay *display) {
+    return display->mBlend;
+}
+
 void DinoField::LoadFadeInPict(MDisplay *display, MView *old, MExtAffinePicture **pict, u32 id, MPoint pos, u32 frames,
                                long unk) {
     MResource<DinoExcavateDefs> defs = gDinoResource->GetExcavateDefs();
@@ -945,12 +949,9 @@ void DinoField::LoadFadeInPict(MDisplay *display, MView *old, MExtAffinePicture 
     (*pict)->SetPosition(pos);
     (*pict)->SetPriority(1);
     mParallel.AddTail(*pict);
-    MTask *priority = (*pict)->CreatePriorityTransfer(2);
-    MBlend *blend = display->mBlend;
-    MTask *fade = blend->CreateCrossFadeInTask((*pict)->GetPlaneMask(), frames, unk);
-    MTask *show = (*pict)->CreateShowTransfer();
-    MTask *timer = new MTimer(1);
-    mPictTasks->AddTail(timer, show, fade, priority);
+    mPictTasks->AddTail(new MTimer(1), (*pict)->CreateShowTransfer(),
+                        DinoFieldBlendOf(display)->CreateCrossFadeInTask((*pict)->GetPlaneMask(), frames, unk),
+                        (*pict)->CreatePriorityTransfer(2));
     if (old) {
         mPictTasks->AddTail(MTaskExitTransfer::Create(old));
     }
