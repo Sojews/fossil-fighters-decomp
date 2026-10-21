@@ -195,14 +195,15 @@ static inline MFx32Point ToFx32Point(MPoint p) {
     return MFx32Point(MFx32(p.x), MFx32(p.y));
 }
 
-// NONMATCHING: stack slots only (the game's square root result is above the centre).
 int DinoFieldMap::FindCircle(MFx32Point pos) {
     for (u32 i = 1; i < ((DinoFieldMapData *) mData.mFile.GetData())->mCircleCount; i++) {
         DinoFieldMapData *data = (DinoFieldMapData *) mData.mFile.GetData();
         DinoFieldMapCircle *circle =
             (DinoFieldMapCircle *) ((u8 *) data + ((u32 *) ((u8 *) data + data->mCircles))[i]);
+        MFx32 len;
         MFx32Point center = ToFx32Point(MPoint(circle->x, circle->y));
-        if ((center - pos).Length() <= MFx32(circle->radius)) {
+        len = (center - pos).Length();
+        if (len <= MFx32(circle->radius)) {
             return i;
         }
     }
