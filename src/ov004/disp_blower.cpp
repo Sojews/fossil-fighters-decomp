@@ -583,7 +583,7 @@ inline MicTestButton::MicTestButton(DinoUiOptionMenu *owner, u32 textId)
     mMotionA8->Show();
     mTasks = new MSerialTaskSet;
     mMessages = new MParallelTaskSet;
-    MTask *msgs, *meter, *a8, *a4, *a0;
+    MTask *msgs, *a0, *a4, *a8, *meter;
     meter = mMeter;
     a8 = mMotionA8;
     a4 = mMotionA4;
@@ -628,6 +628,8 @@ static inline MTaskSet *OptionParallel(DinoUiOptionMenu *menu) {
 #pragma inline_max_size(1000)
 // The speed, volume and mic test items, OK and back, the top screen's help areas and the links between them all;
 // starts on the saved settings.
+// (Matches; objdiff's report still docks it a hair because the item ctor follows it directly in the game, so its two
+// calls there read as branches inside this function.)
 void DinoUiOptionMenu::OnStart() {
     DinoHelpBase::Disable();
     SetLinkFallback(1);
