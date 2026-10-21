@@ -396,6 +396,21 @@ extern "C" struct {
     DinoUiWirelessMatchState StateChildScan;    // 0x4
 } data_ov004_021743d0;
 
+// A new serial set running the task.
+static inline MTask *DinoUiNewSerial(MTask *a) {
+    MSerialTaskSet *set = new MSerialTaskSet(TRUE);
+    set->AddTail(a);
+    return set;
+}
+
+// A new parallel set running the two tasks.
+static inline MTask *DinoUiNewParallel(MTask *a, MTask *b) {
+    MParallelTaskSet *set = new MParallelTaskSet(TRUE);
+    set->AddTail(a);
+    set->AddTail(b);
+    return set;
+}
+
 static inline void AddParallel(MProcess *process, MTask *a, MTask *b, MTask *c, MTask *d) {
     MParallelTaskSet *parallel = &process->mParallel;
     parallel->AddTail(a);
@@ -996,7 +1011,6 @@ void DinoUiCannonParentScanner::StateListen() {
 extern const u32 data_0208ab64;
 
 // Dims the screen, shows the count and starts being a parent with the owner's name.
-// NONMATCHING: the game swaps the stack slots of the ones digit and the show transfer
 void DinoUiCannonParentScanner::StateStart() {
     gCurrentDisplay->mBlend->Reset();
     gCurrentDisplay->mBlend->SetMode(3);
@@ -1027,17 +1041,9 @@ void DinoUiCannonParentScanner::StateStart() {
     DinoUiWirelessSsid ssid;
     ssid.mode = 2;
     MIi_CpuCopy16(player.name, ssid.name, sizeof(ssid.name));
-    MTask *show = mOam->CreateShowTransfer();
-    MTask *fade = gCurrentDisplay->mBlend->CreateFadeRatioAnime(0, 8, 10, 0);
-    MTask *start = mMultiPlay->CreateStartParentTask(&ssid, sizeof(ssid), 0);
-    MSerialTaskSet *starting = new MSerialTaskSet(TRUE);
-    starting->AddTail(start);
-    MParallelTaskSet *opening = new MParallelTaskSet(TRUE);
-    opening->AddTail(starting);
-    opening->AddTail(fade);
-    MSerialTaskSet *serial = &mSerial;
-    serial->AddTail(opening);
-    serial->AddTail(show);
+    mSerial.AddTail(DinoUiNewParallel(DinoUiNewSerial(mMultiPlay->CreateStartParentTask(&ssid, sizeof(ssid), 0)),
+                                      gCurrentDisplay->mBlend->CreateFadeRatioAnime(0, 8, 10, 0)),
+                    mOam->CreateShowTransfer());
     mTasks = new MParallelTaskSet;
     mParallel.AddTail(mTasks);
     mState = data_ov004_021742d0.StateShowCancel_04;
