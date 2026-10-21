@@ -81,7 +81,7 @@ void MCanvasWindow::GetLine(int y, void *dest) {
 void MCanvasWindow::SetLine(int y, const void *src) {
     u8 line[256];
     mCanvas->GetLine(y - mRect.top, line);
-    MI_CpuCopy8(src, line + mRect.left, mRect.right - mRect.left);
+    MI_CpuCopy8(src, line + mRect.left, mRect.GetWidth());
     mCanvas->SetLine(y - mRect.top, line);
 }
 
