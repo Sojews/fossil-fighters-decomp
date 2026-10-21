@@ -1697,8 +1697,7 @@ DinoEventExecAppendCharaRegion::DinoEventExecAppendCharaRegion(DinoEventLoop *ev
     mEvent = event;
     mChara = chara;
     mMap = gDinoResource->GetRegionMapMatch(region);
-    DinoRegionCenter center = gDinoResource->GetRegionCenter(region);
-    mPos.Set(MFx32((int)center.unk00), MFx32((int)center.unk04));
+    mPos = RegionPos(gDinoResource->GetRegionCenter(region));
     mAngle = angle;
     mTarget = target;
 }
