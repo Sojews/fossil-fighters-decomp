@@ -121,6 +121,7 @@ src/ov000/dino_battle2.cpp:
 
 src/ov000/set_var_task.cpp:
     .text       start:0x0218c150 end:0x0218d1cc
+    .init       start:0x02190dcc end:0x02190e60
 
 src/ov000/dino_battle_view3.cpp:
     .text       start:0x0218d1cc end:0x0218da24

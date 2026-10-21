@@ -21,6 +21,7 @@
 #include <string.h>
 #include "m/text_codec.h"
 #include "m/seed_generator.h"
+#include "game/dino_static_init.h"
 
 SetVarTask::~SetVarTask() {
 }
@@ -380,3 +381,52 @@ void DinoBattleTalkWindow::Idle() {
         }
     }
 }
+
+// The file's static initialization (see dino_static_init.h).
+// NONMATCHING: 89.7%, same instructions but other registers (the game's are those of real static MPoint objects;
+// the last read-backs are plain loads, kept in registers).
+extern "C" u32 data_ov000_021971b8[];
+extern "C" u32 data_ov000_021971e0[];
+extern "C" u32 data_ov000_021971f0[];
+extern "C" u32 data_ov000_02197200[];
+static struct SetVarTaskStaticInit {
+    SetVarTaskStaticInit() {
+        DINO_POOL_WORD(data_ov000_02197138, 0x1c) = 128;
+        DINO_POOL_WORD(data_ov000_02197138, 0x20) = 176;
+        DINO_POOL_WORD(data_ov000_02197138, 0x4c) = 8;
+        DINO_POOL_WORD(data_ov000_02197138, 0x50) = 150;
+        DINO_POOL_WORD(data_ov000_02197138, 0x2c) = 64;
+        DINO_POOL_WORD(data_ov000_02197138, 0x30) = 112;
+        DINO_POOL_WORD(data_ov000_02197138, 0x3c) = 192;
+        DINO_POOL_WORD(data_ov000_02197138, 0x40) = 28;
+        DINO_POOL_WORD(data_ov000_02197138, 0x24) = 8;
+        DINO_POOL_WORD(data_ov000_02197138, 0x28) = 158;
+        DINO_POOL_WORD(data_ov000_02197138, 0xc) = -32;
+        DINO_POOL_WORD(data_ov000_02197138, 0x10) = 160;
+        DINO_POOL_WORD(data_ov000_02197138, 0x54) = 32;
+        DINO_POOL_WORD(data_ov000_02197138, 0x58) = 160;
+        DINO_POOL_WORD(data_ov000_02197138, 0x14) = 288;
+        DINO_POOL_WORD(data_ov000_02197138, 0x18) = 160;
+        DINO_POOL_WORD(data_ov000_02197138, 0x44) = 224;
+        DINO_POOL_WORD(data_ov000_02197138, 0x48) = 160;
+        DINO_POOL_WORD(data_ov000_021971b8, 0x20) = 32;
+        DINO_POOL_WORD(data_ov000_021971b8, 0x24) = 160;
+        DINO_POOL_WORD(data_ov000_021971e0, 0x0) = 224;
+        DINO_POOL_WORD(data_ov000_021971e0, 0x4) = 160;
+        DINO_POOL_WORD(data_ov000_021971b8, 0x30) = -32;
+        DINO_POOL_WORD(data_ov000_021971b8, 0x34) = 160;
+        DINO_POOL_WORD(data_ov000_021971f0, 0x0) = 288;
+        DINO_POOL_WORD(data_ov000_021971f0, 0x4) = 160;
+        DINO_POOL_WORD(data_ov000_021971b8, 0x40) = 0;
+        DINO_POOL_WORD(data_ov000_021971b8, 0x44) = 0;
+        DINO_POOL_WORD(data_ov000_02197200, 0x0) = -64;
+        DINO_POOL_WORD(data_ov000_02197200, 0x4) = 0;
+        const s32 *pos = (const s32 *)&data_ov000_02197138;
+        s32 x = pos[0x24 / 4];
+        DINO_POOL_WORD(data_ov000_021971b8, 0x50) = x + 0x30;
+        s32 y = pos[0x28 / 4];
+        DINO_POOL_WORD(data_ov000_021971b8, 0x54) = y;
+        DINO_POOL_WORD(data_ov000_021971b8, 0x58) = x;
+        DINO_POOL_WORD(data_ov000_021971b8, 0x5c) = y;
+    }
+} sSetVarTaskStaticInit;
