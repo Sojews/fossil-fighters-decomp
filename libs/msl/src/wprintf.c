@@ -545,7 +545,6 @@ static wchar_t *double2hex(long double num, wchar_t *buff, print_format format) 
     unsigned char *q;
     unsigned char working_byte;
     long double ld;
-    int expbits, expmask;
     unsigned snum;
     long exp;
     print_format exp_format;
@@ -553,11 +552,9 @@ static wchar_t *double2hex(long double num, wchar_t *buff, print_format format) 
     int mantissa_bit;
     decform form;
     decimal dec;
-    int radix_marker;
 
-    radix_marker = '.';
-    p            = buff;
-    ld           = num;
+    p  = buff;
+    ld = num;
 
     if (format.precision > 509) {
         return 0;
@@ -567,62 +564,48 @@ static wchar_t *double2hex(long double num, wchar_t *buff, print_format format) 
     form.digits = 0x20;
     __num2dec(&form, num, &dec);
 
-    switch (*dec.sig.text) {
-        case '0':
-            dec.exp = 0;
-            if (dec.sgn) {
-                p = buff - 5;
-                if (format.conversion_char == L'A') {
-                    wcscpy(p, L"-0X0");
-                } else {
-                    wcscpy(p, L"-0x0");
-                }
-            } else {
-                p = buff - 4;
-                if (format.conversion_char == L'A') {
-                    wcscpy(p, L"0X0");
-                } else {
-                    wcscpy(p, L"0x0");
-                }
-            }
+    if (fabsl(num) == 0.0) {
+        p = buff - 6;
+        wcscpy(p, L"0x0p0");
+        return p;
+    }
 
-            return p;
-        case 'I':
-            if (dec.sgn) {
-                p = buff - 5;
-                if (format.conversion_char == L'A') {
-                    wcscpy(p, L"-INF");
-                } else {
-                    wcscpy(p, L"-inf");
-                }
+    if (*dec.sig.text == L'I') {
+        if (dec.sgn) {
+            p = buff - 5;
+            if (format.conversion_char == L'A') {
+                wcscpy(p, L"-INF");
             } else {
-                p = buff - 4;
-                if (format.conversion_char == L'A') {
-                    wcscpy(p, L"INF");
-                } else {
-                    wcscpy(p, L"inf");
-                }
+                wcscpy(p, L"-inf");
             }
-
-            return p;
-        case 'N':
-            if (dec.sgn) {
-                p = buff - 5;
-                if (format.conversion_char == L'A') {
-                    wcscpy(p, L"-NAN");
-                } else {
-                    wcscpy(p, L"-nan");
-                }
+        } else {
+            p = buff - 4;
+            if (format.conversion_char == L'A') {
+                wcscpy(p, L"INF");
             } else {
-                p = buff - 4;
-                if (format.conversion_char == L'A') {
-                    wcscpy(p, L"NAN");
-                } else {
-                    wcscpy(p, L"nan");
-                }
+                wcscpy(p, L"inf");
             }
+        }
 
-            return p;
+        return p;
+    } else if (*dec.sig.text == L'N') {
+        if (dec.sgn) {
+            p = buff - 5;
+            if (format.conversion_char == L'A') {
+                wcscpy(p, L"-NAN");
+            } else {
+                wcscpy(p, L"-nan");
+            }
+        } else {
+            p = buff - 4;
+            if (format.conversion_char == L'A') {
+                wcscpy(p, L"NAN");
+            } else {
+                wcscpy(p, L"nan");
+            }
+        }
+
+        return p;
     }
 
     exp_format.justification_options = right_justification;
@@ -634,35 +617,20 @@ static wchar_t *double2hex(long double num, wchar_t *buff, print_format format) 
     exp_format.precision             = 1;
     exp_format.conversion_char       = L'd';
 
-    int i;
-    unsigned char *nump = (unsigned char *) &num;
-    for (i = 0; i < TARGET_FLOAT_BYTES; i++) {
-        unsigned char x                  = nump[i];
-        nump[i]                          = nump[TARGET_FLOAT_BYTES - i + 3];
-        nump[TARGET_FLOAT_BYTES - i + 3] = x;
+    {
+        int i;
+        char *nump = (char *) &num;
+        for (i = 0; i < 4; i++) {
+            char x      = nump[i];
+            nump[i]     = nump[7 - i];
+            nump[7 - i] = x;
+        }
     }
-
-    expbits = TARGET_FLOAT_EXP_BITS;
-    expmask = 0x7FF;
 
     snum = ((unsigned char *) &num)[0] << 25;
-    if (TARGET_FLOAT_EXP_BITS > 7) {
-        snum |= ((unsigned char *) &num)[1] << 17;
-    }
-    if (TARGET_FLOAT_EXP_BITS > 15) {
-        snum |= ((unsigned char *) &num)[2] << 9;
-    }
-    if (TARGET_FLOAT_EXP_BITS > 23) {
-        snum |= ((unsigned char *) &num)[3] << 1;
-    }
-
-    snum = (snum >> (29 - expbits)) & expmask;
-
-    if (snum != 0) {
-        exp = snum - 0x3FF;
-    } else {
-        exp = 0;
-    }
+    snum |= ((unsigned char *) &num)[1] << 17;
+    snum = (snum >> 21) & 0x7FF;
+    exp  = snum - 0x3FF;
 
     p = long2str(exp, buff, exp_format);
     if (format.conversion_char == L'a') {
@@ -672,11 +640,7 @@ static wchar_t *double2hex(long double num, wchar_t *buff, print_format format) 
     }
     q = (unsigned char *) &num;
 
-    if (TARGET_FLOAT_IMPLICIT_J_BIT) {
-        mantissa_bit = (4 + expbits + format.precision * 4) - 1;
-    } else {
-        mantissa_bit = (1 + expbits + format.precision * 4) - 4;
-    }
+    mantissa_bit = format.precision * 4 + 11;
 
     for (hex_precision = format.precision; hex_precision >= 1; hex_precision--) {
         if (mantissa_bit < 64) {
@@ -687,13 +651,6 @@ static wchar_t *double2hex(long double num, wchar_t *buff, print_format format) 
 
             if ((mantissa_bit & ~7) != ((mantissa_bit - 4) & ~7)) {
                 working_byte |= ((*(q + (mantissa_byte - 1))) << 8) >> (7 - ((mantissa_bit) & 7));
-            }
-
-            if (!TARGET_FLOAT_IMPLICIT_J_BIT) {
-                if (mantissa_bit == 1 + expbits) {
-                    *--p = radix_marker;
-                    working_byte &= 0x1;
-                }
             }
 
             if ((working_byte &= 0xF) < 10) {
@@ -711,17 +668,11 @@ static wchar_t *double2hex(long double num, wchar_t *buff, print_format format) 
         mantissa_bit -= 4;
     }
 
-    if (TARGET_FLOAT_IMPLICIT_J_BIT) {
-        if (format.precision || format.alternate_form) {
-            *--p = radix_marker;
-        }
-
-        if (fabsl(ld) != 0.0) {
-            *--p = '1';
-        } else {
-            *--p = '0';
-        }
+    if (format.precision || format.alternate_form) {
+        *--p = L'.';
     }
+
+    *--p = L'1';
 
     if (format.conversion_char == L'a') {
         *--p = L'x';
@@ -1274,8 +1225,8 @@ int __wpformatter(void *(*WriteProc)(void *, const wchar_t *, size_t), void *Wri
                 num_chars = 1;
                 break;
 
-            case L'p':
             case 0xFFFF:
+            case L'p':
             default:
             conversion_error:
                 num_chars = wcslen(curr_format);
@@ -1300,20 +1251,6 @@ int __wpformatter(void *(*WriteProc)(void *, const wchar_t *, size_t), void *Wri
 
                 ++buff_ptr;
                 num_chars--;
-            }
-
-            if ((format.justification_options == zero_fill) &&
-                ((format.conversion_char == L'a') || (format.conversion_char == L'A'))) {
-                if (num_chars < 2) {
-                    return -1;
-                }
-
-                if ((*WriteProc)(WriteProcArg, buff_ptr, 2) == 0) {
-                    return -1;
-                }
-
-                num_chars -= 2;
-                buff_ptr += 2;
             }
 
             while (field_width < format.field_width) {
