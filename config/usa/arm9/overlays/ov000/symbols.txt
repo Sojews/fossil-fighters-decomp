@@ -1017,7 +1017,7 @@ _ZN30DinoBattleViewStatusEffectIconC1EP9MSmartOammm kind:function(thumb,size=0x2
 _ZN16StatusEffectSlotC1Ev kind:function(thumb,size=0xa) addr:0x0217e578
 _ZN16StatusEffectSlotD1Ev kind:function(thumb,size=0xc) addr:0x0217e584
 func_ov000_0217e590 kind:function(thumb,size=0x2) addr:0x0217e590
-func_ov000_0217e594 kind:function(thumb,size=0xd10) addr:0x0217e594
+_ZN30DinoBattleViewStatusEffectIcon10SetEffectsEiPKh kind:function(thumb,size=0xd10) addr:0x0217e594
 .L_0217e81a kind:label(thumb) addr:0x0217e81a local
 .L_0217f238 kind:label(thumb) addr:0x0217f238 local
 _ZN30DinoBattleViewStatusEffectIcon4IdleEv kind:function(thumb,size=0x294) addr:0x0217f2a4

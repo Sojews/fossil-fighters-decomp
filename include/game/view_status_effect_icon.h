@@ -14,6 +14,18 @@
 
 class ViewStatusEffectIcon;
 
+// The status effects' motion paths: {effect, path} pairs, ended by a NULL path; the static initialization fills in
+// the paths. (data_ov000_021952b4's word 0x30 is the first path.)
+struct StatusEffectPath {
+    u32 mEffect;
+    const char *mPath;
+};
+extern "C" struct {
+    u8 unk00[0x30];
+    u32 firstIcon;  // 0x30
+} data_ov000_021952b4;
+extern "C" StatusEffectPath data_ov000_021952e0[];
+
 struct StatusEffectEntry {
     u32 mId;        // 0x00
     int mCount;     // 0x04
@@ -41,6 +53,8 @@ public:
     void ResetIconModes();
     // Waits for both icons' motions and the queue.
     MTask *CreateWaitTask();
+    // Updates the icons to the effects (low nibble: the effect, bits 5-6: the count, bit 7: the flag).
+    void SetEffects(int count, const u8 *effects);
 
     u32 mUnk74;                     // 0x74
     MSmartOam *mOam;                // 0x78
@@ -70,6 +84,7 @@ public:
 
     class PlayEraseMotionTask : public MTask {
     public:
+        PlayEraseMotionTask(ViewStatusEffectIcon *icon) { mIcon = icon; }
         virtual ~PlayEraseMotionTask();
         virtual void Execute();
 
@@ -196,6 +211,22 @@ public:
 
 class ViewStatusEffectIconLoadMotionTask : public MTask {
 public:
+    ViewStatusEffectIconLoadMotionTask(ViewStatusEffectIcon *icon, const StatusEffectEntry *entry, int anime)
+        : mUnk10((u32)icon) {
+        mAnime = anime;
+        int i = 0;
+        if (data_ov000_021952b4.firstIcon != 0) {
+            const StatusEffectPath *path = data_ov000_021952e0;
+            do {
+                if (entry->mId == path->mEffect) {
+                    mUnk14 = data_ov000_021952e0[i].mPath;
+                    break;
+                }
+                path++;
+                i++;
+            } while (path->mPath != NULL);
+        }
+    }
     virtual ~ViewStatusEffectIconLoadMotionTask();
     virtual void Execute();
 
@@ -206,6 +237,10 @@ public:
 
 class ViewStatusEffectIconShowTask : public MTask {
 public:
+    ViewStatusEffectIconShowTask(ViewStatusEffectIcon *icon, u8 show) {
+        mIcon = icon;
+        mShow = show;
+    }
     virtual ~ViewStatusEffectIconShowTask();
     virtual void Execute();
 
