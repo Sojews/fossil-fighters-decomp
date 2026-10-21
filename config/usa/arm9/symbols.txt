@@ -6307,10 +6307,10 @@ _deq kind:function(arm,size=0x8c) addr:0x020856e8
 _dneq kind:function(arm,size=0x8c) addr:0x02085774
 _fgr kind:function(arm,size=0x5c) addr:0x02085800
 func_0208585c kind:function(arm,size=0xc,unknown) addr:0x0208585c
-func_02085868 kind:function(arm,size=0x3b8) addr:0x02085868
+_fdiv kind:function(arm,size=0x3b8) addr:0x02085868
 _f2d kind:function(arm,size=0x84) addr:0x02085c20
 _ffix kind:function(arm,size=0x34) addr:0x02085ca4
-func_02085cd8 kind:function(arm,size=0x48) addr:0x02085cd8
+_fflt kind:function(arm,size=0x48) addr:0x02085cd8
 _fmul kind:function(arm,size=0x1e0) addr:0x02085d20
 func_02085f00 kind:function(arm,size=0xc,unknown) addr:0x02085f00
 _fsub kind:function(arm,size=0x278) addr:0x02085f0c
@@ -6751,6 +6751,8 @@ data_0208a2ec kind:data(any) addr:0x0208a2ec
 data_0208a2f0 kind:data(any) addr:0x0208a2f0
 data_0208a2fc kind:data(any) addr:0x0208a2fc
 data_0208a300 kind:data(any) addr:0x0208a300
+data_0208a304 kind:data(any) addr:0x0208a304
+data_0208a308 kind:data(any) addr:0x0208a308
 data_0208a330 kind:data(any) addr:0x0208a330
 data_0208a334 kind:data(any) addr:0x0208a334
 data_0208a338 kind:data(any) addr:0x0208a338

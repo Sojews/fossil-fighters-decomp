@@ -331,7 +331,7 @@ _Z22DinoCollectCreatureIdsRSt6vectorIPvSaIS0_EEP21DinoBattleModelPlayerS5_ kind:
 _ZN21DinoBattleModelPlayer25CreateUpdateCreaturesTaskEv kind:function(thumb,size=0xfc) addr:0x021629b4
 _Z22DinoAttackHasUnk10Flagm kind:function(thumb,size=0x28) addr:0x02162ab0
 func_ov000_02162ad8 kind:function(thumb,size=0xd0) addr:0x02162ad8
-func_ov000_02162ba8 kind:function(thumb,size=0x428) addr:0x02162ba8
+_ZN21DinoBattleModelPlayer16CreateAttackTaskEP23DinoBattleModelCreatureS1_mhih kind:function(thumb,size=0x428) addr:0x02162ba8
 _ZN21DinoBattleModelPlayerC1Emm kind:function(thumb,size=0xc4) addr:0x02162fd0
 _ZN21DinoBattleModelPlayerD1Ev kind:function(thumb,size=0x6c) addr:0x02163094
 _ZN21DinoBattleModelPlayerD0Ev kind:function(thumb,size=0x70) addr:0x02163100

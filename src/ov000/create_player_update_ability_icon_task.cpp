@@ -837,8 +837,8 @@ void DinoBattleModelCreature::SetUnk108(u32 value) {
 // Whether the target wards off the damage: 1 by its status (taking none of it), 2 by its kind 7 def's chance (taking
 // it scaled down), else 0; out gets what it takes (at least 1).
 // NONMATCHING: 99.9%, the multiplication's two argument copies swap stack slots.
-extern "C" int func_ov000_02162ad8(DinoBattleModelCreature *attacker, DinoBattleModelCreature *target, u32 unk2,
-                                   u32 unk3, u32 unk4, int *damage, int *out, u32 flags) {
+extern "C" int func_ov000_02162ad8(DinoBattleModelCreature *attacker, DinoBattleModelCreature *target, MFx32 unk2,
+                                   MFx32 unk3, MFx32 unk4, int *damage, int *out, u32 flags) {
     int result = 0;
     if (*damage != 0) {
         if ((flags & 1) && (target->GetStatus()->flags & 0x100)) {
@@ -873,6 +873,7 @@ extern "C" int func_ov000_02162ad8(DinoBattleModelCreature *attacker, DinoBattle
     }
     return result;
 }
+
 
 extern "C" BOOL func_ov000_0216c83c(int value);
 
@@ -2755,3 +2756,104 @@ static struct CreatePlayerUpdateAbilityIconTaskStaticInit {
         DINO_POOL_WORD(data_ov000_021924bc, 0x2c) = 112;
     }
 } sCreatePlayerUpdateAbilityIconTaskStaticInit;
+
+extern "C" MFx32 func_ov000_0216e2d8(DinoBattleModelCreature *attacker, DinoBattleModelCreature *target);
+extern "C" MFx32 func_ov000_0216e650(DinoBattleModelCreature *attacker, DinoBattleModelCreature *target);
+extern "C" MFx32 func_ov000_0216e918(DinoBattleModelCreature *creature, MFx32 chance, u8 *flag, int *kind);
+MFx32 GetAffinityRatio(DinoBattleModelCreature *creature, DinoBattleModelCreature *other, u32 attack);
+extern "C" DinoBattleDebugLog *data_ov000_021978c0;
+extern "C" BOOL func_ov000_0218472c(int flag);
+extern "C" const u32 data_0208a304, data_0208a308;  // the debug log's attack and damage formats
+
+// The damage after the special attack's affinity (for a special) and the position.
+static inline int DinoAttackDamage(DinoBattleModelCreature *attacker, DinoBattleModelCreature *target, MFx32 value,
+                                   MFx32 affinity, u8 special) {
+    if (special) {
+        value = attacker->ApplyRatio2(value, affinity);
+    }
+    return MFx32ToInt(MFx32(attacker->ApplyPositionRatio(value, target->GetB8Category())));
+}
+// (For the debug log.)
+static inline float DinoFxToFloat(MFx32 x) {
+    return (float)x.v / 4096.0f;
+}
+
+
+
+// The attacker's attack on the target: whether it hits, the damage (and recoil), the life tasks, and the view's
+// request to show it. (Defined here at the end: placed after func_ov000_02162ad8, as in the game, it changes
+// func_ov000_0216d2cc's branch layout.)
+// NONMATCHING: 99.97%, the inlined damage's ApplyRatio2/ApplyPositionRatio temporaries take lower stack slots than
+// the game's (which has them in creation order with this function's), and one zero store is scheduled earlier.
+MTask *DinoBattleModelPlayer::CreateAttackTask(DinoBattleModelCreature *attacker, DinoBattleModelCreature *target,
+                                               u32 attack, u8 special, int unk, u8 fade) {
+    MSerialTaskSet *set = new MSerialTaskSet(TRUE);
+    int damage = 0;
+    int recoil = 0;
+    int guard = 0;
+    BOOL attackerDown = FALSE;
+    BOOL targetDown = FALSE;
+    attacker->RollUnk10C();
+    u8 result[2];   // [0] hit, [1] missed
+    result[1] = 0;
+    int kind = 0;
+    if (attacker->RollDefUnk23()) {
+        MFx32 base;
+        MFx32 ratio = attacker->GetUnkECRatio();
+        MFx32 defense = func_ov000_0216e2d8(attacker, target);
+        MFx32 hit = attacker->ReduceByDefense(ratio, defense);
+        MFx32 chanceBase = func_ov000_0216f028(attacker);
+        MFx32 chanceRatio = func_ov000_0216e650(attacker, target);
+        MFx32 chance = attacker->CurveRatio(chanceBase, chanceRatio);
+        MFx32 critical = func_ov000_0216e918(attacker, chance, &result[1], &kind);
+        if (result[1]) {
+            result[1] = 1;
+        } else {
+            MFx32 affinity = GetAffinityRatio(attacker, target, attack);
+            const DinoAttackDef *def = gDinoResource->GetAttackDef(attack);
+            char text[0x100];
+            sprintf(text, gDinoResource->GetText(data_0208a304), def->hitCount);
+            data_ov000_021978c0->Print(text);
+            const u16 *cost = DinoOffsetPtr<u16>(def, def->cost);
+            result[0] = 1;
+            base = attacker->CalcDamage(target, MFx32(cost[1]), hit, result);
+            damage = DinoAttackDamage(attacker, target, attacker->ApplyRatio(base, critical), affinity, special);
+            if (damage < 1 && result[0]) {
+                damage = 1;
+            }
+            recoil = 0;
+            result[1] = 0;
+            guard = func_ov000_02162ad8(attacker, target, ratio, MFx32(cost[1]), critical, &damage, &recoil,
+                                        *(const u32 *)((const u8 *)def + 0x1C));
+            if (damage >= (int)target->GetUnkE4() && !target->mPlayer->GetUnkC8()) {
+                guard = 0;
+                recoil = 0;
+            }
+            set->AddTail(new ModelCretureAddLifeTask(target, -damage), new ModelCretureAddLifeTask(attacker, -recoil));
+            if ((int)(target->GetUnkE4() - damage) <= 0 && !target->mPlayer->GetUnkC8()) {
+                targetDown = TRUE;
+            }
+            if (!func_ov000_0218472c(2) && (int)(attacker->GetUnkE4() - recoil) <= 0 && !attacker->mPlayer->GetUnkC8()) {
+                attackerDown = TRUE;
+            }
+            float shown = DinoFxToFloat(MFx32(damage));
+            char text2[0x100];
+            sprintf(text2, gDinoResource->GetText(data_0208a308), shown);
+            data_ov000_021978c0->Print(text2);
+        }
+    } else {
+        result[1] = 1;
+    }
+    if (fade) {
+        mSerial.AddTail(CreateLcdFadeTask(TRUE));
+    }
+    u8 show = 1;
+    if (!special && unk > 0) {
+        show = 0;
+    }
+    set->AddTail(mUnkF4->CreatePostTask(new DinoBattleViewCreatureAbilityRequest(
+        (u32)(MMessageObserver *)this, GetUnkB8(), attacker->GetUnkB4(), attack, target->GetUnkB4(), kind, result[1],
+        damage, targetDown, guard, recoil, attackerDown, special, show, special ? 1 : 2,
+        attacker->CompareUnkECA0(target, attack), 0)));
+    return set;
+}

@@ -137,6 +137,9 @@ public:
     MTask *CreateMotionEffectTask(u32 a, u32 b, u32 c, u32 d, u32 e);
     MTask *CreateAbilityTask(u32 a, u32 b, u32 c);
     MTask *CreateLcdFadeTask(BOOL clearIcons);
+    // The attacker's attack on the target: the damage, the recoil, and the view's request to show it.
+    MTask *CreateAttackTask(DinoBattleModelCreature *attacker, DinoBattleModelCreature *target, u32 attack, u8 special,
+                            int unk, u8 fade);
     DinoBattleModelCreature *GetCreatureInSlot(int slot);
     void ClearEvents();
     void AddAbilitySequence(MTaskSet *set, u32 a, u32 b, u32 attacker, std::vector<void *> &targets, u8 recolor);
@@ -314,6 +317,10 @@ public:
 
 class ModelCretureAddLifeTask : public MTask {
 public:
+    ModelCretureAddLifeTask(DinoBattleModelCreature *creature, int amount) {
+        mUnk10 = (u32)creature;
+        mUnk14 = amount;
+    }
     virtual ~ModelCretureAddLifeTask();
     virtual void Execute();
 

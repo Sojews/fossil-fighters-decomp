@@ -24,10 +24,10 @@ void _deq(void);
 void _dneq(void);
 void _fgr(void);
 void func_0208585c(void);
-void func_02085868(void);
+void _fdiv(void);
 void _f2d(void);
 void _ffix(void);
-void func_02085cd8(void);
+void _fflt(void);
 void _fmul(void);
 void func_02085f00(void);
 void _fsub(void);
@@ -1490,7 +1490,7 @@ asm void func_0208585c(void) {
     eor r0, r0, r1
 }
 
-asm void func_02085868(void) {
+asm void _fdiv(void) {
     stmdb sp!, {lr}
     mov ip, #0xff
     ands r3, ip, r0, lsr #23
@@ -1808,7 +1808,7 @@ asm void _ffix(void) {
     bx lr
 }
 
-asm void func_02085cd8(void) {
+asm void _fflt(void) {
     ands r2, r0, #0x80000000
     rsbmi r0, r0, #0
     cmp r0, #0
