@@ -353,6 +353,23 @@ DinoUiShopSellMenuItem::DinoUiShopSellMenuItem(DinoUiShopSellMenu *owner, const 
     mParallel.AddTail(mMotion);
 }
 
+// Lists the fossils in the containers.
+void DinoUiShopSellMenu::LoadFossils() {
+    mFossils.clear();
+    for (int i = 0; i < 0x40; i++) {
+        DinoBackupEntry entry;
+        gDinoBackup->GetUnk98(i, &entry);
+        if (entry.id) {
+            mFossils.push_back(DinoGetFossilEntry(&entry, mKasekiDefs));
+        }
+    }
+    if (mFossils.size() == 0) {
+        mLastPage = 0;
+    } else {
+        mLastPage = (mFossils.size() - 1) / 8;
+    }
+}
+
 void DinoUiShopSellMenu::ClearItems() {
     RemoveLink(mLinkFrom, 4);
     for (int i = 0; i < mItems.size(); i++) {

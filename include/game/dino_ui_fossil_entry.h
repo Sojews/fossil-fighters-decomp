@@ -11,4 +11,10 @@ struct DinoUiFossilEntry {
     u16 unk4;   // 0x4
 };
 
+// DinoGetKasekiButtonInfo seen as returning the list entry: the lists push what it returns straight in (no conversion
+// temporary in between), which this cast gives. (dino_ui_common.h must be included.)
+#define DinoGetFossilEntry                                                                                           \
+    ((DinoUiFossilEntry(*)(const DinoBackupEntry *, MResource<DinoKasekiDefs>))(                                      \
+        DinoKasekiButtonInfo(*)(const DinoBackupEntry *, MResource<DinoKasekiDefs>))DinoGetKasekiButtonInfo)
+
 #endif

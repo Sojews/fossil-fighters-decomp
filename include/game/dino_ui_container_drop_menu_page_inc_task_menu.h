@@ -13,6 +13,7 @@
 
 class MSmartOam;
 #include "game/dino_ui3_parts_kaseki_button.h"
+#include "game/dino_ui_fossil_entry.h"
 
 class DinoUi3PartsFraction;
 class DinoUi3PartsCursor;
@@ -38,6 +39,7 @@ public:
     void DeleteItems();
     // Makes the page's kaseki buttons and links them.
     void CreateItems();
+    void LoadIcons();
 
     MSmartOam *mOam;            // 0xB4: the items' sprites
     MMenuItem *mUnkB8;          // 0xB8: below the grid
@@ -53,7 +55,7 @@ public:
     MParallelTaskSet *mCursorTasks; // 0xF0
     DinoUi3PartsCursor *mCursor;    // 0xF4
     DinoUi3PartsRockName *mRockName;    // 0xF8
-    std::vector<DinoUiKasekiIcon> mIcons;   // 0xFC: the listed kaseki
+    std::vector<DinoUiFossilEntry> mIcons;  // 0xFC: the listed kaseki
     MResource<DinoKasekiDefs> mKasekiDefs;  // 0x108
     int mPage; // 0x118
     int mLastPage; // 0x11C

@@ -4,6 +4,8 @@
 // Derived destructors have their bases' destructor bodies inlined; auto-inlining the ones defined above does that.
 #pragma auto_inline on
 
+#include "game/dino_ui_common.h"
+
 #include "game/dino_ui_container_drop_menu_page_inc_task_menu.h"
 #include "game/dino_ui_container_drop_menu_page_inc_task.h"
 #include "game/dino_ui_container_drop_menu_item.h"
@@ -70,7 +72,6 @@ extern struct {
 extern "C" const char data_ov005_0216b154[], data_ov005_0216b164[];
 extern const u32 data_0208a668, data_0208aab4, data_0208a670, data_0208a924, data_0208aab8;
 extern const u32 data_0208a660, data_0208a664;
-extern "C" void func_ov005_0215ddd4(DinoUiContainerDropMenu *menu);
 
 inline DinoUiContainerDropBackButton::DinoUiContainerDropBackButton(DinoUiContainerDropMenu *owner)
     : DinoUiContainerDropMenuItem(owner, (const char *)data_ov005_02169308[0x6c / 4], data_ov005_02169388.mBackPos,
@@ -132,7 +133,7 @@ void DinoUiContainerDropMenu::OnStart() {
     mKasekiDefs = gDinoResource->LoadKasekiDefs();
     gDinoBackup->GetPlayer(&player, 0);
     gDinoBackup->CompactUnk98();
-    func_ov005_0215ddd4(this);
+    LoadIcons();
     if (mLastPage != 0) {
         mPageL = new DinoUiContainerDropPageLButton(this);
         AddItem(mPageL);
@@ -180,6 +181,30 @@ DinoUiContainerDropMenuItem::DinoUiContainerDropMenuItem(DinoUiContainerDropMenu
     mMotion->SetPriority(1);
     mMotion->Show();
     mParallel.AddTail(mMotion);
+}
+
+// (The last entry goes in through an inline: its push's tag temporary comes after the loop's.)
+static inline void DinoPushIcon(std::vector<DinoUiFossilEntry> &v, const DinoUiFossilEntry &e) {
+    v.push_back(e);
+}
+
+// Lists the kaseki in the containers, then the last page's entry.
+void DinoUiContainerDropMenu::LoadIcons() {
+    mIcons.clear();
+    for (int i = 0; i < 0x40; i++) {
+        DinoBackupEntry entry;
+        gDinoBackup->GetUnk98(i, &entry);
+        if (entry.id) {
+            mIcons.push_back(DinoGetFossilEntry(&entry, mKasekiDefs));
+        }
+    }
+    DinoPushIcon(mIcons, ((DinoUiFossilEntry(*)(const DinoBackupEntry *))(DinoKasekiButtonInfo(*)(const DinoBackupEntry *))
+                          DinoGetKasekiButtonInfo)(mUnkE0));
+    if (mIcons.size() == 0) {
+        mLastPage = 0;
+    } else {
+        mLastPage = (mIcons.size() - 1) / 8;
+    }
 }
 
 BOOL DinoUiContainerDropMenu::PageRight() {
@@ -411,7 +436,7 @@ void DinoUiContainerDropMenu::CreateItems() {
                 mOam,
                 MPoint(data_ov005_02169388.x + data_ov005_02169388.columnX * (i % 4) + data_ov005_02169388.rowX * (i / 4),
                        data_ov005_02169388.y + data_ov005_02169388.columnY * (i % 4) + data_ov005_02169388.rowY * (i / 4)),
-                mIcons[mPage * 8 + i], 0);
+                (const DinoUiKasekiIcon &)mIcons[mPage * 8 + i], 0);
             AddItem(item);
             mItems.push_back(item);
         }

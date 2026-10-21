@@ -36,6 +36,7 @@ public:
         return (const DinoKasekiDef *)((const u8 *)defs + ((const u32 *)((const u8 *)defs + defs->tableOffset))[id]);
     }
     void ClearItems();
+    void LoadRocks();
     void RefreshPage2();
     void Decide(int index);
     void FinishDecide();

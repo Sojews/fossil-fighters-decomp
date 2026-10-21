@@ -86,6 +86,18 @@ DinoUiShopBuyMenuItem::DinoUiShopBuyMenuItem(DinoUiShopBuyMenu *owner, const std
     mParallel.AddTail(mMotion);
 }
 
+// Lists the fossils for sale.
+void DinoUiShopBuyMenu::LoadFossils() {
+    mUnkE8.clear();
+    for (int i = 0; i < 8; i++) {
+        DinoBackupEntry entry;
+        gDinoBackup->GetUnk148(i, &entry);
+        if (entry.id) {
+            mUnkE8.push_back(DinoGetFossilEntry(&entry, mKasekiDefs));
+        }
+    }
+}
+
 // Clears the page's items.
 void DinoUiShopBuyMenu::ClearItems() {
     RemoveLink(mLinkFrom, 4);

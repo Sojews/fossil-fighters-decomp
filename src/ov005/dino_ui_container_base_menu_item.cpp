@@ -206,10 +206,6 @@ void DinoUiContainerBaseMenu::ClearItems() {
 
 #pragma auto_inline off
 
-static inline const DinoUiFossilEntry &AsFossilEntry(const DinoKasekiButtonInfo &info) {
-    return *(const DinoUiFossilEntry *)&info;
-}
-
 extern "C" const u32 data_0208aacc; // the page buttons' help text
 
 inline DinoUiContainerBaseBackButton::DinoUiContainerBaseBackButton(DinoUiContainerBaseMenu *owner, u32 textId)
@@ -292,14 +288,13 @@ void DinoUiContainerBaseMenu::OnStart() {
     mSerial.AddTail(gLcd->mMain->mBright->CreateFadeInFromBlack(30, 0));
 }
 
-// NONMATCHING: the game addresses the button info and the resource copy from one stack base register.
 void DinoUiContainerBaseMenu::RefreshEntries() {
     mUnk148.clear();
     for (int i = 0; i < mUnk101; i++) {
         DinoBackupEntry entry;
         GetEntry(i, &entry);
         if (entry.id) {
-            mUnk148.push_back(AsFossilEntry(DinoGetKasekiButtonInfo(&entry, mDefs)));
+            mUnk148.push_back(DinoGetFossilEntry(&entry, mDefs));
         }
     }
     if (mUnk148.size() == 0) {

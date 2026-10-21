@@ -155,20 +155,14 @@ BOOL DinoUiContainerMenu::PageLeft() {
     return TRUE;
 }
 
-static inline const DinoUiFossilEntry &AsFossilEntry(const DinoKasekiButtonInfo &info) {
-    return *(const DinoUiFossilEntry *)&info;
-}
-
 // Lists the rocks in the containers.
-// NONMATCHING: as DinoUiContainerBaseMenu::RefreshEntries, the game addresses the button info and the resource
-// copy from one stack base register.
 void DinoUiContainerMenu::RefreshEntries() {
     mUnk100.clear();
     for (int i = 0; i < 0x40; i++) {
         DinoBackupEntry entry;
         gDinoBackup->GetUnk98(i, &entry);
         if (entry.id) {
-            mUnk100.push_back(AsFossilEntry(DinoGetKasekiButtonInfo(&entry, mKasekiDefs)));
+            mUnk100.push_back(DinoGetFossilEntry(&entry, mKasekiDefs));
         }
     }
     if (mUnk100.size() == 0) {

@@ -277,7 +277,6 @@ static inline const char *DinoUiCleaningPath(int i) {
 extern "C" const MPoint data_ov005_021671f0, data_ov005_021671f8;  // the fraction's and the rock name's places
 extern "C" const char data_ov005_02168f9c[], data_ov005_02168fac[]; // the pictures
 extern "C" const u32 data_0208a640, data_0208a644, data_0208a648, data_0208a64c, data_0208a92c, data_0208aacc;
-extern "C" void func_ov005_0215baf0(DinoUiCleaningMenu *menu);    // lists the rocks
 
 inline DinoUiCleaningBackButton::DinoUiCleaningBackButton(DinoUiCleaningMenu *owner)
     : DinoUiCleaningMenuItem(owner, DinoUiCleaningPath(15), data_ov005_02167184.mBackPos, data_0208a640) {
@@ -333,7 +332,7 @@ void DinoUiCleaningMenu::OnStart() {
     mKasekiDefs = gDinoResource->LoadKasekiDefs();
     gDinoBackup->GetPlayer(&player, FALSE);
     gDinoBackup->CompactUnk98();
-    func_ov005_0215baf0(this);
+    LoadRocks();
     mParallel.AddTail(mBackground = new MTextPicture(std::string(data_ov005_02168f9c), TRUE, false));
     mBackground->Show();
     mBackground->SetPriority(2);
@@ -404,6 +403,23 @@ DinoUiCleaningMenuItem::DinoUiCleaningMenuItem(DinoUiCleaningMenu *owner, const 
     mMotion->Show();
     mMotion->GetUnit()->SetMode(1);
     mParallel.AddTail(mMotion);
+}
+
+// Lists the rocks in the containers.
+void DinoUiCleaningMenu::LoadRocks() {
+    mUnkE8.clear();
+    for (int i = 0; i < 0x40; i++) {
+        DinoBackupEntry entry;
+        gDinoBackup->GetUnk98(i, &entry);
+        if (entry.id) {
+            mUnkE8.push_back(DinoGetFossilEntry(&entry, mKasekiDefs));
+        }
+    }
+    if (mUnkE8.size() == 0) {
+        mLastPage = 0;
+    } else {
+        mLastPage = (mUnkE8.size() - 1) / 8;
+    }
 }
 
 void DinoUiCleaningTest::Finish() {
