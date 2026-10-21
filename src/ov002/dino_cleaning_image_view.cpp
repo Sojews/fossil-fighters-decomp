@@ -192,6 +192,8 @@ extern "C" struct {
     const char *mMotionPath;    // 0x10
     u8 unk14[0x3C - 0x14];
     MPoint mCellOrigin;     // 0x3C: (2, 2)
+    u8 unk44[0xB8 - 0x44];
+    MRect mDustBounds;      // 0xB8: where landing dust dirties the image (built by the __sinit)
 } data_ov002_021646e4;
 
 DinoCleaningImageView::DinoCleaningImageView()
@@ -347,6 +349,40 @@ void DinoCleaningImageViewScaleAnime::Apply(int step) {
     mView->SetScale(scale);
 }
 
+// mFrame++: steps a frame on, giving the frame it was.
+static inline MFx32 operator++(MFx32 &a, int) {
+    MFx32 old = a;
+    a += MFx32(1);
+    return old;
+}
+
+// The point in whole pixels.
+static inline MPoint DinoToPoint(MFx32Point p) {
+    return MPoint(MFx32ToInt(p.x), MFx32ToInt(p.y));
+}
+
+// The image cell under a pixel (odd rows of cells sit half a cell to the right).
+static inline MPoint DinoToCell(MPoint p) {
+    int x = p.x - ((p.y & 8) >> 1);
+    return MPoint((x >> 3) + data_ov002_021646e4.mCellOrigin.x, (p.y >> 3) + data_ov002_021646e4.mCellOrigin.y);
+}
+
+// Flies in an arc from mFrom to mTo (mHeight at the top), then dirties the cell it lands on.
+void DinoCleaningNewDust::Idle() {
+    if (mFrame++ >= mDuration) {
+        if (data_ov002_021646e4.mDustBounds.Contains(DinoToPoint(mTo))) {
+            MPoint cell = DinoToCell(DinoToPoint(mTo));
+            mView->AddDirt(cell.x, cell.y);
+        }
+        Exit();
+        return;
+    }
+    MFx32Point pos = mFrom + (mTo - mFrom) * mFrame / mDuration;
+    MFx32 s = mFrame / (mDuration / MFx32(2)) - MFx32(1);
+    MFx32 h = (MFx32(1) - s * s) * mHeight;
+    mMotion->SetPosition(MFx32ToInt(pos.x), MFx32ToInt(pos.y - h));
+}
+
 #pragma auto_inline off
 
 DinoCleaningNewDust::~DinoCleaningNewDust() {
@@ -355,19 +391,14 @@ DinoCleaningNewDust::~DinoCleaningNewDust() {
 DinoCleaningLastDust::~DinoCleaningLastDust() {
 }
 
-// NONMATCHING: 97.8%, stack slots only (the game copies the duration once, for the comparison, yet loads it before
-// the frame is advanced).
+// Slides from mFrom to mTo.
 void DinoCleaningLastDust::Idle() {
-    MFx32 duration = mDuration;
-    MFx32 frame = mFrame;
-    mFrame += MFx32(1);
-    if (frame >= duration) {
+    if (mFrame++ >= mDuration) {
         Exit();
         return;
     }
     MFx32Point pos = mFrom + (mTo - mFrom) * mFrame / mDuration;
-    MFx32Point p = pos;
-    mMotion->SetPosition(MPoint(MFx32ToInt(p.x), MFx32ToInt(p.y)));
+    mMotion->SetPosition(DinoToPoint(pos));
 }
 
 DinoCleaningImageViewScaleAnime::~DinoCleaningImageViewScaleAnime() {
