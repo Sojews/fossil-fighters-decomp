@@ -24,6 +24,7 @@
 #include "game/dino_battle_debug_log.h"
 #include "game/dino_creature_sort.h"
 #include "game/set_live_event_check_task.h"
+#include "game/dino_battle_tutorial.h"
 #include <stdio.h>
 
 
@@ -2938,7 +2939,7 @@ struct DinoSupportCure {
 };
 extern "C" const DinoSupportCure data_ov000_0218faa4[];
 
-extern "C" const u32 data_0208a300, data_0208a2fc;  // the support effect's (on ours, on theirs)
+extern "C" const u32 data_0208a300[], data_0208a2fc;  // [0]: the support effect's (on ours, theirs is 2fc); [1-11]: the debug log's formats
 extern "C" const u32 data_0208a150;                 // the support motion's last argument
 
 // The support creatures' turn-start effects: each cures its leader's status effects (kinds 2-9) and gives its
@@ -3051,7 +3052,7 @@ extern "C" MSerialTaskSet *func_ov000_02169fb8(MMessageObserver *view, DinoBattl
                 if (target->GetDefUnk61() != 8) {
                     flags = 8;
                 }
-                u32 text = side == 1 ? data_0208a300 : data_0208a2fc;
+                u32 text = side == 1 ? data_0208a300[0] : data_0208a2fc;
                 if (player->mUnkB4 == 0) {
                     text++;
                 }
@@ -3566,4 +3567,426 @@ MTask *DinoBattleModelPlayer::CreateAttackTask(DinoBattleModelCreature *attacker
         damage, targetDown, guard, recoil, attackerDown, special, show, special ? 1 : 2,
         attacker->CompareUnkECA0(target, attack), 0)));
     return set;
+}
+
+extern "C" MTask *func_ov000_0216831c(DinoBattleModelPlayer *player, MMessageObserver *reply, u32 side, u32 id,
+                                      u32 index, u32 attack, u8 unk);
+extern "C" MFx32 func_ov000_0216e4c0(DinoBattleModelCreature *creature, DinoBattleModelCreature *target);
+extern "C" const u32 data_0208a260, data_0208a25c;     // the special attack's info bar texts (ours, theirs)
+
+// A creature's ability on a target: the special kinds (status changes, evolution, sacrifices, team effects), a
+// status-only ability, or an attack with its damage; the view is asked to show it and reply gets the result.
+// NONMATCHING
+extern "C" void func_ov000_02166904(DinoBattleModelPlayer *player, MMessageObserver *reply, u32 side, u32 id,
+                                    u32 targetId, u32 index, u32 showName) {
+    DinoBattleModelCreature *creature = player->FindCreatureByB4(id);
+    u32 attack = index >= creature->CountAttacks() ? creature->GetSpecialAttack() : creature->GetAttack(index, NULL);
+    const DinoAttackDef *attackDef = gDinoResource->GetAttackDef(attack);
+    if (*DinoOffsetPtr<u8>(attackDef, attackDef->unk14) == 3) {
+        func_ov000_0216831c(player, reply, side, id, index, attack, showName);
+        return;
+    }
+    DinoBattleModelField *field = (DinoBattleModelField *)player->mUnk100;
+    if (field->mLive != NULL) {
+        player->mParallel.AddTail(field->mModel->CreatePostTask(new DinoBattleModelLiveEventSignal(0)));
+    }
+    player->SetUnk124(player->GetUnk124() | 1);
+    player->mReply = reply;
+    DinoBattleModelCreature *attacker = player->FindCreatureByB4(id);
+    if (attacker == NULL) {
+        return;
+    }
+    int life = attacker->GetUnkE4();
+    attacker->RollUnk10C();
+    BOOL sureHit = (((DinoBattleModelField *)player->mUnk100)->mUnkD0 & 1) ? TRUE : FALSE;
+    u8 special = FALSE;
+    BOOL team = FALSE;
+    u32 ability;
+    if (index >= attacker->CountAttacks()) {
+        ability = attacker->GetSpecialAttack();
+        special = TRUE;
+    } else {
+        ability = attacker->GetAttack(index, NULL);
+    }
+    if (showName) {
+        player->mSerial.AddTail(
+            player->mUnkF4->CreatePostTask(new DinoBattleViewShowAttackNameBarRequest(0, ability, special, 0)));
+    }
+    const DinoAttackDef *def = gDinoResource->GetAttackDef(ability);
+    const u8 *kind = DinoOffsetPtr<u8>(def, def->unk14);
+    u32 kindValue = *kind;
+    u32 hits = def->hitCount;
+    const u16 *cost = DinoOffsetPtr<u16>(def, def->cost);
+    char text[0x100];
+    sprintf(text, gDinoResource->GetText(data_0208a300[1]), hits);
+    data_ov000_021978c0->Print(text);
+    if (attacker->GetStatus()->flags & 0x40) {
+        player->SetUnk124(player->GetUnk124() | 2);
+    }
+    player->AddKasekiPoints(-cost[0]);
+    if (kindValue == 6 || kindValue == 11) {
+        // A sacrifice: the user drops to 1 life.
+        player->mSacrificedLife = attacker->GetUnkE4();
+        SetLifePointTask *set = new SetLifePointTask(attacker, 1);
+        player->mSerial.AddTail(player->mUnkF4->CreatePostTask(new DinoBattleViewPopNumberRedIfZeroSignal(1)), set);
+        life = 1;
+        MParallelTaskSet *together = new MParallelTaskSet(TRUE);
+        DinoSignalWait *wait = new DinoSignalWait(0x10030, NULL, NULL, 1);
+        together->AddTail(wait, DinoSoundCreatePlaySeTask(0x4E, 0),
+                          attacker->CreateUpdateTask(TRUE, (u32)(MMessageObserver *)wait));
+        player->mSerial.AddTail(together, player->mUnkF4->CreatePostTask(new DinoBattleViewPopNumberRedIfZeroSignal(0)),
+                                new MTimer(60),
+                                DinoCreatePostAndWaitTask(player->mUnkF4, new DinoBattleViewWaitActionInfoBarRequest(0)));
+        if (showName) {
+            player->mSerial.AddTail(player->mUnkF4->CreatePostTask(new DinoBattleViewMoveAttackNameBarRequest(0)));
+        }
+        player->mSerial.AddTail(player->CreateUpdateTask(0));
+    } else {
+        if (showName) {
+            player->mSerial.AddTail(player->mUnkF4->CreatePostTask(new DinoBattleViewMoveAttackNameBarRequest(0)));
+        }
+        player->mSerial.AddTail(player->CreateUpdateTask(0));
+    }
+    const u8 *effect = DinoOffsetPtr<u8>(def, def->unk10);
+    u32 status = effect[0];
+    int count = 1;
+    if ((1 << status) & 0xF00) {
+        // A support status on the target: shown, then the turn's result.
+        DinoBattleModelCreature *target = player->FindCreatureByB4(targetId);
+        u32 ids[6] = {0, 0, 0, 0, 0, 0};
+        ids[0] = id;
+        if (id != targetId) {
+            count++;
+            ids[1] = targetId;
+        }
+        player->mSerial.AddTail(
+            player->mUnkF4->CreatePostTask(new DinoBattleViewCreatureSetBlendRequest(0, count, ids, 1)),
+            player->CreateUpdateColorTask(ids, count, 0x20), player->CreateLcdFadeTask(TRUE),
+            player->mUnkF4->CreatePostTask(new DinoBattleViewSetAttackBarUpperLCDRequest(0, ability, 0)),
+            player->CreateAbilityTask(side, id, ability),
+            player->mUnkF4->CreatePostTask(new DinoBattleViewClearAttackBarRequest(0)),
+            player->mUnkF4->CreatePostTask(new DinoBattleViewSetCreaturePriorityRequest(0)),
+            player->mUnkF4->CreatePostTask(new DinoBattleViewSetAttackBarUpperLCDRequest(0, 0, 0)),
+            player->CreateUpdateColorTask(ids, count, 0), player->CreateLcdFadeTask(FALSE),
+            new SetStatusEffectTask(target, status, effect[2], effect[4], effect[5], DinoAttackHasUnk10Flag(ability),
+                                    player->mUnkF4),
+            player->CreateUpdateStateIconTask((u32)target, 0));
+        player->mSerial.AddTail(player->CreateSendAbilityResultTask(reply));
+        return;
+    }
+    switch (kindValue) {
+    case 5:
+        sureHit = TRUE;
+        break;
+    case 3:
+        team = TRUE;
+        break;
+    case 7: {
+        {
+            std::vector<void *> ids;
+            DinoCollectCreatureIds(ids, player, player->mOpponent);
+            player->AddAbilitySequence(&player->mSerial, side, ability, id, ids, FALSE);
+        }
+        if (kind[1] >= (int)player->GetRandom()->Next(100)) {
+            ExecSpecialAttackTask *exec = new ExecSpecialAttackTask(attacker, NULL, 7, 0);
+            player->mSerial.AddTail(
+                player->mUnkF4->CreatePostTask(new DinoBattleViewActionInfoBarUpdateRequest(
+                    *(player->mUnkB4 == 0 ? &data_0208a260 : &data_0208a25c))),
+                DinoCreatePostAndWaitTask(player->mUnkF4, new DinoBattleViewWaitActionInfoBarRequest(0)), exec);
+        }
+        player->mSerial.AddTail(player->CreateUpdateAllColorTask(0), player->CreateSendAbilityResultTask(reply));
+        return;
+    }
+    case 9:
+    case 13:
+    case 14:
+        player->AddAbilitySequence(&player->mSerial, side, ability, id, (void *)targetId, FALSE);
+        player->mSerial.AddTail(new ExecSpecialAttackTask(player->FindCreatureByB4(targetId), NULL, 9, *(const s16 *)(kind + 2)),
+                                player->CreateFieldEffectWaitTask());
+        player->mSerial.AddTail(player->CreateUpdateAllColorTask(0), player->CreateSendAbilityResultTask(reply));
+        return;
+    case 10: {
+        std::vector<void *> ids;
+        DinoCollectCreatureIds(ids, player, NULL);
+        player->AddAbilitySequence(&player->mSerial, side, ability, id, ids, FALSE);
+        player->mSerial.AddTail(new ExecSpecialAttackTask(player, NULL, 10, *(const s16 *)(kind + 2)),
+                                player->CreateUpdateAllColorTask(0), player->CreateSendAbilityResultTask(reply));
+        return;
+    }
+    case 15: {
+        DinoBattleModelCreature *leader = player->FindCreature(0);
+        player->AddAbilitySequence(&player->mSerial, side, ability, id, (void *)(leader != NULL ? leader->GetUnkB4() : 0),
+                                   FALSE);
+        player->mSerial.AddTail(
+            new ExecSpecialAttackTask(player->FindCreatureByB4(targetId), (DinoBattleModelCreature *)reply, 15,
+                                      *(const s16 *)(kind + 2)),
+            player->CreateUpdateAllColorTask(0), player->CreateSendAbilityResultTask(reply));
+        return;
+    }
+    case 16: {
+        std::vector<void *> ids;
+        DinoCollectCreatureIds(ids, player, player->mOpponent);
+        player->AddAbilitySequence(&player->mSerial, side, ability, id, ids, TRUE);
+        player->mSerial.AddTail(player->mUnkF4->CreatePostTask(new DinoBattleViewActionInfoBarUpdateRequest(
+                                    *(player->mUnkB4 == 0 ? &data_0208a2b8[8] : &data_0208a2b8[7]))),
+                                DinoCreatePostAndWaitTask(player->mUnkF4, new DinoBattleViewWaitActionInfoBarRequest(0)));
+        player->mSerial.AddTail(new ExecSpecialAttackTask(player->FindCreatureByB4(id), NULL, 16, *(const s16 *)(kind + 2)));
+        player->mSerial.AddTail(player->CreateSendAbilityResultTask(reply));
+        return;
+    }
+    case 11: {
+        std::vector<void *> ids;
+        for (u32 i = 0; i < player->GetCreatureCount(); i++) {
+            ids.push_back((void *)player->GetCreature(i)->GetUnkB4());
+        }
+        player->AddAbilitySequence(&player->mSerial, side, ability, id, ids, TRUE);
+        player->mSerial.AddTail(new ExecSpecialAttackTask(player, attacker, 11, player->mSacrificedLife),
+                                player->CreateSendAbilityResultTask(reply));
+        return;
+    }
+    case 12: {
+        std::vector<void *> ids;
+        DinoCollectCreatureIds(ids, player, NULL);
+        player->AddAbilitySequence(&player->mSerial, side, ability, id, ids, TRUE);
+        player->mSerial.AddTail(new ExecSpecialAttackTask(player, attacker, 12, 0), player->CreateSendAbilityResultTask(reply));
+        return;
+    }
+    case 2: {
+        // Evolution into one of the table's creatures.
+        u32 into = (kind + *(const u32 *)(kind + 8))[player->GetRandom()->Next(*(const u32 *)(kind + 4))];
+        int level = *(const s16 *)(kind + 2);
+        if (level != 0 && player->GetRandom()->Next(2) != 0) {
+            level += level > 0 ? -1 : 1;
+        }
+        attacker->AddUnkFC(level);
+        player->mSerial.AddTail(player->mUnkF4->CreatePostTask(new DinoBattleView3DRevolutionSetRequest(0, id, into)));
+        player->AddAbilitySequence(&player->mSerial, side, ability, id, NULL, TRUE);
+        player->mSerial.AddTail(new ExecSpecialAttackTask(attacker, NULL, 2, into));
+        MParallelTaskSet *together = new MParallelTaskSet(TRUE);
+        DinoSignalWait *wait = new DinoSignalWait(0x10043, NULL, NULL, 1);
+        MTask *post = player->mUnkF4->CreatePostTask(
+            new DinoBattleViewEvolutionCreatureRequest((u32)(MMessageObserver *)wait, attacker->GetUnkB4(), into));
+        together->AddTail(wait);
+        together->AddTail(post);
+        MTask *waitBar = DinoCreatePostAndWaitTask(player->mUnkF4, new DinoBattleViewWaitActionInfoBarRequest(0));
+        player->mSerial.AddTail(together, player->CreateSendAbilityResultTask(reply), waitBar);
+        return;
+    }
+    }
+
+    // An attack.
+    u8 result[3];   // [0] hit, [1] missed, [2] critical
+    result[2] = 0;
+    int guard = 0;
+    int damage = 0;
+    int recoil = 0;
+    player->ClearEvents();
+    DinoBattleModelCreature *target = player->GetOpponent()->FindCreatureByB4(targetId);
+    if (cost[1] == 0 && kindValue != 6) {
+        // Only a status change.
+        BOOL missed = FALSE;
+        const u8 *change = DinoOffsetPtr<u8>(def, def->unk10);
+        MFx32 affinity = GetAffinityRatio(attacker, target, ability);
+        int chance = 0;
+        if (change[0] > 1) {
+            chance = change[1] * target->GetDefTable(change[0]) / 100;
+        }
+        u32 changed = 0;
+        if (chance > (int)player->GetRandom()->Next(100)) {
+            changed = change[0];
+        } else {
+            missed = TRUE;
+        }
+        u32 ids[6] = {0, 0, 0, 0, 0, 0};
+        ids[0] = id;
+        ids[1] = target->GetUnkB4();
+        player->mSerial.AddTail(player->mUnkF4->CreatePostTask(new DinoBattleViewCreatureSetBlendRequest(0, 2, ids, 1)),
+                                player->CreateLcdFadeTask(TRUE));
+        player->mSerial.AddTail(player->mUnkF4->CreatePostTask(new DinoBattleViewCreatureAbilityRequest(
+            (u32)(MMessageObserver *)player, side, id, ability, target->GetUnkB4(), 5, missed, 0, target->GetUnkE4() == 0,
+            0, 0, attacker->GetUnkE4() == 0, 1, 1, 0, attacker->CompareUnkECA0(target, ability), changed)));
+        return;
+    }
+    if (target != NULL) {
+        result[1] = attacker->RollDefUnk23() ? FALSE : TRUE;
+        u32 inflicted = 0;
+        int hitKind = 0;
+        if (sureHit) {
+            result[1] = inflicted;
+        }
+        if (kindValue == 6 && kind[1] < (int)player->GetRandom()->Next(100)) {
+            result[1] = TRUE;
+        }
+        if (!result[1]) {
+            MFx32 ratio = attacker->CalcUnkEC(target);
+            MFx32 defense;
+            if (kindValue == 6) {
+                defense = MFx32(0);
+            } else {
+                defense = func_ov000_0216e2d8(attacker, target);
+            }
+            MFx32 hit = attacker->ReduceByDefense(ratio, defense);
+            MFx32 chanceBase = func_ov000_0216e4c0(attacker, target);
+            MFx32 chanceRatio = func_ov000_0216e650(attacker, target);
+            MFx32 chance = attacker->CurveRatio(chanceBase, chanceRatio);
+            char text1[0x100];
+            sprintf(text1, gDinoResource->GetText(data_0208a300[11]), DinoFxToFloat(ratio));
+            data_ov000_021978c0->Print(text1);
+            char text2[0x100];
+            sprintf(text2, gDinoResource->GetText(data_0208a300[10]), DinoFxToFloat(defense));
+            data_ov000_021978c0->Print(text2);
+            char text3[0x100];
+            sprintf(text3, gDinoResource->GetText(data_0208a300[9]), DinoFxToFloat(hit));
+            data_ov000_021978c0->Print(text3);
+            char text4[0x100];
+            sprintf(text4, gDinoResource->GetText(data_0208a300[8]), DinoFxToFloat(chanceBase));
+            data_ov000_021978c0->Print(text4);
+            char text5[0x100];
+            sprintf(text5, gDinoResource->GetText(data_0208a300[7]), DinoFxToFloat(chanceRatio));
+            data_ov000_021978c0->Print(text5);
+            char text6[0x100];
+            sprintf(text6, gDinoResource->GetText(data_0208a300[6]), DinoFxToFloat(chance));
+            data_ov000_021978c0->Print(text6);
+            MFx32 critical;
+            MFx32 affinity;
+            if (team) {
+                critical = func_ov000_0216e918(attacker, chance, &result[1], &hitKind);
+                affinity = MFx32(FX32_ONE);
+                player->PushEvent((u32)attacker, (u32)player->GetOpponent()->FindCreature(1), TRUE);
+                player->PushEvent((u32)attacker, (u32)player->GetOpponent()->FindCreature(2), TRUE);
+            } else {
+                if (sureHit) {
+                    critical = attacker->RandomDamageFactor();
+                    result[2] = 0;
+                    result[1] = 0;
+                    hitKind = 2;
+                } else {
+                    critical = func_ov000_0216ea64(attacker, target, chance, &result[2], &result[1], &hitKind, ability);
+                    if (result[2] && ((DinoBattleModel *)player->mBattle->GetUnk1FC())->mTutorial->mUnk0D) {
+                        critical = attacker->RandomDamageFactor();
+                        result[2] = 0;
+                        hitKind = 2;
+                    }
+                }
+                affinity = GetAffinityRatio(attacker, target, ability);
+            }
+            result[0] = TRUE;
+            MFx32 base;
+            if (!result[1]) {
+                base = attacker->CalcDamage(target, MFx32(cost[1]), hit, &result[0]);
+                u32 damageText = data_0208a300[3];
+                char text7[0x100];
+                sprintf(text7, gDinoResource->GetText(damageText), DinoFxToFloat(base));
+                data_ov000_021978c0->Print(text7);
+                char text8[0x100];
+                sprintf(text8, gDinoResource->GetText(data_0208a300[5]), DinoFxToFloat(critical));
+                data_ov000_021978c0->Print(text8);
+                char text9[0x100];
+                sprintf(text9, gDinoResource->GetText(data_0208a300[4]), DinoFxToFloat(affinity));
+                data_ov000_021978c0->Print(text9);
+                base = attacker->ApplyPositionRatio(attacker->ApplyRatio2(attacker->ApplyRatio(base, critical), affinity),
+                                                    target->GetB8Category());
+                char text10[0x100];
+                sprintf(text10, gDinoResource->GetText(damageText), DinoFxToFloat(base));
+                data_ov000_021978c0->Print(text10);
+            }
+            func_ov000_02169404(player, attacker, (u32)target, kindValue, team);
+            if (result[1]) {
+                damage = 0;
+            } else {
+                damage = MFx32ToInt(base);
+                if (damage < 1 && result[0]) {
+                    damage = 1;
+                }
+                if (kindValue == 6) {
+                    damage = *(const s16 *)(kind + 2);
+                    hitKind = 2;
+                }
+                guard = func_ov000_02162ad8(attacker, target, ratio, MFx32(cost[1]), critical, &damage, &recoil,
+                                            *(const u32 *)((const u8 *)def + 0x1C));
+                if (damage >= (int)target->GetUnkE4() && !target->mPlayer->GetUnkC8()) {
+                    guard = 0;
+                    recoil = 0;
+                }
+                if (guard && *kind == 4) {
+                    guard = 0;
+                    damage = 0;
+                    recoil = 0;
+                    result[1] = TRUE;
+                    hitKind = guard;
+                }
+                if (target->GetUnkB8() == 0) {
+                    const u8 *change = DinoOffsetPtr<u8>(def, def->unk10);
+                    if (change[0] > 1 && damage != 0 && damage < (int)target->GetUnkE4()) {
+                        BOOL force = (((DinoBattleModelField *)player->mUnk100)->mUnkD0 & 4) ? TRUE : FALSE;
+                        if ((u32)(hitKind - 2) <= 1) {
+                            GetAffinityRatio(attacker, target, ability);
+                            int chance2 = change[1] * target->GetDefTable(change[0]) / 100;
+                            if (chance2 > (int)player->GetRandom()->Next(100) || force) {
+                                inflicted = change[0];
+                            }
+                        }
+                    }
+                }
+            }
+        } else {
+            if (team) {
+                player->PushEvent((u32)attacker, (u32)player->GetOpponent()->FindCreature(1), TRUE);
+                player->PushEvent((u32)attacker, (u32)player->GetOpponent()->FindCreature(2), TRUE);
+            }
+            func_ov000_02169404(player, attacker, (u32)target, kindValue, team);
+            damage = 0;
+        }
+        target->AddLife(-damage, FALSE);
+        player->mSerial.AddTail(new AddLifePointTask(attacker, recoil, FALSE));
+        if (!func_ov000_0218472c(2)) {
+            life -= recoil;
+        }
+        if (attacker->mPlayer->GetUnkC8() && life <= 0) {
+            life = 1;
+        }
+        if (target->GetUnkE4() == 0) {
+            player->RemoveEvents((u32)target);
+        }
+        u32 ids[6] = {0, 0, 0, 0, 0, 0};
+        ids[0] = id;
+        int shown;
+        if (team) {
+            if (index >= attacker->CountAttacks()) {
+                shown = 0;
+                for (int s = 0; s < 2; s++) {
+                    DinoBattleModelPlayer *p = s ? player->mOpponent : player;
+                    int n = p->GetCreatureCount();
+                    for (int i = 0; i < n; i++) {
+                        ids[shown++] = p->GetCreature(i)->GetUnkB4();
+                    }
+                }
+            } else {
+                int n = player->mOpponent->GetCreatureCount();
+                for (int i = 0; i < n; i++) {
+                    ids[i + 1] = player->mOpponent->GetCreature(i)->GetUnkB4();
+                }
+                shown = n + 1;
+            }
+        } else {
+            ids[1] = target->GetUnkB4();
+            shown = 2;
+        }
+        player->mSerial.AddTail(player->mUnkF4->CreatePostTask(new DinoBattleViewCreatureSetBlendRequest(0, shown, ids, 1)));
+        u8 show = TRUE;
+        u32 mode = 0;
+        if (player->GetUnkAC()) {
+            show = mode;
+            mode = team ? 2 : 1;
+        }
+        player->mSerial.AddTail(
+            player->CreateLcdFadeTask(TRUE),
+            player->mUnkF4->CreatePostTask(new DinoBattleViewSetAttackBarUpperLCDRequest(0, ability, 0)),
+            player->mUnkF4->CreatePostTask(new DinoBattleViewCreatureAbilityRequest(
+                (u32)(MMessageObserver *)player, side, id, ability, target->GetUnkB4(), hitKind, result[1], damage,
+                target->GetUnkE4() == 0, guard, recoil, life <= 0, 1, show, mode, attacker->CompareUnkECA0(target, ability),
+                inflicted)));
+    } else {
+        player->mSerial.AddTail(player->CreateSendAbilityResultTask(reply));
+    }
 }

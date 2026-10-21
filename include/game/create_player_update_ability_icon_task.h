@@ -180,7 +180,7 @@ public:
     MMessageObserver *mReply;           // 0x140: gets the current ability's result
     DinoBattleKpLevel mKpLevel;         // 0x144: from /etc/btl_kp_defs, by the player's level
     u8 mUnk15C;                         // 0x15C
-    u32 unk160;
+    int mSacrificedLife;                // 0x160: the life a sacrifice (attack kinds 6, 11) took
 };
 
 
@@ -364,6 +364,12 @@ public:
 
 class ExecSpecialAttackTask : public MProcess {
 public:
+    ExecSpecialAttackTask(void *target, DinoBattleModelCreature *user, u32 kind, s32 value) : MProcess(NULL) {
+        mTarget = target;
+        mUser = user;
+        mKind = kind;
+        mValue = value;
+    }
     virtual ~ExecSpecialAttackTask();
     virtual void Idle();
 
@@ -388,6 +394,10 @@ public:
 
 class SetLifePointTask : public MTask {
 public:
+    SetLifePointTask(DinoBattleModelCreature *creature, u32 life) {
+        mUnk10 = (u32)creature;
+        mUnk14 = life;
+    }
     virtual ~SetLifePointTask();
     virtual void Execute();
 

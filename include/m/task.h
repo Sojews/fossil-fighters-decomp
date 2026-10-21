@@ -173,6 +173,22 @@ public:
         self->AddTail(k);
     }
     void AddTail(MTask *a, MTask *b, MTask *c, MTask *d, MTask *e, MTask *f, MTask *g, MTask *h, MTask *i,
+                 MTask *j, MTask *k, MTask *l) {
+        MTaskSet *self = this;
+        self->AddTail(a);
+        self->AddTail(b);
+        self->AddTail(c);
+        self->AddTail(d);
+        self->AddTail(e);
+        self->AddTail(f);
+        self->AddTail(g);
+        self->AddTail(h);
+        self->AddTail(i);
+        self->AddTail(j);
+        self->AddTail(k);
+        self->AddTail(l);
+    }
+    void AddTail(MTask *a, MTask *b, MTask *c, MTask *d, MTask *e, MTask *f, MTask *g, MTask *h, MTask *i,
                  MTask *j, MTask *k, MTask *l, MTask *m) {
         MTaskSet *self = this;
         self->AddTail(a);
