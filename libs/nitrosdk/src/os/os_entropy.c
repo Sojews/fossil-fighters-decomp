@@ -34,16 +34,18 @@ extern volatile u64 OSi_TickCounter;
 u16 OS_GetTickLo(void);
 
 void OS_GetLowEntropyData(u32 buffer[8]) {
+    const OSSystemWork *work;
     const u8 *nvram = OS_GetSystemWork()->nvramUserInfo;
     const u8 *macAddress = nvram + 0x74;
     u16 vcount = REG_VCOUNT;
     buffer[0] = (u32) (OS_GetTickLo() | (vcount << 16));
-    buffer[1] = (u32) ((*(u16 *) &macAddress[4] << 16) ^ OSi_TickCounter);
-    buffer[2] = (u32) (*(u32 *) macAddress ^ (OSi_TickCounter >> 32)) ^ OS_GetSystemWork()->vblankCount;
+    buffer[1] = (u32) (*(u16 *) (macAddress + 4) << 16) ^ (u32) OSi_TickCounter;
+    work = OS_GetSystemWork();
+    buffer[2] = (u32) (OSi_TickCounter >> 32) ^ *(u32 *) macAddress ^ work->vblankCount;
     buffer[2] ^= REG_G3X_GXSTAT;
-    buffer[3] = OS_GetSystemWork()->unk1e8;
-    buffer[4] = OS_GetSystemWork()->unk1ec;
-    buffer[5] = (u32) (OS_GetSystemWork()->unk394 << 16) ^ OS_GetSystemWork()->unk390;
-    buffer[6] = (u32) (OS_GetSystemWork()->unk3aa << 16) | OS_GetSystemWork()->unk3ac;
-    buffer[7] = (u32) (OS_GetSystemWork()->unk398 << 16) | HW_BUTTON_XY_BUF | REG_KEYINPUT;
+    buffer[3] = work->unk1e8;
+    buffer[4] = work->unk1ec;
+    buffer[5] = ((u32) work->unk394 << 16) ^ work->unk390;
+    buffer[6] = (u32) ((work->unk3aa << 16) | work->unk3ac);
+    buffer[7] = ((u32) work->unk398 << 16) | (REG_KEYINPUT | HW_BUTTON_XY_BUF);
 }
