@@ -17,6 +17,8 @@
 #include "m/oam_canvas.h"
 #include "game/dino_battle_view_class.h"
 #include "game/dino_static_init.h"
+#include "game/dino_resource.h"
+#include "m/console.h"
 
 inline InfoPanelWindow::InfoPanelWindow(MPictureFile *file, MSmartOam *oam) : MProcess(NULL), mOam(oam), mUnk7C(0) {
     mPicture = new MTextPicture(*file, 1, false);
@@ -91,6 +93,134 @@ void DinoBattleViewCreatureInfo::SetPosition(MPoint pos) {
     mPos.x = pos.x;
     mPos.y = pos.y;
     mOam->SetOffset(MPoint(-pos.x, -pos.y));
+}
+
+extern "C" MPoint data_ov000_02194dbc;      // the element text's position
+extern "C" MPoint data_ov000_02194ea4[6];   // the number texts' positions
+extern "C" MPoint data_ov000_02194e7c[5];   // the label texts' positions
+
+// Builds the panel's page for a kind (0 the stats, 1 a text, 2 the attacks) unless it is already shown; the page
+// arrows show or hide either way.
+extern "C" void func_ov000_0217c9f0(DinoBattleViewCreatureInfo *info, u32 kind, u8 arrows) {
+    info->mUnkEC = arrows;
+    for (int i = 0; i < 2; i++) {
+        if (arrows) {
+            info->mMotions[i]->Show();
+        } else {
+            info->mMotions[i]->Hide();
+        }
+    }
+    if (info->mUnkE8 == kind) {
+        return;
+    }
+    info->mUnkE8 = kind;
+    info->mTasks->Clear();
+    switch (info->mUnkE8) {
+    case 0: {
+        MFont *font = gDinoResource->CreateFont12(0, 1, 10);
+        info->mUnkFC = new MMotion(std::string(data_ov000_02194d8c.elementPath), info->mOam, 2, 1);
+        info->mUnkFC->SetPriority(0);
+        info->mUnkFC->SetAnchor(1);
+        info->mUnkFC->Show();
+        info->mTasks->AddTail(info->mUnkFC);
+        info->mUnk84 = new MIndicator(new MSmartObjCanvas(info->mOam->mDisplay, info->mOam, MPoint(0x70, 0x10),
+                                                          gDinoResource->GetUnkTable(), TRUE),
+                                      font, 0);
+        info->mUnk84->SetPosition(data_ov000_02194dbc);
+        info->mUnk84->SetPriority(0);
+        info->mUnk84->Show();
+        info->mTasks->AddTail(info->mUnk84);
+        MFont *numbers = ((DinoBattleView *) info->mUnk80)->GetUnk120();
+        for (int i = 0; i < 6; i++) {
+            info->mUnk88[i] = new MIndicator(
+                new MSmartObjCanvas(info->mOam->mDisplay, info->mOam, MPoint(0x20, 0x10),
+                                    ((DinoBattleView *) info->mUnk80)->GetUnk11CPalette(), TRUE),
+                numbers, 0);
+            info->mUnk88[i]->SetPosition(data_ov000_02194ea4[i]);
+            info->mUnk88[i]->SetPriority(0);
+            info->mUnk88[i]->Show();
+            info->mTasks->AddTail(info->mUnk88[i]);
+        }
+        MFont *first = ((DinoBattleView *) info->mUnk80)->GetUnk11C();
+        MFont *labels = ((DinoBattleView *) info->mUnk80)->GetUnk118();
+        for (int i = 0; i < 5; i++) {
+            info->mUnkA0[i] = new MIndicator(
+                new MSmartObjCanvas(info->mOam->mDisplay, info->mOam, MPoint(0x20, 0x10),
+                                    ((DinoBattleView *) info->mUnk80)->GetUnk11CPalette(), TRUE),
+                i != 0 ? labels : first, 0);
+            info->mUnkA0[i]->SetPosition(data_ov000_02194e7c[i]);
+            info->mUnkA0[i]->SetPriority(0);
+            info->mUnkA0[i]->Show();
+            info->mTasks->AddTail(info->mUnkA0[i]);
+        }
+        break;
+    }
+    case 1: {
+        MFont *font = gDinoResource->CreateFont12(0, 1, 10);
+        info->mUnkC4 = new MConsole(new MSmartObjCanvas(info->mOam->mDisplay, info->mOam, MPoint(0x6c, 0x20),
+                                                        gDinoResource->GetUnkTable(), TRUE),
+                                    font, MPoint(0, 3), MFx32(0));
+        info->mUnkC4->SetPosition(MPoint(10, 23));
+        info->mUnkC4->SetPriority(0);
+        info->mUnkC4->Show();
+        info->mTasks->AddTail(info->mUnkC4);
+        MFont *numbers = ((DinoBattleView *) info->mUnk80)->GetUnk120();
+        for (int i = 0; i < 4; i++) {
+            info->mUnk88[i] = new MIndicator(
+                new MSmartObjCanvas(info->mOam->mDisplay, info->mOam, MPoint(0x20, 0x10),
+                                    ((DinoBattleView *) info->mUnk80)->GetUnk11CPalette(), TRUE),
+                numbers, 0);
+            info->mUnk88[i]->SetPosition(data_ov000_02194ea4[i + 2]);
+            info->mUnk88[i]->SetPriority(0);
+            info->mUnk88[i]->Show();
+            info->mTasks->AddTail(info->mUnk88[i]);
+        }
+        break;
+    }
+    case 2: {
+        MFont *font = gDinoResource->CreateFont12(0, 10, 1);
+        MFont *numbers = ((DinoBattleView *) info->mUnk80)->GetUnk120();
+        for (int i = 0; i < 2; i++) {
+            info->mUnkB4[i] = new MMotion(std::string(data_ov000_02194d8c.attackPath), info->mOam, 2, 1);
+            info->mUnkB4[i]->SetPosition(MPoint(-3, i * 38));
+            info->mUnkB4[i]->SetPriority(0);
+            info->mUnkB4[i]->SetAnchor(2);
+            info->mUnkB4[i]->Show();
+            info->mTasks->AddTail(info->mUnkB4[i]);
+            info->mUnkBC[i] = new MMotion(std::string(data_ov000_02194d8c.effectPath), info->mOam, 2, 1);
+            info->mUnkBC[i]->SetPosition(MPoint(72, i * 38 + 30));
+            info->mUnkBC[i]->SetPriority(0);
+            info->mUnkBC[i]->Show();
+            info->mTasks->AddTail(info->mUnkBC[i]);
+            info->mUnk88[i] = new MIndicator(new MSmartObjCanvas(info->mOam->mDisplay, info->mOam, MPoint(0x80, 0x10),
+                                                                 gDinoResource->GetUnkTable(), TRUE),
+                                             font, 0);
+            info->mUnk88[i]->SetPosition(MPoint(4, i * 38 + 6));
+            info->mUnk88[i]->SetPriority(0);
+            info->mUnk88[i]->Show();
+            info->mTasks->AddTail(info->mUnk88[i]);
+            int j = i + 2;
+            info->mUnk88[j] = new MIndicator(
+                new MSmartObjCanvas(info->mOam->mDisplay, info->mOam, MPoint(0x20, 0x10),
+                                    ((DinoBattleView *) info->mUnk80)->GetUnk11CPalette(), TRUE),
+                numbers, 0);
+            info->mUnk88[j]->SetPosition(MPoint(81, i * 38 + 22));
+            info->mUnk88[j]->SetPriority(0);
+            info->mUnk88[j]->Show();
+            info->mTasks->AddTail(info->mUnk88[j]);
+            int k = i + 4;
+            info->mUnk88[k] = new MIndicator(
+                new MSmartObjCanvas(info->mOam->mDisplay, info->mOam, MPoint(0x20, 0x10),
+                                    ((DinoBattleView *) info->mUnk80)->GetUnk11CPalette(), TRUE),
+                numbers, 0);
+            info->mUnk88[k]->SetPosition(MPoint(37, i * 38 + 22));
+            info->mUnk88[k]->SetPriority(0);
+            info->mUnk88[k]->Show();
+            info->mTasks->AddTail(info->mUnk88[k]);
+        }
+        break;
+    }
+    }
 }
 
 // Recolors a text: the font has each color's glyphs 0x20 codes apart. Spaces and question marks stay.
