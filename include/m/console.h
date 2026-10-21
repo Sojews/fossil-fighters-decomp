@@ -41,13 +41,12 @@ public:
     MFont *mFont;               // 0x1C
     int mSpacing;               // 0x20
     int mLineSpacing;           // 0x24
-    int mUnk28;                 // 0x28
-    int mUnk2C;                 // 0x2C
+    MPoint mPen;                // 0x28: where the next character goes
     int mUnk30;                 // 0x30
     MFx32 mRate;                // 0x34: characters a frame
     MFx32 mProgress;            // 0x38
     MFx32 mUnk3C;               // 0x3C
-    int mUnk40;                 // 0x40
+    MFx32 mUnk40;               // 0x40: lines left to scroll in
     int mUnk44;                 // 0x44
     std::wstring mText;         // 0x48: what's left to type
     MConsoleFilter *mFilter;    // 0x54
