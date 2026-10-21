@@ -1011,7 +1011,7 @@ void DinoField::FadeOutPict(MDisplay *display, MExtAffinePicture **pict, u32 fra
 
 // Loads the picture over the old one, off the screen (0 left, 1 up, 2 right, 3 down of pos), then slides it in and frees
 // the old one.
-// NONMATCHING: sDirs' offset in the TU's data (like SlideOutPict's), r4/r5 swapped, and LoadFadeInPict's stack slots.
+// NONMATCHING: sDirs' offset in the TU's data (like SlideOutPict's), and r4/r5 swapped.
 void DinoField::LoadSlideInPict(MDisplay *display, MView *old, MExtAffinePicture **pict, u32 id, MPoint pos, u32 dir,
                                 u32 frames, long ease) {
     static const MPoint sDirs[4] = {MPoint(256, 0), MPoint(0, 192), MPoint(-256, 0), MPoint(0, -192)};
@@ -1022,11 +1022,8 @@ void DinoField::LoadSlideInPict(MDisplay *display, MView *old, MExtAffinePicture
     (*pict)->SetPosition(MPoint(x, y));
     (*pict)->SetPriority(1);
     mParallel.AddTail(*pict);
-    MTask *priority = (*pict)->CreatePriorityTransfer(2);
-    MTask *slide = (*pict)->CreateCoordAnime(MPoint(x, y), pos, frames, ease);
-    MTask *show = (*pict)->CreateShowTransfer();
-    MTask *timer = new MTimer(1);
-    mPictTasks->AddTail(timer, show, slide, priority);
+    mPictTasks->AddTail(new MTimer(1), (*pict)->CreateShowTransfer(), (*pict)->CreateCoordAnime(MPoint(x, y), pos, frames, ease),
+                        (*pict)->CreatePriorityTransfer(2));
     if (old) {
         mPictTasks->AddTail(MTaskExitTransfer::Create(old));
     }
