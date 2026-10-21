@@ -101,7 +101,10 @@ public:
     int mEndFrame;                  // 0xB4
     int mFrame;                     // 0xB8
     const char *mPath;              // 0xBC
-    u8 unkC0[0x440 - 0xC0];
+    char mFields[16][50];           // 0xC0: the script line's comma-separated fields
+    u8 mFieldPresent[16];           // 0x3E0
+    fx32 mFieldValues[16];          // 0x3F0: the fields read as numbers
+    u8 mFieldNumeric[16];           // 0x430: whether they were numbers
     u8 mUnk440;                     // 0x440
     char mParentName[16];           // 0x441
     char mJointName[16];            // 0x451

@@ -11,10 +11,17 @@
 #include "m/process_pause.h"
 #include "nitro/mi.h"
 
+extern "C" {
+char *ReadLine(char **p);
+fx32 ParseFx32(char **p);
+void ReadField(char **p, char *out);
+BOOL SkipComma(char **p);
+}
+
 // The sound name tables.
 static u8 sSoundNamesLoaded;
-static std::vector<Dino3DSoundName> *sSongCommands;
 static std::vector<Dino3DSoundName> *sSoundData;
+static std::vector<Dino3DSoundName> *sSongCommands;
 
 // A script keyword and its value; tables end with -1.
 struct Dino3DName {
@@ -620,20 +627,107 @@ void Dino3DLoadCsv::Push22(u32 a, u32 b) {
 }
 
 void Dino3DInitSoundNames() {
-    sSoundData = new std::vector<Dino3DSoundName>();
     sSongCommands = new std::vector<Dino3DSoundName>();
+    sSoundData = new std::vector<Dino3DSoundName>();
 }
 
 void Dino3DDestroySoundNames() {
     Dino3DClearSoundNames();
-    delete sSoundData;
     delete sSongCommands;
+    delete sSoundData;
 }
 
 void Dino3DClearSoundNames() {
     sSoundNamesLoaded = FALSE;
-    sSoundData->clear();
     sSongCommands->clear();
+    sSoundData->clear();
+}
+
+// Loads the sound name tables (song commands, then sound data: an id and a name a line) from the directory, once.
+// NONMATCHING: the game pairs each push_back's two flag bytes (ours puts the fast-path ones first), and reaches the
+// paused task sets through pointers (ours folds their offsets).
+void Dino3DLoadCsv::LoadSoundNames(const char *dir) {
+    MProcessPause pause(this, &mPauseMutex, &mPauseCount);
+    if (sSoundNamesLoaded) {
+        return;
+    }
+    sSoundNamesLoaded = TRUE;
+    sSongCommands->clear();
+    sSoundData->clear();
+    char path[0x80];
+    MFile file;
+    strcpy(path, dir);
+    strcat(path, "songcmd_id.csv");
+    if (file.Open(path)) {
+        char *text = new char[file.GetLength() + 1];
+        text[file.GetLength()] = 0;
+        file.Read(text, file.GetLength());
+        file.Close();
+        char *cursor = text;
+        for (char *line = ReadLine(&cursor); line != NULL; line = ReadLine(&cursor)) {
+            for (int i = 0; i < 16; i++) {
+                mFieldPresent[i] = mFieldNumeric[i] = 0;
+            }
+            int n = 0;
+            do {
+                ReadField(&line, mFields[n]);
+                mFieldPresent[n] = 1;
+                n++;
+            } while (n < 16 && SkipComma(&line));
+            for (int i = 0; i < 16; i++) {
+                if (mFieldPresent[i]) {
+                    char *field = mFields[i];
+                    mFieldValues[i] = ParseFx32(&field);
+                    if (mFieldValues[i] != 0x7fffffff) {
+                        mFieldNumeric[i] = 1;
+                    }
+                }
+            }
+            if (mFieldNumeric[0] && mFieldPresent[1] && strlen(mFields[1]) != 0) {
+                Dino3DSoundName name;
+                name.mId = mFieldValues[0] >> FX32_SHIFT;
+                name.mName = mFields[1];
+                sSongCommands->push_back(name);
+            }
+        }
+        delete[] text;
+    }
+    strcpy(path, dir);
+    strcat(path, "sounddata_id.csv");
+    if (file.Open(path)) {
+        char *text = new char[file.GetLength() + 1];
+        text[file.GetLength()] = 0;
+        file.Read(text, file.GetLength());
+        file.Close();
+        char *cursor = text;
+        for (char *line = ReadLine(&cursor); line != NULL; line = ReadLine(&cursor)) {
+            for (int i = 0; i < 16; i++) {
+                mFieldPresent[i] = mFieldNumeric[i] = 0;
+            }
+            int n = 0;
+            do {
+                ReadField(&line, mFields[n]);
+                mFieldPresent[n] = 1;
+                n++;
+            } while (n < 16 && SkipComma(&line));
+            for (int i = 0; i < 16; i++) {
+                if (mFieldPresent[i]) {
+                    char *field = mFields[i];
+                    mFieldValues[i] = ParseFx32(&field);
+                    if (mFieldValues[i] != 0x7fffffff) {
+                        mFieldNumeric[i] = 1;
+                    }
+                }
+            }
+            if (mFieldNumeric[0] && mFieldPresent[1] && strlen(mFields[1]) != 0) {
+                Dino3DSoundName name;
+                name.mId = mFieldValues[0] >> FX32_SHIFT;
+                name.mName = mFields[1];
+                sSoundData->push_back(name);
+            }
+        }
+        delete[] text;
+    }
 }
 
 #pragma auto_inline off
