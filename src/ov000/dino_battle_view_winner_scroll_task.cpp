@@ -299,8 +299,12 @@ static inline void ResetCreatures(DinoBattleViewPlayer *player) {
     }
 }
 
+// A side's slot. (Through a non-member inline, the slot gets the game's stack slot.)
+static inline DinoBattleViewFieldSlot *DinoWinnerSlot(u32 field, int side) {
+    return ((DinoBattleViewUnkE0 *)field)->mSlotViewsC0[side];
+}
+
 // Without the scroll, resets the second side's creatures and exits; otherwise slides both sides' slots away.
-// NONMATCHING: the task set and the slot swap stack slots.
 void DinoBattleViewWinnerScrollTask::Idle() {
     MParallelTaskSet *tasks;
     if (!mUnk78) {
@@ -315,7 +319,7 @@ void DinoBattleViewWinnerScrollTask::Idle() {
     }
     tasks = new MParallelTaskSet(TRUE);
     for (int side = 0; side < 2; side++) {
-        DinoBattleViewFieldSlot *slot = ((DinoBattleViewUnkE0 *)mUnk74)->mSlotViewsC0[side];
+        DinoBattleViewFieldSlot *slot = DinoWinnerSlot(mUnk74, side);
         if (side == 0) {
             ResetCreatures(slot->mPlayer);
         }
