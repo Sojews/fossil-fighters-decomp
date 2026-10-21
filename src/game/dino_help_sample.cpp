@@ -88,6 +88,12 @@ DinoHelpSampleYesNoMenu::DinoHelpSampleYesNoMenu(MTask *sample) : MMenu(gLcd->Ge
     mSample = sample;
 }
 
+// Centres the label on the screen's width at y.
+static inline void DinoHelpSampleCenter(DinoCommonLabel *label, int y) {
+    MPoint pos((256 - label->GetWidth()) / 2, y);
+    label->SetPosition(pos);
+}
+
 void DinoHelpSampleYesNoMenu::OnStart() {
     DinoHelpBase::Enable();
     mBg = new MTextPicture(sFiles[5], TRUE, false);
@@ -101,8 +107,7 @@ void DinoHelpSampleYesNoMenu::OnStart() {
     mOam = new MSmartOam(30, 0, TRUE);
     MFont *font = gDinoResource->CreateFont12(0, 10, 1);
     DinoCommonLabel *label = new DinoCommonLabel(mOam, font, gDinoResource->GetUnkTable(), kHelpSampleQuitText, MPoint(0, 0));
-    MPoint pos((256 - label->GetWidth()) / 2, 64);
-    label->SetPosition(pos);
+    DinoHelpSampleCenter(label, 64);
     label->Show();
     mParallel.AddTail(label);
     mYes = new DinoHelpSampleYesNoItem(mOam, MPoint(80, 128), sFiles[6], kHelpSampleYesText);
