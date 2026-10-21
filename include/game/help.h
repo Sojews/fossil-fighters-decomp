@@ -31,6 +31,7 @@ public:
     void AddEntry(u32 a, u32 b, u32 c);
     void RemoveEntry(u32 a, u32 b);
     static MTask *CreateEnableTask(DinoHelpBase *base);
+    MTask *CreateEnableTask() { return CreateEnableTask(this); }
 
     u8 mEnabled;                    // 0x04
     DinoHelpItem *mSelectedItem;    // 0x08

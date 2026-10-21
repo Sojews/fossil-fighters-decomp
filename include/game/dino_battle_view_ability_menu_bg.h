@@ -3,6 +3,8 @@
 
 #include <vector>
 #include "m/picture.h"
+#include "m/text.h"
+#include "m/screen.h"
 
 #include "m/menu_item.h"
 #include "m/menu.h"
@@ -26,6 +28,21 @@ public:
     virtual void Idle();
 
     void SetPriority(int priority);
+    // The BG's screen offset (its text's, when it owns the BG).
+    void SetOffset(MPoint offset) {
+        if (mUnk10D4) {
+            mText->SetOffset(offset);
+        } else {
+            mOffset = offset;
+        }
+    }
+    // Slides the BG (a one-frame wait when it doesn't own it).
+    MTask *CreateOffsetAnime(MPoint from, MPoint to, int duration, int ease) {
+        if (mUnk10D4) {
+            return mText->CreateOffsetAnime(from, to, duration, ease);
+        }
+        return new MTimer(1);
+    }
     void StateShow();
     void StateUpdate();
 

@@ -28,6 +28,9 @@
 #include "nitro/mi.h"
 #include "game/dino_battle_view_ability_text_window.h"
 #include "game/dino_message.h"
+#include "game/dino_battle_view_kaseki_point_menu.h"
+#include "game/dino_battle_view.h"
+#include "m/input.h"
 
 extern "C" int data_ov000_021978dc;    // live ability menu BGs
 extern "C" const u32 data_0208a19c;     // frames before the ability menu takes input
@@ -56,17 +59,20 @@ struct AttackMenuBarStatics {
     const char *barPath;    // 0x04: the bar
     const char *noCost;     // 0x08
     const char *hitsPath;   // 0x0C: the hit count
-    u32 unk10;
+    const char *creatureMotionPath; // 0x10: the attacking creature's motion
     const char *bgPath;     // 0x14: the ability menu's BG
     const char *barPath1;   // 0x18: the bar, for attacks on several creatures
     const char *barPath2;   // 0x1C: the bar, with flag1
     void (DinoBattleViewAbilityMenuBG::*StateHidden_20)();
-    u8 unk28[0x48 - 0x28];
+    u8 unk28[0x30 - 0x28];
+    MPoint rowStep;         // 0x30: between the item bars
+    u8 unk38[0x48 - 0x38];
     MPoint mUnk7COffset;    // 0x48
     u32 unk50[2];
     MPoint mUnk80Offset;    // 0x58
     int barX;               // 0x60: the bar's x, unfocused
-    u8 unk64[0x70 - 0x64];
+    int barY;               // 0x64: the first bar's y
+    u8 unk68[0x70 - 0x68];
     void (DinoBattleViewAbilityMenuBG::*StateShow_70)();
 };
 struct AttackMenuBarStatics2 {
@@ -389,9 +395,161 @@ void DinoBattleViewUiAbilityMenuItem::OnFocusChanged(BOOL focused) {
     }
 }
 
+// The attack helps' rects and texts.
+struct DinoBattleViewAbilityHelpDef {
+    u32 text;
+    MRect rect;
+};
+extern "C" DinoBattleViewAbilityHelpDef data_ov000_021949a0[3];
+extern "C" MRect data_ov000_02194950;     // the cancel help's rect
+extern "C" MPoint data_ov000_021947ec;    // the cost text's position
+extern "C" const u32 data_0208a190;       // the open slide's length
+extern const u32 gKasekiRockSizeText[];
+extern "C" DinoBattleViewAbilityTextWindow *func_ov000_0217c0b8(DinoBattleViewAbilityMenuBG *bg, BOOL rows);
+extern "C" MPoint func_ov000_02175b90(DinoBattleViewCreature *creature);
+extern "C" MTask *func_ov000_0218ec8c(u32 arg0, int arg1, BOOL *proceed);
+
+// The excavation settings' section at offset7C (the input repeat is at 0x1C and 0x20).
+static inline const int *DinoAbilityMenuRepeat(const DinoExcavateDefs *d) {
+    if (d->offset7C == 0) {
+        return NULL;
+    }
+    return (const int *) ((const u8 *) d + d->offset7C);
+}
+
+// Builds the menu: the helps, the creature's motion, an item bar per attack (sliding in one after another, linked
+// round in a loop), the cancel item, the cost text, the BG and its text windows; then opens it (after the tutorial,
+// if one shows).
+// NONMATCHING: stack slots of the help loop counter/&mParallel differ, and gKasekiRockSizeText[5] folds the offset into the load.
+void DinoBattleViewUiAbilityMenu::OnStart() {
+    const DinoBattleViewAbilityHelpDef *def = data_ov000_021949a0;
+    for (u32 i = 0; i < 3; def++, i++) {
+        mHelps[i] = new DinAttackItemHelp(def->rect, def->text, gLcd->GetBottomDisplay());
+        mParallel.AddTail(mHelps[i]);
+    }
+    DinoBattleHelpBase *cancel =
+        new DinoBattleHelpBase(gLcd->GetBottomDisplay(), data_ov000_02194950, gKasekiRockSizeText[5]);
+    mParallel.AddTail(cancel);
+    SetSelectedItem(mHelps[0]);
+    for (u32 i = 0; i < 3; i++) {
+        AddEntry((u32) (DinoHelpItem *) mHelps[i], 2, (u32) (DinoHelpItem *) cancel);
+        if (i < 2) {
+            AddEntry((u32) (DinoHelpItem *) mHelps[i], 1, (u32) (DinoHelpItem *) mHelps[i + 1]);
+        }
+        if (i != 0) {
+            AddEntry((u32) (DinoHelpItem *) mHelps[i], 3, (u32) (DinoHelpItem *) mHelps[i - 1]);
+        }
+    }
+    AddEntry((u32) (DinoHelpItem *) cancel, 4, (u32) (DinoHelpItem *) mHelps[0]);
+    AddEntry((u32) (DinoHelpItem *) cancel, 1, 0);
+    AddEntry((u32) (DinoHelpItem *) cancel, 3, 0);
+
+    DinoBattleViewCreature *creature = ((DinoBattleView *) mUnk104)->FindCreatureByAC(mUnkC0);
+    ((DinoBattleView *) mUnk104)->GetUnkE4(((DinoBattleViewPlayer *) creature->GetUnkDC())->mUnkA8)->GetOpponent();
+    MSmartOam *oam = new MSmartOam(1, 0, 1);
+    MMotion *motion = new MMotion(std::string(data_ov000_021947ac.creatureMotionPath), oam, 0, 1);
+    motion->SetPosition(func_ov000_02175b90(creature));
+    motion->Play(1, 0);
+    motion->SetPriority(1);
+    motion->SetAnchor(0);
+    motion->Show();
+    ((DinoBattleViewPlayer *) creature->GetUnkDC())->SetMotions(motion, (MTask *) oam);
+
+    mUnkB4 = new MSmartOam(0x22, 0, 1);
+    mUnkB4->mHidden = TRUE;
+    mParallel.AddTail(mUnkB4->CreateShowTransfer());
+    GetInput()->SetRepeat(0xC0, DinoAbilityMenuRepeat(gDinoResource->GetExcavateDefs().Get())[7],
+                          DinoAbilityMenuRepeat(gDinoResource->GetExcavateDefs().Get())[8]);
+    gDinoResource->GetCreatureDef(mUnkBC);
+    MParallelTaskSet *slides = new MParallelTaskSet(TRUE);
+    mSerial.AddTail(slides);
+    int count = creature->CountAttacks();
+    int rows = count;
+    if (mUnkD4 && creature->GetSpecialAttack() != 0) {
+        rows = count + 1;
+    }
+    unkD0 = 5 - rows;
+    std::vector<DinoBattleViewUiAbilityMenuItem *> items;
+    for (int i = 0; i <= count; i++) {
+        u32 attack;
+        int kind = 0;
+        if ((u32) i < creature->CountAttacks()) {
+            attack = creature->GetAttack(i);
+        } else if (mUnkD4) {
+            attack = creature->GetSpecialAttack();
+            kind = 2;
+        } else {
+            continue;
+        }
+        if (attack == 0) {
+            continue;
+        }
+        mUnkCC++;
+        mItems[i] = new DinoBattleViewUiAbilityMenuItem(this, !(mUnkC4 & (1 << i)), (mUnkC8 & (1 << i)) != 0, attack,
+                                                        kind, i);
+        AddItem(mItems[i]);
+        int row = i + unkD0;
+        int x = data_ov000_021947ac.barX + data_ov000_021947ac.rowStep.x * row;
+        int y = data_ov000_021947ac.barY + data_ov000_021947ac.rowStep.y * row;
+        mItems[i]->GetBar();
+        MPoint start(x, y - 160);
+        MPoint to(x, y);
+        mItems[i]->SetBarPosition(start);
+        MSerialTaskSet *seq = new MSerialTaskSet(TRUE);
+        MTask *slide = func_ov000_0217a45c(mItems[i], start, to, 20, -1);
+        seq->AddTail(new MTimer((count - i) * (data_0208a190 / 7)));
+        seq->AddTail(slide);
+        slides->AddTail(seq);
+        items.push_back(mItems[i]);
+    }
+    u32 size = items.size();
+    if (size > 1) {
+        for (u32 j = 0; j < size; j++) {
+            AddLink(items[j], 2, items[(j + 1) % size]);
+            AddLink(items[j], 4, items[(j - 1 + size) % size]);
+        }
+    }
+    unk120 = (u32) new DinoBattleViewCancelMenuItem();
+    AddItem((MMenuItem *) unk120);
+    MFont *font = gDinoResource->CreateFont12(0, 10, 1);
+    mCostText = new MIndicator(new MTextCanvas(MPoint(0xF0, 0x20), gDinoResource->GetUnkTable(), 0, TRUE), font, 0);
+    mCostText->SetPriority(0);
+    mCostText->SetPosition(data_ov000_021947ec);
+    mParallel.AddTail(mCostText);
+    mBG = new DinoBattleViewAbilityMenuBG();
+    mParallel.AddTail(mBG);
+    unkF8 = (u32) func_ov000_0217c0b8(mBG, FALSE);
+    ((DinoBattleViewAbilityTextWindow *) unkF8)
+        ->StartAnime(MRect(16, 16, 16, 16), MRect(3, unkD0 * 3 + 2, 28, 17), 12, -1);
+    ((DinoBattleViewAbilityTextWindow *) unkF8)->Show();
+    mTextWindow = func_ov000_0217c0b8(mBG, TRUE);
+    mBG->SetOffset(MPoint(0, -192));
+    mParallel.AddTail(mBG->CreateOffsetAnime(MPoint(0, -192), MPoint(0, 0), data_0208a190, -1));
+    MTask *focus = CreateFocusItemTransfer(mItems[mUnkD8]);
+    MTask *show = mCostText->CreateShowTransfer();
+    MTask *showWindow = mTextWindow->CreateShowTask();
+    MTaskSet &serial = mSerial;
+    serial.AddTail(showWindow);
+    serial.AddTail(show);
+    serial.AddTail(focus);
+    MTask *tutorial = func_ov000_0218ec8c(((DinoBattleView *) mUnk104)->GetUnk12C(), 11, NULL);
+    if (tutorial != NULL) {
+        MTask *enable = new MenuEnableTask(this, TRUE);
+        MTask *disable = new MenuEnableTask(this, FALSE);
+        MTaskSet &serial2 = mSerial;
+        serial2.AddTail(disable);
+        serial2.AddTail(tutorial);
+        serial2.AddTail(enable);
+    }
+    if (!((u8 *) ((DinoBattleView *) mUnk104)->GetUnk12C())[0xD]) {
+        mSerial.AddTail(DinoHelpBase::CreateEnableTask());
+    }
+    mParallel.AddTail(mUnkB4);
+}
+
 #pragma auto_inline on
 
-extern "C" MTask *func_ov000_0218ec8c(u32 arg0, int arg1, BOOL *proceed);
+
 
 void DinoBattleViewUiAbilityMenu::OnIdle() {
     MTask *task = func_ov000_0218ec8c(((DinoBattleView *)mUnk104)->GetUnk12C(), -1, 0);

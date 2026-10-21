@@ -146,6 +146,7 @@ public:
 
 class DinAttackItemHelp : public DinoBattleHelpBase {
 public:
+    DinAttackItemHelp(const MRect &rect, u32 textId, MDisplay *display) : DinoBattleHelpBase(display, rect, textId) {}
     virtual ~DinAttackItemHelp();
     virtual MRect GetRect();
 
