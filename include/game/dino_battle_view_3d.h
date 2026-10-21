@@ -90,8 +90,16 @@ public:
 struct DinoBattleView3DEntry {
     u32 unk[4];
 };
+// A side of the debug auto battle: its level, two values and its creatures.
 struct DinoBattleView3DRecord {
-    u32 unk[13];
+    u32 unk00;
+    u32 unk04;
+    u32 unk08[2];
+    struct {
+        u32 id;
+        u32 level;
+        u32 unk08;
+    } creatures[3];     // 0x10
 };
 
 #endif

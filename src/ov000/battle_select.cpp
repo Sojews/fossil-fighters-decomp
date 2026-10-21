@@ -172,6 +172,153 @@ BOOL DinoBattleViewAbilityIcon::IsHidden() {
 
 #pragma auto_inline on
 
+// The debug auto battle's names, the battle select's data and the side name format.
+extern "C" const char data_ov000_021962b4[];
+extern "C" const char data_ov000_021962bc[];
+extern "C" const char data_ov000_021962c4[];
+extern "C" const char data_ov000_021962e0[];
+extern const u32 kCreatureLevelLimits[2];
+
+// One side of the battle select's data: a level, two values and the creatures (id, level, a value each).
+struct DinoBattleSelectSide {
+    u32 unk00;
+    u32 unk04;
+    u32 unk08;          // 0x08
+    u32 unk0CCount;     // 0x0C
+    u32 unk0COffset;    // 0x10
+    u32 creatureCount;  // 0x14
+    u32 creatureOffset; // 0x18
+};
+
+struct DinoBattleSelectData {
+    u32 unk00;
+    u32 count;          // 0x04
+    u32 offset;         // 0x08: of the sides' offsets
+
+    const DinoBattleSelectSide *GetSide(u32 i) const {
+        return (const DinoBattleSelectSide *)((const u8 *)this + ((const u32 *)((const u8 *)this + offset))[i]);
+    }
+};
+
+// The parameters of a debug battle: both sides run by the CPU.
+static inline void DinoDebugBattleParams(DinoBattleParams &params) {
+    MI_CpuFill8(&params, 0, sizeof(params));
+    params.unk00 = 0;
+    params.unk08 = 2;
+    params.unk0C = 2;
+    params.unk10 = 0;
+    params.unk14 = 1;
+    params.unk18 = 0;
+    params.unk1C = 1;
+}
+
+// The creature's parts' levels for its level (as the battle select gives them).
+static inline void DinoDebugSetLevel(DinoCreaturePart *parts, int level) {
+    for (u32 j = 0; j < 4; j++) {
+        parts[j].level = 0;
+        parts[j].unk12 = 0;
+    }
+    switch (level) {
+    case 12:
+        parts[3].level += kCreatureLevelLimits[0];
+    case 11:
+        parts[3].level += kCreatureLevelLimits[0];
+    case 10:
+        parts[3].level += kCreatureLevelLimits[0];
+    case 9:
+        parts[2].level += kCreatureLevelLimits[0];
+    case 8:
+        parts[2].level += kCreatureLevelLimits[0];
+    case 7:
+        parts[2].level += kCreatureLevelLimits[0];
+    case 6:
+        parts[1].level += kCreatureLevelLimits[0];
+    case 5:
+        parts[1].level += kCreatureLevelLimits[0];
+    case 4:
+        parts[1].level += kCreatureLevelLimits[0];
+    case 3:
+        parts[0].level += kCreatureLevelLimits[0];
+    case 2:
+        parts[0].level += kCreatureLevelLimits[0];
+    case 1:
+        parts[0].level += 50;
+    }
+}
+
+// Plays every pair of the battle select's sides against each other, the CPU on both, counting each battle's frames.
+// NONMATCHING
+DebugAutoBattle::DebugAutoBattle() : MProcess(NULL) {
+    mRandom = new MRandom;
+    DinoBattleParams defaults;
+    DinoDebugBattleParams(defaults);
+    for (int side = 0; side < 2; side++) {
+        for (int i = 0; i < 3; i++) {
+            DinoCreatureState *creature = (DinoCreatureState *)&defaults.sides[side].mCreatures[i];
+            creature->index = side * 3 + i + 1;
+            DinoDebugSetLevel(creature->parts, 7);
+        }
+        defaults.sides[side].mName = side != 0 ? data_ov000_021962b4 : data_ov000_021962bc;
+        defaults.sides[side].unk54 = 7;
+    }
+    std::vector<DinoBattleView3DRecord> records;
+    MResource<DinoBattleSelectData> data((std::string(data_ov000_021962c4)));
+    for (u32 i = 0; i < data.Get()->count; i++) {
+        const DinoBattleSelectSide *src = data.Get()->GetSide(i);
+        DinoBattleView3DRecord record;
+        record.unk00 = src->unk08;
+        for (int j = 0; j < src->unk0CCount && j < 2; j++) {
+            record.unk08[j] = ((const u32 *)((const u8 *)src + src->unk0COffset))[j];
+        }
+        for (u32 j = 0; j < src->creatureCount; j++) {
+            const u32 *creature = (const u32 *)((const u8 *)src + src->creatureOffset) + j * 3;
+            record.creatures[j].id = creature[0];
+            record.creatures[j].level = creature[1];
+            record.creatures[j].unk08 = creature[2];
+        }
+        records.push_back(record);
+    }
+    u32 pairs = 0;
+    for (u32 a = 0; a < records.size(); a++) {
+        for (u32 b = a + 1; b < records.size(); b++) {
+            pairs++;
+        }
+    }
+    mResults.resize(pairs);
+    u32 pair = 0;
+    for (u32 a = 0; a < records.size(); a++) {
+        for (u32 b = a + 1; b < records.size(); b++) {
+            DinoBattleParams params;
+            DinoDebugBattleParams(params);
+            for (int side = 0; side < 2; side++) {
+                u32 index = side == 0 ? a : b;
+                char name[16];
+                OS_SPrintf(name, data_ov000_021962e0, index + 1);
+                params.sides[side].mName = name;
+                const DinoBattleView3DRecord &record = records[index];
+                params.sides[side].unk54 = record.unk00;
+                params.sides[side].unk68 = record.unk08[0];
+                params.sides[side].unk6C = record.unk08[0];
+                for (int i = 0; i < 3; i++) {
+                    DinoCreatureState *creature = (DinoCreatureState *)&params.sides[side].mCreatures[i];
+                    creature->index = record.creatures[i].id;
+                    int level = record.creatures[i].level;
+                    if (level > 12) {
+                        level = 12;
+                    }
+                    DinoDebugSetLevel(creature->parts, level);
+                    params.sides[side].unk5C[a % 3] = record.creatures[i].unk08;
+                }
+            }
+            mResults[pair].unk[0] = a;
+            mResults[pair].unk[1] = b;
+            DinoBattleView3DEntry *entry = &mResults[pair];
+            mSerial.AddTail(new TimeCountTask(new DinoBattle(params, (u32)&mResults[pair].unk[3], 0, NULL, NULL), entry));
+            pair++;
+        }
+    }
+}
+
 DebugAutoBattle::~DebugAutoBattle() {
     delete mRandom;
 }

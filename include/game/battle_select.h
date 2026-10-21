@@ -10,6 +10,8 @@
 #include "game/help.h"
 #include "game/dino_field_camera_hook.h"
 #include "m/seed_generator.h"
+#include "game/dino_battle_view_3d.h"
+#include "game/dino_battle.h"
 #include <vector>
 
 // A debug process that plays battles automatically.
@@ -20,7 +22,7 @@ public:
     virtual void Idle();
 
     MRandom *mRandom;           // 0x74
-    std::vector<u32> mUnk78;    // 0x78
+    std::vector<DinoBattleView3DEntry> mResults;   // 0x78: per pair of sides, the two and the battle's counts
 };
 
 class MInput;
@@ -109,16 +111,31 @@ public:
 
 class IncValTask : public MTask {
 public:
+    IncValTask(int *value) {
+        mValue = value;
+    }
     virtual ~IncValTask();
     virtual void Execute();
 
     int *mValue;    // 0x10
 };
 
+// Runs the battle, counting its frames into the entry.
 class TimeCountTask : public MProcess {
 public:
+    TimeCountTask(DinoBattle *battle, DinoBattleView3DEntry *entry) : MProcess(NULL) {
+        mBattle = battle;
+        MTask *exit = MTaskExitTransfer::Create(this);
+        MTaskSet *serial = &mSerial;
+        serial->AddTail(battle);
+        serial->AddTail(exit);
+        entry->unk[2] = 0;
+        mParallel.AddTail(new IncValTask((int *)&entry->unk[2]));
+    }
     virtual ~TimeCountTask();
     virtual void Idle();
+
+    DinoBattle *mBattle;    // 0x74
 };
 
 #endif
