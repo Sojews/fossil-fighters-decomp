@@ -1080,8 +1080,12 @@ void DinoUiCannonParentScanner::StateReceived() {
     mState = data_ov004_02174350.StateShowCancel_4C;
 }
 
+// (The profiles' push goes one inline level deeper than the rocks': that orders the push_back tags' stack bytes.)
+static inline void DinoPushProfile(std::vector<DinoPlayerProfile> &profiles, const DinoPlayerProfile &profile) {
+    profiles.push_back(profile);
+}
+
 // Collects the children's fossil rocks and profiles, and answers their pings.
-// NONMATCHING: the game gives the push_back tags other stack bytes
 void DinoUiCannonParentScanner::OnCountMessage(MMessage *msg) {
     switch (msg->mId) {
     case 0x100A5: {
@@ -1094,7 +1098,7 @@ void DinoUiCannonParentScanner::OnCountMessage(MMessage *msg) {
         break;
     }
     case 0x100A9:
-        mProfiles.push_back(*(const DinoPlayerProfile *)((DinoExchangeSenryuSignal *)msg)->mUnk0C);
+        DinoPushProfile(mProfiles, *(const DinoPlayerProfile *)((DinoExchangeSenryuSignal *)msg)->mUnk0C);
         break;
     case 0x100A6:
         mUnkF9 = FALSE;
