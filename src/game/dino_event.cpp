@@ -893,7 +893,7 @@ void DinoEventLoop::RunCommand(const u8 *command) {
                 points.push_back((void *)(cmd->GetArgs() + 4)[i]);
             }
             mSerial.AddTail(new DinoEventExecStartPatrol(this, DinoEventArg(command, 0), DinoEventArg(command, 1),
-                                                         DinoEventArg(command, 2), DinoEventArg(command, 3),
+                                                         DinoEventArg(command, 2), MFx32::FromRaw(DinoEventArg(command, 3)),
                                                          std::vector<u32>(*(const std::vector<u32> *)&points)));
         }
         break;

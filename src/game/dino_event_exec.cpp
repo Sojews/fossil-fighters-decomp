@@ -367,9 +367,9 @@ void DinoEventExecStartWander::Transfer() {
     }
 }
 
-DinoEventExecStartPatrol::DinoEventExecStartPatrol(DinoEventLoop *event, u32 chara, u32 a, u32 b, u32 c,
+DinoEventExecStartPatrol::DinoEventExecStartPatrol(DinoEventLoop *event, u32 chara, u32 a, u32 b, MFx32 c,
                                                    const std::vector<u32> &route)
-    : mEvent(event), mChara(chara), mA(a), mB(b), mC(c), mRoute(route) {
+    : mEvent(event), mChara(chara), mA(a), mB(b), mC(c.v), mRoute(route) {
 }
 
 void DinoEventExecStartPatrol::Transfer() {

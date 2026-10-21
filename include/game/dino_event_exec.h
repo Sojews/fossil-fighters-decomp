@@ -1261,7 +1261,7 @@ public:
 
 class DinoEventExecStartPatrol : public MTransfer {
 public:
-    DinoEventExecStartPatrol(DinoEventLoop *event, u32 chara, u32 a, u32 b, u32 c, const std::vector<u32> &route);
+    DinoEventExecStartPatrol(DinoEventLoop *event, u32 chara, u32 a, u32 b, MFx32 c, const std::vector<u32> &route);
     virtual ~DinoEventExecStartPatrol();
     virtual void Transfer();
 
