@@ -38,6 +38,7 @@ public:
     virtual ~DinoTalkWindow();
     virtual void Idle();
 
+    void StateOpen();
     // Shows the next-page mark while a page waits, and shakes the window (and its name panel) while mUnkAC lasts.
     void StateShow();
 

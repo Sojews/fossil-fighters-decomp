@@ -58,7 +58,7 @@ extern "C" struct {
     s32 unk10;
     const char *mFramePath; // 0x14
     MPoint unk18;   // the console's position: centered in 256x64 under unk40
-    u8 unk20[8];
+    void (DinoTalkWindow::*StateShow_20)();
     MPoint unk28;
     u8 unk30[8];
     MPoint mFlipOffset;     // 0x38: the name panel's, on the other side
@@ -176,15 +176,79 @@ void DinoTalkWindow::Skip() {
 }
 
 
-// Moves the name panel by shake (on the other side if flipped).
-static inline void DinoTalkShakePanel(DinoTalkWindowNamePanel *panel, MPoint shake) {
-    panel->mShake = shake;
+// Puts the name panel's views where it is (on the other side if flipped).
+static inline void DinoTalkMovePanel(DinoTalkWindowNamePanel *panel) {
     MPoint flip(0, 0);
     if (panel->mFlip) {
         flip = data_020b62f0.mFlipOffset;
     }
     panel->mPanel->SetPosition(panel->mPos + panel->mShake + flip);
     panel->mName->SetPosition(panel->mPos + panel->mShake + panel->mNameOffset + flip);
+}
+
+// Moves the name panel by shake (on the other side if flipped).
+static inline void DinoTalkShakePanel(DinoTalkWindowNamePanel *panel, MPoint shake) {
+    panel->mShake = shake;
+    DinoTalkMovePanel(panel);
+}
+
+// Moves the name panel to pos (on the other side if flipped).
+static inline void DinoTalkPlacePanel(DinoTalkWindowNamePanel *panel, MPoint pos) {
+    panel->mPos = pos;
+    DinoTalkMovePanel(panel);
+}
+
+// Opens the panel to frame tiles, showing as much of the name as fits.
+static inline void DinoTalkOpenPanel(DinoTalkWindowNamePanel *panel, u32 frame) {
+    panel->mUnkAC = std::min(frame, panel->mTiles);
+    panel->mPanel->Play(panel->mUnkAC + 1, 0);
+    panel->mPanel->Show();
+    panel->mName->Clear();
+    u32 width = panel->mUnkAC * 8;
+    u32 margin = (panel->mPanelWidth - panel->mWidth) / 2;
+    if (width > margin) {
+        u32 left = width - margin;
+        std::wstring shown;
+        std::wstring rest;
+        rest = panel->mText;
+        while (!rest.empty()) {
+            wchar_t c = rest.c_str()[0];
+            MPoint size = panel->mFont->GetGlyphSize(c);
+            if (size.x > left) {
+                break;
+            }
+            left -= size.x;
+            shown.push_back(c);
+            rest.erase(rest.begin());
+        }
+        panel->mName->Print(std::wstring(shown));
+    }
+}
+
+// Slides the window in over 16 frames, the name panel opening a tile a frame with as much of the name as fits.
+void DinoTalkWindow::StateOpen() {
+    if (mFlip && mNamePanel == NULL) {
+        mUnk8C = 0x10;
+    }
+    DinoTalkWindowNamePanel *panel = mNamePanel;
+    if (panel != NULL) {
+        if (!mFlip) {
+            DinoTalkPlacePanel(panel, MPoint(0x10, mUnk8C + 0x68));
+        } else {
+            DinoTalkPlacePanel(panel, MPoint(0x10, 0x78));
+        }
+        DinoTalkOpenPanel(mNamePanel, mUnk8C);
+    }
+    if (!mFlip) {
+        ((MTextPicture *)mFrame)->SetPosition(-0x300, mUnk8C + 0x60);
+    }
+    if (mUnk8C++ >= 0x10) {
+        mConsoleTasks->Run();
+        mPos = mFrame->GetPosition();
+        mConsolePos = mConsole->GetPosition();
+        mStarted = TRUE;
+        mState = data_020b62f0.StateShow_20;
+    }
 }
 
 // NONMATCHING: register allocation (the game keeps the flip offset in registers and spills the shake).
