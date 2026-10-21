@@ -78,14 +78,13 @@ MTask *DinoEventKasekiRockFound::CreateFoundMessage() {
 }
 
 // The message as a yes/no question: its last two lines are the answers.
-// NONMATCHING: the game copies the size before scaling it for the answers' addresses (4 bytes more).
 MTask *DinoEventKasekiRockFound::CreateYesNo(u32 message) {
     const u8 *data = (const u8 *)mMessages.Get();
     const u8 *entry = data + ((const u32 *)(data + ((const u32 *)data)[2]))[message];
     std::string text((const char *)entry + ((const u32 *)entry)[1]);
     std::vector<std::string> lines = MSplitString(text, '\n');
-    std::string yes(*(lines.end() - 2));
-    std::string no(*(lines.end() - 1));
+    std::string yes(*(lines.begin() + (u32)lines.size() - 2));
+    std::string no(*(lines.begin() + (u32)lines.size() - 1));
     lines.erase(lines.end() - 2, lines.end());
     text = MJoinStrings(lines, '\n');
     DinoCommonWindowYesNoDialog *dialog = new DinoCommonWindowYesNoDialog(text, &mAnswer);

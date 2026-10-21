@@ -93,7 +93,6 @@ extern "C" const u32 data_0208a67c, data_0208a678;
 
 // The mode's message as a yes/no question (or a one-frame wait if it has none), naming the rocks: its last two lines are
 // the answers.
-// NONMATCHING: the game copies the size before scaling it for the answers' addresses (as KasekiRockFound's).
 MTask *DinoEventKasekiRockGet::CreateYesNo(u32 message) {
     u32 id = data_0208b260[mMode][message];
     if (id == (u32)-1) {
@@ -105,8 +104,8 @@ MTask *DinoEventKasekiRockGet::CreateYesNo(u32 message) {
     text = DinoReplaceTag(text, data_020bd370, mName);
     text = DinoReplaceTag(text, data_020bd378, mSwapName);
     std::vector<std::string> lines = MSplitString(text, '\n');
-    std::string yes(*(lines.end() - 2));
-    std::string no(*(lines.end() - 1));
+    std::string yes(*(lines.begin() + (u32)lines.size() - 2));
+    std::string no(*(lines.begin() + (u32)lines.size() - 1));
     lines.erase(lines.end() - 2, lines.end());
     text = MJoinStrings(lines, '\n');
     DinoCommonWindowYesNoDialog *dialog = new DinoCommonWindowYesNoDialog(text, &mAnswer);
@@ -142,7 +141,6 @@ void DinoEventKasekiRockGet::StateAnswered() {
     }
 }
 
-// NONMATCHING: the game copies the size before scaling it for the answers' addresses (as CreateYesNo).
 // Lets the player choose the stored rock to swap out, with the mode's two questions.
 void DinoEventKasekiRockGet::StateChooseSwap() {
     mSwapIndex = 0;
@@ -158,8 +156,8 @@ void DinoEventKasekiRockGet::StateChooseSwap() {
     text = (const char *)entry + ((const u32 *)entry)[1];
     text = DinoReplaceTag(text, data_020bd370, mName);
     lines = MSplitString(text, '\n');
-    yes = *(lines.end() - 2);
-    no = *(lines.end() - 1);
+    yes = *(lines.begin() + (u32)lines.size() - 2);
+    no = *(lines.begin() + (u32)lines.size() - 1);
     lines.erase(lines.end() - 2, lines.end());
     text = MJoinStrings(lines, '\n');
     texts.push_back(text);
@@ -171,8 +169,8 @@ void DinoEventKasekiRockGet::StateChooseSwap() {
     text = (const char *)entry + ((const u32 *)entry)[1];
     text = DinoReplaceTag(text, data_020bd370, mName);
     lines = MSplitString(text, '\n');
-    yes = *(lines.end() - 2);
-    no = *(lines.end() - 1);
+    yes = *(lines.begin() + (u32)lines.size() - 2);
+    no = *(lines.begin() + (u32)lines.size() - 1);
     lines.erase(lines.end() - 2, lines.end());
     text = MJoinStrings(lines, '\n');
     texts.push_back(text);
