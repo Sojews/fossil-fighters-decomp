@@ -118,8 +118,6 @@ struct DinoLPPanelSlide {
     MPoint to;
 };
 extern "C" const DinoLPPanelSlide data_ov000_02197368[];
-extern "C" u32 data_ov000_02197370[];
-extern "C" const s32 data_ov000_02197374[];
 extern "C" const u32 data_0208a174, data_0208a178, data_0208a17c, data_0208a184, data_0208a188, data_0208a1bc;
 // Slides the panel and its digits from one point to another (the digits sit 10 lower, 20 apart around the middle).
 extern "C" MTask *func_ov000_0218d504(DinoBattleViewLPCountPanel *panel, MPoint from, MPoint to, u32 frames, int ease) {
@@ -138,7 +136,6 @@ extern "C" MTask *func_ov000_0218d504(DinoBattleViewLPCountPanel *panel, MPoint 
     return tasks;
 }
 
-// NONMATCHING: the drop's end point stores its y before its x in the game.
 void DinoBattleViewDecideFirstAttackTeam::StateStart() {
     u32 place;
     MTask *drop;
@@ -159,8 +156,8 @@ void DinoBattleViewDecideFirstAttackTeam::StateStart() {
     counts->AddTail(func_ov000_0218d318(mPanels[0], data_0208a184), func_ov000_0218d318(mPanels[1], data_0208a184));
     int loser = 1 - mUnk8C;
     place = ((DinoBattleView *)mUnk88)->GetUnkE4(loser)->GetUnkAC();
-    drop = func_ov000_0218d504(mPanels[loser], *(const MPoint *)&data_ov000_02197370[place * 4],
-                               MPoint((s32)data_ov000_02197370[place * 4], data_ov000_02197374[place * 4] + 128),
+    drop = func_ov000_0218d504(mPanels[loser], data_ov000_02197368[place].to,
+                               MPoint(data_ov000_02197368[place].to.x, data_ov000_02197368[place].to.y + 128),
                                data_0208a178, data_0208a174);
     GetSerial()->AddTail(counts, new MTimer(data_0208a17c), drop);
     mState = data_ov000_02197300.StateEnd_14;
