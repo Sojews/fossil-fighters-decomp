@@ -40,6 +40,11 @@
 #include "m/picture.h"
 #include "m/indicator.h"
 #include "m/display.h"
+#include "m/3d_scene.h"
+#include "m/3d.h"
+#include "m/anm_model.h"
+#include "m/3d_model.h"
+#include "m/file.h"
 
 #pragma auto_inline off
 DinoUiStatusMenu::DinoUiStatusMenu(int *choice, DinoTeam *team, DinoTeam *team2)
@@ -134,7 +139,8 @@ extern DinoUiStatusLayout data_ov006_02190e9c;
 struct DinoUiStatusLayout2 {
     u8 unk00[0x8];
     const char *okPath;         // 0x08
-    u8 unk0C[0x14 - 0xC];
+    const char *bodyPathFormat; // 0x0C: the player's body model
+    const char *headPathFormat; // 0x10: and head model
     const char *backPath;       // 0x14
     const char *rankPath;       // 0x18
     u8 unk1C[0x2C - 0x1C];
@@ -157,7 +163,6 @@ extern const u32 data_0208a884, data_0208a888, data_0208a88c, data_0208a890, dat
     data_0208a89c, data_0208a8a0, data_0208a8a4, data_0208a8a8, data_0208a8ac, data_0208a8b0, data_0208a8b4,
     data_0208a8b8, data_0208a968, data_0208aa4c;
 extern const int data_02089a10, data_02089a24, data_02089a28, data_02089a38, data_02089a3c, data_02089a40;
-extern "C" void func_ov006_02174478(DinoUiStatusMenu *menu);
 void DinoGetBattleKP(u32 rank, u32 *a, u32 *b);
 
 inline DinoUiStatusBackButton::DinoUiStatusBackButton(DinoUiStatusMenu *owner)
@@ -299,7 +304,7 @@ void DinoUiStatusMenu::OnStart() {
     mTech = new DinoUiPartsTeamTech(data_ov006_02190f68);
     mParallel.AddTail(mTech);
     mTech->Hide();
-    func_ov006_02174478(this);
+    CreatePlayerModel();
     FocusItem(mTabItems[0]);
     mTabItems[1]->SetKeys(0x400);
     mTabItems[2]->SetKeys(0x800);
@@ -607,6 +612,86 @@ void DinoUiStatusMenu::LinkMembers() {
 
 extern const int data_02089a20; // fade frames
 extern const int data_02089a88;
+
+// The player's character data (as DinoField reads it).
+struct DinoStatusCharaData {
+    u32 unk00;
+    u32 bodyModelCount; // 0x04
+    u32 bodyModelNames; // 0x08: offset of the offsets of their names
+    u32 headModelCount; // 0x0C
+    u32 headModelNames; // 0x10
+};
+
+// The 3D scene's heap (in ov003's memory), the body's rotation and the joint the head goes on.
+extern "C" u8 data_ov003_021624cc[];
+extern "C" const VecFx32 data_ov006_02190040;
+extern "C" const char data_ov006_021913cc[];
+
+// The player's model in the corner: the body, then the head (or the head mask worn) on its head joint.
+void DinoUiStatusMenu::CreatePlayerModel() {
+    char path[0x100];
+    MResource<DinoCharaData> chara = gDinoResource->LoadChara(1);
+    DinoCharaState state;
+    gDinoBackup->GetChara(1, &state);
+    u32 body;
+    if ((body = state.bodyModel) >= ((const DinoStatusCharaData *)chara.Get())->bodyModelCount) {
+        return;
+    }
+    const u8 *data = (const u8 *)chara.Get();
+    OS_SPrintf(path, data_ov006_02190e1c.bodyPathFormat,
+               data + ((const u32 *)(data + ((const DinoStatusCharaData *)data)->bodyModelNames))[body], 1);
+    if (!MFileExists(std::string(path))) {
+        return;
+    }
+    M3DScene *scene = new M3DScene((u32)(data_ov003_021624cc + 4), 0xF618);
+    scene->mUnk14 = 1;
+    scene->mUnk18 = 0x12C000;
+    scene->mM3d->mBgCntBits.priority = 3;
+    scene->SetUnk80(-0x56, 0);
+    VecFx32 v;
+    v.x = 0;
+    v.y = 0x4CC;
+    v.z = 0;
+    scene->SetCameraTarget(&v);
+    v.x = 0;
+    v.y = 2 << 12;
+    v.z = 7 << 12;
+    scene->SetCameraPos(&v);
+    MAnmModel *model = new MAnmModel(scene);
+    model->SetFrames(0, 0x40000000);
+    model->Load(path, 0);
+    model->mUnkF4 = 1;
+    model->mFollowParent = TRUE;
+    model->SetRotRef(&data_ov006_02190040);
+    mParallel.AddTail(model);
+    int joint = model->mModel->FindJoint(data_ov006_021913cc);
+    if (state.headModel >= ((const DinoStatusCharaData *)chara.Get())->headModelCount) {
+        return;
+    }
+    if (gDinoBackup->GetSystemVar(4)) {
+        MResource<DinoHeadMaskDefs> masks = gDinoResource->LoadHeadMaskDefs();
+        u32 id = gDinoBackup->GetSystemVar(4);
+        const u8 *defs = (const u8 *)masks.Get();
+        const DinoHeadMaskDef *mask =
+            (const DinoHeadMaskDef *)(defs + ((const u32 *)(defs + ((const DinoHeadMaskDefs *)defs)->tableOffset))[id]);
+        OS_SPrintf(path, data_ov006_02190e1c.headPathFormat, (const char *)mask + mask->modelName);
+    } else {
+        u32 head = state.headModel;
+        const u8 *data = (const u8 *)chara.Get();
+        OS_SPrintf(path, data_ov006_02190e1c.headPathFormat,
+                   data + ((const u32 *)(data + ((const DinoStatusCharaData *)data)->headModelNames))[head]);
+    }
+    MAnmModel *head = new MAnmModel(scene);
+    head->SetFrames(0, 0x40000000);
+    head->Load(path, 0);
+    head->SetParent(model, joint);
+    head->Run();
+    head->mUnkF4 = 1;
+    head->mFollowParent = TRUE;
+    head->SetUnk145();
+    mParallel.AddTail(head);
+    mParallel.AddTail(scene);
+}
 
 void DinoUiStatusMenu::SelectTab(int tab) {
     if (tab < 0 || tab > 2) {

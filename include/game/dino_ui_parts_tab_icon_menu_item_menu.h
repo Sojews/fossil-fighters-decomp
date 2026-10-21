@@ -37,6 +37,7 @@ public:
     void CreateItems();
     void RefreshItems();
     void LinkMembers();
+    void CreatePlayerModel();
     void RefreshOKButton();
     void FinishPage();
     void FinishTab();
