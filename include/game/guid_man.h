@@ -6,6 +6,10 @@
 
 class GuidMan : public MTask {
 public:
+    GuidMan(MTaskSet *tasks, DinoHelpBase *help) {
+        mTasks = tasks;
+        mHelp = help;
+    }
     virtual ~GuidMan();
     virtual void Execute();
 

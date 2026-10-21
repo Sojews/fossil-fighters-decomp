@@ -5684,7 +5684,7 @@ from:0x0216d0f0 kind:load to:0x02175c1c module:overlay(4)
 from:0x0216d0f4 kind:load to:0x02089adc module:main
 from:0x0216d0f8 kind:load to:0x02175bcc module:overlay(4)
 from:0x0216d0fc kind:load to:0x021761a8 add:0x8 module:overlay(4)
-from:0x0216d100 kind:load to:0x021761e8 module:overlay(4)
+from:0x0216d100 kind:load to:0x021761a8 add:0x40 module:overlay(4)
 from:0x0216d104 kind:load to:0x0208abc8 module:main
 from:0x0216d108 kind:load to:0x021759d8 module:overlay(4)
 from:0x0216d10c kind:load to:0x02175a4c module:overlay(4)

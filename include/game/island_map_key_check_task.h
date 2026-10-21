@@ -7,6 +7,7 @@ class DinoUiIslandMapMenu;
 
 class IslandMapKeyCheckTask : public MTask {
 public:
+    IslandMapKeyCheckTask(DinoUiIslandMapMenu *menu) { mMenu = menu; }
     virtual ~IslandMapKeyCheckTask();
     virtual void Execute();
 

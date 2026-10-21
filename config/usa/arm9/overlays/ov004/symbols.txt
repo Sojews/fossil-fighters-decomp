@@ -1535,7 +1535,6 @@ _ZTV23DinoUiIslandMapMenuItem kind:data(any) addr:0x0217612c
 _ZTV19DinoUiIslandMapMenu kind:data(any) addr:0x02176158
 data_ov004_02176180 kind:data(any) addr:0x02176180
 _ZTV17DinoMapBackButton kind:data(any) addr:0x021761a8
-data_ov004_021761e8 kind:data(any) addr:0x021761e8
 data_ov004_021761fc kind:data(any) addr:0x021761fc
 data_ov004_0217620c kind:data(any) addr:0x0217620c
 data_ov004_02176220 kind:data(any) addr:0x02176220

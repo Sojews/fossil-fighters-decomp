@@ -7,9 +7,11 @@
 #include "game/help.h"
 
 class DinoUiIslandMapMenu;
+class MSmartOam;
 
 class DinoMapBackButton : public MMenuItem, public DinoHelpItem {
 public:
+    DinoMapBackButton(DinoUiIslandMapMenu *owner, u32 textId, MSmartOam *oam);
     virtual ~DinoMapBackButton();
     virtual MRect GetFrame();
     virtual void OnFocusChanged(BOOL focused);

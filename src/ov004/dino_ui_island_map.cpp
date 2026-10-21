@@ -69,6 +69,174 @@ void DinoUiIslandMapMenu::OnIdle() {
 
 #pragma auto_inline off
 
+extern "C" const int data_020899c0; // frames before the keys are taken
+extern "C" const int data_020899cc; // the fade in's frames
+extern "C" const int data_020899e4;
+extern "C" const u32 data_0208abc8; // "back"
+extern "C" const u32 data_0208ac48; // the bottom screen's help
+extern "C" const u32 data_0208ac4c; // the top screen's help
+extern "C" MPoint data_ov004_02175ba4[];      // the items' places with up to five places open
+extern "C" MPoint data_ov004_02175c1c[];      // with more
+extern "C" const char *data_ov004_02175bcc[]; // per place: its item's motion
+extern "C" const char *data_ov004_021759d8[];
+extern "C" const MPoint data_ov004_02175a4c;  // the back button's place
+extern "C" const char data_ov004_0217620c[];  // the title picture
+
+inline DinoMapBackButton::DinoMapBackButton(DinoUiIslandMapMenu *owner, u32 textId, MSmartOam *oam) {
+    mOwner = owner;
+    mTextId = textId;
+    mMotion = new MMotion(std::string(data_ov004_021759d8[5]), oam, 2, 1);
+    mMotion->Play(2, 0);
+    mMotion->SetPosition(data_ov004_02175a4c);
+    mMotion->SetPriority(3);
+    mMotion->Show();
+    mParallel.AddTail(mMotion);
+    DinoHelpItem::Enable();
+    SetMode(0);
+}
+
+static inline void DinoCenterOffset(MScreen *screen) {
+    screen->SetOffset(MPoint(0x80, 0xA0));
+}
+// Reads all of an archive file.
+static inline void DinoReadAll(const MArchiveFile &file, void *dest) {
+    const volatile MArchiveFile &f = file;
+    u32 size = f.archive->mEntries[f.index].size;
+    f.archive->Read(f.index, 0, dest, size, NULL);
+}
+
+// The open places' items (laid out in one row, or two with more than five) and the back button, their links, the
+// title, the map and its spotlight, and the help areas.
+// NONMATCHING: the map offset's two dead MPoint temporaries trade stack slots (and the item ctor that follows it
+// in the game makes objdiff's report read its call as a branch inside this function).
+void DinoUiIslandMapMenu::OnStart() {
+    mUnk150 = new MParallelTaskSet;
+    mParallel.AddTail(mUnk150);
+    mSpotTasks = new MParallelTaskSet;
+    mParallel.AddTail(mSpotTasks);
+    mMoveTasks = new MParallelTaskSet;
+    mParallel.AddTail(mMoveTasks);
+    mItemOam = new MSmartOam(0x55, 0, TRUE);
+    mParallel.AddTail(mItemOam);
+    mUnk150->AddTail(gLcd->mMain->mBright->CreateFadeInFromBlack(data_020899e4, data_020899cc),
+                     gLcd->mSub->mBright->CreateFadeInFromBlack(data_020899e4, data_020899cc));
+    mParallel.AddTail(new GuidMan(mMoveTasks, this));
+    u32 open = 0;
+    for (int i = 0; i < 10; i++) {
+        if ((1 << i) & mUnk144) {
+            open++;
+        }
+    }
+    MPoint *place;
+    if (open <= 5) {
+        place = data_ov004_02175ba4;
+    } else {
+        place = data_ov004_02175c1c;
+    }
+    int count, i;
+    int order[10];
+    i = count = 0;
+    int *next = order;
+    for (; i < 10; i++) {
+        if (mUnk144 & (1 << data_02089adc[i])) {
+            AddItem(mItems[i] = new DinoUiIslandMapMenuItem(this, std::string(data_ov004_02175bcc[data_02089adc[i]]),
+                                                            *place, 0, mItemOam));
+            place++;
+            *next++ = i;
+            count++;
+        } else {
+            mItems[i] = NULL;
+        }
+    }
+    DinoMapBackButton *back = new DinoMapBackButton(this, data_0208abc8, mItemOam);
+    AddItem(back);
+    mBackButton = back;
+    SetLinkFallback(0);
+    for (int i = 0; i < count; i++) {
+        if (i != 0 && i != 5) {
+            AddLink(mItems[order[i]], 4, mItems[order[(i - 1 + count) % count]]);
+        }
+        if (i != 4 && i != count - 1) {
+            AddLink(mItems[order[i]], 2, mItems[order[(i + 1) % count]]);
+        }
+    }
+    if (count > 5) {
+        AddLink(mItems[order[0]], 4, mItems[order[4]]);
+        AddLink(mItems[order[4]], 2, mItems[order[0]]);
+        if (count > 5) {
+            AddLink(mItems[order[5]], 4, back);
+            AddLink(mItems[order[count - 1]], 2, back);
+        }
+        AddLink(back, 4, mItems[order[count - 1]]);
+        AddLink(back, 2, mItems[order[5]]);
+        for (int i = 0; i < 5; i++) {
+            if (i + 5 < count) {
+                AddLink(mItems[order[i]], 3, mItems[order[i + 5]]);
+                AddLink(mItems[order[i]], 1, mItems[order[i + 5]]);
+                AddLink(mItems[order[i + 5]], 3, mItems[order[i]]);
+                AddLink(mItems[order[i + 5]], 1, mItems[order[i]]);
+            } else {
+                AddLink(mItems[order[i]], 3, back);
+                AddLink(mItems[order[i]], 1, back);
+            }
+        }
+        AddLink(back, 3, mItems[order[4]]);
+        AddLink(back, 1, mItems[order[4]]);
+    } else {
+        AddLink(mItems[order[0]], 4, back);
+        AddLink(mItems[order[count - 1]], 2, back);
+        AddLink(back, 4, mItems[order[count - 1]]);
+        AddLink(back, 2, mItems[order[0]]);
+    }
+    MTextPicture *title = new MTextPicture(std::string(data_ov004_0217620c), TRUE, false);
+    title->Show();
+    title->SetPriority(3);
+    mParallel.AddTail(title);
+    gCurrentDisplay = gLcd->mMain;
+    mOam = new MSmartOam(0x40, 0, TRUE);
+    mParallel.AddTail(mOam);
+    mBitmap = gLcd->GetTopDisplay()->mBg->CreateIndexBitmap(3, 1);
+    MPal *pal = gLcd->GetTopDisplay()->mBg->mPal;
+    mPalette = pal->Alloc(0x10, mMap.GetPalette(), 1);
+    DinoReadAll(mMap.GetChrFile(), (void *)mBitmap->mBase);
+    mBitmap->SetCenter(0x100, 0x100);
+    DinoCenterOffset(mBitmap);
+    mBitmap->SetScale(MFx32(1), MFx32(1));
+    mBitmap->mBgCntBits.priority = 3;
+    mSerial.AddTail(mBitmap->CreateShowTransfer());
+    mScroll = MPoint(0x80, 0xA0);
+    SetSilentFocus(TRUE);
+    gLcd->mMain->mBlend->SetMode(3);
+    gLcd->mMain->mBlend->SetBrightness(8);
+    gLcd->mMain->mBlend->SetTarget1(0xF);
+    mWindow = new MRasterWindow(-1, NULL, TRUE);
+    mWindow->SetTarget(0x3F);
+    mWindow->SetObjTarget(0x3F);
+    mWindow->SetBlendEnabled(FALSE);
+    mWindow->SetObjBlendEnabled(TRUE);
+    mWindow->Clear();
+    mWindow->SetCircle(MPoint(0x80, 0x60), 0x20);
+    mWindow->Show();
+    mParallel.AddTail(mWindow);
+    gCurrentDisplay = gLcd->mSub;
+    FocusNearestItem(MPoint(0, 0));
+    GetInput()->SetRepeat(0xF0, 0x1E, 10);
+    DinoHelpDummyItem *help = new DinoHelpDummyItem(gLcd->GetBottomDisplay(), MRect(0, 8, 0x100, 0xB7),
+                                                    std::string(gDinoResource->GetText(data_0208ac48)));
+    help->Enable();
+    mParallel.AddTail(help);
+    help = new DinoHelpDummyItem(gLcd->GetTopDisplay(), MRect(0, 8, 0x100, 0xB7),
+                                 std::string(gDinoResource->GetText(data_0208ac4c)));
+    help->Enable();
+    mParallel.AddTail(help);
+    mSerial.AddTail(new MTimer(data_020899c0));
+    IslandMapKeyCheckTask *keys = new IslandMapKeyCheckTask(this);
+    keys->Suspend();
+    mParallel.AddTail(keys);
+    mSerial.AddTail(MTaskRunTransfer::Create(keys));
+    mKeyCheck = keys;
+}
+
 DinoUiIslandMapMenuItem::DinoUiIslandMapMenuItem(DinoUiIslandMapMenu *owner, const std::string &path, MPoint pos, u32 spot,
                                                  MSmartOam *oam) {
     mOwner = owner;
@@ -217,7 +385,6 @@ void DinoUiIslandMapMenu::OnDecide(MMenuItem *item) {
 extern "C" const int data_ov004_02175c6c[]; // per place: the x of its spot on the map (pairs with the y)
 extern "C" const int data_ov004_02175c70[]; // and the y
 extern "C" const char *data_ov004_02175bf4[]; // per place: its name plate's motion
-extern "C" const char *data_ov004_021759d8[];
 extern "C" const MPoint data_ov004_02175a54, data_ov004_02175a6c;
 
 // Scrolls the map to the focused place and shines the spotlight on it.
@@ -372,7 +539,7 @@ extern const int data_020899c4, data_020899d8, data_02089a00;
 // Fades both screens out, then exits.
 void DinoUiIslandMapMenu::OnSpotDecided() {
     mUnk150->Clear();
-    mUnkF8->Exit();
+    mKeyCheck->Exit();
     MTask *exit = CreateExitTransfer();
     MTask *fadeSub = gLcd->mSub->mBright->CreateFadeOutToBlack(data_020899d8, data_020899c4);
     MTask *fadeMain = gLcd->mMain->mBright->CreateFadeOutToBlack(data_020899d8, data_020899c4);

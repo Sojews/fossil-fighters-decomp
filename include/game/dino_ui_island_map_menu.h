@@ -25,7 +25,7 @@ public:
     void SetSilentFocus(BOOL silent);
     BOOL IsSilentFocus();
 
-    u32 mUnkB4;             // 0xB4
+    MSmartOam *mItemOam;    // 0xB4: the map items and back button
     MSmartOam *mOam;        // 0xB8
     MMenuItem *mItems[10];  // 0xBC: one per place on the map
     MRasterWindow *mWindow; // 0xE4: the spotlight on the focused place
@@ -33,7 +33,7 @@ public:
     MMotion *mMarkMotion;   // 0xEC
     MTaskSet *mSpotTasks;   // 0xF0: the motions and text of the focused place
     MTaskSet *mMoveTasks;   // 0xF4: the scroll and spotlight moves
-    MTask *mUnkF8;          // 0xF8
+    MTask *mKeyCheck;       // 0xF8
     MMenuItem *mBackButton; // 0xFC: B goes to it
     MPictureFile mMap;      // 0x100: image/all_map
     MIndexBitmap *mBitmap;  // 0x134
