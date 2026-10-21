@@ -260,6 +260,11 @@ static inline const int *GetExcavate7C(const MResource<DinoExcavateDefs> &defs) 
     return (const int *)((const u8 *)d + d->offset7C);
 }
 
+#pragma auto_inline off
+template class MCallTask0<DinoUiTopMenu, DinoHelpBase>;
+template MTask *MCreateCallTask(DinoUiTopMenu *obj, void (DinoHelpBase::*func)());
+#pragma auto_inline reset
+
 void DinoUiTopMenu::OnStart() {
     mOam = new MSmartOam(0x5A, 0, TRUE);
     mOam->mHidden = TRUE;
@@ -357,8 +362,6 @@ DinoUiTopMenuItem2::DinoUiTopMenuItem2(DinoUiTopMenu *owner, const std::string &
 
 // Template task instances the game emits in this file. Until the code that makes the tasks is decompiled, they are
 // instantiated explicitly.
-template class MCallTask0<DinoUiTopMenu, DinoHelpBase>;
-template MTask *MCreateCallTask(DinoUiTopMenu *obj, void (DinoHelpBase::*func)());
 
 void DinoUiTopMenu::OnFocus(MMenuItem *item) {
     SetSelectedItem(dynamic_cast<DinoHelpItem *>(item));
