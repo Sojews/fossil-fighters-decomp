@@ -40,6 +40,7 @@ public:
     DinoCleaningTimer *mTimer;            // 0x84
     DinoCleaningScore *mScore;            // 0x88
     MSmartOam *mOam;                      // 0x8C
+    u32 unk90;
 };
 
 #endif

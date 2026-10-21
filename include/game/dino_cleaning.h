@@ -77,6 +77,7 @@ public:
     u32 mUnkC4;                     // 0xC4
     u8 mUnkC8;                      // 0xC8
     u8 mUnkC9;                      // 0xC9
+    u8 mUnkCA;                      // 0xCA
     u32 mUnkCC;                     // 0xCC
     u32 mUnkD0;                     // 0xD0
     u32 mUnkD4;                     // 0xD4

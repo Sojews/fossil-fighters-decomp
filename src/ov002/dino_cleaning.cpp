@@ -36,6 +36,12 @@
 #include "m/window.h"
 #include <stdio.h>
 #include "game/dino_static_init.h"
+#include "game/dino_cleaning_drill.h"
+#include "game/dino_cleaning_hammer.h"
+#include "game/dino_cleaning_xray.h"
+#include "game/dino_cleaning_blower.h"
+#include "m/bg.h"
+#include "m/obj.h"
 
 #pragma auto_inline off
 
@@ -292,10 +298,12 @@ extern "C" struct {
     u8 unk0C[0x10 - 0xC];
     const char *mFailPath;      // 0x10: the picture of a failed cleaning
     const char *mCleanPath;     // 0x14: the picture shown when the rock comes clean
-    u8 unk18[0x28 - 0x18];
+    u8 unk18[0x24 - 0x18];
+    const char *mTitlePath;     // 0x24: the title (the first mode's)
     u32 mMaxBonus;              // 0x28: the most the time bonus gives
     int mZero_2C;               // 0x2C: (the constant the count's shake is clamped to)
-    u8 unk30[0x48 - 0x30];
+    u8 unk30[0x44 - 0x30];
+    const char *mTitlePath2;    // 0x44: the other modes' title
     void (DinoCleaning::*State02160638_48)(); // 0x48
     u8 unk50[0x58 - 0x50];
     void (DinoCleaning::*State02160de8_58)(); // 0x58
@@ -332,7 +340,7 @@ extern "C" struct {
     u8 unk30[0x48 - 0x30];
     void (DinoCleaning::*State0216177c_48)(); // 0x48
     void (DinoCleaning::*StateSwitchTool_50)(); // 0x50
-    u8 unk58[0x60 - 0x58];
+    void (DinoCleaning::*State02160de8_58)(); // 0x58
     void (DinoCleaning::*StateStopTool_60)();
     u8 unk68[0x78 - 0x68];
     void (DinoCleaning::*State021610b0_78)();
@@ -470,6 +478,131 @@ void DinoCleaning::State021618c8() {
     }
     DinoSoundPlaySe(0x3A, 0);
     mState = data_ov002_02165a6c.State02162544_38;
+}
+
+extern "C" void (DinoCleaning::*const data_ov002_02165a44)();  // (pooled: State02160de8)
+extern "C" const char data_ov002_02165f58[];    // the live's script, by mode
+extern "C" const char data_ov002_02165f6c[];
+extern "C" const char data_ov002_02165f84[];
+
+static inline MPoint DinoHalfBack(const MPoint &d) {
+    return MPoint(-d.x / 2, -d.y / 2);
+}
+
+static inline MParallelTaskSet *DinoCleaningPar(MTask *a, MTask *b) {
+    MParallelTaskSet *set = new MParallelTaskSet(TRUE);
+    set->AddTail(a);
+    set->AddTail(b);
+    return set;
+}
+
+// Sets the cleaning up: its fossil's numbers, the screens, the input, the live, the tools and the menus.
+// NONMATCHING: 99.7%, the game loads the title size's y before its x when centring it (scheduling).
+void DinoCleaning::State02160638() {
+    DinoSoundLoadScene(0xD);
+    DinoHelpBase::Disable();
+    if (mUnkA0 != NULL) {
+        ((u32 *)mUnkA0)[0] = 0;
+        ((u32 *)mUnkA0)[1] = 0;
+    }
+    mUnk128 = 0;
+    mSleepTimer = 0;
+    MSleepHook::Register();
+    MResource<DinoKasekiDefs> defs = gDinoResource->LoadKasekiDefs();
+    const u8 *def = (const u8 *)defs.Get()->GetDef(mUnk9C);
+    mUnkA4 = ((const u32 *)def)[0x24 / 4];
+    mUnkB4 = ((const u32 *)def)[0x8 / 4];
+    mUnkB8 = ((const u32 *)def)[0xC / 4];
+    mUnkC0 = (MFx32::FromRaw(0x800) * MFx32::FromRaw(((const u32 *)def)[0x10 / 4])).v;
+    mUnkC4 = (MFx32::FromRaw(0x800) * MFx32::FromRaw(((const u32 *)def)[0x14 / 4])).v;
+    mUnkBC = def[1];
+    mUnk12C = ((const u32 *)def)[0x2C / 4] - 1;
+    mUnk130 = ((const u32 *)def)[0x34 / 4];
+    mUnkC8 = def[2];
+    mUnkC9 = def[3];
+    mUnkCA = def[5];
+    mUnkCC = *(const u32 *)(def + ((const u32 *)def)[0x40 / 4]);
+    mUnkD0 = ((const u32 *)(def + ((const u32 *)def)[0x40 / 4]))[1];
+    gLcd->mMain->ResetHooks();
+    gLcd->mSub->ResetHooks();
+    gLcd->mSub->Setup(5, 2, 4, 1, 0, 0);
+    gLcd->mMain->Setup(6, 1, 3, 1, 0, 0);
+    gLcd->mMain->mObj->Show();
+    gLcd->mSub->mObj->Show();
+    gLcd->mMain->SetBackdrop(0xFFFF);
+    gLcd->SetBottomDisplay(gLcd->mMain);
+    gCurrentDisplay = gLcd->mMain;
+    gLcd->VSyncNow();
+    SetDisplay(gCurrentDisplay);
+    gCurrentDisplay->mBg->SetMode(5);
+    mRandom = new MRandom();
+    MSingleInputHub *hub = new MSingleInputHub(1);
+    hub->EnableTouch();
+    mUnkDC = hub->GetInput(0);
+    mParallel.AddTail(hub);
+    std::string script;
+    switch (mMode) {
+    case 0:
+        script = data_ov002_02165f58;
+        break;
+    case 3:
+        script = data_ov002_02165f58;
+        break;
+    case 1:
+        script = data_ov002_02165f6c;
+        break;
+    case 2:
+        script = data_ov002_02165f84;
+        break;
+    }
+    mUnk144 = new MParallelTaskSet();
+    mUnkE4 = new DinoCleaningLive((u32)this, std::string(script));
+    mUnkE4->SetUnkB8(7, (void *)mUnkAC);
+    mUnkE4->SetUnkB8(10, (void *)mUnkA8);
+    mUnkE4->SetUnkB8(8, (void *)((const u32 *)def)[0x24 / 4]);
+    mUnkE4->SetUnkB8(9, (void *)((mUnk9C - 1) & 3));
+    mUnkE4->SetUnkB8(5, (void *)100);
+    mUnkE4->SetUnkA0(0, 1);
+    mUnkE4->SetUnkA0(0x17, mUnkAC == 0 && ((const u32 *)def)[0x24 / 4] == 1);
+    mUnk144->AddTail(mUnkE4);
+    mParallel.AddTail(mUnk144);
+    mUnk13C = new MParallelTaskSet();
+    mParallel.AddTail(mUnk13C);
+    mUnkD4 = (u32) new MSmartOam(100, 50, TRUE);
+    ((MSmartOam *)mUnkD4)->SetUnk1C(7);
+    mTools[0] = new DinoCleaningDrill(this, 0);
+    mParallel.AddTail(mTools[0]);
+    mTools[1] = new DinoCleaningDrill(this, 1);
+    mParallel.AddTail(mTools[1]);
+    mTools[2] = new DinoCleaningHammer(this, 0);
+    mParallel.AddTail(mTools[2]);
+    mTools[3] = new DinoCleaningHammer(this, 1);
+    mParallel.AddTail(mTools[3]);
+    mTools[4] = new DinoCleaningXray(this);
+    mParallel.AddTail(mTools[4]);
+    mToolMenu = new DinoCleaningToolMenu((u32)this, mUnkD4, (u32)&mNextTool);
+    mToolMenu->Deactivate();
+    mParallel.AddTail(mToolMenu);
+    mUnk10C = new DinoCleaningBlower(this);
+    mParallel.AddTail(mUnk10C);
+    mUnk120 = (u32) new MTextPicture(
+        std::string(mMode == 0 ? data_ov002_021659ec.mTitlePath : data_ov002_021659ec.mTitlePath2), 1, true);
+    ((MTextPicture *)mUnk120)->SetPosition(DinoHalfBack(((MTextPicture *)mUnk120)->GetSize() - MPoint(256, 192)));
+    ((MTextPicture *)mUnk120)->SetPriority(3);
+    ((MTextPicture *)mUnk120)->Show();
+    mKasekiRock = NULL;
+    mUnk11C = new MParallelTaskSet();
+    mParallel.AddTail(mUnk11C);
+    mUnk11C->AddTail(MCreateBgCallTask(this, data_ov002_02165a44, 1));
+    mParallel.AddTail((MTextPicture *)mUnk120);
+    mParallel.AddTail((MSmartOam *)mUnkD4);
+    mNextTool = 2;
+    mTool = mNextTool;
+    mStatus = new DinoCleaningStatus(this, ((const u32 *)def)[0x30 / 4] * 60, mUnk130, mUnkC9);
+    mParallel.AddTail(mStatus);
+    mSerial.AddTail(DinoCleaningPar(gLcd->mMain->mBright->CreateFadeInFromWhite(30, 0),
+                                    gLcd->mSub->mBright->CreateFadeInFromWhite(30, 0)));
+    mState = data_ov002_02165aec.State02160de8_58;
 }
 
 // Creates the kaseki rock (and runs it once).
