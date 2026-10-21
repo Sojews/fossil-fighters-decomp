@@ -5,7 +5,11 @@
 #include "m/motion.h"
 #include "m/raster.h"
 #include "nitro/mi.h"
+#include "game/dino_cleaning.h"
+#include "game/dino_cleaning_kaseki_rock.h"
+#include "game/dino_cleaning_rock.h"
 #include "game/dino_cleaning_score.h"
+#include "game/dino_common_live.h"
 #include "game/dino_resource.h"
 #include "game/help.h"
 
@@ -143,4 +147,47 @@ void DinoCleaningScore::Show() {
     mArrow->Play(1, 0);
     mArrow->Show();
     mSerial.AddTail(mArrow->CreateCoordAnime(MPoint(0x80, 0x92), MPoint(0x80, (100 - mScore) * 100 / 100 + 0x2E), 90, -1));
+}
+
+// Works out the score from how clean the rock is (mUnk84, what's left of the fossil and mUnk80, the score; the
+// second mode scores the two rocks' dirt) and shows both on the commentary; the first non-zero score moves on.
+// NONMATCHING: 93%, the MFx32 temporaries' stack copies differ and the second clamp branches the other way round.
+extern "C" void func_ov002_0215bce8(DinoCleaningScore *score) {
+    if (score->mCleaning->GetKasekiRock()) {
+        if (!score->mFlag) {
+            MFx32 ratio = score->mCleaning->GetKasekiRock()->GetRock8C()->GetRatio();
+            MFx32 left = MFx32(100) - (MFx32(100) - ratio) * MFx32(2);
+            score->mUnk84 = MFx32(100 - MFx32ToInt(std::max(MFx32(0), left)));
+            MFx32 diff = score->mCleaning->GetKasekiRock()->GetRatio() - score->mUnk84;
+            score->mUnk80 = std::max(MFx32(0), MFx32::FromRaw(diff.v & 0xFFFFF000));
+        } else {
+            score->mUnk84 = MFx32(0);
+            MFx32 q = ((MFx32(100) - score->mCleaning->GetKasekiRock()->GetRock8C()->GetRatio()) * MFx32(2) +
+                       (MFx32(100) - score->mCleaning->GetKasekiRock()->GetRock90()->GetRatio()) * MFx32(3)) /
+                      MFx32(5);
+            score->mUnk80 = MFx32::FromRaw(q.v & 0xFFFFF000);
+        }
+    } else {
+        score->mUnk84 = MFx32(0);
+        score->mUnk80 = MFx32(0);
+    }
+    score->mCleaning->GetUnkE4()->SetUnkB8(3, (void *)MFx32ToInt(score->mUnk84));
+    score->mCleaning->GetUnkE4()->SetUnkB8(2, (void *)MFx32ToInt(score->mUnk80));
+    switch (score->mUnk9C8) {
+    case 0:
+        if (score->mUnk80 != MFx32(0)) {
+            score->mUnk9C8 = 2;
+        } else {
+            score->mUnk9C8 = 1;
+        }
+        break;
+    case 1:
+        if (score->mUnk80 != MFx32(0)) {
+            score->mUnk9C8 = 2;
+            if (score->mUnk9CC) {
+                score->mCleaning->GetUnkE4()->SetUnkAC(5);
+            }
+        }
+        break;
+    }
 }
