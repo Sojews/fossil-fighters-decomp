@@ -256,6 +256,48 @@ DinoCleaningImageView::DinoCleaningImageView(const DinoCleaningImageView &other)
     ((MIndexBitmap *)mScreen)->Fill(MRect(0, 0, 256, 256), 0);
 }
 
+inline DinoCleaningNewDust::DinoCleaningNewDust(DinoCleaningImageView *view, MFx32Point from, MFx32Point to,
+                                                MFx32 height, MSmartOam *oam)
+    : MProcess(NULL) {
+    mView = view;
+    mFrom = from;
+    mTo = to;
+    mHeight = height;
+    mFrame = MFx32(0);
+    mDuration = MFx32(20);
+    mMotion = new MMotion(MMotionFile(view->mMotion), oam, 0, 1);
+    mMotion->SetPriority(2);
+    mMotion->SetAnchor(3);
+    mMotion->Play(1, 0);
+    mMotion->Show();
+    mParallel.AddTail(mMotion);
+}
+
+// The view's random numbers (a linear congruential generator).
+static inline u32 DinoCleaningRand(u32 *seed) {
+    *seed = *seed * 0x41C64E6D + 0x3039;
+    return *seed;
+}
+
+// The point in fixed point.
+static inline MFx32Point DinoToFx(MPoint p) {
+    return MFx32Point(MFx32(p.x), MFx32(p.y));
+}
+
+// Brushes a bit of dust off at pos, flying a random distance in a random direction.
+// NONMATCHING: the game's frame is 0x30 bigger (more of the points' inline copies on the stack), and it truncates
+// the angle to 16 bits twice.
+extern "C" void func_ov002_0215a4fc(DinoCleaningImageView *view, MPoint pos) {
+    u16 angle = DinoCleaningRand(view->mSeed);
+    MFx32 speed = MFx32((int)((DinoCleaningRand(view->mSeed) & 0x7FFFFFFF) % 40));
+    MFx32Point dir(MFx32::FromRaw(FX_CosIdx(angle)), MFx32::FromRaw(FX_SinIdx(angle)));
+    MFx32Point move = dir * speed;
+    MFx32 height = MFx32((int)((DinoCleaningRand(view->mSeed) & 0x7FFFFFFF) % 10));
+    MFx32Point from = DinoToFx(pos);
+    MFx32Point to = DinoToFx(pos) + move;
+    view->mOamTasks->AddHead(new DinoCleaningNewDust(view, from, to, height, view->mOam));
+}
+
 // a - b. (Taking a by value and returning it keeps both points on the stack, as the game's code does.)
 static inline MPoint DinoPointSub(MPoint a, const MPoint &b) {
     a.x -= b.x;
