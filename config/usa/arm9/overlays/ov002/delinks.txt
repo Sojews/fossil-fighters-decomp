@@ -17,7 +17,7 @@ src/ov002/dino_cleaning_status.cpp:
     .text       start:0x0215b118 end:0x0215b584
 
 src/ov002/dino_cleaning_score.cpp:
-    .text       start:0x0215bc18 end:0x0215c2f8
+    .text       start:0x0215b584 end:0x0215c2f8
 
 src/ov002/dino_cleaning_blower.cpp:
     .text       start:0x0215c86c end:0x0215c998
