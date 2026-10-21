@@ -36,7 +36,7 @@ public:
     MMotion *mUnkB4[2];             // 0xB4
     MMotion *mUnkBC[2];             // 0xBC
     MConsole *mUnkC4;               // 0xC4
-    u32 unkC8[8];
+    char mUnkC8[4][8];              // 0xC8: the stat texts (2-5) with their changes
     u32 mUnkE8;                     // 0xE8: what is shown
     u8 mUnkEC;                      // 0xEC
     DinoBattleViewCreature *mCreature;  // 0xF0: shown
@@ -47,7 +47,8 @@ public:
     MMotion *mMotions[2];           // 0x110
     u32 unk118[3];
     MPictureFile *mPicture;         // 0x124
-    u32 unk128[2];
+    u32 mUnk128;                    // 0x128
+    u32 mUnk12C;                    // 0x12C: a bit per stat that has changed
 };
 
 #endif

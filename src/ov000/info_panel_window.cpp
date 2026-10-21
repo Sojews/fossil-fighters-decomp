@@ -19,6 +19,10 @@
 #include "game/dino_static_init.h"
 #include "game/dino_resource.h"
 #include "m/console.h"
+#include "game/dino_battle_view_creature.h"
+#include "game/dino_battle_view_kaseki_point_menu.h"
+#include "game/dino_battle_view2.h"
+#include <string.h>
 
 inline InfoPanelWindow::InfoPanelWindow(MPictureFile *file, MSmartOam *oam) : MProcess(NULL), mOam(oam), mUnk7C(0) {
     mPicture = new MTextPicture(*file, 1, false);
@@ -241,6 +245,249 @@ extern "C" void func_ov000_0217d254(DinoBattleViewCreatureInfo *info, char *text
         do {
             *text++ += 0x20;
         } while (*text != '\0');
+    }
+}
+
+// The TU's pooled constants.
+struct DinoInfoStatMap {
+    int index[6];   // a stat's change slot, or -1
+};
+struct DinoInfoMotionDef {
+    int unk0D;      // the creature's GetDefUnk0D, or -1 for any
+    int anime;
+};
+template <int N> struct DinoInfoChars {
+    char c[N];
+};
+extern "C" const DinoInfoStatMap data_ov000_0218fff8;
+extern "C" const DinoInfoMotionDef data_ov000_02190010[6];
+extern "C" const DinoInfoMotionDef data_ov000_02190014[];   // (the anime of the one before)
+extern "C" const char data_ov000_02194ff0[];    // "%d"
+extern "C" const char data_ov000_02194ff4[];    // "%3d*"
+extern "C" DinoInfoChars<3> data_ov000_02194ffc;  // "??"
+extern "C" DinoInfoChars<4> data_ov000_02195000;  // " ??"
+extern "C" DinoInfoChars<4> data_ov000_02195004;  // "???"
+extern "C" const char data_ov000_02195008[];    // "/>%3d"
+extern "C" DinoInfoChars<6> data_ov000_02195010;  // "/>???"
+extern "C" const char data_ov000_02195018[];    // "%3d%%&"
+extern "C" const char data_ov000_02195020[];    // "????????"
+extern "C" const char data_ov000_0219502c[];    // "%3d"
+extern "C" const char data_ov000_02195030[];    // "+++"
+extern "C" const char data_ov000_02195034[];    // " *%d%%"
+extern "C" const char data_ov000_0219503c[];    // "*%d%%"
+extern "C" DinoInfoChars<6> data_ov000_02195044;  // "  0%%"
+extern "C" BOOL func_ov000_02179aa0(u32 id);
+
+// The game's inlined strcpy of a short literal.
+#define DINO_INFO_COPY(buf, chars) (*(DinoInfoChars<sizeof(chars)> *) (buf) = (chars))
+
+// Shows a creature's page (the stats with their changes, its text and resistances, or two of its attacks); the
+// numbers show as question marks for a creature not yet known.
+// NONMATCHING: in the two stat loops the text buffer's address is set up before the induction variables (the
+// game sets it up after them).
+void DinoBattleViewCreatureInfo::Update(BOOL show, DinoBattleViewCreature *creature, u32 kind, u8 arrows, u32 page) {
+    mUnk128 = 0;
+    if (!show) {
+        mOam->mHidden = TRUE;
+        return;
+    }
+    if (creature != NULL) {
+        mCreature = creature;
+    }
+    if (mCreature == NULL) {
+        mOam->mHidden = TRUE;
+        return;
+    }
+    func_ov000_0217c9f0(this, kind, arrows);
+    BOOL known = !mCreature->IsUnkCC2();
+    switch (mUnkE8) {
+    case 0: {
+        mWindow->mUnk7C = 0;
+        for (u32 i = 0; i < 6; i++) {
+            if (data_ov000_02190010[i].unk0D == mCreature->GetDefUnk0D() || data_ov000_02190010[i].unk0D == -1) {
+                mUnkFC->Play(data_ov000_02190014[i].unk0D, 0);
+                break;
+            }
+        }
+        mUnk84->SetText(std::string(gDinoResource->GetCreatureText08(mCreature->GetUnkA8())));
+        int stats[6];
+        stats[0] = mCreature->GetUnkF8();
+        stats[1] = mCreature->GetUnk10C();
+        stats[2] = mCreature->GetUnkFC();
+        stats[3] = mCreature->GetUnk100();
+        stats[4] = mCreature->GetUnk104();
+        stats[5] = mCreature->GetUnk108();
+        int changes[5] = {0};
+        if (mCreature->GetUnkB4() == 0) {
+            u32 mask = ((DinoBattleViewPlayer *) mCreature->GetUnkDC())->GetUnk108()->mMask;
+            for (int i = 0; i < 4; i++) {
+                changes[i + 1] =
+                    (mask & (1 << i)) ? ((DinoBattleViewPlayer *) mCreature->GetUnkDC())->GetUnk108()->mTarget[i] : 0;
+            }
+        }
+        DinoInfoStatMap map = data_ov000_0218fff8;
+        mUnk12C = 0;
+        for (int i = 0; i < 6; i++) {
+            char buf[8];
+            char *text = buf;
+            if (known) {
+                if (i == 1) {
+                    OS_SPrintf(text, data_ov000_02194ff0, stats[i]);
+                } else if (map.index[i] != -1) {
+                    int change = changes[map.index[i]];
+                    int value = stats[i] * (change + 100) / 100;
+                    if (value < 0) {
+                        value = 0;
+                    }
+                    OS_SPrintf(text, data_ov000_02194ff4, value);
+                    if (change != 0) {
+                        func_ov000_0217d220(this, text, change < 0 ? 1 : 2);
+                        mUnk12C |= 1 << i;
+                    }
+                    if (i >= 2 && i <= 5) {
+                        strcpy(mUnkC8[i - 2], text);
+                    }
+                } else {
+                    OS_SPrintf(text, data_ov000_02194ff4, stats[i]);
+                }
+            } else if (i == 1) {
+                DINO_INFO_COPY(text, data_ov000_02194ffc);
+            } else {
+                int slot = map.index[i];
+                if (slot != -1) {
+                    DINO_INFO_COPY(text, data_ov000_02195000);
+                    int change = changes[slot];
+                    if (change != 0) {
+                        func_ov000_0217d220(this, text, change < 0 ? 1 : 2);
+                    }
+                } else {
+                    DINO_INFO_COPY(text, data_ov000_02195004);
+                }
+            }
+            mUnk88[i]->SetText(std::string(text));
+        }
+        for (int i = 0; i < 5; i++) {
+            char buf2[8];
+            char *text = buf2;
+            if (i == 0) {
+                if (known) {
+                    OS_SPrintf(text, data_ov000_02195008, mCreature->GetUnkF4());
+                } else {
+                    DINO_INFO_COPY(text, data_ov000_02195010);
+                }
+            } else {
+                int change = changes[i];
+                if (change != 0 && known) {
+                    OS_SPrintf(text, data_ov000_02195018, change < 0 ? -change : change);
+                    func_ov000_0217d254(this, text, change < 0 ? 1 : 2);
+                } else {
+                    buf2[0] = '\0';
+                }
+            }
+            mUnkA0[i]->SetText(std::string(text));
+        }
+        break;
+    }
+    case 2: {
+        gDinoResource->GetCreatureDef(mCreature->GetUnkA8());
+        u32 count = mCreature->CountAttacks();
+        u32 special = mCreature->GetSpecialAttack();
+        if (special != 0) {
+            count++;
+        }
+        for (int i = 0, index = page * 2; i < 2; index++, i++) {
+            if (index < (int) count) {
+                u32 attack = (u32) index < mCreature->CountAttacks() ? mCreature->GetAttack(index) : special;
+                mUnk88[i]->SetText(std::string(known ? gDinoResource->GetAttackName(attack) : data_ov000_02195020));
+                const DinoAttackDef *def = gDinoResource->GetAttackDef(attack);
+                char text[16];
+                if (known) {
+                    OS_SPrintf(text, data_ov000_0219502c, DinoOffsetPtr<u16>(def, def->cost)[0]);
+                } else {
+                    DINO_INFO_COPY(text, data_ov000_02195004);
+                }
+                mUnk88[i + 2]->SetText(std::string(text));
+                u32 bonus = DinoOffsetPtr<u16>(def, def->cost)[1];
+                MIndicator *bonusText = mUnk88[i + 4];
+                if (known) {
+                    if (bonus != 0) {
+                        OS_SPrintf(text, data_ov000_0219502c, bonus + mCreature->GetUnkFC());
+                        bonusText->SetText(std::string(text));
+                    } else {
+                        bonusText->SetText(std::string(data_ov000_02195030));
+                    }
+                } else {
+                    bonusText->SetText(std::string(data_ov000_02195004.c));
+                }
+                if (attack == special) {
+                    mUnkB4[i]->Play(3, 0);
+                } else {
+                    mUnkB4[i]->Play(func_ov000_02179aa0(attack) ? 2 : 1, 0);
+                }
+                u8 hits = DinoOffsetPtr<u8>(def, def->unk10)[3];
+                if (hits > 1 && known) {
+                    mUnkBC[i]->Play(hits - 1, 0);
+                    mUnkBC[i]->Show();
+                } else {
+                    mUnkBC[i]->Hide();
+                }
+                mUnkB4[i]->Show();
+                mUnk88[i]->Show();
+                mUnk88[i + 2]->Show();
+                mUnk88[i + 4]->Show();
+            } else {
+                mUnkB4[i]->Hide();
+                mUnkBC[i]->Hide();
+                mUnk88[i]->Hide();
+                mUnk88[i + 2]->Hide();
+                mUnk88[i + 4]->Hide();
+            }
+        }
+        mWindow->mUnk7C = 2;
+        break;
+    }
+    case 1: {
+        u32 sides = mCreature->mSupportSides;
+        mUnkC4->Clear();
+        if (known) {
+            mUnkC4->Print(std::string(gDinoResource->GetCreatureText0C(!(sides & 1))));
+        } else {
+            mUnkC4->Print(std::string(data_ov000_02195020));
+        }
+        mWindow->mUnk7C = 1;
+        const DinoCreatureDef *def = gDinoResource->GetCreatureDef(mCreature->GetUnkA8());
+        const s8 *table = (sides & 1) ? DinoOffsetPtr<s8>(def, def->unk54) : DinoOffsetPtr<s8>(def, def->unk58);
+        int values[4];
+        values[0] = table[0];
+        values[1] = table[1];
+        values[2] = table[2];
+        values[3] = table[3];
+        for (int i = 0; i < 4; i++) {
+            char text[16];
+            if (known) {
+                int value = values[i];
+                if (value != 0) {
+                    int color = 2;
+                    if (value < 0) {
+                        color = 1;
+                        value = -value;
+                    }
+                    if (value < 10) {
+                        OS_SPrintf(text, data_ov000_02195034, value);
+                    } else {
+                        OS_SPrintf(text, data_ov000_0219503c, value);
+                    }
+                    func_ov000_0217d220(this, text, color);
+                } else {
+                    DINO_INFO_COPY(text, data_ov000_02195044);
+                }
+            } else {
+                DINO_INFO_COPY(text, data_ov000_02195000);
+            }
+            mUnk88[i]->SetText(std::string(text));
+        }
+        break;
+    }
     }
 }
 
