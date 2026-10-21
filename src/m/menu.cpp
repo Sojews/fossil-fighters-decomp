@@ -415,7 +415,7 @@ void MMenu::Idle() {
     (this->*mState)();
 }
 
-// NONMATCHING: the game works out &mSerial after making the tasks.
+// NONMATCHING (99.97%, instructions identical): the report docks the call to MCreateBgCallTask<MMenu>.
 void MMenu::Init() {
     if (mInput == NULL) {
         MSingleInputHub *hub = new MSingleInputHub(1);
@@ -438,12 +438,8 @@ void MMenu::Init() {
         deferred->SetUseMutex(TRUE);
         MSerialTaskSet *serial = &mSerial;
         serial->SetUseMutex(TRUE);
-        MTask *run = MTaskRunTransfer::Create(deferred);
-        MTask *start = MCreateBgCallTask(this, data_020c46c4.OnStart_20, 0);
-        MTask *suspend = MTaskSuspendTransfer::Create(&mParallel);
-        serial->AddTail(suspend);
-        serial->AddTail(start);
-        serial->AddTail(run);
+        mSerial.AddTail(MTaskSuspendTransfer::Create(&mParallel), MCreateBgCallTask(this, data_020c46c4.OnStart_20, 0),
+                        MTaskRunTransfer::Create(deferred));
     }
     mState = data_020c46c4.Update_30;
 }
