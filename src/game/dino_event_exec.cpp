@@ -19,6 +19,7 @@
 #include "game/dino_ui_revive_status_menu.h"
 #include "m/bg.h"
 #include "game/dino_resource.h"
+#include "game/dino_static_init.h"
 #include "game/dino_ui_order_select.h"
 #include "game/dino_sound.h"
 #include "m/picture.h"
@@ -3081,3 +3082,25 @@ void DinoEventExecSideAnchor() {
     DinoBattleSide side;
 }
 #pragma dont_inline reset
+
+// The file's static initialization (see dino_static_init.h): the common layout header and three points of its own.
+// NONMATCHING: the two rects' dead temporaries take each other's stack slots, which moves the schedule.
+extern "C" u8 data_020be7c4[];
+extern "C" u8 data_020be2c4[];
+#pragma always_inline on
+
+static struct DinoEventExecStaticInit {
+    DinoEventExecStaticInit() {
+        DINO_POOL(MPoint, data_020be1c4, 0x60) = MPoint(256, 192);
+        DINO_POOL(MRect, data_020be7c4, 0x48) = DinoSizeRect(DINO_POOL(MPoint, data_020be1c4, 0x60));
+        DINO_POOL(MPoint, data_020be244, 0x38) = MPoint(2, 2);
+        DINO_POOL(MPoint, data_020be1c4, 0x50) = MPoint(36, 28);
+        DINO_POOL(MRect, data_020be7c4, 0x78) = DinoSizeRect(DINO_POOL(MPoint, data_020be1c4, 0x50));
+        DINO_POOL(MPoint, data_020be7c4, 0x58) = MPoint(0, 24);
+        DINO_POOL(MPoint, data_020be7c4, 0x60) = MPoint(256, 192);
+        DINO_POOL(MRect, data_020be7c4, 0x68) = MRect(0, 0, 256, 24);
+        DINO_POOL(MPoint, data_020be144, 0x70) = MPoint(128, 176);
+        DINO_POOL(MPoint, data_020be2c4, 0) = MPoint(8, 150);
+        DINO_POOL(MPoint, data_020be244, 0x60) = MPoint(64, 112);
+    }
+} sDinoEventExecStaticInit;
