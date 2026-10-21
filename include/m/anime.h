@@ -74,6 +74,7 @@ class MRectAnime : public MAnime {
 public:
     MRectAnime(MRect from, MRect to);
     virtual void Apply(int step);
+    MRect GetValue() const { return mValue; }
 
     MRect mValue;   // 0x30
     MRect mFrom;    // 0x40
