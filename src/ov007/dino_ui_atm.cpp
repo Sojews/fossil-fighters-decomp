@@ -661,7 +661,6 @@ extern "C" const char data_ov007_0218e9e4[];
 extern const u32 data_0208aa80, data_0208aa84, data_0208aa8c, data_0208aa90;
 
 // Leaves (asking first if the teams changed); while a team is moved, stops moving it.
-// NONMATCHING: the exit transfer and the fades' set swap registers (r4/r5).
 void DinoUiATMMenu::OnBackDecided() {
     if (mUnk11C == 0) {
         *mResult = mUnk118;
@@ -711,20 +710,11 @@ void DinoUiATMMenu::OnBackDecided() {
             mSerial.AddTail(new DinoCommonWindowMessageBox(
                 MPoint(0x80, 0x60), name + data_ov007_0218e9e4 + gDinoResource->GetText(data_0208aa90), 0x78, 4));
         }
-        MTask *fadeMain;
-        MTask *fadeSub;
-        MTask *stop;
-        MTask *exit = CreateExitTransfer();
-        stop = DinoSoundCreateStopBgmTask(-1, 30);
-        fadeSub = gLcd->mSub->mBright->CreateFadeOutToBlack(30, 0);
-        fadeMain = gLcd->mMain->mBright->CreateFadeOutToBlack(30, 0);
-        MParallelTaskSet *fades = new MParallelTaskSet(TRUE);
-        fades->AddTail(fadeMain);
-        fades->AddTail(fadeSub);
-        fades->AddTail(stop);
-        MSerialTaskSet *serial = &mSerial;
-        serial->AddTail(fades);
-        serial->AddTail(exit);
+        mSerial.AddTail((new MParallelTaskSet(TRUE))
+                            ->Add(gLcd->mMain->mBright->CreateFadeOutToBlack(30, 0))
+                            ->Add(gLcd->mSub->mBright->CreateFadeOutToBlack(30, 0))
+                            ->Add(DinoSoundCreateStopBgmTask(-1, 30)),
+                        CreateExitTransfer());
     } else if (mUnk11C == 1) {
         DinoUiATMBackButton *back = mBackButton;
         back->mMotion->Show();
