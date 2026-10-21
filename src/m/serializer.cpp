@@ -1,5 +1,7 @@
 // MSerializer.
 
+#pragma ipa file
+
 #include "m/serializer.h"
 
 MSerializer::MSerializer() : mClosed(FALSE), mSize(0) {
@@ -84,5 +86,7 @@ void MSerializer::Read(const void *buf) {
 
 // (The reallocation helper's deleter destructor goes ahead of the helper's, and the entries' deleter ahead of the
 // serializer's destructor, as in the game.)
+template void std::__vec_deleter<MSerializer::Entry, std::allocator<MSerializer::Entry> >::sub_push_back(
+    const MSerializer::Entry &x, Metrowerks::int2type<true>);
 template std::__vec_deleter<MSerializer::Entry, std::allocator<MSerializer::Entry> &>::~__vec_deleter();
 template std::__vec_deleter<MSerializer::Entry, std::allocator<MSerializer::Entry> >::~__vec_deleter();
