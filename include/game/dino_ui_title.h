@@ -28,6 +28,7 @@ public:
     void StateShowLogo();
     void LoadLogo();
     void StateOpening();
+    void StateTitleIntro();
     void StateMenu();
     void StateToSaveSlot();
     void StateMenuChosen();
