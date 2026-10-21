@@ -265,19 +265,32 @@ public:
     // Where the container gauge's top is: lower the fuller the containers are.
     MPoint GetContainerGaugePos();
 
-    u32 mUnk74[3];              // 0x74
-    MSmartOam *mOam;            // 0x80
-    u32 mUnk84;                 // 0x84
+    DinoField *mField;          // 0x74
+    MTextPicture *mBack;        // 0x78: the radar's face (by the radar's level)
+    MTextPicture *mBackFrame;   // 0x7C
+    MSmartOam *mOam;            // 0x80: the rock marks'
+    MParallelTaskSet *mRockTasks;   // 0x84
     MSmartOam *mOam88;          // 0x88
     MMotion *mMarker;           // 0x8C
-    MMotion *mMotion90;         // 0x90
-    MMotion *mMotion94;         // 0x94
-    u32 mUnk98[2];              // 0x98
+    MMotion *mMotion90;         // 0x90: distance
+    MMotion *mMotion94;         // 0x94: direction
+    class DinoSeMotion *mDigMark;   // 0x98
+    MMotion *mPlayerMark;       // 0x9C: turned with the affine
     MAfnBlock *mAffine;         // 0xA0
-    u8 unkA4[0x568 - 0xA4];
+    MParallelTaskSet *mUnkA4;   // 0xA4
+    MMotion *mContainerGauge;   // 0xA8
+    u32 unkAC;
+    MPoint mGaugePos;           // 0xB0
+    MMotion *mRocks[200];       // 0xB8: per backup rock entry, those on this map
+    u32 mUnk3D8[100];           // 0x3D8
     u32 mMode;                  // 0x568
     MFx32 mScale;               // 0x56C: map units to radar pixels
-    u8 unk570[0x584 - 0x570];
+    MFx32 mRangeSq;             // 0x570: the excavate defs' range (shortened by the radar's level), squared
+    MFx32 mUnk574;              // 0x574: squares of the excavate defs' distances
+    MFx32 mUnk578;              // 0x578
+    MFx32 mUnk57C;              // 0x57C
+    u16 mUnk580;                // 0x580
+    u16 mUnk582;                // 0x582
     u32 mSignalTime;            // 0x584
     u8 mSignalling;             // 0x588
     std::vector<DinoFieldRadarEntry> mEntries;  // 0x58C

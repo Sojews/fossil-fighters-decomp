@@ -220,7 +220,13 @@ struct DinoExcavateDefs {
     int GetRockAreaWidthA4() const { return rockAreaAC - rockAreaA4; }
     int GetRockAreaWidthA0() const { return rockAreaA8 - rockAreaA0; }
 
-    u8 unk00[0x20];
+    u8 unk00[0xC];
+    fx32 radarRange;    // 0x0C: how far the radar reaches
+    fx32 unk10;         // 0x10: distances the radar compares squared
+    fx32 unk14;         // 0x14
+    fx32 unk18;         // 0x18
+    u16 unk1C;          // 0x1C
+    u16 unk1E;          // 0x1E
     int superRockChance;    // 0x20: percent of rocks that are super rocks (license 2)
     u32 emptyChance;    // 0x24: a dig spot stays empty when MRandom::Next() is at most this
     u8 unk28[0x30 - 0x28];
