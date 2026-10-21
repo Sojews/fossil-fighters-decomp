@@ -22,13 +22,17 @@ class MTextPicture;
 class DinoUiReviveStatusMenuItem;
 class DinoUiReviveStatusParts : public MProcess {
 public:
-    DinoUiReviveStatusParts(MSmartOam *oam, MPoint pos, BOOL flag, u32 level, u32 part);
+    DinoUiReviveStatusParts(MSmartOam *oam, MPoint pos, u8 flag, u32 level, u32 part);
     virtual ~DinoUiReviveStatusParts();
     virtual void Idle();
 
-    u32 mUnk74[5];      // 0x74
-    std::string mText;  // 0x88
-    u8 unk94[4];
+    MSmartOam *mOam;                    // 0x74
+    MPoint mPos;                        // 0x78: the part's motion
+    class DinoUiReviveStatusDigit *mLevel;  // 0x80: the part's level
+    MMotion *mMotion;                   // 0x84: the part
+    std::string mText;                  // 0x88: the motion's path
+    u8 mFlip;                           // 0x94
+    u8 mUnk95;                          // 0x95
 };
 
 class DinoUiRvInformation;

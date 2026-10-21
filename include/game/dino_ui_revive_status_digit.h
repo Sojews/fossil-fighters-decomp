@@ -12,6 +12,7 @@ public:
     virtual ~DinoUiReviveStatusDigit();
     virtual void Idle();
 
+    void SetValue(u32 value, u8 unk88);
     // Counts the number up to the value.
     MTask *CreateCountTask(u32 value, u8 unk88, u8 unk);
 

@@ -2,6 +2,8 @@
 
 // Derived destructors have their bases' destructor bodies inlined; auto-inlining the ones defined above does that.
 #pragma auto_inline on
+// (The game's -ipa file build: needed to inline the digit's constructor, and its SetValue, into the part's.)
+#pragma ipa file
 
 #include <algorithm>
 #include <new>
@@ -67,6 +69,7 @@ template class MCallTask1<MBg, MBg, MIndexBitmap *>;
 template MTask *MCreateCallTask(MBg *obj, void (MBg::*func)(MIndexBitmap *), MIndexBitmap * a0);
 template class MCallTask0<MPalUnit, MPalUnit>;
 template MTask *MCreateCallTask(MPalUnit *obj, void (MPalUnit::*func)());
+template MResource<DinoMessageData>::MResource(std::string path);
 #pragma auto_inline reset
 
 // Gives the palettes back (as a task: see State0215e030).
@@ -181,8 +184,6 @@ extern "C" struct {
 extern "C" void _ZN6MPointC1Eii(MPoint *point, int x, int y);
 
 // Shows the creature's picture, name, voice and motion, its parts and its four numbers.
-// (Instruction-exact. objdiff scores it 99.99%: the game's call to IsUncleanable, which directly follows this function,
-// resolves 4 bytes back onto this function's last literal, and ours calls a copy in its own section.)
 #pragma dont_inline on
 void DinoUiReviveStatus::Start() {
     MResource<DinoKasekiDefs> defs = gDinoResource->LoadKasekiDefs();
@@ -672,31 +673,11 @@ extern "C" const char data_ov003_02161f98[];    // the value's format
 
 extern "C" const char data_ov003_02161f9c[];    // zero's format (the mark)
 extern "C" const char data_ov003_02161fa4[];    // the value's format (the mark)
+extern "C" volatile u32 data_ov003_021624cc;            // the digit offsets' guard
+extern "C" MPoint data_ov003_02161f44, data_ov003_02161f4c, data_ov003_02161f54;    // the digit offsets
 
-// Three digits of a number and the mark shown in their place at the top value.
-// NONMATCHING: the game keeps the loop counter, the digit slot and pos on the stack (and the offsets static is
-// named by address there).
-DinoUiReviveStatusDigit::DinoUiReviveStatusDigit(MSmartOam *oam, MPoint pos, u8 unk88, u32 value, u8 unk90, u8 unk91,
-                                                 u8 unk92)
-    : MProcess(NULL) {
-    mOam = oam;
-    mUnk90 = unk90;
-    mUnk91 = unk91;
-    mUnk92 = unk92;
-    mMotion = new MMotion(std::string(data_ov003_02161d20.mMaxPath), mOam, 0, 1);
-    mMotion->SetPosition(pos);
-    mMotion->SetPriority(3);
-    mMotion->SetAnchor(3);
-    mParallel.AddTail(mMotion);
-    for (u32 i = 0; i < 3; i++) {
-        static const MPoint sOffsets[3] = {MPoint(-12, 0), MPoint(-4, 0), MPoint(4, 0)};
-        mDigits[i] = new MMotion(std::string(data_ov003_02161d20.mDigitPath), mOam, 0, 1);
-        mDigits[i]->SetPriority(3);
-        mDigits[i]->SetAnchor(3);
-        mDigits[i]->SetPosition(MPoint(pos.x + sOffsets[i].x, pos.y + sOffsets[i].y));
-        mDigits[i]->Show();
-        mParallel.AddTail(mDigits[i]);
-    }
+// Shows the value.
+inline void DinoUiReviveStatusDigit::SetValue(u32 value, u8 unk88) {
     mValue = value;
     mUnk88 = unk88;
     if (mValue == 0) {
@@ -739,6 +720,82 @@ DinoUiReviveStatusDigit::DinoUiReviveStatusDigit(MSmartOam *oam, MPoint pos, u8 
                 mDigits[i]->Play(text[i] + (mUnk88 ? 0x21 : 0xC) - '0', 0);
             }
         }
+    }
+}
+
+// Three digits of a number and the mark shown in their place at the top value.
+// NONMATCHING: 98%, the game keeps the new digit's slot address (this + i * 4) on the stack across the path string's
+// destructor for the first call after the store; ours recomputes it. (Inline so the part's constructor inlines it;
+// the calls in Start come before this definition, so the out-of-line copy is still emitted.)
+inline DinoUiReviveStatusDigit::DinoUiReviveStatusDigit(MSmartOam *oam, MPoint pos, u8 unk88, u32 value, u8 unk90, u8 unk91,
+                                                 u8 unk92)
+    : MProcess(NULL) {
+    mOam = oam;
+    mUnk90 = unk90;
+    mUnk91 = unk91;
+    mUnk92 = unk92;
+    mMotion = new MMotion(std::string(data_ov003_02161d20.mMaxPath), mOam, 0, 1);
+    mMotion->SetPosition(pos);
+    mMotion->SetPriority(3);
+    mMotion->SetAnchor(3);
+    mParallel.AddTail(mMotion);
+    for (u32 i = 0; i < 3; i++) {
+        // (A function-local static table of the digits' offsets.)
+        if (!(data_ov003_021624cc & 1)) {
+            data_ov003_02161f44.x = -12;
+            data_ov003_02161f44.y = 0;
+            data_ov003_02161f4c.x = -4;
+            data_ov003_02161f4c.y = 0;
+            data_ov003_02161f54.x = 4;
+            data_ov003_02161f54.y = 0;
+            data_ov003_021624cc |= 1;
+        }
+        mDigits[i] = new MMotion(std::string(data_ov003_02161d20.mDigitPath), mOam, 0, 1);
+        mDigits[i]->SetPriority(3);
+        mDigits[i]->SetAnchor(3);
+        mDigits[i]->SetPosition(MPoint(pos.x + (&data_ov003_02161f44)[i].x, pos.y + (&data_ov003_02161f44)[i].y));
+        mDigits[i]->Show();
+        mParallel.AddTail(mDigits[i]);
+    }
+    SetValue(value, unk88);
+}
+
+// The bytes of a part's def the part reads.
+struct DinoRevivePartDef {
+    u8 unk00;
+    u8 flip;            // 0x01
+    u8 unk02[0x08 - 0x02];
+    u32 motion;         // 0x08: the part's motion's number
+};
+
+extern "C" const char data_ov003_02162378[];    // the part's motion's path format
+
+// One part of the fossil, with its level under it.
+// NONMATCHING: 98.8%, the inlined digit constructor's slot address spill (above), and its two DinoCreatureState
+// temporaries take each other's stack slots.
+DinoUiReviveStatusParts::DinoUiReviveStatusParts(MSmartOam *oam, MPoint pos, u8 flag, u32 level, u32 part)
+    : MProcess(NULL), mOam(oam) {
+    mUnk95 = flag;
+    mLevel = new DinoUiReviveStatusDigit(oam, MPoint(pos.x, pos.y - 10), flag, level, 0, 0, 0);
+    mParallel.AddTail(mLevel);
+    pos.y -= 0x42;
+    mPos = pos;
+    MResource<DinoKasekiDefs> defs = gDinoResource->LoadKasekiDefs();
+    const DinoRevivePartDef *def = (const DinoRevivePartDef *)defs.Get()->GetDef(part);
+    mFlip = def->flip;
+    char text[0x100];
+    OS_SPrintf(text, data_ov003_02162378, def->motion);
+    mText = text;
+    mMotion = new MMotion(std::string(mText), mOam, 0, 1);
+    mMotion->SetFlip(mFlip, 0);
+    mMotion->GetUnit()->SetMode(1);
+    mMotion->SetPriority(3);
+    mMotion->SetAnchor(1);
+    mMotion->Play(mUnk95 ? 2 : 1, 0);
+    mMotion->SetPosition(mPos);
+    mParallel.AddTail(mMotion);
+    if (level) {
+        mMotion->Show();
     }
 }
 
@@ -838,6 +895,8 @@ extern "C" void func_ov003_0215cf1c() {
 }
 
 // The file's static initialization (see dino_static_init.h).
+// NONMATCHING: 99.8%, under -ipa file the two rects' dead stack temporaries are laid out per rect where the game
+// interleaves them (the non-ipa build matched; splitting the init into one static object per line gets closer).
 #pragma always_inline on
 static struct DinoUiReviveStatusStaticInit {
     DinoUiReviveStatusStaticInit() {
