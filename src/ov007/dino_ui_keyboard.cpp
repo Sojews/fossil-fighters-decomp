@@ -214,7 +214,7 @@ DinoUiSenryuMenu::~DinoUiSenryuMenu() {
     mFont128->Release();
 }
 
-extern "C" void func_ov007_02185d28(void *, u32);
+extern "C" void func_ov007_02185d28(DinoUiSenryuMenu *menu, int cur);
 
 SenryuMenuItem::~SenryuMenuItem() {
 }
@@ -300,7 +300,7 @@ DinoUiSenryuList::DinoUiSenryuList() : MProcess(NULL) {
 }
 
 void CurChangeTask::Execute() {
-    func_ov007_02185d28((void *)mUnk10, mUnk14);
+    func_ov007_02185d28((DinoUiSenryuMenu *)mUnk10, mUnk14);
     Exit();
 }
 
@@ -827,9 +827,12 @@ extern "C" struct {
     u8 unk00[8];
     const char *mFramePath;     // 0x08
     const char *mMarkPath;      // 0x0C
-    u8 unk10[4];
+    const char *mPrevPath;      // 0x10: the page arrows
     const char *mCursorPath;    // 0x14
-    u8 unk18[0x3C - 0x18];
+    u8 unk18[0x20 - 0x18];
+    const char *mNextPath;      // 0x20
+    const char *mBackPath;      // 0x24
+    u8 unk28[0x3C - 0x28];
     MPoint mMarkOffset;         // 0x3C
     u8 unk44[0x64 - 0x44];
     MPoint mNameOffset;         // 0x64
@@ -885,7 +888,7 @@ void DinoUiSenryuMenu::OnStart() {
                 if (text[c] == L'\n') {
                     line++;
                 } else {
-                    (mUnk140 + mCount * 3)[line].push_back(text[c]);
+                    mLineTexts[mCount][line].push_back(text[c]);
                 }
                 if (line == 3) {
                     break;
@@ -974,6 +977,179 @@ void DinoUiSenryuMenu::CheckKeys() {
         }
     }
 }
+
+extern "C" const MPoint data_ov007_021918cc;      // the back button's place
+extern "C" const char data_ov007_02191e68[];      // ""
+extern "C" const char data_ov007_02191e6c[];      // the page number's format
+extern const u32 data_0208ac3c;                   // the back button's help
+
+inline DinoSenryuBackButton::DinoSenryuBackButton(DinoUiSenryuMenu *menu, MSmartOam *oam) : SenryuMenuItem(3, menu) {
+    unkAC = (u32)menu;
+    mTextId = data_0208ac3c;
+    mMotion = new MMotion(std::string(data_ov007_02191880.mBackPath), oam, 2, 1);
+    mMotion->Play(2, 0);
+    mMotion->SetPosition(data_ov007_021918cc);
+    mMotion->SetPriority(3);
+    mMotion->Show();
+    mParallel.AddTail(mMotion);
+    DinoHelpItem::Enable();
+    mFrame = mMotion->GetFrame();
+}
+
+// The menu's OAM (the menu item's owner).
+static inline MSmartOam *DinoSenryuOam(SenryuMenuItem *item) {
+    return item->GetMenu()->mOam;
+}
+
+inline DinoUiSenryuMenuItem::DinoUiSenryuMenuItem(u32 index, DinoUiSenryuMenu *menu, MPoint pos)
+    : SenryuMenuItem(index, menu) {
+    mPos = pos;
+    mTextId = 0;
+    mFrame.left = pos.x - 7;
+    mFrame.top = pos.y - 7;
+    mFrame.right = pos.x + 6;
+    mFrame.bottom = pos.y + 6;
+    mMotion = NULL;
+    switch (mIndex) {
+    case 4:
+        mMotion = new MMotion(std::string(data_ov007_02191880.mPrevPath), DinoSenryuOam(this), 2, 1);
+        mMotion->Play(1, 0);
+        mMotion->SetPosition(mPos);
+        mMotion->SetPriority(2);
+        mMotion->SetAnchor(2);
+        mMotion->Show();
+        mFrame = mMotion->GetFrame();
+        mParallel.AddTail(mMotion);
+        DinoHelpItem::Disable();
+        break;
+    case 5:
+        mMotion = new MMotion(std::string(data_ov007_02191880.mNextPath), DinoSenryuOam(this), 2, 1);
+        mMotion->Play(1, 0);
+        mMotion->SetPosition(mPos);
+        mMotion->SetPriority(2);
+        mMotion->SetAnchor(2);
+        mMotion->Show();
+        mFrame = mMotion->GetFrame();
+        mParallel.AddTail(mMotion);
+        DinoHelpItem::Disable();
+        break;
+    }
+}
+
+// Moves the cursor to the entry cur (wrapping around), and when that changes the page (or a rebuild is asked
+// for), fills the page's three poems and rebuilds the menu items and their links.
+#pragma inline_max_size(2000)
+// NONMATCHING: only the page arrows' switch on mIndex differs (the game also checks below 4 first).
+extern "C" void func_ov007_02185d28(DinoUiSenryuMenu *menu, int cur) {
+    u32 count = menu->mCount;
+    cur = (cur + count) % count;
+    if (cur < 0) {
+        cur += count;
+    }
+    int pos = cur;
+    int page = pos / 3;
+    if (pos != menu->mUnk134) {
+        menu->mUnk134 = pos;
+        u32 row = menu->mUnk134 % 3;
+        menu->mCursor->SetPosition(MPoint((data_ov007_02191a3c[row].right + data_ov007_02191a3c[row].left) / 2 - 6,
+                                          (data_ov007_02191a3c[row].bottom + data_ov007_02191a3c[row].top) / 2 + 4));
+    }
+    if (page != menu->mPage || menu->mUnk13C) {
+        menu->mPage = page;
+        menu->mUnk13C = FALSE;
+        menu->mSilentFocus = TRUE;
+        for (int i = 0; i < 3; i++) {
+            int entry = menu->mPage * 3 + i;
+            if (menu->mEntries[entry] & 0x80) {
+                if (menu->mEntries[entry] & 1) {
+                    (&menu->mFont120)[i]->SetShadowColor(4);
+                } else {
+                    (&menu->mFont120)[i]->SetShadowColor(1);
+                }
+                if (menu->mEntries[entry] & 2) {
+                    menu->mMarks[i]->Show();
+                } else {
+                    menu->mMarks[i]->Hide();
+                }
+                menu->mFrames[i]->Hide();
+                std::wstring *lines = menu->mLineTexts[entry];
+                for (int j = 0; j < 3; j++) {
+                    std::wstring line(lines[j]);
+                    menu->mLines[i][j]->SetText(std::string(data_ov007_02191e68));
+                    if (menu->mLines[i][j]->mState == MTask::STATE_RUN) {
+                        menu->mLines[i][j]->Execute();
+                    }
+                    menu->mLines[i][j]->SetText(std::wstring(line));
+                }
+                MPoint size = menu->mFont120->MeasureText(std::wstring(menu->mUnk728[entry]), 0, 0);
+                menu->mNames[i]->SetPosition(0xE5 - size.x, data_ov007_02191880.mNameOffset.y + data_ov007_021919ac[i].y);
+            } else {
+                for (int j = 0; j < 3; j++) {
+                    menu->mLines[i][j]->SetText(std::string(data_ov007_02191e68));
+                }
+                menu->mNames[i]->SetText(std::string(data_ov007_02191e68));
+                menu->mFrames[i]->Show();
+            }
+        }
+        char text[16];
+        OS_SPrintf(text, data_ov007_02191e6c, menu->mPage + 1, (menu->mCount + 2) / 3);
+        menu->mPageText->SetText(std::string(text));
+        menu->ClearItems();
+        MMenuItem *items[3];
+        items[0] = new DinoUiSenryuListHideMenuItem(0, menu, data_ov007_02191a3c[0]);
+        menu->AddItem(items[0]);
+        items[1] = new DinoUiSenryuListHideMenuItem(1, menu, data_ov007_02191a3c[1]);
+        menu->AddItem(items[1]);
+        items[2] = new DinoUiSenryuListHideMenuItem(2, menu, data_ov007_02191a3c[2]);
+        menu->AddItem(items[2]);
+        int last = -1;
+        for (int i = 0; i < 3; i++) {
+            if (menu->mEntries[page * 3 + i] & 0x80) {
+                items[i]->Enable();
+                last = i;
+            } else {
+                items[i]->Disable();
+            }
+        }
+        DinoSenryuBackButton *back = new DinoSenryuBackButton(menu, menu->mOam);
+        menu->AddItem(back);
+        menu->mBackButton = back;
+        if (menu->mCount > 3) {
+            menu->mPrevArrow = new DinoUiSenryuMenuItem(4, menu, MPoint(0xD0, 0xD0));
+            MMenuItem *arrow = menu->mPrevArrow;
+            menu->AddItem(arrow);
+            arrow->SetKeys(0x200);
+            arrow->SetNoFocus(TRUE);
+            menu->mNextArrow = new DinoUiSenryuMenuItem(5, menu, MPoint(0x30, 0xD0));
+            arrow = menu->mNextArrow;
+            menu->AddItem(arrow);
+            arrow->SetKeys(0x100);
+            arrow->SetNoFocus(TRUE);
+        }
+        menu->AddLink(items[0], 4, back);
+        if (last >= 1) {
+            menu->AddLink(items[0], 2, items[1]);
+            menu->AddLink(items[1], 4, items[0]);
+        }
+        if (last >= 2) {
+            menu->AddLink(items[1], 2, items[2]);
+            menu->AddLink(items[2], 4, items[1]);
+        }
+        menu->AddLink(back, 2, items[0]);
+        if (last >= 0) {
+            menu->AddLink(items[last], 2, back);
+            menu->AddLink(back, 4, items[last]);
+        }
+        menu->FocusItem(items[menu->mUnk134 % 3]);
+    }
+    if (menu->mPrevArrow != NULL && menu->mPrevArrow->mMotion != NULL) {
+        menu->mPrevArrow->mMotion->Play(1, 0);
+    }
+    if (menu->mNextArrow != NULL && menu->mNextArrow->mMotion != NULL) {
+        menu->mNextArrow->mMotion->Play(1, 0);
+    }
+}
+#pragma inline_max_size reset
 
 extern "C" const char data_ov007_02191e74[];
 extern const u32 data_0208ac74, data_0208ac34, data_0208ac78, data_0208ac38, data_0208ac70, data_0208ac30;
@@ -1087,8 +1263,8 @@ MTask *DinoUiSenryuMenu::CreateCurChangeTask(u32 cur) {
 #pragma auto_inline off
 
 DinoUiSenryuMenu::DinoUiSenryuMenu() : MMenu(NULL, 0), mCursor(NULL), mPage(99), mUnk134(99) {
-    mUnk108 = 0;
-    mUnk10C = 0;
+    mPrevArrow = NULL;
+    mNextArrow = NULL;
     mBackButton = NULL;
 }
 

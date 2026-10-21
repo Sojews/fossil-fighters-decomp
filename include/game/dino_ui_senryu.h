@@ -16,6 +16,11 @@ class DinoUiSenryuMenu;
 
 class SenryuMenuItem : public MMenuItem {
 public:
+    SenryuMenuItem(u32 index, DinoUiSenryuMenu *menu) {
+        mIndex = index;
+        mUnk8C = (u32)menu;
+    }
+    DinoUiSenryuMenu *GetMenu() { return (DinoUiSenryuMenu *)mUnk8C; }
     virtual ~SenryuMenuItem();
     virtual MRect GetFrame();
 
@@ -26,6 +31,7 @@ public:
 
 class DinoSenryuBackButton : public SenryuMenuItem, public DinoHelpItem {
 public:
+    DinoSenryuBackButton(DinoUiSenryuMenu *menu, MSmartOam *oam);
     virtual ~DinoSenryuBackButton();
     virtual MRect GetFrame();
     virtual void OnFocusChanged(BOOL focused);
@@ -40,8 +46,10 @@ public:
     u32 mTextId;        // 0xB4
 };
 
+// The page arrows (index 4 the previous page, 5 the next).
 class DinoUiSenryuMenuItem : public SenryuMenuItem, public DinoHelpItem {
 public:
+    DinoUiSenryuMenuItem(u32 index, DinoUiSenryuMenu *menu, MPoint pos);
     virtual ~DinoUiSenryuMenuItem();
     virtual void OnFocusChanged(BOOL focused);
     virtual void OnSelectChanged(BOOL selected);
@@ -50,7 +58,7 @@ public:
     virtual MDisplay *GetDisplay();
     virtual const char *GetText();
 
-    u32 unkAC[2];
+    MPoint mPos;        // 0xAC
     MMotion *mMotion;   // 0xB4
     u32 mTextId;        // 0xB8
 };
@@ -64,6 +72,9 @@ public:
 
 class DinoUiSenryuListHideMenuItem : public SenryuMenuItem {
 public:
+    DinoUiSenryuListHideMenuItem(u32 index, DinoUiSenryuMenu *menu, MRect frame) : SenryuMenuItem(index, menu) {
+        mFrame = frame;
+    }
     virtual ~DinoUiSenryuListHideMenuItem();
     virtual void OnFocusChanged(BOOL focused);
     virtual void OnSelectChanged(BOOL selected);

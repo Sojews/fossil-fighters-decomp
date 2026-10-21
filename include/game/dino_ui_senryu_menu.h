@@ -39,8 +39,8 @@ public:
     MView *mCursor;     // 0xEC
     MMotion *mFrames[3];        // 0xF0
     MMotion *mMarks[3];         // 0xFC
-    u32 mUnk108;        // 0x108
-    u32 mUnk10C;        // 0x10C
+    class DinoUiSenryuMenuItem *mPrevArrow;    // 0x108
+    class DinoUiSenryuMenuItem *mNextArrow;    // 0x10C
     MTaskSet *mUnk110;  // 0x110
     MTaskSet *mUnk114;  // 0x114
     MTaskSet *mUnk118;  // 0x118
@@ -50,11 +50,11 @@ public:
     MFont *mFont128;    // 0x128
     MMenuItem *mBackButton; // 0x12C
     u32 mPage;          // 0x130
-    u32 mUnk134;        // 0x134
+    u32 mUnk134;        // 0x134: the cursor's entry
     u32 mChoice;        // 0x138: the sub menu's answer
     u8 mUnk13C;         // 0x13C
     u8 mSilentFocus;    // 0x13D
-    std::wstring mUnk140[126];  // 0x140
+    std::wstring mLineTexts[42][3]; // 0x140: each entry's three lines
     std::wstring mUnk728[42];   // 0x728
     s32 mEntries[42];   // 0x920: the record index << 8, and flags
     u32 mCount;         // 0x9C8: how many entries
