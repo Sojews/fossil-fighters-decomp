@@ -1,6 +1,5 @@
 // The animated 3D objects (MAnmModelBase and its kinds) and MPolygonChar, which plays them from a scene script.
-// Not decompiled yet: TintPalette, most of the Unk0C updates, MPolygonChar::Load (the script reader) and the
-// node data reader.
+// Not decompiled yet: TintPalette, most of the Unk0C updates and the node data reader.
 
 #pragma ipa file
 
@@ -14,6 +13,8 @@
 #include "m/heap.h"
 #include "game/dino_sound.h"
 #include "nitro/mi.h"
+#include "m/file.h"
+#include <string.h>
 
 // Keeps a scene from drawing for the rest of the scope.
 class M3DSceneDisable {
@@ -785,6 +786,360 @@ void MPolygonChar::Reset() {
 }
 #pragma opt_propagation reset
 
+inline MAnmEmit::MAnmEmit(M3DScene *scene) : MAnmModelBase(scene) {
+    for (int i = 0; i < 32; i++) {
+        mParticles[i] = new M3DModel();
+        scene->AddModel(mParticles[i]);
+        mParticles[i]->SetUnk1C(0x1000);
+    }
+    mNext = 0;
+    mLoopEnd = 0;
+}
+
+inline MAnmTargetCamera::MAnmTargetCamera(M3DScene *scene) : MAnmModelBase(scene) {
+    mScene->SetFov(0x1555);
+    mTarget.x = 0;
+    mTarget.y = 0;
+    mTarget.z = 0;
+    mPrev.x = 0;
+    mPrev.y = 0;
+    mPrev.z = 0;
+    mSwayPhase = 0;
+}
+
+inline MAnmRyusen::MAnmRyusen(M3DScene *scene, MAnmModelBase *target, int jointA, int jointB) : MAnmModelBase(scene) {
+    mTarget = target;
+    mJointA = jointA;
+    mJointB = jointB;
+    for (int i = 0; i < 180; i++) {
+        mPointsA[i].y = -0xA000;
+        mPointsB[i].y = -0xA000;
+    }
+    mTrails = new M3DRyusen[180];
+    for (int i = 0; i < 180; i++) {
+        mScene->AddModel(&mTrails[i]);
+    }
+    mHead = 0;
+    mLoopEnd = 0;
+}
+
+extern "C" const char data_020bb8bc[];  // "script"
+extern "C" const char data_020bb8c4[];  // "model"
+extern "C" const char data_020bb8cc[];  // "kasekium00"
+extern "C" const char data_020bb8d8[];  // "loop"
+extern "C" const char data_020bb8e0[];  // "absolute"
+extern "C" const char data_020bb8ec[];  // "attribute"
+extern "C" const char data_020bb8f8[];  // "emitter"
+extern "C" const char data_020bb900[];  // "trace"
+extern "C" const char data_020bb908[];  // "camera"
+extern "C" const char data_020bb910[];  // "sound"
+extern "C" const char data_020bb918[];  // "wait"
+extern "C" const char data_020bb920[];  // "loopframe"
+extern "C" const char data_020bb92c[];  // "endframe"
+extern "C" const char data_020bb938[];  // "name"
+extern "C" const char data_020bb940[];  // "parent"
+extern "C" const MAnmName data_0208b078[];  // a model's track names
+extern "C" const MAnmName data_0208afc0[];  // an emitter's
+extern "C" const MAnmName data_0208b010[];  // a camera target's
+extern "C" const MAnmName data_0208af88[];  // a trail's
+extern "C" const VecFx32 data_0208af70;     // the camera target's rotation (none)
+char *ReadLine(char **p);
+fx32 ParseFx32(char **p);
+void ReadField(char **p, char *out);
+BOOL SkipComma(char **p);
+
+// NONMATCHING (99.8%): the game keeps the (unused) line counter in an ordinary stack slot; ours drops it unless it is
+// volatile, which moves it to the top of the frame.
+// Reads the scene script: after its "script" line, sections that each make an object (a model, emitter, trail,
+// camera target or sound) followed by lines of keys for it ("wait" moves the key frame on).
+void MPolygonChar::Load(const char *script, const char *model) {
+    MProcessPause pause(this, &mMutex, &mPauseCount);
+    MFile file;
+    char *path = new char[0x200];
+    int slash = 0;
+    char dir[0x100];
+    strcpy(dir, script);
+    for (u32 i = 0; i < strlen(dir); i++) {
+        if (dir[i] == '/') {
+            slash = i;
+        }
+    }
+    dir[slash + 1] = 0;
+    Reset();
+    if (file.Open(std::string(script))) {
+        char *text = new char[file.GetLength() + 1];
+        text[file.GetLength()] = 0;
+        file.Read(text, file.GetLength());
+        file.Close();
+        char *cursor = text;
+        int mode = -1;
+        volatile int lineNo = 1;
+        BOOL started = FALSE;
+        u32 count = 0;
+        MAnmModelBase *anm;
+        int frame;
+        MAnmKey key;
+        for (char *line = ReadLine(&cursor); line != NULL; line = ReadLine(&cursor)) {
+            for (int i = 0; i < 16; i++) {
+                mFieldPresent[i] = mFieldNumeric[i] = 0;
+            }
+            int n = 0;
+            do {
+                ReadField(&line, mFields[n]);
+                mFieldPresent[n] = 1;
+                n++;
+            } while (n < 16 && SkipComma(&line));
+            for (int i = 0; i < 16; i++) {
+                if (mFieldPresent[i]) {
+                    char *field = mFields[i];
+                    mFieldValues[i] = ParseFx32(&field);
+                    if (mFieldValues[i] != 0x7fffffff) {
+                        mFieldNumeric[i] = 1;
+                    }
+                }
+            }
+            if (MAnmStrCaseCmp(mFields[0], data_020bb8bc) == 0) {
+                started = TRUE;
+                continue;
+            }
+            if (!started) {
+                continue;
+            }
+            if (mFields[0][0] == '#' || mFields[0][0] == 0 || MAnmStrCaseCmp(mFields[0], data_020bb8bc) == 0) {
+            } else if (MAnmStrCaseCmp(mFields[0], data_020bb8c4) == 0) {
+                frame = 0;
+                if (MAnmStrCaseCmp(mFields[1], data_020bb8cc) != 0 || ((u32)mUnk84 & 2)) {
+                    anm = new MAnmModel((M3DScene *)mUnk80);
+                    if (model != NULL && mUnk74 == NULL) {
+                        strcpy(mFields[1], model);
+                    }
+                    strcpy(path, dir);
+                    strcat(path, mFields[1]);
+                    anm->Load(path, FALSE);
+                    anm->Run();
+                    anm->mFollowParent = mUnkAC;
+                    anm->SetRotRef(&mRot);
+                    anm->SetPosRef(&mPos);
+                    anm->SetUnk134(mUnkB0);
+                    anm->mVisible = FALSE;
+                    for (int i = 3; i < 6; i++) {
+                        if (mFieldPresent[i] == 1) {
+                            if (MAnmStrCaseCmp(mFields[i], data_020bb8d8) == 0) {
+                                anm->mUnkF4 = 1;
+                            }
+                            if (MAnmStrCaseCmp(mFields[i], data_020bb8e0) == 0) {
+                                anm->mUnk1A4 = 1;
+                            }
+                            if (MAnmStrCaseCmp(mFields[i], data_020bb8ec) == 0) {
+                                anm->SetUnk138(mUnkA4);
+                            }
+                        }
+                    }
+                    anm->mStartFrame = mFieldNumeric[2] == 1 ? mFieldValues[2] >> 8 : 0;
+                    anm->mEndFrame = 0x40000000;
+                    anm->unk100 = count++;
+                    mParallel.AddHead(anm);
+                    if (mUnk74 == NULL) {
+                        mUnk74 = anm;
+                    }
+                    mode = 0;
+                } else {
+                    mode = -2;
+                }
+            } else if (MAnmStrCaseCmp(mFields[0], data_020bb8f8) == 0) {
+                frame = 0;
+                anm = new MAnmEmit((M3DScene *)mUnk80);
+                strcpy(path, dir);
+                strcat(path, mFields[1]);
+                anm->Load(path, FALSE);
+                anm->Run();
+                anm->mFollowParent = mUnkAC;
+                anm->SetRotRef(&mRot);
+                anm->SetPosRef(&mPos);
+                anm->SetUnk134(mUnkB0);
+                anm->SetUnk138(0x7FFF);
+                anm->mVisible = FALSE;
+                if (mFieldNumeric[2] == 1) {
+                    anm->mStartFrame = mFieldValues[2] >> 8;
+                } else {
+                    anm->mStartFrame = 0;
+                }
+                anm->mEndFrame = 0x40000000;
+                for (int i = 3; i < 6; i++) {
+                    if (mFieldPresent[i] == 1) {
+                        if (MAnmStrCaseCmp(mFields[i], data_020bb8e0) == 0) {
+                            anm->mUnk1A4 = 1;
+                        }
+                        if (MAnmStrCaseCmp(mFields[i], data_020bb8ec) == 0) {
+                            anm->SetUnk138(mUnkA4);
+                        }
+                    }
+                }
+                anm->unk100 = count++;
+                mParallel.AddHead(anm);
+                mode = 1;
+            } else if (MAnmStrCaseCmp(mFields[0], data_020bb900) == 0) {
+                MAnmModelBase *target = NULL;
+                int jointA = -1;
+                int jointB = -1;
+                frame = 0;
+                for (MTask *task = mParallel.mHead; task != NULL; task = task->mNext) {
+                    MAnmModelBase *other = (MAnmModelBase *)task;
+                    if (MAnmStrCaseCmp(other->mName.c_str(), mFields[1]) == 0) {
+                        target = other;
+                        if (strlen(mFields[2]) != 0) {
+                            jointA = other->mModel->FindJoint(mFields[2]);
+                        }
+                        if (strlen(mFields[3]) != 0) {
+                            jointB = other->mModel->FindJoint(mFields[3]);
+                        }
+                        break;
+                    }
+                }
+                anm = new MAnmRyusen((M3DScene *)mUnk80, target, jointA, jointB);
+                anm->mStartFrame = 1;
+                anm->mEndFrame = 0xFFFF;
+                anm->Run();
+                strcpy(path, dir);
+                strcat(path, mFields[1]);
+                anm->mStartFrame = mFieldNumeric[4] == 1 ? mFieldValues[4] >> 8 : 0;
+                anm->mEndFrame = 0x40000000;
+                if (mFieldNumeric[5] == 1) {
+                    anm->mEndFrame = mFieldValues[5] >> 8;
+                }
+                anm->unk100 = count++;
+                mParallel.AddHead(anm);
+                mode = 5;
+            } else if (MAnmStrCaseCmp(mFields[0], data_020bb908) == 0) {
+                frame = 0;
+                if ((u32)mUnk84 & 4) {
+                    anm = new MAnmTargetCamera((M3DScene *)mUnk80);
+                    anm->mStartFrame = 1;
+                    anm->mEndFrame = 0xFFFF;
+                    anm->Run();
+                    for (int i = 3; i < 6; i++) {
+                        if (mFieldPresent[i] == 1 && MAnmStrCaseCmp(mFields[i], data_020bb8e0) == 0) {
+                            anm->mUnk1A4 = 1;
+                        }
+                    }
+                    anm->SetRotRef(&data_0208af70);
+                    mUnk78 = anm;
+                    mParallel.AddHead(anm);
+                    mode = 2;
+                } else {
+                    mode = -2;
+                }
+            } else if (MAnmStrCaseCmp(mFields[0], data_020bb910) == 0) {
+                frame = 0;
+                anm = new MAnmSE((M3DScene *)mUnk80);
+                anm->Run();
+                anm->mFollowParent = mUnkAC;
+                anm->mActive = TRUE;
+                anm->mStartFrame = mFieldNumeric[2] == 1 ? mFieldValues[2] >> 8 : 0;
+                anm->mEndFrame = 0x40000000;
+                mParallel.AddHead(anm);
+                mode = 100;
+            } else {
+                if (mode == -2) {
+                    continue;
+                }
+                if (mode == -1) {
+                    break;
+                }
+                if (MAnmStrCaseCmp(mFields[0], data_020bb918) == 0) {
+                    MAnmMakeKey(&key, frame, mFieldNumeric, (const int *)mFieldValues);
+                    frame += key.mMin >> 8;
+                } else if (MAnmStrCaseCmp(mFields[0], data_020bb920) == 0) {
+                    anm->mLoopFrame = frame;
+                } else if (MAnmStrCaseCmp(mFields[0], data_020bb92c) == 0) {
+                    anm->mEndFrame = frame;
+                } else if (MAnmStrCaseCmp(mFields[0], data_020bb938) == 0) {
+                    anm->mName = mFields[1];
+                } else if (MAnmStrCaseCmp(mFields[0], data_020bb940) == 0) {
+                    MAnmModelBase *parent = NULL;
+                    for (MTask *task = mParallel.mHead; task != NULL; task = task->mNext) {
+                        MAnmModelBase *other = (MAnmModelBase *)task;
+                        if (MAnmStrCaseCmp(other->mName.c_str(), mFields[1]) == 0) {
+                            int joint = -1;
+                            parent = other;
+                            if (strlen(mFields[2]) != 0) {
+                                joint = other->mModel->FindJoint(mFields[2]);
+                            }
+                            anm->SetParent(other, joint);
+                            break;
+                        }
+                    }
+                    if (parent == NULL && mUnk43C != NULL) {
+                        for (MTask *task = mUnk43C->mParallel.mHead; task != NULL; task = task->mNext) {
+                            MAnmModelBase *other = (MAnmModelBase *)task;
+                            if (MAnmStrCaseCmp(other->mName.c_str(), mFields[1]) == 0) {
+                                int joint = -1;
+                                if (strlen(mFields[2]) != 0) {
+                                    joint = other->mModel->FindJoint(mFields[2]);
+                                }
+                                anm->SetParent(other, joint);
+                                break;
+                            }
+                        }
+                    }
+                } else {
+                    switch (mode) {
+                    case 0: {
+                        int track = MAnmLookup(mFields[0], data_0208b078);
+                        if (track == 32) {
+                            if (mFieldNumeric[1] == 1) {
+                                key.mFrame = mFieldValues[1] >> 8;
+                                key.mUnkC = 0;
+                                for (int i = 0; i < 9; i++) {
+                                    if (mFieldNumeric[2 + i] == 1) {
+                                        key.mMin = mFieldValues[2 + i];
+                                        key.mMax = mFieldValues[2 + i];
+                                        anm->mTracks[i].push_back(key);
+                                    }
+                                }
+                            }
+                        } else if (track != 33 && track != -1) {
+                            MAnmMakeKey(&key, frame, mFieldNumeric, (const int *)mFieldValues);
+                            anm->mTracks[track].push_back(key);
+                        }
+                        break;
+                    }
+                    case 1: {
+                        int track = MAnmLookup(mFields[0], data_0208afc0);
+                        if (track != -1) {
+                            MAnmMakeKey(&key, frame, mFieldNumeric, (const int *)mFieldValues);
+                            anm->mTracks[track].push_back(key);
+                        }
+                        break;
+                    }
+                    case 2: {
+                        int track = MAnmLookup(mFields[0], data_0208b010);
+                        if (track != -1) {
+                            MAnmMakeKey(&key, frame, mFieldNumeric, (const int *)mFieldValues);
+                            if ((u32)mUnk84 & 4) {
+                                anm->mTracks[track].push_back(key);
+                            }
+                        }
+                        break;
+                    }
+                    case 5: {
+                        int track = MAnmLookup(mFields[0], data_0208af88);
+                        if (track != -1) {
+                            MAnmMakeKey(&key, frame, mFieldNumeric, (const int *)mFieldValues);
+                            anm->mTracks[track].push_back(key);
+                        }
+                        break;
+                    }
+                    }
+                }
+            }
+            lineNo++;
+        }
+        delete[] text;
+    }
+    delete[] path;
+}
+
 MPolygonChar::~MPolygonChar() {
 }
 
@@ -908,14 +1263,6 @@ MAnmSE::~MAnmSE() {
 #pragma auto_inline off
 template class std::__vec_deleter<MAnmKey, std::allocator<MAnmKey> >;
 template std::__vec_deleter<MAnmKey, std::allocator<MAnmKey> &>::~__vec_deleter();
-// (The script reader makes arrays of key vectors and trail models; until it is decompiled, this keeps the
-// constructors it uses out of line.)
-#pragma dont_inline on
-void MAnmMakeArrays() {
-    delete[] new std::vector<MAnmKey>[1];
-    delete[] new M3DRyusen[1];
-}
-#pragma dont_inline reset
 
 template std::string::size_type std::string::find(const char *s, std::string::size_type pos,
                                                   std::string::size_type n) const;

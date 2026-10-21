@@ -644,8 +644,6 @@ void Dino3DClearSoundNames() {
 }
 
 // Loads the sound name tables (song commands, then sound data: an id and a name a line) from the directory, once.
-// NONMATCHING: the game pairs each push_back's two flag bytes (ours puts the fast-path ones first), and reaches the
-// paused task sets through pointers (ours folds their offsets).
 void Dino3DLoadCsv::LoadSoundNames(const char *dir) {
     MProcessPause pause(this, &mPauseMutex, &mPauseCount);
     if (sSoundNamesLoaded) {

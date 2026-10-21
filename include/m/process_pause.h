@@ -14,15 +14,19 @@ public:
         mCount = count;
         MMutexLock lock(mMutex);
         if (++*mCount == 1) {
-            mProcess->mParallel.Suspend();
-            mProcess->mSerial.Suspend();
+            MTaskSet *parallel = &mProcess->mParallel;
+            parallel->Suspend();
+            MTaskSet *serial = &mProcess->mSerial;
+            serial->Suspend();
         }
     }
     ~MProcessPause() {
         MMutexLock lock(mMutex);
         if (--*mCount == 0) {
-            mProcess->mParallel.Run();
-            mProcess->mSerial.Run();
+            MTaskSet *parallel = &mProcess->mParallel;
+            parallel->Run();
+            MTaskSet *serial = &mProcess->mSerial;
+            serial->Run();
         }
     }
 

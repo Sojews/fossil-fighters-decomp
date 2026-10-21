@@ -50,8 +50,11 @@ public:
     int mUnkB0;                 // 0xB0
     int mEndFrame;              // 0xB4
     int mFrame;                 // 0xB8
-    u8 unkBC[0x43C - 0xBC];
-    u32 mUnk43C;                // 0x43C
+    char mFields[16][50];       // 0xBC: the script line's comma-separated fields
+    u8 mFieldPresent[16];       // 0x3DC
+    fx32 mFieldValues[16];      // 0x3EC: the fields read as numbers
+    u8 mFieldNumeric[16];       // 0x42C: whether they were numbers
+    MPolygonChar *mUnk43C;      // 0x43C: another character whose objects can be parents
     OSMutex mMutex;             // 0x440
     int mPauseCount;            // 0x458: the task sets stay suspended while this isn't 0
 };
