@@ -544,7 +544,6 @@ static char *double2hex(long double num, char *buff, print_format format) {
     unsigned char *q;
     unsigned char working_byte;
     long double ld;
-    int expbits, expmask;
     unsigned snum;
     long exp;
     print_format exp_format;
@@ -552,11 +551,9 @@ static char *double2hex(long double num, char *buff, print_format format) {
     int mantissa_bit;
     decform form;
     decimal dec;
-    int radix_marker;
 
-    radix_marker = '.';
-    p            = buff;
-    ld           = num;
+    p  = buff;
+    ld = num;
 
     if (format.precision > 509) {
         return 0;
@@ -566,62 +563,48 @@ static char *double2hex(long double num, char *buff, print_format format) {
     form.digits = 0x20;
     __num2dec(&form, num, &dec);
 
-    switch (*dec.sig.text) {
-        case '0':
-            dec.exp = 0;
-            if (dec.sgn) {
-                p = buff - 5;
-                if (format.conversion_char == 'A') {
-                    strcpy(p, "-0X0");
-                } else {
-                    strcpy(p, "-0x0");
-                }
-            } else {
-                p = buff - 4;
-                if (format.conversion_char == 'A') {
-                    strcpy(p, "0X0");
-                } else {
-                    strcpy(p, "0x0");
-                }
-            }
+    if (fabsl(num) == 0.0) {
+        p = buff - 6;
+        strcpy(p, "0x0p0");
+        return p;
+    }
 
-            return p;
-        case 'I':
-            if (dec.sgn) {
-                p = buff - 5;
-                if (format.conversion_char == 'A') {
-                    strcpy(p, "-INF");
-                } else {
-                    strcpy(p, "-inf");
-                }
+    if (*dec.sig.text == 'I') {
+        if (dec.sgn) {
+            p = buff - 5;
+            if (format.conversion_char == 'A') {
+                strcpy(p, "-INF");
             } else {
-                p = buff - 4;
-                if (format.conversion_char == 'A') {
-                    strcpy(p, "INF");
-                } else {
-                    strcpy(p, "inf");
-                }
+                strcpy(p, "-inf");
             }
-
-            return p;
-        case 'N':
-            if (dec.sgn) {
-                p = buff - 5;
-                if (format.conversion_char == 'A') {
-                    strcpy(p, "-NAN");
-                } else {
-                    strcpy(p, "-nan");
-                }
+        } else {
+            p = buff - 4;
+            if (format.conversion_char == 'A') {
+                strcpy(p, "INF");
             } else {
-                p = buff - 4;
-                if (format.conversion_char == 'A') {
-                    strcpy(p, "NAN");
-                } else {
-                    strcpy(p, "nan");
-                }
+                strcpy(p, "inf");
             }
+        }
 
-            return p;
+        return p;
+    } else if (*dec.sig.text == 'N') {
+        if (dec.sgn) {
+            p = buff - 5;
+            if (format.conversion_char == 'A') {
+                strcpy(p, "-NAN");
+            } else {
+                strcpy(p, "-nan");
+            }
+        } else {
+            p = buff - 4;
+            if (format.conversion_char == 'A') {
+                strcpy(p, "NAN");
+            } else {
+                strcpy(p, "nan");
+            }
+        }
+
+        return p;
     }
 
     exp_format.justification_options = right_justification;
@@ -633,35 +616,20 @@ static char *double2hex(long double num, char *buff, print_format format) {
     exp_format.precision             = 1;
     exp_format.conversion_char       = 'd';
 
-    int i;
-    unsigned char *nump = (unsigned char *) &num;
-    for (i = 0; i < TARGET_FLOAT_BYTES; i++) {
-        unsigned char x                  = nump[i];
-        nump[i]                          = nump[TARGET_FLOAT_BYTES - i + 3];
-        nump[TARGET_FLOAT_BYTES - i + 3] = x;
+    {
+        int i;
+        char *nump = (char *) &num;
+        for (i = 0; i < 4; i++) {
+            char x      = nump[i];
+            nump[i]     = nump[7 - i];
+            nump[7 - i] = x;
+        }
     }
-
-    expbits = TARGET_FLOAT_EXP_BITS;
-    expmask = 0x7FF;
 
     snum = ((unsigned char *) &num)[0] << 25;
-    if (TARGET_FLOAT_EXP_BITS > 7) {
-        snum |= ((unsigned char *) &num)[1] << 17;
-    }
-    if (TARGET_FLOAT_EXP_BITS > 15) {
-        snum |= ((unsigned char *) &num)[2] << 9;
-    }
-    if (TARGET_FLOAT_EXP_BITS > 23) {
-        snum |= ((unsigned char *) &num)[3] << 1;
-    }
-
-    snum = (snum >> (29 - expbits)) & expmask;
-
-    if (snum != 0) {
-        exp = snum - 0x3FF;
-    } else {
-        exp = 0;
-    }
+    snum |= ((unsigned char *) &num)[1] << 17;
+    snum = (snum >> 21) & 0x7FF;
+    exp  = snum - 0x3FF;
 
     p = long2str(exp, buff, exp_format);
     if (format.conversion_char == 'a') {
@@ -671,11 +639,7 @@ static char *double2hex(long double num, char *buff, print_format format) {
     }
     q = (unsigned char *) &num;
 
-    if (TARGET_FLOAT_IMPLICIT_J_BIT) {
-        mantissa_bit = (4 + expbits + format.precision * 4) - 1;
-    } else {
-        mantissa_bit = (1 + expbits + format.precision * 4) - 4;
-    }
+    mantissa_bit = format.precision * 4 + 11;
 
     for (hex_precision = format.precision; hex_precision >= 1; hex_precision--) {
         if (mantissa_bit < 64) {
@@ -686,13 +650,6 @@ static char *double2hex(long double num, char *buff, print_format format) {
 
             if ((mantissa_bit & ~7) != ((mantissa_bit - 4) & ~7)) {
                 working_byte |= ((*(q + (mantissa_byte - 1))) << 8) >> (7 - ((mantissa_bit) & 7));
-            }
-
-            if (!TARGET_FLOAT_IMPLICIT_J_BIT) {
-                if (mantissa_bit == 1 + expbits) {
-                    *--p = radix_marker;
-                    working_byte &= 0x1;
-                }
             }
 
             if ((working_byte &= 0xF) < 10) {
@@ -710,17 +667,11 @@ static char *double2hex(long double num, char *buff, print_format format) {
         mantissa_bit -= 4;
     }
 
-    if (TARGET_FLOAT_IMPLICIT_J_BIT) {
-        if (format.precision || format.alternate_form) {
-            *--p = radix_marker;
-        }
-
-        if (fabsl(ld) != 0.0) {
-            *--p = '1';
-        } else {
-            *--p = '0';
-        }
+    if (format.precision || format.alternate_form) {
+        *--p = '.';
     }
+
+    *--p = '1';
 
     if (format.conversion_char == 'a') {
         *--p = 'x';
@@ -1024,6 +975,8 @@ char *float2str(long double num, char *buff, print_format format) {
     return p;
 }
 
+// NONMATCHING: mwcc lowers the conversion switch into a 'd'-'x' table where the game's runs 'd'-'u' (with 'x'
+// tested after it), and the long2str failure branches lay out differently.
 int __pformatter(void *(*WriteProc)(void *, const char *, size_t), void *WriteProcArg, const char *format_str,
                   va_list arg) {
     int num_chars, chars_written, field_width;
@@ -1084,6 +1037,10 @@ int __pformatter(void *(*WriteProc)(void *, const char *, size_t), void *WritePr
                     long_num = (short) long_num;
                 }
 
+                if (format.argument_options == char_argument) {
+                    long_num = (signed char) long_num;
+                }
+
                 if ((format.argument_options == long_long_argument) || (format.argument_options == intmax_argument)) {
                     if (!(buff_ptr = longlong2str(long_long_num, buff + 512, format))) {
                         goto conversion_error;
@@ -1117,6 +1074,10 @@ int __pformatter(void *(*WriteProc)(void *, const char *, size_t), void *WritePr
 
                 if (format.argument_options == short_argument) {
                     long_num = (unsigned short) long_num;
+                }
+
+                if (format.argument_options == char_argument) {
+                    long_num = (unsigned char) long_num;
                 }
 
                 if ((format.argument_options == long_long_argument) || (format.argument_options == intmax_argument)) {
@@ -1235,15 +1196,9 @@ int __pformatter(void *(*WriteProc)(void *, const char *, size_t), void *WritePr
                 continue;
 
             case 'c':
-                buff_ptr = buff;
-                if (format.argument_options == wchar_argument) {
-                    wchar_t wchar = va_arg(arg, int);
-                    num_chars     = wctomb(buff, wchar);
-                } else {
-                    *buff_ptr = va_arg(arg, int);
-                    num_chars = 1;
-                }
-
+                buff_ptr  = buff;
+                *buff_ptr = va_arg(arg, int);
+                num_chars = 1;
                 break;
 
             case '%':
@@ -1252,8 +1207,8 @@ int __pformatter(void *(*WriteProc)(void *, const char *, size_t), void *WritePr
                 num_chars = 1;
                 break;
 
-            case 'p':
             case 0xFF:
+            case 'p':
             default:
             conversion_error:
                 num_chars = strlen(curr_format);
@@ -1278,20 +1233,6 @@ int __pformatter(void *(*WriteProc)(void *, const char *, size_t), void *WritePr
 
                 ++buff_ptr;
                 num_chars--;
-            }
-
-            if ((format.justification_options == zero_fill) &&
-                ((format.conversion_char == 'a') || (format.conversion_char == 'A'))) {
-                if (num_chars < 2) {
-                    return -1;
-                }
-
-                if ((*WriteProc)(WriteProcArg, buff_ptr, 2) == 0) {
-                    return -1;
-                }
-
-                num_chars -= 2;
-                buff_ptr += 2;
             }
 
             while (field_width < format.field_width) {
