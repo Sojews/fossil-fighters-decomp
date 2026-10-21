@@ -134,6 +134,8 @@ class DinoFieldChara : public MProcess, public MSerializer {
 public:
     DinoFieldChara(DinoField *field, M3DScene *scene);
     virtual ~DinoFieldChara();
+    // Not decompiled yet: runs the character's task.
+    virtual void Idle();
     virtual void Read(const void *buf);
 
     DinoFieldCharaModel *GetModel();

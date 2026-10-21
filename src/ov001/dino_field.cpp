@@ -42,6 +42,9 @@
 #include "m/looper.h"
 #include "m/motion.h"
 #include "game/help.h"
+#include "m/input.h"
+#include "game/dino_field_radar_menu.h"
+#include "game/dino_field_town_map_menu.h"
 #include "game/dino_backup.h"
 #include "game/dino_resource.h"
 
@@ -67,6 +70,150 @@ void DinoField::CreateEffects(MPolygonChar **effects, u32 count, u32 id) {
         mEffectTasks->AddTail(*effects);
         effects++;
     }
+}
+
+// The TU's pooled strings.
+extern "C" struct {
+    u32 unk00;
+    const char *mBlackPath;         // 0x04: "/motion/common/black.bin"
+    const char *mKasekiButtonPath;  // 0x08
+    const char *mMenuButtonPath;    // 0x0C
+    const char *mDefsPath;          // 0x10: "/etc/excavate_defs"
+} data_ov001_02169360;
+// The 3D scene's texture heap.
+extern "C" u8 data_ov001_0216ae68[];
+// The buttons' help texts.
+extern const u32 data_0208adb4, data_0208adb8, data_0208adbc;
+
+// The excavation defs, read as the field's.
+static inline const MResource<DinoFieldDefs> &DinoAsFieldDefs(const MResource<DinoExcavateDefs> &defs) {
+    return (const MResource<DinoFieldDefs> &)defs;
+}
+
+// Makes the field: its screens (unless it only holds a saved state), characters, map, camera, radar and town map,
+// the buttons and their help, and what it saves.
+DinoField::DinoField(MScreen **screen, u32 arg1)
+    : MProcess(NULL), mUnk264(FALSE), mUnk2C8((BOOL *)screen), mUnk3C8(arg1) {
+    if (!mUnk3C8) {
+        mDefs = DinoAsFieldDefs(MResource<DinoExcavateDefs>(std::string(data_ov001_02169360.mDefsPath)));
+    }
+    GetParallel()->SetUseMutex(TRUE);
+    DinoHelpBase::Disable();
+    if (!arg1) {
+        gLcd->mMain->ResetHooks();
+        if (*mUnk2C8 == NULL) {
+            gLcd->mSub->ResetHooks();
+        }
+        if (*mUnk2C8 == NULL) {
+            gLcd->mSub->Setup(5, 2, 1, 0, 0, 0);
+        }
+        gLcd->mMain->Setup(5, 1, 3, 0, 2, 1);
+        gLcd->VSyncNow();
+        gLcd->mMain->mBg->SetBg0Reserved(1);
+        gLcd->mMain->SetBackdrop(0x8000);
+        gLcd->mMain->mObj->Show();
+        if (*mUnk2C8 == NULL) {
+            gLcd->mSub->SetBackdrop(0x8000);
+            gLcd->mSub->mObj->Show();
+        }
+        gLcd->SetBottomDisplay(gLcd->mMain);
+        SetDisplay(gCurrentDisplay = gLcd->GetTopDisplay());
+    }
+    mFadeTasks = new MParallelTaskSet;
+    mParallel.AddTail(mFadeTasks);
+    mUnk230 = (u32) new MSingleInputHub(1);
+    ((MInputHub *)mUnk230)->EnableTouch();
+    mUnk234 = (u32)((MInputHub *)mUnk230)->GetInput(0);
+    mParallel.AddTail((MTask *)mUnk230);
+    mKasekiRockTasks = new MParallelTaskSet;
+    mUnk370 = new MParallelTaskSet;
+    mEffectTasks = new MParallelTaskSet;
+    mUnk24C[0] = (u32) new MParallelTaskSet;
+    mParallel.AddTail((MTask *)mUnk24C[0]);
+    ((MTaskSet *)mUnk24C[0])->AddTail(mUnk370, mEffectTasks, mKasekiRockTasks);
+    MI_CpuFill8(&mSteps[0], 0, 0x18);
+    MI_CpuFill8(&mSteps[1], 0, 0x18);
+    MI_CpuFill8(&mSteps[2], 0, 0x20);
+    mUnk378 = 0;
+    mUnk37C = 1;
+    MI_CpuFill8(mLoad, 0, sizeof(mLoad));
+    mLoadAverage = 0;
+    mLoadIndex = 0;
+    mHoles = new MParallelTaskSet;
+    mParallel.AddTail(mHoles);
+    mRockHoles = new MParallelTaskSet;
+    mParallel.AddTail(mRockHoles);
+    if (!arg1) {
+        mScene = new M3DScene((u32)data_ov001_0216ae68, 0x2E630);
+        mScene->mUnk14 = 1;
+        mScene->mUnk18 = 0x12C000;
+        mScene->mM3d->mBgCntBits.priority = 3;
+        mParallel.AddTail(mScene);
+    } else {
+        mScene = NULL;
+    }
+    for (u32 i = 0; i < 100; i++) {
+        mCharas[i] = new DinoFieldChara(this, mScene);
+        Add(mCharas[i]);
+        ((MTaskSet *)mUnk24C[0])->AddTail(mCharas[i]);
+    }
+    mMap = new DinoFieldMap(mScene);
+    Add(mMap);
+    ((MTaskSet *)mUnk24C[0])->AddTail(mMap);
+    mCamera = new DinoFieldCamera(this, (u32)mScene);
+    Add(mCamera);
+    ((MTaskSet *)mUnk24C[0])->AddTail(mCamera);
+    if (*mUnk2C8 != NULL) {
+        mCamera->SetUnk15C(TRUE);
+    }
+    mRadar = new DinoFieldRadarManager(this);
+    mCamera->AddHook(mRadar);
+    ((MTaskSet *)mUnk24C[0])->AddTail(mRadar);
+    mTownMap = new DinoFieldTownMapManager(this);
+    mCamera->AddHook(mTownMap);
+    ((MTaskSet *)mUnk24C[0])->AddTail(mTownMap);
+    mUnk258 = TRUE;
+    mFrames = 0;
+    Add(&mUnk258, 1);
+    mUnk238 = -1;
+    Add((s32 *)&mUnk238, 1);
+    if (!arg1) {
+        mOam = new MSmartOam(gLcd->mMain, 30, 0, 1);
+        mOam->SetUnk1C(7);
+        mParallel.AddTail(mOam);
+        mUnk2C4 = new DinoHelpDummyItem(gLcd->mMain, MRect(0, 0, 256, 192),
+                                        std::string(gDinoResource->GetText(data_0208adbc)));
+        mUnk2B4 = new MMotion(std::string(data_ov001_02169360.mMenuButtonPath), mOam, 0, 1);
+        mUnk2B4->SetPosition(128, 96);
+        mUnk2B4->Show();
+        mUnk2B4->SetPriority(2);
+        ((MTaskSet *)mUnk24C[0])->AddTail(mUnk2B4);
+        mUnk2B8 = new DinoHelpDummyItem(gLcd->mMain, MRect(224, 160, 256, 192),
+                                        std::string(gDinoResource->GetText(data_0208adb8)));
+        mUnk2BC = new MMotion(std::string(data_ov001_02169360.mKasekiButtonPath), mOam, 0, 1);
+        mUnk2BC->SetPosition(128, 96);
+        mUnk2BC->Show();
+        mUnk2BC->SetPriority(2);
+        ((MTaskSet *)mUnk24C[0])->AddTail(mUnk2BC);
+        mUnk2C0 = new DinoHelpDummyItem(gLcd->mMain, MRect(0, 160, 32, 192),
+                                        std::string(gDinoResource->GetText(data_0208adb4)));
+    }
+    mBgmScene = 0;
+    mBgm = 0;
+    mBgmChanging = FALSE;
+    Add((s32 *)&mBgmScene, 1);
+    Add((s32 *)&mBgm, 1);
+    Add((s32 *)&mBgmChanging, 1);
+    MI_CpuFill8(&mQuake, 0, 0x14);
+    Add(&mQuake, 0x14);
+    mMoney = NULL;
+    mDonate = NULL;
+    Close();
+    mLowerPict = mUpperPict = NULL;
+    mLowerPictId = mUpperPictId = 0;
+    mPictTasks = new MSerialTaskSet;
+    mPictTasks->SetUseMutex(TRUE);
+    mParallel.AddTail(mPictTasks);
 }
 
 #pragma auto_inline off
@@ -1633,11 +1780,6 @@ extern "C" MProcess *func_ov001_02159d3c(DinoField *field) {
     return new DinoFieldCaptureFadeInTask(field);
 }
 
-// The TU's pooled strings.
-extern "C" struct {
-    u32 unk00;
-    const char *mBlackPath;     // 0x04: "/motion/common/black.bin"
-} data_ov001_02169360;
 
 // The TU's pooled pointer-to-member constants.
 extern "C" struct {
