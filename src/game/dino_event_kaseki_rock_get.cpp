@@ -15,6 +15,13 @@
 // (The game calls dino_resource.cpp's copy.)
 template <> MResource<DinoMessageData>::MResource(std::string path);
 
+// (Emits the message resource's out-of-line constructor here, so it isn't the next function after a caller.)
+#pragma dont_inline on
+void DinoEventKasekiRockGetMessageAnchor(const std::string &path) {
+    MResource<DinoMessageData> messages(path);
+}
+#pragma dont_inline reset
+
 DinoEventKasekiRockGet::~DinoEventKasekiRockGet() {
 }
 

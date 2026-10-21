@@ -321,6 +321,9 @@ void DinoEventRevive::StateEffectEnd() {
 M_EXTERN_OVERLAY(ov003);
 M_EXTERN_OVERLAY(ov007);
 
+// (Emitted ahead of Idle, so it isn't the next function after its caller.)
+template MTask *MCreateBgCallTask(DinoEventReviveEffect *obj, void (DinoEventReviveEffect::*func)(), int thread);
+
 // Plays the revive effect while the creature's status loads, then shows the status.
 void DinoEventReviveEffect::Idle() {
     switch (mStep++) {
@@ -356,7 +359,6 @@ void DinoEventReviveEffect::LoadStatus() {
 // Template task instances the game emits in this file. Until the code that makes the tasks is decompiled, they are
 // instantiated explicitly.
 template class MBgCallTask0<DinoEventReviveEffect>;
-template MTask *MCreateBgCallTask(DinoEventReviveEffect *obj, void (DinoEventReviveEffect::*func)(), int thread);
 template class MBgCallTask0<DinoEventCaptureFadeUiTask>;
 template MTask *MCreateBgCallTask(DinoEventCaptureFadeUiTask *obj, void (DinoEventCaptureFadeUiTask::*func)(), int thread);
 
