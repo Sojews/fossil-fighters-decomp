@@ -595,13 +595,12 @@ void DinoUiMaskBuyMenu::RefreshPage2() {
 extern "C" const u32 data_ov005_02164ba0[]; // the flags that put the masks on sale, in order
 
 // The masks for sale: those with a name and a price, while their flag is set, that the player hasn't got yet.
-// NONMATCHING: only k and the counter's register copy swap registers (r4/r6).
 void DinoUiMaskBuyMenu::LoadMasks() {
-    mMasks.clear();
     int k = 0;
+    mMasks.clear();
     MResource<DinoHeadMaskDefs> defs = gDinoResource->LoadHeadMaskDefs();
-    for (u32 i = 1; i < gDinoResource->GetHeadMaskCount(); i++) {
-        u32 id = i;
+    u32 i = 1;
+    for (u32 id = i; id < gDinoResource->GetHeadMaskCount(); id = ++i) {
         const u8 *base = (const u8 *)defs.Get();
         const DinoHeadMaskDef *def =
             (const DinoHeadMaskDef *)(base + ((const u32 *)(base + ((const DinoHeadMaskDefs *)base)->tableOffset))[id]);
