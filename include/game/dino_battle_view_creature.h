@@ -79,6 +79,10 @@ public:
 
     class SetCoordTask : public MTask {
     public:
+        SetCoordTask(DinoBattleViewCreature *creature, MPoint pos) {
+            mCreature = creature;
+            mPos = pos;
+        }
         virtual ~SetCoordTask();
         virtual void Execute();
 

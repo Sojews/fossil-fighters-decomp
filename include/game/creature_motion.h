@@ -41,6 +41,13 @@ public:
 
 class CreateCreatureMotionTask : public MTask {
 public:
+    CreateCreatureMotionTask(CreatureMotion **slot, DinoBattleViewCreature *view, const char *path, MSmartOam *oam, int arg)
+        : mPath(path) {
+        mSlot = slot;
+        mView = view;
+        mOam = oam;
+        mArg = arg;
+    }
     virtual ~CreateCreatureMotionTask();
     virtual void Execute();
 
@@ -53,12 +60,21 @@ public:
 
 class EffectMotionTask : public MProcess {
 public:
+    // Plays the motion file's anime once at pos (on its own OAM, offset like the creature's), then exits.
+    EffectMotionTask(const char *path, int anime, MPoint pos, MPoint offset);
     virtual ~EffectMotionTask();
     virtual void Idle();
 };
 
 class SetCretureIconTask : public MProcess {
 public:
+    SetCretureIconTask(CreatureMotion **motion, MTaskSet *tasks, MPoint pos, BOOL flip, int anime) : MProcess(NULL) {
+        mMotion = (MMotion **)motion;
+        mTasks = tasks;
+        mPos = pos;
+        mFlip = flip;
+        mAnime = anime;
+    }
     virtual ~SetCretureIconTask();
     virtual void Idle();
 
@@ -71,6 +87,11 @@ public:
 
 class SetCretureIconPriorityTask : public MTask {
 public:
+    SetCretureIconPriorityTask(CreatureMotion **motion, int priority, int anchor) {
+        mMotion = (MMotion **)motion;
+        mPriority = priority;
+        mAnchor = anchor;
+    }
     virtual ~SetCretureIconPriorityTask();
     virtual void Execute();
 
@@ -98,6 +119,11 @@ class DinoBattleViewCreature;
 
 class UpdateLifePointTask : public MProcess {
 public:
+    UpdateLifePointTask(DinoBattleViewCreature *creature, int value, u32 kind) : MProcess(NULL) {
+        mCreature = creature;
+        mValue = value;
+        mKind = kind;
+    }
     virtual ~UpdateLifePointTask();
     virtual void Idle();
 
@@ -108,6 +134,10 @@ public:
 
 class SetColorMaskTask : public MTask {
 public:
+    SetColorMaskTask(DinoBattleViewCreature *target, u32 mask) {
+        mTarget = (Target *)target;
+        mColorMask = mask;
+    }
     virtual ~SetColorMaskTask();
     virtual void Execute();
 

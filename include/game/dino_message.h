@@ -635,6 +635,7 @@ public:
 class DinoBattleViewCreatureMoveResult : public MMessage {
 public:
     DinoBattleViewCreatureMoveResult() : MMessage(0x10022) {}
+    DinoBattleViewCreatureMoveResult(u32 arg) : MMessage(0x10022), mUnk0C(arg) {}
     virtual u32 GetSize() { return 8; }
     virtual void Write(void *buf) {
         MI_CpuCopy8(&mId, buf, 4);
@@ -1005,6 +1006,9 @@ public:
 class DinoBattleViewCreatureAbilityResult : public MMessage {
 public:
     DinoBattleViewCreatureAbilityResult() : MMessage(0x1002A) {}
+    DinoBattleViewCreatureAbilityResult(u32 a, u32 b, u32 c, u32 d, u32 e, u32 f, u32 g, u8 h, u8 i, u32 j)
+        : MMessage(0x1002A), mUnk0C(a), mUnk10(b), mUnk14(c), mUnk18(d), mUnk1C(e), mUnk20(f), mUnk24(g), mUnk28(h),
+          mUnk29(i), mUnk2C(j) {}
     virtual u32 GetSize() { return 40; }
     virtual void Write(void *buf) {
         MI_CpuCopy8(&mId, buf, 4);
@@ -1171,6 +1175,20 @@ public:
 class DinoBattleViewCreatureAbility3DRequest : public MMessage {
 public:
     DinoBattleViewCreatureAbility3DRequest() : MMessage(0x1002B) {}
+    DinoBattleViewCreatureAbility3DRequest(u32 a, u32 b, u32 c, u32 d, u32 e, u32 f, u8 g, u32 h, const int *damage, u8 i,
+                                           u32 j, u32 k, u8 l, u8 m, u8 n, u32 o, u32 p, u32 q)
+        : MMessage(0x1002B), mUnk0C(a), mUnk10(b), mUnk14(c), mUnk18(d), mUnk1C(e), mUnk20(f), mUnk24(g), mUnk28(h) {
+        MI_CpuCopy8(damage, mUnk2C, sizeof(mUnk2C));
+        mUnk38 = i;
+        mUnk3C = j;
+        mUnk40 = k;
+        mUnk44 = l;
+        mUnk45 = m;
+        mUnk46 = n;
+        mUnk48 = o;
+        mUnk4C = p;
+        mUnk50 = q;
+    }
     virtual u32 GetSize() { return 72; }
     virtual void Write(void *buf) {
         MI_CpuCopy8(&mId, buf, 4);

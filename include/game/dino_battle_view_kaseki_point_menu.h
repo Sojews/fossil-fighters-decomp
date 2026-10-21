@@ -30,6 +30,7 @@ public:
     DinoBattleViewAbilityIcon *GetUnk108();
     u32 GetUnkAC();
     u32 GetUnkCC() { return mUnkCC; }
+    u32 GetUnkA8() { return mUnkA8; }
     std::string GetUnkC0();
     void SetMotions(MMotion *motion, MTask *task);
     void TakeMotions(MMotion **motion, MTask **task);
