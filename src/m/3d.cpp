@@ -262,6 +262,10 @@ void M3d::SetViewport(int x1, int y1, int x2, int y2) {
 
 // The queues' members the game emits in this file.
 #pragma auto_inline off
+// (Ahead of reserve, which uses it.)
+template void std::__cdeque_deleter<void *, std::allocator<void *> &>::construct_at_end(
+    const std::__cdeque_deleter<void *, std::allocator<void *> >::iterator &first,
+    const std::__cdeque_deleter<void *, std::allocator<void *> >::iterator &last, Metrowerks::int2type<true>);
 template class std::__cdeque_deleter<void *, std::allocator<void *> >;
 template class std::__cdeque_deleter<void *, std::allocator<void *> &>;
 template class std::__cdeque_deleter<void *, std::allocator<void *> >::iterator;
