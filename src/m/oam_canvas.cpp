@@ -135,12 +135,13 @@ void MOamCanvas<TOam, TUnit>::FillRect(MRect rect, int color) {
 template <class TOam, class TUnit>
 int MOamCanvas<TOam, TUnit>::GetPixel(int x, int y) {
     for (u32 i = 0; i < mPieces.size(); i++) {
-        if (mPieces[i].rect.Contains(MPoint(x, y))) {
+        MRect &r = mPieces[i].rect;
+        if (r.left <= x && x < r.right && r.top <= y && y < r.bottom) {
             Piece &piece = mPieces[i];
-            int px = x - piece.rect.left;
             int py = y - piece.rect.top;
+            int px = x - piece.rect.left;
             u32 tile = piece.chrOffset + ((px >> 3) + (py >> 3) * ((piece.rect.right - piece.rect.left) >> 3));
-            u32 row = *(u32 *)(mChrBlock->addr + mChrBlock->unitSize * tile + (py & 7) * 4);
+            u32 row = ((u32 *)(mChrBlock->addr + mChrBlock->unitSize * tile))[py & 7];
             return (row >> ((px & 7) * 4)) & 0xF;
         }
     }

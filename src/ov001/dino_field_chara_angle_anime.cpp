@@ -19,7 +19,6 @@
 #include "game/dino_field_chara_hide_manpu_task.h"
 #include "game/dino_field_chara_model_motion_id_task.h"
 
-// NONMATCHING: the two dead MPoint temporaries of SetUnk2D8Pos are stored in a different order.
 DinoFieldChara::DinoFieldChara(DinoField *field, M3DScene *scene)
     : MProcess(NULL), mUnk114(0), mField(field), mScene(scene) {
     mUnk310 = 0;
@@ -28,7 +27,7 @@ DinoFieldChara::DinoFieldChara(DinoField *field, M3DScene *scene)
     mHead = NULL;
     mManpu = NULL;
     mEffect = NULL;
-    SetUnk2D8Pos(MPoint(0, 0));
+    mUnk2D8 = MFx32Point(MFx32(0), MFx32(0));
     mUnk2E0 = 0;
     ResetState();
     Add((u8 *) &mModel, 0x2C);
@@ -118,7 +117,6 @@ void DinoFieldChara::ResetState() {
 }
 
 // Forgets the models and tasks, then loads the character's data and models again (or stops, with no character).
-// NONMATCHING: the game also zeroes a dead 16-byte stack temporary (at the bottom of the frame) by the INT_MIN chain.
 void DinoFieldChara::Refresh() {
     mMoveTasks->Clear();
     mTaskSet->Clear();
@@ -133,8 +131,7 @@ void DinoFieldChara::Refresh() {
     mMotionModelsAlt.clear();
     mModelResource = M3DModelResource();
     mData = MResource<DinoCharaData>();
-    mUnk2D8.x = 0;
-    mUnk2D8.y = 0;
+    mUnk2D8 = MFx32Point(MFx32(0), MFx32(0));
     mUnk2E0 = 0;
     mBeholdTarget = 0;
     mBodyPos.x = mBodyPos.y = mBodyPos.z = 0x80000000;
@@ -187,7 +184,7 @@ MFx32 DinoFieldChara::GetUnk50() {
     return v;
 }
 
-void DinoFieldChara::SetUnk2D8(MPoint pos, u32 a, u32 b) {
+void DinoFieldChara::SetUnk2D8(MFx32Point pos, u32 a, MFx32 b) {
     mUnk2D8 = pos;
     mUnk2E0 = a;
     mUnk2E4 = b;
@@ -197,12 +194,11 @@ void DinoFieldChara::ClearUnk2E0() {
     mUnk2E0 = 0;
 }
 
-// NONMATCHING: two dead stores to the MPoint temporaries are in a different order.
 void DinoFieldChara::StopWalking() {
     if (!mModel.unk05[0]) {
         SetMotion(1, 1, mField->GetMap()->GetWalkSpeed());
     }
-    SetUnk2D8Pos(MPoint(0, 0));
+    mUnk2D8 = MFx32Point(MFx32(0), MFx32(0));
     mUnk2E0 = 0;
 }
 
@@ -374,8 +370,8 @@ void DinoFieldChara::SetTask(DinoCharaTask task) {
     case 0: {
         DinoCharaState state;
         gDinoBackup->GetChara(mModel.id, &state);
-        mHomeX = state.x;
-        mHomeY = state.y;
+        mHome.x = state.x;
+        mHome.y = state.y;
         break;
     }
     case 2:
@@ -625,8 +621,8 @@ BOOL DinoFieldChara::Unk02162154() {
         MFx32Point d = chara->GetModel()->pos - mModel.pos;
         MFx32 speed = MFx32::FromRaw(mTask.unk28.w[2] / 60);
         MFx32Point v = d / d.Length() * speed;
-        SetUnk2D8(MPoint(v.x.v, v.y.v), 2, FX32_ONE);
-        MFx32Point away = mModel.pos - MFx32Point(mHomeX, mHomeY);
+        SetUnk2D8(v, 2, MFx32(1));
+        MFx32Point away = mModel.pos - mHome;
         MFx32 limit = MFx32::FromRaw(mTask.unk28.w[1]);
         if (away.x * away.x + away.y * away.y > limit * limit) {
             mModel.unk10 = 2;
@@ -644,7 +640,7 @@ BOOL DinoFieldChara::Unk02162154() {
                 break;
             }
         }
-        MFx32Point d = MFx32Point(mHomeX, mHomeY) - mModel.pos;
+        MFx32Point d = mHome - mModel.pos;
         MFx32 speed = MFx32::FromRaw(mTask.unk28.w[3] / 60);
         MFx32 len = d.Length();
         if (len <= speed * MFx32(10)) {
@@ -652,7 +648,7 @@ BOOL DinoFieldChara::Unk02162154() {
             mModel.unk10 = 0;
         } else {
             MFx32Point v = d / len * speed;
-            SetUnk2D8(MPoint(v.x.v, v.y.v), 2, FX32_ONE);
+            SetUnk2D8(v, 2, MFx32(1));
         }
         break;
     }
@@ -683,7 +679,7 @@ void DinoFieldChara::IdleFollow() {
     const DinoFollowDefs *defs = (const DinoFollowDefs *)gDinoResource->GetExcavate78();
     MFx32 speed;
     u32 mode;
-    if (len >= defs->start || (len >= defs->keep && !((const MFx32Point &)mUnk2D8 == MFx32Point(MFx32(0), MFx32(0))))) {
+    if (len >= defs->start || (len >= defs->keep && !(mUnk2D8 == MFx32Point(MFx32(0), MFx32(0))))) {
         speed = len * defs->factor * walk;
         if (speed >= defs->run * walk) {
             mode = 3;
@@ -697,7 +693,41 @@ void DinoFieldChara::IdleFollow() {
         mode = 1;
     }
     MFx32Point v = d / d.Length() * speed;
-    SetUnk2D8(MPoint(v.x.v, v.y.v), mode, walk.v);
+    SetUnk2D8(v, mode, walk);
+}
+
+static inline MFx32Point AngleToDir(u16 angle) {
+    return MFx32Point(MFx32::FromRaw(FX_SinCosTable_[(angle >> 4) * 2 + 1]), MFx32::FromRaw(FX_SinCosTable_[(angle >> 4) * 2]));
+}
+
+// Wandering (mTask.unk8.wander): waits w[0] to w[1] frames, then walks at w[2] per second to a random point within
+// w[3] of where the backup has the character.
+// NONMATCHING: the game keeps the speed in a stack slot (and the random distance across the Next call).
+void DinoFieldChara::IdleWander() {
+    if (mField->IsUnk258() || Unk02162154()) {
+        return;
+    }
+    if (mUnkC0 != 0) {
+        if (--mUnkC0 != 0) {
+            return;
+        }
+        DinoCharaState state;
+        gDinoBackup->GetChara(mModel.id, &state);
+        MFx32Point offset = AngleToDir(gDinoResource->GetRandom()->Next(0x10000)) *
+                            (gDinoResource->GetRandom()->NextFraction() * MFx32::FromRaw(mTask.unk8.wander.w[3]));
+        MFx32Point target(state.x + offset.x, state.y + offset.y);
+        mHome = target;
+    }
+    MFx32Point d = mHome - mModel.pos;
+    MFx32 speed = MFx32::FromRaw(mTask.unk8.wander.w[2] / 60);
+    MFx32 len = d.Length();
+    if (len <= speed * MFx32(10)) {
+        SetMotion(1, 1, MFx32(1));
+        mUnkC0 = mTask.unk8.wander.w[0] + MFx32ToInt(MFx32(mTask.unk8.wander.w[1] - mTask.unk8.wander.w[0]) *
+                                                     gDinoResource->GetRandom()->NextFraction());
+    } else {
+        SetUnk2D8(d / len * speed, 2, MFx32(1));
+    }
 }
 
 void DinoFieldChara::SetFootSe(u32 se) {

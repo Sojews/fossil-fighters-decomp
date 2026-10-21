@@ -173,20 +173,20 @@ public:
     u8 GetUnk2D();
     MRect GetRect40();
     MFx32 GetUnk50();
-    void SetUnk2D8(MPoint pos, u32 a, u32 b);
+    void SetUnk2D8(MFx32Point pos, u32 a, MFx32 b);
     void ClearUnk2E0();
     void StopWalking();
     void LeaveUnk258();
     void PlayReaction();
     BOOL IsUnk24Reacting();
     BOOL IsFocusNear();
-    void SetUnk2D8Pos(MPoint pos) { mUnk2D8 = pos; }
     BOOL IsUnk20Two();
     // Not decompiled yet: what a character with no task does (unless the field's unk258 is set).
     BOOL Unk02162154();
     // The idle step of each task kind (DinoCharaTask::unk4).
     void IdleNoTask();
     void IdleFollow();
+    void IdleWander();
     void MoveTo(MFx32Point coord, u32 frames, u32 ease, u8 silent);
     MTask *CreateWaitMoveTask();
     MTask *CreateWaitStopTask();
@@ -200,8 +200,7 @@ public:
     MResource<DinoCharaData> mData; // 0x8C: the character's data file
     DinoFieldCharaModel mModel; // 0x9C
     u32 mMotion;                // 0xB4: the motion playing
-    MFx32 mHomeX;               // 0xB8: where the character was placed
-    MFx32 mHomeY;               // 0xBC
+    MFx32Point mHome;           // 0xB8: where the character was placed (where it wanders to, while wandering)
     u32 mUnkC0;                 // 0xC0
     u32 mUnkC4;                 // 0xC4
     DinoCharaTask mTask;        // 0xC8: what the character does on its own
@@ -222,9 +221,9 @@ public:
     std::map<u32, M3DModelResource> mMotionModelsAlt;   // 0x164: (when the field's unk258 is set)
     M3DModelResource mModelResource;                    // 0x174
     char mMotionModelPath[256]; // 0x1D8
-    MPoint mUnk2D8;             // 0x2D8
+    MFx32Point mUnk2D8;         // 0x2D8
     u32 mUnk2E0;                // 0x2E0
-    u32 mUnk2E4;                // 0x2E4
+    MFx32 mUnk2E4;              // 0x2E4: the motion speed
     MResource<DinoHeadMaskDefs> mHeadMasks; // 0x2E8: loaded for the player's head mask
     MMotion *mManpu;            // 0x2F8: the emotion bubble shown over the character
     u32 mUnk2FC[2];             // 0x2FC
