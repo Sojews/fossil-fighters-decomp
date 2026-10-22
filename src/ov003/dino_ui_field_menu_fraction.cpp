@@ -303,10 +303,30 @@ struct DinoCreatureStats {
     int hp;         // 0x00
     int stats[5];   // 0x04
 };
-extern "C" DinoCreatureStats func_02030f38(const DinoCreatureStatsInput *info, BOOL fixed, fx32 fraction);
+extern "C" DinoCreatureStats func_02030f38(const DinoCreatureStatsInput *info, BOOL fixed, MFx32 fraction);
 
-// NONMATCHING: stack layout (the game's frame is one word bigger and puts the team below the creature).
+// The creature's level (as GetCreatureLevel, the sum declared before the cap).
+static inline u32 DinoTeamCreatureTotal(const DinoCreatureState &creature) {
+    if (creature.parts[0].level == 0) {
+        return 0;
+    }
+    u32 sum, max;
+    sum = creature.unk0_8 + (creature.parts[0].level + creature.parts[1].level + creature.parts[2].level +
+                             creature.parts[3].level);
+    max = kCreatureLevelLimits[0] * 11 + 50;
+    return std::min(max, sum);
+}
+
+static inline u32 DinoTeamCreatureLevel(const DinoCreatureState &creature) {
+    if (creature.parts[0].level == 0) {
+        return 0;
+    }
+    return (DinoTeamCreatureTotal(creature) - 50) / kCreatureLevelLimits[0] + 1;
+}
+
 void DinoUiPartsTeamInfo::SetTeam(u32 index) {
+    const DinoCreatureDef *def;
+    DinoCreatureState creature;
     DinoTeam team;
     gDinoBackup->GetTeam(index, &team);
     u32 i;
@@ -330,8 +350,6 @@ void DinoUiPartsTeamInfo::SetTeam(u32 index) {
     }
     for (int i = 0; i < 5; i++) {
         mTexts[i]->SetText(std::string(gDinoResource->GetCreatureText08(team.slots[i])));
-        const DinoCreatureDef *def;
-        DinoCreatureState creature;
         if (team.slots[i] != 0) {
             def = gDinoResource->GetCreatureDef(team.slots[i]);
             gDinoBackup->GetCreature(team.slots[i], &creature);
@@ -339,15 +357,15 @@ void DinoUiPartsTeamInfo::SetTeam(u32 index) {
             info.levels[0] = info.levels[1] = info.levels[2] = info.levels[3] = 0;
             MI_CpuFill8(&info, 0, sizeof(info));
             info.id = team.slots[i];
-            info.rank = GetCreatureLevel(creature);
+            info.rank = DinoTeamCreatureLevel(creature);
             info.levels[4] = creature.unk0_8;
             for (int j = 0; j < 4; j++) {
                 info.bonus[j] = creature.parts[j].unk12;
                 info.levels[j] = creature.parts[j].level;
             }
-            DinoCreatureStats stats = func_02030f38(&info, FALSE, 0);
+            DinoCreatureStats stats = func_02030f38(&info, FALSE, MFx32::FromRaw(0));
             mNumbers[i]->SetValue((u16)stats.hp);
-            mNumbers[5 + i]->SetValue((u16)GetCreatureLevel(creature));
+            mNumbers[5 + i]->SetValue((u16)DinoTeamCreatureLevel(creature));
         } else {
             mNumbers[i]->SetValue(0xFFFF);
             mNumbers[5 + i]->SetValue(0xFFFE);
@@ -362,7 +380,7 @@ void DinoUiPartsTeamInfo::SetTeam(u32 index) {
                 char path[256];
                 OS_SPrintf(path, "/motion/ui_reviver_medal/reviver_%03d.bin", team.slots[i]);
                 mMotions[i] = new MMotion(std::string(path), mOam, 2, 1);
-                if (GetCreatureLevel(creature) == 12) {
+                if (DinoTeamCreatureLevel(creature) == 12) {
                     mMotions[i]->Play(1, 0);
                 } else {
                     mMotions[i]->Play(2, 0);
