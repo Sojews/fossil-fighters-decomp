@@ -221,6 +221,9 @@ template std::__vec_deleter<MBackupStorage::Region, std::allocator<MBackupStorag
 template void std::__vec_deleter<MBackupStorage::File, std::allocator<MBackupStorage::File> >::sub_push_back(
     const MBackupStorage::File &x, Metrowerks::int2type<false>);
 template std::__vec_deleter<MBackupStorage::File, std::allocator<MBackupStorage::File> >::~__vec_deleter();
+template void std::__vec_deleter<MBackupStorage::Copy, std::allocator<MBackupStorage::Copy> >::append(
+    size_t n, Metrowerks::int2type<true>);
+template std::__vec_deleter<MBackupStorage::Copy, std::allocator<MBackupStorage::Copy> >::~__vec_deleter();
 
 void MBackupStorage::Mount() {
     mMountTried = TRUE;

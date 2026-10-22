@@ -740,6 +740,10 @@ namespace std {
         }
 
         void construct_at_end(size_t n) {
+            construct_at_end(n, Metrowerks::int2type<TAG_UNK>());
+        }
+
+        void construct_at_end(size_t n, Metrowerks::int2type<TAG_UNK>) {
             for (pointer p = _Base::data_ + start_ + _Base::size_; n; n--, p++, _Base::size_++) {
                 _Base::alloc().construct(p, T());
             }
