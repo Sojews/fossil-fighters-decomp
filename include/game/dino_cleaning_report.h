@@ -22,8 +22,9 @@ public:
     void State0215670c();
     void State02156808();
     // Shows message id (formatted with arg) with the choices, the answer going to result.
-    void ShowMessage(u32 id, const std::string &arg, u32 *result, const std::string &a, const std::string &b,
-                     const std::string &c, const std::string &d);
+    void ShowMessage(u32 id, const std::string &arg = "", u32 *result = NULL, const std::string &a = "",
+                     const std::string &b = "", const std::string &c = "", const std::string &d = "");
+    class DinoCleaning *GetCleaning() { return (class DinoCleaning *)mUnk7C; }
 
     void (DinoCleaningReport::*mState)(); // 0x74
     u32 mUnk7C;             // 0x7C
