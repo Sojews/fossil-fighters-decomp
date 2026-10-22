@@ -1,5 +1,7 @@
 // The 3D resources: the 3D heap, the model, animation and texture caches, and M3DModelResource.
 
+#pragma ipa file
+
 #include <ctype.h>
 #include <map>
 #include <scanf.h>
@@ -44,9 +46,10 @@ typedef std::map<MArchiveFile, M3DTexEntry> M3DTexCache;
 
 static MHeap *sHeap;
 // NONMATCHING (__sinit): the game constructs the model cache, the anim cache, then the texture cache (in this layout).
+// (In this order, the file's ipa pools them where the game has them.)
+static M3DCache sAnimCache;
 static M3DTexCache sTexCache;
 static M3DCache sModelCache;
-static M3DCache sAnimCache;
 static MMutex sMutex;
 
 // Holds the caches' mutex for the rest of the scope.
