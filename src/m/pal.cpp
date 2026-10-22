@@ -133,7 +133,8 @@ void MPalAnime::AddFrame(const u16 *data) {
     frame.data = data;
     frame.owned = FALSE;
     frame.color = 0;
-    mFrames.push_back(frame);
+    const Frame &f = frame;
+    mFrames.push_back(f);
     mSteps = (mFrames.size() - 1) * 32 + 1;
 }
 
@@ -142,7 +143,8 @@ void MPalAnime::AddColor(u16 color) {
     frame.data = NULL;
     frame.owned = FALSE;
     frame.color = color;
-    mFrames.push_back(frame);
+    const Frame &f = frame;
+    mFrames.push_back(f);
     mSteps = (mFrames.size() - 1) * 32 + 1;
 }
 
