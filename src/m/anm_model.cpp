@@ -225,16 +225,13 @@ void MAnmModelBase::TintPalette(u16 color, fx32 amount) {
     int r = (color & 0x1F) * amount;
     int g = ((color >> 5) & 0x1F) * amount;
     int b = ((color >> 10) & 0x1F) * amount;
-    fx32 keep = 0x1000 - amount;
+    amount = 0x1000 - amount;
     for (u32 i = 0; i < size / 2; i++) {
         u16 c = ((u16 *) palette)[i];
         int cr = c & 0x1F;
         int cg = (c >> 5) & 0x1F;
         int cb = (c >> 10) & 0x1F;
-        cr = (cr * keep + r) >> 12;
-        cg = (cg * keep + g) >> 12;
-        cb = (cb * keep + b) >> 12;
-        tinted[i] = cr | (cg << 5) | (cb << 10);
+        tinted[i] = (((cb * amount + b) >> 12) << 10) | ((((cg * amount + g) >> 12) << 5) | ((cr * amount + r) >> 12));
     }
     mScene->LoadPltt(plttKey, tinted);
     mScene->QueueE8(NULL, (u32) tinted);
