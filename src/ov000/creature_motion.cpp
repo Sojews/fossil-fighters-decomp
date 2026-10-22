@@ -33,6 +33,10 @@
 CreatureMotion::~CreatureMotion() {
 }
 
+// (Emitted here, with the vtable and the OnMessage thunk.)
+DinoBattleViewCreature::~DinoBattleViewCreature() {
+}
+
 NopTask::~NopTask() {
 }
 

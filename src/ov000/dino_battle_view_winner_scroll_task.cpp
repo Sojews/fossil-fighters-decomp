@@ -43,6 +43,10 @@
 #include "game/dino_battle_view_kaseki_point.h"
 #include "game/dino_battle_view_ability_text_window.h"
 
+// (Emitted here, with the vtable and the OnMessage thunk.)
+DinoBattleViewField::~DinoBattleViewField() {
+}
+
 DinoBattleViewWinnerScrollTask::~DinoBattleViewWinnerScrollTask() {
     if (!mUnk78) {
         DinoSoundPlaySe(0x74, 0);

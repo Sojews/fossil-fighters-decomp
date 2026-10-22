@@ -13,9 +13,6 @@
 #include "game/view_status_effect_icon.h"
 #include "game/dino_battle_view_lifebar.h"
 
-DinoBattleViewCreature::~DinoBattleViewCreature() {
-}
-
 void CreatureMotion::Unk44(int arg) {
     switch (arg) {
     case 1:

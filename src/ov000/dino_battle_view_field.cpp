@@ -17,9 +17,6 @@
 #include "m/smart_oam.h"
 #include "m/lcd.h"
 
-DinoBattleViewField::~DinoBattleViewField() {
-}
-
 static inline const MPoint *DinoFieldPoints() {
     const DinoBattleAdjustDefs *defs = gDinoResource->GetBattleAdjustDefs();
     return (const MPoint *)((const u8 *)defs + defs->fieldPoints);
