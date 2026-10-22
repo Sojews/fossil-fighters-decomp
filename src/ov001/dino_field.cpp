@@ -336,7 +336,8 @@ DinoFieldChara *DinoField::GetChara(u32 id) {
 }
 
 // (The game calls even the inline MFx32 operators here, and keeps their copies after this function.)
-// NONMATCHING: the logic is the game's, but not the temporaries' stack slots or the skip test's branches.
+// NONMATCHING: 99.995%, the game's call to MFx32Point's implicit copy constructor resolves to its in-file copy, ours to a
+// separate (weak) one.
 #pragma dont_inline on
 
 MFx32Point DinoField::ResolveMove(DinoFieldChara *chara, MFx32Point move) {
@@ -348,9 +349,19 @@ MFx32Point DinoField::ResolveMove(DinoFieldChara *chara, MFx32Point move) {
     }
     for (u32 i = 0; i < 100; i++) {
         DinoFieldChara *other = mCharas[i];
-        if (other->GetModel()->id == 0 || other == chara || other->GetHeight() == MFx32(0) ||
-            (focus == chara->GetModel()->id && other->GetTask()->unk4 == 1) ||
-            (focus == other->GetModel()->id && chara->GetTask()->unk4 == 1)) {
+        if (other->GetModel()->id == 0) {
+            continue;
+        }
+        if (other == chara) {
+            continue;
+        }
+        if (other->GetHeight() == MFx32(0)) {
+            continue;
+        }
+        if (focus == chara->GetModel()->id && other->GetTask()->unk4 == 1) {
+            continue;
+        }
+        if (focus == other->GetModel()->id && chara->GetTask()->unk4 == 1) {
             continue;
         }
         if (other->GetUnk2C() == 0) {
@@ -361,7 +372,7 @@ MFx32Point DinoField::ResolveMove(DinoFieldChara *chara, MFx32Point move) {
                 result += d / len * (r - len);
             }
         } else {
-            MFx32Circle circle(result.x, result.y, chara->GetHeight());
+            MFx32Circle circle(result, chara->GetHeight());
             MFx32Rect rect = other->GetRect30() + other->GetModel()->pos;
             if (circle.Overlaps(rect)) {
                 result += rect.PushOut(circle);

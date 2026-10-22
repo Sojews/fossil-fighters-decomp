@@ -184,9 +184,9 @@ inline MFx32 MFx32Point::Length() const {
 }
 
 struct MFx32Circle {
-    MFx32Circle(MFx32 x_, MFx32 y_, MFx32 r_) {
-        x = x_;
-        y = y_;
+    MFx32Circle(MFx32Point center, MFx32 r_) {
+        x = center.x;
+        y = center.y;
         r = r_;
     }
 
