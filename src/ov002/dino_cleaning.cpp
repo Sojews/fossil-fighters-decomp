@@ -144,13 +144,12 @@ extern "C" struct {
 } data_ov002_02165854;
 extern "C" void func_ov002_0215a7b4(DinoCleaningImageView *view);
 
-// Knocks out the top rock's cells left with no top rock around them (where either rock is through already), then
+// Knocks out the top rock's cells left with no top rock around them (where the rock below is through already), then
 // refreshes the view.
-// NONMATCHING: 99.97%, the game's second test branches past the "i = 0" it shares with the first.
 extern "C" void func_ov002_0215fdec(DinoCleaningKasekiRock *rock) {
     for (int col = data_ov002_02165854.mBounds.left; col < data_ov002_02165854.mBounds.right; col++) {
         for (int row = data_ov002_02165854.mBounds.top; row < data_ov002_02165854.mBounds.bottom; row++) {
-            if (rock->mRock90->GetCellLayer(col, row) == 0 || rock->mRock8C->GetCellLayer(col, row) == 0) {
+            if (rock->mRock90->GetCellLayer(col, row) != 0 && rock->mRock8C->GetCellLayer(col, row) == 0) {
                 for (u32 i = 0; i < 6; i++) {
                     MPoint n = GetNeighbour(MPoint(col, row), i);
                     if (rock->mRock90->GetCellLayer(n.x, n.y) != 0) {
