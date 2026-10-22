@@ -378,7 +378,7 @@ struct DinoCreatureStats {
     int hp;         // 0x00
     int stats[5];   // 0x04
 };
-extern "C" DinoCreatureStats func_02030f38(const DinoCreatureStatsInput *info, BOOL fixed, fx32 fraction);
+extern "C" DinoCreatureStats func_02030f38(const DinoCreatureStatsInput *info, BOOL fixed, MFx32 fraction);
 extern "C" const char data_ov003_02160c38[];
 
 void DinoUiRvInformation::ShowStatusPage() {
@@ -407,7 +407,7 @@ void DinoUiRvInformation::ShowStatusPage() {
             info.bonus[i] = body->parts[i].unk12;
             info.levels[i] = body->parts[i].level;
         }
-        DinoCreatureStats stats = func_02030f38(&info, mUnk1B1, mUnk1B4.v);
+        DinoCreatureStats stats = func_02030f38(&info, mUnk1B1, mUnk1B4);
         mNumbersBC[0]->SetValue((u16)stats.hp);
         mNumbersBC[1]->SetValue((u16)GetCreatureLevel(*(const DinoCreatureState *)&mInfo));
         mNumbersBC[2]->SetValue((u16)stats.stats[0]);
@@ -520,7 +520,7 @@ void DinoUiRvInformation::ShowAttackPage() {
                     info.bonus[i] = parts->parts[i].unk12;
                     info.levels[i] = parts->parts[i].level;
                 }
-                DinoCreatureStats stats = func_02030f38(&info, FALSE, 0);
+                DinoCreatureStats stats = func_02030f38(&info, FALSE, MFx32::FromRaw(0));
                 mNumbers12C[row]->SetValue((u16)(power + stats.stats[0]));
             } else {
                 mNumbers12C[row]->SetValue(0xFFFF);
