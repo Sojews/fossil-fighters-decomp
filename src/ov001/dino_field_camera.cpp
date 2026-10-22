@@ -328,7 +328,7 @@ void DinoFieldCamera::IdleUnk0() {
         DinoFieldMapCircle *circle = mField->GetMap()->GetCircle(mUnkFC);
         MFx32Point c = ToFx32Point(MPoint(circle->x, circle->y));
         MFx32 d = (mFocusPos - c).Length();
-        if (d > MFx32(circle->radius)) {
+        if (d.v > MFx32(circle->radius).v) {
             mUnkFC = mField->GetMap()->FindCircle(mFocusPos);
         }
     } else {

@@ -5,11 +5,16 @@
 #include "m/fx32.h"
 
 // How far the field's lines sway (set elsewhere).
-extern "C" MFx32 data_020b5ac4;
+extern "C" const MFx32 data_020b5ac4;
 
 // The sine of the phase's place in the period, doubled.
 static inline MFx32 Wave(u32 phase, u32 period) {
     return MFx32::FromRaw(FX_SinIdx((u16)((phase << 16) / period))) * MFx32(2);
+}
+
+// The value with its fraction cut off.
+static inline MFx32 Floor(MFx32 x) {
+    return MFx32::FromRaw(x.v & 0xFFFFF000);
 }
 
 DinoFieldRaster::DinoFieldRaster(u32 arg) : MProcess(NULL) {
@@ -23,15 +28,15 @@ DinoFieldRaster::~DinoFieldRaster() {
 }
 
 // Sways each line by three waves.
-// NONMATCHING: the temporaries' stack slots, and when the line pointer and the sway amount are loaded.
+// NONMATCHING: 99.8, the dead temporaries the waves leave sit in other stack slots.
 void DinoFieldRaster::Idle() {
     u32 t = ++mFrame / 2;
     u16 *line = (u16 *)mIO->mBack;
     for (u32 i = 0; i < M_RASTER_LINES; i++) {
         MFx32 sway = Wave(t + i, 50) + Wave(t * 2 + i, 100) + Wave(t * 3 + i, 200);
-        line[0] = MFx32ToInt(MFx32::FromRaw(sway.v & 0xFFFFF000) * data_020b5ac4);
-        line[1] = 0;
-        line += 2;
+        sway = Floor(sway);
+        line[i * 2] = MFx32ToInt(sway * data_020b5ac4);
+        line[i * 2 + 1] = 0;
     }
     mIO->Flip();
 }
