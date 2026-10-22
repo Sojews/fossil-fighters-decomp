@@ -1,5 +1,7 @@
 // MMultiPlay: wireless play over the WM library, and the tasks that wrap its steps.
 
+#pragma ipa file
+
 #include "m/multi_play.h"
 #include "m/irq.h"
 #include "m/dma.h"
@@ -17,7 +19,7 @@ static struct {
     MMultiPlay *instance;
 } sMultiPlay;
 
-static const struct {
+struct MMultiPlayParams {
     u32 unk00;
     u32 maxSharedDataSize;
     const char *wirelessIconPath;
@@ -25,10 +27,21 @@ static const struct {
     u32 unk10;
     u32 unk14;
     const char *sendIconPath;
-} sParams = {
-    0, 0x200, "m2:/motion/mp_wireless_icon.bin", "m2:/motion/mp_link_white.bin", 0x200, 15,
-    "m2:/motion/mp_send_icon.bin",
 };
+// The TU's pool (left in the game's data: defined here, the file's ipa would fold the parameters into the code): the
+// parameters, {0, 0x200, "m2:/motion/mp_wireless_icon.bin", "m2:/motion/mp_link_white.bin", 0x200, 15,
+// "m2:/motion/mp_send_icon.bin"}, then the pointer-to-member constants the driver tasks copy their next steps from
+// (see menu.cpp).
+extern "C" struct {
+    MMultiPlayParams params;                                        // 0x00
+    u8 unk1C[0x24 - 0x1C];
+    void (MMultiPlayWirelessDriverStartTask::*WaitStartUp_24)();  // 0x24
+    void (MMultiPlayWirelessDriverStartTask::*StartUp_2C)();      // 0x2C
+    void (MMultiPlayWirelessDriverStopTask::*WaitTerminate_34)();  // 0x34
+    u8 unk3C[0x54 - 0x3C];
+    void (MMultiPlayWirelessDriverStopTask::*Terminate_54)();      // 0x54
+} data_020c4b0c;
+#define sParams (data_020c4b0c.params)
 
 // The icons' graphics, an archive image in the game's data (not reproduced here).
 extern "C" const u8 gMultiPlayIconArchive[];
@@ -1003,16 +1016,6 @@ void MMultiPlayLinkIcon::Execute() {
     MMultiPlayIcon::Execute();
 }
 
-// The TU's pooled pointer-to-member constants the driver tasks copy their next steps from (see menu.cpp).
-extern "C" struct {
-    u8 unk00[0x24];
-    void (MMultiPlayWirelessDriverStartTask::*WaitStartUp_24)();  // 0x24
-    void (MMultiPlayWirelessDriverStartTask::*StartUp_2C)();      // 0x2C
-    void (MMultiPlayWirelessDriverStopTask::*WaitTerminate_34)();  // 0x34
-    u8 unk3C[0x54 - 0x3C];
-    void (MMultiPlayWirelessDriverStopTask::*Terminate_54)();      // 0x54
-} data_020c4b0c;
-
 void MMultiPlayWirelessDriverStartTask::WaitStartUp() {
     if (mDone) {
         Exit();
@@ -1255,5 +1258,8 @@ void MMultiPlayMessageHub::Execute() {
 #pragma auto_inline off
 // Vector instances the game emits in this file (made explicitly until the hub's send code is decompiled).
 template class std::__vec_deleter<char, std::allocator<char> >;
+template void std::__vec_deleter<MMultiPlayHubIncoming, std::allocator<MMultiPlayHubIncoming> >::sub_push_back(
+    const MMultiPlayHubIncoming &x, Metrowerks::int2type<true>);
+template std::__vec_deleter<MMultiPlayHubIncoming, std::allocator<MMultiPlayHubIncoming> >::~__vec_deleter();
 template class std::__vec_deleter<MMultiPlayHubOutgoing, std::allocator<MMultiPlayHubOutgoing> >;
 template std::__vec_deleter<MMultiPlayHubIncoming, std::allocator<MMultiPlayHubIncoming> &>::~__vec_deleter();
