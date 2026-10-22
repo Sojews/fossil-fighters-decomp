@@ -39,10 +39,14 @@ static inline const MPoint *DinoKPUpDownPoints() {
     return (const MPoint *)((const u8 *)defs + defs->kpUpDownPoints);
 }
 
-// NONMATCHING: 88%, the game recomputes the point's offset each time (ours steps it) and keeps i in a register.
+// The i-th motion's place (by value).
+static inline MPoint DinoKPUpDownPoint(u32 i) {
+    return DinoKPUpDownPoints()[i];
+}
+
 DinoBattleViewKPUpDown::DinoBattleViewKPUpDown() : MProcess(NULL) {
     for (int i = 0; i < 2; i++) {
-        KPUpDownMotion *motion = new KPUpDownMotion(DinoKPUpDownPoints()[i]);
+        KPUpDownMotion *motion = new KPUpDownMotion(DinoKPUpDownPoint(i));
         mMotions[i] = motion;
         mParallel.AddTail(motion);
     }
