@@ -958,21 +958,9 @@ void DinoCleaning::State02161f9c() {
     mState = data_ov002_02165aec.State02162cec_40;
 }
 
-// One of the best score's digits, played after the frame (waiting for it in set).
-static inline DinoSeMotion *DinoCleaningBestDigit(DinoCleaning *c, MParallelTaskSet *set, const char *path, int anime) {
-    DinoSeMotion *motion = new DinoSeMotion(std::string(path), (MSmartOam *)c->mUnkD4, 0, 1);
-    motion->AddSe(0x3C);
-    motion->GetUnit()->SetMode(1);
-    motion->Show();
-    motion->SetAnchor(1);
-    motion->SetPosition(0x80, 0x60);
-    c->mUnk13C->AddTail(motion);
-    c->mSerial.AddTail(motion->CreatePlayTransfer(anime, 0));
-    set->AddTail(motion->CreateWaitStopTask());
-    return motion;
-}
-
 // The best cleaning: paper falls, the picture drops in, zooms and shakes, then the score counts in.
+// NONMATCHING: 99.996%, the drop's first point stores its x after the second point (State02161f9c's identical call
+// stores it before).
 void DinoCleaning::State02162544() {
     mUnkE4->SetUnkA0(8, TRUE);
     if (mUnkA0 != NULL) {
@@ -1015,15 +1003,47 @@ void DinoCleaning::State02162544() {
     }
     if (mUnkCA) {
         MParallelTaskSet *set = new MParallelTaskSet(TRUE);
-        DinoCleaningBestDigit(this, set, data_ov002_021659ec.mBestScorePath, 1);
+        DinoSeMotion *motion = new DinoSeMotion(std::string(data_ov002_021659ec.mBestScorePath), (MSmartOam *)mUnkD4, 0, 1);
+        motion->AddSe(0x3C);
+        motion->GetUnit()->SetMode(1);
+        motion->Show();
+        motion->SetAnchor(1);
+        motion->SetPosition(0x80, 0x60);
+        mUnk13C->AddTail(motion);
+        mSerial.AddTail(motion->CreatePlayTransfer(1, 0));
+        set->AddTail(motion->CreateWaitStopTask());
         u32 score = ((u32 *)mUnkA0)[0];
         if (score >= 100) {
-            DinoCleaningBestDigit(this, set, data_ov002_021659ec.mBestHundredsPath, 1);
+            motion = new DinoSeMotion(std::string(data_ov002_021659ec.mBestHundredsPath), (MSmartOam *)mUnkD4, 0, 1);
+            motion->AddSe(0x3C);
+            motion->GetUnit()->SetMode(1);
+            motion->Show();
+            motion->SetAnchor(1);
+            motion->SetPosition(0x80, 0x60);
+            mUnk13C->AddTail(motion);
+            mSerial.AddTail(motion->CreatePlayTransfer(1, 0));
+            set->AddTail(motion->CreateWaitStopTask());
         }
         if (score >= 10) {
-            DinoCleaningBestDigit(this, set, data_ov002_021659ec.mBestTensPath, score / 10 % 10 + 1);
+            motion = new DinoSeMotion(std::string(data_ov002_021659ec.mBestTensPath), (MSmartOam *)mUnkD4, 0, 1);
+            motion->AddSe(0x3C);
+            motion->GetUnit()->SetMode(1);
+            motion->Show();
+            motion->SetAnchor(1);
+            motion->SetPosition(0x80, 0x60);
+            mUnk13C->AddTail(motion);
+            mSerial.AddTail(motion->CreatePlayTransfer(score / 10 % 10 + 1, 0));
+            set->AddTail(motion->CreateWaitStopTask());
         }
-        DinoCleaningBestDigit(this, set, data_ov002_021659ec.mBestOnesPath, score % 10 + 1);
+        motion = new DinoSeMotion(std::string(data_ov002_021659ec.mBestOnesPath), (MSmartOam *)mUnkD4, 0, 1);
+        motion->AddSe(0x3C);
+        motion->GetUnit()->SetMode(1);
+        motion->Show();
+        motion->SetAnchor(1);
+        motion->SetPosition(0x80, 0x60);
+        mUnk13C->AddTail(motion);
+        mSerial.AddTail(motion->CreatePlayTransfer(score % 10 + 1, 0));
+        set->AddTail(motion->CreateWaitStopTask());
         mSerial.AddTail(set);
     }
     AddSerial(this, MCreateCallTask((DinoCleaningLive *)mUnkE4, data_ov002_02165b54.SetUnkAC_00, (u32)0x16),
