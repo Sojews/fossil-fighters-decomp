@@ -1791,7 +1791,6 @@ extern "C" struct {
     void (DinoFieldCaptureFadeInTask::*LoadField_00)();
 } data_ov001_021693bc;
 
-// NONMATCHING: the game works out the blend target (1 << bg) before fetching the bottom display (as the fade-out).
 // Brings the field back: the capture left on the top screen moves to the bottom screen and shrinks away while the field
 // reloads in the background, then the top screen fades in from black.
 void DinoFieldCaptureFadeInTask::Idle() {
@@ -1838,7 +1837,9 @@ void DinoFieldCaptureFadeInTask::Idle() {
         mField->GetCamera()->NotifyHooks1();
         gLcd->GetBottomDisplay()->mBlend->Reset();
         gLcd->GetBottomDisplay()->mBlend->SetMode(1);
-        gLcd->GetBottomDisplay()->mBlend->SetTarget1(1 << mBitmap->mBg);
+        int plane = 1 << mBitmap->mBg;
+        MBlend *blend = gLcd->GetBottomDisplay()->mBlend;
+        blend->SetTarget1(plane);
         gLcd->GetBottomDisplay()->mBlend->SetTarget2(0x3F);
         mBlack->Hide();
         mSerial.AddTail(mField->mScene->CreateWaitTransferCompleteTask(),
@@ -1859,8 +1860,7 @@ void DinoFieldCaptureFadeInTask::Idle() {
 
 // Captures the bottom screen, fades it into the top one, then closes a circle on the bottom screen and removes the
 // field's sprites.
-// NONMATCHING: the game works out the blend target (1 << bg) before fetching the bottom display, and keeps the
-// smart OAM in r6 (ours r7).
+// NONMATCHING: 99.4, the game keeps the smart OAM in r6 (ours r7) and tests it again after new.
 void DinoFieldCaptureFadeOutTask::Idle() {
     switch (mStep++) {
     case 0:
@@ -1887,7 +1887,9 @@ void DinoFieldCaptureFadeOutTask::Idle() {
         mBitmap->Show();
         gLcd->GetBottomDisplay()->mBlend->Reset();
         gLcd->GetBottomDisplay()->mBlend->SetMode(1);
-        gLcd->GetBottomDisplay()->mBlend->SetTarget1(1 << mBitmap->mBg);
+        int plane = 1 << mBitmap->mBg;
+        MBlend *blend = gLcd->GetBottomDisplay()->mBlend;
+        blend->SetTarget1(plane);
         gLcd->GetBottomDisplay()->mBlend->SetTarget2(0x3F);
         mSerial.AddTail((new MParallelTaskSet(TRUE))
                             ->Add(gLcd->GetTopDisplay()->mBright->CreateFadeOutToBlack(10, 0))
