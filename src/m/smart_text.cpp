@@ -9,7 +9,7 @@
 
 TextPattern::TextPattern(const u16 *src, MPoint srcSize, MPoint dst, int tile, int palette, bool hflip, bool vflip)
     : Item(MRect(dst.x, dst.y, dst.x + srcSize.x, dst.y + srcSize.y)), mSrc(src), mSrcSize(srcSize),
-      mOffset(-dst.x, -dst.y), mTile(tile), mPalette(palette), mHFlip(hflip), mVFlip(vflip) {
+      mOffset(MPoint(0, 0) - dst), mTile(tile), mPalette(palette), mHFlip(hflip), mVFlip(vflip) {
 }
 
 void TextPattern::Draw(MText *text, MRect clip) {
@@ -21,7 +21,7 @@ void TextPattern::Draw(MText *text, MRect clip) {
 }
 
 TextSequence::TextSequence(MPoint srcSize, MPoint dst, int tile, int palette, bool hflip, bool vflip)
-    : Item(MRect(dst.x, dst.y, dst.x + srcSize.x, dst.y + srcSize.y)), mSrcSize(srcSize), mOffset(-dst.x, -dst.y),
+    : Item(MRect(dst.x, dst.y, dst.x + srcSize.x, dst.y + srcSize.y)), mSrcSize(srcSize), mOffset(MPoint(0, 0) - dst),
       mTile(tile), mPalette(palette), mHFlip(hflip), mVFlip(vflip) {
 }
 
@@ -76,12 +76,12 @@ void MSmartText::Erase(MRect rect) {
 
 void MSmartText::Transfer(const u16 *src, MPoint srcSize, MPoint dst, int tile, int palette, bool hflip,
                           bool vflip) {
-    Erase(MRect(dst.x, dst.y, dst.x + srcSize.x, dst.y + srcSize.y));
+    Erase(MRect(dst, dst + srcSize));
     Add(new TextPattern(src, srcSize, dst, tile, palette, hflip, vflip));
 }
 
 void MSmartText::TransferSequence(MPoint srcSize, MPoint dst, int tile, int palette, bool hflip, bool vflip) {
-    Erase(MRect(dst.x, dst.y, dst.x + srcSize.x, dst.y + srcSize.y));
+    Erase(MRect(dst, dst + srcSize));
     Add(new TextSequence(srcSize, dst, tile, palette, hflip, vflip));
 }
 
