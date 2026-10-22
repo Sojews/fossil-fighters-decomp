@@ -690,7 +690,26 @@ struct DinoFollowDefs {
     MFx32 start;    // 0x34: how far the target must be to start following
     MFx32 keep;     // 0x38: and to keep following
     MFx32 factor;   // 0x3C: the speed per distance
+
+    MFx32 GetTrot() const { return trot; }
+    MFx32 GetRun() const { return run; }
+    MFx32 GetStart() const { return start; }
+    MFx32 GetKeep() const { return keep; }
+    MFx32 GetFactor() const { return factor; }
 };
+
+// The point's length, squaring x after y.
+static inline MFx32 DinoLength(const MFx32Point &p) {
+    MFx32 r;
+    s64 xx = p.x.v;
+    s64 yy = p.y.v;
+    *(vu16 *) 0x040002B0 = 1;
+    *(u64 *) 0x040002B8 = xx * xx + (yy * yy + 0x1000);
+    while (*(vu16 *) 0x040002B0 & 0x8000) {
+    }
+    r.v = *(vu32 *) 0x040002B4;
+    return r;
+}
 
 // Watching (mTask.unk28): turns to the camera's focus when it comes within range (w[0] around its height),
 // follows it at w[2] per second until it strays w[1] from home, waits w[4] frames, then walks home at w[3].
@@ -766,7 +785,7 @@ void DinoFieldChara::IdleNoTask() {
 
 // Following (mTask.unk8.fellow): walks after its target, faster the further it is (and only once it's far enough,
 // or a little nearer while already walking).
-// NONMATCHING: the game keeps more dead copies of the MFx32 temporaries and squares y first in Length.
+// NONMATCHING: 95%, register allocation (the game keeps the squared length's high word in r4, the defs in r6).
 void DinoFieldChara::IdleFollow() {
     if (mField->IsUnk258()) {
         return;
@@ -776,16 +795,22 @@ void DinoFieldChara::IdleFollow() {
         return;
     }
     MFx32Point d = chara->GetModel()->pos - mModel.pos;
-    MFx32 len = d.Length();
+    MFx32 len = DinoLength(d);
+    MFx32 speed;
     MFx32 walk = mField->GetMap()->GetWalkSpeed();
     const DinoFollowDefs *defs = (const DinoFollowDefs *)gDinoResource->GetExcavate78();
-    MFx32 speed;
     u32 mode;
-    if (len >= defs->start || (len >= defs->keep && (mUnk2D8.x != MFx32(0) || mUnk2D8.y != MFx32(0)))) {
-        speed = len * defs->factor * walk;
-        if (speed >= defs->run * walk) {
+    BOOL follow = FALSE;
+    if (len >= defs->GetStart()) {
+        follow = TRUE;
+    } else if (len >= defs->GetKeep() && (mUnk2D8.x != MFx32(0) || mUnk2D8.y != MFx32(0))) {
+        follow = TRUE;
+    }
+    if (follow) {
+        speed = len * defs->GetFactor() * walk;
+        if (speed >= defs->GetRun() * walk) {
             mode = 3;
-        } else if (speed >= defs->trot * walk) {
+        } else if (speed >= defs->GetTrot() * walk) {
             mode = 2;
         } else {
             mode = 1;
@@ -837,7 +862,7 @@ static inline MFx32Point RegionCenterFx(DinoRegionCenter p) {
 
 // Patrolling (mTask.unk8.patrol): waits w[0] to w[1] frames, then walks at w[2] per second to the center of the next
 // region in its list.
-// NONMATCHING: the game squares d.y before d.x in the first Length (ours flips them, with the sum shared by both).
+// NONMATCHING: 98.8, the squared length's sum is kept in other registers.
 void DinoFieldChara::IdlePatrol() {
     if (mField->IsUnk258() || Unk02162154()) {
         return;
@@ -859,7 +884,7 @@ void DinoFieldChara::IdlePatrol() {
     }
     MFx32Point d = mHome - mModel.pos;
     MFx32 speed = MFx32::FromRaw((s32)mTask.unk8.patrol.w[2] / 60);
-    if (d.Length() <= speed.Times(MFx32(10))) {
+    if (DinoLength(d) <= speed.Times(MFx32(10))) {
         SetMotion(1, 1, MFx32(1));
         mUnkC0 = mTask.unk8.patrol.w[0] + MFx32ToInt(MFx32(mTask.unk8.patrol.w[1] - mTask.unk8.patrol.w[0]) *
                                                      gDinoResource->GetRandom()->NextFraction());
