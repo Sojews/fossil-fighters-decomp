@@ -3,6 +3,7 @@
 
 #pragma ipa file
 
+#include <typeinfo>
 #include "game/dino_ui_rv_information3d_model.h"
 #include "game/dino_ui_rv_information3d_model_rotate.h"
 #include "m/bg_new_task.h"
@@ -73,7 +74,7 @@ DinoUiRvInformation3DModel::DinoUiRvInformation3DModel() : MProcess(NULL) {
 extern "C" void G3X_Reset();
 #define DINO_TOUCH_BUTTON 0x1000   // the touch screen in MInput's buttons
 #define REG_G3_SWAP_BUFFERS (*(volatile u32 *) 0x04000540)
-extern "C" u32 data_ov003_021607e0[];           // the TU's pooled statics (+0x6C: the model's touch area)
+// The TU's pooled statics start at the model's typeinfo (+0x6C: the model's touch area).
 // The TU's pooled statics.
 extern "C" struct DinoRvInformation3DModelStatics {
     u32 unk00;
@@ -103,7 +104,7 @@ void DinoUiRvInformation3DModel::SetUnk84(u32 value) {
 void DinoUiRvInformation3DModel::Idle() {
     if (!mTasks->IsEmpty()) {
         if (gCurrentDisplay == gLcd->GetBottomDisplay() && (mInput->GetPressed() & DINO_TOUCH_BUTTON) &&
-            DINO_POOL(MRect, data_ov003_021607e0, 0x6C).Contains(mInput->GetTouchPos())) {
+            DINO_POOL(MRect, *(u32 *)&typeid(DinoUiRvInformation3DModel), 0x6C).Contains(mInput->GetTouchPos())) {
             mTouch = mInput->GetTouchPos();
             mDragging = TRUE;
             mUnkA8 = mUnkAC = 0;
@@ -898,7 +899,7 @@ static struct DinoUiRvInformation3dModelStaticInit {
         DINO_POOL_WORD(data_ov003_021606e0, 0x28) = 104;
         DINO_POOL_WORD(data_ov003_02160660, 0x24) = 128;
         DINO_POOL_WORD(data_ov003_02160660, 0x28) = 152;
-        DINO_POOL_WORD(data_ov003_021607e0, 0x7c) = 128;
+        DINO_POOL_WORD(*(u32 *)&typeid(DinoUiRvInformation3DModel), 0x7c) = 128;
         DINO_POOL_WORD(data_ov003_02160860, 0x0) = 56;
         DINO_POOL_WORD(data_ov003_02160860, 0x4) = 128;
         DINO_POOL_WORD(data_ov003_02160860, 0x8) = 104;
@@ -948,9 +949,9 @@ static struct DinoUiRvInformation3dModelStaticInit {
         DINO_POOL_WORD(data_ov003_021606e0, 0x58) = 102;
         DINO_POOL_WORD(data_ov003_021606e0, 0x6c) = 60;
         DINO_POOL_WORD(data_ov003_021606e0, 0x70) = 146;
-        DINO_POOL_WORD(data_ov003_021607e0, 0x6c) = 157;
-        DINO_POOL_WORD(data_ov003_021607e0, 0x70) = 31;
-        DINO_POOL_WORD(data_ov003_021607e0, 0x74) = 256;
-        DINO_POOL_WORD(data_ov003_021607e0, 0x78) = 100;
+        DINO_POOL_WORD(*(u32 *)&typeid(DinoUiRvInformation3DModel), 0x6c) = 157;
+        DINO_POOL_WORD(*(u32 *)&typeid(DinoUiRvInformation3DModel), 0x70) = 31;
+        DINO_POOL_WORD(*(u32 *)&typeid(DinoUiRvInformation3DModel), 0x74) = 256;
+        DINO_POOL_WORD(*(u32 *)&typeid(DinoUiRvInformation3DModel), 0x78) = 100;
     }
 } sDinoUiRvInformation3dModelStaticInit;
