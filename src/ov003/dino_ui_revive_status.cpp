@@ -187,6 +187,8 @@ extern "C" struct {
     u8 unk00[0x54];
     void (DinoUiReviveEffect::*State0215e9e8_54)(); // 0x54
     void (DinoUiReviveStatus::*State_5C)();    // 0x5C
+    u8 unk64[0x74 - 0x64];
+    void (DinoUiReviveEffect::*CheckSkip2_74)();    // 0x74
 } data_ov003_02161da0;
 
 // MPoint::MPoint(int, int) by its linker name: constructs the game's local statics at their known addresses (placement
@@ -616,6 +618,13 @@ void DinoUiReviveEffect::State0215e220() {
 
 extern "C" const char data_ov003_021624a0[];  // the flash
 
+// Lets the old motion go after a while.
+static inline void DinoReviveLetGo(DinoUiReviveStatusParts *parts, MMotion *old) {
+    MSerialTaskSet *serial = new MSerialTaskSet(TRUE);
+    parts->mParallel.AddTail(serial);
+    serial->Add(new MTimer(DinoReviveFrames(120)))->Add(MTaskExitTransfer::Create(old));
+}
+
 // Makes the part's motion again (when it's shown), letting the old one go after a while.
 static inline void DinoReviveRemake(DinoUiReviveStatusParts *parts) {
     if (!parts->mMotion->IsHidden()) {
@@ -629,9 +638,7 @@ static inline void DinoReviveRemake(DinoUiReviveStatusParts *parts) {
         parts->mMotion->Play(!parts->mUnk95 ? 1 : 2, 0);
         parts->mMotion->SetPosition(parts->mPos);
         parts->mParallel.AddTail(parts->mMotion);
-        MSerialTaskSet *serial = new MSerialTaskSet(TRUE);
-        parts->mParallel.AddTail(serial);
-        serial->Add(new MTimer(DinoReviveFrames(120)))->Add(MTaskExitTransfer::Create(old));
+        DinoReviveLetGo(parts, old);
     }
 }
 
@@ -657,7 +664,6 @@ static inline MTask *DinoReviveParts(DinoUiReviveStatusParts *parts, u32 level, 
 }
 
 // Brings the part back (see DinoReviveParts), then flashes the top screen.
-// NONMATCHING: 99.8%, two registers swap in DinoReviveRemake (the game's serial set takes r5, its timer r4).
 void DinoUiReviveEffect::State0215e274() {
     DinoSoundPlaySe(0x7F, 0);
     bool flag = mUnkAC.parts[mUnkC8].unk19;
@@ -720,6 +726,28 @@ void DinoUiReviveEffect::State0215ec2c() {
         mSerial.AddTail(new DinoEventTalkWindow(gCurrentDisplay, text, 0, 0));
     }
     mState = data_ov003_02161d20.State0215da04_EC;
+}
+
+static inline bool DinoReviveHasHead(const DinoCreatureState *creature) {
+    return creature->parts[0].level != 0;
+}
+
+// Brings the next part back (with a sound for whether the creature's level went up), letting a button skip after.
+void DinoUiReviveEffect::State0215ee24() {
+    if (DinoReviveHasHead(&mCreature)) {
+        if (DinoGetCreatureLevel(&mCreature) == DinoGetCreatureLevel(&mUnkAC)) {
+            DinoSoundPlaySe(0x80, 0);
+        } else {
+            DinoSoundPlaySe(0x571, 0);
+        }
+    } else {
+        GetSerial()->AddTail(DinoSoundCreateStopSeTask(0x80, 5), new MTimer(5), DinoSoundCreatePlaySeTask(0x80, 0));
+    }
+    bool flag = mUnkAC.parts[mUnkC8].unk19;
+    u32 level = mUnkAC.parts[mUnkC8].level;
+    DinoUiReviveStatusParts *parts = mStatus->GetParts(mUnkC8);
+    mEffectTasks->AddTail(DinoReviveParts(parts, level, flag));
+    mState = data_ov003_02161da0.CheckSkip2_74;
 }
 
 // Scrolls the picture up from a random place across, with a sound on the way.
