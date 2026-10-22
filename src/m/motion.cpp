@@ -874,21 +874,24 @@ void MMotion::SetAnimeState(int index, int a, int b) {
     mUnk64[index].Set(a, b);
 }
 
+// Puts the cell's entry in the OBJ mode and sizes it (double-size affine cells cover twice the shape).
+static inline void SetEntryMode(MSmartOamCell *entry, int mode) {
+    entry->objMode = mode;
+    if (mode != 3) {
+        int shape = entry->GetShape();
+        entry->width = gObjSizes[0][shape].x;
+        entry->height = gObjSizes[0][shape].y;
+    } else {
+        int shape = entry->GetShape();
+        entry->width = gObjSizes[0][shape].x * 2;
+        entry->height = gObjSizes[0][shape].y * 2;
+    }
+}
+
 void MMotion::ShowCell(int cell) {
     mCells[cell].visible = TRUE;
     if (!mHidden) {
-        MSmartOamCell *entry = &mEntries[mCells[cell].entry];
-        int mode = mCells[cell].objMode;
-        entry->objMode = mode;
-        if (mode != 3) {
-            int shape = entry->GetShape();
-            entry->width = gObjSizes[0][shape].x;
-            entry->height = gObjSizes[0][shape].y;
-        } else {
-            int shape = entry->GetShape();
-            entry->width = gObjSizes[0][shape].x * 2;
-            entry->height = gObjSizes[0][shape].y * 2;
-        }
+        SetEntryMode(GetCellEntry(cell), mCells[cell].objMode);
     }
 }
 
@@ -960,16 +963,20 @@ void MMotion::SetCellAttr(int cell, int attr) {
     entry->unk0C = oy + mUnk50;
 }
 
+// The rect's corners as plain words (a block copy, unlike MRect's member-wise one).
+struct MMotionCellRect {
+    int left, top, right, bottom;
+};
+
 void MMotion::SetCellRect(int cell, MRect rect) {
-    MRect r = rect;
-    MRect *p = &r;
+    MMotionCellRect r = *(MMotionCellRect *) &rect;
     if (mUnk2B) {
-        p->left = -p->left;
-        p->top = -p->top;
+        r.left = -r.left;
+        r.top = -r.top;
     }
     if (mUnk2C) {
-        p->right = -p->right;
-        p->bottom = -p->bottom;
+        r.right = -r.right;
+        r.bottom = -r.bottom;
     }
     s16 *params = (s16 *) mAffines[cell]->addr;
     params[3] = r.left >> 4;
