@@ -125,7 +125,7 @@ MTask *MBlend::CreateCrossFadeOutTask(int planes, u32 duration, int ease) {
 
 void MBlendAlphaRatioAnime::Apply(int step) {
     MPointAnime::Apply(step);
-    mBlend->SetAlpha(mValue.x, mValue.y);
+    mBlend->SetAlpha(GetValue().x, GetValue().y);
 }
 
 void MBlendFadeRatioAnime::Apply(int step) {

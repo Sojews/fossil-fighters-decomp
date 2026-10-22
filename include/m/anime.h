@@ -62,6 +62,7 @@ class MPointAnime : public MAnime {
 public:
     MPointAnime(MPoint from, MPoint to);
     virtual void Apply(int step);
+    MPoint GetValue() const { return mValue; }
 
     MPoint mValue;  // 0x30
     MPoint mFrom;   // 0x38
