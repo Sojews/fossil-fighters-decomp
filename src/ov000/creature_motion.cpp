@@ -1312,7 +1312,8 @@ extern "C" MMotion *func_ov000_02173d64(MSmartOam *oam, const std::string &name,
 }
 
 static inline int DinoLerp(int from, int to, int t, int n) {
-    return from + (to - from) * t / n;
+    int d = to - from;
+    return from + d * t / n;
 }
 
 static inline fx32 DinoFxMul(fx32 a, fx16 b) {
@@ -1320,18 +1321,18 @@ static inline fx32 DinoFxMul(fx32 a, fx16 b) {
 }
 
 // Moves the motion from mFrom to mTo, wobbling around the way (the wobble grows for a second, then shrinks).
-// NONMATCHING: 92%, the game spills the duration (ours spills the start's y).
 void ShuffleMoveTask::Execute() {
     u32 frame = ++mFrame;
-    if (frame >= mDuration) {
+    int duration = mDuration;
+    if (frame >= duration) {
         mMotion->SetPosition(mTo);
         Exit();
         return;
     }
     int fromY = mFrom.y;
     int fromX = mFrom.x;
-    int y = DinoLerp(fromY, mTo.y, frame, mDuration);
-    int x = DinoLerp(fromX, mTo.x, frame, mDuration);
+    int y = DinoLerp(fromY, mTo.y, frame, duration);
+    int x = DinoLerp(fromX, mTo.x, frame, duration);
     if (mRadius != 0 || frame < 60) {
         mRadius += frame < 60 ? 0xC00 : -0xC00;
     }
