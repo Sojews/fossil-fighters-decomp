@@ -468,7 +468,9 @@ static struct ViewStatusEffectIconStaticInit {
         DINO_POOL_WORD(data_ov000_021952b4, 0x58) = DINO_POOL_WORD(data_ov000_02195234, 0x20);
         DINO_POOL_WORD(data_ov000_021952b4, 0x60) = DINO_POOL_WORD(data_ov000_02195234, 0x24);
         DINO_POOL_WORD(data_ov000_021952b4, 0x68) = DINO_POOL_WORD(data_ov000_02195234, 0x14);
-        DINO_POOL_WORD(data_ov000_021952b4, 0x70) = DINO_POOL_WORD(data_ov000_02195234, 0x10);
-        DINO_POOL_WORD(data_ov000_021952b4, 0x78) = DINO_POOL_WORD(data_ov000_02195234, 0x28);
+        s32 last0 = DINO_POOL_WORD(data_ov000_02195234, 0x10);
+        s32 last1 = DINO_POOL_WORD(data_ov000_02195234, 0x28);
+        DINO_POOL_WORD(data_ov000_021952b4, 0x70) = last0;
+        DINO_POOL_WORD(data_ov000_021952b4, 0x78) = last1;
     }
 } sViewStatusEffectIconStaticInit;
