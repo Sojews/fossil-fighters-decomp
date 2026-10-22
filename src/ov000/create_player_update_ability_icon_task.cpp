@@ -1,5 +1,7 @@
 // CreatePlayerUpdateAbilityIconTask.
 
+#pragma ipa file
+
 // Derived destructors have their bases' destructor bodies inlined; auto-inlining the ones defined above does that.
 #pragma auto_inline on
 
@@ -1581,6 +1583,8 @@ MTask *DinoBattleModelPlayer::CreateLcdFadeTask(BOOL clearIcons) {
     return set;
 }
 
+// NONMATCHING since the file went to #pragma ipa file (which matches its vector members and CurveRatio): the inlined
+// push_back's two tag temporaries take each other's byte slots.
 // The same with one target (or none: the attacker's own).
 void DinoBattleModelPlayer::AddAbilitySequence(MTaskSet *set, u32 a, u32 b, u32 attacker, void *target, u8 recolor) {
     std::vector<void *> targets;
@@ -2457,6 +2461,8 @@ void DinoBattleModelPlayer::OnMessage(MMessage *msg) {
 }
 
 // Collects the ids of both players' creatures (either player may be missing).
+// NONMATCHING since the file went to #pragma ipa file (which matches its vector members and CurveRatio): the inlined
+// push_back's two tag temporaries take each other's byte slots.
 void DinoCollectCreatureIds(std::vector<void *> &ids, DinoBattleModelPlayer *first, DinoBattleModelPlayer *second) {
     for (u32 side = 0; side < 2; side++) {
         DinoBattleModelPlayer *player = side ? second : first;
@@ -3456,8 +3462,6 @@ extern "C" MFx32 func_ov000_0216ea64(DinoBattleModelCreature *creature, DinoBatt
 }
 
 // A vector member the game emits in this file (made explicitly until the code that uses it is decompiled).
-// NONMATCHING: its two int2type temporaries swap stack slots (they match with `#pragma ipa file`, which this file
-// can't take yet: three other functions stop matching).
 #pragma auto_inline off
 template void std::__vec_deleter<DinoBattlePlayerEvent, std::allocator<DinoBattlePlayerEvent> >::reallocate_clear(
     size_t n, size_t max);
