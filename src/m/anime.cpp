@@ -48,7 +48,7 @@ void MAnime::Execute() {
     last = mLastStep;
     count = mSteps;
     max = count - 1;
-    step = (int)(mFrame * max) / (int)mDuration;
+    step = (int)(max * mFrame) / (int)mDuration;
     ease = mEase;
     if (ease != 0) {
         if (ease > 10) {
