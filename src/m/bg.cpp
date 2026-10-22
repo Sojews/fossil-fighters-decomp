@@ -59,6 +59,7 @@ MBg::~MBg() {
 
 // NONMATCHING: only the stack slots of the spilled loop variables differ.
 void MBg::SetMode(int mode) {
+    u32 i;
     const Mode *newMode = &sModes[mode];
     if (newMode == mMode) {
         return;
@@ -67,7 +68,7 @@ void MBg::SetMode(int mode) {
     MScreen *screens[4];
     int from[4];
     int to[4];
-    for (u32 i = 0; i < 4; i++) {
+    for (i = 0; i < 4; i++) {
         screens[i] = NULL;
     }
     u32 n = 0;
@@ -76,7 +77,7 @@ void MBg::SetMode(int mode) {
         n = 1;
     }
     {
-        u32 i = n;
+        i = n;
         if (i < mMode->text.count) {
             int *f = from;
             int *t = to;
@@ -103,7 +104,7 @@ void MBg::SetMode(int mode) {
     }
     n = 0;
     {
-        u32 i = 0;
+        i = 0;
         if (i < mMode->affine.count) {
             int *f = &from[count];
             int *t = &to[count];
@@ -130,7 +131,7 @@ void MBg::SetMode(int mode) {
     }
     n = 0;
     {
-        u32 i = 0;
+        i = 0;
         if (i < mMode->ext.count) {
             int *f = &from[count];
             int *t = &to[count];
@@ -157,7 +158,7 @@ void MBg::SetMode(int mode) {
     }
     n = 0;
     {
-        u32 i = 0;
+        i = 0;
         if (i < mMode->unk18.count) {
             int *f = &from[count];
             int *t = &to[count];
@@ -182,7 +183,7 @@ void MBg::SetMode(int mode) {
             } while (i < mMode->unk18.count);
         }
     }
-    for (u32 i = 0; i < 4; i++) {
+    for (i = 0; i < 4; i++) {
         mScreens[i] = screens[i];
         if (screens[i] != NULL) {
             screens[i]->SetBg(i);
