@@ -40,8 +40,8 @@ extern "C" const u32 data_0208ad9c;     // the town map's help text
 
 inline TownMapIcon::TownMapIcon(MSmartOam *oam) : MProcess(NULL) {
     for (int i = 0; i < 2; i++) {
-        MMotion *&motion = (mMotions[i] = new MMotion(std::string(data_ov001_0216a8e4.mIconPath), oam, 0, 1));
-        motion->Show();
+        mMotions[i] = new MMotion(std::string(data_ov001_0216a8e4.mIconPath), oam, 0, 1);
+        mMotions[i]->Show();
         mMotions[i]->SetPriority(3);
         mMotions[i]->SetAnchor(i);
         mMotions[i]->Play(i ? 4 : 2, 0);
@@ -50,7 +50,7 @@ inline TownMapIcon::TownMapIcon(MSmartOam *oam) : MProcess(NULL) {
     mMotions[1]->GetUnit()->SetMode(1);
 }
 
-// NONMATCHING: in the icon's loop the game keeps this + i * 4 (not &mMotions[i]) across the path string's destructor.
+// NONMATCHING: in the icon's loop the game spills this + i * 4 across the path string's destructor (ours recomputes it).
 DinoFieldTownMap::DinoFieldTownMap(DinoField *field, u32 map) : MProcess(gLcd->GetTopDisplay()) {
     mPicture = NULL;
     mField = field;

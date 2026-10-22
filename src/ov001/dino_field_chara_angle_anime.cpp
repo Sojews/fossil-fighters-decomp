@@ -722,7 +722,7 @@ BOOL DinoFieldChara::Unk02162154() {
     }
     case 1: {
         MFx32Point d = chara->GetModel()->pos - mModel.pos;
-        MFx32 speed = MFx32::FromRaw(mTask.unk28.w[2] / 60);
+        MFx32 speed = MFx32::FromRaw((s32)mTask.unk28.w[2] / 60);
         SetUnk2D8(d / d.Length() * speed, 2, MFx32(1));
         MFx32Point away = mModel.pos - mHome;
         MFx32 limit = MFx32::FromRaw(mTask.unk28.w[1]);
@@ -744,7 +744,7 @@ BOOL DinoFieldChara::Unk02162154() {
             }
         }
         MFx32Point d = mHome - mModel.pos;
-        MFx32 speed = MFx32::FromRaw(mTask.unk28.w[3] / 60);
+        MFx32 speed = MFx32::FromRaw((s32)mTask.unk28.w[3] / 60);
         MFx32 len = d.Length();
         if (len <= speed.Times(MFx32(10))) {
             SetMotion(1, 1, MFx32(1));
@@ -820,7 +820,7 @@ void DinoFieldChara::IdleWander() {
         mHome = target;
     }
     MFx32Point d = mHome - mModel.pos;
-    MFx32 speed = MFx32::FromRaw(mTask.unk8.wander.w[2] / 60);
+    MFx32 speed = MFx32::FromRaw((s32)mTask.unk8.wander.w[2] / 60);
     MFx32 len = d.Length();
     if (len <= speed.Times(MFx32(10))) {
         SetMotion(1, 1, MFx32(1));
@@ -858,7 +858,7 @@ void DinoFieldChara::IdlePatrol() {
         mHome = RegionCenterFx(gDinoResource->GetRegionCenter(mUnkC4));
     }
     MFx32Point d = mHome - mModel.pos;
-    MFx32 speed = MFx32::FromRaw(mTask.unk8.patrol.w[2] / 60);
+    MFx32 speed = MFx32::FromRaw((s32)mTask.unk8.patrol.w[2] / 60);
     if (d.Length() <= speed.Times(MFx32(10))) {
         SetMotion(1, 1, MFx32(1));
         mUnkC0 = mTask.unk8.patrol.w[0] + MFx32ToInt(MFx32(mTask.unk8.patrol.w[1] - mTask.unk8.patrol.w[0]) *

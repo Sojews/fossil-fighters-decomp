@@ -503,7 +503,9 @@ void DinoFieldCamera::Idle() {
         return;
     }
     DinoFieldCharaModel *model = chara->GetModel();
-    mFocusPos.Set(model->pos.x, model->pos.y);
+    MFx32Point &pos = model->pos;
+    mFocusPos.x = pos.x;
+    mFocusPos.y = pos.y;
     SetUnk94(mFocusPos.x.v, 0x1000, mFocusPos.y.v);
     if (changed) {
         mUnkFC = 0;
