@@ -606,10 +606,6 @@ void M3DModel::SetAnimData(void *data) {
 }
 
 // A 32-bit value stored as two halfwords.
-static inline u32 ReadU32(const u16 *p, u32 i) {
-    return (p[i + 1] << 16) | p[i];
-}
-
 // Makes the ground from the model file's grid chunk.
 void M3DModel::LoadGrid(const void *data) {
     mFlags &= ~0x100;
@@ -618,32 +614,40 @@ void M3DModel::LoadGrid(const void *data) {
     mGridUnk = ((const u32 *) data)[7];
     const u16 *cmds = (const u16 *) ((const u8 *) data + 0x28);
     int i = 0;
-    while (cmds[i] != 0xFFF) {
-        switch (cmds[i]) {
-        case 0x50: {
-            u32 len = ReadU32(cmds, i + 2);
-            i = i + 4 + (len >> 1);
-            break;
-        }
-        case 0x51: {
-            u32 len = ReadU32(cmds, i + 2);
-            i = i + 4 + (len >> 1);
-            break;
-        }
-        case 0x52: {
-            u32 len = ReadU32(cmds, i + 2);
-            i += 4;
-            mGrid->Load(&cmds[i]);
-            i += len >> 1;
-            break;
-        }
-        case 0x53:
-            i += 8;
-            break;
-        default:
-            return;
-        }
+    if (cmds[0] != 0xFFF) {
+        do {
+            switch (cmds[i]) {
+            case 0x50: {
+                i += 2;
+                u32 len = cmds[i++];
+                len |= cmds[i++] << 16;
+                i += len >> 1;
+                break;
+            }
+            case 0x51: {
+                i += 2;
+                u32 len = cmds[i++];
+                len |= cmds[i++] << 16;
+                i += len >> 1;
+                break;
+            }
+            case 0x53:
+                i += 8;
+                break;
+            case 0x52: {
+                i += 2;
+                u32 len = cmds[i++];
+                len |= cmds[i++] << 16;
+                mGrid->Load(&cmds[i]);
+                i += len >> 1;
+                break;
+            }
+            default:
+                goto done;
+            }
+        } while (cmds[i] != 0xFFF);
     }
+done:;
 }
 
 // Where the joint shows on the bottom screen (in pixels); FALSE if that's off it.
