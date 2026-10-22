@@ -358,8 +358,8 @@ namespace std {
     OutputIterator __insertion_sort_move(BidirectionalIterator first, BidirectionalIterator last,
                                          OutputIterator result, Compare &comp) {
         typedef typename iterator_traits<OutputIterator>::value_type value_type;
-        BidirectionalIterator f = first;
         __vec_iterator<value_type> last2(result.base());
+        BidirectionalIterator f = first;
         if (!(f == last)) {
             *result = *first;
             for (++f, ++last2; f != last; ++f, ++last2) {
