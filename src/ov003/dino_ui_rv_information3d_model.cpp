@@ -859,7 +859,6 @@ extern "C" u32 data_ov003_021606e0[];
 extern "C" u32 data_ov003_02160760[];
 extern "C" u32 data_ov003_02160860[];
 extern "C" u32 data_ov003_021608e0[];
-extern "C" u32 data_ov003_021607e0[];
 // NONMATCHING: several stores of reused constants are scheduled one instruction later.
 static struct DinoUiRvInformation3dModelStaticInit {
     DinoUiRvInformation3dModelStaticInit() {
