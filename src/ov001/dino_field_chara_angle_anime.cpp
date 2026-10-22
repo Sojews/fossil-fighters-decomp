@@ -713,7 +713,12 @@ static inline MFx32 DinoLength(const MFx32Point &p) {
 
 // Watching (mTask.unk28): turns to the camera's focus when it comes within range (w[0] around its height),
 // follows it at w[2] per second until it strays w[1] from home, waits w[4] frames, then walks home at w[3].
-// NONMATCHING: the frame is 8 bytes smaller (the game doesn't keep the factors of (height + range)^2 on the stack).
+// NONMATCHING: 95.6, the frame is 32 bytes smaller (the game keeps more copies of the products) and registers differ.
+// Whether d is shorter than limit.
+static inline bool DinoWithin(const MFx32Point &d, MFx32 limit) {
+    return d.x * d.x + d.y * d.y < limit * limit;
+}
+
 BOOL DinoFieldChara::Unk02162154() {
     if (!mTask.unk28.active) {
         return FALSE;
@@ -729,10 +734,11 @@ BOOL DinoFieldChara::Unk02162154() {
     switch (mModel.unk10) {
     case 0: {
         MFx32Point d = chara->GetModel()->pos - mModel.pos;
-        MFx32 range = MFx32::FromRaw(mTask.unk28.w[0]);
+        MFx32 range;
+        range.v = mTask.unk28.w[0];
         MFx32 height = chara->GetHeight();
         MFx32 limit = height + range;
-        if (d.x * d.x + d.y * d.y < limit * limit) {
+        if (DinoWithin(d, limit)) {
             mModel.unk10 = 1;
         } else {
             return FALSE;
@@ -754,10 +760,11 @@ BOOL DinoFieldChara::Unk02162154() {
     case 2: {
         if (++*(u16 *) mModel.unk14 >= mTask.unk28.w[4]) {
             MFx32Point d = chara->GetModel()->pos - mModel.pos;
-            MFx32 range = MFx32::FromRaw(mTask.unk28.w[0]);
+            MFx32 range;
+            range.v = mTask.unk28.w[0];
             MFx32 height = chara->GetHeight();
             MFx32 limit = height + range;
-            if (d.x * d.x + d.y * d.y < limit * limit) {
+            if (DinoWithin(d, limit)) {
                 mModel.unk10 = 1;
                 break;
             }
