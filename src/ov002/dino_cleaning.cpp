@@ -763,18 +763,20 @@ void DinoCleaning::State021610b0() {
 }
 
 // A random offset in [-range/2, range/2).
-static inline MFx32 RandomOffset(MRandom *random, MFx32 range) {
-    return range * random->NextFraction() - range / MFx32(2);
+// Shakes the count's text, less as its second runs out, then counts on.
+extern "C" const int data_ov002_02165a18;  // (the pool's +0x2C by its own name)
+
+// std::max on a pooled operand: its value read through the pool, the operand returned by its own symbol.
+static inline const int &DinoMaxPooled(const int &a, const int &b, const int &bNamed) {
+    return a < b ? bNamed : a;
 }
 
-// Shakes the count's text, less as its second runs out, then counts on.
-// NONMATCHING: the game loads mRandom just before each NextFraction call.
 void DinoCleaning::State02161164() {
-    MFx32 scale = MFx32(std::max((int)mUnk114 - 45, data_ov002_021659ec.mZero_2C)) / MFx32(2);
+    MFx32 scale = MFx32(DinoMaxPooled((int)mUnk114 - 45, data_ov002_021659ec.mZero_2C, data_ov002_02165a18)) /
+                  MFx32(2);
     mUnk118->Show();
-    MFx32 x = RandomOffset(mRandom, scale);
-    MFx32 y = RandomOffset(mRandom, scale);
-    mUnk118->SetPosition(MFx32ToInt(x), MFx32ToInt(y));
+    mUnk118->SetPosition(MFx32ToInt(scale * mRandom->NextFraction() - scale / MFx32(2)),
+                         MFx32ToInt(scale * mRandom->NextFraction() - scale / MFx32(2)));
     mUnk114--;
     if (mUnk114 == 0) {
         mUnk118->Exit();
