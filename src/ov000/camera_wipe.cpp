@@ -149,7 +149,7 @@ M3DFadeTask::~M3DFadeTask() {
     }
 }
 
-// NONMATCHING: 89%, register choice (the game keeps the density in r0).
+// NONMATCHING: 92%, register choice (the game keeps the density in r0 and the table in r1).
 // Steps the fog to the next density (starting from the table's), stopping at either end.
 void M3DFadeTask::Execute() {
     if (mUnk1C) {
@@ -164,6 +164,7 @@ void M3DFadeTask::Execute() {
             mUnk14 = -mUnk14;
         }
     }
+    u8 *table = data_ov000_02197934;
     int density = mUnk10 >> 12;
     mUnk10 += mUnk14;
     if (density > 127) {
@@ -173,7 +174,9 @@ void M3DFadeTask::Execute() {
         Exit();
         density = 0;
     }
-    FillFogTable(density);
+    for (int i = 0; i < 32; i++) {
+        *table++ = density;
+    }
     G3X_SetFog(TRUE, 0, 0, 0);
     *(vu32 *)0x04000358 = 0x1F << 16;
     G3X_SetFogTable((const u32 *)data_ov000_02197934);
