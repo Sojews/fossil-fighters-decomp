@@ -5,8 +5,7 @@
 // NONMATCHING: the constructors of DinoUiFieldMenuNumber, DinoUiFieldMenuFraction4 and DinoUiPartsTeamTech (the game
 // keeps this + i * 4 in a stack slot across the first string temporary's destructor), DinoUiFieldMenuNumber3,
 // DinoUiPartsNumber8, DinoUiPartsReviverName, DinoUiPartsRockName and DinoUiPartsTeamIndicator (the game loads
-// gCurrentDisplay after copying the canvas size), DinoUiPartsReviverName::SetCreature (the game takes the length
-// limit's address from its own literal) and DinoUiPartsKasekiButton::Setup (four stack slots in another order).
+// gCurrentDisplay after copying the canvas size) and DinoUiPartsKasekiButton::Setup (four stack slots in another order).
 
 // Derived destructors have their bases' destructor bodies inlined; auto-inlining the ones defined above does that.
 #pragma auto_inline on
@@ -873,13 +872,19 @@ DinoUiPartsReviverName::DinoUiPartsReviverName() : MProcess(NULL) {
 }
 #pragma opt_common_subs reset
 
+// std::min on a pooled operand: its value read through the pool, the operand returned by its own symbol.
+extern "C" const u8 data_ov003_02160c62;
+static inline const u8 &DinoMinPooled(const u8 &a, const u8 &b, const u8 &bNamed) {
+    return b < a ? bNamed : a;
+}
+
 void DinoUiPartsReviverName::SetCreature(u32 id) {
     std::string name(gDinoResource->GetCreatureText08(id));
     mText->SetText(std::string(name));
     MPoint size = mFont->MeasureText(name, 0, 0);
     u8 length = (size.x + 7) / 8;
-    // The longest plate (16 letters) is a constant in the file's data.
-    mLength = std::min(length, ((const u8 *)data_ov003_02160c60)[2]);
+    // The longest plate (16 letters) is a constant in the file's data (pooled at data_ov003_02160c60 + 2).
+    mLength = DinoMinPooled(length, ((const u8 *)data_ov003_02160c60)[2], data_ov003_02160c62);
     mMotion->Hide();
     mText->Hide();
     mLeft = mLength + 15;
