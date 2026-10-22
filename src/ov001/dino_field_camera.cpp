@@ -63,7 +63,7 @@ DinoFieldCamera::DinoFieldCamera(DinoField *field, u32 namePanel)
 class DinoFieldCameraMoveAnime : public MAnime {
 public:
     // Each angle turns the short way round.
-    DinoFieldCameraMoveAnime(DinoFieldCamera *camera, u16 fromX, u16 fromY, u16 fromZ, u32 fromScale, u16 toX, u16 toY,
+    DinoFieldCameraMoveAnime(DinoFieldCamera *camera, u16 fromX, u16 fromY, u16 fromZ, MFx32 fromScale, u16 toX, u16 toY,
                              u16 toZ, u32 toScale, u32 duration, int ease) {
         mCamera = camera;
         mSteps = 0x100;
@@ -90,7 +90,7 @@ public:
         } else {
             mToZ = mFromZ - (0x10000 - d);
         }
-        mFromScale.v = fromScale;
+        mFromScale = fromScale;
         mToScale.v = toScale;
     }
     virtual ~DinoFieldCameraMoveAnime();
@@ -550,8 +550,7 @@ void DinoFieldCameraMoveAnime::Apply(int step) {
                           mFrame);
 }
 
-// NONMATCHING: register allocation (the game keeps x in a register and spills the scale).
 void DinoFieldCamera::StartRotate(u16 x, u16 y, u16 z, u32 scale, u32 duration, u32 ease) {
     mUnkE8->Clear();
-    mUnkE8->AddTail(new DinoFieldCameraMoveAnime(this, mUnkD4, mUnkD6, mUnkD8, mUnkDC.v, x, y, z, scale, duration, ease));
+    mUnkE8->AddTail(new DinoFieldCameraMoveAnime(this, mUnkD4, mUnkD6, mUnkD8, mUnkDC, x, y, z, scale, duration, ease));
 }

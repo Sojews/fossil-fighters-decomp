@@ -1659,29 +1659,30 @@ void DinoField::CreateRockHole(MFx32Point pos, u32 arg) {
     mRockHoles->AddTail(new DinoFieldHole(this, (u32)mScene, pos, arg, 0));
 }
 
+// The square of the point's distance from the origin.
+static inline MFx32 SquareSum(const MFx32Point &d) {
+    return d.x * d.x + d.y * d.y;
+}
+
 // Whether a is within the square root of range of b.
-static inline bool IsWithin(MFx32Point a, MFx32Point b, MFx32 range) {
-    MFx32Point d = a - b;
-    return d.x * d.x + d.y * d.y <= range;
+static inline bool IsWithin(const MFx32Point &a, const MFx32Point &b, MFx32 range) {
+    return SquareSum(a - b) <= range;
 }
 
-static inline bool IsNearHole(DinoFieldHole *hole, MFx32Point pos) {
-    bool near = false;
-    if (hole->GetUnk110()) {
-        MFx32 range;
-        range.v = 0x2400;
-        if (IsWithin(hole->GetPos(), pos, range)) {
-            near = true;
-        }
-    }
-    return near;
-}
-
-// NONMATCHING: stack slots of the point temporaries only.
+// NONMATCHING: 89%, the game hoists the hole position's address and both halves of pos out of the loop.
 DinoFieldHole *DinoField::FindRockHole(MFx32Point pos) {
     for (DinoFieldHole *hole = (DinoFieldHole *)mRockHoles->mHead; hole != NULL;
          hole = (DinoFieldHole *)hole->mNext) {
-        if (IsNearHole(hole, pos)) {
+        bool near = false;
+        if (hole->GetUnk110()) {
+            MFx32 range;
+            range.v = 0x2400;
+            MFx32Point at = hole->GetPos();
+            if (IsWithin(at, pos, range)) {
+                near = true;
+            }
+        }
+        if (near) {
             return hole;
         }
     }
