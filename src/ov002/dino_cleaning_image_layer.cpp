@@ -37,10 +37,8 @@ DinoCleaningImageLayer::DinoCleaningImageLayer(const DinoCleaningImageLayer &oth
     mPicture = other.mPicture;
     DinoCopyArray(mPalette, other.mPalette);
     mUnk1C28 = other.mUnk1C28;
-    mUnk1C2C = other.mUnk1C2C;
-    mUnk1C30 = other.mUnk1C30;
-    mUnk1C34 = other.mUnk1C34;
-    mUnk1C38 = other.mUnk1C38;
+    mSize = other.mSize;
+    mTileSize = other.mTileSize;
     mUnk1C3C = other.mUnk1C3C;
     mUnk1C40 = other.mUnk1C40;
     mUnk1C44 = other.mUnk1C44;

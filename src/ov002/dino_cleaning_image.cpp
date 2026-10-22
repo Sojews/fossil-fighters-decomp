@@ -13,6 +13,9 @@
 #include "types.h"
 #include "m/fx32.h"
 #include "game/dino_static_init.h"
+#include "game/dino_cleaning_neighbour.h"
+#include "m/archive.h"
+#include "m/seed_generator.h"
 
 #pragma auto_inline off
 
@@ -26,6 +29,152 @@ u32 DinoCleaningImageLayer::GetUnk1C3C() {
 
 u8 DinoCleaningImageLayer::GetUnk800() {
     return mUnk800;
+}
+
+// std::reverse (our <algorithm> doesn't have it yet).
+template <class T> static inline void DinoReverse(T *first, T *last) {
+    if (first != last) {
+        for (--last; first < last; ++first, --last) {
+            T t = *first;
+            *first = *last;
+            *last = t;
+        }
+    }
+}
+
+// The pooled constants (shared with the image view's file).
+extern "C" u32 data_ov002_021646e4[];
+// (The pool from +0x80, by its own symbol.)
+extern "C" struct {
+    u8 unk00[0x38];
+    MRect mCellBounds;          // 0x38: cells outside it start uncovered
+} data_ov002_02164764;
+extern "C" const u8 data_ov002_021632c4[10][8];     // a cell's footprint, from a pixel above its corner
+extern "C" const u8 data_ov002_02163364[6][10][8];  // the footprint's edge towards each neighbour
+
+// Loads the layer: its pixels (mirrored for mUnk14), its palette sorted by brightness (the pixels remapped to the
+// palettes from start on), then for each cell whether any of its pixels is set, its edges, how hard it is, and
+// which cells are surrounded.
+// NONMATCHING: 91%, the game's frame is 12 bytes bigger (its temporaries sit 12 bytes higher) and it schedules the
+// cell loop's rect temporaries differently.
+extern "C" void func_ov002_02158b74(DinoCleaningImageLayer *layer, MPalUnit *block, u32 start) {
+    layer->mUnk1C28 = start;
+    layer->mSize = layer->mPicture.CalcSize();
+    layer->mTileSize = layer->mPicture.CalcTileSize();
+    MI_CpuFill8(layer->mPixels, 0, 0xC200);
+    layer->mPicture.GetChrFile().Read(layer->mUnk1C + 0x1800, 0xA800);
+    if (layer->mUnk14) {
+        for (int row = 0; row < 0xC0; row++) {
+            DinoReverse(layer->mUnk1C + row * 0x100, layer->mUnk1C + (row + 1) * 0x100);
+        }
+    }
+    MI_CpuCopy8(layer->mPicture.GetPalette(), layer->mPalette, sizeof(layer->mPalette));
+    u32 order[32];
+    u32 bright[32];
+    u32 i;
+    for (i = 0; i < 32; i++) {
+        order[i] = i;
+        u16 c = layer->mPalette[i];
+        u32 b = (c >> 10) & 0x1F;
+        bright[i] = b + ((c & 0x1F) * 3 + ((c >> 5) & 0x1F) * 6);
+    }
+    for (i = 1; i < 31; i++) {
+        for (u32 j = i + 1; j < 32; j++) {
+            if (bright[order[i]] > bright[order[j]]) {
+                std::swap(order[i], order[j]);
+            }
+        }
+    }
+    for (i = 0; i < 32; i++) {
+        layer->mPalette[i] = ((const u16 *)layer->mPicture.GetPalette())[order[i]];
+    }
+    block->Load(layer->mPalette, start, 2);
+    u32 remap[32];
+    remap[0] = 0;
+    for (i = 1; i < 32; i++) {
+        remap[order[i]] = start * 16 + i;
+    }
+    for (i = 0; i < 0xC000; i++) {
+        layer->mUnk1C[i] = remap[layer->mUnk1C[i]];
+    }
+    MI_CpuFill8(layer->mGrid, 0, sizeof(layer->mGrid));
+    u8 edges[6][10];
+    for (u32 dir = 0; dir < 6; dir++) {
+        for (u32 row = 0; row < 10; row++) {
+            edges[dir][row] = 0;
+            for (u32 bit = 0; bit < 8; bit++) {
+                if (data_ov002_02163364[dir][row][bit]) {
+                    edges[dir][row] |= 1 << bit;
+                }
+            }
+        }
+    }
+    for (int y = 0; y < 28; y++) {
+        for (int x = 0; x < 36; x++) {
+            layer->mHard[x][y] = 1;
+            layer->mCells410[x][y] = 0;
+            MPoint cell(x, y);
+            MPoint d = cell;
+            d.x -= DINO_POOL(MPoint, data_ov002_021646e4, 0x3C).x;
+            d.y -= DINO_POOL(MPoint, data_ov002_021646e4, 0x3C).y;
+            MPoint pos(d.x * 8 + (d.y & 1) * 4, d.y * 8);
+            MRect rect(pos, pos + MPoint(8, 8));
+            rect.top--;
+            rect.bottom++;
+            if (!data_ov002_02164764.mCellBounds.Contains(rect)) {
+                continue;
+            }
+            int count = 0;
+            u8 rows[10];
+            const u8 *shape = &data_ov002_021632c4[0][0];
+            for (int py = rect.top; py < rect.bottom; py++) {
+                rows[py - rect.top] = 0;
+                for (int px = rect.left; px < rect.right; px++) {
+                    if (*shape++ && layer->mUnk1C[px + py * 0x100]) {
+                        rows[py - rect.top] |= 1 << (px - rect.left);
+                        layer->mHard[x][y] = 0;
+                        count++;
+                    }
+                }
+            }
+            if (MFx32(count) / MFx32(64) <= DINO_POOL(MFx32, data_ov002_021646e4, 0x4)) {
+                layer->mCells410[x][y] = 1;
+            }
+            u8 sides = 0;
+            if (!layer->mHard[x][y]) {
+                for (u32 dir = 0; dir < 6; dir++) {
+                    for (int row = 0; row < 10; row++) {
+                        if (edges[dir][row] & rows[row]) {
+                            sides |= 1 << dir;
+                            break;
+                        }
+                    }
+                }
+            }
+            layer->mCells[x][y] = sides;
+            if (layer->mUnk1C44 && !layer->mHard[x][y]) {
+                layer->mGrid[x][y] = ((MFx32::FromRaw(0xE66) + ((MRandom *)layer->mUnk1C44)->NextFraction() *
+                                       MFx32::FromRaw(0x333)) * layer->mUnk1C40).v;
+            }
+        }
+    }
+    for (int y = 0; y < 28; y++) {
+        for (int x = 0; x < 36; x++) {
+            if (layer->mCells410[x][y]) {
+                BOOL surrounded = TRUE;
+                for (u32 dir = 0; dir < 6; dir++) {
+                    MPoint n = GetNeighbour(MPoint(x, y), dir);
+                    if (!layer->mHard[n.x][n.y] && !layer->mCells410[n.x][n.y]) {
+                        surrounded = FALSE;
+                        break;
+                    }
+                }
+                if (surrounded) {
+                    layer->mCells410[x][y] = 2;
+                }
+            }
+        }
+    }
 }
 
 void DinoCleaningImageLayer::CreatePalAnime(MTaskSet *set, MPalUnit *block, u32 start, u16 color) {
@@ -117,14 +266,13 @@ void DinoCleaningImage::LoadPalettes(MPalUnit *block, u32 start) {
     }
 }
 
-extern "C" void func_ov002_02158b74(DinoCleaningImageLayer *layer, u32 arg, u32 start);
 
 // NONMATCHING: 81%, the game recomputes the layer cell index for every layer (strength-reducing only the mask row).
 void DinoCleaningImage::Build(u32 arg, u32 start) {
     mUnk08 = TRUE;
     std::vector<DinoCleaningImageLayer *>::iterator it;
     for (it = mLayers.begin(); it != mLayers.end(); ++it) {
-        func_ov002_02158b74(*it, arg, start);
+        func_ov002_02158b74(*it, (MPalUnit *)arg, start);
         if (!(*it)->GetUnk800()) {
             start += 2;
         }
@@ -197,7 +345,6 @@ template void std::__vec_deleter<u32, std::allocator<u32> >::assign<u32 *>(u32 *
 
 // The file's static initialization (see dino_static_init.h), with the screen center and a half.
 // NONMATCHING: the dead stack copies of the layout and the center take other slots.
-extern "C" u32 data_ov002_021646e4[];
 #pragma always_inline on
 static struct DinoCleaningImageStaticInit {
     DinoCleaningImageStaticInit() {

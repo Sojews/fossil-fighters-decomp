@@ -33,10 +33,8 @@ public:
     MPictureFile mPicture;  // 0x1BB4
     u16 mPalette[32];       // 0x1BE8
     u32 mUnk1C28;           // 0x1C28
-    u32 mUnk1C2C;           // 0x1C2C
-    u32 mUnk1C30;           // 0x1C30
-    u32 mUnk1C34;           // 0x1C34
-    u32 mUnk1C38;           // 0x1C38
+    MPoint mSize;           // 0x1C2C: the picture's, in pixels
+    MPoint mTileSize;       // 0x1C34
     u32 mUnk1C3C;           // 0x1C3C: a sound effect
     MFx32 mUnk1C40;         // 0x1C40
     u32 mUnk1C44;           // 0x1C44
