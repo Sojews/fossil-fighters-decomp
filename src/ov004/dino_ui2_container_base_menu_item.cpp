@@ -355,7 +355,6 @@ extern "C" const u32 data_0208aac8; // the empty slots' help text
 
 // Makes the page's buttons (blank past the last entry) and links them in a grid.
 void DinoUi2ContainerBaseMenu::RefreshPage2() {
-    u32 emptyText = data_0208aac8;
     for (int i = 0; i < 8; i++) {
         DinoUi2PartsKasekiButton *button;
         if (mUnk134.size() > i + mPage * 8) {
@@ -376,7 +375,7 @@ void DinoUi2ContainerBaseMenu::RefreshPage2() {
                            data_ov004_02176b44.mRow.x * (i / 4),
                        data_ov004_02176bc4.y + data_ov004_02176b44.mColumn.y * (i % 4) +
                            data_ov004_02176b44.mRow.y * (i / 4)),
-                (const DinoUiKasekiIcon &)DinoUi2GetEmptyKasekiInfo(), 0, emptyText);
+                (const DinoUiKasekiIcon &)DinoUi2GetEmptyKasekiInfo(), 0, data_0208aac8);
             button->HideMotion();
         }
         mItems.push_back(button);
