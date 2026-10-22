@@ -605,7 +605,6 @@ void M3DModel::SetAnimData(void *data) {
     mFrame = 0;
 }
 
-// A 32-bit value stored as two halfwords.
 // Makes the ground from the model file's grid chunk.
 void M3DModel::LoadGrid(const void *data) {
     mFlags &= ~0x100;
