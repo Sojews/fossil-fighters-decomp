@@ -36,6 +36,9 @@
 #include "game/dino_sound.h"
 #include "game/dino_event_talk_window.h"
 #include "game/dino_static_init.h"
+#include "m/3d.h"
+#include "m/3d_scene.h"
+#include "m/anm_model.h"
 
 DinoUiReviveStatus::~DinoUiReviveStatus() {
 }
@@ -108,7 +111,8 @@ extern "C" struct {
     u8 unk2C[0x30 - 0x2C];
     const char *mMaxPath;                           // 0x30: the top value's mark
     void (DinoUiReviveEffect::*CheckSkip_34)();     // 0x34
-    u8 unk3C[0x4C - 0x3C];
+    void (DinoUiReviveEffect::*State0215da04_3C)(); // 0x3C
+    u8 unk44[0x4C - 0x44];
     void (DinoUiReviveEffect::*Leave_4C)();         // 0x4C
     void (DinoUiReviveEffect::*State0215da04_54)(); // 0x54
 
@@ -140,10 +144,13 @@ DinoUiReviveEffect::DinoUiReviveEffect(const DinoCreatureState &creature, const 
     mState = data_ov003_02161d20.Start_94;
 }
 
+// (Called, not inlined, by DinoUiReviveEffect::Start.)
+#pragma auto_inline off
 DinoUiReviveStatus::DinoUiReviveStatus(MDisplay *display, const DinoCreatureInfo &info, u8 flag)
     : MProcess(display), mInfo(info), mFlag(flag) {
     mState = data_ov003_02161d20.Start_74;
 }
+#pragma auto_inline reset
 
 // The first word of a part's state, with its flag.
 struct DinoRevivePartBits {
@@ -280,6 +287,139 @@ void DinoUiReviveStatus::Start() {
     mState = data_ov003_02161da0.State_5C;
 }
 #pragma dont_inline reset
+
+extern "C" const char data_ov003_021621a4[];  // the light's picture
+extern "C" const char data_ov003_02162448[];  // the creature's model ("din%03d"-style)
+extern "C" const char data_ov003_02162464[];  // the picture scrolled up the first time
+
+// Rises from below the top screen, blended over the model.
+inline DinoUiReviveEffectLight::DinoUiReviveEffectLight() : MProcess(gLcd->GetTopDisplay()), mAngle(0), mTimer(0) {
+    MDisplayScope scope(GetDisplay());
+    mPicture = new MTextPicture(std::string(data_ov003_021621a4), TRUE, false);
+    mPicture->SetPriority(1);
+    mPicture->SetPosition(0, -0x60);
+    mParallel.AddTail(mPicture);
+    gCurrentDisplay->mBlend->SetMode(1);
+    gCurrentDisplay->mBlend->SetAlpha(16, 16);
+    MBlend *blend = gCurrentDisplay->mBlend;
+    blend->SetTarget1(mPicture->GetPlaneMask());
+    gCurrentDisplay->mBlend->SetTarget2(0x3F);
+    mHeight = 0;
+}
+
+// Sets the screens up: the creature's model turning on the top screen (the camera placed for its size), the light, the
+// picture to scroll the first time (when the creature had no head yet), and the status below.
+void DinoUiReviveEffect::Start() {
+    DinoSoundLoadScene(0x20);
+    DinoSoundPlayBgm(0x7E, 0);
+    mEffectTasks = new MParallelTaskSet();
+    mParallel.AddTail(mEffectTasks);
+    MSingleInputHub *hub = new MSingleInputHub(1);
+    hub->EnableTouch();
+    mInput = hub->GetInput(0);
+    mParallel.AddTail(hub);
+    MResource<DinoKasekiDefs> defs = gDinoResource->LoadKasekiDefs();
+    mUncleanable = defs.Get()->GetDef((mUnk94.index - 1) * 4 + 1)->IsUncleanable();
+    mPartCount = mUncleanable ? 1 : 4;
+    gLcd->mMain->ResetHooks();
+    gLcd->mSub->ResetHooks();
+    gLcd->mMain->Setup(5, 0, 3, 1, 1, 1);
+    gLcd->mSub->Setup(5, 2, 4, 1, 0, 0);
+    gLcd->mMain->mBg->SetBg0Reserved(1);
+    gLcd->mSub->mBg->SetMode(3);
+    gLcd->SetBottomDisplay(gLcd->mSub);
+    gLcd->mMain->mObj->Show();
+    gLcd->mSub->mObj->Show();
+    gLcd->VSyncNow();
+    SetDisplay(gLcd->GetBottomDisplay());
+    mScene = new M3DScene();
+    mScene->mUnk14 = 1;
+    mScene->mUnk18 = 300 << FX32_SHIFT;
+    mScene->mM3d->mBgCntBits.priority = 3;
+    MFx32 y = MFx32(0);
+    MFx32 height = MFx32(5);
+    MFx32 angle(1);
+    MFx32 distance = MFx32(11);
+    switch (mUnkAC.index) {
+    case 0x29:
+    case 0x2C:
+    case 0x2D:
+    case 0x2E:
+    case 0x2F:
+    case 0x30:
+    case 0x31:
+    case 0x32:
+    case 0x55:
+    case 0x56:
+    case 0x57:
+    case 0x58:
+    case 0x59:
+    case 0x69:
+        distance = MFx32(15);
+        height = MFx32(7);
+        break;
+    case 0x50:
+    case 0x51:
+    case 0x52:
+    case 0x54:
+        distance = MFx32(18);
+        height = MFx32(7);
+        break;
+    case 0x43:
+        height = MFx32(4);
+        distance = MFx32(11);
+        y = MFx32(5);
+        angle = MFx32(1);
+        break;
+    }
+    VecFx32 v;
+    v.x = 0;
+    v.y = height.v;
+    v.z = 0;
+    mScene->SetCameraTarget(&v);
+    v.x = (distance * MFx32::FromRaw(FX_SinIdx(angle.v))).v;
+    v.y = y.v;
+    v.z = (distance * MFx32::FromRaw(FX_CosIdx(angle.v))).v;
+    mScene->SetCameraPos(&v);
+    char path[0x100];
+    OS_SPrintf(path, data_ov003_02162448, mUnk94.index);
+    mModel = new MAnmModel(mScene);
+    mModel->SetFrames(0, 0x40000000);
+    mModel->Load(path, 0);
+    mModel->Run();
+    mModel->mUnkF4 = 1;
+    mModel->mFollowParent = TRUE;
+    mParallel.AddTail(mModel, mScene);
+    MTask *mainFade;
+    MTask *subFade = gLcd->mSub->mBright->CreateFadeInFromBlack(60, 0);
+    mainFade = gLcd->mMain->mBright->CreateFadeInFromBlack(60, 0);
+    MParallelTaskSet *fades = new MParallelTaskSet(TRUE);
+    fades->AddTail(mainFade);
+    fades->AddTail(subFade);
+    mSerial.AddTail(fades);
+    mLight = new DinoUiReviveEffectLight();
+    mParallel.AddTail(mLight);
+    if (mUnk94.parts[0].level == 0) {
+        mUnk94.parts[1].level = 0;
+        mUnk94.parts[2].level = 0;
+        mUnk94.parts[3].level = 0;
+        mUnk114 = TRUE;
+        data_ov003_021624c0 = mUnk114;
+        mScroller = new MTextPicture(gLcd->GetTopDisplay(), std::string(data_ov003_02162464), TRUE, false);
+        mScroller->SetPriority(2);
+        mScroller->Show();
+        mParallel.AddTail(mScroller);
+    } else {
+        DinoUiReviveEffectLight *light = mLight;
+        light->mHeight = 0x60;
+        light->mPicture->Show();
+        mUnk114 = FALSE;
+        data_ov003_021624c0 = mUnk114;
+    }
+    mStatus = new DinoUiReviveStatus(gLcd->GetBottomDisplay(), (const DinoCreatureInfo &)mUnk94, TRUE);
+    mParallel.AddTail(mStatus);
+    mState = data_ov003_02161d20.State0215da04_3C;
+}
 
 extern "C" const int data_020899fc;
 extern "C" const int data_02089a48;

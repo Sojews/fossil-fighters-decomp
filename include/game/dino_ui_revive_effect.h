@@ -6,7 +6,9 @@
 #include "m/task.h"
 #include "game/dino_backup.h"
 
-class MExtAffinePicture;
+class MTextPicture;
+class M3DScene;
+class MAnmModel;
 class MIndexBitmap;
 class MInput;
 class MView;
@@ -49,9 +51,10 @@ public:
     MIndexBitmap *mBitmap;                  // 0x100
     MPalUnit *mPalBlock;                   // 0x104
     class DinoUiReviveStatus *mStatus;      // 0x108
-    u32 unk10C[2];
+    M3DScene *mScene;                       // 0x10C
+    MAnmModel *mModel;                      // 0x110: the creature's
     u8 mUnk114;                             // 0x114
-    MExtAffinePicture *mScroller;           // 0x118: scrolled up over the effect
+    MTextPicture *mScroller;                // 0x118: scrolled up over the effect
     int mScrollFrame;                       // 0x11C
     class DinoUiReviveEffectLight *mLight;  // 0x120
     MView *mUnk124;                         // 0x124
@@ -60,7 +63,7 @@ public:
     MInput *mInput;                         // 0x13C
     u8 mShowText;                           // 0x140: tell the player the creature's name after the effect
     MTaskSet *mEffectTasks;                 // 0x144
-    u32 unk148;
+    u8 mUncleanable;                        // 0x148: a one-piece fossil
     u32 mPartCount;                         // 0x14C: how many parts to check
 };
 
