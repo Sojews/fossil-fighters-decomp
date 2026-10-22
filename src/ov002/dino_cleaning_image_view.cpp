@@ -50,22 +50,25 @@ DinoCleaningImage *DinoCleaningImageView::GetImage(int index) {
     return mImages[index];
 }
 
-// NONMATCHING: the game keeps start (0) in a register instead of folding it.
+// (start is set twice, so the game keeps its 0 in a register.)
 void DinoCleaningImageView::CreatePalAnimes() {
-    u32 start = 0;
+    u32 start;
 
     mPalTasks->Clear();
+    start = 0;
     mImages[0]->CreatePalAnimes(mPalTasks, mPal, start, 0x8000);
-    mImages[1]->CreatePalAnimes(mPalTasks, mPal, start + mImages[0]->CountPalettes(), 0xFFFF);
+    start += mImages[0]->CountPalettes();
+    mImages[1]->CreatePalAnimes(mPalTasks, mPal, start, 0xFFFF);
 }
 
-// NONMATCHING: as CreatePalAnimes.
 void DinoCleaningImageView::LoadPalettes() {
-    u32 start = 0;
+    u32 start;
 
     mPalTasks->Clear();
+    start = 0;
     mImages[0]->LoadPalettes(mPal, start);
-    mImages[1]->LoadPalettes(mPal, start + mImages[0]->CountPalettes());
+    start += mImages[0]->CountPalettes();
+    mImages[1]->LoadPalettes(mPal, start);
 }
 
 void DinoCleaningImageView::Move(int x, int y) {

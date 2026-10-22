@@ -110,25 +110,23 @@ void DinoCleaningKasekiRock::Finish() {
     GetDisplay()->mBright->Reset();
 }
 
-// NONMATCHING: the game reads the size through the returned temporary's address (an inline helper?).
+// Minus half of d (to centre something d bigger than the screen).
+static inline MPoint DinoHalfBack(const MPoint &d) {
+    return MPoint(-d.x / 2, -d.y / 2);
+}
+
+// NONMATCHING: 80%, the game loads offset.y into a saved register before GetSize and reads the size's y before its x
+// (as State02160638 does).
 void DinoCleaningKasekiRock::SetOffsetAll(MPoint offset) {
-    MPoint pos;
-    MPoint size = mUnk80->GetSize();
-    pos.x = -(size.x - 256) / 2 + offset.x;
-    pos.y = -(size.y - 192) / 2 + offset.y;
-    mUnk80->SetPosition(pos);
+    mUnk80->SetPosition(DinoHalfBack(mUnk80->GetSize() - MPoint(256, 192)) + offset);
     mOam->SetOffset(MPoint(-offset.x, -offset.y));
     mUnk88->SetPosition(offset);
     mView->SetPosition(offset);
 }
 
-// NONMATCHING: as SetOffsetAll.
+// NONMATCHING: 95%, as SetOffsetAll.
 void DinoCleaningKasekiRock::SetOffset(MPoint offset) {
-    MPoint pos;
-    MPoint size = mUnk80->GetSize();
-    pos.x = -(size.x - 256) / 2 + offset.x;
-    pos.y = -(size.y - 192) / 2 + offset.y;
-    mUnk80->SetPosition(pos);
+    mUnk80->SetPosition(DinoHalfBack(mUnk80->GetSize() - MPoint(256, 192)) + offset);
     mOam->SetOffset(MPoint(-offset.x, -offset.y));
 }
 
@@ -607,10 +605,6 @@ extern "C" void (DinoCleaning::*const data_ov002_02165a44)();  // (pooled: State
 extern "C" const char data_ov002_02165f58[];    // the live's script, by mode
 extern "C" const char data_ov002_02165f6c[];
 extern "C" const char data_ov002_02165f84[];
-
-static inline MPoint DinoHalfBack(const MPoint &d) {
-    return MPoint(-d.x / 2, -d.y / 2);
-}
 
 static inline MParallelTaskSet *DinoCleaningPar(MTask *a, MTask *b) {
     MParallelTaskSet *set = new MParallelTaskSet(TRUE);
