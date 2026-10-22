@@ -611,32 +611,34 @@ MRect MMotion::GetFrame() {
 }
 
 void MMotion::ResetAnime() {
+    u32 i;
     mUnk40 = -1;
     mFrame = 0;
     mUnk38 = -1;
-    for (u32 i = 0; i < mCellCount; i++) {
+    for (i = 0; i < mCellCount; i++) {
         mCells[i].entry = mCellCount - i - 1;
         mCells[i].unk04 = 0;
         mCells[i].visible = FALSE;
         mCells[i].objMode = 0;
         mCells[i].offsetY = 0;
-        mCells[i].unk14 = MPoint(0, 0);
+        mCells[i].unk14.Set(0, 0);
+        int y = mUnk50;
         MSmartOamCell *entry = &mEntries[i];
         entry->unk08 = 0;
-        entry->unk0C = mUnk50;
+        entry->unk0C = y;
         entry->SetCoord(mPos);
         entry->objMode = 2;
         entry->SetFlip(mUnk2B, mUnk2C);
     }
     if (mUnk2A) {
-        for (u32 i = 0; i < mCellCount; i++) {
+        for (i = 0; i < mCellCount; i++) {
             if (mAffines[i] != NULL) {
                 mDisplay->mObj->mAfn->Free(mAffines[i]);
                 mAffines[i] = NULL;
             }
         }
     }
-    for (u32 i = 0; i < mFile.GetAnimeCount(); i++) {
+    for (i = 0; i < mFile.GetAnimeCount(); i++) {
         mUnk64[i].Set(0, 0);
     }
 }
