@@ -5,10 +5,13 @@
 #include "m/fx32.h"
 
 class MMotion;
+class MSmartOam;
+class DinoCleaningImageView;
 
 // The last bit of dust, flying from where it was to its place.
 class DinoCleaningLastDust : public MProcess {
 public:
+    inline DinoCleaningLastDust(DinoCleaningImageView *view, MFx32Point from, MFx32Point to, MSmartOam *oam);
     virtual ~DinoCleaningLastDust();
     virtual void Idle();
 

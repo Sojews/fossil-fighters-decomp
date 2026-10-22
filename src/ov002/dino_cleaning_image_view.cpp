@@ -191,13 +191,15 @@ void DinoCleaningImageView::CreateScreen() {
 
 // The pooled constants the code reads.
 extern "C" struct {
-    u8 unk00[0x10];
+    u8 unk00[0xC];
+    int mMinDirt;           // 0x0C: the least dirt a cell keeps when the last dust is taken off
     const char *mMotionPath;    // 0x10
     u8 unk14[0x3C - 0x14];
     MPoint mCellOrigin;     // 0x3C: (2, 2)
     u8 unk44[0xB8 - 0x44];
     MRect mDustBounds;      // 0xB8: where landing dust dirties the image (built by the __sinit)
 } data_ov002_021646e4;
+extern "C" const int data_ov002_021646f0;   // (the pool's +0xC, by its own symbol)
 
 DinoCleaningImageView::DinoCleaningImageView()
     : MFixedSizeView(MPoint(256, 192)), mKeepPal(FALSE), mDisplay(gCurrentDisplay), mPos(0, 0), mDirtSum(0, 0),
@@ -332,6 +334,84 @@ MFx32 DinoCleaningImageView::GetDirtRatio() {
         }
     }
     return MFx32(100) * MFx32(count) / MFx32(36 * 28);
+}
+
+// std::max on a pooled operand: its value read through the pool, the operand returned by its own symbol.
+static inline const int &DinoMaxPooled(const int &a, const int &aNamed, const int &b) {
+    return a < b ? b : aNamed;
+}
+
+inline DinoCleaningLastDust::DinoCleaningLastDust(DinoCleaningImageView *view, MFx32Point from, MFx32Point to,
+                                                  MSmartOam *oam)
+    : MProcess(NULL) {
+    unk74 = (u32)view;
+    mFrom = from;
+    mTo = to;
+    mFrame = MFx32(0);
+    mDuration = MFx32(10);
+    mMotion = new MMotion(MMotionFile(view->mMotion), oam, 0, 1);
+    mMotion->SetPriority(2);
+    mMotion->SetAnchor(3);
+    mMotion->Play(1, 0);
+    mMotion->Show();
+    mParallel.AddTail(mMotion);
+}
+
+// Takes up to 20 random bits of dirt off (a cell keeps mMinDirt), the first 6 flying off away from the dirt's centre.
+// NONMATCHING: 84%, the frame is 16 bytes smaller (the game keeps more temporaries) and registers differ.
+extern "C" void func_ov002_0215a7b4(DinoCleaningImageView *view) {
+    std::vector<DinoCleaningStatusEntry>::iterator it;
+    DinoCleaningStatusEntry cell;
+    MFx32Point centre;
+    MFx32Point from;
+    MFx32Point away;
+    MFx32Point to;
+    DinoCleaningStatusEntry dirty;
+    if (view->mOam == NULL) {
+        return;
+    }
+    view->mUnkDA04.clear();
+    for (int col = 0; col < 28; col++) {
+        for (int row = 0; row < 36; row++) {
+            if (view->mCells[row][col] != 0) {
+                dirty.unk4 = col;
+                dirty.unk0 = row;
+                const DinoCleaningStatusEntry &c = dirty;
+                view->mUnkDA04.push_back(c);
+            }
+        }
+    }
+    for (u32 n = 0; n < 20; n++) {
+        if (view->mUnkDA04.empty()) {
+            return;
+        }
+        it = view->mUnkDA04.begin() + (DinoCleaningRand(view->mSeed) & 0x7FFFFFFF) % view->mUnkDA04.size();
+        cell = *it;
+        centre = DinoToFx(view->mDirtSum / (int)view->mUnkD9E0);
+        MPoint d = DinoPointSub(*(const MPoint *)&cell, data_ov002_021646e4.mCellOrigin);
+        int x = d.x * 8 + (d.y & 1) * 4;
+        int y = d.y * 8;
+        u32 left = DinoMaxPooled(data_ov002_021646e4.mMinDirt, data_ov002_021646f0,
+                                 view->mCells[cell.unk0][cell.unk4] - 3);
+        int taken = view->mCells[cell.unk0][cell.unk4] - left;
+        view->mDirtSum.x -= x * taken;
+        view->mDirtSum.y -= y * taken;
+        view->mUnkD9E0 -= view->mCells[cell.unk0][cell.unk4] - left;
+        view->mCells[cell.unk0][cell.unk4] = left;
+        view->mDirty[cell.unk0][cell.unk4] = TRUE;
+        if (view->mCells[cell.unk0][cell.unk4] == 0) {
+            view->mUnkDA04.erase(it);
+        }
+        if (n < 6) {
+            MPoint e = DinoPointSub(*(const MPoint *)&cell, data_ov002_021646e4.mCellOrigin);
+            from = DinoToFx(MPoint(e.x * 8 + (e.y & 1) * 4, e.y * 8));
+            away = from - centre;
+            u16 angle = FX_Atan2Idx(away.y.v, away.x.v) + (DinoCleaningRand(view->mSeed) & 0x3FFF) - 0x2000;
+            to = from + MFx32Point(MFx32::FromRaw(FX_CosIdx(angle)) * MFx32(50),
+                                   MFx32::FromRaw(FX_SinIdx(angle)) * MFx32(50));
+            view->mOamTasks->AddHead(new DinoCleaningLastDust(view, from, to, view->mOam));
+        }
+    }
 }
 
 void DinoCleaningImageView::SetScale(MFx32 scale) {
