@@ -57,7 +57,7 @@ public:
     MTextPicture *mScroller;                // 0x118: scrolled up over the effect
     int mScrollFrame;                       // 0x11C
     class DinoUiReviveEffectLight *mLight;  // 0x120
-    MView *mUnk124;                         // 0x124
+    MTextPicture *mFlash;                   // 0x124: flashed over the top screen as a part comes back
     MResource<DinoMessageData> mMessages;   // 0x128: the cleaning messages
     int mTimer;                             // 0x138
     MInput *mInput;                         // 0x13C

@@ -102,7 +102,9 @@ extern "C" u8 data_ov003_021624c0;
 
 // The TU's pooled pointer-to-member constants (see menu.cpp).
 extern "C" struct {
-    u8 unk00[0x10];
+    u8 unk00[0x08];
+    const char *mShinePath;                         // 0x08: over a part as it comes back
+    u8 unk0C[0x10 - 0x0C];
     const char *mSparkPath;                         // 0x10
     u8 unk14[0x1C - 0x14];
     const char *mDigitPath;                         // 0x1C: a number digit
@@ -182,7 +184,8 @@ extern "C" struct {
 extern "C" const char *data_ov003_02161f5c[];  // (motions - 1)
 extern "C" MPoint data_ov003_02161f78, data_ov003_02161f80, data_ov003_02161f88, data_ov003_02161f90;
 extern "C" struct {
-    u8 unk00[0x5C];
+    u8 unk00[0x54];
+    void (DinoUiReviveEffect::*State0215e9e8_54)(); // 0x54
     void (DinoUiReviveStatus::*State_5C)();    // 0x5C
 } data_ov003_02161da0;
 
@@ -611,6 +614,80 @@ void DinoUiReviveEffect::State0215e220() {
     mState = data_ov003_02161d20.State0215ee24_84;
 }
 
+extern "C" const char data_ov003_021624a0[];  // the flash
+
+// Makes the part's motion again (when it's shown), letting the old one go after a while.
+static inline void DinoReviveRemake(DinoUiReviveStatusParts *parts) {
+    if (!parts->mMotion->IsHidden()) {
+        MMotion *old = parts->mMotion;
+        old->SetAnchor(2);
+        parts->mMotion = new MMotion(std::string(parts->mText), parts->mOam, 0, 1);
+        parts->mMotion->SetFlip(parts->mFlip, 0);
+        parts->mMotion->GetUnit()->SetMode(1);
+        parts->mMotion->SetPriority(3);
+        parts->mMotion->SetAnchor(1);
+        parts->mMotion->Play(!parts->mUnk95 ? 1 : 2, 0);
+        parts->mMotion->SetPosition(parts->mPos);
+        parts->mParallel.AddTail(parts->mMotion);
+        MSerialTaskSet *serial = new MSerialTaskSet(TRUE);
+        parts->mParallel.AddTail(serial);
+        serial->Add(new MTimer(DinoReviveFrames(120)))->Add(MTaskExitTransfer::Create(old));
+    }
+}
+
+// Plays the part's motion for its new state with a shine over it; returns the tasks that drop the motion into place
+// and count the level up. (Two inline levels, as the game's stack layout shows.)
+static inline MTask *DinoReviveParts(DinoUiReviveStatusParts *parts, u32 level, bool flag) {
+    DinoReviveRemake(parts);
+    parts->mMotion->Play(!flag ? 1 : 2, 0);
+    MMotion *shine = new MMotion(std::string(data_ov003_02161d20.mShinePath), parts->mOam, 0, 1);
+    shine->SetPosition(parts->mPos);
+    shine->GetUnit()->SetMode(1);
+    shine->SetPriority(3);
+    shine->Play(1, 0);
+    parts->mParallel.AddTail(shine);
+    parts->mParallel.AddTail(
+        (new MSerialTaskSet(TRUE))->Add(new MTimer(DinoReviveFrames(480)))->Add(MTaskExitTransfer::Create(shine)));
+    return (new MSerialTaskSet(TRUE))
+                        ->Add(parts->mMotion->CreateShowTransfer())
+                        ->Add(parts->mMotion->CreateCoordAnime(MPoint(parts->mPos.x, -0x20), parts->mPos,
+                                                               DinoReviveFrames(120), -3))
+                        ->Add(shine->CreateShowTransfer())
+                        ->Add(parts->mLevel->CreateCountTask(level, flag, 0));
+}
+
+// Brings the part back (see DinoReviveParts), then flashes the top screen.
+// NONMATCHING: 99.8%, two registers swap in DinoReviveRemake (the game's serial set takes r5, its timer r4).
+void DinoUiReviveEffect::State0215e274() {
+    DinoSoundPlaySe(0x7F, 0);
+    bool flag = mUnkAC.parts[mUnkC8].unk19;
+    u32 level = mUnkAC.parts[mUnkC8].level;
+    DinoUiReviveStatusParts *parts = mStatus->GetParts(mUnkC8);
+    mSerial.AddTail(DinoReviveParts(parts, level, flag));
+    mFlash = new MTextPicture(std::string(data_ov003_021624a0), TRUE, false);
+    gCurrentDisplay->mBlend->SetMode(3);
+    gCurrentDisplay->mBlend->SetAlpha(16, 0);
+    MBlend *blend = gCurrentDisplay->mBlend;
+    blend->SetTarget1(mFlash->GetPlaneMask() ^ 0x3F);
+    gCurrentDisplay->mBlend->SetTarget2(0x3F);
+    mParallel.AddTail(mFlash);
+    MTask *move;
+    MTask *fade;
+    blend = gCurrentDisplay->mBlend;
+    fade = blend->CreateFadeRatioAnime(0, 16, DinoReviveFrames(60), 0);
+    MPoint from(0, 192);
+    MPoint to(0, 0);
+    move = mFlash->CreateCoordAnime(from, to, DinoReviveFrames(60), -2);
+    MParallelTaskSet *anims = new MParallelTaskSet(TRUE);
+    anims->AddTail(move);
+    anims->AddTail(fade);
+    MTask *show = mFlash->CreateShowTransfer();
+    MSerialTaskSet *serial = &mSerial;
+    serial->AddTail(show);
+    serial->AddTail(anims);
+    mState = data_ov003_02161da0.State0215e9e8_54;
+}
+
 // A duration of the effect, scaled for which version of it plays.
 int DinoReviveFrames(int frames);
 
@@ -622,12 +699,12 @@ void DinoUiReviveEffect::State0215ec2c() {
     MTask *timer = new MTimer(1);
     MTask *fade;
     MTask *exit;
-    exit = MTaskExitTransfer::Create(mUnk124);
+    exit = MTaskExitTransfer::Create(mFlash);
     MBlend *blend = gCurrentDisplay->mBlend;
     fade = blend->CreateFadeRatioAnime(16, 0, DinoReviveFrames(60), 0);
     MPoint from(0, 0);
     MPoint to(0, 192);
-    MTask *move = mUnk124->CreateCoordAnime(from, to, DinoReviveFrames(60), 2);
+    MTask *move = mFlash->CreateCoordAnime(from, to, DinoReviveFrames(60), 2);
     MParallelTaskSet *anims = new MParallelTaskSet(TRUE);
     anims->AddTail(move);
     anims->AddTail(fade);
@@ -774,9 +851,12 @@ u32 DinoGetCreatureExpToNext(const DinoCreatureState *creature) {
     return kCreatureLevelLimits[0] * (next - 1) + 50 - DinoGetCreatureTotal(creature);
 }
 
+// (Called, not inlined, by DinoUiReviveEffect::State0215e274.)
+#pragma auto_inline off
 DinoUiReviveStatusParts *DinoUiReviveStatus::GetParts(int i) {
     return mParts[i];
 }
+#pragma auto_inline reset
 
 #pragma dont_inline on
 void DinoUiReviveStatus::SetCreature(const DinoCreatureState &creature) {
@@ -940,7 +1020,7 @@ DinoUiReviveStatusParts::DinoUiReviveStatusParts(MSmartOam *oam, MPoint pos, u8 
 }
 
 // Shows the value's digits (or, at the top value, the motion instead), each digit popping up after the last.
-MTask *DinoUiReviveStatusDigit::CreateCountTask(u32 value, u8 unk88, u8 unk) {
+inline MTask *DinoUiReviveStatusDigit::CreateCountTask(u32 value, u8 unk88, u8 unk) {
     mValue = value;
     mUnk88 = unk88;
     MSerialTaskSet *set = new MSerialTaskSet(TRUE);
