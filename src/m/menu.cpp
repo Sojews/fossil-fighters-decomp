@@ -151,17 +151,17 @@ void MMenu::AddItem(MMenuItem *item) {
     mItems->AddTail(item);
 }
 
+// NONMATCHING: register allocation (the game keeps the iterator in r2 for the erase call; 86%).
 void MMenu::RemoveItem(MMenuItem *item) {
     mItems->Remove(item);
     item->mMenu = NULL;
     // Drop the links to or from the item.
-    MMenuLinks::iterator it = mLinks.begin();
-    while (it != mLinks.end()) {
+restart:
+    for (MMenuLinks::iterator it = mLinks.begin(); it != mLinks.end(); ++it) {
         if (it->first == item || it->second.second == item) {
-            mLinks.erase(it);
-            it = mLinks.begin();
-        } else {
-            ++it;
+            MMenuLinks::iterator e = it;
+            mLinks.erase(e);
+            goto restart;
         }
     }
 }
