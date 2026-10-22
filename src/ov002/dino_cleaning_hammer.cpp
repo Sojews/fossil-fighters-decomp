@@ -108,7 +108,6 @@ void DinoCleaningHammerEffect::StateStart() {
 }
 
 extern "C" fx32 FX_Sqrt(fx32 x);
-extern "C" void func_02068df4(MRasterWindow *window, MPoint center, int radius);  // cuts a disc out of the window
 
 // The square root (of a raw value: the game hands FX_Sqrt the quotient without copying it).
 static inline MFx32 DinoFxSqrtRaw(fx32 x) {
@@ -116,17 +115,17 @@ static inline MFx32 DinoFxSqrtRaw(fx32 x) {
 }
 
 // The ring grows (fast, then slower): the window is the disc less the inner disc and the right edge.
-// NONMATCHING: 90%, the game keeps both radii's last products on the stack (the inner one is read back from there)
-// where ours keeps them in registers. (The clamps are bound to references: the game reads them after MFx32(mFrames).)
+// NONMATCHING: 96.7%, the game loads mFrame twice for the post-increment (once for the old value, once to add).
+// (The clamps are bound to references: the game reads them after MFx32(mFrames).)
 void DinoCleaningHammerEffect::State0215caf8() {
     const int &f = std::min(mFrame, mFrames - 1);
     MFx32 ratio = MFx32(f) / MFx32(mFrames);
     int outer = MFx32ToInt(DinoFxSqrtRaw(ratio.v) * MFx32(mFrames) * MFx32(8));
     const int &g = std::max(mFrame - 2, data_ov002_02164fb8.mInnerMin);
     ratio = MFx32(g) / MFx32(mFrames);
-    MFx32 inner = DinoFxSqrtRaw(ratio.v) * MFx32(mFrames) * MFx32(8);
+    int inner = MFx32ToInt(DinoFxSqrtRaw(ratio.v) * MFx32(mFrames) * MFx32(8));
     mWindow->SetCircle(mCenter, outer);
-    func_02068df4(mWindow, mCenter, MFx32ToInt(inner));
+    mWindow->SubtractCircle(mCenter, inner);
     mWindow->SubtractRect(MRect(255, 0, 256, 192));
     if (mFrame++ > mFrames + 2) {
         mState = data_ov002_02164fb8.StateClear_20;
