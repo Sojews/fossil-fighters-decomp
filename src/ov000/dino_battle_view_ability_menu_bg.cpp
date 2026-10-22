@@ -219,7 +219,11 @@ MRect AttackMenuBarMotion::GetFrame() {
     return mMotion->GetFrame();
 }
 
-// NONMATCHING: the game reads the menu's mUnk104 before calling GetUnkB4 (ours calls first), so flag3 gets spilled
+// The menu's battle view (through an inline, so it's read before GetUnkB4 is called).
+static inline void *DinoAbilityMenuView(DinoBattleViewUiAbilityMenu *menu) {
+    return menu->mUnk104;
+}
+
 DinoBattleViewUiAbilityMenuItem::DinoBattleViewUiAbilityMenuItem(DinoBattleViewUiAbilityMenu *menu, bool flag, bool flag3, u32 attack,
                                                                  u32 kind, u32 unk90) {
     mUnk88 = kind;
@@ -227,7 +231,7 @@ DinoBattleViewUiAbilityMenuItem::DinoBattleViewUiAbilityMenuItem(DinoBattleViewU
     mUnk90 = unk90;
     mUnk94 = flag;
     mMenu = menu;
-    mUnk98 = new AttackMenuBarMotion(mMenu->mUnk104, mMenu->GetUnkB4(), mUnk8C, mUnk88 == 2, flag, flag3, false);
+    mUnk98 = new AttackMenuBarMotion(DinoAbilityMenuView(mMenu), mMenu->GetUnkB4(), mUnk8C, mUnk88 == 2, flag, flag3, false);
     mTasks = new MParallelTaskSet();
     MTask *bar = mUnk98;
     MTaskSet *parallel = &mParallel;
