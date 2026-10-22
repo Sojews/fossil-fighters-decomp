@@ -517,31 +517,32 @@ void M3DModel::SetModelData(void *data, BOOL own) {
         own = FALSE;
     }
     mOwnsModelData = own;
-    mUnk32A = 1;
     const u16 *script = (const u16 *)((const u8 *)mModelRes + 0x28);
+    mUnk32A = 1;
     u32 i = 0;
     if (script[0] != 0xFFF) {
         do {
             switch (script[i]) {
             case 0x50:
-                mUnk314 = script[i + 2];
-                mUnk314 |= script[i + 3] << 16;
-                i += 4;
+                i += 2;
+                mUnk314 = script[i++];
+                mUnk314 |= script[i++] << 16;
                 mUnk30C = &script[i];
                 i += mUnk314 >> 1;
                 mUnk314 >>= 3;
                 break;
             case 0x51:
-                mUnk310 = script[i + 2];
-                mUnk310 |= script[i + 3] << 16;
-                i += 4;
+                i += 2;
+                mUnk310 = script[i++];
+                mUnk310 |= script[i++] << 16;
                 mUnk308 = &script[i];
                 i += mUnk310 >> 1;
                 mUnk310 >>= 3;
                 break;
             case 0x53: {
-                mUnk324 = script[i + 1] + 1;
-                MI_CpuCopy32(&script[i + 2], mBox, sizeof(mBox));
+                i++;
+                mUnk324 = script[i++] + 1;
+                MI_CpuCopy32(&script[i], mBox, sizeof(mBox));
                 s16 size = mBox[3];
                 if (size < mBox[4]) {
                     size = mBox[4];
@@ -549,16 +550,16 @@ void M3DModel::SetModelData(void *data, BOOL own) {
                 if (size < mBox[5]) {
                     size = mBox[5];
                 }
-                i += 8;
+                i += 6;
                 mBox[3] = mBox[4] = mBox[5] = size;
                 mBox[0] = mBox[1] = mBox[2] = -size >> 1;
                 mFlags |= 0x100;
                 break;
             }
             case 0x52:
-                mUnk300 = script[i + 2];
-                mUnk300 |= script[i + 3] << 16;
-                i += 4;
+                i += 2;
+                mUnk300 = script[i++];
+                mUnk300 |= script[i++] << 16;
                 if (mOwnsModelData) {
                     mModelData = new u8[mUnk300 & ~1];
                     MI_CpuCopy32(&script[i], mModelData, mUnk300);
