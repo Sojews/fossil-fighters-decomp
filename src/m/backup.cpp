@@ -203,25 +203,20 @@ void MBackupStorage::AddFile(u32 size, u32 copies) {
     mFiles.push_back(file);
 }
 
+// (Emitted before its caller, as in the game's order.)
+template void std::__vec_deleter<MBackupStorage::Region, std::allocator<MBackupStorage::Region> >::sub_push_back(
+    const MBackupStorage::Region &x, Metrowerks::int2type<true>);
+
 u32 MBackupStorage::AllocRegion(u32 size) {
-    u32 offset;
-    if (mRegions.size() == 0) {
-        offset = 0;
-    } else {
-        Region &last = mRegions[mRegions.size() - 1];
-        offset = mDevice->GetPageSize() * ((last.offset + last.size + mDevice->GetPageSize() - 1) / mDevice->GetPageSize());
-    }
     Region region;
+    region.offset = mRegions.size() == 0 ? 0 : mDevice->GetPageSize() * ((mRegions.back().offset + mRegions.back().size + mDevice->GetPageSize() - 1) / mDevice->GetPageSize());
     region.size = size;
-    region.offset = offset;
     u32 index = mRegions.size();
     mRegions.push_back(region);
     return index;
 }
 
 // The storage's vector members, in the game's order.
-template void std::__vec_deleter<MBackupStorage::Region, std::allocator<MBackupStorage::Region> >::sub_push_back(
-    const MBackupStorage::Region &x, Metrowerks::int2type<true>);
 template std::__vec_deleter<MBackupStorage::Region, std::allocator<MBackupStorage::Region> >::~__vec_deleter();
 template void std::__vec_deleter<MBackupStorage::File, std::allocator<MBackupStorage::File> >::sub_push_back(
     const MBackupStorage::File &x, Metrowerks::int2type<false>);

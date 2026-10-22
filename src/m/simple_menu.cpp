@@ -17,17 +17,18 @@
 
 // For fonts without a palette: black on white.
 static const u16 sPalette[2] = {0x0000, 0x7FFF};
-// Where the items are laid out.
-static struct {
-    int left, top, right, bottom;
-} sArea = {0, 0, 0, 0};
-
 // The TU's pooled pointer-to-member constants (see menu.cpp).
 extern "C" struct {
     u8 unk00[4];
     void (MSimpleMenu::*Update_04)();   // 0x04
     void (MSimpleMenu::*Start_0C)();    // 0x0C
 } data_020c45f8;
+
+// Where the items are laid out (pooled at 0x70, set by the static init).
+struct MSimpleMenuArea {
+    int left, top, right, bottom;
+};
+#define sArea DINO_POOL_NV(MSimpleMenuArea, data_020c45f8, 0x70)
 
 MSimpleMenu::MSimpleMenu(int *result, MFont *font, const Item *items, int initial)
     : MProcess(NULL), mResult(result), mFont(font), mItems(items), mInitial(initial), mHasCancel(FALSE),
