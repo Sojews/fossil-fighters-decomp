@@ -12,6 +12,7 @@
 #include "game/dino_common_live.h"
 #include "game/dino_resource.h"
 #include "game/help.h"
+#include "game/dino_sound.h"
 
 // A colour, 0-255 a channel.
 struct DinoCleaningScoreRgb {
@@ -189,5 +190,106 @@ extern "C" void func_ov002_0215bce8(DinoCleaningScore *score) {
             }
         }
         break;
+    }
+}
+
+// The TU's pooled literals (std::min/std::max operands): the value read through the pool, the operand returned by its own
+// symbol.
+extern "C" struct {
+    u8 unk00[0x20];
+    int mTopLimit;              // 0x20: 66
+    u8 unk24[0x4C - 0x24];
+    int mBottomLimit;           // 0x4C: 126
+} data_ov002_02164a58;
+extern "C" const int data_ov002_02164a78, data_ov002_02164aa4;
+
+static inline const int &DinoScoreMin(const int &a, const int &named, const int &b) {
+    return b < a ? b : named;
+}
+static inline const int &DinoScoreMax(const int &a, const int &named, const int &b) {
+    return a < b ? b : named;
+}
+
+extern "C" u8 data_0208a22c;                    // shows the windows' numbers
+extern "C" MPoint data_ov002_02164ba4[3];       // the success window's digits, from its corner
+extern "C" MPoint data_ov002_02164b8c[3];       // the failure window's
+
+// Follows the score: sounds as the score passes the target either way, the arrow's motion, the windows sliding to
+// the two scores (with their digits) and the backdrop's gradients between them.
+// NONMATCHING: 99.9%, the last gradient loop's line, source and offset registers rotate (r2/r3/r4); tried separate,
+// swapped and while-loop counters.
+void DinoCleaningScore::Idle() {
+    mPrev80 = mUnk80;
+    mPrev84 = mUnk84;
+    func_ov002_0215bce8(this);
+    mUnk91 = mUnk84 > mPrev84;
+    mUnk90 = mUnk80 > mPrev80;
+    bool up = mPrev80 < MFx32(mScore) && mUnk80 >= MFx32(mScore);
+    if (up) {
+        DinoSoundPlaySe(0x44, 0);
+    }
+    bool down = (!mUnk9C4 && mPrev80 >= MFx32(mScore)) && mUnk80 < MFx32(mScore);
+    if (down) {
+        mUnk9C4 = TRUE;
+        DinoSoundPlaySe(0x40, 0);
+    }
+    if (GetUnk91()) {
+        mArrow->Play(4, 0);
+    } else if (GetUnk90()) {
+        mArrow->Play(3, 0);
+    } else if (!mArrow->IsPlaying()) {
+        mArrow->Play(2, 0);
+    }
+    int top = MFx32ToInt(MFx32(46) + MFx32(100) * mUnk84 / MFx32(100));
+    int bottom = MFx32ToInt(MFx32(146) - MFx32(100) * mUnk80 / MFx32(100));
+    mFailureWindow->SetPosition(0x80, DinoScoreMin(data_ov002_02164a58.mTopLimit, data_ov002_02164a78, top));
+    mSuccessWindow->SetPosition(0x80, DinoScoreMax(data_ov002_02164a58.mBottomLimit, data_ov002_02164aa4, bottom));
+    if (data_0208a22c) {
+        u32 n = MFx32ToInt(mUnk80);
+        if (n != 0) {
+            mSuccessWindow->Show();
+        }
+        if (!mSuccessWindow->IsHidden()) {
+            for (u32 i = 0; i < 3; i++) {
+                u32 digit = n % 10;
+                n /= 10;
+                mDigits[i]->Play(digit + 1, 0);
+                mDigits[i]->SetPosition(data_ov002_02164ba4[i] + mSuccessWindow->GetPosition());
+                if (n != 0 || digit != 0 || i == 0) {
+                    mDigits[i]->Show();
+                } else {
+                    mDigits[i]->Hide();
+                }
+            }
+        }
+        n = MFx32ToInt(mUnk84);
+        if (n != 0) {
+            mFailureWindow->Show();
+        }
+        if (!mFailureWindow->IsHidden()) {
+            for (u32 i = 0; i < 3; i++) {
+                u32 digit = n % 10;
+                n /= 10;
+                mDigits2[i]->Play(digit + 1, 0);
+                mDigits2[i]->SetPosition(data_ov002_02164b8c[i] + mFailureWindow->GetPosition());
+                if (n != 0 || digit != 0 || i == 0) {
+                    mDigits2[i]->Show();
+                } else {
+                    mDigits2[i]->Hide();
+                }
+            }
+        }
+    }
+    for (u32 i = 0; i < 2; i++) {
+        u32 k, line;
+        for (line = top + 1, k = 0; line < bottom; line++, k++) {
+            (&mRasterFront)[i][line] = mGradients[0][i][k + (top - 45)];
+        }
+        for (line = bottom, k = 0; line < 146; line++, k++) {
+            (&mRasterFront)[i][line] = mGradients[1][i][k];
+        }
+        for (line = top, k = 0; line >= 46; line--, k++) {
+            (&mRasterFront)[i][line] = mGradients[2][i][k];
+        }
     }
 }

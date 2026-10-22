@@ -27,7 +27,8 @@ public:
     u8 mFlag;                   // 0x7C
     MFx32 mUnk80;               // 0x80
     MFx32 mUnk84;               // 0x84
-    u8 unk88[0x90 - 0x88];
+    MFx32 mPrev80;              // 0x88: last frame's
+    MFx32 mPrev84;              // 0x8C
     u8 mUnk90;                  // 0x90
     u8 mUnk91;                  // 0x91
     MRasterPal *mRaster;        // 0x94: the backdrop colour per line
