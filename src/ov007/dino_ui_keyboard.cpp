@@ -1408,7 +1408,8 @@ void DinoUiSenryuMenu::OnDecide(MMenuItem *item) {
     case 0:
     case 1:
     case 2: {
-        u32 index = mPage * 3 + ((SenryuMenuItem *)item)->mIndex;
+        u32 base = mPage * 3;
+        u32 index = base + ((SenryuMenuItem *)item)->mIndex;
         mSerial.AddTail(CreateCurChangeTask(index));
         if (!(mEntries[index] & 0x80)) {
             break;
