@@ -291,17 +291,14 @@ static inline MFx32Point DinoToFx(MPoint p) {
 }
 
 // Brushes a bit of dust off at pos, flying a random distance in a random direction.
-// NONMATCHING: the game's frame is 0x30 bigger (more of the points' inline copies on the stack), and it truncates
-// the angle to 16 bits twice.
+// NONMATCHING: 88.6%, the game truncates the angle to 16 bits twice, adds the end point's y before its x and keeps
+// the height in a register.
 extern "C" void func_ov002_0215a4fc(DinoCleaningImageView *view, MPoint pos) {
     u16 angle = DinoCleaningRand(view->mSeed);
-    MFx32 speed = MFx32((int)((DinoCleaningRand(view->mSeed) & 0x7FFFFFFF) % 40));
-    MFx32Point dir(MFx32::FromRaw(FX_CosIdx(angle)), MFx32::FromRaw(FX_SinIdx(angle)));
-    MFx32Point move = dir * speed;
+    MFx32Point move = MFx32Point(MFx32::FromRaw(FX_CosIdx(angle)), MFx32::FromRaw(FX_SinIdx(angle))) *
+                      MFx32((int)((DinoCleaningRand(view->mSeed) & 0x7FFFFFFF) % 40));
     MFx32 height = MFx32((int)((DinoCleaningRand(view->mSeed) & 0x7FFFFFFF) % 10));
-    MFx32Point from = DinoToFx(pos);
-    MFx32Point to = DinoToFx(pos) + move;
-    view->mOamTasks->AddHead(new DinoCleaningNewDust(view, from, to, height, view->mOam));
+    view->mOamTasks->AddHead(new DinoCleaningNewDust(view, DinoToFx(pos), DinoToFx(pos) + move, height, view->mOam));
 }
 
 // a - b. (Taking a by value and returning it keeps both points on the stack, as the game's code does.)
