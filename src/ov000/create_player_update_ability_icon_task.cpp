@@ -729,14 +729,20 @@ u32 DinoBattleModelCreature::CountAttacks() {
 }
 
 // The index'th attack its level allows (and, with arg, that attack's value from the u8 table, less one); 0 if none.
+// The creature's i-th attack.
+static inline u32 AttackIdOf(const DinoCreatureDef *def, u32 i) {
+    return ((const u32 *) ((const u8 *) def + def->attackIds))[i];
+}
+
 u32 DinoBattleModelCreature::GetAttack(u32 index, int *arg) {
     const DinoCreatureDef *def = gDinoResource->GetCreatureDef(mUnkB0);
     for (int i = 0; i < def->attackCount; i++) {
-        if (((const u32 *) ((const u8 *) def + def->attackLevels))[i] <= mUnk100 && index-- == 0) {
+        if (def->GetAttackLevel(i) <= mUnk100 && index-- == 0) {
             if (arg != NULL) {
-                *arg = ((const u8 *) def + def->attackUnk78)[i] - 1;
+                const u8 *p = (const u8 *) def + def->attackUnk78;
+                *arg = p[i] - 1;
             }
-            return ((const u32 *) ((const u8 *) def + def->attackIds))[i];
+            return AttackIdOf(def, i);
         }
     }
     return 0;

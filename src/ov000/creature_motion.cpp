@@ -1171,7 +1171,7 @@ u32 DinoBattleViewCreature::CountAttacks() {
 u32 DinoBattleViewCreature::GetAttack(u32 index) {
     const DinoCreatureDef *def = gDinoResource->GetCreatureDef(mUnkA8);
     for (int i = 0; i < def->attackCount; i++) {
-        if (((const u32 *) ((const u8 *) def + def->attackLevels))[i] <= mLevel && index-- == 0) {
+        if (def->GetAttackLevel(i) <= mLevel && index-- == 0) {
             return ((const u32 *) ((const u8 *) def + def->attackIds))[i];
         }
     }
