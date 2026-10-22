@@ -114,7 +114,11 @@ void MSimpleMenu::SetCursor(int id) {
         }
     }
     if (i == count) {
-        i = first >= 0 ? first : 0;
+        if (first >= 0) {
+            i = first;
+        } else {
+            i = 0;
+        }
     }
     mCursor = i;
     for (u32 side = 0; side < 2; side++) {
