@@ -17,6 +17,7 @@
 #include "m/smart_oam.h"
 #include "m/blend.h"
 #include "game/dino_cleaning_paper.h"
+#include "game/dino_se_motion.h"
 #include "game/dino_cleaning_report.h"
 #include "m/bright.h"
 #include "game/dino_cleaning_kaseki_rock_xray_blend_manager.h"
@@ -303,14 +304,20 @@ extern "C" struct {
     u8 unk00[0x4];
     MFx32 mChipPower;           // 0x04: what each cell takes when the rock is cleared at once
     const char *mCountFormat;   // 0x08
-    u8 unk0C[0x10 - 0xC];
+    const char *mOnesPath;      // 0x0C: the passed score's ones digit
     const char *mFailPath;      // 0x10: the picture of a failed cleaning
     const char *mCleanPath;     // 0x14: the picture shown when the rock comes clean
-    u8 unk18[0x24 - 0x18];
+    const char *mBestScorePath; // 0x18: the best score's frame
+    const char *mBestTensPath;  // 0x1C
+    const char *mBestPath;      // 0x20: the picture of a best cleaning
     const char *mTitlePath;     // 0x24: the title (the first mode's)
     u32 mMaxBonus;              // 0x28: the most the time bonus gives
     int mZero_2C;               // 0x2C: (the constant the count's shake is clamped to)
-    u8 unk30[0x44 - 0x30];
+    const char *mBestHundredsPath; // 0x30
+    const char *mBestOnesPath;  // 0x34
+    const char *mTensPath;      // 0x38
+    const char *mPassPath;      // 0x3C: the picture of a passed cleaning
+    const char *mScorePath;     // 0x40: the passed score's frame
     const char *mTitlePath2;    // 0x44: the other modes' title
     void (DinoCleaning::*State02160638_48)(); // 0x48
     u8 unk50[0x58 - 0x50];
@@ -345,7 +352,8 @@ extern "C" struct {
     u8 unk18[0x20 - 0x18];
     void (DinoCleaning::*StateStopAnswered_20)();
     void (DinoCleaning::*State02162cec_28)(); // 0x28
-    u8 unk30[0x48 - 0x30];
+    u8 unk30[0x40 - 0x30];
+    void (DinoCleaning::*State02162cec_40)(); // 0x40
     void (DinoCleaning::*State0216177c_48)(); // 0x48
     void (DinoCleaning::*StateSwitchTool_50)(); // 0x50
     void (DinoCleaning::*State02160de8_58)(); // 0x58
@@ -356,7 +364,7 @@ extern "C" struct {
 } data_ov002_02165aec;
 extern "C" struct {
     void (DinoCommonLive::*SetUnkA0_00)(u32, bool); // 0x00 (DinoCommonLive::SetUnkA0)
-    u8 unk08[0x10 - 0x8];
+    void (DinoCleaning::*State02162cec_08)(); // 0x08
     void (DinoCleaning::*State02161260_10)(); // 0x10
     void (DinoHelpBase::*Enable_18)(); // 0x18
     void (DinoCleaning::*State021610b0_20)(); // 0x20
@@ -883,6 +891,144 @@ void DinoCleaning::State02161d48() {
               mResultPicture->GetScreen()->CreateRotAnime(0, 0x1000, 20, 2),
               MCreateCallTask((DinoCleaningLive *)mUnkE4, data_ov002_02165b24.SetUnkAC_00, (u32)0x16), new MTimer(120));
     mState = data_ov002_02165aec.State02162cec_28;
+}
+
+extern "C" struct {
+    void (DinoCommonLive::*SetUnkAC_00)(u32); // 0x00
+} data_ov002_02165b1c, data_ov002_02165b54;
+
+static inline void AddSerial(DinoCleaning *process, MTask *a, MTask *b, MTask *c) {
+    MSerialTaskSet *serial = &process->mSerial;
+    serial->AddTail(a);
+    serial->AddTail(b);
+    serial->AddTail(c);
+}
+
+// The cleaning passed: the picture zooms in, with the score, then shakes and sways, less and less.
+void DinoCleaning::State02161f9c() {
+    mUnkE4->SetUnkA0(7, TRUE);
+    if (mUnkA0 != NULL) {
+        ((u32 *)mUnkA0)[3] = 1;
+        if (((u32 *)mUnkA0)[0] == 0) {
+            ((u32 *)mUnkA0)[0] = MFx32ToInt(mStatus->GetScore()->GetUnk80());
+        }
+    }
+    mResultPicture = new MExtAffinePicture(std::string(data_ov002_021659ec.mPassPath), TRUE, false);
+    mParallel.AddTail(mResultPicture);
+    mResultPicture->Show();
+    mResultPicture->GetScreen()->SetCenter(0x80, 0x60);
+    mSerial.AddTail(DinoCleaningPar(mResultPicture->CreateCoordAnime(MPoint(0, 192), MPoint(0, -32), 60, -2),
+                                    mResultPicture->GetScreen()->CreateScaleAnime(
+                                        MFx32Point(MFx32::FromRaw(0x1800), MFx32::FromRaw(0x1800)),
+                                        MFx32Point(MFx32(1), MFx32(1)), 60, 0)));
+    if (mUnkCA) {
+        u32 score = MFx32ToInt(mStatus->GetScore()->GetUnk80());
+        MMotion *motion = new MMotion(std::string(data_ov002_021659ec.mScorePath), (MSmartOam *)mUnkD4, 0, 1);
+        motion->Show();
+        motion->GetUnit()->SetMode(1);
+        motion->SetPosition(0x80, 0x60);
+        mUnk13C->AddTail(motion);
+        mSerial.AddTail(motion->CreatePlayTransfer(1, 0));
+        motion = new MMotion(std::string(data_ov002_021659ec.mTensPath), (MSmartOam *)mUnkD4, 0, 1);
+        motion->Show();
+        motion->GetUnit()->SetMode(1);
+        motion->SetPosition(0x80, 0x60);
+        mUnk13C->AddTail(motion);
+        mSerial.AddTail(motion->CreatePlayTransfer(score / 10 + 1, 0));
+        motion = new MMotion(std::string(data_ov002_021659ec.mOnesPath), (MSmartOam *)mUnkD4, 0, 1);
+        motion->Show();
+        motion->GetUnit()->SetMode(1);
+        motion->SetPosition(0x80, 0x60);
+        mUnk13C->AddTail(motion);
+        mSerial.AddTail(motion->CreatePlayTransfer(score % 10 + 1, 0));
+    }
+    AddSerial(this, mResultPicture->CreateCoordAnime(MPoint(0, -32), MPoint(0, 0), 10, 2),
+              DinoSoundCreatePlaySeTask(0x3D, 0));
+    for (int i = 20; i >= 0; i--) {
+        MFx32 amp = MFx32(i) / MFx32(2);
+        AddSerial(this,
+                  mResultPicture->CreateCoordTransfer(MFx32ToInt(amp * mRandom->NextFraction() - amp / MFx32(2)),
+                                                         MFx32ToInt(amp * mRandom->NextFraction() - amp / MFx32(2))),
+                  mResultPicture->GetScreen()->CreateRotTransfer(
+                      MFx32ToInt(amp * mRandom->NextFraction() * MFx32(512) - amp * MFx32(512) / MFx32(2))),
+                  new MTimer(1));
+    }
+    AddSerial(this, MCreateCallTask((DinoCleaningLive *)mUnkE4, data_ov002_02165b1c.SetUnkAC_00, (u32)0x16),
+              new MTimer(100));
+    mState = data_ov002_02165aec.State02162cec_40;
+}
+
+// One of the best score's digits, played after the frame (waiting for it in set).
+static inline DinoSeMotion *DinoCleaningBestDigit(DinoCleaning *c, MParallelTaskSet *set, const char *path, int anime) {
+    DinoSeMotion *motion = new DinoSeMotion(std::string(path), (MSmartOam *)c->mUnkD4, 0, 1);
+    motion->AddSe(0x3C);
+    motion->GetUnit()->SetMode(1);
+    motion->Show();
+    motion->SetAnchor(1);
+    motion->SetPosition(0x80, 0x60);
+    c->mUnk13C->AddTail(motion);
+    c->mSerial.AddTail(motion->CreatePlayTransfer(anime, 0));
+    set->AddTail(motion->CreateWaitStopTask());
+    return motion;
+}
+
+// The best cleaning: paper falls, the picture drops in, zooms and shakes, then the score counts in.
+void DinoCleaning::State02162544() {
+    mUnkE4->SetUnkA0(8, TRUE);
+    if (mUnkA0 != NULL) {
+        if (mUnkA4) {
+            ((u32 *)mUnkA0)[3] = 1;
+            if (((u32 *)mUnkA0)[0] == 0) {
+                ((u32 *)mUnkA0)[0] = MFx32ToInt(mStatus->GetScore()->GetUnk80());
+            }
+        } else {
+            ((u32 *)mUnkA0)[3] = 2;
+            if (((u32 *)mUnkA0)[0] == 0) {
+                ((u32 *)mUnkA0)[0] = MFx32ToInt(mStatus->GetScore()->GetUnk80());
+            }
+        }
+    }
+    MSmartOam *oam = new MSmartOam(gLcd->GetTopDisplay(), 100, 50, TRUE);
+    oam->mOffset.x = 0;
+    oam->mOffset.y = -192;
+    mPaper = new DinoCleaningPaper(oam, (MSmartOam *)mUnkD4, mRandom);
+    mParallel.AddHead(mPaper);
+    mParallel.AddTail(oam);
+    mResultPicture = new MExtAffinePicture(std::string(data_ov002_021659ec.mBestPath), TRUE, false);
+    mParallel.AddTail(mResultPicture);
+    mResultPicture->Show();
+    mResultPicture->GetScreen()->SetCenter(0x80, 0x60);
+    AddSerial(this,
+              DinoCleaningPar(mResultPicture->CreateCoordAnime(MPoint(0, 192), MPoint(0, -32), 60, -2),
+                              mResultPicture->GetScreen()->CreateScaleAnime(
+                                  MFx32Point(MFx32::FromRaw(0x1800), MFx32::FromRaw(0x1800)),
+                                  MFx32Point(MFx32(1), MFx32(1)), 60, 0)),
+              mResultPicture->CreateCoordAnime(MPoint(0, -32), MPoint(0, 0), 10, 2), DinoSoundCreatePlaySeTask(0x3E, 0));
+    for (int i = 20; i >= 0; i--) {
+        MFx32 amp = MFx32(i) / MFx32(2);
+        AddSerial(this,
+                  mResultPicture->CreateCoordTransfer(MFx32ToInt(amp * mRandom->NextFraction() - amp / MFx32(2)),
+                                                         MFx32ToInt(amp * mRandom->NextFraction() - amp / MFx32(2))),
+                  mResultPicture->GetScreen()->CreateRotTransfer(
+                      MFx32ToInt(amp * mRandom->NextFraction() * MFx32(512) - amp * MFx32(512) / MFx32(2))),
+                  new MTimer(1));
+    }
+    if (mUnkCA) {
+        MParallelTaskSet *set = new MParallelTaskSet(TRUE);
+        DinoCleaningBestDigit(this, set, data_ov002_021659ec.mBestScorePath, 1);
+        u32 score = ((u32 *)mUnkA0)[0];
+        if (score >= 100) {
+            DinoCleaningBestDigit(this, set, data_ov002_021659ec.mBestHundredsPath, 1);
+        }
+        if (score >= 10) {
+            DinoCleaningBestDigit(this, set, data_ov002_021659ec.mBestTensPath, score / 10 % 10 + 1);
+        }
+        DinoCleaningBestDigit(this, set, data_ov002_021659ec.mBestOnesPath, score % 10 + 1);
+        mSerial.AddTail(set);
+    }
+    AddSerial(this, MCreateCallTask((DinoCleaningLive *)mUnkE4, data_ov002_02165b54.SetUnkAC_00, (u32)0x16),
+              new MTimer(100));
+    mState = data_ov002_02165b6c.State02162cec_08;
 }
 
 void DinoCleaning::StateEnableToolMenu() {
