@@ -863,20 +863,38 @@ u32 DinoGetCreatureLevel(const DinoCreatureState *creature) {
     return (DinoGetCreatureTotal(creature) - 50) / kCreatureLevelLimits[0] + 1;
 }
 
+// DinoGetCreatureTotal and DinoGetCreatureLevel with the sum declared first (inlined into the experience to the next
+// level, where the game puts the sum below the cap).
+static inline u32 DinoCreatureTotalSumFirst(const DinoCreatureState *creature) {
+    if (creature->parts[0].level == 0) {
+        return 0;
+    }
+    u32 sum, max;
+    sum = creature->unk0_8 + (creature->parts[0].level + creature->parts[1].level + creature->parts[2].level +
+                              creature->parts[3].level);
+    max = kCreatureLevelLimits[0] * 11 + 50;
+    return std::min(max, sum);
+}
+static inline u32 DinoCreatureLevelSumFirst(const DinoCreatureState *creature) {
+    if (creature->parts[0].level == 0) {
+        return 0;
+    }
+    return (DinoCreatureTotalSumFirst(creature) - 50) / kCreatureLevelLimits[0] + 1;
+}
+
 // The experience a creature still needs for its next level (0 at the top level).
-// NONMATCHING: 98%, the two inlined std::min temporaries swap stack slots.
 u32 DinoGetCreatureExpToNext(const DinoCreatureState *creature) {
     u32 next;
     if (creature->parts[0].level == 0) {
         next = 0;
     } else {
-        u32 level = DinoGetCreatureLevel(creature);
+        u32 level = DinoCreatureLevelSumFirst(creature);
         next = level == 12 ? 0 : level + 1;
     }
     if (next == 0) {
         return 0;
     }
-    return kCreatureLevelLimits[0] * (next - 1) + 50 - DinoGetCreatureTotal(creature);
+    return (next - 1) * kCreatureLevelLimits[0] + 50 - DinoGetCreatureTotal(creature);
 }
 
 // (Called, not inlined, by DinoUiReviveEffect::State0215e274.)
