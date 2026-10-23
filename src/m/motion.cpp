@@ -683,11 +683,15 @@ MRect MMotion::GetCellRect(u32 cell) {
     return rect.Moved(pos);
 }
 
+static inline void MMotionUnite(MRect &frame, MRect r) {
+    frame.Unite(r);
+}
+
 MRect MMotion::GetFrame() {
     MRect frame(0x7FFFFFFF, 0x7FFFFFFF, 0x80000000, 0x80000000);
     for (u32 i = 0; i < mCellCount; i++) {
         if (mCells[i].visible) {
-            frame.Unite(GetCellRect(i));
+            MMotionUnite(frame, GetCellRect(i));
         }
     }
     if (frame.left == 0x7FFFFFFF && frame.top == 0x7FFFFFFF && frame.right == 0x80000000 && frame.bottom == 0x80000000) {
