@@ -1,4 +1,4 @@
-// MExtAffine and its transfers. Not decompiled yet: the tile map copy with flips (func_0204c5f0).
+// MExtAffine and its transfers.
 
 #include "m/ext_affine.h"
 #include "game/dino_static_init.h"
@@ -50,9 +50,95 @@ void MExtAffine::Fill(MRect rect, int tile, int palette, bool hflip, bool vflip)
 MExtAffineTransfer::~MExtAffineTransfer() {
 }
 
-// Copies a w x h block of tile entries from (x, y) of the source to (dx, dy) of the map, with the flips.
+// Copies h rows of w tile entries from (x, y) of the source into the map from (dx, dy), adding attr and
+// flipping with flip (the rows go bottom up when vertically flipped, each row right to left when horizontally).
+static inline void MExtAffineCopyTiles(const u16 *src, int srcWidth, int x, int y, int w, int h, u32 base, int size,
+                                       int blocks, int dx, int dy, u16 attr, u16 flip) {
+    const u16 *s;
+    if (!(flip & 0x800)) {
+        if (!(flip & 0x400)) {
+            u16 *d = MExtAffine::GetEntry((u16 *) base, size, dx, dy);
+            s = src + srcWidth * y + x;
+            int n;
+            int rows = h;
+            while (rows != 0) {
+                n = w;
+                while (n != 0) {
+                    n--;
+                    *d = (*s++ + attr) ^ flip;
+                    d++;
+                }
+                rows--;
+                d += blocks - w;
+                s += srcWidth - w;
+            }
+        } else {
+            u16 *d = MExtAffine::GetEntry((u16 *) base, size, dx + w - 1, dy);
+            s = src + srcWidth * y + x;
+            int n;
+            int rows = h;
+            while (rows != 0) {
+                n = w;
+                while (n != 0) {
+                    n--;
+                    *d-- = (*s++ + attr) ^ flip;
+                }
+                rows--;
+                d += blocks + w;
+                s += srcWidth - w;
+            }
+        }
+    } else {
+        if (!(flip & 0x400)) {
+            u16 *d = MExtAffine::GetEntry((u16 *) base, size, dx, dy + h - 1);
+            s = src + srcWidth * y + x;
+            int n;
+            int rows = h;
+            while (rows != 0) {
+                n = w;
+                while (n != 0) {
+                    n--;
+                    *d++ = (*s++ + attr) ^ flip;
+                }
+                rows--;
+                d += -(blocks + w);
+                s += srcWidth - w;
+            }
+        } else {
+            u16 *d = MExtAffine::GetEntry((u16 *) base, size, dx + w - 1, dy + h - 1);
+            s = src + srcWidth * y + x;
+            int n;
+            int rows = h;
+            while (rows != 0) {
+                n = w;
+                while (n != 0) {
+                    n--;
+                    *d-- = (*s++ + attr) ^ flip;
+                }
+                rows--;
+                d += -(blocks - w);
+                s += srcWidth - w;
+            }
+        }
+    }
+}
+
+// Copies a w x h block of tile entries from (x, y) of the source to (dx, dy) of the map, with the flips; a copy
+// crossing the map's bottom edge goes on at its top (the source's last rows first when flipped).
 extern "C" void func_0204c5f0(int blocks, const u16 *src, int srcWidth, int srcHeight, int x, int y, int w, int h,
-                              u32 base, int size, int dx, int dy, u16 attr, u16 flip);
+                              u32 base, int size, int dx, int dy, u16 attr, u16 flip) {
+    if (dy + h < blocks) {
+        MExtAffineCopyTiles(src, srcWidth, x, y, w, h, base, size, blocks, dx, dy, attr, flip);
+    } else if (!(flip & 0x800)) {
+        MExtAffineCopyTiles(src, srcWidth, x, y, w, blocks - dy, base, size, blocks, dx, dy, attr, flip);
+        MExtAffineCopyTiles(src, srcWidth, x, y + blocks - dy, w, h - (blocks - dy), base, size, blocks, dx, 0, attr,
+                            flip);
+    } else {
+        MExtAffineCopyTiles(src, srcWidth, x, y + h - (blocks - dy), w, blocks - dy, base, size, blocks, dx, dy, attr,
+                            flip);
+        MExtAffineCopyTiles(src, srcWidth, x, y, w, h - (blocks - dy), base, size, blocks, dx, 0, attr, flip);
+    }
+}
 
 // The copy wraps round the map's right edge: it's done in two parts (in the other order when flipped).
 void MExtAffineTransfer::Transfer() {
