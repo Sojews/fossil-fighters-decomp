@@ -13,6 +13,7 @@ src/ov007/dino_ui_atm_cursor.cpp:
 
 src/ov007/dino_ui_organization_menu.cpp:
     .text       start:0x02174ad8 end:0x02180f98
+    .init       start:0x0218c090 end:0x0218c478
 
 src/ov007/dino_ui_team_select.cpp:
     .text       start:0x0218ad84 end:0x0218bdc0
