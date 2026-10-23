@@ -216,10 +216,10 @@ MTextCanvas::MTextCanvas(MDisplay *display, MPoint size, const void *palette, in
 }
 
 void MTextCanvas::Init(const void *palette, BOOL fromEnd) {
-    u32 count = (GetHeight() + 7) >> 3;
+    int count = (GetHeight() + 7) >> 3;
     mTileSize.x = (GetWidth() + 7) >> 3;
     mTileSize.y = count;
-    count *= mTileSize.x;
+    count = (u32) mTileSize.x * count;
     MBg *bg = mDisplay->mBg;
     mPal = bg->mPal->Alloc(1, palette, fromEnd);
     mChr = bg->CreateChr(0, count + 1, fromEnd);
