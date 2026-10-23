@@ -519,15 +519,25 @@ def main():
     ap.add_argument("-j", type=int, default=max(1, os.cpu_count() - 2))
     ap.add_argument("-t", type=float, default=600, help="seconds")
     ap.add_argument("--seed", type=int, default=None)
+    ap.add_argument("--resume", action="store_true", help="start from the best candidate of an earlier run")
     a = ap.parse_args()
     src = (ROOT / a.src).resolve()
     text = src.read_text()
     o, c = find_body(text, a.start)
     body = text[o + 1:c]
+    out = ROOT / "build/permute" / a.symbol
+    if a.resume:
+        bests = sorted(out.glob("best-*.cpp"), key=lambda p: int(p.stem[5:]))
+        if bests:
+            prev = bests[0].read_text()
+            po, pc = find_body(prev, a.start)
+            body = prev[po + 1:pc]
+            text = text[:o + 1] + body + text[c:]
+            o, c = find_body(text, a.start)
+            print(f"resuming from {bests[0].name}", flush=True)
     cmd = compile_command(src)
     theirs, trel, thumb = target(src, a.symbol)
     theirs_tokens = tokens(theirs, thumb, frozenset(trel))
-    out = ROOT / "build/permute" / a.symbol
     TMP.mkdir(parents=True, exist_ok=True)
     out.mkdir(parents=True, exist_ok=True)
 

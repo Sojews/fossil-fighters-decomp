@@ -51,6 +51,7 @@ def main():
     ap.add_argument("-j", type=int, default=9)
     ap.add_argument("--units", nargs="*", default=["src/"])
     ap.add_argument("--list", action="store_true")
+    ap.add_argument("--improved", help="only the functions an earlier batch log shows improving (resumed from their best)")
     a = ap.parse_args()
     report = json.load(open(ROOT / "build/report.json"))
     cands = []
@@ -72,6 +73,13 @@ def main():
                 start = definition_start(src, f["name"])
                 if start:
                     cands.append((pct, size, src, f["name"], start))
+    if a.improved:
+        better = set()
+        for l in open(a.improved):
+            m = re.search(r" (\S+): base score (\d+); done: best (\d+)", l)
+            if m and 0 < int(m.group(3)) < int(m.group(2)):
+                better.add(m.group(1))
+        cands = [c for c in cands if c[3] in better]
     cands.sort(key=lambda c: (-c[0], c[1]))
     if a.list:
         for pct, size, src, sym, start in cands:
@@ -83,7 +91,7 @@ def main():
     for pct, size, src, sym, start in cands:
         t0 = time.time()
         r = subprocess.run([sys.executable, str(ROOT / "tools/permute.py"), str(src.relative_to(ROOT)), sym, start,
-                            "-j", str(a.j), "-t", str(a.t)], cwd=ROOT, capture_output=True, text=True)
+                            "-j", str(a.j), "-t", str(a.t)] + (["--resume"] if a.improved else []), cwd=ROOT, capture_output=True, text=True)
         lines = (r.stdout + r.stderr).strip().split("\n")
         base = next((l for l in lines if l.startswith("base score")), "?")
         last = lines[-1] if lines else "?"
