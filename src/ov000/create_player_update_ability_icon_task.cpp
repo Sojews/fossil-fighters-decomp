@@ -3313,8 +3313,6 @@ MFx32 DinoBattleModelCreature::ApplyPositionRatio(MFx32 damage, int otherCategor
 }
 
 // The damage from attack against defense, raised or lowered by the support effects of the creatures beside it.
-// NONMATCHING: the copies of percent for the additions and the division take the stack slot below their other
-// operand's copy in the game, above it here.
 MFx32 DinoBattleModelCreature::CalcDamage(DinoBattleModelCreature *target, MFx32 attack, MFx32 defense, u8 *hit) {
     if (gDinoResource->GetBattleAdjustDefs()->unk168) {
         if (attack > MFx32(0)) {
@@ -3326,16 +3324,16 @@ MFx32 DinoBattleModelCreature::CalcDamage(DinoBattleModelCreature *target, MFx32
                         DinoBattleModelCreature *enemy = mPlayer->GetOpponent()->FindCreature(i ? 2 : 1);
                         if (ally != NULL && (ally->GetUnk108() & 1)) {
                             DinoBattleCreatureDef *def = ally->GetDef();
-                            percent = percent + MFx32(DinoOffsetPtr<s8>(def, def->mUnk54)[0]);
+                            percent += MFx32(DinoOffsetPtr<s8>(def, def->mUnk54)[0]);
                         }
                         if (enemy != NULL && (enemy->GetUnk108() & 2)) {
                             DinoBattleCreatureDef *def = enemy->GetDef();
-                            percent = percent + MFx32(DinoOffsetPtr<s8>(def, def->mUnk58)[0]);
+                            percent += MFx32(DinoOffsetPtr<s8>(def, def->mUnk58)[0]);
                         }
                     }
                 }
             }
-            percent = percent / MFx32(100);
+            percent /= MFx32(100);
             return (attack * percent + defense) / MFx32(gDinoResource->GetBattleAdjustDefs()->unk10);
         }
         *hit = FALSE;
