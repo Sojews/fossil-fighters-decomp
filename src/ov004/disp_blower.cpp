@@ -20,6 +20,7 @@
 #include "m/motion.h"
 #include "m/picture.h"
 #include "m/smart_oam.h"
+#include "game/dino_static_init.h"
 
 // The file's pooled statics (anchor data_ov004_0217520c): motion paths, the callback the menu runs once shown, and
 // the layout points (zero in the ROM, set up at startup).
@@ -805,3 +806,49 @@ DinoUiOptionMenuItem::DinoUiOptionMenuItem(DinoUiOptionMenu *owner, const std::s
 template <> MTask *MCreateCallTask(DinoUiOptionMenu *obj, void (DinoHelpBase::*func)()) {
     return new MCallTask0<DinoUiOptionMenu, DinoHelpBase>(obj, func);
 }
+
+// The file's static initialization (see dino_static_init.h).
+extern "C" u32 data_ov004_0217528c[];
+static struct DispBlowerStaticInit {
+    DispBlowerStaticInit() {
+        DINO_POOL_WORD(data_ov004_0217520c, 0x50) = 0x80;
+        DINO_POOL_WORD(data_ov004_0217520c, 0x54) = 0x60;
+        DINO_POOL_WORD(data_ov004_0217520c, 0x68) = 0x49;
+        DINO_POOL_WORD(data_ov004_0217520c, 0x6C) = 0x34;
+        DINO_POOL_WORD(data_ov004_0217520c, 0x58) = 0x35;
+        DINO_POOL_WORD(data_ov004_0217520c, 0x5C) = 0;
+        DINO_POOL_WORD(data_ov004_0217520c, 0x40) = 0x35;
+        DINO_POOL_WORD(data_ov004_0217520c, 0x44) = 0x57;
+        DINO_POOL_WORD(data_ov004_0217528c, 0x20) = 0x35;
+        DINO_POOL_WORD(data_ov004_0217528c, 0x24) = 0x6B;
+        DINO_POOL_WORD(data_ov004_0217528c, 0x08) = 0x80;
+        DINO_POOL_WORD(data_ov004_0217528c, 0x0C) = 0x60;
+        DINO_POOL_WORD(data_ov004_0217528c, 0x30) = 0x12;
+        DINO_POOL_WORD(data_ov004_0217528c, 0x34) = 0;
+        DINO_POOL_WORD(data_ov004_0217528c, 0x28) = 0x12;
+        DINO_POOL_WORD(data_ov004_0217528c, 0x2C) = 0;
+        DINO_POOL_WORD(data_ov004_0217528c, 0x18) = 0x80;
+        DINO_POOL_WORD(data_ov004_0217528c, 0x1C) = 0x60;
+        DINO_POOL_WORD(data_ov004_0217520c, 0x78) = 0x80;
+        DINO_POOL_WORD(data_ov004_0217520c, 0x7C) = 0x60;
+        DINO_POOL_WORD(data_ov004_0217520c, 0x48) = 0x80;
+        DINO_POOL_WORD(data_ov004_0217520c, 0x4C) = 0x60;
+        DINO_POOL_WORD(data_ov004_0217530c, 0x5C) = 0x40;
+        DINO_POOL_WORD(data_ov004_0217530c, 0x60) = 0x86;
+        DINO_POOL_WORD(data_ov004_0217530c, 0x64) = 0xC0;
+        DINO_POOL_WORD(data_ov004_0217530c, 0x68) = 0x96;
+    }
+} sDispBlowerStaticInit;
+
+std::string data_ov004_021772b4[3] = {data_ov004_0217520c.mPaths[5], data_ov004_0217520c.mPaths[9],
+                                      data_ov004_0217520c.mPaths[6]};
+
+extern "C" const u32 data_0208abac, data_0208abb0, data_0208abb4;
+
+static struct DispBlowerStaticInit2 {
+    DispBlowerStaticInit2() {
+        DINO_POOL_WORD(data_ov004_0217528c, 0x58) = data_0208abb4;
+        DINO_POOL_WORD(data_ov004_0217528c, 0x5C) = data_0208abb0;
+        DINO_POOL_WORD(data_ov004_0217528c, 0x60) = data_0208abac;
+    }
+} sDispBlowerStaticInit2;

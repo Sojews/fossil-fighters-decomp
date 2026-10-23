@@ -31,6 +31,7 @@ src/ov004/dino_ui_save_option.cpp:
 
 src/ov004/disp_blower.cpp:
     .text       start:0x0216a104 end:0x0216c954
+    .init       start:0x02171954 end:0x02171a30
 
 src/ov004/dino_ui_island_map.cpp:
     .text       start:0x0216c954 end:0x0216e65c
