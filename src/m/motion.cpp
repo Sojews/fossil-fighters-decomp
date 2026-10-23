@@ -12,6 +12,10 @@
 #include "m/obj.h"
 #include "m/chr.h"
 #include "m/pal.h"
+#include "m/fx32.h"
+#include "nitro/g2.h"
+
+extern "C" int MTX_Inverse22(const MtxFx22 *src, MtxFx22 *dst);
 
 static MMutex sMotionDatasMutex;
 static std::map<FSFileID, MMotionData *> sMotionDatas;
@@ -595,6 +599,88 @@ void MMotion::Hide() {
 
 BOOL MMotion::IsHidden() {
     return mHidden;
+}
+
+// The matrix of an OAM affine parameter set (8.8 fixed point) as fx32.
+static inline MtxFx22 MMotionGetAffineMtx(const GXOamAffine *oam) {
+    MtxFx22 m;
+    m._00 = oam->PA << 4;
+    m._01 = oam->PB << 4;
+    m._10 = oam->PC << 4;
+    m._11 = oam->PD << 4;
+    return m;
+}
+
+// A 2x2 fx32 matrix as MFx32s.
+struct MMotionMtx {
+    MFx32 _00, _01, _10, _11;
+};
+
+static inline MFx32Point MMotionToFx(MPoint p) {
+    return MFx32Point(p.x, p.y);
+}
+
+// The rectangle a cell's graphics cover (flipped, or turned by its affine matrix and clipped to the OBJ), relative to
+// the motion's position.
+MRect MMotion::GetCellRect(u32 cell) {
+    MSmartOamCell *entry = &mEntries[mCells[cell].entry];
+    MRect rect = mFile.GetChrBounds(mCells[cell].unk04);
+    if (entry->objMode == 0) {
+        int shape = entry->shape | (entry->size << 2);
+        int w = gObjSizes[0][shape].x;
+        int h = gObjSizes[0][shape].y;
+        MPoint size(w, h);
+        // (The vertical flip tests the horizontal flip bit too.)
+        bool flip = entry->hflip;
+        if (flip) {
+            rect.left = size.x - rect.left;
+            rect.right = size.x - rect.right;
+            std::swap(rect.left, rect.right);
+        }
+        if (flip) {
+            rect.top = size.y - rect.top;
+            rect.bottom = size.y - rect.bottom;
+            std::swap(rect.top, rect.bottom);
+        }
+    }
+    if (entry->objMode == 1 || entry->objMode == 3) {
+        int shape = entry->GetShape();
+        MPoint size(gObjSizes[0][shape].x, gObjSizes[0][shape].y);
+        MPoint half = size / 2;
+        MtxFx22 mtx = MMotionGetAffineMtx((const GXOamAffine *) mAffines[cell]->addr);
+        MTX_Inverse22(&mtx, &mtx);
+        if (entry->objMode == 3) {
+            rect.Offset(MPoint(size.x / 2, size.y / 2));
+            size = MPoint(size.x * 2, size.y * 2);
+            half = MPoint(half.x * 2, half.y * 2);
+        }
+        rect.Offset(MPoint(0, 0) - half);
+        MFx32Point corners[4] = {
+            MMotionToFx(MPoint(rect.left, rect.top)),
+            MMotionToFx(MPoint(rect.left, rect.bottom)),
+            MMotionToFx(MPoint(rect.right, rect.top)),
+            MMotionToFx(MPoint(rect.right, rect.bottom)),
+        };
+        MMotionMtx m = *(MMotionMtx *) &mtx;
+        rect = MRect(INT_MAX, INT_MAX, INT_MIN, INT_MIN);
+        for (u32 i = 0; i < 4; i++) {
+            int x = MFx32ToInt(m._00 * corners[i].x + m._01 * corners[i].y);
+            int y = MFx32ToInt(m._10 * corners[i].x + m._11 * corners[i].y);
+            rect.left = std::min(rect.left, x);
+            rect.top = std::min(rect.top, y);
+            rect.right = std::max(rect.right, x + 1);
+            rect.bottom = std::max(rect.bottom, y + 1);
+        }
+        rect.Offset(half);
+        // (The dead std::max calls only bind literal zeros to const int &: their pool constants put the clamp's zeros at
+        // the game's offsets.)
+        std::max(0, 0);
+        rect = MRect(std::max(0, rect.left), std::max(0, rect.top), std::min(size.x, rect.right),
+                     std::min(size.y, rect.bottom));
+        std::max(size.x, 0);
+    }
+    MPoint pos(entry->posX - entry->unk08, entry->posY - entry->unk0C);
+    return rect.Moved(pos);
 }
 
 MRect MMotion::GetFrame() {
