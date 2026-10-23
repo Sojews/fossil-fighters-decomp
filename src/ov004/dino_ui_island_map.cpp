@@ -30,6 +30,7 @@
 #include "game/dino_sound.h"
 #include "m/bright.h"
 #include "m/display.h"
+#include "game/dino_static_init.h"
 
 extern const int data_02089adc[10]; // the place each map item stands for
 
@@ -613,3 +614,132 @@ void DinoUiIslandMap::Idle() {
 
 // (Off at the end of the file, where template members are instantiated: the game calls them out of line.)
 #pragma auto_inline off
+
+// The file's static initialization (see dino_static_init.h): layout points, path tables copied from the pooled paths,
+// the map spots, and text ids copied from main's constants.
+// NONMATCHING: 88%, the same stores in the same order; the game keeps the anchors and constants in other registers.
+extern "C" u32 data_0208abfc[];
+extern "C" u32 data_0208ac00[];
+extern "C" u32 data_0208ac04[];
+extern "C" u32 data_0208ac08[];
+extern "C" u32 data_0208ac0c[];
+extern "C" u32 data_0208ac10[];
+extern "C" u32 data_0208ac14[];
+extern "C" u32 data_0208ac18[];
+extern "C" u32 data_0208ac1c[];
+extern "C" u32 data_0208ac20[];
+extern "C" u32 data_ov004_02175b18[];
+extern "C" u32 data_ov004_02175b58[];
+extern "C" u32 data_ov004_02175bac[];
+extern "C" u32 data_ov004_02175bb4[];
+extern "C" u32 data_ov004_02175bbc[];
+extern "C" u32 data_ov004_02175bc4[];
+extern "C" u32 data_ov004_02175bd8[];
+extern "C" u32 data_ov004_02175c24[];
+extern "C" u32 data_ov004_02175c2c[];
+extern "C" u32 data_ov004_02175c34[];
+extern "C" u32 data_ov004_02175c3c[];
+extern "C" u32 data_ov004_02175c44[];
+extern "C" u32 data_ov004_02175c4c[];
+extern "C" u32 data_ov004_02175c54[];
+extern "C" u32 data_ov004_02175c58[];
+extern "C" u32 data_ov004_02175c5c[];
+extern "C" u32 data_ov004_02175c64[];
+static struct DinoUiIslandMapStaticInit {
+    DinoUiIslandMapStaticInit() {
+        DINO_POOL_WORD(data_ov004_021759d8, 0x74) = 0x80;
+        DINO_POOL_WORD(data_ov004_021759d8, 0x78) = 0x60;
+        DINO_POOL_WORD(data_ov004_02175b58, 0x74) = DINO_POOL_WORD(data_ov004_021759d8, 0x40);
+        DINO_POOL_WORD(data_ov004_02175b58, 0x78) = DINO_POOL_WORD(data_ov004_021759d8, 0x2C);
+        DINO_POOL_WORD(data_ov004_02175b58, 0x7C) = DINO_POOL_WORD(data_ov004_021759d8, 0x34);
+        DINO_POOL_WORD(data_ov004_02175bd8, 0x0) = DINO_POOL_WORD(data_ov004_021759d8, 0x1C);
+        DINO_POOL_WORD(data_ov004_02175bd8, 0x4) = DINO_POOL_WORD(data_ov004_021759d8, 0x50);
+        DINO_POOL_WORD(data_ov004_02175bd8, 0x8) = DINO_POOL_WORD(data_ov004_021759d8, 0x28);
+        DINO_POOL_WORD(data_ov004_02175bd8, 0xC) = DINO_POOL_WORD(data_ov004_021759d8, 0x20);
+        DINO_POOL_WORD(data_ov004_02175bd8, 0x10) = DINO_POOL_WORD(data_ov004_021759d8, 0x4);
+        DINO_POOL_WORD(data_ov004_02175bd8, 0x14) = DINO_POOL_WORD(data_ov004_021759d8, 0x58);
+        DINO_POOL_WORD(data_ov004_02175bd8, 0x18) = DINO_POOL_WORD(data_ov004_021759d8, 0x54);
+        DINO_POOL_WORD(data_ov004_02175bd8, 0x1C) = DINO_POOL_WORD(data_ov004_021759d8, 0x48);
+        DINO_POOL_WORD(data_ov004_02175bd8, 0x20) = DINO_POOL_WORD(data_ov004_021759d8, 0x18);
+        DINO_POOL_WORD(data_ov004_02175bd8, 0x24) = DINO_POOL_WORD(data_ov004_021759d8, 0x38);
+        DINO_POOL_WORD(data_ov004_02175bd8, 0x28) = DINO_POOL_WORD(data_ov004_021759d8, 0x44);
+        DINO_POOL_WORD(data_ov004_02175bd8, 0x2C) = DINO_POOL_WORD(data_ov004_021759d8, 0x8);
+        DINO_POOL_WORD(data_ov004_02175bd8, 0x30) = DINO_POOL_WORD(data_ov004_021759d8, 0x4C);
+        DINO_POOL_WORD(data_ov004_02175bd8, 0x34) = DINO_POOL_WORD(data_ov004_021759d8, 0x10);
+        DINO_POOL_WORD(data_ov004_02175bd8, 0x38) = DINO_POOL_WORD(data_ov004_021759d8, 0x24);
+        DINO_POOL_WORD(data_ov004_02175bd8, 0x3C) = DINO_POOL_WORD(data_ov004_021759d8, 0x30);
+        DINO_POOL_WORD(data_ov004_02175bd8, 0x40) = DINO_POOL_WORD(data_ov004_021759d8, 0x3C);
+        DINO_POOL_WORD(data_ov004_021759d8, 0x7C) = -0x40;
+        DINO_POOL_WORD(data_ov004_02175a58, 0x0) = 0x70;
+        DINO_POOL_WORD(data_ov004_02175a58, 0x4) = 0x3C;
+        DINO_POOL_WORD(data_ov004_02175a58, 0x8) = 0x70;
+        DINO_POOL_WORD(data_ov004_021759d8, 0x6C) = 0x140;
+        DINO_POOL_WORD(data_ov004_021759d8, 0x70) = 0x70;
+        DINO_POOL_WORD(data_ov004_02175a58, 0xC) = 0xCC;
+        DINO_POOL_WORD(data_ov004_02175a58, 0x10) = 0x70;
+        DINO_POOL_WORD(data_ov004_02175a58, 0x14) = 0x80;
+        DINO_POOL_WORD(data_ov004_02175a58, 0x18) = 0xB0;
+        DINO_POOL_WORD(data_ov004_02175a58, 0x1C) = 0x80;
+        DINO_POOL_WORD(data_ov004_02175a58, 0x20) = 0x9C;
+        DINO_POOL_WORD(data_ov004_02175bd8, 0x44) = 0x44;
+        DINO_POOL_WORD(data_ov004_02175bd8, 0x48) = 0x1B;
+        DINO_POOL_WORD(data_ov004_02175c24, 0x0) = 0x44;
+        DINO_POOL_WORD(data_ov004_02175c24, 0x4) = 0x40;
+        DINO_POOL_WORD(data_ov004_02175c2c, 0x0) = 0x44;
+        DINO_POOL_WORD(data_ov004_02175c2c, 0x4) = 0x65;
+        DINO_POOL_WORD(data_ov004_02175c34, 0x0) = 0x44;
+        DINO_POOL_WORD(data_ov004_02175c34, 0x4) = 0x8A;
+        DINO_POOL_WORD(data_ov004_02175c3c, 0x0) = 0x44;
+        DINO_POOL_WORD(data_ov004_02175c3c, 0x4) = 0xAF;
+        DINO_POOL_WORD(data_ov004_02175c44, 0x0) = 0xBC;
+        DINO_POOL_WORD(data_ov004_02175c44, 0x4) = 0x2D;
+        DINO_POOL_WORD(data_ov004_02175c4c, 0x0) = 0xBC;
+        DINO_POOL_WORD(data_ov004_02175c4c, 0x4) = 0x52;
+        DINO_POOL_WORD(data_ov004_02175c54, 0x0) = 0xBC;
+        DINO_POOL_WORD(data_ov004_02175c54, 0x4) = 0x77;
+        DINO_POOL_WORD(data_ov004_02175c5c, 0x0) = 0xBC;
+        DINO_POOL_WORD(data_ov004_02175c5c, 0x4) = 0x9C;
+        DINO_POOL_WORD(data_ov004_02175c64, 0x0) = 0xBC;
+        DINO_POOL_WORD(data_ov004_02175c64, 0x4) = 0xC1;
+        DINO_POOL_WORD(data_ov004_02175b58, 0x4C) = 0x80;
+        DINO_POOL_WORD(data_ov004_02175b58, 0x50) = 0x1B;
+        DINO_POOL_WORD(data_ov004_02175bac, 0x0) = 0x80;
+        DINO_POOL_WORD(data_ov004_02175bac, 0x4) = 0x40;
+        DINO_POOL_WORD(data_ov004_02175bb4, 0x0) = 0x80;
+        DINO_POOL_WORD(data_ov004_02175bb4, 0x4) = 0x65;
+        DINO_POOL_WORD(data_ov004_02175bbc, 0x0) = 0x80;
+        DINO_POOL_WORD(data_ov004_02175bbc, 0x4) = 0x8A;
+        DINO_POOL_WORD(data_ov004_02175bc4, 0x0) = 0x80;
+        DINO_POOL_WORD(data_ov004_02175bc4, 0x4) = 0xAF;
+        DINO_POOL_WORD(data_ov004_02175c58, 0x14) = -0xD5;
+        DINO_POOL_WORD(data_ov004_02175c58, 0x18) = -0xB7;
+        DINO_POOL_WORD(data_ov004_02175c58, 0x1C) = -0x69;
+        DINO_POOL_WORD(data_ov004_02175c58, 0x20) = -0xCE;
+        DINO_POOL_WORD(data_ov004_02175c58, 0x24) = -0xB3;
+        DINO_POOL_WORD(data_ov004_02175c58, 0x28) = -0x6C;
+        DINO_POOL_WORD(data_ov004_02175c58, 0x2C) = -0x9F;
+        DINO_POOL_WORD(data_ov004_02175c58, 0x30) = -0xAE;
+        DINO_POOL_WORD(data_ov004_02175c58, 0x34) = 0xD;
+        DINO_POOL_WORD(data_ov004_02175c58, 0x38) = -0x48;
+        DINO_POOL_WORD(data_ov004_02175c58, 0x3C) = -0x79;
+        DINO_POOL_WORD(data_ov004_02175c58, 0x40) = -0x61;
+        DINO_POOL_WORD(data_ov004_02175c58, 0x44) = 0x80;
+        DINO_POOL_WORD(data_ov004_02175c58, 0x48) = 0x40;
+        DINO_POOL_WORD(data_ov004_02175c58, 0x4C) = -0xD4;
+        DINO_POOL_WORD(data_ov004_02175c58, 0x50) = -0x83;
+        DINO_POOL_WORD(data_ov004_02175c58, 0x54) = 0x46;
+        DINO_POOL_WORD(data_ov004_02175c58, 0x58) = -0x170;
+        DINO_POOL_WORD(data_ov004_02175c58, 0x5C) = -0x10F;
+        DINO_POOL_WORD(data_ov004_02175c58, 0x60) = 0xA;
+        DINO_POOL_WORD_16(data_ov004_02175b18, 0x38) = DINO_POOL_WORD(data_0208ac20, 0x0);
+        DINO_POOL_WORD_16(data_ov004_02175b18, 0x3A) = DINO_POOL_WORD(data_0208ac1c, 0x0);
+        DINO_POOL_WORD_16(data_ov004_02175b18, 0x3C) = DINO_POOL_WORD(data_0208ac18, 0x0);
+        DINO_POOL_WORD_16(data_ov004_02175b18, 0x3E) = DINO_POOL_WORD(data_0208ac14, 0x0);
+        DINO_POOL_WORD_16(data_ov004_02175b58, 0x0) = DINO_POOL_WORD(data_0208ac10, 0x0);
+        DINO_POOL_WORD_16(data_ov004_02175b58, 0x2) = DINO_POOL_WORD(data_0208ac0c, 0x0);
+        DINO_POOL_WORD_16(data_ov004_02175b58, 0x4) = DINO_POOL_WORD(data_0208ac08, 0x0);
+        DINO_POOL_WORD_16(data_ov004_02175b58, 0x6) = DINO_POOL_WORD(data_0208ac04, 0x0);
+        DINO_POOL_WORD_16(data_ov004_02175b58, 0x8) = DINO_POOL_WORD(data_0208ac00, 0x0);
+        DINO_POOL_WORD_16(data_ov004_02175b58, 0xA) = DINO_POOL_WORD(data_0208abfc, 0x0);
+    }
+} sDinoUiIslandMapStaticInit;
