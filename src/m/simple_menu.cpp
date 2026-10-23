@@ -102,7 +102,6 @@ MPoint MSimpleMenu::GetArrowPos(int side, int index) {
 
 // On the item with the id, or the first one.
 void MSimpleMenu::SetCursor(int id) {
-    u32 count = mEntries.size();
     int first = -1;
     u32 i;
     for (i = 0; i < mEntries.size(); i++) {
@@ -113,6 +112,7 @@ void MSimpleMenu::SetCursor(int id) {
             first = i;
         }
     }
+    const int count = mEntries.size();
     if (i == count) {
         if (first >= 0) {
             i = first;
