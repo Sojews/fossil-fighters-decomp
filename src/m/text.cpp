@@ -1,4 +1,4 @@
-// MText and its transfers. Not decompiled yet: the tile map copy with flips (func_02056750).
+// MText and its transfers.
 
 #include "m/text.h"
 #include "m/looper.h"
@@ -141,9 +141,95 @@ void MText::Fill(MRect rect, int tile, int palette, bool hflip, bool vflip) {
 MTextTransfer::~MTextTransfer() {
 }
 
-// Copies a w x h block of tile entries from (x, y) of the source to (dx, dy) of a 32x32 screen block, with the flips.
+// Copies h rows of w tile entries from (x, y) of the source into the screen block from (dx, dy), adding attr and
+// flipping with flip (the rows go bottom up when vertically flipped, each row right to left when horizontally).
+static inline void MTextCopyTiles(const u16 *src, int srcWidth, int x, int y, int w, int h, u32 base, int block, int dx,
+                                  int dy, u16 attr, u16 flip) {
+    const u16 *s;
+    if (!(flip & 0x800)) {
+        if (!(flip & 0x400)) {
+            u16 *d = (u16 *) base + ((dy + block * 32) * 32 + dx);
+            s = src + srcWidth * y + x;
+            int n;
+            int rows = h;
+            while (rows != 0) {
+                n = w;
+                while (n != 0) {
+                    n--;
+                    *d = (*s++ + attr) ^ flip;
+                    d++;
+                }
+                rows--;
+                d += 32 - w;
+                s += srcWidth - w;
+            }
+        } else {
+            u16 *d = (u16 *) base + ((dy + block * 32) * 32 + (dx + w - 1));
+            s = src + srcWidth * y + x;
+            int n;
+            int rows = h;
+            while (rows != 0) {
+                n = w;
+                while (n != 0) {
+                    n--;
+                    *d-- = (*s++ + attr) ^ flip;
+                }
+                rows--;
+                d += w + 32;
+                s += srcWidth - w;
+            }
+        }
+    } else {
+        if (!(flip & 0x400)) {
+            u16 *d = (u16 *) base + (((dy + h - 1) + block * 32) * 32 + dx);
+            s = src + srcWidth * y + x;
+            int n;
+            int rows = h;
+            while (rows != 0) {
+                n = w;
+                while (n != 0) {
+                    n--;
+                    *d++ = (*s++ + attr) ^ flip;
+                }
+                rows--;
+                d += -(w + 32);
+                s += srcWidth - w;
+            }
+        } else {
+            u16 *d = (u16 *) base + (((dy + h - 1) + block * 32) * 32 + (dx + w - 1));
+            s = src + srcWidth * y + x;
+            int n;
+            int rows = h;
+            while (rows != 0) {
+                n = w;
+                while (n != 0) {
+                    n--;
+                    *d-- = (*s++ + attr) ^ flip;
+                }
+                rows--;
+                d += -(32 - w);
+                s += srcWidth - w;
+            }
+        }
+    }
+}
+
+// Copies a w x h block of tile entries from (x, y) of the source to (dx, dy) of a 32x32 screen block, with the flips;
+// a copy crossing the block's bottom edge goes on in the block below (the source's last rows first when flipped).
 extern "C" void func_02056750(const u16 *src, int srcWidth, int srcHeight, int x, int y, int w, int h, u32 base,
-                              int size, int block, int dx, int dy, u16 attr, u16 flip);
+                              int size, int block, int dx, int dy, u16 attr, u16 flip) {
+    if (dy + h < 32) {
+        MTextCopyTiles(src, srcWidth, x, y, w, h, base, block, dx, dy, attr, flip);
+    } else if (!(flip & 0x800)) {
+        MTextCopyTiles(src, srcWidth, x, y, w, 32 - dy, base, block, dx, dy, attr, flip);
+        y += 32;
+        MTextCopyTiles(src, srcWidth, x, y - dy, w, h - (32 - dy), base, MText::GetDownBlock(size, block), dx, 0, attr,
+                       flip);
+    } else {
+        MTextCopyTiles(src, srcWidth, x, y + h - (32 - dy), w, 32 - dy, base, block, dx, dy, attr, flip);
+        MTextCopyTiles(src, srcWidth, x, y, w, h - (32 - dy), base, MText::GetDownBlock(size, block), dx, 0, attr, flip);
+    }
+}
 
 // Picks the screen block the destination is in; a copy crossing the block's right edge is done in two parts (in the
 // other order when flipped).
