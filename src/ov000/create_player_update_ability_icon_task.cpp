@@ -851,7 +851,6 @@ void DinoBattleModelCreature::SetUnk108(u32 value) {
 
 // Whether the target wards off the damage: 1 by its status (taking none of it), 2 by its kind 7 def's chance (taking
 // it scaled down), else 0; out gets what it takes (at least 1).
-// NONMATCHING: 99.9%, the multiplication's two argument copies swap stack slots.
 extern "C" int func_ov000_02162ad8(DinoBattleModelCreature *attacker, DinoBattleModelCreature *target, MFx32 unk2,
                                    MFx32 unk3, MFx32 unk4, int *damage, int *out, u32 flags) {
     int result = 0;
@@ -874,7 +873,7 @@ extern "C" int func_ov000_02162ad8(DinoBattleModelCreature *attacker, DinoBattle
             MFx32 taken = MFx32(*damage);
             if (result == 2) {
                 MFx32 ratio = gDinoResource->GetBattleAdjustDefs()->unk50;
-                taken = taken * ratio;
+                taken *= ratio;
             }
             int value = MFx32ToInt(taken);
             if (value < 1) {
