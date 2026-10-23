@@ -507,8 +507,6 @@ BOOL M3DModel::GetJointMatrix(int joint, MtxFx44 *mtx, u8 withRotation) {
 
 // Takes the model resource and reads the tagged blocks after its header, up to 0xFFF. Unless the resource says
 // otherwise (flag 0x100), the model data block is copied (when own is set).
-// NONMATCHING: the game indexes the blocks as script + (i + n) * 2 where ours folds n into the load, and it
-// loads the resource before setting mUnk32A.
 void M3DModel::SetModelData(void *data, BOOL own) {
     mModelRes = data;
     mFlags &= ~0x101;
@@ -518,8 +516,8 @@ void M3DModel::SetModelData(void *data, BOOL own) {
     }
     mOwnsModelData = own;
     const u16 *script = (const u16 *)((const u8 *)mModelRes + 0x28);
-    mUnk32A = 1;
     u32 i = 0;
+    mUnk32A = 1;
     if (script[0] != 0xFFF) {
         do {
             switch (script[i]) {
