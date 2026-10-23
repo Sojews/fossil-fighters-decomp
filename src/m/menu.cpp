@@ -344,21 +344,27 @@ MMenuItem *MMenu::FindLinkedItem(MMenuItem *from, int dir) {
 }
 
 // The nearest item in the direction: inside the 90 degree wedge from the frame's center that way.
+// (The unused locals only reproduce the game's order of loading the frame's sides.)
 MMenuItem *MMenu::FindItemInDirection(MRect from, int dir) {
+    int x;
+    int y;
     switch (dir) {
     default:
         return NULL;
     case 1: {
+        const int midY = (from.top + from.bottom) >> 1;
         int x = (from.left + from.right) >> 1;
         int y = (from.top + from.bottom) >> 1;
         MMenuHalfPlane planes[3] = {{1, x, 0, y}, {1, x, -1, from.top}, {1, x, 1, from.bottom}};
-        return FindItemInRegion(MPoint(x, y), planes);
+        MPoint center(x, y);
+        return FindItemInRegion(center, planes);
     }
     case 2: {
         int x = (from.left + from.right) >> 1;
         int y = (from.top + from.bottom) >> 1;
         MMenuHalfPlane planes[3] = {{0, x, 1, y}, {-1, from.right, 1, y}, {1, from.left, 1, y}};
-        return FindItemInRegion(MPoint(x, y), planes);
+        MPoint center(x, y);
+        return FindItemInRegion(center, planes);
     }
     case 3: {
         int x = (from.left + from.right) >> 1;
