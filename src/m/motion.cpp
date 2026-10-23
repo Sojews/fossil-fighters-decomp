@@ -70,24 +70,23 @@ void MMotionData::LockFiles(int which) {
 }
 
 MChrBlock **MMotionData::AcquireChrs(MDisplay *display) {
+    u32 tiles;
+    u32 i;
     MScopedLock lock(&mMutex.mutex, TRUE);
     int d = display->GetRegs00();
     LockFiles(1);
     if (mChrRefs[d]++ == 0) {
         const MMotionGfxHeader *data;
-        u32 i;
-        MChr *chr;
         u32 count;
-        u32 tiles;
-        u32 boundary;
+        s32 boundary;
         u32 size;
         count = ((MMotionHeader *) mFile.GetData())->chrs.count;
-        chr = display->mObj->mChr;
+        MChr *chr = display->mObj->mChr;
         mChrs[d] = new MChrBlock *[count];
         for (i = 0; i < count; i++) {
             data = (const MMotionGfxHeader *) mChrFiles[i].GetData();
-            tiles = data->tiles;
             boundary = chr->mBoundary;
+            tiles = data->tiles;
             if (chr->mMode == 0) {
                 size = boundary * ((tiles + boundary - 1) / boundary);
             } else {
