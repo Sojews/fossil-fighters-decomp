@@ -149,7 +149,6 @@ M3DFadeTask::~M3DFadeTask() {
     }
 }
 
-// NONMATCHING: 92%, register choice (the game keeps the density in r0 and the table in r1).
 // Steps the fog to the next density (starting from the table's), stopping at either end.
 void M3DFadeTask::Execute() {
     if (mUnk1C) {
@@ -168,11 +167,11 @@ void M3DFadeTask::Execute() {
     int density = mUnk10 >> 12;
     mUnk10 += mUnk14;
     if (density > 127) {
-        Exit();
         density = 127;
-    } else if (density < 0) {
         Exit();
+    } else if (density < 0) {
         density = 0;
+        Exit();
     }
     for (int i = 0; i < 32; i++) {
         *table++ = density;
