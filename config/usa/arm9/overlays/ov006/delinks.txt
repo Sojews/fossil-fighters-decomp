@@ -40,3 +40,4 @@ src/ov006/dino_ui_museum.cpp:
 
 src/ov006/dino_ui_order_select.cpp:
     .text       start:0x0218b434 end:0x02190040
+    .init       start:0x021908ec end:0x02190d7c
