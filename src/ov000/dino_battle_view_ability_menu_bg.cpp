@@ -331,8 +331,8 @@ extern "C" void func_ov000_0217b838() {
 
 
 // Only the first two menus at a time load the BG; the others share it.
-// NONMATCHING (99%): the scheduling of the Transfer call's point arguments.
 DinoBattleViewAbilityMenuBG::DinoBattleViewAbilityMenuBG() : MProcess(NULL) {
+    MPal *pal;
     if (data_ov000_021978dc >= 2) {
         mUnk10D4 = FALSE;
         mOffset.x = 0;
@@ -345,8 +345,9 @@ DinoBattleViewAbilityMenuBG::DinoBattleViewAbilityMenuBG() : MProcess(NULL) {
         mPicture = MPictureFile(std::string(data_ov000_021947ac.bgPath), 0);
         mBg = gCurrentDisplay->mBg;
         mText = mBg->CreateText(2, TRUE);
-        mText->mTextCntBits.colors256 = mPicture.IsUnk04();
-        MPal *pal = mBg->mPal;
+        int colors256 = mPicture.IsUnk04();
+        mText->mTextCntBits.colors256 = colors256;
+        pal = mBg->mPal;
         mPalBlock = pal->Alloc(mPicture.GetPaletteSize(), NULL, TRUE);
         mPalBlock->Load(mPicture.GetPalette(), 0, -1);
         mChr = mBg->CreateChr(mPicture.IsUnk04(), mPicture.GetChrSize(), TRUE);
