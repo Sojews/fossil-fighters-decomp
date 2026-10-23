@@ -1007,7 +1007,6 @@ MFx32 DinoBattleModelCreature::RandomFraction() {
     return mPlayer->RandomFraction();
 }
 
-// NONMATCHING: each operator+'s two by-value parameter copies take each other's stack slots (also under -ipa file).
 MFx32 DinoBattleModelCreature::CalcUnkEC(DinoBattleModelCreature *target) {
     MFx32 base(mUnkEC);
     MFx32 result = base;
@@ -1020,24 +1019,24 @@ MFx32 DinoBattleModelCreature::CalcUnkEC(DinoBattleModelCreature *target) {
                 if (ally != NULL && (ally->GetUnk108() & 1)) {
                     DinoBattleCreatureDef *def = ally->GetDef();
                     const s8 *support = def->mUnk54 == 0 ? NULL : (const s8 *)def + def->mUnk54;
-                    result = result + MFx32(support[0]) * base / MFx32(100);
+                    result += MFx32(support[0]) * base / MFx32(100);
                 }
                 if (enemy != NULL && (enemy->GetUnk108() & 2)) {
                     DinoBattleCreatureDef *def = enemy->GetDef();
                     const s8 *support = def->mUnk58 == 0 ? NULL : (const s8 *)def + def->mUnk58;
-                    result = result + MFx32(support[0]) * base / MFx32(100);
+                    result += MFx32(support[0]) * base / MFx32(100);
                 }
             }
         }
         if (mStatus.flags & 0x80) {
-            result = result + MFx32(mStatus.unk24);
+            result += MFx32(mStatus.unk24);
         }
         if (mStatus.flags & 0x200) {
-            result = result + MFx32(mStatus.unk30);
+            result += MFx32(mStatus.unk30);
         }
     }
     if (IsInPinch() && GetDefUnk61() == 5) {
-        result = result * (pinch * MFx32(mDef->mUnk62) * MFx32::FromRaw(0x19A));
+        result *= (pinch * MFx32(mDef->mUnk62) * MFx32::FromRaw(0x19A));
     }
     return result;
 }
@@ -3173,7 +3172,6 @@ MFx32 GetAffinityRatio(DinoBattleModelCreature *creature, DinoBattleModelCreatur
 
 // The target's unkF0 with the support effects and statuses applied: those of the attacker's side against it and
 // those of its own side for it.
-// NONMATCHING: the operator+/- parameter copies swap stack slots, as in CalcUnkEC.
 extern "C" MFx32 func_ov000_0216e2d8(DinoBattleModelCreature *attacker, DinoBattleModelCreature *target) {
     const MFx32 pinch = gDinoResource->GetBattleAdjustDefs()->unk40;
     MFx32 base(target->GetUnkF0());
@@ -3186,30 +3184,29 @@ extern "C" MFx32 func_ov000_0216e2d8(DinoBattleModelCreature *attacker, DinoBatt
                 if (ally != NULL && (ally->GetUnk108() & 2)) {
                     DinoBattleCreatureDef *def = ally->GetDef();
                     const s8 *support = def->mUnk58 == 0 ? NULL : (const s8 *)def + def->mUnk58;
-                    result = result + MFx32(support[1]) * base / MFx32(100);
+                    result += MFx32(support[1]) * base / MFx32(100);
                 }
                 if (enemy != NULL && (enemy->GetUnk108() & 1)) {
                     DinoBattleCreatureDef *def = enemy->GetDef();
                     const s8 *support = def->mUnk54 == 0 ? NULL : (const s8 *)def + def->mUnk54;
-                    result = result + MFx32(support[1]) * base / MFx32(100);
+                    result += MFx32(support[1]) * base / MFx32(100);
                 }
             }
         }
         if (target->mStatus.flags & 0x400) {
-            result = result + MFx32(target->mStatus.unk38);
+            result += MFx32(target->mStatus.unk38);
         }
         if (target->mStatus.flags & 0x200) {
-            result = result - MFx32(target->mStatus.unk34);
+            result -= MFx32(target->mStatus.unk34);
         }
     }
     if (target->IsInPinch() && target->GetDefUnk61() == 5) {
-        result = result * (pinch * MFx32(target->GetDef()->mUnk62) * MFx32::FromRaw(0x19A));
+        result *= (pinch * MFx32(target->GetDef()->mUnk62) * MFx32::FromRaw(0x19A));
     }
     return result;
 }
 
 // The creature's unkF4 with the support effects and statuses applied.
-// NONMATCHING: the operator+/- parameter copies swap stack slots, as in CalcUnkEC.
 extern "C" MFx32 func_ov000_0216e4c0(DinoBattleModelCreature *creature, DinoBattleModelCreature *target) {
     const MFx32 pinch = gDinoResource->GetBattleAdjustDefs()->pinchBoost;
     MFx32 base(creature->mUnkF4);
@@ -3222,28 +3219,27 @@ extern "C" MFx32 func_ov000_0216e4c0(DinoBattleModelCreature *creature, DinoBatt
                 if (ally != NULL && (ally->GetUnk108() & 1)) {
                     DinoBattleCreatureDef *def = ally->GetDef();
                     const s8 *support = def->mUnk54 == 0 ? NULL : (const s8 *)def + def->mUnk54;
-                    result = result + MFx32(support[2]) * base / MFx32(100);
+                    result += MFx32(support[2]) * base / MFx32(100);
                 }
                 if (enemy != NULL && (enemy->GetUnk108() & 2)) {
                     DinoBattleCreatureDef *def = enemy->GetDef();
                     const s8 *support = def->mUnk58 == 0 ? NULL : (const s8 *)def + def->mUnk58;
-                    result = result + MFx32(support[2]) * base / MFx32(100);
+                    result += MFx32(support[2]) * base / MFx32(100);
                 }
             }
         }
         if (creature->mStatus.flags & 0x80) {
-            result = result - MFx32(creature->mStatus.unk28);
+            result -= MFx32(creature->mStatus.unk28);
         }
     }
     if (creature->IsInPinch() && creature->GetDefUnk61() == 5) {
-        result = result * (pinch * MFx32(creature->mDef->mUnk62) * MFx32::FromRaw(0x19A));
+        result *= (pinch * MFx32(creature->mDef->mUnk62) * MFx32::FromRaw(0x19A));
     }
     return result;
 }
 
 // The target's unkF8 with the support effects and statuses applied: those of the attacker's side against it and
 // those of its own side for it; 0 under status 3.
-// NONMATCHING: the operator+ parameter copies swap stack slots, as in CalcUnkEC.
 extern "C" MFx32 func_ov000_0216e650(DinoBattleModelCreature *attacker, DinoBattleModelCreature *target) {
     if (target->GetStatus()->flags & 8) {
         return MFx32(0);
@@ -3259,21 +3255,21 @@ extern "C" MFx32 func_ov000_0216e650(DinoBattleModelCreature *attacker, DinoBatt
                 if (ally != NULL && (ally->GetUnk108() & 2)) {
                     DinoBattleCreatureDef *def = ally->GetDef();
                     const s8 *support = def->mUnk58 == 0 ? NULL : (const s8 *)def + def->mUnk58;
-                    result = result + MFx32(support[3]) * base / MFx32(100);
+                    result += MFx32(support[3]) * base / MFx32(100);
                 }
                 if (enemy != NULL && (enemy->GetUnk108() & 1)) {
                     DinoBattleCreatureDef *def = enemy->GetDef();
                     const s8 *support = def->mUnk54 == 0 ? NULL : (const s8 *)def + def->mUnk54;
-                    result = result + MFx32(support[3]) * base / MFx32(100);
+                    result += MFx32(support[3]) * base / MFx32(100);
                 }
             }
         }
         if (target->mStatus.flags & 0x800) {
-            result = result + MFx32(target->mStatus.unk3C);
+            result += MFx32(target->mStatus.unk3C);
         }
     }
     if (target->IsInPinch() && target->GetDefUnk61() == 5) {
-        result = result * (pinch * MFx32(target->GetDef()->mUnk62) * MFx32::FromRaw(0x19A));
+        result *= (pinch * MFx32(target->GetDef()->mUnk62) * MFx32::FromRaw(0x19A));
     }
     return result;
 }
