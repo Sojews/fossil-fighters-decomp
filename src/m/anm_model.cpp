@@ -481,7 +481,7 @@ void MAnmEmit::Unk0C() {
     }
 }
 
-// NONMATCHING: the game keeps the sine table's address in a register and works out both angles' indices first.
+// NONMATCHING: 99.5%, the two distance products land in the other registers.
 // Aims the scene's camera: orbits the target (tracks 3, 4: angles, 6: distance), smoothed (11), with the field of
 // view (7) and a sway (8, 9: amounts, 10: period).
 void MAnmTargetCamera::Unk0C() {

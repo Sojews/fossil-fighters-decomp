@@ -296,10 +296,9 @@ void DinoSplitDamage(int *out, u32 attack, int total) {
     int count = def->hitCount;
     MFx32 sum = MFx32(DinoOffsetPtr<u16>(def, def->cost)[1]);
     int assigned = 0;
-    int *p = out;
     for (int i = 0; i < count; i++) {
         int part = MFx32ToInt(MFx32(total) * MFx32(DinoAttackHitOf(def, i).weight) / sum);
-        *p++ = part;
+        out[i] = part;
         assigned += part;
     }
     while (assigned < total) {
