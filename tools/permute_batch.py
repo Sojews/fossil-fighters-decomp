@@ -52,6 +52,7 @@ def main():
     ap.add_argument("--units", nargs="*", default=["src/"])
     ap.add_argument("--list", action="store_true")
     ap.add_argument("--improved", help="only the functions an earlier batch log shows improving (resumed from their best)")
+    ap.add_argument("--retry", help="only the functions an earlier batch log shows failing to run")
     a = ap.parse_args()
     report = json.load(open(ROOT / "build/report.json"))
     cands = []
@@ -80,6 +81,9 @@ def main():
             if m and 0 < int(m.group(3)) < int(m.group(2)):
                 better.add(m.group(1))
         cands = [c for c in cands if c[3] in better]
+    if a.retry:
+        failed = {m.group(1) for l in open(a.retry) for m in [re.search(r" (\S+): \?;", l)] if m}
+        cands = [c for c in cands if c[3] in failed]
     cands.sort(key=lambda c: (-c[0], c[1]))
     if a.list:
         for pct, size, src, sym, start in cands:

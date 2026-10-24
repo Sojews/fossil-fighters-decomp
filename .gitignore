@@ -18,3 +18,6 @@ __pycache__/
 tools/sdk_names/ref/
 tools/sdk_names/obj/
 _static_order_tmp.*
+
+# Local Python environment (capstone for try_match/permute)
+.venv/
