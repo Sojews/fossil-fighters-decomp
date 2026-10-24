@@ -286,22 +286,26 @@ void DinoCommonTutorialWindow::ShowShortArrow(MPoint pos, int dir) {
 }
 
 // Marks a rectangle with a corner at each of its corners.
-// NONMATCHING: the game keeps the left edge in a stack slot of its own.
 void DinoCommonTutorialWindow::ShowCorners(MRect rect) {
     DinoSoundPlaySe(0x3B0, 0);
+    MMotion *corner;
     mArrows->Clear();
-    MMotion *corner = new MMotion(data_020b5e5c.cornerPath, mOam, 0, 1);
-    corner->SetPosition(MPoint(rect.left, rect.top));
+    corner = new MMotion(data_020b5e5c.cornerPath, mOam, 0, 1);
+    MPoint topLeft(rect.left, rect.top);
+    s32 left = rect.left;
+    corner->SetPosition(topLeft);
     corner->Play(1, 0);
     corner->Show();
     mArrows->AddTail(corner);
     corner = new MMotion(data_020b5e5c.cornerPath, mOam, 0, 1);
-    corner->SetPosition(MPoint(rect.right, rect.top));
+    MPoint perm1(rect.right, rect.top);
+    corner->SetPosition(perm1);
     corner->Play(3, 0);
     corner->Show();
     mArrows->AddTail(corner);
     corner = new MMotion(data_020b5e5c.cornerPath, mOam, 0, 1);
-    corner->SetPosition(MPoint(rect.left, rect.bottom));
+    MPoint bottomLeft(left, rect.bottom);
+    corner->SetPosition(bottomLeft);
     corner->Play(2, 0);
     corner->Show();
     mArrows->AddTail(corner);
