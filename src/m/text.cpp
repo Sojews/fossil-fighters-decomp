@@ -302,10 +302,9 @@ MTextFill::~MTextFill() {
 
 // Picks the screen block the rectangle starts in; a fill crossing a block's right or bottom edge carries on in the
 // next block.
-// NONMATCHING: dy gets the stack slot below the two row-count temporaries in the game.
 void MTextFill::Transfer() {
-    int block;
-    u32 base;
+    s32 block;
+    s32 base;
     int size;
     int dx;
     int dy;
@@ -339,8 +338,9 @@ void MTextFill::Transfer() {
             MTEXT_FILL_BLOCK(MTEXT_ENTRY(block, dx, dy), 32 - dx, 32 - dy);
             MTEXT_FILL_BLOCK(MTEXT_ENTRY(MText::GetDownBlock(size, block), dx, 0), 32 - dx, h - (32 - dy));
         }
-        int right = MText::GetRightBlock(size, block);
-        if (dy + h < 32) {
+        s32 right;
+        right = MText::GetRightBlock(size, block);
+        if (h + dy < 32) {
             MTEXT_FILL_BLOCK(MTEXT_ENTRY(right, 0, dy), w - (32 - dx), h);
         } else {
             MTEXT_FILL_BLOCK(MTEXT_ENTRY(right, 0, dy), w - (32 - dx), 32 - dy);
