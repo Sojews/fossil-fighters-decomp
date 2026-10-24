@@ -53,8 +53,8 @@ void MSoftReset(u32 parameter) {
 void MSoftResetHandler::OnVSync() {
     if (mEnabled) {
         MInput *input = mInput.GetInput(0);
-        u32 buttons = input->mButtons;
-        u32 pressed = buttons & (input->mPrevButtons ^ buttons);
+        s32 buttons = input->mButtons;
+        s32 pressed = buttons & (input->mPrevButtons ^ buttons);
         BOOL reset = FALSE;
         if ((pressed & SOFT_RESET_BUTTONS) && (buttons & SOFT_RESET_BUTTONS) == SOFT_RESET_BUTTONS) {
             reset = TRUE;
