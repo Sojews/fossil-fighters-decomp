@@ -5,8 +5,8 @@ Usage: python3 tools/permute.py src/foo.cpp SYMBOL "DEFINITION START" [-j JOBS] 
 
 SYMBOL is the function's (mangled) name as the game's symbols.txt has it; DEFINITION START is a literal prefix of
 the line that starts its definition, e.g. "void MSimpleMenu::Layout(". The whole file is recompiled for every
-candidate (with the file's own flags from build.ninja), so the result is exact; only the function's body is
-mutated. Mutations are textual and many don't compile, which costs nothing but time. Candidates scoring at least as
+candidate (with the file's own flags from build.ninja), so the result is exact; only the function's body, and the
+bodies of the file's static inline functions it calls (unless --no-helpers), are mutated. Mutations are textual and many don't compile, which costs nothing but time. Candidates scoring at least as
 well as the best so far are kept and mutated further; whenever the score improves, the source is written to
 build/permute/<SYMBOL>/best-<score>.cpp, and a full match stops the run.
 
@@ -452,10 +452,133 @@ def m_decl_to_top(lines, r):
     return lines
 
 
+def m_decl_earlier(lines, r):
+    """Splits a declaration and moves the bare declaration up past other declarations of the same block."""
+    idx = [i for i, l in enumerate(lines) if DECL.match(l) and not l.strip().startswith("const ")
+           and "&" not in DECL.match(l).group(2)]
+    if not idx:
+        return None
+    i = r.choice(idx)
+    m = DECL.match(lines[i])
+    ind, typ, name, init = m.groups()
+    ups = []
+    j = i - 1
+    while j >= 0 and indent(lines[j]) >= len(ind) and len(ups) < 8:
+        if indent(lines[j]) == len(ind):
+            ups.append(j)
+        j -= 1
+    if not ups:
+        return None
+    k = r.choice(ups)
+    lines = lines[:]
+    if init == ";":
+        del lines[i]
+    else:
+        lines[i] = f"{ind}{name}{init}"
+    lines.insert(k, f"{ind}{typ}{name};")
+    return lines
+
+
+def block_end(lines, i):
+    """The index of the line closing the block opened on line i (which ends with '{')."""
+    depth = 0
+    for j in range(i, len(lines)):
+        for ch in lines[j]:
+            if ch == "{":
+                depth += 1
+            elif ch == "}":
+                depth -= 1
+                if depth == 0:
+                    return j if j > i else None
+    return None
+
+
+def m_if_swap(lines, r):
+    """if (c) { A } else { B }  ->  if (!(c)) { B } else { A }"""
+    cands = []
+    for i, l in enumerate(lines):
+        m = re.match(r"^(\s*)if \((.*)\) \{\s*$", l)
+        if not m:
+            continue
+        j = block_end(lines, i)
+        if j is None or lines[j].strip() != "} else {":
+            continue
+        k = block_end([lines[j].replace("}", "", 1)] + lines[j + 1:], 0)
+        k = None if k is None else k + j
+        if k is None or lines[k].strip() != "}":
+            continue
+        cands.append((i, j, k, m.group(1), m.group(2)))
+    if not cands:
+        return None
+    i, j, k, ind, cond = r.choice(cands)
+    c = cond[2:-1] if cond.startswith("!(") and cond.endswith(")") else f"!({cond})"
+    return lines[:i] + [f"{ind}if ({c}) {{"] + lines[j + 1:k] + [f"{ind}}} else {{"] + lines[i + 1:j] + [f"{ind}}}"] + \
+        lines[k + 1:]
+
+
+def m_arg_hoist(lines, r):
+    """Moves one argument of a call (not a plain name or literal) into a local declared just before the statement."""
+    pat = re.compile(r"\w\(([^()]*(?:\([^()]*\)[^()]*)*)\)")
+    cands = []
+    for i, l in enumerate(lines):
+        if not (simple(l) or l.strip().startswith("return ")) or not l.strip().endswith(";"):
+            continue
+        for m in pat.finditer(l):
+            args, depth, cur, pos = [], 0, "", m.start(1)
+            for ch_i, ch in enumerate(m.group(1)):
+                if ch == "," and depth == 0:
+                    args.append((pos, cur))
+                    pos = m.start(1) + ch_i + 1
+                    cur = ""
+                    continue
+                depth += ch in "([" and 1 or ch in ")]" and -1 or 0
+                cur += ch
+            args.append((pos, cur))
+            for pos, a in args:
+                t = a.strip()
+                if t and not re.fullmatch(r"[A-Za-z_]\w*|-?\d+|0x[0-9A-Fa-f]+|NULL|TRUE|FALSE", t) and '"' not in t:
+                    cands.append((i, pos + len(a) - len(a.lstrip()), t))
+    if not cands:
+        return None
+    i, pos, t = r.choice(cands)
+    name = f"perm{r.randrange(1000)}"
+    typ = r.choice(TYPES[:3])
+    l = lines[i]
+    lines = lines[:]
+    lines[i:i + 1] = [" " * indent(l) + f"{typ} {name} = {t};", l[:pos] + name + l[pos + len(t):]]
+    return lines
+
+
+def m_ptr_index(lines, r):
+    """In a for loop over i, *p++ = e; (with p = base before the loop)  ->  base[i] = e;  (and back is left to drift)"""
+    for _ in range(4):
+        fors = [i for i, l in enumerate(lines) if re.match(rf"^\s*for \((?:\w+ )?({IDENT}) = 0; \1 < ", l)]
+        if not fors:
+            return None
+        f = r.choice(fors)
+        var = re.match(rf"^\s*for \((?:\w+ )?({IDENT})", lines[f]).group(1)
+        end = block_end(lines, f)
+        if end is None:
+            continue
+        for k in range(f + 1, end):
+            m = re.match(rf"^(\s*)\*({IDENT})\+\+ = (.*);\s*$", lines[k])
+            if not m:
+                continue
+            ptr = m.group(2)
+            init = [j for j in range(f) if re.match(rf"^\s*(?:[\w:<>]+ \*+)?{ptr} = ({IDENT});\s*$", lines[j])]
+            if not init:
+                continue
+            base = re.match(rf"^\s*(?:[\w:<>]+ \*+)?{ptr} = ({IDENT});", lines[init[-1]]).group(1)
+            lines = lines[:]
+            lines[k] = f"{m.group(1)}{base}[{var}] = {m.group(3)};"
+            return lines
+    return None
+
+
 MUTATIONS = [(m_swap_adjacent, 3), (m_move_decl, 4), (m_split_decl, 2), (m_join_decl, 2), (m_const, 1),
              (m_type, 2), (m_commute, 3), (m_compound, 1), (m_incr, 1), (m_block, 2), (m_cast, 1), (m_temp, 2),
              (m_reassoc, 1), (m_cond, 1), (m_named_ctor, 2), (m_postinc, 1),
-             (m_decl_to_top, 2)]
+             (m_decl_to_top, 2), (m_decl_earlier, 3), (m_if_swap, 1), (m_arg_hoist, 2), (m_ptr_index, 1)]
 
 
 def mutate(body: str, r: random.Random) -> str:
@@ -472,24 +595,66 @@ def mutate(body: str, r: random.Random) -> str:
 
 # ---- the search
 
+SEP = "\n//@@permute-part@@\n"   # between the bodies (the function's own first, then its helpers')
+
+
+def helper_starts(text: str, body: str) -> list:
+    """Definition starts of the file's static inline functions that the body calls (their bodies get mutated too)."""
+    out = []
+    for name in sorted(set(re.findall(r"\b([A-Za-z_]\w*)\(", body))):
+        m = re.search(rf"^static inline [^;{{}}\n]*?\b{re.escape(name)}\(", text, re.M)
+        if m:
+            out.append(m.group(0))
+    return out
+
+
+def spans(text: str, starts: list) -> list:
+    return sorted(find_body(text, s) for s in starts)
+
+
+def split(text: str, starts: list):
+    """(frame, parts): the text around the bodies and the bodies, in the starts' order."""
+    sp = spans(text, starts)
+    order = [sorted(sp).index(find_body(text, s)) for s in starts]
+    frame, pos, parts = [], 0, [None] * len(sp)
+    for k, (o, c) in enumerate(sp):
+        frame.append(text[pos:o + 1])
+        parts[order.index(k)] = text[o + 1:c]
+        pos = c
+    frame.append(text[pos:])
+    return frame, parts, order
+
+
+def assemble(frame, order, body: str) -> str:
+    parts = body.split(SEP)
+    out = frame[0]
+    for k in range(len(frame) - 1):
+        out += parts[order.index(k)] + frame[k + 1]
+    return out
+
+
+def mutate_parts(body: str, r: random.Random) -> str:
+    parts = body.split(SEP)
+    k = 0 if len(parts) == 1 or r.random() < 0.7 else r.randrange(1, len(parts))
+    parts[k] = mutate(parts[k], r)
+    return SEP.join(parts)
+
+
 def worker(args):
-    wid, src, symbol, start, cmd, theirs_tokens, thumb, deadline, seed, best_q, shared = args
+    wid, src, symbol, starts, cmd, theirs_tokens, thumb, deadline, seed, best_q, shared = args
     r = random.Random(seed)
-    text = src.read_text()
+    frame, _, order = split(src.read_text(), starts)
     tmp = Path(tempfile.mkdtemp(prefix=f"perm{wid}_", dir=TMP))
     path = tmp / src.name
     pool = [(shared["score"], shared["body"])]
-    head, tail = None, None
-    o, c = find_body(text, start)
-    head, tail = text[:o + 1], text[c:]
     tries = 0
     try:
         while time.time() < deadline and shared["score"] > 0:
             if r.random() < 0.15:           # follow the global best now and then
                 pool.append((shared["score"], shared["body"]))
             base = r.choice(sorted(pool)[:4])
-            body = mutate(base[1], r)
-            path.write_text(head + body + tail)
+            body = mutate_parts(base[1], r)
+            path.write_text(assemble(frame, order, body))
             obj = tmp / (src.stem + ".o")
             if obj.exists():
                 obj.unlink()
@@ -520,21 +685,27 @@ def main():
     ap.add_argument("-t", type=float, default=600, help="seconds")
     ap.add_argument("--seed", type=int, default=None)
     ap.add_argument("--resume", action="store_true", help="start from the best candidate of an earlier run")
+    ap.add_argument("--no-helpers", action="store_true", help="don't mutate the static inline helpers it calls")
     a = ap.parse_args()
     src = (ROOT / a.src).resolve()
     text = src.read_text()
     o, c = find_body(text, a.start)
-    body = text[o + 1:c]
+    starts = [a.start] + ([] if a.no_helpers else
+                          [h for h in helper_starts(text, text[o + 1:c]) if find_body(text, h) != (o, c)])
+    frame, parts, order = split(text, starts)
+    body = SEP.join(parts)
     out = ROOT / "build/permute" / a.symbol
     if a.resume:
         bests = sorted(out.glob("best-*.cpp"), key=lambda p: int(p.stem[5:]))
         if bests:
-            prev = bests[0].read_text()
-            po, pc = find_body(prev, a.start)
-            body = prev[po + 1:pc]
-            text = text[:o + 1] + body + text[c:]
-            o, c = find_body(text, a.start)
-            print(f"resuming from {bests[0].name}", flush=True)
+            try:
+                _, prev_parts, _ = split(bests[0].read_text(), starts)
+                body = SEP.join(prev_parts)
+                print(f"resuming from {bests[0].name}", flush=True)
+            except SystemExit:
+                print(f"can't resume from {bests[0].name}", flush=True)
+    if len(starts) > 1:
+        print("also mutating:", ", ".join(starts[1:]), flush=True)
     cmd = compile_command(src)
     theirs, trel, thumb = target(src, a.symbol)
     theirs_tokens = tokens(theirs, thumb, frozenset(trel))
@@ -543,7 +714,7 @@ def main():
 
     with tempfile.TemporaryDirectory(dir=TMP) as tmp:
         p = Path(tmp) / src.name
-        p.write_text(text)
+        p.write_text(assemble(frame, order, body))
         subprocess.run(cmd + ["-c", str(p), "-o", tmp + "/"], cwd=ROOT, capture_output=True)
         f = our_function(Path(tmp) / (src.stem + ".o"), a.symbol)
         if f is None:
@@ -557,7 +728,7 @@ def main():
     q = mgr.Queue()
     deadline = time.time() + a.t
     seed = a.seed if a.seed is not None else random.randrange(1 << 30)
-    jobs = [(i, src, a.symbol, a.start, cmd, theirs_tokens, thumb, deadline, seed + i, q, shared) for i in range(a.j)]
+    jobs = [(i, src, a.symbol, starts, cmd, theirs_tokens, thumb, deadline, seed + i, q, shared) for i in range(a.j)]
     with mp.Pool(a.j) as pool:
         res = pool.map_async(worker, jobs)
         t0 = time.time()
@@ -568,7 +739,7 @@ def main():
                 continue
             if s < shared["score"]:
                 shared["score"], shared["body"] = s, b
-                (out / f"best-{s}.cpp").write_text(text[:o + 1] + b + text[c:])
+                (out / f"best-{s}.cpp").write_text(assemble(frame, order, b))
                 print(f"[{time.time() - t0:6.0f}s] score {s} (worker {wid}, try {tries}) -> {out}/best-{s}.cpp",
                       flush=True)
         total = sum(res.get())
