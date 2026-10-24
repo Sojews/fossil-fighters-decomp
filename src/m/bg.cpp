@@ -363,9 +363,10 @@ MChr *MBg::CreateChr(int mode, u32 units, BOOL fromEnd) {
     }
     u32 addr = mVram->AllocAddr(MChr::GetVramSize(mode, units), fromEnd, sChrAligns[mode], 0x4000,
                                 sChrBoundaryCounts[mode], 0x40000);
+    u32 charOffset;
     u32 base = mVram->mBase;
     u32 charBase = (addr - base) >> 14;
-    u32 charOffset = charBase << 14;  // NONMATCHING: base and this get each other's places
+    charOffset = charBase << 14;
     mChrs[i] = new MChr(mDisplay, charBase, base + charOffset, addr, mode, units, 1);
     return mChrs[i];
 }
