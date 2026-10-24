@@ -159,7 +159,6 @@ void DinoCleaningHammerTask::StateStart() {
     mState = data_ov002_02164fb8.State0215ccfc_78;
 }
 
-// NONMATCHING: 98.8%, one stack slot more in the game (std::max's operator< argument copies).
 // Spreads the hit to the joined cells around it (no deeper ones), breaking what it reached last frame, and shakes the
 // rock, less and less.
 void DinoCleaningHammerTask::State0215ccfc() {
@@ -188,7 +187,7 @@ void DinoCleaningHammerTask::State0215ccfc() {
             }
         }
     }
-    mRadius = mRadius - mDecay;
+    mRadius -= mDecay;
     MFx32 amp = std::max(MFx32(0), mRadius * MFx32(1));
     mKasekiRock->SetOffsetAll(MPoint(MFx32ToInt(amp * mRandom->NextFraction() - amp / MFx32(2)),
                                      MFx32ToInt(amp * mRandom->NextFraction() - amp / MFx32(2))));
