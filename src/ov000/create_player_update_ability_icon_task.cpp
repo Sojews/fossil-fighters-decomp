@@ -1776,8 +1776,8 @@ extern "C" const u32 data_0208a290, data_0208a28c;  // the confusion's info bar 
 
 // A confused leader's turn: it may lose the turn, use a random attack on a random target, or swap with a support
 // creature. reply (if any) gets the confusion's result.
-// NONMATCHING: the attack count and the swap target take each other's spill slots.
 extern "C" void func_ov000_02165bd0(DinoBattleModelPlayer *player, MMessageObserver *reply) {
+    u32 count;
     DinoBattleModelCreature *creature = player->FindCreature(0);
     player->mBattle->GetUnk1FC();
     if (creature == NULL || !(creature->GetStatus()->flags & 0x40)) {
@@ -1786,9 +1786,9 @@ extern "C" void func_ov000_02165bd0(DinoBattleModelPlayer *player, MMessageObser
     player->mSerial.AddTail(player->mUnkF4->CreatePostTask(new DinoBattleViewActionInfoBarUpdateRequest(
                                 player->mUnkB4 == 0 ? data_0208a290 : data_0208a28c)),
                             DinoCreatePostAndWaitTask(player->mUnkF4, new DinoBattleViewWaitActionInfoBarRequest(0)));
-    DinoBattleModelCreature *other;
     u32 attack;
-    u32 count = creature->CountAttacks();
+    DinoBattleModelCreature *other;
+    count = creature->CountAttacks();
     u32 blocked = 0;
     for (u32 i = 0; i < count; i++) {
         const DinoAttackDef *def = gDinoResource->GetAttackDef(creature->GetAttack(i, NULL));
