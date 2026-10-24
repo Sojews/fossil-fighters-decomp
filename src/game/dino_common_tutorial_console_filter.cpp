@@ -298,8 +298,8 @@ void DinoCommonTutorialWindow::ShowCorners(MRect rect) {
     corner->Show();
     mArrows->AddTail(corner);
     corner = new MMotion(data_020b5e5c.cornerPath, mOam, 0, 1);
-    MPoint perm1(rect.right, rect.top);
-    corner->SetPosition(perm1);
+    MPoint topRight(rect.right, rect.top);
+    corner->SetPosition(topRight);
     corner->Play(3, 0);
     corner->Show();
     mArrows->AddTail(corner);
