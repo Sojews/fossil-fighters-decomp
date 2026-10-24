@@ -183,20 +183,19 @@ void MDisplay::SetBg0Is3D(BOOL on) {
 }
 
 // Sets the BG mode and moves the layers' visibility (and their blend and window settings) between BG numbers.
-// NONMATCHING: the game keeps the count in its argument slot (and the two bits swap registers).
-void MDisplay::SetBgMode(int mode, const int *from, const int *to, int count) {
+// NONMATCHING: the two bit masks swap registers (and the from/to pointers load the other way round).
+void MDisplay::SetBgMode(int mode, const int *from, const int *to, u32 count) {
     u32 i;
-    u32 n = count;
 
     mDispCnt.bgMode = mode;
-    for (i = 0; i < n; i++) {
+    for (i = 0; i < count; i++) {
         u32 bitA = 1 << (from[i] + 8);
         u32 bitB = 1 << (to[i] + 8);
         mDispCnt.raw = (mDispCnt.raw & ~(bitB | bitA)) | ((mDispCnt.raw & bitA) ? bitB : 0) |
                        ((mDispCnt.raw & bitB) ? bitA : 0);
     }
-    mBlend->SwapPlanes(mode, from, to, n);
-    mWin->SwapPlanes(mode, from, to, n);
+    mBlend->SwapPlanes(mode, from, to, count);
+    mWin->SwapPlanes(mode, from, to, count);
 }
 
 void MDisplay::SetObjTileBoundary(int boundary) {

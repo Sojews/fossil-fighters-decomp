@@ -116,7 +116,7 @@ public:
     volatile u16 *GetBackdropReg();
     void SetBg0Is3D(BOOL on);
     // Sets the BG mode, moving the layers listed from one BG number to another.
-    void SetBgMode(int mode, const int *from, const int *to, int count);
+    void SetBgMode(int mode, const int *from, const int *to, u32 count);
     void SetObjTileBoundary(int boundary);
 
     MLcd *mLcd;             // 0x04
