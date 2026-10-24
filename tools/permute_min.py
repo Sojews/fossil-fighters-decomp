@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-"""Shrinks a permuter match to the edits it needs: drops diff hunks one by one while the function still matches.
+"""Shrinks a permuter candidate to the edits it needs: drops diff hunks one by one while its score doesn't get worse
+(for a match, while it still matches).
 
 Usage: python3 tools/permute_min.py src/foo.cpp SYMBOL build/permute/SYMBOL/best-0.cpp
 Writes the minimal version over src/foo.cpp (check the result with try_match and the gate before committing).
@@ -15,14 +16,14 @@ sys.path.insert(0, str(ROOT / "tools"))
 import permute  # noqa: E402
 
 
-def matches(text, src, symbol, cmd, theirs):
+def score_of(text, src, symbol, cmd, theirs):
     with tempfile.TemporaryDirectory(dir=permute.TMP) as tmp:
         p = Path(tmp) / src.name
         p.write_text(text)
         subprocess.run(cmd + ["-c", str(p), "-o", tmp + "/"], cwd=ROOT, capture_output=True)
         obj = Path(tmp) / (src.stem + ".o")
         f = permute.our_function(obj, symbol) if obj.exists() else None
-        return f is not None and permute.score(permute.tokens(f[0], theirs[2], frozenset(f[1])), theirs[3]) == 0
+        return 1 << 30 if f is None else permute.score(permute.tokens(f[0], theirs[2], frozenset(f[1])), theirs[3])
 
 
 def main():
@@ -43,10 +44,11 @@ def main():
             pos = i2
         return "\n".join(out + a[pos:])
 
-    assert matches(build(keep), src, symbol, cmd, theirs), "the candidate doesn't match"
+    goal = score_of(build(keep), src, symbol, cmd, theirs)
+    print(f"candidate score {goal}")
     for k in list(keep):
         trial = [x for x in keep if x != k]
-        if matches(build(trial), src, symbol, cmd, theirs):
+        if score_of(build(trial), src, symbol, cmd, theirs) <= goal:
             keep = trial
     src.write_text(build(keep))
     print(f"kept {len(keep)} of {len(hunks)} hunks")

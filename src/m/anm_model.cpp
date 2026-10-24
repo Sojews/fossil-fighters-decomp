@@ -533,14 +533,14 @@ void MAnmTargetCamera::Unk0C() {
     v.x = distance * table[p + 1] >> FX32_SHIFT;
     v.y = distance * table[p] >> FX32_SHIFT;
     v.z = v.x;
-    fx16 sinYaw = table[y];
-    v.x = mPos.x + (sinYaw * v.z >> FX32_SHIFT);
+    const fx16 sinYaw = table[y];
+    v.x = mPos.x + (v.z * sinYaw >> FX32_SHIFT);
     v.y += mPos.y;
     fx16 cosYaw = table[y + 1];
     v.z = mPos.z + (v.z * cosYaw >> FX32_SHIFT);
     mScene->SetCameraPos(&v);
-    mScene->SetCameraTarget(&mPos);
     fx16 sin0 = table[0];
+    mScene->SetCameraTarget(&mPos);
     v.x = FX_Mul(sin0, cosYaw);
     v.y = table[1];
     v.z = -FX_Mul(sin0, sinYaw);
