@@ -575,10 +575,23 @@ def m_ptr_index(lines, r):
     return None
 
 
+def m_dead_local(lines, r):
+    """Declares an unused local somewhere (mwcc still gives some of them stack slots, which moves the others)."""
+    idx = [i for i, l in enumerate(lines) if l.strip() and not l.strip().startswith(("case", "default", "}", "//"))]
+    if not idx:
+        return None
+    i = r.choice(idx)
+    typ = r.choice(["int", "int", "u32", "MPoint", "MFx32", "s16"])
+    lines = lines[:]
+    lines.insert(i, " " * indent(lines[i]) + f"{typ} perm{r.randrange(1000)};")
+    return lines
+
+
 MUTATIONS = [(m_swap_adjacent, 3), (m_move_decl, 4), (m_split_decl, 2), (m_join_decl, 2), (m_const, 1),
              (m_type, 2), (m_commute, 3), (m_compound, 1), (m_incr, 1), (m_block, 2), (m_cast, 1), (m_temp, 2),
              (m_reassoc, 1), (m_cond, 1), (m_named_ctor, 2), (m_postinc, 1),
-             (m_decl_to_top, 2), (m_decl_earlier, 3), (m_if_swap, 1), (m_arg_hoist, 2), (m_ptr_index, 1)]
+             (m_decl_to_top, 2), (m_decl_earlier, 3), (m_if_swap, 1), (m_arg_hoist, 2), (m_ptr_index, 1),
+             (m_dead_local, 2)]
 
 
 def mutate(body: str, r: random.Random) -> str:

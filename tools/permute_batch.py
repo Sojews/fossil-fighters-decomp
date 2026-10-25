@@ -46,11 +46,13 @@ def definition_start(src: Path, symbol: str):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--min", type=float, default=90)
+    ap.add_argument("--max", type=float, default=100, help="only functions below this match percentage")
     ap.add_argument("--max-size", type=int, default=4096)
     ap.add_argument("-t", type=float, default=600)
     ap.add_argument("-j", type=int, default=9)
     ap.add_argument("--units", nargs="*", default=["src/"])
     ap.add_argument("--list", action="store_true")
+    ap.add_argument("--resume", action="store_true", help="start each from its best earlier candidate")
     ap.add_argument("--improved", help="only the functions an earlier batch log shows improving (resumed from their best)")
     ap.add_argument("--retry", help="only the functions an earlier batch log shows failing to run")
     a = ap.parse_args()
@@ -70,7 +72,7 @@ def main():
             dup = re.sub(r"([CD])2E", r"\g<1>1E", f["name"])    # (base-object ctors/dtors repeat the complete ones)
             if dup != f["name"] and any(g["name"] == dup for g in u["functions"]):
                 continue
-            if a.min <= pct < 100 and size <= a.max_size and not f["name"].startswith("__sinit"):
+            if a.min <= pct < min(a.max, 100) and size <= a.max_size and not f["name"].startswith("__sinit"):
                 start = definition_start(src, f["name"])
                 if start:
                     cands.append((pct, size, src, f["name"], start))
@@ -95,7 +97,7 @@ def main():
     for pct, size, src, sym, start in cands:
         t0 = time.time()
         r = subprocess.run([sys.executable, str(ROOT / "tools/permute.py"), str(src.relative_to(ROOT)), sym, start,
-                            "-j", str(a.j), "-t", str(a.t)] + (["--resume"] if a.improved else []), cwd=ROOT, capture_output=True, text=True)
+                            "-j", str(a.j), "-t", str(a.t)] + (["--resume"] if a.improved or a.resume else []), cwd=ROOT, capture_output=True, text=True)
         lines = (r.stdout + r.stderr).strip().split("\n")
         base = next((l for l in lines if l.startswith("base score")), "?")
         last = lines[-1] if lines else "?"
