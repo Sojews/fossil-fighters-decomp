@@ -27,11 +27,12 @@ TextSequence::TextSequence(MPoint srcSize, MPoint dst, int tile, int palette, bo
 }
 
 void TextSequence::Draw(MText *text, MRect clip) {
+    MPoint dst(clip.left, clip.top);
     int dy = mVFlip ? (mRect.bottom - clip.bottom) - (clip.top - mRect.top) : 0;
     int dx = mHFlip ? (mRect.right - clip.right) - (clip.left - mRect.left) : 0;
     MRect src(clip.left + dx, clip.top + dy, clip.right + dx, clip.bottom + dy);
     src.Offset(mOffset);
-    text->TransferSequence(mSrcSize, src, MPoint(clip.left, clip.top), mTile, mPalette, mHFlip, mVFlip);
+    text->TransferSequence(mSrcSize, src, dst, mTile, mPalette, mHFlip, mVFlip);
 }
 
 TextFill::TextFill(MRect rect, int tile, int palette, bool hflip, bool vflip) : Item(rect) {
