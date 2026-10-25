@@ -920,19 +920,19 @@ void UseCreatureSelect::Start() {
 extern "C" u32 data_ov000_02197908[];   // (+4: the guard of Select's static)
 
 // NONMATCHING: the game keeps `this` on the stack (sp+0x14) and the start key's loop recomputes each creature's
-// address; ours is 0x4C bytes shorter. The logic follows the game case by case.
+// address; ours is 0x2C bytes shorter. The logic follows the game case by case.
 void UseCreatureSelect::Select() {
+    BOOL changed = FALSE;
     if (!(data_ov000_02197908[1] & 1)) {
         data_ov000_02195e50.creatureCount = gDinoResource->GetCreatureCount();
         data_ov000_02197908[1] |= 1;
     }
-    BOOL changed = FALSE;
     switch (mInputHub->GetInput(0)->GetPressed() & 0x3FFF) {
     case 0x2000:    // a fixed pair of creatures
         mIds[0] = 0x46;
+        mIds[3] = 0x47;
         mIds[1] = changed;
         mIds[2] = changed;
-        mIds[3] = 0x47;
         mIds[4] = changed;
         mIds[5] = changed;
         mLevels[0] = 3;
@@ -999,15 +999,15 @@ void UseCreatureSelect::Select() {
         return;
     case 0x8:
         for (int i = 0; i < mCount; i++) {
-            int slot = i % 3;
             int side = i / 3;
+            const int slot = i % 3;
             DinoBattleSelectCreature *creature = (DinoBattleSelectCreature *)DinoBattleSelectCreatureAt(mParams, side, slot);
             creature->id = mIds[i];
             int level = mLevels[i];
+            DinoCreaturePart *parts = (DinoCreaturePart *)&((DinoBattleParams *)mParams)->sides[side].mCreatures[slot].unk04[0];
             if (level > 12) {
                 level = 12;
             }
-            DinoCreaturePart *parts = (DinoCreaturePart *)&((DinoBattleParams *)mParams)->sides[side].mCreatures[slot].unk04[0];
             for (u32 j = 0; j < 4; j++) {
                 parts[j].level = 0;
                 parts[j].unk12 = 0;

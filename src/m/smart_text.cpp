@@ -13,11 +13,12 @@ TextPattern::TextPattern(const u16 *src, MPoint srcSize, MPoint dst, int tile, i
 }
 
 void TextPattern::Draw(MText *text, MRect clip) {
+    MPoint dst(clip.left, clip.top);
     int dy = mVFlip ? (mRect.bottom - clip.bottom) - (clip.top - mRect.top) : 0;
     int dx = mHFlip ? (mRect.right - clip.right) - (clip.left - mRect.left) : 0;
     MRect src(clip.left + dx, clip.top + dy, clip.right + dx, clip.bottom + dy);
     src.Offset(mOffset);
-    text->Transfer(mSrc, mSrcSize, src, MPoint(clip.left, clip.top), mTile, mPalette, mHFlip, mVFlip);
+    text->Transfer(mSrc, mSrcSize, src, dst, mTile, mPalette, mHFlip, mVFlip);
 }
 
 TextSequence::TextSequence(MPoint srcSize, MPoint dst, int tile, int palette, bool hflip, bool vflip)

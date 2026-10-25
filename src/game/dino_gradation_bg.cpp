@@ -18,27 +18,26 @@ DinoGradationBg::DinoGradationBg(MDisplay *display) {
     mRaster->SetFlipOnVBlank(TRUE);
 }
 
-// NONMATCHING: register allocation (the game keeps the red accumulator on the stack and blue in lr) and 8 bytes.
+// NONMATCHING: register allocation (the game keeps the red accumulator on the stack and blue in lr) and 4 bytes.
 void DinoGradationBg::SetGradation(int r0, int g0, int b0, int r1, int g1, int b1) {
-    int rAcc = 0;
-    int gAcc = 0;
-    int bAcc = 0;
+    int r;
     u32 i;
+    int gAcc;
+    int rAcc = 0;
+    int bAcc = 0;
+    gAcc = 0;
 
     for (i = 0; i < M_RASTER_LINES; i++) {
-        u32 r4;
-        u32 b4;
-        u32 g4;
         int t = M_RASTER_LINES - i;
-        u32 r = (u32)(0x155 * (r0 * t + rAcc)) >> 16;
+        r = (u32)(0x155 * (r0 * t + rAcc)) >> 16;
         u32 g = (u32)(0x155 * (g0 * t + gAcc)) >> 16;
-        u32 b = (u32)(0x155 * (t * b0 + bAcc)) >> 16;
+        u32 b = (u32)(0x155 * (b0 * t + bAcc)) >> 16;
         mFront[i] = (r >> 3) | ((g >> 3) << 5) | ((b >> 3) << 10);
-        g4 = g + 4;
+        u32 g4 = g + 4;
+        u32 b4 = b + 4;
         const u32 &gc = std::min(g4, data_020b5e14[2]);
-        b4 = b + 4;
         const u32 &bc = std::min(b4, data_020b5e14[1]);
-        r4 = r + 4;
+        u32 r4 = r + 4;
         const u32 &rc = std::min(r4, data_020b5e14[0]);
         mBack[i] = (rc >> 3) | ((gc >> 3) << 5) | ((bc >> 3) << 10);
         rAcc += r1;

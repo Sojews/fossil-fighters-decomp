@@ -260,12 +260,22 @@ def m_type(lines, r):
 COMM = re.compile(rf"({OPERAND}) (\+|\*|&|\||\^|==|!=) ({OPERAND})")
 
 
+def standalone(line, m):
+    """Whether the match is a whole operand of its expression: nothing that binds tighter (or a cast, a unary
+    operator, a member access) sits right before or after it, so rewriting it inside keeps the meaning."""
+    before, after = line[:m.start()].rstrip(), line[m.end():].lstrip()
+    return ((not before or before[-1] in "(,=[?:{" or before.endswith("return")) and before[-2:] not in ("==", "!=")
+            and (not after or after[0] in "),;]?:" or after.startswith(("&&", "||"))))
+
+
 def m_commute(lines, r):
     idx = [i for i, l in enumerate(lines) if COMM.search(l) and not l.strip().startswith("//")]
     if not idx:
         return None
     i = r.choice(idx)
-    ms = list(COMM.finditer(lines[i]))
+    ms = [m for m in COMM.finditer(lines[i]) if standalone(lines[i], m)]
+    if not ms:
+        return None
     m = r.choice(ms)
     lines = lines[:]
     lines[i] = lines[i][:m.start()] + f"{m.group(3)} {m.group(2)} {m.group(1)}" + lines[i][m.end():]
@@ -362,11 +372,11 @@ def m_temp(lines, r):
 
 def m_reassoc(lines, r):
     pat = re.compile(rf"({OPERAND}) ([-+]) ({OPERAND}) ([-+]) ({OPERAND})")
-    idx = [i for i, l in enumerate(lines) if pat.search(l)]
+    idx = [i for i, l in enumerate(lines) if any(standalone(l, m) for m in pat.finditer(l))]
     if not idx:
         return None
     i = r.choice(idx)
-    m = r.choice(list(pat.finditer(lines[i])))
+    m = r.choice([m for m in pat.finditer(lines[i]) if standalone(lines[i], m)])
     if m.group(2) == "+" and m.group(4) == "+":
         new = f"{m.group(1)} + ({m.group(3)} + {m.group(5)})"
     elif m.group(2) == "+" and m.group(4) == "-":
