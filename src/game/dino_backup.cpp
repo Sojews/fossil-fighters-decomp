@@ -1169,16 +1169,16 @@ std::string DinoBackup::GetEntryName(const DinoBackupEntry *entry) {
         return gDinoResource->GetKasekiRockName(entry->id);
     case 1: {
         MResource<DinoKasekiDefs> defs = gDinoResource->LoadKasekiDefs();
-        const DinoKasekiDefs *data = defs.Get();
         u32 id = entry->id;
+        const DinoKasekiDefs *data = defs.Get();
         return std::string(gDinoResource->GetText(
             ((const DinoKasekiDef *) ((const u8 *) data + ((const u32 *) ((const u8 *) data + data->tableOffset))[id]))
                 ->nameText));
     }
     case 2: {
         MResource<DinoKasekiDefs> defs = gDinoResource->LoadKasekiDefs();
-        const DinoKasekiDefs *data = defs.Get();
         u32 id = entry->id;
+        const DinoKasekiDefs *data = defs.Get();
         return std::string(gDinoResource->GetText(
             ((const DinoKasekiDef *) ((const u8 *) data + ((const u32 *) ((const u8 *) data + data->tableOffset))[id]))
                 ->nameText));
