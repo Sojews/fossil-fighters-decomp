@@ -31,9 +31,11 @@ u32 DinoWeightedRandom::Pick() {
 DinoSeMotion::~DinoSeMotion() {
 }
 
-// Template instances the game emits in this file.
+// Template instances the game emits in this file (with common subexpressions on, unlike the file).
+#pragma opt_common_subs on
 template class std::__vec_deleter<void *, std::allocator<void *> &>;
 template class std::__vec_deleter<void *, std::allocator<void *> >;
+#pragma opt_common_subs off
 
 DinoSeMotion::DinoSeMotion(const std::string &path, MSmartOam *oam, int flags, int fromEnd)
     : MMotion(std::string(path), oam, flags, fromEnd) {

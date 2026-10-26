@@ -242,8 +242,10 @@ BOOL DinoFieldCharaGetScreenPos(MPoint *pos, DinoFieldChara *chara);
 
 struct MAfnBlock;
 
-// An 8-byte entry of the radar's list (only its size is known).
+// An 8-byte entry of the radar's list (only its size is known). (A user default constructor makes it non-trivial,
+// as the game's vector code for it shows.)
 struct DinoFieldRadarEntry {
+    DinoFieldRadarEntry() {}
     u32 unk0;
     u32 unk4;
 };
