@@ -109,11 +109,8 @@ DinoUiDebugReviverMenuItem::~DinoUiDebugReviverMenuItem() {
 void DinoUiDebugReviverMenuItem::OnDecide() {
 }
 
-// NONMATCHING: register allocation only (the game builds the rect without moving the return slot out of r0).
 MRect DinoUiDebugReviverMenuItem::GetFrame() {
-    MRect frame(0, 0, 24, 12);
-    frame.Offset(mPos);
-    return frame.Inflate(6);
+    return MRect(0, 0, 24, 12).Moved(mPos).Inflate(6);
 }
 
 void DinoUiDebugReviverMenu::OnFocus(MMenuItem *item) {
