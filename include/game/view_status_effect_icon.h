@@ -27,12 +27,21 @@ extern "C" struct {
 extern "C" StatusEffectPath data_ov000_021952e0[];
 
 struct StatusEffectEntry {
+    StatusEffectEntry() {}
+
     u32 mId;        // 0x00
     int mCount;     // 0x04
     u8 mFlag;       // 0x08
 
     int GetAnime();
 };
+
+// (A user constructor, but the game copies it with vector's trivial paths.)
+namespace Metrowerks {
+template <> struct is_trivial<StatusEffectEntry> {
+    static const bool value = true;
+};
+} // namespace Metrowerks
 
 struct StatusEffectSlot {
     std::vector<StatusEffectEntry> mEntries;    // 0x00
