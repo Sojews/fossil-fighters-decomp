@@ -788,6 +788,7 @@ public:
     DinoEventLoop *mEvent;  // 0x10
     u32 mChara;         // 0x14
     u32 mMotion;        // 0x18
+    u8 unk1C[0x24 - 0x1C];
 };
 
 class DinoEventExecChrEffect : public MTransfer {
@@ -799,6 +800,7 @@ public:
     DinoEventLoop *mEvent;  // 0x10
     u32 mChara;         // 0x14
     u32 mEffect;        // 0x18
+    u8 unk1C[0x24 - 0x1C];
 };
 
 class DinoEventExecKeyWait : public MProcess {
