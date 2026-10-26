@@ -11,10 +11,7 @@
 // Reads records from a file through a 256-byte buffer.
 class DinoFileCache {
 public:
-    DinoFileCache(const char *path) {
-        mOpened = FALSE;
-        mPath = path;
-    }
+    DinoFileCache() {}
 
     void Read(u32 offset, void *dest, u32 size);
 
@@ -134,18 +131,22 @@ extern "C" struct {
 #define sEtcBattleAttackTypePath (data_020ba044.mEtcBattleAttackType)
 
 // The order here gives the game's layout (see tools/static_order.py).
-// NONMATCHING (__sinit): the game constructs the table, the mutex, then the caches region map, region center, talk,
-// excavate, bgm, scene; declaring them in that order gives that code but breaks the layout the readers need.
+// The game constructs the table, the mutex, then the caches region map, region center, talk, excavate, bgm, scene;
+// declaring them in that order gives that code but breaks the layout the readers need, so these have no constructors
+// and __sinit is rebuilt at the end of the file through the game's pool anchors.
 // static_order: begin
 DinoResource *gDinoResource;
-static MMutex sMutex;
-static DinoFileCache sTalkMessageMatch(sEtcTalkMsgMatchPath);
-static DinoFileCache sMapSceneMatch(sEtcMapSceneMatchPath);
-static DinoFileCache sMapBgmMatch(sEtcMapBgmMatchPath);
-static DinoFileCache sRegionCenterMatch(sEtcRegionCenterMatchPath);
-static DinoFileCache sMapExcavateMatch(sEtcMapExcavateMatchPath);
-static DinoFileCache sRegionMapMatch(sEtcRegionMapMatchPath);
-static const u16 sUnkTable[14] = {0, Rgb(0, 0, 0), Rgb(0, 18, 0), Rgb(30, 2, 2), Rgb(22, 11, 0), Rgb(9, 15, 27), Rgb(31, 12, 25), Rgb(26, 0, 12), Rgb(10, 15, 23), Rgb(31, 18, 0), Rgb(31, 31, 31), Rgb(16, 16, 16), Rgb(31, 18, 20), 0};
+static struct {
+    OSMutex mutex;
+} sMutex;
+static DinoFileCache sTalkMessageMatch;
+static DinoFileCache sMapSceneMatch;
+static DinoFileCache sMapBgmMatch;
+static DinoFileCache sRegionCenterMatch;
+static DinoFileCache sMapExcavateMatch;
+static DinoFileCache sRegionMapMatch;
+// (Initialized data, as the game keeps it in .data; its __sinit writes the colors there, below.)
+static u16 sUnkTable[14] = {0, 0x8000, 0x8240, 0x885E, 0x8176, 0xEDE9, 0xE59F, 0xB01A, 0xDDEA, 0x825F, 0xFFFF, 0xC210, 0xD25F, 0};
 // static_order: end
 
 inline void DinoFileCache::Read(u32 offset, void *dest, u32 size) {
@@ -546,3 +547,53 @@ u32 DinoResource::FindExcavateRange(u32 value) {
 
 // String members the game emits in this file.
 template std::string &std::string::operator+=(const char *s);
+
+// The statics above, constructed through the game's pool anchors (the table is in .data after the paths, the mutex
+// and caches in .bss). The volatile accesses keep each cache's flag store ahead of its path load, as the game's
+// inlined constructors did. (dino_static_init.h's DINO_POOL_NV; including that header moves this file's code.)
+#define DINO_POOL_NV(T, sym, off) (*(T *)((u8 *)&(sym) + (off)))
+extern "C" u8 data_020ba084[];
+extern "C" u8 data_020cb97c[];
+extern "C" u8 data_020cba78[];
+extern "C" u8 data_020cba98[];
+extern "C" u8 data_020cbb78[];
+extern "C" u8 data_020cbbb8[];
+extern "C" u8 data_020cbc78[];
+extern "C" u8 data_020cbcb8[];
+extern "C" u8 data_020cbd78[];
+extern "C" u8 data_020cbdd8[];
+extern "C" u8 data_020cbef8[];
+
+static struct DinoResourceStaticInit {
+    DinoResourceStaticInit() {
+        DINO_POOL_NV(u16, data_020ba084, 0x06) = Rgb(0, 0, 0);
+        DINO_POOL_NV(u16, data_020ba084, 0x08) = Rgb(0, 18, 0);
+        DINO_POOL_NV(u16, data_020ba084, 0x0A) = Rgb(30, 2, 2);
+        DINO_POOL_NV(u16, data_020ba084, 0x0C) = Rgb(22, 11, 0);
+        DINO_POOL_NV(u16, data_020ba084, 0x0E) = Rgb(9, 15, 27);
+        DINO_POOL_NV(u16, data_020ba084, 0x10) = Rgb(31, 12, 25);
+        DINO_POOL_NV(u16, data_020ba084, 0x12) = Rgb(26, 0, 12);
+        DINO_POOL_NV(u16, data_020ba084, 0x14) = Rgb(10, 15, 23);
+        DINO_POOL_NV(u16, data_020ba084, 0x16) = Rgb(31, 18, 0);
+        DINO_POOL_NV(u16, data_020ba084, 0x18) = Rgb(31, 31, 31);
+        DINO_POOL_NV(u16, data_020ba084, 0x1A) = Rgb(16, 16, 16);
+        DINO_POOL_NV(u16, data_020ba084, 0x1C) = Rgb(31, 18, 20);
+        OS_InitMutex((OSMutex *)data_020cb97c);
+        *(volatile u8 *)((u8 *)&data_020cbbb8 + 0x04) = FALSE;
+        DINO_POOL_NV(const char *, data_020cbb78, 0x48) = *(const char *volatile *)&sEtcRegionMapMatchPath;
+        *(volatile u8 *)((u8 *)&data_020cbcb8 + 0x18) = FALSE;
+        DINO_POOL_NV(const char *, data_020cbc78, 0x5C) = *(const char *volatile *)&sEtcRegionCenterMatchPath;
+        *(volatile u8 *)((u8 *)&data_020cbdd8 + 0x0C) = FALSE;
+        DINO_POOL_NV(const char *, data_020cbd78, 0x70) = *(const char *volatile *)&sEtcTalkMsgMatchPath;
+        *(volatile u8 *)((u8 *)&data_020cbef8 + 0x00) = FALSE;
+        DINO_POOL_NV(const char *, data_020cbef8, 0x04) = *(const char *volatile *)&sEtcMapExcavateMatchPath;
+        {
+            u8 *cache = (u8 *)&gDinoResource;
+            const char *path = *(const char *volatile *)&sEtcMapBgmMatchPath;
+            *(volatile u8 *)(cache + 0x1C) = FALSE;
+            *(const char **)(cache + 0x20) = path;
+        }
+        *(volatile u8 *)((u8 *)&data_020cba98 + 0x10) = FALSE;
+        DINO_POOL_NV(const char *, data_020cba78, 0x34) = *(const char *volatile *)&sEtcMapSceneMatchPath;
+    }
+} sDinoResourceStaticInit;
