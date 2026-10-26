@@ -1028,12 +1028,10 @@ void DinoField::LoadSlideInPict(MDisplay *display, MView *old, MExtAffinePicture
     static const MPoint sDirs[4] = {MPoint(256, 0), MPoint(0, 192), MPoint(-256, 0), MPoint(0, -192)};
     MResource<DinoExcavateDefs> defs = gDinoResource->GetExcavateDefs();
     *pict = new MExtAffinePicture(display, std::string("/image/") + GetPictName(defs.Get(), id), TRUE, false);
-    int x = pos.x + sDirs[dir].x;
-    int y = pos.y + sDirs[dir].y;
-    (*pict)->SetPosition(MPoint(x, y));
+    (*pict)->SetPosition(pos + sDirs[dir]);
     (*pict)->SetPriority(1);
     mParallel.AddTail(*pict);
-    mPictTasks->AddTail(new MTimer(1), (*pict)->CreateShowTransfer(), (*pict)->CreateCoordAnime(MPoint(x, y), pos, frames, ease),
+    mPictTasks->AddTail(new MTimer(1), (*pict)->CreateShowTransfer(), (*pict)->CreateCoordAnime(pos + sDirs[dir], pos, frames, ease),
                         (*pict)->CreatePriorityTransfer(2));
     if (old) {
         mPictTasks->AddTail(MTaskExitTransfer::Create(old));
