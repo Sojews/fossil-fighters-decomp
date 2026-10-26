@@ -300,7 +300,8 @@ void DinoEventKasekiRockFound::StateDig() {
     mAngle = mChara->GetModel()->angle;
     mEffect = new MPolygonChar(mEvent->GetField()->mScene, 0x7FFF, NULL, NULL);
     MPolygonChar *e;
-    (e = mEffect)->SetPosition(mHole->GetPos().x.v, mHole->mUnk90, mHole->GetPos().y.v);
+    // (The height as an MFx32, as the game passes it.)
+    (e = mEffect)->SetPosition(mHole->GetPos().x.v, MFx32::FromRaw(mHole->mUnk90).v, mHole->GetPos().y.v);
     for (MAnmModelBase *anm = (MAnmModelBase *)e->mParallel.mHead; anm != NULL; anm = (MAnmModelBase *)anm->mNext) {
         anm->mPosRef = &e->mPos;
         anm->mUnk11B = TRUE;
