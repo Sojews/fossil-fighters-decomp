@@ -179,22 +179,19 @@ void DinoGetBattleKP(u32 value, u32 *a, u32 *b) {
 // right (wrapping to the row's start).
 void DinoLinkGrid(MMenu *menu, std::vector<MMenuItem *> *items, MMenuItem *below) {
     for (int i = 0; i < items->size(); i++) {
-        int col;
-        int down = i + 4;
-        if (down < items->size()) {
-            menu->AddLink((*items)[i], 2, (*items)[down]);
+        if (i + 4 < items->size()) {
+            menu->AddLink((*items)[i], 2, (*items)[i + 4]);
         } else {
             menu->AddLink((*items)[i], 2, below);
         }
-        col = i % 4;
-        if (col != 0) {
+        if (i % 4 != 0) {
             menu->AddLink((*items)[i], 3, (*items)[i - 1]);
-        } else if (down < items->size()) {
+        } else if (i + 4 < items->size()) {
             menu->AddLink((*items)[i], 3, (*items)[i + 3]);
         } else {
-            menu->AddLink((*items)[i], 3, (MMenuItem *)items->back());
+            menu->AddLink((*items)[i], 3, *--items->end());
         }
-        if (col == 3 || i == items->size() - 1) {
+        if (i % 4 == 3 || i == items->size() - 1) {
             menu->AddLink((*items)[i], 1, (*items)[i / 4 * 4]);
         } else {
             menu->AddLink((*items)[i], 1, (*items)[i + 1]);
