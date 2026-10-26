@@ -41,8 +41,7 @@ void MSimpleMenu::Init() {
     mFont->SetColors(0, 1, 0);
     mAnimTasks = new MParallelTaskSet;
     mViews = new MParallelTaskSet;
-    mParallel.AddTail(mAnimTasks);
-    mParallel.AddTail(mViews);
+    mParallel.AddTail(mAnimTasks, mViews);
     mState = data_020c45f8.Start_0C;
 }
 
@@ -155,10 +154,7 @@ void MSimpleMenu::Decide(int id) {
             MoveCursor(i);
         }
     }
-    MTask *exit = MTaskExitTransfer::Create(this);
-    MTask *timer = new MTimer(10);
-    mSerial.AddTail(timer);
-    mSerial.AddTail(exit);
+    mSerial.AddTail(new MTimer(10), MTaskExitTransfer::Create(this));
 }
 
 void MSimpleMenu::MoveCursor(int index) {
