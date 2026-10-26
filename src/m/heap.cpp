@@ -47,18 +47,21 @@ MHeapBlock *MHeap::NewBlock() {
     return (MHeapBlock *)operator new[](mBlockSize);
 }
 
+static inline u32 MAlignUp(u32 v, u32 a) { return (v + a - 1) & ~(a - 1); }
+static inline u32 MAlignDown(u32 v, u32 a) { return v & ~(a - 1); }
+
 MHeapBlock *MHeap::Alloc(u32 size, BOOL fromEnd, u32 align, u32 boundary, u32 boundaryCount, u32 limit) {
     MScopedLock lock(&mMutex, TRUE);
-    u32 bestAddr = 0;
-    MHeapBlock **bestLink = NULL;
     MHeapBlock *best = NULL;
+    u32 bestAddr = 0;
     MHeapBlock **link = &mFree;
+    MHeapBlock **bestLink = NULL;
     MHeapBlock *block;
     MHeapBlock *n;
 
     for (block = mFree; block != NULL; block = block->next) {
-        u32 blockAddr = block->addr;
         u32 blockSize = block->size;
+        u32 blockAddr = block->addr;
         u32 addr;
 
         if (limit != 0) {
@@ -71,16 +74,16 @@ MHeapBlock *MHeap::Alloc(u32 size, BOOL fromEnd, u32 align, u32 boundary, u32 bo
             }
         }
         if (!fromEnd) {
-            addr = (blockAddr + align - 1) & ~(align - 1);
+            addr = MAlignUp(blockAddr, align);
             if (boundary != 0
-                && ((addr + size - 1) & ~(boundary - 1)) - (addr & ~(boundary - 1)) >= boundary * boundaryCount) {
-                addr = (blockAddr + boundary - 1) & ~(boundary - 1);
+                && MAlignDown(addr + size - 1, boundary) - MAlignDown(addr, boundary) >= boundaryCount * boundary) {
+                addr = MAlignUp(blockAddr, boundary);
             }
         } else {
-            addr = (blockAddr + blockSize - size) & ~(align - 1);
+            addr = MAlignDown(blockAddr + blockSize - size, align);
             if (boundary != 0) {
-                u32 start = addr & ~(boundary - 1);
-                if (((addr + size - 1) & ~(boundary - 1)) - start >= boundary * boundaryCount) {
+                u32 start = MAlignDown(addr, boundary);
+                if (MAlignDown(addr + size - 1, boundary) - start >= boundaryCount * boundary) {
                     addr = start;
                 }
             }
