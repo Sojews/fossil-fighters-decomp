@@ -174,7 +174,6 @@ void DinoGetBattleKP(u32 value, u32 *a, u32 *b) {
     }
 }
 
-// NONMATCHING: 91%, stack slots (the game's frame has one slot fewer).
 // Links a grid of items four to a row: down (or to below from the last row), left (wrapping to the row's end) and
 // right (wrapping to the row's start).
 void DinoLinkGrid(MMenu *menu, std::vector<MMenuItem *> *items, MMenuItem *below) {
