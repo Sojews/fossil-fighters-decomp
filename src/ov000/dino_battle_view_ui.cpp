@@ -1269,8 +1269,9 @@ static struct DinoBattleViewUiStaticInit {
         DINO_POOL_WORD(data_ov000_02193c64, 0x40) = 4;
         DINO_POOL_WORD(data_ov000_02193c64, 0x44) = 124;
         DINO_POOL_WORD(data_ov000_02193c64, 0x48) = 188;
-        DINO_POOL_WORD(data_ov000_02193cb0, 0x0) = 132;
-        DINO_POOL_WORD(data_ov000_02193cb0, 0x4) = 4;
+        volatile s32 *p = (volatile s32 *) &data_ov000_02193cb0;
+        p[0] = 132;
+        p[1] = 4;
         DINO_POOL_WORD(data_ov000_02193cb0, 0x8) = 252;
         DINO_POOL_WORD(data_ov000_02193cb0, 0xc) = 188;
         DINO_POOL_WORD(data_ov000_02193be4, 0x2c) = 65;

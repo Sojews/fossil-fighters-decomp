@@ -519,7 +519,6 @@ void WaitKPCountTask::Execute() {
 
 // The file's static initialization (see dino_static_init.h); the pool is one object, its second 0x80 bytes addressed
 // through the first anchor.
-// NONMATCHING: 92.6%, register choice only (the game reuses the first anchor's register for the second).
 extern "C" u32 data_ov000_021919ec[];
 extern "C" u32 data_ov000_021919fc[];
 static struct DinoBattleViewKasekiPointStaticInit {
@@ -534,11 +533,13 @@ static struct DinoBattleViewKasekiPointStaticInit {
         DINO_POOL_WORD(data_ov000_02191900, 0x1c) = 32;
         DINO_POOL_WORD(data_ov000_02191900, 0xe4) = 24;
         DINO_POOL_WORD(data_ov000_02191900, 0xe8) = 176;
-        DINO_POOL_WORD(data_ov000_021919ec, 0x0) = 231;
-        DINO_POOL_WORD(data_ov000_021919ec, 0x4) = 176;
+        volatile s32 *p = (volatile s32 *) &data_ov000_021919ec;
+        p[0] = 231;
+        p[1] = 176;
         DINO_POOL_WORD(data_ov000_02191900, 0xf4) = 48;
         DINO_POOL_WORD(data_ov000_02191900, 0xf8) = 178;
-        DINO_POOL_WORD(data_ov000_021919fc, 0x0) = 240;
-        DINO_POOL_WORD(data_ov000_021919fc, 0x4) = 178;
+        p = (volatile s32 *) &data_ov000_021919fc;
+        p[0] = 240;
+        p[1] = 178;
     }
 } sDinoBattleViewKasekiPointStaticInit;
