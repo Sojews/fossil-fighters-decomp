@@ -16,9 +16,9 @@ public:
             const DinoBattleAdjustDefs *defs = gDinoResource->GetBattleAdjustDefs();
             const u8 *top = (const u8 *) defs + defs->backdropTop + t * 4;
             const DinoBattleAdjustDefs *defs2 = gDinoResource->GetBattleAdjustDefs();
-            int r = top[0];
-            int g = top[1];
-            int b = top[2];
+            u32 r = top[0];
+            u32 g = top[1];
+            u32 b = top[2];
             const u8 *bottom = (const u8 *) defs2 + defs2->backdropBottom + t * 4;
             int dr = bottom[0] - r;
             int dg = bottom[1] - g;
@@ -28,7 +28,7 @@ public:
             int ag = 0;
             int ab = 0;
             for (int y = 0; y < M_RASTER_LINES; y++) {
-                *line++ = 0x8000 | (((b + ab / 191) >> 3) << 10) | (((g + ag / 191) >> 3) << 5) | ((r + ar / 191) >> 3);
+                *line++ = (((b + ab / 191) >> 3) << 10) | ((((g + ag / 191) >> 3) << 5) | (0x8000 | ((r + ar / 191) >> 3)));
                 ar += dr;
                 ag += dg;
                 ab += db;
