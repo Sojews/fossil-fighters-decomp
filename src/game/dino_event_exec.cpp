@@ -834,23 +834,33 @@ DinoEventExecShopSet::DinoEventExecShopSet(u32 shop) {
 }
 
 // Stocks the shop: its fixed entries, then random picks until it is full.
+// (Without strength reduction, as the shop menu's Restock: the fixed entries' loop is written out with its offset
+// counter the way the game's code steps it, the random picks index the entries by the counter.)
+#pragma opt_strength_reduction off
 void DinoEventExecShopSet::Transfer() {
     MResource<DinoShopData> shop = gDinoResource->LoadShop(mShop);
     gDinoBackup->SetUnk144(mShop);
     gDinoBackup->ClearUnk148();
-    for (u32 i = 0; i < shop.Get()->fixedCount; i++) {
-        const DinoShopData *data = shop.Get();
-        gDinoBackup->AddUnk148((const DinoEntrySource *) ((const u8 *) data + data->fixedOffset) + i);
+    u32 i = 0;
+    if (i < shop.Get()->fixedCount) {
+        u32 offset = i;
+        do {
+            const DinoShopData *data = shop.Get();
+            gDinoBackup->AddUnk148((const DinoEntrySource *) ((const u8 *) data + data->fixedOffset + offset));
+            offset += sizeof(DinoEntrySource);
+            i++;
+        } while (i < shop.Get()->fixedCount);
     }
     while (!gDinoBackup->IsUnk148Full()) {
+        DinoBackupEntry entry;
         MRandomRef random(gDinoResource->GetRandom());
         const DinoEntrySource *chosen;
         for (u32 i = 0; i < shop.Get()->randomCount; i++) {
-            const DinoShopData *data = shop.Get();
-            const DinoEntrySource *source = (const DinoEntrySource *) ((const u8 *) data + data->randomOffset) + i;
             BOOL unsold = TRUE;
-            for (int j = 0; j < 8; j++) {
-                DinoBackupEntry entry;
+            const DinoShopData *data = shop.Get();
+            int j;
+            const DinoEntrySource *source = (const DinoEntrySource *) ((const u8 *) data + data->randomOffset) + i;
+            for (j = 0; j < 8; j++) {
                 gDinoBackup->GetUnk148(j, &entry);
                 if (entry.id != 0 && entry.id == source->id) {
                     unsold = FALSE;
@@ -863,6 +873,7 @@ void DinoEventExecShopSet::Transfer() {
         gDinoBackup->AddUnk148(chosen);
     }
 }
+#pragma opt_strength_reduction reset
 
 DinoEventExecKasekiRockGet::DinoEventExecKasekiRockGet(DinoEventLoop *event, u32 flag, u32 id, u32 a, u32 b, u8 c)
     : MProcess(NULL) {

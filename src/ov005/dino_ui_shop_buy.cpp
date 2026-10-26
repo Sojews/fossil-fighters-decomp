@@ -43,24 +43,26 @@ DinoUiShopBuyMenu::DinoUiShopBuyMenu() : MMenu(NULL, 0), mPage(0), mLastPage(0),
 }
 
 // How long the shop's stock lasts, in frames.
-extern "C" const u64 data_02089ad4;
+extern const u64 kBackupRecentFrames;
 
 // Once that long has passed, restocks the shop with random picks until it is full.
-// NONMATCHING: the entry index gets a second (strength-reduced) counter, as in DinoEventExecShopSet::Transfer.
+// (Without strength reduction: the game indexes the entries by the counter itself.)
+#pragma opt_strength_reduction off
 void DinoUiShopBuyMenu::Restock() {
-    if (gDinoBackup->GetPlayFrames() - gDinoBackup->GetUnk160() <= data_02089ad4) {
+    if (gDinoBackup->GetPlayFrames() - gDinoBackup->GetUnk160() <= kBackupRecentFrames) {
         return;
     }
     MResource<DinoShopData> shop = gDinoResource->LoadShop(gDinoBackup->GetUnk144());
     while (!gDinoBackup->IsUnk148Full()) {
+        DinoBackupEntry entry;
         MRandomRef random(gDinoResource->GetRandom());
         const DinoEntrySource *chosen;
         for (u32 i = 0; i < shop.Get()->randomCount; i++) {
-            const DinoShopData *data = shop.Get();
-            const DinoEntrySource *source = (const DinoEntrySource *)((const u8 *)data + data->randomOffset) + i;
             BOOL unsold = TRUE;
-            for (int j = 0; j < 8; j++) {
-                DinoBackupEntry entry;
+            const DinoShopData *data = shop.Get();
+            int j;
+            const DinoEntrySource *source = (const DinoEntrySource *)((const u8 *)data + data->randomOffset) + i;
+            for (j = 0; j < 8; j++) {
                 gDinoBackup->GetUnk148(j, &entry);
                 if (entry.id != 0 && entry.id == source->id) {
                     unsold = FALSE;
@@ -73,6 +75,7 @@ void DinoUiShopBuyMenu::Restock() {
         gDinoBackup->AddUnk148(chosen);
     }
 }
+#pragma opt_strength_reduction reset
 
 DinoUiShopBuyMenuItem::DinoUiShopBuyMenuItem(DinoUiShopBuyMenu *owner, const std::string &path, MPoint pos, u32 textId) {
     mOwner = owner;
