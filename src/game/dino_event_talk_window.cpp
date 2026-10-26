@@ -190,11 +190,7 @@ void DinoEventTalkWindow::StateEnd() {
     MTask *exit = MTaskExitTransfer::Create(this);
     MTask *timer = new MTimer(1);
     MTask *windowExit = MTaskExitTransfer::Create(mWindow);
-    MSerialTaskSet *serial = &mSerial;
-    serial->AddTail(mWindow->CreateCloseTask());
-    serial->AddTail(windowExit);
-    serial->AddTail(timer);
-    serial->AddTail(exit);
+    mSerial.AddTail(mWindow->CreateCloseTask(), windowExit, timer, exit);
 }
 
 // String members the game emits in this file.
