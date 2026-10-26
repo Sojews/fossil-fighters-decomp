@@ -1203,10 +1203,8 @@ void DinoUiOrderSelectMenu::ShowPage(u8 page) {
 
 // The file's static initialization (see dino_static_init.h): layout points, path tables copied from the pooled paths,
 // the MPoint[5] places, then the pages' pictures.
-// NONMATCHING: 98.8%, the game stores each place table's first point before loading the next point's x.
 extern "C" u32 data_ov006_02196f4c[];
 extern "C" u32 data_ov006_0219704c[];
-extern "C" u32 data_ov006_021972cc[];
 extern "C" u32 data_ov006_021972f8[];
 extern "C" u32 data_ov006_02197300[];
 extern "C" u32 data_ov006_02197308[];
@@ -1386,8 +1384,8 @@ static struct DinoUiOrderSelectStaticInit {
         DINO_POOL_WORD(data_ov006_0219714c, 0x30) = 0x66;
         DINO_POOL_WORD(data_ov006_0219714c, 0x24) = 0x80;
         DINO_POOL_WORD(data_ov006_0219714c, 0x28) = 0x60;
-        DINO_POOL_WORD(data_ov006_021972cc, 0x74) = 0x32;
-        DINO_POOL_WORD(data_ov006_021972cc, 0x78) = 0x8A;
+        DINO_POOL_WORD(data_ov006_021970cc, 0x274) = 0x32;
+        DINO_POOL_WORD(data_ov006_021970cc, 0x278) = 0x8A;
         volatile s32 *p = (volatile s32 *) &data_ov006_02197348;
         p[0x0 / 4] = 0x5F;
         p[0x4 / 4] = 0x8A;
@@ -1400,8 +1398,8 @@ static struct DinoUiOrderSelectStaticInit {
         p = (volatile s32 *) &data_ov006_02197360;
         p[0x0 / 4] = 0xDA;
         p[0x4 / 4] = 0x8A;
-        DINO_POOL_WORD(data_ov006_021972cc, 0x4C) = 0x2C;
-        DINO_POOL_WORD(data_ov006_021972cc, 0x50) = 0x1F;
+        DINO_POOL_WORD(data_ov006_021970cc, 0x24c) = 0x2C;
+        DINO_POOL_WORD(data_ov006_021970cc, 0x250) = 0x1F;
         DINO_POOL_WORD(data_ov006_02197320, 0x0) = 0x59;
         DINO_POOL_WORD(data_ov006_02197320, 0x4) = 0x1F;
         DINO_POOL_WORD(data_ov006_02197328, 0x0) = 0x86;
@@ -1410,8 +1408,8 @@ static struct DinoUiOrderSelectStaticInit {
         DINO_POOL_WORD(data_ov006_02197330, 0x4) = 0x1F;
         DINO_POOL_WORD(data_ov006_02197338, 0x0) = 0xE0;
         DINO_POOL_WORD(data_ov006_02197338, 0x4) = 0x1F;
-        DINO_POOL_WORD(data_ov006_021972cc, 0x24) = 0x59;
-        DINO_POOL_WORD(data_ov006_021972cc, 0x28) = 0x1F;
+        DINO_POOL_WORD(data_ov006_021970cc, 0x224) = 0x59;
+        DINO_POOL_WORD(data_ov006_021970cc, 0x228) = 0x1F;
         DINO_POOL_WORD(data_ov006_021972f8, 0x0) = 0x86;
         DINO_POOL_WORD(data_ov006_021972f8, 0x4) = 0x1F;
         DINO_POOL_WORD(data_ov006_02197300, 0x0) = 0xB3;
@@ -1426,9 +1424,9 @@ static struct DinoUiOrderSelectStaticInit {
         DINO_POOL_WORD(data_ov006_021970cc, 0x60) = 8;
         DINO_POOL_WORD(data_ov006_0219714c, 0x54) = -6;
         DINO_POOL_WORD(data_ov006_0219714c, 0x58) = 0xC;
-        DINO_POOL_WORD(data_ov006_0219724c, 0x2C) = DINO_POOL_WORD(data_ov006_021972cc, 0x74);
-        DINO_POOL_WORD(data_ov006_0219724c, 0x30) = DINO_POOL_WORD(data_ov006_021972cc, 0x78);
-        DINO_POOL_WORD(data_ov006_0219724c, 0x34) = DINO_POOL_WORD(data_ov006_021972cc, 0x7C);
+        DINO_POOL_WORD(data_ov006_0219724c, 0x2C) = DINO_POOL_WORD(data_ov006_021970cc, 0x274);
+        DINO_POOL_WORD(data_ov006_0219724c, 0x30) = DINO_POOL_WORD(data_ov006_021970cc, 0x278);
+        DINO_POOL_WORD(data_ov006_0219724c, 0x34) = DINO_POOL_WORD(data_ov006_021970cc, 0x27c);
         DINO_POOL_WORD(data_ov006_0219724c, 0x38) = DINO_POOL_WORD(data_ov006_0219734c, 0x0);
         DINO_POOL_WORD(data_ov006_0219724c, 0x3C) = DINO_POOL_WORD(data_ov006_0219734c, 0x4);
         DINO_POOL_WORD(data_ov006_0219724c, 0x40) = DINO_POOL_WORD(data_ov006_0219734c, 0x8);

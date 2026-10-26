@@ -1766,7 +1766,6 @@ template void std::stable_sort(std::vector<u32>::iterator, std::vector<u32>::ite
 template void std::stable_sort(std::vector<u32>::iterator, std::vector<u32>::iterator, DinoCreatureByVoice);
 
 // The file's static initialization (see dino_static_init.h), as in the medal menu's; then the tab backgrounds.
-// NONMATCHING: 99.6%, the game computes -0x28 (from 0xB7) after the last point's second store.
 extern "C" u32 data_ov007_0218eaec[];
 extern "C" u32 data_ov007_0218ecec[];
 extern "C" u32 data_ov007_0218ee6c[];
@@ -1947,18 +1946,18 @@ static struct DinoUiOrganizationMenuStaticInit {
         DINO_POOL_WORD(data_ov007_0218ebec, 0x74) = 0;
         DINO_POOL_WORD(data_ov007_0218ebec, 0x78) = 0x13;
         DINO_POOL_WORD(data_ov007_0218ebec, 0x7C) = 0x9E;
-        DINO_POOL_WORD(data_ov007_0218ec6c, 0x0) = 0x2D;
-        DINO_POOL_WORD(data_ov007_0218ec6c, 0x4) = 0;
-        DINO_POOL_WORD(data_ov007_0218ec6c, 0x8) = 0x80;
-        DINO_POOL_WORD(data_ov007_0218ec6c, 0xC) = 0x60;
-        DINO_POOL_WORD(data_ov007_0218ec6c, 0x10) = 0x79;
-        DINO_POOL_WORD(data_ov007_0218ec6c, 0x14) = 0x74;
-        DINO_POOL_WORD(data_ov007_0218ec6c, 0x18) = 0x87;
-        DINO_POOL_WORD(data_ov007_0218ec6c, 0x1C) = 0x74;
-        DINO_POOL_WORD(data_ov007_0218ec6c, 0x20) = 0xF7;
-        DINO_POOL_WORD(data_ov007_0218ec6c, 0x24) = 0x97;
-        DINO_POOL_WORD(data_ov007_0218ec6c, 0x28) = 0;
-        DINO_POOL_WORD(data_ov007_0218ec6c, 0x2C) = 0xB0;
+        DINO_POOL_WORD(data_ov007_0218ebec, 0x80) = 0x2D;
+        DINO_POOL_WORD(data_ov007_0218ebec, 0x84) = 0;
+        DINO_POOL_WORD(data_ov007_0218ebec, 0x88) = 0x80;
+        DINO_POOL_WORD(data_ov007_0218ebec, 0x8c) = 0x60;
+        DINO_POOL_WORD(data_ov007_0218ebec, 0x90) = 0x79;
+        DINO_POOL_WORD(data_ov007_0218ebec, 0x94) = 0x74;
+        DINO_POOL_WORD(data_ov007_0218ebec, 0x98) = 0x87;
+        DINO_POOL_WORD(data_ov007_0218ebec, 0x9c) = 0x74;
+        DINO_POOL_WORD(data_ov007_0218ebec, 0xa0) = 0xF7;
+        DINO_POOL_WORD(data_ov007_0218ebec, 0xa4) = 0x97;
+        DINO_POOL_WORD(data_ov007_0218ebec, 0xa8) = 0;
+        DINO_POOL_WORD(data_ov007_0218ebec, 0xac) = 0xB0;
         DINO_POOL_WORD(_ZTI26DinoUiPartsTabIconMenuItem_ov007, 0x20) = 0x33;
         DINO_POOL_WORD(_ZTI26DinoUiPartsTabIconMenuItem_ov007, 0x24) = 0x29;
         DINO_POOL_WORD(data_ov007_0218ef14, 0x0) = 0x60;
@@ -1972,24 +1971,24 @@ static struct DinoUiOrganizationMenuStaticInit {
         p = (volatile s32 *) &data_ov007_0218ef2c;
         p[0x0 / 4] = 0xDB;
         p[0x4 / 4] = 0x29;
-        DINO_POOL_WORD(data_ov007_0218ec6c, 0x30) = -0x28;
-        DINO_POOL_WORD(data_ov007_0218ec6c, 0x34) = 0x1C;
-        DINO_POOL_WORD(data_ov007_0218ec6c, 0x38) = -0x20;
-        DINO_POOL_WORD(data_ov007_0218ec6c, 0x3C) = 8;
-        DINO_POOL_WORD(data_ov007_0218ec6c, 0x40) = -6;
-        DINO_POOL_WORD(data_ov007_0218ec6c, 0x44) = 0xC;
+        DINO_POOL_WORD(data_ov007_0218ebec, 0xb0) = -0x28;
+        DINO_POOL_WORD(data_ov007_0218ebec, 0xb4) = 0x1C;
+        DINO_POOL_WORD(data_ov007_0218ebec, 0xb8) = -0x20;
+        DINO_POOL_WORD(data_ov007_0218ebec, 0xbc) = 8;
+        DINO_POOL_WORD(data_ov007_0218ebec, 0xc0) = -6;
+        DINO_POOL_WORD(data_ov007_0218ebec, 0xc4) = 0xC;
         DINO_POOL_WORD(data_ov007_0218ee6c, 0x8) = DINO_POOL_WORD(_ZTI26DinoUiPartsTabIconMenuItem_ov007, 0x20);
         DINO_POOL_WORD(data_ov007_0218ee6c, 0xC) = DINO_POOL_WORD(_ZTI26DinoUiPartsTabIconMenuItem_ov007, 0x24);
         DINO_POOL_WORD(data_ov007_0218ee6c, 0x10) = DINO_POOL_WORD(_ZTI26DinoUiPartsTabIconMenuItem_ov007, 0x28);
         DINO_POOL_WORD(data_ov007_0218ee6c, 0x14) = DINO_POOL_WORD(_ZTI26DinoUiPartsTabIconMenuItem_ov007, 0x2C);
         DINO_POOL_WORD(data_ov007_0218ee6c, 0x18) = DINO_POOL_WORD(_ZTI26DinoUiPartsTabIconMenuItem_ov007, 0x30);
         DINO_POOL_WORD(data_ov007_0218ee6c, 0x1C) = DINO_POOL_WORD(_ZTI26DinoUiPartsTabIconMenuItem_ov007, 0x34);
-        DINO_POOL_WORD(data_ov007_0218ec6c, 0x48) = 0x120;
-        DINO_POOL_WORD(data_ov007_0218ec6c, 0x4C) = 0x29;
-        DINO_POOL_WORD(data_ov007_0218ec6c, 0x50) = -0x20;
-        DINO_POOL_WORD(data_ov007_0218ec6c, 0x54) = 0x29;
-        DINO_POOL_WORD(data_ov007_0218ec6c, 0x58) = 0x120;
-        DINO_POOL_WORD(data_ov007_0218ec6c, 0x5C) = 0x29;
+        DINO_POOL_WORD(data_ov007_0218ebec, 0xc8) = 0x120;
+        DINO_POOL_WORD(data_ov007_0218ebec, 0xcc) = 0x29;
+        DINO_POOL_WORD(data_ov007_0218ebec, 0xd0) = -0x20;
+        DINO_POOL_WORD(data_ov007_0218ebec, 0xd4) = 0x29;
+        DINO_POOL_WORD(data_ov007_0218ebec, 0xd8) = 0x120;
+        DINO_POOL_WORD(data_ov007_0218ebec, 0xdc) = 0x29;
     }
 } sDinoUiOrganizationMenuStaticInit;
 

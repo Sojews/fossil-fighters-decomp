@@ -779,9 +779,9 @@ void DinoBattleViewField::OnMessage(MMessage *msg) {
 
 #undef DINO_FIELD
 
-// The file's static initialization (see dino_static_init.h).
+// The file's static initialization (see dino_static_init.h). The pool is one object: stores past its first 0x80 bytes go
+// through the first anchor.
 extern "C" u32 data_ov000_02191dcc[];
-// NONMATCHING: the game loads the last two anchors' addresses together, before the first group's stores.
 static struct DinoBattleViewWinnerScrollTaskStaticInit {
     DinoBattleViewWinnerScrollTaskStaticInit() {
         DINO_POOL_WORD(data_ov000_02191b1c, 0x70) = 128;
@@ -790,8 +790,8 @@ static struct DinoBattleViewWinnerScrollTaskStaticInit {
         DINO_POOL_WORD(data_ov000_02191b9c, 0x14) = 150;
         DINO_POOL_WORD(data_ov000_02191b1c, 0x78) = 64;
         DINO_POOL_WORD(data_ov000_02191b1c, 0x7c) = 112;
-        DINO_POOL_WORD(data_ov000_02191d9c, 0x28) = 64;
-        DINO_POOL_WORD(data_ov000_02191d9c, 0x2c) = 96;
+        DINO_POOL_WORD(data_ov000_02191b1c, 0x2a8) = 64;
+        DINO_POOL_WORD(data_ov000_02191b1c, 0x2ac) = 96;
         volatile s32 *p = (volatile s32 *)data_ov000_02191dcc;
         p[0] = 112 * 4;
         p[1] = 96;
