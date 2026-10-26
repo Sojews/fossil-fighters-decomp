@@ -3112,7 +3112,7 @@ static struct DinoEventExecStaticInit {
     DinoEventExecStaticInit() {
         DINO_POOL_NV(MPoint, data_020be1c4, 0x60) = MPoint(256, 192);
         DINO_POOL_NV(MRect, data_020be7c4, 0x48) = DinoSizeRect(DINO_POOL_NV(MPoint, data_020be1c4, 0x60));
-        DINO_POOL_NV(MPoint, data_020be244, 0x38) = MPoint(2, 2);
+        DINO_POOL_NV(MPoint, data_020be144, 0x138) = MPoint(2, 2);
         DINO_POOL_NV(MPoint, data_020be1c4, 0x50) = MPoint(36, 28);
         DINO_POOL_NV(MRect, data_020be7c4, 0x78) = DinoSizeRect(DINO_POOL_NV(MPoint, data_020be1c4, 0x50));
         DINO_POOL_NV(MPoint, data_020be7c4, 0x58) = MPoint(0, 24);
@@ -3120,6 +3120,6 @@ static struct DinoEventExecStaticInit {
         DINO_POOL_NV(MRect, data_020be7c4, 0x68) = MRect(0, 0, 256, 24);
         DINO_POOL_NV(MPoint, data_020be144, 0x70) = MPoint(128, 176);
         DINO_POOL_NV(MPoint, data_020be2c4, 0) = MPoint(8, 150);
-        DINO_POOL_NV(MPoint, data_020be244, 0x60) = MPoint(64, 112);
+        DINO_POOL_NV(MPoint, data_020be144, 0x160) = MPoint(64, 112);
     }
 } sDinoEventExecStaticInit;
