@@ -1,7 +1,7 @@
 // MSimpleMenu.
-// NONMATCHING: Init and Start (the pointer-to-member constants and the type infos come out in a different order in
-// .data, so their offsets from the data anchor differ), AddItem and Start (the string temporary), Layout, SetCursor,
-// Decide and Update (register allocation and scheduling), append_realloc (as everywhere).
+// NONMATCHING: Start (the pointer-to-member constants and the type infos come out in a different order in .data, so
+// their offsets from the data anchor differ), AddItem and Start (the string temporary), Layout (register allocation
+// and scheduling).
 
 #pragma ipa file
 
