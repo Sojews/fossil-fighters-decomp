@@ -20,7 +20,7 @@ DinoGradationBg::DinoGradationBg(MDisplay *display) {
 
 // NONMATCHING: register allocation (the game keeps the red accumulator on the stack and blue in lr) and 4 bytes.
 void DinoGradationBg::SetGradation(int r0, int g0, int b0, int r1, int g1, int b1) {
-    int r;
+    u32 r;
     u32 i;
     int gAcc;
     int rAcc = 0;
