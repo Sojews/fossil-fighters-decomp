@@ -295,10 +295,14 @@ inline DinoCleaningKasekiRockXrayBlendManager::DinoCleaningKasekiRockXrayBlendMa
 // and three rock layers), a rock for each, the view and its x-ray copy, then counts the fossil's visible cells.
 // NONMATCHING: 99.45%, the per-iteration scale table sits below the layer table (the game has it above), and the
 // loop counter's store is scheduled after the table copies.
+extern "C" const u32 data_ov002_02163550[3];  // the chips layers' sounds: 0x27, 0x28, 0x29
+
 DinoCleaningKasekiRock::DinoCleaningKasekiRock(DinoCleaning *cleaning, u32 view, u32 number, u32 kasekiScale,
                                                u32 kasekiVariant, u8 unk14, u32 chipsNumber, u32 chipsScale,
                                                u32 chipsVariant, u8 unk4B8, BOOL unk19C, u32 scale0, u32 scale1)
     : MProcess(NULL) {
+    fx32 s0;
+    fx32 s1;
     unk7C = (u32)cleaning;
     mUnk4A0 = chipsVariant;
     mOam = (MSmartOam *)cleaning->GetUnkD4();
@@ -314,11 +318,12 @@ DinoCleaningKasekiRock::DinoCleaningKasekiRock(DinoCleaning *cleaning, u32 view,
     char path[0x80];
     DinoCleaningImage *kaseki = new DinoCleaningImage(cleaning);
     kaseki->AddLayer(new DinoCleaningImageLayer(0, std::string(data_ov002_021657d4.mBlankLayerPath), 1, 0, MFx32(1)));
+    u32 i = 3;
     u32 sounds[2][3] = {{0x2a, 0x2a, 0x2b}, {0, 0x2a, 0x2b}};
     u32 layers[3] = {1, 3, 2};
-    fx32 s0 = scale0;
-    fx32 s1 = scale1;
-    for (u32 i = 3; i > 0; i--) {
+    s0 = scale0;
+    s1 = scale1;
+    for (; i > 0; i--) {
         MFx32 scales[2][3] = {{MFx32::FromRaw(s0), MFx32::FromRaw(s1), MFx32(1)},
                               {MFx32::FromRaw(s0), MFx32::FromRaw(s1), MFx32(20)}};
         OS_SPrintf(path, data_ov002_021657d4.mKasekiLayerFormat, number, layers[i - 1],
@@ -334,7 +339,6 @@ DinoCleaningKasekiRock::DinoCleaningKasekiRock(DinoCleaning *cleaning, u32 view,
 
     DinoCleaningImage *chips = new DinoCleaningImage(cleaning);
     chips->AddLayer(new DinoCleaningImageLayer(0, std::string(data_ov002_021657d4.mBlankLayerPath), 1, 0, MFx32(1)));
-    static const u32 chipsSounds[3] = {0x27, 0x28, 0x29};
     for (u32 i = 3; i > 0; i--) {
         if (!(data_ov002_02165fa4 & 1)) {
             data_ov002_02165854.mChipsScales[0][0] = MFx32(1);
@@ -347,7 +351,7 @@ DinoCleaningKasekiRock::DinoCleaningKasekiRock(DinoCleaning *cleaning, u32 view,
         }
         OS_SPrintf(path, data_ov002_021657d4.mChipsLayerFormat, chipsNumber, i, (i == 1 ? chipsVariant : 0) + 'a');
         chips->AddLayer(new DinoCleaningImageLayer((u32)cleaning->GetRandom(), std::string(path), 0,
-                                                   chipsSounds[i - 1],
+                                                   data_ov002_02163550[i - 1],
                                                    data_ov002_021658a8[chipsVariant == 1 ? 1 : 0][i - 1]));
     }
     mRock90 = new DinoCleaningRock((u32)cleaning, chips, (u32)cleaning->GetRandom(), chipsScale);
