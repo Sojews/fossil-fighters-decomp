@@ -652,8 +652,9 @@ static struct DinoUiIslandMapStaticInit {
         DINO_POOL_WORD(data_ov004_02175b58, 0x74) = DINO_POOL_WORD(data_ov004_021759d8, 0x40);
         DINO_POOL_WORD(data_ov004_02175b58, 0x78) = DINO_POOL_WORD(data_ov004_021759d8, 0x2C);
         DINO_POOL_WORD(data_ov004_02175b58, 0x7C) = DINO_POOL_WORD(data_ov004_021759d8, 0x34);
-        DINO_POOL_WORD(data_ov004_02175bd8, 0x0) = DINO_POOL_WORD(data_ov004_021759d8, 0x1C);
-        DINO_POOL_WORD(data_ov004_02175bd8, 0x4) = DINO_POOL_WORD(data_ov004_021759d8, 0x50);
+        volatile s32 *p = (volatile s32 *) &data_ov004_02175bd8;
+        p[0] = DINO_POOL_WORD(data_ov004_021759d8, 0x1C);
+        p[1] = DINO_POOL_WORD(data_ov004_021759d8, 0x50);
         DINO_POOL_WORD(data_ov004_02175bd8, 0x8) = DINO_POOL_WORD(data_ov004_021759d8, 0x28);
         DINO_POOL_WORD(data_ov004_02175bd8, 0xC) = DINO_POOL_WORD(data_ov004_021759d8, 0x20);
         DINO_POOL_WORD(data_ov004_02175bd8, 0x10) = DINO_POOL_WORD(data_ov004_021759d8, 0x4);
@@ -670,8 +671,9 @@ static struct DinoUiIslandMapStaticInit {
         DINO_POOL_WORD(data_ov004_02175bd8, 0x3C) = DINO_POOL_WORD(data_ov004_021759d8, 0x30);
         DINO_POOL_WORD(data_ov004_02175bd8, 0x40) = DINO_POOL_WORD(data_ov004_021759d8, 0x3C);
         DINO_POOL_WORD(data_ov004_021759d8, 0x7C) = -0x40;
-        DINO_POOL_WORD(data_ov004_02175a58, 0x0) = 0x70;
-        DINO_POOL_WORD(data_ov004_02175a58, 0x4) = 0x3C;
+        p = (volatile s32 *) &data_ov004_02175a58;
+        p[0] = 0x70;
+        p[1] = 0x3C;
         DINO_POOL_WORD(data_ov004_02175a58, 0x8) = 0x70;
         DINO_POOL_WORD(data_ov004_021759d8, 0x6C) = 0x140;
         DINO_POOL_WORD(data_ov004_021759d8, 0x70) = 0x70;
