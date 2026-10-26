@@ -677,7 +677,6 @@ void DinoBattleViewUiAbilityMenu::Close() {
 // The file's static initialization (see dino_static_init.h).
 extern "C" u32 data_0208a36c[];
 extern "C" u32 data_0208a364[];
-extern "C" u32 data_ov000_0219492c[];
 extern "C" u32 data_ov000_021949ac[];
 extern "C" u32 data_0208a368[];
 static struct DinoBattleViewAbilityMenuBgStaticInit {

@@ -568,7 +568,6 @@ DinoBattleViewPopNumber::DinoBattleViewPopNumber(DinoBattleView *view, MSmartOam
 }
 
 // The file's static initialization (see dino_static_init.h).
-extern "C" u32 data_ov000_02194e0c[];
 extern "C" u32 data_ov000_02194e64[];
 extern "C" u32 data_ov000_02194e6c[];
 extern "C" u32 data_ov000_02194e74[];

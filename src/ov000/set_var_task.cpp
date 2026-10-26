@@ -385,7 +385,6 @@ void DinoBattleTalkWindow::Idle() {
 // The file's static initialization (see dino_static_init.h).
 // NONMATCHING: 89.7%, same instructions but other registers (the game's are those of real static MPoint objects;
 // the last read-backs are plain loads, kept in registers).
-extern "C" u32 data_ov000_021971b8[];
 extern "C" u32 data_ov000_021971e0[];
 extern "C" u32 data_ov000_021971f0[];
 extern "C" u32 data_ov000_02197200[];
