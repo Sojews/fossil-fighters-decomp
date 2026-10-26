@@ -251,7 +251,6 @@ void DinoTalkWindow::StateOpen() {
     }
 }
 
-// NONMATCHING: register allocation (the game keeps the flip offset in registers and spills the shake).
 void DinoTalkWindow::StateShow() {
     if (mUnkF4 && IsPageDone() && !mUnkB0) {
         mNextMark->Show();
@@ -263,14 +262,16 @@ void DinoTalkWindow::StateShow() {
     }
     mUnkAC--;
     u32 n = mUnkAC;
-    int y = gDinoResource->GetRandom()->Next(n * 2 + 1) - n;
+    // (Signed here, unsigned below: the game works the range out twice.)
+    int y = gDinoResource->GetRandom()->Next((int)n * 2 + 1) - n;
     int x = gDinoResource->GetRandom()->Next(n * 2 + 1) - mUnkAC;
+    MPoint shake(x, y);
     DinoTalkWindowNamePanel *panel = mNamePanel;
     if (panel != NULL) {
-        DinoTalkShakePanel(panel, MPoint(x, y));
+        DinoTalkShakePanel(panel, shake);
     }
-    mFrame->SetPosition(MPoint(mPos.x + x, mPos.y + y));
-    mConsole->SetPosition(MPoint(mConsolePos.x + x, mConsolePos.y + y));
+    mFrame->SetPosition(mPos + shake);
+    mConsole->SetPosition(mConsolePos + shake);
 }
 
 BOOL DinoTalkWindow::IsAnimating() {
