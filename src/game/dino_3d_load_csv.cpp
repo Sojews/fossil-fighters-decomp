@@ -477,15 +477,8 @@ void Dino3DLoadCsv::SetParent(Dino3DLoadCsv *parent) {
     if (mParentName[0] == 0) {
         return;
     }
-    Dino3DLoadCsv *p = mUnk464;
-    int paused;
-    if (p != NULL) {
-        MMutexLock lock(&p->mPauseMutex);
-        paused = p->mPauseCount;
-    } else {
-        paused = 0;
-    }
-    if (paused != 0) {
+    Dino3DLoadCsv *p;
+    if (mUnk464 != NULL && mUnk464->GetPauseCount() != 0) {
         return;
     }
     p = mUnk464;
