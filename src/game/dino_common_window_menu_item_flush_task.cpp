@@ -25,6 +25,7 @@
 
 static const char *sCursorMotions[] = {NULL, "/motion/ui_cursor/shovel.bin"};
 
+#pragma auto_inline off
 DinoCommonWindowMenuCursor::DinoCommonWindowMenuCursor(MSmartOam *oam) {
     mFrame.left = 0;
     mFrame.top = 0;
@@ -34,6 +35,7 @@ DinoCommonWindowMenuCursor::DinoCommonWindowMenuCursor(MSmartOam *oam) {
     mUnk10->Play(3, 0);
     mUnk10->GetUnit()->SetMode(1);
 }
+#pragma auto_inline reset
 
 DinoCommonWindowMenu::DinoCommonWindowMenu(void *unkE4, MPoint pos, const std::vector<DinoWindowChoice> *choices,
                                            u32 unkFC)
