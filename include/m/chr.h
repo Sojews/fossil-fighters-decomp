@@ -47,10 +47,13 @@ public:
 
 // Adds a 16-color palette's offset to each nonzero pixel of 256-color tiles.
 inline void MAddPaletteOffset(const u16 *src, u16 *dest, u32 size, int palette) {
+    u32 n;
+    u16 px;
+    u16 hi;
     u16 lo = palette << 4;
-    u16 hi = lo << 8;
-    for (u32 n = size >> 1; n != 0; n--) {
-        u16 px = *src++;
+    hi = lo << 8;
+    for (n = size >> 1; n != 0; n--) {
+        px = *src++;
         if ((u8)px != 0) {
             px += lo;
         }

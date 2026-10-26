@@ -124,7 +124,6 @@ void MChr::FreeShared(MChrBlock *block) {
     MHeap::Free(block);
 }
 
-// NONMATCHING: register allocation (as in MChr256Transfer::Transfer).
 void MChr256Filter::Filter(const void *src, void *dest, u32 size) {
     MAddPaletteOffset((const u16 *)src, (u16 *)dest, size, mPalette);
 }
