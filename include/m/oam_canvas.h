@@ -62,8 +62,11 @@ class MObjCanvas : public MOamCanvas<MOam, MOamUnit> {
 public:
     MObjCanvas(MDisplay *display, MOam *oam, MPoint size, const void *palette, BOOL fromEnd)
         : MOamCanvas<MOam, MOamUnit>(display, oam, size, palette, fromEnd) {}
-    // With the display's sprites.
-    MObjCanvas(MDisplay *display, const MPoint &size, const void *palette, BOOL fromEnd)
+    // With the display's sprites. (The game has both: callers passing a palette of a font, `const void *`, copy the size
+    // first, the others don't.)
+    MObjCanvas(MDisplay *display, const MPoint &size, const u16 *palette, BOOL fromEnd)
+        : MOamCanvas<MOam, MOamUnit>(display, display->mObj->mOam, size, palette, fromEnd) {}
+    MObjCanvas(MDisplay *display, MPoint size, const void *palette, BOOL fromEnd)
         : MOamCanvas<MOam, MOamUnit>(display, display->mObj->mOam, size, palette, fromEnd) {}
     virtual ~MObjCanvas() {}
 };

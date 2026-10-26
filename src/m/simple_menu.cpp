@@ -1,7 +1,5 @@
 // MSimpleMenu.
-// NONMATCHING: Start (the pointer-to-member constants and the type infos come out in a different order in .data, so
-// their offsets from the data anchor differ), AddItem and Start (the string temporary), Layout (register allocation
-// and scheduling).
+// NONMATCHING: Layout (register allocation and scheduling).
 
 #pragma ipa file
 
@@ -68,7 +66,7 @@ void MSimpleMenu::AddEntry(int id, MView *view) {
 void MSimpleMenu::AddItem(int id, std::string text) {
     const char *s = text.c_str();
     MIndicator *item = new MIndicator(
-        new MObjCanvas(GetDisplay(), GetDisplay()->mObj->mOam, mFont->MeasureText(s, 0, 0),
+        new MObjCanvas(GetDisplay(), mFont->MeasureText(s, 0, 0),
                        mFont->GetPalette() != NULL ? mFont->GetPalette() : sPalette, TRUE),
         mFont, 0);
     item->SetText(s);
@@ -181,7 +179,7 @@ void MSimpleMenu::Start() {
     }
     for (int side = 0; side < 2; side++) {
         MIndicator *indicator = new MIndicator(
-            new MObjCanvas(GetDisplay(), GetDisplay()->mObj->mOam, mFont->MeasureText(arrow, 0, 0),
+            new MObjCanvas(GetDisplay(), mFont->MeasureText(arrow, 0, 0),
                            mFont->GetPalette() != NULL ? mFont->GetPalette() : sPalette, TRUE),
             mFont, 0);
         if (!mLocked) {
