@@ -1384,13 +1384,8 @@ void DinoUiChildScannerBattleConnect::StateStart() {
 extern const u32 data_0208ab90, data_0208ab94, data_0208ad70, data_0208ad74;
 
 
-static inline void AddMarkedChoice(DinoCommonWindowMenu *window, u32 id, const std::string &help,
-                                   const std::string &text) {
-    window->AddChoice(id, text, help);
-}
-
 // Offers to connect (or not) to the console, by its item.
-// NONMATCHING: the game keeps destroy flags for the marked choice's temporaries, and swaps r6/r7
+// (The marked choice is added under a condition, so its temporaries get destroy flags, as in the game.)
 void DinoUiChildScannerBattleConnect::StateConnect() {
     u32 anchor;
     u32 connect = data_0208ab94;
@@ -1411,8 +1406,8 @@ void DinoUiChildScannerBattleConnect::StateConnect() {
         std::string text(gDinoResource->GetText(connect));
         std::string help(gDinoResource->GetText(data_0208ad74));
         window->AddChoice(connect, text, help);
-        AddMarkedChoice(window, data_0208ab90, gDinoResource->GetText(data_0208ad70),
-                        std::string("*") + gDinoResource->GetText(data_0208ab90));
+        BOOL marked = TRUE;
+        marked && (window->AddChoice(data_0208ab90, std::string("*") + gDinoResource->GetText(data_0208ab90), gDinoResource->GetText(data_0208ad70)), TRUE);
     }
     mUnkE8->AddTail(window);
     mState = data_ov004_02174350.StateChoose_24;
