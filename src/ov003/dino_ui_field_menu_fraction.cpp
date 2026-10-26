@@ -114,7 +114,8 @@ DinoUiFieldMenuNumber::DinoUiFieldMenuNumber(MSmartOam *oam, MPoint pos) : MProc
     for (int i = 0; i < 5; i++) {
         mDigits[i] = new MMotion(std::string(data_ov003_02160c60[28]), oam, 2, 1);
         mDigits[i]->Play(1, 0);
-        mDigits[i]->SetPosition(pos.x + i * 8, pos.y);
+        MPoint p = pos + MPoint(i * 8, 0);
+        mDigits[i]->SetPosition(p.x, p.y);
         mDigits[i]->SetPriority(2);
         mDigits[i]->Show();
         mParallel.AddTail(mDigits[i]);
