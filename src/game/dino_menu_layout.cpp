@@ -177,8 +177,9 @@ static struct DinoMenuLayoutStaticInit {
         DINO_POOL_WORD(data_020b58d0, 0x4) = 176;
         DINO_POOL_WORD(data_020b58d0, 0x8) = 110;
         DINO_POOL_WORD(data_020b58d0, 0xc) = 191;
-        DINO_POOL_WORD(data_020b5814, 0x44) = 26;
-        DINO_POOL_WORD(data_020b5814, 0x48) = 175;
+        p = (volatile s32 *) &data_020b5814;
+        p[0x44 / 4] = 26;
+        p[0x48 / 4] = 175;
         p = (volatile s32 *) &data_020b5860;
         p[0] = 60;
         p[1] = 175;

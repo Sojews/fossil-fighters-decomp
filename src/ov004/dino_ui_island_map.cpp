@@ -703,8 +703,9 @@ static struct DinoUiIslandMapStaticInit {
         DINO_POOL_WORD(data_ov004_02175c5c, 0x4) = 0x9C;
         DINO_POOL_WORD(data_ov004_02175c64, 0x0) = 0xBC;
         DINO_POOL_WORD(data_ov004_02175c64, 0x4) = 0xC1;
-        DINO_POOL_WORD(data_ov004_02175b58, 0x4C) = 0x80;
-        DINO_POOL_WORD(data_ov004_02175b58, 0x50) = 0x1B;
+        p = (volatile s32 *) &data_ov004_02175b58;
+        p[0x4C / 4] = 0x80;
+        p[0x50 / 4] = 0x1B;
         DINO_POOL_WORD(data_ov004_02175bac, 0x0) = 0x80;
         DINO_POOL_WORD(data_ov004_02175bac, 0x4) = 0x40;
         DINO_POOL_WORD(data_ov004_02175bb4, 0x0) = 0x80;
