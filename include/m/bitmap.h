@@ -28,6 +28,7 @@ public:
     void Load(const u8 *src, MPoint srcSize, MRect srcRect, MPoint dst, int palette, bool hflip, bool vflip);
     void Load(const u8 *src, MPoint srcSize, MPoint dst, int palette, bool hflip, bool vflip);
     void Fill(MRect rect, int color);
+    MPoint GetBitmapSize() const { return mBitmapSize; }
 
     int mSize;              // 0x34
     MPoint mBitmapSize;     // 0x38: pixels
@@ -37,25 +38,25 @@ public:
 // every pixel and flipping it if asked.
 class MIndexBitmapLoadTransfer : public MTransfer {
 public:
-    MIndexBitmapLoadTransfer(MIndexBitmap *bitmap, MPoint dst, const u8 *src, MPoint srcSize, MRect srcRect,
+    MIndexBitmapLoadTransfer(MIndexBitmap *bitmap, const u8 *src, MPoint srcSize, MRect srcRect, MPoint dst,
                              int palette, bool hflip, bool vflip) {
         mSrc = src;
         mSrcSize = srcSize;
         mSrcRect = srcRect;
         mDstBase = bitmap->mBase;
-        mDstSize = bitmap->mBitmapSize;
+        mDstSize = bitmap->GetBitmapSize();
         mDst = dst;
         mPalette = palette;
         mHFlip = hflip;
         mVFlip = vflip;
     }
-    MIndexBitmapLoadTransfer(MIndexBitmap *bitmap, MPoint dst, const u8 *src, MPoint srcSize, int palette, bool hflip,
+    MIndexBitmapLoadTransfer(MIndexBitmap *bitmap, const u8 *src, MPoint srcSize, MPoint dst, int palette, bool hflip,
                              bool vflip) {
         mSrc = src;
         mSrcSize = srcSize;
         mSrcRect = MRect(MPoint(0, 0), srcSize);
         mDstBase = bitmap->mBase;
-        mDstSize = bitmap->mBitmapSize;
+        mDstSize = bitmap->GetBitmapSize();
         mDst = dst;
         mPalette = palette;
         mHFlip = hflip;

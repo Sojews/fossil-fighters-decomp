@@ -22,15 +22,16 @@ MIndexBitmap::MIndexBitmap(MDisplay *display, u32 screenBase, u32 base, int size
     mBmpCntBits.bitmap = TRUE;
 }
 
-// NONMATCHING: both Loads differ in register allocation only, like MText's transfer factories.
+// NONMATCHING: both Loads differ only in the stack slots of the transfer constructor's argument copies (the game
+// has srcSize below dst), like MText's transfer factories.
 void MIndexBitmap::Load(const u8 *src, MPoint srcSize, MRect srcRect, MPoint dst, int palette, bool hflip,
                         bool vflip) {
     gLooper->AddTransferTask(
-        new MIndexBitmapLoadTransfer(this, dst, src, srcSize, srcRect, palette, hflip, vflip));
+        new MIndexBitmapLoadTransfer(this, src, srcSize, srcRect, dst, palette, hflip, vflip));
 }
 
 void MIndexBitmap::Load(const u8 *src, MPoint srcSize, MPoint dst, int palette, bool hflip, bool vflip) {
-    gLooper->AddTransferTask(new MIndexBitmapLoadTransfer(this, dst, src, srcSize, palette, hflip, vflip));
+    gLooper->AddTransferTask(new MIndexBitmapLoadTransfer(this, src, srcSize, dst, palette, hflip, vflip));
 }
 
 void MIndexBitmap::Fill(MRect rect, int color) {
