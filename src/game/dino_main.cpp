@@ -778,8 +778,8 @@ DinoMain::~DinoMain() {
 }
 
 // The file's static initialization (see dino_static_init.h): five points of its own and the common layout header.
-// NONMATCHING: the stores and dead temporaries are scheduled differently.
-extern "C" u8 data_020c01f0[];
+// NONMATCHING (97%): the screen and icon rects' dead temporaries take each other's stack slots, and the first point's y is
+// stored later.
 #pragma always_inline on
 
 static struct DinoMainStaticInit {
@@ -787,15 +787,15 @@ static struct DinoMainStaticInit {
         DINO_POOL(MPoint, data_020bff70, 0x24) = MPoint(128, 176);
         DINO_POOL(MPoint, data_020c00f0, 0x5c) = MPoint(8, 150);
         DINO_POOL(MPoint, data_020c0070, 0x4c) = MPoint(64, 112);
-        DINO_POOL(MPoint, data_020bfff0, 0x4c) = MPoint(240, 176);
-        DINO_POOL(MPoint, data_020bfff0, 0x44) = MPoint(16, 0);
         DINO_POOL(MPoint, data_020bfff0, 0x1c) = MPoint(256, 192);
-        DINO_POOL(MRect, data_020c01f0, 0x38) = DinoSizeRect(DINO_POOL(MPoint, data_020bfff0, 0x1c));
+        DINO_POOL(MRect, data_020bff70, 0x2b8) = DinoSizeRect(DINO_POOL(MPoint, data_020bfff0, 0x1c));
         DINO_POOL(MPoint, data_020bfff0, 0x14) = MPoint(2, 2);
         DINO_POOL(MPoint, data_020bff70, 0x34) = MPoint(36, 28);
-        DINO_POOL(MRect, data_020c01f0, 0x48) = DinoSizeRect(DINO_POOL(MPoint, data_020bff70, 0x34));
-        DINO_POOL(MPoint, data_020c01f0, 0x58) = MPoint(0, 24);
-        DINO_POOL(MPoint, data_020c01f0, 0x60) = MPoint(256, 192);
-        DINO_POOL(MRect, data_020c01f0, 0x68) = MRect(0, 0, 256, 24);
+        DINO_POOL(MRect, data_020bff70, 0x2c8) = DinoSizeRect(DINO_POOL(MPoint, data_020bff70, 0x34));
+        DINO_POOL(MPoint, data_020bff70, 0x2d8) = MPoint(0, 24);
+        DINO_POOL(MPoint, data_020bff70, 0x2e0) = MPoint(256, 192);
+        DINO_POOL(MRect, data_020bff70, 0x2e8) = MRect(0, 0, 256, 24);
+        DINO_POOL(MPoint, data_020bfff0, 0x4c) = MPoint(240, 176);
+        DINO_POOL(MPoint, data_020bfff0, 0x44) = MPoint(16, 0);
     }
 } sDinoMainStaticInit;
