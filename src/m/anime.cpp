@@ -5,10 +5,10 @@
 #include "m/anime.h"
 
 // base * (base / denom)^n
-static inline int EasePow(int base, u32 n, int denom) {
+static inline int EasePow(int base, int n, int denom) {
     int v = base;
 
-    for (u32 i = 0; i < n; i++) {
+    for (int i = 0; i < n; i++) {
         v = v * base / denom;
     }
     return v;
