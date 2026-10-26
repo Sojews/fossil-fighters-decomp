@@ -599,8 +599,8 @@ static struct InfoPanelWindowStaticInit {
         DINO_POOL_WORD(data_ov000_02194d8c, 0x4c) = 29;
         DINO_POOL_WORD(data_ov000_02194d8c, 0x60) = 84;
         DINO_POOL_WORD(data_ov000_02194d8c, 0x64) = 29;
-        DINO_POOL_WORD(data_ov000_02194e0c, 0x50) = 32;
-        DINO_POOL_WORD(data_ov000_02194e0c, 0x54) = 48;
+        DINO_POOL_WORD(data_ov000_02194d8c, 0xd0) = 32;
+        DINO_POOL_WORD(data_ov000_02194d8c, 0xd4) = 48;
         DINO_POOL_WORD(data_ov000_02194e64, 0x0) = 96;
         DINO_POOL_WORD(data_ov000_02194e64, 0x4) = 48;
         DINO_POOL_WORD(data_ov000_02194e6c, 0x0) = 32;
@@ -621,8 +621,8 @@ static struct InfoPanelWindowStaticInit {
         DINO_POOL_WORD(data_ov000_02194ec4, 0x4) = 59;
         DINO_POOL_WORD(data_ov000_02194ecc, 0x0) = 81;
         DINO_POOL_WORD(data_ov000_02194ecc, 0x4) = 59;
-        DINO_POOL_WORD(data_ov000_02194e0c, 0x70) = 51;
-        DINO_POOL_WORD(data_ov000_02194e0c, 0x74) = 30;
+        DINO_POOL_WORD(data_ov000_02194d8c, 0xf0) = 51;
+        DINO_POOL_WORD(data_ov000_02194d8c, 0xf4) = 30;
         DINO_POOL_WORD(data_ov000_02194e84, 0x0) = 43;
         DINO_POOL_WORD(data_ov000_02194e84, 0x4) = 49;
         DINO_POOL_WORD(data_ov000_02194e8c, 0x0) = 103;

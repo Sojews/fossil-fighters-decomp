@@ -702,9 +702,9 @@ static struct DinoBattleViewAbilityMenuBgStaticInit {
         DINO_POOL_WORD(data_ov000_021947ac, 0x5c) = -6;
         DINO_POOL_WORD(data_ov000_021947ac, 0x48) = 49;
         DINO_POOL_WORD(data_ov000_021947ac, 0x4c) = -8;
-        DINO_POOL_WORD(data_ov000_0219492c, 0x74) = DINO_POOL_WORD(data_0208a36c, 0x0);
-        DINO_POOL_WORD(data_ov000_0219492c, 0x78) = 0;
-        DINO_POOL_WORD(data_ov000_0219492c, 0x7c) = 0;
+        DINO_POOL_WORD(data_ov000_021947ac, 0x1f4) = DINO_POOL_WORD(data_0208a36c, 0x0);
+        DINO_POOL_WORD(data_ov000_021947ac, 0x1f8) = 0;
+        DINO_POOL_WORD(data_ov000_021947ac, 0x1fc) = 0;
         DINO_POOL_WORD(data_ov000_021949ac, 0x0) = 127;
         DINO_POOL_WORD(data_ov000_021949ac, 0x4) = 22;
         DINO_POOL_WORD(data_ov000_021949ac, 0x8) = DINO_POOL_WORD(data_0208a368, 0x0);
@@ -717,9 +717,9 @@ static struct DinoBattleViewAbilityMenuBgStaticInit {
         DINO_POOL_WORD(data_ov000_021949ac, 0x24) = 0;
         DINO_POOL_WORD(data_ov000_021949ac, 0x28) = 189;
         DINO_POOL_WORD(data_ov000_021949ac, 0x2c) = 22;
-        DINO_POOL_WORD(data_ov000_0219492c, 0x24) = 0;
-        DINO_POOL_WORD(data_ov000_0219492c, 0x28) = 145;
-        DINO_POOL_WORD(data_ov000_0219492c, 0x2c) = 255;
-        DINO_POOL_WORD(data_ov000_0219492c, 0x30) = 164;
+        DINO_POOL_WORD(data_ov000_021947ac, 0x1a4) = 0;
+        DINO_POOL_WORD(data_ov000_021947ac, 0x1a8) = 145;
+        DINO_POOL_WORD(data_ov000_021947ac, 0x1ac) = 255;
+        DINO_POOL_WORD(data_ov000_021947ac, 0x1b0) = 164;
     }
 } sDinoBattleViewAbilityMenuBgStaticInit;
