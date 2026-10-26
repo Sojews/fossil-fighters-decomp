@@ -71,7 +71,7 @@ void DinoMpGame::StateStart() {
     params.unk00 = 2;
     params.unk04 = (u32)mMultiPlay;
     for (int i = 0; i < 2; i++) {
-        (&params.unk08)[i] = i != mMultiPlay->GetPlayerIndex() ? 1 : 0;
+        (&params.unk08)[i] = i == mMultiPlay->GetPlayerIndex() ? 0 : 1;
     }
     if (mMultiPlay->GetPlayerIndex() != 1) {
         params.unk10 = 0;
