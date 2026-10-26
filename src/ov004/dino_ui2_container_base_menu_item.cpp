@@ -612,7 +612,7 @@ void DinoUi2ContainerBaseMenu::RefreshEntries() {
 
 
 // The file's static initialization (see dino_static_init.h).
-// NONMATCHING: register choice/scheduling of the pooled stores.
+// (One pool: the words past its first 0x80 bytes go through the same anchor, so the stores schedule as the game's.)
 static struct DinoUi2ContainerBaseMenuItemStaticInit {
     DinoUi2ContainerBaseMenuItemStaticInit() {
         DINO_POOL_WORD(data_ov004_02176b44, 0x20) = 128;
@@ -621,8 +621,8 @@ static struct DinoUi2ContainerBaseMenuItemStaticInit {
         DINO_POOL_WORD(data_ov004_02176b44, 0x3c) = 96;
         DINO_POOL_WORD(data_ov004_02176b44, 0x10) = 128;
         DINO_POOL_WORD(data_ov004_02176b44, 0x14) = 96;
-        DINO_POOL_WORD(data_ov004_02176bc4, 0x0) = 53;
-        DINO_POOL_WORD(data_ov004_02176bc4, 0x4) = 35;
+        DINO_POOL_WORD(data_ov004_02176b44, 0x80) = 53;
+        DINO_POOL_WORD(data_ov004_02176b44, 0x84) = 35;
         DINO_POOL_WORD(data_ov004_02176b44, 0x70) = 50;
         DINO_POOL_WORD(data_ov004_02176b44, 0x74) = 0;
         DINO_POOL_WORD(data_ov004_02176b44, 0x28) = 0;

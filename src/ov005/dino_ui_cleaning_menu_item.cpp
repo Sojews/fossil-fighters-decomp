@@ -120,7 +120,9 @@ void DinoUiCleaningTest::Idle() {
 // Template task instances the game emits in this file. Until the code that makes the tasks is decompiled, they are
 // instantiated explicitly.
 template class MCallTask0<DinoUiCleaningMenu, DinoUiCleaningMenu>;
+#pragma auto_inline off
 template MTask *MCreateCallTask(DinoUiCleaningMenu *obj, void (DinoUiCleaningMenu::*func)());
+#pragma auto_inline reset
 
 // Moves the cursor to the item, and shows the fossil's name (marked if it can't be cleaned).
 void DinoUiCleaningMenu::OnFocus(MMenuItem *item) {
@@ -493,18 +495,16 @@ extern "C" struct {
 extern const u32 data_0208aa24, data_0208aa28, data_0208a638, data_0208a63c;
 
 // Asks to confirm the rock.
-// NONMATCHING: the game works the window's place out after allocating it, the column twice
+// NONMATCHING (77%): the game works out the row terms first and the column test twice (allocating first, as here)
 void DinoUiCleaningMenu::Decide(int index) {
     mCursor->Hide();
     mChoice = index + mPage * 8;
     mAnswer = 0;
-    int row = index / 4;
-    int col = index % 4;
-    MPoint pos(data_ov005_02167184.mWindowBase.x + (col - (col == 3)) * data_ov005_02167184.mWindowColStep.x +
-                   row * data_ov005_02167184.mWindowRowStep.x + data_ov005_02167184.mWindowOffset.x,
-               data_ov005_02167184.mWindowBase.y + (col - (col == 3)) * data_ov005_02167184.mWindowColStep.y +
-                   row * data_ov005_02167184.mWindowRowStep.y + data_ov005_02167184.mWindowOffset.y);
-    DinoCommonWindowMenu *window = new DinoCommonWindowMenu(gLcd->GetBottomDisplay(), &mAnswer, pos, NULL, 0);
+    DinoCommonWindowMenu *window = new DinoCommonWindowMenu(gLcd->GetBottomDisplay(), &mAnswer,
+        MPoint(data_ov005_02167184.mWindowBase.x + (index % 4 - (index % 4 == 3)) * data_ov005_02167184.mWindowColStep.x +
+                   index / 4 * data_ov005_02167184.mWindowRowStep.x + data_ov005_02167184.mWindowOffset.x,
+               data_ov005_02167184.mWindowBase.y + (index % 4 - (index % 4 == 3)) * data_ov005_02167184.mWindowColStep.y +
+                   index / 4 * data_ov005_02167184.mWindowRowStep.y + data_ov005_02167184.mWindowOffset.y), NULL, 0);
     window->AddChoice(1, gDinoResource->GetText(data_0208aa28), gDinoResource->GetText(data_0208a63c));
     window->AddChoice(-2, gDinoResource->GetText(data_0208aa24), gDinoResource->GetText(data_0208a638));
     MTask *show = mCursor->CreateShowTransfer();
