@@ -747,8 +747,9 @@ extern "C" const char data_ov003_02160bfc[];    // the name font
 extern "C" const char *const data_ov003_02160894[]; // the pictures, by page
 
 // Sets up the information panel: the name and its plate, the pictures (ten with the extra page) and the 3D model.
-// NONMATCHING (96.5%): the game loads gCurrentDisplay for the two canvases after copying their size (also with an
-// MObjCanvas(size, palette, fromEnd) on the current display); ours loads it first.
+// (Without common-subexpression elimination: the game loads gCurrentDisplay for the two canvases after copying their
+// size.)
+#pragma opt_common_subs off
 DinoUiRvInformation::DinoUiRvInformation(u8 hasTenPictures)
     : MProcess(gLcd->mMain), mUnk164(NULL), mPage(0), mHasTenPictures(hasTenPictures), mUnk195(0), mUnk198(0),
       mUnk1AC(0), mUnk1B0(1), mUnk1B1(0), mUnk1B4(1) {
@@ -804,6 +805,7 @@ DinoUiRvInformation::DinoUiRvInformation(u8 hasTenPictures)
     Unk02156800();
     gCurrentDisplay = gLcd->mSub;
 }
+#pragma opt_common_subs reset
 
 #pragma auto_inline off
 
@@ -827,10 +829,10 @@ BOOL DinoUiRvAttackFlag(u32 id) {
     return FALSE;
 }
 
-extern "C" void func_ov003_02156eac(DinoUiRvInformation3DModel *model, MFx32 angle) {
+extern "C" void func_ov003_02156eac(DinoUiRvInformation *info, MFx32 angle) {
     BOOL out = angle < MFx32(0) || MFx32(100) <= angle;
     if (!out) {
-        model->mAngle = angle;
+        info->mUnk1B4 = angle;
     }
 }
 

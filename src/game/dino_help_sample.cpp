@@ -134,6 +134,8 @@ extern "C" struct {
     MRect consoleRect;  // 0x2C: sConsoleRect
 } data_020bc804;
 
+// (Without common-subexpression elimination, as the game.)
+#pragma opt_common_subs off
 DinoHelpSampleConsole::DinoHelpSampleConsole(MDisplay *display) : MProcess(display) {
     DinoHelpItem::Enable();
     MDisplayScope scope(display);
@@ -155,6 +157,7 @@ DinoHelpSampleConsole::DinoHelpSampleConsole(MDisplay *display) : MProcess(displ
     mConsole->Show();
     mParallel.AddTail(mConsole);
 }
+#pragma opt_common_subs reset
 
 void DinoHelpSampleConsole::SetText(const char *text) {
     mConsole->Clear();

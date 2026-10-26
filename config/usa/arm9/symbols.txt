@@ -11469,7 +11469,6 @@ data_020bca3c kind:data(any) addr:0x020bca3c
 data_020bca60 kind:data(any) addr:0x020bca60
 data_020bca84 kind:data(any) addr:0x020bca84
 _ZTV21DinoHelpSampleConsole kind:data(any) addr:0x020bcaac
-data_020bcad8 kind:data(any) addr:0x020bcad8
 _ZTV18DinoHelpSampleMenu kind:data(any) addr:0x020bcaec
 data_020bcb0c kind:data(any) addr:0x020bcb0c
 _ZTV23DinoHelpSampleYesNoMenu kind:data(any) addr:0x020bcb34

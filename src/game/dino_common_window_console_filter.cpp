@@ -273,9 +273,9 @@ extern "C" struct {
     MPoint unk44;   // (216, 44): derived from unk14 (mwcc reuses the stored 4)
 } data_020bc024;
 
-// NONMATCHING: the game keeps the measuring canvas in ip (ours spills it) and loads gCurrentDisplay after copying
-// the size.
 // Measures the text, then makes its console, the window around it (anchored by mUnk90) and the mark of kind mUnk9C.
+// (Without common-subexpression elimination: the game loads gCurrentDisplay again after copying the size.)
+#pragma opt_common_subs off
 void DinoCommonWindowMessage::Load() {
     DinoCommonFont *font = new DinoCommonFont(0, 1, 0);
     MConsole *measure = new MConsole(new MDummyCanvas(MPoint(0xD8, 0xC0)), font, data_020bc024.unk14, MFx32(0));
@@ -368,6 +368,7 @@ void DinoCommonWindowMessage::Load() {
         mUnkA0 = (MView *)oam;
     }
 }
+#pragma opt_common_subs reset
 
 // Opens the window out of its position and shows the text.
 void DinoCommonWindowMessage::Start() {

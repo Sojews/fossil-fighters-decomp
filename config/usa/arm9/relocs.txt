@@ -8492,7 +8492,7 @@ from:0x02031bfa kind:thumb_call to:0x02052e38 module:main
 from:0x02031c20 kind:thumb_call to:0x02064a84 module:main
 from:0x02031c5a kind:thumb_call to:0x020531a4 module:main
 from:0x02031c6c kind:load to:0x020bcaac add:0x8 module:main
-from:0x02031c70 kind:load to:0x020bcad8 module:main
+from:0x02031c70 kind:load to:0x020bcaac add:0x2c module:main
 from:0x02031c74 kind:load to:0x0214d1bc module:main
 from:0x02031c78 kind:load to:0x020bc784 module:main
 from:0x02031c7c kind:load to:0x020bc804 module:main

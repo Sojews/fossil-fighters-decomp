@@ -36,10 +36,7 @@ public:
     fx32 mUnkA8;        // 0xA8: the Y turn's speed
     fx32 mUnkAC;        // 0xAC: the X turn's speed
     class DinoUiRvInformation3DModelRotate *mRotate;    // 0xB0
-    u8 unkB4[0x108 - 0xB4];
-    M3DModel *mModel;   // 0x108
-    u8 unk10C[0x1B4 - 0x10C];
-    MFx32 mAngle;   // 0x1B4: 0 to 100
+    u8 unkB4[0xF4 - 0xB4];
 };
 
 #endif
