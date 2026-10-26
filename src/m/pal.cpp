@@ -221,13 +221,26 @@ void MPalAnime::Apply(int step) {
     }
 }
 
-// NONMATCHING: register allocation only (the game keeps freeSrc in r7 and spills the bank; ours the reverse).
+// Maps a VRAM bank to the CPU while it lives.
+class MVramBankMap {
+public:
+    MVramBankMap(int bank, MVramCnt cnt) : mBank(bank) { mOld = gLcd->SetBankCnt(mBank, cnt); }
+    ~MVramBankMap() { gLcd->SetBankCnt(mBank, mOld); }
+
+    int mBank;
+    MVramCnt mOld;
+};
+
+// NONMATCHING: 99.9%, the bank mapper and the copy of its old setting take each other's stack slots.
 void MPalLoadTask::Transfer() {
     u8 freeSrc = mUnk20;
     int bank = (int)mExtPalette;
-    u32 size = mSize;
-    void *dest = mDest;
-    const void *src = mSrc;
+    const void *src;
+    void *dest;
+    u32 size;
+    size = mSize;
+    dest = mDest;
+    src = mSrc;
     if (bank == 0) {
         MCopy(src, dest, size);
     } else {
@@ -236,10 +249,8 @@ void MPalLoadTask::Transfer() {
         cnt.mst = 0;
         cnt.offset = 0;
         cnt.enable = TRUE;
-        MVramCnt old = gLcd->SetBankCnt(bank, cnt);
-        MCopy(src, dest, size);
-        MI_WaitDma(M_DMA_NO);
-        gLcd->SetBankCnt(bank, old);
+        MVramBankMap map(bank, cnt);
+        MCopy(src, dest, size, TRUE);
     }
     if (freeSrc) {
         delete[] (u8 *)src;

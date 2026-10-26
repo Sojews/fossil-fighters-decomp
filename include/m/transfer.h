@@ -6,8 +6,9 @@
 #include "m/dma.h"
 #include "nitro/mi.h"
 
-// Copies by DMA when it's allowed and the size is a multiple of 32 bytes, otherwise by CPU.
-inline void MCopy(const void *src, void *dest, u32 size) {
+// Copies by DMA when it's allowed and the size is a multiple of 32 bytes, otherwise by CPU (with wait, a DMA copy is
+// waited for).
+inline void MCopy(const void *src, void *dest, u32 size, BOOL wait = FALSE) {
     if (!gDmaEnabled || gDmaChannelUsed[3] || (size & 0x1F)) {
         if (((u32)src | (u32)dest | size) & 3) {
             MIi_CpuCopy16(src, dest, size);
@@ -23,6 +24,9 @@ inline void MCopy(const void *src, void *dest, u32 size) {
             MI_DmaCopy16(M_DMA_NO, src, dest, size);
         } else {
             MI_DmaCopy32(M_DMA_NO, src, dest, size);
+        }
+        if (wait) {
+            MI_WaitDma(M_DMA_NO);
         }
     }
 }
