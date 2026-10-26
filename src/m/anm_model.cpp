@@ -1,5 +1,5 @@
 // The animated 3D objects (MAnmModelBase and its kinds) and MPolygonChar, which plays them from a scene script.
-// Not decompiled yet: TintPalette and most of the Unk0C updates.
+// Not decompiled yet: most of the Unk0C updates.
 
 #pragma ipa file
 
@@ -210,6 +210,8 @@ void MAnmModelBase::PlaySounds(int frame) {
 }
 #pragma opt_strength_reduction reset
 
+// Blends the palette toward the color and queues it over the old one.
+// NONMATCHING: 73%, register allocation (the game keeps the index and one channel's product on the stack).
 void MAnmModelBase::TintPalette(u16 color, fx32 amount) {
     if (mResource == NULL) {
         return;
@@ -233,7 +235,7 @@ void MAnmModelBase::TintPalette(u16 color, fx32 amount) {
         int cb = (c >> 10) & 0x1F;
         tinted[i] = (((cb * amount + b) >> 12) << 10) | ((((cg * amount + g) >> 12) << 5) | ((cr * amount + r) >> 12));
     }
-    mScene->LoadPltt(plttKey, tinted);
+    mScene->QueueD0((const void *)plttKey, (u32)tinted, size);
     mScene->QueueE8(NULL, (u32) tinted);
 }
 

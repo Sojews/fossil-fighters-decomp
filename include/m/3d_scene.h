@@ -39,7 +39,6 @@ public:
     // Back to the defaults: one white light, the camera at z = 1 looking at the origin, the 3D layer shown.
     void Init();
     MTask *CreateEnableTask(u8 enable);
-    void LoadPltt(u32 key, const void *data);
     void AddModel(M3DModel *model);
     void RemoveModel(M3DModel *model);
 
