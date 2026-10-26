@@ -6683,7 +6683,7 @@ from:0x02171c48 kind:load to:0x0208ac00 module:main
 from:0x02171c4c kind:load to:0x0208abfc module:main
 from:0x02171d10 kind:load to:0x021762a0 module:overlay(4)
 from:0x02171d14 kind:load to:0x02176220 module:overlay(4)
-from:0x02171d18 kind:load to:0x02176320 module:overlay(4)
+from:0x02171d18 kind:load to:0x02176220 add:0x100 module:overlay(4)
 from:0x02171d1c kind:load to:0x021763a0 module:overlay(4)
 from:0x02171d7c kind:load to:0x02176b44 module:overlay(4)
 from:0x02171d80 kind:load to:0x02176bc4 module:overlay(4)
