@@ -1073,34 +1073,34 @@ extern "C" MIndicator *DinoBattleSelectLevelIndicatorAnchor(MSmartOam *oam, MFon
 }
 
 // The file's static initialization (see dino_static_init.h).
-extern "C" u32 data_ov000_02195f50[];
 extern "C" u32 data_ov000_02195f90[];
 extern "C" u32 data_ov000_02195fa0[];
 extern "C" u32 data_ov000_02195fb0[];
 extern "C" u32 data_ov000_02195fb8[];
 extern "C" u32 data_ov000_02195fc0[];
-// NONMATCHING: register choice of the anchors (the game keeps the first anchor in r2).
 static struct BattleSelectStaticInit {
     BattleSelectStaticInit() {
+        volatile s32 *p;
         DINO_POOL_WORD(data_ov000_02195e50, 0x70) = 128;
         DINO_POOL_WORD(data_ov000_02195e50, 0x74) = 176;
         DINO_POOL_WORD(data_ov000_02195e50, 0x60) = 8;
         DINO_POOL_WORD(data_ov000_02195e50, 0x64) = 150;
         DINO_POOL_WORD(data_ov000_02195e50, 0x30) = 64;
         DINO_POOL_WORD(data_ov000_02195e50, 0x34) = 112;
-        volatile s32 *p = (volatile s32 *)&data_ov000_02195f50;
-        p[0x38 / 4] = 32;
-        p[0x3c / 4] = 48;
-        DINO_POOL_WORD(data_ov000_02195f90, 0x0) = 32;
-        DINO_POOL_WORD(data_ov000_02195f90, 0x4) = 48;
-        DINO_POOL_WORD(data_ov000_02195f50, 0x48) = 0;
-        DINO_POOL_WORD(data_ov000_02195f50, 0x4c) = 32;
-        DINO_POOL_WORD(data_ov000_02195fa0, 0x0) = 0;
-        DINO_POOL_WORD(data_ov000_02195fa0, 0x4) = 20;
+        DINO_POOL_WORD(data_ov000_02195e50, 0x138) = 32;
+        DINO_POOL_WORD(data_ov000_02195e50, 0x13c) = 48;
+        p = (volatile s32 *)&data_ov000_02195f90;
+        p[0x0 / 4] = 32;
+        p[0x4 / 4] = 48;
+        DINO_POOL_WORD(data_ov000_02195e50, 0x148) = 0;
+        DINO_POOL_WORD(data_ov000_02195e50, 0x14c) = 32;
+        p = (volatile s32 *)&data_ov000_02195fa0;
+        p[0x0 / 4] = 0;
+        p[0x4 / 4] = 20;
         DINO_POOL_WORD(data_ov000_02195e50, 0x58) = -16;
         DINO_POOL_WORD(data_ov000_02195e50, 0x5c) = 0;
-        DINO_POOL_WORD(data_ov000_02195f50, 0x58) = 32;
-        DINO_POOL_WORD(data_ov000_02195f50, 0x5c) = 32;
+        DINO_POOL_WORD(data_ov000_02195e50, 0x158) = 32;
+        DINO_POOL_WORD(data_ov000_02195e50, 0x15c) = 32;
         p = (volatile s32 *)&data_ov000_02195fb0;
         p[0x0 / 4] = 32;
         p[0x4 / 4] = 56;
