@@ -336,3 +336,20 @@ void DinoCleaningHammer::Unk20() {
     set->AddTail(effect);
     GetCleaning()->GetSerial()->AddTail(set);
 }
+
+// The file's static initialization (see dino_static_init.h), with the hammer's fixed-point constants.
+// NONMATCHING (like the drill's): the screen rect sits past the +0x80 anchor and the game hoists its zero half.
+#pragma always_inline on
+static struct DinoCleaningHammerStaticInit {
+    DinoCleaningHammerStaticInit() {
+        DINO_COMMON_LAYOUT_INIT(data_ov002_02164fb8, 0x70, 0xc8, 0x38, 0x28, 0xd8, 0xe8, 0xf0, 0xf8);
+        DINO_POOL(MFx32, data_ov002_02164fb8, 0x8) = MFx32::FromRaw(0x2400);
+        DINO_POOL(MFx32, data_ov002_02164fb8, 0x10) = MFx32::FromRaw(0x4555);
+        DINO_POOL(MFx32, data_ov002_02164fb8, 0x4) = MFx32::FromRaw(0x400);
+        DINO_POOL(MFx32, data_ov002_02164fb8, 0x18) = MFx32::FromRaw(0x555);
+        DINO_POOL(MFx32, data_ov002_02164fb8, 0xc) = MFx32::FromRaw(0xccd);
+        DINO_POOL(MFx32, data_ov002_02164fb8, 0x0) = DINO_POOL(MFx32, data_ov002_02164fb8, 0xc).Mul(MFx32(10));
+        DINO_POOL(MFx32, data_ov002_02164fb8, 0x14) =
+            DINO_POOL(MFx32, data_ov002_02164fb8, 0xc).Mul(MFx32(10)) * MFx32(1);
+    }
+} sDinoCleaningHammerStaticInit;
