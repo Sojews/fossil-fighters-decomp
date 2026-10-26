@@ -149,7 +149,7 @@ DinoCleaningTalkWindow::DinoCleaningTalkWindow(u32 arg)
 }
 
 // Resumes the text once the wait is over (while B8 runs and B4 doesn't); shakes the window while a shake is left.
-// NONMATCHING: the offset's -y goes through a register copy (opt_common_subs off fixes the rest).
+// (Without common subexpression elimination.)
 #pragma opt_common_subs off
 void DinoCleaningTalkWindow::Idle() {
     if (mUnkD0 != 0) {
@@ -161,12 +161,14 @@ void DinoCleaningTalkWindow::Idle() {
     if (mUnkCC != 0) {
         mUnkCC--;
         if (!mTasksB8->IsEmpty() && mTasksB4->IsEmpty()) {
+            int dy;
             int range = mUnkCC;
-            MPoint d(gDinoResource->GetRandom()->Next(range * 2 + 1) - mUnkCC,
-                     gDinoResource->GetRandom()->Next(range * 2 + 1) - range);
+            dy = gDinoResource->GetRandom()->Next(range * 2 + 1) - range;
+            int dx = gDinoResource->GetRandom()->Next(range * 2 + 1) - mUnkCC;
+            MPoint d(dx, dy);
             mConsole->SetPosition(data_ov002_0216431c.mPos + d);
             mFace->SetPosition(d);
-            mOam->SetOffset(MPoint(-d.x, -d.y));
+            mOam->SetOffset(MPoint(-d.x, -dy));
         }
     }
 }
