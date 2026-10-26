@@ -42,6 +42,9 @@ public:
 class MPalAnime : public MAnime {
 public:
     struct Frame {
+        Frame() {}
+        Frame(const Frame &o) : data(o.data), owned(o.owned), color(o.color) {}
+
         const u16 *data;    // the colors, or NULL for a solid color
         s16 owned;          // data was made here (a blend) and is freed with the anime
         u16 color;
@@ -70,6 +73,16 @@ public:
     u32 mLoadStart;             // 0x54
     u32 mLoadCount;             // 0x58: 0: load the whole run
 };
+
+// (Copied member by member, but the game moves it with vector's trivial paths.)
+namespace Metrowerks {
+template <> struct is_trivial<MPalAnime::Frame> {
+    static const bool value = true;
+};
+template <> struct has_trivial_copy_ctor<MPalAnime::Frame> {
+    static const bool value = true;
+};
+} // namespace Metrowerks
 
 // Copies palette data, mapping the extended palette VRAM in first if needed.
 class MPalLoadTask : public MTransfer {
