@@ -75,9 +75,13 @@ src/ov002/dino_cleaning_image.cpp:
     .text       start:0x02158b5c end:0x02159990
     .init       start:0x021637bc end:0x0216383c
 
-src/ov002/dino_cleaning.cpp:
-    .text       start:0x0215f218 end:0x021632c4
+src/ov002/dino_cleaning_kaseki_rock.cpp:
+    .text       start:0x0215f218 end:0x02160324
     .init       start:0x02163d10 end:0x02163d80
+
+src/ov002/dino_cleaning.cpp:
+    .text       start:0x02160324 end:0x021632c4
+    .init       start:0x02163d80 end:0x02163e00
 
 src/ov002/dino_cleaning_image_view.cpp:
     .text       start:0x02159990 end:0x0215b118

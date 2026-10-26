@@ -407,8 +407,8 @@ __sinit_dino_cleaning_hammer.cpp kind:function(thumb,size=0xc0) addr:0x02163af8
 __sinit_dino_cleaning_drill.cpp kind:function(thumb,size=0x88) addr:0x02163bb8
 __sinit_dino_cleaning_dummy_item.cpp kind:function(thumb,size=0x6c) addr:0x02163c40
 __sinit_dino_cleaning_rock.cpp kind:function(thumb,size=0x64) addr:0x02163cac
-__sinit_dino_cleaning.cpp kind:function(thumb,size=0x70) addr:0x02163d10
-__sinit_ov002_02163d80 kind:function(thumb,size=0x80) addr:0x02163d80
+__sinit_dino_cleaning_kaseki_rock.cpp kind:function(thumb,size=0x70) addr:0x02163d10
+__sinit_dino_cleaning.cpp kind:function(thumb,size=0x80) addr:0x02163d80
 .p__sinit_ov002_02163574 kind:data(word) addr:0x02163e00
 .p__sinit_ov002_021635e0 kind:data(word) addr:0x02163e04
 .p__sinit_ov002_0216364c kind:data(word) addr:0x02163e08
