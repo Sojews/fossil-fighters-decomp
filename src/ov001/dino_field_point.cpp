@@ -70,14 +70,13 @@ MRect DinoFieldPoint::GetFrame() {
 }
 
 // Redraws the digits that changed.
-// NONMATCHING: the game stores `changed` before loading Format from the vtable.
 void DinoFieldPoint::Idle() {
-    BOOL changed = FALSE;
+    bool changed = false;
     char buf[0xC];
     Format(buf);
     for (u32 i = 0; i < mDigits; i++) {
         if (buf[i] != mChars[i]) {
-            changed = TRUE;
+            changed = true;
             mChars[i] = buf[i];
             if (mDigitMotions[i] != NULL) {
                 mTasks->Remove(mDigitMotions[i]);
