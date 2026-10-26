@@ -865,7 +865,7 @@ void DinoBattleViewCreature::OnMessage(MMessage *msg) {
         }
         BOOL support = FALSE;
         BOOL other = FALSE;
-        for (int i = 0; i < req->mUnk18; i++) {
+        for (int i = 0; i < (int)req->mUnk18; i++) {
             switch (req->mUnk1C[i] & 0xF) {
             case 8:
             case 9:
