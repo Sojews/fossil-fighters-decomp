@@ -317,7 +317,7 @@ namespace std {
         };
         // The header: its left link is the root (the root's parent is the header).
         // Frees a new node unless released (the stack temporaries these make match the game's insert_node_at;
-        // the real MSL shape is a guess).
+        // the real MSL shape is a guess; the two __node_p copies still take each other's slots for trivial values).
         struct __node_e {};
         struct __node_p {
             __node_p(node *p) : p_(p) {}
@@ -326,8 +326,11 @@ namespace std {
         struct __node_hold {
             __node_hold(__node_e, void *a, __node_p p) : alloc_(a), p_(p.p_) {}
             ~__node_hold() {
-                if (p_ != 0) {
-                    ::operator delete(p_);
+                // (Through p_'s address: the game keeps the guard on the stack even when constructing the value
+                // calls nothing.)
+                node **pp = &p_;
+                if (*pp != 0) {
+                    ::operator delete(*pp);
                 }
             }
             node *release() {
@@ -472,7 +475,7 @@ namespace std {
             abort();
         }
         __node_hold hold(__node_e(), (void *) &header_, __node_p(n));
-        ::new (&n->data_) Value(v);
+        ::new (&hold.p_->data_) Value(v);
         n = hold.release();
         n->right_ = 0;
         n->left_ = 0;

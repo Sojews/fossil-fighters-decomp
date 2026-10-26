@@ -22,20 +22,29 @@ namespace std {
         };
         typedef typename Allocator::template rebind<node>::other node_allocator;
 
-        // Frees a node that was allocated but not yet linked in.
-        class node_holder {
-        public:
-            node_holder(node *p) : ptr_(p) {}
-            ~node_holder() {
-                if (ptr_ != 0) {
-                    ::operator delete(ptr_);
+        // Frees a node that was allocated but not yet linked in (the same guard as the tree's: its stack
+        // temporaries match the game's insert; the real MSL shape is a guess).
+        struct __node_e {};
+        struct __node_p {
+            __node_p(node *p) : p_(p) {}
+            node *p_;
+        };
+        struct __node_hold {
+            __node_hold(__node_e, void *a, __node_p p) : alloc_(a), p_(p.p_) {}
+            ~__node_hold() {
+                // (Through p_'s address: the game keeps the guard on the stack even when nothing is called.)
+                node **pp = &p_;
+                if (*pp != 0) {
+                    ::operator delete(*pp);
                 }
             }
-            void release() {
-                ptr_ = 0;
+            node *release() {
+                node *p = p_;
+                p_ = 0;
+                return p;
             }
-
-            node *ptr_;
+            void *alloc_;
+            node *p_;
         };
 
     public:
@@ -167,9 +176,9 @@ namespace std {
     template <class T, class Allocator>
     typename __list_imp<T, Allocator>::iterator __list_imp<T, Allocator>::insert(iterator pos, const T &x) {
         node *n = allocate_node();
-        node_holder h(n);
-        allocator<T>().construct(&n->data_, x);
-        h.release();
+        __node_hold hold(__node_e(), (void *) &tail_, __node_p(n));
+        ::new (&hold.p_->data_) T(x);
+        n = hold.release();
         node_base *p = pos.node_;
         p->prev_->next_ = n;
         n->prev_ = p->prev_;
