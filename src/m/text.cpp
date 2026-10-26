@@ -120,16 +120,16 @@ void MText::Update() {
 // NONMATCHING: these three differ from the game in register and stack slot allocation only.
 void MText::Transfer(const u16 *src, MPoint srcSize, MRect srcRect, MPoint dst, int tile, int palette, bool hflip,
                      bool vflip) {
-    gLooper->AddTransferTask(new MTextTransfer(this, dst, src, srcSize, srcRect, tile, palette, hflip, vflip));
+    gLooper->AddTransferTask(new MTextTransfer(this, src, srcSize, srcRect, dst, tile, palette, hflip, vflip));
 }
 
 void MText::Transfer(const u16 *src, MPoint srcSize, MPoint dst, int tile, int palette, bool hflip, bool vflip) {
-    gLooper->AddTransferTask(new MTextTransfer(this, dst, src, srcSize, tile, palette, hflip, vflip));
+    gLooper->AddTransferTask(new MTextTransfer(this, src, srcSize, dst, tile, palette, hflip, vflip));
 }
 
 void MText::TransferSequence(MPoint srcSize, MRect srcRect, MPoint dst, int tile, int palette, bool hflip,
                              bool vflip) {
-    gLooper->AddTransferTask(new MTextTransfer(this, dst, sTileSequence, srcSize, srcRect, tile, palette, hflip,
+    gLooper->AddTransferTask(new MTextTransfer(this, sTileSequence, srcSize, srcRect, dst, tile, palette, hflip,
                                                vflip));
 }
 

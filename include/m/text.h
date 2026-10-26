@@ -46,7 +46,7 @@ public:
 // Copies a rectangle of a tile map into a text screen, adding a tile number and palette to every entry.
 class MTextTransfer : public MTransfer {
 public:
-    MTextTransfer(MText *text, MPoint dst, const u16 *src, MPoint srcSize, MRect srcRect, int tile, int palette,
+    MTextTransfer(MText *text, const u16 *src, MPoint srcSize, MRect srcRect, MPoint dst, int tile, int palette,
                   bool hflip, bool vflip) {
         mSrc = src;
         mSrcSize = srcSize;
@@ -57,7 +57,7 @@ public:
         mAttr = tile | (palette << 12);
         mFlip = (hflip ? 0x400 : 0) | (vflip ? 0x800 : 0);
     }
-    MTextTransfer(MText *text, MPoint dst, const u16 *src, MPoint srcSize, int tile, int palette, bool hflip,
+    MTextTransfer(MText *text, const u16 *src, MPoint srcSize, MPoint dst, int tile, int palette, bool hflip,
                   bool vflip) {
         mSrc = src;
         mSrcSize = srcSize;
