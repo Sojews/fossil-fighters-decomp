@@ -71,7 +71,7 @@ DinoFieldTownMap::DinoFieldTownMap(DinoField *field, u32 map) : MProcess(gLcd->G
         oam->SetUnk1C(1);
         mIcon = new TownMapIcon(oam);
         mIcons->AddTail(mIcon);
-        mBlinks = new MParallelTaskSet();
+        mBlinks = new MSerialTaskSet();
         mParallel.AddTail(mIcons, mBlinks, oam);
         MBlend *blend = gLcd->mSub->mBlend;
         blend->SetMode(1);
