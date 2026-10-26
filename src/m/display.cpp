@@ -255,16 +255,14 @@ extern MDisplayRegs data_0208b6ec;  // sub engine
 }
 
 MLcd::MLcd() : MLooperVSyncTask(FALSE, TRUE) {
-    u32 i;
-
     OS_InitMutex(&mMutex);
     mPowCnt = REG_POWCNT;
     mCapture.raw = 0;
     mSwapped = FALSE;
-    for (i = 0; i < 10; i++) {
+    for (u32 i = 0; i < 10; i++) {
         mBankUsed[i] = FALSE;
     }
-    for (i = 0; i < 10; i++) {
+    for (u32 i = 0; i < 10; i++) {
         mBankCnt[i].raw = 0;
     }
     mMain = new MDisplay(this, &data_0208b65c);
