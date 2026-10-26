@@ -171,7 +171,7 @@ public:
     u8 GetUnk2C();
     MFx32Rect GetRect30();
     u8 GetUnk2D();
-    MRect GetRect40();
+    MFx32Rect GetRect40();
     MFx32 GetUnk50();
     void SetUnk2D8(MFx32Point pos, u32 a, MFx32 b);
     void ClearUnk2E0();
@@ -423,7 +423,7 @@ public:
     // The highest of the ground heights around pos (a tile each way), a little above it.
     fx32 GetMaxGroundHeight(MFx32Point pos);
     DinoFieldHole *CreateHole(MFx32Point pos);
-    void CreateRockHole(MFx32Point pos, u32 arg);
+    void CreateRockHole(MFx32Point pos, long arg);
     // The open rock hole within 1.5 of pos, or NULL.
     DinoFieldHole *FindRockHole(MFx32Point pos);
     BOOL IsWalkable(fx32 x, fx32 y, fx32 *height);
@@ -465,7 +465,7 @@ public:
             Step(dir, step, runA, runFrames, c);
         }
     }
-    void WalkOnLand0(u32 dir);
+    void WalkOnLand0(u32 dir, u32 run);
     void CreateKasekiRock(u32 index);
     DinoFieldKasekiRock *GetKasekiRock(u32 index) { return mKasekiRocks[index]; }
     // Makes the kaseki rocks the backup has, if this is their map.
@@ -475,7 +475,7 @@ public:
     // Reloads the map the field is on: the charas, the fellows' places (with whom they follow), the kaseki rocks.
     void ReloadMap();
     void HideUnk2B4();
-    void WalkOnLand1(u32 dir);
+    void WalkOnLand1(u32 dir, u32 run);
     void WalkInWater(u32 dir, u32 run);
     MTask *CreateMoneyShowTask();
     MTask *CreateMoneyHideTask();

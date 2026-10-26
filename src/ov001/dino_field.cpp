@@ -1551,13 +1551,13 @@ void DinoField::Idle() {
 }
 
 // NONMATCHING (and WalkOnLand1): the game keeps the run test even with run 0 (movs r2, #0; bne).
-void DinoField::WalkOnLand0(u32 dir) {
+void DinoField::WalkOnLand0(u32 dir, u32 run) {
     if (mMap->GetMapData()[0x68] == 0) {
         Walk(dir, 0, &mSteps[0], 3, 10, 6, 5, 1);
     }
 }
 
-void DinoField::WalkOnLand1(u32 dir) {
+void DinoField::WalkOnLand1(u32 dir, u32 run) {
     if (mMap->GetMapData()[0x68] == 0) {
         Walk(dir, 0, &mSteps[1], 3, 7, 6, 3, 2);
     }
@@ -1655,7 +1655,7 @@ DinoFieldHole *DinoField::CreateHole(MFx32Point pos) {
     return hole;
 }
 
-void DinoField::CreateRockHole(MFx32Point pos, u32 arg) {
+void DinoField::CreateRockHole(MFx32Point pos, long arg) {
     mRockHoles->AddTail(new DinoFieldHole(this, (u32)mScene, pos, arg, 0));
 }
 

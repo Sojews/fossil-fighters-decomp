@@ -99,7 +99,7 @@ struct DinoFieldCharaData {
     u8 unk2E;
     u8 mUnk2F;          // 0x2F
     MFx32Rect mRect30;  // 0x30: the collision box, around the position
-    MRect mRect40;      // 0x40
+    MFx32Rect mRect40;  // 0x40
     MFx32 mUnk50;       // 0x50: -10 = the default
     u32 mWalkStepCount; // 0x54: the frames of the walk motion with a footstep
     u32 mWalkSteps;     // 0x58: offset of them (u16s)
@@ -175,7 +175,7 @@ u8 DinoFieldChara::GetUnk2D() {
     return ((DinoFieldCharaData *) mData.mFile.GetData())->mUnk2D;
 }
 
-MRect DinoFieldChara::GetRect40() {
+MFx32Rect DinoFieldChara::GetRect40() {
     const DinoFieldCharaData *data = (const DinoFieldCharaData *) mData.mFile.GetData();
     return data->mRect40;
 }
