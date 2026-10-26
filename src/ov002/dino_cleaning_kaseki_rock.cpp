@@ -1,6 +1,7 @@
 // DinoCleaningKasekiRock: the rock being cleaned (its layers, hits and drop), with its X-ray blend manager.
 // (The game's DinoCleaning file is a separate translation unit: its pools and static initialization are its own.)
 
+#pragma ipa file
 #include <algorithm>
 #include "m/lcd.h"
 #include "game/dino_cleaning.h"
@@ -125,7 +126,6 @@ void DinoCleaningKasekiRock::SetOffsetAll(MPoint offset) {
     mView->SetPosition(offset);
 }
 
-// NONMATCHING: 95%, as SetOffsetAll.
 void DinoCleaningKasekiRock::SetOffset(MPoint offset) {
     mUnk80->SetPosition(DinoHalfBack(mUnk80->GetSize() - MPoint(256, 192)) + offset);
     mOam->SetOffset(MPoint(-offset.x, -offset.y));
