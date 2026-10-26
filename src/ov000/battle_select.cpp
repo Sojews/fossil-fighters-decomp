@@ -919,20 +919,20 @@ void UseCreatureSelect::Start() {
 
 extern "C" u32 data_ov000_02197908[];   // (+4: the guard of Select's static)
 
-// NONMATCHING: the game keeps `this` on the stack (sp+0x14) and the start key's loop recomputes each creature's
-// address; ours is 0x2C bytes shorter. The logic follows the game case by case.
+// NONMATCHING: 99.3%, the cursor's row position loads the step table before the base (as in Start).
 void UseCreatureSelect::Select() {
-    BOOL changed = FALSE;
     if (!(data_ov000_02197908[1] & 1)) {
         data_ov000_02195e50.creatureCount = gDinoResource->GetCreatureCount();
         data_ov000_02197908[1] |= 1;
     }
-    switch (mInputHub->GetInput(0)->GetPressed() & 0x3FFF) {
+    u32 pressed = mInputHub->GetInput(0)->GetPressed() & 0x3FFF;
+    BOOL changed = FALSE;
+    switch (pressed) {
     case 0x2000:    // a fixed pair of creatures
         mIds[0] = 0x46;
-        mIds[3] = 0x47;
         mIds[1] = changed;
         mIds[2] = changed;
+        mIds[3] = 0x47;
         mIds[4] = changed;
         mIds[5] = changed;
         mLevels[0] = 3;
@@ -1004,39 +1004,39 @@ void UseCreatureSelect::Select() {
             DinoBattleSelectCreature *creature = (DinoBattleSelectCreature *)DinoBattleSelectCreatureAt(mParams, side, slot);
             creature->id = mIds[i];
             int level = mLevels[i];
-            DinoCreaturePart *parts = (DinoCreaturePart *)&((DinoBattleParams *)mParams)->sides[side].mCreatures[slot].unk04[0];
+            DinoCreatureState *state = (DinoCreatureState *)&((DinoBattleParams *)mParams)->sides[side].mCreatures[slot];
             if (level > 12) {
                 level = 12;
             }
             for (u32 j = 0; j < 4; j++) {
-                parts[j].level = 0;
-                parts[j].unk12 = 0;
+                state->parts[j].level = 0;
+                state->parts[j].unk12 = 0;
             }
             switch (level) {
             case 12:
-                parts[3].level += kCreatureLevelLimits[0];
+                state->parts[3].level += kCreatureLevelLimits[0];
             case 11:
-                parts[3].level += kCreatureLevelLimits[0];
+                state->parts[3].level += kCreatureLevelLimits[0];
             case 10:
-                parts[3].level += kCreatureLevelLimits[0];
+                state->parts[3].level += kCreatureLevelLimits[0];
             case 9:
-                parts[2].level += kCreatureLevelLimits[0];
+                state->parts[2].level += kCreatureLevelLimits[0];
             case 8:
-                parts[2].level += kCreatureLevelLimits[0];
+                state->parts[2].level += kCreatureLevelLimits[0];
             case 7:
-                parts[2].level += kCreatureLevelLimits[0];
+                state->parts[2].level += kCreatureLevelLimits[0];
             case 6:
-                parts[1].level += kCreatureLevelLimits[0];
+                state->parts[1].level += kCreatureLevelLimits[0];
             case 5:
-                parts[1].level += kCreatureLevelLimits[0];
+                state->parts[1].level += kCreatureLevelLimits[0];
             case 4:
-                parts[1].level += kCreatureLevelLimits[0];
+                state->parts[1].level += kCreatureLevelLimits[0];
             case 3:
-                parts[0].level += kCreatureLevelLimits[0];
+                state->parts[0].level += kCreatureLevelLimits[0];
             case 2:
-                parts[0].level += kCreatureLevelLimits[0];
+                state->parts[0].level += kCreatureLevelLimits[0];
             case 1:
-                parts[0].level += 50;
+                state->parts[0].level += 50;
             }
             ((DinoBattleParams *)mParams)->sides[side].unk5C[slot] = mUnkA4[i];
         }
@@ -1045,13 +1045,12 @@ void UseCreatureSelect::Select() {
     }
     if (changed) {
         char text[64];
-        int i = mUnk88;
-        if (mUnk80 & (1 << (i / 3))) {
-            OS_SPrintf(text, data_ov000_02195e50.rowFormat, mLevels[i], mIds[i], gDinoResource->GetCreatureName(mIds[i]),
-                       mUnkA4[i]);
+        if (mUnk80 & (1 << (mUnk88 / 3))) {
+            OS_SPrintf(text, data_ov000_02195e50.rowFormat, mLevels[mUnk88], mIds[mUnk88], gDinoResource->GetCreatureName(mIds[mUnk88]),
+                       mUnkA4[mUnk88]);
         } else {
-            OS_SPrintf(text, data_ov000_02195e50.rowFormatShort, mLevels[i], mIds[i],
-                       gDinoResource->GetCreatureName(mIds[i]));
+            OS_SPrintf(text, data_ov000_02195e50.rowFormatShort, mLevels[mUnk88], mIds[mUnk88],
+                       gDinoResource->GetCreatureName(mIds[mUnk88]));
         }
         mRows[mUnk88]->SetText(std::string(text));
     }

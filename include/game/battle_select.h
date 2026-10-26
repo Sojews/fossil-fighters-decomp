@@ -62,9 +62,9 @@ public:
     u32 mUnk80;             // 0x80: by side, rows that show their unk5C value
     int mCount;             // 0x84: the rows
     u32 mUnk88;             // 0x88: the row the cursor is on
-    u32 mIds[6];            // 0x8C: by row, the creature
-    u32 mUnkA4[6];          // 0xA4: by row, the side's unk5C value
-    u32 mLevels[6];         // 0xBC: by row
+    int mIds[6];            // 0x8C: by row, the creature
+    int mUnkA4[6];          // 0xA4: by row, the side's unk5C value
+    int mLevels[6];         // 0xBC: by row
     class MIndicator *mHeader;      // 0xD4
     class MIndicator *mRows[6];     // 0xD8
     class MIndicator *mCursor;      // 0xF0
