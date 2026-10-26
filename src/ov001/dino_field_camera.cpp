@@ -242,7 +242,7 @@ void DinoFieldCamera::UnkV14() {
         MFx32Point d(MFx32::FromRaw(mUnk94 - mUnkAC.x), MFx32::FromRaw(mUnk9C - mUnkAC.z));
         MFx32 length = d.Length();
         if (length > reach) {
-            u16 angle = FX_Atan2Idx(d.y.v, d.x.v);
+            u16 angle = MFx32PointAngle(d);
             MFx32 over = length - reach;
             mUnkAC.x += (MFx32::FromRaw(FX_CosIdx(angle)) * over).v;
             mUnkAC.z += (MFx32::FromRaw(FX_SinIdx(angle)) * over).v;
