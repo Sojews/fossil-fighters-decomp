@@ -1,6 +1,8 @@
 // DinoFieldPlayerControl: moves the player on the field and ends when the player does something that needs an event
 // (talking, digging, a menu), filling in the request for the event loop.
 
+#pragma ipa file
+
 #include "game/dino_field_player_control.h"
 #include "m/call_task.h"
 #include "m/fx32.h"
