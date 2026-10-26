@@ -426,7 +426,7 @@ std::wstring &DinoTalkFilterReplaceAnchor(std::wstring &s, const std::wstring &t
 // An opaque 15-bit color from 8-bit components.
 #define DINO_TALK_RGB(r, g, b) (0x8000 | ((u32) (r) >> 3) | (((u32) (g) >> 3) << 5) | (((u32) (b) >> 3) << 10))
 
-// NONMATCHING: the game reloads `colored` after its first store, and allocates the color pointers differently.
+// NONMATCHING (99.1%): the game gives the speaker colours' three pointers other registers.
 DinoTalkWindow::DinoTalkWindow(MDisplay *display, std::string speaker, int oam, int priority, u8 flip)
     : MProcess(display), mText(MDecodeUtf8(speaker)), mUnkB0(0), mOam(oam), mFlip(flip) {
     u32 option = gDinoBackup->GetUnk34_16();
@@ -439,7 +439,7 @@ DinoTalkWindow::DinoTalkWindow(MDisplay *display, std::string speaker, int oam, 
         mOffset.x = 0;
         mOffset.y = 0;
     }
-    BOOL colored;
+    bool colored;
     mStarted = colored = FALSE;
     u32 se = mText.size() == 0 ? 0xAE : 0xAA;
     const DinoTalkSettings *settings = (const DinoTalkSettings *) gDinoResource->GetExcavate7C();
@@ -478,7 +478,7 @@ DinoTalkWindow::DinoTalkWindow(MDisplay *display, std::string speaker, int oam, 
     mConsole->SetPosition(MPoint(data_020b62f0.unk18.x + mOffset.x, data_020b62f0.unk18.y + mOffset.y));
     mConsole->SetUnk44(12);
     mConsole->SetFilter(new DinoTalkConsoleFilter(font, this, se));
-    mConsoleTasks = new MSerialTaskSet;
+    mConsoleTasks = new MParallelTaskSet;
     GetParallel()->AddTail(mConsoleTasks);
     mConsoleTasks->AddTail(mConsole);
     mConsoleTasks->mState = 1;
