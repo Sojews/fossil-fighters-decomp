@@ -166,10 +166,14 @@ BOOL DinoHelpDriver::CanShowHelp() {
     return FALSE;
 }
 
+// (At optimization level 3: the game keeps the entry pair and the result in their own stack slots.)
+#pragma optimization_level 3
 void DinoHelpDriver::AddEntry(u32 a, u32 b, u32 c) {
     MScopedLock lock(&sHelpMutex.mutex, TRUE);
-    mEntries.insert(std::multimap<u32, std::pair<u32, u32> >::value_type(a, std::make_pair(b, c)));
+    std::pair<u32, u32> p = std::make_pair(b, c);
+    mEntries.insert(std::multimap<u32, std::pair<u32, u32> >::value_type(a, p));
 }
+#pragma optimization_level reset
 
 void DinoHelpDriver::RemoveEntry(u32 a, u32 b) {
     OS_LockMutex(&sHelpMutex.mutex);
