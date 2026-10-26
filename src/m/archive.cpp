@@ -1,5 +1,7 @@
 // MArchive and MArchivePtr.
 
+#pragma ipa file
+
 #include <map>
 #include "m/archive.h"
 #include "m/file.h"
@@ -8,12 +10,12 @@
 #include "m/task.h"
 #include "m/transfer.h"
 
-// Read's buffers for compressed and filtered files, and whether they're in use.
+// Whether Read's buffers are in use; the open archives, by file; Read's buffers for compressed and filtered files.
+// (The order puts the archives' destructor-chain entry where the game has it.)
 static bool sReadBuffersBusy;
-static u8 *sReadBuffer;
-static u8 *sReadBuffer2;
-// The open archives, by file.
 static std::map<FSFileID, MArchive *> sArchives;
+static u8 *sReadBuffer2;
+static u8 *sReadBuffer;
 static MMutex sArchivesMutex;
 
 void MInitArchive() {
