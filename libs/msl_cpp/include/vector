@@ -16,6 +16,21 @@
 // from key decomp
 
 namespace std {
+    template <class C, class Traits, class Alloc> class basic_string;
+    template <typename T, typename Allocator> class vector;
+
+    // How a reallocation moves the old elements: pointers, strings and vectors are moved with memcpy (the
+    // old ones zeroed), anything else is constructed one by one from the end.
+    template <class T> struct __vec_move_tag {
+        enum { value = is_pointer<T>::value ? 2 : 0 };
+    };
+    template <class C, class Traits, class Alloc> struct __vec_move_tag<basic_string<C, Traits, Alloc> > {
+        enum { value = 2 };
+    };
+    template <class U, class A> struct __vec_move_tag<vector<U, A> > {
+        enum { value = 2 };
+    };
+
     template <bool> class __vector_common {
     public:
         static void throw_length_error();
@@ -761,7 +776,7 @@ namespace std {
         }
 
         void move_construct_to_begin(pointer first, pointer last) {
-            move_construct_to_begin(first, last, Metrowerks::int2type<is_pointer<T>::value ? 2 : 0>());
+            move_construct_to_begin(first, last, Metrowerks::int2type<__vec_move_tag<T>::value>());
         }
 
         void move_construct_to_begin(pointer first, pointer last, Metrowerks::int2type<TAG_UNK>) {
