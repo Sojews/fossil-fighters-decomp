@@ -211,14 +211,15 @@ void DinoSoundMainTask::OnVSync() {
     func_020031f4();
 }
 
-// NONMATCHING: the game's frame has the unused word below the std::min temporaries, not in the lock.
+// NONMATCHING: the game's frame has the unused word below the std::min temporaries (the up one is a slot higher).
 void DinoSoundMainTask::OnPostLoop() {
     DinoSoundLock lock(&sMutex.mutex, TRUE);
     if (sVolume != sTargetVolume) {
         if (sVolume < sTargetVolume) {
-            sVolume += std::min(sTargetVolume - sVolume, sFadeUpStep);
+            sVolume += std::min(sFadeUpStep, sTargetVolume - sVolume);
         } else {
-            sVolume -= std::min(sVolume - sTargetVolume, sFadeDownStep);
+            u32 diff = sVolume - sTargetVolume;
+            sVolume -= std::min(sFadeDownStep, diff);
         }
         func_02003234(sVolume);
     }
