@@ -813,7 +813,6 @@ DinoBattleViewUiAttackerMenu::DinoBattleViewUiAttackerMenu(DinoBattleView *view,
     mSerial.AddTail(new MTimer(1));
 }
 
-// NONMATCHING: the game starts the second loop's offset from the flag's stack slot.
 DinoBattleViewUiDefenderMenu::DinoBattleViewUiDefenderMenu(DinoBattleView *view, int player, MMessageObserver *target,
                                                            const u32 *ids, int count)
     : DinoBattleViewUiSelectAreaCommon(view, player, target, 2, 1, 1) {
@@ -825,11 +824,11 @@ DinoBattleViewUiDefenderMenu::DinoBattleViewUiDefenderMenu(DinoBattleView *view,
     mSide = ((DinoBattleView *)mUnkEC)->FindCreatureByAC(mIds[0])->GetUnkB0();
     mSideC0 = mSide;
     mUnkBC = mSideC0;
-    BOOL back = FALSE;
+    bool back = false;
     int i;
     for (i = 0; i < count; i++) {
         if (((DinoBattleView *)mUnkEC)->FindCreatureByAC(mIds[i])->GetUnkB4() == 3) {
-            back = TRUE;
+            back = true;
             break;
         }
     }
