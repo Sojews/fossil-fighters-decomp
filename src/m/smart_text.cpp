@@ -15,8 +15,12 @@ TextPattern::TextPattern(const u16 *src, MPoint srcSize, MPoint dst, int tile, i
 void TextPattern::Draw(MText *text, MRect clip) {
     MPoint dst(clip.left, clip.top);
     int dy = mVFlip ? (mRect.bottom - clip.bottom) - (clip.top - mRect.top) : 0;
+    int bottom = clip.bottom + dy;
     int dx = mHFlip ? (mRect.right - clip.right) - (clip.left - mRect.left) : 0;
-    MRect src(clip.left + dx, clip.top + dy, clip.right + dx, clip.bottom + dy);
+    int top = clip.top + dy;
+    int left = clip.left + dx;
+    int right = clip.right + dx;
+    MRect src(left, top, right, bottom);
     src.Offset(mOffset);
     text->Transfer(mSrc, mSrcSize, src, dst, mTile, mPalette, mHFlip, mVFlip);
 }
@@ -29,8 +33,12 @@ TextSequence::TextSequence(MPoint srcSize, MPoint dst, int tile, int palette, bo
 void TextSequence::Draw(MText *text, MRect clip) {
     MPoint dst(clip.left, clip.top);
     int dy = mVFlip ? (mRect.bottom - clip.bottom) - (clip.top - mRect.top) : 0;
+    int bottom = clip.bottom + dy;
     int dx = mHFlip ? (mRect.right - clip.right) - (clip.left - mRect.left) : 0;
-    MRect src(clip.left + dx, clip.top + dy, clip.right + dx, clip.bottom + dy);
+    int top = clip.top + dy;
+    int left = clip.left + dx;
+    int right = clip.right + dx;
+    MRect src(left, top, right, bottom);
     src.Offset(mOffset);
     text->TransferSequence(mSrcSize, src, dst, mTile, mPalette, mHFlip, mVFlip);
 }
