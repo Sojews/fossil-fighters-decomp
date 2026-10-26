@@ -28,6 +28,7 @@ public:
     int mCount;         // 0xCC
     MMotion *mMarks[3]; // 0xD0: over the creatures
     MMenuItem *mOkItem; // 0xDC
+    u32 mUnkE0;         // 0xE0: (the game allocates 0xE4 bytes)
 };
 
 #endif

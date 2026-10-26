@@ -45,6 +45,7 @@ public:
     u32 mUnk8C;     // 0x8C
     u32 mUnk90;     // 0x90
     u32 mUnk94;     // 0x94
+    u32 mUnk98;     // 0x98: (the game allocates 0x9C bytes)
 };
 
 #endif
