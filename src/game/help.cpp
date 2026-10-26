@@ -400,12 +400,17 @@ DinoHelpItem *DinoHelpSign::GetItem() {
 void DinoHelpSign::OnDecide() {
 }
 
+static inline MRect DinoHelpTopShift(const MRect &rect) {
+    MRect r = rect;
+    r.top += kHelpTopScreenOffset;
+    r.bottom += kHelpTopScreenOffset;
+    return r;
+}
+
+// NONMATCHING (92%): the game copies the rect through a pointer register and frees the frame before the copy.
 MRect DinoHelpSign::GetFrame() {
     if (mItem->GetDisplay() == gLcd->GetTopDisplay()) {
-        MRect frame = mItem->GetRect();
-        frame.top += kHelpTopScreenOffset;
-        frame.bottom += kHelpTopScreenOffset;
-        return frame;
+        return DinoHelpTopShift(mItem->GetRect());
     }
     return mItem->GetRect();
 }
