@@ -1022,7 +1022,7 @@ void DinoField::FadeOutPict(MDisplay *display, MExtAffinePicture **pict, u32 fra
 
 // Loads the picture over the old one, off the screen (0 left, 1 up, 2 right, 3 down of pos), then slides it in and frees
 // the old one.
-// NONMATCHING: sDirs' offset in the TU's data (like SlideOutPict's), and r4/r5 swapped.
+// NONMATCHING: sDirs' offset in the TU's data (like SlideOutPict's).
 void DinoField::LoadSlideInPict(MDisplay *display, MView *old, MExtAffinePicture **pict, u32 id, MPoint pos, u32 dir,
                                 u32 frames, long ease) {
     static const MPoint sDirs[4] = {MPoint(256, 0), MPoint(0, 192), MPoint(-256, 0), MPoint(0, -192)};
