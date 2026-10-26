@@ -150,7 +150,8 @@ static struct DinoBattleViewKpUpDownStaticInit {
         DINO_POOL_WORD(data_ov000_0219504c, 0x18) = -12;
         DINO_POOL_WORD(data_ov000_021950cc, 0x38) = 72;
         DINO_POOL_WORD(data_ov000_021950cc, 0x3c) = 196;
-        DINO_POOL_WORD(data_ov000_0219510c, 0x0) = 184;
-        DINO_POOL_WORD(data_ov000_0219510c, 0x4) = 196;
+        volatile s32 *p = (volatile s32 *) &data_ov000_0219510c;
+        p[0] = 184;
+        p[1] = 196;
     }
 } sDinoBattleViewKpUpDownStaticInit;
