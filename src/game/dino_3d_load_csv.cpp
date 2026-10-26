@@ -1,5 +1,6 @@
 // Dino3DLoadCsv: plays a battle scene script (CSV) and takes commands from the battle code.
 
+#pragma ipa file
 #include "game/dino_3d_load_csv.h"
 #include "m/3d_resource.h"
 #include "m/file.h"

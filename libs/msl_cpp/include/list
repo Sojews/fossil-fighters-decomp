@@ -223,7 +223,9 @@ namespace std {
             this->init();
         }
         ~list() {
-            this->clear();
+            // (Not this->clear(), as in list<T *>: so the two iterator temporaries take the game's slots with
+            // -ipa file too.)
+            this->erase(this->begin(), this->end());
         }
     };
 
