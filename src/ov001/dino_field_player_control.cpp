@@ -94,9 +94,8 @@ static inline u32 GetReleased(MInput *input) {
 
 // The distance between the points (with the hardware square root).
 static inline u32 Distance(const MPoint &a, const MPoint &b) {
-    int dx = a.x - b.x;
-    int dy = a.y - b.y;
-    *(vu32 *) 0x040002B8 = dx * dx + dy * dy;
+    MPoint d = a - b;
+    *(vu32 *) 0x040002B8 = d.x * d.x + d.y * d.y;
     while (*(vu16 *) 0x040002B0 & 0x8000) {
     }
     return *(vu32 *) 0x040002B4;
@@ -115,6 +114,24 @@ static inline bool Contains(const MFx32Rect &r, const MFx32Point &p) {
     return r.left <= p.x && p.x < r.right && r.top <= p.y && p.y < r.bottom;
 }
 
+// Whether the point is within the character's rectangle.
+static inline bool IsOnChara(DinoFieldChara *chara, MFx32Point p) {
+    return Contains(chara->GetRect40() + chara->GetModel()->pos, p);
+}
+
+// The character following the player.
+static inline DinoFieldChara *FindFollower(DinoField *field, DinoFieldChara *player) {
+    DinoFieldChara *follower = NULL;
+    for (u32 i = 0; i < 100; i++) {
+        DinoFieldChara *chara = field->mCharas[i];
+        if (chara != NULL && chara != player && chara->mTask.unk4 == 1) {
+            follower = chara;
+            break;
+        }
+    }
+    return follower;
+}
+
 // NONMATCHING: written from the game's code; the stack temporaries are laid out differently.
 void DinoFieldPlayerControl::Idle() {
     DinoFieldChara *player;
@@ -122,15 +139,7 @@ void DinoFieldPlayerControl::Idle() {
     if (focus == 0 || (player = mField->GetChara(focus)) == NULL) {
         return;
     }
-    // The character following the player (the last walk's run partner).
-    DinoFieldChara *follower = NULL;
-    for (u32 i = 0; i < 100; i++) {
-        DinoFieldChara *chara = mField->mCharas[i];
-        if (chara != NULL && chara != player && chara->mTask.unk4 == 1) {
-            follower = chara;
-            break;
-        }
-    }
+    DinoFieldChara *follower = FindFollower(mField, player);
     u32 map = mField->GetMap()->GetInfo()->id;
     if (map != mMap) {
         mArea = *(u32 *) mField->mMap->GetArea(player->GetModel()->pos);
@@ -185,13 +194,8 @@ void DinoFieldPlayerControl::Idle() {
     }
     if ((mInput->mButtons & 0x1000) && mTouching) {
         mTouchFrames++;
-        if (mTouchFrames >= 20) {
+        if (mTouchFrames >= 20 || (int) Distance(mTouchStart, mInput->GetTouchPos()) >= 8) {
             mTouching = 0;
-        } else {
-            MPoint touch = mInput->GetTouchPos();
-            if ((int) Distance(mTouchStart, touch) >= 8) {
-                mTouching = 0;
-            }
         }
     }
     if ((GetReleased(mInput) & 0x1000) && mTouching) {
@@ -211,7 +215,7 @@ void DinoFieldPlayerControl::Idle() {
         void *area = mField->mMap->GetArea(player->GetModel()->pos);
         u32 old = mArea;
         mArea = *(u32 *) area;
-        if (old != mArea && mExitAreas->Test(mArea)) {
+        if (old != mArea && (mExitAreas->mBytes[mArea >> 3] & (1 << (mArea & 7)))) {
             mUnk78[0] = 2;
             mUnk78[1] = mArea;
             mUnk78[2] = ((u32 *) area)[3];
@@ -264,7 +268,7 @@ void DinoFieldPlayerControl::Idle() {
             }
             BOOL hit = FALSE;
             if (chara->GetUnk2D()) {
-                if (Contains(chara->GetRect40() + chara->GetModel()->pos, target)) {
+                if (IsOnChara(chara, target)) {
                     hit = TRUE;
                 }
             } else {
@@ -442,10 +446,10 @@ walk : {
         int dir = mInput->GetDirection();
         if (dir != -1) {
             angle = dir << 13;
-            if (mInput->mButtons & 2) {
-                speed = defs->runSpeed * walkSpeed;
-            } else {
+            if (!(mInput->mButtons & 2)) {
                 speed = defs->walkSpeed * walkSpeed;
+            } else {
+                speed = defs->runSpeed * walkSpeed;
             }
         } else {
             angle = player->GetModel()->angle;
