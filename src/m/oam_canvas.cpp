@@ -202,21 +202,21 @@ template <class TOam, class TUnit>
 void MOamCanvas<TOam, TUnit>::Layout(MRect rect) {
     mRects.push_back(rect);
     while (mRects.size() != 0) {
-        rect = *(mRects.end() - 1);
+        rect = *--mRects.end();
         mRects.erase(mRects.end() - 1);
         int h = rect.bottom - rect.top;
         int w = rect.right - rect.left;
-        int best = -1;
-        int fitting = -1;
-        int bestArea = 0x80000000;
         int fittingArea = 0x80000000;
+        int bestArea = 0x80000000;
+        int fitting = -1;
+        int best = -1;
         if (MPoint(w, h) == MPoint(8, 8)) {
             AddPiece(rect, 0);
         } else {
             int i;
             const MPoint *size = &gObjSizes[3][2];
             for (i = 14; i > 0; i--, size--) {
-                MPoint s = *size;
+                const MPoint &s = *size;
                 if (s == MPoint(0, 0)) {
                     continue;
                 }
@@ -230,7 +230,7 @@ void MOamCanvas<TOam, TUnit>::Layout(MRect rect) {
                         fittingArea = area;
                         fitting = i;
                     }
-                } else if (area > bestArea && area < (h < s.y ? h : s.y) * (w < s.x ? w : s.x) * 2) {
+                } else if (area > bestArea && area < std::min(s.y, h) * std::min(s.x, w) * 2) {
                     bestArea = area;
                     best = i;
                 }
