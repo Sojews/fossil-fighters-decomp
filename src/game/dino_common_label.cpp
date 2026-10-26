@@ -11,11 +11,16 @@
 #include "m/smart_oam.h"
 #include "m/text_codec.h"
 
+// (By reference: the game copies the id to the frame for it.)
+static inline const char *DinoLabelText(const u32 &id) {
+    return gDinoResource->GetText(id);
+}
+
 DinoCommonLabel::DinoCommonLabel(MSmartOam *oam, MFont *font, const void *palette, u32 textId, MPoint spacing)
-    : MFixedSizeView(MPoint(0, 0)), mFont(font), mText(gDinoResource->GetText(textId)), mSpacing(spacing.x),
+    : MFixedSizeView(MPoint(0, 0)), mFont(font), mText(DinoLabelText(textId)), mSpacing(spacing.x),
       mLineSpacing(spacing.y) {
     mCanvas = mSmartCanvas = new MSmartObjCanvas(
-        oam->mDisplay, oam, font->MeasureText(gDinoResource->GetText(textId), mSpacing, mLineSpacing), palette, TRUE);
+        oam->mDisplay, oam, font->MeasureText(DinoLabelText(textId), mSpacing, mLineSpacing), palette, TRUE);
     Init();
 }
 
