@@ -1,5 +1,8 @@
 // DinoEventKasekiRockFound.
 
+#pragma ipa file
+// (The game's unit calls the resources' constructor without a copy of its own.)
+#define M_RESOURCE_CTOR_ELSEWHERE
 #include "game/dino_event_kaseki_rock_found.h"
 #include "game/dino_field.h"
 #include "m/lcd.h"

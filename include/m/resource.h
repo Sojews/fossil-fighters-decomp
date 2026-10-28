@@ -9,11 +9,15 @@ template <class T>
 class MResource {
 public:
     MResource() {}
+#ifndef M_RESOURCE_CTOR_ELSEWHERE
     MResource(std::string path) : mArchive(path) {
         mFile = mArchive.GetFile(0);
         mFile.Lock();
         mFile.GetData();
     }
+#else
+    MResource(std::string path);
+#endif
 
     const T *Get() { return (const T *)mFile.GetData(); }
     // Takes another type's resource (the same file, read as a T).
