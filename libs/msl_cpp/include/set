@@ -42,9 +42,10 @@ namespace std {
     template <class Key, class Compare, class Allocator>
     template <class InputIterator>
     void set<Key, Compare, Allocator>::insert(InputIterator first, InputIterator last) {
-        iterator e = this->end();
-        for (; first != last; ++first) {
-            insert(e, *first);
+        if (first != last) {
+            for (; first != last; ++first) {
+                insert(this->end(), *first);
+            }
         }
     }
 } // namespace std
