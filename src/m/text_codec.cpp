@@ -176,7 +176,8 @@ void MSetUnkText(std::string text) {
 
 static void MSetUnkTextChars(std::wstring text) {
     sUnkTextChars.clear();
-    sUnkTextChars.insert(text.begin(), text.end());
+    const wchar_t *e = text.end().p_;
+    sUnkTextChars.insert(text.begin(), std::wstring::const_iterator(e));
 }
 
 BOOL MIsUnkTextChar(wchar_t c) {
