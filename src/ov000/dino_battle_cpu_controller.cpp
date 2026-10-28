@@ -1,5 +1,7 @@
 // DinoBattleCpuController.
 
+#pragma ipa file
+
 #include "game/set_live_event_check_task.h"
 #include "game/dino_battle_controller.h"
 #include "types.h"
@@ -224,6 +226,11 @@ int DinoBattleCpuController::EstimateDamage(DinoBattleModelCreature *attacker, D
 
 
 // Lists the creatures the creature's attack would target (none if it can't use it).
+// (Pushed through a reference, which gives the game's order for push_back's byte temps under -ipa file.)
+static inline void PushTarget(std::vector<DinoBattleModelCreature *> &v, DinoBattleModelCreature *const &x) {
+    v.push_back(x);
+}
+
 void DinoBattleCpuController::CollectTargets(DinoBattleModelPlayer *player, DinoBattleModelCreature *creature,
                                              u32 attack) {
     mTargets.clear();
@@ -237,40 +244,40 @@ void DinoBattleCpuController::CollectTargets(DinoBattleModelPlayer *player, Dino
     DinoBattleModelPlayer *opponent = player->GetOpponent();
     if (*DinoOffsetPtr<u8>(def, def->unk14) == 3 || *DinoOffsetPtr<u8>(def, def->unk14) == 16) {
         for (u32 i = 0; i < opponent->GetCreatureCount(); i++) {
-            mTargets.push_back(opponent->GetCreature(i));
+            PushTarget(mTargets, opponent->GetCreature(i));
         }
     } else if (*DinoOffsetPtr<u8>(def, def->unk14) == 10 || *DinoOffsetPtr<u8>(def, def->unk14) == 13) {
         for (u32 i = 0; i < player->GetCreatureCount(); i++) {
-            mTargets.push_back(player->GetCreature(i));
+            PushTarget(mTargets, player->GetCreature(i));
         }
     } else if (*DinoOffsetPtr<u8>(def, def->unk10) == 9 || *DinoOffsetPtr<u8>(def, def->unk10) == 10 ||
                *DinoOffsetPtr<u8>(def, def->unk10) == 11) {
         for (u32 i = 0; i < player->GetCreatureCount(); i++) {
             if (player->GetCreature(i)->GetUnkB8() != 3) {
-                mTargets.push_back(player->GetCreature(i));
+                PushTarget(mTargets, player->GetCreature(i));
             }
         }
     } else if (*DinoOffsetPtr<u8>(def, def->unk14) == 11 || *DinoOffsetPtr<u8>(def, def->unk14) == 14) {
         for (u32 i = 0; i < player->GetCreatureCount(); i++) {
             if (player->GetCreature(i) != creature) {
-                mTargets.push_back(player->GetCreature(i));
+                PushTarget(mTargets, player->GetCreature(i));
             }
         }
     } else if (*DinoOffsetPtr<u8>(def, def->unk14) == 12) {
         if (player->GetCreatureCount() != 1) {
-            mTargets.push_back(creature);
+            PushTarget(mTargets, creature);
         }
     } else if (*DinoOffsetPtr<u8>(def, def->unk14) == 9 || *DinoOffsetPtr<u8>(def, def->unk14) == 2 ||
                *DinoOffsetPtr<u8>(def, def->unk10) == 8) {
-        mTargets.push_back(creature);
+        PushTarget(mTargets, creature);
     } else if (*DinoOffsetPtr<u8>(def, def->unk14) == 15) {
-        mTargets.push_back(player->FindCreature(0));
+        PushTarget(mTargets, player->FindCreature(0));
     } else {
         u32 ids[3];
         int count;
         opponent->CollectCreaturesNearB8(creature->GetB8Category(), ids, &count);
         for (int i = 0; i < count; i++) {
-            mTargets.push_back(opponent->FindCreatureByB4(ids[i]));
+            PushTarget(mTargets, opponent->FindCreatureByB4(ids[i]));
         }
     }
 }
