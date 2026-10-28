@@ -29,22 +29,29 @@ namespace std {
             __node_p(node *p) : p_(p) {}
             node *p_;
         };
+        struct __node_pair {
+            __node_pair(void *a, node *p) : alloc_(a), p_(p) {}
+            void *alloc_;
+            node *p_;
+        };
         struct __node_hold {
-            __node_hold(__node_e, void *a, __node_p p) : alloc_(a), p_(p.p_) {}
+            __node_hold(__node_e, void *a, node *n) : d_(a, get(__node_p(n))) {}
             ~__node_hold() {
                 // (Through p_'s address: the game keeps the guard on the stack even when nothing is called.)
-                node **pp = &p_;
+                node **pp = &d_.p_;
                 if (*pp != 0) {
                     ::operator delete(*pp);
                 }
             }
+            static node *get(__node_p p) {
+                return p.p_;
+            }
             node *release() {
-                node *p = p_;
-                p_ = 0;
+                node *p = d_.p_;
+                d_.p_ = 0;
                 return p;
             }
-            void *alloc_;
-            node *p_;
+            __node_pair d_;
         };
 
     public:
@@ -176,8 +183,8 @@ namespace std {
     template <class T, class Allocator>
     typename __list_imp<T, Allocator>::iterator __list_imp<T, Allocator>::insert(iterator pos, const T &x) {
         node *n = allocate_node();
-        __node_hold hold(__node_e(), (void *) &tail_, __node_p(n));
-        ::new (&hold.p_->data_) T(x);
+        __node_hold hold(__node_e(), (void *) &tail_, n);
+        ::new (&hold.d_.p_->data_) T(x);
         n = hold.release();
         node_base *p = pos.node_;
         p->prev_->next_ = n;
