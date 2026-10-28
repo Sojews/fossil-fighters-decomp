@@ -2,6 +2,7 @@
 // Only the destructors are decompiled so far.
 
 // The buttons' destructors have the base destructor body inlined; auto-inlining the one defined above does that.
+#pragma ipa file
 #pragma auto_inline on
 
 #include "game/dino_ui2_parts_rock_name.h"
@@ -196,6 +197,7 @@ void DinoUi2ContainerBaseDecideButton::OnDecide() {
     }
 }
 
+#pragma auto_inline off
 void DinoUi2ContainerBaseMenu::ClearItems() {
     RemoveLink(mLinkFrom, 4);
     for (int i = 0; i < mItems.size(); i++) {
@@ -204,6 +206,7 @@ void DinoUi2ContainerBaseMenu::ClearItems() {
     }
     mItems.clear();
 }
+#pragma auto_inline on
 
 extern MView *data_ov004_02177284; // the view the cross-fade keeps
 
@@ -354,6 +357,11 @@ extern "C" MPoint data_ov004_02176bc4;
 extern "C" const u32 data_0208aac8; // the empty slots' help text
 
 // Makes the page's buttons (blank past the last entry) and links them in a grid.
+// (Pushed through a reference, which gives the game's order for push_back's byte temps under -ipa file.)
+static inline void DinoPushItem(std::vector<void *> &v, void *const &x) {
+    v.push_back(x);
+}
+
 void DinoUi2ContainerBaseMenu::RefreshPage2() {
     for (int i = 0; i < 8; i++) {
         DinoUi2PartsKasekiButton *button;
@@ -378,7 +386,7 @@ void DinoUi2ContainerBaseMenu::RefreshPage2() {
                 (const DinoUiKasekiIcon &)DinoUi2GetEmptyKasekiInfo(), 0, data_0208aac8);
             button->HideMotion();
         }
-        mItems.push_back(button);
+        DinoPushItem(mItems, button);
         AddItem(button);
     }
     DinoUi2LinkKasekiGrid(this, (std::vector<MMenuItem *> &)mItems, mLinkFrom);
@@ -553,7 +561,7 @@ void DinoUi2CannonShootMenu::FinishDecide() {
         for (int i = 0; i < 8; i++) {
             if (mFlags[i]) {
                 mFlags[i] = FALSE;
-                mChosen->push_back((void *)i);
+                DinoPushItem(*mChosen, (void *)i);
             }
         }
         mUnkFC = 0;
