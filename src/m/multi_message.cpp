@@ -177,7 +177,6 @@ void MMessageObserver::Post(MMessage *msg) {
     MPush(mQueue, msg);
 }
 
-// NONMATCHING: the loop pointer and this get each other's registers.
 void MMessageObserver::ClearQueue() {
     MScopedLock lock(&mMutex, TRUE);
     for (std::vector<MMessage *>::iterator it = mQueue.begin(); it != mQueue.end(); it++) {
