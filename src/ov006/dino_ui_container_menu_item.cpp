@@ -2,6 +2,7 @@
 // Only the destructors are decompiled so far.
 
 // Derived destructors have their bases' destructor bodies inlined; auto-inlining the ones defined above does that.
+#pragma ipa file
 #pragma auto_inline on
 
 #include "game/dino_backup.h"
@@ -137,6 +138,7 @@ template class MCallTask0<DinoUiContainerMenu, DinoUiContainerMenu>;
 template MTask *MCreateCallTask(DinoUiContainerMenu *obj, void (DinoUiContainerMenu::*func)());
 #pragma auto_inline reset
 
+#pragma auto_inline off
 BOOL DinoUiContainerMenu::PageRight() {
     mPage = (mPage + 1) % (mLastPage + 1);
     ClearItems();
@@ -145,7 +147,9 @@ BOOL DinoUiContainerMenu::PageRight() {
     FocusNearestItem(mCursor->GetPosition());
     return TRUE;
 }
+#pragma auto_inline on
 
+#pragma auto_inline off
 BOOL DinoUiContainerMenu::PageLeft() {
     mPage = (mPage + mLastPage) % (mLastPage + 1);
     ClearItems();
@@ -154,6 +158,7 @@ BOOL DinoUiContainerMenu::PageLeft() {
     FocusNearestItem(mCursor->GetPosition());
     return TRUE;
 }
+#pragma auto_inline on
 
 // Lists the rocks in the containers.
 void DinoUiContainerMenu::RefreshEntries() {
@@ -172,6 +177,7 @@ void DinoUiContainerMenu::RefreshEntries() {
     }
 }
 
+#pragma auto_inline off
 void DinoUiContainerMenu::FinishDiscard() {
     if (mUnk120 == 1) {
         if (mLastPage > 0) {
@@ -197,6 +203,7 @@ void DinoUiContainerMenu::FinishDiscard() {
         FocusNearestItem(mCursor->GetPosition());
     }
 }
+#pragma auto_inline on
 
 void DinoUiContainerMenu::OnDecide(MMenuItem *item) {
     int i;
@@ -213,12 +220,14 @@ void DinoUiContainerMenu::OnDecide(MMenuItem *item) {
     }
 }
 
+#pragma auto_inline off
 void DinoUiContainerMenu::ClearItems() {
     for (int i = 0; i < mItems.size(); i++) {
         RemoveItem((MMenuItem *)mItems[i]);
         delete (MMenuItem *)mItems[i];
     }
 }
+#pragma auto_inline on
 
 extern const int data_02089a20; // fade frames
 extern const int data_02089a88;
@@ -301,6 +310,7 @@ extern const u32 data_0208aa3c; // "the team was changed" text
 extern const int data_02089a30;
 extern const int data_02089a2c;
 
+#pragma auto_inline off
 void DinoUiContainerMenu::OnBackDecided() {
     *mResult = 9;
     mSerial.AddTail(new MTimer(data_02089a34));
@@ -314,6 +324,7 @@ void DinoUiContainerMenu::OnBackDecided() {
     serial->AddTail(fade);
     serial->AddTail(exit);
 }
+#pragma auto_inline on
 
 extern const u32 data_0208aae0; // "the team will be saved" text
 
@@ -541,6 +552,12 @@ DinoUiContainerMenuItem::DinoUiContainerMenuItem(DinoUiContainerMenu *owner, con
     mMotion->GetUnit()->SetMode(1);
 }
 
+// (Pushed through a reference, which gives the game's order for push_back's byte temps under -ipa file.)
+template <class T> static inline void DinoPush(std::vector<T> &v, const typename std::vector<T>::value_type &x) {
+    v.push_back(x);
+}
+
+
 // The OK button is usable once the team has a first member.
 
 void DinoLinkGrid(MMenu *menu, std::vector<MMenuItem *> *items, MMenuItem *below);
@@ -556,7 +573,7 @@ void DinoUiContainerMenu::RefreshPage2() {
                 mOam, MPoint(data_ov006_021915d4.x + data_ov006_021915d4.colX * (i % 4) + data_ov006_02191654.rowX * (i / 4),
                        data_ov006_021915d4.y + data_ov006_021915d4.colY * (i % 4) + data_ov006_02191654.rowY * (i / 4)),
                 (const DinoKasekiButtonInfo &)mUnk100[i + mPage * 8], 0);
-            mItems.push_back(button);
+            DinoPush(mItems, button);
             AddItem(button);
         } else {
             DinoKasekiButtonInfo empty;
@@ -569,7 +586,7 @@ void DinoUiContainerMenu::RefreshPage2() {
                        data_ov006_021915d4.y + data_ov006_021915d4.colY * (i % 4) + data_ov006_02191654.rowY * (i / 4)),
                 empty, 0);
             button->HideMotion();
-            mItems.push_back(button);
+            DinoPush(mItems, button);
             AddItem(button);
         }
     }
