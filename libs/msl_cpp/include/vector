@@ -423,25 +423,23 @@ namespace std {
             return;
         }
         size_t c = cap();
-        if (n > c || size_ > c - n) {
-            if (!expand_by(size_ + n - c)) {
-                pointer old = data_;
-                size_t old_cap = cap();
-                size_t off = pos - old;
-                allocate(grow_by(size_ + n - old_cap));
-                copy_range(first, last, data_ + off);
-                insert_realloc_finish(old, off, n, old_cap);
+        if ((n <= c && size_ <= c - n) || expand_by(size_ + n - c)) {
+            pointer e = end();
+            size_t tail = e - pos;
+            size_ += n;
+            e += n;
+            if (tail != 0) {
+                e = __copy_backward_trivial(e - n - tail, e - n, e);
             }
-            return;
+            copy_range(first, last, e - n);
+        } else {
+            pointer old = data_;
+            size_t old_cap = cap();
+            size_t off = pos - old;
+            allocate(grow_by(size_ + n - old_cap));
+            copy_range(first, last, data_ + off);
+            insert_realloc_finish(old, off, n, old_cap);
         }
-        pointer e = end();
-        size_t tail = e - pos;
-        size_ += n;
-        e += n;
-        if (tail != 0) {
-            e = __copy_backward_trivial(e - n - tail, e - n, e);
-        }
-        copy_range(first, last, e - n);
     }
 
     template <typename T, typename Allocator>
