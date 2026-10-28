@@ -317,29 +317,37 @@ namespace std {
         };
         // The header: its left link is the root (the root's parent is the header).
         // Frees a new node unless released (the stack temporaries these make match the game's insert_node_at;
-        // the real MSL shape is a guess; the two __node_p copies still take each other's slots for trivial values).
+        // the real MSL shape is a guess: an allocator/pointer pair whose pointer is handed through a by-value
+        // wrapper first, which puts the wrapper's two copies in the game's slot order).
         struct __node_e {};
         struct __node_p {
             __node_p(node *p) : p_(p) {}
             node *p_;
         };
+        struct __node_pair {
+            __node_pair(void *a, node *p) : alloc_(a), p_(p) {}
+            void *alloc_;
+            node *p_;
+        };
         struct __node_hold {
-            __node_hold(__node_e, void *a, __node_p p) : alloc_(a), p_(p.p_) {}
+            __node_hold(__node_e, void *a, node *n) : d_(a, get(__node_p(n))) {}
             ~__node_hold() {
                 // (Through p_'s address: the game keeps the guard on the stack even when constructing the value
                 // calls nothing.)
-                node **pp = &p_;
+                node **pp = &d_.p_;
                 if (*pp != 0) {
                     ::operator delete(*pp);
                 }
             }
+            static node *get(__node_p p) {
+                return p.p_;
+            }
             node *release() {
-                node *p = p_;
-                p_ = 0;
+                node *p = d_.p_;
+                d_.p_ = 0;
                 return p;
             }
-            void *alloc_;
-            node *p_;
+            __node_pair d_;
         };
         // Trees of values with a non-trivial destructor have a word between the header and leftmost_ that's
         // never written (seen in the game's map<MArchiveFile, ...> and map<u32, DinoEventEpisode>; the real MSL
@@ -474,8 +482,8 @@ namespace std {
             printf("Memory allocation failure");
             abort();
         }
-        __node_hold hold(__node_e(), (void *) &header_, __node_p(n));
-        ::new (&hold.p_->data_) Value(v);
+        __node_hold hold(__node_e(), (void *) &header_, n);
+        ::new (&hold.d_.p_->data_) Value(v);
         n = hold.release();
         n->right_ = 0;
         n->left_ = 0;
