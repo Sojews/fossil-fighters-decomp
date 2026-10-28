@@ -1,6 +1,9 @@
 // MFile, the path-to-file-ID cache, archives mounted from memory, and overlay loading.
 
 #define MSL_STRING_DEFINITIONS
+#define MSL_STRING_COMPARE_ELSEWHERE
+#pragma ipa file
+
 #include <algorithm>
 #include <map>
 #include "m/file.h"

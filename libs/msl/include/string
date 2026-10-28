@@ -299,6 +299,8 @@ typename basic_string<C, Traits, Alloc>::size_type basic_string<C, Traits, Alloc
     return npos;
 }
 
+// (A TU can leave it to another file, as the game's linker did: then no weak copy lands after its caller.)
+#ifndef MSL_STRING_COMPARE_ELSEWHERE
 template <class C, class Traits, class Alloc>
 int basic_string<C, Traits, Alloc>::compare(size_type pos, size_type n1, const C *s, size_type n2) const {
     const C *p;
@@ -327,6 +329,7 @@ int basic_string<C, Traits, Alloc>::compare(size_type pos, size_type n1, const C
     }
     return result;
 }
+#endif
 
 // The basic members, defined only where MSL_STRING_BASICS is (each file that emits one instantiates it).
 #ifdef MSL_STRING_BASICS
