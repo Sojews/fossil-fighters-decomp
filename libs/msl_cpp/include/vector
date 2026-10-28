@@ -19,10 +19,10 @@ namespace std {
     template <class C, class Traits, class Alloc> class basic_string;
     template <typename T, typename Allocator> class vector;
 
-    // How a reallocation moves the old elements: pointers, strings and vectors are moved with memcpy (the
+    // How a reallocation moves the old elements: scalars, strings and vectors are moved with memcpy (the
     // old ones zeroed), anything else is constructed one by one from the end.
     template <class T> struct __vec_move_tag {
-        enum { value = is_pointer<T>::value ? 2 : 0 };
+        enum { value = is_scalar<T>::value ? 2 : 0 };
     };
     template <class C, class Traits, class Alloc> struct __vec_move_tag<basic_string<C, Traits, Alloc> > {
         enum { value = 2 };
