@@ -2,6 +2,7 @@
 // Only the destructors are decompiled so far.
 
 // Derived destructors have their bases' destructor bodies inlined; auto-inlining the ones defined above does that.
+#pragma ipa file
 #pragma auto_inline on
 
 #include "m/display.h"
@@ -234,9 +235,11 @@ DinoUiWirelessCancel::DinoUiWirelessCancel(u8 *cancelled) : MMenu(0) {
 
 #pragma auto_inline on
 
+#pragma auto_inline off
 void DinoUiWirelessCancel::Cancel() {
     *mCancelled = TRUE;
 }
+#pragma auto_inline reset
 
 extern const u32 data_0208ad7c; // a text number
 const char *DinoUiChildScannerStartCannonParentItem::GetText() {
@@ -1011,6 +1014,7 @@ void DinoUiCannonParentScanner::StateListen() {
 extern const u32 data_0208ab64;
 
 // Dims the screen, shows the count and starts being a parent with the owner's name.
+// NONMATCHING: under -ipa file, two spill slots (the show transfer and mTens) take each other's places.
 void DinoUiCannonParentScanner::StateStart() {
     gCurrentDisplay->mBlend->Reset();
     gCurrentDisplay->mBlend->SetMode(3);
@@ -1041,9 +1045,10 @@ void DinoUiCannonParentScanner::StateStart() {
     DinoUiWirelessSsid ssid;
     ssid.mode = 2;
     MIi_CpuCopy16(player.name, ssid.name, sizeof(ssid.name));
-    mSerial.AddTail(DinoUiNewParallel(DinoUiNewSerial(mMultiPlay->CreateStartParentTask(&ssid, sizeof(ssid), 0)),
-                                      gCurrentDisplay->mBlend->CreateFadeRatioAnime(0, 8, 10, 0)),
-                    mOam->CreateShowTransfer());
+    MTask *show = mOam->CreateShowTransfer();
+    MTask *fade = gCurrentDisplay->mBlend->CreateFadeRatioAnime(0, 8, 10, 0);
+    mSerial.AddTail(DinoUiNewParallel(DinoUiNewSerial(mMultiPlay->CreateStartParentTask(&ssid, sizeof(ssid), 0)), fade),
+                    show);
     mTasks = new MParallelTaskSet;
     mParallel.AddTail(mTasks);
     mState = data_ov004_021742d0.StateShowCancel_04;
@@ -1086,11 +1091,6 @@ void DinoUiCannonParentScanner::StateReceived() {
     mState = data_ov004_02174350.StateShowCancel_4C;
 }
 
-// (The profiles' push goes one inline level deeper than the rocks': that orders the push_back tags' stack bytes.)
-static inline void DinoPushProfile(std::vector<DinoPlayerProfile> &profiles, const DinoPlayerProfile &profile) {
-    profiles.push_back(profile);
-}
-
 // Collects the children's fossil rocks and profiles, and answers their pings.
 void DinoUiCannonParentScanner::OnCountMessage(MMessage *msg) {
     switch (msg->mId) {
@@ -1104,7 +1104,7 @@ void DinoUiCannonParentScanner::OnCountMessage(MMessage *msg) {
         break;
     }
     case 0x100A9:
-        DinoPushProfile(mProfiles, *(const DinoPlayerProfile *)((DinoExchangeSenryuSignal *)msg)->mUnk0C);
+        mProfiles.push_back(*(const DinoPlayerProfile *)((DinoExchangeSenryuSignal *)msg)->mUnk0C);
         break;
     case 0x100A6:
         mUnkF9 = FALSE;
@@ -1604,10 +1604,12 @@ DinoUiWirelessMatch::DinoUiWirelessMatch(u32 *result, u8 arg)
     mState = data_ov004_02174250.StateStart;
 }
 
+#pragma auto_inline off
 DinoUiBattleParentScanner::DinoUiBattleParentScanner(MMultiPlay *multiPlay, u32 *result)
     : MProcess(NULL), mMultiPlay(multiPlay), mResult(result) {
     mState = data_ov004_021740d0.StateStart_5C;
 }
+#pragma auto_inline reset
 
 extern const u32 data_0208ab74, data_0208ab78;
 
@@ -1699,10 +1701,12 @@ void DinoUiBattleParentScanner::State02165818() {
     }
 }
 
+#pragma auto_inline off
 DinoUiCannonParentScanner::DinoUiCannonParentScanner(MMultiPlay *multiPlay, u32 *result)
     : MProcess(NULL), mMultiPlay(multiPlay), mResult(result) {
     mState = data_ov004_021741d0.StateStart_7C;
 }
+#pragma auto_inline reset
 
 void DinoUiCannonParentScanner::OnConnectMessage(MMessage *msg) {
     if (msg->mId == 5) {
@@ -1786,6 +1790,12 @@ void DinoUiChildScannerBattleConnect::StateRescan() {
 
 // Template task instances the game emits in this file. (Instantiated here, after the code that uses them, so that it
 // calls them.)
+#pragma auto_inline off
+template void std::__vec_deleter<DinoPlayerProfile, std::allocator<DinoPlayerProfile> >::sub_push_back(
+    const DinoPlayerProfile &x, Metrowerks::int2type<true>);
+template void std::__vec_deleter<DinoBackupEntry, std::allocator<DinoBackupEntry> >::sub_push_back(
+    const DinoBackupEntry &x, Metrowerks::int2type<true>);
+#pragma auto_inline reset
 template class MCallTask0<DinoUiBattleParentScanner, MMessageObserver>;
 template MTask *MCreateCallTask(DinoUiBattleParentScanner *obj, void (MMessageObserver::*func)());
 
