@@ -3,6 +3,7 @@
 // Derived destructors have their bases' destructor bodies inlined; auto-inlining the ones defined above does that.
 #pragma auto_inline on
 
+#pragma ipa file
 #include "game/dino_field.h"
 #include "m/input.h"
 #include "m/lcd.h"
@@ -530,14 +531,17 @@ void BitmapMove::Apply(int step) {
     mScreen->SetOffset(pos);
 }
 
+#pragma auto_inline off
 void DinoUiIslandMapMenu::OnBackDecided() {
     *mResult = -1;
     OnSpotDecided();
 }
+#pragma auto_inline reset
 
 extern const int data_020899c4, data_020899d8, data_02089a00;
 
 // Fades both screens out, then exits.
+#pragma auto_inline off
 void DinoUiIslandMapMenu::OnSpotDecided() {
     mUnk150->Clear();
     mKeyCheck->Exit();
@@ -553,6 +557,7 @@ void DinoUiIslandMapMenu::OnSpotDecided() {
     serial->AddTail(fades);
     serial->AddTail(exit);
 }
+#pragma auto_inline reset
 
 void IslandMapKeyCheckTask::Execute() {
     mMenu->CheckKeys();
@@ -566,6 +571,7 @@ void GuidMan::Execute() {
     }
 }
 
+#pragma auto_inline off
 void DinoUiIslandMapMenu::CheckKeys() {
     MSerialTaskSet *serial = &mSerial;
     if (serial->IsEmpty()) {
@@ -580,6 +586,7 @@ void DinoUiIslandMapMenu::CheckKeys() {
         }
     }
 }
+#pragma auto_inline reset
 
 DinoUiIslandMap::DinoUiIslandMap(s32 *result, u32 unlocked) : MProcess(NULL) {
     mUnlocked = unlocked;
