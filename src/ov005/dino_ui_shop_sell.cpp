@@ -2,6 +2,7 @@
 // Only the destructors are decompiled so far.
 
 // Derived destructors have their bases' destructor bodies inlined; auto-inlining the ones defined above does that.
+#pragma ipa file
 #pragma auto_inline on
 
 #include "game/dino_common_window_yes_no_dialog.h"
@@ -128,6 +129,7 @@ void DinoUiShopSellPageLButton::OnDecide() {
     }
 }
 
+#pragma auto_inline off
 void DinoUiShopSellMenu::OnBackDecided() {
     MTask *fade;
     MTask *exit;
@@ -140,6 +142,7 @@ void DinoUiShopSellMenu::OnBackDecided() {
     serial->AddTail(fade);
     serial->AddTail(exit);
 }
+#pragma auto_inline on
 
 // Pooled file statics: the button corners.
 struct DinoUiShopSellStatics {
@@ -317,6 +320,7 @@ void DinoUiShopSellSellButton::OnFocusChanged(BOOL focused) {
 // instantiated explicitly.
 template class MCallTask0<DinoUiShopSellMenu, DinoUiShopSellMenu>;
 
+#pragma auto_inline off
 BOOL DinoUiShopSellMenu::PageRight() {
     mPage = (mPage + 1) % (mLastPage + 1);
     ClearItems();
@@ -327,7 +331,9 @@ BOOL DinoUiShopSellMenu::PageRight() {
     }
     return TRUE;
 }
+#pragma auto_inline on
 
+#pragma auto_inline off
 BOOL DinoUiShopSellMenu::PageLeft() {
     mPage = (mPage + mLastPage) % (mLastPage + 1);
     ClearItems();
@@ -338,6 +344,7 @@ BOOL DinoUiShopSellMenu::PageLeft() {
     }
     return TRUE;
 }
+#pragma auto_inline on
 
 #pragma auto_inline off
 
@@ -399,6 +406,11 @@ u8 DinoUiShopSellMenu::GetFlag(int index) {
 extern const u32 data_0208a1f4;
 
 // Makes the page's buttons (blank past the last fossil) and links them in a grid, the top row to the back button.
+// (Pushed through a reference, which gives the game's order for push_back's byte temps under -ipa file.)
+static inline void DinoPushItem(std::vector<void *> &v, void *const &x) {
+    v.push_back(x);
+}
+
 void DinoUiShopSellMenu::RefreshPage2() {
     mItems.clear();
     for (int i = 0; i < 8; i++) {
@@ -421,7 +433,7 @@ void DinoUiShopSellMenu::RefreshPage2() {
                 (const DinoUiKasekiIcon &)DinoUi2GetEmptyKasekiInfo(), 0);
             button->HideMotion();
         }
-        mItems.push_back(button);
+        DinoPushItem(mItems, button);
         AddItem(button);
     }
     DinoUi2LinkKasekiGrid(this, (std::vector<MMenuItem *> &)mItems, mLinkFrom);
