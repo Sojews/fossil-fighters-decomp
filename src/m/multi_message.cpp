@@ -1,28 +1,27 @@
 // Message types for wireless play and download play, and the factory that creates them from received data.
 
+#pragma ipa file
+
 #include <vector>
 #include "m/multi_message.h"
 #include <algorithm>
 #include "m/observer.h"
 
-
-
 MMessage *CreateMultiMessage(const void *data);
 
-std::vector<MMessageFactory> gMessageFactories;
-// A stand-in for 12 bytes of the TU's .bss we don't have yet: with it, mwcc lays the vector out before its
-// destructor-chain entry, as the game does. (This unit links the game's own data, so it isn't emitted.)
-static u8 sUnknownBss[12];
-void *MultiMessageUnknownBss() {
-    return sUnknownBss;
+// (Pushed through a reference, which gives the game's order for push_back's byte temps under -ipa file.)
+template <class T> static inline void MPush(std::vector<T> &v, const T &x) {
+    v.push_back(x);
 }
+
+std::vector<MMessageFactory> gMessageFactories;
 
 void RegisterMultiMessages() {
     AddMessageFactory(CreateMultiMessage);
 }
 
 void AddMessageFactory(MMessageFactory factory) {
-    gMessageFactories.push_back(factory);
+    MPush(gMessageFactories, factory);
 }
 
 // Creates a message from its serialized form, trying the most recently added factories first.
@@ -175,7 +174,7 @@ MMessageObserver::~MMessageObserver() {
 void MMessageObserver::Post(MMessage *msg) {
     MScopedLock lock(&mMutex, TRUE);
     msg->AddRef();
-    mQueue.push_back(msg);
+    MPush(mQueue, msg);
 }
 
 // NONMATCHING: the loop pointer and this get each other's registers.
@@ -207,8 +206,8 @@ MMessageSubject::~MMessageSubject() {
 
 void MMessageSubject::AddObserver(MMessageObserver *observer) {
     MScopedLock lock(&mMutex, TRUE);
-    mObservers.push_back(observer);
-    observer->mSubjects.push_back(this);
+    MPush(mObservers, observer);
+    MPush(observer->mSubjects, (MMessageSubject *)this);
 }
 
 // NONMATCHING: the game's stack frame is 8 bytes bigger (unused space, as if for a lock object kept in a
