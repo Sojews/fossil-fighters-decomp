@@ -4,6 +4,8 @@
 // and two zeroed bytes on the stack); FindItemInDirection (the order the rect's words are loaded); the tree's
 // insert_node_at (two stores swapped).
 
+#pragma ipa file
+
 #include "m/menu.h"
 #include "m/lcd.h"
 #include "m/input.h"
