@@ -1,5 +1,7 @@
 // Palette memory.
 
+#pragma ipa file
+
 #include <algorithm>
 #include "m/pal.h"
 #include "m/looper.h"
@@ -256,6 +258,12 @@ void MPalLoadTask::Transfer() {
         delete[] (u8 *)src;
     }
 }
+
+// (Made here so its callees go after it, at the end of the file, as the game emits them.)
+#pragma auto_inline off
+template void std::__vec_deleter<MPalAnime::Frame, std::allocator<MPalAnime::Frame> >::sub_push_back(
+    const MPalAnime::Frame &x, Metrowerks::int2type<true>);
+#pragma auto_inline reset
 
 MPalLoadTask::~MPalLoadTask() {
 }
