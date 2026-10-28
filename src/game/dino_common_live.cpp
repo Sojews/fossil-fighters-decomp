@@ -68,35 +68,37 @@ struct DinoCommonLiveCondition {
 
 // NONMATCHING: the flag loops step a pointer through the operands (the game indexes them), and the flag test is
 // materialized rather than kept as TRUE-then-cleared.
+// (The game reloads the flag vectors and the argument list on every pass of the flag loops.)
+#pragma opt_loop_invariants off
 BOOL DinoCommonLive::CheckCondition(const DinoCommonLiveCondition *cond) {
     switch (cond->kind) {
     default:
         return FALSE;
-    case 0:
-        return mUnkB8[cond->GetArgs()[0]] == mUnkB8[cond->GetArgs()[1]] ? TRUE : FALSE;
-    case 1:
-        return mUnkB8[cond->GetArgs()[0]] != mUnkB8[cond->GetArgs()[1]] ? TRUE : FALSE;
-    case 2:
-        return (int)mUnkB8[cond->GetArgs()[0]] < (int)mUnkB8[cond->GetArgs()[1]] ? TRUE : FALSE;
-    case 3:
-        return (int)mUnkB8[cond->GetArgs()[0]] <= (int)mUnkB8[cond->GetArgs()[1]] ? TRUE : FALSE;
     case 4:
-        return (int)mUnkB8[cond->GetArgs()[0]] > (int)mUnkB8[cond->GetArgs()[1]] ? TRUE : FALSE;
+        return mUnkB8[cond->GetArgs()[0]] == mUnkB8[cond->GetArgs()[1]] ? TRUE : FALSE;
     case 5:
-        return (int)mUnkB8[cond->GetArgs()[0]] >= (int)mUnkB8[cond->GetArgs()[1]] ? TRUE : FALSE;
+        return mUnkB8[cond->GetArgs()[0]] != mUnkB8[cond->GetArgs()[1]] ? TRUE : FALSE;
     case 6:
-        return mUnkB8[cond->GetArgs()[0]] == cond->GetArgs()[1] ? TRUE : FALSE;
+        return (int)mUnkB8[cond->GetArgs()[0]] < (int)mUnkB8[cond->GetArgs()[1]] ? TRUE : FALSE;
     case 7:
-        return mUnkB8[cond->GetArgs()[0]] != cond->GetArgs()[1] ? TRUE : FALSE;
+        return (int)mUnkB8[cond->GetArgs()[0]] <= (int)mUnkB8[cond->GetArgs()[1]] ? TRUE : FALSE;
     case 8:
-        return (int)mUnkB8[cond->GetArgs()[0]] < (int)cond->GetArgs()[1] ? TRUE : FALSE;
+        return (int)mUnkB8[cond->GetArgs()[0]] > (int)mUnkB8[cond->GetArgs()[1]] ? TRUE : FALSE;
     case 9:
-        return (int)mUnkB8[cond->GetArgs()[0]] <= (int)cond->GetArgs()[1] ? TRUE : FALSE;
+        return (int)mUnkB8[cond->GetArgs()[0]] >= (int)mUnkB8[cond->GetArgs()[1]] ? TRUE : FALSE;
     case 10:
-        return (int)mUnkB8[cond->GetArgs()[0]] > (int)cond->GetArgs()[1] ? TRUE : FALSE;
+        return mUnkB8[cond->GetArgs()[0]] == cond->GetArgs()[1] ? TRUE : FALSE;
     case 11:
-        return (int)mUnkB8[cond->GetArgs()[0]] >= (int)cond->GetArgs()[1] ? TRUE : FALSE;
+        return mUnkB8[cond->GetArgs()[0]] != cond->GetArgs()[1] ? TRUE : FALSE;
     case 12:
+        return (int)mUnkB8[cond->GetArgs()[0]] < (int)cond->GetArgs()[1] ? TRUE : FALSE;
+    case 13:
+        return (int)mUnkB8[cond->GetArgs()[0]] <= (int)cond->GetArgs()[1] ? TRUE : FALSE;
+    case 14:
+        return (int)mUnkB8[cond->GetArgs()[0]] > (int)cond->GetArgs()[1] ? TRUE : FALSE;
+    case 15:
+        return (int)mUnkB8[cond->GetArgs()[0]] >= (int)cond->GetArgs()[1] ? TRUE : FALSE;
+    case 0:
         for (u32 i = 0; i < cond->count; i++) {
             u32 flag = cond->GetArgs()[i];
             BOOL set = IsFlagSet(flag);
@@ -105,7 +107,7 @@ BOOL DinoCommonLive::CheckCondition(const DinoCommonLiveCondition *cond) {
             }
         }
         return TRUE;
-    case 13:
+    case 1:
         for (u32 i = 0; i < cond->count; i++) {
             u32 flag = cond->GetArgs()[i];
             BOOL set = IsFlagSet(flag);
@@ -114,7 +116,7 @@ BOOL DinoCommonLive::CheckCondition(const DinoCommonLiveCondition *cond) {
             }
         }
         return FALSE;
-    case 14:
+    case 2:
         for (u32 i = 0; i < cond->count; i++) {
             u32 flag = cond->GetArgs()[i];
             BOOL set = IsFlagSet(flag);
@@ -123,7 +125,7 @@ BOOL DinoCommonLive::CheckCondition(const DinoCommonLiveCondition *cond) {
             }
         }
         return TRUE;
-    case 15:
+    case 3:
         for (u32 i = 0; i < cond->count; i++) {
             u32 flag = cond->GetArgs()[i];
             BOOL set = IsFlagSet(flag);
@@ -134,6 +136,7 @@ BOOL DinoCommonLive::CheckCondition(const DinoCommonLiveCondition *cond) {
         return FALSE;
     }
 }
+#pragma opt_loop_invariants reset
 
 // The data's line (a table of offsets after the header).
 static inline u8 *DinoLiveLine(MResource<DinoCommonLiveData> &res, u32 i) {
