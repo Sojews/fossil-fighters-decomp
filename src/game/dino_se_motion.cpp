@@ -2,6 +2,7 @@
 // Also DinoWeightedRandom.
 
 // The game built this file without common-subexpression elimination (loops reload their bounds).
+#pragma ipa file
 #pragma opt_common_subs off
 
 
@@ -13,9 +14,14 @@
 DinoWeightedRandom::DinoWeightedRandom(MRandom *random) : mRandom(random), mTotal(0) {
 }
 
+// (Pushed through a reference, which gives the game's order for push_back's byte temps under -ipa file.)
+static inline void DinoPushWord(std::vector<void *> &v, void *const &x) {
+    v.push_back(x);
+}
+
 void DinoWeightedRandom::Add(int weight) {
     mTotal += weight;
-    mBounds.push_back(reinterpret_cast<void *&>(mTotal));
+    DinoPushWord(mBounds, reinterpret_cast<void *&>(mTotal));
 }
 
 u32 DinoWeightedRandom::Pick() {
@@ -42,7 +48,7 @@ DinoSeMotion::DinoSeMotion(const std::string &path, MSmartOam *oam, int flags, i
 }
 
 void DinoSeMotion::AddSe(u32 se) {
-    mSes.push_back(reinterpret_cast<void *&>(se));
+    DinoPushWord(mSes, reinterpret_cast<void *&>(se));
 }
 
 void DinoSeMotion::Unk44(int arg) {
