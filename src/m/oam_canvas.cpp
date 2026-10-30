@@ -138,12 +138,11 @@ template <class TOam, class TUnit>
 void MOamCanvas<TOam, TUnit>::SetPixel(int x, int y, int color) {
     for (u32 i = 0; i < mPieces.size(); i++) {
         Piece &piece = mPieces[i];
-        int left = piece.rect.left;
-        int right = piece.rect.right;
-        if (left <= x && x < right && piece.rect.top <= y && y < piece.rect.bottom) {
-            int py = y - piece.rect.top;
-            int px = x - piece.rect.left;
-            u32 tile = piece.chrOffset + (px >> 3) + (py >> 3) * ((right - left) >> 3);
+        if (piece.rect.left <= x && x < piece.rect.right && piece.rect.top <= y && y < piece.rect.bottom) {
+            MPoint tl = piece.rect.GetTopLeft();
+            int py = y - tl.y;
+            int px = x - tl.x;
+            u32 tile = piece.chrOffset + (px >> 3) + (py >> 3) * ((piece.rect.right - piece.rect.left) >> 3);
             u32 *row = (u32 *)mChrBlock->GetTileAddr(tile) + (py & 7);
             int shift = (px & 7) * 4;
             *row = (*row & ~(0xF << shift)) | (color << shift);
@@ -200,19 +199,20 @@ void MOamCanvas<TOam, TUnit>::Layout(MRect rect) {
     while (mRects.size() != 0) {
         rect = *--mRects.end();
         mRects.erase(mRects.end() - 1);
-        int h = rect.bottom - rect.top;
         int w = rect.right - rect.left;
+        int h = rect.bottom - rect.top;
         int fittingArea = 0x80000000;
         int bestArea = 0x80000000;
         int fitting = -1;
         int best = -1;
-        if (MPoint(w, h) == MPoint(8, 8)) {
+        MPoint sz(w, h);
+        if (sz == MPoint(8, 8)) {
             AddPiece(rect, 0);
         } else {
             int i;
             const MPoint *size = &gObjSizes[3][2];
             for (i = 14; i > 0; i--, size--) {
-                const MPoint &s = *size;
+                const MPoint s = *size;
                 if (s == MPoint(0, 0)) {
                     continue;
                 }
@@ -243,17 +243,17 @@ void MOamCanvas<TOam, TUnit>::Layout(MRect rect) {
 
 template <class TOam, class TUnit>
 void MOamCanvas<TOam, TUnit>::Alloc(BOOL fromEnd) {
+    u32 i;
     u32 offset = 0;
     MChr *chr = mDisplay->mObj->mChr;
-    for (u32 i = 0; i < mPieces.size(); i++) {
+    for (i = 0; i < mPieces.size(); i++) {
         Piece &piece = mPieces[i];
         u32 tiles = gObjTileSizes[0][piece.shape].x * gObjTileSizes[0][piece.shape].y;
-        u32 boundary = chr->mBoundary;
         u32 size;
         if (chr->mMode == 0) {
-            size = (tiles + boundary - 1) / boundary * boundary;
+            size = (tiles + chr->mBoundary - 1) / chr->mBoundary * chr->mBoundary;
         } else {
-            size = (tiles * 2 + boundary - 1) / boundary * boundary / 2;
+            size = (tiles * 2 + chr->mBoundary - 1) / chr->mBoundary * chr->mBoundary / 2;
         }
         piece.chrSize = size;
         mPieces[i].chrOffset = offset;
@@ -261,7 +261,7 @@ void MOamCanvas<TOam, TUnit>::Alloc(BOOL fromEnd) {
     }
     mUnit = mOam->Alloc(mPieces.size(), fromEnd);
     mChrBlock = chr->Alloc(0, offset, fromEnd);
-    for (u32 i = 0; i < mPieces.size(); i++) {
+    for (i = 0; i < mPieces.size(); i++) {
         int shape = mPieces[i].shape;
         mUnit->GetEntries()[i].SetShape(shape);
         mUnit->GetEntries()[i].SetPalette(mPalBlock);
