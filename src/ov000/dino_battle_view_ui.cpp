@@ -973,6 +973,7 @@ void DinoBattleViewUiSelectAllMenu::OnStart() {
     MSmartOam *oam = new MSmartOam(3, 0, 1);
     DinoSoundPlaySe(0x5F, 0);
     u32 text = data_0208a358;
+    MParallelTaskSet *parallel = &mParallel;
     for (u32 i = 0; i < mCount; i++) {
         DinoBattleViewCreature *creature = ((DinoBattleView *)mView)->FindCreatureByAC(mIds[i]);
         if (((DinoBattleView *)mView)->GetUnkE4(mPlayer)->GetUnkAC() == creature->GetUnkB0()) {
@@ -983,15 +984,14 @@ void DinoBattleViewUiSelectAllMenu::OnStart() {
         }
         MSmartOam *creatureOam = creature->mMotion->mOam;
         MPoint offset(-creatureOam->mOffset.x, -creatureOam->mOffset.y);
-        MRect frame = creature->mMotion->GetFrame();
-        frame.Offset(offset);
+        MRect frame = creature->mMotion->GetFrame().Moved(offset);
         mMarks[i] = new MMotion(data_ov000_02193ae4.markPath, oam, 0, 1);
         mMarks[i]->SetPosition(frame.GetCenter());
         mMarks[i]->Play(1, 0);
         mMarks[i]->SetPriority(1);
         mMarks[i]->SetAnchor(0);
         mMarks[i]->Show();
-        mParallel.AddTail(mMarks[i]);
+        parallel->AddTail(mMarks[i]);
         AddItem(new DinoFrameItem(frame));
     }
     int side;
@@ -1010,7 +1010,6 @@ void DinoBattleViewUiSelectAllMenu::OnStart() {
         mSerial.AddTail(DinoHelpBase::CreateEnableTask(&help));
     }
 }
-
 #pragma opt_common_subs on
 // The cancel item backs out; a creature that can be swapped in is told to the target.
 void DinoBattleViewUiChangeMenu::OnDecide(MMenuItem *item) {
