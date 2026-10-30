@@ -662,11 +662,7 @@ void DinoBattleViewUiAbilityMenu::Close() {
     mCostText->Hide();
     MPoint to(0, -192);
     MPoint from = mBG->mUnk10D4 ? mBG->mText->GetOffset() : mBG->mOffset;
-    if (mBG->mUnk10D4) {
-        mParallel.AddTail(mBG->mText->CreateOffsetAnime(from, to, frames, 1));
-    } else {
-        mParallel.AddTail(new MTimer(1));
-    }
+    mParallel.AddTail(mBG->mUnk10D4 ? mBG->mText->CreateOffsetAnime(from, to, frames, 1) : new MTimer(1));
     if (slides != NULL) {
         mSerial.AddTail(slides);
     }
