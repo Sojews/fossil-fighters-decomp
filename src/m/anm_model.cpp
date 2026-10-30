@@ -1158,8 +1158,11 @@ extern "C" const char data_020bb9ec[];  // "<translate_x"
 extern "C" const char data_020bb9fc[];  // "<translate_y"
 extern "C" const char data_020bba0c[];  // "<translate_z"
 
-// NONMATCHING (99.3%): each push_back's two flag bytes are the other way round (as with vector<void *> pushes in the
-// other ipa files).
+// (Pushed through a reference, which gives the game's order for push_back's byte temps under -ipa file.)
+static inline void MAnmPush(std::vector<void *> &v, void *const &x) {
+    v.push_back(x);
+}
+
 // Loads a node animation file (XML-like): the node's scale, rotate and translate value lists, then for each axis
 // its keys (data_size values from data_head, one every 16 frames) into the transform tracks.
 void MAnmLoadTracks(const char *path, MAnmModelBase *model) {
@@ -1203,7 +1206,7 @@ void MAnmLoadTracks(const char *path, MAnmModelBase *model) {
                     SkipWhitespace(&line);
                     value = (void *)ParseFx32(&line);
                     if (value != (void *)0x7fffffff) {
-                        scales.push_back(value);
+                        MAnmPush(scales, value);
                     }
                 } while (value != (void *)0x7fffffff);
                 break;
@@ -1212,7 +1215,7 @@ void MAnmLoadTracks(const char *path, MAnmModelBase *model) {
                     SkipWhitespace(&line);
                     value = (void *)ParseFx32(&line);
                     if (value != (void *)0x7fffffff) {
-                        rotates.push_back(value);
+                        MAnmPush(rotates, value);
                     }
                 } while (value != (void *)0x7fffffff);
                 break;
@@ -1221,7 +1224,7 @@ void MAnmLoadTracks(const char *path, MAnmModelBase *model) {
                     SkipWhitespace(&line);
                     value = (void *)ParseFx32(&line);
                     if (value != (void *)0x7fffffff) {
-                        translates.push_back(value);
+                        MAnmPush(translates, value);
                     }
                 } while (value != (void *)0x7fffffff);
                 break;
@@ -1248,8 +1251,8 @@ void MAnmLoadTracks(const char *path, MAnmModelBase *model) {
                 int head = ParseInt(&p);
                 for (int i = 0; i < size; i++) {
                     key.mFrame = (i + 1) << 4;
-                    key.mMin = (int)scales[head + i];
-                    key.mMax = (int)scales[head + i];
+                    key.mMin = (int)scales[i + head];
+                    key.mMax = (int)scales[i + head];
                     model->mTracks[6].push_back(key);
                 }
             }
@@ -1263,8 +1266,8 @@ void MAnmLoadTracks(const char *path, MAnmModelBase *model) {
                 int head = ParseInt(&p);
                 for (int i = 0; i < size; i++) {
                     key.mFrame = (i + 1) << 4;
-                    key.mMin = (int)scales[head + i];
-                    key.mMax = (int)scales[head + i];
+                    key.mMin = (int)scales[i + head];
+                    key.mMax = (int)scales[i + head];
                     model->mTracks[7].push_back(key);
                 }
             }
@@ -1278,8 +1281,8 @@ void MAnmLoadTracks(const char *path, MAnmModelBase *model) {
                 int head = ParseInt(&p);
                 for (int i = 0; i < size; i++) {
                     key.mFrame = (i + 1) << 4;
-                    key.mMin = (int)scales[head + i];
-                    key.mMax = (int)scales[head + i];
+                    key.mMin = (int)scales[i + head];
+                    key.mMax = (int)scales[i + head];
                     model->mTracks[8].push_back(key);
                 }
             }
@@ -1293,8 +1296,8 @@ void MAnmLoadTracks(const char *path, MAnmModelBase *model) {
                 int head = ParseInt(&p);
                 for (int i = 0; i < size; i++) {
                     key.mFrame = (i + 1) << 4;
-                    key.mMin = (int)rotates[head + i];
-                    key.mMax = (int)rotates[head + i];
+                    key.mMin = (int)rotates[i + head];
+                    key.mMax = (int)rotates[i + head];
                     model->mTracks[3].push_back(key);
                 }
             }
@@ -1308,8 +1311,8 @@ void MAnmLoadTracks(const char *path, MAnmModelBase *model) {
                 int head = ParseInt(&p);
                 for (int i = 0; i < size; i++) {
                     key.mFrame = (i + 1) << 4;
-                    key.mMin = (int)rotates[head + i];
-                    key.mMax = (int)rotates[head + i];
+                    key.mMin = (int)rotates[i + head];
+                    key.mMax = (int)rotates[i + head];
                     model->mTracks[4].push_back(key);
                 }
             }
@@ -1323,8 +1326,8 @@ void MAnmLoadTracks(const char *path, MAnmModelBase *model) {
                 int head = ParseInt(&p);
                 for (int i = 0; i < size; i++) {
                     key.mFrame = (i + 1) << 4;
-                    key.mMin = (int)rotates[head + i];
-                    key.mMax = (int)rotates[head + i];
+                    key.mMin = (int)rotates[i + head];
+                    key.mMax = (int)rotates[i + head];
                     model->mTracks[5].push_back(key);
                 }
             }
@@ -1338,8 +1341,8 @@ void MAnmLoadTracks(const char *path, MAnmModelBase *model) {
                 int head = ParseInt(&p);
                 for (int i = 0; i < size; i++) {
                     key.mFrame = (i + 1) << 4;
-                    key.mMin = (int)translates[head + i];
-                    key.mMax = (int)translates[head + i];
+                    key.mMin = (int)translates[i + head];
+                    key.mMax = (int)translates[i + head];
                     model->mTracks[0].push_back(key);
                 }
             }
@@ -1353,8 +1356,8 @@ void MAnmLoadTracks(const char *path, MAnmModelBase *model) {
                 int head = ParseInt(&p);
                 for (int i = 0; i < size; i++) {
                     key.mFrame = (i + 1) << 4;
-                    key.mMin = (int)translates[head + i];
-                    key.mMax = (int)translates[head + i];
+                    key.mMin = (int)translates[i + head];
+                    key.mMax = (int)translates[i + head];
                     model->mTracks[1].push_back(key);
                 }
             }
@@ -1368,8 +1371,8 @@ void MAnmLoadTracks(const char *path, MAnmModelBase *model) {
                 int head = ParseInt(&p);
                 for (int i = 0; i < size; i++) {
                     key.mFrame = (i + 1) << 4;
-                    key.mMin = (int)translates[head + i];
-                    key.mMax = (int)translates[head + i];
+                    key.mMin = (int)translates[i + head];
+                    key.mMax = (int)translates[i + head];
                     model->mTracks[2].push_back(key);
                 }
             }
