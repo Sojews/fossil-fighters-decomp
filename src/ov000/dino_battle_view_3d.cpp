@@ -178,7 +178,6 @@ void B3DStatusViewTask::StateFade() {
 }
 
 // Goes on to the next status: within the same group the cameras just resume, else the group fades.
-// NONMATCHING: 98%, the fade's duration is loaded later than in the game (scheduling).
 void B3DStatusViewTask::StateNext() {
     mView->GetUnk19C(&mUnk7C, &mUnk80);
     if (mUnk80 == (u32)-1) {

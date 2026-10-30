@@ -10,7 +10,7 @@
 #include "game/help.h"
 #include "game/dino_field_camera_hook.h"
 
-extern "C" u32 data_0208a0b4, data_0208a0b8;
+extern "C" const u32 data_0208a0b4, data_0208a0b8;
 
 class BlackInTask : public MProcess {
 public:

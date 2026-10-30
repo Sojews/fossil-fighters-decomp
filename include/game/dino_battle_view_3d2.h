@@ -148,7 +148,7 @@ public:
     u32 mMask;              // 0x14
 };
 
-extern "C" u32 data_0208a0b4, data_0208a0b8;
+extern "C" const u32 data_0208a0b4, data_0208a0b8;
 
 class DinoBattleView3DGroupFade : public MProcess {
 public:
