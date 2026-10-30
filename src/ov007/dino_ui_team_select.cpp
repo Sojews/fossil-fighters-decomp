@@ -1,5 +1,4 @@
 // DinoUiTeamSelect.
-// NONMATCHING: DinoUiTeamSelect::Idle (an extra cmp on the new menu's null check).
 
 // Derived destructors have their bases' destructor bodies inlined; auto-inlining the ones defined above does that.
 #pragma auto_inline on
@@ -288,8 +287,10 @@ void DinoUiTeamSelect::Idle() {
     gLcd->VSyncNow();
     gLcd->SetBottomDisplay(gLcd->mSub);
     gCurrentDisplay = gLcd->GetBottomDisplay();
-    gLcd->GetTopDisplay()->mBright->Reset();
-    gLcd->GetBottomDisplay()->mBright->Reset();
+    MDisplay *top = gLcd->GetTopDisplay();
+    top->mBright->Reset();
+    MDisplay *bottom = gLcd->GetBottomDisplay();
+    bottom->mBright->Reset();
     MTask *exit = MTaskExitTransfer::Create(this);
     MTask *menu = new DinoUiTeamSelectMenu((int *)mResult, mUnk78, mUnk79);
     MSerialTaskSet *serial = &mSerial;
