@@ -20,10 +20,7 @@ void MAnime::Reset() {
     mLoopsLeft = mLoops;
 }
 
-// NONMATCHING: the two halves' stack slots are swapped.
 void MAnime::Execute() {
-    int ease;
-
     if (!mStarted) {
         Reset();
     }
@@ -45,17 +42,17 @@ void MAnime::Execute() {
     u32 count = mSteps;
     int max = count - 1;
     int step = (int)(max * mFrame) / (int)mDuration;
-    ease = mEase;
+    int ease = mEase;
     if (ease != 0) {
         if (ease > 10) {
-            u32 half = (u32)count >> 1;
+            int half = (u32)count >> 1;
             if ((u32)step < half) {
                 u32 n = ease - 10;
                 step = EasePow(step, n, half - 1);
             } else {
                 u32 n = ease - 10;
                 int rest = max - half;
-                int v = EasePow(rest - (step - (int)half), n, rest);
+                u32 v = EasePow(rest - (step - (int)half), n, rest);
                 step = half + (rest - v);
             }
         } else if (ease < -10) {
@@ -68,8 +65,8 @@ void MAnime::Execute() {
                 step = (half - 1) - v;
             } else {
                 u32 n = -(10 + ease);
-                int d = max - half;
                 const int b = step - (int)half;
+                int d = max - half;
                 int v = EasePow(b, n, d);
                 step = half + v;
             }
