@@ -337,7 +337,7 @@ MFx32 DinoBattleCpuController::ScoreEscape(DinoBattleModelPlayer *player, DinoBa
             total = total + score;
             break;
         case 1:
-            total = total + score * player->GetRandom()->NextFraction();
+            total += score * player->GetRandom()->NextFraction();
             break;
         case 0x30:
             if ((support1 != NULL && creature->CompareUnkED0C(rival) < 0 && support1->CompareUnkED0C(rival) >= 0) ||
@@ -403,18 +403,18 @@ MFx32 DinoBattleCpuController::ScoreEscape(DinoBattleModelPlayer *player, DinoBa
             break;
         case 0x3F:
             if (bestSlot == 0) {
-                total = total + score * (MFx32(1) - MFx32(1) * MFx32((int)strongest->GetUnkE4()) /
+                total += score * (MFx32(1) - MFx32(1) * MFx32((int)strongest->GetUnkE4()) /
                                                        MFx32((int)strongest->GetUnkE8()));
             }
             break;
         case 0x40:
             if (player->AllCreaturesShareDefFlag()) {
-                total = total + score * (MFx32(1) - MFx32(1) * MFx32((int)creature->GetUnkE4()) /
+                total += score * (MFx32(1) - MFx32(1) * MFx32((int)creature->GetUnkE4()) /
                                                        MFx32((int)creature->GetUnkE8()));
             }
             break;
         case 0x41:
-            total = total + score * (MFx32(1) - MFx32(1) * MFx32((int)creature->GetUnkE4()) /
+            total += score * (MFx32(1) - MFx32(1) * MFx32((int)creature->GetUnkE4()) /
                                                    MFx32((int)creature->GetUnkE8()));
             break;
         case 0x42:
@@ -525,7 +525,7 @@ MFx32 DinoBattleCpuController::ScoreAttack(DinoBattleModelPlayer *player, DinoBa
             total = total + score;
             break;
         case 1:
-            total = total + score * player->GetRandom()->NextFraction();
+            total += score * player->GetRandom()->NextFraction();
             break;
         case 5:
             for (u32 t = 0; t < mTargets.size(); t++) {
@@ -546,10 +546,10 @@ MFx32 DinoBattleCpuController::ScoreAttack(DinoBattleModelPlayer *player, DinoBa
             }
             break;
         case 7:
-            total = total + score * MFx32((int)creature->GetUnkE4()) / MFx32((int)creature->GetUnkE8());
+            total += score * MFx32((int)creature->GetUnkE4()) / MFx32((int)creature->GetUnkE8());
             break;
         case 8:
-            total = total + score * (MFx32(1) - MFx32(1) * MFx32((int)creature->GetUnkE4()) /
+            total += score * (MFx32(1) - MFx32(1) * MFx32((int)creature->GetUnkE4()) /
                                                    MFx32((int)creature->GetUnkE8()));
             break;
         case 3:
@@ -644,7 +644,7 @@ MFx32 DinoBattleCpuController::ScoreAttack(DinoBattleModelPlayer *player, DinoBa
             }
             break;
         case 0x17:
-            total = total + score * MFx32(opponent->GetUnk128()) / MFx32((int)opponent->GetUnk14C());
+            total += score * MFx32(opponent->GetUnk128()) / MFx32((int)opponent->GetUnk14C());
             break;
         case 0x18:
             if (opponent->FindCreature(0) == opponent->GetCreatureInSlot(0)) {
@@ -771,7 +771,7 @@ MFx32 DinoBattleCpuController::ScoreAttack(DinoBattleModelPlayer *player, DinoBa
             if (opponent->GetCreatureCount() > 1 && !LeaderHasStatus(opponent, 2) && !LeaderHasStatus(opponent, 4) &&
                 !LeaderHasStatus(opponent, 6) && !LeaderHasStatus(opponent, 7) && !LeaderHasStatus(opponent, 5) &&
                 !LeaderHasStatus(opponent, 3)) {
-                total = total + score * player->GetRandom()->NextFraction();
+                total += score * player->GetRandom()->NextFraction();
             }
             break;
         }
@@ -798,7 +798,7 @@ MFx32 DinoBattleCpuController::ScoreTarget(DinoBattleModelPlayer *player, DinoBa
             total = total + score;
             break;
         case 1:
-            total = total + score * player->GetRandom()->NextFraction();
+            total += score * player->GetRandom()->NextFraction();
             break;
         case 0x62:
             if ((int)target->GetUnkE4() <= EstimateDamage(creature, target, attack)) {
@@ -1009,7 +1009,7 @@ MFx32 DinoBattleCpuController::ScoreTarget(DinoBattleModelPlayer *player, DinoBa
             break;
         }
         case 0x87:
-            total = total + score * (MFx32(1) - MFx32(1) * MFx32((int)target->GetUnkE4()) /
+            total += score * (MFx32(1) - MFx32(1) * MFx32((int)target->GetUnkE4()) /
                                                    MFx32((int)target->GetUnkE8()));
             break;
         case 0x88:
@@ -1053,7 +1053,7 @@ MFx32 DinoBattleCpuController::ScoreCreatureConditions(DinoBattleModelPlayer *pl
             total = total + score;
             break;
         case 1:
-            total = total + score * player->GetRandom()->NextFraction();
+            total += score * player->GetRandom()->NextFraction();
             break;
         case 0x46:
             if (HasCostlyAttackUnk10(player, creature, 2)) {
@@ -1223,7 +1223,7 @@ MFx32 DinoBattleCpuController::ScoreConditions(DinoBattleModelPlayer *player, Di
             total = total + score;
             break;
         case 1:
-            total = total + score * player->GetRandom()->NextFraction();
+            total += score * player->GetRandom()->NextFraction();
             break;
         case 0x8B:
             if ((int)creature->GetUnkE4() > (int)target->GetUnkE4()) {
