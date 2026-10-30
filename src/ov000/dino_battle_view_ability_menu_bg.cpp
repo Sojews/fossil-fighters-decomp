@@ -412,6 +412,7 @@ extern "C" MRect data_ov000_02194950;     // the cancel help's rect
 extern "C" MPoint data_ov000_021947ec;    // the cost text's position
 extern "C" const u32 data_0208a190;       // the open slide's length
 extern const u32 gKasekiRockSizeText[];
+extern "C" const u32 data_0208a360;   // (gKasekiRockSizeText[5], which the game reaches by its own address)
 extern "C" DinoBattleViewAbilityTextWindow *func_ov000_0217c0b8(DinoBattleViewAbilityMenuBG *bg, BOOL rows);
 extern "C" MPoint func_ov000_02175b90(DinoBattleViewCreature *creature);
 extern "C" MTask *func_ov000_0218ec8c(u32 arg0, int arg1, BOOL *proceed);
@@ -435,7 +436,7 @@ void DinoBattleViewUiAbilityMenu::OnStart() {
         mParallel.AddTail(mHelps[i]);
     }
     DinoBattleHelpBase *cancel =
-        new DinoBattleHelpBase(gLcd->GetBottomDisplay(), data_ov000_02194950, gKasekiRockSizeText[5]);
+        new DinoBattleHelpBase(gLcd->GetBottomDisplay(), data_ov000_02194950, data_0208a360);
     mParallel.AddTail(cancel);
     SetSelectedItem(mHelps[0]);
     for (u32 i = 0; i < 3; i++) {

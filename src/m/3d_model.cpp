@@ -870,7 +870,7 @@ void M3DModelPatchDisplayList(M3DModel *model, const u32 *tags, u32 count) {
                 const u8 *mtx = anim + (((const u32 *) anim)[3] + (((const u32 *) anim)[1] + ((const u32 *) anim)[2]));
                 u32 n = arg >> 8;
                 while (n--) {
-                    mtx += 4 + ((const u32 *) anim)[6] * 0x30;
+                    mtx = mtx + 4 + ((const u32 *) anim)[6] * 0x30;
                 }
                 MIi_CpuCopy32(mtx + 4 + frameOffset, model->mModelData + (offset & ~1), 0x30);
                 break;
