@@ -417,8 +417,8 @@ static struct SetVarTaskStaticInit {
         DINO_POOL_WORD(data_ov000_021971f0, 0x0) = 288;
         DINO_POOL_WORD(data_ov000_021971f0, 0x4) = 160;
         DINO_POOL_WORD(data_ov000_02197138, 0xc0) = 0;
-        DINO_POOL_WORD(data_ov000_02197138, 0xc4) = 0;
         DINO_POOL_WORD(data_ov000_02197200, 0x0) = -64;
+        DINO_POOL_WORD(data_ov000_02197138, 0xc4) = 0;
         DINO_POOL_WORD(data_ov000_02197200, 0x4) = 0;
         const s32 *pos = (const s32 *)&data_ov000_02197138;
         s32 x = pos[0x24 / 4];

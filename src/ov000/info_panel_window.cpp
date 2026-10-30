@@ -616,8 +616,8 @@ static struct InfoPanelWindowStaticInit {
         DINO_POOL_WORD(data_ov000_02194eb4, 0x4) = 41;
         DINO_POOL_WORD(data_ov000_02194ebc, 0x0) = 81;
         DINO_POOL_WORD(data_ov000_02194ebc, 0x4) = 41;
-        DINO_POOL_WORD(data_ov000_02194ec4, 0x0) = 21;
         DINO_POOL_WORD(data_ov000_02194ec4, 0x4) = 59;
+        DINO_POOL_WORD(data_ov000_02194ec4, 0x0) = 21;
         DINO_POOL_WORD(data_ov000_02194ecc, 0x0) = 81;
         DINO_POOL_WORD(data_ov000_02194ecc, 0x4) = 59;
         DINO_POOL_WORD(data_ov000_02194d8c, 0xf0) = 51;
