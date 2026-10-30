@@ -2280,10 +2280,10 @@ void DinoBattleModelPlayer::OnMessage(MMessage *msg) {
                                 DinoCreatePostAndWaitTask(mUnkF4, new DinoBattleViewWaitActionInfoBarRequest(0)),
                                 DinoSoundCreatePlaySeTask(0x4E, 0), new PlayerUpdateTask(mOpponent, 0),
                                 mUnkF4->CreatePostTask(
-                                    new DinoBattleViewFreeCoordEffectRequest(mOpponent->mUnkB4 == 0 ? 0 : 1, 1)),
+                                    new DinoBattleViewFreeCoordEffectRequest(mOpponent->mUnkB4 == 0 ? DINO_FREE_COORD_LEFT : DINO_FREE_COORD_RIGHT, 1)),
                                 new MTimer(data_0208a18c), DinoSoundCreatePlaySeTask(0x51, 0),
                                 new PlayerUpdateTask(this, 0),
-                                mUnkF4->CreatePostTask(new DinoBattleViewFreeCoordEffectRequest(mUnkB4 == 0 ? 0 : 1, 0)),
+                                mUnkF4->CreatePostTask(new DinoBattleViewFreeCoordEffectRequest(mUnkB4 == 0 ? DINO_FREE_COORD_LEFT : DINO_FREE_COORD_RIGHT, 0)),
                                 new MTimer(1), CreateFieldEffectWaitTask());
             }
         }
