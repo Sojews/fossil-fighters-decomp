@@ -771,31 +771,33 @@ inline DinoKBBackButton::DinoKBBackButton(DinoUiKeyboardMenu *menu, MSmartOam *o
 }
 
 #define DINO_KB_ARROW_MOTIONS()                                                                                  \
-    switch (mIndex) {                                                                                            \
-    case 4:                                                                                                      \
-        mMotion = new MMotion(std::string(((const DinoUiKeyboardLayout *)data_ov007_02190fa0)->mPaths[4]),       \
-                              ((DinoUiKeyboardMenu *)unk98)->mOam, 2, 1);                                         \
-        mMotion->Play(1, 0);                                                                                     \
-        mMotion->SetPosition(mPos);                                                                              \
-        mMotion->SetPriority(2);                                                                                 \
-        mMotion->Show();                                                                                         \
-        mFrame = mMotion->GetFrame();                                                                            \
-        mParallel.AddTail(mMotion);                                                                              \
-        mTasks = new MSerialTaskSet(FALSE);                                                                      \
-        mParallel.AddTail(mTasks);                                                                               \
-        break;                                                                                                   \
-    case 5:                                                                                                      \
-        mMotion = new MMotion(std::string(((const DinoUiKeyboardLayout *)data_ov007_02190fa0)->mPaths[7]),       \
-                              ((DinoUiKeyboardMenu *)unk98)->mOam, 2, 1);                                         \
-        mMotion->Play(1, 0);                                                                                     \
-        mMotion->SetPosition(mPos);                                                                              \
-        mMotion->SetPriority(2);                                                                                 \
-        mMotion->Show();                                                                                         \
-        mFrame = mMotion->GetFrame();                                                                            \
-        mParallel.AddTail(mMotion);                                                                              \
-        mTasks = new MSerialTaskSet(FALSE);                                                                      \
-        mParallel.AddTail(mTasks);                                                                               \
-        break;                                                                                                   \
+    if (mIndex >= 4) {                                                                                           \
+        switch (mIndex) {                                                                                        \
+        case 4:                                                                                                  \
+            mMotion = new MMotion(std::string(((const DinoUiKeyboardLayout *)data_ov007_02190fa0)->mPaths[4]),   \
+                                  ((DinoUiKeyboardMenu *)unk98)->mOam, 2, 1);                                    \
+            mMotion->Play(1, 0);                                                                                 \
+            mMotion->SetPosition(mPos);                                                                          \
+            mMotion->SetPriority(2);                                                                             \
+            mMotion->Show();                                                                                     \
+            mFrame = mMotion->GetFrame();                                                                        \
+            mParallel.AddTail(mMotion);                                                                          \
+            mTasks = new MSerialTaskSet(FALSE);                                                                  \
+            mParallel.AddTail(mTasks);                                                                           \
+            break;                                                                                               \
+        case 5:                                                                                                  \
+            mMotion = new MMotion(std::string(((const DinoUiKeyboardLayout *)data_ov007_02190fa0)->mPaths[7]),   \
+                                  ((DinoUiKeyboardMenu *)unk98)->mOam, 2, 1);                                    \
+            mMotion->Play(1, 0);                                                                                 \
+            mMotion->SetPosition(mPos);                                                                          \
+            mMotion->SetPriority(2);                                                                             \
+            mMotion->Show();                                                                                     \
+            mFrame = mMotion->GetFrame();                                                                        \
+            mParallel.AddTail(mMotion);                                                                          \
+            mTasks = new MSerialTaskSet(FALSE);                                                                  \
+            mParallel.AddTail(mTasks);                                                                           \
+            break;                                                                                               \
+        }                                                                                                        \
     }                                                                                                            \
     switch (mIndex) {                                                                                            \
     case 1:                                                                                                      \
