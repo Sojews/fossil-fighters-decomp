@@ -567,6 +567,8 @@ struct DinoDamageMotion {
     const char *path;   // 0x10
 };
 extern "C" DinoDamageMotion data_ov000_02193254[7];
+// (The game's code reaches the table's paths through these two nearby addresses, 0x24 before it and 0x5C into it.)
+extern "C" const char *data_ov000_02193230[], *data_ov000_021932b0[];
 extern "C" u32 data_ov000_021978d8;     // their initialization guard
 extern "C" const char *const data_0208a2a4, *const data_0208a2a8, *const data_0208a2ac;
 
@@ -605,13 +607,13 @@ void DinoBattleViewCreature::OnMessage(MMessage *msg) {
             break;
         }
         if (!(data_ov000_021978d8 & 1)) {
-            data_ov000_02193254[0].path = data_0208a2a4;
-            data_ov000_02193254[1].path = data_0208a2a8;
-            data_ov000_02193254[2].path = data_0208a2a8;
-            data_ov000_02193254[3].path = data_0208a2a8;
-            data_ov000_02193254[4].path = data_0208a2a8;
-            data_ov000_02193254[5].path = data_0208a2ac;
-            data_ov000_02193254[6].path = data_0208a2ac;
+            data_ov000_02193230[0x34 / 4] = data_0208a2a4;
+            data_ov000_02193230[0x48 / 4] = data_0208a2a8;
+            data_ov000_02193230[0x5C / 4] = data_0208a2a8;
+            data_ov000_02193230[0x70 / 4] = data_0208a2a8;
+            data_ov000_021932b0[0x04 / 4] = data_0208a2a8;
+            data_ov000_021932b0[0x18 / 4] = data_0208a2ac;
+            data_ov000_021932b0[0x2C / 4] = data_0208a2ac;
             data_ov000_021978d8 |= 1;
         }
         for (u32 i = 0; i < 7; i++) {
