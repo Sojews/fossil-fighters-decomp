@@ -26,6 +26,24 @@ extern "C" struct {
     int mDefaultEncoding;   // 0x08
 } data_020c09c4;
 #define sDefaultEncoding (data_020c09c4.mDefaultEncoding)
+
+// The set's insert, spelled out: the game reads its pair's bools from the TU's .data pool (false at +1, true at +2)
+// where ours would pool them at its own offsets.
+typedef std::__red_black_tree<wchar_t, wchar_t, std::__identity<wchar_t>, std::less<wchar_t>, std::allocator<wchar_t> >
+    MWcharTree;
+template <> std::pair<MWcharTree::iterator, bool> MWcharTree::insert_unique(const wchar_t &v) {
+    node_base *last_not_greater;
+    bool left;
+    bool leftmost;
+    node_base *p = find_insert_position(std::__identity<wchar_t>::get(v), last_not_greater, left, leftmost);
+    if (last_not_greater == 0 || std::__identity<wchar_t>::less(static_cast<std::less<wchar_t> &>(*this),
+                                                                 static_cast<node *>(last_not_greater)->data_,
+                                                                 std::__identity<wchar_t>::get(v))) {
+        return std::pair<iterator, bool>(iterator(insert_node_at(p, left, leftmost, v)),
+                                         *((const bool *)&data_020c09c4 + 2));
+    }
+    return std::pair<iterator, bool>(iterator(last_not_greater), *((const bool *)&data_020c09c4 + 1));
+}
 static std::set<wchar_t> sUnkTextChars;
 static std::set<wchar_t> sUnkChars;
 static OSOwnerInfo *sOwnerInfo;
