@@ -163,8 +163,9 @@ void MAnmModelBase::Unk0C() {
 #pragma opt_strength_reduction off
 // A track's value at a frame: random between the keys' bounds, interpolated between the keys around the frame
 // (the last key's bounds after the last key, the first key's before the first).
-// NONMATCHING: the game reloads the track's size in the search loop and recomputes the track's address at each use,
-// and keeps the 64-bit operands on the stack.
+// NONMATCHING: 92%, the search loop reloads the frame from the stack in the game, and some registers differ.
+#pragma opt_common_subs off
+#pragma opt_loop_invariants off
 int MAnmModelBase::GetValue(int track, int frame) {
     u32 count = mTracks[track].size();
     if (count == 0) {
@@ -172,7 +173,7 @@ int MAnmModelBase::GetValue(int track, int frame) {
     }
     u32 i;
     for (i = 0; i < mTracks[track].size(); i++) {
-        if (frame + 0x10 < mTracks[track][i].mFrame) {
+        if (mTracks[track][i].mFrame > frame + 0x10) {
             break;
         }
     }
@@ -186,18 +187,25 @@ int MAnmModelBase::GetValue(int track, int frame) {
     }
     MAnmKey *a = &mTracks[track][i - 1];
     MAnmKey *b = &mTracks[track][i];
-    s64 span = (s64)b->mFrame - a->mFrame;
+    s64 aFrame = a->mFrame;
+    s64 aMin = a->mMin;
+    s64 bMin = b->mMin;
+    s64 aMax = a->mMax;
+    s64 bMax = b->mMax;
+    s64 span = (s64)b->mFrame - aFrame;
     frame += 0x10;
-    s64 t = (s64)frame - a->mFrame;
+    s64 t = (s64)frame - aFrame;
     s64 u = span - t;
     if (span == 0) {
-        return a->mMin + mRandom.Next(a->mMax - a->mMin);
+        return (int)aMin + mRandom.Next((int)aMax - (int)aMin);
     }
-    int lo = ((s64)a->mMin * u + (s64)b->mMin * t) / span;
-    int hi = ((s64)a->mMax * u + (s64)b->mMax * t) / span;
+    int lo = (aMin * u + bMin * t) / span;
+    int hi = (aMax * u + bMax * t) / span;
     return lo + mRandom.Next(hi - lo);
 }
 
+#pragma opt_loop_invariants reset
+#pragma opt_common_subs reset
 void MAnmModelBase::PlaySounds(int frame) {
     if (mSounds.size() != 0) {
         for (u32 i = 0; i < mSounds.size(); i++) {
