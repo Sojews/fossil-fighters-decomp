@@ -1086,10 +1086,14 @@ void MMotion::SetCellRect(int cell, MRect rect) {
 // Changes the cell's graphics (and shape), then places it again for the new size.
 // NONMATCHING: register allocation (the game keeps the cell's scaled index in a register and spills the cell).
 void MMotion::SetCellChr(int cell, u32 chr) {
+    int h;
+    MSmartOamCell *entry;
+    int w;
     MMotionCell &c = mCells[cell];
-    MSmartOamCell *entry = &mEntries[c.entry];
+    entry = &mEntries[c.entry];
     const MMotionGfxHeader *data =
         (const MMotionGfxHeader *) mFile.GetChr(chr, mUnk78 != NULL ? &mUnk78->animes[cell] : NULL);
+    int ox = c.unk14.x;
     c.unk04 = chr;
     entry->colors256 = data->mode;
     if (mFlags & 2) {
@@ -1100,13 +1104,12 @@ void MMotion::SetCellChr(int cell, u32 chr) {
         entry->SetChr(mChrs[chr]);
         entry->SetShape(data->extPalette);
     }
-    int ox = c.unk14.x;
     entry = &mEntries[c.entry];
     int oy = c.unk14.y;
     if (mUnk2B || mUnk2C) {
         int shape = entry->GetShape();
-        int w = gObjSizes[0][shape].x;
-        int h = gObjSizes[0][shape].y;
+        w = gObjSizes[0][shape].x;
+        h = gObjSizes[0][shape].y;
         if (c.objMode == 3) {
             w *= 2;
             h *= 2;
