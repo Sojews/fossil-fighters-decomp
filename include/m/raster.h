@@ -108,7 +108,8 @@ public:
     // Takes a disc out of the window.
     void SubtractCircle(MPoint center, int radius);
     template <class Op> inline void ForEachLine(MRect rect, Op op);
-    template <class Op> inline void ForEachCircleLine(MPoint center, int radius, Op op);
+    template <class Op> inline void ForEachLineGuarded(MRect rect, Op op);
+    template <class Op> inline void ForEachCircleLine(Op op, MPoint center, int radius);
 
     MWin *mWin;             // 0x3C
     MRasterSpan *mSpans;    // 0x40: two per line

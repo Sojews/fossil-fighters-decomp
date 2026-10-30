@@ -282,9 +282,9 @@ void MSmartOam::Execute() {
             mask |= 0x3ff;
         }
         for (u32 i = 2; i <= mCount; i++) {
+            u32 j = i;
             int index = mOrder[i];
             u32 key = mEntries[index].links & mask;
-            u32 j = i;
             while ((mEntries[mOrder[j - 1]].links & mask) > key) {
                 mOrder[j] = mOrder[j - 1];
                 j--;
@@ -292,11 +292,11 @@ void MSmartOam::Execute() {
             mOrder[j] = index;
         }
     }
-    MOamCell *dst = mOamBlock->GetEntries();
     int left = mUnk3C;
     int top = mUnk40;
     int right = mClipWidth;
     int bottom = mClipHeight;
+    MOamCell *dst = mOamBlock->GetEntries();
     u32 i = 1;
     u32 used = 0;
     for (; i <= mCount && used < mOamCount; i++) {
@@ -304,10 +304,7 @@ void MSmartOam::Execute() {
         if (cell->objMode == 2) {
             continue;
         }
-        MPoint origin;
-        origin.x = cell->posX - cell->unk08;
-        origin.y = cell->posY - cell->unk0C;
-        MPoint pos = origin - mOffset;
+        MPoint pos = MPoint(cell->posX - cell->unk08, cell->posY - cell->unk0C) - mOffset;
         if (pos.x + cell->width < left || pos.x >= right || pos.y + cell->height < top || pos.y >= bottom) {
             continue;
         }

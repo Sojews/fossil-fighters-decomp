@@ -187,11 +187,30 @@ template <class Op> inline void MRasterWindow::ForEachLine(MRect rect, Op op) {
     }
 }
 
+// (AddRect's copy, whose loop tests its entry twice.)
+template <class Op> inline void MRasterWindow::ForEachLineGuarded(MRect rect, Op op) {
+    if (mAutoFlip && !mChanged) {
+        Clear();
+    }
+    if (MRect(0, 0, 256, M_RASTER_LINES).Intersects(rect)) {
+        rect = rect.Intersection(MRect(0, 0, 256, M_RASTER_LINES));
+        int y = rect.top;
+        if (y < rect.bottom) {
+            for (; y < rect.bottom; y++) {
+                op(rect.left, rect.right, y);
+            }
+        }
+    }
+}
+
 // Adds [left, right) to a line, merged into a span it touches.
 struct AddSpanOp {
     AddSpanOp(MRasterWindow *window) : mWindow(window) {}
     inline void operator()(int left, int right, int line) {
-        MRasterSpan *spans = &mWindow->mSpans[line * 2];
+        if (left >= right) {
+            return;
+        }
+        MRasterSpan *spans = (MRasterSpan *)((u8 *)mWindow->mSpans + line * 16);
         u8 *regs = mWindow->mBack + line * 4;
         if (spans[0].IsEmpty()) {
             spans[0].Set(left, right);
@@ -222,7 +241,7 @@ struct SubtractSpanOp {
 // (The span adder is big; the game inlines it anyway.)
 #pragma inline_max_size(2000)
 void MRasterWindow::AddRect(MRect rect) {
-    ForEachLine(rect, AddSpanOp(this));
+    ForEachLineGuarded(rect, AddSpanOp(this));
 }
 
 void MRasterWindow::SubtractSpan(int left, int right, int line) {
@@ -274,7 +293,7 @@ void MRasterWindow::SubtractRect(MRect rect) {
 static const int sRasterWidth = 256;
 
 // Calls op for the lines of a disc, four at a time (midpoint circle), with each line's clipped left and right edges.
-template <class Op> inline void MRasterWindow::ForEachCircleLine(MPoint center, int radius, Op op) {
+template <class Op> inline void MRasterWindow::ForEachCircleLine(Op op, MPoint center, int radius) {
     if (mAutoFlip && !mChanged) {
         Clear();
     }
@@ -322,11 +341,11 @@ template <class Op> inline void MRasterWindow::ForEachCircleLine(MPoint center, 
 
 // NONMATCHING: stack slots, and the inlined span adds differ (as in AddRect).
 void MRasterWindow::SetCircle(MPoint center, int radius) {
-    ForEachCircleLine(center, radius, AddSpanOp(this));
+    ForEachCircleLine(AddSpanOp(this), center, radius);
 }
 
 // NONMATCHING: the game swaps the stack slots of the rect and its copy for Intersects, and keeps the window in a
 // register from later.
 void MRasterWindow::SubtractCircle(MPoint center, int radius) {
-    ForEachCircleLine(center, radius, SubtractSpanOp(this));
+    ForEachCircleLine(SubtractSpanOp(this), center, radius);
 }
