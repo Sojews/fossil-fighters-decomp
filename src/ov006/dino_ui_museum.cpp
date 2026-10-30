@@ -1,4 +1,5 @@
 // DinoUiMuseum.
+#pragma ipa file
 
 // Derived destructors have their bases' destructor bodies inlined; auto-inlining the ones defined above does that.
 #pragma auto_inline on
@@ -290,7 +291,7 @@ static inline const DinoMuseumDef *GetMuseumDef(const DinoMuseumDefs *defs, u32 
     return (const DinoMuseumDef *)((const u8 *)defs + defs->tableOffset) + id;
 }
 
-// OnStart's function-local static and its guard come first in the file's .bss (OnStart isn't decompiled yet).
+// OnStart's guard and the word after it come first in the file's .bss.
 static u32 sOnStartStatic[2];
 // The museum's definitions, held in a static object (made and freed by the file's static initializer).
 static MResource<DinoMuseumDefs> sMuseumDefs;
@@ -561,6 +562,8 @@ void DinoUiMuseumInformationMenu::Refresh() {
     mModel->SetModel(id);
 }
 
+// (Called, not inlined, by the buttons above: the file is built with ipa.)
+#pragma auto_inline off
 void DinoUiMuseumInformationMenu::PlayVoice() {
     DinoSoundPlaySe(gDinoResource->GetCreatureDef(mInfo->mCreatures[*mPage])->voice + 0x475, 0);
 }
@@ -587,6 +590,8 @@ void DinoUiMuseumInformationMenu::PageLeft() {
     *mPage = (*mPage + mInfo->mPageCount - 1) % mInfo->mPageCount;
     Refresh();
 }
+
+#pragma auto_inline reset
 
 void DinoUiMuseumMenu::OnIdle() {
     mUnk1AC = TRUE;
@@ -750,14 +755,14 @@ static inline MTaskSet *MuseumInfoParallel(DinoUiMuseumInformationMenu *menu) {
 // The help areas, the page fraction and buttons, the tab picture and tabs, the cursor, the slots' cry numbers, the
 // name, the information picture and the 3D model; then the slots, and a fade in from white.
 void DinoUiMuseumMenu::OnStart() {
-    u32 guard = data_ov006_02199188;
+    u32 guard = sOnStartStatic[0];
     if (!(guard & 1)) {
         DINO_POOL_WORD(data_ov006_02196388, 0x70) = data_0208a5bc;
         DINO_POOL_WORD(data_ov006_02196388, 0x74) = data_0208a5b8;
         DINO_POOL_WORD(data_ov006_02196388, 0x78) = data_0208a5b4;
         DINO_POOL_WORD(data_ov006_02196388, 0x7c) = data_0208a5b0;
         DINO_POOL_WORD(data_ov006_02196408, 0) = data_0208a5ac;
-        DINO_POOL_WORD(data_ov006_02199188, 0) = guard | 1;
+        DINO_POOL_WORD(sOnStartStatic, 0) = guard | 1;
     }
     SetLinkFallback(1);
     {
@@ -1064,11 +1069,14 @@ void DinoUiMuseum3DModel::LoadModel() {
     mTasks->AddTail(mModel);
 }
 
+// (Called, not inlined, by Refresh and OnFocus under ipa.)
+#pragma auto_inline off
 void DinoUiMuseum3DModel::SetModel(u32 id) {
     if (mRequested != id) {
         mRequested = id;
     }
 }
+#pragma auto_inline reset
 
 extern "C" struct {
     void (DinoUiMuseum3DModel::*LoadModel_00)();
