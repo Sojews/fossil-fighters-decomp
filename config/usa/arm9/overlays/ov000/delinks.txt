@@ -92,6 +92,7 @@ src/ov000/view_status_effect_icon.cpp:
 
 src/ov000/dino_battle_debug_log.cpp:
     .text       start:0x0217fcd0 end:0x0217ffdc
+    .init       start:0x02190a70 end:0x02190bf0
 
 src/ov000/dino_battle_view2.cpp:
     .text       start:0x0217ffdc end:0x021817fc
