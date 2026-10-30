@@ -39,15 +39,14 @@ void MAffineScreen::SetCenter(MPoint center) {
 static inline void SetBgAffine(volatile u32 *regs, const MtxFx22 *mtx, int centerX, int centerY, int x, int y) {
     regs[0] = (u16)(s16)(mtx->_00 >> 4) | ((u16)(s16)(mtx->_01 >> 4) << 16);
     regs[1] = (u16)(s16)(mtx->_10 >> 4) | ((u16)(s16)(mtx->_11 >> 4) << 16);
-    int dx = x - centerX;
-    int dy = y - centerY;
-    fx32 refY = (centerY << 12) + (mtx->_10 * dx + mtx->_11 * dy) + 0x800;
-    fx32 refX = (centerX << 12) + (mtx->_00 * dx + mtx->_01 * dy) + 0x800;
+    x -= centerX;
+    y -= centerY;
+    fx32 refY = (centerY << 12) + (mtx->_10 * x + mtx->_11 * y) + 0x800;
+    fx32 refX = (centerX << 12) + (mtx->_00 * x + mtx->_01 * y) + 0x800;
     regs[2] = refX >> 4;
     regs[3] = refY >> 4;
 }
 
-// NONMATCHING: the reference point math is scheduled differently (dx/dy land in swapped registers).
 void MAffineScreen::Update() {
     MtxFx22 mtx;
 
@@ -55,7 +54,8 @@ void MAffineScreen::Update() {
     sAffineUpdateCount += 0x10;
     MTX_Rot22_(&mtx, FX_SinIdx(mRot), FX_CosIdx(mRot));
     MTX_ScaleApply22(&mtx, &mtx, (MFx32(1) / mScale.x).v, (MFx32(1) / mScale.y).v);
-    SetBgAffine((volatile u32 *)mDisplay->GetRegs28(mBg), &mtx, mCenter.x, mCenter.y, mOffset.x, mOffset.y);
+    MPoint center = mCenter;
+    SetBgAffine((volatile u32 *)mDisplay->GetRegs28(mBg), &mtx, center.x, center.y, mOffset.x, mOffset.y);
 }
 
 MTask *MAffineScreen::CreateRotTransfer(u16 rot) {
