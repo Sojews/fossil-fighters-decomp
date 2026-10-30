@@ -65,117 +65,116 @@ MIndexBitmapLoadTransfer::~MIndexBitmapLoadTransfer() {
 // through a long branch).
 void MIndexBitmapLoadTransfer::Transfer() {
     int srcSkip = mSrcSize.x;
-    if (srcSkip == 0 || mSrcSize.y == 0) {
-        return;
-    }
-    u16 lo = mPalette << 4;
-    u16 hi = lo << 8;
-    const u16 *src;
-    int width;
-    if (!mVFlip) {
-        src = (const u16 *) (mSrc + mSrcRect.left + srcSkip * mSrcRect.top);
-        width = mSrcRect.GetWidth();
-        srcSkip -= width;
-    } else {
-        src = (const u16 *) (mSrc + mSrcRect.left + srcSkip * (mSrcRect.bottom - 1));
-        width = mSrcRect.GetWidth();
-        srcSkip = -(srcSkip + width);
-    }
-    srcSkip >>= 1;
-    if (!mHFlip) {
-        u16 *dst = (u16 *) (mDstBase + mDst.x + mDstSize.x * mDst.y);
-        int dstSkip = (mDstSize.x - width) >> 1;
-        int pairs = width >> 1;
-        int rows = mSrcRect.GetHeight();
-        if (rows == 0) {
-            return;
+    if (srcSkip != 0 && mSrcSize.y != 0) {
+        u16 lo = mPalette << 4;
+        u16 hi = lo << 8;
+        const u16 *src;
+        int width;
+        if (!mVFlip) {
+            src = (const u16 *) (mSrc + mSrcRect.left + srcSkip * mSrcRect.top);
+            width = mSrcRect.GetWidth();
+            srcSkip -= width;
+        } else {
+            src = (const u16 *) (mSrc + mSrcRect.left + srcSkip * (mSrcRect.bottom - 1));
+            width = mSrcRect.GetWidth();
+            srcSkip = -(srcSkip + width);
         }
-        do {
-            if (mPalette == 0) {
-                MCopy(src, dst, pairs * 2);
-                src += pairs;
-                dst += pairs;
-            } else {
+        srcSkip >>= 1;
+        if (!mHFlip) {
+            u16 *dst = (u16 *) (mDstBase + mDst.x + mDstSize.x * mDst.y);
+            int dstSkip = (mDstSize.x - width) >> 1;
+            int pairs = width >> 1;
+            int rows = mSrcRect.GetHeight();
+            if (rows == 0) {
+                return;
+            }
+            do {
+                if (mPalette == 0) {
+                    MCopy(src, dst, pairs * 2);
+                    src += pairs;
+                    dst += pairs;
+                } else {
+                    int n = (pairs + 3) >> 2;
+                    switch (pairs & 3) {
+                    case 0:
+                        do {
+                            u16 px;
+                            px = *src;
+                            MINDEX_BITMAP_PIXEL(px);
+                            *dst = px;
+                            src++;
+                            dst++;
+                    case 3:
+                            px = *src;
+                            MINDEX_BITMAP_PIXEL(px);
+                            *dst = px;
+                            src++;
+                            dst++;
+                    case 2:
+                            px = *src;
+                            MINDEX_BITMAP_PIXEL(px);
+                            *dst = px;
+                            src++;
+                            dst++;
+                    case 1:
+                            px = *src;
+                            MINDEX_BITMAP_PIXEL(px);
+                            *dst = px;
+                            src++;
+                            dst++;
+                        } while (--n != 0);
+                    }
+                }
+                src += srcSkip;
+                dst += dstSkip;
+            } while (--rows != 0);
+        } else {
+            u16 *dst = (u16 *) (mDstBase + mDst.x + width - 1 + mDstSize.x * mDst.y);
+            int dstSkip = (mDstSize.x + width) >> 1;
+            int pairs = width >> 1;
+            int rows = mSrcRect.GetHeight();
+            if (rows == 0) {
+                return;
+            }
+            do {
                 int n = (pairs + 3) >> 2;
                 switch (pairs & 3) {
                 case 0:
                     do {
                         u16 px;
                         px = *src;
+                        px = (px >> 8) | (u16)(px << 8);
                         MINDEX_BITMAP_PIXEL(px);
                         *dst = px;
                         src++;
-                        dst++;
+                        dst--;
                 case 3:
                         px = *src;
+                        px = (px >> 8) | (u16)(px << 8);
                         MINDEX_BITMAP_PIXEL(px);
                         *dst = px;
                         src++;
-                        dst++;
+                        dst--;
                 case 2:
                         px = *src;
+                        px = (px >> 8) | (u16)(px << 8);
                         MINDEX_BITMAP_PIXEL(px);
                         *dst = px;
                         src++;
-                        dst++;
+                        dst--;
                 case 1:
                         px = *src;
+                        px = (px >> 8) | (u16)(px << 8);
                         MINDEX_BITMAP_PIXEL(px);
                         *dst = px;
                         src++;
-                        dst++;
+                        dst--;
                     } while (--n != 0);
                 }
-            }
-            src += srcSkip;
-            dst += dstSkip;
-        } while (--rows != 0);
-    } else {
-        u16 *dst = (u16 *) (mDstBase + mDst.x + width - 1 + mDstSize.x * mDst.y);
-        int dstSkip = (mDstSize.x + width) >> 1;
-        int pairs = width >> 1;
-        int rows = mSrcRect.GetHeight();
-        if (rows == 0) {
-            return;
+                src += srcSkip;
+                dst += dstSkip;
+            } while (--rows != 0);
         }
-        do {
-            int n = (pairs + 3) >> 2;
-            switch (pairs & 3) {
-            case 0:
-                do {
-                    u16 px;
-                    px = *src;
-                    px = (px >> 8) | (u16)(px << 8);
-                    MINDEX_BITMAP_PIXEL(px);
-                    *dst = px;
-                    src++;
-                    dst--;
-            case 3:
-                    px = *src;
-                    px = (px >> 8) | (u16)(px << 8);
-                    MINDEX_BITMAP_PIXEL(px);
-                    *dst = px;
-                    src++;
-                    dst--;
-            case 2:
-                    px = *src;
-                    px = (px >> 8) | (u16)(px << 8);
-                    MINDEX_BITMAP_PIXEL(px);
-                    *dst = px;
-                    src++;
-                    dst--;
-            case 1:
-                    px = *src;
-                    px = (px >> 8) | (u16)(px << 8);
-                    MINDEX_BITMAP_PIXEL(px);
-                    *dst = px;
-                    src++;
-                    dst--;
-                } while (--n != 0);
-            }
-            src += srcSkip;
-            dst += dstSkip;
-        } while (--rows != 0);
     }
 }
 
