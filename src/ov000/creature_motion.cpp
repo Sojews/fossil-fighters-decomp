@@ -1160,8 +1160,12 @@ MPalAnime *DinoBattleViewCreature::CreatePalBlend(BOOL withBase, u16 color, int 
     return anime;
 }
 
+// (Through a u32 index, which keeps the game's i * 4 in the loop instead of a running pointer.)
+static inline u32 DinoAttackLevelAt(const u32 *levels, u32 i) {
+    return levels[i];
+}
+
 // The number of the creature's attacks its level allows.
-// NONMATCHING (and GetAttack): as DinoBattleModelCreature's, the game indexes the tables with i * 4 every time.
 u32 DinoBattleViewCreature::CountAttacks() {
     const DinoCreatureDef *def = gDinoResource->GetCreatureDef(mUnkA8);
     u32 count = 0;
@@ -1169,7 +1173,7 @@ u32 DinoBattleViewCreature::CountAttacks() {
     if (i < def->attackCount) {
         const u32 *levels = (const u32 *) ((const u8 *) def + def->attackLevels);
         for (; i < def->attackCount; i++) {
-            if (levels[i] <= mLevel) {
+            if (DinoAttackLevelAt(levels, i) <= mLevel) {
                 count++;
             }
         }

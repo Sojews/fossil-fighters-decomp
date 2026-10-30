@@ -713,8 +713,12 @@ MTask *DinoBattleModelCreature::CreateUpdateTask(u8 a, u32 b) {
     return new DinoCreatureUpdateTask(this, a, b);
 }
 
+// (Through a u32 index, which keeps the game's i * 4 in the loop instead of a running pointer.)
+static inline u32 DinoAttackLevelAt(const u32 *levels, u32 i) {
+    return levels[i];
+}
+
 // The number of the creature's attacks its level allows.
-// NONMATCHING (and GetAttack): the game indexes the level table with i * 4 each time; ours strength-reduces it.
 u32 DinoBattleModelCreature::CountAttacks() {
     const DinoCreatureDef *def = gDinoResource->GetCreatureDef(mUnkB0);
     u32 count = 0;
@@ -722,7 +726,7 @@ u32 DinoBattleModelCreature::CountAttacks() {
     if (i < def->attackCount) {
         const u32 *levels = (const u32 *) ((const u8 *) def + def->attackLevels);
         for (; i < def->attackCount; i++) {
-            if (levels[i] <= mUnk100) {
+            if (DinoAttackLevelAt(levels, i) <= mUnk100) {
                 count++;
             }
         }
