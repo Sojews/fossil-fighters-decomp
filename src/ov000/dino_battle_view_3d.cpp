@@ -1180,17 +1180,17 @@ void DinoBattleView3D::OnMessage(MMessage *msg) {
                 defs->mType = 1;
                 defs->mSes2[0] = 0x2D7;
                 break;
-            case 2:
-                camera = 5;
-                path = data_ov000_0219654c[h + 1];
-                defs->mType = 1;
-                defs->mSes2[0] = 0x2D6;
-                break;
             case 3:
                 camera = 6;
                 path = data_ov000_0219654c[h + 2];
                 defs->mType = 2;
                 defs->mSes2[0] = 0x2D5;
+                break;
+            case 2:
+                camera = 5;
+                path = data_ov000_0219654c[h + 1];
+                defs->mType = 1;
+                defs->mSes2[0] = 0x2D6;
                 break;
             case 5:
                 camera = 5;

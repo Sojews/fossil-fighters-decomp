@@ -639,14 +639,14 @@ void DinoBattleViewCreature::OnMessage(MMessage *msg) {
                 tasks->AddTail(oam);
                 int se = -1;
                 switch (data_ov000_02193254[i].kind) {
-                case 0:
-                    se = 0x50;
-                    break;
                 case 2:
                     se = req->mUnk21 ? 0x56D : 0x4E;
                     break;
                 case 3:
                     se = req->mUnk21 ? 0x56D : 0x4D;
+                    break;
+                case 0:
+                    se = 0x50;
                     break;
                 }
                 if (se != -1) {

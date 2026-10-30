@@ -880,11 +880,11 @@ extern "C" void func_ov007_02182020(DinoUiKeyboardMenu *menu) {
     menu->AddItem(page);
     menu->mPageHelp = page;
     switch (menu->mMode) {
-    case 0:
-        okText = data_0208ac60;
-        break;
     case 1:
         okText = data_0208ac54;
+        break;
+    case 0:
+        okText = data_0208ac60;
         break;
     }
     menu->mOkButton = new DinoUiKeyboardMenuItem(3, 0, data_ov007_02191020.mOkPos, menu, data_ov007_02191020.mOkSize,
