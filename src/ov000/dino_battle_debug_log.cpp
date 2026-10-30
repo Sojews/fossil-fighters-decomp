@@ -27,7 +27,7 @@ DinoBattleDebugLog::DinoBattleDebugLog(MDisplay *display) : MProcess(display) {
         MDisplayScope scope(display);
         MFont *font = gDinoResource->CreateFont12(0, 10, 1);
         mConsole = new MConsole(new MTextCanvas(MPoint(0x100, 0xCC), gDinoResource->GetUnkTable(), 0, TRUE), font,
-                                MPoint(0, 2), MFx32::FromRaw(0x4CD));
+                                MPoint(0, 2), MFx32Const(0.3));
         mConsole->SetUnk3C(MFx32(4));
         mConsole->Show();
         mParallel.AddTail(mConsole);

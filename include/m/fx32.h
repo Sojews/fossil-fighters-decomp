@@ -24,6 +24,12 @@ public:
     fx32 v;
 };
 
+// An MFx32 made from a constant, rounded as FX32_CONST does (constructed in place, unlike FromRaw's copy; a class of
+// its own so that MFx32's integer conversions stay unambiguous).
+struct MFx32Const : MFx32 {
+    MFx32Const(double d) { v = (fx32)(d > 0 ? d * 4096.0 + 0.5 : d * 4096.0 - 0.5); }
+};
+
 inline bool operator==(MFx32 a, MFx32 b) {
     return a.v == b.v;
 }
