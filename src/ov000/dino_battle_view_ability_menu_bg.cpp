@@ -560,10 +560,14 @@ extern "C" const MPoint data_ov000_02194834;
 extern "C" void func_ov000_021615b4(DinoBattleViewUnkE0 *field, AttackMenuBarMotion *bar,
                                     DinoBattleViewAbilityMenuBG *bg, int y);
 
+// The background's vertical offset.
+static inline int DinoBgOffsetY(DinoBattleViewAbilityMenuBG *bg) {
+    return bg->GetOffset().y;
+}
+
 // Cancel closes the menu; an attack (when usable) slides the other bars off, moves the chosen one down with the BG,
 // hands a copy of its bar to the field and reports the choice.
-// NONMATCHING: the two GetOffset() temporaries' slots are swapped, and mUnk104 is loaded before GetBar() for the
-// bar copy (the game loads it after).
+#pragma opt_common_subs off
 void DinoBattleViewUiAbilityMenu::OnDecide(MMenuItem *menuItem) {
     DinoBattleViewUiAbilityMenuItem *item = (DinoBattleViewUiAbilityMenuItem *) menuItem;
     if (menuItem == (MMenuItem *) unk120) {
@@ -589,7 +593,8 @@ void DinoBattleViewUiAbilityMenu::OnDecide(MMenuItem *menuItem) {
             for (int i = 0; i < (int) mUnkCC; i++) {
                 if (mItems[i] != item) {
                     MPoint pos = mItems[i]->GetBarPosition();
-                    slides->AddTail(func_ov000_0217a45c(mItems[i], pos, MPoint(368, pos.y), 20, 1));
+                    MPoint dest(368, pos.y);
+                    slides->AddTail(func_ov000_0217a45c(mItems[i], pos, dest, 20, 1));
                 }
             }
             slides->AddTail(DinoSoundCreatePlaySeTask(0x61, 0));
@@ -602,8 +607,9 @@ void DinoBattleViewUiAbilityMenu::OnDecide(MMenuItem *menuItem) {
             mSerial.AddTail(slides);
 
             MParallelTaskSet *move = new MParallelTaskSet(TRUE);
-            MPoint to(0, mBG->GetOffset().y + item->GetBarPosition().y - data_ov000_0219482c.chosenBarPos.y);
-            MPoint from = mBG->GetOffset();
+            MPoint from;
+            MPoint to(0, DinoBgOffsetY(mBG) + item->GetBarPosition().y - data_ov000_0219482c.chosenBarPos.y);
+            from = mBG->GetOffset();
             MTask *bgSlide = mBG->CreateOffsetAnime(from, to, data_0208a1b4, -1);
             MTask *barSlide = func_ov000_0217a45c(item, item->GetBarPosition(), data_ov000_0219482c.chosenBarPos,
                                                   data_0208a1b4, -1);
@@ -619,16 +625,18 @@ void DinoBattleViewUiAbilityMenu::OnDecide(MMenuItem *menuItem) {
             mParallel.Remove(mBG);
             DinoBattleViewUnkE0 *field = ((DinoBattleView *) mUnk104)->mUnkE0;
             func_ov000_021615b4(field, bar, mBG, item->GetBarPosition().y);
+            MTask *post, *exit;
+            exit = MTaskExitTransfer::Create(this);
+            post = ((MMessageObserver *) mUnkB8)
+                       ->CreatePostTask(new DinoBattleViewUiAbilityMenuResult(mUnkC0, item->GetUnk90(), FALSE));
             mSerial.AddTail(move, bar->CreateShowTask(), mBG->CreateSetPriorityTask(1),
-                            new AttackMenuBarMotion::SetPriorityTask(bar, 1),
-                            ((MMessageObserver *) mUnkB8)
-                                ->CreatePostTask(new DinoBattleViewUiAbilityMenuResult(mUnkC0, item->GetUnk90(), FALSE)),
-                            MTaskExitTransfer::Create(this));
+                            new AttackMenuBarMotion::SetPriorityTask(bar, 1), post, exit);
         }
     } else {
         DinoSoundPlaySe(0x62, 0);
     }
 }
+#pragma opt_common_subs reset
 
 #pragma auto_inline on
 
