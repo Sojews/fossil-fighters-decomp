@@ -863,7 +863,7 @@ void DinoBattleViewUiAttackerMenu::OnStart() {
 // The defender help's texts: with one of the player's own creatures among the defenders, or not.
 extern "C" const u32 data_0208a354, data_0208a358;
 
-// NONMATCHING: the end iterator and the locals get other stack slots.
+// NONMATCHING: two locals swap stack slots, and the game keeps the map iterator in a register across the inner loop.
 void DinoBattleViewUiDefenderMenu::OnStart() {
     DinoBattleViewUiSelectAreaCommon::OnStart();
     u32 text = data_0208a358;
@@ -877,11 +877,12 @@ void DinoBattleViewUiDefenderMenu::OnStart() {
         }
     }
     mParallel.AddTail(new DinoBattleHelpBase(gLcd->GetBottomDisplay(), data_ov000_02193ca0[mSide], text));
-    for (std::map<u32, void *>::iterator it = mUnk130.begin(); it != mUnk130.end(); ++it) {
+    for (std::map<u32, void *>::iterator it = mUnk130.begin(), end = mUnk130.end(); it != end; ++it) {
         BOOL other = TRUE;
         for (int i = 0; i < mCount; i++) {
             DinoBattleViewCreature *c = ((DinoBattleView *)mUnkEC)->FindCreatureByAC(mIds[i]);
-            if (it->first == (u32)c) {
+            u32 key = it->first;
+            if (key == (u32)c) {
                 other = FALSE;
                 break;
             }
