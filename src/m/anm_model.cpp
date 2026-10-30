@@ -395,7 +395,6 @@ MAnmModelBase::~MAnmModelBase() {
 
 // Emits a particle (a copy of the model, placed by the transform tracks) every so often, and moves the live ones
 // along their z axes.
-// NONMATCHING: the game loads a particle's speed before the particle (r1/r0 swapped).
 void MAnmEmit::Unk0C() {
     if (!mLoaded) {
         return;

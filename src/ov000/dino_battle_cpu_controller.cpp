@@ -298,7 +298,6 @@ struct DinoBattleCpuConditions {
 
 extern "C" BOOL func_ov000_0216c83c(int slot);
 
-// NONMATCHING: as in ScoreCreatureConditions, the game puts each compound score's copy above the total's.
 MFx32 DinoBattleCpuController::ScoreEscape(DinoBattleModelPlayer *player, DinoBattleModelCreature *creature,
                                            DinoBattleFile file) {
     if (!file.mArchive.IsValid()) {
@@ -487,7 +486,6 @@ MFx32 DinoBattleCpuController::ScoreEscape(DinoBattleModelPlayer *player, DinoBa
     return total;
 }
 
-// NONMATCHING: as in ScoreCreatureConditions, the game puts each compound score's copy above the total's.
 MFx32 DinoBattleCpuController::ScoreAttack(DinoBattleModelPlayer *player, DinoBattleModelCreature *creature,
                                            DinoBattleFile file, u32 attack) {
     if (!file.mArchive.IsValid()) {
@@ -778,7 +776,6 @@ MFx32 DinoBattleCpuController::ScoreAttack(DinoBattleModelPlayer *player, DinoBa
     }
     return total;
 }
-// NONMATCHING: as in ScoreCreatureConditions, the game puts each compound score's copy above the total's.
 MFx32 DinoBattleCpuController::ScoreTarget(DinoBattleModelPlayer *player, DinoBattleModelCreature *creature,
                                            DinoBattleModelCreature *target, DinoBattleFile file, u32 attack) {
     if (!file.mArchive.IsValid()) {
@@ -1033,8 +1030,6 @@ MFx32 DinoBattleCpuController::ScoreTarget(DinoBattleModelPlayer *player, DinoBa
 }
 
 
-// NONMATCHING: in case 1 the operator+ parameter copies swap stack slots, as in ScoreConditions (casting either
-// operand fixes the order but costs a stack slot).
 MFx32 DinoBattleCpuController::ScoreCreatureConditions(DinoBattleModelPlayer *player, DinoBattleModelCreature *creature,
                                                        DinoBattleFile file) {
     if (!file.mArchive.IsValid()) {
@@ -1203,7 +1198,6 @@ MFx32 DinoBattleCpuController::ScoreCreatureConditions(DinoBattleModelPlayer *pl
     return total;
 }
 
-// NONMATCHING: in case 1 the operator+ parameter copies swap stack slots, as in CalcUnkEC.
 MFx32 DinoBattleCpuController::ScoreConditions(DinoBattleModelPlayer *player, DinoBattleModelCreature *creature,
                                                DinoBattleModelCreature *target, DinoBattleFile file) {
     if (!file.mArchive.IsValid()) {

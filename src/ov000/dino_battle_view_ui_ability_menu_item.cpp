@@ -81,7 +81,6 @@ void DinoBattleViewAbilityTextWindow::SetRect(MRect rect) {
     StartAnime(rect, rect, 0, 0);
 }
 
-// NONMATCHING: the game copies the four fields straight off the anime pointer (offsets 0x30-0x3c); ours forms &mValue
 MRect DinoBattleViewAbilityTextWindow::GetRect() {
     if (mTask != NULL) {
         return mTask->GetValue();

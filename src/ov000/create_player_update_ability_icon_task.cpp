@@ -1470,7 +1470,6 @@ MTask *DinoBattleModelPlayer::CreateMotionEffectTask(u32 a, u32 b, u32 c, u32 d,
 }
 
 // Updates every creature on both sides, waits for them all, and exits.
-// NONMATCHING: 87%, the game spills this and keeps the wait in a register (ours the other way round).
 void UpdateAllCreatureTask::Idle() {
     int count = mPlayer->GetCreatureCount() + mPlayer->GetOpponent()->GetCreatureCount();
     MParallelTaskSet *set = new MParallelTaskSet(TRUE);
@@ -3354,8 +3353,6 @@ MFx32 DinoBattleModelCreature::RandomDamageFactor() {
 }
 
 // A ratio that follows a quarter sine wave of (a - b) over the curve's range, capped at 1.
-// NONMATCHING: the copies std::min and std::max make for their comparisons take the lowest stack slots here, the
-// ones right after the subtraction's in the game.
 MFx32 DinoBattleModelCreature::CurveRatio(MFx32 a, MFx32 b) {
     const MFx32 range = gDinoResource->GetBattleAdjustDefs()->curveRange;
     const MFx32 base = gDinoResource->GetBattleAdjustDefs()->curveBase;

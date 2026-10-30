@@ -22,7 +22,6 @@ DinoBattleDebugLog::~DinoBattleDebugLog() {
 #pragma auto_inline off
 
 // A console of the battle's log, when the adjustment data asks for one.
-// NONMATCHING: the game loads the speed argument straight from its stack slot (ours through its address).
 DinoBattleDebugLog::DinoBattleDebugLog(MDisplay *display) : MProcess(display) {
     if (gDinoResource->GetBattleAdjustDefs()->debugLog) {
         MDisplayScope scope(display);

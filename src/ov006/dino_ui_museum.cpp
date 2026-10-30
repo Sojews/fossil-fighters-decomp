@@ -394,8 +394,6 @@ template <>
 void __vec_deleter<MMotionFile, allocator<MMotionFile> >::erase_at_end(size_t n, Metrowerks::int2type<false>);
 }  // namespace std
 
-// NONMATCHING: clear()'s tag byte takes another stack slot; the medal menu's identical code matches under
-// `#pragma ipa file`, which this file (likely two of the game's) can't take as a whole.
 void DinoUiMuseumMenu::LoadCreatures() {
     mCreatures.clear();
     for (u32 id = 1; id <= gDinoResource->GetCreatureCount() - 1; id++) {

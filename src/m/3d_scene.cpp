@@ -25,7 +25,6 @@ M3DScene::M3DScene() : mUnk10(0), mUnk14(1), mUnk18(0x190000), mDirty(TRUE) {
     Init();
 }
 
-// NONMATCHING: the game copies heapSize out of its register before heap.
 M3DScene::M3DScene(u32 heap, u32 heapSize) : mUnk10(0), mUnk14(0), mUnk18(0x190000), mDirty(TRUE) {
     OS_InitMutex(&mMutex);
     mHeap = new M3DHeap(heap, heapSize);

@@ -1403,7 +1403,6 @@ extern "C" const char data_ov007_02191e74[];
 extern const u32 data_0208ac74, data_0208ac34, data_0208ac78, data_0208ac38, data_0208ac70, data_0208ac30;
 
 // A poem: asks whether to mark it (or unmark it) or read it; the arrows turn the page.
-// NONMATCHING: the game adds the page offset and the item's index the other way round.
 void DinoUiSenryuMenu::OnDecide(MMenuItem *item) {
     if (item == NULL) {
         return;
