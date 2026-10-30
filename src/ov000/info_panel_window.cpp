@@ -534,7 +534,7 @@ DinoBattleViewPopNumber::DinoBattleViewPopNumber(DinoBattleView *view, MSmartOam
         }
         shift = kind << 5;
     }
-    char text[20];
+    char text[8];
     OS_SPrintf(text, "%4d", number);
     if (shift != 0) {
         char *c = text;
