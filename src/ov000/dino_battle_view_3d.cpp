@@ -925,7 +925,11 @@ void DinoBattleView3D::OnMessage(MMessage *msg) {
                 case 1:
                     camera = 5;
                     defs->mSes2[i] = 0x2D7;
-                    paths[i] = m->mUnk38 ? data_ov000_0219654c[h + 2] : data_ov000_0219654c[h];
+                    if (m->mUnk38) {
+                        paths[i] = data_ov000_0219654c[h + 2];
+                    } else {
+                        paths[i] = data_ov000_0219654c[h];
+                    }
                     defs->mType = 1;
                     if (m->mUnk38 && IsLastHit(base + i, i)) {
                         camera = 6;
