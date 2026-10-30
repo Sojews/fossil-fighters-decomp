@@ -64,8 +64,8 @@ extern "C" void func_ov000_0217df4c(DinoBattleViewKPUpDown *view, int value, int
     char text[8];
     KPUpDownMotion *motion;
     MParallelTaskSet *digits;
-    int i;
     int len;
+    int i;
     MSmartOam *oam;
     if (value == 0) {
         return;
@@ -84,19 +84,22 @@ extern "C" void func_ov000_0217df4c(DinoBattleViewKPUpDown *view, int value, int
     } else {
         DinoSoundPlaySe(0x57, 0);
     }
-    for (i = 0; i < len; i++) {
-        MMotion *digit = new MMotion(
-            std::string(value >= 0 ? ((const char **)data_ov000_0219504c)[2] : ((const char **)data_ov000_0219504c)[1]),
-            oam, 2, 1);
-        digit->SetPriority(2);
-        digit->SetAnchor(3);
-        digit->Show();
-        digit->SetPosition(pos);
-        digit->GetUnit()->SetMode(1);
-        digits->AddTail(digit);
-        pos.x += 16;
-        int anime = text[i] == '+' ? 11 : text[i] - '0' + 1;
-        tasks->AddTail(digit->CreatePlayTransfer(anime, 0), new MTimer(3));
+    i = 0;
+    if (len > 0) {
+        for (; i < len; i++) {
+            MMotion *digit = new MMotion(
+                std::string(value >= 0 ? ((const char **)data_ov000_0219504c)[2] : ((const char **)data_ov000_0219504c)[1]),
+                oam, 2, 1);
+            digit->SetPriority(2);
+            digit->SetAnchor(3);
+            digit->Show();
+            digit->SetPosition(pos);
+            digit->GetUnit()->SetMode(1);
+            digits->AddTail(digit);
+            pos.x += 16;
+            int anime = text[i] == '+' ? 11 : text[i] - '0' + 1;
+            tasks->AddTail(digit->CreatePlayTransfer(anime, 0), new MTimer(3));
+        }
     }
     tasks->AddTail(new MTimer(60), MTaskExitTransfer::Create(digits));
     digits->AddTail(oam);
