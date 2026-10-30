@@ -40,3 +40,5 @@ DinoBattleDebugLog::DinoBattleDebugLog(MDisplay *display) : MProcess(display) {
 // The status effect icon's vector members the game emits in this file.
 template size_t std::__vec_deleter<StatusEffectEntry, std::allocator<StatusEffectEntry> >::grow_by(size_t n);
 template void std::__vec_deleter<StatusEffectEntry, std::allocator<StatusEffectEntry> >::append_realloc(size_t n, const StatusEffectEntry &x);
+template std::__vec_deleter_helper<StatusEffectEntry, std::allocator<StatusEffectEntry> &>::~__vec_deleter_helper();
+template void std::__vec_deleter<StatusEffectEntry, std::allocator<StatusEffectEntry> &>::allocate(size_t n, Metrowerks::int2type<true>);
