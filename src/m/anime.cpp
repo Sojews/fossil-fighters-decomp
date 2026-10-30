@@ -111,7 +111,7 @@ MPointAnime::MPointAnime(MPoint from, MPoint to) {
     mFrom = from;
     mTo = to;
     long dy = labs(from.y - to.y);
-    long dx = labs(from.x - to.x);
+    int dx = labs(from.x - to.x);
     mSteps = std::max<int>(dx, dy) + 1;
     mDeltaX = ((to.x - from.x) << 16) / (mSteps - 1);
     mDeltaY = ((to.y - from.y) << 16) / (mSteps - 1);
