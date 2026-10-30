@@ -996,9 +996,11 @@ namespace std {
             this->init();
             this->init(n, value);
         }
-        template <class It> vector(It first, It last) {
+        template <class It> vector(It first, It last, const Allocator &a = Allocator()) {
             this->init();
-            Metrowerks::int2type<false> t;
+            choose_init(first, last, Metrowerks::int2type<false>());
+        }
+        template <class It> void choose_init(It first, It last, Metrowerks::int2type<false> t) {
             this->init(first, last, t);
         }
         vector(const vector &x) {
