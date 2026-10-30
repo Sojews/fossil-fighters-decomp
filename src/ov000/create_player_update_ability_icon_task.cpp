@@ -1479,7 +1479,8 @@ void UpdateAllCreatureTask::Idle() {
     DinoBattleModelPlayer *player = mPlayer;
     for (int side = 0; side < 2; side++) {
         for (int i = 0; i < player->GetCreatureCount(); i++) {
-            set->AddTail(player->GetCreature(i)->CreateUpdateTask(0, (u32)(MMessageObserver *)wait));
+            DinoBattleModelCreature *c = player->GetCreature(i);
+            set->AddTail(c->CreateUpdateTask(0, (u32)(MMessageObserver *)wait));
         }
         player = player->GetOpponent();
     }
