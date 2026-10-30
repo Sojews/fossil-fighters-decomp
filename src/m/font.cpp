@@ -367,7 +367,7 @@ void MChr16FontTransfer::Transfer() {
     if (endShift == 0) {
         lastMask = 1 - 2;
     }
-    u32 words = (end + 7) >> 3;
+    int words = (end + 7) >> 3;
     int nextRow = -words * 8 + 1;
     int nextTileRow = nextRow + (width - 1) * 8;
     u32 first = mPos.x < 0 ? -(mPos.x >> 3) : 0;
