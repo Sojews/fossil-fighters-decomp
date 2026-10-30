@@ -331,10 +331,9 @@ MMenuItem *MMenu::FindNearestItem(MPoint pos) {
 // The item linked from `from` in the direction (1 right, 2 down, 3 left, 4 up). Without links from it, or when
 // they miss the direction and the menu falls back, the nearest item that way.
 MMenuItem *MMenu::FindLinkedItem(MMenuItem *from, int dir) {
-    std::pair<MMenuLinks::iterator, MMenuLinks::iterator> found = mLinks.equal_range(from);
-    std::pair<MMenuLinks::iterator, MMenuLinks::iterator> range = found;
+    std::pair<MMenuLinks::const_iterator, MMenuLinks::const_iterator> range = mLinks.equal_range(from);
     if (range.first != range.second) {
-        for (MMenuLinks::iterator it = range.first; it != range.second; ++it) {
+        for (MMenuLinks::const_iterator it = range.first; it != range.second; ++it) {
             if (dir == it->second.first) {
                 MMenuItem *to = it->second.second;
                 if (to != NULL && to->mEnabled && !to->mNoFocus) {

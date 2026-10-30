@@ -398,6 +398,39 @@ namespace std {
             node_base *node_;
         };
 
+        // (An iterator converts with an empty tag argument, which leaves a zeroed byte on the stack.)
+        struct __const_tag {};
+        class const_iterator {
+        public:
+            typedef bidirectional_iterator_tag iterator_category;
+            typedef Value value_type;
+            typedef ptrdiff_t difference_type;
+            typedef const Value *pointer;
+            typedef const Value &reference;
+
+            const_iterator() {}
+            explicit const_iterator(node_base *n) : node_(n) {}
+            const_iterator(const iterator &i, __const_tag = __const_tag()) : node_(i.node_) {}
+            const Value &operator*() const {
+                return static_cast<node *>(node_)->data_;
+            }
+            const Value *operator->() const {
+                return &static_cast<node *>(node_)->data_;
+            }
+            const_iterator &operator++() {
+                increment(node_);
+                return *this;
+            }
+            bool operator==(const const_iterator &x) const {
+                return node_ == x.node_;
+            }
+            bool operator!=(const const_iterator &x) const {
+                return node_ != x.node_;
+            }
+
+            node_base *node_;
+        };
+
         // (mwcc never inlines a template base class's constructor, so the map or set sets the tree up. The
         // destructor is defined outside the class, so it isn't an inline function and is never inlined.)
         void init() {
