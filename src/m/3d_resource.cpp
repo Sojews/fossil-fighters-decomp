@@ -469,6 +469,7 @@ fx32 M3DGrid::GetHeight(fx32 px, fx32 pz) {
 // Whether (x, z) is on a triangle of the grid; hint caches the last hit (cell << 16 | first index).
 // NONMATCHING: register allocation (the game keeps this in r6 and the cell on the stack).
 BOOL M3DGrid::IsOnGround(fx32 x, fx32 z, fx32 *hint) {
+    int i;
     x >>= mShiftX;
     z >>= mShiftZ;
     int cx = (x >> 11) + 16;
@@ -487,7 +488,7 @@ BOOL M3DGrid::IsOnGround(fx32 x, fx32 z, fx32 *hint) {
     }
     u32 cell = cx + cz * mDim;
     if (*(u32 *) hint >> 16 == cell) {
-        u32 i = *(u32 *) hint & 0xFFFF;
+        i = *(u32 *) hint & 0xFFFF;
         std::vector<u16> &tris = mCells[*(u32 *) hint >> 16];
         M3D_GRID_IN_TRIANGLE(mVerts, tris, i, x, z, scan);
         *(u32 *) hint = (u16) i | (cell << 16);
@@ -495,7 +496,7 @@ BOOL M3DGrid::IsOnGround(fx32 x, fx32 z, fx32 *hint) {
     }
 scan:
     std::vector<u16> &tris = mCells[cell];
-    for (u32 i = 0; i < tris.size(); i += 3) {
+    for (i = 0; i < tris.size(); i += 3) {
         M3D_GRID_IN_TRIANGLE(mVerts, tris, i, x, z, next);
         *(u32 *) hint = (u16) i | (cell << 16);
         return TRUE;
