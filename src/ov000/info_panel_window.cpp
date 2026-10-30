@@ -559,7 +559,7 @@ DinoBattleViewPopNumber::DinoBattleViewPopNumber(DinoBattleView *view, MSmartOam
     if (kind == 3) {
         mSerial.AddTail(mIndicator->CreateCoordAnime(from, from + MPoint(0, -10), 20, -2));
     } else {
-        for (int height = 10; height > 0; height -= 3) {
+        for (s32 height = 10; height > 0; height -= 3) {
             GetSerial()->AddTail(mIndicator->CreateCoordAnime(from, from + MPoint(0, -height), height + 2, -1),
                                  mIndicator->CreateCoordAnime(from + MPoint(0, -height), from, height + 2, 1));
         }
