@@ -1188,3 +1188,10 @@ template void std::__vec_deleter<MArchiveFile, std::allocator<MArchiveFile> >::a
 template void std::__vec_deleter<MArchiveFile, std::allocator<MArchiveFile> >::sub_push_back(const MArchiveFile &x, Metrowerks::int2type<false>);
 template void std::__vec_deleter<MArchiveFile, std::allocator<MArchiveFile> >::allocate(size_t n, Metrowerks::int2type<true>);
 template void std::__vec_deleter<MArchiveFile, std::allocator<MArchiveFile> >::erase_at_end(size_t n, Metrowerks::int2type<false>);
+// vector<bool>'s, in the game's order.
+template void std::__bitvec_deleter<std::allocator<bool> >::resize(size_t n, bool x);
+template void std::__bitvec_deleter<std::allocator<bool> >::reserve_bits(size_t n);
+template size_t std::__bitvec_deleter<std::allocator<bool> >::recommend(size_t n);
+template std::__bitvec_deleter<std::allocator<bool> >::~__bitvec_deleter();
+template void std::__bitvector_common<true>::throw_length_error();
+template void std::__bitvec_deleter<std::allocator<bool> >::fill_n(std::__bitvec_deleter<std::allocator<bool> >::iterator first, size_t n, const bool &x);
