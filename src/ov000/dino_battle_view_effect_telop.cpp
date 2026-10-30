@@ -205,18 +205,20 @@ inline SkipWinTelopTask::SkipWinTelopTask(MView *picture, DinoBattleView *view, 
     mView3D = (DinoBattleView3D *)view;
 }
 
-extern "C" const int data_ov000_02193888;   // (the won frames' own label: the game takes their address from it)
 extern "C" const int data_0208a128, data_0208a12c;    // the win count's slide out: ease, frames
 extern "C" const int data_0208a130;                    // frames before it slides out
 extern "C" const int data_0208a134, data_0208a138;    // its slide in: ease, frames
 extern "C" const int data_0208a13c;                    // frames before it shows
 
+// The won telop's least frames. (An inline's result, so its temporary goes on the stack below the random generator.)
+static inline int DinoWonLeast() {
+    return 0xFE;
+}
+
 // The won telop: zooms the picture in from the corner, shakes it less and less, settles it with a hop and waits
 // (skippable); the player's win count slides up from below meanwhile.
-// NONMATCHING: the game has the frames' least below the random generator on the stack (ours: above it).
 void DinoBattleViewEffectTelop::StateWin() {
-    int least = 0xFE;
-    int frames = *(data_ov000_0219387c.winFrames < least ? &least : &data_ov000_02193888);
+    int frames = std::max(data_ov000_0219387c.winFrames, DinoWonLeast());
     mPicture->Show();
     mParallel.AddTail(mPicture);
     mState = data_ov000_0219387c.State_50;
