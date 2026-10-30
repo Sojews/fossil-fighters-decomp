@@ -696,10 +696,12 @@ extern "C" s16 data_0214c18c[];
 static inline void M3DSetDiv32_32(u32 numer, u32 denom) {
     REG_CP_DIVCNT = 0;
     REG_CP_DIV_NUMER_L = numer;
-    REG_CP_DIV_DENOM = denom;
+    u64 d = denom;
+    REG_CP_DIV_DENOM = d;
 }
 
 static inline s32 M3DGetDivResult32() {
+    REG_CP_DIVCNT;
     while (REG_CP_DIVCNT & 0x8000) {
     }
     return REG_CP_DIV_RESULT_L;
@@ -755,8 +757,8 @@ const s16 *M3DModelGetMorphVertices(M3DModel *model) {
         out[0] = (prev[0] * w0 + next[0] * w1) / d;
         out[1] = (prev[1] * w0 + next[1] * w1) / d;
         out[2] = (prev[2] * w0 + next[2] * w1) / d;
-        next += 3;
         prev += 3;
+        next += 3;
         out += 3;
     }
     int n = (count >> 1) * 3;
