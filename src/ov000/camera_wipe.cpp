@@ -60,11 +60,10 @@ void CameraWipe::Idle() {
     mOwner->mScreen->Show();
     mWindow->Clear();
     MRect rect;
-    int y;
     switch (mMode) {
     case 0:
         rect.left = 0;
-        for (y = 0; y < 192; y++) {
+        for (int y = 0; y < 192; y++) {
             rect.top = y;
             rect.bottom = y + 1;
             rect.right = 256 - (mUnk88 >> 12) + data_ov000_02197954[y];
@@ -79,7 +78,7 @@ void CameraWipe::Idle() {
         break;
     case 1:
         rect.right = 256;
-        for (y = 0; y < 192; y++) {
+        for (int y = 0; y < 192; y++) {
             rect.top = y;
             rect.bottom = y + 1;
             rect.left = (mUnk88 >> 12) - data_ov000_02197954[y];
@@ -94,7 +93,7 @@ void CameraWipe::Idle() {
         break;
     case 2:
         rect.left = 0;
-        for (y = 0; y < 192; y++) {
+        for (int y = 0; y < 192; y++) {
             rect.top = y;
             rect.bottom = y + 1;
             rect.right = (mUnk88 >> 12) - data_ov000_02197954[y];
@@ -109,7 +108,7 @@ void CameraWipe::Idle() {
         break;
     case 3:
         rect.right = 256;
-        for (y = 0; y < 192; y++) {
+        for (int y = 0; y < 192; y++) {
             rect.top = y;
             rect.bottom = y + 1;
             rect.left = 256 - (mUnk88 >> 12) + data_ov000_02197954[y];
