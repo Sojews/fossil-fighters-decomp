@@ -359,7 +359,7 @@ extern "C" MTask *func_ov000_0216ff18(DinoBattleViewCreature *creature, MPoint f
                                                          frames, ease));
     }
     const MPoint &markOffset = data_ov000_02193030.markOffset;
-    set->AddTail(creature->mMotion140->CreateCoordAnime(from + markOffset, to + markOffset, frames, ease));
+    set->AddTail(creature->mMotion140->CreateCoordAnime(markOffset + from, markOffset + to, frames, ease));
     creature->mCoord = to;
     return set;
 }

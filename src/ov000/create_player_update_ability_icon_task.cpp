@@ -2028,7 +2028,8 @@ extern "C" void func_ov000_0216831c(DinoBattleModelPlayer *player, MMessageObser
 extern "C" MTask *func_ov000_0218ec8c(u32 tutorial, int kind, BOOL *proceed);
 extern "C" MSerialTaskSet *func_ov000_02169fb8(MMessageObserver *view, DinoBattleModelPlayer *player,
                                                DinoBattleModelPlayer *other, BOOL unused);
-extern "C" const u32 data_0208a2b8[], data_0208a2b4;  // info bar texts (the first two: the cure's, ours and theirs)
+extern "C" const u32 data_0208a2b8[], data_0208a2b4;
+extern "C" const u32 data_0208a2bc, data_0208a2e0;   // (data_0208a2b8[1] and data_0208a2dc[1], which the game reaches by their own addresses)  // info bar texts (the first two: the cure's, ours and theirs)
 u8 DinoAttackHasUnk10Flag(u32 id);
 
 // NONMATCHING
@@ -4184,7 +4185,7 @@ extern "C" void func_ov000_0216831c(DinoBattleModelPlayer *player, MMessageObser
         }
         // Countered.
         DinoBattleModelCreature *target = targets[i];
-        u32 text = (results[i].guard == 1 ? data_0208a2dc[1] : data_0208a2b8[1]) + (player->mUnkB4 == 0 ? 1 : 0);
+        u32 text = (results[i].guard == 1 ? data_0208a2e0 : data_0208a2bc) + (player->mUnkB4 == 0 ? 1 : 0);
         BOOL effect = results[i].guard != 1;
         player->mSerial.AddTail(DinoCreatePostAndWaitTask(player->mUnkF4, new DinoBattleViewWaitActionInfoBarRequest(0)));
         if (effect) {

@@ -333,7 +333,7 @@ void M3DModel::Draw(u32 lights) {
                     u32 tex = (t >> 24) & 0x3F;
                     u32 pltt = (t >> 16) & 0x3F;
                     u32 id = (material + mPolygonId) & 0x3F;
-                    int alpha = (int)(a * mUnk1C) >> 12;
+                    int alpha = (int)(mUnk1C * a) >> 12;
                     if (alpha <= 0) {
                         alpha = 0x1F;
                         t &= ~0xC0;

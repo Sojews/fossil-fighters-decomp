@@ -778,6 +778,7 @@ extern "C" const u32 data_0208a0e8;    // the ability's group fade length
 extern "C" const u32 data_0208a118;    // how long a hit that knocks down is held
 extern "C" const u32 data_0208a0bc;    // the turn end's length
 extern "C" const u32 data_0208a0cc[2]; // [1]: its fades' length
+extern "C" const u32 data_0208a0d0;    // (data_0208a0cc[1], which OnMessage reaches by its own address)
 extern "C" const u32 data_0208a1e0, data_0208a0dc;  // before the winner's pose, by creatures left (1, 2; 3 is [0] above)
 extern "C" const char *const data_ov000_0219654c[];  // the hit models, by hit (three each)
 
@@ -1341,9 +1342,9 @@ void DinoBattleView3D::OnMessage(MMessage *msg) {
         FlushQueue();
         if (mUnk140 == 0) {
             mUnkC0->AddTail(func_ov000_0218ae50(data_0208a0c0));
-            mUnkC0->AddTail(new BlackOutTask(data_0208a0cc[1]),
+            mUnkC0->AddTail(new BlackOutTask(data_0208a0d0),
                             func_ov000_0218ac04(mUnkE4, &mUnk1A4[4], &data_ov000_02190334, side == 0),
-                            new BlackInTask(data_0208a0cc[1]), new MTimer(data_0208a0bc - data_0208a0cc[1]));
+                            new BlackInTask(data_0208a0d0), new MTimer(data_0208a0bc - data_0208a0d0));
         }
         mUnkC0->AddTail(new DinoBattleView3DGroupFade(mUnkE4, GROUP_FADE_TARGET, mSlot, 1, -1, -1));
         if (m->mUnk0C != 0) {

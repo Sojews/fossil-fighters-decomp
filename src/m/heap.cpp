@@ -88,9 +88,9 @@ MHeapBlock *MHeap::Alloc(u32 size, BOOL fromEnd, u32 align, u32 boundary, u32 bo
                 }
             }
         }
-        if (addr >= blockAddr && blockAddr + blockSize >= addr + size) {
-            bestAddr = addr;
+        if (blockAddr <= addr && blockAddr + blockSize >= addr + size) {
             best = block;
+            bestAddr = addr;
             bestLink = link;
             if (!fromEnd) {
                 break;
