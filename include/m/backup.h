@@ -138,4 +138,11 @@ public:
     MATHCRC32Table mCrcTable;       // 0x2C
 };
 
+namespace std {
+// (A file's copy copies its vector of copies.)
+template <> struct __vec_push_tag<MBackupStorage::File> {
+    enum { value = 1 };
+};
+}
+
 #endif

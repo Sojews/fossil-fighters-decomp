@@ -24,6 +24,15 @@ namespace std {
     template <class T> struct __vec_move_tag {
         enum { value = is_scalar<T>::value ? 2 : 0 };
     };
+    // Whether push_back's slow path makes its tag itself (true) or one call further in: the game's element types
+    // whose copy constructor copies a vector (and so has a tag of its own) do the former.
+    template <class T> struct __vec_push_tag {
+        enum { value = 0 };
+    };
+    template <class U, class A> struct __vec_push_tag<vector<U, A> > {
+        enum { value = 1 };
+    };
+
     template <class C, class Traits, class Alloc> struct __vec_move_tag<basic_string<C, Traits, Alloc> > {
         enum { value = 2 };
     };
@@ -860,6 +869,9 @@ namespace std {
                     new (this->end()) T(x);
                     this->size_++;
                 }
+            } else if (__vec_push_tag<T>::value) {
+                this->sub_push_back(x, Metrowerks::int2type<Metrowerks::has_trivial_copy_ctor<T>::value &&
+                                                            Metrowerks::has_trivial_assignment<T>::value>());
             } else {
                 this->sub_push_back(x);
             }
