@@ -78,8 +78,8 @@ void DinoBattleViewTutorialMotion::SetRect(MRect rect) {
     mParallel.AddTail(mRect);
 }
 
-// NONMATCHING: register allocation in the -1 loop (the game reuses the -1 register as the counter) and the
-// rectangle's NULL is rematerialized.
+// NONMATCHING: the game clears the rectangle only when it was set (as `if (mRect) { mRect->Exit(); mRect = NULL; }`),
+// but that form gives other registers in the -1 loop here; the always-clearing form matches everything else.
 void DinoBattleViewTutorialMotion::Hide(int index) {
     if (index == -1) {
         for (int i = 0; i < 3; i++) {
@@ -90,8 +90,8 @@ void DinoBattleViewTutorialMotion::Hide(int index) {
         }
         if (mRect != NULL) {
             mRect->Exit();
-            mRect = NULL;
         }
+        mRect = NULL;
     } else if (mArrows[index] != NULL) {
         mArrows[index]->Exit();
         mArrows[index] = NULL;
