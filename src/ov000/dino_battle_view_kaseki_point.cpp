@@ -388,8 +388,9 @@ void DinoBattleViewPlayer::OnMessage(MMessage *msg) {
     case 0x1002D:
         if (mMotion != NULL) {
             MTask *task = mMotionTask;
-            mParallel.Remove(mMotion);
-            mParallel.Remove(task);
+            MTaskSet *parallel = &mParallel;
+            parallel->Remove(mMotion);
+            parallel->Remove(task);
             delete mMotion;
             delete mMotionTask;
             mMotion = NULL;
