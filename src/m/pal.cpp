@@ -166,8 +166,11 @@ void MPalAnime::AddBlend(const u16 *data, u16 color, int weight) {
     frame.color = 0;
     const Frame &f = frame;
     mFrames.push_back(f);
-    for (u32 n = mColorCount; n != 0; n--) {
-        *dst++ = MBlendColor(*data++, color, weight);
+    u32 n = mColorCount;
+    while (n != 0) {
+        *dst = MBlendColor(*data++, color, weight);
+        n--;
+        dst++;
     }
     mSteps = (mFrames.size() - 1) * 32 + 1;
 }
