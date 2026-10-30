@@ -1,6 +1,6 @@
 // MMenuItem, MMenu and the focus transfers.
-// NONMATCHING: Init (where it works out &mSerial); RemoveItem, AddLink and RemoveLink (the game keeps a stored copy of the iterator
-// or of the inner pair that ours optimizes away, as in help.cpp); FindLinkedItem (the game keeps a copy of the range
+// NONMATCHING: Init (where it works out &mSerial); AddLink (the game keeps a stored copy of the inner pair that ours
+// optimizes away, as in help.cpp); FindLinkedItem (the game keeps a copy of the range
 // and two zeroed bytes on the stack); FindItemInDirection (the order the rect's words are loaded); the tree's
 // insert_node_at (two stores swapped).
 
@@ -153,7 +153,7 @@ void MMenu::AddItem(MMenuItem *item) {
     mItems->AddTail(item);
 }
 
-// NONMATCHING: register allocation (the game keeps the iterator in r2 for the erase call; 86%).
+// (The erased iterator is a named copy rebuilt from the node, which the game keeps on the stack.)
 void MMenu::RemoveItem(MMenuItem *item) {
     mItems->Remove(item);
     item->mMenu = NULL;
@@ -161,9 +161,10 @@ void MMenu::RemoveItem(MMenuItem *item) {
 restart:
     for (MMenuLinks::iterator it = mLinks.begin(); it != mLinks.end(); ++it) {
         if (it->first == item || it->second.second == item) {
-            MMenuLinks::iterator e = it;
+            MMenuLinks::iterator e(it.node_);
             mLinks.erase(e);
             goto restart;
+
         }
     }
 }
@@ -180,13 +181,16 @@ void MMenu::AddLink(MMenuItem *from, int dir, MMenuItem *to) {
 void MMenu::RemoveLink(MMenuItem *from, int dir) {
     for (MMenuLinks::iterator it = mLinks.begin(); it != mLinks.end(); ++it) {
         if (it->first == from && dir == it->second.first) {
-            mLinks.erase(it);
+            MMenuLinks::iterator e(it.node_);
+            mLinks.erase(e);
             return;
+
         }
     }
 }
 
-void MMenu::SetLinkFallback(BOOL fallback) {
+void MMenu::SetLinkFallback
+(BOOL fallback) {
     mLinkFallback = fallback;
 }
 
