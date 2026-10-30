@@ -75,7 +75,7 @@ void MSimpleMenu::AddItem(int id, std::string text) {
 
 // Centers the items across the area, spread evenly down it.
 void MSimpleMenu::Layout() {
-    for (u32 i = 0; i < mEntries.size(); i++) {
+    for (int i = 0; i < mEntries.size(); i++) {
         MView *view = mEntries[i].view;
         u32 count = mEntries.size();
         int top = sArea.top;

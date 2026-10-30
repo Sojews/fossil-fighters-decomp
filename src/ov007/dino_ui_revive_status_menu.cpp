@@ -868,17 +868,14 @@ extern const u32 data_0208a830, data_0208a834, data_0208a838, data_0208a83c;
 #pragma always_inline on
 static struct DinoUiReviveStatusMenuStaticInit {
     DinoUiReviveStatusMenuStaticInit() {
-        MPoint screen(256, 192);
-        data_ov007_02191e78.mScreenSize = screen;
-        data_ov007_02191f78.mScreenRect = MRect(0, 0, 256, 192);
+        data_ov007_02191e78.mScreenSize = MPoint(256, 192);
+        data_ov007_02191f78.mScreenRect = DinoSizeRect(data_ov007_02191e78.mScreenSize);
         data_ov007_02191e78.mIconMargin = MPoint(2, 2);
-        MPoint icon(36, 28);
-        data_ov007_02191e78.mIconSize = icon;
-        data_ov007_02191f78.mIconRect = DinoSizeRect(icon);
+        data_ov007_02191e78.mIconSize = MPoint(36, 28);
+        data_ov007_02191f78.mIconRect = DinoSizeRect(data_ov007_02191e78.mIconSize);
         data_ov007_02191f78.mBarPos = MPoint(0, 24);
-        MPoint bar(256, 192);
-        data_ov007_02191f78.mBarSize = bar;
-        data_ov007_02191f78.mBarRect = DinoBarRect(bar);
+        data_ov007_02191f78.mBarSize = MPoint(256, 192);
+        data_ov007_02191f78.mBarRect = MRect(0, 0, 256, 24);
         DINO_POOL(MPoint, data_ov007_02191e78, 0x28) = MPoint(128, 176);
         DINO_POOL(MPoint, data_ov007_02191e78, 0x60) = MPoint(8, 150);
         DINO_POOL(MPoint, data_ov007_02191e78, 0x40) = MPoint(64, 112);
