@@ -880,7 +880,8 @@ void DinoBattleViewUiDefenderMenu::OnStart() {
     for (std::map<u32, void *>::iterator it = mUnk130.begin(); it != mUnk130.end(); ++it) {
         BOOL other = TRUE;
         for (int i = 0; i < mCount; i++) {
-            if (it->first == (u32)((DinoBattleView *)mUnkEC)->FindCreatureByAC(mIds[i])) {
+            DinoBattleViewCreature *c = ((DinoBattleView *)mUnkEC)->FindCreatureByAC(mIds[i]);
+            if (it->first == (u32)c) {
                 other = FALSE;
                 break;
             }
