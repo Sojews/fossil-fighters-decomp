@@ -714,6 +714,7 @@ static inline s32 M3DGetDivResult32() {
 // blended (by the CPU and the hardware divider in turn).
 // NONMATCHING: register allocation (the game spills the count and the divider's zero high word to the stack).
 const s16 *M3DModelGetMorphVertices(M3DModel *model) {
+    u32 t0;
     const M3DMorphAnim *anim = (const M3DMorphAnim *) model->mAnimRes;
     int count = anim->vertexCount;
     if (count == 0) {
@@ -724,7 +725,7 @@ const s16 *M3DModelGetMorphVertices(M3DModel *model) {
     const s16 *prev = anim->frames;
     const s16 *next = prev;
     u32 t1 = 0;
-    u32 t0 = 0;
+    t0 = 0;
     u32 frame = model->mFrame;
     s16 *out = data_0214c18c;
     s32 w0;
