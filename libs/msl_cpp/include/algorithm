@@ -364,17 +364,16 @@ namespace std {
     OutputIterator __insertion_sort_move(BidirectionalIterator first, BidirectionalIterator last,
                                          OutputIterator result, Compare &comp) {
         typedef typename iterator_traits<OutputIterator>::value_type value_type;
-        BidirectionalIterator f = first;
         __vec_iterator<value_type> last2(result.base());
-        if (!(f == last)) {
+        if (!(first == last)) {
             *result = *first;
-            for (++f, ++last2; f != last; ++f, ++last2) {
+            for (++last2, ++first; first != last; ++first, ++last2) {
                 value_type *j = last2.ptr_;
                 value_type *i = j;
-                for (; i != result.base() && comp(*f, *--i); --j) {
+                for (; i != result.base() && comp(*first, *--i); --j) {
                     *OutputIterator(j, result.buf_) = *i;
                 }
-                *OutputIterator(j, result.buf_) = *f;
+                *OutputIterator(j, result.buf_) = *first;
             }
         }
         return OutputIterator(last2.ptr_, result.buf_);
