@@ -773,14 +773,15 @@ int MMotion::GetAnime() {
 
 // Runs the anime's commands up to the next wait that outlasts the frames given.
 void MMotion::Advance(u32 frames) {
-    BOOL done = FALSE;
-    struct {
+    bool done = false;
+    struct Change {
         u32 pal;
         u32 chr;
     } changes[16];
+    Change *change = changes;
     for (u32 i = 0; i < mCellCount; i++) {
-        changes[i].pal = -1;
-        changes[i].chr = -1;
+        change[i].pal = -1;
+        change[i].chr = -1;
     }
     do {
         u16 command = *mScript++;
@@ -811,16 +812,16 @@ void MMotion::Advance(u32 frames) {
                 } else {
                     mFramesLeft -= frames;
                     mFrame += frames;
-                    done = TRUE;
+                    done = true;
                 }
             } else {
-                done = TRUE;
+                done = true;
             }
             break;
         }
         case 12:
             mPlaying = FALSE;
-            done = TRUE;
+            done = true;
             if (mUnk2A) {
                 for (u32 i = 0; i < mCellCount; i++) {
                     if (!mCells[i].visible) {
@@ -841,7 +842,7 @@ void MMotion::Advance(u32 frames) {
         case 7: {
             int length = command >> 8;
             const char *data = (const char *) mScript;
-            mScript = (const u16 *) ((const u8 *) mScript + length + 1);
+            *(const u8 **) &mScript += (length + 1) & ~1;
             Command(data, length);
             break;
         }
@@ -860,10 +861,10 @@ void MMotion::Advance(u32 frames) {
             Unk48(command >> 8);
             break;
         case 0:
-            changes[command >> 8].pal = *mScript++;
+            change[command >> 8].pal = *mScript++;
             break;
         case 1:
-            changes[command >> 8].chr = *mScript++;
+            change[command >> 8].chr = *mScript++;
             break;
         case 2:
             ShowCell(command >> 8);
@@ -875,21 +876,22 @@ void MMotion::Advance(u32 frames) {
             SetCellAttr(command >> 8, *mScript++);
             break;
         case 13: {
-            int left = *(const s16 *) mScript++ << 4;
-            int top = *(const s16 *) mScript++ << 4;
-            int right = *(const s16 *) mScript++ << 4;
-            int bottom = *(const s16 *) mScript++ << 4;
-            SetCellRect(command >> 8, MRect(left, top, right, bottom));
+            MRect rect;
+            rect.left = *(const s16 *) mScript++ << 4;
+            rect.top = *(const s16 *) mScript++ << 4;
+            rect.right = *(const s16 *) mScript++ << 4;
+            rect.bottom = *(const s16 *) mScript++ << 4;
+            SetCellRect(command >> 8, rect);
             break;
         }
         }
     } while (!done);
     for (u32 i = 0; i < mCellCount; i++) {
-        if (changes[i].pal != -1) {
-            SetCellPalette(i, changes[i].pal);
+        if (change[i].pal != -1) {
+            SetCellPalette(i, change[i].pal);
         }
-        if (changes[i].chr != -1) {
-            SetCellChr(i, changes[i].chr);
+        if (change[i].chr != -1) {
+            SetCellChr(i, change[i].chr);
         }
     }
 }
@@ -983,7 +985,7 @@ static inline void SetEntryMode(MSmartOamCell *entry, int mode) {
 }
 
 void MMotion::ShowCell(int cell) {
-    mCells[cell].visible = TRUE;
+    mCells[(u32) cell].visible = TRUE;
     if (!mHidden) {
         SetEntryMode(GetCellEntry(cell), mCells[cell].objMode);
     }
