@@ -186,14 +186,14 @@ void MDisplay::SetBg0Is3D(BOOL on) {
 // NONMATCHING: the two bit masks swap registers (and the from/to pointers load the other way round).
 void MDisplay::SetBgMode(int mode, const int *from, const int *to, u32 count) {
     u32 i;
-    u32 bitA, bitB;
+    u32 bitB, bitA;
 
     mDispCnt.bgMode = mode;
     for (i = 0; i < count; i++) {
-        bitB = 1 << (to[i] + 8);
         bitA = 1 << (from[i] + 8);
-        mDispCnt.raw = (mDispCnt.raw & ~(bitB | bitA)) | ((mDispCnt.raw & bitA) ? bitB : 0) |
-                       ((mDispCnt.raw & bitB) ? bitA : 0);
+        bitB = 1 << (to[i] + 8);
+        mDispCnt.raw = (mDispCnt.raw & ~(bitB | bitA)) | ((mDispCnt.raw & bitB) ? bitA : 0) |
+                       ((mDispCnt.raw & bitA) ? bitB : 0);
     }
     mBlend->SwapPlanes(mode, from, to, count);
     mWin->SwapPlanes(mode, from, to, count);
