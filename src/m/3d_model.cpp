@@ -223,7 +223,8 @@ void M3DModel::Draw(u32 lights) {
         MtxFx33 m;
         MTX_Identity33_(&m);
         int idx = (angle >> 4) * 2;
-        m._00 = m._22 = FX_SinCosTable_[idx + 1];
+        m._00 = FX_SinCosTable_[idx + 1];
+        m._22 = m._00;
         m._20 = FX_SinCosTable_[idx];
         m._02 = -m._20;
         MTX_Concat43(&mMatrix43, &mScene->mCamera, &mMatrix43);
@@ -333,7 +334,7 @@ void M3DModel::Draw(u32 lights) {
                     u32 tex = (t >> 24) & 0x3F;
                     u32 pltt = (t >> 16) & 0x3F;
                     u32 id = (material + mPolygonId) & 0x3F;
-                    int alpha = (int)(mUnk1C * a) >> 12;
+                    int alpha = (int)(a * mUnk1C) >> 12;
                     if (alpha <= 0) {
                         alpha = 0x1F;
                         t &= ~0xC0;
