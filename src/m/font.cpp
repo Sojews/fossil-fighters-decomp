@@ -474,17 +474,17 @@ void MChr16BinFontTransfer::Transfer() {
         while (rows != 0) {
             u32 bits = 0;
             switch (srcBytes) {
-            case 1:
-                bits = src[0] << 24;
-                src += 1;
+            case 3:
+                bits = (src[0] << 24) | (src[1] << 16) | (src[2] << 8);
+                src += 3;
                 break;
             case 2:
                 bits = (src[0] << 24) | (src[1] << 16);
                 src += 2;
                 break;
-            case 3:
-                bits = (src[0] << 24) | (src[1] << 16) | (src[2] << 8);
-                src += 3;
+            case 1:
+                bits = src[0] << 24;
+                src += 1;
                 break;
             }
             u32 glyph = mask & ((bits >> shift) << mUnk3C);
@@ -537,17 +537,17 @@ void MChr16BinFontTransfer::Transfer() {
         while (rows != 0) {
             u32 prev = shadow;
             switch (srcBytes) {
-            case 1:
-                bits = src[0] << 24;
-                src += 1;
+            case 3:
+                bits = (src[0] << 24) | (src[1] << 16) | (src[2] << 8);
+                src += 3;
                 break;
             case 2:
                 bits = (src[0] << 24) | (src[1] << 16);
                 src += 2;
                 break;
-            case 3:
-                bits = (src[0] << 24) | (src[1] << 16) | (src[2] << 8);
-                src += 3;
+            case 1:
+                bits = src[0] << 24;
+                src += 1;
                 break;
             }
             u32 row = (bits >> shift) << mUnk3C;
