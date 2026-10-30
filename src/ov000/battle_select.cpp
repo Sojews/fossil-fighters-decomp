@@ -856,7 +856,7 @@ static inline u32 DinoBattleSelectCreatureLevel(const DinoBattleSelectCreature *
 static inline MPoint DinoCursorRowPos(u32 both, int row) {
     const MPoint &base = data_ov000_02195f88[both];
     const MPoint &step = data_ov000_02195f98[both];
-    return base + MPoint(step.x * row, step.y * row);
+    return MPoint(step.x * row, step.y * row) + base;
 }
 
 static inline MPoint DinoRowPos(u32 both, int row) {
@@ -870,9 +870,10 @@ void UseCreatureSelect::Start() {
     mInputHub = new MSingleInputHub(1);
     mInputHub->GetInput(0)->SetRepeat(0xF0, 20, 3);
     mParallel.AddTail(mInputHub);
+    MFontSet *font;
     MSmartOam *top = new MSmartOam(gLcd->mMain, 100, 0, TRUE);
     MSmartOam *oam = new MSmartOam(gLcd->mSub, 100, 0, TRUE);
-    MFontSet *font = gDinoResource->CreateFont12(0, 10, 1);
+    font = gDinoResource->CreateFont12(0, 10, 1);
     CreateTexts(top, font);
     mParallel.AddTail(top);
     mCount = mUnk7C ? 6 : 3;

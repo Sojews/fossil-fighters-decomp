@@ -356,9 +356,10 @@ void MChr16FontTransfer::Transfer() {
         mGlyphSize.y -= over;
     }
     int rows = mGlyphSize.y;
+    int shift;
     int width = mSize.x;
     u32 *dst = (u32 *) ((u8 *) mDest + ((mPos.x >> 3) + (mPos.y >> 3) * width) * 32 + (mPos.y & 7) * 4);
-    int shift = mPos.x & 7;
+    shift = mPos.x & 7;
     u32 firstMask = ~((1 << (shift * 4)) - 1);
     int end = shift + mGlyphSize.x;
     int endShift = end & 7;
@@ -402,10 +403,11 @@ void MChr16FontTransfer::Transfer() {
         while (rows != 0) {
             u32 carry = 0;
             for (u32 i = 0; i < words; i++) {
+                u32 mask;
                 u32 word = MReadGlyphWord(src);
                 u32 out = (word << shift) | (carry >> (32 - shift));
                 // A nibble mask of the nonzero pixels.
-                u32 mask = (((((~out >> 1) & 0x77777777) + out) & 0x88888888) >> 3) + 0x77777777;
+                mask = (((((~out >> 1) & 0x77777777) + out) & 0x88888888) >> 3) + 0x77777777;
                 mask ^= 0x77777777;
                 if (i >= first && i < last) {
                     if (i == 0 && i == words - 1) {

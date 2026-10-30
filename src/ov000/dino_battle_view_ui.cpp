@@ -974,8 +974,8 @@ void DinoBattleViewUiSelectAllMenu::OnStart() {
     MSmartOam *oam = new MSmartOam(3, 0, 1);
     DinoSoundPlaySe(0x5F, 0);
     u32 text = data_0208a358;
-    MParallelTaskSet *parallel = &mParallel;
     for (u32 i = 0; i < mCount; i++) {
+        MParallelTaskSet *parallel = &mParallel;
         DinoBattleViewCreature *creature = ((DinoBattleView *)mView)->FindCreatureByAC(mIds[i]);
         if (((DinoBattleView *)mView)->GetUnkE4(mPlayer)->GetUnkAC() == creature->GetUnkB0()) {
             text = data_0208a354;
