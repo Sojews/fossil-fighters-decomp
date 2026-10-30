@@ -3487,14 +3487,6 @@ extern "C" DinoBattleDebugLog *data_ov000_021978c0;
 extern "C" BOOL func_ov000_0218472c(int flag);
 extern "C" const u32 data_0208a304, data_0208a308;  // the debug log's attack and damage formats
 
-// The damage after the special attack's affinity (for a special) and the position.
-static inline int DinoAttackDamage(DinoBattleModelCreature *attacker, DinoBattleModelCreature *target, MFx32 value,
-                                   MFx32 affinity, u8 special) {
-    if (special) {
-        value = attacker->ApplyRatio2(value, affinity);
-    }
-    return MFx32ToInt(MFx32(attacker->ApplyPositionRatio(value, target->GetB8Category())));
-}
 // (For the debug log.)
 static inline float DinoFxToFloat(MFx32 x) {
     return (float)x.v / 4096.0f;
@@ -3505,8 +3497,7 @@ static inline float DinoFxToFloat(MFx32 x) {
 // The attacker's attack on the target: whether it hits, the damage (and recoil), the life tasks, and the view's
 // request to show it. (Defined here at the end: placed after func_ov000_02162ad8, as in the game, it changes
 // func_ov000_0216d2cc's branch layout.)
-// NONMATCHING: 99.97%, the inlined damage's ApplyRatio2/ApplyPositionRatio temporaries take lower stack slots than
-// the game's (which has them in creation order with this function's), and one zero store is scheduled earlier.
+// NONMATCHING: 99.98%, one zero store is scheduled earlier and two MFx32 temporaries take each other's slots.
 MTask *DinoBattleModelPlayer::CreateAttackTask(DinoBattleModelCreature *attacker, DinoBattleModelCreature *target,
                                                u32 attack, u8 special, int unk, u8 fade) {
     MSerialTaskSet *set = new MSerialTaskSet(TRUE);
@@ -3539,7 +3530,11 @@ MTask *DinoBattleModelPlayer::CreateAttackTask(DinoBattleModelCreature *attacker
             const u16 *cost = DinoOffsetPtr<u16>(def, def->cost);
             result[0] = 1;
             base = attacker->CalcDamage(target, MFx32(cost[1]), hit, result);
-            damage = DinoAttackDamage(attacker, target, attacker->ApplyRatio(base, critical), affinity, special);
+            base = attacker->ApplyRatio(base, critical);
+            if (special) {
+                base = attacker->ApplyRatio2(base, affinity);
+            }
+            damage = MFx32ToInt(MFx32(attacker->ApplyPositionRatio(base, target->GetB8Category())));
             if (damage < 1 && result[0]) {
                 damage = 1;
             }
