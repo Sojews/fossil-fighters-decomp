@@ -270,7 +270,7 @@ MRect MMotionFile::GetChrBounds(u32 index) {
         if (chr->mode == 0) {
             for (int ty = 0; ty < size.y; ty++) {
                 for (int tx = 0; tx < size.x; tx++) {
-                    for (int row = 0; row < 8; row++) {
+                    for (int row = 0; row < 8; row++, rows++) {
                         if (*rows != 0) {
                             int y = row + ty * 8;
                             rect.top = std::min(rect.top, y);
@@ -291,14 +291,13 @@ MRect MMotionFile::GetChrBounds(u32 index) {
                             }
                         }
                         pixels += 4;
-                        rows++;
                     }
                 }
             }
         } else {
             for (int ty = 0; ty < size.y; ty++) {
                 for (int tx = 0; tx < size.x; tx++) {
-                    for (int row = 0; row < 8; row++) {
+                    for (int row = 0; row < 8; row++, rows += 2) {
                         if (rows[0] != 0 || rows[1] != 0) {
                             int y = row + ty * 8;
                             rect.top = std::min(rect.top, y);
@@ -312,7 +311,6 @@ MRect MMotionFile::GetChrBounds(u32 index) {
                                 x++;
                             }
                         }
-                        rows += 2;
                         pixels += 8;
                     }
                 }
