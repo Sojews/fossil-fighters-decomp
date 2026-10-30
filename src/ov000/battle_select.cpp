@@ -286,8 +286,8 @@ DebugAutoBattle::DebugAutoBattle() : MProcess(NULL) {
         }
     }
     mResults.resize(pairs);
-    u32 pair = 0;
-    for (u32 a = 0; a < records.size(); a++) {
+    int pair = 0;
+    for (int a = 0; a < records.size(); a++) {
         for (u32 b = a + 1; b < records.size(); b++) {
             DinoBattleParams params;
             DinoDebugBattleParams(params);
