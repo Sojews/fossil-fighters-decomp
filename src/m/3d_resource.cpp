@@ -377,8 +377,11 @@ void M3DGrid::Load(const void *data) {
 // The height of the highest triangle under (x, z), or the lowest fx32 if there's none.
 // NONMATCHING: register allocation and the order of the loop's spill slots.
 fx32 M3DGrid::GetHeight(fx32 px, fx32 pz) {
+    int a;
+    int b;
     int best;
     std::vector<u16> *tris;
+    int c;
     int i;
     int ya, yb, za, zb;
     int x0, y0, z0, x1, y1, z1, x2, y2, z2;
@@ -408,8 +411,8 @@ fx32 M3DGrid::GetHeight(fx32 px, fx32 pz) {
         y0 = mVerts[(*tris)[i]].y;
         z0 = mVerts[(*tris)[i]].z - z;
         x1 = mVerts[(*tris)[i + 1]].x - x;
-        z1 = mVerts[(*tris)[i + 1]].z - z;
         y1 = mVerts[(*tris)[i + 1]].y;
+        z1 = mVerts[(*tris)[i + 1]].z - z;
         x2 = mVerts[(*tris)[i + 2]].x - x;
         y2 = mVerts[(*tris)[i + 2]].y;
         z2 = mVerts[(*tris)[i + 2]].z - z;
@@ -417,21 +420,21 @@ fx32 M3DGrid::GetHeight(fx32 px, fx32 pz) {
         if (x0 > 0 && x1 > 0 && x2 > 0) continue;
         if (z0 < 0 && z1 < 0 && z2 < 0) continue;
         if (z0 > 0 && z1 > 0 && z2 > 0) continue;
-        if (x0 * z1 - x1 * z0 > 0) continue;
+        if (z1 * x0 - x1 * z0 > 0) continue;
         if (z0 * x2 - x0 * z2 > 0) continue;
-        if (x1 * z2 - x2 * z1 > 0) continue;
+        if (z2 * x1 - x2 * z1 > 0) continue;
         if (x0 == x1 && x0 == x2) {
             h = y0 + -x0 * (y1 - y0) / (z1 - z0);
         } else {
-            int a = x1 - x0;
+            a = x1 - x0;
+            b = x2 - x0;
             if (a < 0) {
                 a = -a;
             }
-            int b = x2 - x0;
             if (b < 0) {
                 b = -b;
             }
-            int c = x2 - x1;
+            c = x2 - x1;
             if (c < 0) {
                 c = -c;
             }
