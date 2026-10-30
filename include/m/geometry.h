@@ -81,6 +81,15 @@ struct MRect {
         r.bottom += d;
         return r;
     }
+    // This rect moved by (dx, dy).
+    MRect Moved(int dx, int dy) const {
+        MRect r = *this;
+        r.left += dx;
+        r.top += dy;
+        r.right += dx;
+        r.bottom += dy;
+        return r;
+    }
     // This rect moved by p.
     MRect Moved(MPoint p) const {
         int x = p.x, y = p.y;

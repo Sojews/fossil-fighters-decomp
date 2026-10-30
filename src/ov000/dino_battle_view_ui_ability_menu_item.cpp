@@ -33,20 +33,10 @@ MRect DinAttackItemHelp::GetRect() {
         MRect frame = mItem->GetFrame();
         if (mFlag) {
             int y = frame.top - 2;
-            r = DinoBattleHelpBase::GetRect();
-            r.left += frame.left;
-            r.top += y;
-            r.right += frame.left;
-            r.bottom += y;
-            return r;
+            return DinoBattleHelpBase::GetRect().Moved(frame.left, y);
         }
         int y = frame.top;
-        r = DinoBattleHelpBase::GetRect();
-        r.left += frame.left;
-        r.top += y;
-        r.right += frame.left;
-        r.bottom += y;
-        return r;
+        return DinoBattleHelpBase::GetRect().Moved(frame.left, y);
     }
     r = MRect(0, 0, 0, 0);
     return r;
