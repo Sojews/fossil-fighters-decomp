@@ -859,6 +859,13 @@ static inline MPoint DinoCursorRowPos(u32 both, int row) {
     return MPoint(step.x * row, step.y * row) + base;
 }
 
+// (Select's: the base plus the step scaled.)
+static inline MPoint DinoCursorRowPosFromBase(u32 both, int row) {
+    const MPoint &base = data_ov000_02195f88[both];
+    const MPoint &step = data_ov000_02195f98[both];
+    return base + MPoint(step.x * row, step.y * row);
+}
+
 static inline MPoint DinoRowPos(u32 both, int row) {
     const MPoint &base = data_ov000_02195f88[both];
     const MPoint &step = data_ov000_02195f98[both];
@@ -1062,7 +1069,7 @@ void UseCreatureSelect::Select() {
         }
         mRows[mUnk88]->SetText(std::string(text));
     }
-    mCursor->SetPosition(DinoCursorRowPos(mUnk7C, mUnk88) + data_ov000_02195e50.cursorOffset);
+    mCursor->SetPosition(DinoCursorRowPosFromBase(mUnk7C, mUnk88) + data_ov000_02195e50.cursorOffset);
 }
 
 // The same, for the level select.
