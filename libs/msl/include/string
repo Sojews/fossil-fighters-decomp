@@ -54,7 +54,7 @@ public:
             --p_;
             return *this;
         }
-        bool operator!=(const const_iterator &x) const { return p_ != x.p_; }
+        bool operator!=(const const_iterator &x) const { return !(p_ == x.p_); }
         bool operator==(const const_iterator &x) const { return p_ == x.p_; }
 
         const C *p_;
