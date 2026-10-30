@@ -820,8 +820,8 @@ void M3DModelPatchDisplayList(M3DModel *model, const u32 *tags, u32 count) {
             case 2: {
                 u32 t = texWords[arg];
                 const M3DTexEntry *tex = (const M3DTexEntry *) model->mUnkDC + ((t >> 24) & 0x7F);
-                const M3DTexEntry *pltt = (const M3DTexEntry *) model->mUnkDC + ((t >> 16) & 0x7F);
                 int shift = 4 - (((M3D_TEX_IMAGE_PARAM(tex) >> 26) & 7) == 2 ? 1 : 0);
+                const M3DTexEntry *pltt = (const M3DTexEntry *) model->mUnkDC + ((t >> 16) & 0x7F);
                 u32 base = (model->mPlttKey + M3D_TEX_PLTT_OFFSET(pltt)) >> shift;
                 u32 at = offset & ~1;
                 *(u16 *) (model->mModelData + at) = base;

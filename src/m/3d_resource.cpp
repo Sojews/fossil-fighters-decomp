@@ -408,8 +408,8 @@ fx32 M3DGrid::GetHeight(fx32 px, fx32 pz) {
         y0 = mVerts[(*tris)[i]].y;
         z0 = mVerts[(*tris)[i]].z - z;
         x1 = mVerts[(*tris)[i + 1]].x - x;
-        y1 = mVerts[(*tris)[i + 1]].y;
         z1 = mVerts[(*tris)[i + 1]].z - z;
+        y1 = mVerts[(*tris)[i + 1]].y;
         x2 = mVerts[(*tris)[i + 2]].x - x;
         y2 = mVerts[(*tris)[i + 2]].y;
         z2 = mVerts[(*tris)[i + 2]].z - z;
