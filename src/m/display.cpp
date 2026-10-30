@@ -208,13 +208,18 @@ static void SwitchThreadDisplay(u32 from, u32 to) {
     if (sPrevSwitchThreadCallback != NULL) {
         sPrevSwitchThreadCallback((OSThread *) from, (OSThread *) to);
     }
-    MIrqLock lock;
+    // (MIrqLock's steps written out: the game keeps the flag in a register, not in a lock object.)
+    u16 prev = REG_IME;
+    REG_IME = 0;
+    bool enabled = prev;
     MThreadDisplayMap::iterator it = sThreadDisplays->find(from);
     if (it != sThreadDisplays->end()) {
         it->second = gCurrentDisplay;
     }
     it = sThreadDisplays->find(to);
     gCurrentDisplay = it != sThreadDisplays->end() ? (MDisplay *) it->second : NULL;
+    prev = REG_IME;
+    REG_IME = enabled;
 }
 
 void InitThreadDisplays() {
