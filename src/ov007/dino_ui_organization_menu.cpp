@@ -40,6 +40,13 @@
 #include <printf.h>
 #include "game/dino_ui_parts_reviver_name.h"
 
+// The sorts' buffer: the pair's zero is the long at +0x54 of the file's pooled .data (see the sort instances at the
+// end), so the instance is spelled out with that zero.
+extern "C" const char *data_ov007_0218e9ec[];
+namespace std {
+template <> pair<u32 *, ptrdiff_t> get_temporary_buffer<u32>(ptrdiff_t len);
+} // namespace std
+
 DinoUiOrganizationMenu::~DinoUiOrganizationMenu() {
     gCurrentDisplay->mBlend->Reset();
 }
@@ -1757,8 +1764,21 @@ template void std::__vec_deleter<MMotionFile, std::allocator<MMotionFile> >::sub
 template void std::__vec_deleter<u32, std::allocator<u32> >::assign<u32 *>(u32 *first, u32 *last, Metrowerks::int2type<true>);
 
 // The list's sorts (the game emits the whole stable_sort machinery here, after SetSort's caller).
-// NONMATCHING: std::__inplace_merge, std::__stable_sort_move, std::__insertion_sort_move and std::get_temporary_buffer,
-// as in ov006_02178b80.cpp.
+// NONMATCHING: std::__inplace_merge, std::__stable_sort_move and std::__insertion_sort_move, as in ov006_02178b80.cpp.
+namespace std {
+template <> pair<u32 *, ptrdiff_t> get_temporary_buffer<u32>(ptrdiff_t len) {
+    pair<u32 *, ptrdiff_t> result(0, *(const long *)((const u8 *)data_ov007_0218e9ec + 0x54));
+    while (len > 0) {
+        result.first = (u32 *)::operator new[](len * sizeof(u32), nothrow);
+        if (result.first != 0) {
+            result.second = len;
+            return result;
+        }
+        len /= 2;
+    }
+    return result;
+}
+} // namespace std
 template void std::stable_sort(std::vector<u32>::iterator, std::vector<u32>::iterator, DinoCreatureByUnk0D);
 template void std::stable_sort(std::vector<u32>::iterator, std::vector<u32>::iterator, DinoCreatureByUnk02031104);
 template void std::stable_sort(std::vector<u32>::iterator, std::vector<u32>::iterator, DinoCreatureByLevel);

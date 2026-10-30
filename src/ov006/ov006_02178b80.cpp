@@ -7,6 +7,27 @@
 #include "game/dino_ui_rv_status_menu_item_menu.h"
 #include "m/lcd.h"
 
+// The sorts' buffer: the pair's zero is the long at +0xC of the file's pooled .data object (the rest of it isn't
+// decompiled), so the instance is spelled out here with that zero.
+extern "C" struct {
+    u8 unk00[0xC];
+    long zero;  // 0x0C
+} data_ov006_021939d4;
+namespace std {
+template <> pair<u32 *, ptrdiff_t> get_temporary_buffer<u32>(ptrdiff_t len) {
+    pair<u32 *, ptrdiff_t> result(0, data_ov006_021939d4.zero);
+    while (len > 0) {
+        result.first = (u32 *)::operator new[](len * sizeof(u32), nothrow);
+        if (result.first != 0) {
+            result.second = len;
+            return result;
+        }
+        len /= 2;
+    }
+    return result;
+}
+} // namespace std
+
 DinoUiRvStatusMenu::DinoUiRvStatusMenu(int page, const DinoTeam *team)
     : MMenu(gLcd->mMain, NULL, 0), mResult(NULL), mPage(page), mLastPage(0), mTab(0), mUnk109(0xFF), mUnk10A(0) {
     mCreatures.clear();
@@ -86,8 +107,7 @@ DinoUiRvStatusMenu::DinoUiRvStatusMenu(int *page, u8 sort)
 
 // The list's sorts (the game emits the whole stable_sort machinery here, the medal menu and the museum use it too).
 // NONMATCHING: std::__inplace_merge (stack layout, and the game elides one argument copy), std::__stable_sort_move
-// and std::__insertion_sort_move (register allocation), as in the museum; std::get_temporary_buffer (the game loads
-// the pair's zero from the TU's pooled .data object at data_ov006_021939d4, which isn't decompiled).
+// and std::__insertion_sort_move (register allocation), as in the museum.
 template void std::stable_sort(std::vector<u32>::iterator, std::vector<u32>::iterator, DinoCreatureByUnk0D);
 template void std::stable_sort(std::vector<u32>::iterator, std::vector<u32>::iterator, DinoCreatureByUnk02031104);
 template void std::stable_sort(std::vector<u32>::iterator, std::vector<u32>::iterator, DinoCreatureByLevel);
