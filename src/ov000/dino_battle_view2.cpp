@@ -135,9 +135,9 @@ extern "C" MTask *func_ov000_0218ec8c(u32 arg0, int arg1, BOOL *proceed);
 extern "C" const u32 data_0208a3a0, data_0208a3a4, data_0208a444;
 
 // NONMATCHING: 99.9%, the game tests the flag with the branch the other way round (beq to the 1).
-DinoBattleViewTurnEndDialog::DinoBattleViewTurnEndDialog(u32 view, MMessageObserver *target, BOOL focusNo)
+DinoBattleViewTurnEndDialog::DinoBattleViewTurnEndDialog(u32 view, MMessageObserver *target, BOOL focusYes)
     : DinoCommonYesNoMenu(std::string(gDinoResource->GetText(data_0208a444)), NULL, data_0208a3a4, data_0208a3a0,
-                          !focusNo),
+                          focusYes ? DINO_YES_NO_ITEM_YES : DINO_YES_NO_ITEM_NO),
       mTarget(target), mUnkE0(view) {
 }
 
@@ -312,7 +312,8 @@ void DinoBattleDebugLog::Clear() {
 extern "C" const u32 data_0208a39c, data_0208a3a0;
 
 DinoBattleViewGivingUpDialog::DinoBattleViewGivingUpDialog(const char *text, u8 *givingUp)
-    : DinoCommonYesNoMenu(std::string(text), NULL, data_0208a39c, data_0208a3a0, 1), mGivingUp(givingUp) {
+    : DinoCommonYesNoMenu(std::string(text), NULL, data_0208a39c, data_0208a3a0, DINO_YES_NO_ITEM_NO),
+      mGivingUp(givingUp) {
 }
 
 inline DinoBattleViewUiRootSelectItem::DinoBattleViewUiRootSelectItem(DinoBattleViewUiRootSelect *menu, int index,

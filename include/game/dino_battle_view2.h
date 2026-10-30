@@ -66,9 +66,12 @@ public:
     std::vector<void *> mUnk100;    // 0x100
 };
 
+// A DinoCommonYesNoMenu's items, in order (its initially focused one).
+enum DinoYesNoItem { DINO_YES_NO_ITEM_YES, DINO_YES_NO_ITEM_NO };
+
 class DinoBattleViewTurnEndDialog : public DinoCommonYesNoMenu {
 public:
-    DinoBattleViewTurnEndDialog(u32 view, MMessageObserver *target, BOOL focusNo);
+    DinoBattleViewTurnEndDialog(u32 view, MMessageObserver *target, BOOL focusYes);
     virtual ~DinoBattleViewTurnEndDialog();
     virtual void OnStart();
     virtual void OnFocus(MMenuItem *item);
