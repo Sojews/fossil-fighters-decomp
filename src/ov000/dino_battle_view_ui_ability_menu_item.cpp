@@ -26,7 +26,6 @@ DinAttackItemHelp::~DinAttackItemHelp() {
 }
 
 // The help sits on the item (two pixels higher for some).
-// NONMATCHING: 97%, the game copies the base rect through a pointer to it.
 MRect DinAttackItemHelp::GetRect() {
     MRect r;
     if (mItem != NULL) {
