@@ -719,7 +719,7 @@ const s16 *M3DModelGetMorphVertices(M3DModel *model) {
     if (count == 0) {
         return data_0214c18c;
     }
-    int w1 = 0;
+    s32 w1 = 0;
     u32 flags = ((const u32 *) model->mModelRes)[5];
     const s16 *prev = anim->frames;
     const s16 *next = prev;
@@ -727,7 +727,7 @@ const s16 *M3DModelGetMorphVertices(M3DModel *model) {
     u32 t0 = 0;
     u32 frame = model->mFrame;
     s16 *out = data_0214c18c;
-    int w0;
+    s32 w0;
     int d;
     if (flags & 2) {
         for (; w1 < anim->frameCount; ) {
@@ -747,30 +747,25 @@ const s16 *M3DModelGetMorphVertices(M3DModel *model) {
     }
     prev += 2;
     next += 2;
-    if (t0 == t1 || w1 == 0) {
-        return prev;
+    if (t0 != t1 && w1 != 0) {
+        if (count >= 650) {
+            return prev;
+        }
+        if (count & 1) {
+            *out++ = (*prev++ * w0 + *next++ * w1) / d;
+            *out++ = (*prev++ * w0 + *next++ * w1) / d;
+            *out++ = (*prev++ * w0 + *next++ * w1) / d;
+        }
+        int n = (count >> 1) * 3;
+        for (int i = 0; i < n; i++) {
+            M3DSetDiv32_32(*prev++ * w0 + *next++ * w1, d);
+            out[1] = (*prev++ * w0 + *next++ * w1) / d;
+            *out = M3DGetDivResult32();
+            out += 2;
+        }
+        return data_0214c18c;
     }
-    if (count >= 650) {
-        return prev;
-    }
-    if (count & 1) {
-        out[0] = (prev[0] * w0 + next[0] * w1) / d;
-        out[1] = (prev[1] * w0 + next[1] * w1) / d;
-        out[2] = (prev[2] * w0 + next[2] * w1) / d;
-        prev += 3;
-        next += 3;
-        out += 3;
-    }
-    int n = (count >> 1) * 3;
-    for (int i = 0; i < n; i++) {
-        M3DSetDiv32_32(prev[0] * w0 + next[0] * w1, d);
-        out[1] = (prev[1] * w0 + next[1] * w1) / d;
-        next += 2;
-        prev += 2;
-        *out = M3DGetDivResult32();
-        out += 2;
-    }
-    return data_0214c18c;
+    return prev;
 }
 
 extern "C" void G3_MultMtx43(const MtxFx43 *m);
