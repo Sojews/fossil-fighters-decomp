@@ -247,8 +247,8 @@ void MOamCanvas<TOam, TUnit>::Alloc(BOOL fromEnd) {
     MChr *chr = mDisplay->mObj->mChr;
     for (u32 i = 0; i < mPieces.size(); i++) {
         Piece &piece = mPieces[i];
-        u32 boundary = chr->mBoundary;
         u32 tiles = gObjTileSizes[0][piece.shape].x * gObjTileSizes[0][piece.shape].y;
+        u32 boundary = chr->mBoundary;
         u32 size;
         if (chr->mMode == 0) {
             size = (tiles + boundary - 1) / boundary * boundary;
@@ -263,17 +263,15 @@ void MOamCanvas<TOam, TUnit>::Alloc(BOOL fromEnd) {
     mChrBlock = chr->Alloc(0, offset, fromEnd);
     for (u32 i = 0; i < mPieces.size(); i++) {
         int shape = mPieces[i].shape;
-        typename TUnit::Entry *entry = &mUnit->GetEntries()[i];
-        entry->SetShape(shape);
-        entry->SetPalette(mPalBlock);
+        mUnit->GetEntries()[i].SetShape(shape);
+        mUnit->GetEntries()[i].SetPalette(mPalBlock);
         u32 tile = (mChrBlock->index + mPieces[i].chrOffset) / chr->mBoundary;
-        if (entry->colors256 == 1) {
+        if (mUnit->GetEntries()[i].colors256 == 1) {
             tile *= 2;
         }
-        entry->tile = tile;
+        mUnit->GetEntries()[i].tile = tile;
     }
 }
-
 template class MOamCanvas<MOam, MOamUnit>;
 template class MOamCanvas<MSmartOam, MSmartOamUnit>;
 
