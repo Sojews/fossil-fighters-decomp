@@ -322,10 +322,11 @@ namespace std {
         }
 
         void resize(size_t n) {
-            if (n > size_) {
-                append(n - size_, Metrowerks::int2type<true>());
-            } else if (n < size_) {
-                erase_at_end(size_ - n);
+            size_t sz = size_;
+            if (n > sz) {
+                append(n - sz, Metrowerks::int2type<true>());
+            } else if (n < sz) {
+                erase_at_end(sz - n);
             }
         }
 

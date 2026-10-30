@@ -189,6 +189,10 @@ struct DinoBattleSelectSide {
     u32 unk0COffset;    // 0x10
     u32 creatureCount;  // 0x14
     u32 creatureOffset; // 0x18
+
+    u32 GetUnk0C(u32 j) const {
+        return ((const u32 *)((const u8 *)this + unk0COffset))[j];
+    }
 };
 
 struct DinoBattleSelectData {
@@ -255,9 +259,8 @@ DebugAutoBattle::DebugAutoBattle() : MProcess(NULL) {
     DinoDebugBattleParams(defaults);
     for (int side = 0; side < 2; side++) {
         for (int i = 0; i < 3; i++) {
-            DinoCreatureState *creature = (DinoCreatureState *)&defaults.sides[side].mCreatures[i];
-            creature->index = side * 3 + i + 1;
-            DinoDebugSetLevel(creature->parts, 7);
+            ((DinoCreatureState *)&defaults.sides[side].mCreatures[i])->index = side * 3 + i + 1;
+            DinoDebugSetLevel(((DinoCreatureState *)&defaults.sides[side].mCreatures[i])->parts, 7);
         }
         defaults.sides[side].mName = side != 0 ? data_ov000_021962b4 : data_ov000_021962bc;
         defaults.sides[side].unk54 = 7;
@@ -269,7 +272,7 @@ DebugAutoBattle::DebugAutoBattle() : MProcess(NULL) {
         DinoBattleView3DRecord record;
         record.unk00 = src->unk08;
         for (int j = 0; j < src->unk0CCount && j < 2; j++) {
-            record.unk08[j] = ((const u32 *)((const u8 *)src + src->unk0COffset))[j];
+            record.unk08[j] = src->GetUnk0C(j);
         }
         for (u32 j = 0; j < src->creatureCount; j++) {
             const u32 *creature = (const u32 *)((const u8 *)src + src->creatureOffset) + j * 3;
@@ -296,19 +299,17 @@ DebugAutoBattle::DebugAutoBattle() : MProcess(NULL) {
                 char name[16];
                 OS_SPrintf(name, data_ov000_021962e0, index + 1);
                 params.sides[side].mName = name;
-                const DinoBattleView3DRecord &record = records[index];
-                params.sides[side].unk54 = record.unk00;
-                params.sides[side].unk68 = record.unk08[0];
-                params.sides[side].unk6C = record.unk08[0];
+                params.sides[side].unk54 = records[index].unk00;
+                params.sides[side].unk68 = records[index].unk08[0];
+                params.sides[side].unk6C = records[index].unk08[0];
                 for (int i = 0; i < 3; i++) {
-                    DinoCreatureState *creature = (DinoCreatureState *)&params.sides[side].mCreatures[i];
-                    creature->index = record.creatures[i].id;
-                    int level = record.creatures[i].level;
+                    ((DinoCreatureState *)&params.sides[side].mCreatures[i])->index = records[index].creatures[i].id;
+                    int level = records[index].creatures[i].level;
                     if (level > 12) {
                         level = 12;
                     }
-                    DinoDebugSetLevel(creature->parts, level);
-                    params.sides[side].unk5C[a % 3] = record.creatures[i].unk08;
+                    DinoDebugSetLevel(((DinoCreatureState *)&params.sides[side].mCreatures[i])->parts, level);
+                    params.sides[side].unk5C[(u32)a % 3] = records[index].creatures[i].unk08;
                 }
             }
             mResults[pair].unk[0] = a;
