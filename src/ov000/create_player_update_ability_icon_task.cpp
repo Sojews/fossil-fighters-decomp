@@ -3831,12 +3831,7 @@ extern "C" void func_ov000_02166904(DinoBattleModelPlayer *player, MMessageObser
         }
         if (!result[1]) {
             MFx32 ratio = attacker->CalcUnkEC(target);
-            MFx32 defense;
-            if (kindValue == 6) {
-                defense = MFx32(0);
-            } else {
-                defense = func_ov000_0216e2d8(attacker, target);
-            }
+            MFx32 defense = kindValue == 6 ? MFx32(0) : func_ov000_0216e2d8(attacker, target);
             MFx32 hit = attacker->ReduceByDefense(ratio, defense);
             MFx32 chanceBase = func_ov000_0216e4c0(attacker, target);
             MFx32 chanceRatio = func_ov000_0216e650(attacker, target);
