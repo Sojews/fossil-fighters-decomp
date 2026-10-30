@@ -889,8 +889,8 @@ void DinoBattleView3D::OnMessage(MMessage *msg) {
         mView->GetUnkE4((s32)m->mUnk1C >> 16)->GetUnkAC();
         BOOL marks = TRUE;
         u32 hits = 0;
-        u32 camera = 0;
         DinoBattleView3DDamageDefs *defs = new DinoBattleView3DDamageDefs;
+        u32 camera = 0;
         defs->mType = 0xFFFF;
         defs->mCount = 0;
         int i = 0;
