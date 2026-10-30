@@ -301,13 +301,13 @@ struct DinoUiMuseumPaths;
 extern "C" DinoUiMuseumPaths data_ov006_02196288;
 // OnStart's guard and the word after it come first in the file's .bss. (The static initializer's layout stores run
 // as this object's construction: the game's file has no separate static-init object.)
-// NONMATCHING: __sinit_dino_ui_museum.cpp 92.7%, scheduling only (the game loads the second pool anchor before the
+// NONMATCHING: __sinit_dino_ui_museum.cpp 93.3%, scheduling only (the game loads the second pool anchor before the
 // first store, and makes its last store after loading gDinoResource).
 static struct DinoUiMuseumOnStartStatic {
     DinoUiMuseumOnStartStatic() {
         DINO_POOL_WORD(data_ov006_02196288, 0x2c) = 128;
-        DINO_POOL_WORD(data_ov006_02196288, 0x30) = 176;
         DINO_POOL_WORD(data_ov006_02196208, 0x24) = 8;
+        DINO_POOL_WORD(data_ov006_02196288, 0x30) = 176;
         DINO_POOL_WORD(data_ov006_02196208, 0x28) = 150;
         DINO_POOL_WORD(data_ov006_02196188, 0x4c) = 64;
         DINO_POOL_WORD(data_ov006_02196188, 0x50) = 112;
