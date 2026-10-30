@@ -301,8 +301,8 @@ MRect MMotionFile::GetChrBounds(u32 index) {
                     for (int row = 0; row < 8; row++) {
                         if (rows[0] != 0 || rows[1] != 0) {
                             int y = row + ty * 8;
-                            rect.bottom = std::max(rect.bottom, y);
                             rect.top = std::min(rect.top, y);
+                            rect.bottom = std::max(rect.bottom, y);
                             int x = tx * 8;
                             for (u32 i = 0; i < 8; i++) {
                                 if (pixels[i] != 0) {
