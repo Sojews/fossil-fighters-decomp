@@ -2389,8 +2389,9 @@ void DinoBattleModelPlayer::OnMessage(MMessage *msg) {
                                                  special, 0, GetUnkAC(), 1));
             } else if (target->GetUnkE4() == 0) {
                 MTask *icon = CreateUpdateAbilityIconTask(TRUE);
-                mSerial.AddTail(opponent->CreateMoveToHeatAreaAnyCreature(), icon);
-                mSerial.AddTail(CreateSendAbilityResultTask(mReply));
+                MTaskSet *serial = &mSerial;
+                serial->AddTail(opponent->CreateMoveToHeatAreaAnyCreature(), icon);
+                serial->AddTail(CreateSendAbilityResultTask(mReply));
             } else {
                 // The follow-up attack.
                 u32 ids[6] = {0, 0, 0, 0, 0, 0};
