@@ -143,6 +143,21 @@ MMultiPlay::~MMultiPlay() {
     delete[] mParentLifetime;
 }
 
+static inline void MMultiPlayNotifyParent(MMessageSubject *subject, u32 i, MMultiPlayParentEvents *parent) {
+    if (parent->found) {
+        subject->Notify(new MMultiPlayParentFoundMessage(i, parent->foundGameInfo, parent->bssid));
+        parent->found = FALSE;
+    }
+    if (parent->updated) {
+        subject->Notify(new MMultiPlayParentUpdatedMessage(i, parent->updatedGameInfo));
+        parent->updated = FALSE;
+    }
+    if (parent->lost) {
+        subject->Notify(new MMultiPlayParentLostMessage(i));
+        parent->lost = FALSE;
+    }
+}
+
 void MMultiPlay::Execute() {
     if (mTimeout != 0 && !mSynchronizing) {
         mTimeout--;
@@ -212,19 +227,7 @@ void MMultiPlay::Execute() {
         }
     }
     for (u32 i = 0; i < events->mMaxParents; i++) {
-        MMultiPlayParentEvents *parent = &events->mParents[i];
-        if (parent->found) {
-            subject->Notify(new MMultiPlayParentFoundMessage(i, parent->foundGameInfo, parent->bssid));
-            parent->found = FALSE;
-        }
-        if (parent->updated) {
-            subject->Notify(new MMultiPlayParentUpdatedMessage(i, parent->updatedGameInfo));
-            parent->updated = FALSE;
-        }
-        if (parent->lost) {
-            subject->Notify(new MMultiPlayParentLostMessage(i));
-            parent->lost = FALSE;
-        }
+        MMultiPlayNotifyParent(subject, i, &events->mParents[i]);
     }
     if (events->mFatalError) {
         events->mFatalError = FALSE;

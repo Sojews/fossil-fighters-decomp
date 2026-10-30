@@ -182,9 +182,10 @@ void MHeap::Free(u32 addr, BOOL mustBeUsed) {
     }
     prev = (MHeapBlock *)&mFree;
     for (cur = mFree; cur != NULL; cur = cur->next) {
-        if (cur->addr > block->addr) {
-            BOOL mergePrev = cur != mFree && prev->addr + prev->size == block->addr;
-            BOOL mergeNext = block->addr + block->size == cur->addr;
+        u32 start = block->addr;
+        if (cur->addr > start) {
+            BOOL mergePrev = cur != mFree && prev->addr + prev->size == start;
+            BOOL mergeNext = start + block->size == cur->addr;
 
             if (mergePrev && mergeNext) {
                 prev->size += cur->size + block->size;

@@ -574,10 +574,12 @@ namespace std {
                 ok = false;
             }
             if (ok) {
-                if (hint.node_->left_ == 0) {
-                    return iterator(insert_node_at(hint.node_, true, hint == begin(), v));
+                node_base *h = hint.node_;
+                node_base *p = prev.node_;
+                if (h->left_ == 0) {
+                    return iterator(insert_node_at(h, true, h == leftmost_, v));
                 }
-                return iterator(insert_node_at(prev.node_, false, false, v));
+                return iterator(insert_node_at(p, false, false, v));
             }
         } else if (KeyOf::less(static_cast<Compare &>(*this), *hint, KeyOf::get(v))) {
             iterator next = hint;
