@@ -757,59 +757,59 @@ void UseCreatureSelect::CreateTexts(MSmartOam *oam, MFont *font) {
 extern "C" const u32 data_0208a330, data_0208a334, data_0208a348;
 extern "C" const char data_ov000_02196238[], data_ov000_02196240[];
 
-// The creature's i-th attack.
-static inline u32 DinoCreatureAttack(const DinoCreatureDef *def, int i) {
+// The creature's i-th attack. (A u32 index keeps the game's i * 4 in the loop instead of a second induction variable.)
+static inline u32 DinoCreatureAttack(const DinoCreatureDef *def, u32 i) {
     return ((const u32 *)((const u8 *)def + def->attackIds))[i];
 }
 
 // Shows the creature's name and level, and each of its attacks (the special one last).
-// NONMATCHING: 94%, our loop keeps the attack index as a second induction variable (one more spill).
 void UseCreatureSelect::ShowCreature(u32 creature) {
     for (int i = 0; i < 5; i++) {
         mNames[i]->Hide();
         mValues[i]->Hide();
     }
-    if (creature != 0) {
-        const DinoCreatureDef *def = gDinoResource->GetCreatureDef(creature);
-        char text[64];
-        OS_SPrintf(text, data_ov000_02196238, gDinoResource->GetText(data_0208a348 + def->GetUnk0D() - 1),
-                   def->unk61);
-        mTitle->SetText(std::string(text));
-        int count = def->attackCount;
-        int color = 10;
-        for (int i = 0; i <= count; i++) {
-            u32 attack;
-            if (i < count) {
-                attack = DinoCreatureAttack(def, i);
-            } else {
-                color = 3;
-                attack = def->specialAttack;
-            }
-            if (attack == 0) {
-                continue;
-            }
-            const DinoAttackDef *attackDef = gDinoResource->GetAttackDef(attack);
-            const u8 *kind = DinoOffsetPtr<u8>(attackDef, attackDef->unk10);
-            const u8 *range = DinoOffsetPtr<u8>(attackDef, attackDef->unk14);
-            u32 k = *kind;
-            if (i < count) {
-                switch (k) {
-                case 8:
-                case 9:
-                case 10:
-                case 11:
-                    color = 2;
-                    break;
-                }
-            }
-            mNames[i]->GetFont()->SetColors(color, 0, 1);
-            mNames[i]->SetText(std::string(gDinoResource->GetAttackName(attack)));
-            OS_SPrintf(text, data_ov000_02196240, gDinoResource->GetText(data_0208a334 + k - 1),
-                       gDinoResource->GetText(data_0208a330 + *range - 1));
-            mValues[i]->SetText(std::string(text));
-            mNames[i]->Show();
-            mValues[i]->Show();
+    if (creature == 0) {
+        return;
+    }
+    const DinoCreatureDef *def = gDinoResource->GetCreatureDef(creature);
+    char text[64];
+    OS_SPrintf(text, data_ov000_02196238, gDinoResource->GetText(data_0208a348 + def->GetUnk0D() - 1),
+               def->unk61);
+    mTitle->SetText(std::string(text));
+    int count = def->attackCount;
+    int color = 10;
+    for (int i = 0; i <= count; i++) {
+        u32 attack;
+        if (i < count) {
+            attack = DinoCreatureAttack(def, i);
+        } else {
+            color = 3;
+            attack = def->specialAttack;
         }
+        if (attack == 0) {
+            continue;
+        }
+        const DinoAttackDef *attackDef = gDinoResource->GetAttackDef(attack);
+        const u8 *kind = DinoOffsetPtr<u8>(attackDef, attackDef->unk10);
+        const u8 *range = DinoOffsetPtr<u8>(attackDef, attackDef->unk14);
+        u32 k = *kind;
+        if (i < count) {
+            switch (k) {
+            case 8:
+            case 9:
+            case 10:
+            case 11:
+                color = 2;
+                break;
+            }
+        }
+        mNames[i]->GetFont()->SetColors(0, color, 1);
+        mNames[i]->SetText(std::string(gDinoResource->GetAttackName(attack)));
+        OS_SPrintf(text, data_ov000_02196240, gDinoResource->GetText(k + data_0208a334 - 1),
+                   gDinoResource->GetText(data_0208a330 + *range - 1));
+        mValues[i]->SetText(std::string(text));
+        mNames[i]->Show();
+        mValues[i]->Show();
     }
 }
 
