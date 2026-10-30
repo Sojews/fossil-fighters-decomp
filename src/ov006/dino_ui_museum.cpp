@@ -293,10 +293,67 @@ static inline const DinoMuseumDef *GetMuseumDef(const DinoMuseumDefs *defs, u32 
     return (const DinoMuseumDef *)((const u8 *)defs + defs->tableOffset) + id;
 }
 
-// OnStart's guard and the word after it come first in the file's .bss.
-static u32 sOnStartStatic[2];
+// The layout's pooled places, filled in by the file's static initializer (see dino_static_init.h).
+extern "C" u32 data_ov006_02196188[];
+struct DinoUiMuseumLayout;
+extern DinoUiMuseumLayout data_ov006_02196208;
+struct DinoUiMuseumPaths;
+extern "C" DinoUiMuseumPaths data_ov006_02196288;
+// OnStart's guard and the word after it come first in the file's .bss. (The static initializer's layout stores run
+// as this object's construction: the game's file has no separate static-init object.)
+// NONMATCHING: __sinit_dino_ui_museum.cpp 92.7%, scheduling only (the game loads the second pool anchor before the
+// first store, and makes its last store after loading gDinoResource).
+static struct DinoUiMuseumOnStartStatic {
+    DinoUiMuseumOnStartStatic() {
+        DINO_POOL_WORD(data_ov006_02196288, 0x2c) = 128;
+        DINO_POOL_WORD(data_ov006_02196288, 0x30) = 176;
+        DINO_POOL_WORD(data_ov006_02196208, 0x24) = 8;
+        DINO_POOL_WORD(data_ov006_02196208, 0x28) = 150;
+        DINO_POOL_WORD(data_ov006_02196188, 0x4c) = 64;
+        DINO_POOL_WORD(data_ov006_02196188, 0x50) = 112;
+        DINO_POOL_WORD(data_ov006_02196208, 0x64) = 43;
+        DINO_POOL_WORD(data_ov006_02196208, 0x68) = 56;
+        DINO_POOL_WORD(data_ov006_02196208, 0x34) = 45;
+        DINO_POOL_WORD(data_ov006_02196208, 0x38) = 0;
+        DINO_POOL_WORD(data_ov006_02196208, 0x44) = 0;
+        DINO_POOL_WORD(data_ov006_02196208, 0x48) = 32;
+        DINO_POOL_WORD(data_ov006_02196208, 0x54) = -27;
+        DINO_POOL_WORD(data_ov006_02196208, 0x58) = -14;
+        DINO_POOL_WORD(data_ov006_02196208, 0x1c) = -27;
+        DINO_POOL_WORD(data_ov006_02196208, 0x20) = 14;
+        DINO_POOL_WORD(data_ov006_02196208, 0x7c) = -32;
+        DINO_POOL_WORD(data_ov006_02196288, 0x0) = 8;
+        DINO_POOL_WORD(data_ov006_02196288, 0x34) = -6;
+        DINO_POOL_WORD(data_ov006_02196288, 0x38) = 12;
+        DINO_POOL_WORD(data_ov006_02196208, 0x4) = 16;
+        DINO_POOL_WORD(data_ov006_02196208, 0x8) = 135;
+        DINO_POOL_WORD(data_ov006_02196208, 0x3c) = 45;
+        DINO_POOL_WORD(data_ov006_02196208, 0x40) = 0;
+        DINO_POOL_WORD(data_ov006_02196288, 0xc) = 128;
+        DINO_POOL_WORD(data_ov006_02196288, 0x10) = 96;
+        DINO_POOL_WORD(data_ov006_02196188, 0x5c) = 128;
+        DINO_POOL_WORD(data_ov006_02196188, 0x60) = 96;
+        DINO_POOL_WORD(data_ov006_02196188, 0x74) = 128;
+        DINO_POOL_WORD(data_ov006_02196188, 0x78) = 96;
+        DINO_POOL_WORD(data_ov006_02196288, 0x3c) = 247;
+        DINO_POOL_WORD(data_ov006_02196288, 0x40) = 127;
+        DINO_POOL_WORD(data_ov006_02196188, 0x3c) = 45;
+        DINO_POOL_WORD(data_ov006_02196188, 0x40) = 6;
+        DINO_POOL_WORD(data_ov006_02196208, 0xc) = 128;
+        DINO_POOL_WORD(data_ov006_02196208, 0x10) = 96;
+        DINO_POOL_WORD(data_ov006_02196188, 0x6c) = 90;
+        DINO_POOL_WORD(data_ov006_02196188, 0x70) = 5;
+        DINO_POOL_WORD(data_ov006_02196288, 0x4) = 40;
+        DINO_POOL_WORD(data_ov006_02196288, 0x8) = 42;
+        DINO_POOL_WORD(data_ov006_02196188, 0x44) = 128;
+        DINO_POOL_WORD(data_ov006_02196188, 0x48) = 96;
+    }
+
+    u32 guard;
+    u32 unk4;
+} sOnStartStatic;
 // The museum's definitions, held in a static object (made and freed by the file's static initializer).
-static MResource<DinoMuseumDefs> sMuseumDefs;
+static MResource<DinoMuseumDefs> sMuseumDefs = gDinoResource->LoadMuseumDefs();
 
 // The tabs' orders.
 struct DinoMuseumByUnk0C {
@@ -695,10 +752,11 @@ void DinoUiMuseumMenu::CreateSlot(u32 index) {
 
 // The TU's pooled paths and places, and the main constants OnStart reads.
 extern "C" u32 data_ov006_02196188[];
-extern "C" struct {
+struct DinoUiMuseumPaths {
     u8 unk00[0xC];
     MPoint backPos;         // 0x0C
-} data_ov006_02196288;
+};
+extern "C" DinoUiMuseumPaths data_ov006_02196288;
 // The page buttons' places, in the path pool.
 static inline const MPoint &DinoUiMuseumPoint(u32 offset) {
     return *(const MPoint *)((const u8 *)data_ov006_02196188 + offset);
@@ -757,14 +815,14 @@ static inline MTaskSet *MuseumInfoParallel(DinoUiMuseumInformationMenu *menu) {
 // The help areas, the page fraction and buttons, the tab picture and tabs, the cursor, the slots' cry numbers, the
 // name, the information picture and the 3D model; then the slots, and a fade in from white.
 void DinoUiMuseumMenu::OnStart() {
-    u32 guard = sOnStartStatic[0];
+    u32 guard = sOnStartStatic.guard;
     if (!(guard & 1)) {
         DINO_POOL_WORD(data_ov006_02196388, 0x70) = data_0208a5bc;
         DINO_POOL_WORD(data_ov006_02196388, 0x74) = data_0208a5b8;
         DINO_POOL_WORD(data_ov006_02196388, 0x78) = data_0208a5b4;
         DINO_POOL_WORD(data_ov006_02196388, 0x7c) = data_0208a5b0;
         DINO_POOL_WORD(data_ov006_02196408, 0) = data_0208a5ac;
-        DINO_POOL_WORD(sOnStartStatic, 0) = guard | 1;
+        sOnStartStatic.guard = guard | 1;
     }
     SetLinkFallback(1);
     {

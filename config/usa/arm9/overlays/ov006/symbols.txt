@@ -693,7 +693,7 @@ __sinit_dino_ui_container_menu_item.cpp kind:function(thumb,size=0x2d0) addr:0x0
 __sinit_dino_ui_item_item_button.cpp kind:function(thumb,size=0x70) addr:0x02190408
 __sinit_dino_ui_rv_status_menu_item.cpp kind:function(thumb,size=0x54) addr:0x02190478
 __sinit_dino_ui_medal_menu.cpp kind:function(thumb,size=0x354) addr:0x021904cc
-__sinit_ov006_02190820 kind:function(thumb,size=0xcc) addr:0x02190820
+__sinit_dino_ui_museum.cpp kind:function(thumb,size=0xcc) addr:0x02190820
 __sinit_dino_ui_order_select.cpp kind:function(thumb,size=0x48e) addr:0x021908ec
 .p__sinit_ov006_0219004c kind:data(word) addr:0x02190d7c
 .p__sinit_ov006_0219006c kind:data(word) addr:0x02190d80
