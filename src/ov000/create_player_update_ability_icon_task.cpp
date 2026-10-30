@@ -944,7 +944,7 @@ extern "C" DinoCreatureStats func_02030f38(const DinoCreatureStatsInput *info, B
 
 // Sets the creature up as creature id: its definition, the sides its support effects touch, its attacks' element
 // masks and its stats (with full life, or the life its rank's experience gives).
-// NONMATCHING (94%): the game loads all the stats before storing them, and spills fullLife on entry.
+// NONMATCHING (96%): the game loads all the stats before storing them, and spills fullLife on entry.
 extern "C" void func_ov000_0216c90c(DinoBattleModelCreature *creature, u32 id, BOOL resetStatus, BOOL fullLife) {
     creature->mUnkB0 = id;
     creature->mDef = (DinoBattleCreatureDef *)gDinoResource->GetCreatureDef(id);
@@ -1001,7 +1001,7 @@ extern "C" void func_ov000_0216c90c(DinoBattleModelCreature *creature, u32 id, B
     creature->mUnkF8 = stats.stats[3];
     creature->unk104 = stats.stats[4];
     if (fullLife) {
-        life = ((const DinoCreatureDef *)creature->mDef)->GetHpTable()[creature->mUnkFC - 1];
+        life = ((const DinoCreatureDef *)creature->mDef)->GetHpTable()[(u32)(creature->mUnkFC - 1)];
     }
     creature->mUnkE8 = creature->mUnkE4 = life;
     creature->mUnk108 = 0;
