@@ -898,8 +898,8 @@ void MMotion::Advance(u32 frames) {
 // NONMATCHING: register allocation (the game keeps this in r4 and the scaled index in r0) and when mCells is reloaded.
 void MMotion::SetCellOffset(int cell, int x, int y) {
     mCells[cell].unk14 = MPoint(x, y);
-    int ox = mCells[cell].unk14.x;
     int oy = mCells[cell].unk14.y;
+    int ox = mCells[cell].unk14.x;
     MSmartOamCell *entry = &mEntries[mCells[cell].entry];
     if (mUnk2B || mUnk2C) {
         int shape = entry->GetShape();
@@ -916,8 +916,9 @@ void MMotion::SetCellOffset(int cell, int x, int y) {
             oy = h - oy;
         }
     }
+    int py = oy + mUnk50;
     entry->unk08 = ox;
-    entry->unk0C = oy + mUnk50;
+    entry->unk0C = py;
 }
 
 void MMotion::SetCellOffsetY(int cell, int y) {
@@ -996,6 +997,9 @@ void MMotion::HideCell(int cell) {
 // Switches the cell between normal (4: attr's low bits flip it) and affine (8) or double-size affine (0x10) modes.
 // NONMATCHING: register allocation (as in SetCellOffset, whose placement code this repeats).
 void MMotion::SetCellAttr(int cell, int attr) {
+    bool hflip;
+    int h;
+    MSmartOamCell *entry;
     if (attr & 4) {
         if (mUnk2A && mAffines[cell] != NULL) {
             mDisplay->mObj->mAfn->Free(mAffines[cell]);
@@ -1003,8 +1007,8 @@ void MMotion::SetCellAttr(int cell, int attr) {
         }
         mCells[cell].objMode = 0;
         bool vflip = ((attr & 2) ? 1 : 0) ^ mUnk2C;
-        bool hflip = ((attr & 1) ? 1 : 0) ^ mUnk2B;
-        MSmartOamCell *entry = &mEntries[mCells[cell].entry];
+        hflip = ((attr & 1) ? 1 : 0) ^ mUnk2B;
+        entry = &mEntries[mCells[cell].entry];
         entry->hflip = hflip;
         entry->vflip = vflip;
     } else if (attr & 8) {
@@ -1034,13 +1038,13 @@ void MMotion::SetCellAttr(int cell, int attr) {
             entry->height = gObjSizes[0][shape].y * 2;
         }
     }
-    MSmartOamCell *entry = &mEntries[mCells[cell].entry];
+    entry = &mEntries[mCells[(u32) cell].entry];
     int ox = mCells[cell].unk14.x;
     int oy = mCells[cell].unk14.y;
     if (mUnk2B || mUnk2C) {
         int shape = entry->GetShape();
         int w = gObjSizes[0][shape].x;
-        int h = gObjSizes[0][shape].y;
+        h = gObjSizes[0][shape].y;
         if (mCells[cell].objMode == 3) {
             w *= 2;
             h *= 2;
@@ -1052,8 +1056,9 @@ void MMotion::SetCellAttr(int cell, int attr) {
             oy = h - oy;
         }
     }
+    int py = oy + mUnk50;
     entry->unk08 = ox;
-    entry->unk0C = oy + mUnk50;
+    entry->unk0C = py;
 }
 
 // The rect's corners as plain words (a block copy, unlike MRect's member-wise one).
