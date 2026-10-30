@@ -284,7 +284,6 @@ struct DinoAttackHit {
 };
 
 // Splits the damage between the attack's hits by their weights (the rounding goes to the first).
-// NONMATCHING: 97%, register rotation (the game copies out to the walking pointer just before the loop).
 // The attack's i-th hit.
 static inline const DinoAttackHit &DinoAttackHitOf(const DinoAttackDef *def, u32 i) {
     return ((const DinoAttackHit *)((const u8 *)def + def->hits))[i];
