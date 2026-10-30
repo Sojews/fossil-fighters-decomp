@@ -231,8 +231,13 @@ namespace std {
         return result;
     }
 
+    // (A TU can leave it to another file, as the game's linker did: then no weak copy lands after its caller.)
     template <class ForwardIterator>
-    ForwardIterator rotate(ForwardIterator first, ForwardIterator middle, ForwardIterator last) {
+    ForwardIterator rotate(ForwardIterator first, ForwardIterator middle, ForwardIterator last)
+#ifdef MSL_ROTATE_ELSEWHERE
+        ;
+#else
+    {
         if (first == middle) {
             return last;
         }
@@ -270,6 +275,7 @@ namespace std {
         }
         return result;
     }
+#endif
 
     template <class ForwardIterator, class T, class Compare>
     ForwardIterator __lower_bound(ForwardIterator first, ForwardIterator last, const T &value, Compare &comp) {

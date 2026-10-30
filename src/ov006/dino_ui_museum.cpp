@@ -1,4 +1,6 @@
 // DinoUiMuseum.
+// (The game's unit has no std::rotate: the linker kept another file's copy.)
+#define MSL_ROTATE_ELSEWHERE
 #pragma ipa file
 
 // Derived destructors have their bases' destructor bodies inlined; auto-inlining the ones defined above does that.
