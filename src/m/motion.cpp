@@ -1,5 +1,7 @@
 // Motions: animated OBJ graphics loaded from a motion file, shown as a view.
 
+// (The motion-data cache's tree is the archive cache's in the game: motion.cpp has no copy of its destructor.)
+#define MSL_TREE_DTOR_ELSEWHERE
 #pragma ipa file
 
 #include "m/archive.h"

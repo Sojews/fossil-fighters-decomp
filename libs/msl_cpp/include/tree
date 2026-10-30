@@ -511,12 +511,15 @@ namespace std {
         return iterator(insert_node_at(p, left, leftmost, v));
     }
 
+    // (A TU can leave it to another file, as the game's linker did: then no weak copy lands after its caller.)
+#ifndef MSL_TREE_DTOR_ELSEWHERE
     template <class Key, class Value, class KeyOf, class Compare, class Allocator>
     __red_black_tree<Key, Value, KeyOf, Compare, Allocator>::~__red_black_tree() {
         if (header_.left_ != 0) {
             destroy(header_.left_);
         }
     }
+#endif
 
     template <class Key, class Value, class KeyOf, class Compare, class Allocator>
     void __red_black_tree<Key, Value, KeyOf, Compare, Allocator>::clear() {
