@@ -54,7 +54,7 @@ public:
         mDstBase = text->mBase;
         mDstSize = text->mSize;
         mDst = dst;
-        mAttr = tile | (palette << 12);
+        mAttr = (palette << 12) | tile;
         mFlip = (hflip ? 0x400 : 0) | (vflip ? 0x800 : 0);
     }
     MTextTransfer(MText *text, const u16 *src, MPoint srcSize, MPoint dst, int tile, int palette, bool hflip,
@@ -65,7 +65,7 @@ public:
         mDstBase = text->mBase;
         mDstSize = text->mSize;
         mDst = dst;
-        mAttr = tile | (palette << 12);
+        mAttr = (palette << 12) | tile;
         mFlip = (hflip ? 0x400 : 0) | (vflip ? 0x800 : 0);
     }
     virtual ~MTextTransfer();
