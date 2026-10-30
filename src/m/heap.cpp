@@ -48,7 +48,7 @@ MHeapBlock *MHeap::NewBlock() {
 }
 
 static inline u32 MAlignUp(u32 v, u32 a) { return (v + a - 1) & ~(a - 1); }
-static inline u32 MAlignDown(u32 v, u32 a) { return v & ~(a - 1); }
+static inline u32 MAlignDown(u32 v, u32 a) { return ~(a - 1) & v; }
 
 MHeapBlock *MHeap::Alloc(u32 size, BOOL fromEnd, u32 align, u32 boundary, u32 boundaryCount, u32 limit) {
     MScopedLock lock(&mMutex, TRUE);
