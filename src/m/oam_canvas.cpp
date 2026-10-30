@@ -180,7 +180,7 @@ void MOamCanvas<TOam, TUnit>::Execute() {
 template <class TOam, class TUnit>
 void MOamCanvas<TOam, TUnit>::AddPiece(MRect rect, int shape) {
     int h = rect.GetHeight();
-    int w = rect.GetWidth();
+    s32 w = rect.GetWidth();
     MPoint size = gObjSizes[0][shape];
     int sw = size.x;
     int sh = size.y;
