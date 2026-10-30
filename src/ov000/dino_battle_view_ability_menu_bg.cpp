@@ -428,12 +428,14 @@ static inline const int *DinoAbilityMenuRepeat(const DinoExcavateDefs *d) {
 // Builds the menu: the helps, the creature's motion, an item bar per attack (sliding in one after another, linked
 // round in a loop), the cancel item, the cost text, the BG and its text windows; then opens it (after the tutorial,
 // if one shows).
-// NONMATCHING: stack slots of the help loop counter/&mParallel differ, and gKasekiRockSizeText[5] folds the offset into the load.
+// NONMATCHING: the help loop's &mParallel takes the top spill slot (the game's lowest), and gKasekiRockSizeText[5]
+// folds the offset into the load.
 void DinoBattleViewUiAbilityMenu::OnStart() {
     const DinoBattleViewAbilityHelpDef *def = data_ov000_021949a0;
     for (u32 i = 0; i < 3; def++, i++) {
+        MTaskSet *parallel = &mParallel;
         mHelps[i] = new DinAttackItemHelp(def->rect, def->text, gLcd->GetBottomDisplay());
-        mParallel.AddTail(mHelps[i]);
+        parallel->AddTail(mHelps[i]);
     }
     DinoBattleHelpBase *cancel =
         new DinoBattleHelpBase(gLcd->GetBottomDisplay(), data_ov000_02194950, data_0208a360);
