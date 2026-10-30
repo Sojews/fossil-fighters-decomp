@@ -777,6 +777,7 @@ void M3DModelPatchDisplayList(M3DModel *model, const u32 *tags, u32 count) {
     const s16 *verts = M3DModelGetMorphVertices(model);
     u32 frame = model->mFrame >> 4;
     const u32 *texWords;
+    int alpha;
     if (((const u32 *) model->mModelRes)[5] & 0xC) {
         const u8 *anim = (const u8 *) model->mAnimRes;
         texWords = (const u32 *) (anim + (((const u32 *) anim)[1] + ((const u32 *) anim)[2])) +
@@ -827,7 +828,7 @@ void M3DModelPatchDisplayList(M3DModel *model, const u32 *tags, u32 count) {
             }
             case 3: {
                 u32 t = texWords[arg];
-                int alpha = (int) (((t >> 8) & 0x1F) * model->mUnk1C) >> 12;
+                alpha = (int) (((t >> 8) & 0x1F) * model->mUnk1C) >> 12;
                 u32 id = model->mPolygonId + (model->mUnkD1 & arg);
                 if (alpha <= 0) {
                     t &= ~0xC0;
