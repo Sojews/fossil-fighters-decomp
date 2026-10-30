@@ -57,7 +57,6 @@ MBg::~MBg() {
     delete mPal;
 }
 
-// NONMATCHING: only the stack slots of the spilled loop variables differ.
 void MBg::SetMode(int mode) {
     u32 i;
     const Mode *newMode = &sModes[mode];
@@ -79,8 +78,6 @@ void MBg::SetMode(int mode) {
     {
         i = n;
         if (i < mMode->text.count) {
-            int *f = from;
-            int *t = to;
             do {
                 u32 bg = mMode->text.start + i;
                 if (mScreens[bg] != NULL) {
@@ -90,10 +87,8 @@ void MBg::SetMode(int mode) {
                     u32 newBg = newMode->text.start + n;
                     screens[newBg] = mScreens[bg];
                     if (bg != newBg) {
-                        *f = bg;
-                        *t = newBg;
-                        f++;
-                        t++;
+                        from[count] = bg;
+                        to[count] = newBg;
                         count++;
                     }
                     n++;
@@ -106,8 +101,6 @@ void MBg::SetMode(int mode) {
     {
         i = 0;
         if (i < mMode->affine.count) {
-            int *f = &from[count];
-            int *t = &to[count];
             do {
                 u32 bg = mMode->affine.start + i;
                 if (mScreens[bg] != NULL) {
@@ -117,10 +110,8 @@ void MBg::SetMode(int mode) {
                     u32 newBg = newMode->affine.start + n;
                     screens[newBg] = mScreens[bg];
                     if (bg != newBg) {
-                        *f = bg;
-                        *t = newBg;
-                        f++;
-                        t++;
+                        from[count] = bg;
+                        to[count] = newBg;
                         count++;
                     }
                     n++;
@@ -133,8 +124,6 @@ void MBg::SetMode(int mode) {
     {
         i = 0;
         if (i < mMode->ext.count) {
-            int *f = &from[count];
-            int *t = &to[count];
             do {
                 u32 bg = mMode->ext.start + i;
                 if (mScreens[bg] != NULL) {
@@ -144,10 +133,8 @@ void MBg::SetMode(int mode) {
                     u32 newBg = newMode->ext.start + n;
                     screens[newBg] = mScreens[bg];
                     if (bg != newBg) {
-                        *f = bg;
-                        *t = newBg;
-                        f++;
-                        t++;
+                        from[count] = bg;
+                        to[count] = newBg;
                         count++;
                     }
                     n++;
@@ -160,8 +147,6 @@ void MBg::SetMode(int mode) {
     {
         i = 0;
         if (i < mMode->unk18.count) {
-            int *f = &from[count];
-            int *t = &to[count];
             do {
                 u32 bg = mMode->unk18.start + i;
                 if (mScreens[bg] != NULL) {
@@ -171,10 +156,8 @@ void MBg::SetMode(int mode) {
                     u32 newBg = newMode->unk18.start + n;
                     screens[newBg] = mScreens[bg];
                     if (bg != newBg) {
-                        *f = bg;
-                        *t = newBg;
-                        f++;
-                        t++;
+                        from[count] = bg;
+                        to[count] = newBg;
                         count++;
                     }
                     n++;
@@ -185,8 +168,8 @@ void MBg::SetMode(int mode) {
     }
     for (i = 0; i < 4; i++) {
         mScreens[i] = screens[i];
-        if (screens[i] != NULL) {
-            screens[i]->SetBg(i);
+        if (mScreens[i] != NULL) {
+            mScreens[i]->SetBg(i);
         }
     }
     mMode = newMode;
