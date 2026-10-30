@@ -51,19 +51,21 @@ static inline u32 MAlignUp(u32 v, u32 a) { return (v + a - 1) & ~(a - 1); }
 static inline u32 MAlignDown(u32 v, u32 a) { return ~(a - 1) & v; }
 
 MHeapBlock *MHeap::Alloc(u32 size, BOOL fromEnd, u32 align, u32 boundary, u32 boundaryCount, u32 limit) {
-    MScopedLock lock(&mMutex, TRUE);
-    MHeapBlock *best = NULL;
-    u32 bestAddr = 0;
-    MHeapBlock **link = &mFree;
-    MHeapBlock **bestLink = NULL;
+    MHeapBlock **link;
+    MHeapBlock *best;
     MHeapBlock *block;
+    MHeapBlock **bestLink;
+    MScopedLock lock(&mMutex, TRUE);
+    u32 bestAddr = 0;
+    bestLink = NULL;
     MHeapBlock *n;
+    best = NULL;
+    link = &mFree;
 
     for (block = mFree; block != NULL; block = block->next) {
-        u32 blockSize = block->size;
-        u32 blockAddr = block->addr;
         u32 addr;
-
+        u32 blockAddr = block->addr;
+        u32 blockSize = block->size;
         if (limit != 0) {
             u32 end = mBase + limit;
             if (blockAddr + blockSize > end) {
@@ -76,22 +78,22 @@ MHeapBlock *MHeap::Alloc(u32 size, BOOL fromEnd, u32 align, u32 boundary, u32 bo
         if (!fromEnd) {
             addr = MAlignUp(blockAddr, align);
             if (boundary != 0
-                && MAlignDown(addr + size - 1, boundary) - MAlignDown(addr, boundary) >= boundaryCount * boundary) {
+                && MAlignDown(addr + size - 1, boundary) - (addr & ~(boundary - 1)) >= boundaryCount * boundary) {
                 addr = MAlignUp(blockAddr, boundary);
             }
         } else {
             addr = MAlignDown(blockAddr + blockSize - size, align);
             if (boundary != 0) {
-                u32 start = MAlignDown(addr, boundary);
+                u32 start = addr & ~(boundary - 1);
                 if (MAlignDown(addr + size - 1, boundary) - start >= boundaryCount * boundary) {
                     addr = start;
                 }
             }
         }
-        if (blockAddr <= addr && blockAddr + blockSize >= addr + size) {
+        if (addr >= blockAddr && blockAddr + blockSize >= addr + size) {
             best = block;
-            bestAddr = addr;
             bestLink = link;
+            bestAddr = addr;
             if (!fromEnd) {
                 break;
             }
