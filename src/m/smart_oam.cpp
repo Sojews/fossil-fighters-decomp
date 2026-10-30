@@ -271,7 +271,7 @@ void MSmartOam::Execute() {
         return;
     }
     if (mUnk1C != 0) {
-        u32 mask = 0;
+        int mask = 0;
         if (mUnk1C & 1) {
             mask |= 0xc0000000;
         }
