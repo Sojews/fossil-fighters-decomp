@@ -712,8 +712,7 @@ void DinoBattleViewCreature::OnMessage(MMessage *msg) {
             const DinoBattleAdjustDefs *defs = gDinoResource->GetBattleAdjustDefs();
             int dx = defs->unk140[0];
             int dy = defs->unk140[1];
-            MPoint at = mMotion->GetPosition();
-            MPoint pos(at.x + dx, at.y + dy);
+            MPoint pos = mMotion->GetPosition().Offset(dx, dy);
             int diff = req->mUnk18 - mUnkF8;
             if (diff != 0) {
                 if (diff < 0) {
