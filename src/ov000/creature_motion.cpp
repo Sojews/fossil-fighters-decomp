@@ -421,7 +421,12 @@ inline MTask *DinoBattleView::CreateActionInfoBarUpdateTask(u32 text) {
     return CreatePostTask(new DinoBattleViewActionInfoBarUpdateRequest(text));
 }
 
-// NONMATCHING: the game reads the creature's side for the bar text after allocating the request (here before).
+// (The creature is passed whole: the game reads its side after allocating the request.)
+static inline MTask *DinoCreatePinchTextTask(DinoBattleView *view, u32 text, const DinoBattleViewCreature *c) {
+    return view->CreatePostTask(new DinoBattleViewActionInfoBarUpdateRequest(text + (c->mUnkB0 == 1 ? 1 : 0)));
+}
+
+// NONMATCHING (95%): the game keeps the text id in a register and spills the view.
 void DinoBattleViewCreature::SetLife(int life) {
     if (mUnkF8 == 0 || life == 0) {
         mUnkF8 = life;
@@ -437,7 +442,7 @@ void DinoBattleViewCreature::SetLife(int life) {
     ((DinoBattleViewPlayer *)mUnkDC)->mView->IncUnk13C();
     MTask *enable = ((DinoBattleViewPlayer *)mUnkDC)->mView->CreateEnableRootSelectTask();
     MTask *wait = ((DinoBattleViewPlayer *)mUnkDC)->mView->CreateWaitActionInfoBarTask();
-    MTask *post = ((DinoBattleViewPlayer *)mUnkDC)->mView->CreateActionInfoBarUpdateTask(text + (mUnkB0 == 1 ? 1 : 0));
+    MTask *post = DinoCreatePinchTextTask(((DinoBattleViewPlayer *)mUnkDC)->mView, text, this);
     set->AddTail(DinoBattleViewPopNumber::CreateWaitTask(), post, wait, enable);
     if (!pinch) {
         MSmartOam *oam = new MSmartOam(10, 5, TRUE);
