@@ -1101,8 +1101,8 @@ void MMotion::SetCellChr(int cell, u32 chr) {
         entry->SetShape(data->extPalette);
     }
     int ox = c.unk14.x;
-    int oy = c.unk14.y;
     entry = &mEntries[c.entry];
+    int oy = c.unk14.y;
     if (mUnk2B || mUnk2C) {
         int shape = entry->GetShape();
         int w = gObjSizes[0][shape].x;
@@ -1118,8 +1118,9 @@ void MMotion::SetCellChr(int cell, u32 chr) {
             oy = h - oy;
         }
     }
+    int py = oy + mUnk50;
     entry->unk08 = ox;
-    entry->unk0C = oy + mUnk50;
+    entry->unk0C = py;
 }
 
 void MMotion::SetCellPalette(int cell, u32 pal) {
