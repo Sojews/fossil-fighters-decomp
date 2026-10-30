@@ -44,7 +44,6 @@ CameraWipe::~CameraWipe() {
 extern u32 data_ov000_02197954[256];    // random fog values (0 to 127)
 
 // Wipes the main screen's window line by line, with a ragged edge; at the end it resets the window and exits.
-// NONMATCHING: the loops' counter and table cursor swap r5/r6.
 void CameraWipe::Idle() {
     if (mUnk88 == 0x1000 && (u32)(mMode - 2) <= 1) {
         DinoSoundPlaySe(0x387, 0);

@@ -192,7 +192,6 @@ M1BitFont::M1BitFont(const MFontData *data) : MRawFont(data) {
     mUnk20 = (GetData()->flags & 1) ? 1 : 0;
 }
 
-// NONMATCHING: the destination address gets r6 instead of r7 (also M4BitFont::Draw).
 void M1BitFont::Draw(MChrBlock *chr, u32 tile, MPoint size, MPoint pos, u32 code) {
     const u8 *glyph = FindGlyph(code);
     const u8 *bits = glyph + 2;
