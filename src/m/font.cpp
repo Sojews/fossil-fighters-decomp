@@ -442,6 +442,7 @@ extern "C" const u32 data_0208cccc[256];    // each byte's bits spread to nibble
 // transfer.
 void MChr16BinFontTransfer::Transfer() {
     const u8 *src = mSrc;
+    const u32 *spread;
     int srcBytes = (mGlyphSize.x + 7) >> 3;
     if (mPos.y < 0) {
         src += srcBytes * -mPos.y;
@@ -468,7 +469,7 @@ void MChr16BinFontTransfer::Transfer() {
     u32 words = (shift + mGlyphSize.x + 7) >> 3;
     int nextRow = -words * 8 + 1;
     int nextTileRow = nextRow + (width - 1) * 8;
-    const u32 *spread = data_0208cccc;
+    spread = data_0208cccc;
     if (mColor == mBackColor) {
         while (rows != 0) {
             u32 bits = 0;
