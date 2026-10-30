@@ -670,8 +670,8 @@ void DinoBattleViewCreature::OnMessage(MMessage *msg) {
                     MTask *show = ((DinoBattleViewLifebar *)mUnkE0)->CreateShowTask();
                     MTask *barCoord = ((DinoBattleViewLifebar *)mUnkE0)->CreateCoordTask(func_ov000_0216f4c0(mUnkB0, 3, unk134));
                     MTask *slide = mMotion->CreateCoordAnime(GetCoord(), pos, 10, -2);
-                    MTask *hide = ((DinoBattleViewLifebar *)mUnkE0)->CreateHideTask();
                     MSerialTaskSet *seq = new MSerialTaskSet(TRUE);
+                    MTask *hide = ((DinoBattleViewLifebar *)mUnkE0)->CreateHideTask();
                     seq->AddTail(hide, slide, barCoord, show, setCoord, timer, move, life);
                     together->AddTail(seq);
                     together->AddTail(mark);
