@@ -1284,7 +1284,7 @@ inline DinoUiSenryuMenuItem::DinoUiSenryuMenuItem(u32 index, DinoUiSenryuMenu *m
 // Moves the cursor to the entry cur (wrapping around), and when that changes the page (or a rebuild is asked
 // for), fills the page's three poems and rebuilds the menu items and their links.
 #pragma inline_max_size(2000)
-// NONMATCHING: 99.96%, two of the temporaries (the cursor's position, a name's size) take each other's stack slots.
+// NONMATCHING: 99.96%, the inlined menu items' string and frame temporaries are laid out in another order.
 extern "C" void func_ov007_02185d28(DinoUiSenryuMenu *menu, int cur) {
     u32 count = menu->mCount;
     cur = (cur + count) % count;
@@ -1296,8 +1296,9 @@ extern "C" void func_ov007_02185d28(DinoUiSenryuMenu *menu, int cur) {
     if (pos != menu->mUnk134) {
         menu->mUnk134 = pos;
         u32 row = menu->mUnk134 % 3;
-        menu->mCursor->SetPosition(MPoint((data_ov007_02191a3c[row].right + data_ov007_02191a3c[row].left) / 2 - 6,
-                                          (data_ov007_02191a3c[row].bottom + data_ov007_02191a3c[row].top) / 2 + 4));
+        MPoint cursor((data_ov007_02191a3c[row].right + data_ov007_02191a3c[row].left) / 2 - 6,
+                      (data_ov007_02191a3c[row].bottom + data_ov007_02191a3c[row].top) / 2 + 4);
+        menu->mCursor->SetPosition(cursor);
     }
     if (page != menu->mPage || menu->mUnk13C) {
         menu->mPage = page;
