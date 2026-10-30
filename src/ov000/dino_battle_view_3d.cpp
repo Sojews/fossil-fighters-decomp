@@ -104,11 +104,23 @@ extern "C" struct {
     u8 unk64[0x6C - 0x64];
     void (B3DStatusViewTask::*State_6C)();
     void (B3DStatusViewTask::*State_74)();
-    u8 unk7C[0xD4 - 0x7C];
-    void (B3DStatusViewTask::*State_D4)();
-    u8 unkDC[0xEC - 0xDC];
-    void (B3DStatusViewTask::*State_EC)();
 } data_ov000_021962e8;
+
+class DinoBattleView3D;
+// The next pool symbol's.
+extern "C" struct {
+    u8 unk00[0x1C];
+    void (DinoBattleView3D::*StateLoad_1C)();
+    u8 unk24[0x2C - 0x24];
+    void (B3DStatusViewTask::*StateCheck_2C)();
+    u8 unk34[0x3C - 0x34];
+    void (DinoBattleView3D::*RunNextQueued_3C)();
+    u8 unk44[0x4C - 0x44];
+    void (B3DStatusViewTask::*State_4C)();
+    void (B3DStatusViewTask::*State_54)();
+    u8 unk5C[0x6C - 0x5C];
+    void (B3DStatusViewTask::*State_6C)();
+} data_ov000_02196368;
 
 extern "C" MTask *func_ov000_0218abd0(void *camera, int light);
 extern "C" MTask *func_ov000_0218ac04(void *camera, void *arg1, const VecFx32 *arg2, BOOL arg3);
@@ -175,14 +187,14 @@ void B3DStatusViewTask::StateNext() {
     }
     if ((mUnk80 >> 16) == (mUnk7C >> 16)) {
         GetSerial()->AddTail(func_ov000_0218ac40(mView->mUnkE8, 1), func_ov000_0218ac40(mView->mUnkE4, 1));
-        mState = data_ov000_021962e8.State_EC;
+        mState = data_ov000_02196368.State_6C;
         return;
     }
     mUnk84 = mView->mView->GetUnkE4(mUnk80 >> 16)->GetUnkAC();
     GetSerial()->AddTail(new DinoBattleView3DGroupFade(mView->mUnkE4, (DinoBattleView3DGroupFade::Target *)mView,
                                                        mUnk84 == 0, 1, -1),
                          func_ov000_0218ac40(mView->mUnkE4, 1), func_ov000_0218ac40(mView->mUnkE8, 0));
-    mState = data_ov000_021962e8.State_4C;
+    mState = data_ov000_02196368.State_4C;
 }
 
 // Shows the view's current status, then goes on to the next (fading in between different ones).
@@ -208,7 +220,7 @@ void B3DStatusViewTask::StateCheck() {
         return;
     }
     if (mUnk7C == mUnk80) {
-        mState = data_ov000_021962e8.State_D4;
+        mState = data_ov000_02196368.State_54;
         return;
     }
     mSerial.AddTail(new BlackInTask());
@@ -760,16 +772,6 @@ void DinoBattleView3D::SetUnk19C(u32 value) {
 u32 DinoBattleView3D::GetUnkB0() {
     return mUnkB0;
 }
-
-// The TU's pooled pointer-to-member constants.
-extern "C" struct {
-    u8 unk00[0x1C];
-    void (DinoBattleView3D::*StateLoad_1C)();
-    u8 unk24[0x2C - 0x24];
-    void (B3DStatusViewTask::*StateCheck_2C)();
-    u8 unk34[0x3C - 0x34];
-    void (DinoBattleView3D::*RunNextQueued_3C)();
-} data_ov000_02196368;
 
 extern "C" u32 data_0208a0c0;
 extern "C" const u32 data_0208a0e8;    // the ability's group fade length
