@@ -65,8 +65,8 @@ void CameraWipe::Idle() {
     case 0:
         rect.left = 0;
         for (y = 0; y < 192; y++) {
-            rect.bottom = y + 1;
             rect.top = y;
+            rect.bottom = y + 1;
             rect.right = 256 - (mUnk88 >> 12) + data_ov000_02197954[y];
             if (rect.right > 256) {
                 rect.right = 256;
@@ -80,8 +80,8 @@ void CameraWipe::Idle() {
     case 1:
         rect.right = 256;
         for (y = 0; y < 192; y++) {
-            rect.bottom = y + 1;
             rect.top = y;
+            rect.bottom = y + 1;
             rect.left = (mUnk88 >> 12) - data_ov000_02197954[y];
             if (rect.left < 0) {
                 rect.left = 0;
@@ -95,8 +95,8 @@ void CameraWipe::Idle() {
     case 2:
         rect.left = 0;
         for (y = 0; y < 192; y++) {
-            rect.bottom = y + 1;
             rect.top = y;
+            rect.bottom = y + 1;
             rect.right = (mUnk88 >> 12) - data_ov000_02197954[y];
             if (rect.right > 256) {
                 rect.right = 256;
@@ -110,8 +110,8 @@ void CameraWipe::Idle() {
     case 3:
         rect.right = 256;
         for (y = 0; y < 192; y++) {
-            rect.bottom = y + 1;
             rect.top = y;
+            rect.bottom = y + 1;
             rect.left = 256 - (mUnk88 >> 12) + data_ov000_02197954[y];
             if (rect.left < 0) {
                 rect.left = 0;
