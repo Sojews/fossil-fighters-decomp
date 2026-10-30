@@ -389,6 +389,7 @@ inline DinoBattleViewWinnerScrollTask::DinoBattleViewWinnerScrollTask(u32 field,
 // NONMATCHING: 80.5%, call sequence identical. The game keeps this on the stack (reloading it in every case) where ours keeps it in a register,
 // which moves the spills; the cases' code is otherwise laid out as the game's.
 #define DINO_FIELD ((DinoBattleViewUnkE0 *)this)
+#pragma opt_strength_reduction off
 void DinoBattleViewField::OnMessage(MMessage *msg) {
     switch (msg->mId) {
     case 0x10009: {
@@ -777,6 +778,7 @@ void DinoBattleViewField::OnMessage(MMessage *msg) {
     }
     }
 }
+#pragma opt_strength_reduction reset
 
 #undef DINO_FIELD
 

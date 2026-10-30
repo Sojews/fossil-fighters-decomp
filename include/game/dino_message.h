@@ -113,8 +113,9 @@ class DinoBattleModelCreatureBeginSignal : public MMessage {
 public:
     DinoBattleModelCreatureBeginSignal() : MMessage(0x10006) {}
     // (Takes a side's 0x18-byte creature entry, DinoBattleSide::Creature.)
-    template <class C>
-    DinoBattleModelCreatureBeginSignal(u32 side, u32 slot, C creature, u32 unk2C, u32 unk30)
+    // (unk30 is taken as given: the CPU controller passes a 4-byte struct, copied on the stack.)
+    template <class C, class U>
+    DinoBattleModelCreatureBeginSignal(u32 side, u32 slot, C creature, u32 unk2C, U unk30)
         : MMessage(0x10006), mUnk0C(side), mUnk10(slot) {
         *(C *)mUnk14 = creature;
         mUnk2C = unk2C;

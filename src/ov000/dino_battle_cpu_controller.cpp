@@ -26,6 +26,12 @@ extern "C" const u32 data_ov000_0218fa08[3];    // the creature slots, by entry
 // Starts the CPU side (its player and creatures), and clears the attack bar when its turn ends.
 // NONMATCHING (98.6%): the game stores each creature's unk7C value twice (one dead copy), shifting the creature
 // copy's stack slot; ours keeps one.
+// A side's per-creature word (unk7C..unk84), which the game passes to the creature's begin signal as a 4-byte struct.
+struct DinoBattleCpuWord {
+    u32 v;
+    operator u32() const { return v; }
+};
+
 void DinoBattleCpuController::OnMessage(MMessage *msg) {
     switch (msg->mId) {
     default:
@@ -42,7 +48,7 @@ void DinoBattleCpuController::OnMessage(MMessage *msg) {
                     ->Post(new DinoBattleModelCreatureBeginSignal(mUnkA8, data_ov000_0218fa08[i],
                                                                   mParams.sides[mUnkA8].mCreatures[i],
                                                                   mParams.sides[mUnkA8].mLevels[i],
-                                                                  (&mParams.sides[mUnkA8].unk7C)[i]));
+                                                                  ((const DinoBattleCpuWord *)&mParams.sides[mUnkA8].unk7C)[i]));
             }
         }
         ((DinoBattleModel *)mUnkAC)->Post(new DinoBattleControllerInitResult(mUnkA8));
