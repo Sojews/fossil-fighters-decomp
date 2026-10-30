@@ -2072,6 +2072,9 @@ public:
 
 };
 
+// The end of the bottom screen a free-coordinates effect plays at.
+enum DinoBattleFreeCoordSide { DINO_FREE_COORD_LEFT, DINO_FREE_COORD_RIGHT };
+
 class DinoBattleViewFreeCoordEffectRequest : public MMessage {
 public:
     DinoBattleViewFreeCoordEffectRequest() : MMessage(0x10059) {}

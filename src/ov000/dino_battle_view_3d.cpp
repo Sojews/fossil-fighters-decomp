@@ -334,7 +334,8 @@ void DinoBattleView3DDamage::Idle() {
         break;
     case 11:
         ((u8 *)mOwner)[0x144] = 1;
-        mParallel.AddTail(new CameraWipe((CameraWipe::Owner *)mOwner, mSide ? 1 : 0, 15));
+        mParallel.AddTail(new CameraWipe((CameraWipe::Owner *)mOwner,
+                                         mSide == 0 ? CAMERA_WIPE_SHRINK_TO_LEFT : CAMERA_WIPE_SHRINK_TO_RIGHT, 15));
         mStep = 2;
         break;
     case 2:

@@ -20,6 +20,14 @@ class DinoBattleViewAbilityTextWindow;
 
 class MRasterWindow;
 
+// A CameraWipe's mode (its low half): the window over the main screen, with t the progress in pixels.
+enum CameraWipeMode {
+    CAMERA_WIPE_SHRINK_TO_LEFT,  // [0, 256 - t)
+    CAMERA_WIPE_SHRINK_TO_RIGHT, // [t, 256)
+    CAMERA_WIPE_GROW_FROM_LEFT,  // [0, t); the screen is hidden after
+    CAMERA_WIPE_GROW_FROM_RIGHT, // [256 - t, 256); the screen is hidden after
+};
+
 class CameraWipe : public MProcess {
 public:
     struct Owner {

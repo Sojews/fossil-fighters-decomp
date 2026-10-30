@@ -1159,7 +1159,7 @@ extern "C" MTask *func_ov000_0216dec4(DinoBattleModelCreature *creature) {
             DinoBattleModelPlayer *player = i != 0 ? creature->mPlayer->GetOpponent() : creature->mPlayer;
             tasks->AddTail(player->CreateSetKasekiPointTask(average));
             if (average != points[i]) {
-                BOOL side = player->mUnkB4 == 0 ? FALSE : TRUE;
+                u32 side = player->mUnkB4 == 0 ? DINO_FREE_COORD_LEFT : DINO_FREE_COORD_RIGHT;
                 if (average > points[i]) {
                     MTask *post = creature->mView->CreatePostTask(new DinoBattleViewFreeCoordEffectRequest(side, 0));
                     tasks->AddTail(DinoSoundCreatePlaySeTask(0x51, 0));
