@@ -146,11 +146,9 @@ MRectAnime::MRectAnime(MRect from, MRect to) {
     mFrom = from;
     mTo = to;
     long b = labs(from.bottom - to.bottom);
-    long r = labs(from.right - to.right);
-    const int &m1 = std::max<int>(r, b);
+    const int &m1 = std::max<int>(labs(from.right - to.right), b);
     long t = labs(from.top - to.top);
-    long l = labs(from.left - to.left);
-    mSteps = std::max(std::max<int>(l, t), m1) + 1;
+    mSteps = std::max(std::max<int>(labs(from.left - to.left), t), m1) + 1;
     mDelta[0] = ((to.left - from.left) << 16) / (mSteps - 1);
     mDelta[1] = ((to.top - from.top) << 16) / (mSteps - 1);
     mDelta[2] = ((to.right - from.right) << 16) / (mSteps - 1);
