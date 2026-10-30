@@ -57,7 +57,8 @@ extern "C" const char data_ov000_02195114[];   // the change's format ("%+d")
 extern "C" u32 data_ov000_0219504c[];           // the TU's pooled statics (+0x04: the loss digits, +0x08: the gain)
 
 // Shows a side's kaseki point change, one digit after another.
-// NONMATCHING: the spilled locals (the length, the digit set, the oam) take other stack slots.
+// NONMATCHING: 99.3%, the spilled length, counter and oam take other stack slots, and the game tests the count before
+// entering the loop.
 extern "C" void func_ov000_0217df4c(DinoBattleViewKPUpDown *view, int value, int side) {
     MPoint pos;
     char text[8];
@@ -66,7 +67,6 @@ extern "C" void func_ov000_0217df4c(DinoBattleViewKPUpDown *view, int value, int
     int i;
     int len;
     MSmartOam *oam;
-    const char *c;
     if (value == 0) {
         return;
     }
@@ -84,7 +84,6 @@ extern "C" void func_ov000_0217df4c(DinoBattleViewKPUpDown *view, int value, int
     } else {
         DinoSoundPlaySe(0x57, 0);
     }
-    c = text;
     for (i = 0; i < len; i++) {
         MMotion *digit = new MMotion(
             std::string(value >= 0 ? ((const char **)data_ov000_0219504c)[2] : ((const char **)data_ov000_0219504c)[1]),
@@ -96,9 +95,8 @@ extern "C" void func_ov000_0217df4c(DinoBattleViewKPUpDown *view, int value, int
         digit->GetUnit()->SetMode(1);
         digits->AddTail(digit);
         pos.x += 16;
-        int anime = *c == '+' ? 11 : *c - '0' + 1;
+        int anime = text[i] == '+' ? 11 : text[i] - '0' + 1;
         tasks->AddTail(digit->CreatePlayTransfer(anime, 0), new MTimer(3));
-        c++;
     }
     tasks->AddTail(new MTimer(60), MTaskExitTransfer::Create(digits));
     digits->AddTail(oam);
