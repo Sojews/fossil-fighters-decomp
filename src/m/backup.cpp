@@ -192,13 +192,19 @@ MBackupStorage::~MBackupStorage() {
     delete mDevice;
 }
 
-// NONMATCHING since the file went to #pragma ipa file: the inlined resize's tag temporary takes the other byte slot.
+// (Resized through a helper, which gives the game's slot for resize's tag temporary under -ipa file.)
+template <class T> static inline void MResize(std::vector<T> &v, u32 n) {
+    v.resize(n);
+}
+
+// NONMATCHING: the inlined push_back's copy-construct tag and its sub_push_back tag take each other's byte slots
+// (also in DinoBattleView3D's constructor; no header or call shape found yet).
 void MBackupStorage::AddFile(u32 size, u32 copies) {
     File file;
     file.size = size;
     file.current = 0;
     file.serial = 0;
-    file.copies.resize(copies);
+    MResize(file.copies, copies);
     file.damaged = FALSE;
     mFiles.push_back(file);
 }
@@ -339,7 +345,7 @@ BOOL MBackupStorage::WriteFile(u32 file, const void *buf) {
     copy.serial = f.serial;
     u32 crc = 0xFFFFFFFF;
     MATHi_CRC32UpdateRev(&mCrcTable, &crc, &copy, 4);
-    MATHi_CRC32UpdateRev(&mCrcTable, &crc, buf, files[file].size);
+    MATHi_CRC32UpdateRev(&mCrcTable, &crc, buf, f.size);
     copy.crc = ~crc;
     if (WriteRegion(copy.dataRegion, buf) && WriteRegion(copy.headerRegion, &copy)) {
         return TRUE;
