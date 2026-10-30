@@ -230,7 +230,7 @@ void MAnmModelBase::TintPalette(u16 color, fx32 amount) {
     amount = 0x1000 - amount;
     u16 *src = (u16 *) palette;
     for (u32 i = 0; i < size / 2; i++) {
-        u16 c = src[i];
+        s16 c = src[i];
         int cr = c & 0x1F;
         int cg = (c >> 5) & 0x1F;
         int cb = (c >> 10) & 0x1F;
