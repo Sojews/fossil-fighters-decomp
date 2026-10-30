@@ -852,6 +852,13 @@ static inline u32 DinoBattleSelectCreatureLevel(const DinoBattleSelectCreature *
 }
 
 // The row's position.
+// (The cursor's: the step scaled first, then added to the base.)
+static inline MPoint DinoCursorRowPos(u32 both, int row) {
+    const MPoint &base = data_ov000_02195f88[both];
+    const MPoint &step = data_ov000_02195f98[both];
+    return base + MPoint(step.x * row, step.y * row);
+}
+
 static inline MPoint DinoRowPos(u32 both, int row) {
     const MPoint &base = data_ov000_02195f88[both];
     const MPoint &step = data_ov000_02195f98[both];
@@ -909,7 +916,7 @@ void UseCreatureSelect::Start() {
     }
     mCursor = new MIndicator(new MSmartObjCanvas(oam, MPoint(128, 16), gDinoResource->GetUnkTable(), TRUE), font, 0);
     mCursor->SetText(std::string(gDinoResource->GetText(data_0208ade0)));
-    mCursor->SetPosition(DinoRowPos(mUnk7C, mUnk88) + data_ov000_02195e50.cursorOffset);
+    mCursor->SetPosition(DinoCursorRowPos(mUnk7C, mUnk88) + data_ov000_02195e50.cursorOffset);
     mCursor->SetPriority(0);
     mCursor->Show();
     mParallel.AddTail(mCursor, oam);
@@ -1054,7 +1061,7 @@ void UseCreatureSelect::Select() {
         }
         mRows[mUnk88]->SetText(std::string(text));
     }
-    mCursor->SetPosition(DinoRowPos(mUnk7C, mUnk88) + data_ov000_02195e50.cursorOffset);
+    mCursor->SetPosition(DinoCursorRowPos(mUnk7C, mUnk88) + data_ov000_02195e50.cursorOffset);
 }
 
 // The same, for the level select.
