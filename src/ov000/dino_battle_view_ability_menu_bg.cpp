@@ -653,25 +653,31 @@ void DinoBattleViewUiAbilityMenu::OnIdle() {
 
 extern "C" const u32 data_0208a194;    // the close slide's length
 
-// NONMATCHING: the loop guard shares the zero-length branch's trampoline in the game; locals' slots differ.
+// NONMATCHING: slides, frames and frames / 7 take each other's stack slots.
 void DinoBattleViewUiAbilityMenu::Close() {
     Disable();
     MParallelTaskSet *slides = NULL;
     u32 frames = data_0208a194;
     if (frames != 0) {
         slides = new MParallelTaskSet(TRUE);
-        for (int i = 0; i < (int)mUnkCC; i++) {
-            MPoint pos = mItems[i]->GetBarPosition();
-            MSerialTaskSet *seq = new MSerialTaskSet(TRUE);
-            MTask *slide = func_ov000_0217a45c(mItems[i], pos, MPoint(pos.x, pos.y - 192), 20, -1);
-            seq->AddTail(new MTimer(frames / 7 * i), slide);
-            slides->AddTail(seq);
+        // (The count check before the loop is the game's: its loop entry tests twice.)
+        int i = 0;
+        if ((int)mUnkCC > 0) {
+            for (; i < (int)mUnkCC; i++) {
+                MPoint pos = mItems[i]->GetBarPosition();
+                MSerialTaskSet *seq = new MSerialTaskSet(TRUE);
+                MPoint dest(pos.x, pos.y - 192);
+                MTask *slide = func_ov000_0217a45c(mItems[i], pos, dest, 20, -1);
+                seq->AddTail(new MTimer(frames / 7 * i), slide);
+                slides->AddTail(seq);
+            }
         }
     }
     mTextWindow->Hide();
     mCostText->Hide();
+    MPoint from;
     MPoint to(0, -192);
-    MPoint from = mBG->mUnk10D4 ? mBG->mText->GetOffset() : mBG->mOffset;
+    from = mBG->mUnk10D4 ? mBG->mText->GetOffset() : mBG->mOffset;
     mParallel.AddTail(mBG->mUnk10D4 ? mBG->mText->CreateOffsetAnime(from, to, frames, 1) : new MTimer(1));
     if (slides != NULL) {
         mSerial.AddTail(slides);
