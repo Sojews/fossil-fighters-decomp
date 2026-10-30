@@ -65,11 +65,11 @@ void MChr16Fill::Transfer() {
         last = cols;
     }
     if (rows != 0) {
+        u32 mask = leftMask & rightMask;
         do {
             for (u32 c = 0; c < (u32) cols; c++) {
                 if (c >= first && c < last) {
                     if (c == 0 && c == cols - 1) {
-                        u32 mask = leftMask & rightMask;
                         *p = (*p & ~mask) | (fill & mask);
                     } else if (c == 0) {
                         *p = (*p & ~leftMask) | (leftMask & fill);
