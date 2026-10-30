@@ -1111,15 +1111,16 @@ void MMultiPlayMessageHub::SendToAll(MMessage *msg) {
     SendTo(0xFFFF, msg);
 }
 
-// Serializes msg and queues it for the consoles in mask. NONMATCHING: the game spills mask and msg (and keeps the
-// buffer in r7); so does the vector's range init, which goes through a char temporary on the stack.
+// Serializes msg and queues it for the consoles in mask. NONMATCHING: the game makes the end pointer after the new,
+// and the range constructor's tags sit differently.
 void MMultiPlayMessageHub::SendTo(u32 mask, MMessage *msg) {
     msg->AddRef();
     u32 size = msg->GetSize();
     u8 *buf = new u8[size];
     msg->Write(buf);
     MMultiPlayHubOutgoing out;
-    out.data = new std::vector<char>(std::__msl_move_iter<u8 *>(buf), std::__msl_move_iter<u8 *>(buf + size));
+    u8 *end = buf + size;
+    out.data = new std::vector<char>(std::__msl_move_iter<u8 *>(buf), std::__msl_move_iter<u8 *>(end));
     out.mask = mask;
     mOutgoing.push_back(out);
     delete[] buf;
