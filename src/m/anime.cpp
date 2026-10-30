@@ -5,8 +5,7 @@
 #include "m/anime.h"
 
 // base * (base / denom)^n
-static inline int EasePow(int base, int count, int denom) {
-    u32 n = count;
+static inline int EasePow(int base, u32 n, int denom) {
     int v = base;
     for (u32 i = 0; i < n; i++) {
         v = v * base / denom;
@@ -21,11 +20,8 @@ void MAnime::Reset() {
     mLoopsLeft = mLoops;
 }
 
+// NONMATCHING: the two halves' stack slots are swapped.
 void MAnime::Execute() {
-    int last;
-    int step;
-    int max;
-    int count;
     int ease;
 
     if (!mStarted) {
@@ -45,40 +41,48 @@ void MAnime::Execute() {
         }
         mFinished = TRUE;
     }
-    last = mLastStep;
-    count = mSteps;
-    max = count - 1;
-    step = (int)(max * mFrame) / (int)mDuration;
+    int last = mLastStep;
+    u32 count = mSteps;
+    int max = count - 1;
+    int step = (int)(max * mFrame) / (int)mDuration;
     ease = mEase;
     if (ease != 0) {
         if (ease > 10) {
             u32 half = (u32)count >> 1;
             if ((u32)step < half) {
-                step = EasePow(step, ease - 10, half - 1);
+                u32 n = ease - 10;
+                step = EasePow(step, n, half - 1);
             } else {
+                u32 n = ease - 10;
                 int rest = max - half;
-                int v = EasePow(rest - (step - (int)half), ease - 10, rest);
+                int v = EasePow(rest - (step - (int)half), n, rest);
                 step = half + (rest - v);
             }
         } else if (ease < -10) {
             u32 half = (u32)count >> 1;
             if ((u32)step < half) {
+                u32 n = -(10 + ease);
                 int end = half - 1;
-                int v = EasePow(end - step, -(ease + 10), end);
+                int b = end - step;
+                int v = EasePow(b, n, end);
                 step = (half - 1) - v;
             } else {
-                int v = EasePow(step - (int)half, -(ease + 10), max - half);
+                u32 n = -(10 + ease);
+                int d = max - half;
+                const int b = step - (int)half;
+                int v = EasePow(b, n, d);
                 step = half + v;
             }
         } else if (ease > 0) {
             step = EasePow(step, ease, max);
         } else {
-            step = max - EasePow(max - step, -ease, max);
+            u32 n = -ease;
+            step = max - EasePow(max - step, n, max);
         }
     }
     mLastStep = step;
-    if (step != last) {
-        Apply(step);
+    if (mLastStep != last) {
+        Apply(mLastStep);
     }
 }
 
