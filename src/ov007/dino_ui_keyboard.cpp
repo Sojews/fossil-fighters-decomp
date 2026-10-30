@@ -1007,7 +1007,6 @@ extern const int data_02089ac8, data_02089acc, data_02089ad0;
 
 // Keeps the name, without its trailing blanks, as the player's or the team's (a team's first name also fades the top
 // screen out), and fades out.
-// NONMATCHING: the two fade constants swap registers, as in OnBackDecided.
 void DinoUiKeyboardMenu::Finish() {
     BOOL fadeTop = FALSE;
     for (int i = mUnk19C.size() - 1; i >= 0; i--) {
@@ -1049,7 +1048,8 @@ void DinoUiKeyboardMenu::Finish() {
         }
     }
     MParallelTaskSet *fades = new MParallelTaskSet(TRUE);
-    MBright *bright = gLcd->GetBottomDisplay()->mBright;
+    MDisplay *display = gLcd->GetBottomDisplay();
+    MBright *bright = display->mBright;
     fades->AddTail(bright->CreateFadeOutToBlack(data_02089acc, data_02089ac8));
     if (mMode == 0) {
         fades->AddTail(gLcd->GetTopDisplay()->mBright->CreateFadeOutToBlack(data_02089acc, data_02089ac8));
@@ -1521,39 +1521,6 @@ template std::wstring std::wstring::substr(std::wstring::size_type pos, std::wst
 
 extern const int data_02089ac8, data_02089acc, data_02089ad0;
 
-// NONMATCHING: the two fade constants swap registers.
-void DinoUiKeyboardMenu::OnBackDecided() {
-    if (mMode == 0) {
-        DinoPlayerData player;
-        gDinoBackup->GetPlayer(&player, 0);
-        std::wstring name((const wchar_t *)player.name);
-        if (name.size() == 0) {
-            player.name[0] = mUnk1B4[0][0x1D];
-            player.name[1] = mUnk1B4[0][0x29];
-            player.name[2] = mUnk1B4[0][0xC];
-            player.name[3] = mUnk1B4[0][8];
-        }
-        mUnk19C = (const wchar_t *)player.name;
-        RefreshName();
-        gDinoBackup->SetPlayer(&player);
-    }
-    MParallelTaskSet *fades = new MParallelTaskSet(TRUE);
-    MBright *bright = gLcd->GetBottomDisplay()->mBright;
-    fades->AddTail(bright->CreateFadeOutToBlack(data_02089acc, data_02089ac8));
-    if (mMode == 0) {
-        fades->AddTail(gLcd->GetTopDisplay()->mBright->CreateFadeOutToBlack(data_02089acc, data_02089ac8));
-    }
-    mUnk158->Exit();
-    MTask *exit = MTaskExitTransfer::Create(&(MTask &)*this);
-    KasekiPictCache *cache = mPictCache;
-    cache->mStop = TRUE;
-    MTask *waitTask = MTaskSetWaitEmptyTask::Create(&cache->mSerial);
-    GetSerial()->AddTail(new MTimer(data_02089ad0), fades, waitTask, exit);
-}
-
-// Where the cursor goes for each place in the name, per mode.
-extern "C" const MPoint data_ov007_021911f0[][18];
-
 void DinoUiKeyboardMenu::RefreshName() {
     for (int i = mUnk19C.size(); i < mMaxLength; i++) {
         mChars[i]->SetText(std::string(""));
@@ -1578,6 +1545,39 @@ void DinoUiKeyboardMenu::RefreshName() {
         mSerial.AddTail(mCursor->CreatePlayTransfer(1, 0));
     }
 }
+
+void DinoUiKeyboardMenu::OnBackDecided() {
+    if (mMode == 0) {
+        DinoPlayerData player;
+        gDinoBackup->GetPlayer(&player, 0);
+        std::wstring name((const wchar_t *)player.name);
+        if (name.size() == 0) {
+            player.name[0] = mUnk1B4[0][0x1D];
+            player.name[1] = mUnk1B4[0][0x29];
+            player.name[2] = mUnk1B4[0][0xC];
+            player.name[3] = mUnk1B4[0][8];
+        }
+        mUnk19C = (const wchar_t *)player.name;
+        RefreshName();
+        gDinoBackup->SetPlayer(&player);
+    }
+    MParallelTaskSet *fades = new MParallelTaskSet(TRUE);
+    MDisplay *display = gLcd->GetBottomDisplay();
+    MBright *bright = display->mBright;
+    fades->AddTail(bright->CreateFadeOutToBlack(data_02089acc, data_02089ac8));
+    if (mMode == 0) {
+        fades->AddTail(gLcd->GetTopDisplay()->mBright->CreateFadeOutToBlack(data_02089acc, data_02089ac8));
+    }
+    mUnk158->Exit();
+    MTask *exit = MTaskExitTransfer::Create(&(MTask &)*this);
+    KasekiPictCache *cache = mPictCache;
+    cache->mStop = TRUE;
+    MTask *waitTask = MTaskSetWaitEmptyTask::Create(&cache->mSerial);
+    GetSerial()->AddTail(new MTimer(data_02089ad0), fades, waitTask, exit);
+}
+
+// Where the cursor goes for each place in the name, per mode.
+extern "C" const MPoint data_ov007_021911f0[][18];
 
 extern const int data_020899f8, data_02089a84;
 

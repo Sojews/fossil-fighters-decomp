@@ -410,14 +410,14 @@ void DinoUiReviveStatusMenu::FadeIn() {
 
 extern const int data_02089a6c, data_02089a70;
 
-// NONMATCHING: the two fade constants swap registers (as DinoUiKeyboardMenu::OnBackDecided).
 void DinoUiReviveStatusMenu::Leave() {
     if (mUnk122) {
         mSerial.AddTail(DinoSoundCreateStopBgmAllTask(30));
     }
     if (mFlag) {
         MTask *exit = CreateExitTransfer();
-        MBright *bright = gLcd->GetBottomDisplay()->mBright;
+        MDisplay *display = gLcd->GetBottomDisplay();
+        MBright *bright = display->mBright;
         MTask *fadeBottom = bright->CreateFadeOutToWhite(data_02089a70, data_02089a6c);
         MTask *fadeTop = gLcd->GetTopDisplay()->mBright->CreateFadeOutToWhite(data_02089a70, data_02089a6c);
         MParallelTaskSet *fades = new MParallelTaskSet(TRUE);
@@ -428,7 +428,8 @@ void DinoUiReviveStatusMenu::Leave() {
         serial->AddTail(exit);
     } else {
         MTask *exit = CreateExitTransfer();
-        MBright *bright = gLcd->GetBottomDisplay()->mBright;
+        MDisplay *display = gLcd->GetBottomDisplay();
+        MBright *bright = display->mBright;
         MTask *fadeBottom = bright->CreateFadeOutToBlack(data_02089a70, data_02089a6c);
         MTask *fadeTop = gLcd->GetTopDisplay()->mBright->CreateFadeOutToBlack(data_02089a70, data_02089a6c);
         MParallelTaskSet *fades = new MParallelTaskSet(TRUE);
