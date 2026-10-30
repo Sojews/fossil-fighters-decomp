@@ -346,7 +346,7 @@ void M3DModel::Draw(u32 lights) {
                     const M3DTexEntry *entries = (const M3DTexEntry *)mUnkDC;
                     int shift = ((M3D_TEX_IMAGE_PARAM(entries + tex) >> 26) & 7) == 2 ? 1 : 0;
                     REG_G3_PLTT_BASE = (mPlttKey + M3D_TEX_PLTT_OFFSET(entries + pltt)) >> (4 - shift);
-                    REG_G3_POLYGON_ATTR = (id << 24) | ((alpha << 16) | (t & 0xF0)) | 0x3000;
+                    REG_G3_POLYGON_ATTR = (id << 24) | ((t & 0xF0) | (alpha << 16)) | 0x3000;
                     if (t & 0x8000) {
                         if (mJointFrames[material] != NULL) {
                             MtxFx44 mtx;
