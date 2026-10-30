@@ -1404,7 +1404,8 @@ void DinoBattleCpuController::DecideAction(u32 first) {
             support = other;
         } else {
             MFx32 a = ScoreConditions(player, support, other, mAi.mFiles[0]);
-            MFx32 b = ScoreConditions(player, other, support, mAi.mFiles[1]);
+            MFx32 b;
+            b = ScoreConditions(player, other, support, mAi.mFiles[1]);
             if (a > b) {
             } else if (a < b) {
                 support = other;
