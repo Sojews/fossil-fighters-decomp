@@ -183,7 +183,6 @@ void MDisplay::SetBg0Is3D(BOOL on) {
 }
 
 // Sets the BG mode and moves the layers' visibility (and their blend and window settings) between BG numbers.
-// NONMATCHING: the two bit masks swap registers (and the from/to pointers load the other way round).
 void MDisplay::SetBgMode(int mode, const int *from, const int *to, u32 count) {
     u32 i;
     u32 bitB, bitA;
