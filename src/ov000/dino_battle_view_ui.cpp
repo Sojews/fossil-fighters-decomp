@@ -863,7 +863,9 @@ void DinoBattleViewUiAttackerMenu::OnStart() {
 // The defender help's texts: with one of the player's own creatures among the defenders, or not.
 extern "C" const u32 data_0208a354, data_0208a358;
 
-// NONMATCHING: two locals swap stack slots, and the game keeps the map iterator in a register across the inner loop.
+// (Compiled with common subexpressions on, unlike its neighbours.)
+// NONMATCHING: text and the map end iterator swap stack slots.
+#pragma opt_common_subs on
 void DinoBattleViewUiDefenderMenu::OnStart() {
     DinoBattleViewUiSelectAreaCommon::OnStart();
     u32 text = data_0208a358;
@@ -967,15 +969,17 @@ void DinoBattleViewUiDefenderMenu::ResetRows() {
                              otherView->CreateCoordAnime(otherView->GetPosition(), func_ov000_0215f22c(3, other), 8, -2)));
 }
 
-#pragma opt_common_subs off
 // Marks every creature that can be chosen, with a frame item over each.
-// NONMATCHING: the oam and &mParallel take each other's stack slots, and the game reloads mCount after the loop.
+static inline MParallelTaskSet *DinoSelectAllParallel(DinoBattleViewUiSelectAllMenu *menu) {
+    return &menu->mParallel;
+}
+
 void DinoBattleViewUiSelectAllMenu::OnStart() {
     MSmartOam *oam = new MSmartOam(3, 0, 1);
     DinoSoundPlaySe(0x5F, 0);
     u32 text = data_0208a358;
     for (u32 i = 0; i < mCount; i++) {
-        MParallelTaskSet *parallel = &mParallel;
+        MParallelTaskSet *parallel = DinoSelectAllParallel(this);
         DinoBattleViewCreature *creature = ((DinoBattleView *)mView)->FindCreatureByAC(mIds[i]);
         if (((DinoBattleView *)mView)->GetUnkE4(mPlayer)->GetUnkAC() == creature->GetUnkB0()) {
             text = data_0208a354;
@@ -1011,7 +1015,6 @@ void DinoBattleViewUiSelectAllMenu::OnStart() {
         mSerial.AddTail(DinoHelpBase::CreateEnableTask(&help));
     }
 }
-#pragma opt_common_subs on
 // The cancel item backs out; a creature that can be swapped in is told to the target.
 void DinoBattleViewUiChangeMenu::OnDecide(MMenuItem *item) {
     if (HandlePageItem(item)) {

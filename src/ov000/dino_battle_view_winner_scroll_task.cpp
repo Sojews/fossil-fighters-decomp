@@ -1,5 +1,5 @@
 // DinoBattleViewWinnerScrollTask, DinoBattleViewBackdrop.
-// NONMATCHING: DinoBattleViewBackdrop::Execute (spilled values in other stack slots, registers in the loop).
+// NONMATCHING: DinoBattleViewBackdrop::Execute (the spilled top/bottom values and the loop state swap stack slots).
 
 // Derived destructors have their bases' destructor bodies inlined; auto-inlining the ones defined above does that.
 #pragma auto_inline on
@@ -179,8 +179,9 @@ void DinoBattleViewBackdrop::Execute() {
     int ag = 0;
     int ab = 0;
     for (int i = 0; i < M_RASTER_LINES; i++) {
-        *line++ = 0x8000 | ((u32)(r + ar / (M_RASTER_LINES - 1)) >> 3) | ((u32)(b + ab / (M_RASTER_LINES - 1)) >> 3 << 10) |
-                  ((u32)(g + ag / (M_RASTER_LINES - 1)) >> 3 << 5);
+        // (Grouped from the blue end: the game works out blue, then green, then red.)
+        *line++ = ((u32)(b + ab / (M_RASTER_LINES - 1)) >> 3 << 10) |
+                  (((u32)(g + ag / (M_RASTER_LINES - 1)) >> 3 << 5) | (((u32)(r + ar / (M_RASTER_LINES - 1)) >> 3) | 0x8000));
         ar += dr;
         ag += dg;
         ab += db;

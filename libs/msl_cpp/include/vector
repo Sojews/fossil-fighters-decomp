@@ -176,6 +176,9 @@ namespace std {
 
         iterator erase(iterator __first, iterator __last, UnkMSLStruct1);
         iterator erase(iterator pos, UnkMSLStruct1);
+        iterator erase(iterator pos) {
+            return erase(pos, UnkMSLStruct1());
+        }
 
         void sub_push_back(const_reference x, Metrowerks::int2type<false>);
         void sub_push_back(const_reference x, Metrowerks::int2type<true>);
@@ -1159,7 +1162,7 @@ namespace std {
             return iterator((T **) _Base::erase((void **) first.ptr_, (void **) last.ptr_, UnkMSLStruct1()));
         }
         iterator erase(iterator pos) {
-            return iterator((T **) _Base::erase((void **) pos.ptr_, UnkMSLStruct1()));
+            return iterator((T **) _Base::erase((void **) pos.ptr_));
         }
     };
 } // namespace std

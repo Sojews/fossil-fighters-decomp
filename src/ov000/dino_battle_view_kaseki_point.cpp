@@ -324,7 +324,7 @@ void DinoBattleViewPlayer::OnMessage(MMessage *msg) {
         if (req->mUnk38) {
             mUnk114 = TRUE;
         }
-        break;
+        return;
     }
     case 0x10033: {
         DinoBattleViewCreatureEndRequest *req = (DinoBattleViewCreatureEndRequest *)msg;
@@ -369,7 +369,7 @@ void DinoBattleViewPlayer::OnMessage(MMessage *msg) {
         if (req->mUnk0C != 0 && req->mUnk10 == mUnkA8) {
             ((MMessageObserver *)req->mUnk0C)->Post(new DinoBattleViewPlayerUpdateAbilityIconResult());
         }
-        break;
+        return;
     }
     case 0x10092: {
         DinoBattleViewPlayerWaitKPCountStopRequest *req = (DinoBattleViewPlayerWaitKPCountStopRequest *)msg;
