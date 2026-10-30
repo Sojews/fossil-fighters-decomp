@@ -36,7 +36,7 @@ public:
         mDstBase = screen->mBase;
         mDstSize = screen->GetSize();
         mDst = dst;
-        mAttr = tile | (palette << 12);
+        mAttr = (palette << 12) | tile;
         mFlip = (hflip ? 0x400 : 0) | (vflip ? 0x800 : 0);
     }
     virtual ~MExtAffineTransfer();
