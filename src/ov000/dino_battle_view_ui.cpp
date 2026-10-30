@@ -968,8 +968,7 @@ void DinoBattleViewUiDefenderMenu::ResetRows() {
 
 #pragma opt_common_subs off
 // Marks every creature that can be chosen, with a frame item over each.
-// NONMATCHING: the game hoists &mParallel into a second loop preheader, copies the offset argument before the
-// GetFrame call and keeps the frame in another temporary (stack slots differ).
+// NONMATCHING: the oam and &mParallel take each other's stack slots, and the game reloads mCount after the loop.
 void DinoBattleViewUiSelectAllMenu::OnStart() {
     MSmartOam *oam = new MSmartOam(3, 0, 1);
     DinoSoundPlaySe(0x5F, 0);
@@ -1183,7 +1182,6 @@ DinoBattleViewUiCreatureInfoMenu::DinoBattleViewUiCreatureInfoMenu(DinoBattleVie
 
 #pragma opt_common_subs on
 // The page items page the info (handled twice over, as the game does); the close item puts everything back.
-// NONMATCHING: the other view, the anime, the loop counter and the wait get other stack slots.
 void DinoBattleViewUiCreatureInfoMenu::OnDecide(MMenuItem *item) {
     if (HandlePageItem(item)) {
         return;
@@ -1222,18 +1220,17 @@ void DinoBattleViewUiCreatureInfoMenu::OnDecide(MMenuItem *item) {
         int side = mSideC0;
         other = 1 - side;
         MView *sideView = ((DinoBattleView *)mUnkEC)->mUnkE0->mSlotViewsC0[side];
-        MView *otherView = ((DinoBattleView *)mUnkEC)->mUnkE0->mSlotViewsC0[other];
+        MView *otherView = DinoSlotView(mUnkEC, other);
         mUnkF8->AddTail(Together(sideView->CreateCoordAnime(sideView->GetPosition(), func_ov000_0215f22c(2, side), 8, -2),
                                  otherView->CreateCoordAnime(otherView->GetPosition(), func_ov000_0215f22c(3, other), 8, -2)));
         int count = 0;
-        u32 i;
-        for (i = 0; i < 2; i++) {
+        for (u32 i = 0; i < 2; i++) {
             count += ((DinoBattleView *)mUnkEC)->GetUnkE4(i)->GetCreatureCount();
         }
         if (count != 0) {
             DinoSignalWait *wait = new DinoSignalWait(0x100A1, NULL, NULL, count);
             mSerial.AddTail(wait);
-            for (i = 0; i < 2; i++) {
+            for (u32 i = 0; i < 2; i++) {
                 DinoBattleViewPlayer *player = ((DinoBattleView *)mUnkEC)->GetUnkE4(i);
                 for (u32 j = 0; j < player->GetCreatureCount(); j++) {
                     player->GetCreature(j)->Post(new DinoBattleViewCreatureViewInfoMoveRequest(wait, FALSE));
