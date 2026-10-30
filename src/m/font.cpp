@@ -199,7 +199,7 @@ void M1BitFont::Draw(MChrBlock *chr, u32 tile, MPoint size, MPoint pos, u32 code
     if (bits != NULL) {
         gLooper->AddTransferTask(new MChr16BinFontTransfer(bits, GetGlyphSize(code), size, pos, GetColor(),
                                                            GetShadowColor(), GetBackColor(), mUnk20,
-                                                           (void *)(chr->addr + tile * chr->unitSize)));
+                                                           (void *)chr->GetTileAddr(tile)));
     }
 }
 
@@ -221,7 +221,7 @@ void M4BitFont::Draw(MChrBlock *chr, u32 tile, MPoint size, MPoint pos, u32 code
     const u8 *bits = glyph + 2;
     if (bits != NULL) {
         gLooper->AddTransferTask(new MChr16FontTransfer(bits, GetGlyphSize(code), size, pos, mOwnColors,
-                                                        (void *)(chr->addr + tile * chr->unitSize)));
+                                                        (void *)chr->GetTileAddr(tile)));
     }
 }
 
