@@ -1145,12 +1145,14 @@ void DinoUiSenryuMenu::OnStart() {
         mCount = 1;
     }
     for (int o = 0; o < 3; o++) {
+        MTaskSet *outer = &mParallel;
         for (int j = 0; j < 3; j++) {
+            MTaskSet *parallel = &mParallel;
             mLines[o][j] = new MIndicator(
                 new MObjCanvas(gCurrentDisplay, MPoint(0xCC, 0xC),
                                gDinoResource->GetUnkTable(), TRUE),
                 (&mFont120)[o], 0);
-            mParallel.AddTail(mLines[o][j]);
+            parallel->AddTail(mLines[o][j]);
             mLines[o][j]->SetPosition(MPoint(data_ov007_021919c4[j].x - 6 + data_ov007_021919ac[o].x,
                                                   data_ov007_021919c4[j].y - 6 + data_ov007_021919ac[o].y));
             mLines[o][j]->SetPriority(3);
@@ -1159,7 +1161,7 @@ void DinoUiSenryuMenu::OnStart() {
         mNames[o] = new MIndicator(new MObjCanvas(gCurrentDisplay, MPoint(0x30, 0xC),
                                                   gDinoResource->GetUnkTable(), TRUE),
                                    (&mFont120)[o], 0);
-        mParallel.AddTail(mNames[o]);
+        outer->AddTail(mNames[o]);
         mNames[o]->SetPosition(MPoint(data_ov007_02191880.mNameOffset.x + data_ov007_021919ac[o].x,
                                       data_ov007_02191880.mNameOffset.y + data_ov007_021919ac[o].y));
         mNames[o]->SetPriority(3);
