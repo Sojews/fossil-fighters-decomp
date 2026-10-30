@@ -18,6 +18,8 @@ public:
         int shape;      // 0x10: size * 4 + shape (an index into gObjSizes)
         u32 chrSize;    // 0x14: tiles
         u32 chrOffset;  // 0x18: tiles into the canvas's characters
+        Piece() {}
+        Piece(MRect r, int s) : rect(r), shape(s) {}
     };
 
     MOamCanvas(MDisplay *display, TOam *oam, MPoint size, const void *palette, BOOL fromEnd);

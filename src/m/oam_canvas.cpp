@@ -184,10 +184,7 @@ void MOamCanvas<TOam, TUnit>::AddPiece(MRect rect, int shape) {
     MPoint size = gObjSizes[0][shape];
     int sw = size.x;
     int sh = size.y;
-    Piece piece;
-    piece.rect = MRect(rect.GetTopLeft(), rect.GetTopLeft() + size);
-    piece.shape = shape;
-    mPieces.push_back(piece);
+    mPieces.push_back(Piece(MRect(rect.GetTopLeft(), rect.GetTopLeft() + size), shape));
     if (w <= sw && h > sh) {
         mRects.push_back(MRect(rect.left, rect.top + sh, rect.right, rect.bottom));
     } else if (w > sw && h <= sh) {
@@ -197,7 +194,6 @@ void MOamCanvas<TOam, TUnit>::AddPiece(MRect rect, int shape) {
         mRects.push_back(MRect(rect.left + sw, rect.top, rect.right, rect.top + sh));
     }
 }
-
 template <class TOam, class TUnit>
 void MOamCanvas<TOam, TUnit>::Layout(MRect rect) {
     mRects.push_back(rect);
