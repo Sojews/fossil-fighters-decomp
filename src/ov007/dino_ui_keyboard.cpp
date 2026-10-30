@@ -1092,6 +1092,7 @@ extern const int data_02089a18;
 // marks, the page number, the cursor and the help.
 // NONMATCHING: the game reads gCurrentDisplay for the canvases after copying their size (as elsewhere), and its
 // spill slots differ.
+#pragma opt_common_subs off
 void DinoUiSenryuMenu::OnStart() {
     mParallel.AddTail(mUnk114 = new MParallelTaskSet, mUnk110 = new MParallelTaskSet, mUnk118 = new MSerialTaskSet);
     mOam = new MSmartOam(0x28, 0, TRUE);
@@ -1206,6 +1207,7 @@ void DinoUiSenryuMenu::OnStart() {
     mSerial.AddTail(MTaskRunTransfer::Create(keys));
     mUnk11C = keys;
 }
+#pragma opt_common_subs reset
 
 void DinoUiSenryuMenu::CheckKeys() {
     MSerialTaskSet *serial = &mSerial;
