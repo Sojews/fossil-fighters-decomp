@@ -219,7 +219,7 @@ void MAnmModelBase::PlaySounds(int frame) {
 #pragma opt_strength_reduction reset
 
 // Blends the palette toward the color and queues it over the old one.
-// NONMATCHING: 73%, register allocation (the game keeps the index and one channel's product on the stack).
+// NONMATCHING: 76%, register allocation (the game keeps the index and the green product on the stack).
 void MAnmModelBase::TintPalette(u16 color, fx32 amount) {
     if (mResource == NULL) {
         return;
@@ -238,11 +238,11 @@ void MAnmModelBase::TintPalette(u16 color, fx32 amount) {
     amount = 0x1000 - amount;
     u16 *src = (u16 *) palette;
     for (u32 i = 0; i < size / 2; i++) {
-        s16 c = src[i];
-        int cr = c & 0x1F;
-        int cg = (c >> 5) & 0x1F;
+        u16 c = src[i];
+        int cr = (c & 0x1F) * amount;
+        int cg = ((c >> 5) & 0x1F) * amount;
         int cb = (c >> 10) & 0x1F;
-        tinted[i] = (((cb * amount + b) >> 12) << 10) | ((((cg * amount + g) >> 12) << 5) | ((cr * amount + r) >> 12));
+        tinted[i] = (((cb * amount + b) >> 12) << 10) | (((cg + g) >> 12) << 5) | ((cr + r) >> 12);
     }
     mScene->QueueD0((const void *)plttKey, (u32)tinted, size);
     mScene->QueueE8(NULL, (u32) tinted);
