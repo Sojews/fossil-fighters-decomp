@@ -35,23 +35,25 @@ void MChr16Fill::Transfer() {
     }
     int rows = mSize.y;
     int tilesX = mTiles.x;
+    u32 rightMask;
+    u32 leftMask;
+    u32 first;
     int x = mOrigin.x;
     int y = mOrigin.y;
     int tx = x >> 3;
     u32 *p = (u32 *) (mBase + (tx + (y >> 3) * tilesX) * 32 + (y & 7) * 4);
     int left = x & 7;
-    u32 leftMask = ~((1 << (left * 4)) - 1);
+    leftMask = ~((1 << (left * 4)) - 1);
     int w = mSize.x;
     int end = left + w;
     int right = end & 7;
-    u32 rightMask = (1 << (right * 4)) - 1;
+    rightMask = (1 << (right * 4)) - 1;
     if (right == 0) {
         rightMask = -1;
     }
     int cols = (end + 7) >> 3;
     int nextRow = -cols * 8 + 1;
     int nextTileRow = nextRow + (tilesX - 1) * 8;
-    u32 first;
     if (x < 0) {
         first = -tx;
     } else {
