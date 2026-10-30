@@ -416,6 +416,8 @@ namespace std {
                          typename iterator_traits<BidirectionalIterator>::difference_type len2,
                          BufferIterator buf_first, BufferIterator buf_last) {
         typedef typename iterator_traits<BidirectionalIterator>::difference_type difference_type;
+        BidirectionalIterator first_cut;
+        BidirectionalIterator second_cut;
         if (len1 == 0 || len2 == 0) {
             return;
         }
@@ -427,17 +429,13 @@ namespace std {
         }
         difference_type buf_len = buf_last - buf_first;
         if (len1 <= len2 && len1 <= buf_len) {
-            BufferIterator buf_end = copy(first, middle, buf_first);
-            __merge(buf_first, buf_end, middle, last, first, comp);
+            __merge(buf_first, copy(first, middle, buf_first), middle, last, first, comp);
             return;
         }
         if (len2 <= buf_len) {
-            BufferIterator buf_end = copy(middle, last, buf_first);
-            __merge_backward(first, middle, buf_first, buf_end, last, comp);
+            __merge_backward(first, middle, buf_first, copy(middle, last, buf_first), last, comp);
             return;
         }
-        BidirectionalIterator first_cut;
-        BidirectionalIterator second_cut;
         difference_type len11;
         difference_type len22;
         if (len1 <= len2) {
@@ -445,13 +443,13 @@ namespace std {
             second_cut = middle;
             advance(second_cut, len22);
             first_cut = __upper_bound(first, middle, *second_cut, comp);
-            len11 = distance(first, first_cut);
+            len11 = __distance(first, first_cut, typename iterator_traits<BidirectionalIterator>::iterator_category());
         } else {
             len11 = len1 / 2;
             first_cut = first;
             advance(first_cut, len11);
             second_cut = __lower_bound(middle, last, *first_cut, comp);
-            len22 = distance(middle, second_cut);
+            len22 = __distance(middle, second_cut, typename iterator_traits<BidirectionalIterator>::iterator_category());
         }
         middle = rotate(first_cut, middle, second_cut);
         __inplace_merge(first, first_cut, middle, comp, len11, len22, buf_first, buf_last);
