@@ -409,7 +409,7 @@ void DinoBattleViewField::OnMessage(MMessage *msg) {
         DINO_FIELD->mPlayerBG->SetSide(player->GetUnkAC());
         for (int side = 0; side < 2; side++) {
             BOOL same = side == DINO_FIELD->mView->GetUnkE4(req->mUnk10)->GetUnkAC();
-            int ease = same ? 1 : -1;
+            int ease = !same ? -1 : 1;
             int kind = same ? 2 : 3;
             DinoBattleViewFieldSlot *slot = DINO_FIELD->mSlotViewsC0[side];
             mParallel.AddTail(slot->CreateCoordAnime(slot->GetPosition(), func_ov000_0215f22c(kind, side), 40, ease));
