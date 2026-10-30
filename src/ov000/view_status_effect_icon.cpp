@@ -122,6 +122,7 @@ extern "C" u32 func_ov000_0217e298(const u32 *effect);
 // NONMATCHING: same control flow and calls; register and stack-slot allocation differ (the game keeps the slot's
 // offset in r7 throughout, and its frame is 8 bytes smaller).
 void DinoBattleViewStatusEffectIcon::SetEffects(int count, const u8 *effects) {
+    u32 slot;
     u32 present = 0;
     for (int i = 0; i < count; i++) {
         present |= 1 << (effects[i] & 0xf);
@@ -159,9 +160,9 @@ void DinoBattleViewStatusEffectIcon::SetEffects(int count, const u8 *effects) {
             slot = 0;
             break;
         }
-        StatusEffectChange *change = &changes.mSlots[slot];
         u32 bit = 1 << e;
         u32 has = present & bit;
+        StatusEffectChange *change = &changes.mSlots[slot];
         change->mPresent |= has;
         if ((present ^ shown[slot]) & bit) {
             if (has) {
@@ -186,7 +187,7 @@ void DinoBattleViewStatusEffectIcon::SetEffects(int count, const u8 *effects) {
 
     MSerialTaskSet *queue = new MSerialTaskSet(TRUE);
     for (int e = 1; e < 12; e++) {
-        int slot = 1;
+        slot = 1;
         switch (e) {
         case 8:
         case 9:
@@ -198,7 +199,7 @@ void DinoBattleViewStatusEffectIcon::SetEffects(int count, const u8 *effects) {
         u32 bit = 1 << e;
         int num = 0;
         BOOL flag = FALSE;
-        u32 has = present & bit;
+        u32 has = bit & present;
         if (has) {
             for (int i = 0; i < count; i++) {
                 if (e == (effects[i] & 0xf)) {
