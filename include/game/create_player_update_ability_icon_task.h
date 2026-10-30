@@ -3,6 +3,7 @@
 
 #include "m/fx32.h"
 #include "game/dino_battle_creature_def.h"
+#include "game/dino_backup.h"
 
 #include <vector>
 #include "m/menu_item.h"
@@ -185,7 +186,8 @@ public:
 
 
 struct DinoBattleCreatureStats {
-    u32 v[6];
+    u32 state;              // 0x00: a DinoCreatureState
+    DinoCreatureBody body;  // 0x04
 };
 
 // A creature's status effects.

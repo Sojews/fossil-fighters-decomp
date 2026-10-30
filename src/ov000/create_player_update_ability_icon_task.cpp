@@ -987,7 +987,7 @@ extern "C" void func_ov000_0216c90c(DinoBattleModelCreature *creature, u32 id, B
     MI_CpuFill8(&info, 0, sizeof(info));
     info.id = id;
     info.rank = creature->mUnkFC;
-    const DinoCreatureBody *body = (const DinoCreatureBody *)&creature->mStats.v[1];
+    const DinoCreatureBody *body = &creature->mStats.body;
     info.levels[4] = ((const DinoCreatureState *)&creature->mStats)->unk0_8;
     for (int i = 0; i < 4; i++) {
         info.bonus[i] = body->parts[i].unk12;
