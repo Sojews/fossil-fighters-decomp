@@ -68,8 +68,13 @@ MSmartText::~MSmartText() {
     mDisplay->mBg->DeleteText(mText);
 }
 
+// (Pushed through a reference, which gives the game's order for push_back's byte temps under -ipa file.)
+static inline void MPush(std::vector<MSmartText::Item *> &v, MSmartText::Item *const &x) {
+    v.push_back(x);
+}
+
 void MSmartText::Add(Item *item) {
-    mItems.push_back(item);
+    MPush(mItems, item);
 }
 
 void MSmartText::Erase(MRect rect) {

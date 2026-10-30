@@ -1581,13 +1581,16 @@ MTask *DinoBattleModelPlayer::CreateLcdFadeTask(BOOL clearIcons) {
     return set;
 }
 
-// NONMATCHING since the file went to #pragma ipa file (which matches its vector members and CurveRatio): the inlined
-// push_back's two tag temporaries take each other's byte slots.
+// (Pushed through a reference, which gives the game's order for push_back's byte temps under -ipa file.)
+static inline void DinoPushPtr(std::vector<void *> &v, void *const &x) {
+    v.push_back(x);
+}
+
 // The same with one target (or none: the attacker's own).
 void DinoBattleModelPlayer::AddAbilitySequence(MTaskSet *set, u32 a, u32 b, u32 attacker, void *target, u8 recolor) {
     std::vector<void *> targets;
     if ((void *)attacker != target) {
-        targets.push_back(target);
+        DinoPushPtr(targets, target);
     }
     AddAbilitySequence(set, a, b, attacker, targets, recolor);
 }
@@ -2459,14 +2462,12 @@ void DinoBattleModelPlayer::OnMessage(MMessage *msg) {
 }
 
 // Collects the ids of both players' creatures (either player may be missing).
-// NONMATCHING since the file went to #pragma ipa file (which matches its vector members and CurveRatio): the inlined
-// push_back's two tag temporaries take each other's byte slots.
 void DinoCollectCreatureIds(std::vector<void *> &ids, DinoBattleModelPlayer *first, DinoBattleModelPlayer *second) {
     for (u32 side = 0; side < 2; side++) {
         DinoBattleModelPlayer *player = side ? second : first;
         if (player != NULL) {
             for (u32 i = 0; i < player->GetCreatureCount(); i++) {
-                ids.push_back((void *)player->GetCreature(i)->GetUnkB4());
+                DinoPushPtr(ids, (void *)player->GetCreature(i)->GetUnkB4());
             }
         }
     }
