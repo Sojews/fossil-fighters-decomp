@@ -16,10 +16,11 @@ void TextPattern::Draw(MText *text, MRect clip) {
     MPoint dst(clip.left, clip.top);
     int dy = mVFlip ? (mRect.bottom - clip.bottom) - (clip.top - mRect.top) : 0;
     int bottom = clip.bottom + dy;
-    int dx = mHFlip ? (mRect.right - clip.right) - (clip.left - mRect.left) : 0;
-    int top = clip.top + dy;
+    // (The game subtracts mRect.top here, not mRect.left: it loads this+0x8, as the dy line does.)
+    int dx = mHFlip ? (mRect.right - clip.right) - (clip.left - mRect.top) : 0;
     int left = clip.left + dx;
     int right = clip.right + dx;
+    int top = clip.top + dy;
     MRect src(left, top, right, bottom);
     src.Offset(mOffset);
     text->Transfer(mSrc, mSrcSize, src, dst, mTile, mPalette, mHFlip, mVFlip);
@@ -30,20 +31,23 @@ TextSequence::TextSequence(MPoint srcSize, MPoint dst, int tile, int palette, bo
       mTile(tile), mPalette(palette), mHFlip(hflip), mVFlip(vflip) {
 }
 
+#pragma optimization_level 3
 #pragma opt_dead_assignments off
 void TextSequence::Draw(MText *text, MRect clip) {
     MPoint dst(clip.left, clip.top);
     int dy = mVFlip ? (mRect.bottom - clip.bottom) - (clip.top - mRect.top) : 0;
     int bottom = clip.bottom + dy;
-    int dx = mHFlip ? (mRect.right - clip.right) - (clip.left - mRect.left) : 0;
-    int top = clip.top + dy;
+    // (The game subtracts mRect.top here, not mRect.left: it loads this+0x8, as the dy line does.)
+    int dx = mHFlip ? (mRect.right - clip.right) - (clip.left - mRect.top) : 0;
     int left = clip.left + dx;
     int right = clip.right + dx;
+    int top = clip.top + dy;
     MRect src(left, top, right, bottom);
     src.Offset(mOffset);
     text->TransferSequence(mSrcSize, src, dst, mTile, mPalette, mHFlip, mVFlip);
 }
 #pragma opt_dead_assignments reset
+#pragma optimization_level reset
 
 TextFill::TextFill(MRect rect, int tile, int palette, bool hflip, bool vflip) : Item(rect) {
     mTile = tile;
