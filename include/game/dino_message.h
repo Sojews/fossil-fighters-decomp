@@ -2899,7 +2899,8 @@ public:
 class DinoBattleViewTutorialSetArroeRequest : public MMessage {
 public:
     DinoBattleViewTutorialSetArroeRequest() : MMessage(0x10087) {}
-    DinoBattleViewTutorialSetArroeRequest(u32 unk10, u32 unk14, MPoint pos)
+    // (unk14 before unk10: the game evaluates unk10 first.)
+    DinoBattleViewTutorialSetArroeRequest(u32 unk14, u32 unk10, MPoint pos)
         : MMessage(0x10087), mUnk0C(0), mUnk10(unk10), mUnk14(unk14) {
         *(MPoint *)mUnk18 = pos;
     }

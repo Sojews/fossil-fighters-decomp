@@ -172,16 +172,15 @@ extern "C" MTask *func_ov000_0218ec8c(DinoBattleTutorial *tutorial, int event, B
             }
             tasks->AddTail(DinoCreatePostAndWaitTask(
                 tutorial->mView,
-                new DinoBattleViewTutorialSetArroeRequest(DinoTutorialParams(entry)[1] - 1, DinoTutorialParams(entry)[2],
+                new DinoBattleViewTutorialSetArroeRequest(DinoTutorialParams(entry)[2], DinoTutorialParams(entry)[1] - 1,
                                                           MPoint(DinoTutorialParams(entry)[3], DinoTutorialParams(entry)[4]))));
             break;
         case 8:
             if (tasks == NULL) {
                 tasks = new MSerialTaskSet(TRUE);
             }
-            const s32 *params = DinoTutorialParams(entry);
             tasks->AddTail(DinoCreatePostAndWaitTask(
-                tutorial->mView, new DinoBattleViewTutorialSetArroeRequest(params[1] - 1, 0, MPoint(0, 0))));
+                tutorial->mView, new DinoBattleViewTutorialSetArroeRequest(0, DinoTutorialParams(entry)[1] - 1, MPoint(0, 0))));
             break;
         case 9:
             if (tasks == NULL) {
