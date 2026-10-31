@@ -238,6 +238,11 @@ public:
     MVramCnt mOld;
 };
 
+static inline void MCopyMapped(int bank, MVramCnt cnt, const void *src, void *dest, u32 size) {
+    MVramBankMap map(bank, cnt);
+    MCopy(src, dest, size, TRUE);
+}
+
 // NONMATCHING: 99.9%, the bank mapper and the copy of its old setting take each other's stack slots.
 void MPalLoadTask::Transfer() {
     u8 freeSrc = mUnk20;
@@ -256,8 +261,7 @@ void MPalLoadTask::Transfer() {
         cnt.mst = 0;
         cnt.offset = 0;
         cnt.enable = TRUE;
-        MVramBankMap map(bank, cnt);
-        MCopy(src, dest, size, TRUE);
+        MCopyMapped(bank, cnt, src, dest, size);
     }
     if (freeSrc) {
         delete[] (u8 *)src;
