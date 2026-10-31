@@ -831,7 +831,7 @@ void M3DModelPatchDisplayList(M3DModel *model, const u32 *tags, u32 count) {
             case 3: {
                 u32 t = texWords[arg];
                 alpha = (int) (((t >> 8) & 0x1F) * model->mUnk1C) >> 12;
-                u32 id = model->mPolygonId + (model->mUnkD1 & arg);
+                u32 id = (model->mPolygonId + (model->mUnkD1 & arg)) & 0x3F;
                 if (alpha <= 0) {
                     t &= ~0xC0;
                     alpha = 0x1F;
@@ -839,7 +839,6 @@ void M3DModelPatchDisplayList(M3DModel *model, const u32 *tags, u32 count) {
                 if (model->mUnk2E != 0) {
                     alpha = 0;
                 }
-                id &= 0x3F;
                 if (model->mScene->mUnk7C) {
                     u32 x = (t ^ (t >> 1)) & 0x40;
                     x |= x << 1;
