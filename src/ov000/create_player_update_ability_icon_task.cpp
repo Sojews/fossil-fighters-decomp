@@ -3981,7 +3981,8 @@ extern "C" void func_ov000_02166904(DinoBattleModelPlayer *player, MMessageObser
                     DinoBattleModelPlayer *p = s ? player->mOpponent : player;
                     int n = p->GetCreatureCount();
                     for (int i = 0; i < n; i++) {
-                        ids[shown++] = p->GetCreature(i)->GetUnkB4();
+                        ids[shown] = p->GetCreature(i)->GetUnkB4();
+                        shown++;
                     }
                 }
             } else {
