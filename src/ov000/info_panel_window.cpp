@@ -285,6 +285,7 @@ extern "C" BOOL func_ov000_02179aa0(u32 id);
 // numbers show as question marks for a creature not yet known.
 // NONMATCHING: in the two stat loops the text buffer's address is set up before the induction variables (the
 // game sets it up after them).
+#pragma opt_loop_invariants off
 void DinoBattleViewCreatureInfo::Update(BOOL show, DinoBattleViewCreature *creature, u32 kind, u8 arrows, u32 page) {
     mUnk128 = 0;
     if (!show) {
@@ -490,6 +491,7 @@ void DinoBattleViewCreatureInfo::Update(BOOL show, DinoBattleViewCreature *creat
     }
     }
 }
+#pragma opt_loop_invariants reset
 
 void DinoBattleViewCreatureInfo::Show() {
     mWindow->mPicture->Show();
