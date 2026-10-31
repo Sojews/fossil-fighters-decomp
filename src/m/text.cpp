@@ -1,3 +1,4 @@
+#pragma ipa file
 // MText and its transfers.
 
 #include "m/text.h"
@@ -117,20 +118,29 @@ void MText::Update() {
     *(volatile u32 *)mDisplay->GetRegs18(mBg) = (u16)offset.x | ((u16)offset.y << 16);
 }
 
-// NONMATCHING: these three differ from the game in register and stack slot allocation only.
+// (The game makes the tasks through small inlines, which order their temporaries' stack slots.)
+static inline MTextTransfer *MNewTextTransfer(MText *text, const u16 *src, MPoint srcSize, MRect srcRect, MPoint dst,
+                                              int tile, int palette, bool hflip, bool vflip) {
+    return new MTextTransfer(text, src, srcSize, srcRect, dst, tile, palette, hflip, vflip);
+}
+
+static inline MTextTransfer *MNewTextTransfer(MText *text, const u16 *src, MPoint srcSize, MPoint dst, int tile,
+                                              int palette, bool hflip, bool vflip) {
+    return new MTextTransfer(text, src, srcSize, dst, tile, palette, hflip, vflip);
+}
+
 void MText::Transfer(const u16 *src, MPoint srcSize, MRect srcRect, MPoint dst, int tile, int palette, bool hflip,
                      bool vflip) {
-    gLooper->AddTransferTask(new MTextTransfer(this, src, srcSize, srcRect, dst, tile, palette, hflip, vflip));
+    gLooper->AddTransferTask(MNewTextTransfer(this, src, srcSize, srcRect, dst, tile, palette, hflip, vflip));
 }
 
 void MText::Transfer(const u16 *src, MPoint srcSize, MPoint dst, int tile, int palette, bool hflip, bool vflip) {
-    gLooper->AddTransferTask(new MTextTransfer(this, src, srcSize, dst, tile, palette, hflip, vflip));
+    gLooper->AddTransferTask(MNewTextTransfer(this, src, srcSize, dst, tile, palette, hflip, vflip));
 }
 
 void MText::TransferSequence(MPoint srcSize, MRect srcRect, MPoint dst, int tile, int palette, bool hflip,
                              bool vflip) {
-    gLooper->AddTransferTask(new MTextTransfer(this, sTileSequence, srcSize, srcRect, dst, tile, palette, hflip,
-                                               vflip));
+    gLooper->AddTransferTask(MNewTextTransfer(this, sTileSequence, srcSize, srcRect, dst, tile, palette, hflip, vflip));
 }
 
 void MText::Fill(MRect rect, int tile, int palette, bool hflip, bool vflip) {

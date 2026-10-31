@@ -1,3 +1,4 @@
+#pragma ipa file
 // MIndexBitmap and the indexed bitmap transfers.
 
 #include "m/bitmap.h"
@@ -22,16 +23,26 @@ MIndexBitmap::MIndexBitmap(MDisplay *display, u32 screenBase, u32 base, int size
     mBmpCntBits.bitmap = TRUE;
 }
 
-// NONMATCHING: both Loads differ only in the stack slots of the transfer constructor's argument copies (the game
-// has srcSize below dst), like MText's transfer factories.
+// (The game makes the tasks through small inlines, which order their temporaries' stack slots.)
+static inline MIndexBitmapLoadTransfer *MNewIndexBitmapLoadTransfer(MIndexBitmap *bitmap, const u8 *src, MPoint srcSize,
+                                                                    MRect srcRect, MPoint dst, int palette, bool hflip,
+                                                                    bool vflip) {
+    return new MIndexBitmapLoadTransfer(bitmap, src, srcSize, srcRect, dst, palette, hflip, vflip);
+}
+
+static inline MIndexBitmapLoadTransfer *MNewIndexBitmapLoadTransfer(MIndexBitmap *bitmap, const u8 *src, MPoint srcSize,
+                                                                    MPoint dst, int palette, bool hflip, bool vflip) {
+    return new MIndexBitmapLoadTransfer(bitmap, src, srcSize, dst, palette, hflip, vflip);
+}
+
 void MIndexBitmap::Load(const u8 *src, MPoint srcSize, MRect srcRect, MPoint dst, int palette, bool hflip,
                         bool vflip) {
     gLooper->AddTransferTask(
-        new MIndexBitmapLoadTransfer(this, src, srcSize, srcRect, dst, palette, hflip, vflip));
+        MNewIndexBitmapLoadTransfer(this, src, srcSize, srcRect, dst, palette, hflip, vflip));
 }
 
 void MIndexBitmap::Load(const u8 *src, MPoint srcSize, MPoint dst, int palette, bool hflip, bool vflip) {
-    gLooper->AddTransferTask(new MIndexBitmapLoadTransfer(this, src, srcSize, dst, palette, hflip, vflip));
+    gLooper->AddTransferTask(MNewIndexBitmapLoadTransfer(this, src, srcSize, dst, palette, hflip, vflip));
 }
 
 void MIndexBitmap::Fill(MRect rect, int color) {

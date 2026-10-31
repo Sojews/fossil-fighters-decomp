@@ -1,3 +1,4 @@
+#pragma ipa file
 // MExtAffine and its transfers.
 
 #include "m/ext_affine.h"
@@ -37,10 +38,15 @@ MPal *MExtAffine::GetPalette() {
     return mPal;
 }
 
-// NONMATCHING: the stack temporaries are laid out in a different order.
+// (The game makes the task through a small inline, which orders its temporaries' stack slots.)
+static inline MExtAffineTransfer *MNewExtAffineTransfer(MExtAffine *screen, const u16 *src, MPoint srcSize, MPoint dst,
+                                                        int tile, int palette, bool hflip, bool vflip) {
+    return new MExtAffineTransfer(screen, src, srcSize, dst, tile, palette, hflip, vflip);
+}
+
 void MExtAffine::Transfer(const u16 *src, MPoint srcSize, MPoint dst, int tile, int palette, bool hflip,
                           bool vflip) {
-    gLooper->AddTransferTask(new MExtAffineTransfer(this, src, srcSize, dst, tile, palette, hflip, vflip));
+    gLooper->AddTransferTask(MNewExtAffineTransfer(this, src, srcSize, dst, tile, palette, hflip, vflip));
 }
 
 void MExtAffine::Fill(MRect rect, int tile, int palette, bool hflip, bool vflip) {
