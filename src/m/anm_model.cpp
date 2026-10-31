@@ -220,6 +220,7 @@ void MAnmModelBase::PlaySounds(int frame) {
 
 // Blends the palette toward the color and queues it over the old one.
 // NONMATCHING: 76%, register allocation (the game keeps the index and the green product on the stack).
+#pragma opt_dead_assignments off
 void MAnmModelBase::TintPalette(u16 color, fx32 amount) {
     if (mResource == NULL) {
         return;
@@ -247,6 +248,7 @@ void MAnmModelBase::TintPalette(u16 color, fx32 amount) {
     mScene->QueueD0((const void *)plttKey, (u32)tinted, size);
     mScene->QueueE8(NULL, (u32) tinted);
 }
+#pragma opt_dead_assignments reset
 
 void MAnmModelBase::ClearTransformTracks() {
     mTracks[6].clear();
