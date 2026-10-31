@@ -4016,7 +4016,7 @@ extern "C" void func_ov000_0216831c(DinoBattleModelPlayer *player, MMessageObser
         player->mSerial.AddTail(
             player->mUnkF4->CreatePostTask(new DinoBattleViewShowAttackNameBarRequest(0, attack, special, 1)));
     }
-    u32 ability = attack;
+    const u32 ability = attack;
     const DinoAttackDef *def = gDinoResource->GetAttackDef(ability);
     const u16 *cost = DinoOffsetPtr<u16>(def, def->cost);
     if (attacker->GetStatus()->flags & 0x40) {
@@ -4048,17 +4048,20 @@ extern "C" void func_ov000_0216831c(DinoBattleModelPlayer *player, MMessageObser
         results[i].kind = 0;
         results[i].guard = 0;
         if (!result[1]) {
+            MFx32 base;
             MFx32 ratio = attacker->CalcUnkEC(target);
             MFx32 defense = func_ov000_0216e2d8(attacker, target);
             MFx32 hit = attacker->ReduceByDefense(ratio, defense);
             MFx32 chanceBase = func_ov000_0216e4c0(attacker, target);
             MFx32 chanceRatio = func_ov000_0216e650(attacker, target);
             MFx32 chance = attacker->CurveRatio(chanceBase, chanceRatio);
-            MFx32 critical = func_ov000_0216e918(attacker, chance, &result[1], &results[i].kind);
+            MFx32 critical;
+            critical = func_ov000_0216e918(attacker, chance, &result[1], &results[i].kind);
             if (!result[1]) {
                 result[0] = TRUE;
-                MFx32 base = attacker->CalcDamage(target, MFx32(cost[1]), hit, &result[0]);
-                base = attacker->ApplyPositionRatio(attacker->ApplyRatio(base, critical), target->GetB8Category());
+                base = attacker->CalcDamage(target, MFx32(cost[1]), hit, &result[0]);
+                base = attacker->ApplyRatio(base, critical);
+                base = attacker->ApplyPositionRatio(base, target->GetB8Category());
                 results[i].damage = MFx32ToInt(base);
                 if (results[i].damage < 1 && result[0]) {
                     results[i].damage = 1;
@@ -4099,7 +4102,8 @@ extern "C" void func_ov000_0216831c(DinoBattleModelPlayer *player, MMessageObser
     for (u32 i = 0; i < attacker->CountAttacks(); i++) {
         if (ability == attacker->GetAttack(i, NULL)) {
             const DinoBattleCreatureDef *creatureDef = attacker->GetDef();
-            index3D = ((const u8 *)creatureDef + creatureDef->mUnk78)[i];
+            const u8 *table = (const u8 *)creatureDef + creatureDef->mUnk78;
+            index3D = table[i];
             break;
         }
     }
@@ -4120,7 +4124,7 @@ extern "C" void func_ov000_0216831c(DinoBattleModelPlayer *player, MMessageObser
     } else {
         player->mSerial.AddTail(new MTimer(120));
     }
-    player->mSerial.AddTail(player->mUnkF4->CreatePostTask(new DinoBattleViewFocusLCDFrameRequest(0, 0)), new MTimer(30),
+    player->GetSerial()->AddTail(player->mUnkF4->CreatePostTask(new DinoBattleViewFocusLCDFrameRequest(0, 0)), new MTimer(30),
                             player->mUnkF4->CreatePostTask(new DinoBattleViewClearAttackBarRequest(0)),
                             player->mUnkF4->CreatePostTask(new DinoBattleViewSetCreaturePriorityRequest(0)),
                             player->mUnkF4->CreatePostTask(new DinoBattleViewSetAttackBarUpperLCDRequest(0, 0, 0)),
