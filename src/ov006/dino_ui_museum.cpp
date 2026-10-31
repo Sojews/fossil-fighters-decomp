@@ -364,14 +364,14 @@ struct DinoMuseumByUnk0C {
     }
 };
 struct DinoMuseumByUnk0A {
-    static u32 Key(u32 id) { return GetMuseumDef(sMuseumDefs.Get(), id)->unk0A; }
+    static u16 Key(u32 id) { return GetMuseumDef(sMuseumDefs.Get(), id)->unk0A; }
     bool operator()(const u32 &a, const u32 &b) const {
         u32 x = Key(a);
         return x < Key(b);
     }
 };
 struct DinoMuseumByUnk08 {
-    static u32 Key(u32 id) { return GetMuseumDef(sMuseumDefs.Get(), id)->unk08; }
+    static u16 Key(u32 id) { return GetMuseumDef(sMuseumDefs.Get(), id)->unk08; }
     bool operator()(const u32 &a, const u32 &b) const {
         u32 x = Key(a);
         return x > Key(b);

@@ -612,10 +612,10 @@ void DinoUiReviveStatusMenu::ShowLearnedAttacks() {
     u32 learned = 0;
     u32 known = 0;
     for (u32 i = 0; i < def->attackCount; i++) {
-        if (CountRevivedParts(mCreature) >= ((const u32 *)((const u8 *)def + def->attackLevels))[i]) {
+        if (((const u32 *)((const u8 *)def + def->attackLevels))[i] <= CountRevivedParts(mCreature)) {
             known++;
         }
-        if (CountRevivedParts(mCreature2) >= ((const u32 *)((const u8 *)def + def->attackLevels))[i]) {
+        if (((const u32 *)((const u8 *)def + def->attackLevels))[i] <= CountRevivedParts(mCreature2)) {
             learned++;
         }
         if (learned > known + count) {
