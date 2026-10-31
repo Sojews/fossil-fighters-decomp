@@ -30,6 +30,7 @@ TextSequence::TextSequence(MPoint srcSize, MPoint dst, int tile, int palette, bo
       mTile(tile), mPalette(palette), mHFlip(hflip), mVFlip(vflip) {
 }
 
+#pragma opt_dead_assignments off
 void TextSequence::Draw(MText *text, MRect clip) {
     MPoint dst(clip.left, clip.top);
     int dy = mVFlip ? (mRect.bottom - clip.bottom) - (clip.top - mRect.top) : 0;
@@ -42,6 +43,7 @@ void TextSequence::Draw(MText *text, MRect clip) {
     src.Offset(mOffset);
     text->TransferSequence(mSrcSize, src, dst, mTile, mPalette, mHFlip, mVFlip);
 }
+#pragma opt_dead_assignments reset
 
 TextFill::TextFill(MRect rect, int tile, int palette, bool hflip, bool vflip) : Item(rect) {
     mTile = tile;
