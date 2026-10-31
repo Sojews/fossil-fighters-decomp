@@ -1010,8 +1010,9 @@ namespace std {
             this->init();
             choose_init(first, last, Metrowerks::int2type<false>());
         }
-        template <class It> void choose_init(It first, It last, Metrowerks::int2type<false> t) {
-            this->init(first, last, t);
+        // (The tag comes by reference and init gets a fresh one: the game keeps both tag bytes on the stack.)
+        template <class It> void choose_init(It first, It last, const Metrowerks::int2type<false> &) {
+            this->init(first, last, Metrowerks::int2type<false>());
         }
         vector(const vector &x) {
             this->init();
