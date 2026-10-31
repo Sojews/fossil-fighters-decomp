@@ -53,7 +53,7 @@ public:
 
 class KeyboardMenuItem : public MMenuItem {
 public:
-    KeyboardMenuItem(u32 index, u32 arg, MPoint pos, DinoUiKeyboardMenu *menu) {
+    KeyboardMenuItem(u32 index, u32 arg, const MPoint &pos, DinoUiKeyboardMenu *menu) {
         mIndex = index;
         mArg = arg;
         mPos = pos;
@@ -92,17 +92,17 @@ class DinoUiKeyboardHideMenuItem : public KeyboardMenuItem {
 public:
     DinoUiKeyboardHideMenuItem(u32 index, u32 arg, MPoint pos, DinoUiKeyboardMenu *menu)
         : KeyboardMenuItem(index, arg, pos, menu) {
-        if (mIndex == 0xF2) {
-            mFrame.left = mPos.x;
-            mFrame.top = mPos.y;
-            mFrame.right = mPos.x + 0x40;
-            mFrame.bottom = mPos.y + 0xC;
-        } else {
+        if (mIndex != 0xF2) {
             int half = mIndex == 0xF0 ? 6 : 0xC;
             mFrame.left = mPos.x - half;
             mFrame.top = mPos.y - half;
             mFrame.right = mPos.x + half;
             mFrame.bottom = mPos.y + half;
+        } else {
+            mFrame.left = mPos.x;
+            mFrame.top = mPos.y;
+            mFrame.right = mPos.x + 0x40;
+            mFrame.bottom = mPos.y + 0xC;
         }
     }
     virtual ~DinoUiKeyboardHideMenuItem();

@@ -40,6 +40,8 @@ public:
     // cursor, START goes to the OK button.
     void CheckKeys();
 
+    MSmartOam *GetOam() { return mOam; }
+
     MSmartOam *mOam;            // 0xB4
     u8 unkB8[0xE4 - 0xB8];
     MMenuItem *mOkButton;       // 0xE4: START goes to it

@@ -611,8 +611,17 @@ extern "C" void func_ov007_02182020(DinoUiKeyboardMenu *menu);
 extern const int data_020899bc, data_020899c8, data_020899e0;
 extern const u32 data_0208aa78, data_0208ac28, data_0208ac2c, data_0208ac58, data_0208ac68, data_0208ac6c, data_0208ac7c,
     data_0208ac80, data_0208ac84, data_0208ac88;
+// The keyboard's layout: the motions' paths, then the places of the back button and the page key.
+struct DinoUiKeyboardLayout {
+    const char *mPaths[13];     // 0x00: [4]/[7] the page arrows, [6] the back button, [8] the cursor
+    MPoint mBackPos;            // 0x34
+    u8 unk3C[0x54 - 0x3C];
+    MPoint mPageSize;           // 0x54: the page key's half size
+    u8 unk5C[0x64 - 0x5C];
+    MPoint mPagePos;            // 0x64
+};
 // The motions' paths (the cursor's is [8]) and the name's caption.
-extern "C" const char *const data_ov007_02190fa0[];
+extern "C" const DinoUiKeyboardLayout data_ov007_02190fa0;
 extern "C" const char data_ov007_02191854[];
 extern "C" const MPoint data_ov007_021911f0[][18];
 
@@ -649,7 +658,7 @@ void DinoUiKeyboardMenu::OnStart() {
         help = new DinoHelpDummyItem(gCurrentDisplay, MRect(9, 10, 0xF6, 0x35), gDinoResource->GetText(data_0208ac6c));
         mHelp = help;
         mMaxLength = 8;
-        mCursor = new MMotion(data_ov007_02190fa0[8], mOam, 2, 1);
+        mCursor = new MMotion(data_ov007_02190fa0.mPaths[8], mOam, 2, 1);
         font = gDinoResource->CreateFont24(0, 10, 1);
         offset = MPoint(6, 12);
         DinoPlayerData player;
@@ -669,7 +678,7 @@ void DinoUiKeyboardMenu::OnStart() {
         mParallel.AddTail(new DinoGuideMessage(gDinoResource->GetText(data_0208ac28)));
         help = new DinoHelpDummyItem(gCurrentDisplay, MRect(9, 10, 0xF6, 0x35), gDinoResource->GetText(data_0208ac58));
         mHelp = help;
-        mCursor = new MMotion(data_ov007_02190fa0[8], mOam, 2, 1);
+        mCursor = new MMotion(data_ov007_02190fa0.mPaths[8], mOam, 2, 1);
         mMaxLength = 0x10;
         font = gDinoResource->CreateFont24(0, 10, 1);
         offset = MPoint(6, 12);
@@ -735,15 +744,6 @@ void DinoUiKeyboardMenu::OnStart() {
 }
 #pragma opt_common_subs reset
 
-// The keyboard's layout: the motions' paths, then the places of the back button and the page key.
-struct DinoUiKeyboardLayout {
-    const char *mPaths[13];     // 0x00: [4]/[7] the page arrows, [6] the back button, [8] the cursor
-    MPoint mBackPos;            // 0x34
-    u8 unk3C[0x54 - 0x3C];
-    MPoint mPageSize;           // 0x54: the page key's half size
-    u8 unk5C[0x64 - 0x5C];
-    MPoint mPagePos;            // 0x64
-};
 struct DinoUiKeyboardOkLayout {
     u32 unk00;
     MPoint mOkSize;             // 0x04: the OK key's half size
@@ -761,7 +761,7 @@ inline DinoKBBackButton::DinoKBBackButton(DinoUiKeyboardMenu *menu, MSmartOam *o
     : KeyboardMenuItem(6, 0, pos, menu) {
     unkB8 = (u32)menu;
     mTextId = textId;
-    mMotion = new MMotion(std::string(((const DinoUiKeyboardLayout *)data_ov007_02190fa0)->mPaths[6]), oam, 2, 1);
+    mMotion = new MMotion(std::string(data_ov007_02190fa0.mPaths[6]), oam, 2, 1);
     mMotion->Play(2, 0);
     mMotion->SetPosition(data_ov007_02190fd4);
     mMotion->SetPriority(3);
@@ -774,8 +774,8 @@ inline DinoKBBackButton::DinoKBBackButton(DinoUiKeyboardMenu *menu, MSmartOam *o
     if (mIndex >= 4) {                                                                                           \
         switch (mIndex) {                                                                                        \
         case 4:                                                                                                  \
-            mMotion = new MMotion(std::string(((const DinoUiKeyboardLayout *)data_ov007_02190fa0)->mPaths[4]),   \
-                                  ((DinoUiKeyboardMenu *)unk98)->mOam, 2, 1);                                    \
+            mMotion = new MMotion(std::string(data_ov007_02190fa0.mPaths[4]),   \
+                                  ((DinoUiKeyboardMenu *)unk98)->GetOam(), 2, 1);                                  \
             mMotion->Play(1, 0);                                                                                 \
             mMotion->SetPosition(mPos);                                                                          \
             mMotion->SetPriority(2);                                                                             \
@@ -786,8 +786,8 @@ inline DinoKBBackButton::DinoKBBackButton(DinoUiKeyboardMenu *menu, MSmartOam *o
             mParallel.AddTail(mTasks);                                                                           \
             break;                                                                                               \
         case 5:                                                                                                  \
-            mMotion = new MMotion(std::string(((const DinoUiKeyboardLayout *)data_ov007_02190fa0)->mPaths[7]),   \
-                                  ((DinoUiKeyboardMenu *)unk98)->mOam, 2, 1);                                    \
+            mMotion = new MMotion(std::string(data_ov007_02190fa0.mPaths[7]),   \
+                                  ((DinoUiKeyboardMenu *)unk98)->GetOam(), 2, 1);                                  \
             mMotion->Play(1, 0);                                                                                 \
             mMotion->SetPosition(mPos);                                                                          \
             mMotion->SetPriority(2);                                                                             \
@@ -799,16 +799,10 @@ inline DinoKBBackButton::DinoKBBackButton(DinoUiKeyboardMenu *menu, MSmartOam *o
             break;                                                                                               \
         }                                                                                                        \
     }                                                                                                            \
-    switch (mIndex) {                                                                                            \
-    case 1:                                                                                                      \
-    case 2:                                                                                                      \
-    case 3:                                                                                                      \
-    case 6:                                                                                                      \
+    if (mIndex == 1 || mIndex == 2 || mIndex == 3 || mIndex == 6) {                                             \
         DinoHelpItem::Enable();                                                                                  \
-        break;                                                                                                   \
-    default:                                                                                                     \
+    } else {                                                                                                     \
         DinoHelpItem::Disable();                                                                                 \
-        break;                                                                                                   \
     }
 
 inline DinoUiKeyboardMenuItem::DinoUiKeyboardMenuItem(u32 index, u32 arg, MPoint pos, DinoUiKeyboardMenu *menu)
@@ -840,21 +834,20 @@ inline DinoUiKeyboardMenuItem::DinoUiKeyboardMenuItem(u32 index, u32 arg, MPoint
 // NONMATCHING
 extern "C" void func_ov007_02182020(DinoUiKeyboardMenu *menu) {
     u32 okText = 0;
-    MMenuItem *back = NULL;
     menu->ClearItems();
     menu->mBackButton = NULL;
+    MMenuItem *back = NULL;
     menu->mUnkE8 = NULL;
-    const DinoUiKeyboardLayout *layout = (const DinoUiKeyboardLayout *)data_ov007_02190fa0;
     switch (menu->mMode) {
     case 0:
         if (menu->mFlag == 1) {
-            menu->mBackButton = new DinoKBBackButton(menu, menu->mOam, layout->mBackPos, data_0208ac5c);
+            menu->mBackButton = new DinoKBBackButton(menu, menu->GetOam(), data_ov007_02190fa0.mBackPos, data_0208ac5c);
             back = menu->mBackButton;
             menu->AddItem(back);
         }
         break;
     case 1:
-        menu->mBackButton = new DinoKBBackButton(menu, menu->mOam, layout->mBackPos, data_0208ac50);
+        menu->mBackButton = new DinoKBBackButton(menu, menu->GetOam(), data_ov007_02190fa0.mBackPos, data_0208ac50);
         back = menu->mBackButton;
         menu->AddItem(back);
         break;
@@ -864,10 +857,8 @@ extern "C" void func_ov007_02182020(DinoUiKeyboardMenu *menu) {
     for (int group = 0; group < 3; group++) {
         for (int row = 0; row < 6; row++) {
             for (int col = 0; col < 5; col++) {
-                keys[row][group * 5 + col] = new DinoUiKeyboardMenuItem(0, col + row * 5 + group * 30,
-                                                  MPoint(data_ov007_02191130[group].x + col * 14,
-                                                         data_ov007_02191130[group].y + row * 14),
-                                                  menu);
+                MPoint pos(data_ov007_02191130[group].x + col * 14, data_ov007_02191130[group].y + row * 14);
+                keys[row][group * 5 + col] = new DinoUiKeyboardMenuItem(0, col + row * 5 + group * 30, pos, menu);
                 if (menu->mUnkE8 == NULL) {
                     menu->mUnkE8 = keys[row][group * 5 + col];
                 }
@@ -876,15 +867,15 @@ extern "C" void func_ov007_02182020(DinoUiKeyboardMenu *menu) {
         }
     }
     DinoUiKeyboardMenuItem *page =
-        new DinoUiKeyboardMenuItem(2, 0, layout->mPagePos, menu, layout->mPageSize, data_0208ac64);
+        new DinoUiKeyboardMenuItem(2, 0, data_ov007_02190fa0.mPagePos, menu, data_ov007_02190fa0.mPageSize, data_0208ac64);
     menu->AddItem(page);
     menu->mPageHelp = page;
     switch (menu->mMode) {
-    case 1:
-        okText = data_0208ac54;
-        break;
     case 0:
         okText = data_0208ac60;
+        break;
+    case 1:
+        okText = data_0208ac54;
         break;
     }
     menu->mOkButton = new DinoUiKeyboardMenuItem(3, 0, data_ov007_02191020.mOkPos, menu, data_ov007_02191020.mOkSize,
