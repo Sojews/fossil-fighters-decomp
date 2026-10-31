@@ -143,7 +143,7 @@ void MIndexBitmapLoadTransfer::Transfer() {
             u16 *dst = (u16 *) (mDstBase + mDst.x + width - 1 + mDstSize.x * mDst.y);
             int dstSkip = (mDstSize.x + width) >> 1;
             int pairs = width >> 1;
-            int rows = mSrcRect.GetHeight();
+            s32 rows = mSrcRect.GetHeight();
             if (rows == 0) {
                 return;
             }

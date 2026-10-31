@@ -332,8 +332,9 @@ void M3DModel::Draw(u32 lights) {
                     u32 t = texWords[material];
                     u32 a = (t >> 8) & 0x1F;
                     u32 tex = (t >> 24) & 0x3F;
-                    u32 pltt = (t >> 16) & 0x3F;
+                    u32 pltt;
                     u32 id = (material + mPolygonId) & 0x3F;
+                    pltt = (t >> 16) & 0x3F;
                     int alpha = (int)(a * mUnk1C) >> 12;
                     if (alpha <= 0) {
                         alpha = 0x1F;
@@ -716,6 +717,7 @@ static inline s32 M3DGetDivResult32() {
 // NONMATCHING: register allocation (the game spills the count and the divider's zero high word to the stack).
 const s16 *M3DModelGetMorphVertices(M3DModel *model) {
     u32 t0;
+    u32 t1;
     const M3DMorphAnim *anim = (const M3DMorphAnim *) model->mAnimRes;
     int count = anim->vertexCount;
     if (count == 0) {
@@ -725,7 +727,7 @@ const s16 *M3DModelGetMorphVertices(M3DModel *model) {
     u32 flags = ((const u32 *) model->mModelRes)[5];
     const s16 *prev = anim->frames;
     const s16 *next = prev;
-    u32 t1 = 0;
+    t1 = 0;
     t0 = 0;
     u32 frame = model->mFrame;
     s16 *out = data_0214c18c;
@@ -794,10 +796,11 @@ void M3DModelPatchDisplayList(M3DModel *model, const u32 *tags, u32 count) {
     }
     u32 frameOffset = frame * 0x30;
     do {
-        u32 word = tags[i * 2];
-        u32 offset = word & 0x0FFFFFFF;
-        u32 type = word >> 28;
+        u32 offset;
         u32 arg = tags[i * 2 + 1];
+        u32 word = tags[i * 2];
+        offset = word & 0x0FFFFFFF;
+        u32 type = word >> 28;
         if (model->mUnk300 >= offset) {
             switch (type) {
             case 0: {
