@@ -240,9 +240,11 @@ struct SubtractSpanOp {
 
 // (The span adder is big; the game inlines it anyway.)
 #pragma inline_max_size(2000)
+#pragma opt_loop_invariants off
 void MRasterWindow::AddRect(MRect rect) {
     ForEachLineGuarded(rect, AddSpanOp(this));
 }
+#pragma opt_loop_invariants reset
 
 void MRasterWindow::SubtractSpan(int left, int right, int line) {
     if (left >= right) {
@@ -340,12 +342,16 @@ template <class Op> inline void MRasterWindow::ForEachCircleLine(Op op, MPoint c
 }
 
 // NONMATCHING: stack slots, and the inlined span adds differ (as in AddRect).
+#pragma opt_common_subs off
 void MRasterWindow::SetCircle(MPoint center, int radius) {
     ForEachCircleLine(AddSpanOp(this), center, radius);
 }
+#pragma opt_common_subs reset
 
 // NONMATCHING: the game swaps the stack slots of the rect and its copy for Intersects, and keeps the window in a
 // register from later.
+#pragma opt_common_subs off
 void MRasterWindow::SubtractCircle(MPoint center, int radius) {
     ForEachCircleLine(SubtractSpanOp(this), center, radius);
 }
+#pragma opt_common_subs reset
