@@ -4,6 +4,11 @@
 #include "m/raster.h"
 #include "game/dino_resource.h"
 
+// A backdrop table's color (four bytes each) at the given offset into the battle adjust defs.
+static inline const u8 *DinoBackdropColor(const DinoBattleAdjustDefs *defs, u32 offset, u32 t) {
+    return (const u8 *) defs + offset + t * 4;
+}
+
 // The battle's backdrop: a color per line, from one of the prepared tables or fading between two.
 class DinoBattleViewBackdrop : public MRasterPal {
 public:
@@ -14,12 +19,12 @@ public:
         mFading = FALSE;
         for (int t = 0; t < 5; t++) {
             const DinoBattleAdjustDefs *defs = gDinoResource->GetBattleAdjustDefs();
-            const u8 *top = (const u8 *) defs + defs->backdropTop + t * 4;
+            const u8 *top = DinoBackdropColor(defs, defs->backdropTop, t);
             const DinoBattleAdjustDefs *defs2 = gDinoResource->GetBattleAdjustDefs();
             u32 r = top[0];
             u32 g = top[1];
             u32 b = top[2];
-            const u8 *bottom = (const u8 *) defs2 + defs2->backdropBottom + t * 4;
+            const u8 *bottom = DinoBackdropColor(defs2, defs2->backdropBottom, t);
             int dr = bottom[0] - r;
             int dg = bottom[1] - g;
             int db = bottom[2] - b;
