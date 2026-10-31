@@ -889,8 +889,8 @@ void DinoBattleView3D::OnMessage(MMessage *msg) {
         mView->GetUnkE4((s32)m->mUnk1C >> 16)->GetUnkAC();
         BOOL marks = TRUE;
         u32 hits = 0;
-        DinoBattleView3DDamageDefs *defs = new DinoBattleView3DDamageDefs;
         u32 camera = 0;
+        DinoBattleView3DDamageDefs *defs = new DinoBattleView3DDamageDefs;
         defs->mType = 0xFFFF;
         defs->mCount = 0;
         int i = 0;
@@ -1180,17 +1180,17 @@ void DinoBattleView3D::OnMessage(MMessage *msg) {
                 defs->mType = 1;
                 defs->mSes2[0] = 0x2D7;
                 break;
-            case 3:
-                camera = 6;
-                path = data_ov000_0219654c[h + 2];
-                defs->mType = 2;
-                defs->mSes2[0] = 0x2D5;
-                break;
             case 2:
                 camera = 5;
                 path = data_ov000_0219654c[h + 1];
                 defs->mType = 1;
                 defs->mSes2[0] = 0x2D6;
+                break;
+            case 3:
+                camera = 6;
+                path = data_ov000_0219654c[h + 2];
+                defs->mType = 2;
+                defs->mSes2[0] = 0x2D5;
                 break;
             case 5:
                 camera = 5;
@@ -1303,7 +1303,8 @@ void DinoBattleView3D::OnMessage(MMessage *msg) {
     case 0x10033: {
         DinoBattleViewCreatureEndRequest *m = (DinoBattleViewCreatureEndRequest *)msg;
         CancelQueue();
-        mUnk14A[(u16)m->mUnk14 - 1 + mView->GetUnkE4((s32)m->mUnk14 >> 16)->GetUnkAC() * 3] = FALSE;
+        int i = (u16)m->mUnk14 - 1 + mView->GetUnkE4((s32)m->mUnk14 >> 16)->GetUnkAC() * 3;
+        mUnk14A[i] = FALSE;
         if (mSlot != mView->GetUnkE4((s32)m->mUnk14 >> 16)->GetUnkAC()) {
             break;
         }
@@ -1312,7 +1313,8 @@ void DinoBattleView3D::OnMessage(MMessage *msg) {
     }
     case 0x1002F: {
         DinoBattleViewCreatureUpdateRequest *m = (DinoBattleViewCreatureUpdateRequest *)msg;
-        mUnk150[(u16)m->mUnk10 - 1 + mView->GetUnkE4((s32)m->mUnk10 >> 16)->GetUnkAC() * 3] = m->mUnk38;
+        int i = (u16)m->mUnk10 - 1 + mView->GetUnkE4((s32)m->mUnk10 >> 16)->GetUnkAC() * 3;
+        mUnk150[i] = m->mUnk38;
         break;
     }
     case 0x10010:

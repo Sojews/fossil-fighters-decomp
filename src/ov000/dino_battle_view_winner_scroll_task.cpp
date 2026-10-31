@@ -386,15 +386,16 @@ inline DinoBattleViewWinnerScrollTask::DinoBattleViewWinnerScrollTask(u32 field,
 }
 
 // The view's requests: menus, effects, tutorial marks and the attack bar, each answered when done.
-// NONMATCHING: 80.5%, call sequence identical. The game keeps this on the stack (reloading it in every case) where ours keeps it in a register,
-// which moves the spills; the cases' code is otherwise laid out as the game's.
-#define DINO_FIELD ((DinoBattleViewUnkE0 *)this)
+// NONMATCHING: 87%, call sequence identical. The game spills this to the stack (reloading it in every case); a volatile
+// copy reproduces the reloads but not the slot (nor the dispatch's registers), so the spills still sit elsewhere.
+#define DINO_FIELD ((DinoBattleViewUnkE0 *)self)
 #pragma opt_strength_reduction off
 void DinoBattleViewField::OnMessage(MMessage *msg) {
+    DinoBattleViewField *volatile self = this;   // (kept on the stack, as the game keeps this)
     switch (msg->mId) {
     case 0x10009: {
         DinoBattleViewEffectGameBeginRequest *req = (DinoBattleViewEffectGameBeginRequest *)msg;
-        GetSerial()->AddTail(new DinoBattleViewEffectGameBegin((u32)DINO_FIELD->mView, DINO_FIELD->mView->GetPlayerByAC(0)->GetUnkC0(),
+        self->GetSerial()->AddTail(new DinoBattleViewEffectGameBegin((u32)DINO_FIELD->mView, DINO_FIELD->mView->GetPlayerByAC(0)->GetUnkC0(),
                                                                DINO_FIELD->mView->GetPlayerByAC(1)->GetUnkC0()),
                              ((MMessageObserver *)req->mUnk0C)->CreatePostTask(new DinoBattleViewEffectGameBeginResult()));
         if (DINO_FIELD->mView->GetUnk130() != 0) {
@@ -414,7 +415,7 @@ void DinoBattleViewField::OnMessage(MMessage *msg) {
             int ease = !same ? -1 : 1;
             int kind = same ? 2 : 3;
             DinoBattleViewFieldSlot *slot = DINO_FIELD->mSlotViewsC0[side];
-            mParallel.AddTail(slot->CreateCoordAnime(slot->GetPosition(), func_ov000_0215f22c(kind, side), 40, ease));
+            self->mParallel.AddTail(slot->CreateCoordAnime(slot->GetPosition(), func_ov000_0215f22c(kind, side), 40, ease));
             BOOL turn = side == req->mUnk10;
             DinoBattleViewPlayer *p = DINO_FIELD->mView->GetUnkE4(side);
             for (int i = 0; i < p->GetCreatureCount(); i++) {
@@ -430,35 +431,35 @@ void DinoBattleViewField::OnMessage(MMessage *msg) {
                                                    own ? 3 : 2, req->mUnk0C, (u32) new DinoBattleViewEffectTurnBeginResult(),
                                                    1),
                      MTaskRunTransfer::Create((MTask *)DINO_FIELD->mArrow));
-        mParallel.AddTail(set);
+        self->mParallel.AddTail(set);
         break;
     }
     case 0x10010: {
         DinoBattleViewUiRootMenuRequest *req = (DinoBattleViewUiRootMenuRequest *)msg;
-        mParallel.AddTail(new DinoBattleViewUiRootSelect(DINO_FIELD->mView, (MMessageObserver *)req->mUnk0C, req->mUnk10,
+        self->mParallel.AddTail(new DinoBattleViewUiRootSelect(DINO_FIELD->mView, (MMessageObserver *)req->mUnk0C, req->mUnk10,
                                                          req->mUnk14, req->mUnk18, req->mUnk1C, req->mUnk20));
         break;
     }
     case 0x1001B: {
         DinoBattleViewUiChangeMenuRequest *req = (DinoBattleViewUiChangeMenuRequest *)msg;
-        mParallel.AddTail(new DinoBattleViewUiChangeMenu(DINO_FIELD->mView, req->mUnk10, req->mUnk14,
+        self->mParallel.AddTail(new DinoBattleViewUiChangeMenu(DINO_FIELD->mView, req->mUnk10, req->mUnk14,
                                                          (MMessageObserver *)req->mUnk0C, (const u32 *)req->mUnk18,
                                                          req->mUnk24, (MSmartOam *)DINO_FIELD->unkB0));
         break;
     }
     case 0x1004B: {
         DinoBattleViewUiTurnEndRequest *req = (DinoBattleViewUiTurnEndRequest *)msg;
-        mParallel.AddTail(new DinoBattleViewTurnEndDialog((u32)DINO_FIELD->mView, (MMessageObserver *)req->mUnk0C, req->mUnk14));
+        self->mParallel.AddTail(new DinoBattleViewTurnEndDialog((u32)DINO_FIELD->mView, (MMessageObserver *)req->mUnk0C, req->mUnk14));
         break;
     }
     case 0x1001D: {
         DinoBattleViewUiCreatureInfoMenuRequest *req = (DinoBattleViewUiCreatureInfoMenuRequest *)msg;
-        mParallel.AddTail(new DinoBattleViewUiCreatureInfoMenu(DINO_FIELD->mView, req->mUnk10, (MMessageObserver *)req->mUnk0C));
+        self->mParallel.AddTail(new DinoBattleViewUiCreatureInfoMenu(DINO_FIELD->mView, req->mUnk10, (MMessageObserver *)req->mUnk0C));
         break;
     }
     case 0x10017: {
         DinoBattleViewUiAttackerMenuRequest *req = (DinoBattleViewUiAttackerMenuRequest *)msg;
-        mParallel.AddTail(new DinoBattleViewUiAttackerMenu(DINO_FIELD->mView, req->mUnk10, (MMessageObserver *)req->mUnk0C,
+        self->mParallel.AddTail(new DinoBattleViewUiAttackerMenu(DINO_FIELD->mView, req->mUnk10, (MMessageObserver *)req->mUnk0C,
                                                            (const u32 *)req->mUnk14, req->mUnk20, req->mUnk24,
                                                            req->mUnk28));
         break;
@@ -466,10 +467,10 @@ void DinoBattleViewField::OnMessage(MMessage *msg) {
     case 0x10019: {
         DinoBattleViewUiDefenderMenuRequest *req = (DinoBattleViewUiDefenderMenuRequest *)msg;
         if (!req->mUnk24) {
-            mParallel.AddTail(new DinoBattleViewUiDefenderMenu(DINO_FIELD->mView, req->mUnk10, (MMessageObserver *)req->mUnk0C,
+            self->mParallel.AddTail(new DinoBattleViewUiDefenderMenu(DINO_FIELD->mView, req->mUnk10, (MMessageObserver *)req->mUnk0C,
                                                                (const u32 *)req->mUnk14, req->mUnk20));
         } else {
-            mParallel.AddTail(new DinoBattleViewUiSelectAllMenu(DINO_FIELD->mView, req->mUnk10, (MMessageObserver *)req->mUnk0C,
+            self->mParallel.AddTail(new DinoBattleViewUiSelectAllMenu(DINO_FIELD->mView, req->mUnk10, (MMessageObserver *)req->mUnk0C,
                                                                 (const u32 *)req->mUnk14, req->mUnk20));
         }
         break;
@@ -477,7 +478,7 @@ void DinoBattleViewField::OnMessage(MMessage *msg) {
     case 0x10023: {
         DinoBattleViewUiAbilityMenuRequest *req = (DinoBattleViewUiAbilityMenuRequest *)msg;
         DinoBattleViewCreature *creature = DINO_FIELD->mView->GetUnkE4(req->mUnk10)->FindCreatureByAC(req->mUnk14);
-        mParallel.AddTail(new DinoBattleViewUiAbilityMenu(req->mUnk0C, creature->GetUnkA8(), req->mUnk14, req->mUnk18,
+        self->mParallel.AddTail(new DinoBattleViewUiAbilityMenu(req->mUnk0C, creature->GetUnkA8(), req->mUnk14, req->mUnk18,
                                                           req->mUnk1C, *(const DinoBattleViewUiAbilityMenuArgs *)req->mUnk20,
                                                           req->mUnk38, req->mUnk3C, DINO_FIELD->mView));
         break;
@@ -489,23 +490,23 @@ void DinoBattleViewField::OnMessage(MMessage *msg) {
         BOOL won = DINO_FIELD->mView->GetUnkE4(req->mUnk10)->GetUnkAC() == 0;
         func_ov000_0216147c(DINO_FIELD, won ? 3 : 4);
         if (won) {
-            set->AddTail(new DinoBattleViewWinnerScrollTask((u32)this, TRUE),
+            set->AddTail(new DinoBattleViewWinnerScrollTask((u32)self, TRUE),
                          new DinoBattleViewEffectTelop((u32)DINO_FIELD->mView,
                                                        std::string(((const char *const *)data_ov000_02191b1c)[0x30 / 4]), 4,
                                                        0, 0, 0));
         } else {
-            set->AddTail(new DinoBattleViewWinnerScrollTask((u32)this, FALSE),
+            set->AddTail(new DinoBattleViewWinnerScrollTask((u32)self, FALSE),
                          new DinoBattleViewEffectTelop((u32)DINO_FIELD->mView,
                                                        std::string(((const char *const *)data_ov000_02191b1c)[0x34 / 4]), 5,
                                                        0, 0, 0));
         }
         set->AddTail(((MMessageObserver *)req->mUnk0C)->CreatePostTask(new DinoBattleViewEffectGameEndResult()));
-        mParallel.AddTail(set);
+        self->mParallel.AddTail(set);
         break;
     }
     case 0x10061: {
         DinoBattleViewWaitUpdateSupportEffectAnimeRequest *req = (DinoBattleViewWaitUpdateSupportEffectAnimeRequest *)msg;
-        GetSerial()->AddTail(new WaitUpdateSupportEffectAnimeTask(DINO_FIELD->mView),
+        self->GetSerial()->AddTail(new WaitUpdateSupportEffectAnimeTask(DINO_FIELD->mView),
                              ((MMessageObserver *)req->mUnk0C)
                                  ->CreatePostTask(new DinoBattleViewWaitUpdateSupportEffectAnimeResult()));
         break;
@@ -562,7 +563,7 @@ void DinoBattleViewField::OnMessage(MMessage *msg) {
     }
     case 0x1006B: {
         DinoBattleViewWaitActionInfoBarRequest *req = (DinoBattleViewWaitActionInfoBarRequest *)msg;
-        GetSerial()->AddTail(new WaitActionInfoBarTask((DinoBattleViewActionInfoBar *)DINO_FIELD->mView->GetUnk104()),
+        self->GetSerial()->AddTail(new WaitActionInfoBarTask((DinoBattleViewActionInfoBar *)DINO_FIELD->mView->GetUnk104()),
                              ((MMessageObserver *)req->mUnk0C)->CreatePostTask(new DinoBattleViewWaitActionInfoBarResult()));
         break;
     }
@@ -573,7 +574,7 @@ void DinoBattleViewField::OnMessage(MMessage *msg) {
         MSerialTaskSet *set = new MSerialTaskSet(TRUE);
         set->AddTail(wait);
         set->AddTail(post);
-        GetSerial()->AddTail(set);
+        self->GetSerial()->AddTail(set);
         break;
     }
     case 0x1006F: {
@@ -654,30 +655,30 @@ void DinoBattleViewField::OnMessage(MMessage *msg) {
                     break;
                 }
             }
-            GetSerial()->AddTail(func_ov000_0218e6b0(DINO_FIELD->mTutorialWindow));
+            self->GetSerial()->AddTail(func_ov000_0218e6b0(DINO_FIELD->mTutorialWindow));
         } else {
-            GetSerial()->AddTail(new TutorialWindowCloseTask((u32)DINO_FIELD->mTutorialWindow), new MTimer(1));
+            self->GetSerial()->AddTail(new TutorialWindowCloseTask((u32)DINO_FIELD->mTutorialWindow), new MTimer(1));
         }
         if (req->mUnk0C != 0) {
-            GetSerial()->AddTail(((MMessageObserver *)req->mUnk0C)->CreatePostTask(new DinoBattleViewTutorialWindowResult()));
+            self->GetSerial()->AddTail(((MMessageObserver *)req->mUnk0C)->CreatePostTask(new DinoBattleViewTutorialWindowResult()));
         }
         break;
     }
     case 0x10087: {
         DinoBattleViewTutorialSetArroeRequest *req = (DinoBattleViewTutorialSetArroeRequest *)msg;
-        GetSerial()->AddTail(new SetTutorialMotionArrorTask(DINO_FIELD->mTutorialMotion, req->mUnk10, req->mUnk14,
+        self->GetSerial()->AddTail(new SetTutorialMotionArrorTask(DINO_FIELD->mTutorialMotion, req->mUnk10, req->mUnk14,
                                                             *(const MPoint *)req->mUnk18));
         if (req->mUnk0C != 0) {
-            GetSerial()->AddTail(((MMessageObserver *)req->mUnk0C)->CreatePostTask(new DinoBattleViewTutorialSetArroeResult()));
+            self->GetSerial()->AddTail(((MMessageObserver *)req->mUnk0C)->CreatePostTask(new DinoBattleViewTutorialSetArroeResult()));
         }
         break;
     }
     case 0x10089: {
         DinoBattleViewTutorialSetRectRequest *req = (DinoBattleViewTutorialSetRectRequest *)msg;
-        GetSerial()->AddTail(new SetTutorialMotionRectTask(DINO_FIELD->mTutorialMotion, *(const MPoint *)req->mUnk10,
+        self->GetSerial()->AddTail(new SetTutorialMotionRectTask(DINO_FIELD->mTutorialMotion, *(const MPoint *)req->mUnk10,
                                                            *(const MPoint *)req->mUnk18));
         if (req->mUnk0C != 0) {
-            GetSerial()->AddTail(((MMessageObserver *)req->mUnk0C)->CreatePostTask(new DinoBattleViewTutorialSetRectResult()));
+            self->GetSerial()->AddTail(((MMessageObserver *)req->mUnk0C)->CreatePostTask(new DinoBattleViewTutorialSetRectResult()));
         }
         break;
     }
@@ -704,10 +705,10 @@ void DinoBattleViewField::OnMessage(MMessage *msg) {
     }
     case 0x1008E: {
         DinoBattleViewDecideFirstAttackTeamRequest *req = (DinoBattleViewDecideFirstAttackTeamRequest *)msg;
-        GetSerial()->AddTail(new DinoBattleViewDecideFirstAttackTeam((u32)DINO_FIELD->mView, req->mUnk10, ((const u32 *)req->mUnk14)[0],
+        self->GetSerial()->AddTail(new DinoBattleViewDecideFirstAttackTeam((u32)DINO_FIELD->mView, req->mUnk10, ((const u32 *)req->mUnk14)[0],
                                                                      ((const u32 *)req->mUnk14)[1]));
         if (req->mUnk0C != 0) {
-            GetSerial()->AddTail(
+            self->GetSerial()->AddTail(
                 ((MMessageObserver *)req->mUnk0C)->CreatePostTask(new DinoBattleViewDecideFirstAttackTeamResult()));
         }
         break;
@@ -715,10 +716,10 @@ void DinoBattleViewField::OnMessage(MMessage *msg) {
     case 0x10095: {
         DinoBattleViewSetAttackBarUpperLCDRequest *req = (DinoBattleViewSetAttackBarUpperLCDRequest *)msg;
         if (req->mUnk0C != 0) {
-            GetSerial()->AddTail(
+            self->GetSerial()->AddTail(
                 ((MMessageObserver *)req->mUnk0C)->CreatePostTask(new DinoBattleViewSetAttackBarUpperLCDResult()));
         }
-        break;
+        return;
     }
     case 0x10084: {
         for (int side = 0; side < 2; side++) {
@@ -762,7 +763,7 @@ void DinoBattleViewField::OnMessage(MMessage *msg) {
         tasks->AddTail(set);
         tasks->AddTail(after);
         if (req->mUnk0C != 0) {
-            GetSerial()->AddTail(((MMessageObserver *)req->mUnk0C)->CreatePostTask(new DinoBattleViewFreeCoordEffectResult()));
+            self->GetSerial()->AddTail(((MMessageObserver *)req->mUnk0C)->CreatePostTask(new DinoBattleViewFreeCoordEffectResult()));
         }
         break;
     }
