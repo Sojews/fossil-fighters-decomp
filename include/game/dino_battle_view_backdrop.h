@@ -9,11 +9,13 @@ static inline const u8 *DinoBackdropColor(const DinoBattleAdjustDefs *defs, u32 
     return (const u8 *) defs + offset + t * 4;
 }
 
-// The battle's backdrop: a color per line, from one of the prepared tables or fading between two.
-class DinoBattleViewBackdrop : public MRasterPal {
+// The battle's backdrop: a color per line, from one of the prepared tables or fading between two. (Its type info
+// names MRasterIO as the base: it isn't an MRasterPal, though it keeps the display the same way.)
+class DinoBattleViewBackdrop : public MRasterIO {
 public:
     // Fills each table with its backdrop's colors, from the top color down to the bottom one.
-    DinoBattleViewBackdrop() : MRasterPal(-1) {
+    DinoBattleViewBackdrop() : MRasterIO(-1, gCurrentDisplay->GetBackdropReg(), 2) {
+        mUnk3C = (u32) gCurrentDisplay;
         mTable = 0;
         mFrame = 0;
         mFading = FALSE;
@@ -44,6 +46,7 @@ public:
     virtual void Execute();
     virtual void OnVSync();
 
+    u32 mUnk3C;                     // 0x3C: the display
     u16 *mTables[5];                // 0x40
     u16 mFadeLines[M_RASTER_LINES]; // 0x54
     u32 mTable;                     // 0x1D4: shown when not fading
