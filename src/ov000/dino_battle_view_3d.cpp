@@ -1657,10 +1657,20 @@ void DinoBattleView3D::FlushQueue() {
 }
 
 // The queue's members the game emits in this file.
+#pragma opt_common_subs off
 template std::__deque_deleter<MTask *, std::allocator<MTask *> >::~__deque_deleter();
+#pragma opt_common_subs reset
 template std::__deque_deleter<MTask *, std::allocator<MTask *> >::iterator std::__deque_deleter<MTask *, std::allocator<MTask *> >::make_iter(size_t n);
 template void std::__deque_deleter<MTask *, std::allocator<MTask *> >::push_back(MTask *const &x, Metrowerks::int2type<true>);
 template void std::__deque_deleter<MTask *, std::allocator<MTask *> >::erase_front(size_t n, Metrowerks::int2type<true>);
+// (The map's range insert without common subexpressions eliminated, as the game has it; its copy helpers first, so
+// that they keep the usual optimizations.)
+template std::__cdeque_deleter<void *, std::allocator<void *> >::iterator std::__cdeque_copy<std::__cdeque_deleter<void *, std::allocator<void *> >::iterator>(std::__cdeque_deleter<void *, std::allocator<void *> >::iterator &first, std::__cdeque_deleter<void *, std::allocator<void *> >::iterator &last, std::__cdeque_deleter<void *, std::allocator<void *> >::iterator &result);
+template std::__cdeque_deleter<void *, std::allocator<void *> >::iterator std::__cdeque_copy_backward<std::__cdeque_deleter<void *, std::allocator<void *> >::iterator>(std::__cdeque_deleter<void *, std::allocator<void *> >::iterator &first, std::__cdeque_deleter<void *, std::allocator<void *> >::iterator &last, std::__cdeque_deleter<void *, std::allocator<void *> >::iterator &result);
+#pragma opt_common_subs off
+template void std::__cdeque_deleter<void *, std::allocator<void *> >::insert<std::__cdeque_move_iter<std::__cdeque_deleter<void *, std::allocator<void *> >::iterator> >(
+    const std::__cdeque_deleter<void *, std::allocator<void *> >::iterator &pos, std::__cdeque_move_iter<std::__cdeque_deleter<void *, std::allocator<void *> >::iterator> first, std::__cdeque_move_iter<std::__cdeque_deleter<void *, std::allocator<void *> >::iterator> last, Metrowerks::int2type<true>);
+#pragma opt_common_subs reset
 
 // The file's static initialization (see dino_static_init.h).
 extern "C" u32 data_ov000_021964e8[];
