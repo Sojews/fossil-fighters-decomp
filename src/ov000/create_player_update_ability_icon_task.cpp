@@ -3696,7 +3696,7 @@ extern "C" void func_ov000_02166904(DinoBattleModelPlayer *player, MMessageObser
             player->mUnkF4->CreatePostTask(new DinoBattleViewSetCreaturePriorityRequest(0)),
             player->mUnkF4->CreatePostTask(new DinoBattleViewSetAttackBarUpperLCDRequest(0, 0, 0)),
             player->CreateUpdateColorTask(ids, count, 0), player->CreateLcdFadeTask(FALSE),
-            new SetStatusEffectTask(target, status, effect[2], effect[4], effect[5], DinoAttackHasUnk10Flag(ability),
+            new SetStatusEffectTask(target, effect[0], effect[2], effect[4], effect[5], DinoAttackHasUnk10Flag(ability),
                                     player->mUnkF4),
             player->CreateUpdateStateIconTask((u32)target, 0));
         player->mSerial.AddTail(player->CreateSendAbilityResultTask(reply));
@@ -3899,7 +3899,7 @@ extern "C" void func_ov000_02166904(DinoBattleModelPlayer *player, MMessageObser
                 base = attacker->CalcDamage(target, MFx32(cost[1]), hit, &result[0]);
                 u32 damageText = data_0208a30c;
                 char text7[0x100];
-                sprintf(text7, gDinoResource->GetText(damageText), DinoFxToFloat(base));
+                sprintf(text7, gDinoResource->GetText(data_0208a30c), DinoFxToFloat(base));
                 data_ov000_021978c0->Print(text7);
                 char text8[0x100];
                 sprintf(text8, gDinoResource->GetText(data_0208a314), DinoFxToFloat(critical));
