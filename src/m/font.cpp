@@ -347,7 +347,7 @@ void MChr16FontTransfer::Transfer() {
     const u32 *src = (const u32 *) mSrc;
     int srcWords = (mGlyphSize.x + 7) >> 3;
     if (mPos.y < 0) {
-        src += -mPos.y * srcWords;
+        src += srcWords * -mPos.y;
         mGlyphSize.y += mPos.y;
         mPos.y = 0;
     }
@@ -376,8 +376,9 @@ void MChr16FontTransfer::Transfer() {
     shift *= 4;
     if (!mOwnColors) {
         while (rows != 0) {
+            u32 i;
             u32 carry = 0;
-            for (u32 i = 0; i < words; i++) {
+            for (i = 0; i < words; i++) {
                 u32 word = MReadGlyphWord(src);
                 u32 out = (word << shift) | (carry >> (32 - shift));
                 if (i >= first && i < last) {
@@ -396,7 +397,7 @@ void MChr16FontTransfer::Transfer() {
                 dst += 8;
             }
             src -= words - srcWords;
-            dst = (u32 *) ((u8 *) dst + ((((u8 *) dst - (u8 *) mDest) & 0x1F) == 0x1C ? nextTileRow * 4 : nextRow * 4));
+            dst = (u32 *) ((u8 *) dst + ((((u8 *) dst - (u8 *) mDest) & 0x1F) != 0x1C ? nextRow * 4 : nextTileRow * 4));
             rows--;
         }
     } else {
@@ -407,7 +408,7 @@ void MChr16FontTransfer::Transfer() {
                 u32 word = MReadGlyphWord(src);
                 u32 out = (word << shift) | (carry >> (32 - shift));
                 // A nibble mask of the nonzero pixels.
-                mask = (((((~out >> 1) & 0x77777777) + out) & 0x88888888) >> 3) + 0x77777777;
+                mask = (((out + ((~out >> 1) & 0x77777777)) & 0x88888888) >> 3) + 0x77777777;
                 mask ^= 0x77777777;
                 if (i >= first && i < last) {
                     if (i == 0 && i == words - 1) {
@@ -426,7 +427,7 @@ void MChr16FontTransfer::Transfer() {
                 dst += 8;
             }
             src -= words - srcWords;
-            dst = (u32 *) ((u8 *) dst + ((((u8 *) dst - (u8 *) mDest) & 0x1F) == 0x1C ? nextTileRow * 4 : nextRow * 4));
+            dst = (u32 *) ((u8 *) dst + ((((u8 *) dst - (u8 *) mDest) & 0x1F) != 0x1C ? nextRow * 4 : nextTileRow * 4));
             rows--;
         }
     }
@@ -528,7 +529,7 @@ void MChr16BinFontTransfer::Transfer() {
                 dst += 32;
                 break;
             }
-            dst = (u32 *) ((u8 *) dst + ((((u8 *) dst - (u8 *) mDest) & 0x1F) == 0x1C ? nextTileRow * 4 : nextRow * 4));
+            dst = (u32 *) ((u8 *) dst + ((((u8 *) dst - (u8 *) mDest) & 0x1F) != 0x1C ? nextRow * 4 : nextTileRow * 4));
             rows--;
         }
     } else {
@@ -594,7 +595,7 @@ void MChr16BinFontTransfer::Transfer() {
                 dst += 32;
                 break;
             }
-            dst = (u32 *) ((u8 *) dst + ((((u8 *) dst - (u8 *) mDest) & 0x1F) == 0x1C ? nextTileRow * 4 : nextRow * 4));
+            dst = (u32 *) ((u8 *) dst + ((((u8 *) dst - (u8 *) mDest) & 0x1F) != 0x1C ? nextRow * 4 : nextTileRow * 4));
             rows--;
         }
     }
