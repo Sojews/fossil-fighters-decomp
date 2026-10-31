@@ -172,8 +172,7 @@ public:
             }
             mMotion->SetPriority(front ? 1 : 2);
             MTask *priority = new SetPriorityTask(this, 2);
-            MTask *wait = mMotion->CreateWaitStopTask();
-            mTasks->AddTail(new MTimer(1), wait, priority);
+            mTasks->AddTail(new MTimer(1), mMotion->CreateWaitStopTask(), priority);
         }
     }
     void SetPosition(MPoint pos) {

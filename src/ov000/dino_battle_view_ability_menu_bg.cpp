@@ -430,10 +430,15 @@ static inline const int *DinoAbilityMenuRepeat(const DinoExcavateDefs *d) {
 // if one shows).
 // NONMATCHING: the help loop's &mParallel takes the top spill slot (the game's lowest), and gKasekiRockSizeText[5]
 // folds the offset into the load.
+// (A non-member inline: the loop's hoisted &mParallel takes the game's slot.)
+static inline MTaskSet *DinoAbilityParallel(DinoBattleViewUiAbilityMenu *menu) {
+    return &menu->mParallel;
+}
+
 void DinoBattleViewUiAbilityMenu::OnStart() {
     const DinoBattleViewAbilityHelpDef *def = data_ov000_021949a0;
     for (u32 i = 0; i < 3; def++, i++) {
-        MTaskSet *parallel = &mParallel;
+        MTaskSet *parallel = DinoAbilityParallel(this);
         mHelps[i] = new DinAttackItemHelp(def->rect, def->text, gLcd->GetBottomDisplay());
         parallel->AddTail(mHelps[i]);
     }
@@ -653,7 +658,7 @@ void DinoBattleViewUiAbilityMenu::OnIdle() {
 
 extern "C" const u32 data_0208a194;    // the close slide's length
 
-// NONMATCHING: slides, frames and frames / 7 take each other's stack slots.
+// (The anime re-reads the length: one use fewer for frames, which takes the game's spill slot.)
 void DinoBattleViewUiAbilityMenu::Close() {
     Disable();
     MParallelTaskSet *slides = NULL;
@@ -678,7 +683,7 @@ void DinoBattleViewUiAbilityMenu::Close() {
     MPoint from;
     MPoint to(0, -192);
     from = mBG->mUnk10D4 ? mBG->mText->GetOffset() : mBG->mOffset;
-    mParallel.AddTail(mBG->mUnk10D4 ? mBG->mText->CreateOffsetAnime(from, to, frames, 1) : new MTimer(1));
+    mParallel.AddTail(mBG->mUnk10D4 ? mBG->mText->CreateOffsetAnime(from, to, data_0208a194, 1) : new MTimer(1));
     if (slides != NULL) {
         mSerial.AddTail(slides);
     }
