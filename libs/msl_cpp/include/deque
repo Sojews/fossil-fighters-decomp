@@ -122,7 +122,8 @@ namespace std {
             }
             iterator operator-(difference_type n) const {
                 iterator tmp(*this);
-                return tmp += -n;
+                tmp += -n;
+                return tmp;
             }
             bool operator==(const iterator &x) const {
                 return ptr_ == x.ptr_;
@@ -669,7 +670,7 @@ namespace std {
                 size_ += n;
                 i = end();
                 if (back != 0) {
-                    i = __cdeque_copy_backward_i(i - (n + back), i - n, i);
+                    i = __cdeque_copy_backward_i(i + -(difference_type)(n + back), i + -(difference_type)n, i);
                 }
                 i += -(difference_type) n;
             }
@@ -784,8 +785,7 @@ namespace std {
         erase_at_end(size_, Metrowerks::int2type<true>());
         buf_type &b = buf();
         if (!b.empty()) {
-            buf_type::iterator e = b.end();
-            for (buf_type::iterator i = b.begin(); i != e; ++i) {
+            for (buf_type::iterator e = b.end(), i(b); i != e; ++i) {
                 if (*i != 0) {
                     ::operator delete(*i);
                 }
@@ -832,12 +832,11 @@ namespace std {
         buf_type &b = buf();
         size_type nb = n / __block + (n % __block != 0);
         // Reuse the blocks in front of the first element.
-        while (nb != 0 && start_ >= __block) {
+        for (; nb != 0 && start_ >= __block; --nb) {
             void *blk = b.front();
             b.pop_front();
             b.back() = blk;
             b.push_back(0);
-            --nb;
             start_ -= __block;
         }
         if (nb == 0) {
@@ -846,7 +845,7 @@ namespace std {
         if (nb * __block > max_size() || capacity() > max_size() - nb * __block) {
             __deque_common<true>::throw_length_error("deque::add_back_capacity length error");
         }
-        if (b.size_ + nb <= b.capacity()) {
+        if (nb + b.size_ <= b.capacity()) {
             for (; nb != 0; --nb) {
                 b.back() = allocator<T>().allocate(__block);
                 b.push_back(0);
@@ -854,26 +853,27 @@ namespace std {
             return;
         }
         __deque_deleter tmp;
-        tmp.init();
-        buf_type &tb = tmp.buf();
+        tmp.start_ = 0;
+        tmp.size_ = 0;
         {
+            buf_type &t = tmp.buf();
+            t.init();
             buf_type e;
             e.init();
             const buf_type &ce = e;
             Metrowerks::int2type<true> a;
-            tb.init_copy(ce.begin(), ce.end(), a);
+            t.init_copy(ce.begin(), ce.end(), a);
         }
-        tb.reserve(std::max(2 * b.capacity(), b.size_ + nb + 1));
+        buf_type &tb = tmp.buf();
+        tb.reserve(std::max(2 * b.capacity(), nb + b.size_ + 1));
         tb.push_back(0);
         for (; nb != 0; --nb) {
             tb.back() = allocator<T>().allocate(__block);
             tb.push_back(0);
         }
         if (b.size_ != 0) {
-            buf_type::iterator last = b.end();
-            last += -1;
-            tb.insert(tb.begin(), __cdeque_move_iter<buf_type::iterator>(b.begin()),
-                      __cdeque_move_iter<buf_type::iterator>(last), Metrowerks::int2type<true>());
+            tb.insert(buf_type::iterator(tb), __cdeque_move_iter<buf_type::iterator>(buf_type::iterator(b)),
+                      __cdeque_move_iter<buf_type::iterator>(b.end() - 1), Metrowerks::int2type<true>());
         }
         std::swap(b.data_, tb.data_);
         std::swap(b.start_, tb.start_);
