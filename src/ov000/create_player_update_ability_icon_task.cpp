@@ -2032,6 +2032,16 @@ extern "C" const u32 data_0208a2b8[], data_0208a2b4;
 extern "C" const u32 data_0208a2bc, data_0208a2e0;   // (data_0208a2b8[1] and data_0208a2dc[1], which the game reaches by their own addresses)  // info bar texts (the first two: the cure's, ours and theirs)
 u8 DinoAttackHasUnk10Flag(u32 id);
 
+// A byte of an attack's data (read through a call, so the game reads it before the calls beside it).
+static inline u8 DinoByteAt(const u8 *data, int i) {
+    return data[i];
+}
+
+// A creature's follow-up attack.
+static inline u32 DinoCreatureUnk34(DinoBattleModelCreature *creature) {
+    return creature->GetDef()->mUnk34;
+}
+
 // The player's most kaseki points.
 static inline u32 DinoPlayerMaxKasekiPoints(DinoBattleModelPlayer *player) {
     return player->mKpLevel.maxPoints;
@@ -2083,7 +2093,7 @@ void DinoBattleModelPlayer::OnMessage(MMessage *msg) {
             break;
         }
         u32 unk2C = sig->mUnk2C;
-        u32 unk178 = 0;
+        volatile u32 unk178 = 0;   // (kept in memory, as the game does)
         if (IsCpu()) {
             unk178 = sig->mUnk30;
         }
@@ -2173,16 +2183,16 @@ void DinoBattleModelPlayer::OnMessage(MMessage *msg) {
                                 *(mUnkB4 == 0 ? &data_0208a2b8[6] : &data_0208a2b8[5]))),
                             waitBar, motions);
         }
-        tutorial = func_ov000_0218ec8c((u32)((DinoBattleModelField *)mUnk100)->mModel->mTutorial, 0x16, NULL);
-        if (tutorial != NULL) {
+        MTask *kpTutorial = func_ov000_0218ec8c((u32)((DinoBattleModelField *)mUnk100)->mModel->mTutorial, 0x16, NULL);
+        if (kpTutorial != NULL) {
             mSerial.AddTail(DinoCreatePostAndWaitTask(mUnkF4, new DinoBattleViewPlayerWaitKPCountStopRequest(0, mUnkB8)),
-                            tutorial);
+                            kpTutorial);
         }
         }
         if (req->mUnk0C != 0) {
             mSerial.AddTail(((MMessageObserver *)req->mUnk0C)->CreatePostTask(new DinoBattleModelPlayerTurnBeginResult()));
         }
-        break;
+        return;
     }
     case 0x1001F: {
         DinoBattleModelGoEscapeAreaRequest *req = (DinoBattleModelGoEscapeAreaRequest *)msg;
@@ -2271,7 +2281,7 @@ void DinoBattleModelPlayer::OnMessage(MMessage *msg) {
                                 waitBar);
             }
         }
-        if (*kind == 5 && res->mUnk14 != 0 && (kind[1] >= (int)GetRandom()->Next(100) || steal)) {
+        if (*kind == 5 && res->mUnk14 != 0 && (DinoByteAt(kind, 1) >= (int)GetRandom()->Next(100) || steal)) {
             // Steals kaseki points.
             int theirs = mOpponent->GetUnk128();
             int left = theirs - *(const s16 *)(kind + 2);
@@ -2307,7 +2317,7 @@ void DinoBattleModelPlayer::OnMessage(MMessage *msg) {
         } else {
             if (*kind == 8 && !res->mUnk29 && !res->mUnk20 && attacker->GetUnkB8() == 0 && target->GetUnkB8() == 0 &&
                 target->mPlayer->GetCreatureCount() >= 2 && target->mPlayer->FindCreature(3) == NULL &&
-                kind[1] >= (int)GetRandom()->Next(100)) {
+                DinoByteAt(kind, 1) >= (int)GetRandom()->Next(100)) {
                 // Knocks the target out of the fight area.
                 MParallelTaskSet *knock = new MParallelTaskSet(TRUE);
                 mSerial.Remove(seq);
@@ -2338,7 +2348,8 @@ void DinoBattleModelPlayer::OnMessage(MMessage *msg) {
             }
             if (target->GetUnkB8() == 0 && res->mUnk2C != 0) {
                 const u8 *effect = DinoOffsetPtr<u8>(def, def->unk10);
-                mSerial.AddTail(new SetStatusEffectTask(target, effect[0], effect[2], effect[4], effect[5],
+                mSerial.AddTail(new SetStatusEffectTask(target, DinoByteAt(effect, 0), DinoByteAt(effect, 2),
+                                                        DinoByteAt(effect, 4), DinoByteAt(effect, 5),
                                                         DinoAttackHasUnk10Flag(res->mUnk1C), mUnkF4));
             }
             mSerial.AddTail(target->mPlayer->CreateUpdateStateIconTask((u32)target, 0));
@@ -2347,7 +2358,7 @@ void DinoBattleModelPlayer::OnMessage(MMessage *msg) {
             // Countered.
             DinoBattleModelCreature *self = FindCreatureByB4(res->mUnk0C);
             if (self != NULL) {
-                u32 text = res->mUnk20 == 1 ? data_0208a2dc[1] : data_0208a2b8[1];
+                u32 text = res->mUnk20 == 1 ? data_0208a2e0 : data_0208a2bc;
                 if (mUnkB4 == 0) {
                     text++;
                 }
@@ -2370,7 +2381,7 @@ void DinoBattleModelPlayer::OnMessage(MMessage *msg) {
                     counter->AddTail(counterWait);
                     counter->AddTail(hit);
                 } else {
-                    MTask *hit = func_ov000_0216d4b0(self, 0, 0, 0, 0);
+                    MTask *hit = func_ov000_0216d4b0(self, 0, res->mUnk24, 0, 0);
                     counter->AddTail(counterWait);
                     counter->AddTail(hit);
                 }
@@ -2394,9 +2405,8 @@ void DinoBattleModelPlayer::OnMessage(MMessage *msg) {
                                                  special, 0, GetUnkAC(), 1));
             } else if (target->GetUnkE4() == 0) {
                 MTask *icon = CreateUpdateAbilityIconTask(TRUE);
-                MTaskSet *serial = &mSerial;
-                serial->AddTail(opponent->CreateMoveToHeatAreaAnyCreature(), icon);
-                serial->AddTail(CreateSendAbilityResultTask(mReply));
+                mSerial.AddTail(opponent->CreateMoveToHeatAreaAnyCreature(), icon);
+                mSerial.AddTail(CreateSendAbilityResultTask(mReply));
             } else {
                 // The follow-up attack.
                 u32 ids[6] = {0, 0, 0, 0, 0, 0};
@@ -2412,7 +2422,7 @@ void DinoBattleModelPlayer::OnMessage(MMessage *msg) {
                     mUnkF4->CreatePostTask(new DinoBattleViewShowAttackNameBarRequest(
                         0, ((DinoBattleModelCreature *)next.mUnk0)->GetDef()->mUnk34, 0, 1)),
                     CreateAttackTask((DinoBattleModelCreature *)next.mUnk0, (DinoBattleModelCreature *)next.mUnk4,
-                                     ((DinoBattleModelCreature *)next.mUnk0)->GetDef()->mUnk34, 1, GetUnkAC(), 0));
+                                     DinoCreatureUnk34((DinoBattleModelCreature *)next.mUnk0), 1, GetUnkAC(), 0));
             }
         } else {
             MParallelTaskSet *moves = new MParallelTaskSet(TRUE);
@@ -2443,8 +2453,8 @@ void DinoBattleModelPlayer::OnMessage(MMessage *msg) {
         if (tutorial != NULL) {
             mSerial.AddTail(tutorial);
         }
-        DinoBattleParams *params = &mBattle->mParams;
         BOOL lost = FALSE;
+        DinoBattleParams *params = &mBattle->mParams;
         if (GetCreatureCount() == 0 || (params->unk158 && (&params->unk08)[mUnkB8] == 0)) {
             lost = TRUE;
         }
