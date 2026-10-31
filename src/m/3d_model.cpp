@@ -761,7 +761,7 @@ const s16 *M3DModelGetMorphVertices(M3DModel *model) {
             *out++ = (*prev++ * w0 + *next++ * w1) / d;
         }
         int n = (count >> 1) * 3;
-        for (int i = 0; i < n; i++) {
+        for (s32 i = 0; i < n; i++) {
             M3DSetDiv32_32(*prev++ * w0 + *next++ * w1, d);
             out[1] = (*prev++ * w0 + *next++ * w1) / d;
             *out = M3DGetDivResult32();

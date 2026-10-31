@@ -607,10 +607,11 @@ void DinoUiReviveStatusMenu::ShowLearnedAttacks() {
         return;
     }
     const DinoCreatureDef *def = gDinoResource->GetCreatureDef(mCreature.index);
+    int count;
     std::string names;
-    u32 count = 0;
     u32 learned = 0;
-    u32 known = 0;
+    count = 0;
+    s32 known = 0;
     for (u32 i = 0; i < def->attackCount; i++) {
         if (((const u32 *)((const u8 *)def + def->attackLevels))[i] <= CountRevivedParts(mCreature)) {
             known++;
@@ -632,8 +633,8 @@ void DinoUiReviveStatusMenu::ShowLearnedAttacks() {
                                                            std::string(gDinoResource->GetText(data_0208a4b0)), 4));
         }
     } else {
-        std::string text;
         char line[0x80];
+        std::string text;
         sprintf(line, gDinoResource->GetText(data_0208a4b8), names.c_str());
         text += line;
         if (learned == def->attackCount) {
