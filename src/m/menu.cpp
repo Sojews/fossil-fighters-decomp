@@ -330,6 +330,7 @@ MMenuItem *MMenu::FindNearestItem(MPoint pos) {
 
 // The item linked from `from` in the direction (1 right, 2 down, 3 left, 4 up). Without links from it, or when
 // they miss the direction and the menu falls back, the nearest item that way.
+#pragma opt_common_subs off
 MMenuItem *MMenu::FindLinkedItem(MMenuItem *from, int dir) {
     std::pair<MMenuLinks::const_iterator, MMenuLinks::const_iterator> range = mLinks.equal_range(from);
     if (range.first != range.second) {
@@ -348,6 +349,7 @@ MMenuItem *MMenu::FindLinkedItem(MMenuItem *from, int dir) {
     }
     return FindItemInDirection(from->GetFrame(), dir);
 }
+#pragma opt_common_subs reset
 
 // The nearest item in the direction: inside the 90 degree wedge from the frame's center that way.
 // (The unused locals only reproduce the game's order of loading the frame's sides.)
