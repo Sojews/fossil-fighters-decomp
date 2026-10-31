@@ -1189,6 +1189,11 @@ void MMultiPlayMessageHub::SendPending() {
     }
 }
 
+// (An inline of its own: it puts the insert's temporaries below the copy's, as in the game.)
+static inline void MMultiPlayAppend(std::vector<char> *v, u8 *data, u32 n) {
+    v->insert(v->end(), std::__msl_move_iter<u8 *>(data), std::__msl_move_iter<u8 *>(data + n));
+}
+
 // Reads what each console shared this frame: message headers and pieces, put back together per console; a finished
 // message for this console is sent to the observers. Until everyone is in step, the shared data is only compared
 // with what this console sends. NONMATCHING: the game's stack slots for the insert's iterators and tag bytes differ
@@ -1237,7 +1242,7 @@ void MMultiPlayMessageHub::ReceivePending() {
             } else {
                 u32 n = std::min(mIncoming[i].unk8, left);
                 std::vector<char> *v = mIncoming[i].data;
-                v->insert(v->end(), std::__msl_move_iter<u8 *>(data), std::__msl_move_iter<u8 *>(data + n));
+                MMultiPlayAppend(v, data, n);
                 mIncoming[i].unk8 -= n;
                 data += n;
                 left -= n;

@@ -1,8 +1,6 @@
 // MMenuItem, MMenu and the focus transfers.
-// NONMATCHING: Init (where it works out &mSerial); AddLink (the game keeps a stored copy of the inner pair that ours
-// optimizes away, as in help.cpp); FindLinkedItem (the game keeps a copy of the range
-// and two zeroed bytes on the stack); FindItemInDirection (the order the rect's words are loaded); the tree's
-// insert_node_at (two stores swapped).
+// NONMATCHING: Init (where it works out &mSerial); FindLinkedItem (the game keeps a copy of the range on the stack);
+// FindItemInDirection (the order the rect's words are loaded); the tree's insert_node_at (two stores swapped).
 
 #pragma ipa file
 
@@ -174,9 +172,13 @@ void MMenu::ClearItems() {
     mLinks.clear();
 }
 
+// (At optimization level 3: the game keeps the inner pair in its own stack slot, as in help.cpp.)
+#pragma optimization_level 3
 void MMenu::AddLink(MMenuItem *from, int dir, MMenuItem *to) {
-    mLinks.insert(MMenuLinks::value_type(from, std::make_pair(dir, to)));
+    std::pair<int, MMenuItem *> p = std::make_pair(dir, to);
+    mLinks.insert(MMenuLinks::value_type(from, p));
 }
+#pragma optimization_level reset
 
 void MMenu::RemoveLink(MMenuItem *from, int dir) {
     for (MMenuLinks::iterator it = mLinks.begin(); it != mLinks.end(); ++it) {

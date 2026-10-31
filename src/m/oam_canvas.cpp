@@ -206,7 +206,8 @@ void MOamCanvas<TOam, TUnit>::Layout(MRect rect) {
         int fitting = -1;
         int best = -1;
         MPoint sz(w, h);
-        if (sz == MPoint(8, 8)) {
+        bool is8 = sz == MPoint(8, 8);
+        if (is8) {
             AddPiece(rect, 0);
         } else {
             int i;
@@ -220,7 +221,7 @@ void MOamCanvas<TOam, TUnit>::Layout(MRect rect) {
                     AddPiece(rect, i);
                     goto next;
                 }
-                int area = s.x * s.y;
+                int area = s.y * s.x;
                 if (s.x <= w && s.y <= h) {
                     if (area > fittingArea) {
                         fittingArea = area;
@@ -272,6 +273,57 @@ void MOamCanvas<TOam, TUnit>::Alloc(BOOL fromEnd) {
         mUnit->GetEntries()[i].tile = tile;
     }
 }
+
+// MSmartOamCell::SetShape, but with the height read first (as the game's smart Alloc has it; MMotion's SetCellChr
+// has the header's order).
+static inline void SetSmartShape(MSmartOamCell *c, int shape) {
+    c->MOamCell::SetShape(shape);
+    if (c->objMode != 3) {
+        int h = gObjSizes[0][shape].y;
+        c->width = gObjSizes[0][shape].x;
+        c->height = h;
+    } else {
+        int h = gObjSizes[0][shape].y * 2;
+        c->width = gObjSizes[0][shape].x * 2;
+        c->height = h;
+    }
+}
+
+// (Written out for the smart OAM: the game takes the entry before working out its tile there, but not in the
+// plain OAM's copy.)
+template <>
+void MOamCanvas<MSmartOam, MSmartOamUnit>::Alloc(BOOL fromEnd) {
+    u32 i;
+    u32 offset = 0;
+    MChr *chr = mDisplay->mObj->mChr;
+    for (i = 0; i < mPieces.size(); i++) {
+        Piece &piece = mPieces[i];
+        u32 tiles = gObjTileSizes[0][piece.shape].x * gObjTileSizes[0][piece.shape].y;
+        u32 size;
+        if (chr->mMode == 0) {
+            size = (tiles + chr->mBoundary - 1) / chr->mBoundary * chr->mBoundary;
+        } else {
+            size = (tiles * 2 + chr->mBoundary - 1) / chr->mBoundary * chr->mBoundary / 2;
+        }
+        piece.chrSize = size;
+        mPieces[i].chrOffset = offset;
+        offset += mPieces[i].chrSize;
+    }
+    mUnit = mOam->Alloc(mPieces.size(), fromEnd);
+    mChrBlock = chr->Alloc(0, offset, fromEnd);
+    for (i = 0; i < mPieces.size(); i++) {
+        int shape = mPieces[i].shape;
+        SetSmartShape(&mUnit->GetEntries()[i], shape);
+        mUnit->GetEntries()[i].SetPalette(mPalBlock);
+        MSmartOamCell &e = mUnit->GetEntries()[i];
+        u32 tile = (mChrBlock->index + mPieces[i].chrOffset) / chr->mBoundary;
+        if (e.colors256 == 1) {
+            tile *= 2;
+        }
+        e.tile = tile;
+    }
+}
+
 template class MOamCanvas<MOam, MOamUnit>;
 template class MOamCanvas<MSmartOam, MSmartOamUnit>;
 

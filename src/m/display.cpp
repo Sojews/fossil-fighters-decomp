@@ -202,7 +202,13 @@ void MDisplay::SetObjTileBoundary(int boundary) {
     mDispCnt.objTileBoundary = boundary;
 }
 
-// Keeps gCurrentDisplay per thread.
+// (Takes the iterator by value: the game leaves a dead copy of it on the stack for each test.)
+static inline bool IsFound(MThreadDisplayMap::iterator it) {
+    return it != sThreadDisplays->end();
+}
+
+// Keeps gCurrentDisplay per thread. (The explicit iterator conversions keep find's result in its own slot.)
+// NONMATCHING: stack slots only (the game has the first test's copy above the iterators, and one more word).
 static void SwitchThreadDisplay(u32 from, u32 to) {
     if (sPrevSwitchThreadCallback != NULL) {
         sPrevSwitchThreadCallback((OSThread *) from, (OSThread *) to);
@@ -211,12 +217,16 @@ static void SwitchThreadDisplay(u32 from, u32 to) {
     u16 prev = REG_IME;
     REG_IME = 0;
     bool enabled = prev;
-    MThreadDisplayMap::iterator it = sThreadDisplays->find(from);
-    if (it != sThreadDisplays->end()) {
+    MThreadDisplayMap::iterator it = MThreadDisplayMap::iterator(sThreadDisplays->find(from));
+    if (IsFound(it)) {
         it->second = gCurrentDisplay;
     }
-    it = sThreadDisplays->find(to);
-    gCurrentDisplay = it != sThreadDisplays->end() ? (MDisplay *) it->second : NULL;
+    MThreadDisplayMap::iterator it2 = MThreadDisplayMap::iterator(sThreadDisplays->find(to));
+    if (IsFound(it2)) {
+        gCurrentDisplay = (MDisplay *) it2->second;
+    } else {
+        gCurrentDisplay = NULL;
+    }
     prev = REG_IME;
     REG_IME = enabled;
 }
