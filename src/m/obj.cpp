@@ -9,6 +9,10 @@
 static const u32 sChrShifts[2] = {5, 6};
 static const u32 sChrUnitSizes[2] = {32, 64};
 
+// (The game's pool puts a word and three type infos, 0x28 bytes, ahead of the size tables; __sinit reaches the first
+// table from the pool's start.)
+static u32 sObjPoolHead[10];
+
 MPoint gObjTileSizes[4][4] = {
     {MPoint(1, 1), MPoint(2, 1), MPoint(1, 2), MPoint()},
     {MPoint(2, 2), MPoint(4, 1), MPoint(1, 4), MPoint()},
