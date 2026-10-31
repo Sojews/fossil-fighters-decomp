@@ -2167,7 +2167,7 @@ void DinoBattleModelPlayer::OnMessage(MMessage *msg) {
         std::vector<DinoBattleModelCreature *> boosters;
         for (int i = 0; i < GetCreatureCount(); i++) {
             if (GetCreature(i)->GetDefUnk61() == 4) {
-                boosters.push_back(GetCreature(i));
+                DinoPushCreature(boosters, GetCreature(i));
                 points += base * (GetCreature(i)->GetDef()->mUnk62 - 10) / 10;
             }
         }
