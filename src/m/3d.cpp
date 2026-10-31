@@ -273,7 +273,21 @@ template class std::__cdeque_deleter<void *, std::allocator<void *> &>;
 template class std::__cdeque_deleter<void *, std::allocator<void *> >::iterator;
 template class std::__cdeque_deleter<void *, std::allocator<void *> >::const_iterator;
 template class std::__deque_common<true>;
+// (Its copy helpers first, so that they keep the usual optimizations.)
+template std::__cdeque_deleter<void *, std::allocator<void *> >::iterator std::__cdeque_copy<std::__cdeque_deleter<void *, std::allocator<void *> >::iterator>(std::__cdeque_deleter<void *, std::allocator<void *> >::iterator &first, std::__cdeque_deleter<void *, std::allocator<void *> >::iterator &last, std::__cdeque_deleter<void *, std::allocator<void *> >::iterator &result);
+template std::__cdeque_deleter<void *, std::allocator<void *> >::iterator std::__cdeque_copy_backward<std::__cdeque_deleter<void *, std::allocator<void *> >::iterator>(std::__cdeque_deleter<void *, std::allocator<void *> >::iterator &first, std::__cdeque_deleter<void *, std::allocator<void *> >::iterator &last, std::__cdeque_deleter<void *, std::allocator<void *> >::iterator &result);
+// (The range insert without common subexpressions eliminated, as the game has it.)
+#pragma opt_common_subs off
+template void std::__cdeque_deleter<void *, std::allocator<void *> >::insert<std::__cdeque_move_iter<std::__cdeque_deleter<void *, std::allocator<void *> >::iterator> >(
+    const std::__cdeque_deleter<void *, std::allocator<void *> >::iterator &pos,
+    std::__cdeque_move_iter<std::__cdeque_deleter<void *, std::allocator<void *> >::iterator> first,
+    std::__cdeque_move_iter<std::__cdeque_deleter<void *, std::allocator<void *> >::iterator> last,
+    Metrowerks::int2type<true>);
+#pragma opt_common_subs reset
+// (Its destructor without common subexpressions eliminated, as the game has it.)
+#pragma opt_common_subs off
 template std::__deque_deleter<M3dTransfer, std::allocator<M3dTransfer> >::~__deque_deleter();
+#pragma opt_common_subs reset
 template std::__deque_deleter<M3dTransfer, std::allocator<M3dTransfer> >::iterator std::__deque_deleter<M3dTransfer, std::allocator<M3dTransfer> >::make_iter(size_t n);
 template void std::__deque_deleter<M3dTransfer, std::allocator<M3dTransfer> >::push_back(const M3dTransfer &x, Metrowerks::int2type<true>);
 template void std::__deque_deleter<M3dTransfer, std::allocator<M3dTransfer> >::erase_front(size_t n, Metrowerks::int2type<true>);

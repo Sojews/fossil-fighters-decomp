@@ -1266,6 +1266,10 @@ void MMultiPlayMessageHub::Execute() {
 
 #pragma auto_inline off
 // Vector instances the game emits in this file (made explicitly until the hub's send code is decompiled).
+// (reallocate_copy_trivial first and on its own: the game's copy has no common subexpressions eliminated.)
+#pragma opt_common_subs off
+template void std::__vec_deleter<char, std::allocator<char> >::reallocate_copy_trivial(size_t n);
+#pragma opt_common_subs reset
 template class std::__vec_deleter<char, std::allocator<char> >;
 template void std::__vec_deleter<MMultiPlayHubIncoming, std::allocator<MMultiPlayHubIncoming> >::sub_push_back(
     const MMultiPlayHubIncoming &x, Metrowerks::int2type<true>);
