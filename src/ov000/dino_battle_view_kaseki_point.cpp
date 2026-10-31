@@ -345,7 +345,7 @@ void DinoBattleViewPlayer::OnMessage(MMessage *msg) {
         if (req->mUnk0C != 0) {
             mSerial.AddTail(((MMessageObserver *)req->mUnk0C)->CreatePostTask(new DinoBattleViewCreatureEndResult()));
         }
-        break;
+        return;
     }
     case 0x10038: {
         DinoBattleViewPlayerUpdateRequest *req = (DinoBattleViewPlayerUpdateRequest *)msg;
@@ -358,7 +358,7 @@ void DinoBattleViewPlayer::OnMessage(MMessage *msg) {
         if (req->mUnk0C != 0) {
             ((MMessageObserver *)req->mUnk0C)->Post(new DinoBattleViewPlayerUpdateResult());
         }
-        break;
+        return;
     }
     case 0x10049: {
         DinoBattleViewPlayerUpdateAbilityIconRequest *req = (DinoBattleViewPlayerUpdateAbilityIconRequest *)msg;

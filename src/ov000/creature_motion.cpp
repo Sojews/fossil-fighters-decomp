@@ -604,12 +604,14 @@ extern "C" const u32 data_0208a274, data_0208a278;    // evolved-into texts (lef
 extern "C" void func_ov000_0218b4dc(DinoBattleViewActionInfoBar *bar, const char *text);
 
 // NONMATCHING
+// (At optimization level 3, as the game was.)
+#pragma optimization_level 3
 void DinoBattleViewCreature::OnMessage(MMessage *msg) {
     switch (msg->mId) {
     case 0x1005F: {
         DinoBattleViewCreatureDamagedUpdateRequest *req = (DinoBattleViewCreatureDamagedUpdateRequest *)msg;
         if (req->mUnk10 != mUnkAC) {
-            break;
+            return;
         }
         if (!(data_ov000_021978d8 & 1)) {
             data_ov000_02193230[0x34 / 4] = data_0208a2a4;
@@ -967,7 +969,7 @@ void DinoBattleViewCreature::OnMessage(MMessage *msg) {
             } else {
                 for (u32 i = 0; i < CountAttacks(); i++) {
                     if (req->mUnk18 == GetAttack(i)) {
-                        index = ((const u8 *)def + def->attackUnk78)[i];
+                        index = ((const u8 *)((u32)def + def->attackUnk78))[i];
                         break;
                     }
                 }
@@ -1125,6 +1127,7 @@ void DinoBattleViewCreature::OnMessage(MMessage *msg) {
         break;
     }
 }
+#pragma optimization_level reset
 
 void DinoBattleViewCreature::HideAll() {
     mStatusIcons->HideIcons();

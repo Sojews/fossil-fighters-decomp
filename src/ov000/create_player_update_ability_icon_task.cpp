@@ -987,7 +987,7 @@ extern "C" void func_ov000_0216c90c(DinoBattleModelCreature *creature, u32 id, B
     MI_CpuFill8(&info, 0, sizeof(info));
     info.id = id;
     info.rank = creature->mUnkFC;
-    const DinoCreatureBody *body = &creature->mStats.body;
+    const DinoCreatureBody *body = (const DinoCreatureBody *)creature->mStats.parts;
     info.levels[4] = ((const DinoCreatureState *)&creature->mStats)->unk0_8;
     for (int i = 0; i < 4; i++) {
         info.bonus[i] = body->parts[i].unk12;
@@ -1586,6 +1586,9 @@ MTask *DinoBattleModelPlayer::CreateLcdFadeTask(BOOL clearIcons) {
 }
 
 // (Pushed through a reference, which gives the game's order for push_back's byte temps under -ipa file.)
+static inline void DinoPushCreature(std::vector<DinoBattleModelCreature *> &v, DinoBattleModelCreature *const &x) {
+    v.push_back(x);
+}
 static inline void DinoPushPtr(std::vector<void *> &v, void *const &x) {
     v.push_back(x);
 }
@@ -2100,7 +2103,7 @@ void DinoBattleModelPlayer::OnMessage(MMessage *msg) {
         DinoBattleModelCreature *creature = new DinoBattleModelCreature(
             mUnkF4, this, sig->mUnk14[0] & 0xFF, NextUnkId(), sig->mUnk10, *(DinoBattleCreatureStats *)sig->mUnk14,
             GetCreatureLevel(*(const DinoCreatureState *)sig->mUnk14), unk2C, unk178);
-        mCreatures.push_back(creature);
+        DinoPushCreature(mCreatures, creature);
         mSubject.AddObserver(creature);
         mParallel.AddTail(creature);
         mUnk130[sig->mUnk10] = creature->GetUnkB4();
@@ -3598,7 +3601,8 @@ extern "C" const u32 data_0208a260, data_0208a25c;     // the special attack's i
 extern "C" const u32 data_0208a304, data_0208a30c, data_0208a310, data_0208a314, data_0208a318, data_0208a31c, data_0208a320, data_0208a324, data_0208a328, data_0208a32c;
 // A creature's ability on a target: the special kinds (status changes, evolution, sacrifices, team effects), a
 // status-only ability, or an attack with its damage; the view is asked to show it and reply gets the result.
-// NONMATCHING
+// NONMATCHING (at optimization level 3, as the game was)
+#pragma optimization_level 3
 extern "C" void func_ov000_02166904(DinoBattleModelPlayer *player, MMessageObserver *reply, u32 side, u32 id,
                                     u32 targetId, u32 index, u8 showName) {
     DinoBattleModelCreature *creature = player->FindCreatureByB4(id);
@@ -3761,7 +3765,7 @@ extern "C" void func_ov000_02166904(DinoBattleModelPlayer *player, MMessageObser
     case 11: {
         std::vector<void *> ids;
         for (u32 i = 0; i < player->GetCreatureCount(); i++) {
-            ids.push_back((void *)player->GetCreature(i)->GetUnkB4());
+            DinoPushPtr(ids, (void *)player->GetCreature(i)->GetUnkB4());
         }
         player->AddAbilitySequence(&player->mSerial, side, ability, id, ids, TRUE);
         player->mSerial.AddTail(new ExecSpecialAttackTask(player, attacker, 11, player->mSacrificedLife),
@@ -4009,6 +4013,7 @@ extern "C" void func_ov000_02166904(DinoBattleModelPlayer *player, MMessageObser
         player->mSerial.AddTail(player->CreateSendAbilityResultTask(reply));
     }
 }
+#pragma optimization_level reset
 
 extern "C" const u32 data_ov000_0218fa94[];    // the opponent's slots a team attack hits, ended by 4
 extern "C" const u32 data_0208a148;            // frames to wait after each target's damage (0: wait for the view)

@@ -185,9 +185,12 @@ public:
 };
 
 
+// (The body's parts and its last word are separate members: the game copies the parts as one block and the
+// last word on its own.)
 struct DinoBattleCreatureStats {
-    u32 state;              // 0x00: a DinoCreatureState
-    DinoCreatureBody body;  // 0x04
+    u32 state;                      // 0x00: a DinoCreatureState
+    DinoCreaturePart parts[4];      // 0x04: a DinoCreatureBody
+    u32 unk14;                      // 0x14
 };
 
 // A creature's status effects.
