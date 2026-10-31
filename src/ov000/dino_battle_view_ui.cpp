@@ -1,3 +1,4 @@
+#pragma ipa file
 // DinoBattleViewUi.
 
 // The game built this file without common-subexpression elimination (loops reload their bounds).
