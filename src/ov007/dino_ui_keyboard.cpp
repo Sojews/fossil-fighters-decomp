@@ -1,5 +1,9 @@
 // DinoUiKeyboard.
 
+// (Built with ipa file: the MPictureFile vector's append_realloc packs its tag bytes as the game's does only then.
+// The callees the game calls out of line are kept from inlining below.)
+#pragma ipa file
+
 // Derived destructors have their bases' destructor bodies inlined; auto-inlining the ones defined above does that.
 #pragma auto_inline on
 
@@ -373,6 +377,7 @@ void DinoUiKeyboardMenuItem::OnDecide() {
 }
 
 // Fades out and leaves.
+#pragma auto_inline off
 void DinoUiSenryuMenu::OnBackDecided() {
     Deactivate();
     mUnk11C->Exit();
@@ -381,6 +386,7 @@ void DinoUiSenryuMenu::OnBackDecided() {
     fade = gLcd->mMain->mBright->CreateFadeOutToBlack(data_020899e8, data_020899d4);
     GetSerial()->AddTail(new MTimer(data_02089a1c), fade, exit);
 }
+#pragma auto_inline on
 
 void DinoUiSenryuMenu::OnFocus(MMenuItem *item) {
     if (item != NULL) {
@@ -628,6 +634,10 @@ extern "C" const MPoint data_ov007_021911f0[][18];
 // Builds the keyboard for a player's name (mode 0) or a team's (mode 1): the name, padded with blanks to its
 // length, a character each, the cursor and the help, then starts loading the keyboard pictures.
 #pragma opt_common_subs off
+// (An explicit specialization, declared here and defined after OnStart, keeps it out of OnStart under ipa and puts
+// it right after OnStart, where the game has it.)
+template <> MTask *MCreateBgCallTask<KasekiPictCache>(KasekiPictCache *obj, void (KasekiPictCache::*func)(), int thread);
+
 void DinoUiKeyboardMenu::OnStart() {
     if (mMode == 0) {
         gLcd->GetTopDisplay()->mObj->Show();
@@ -742,6 +752,12 @@ void DinoUiKeyboardMenu::OnStart() {
     mPictCache = new KasekiPictCache(data_ov007_021911c0[mMode]);
     mParallel.AddTail(mPictCache);
 }
+
+#pragma auto_inline off
+template <> MTask *MCreateBgCallTask<KasekiPictCache>(KasekiPictCache *obj, void (KasekiPictCache::*func)(), int thread) {
+    return new MBgCallTask0<KasekiPictCache>(obj, func, thread);
+}
+#pragma auto_inline on
 #pragma opt_common_subs reset
 
 struct DinoUiKeyboardOkLayout {
@@ -968,8 +984,6 @@ extern "C" void func_ov007_02182020(DinoUiKeyboardMenu *menu) {
 }
 #pragma inline_max_size reset
 
-template MTask *MCreateBgCallTask(KasekiPictCache *obj, void (KasekiPictCache::*func)(), int thread);
-
 MRect DinoUiKeyboardHideMenuItem::GetRect() {
     return GetFrame();
 }
@@ -986,6 +1000,7 @@ MDisplay *DinoUiSenryuListHideMenuItem::GetDisplay() {
     return MProcess::GetDisplay();
 }
 
+#pragma auto_inline off
 MTask *DinoUiKeyboardMenu::CreateSetFocusTask(MMenuItem *item) {
     return new SetFocusTask(this, item);
 }
@@ -993,6 +1008,7 @@ MTask *DinoUiKeyboardMenu::CreateSetFocusTask(MMenuItem *item) {
 MTask *DinoUiKeyboardMenu::CreatePageChangeTask(u32 page) {
     return new PageChangeTask(this, page);
 }
+#pragma auto_inline on
 
 extern const int data_02089ac8, data_02089acc, data_02089ad0;
 
@@ -1200,6 +1216,7 @@ void DinoUiSenryuMenu::OnStart() {
 }
 #pragma opt_common_subs reset
 
+#pragma auto_inline off
 void DinoUiSenryuMenu::CheckKeys() {
     MSerialTaskSet *serial = &mSerial;
     if (serial->IsEmpty()) {
@@ -1214,6 +1231,7 @@ void DinoUiSenryuMenu::CheckKeys() {
         }
     }
 }
+#pragma auto_inline on
 
 extern "C" const MPoint data_ov007_021918cc;      // the back button's place
 extern "C" const char data_ov007_02191e68[];      // ""
@@ -1497,11 +1515,11 @@ void DinoUiSenryuMenu::OnSubMenuChoice(u32 choice, u32 index) {
     }
 }
 
+#pragma auto_inline off
 MTask *DinoUiSenryuMenu::CreateCurChangeTask(u32 cur) {
     return new CurChangeTask(this, cur);
 }
 
-#pragma auto_inline off
 
 DinoUiSenryuMenu::DinoUiSenryuMenu() : MMenu(NULL, 0), mCursor(NULL), mPage(99), mUnk134(99) {
     mPrevArrow = NULL;
