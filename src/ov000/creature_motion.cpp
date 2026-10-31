@@ -639,11 +639,11 @@ void DinoBattleViewCreature::OnMessage(MMessage *msg) {
                 tasks->AddTail(oam);
                 int se = -1;
                 switch (data_ov000_02193254[i].kind) {
-                case 2:
-                    se = req->mUnk21 ? 0x56D : 0x4E;
-                    break;
                 case 3:
                     se = req->mUnk21 ? 0x56D : 0x4D;
+                    break;
+                case 2:
+                    se = req->mUnk21 ? 0x56D : 0x4E;
                     break;
                 case 0:
                     se = 0x50;
@@ -670,8 +670,8 @@ void DinoBattleViewCreature::OnMessage(MMessage *msg) {
                     MTask *show = ((DinoBattleViewLifebar *)mUnkE0)->CreateShowTask();
                     MTask *barCoord = ((DinoBattleViewLifebar *)mUnkE0)->CreateCoordTask(func_ov000_0216f4c0(mUnkB0, 3, unk134));
                     MTask *slide = mMotion->CreateCoordAnime(GetCoord(), pos, 10, -2);
-                    MSerialTaskSet *seq = new MSerialTaskSet(TRUE);
                     MTask *hide = ((DinoBattleViewLifebar *)mUnkE0)->CreateHideTask();
+                    MSerialTaskSet *seq = new MSerialTaskSet(TRUE);
                     seq->AddTail(hide, slide, barCoord, show, setCoord, timer, move, life);
                     together->AddTail(seq);
                     together->AddTail(mark);
@@ -700,7 +700,7 @@ void DinoBattleViewCreature::OnMessage(MMessage *msg) {
         if (req->mUnk0C != 0) {
             mSerial.AddTail(((MMessageObserver *)req->mUnk0C)->CreatePostTask(new DinoBattleViewCreatureDamagedUpdateResult()));
         }
-        break;
+        return;
     }
     case 0x1002F: {
         DinoBattleViewCreatureUpdateRequest *req = (DinoBattleViewCreatureUpdateRequest *)msg;
@@ -750,7 +750,7 @@ void DinoBattleViewCreature::OnMessage(MMessage *msg) {
         if (req->mUnk0C != 0) {
             mSerial.AddTail(((MMessageObserver *)req->mUnk0C)->CreatePostTask(new DinoBattleViewCreatureUpdateResult()));
         }
-        break;
+        return;
     }
     case 0x1005D: {
         DinoBattleViewCreatureTurnBeginSignal *sig = (DinoBattleViewCreatureTurnBeginSignal *)msg;
@@ -770,10 +770,11 @@ void DinoBattleViewCreature::OnMessage(MMessage *msg) {
     case 0x10051: {
         DinoBattleViewCreatureSupportEffectRequest *req = (DinoBattleViewCreatureSupportEffectRequest *)msg;
         if (req->mUnk10 != mUnkAC) {
-            break;
+            return;
         }
         SetUnk118(req->mUnk14);
-        mTasks11C[0]->AddTail(new EffectMotionTask(data_ov000_02193030[1], 2, mMotion->GetPosition(),
+        const char *path = data_ov000_02193030[1];
+        mTasks11C[0]->AddTail(new EffectMotionTask(path, 2, mMotion->GetPosition(),
                                                    ((MSmartOam *)mUnkD8)->GetOffset()));
         MSerialTaskSet *seq = new MSerialTaskSet(TRUE);
         MTask *back = mMotion->CreatePlayTransfer(func_ov000_0216f698(mUnkB4, unk134, mUnk159), 0);
@@ -785,7 +786,7 @@ void DinoBattleViewCreature::OnMessage(MMessage *msg) {
         if (req->mUnk0C != 0) {
             mSerial.AddTail(((MMessageObserver *)req->mUnk0C)->CreatePostTask(new DinoBattleViewCreatureSupportEffectResult()));
         }
-        break;
+        return;
     }
     case 0x10053: {
         DinoBattleViewCreatureMotionEffectRequest *req = (DinoBattleViewCreatureMotionEffectRequest *)msg;
@@ -836,7 +837,7 @@ void DinoBattleViewCreature::OnMessage(MMessage *msg) {
                                                             ((MSmartOam *)mUnkD8)->GetOffset());
             if (keep) {
                 mTasks11C[0]->AddTail(effect);
-            } else if (req->mUnk20 < 0) {
+            } else if ((s32)req->mUnk20 < 0) {   // (a negative delay: wait for the effect itself)
                 mSerial.AddTail(effect);
             } else {
                 mTasks11C[0]->AddTail(effect);
@@ -849,7 +850,7 @@ void DinoBattleViewCreature::OnMessage(MMessage *msg) {
         if (req->mUnk0C != 0) {
             mSerial.AddTail(((MMessageObserver *)req->mUnk0C)->CreatePostTask(new DinoBattleViewCreatureMotionEffectResult()));
         }
-        break;
+        return;
     }
     case 0x10057: {
         DinoBattleViewCreaturePlayMotionRequest *req = (DinoBattleViewCreaturePlayMotionRequest *)msg;
@@ -892,7 +893,7 @@ void DinoBattleViewCreature::OnMessage(MMessage *msg) {
         if (req->mUnk0C != 0) {
             mSerial.AddTail(((MMessageObserver *)req->mUnk0C)->CreatePostTask(new DinoBattleViewPlayerUpdateStateIconResult()));
         }
-        break;
+        return;
     }
     case 0x10048: {
         DinoBattleViewDeleteStatusEffectSignal *sig = (DinoBattleViewDeleteStatusEffectSignal *)msg;
@@ -931,7 +932,7 @@ void DinoBattleViewCreature::OnMessage(MMessage *msg) {
     case 0x10028: {
         DinoBattleViewCreatureCpuArrowUpdateSignal *sig = (DinoBattleViewCreatureCpuArrowUpdateSignal *)msg;
         if (sig->mUnk0C == ((DinoBattleViewPlayer *)mUnkDC)->mUnkA8) {
-            break;
+            return;
         }
         SetAdvantage(((DinoBattleViewPlayer *)mUnkDC)->GetOpponent()->FindCreatureByAC(sig->mUnk10));
         break;
@@ -966,7 +967,7 @@ void DinoBattleViewCreature::OnMessage(MMessage *msg) {
             } else {
                 for (u32 i = 0; i < CountAttacks(); i++) {
                     if (req->mUnk18 == GetAttack(i)) {
-                        index = DinoOffsetPtr<u8>(def, def->attackUnk78)[i];
+                        index = ((const u8 *)def + def->attackUnk78)[i];
                         break;
                     }
                 }
@@ -1028,7 +1029,7 @@ void DinoBattleViewCreature::OnMessage(MMessage *msg) {
         if (req->mUnk0C != 0) {
             mSerial.AddTail(((MMessageObserver *)req->mUnk0C)->CreatePostTask(new DinoBattleViewEvolutionCreatureResult()));
         }
-        break;
+        return;
     }
     case 0x10044: {
         DinoBattleViewCreatureCounterDamageRequest *req = (DinoBattleViewCreatureCounterDamageRequest *)msg;
@@ -1080,7 +1081,7 @@ void DinoBattleViewCreature::OnMessage(MMessage *msg) {
     case 0x1009A: {
         DinoBattleViewCreatureUpdateColorRequest *req = (DinoBattleViewCreatureUpdateColorRequest *)msg;
         if (req->mUnk10 != GetUnkAC()) {
-            break;
+            return;
         }
         mMask148 = req->mUnk14;
         UpdateStatusColor(TRUE);
@@ -1100,14 +1101,16 @@ void DinoBattleViewCreature::OnMessage(MMessage *msg) {
         BOOL own = player->mUnkA8 == player->mView->mUnkE0->unkA8;
         MParallelTaskSet *together = new MParallelTaskSet(TRUE);
         MPoint to;
-        DinoBattleViewLifebar *lifebar = (DinoBattleViewLifebar *)mUnkE0;
         if (req->mUnk10) {
             to = func_ov000_0216f434(mUnkB0, mUnkB4);
-            together->AddTail(lifebar->CreateCoordAnime(lifebar->GetPosition(), func_ov000_0216f600(mUnkB0, mUnkB4), 10, -1));
+            together->AddTail(((DinoBattleViewLifebar *)mUnkE0)
+                                  ->CreateCoordAnime(((DinoBattleViewLifebar *)mUnkE0)->GetPosition(),
+                                                     func_ov000_0216f600(mUnkB0, mUnkB4), 10, -1));
         } else {
             to = func_ov000_0216f320(mUnkB0, mUnkB4, own);
-            together->AddTail(
-                lifebar->CreateCoordAnime(lifebar->GetPosition(), func_ov000_0216f4c0(mUnkB0, mUnkB4, own), 10, -1));
+            together->AddTail(((DinoBattleViewLifebar *)mUnkE0)
+                                  ->CreateCoordAnime(((DinoBattleViewLifebar *)mUnkE0)->GetPosition(),
+                                                     func_ov000_0216f4c0(mUnkB0, mUnkB4, own), 10, -1));
         }
         together->AddTail(func_ov000_0216ff18(this, GetCoord(), to, 10, -1, 0, 0));
         mSerial.AddTail(together);
