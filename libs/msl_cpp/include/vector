@@ -85,7 +85,9 @@ namespace std {
         Allocator *alloc;
     };
 
-    template <class T> inline void __msl_assign(T &d, const T &s, Metrowerks::int2type<true>) {
+    // (The element goes through a stack temp of type T: the game converts each one into a byte and reads it back,
+    // as a volatile copy does.)
+    template <class T> inline void __msl_assign(T &d, volatile T s, Metrowerks::int2type<true>) {
         d = s;
     }
 
@@ -287,11 +289,15 @@ namespace std {
         void init_copy(const T *first, const T *last, Metrowerks::int2type<true>);
         // Fills an empty vector from [first, last) (out of line; the range constructor's work).
         template <class It> void init(It first, It last, Metrowerks::int2type<false>);
-        template <class It> void move_range_at_end(It first, It last) {
-            UnkMSLStruct1 unk = UnkMSLStruct1();
-            for (pointer p = data_ + size_; first != last; ++first, ++p) {
+        // (last comes first: the game copies it first and gives it the lower stack slot.)
+        template <class It> static void move_range(It last, It first, pointer p) {
+            for (; first != last; ++first, ++p) {
                 __msl_assign<T>(*p, *first, Metrowerks::int2type<true>());
             }
+        }
+        template <class It> void move_range_at_end(const It &first, const It &last) {
+            UnkMSLStruct1 unk = UnkMSLStruct1();
+            move_range(last, first, data_ + size_);
         }
         // Copies plain data in one move (an inline of its own, so the length is worked out again).
         static void copy_trivial(const T *first, const T *last, T *dest) {
@@ -390,7 +396,7 @@ namespace std {
         // Moves the old elements around the n inserted at off into the new buffer and frees the old one (out of
         // line; the reallocating insert's tail).
         iterator insert_realloc_finish(pointer old, size_t off, size_t n, size_t old_cap);
-        template <class It> static void copy_range(It first, It last, pointer p) {
+        template <class It> static void copy_range(It first, const It &last, pointer p) {
             for (; first != last; ++first, ++p) {
                 __msl_assign<T>(*p, *first, Metrowerks::int2type<true>());
             }
@@ -437,19 +443,19 @@ namespace std {
         }
         size_t c = cap();
         if ((n <= c && size_ <= c - n) || expand_by(size_ + n - c)) {
-            pointer e = end();
-            size_t tail = e - pos;
+            size_t tail = end() - pos;
+            pointer e = end() + n;
             size_ += n;
-            e += n;
             if (tail != 0) {
-                e = __copy_backward_trivial(e - n - tail, e - n, e);
+                e = __copy_backward_trivial(e - (n + tail), e - n, e);
             }
             copy_range(first, last, e - n);
         } else {
+            size_t off;
             pointer old = data_;
             size_t old_cap = cap();
-            size_t off = pos - old;
-            allocate(grow_by(size_ + n - old_cap));
+            off = pos - old;
+            allocate(size_ + n, grow_by(size_ + n - old_cap));
             copy_range(first, last, data_ + off);
             insert_realloc_finish(old, off, n, old_cap);
         }
