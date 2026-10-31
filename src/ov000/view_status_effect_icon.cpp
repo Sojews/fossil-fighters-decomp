@@ -151,7 +151,7 @@ void DinoBattleViewStatusEffectIcon::SetEffects(int count, const u8 *effects) {
 
     StatusEffectChanges changes = data_ov000_02190040;
     for (int e = 1; e < 12; e++) {
-        int slot = 1;
+        slot = 1;
         switch (e) {
         case 8:
         case 9:
@@ -292,12 +292,15 @@ void DinoBattleViewStatusEffectIcon::SetEffects(int count, const u8 *effects) {
                 mSlots[slot].mIcon->PlayAnime(num + 4 + (flag ? 12 : 0));
                 DinoSoundPlaySe(0x58, 0);
             } else if (changes.mSlots[slot].mEffects & bit) {
-                if (num == 1) {
-                    mSlots[slot].mIcon->PlayAnime((flag ? 12 : 0) + 11);
-                    DinoSoundPlaySe(0x59, 0);
-                } else if (num == 2) {
+                switch (num) {
+                case 2:
                     mSlots[slot].mIcon->PlayAnime((flag ? 12 : 0) + 3);
                     DinoSoundPlaySe(0x59, 0);
+                    break;
+                case 1:
+                    mSlots[slot].mIcon->PlayAnime((flag ? 12 : 0) + 11);
+                    DinoSoundPlaySe(0x59, 0);
+                    break;
                 }
             }
         }
