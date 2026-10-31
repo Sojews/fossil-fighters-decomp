@@ -225,9 +225,9 @@ void MAnmModelBase::TintPalette(u16 color, fx32 amount) {
     if (mResource == NULL) {
         return;
     }
-    u32 plttKey;
     u32 size;
     u8 *palette;
+    u32 plttKey;
     mResource->GetPalette(&plttKey, &palette, &size);
     if (palette == NULL) {
         return;
@@ -237,9 +237,8 @@ void MAnmModelBase::TintPalette(u16 color, fx32 amount) {
     int g = ((color >> 5) & 0x1F) * amount;
     int b = ((color >> 10) & 0x1F) * amount;
     amount = 0x1000 - amount;
-    u16 *src = (u16 *) palette;
     for (u32 i = 0; i < size / 2; i++) {
-        u16 c = src[i];
+        u16 c = ((u16 *) palette)[i];
         int cr = (c & 0x1F) * amount;
         int cg = ((c >> 5) & 0x1F) * amount;
         int cb = (c >> 10) & 0x1F;

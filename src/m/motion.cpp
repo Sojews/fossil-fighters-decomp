@@ -898,9 +898,10 @@ void MMotion::Advance(u32 frames) {
 // NONMATCHING: register allocation (the game keeps this in r4 and the scaled index in r0) and when mCells is reloaded.
 void MMotion::SetCellOffset(int cell, int x, int y) {
     mCells[cell].unk14 = MPoint(x, y);
-    int oy = mCells[cell].unk14.y;
-    int ox = mCells[cell].unk14.x;
-    MSmartOamCell *entry = &mEntries[mCells[cell].entry];
+    const MPoint &off = mCells[cell].unk14;
+    int oy = off.y;
+    int ox = off.x;
+    MSmartOamCell *entry = GetCellEntry(cell);
     if (mUnk2B || mUnk2C) {
         int shape = entry->GetShape();
         int w = gObjSizes[0][shape].x;
@@ -983,7 +984,7 @@ static inline void SetEntryMode(MSmartOamCell *entry, int mode) {
 }
 
 void MMotion::ShowCell(int cell) {
-    mCells[(u32) cell].visible = TRUE;
+    mCells[cell].visible = TRUE;
     if (!mHidden) {
         SetEntryMode(GetCellEntry(cell), mCells[cell].objMode);
     }
@@ -1026,7 +1027,7 @@ void MMotion::SetCellAttr(int cell, int attr) {
     }
     if (!mHidden && mCells[cell].visible) {
         int mode = mCells[cell].objMode;
-        MSmartOamCell *entry = &mEntries[mCells[cell].entry];
+        MSmartOamCell *entry = GetCellEntry(cell);
         entry->objMode = mode;
         if (mode != 3) {
             int shape = entry->GetShape();
@@ -1038,14 +1039,16 @@ void MMotion::SetCellAttr(int cell, int attr) {
             entry->height = gObjSizes[0][shape].y * 2;
         }
     }
-    entry = &mEntries[mCells[(u32) cell].entry];
-    int ox = mCells[cell].unk14.x;
-    int oy = mCells[cell].unk14.y;
+    entry = GetCellEntry((u32) cell);
+    MMotionCell &c = mCells[cell];
+    const MPoint &off = c.unk14;
+    int ox = off.x;
+    int oy = off.y;
     if (mUnk2B || mUnk2C) {
         int shape = entry->GetShape();
         int w = gObjSizes[0][shape].x;
         h = gObjSizes[0][shape].y;
-        if (mCells[cell].objMode == 3) {
+        if (c.objMode == 3) {
             w *= 2;
             h *= 2;
         }
@@ -1104,7 +1107,7 @@ void MMotion::SetCellChr(int cell, u32 chr) {
         entry->SetChr(mChrs[chr]);
         entry->SetShape(data->extPalette);
     }
-    entry = &mEntries[c.entry];
+    entry = GetCellEntry(cell);
     int oy = c.unk14.y;
     if (mUnk2B || mUnk2C) {
         int shape = entry->GetShape();

@@ -177,7 +177,7 @@ public:
     void SetOverride(BOOL off);
     void SetPosition(int x, int y);
     MRect GetCellRect(u32 cell);
-    MSmartOamCell *GetCellEntry(int cell) { return &mEntries[mCells[cell].entry]; }
+    MSmartOamCell *GetCellEntry(int cell) const { return &mEntries[mCells[cell].entry]; }
     void SetCellOffset(int cell, int x, int y);
     void SetCellOffsetY(int cell, int y);
     void Command(const char *data, int length);
