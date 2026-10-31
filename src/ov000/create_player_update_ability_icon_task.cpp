@@ -1776,7 +1776,7 @@ u32 DinoBattleModelPlayer::NextUnkId() {
 }
 
 extern "C" void func_ov000_02166904(DinoBattleModelPlayer *player, MMessageObserver *reply, u32 side, u32 id,
-                                    u32 targetId, u32 attack, u32 unk);
+                                    u32 targetId, u32 attack, u8 unk);
 extern "C" void func_ov000_021661b4(DinoBattleModelPlayer *player, MMessageObserver *reply, MMessage *msg, u32 id,
                                     u32 otherId);
 extern "C" const u32 data_0208a290, data_0208a28c;  // the confusion's info bar texts (ours, theirs)
@@ -2032,6 +2032,11 @@ extern "C" const u32 data_0208a2b8[], data_0208a2b4;
 extern "C" const u32 data_0208a2bc, data_0208a2e0;   // (data_0208a2b8[1] and data_0208a2dc[1], which the game reaches by their own addresses)  // info bar texts (the first two: the cure's, ours and theirs)
 u8 DinoAttackHasUnk10Flag(u32 id);
 
+// The player's most kaseki points.
+static inline u32 DinoPlayerMaxKasekiPoints(DinoBattleModelPlayer *player) {
+    return player->mKpLevel.maxPoints;
+}
+
 // NONMATCHING
 void DinoBattleModelPlayer::OnMessage(MMessage *msg) {
     switch (msg->mId) {
@@ -2067,7 +2072,8 @@ void DinoBattleModelPlayer::OnMessage(MMessage *msg) {
         if (sig->mUnk34) {
             SetUnk15C();
         }
-        mUnkF4->Post(new DinoBattleViewPlayerBeginSignal(mUnkB8, sig->mUnk14, mKpLevel.maxPoints, sig->mUnk30, sig->mUnk34));
+        mUnkF4->Post(new DinoBattleViewPlayerBeginSignal(mUnkB8, sig->mUnk14, DinoPlayerMaxKasekiPoints(this), sig->mUnk30,
+                                                         sig->mUnk34));
         SendUpdateRequest(0);
         break;
     }
@@ -3578,13 +3584,16 @@ extern "C" void func_ov000_0216831c(DinoBattleModelPlayer *player, MMessageObser
 extern "C" MFx32 func_ov000_0216e4c0(DinoBattleModelCreature *creature, DinoBattleModelCreature *target);
 extern "C" const u32 data_0208a260, data_0208a25c;     // the special attack's info bar texts (ours, theirs)
 
+// (The debug log formats, which the game reaches by their own addresses.)
+extern "C" const u32 data_0208a304, data_0208a30c, data_0208a310, data_0208a314, data_0208a318, data_0208a31c, data_0208a320, data_0208a324, data_0208a328, data_0208a32c;
 // A creature's ability on a target: the special kinds (status changes, evolution, sacrifices, team effects), a
 // status-only ability, or an attack with its damage; the view is asked to show it and reply gets the result.
 // NONMATCHING
 extern "C" void func_ov000_02166904(DinoBattleModelPlayer *player, MMessageObserver *reply, u32 side, u32 id,
-                                    u32 targetId, u32 index, u32 showName) {
+                                    u32 targetId, u32 index, u8 showName) {
     DinoBattleModelCreature *creature = player->FindCreatureByB4(id);
-    u32 attack = index >= creature->CountAttacks() ? creature->GetSpecialAttack() : creature->GetAttack(index, NULL);
+    const u32 attackIndex = index;
+    u32 attack = attackIndex >= creature->CountAttacks() ? creature->GetSpecialAttack() : creature->GetAttack(attackIndex, NULL);
     const DinoAttackDef *attackDef = gDinoResource->GetAttackDef(attack);
     if (*DinoOffsetPtr<u8>(attackDef, attackDef->unk14) == 3) {
         func_ov000_0216831c(player, reply, side, id, index, attack, showName);
@@ -3607,11 +3616,11 @@ extern "C" void func_ov000_02166904(DinoBattleModelPlayer *player, MMessageObser
     u8 special = FALSE;
     BOOL team = FALSE;
     u32 ability;
-    if (index >= attacker->CountAttacks()) {
+    if (attackIndex >= attacker->CountAttacks()) {
         ability = attacker->GetSpecialAttack();
         special = TRUE;
     } else {
-        ability = attacker->GetAttack(index, NULL);
+        ability = attacker->GetAttack(attackIndex, NULL);
     }
     if (showName) {
         player->mSerial.AddTail(
@@ -3623,7 +3632,7 @@ extern "C" void func_ov000_02166904(DinoBattleModelPlayer *player, MMessageObser
     u32 hits = def->hitCount;
     const u16 *cost = DinoOffsetPtr<u16>(def, def->cost);
     char text[0x100];
-    sprintf(text, gDinoResource->GetText(data_0208a300[1]), hits);
+    sprintf(text, gDinoResource->GetText(data_0208a304), hits);
     data_ov000_021978c0->Print(text);
     if (attacker->GetStatus()->flags & 0x40) {
         player->SetUnk124(player->GetUnk124() | 2);
@@ -3830,22 +3839,22 @@ extern "C" void func_ov000_02166904(DinoBattleModelPlayer *player, MMessageObser
             MFx32 chanceRatio = func_ov000_0216e650(attacker, target);
             MFx32 chance = attacker->CurveRatio(chanceBase, chanceRatio);
             char text1[0x100];
-            sprintf(text1, gDinoResource->GetText(data_0208a300[11]), DinoFxToFloat(ratio));
+            sprintf(text1, gDinoResource->GetText(data_0208a32c), DinoFxToFloat(ratio));
             data_ov000_021978c0->Print(text1);
             char text2[0x100];
-            sprintf(text2, gDinoResource->GetText(data_0208a300[10]), DinoFxToFloat(defense));
+            sprintf(text2, gDinoResource->GetText(data_0208a328), DinoFxToFloat(defense));
             data_ov000_021978c0->Print(text2);
             char text3[0x100];
-            sprintf(text3, gDinoResource->GetText(data_0208a300[9]), DinoFxToFloat(hit));
+            sprintf(text3, gDinoResource->GetText(data_0208a324), DinoFxToFloat(hit));
             data_ov000_021978c0->Print(text3);
             char text4[0x100];
-            sprintf(text4, gDinoResource->GetText(data_0208a300[8]), DinoFxToFloat(chanceBase));
+            sprintf(text4, gDinoResource->GetText(data_0208a320), DinoFxToFloat(chanceBase));
             data_ov000_021978c0->Print(text4);
             char text5[0x100];
-            sprintf(text5, gDinoResource->GetText(data_0208a300[7]), DinoFxToFloat(chanceRatio));
+            sprintf(text5, gDinoResource->GetText(data_0208a31c), DinoFxToFloat(chanceRatio));
             data_ov000_021978c0->Print(text5);
             char text6[0x100];
-            sprintf(text6, gDinoResource->GetText(data_0208a300[6]), DinoFxToFloat(chance));
+            sprintf(text6, gDinoResource->GetText(data_0208a318), DinoFxToFloat(chance));
             data_ov000_021978c0->Print(text6);
             MFx32 critical;
             MFx32 affinity;
@@ -3874,15 +3883,15 @@ extern "C" void func_ov000_02166904(DinoBattleModelPlayer *player, MMessageObser
             MFx32 base;
             if (!result[1]) {
                 base = attacker->CalcDamage(target, MFx32(cost[1]), hit, &result[0]);
-                u32 damageText = data_0208a300[3];
+                u32 damageText = data_0208a30c;
                 char text7[0x100];
                 sprintf(text7, gDinoResource->GetText(damageText), DinoFxToFloat(base));
                 data_ov000_021978c0->Print(text7);
                 char text8[0x100];
-                sprintf(text8, gDinoResource->GetText(data_0208a300[5]), DinoFxToFloat(critical));
+                sprintf(text8, gDinoResource->GetText(data_0208a314), DinoFxToFloat(critical));
                 data_ov000_021978c0->Print(text8);
                 char text9[0x100];
-                sprintf(text9, gDinoResource->GetText(data_0208a300[4]), DinoFxToFloat(affinity));
+                sprintf(text9, gDinoResource->GetText(data_0208a310), DinoFxToFloat(affinity));
                 data_ov000_021978c0->Print(text9);
                 base = attacker->ApplyPositionRatio(attacker->ApplyRatio2(attacker->ApplyRatio(base, critical), affinity),
                                                     target->GetB8Category());
@@ -3952,7 +3961,7 @@ extern "C" void func_ov000_02166904(DinoBattleModelPlayer *player, MMessageObser
         ids[0] = id;
         int shown;
         if (team) {
-            if (index >= attacker->CountAttacks()) {
+            if (attackIndex >= attacker->CountAttacks()) {
                 shown = 0;
                 for (int s = 0; s < 2; s++) {
                     DinoBattleModelPlayer *p = s ? player->mOpponent : player;
