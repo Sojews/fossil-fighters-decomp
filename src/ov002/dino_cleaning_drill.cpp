@@ -274,7 +274,7 @@ void DinoCleaningDrill::Unk20() {
         mPrevTouch = touch;
         mPrevCell = cell;
         scale = sDrillPool.mForce;
-        const MFx32 &force = power * scale;
+        const MFx32 &force = scale * power;
         DinoCleaningKasekiRock *rock = GetCleaning()->GetKasekiRock();
         if (!rock->IsCellClear(cell.x, cell.y) && !rock->GetUnk4B8() &&
             !(GetCleaning()->mUnkAC == 1 && rock->GetCellLayer(cell.x, cell.y) == 6)) {
