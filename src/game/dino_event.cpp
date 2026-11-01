@@ -247,7 +247,7 @@ void DinoEventLoop::Start() {
     mState = data_020bd9d0.StateRun_20;
 }
 
-// NONMATCHING: ours reloads the iterator for the copy it passes ProcessEpisode (the game reuses the one it compared).
+// (The copy ProcessEpisode gets is built from the node pointer, which reuses the value the loop test loaded.)
 void DinoEventLoop::StateRun() {
     u32 type = mRequest->type;
     if (type == 3) {
@@ -288,7 +288,7 @@ void DinoEventLoop::StateRun() {
         return;
     }
     for (std::map<u32, DinoEventEpisode>::iterator it = mEpisodeFiles.begin(); it != mEpisodeFiles.end(); ++it) {
-        if (ProcessEpisode(std::map<u32, DinoEventEpisode>::iterator(it))) {
+        if (ProcessEpisode(std::map<u32, DinoEventEpisode>::iterator(it.node_))) {
             mRequest->type = 0;
             mControlResult->unk08 = 0;
             return;
@@ -355,7 +355,7 @@ static inline DinoEventVar DinoEventPackedVar(u32 packed) {
 
 // Whether an event condition holds: the field's request, an episode cleared, variables against each other or
 // values, characters met, creatures revived, flags and clears, a full container, a creature in the team.
-// NONMATCHING: in the team case the game loads the argument inside the loop (ours hoists it).
+// (In the team case the game reloads the argument on every pass, which a volatile read reproduces.)
 BOOL DinoEventLoop::CheckCondition(const u8 *data) {
     const DinoEventCondition *condition = (const DinoEventCondition *)data;
     switch (condition->type) {
@@ -551,7 +551,7 @@ BOOL DinoEventLoop::CheckCondition(const u8 *data) {
         DinoTeam team;
         gDinoBackup->GetTeam(gDinoBackup->GetUnk34_26(), &team);
         for (u32 i = 0; i < 5; i++) {
-            if (team.slots[i] == condition->GetArgs()[0]) {
+            if (team.slots[i] == *(volatile const u32 *)condition->GetArgs()) {
                 return TRUE;
             }
         }

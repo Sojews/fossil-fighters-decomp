@@ -975,9 +975,12 @@ extern "C" const char data_020bff48[]; // ""
 
 extern "C" const u32 data_0208adac, data_0208adb0; // the help for the donation and money panels
 
+// The loop's field, through an inline (an inline-call argument is evaluated ahead of the others).
+static inline DinoField *DinoEventFieldOf(DinoEventLoop *event) { return event->GetField(); }
+
 // Asks with the text's lines as choices, in a menu or under a talk window's question, and keeps the answer in a local
 // variable.
-// NONMATCHING: the game gets the field (for a panel's frame) before the bottom display, and swaps r4/r5 for the window.
+// (The panels' field comes through an inline, so it is fetched before the bottom display, as in the game.)
 void DinoEventExecChoice::Idle() {
     switch (mStep++) {
     case 0:
@@ -1001,11 +1004,11 @@ void DinoEventExecChoice::Idle() {
                                  std::string(gDinoResource->GetText(mUnk8C)));
             }
             if (mEvent->GetField()->mMoney) {
-                window->AddEntry((u32)gLcd->GetBottomDisplay(), mEvent->GetField()->mMoney->GetFrame(),
+                window->AddEntry((u32)gLcd->GetBottomDisplay(), DinoEventFieldOf(mEvent)->mMoney->GetFrame(),
                                  std::string(gDinoResource->GetText(data_0208adb0)));
             }
             if (mEvent->GetField()->mDonate) {
-                window->AddEntry((u32)gLcd->GetBottomDisplay(), mEvent->GetField()->mDonate->GetFrame(),
+                window->AddEntry((u32)gLcd->GetBottomDisplay(), DinoEventFieldOf(mEvent)->mDonate->GetFrame(),
                                  std::string(gDinoResource->GetText(data_0208adac)));
             }
             mSerial.AddTail(window);
@@ -3041,8 +3044,8 @@ struct DinoWarpDefs {
     MFx32 unk24;
 };
 
-// NONMATCHING: the game spills tasks, the move, the wait and the angle in the opposite order and stores the 10 and 2
-// before it takes the length.
+// NONMATCHING: the game spills tasks, the move, the wait and the angle in the opposite order, and keeps the 10, the 2
+// and the length as temporaries (its frame is 8 bytes larger).
 void DinoEventExecAutoWarp::StateArrive() {
     if ((mNewBgm != 0 && mScene != mNewScene) || mBgm != mNewBgm) {
         DinoSoundLoadScene(mNewScene);
@@ -3071,8 +3074,11 @@ void DinoEventExecAutoWarp::StateArrive() {
             offset += step;
         } while (((DinoFieldMapArea *)mEvent->GetField()->GetMap()->GetArea(pos + offset))->id == area->id);
         MTask *wait = mEvent->GetField()->CreateCharaWaitMoveTask(mEvent->GetField()->GetCamera()->GetFocus());
+        MFx32 ten(10);
+        MFx32 two(2);
+        MFx32 len = offset.Length();
         MTask *move = mEvent->GetField()->CreateCharaMoveOffsetTask(
-            mEvent->GetField()->GetCamera()->GetFocus(), offset, MFx32ToInt(offset.Length() / MFx32(2) * MFx32(10)),
+            mEvent->GetField()->GetCamera()->GetFocus(), offset, MFx32ToInt(len / two * ten),
             0, 0);
         MTimer *timer = new MTimer(10);
         MTask *turn = mEvent->GetField()->CreateCharaAngleTask(mEvent->GetField()->GetCamera()->GetFocus(), angle, 1, 0);
