@@ -227,7 +227,11 @@ static inline void DinoDancePush(std::vector<MTask *> &v, DinoFieldChara *const 
     v.push_back((MTask *const &)chara);
 }
 
-// NONMATCHING: the game spills the time digits loop's &mParallel to the lowest slot (ours, the highest).
+// (A non-member inline: the digit loop's &mParallel takes the game's spill slot.)
+static inline MTaskSet *DinoDanceParallel(DinoFieldDance *dance) {
+    return &dance->mParallel;
+}
+
 // Sets the dance up: its dancers, the time display and a blinking start.
 void DinoFieldDance::Start() {
     mFont = new DinoCommonFont(0, 0, 0);
@@ -247,12 +251,13 @@ void DinoFieldDance::Start() {
     mInput = hub->GetInput(0);
     mOam = new MSmartOam(gLcd->GetBottomDisplay(), 5, 0, 1);
     for (u32 i = 0; i < 4; i++) {
+        MTaskSet *parallel = DinoDanceParallel(this);
         mTimeDigits[i] = new MMotion(std::string(data_ov001_0216a814.mDigitPath), mOam, 0, 1);
         mTimeDigits[i]->SetPriority(2);
         mTimeDigits[i]->SetAnchor(1);
         mTimeDigits[i]->SetPosition(data_ov001_0216a860[i] + MPoint(128, 96));
         mTimeDigits[i]->Show();
-        mParallel.AddTail(mTimeDigits[i]);
+        parallel->AddTail(mTimeDigits[i]);
     }
     mParallel.AddTail(mOam);
     mUnkDC = new MSerialTaskSet;

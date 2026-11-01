@@ -5,7 +5,7 @@
 // NONMATCHING: the constructors of DinoUiFieldMenuNumber, DinoUiFieldMenuFraction4 and DinoUiPartsTeamTech (the game
 // keeps this + i * 4 in a stack slot across the first string temporary's destructor), DinoUiFieldMenuNumber3,
 // DinoUiPartsNumber8, DinoUiPartsReviverName, DinoUiPartsRockName and DinoUiPartsTeamIndicator (the game loads
-// gCurrentDisplay after copying the canvas size) and DinoUiPartsKasekiButton::Setup (four stack slots in another order).
+// gCurrentDisplay after copying the canvas size).
 
 // Derived destructors have their bases' destructor bodies inlined; auto-inlining the ones defined above does that.
 #pragma auto_inline on
@@ -567,6 +567,11 @@ DinoUiPartsKasekiButton::DinoUiPartsKasekiButton(MSmartOam *oam, MPoint pos, Din
     SetMode(2);
 }
 
+// (A non-member inline: the level loop's &mParallel takes the game's spill slot.)
+static inline MTaskSet *DinoKasekiButtonParallel(DinoUiPartsKasekiButton *button) {
+    return &button->mParallel;
+}
+
 void DinoUiPartsKasekiButton::Setup(MSmartOam *oam, DinoKasekiButtonInfo info) {
     mMotion = new MMotion(std::string(data_ov003_02161028[info.icon % 30]), oam, 2, 1);
     mMotion->Play(info.color + 1, 0);
@@ -591,7 +596,7 @@ void DinoUiPartsKasekiButton::Setup(MSmartOam *oam, DinoKasekiButtonInfo info) {
     u8 type = info.type;
     if (type == 3 || ((type == 1 || type == 2) && info.level >= 125)) {
         mBadge = new MMotion(std::string(data_ov003_02160c60[26]), oam, 0, 1);
-        if (type == 3) {
+        if (info.type == 3) {  // (re-read: one use fewer for the type local, which the game spills first)
             mBadge->Play(3, 0);
         } else {
             mBadge->Play(4, 0);
@@ -603,12 +608,13 @@ void DinoUiPartsKasekiButton::Setup(MSmartOam *oam, DinoKasekiButtonInfo info) {
         mParallel.AddTail(mBadge);
     } else if (type == 1 || type == 2 || type == 5) {
         for (int i = 0; i < 4; i++) {
+            MTaskSet *parallel = DinoKasekiButtonParallel(this);
             mLevel[i] = new MMotion(std::string(data_ov003_02160c60[6]), oam, 0, 1);
             mLevel[i]->SetPosition(mPos.Offset(i * 8 - 14, 16));
             mLevel[i]->SetPriority(2);
             mLevel[i]->GetUnit()->SetMode(1);
             mLevel[i]->Show();
-            mParallel.AddTail(mLevel[i]);
+            parallel->AddTail(mLevel[i]);
         }
         mLevel[3]->SetPosition(MPoint(mPos.x + 9, mPos.y + 15));
         int level = info.level;
