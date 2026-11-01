@@ -156,7 +156,7 @@ void DinoCommonWindowMenu::OnStart() {
             cancel = TRUE;
         }
         text = mChoices[i].unk04;
-        name = mChoices[i].unk10;
+        name = mChoices[(u32) i].unk10;
         if (text.size() != 0 && text[0] == '*') {
             cancel = TRUE;
             text = text.substr(1);

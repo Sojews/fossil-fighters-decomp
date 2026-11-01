@@ -3062,7 +3062,7 @@ void DinoEventExecAutoWarp::StateArrive() {
         tasks->AddTail(new DinoEventExecFade(mEvent, 4, 30, 1));
         break;
     }
-    u32 angle = area->exitAngle;
+    int angle = area->exitAngle;
     if (angle != (u32)-1) {
         const DinoWarpDefs *defs = (const DinoWarpDefs *)gDinoResource->GetExcavate78();
         MFx32 walk = mEvent->GetField()->GetMap()->GetWalkSpeed();
