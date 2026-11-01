@@ -135,7 +135,7 @@ extern "C" void func_ov002_02158b74(DinoCleaningImageLayer *layer, MPalUnit *blo
             for (int py = rect.top; py < rect.bottom; py++) {
                 rows[py - rect.top] = 0;
                 for (int px = rect.left; px < rect.right; px++) {
-                    if (*shape++ && layer->mUnk1C[px + py * 0x100]) {
+                    if (*shape++ && layer->mUnk1C[(u32)(px + py * 0x100)]) {
                         rows[py - rect.top] |= 1 << (px - rect.left);
                         layer->mHard[x][y] = 0;
                         count++;
@@ -272,7 +272,12 @@ void DinoCleaningImage::LoadPalettes(MPalUnit *block, u32 start) {
 }
 
 
-// NONMATCHING: 81%, the game recomputes the layer cell index for every layer (strength-reducing only the mask row).
+// (Through int-indexed accessors, so the cell index is recomputed per row instead of strength-reduced.)
+static inline u8 DinoLayerHard(const DinoCleaningImageLayer *layer, int row, int col) { return layer->mHard[row][col]; }
+static inline u8 DinoLayerCells(const DinoCleaningImageLayer *layer, int row, int col) { return layer->mCells410[row][col]; }
+
+// NONMATCHING: 99.2%, the first mask loop's iterator, end and mask pointer take other registers.
+// A layer counts toward the grid when its cell is breakable; only the uncovered ones count as left.
 void DinoCleaningImage::Build(u32 arg, u32 start) {
     mUnk08 = TRUE;
     std::vector<DinoCleaningImageLayer *>::iterator it;
@@ -286,7 +291,7 @@ void DinoCleaningImage::Build(u32 arg, u32 start) {
         for (u32 row = 0; row < 36; row++) {
             mMask[row][col] = TRUE;
             for (it = mLayers.begin(); it != mLayers.end(); ++it) {
-                if ((*it)->mHard[row][col] == 0) {
+                if (DinoLayerHard(*it, row, col) == 0) {
                     mMask[row][col] = FALSE;
                     break;
                 }
@@ -301,9 +306,11 @@ void DinoCleaningImage::Build(u32 arg, u32 start) {
             } else {
                 int top = 0;
                 for (it = mLayers.begin(); it != mLayers.end(); ++it) {
-                    if ((*it)->mHard[row][col] == 0 && (*it)->mCells410[row][col] == 0) {
+                    if (DinoLayerHard(*it, row, col) == 0) {
                         top = it.ptr_ - mLayers.begin().ptr_;
-                        mUnk13FC++;
+                        if (DinoLayerCells(*it, row, col) == 0) {
+                            mUnk13FC++;
+                        }
                     }
                 }
                 mGrid[row][col] = top;
@@ -312,6 +319,7 @@ void DinoCleaningImage::Build(u32 arg, u32 start) {
     }
     mUnk1400 = mUnk13FC;
 }
+
 
 void DinoCleaningImage::PlayLayerSounds() {
     for (std::vector<DinoCleaningImageLayer *>::iterator it = mLayers.begin(); it != mLayers.end(); ++it) {

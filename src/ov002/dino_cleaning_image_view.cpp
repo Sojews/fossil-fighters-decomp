@@ -146,7 +146,9 @@ void DinoCleaningImage::SetCellLayer(int row, int col, u32 layer) {
     }
 }
 
-// NONMATCHING: 99.9%, the offset point and SetOffset's copy of it swap stack slots.
+// Moves the screen down a line. (The offset point is built inside the inline, which gives the game's temp slots.)
+static inline void DinoOffsetScreen(MIndexBitmap *screen) { screen->SetOffset(MPoint(0, 1)); }
+
 void DinoCleaningImageView::CreateScreen() {
     std::vector<DinoCleaningImage *>::iterator it;
     u32 count = 0;
@@ -157,7 +159,7 @@ void DinoCleaningImageView::CreateScreen() {
     mPal = bg->mPal->Alloc(count, NULL, TRUE);
     MIndexBitmap *screen = bg->CreateIndexBitmap(1, TRUE);
     mScreen = screen;
-    screen->SetOffset(MPoint(0, 1));
+    DinoOffsetScreen(screen);
     u32 start = 0;
     for (it = mImages.begin(); it != mImages.end(); ++it) {
         (*it)->Build((u32)mPal, start);
@@ -248,7 +250,6 @@ inline void DinoCleaningImageView::Assign(const DinoCleaningImageView &src) {
     mPalTasks = src.mPalTasks;
 }
 
-// NONMATCHING: scheduling, the game stores the offset and rect temporaries in another order.
 DinoCleaningImageView::DinoCleaningImageView(const DinoCleaningImageView &other) : mMotion(other.mMotion) {
     Assign(other);
     mKeepPal = TRUE;
@@ -263,7 +264,7 @@ DinoCleaningImageView::DinoCleaningImageView(const DinoCleaningImageView &other)
     }
     MIndexBitmap *screen = mDisplay->mBg->CreateIndexBitmap(1, TRUE);
     mScreen = screen;
-    screen->SetOffset(MPoint(0, 1));
+    DinoOffsetScreen(screen);
     ((MIndexBitmap *)mScreen)->Fill(MRect(0, 0, 256, 256), 0);
 }
 
@@ -290,16 +291,20 @@ static inline u32 DinoCleaningRand(u32 *seed) {
     return *seed;
 }
 
+// The unit vector at angle.
+static inline MFx32Point DinoDirection(u16 angle) {
+    return MFx32Point(MFx32::FromRaw(FX_CosIdx(angle)), MFx32::FromRaw(FX_SinIdx(angle)));
+}
+
 // The point in fixed point.
 static inline MFx32Point DinoToFx(MPoint p) {
     return MFx32Point(MFx32(p.x), MFx32(p.y));
 }
 
 // Brushes a bit of dust off at pos, flying a random distance in a random direction.
-// NONMATCHING: 88.6%, the game truncates the angle to 16 bits twice, adds the end point's y before its x and keeps
-// the height in a register.
+// NONMATCHING: 92.7%, the game keeps the height in a register and adds the end point's y before its x.
 extern "C" void func_ov002_0215a4fc(DinoCleaningImageView *view, MPoint pos) {
-    u16 angle = DinoCleaningRand(view->mSeed);
+    u16 angle = (int)(u16)DinoCleaningRand(view->mSeed);  // (truncated twice, as the game does)
     MFx32Point move = MFx32Point(MFx32::FromRaw(FX_CosIdx(angle)), MFx32::FromRaw(FX_SinIdx(angle))) *
                       MFx32((int)((DinoCleaningRand(view->mSeed) & 0x7FFFFFFF) % 40));
     MFx32 height = MFx32((int)((DinoCleaningRand(view->mSeed) & 0x7FFFFFFF) % 10));
@@ -358,7 +363,7 @@ inline DinoCleaningLastDust::DinoCleaningLastDust(DinoCleaningImageView *view, M
 }
 
 // Takes up to 20 random bits of dirt off (a cell keeps mMinDirt), the first 6 flying off away from the dirt's centre.
-// NONMATCHING: 84%, the frame is 16 bytes smaller (the game keeps more temporaries) and registers differ.
+// NONMATCHING: 87.9%, the frame is 16 bytes smaller (the game keeps more temporaries) and registers differ.
 extern "C" void func_ov002_0215a7b4(DinoCleaningImageView *view) {
     std::vector<DinoCleaningStatusEntry>::iterator it;
     DinoCleaningStatusEntry cell;
@@ -406,9 +411,8 @@ extern "C" void func_ov002_0215a7b4(DinoCleaningImageView *view) {
             MPoint e = DinoPointSub(*(const MPoint *)&cell, data_ov002_021646e4.mCellOrigin);
             from = DinoToFx(MPoint(e.x * 8 + (e.y & 1) * 4, e.y * 8));
             away = from - centre;
-            u16 angle = FX_Atan2Idx(away.y.v, away.x.v) + (DinoCleaningRand(view->mSeed) & 0x3FFF) - 0x2000;
-            to = from + MFx32Point(MFx32::FromRaw(FX_CosIdx(angle)) * MFx32(50),
-                                   MFx32::FromRaw(FX_SinIdx(angle)) * MFx32(50));
+            u16 spread = DinoCleaningRand(view->mSeed) & 0x3FFF;
+            to = from + DinoDirection(FX_Atan2Idx(away.y.v, away.x.v) + spread - 0x2000) * MFx32(50);
             view->mOamTasks->AddHead(new DinoCleaningLastDust(view, from, to, view->mOam));
         }
     }
