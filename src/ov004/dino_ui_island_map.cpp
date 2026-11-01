@@ -468,7 +468,6 @@ extern "C" const struct {
 extern "C" const MPoint data_ov004_02175a44, data_ov004_02175a5c, data_ov004_02175a64, data_ov004_02175a74;
 
 // Fades the top screen in, follows the scroll, then narrows the spotlight while the name plate and marker come in.
-// NONMATCHING: the last centre's x and y load in the other order.
 void SpotMove::Idle() {
     if (mFrame <= 3) {
         gLcd->mMain->mBlend->SetBrightness((3 - mFrame) * 2);
@@ -519,7 +518,7 @@ void SpotMove::Idle() {
         mName->SetPosition(name);
         MPoint mark(mMarkMove->mValue.x, mMarkMove->mValue.y);
         mMark->SetPosition(mark);
-        MPoint font(mMarkMove->mValue.x, mMarkMove->mValue.y);
+        MPoint font = mMarkMove->GetValue();
         mFont->SetCenter(font);
     }
     mFrame++;
