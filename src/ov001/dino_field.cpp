@@ -1548,16 +1548,19 @@ void DinoField::Idle() {
     }
 }
 
-// NONMATCHING (and WalkOnLand1): the game keeps the run test even with run 0 (movs r2, #0; bne).
+// NONMATCHING (and WalkOnLand1): the run argument is the tested water byte (the game's run test reuses the
+// byte's compare flags), but the game re-materializes it as `movs r2, #0` where ours keeps the loaded register.
 void DinoField::WalkOnLand0(u32 dir, u32 run) {
-    if (mMap->GetMapData()[0x68] == 0) {
-        Walk(dir, 0, &mSteps[0], 3, 10, 6, 5, 1);
+    u8 water = mMap->GetMapData()[0x68];
+    if (water == 0) {
+        Walk(dir, water, &mSteps[0], 3, 10, 6, 5, 1);
     }
 }
 
 void DinoField::WalkOnLand1(u32 dir, u32 run) {
-    if (mMap->GetMapData()[0x68] == 0) {
-        Walk(dir, 0, &mSteps[1], 3, 7, 6, 3, 2);
+    u8 water = mMap->GetMapData()[0x68];
+    if (water == 0) {
+        Walk(dir, water, &mSteps[1], 3, 7, 6, 3, 2);
     }
 }
 
