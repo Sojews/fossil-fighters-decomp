@@ -1801,12 +1801,12 @@ template MTask *MCreateCallTask(DinoUiBattleParentScanner *obj, void (MMessageOb
 
 // The file's static initialization (see dino_static_init.h).
 extern "C" u32 data_ov004_021744d0[];
-// NONMATCHING: register choice/scheduling of the pooled stores.
+// The first three are plain (non-volatile) stores, which lets the scheduler move the 0x7c store after the 144 load.
 static struct DinoUiWirelessCancelItemStaticInit {
     DinoUiWirelessCancelItemStaticInit() {
-        DINO_POOL_WORD(data_ov004_021742d0, 0x74) = 112;
-        DINO_POOL_WORD(data_ov004_02174150, 0x7c) = 112;
-        DINO_POOL_WORD(data_ov004_021742d0, 0x78) = 144;
+        DINO_POOL_NV(s32, data_ov004_021742d0, 0x74) = 112;
+        DINO_POOL_NV(s32, data_ov004_021742d0, 0x78) = 144;
+        DINO_POOL_NV(s32, data_ov004_02174150, 0x7c) = 112;
         DINO_POOL_WORD(data_ov004_021741d0, 0x0) = 176;
         DINO_POOL_WORD(data_ov004_021742d0, 0x4c) = 128;
         DINO_POOL_WORD(data_ov004_021742d0, 0x50) = 96;
