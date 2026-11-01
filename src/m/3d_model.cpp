@@ -714,25 +714,27 @@ static inline s32 M3DGetDivResult32() {
 
 // The model's vertices at its animation frame: a key's own when the frame is on it, else the two keys around it
 // blended (by the CPU and the hardware divider in turn).
-// NONMATCHING: register allocation (the game spills the count and the divider's zero high word to the stack).
 const s16 *M3DModelGetMorphVertices(M3DModel *model) {
-    u32 t0;
+    int count;
+    int d;
+    int n;
+    s32 t0;
     u32 t1;
     const M3DMorphAnim *anim = (const M3DMorphAnim *) model->mAnimRes;
-    int count = anim->vertexCount;
+    count = anim->vertexCount;
     if (count == 0) {
         return data_0214c18c;
     }
+    const int flags = ((const u32 *) model->mModelRes)[5];
+    s16 *out;
     s32 w1 = 0;
-    u32 flags = ((const u32 *) model->mModelRes)[5];
     const s16 *prev = anim->frames;
     const s16 *next = prev;
+    s32 w0;
     t1 = 0;
     t0 = 0;
-    u32 frame = model->mFrame;
-    s16 *out = data_0214c18c;
-    s32 w0;
-    int d;
+    out = data_0214c18c;
+    const u32 frame = model->mFrame;
     if (flags & 2) {
         for (; w1 < anim->frameCount; ) {
             t1 = *(const u16 *) next;
@@ -760,10 +762,10 @@ const s16 *M3DModelGetMorphVertices(M3DModel *model) {
             *out++ = (*prev++ * w0 + *next++ * w1) / d;
             *out++ = (*prev++ * w0 + *next++ * w1) / d;
         }
-        int n = (count >> 1) * 3;
+        n = (count >> 1) * 3;
         for (s32 i = 0; i < n; i++) {
-            M3DSetDiv32_32(*prev++ * w0 + *next++ * w1, d);
-            out[1] = (*prev++ * w0 + *next++ * w1) / d;
+            M3DSetDiv32_32(*prev++ * w0 + *next++ * (u32) w1, d);
+            out[1] = (*prev++ * (int) w0 + *next++ * w1) / d;
             *out = M3DGetDivResult32();
             out += 2;
         }
