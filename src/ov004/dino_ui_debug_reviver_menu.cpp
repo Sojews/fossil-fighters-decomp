@@ -38,6 +38,7 @@ void DinoUiDebugReviverMenu::OnStart() {
 // and 50); B leaves.
 // NONMATCHING: stack slots and registers only (the game puts each branch's state below the redraw's, and the item in r6).
 void DinoUiDebugReviverMenu::OnIdle() {
+    DinoUiDebugReviverMenuItem *item;
     if (GetInput()->GetPressed() & 0x100) {
         mUnkBC++;
         if (mUnkBC >= gDinoResource->GetCreatureCount()) {
@@ -55,7 +56,7 @@ void DinoUiDebugReviverMenu::OnIdle() {
         return;
     }
     if (GetInput()->GetPressed() & 0x40) {
-        DinoUiDebugReviverMenuItem *item = (DinoUiDebugReviverMenuItem *)GetFocusedItem();
+        item = (DinoUiDebugReviverMenuItem *)GetFocusedItem();
         DinoCreatureState state;
         gDinoBackup->GetCreature(item->mCreature, &state);
         if (state.parts[item->mPart].level < 150) {
@@ -69,7 +70,7 @@ void DinoUiDebugReviverMenu::OnIdle() {
         return;
     }
     if (GetInput()->GetPressed() & 0x80) {
-        DinoUiDebugReviverMenuItem *item = (DinoUiDebugReviverMenuItem *)GetFocusedItem();
+        item = (DinoUiDebugReviverMenuItem *)GetFocusedItem();
         DinoCreatureState state;
         gDinoBackup->GetCreature(item->mCreature, &state);
         if (state.parts[item->mPart].level) {
