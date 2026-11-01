@@ -796,12 +796,11 @@ void M3DModelPatchDisplayList(M3DModel *model, const u32 *tags, u32 count) {
     if (i >= count) {
         return;
     }
-    u32 frameOffset = frame * 0x30;
+    int frameOffset = frame * 0x30;
     do {
-        u32 offset;
         u32 arg = tags[i * 2 + 1];
         u32 word = tags[i * 2];
-        offset = word & 0x0FFFFFFF;
+        u32 offset = word & 0x0FFFFFFF;
         u32 type = word >> 28;
         if (model->mUnk300 >= offset) {
             switch (type) {
