@@ -182,11 +182,24 @@ void DinoCleaningToolMenu::OnStart() {
 }
 
 // The file's static initialization (see dino_static_init.h).
-// NONMATCHING: scheduling. The game hoists the screen rect's zero half (past the pool's 0x80 anchor) above the
-// screen size's stores; mwcc treats our pool accesses as one object and keeps them in order.
+// The pool's words past 0x7c go through the game's second anchor (data_ov002_02165498, the pool + 0x80); the icon
+// rect straddles it, so its first word goes through the first anchor and the rest through the second.
+// NONMATCHING: scheduling. The icon rect's words, now separate stores, are scheduled up among the earlier stores.
+extern "C" u32 data_ov002_02165498[];
 #pragma always_inline on
 static struct DinoCleaningDummyItemStaticInit {
     DinoCleaningDummyItemStaticInit() {
-        DINO_COMMON_LAYOUT_INIT(data_ov002_02165418, 0x18, 0x8c, 0x38, 0x30, 0x7c, 0x9c, 0xa4, 0xac);
+        DINO_POOL(MPoint, data_ov002_02165418, 0x18) = MPoint(256, 192);
+        DINO_POOL(MRect, data_ov002_02165498, 0xc) = DinoSizeRect(DINO_POOL(MPoint, data_ov002_02165418, 0x18));
+        DINO_POOL(MPoint, data_ov002_02165418, 0x38) = MPoint(2, 2);
+        DINO_POOL(MPoint, data_ov002_02165418, 0x30) = MPoint(36, 28);
+        MRect icon = DinoSizeRect(DINO_POOL(MPoint, data_ov002_02165418, 0x30));
+        DINO_POOL_NV(s32, data_ov002_02165418, 0x7c) = icon.left;
+        DINO_POOL_NV(s32, data_ov002_02165498, 0x0) = icon.top;
+        DINO_POOL_NV(s32, data_ov002_02165498, 0x4) = icon.right;
+        DINO_POOL_NV(s32, data_ov002_02165498, 0x8) = icon.bottom;
+        DINO_POOL(MPoint, data_ov002_02165498, 0x1c) = MPoint(0, 24);
+        DINO_POOL(MPoint, data_ov002_02165498, 0x24) = MPoint(256, 192);
+        DINO_POOL(MRect, data_ov002_02165498, 0x2c) = MRect(0, 0, 256, 24);
     }
 } sDinoCleaningDummyItemStaticInit;

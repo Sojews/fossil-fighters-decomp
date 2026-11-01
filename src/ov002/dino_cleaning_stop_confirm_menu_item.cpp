@@ -202,11 +202,12 @@ void DinoCleaningSleep::Start() {
 }
 
 // The file's static initialization (see dino_static_init.h).
-// NONMATCHING: scheduling. The game hoists the screen rect's zero half (past the pool's 0x80 anchor) above the
-// screen size's stores; mwcc treats our pool accesses as one object and keeps them in order.
+// NONMATCHING: scheduling. Through the game's two anchors (see DINO_COMMON_LAYOUT_INIT2) the screen rect's zero half
+// is hoisted as the game has it, but the icon rect's stores are also scheduled up past the icon size's.
+extern "C" u32 data_ov002_02163fc0[];
 #pragma always_inline on
 static struct DinoCleaningStopConfirmMenuItemStaticInit {
     DinoCleaningStopConfirmMenuItemStaticInit() {
-        DINO_COMMON_LAYOUT_INIT(data_ov002_02163f40, 0x30, 0x94, 0x28, 0x58, 0xa4, 0xb4, 0xbc, 0xc4);
+        DINO_COMMON_LAYOUT_INIT2(data_ov002_02163f40, data_ov002_02163fc0, 0x30, 0x94, 0x28, 0x58, 0xa4, 0xb4, 0xbc, 0xc4);
     }
 } sDinoCleaningStopConfirmMenuItemStaticInit;

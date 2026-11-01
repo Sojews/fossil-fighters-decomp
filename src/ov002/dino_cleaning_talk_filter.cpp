@@ -183,20 +183,22 @@ static inline MTask *DinoTalkParallel(MTask *a, MTask *b, MTask *c) {
     return set;
 }
 
-// One expression, so the points' temporaries get the game's stack slots (in source order).
-// NONMATCHING: the clear and window tasks' spill slots are swapped, and 320 is made differently.
+// One expression, so the points' temporaries get the game's stack slots (in source order). The frame's start point is
+// a named local: that makes 256 directly and 320 from the 192 already in a register, as the game does.
+// NONMATCHING: the clear and window tasks' spill slots are swapped, and the start point sits in a named slot.
 void DinoCleaningTalkWindow::Close() {
     mUnkCC = 0;
     mUnkD0 = 0;
     mConsole->Run();
     MTask *clear = gLcd->GetTopDisplay()->mBlend->CreateClearTransfer();
     MTask *empty = MTaskSetMakeEmptyTask::Create(mTasksB8);
+    MPoint from(256, 192);
     mTasksB4->AddTail(
         DinoTalkParallel(mFace->CreateCoordAnime(MPoint(0, 0), MPoint(0, 40), 20, 2),
                          mConsole->CreateCoordAnime(data_ov002_0216431c.mPos,
                                                     MPoint(data_ov002_0216431c.mPos.x, data_ov002_0216431c.mPos.y + 40),
                                                     20, 2),
-                         mFrame->CreateCoordAnime(MPoint(256, 192), MPoint(320, 192), 20, 2)),
+                         mFrame->CreateCoordAnime(from, MPoint(320, 192), 20, 2)),
         empty, clear);
 }
 
@@ -212,7 +214,8 @@ void DinoCleaningTalkWindow::SetUnkCC(u32 value) {
 
 // Says text: opens the window (the face, the frame with a random motion and the console, sliding in) or, when it's
 // open, puts it back in place and replaces the text.
-// NONMATCHING: two task spills take each other's stack slots, and 256 and 320 are made the other way round.
+// The frame's start point is a named local, which makes 320 directly and 256 from the 192 (as in Close).
+// NONMATCHING: two task spills take each other's stack slots, and the start point sits in a named slot.
 extern "C" void func_ov002_021573e8(DinoCleaningTalkWindow *window, const char *text) {
     window->mRate = MFx32::FromRaw(((const s32 *)gDinoResource->GetExcavate7C())[5]);
     if (!window->mTasksB8->IsEmpty()) {
@@ -253,12 +256,13 @@ extern "C" void func_ov002_021573e8(DinoCleaningTalkWindow *window, const char *
     blend->SetAlpha(12, 4);
     window->mTasksB8->AddTail(window->mFace, window->mConsole, window->mFrame, window->mOam);
     MTask *run = MTaskRunTransfer::Create(window->mConsole);
+    MPoint from(320, 192);
     window->mTasksB4->AddTail(
         DinoTalkParallel(window->mFace->CreateCoordAnime(MPoint(0, 40), MPoint(0, 0), 10, 12),
                          window->mConsole->CreateCoordAnime(MPoint(data_ov002_0216431c.mPos.x,
                                                                    data_ov002_0216431c.mPos.y + 40),
                                                             data_ov002_0216431c.mPos, 10, 12),
-                         window->mFrame->CreateCoordAnime(MPoint(320, 192), MPoint(256, 192), 10, 12)),
+                         window->mFrame->CreateCoordAnime(from, MPoint(256, 192), 10, 12)),
         run);
 }
 
