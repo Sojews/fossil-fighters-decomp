@@ -182,7 +182,8 @@ void DinoCleaningKasekiRock::Hit(int row, int col, MFx32 power, MFx32 scale, MFx
         left = std::max(MFx32(0), left - decay);
     }
     power = left;
-    mRock8C->Hit(row, col, power * scale);
+    power *= scale;
+    mRock8C->Hit(row, col, power);
     if (mUnk4A0 != 1) {
         ((DinoCleaningImageView *)mUnk88)->GetImage(0)->SetCellLayer(row, col, mRock8C->GetCellLayer(row, col));
         return;
@@ -247,8 +248,8 @@ void DinoCleaningKasekiRock::StartDrop() {
 // Falls until it lands, then settles.
 // NONMATCHING: the two additions' argument copies swap stack slots.
 void DinoCleaningKasekiRock::StateDrop() {
-    mDropY = mDropY + mDropSpeed;
-    mDropSpeed = mDropSpeed + MFx32::FromRaw(0xE66);
+    mDropY += mDropSpeed;
+    mDropSpeed += MFx32::FromRaw(0xE66);
     if (mDropY < MFx32(0) || mDropSpeed < MFx32(0)) {
         mView->Move(0, MFx32ToInt(mDropY));
         return;
