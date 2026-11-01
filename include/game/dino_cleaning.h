@@ -42,9 +42,6 @@ public:
     void StateCheckDone();
     void StateSleep();
     void StatePlay();
-    inline BOOL IsRockClean();
-    inline BOOL IsTargetReached();
-    inline BOOL IsOver();
     void StateWake();
     void StateStopConfirm();
     void StateQuit();

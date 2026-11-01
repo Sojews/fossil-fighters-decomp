@@ -720,40 +720,7 @@ void DinoCleaning::StateStopTool() {
     mState = data_ov002_021659ec.StatePlay_78;
 }
 
-// Whether the rock is clean (only without a target).
-inline BOOL DinoCleaning::IsRockClean() {
-    BOOL done = FALSE;
-    if (!mUnkC9) {
-        if (mKasekiRock->GetRatio() == MFx32(100)) {
-            done = TRUE;
-        }
-    }
-    return done;
-}
-
-// Whether the target is reached (only with one).
-inline BOOL DinoCleaning::IsTargetReached() {
-    BOOL done = FALSE;
-    if (mUnkC9) {
-        if (mStatus->GetScore()->GetUnk80() >= MFx32(mUnk130)) {
-            done = TRUE;
-        }
-    }
-    return done;
-}
-
-// Whether too much was broken or the time is up.
-inline BOOL DinoCleaning::IsOver() {
-    BOOL done = TRUE;
-    if (!(mStatus->GetScore()->GetUnk84() > MFx32(100 - mUnk130))) {
-        if (!mStatus->GetTimer()->IsAtStart()) {
-            done = FALSE;
-        }
-    }
-    return done;
-}
-
-// NONMATCHING: the ratios' MFx32ToInt copies and the checks' temporaries take each other's stack slots.
+// NONMATCHING: each check's constant and call result take each other's stack slots.
 // The cleaning itself: updates the commentary's numbers, switches tools when asked, and ends once the rock is clean,
 // the target is reached or the time is up (else runs the tool, the stop confirmation or sleep).
 void DinoCleaning::StatePlay() {
@@ -771,21 +738,42 @@ void DinoCleaning::StatePlay() {
         mState = data_ov002_02165aec.StateSwitchTool_50;
         return;
     }
-    if (IsRockClean()) {
+    // The rock is clean (only without a target).
+    BOOL clean = FALSE;
+    if (!mUnkC9) {
+        if (mKasekiRock->GetRatio() == MFx32(100)) {
+            clean = TRUE;
+        }
+    }
+    if (clean) {
         DinoSoundPlaySe(0x1F, 0);
         mStatus->StatePause();
         mTools[mTool]->Unk1C();
         mState = data_ov002_02165aec.State0216177c_48;
         return;
     }
-    if (IsTargetReached()) {
+    // The target is reached (only with one).
+    BOOL reached = FALSE;
+    if (mUnkC9) {
+        if (mStatus->GetScore()->GetUnk80() >= MFx32(mUnk130)) {
+            reached = TRUE;
+        }
+    }
+    if (reached) {
         DinoSoundPlaySe(0x1F, 0);
         mStatus->StatePause();
         mTools[mTool]->Unk1C();
         mState = data_ov002_021659ec.State0216177c_68;
         return;
     }
-    if (IsOver()) {
+    // Too much was broken or the time is up.
+    BOOL over = TRUE;
+    if (!(mStatus->GetScore()->GetUnk84() > MFx32(100 - mUnk130))) {
+        if (!mStatus->GetTimer()->IsAtStart()) {
+            over = FALSE;
+        }
+    }
+    if (over) {
         DinoSoundPlaySe(0x1F, 0);
         mStatus->StatePause();
         mTools[mTool]->Unk1C();

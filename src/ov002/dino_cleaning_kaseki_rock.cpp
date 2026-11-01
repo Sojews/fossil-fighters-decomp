@@ -117,11 +117,9 @@ static inline MPoint DinoHalfBack(const MPoint &d) {
     return MPoint(-d.x / 2, -d.y / 2);
 }
 
-// NONMATCHING: 80%, the game loads offset.y into a saved register before GetSize and reads the size's y before its x
-// (as State02160638 does).
 void DinoCleaningKasekiRock::SetOffsetAll(MPoint offset) {
     mUnk80->SetPosition(DinoHalfBack(mUnk80->GetSize() - MPoint(256, 192)) + offset);
-    mOam->SetOffset(MPoint(-offset.x, -offset.y));
+    mOam->SetOffset(MPoint(0, 0) - offset);
     mUnk88->SetPosition(offset);
     mView->SetPosition(offset);
 }
