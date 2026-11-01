@@ -62,8 +62,11 @@ void DinoMpGame::StateFinish() {
     mSerial.AddTail(MTaskExitTransfer::Create(this));
 }
 
+// Who controls a battle side: this DS or the other one.
+enum DinoMpController { DINO_MP_LOCAL, DINO_MP_REMOTE };
+
 // A wireless battle: player 0 is the parent.
-// NONMATCHING: the game keeps the 0 in a register (from the loop counter's start).
+// (The sides' controllers are enum-typed, so the ternary keeps its branch order.)
 void DinoMpGame::StateStart() {
     mParallel.AddTail(mMultiPlay);
     DinoBattleParams params;
@@ -71,7 +74,7 @@ void DinoMpGame::StateStart() {
     params.unk00 = 2;
     params.unk04 = (u32)mMultiPlay;
     for (int i = 0; i < 2; i++) {
-        (&params.unk08)[i] = i == mMultiPlay->GetPlayerIndex() ? 0 : 1;
+        (&params.unk08)[i] = i == mMultiPlay->GetPlayerIndex() ? DINO_MP_LOCAL : DINO_MP_REMOTE;
     }
     if (mMultiPlay->GetPlayerIndex() != 1) {
         params.unk10 = 0;

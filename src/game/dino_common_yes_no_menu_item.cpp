@@ -72,15 +72,14 @@ DinoCommonYesNoMenu::DinoCommonYesNoMenu(const std::string &text, BOOL *result, 
     SetDeferStart(TRUE);
 }
 
-// NONMATCHING: the game stores the dead copy of pos (MoveTo's argument) before the rect's temporaries.
+// (The rect is built and then moved to pos as one expression, so the dead copy of pos comes before its temporaries.)
 void DinoCommonYesNoMenu::OnStart() {
     MSmartOam *oam = new MSmartOam(8, 0, TRUE);
     oam->mHidden = TRUE;
     mSerial.AddTail(oam->CreateShowTransfer());
     MPoint size(0x12, 8);
     MPoint pos((0x20 - size.x) / 2, (0x18 - size.y) / 2);
-    MRect rect(MPoint(0, 0), size);
-    rect.MoveTo(pos);
+    MRect rect = MRect(MPoint(0, 0), size).MovedTo(pos);
     mWindow = new DinoCommonWindow(0, TRUE, FALSE);
     mWindow->SetFrame(rect);
     mWindow->SetPriority(0);

@@ -100,6 +100,16 @@ struct MRect {
         r.bottom += y;
         return r;
     }
+    // This rect with its top left moved to p.
+    MRect MovedTo(MPoint p) const {
+        int x = p.x, y = p.y;
+        MRect r = *this;
+        r.right += x - r.left;
+        r.bottom += y - r.top;
+        r.left = x;
+        r.top = y;
+        return r;
+    }
     // This rect moved by p.
     MRect operator+(MPoint p) const { return MRect(left + p.x, top + p.y, right + p.x, bottom + p.y); }
     MPoint GetTopLeft() const { return MPoint(left, top); }
