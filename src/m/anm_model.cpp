@@ -242,7 +242,7 @@ void MAnmModelBase::TintPalette(u16 color, fx32 amount) {
         int cr = (c & 0x1F) * amount;
         int cg = ((c >> 5) & 0x1F) * amount;
         int cb = (c >> 10) & 0x1F;
-        tinted[i] = (((cb * amount + b) >> 12) << 10) | (((cg + g) >> 12) << 5) | ((cr + r) >> 12);
+        tinted[i] = (((cb * amount + b) >> 12) << 10) | (((cr + r) >> 12) | (((cg + g) >> 12) << 5));
     }
     mScene->QueueD0((const void *)plttKey, (u32)tinted, size);
     mScene->QueueE8(NULL, (u32) tinted);
