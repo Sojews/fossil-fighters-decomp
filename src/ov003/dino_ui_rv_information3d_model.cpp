@@ -99,7 +99,7 @@ void DinoUiRvInformation3DModel::SetUnk84(u32 value) {
 }
 
 // Turns the model with drags on it (easing off after), and loads the model again when the creature changes.
-// NONMATCHING: register allocation around the touch checks (the game loads the buttons again for the release test).
+// (The drag and release tests share one input pointer; the release test reads the buttons again through it.)
 #pragma opt_common_subs off
 void DinoUiRvInformation3DModel::Idle() {
     if (!mTasks->IsEmpty()) {
@@ -108,14 +108,17 @@ void DinoUiRvInformation3DModel::Idle() {
             mTouch = mInput->GetTouchPos();
             mDragging = TRUE;
             mUnkA8 = mUnkAC = 0;
-        } else if ((mInput->mButtons & DINO_TOUCH_BUTTON) && mDragging) {
-            MPoint touch = mInput->GetTouchPos();
-            mUnkA8 += (touch.x - mTouch.x) << FX32_SHIFT;
-            mUnkAC += (touch.y - mTouch.y) << FX32_SHIFT;
-            mTouch.x = touch.x;
-            mTouch.y = touch.y;
-        } else if (mInput->mPrevButtons & (mInput->mButtons ^ mInput->mPrevButtons) & DINO_TOUCH_BUTTON) {
-            mDragging = FALSE;
+        } else {
+            MInput *input = mInput;
+            if ((input->mButtons & DINO_TOUCH_BUTTON) && mDragging) {
+                MPoint touch = mInput->GetTouchPos();
+                mUnkA8 += (touch.x - mTouch.x) << FX32_SHIFT;
+                mUnkAC += (touch.y - mTouch.y) << FX32_SHIFT;
+                mTouch.x = touch.x;
+                mTouch.y = touch.y;
+            } else if (input->mPrevButtons & (input->mButtons ^ input->mPrevButtons) & DINO_TOUCH_BUTTON) {
+                mDragging = FALSE;
+            }
         }
         mUnkA8 = std::min(std::max(mUnkA8, data_ov003_02160660.minTurnY), data_ov003_02160660.maxTurnY);
         mUnkA8 = mUnkA8 * 4 / 5;
@@ -137,8 +140,9 @@ void DinoUiRvInformation3DModel::Idle() {
         rotate->mRotY = mUnk90;
         rotate->mRotX = mUnk94;
     }
-    if (mUnk84 != mUnk80) {
-        mUnk80 = mUnk84;
+    u32 next = mUnk84;
+    if (mUnk80 != next) {
+        mUnk80 = next;
         GetSerial()->AddTail(MTaskSetMakeEmptyTask::Create(mTasks));
         if (mUnk80 != 0) {
             VecFx32 pos;
