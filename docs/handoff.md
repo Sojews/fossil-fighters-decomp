@@ -1,0 +1,369 @@
+# Handoff: ov001 / ov003 / ov004 / ov005
+
+Snapshot taken 2026-11-02 at `origin/main` **0c602c57** (your HEAD). On that commit a fresh build plus
+`objdiff-cli report generate` gives:
+
+- **11503 / 11789** functions matched
+- **81.60%** code matched, fuzzy 98.81%
+- `build/ff_usa.nds: OK`
+
+## 0. Who owns what
+
+Two Claude sessions shared this repo. This document covers mine: **src/ov001, src/ov003, src/ov004 and src/ov005**.
+The other session ("jonny-d6") owns src/game, src/m, ov000, ov002, ov006 and ov007. I don't know what it has in
+flight. Before you edit those directories, or the shared headers `include/m/*`, `include/game/*` and
+`libs/msl_cpp/include/*`, ask the user whether that session is still running.
+
+Unmatched functions per area (from the report at 0c602c57):
+
+| area | matched | unmatched | code % |
+|---|---|---|---|
+| ov001 | 439/464 | 25 | 68.0 |
+| ov003 | 243/250 | 7 | 90.2 |
+| ov004 | 964/976 | 12 | 89.2 |
+| ov005 | 597/598 | 1 | 99.3 |
+| *(other session)* game / m / ov000 / ov002 / ov006 / ov007 | | 46 / 58 / 46 / 24 / 15 / 13 | |
+| libs msl / nitrosdk / nitrosystem / runtime | | 12 / 10 / 5 / 3 | |
+
+## 1. Work in flight
+
+**Nothing is uncommitted.** Every attempt is pushed. Each unmatched function below is real C, not a stub:
+it compiles, objdiff scores it, and its unit links the original bytes (see §4, "partial units"). None of these
+overlays uses `#ifdef NONMATCHING` with an asm fallback. Each function instead carries a `// NONMATCHING: <reason>`
+comment above its definition.
+
+Percentages are fuzzy match from `build/report.json`. "Line" is the definition, or the NONMATCHING comment just
+above it.
+
+### ov001
+
+| % | size | function | file:line | remaining mismatch |
+|---|---|---|---|---|
+| 99.99 | 472 | `DinoField::LoadSlideInPict` | dino_field.cpp:1025 | pool offset: the static `sDirs` sits at a different offset in the TU's data, because not all of the game's data before it is emitted here |
+| 99.93 | 492 | `DinoFieldCamera::IdleUnk2` | dino_field_camera.cpp:437 | stack slots: the setting's scale vs the easing temps |
+| 99.86 | 2222 | `DinoField::ResolveMove` | dino_field.cpp:343 | the game's call to MFx32Point's implicit copy ctor resolves to an in-file copy; ours goes to a weak copy. Needs the game's ipa emission order |
+| 99.81 | 284 | `DinoFieldRaster::Idle` | dino_field_raster.cpp:31 | stack slots of dead temps |
+| 99.59 | 1352 | `func_ov001_0215f900` | dino_field_map.cpp:228 | register allocation |
+| 99.37 | 1480 | `DinoFieldCaptureFadeOutTask::Idle` | dino_field.cpp:1864 | register swap: the smart OAM is in r6 in the game, r7 in ours; the game also re-tests it after `new` |
+| 98.84 | 840 | `DinoFieldTownMap::DinoFieldTownMap` | dino_field_town_map.cpp:53 | the `this + i*4` family (§6) |
+| 98.82 | 564 | `DinoFieldChara::IdlePatrol` | dino_field_chara_angle_anime.cpp:872 | registers of an s64 squared-length sum |
+| 97.84 | 108 | `DinoField::WalkOnLand0` / `WalkOnLand1` | dino_field.cpp:1551 | one instruction: the game re-materializes `movs r2,#0`, ours reuses the loaded byte |
+| 97.42 | 296 | `DinoField::SlideOutPict` | dino_field.cpp:1078 | pool offset of `sDirs` (same cause as LoadSlideInPict) |
+| 97.26 | 716 | `DinoField::Step` | dino_field.cpp:1732 | the game builds `MFx32(1)` directly into `operator+=`'s parameter, while ours keeps a temp (+4 slot shift); the game also stores the rotation after computing its y |
+| 96.54 | 604 | `DinoFieldChara::IdleWander` | dino_field_chara_angle_anime.cpp:838 | the random distance gets its own stack slot across `Next()` |
+| 96.49 | 352 | `DinoField::ZoomOutPict` | dino_field.cpp:1157 | stack layout of the scale points, plus a cached ease |
+| 95.62 | 536 | `DinoField::LoadZoomInPict` | dino_field.cpp:1095 | build order of the scale points, a cached ease, and LoadFadeInPict's slots |
+| 95.62 | 1076 | `DinoFieldChara::Unk02162154` | dino_field_chara_angle_anime.cpp:722 | the game's frame is 32 bytes smaller and its registers differ |
+| 95.45 | 500 | `DinoFieldChara::IdleFollow` | dino_field_chara_angle_anime.cpp:795 | registers: the s64 high word is in r4 and the defs in r6 in the game |
+| 95.28 | 288 | `DinoFieldBattleStartEffect::StateClose` | dino_field_battle_start_effect.cpp:50 | the game re-takes the pooled min-radius address for `std::max`'s result |
+| 90.61 | 1652 | `DinoFieldCamera::UnkV14` | dino_field_camera.cpp:224 | the game truncates yaw and pitch to u16 two more times (more inline levels?), and the drag temps are scheduled differently. A real expression-shape job |
+| 90.52 | 832 | `DinoFieldCamera::IdleUnk0` | dino_field_camera.cpp:314 | the game's frame has 32 more bytes of temps and reads the first distance after the radius |
+| 89.47 | 168 | `DinoField::FindRockHole` | dino_field.cpp:1673 | the game hoists `&hole->pos` and both halves of `pos` out of the loop. A `near` hoist plus `#pragma opt_loop_invariants off` reached 91.2 locally but was not committed |
+| 87.04 | 372 | `MFx32Rect::PushOut` | include/m/fx32.h:243 | weak copy emitted into dino_field. **Shared header** |
+| 86.38 | 68 | `operator+(const MFx32Rect&, MFx32Point)` | include/m/fx32.h:217 | the game stores one operand copy per add. **Shared header** |
+| 86.12 | 6968 | `DinoFieldPlayerControl::Idle` | dino_field_player_control.cpp:137 | stack temp layout throughout. Biggest byte count left |
+| 66.18 | 3352 | `DinoFieldRadar::Idle` | dino_field_radar.cpp:286 | same calls in the same order, but the inline math leaves about 20 extra temps (frame 0x660 vs 0x5DC), which pushes much of it past sp+0x3FC. Lowest % |
+
+### ov003
+
+| % | size | function | file:line | remaining mismatch |
+|---|---|---|---|---|
+| 99.79 | 120 | `__sinit_dino_ui_revive_status.cpp` | dino_ui_revive_status.cpp:1164 | under ipa, the two rects' dead temps are laid out per rect, while the game interleaves them. It matched in a non-ipa build, but the file needs ipa. Splitting it into one object per line gives 99.89 |
+| 98.85 | 1158 | `DinoUiReviveStatusParts` ctor | dino_ui_revive_status.cpp:1042 | `this+i*4` family, plus two DinoCreatureState temps in swapped slots |
+| 98.37 | 760 | `DinoUiReviveStatusDigit` ctor | dino_ui_revive_status.cpp:996 | `this+i*4` family |
+| 97.81 | 572 | `DinoUiFieldMenuFraction4` ctor | dino_ui_field_menu_fraction.cpp:1002 | `this+i*4` family |
+| 96.35 | 368 | `DinoUiPartsTeamTech` ctor | dino_ui_field_menu_fraction.cpp:407 | `this+i*4` family |
+| 94.61 | 1140 | `DinoUiRvInformation::ShowAttackPage` | dino_ui_rv_information3d_model.cpp:453 | ours strength-reduces the attack loops, and the row search keeps `n` on the stack. `opt_strength_reduction off` and a guarded loop both score worse |
+| 94.12 | 212 | `DinoUiFieldMenuNumber` ctor | dino_ui_field_menu_fraction.cpp:113 | `this+i*4` family |
+
+### ov004
+
+| % | size | function | file:line | remaining mismatch |
+|---|---|---|---|---|
+| 99.99 | 974 | `DinoUiCannonParentScanner::StateStart` | dino_ui_wireless_cancel_item.cpp:1017 | under ipa, two spill slots (the show transfer and `mTens`) are swapped |
+| 99.99 | 624 | `DispBlower::Execute` | disp_blower.cpp:52 | the wait message's position temp sits lower on the stack in the game |
+| 99.93 | 544 | `DinoUiDebugReviverMenu::Refresh` | dino_ui_debug_reviver_menu.cpp:92 | stack slots of the inlined item ctor |
+| 99.78 | 784 | `DinoUiDebugReviverMenu::OnIdle` | dino_ui_debug_reviver_menu.cpp:39 | stack slots and registers (the item is in r6 in the game) |
+| 99.52 | 836 | `DinoUiIslandMapMenu::OnFocus` | dino_ui_island_map.cpp:393 | the game loads both spot-table addresses first, so x and y swap registers. `MPoint(0,0)-p` made no difference |
+| 99.21 | 1708 | `DinoUiSaveSlotConfirm::Unk02159590` | dino_ui_top_menu.cpp:1032 | the summary sits below the inlined item's locals, and item/oam swap registers |
+| 98.75 | 2420 | `DinoUiEnding::StateStart` | dino_ui_top_menu.cpp:1248 | scheduling only: the game loads the strip position before storing the rect constants |
+| 98.24 | 172 | `DinoUiWirelessCancel::CreateCloseTask` | dino_ui_wireless_cancel_item.cpp:791 | register swap between the sound task and the set |
+| 95.23 | 556 | `DinoUiExchange::StateSave` | dino_ui_exchange.cpp:347 | the game's `set::insert` leaves two empty temps on the stack (zeroed after the call), which shifts the slots |
+| 92.23 | 3188 | `DinoUiDebugKasekiRockGetMenu::OnStart` | dino_ui_debug_kaseki_rock_get.cpp:303 | register and slot choices in the item ctors (centring halves, the type items' oam) |
+| 89.92 | 544 | `__sinit_dino_ui_island_map.cpp` | dino_ui_island_map.cpp:626 | same stores in the same order, but anchors and constants are in other registers |
+| 79.00 | 70 | `DinoUiDebugFlagMenuItem::GetFrame` | dino_ui_debug_flag_menu.cpp:50 | the game computes right and bottom before storing any edge, and keeps 16 in r1. Small and not seriously attacked yet |
+
+### ov005
+
+| % | size | function | file:line | remaining mismatch |
+|---|---|---|---|---|
+| 77.20 | 424 | `DinoUiCleaningMenu::Decide(int)` | dino_ui_cleaning_menu_item.cpp:498 | the game computes the row terms first and does the column test twice. **The only unmatched function in ov005** |
+
+## 2. Frontier
+
+- **Nothing in the overlays is left to delink.** Every overlay's `.text` is fully covered by `src/` ranges in
+  `config/usa/arm9/overlays/ov00N/delinks.txt`. I checked by computing the gaps. Main arm9 has only two tiny
+  uncovered spans: `0x02000b64–0x02000ba0` and `0x0208638c–0x020863ac`. The work left is matching the ~286
+  unmatched functions, not adding files.
+- The last delinks changes in my overlays were on 2026-10-23: `__sinit_dino_ui_island_map.cpp` (87751caa) and
+  `__sinit_disp_blower.cpp` (ac216e6c). Since then every change in this area has been C edits only.
+- Overlay base: ov000–ov005 load at `0x021558a0`; ov006 and ov007 load at `0x02171b00`.
+
+**What I'd attack next, in this order:**
+
+1. *(Done: PR #1's two library functions were merged in the same commit as this file, so main is now 11505.)*
+2. **`DinoUiCleaningMenu::Decide`** (ov005, 77%). It's the last unmatched function in ov005 and the note says
+   what's wrong (statement order and a duplicated column test). Write the row terms first.
+3. **`DinoUiDebugFlagMenuItem::GetFrame`** (70 bytes, 79%). Compute right and bottom into locals before
+   storing any edge.
+4. **Low-percentage expression-shape rewrites with large byte counts:** `DinoFieldRadar::Idle` (66%, 3.3 KB),
+   `DinoFieldCamera::UnkV14` / `IdleUnk0` (~90%), `DinoFieldPlayerControl::Idle` (86%, 7 KB). These move code %
+   the most. Most of the gap is too many inline temporaries. Try fewer named locals, temps built inside static
+   inline helpers, by-value accessors, and `MPoint(0,0) - p` forms.
+5. **Leave the 99.x register/slot puzzles alone** unless you have a new idea. Every sweep and a 600 s permuter
+   round on each failed to move them (§6).
+
+## 3. Uncommitted state
+
+In my checkouts at 0c602c57:
+
+```
+$ git status --short
+?? .venv            # local symlink to the Python venv, not part of the repo
+$ git diff --stat
+(empty)
+```
+
+There's nothing worth keeping, so there is no `docs/handoff.patch`.
+
+## 4. Conventions not in the README
+
+**Build and report mechanics**
+
+- **Partial units.** A `src/` file listed in `delinks.txt` *without* a `complete` line links the **original
+  bytes**, but is still compiled so objdiff can score it (see `tools/configure.py`, the `partial` list). That's
+  why non-matching C can't break the ROM. Main arm9 has 116 `complete` units; **no unit in ov001–ov005 is marked
+  `complete`, even the ones at 100%** (for example `src/ov005/dino_ui_shop_sell.cpp`, 77/77). I never tested
+  flipping them, so don't assume it's free: overlay data/bss ownership may not be reproduced. Run a full `ninja`
+  and check for `OK` if you try.
+- **`build/report.json` is the truth.** Generate it with `tools/bin/objdiff-cli report generate -o build/report.json`.
+  `objdiff-cli diff` on a single symbol can disagree with it in either direction when a call goes to a template copy
+  that the game keeps in another unit, or to the next symbol. Judge progress by the report.
+- **No-regression rule before every push:** no function that was at 100 may drop. Compare against a report
+  generated before the change.
+- Builds are incremental. `tools/fix_dep.py` strips wibo's `Z:/` prefix from `.d` files; without it, every build
+  recompiles ~400 files.
+
+**Symbols**
+
+- **Symbol size bugs.** If the game has non-zero bytes between a function symbol's end and the next symbol, the
+  size in `symbols.txt` is probably short. DinoReplaceTag was 0x66 instead of 0x68, because its trailing `pop`
+  was outside the symbol. Every hit repo-wide is now fixed except `func_ov007_02182020`, which is 2 bytes short
+  but which our code can't match yet.
+- C++ symbols are renamed in `symbols.txt` to the mangled names we produce. Both ctor variants share one address
+  where the game merged them.
+
+**ipa and static data**
+
+- **`#pragma ipa file` per TU.** The game used `-ipa file`. Under ipa:
+  - static declaration order decides offsets in the TU's pooled block;
+  - unreferenced statics are dropped;
+  - functions defined later in the file can be inlined.
+- **Sinit pools** (`include/game/dino_static_init.h`):
+  - `DINO_POOL_WORD` is volatile, so the store order is fixed.
+  - `DINO_POOL_NV` is non-volatile, so the scheduler may reorder stores. Use NV for the first N stores in offset
+    order when the game interleaves them (this matched the wireless_cancel sinit).
+  - `DINO_COMMON_LAYOUT_INIT` / `DINO_COMMON_LAYOUT_INIT2` / `DINO_POOL_AT`: pool offsets ≥ 0x80 go through a
+    second anchor, the data symbol at pool+0x80, which is loaded first.
+- **Pooled bool constants for `set::insert_unique`.** The offsets differ per TU: in the exchange TU, true is at +1
+  and false at +2; text_codec has the reverse. Use an explicit specialization that reads them from the pool
+  symbol, with the pool struct declared above the tree instantiation (`src/ov004/dino_ui_exchange.cpp`).
+
+**Stack slots and registers**
+
+- **Local placement.** Named locals go top-down; compiler temps go below them; temps from inline helpers go
+  lowest. **Named locals inside an inline are laid out ascending.** To get the game's descending order, below
+  the caller's locals, pass the values as the caller's expression temporaries through `const&` params. Example:
+  `PickExchangeId(gDinoResource->GetExcavateDefs(), gDinoResource->GetExcavateDefs())` matched MakeExchangeEntry.
+- **Spill slots.** Among values live across calls, ours spills the value with the fewest uses first, into the
+  lowest slot. To flip two slots, change their relative use counts, for example by re-reading a member at one use
+  instead of going through a local.
+- **A pointer the game reuses across an if/else-if chain** under `opt_common_subs off` should be one named local
+  over the whole chain (`MInput *input = mInput;` in RvInformation3DModel::Idle).
+- **Loop-top cached member address:** `MTaskSet *parallel = SomeNonMemberStaticInline(this);` where the inline
+  returns `&obj->mParallel` (DinoFieldDance::Start, DinoUiPartsKasekiButton::Setup).
+- **Point copied field by field from another object's MPoint member:** use the by-value accessor
+  (`MPoint font = mMarkMove->GetValue();` matched SpotMove::Idle).
+- **One shared local across two branches**, declared at the top, instead of one per branch (OnIdle +0.2).
+
+**Expression shape**
+
+- `x += y` and `x = x + y` compile differently for MFx32, and so do `a *= s` and `a = a * s`. Try both
+  (`KasekiRock::StateDrop`/`Hit` matched this way).
+- Compare-operand order is canonicalized, so swapping `a == x` does nothing. However,
+  `u32 next = m84; if (m80 != next)` did fix the cmp operand order.
+- **Permuter outputs: keep the no-op-looking casts** (`(u32) w`, `(int) x`). They're often what matters. Remove
+  them one at a time, never all at once.
+- **Member read twice around a post-increment and then stored:**
+  `int next = x + 1; int prev = *(volatile int *)&x; *(volatile int *)&x = next;` Both volatiles are needed.
+- `MPoint(0, 0) - p` instead of `MPoint(-p.x, -p.y)` keeps a component in a register across a call.
+
+**Commits**
+
+- Message style: `<Function> X->Y: <idiom that did it>`, or `Match <Function> (<idiom>)`, with
+  `git pull --rebase` before pushing to `main`.
+
+## 5. Tooling
+
+Use **`.venv/bin/python`** for the permuter and try_match; they need capstone, and the venv has 5.0.7.
+
+- **try_match:** `.venv/bin/python tools/try_match.py src/ov001/dino_field.cpp _ZN9DinoField12FindRockHoleE10MFx32Point`.
+  It filters by **mangled** name; omit the name for every function in the file. It's fine for a first look. For scoring I used the objdiff
+  helpers below, because they match the report.
+- **Single-function permuter.** I ran it in a separate worktree (a git worktree synced to `origin/main`) so it
+  never touches my edit tree:
+  ```sh
+  .venv/bin/python tools/permute.py src/ov001/dino_field.cpp \
+      _ZN9DinoField12FindRockHoleE10MFx32Point "DinoFieldHole *DinoField::FindRockHole(" -t 600 -j 3
+  ```
+  - The third argument is a literal prefix of the definition line.
+  - Results go to `build/permute/<SYMBOL>/best-<score>.cpp`.
+  - Use `--resume` to continue from the best result, and `--no-helpers` to leave static inlines alone.
+  - I used `-j 3` per queue with two queues side by side, the default random seed, and 600 s per function.
+  - **The permuter score does not track objdiff %.** A drop from 293 to 244 can be worth 0.00% in the report.
+    Re-score every candidate with objdiff before applying it.
+- **Batch permuter:**
+  `.venv/bin/python tools/permute_batch.py --min 95 --units src/ov001 src/ov003 -t 600 -j 3`.
+  - It reads `build/report.json`, so generate the report first.
+  - It writes a summary to `build/permute/batch.log` and changes nothing in `src/`.
+  - `--list` prints the candidates. `--improved LOG` re-runs only the functions that improved, starting from
+    their best result.
+- **Helper scripts from my machine, not in the repo.** Run them from the repo root. The core three are in the
+  appendix.
+  - `fs.py UNIT SYM...`: rebuilds one object (`ninja build/usa/<unit>.o`) and prints objdiff's match % per
+    symbol. This is the fast inner loop.
+  - `vt.py SPEC.py`: variant tester. SPEC defines `FILE`, `UNIT`, `SYMS` and
+    `VARIANTS = [(name, old, new) | (name, [(old, new), ...])]`. It tries each variant, scores it with fs.py,
+    and always restores the file.
+  - `dk.py UNIT SYM`: prints only the rows objdiff itself marks as differing (`diff_kind`). Counting raw differing
+    rows is noisy, because branch targets are formatted differently on the two sides.
+  - `gapscan.py REPORT`: the symbol-size check from §4.
+  - `vers.sh`: compiles one TU with all ten mwcc 2.0 builds (`base` … `sp2p4`) and scores it. **Result: no
+    version changes anything in these overlays.** It's here so you don't repeat it.
+  - Regression check: generate a report before and after, then list every function that was 100 before and
+    isn't after. It's a ten-line Python script over `units[].functions[].fuzzy_match_percent`.
+
+## 6. Open questions, dead ends, PR #1
+
+**PR #1 (totomam, "A small gift of functions from the Fossil Fighters: Champions decomp").** I reviewed it
+against 0c602c57:
+
+- **3 of its 5 changes are obsolete.** `MChr256Filter::Filter`, `MBackupStorage::AllocRegion`, and
+  `MCanvas::ReadRow`/`WriteRow` are already at 100% on main, matched independently, so those hunks
+  (`src/m/obj.cpp`, `src/m/backup.cpp`, `src/m/canvas.cpp`) **conflict**.
+- **The other 2 apply cleanly and match.** These are `LoadSingleWave` (91.66 → 100) and `func_020878e8`, the EH
+  HandleUnexpected (99.17 → 100). I tested:
+  ```sh
+  gh pr diff 1 -R Sojews/fossil-fighters-decomp > /tmp/pr1.diff
+  git apply --include='libs/*' /tmp/pr1.diff
+  ninja && tools/bin/objdiff-cli report generate -o build/report.json
+  ```
+  Result: 11503 → **11505**, no regressions, `build/ff_usa.nds: OK`.
+- **Merged (only the two `libs/` files)** in the commit that added this handoff, with the author credited.
+  The PR itself is still open: replying on it and closing it is the user's call.
+
+**Traps. Don't spend time here without a genuinely new idea:**
+
+- **The `this + i*4` family.** The game keeps a digit or icon slot address (`this + i*4`) in a stack slot across
+  the path `std::string`'s destructor; ours recomputes it. This affects the FieldMenuNumber, Fraction4, TeamTech,
+  ReviveStatusDigit/Parts and TownMap ctors (5–6 functions). All of these produced identical output:
+  - all ten mwcc 2.0 versions;
+  - ipa on or off;
+  - opt pragmas;
+  - reference or pointer slot locals (the address is kept, but hoisted as `this+0x74`);
+  - chained assignment;
+  - helper functions;
+  - type changes;
+  - the permuter.
+
+  Cracking it would probably fix all of them at once, but it's the deepest hole here.
+- **`DINO_COMMON_LAYOUT_INIT` sinits:** mixing NV and volatile pool stores changes nothing, because the
+  single-anchor aliasing blocks the game's reordering.
+- **`LoadSlideInPict` / `SlideOutPict`:** the `sDirs` bss/data offset depends on game data that this TU doesn't
+  emit.
+- **`ResolveMove`:** needs the game's ipa emission order (a `bl` to a local copy-ctor emitted right after it).
+- **Permuter-dead.** These didn't move objdiff % in a 600 s round: OnFocus, CreateCloseTask, DispBlower::Execute,
+  IdlePatrol/IdleFollow (s64 sum registers), StateClose, DebugKasekiRockGet::OnStart, ShowAttackPage, and the
+  revive_status sinit.
+- **Permuter "improvements" I mined that didn't help:** LoadZoomInPict (110 → 81 score), the TownMap ctor
+  (144 → 114), Fraction4 (142 → 112; noise output that even reads a variable before setting it), and IdleUnk2
+  (+0.01%). Untested: the ReviveStatusParts candidate (293 → 244, a flag copy and `level != 0`).
+- **`MFx32Rect::PushOut` and `operator+`** are inline in the shared `include/m/fx32.h`. Changing them affects every
+  TU that uses them, so coordinate before touching them.
+
+**Suspected wrong, not verified:**
+
+- `func_ov007_02182020` (other session's area): symbol size looks 2 bytes short (0x12ce, probably 0x12d0).
+
+## 7. Build reality
+
+- A clean `python3 tools/configure.py usa && ninja` at 0c602c57 finishes with **`build/ff_usa.nds: OK`** on macOS
+  (Apple Silicon, wibo + mwccarm 2.0).
+- The default target is `rom partial`. `rom` is the SHA-1 check, and `partial` compiles the non-`complete` units
+  for objdiff. `ninja check` runs the module check only.
+- There are no known-broken files. Any file can be edited: non-matching C in a partial unit can't break the ROM.
+  It can only lower the report.
+- Every unit uses the default compiler version except `libs/nitrosdk/src/crypto/`, which uses mwcc 1.2/sp2 and is
+  set in `CC_VERSION_BY_PATH` in `tools/configure.py`.
+- Linux: the build is meant to work there, but I've only run it on macOS.
+
+---
+
+## Appendix: core helper scripts
+
+Save these anywhere and run them from the repo root.
+
+```python
+# fs.py UNIT SYM [SYM...]   e.g. fs.py src/ov001/dino_field _ZN9DinoField12FindRockHoleE10MFx32Point
+import json,subprocess,sys
+u=sys.argv[1]
+r=subprocess.run(['ninja','build/usa/'+u+'.o'],capture_output=True,text=True)
+if r.returncode: print('BUILD FAIL'); print('\n'.join(l for l in r.stdout.split('\n') if 'rror' in l)[:1500]); sys.exit(1)
+for sym in sys.argv[2:]:
+    d=json.loads(subprocess.run(['tools/bin/objdiff-cli','diff','-p','.','-u',u,'-o','-','--format','json',sym],capture_output=True,text=True).stdout)
+    L=[s for s in d['left']['symbols'] if s.get('name')==sym and s.get('instructions')]
+    R=[s for s in d['right']['symbols'] if s.get('name')==sym and s.get('instructions')]
+    if not R: print(sym,'NOT FOUND in ours'); continue
+    print('%.3f'%L[0].get('match_percent',0), sym)
+```
+
+```python
+# vt.py SPEC.py : SPEC defines FILE, UNIT, SYMS, VARIANTS=[(name,old,new) | (name,[(old,new),...])], optional ALL=True
+import sys,subprocess,runpy,os
+FS=os.path.join(os.path.dirname(os.path.abspath(__file__)),'fs.py')
+sp=runpy.run_path(sys.argv[1]); FILE,UNIT,SYMS,V=sp['FILE'],sp['UNIT'],sp['SYMS'],sp['VARIANTS']; ALL=sp.get('ALL',False)
+orig=open(FILE).read()
+score=lambda:' | '.join(subprocess.run(['python3',FS,UNIT]+SYMS,capture_output=True,text=True).stdout.strip().split('\n'))
+try:
+    print('%-14s %s'%('base',score()))
+    for v in V:
+        name=v[0]; edits=v[1] if isinstance(v[1],list) else [(v[1],v[2])]; s=orig
+        if any((s.count(o)!=1 and not ALL) or s.count(o)==0 for o,_ in edits): print(name,': old text not unique/found'); continue
+        for o,n in edits: s=s.replace(o,n)
+        open(FILE,'w').write(s); print('%-14s %s'%(name,score()),flush=True)
+finally:
+    open(FILE,'w').write(orig); subprocess.run(['ninja','build/usa/'+UNIT+'.o'],capture_output=True)
+```
+
+```python
+# dk.py UNIT SYM : only the rows objdiff marks as different (left = game)
+import json,subprocess,sys
+u,sym=sys.argv[1],sys.argv[2]
+d=json.loads(subprocess.run(['tools/bin/objdiff-cli','diff','-p','.','-u',u,'-o','-','--format','json',sym],capture_output=True,text=True).stdout)
+pk=lambda s:[x for x in d[s]['symbols'] if x.get('name')==sym and x.get('instructions')][0]['instructions']
+l,r=pk('left'),pk('right')
+for i in range(max(len(l),len(r))):
+    a=l[i] if i<len(l) else {}; b=r[i] if i<len(r) else {}
+    k=a.get('diff_kind') or b.get('diff_kind')
+    if k and k!='DIFF_NONE': print(i,k,a.get('instruction',{}).get('formatted'),'|',b.get('instruction',{}).get('formatted'))
+```
