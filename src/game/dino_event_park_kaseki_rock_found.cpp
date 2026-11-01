@@ -1,4 +1,5 @@
 // DinoEventParkKasekiRockFound.
+#pragma ipa file
 
 #include "game/dino_static_init.h"
 #include "game/dino_event_park_kaseki_rock_found.h"
@@ -85,7 +86,6 @@ void DinoEventKasekiRockFound::StateGet() {
 
 // The battle's rival (its data's chara, when it has one) appears at the rock, walks a tile out of it facing the
 // finder, and the finder turns to the rock; then the rival's message and talk, and the yes/no.
-// NONMATCHING: same code; the MFx32 temporaries take other stack slots.
 void DinoEventKasekiRockFound::StateRival() {
     if (((const u32 *)mBattleData.Get())[11] != 0) {
         DinoSoundPlaySe(0xCF, 0);
@@ -100,10 +100,10 @@ void DinoEventKasekiRockFound::StateRival() {
         mRival->Refresh();
         mRival->SetCommonMotion(12);
         mRival->GetModel()->id = 0;
-        MFx32Point offset = MFx32Point(MFx32::FromRaw(FX_SinCosTable_[(mRival->GetModel()->angle >> 4) * 2 + 1]),
-                                       MFx32::FromRaw(FX_SinCosTable_[(mRival->GetModel()->angle >> 4) * 2])) *
-                            MFx32(1);
-        mRival->MoveTo(rock - offset, 30, 0, TRUE);
+        mRival->MoveTo(rock - MFx32Point(MFx32::FromRaw(FX_SinCosTable_[(mRival->GetModel()->angle >> 4) * 2 + 1]),
+                                         MFx32::FromRaw(FX_SinCosTable_[(mRival->GetModel()->angle >> 4) * 2])) *
+                                  MFx32(1),
+                       30, 0, TRUE);
         mSerial.AddTail(new MTimer(30), mChara->CreateAngleToTask(MFx32PointAngle(rock - mChara->GetModel()->pos), 10, 12),
                         new MTimer(30));
     } else {
@@ -197,48 +197,19 @@ void DinoEventParkKasekiRockFound::StateStart() {
 
 extern "C" const u32 data_0208b2d8[]; // per rock color: the chara's motion
 
-// NONMATCHING: the task locals' stack slots (the game spills them in a different order).
+// NONMATCHING: the rock index (read before GetField) and the motion task take each other's stack slots.
 void DinoEventParkKasekiRockFound::StateFound() {
-    MTask *camera;
-    MTask *motion;
-    MTask *removeRock;
-    MTask *wait10;
-    MTask *se2;
-    MTask *showManpu;
-    MTask *wait30;
-    MTask *turn;
-    MTask *hideManpu;
-    MTask *wait5;
-    MTask *wait15;
     MTask *get = new DinoEventKasekiRockGet(mEvent, 3, (const DinoBackupEntry *) &mEntry.unk14, &mTaken);
     MTask *se = DinoSoundCreatePlaySeTask(0x69, 0);
     MParallelTaskSet *getting = new MParallelTaskSet(TRUE);
     getting->AddTail(se);
     getting->AddTail(get);
-    wait15 = new MTimer(15);
-    wait5 = new MTimer(5);
-    hideManpu = mChara->CreateHideManpuTask();
-    turn = mChara->CreateAngleToTask(0x4000, 0x14, 0xC);
-    wait30 = new MTimer(30);
-    showManpu = mChara->CreateShowManpuTask(2, MPoint(0, 0));
-    se2 = DinoSoundCreatePlaySeTask(0xD0, 0);
-    wait10 = new MTimer(10);
-    removeRock = MTaskExitTransfer::Create((MTask *) mEvent->GetField()->GetKasekiRock(mIndex));
-    motion = mChara->CreateSetMotionTask(data_0208b2d8[mEntry.color], 0, MFx32(1));
-    camera = new DinoEventExecCamera(mEvent, 0x400, 0x1B53, 0, 0x2B000, 0x3C, 0xC);
-    MSerialTaskSet *serial = &mSerial;
-    serial->AddTail(camera);
-    serial->AddTail(motion);
-    serial->AddTail(removeRock);
-    serial->AddTail(wait10);
-    serial->AddTail(se2);
-    serial->AddTail(showManpu);
-    serial->AddTail(wait30);
-    serial->AddTail(turn);
-    serial->AddTail(hideManpu);
-    serial->AddTail(wait5);
-    serial->AddTail(wait15);
-    serial->AddTail(getting);
+    GetSerial()->AddTail(new DinoEventExecCamera(mEvent, 0x400, 0x1B53, 0, 0x2B000, 0x3C, 0xC),
+                         mChara->CreateSetMotionTask(data_0208b2d8[mEntry.color], 0, MFx32(1)),
+                         MTaskExitTransfer::Create((MTask *) mEvent->GetField()->GetKasekiRock(mIndex)), new MTimer(10),
+                         DinoSoundCreatePlaySeTask(0xD0, 0), mChara->CreateShowManpuTask(2, MPoint(0, 0)), new MTimer(30),
+                         mChara->CreateAngleToTask(0x4000, 0x14, 0xC), mChara->CreateHideManpuTask(), new MTimer(5),
+                         new MTimer(15), getting);
     mState = data_020bd380.StateEnd_70;
 }
 
@@ -269,11 +240,12 @@ static struct DinoEventParkKasekiRockFoundStaticInit {
     DinoEventParkKasekiRockFoundStaticInit() {
         DINO_POOL_NV(MPoint, data_020bd400, 0x10) = MPoint(256, 192);
         DINO_POOL_NV(MRect, data_020bd480, 0x10) = DinoSizeRect(DINO_POOL_NV(MPoint, data_020bd400, 0x10));
-        DINO_POOL_NV(MPoint, data_020bd380, 0x20) = MPoint(2, 2);
         DINO_POOL_NV(MPoint, data_020bd400, 0x8) = MPoint(36, 28);
         DINO_POOL_NV(MRect, data_020bd480, 0x20) = DinoSizeRect(DINO_POOL_NV(MPoint, data_020bd400, 0x8));
+        DINO_POOL_NV(MPoint, data_020bd380, 0x20) = MPoint(2, 2);
         DINO_POOL_NV(MPoint, data_020bd480, 0x30) = MPoint(0, 24);
         DINO_POOL_NV(MPoint, data_020bd480, 0x38) = MPoint(256, 192);
         DINO_POOL_NV(MRect, data_020bd480, 0x40) = MRect(0, 0, 256, 24);
+
     }
 } sDinoEventParkKasekiRockFoundStaticInit;

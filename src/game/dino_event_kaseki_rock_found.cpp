@@ -106,6 +106,10 @@ MTask *DinoEventKasekiRockFound::CreateYesNo(u32 message) {
 template class std::__vec_deleter<std::string, std::allocator<std::string> >;
 template std::__vec_deleter<std::string, std::allocator<std::string> &>::~__vec_deleter();
 
+// (Defined in the next file, where the game emits it right after StateDig.)
+template <> MTask *MCreateCallTask<MPolygonChar, MPolygonChar, const char *, const char *>(
+    MPolygonChar *obj, void (MPolygonChar::*func)(const char *, const char *), const char *a1, const char *a2);
+
 // The finder's digging motion for each kind of rock.
 // A dig spot's settings (in the map's M data).
 struct DinoDigSpot {

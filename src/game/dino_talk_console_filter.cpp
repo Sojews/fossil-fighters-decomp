@@ -425,9 +425,8 @@ std::wstring &DinoTalkFilterReplaceAnchor(std::wstring &s, const std::wstring &t
 #pragma dont_inline reset
 
 // An opaque 15-bit color from 8-bit components.
-#define DINO_TALK_RGB(r, g, b) (0x8000 | ((u32) (r) >> 3) | (((u32) (g) >> 3) << 5) | (((u32) (b) >> 3) << 10))
+#define DINO_TALK_RGB(r, g, b) ((((u32) (b) >> 3) << 10) | ((((u32) (g) >> 3) << 5) | (((u32) (r) >> 3) | 0x8000)))
 
-// NONMATCHING (99.1%): the game gives the speaker colours' three pointers other registers.
 DinoTalkWindow::DinoTalkWindow(MDisplay *display, std::string speaker, int oam, int priority, u8 flip)
     : MProcess(display), mText(MDecodeUtf8(speaker)), mUnkB0(0), mOam(oam), mFlip(flip) {
     u32 option = gDinoBackup->GetUnk34_16();

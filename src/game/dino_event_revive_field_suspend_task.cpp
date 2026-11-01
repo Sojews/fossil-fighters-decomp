@@ -756,11 +756,11 @@ extern "C" u8 data_020bd7a8[];
 static struct DinoEventReviveStaticInit {
     DinoEventReviveStaticInit() {
         DINO_POOL_NV(MPoint, data_020bd6a8, 0x2c) = MPoint(256, 192);
-        DINO_POOL_NV(MRect, data_020bd728, 0x78) = DinoSizeRect(DINO_POOL_NV(MPoint, data_020bd6a8, 0x2c));
-        DINO_POOL_NV(MPoint, data_020bd6a8, 0x54) = MPoint(2, 2);
         DINO_POOL_NV(MPoint, data_020bd6a8, 0x44) = MPoint(36, 28);
+        DINO_POOL_NV(MRect, data_020bd728, 0x78) = DinoSizeRect(DINO_POOL_NV(MPoint, data_020bd6a8, 0x2c));
         DINO_POOL_NV(MRect, data_020bd7a8, 0x8) = DinoSizeRect(DINO_POOL_NV(MPoint, data_020bd6a8, 0x44));
         DINO_POOL_NV(MPoint, data_020bd7a8, 0x20) = MPoint(256, 192);
+        DINO_POOL_NV(MPoint, data_020bd6a8, 0x54) = MPoint(2, 2);
         DINO_POOL_NV(MPoint, data_020bd7a8, 0x18) = MPoint(0, 24);
         DINO_POOL_NV(MRect, data_020bd7a8, 0x28) = MRect(0, 0, 256, 24);
     }
