@@ -47,16 +47,15 @@ static inline const u32 *ExchangeIds(const DinoExcavateDefs *data) {
     return (const u32 *)((const u8 *)data + data->exchangeOffset);
 }
 
-static inline u32 RandomExchangeId() {
-    MResource<DinoExcavateDefs> defs = gDinoResource->GetExcavateDefs();
-    MResource<DinoExcavateDefs> defs2 = gDinoResource->GetExcavateDefs();
-    u32 index = gDinoResource->GetRandom()->Next(defs2.Get()->exchangeCount);
-    return ExchangeIds(defs.Get())[index];
+// The two excavate resources are temporaries of the caller's expression (stack slots below its named locals, in
+// creation order).
+static inline u32 PickExchangeId(const MResource<DinoExcavateDefs> &defs, const MResource<DinoExcavateDefs> &defs2) {
+    u32 index = gDinoResource->GetRandom()->Next(((MResource<DinoExcavateDefs> &)defs2).Get()->exchangeCount);
+    return ExchangeIds(((MResource<DinoExcavateDefs> &)defs).Get())[index];
 }
 
-// NONMATCHING: the two excavate resources swap stack slots.
 void DinoUiExchange::MakeExchangeEntry(DinoBackupEntry *entry) {
-    u32 id = RandomExchangeId();
+    u32 id = PickExchangeId(gDinoResource->GetExcavateDefs(), gDinoResource->GetExcavateDefs());
     MResource<DinoKasekiDefs> kaseki = gDinoResource->LoadKasekiDefs();
     const DinoKasekiDef *def = kaseki.Get()->GetDef(id);
     MI_CpuFill8(entry, 0, sizeof(DinoBackupEntry));
