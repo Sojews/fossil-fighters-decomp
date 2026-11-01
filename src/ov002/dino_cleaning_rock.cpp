@@ -65,7 +65,7 @@ MFx32 DinoCleaningRock::Hit(int row, int col, MFx32 power) {
     if (IsCellClear(row, col)) {
         return power;
     }
-    int layer = mImage->mGrid[row][col];
+    u32 layer = mImage->mGrid[row][col];
     if (layer != 0) {
         do {
             if (mImage->GetLayer(layer)->mHard[row][col] == 0) {
