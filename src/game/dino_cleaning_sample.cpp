@@ -443,15 +443,16 @@ template class std::__vec_deleter<void *, std::allocator<void *> >;
 #pragma auto_inline reset
 #pragma always_inline on
 
+extern "C" u32 data_020bcd24[];
 static struct DinoCleaningSampleStaticInit {
     DinoCleaningSampleStaticInit() {
         DINO_POOL(MPoint, data_020bcc24, 0x10) = MPoint(256, 192);
-        DINO_POOL(MRect, data_020bcc24, 0x134) = DinoSizeRect(DINO_POOL(MPoint, data_020bcc24, 0x10));
+        DINO_POOL(MRect, data_020bcd24, 0x34) = DinoSizeRect(DINO_POOL(MPoint, data_020bcc24, 0x10));
         DINO_POOL(MPoint, data_020bcc24, 0x20) = MPoint(2, 2);
         DINO_POOL(MPoint, data_020bcc24, 0x18) = MPoint(36, 28);
-        DINO_POOL(MRect, data_020bcc24, 0x144) = DinoSizeRect(DINO_POOL(MPoint, data_020bcc24, 0x18));
-        DINO_POOL(MPoint, data_020bcc24, 0x124) = MPoint(0, 24);
-        DINO_POOL(MPoint, data_020bcc24, 0x12c) = MPoint(256, 192);
-        DINO_POOL(MRect, data_020bcc24, 0x114) = MRect(0, 0, 256, 24);
+        DINO_POOL(MRect, data_020bcd24, 0x44) = DinoSizeRect(DINO_POOL(MPoint, data_020bcc24, 0x18));
+        DINO_POOL(MPoint, data_020bcd24, 0x24) = MPoint(0, 24);
+        DINO_POOL(MPoint, data_020bcd24, 0x2c) = MPoint(256, 192);
+        DINO_POOL(MRect, data_020bcd24, 0x14) = MRect(0, 0, 256, 24);
     }
 } sDinoCleaningSampleStaticInit;

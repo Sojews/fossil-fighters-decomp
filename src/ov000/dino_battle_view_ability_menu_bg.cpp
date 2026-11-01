@@ -735,7 +735,7 @@ static struct DinoBattleViewAbilityMenuBgStaticInit {
         DINO_POOL_WORD(data_ov000_021949ac, 0x24) = 0;
         DINO_POOL_WORD(data_ov000_021949ac, 0x28) = 189;
         DINO_POOL_WORD(data_ov000_021949ac, 0x2c) = 22;
-        DINO_POOL_WORD(data_ov000_0219492c, 0x24) = 0;
+        DINO_POOL_NV(s32, data_ov000_0219492c, 0x24) = 0;
         DINO_POOL_WORD(data_ov000_0219492c, 0x28) = 145;
         DINO_POOL_WORD(data_ov000_0219492c, 0x2c) = 255;
         DINO_POOL_WORD(data_ov000_0219492c, 0x30) = 164;
