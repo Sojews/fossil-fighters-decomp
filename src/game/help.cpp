@@ -82,13 +82,23 @@ void DinoHelpDriver::RemoveBase(DinoHelpBase *base) {
     }
 }
 
+// (The game's search makes one more by-value copy of each iterator than std::find does.)
+template <typename It, typename T> static inline It HelpFind(It first, It last, const T &value) {
+    return std::find(first, last, value);
+}
+
+// NONMATCHING (at optimization level 3, as the game was): the game keeps the search's result in its loop slot.
+#pragma optimization_level 3
 BOOL DinoHelpDriver::HasBase(DinoHelpBase *base) {
     OSMutex *mutex = &sHelpMutex.mutex;
     OS_LockMutex(mutex);
-    BOOL found = std::find(mBases.begin(), mBases.end(), base) != mBases.end();
+    std::list<DinoHelpBase *>::iterator e = mBases.end();
+    std::list<DinoHelpBase *>::iterator b = mBases.begin();
+    BOOL found = HelpFind(b, e, base) != mBases.end();
     OS_UnlockMutex(mutex);
     return found;
 }
+#pragma optimization_level reset
 
 void DinoHelpDriver::AddItem(DinoHelpItem *item) {
     MScopedLock lock(&sHelpMutex.mutex, TRUE);
@@ -99,13 +109,12 @@ void DinoHelpDriver::RemoveItem(DinoHelpItem *item) {
     OS_LockMutex(&sHelpMutex.mutex);
     mItems.erase(std::find(mItems.begin(), mItems.end(), item));
     // Drop the entries linking to or from the item.
-    std::multimap<u32, std::pair<u32, u32> >::iterator it = mEntries.begin();
-    while (it != mEntries.end()) {
+again:
+    for (std::multimap<u32, std::pair<u32, u32> >::iterator it = mEntries.begin(); it != mEntries.end(); ++it) {
         if (it->first == (u32) item || it->second.second == (u32) item) {
-            mEntries.erase(it);
-            it = mEntries.begin();
-        } else {
-            ++it;
+            std::multimap<u32, std::pair<u32, u32> >::iterator e = it;
+            mEntries.erase(e);
+            goto again;
         }
     }
     OS_UnlockMutex(&sHelpMutex.mutex);
@@ -141,7 +150,8 @@ void DinoHelpDriver::NotifyClose() {
 
 // Whether there is help to show: help is on, the current base is enabled, neither screen is faded and one of the
 // base's enabled items has text.
-// NONMATCHING: the game keeps copies of the list iterators on the stack.
+// NONMATCHING (at optimization level 3, as the game was): the iterator copies take each other's stack slots.
+#pragma optimization_level 3
 BOOL DinoHelpDriver::CanShowHelp() {
     MScopedLock lock(&sHelpMutex.mutex, TRUE);
     if (mEnableCount <= 0) {
@@ -165,6 +175,7 @@ BOOL DinoHelpDriver::CanShowHelp() {
     }
     return FALSE;
 }
+#pragma optimization_level reset
 
 // (At optimization level 3: the game keeps the entry pair and the result in their own stack slots.)
 #pragma optimization_level 3
@@ -179,7 +190,8 @@ void DinoHelpDriver::RemoveEntry(u32 a, u32 b) {
     OS_LockMutex(&sHelpMutex.mutex);
     for (std::multimap<u32, std::pair<u32, u32> >::iterator it = mEntries.begin(); it != mEntries.end(); ++it) {
         if (a == it->first && b == it->second.first) {
-            mEntries.erase(it);
+            std::multimap<u32, std::pair<u32, u32> >::iterator e = it;
+            mEntries.erase(e);
             OS_UnlockMutex(&sHelpMutex.mutex);
             return;
         }
@@ -400,17 +412,17 @@ DinoHelpItem *DinoHelpSign::GetItem() {
 void DinoHelpSign::OnDecide() {
 }
 
-static inline MRect DinoHelpTopShift(const MRect &rect) {
-    MRect r = rect;
+// (Through a pointer: the game copies the rect through a pointer register, after freeing the frame.)
+static inline MRect DinoHelpTopShift(const MRect *rect) {
+    MRect r = *rect;
     r.top += kHelpTopScreenOffset;
     r.bottom += kHelpTopScreenOffset;
     return r;
 }
 
-// NONMATCHING (92%): the game copies the rect through a pointer register and frees the frame before the copy.
 MRect DinoHelpSign::GetFrame() {
     if (mItem->GetDisplay() == gLcd->GetTopDisplay()) {
-        return DinoHelpTopShift(mItem->GetRect());
+        return DinoHelpTopShift(&mItem->GetRect());
     }
     return mItem->GetRect();
 }
