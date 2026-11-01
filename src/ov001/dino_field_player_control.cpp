@@ -457,7 +457,7 @@ walk : {
             angle = player->GetModel()->angle;
         }
     }
-    angle -= mField->GetCamera()->GetUnkD8();
+    angle = angle - mField->GetCamera()->GetUnkD8();
     if (mSpeed < speed) {
         mSpeed = std::min(mSpeed + defs->accel * walkSpeed, speed);
     } else if (mSpeed > speed) {

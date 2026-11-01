@@ -81,7 +81,7 @@ MFx32 DinoCleaningRock::Hit(int row, int col, MFx32 power) {
                 if (mHardness[row][col] > power) {
                     mImage->SetCellLayer(row, col, layer);
                     MFx32 &hardness = mHardness[row][col];
-                    hardness = hardness - power;
+                    hardness -= power;
                     return MFx32(0);
                 }
                 power = power - mHardness[row][col];
