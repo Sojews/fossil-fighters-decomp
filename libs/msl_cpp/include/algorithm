@@ -507,9 +507,9 @@ namespace std {
 
     template <class T> inline __temp_buffer<T>::__temp_buffer(ptrdiff_t len) {
         pair<T *, ptrdiff_t> p = get_temporary_buffer<T>(len);
+        data_ = p.first;
         size_ = p.second;
         n_ = 0;
-        data_ = p.first;
     }
 
     template <class RandomAccessIterator, class Compare>

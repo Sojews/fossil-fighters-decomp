@@ -252,7 +252,6 @@ done:
 }
 
 // Writes a save file in Read's format. Blocks whose data hasn't changed keep their old encryption.
-// NONMATCHING: the end of the loop (the game makes the 0x200 step first and the source step from it).
 BOOL DinoBackup::Write(u32 file, u32 size, const void *src) {
     if (mStorage == NULL) {
         return FALSE;
@@ -275,6 +274,7 @@ BOOL DinoBackup::Write(u32 file, u32 size, const void *src) {
     }
     for (i = 0; i < blocks; i++) {
         u8 *block = out + i * 0x200;
+        const u8 *s = (const u8 *) src + i * 0x1E0;
         u8 *oldBlock = old + i * 0x200;
         if (old != NULL) {
             MI_CpuCopy8(oldBlock, block, 0x200);
@@ -287,12 +287,12 @@ BOOL DinoBackup::Write(u32 file, u32 size, const void *src) {
             func_0204b15c(&cipher, oldBlock + 0x10, 0x1F0, oldBlock + 0x10);
             u8 digest[16];
             MATH_CalcMD5(digest, oldBlock + 0x20, 0x1E0);
-            if (memcmp(digest, oldBlock + 0x10, 16) == 0 && memcmp(oldBlock + 0x20, src, 0x1E0) == 0) {
-                goto next;
+            if (memcmp(digest, oldBlock + 0x10, 16) == 0 && memcmp(oldBlock + 0x20, s, 0x1E0) == 0) {
+                continue;
             }
         }
         {
-            MI_CpuCopy8(src, block + 0x20, 0x1E0);
+            MI_CpuCopy8(s, block + 0x20, 0x1E0);
             MATH_CalcMD5(block + 0x10, block + 0x20, 0x1E0);
             for (u32 k = 0; k < 4; k++) {
                 ((u32 *) block)[k] = gDinoResource->GetRandom()->Next();
@@ -305,8 +305,6 @@ BOOL DinoBackup::Write(u32 file, u32 size, const void *src) {
             func_0204b0ec(&cipher, key, 16);
             func_0204b15c(&cipher, block + 0x10, 0x1F0, block + 0x10);
         }
-    next:
-        src = (const u8 *) src + 0x1E0;
     }
     if (!mStorage->WriteFile(file, out)) {
         mEnabled = FALSE;
@@ -1079,6 +1077,10 @@ s32 DinoBackup::FindFreeEntry(DinoBackupEntry *entries, u32 count) {
 // The order the entries are sorted into: used ones first, then active ones (by type). (The game emits the whole
 // stable_sort machinery after CompactEntries. NONMATCHING: stable_sort, get_temporary_buffer, __stable_sort,
 // __stable_sort_move, __merge_backward and two of the __merges, as for the creature lists' sorts.)
+namespace std {
+template <> pair<DinoBackupEntry *, ptrdiff_t> get_temporary_buffer<DinoBackupEntry>(ptrdiff_t len);
+}
+
 struct DinoBackupEntryOrder {
     bool operator()(const DinoBackupEntry &a, const DinoBackupEntry &b) const {
         if (a.id != 0 && b.id == 0) {
@@ -1115,6 +1117,20 @@ again:
         }
     }
     std::stable_sort(entries, entries + count, DinoBackupEntryOrder());
+}
+
+// (The buffer's empty size is the last of the file's limits: its zero is pooled after them.)
+template <> std::pair<DinoBackupEntry *, ptrdiff_t> std::get_temporary_buffer<DinoBackupEntry>(ptrdiff_t len) {
+    pair<DinoBackupEntry *, ptrdiff_t> result(0, sLimits[15]);
+    while (len > 0) {
+        result.first = (DinoBackupEntry *)::operator new[](len * sizeof(DinoBackupEntry), nothrow);
+        if (result.first != 0) {
+            result.second = len;
+            return result;
+        }
+        len /= 2;
+    }
+    return result;
 }
 
 u32 DinoBackup::GetUnk98Capacity() {
@@ -1371,11 +1387,9 @@ void DinoBackup::SetSystemVar(u32 index, s32 value) {
     case 19:
         mPlayer->unk2c_0 = std::max(sLimits[13], std::min(sLimits[3], value));
         break;
-    case 25: {
-        u32 v = value;
-        mPlayer->unk34_0 = std::min(v, (u32) sLimits[9]);
+    case 25:
+        mPlayer->unk34_0 = std::min((u32) value, *(const u32 *) &sLimits[9]);
         break;
-    }
     case 30:
         mPlayer->unk34_28 = value;
         break;
@@ -1629,8 +1643,8 @@ BOOL DinoBackup::GetSystemFlag(u32 id) {
     case 0x2a:
         for (u32 i = 0; i < 64; i++) {
             DinoBackupEntry *entry = &mUnk98[i];
-            if (entry->id != 0 && entry->unk10_0 != 1 &&
-                (entry->unk10_3 || ((DinoKasekiRock *) &mKasekiRocks[entry->id])->found)) {
+            DinoKasekiRock *rock = (DinoKasekiRock *) &mKasekiRocks[entry->id];
+            if (entry->id != 0 && entry->unk10_0 != 1 && (entry->unk10_3 || rock->found)) {
                 return FALSE;
             }
         }
