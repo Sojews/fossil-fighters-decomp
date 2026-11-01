@@ -20,10 +20,16 @@ struct DinoCleaningScoreRgb {
     u32 r, g, b;
 };
 
-static const char *sDigitPath = "/motion/cleaning/score_digit.bin";
-static const char *sArrowPath = "/motion/cleaning/yajirusi.bin";
-static const char *sFailurePath = "/motion/cleaning/failure_window.bin";
-static const char *sSuccessPath = "/motion/cleaning/success_window.bin";
+struct DinoScoreLiterals;
+extern "C" DinoScoreLiterals data_ov002_02164a58;
+// The motions' paths, kept in the TU's literal block (data_ov002_02164a58) among the clamps:
+// +0x24 "/motion/cleaning/score_digit.bin", +0x3C "/motion/cleaning/yajirusi.bin",
+// +0x50 "/motion/cleaning/failure_window.bin", +0x58 "/motion/cleaning/success_window.bin".
+#define SCORE_PATH(off) (((const char *const *)&data_ov002_02164a58)[(off) / 4])
+#define sDigitPath SCORE_PATH(0x24)
+#define sArrowPath SCORE_PATH(0x3C)
+#define sFailurePath SCORE_PATH(0x50)
+#define sSuccessPath SCORE_PATH(0x58)
 
 // The statics this TU's __sinit builds.
 extern "C" struct {
@@ -37,14 +43,26 @@ extern "C" const u32 data_0208ad34;  // the help text over the score
 extern "C" void func_ov002_0215bce8(DinoCleaningScore *score);
 
 #define SCORE_DATA data_ov002_02164ad8
+// The channels' 0xFF clamps (std::min on a pooled literal): the value read through the TU's literal block, the
+// literal returned by its own symbol.
+extern "C" const u32 data_ov002_02164a5c, data_ov002_02164a60, data_ov002_02164a64, data_ov002_02164a68,
+    data_ov002_02164a6c, data_ov002_02164a70, data_ov002_02164a74, data_ov002_02164a80, data_ov002_02164a84,
+    data_ov002_02164a88, data_ov002_02164a8c, data_ov002_02164a90, data_ov002_02164a98, data_ov002_02164a9c,
+    data_ov002_02164aa0, data_ov002_02164aac, data_ov002_02164ab4, data_ov002_02164ab8;
+extern "C" struct DinoScoreLiterals data_ov002_02164a58;
+static inline const u32 &DinoScoreClamp(const u32 &a, const u32 &named, const u32 &b) {
+    return b < a ? b : named;
+}
+#define SCORE_FF(off, named, x) DinoScoreClamp(((const u32 *)&data_ov002_02164a58)[(off) / 4], named, x)
+
 // t percent of the way from one channel to the other.
 #define LERP(from, to, t) (((from) * (100 - (t)) + (to) * (t)) / 100)
 #define SCORE_RGB(r, g, b) ((((b) >> 3) << 10) | ((((g) >> 3) << 5) | (0x8000 | ((r) >> 3))))
 
 // Builds the backdrop gradients (grey, blue and red, each in a normal and a brighter version, every channel
 // clamped to 0xFF), the backdrop's raster, the success and failure windows with their score digits, and the arrow.
-// NONMATCHING: 97.9%, the game keeps the digit loops' counters on the stack (its frame is 8 bytes bigger), and the
-// clamp literals' offsets in the TU's data block differ until the rest of the TU's data is written.
+// NONMATCHING: 97.9%, the game keeps the digit loops' counters on the stack and this + i * 4 in a register across
+// the path string's destructor (its frame is 8 bytes bigger): the known "this+i*4 across a string dtor" loop family.
 DinoCleaningScore::DinoCleaningScore(DinoCleaning *cleaning, MSmartOam *oam, u32 score, u8 flag) : MProcess(NULL) {
     mCleaning = cleaning;
     mScore = score;
@@ -54,26 +72,26 @@ DinoCleaningScore::DinoCleaningScore(DinoCleaning *cleaning, MSmartOam *oam, u32
     mUnk9CC = 0;
     for (u32 k = 0; k < 2; k++) {
         for (u32 j = 0; j < 100; j++) {
-            u32 r = LERP(std::min((u32)0xFF, SCORE_DATA.mColors[5].r + k * 4),
-                         std::min((u32)0xFF, SCORE_DATA.mColors[3].r + k * 4), j);
-            u32 g = LERP(std::min((u32)0xFF, SCORE_DATA.mColors[5].g + k * 4),
-                         std::min((u32)0xFF, SCORE_DATA.mColors[3].g + k * 4), j);
-            u32 b = LERP(std::min((u32)0xFF, SCORE_DATA.mColors[5].b + k * 4),
-                         std::min((u32)0xFF, SCORE_DATA.mColors[3].b + k * 4), j);
+            u32 r = LERP(SCORE_FF(0x0C, data_ov002_02164a64, SCORE_DATA.mColors[5].r + k * 4),
+                         SCORE_FF(0x04, data_ov002_02164a5c, SCORE_DATA.mColors[3].r + k * 4), j);
+            u32 g = LERP(SCORE_FF(0x60, data_ov002_02164ab8, SCORE_DATA.mColors[5].g + k * 4),
+                         SCORE_FF(0x44, data_ov002_02164a9c, SCORE_DATA.mColors[3].g + k * 4), j);
+            u32 b = LERP(SCORE_FF(0x48, data_ov002_02164aa0, SCORE_DATA.mColors[5].b + k * 4),
+                         SCORE_FF(0x14, data_ov002_02164a6c, SCORE_DATA.mColors[3].b + k * 4), j);
             mGradients[0][k][j] = SCORE_RGB(r, g, b);
-            r = LERP(std::min((u32)0xFF, SCORE_DATA.mColors[1].r + k * 4),
-                     std::min((u32)0xFF, SCORE_DATA.mColors[2].r + k * 4), j);
-            g = LERP(std::min((u32)0xFF, SCORE_DATA.mColors[1].g + k * 4),
-                     std::min((u32)0xFF, SCORE_DATA.mColors[2].g + k * 4), j);
-            b = LERP(std::min((u32)0xFF, SCORE_DATA.mColors[1].b + k * 4),
-                     std::min((u32)0xFF, SCORE_DATA.mColors[2].b + k * 4), j);
+            r = LERP(SCORE_FF(0x54, data_ov002_02164aac, SCORE_DATA.mColors[1].r + k * 4),
+                     SCORE_FF(0x18, data_ov002_02164a70, SCORE_DATA.mColors[2].r + k * 4), j);
+            g = LERP(SCORE_FF(0x5C, data_ov002_02164ab4, SCORE_DATA.mColors[1].g + k * 4),
+                     SCORE_FF(0x30, data_ov002_02164a88, SCORE_DATA.mColors[2].g + k * 4), j);
+            b = LERP(SCORE_FF(0x34, data_ov002_02164a8c, SCORE_DATA.mColors[1].b + k * 4),
+                     SCORE_FF(0x40, data_ov002_02164a98, SCORE_DATA.mColors[2].b + k * 4), j);
             mGradients[1][k][j] = SCORE_RGB(r, g, b);
-            r = LERP(std::min((u32)0xFF, SCORE_DATA.mColors[4].r + k * 4),
-                     std::min((u32)0xFF, SCORE_DATA.mColors[0].r + k * 4), j);
-            g = LERP(std::min((u32)0xFF, SCORE_DATA.mColors[4].g + k * 4),
-                     std::min((u32)0xFF, SCORE_DATA.mColors[0].g + k * 4), j);
-            b = LERP(std::min((u32)0xFF, SCORE_DATA.mColors[4].b + k * 4),
-                     std::min((u32)0xFF, SCORE_DATA.mColors[0].b + k * 4), j);
+            r = LERP(SCORE_FF(0x38, data_ov002_02164a90, SCORE_DATA.mColors[4].r + k * 4),
+                     SCORE_FF(0x10, data_ov002_02164a68, SCORE_DATA.mColors[0].r + k * 4), j);
+            g = LERP(SCORE_FF(0x08, data_ov002_02164a60, SCORE_DATA.mColors[4].g + k * 4),
+                     SCORE_FF(0x28, data_ov002_02164a80, SCORE_DATA.mColors[0].g + k * 4), j);
+            b = LERP(SCORE_FF(0x2C, data_ov002_02164a84, SCORE_DATA.mColors[4].b + k * 4),
+                     SCORE_FF(0x1C, data_ov002_02164a74, SCORE_DATA.mColors[0].b + k * 4), j);
             mGradients[2][k][j] = SCORE_RGB(r, g, b);
         }
     }
@@ -151,17 +169,23 @@ void DinoCleaningScore::Show() {
     mSerial.AddTail(mArrow->CreateCoordAnime(MPoint(0x80, 0x92), MPoint(0x80, (100 - mScore) * 100 / 100 + 0x2E), 90, -1));
 }
 
+// The score rounded down to a whole number (by value: the game copies it).
+static inline MFx32 DinoScoreFloor(MFx32 x) {
+    return MFx32::FromRaw(x.v & 0xFFFFF000);
+}
+
 // Works out the score from how clean the rock is (mUnk84, what's left of the fossil and mUnk80, the score; the
 // second mode scores the two rocks' dirt) and shows both on the commentary; the first non-zero score moves on.
-// NONMATCHING: 93%, the MFx32 temporaries' stack copies differ and the second clamp branches the other way round.
+// NONMATCHING: 96%, the MFx32 temporaries' stack slots differ (the game's max copies sit with the others, ours lowest).
 extern "C" void func_ov002_0215bce8(DinoCleaningScore *score) {
     if (score->mCleaning->GetKasekiRock()) {
         if (!score->mFlag) {
-            MFx32 ratio = score->mCleaning->GetKasekiRock()->GetRock8C()->GetRatio();
-            MFx32 left = MFx32(100) - (MFx32(100) - ratio) * MFx32(2);
+            const MFx32 &ratio = score->mCleaning->GetKasekiRock()->GetRock8C()->GetRatio();
+            MFx32 lost = MFx32(100) - ratio;
+            MFx32 left = MFx32(100) - lost * MFx32(2);
             score->mUnk84 = MFx32(100 - MFx32ToInt(std::max(MFx32(0), left)));
-            MFx32 diff = score->mCleaning->GetKasekiRock()->GetRatio() - score->mUnk84;
-            score->mUnk80 = std::max(MFx32(0), MFx32::FromRaw(diff.v & 0xFFFFF000));
+            MFx32 masked = DinoScoreFloor(score->mCleaning->GetKasekiRock()->GetRatio() - score->mUnk84);
+            score->mUnk80 = std::max(MFx32(0), masked);
         } else {
             score->mUnk84 = MFx32(0);
             MFx32 q = ((MFx32(100) - score->mCleaning->GetKasekiRock()->GetRock8C()->GetRatio()) * MFx32(2) +
@@ -196,12 +220,13 @@ extern "C" void func_ov002_0215bce8(DinoCleaningScore *score) {
 
 // The TU's pooled literals (std::min/std::max operands): the value read through the pool, the operand returned by its own
 // symbol.
-extern "C" struct {
+extern "C" struct DinoScoreLiterals {
     u8 unk00[0x20];
     int mTopLimit;              // 0x20: 66
     u8 unk24[0x4C - 0x24];
     int mBottomLimit;           // 0x4C: 126
-} data_ov002_02164a58;
+};
+extern "C" DinoScoreLiterals data_ov002_02164a58;
 extern "C" const int data_ov002_02164a78, data_ov002_02164aa4;
 
 static inline const int &DinoScoreMin(const int &a, const int &named, const int &b) {
@@ -217,8 +242,7 @@ extern "C" MPoint data_ov002_02164b8c[3];       // the failure window's
 
 // Follows the score: sounds as the score passes the target either way, the arrow's motion, the windows sliding to
 // the two scores (with their digits) and the backdrop's gradients between them.
-// NONMATCHING: 99.9%, the last gradient loop's line, source and offset registers rotate (r2/r3/r4); tried separate,
-// swapped and while-loop counters.
+// (The last gradient loop has its own line variable, declared before the loop: it takes the game's registers.)
 void DinoCleaningScore::Idle() {
     mPrev80 = mUnk80;
     mPrev84 = mUnk84;
@@ -289,8 +313,9 @@ void DinoCleaningScore::Idle() {
         for (line = bottom, k = 0; line < 146; line++, k++) {
             (&mRasterFront)[i][line] = mGradients[1][i][k];
         }
-        for (line = top, k = 0; line >= 46; line--, k++) {
-            (&mRasterFront)[i][line] = mGradients[2][i][k];
+        u32 up;
+        for (up = top, k = 0; up >= 46; up--, k++) {
+            (&mRasterFront)[i][up] = mGradients[2][i][k];
         }
     }
 }

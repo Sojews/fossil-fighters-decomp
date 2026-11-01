@@ -115,8 +115,8 @@ static inline MFx32 DinoFxSqrtRaw(fx32 x) {
 }
 
 // The ring grows (fast, then slower): the window is the disc less the inner disc and the right edge.
-// NONMATCHING: 96.7%, the game loads mFrame twice for the post-increment (once for the old value, once to add).
-// (The clamps are bound to references: the game reads them after MFx32(mFrames).)
+// (The clamps are bound to references: the game reads them after MFx32(mFrames). The frame step reads mFrame once to
+// add and again, afterwards, for the old value it tests, then stores: a volatile read and store keep that order.)
 void DinoCleaningHammerEffect::State0215caf8() {
     const int &f = std::min(mFrame, mFrames - 1);
     MFx32 ratio = MFx32(f) / MFx32(mFrames);
@@ -127,7 +127,10 @@ void DinoCleaningHammerEffect::State0215caf8() {
     mWindow->SetCircle(mCenter, outer);
     mWindow->SubtractCircle(mCenter, inner);
     mWindow->SubtractRect(MRect(255, 0, 256, 192));
-    if (mFrame++ > mFrames + 2) {
+    int next = mFrame + 1;
+    int prev = *(volatile int *)&mFrame;
+    *(volatile int *)&mFrame = next;
+    if (prev > mFrames + 2) {
         mState = data_ov002_02164fb8.StateClear_20;
     }
 }
