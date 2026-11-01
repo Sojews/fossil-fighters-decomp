@@ -104,14 +104,6 @@ void DinoUiExchange::Reset() {
 template class MBgCallTask0<DinoBackup>;
 template MTask *MCreateBgCallTask(DinoBackup *obj, void (DinoBackup::*func)(), int thread);
 
-// The set of partners' addresses. The game built its search loops without strength reduction.
-// NONMATCHING: insert_node_at (register allocation) and insert_unique (its true/false constants sit one byte
-// further into the file's pooled data, after one an undecompiled function uses).
-#pragma opt_strength_reduction off
-template class std::__red_black_tree<DinoMacAddress, DinoMacAddress, std::__identity<DinoMacAddress>,
-                                     std::less<DinoMacAddress>, std::allocator<DinoMacAddress> >;
-#pragma opt_strength_reduction reset
-
 // The TU's pooled pointer-to-member constants (see menu.cpp).
 extern "C" struct {
     u8 unk00[0x8];
@@ -133,6 +125,32 @@ extern "C" struct {
     void (DinoUiExchange::*OnScanMessage_74)(MMessage *msg); // 0x74
     void (DinoUiExchange::*StateCancelled_7C)(); // 0x7c (its second word is in the next block)
 } data_ov004_02171de0;
+
+// The set of partners' addresses. The game built its search loops without strength reduction.
+// NONMATCHING: insert_node_at (register allocation).
+#pragma opt_strength_reduction off
+// insert_unique spelled out: the game reads its pair's bools from the TU's .data pool (true at +1, false at +2),
+// past a byte an undecompiled function uses, where ours would pool them at its own offsets.
+typedef std::__red_black_tree<DinoMacAddress, DinoMacAddress, std::__identity<DinoMacAddress>, std::less<DinoMacAddress>,
+                              std::allocator<DinoMacAddress> >
+    DinoMacTree;
+template <> std::pair<DinoMacTree::iterator, bool> DinoMacTree::insert_unique(const DinoMacAddress &v) {
+    node_base *last_not_greater;
+    bool left;
+    bool leftmost;
+    node_base *p = find_insert_position(std::__identity<DinoMacAddress>::get(v), last_not_greater, left, leftmost);
+    if (last_not_greater == 0 || std::__identity<DinoMacAddress>::less(static_cast<std::less<DinoMacAddress> &>(*this),
+                                                                      static_cast<node *>(last_not_greater)->data_,
+                                                                      std::__identity<DinoMacAddress>::get(v))) {
+        return std::pair<iterator, bool>(iterator(insert_node_at(p, left, leftmost, v)),
+                                         *((const bool *)&data_ov004_02171de0 + 1));
+    }
+    return std::pair<iterator, bool>(iterator(last_not_greater), *((const bool *)&data_ov004_02171de0 + 2));
+}
+template class std::__red_black_tree<DinoMacAddress, DinoMacAddress, std::__identity<DinoMacAddress>,
+                                     std::less<DinoMacAddress>, std::allocator<DinoMacAddress> >;
+#pragma opt_strength_reduction reset
+
 extern "C" struct {
     u8 unk00[0x4];
     void (DinoUiExchange::*OnExchangeMessage_04)(MMessage *msg); // 0x04
