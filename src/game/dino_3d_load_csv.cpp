@@ -728,8 +728,9 @@ extern "C" const Dino3DName data_0208b188[];    // a camera target's
 extern "C" const Dino3DName data_0208b100[];    // a trail's
 extern "C" const VecFx32 data_0208b0e8;         // the camera target's rotation (none)
 
-// NONMATCHING (99.6%): the game keeps each push_back's two flag bytes together (ours puts the fast-path ones first),
-// keeps the unused line counter in an ordinary slot, and reads model from where it was passed.
+// NONMATCHING (99.98%): the game keeps the unused line counter in an ordinary slot (ours, volatile, sits with the
+// address-taken locals). (model is read through a volatile, so it stays where it was passed, as in the game; the loops
+// share one counter.)
 // Reads a scene script, like MPolygonChar::Load: after its "script" line, sections that each make an object (a
 // model and its shadow, an emitter, a trail, a camera target or sounds) followed by lines of keys for it. unk84's
 // bits pick what is made (2: the kaseki model, 0x80: keep the first model's palette, 1: its shadow, 4: the camera
@@ -745,8 +746,9 @@ void Dino3DLoadCsv::ParseScript(char *text, void *unk84, const char *dir, const 
     MAnmModelBase *anm;
     int frame;
     MAnmKey key;
+    int i;
     for (char *line = ReadLine(&cursor); line != NULL; line = ReadLine(&cursor)) {
-        for (int i = 0; i < 16; i++) {
+        for (i = 0; i < 16; i++) {
             mFieldPresent[i] = mFieldNumeric[i] = 0;
         }
         int n = 0;
@@ -755,7 +757,7 @@ void Dino3DLoadCsv::ParseScript(char *text, void *unk84, const char *dir, const 
             mFieldPresent[n] = 1;
             n++;
         } while (n < 16 && SkipComma(&line));
-        for (int i = 0; i < 16; i++) {
+        for (i = 0; i < 16; i++) {
             if (mFieldPresent[i]) {
                 char *field = mFields[i];
                 mFieldValues[i] = ParseFx32(&field);
@@ -776,8 +778,9 @@ void Dino3DLoadCsv::ParseScript(char *text, void *unk84, const char *dir, const 
             frame = shift;
             if (Dino3DStrCaseCmp(mFields[1], "kasekium00") != 0 || ((u32)unk84 & 2)) {
                 anm = new MAnmModel((M3DScene *)mUnk80);
-                if (model != NULL && mUnk74 == NULL) {
-                    strcpy(mFields[1], model);
+                const char *name = *(const char *const volatile *)&model;
+                if (name != NULL && mUnk74 == NULL) {
+                    strcpy(mFields[1], name);
                 }
                 strcpy(path, dir);
                 strcat(path, mFields[1]);
@@ -791,7 +794,7 @@ void Dino3DLoadCsv::ParseScript(char *text, void *unk84, const char *dir, const 
                 anm->SetRotRef(&mRot);
                 anm->SetPosRef(&mPos);
                 anm->SetUnk134(mUnkB0);
-                for (int i = 3; i < 6; i++) {
+                for (i = 3; i < 6; i++) {
                     if (mFieldPresent[i] == 1) {
                         if (Dino3DStrCaseCmp(mFields[i], "loop") == 0) {
                             anm->mUnkF4 = 1;
@@ -857,7 +860,7 @@ void Dino3DLoadCsv::ParseScript(char *text, void *unk84, const char *dir, const 
                 anm->mStartFrame = shift;
             }
             anm->mEndFrame = 0x40000000;
-            for (int i = 3; i < 6; i++) {
+            for (i = 3; i < 6; i++) {
                 if (mFieldPresent[i] == 1) {
                     if (Dino3DStrCaseCmp(mFields[i], "absolute") == 0) {
                         anm->mUnk1A4 = 1;
@@ -916,7 +919,7 @@ void Dino3DLoadCsv::ParseScript(char *text, void *unk84, const char *dir, const 
                 anm->mStartFrame = 1;
                 anm->mEndFrame = 0xFFFF;
                 anm->Run();
-                for (int i = 3; i < 6; i++) {
+                for (i = 3; i < 6; i++) {
                     if (mFieldPresent[i] == 1 && Dino3DStrCaseCmp(mFields[i], "absolute") == 0) {
                         anm->mUnk1A4 = 1;
                     }
@@ -960,10 +963,10 @@ void Dino3DLoadCsv::ParseScript(char *text, void *unk84, const char *dir, const 
                 anm->mName = mFields[1];
             } else if (Dino3DStrCaseCmp(mFields[0], "SongCmd") == 0) {
                 if (mFieldPresent[1] && strlen(mFields[1]) != 0) {
-                    int command = -1;
-                    int data = -1;
+                    int data, command;
+                    data = command = -1;
                     u32 flags = 0;
-                    for (int i = 0; i < sSongCommands->size(); i++) {
+                    for (i = 0; i < sSongCommands->size(); i++) {
                         if (Dino3DStrCaseCmp(mFields[1], (*sSongCommands)[i].mName.c_str()) == 0) {
                             command = (*sSongCommands)[i].mId;
                             break;
@@ -972,7 +975,7 @@ void Dino3DLoadCsv::ParseScript(char *text, void *unk84, const char *dir, const 
                     if (mFieldNumeric[2]) {
                         data = mFieldValues[2] >> 12;
                     } else {
-                        for (int i = 0; i < sSoundData->size(); i++) {
+                        for (i = 0; i < sSoundData->size(); i++) {
                             if (Dino3DStrCaseCmp(mFields[2], (*sSoundData)[i].mName.c_str()) == 0) {
                                 data = (*sSoundData)[i].mId;
                                 break;
@@ -1034,7 +1037,7 @@ void Dino3DLoadCsv::ParseScript(char *text, void *unk84, const char *dir, const 
                         if (mFieldNumeric[1] == 1) {
                             key.mFrame = (mFieldValues[1] >> 8) + shift;
                             key.mUnkC = 0;
-                            for (int i = 0; i < 9; i++) {
+                            for (i = 0; i < 9; i++) {
                                 if (mFieldNumeric[2 + i] == 1) {
                                     key.mMin = mFieldValues[2 + i];
                                     key.mMax = mFieldValues[2 + i];
