@@ -492,7 +492,9 @@ void MAnmEmit::Unk0C() {
     }
 }
 
-// NONMATCHING: 99.5%, the two distance products land in the other registers.
+// Scales a by the fx32 b (the inline's operand order picks the game's product registers).
+static inline fx32 MAnmScale(fx32 a, fx32 b) { return b * a >> FX32_SHIFT; }
+
 // Aims the scene's camera: orbits the target (tracks 3, 4: angles, 6: distance), smoothed (11), with the field of
 // view (7) and a sway (8, 9: amounts, 10: period).
 void MAnmTargetCamera::Unk0C() {
@@ -541,8 +543,8 @@ void MAnmTargetCamera::Unk0C() {
     int p = ((u16)pitch >> 4) * 2;
     int y = ((u16)yaw >> 4) * 2;
     VecFx32 v;
-    v.x = distance * table[p + 1] >> FX32_SHIFT;
-    v.y = distance * table[p] >> FX32_SHIFT;
+    v.x = MAnmScale(distance, table[p + 1]);
+    v.y = MAnmScale(distance, table[p]);
     v.z = v.x;
     const fx16 sinYaw = table[y];
     v.x = mPos.x + (v.z * sinYaw >> FX32_SHIFT);
