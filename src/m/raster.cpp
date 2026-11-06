@@ -188,7 +188,7 @@ template <class Op> inline void MRasterWindow::ForEachLine(MRect rect, Op op) {
     if (OnScreen(rect)) {
         rect = rect.Intersection(MRect(0, 0, 256, M_RASTER_LINES));
         for (int y = rect.top; y < rect.bottom; y++) {
-            op(rect.left, rect.right, y);
+            op(rect.right, rect.left, y);
         }
     }
 }
@@ -204,7 +204,7 @@ template <class Op> inline void MRasterWindow::ForEachLineGuarded(MRect rect, Op
         int y = rect.top;
         if (y < rect.bottom) {
             for (; y < rect.bottom; y++) {
-                op(rect.left, right, y);
+                op(right, rect.left, y);
             }
         }
     }
@@ -213,7 +213,7 @@ template <class Op> inline void MRasterWindow::ForEachLineGuarded(MRect rect, Op
 // Adds [left, right) to a line, merged into a span it touches.
 struct AddSpanOp {
     AddSpanOp(MRasterWindow *window) : mWindow(window) {}
-    inline void operator()(int left, int right, int line) {
+    inline void operator()(int right, int left, int line) {
         if (left >= right) {
             return;
         }
@@ -240,7 +240,7 @@ struct AddSpanOp {
 
 struct SubtractSpanOp {
     SubtractSpanOp(MRasterWindow *window) : mWindow(window) {}
-    void operator()(int left, int right, int line) { mWindow->SubtractSpan(left, right, line); }
+    void operator()(int right, int left, int line) { mWindow->SubtractSpan(left, right, line); }
 
     MRasterWindow *mWindow;
 };
@@ -322,21 +322,21 @@ template <class Op> inline void MRasterWindow::ForEachCircleLine(Op op, MPoint c
         int right = std::min(sRasterWidth, std::max(0, center.x + y));
         int line = center.y - x;
         if (line >= 0 && line < M_RASTER_LINES) {
-            op(left, right, line);
+            op(right, left, line);
         }
         line = below - 1;
         if (line >= 0 && line < M_RASTER_LINES) {
-            op(left, right, line);
+            op(right, left, line);
         }
         left = std::min(sRasterWidth, std::max(0, center.x - x));
         right = std::min(sRasterWidth, std::max(0, center.x + x));
         line = center.y - y;
         if (line >= 0 && line < M_RASTER_LINES) {
-            op(left, right, line);
+            op(right, left, line);
         }
         line = bottom - 1;
         if (line >= 0 && line < M_RASTER_LINES) {
-            op(left, right, line);
+            op(right, left, line);
         }
         err -= 2 * x - 1;
         if (err < 0) {
