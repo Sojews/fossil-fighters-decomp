@@ -308,9 +308,9 @@ template <class Op> inline void MRasterWindow::ForEachCircleLine(Op op, MPoint c
     if (!MRect(0, 0, 256, M_RASTER_LINES).Intersects(rect)) {
         return;
     }
+    int below = center.y;
     int err = radius;
     int y = radius;
-    int below = center.y;
     for (int x = 0; y >= x; x++) {
         int left = std::min(sRasterWidth, std::max(0, center.x - y));
         int right = std::min(sRasterWidth, std::max(0, center.x + y));
