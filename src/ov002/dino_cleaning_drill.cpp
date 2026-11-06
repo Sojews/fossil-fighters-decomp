@@ -132,6 +132,10 @@ static inline MPoint DinoDrillCellCenter(MPoint cell) {
     return MPoint(cell.x * 8 + (cell.y & 1) * 4 + 4, cell.y * 8 + 4);
 }
 
+// The force product: the game keeps it in the frame's lowest temporary slot, as a temporary made inside an inline
+// helper. (The reference outlives the temporary in standard C++; mwcc keeps the slot for the whole function.)
+static inline const MFx32 &DinoDrillRef(const MFx32 &x) { return x; }
+static inline const MFx32 &DinoDrillMul(const MFx32 &a, const MFx32 &b) { return DinoDrillRef(a * b); }
 static inline MFx32 DinoDrillSqrt(MFx32 x) {
     return MFx32::FromRaw(FX_Sqrt(x.v));
 }
@@ -226,8 +230,8 @@ template <class Op> static inline void DinoDrawLine(Op op, MRect clip, MPoint fr
 
 // Drills while the stylus is down: the cells along the stroke since last frame (and their neighbours, see MarkCell),
 // hitting each newly marked cell.
-// NONMATCHING: 99.3%, the game keeps the force product in the frame's lowest temporary slot, ours sits with the named
-// locals (shifting the temporaries between by 4); tried a named local, a const reference, Times/Mul, helpers.
+// NONMATCHING: 99.4%, stack slots: the line's per-point temporaries pair up per call site in the game (ours group by
+// depth), the line's |dx|*2 and sy spill slots swap, and the distance clamp's temporaries order differently.
 void DinoCleaningDrill::Unk20() {
     MInput *input = GetCleaning()->GetUnkDC();
     if ((input->mButtons & 0x1000) && data_ov002_02165278.mArea.Contains(input->GetTouchPos())) {
@@ -277,7 +281,7 @@ void DinoCleaningDrill::Unk20() {
         mPrevTouch = touch;
         mPrevCell = cell;
         scale = sDrillPool.mForce;
-        const MFx32 &force = scale * power;
+        const MFx32 &force = DinoDrillMul(scale, power);
         DinoCleaningKasekiRock *rock = GetCleaning()->GetKasekiRock();
         if (!rock->IsCellClear(cell.x, cell.y) && !rock->GetUnk4B8() &&
             !(GetCleaning()->mUnkAC == 1 && rock->GetCellLayer(cell.x, cell.y) == 6)) {
