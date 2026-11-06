@@ -200,15 +200,16 @@ void DinoEventParkKasekiRockFound::StateStart() {
 
 extern "C" const u32 data_0208b2d8[]; // per rock color: the chara's motion
 
-// NONMATCHING: the rock index (read before GetField) and the motion task take each other's stack slots.
 void DinoEventParkKasekiRockFound::StateFound() {
     MTask *get = new DinoEventKasekiRockGet(mEvent, 3, (const DinoBackupEntry *) &mEntry.unk14, &mTaken);
     MTask *se = DinoSoundCreatePlaySeTask(0x69, 0);
     MParallelTaskSet *getting = new MParallelTaskSet(TRUE);
     getting->AddTail(se);
     getting->AddTail(get);
+    // (The motion task through a named local: its spill slot goes above the rock index's, as in the game.)
+    MTask *motion;
     GetSerial()->AddTail(new DinoEventExecCamera(mEvent, 0x400, 0x1B53, 0, 0x2B000, 0x3C, 0xC),
-                         mChara->CreateSetMotionTask(data_0208b2d8[mEntry.color], 0, MFx32(1)),
+                         (motion = mChara->CreateSetMotionTask(data_0208b2d8[mEntry.color], 0, MFx32(1)), motion),
                          MTaskExitTransfer::Create((MTask *) mEvent->GetField()->GetKasekiRock(mIndex)), new MTimer(10),
                          DinoSoundCreatePlaySeTask(0xD0, 0), mChara->CreateShowManpuTask(2, MPoint(0, 0)), new MTimer(30),
                          mChara->CreateAngleToTask(0x4000, 0x14, 0xC), mChara->CreateHideManpuTask(), new MTimer(5),
