@@ -143,6 +143,19 @@ MMultiPlay::~MMultiPlay() {
     delete[] mParentLifetime;
 }
 
+// (Takes the events and finds the child itself: that is what gives the child and the message the game's registers.)
+static inline void MMultiPlayNotifyChild(MMessageSubject *subject, MMultiPlayEvents *events, u32 i) {
+    MMultiPlayChildEvents *child = &events->mChildren[i];
+    if (child->connected) {
+        subject->Notify(new MMultiPlayChildConnectedMessage(i, child->ssid, child->macAddress));
+        child->connected = FALSE;
+    }
+    if (child->disconnected) {
+        subject->Notify(new MMultiPlayChildDisconnectedMessage(i));
+        child->disconnected = FALSE;
+    }
+}
+
 static inline void MMultiPlayNotifyParent(MMessageSubject *subject, u32 i, MMultiPlayParentEvents *parent) {
     if (parent->found) {
         subject->Notify(new MMultiPlayParentFoundMessage(i, parent->foundGameInfo, parent->bssid));
@@ -216,15 +229,7 @@ void MMultiPlay::Execute() {
                                                                     events->mAnotherGameBssid));
     }
     for (u32 i = 0; i < events->mMaxChildren; i++) {
-        MMultiPlayChildEvents *child = &events->mChildren[i];
-        if (child->connected) {
-            subject->Notify(new MMultiPlayChildConnectedMessage(i, child->ssid, child->macAddress));
-            child->connected = FALSE;
-        }
-        if (child->disconnected) {
-            subject->Notify(new MMultiPlayChildDisconnectedMessage(i));
-            child->disconnected = FALSE;
-        }
+        MMultiPlayNotifyChild(subject, events, i);
     }
     for (u32 i = 0; i < events->mMaxParents; i++) {
         MMultiPlayNotifyParent(subject, i, &events->mParents[i]);
