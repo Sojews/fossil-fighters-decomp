@@ -404,7 +404,8 @@ namespace std {
     };
 
     template <class T> inline void __cdeque_construct(T *p, const T &x, Metrowerks::int2type<true>) {
-        ::new (p) T(x);
+        const T &y = x;   // (through a reference: the game keeps the element temporary in memory)
+        allocator<T>().construct(p, y);
     }
     template <class T> inline void __cdeque_assign(T &d, const T &s, Metrowerks::int2type<true>) {
         d = s;
