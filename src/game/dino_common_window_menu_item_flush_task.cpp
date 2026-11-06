@@ -249,7 +249,9 @@ DinoCommonWindowMenuItemFlushTask::~DinoCommonWindowMenuItemFlushTask() {
 }
 
 // B chooses the cancel item: sets the result, hides the items and the cursor and closes the window.
-// NONMATCHING: the game reloads the choice count each pass.
+// NONMATCHING: register choice in the cancel test (the count reload comes from loop invariants + CSE off).
+#pragma opt_loop_invariants off
+#pragma opt_common_subs off
 #pragma opt_strength_reduction off
 void DinoCommonWindowMenu::OnIdle() {
     if (mCancelItem != NULL && (GetInput()->GetPressed() & 2)) {
@@ -273,6 +275,8 @@ void DinoCommonWindowMenu::OnIdle() {
     }
 }
 #pragma opt_strength_reduction reset
+#pragma opt_common_subs reset
+#pragma opt_loop_invariants reset
 
 // The TU's pooled data (the offset is set by the TU's static initializer).
 extern "C" struct {
