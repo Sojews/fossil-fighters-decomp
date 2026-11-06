@@ -3110,23 +3110,27 @@ void DinoEventExecSideAnchor() {
 #pragma dont_inline reset
 
 // The file's static initialization (see dino_static_init.h): the common layout header and three points of its own.
-// NONMATCHING: the two rects' dead temporaries take each other's stack slots, which moves the schedule.
+// The stores are one comma expression in the static object's initializer, so the rects' MPoint temporaries are
+// __sinit's own expression temporaries (laid out top down like the game's) rather than an inlined ctor's.
+// NONMATCHING: the game's pool anchor past data_020be1c4 + 0x80 is _ZTI25DinoEventExecContainerNum (typeid() as the
+// anchor stops mwcc from hoisting the rect's zero half), and the MPoint(2, 2) store is scheduled earlier.
 extern "C" u8 data_020be7c4[];
 extern "C" u8 data_020be2c4[];
 #pragma always_inline on
 
 static struct DinoEventExecStaticInit {
-    DinoEventExecStaticInit() {
-        DINO_POOL_NV(MPoint, data_020be1c4, 0x60) = MPoint(256, 192);
-        DINO_POOL_NV(MRect, data_020be7c4, 0x48) = DinoSizeRect(DINO_POOL_NV(MPoint, data_020be1c4, 0x60));
-        DINO_POOL_NV(MPoint, data_020be144, 0x138) = MPoint(2, 2);
-        DINO_POOL_NV(MPoint, data_020be1c4, 0x50) = MPoint(36, 28);
-        DINO_POOL_NV(MRect, data_020be7c4, 0x78) = DinoSizeRect(DINO_POOL_NV(MPoint, data_020be1c4, 0x50));
-        DINO_POOL_NV(MPoint, data_020be7c4, 0x58) = MPoint(0, 24);
-        DINO_POOL_NV(MPoint, data_020be7c4, 0x60) = MPoint(256, 192);
-        DINO_POOL_NV(MRect, data_020be7c4, 0x68) = MRect(0, 0, 256, 24);
-        DINO_POOL_NV(MPoint, data_020be144, 0x70) = MPoint(128, 176);
-        DINO_POOL_NV(MPoint, data_020be2c4, 0) = MPoint(8, 150);
-        DINO_POOL_NV(MPoint, data_020be144, 0x160) = MPoint(64, 112);
-    }
-} sDinoEventExecStaticInit;
+    DinoEventExecStaticInit(int) {}
+} sDinoEventExecStaticInit((
+    DINO_POOL_NV(MPoint, data_020be1c4, 0x60) = MPoint(256, 192),
+    DINO_POOL_NV(MRect, data_020be7c4, 0x48) = MRect(MPoint(0, 0), DINO_POOL_NV(MPoint, data_020be1c4, 0x60)),
+    DINO_POOL_NV(MPoint, data_020be144, 0x138) = MPoint(2, 2),
+    DINO_POOL_NV(MPoint, data_020be1c4, 0x50) = MPoint(36, 28),
+    DINO_POOL_NV(MRect, data_020be7c4, 0x78) = MRect(MPoint(0, 0), DINO_POOL_NV(MPoint, data_020be1c4, 0x50)),
+    DINO_POOL_NV(MPoint, data_020be7c4, 0x58) = MPoint(0, 24),
+    DINO_POOL_NV(MPoint, data_020be7c4, 0x60) = MPoint(256, 192),
+    DINO_POOL_NV(MRect, data_020be7c4, 0x68) = MRect(0, 0, 256, 24),
+    DINO_POOL_NV(MPoint, data_020be144, 0x70) = MPoint(128, 176),
+    DINO_POOL_NV(MPoint, data_020be2c4, 0) = MPoint(8, 150),
+    DINO_POOL_NV(MPoint, data_020be144, 0x160) = MPoint(64, 112),
+    0));
+
