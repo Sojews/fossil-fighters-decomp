@@ -265,9 +265,10 @@ MRect MMotionFile::GetChrBounds(u32 index) {
     }
     if (!mData->mChrBoundsDone[index]) {
         mData->mChrBoundsDone[index] = true;
+        MPoint size;
         const MMotionGfxHeader *chr = (const MMotionGfxHeader *) GetChr(index, NULL);
         // (The chr files keep the OBJ size where the palette files keep extPalette.)
-        MPoint size(gObjTileSizes[0][chr->extPalette].x, gObjTileSizes[0][chr->extPalette].y);
+        size = MPoint(gObjTileSizes[0][chr->extPalette].x, gObjTileSizes[0][chr->extPalette].y);
         const u8 *pixels = (const u8 *) (chr + 1);
         MRect rect(INT_MAX, INT_MAX, INT_MIN, INT_MIN);
         const u32 *rows = (const u32 *) (chr + 1);
