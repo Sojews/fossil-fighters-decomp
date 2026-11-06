@@ -878,7 +878,12 @@ static inline MPoint DinoRowPos(u32 both, int row) {
     return MPoint(base.x + step.x * row, base.y + step.y * row);
 }
 
-// NONMATCHING: the game loads the row tables' entries in another order (step before base) and some stack slots differ.
+static inline MParallelTaskSet *DinoUseParallel(UseCreatureSelect *select) {
+    return &select->mParallel;
+}
+
+// NONMATCHING: the game loads the row position's step.y before step.x (before the literal pool island), which shifts
+// every literal offset by 4.
 void UseCreatureSelect::Start() {
     mInputHub = new MSingleInputHub(1);
     mInputHub->GetInput(0)->SetRepeat(0xF0, 20, 3);
@@ -908,10 +913,7 @@ void UseCreatureSelect::Start() {
                          : DinoBattleSelectCreatureLevel(DinoBattleSelectCreatureAt(mParams, side, slot));
         mUnkA4[i] = ((DinoBattleParams *)mParams)->sides[side].unk5C[slot];
     }
-    int i = 0;
-    if (i < mCount) {
-    MParallelTaskSet *parallel = &mParallel;
-    for (; i < mCount; i++) {
+    for (int i = 0; i < mCount; i++) {
         char text[64];
         if (mUnk80 & (1 << (i / 3))) {
             OS_SPrintf(text, data_ov000_02195e50.rowFormat, mLevels[i], mIds[i], gDinoResource->GetCreatureName(mIds[i]),
@@ -925,8 +927,8 @@ void UseCreatureSelect::Start() {
         mRows[i]->SetPosition(DinoRowPos(mUnk7C, i));
         mRows[i]->SetPriority(0);
         mRows[i]->Show();
+        MParallelTaskSet *parallel = DinoUseParallel(this);
         parallel->AddTail(mRows[i]);
-    }
     }
     mCursor = new MIndicator(new MSmartObjCanvas(oam, MPoint(128, 16), gDinoResource->GetUnkTable(), TRUE), font, 0);
     mCursor->SetText(std::string(gDinoResource->GetText(data_0208ade0)));
