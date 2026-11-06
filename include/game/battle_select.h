@@ -123,7 +123,7 @@ public:
 // Runs the battle, counting its frames into the entry.
 class TimeCountTask : public MProcess {
 public:
-    TimeCountTask(DinoBattle *battle, DinoBattleView3DEntry *entry) : MProcess(NULL) {
+    TimeCountTask(DinoBattleView3DEntry *entry, DinoBattle *battle) : MProcess(NULL) {
         mBattle = battle;
         MTask *exit = MTaskExitTransfer::Create(this);
         MTaskSet *serial = &mSerial;

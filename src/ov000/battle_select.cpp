@@ -251,13 +251,16 @@ static inline void DinoDebugSetLevel(DinoCreaturePart *parts, int level) {
     }
 }
 
-// (Resized through an inline: its tag temporaries then sit below the record push's.)
-static inline void DinoResizeResults(std::vector<DinoBattleView3DEntry> &v, u32 n) {
+// (Resized through two inlines: resize's tag temporaries then sit below both of the record push's.)
+static inline void DinoResizeVector(std::vector<DinoBattleView3DEntry> &v, u32 n) {
     v.resize(n);
 }
 
+static inline void DinoResizeResults(std::vector<DinoBattleView3DEntry> &v, u32 n) {
+    DinoResizeVector(v, n);
+}
+
 // Plays every pair of the battle select's sides against each other, the CPU on both, counting each battle's frames.
-// NONMATCHING
 DebugAutoBattle::DebugAutoBattle() : MProcess(NULL) {
     mRandom = new MRandom;
     DinoBattleParams defaults;
@@ -319,8 +322,7 @@ DebugAutoBattle::DebugAutoBattle() : MProcess(NULL) {
             }
             mResults[pair].unk[0] = a;
             mResults[pair].unk[1] = b;
-            DinoBattleView3DEntry *entry = &mResults[pair];
-            mSerial.AddTail(new TimeCountTask(new DinoBattle(params, (u32)&mResults[pair].unk[3], 0, NULL, NULL), entry));
+            mSerial.AddTail(new TimeCountTask(&mResults[pair], new DinoBattle(params, (u32)&mResults[pair].unk[3], 0, NULL, NULL)));
             pair++;
         }
     }
