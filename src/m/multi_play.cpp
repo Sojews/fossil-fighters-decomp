@@ -1114,16 +1114,14 @@ void MMultiPlayMessageHub::SendToAll(MMessage *msg) {
     SendTo(0xFFFF, msg);
 }
 
-// Serializes msg and queues it for the consoles in mask. NONMATCHING: the game stores the first iterator after the
-// new and gives it the lower stack slot (a named first iterator is what keeps buf, not mask, in a register).
+// Serializes msg and queues it for the consoles in mask.
 void MMultiPlayMessageHub::SendTo(u32 mask, MMessage *msg) {
     msg->AddRef();
     u32 size = msg->GetSize();
     u8 *buf = new u8[size];
     msg->Write(buf);
     MMultiPlayHubOutgoing out;
-    std::__msl_move_iter<u8 *> first(buf);
-    out.data = new std::vector<char>(first, std::__msl_move_iter<u8 *>(buf + size));
+    out.data = new std::vector<char>(buf, buf + size);
     out.mask = mask;
     mOutgoing.push_back(out);
     delete[] buf;

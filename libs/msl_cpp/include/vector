@@ -1012,12 +1012,12 @@ namespace std {
         }
         template <class It> vector(It first, It last, const Allocator &a = Allocator()) {
             this->init();
-            // (Two zeroed tag temporaries, then the tag init gets, never set, in the lowest byte: the game's layout in
-            // MMultiPlayMessageHub::SendTo.)
+            // (Two zeroed tag temporaries, then the tag init gets, never set, in the lowest byte; the range is read
+            // through move iterators made here: the game's layout in MMultiPlayMessageHub::SendTo.)
             Metrowerks::int2type<false>();
             Metrowerks::int2type<false>();
             Metrowerks::int2type<false> t;
-            choose_init(first, last, t);
+            choose_init(__msl_move_iter<It>(first), __msl_move_iter<It>(last), t);
         }
         template <class It> void choose_init(It first, It last, const Metrowerks::int2type<false> &t) {
             this->init(first, last, t);
