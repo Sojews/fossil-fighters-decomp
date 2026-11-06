@@ -1097,9 +1097,10 @@ extern const int data_02089a18;
 
 // The poems saved in the records (three lines each, with the author and its flags), their labels, frames and
 // marks, the page number, the cursor and the help.
-// NONMATCHING: the game reads gCurrentDisplay for the canvases after copying their size (as elsewhere), and its
-// spill slots differ. (The poem loop spells out operator[]: its is_long tests materialize as bools under
-// opt_common_subs off as the game's do, and both reads share one `c << 1` byte offset.)
+// (opt_common_subs off makes the game's gCurrentDisplay read after each canvas size copy. The poem loop spells out
+// operator[]: its is_long tests materialize as bools as the game's do, and both reads share one `c << 1` byte
+// offset; the line slot is an explicit byte offset, and the canvas loop's locals are declared j, parallel, outer
+// for the game's spill slots.)
 #pragma opt_common_subs off
 void DinoUiSenryuMenu::OnStart() {
     mParallel.AddTail(mUnk114 = new MParallelTaskSet, mUnk110 = new MParallelTaskSet, mUnk118 = new MSerialTaskSet);
@@ -1161,9 +1162,10 @@ void DinoUiSenryuMenu::OnStart() {
         mCount = 1;
     }
     for (int o = 0; o < 3; o++) {
-        MTaskSet *outer = &mParallel;
+        int j;
         MTaskSet *parallel;
-        for (int j = 0; j < 3; j++) {
+        MTaskSet *outer = &mParallel;
+        for (j = 0; j < 3; j++) {
             parallel = &mParallel;
             mLines[o][j] = new MIndicator(
                 new MObjCanvas(gCurrentDisplay, MPoint(0xCC, 0xC),
