@@ -1333,8 +1333,11 @@ extern "C" u32 func_ov000_0216d2cc(DinoBattleModelCreature *creature, BOOL check
 extern "C" MTask *func_ov000_0218ec8c(u32 tutorial, int kind, BOOL *proceed);
 extern "C" const u32 data_0208a1a0, data_0208a1a4;  // the CPU's wait before its first move, and before the others
 
-// NONMATCHING (98.9%): the game keeps each target's score in a stack slot (ours in a register), which shifts the
-// frame by a word.
+// NONMATCHING (99.0%): the game's swap/attack/score MFx32s are register variables it spills (slots 0x40/0x44/0x48)
+// while `end` lives in memory (0xc0); ours keeps swap/attack in memory (address taken by the assignment and the
+// pair's const& binding) and the score in a register, so the frame is a word short. The game also compares `set`
+// (reloaded) rather than `attack` with CountAttacks, and initialises case 1's `b` directly (both lose % until the
+// spills match). The named candidate locals give the game's top-of-frame order (tree, then the three candidates).
 void DinoBattleCpuController::DecideAction(u32 first) {
     mSerial.AddTail(new MTimer(first ? data_0208a1a0 : data_0208a1a4));
     DinoBattleModel *model = (DinoBattleModel *)mUnkAC;
@@ -1358,12 +1361,14 @@ void DinoBattleCpuController::DecideAction(u32 first) {
         MFx32 end;
         end = ScoreEscape(player, creature, group.mDataA);
         if (end != MFx32(0)) {
-            candidates.insert(DinoBattleCpuCandidates::value_type(end, DinoBattleCpuCandidate(1)));
+            DinoBattleCpuCandidate c(1);
+            candidates.insert(DinoBattleCpuCandidates::value_type(end, c));
         }
         MFx32 swap;
         swap = ScoreCreatureConditions(player, creature, group.mDataB);
         if (swap != MFx32(0)) {
-            candidates.insert(DinoBattleCpuCandidates::value_type(swap, DinoBattleCpuCandidate(2)));
+            DinoBattleCpuCandidate c(2);
+            candidates.insert(DinoBattleCpuCandidates::value_type(swap, c));
         }
         u32 usable = func_ov000_0216d2cc(creature, TRUE);
         u32 count = creature->CountAttacks();
@@ -1381,8 +1386,8 @@ void DinoBattleCpuController::DecideAction(u32 first) {
             attack = ScoreAttack(player, creature, group.mSets[set], a);
             if (attack != MFx32(0)) {
                 if (a < count || player->AllCreaturesShareDefFlag()) {
-                    candidates.insert(
-                        DinoBattleCpuCandidates::value_type(attack, DinoBattleCpuCandidate(0, creature, a)));
+                    DinoBattleCpuCandidate c(0, creature, a);
+                    candidates.insert(DinoBattleCpuCandidates::value_type(attack, c));
                 }
             }
         }
