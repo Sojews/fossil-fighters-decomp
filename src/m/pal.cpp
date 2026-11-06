@@ -200,20 +200,21 @@ void MPalAnime::Apply(int step) {
     u16 curColor = cur->color;
     u16 nextColor = next->color;
     u16 *dst = mColors;
+    u32 n;
     if (a != NULL && b != NULL) {
-        for (u32 n = mColorCount; n != 0; n--) {
+        for (n = mColorCount; n != 0; n--) {
             *dst++ = MBlendColor(*a++, *b++, w);
         }
     } else if (a != NULL && b == NULL) {
-        for (u32 n = mColorCount; n != 0; n--) {
+        for (n = mColorCount; n != 0; n--) {
             *dst++ = MBlendColor(*a++, nextColor, w);
         }
     } else if (a == NULL && b != NULL) {
-        for (u32 n = mColorCount; n != 0; n--) {
+        for (n = mColorCount; n != 0; n--) {
             *dst++ = MBlendColor(curColor, *b++, w);
         }
     } else {
-        u32 n = mColorCount;
+        n = mColorCount;
         if (n != 0) {
             u16 color = MBlendColor(curColor, nextColor, w);
             do {
