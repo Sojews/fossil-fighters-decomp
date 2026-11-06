@@ -1008,14 +1008,14 @@ namespace std {
         }
         template <class It> vector(It first, It last, const Allocator &a = Allocator()) {
             this->init();
+            // (Two zeroed tag temporaries, then the tag init gets, never set, in the lowest byte: the game's layout in
+            // MMultiPlayMessageHub::SendTo.)
+            Metrowerks::int2type<false>();
+            Metrowerks::int2type<false>();
             Metrowerks::int2type<false> t;
             choose_init(first, last, t);
         }
-        // (init gets the constructor's tag, never set, from the lowest byte; two zeroed tag temporaries sit above it,
-        // as in the game's range constructor in MMultiPlayMessageHub::SendTo.)
         template <class It> void choose_init(It first, It last, const Metrowerks::int2type<false> &t) {
-            Metrowerks::int2type<false>();
-            Metrowerks::int2type<false>();
             this->init(first, last, t);
         }
         vector(const vector &x) {
