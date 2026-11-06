@@ -99,10 +99,10 @@ M3DGrid::~M3DGrid() {
 
 // Builds the grid from a display list: the vertices it draws (scaled up as far as they fit in 16 bits) and, in each
 // cell, the triangles over it. The list ends at its first matrix pop.
-// NONMATCHING (99.2%): which zero the game reuses for the flags (the rescale flag, then each command's vertex flag
-// from it), the list pointer's spill, register choices in the bounds and the 10-bit vertex, and the slot of the
-// hoisted `strip & 1` (the game's sits between minCX2 and maxCX2). The C89 declaration order below gives the game's
-// stack slots (named locals take the top slots in declaration order).
+// NONMATCHING (99.3%): which zero the game reuses for the flags (the rescale flag, then each command's vertex flag
+// from it), the list pointer's spill, and register choices in the bounds and the 10-bit vertex. The C89 declaration
+// order below gives the game's stack slots (named locals take the top slots in declaration order); the strip
+// parity is a named local (its slot sits between minCX2 and maxCX2), set after the row loop's guard.
 void M3DGrid::Load(const void *data) {
     int type;
     int strip;
@@ -130,6 +130,7 @@ void M3DGrid::Load(const void *data) {
     int minCX3;
     int maxCX3;
     int minCX2;
+    int odd;
     int maxCX2;
     int minCX1;
     int maxCX1;
@@ -341,18 +342,21 @@ void M3DGrid::Load(const void *data) {
                         maxCZ2 = -32;
                         maxCX2 = -32;
                         M3D_GRID_BOUND(3, minCX2, minCZ2, maxCX2, maxCZ2);
-                        for (; minCZ2 <= maxCZ2; minCZ2++) {
-                            for (cx2 = minCX2; cx2 <= maxCX2; cx2++) {
-                                if (strip & 1) {
-                                    M3D_GRID_CELL(cx2, minCZ2).push_back(count - 3);
-                                    M3D_GRID_CELL(cx2, minCZ2).push_back(count - 2);
-                                    M3D_GRID_CELL(cx2, minCZ2).push_back(count - 1);
-                                } else {
-                                    M3D_GRID_CELL(cx2, minCZ2).push_back(count - 3);
-                                    M3D_GRID_CELL(cx2, minCZ2).push_back(count - 1);
-                                    M3D_GRID_CELL(cx2, minCZ2).push_back(count - 2);
+                        if (minCZ2 <= maxCZ2) {
+                            odd = strip & 1;
+                            do {
+                                for (cx2 = minCX2; cx2 <= maxCX2; cx2++) {
+                                    if (odd) {
+                                        M3D_GRID_CELL(cx2, minCZ2).push_back(count - 3);
+                                        M3D_GRID_CELL(cx2, minCZ2).push_back(count - 2);
+                                        M3D_GRID_CELL(cx2, minCZ2).push_back(count - 1);
+                                    } else {
+                                        M3D_GRID_CELL(cx2, minCZ2).push_back(count - 3);
+                                        M3D_GRID_CELL(cx2, minCZ2).push_back(count - 1);
+                                        M3D_GRID_CELL(cx2, minCZ2).push_back(count - 2);
+                                    }
                                 }
-                            }
+                            } while (++minCZ2 <= maxCZ2);
                         }
                     }
                     break;
