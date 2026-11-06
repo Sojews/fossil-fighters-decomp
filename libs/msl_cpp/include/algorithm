@@ -397,7 +397,8 @@ namespace std {
         }
         if (len == 2) {
             RandomAccessIterator i = last;
-            if (comp(*--i, *first)) {
+            --i;
+            if (comp(*i, *first)) {
                 reverse_copy(first, last, result);
             } else {
                 copy(first, last, result);
