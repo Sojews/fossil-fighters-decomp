@@ -534,15 +534,20 @@ void DinoHelpStatus::OpenStep() {
 
 extern const MFx32 data_020b5814; // frames per pixel
 
-// NONMATCHING: stack slots only (the game has the frame count's temporaries below the points', as if all one
-// statement, yet works out dx before the first point's position).
+// (Inline, two deep, so its MFx32 temporaries sit below the caller's points on the stack in the game's order.)
+static inline int DinoHelpScrollFrames2(MSmartObjCanvas *canvas) {
+    return MFx32ToInt(MFx32(canvas->GetWidth() - 256) * data_020b5814);
+}
+static inline int DinoHelpScrollFrames(MSmartObjCanvas *canvas) {
+    return DinoHelpScrollFrames2(canvas);
+}
+
 void DinoHelpStatus::Scroll() {
     if (mCanvas != NULL && mCanvas->GetWidth() > 256) {
-        int frames = MFx32ToInt(MFx32(mCanvas->GetWidth() - 256) * data_020b5814);
+        int frames = DinoHelpScrollFrames(mCanvas);
         int dx = mCanvas->GetWidth() - 256;
-        MPoint to(-dx, mCanvas->GetPosition().y);
-        MPoint from(0, mCanvas->GetPosition().y);
-        mSerial.AddTail(mCanvas->CreateCoordAnime(from, to, frames, 0));
+        mSerial.AddTail(mCanvas->CreateCoordAnime(MPoint(0, mCanvas->GetPosition().y),
+                                                  MPoint(-dx, mCanvas->GetPosition().y), frames, 0));
     }
 }
 
