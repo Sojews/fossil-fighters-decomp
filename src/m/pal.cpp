@@ -229,22 +229,28 @@ void MPalAnime::Apply(int step) {
     }
 }
 
-// Maps a VRAM bank to the CPU while it lives.
+// Maps a VRAM bank to the CPU (the LCDC) while it lives.
 class MVramBankMap {
 public:
-    MVramBankMap(int bank, MVramCnt cnt) : mBank(bank) { mOld = gLcd->SetBankCnt(mBank, cnt); }
+    MVramBankMap(int bank) : mBank(bank) {
+        MVramCnt cnt;
+        cnt.raw = 0;
+        cnt.mst = 0;
+        cnt.offset = 0;
+        cnt.enable = TRUE;
+        mOld = gLcd->SetBankCnt(mBank, cnt);
+    }
     ~MVramBankMap() { gLcd->SetBankCnt(mBank, mOld); }
 
     int mBank;
     MVramCnt mOld;
 };
 
-static inline void MCopyMapped(int bank, MVramCnt cnt, const void *src, void *dest, u32 size) {
-    MVramBankMap map(bank, cnt);
+static inline void MCopyMapped(int bank, const void *src, void *dest, u32 size) {
+    MVramBankMap map(bank);
     MCopy(src, dest, size, TRUE);
 }
 
-// NONMATCHING: 99.9%, the bank mapper and the copy of its old setting take each other's stack slots.
 void MPalLoadTask::Transfer() {
     u8 freeSrc = mUnk20;
     int bank = (int)mExtPalette;
@@ -257,12 +263,7 @@ void MPalLoadTask::Transfer() {
     if (bank == 0) {
         MCopy(src, dest, size);
     } else {
-        MVramCnt cnt;
-        cnt.raw = 0;
-        cnt.mst = 0;
-        cnt.offset = 0;
-        cnt.enable = TRUE;
-        MCopyMapped(bank, cnt, src, dest, size);
+        MCopyMapped(bank, src, dest, size);
     }
     if (freeSrc) {
         delete[] (u8 *)src;
