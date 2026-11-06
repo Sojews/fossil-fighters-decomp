@@ -863,8 +863,7 @@ static inline u32 DinoBattleSelectCreatureLevel(const DinoBattleSelectCreature *
     return (DinoBattleSelectCreatureTotal(creature) - 50) / kCreatureLevelLimits[0] + 1;
 }
 
-// The row's position.
-// (The cursor's: the base plus the step scaled, the scaled step made first.)
+// The row's position (the rows' and the cursor's): the base plus the step scaled, the scaled step made first.
 static inline MPoint DinoCursorRowPosFromBase(u32 both, int row) {
     const MPoint &step = data_ov000_02195f98[both];
     MPoint offset(step.x * row, step.y * row);
@@ -872,18 +871,10 @@ static inline MPoint DinoCursorRowPosFromBase(u32 both, int row) {
     return base + offset;
 }
 
-static inline MPoint DinoRowPos(u32 both, int row) {
-    const MPoint &step = data_ov000_02195f98[both];
-    const MPoint &base = data_ov000_02195f88[both];
-    return MPoint(base.x + step.x * row, base.y + step.y * row);
-}
-
 static inline MParallelTaskSet *DinoUseParallel(UseCreatureSelect *select) {
     return &select->mParallel;
 }
 
-// NONMATCHING: the game loads the row position's step.y before step.x (before the literal pool island), which shifts
-// every literal offset by 4.
 void UseCreatureSelect::Start() {
     mInputHub = new MSingleInputHub(1);
     mInputHub->GetInput(0)->SetRepeat(0xF0, 20, 3);
@@ -924,7 +915,7 @@ void UseCreatureSelect::Start() {
         }
         mRows[i] = new MIndicator(new MSmartObjCanvas(oam, MPoint(192, 16), gDinoResource->GetUnkTable(), TRUE), font, 0);
         mRows[i]->SetText(std::string(text));
-        mRows[i]->SetPosition(DinoRowPos(mUnk7C, i));
+        mRows[i]->SetPosition(DinoCursorRowPosFromBase(mUnk7C, i));
         mRows[i]->SetPriority(0);
         mRows[i]->Show();
         MParallelTaskSet *parallel = DinoUseParallel(this);
