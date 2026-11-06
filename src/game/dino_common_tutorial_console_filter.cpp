@@ -189,13 +189,9 @@ DinoCommonTutorialWindow::DinoCommonTutorialWindow(MDisplay *display, std::strin
     mState = data_020b5e5c.StateStart_2C;
 }
 
-static inline MPoint operator*(const MPoint &p, int k) {
-    return MPoint(p.x * k, p.y * k);
-}
-
-// NONMATCHING: the game multiplies the margin by a -2 it builds at run time ((1 + 1) * (1 - 2)); the inset rect's size
-// gets its right - left + c shape. (Common subexpressions off: gCurrentDisplay is reloaded after the canvas size copy,
-// and this/the hub get the game's registers.)
+// (Common subexpressions off: gCurrentDisplay is reloaded after the canvas size copy, and this/the hub get the game's
+// registers. The canvas is the frame shrunk by its margins: Inflate's dx - -dx comes out as the game's run-time
+// (1 + 1) * (1 - 2) factor.)
 #pragma opt_common_subs off
 void DinoCommonTutorialWindow::StateStart() {
     DinoSoundPlaySe(0xA8, 0);
@@ -220,7 +216,7 @@ void DinoCommonTutorialWindow::StateStart() {
         frame->Show();
         mParallel.AddTail(frame);
         DinoCommonFont *font = new DinoCommonFont(0, 1, 0);
-        mConsole = new MConsole(new MObjCanvas(gCurrentDisplay, MRect(rect.left + 0x10, rect.top + 0xA, rect.right - 0x10, rect.bottom - 0xA).GetSize(),
+        mConsole = new MConsole(new MObjCanvas(gCurrentDisplay, rect.Inflate(-0x10, -0xA).GetSize(),
                                                gDinoResource->GetUnkTable(), TRUE),
                                 font, MPoint(0, 4), MFx32(2));
         mConsole->Print(std::string(mText));
