@@ -162,15 +162,14 @@ void MAnmModelBase::Unk0C() {
 
 // A track's value at a frame: random between the keys' bounds, interpolated between the keys around the frame
 // (the last key's bounds after the last key, the first key's before the first).
-// NONMATCHING: 96%, the search loop reloads the frame from the stack in the game, and some registers differ.
+// NONMATCHING: 96.7%, register choices differ (search loop temps, the interpolation keys).
 #pragma opt_common_subs off
-#pragma opt_loop_invariants off
 int MAnmModelBase::GetValue(int track, int frame) {
     u32 count = mTracks[track].size();
     if (count == 0) {
         return 0;
     }
-    u32 i;
+    int i;
     for (i = 0; i < mTracks[track].size(); i++) {
         if (mTracks[track][i].mFrame > frame + 0x10) {
             break;
@@ -203,7 +202,6 @@ int MAnmModelBase::GetValue(int track, int frame) {
     return lo + mRandom.Next(hi - lo);
 }
 
-#pragma opt_loop_invariants reset
 #pragma opt_common_subs reset
 #pragma opt_strength_reduction off
 void MAnmModelBase::PlaySounds(int frame) {
