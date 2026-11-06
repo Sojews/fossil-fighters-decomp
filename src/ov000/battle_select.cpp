@@ -329,9 +329,13 @@ void DebugAutoBattle::Idle() {
     Exit();
 }
 
-// NONMATCHING: 99.9%, the canvas size and the position temporaries swap stack slots.
+// The position that centers a view on the screen (its size is a temporary of this inline, below the caller's).
+static inline MPoint CenterOnScreen(MView *view) {
+    MPoint size = view->GetSize();
+    return MPoint((256 - size.x) / 2, (192 - size.y) / 2);
+}
+
 BattleSelect::BattleSelect(u32 unk74) : MProcess(NULL) {
-    MPoint size;
     mUnk74 = unk74;
     mUnk78 = 0;
     MSingleInputHub *hub = new MSingleInputHub(1);
@@ -341,8 +345,7 @@ BattleSelect::BattleSelect(u32 unk74) : MProcess(NULL) {
     mIndicator = new MIndicator(new MObjCanvas(gLcd->GetBottomDisplay(), MPoint(0x54, 0xC), gDinoResource->GetUnkTable(),
                                                TRUE),
                                 gDinoResource->CreateFont12(0, 10, 1), 0);
-    size = mIndicator->GetSize();
-    mIndicator->SetPosition(MPoint((256 - size.x) / 2, (192 - size.y) / 2));
+    mIndicator->SetPosition(CenterOnScreen(mIndicator));
     mIndicator->Show();
     mParallel.AddTail(mIndicator);
 }
