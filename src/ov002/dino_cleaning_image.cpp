@@ -276,7 +276,7 @@ void DinoCleaningImage::LoadPalettes(MPalUnit *block, u32 start) {
 static inline u8 DinoLayerHard(const DinoCleaningImageLayer *layer, int row, int col) { return layer->mHard[row][col]; }
 static inline u8 DinoLayerCells(const DinoCleaningImageLayer *layer, int row, int col) { return layer->mCells410[row][col]; }
 
-// NONMATCHING: 99.2%, the first mask loop's iterator, end and mask pointer take other registers.
+// NONMATCHING: 99.7%, the first mask loop's iterator and end take each other's registers (`end() != it` fixed the mask pointer).
 // A layer counts toward the grid when its cell is breakable; only the uncovered ones count as left.
 void DinoCleaningImage::Build(u32 arg, u32 start) {
     mUnk08 = TRUE;
@@ -290,7 +290,7 @@ void DinoCleaningImage::Build(u32 arg, u32 start) {
     for (u32 col = 0; col < 28; col++) {
         for (u32 row = 0; row < 36; row++) {
             mMask[row][col] = TRUE;
-            for (it = mLayers.begin(); it != mLayers.end(); ++it) {
+            for (it = mLayers.begin(); mLayers.end() != it; ++it) {
                 if (DinoLayerHard(*it, row, col) == 0) {
                     mMask[row][col] = FALSE;
                     break;
