@@ -1,3 +1,4 @@
+#pragma ipa file
 // DinoEventLoop: runs the event scripts.
 // Only a few small methods are decompiled so far.
 
@@ -662,7 +663,8 @@ static struct DinoEventStaticInit {
 
 extern "C" void _ZNSt13__vec_deleterImSaImEE19reallocate_copy_altEm(void *vector, size_t n);
 extern "C" void _ZNSt13__vec_deleterImSaImEE9init_copyEPKmS3_N10Metrowerks8int2typeILi1EEE(void *vector, const u32 *first,
-                                                                                        const u32 *last, u8 tag);
+                                                                                        const u32 *last,
+                                                                                        Metrowerks::int2type<true> tag);
 
 // (vector::reserve and the copy constructor, through the u32 vector's out-of-line members the game calls here; see
 // dino_ui_title.cpp.)
@@ -678,6 +680,22 @@ struct DinoEventVarArg : DinoEventVar {
         index = packed & 0xffffff;
     }
 };
+
+static inline void DinoEventPushPoint(std::vector<void *> &v, void *const &x) {
+    v.push_back(x);
+}
+
+// The route copy: built through the u32 vector's out-of-line copy, destroyed as a vector of void *s.
+struct DinoEventRoute : public std::vector<void *> {
+    DinoEventRoute(const std::vector<void *> &x) {
+        Metrowerks::int2type<true> t;
+        const u32 *data = *(const u32 *const *)&x;
+        _ZNSt13__vec_deleterImSaImEE9init_copyEPKmS3_N10Metrowerks8int2typeILi1EEE(this, data, data + ((const u32 *)&x)[1], t);
+    }
+};
+static inline const std::vector<u32> &DinoEventRouteOf(const std::vector<void *> &v) {
+    return *(const std::vector<u32> *)&v;
+}
 
 // Degrees as an angle (0x10000 a turn).
 static inline s32 DinoEventDegree(u32 degrees) {
@@ -897,11 +915,11 @@ void DinoEventLoop::RunCommand(const u8 *command) {
             std::vector<void *> points;
             DinoEventReservePoints(points, count);
             for (u32 i = 0; i < count; i++) {
-                points.push_back((void *)(cmd->GetArgs() + 4)[i]);
+                DinoEventPushPoint(points, (void *)(cmd->GetArgs() + 4)[i]);
             }
             mSerial.AddTail(new DinoEventExecStartPatrol(this, DinoEventArg(command, 0), DinoEventArg(command, 1),
                                                          DinoEventArg(command, 2), MFx32::FromRaw(DinoEventArg(command, 3)),
-                                                         std::vector<u32>(*(const std::vector<u32> *)&points)));
+                                                         DinoEventRouteOf(DinoEventRoute(points))));
         }
         break;
     case 0x51: case 0x53: case 0x55:
