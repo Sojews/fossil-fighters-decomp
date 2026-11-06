@@ -281,6 +281,16 @@ extern "C" BOOL func_ov000_02179aa0(u32 id);
 // The game's inlined strcpy of a short literal.
 #define DINO_INFO_COPY(buf, chars) (*(DinoInfoChars<sizeof(chars)> *) (buf) = (chars))
 
+// The stat changes of a creature's player (its mask is an inline local, so it takes one of the game's lowest spill
+// slots).
+static inline void DinoInfoChanges(DinoBattleViewCreatureInfo *info, int *changes) {
+    u32 mask = ((DinoBattleViewPlayer *) info->mCreature->GetUnkDC())->GetUnk108()->mMask;
+    for (int i = 0; i < 4; i++) {
+        changes[i + 1] =
+            (mask & (1 << i)) ? ((DinoBattleViewPlayer *) info->mCreature->GetUnkDC())->GetUnk108()->mTarget[i] : 0;
+    }
+}
+
 // Shows a creature's page (the stats with their changes, its text and resistances, or two of its attacks); the
 // numbers show as question marks for a creature not yet known.
 // NONMATCHING: in the two stat loops the text buffer's address is set up before the induction variables (the
@@ -320,11 +330,7 @@ void DinoBattleViewCreatureInfo::Update(BOOL show, DinoBattleViewCreature *creat
         stats[5] = mCreature->GetUnk108();
         int changes[5] = {0};
         if (mCreature->GetUnkB4() == 0) {
-            u32 mask = ((DinoBattleViewPlayer *) mCreature->GetUnkDC())->GetUnk108()->mMask;
-            for (int i = 0; i < 4; i++) {
-                changes[i + 1] =
-                    (mask & (1 << i)) ? ((DinoBattleViewPlayer *) mCreature->GetUnkDC())->GetUnk108()->mTarget[i] : 0;
-            }
+            DinoInfoChanges(this, changes);
         }
         DinoInfoStatMap map = data_ov000_0218fff8;
         mUnk12C = 0;
