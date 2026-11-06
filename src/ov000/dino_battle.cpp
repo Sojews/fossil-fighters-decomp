@@ -226,13 +226,19 @@ void DinoBattleDebugSelect::StateLevelSelect() {
 
 extern "C" u8 data_ov000_021978c4[12];
 
+// A side's creature id as a bit field (as battle_select.cpp's DinoBattleSelectCreature reads it).
+struct DinoBattleDebugCreature {
+    u32 id : 8;
+    u32 : 24;
+};
+
 // Gives every chosen creature without a level level 4 and starts the battle, then selects again.
-// NONMATCHING: the constant 4 and the loaded id swap r4/r5.
+// (Reading the id as a bit field, not a (u8) cast, gives the constant 4 and the id the game's registers.)
 void DinoBattleDebugSelect::StateStart() {
     for (u32 side = 0; side < 2; side++) {
         DinoBattleSide::Creature *creatures = mParams.sides[side].mCreatures;
         for (u32 i = 0; i < 3; i++) {
-            if ((u8)creatures[i].mId != 0 && mParams.sides[side].mLevels[i] == 0) {
+            if (((DinoBattleDebugCreature *)&creatures[i])->id != 0 && mParams.sides[side].mLevels[i] == 0) {
                 mParams.sides[side].mLevels[i] = 4;
             }
         }
