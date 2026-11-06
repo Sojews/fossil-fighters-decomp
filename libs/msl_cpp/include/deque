@@ -524,6 +524,11 @@ namespace std {
         return __cdeque_copy_in(first, last, result);
     }
 
+    // (insert reads its first element's address through this: a non-member inline moves the value's spill slot down.)
+    template <class T, class A> inline T *__cdeque_first_ptr(const __cdeque_deleter<T, A> &d) {
+        return d.data_ + d.start_;
+    }
+
     template <class T, class Allocator> __cdeque_deleter<T, Allocator>::~__cdeque_deleter() {
         if (data_ != nullptr) {
             clear();
@@ -663,7 +668,7 @@ namespace std {
         if (n == 0) {
             return;
         }
-        T *b = data_ + start_;
+        T *b = __cdeque_first_ptr(*this);
         size_t pi = pos.ptr_ - b;
         if (pos.ptr_ < b) {
             pi += cap();
