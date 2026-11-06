@@ -256,7 +256,6 @@ template <class T> static inline void MResize(std::vector<T> &v, u32 n) {
 }
 
 // The bounds of a chr file's opaque pixels (worked out once; an empty chr's are the point at its center).
-// NONMATCHING: the game keeps the tile size in two late stack temporaries (ours lands higher in the frame).
 MRect MMotionFile::GetChrBounds(u32 index) {
     MScopedLock lock(&mData->mMutex.mutex, TRUE);
     if (mData->mChrBoundsDone.empty()) {
@@ -267,8 +266,10 @@ MRect MMotionFile::GetChrBounds(u32 index) {
         mData->mChrBoundsDone[index] = true;
         MPoint size;
         const MMotionGfxHeader *chr = (const MMotionGfxHeader *) GetChr(index, NULL);
-        // (The chr files keep the OBJ size where the palette files keep extPalette.)
-        size = MPoint(gObjTileSizes[0][chr->extPalette].x, gObjTileSizes[0][chr->extPalette].y);
+        // (The chr files keep the OBJ size where the palette files keep extPalette. The size is declared up front and
+        // its height read first, as unsigned: that gives the game's spill slots.)
+        u32 h = gObjTileSizes[0][chr->extPalette].y;
+        size = MPoint(gObjTileSizes[0][chr->extPalette].x, h);
         const u8 *pixels = (const u8 *) (chr + 1);
         MRect rect(INT_MAX, INT_MAX, INT_MIN, INT_MIN);
         const u32 *rows = (const u32 *) (chr + 1);
