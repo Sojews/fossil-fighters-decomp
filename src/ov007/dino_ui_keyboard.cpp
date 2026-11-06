@@ -1134,15 +1134,18 @@ void DinoUiSenryuMenu::OnStart() {
         if (record.unk78) {
             std::wstring text = MDecodeUtf8(std::string((const char *)record.data));
             int line = 0;
+            u32 lineOff;
             bool isLong;
-            for (int c = 0; c < ((isLong = text.is_long()) == false ? text.mShort.size : text.mLong.size); c++) {
+            int c;
+            for (c = 0, lineOff = 0; c < ((isLong = text.is_long()) == false ? text.mShort.size : text.mLong.size); c++) {
                 bool isShort = !isLong;
                 const wchar_t *buf = isShort ? text.mShort.buf : text.mLong.data;
                 u32 off = (u32)c << 1;
                 if (*(const wchar_t *)((const u8 *)buf + off) == L'\n') {
+                    lineOff += sizeof(std::wstring);
                     line++;
                 } else {
-                    mLineTexts[mCount][line].push_back(
+                    ((std::wstring *)((u8 *)mLineTexts[mCount] + lineOff))->push_back(
                         *(const wchar_t *)((const u8 *)(isShort ? text.mShort.buf : text.mLong.data) + off));
                 }
                 if (line == 3) {
