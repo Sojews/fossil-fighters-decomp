@@ -682,21 +682,42 @@ MRect MMotion::GetCellRect(u32 cell) {
     return rect.Moved(pos);
 }
 
-static inline void MMotionUnite(MRect &frame, MRect r) {
-    frame.Unite(r);
+// MRect::Unite on a frame kept as four ints (spilled left lowest, as the game's; an MRect local is laid out the
+// other way round).
+static inline void MMotionUnite2(int &left, int &top, int &right, int &bottom, MRect o) {
+    if (bottom <= o.bottom) {
+        bottom = o.bottom;
+    }
+    if (right <= o.right) {
+        right = o.right;
+    }
+    if (top >= o.top) {
+        top = o.top;
+    }
+    if (left >= o.left) {
+        left = o.left;
+    }
+}
+
+static inline void MMotionUnite(int &left, int &top, int &right, int &bottom, MRect r) {
+    MMotionUnite2(left, top, right, bottom, r);
 }
 
 MRect MMotion::GetFrame() {
-    MRect frame(0x7FFFFFFF, 0x7FFFFFFF, 0x80000000, 0x80000000);
+    int bottom, right, top, left;
+    left = 0x7FFFFFFF;
+    top = 0x7FFFFFFF;
+    right = 0x80000000;
+    bottom = 0x80000000;
     for (u32 i = 0; i < mCellCount; i++) {
         if (mCells[i].visible) {
-            MMotionUnite(frame, GetCellRect(i));
+            MMotionUnite(left, top, right, bottom, GetCellRect(i));
         }
     }
-    if (frame.left == 0x7FFFFFFF && frame.top == 0x7FFFFFFF && frame.right == 0x80000000 && frame.bottom == 0x80000000) {
+    if (left == 0x7FFFFFFF && top == 0x7FFFFFFF && right == 0x80000000 && bottom == 0x80000000) {
         return MRect(GetPosition(), GetPosition());
     }
-    return frame;
+    return MRect(left, top, right, bottom);
 }
 
 void MMotion::ResetAnime() {
