@@ -219,7 +219,6 @@ void MAnmModelBase::PlaySounds(int frame) {
 #pragma opt_strength_reduction reset
 
 // Blends the palette toward the color and queues it over the old one.
-// NONMATCHING: 97.5%, the green term is shifted early (scheduling).
 #pragma opt_dead_assignments off
 void MAnmModelBase::TintPalette(u16 color, fx32 amount) {
     if (mResource == NULL) {
@@ -242,7 +241,10 @@ void MAnmModelBase::TintPalette(u16 color, fx32 amount) {
         int cr = (c & 0x1F) * amount;
         int cg = ((c >> 5) & 0x1F) * amount;
         int cb = ((c >> 10) & 0x1F) * amount;
-        tinted[i] = ((cr + r) >> 12) | ((((cg + g) >> 12) << 5) | (((cb + b) >> 12) << 10));
+        int R = (cr + r) >> 12;
+        int G = (cg + g) >> 12;
+        int B = (cb + b) >> 12;
+        tinted[i] = (B << 10) | (G << 5) | R;
     }
     mScene->QueueD0((const void *)plttKey, (u32)tinted, size);
     mScene->QueueE8(NULL, (u32) tinted);
