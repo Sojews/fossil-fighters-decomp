@@ -34,11 +34,16 @@ static inline const u8 *DinoTutorialEntry(DinoBattleTutorial *tutorial, u32 i) {
     return data + ((const u32 *)(data + ((const u32 *)data)[2]))[i];
 }
 
+// The command's parameter k (0: its type).
+static inline s32 DinoTutorialArg(const u8 *entry, int k) {
+    return DinoTutorialParams(entry)[k];
+}
+
 // Runs the tutorial's script on an event: first the conditions at the current position pick where to go (1-2: on
 // this event, 3-4: on a comparison; 2 and 4 also stop the script when they fail), then the commands from there make
 // the tasks (pointers, rects, the window, ...) until the next condition. Returns NULL when there is nothing to show.
-// NONMATCHING: in the two pointer (SetArroe) commands the game schedules the position temporaries' stores and the
-// parameter loads differently (ctor forms tried: by value, by reference, x/y, an MPoint member, 1-based index).
+// (The pointer commands read their scalar parameters through DinoTutorialArg, an inline call, so they are evaluated
+// before the position temporary: that gives the game's register choice.)
 #pragma opt_strength_reduction off
 extern "C" MTask *func_ov000_0218ec8c(DinoBattleTutorial *tutorial, int event, BOOL *proceed) {
     if (tutorial->mUnk0C) {
@@ -172,7 +177,7 @@ extern "C" MTask *func_ov000_0218ec8c(DinoBattleTutorial *tutorial, int event, B
             }
             tasks->AddTail(DinoCreatePostAndWaitTask(
                 tutorial->mView,
-                new DinoBattleViewTutorialSetArroeRequest(DinoTutorialParams(entry)[2], DinoTutorialParams(entry)[1] - 1,
+                new DinoBattleViewTutorialSetArroeRequest(DinoTutorialArg(entry, 2), DinoTutorialArg(entry, 1) - 1,
                                                           MPoint(DinoTutorialParams(entry)[3], DinoTutorialParams(entry)[4]))));
             break;
         case 8:
@@ -180,7 +185,7 @@ extern "C" MTask *func_ov000_0218ec8c(DinoBattleTutorial *tutorial, int event, B
                 tasks = new MSerialTaskSet(TRUE);
             }
             tasks->AddTail(DinoCreatePostAndWaitTask(
-                tutorial->mView, new DinoBattleViewTutorialSetArroeRequest(0, DinoTutorialParams(entry)[1] - 1, MPoint(0, 0))));
+                tutorial->mView, new DinoBattleViewTutorialSetArroeRequest(0, DinoTutorialArg(entry, 1) - 1, MPoint(0, 0))));
             break;
         case 9:
             if (tasks == NULL) {
