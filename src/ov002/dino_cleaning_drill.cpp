@@ -317,10 +317,10 @@ void DinoCleaningDrill::Unk20() {
             DinoSoundFunc_0201feec(0x31);
             return;
         }
-        return;
+    } else {
+        mTouching = 0;
+        HideGuides();
     }
-    mTouching = 0;
-    HideGuides();
 }
 
 DinoCleaningDrill::~DinoCleaningDrill() {
