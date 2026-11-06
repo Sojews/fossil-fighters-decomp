@@ -1095,10 +1095,16 @@ extern "C" const char data_ov007_02191e50[];      // the page number's font
 extern const u32 data_0208ac24, data_0208ac40, data_0208ac44;
 extern const int data_02089a18;
 
+// A line's character (a u32 index, as std::wstring::operator[]).
+static inline wchar_t DinoWcharAt(const wchar_t *text, u32 i) {
+    return text[i];
+}
+
 // The poems saved in the records (three lines each, with the author and its flags), their labels, frames and
 // marks, the page number, the cursor and the help.
 // NONMATCHING: the game reads gCurrentDisplay for the canvases after copying their size (as elsewhere), and its
-// spill slots differ.
+// spill slots differ. (The poem loop spells out operator[] so its is_long tests materialize as bools under
+// opt_common_subs off, as the game's do.)
 #pragma opt_common_subs off
 void DinoUiSenryuMenu::OnStart() {
     mParallel.AddTail(mUnk114 = new MParallelTaskSet, mUnk110 = new MParallelTaskSet, mUnk118 = new MSerialTaskSet);
@@ -1134,11 +1140,13 @@ void DinoUiSenryuMenu::OnStart() {
         if (record.unk78) {
             std::wstring text = MDecodeUtf8(std::string((const char *)record.data));
             int line = 0;
-            for (int c = 0; c < text.size(); c++) {
-                if (text[c] == L'\n') {
+            bool isLong;
+            for (int c = 0; c < ((isLong = text.is_long()) == false ? text.mShort.size : text.mLong.size); c++) {
+                bool isShort = !isLong;
+                if (DinoWcharAt(isShort ? text.mShort.buf : text.mLong.data, c) == L'\n') {
                     line++;
                 } else {
-                    mLineTexts[mCount][line].push_back(text[c]);
+                    mLineTexts[mCount][line].push_back(DinoWcharAt(isShort ? text.mShort.buf : text.mLong.data, c));
                 }
                 if (line == 3) {
                     break;
