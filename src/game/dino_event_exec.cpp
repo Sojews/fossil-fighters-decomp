@@ -1750,7 +1750,8 @@ void DinoEventExecAppendCharaRegion::Execute() {
             DinoCharaState target;
             gDinoBackup->GetChara(mTarget, &target);
             if (target.map == mMap) {
-                MFx32Point d(target.x - mPos.x, target.y - mPos.y);
+                // (The state's x, y read as one point: the same temps as the field branch.)
+                MFx32Point d = *(MFx32Point *)&target.x - mPos;
                 mAngle = AngleOf(d);
             }
         }
