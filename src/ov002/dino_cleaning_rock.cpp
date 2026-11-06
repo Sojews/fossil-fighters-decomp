@@ -60,7 +60,12 @@ u8 DinoCleaningRock::GetCell(int row, int col) {
 }
 
 
-// NONMATCHING: 99.7%, temporaries take stack slots in the opposite order (incl. the MFx32 operators' copies).
+// (Two inline layers put the power subtraction's copies below the hardness subtraction's, as in the game.)
+static inline void SubFrom(MFx32 &p, const MFx32 &h) { p -= h; }
+static inline void SubFrom2(MFx32 &p, MFx32 h) { SubFrom(p, h); }
+
+// NONMATCHING: 99.8%, the == and * temporaries take stack slots in a different order (FromRaw's copy sits above the
+// == copies; the game puts it below the * copies), and the hardness subtraction swaps r1/r2.
 MFx32 DinoCleaningRock::Hit(int row, int col, MFx32 power) {
     if (IsCellClear(row, col)) {
         return power;
@@ -84,7 +89,7 @@ MFx32 DinoCleaningRock::Hit(int row, int col, MFx32 power) {
                     hardness -= power;
                     return MFx32(0);
                 }
-                power = power - mHardness[row][col];
+                SubFrom2(power, mHardness[row][col]);
                 mHardness[row][col] = MFx32(0);
             }
         } while (--layer != 0);
