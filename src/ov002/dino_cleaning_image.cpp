@@ -357,12 +357,26 @@ void DinoCleaningImage::ClearGrid() {
 template void std::__vec_deleter<u32, std::allocator<u32> >::assign<u32 *>(u32 *first, u32 *last, Metrowerks::int2type<true>);
 
 // The file's static initialization (see dino_static_init.h), with the screen center and a half.
-// NONMATCHING: the dead stack copies of the layout and the center take other slots.
+// The common layout is written out (not DINO_COMMON_LAYOUT_INIT): rects built straight from MPoint(0, 0) and the size,
+// and the center from named halves, put the dead stack copies in the game's slots.
+// NONMATCHING: scheduling (the game hoists the screen rect's zero half above the size's stores; the words past 0x80
+// go through the anchor data_ov002_02164764, see DINO_COMMON_LAYOUT_INIT2) and two of the rects' zero copies swap slots.
 #pragma always_inline on
 static struct DinoCleaningImageStaticInit {
     DinoCleaningImageStaticInit() {
-        DINO_COMMON_LAYOUT_INIT(data_ov002_021646e4, 0x34, 0xb8, 0x3c, 0x1c, 0xc8, 0xe8, 0xf0, 0xd8);
-        DINO_POOL(MFx32Point, data_ov002_021646e4, 0x14).Set(MFx32(128), MFx32(96));
+        DINO_POOL(MPoint, data_ov002_021646e4, 0x34) = MPoint(256, 192);
+        DINO_POOL(MRect, data_ov002_021646e4, 0xb8) = MRect(MPoint(0, 0), DINO_POOL(MPoint, data_ov002_021646e4, 0x34));
+        DINO_POOL(MPoint, data_ov002_021646e4, 0x3c) = MPoint(2, 2);
+        DINO_POOL(MPoint, data_ov002_021646e4, 0x1c) = MPoint(36, 28);
+        DINO_POOL(MRect, data_ov002_021646e4, 0xc8) = MRect(MPoint(0, 0), DINO_POOL(MPoint, data_ov002_021646e4, 0x1c));
+        DINO_POOL(MPoint, data_ov002_021646e4, 0xe8) = MPoint(0, 24);
+        DINO_POOL(MPoint, data_ov002_021646e4, 0xf0) = MPoint(256, 192);
+        DINO_POOL(MRect, data_ov002_021646e4, 0xd8) = MRect(0, 0, 256, 24);
+        {
+            MFx32 y(96);
+            MFx32 x(128);
+            DINO_POOL(MFx32Point, data_ov002_021646e4, 0x14).Set(x, y);
+        }
         DINO_POOL(MFx32, data_ov002_021646e4, 0x4) = MFx32::FromRaw(0x800);
     }
 } sDinoCleaningImageStaticInit;
