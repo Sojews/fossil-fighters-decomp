@@ -97,7 +97,7 @@ above it.
 
 | % | size | function | file:line | remaining mismatch |
 |---|---|---|---|---|
-| 77.20 | 424 | `DinoUiCleaningMenu::Decide(int)` | dino_ui_cleaning_menu_item.cpp:498 | the game computes the row terms first and does the column test twice. **The only unmatched function in ov005** |
+| 79.51 | 424 | `DinoUiCleaningMenu::Decide(int)` | dino_ui_cleaning_menu_item.cpp:498 | the two column tests must not CSE — `(u32)(index % 4) == 3` on the Y axis does that (both match as cmp/bne now). The game computes the Y column product (r0) before building X; ours builds X first. Pure scheduling/register choice left |
 
 ## 2. Frontier
 
@@ -112,8 +112,8 @@ above it.
 **What I'd attack next, in this order:**
 
 1. *(Done: PR #1's two library functions were merged in the same commit as this file, so main is now 11505.)*
-2. **`DinoUiCleaningMenu::Decide`** (ov005, 77%). It's the last unmatched function in ov005 and the note says
-   what's wrong (statement order and a duplicated column test). Write the row terms first.
+2. **`DinoUiCleaningMenu::Decide`** (ov005, 79.5%). It's the last unmatched function in ov005; see the table row for
+   the current state. The >77% moves came from keeping both column tests (CSE-blocks them: `(u32)(index % 4) == 3` on the Y axis; both now cmp/bne). Hoisting row terms or separate locals made it worse.
 3. **`DinoUiDebugFlagMenuItem::GetFrame`** (70 bytes, 79%). Compute right and bottom into locals before
    storing any edge.
 4. **Low-percentage expression-shape rewrites with large byte counts:** `DinoFieldRadar::Idle` (66%, 3.3 KB),

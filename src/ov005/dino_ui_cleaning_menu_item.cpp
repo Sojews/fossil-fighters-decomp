@@ -495,7 +495,9 @@ extern "C" struct {
 extern const u32 data_0208aa24, data_0208aa28, data_0208a638, data_0208a63c;
 
 // Asks to confirm the rock.
-// NONMATCHING (77%): the game works out the row terms first and the column test twice (allocating first, as here)
+// NONMATCHING (79.5%): the two column tests must not CSE ((u32)(index % 4) == 3 does that).
+// The game computes the Y column product (kept in r0) before building X; ours builds X
+// first. Ordering and a few register choices are all that's left.
 void DinoUiCleaningMenu::Decide(int index) {
     mCursor->Hide();
     mChoice = index + mPage * 8;
@@ -503,7 +505,7 @@ void DinoUiCleaningMenu::Decide(int index) {
     DinoCommonWindowMenu *window = new DinoCommonWindowMenu(gLcd->GetBottomDisplay(), &mAnswer,
         MPoint(data_ov005_02167184.mWindowBase.x + (index % 4 - (index % 4 == 3)) * data_ov005_02167184.mWindowColStep.x +
                    index / 4 * data_ov005_02167184.mWindowRowStep.x + data_ov005_02167184.mWindowOffset.x,
-               data_ov005_02167184.mWindowBase.y + (index % 4 - (index % 4 == 3)) * data_ov005_02167184.mWindowColStep.y +
+               data_ov005_02167184.mWindowBase.y + (index % 4 - ((u32) (index % 4) == 3)) * data_ov005_02167184.mWindowColStep.y +
                    index / 4 * data_ov005_02167184.mWindowRowStep.y + data_ov005_02167184.mWindowOffset.y), NULL, 0);
     window->AddChoice(1, gDinoResource->GetText(data_0208aa28), gDinoResource->GetText(data_0208a63c));
     window->AddChoice(-2, gDinoResource->GetText(data_0208aa24), gDinoResource->GetText(data_0208a638));
