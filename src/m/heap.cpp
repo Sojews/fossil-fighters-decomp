@@ -159,15 +159,15 @@ void MHeap::Free(u32 addr, BOOL mustBeUsed) {
     MHeapBlock *prev;
     MHeapBlock *cur;
 
-    link = &mFallback;
+    prev = (MHeapBlock *)&mFallback;
     for (block = mFallback; block != NULL; block = block->next) {
         if (block->addr == addr) {
-            *link = block->next;
+            prev->next = block->next;
             delete[] (u8 *)block->addr;
             delete block;
             return;
         }
-        link = &block->next;
+        prev = block;
     }
     link = &mUsed;
     for (block = mUsed; block != NULL; block = block->next) {
@@ -182,10 +182,11 @@ void MHeap::Free(u32 addr, BOOL mustBeUsed) {
     }
     prev = (MHeapBlock *)&mFree;
     for (cur = mFree; cur != NULL; cur = cur->next) {
-        u32 start = block->addr;
-        if (cur->addr > start) {
-            BOOL mergePrev = cur != mFree && prev->addr + prev->size == start;
-            BOOL mergeNext = start + block->size == cur->addr;
+        if (cur->addr > block->addr) {
+            u32 prevEnd;    // assigned in a comma expression so the compare reads (end, start) like the game
+            BOOL mergePrev = cur != mFree && (prevEnd = prev->addr + prev->size, prevEnd == block->addr);
+            u32 end = block->addr + block->size;
+            BOOL mergeNext = end == cur->addr;
 
             if (mergePrev && mergeNext) {
                 prev->size += cur->size + block->size;
