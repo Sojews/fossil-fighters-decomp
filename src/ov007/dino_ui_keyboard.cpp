@@ -1095,16 +1095,11 @@ extern "C" const char data_ov007_02191e50[];      // the page number's font
 extern const u32 data_0208ac24, data_0208ac40, data_0208ac44;
 extern const int data_02089a18;
 
-// A line's character (a u32 index, as std::wstring::operator[]).
-static inline wchar_t DinoWcharAt(const wchar_t *text, u32 i) {
-    return text[i];
-}
-
 // The poems saved in the records (three lines each, with the author and its flags), their labels, frames and
 // marks, the page number, the cursor and the help.
 // NONMATCHING: the game reads gCurrentDisplay for the canvases after copying their size (as elsewhere), and its
-// spill slots differ. (The poem loop spells out operator[] so its is_long tests materialize as bools under
-// opt_common_subs off, as the game's do.)
+// spill slots differ. (The poem loop spells out operator[]: its is_long tests materialize as bools under
+// opt_common_subs off as the game's do, and both reads share one `c << 1` byte offset.)
 #pragma opt_common_subs off
 void DinoUiSenryuMenu::OnStart() {
     mParallel.AddTail(mUnk114 = new MParallelTaskSet, mUnk110 = new MParallelTaskSet, mUnk118 = new MSerialTaskSet);
@@ -1133,8 +1128,9 @@ void DinoUiSenryuMenu::OnStart() {
     for (int j = 0; j < 42; j++) {
         mEntries[j] = 0;
     }
+    int i = 0;
     s32 index = 0;
-    for (int i = 0; i < 42; index += 0x100, i++) {
+    for (; i < 42; index += 0x100, i++) {
         DinoBackupRecord record;
         gDinoBackup->GetRecord(i, &record);
         if (record.unk78) {
@@ -1143,10 +1139,13 @@ void DinoUiSenryuMenu::OnStart() {
             bool isLong;
             for (int c = 0; c < ((isLong = text.is_long()) == false ? text.mShort.size : text.mLong.size); c++) {
                 bool isShort = !isLong;
-                if (DinoWcharAt(isShort ? text.mShort.buf : text.mLong.data, c) == L'\n') {
+                const wchar_t *buf = isShort ? text.mShort.buf : text.mLong.data;
+                u32 off = (u32)c << 1;
+                if (*(const wchar_t *)((const u8 *)buf + off) == L'\n') {
                     line++;
                 } else {
-                    mLineTexts[mCount][line].push_back(DinoWcharAt(isShort ? text.mShort.buf : text.mLong.data, c));
+                    mLineTexts[mCount][line].push_back(
+                        *(const wchar_t *)((const u8 *)(isShort ? text.mShort.buf : text.mLong.data) + off));
                 }
                 if (line == 3) {
                     break;
