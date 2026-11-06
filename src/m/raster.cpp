@@ -197,7 +197,8 @@ template <class Op> inline void MRasterWindow::ForEachLineGuarded(MRect rect, Op
         int y = rect.top;
         if (y < rect.bottom) {
             for (; y < rect.bottom; y++) {
-                op(rect.left, rect.right, y);
+                int right = rect.right;
+                op(rect.left, right, y);
             }
         }
     }
