@@ -249,18 +249,15 @@ DinoCommonWindowMenuItemFlushTask::~DinoCommonWindowMenuItemFlushTask() {
 }
 
 // B chooses the cancel item: sets the result, hides the items and the cursor and closes the window.
-// NONMATCHING: register choice in the cancel test (the count reload comes from loop invariants + CSE off).
-#pragma opt_loop_invariants off
-#pragma opt_common_subs off
-#pragma opt_strength_reduction off
+// (int indices: the game reloads the count each pass and indexes with a shift, without strength reduction.)
 void DinoCommonWindowMenu::OnIdle() {
     if (mCancelItem != NULL && (GetInput()->GetPressed() & 2)) {
-        for (u32 i = 0; i < mChoices.size(); i++) {
-            if (mUnkC0[i] == mCancelItem) {
+        for (int i = 0; i < mChoices.size(); i++) {
+            if (mCancelItem == mUnkC0[i]) {
                 *(u32 *)mUnkE4 = mChoices[i].unk00;
                 DinoSoundPlaySe(0x9A, 0);
                 MParallelTaskSet *hides = new MParallelTaskSet(TRUE);
-                for (u32 j = 0; j < mChoices.size(); j++) {
+                for (int j = 0; j < mChoices.size(); j++) {
                     hides->AddTail(((DinoCommonWindowMenuItem *)mUnkC0[j])->mUnk94->CreateHideTransfer());
                 }
                 GetSerial()->AddTail(mCursor->CreateHideTransfer(), hides,
@@ -274,9 +271,6 @@ void DinoCommonWindowMenu::OnIdle() {
         }
     }
 }
-#pragma opt_strength_reduction reset
-#pragma opt_common_subs reset
-#pragma opt_loop_invariants reset
 
 // The TU's pooled data (the offset is set by the TU's static initializer).
 extern "C" struct {
