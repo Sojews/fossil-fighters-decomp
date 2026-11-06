@@ -1052,11 +1052,14 @@ namespace std {
             _Constructor::push_back(x);
         }
 
+        // (The range is read through move iterators made here, and the two tag temporaries are arguments: the game's
+        // layout in MMultiPlayMessageHub::ReceivePending.)
         template <class It> void insert(iterator pos, It first, It last) {
-            UnkMSLStruct1 a = UnkMSLStruct1();
-            UnkMSLStruct1 b = UnkMSLStruct1();
-            // (The range is read through move iterators made here, as the game does.)
-            _Deleter::insert(pos.base(), __msl_move_iter<It>(first), __msl_move_iter<It>(last), Metrowerks::int2type<false>());
+            choose_insert(pos, __msl_move_iter<It>(first), __msl_move_iter<It>(last), UnkMSLStruct1(), UnkMSLStruct1());
+        }
+        template <class It>
+        void choose_insert(iterator pos, It first, It last, const UnkMSLStruct1 &, const UnkMSLStruct1 &) {
+            _Deleter::insert(pos.base(), first, last, Metrowerks::int2type<false>());
         }
 
         void reserve(size_t n) {
