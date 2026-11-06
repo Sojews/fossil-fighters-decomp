@@ -200,10 +200,10 @@ template <class Op> inline void MRasterWindow::ForEachLineGuarded(MRect rect, Op
     }
     if (OnScreen(rect)) {
         rect = rect.Intersection(MRect(0, 0, 256, M_RASTER_LINES));
+        int right = rect.right;
         int y = rect.top;
         if (y < rect.bottom) {
             for (; y < rect.bottom; y++) {
-                int right = rect.right;
                 op(rect.left, right, y);
             }
         }

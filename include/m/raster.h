@@ -60,7 +60,7 @@ public:
 // A horizontal span of a line covered by a window, in the order of the window registers' bytes. All zero is none.
 union MRasterSpan {
     bool IsEmpty() const { return bits == 0; }
-    void Set(int left_, int right_) {
+    void Set(const int &left_, const int &right_) {
         left = left_;
         right = right_;
     }
