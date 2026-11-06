@@ -33,9 +33,14 @@ static inline DinoBattleViewKasekiPoint *KasekiPoint(DinoBattleViewPlayer *playe
     return player->GetKasekiPoint();
 }
 
+// A side's slot view. (Through a non-member inline, the slot's player and side cursors advance in the game's order.)
+static inline DinoBattleViewFieldSlot *DinoSlotOf(DinoBattleView *view, int side) {
+    return view->mUnkE0->mSlotViewsC0[side];
+}
+
 // Loads the fonts and the view's data and makes the screens' parts: the field, both players and (when the
 // battle settings ask for it) the 3D view.
-// NONMATCHING: the last loop's cursor and slot index swap r2/r4. (The report also docks the MResource
+// NONMATCHING: the last loop's view cursor and slot index swap r2/r4. (The report also docks the MResource
 // constructor below it by 0.07%, though it matches on its own.)
 DinoBattleView::DinoBattleView(const DinoBattleParams *params) : MProcess(NULL) {
     mUnk13C = 0;
@@ -86,7 +91,7 @@ DinoBattleView::DinoBattleView(const DinoBattleParams *params) : MProcess(NULL) 
         mUnkE4[i]->GetKasekiPoint()->LoadPalette(0);
     }
     for (i = 0; i < 2; i++) {
-        mUnkE0->mSlotViewsC0[(&params->unk10)[i]]->mPlayer = mUnkE4[i];
+        DinoSlotOf(this, (&params->unk10)[i])->mPlayer = mUnkE4[i];
     }
     GetParallel()->AddTail(mUnkE0, mUnk104, mUnk108, mUnkE4[0], mUnkE4[1], mUnk10C, mPlayerOams[0], mPlayerOams[1]);
     mUnkEC = NULL;
