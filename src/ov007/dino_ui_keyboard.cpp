@@ -1128,9 +1128,7 @@ void DinoUiSenryuMenu::OnStart() {
     for (int j = 0; j < 42; j++) {
         mEntries[j] = 0;
     }
-    int i = 0;
-    s32 index = 0;
-    for (; i < 42; index += 0x100, i++) {
+    for (int i = 0; i < 42; i++) {
         DinoBackupRecord record;
         gDinoBackup->GetRecord(i, &record);
         if (record.unk78) {
@@ -1152,7 +1150,7 @@ void DinoUiSenryuMenu::OnStart() {
                 }
             }
             mUnk728[mCount] = (const wchar_t *)record.name;
-            mEntries[mCount] = index | ((record.unk79 ? 2 : 0) | record.unk7a | 0x80);
+            mEntries[mCount] = (i << 8) | ((record.unk79 ? 2 : 0) | record.unk7a | 0x80);
             mCount++;
         }
     }
