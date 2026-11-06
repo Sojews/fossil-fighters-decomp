@@ -31,8 +31,9 @@ u8 DinoCleaningImageLayer::GetUnk800() {
     return mUnk800;
 }
 
-// std::reverse (our <algorithm> doesn't have it yet).
-template <class T> static inline void DinoReverse(T *first, T *last) {
+// std::reverse (our <algorithm> doesn't have it yet). (first is copied into a local, which gives the game's registers.)
+template <class T> static inline void DinoReverse(T *first_, T *last) {
+    T *first = first_;
     if (first != last) {
         for (--last; first < last; ++first, --last) {
             T t = *first;
@@ -66,7 +67,6 @@ static inline bool DinoFxLe(MFx32 a, const MFx32 &b) {
 // Loads the layer: its pixels (mirrored for mUnk14), its palette sorted by brightness (the pixels remapped to the
 // palettes from start on), then for each cell whether any of its pixels is set, its edges, how hard it is, and
 // which cells are surrounded.
-// NONMATCHING: 99.8%, the mirrored rows' reverse loop gets other registers (tried std::swap, while and helper forms).
 extern "C" void func_ov002_02158b74(DinoCleaningImageLayer *layer, MPalUnit *block, u32 start) {
     layer->mUnk1C28 = start;
     layer->mSize = layer->mPicture.CalcSize();
