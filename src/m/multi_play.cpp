@@ -1189,7 +1189,7 @@ void MMultiPlayMessageHub::SendPending() {
 
 // (An inline of its own: it puts the insert's temporaries below the copy's, as in the game.)
 static inline void MMultiPlayAppend(std::vector<char> *v, u8 *data, u32 n) {
-    v->insert(v->end(), std::__msl_move_iter<u8 *>(data), std::__msl_move_iter<u8 *>(data + n));
+    v->insert(v->end(), data, data + n);
 }
 
 // Reads what each console shared this frame: message headers and pieces, put back together per console; a finished

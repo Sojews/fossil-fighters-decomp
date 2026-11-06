@@ -1055,7 +1055,8 @@ namespace std {
         template <class It> void insert(iterator pos, It first, It last) {
             UnkMSLStruct1 a = UnkMSLStruct1();
             UnkMSLStruct1 b = UnkMSLStruct1();
-            _Deleter::insert(pos.base(), first, last, Metrowerks::int2type<false>());
+            // (The range is read through move iterators made here, as the game does.)
+            _Deleter::insert(pos.base(), __msl_move_iter<It>(first), __msl_move_iter<It>(last), Metrowerks::int2type<false>());
         }
 
         void reserve(size_t n) {
