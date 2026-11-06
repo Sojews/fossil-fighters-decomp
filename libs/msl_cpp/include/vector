@@ -292,7 +292,11 @@ namespace std {
         // (last comes first: the game copies it first and gives it the lower stack slot.)
         template <class It> static void move_range(It last, It first, pointer p) {
             for (; first != last; ++first, ++p) {
-                __msl_assign<T>(*p, *first, Metrowerks::int2type<true>());
+                // (__msl_assign by hand: the tag temporary first, then the element in a volatile local, so the tag
+                // takes the lower byte as in the game.)
+                Metrowerks::int2type<true>();
+                volatile T c = *first;
+                *p = c;
             }
         }
         template <class It> void move_range_at_end(const It &first, const It &last) {
