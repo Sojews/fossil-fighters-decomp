@@ -74,16 +74,20 @@ void DinoGuideMessage::Restart() {
 
 extern "C" const MFx32 data_020b5814;   // frames per pixel of the scroll
 
+// (Inline so its MFx32 temporaries sit below the caller's points on the stack.)
+static inline int DinoGuideScrollFrames(MSmartObjCanvas *canvas) {
+    MFx32 w(canvas->GetWidth() - 256);
+    return MFx32ToInt(w * data_020b5814);
+}
+
 // Scrolls a strip wider than the screen across it.
-// NONMATCHING: stack slots only (as DinoHelpStatus::Scroll).
 void DinoGuideMessage::Scroll() {
     MScopedLock lock(&mMutex, TRUE);
     if (mCanvas != NULL && mCanvas->GetWidth() > 256) {
-        int frames = MFx32ToInt(MFx32(mCanvas->GetWidth() - 256) * data_020b5814);
+        int frames = DinoGuideScrollFrames(mCanvas);
         int dist = mCanvas->GetWidth() - 256;
-        MPoint to(-dist, mCanvas->GetPosition().y);
-        MPoint from(0, mCanvas->GetPosition().y);
-        mSerial.AddTail(mCanvas->CreateCoordAnime(from, to, frames, 0));
+        mSerial.AddTail(mCanvas->CreateCoordAnime(MPoint(0, mCanvas->GetPosition().y),
+                                                  MPoint(-dist, mCanvas->GetPosition().y), frames, 0));
     }
 }
 
