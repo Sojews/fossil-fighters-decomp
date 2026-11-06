@@ -470,7 +470,8 @@ namespace std {
             return;
         }
         if (len == 2) {
-            if (comp(*--last, *first)) {
+            --last;
+            if (comp(*last, *first)) {
                 swap(*first, *last);
             }
             return;
