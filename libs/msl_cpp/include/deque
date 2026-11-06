@@ -214,7 +214,7 @@ namespace std {
         iterator end() {
             return iterator(data_ + (cap() != 0 ? (start_ + size_) % cap() : 0), *this);
         }
-        // end() with the block pointer read once (the deleter's destructor builds its range from this one iterator).
+        // end() with the block pointer read once (the deleter's destructor and insert use this form).
         iterator end_fields() {
             T *p = data_ + (cap() != 0 ? (start_ + size_) % cap() : 0);
             T *b = data_;
@@ -669,8 +669,8 @@ namespace std {
         }
         size_t c = capacity();
         if (n <= c && size_ <= c - n) {
-            iterator ob(b, *this);
-            iterator i = ob;
+            iterator i(b, *this);
+            iterator ob = i;
             size_t back = size_ - pi;
             if (pi < back) {
                 i += -(difference_type) n;
@@ -681,7 +681,7 @@ namespace std {
                 }
             } else {
                 size_ += n;
-                i = end();
+                i = end_fields();
                 if (back != 0) {
                     i = __cdeque_copy_backward_i(i + -(difference_type)(n + back), i + -(difference_type)n, i);
                 }
