@@ -2781,8 +2781,10 @@ void DinoEventExecBattle::StateResult() {
             gLcd->GetBottomDisplay()->mWin->Reset();
             gLcd->GetTopDisplay()->SetBackdrop(0xffff);
             gLcd->GetBottomDisplay()->SetBackdrop(0xffff);
-            MTask *bottom = gLcd->GetBottomDisplay()->mBright->CreateFadeInFromBlack(30, 0);
-            MTask *top = gLcd->GetTopDisplay()->mBright->CreateFadeInFromBlack(30, 0);
+            MTask *top;
+            MTask *bottom;
+            bottom = gLcd->GetBottomDisplay()->mBright->CreateFadeInFromBlack(30, 0);
+            top = gLcd->GetTopDisplay()->mBright->CreateFadeInFromBlack(30, 0);
             MParallelTaskSet *fades = new MParallelTaskSet(TRUE);
             fades->AddTail(top);
             fades->AddTail(bottom);
