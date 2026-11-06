@@ -99,7 +99,7 @@ void DinoCommonWindowMenu::OnStart() {
     }
     SetLinkFallback(1);
     MFont *font = gDinoResource->CreateFont12(0, 1, 0);
-    int width = 0x18;
+    s32 width = 0x18;
     for (int i = 0; i < mChoices.size(); i++) {
         std::string text = mChoices[i].unk04;
         if (text.size() != 0 && text[0] == '*') {
@@ -183,21 +183,18 @@ void DinoCommonWindowMenu::OnStart() {
     AddLink((MMenuItem *)mUnkC0[0], 4, (MMenuItem *)mUnkC0[mUnkC0.size() - 1]);
     AddLink((MMenuItem *)mUnkC0[mUnkC0.size() - 1], 2, (MMenuItem *)mUnkC0[0]);
     DinoHelpDummyItem *prev = NULL;
-    u32 j = 0;
-    if (j < mEntries.size()) {
+    for (u32 j = 0; j < mEntries.size(); j++) {
+        DinoCommonWindowMenuEntry *entry = &mEntries[j];
+        DinoHelpDummyItem *help = new DinoHelpDummyItem((MDisplay *)entry->id, entry->rect, std::string(entry->text));
         MTaskSet *parallel = &mParallel;
-        for (; j < mEntries.size(); j++) {
-            DinoCommonWindowMenuEntry *entry = &mEntries[j];
-            DinoHelpDummyItem *help = new DinoHelpDummyItem((MDisplay *)entry->id, entry->rect, std::string(entry->text));
-            parallel->AddTail(help);
-            if (prev != NULL) {
-                DinoHelpBase::AddEntry((u32)prev, 2, (u32)help);
-            }
-            DinoHelpBase::AddEntry((u32)help, 4, (u32)prev);
-            DinoHelpBase::AddEntry((u32)help, 1, 0);
-            DinoHelpBase::AddEntry((u32)help, 3, 0);
-            prev = help;
+        parallel->AddTail(help);
+        if (prev != NULL) {
+            DinoHelpBase::AddEntry((u32)prev, 2, (u32)help);
         }
+        DinoHelpBase::AddEntry((u32)help, 4, (u32)prev);
+        DinoHelpBase::AddEntry((u32)help, 1, 0);
+        DinoHelpBase::AddEntry((u32)help, 3, 0);
+        prev = help;
     }
     if (prev != NULL) {
         DinoHelpBase::AddEntry((u32)prev, 2, (u32)(DinoHelpItem *)(DinoCommonWindowMenuItem *)mUnkC0[0]);
