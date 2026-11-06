@@ -214,6 +214,19 @@ namespace std {
         iterator end() {
             return iterator(data_ + (cap() != 0 ? (start_ + size_) % cap() : 0), *this);
         }
+        // end() with the block pointer read once (the deleter's destructor builds its range from this one iterator).
+        iterator end_fields() {
+            T *p = data_ + (cap() != 0 ? (start_ + size_) % cap() : 0);
+            T *b = data_;
+            T *e = b + cap();
+            T *f = b + start_;
+            iterator r;
+            r.ptr_ = p;
+            r.beg_ = b;
+            r.first_ = f;
+            r.end_ = e;
+            return r;
+        }
         const_iterator begin() const {
             return const_iterator(data_ + start_, *this);
         }
@@ -785,7 +798,10 @@ namespace std {
         erase_at_end(size_, Metrowerks::int2type<true>());
         buf_type &b = buf();
         if (!b.empty()) {
-            for (buf_type::iterator e = b.end(), i(b); i != e; ++i) {
+            buf_type::iterator e = b.end_fields();
+            buf_type::iterator i = e;
+            i.ptr_ = i.first_;
+            for (; i != e; ++i) {
                 if (*i != 0) {
                     ::operator delete(*i);
                 }
