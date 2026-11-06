@@ -1,5 +1,8 @@
 // Raster effects.
 
+// The game built this file with -ipa file: inlined temporaries get stack slots in creation order.
+#pragma ipa file
+
 #include <algorithm>
 #include "m/raster.h"
 #include "m/display.h"
@@ -174,12 +177,15 @@ static inline void WriteLine(MRasterSpan *spans, u8 *regs) {
     }
 }
 
+// Whether r is at least partly on the screen.
+static inline bool OnScreen(MRect r) { return MRect(0, 0, 256, M_RASTER_LINES).Intersects(r); }
+
 // Calls op for each line of rect on the screen, with the rect's left and right edges.
 template <class Op> inline void MRasterWindow::ForEachLine(MRect rect, Op op) {
     if (mAutoFlip && !mChanged) {
         Clear();
     }
-    if (MRect(0, 0, 256, M_RASTER_LINES).Intersects(rect)) {
+    if (OnScreen(rect)) {
         rect = rect.Intersection(MRect(0, 0, 256, M_RASTER_LINES));
         for (int y = rect.top; y < rect.bottom; y++) {
             op(rect.left, rect.right, y);
@@ -192,7 +198,7 @@ template <class Op> inline void MRasterWindow::ForEachLineGuarded(MRect rect, Op
     if (mAutoFlip && !mChanged) {
         Clear();
     }
-    if (MRect(0, 0, 256, M_RASTER_LINES).Intersects(rect)) {
+    if (OnScreen(rect)) {
         rect = rect.Intersection(MRect(0, 0, 256, M_RASTER_LINES));
         int y = rect.top;
         if (y < rect.bottom) {
@@ -305,7 +311,7 @@ template <class Op> inline void MRasterWindow::ForEachCircleLine(Op op, MPoint c
     }
     MRect rect(center.x - radius, center.y - radius, center.x + radius, center.y + radius);
     int bottom = center.y + radius;
-    if (!MRect(0, 0, 256, M_RASTER_LINES).Intersects(rect)) {
+    if (!OnScreen(rect)) {
         return;
     }
     int below = center.y;
