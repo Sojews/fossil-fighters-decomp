@@ -368,12 +368,12 @@ namespace std {
         if (!(first == last)) {
             *result = *first;
             for (++last2, ++first; first != last; ++first, ++last2) {
-                value_type *j = last2.ptr_;
-                value_type *i = j;
-                for (; i != result.base() && comp(*first, *--i); --j) {
-                    *OutputIterator(j, result.buf_) = *i;
+                __vec_iterator<value_type> j = last2;
+                __vec_iterator<value_type> i = j;
+                for (; i.ptr_ != result.base() && comp(*first, *--i); --j) {
+                    *OutputIterator(j.ptr_, result.buf_) = *i;
                 }
-                *OutputIterator(j, result.buf_) = *first;
+                *OutputIterator(j.ptr_, result.buf_) = *first;
             }
         }
         return OutputIterator(last2.ptr_, result.buf_);
