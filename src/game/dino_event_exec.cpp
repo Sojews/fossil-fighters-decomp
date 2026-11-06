@@ -3045,8 +3045,13 @@ struct DinoWarpDefs {
     MFx32 unk24;
 };
 
-// NONMATCHING: the game spills tasks, the move, the wait and the angle in the opposite order, and keeps the 10, the 2
-// and the length as temporaries (its frame is 8 bytes larger).
+// The walk's frame count: the 2 and the 10 as by-value parameters give the game's temporaries (copy and parameter).
+static inline int WarpWalkFrames(const MFx32Point &offset, MFx32 two, MFx32 ten) {
+    return MFx32ToInt(offset.Length() / two * ten);
+}
+
+// NONMATCHING: the game spills two of the tasks in swapped stack slots, and the multiply's result temporary sits at
+// the frame bottom.
 void DinoEventExecAutoWarp::StateArrive() {
     if ((mNewBgm != 0 && mScene != mNewScene) || mBgm != mNewBgm) {
         DinoSoundLoadScene(mNewScene);
@@ -3075,11 +3080,8 @@ void DinoEventExecAutoWarp::StateArrive() {
             offset += step;
         } while (((DinoFieldMapArea *)mEvent->GetField()->GetMap()->GetArea(pos + offset))->id == area->id);
         MTask *wait = mEvent->GetField()->CreateCharaWaitMoveTask(mEvent->GetField()->GetCamera()->GetFocus());
-        MFx32 ten(10);
-        MFx32 two(2);
-        MFx32 len = offset.Length();
         MTask *move = mEvent->GetField()->CreateCharaMoveOffsetTask(
-            mEvent->GetField()->GetCamera()->GetFocus(), offset, MFx32ToInt(len / two * ten),
+            mEvent->GetField()->GetCamera()->GetFocus(), offset, WarpWalkFrames(offset, MFx32(2), MFx32(10)),
             0, 0);
         MTimer *timer = new MTimer(10);
         MTask *turn = mEvent->GetField()->CreateCharaAngleTask(mEvent->GetField()->GetCamera()->GetFocus(), angle, 1, 0);
