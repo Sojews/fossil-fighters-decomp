@@ -59,16 +59,36 @@ extern "C" u32 data_ov000_0219504c[];           // the TU's pooled statics (+0x0
 // The text's length (read through an inline: the game spills it into a lower slot than a plain local's).
 static inline int KPTextLen(const char *t) { return strlen(t); }
 
+// Adds a digit motion per character of the text, each playing its digit's animation in turn.
+// (An inline helper: the game's counter takes a lower stack slot than the caller's digits set.)
+static inline void KPAddDigits(MSerialTaskSet *tasks, MParallelTaskSet *digits, MSmartOam *oam, MPoint &pos, char *text,
+                               int len, int value) {
+    int i = 0;
+    if (len > 0) {
+        for (; i < len; i++) {
+            MMotion *digit = new MMotion(
+                std::string(value >= 0 ? ((const char **)data_ov000_0219504c)[2] : ((const char **)data_ov000_0219504c)[1]),
+                oam, 2, 1);
+            digit->SetPriority(2);
+            digit->SetAnchor(3);
+            digit->Show();
+            digit->SetPosition(pos);
+            digit->GetUnit()->SetMode(1);
+            digits->AddTail(digit);
+            pos.x += 16;
+            int anime = text[i] == '+' ? 11 : text[i] - '0' + 1;
+            tasks->AddTail(digit->CreatePlayTransfer(anime, 0), new MTimer(3));
+        }
+    }
+}
+
 // Shows a side's kaseki point change, one digit after another.
-// NONMATCHING: 99.96%, the spilled counter and digits set take each other's stack slots (the length read through
-// KPTextLen took its slot).
 extern "C" void func_ov000_0217df4c(DinoBattleViewKPUpDown *view, int value, int side) {
     MPoint pos;
     char text[8];
     KPUpDownMotion *motion;
     MParallelTaskSet *digits;
     int len;
-    int i;
     MSmartOam *oam;
     if (value == 0) {
         return;
@@ -87,23 +107,7 @@ extern "C" void func_ov000_0217df4c(DinoBattleViewKPUpDown *view, int value, int
     } else {
         DinoSoundPlaySe(0x57, 0);
     }
-    i = 0;
-    if (len > 0) {
-        for (; i < len; i++) {
-            MMotion *digit = new MMotion(
-                std::string(value >= 0 ? ((const char **)data_ov000_0219504c)[2] : ((const char **)data_ov000_0219504c)[1]),
-                oam, 2, 1);
-            digit->SetPriority(2);
-            digit->SetAnchor(3);
-            digit->Show();
-            digit->SetPosition(pos);
-            digit->GetUnit()->SetMode(1);
-            digits->AddTail(digit);
-            pos.x += 16;
-            int anime = text[i] == '+' ? 11 : text[i] - '0' + 1;
-            tasks->AddTail(digit->CreatePlayTransfer(anime, 0), new MTimer(3));
-        }
-    }
+    KPAddDigits(tasks, digits, oam, pos, text, len, value);
     tasks->AddTail(new MTimer(60), MTaskExitTransfer::Create(digits));
     digits->AddTail(oam);
     motion->mTasks->AddTail(digits);
