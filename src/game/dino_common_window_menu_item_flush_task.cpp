@@ -76,8 +76,8 @@ extern "C" struct {
 } data_020bbd44;
 
 // The excavation settings' section at offset7C (the input repeat is at 0x1C and 0x20).
-static inline const int *GetExcavate7C(MResource<DinoExcavateDefs> &defs) {
-    const DinoExcavateDefs *d = defs.Get();
+static inline const int *GetExcavate7C(const MResource<DinoExcavateDefs> &defs) {
+    const DinoExcavateDefs *d = ((MResource<DinoExcavateDefs> &)defs).Get();
     if (d->offset7C == 0) {
         return NULL;
     }
@@ -114,8 +114,7 @@ void DinoCommonWindowMenu::OnStart() {
             width = size.x;
         }
     }
-    mUnkBC = (mChoices.size() + 1) / 4 + mChoices.size() * 2 + 2;
-    mWidth = (width + 7) / 8 + 4;
+    *(MPoint *)&mWidth = MPoint((width + 7) / 8 + 4, (mChoices.size() + 1) / 4 + mChoices.size() * 2 + 2);
     switch (mUnkFC) {
     case 0:
         mUnk100 = MPoint(0, 0);
@@ -140,7 +139,7 @@ void DinoCommonWindowMenu::OnStart() {
         break;
     }
     mWindow = new DinoCommonWindow(0, false, false);
-    mWindow->SetFrame(MRect(MPoint(0, 0), MPoint(mWidth, mUnkBC)));
+    mWindow->SetFrame(MRect(MPoint(0, 0), *(MPoint *)&mWidth));
     mWindow->SetPriority(0);
     mWindow->SetPosition(mPos - mUnk100);
     mParallel.AddTail(mWindow);
@@ -184,17 +183,21 @@ void DinoCommonWindowMenu::OnStart() {
     AddLink((MMenuItem *)mUnkC0[0], 4, (MMenuItem *)mUnkC0[mUnkC0.size() - 1]);
     AddLink((MMenuItem *)mUnkC0[mUnkC0.size() - 1], 2, (MMenuItem *)mUnkC0[0]);
     DinoHelpDummyItem *prev = NULL;
-    for (u32 i = 0; i < mEntries.size(); i++) {
-        DinoCommonWindowMenuEntry *entry = &mEntries[i];
-        DinoHelpDummyItem *help = new DinoHelpDummyItem((MDisplay *)entry->id, entry->rect, std::string(entry->text));
-        mParallel.AddTail(help);
-        if (prev != NULL) {
-            DinoHelpBase::AddEntry((u32)prev, 2, (u32)help);
+    u32 j = 0;
+    if (j < mEntries.size()) {
+        MTaskSet *parallel = &mParallel;
+        for (; j < mEntries.size(); j++) {
+            DinoCommonWindowMenuEntry *entry = &mEntries[j];
+            DinoHelpDummyItem *help = new DinoHelpDummyItem((MDisplay *)entry->id, entry->rect, std::string(entry->text));
+            parallel->AddTail(help);
+            if (prev != NULL) {
+                DinoHelpBase::AddEntry((u32)prev, 2, (u32)help);
+            }
+            DinoHelpBase::AddEntry((u32)help, 4, (u32)prev);
+            DinoHelpBase::AddEntry((u32)help, 1, 0);
+            DinoHelpBase::AddEntry((u32)help, 3, 0);
+            prev = help;
         }
-        DinoHelpBase::AddEntry((u32)help, 4, (u32)prev);
-        DinoHelpBase::AddEntry((u32)help, 1, 0);
-        DinoHelpBase::AddEntry((u32)help, 3, 0);
-        prev = help;
     }
     if (prev != NULL) {
         DinoHelpBase::AddEntry((u32)prev, 2, (u32)(DinoHelpItem *)(DinoCommonWindowMenuItem *)mUnkC0[0]);
@@ -216,11 +219,8 @@ void DinoCommonWindowMenu::OnStart() {
     shows->AddTail(mCursor->CreateShowTransfer());
     shows->AddTail(play);
     DinoSoundPlaySe(0x95, 0);
-    {
-        MResource<DinoExcavateDefs> delayDefs = gDinoResource->GetExcavateDefs();
-        MResource<DinoExcavateDefs> intervalDefs = gDinoResource->GetExcavateDefs();
-        GetInput()->SetRepeat(0xF0, GetExcavate7C(delayDefs)[7], GetExcavate7C(intervalDefs)[8]);
-    }
+    GetInput()->SetRepeat(0xF0, GetExcavate7C(gDinoResource->GetExcavateDefs())[7],
+                          GetExcavate7C(gDinoResource->GetExcavateDefs())[8]);
     MTask *enable = MCreateCallTask(this, data_020bbd44.Enable);
     MTask *open = mWindow->CreateOpenTask(MRect(mPos, mPos));
     MTask *show = mWindow->CreateShowTransfer();
