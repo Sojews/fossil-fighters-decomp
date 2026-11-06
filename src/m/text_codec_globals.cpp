@@ -1,7 +1,8 @@
 // Globals no code uses (between the text codec and the file code): the game still constructs them at startup and
 // destroys them at exit.
-// NONMATCHING: the static initializer (the globals' and their destructor records' places in the pool depend on
-// names we don't know).
+// mwcc lays a file's .bss out by heap-sorting its objects by size, starting from the reverse of their definition order
+// (each destructor record is defined just before its object). The game's layout doesn't come out of these four
+// objects alone, so the unused arrays (sizes over 12 bytes, so they land after everything here) steer the sort.
 
 #include "types.h"
 #include <string>
@@ -24,11 +25,19 @@ struct MUnusedEntry34 {
     std::vector<void *> list1;  // 0x28
 };
 
+// (The objects carry the game's address names, as objdiff compares references to them by name.)
+static u32 sPad0[8];
+static u32 sPad1[5];
+static std::vector<MUnusedEntry10> data_0214d254;
+static u32 sPad2[4];
+static u32 sPad3[8];
+static u32 sPad4[7];
 static u32 sUnused0;
-static std::vector<MUnusedEntry10> sUnused10;
-static std::vector<MUnusedEntry34> sUnused34;
-static std::vector<u32> sUnused4;
-static std::string sUnusedText;
+static std::vector<MUnusedEntry34> data_0214d224;
+static u32 sPad5[6];
+static std::vector<u32> data_0214d218;
+static std::string data_0214d248;
+static u32 sPad6[5];
 
 // (The vectors' members, in the order the game emits them.)
 template std::__vec_deleter<u32, std::allocator<u32> >::~__vec_deleter();
