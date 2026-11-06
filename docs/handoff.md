@@ -202,6 +202,9 @@ There's nothing worth keeping, so there is no `docs/handoff.patch`.
   (`KasekiRock::StateDrop`/`Hit` matched this way).
 - Compare-operand order is canonicalized, so swapping `a == x` does nothing. However,
   `u32 next = m84; if (m80 != next)` did fix the cmp operand order.
+- **To stop mwcc CSE-ing two identical comparisons, change one side's type, not its value:
+  `(u32)(index % 4) == 3` instead of a second `index % 4 == 3`.** Same `cmp/bne` bytes, different
+  expression. (DinoUiCleaningMenu::Decide 77.20→79.51 — the game's two column tests both emit.)
 - **Permuter outputs: keep the no-op-looking casts** (`(u32) w`, `(int) x`). They're often what matters. Remove
   them one at a time, never all at once.
 - **Member read twice around a post-increment and then stored:**
