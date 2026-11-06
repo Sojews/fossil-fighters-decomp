@@ -56,9 +56,12 @@ DinoBattleViewKPUpDown::DinoBattleViewKPUpDown() : MProcess(NULL) {
 extern "C" const char data_ov000_02195114[];   // the change's format ("%+d")
 extern "C" u32 data_ov000_0219504c[];           // the TU's pooled statics (+0x04: the loss digits, +0x08: the gain)
 
+// The text's length (read through an inline: the game spills it into a lower slot than a plain local's).
+static inline int KPTextLen(const char *t) { return strlen(t); }
+
 // Shows a side's kaseki point change, one digit after another.
-// NONMATCHING: 99.3%, the spilled length, counter and oam take other stack slots, and the game tests the count before
-// entering the loop.
+// NONMATCHING: 99.96%, the spilled counter and digits set take each other's stack slots (the length read through
+// KPTextLen took its slot).
 extern "C" void func_ov000_0217df4c(DinoBattleViewKPUpDown *view, int value, int side) {
     MPoint pos;
     char text[8];
@@ -72,7 +75,7 @@ extern "C" void func_ov000_0217df4c(DinoBattleViewKPUpDown *view, int value, int
     }
     motion = view->mMotions[side];
     OS_SPrintf(text, data_ov000_02195114, value < 0 ? -value : value);
-    len = strlen(text);
+    len = KPTextLen(text);
     motion->mTasks->Clear();
     MSerialTaskSet *tasks = new MSerialTaskSet(TRUE);
     digits = new MParallelTaskSet();
