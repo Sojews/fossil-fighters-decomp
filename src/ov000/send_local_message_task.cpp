@@ -191,7 +191,15 @@ extern "C" MTask *func_ov000_02169fb8(MMessageObserver *view, DinoBattleModelPla
 extern "C" const u32 data_0208a2d8, data_0208a2dc;     // action info bar texts
 extern "C" const u32 data_0208a1e0, data_0208a0dc, data_0208a0cc;  // frames before the live's game-end line, by creatures left
 
-// NONMATCHING
+// Builds a parallel task set of three tasks.
+static inline MParallelTaskSet *DinoNewParallel3(MTask *a, MTask *b, MTask *c) {
+    MParallelTaskSet *s = new MParallelTaskSet(TRUE);
+    s->AddTail(a);
+    s->AddTail(b);
+    s->AddTail(c);
+    return s;
+}
+
 void DinoBattleModelField::OnMessage(MMessage *msg) {
     switch (msg->mId) {
     case 0x10002: {
@@ -451,16 +459,12 @@ void DinoBattleModelField::OnMessage(MMessage *msg) {
         if (mModel->GetPlayer(0)->GetCreatureCount() == 0 || mModel->GetPlayer(1)->GetCreatureCount() == 0) {
             break;
         }
-        MTask *fadeSub, *fadeMain, *bgm, *exit;
-        exit = MTaskExitTransfer::Create(mBattle);
-        bgm = DinoSoundCreateStopBgmTask(-1, 60);
-        fadeSub = gLcd->mSub->mBright->CreateFadeOutToBlack(60, 0);
-        fadeMain = gLcd->mMain->mBright->CreateFadeOutToBlack(60, 0);
-        MParallelTaskSet *together = new MParallelTaskSet(TRUE);
-        together->AddTail(fadeMain);
-        together->AddTail(fadeSub);
-        together->AddTail(bgm);
-        mSerial.AddTail(together, exit);
+        // One nested expression: the tasks are temporaries (inline args evaluate right to left, so the exit
+        // transfer is created first), which gives the game's spill slots.
+        mSerial.AddTail(DinoNewParallel3(gLcd->mMain->mBright->CreateFadeOutToBlack(60, 0),
+                                         gLcd->mSub->mBright->CreateFadeOutToBlack(60, 0),
+                                         DinoSoundCreateStopBgmTask(-1, 60)),
+                        MTaskExitTransfer::Create(mBattle));
         break;
     }
     case 0x1009F:
