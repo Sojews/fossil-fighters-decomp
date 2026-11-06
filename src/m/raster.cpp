@@ -180,7 +180,7 @@ static inline void WriteLine(MRasterSpan *spans, u8 *regs) {
 // Whether r is at least partly on the screen.
 static inline bool OnScreen(MRect r) { return MRect(0, 0, 256, M_RASTER_LINES).Intersects(r); }
 
-// Calls op for each line of rect on the screen, with the rect's left and right edges.
+// Calls op for each line of rect on the screen, with the rect's right and left edges (window register order).
 template <class Op> inline void MRasterWindow::ForEachLine(MRect rect, Op op) {
     if (mAutoFlip && !mChanged) {
         Clear();
@@ -245,13 +245,11 @@ struct SubtractSpanOp {
     MRasterWindow *mWindow;
 };
 
-// (The span adder is big; the game inlines it anyway.)
-#pragma inline_max_size(2000)
-#pragma opt_loop_invariants off
+// NONMATCHING: register choice in the inlined span add (the game computes the span pointer in r2, the register
+// pointer in r1 and loads the window once; declaring regs before spans gets that but costs SetCircle).
 void MRasterWindow::AddRect(MRect rect) {
     ForEachLineGuarded(rect, AddSpanOp(this));
 }
-#pragma opt_loop_invariants reset
 
 void MRasterWindow::SubtractSpan(int left, int right, int line) {
     if (left >= right) {
@@ -301,7 +299,7 @@ void MRasterWindow::SubtractRect(MRect rect) {
 // The screen's width, which spans are clipped to.
 static const int sRasterWidth = 256;
 
-// Calls op for the lines of a disc, four at a time (midpoint circle), with each line's clipped left and right edges.
+// Calls op for the lines of a disc, four at a time (midpoint circle), with each line's clipped right and left edges.
 template <class Op> inline void MRasterWindow::ForEachCircleLine(Op op, MPoint center, int radius) {
     if (mAutoFlip && !mChanged) {
         Clear();
@@ -348,15 +346,15 @@ template <class Op> inline void MRasterWindow::ForEachCircleLine(Op op, MPoint c
     }
 }
 
-// NONMATCHING: stack slots, and the inlined span adds differ (as in AddRect).
+// NONMATCHING: stack slots, registers in the inlined span adds, and the literal-0 pool offsets (ipa data layout).
 #pragma opt_common_subs off
 void MRasterWindow::SetCircle(MPoint center, int radius) {
     ForEachCircleLine(AddSpanOp(this), center, radius);
 }
 #pragma opt_common_subs reset
 
-// NONMATCHING: the game swaps the stack slots of the rect and its copy for Intersects, and keeps the window in a
-// register from later.
+// NONMATCHING: the spill slots of center.y and the lower-half line counter are swapped, and the literal-0 pool
+// offsets differ (the game's ipa .data layout interleaves SetCircle's and SubtractCircle's zeros).
 #pragma opt_common_subs off
 void MRasterWindow::SubtractCircle(MPoint center, int radius) {
     ForEachCircleLine(SubtractSpanOp(this), center, radius);
