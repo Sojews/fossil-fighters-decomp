@@ -25,8 +25,7 @@ public:
     void AddEntry(u32 id, MRect rect, const std::string &text);
 
     DinoCommonWindow *mWindow;                      // 0xB4
-    u32 mWidth;                                     // 0xB8: of the window, in tiles
-    u32 mUnkBC;                                     // 0xBC
+    MPoint mSize;                                   // 0xB8: of the window, in tiles
     std::vector<void *> mUnkC0;                     // 0xC0
     std::vector<DinoCommonWindowMenuEntry> mEntries;// 0xCC
     u32 mUnkD8;                                     // 0xD8

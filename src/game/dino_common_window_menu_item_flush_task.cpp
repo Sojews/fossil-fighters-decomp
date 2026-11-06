@@ -89,7 +89,8 @@ static inline const int *GetExcavate7C(const MResource<DinoExcavateDefs> &defs) 
 // just exits.
 // (int indices with strength reduction on: only the item's y, i * 0x12 + 8, becomes an induction variable, as in the
 // game; the loop entry is tested twice: `if (i < size) for (; i < size; ...)`.)
-// NONMATCHING: stack layout (the game's frame is 0x8 smaller) and the width/height stores' order.
+// NONMATCHING: one spill slot (the entry loop's &mParallel sits below the shows set's in the game) and the item ctor's
+// bl, which the report scores as next-function docking.
 #pragma auto_inline off
 template MTask *MCreateCallTask(DinoCommonWindowMenu *obj, void (DinoHelpBase::*func)());
 void DinoCommonWindowMenu::OnStart() {
@@ -114,32 +115,32 @@ void DinoCommonWindowMenu::OnStart() {
             width = size.x;
         }
     }
-    *(MPoint *)&mWidth = MPoint((width + 7) / 8 + 4, (mChoices.size() + 1) / 4 + mChoices.size() * 2 + 2);
+    mSize = MPoint((width + 7) / 8 + 4, (mChoices.size() + 1) / 4 + mChoices.size() * 2 + 2);
     switch (mUnkFC) {
     case 0:
         mUnk100 = MPoint(0, 0);
         break;
     case 1:
-        mUnk100 = MPoint(mWidth * 8, 0);
+        mUnk100 = MPoint(mSize.x * 8, 0);
         break;
     case 2:
-        mUnk100 = MPoint(0, mUnkBC * 8);
+        mUnk100 = MPoint(0, mSize.y * 8);
         break;
     case 3:
-        mUnk100 = MPoint(mWidth * 8, mUnkBC * 8);
+        mUnk100 = MPoint(mSize.x * 8, mSize.y * 8);
         break;
     case 4:
-        mUnk100 = MPoint(mWidth * 4, mUnkBC * 4);
+        mUnk100 = MPoint(mSize.x * 4, mSize.y * 4);
         break;
     case 5:
-        mUnk100 = MPoint(mWidth * 4, 0);
+        mUnk100 = MPoint(mSize.x * 4, 0);
         break;
     case 6:
-        mUnk100 = MPoint(mWidth * 4, mUnkBC * 8);
+        mUnk100 = MPoint(mSize.x * 4, mSize.y * 8);
         break;
     }
     mWindow = new DinoCommonWindow(0, false, false);
-    mWindow->SetFrame(MRect(MPoint(0, 0), *(MPoint *)&mWidth));
+    mWindow->SetFrame(MRect(MPoint(0, 0), mSize));
     mWindow->SetPriority(0);
     mWindow->SetPosition(mPos - mUnk100);
     mParallel.AddTail(mWindow);
@@ -258,7 +259,7 @@ void DinoCommonWindowMenu::OnIdle() {
                     hides->AddTail(((DinoCommonWindowMenuItem *)mUnkC0[j])->mUnk94->CreateHideTransfer());
                 }
                 GetSerial()->AddTail(mCursor->CreateHideTransfer(), hides,
-                                     mWindow->CreateCloseTask(MRect(mWidth * 4, 0, mWidth * 4, mUnkBC * 8)
+                                     mWindow->CreateCloseTask(MRect(mSize.x * 4, 0, mSize.x * 4, mSize.y * 8)
                                                                   .Moved(MPoint(mPos.x - mUnk100.x,
                                                                                 mPos.y - mUnk100.y))),
                                      CreateExitTransfer());
@@ -294,7 +295,7 @@ void DinoCommonWindowMenu::OnFocus(MMenuItem *item) {
     for (int i = 0; i < mChoices.size(); i++) {
         if (item == mUnkC0[i]) {
             mWindow->Unk0201bb5c();
-            mWindow->Flush(MRect(3, i / 4 + (i * 2 + 1), mWidth - 1, i / 4 + (i * 2 + 1) + (i % 4 < 2 ? 2 : 3)),
+            mWindow->Flush(MRect(3, i / 4 + (i * 2 + 1), mSize.x - 1, i / 4 + (i * 2 + 1) + (i % 4 < 2 ? 2 : 3)),
                            i % 4);
         }
     }
@@ -312,7 +313,7 @@ void DinoCommonWindowMenu::OnDecide(MMenuItem *item) {
                 hides->AddTail(((DinoCommonWindowMenuItem *)mUnkC0[j])->mUnk94->CreateHideTransfer());
             }
             MPoint offset(mPos.x - mUnk100.x, mPos.y - mUnk100.y);
-            MRect rect = MRect(mWidth * 4, 0, mWidth * 4, mUnkBC * 8).Moved(offset);
+            MRect rect = MRect(mSize.x * 4, 0, mSize.x * 4, mSize.y * 8).Moved(offset);
             GetSerial()->AddTail(mCursor->mUnk10->CreatePlayTransfer(2, 1),
                                  new DinoCommonWindowMenuItemFlushTask(this, i), hides,
                                  mWindow->CreateCloseTask(rect));
@@ -335,7 +336,7 @@ void DinoCommonWindowMenuItemFlushTask::Execute() {
         int row = mIndex % 4;
         int height = row < 2 ? 2 : 3;
         int top = mIndex / 4 + (mIndex * 2 + 1);
-        mMenu->mWindow->Flush(MRect(3, top, mMenu->mWidth - 1, top + height), row);
+        mMenu->mWindow->Flush(MRect(3, top, mMenu->mSize.x - 1, top + height), row);
     }
 }
 
