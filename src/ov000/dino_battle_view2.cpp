@@ -365,9 +365,7 @@ static inline MTaskSet *DinoRootParallel(DinoBattleViewUiRootSelect *menu) {
 }
 
 // Makes the attack icons, the help areas and the four commands, and links them.
-// NONMATCHING: the help loop's guard. The game loads the table pointer after the guard and hoists &mParallel between
-// the guard and the loop's own check (the slots are right now: &mParallel through a non-member inline, the peer's
-// find).
+// (&mParallel goes through a non-member inline so its hoisted temp takes the game's spill slot.)
 void DinoBattleViewUiRootSelect::OnStart() {
     mOam = new MSmartOam(4, 0, 1);
     for (u32 i = 0; i < 3; i++) {
@@ -385,14 +383,14 @@ void DinoBattleViewUiRootSelect::OnStart() {
     DinoBattleHelpBase *help = new DinoBattleHelpBase(gLcd->GetTopDisplay(), MRect(4, 4, 0xFC, 0xBC), data_0208a398);
     mParallel.AddTail(help);
     helps[0] = help;
-    DinoBattleRootHelpDef *def = data_ov000_021958dc.helps;
-    if (def->textId != 0) {
-        for (; def->textId != 0; def++) {
-            help = new DinoBattleHelpBase(gLcd->GetBottomDisplay(), def->rect, def->textId);
-            MTaskSet *parallel = DinoRootParallel(this);
-            parallel->AddTail(help);
-            helps[def->slot] = help;
-        }
+    // (Index form, so the guard reads the table directly and the pointer is set up after it; the no-op cast makes the
+    // loop's test share the pointer's induction variable instead of getting its own.)
+    for (int k = 0; ((DinoBattleRootHelpDef *)&data_ov000_021958dc.helps[k])->textId != 0; k++) {
+        DinoBattleRootHelpDef *def = &data_ov000_021958dc.helps[k];
+        help = new DinoBattleHelpBase(gLcd->GetBottomDisplay(), def->rect, def->textId);
+        MTaskSet *parallel = DinoRootParallel(this);
+        parallel->AddTail(help);
+        helps[def->slot] = help;
     }
 
     for (u32 i = 0; i < 2; i++) {
