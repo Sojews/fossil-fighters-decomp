@@ -321,7 +321,7 @@ MRect MMotionFile::GetChrBounds(u32 index) {
             }
         }
         if (rect.left == INT_MAX && rect.top == INT_MAX && rect.right == INT_MIN && rect.bottom == INT_MIN) {
-            rect = MRect(MPoint(size.x * 8 / 2, size.y * 8 / 2), MPoint(size.x * 8 / 2, size.y * 8 / 2));
+            rect = MRect(MPoint(size.x * 8, size.y * 8) / 2, MPoint(size.x * 8, size.y * 8) / 2);
         } else {
             rect.right++;
             rect.bottom++;
