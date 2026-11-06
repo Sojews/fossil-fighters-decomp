@@ -251,6 +251,11 @@ static inline void DinoDebugSetLevel(DinoCreaturePart *parts, int level) {
     }
 }
 
+// (Resized through an inline: its tag temporaries then sit below the record push's.)
+static inline void DinoResizeResults(std::vector<DinoBattleView3DEntry> &v, u32 n) {
+    v.resize(n);
+}
+
 // Plays every pair of the battle select's sides against each other, the CPU on both, counting each battle's frames.
 // NONMATCHING
 DebugAutoBattle::DebugAutoBattle() : MProcess(NULL) {
@@ -288,7 +293,7 @@ DebugAutoBattle::DebugAutoBattle() : MProcess(NULL) {
             pairs++;
         }
     }
-    mResults.resize(pairs);
+    DinoResizeResults(mResults, pairs);
     int pair = 0;
     for (int a = 0; a < records.size(); a++) {
         for (u32 b = a + 1; b < records.size(); b++) {
