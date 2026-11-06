@@ -3512,7 +3512,7 @@ static inline float DinoFxToFloat(MFx32 x) {
 // The attacker's attack on the target: whether it hits, the damage (and recoil), the life tasks, and the view's
 // request to show it. (Defined here at the end: placed after func_ov000_02162ad8, as in the game, it changes
 // func_ov000_0216d2cc's branch layout.)
-// NONMATCHING: 99.99%, the guard's zero store is scheduled first (the game stores it after the attacker's flag).
+// NONMATCHING: 99.99%, the guard's zero store is scheduled before the attacker's flag (the game stores it after).
 MTask *DinoBattleModelPlayer::CreateAttackTask(DinoBattleModelCreature *attacker, DinoBattleModelCreature *target,
                                                u32 attack, u8 special, int unk, u8 fade) {
     MSerialTaskSet *set = new MSerialTaskSet(TRUE);
@@ -3520,7 +3520,7 @@ MTask *DinoBattleModelPlayer::CreateAttackTask(DinoBattleModelCreature *attacker
     int guard = 0;
     BOOL attackerDown = FALSE;
     int recoil = 0;
-    BOOL targetDown = FALSE;
+    u8 targetDown = FALSE;
     attacker->RollUnk10C();
     u8 result[2];   // [0] hit, [1] missed
     result[1] = 0;
