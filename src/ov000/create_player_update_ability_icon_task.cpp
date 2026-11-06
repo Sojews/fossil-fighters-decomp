@@ -3126,12 +3126,11 @@ void DinoBattleModelPlayer::SetUnk15C() {
 // A status: its bit in the flags, its level and whether it's lasting.
 struct DinoStatusIconSource {
     u32 kind;
-    int bit;
+    u32 bit;
     const s8 *level;
     const s8 *lasting;
 };
 
-// NONMATCHING: the bit counter and the table's bit swap r3/r5.
 void DinoBattleModelPlayer::SendUpdateStateIcon(DinoBattleModelCreature *creature, u32 reply) {
     u8 icons[12] = {0};
     int count = 0;
