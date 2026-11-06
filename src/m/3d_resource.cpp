@@ -99,10 +99,10 @@ M3DGrid::~M3DGrid() {
 
 // Builds the grid from a display list: the vertices it draws (scaled up as far as they fit in 16 bits) and, in each
 // cell, the triangles over it. The list ends at its first matrix pop.
-// NONMATCHING (99.3%): which zero the game reuses for the flags (the rescale flag, then each command's vertex flag
-// from it), the list pointer's spill, and register choices in the bounds and the 10-bit vertex. The C89 declaration
-// order below gives the game's stack slots (named locals take the top slots in declaration order); the strip
-// parity is a named local (its slot sits between minCX2 and maxCX2), set after the row loop's guard.
+// NONMATCHING (99.35%): which zero the game reuses for the flags (the rescale flag, then each command's vertex flag
+// from it), the list pointer's spill, and the 10-bit vertex's schedule. The C89 declaration order below gives the
+// game's stack slots (named locals take the top slots in declaration order); the strip parity is a named local (its
+// slot sits between minCX2 and maxCX2), set after the row loop's guard; maxX being an s32 gives the bounds' registers.
 void M3DGrid::Load(const void *data) {
     int type;
     int strip;
@@ -125,7 +125,7 @@ void M3DGrid::Load(const void *data) {
     int minX;
     int maxZ;
     int maxY;
-    int maxX;
+    s32 maxX;
     int x, y, z;
     int minCX3;
     int maxCX3;
