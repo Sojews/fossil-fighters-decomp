@@ -1,4 +1,5 @@
 // SetToturialFlagTask.
+#pragma ipa file  // (emits the SetRect instance right after the script interpreter, as the game does)
 
 // Derived destructors have their bases' destructor bodies inlined; auto-inlining the ones defined above does that.
 #pragma auto_inline on
