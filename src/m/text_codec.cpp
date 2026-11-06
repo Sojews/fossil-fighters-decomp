@@ -45,8 +45,16 @@ template <> std::pair<MWcharTree::iterator, bool> MWcharTree::insert_unique(cons
     return std::pair<iterator, bool>(iterator(last_not_greater), *((const bool *)&data_020c09c4 + 1));
 }
 static std::set<wchar_t> sUnkTextChars;
+// (Four placeholder .rodata objects between the sets: they move each set's destructor-chain entry in front of it in
+// the .bss layout, as the game has it: chain, sUnkChars, chain, sUnkTextChars.)
+extern const int gTextCodecLayoutPad0 = 0;
+extern const int gTextCodecLayoutPad1 = 0;
+extern const int gTextCodecLayoutPad2 = 0;
+extern const int gTextCodecLayoutPad3 = 0;
 static std::set<wchar_t> sUnkChars;
-static OSOwnerInfo *sOwnerInfo;
+// (The game has the owner info pointer after the sets, which our 4-byte-statics-first .bss layout can't give: it is
+// left to the game's symbol.)
+extern OSOwnerInfo *sOwnerInfo;
 
 // Removes the spaces at each end.
 static std::string MTrimString(std::string text) {
