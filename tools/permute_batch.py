@@ -43,6 +43,30 @@ def definition_start(src: Path, symbol: str):
     return found
 
 
+def candidates(report, units, min_pct, max_pct, max_size):
+    """(pct, size, src path, symbol, definition start) of each permutable near-miss in the report, unsorted."""
+    cands = []
+    for u in report["units"]:
+        if not any(u["name"].startswith(p) for p in units):
+            continue
+        src = ROOT / (u["name"] + ".cpp")
+        if not src.exists():
+            src = ROOT / (u["name"] + ".c")
+            if not src.exists():
+                continue
+        for f in u.get("functions", []):
+            pct = f.get("fuzzy_match_percent") or 0
+            size = int(f.get("size", 0))
+            dup = re.sub(r"([CD])2E", r"\g<1>1E", f["name"])    # (base-object ctors/dtors repeat the complete ones)
+            if dup != f["name"] and any(g["name"] == dup for g in u["functions"]):
+                continue
+            if min_pct <= pct < min(max_pct, 100) and size <= max_size and not f["name"].startswith("__sinit"):
+                start = definition_start(src, f["name"])
+                if start:
+                    cands.append((pct, size, src, f["name"], start))
+    return cands
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--min", type=float, default=90)
@@ -57,25 +81,7 @@ def main():
     ap.add_argument("--retry", help="only the functions an earlier batch log shows failing to run")
     a = ap.parse_args()
     report = json.load(open(ROOT / "build/report.json"))
-    cands = []
-    for u in report["units"]:
-        if not any(u["name"].startswith(p) for p in a.units):
-            continue
-        src = ROOT / (u["name"] + ".cpp")
-        if not src.exists():
-            src = ROOT / (u["name"] + ".c")
-            if not src.exists():
-                continue
-        for f in u.get("functions", []):
-            pct = f.get("fuzzy_match_percent") or 0
-            size = int(f.get("size", 0))
-            dup = re.sub(r"([CD])2E", r"\g<1>1E", f["name"])    # (base-object ctors/dtors repeat the complete ones)
-            if dup != f["name"] and any(g["name"] == dup for g in u["functions"]):
-                continue
-            if a.min <= pct < min(a.max, 100) and size <= a.max_size and not f["name"].startswith("__sinit"):
-                start = definition_start(src, f["name"])
-                if start:
-                    cands.append((pct, size, src, f["name"], start))
+    cands = candidates(report, a.units, a.min, a.max, a.max_size)
     if a.improved:
         better = set()
         for l in open(a.improved):
