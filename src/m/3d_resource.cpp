@@ -99,34 +99,70 @@ M3DGrid::~M3DGrid() {
 
 // Builds the grid from a display list: the vertices it draws (scaled up as far as they fit in 16 bits) and, in each
 // cell, the triangles over it. The list ends at its first matrix pop.
-// NONMATCHING (99.1%): which zero the game reuses for the flags (the rescale flag, then each command's vertex flag
-// from it), the list pointer's spill, and register choices in the bounds and the 10-bit vertex.
+// NONMATCHING (99.2%): which zero the game reuses for the flags (the rescale flag, then each command's vertex flag
+// from it), the list pointer's spill, register choices in the bounds and the 10-bit vertex, and the slot of the
+// hoisted `strip & 1` (the game's sits between minCX2 and maxCX2). The C89 declaration order below gives the game's
+// stack slots (named locals take the top slots in declaration order).
 void M3DGrid::Load(const void *data) {
-    int minZ = 0;
-    int minY = 0;
-    int minX = 0;
-    int maxZ = 0;
-    int maxY = 0;
-    int shift = 0;
-    int shiftZ = 0;
-    int maxX = 0;
+    int type;
+    int strip;
+    int count;
+    int shift;
+    int shiftZ;
+    const u8 *cmds;
+    const u32 *p;
+    int c;
+    int minCZ0;
+    int cx0;
+    int minCZ1;
+    int cx1;
+    int minCZ2;
+    int cx2;
+    int minCZ3;
+    int cx3;
+    int minZ;
+    int minY;
+    int minX;
+    int maxZ;
+    int maxY;
+    int maxX;
     int x, y, z;
+    int minCX3;
+    int maxCX3;
+    int minCX2;
+    int maxCX2;
+    int minCX1;
+    int maxCX1;
+    int minCX0;
+    int maxCX0;
+    int maxCZ0;
+    int maxCZ1;
+    int maxCZ2;
+    int maxCZ3;
     BOOL again;
+    minZ = 0;
+    minY = 0;
+    minX = 0;
+    maxZ = 0;
+    maxY = 0;
+    shift = 0;
+    shiftZ = 0;
+    maxX = 0;
     do {
-        const u8 *cmds = (const u8 *)data;
-        const u32 *p = (const u32 *)data;
+        cmds = (const u8 *)data;
+        p = (const u32 *)data;
         u32 cells = mDim * mDim;
         for (u32 i = 0; i < cells; i++) {
             mCells[i].clear();
         }
         mVerts.clear();
-        int strip = 0;
-        int count = 0;
-        int type = -1;
+        strip = 0;
+        count = 0;
+        type = -1;
         p++;
         again = FALSE;
         for (;;) {
-            for (int c = 0; c < 4; c++) {
+            for (c = 0; c < 4; c++) {
                 BOOL vertex = FALSE;
                 switch (cmds[c]) {
                 case 0x00:
@@ -263,58 +299,58 @@ void M3DGrid::Load(const void *data) {
                 switch (type) {
                 case 0:
                     if (strip >= 3) {
-                        int minCZ = 32;
-                        int minCX = 32;
-                        int maxCZ = -32;
-                        int maxCX = -32;
+                        minCZ0 = 32;
+                        minCX0 = 32;
+                        maxCZ0 = -32;
+                        maxCX0 = -32;
                         strip = 0;
-                        M3D_GRID_BOUND(3, minCX, minCZ, maxCX, maxCZ);
-                        for (; minCZ <= maxCZ; minCZ++) {
-                            for (int cx = minCX; cx <= maxCX; cx++) {
-                                M3D_GRID_CELL(cx, minCZ).push_back(count - 3);
-                                M3D_GRID_CELL(cx, minCZ).push_back(count - 2);
-                                M3D_GRID_CELL(cx, minCZ).push_back(count - 1);
+                        M3D_GRID_BOUND(3, minCX0, minCZ0, maxCX0, maxCZ0);
+                        for (; minCZ0 <= maxCZ0; minCZ0++) {
+                            for (cx0 = minCX0; cx0 <= maxCX0; cx0++) {
+                                M3D_GRID_CELL(cx0, minCZ0).push_back(count - 3);
+                                M3D_GRID_CELL(cx0, minCZ0).push_back(count - 2);
+                                M3D_GRID_CELL(cx0, minCZ0).push_back(count - 1);
                             }
                         }
                     }
                     break;
                 case 1:
                     if (strip >= 4) {
-                        int minCZ = 32;
-                        int minCX = 32;
-                        int maxCZ = -32;
-                        int maxCX = -32;
+                        minCZ1 = 32;
+                        minCX1 = 32;
+                        maxCZ1 = -32;
+                        maxCX1 = -32;
                         strip = 0;
-                        M3D_GRID_BOUND(4, minCX, minCZ, maxCX, maxCZ);
-                        for (; minCZ <= maxCZ; minCZ++) {
-                            for (int cx = minCX; cx <= maxCX; cx++) {
-                                M3D_GRID_CELL(cx, minCZ).push_back(count - 4);
-                                M3D_GRID_CELL(cx, minCZ).push_back(count - 3);
-                                M3D_GRID_CELL(cx, minCZ).push_back(count - 1);
-                                M3D_GRID_CELL(cx, minCZ).push_back(count - 1);
-                                M3D_GRID_CELL(cx, minCZ).push_back(count - 3);
-                                M3D_GRID_CELL(cx, minCZ).push_back(count - 2);
+                        M3D_GRID_BOUND(4, minCX1, minCZ1, maxCX1, maxCZ1);
+                        for (; minCZ1 <= maxCZ1; minCZ1++) {
+                            for (cx1 = minCX1; cx1 <= maxCX1; cx1++) {
+                                M3D_GRID_CELL(cx1, minCZ1).push_back(count - 4);
+                                M3D_GRID_CELL(cx1, minCZ1).push_back(count - 3);
+                                M3D_GRID_CELL(cx1, minCZ1).push_back(count - 1);
+                                M3D_GRID_CELL(cx1, minCZ1).push_back(count - 1);
+                                M3D_GRID_CELL(cx1, minCZ1).push_back(count - 3);
+                                M3D_GRID_CELL(cx1, minCZ1).push_back(count - 2);
                             }
                         }
                     }
                     break;
                 case 2:
                     if (strip >= 3) {
-                        int minCZ = 32;
-                        int minCX = 32;
-                        int maxCZ = -32;
-                        int maxCX = -32;
-                        M3D_GRID_BOUND(3, minCX, minCZ, maxCX, maxCZ);
-                        for (; minCZ <= maxCZ; minCZ++) {
-                            for (int cx = minCX; cx <= maxCX; cx++) {
+                        minCZ2 = 32;
+                        minCX2 = 32;
+                        maxCZ2 = -32;
+                        maxCX2 = -32;
+                        M3D_GRID_BOUND(3, minCX2, minCZ2, maxCX2, maxCZ2);
+                        for (; minCZ2 <= maxCZ2; minCZ2++) {
+                            for (cx2 = minCX2; cx2 <= maxCX2; cx2++) {
                                 if (strip & 1) {
-                                    M3D_GRID_CELL(cx, minCZ).push_back(count - 3);
-                                    M3D_GRID_CELL(cx, minCZ).push_back(count - 2);
-                                    M3D_GRID_CELL(cx, minCZ).push_back(count - 1);
+                                    M3D_GRID_CELL(cx2, minCZ2).push_back(count - 3);
+                                    M3D_GRID_CELL(cx2, minCZ2).push_back(count - 2);
+                                    M3D_GRID_CELL(cx2, minCZ2).push_back(count - 1);
                                 } else {
-                                    M3D_GRID_CELL(cx, minCZ).push_back(count - 3);
-                                    M3D_GRID_CELL(cx, minCZ).push_back(count - 1);
-                                    M3D_GRID_CELL(cx, minCZ).push_back(count - 2);
+                                    M3D_GRID_CELL(cx2, minCZ2).push_back(count - 3);
+                                    M3D_GRID_CELL(cx2, minCZ2).push_back(count - 1);
+                                    M3D_GRID_CELL(cx2, minCZ2).push_back(count - 2);
                                 }
                             }
                         }
@@ -322,19 +358,19 @@ void M3DGrid::Load(const void *data) {
                     break;
                 case 3:
                     if (strip >= 4 && !(strip & 1)) {
-                        int minCZ = 32;
-                        int minCX = 32;
-                        int maxCZ = -32;
-                        int maxCX = -32;
-                        M3D_GRID_BOUND(4, minCX, minCZ, maxCX, maxCZ);
-                        for (; minCZ <= maxCZ; minCZ++) {
-                            for (int cx = minCX; cx <= maxCX; cx++) {
-                                M3D_GRID_CELL(cx, minCZ).push_back(count - 4);
-                                M3D_GRID_CELL(cx, minCZ).push_back(count - 3);
-                                M3D_GRID_CELL(cx, minCZ).push_back(count - 1);
-                                M3D_GRID_CELL(cx, minCZ).push_back(count - 4);
-                                M3D_GRID_CELL(cx, minCZ).push_back(count - 1);
-                                M3D_GRID_CELL(cx, minCZ).push_back(count - 2);
+                        minCZ3 = 32;
+                        minCX3 = 32;
+                        maxCZ3 = -32;
+                        maxCX3 = -32;
+                        M3D_GRID_BOUND(4, minCX3, minCZ3, maxCX3, maxCZ3);
+                        for (; minCZ3 <= maxCZ3; minCZ3++) {
+                            for (cx3 = minCX3; cx3 <= maxCX3; cx3++) {
+                                M3D_GRID_CELL(cx3, minCZ3).push_back(count - 4);
+                                M3D_GRID_CELL(cx3, minCZ3).push_back(count - 3);
+                                M3D_GRID_CELL(cx3, minCZ3).push_back(count - 1);
+                                M3D_GRID_CELL(cx3, minCZ3).push_back(count - 4);
+                                M3D_GRID_CELL(cx3, minCZ3).push_back(count - 1);
+                                M3D_GRID_CELL(cx3, minCZ3).push_back(count - 2);
                             }
                         }
                     }
@@ -461,7 +497,7 @@ fx32 M3DGrid::GetHeight(fx32 px, fx32 pz) {
         }
     }
     if (best == -0x8000) {
-        return best << 16;
+        return -0x8000 << 16;  // (the pooled -0x8000, shifted)
     }
     return best << mShiftX;
 }
