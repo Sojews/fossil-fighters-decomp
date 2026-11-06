@@ -584,8 +584,7 @@ extern "C" const u32 data_0208a420;     // the level select's title
 static MIndicator *CreateLevelIndicator(MSmartOam *oam, MFont *font, MPoint size, MPoint pos);
 extern "C" const u32 data_0208ade0;     // the level select's cursor
 
-// NONMATCHING (99.97): the game keeps the first loop's &mParallel below the oam on the stack.
-// (A non-member inline: the loop's hoisted &mParallel takes the game's slot.)
+// (A non-member inline called in each loop's body: the loops' hoisted &mParallel take the game's spill slots.)
 static inline MParallelTaskSet *DinoLevelParallel(PlayerLevelSelect *select) {
     return &select->mParallel;
 }
@@ -603,10 +602,7 @@ void PlayerLevelSelect::Start() {
     title->SetPriority(0);
     title->Show();
     mParallel.AddTail(title);
-    int i = 0;
-    if (i <= mUnk7C) {
-    MParallelTaskSet *parallel = &mParallel;
-    for (; i <= mUnk7C; i++) {
+    for (int i = 0; i <= mUnk7C; i++) {
         char text[64];
         OS_SPrintf(text, "%s %d", gDinoResource->GetText(data_0208a418), mValues[i]);
         mTexts[i] = new MIndicator(new MSmartObjCanvas(oam, MPoint(192, 16), gDinoResource->GetUnkTable(), TRUE), font, 0);
@@ -614,8 +610,8 @@ void PlayerLevelSelect::Start() {
         mTexts[i]->SetPosition(data_ov000_02195fa8[i]);
         mTexts[i]->SetPriority(0);
         mTexts[i]->Show();
+        MParallelTaskSet *parallel = DinoLevelParallel(this);
         parallel->AddTail(mTexts[i]);
-    }
     }
     for (int i = 2; i <= 3; i++) {
         MIndicator *text = CreateLevelIndicator(oam, font, MPoint(96, 16), data_ov000_02195fa8[i]);
