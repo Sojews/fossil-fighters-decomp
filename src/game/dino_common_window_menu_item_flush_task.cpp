@@ -221,10 +221,8 @@ void DinoCommonWindowMenu::OnStart() {
     DinoSoundPlaySe(0x95, 0);
     GetInput()->SetRepeat(0xF0, GetExcavate7C(gDinoResource->GetExcavateDefs())[7],
                           GetExcavate7C(gDinoResource->GetExcavateDefs())[8]);
-    MTask *enable = MCreateCallTask(this, data_020bbd44.Enable);
-    MTask *open = mWindow->CreateOpenTask(MRect(mPos, mPos));
-    MTask *show = mWindow->CreateShowTransfer();
-    mSerial.AddTail(new MTimer(1), show, open, shows, enable);
+    mSerial.AddTail(new MTimer(1), mWindow->CreateShowTransfer(), mWindow->CreateOpenTask(MRect(mPos, mPos)), shows,
+                    MCreateCallTask(this, data_020bbd44.Enable));
 }
 #pragma auto_inline reset
 
