@@ -125,18 +125,22 @@ BOOL DinoCleaningTalkFilter::Filter(MConsole *console, int c) {
     return TRUE;
 }
 
-// The pooled constants the code reads.
-extern "C" struct {
+// The pooled constants the code reads. The pool is an untyped array viewed through this struct: declared as the struct
+// itself, mwcc reloads the screen size in __sinit.
+struct DinoCleaningTalkPool {
     u8 unk00[0x8];
     const char *mMotionPath;    // 0x08
     const char *mPicturePath;   // 0x0C
     u8 unk10[0x20 - 0x10];
     MPoint mPos;                // 0x20: the window's place
-} data_ov002_0216431c;
+};
+extern "C" u32 data_ov002_0216431c[];
+extern "C" u32 data_ov002_0216439c[];   // the pool + 0x80 (__sinit's second anchor)
+#define sTalkPool (*(DinoCleaningTalkPool *)data_ov002_0216431c)
 
 DinoCleaningTalkWindow::DinoCleaningTalkWindow(u32 arg)
-    : MProcess(NULL), mUnk74(arg), mPicture(std::string(data_ov002_0216431c.mPicturePath), 7),
-      mMotion(std::string(data_ov002_0216431c.mMotionPath), 7) {
+    : MProcess(NULL), mUnk74(arg), mPicture(std::string(sTalkPool.mPicturePath), 7),
+      mMotion(std::string(sTalkPool.mMotionPath), 7) {
     mUnkCC = 0;
     mUnkD0 = 0;
     mRate.v = ((const u32 *)gDinoResource->GetExcavate7C())[5];
@@ -166,7 +170,7 @@ void DinoCleaningTalkWindow::Idle() {
             dy = gDinoResource->GetRandom()->Next(range * 2 + 1) - range;
             int dx = gDinoResource->GetRandom()->Next(range * 2 + 1) - mUnkCC;
             MPoint d(dx, dy);
-            mConsole->SetPosition(data_ov002_0216431c.mPos + d);
+            mConsole->SetPosition(sTalkPool.mPos + d);
             mFace->SetPosition(d);
             mOam->SetOffset(MPoint(-d.x, -dy));
         }
@@ -205,8 +209,8 @@ void DinoCleaningTalkWindow::Close() {
     MTask *empty = MTaskSetMakeEmptyTask::Create(mTasksB8);
     mTasksB4->AddTail(
         DinoTalkParallel(mFace->CreateCoordAnime(MPoint(0, 0), MPoint(0, 40), 20, 2),
-                         mConsole->CreateCoordAnime(data_ov002_0216431c.mPos,
-                                                    MPoint(data_ov002_0216431c.mPos.x, data_ov002_0216431c.mPos.y + 40),
+                         mConsole->CreateCoordAnime(sTalkPool.mPos,
+                                                    MPoint(sTalkPool.mPos.x, sTalkPool.mPos.y + 40),
                                                     20, 2),
                          DinoTalkFrameOut(mFrame, MPoint(256, 192))),
         empty, clear);
@@ -237,7 +241,7 @@ extern "C" void func_ov002_021573e8(DinoCleaningTalkWindow *window, const char *
         window->mFace->SetPosition(0, 0);
         ((MMotion *)window->mFrame)->SetPosition(256, 192);
         window->mConsole->SetRate(window->mRate);
-        window->mConsole->SetPosition(data_ov002_0216431c.mPos);
+        window->mConsole->SetPosition(sTalkPool.mPos);
         window->mConsole->Clear();
         window->mConsole->ClearText();
         window->mConsole->Print(std::string(text));
@@ -268,9 +272,9 @@ extern "C" void func_ov002_021573e8(DinoCleaningTalkWindow *window, const char *
     MTask *run = MTaskRunTransfer::Create(window->mConsole);
     window->mTasksB4->AddTail(
         DinoTalkParallel(window->mFace->CreateCoordAnime(MPoint(0, 40), MPoint(0, 0), 10, 12),
-                         window->mConsole->CreateCoordAnime(MPoint(data_ov002_0216431c.mPos.x,
-                                                                   data_ov002_0216431c.mPos.y + 40),
-                                                            data_ov002_0216431c.mPos, 10, 12),
+                         window->mConsole->CreateCoordAnime(MPoint(sTalkPool.mPos.x,
+                                                                   sTalkPool.mPos.y + 40),
+                                                            sTalkPool.mPos, 10, 12),
                          DinoTalkFrameIn(window->mFrame, MPoint(320, 192))),
         run);
 }
@@ -289,11 +293,12 @@ void DinoCleaningTalkWindow::Reset() {
 }
 
 // The file's static initialization (see dino_static_init.h).
-// NONMATCHING: scheduling, as in dino_cleaning_stop_confirm_menu_item.cpp (the screen rect lies past the 0x80 anchor).
+// NONMATCHING: scheduling and the size copies' stack slots, as in dino_cleaning_stop_confirm_menu_item.cpp (the screen
+// rect lies past the 0x80 anchor).
 #pragma always_inline on
 static struct DinoCleaningTalkFilterStaticInit {
     DinoCleaningTalkFilterStaticInit() {
-        DINO_COMMON_LAYOUT_INIT(data_ov002_0216431c, 0x28, 0xb8, 0x18, 0x10, 0xa8, 0xc8, 0xd0, 0xd8);
+        DINO_COMMON_LAYOUT_INIT2(data_ov002_0216431c, data_ov002_0216439c, 0x28, 0xb8, 0x18, 0x10, 0xa8, 0xc8, 0xd0, 0xd8);
         DINO_POOL(MPoint, data_ov002_0216431c, 0x30) = MPoint(216, 28);
         DINO_POOL(MPoint, data_ov002_0216431c, 0x20) = MPoint(8, 158);
     }
