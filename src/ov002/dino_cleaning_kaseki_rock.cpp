@@ -439,13 +439,24 @@ extern "C" void func_ov002_0215fdd4(DinoCleaningKasekiRock *rock, MPoint pos) {
     func_ov002_0215a4fc(rock->mView, pos);
 }
 
-// The file's static initialization (see dino_static_init.h).
+// The file's static initialization (see dino_static_init.h): the common layout constants through the pool's two
+// anchors, then the X-ray scales. The stores are a static's initializer expression rather than a static object's
+// constructor, so they're evaluated in __sinit itself: their temporaries (each rect's origin and its by-value
+// arguments) then take the game's frame slots, which an inlined constructor's don't under ipa.
 // NONMATCHING: scheduling, as in dino_cleaning_stop_confirm_menu_item.cpp.
 #pragma always_inline on
-static struct DinoCleaningKasekiRockStaticInit {
-    DinoCleaningKasekiRockStaticInit() {
-        DINO_COMMON_LAYOUT_INIT2(data_ov002_021657d4, data_ov002_02165854, 0x18, 0x94, 0x58, 0x40, 0xc4, 0xa4, 0xac, 0xb4);
-        DINO_POOL_WORD(data_ov002_021657d4, 0xc) = 4096;
-        DINO_POOL_WORD(data_ov002_021657d4, 0x8) = 4096;
-    }
-} sDinoCleaningKasekiRockStaticInit;
+#define DINO_KASEKI_ROCK_POOL(T, off) DINO_POOL_AT(T, data_ov002_021657d4, data_ov002_02165854, off)
+struct DinoCleaningKasekiRockStaticInit {
+    DinoCleaningKasekiRockStaticInit(int) {}
+};
+static DinoCleaningKasekiRockStaticInit sDinoCleaningKasekiRockStaticInit((
+    DINO_KASEKI_ROCK_POOL(MPoint, 0x18) = MPoint(256, 192),
+    DINO_KASEKI_ROCK_POOL(MRect, 0x94) = MRect(MPoint(0, 0), DINO_KASEKI_ROCK_POOL(MPoint, 0x18)),
+    DINO_KASEKI_ROCK_POOL(MPoint, 0x58) = MPoint(2, 2),
+    DINO_KASEKI_ROCK_POOL(MPoint, 0x40) = MPoint(36, 28),
+    DINO_KASEKI_ROCK_POOL(MRect, 0xc4) = MRect(MPoint(0, 0), DINO_KASEKI_ROCK_POOL(MPoint, 0x40)),
+    DINO_KASEKI_ROCK_POOL(MPoint, 0xa4) = MPoint(0, 24),
+    DINO_KASEKI_ROCK_POOL(MPoint, 0xac) = MPoint(256, 192),
+    DINO_KASEKI_ROCK_POOL(MRect, 0xb4) = MRect(0, 0, 256, 24),
+    DINO_POOL_WORD(data_ov002_021657d4, 0xc) = 4096,
+    DINO_POOL_WORD(data_ov002_021657d4, 0x8) = 4096, 0));
