@@ -2900,14 +2900,14 @@ static inline MFx32Point DinoUniform(const MFx32 &s) {
     return p;
 }
 
-// A parallel set of a and b that exits when both have.
-static inline MTask *DinoParallel(MTask *a, MTask *b) {
-    MParallelTaskSet *set = new MParallelTaskSet(TRUE);
+// Adds a and b to a new parallel set (one that exits when both have). The set comes in as an argument (evaluated after
+// the tasks): the game's spill slots for the level-up's tasks follow from it.
+static inline MTask *DinoParallel(MParallelTaskSet *set, MTask *a, MTask *b) {
     set->AddTail(a, b);
     return set;
 }
 
-// NONMATCHING: the game spills the tasks it builds for the serial set to other stack slots.
+// NONMATCHING: the second scale anime and the sound task take each other's spill slots.
 void DinoEventExecBattle::StateLevelUp() {
     if (mUnk198.size() == 0) {
         mState = data_020be144.StateOpenField_18;
@@ -2927,12 +2927,14 @@ void DinoEventExecBattle::StateLevelUp() {
     OS_SPrintf(buf, gDinoResource->GetText(data_0208a4ac), gDinoResource->GetCreatureText08(creatures[i].index),
                func_02031104(&creatures[i]) - func_02031104(&mCreatures[i]));
     GetSerial()->AddTail(
-        DinoParallel(gLcd->GetBottomDisplay()->mBright->CreateFadeInFromWhite(data_0208a1f0, data_0208a1ec),
+        DinoParallel(new MParallelTaskSet(TRUE),
+                     gLcd->GetBottomDisplay()->mBright->CreateFadeInFromWhite(data_0208a1f0, data_0208a1ec),
                      picture->GetScreen()->CreateScaleAnime(DinoUniform(data_020b5ab4), MFx32Point(MFx32(1), MFx32(1)),
                                                             data_0208a1f0, data_0208a1ec)),
         new MTimer(data_0208a1f8), DinoSoundCreatePlaySeTask(0x458, 0),
         new DinoCommonWindowMessageBox(gLcd->GetBottomDisplay(), MPoint(0x80, 0x60), std::string(buf), 4),
-        DinoParallel(gLcd->GetBottomDisplay()->mBright->CreateFadeOutToWhite(data_0208a1e4, data_0208a1e8),
+        DinoParallel(new MParallelTaskSet(TRUE),
+                     gLcd->GetBottomDisplay()->mBright->CreateFadeOutToWhite(data_0208a1e4, data_0208a1e8),
                      picture->GetScreen()->CreateScaleAnime(MFx32Point(MFx32(1), MFx32(1)), DinoUniform(data_020b5ab0),
                                                             data_0208a1e4, data_0208a1e8)),
         picture->CreateExitTransfer());
