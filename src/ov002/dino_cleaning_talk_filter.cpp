@@ -175,6 +175,17 @@ void DinoCleaningTalkWindow::Idle() {
 #pragma opt_common_subs reset
 
 
+// The frame's slides out and in. The start point is a parameter: that builds it before the end point (making 256
+// directly and 320 from the 192 already in a register in Close, and the other way round when saying), with the points
+// in the game's slots.
+static inline MTask *DinoTalkFrameOut(MView *frame, MPoint from) {
+    return frame->CreateCoordAnime(from, MPoint(320, 192), 20, 2);
+}
+
+static inline MTask *DinoTalkFrameIn(MView *frame, MPoint from) {
+    return frame->CreateCoordAnime(from, MPoint(256, 192), 10, 12);
+}
+
 static inline MTask *DinoTalkParallel(MTask *a, MTask *b, MTask *c) {
     MParallelTaskSet *set = new MParallelTaskSet(TRUE);
     set->AddTail(a);
@@ -183,22 +194,21 @@ static inline MTask *DinoTalkParallel(MTask *a, MTask *b, MTask *c) {
     return set;
 }
 
-// One expression, so the points' temporaries get the game's stack slots (in source order). The frame's start point is
-// a named local: that makes 256 directly and 320 from the 192 already in a register, as the game does.
-// NONMATCHING: the clear and window tasks' spill slots are swapped, and the start point sits in a named slot.
+// One expression, so the points' temporaries get the game's stack slots (in source order).
+// NONMATCHING: the clear and window tasks' spill slots are swapped, and the face's two points are stored in the other
+// order.
 void DinoCleaningTalkWindow::Close() {
     mUnkCC = 0;
     mUnkD0 = 0;
     mConsole->Run();
     MTask *clear = gLcd->GetTopDisplay()->mBlend->CreateClearTransfer();
     MTask *empty = MTaskSetMakeEmptyTask::Create(mTasksB8);
-    MPoint from(256, 192);
     mTasksB4->AddTail(
         DinoTalkParallel(mFace->CreateCoordAnime(MPoint(0, 0), MPoint(0, 40), 20, 2),
                          mConsole->CreateCoordAnime(data_ov002_0216431c.mPos,
                                                     MPoint(data_ov002_0216431c.mPos.x, data_ov002_0216431c.mPos.y + 40),
                                                     20, 2),
-                         mFrame->CreateCoordAnime(from, MPoint(320, 192), 20, 2)),
+                         DinoTalkFrameOut(mFrame, MPoint(256, 192))),
         empty, clear);
 }
 
@@ -214,8 +224,8 @@ void DinoCleaningTalkWindow::SetUnkCC(u32 value) {
 
 // Says text: opens the window (the face, the frame with a random motion and the console, sliding in) or, when it's
 // open, puts it back in place and replaces the text.
-// The frame's start point is a named local, which makes 320 directly and 256 from the 192 (as in Close).
-// NONMATCHING: two task spills take each other's stack slots, and the start point sits in a named slot.
+// NONMATCHING: the three spilled tasks take each other's stack slots, the frame's end point sits 8 bytes low, and the
+// face's two points are stored in the other order.
 extern "C" void func_ov002_021573e8(DinoCleaningTalkWindow *window, const char *text) {
     window->mRate = MFx32::FromRaw(((const s32 *)gDinoResource->GetExcavate7C())[5]);
     if (!window->mTasksB8->IsEmpty()) {
@@ -256,13 +266,12 @@ extern "C" void func_ov002_021573e8(DinoCleaningTalkWindow *window, const char *
     blend->SetAlpha(12, 4);
     window->mTasksB8->AddTail(window->mFace, window->mConsole, window->mFrame, window->mOam);
     MTask *run = MTaskRunTransfer::Create(window->mConsole);
-    MPoint from(320, 192);
     window->mTasksB4->AddTail(
         DinoTalkParallel(window->mFace->CreateCoordAnime(MPoint(0, 40), MPoint(0, 0), 10, 12),
                          window->mConsole->CreateCoordAnime(MPoint(data_ov002_0216431c.mPos.x,
                                                                    data_ov002_0216431c.mPos.y + 40),
                                                             data_ov002_0216431c.mPos, 10, 12),
-                         window->mFrame->CreateCoordAnime(from, MPoint(256, 192), 10, 12)),
+                         DinoTalkFrameIn(window->mFrame, MPoint(320, 192))),
         run);
 }
 
