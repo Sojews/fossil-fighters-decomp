@@ -155,11 +155,14 @@ void DinoEventKasekiRockFound::StateBattleEnd() {
     mSerial.AddTail(MTaskExitTransfer::Create(this));
 }
 
-// NONMATCHING: the three speed temporaries get their stack slots in another order.
+// The first two motions go through an inline helper: its speed temporaries take the lowest stack slots, below the
+// third motion's.
+static inline MTask *SetMotion(DinoFieldChara *c, u32 m) { return c->CreateSetMotionTask(m, 1, MFx32(1)); }
+
 void DinoEventKasekiRockFound::State020374d4() {
     std::string text(data_020bd604);
-    GetSerial()->AddTail(mChara->CreateSetMotionTask(0x26, 1, MFx32(1)), CreateMessageBox(0x11, text),
-                         mChara->CreateSetMotionTask(0x28, 1, MFx32(1)), mChara->CreateAngleToTask(mAngle, 20, 12),
+    GetSerial()->AddTail(SetMotion(mChara, 0x26), CreateMessageBox(0x11, text),
+                         SetMotion(mChara, 0x28), mChara->CreateAngleToTask(mAngle, 20, 12),
                          new MTimer(30), DinoSoundCreatePlaySeTask(0x3B8, 0), mChara->CreateWaitStopTask(),
                          mChara->CreateSetMotionTask(1, 1, MFx32(1)),
                          MCreateCallTask(mHole, &DinoFieldHole::StartChangeToHole), MTaskExitTransfer::Create(this));
