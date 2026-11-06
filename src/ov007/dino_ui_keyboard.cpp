@@ -1159,8 +1159,9 @@ void DinoUiSenryuMenu::OnStart() {
     }
     for (int o = 0; o < 3; o++) {
         MTaskSet *outer = &mParallel;
+        MTaskSet *parallel;
         for (int j = 0; j < 3; j++) {
-            MTaskSet *parallel = &mParallel;
+            parallel = &mParallel;
             mLines[o][j] = new MIndicator(
                 new MObjCanvas(gCurrentDisplay, MPoint(0xCC, 0xC),
                                gDinoResource->GetUnkTable(), TRUE),
