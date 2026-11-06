@@ -672,6 +672,13 @@ static inline void DinoEventReservePoints(std::vector<void *> &points, size_t n)
     }
 }
 
+struct DinoEventVarArg : DinoEventVar {
+    DinoEventVarArg(u32 packed) {
+        type = packed >> 24;
+        index = packed & 0xffffff;
+    }
+};
+
 // Degrees as an angle (0x10000 a turn).
 static inline s32 DinoEventDegree(u32 degrees) {
     return (s32)(degrees << 16) / 360;
@@ -804,20 +811,20 @@ void DinoEventLoop::RunCommand(const u8 *command) {
     case 0x5:
         for (u32 i = 0; i < cmd->count; i++) {
             MTaskSet *serial = &mSerial;
-            serial->AddTail(new DinoEventExecFlagSet((u32)this, DinoEventPackedVar(DinoEventArg(command, i)), 1));
+            serial->AddTail(new DinoEventExecFlagSet((u32)this, DinoEventVarArg(DinoEventArg(command, i)), 1));
         }
         break;
     case 0x6:
         for (u32 i = 0; i < cmd->count; i++) {
             MTaskSet *serial = &mSerial;
-            serial->AddTail(new DinoEventExecFlagSet((u32)this, DinoEventPackedVar(DinoEventArg(command, i)), 0));
+            serial->AddTail(new DinoEventExecFlagSet((u32)this, DinoEventVarArg(DinoEventArg(command, i)), 0));
         }
         break;
     case 0x46: case 0x47: case 0x48: case 0x49: case 0x4a:
-        mSerial.AddTail(new DinoEventExecVarValue(cmd->type, DinoEventPackedVar(DinoEventArg(command, 0)), DinoEventArg(command, 1)));
+        mSerial.AddTail(new DinoEventExecVarValue(cmd->type, DinoEventVarArg(DinoEventArg(command, 0)), DinoEventArg(command, 1)));
         break;
     case 0x4b: case 0x4c: case 0x4d: case 0x4e: case 0x4f:
-        mSerial.AddTail(new DinoEventExecVarVar(cmd->type, DinoEventPackedVar(DinoEventArg(command, 0)), DinoEventPackedVar(DinoEventArg(command, 1))));
+        mSerial.AddTail(new DinoEventExecVarVar(cmd->type, DinoEventVarArg(DinoEventArg(command, 0)), DinoEventVarArg(DinoEventArg(command, 1))));
         break;
     case 0x3:
         mSerial.AddTail(new DinoEventExecEventClear((u32)this, DinoEventArg(command, 0), 1));
@@ -925,10 +932,10 @@ void DinoEventLoop::RunCommand(const u8 *command) {
         mSerial.AddTail(new DinoEventExecChoice(this, DinoEventArg(command, 1), DinoEventArg(command, 2), DinoEventArg(command, 0), DinoEventArg(command, 3)));
         break;
     case 0x36:
-        mSerial.AddTail(new DinoEventExecShopChoice(this, DinoEventArg(command, 0), DinoEventPackedVar(DinoEventArg(command, 1))));
+        mSerial.AddTail(new DinoEventExecShopChoice(this, DinoEventArg(command, 0), DinoEventVarArg(DinoEventArg(command, 1))));
         break;
     case 0x37:
-        mSerial.AddTail(new DinoEventExecShopChoice2(this, DinoEventArg(command, 0), DinoEventPackedVar(DinoEventArg(command, 1)), DinoEventArg(command, 2)));
+        mSerial.AddTail(new DinoEventExecShopChoice2(this, DinoEventArg(command, 0), DinoEventVarArg(DinoEventArg(command, 1)), DinoEventArg(command, 2)));
         break;
     case 0x58:
         mSerial.AddTail(new DinoEventExecLicenseGet(1));
@@ -1114,7 +1121,7 @@ void DinoEventLoop::RunCommand(const u8 *command) {
         mSerial.AddTail(new DinoEventExecEraseAllExcrement((u32)this));
         break;
     case 0x94:
-        mSerial.AddTail(new DinoEventExecEraseExcrement((u32)this, DinoEventPackedVar(DinoEventArg(command, 0))));
+        mSerial.AddTail(new DinoEventExecEraseExcrement((u32)this, DinoEventVarArg(DinoEventArg(command, 0))));
         break;
     case 0x95:
         mSerial.AddTail(new DinoEventExecGameOver(this));
