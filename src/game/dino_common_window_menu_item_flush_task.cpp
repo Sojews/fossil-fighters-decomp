@@ -87,9 +87,9 @@ static inline const int *GetExcavate7C(MResource<DinoExcavateDefs> &defs) {
 // Sizes the window to the widest choice and the count, then a menu item per choice ("*" marks the cancel choice;
 // "text:name" gives the help a name), help areas for the entries, the cursor, and opens the window. With no choices,
 // just exits.
-// NONMATCHING: stack layout (the game's frame is 0x1C smaller: fewer string/point temporaries) and the width/height
-// stores' order.
-#pragma opt_strength_reduction off
+// (int indices with strength reduction on: only the item's y, i * 0x12 + 8, becomes an induction variable, as in the
+// game; the loop entry is tested twice: `if (i < size) for (; i < size; ...)`.)
+// NONMATCHING: stack layout (the game's frame is 0x8 smaller) and the width/height stores' order.
 #pragma auto_inline off
 template MTask *MCreateCallTask(DinoCommonWindowMenu *obj, void (DinoHelpBase::*func)());
 void DinoCommonWindowMenu::OnStart() {
@@ -100,7 +100,7 @@ void DinoCommonWindowMenu::OnStart() {
     SetLinkFallback(1);
     MFont *font = gDinoResource->CreateFont12(0, 1, 0);
     int width = 0x18;
-    for (u32 i = 0; i < mChoices.size(); i++) {
+    for (int i = 0; i < mChoices.size(); i++) {
         std::string text = mChoices[i].unk04;
         if (text.size() != 0 && text[0] == '*') {
             text = text.substr(1);
@@ -147,37 +147,39 @@ void DinoCommonWindowMenu::OnStart() {
     MParallelTaskSet *shows = new MParallelTaskSet(TRUE);
     MMenuItem *focus = NULL;
     mCancelItem = NULL;
-    int y = 8;
-    for (u32 i = 0; i < mChoices.size(); i++) {
-        std::string text;
-        std::string name;
-        BOOL cancel = FALSE;
-        if (mChoices[i].unk00 == (u32)-2) {
-            cancel = TRUE;
+    int i = 0;
+    if (i < mChoices.size()) {
+        for (; i < mChoices.size(); i++) {
+            std::string text;
+            std::string name;
+            BOOL cancel = FALSE;
+            if (mChoices[i].unk00 == (u32)-2) {
+                cancel = TRUE;
+            }
+            text = mChoices[i].unk04;
+            name = mChoices[(u32) i].unk10;
+            if (text.size() != 0 && text[0] == '*') {
+                cancel = TRUE;
+                text = text.substr(1);
+            }
+            u32 colon = text.find(':', 0);
+            if (colon != std::string::npos) {
+                name = text.substr(colon + 1);
+                text = text.substr(0, colon);
+            }
+            mUnkC0.push_back(
+                new DinoCommonWindowMenuItem(font, (mPos - mUnk100).Offset(0x18, i * 0x12 + 8), text, name, width));
+            AddItem((MMenuItem *)mUnkC0[i]);
+            DinoHelpBase::AddEntry((u32)(DinoHelpItem *)(DinoCommonWindowMenuItem *)mUnkC0[i], 1, 0);
+            DinoHelpBase::AddEntry((u32)(DinoHelpItem *)(DinoCommonWindowMenuItem *)mUnkC0[i], 3, 0);
+            shows->AddTail(((DinoCommonWindowMenuItem *)mUnkC0[i])->mUnk94->CreateShowTransfer());
+            if (*(u32 *)mUnkE4 == mChoices[i].unk00) {
+                focus = (MMenuItem *)mUnkC0[i];
+            }
+            if (cancel) {
+                mCancelItem = (MMenuItem *)mUnkC0[i];
+            }
         }
-        text = mChoices[i].unk04;
-        name = mChoices[(u32) i].unk10;
-        if (text.size() != 0 && text[0] == '*') {
-            cancel = TRUE;
-            text = text.substr(1);
-        }
-        u32 colon = text.find(':', 0);
-        if (colon != std::string::npos) {
-            name = text.substr(colon + 1);
-            text = text.substr(0, colon);
-        }
-        mUnkC0.push_back(new DinoCommonWindowMenuItem(font, (mPos - mUnk100).Offset(0x18, y), text, name, width));
-        AddItem((MMenuItem *)mUnkC0[i]);
-        DinoHelpBase::AddEntry((u32)(DinoHelpItem *)(DinoCommonWindowMenuItem *)mUnkC0[i], 1, 0);
-        DinoHelpBase::AddEntry((u32)(DinoHelpItem *)(DinoCommonWindowMenuItem *)mUnkC0[i], 3, 0);
-        shows->AddTail(((DinoCommonWindowMenuItem *)mUnkC0[i])->mUnk94->CreateShowTransfer());
-        if (*(u32 *)mUnkE4 == mChoices[i].unk00) {
-            focus = (MMenuItem *)mUnkC0[i];
-        }
-        if (cancel) {
-            mCancelItem = (MMenuItem *)mUnkC0[i];
-        }
-        y += 0x12;
     }
     AddLink((MMenuItem *)mUnkC0[0], 4, (MMenuItem *)mUnkC0[mUnkC0.size() - 1]);
     AddLink((MMenuItem *)mUnkC0[mUnkC0.size() - 1], 2, (MMenuItem *)mUnkC0[0]);
@@ -225,7 +227,6 @@ void DinoCommonWindowMenu::OnStart() {
     mSerial.AddTail(new MTimer(1), show, open, shows, enable);
 }
 #pragma auto_inline reset
-#pragma opt_strength_reduction reset
 
 // A choice: its text in an indicator (hidden until shown) at pos, and its frame the given width.
 // (No common subexpressions: the game reads gCurrentDisplay after copying the size argument.)
