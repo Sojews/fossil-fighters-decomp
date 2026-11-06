@@ -300,8 +300,10 @@ extern "C" const u32 data_020b5a9c;     // (in the shared battle pool at data_02
 
 // Loads the hit's models, then plays them one step at a time with the hit marks (a button skips to the end), and
 // wipes or fades out.
-// NONMATCHING: 99.98%, the wipe-in mode's branches are the other way round, and the extra marks' x is spilled to
-// the last stack slot instead of the first.
+// (The extra marks read x through this non-member inline, which gives its hoisted copy the lowest spill slot like
+// the game's; `- -offset` keeps the game's operand order for the add.)
+static inline int DamagePosX(const MPoint &p) { return p.x; }
+
 void DinoBattleView3DDamage::Idle() {
     switch (mStep) {
     case 0:
@@ -375,7 +377,7 @@ void DinoBattleView3DDamage::Idle() {
             mShown = 1;
             for (u32 i = 1; i < mMotionCount; i++) {
                 mMotions[i] = new MMotion(std::string(data_ov000_021962e8.mMarkMotion_24), mDefs->mOam, 0, 1);
-                mMotions[i]->SetPosition(pos.x + mDefs->mOffsets[(int)i - 1 + mIndex * 4], pos.y);
+                mMotions[i]->SetPosition(DamagePosX(pos) - -mDefs->mOffsets[(int)i - 1 + mIndex * 4], pos.y);
                 mMotions[i]->SetPriority(2);
                 mMotions[i]->SetAnchor(4);
                 mDefs->mTasks->AddTail(mMotions[i]);
