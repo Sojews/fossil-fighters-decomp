@@ -963,20 +963,28 @@ void DinoCleaning::StateQuit() {
     serial.AddTail(exit);
 }
 
-// The file's static initialization (see dino_static_init.h): the common layout constants and the chips' power.
-// NONMATCHING (80%): the game stores the screen rect first and keeps the sizes as constants; the dead stack
-// temporaries differ.
+// The file's static initialization (see dino_static_init.h): the common layout constants and the chips' power, through
+// the game's pool anchors (one per 0x80 bytes; the literal pool shows which one each store used).
+// NONMATCHING (82%): scheduling. The game stores the screen rect (through the fourth anchor) before the screen size,
+// with the size's y after the icon margin (see DINO_COMMON_LAYOUT_INIT2).
+extern "C" u8 data_ov002_02165bec[];
+#define DINO_CLEANING_POOL(T, off)                                                                                     \
+    (*(T *)((off) < 0x80    ? (u8 *)&data_ov002_021659ec + (off)                                                      \
+            : (off) < 0x100 ? (u8 *)&data_ov002_02165a6c + ((off) - 0x80)                                             \
+            : (off) < 0x180 ? (u8 *)&data_ov002_02165aec + ((off) - 0x100)                                            \
+            : (off) < 0x200 ? (u8 *)&data_ov002_02165b6c + ((off) - 0x180)                                            \
+                            : (u8 *)data_ov002_02165bec + ((off) - 0x200)))
 #pragma always_inline on
 static struct DinoCleaningStaticInit {
     DinoCleaningStaticInit() {
-        DINO_POOL(MRect, data_ov002_021659ec, 0x1f0) = DinoSizeRect(MPoint(256, 192));
-        DINO_POOL(MPoint, data_ov002_021659ec, 0x50) = MPoint(256, 192);
-        DINO_POOL(MPoint, data_ov002_021659ec, 0xc8) = MPoint(2, 2);
-        DINO_POOL(MPoint, data_ov002_021659ec, 0xb0) = MPoint(36, 28);
-        DINO_POOL(MRect, data_ov002_021659ec, 0x200) = DinoSizeRect(MPoint(36, 28));
-        DINO_POOL(MPoint, data_ov002_021659ec, 0x210) = MPoint(0, 24);
-        DINO_POOL(MPoint, data_ov002_021659ec, 0x218) = MPoint(256, 192);
-        DINO_POOL(MRect, data_ov002_021659ec, 0x220) = MRect(0, 0, 256, 24);
-        DINO_POOL(MFx32, data_ov002_021659ec, 0x4) = MFx32::FromRaw(0x333);
+        DINO_CLEANING_POOL(MPoint, 0x50) = MPoint(256, 192);
+        DINO_CLEANING_POOL(MRect, 0x1f0) = DinoSizeRect(DINO_CLEANING_POOL(MPoint, 0x50));
+        DINO_CLEANING_POOL(MPoint, 0xc8) = MPoint(2, 2);
+        DINO_CLEANING_POOL(MPoint, 0xb0) = MPoint(36, 28);
+        DINO_CLEANING_POOL(MRect, 0x200) = DinoSizeRect(DINO_CLEANING_POOL(MPoint, 0xb0));
+        DINO_CLEANING_POOL(MPoint, 0x210) = MPoint(0, 24);
+        DINO_CLEANING_POOL(MPoint, 0x218) = MPoint(256, 192);
+        DINO_CLEANING_POOL(MRect, 0x220) = MRect(0, 0, 256, 24);
+        DINO_CLEANING_POOL(MFx32, 0x4) = MFx32::FromRaw(0x333);
     }
 } sDinoCleaningStaticInit;
