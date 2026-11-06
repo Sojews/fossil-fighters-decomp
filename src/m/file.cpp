@@ -55,12 +55,42 @@ extern "C" struct {
     u32 mMaxReadSize;   // 0x08
 } data_020c0a10;
 #define sMaxReadSize (data_020c0a10.mMaxReadSize)
+
+typedef std::map<std::string, MFileArchive *> MArchiveMap;
+// MArchiveMap::~map() (complete-object), the destructor sFileStaticInit registers for sMountedArchives.
+extern "C" inline MArchiveMap *_ZNSt3mapISsP12MFileArchiveSt4lessISsESaISt4pairIKSsS2_EEED1Ev(MArchiveMap *self) {
+    self->~MArchiveMap();
+    return self;
+}
+extern "C" void *__register_global_object(void *object, void *destructor, void *link);
+
+// The game constructs the path cache mutex, the path cache, the prefix, the archive map, then the mount mutex, but
+// lays .bss out as gRomArchive, the map's destructor-chain link, the map, ..., sMountMutex before sPathCacheMutex.
+// No declaration order of ordinary statics gives both (the compiler-made chain links move with them), so the map
+// and the mount mutex have no constructors and are set up by sFileStaticInit below; this order gives the layout.
 FSArchive *gRomArchive;
+static struct { u32 w[3]; } data_0214d2cc;  // the archive map's DestructorChain link
+static struct { OSMutex mutex; } sMountMutex;
+static struct { u32 w[3]; } sMountedArchives;
+#define sArchives (*(MArchiveMap *) &sMountedArchives)
+// sArchives.end(), from the header's own address (through the cast the compiler adds 4 to the map's address).
+#define sArchivesEnd \
+    MArchiveMap::iterator((std::__red_black_tree_common<true>::node_base *) &sMountedArchives.w[1])
 static MMutex sPathCacheMutex;
 static MPathCacheEntry sPathCache[10];
 static std::string sRomPrefix("rom:/");
-static std::map<std::string, MFileArchive *> sMountedArchives;
-static MMutex sMountMutex;
+static struct MFileStaticInit {
+    MFileStaticInit() {
+        // MArchiveMap() (an empty tree: no root, no size, header links to itself)
+        sMountedArchives.w[0] = 0;
+        sMountedArchives.w[1] = 0;
+        sMountedArchives.w[2] = (u32) &sMountedArchives.w[1];
+        __register_global_object(&sMountedArchives,
+                                 (void *) _ZNSt3mapISsP12MFileArchiveSt4lessISsESaISt4pairIKSsS2_EEED1Ev,
+                                 &data_0214d2cc);
+        OS_InitMutex(&sMountMutex.mutex);
+    }
+} sFileStaticInit;
 
 s32 MReadFile(FSFile *file, void *dest, u32 size) {
     s32 total = 0;
@@ -262,25 +292,25 @@ MFileArchive::MFileArchive(const char *name, const void *data) {
 void MMountArchive(const char *name, const void *data) {
     MScopedLock lock(&sMountMutex.mutex, TRUE);
     std::map<std::string, MFileArchive *>::iterator it;
-    it = sMountedArchives.find(name);
-    if (it != sMountedArchives.end()) {
+    it = sArchives.find(name);
+    if (it != sArchivesEnd) {
         it->second->mRefCount++;
     } else {
         MFileArchive *archive = new MFileArchive(name, data);
         archive->mRefCount++;
-        sMountedArchives[name] = archive;
+        sArchives[name] = archive;
     }
 }
 
 void MUnmountArchive(const char *name) {
     MScopedLock lock(&sMountMutex.mutex, TRUE);
     std::map<std::string, MFileArchive *>::iterator it;
-    it = sMountedArchives.find(name);
-    if (it != sMountedArchives.end()) {
+    it = sArchives.find(name);
+    if (it != sArchivesEnd) {
         MFileArchive *archive = it->second;
         if (--archive->mRefCount == 0) {
             delete archive;
-            sMountedArchives.erase(name);
+            sArchives.erase(name);
         }
     } else {
         OS_Terminate();
