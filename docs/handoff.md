@@ -218,6 +218,9 @@ There's nothing worth keeping, so there is no `docs/handoff.patch`.
 
 ## 5. Tooling
 
+The symptom-organized matching playbook is [docs/matching-idioms.md](matching-idioms.md); it also documents
+`tools/overnight_sweep.py` (unattended permuter + gate + commit) and `tools/callcheck.py` (call-target check).
+
 Use **`.venv/bin/python`** for the permuter and try_match; they need capstone, and the venv has 5.0.7.
 
 - **try_match:** `.venv/bin/python tools/try_match.py src/ov001/dino_field.cpp _ZN9DinoField12FindRockHoleE10MFx32Point`.
