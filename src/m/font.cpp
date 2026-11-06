@@ -341,8 +341,9 @@ static inline u32 MReadGlyphWord(const u32 *src) {
 
 // Draws a 4-bit glyph into 4-bit tiles at a pixel position, clipped to the destination; with its own colors, the
 // glyph's zero pixels are transparent.
-// NONMATCHING: the game hoists `words - 1` and the masks' complements out of the row loop (ours recomputes them each
-// row), which also shifts its register and stack choices.
+// NONMATCHING (99.6): the instructions match; the game's stack slots for width, the glyph width, firstMask and the
+// own-colors loop's word are permuted from ours (and i/mask swap r3/r4 in that loop). The no-op (int) casts on width
+// and the signed firstMask are permuter finds that move some of them.
 void MChr16FontTransfer::Transfer() {
     const u32 *src = (const u32 *) mSrc;
     int srcWords = (mGlyphSize.x + 7) >> 3;
@@ -356,11 +357,10 @@ void MChr16FontTransfer::Transfer() {
         mGlyphSize.y -= over;
     }
     int rows = mGlyphSize.y;
-    int shift;
     int width = mSize.x;
-    u32 *dst = (u32 *) ((u8 *) mDest + ((mPos.x >> 3) + (mPos.y >> 3) * width) * 32 + (mPos.y & 7) * 4);
-    shift = mPos.x & 7;
-    u32 firstMask = ~((1 << (shift * 4)) - 1);
+    u32 *dst = (u32 *) ((u8 *) mDest + ((mPos.x >> 3) + (mPos.y >> 3) * (int) width) * 32 + (mPos.y & 7) * 4);
+    int shift = mPos.x & 7;
+    int firstMask = ~((1 << (shift * 4)) - 1);
     int end = shift + mGlyphSize.x;
     int endShift = end & 7;
     u32 lastMask = (1 << (endShift * 4)) - 1;
@@ -371,7 +371,7 @@ void MChr16FontTransfer::Transfer() {
     int nextRow = -words * 8 + 1;
     int nextTileRow = nextRow + (width - 1) * 8;
     u32 first = mPos.x < 0 ? -(mPos.x >> 3) : 0;
-    int overX = mPos.x + mGlyphSize.x - width * 8;
+    int overX = mPos.x + mGlyphSize.x - (int) width * 8;
     u32 last = overX > 0 ? words - ((overX + 7) >> 3) : words;
     shift *= 4;
     if (!mOwnColors) {
@@ -383,7 +383,7 @@ void MChr16FontTransfer::Transfer() {
                 u32 out = (word << shift) | (carry >> (32 - shift));
                 if (i >= first && i < last) {
                     if (i == 0 && i == words - 1) {
-                        *dst = (*dst & ~(lastMask & firstMask)) | (out & (lastMask & firstMask));
+                        *dst = (*dst & ~(lastMask & firstMask)) | (out & (firstMask & lastMask));
                     } else if (i == 0) {
                         *dst = (*dst & ~firstMask) | (out & firstMask);
                     } else if (i == words - 1) {
