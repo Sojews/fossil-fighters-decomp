@@ -142,6 +142,7 @@ public:
     // Replaces [pos, pos + n) with [first, last) (the iterator tag picks the copy loop).
     basic_string &__replace(size_type pos, size_type n, const C *first, const C *last, random_access_iterator_tag);
     basic_string &assign(const C *first, const C *last);
+    static inline void __terminate(C *p, size_type n);
 
     // Short strings are stored in place.
     union {
@@ -356,8 +357,9 @@ basic_string<C, Traits, Alloc>::~basic_string() {
 #ifdef MSL_STRING_REPLACE_DEFINITION
 // Replaces [pos, pos + n) with [first, last), growing onto the heap when it no longer fits. (A range from inside
 // the string itself is copied out first.)
-// NONMATCHING (both instances, ~99%): the game's TU pool puts the two terminator constants the other way round
-// (char), and numbers the in-place path's registers differently (wchar_t).
+// NONMATCHING (both instances, ~99%): the in-place path's copy constructor loop gets other registers, and the
+// wchar_t one computes p + pos + n2 in another register order. (The heap path ends through __terminate so its
+// terminator constant is made after the in-place path's, which puts the two in the game's pool order.)
 template <class C, class Traits, class Alloc>
 basic_string<C, Traits, Alloc> &basic_string<C, Traits, Alloc>::__replace(size_type pos, size_type n, const C *first,
                                                                           const C *last, random_access_iterator_tag) {
@@ -409,7 +411,7 @@ basic_string<C, Traits, Alloc> &basic_string<C, Traits, Alloc>::__replace(size_t
         if (tail != 0) {
             Traits::copy(dst + n2, p + pos + rlen, tail);
         }
-        Traits::assign(buf[newSize], C());
+        __terminate(buf, newSize);
         if (wasLong) {
             ::operator delete(p);
         } else {
@@ -439,6 +441,11 @@ basic_string<C, Traits, Alloc> &basic_string<C, Traits, Alloc>::__replace(size_t
     return *this;
 }
 #endif
+
+template <class C, class Traits, class Alloc>
+inline void basic_string<C, Traits, Alloc>::__terminate(C *p, size_type n) {
+    Traits::assign(p[n], C());
+}
 
 // Makes room for n characters (never fewer than it holds), moving between the in-place buffer and the heap.
 template <class C, class Traits, class Alloc>
