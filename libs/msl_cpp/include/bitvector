@@ -55,6 +55,30 @@ namespace std {
             return iterator(data_ + size_ / bits_per_word, 1 << (size_ % bits_per_word));
         }
 
+        // One bit, to read or write.
+        class reference {
+        public:
+            reference(word_type *word, word_type mask) : word_(word), mask_(mask) {}
+            operator bool() const {
+                return (*word_ & mask_) != 0;
+            }
+            reference &operator=(bool x) {
+                if (x) {
+                    *word_ |= mask_;
+                } else {
+                    *word_ &= ~mask_;
+                }
+                return *this;
+            }
+
+            word_type *word_;
+            word_type mask_;
+        };
+
+        reference operator[](size_type n) {
+            return reference(data_ + n / bits_per_word, 1 << (n % bits_per_word));
+        }
+
         bool operator[](size_type n) const {
             return (data_[n / bits_per_word] & (1 << (n % bits_per_word))) != 0;
         }

@@ -250,17 +250,21 @@ void *MMotionFile::GetChr(u32 index, MArchiveFile *file) {
     return f.GetData();
 }
 
+// (Resized through a helper, which gives the game's slots for resize's tag temporaries under -ipa file.)
+template <class T> static inline void MResize(std::vector<T> &v, u32 n) {
+    v.resize(n);
+}
+
 // The bounds of a chr file's opaque pixels (worked out once; an empty chr's are the point at its center).
-// NONMATCHING: the game keeps the tile size in two late stack temporaries (ours lands higher in the frame) and the
-// resize's int2type tags sit in swapped slots.
+// NONMATCHING: the game keeps the tile size in two late stack temporaries (ours lands higher in the frame).
 MRect MMotionFile::GetChrBounds(u32 index) {
     MScopedLock lock(&mData->mMutex.mutex, TRUE);
     if (mData->mChrBoundsDone.empty()) {
         mData->mChrBoundsDone.resize(((MMotionHeader *) mData->mFile.GetData())->chrs.count, false);
-        mData->mChrBounds.resize(((MMotionHeader *) mData->mFile.GetData())->chrs.count);
+        MResize(mData->mChrBounds, ((MMotionHeader *) mData->mFile.GetData())->chrs.count);
     }
     if (!mData->mChrBoundsDone[index]) {
-        mData->mChrBoundsDone.set(index);
+        mData->mChrBoundsDone[index] = true;
         const MMotionGfxHeader *chr = (const MMotionGfxHeader *) GetChr(index, NULL);
         // (The chr files keep the OBJ size where the palette files keep extPalette.)
         MPoint size(gObjTileSizes[0][chr->extPalette].x, gObjTileSizes[0][chr->extPalette].y);
