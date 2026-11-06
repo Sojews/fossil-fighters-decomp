@@ -3605,7 +3605,7 @@ extern "C" const u32 data_0208a304, data_0208a30c, data_0208a310, data_0208a314,
 extern "C" void func_ov000_02166904(DinoBattleModelPlayer *player, MMessageObserver *reply, u32 side, u32 id,
                                     u32 targetId, u32 index, u8 showName) {
     DinoBattleModelCreature *creature = player->FindCreatureByB4(id);
-    const u32 attackIndex = index;
+    const int attackIndex = index;
     u32 attack = attackIndex >= creature->CountAttacks() ? creature->GetSpecialAttack() : creature->GetAttack(attackIndex, NULL);
     const DinoAttackDef *attackDef = gDinoResource->GetAttackDef(attack);
     if (*DinoOffsetPtr<u8>(attackDef, attackDef->unk14) == 3) {
