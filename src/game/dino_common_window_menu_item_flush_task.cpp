@@ -166,7 +166,8 @@ void DinoCommonWindowMenu::OnStart() {
                 name = text.substr(colon + 1);
                 text = text.substr(0, colon);
             }
-            mUnkC0.push_back(
+            // (The vector<void *> push straight from the deleter: the game's two tag bytes are in that order.)
+            ((std::__vec_deleter<void *, std::allocator<void *> > &)mUnkC0).push_back(
                 new DinoCommonWindowMenuItem(font, (mPos - mUnk100).Offset(0x18, i * 0x12 + 8), text, name, width));
             AddItem((MMenuItem *)mUnkC0[i]);
             DinoHelpBase::AddEntry((u32)(DinoHelpItem *)(DinoCommonWindowMenuItem *)mUnkC0[i], 1, 0);
