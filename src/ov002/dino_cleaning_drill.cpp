@@ -39,6 +39,9 @@ struct DinoCleaningDrillPool {
 extern "C" struct {
     u8 unk00[0x20];
     MRect mArea;            // 0x20: where the drill works
+    // (Declared up to 0x4C only: mwcc then keeps the screen rect's last word, past the struct's end, behind the
+    // stores through the first anchor, but hoists the rect's zero half above the screen size as the game does.)
+    u8 unk30[0x1C];
 } data_ov002_02165278;
 extern "C" u32 data_ov002_021651f8[];
 #define sDrillPool (*(DinoCleaningDrillPool *)data_ov002_021651f8)
@@ -329,11 +332,11 @@ template class MBgCallTask0<DinoCleaningDrill>;
 template MTask *MCreateBgCallTask(DinoCleaningDrill *obj, void (DinoCleaningDrill::*func)(), int thread);
 
 // The file's static initialization (see dino_static_init.h), with the drill's fixed-point constants.
-// NONMATCHING: the screen rect sits past the +0x80 anchor and the game hoists its zero half.
+// NONMATCHING: the icon rect's stores mix with the icon size's, and the rects' temporaries take other stack slots.
 #pragma always_inline on
 static struct DinoCleaningDrillStaticInit {
     DinoCleaningDrillStaticInit() {
-        DINO_COMMON_LAYOUT_INIT(data_ov002_021651f8, 0x3c, 0xc0, 0x4c, 0x34, 0x90, 0xa0, 0xa8, 0xb0);
+        DINO_COMMON_LAYOUT_INIT2(data_ov002_021651f8, data_ov002_02165278, 0x3c, 0xc0, 0x4c, 0x34, 0x90, 0xa0, 0xa8, 0xb0);
         DINO_POOL(MFx32, data_ov002_021651f8, 0x4) = MFx32::FromRaw(0x666);
         DINO_POOL(MFx32, data_ov002_021651f8, 0x28) = MFx32::FromRaw(0x333);
         DINO_POOL(MFx32, data_ov002_021651f8, 0xc) = MFx32(24);
