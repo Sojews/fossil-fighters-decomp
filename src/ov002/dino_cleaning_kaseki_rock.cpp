@@ -292,16 +292,15 @@ inline DinoCleaningKasekiRockXrayBlendManager::DinoCleaningKasekiRockXrayBlendMa
 
 // Builds the rock: the fossil's image (a blank layer and three fossil layers) over the chips' image (a blank layer
 // and three rock layers), a rock for each, the view and its x-ray copy, then counts the fossil's visible cells.
-// NONMATCHING: 99.45%, the per-iteration scale table sits below the layer table (the game has it above), and the
-// loop counter's store is scheduled after the table copies.
+// The three tables are declared inside the loop (mwcc hoists their copies out of it, which gives the game's frame
+// order), and the scales are read through the parameters' addresses (the hoisted copies then spill last, as the
+// game's do).
 extern "C" const u32 data_ov002_02163550[3];  // the chips layers' sounds: 0x27, 0x28, 0x29
 
 DinoCleaningKasekiRock::DinoCleaningKasekiRock(DinoCleaning *cleaning, u32 view, u32 number, u32 kasekiScale,
                                                u32 kasekiVariant, u8 unk14, u32 chipsNumber, u32 chipsScale,
                                                u32 chipsVariant, u8 unk4B8, BOOL unk19C, u32 scale0, u32 scale1)
     : MProcess(NULL) {
-    fx32 s0;
-    fx32 s1;
     unk7C = (u32)cleaning;
     mUnk4A0 = chipsVariant;
     mOam = (MSmartOam *)cleaning->GetUnkD4();
@@ -318,13 +317,11 @@ DinoCleaningKasekiRock::DinoCleaningKasekiRock(DinoCleaning *cleaning, u32 view,
     DinoCleaningImage *kaseki = new DinoCleaningImage(cleaning);
     kaseki->AddLayer(new DinoCleaningImageLayer(0, std::string(data_ov002_021657d4.mBlankLayerPath), 1, 0, MFx32(1)));
     u32 i = 3;
-    u32 sounds[2][3] = {{0x2a, 0x2a, 0x2b}, {0, 0x2a, 0x2b}};
-    u32 layers[3] = {1, 3, 2};
-    s0 = scale0;
-    s1 = scale1;
     for (; i > 0; i--) {
-        MFx32 scales[2][3] = {{MFx32::FromRaw(s0), MFx32::FromRaw(s1), MFx32(1)},
-                              {MFx32::FromRaw(s0), MFx32::FromRaw(s1), MFx32(20)}};
+        u32 sounds[2][3] = {{0x2a, 0x2a, 0x2b}, {0, 0x2a, 0x2b}};
+        MFx32 scales[2][3] = {{*(MFx32 *)&scale0, *(MFx32 *)&scale1, MFx32(1)},
+                              {*(MFx32 *)&scale0, *(MFx32 *)&scale1, MFx32(20)}};
+        u32 layers[3] = {1, 3, 2};
         OS_SPrintf(path, data_ov002_021657d4.mKasekiLayerFormat, number, layers[i - 1],
                    (i < 3 ? kasekiVariant : 0) + 'a');
         DinoCleaningImageLayer *layer = new DinoCleaningImageLayer((u32)cleaning->GetRandom(), std::string(path), 0,
