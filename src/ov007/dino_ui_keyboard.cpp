@@ -1267,6 +1267,38 @@ static inline MSmartOam *DinoSenryuOam(SenryuMenuItem *item) {
     return item->GetMenu()->mOam;
 }
 
+// The page arrows' motions (only the arrows, 4 and 5, have motions; below 4 are the function keys).
+// (Its own inline under the ctor: each inline level reverses its temporaries' slot order, so two levels down the
+// strings and frames descend in source order as the game's do.)
+static inline void DinoSenryuArrowMotions(DinoUiSenryuMenuItem *item) {
+    if (item->mIndex >= 4) {
+        switch (item->mIndex) {
+        case 4:
+            item->mMotion = new MMotion(std::string(data_ov007_02191880.mPrevPath), DinoSenryuOam(item), 2, 1);
+            item->mMotion->Play(1, 0);
+            item->mMotion->SetPosition(item->mPos);
+            item->mMotion->SetPriority(2);
+            item->mMotion->SetAnchor(2);
+            item->mMotion->Show();
+            item->mFrame = item->mMotion->GetFrame();
+            item->mParallel.AddTail(item->mMotion);
+            item->DinoHelpItem::Disable();
+            break;
+        case 5:
+            item->mMotion = new MMotion(std::string(data_ov007_02191880.mNextPath), DinoSenryuOam(item), 2, 1);
+            item->mMotion->Play(1, 0);
+            item->mMotion->SetPosition(item->mPos);
+            item->mMotion->SetPriority(2);
+            item->mMotion->SetAnchor(2);
+            item->mMotion->Show();
+            item->mFrame = item->mMotion->GetFrame();
+            item->mParallel.AddTail(item->mMotion);
+            item->DinoHelpItem::Disable();
+            break;
+        }
+    }
+}
+
 inline DinoUiSenryuMenuItem::DinoUiSenryuMenuItem(u32 index, DinoUiSenryuMenu *menu, MPoint pos)
     : SenryuMenuItem(index, menu) {
     mPos = pos;
@@ -1276,39 +1308,12 @@ inline DinoUiSenryuMenuItem::DinoUiSenryuMenuItem(u32 index, DinoUiSenryuMenu *m
     mFrame.right = pos.x + 6;
     mFrame.bottom = pos.y + 6;
     mMotion = NULL;
-    // (Only the page arrows, 4 and 5, have motions; below 4 are the function keys.)
-    if (mIndex >= 4) {
-        switch (mIndex) {
-        case 4:
-            mMotion = new MMotion(std::string(data_ov007_02191880.mPrevPath), DinoSenryuOam(this), 2, 1);
-            mMotion->Play(1, 0);
-            mMotion->SetPosition(mPos);
-            mMotion->SetPriority(2);
-            mMotion->SetAnchor(2);
-            mMotion->Show();
-            mFrame = mMotion->GetFrame();
-            mParallel.AddTail(mMotion);
-            DinoHelpItem::Disable();
-            break;
-        case 5:
-            mMotion = new MMotion(std::string(data_ov007_02191880.mNextPath), DinoSenryuOam(this), 2, 1);
-            mMotion->Play(1, 0);
-            mMotion->SetPosition(mPos);
-            mMotion->SetPriority(2);
-            mMotion->SetAnchor(2);
-            mMotion->Show();
-            mFrame = mMotion->GetFrame();
-            mParallel.AddTail(mMotion);
-            DinoHelpItem::Disable();
-            break;
-        }
-    }
+    DinoSenryuArrowMotions(this);
 }
 
 // Moves the cursor to the entry cur (wrapping around), and when that changes the page (or a rebuild is asked
 // for), fills the page's three poems and rebuilds the menu items and their links.
 #pragma inline_max_size(2000)
-// NONMATCHING: 99.96%, the inlined menu items' string and frame temporaries are laid out in another order.
 extern "C" void func_ov007_02185d28(DinoUiSenryuMenu *menu, int cur) {
     u32 count = menu->mCount;
     cur = (cur + count) % count;
