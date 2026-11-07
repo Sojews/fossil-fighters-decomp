@@ -363,7 +363,7 @@ inline DinoCleaningLastDust::DinoCleaningLastDust(MSmartOam *oam, DinoCleaningIm
 }
 
 // Takes up to 20 random bits of dirt off (a cell keeps mMinDirt), the first 6 flying off away from the dirt's centre.
-// NONMATCHING: 90.4%, the frame is 12 bytes smaller (the game keeps more temporaries) and registers differ.
+// NONMATCHING: 95.1%, stack slots and some registers differ.
 extern "C" void func_ov002_0215a7b4(DinoCleaningImageView *view) {
     std::vector<DinoCleaningStatusEntry>::iterator it;
     DinoCleaningStatusEntry cell;
@@ -397,15 +397,17 @@ extern "C" void func_ov002_0215a7b4(DinoCleaningImageView *view) {
         MPoint d = DinoPointSub(*(const MPoint *)&cell, data_ov002_021646e4.mCellOrigin);
         int x = d.x * 8 + (d.y & 1) * 4;
         int y = d.y * 8;
+        u32 row = cell.unk0;
+        u32 col = cell.unk4;
         u32 left = DinoMaxPooled(data_ov002_021646e4.mMinDirt, data_ov002_021646f0,
-                                 view->mCells[cell.unk0][cell.unk4] - 3);
-        int taken = view->mCells[cell.unk0][cell.unk4] - left;
+                                 view->mCells[row][col] - 3);
+        int taken = view->mCells[row][col] - left;
         view->mDirtSum.x -= x * taken;
         view->mDirtSum.y -= y * taken;
-        view->mUnkD9E0 -= view->mCells[cell.unk0][cell.unk4] - left;
-        view->mCells[cell.unk0][cell.unk4] = left;
-        view->mDirty[cell.unk0][cell.unk4] = TRUE;
-        if (view->mCells[cell.unk0][cell.unk4] == 0) {
+        view->mUnkD9E0 -= view->mCells[row][col] - left;
+        view->mCells[row][col] = left;
+        view->mDirty[row][col] = TRUE;
+        if (view->mCells[row][col] == 0) {
             view->mUnkDA04.erase(it);
         }
         if (n < 6) {
