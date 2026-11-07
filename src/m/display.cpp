@@ -202,38 +202,39 @@ void MDisplay::SetObjTileBoundary(int boundary) {
     mDispCnt.objTileBoundary = boundary;
 }
 
-// (Takes the iterator by value: the game leaves a dead copy of it on the stack for each test.)
+// (Takes the iterator by value: the game leaves a dead copy of it on the stack.)
 static inline bool IsFound(MThreadDisplayMap::iterator it) {
     return it != sThreadDisplays->end();
 }
 
-// (One more by-value hop: the first test's dead copy goes below the second's.)
-static inline bool IsFoundOuter(MThreadDisplayMap::iterator it) {
-    return IsFound(it);
-}
-
-// (An unused word-sized object with a destructor: it reserves the frame's extra word, which the game seems to keep
-// for a lock object whose flag lives in a register.)
-struct MFrameWord {
-    u32 unused;
-    ~MFrameWord() {}
+// (Objects with destructors stay on the stack: the game keeps two in-memory copies of the first lookup's result in
+// the top words, and an unused word at the bottom of the frame.)
+struct MThreadDisplayHolder {
+    MThreadDisplayMap::iterator it;
+    MThreadDisplayHolder() {}
+    ~MThreadDisplayHolder() {}
+};
+struct MFrameScope {
+    MFrameScope() {}
+    ~MFrameScope() {}
 };
 
-// Keeps gCurrentDisplay per thread. (The explicit iterator conversions keep find's result in its own slot.)
-// NONMATCHING: stack slots only (the game has the first test's copy in the top word and leaves the bottom one unused;
-// ours has them the other way round).
+// Keeps gCurrentDisplay per thread. (The explicit iterator conversion keeps find's result in its own slot.)
 static void SwitchThreadDisplay(u32 from, u32 to) {
     if (sPrevSwitchThreadCallback != NULL) {
         sPrevSwitchThreadCallback((OSThread *) from, (OSThread *) to);
     }
-    MFrameWord frameWord;
+    MThreadDisplayHolder found;
+    MFrameScope scope;
     // (MIrqLock's steps written out: the game keeps the flag in a register, not in a lock object.)
     u16 prev = REG_IME;
     REG_IME = 0;
     bool enabled = prev;
-    MThreadDisplayMap::iterator it = MThreadDisplayMap::iterator(sThreadDisplays->find(from));
-    if (IsFoundOuter(it)) {
-        it->second = gCurrentDisplay;
+    MThreadDisplayHolder cur;
+    cur.it = sThreadDisplays->find(from);
+    found.it = cur.it;
+    if (cur.it != sThreadDisplays->end()) {
+        cur.it->second = gCurrentDisplay;
     }
     MThreadDisplayMap::iterator it2 = MThreadDisplayMap::iterator(sThreadDisplays->find(to));
     if (IsFound(it2)) {
