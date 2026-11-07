@@ -106,8 +106,8 @@ DinoUiRvStatusMenu::DinoUiRvStatusMenu(int *page, u8 sort)
 }
 
 // The list's sorts (the game emits the whole stable_sort machinery here, the medal menu and the museum use it too).
-// NONMATCHING: std::__inplace_merge (stack layout, and the game elides one argument copy), std::__stable_sort_move
-// and std::__insertion_sort_move (register allocation), as in the museum.
+// NONMATCHING: std::__inplace_merge (stack layout, and the game elides one argument copy) and
+// std::__insertion_sort_move (register allocation).
 template void std::stable_sort(std::vector<u32>::iterator, std::vector<u32>::iterator, DinoCreatureByUnk0D);
 template void std::stable_sort(std::vector<u32>::iterator, std::vector<u32>::iterator, DinoCreatureByUnk02031104);
 template void std::stable_sort(std::vector<u32>::iterator, std::vector<u32>::iterator, DinoCreatureByLevel);

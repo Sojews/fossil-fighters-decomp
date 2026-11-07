@@ -155,8 +155,7 @@ namespace std {
             return *this;
         }
         __temp_buffer_iterator operator+(difference_type n) const {
-            __temp_buffer_iterator tmp = *this;
-            return tmp += n;
+            return __temp_buffer_iterator(*this) += n;
         }
         difference_type operator-(const __temp_buffer_iterator &x) const { return (T *)ptr_ - (T *)x.ptr_; }
         T *base() const { return (T *)ptr_; }

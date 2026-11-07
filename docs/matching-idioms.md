@@ -475,6 +475,9 @@ Headers in `libs/msl_cpp/include`. Any header change needs the gate over the who
 - `__insertion_sort_move` advances `first` itself (guard `!(first == last)`); `__inplace_merge` cut iterators declared
   at the top, distances via by-value `__distance`. A shape shared by many template instances points at a header line.
 - deque iterator `operator-` as `tmp += -n; return tmp;` gives the separate return copy.
+- `__temp_buffer_iterator::operator+` as `return __temp_buffer_iterator(*this) += n;` (no named tmp): fixed the
+  comp/buf_ register swap in every light-comparator `__stable_sort_move` (+12, incl. DinoBackupEntry). An iterator
+  operator's temp form changes the caller's regalloc even when the emitted copies look identical.
 - `~list() { this->erase(this->begin(), this->end()); }` keeps iterator temps' slots under ipa.
 
 ---
@@ -524,8 +527,8 @@ Proven unreproducible with the configured compiler; don't spend time without a g
 - **ipa emission order where the game's callee follows its caller** (ResolveMove, keyboard
   MCreateBgCallTask<KasekiPictCache>): explicit instantiation before/after, auto_inline off, dont_inline all fail.
 - MArchive::Release (lock promoted across calls), MMessageSubject::RemoveObserver (frame +8), MMenu::AddLink
-  make_pair temp forms, deque `__cdeque_copy_in` mid copy, vector<char>::insert byte temp, stable_sort_move
-  comparator registers for light comparators, MOamCanvas::GetPixel, text_codec/file.cpp/3d_resource .bss layouts.
+  make_pair temp forms, deque `__cdeque_copy_in` mid copy, vector<char>::insert byte temp,
+  MOamCanvas::GetPixel, text_codec/file.cpp/3d_resource .bss layouts.
 - Two-slot swaps in 99.9x functions that use-count, declaration order, and per-loop counters didn't fix:
   ModelField/StatusEffectIcon Idle, EffectTelop StateWin, SelectAllMenu::OnStart.
 - Things that are canonicalized (no effect): `==`/`<` operand swaps (but `u32 next = m84; if (m80 != next)` did fix
