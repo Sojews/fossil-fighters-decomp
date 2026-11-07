@@ -155,7 +155,10 @@ void DinoHelpDriver::NotifyClose() {
 
 // Whether there is help to show: help is on, the current base is enabled, neither screen is faded and one of the
 // base's enabled items has text.
-// NONMATCHING (at optimization level 3, as the game was): the iterator copies take each other's stack slots.
+// (At optimization level 3, as the game was. The loop runs on a list<void *> iterator copied out of a wrapper
+// built from the base's begin(): a separate flat object, so it lives in a register; the wrapper and both
+// begin temporaries take the game's slots above end()'s.)
+typedef std::__list_imp<void *, std::allocator<void *> > HelpItemBase;
 #pragma optimization_level 3
 BOOL DinoHelpDriver::CanShowHelp() {
     MScopedLock lock(&sHelpMutex.mutex, TRUE);
@@ -172,9 +175,10 @@ BOOL DinoHelpDriver::CanShowHelp() {
         (gLcd->GetBottomDisplay()->mBright->GetMode() != 0 && gLcd->GetBottomDisplay()->mBright->GetFactor() != 0)) {
         return FALSE;
     }
-    for (std::list<DinoHelpItem *>::iterator it = mItems.begin(); it != mItems.end(); it++) {
-        if ((*it)->mBase == sHelpCurrentBase && (*it)->IsEnabled() && (*it)->GetText() != NULL &&
-            (*it)->GetText()[0] != '\0') {
+    for (HelpItemBase::iterator it = std::list<DinoHelpItem *>::iterator(mItems.HelpItemBase::begin()).it_;
+         it != mItems.end().it_; it++) {
+        if (((DinoHelpItem *) *it)->mBase == sHelpCurrentBase && ((DinoHelpItem *) *it)->IsEnabled() &&
+            ((DinoHelpItem *) *it)->GetText() != NULL && ((DinoHelpItem *) *it)->GetText()[0] != '\0') {
             return TRUE;
         }
     }
