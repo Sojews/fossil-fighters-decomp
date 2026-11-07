@@ -360,20 +360,32 @@ namespace std {
         }
     }
 
+    // An iterator's pointer (a vector iterator's is its base()).
+    template <class T> class __vec_iterator;
+    template <class T> inline T *__iter_ptr(const __vec_iterator<T> &x) {
+        return x.base();
+    }
+    template <class T> inline T *__iter_ptr(T *x) {
+        return x;
+    }
+
     template <class BidirectionalIterator, class OutputIterator, class Compare>
     OutputIterator __insertion_sort_move(BidirectionalIterator first, BidirectionalIterator last,
                                          OutputIterator result, Compare &comp) {
         typedef typename iterator_traits<OutputIterator>::value_type value_type;
         __vec_iterator<value_type> last2(result.base());
-        if (!(first == last)) {
+        // (A copy built from the pointer, not from first itself, stays apart from the parameter: the game copies
+        // first right after last2 and reads the first element through the parameter.)
+        BidirectionalIterator f(__iter_ptr(first));
+        if (!(f == last)) {
             *result = *first;
-            for (++last2, ++first; first != last; ++first, ++last2) {
+            for (++f, ++last2; f != last; ++f, ++last2) {
                 __vec_iterator<value_type> j = last2;
                 __vec_iterator<value_type> i = j;
-                for (; i.ptr_ != result.base() && comp(*first, *--i); --j) {
+                for (; i.ptr_ != result.base() && comp(*f, *--i); --j) {
                     *OutputIterator(j.ptr_, result.buf_) = *i;
                 }
-                *OutputIterator(j.ptr_, result.buf_) = *first;
+                *OutputIterator(j.ptr_, result.buf_) = *f;
             }
         }
         return OutputIterator(last2.ptr_, result.buf_);

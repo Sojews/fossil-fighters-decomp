@@ -420,7 +420,7 @@ void DinoUiMuseumMenu::LoadCreatures() {
 
 // The tab's sort (the game emits the whole stable_sort machinery here).
 // NONMATCHING: std::__stable_sort_move (comp and the buffer's owner swap registers), std::__insertion_sort_move (the
-// first few instructions' order).
+// copy of first and last2 take each other's stack slot).
 template void std::stable_sort(std::vector<u32>::iterator, std::vector<u32>::iterator, DinoMuseumByUnk0C);
 template void std::stable_sort(std::vector<u32>::iterator, std::vector<u32>::iterator, DinoMuseumByUnk0A);
 template void std::stable_sort(std::vector<u32>::iterator, std::vector<u32>::iterator, DinoMuseumByUnk08);
