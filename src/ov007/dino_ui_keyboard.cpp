@@ -822,6 +822,10 @@ static inline void DinoKBArrowMotions(DinoUiKeyboardMenuItem *item) {
     }
 }
 
+static inline void DinoKBArrowMotionsDeep(DinoUiKeyboardMenuItem *item) {
+    DinoKBArrowMotions(item);
+}
+
 inline DinoUiKeyboardMenuItem::DinoUiKeyboardMenuItem(u32 index, u32 arg, MPoint pos, DinoUiKeyboardMenu *menu)
     : KeyboardMenuItem(index, arg, pos, menu) {
     mTextId = 0;
@@ -842,7 +846,12 @@ inline DinoUiKeyboardMenuItem::DinoUiKeyboardMenuItem(u32 index, u32 arg, MPoint
     mFrame.right = mPos.x + halfSize.x;
     mFrame.bottom = mPos.y + halfSize.y;
     mMotion = NULL;
-    DinoKBArrowMotions(this);
+    DinoKBArrowMotionsDeep(this);
+}
+
+static inline DinoUiKeyboardMenuItem *DinoNewKBItem(u32 index, u32 arg, const MPoint &pos, DinoUiKeyboardMenu *menu,
+                                                    const MPoint &halfSize, u32 textId) {
+    return new DinoUiKeyboardMenuItem(index, arg, pos, menu, halfSize, textId);
 }
 
 // Rebuilds the keyboard's menu items: the back button (for the mode), the character keys (three groups of 6 rows
@@ -884,7 +893,7 @@ extern "C" void func_ov007_02182020(DinoUiKeyboardMenu *menu) {
         }
     }
     DinoUiKeyboardMenuItem *page =
-        new DinoUiKeyboardMenuItem(2, 0, data_ov007_02190fa0.mPagePos, menu, data_ov007_02190fa0.mPageSize, data_0208ac64);
+        DinoNewKBItem(2, 0, data_ov007_02190fa0.mPagePos, menu, data_ov007_02190fa0.mPageSize, data_0208ac64);
     menu->AddItem(page);
     menu->mPageHelp = page;
     switch (menu->mMode) {
@@ -895,7 +904,7 @@ extern "C" void func_ov007_02182020(DinoUiKeyboardMenu *menu) {
         okText = data_0208ac54;
         break;
     }
-    menu->mOkButton = new DinoUiKeyboardMenuItem(3, 0, data_ov007_02191020.mOkPos, menu, data_ov007_02191020.mOkSize,
+    menu->mOkButton = DinoNewKBItem(3, 0, data_ov007_02191020.mOkPos, menu, data_ov007_02191020.mOkSize,
                                                  okText);
     menu->AddItem(menu->mOkButton);
     menu->mOkHelp = static_cast<DinoUiKeyboardMenuItem *>(menu->mOkButton);
