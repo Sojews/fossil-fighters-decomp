@@ -168,8 +168,8 @@ static inline void M3DResetTexMtx() {
 
 // Draws the model: culled by its box when asked, then either its display list (patched for the frame and sent by
 // DMA) or its command list run here.
-// NONMATCHING (95.8%): register choices in the material command (the game re-materializes each field mask and keeps
-// the alpha on the stack), and two scheduling differences.
+// NONMATCHING (99.45%): the command list's `identity = FALSE` store is scheduled before the frame load, and the
+// spill slots of the command-list locals come out in a different order.
 void M3DModel::Draw(u32 lights) {
     if ((mFlags & 3) != 3) {
         return;
@@ -242,8 +242,8 @@ void M3DModel::Draw(u32 lights) {
             u32 offset = anim[4] + (anim[3] + (anim[1] + anim[2]));
             u32 frame = (mFrame >> 4) % ((const u32 *)((const u8 *)anim + offset))[1];
             offset += 8;
-            unk2E0 = (u32)((const u8 *)anim + offset) +
-                     *(const u32 *)((const u8 *)res + (res[1] + res[2])) * frame * 0x30;
+            u32 stride = *(const u32 *)((const u8 *)res + (res[1] + res[2]));
+            unk2E0 = (u32)((const u8 *)anim + offset) + stride * frame * 0x30;
         } else {
             unk2E0 = 0;
         }
@@ -332,10 +332,10 @@ void M3DModel::Draw(u32 lights) {
                     u32 t = texWords[material];
                     u32 a = (t >> 8) & 0x1F;
                     u32 tex = (t >> 24) & 0x3F;
-                    u32 pltt;
+                    u32 pltt = (t >> 16) & 0x3F;
                     u32 id = (material + mPolygonId) & 0x3F;
-                    pltt = (t >> 16) & 0x3F;
-                    int alpha = (int)(a * mUnk1C) >> 12;
+                    a *= mUnk1C;
+                    int alpha = (int)a >> 12;
                     if (alpha <= 0) {
                         alpha = 0x1F;
                         t &= ~0xC0;
