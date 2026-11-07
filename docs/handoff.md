@@ -387,3 +387,13 @@ State at origin/main **acb44c50** (report: 11633/11787 fuzzy-100). Changes this 
 Dead ends confirmed this pass (files restored): Decide permuter best-383 scores 78.8 vs 79.5 (permuter score ≠ report again); WalkOnLand0/1 literal-0 collapses to 56.7, `water != 0` to 92.2 — the game's `movs r2,#0` is allocator-order, permuter-dead too (best 12 = base 12 after 408 compiles); DinoUiExchange::StateSave pair-temp / mac-local shapes don't produce the game's two zeroed temps (all ~95.1); DinoUiEnding::StateStart DinoEndingStrip folded-ctor and pos-first variants regress (95.6 / 97.5) — the "loads strip position before rect constants" scheduling stands, and sp offsets shift by ~0x10 in the mid-function.
 
 Still open in these overlays (unchanged): DinoFieldRadar::Idle 66.18, DinoFieldPlayerControl::Idle 86.12, DinoFieldCamera::IdleUnk0 90.52 (game's frame is 40 bytes BIGGER — needs extra temps, not fewer), DinoUiDebugKasekiRockGetMenu::OnStart 92.23, DinoUiEnding::StateStart 98.75, the `this+i*4` family, and the 99.x slot puzzles. Frontier order stands: low-% large-byte rewrites first (Radar, PlayerControl, IdleUnk0), then small surgical (saved for permuter runs).
+
+---
+
+## Session update 2026-11-08 (third agent pass; same four-overlay area)
+
+On top of the pass above (HEAD 146461b5). Committed and pushed, no report regressions:
+
+- **DinoFieldCamera::IdleUnk0 90.52 -> 92.15** (a 600s permuter round found it — the round's own score dropped 674->555 while the report ROSE, the permuter-score ≠ report mismatch again). IdleUnk0's "game frame 40 bytes BIGGER" turned out to mean: materialize every used value into its own named local (`camera`/`def`/`circle`/`inner`/`outer`/`len` declared in the game's order at the top, per-value slot copies like `u32 perm578 = camera.x` before the store, `MPoint perm437` before ToFx32Point), plus `0 == x` compare forms and the comparison as `MFx32(circle->radius).v < d.v`. Dummy/never-read `perm` locals from the permuter were removable for free (92.151 with or without). The two point temps for `(mFocusPos - c)` and `(mFocusPos - center)` are still in different slots than the game.
+
+Dead ends confirmed this pass: PlayerControl::Idle's follower loop (the game keeps `i` and recomputes `field + i*4` per iteration, no strength reduction; ours keeps a running pointer) — `#pragma opt_strength_reduction off` regresses to 85.55, `opt_loop_invariants off` to 85.88, `opt_common_subs off` to 82.87, inline-loop/GetCharaSlot/GetChara variants unchanged or slightly worse (the game SR'd its other loops, so the global pragma is too blunt). Re-scored via `objdiff-cli diff` per unit (report format no longer carries per-symbol data).
