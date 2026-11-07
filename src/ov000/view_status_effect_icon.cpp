@@ -120,8 +120,10 @@ extern "C" u32 func_ov000_0217e298(const u32 *effect);
 
 // Effects 8-11 go on the first icon, the rest on the second; each icon cycles through its effects. Added effects show
 // at once, removed ones queue the erase anime and the next effect, kept ones replay when their flag or count changes.
-// NONMATCHING: same instructions; four spill slots differ (the game puts num/bit low and slot/e high in the second
-// loop, ours the reverse) and the next-effect loop swaps two registers.
+// NONMATCHING: same instructions; num and slot swap spill slots in the second loop (the game puts num low, slot high),
+// and the removed effect's change pointer adds sp before the multiply. (The u32 counters with signed loop tests and
+// the int bit put e, bit and the next-effect loop's registers where the game has them; slot/num types, no-op casts,
+// separate slot variables and helpers don't move the last pair.)
 void DinoBattleViewStatusEffectIcon::SetEffects(int count, const u8 *effects) {
     u32 slot;
     u32 present = 0;
