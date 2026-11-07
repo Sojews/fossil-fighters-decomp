@@ -805,11 +805,9 @@ void M3DModelPatchDisplayList(M3DModel *model, const u32 *tags, u32 count) {
         if (model->mUnk300 >= offset) {
             switch (type) {
             case 0: {
-                u16 x = verts[arg];
-                const s16 *v = verts + arg;
                 u32 at = offset & ~1;
-                *(u32 *) (model->mModelData + at) = x | (v[1] << 16);
-                *(s16 *) (model->mModelData + at + 4) = v[2];
+                *(u32 *) (model->mModelData + at) = (u16)verts[arg] | (verts[arg + 1] << 16);
+                *(s16 *) (model->mModelData + at + 4) = verts[arg + 2];
                 break;
             }
             case 1: {
