@@ -3049,13 +3049,14 @@ struct DinoWarpDefs {
     MFx32 unk24;
 };
 
-// The walk's frame count: the 2 and the 10 as by-value parameters give the game's temporaries (copy and parameter).
-static inline int WarpWalkFrames(const MFx32Point &offset, MFx32 two, MFx32 ten) {
-    return MFx32ToInt(offset.Length() / two * ten);
+// The walk's time: the 2 and the 10 as by-value parameters give the game's temporaries (copy and parameter); returning
+// the MFx32 (converted by the caller) moves the product's temporary up beside them.
+static inline MFx32 WarpWalkFrames(const MFx32Point &offset, MFx32 two, MFx32 ten) {
+    return offset.Length() / two * ten;
 }
 
-// NONMATCHING: the game spills two of the tasks in swapped stack slots, and the multiply's result temporary sits at
-// the frame bottom.
+// NONMATCHING: the game spills two of the tasks in swapped stack slots, and keeps the length and the quotient beside
+// the 2 and the 10 (ours puts them in the low copies area).
 void DinoEventExecAutoWarp::StateArrive() {
     if ((mNewBgm != 0 && mScene != mNewScene) || mBgm != mNewBgm) {
         DinoSoundLoadScene(mNewScene);
@@ -3084,9 +3085,8 @@ void DinoEventExecAutoWarp::StateArrive() {
             offset += step;
         } while (((DinoFieldMapArea *)mEvent->GetField()->GetMap()->GetArea(pos + offset))->id == area->id);
         MTask *wait = mEvent->GetField()->CreateCharaWaitMoveTask(mEvent->GetField()->GetCamera()->GetFocus());
-        MTask *move = mEvent->GetField()->CreateCharaMoveOffsetTask(
-            mEvent->GetField()->GetCamera()->GetFocus(), offset, WarpWalkFrames(offset, MFx32(2), MFx32(10)),
-            0, 0);
+        MTask *move = mEvent->GetField()->CreateCharaMoveOffsetTask(mEvent->GetField()->GetCamera()->GetFocus(), offset,
+            MFx32ToInt(WarpWalkFrames(offset, MFx32(2), MFx32(10))), 0, 0);
         MTimer *timer = new MTimer(10);
         MTask *turn = mEvent->GetField()->CreateCharaAngleTask(mEvent->GetField()->GetCamera()->GetFocus(), angle, 1, 0);
         MSerialTaskSet *serial = new MSerialTaskSet(TRUE);
