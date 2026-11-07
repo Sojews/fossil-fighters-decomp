@@ -18,31 +18,27 @@ DinoGradationBg::DinoGradationBg(MDisplay *display) {
     mRaster->SetFlipOnVBlank(TRUE);
 }
 
-// NONMATCHING: register allocation (the game keeps the red accumulator on the stack and blue in lr) and 4 bytes.
-void DinoGradationBg::SetGradation(int r0, int g0, int b0, int r1, int g1, int b1) {
-    u32 r;
-    u32 i;
-    int gAcc;
-    int rAcc = 0;
-    int bAcc = 0;
-    gAcc = 0;
+// The red limit's address gets its own literal (a separate object at the anchor), so name it through the word before.
+extern u32 data_020b5e10[];
 
-    for (i = 0; i < M_RASTER_LINES; i++) {
+// std::min(a, value) that returns the address of `named` (the same word as `value`) when it clamps.
+static inline const u32 &MinNamed(const u32 &a, const u32 &value, const u32 &named) {
+    return value < a ? named : a;
+}
+
+// Blends each raster line from (r0, g0, b0) to (r1, g1, b1); the back table is 4 brighter, clamped to 255.
+// NONMATCHING: scheduling only (the game adds red's +4 before loading the red limit's base).
+
+void DinoGradationBg::SetGradation(int r0, int g0, int b0, int r1, int g1, int b1) {
+    int i;
+    for (i = 0; (u32)i < M_RASTER_LINES; i++) {
         int t = M_RASTER_LINES - i;
-        r = (u32)(0x155 * (r0 * t + rAcc)) >> 16;
-        u32 g = (u32)(0x155 * (g0 * t + gAcc)) >> 16;
-        u32 b = (u32)(0x155 * (b0 * t + bAcc)) >> 16;
-        mFront[i] = (r >> 3) | ((g >> 3) << 5) | ((b >> 3) << 10);
-        u32 g4 = g + 4;
-        u32 b4 = b + 4;
-        const u32 &gc = std::min(g4, data_020b5e14[2]);
-        const u32 &bc = std::min(b4, data_020b5e14[1]);
-        u32 r4 = r + 4;
-        const u32 &rc = std::min(r4, data_020b5e14[0]);
-        mBack[i] = (rc >> 3) | ((gc >> 3) << 5) | ((bc >> 3) << 10);
-        rAcc += r1;
-        gAcc += g1;
-        bAcc += b1;
+        u32 r = (u32)(0x155 * (r0 * t + r1 * i)) >> 16;
+        u32 g = (u32)(0x155 * (g0 * t + g1 * i)) >> 16;
+        u32 b = (u32)(0x155 * (b0 * t + b1 * i)) >> 16;
+        mFront[i] = (r >> 3) | (((b >> 3) << 10) | ((g >> 3) << 5));
+        mBack[i] = (MinNamed(r + 4, data_020b5e14[0], data_020b5e10[1]) >> 3) |
+                   (((std::min(b + 4, data_020b5e14[1]) >> 3) << 10) | ((std::min(g + 4, data_020b5e14[2]) >> 3) << 5));
     }
 }
 
