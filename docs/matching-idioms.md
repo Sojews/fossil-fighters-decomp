@@ -188,6 +188,7 @@ Levers:
 | one slot reused across statements for `std::string("")` | it's a **default argument** (`const std::string &t = ""`, call omits it); explicit temps get one slot each |
 | std::min/max temporaries swapped | swap the declaration order of the inline's locals (`u32 sum, max;` vs `u32 max, sum;`) |
 | `int2type`/tag byte temps swapped | see [MSL](#msl-templates) byte-temp rule |
+| a call's tag byte sits *above* earlier inline temps (game: below, in source order) | create the tag one inline level down: `f(a, p, x)` -> inline `f(a, p, x, int2type<true>())` (cdeque insert construct loop) |
 | `new X(by-value MPoint args)` temp order | `#pragma ipa file` + `static inline X *MNewX(...) { return new X(...); }` (six m/ transfer factories; no effect without ipa) |
 | a value the game keeps on the stack | `T *volatile self = this;`; for a byte temp, a `volatile` by-value param (`__msl_assign(T &d, volatile T s, ...)`) |
 | entry copy of a stack-passed param to its home slot | read it through a volatile into a local (ParseScript) |
@@ -270,6 +271,11 @@ Declaring all of a function's counters/flags at the top also stopped mwcc cross-
 - Member read twice around a post-increment then stored:
   `int next = x + 1; int prev = *(volatile int *)&x; *(volatile int *)&x = next;` (both volatiles; HammerEffect).
 - `u64 d = denom; REG = d;` spills the zero high word like the game.
+- A stack temp the game stores **once after a loop** (`bne loop; str rX, [sp, #N]`), the value held in a register
+  through the loop = a **function-scope struct with a user destructor** holding the value, assigned inside the loop:
+  `__cdeque_elem<T> e; do { e.v = *first; a.construct(p, e.v); ... } while (...)` (MSL cdeque insert x2). A scalar
+  local, a POD struct, a reference-bound temp or a loop-scope holder all store every iteration or vanish.
+- `cmp n, #0; beq X; beq X` (duplicate loop guard) from `for (; n != 0; ...)`: write `if (n != 0) do { ... } while (n != 0);`.
 
 **Truncation/width:** `(int)(u16)x` into a u16 = double `lsl/lsr #16`; obj.h `y = (u8)pos.y` = double `lsl/lsr #24`;
 MFx32PointAngle adds the game's u16 truncation. `s32` (long) weights vs `int` differ.
