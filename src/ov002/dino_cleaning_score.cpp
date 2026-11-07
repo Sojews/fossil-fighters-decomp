@@ -1,5 +1,9 @@
 // DinoCleaningScore: the score screen at the end of a cleaning.
 
+// (The game's -ipa file build: func_ov002_0215bce8's std::max compare copies sit in source order among the other
+// temporaries only under it.)
+#pragma ipa file
+
 #include <algorithm>
 #include <string>
 #include "m/motion.h"
@@ -61,8 +65,9 @@ static inline const u32 &DinoScoreClamp(const u32 &a, const u32 &named, const u3
 
 // Builds the backdrop gradients (grey, blue and red, each in a normal and a brighter version, every channel
 // clamped to 0xFF), the backdrop's raster, the success and failure windows with their score digits, and the arrow.
-// NONMATCHING: 97.9%, the game keeps the digit loops' counters on the stack and this + i * 4 in a register across
+// NONMATCHING: 94.5%, the game keeps the digit loops' counters on the stack and this + i * 4 in a register across
 // the path string's destructor (its frame is 8 bytes bigger): the known "this+i*4 across a string dtor" loop family.
+// Under the file's ipa some of the clamps also load the pooled limit before the colour (97.9% without ipa).
 DinoCleaningScore::DinoCleaningScore(DinoCleaning *cleaning, MSmartOam *oam, u32 score, u8 flag) : MProcess(NULL) {
     mCleaning = cleaning;
     mScore = score;
@@ -178,18 +183,23 @@ static inline MFx32 DinoScoreFloor(MFx32 x) {
 // second mode scores the two rocks' dirt) and shows both on the commentary; the first non-zero score moves on.
 // The rock's ratio read inside lost's expression and the floor applied to the second mode's quotient (its own temp
 // and copy) give the game's frame.
-// NONMATCHING: 97.7%, the std::max operator< copies: the game (-ipa file) keeps them beside the other copies with
-// left and masked as temps, ours keeps them in the lowest slots (needs left and masked named, or a copy is dropped);
-// with `#pragma ipa file` and temps this reaches 97.8 but the ctor drops 97.9 -> 94.5. The second max also selects the
-// other way round (both addresses in registers, `mov r3, r0` after `blt`; max(masked, 0) gets the compare right).
+// The first std::max's compare param copies follow source order among the other temporaries only under the file's ipa.
+// The second max: the game keeps &b (passed as a pointer) as the default and switches to &a (std::max's ternary
+// picks the other way round, and a reference parameter takes b's address after a is built).
+static inline const MFx32 &DinoScoreFxMax(const MFx32 &a, const MFx32 *p) {
+    const MFx32 &b = *p;
+    if (!(a < b)) {
+        p = &a;
+    }
+    return *p;
+}
+
 extern "C" void func_ov002_0215bce8(DinoCleaningScore *score) {
     if (score->mCleaning->GetKasekiRock()) {
         if (!score->mFlag) {
             MFx32 lost = MFx32(100) - score->mCleaning->GetKasekiRock()->GetRock8C()->GetRatio();
-            MFx32 left = MFx32(100) - lost * MFx32(2);
-            score->mUnk84 = MFx32(100 - MFx32ToInt(std::max(MFx32(0), left)));
-            MFx32 masked = DinoScoreFloor(score->mCleaning->GetKasekiRock()->GetRatio() - score->mUnk84);
-            score->mUnk80 = std::max(masked, MFx32(0));
+            score->mUnk84 = MFx32(100 - MFx32ToInt(std::max(MFx32(0), MFx32(100) - lost * MFx32(2))));
+            score->mUnk80 = DinoScoreFxMax(MFx32(0), &(const MFx32 &)DinoScoreFloor(score->mCleaning->GetKasekiRock()->GetRatio() - score->mUnk84));
         } else {
             score->mUnk84 = MFx32(0);
             score->mUnk80 =
@@ -330,7 +340,7 @@ void DinoCleaningScore::Idle() {
 // Everything goes through the game's three pool anchors (0x00-0x7f via the literal block, 0x80-0xff via
 // data_ov002_02164ad8, past 0x100 also via ad8 so the literal is shared); the literal block's struct must be 0x80
 // bytes, or mwcc reloads the screen size's x it just stored (an access past the end of the declared object).
-// NONMATCHING: 92%, the game hoists the screen rect's first zero (and loads data_ov002_02164ad8 first) above the
+// NONMATCHING: 91.8%, the game hoists the screen rect's first zero (and loads data_ov002_02164ad8 first) above the
 // screen size's stores, and the digit points' anchor and value registers swap.
 extern "C" u32 data_ov002_02164b58[], data_ov002_02164b94[], data_ov002_02164b9c[], data_ov002_02164bac[],
     data_ov002_02164bb4[];
