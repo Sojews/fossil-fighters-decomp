@@ -340,19 +340,24 @@ void DinoCleaningHammer::Unk20() {
     GetCleaning()->GetSerial()->AddTail(set);
 }
 
-// The file's static initialization (see dino_static_init.h), with the hammer's fixed-point constants.
-// NONMATCHING (like the drill's): the screen rect sits past the +0x80 anchor and the game hoists its zero half.
 #pragma always_inline on
+#define S data_ov002_02164fb8
 static struct DinoCleaningHammerStaticInit {
-    DinoCleaningHammerStaticInit() {
-        DINO_COMMON_LAYOUT_INIT(data_ov002_02164fb8, 0x70, 0xc8, 0x38, 0x28, 0xd8, 0xe8, 0xf0, 0xf8);
-        DINO_POOL(MFx32, data_ov002_02164fb8, 0x8) = MFx32::FromRaw(0x2400);
-        DINO_POOL(MFx32, data_ov002_02164fb8, 0x10) = MFx32::FromRaw(0x4555);
-        DINO_POOL(MFx32, data_ov002_02164fb8, 0x4) = MFx32::FromRaw(0x400);
-        DINO_POOL(MFx32, data_ov002_02164fb8, 0x18) = MFx32::FromRaw(0x555);
-        DINO_POOL(MFx32, data_ov002_02164fb8, 0xc) = MFx32::FromRaw(0xccd);
-        DINO_POOL(MFx32, data_ov002_02164fb8, 0x0) = DINO_POOL(MFx32, data_ov002_02164fb8, 0xc).Mul(MFx32(10));
-        DINO_POOL(MFx32, data_ov002_02164fb8, 0x14) =
-            DINO_POOL(MFx32, data_ov002_02164fb8, 0xc).Mul(MFx32(10)) * MFx32(1);
-    }
-} sDinoCleaningHammerStaticInit;
+    DinoCleaningHammerStaticInit(int) {}
+} sDinoCleaningHammerStaticInit((
+    DINO_POOL(MPoint, S, 0x70) = MPoint(256, 192),
+    DINO_POOL(MRect, S, 0xc8) = MRect(MPoint(0, 0), DINO_POOL(MPoint, S, 0x70)),
+    DINO_POOL(MPoint, S, 0x38) = MPoint(2, 2),
+    DINO_POOL(MPoint, S, 0x28) = MPoint(36, 28),
+    DINO_POOL(MRect, S, 0xd8) = MRect(MPoint(0, 0), DINO_POOL(MPoint, S, 0x28)),
+    DINO_POOL(MPoint, S, 0xe8) = MPoint(0, 24),
+    DINO_POOL(MPoint, S, 0xf0) = MPoint(256, 192),
+    DINO_POOL(MRect, S, 0xf8) = MRect(0, 0, 256, 24),
+    DINO_POOL(MFx32, S, 0x8) = MFx32::FromRaw(0x2400),
+    DINO_POOL(MFx32, S, 0x10) = MFx32::FromRaw(0x4555),
+    DINO_POOL(MFx32, S, 0x4) = MFx32::FromRaw(0x400),
+    DINO_POOL(MFx32, S, 0x18) = MFx32::FromRaw(0x555),
+    DINO_POOL(MFx32, S, 0xc) = MFx32::FromRaw(0xccd),
+    DINO_POOL(MFx32, S, 0x0) = DINO_POOL(MFx32, S, 0xc).Mul(MFx32(10)),
+    DINO_POOL(MFx32, S, 0x14) = DINO_POOL(MFx32, S, 0xc).Mul(MFx32(10)) * MFx32(1),
+    0));
