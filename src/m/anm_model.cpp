@@ -162,7 +162,6 @@ void MAnmModelBase::Unk0C() {
 
 // A track's value at a frame: random between the keys' bounds, interpolated between the keys around the frame
 // (the last key's bounds after the last key, the first key's before the first).
-// NONMATCHING: 99.8%, register choices differ (search loop temps).
 #pragma opt_common_subs off
 int MAnmModelBase::GetValue(int track, int frame) {
     u32 count = mTracks[track].size();
@@ -171,7 +170,7 @@ int MAnmModelBase::GetValue(int track, int frame) {
     }
     int i;
     for (i = 0; i < mTracks[track].size(); i++) {
-        if (mTracks[track][i].mFrame > frame + 0x10) {
+        if ((int)(frame + 0x10) < mTracks[track][i].mFrame) {
             break;
         }
     }
