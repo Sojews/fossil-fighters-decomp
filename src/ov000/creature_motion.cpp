@@ -577,17 +577,20 @@ extern "C" const char *data_ov000_02193230[], *data_ov000_021932b0[];
 extern "C" u32 data_ov000_021978d8;     // their initialization guard
 extern "C" const char *const data_0208a2a4, *const data_0208a2a8, *const data_0208a2ac;
 
-inline EffectMotionTask::EffectMotionTask(const char *path, int anime, MPoint pos, MPoint offset) : MProcess(NULL) {
+// (path by const&, copied first: the game reads the pooled path only after the base ctor; &mParallel is cached.)
+inline EffectMotionTask::EffectMotionTask(const char *const &path, int anime, MPoint pos, MPoint offset) : MProcess(NULL) {
+    const char *p = path;
     MSmartOam *oam = new MSmartOam(10, 0, TRUE);
     oam->SetOffset(offset);
-    MMotion *motion = new MMotion(std::string(path), oam, 0, 1);
+    MMotion *motion = new MMotion(std::string(p), oam, 0, 1);
     motion->SetPosition(pos);
     motion->SetPriority(1);
     motion->Show();
     motion->Play(anime, 0);
     motion->GetUnit()->SetMode(1);
-    mParallel.AddTail(motion);
-    mParallel.AddTail(oam);
+    MTaskSet *par = &mParallel;
+    par->AddTail(motion);
+    par->AddTail(oam);
     mSerial.AddTail(motion->CreateWaitStopTask(), MTaskExitTransfer::Create(this));
 }
 
@@ -775,8 +778,7 @@ void DinoBattleViewCreature::OnMessage(MMessage *msg) {
             return;
         }
         SetUnk118(req->mUnk14);
-        const char *path = data_ov000_02193030[1];
-        mTasks11C[0]->AddTail(new EffectMotionTask(path, 2, mMotion->GetPosition(),
+        mTasks11C[0]->AddTail(new EffectMotionTask(data_ov000_02193030[1], 2, mMotion->GetPosition(),
                                                    ((MSmartOam *)mUnkD8)->GetOffset()));
         MSerialTaskSet *seq = new MSerialTaskSet(TRUE);
         MTask *back = mMotion->CreatePlayTransfer(func_ov000_0216f698(mUnkB4, unk134, mUnk159), 0);
@@ -835,7 +837,7 @@ void DinoBattleViewCreature::OnMessage(MMessage *msg) {
                 seq->AddTail(mMotion->CreatePlayTransfer(req->mUnk18, 0), wait, back);
                 mParallel.AddTail(seq);
             }
-            EffectMotionTask *effect = new EffectMotionTask(path, req->mUnk14, mMotion->GetPosition() + MPoint(dx, dy),
+            EffectMotionTask *effect = new EffectMotionTask(path, req->mUnk14, mMotion->GetPosition().Offset(dx, dy),
                                                             ((MSmartOam *)mUnkD8)->GetOffset());
             if (keep) {
                 mTasks11C[0]->AddTail(effect);

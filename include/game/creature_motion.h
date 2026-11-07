@@ -61,7 +61,7 @@ public:
 class EffectMotionTask : public MProcess {
 public:
     // Plays the motion file's anime once at pos (on its own OAM, offset like the creature's), then exits.
-    EffectMotionTask(const char *path, int anime, MPoint pos, MPoint offset);
+    EffectMotionTask(const char *const &path, int anime, MPoint pos, MPoint offset);
     virtual ~EffectMotionTask();
     virtual void Idle();
 };
