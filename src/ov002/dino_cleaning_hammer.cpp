@@ -340,6 +340,12 @@ void DinoCleaningHammer::Unk20() {
     GetCleaning()->GetSerial()->AddTail(set);
 }
 
+// The file's static initialization (see dino_static_init.h), with the hammer's fixed-point constants. Written as one
+// file-scope initializer expression rather than a constructor body: the expression's temporaries are __sinit's own,
+// so they take the game's descending slots (a constructor's inlined body gets other slots), and each rect is built
+// from MPoint(0, 0) and the pool point directly (only the MRect ctor's argument copies go below).
+// NONMATCHING: the game hoists the screen rect's zero half above the size's stores (its rect is reached through the
+// +0x80 anchor, the task's typeinfo, as a separate object), and keeps the last product's temporary above MFx32(1)'s.
 #pragma always_inline on
 #define S data_ov002_02164fb8
 static struct DinoCleaningHammerStaticInit {
@@ -361,3 +367,4 @@ static struct DinoCleaningHammerStaticInit {
     DINO_POOL(MFx32, S, 0x0) = DINO_POOL(MFx32, S, 0xc).Mul(MFx32(10)),
     DINO_POOL(MFx32, S, 0x14) = DINO_POOL(MFx32, S, 0xc).Mul(MFx32(10)) * MFx32(1),
     0));
+#undef S
