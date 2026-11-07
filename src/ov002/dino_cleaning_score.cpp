@@ -176,22 +176,26 @@ static inline MFx32 DinoScoreFloor(MFx32 x) {
 
 // Works out the score from how clean the rock is (mUnk84, what's left of the fossil and mUnk80, the score; the
 // second mode scores the two rocks' dirt) and shows both on the commentary; the first non-zero score moves on.
-// NONMATCHING: 96%, the MFx32 temporaries' stack slots differ (the game's max copies sit with the others, ours lowest).
+// The rock's ratio read inside lost's expression and the floor applied to the second mode's quotient (its own temp
+// and copy) give the game's frame.
+// NONMATCHING: 97.6%, the std::max operator< copies: the game (-ipa file) keeps them beside the other copies with
+// left and masked as temps, ours keeps them in the lowest slots (needs left and masked named, or a copy is dropped);
+// with `#pragma ipa file` and temps this reaches 97.8 but the ctor drops 97.9 -> 94.5. The second max also selects the
+// other way round (`mov r3, r0` after `blt`).
 extern "C" void func_ov002_0215bce8(DinoCleaningScore *score) {
     if (score->mCleaning->GetKasekiRock()) {
         if (!score->mFlag) {
-            const MFx32 &ratio = score->mCleaning->GetKasekiRock()->GetRock8C()->GetRatio();
-            MFx32 lost = MFx32(100) - ratio;
+            MFx32 lost = MFx32(100) - score->mCleaning->GetKasekiRock()->GetRock8C()->GetRatio();
             MFx32 left = MFx32(100) - lost * MFx32(2);
             score->mUnk84 = MFx32(100 - MFx32ToInt(std::max(MFx32(0), left)));
             MFx32 masked = DinoScoreFloor(score->mCleaning->GetKasekiRock()->GetRatio() - score->mUnk84);
             score->mUnk80 = std::max(MFx32(0), masked);
         } else {
             score->mUnk84 = MFx32(0);
-            MFx32 q = ((MFx32(100) - score->mCleaning->GetKasekiRock()->GetRock8C()->GetRatio()) * MFx32(2) +
-                       (MFx32(100) - score->mCleaning->GetKasekiRock()->GetRock90()->GetRatio()) * MFx32(3)) /
-                      MFx32(5);
-            score->mUnk80 = MFx32::FromRaw(q.v & 0xFFFFF000);
+            score->mUnk80 =
+                DinoScoreFloor(((MFx32(100) - score->mCleaning->GetKasekiRock()->GetRock8C()->GetRatio()) * MFx32(2) +
+                                (MFx32(100) - score->mCleaning->GetKasekiRock()->GetRock90()->GetRatio()) * MFx32(3)) /
+                               MFx32(5));
         }
     } else {
         score->mUnk84 = MFx32(0);
