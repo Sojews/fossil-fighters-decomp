@@ -529,6 +529,13 @@ namespace std {
         return __cdeque_copy_in(first, last, result);
     }
 
+    // p's index from the first element b (insert works it out through this, with pi an out-parameter: that gives the game's pos.ptr_ register and pi/back slots).
+    template <class T, class A> inline void __cdeque_index(size_t &pi, T *p, T *b, const __cdeque_deleter<T, A> &d) {
+        pi = p - b;
+        if (p < b) {
+            pi += d.cap();
+        }
+    }
     // (insert reads its first element's address through this: a non-member inline moves the value's spill slot down.)
     template <class T, class A> inline T *__cdeque_first_ptr(const __cdeque_deleter<T, A> &d) {
         return d.data_ + d.start_;
@@ -674,10 +681,8 @@ namespace std {
             return;
         }
         T *b = __cdeque_first_ptr(*this);
-        size_t pi = pos.ptr_ - b;
-        if (pos.ptr_ < b) {
-            pi += cap();
-        }
+        size_t pi;
+        __cdeque_index(pi, pos.ptr_, b, *this);
         size_t c = capacity();
         if (n <= c && size_ <= c - n) {
             iterator i(b, *this);
