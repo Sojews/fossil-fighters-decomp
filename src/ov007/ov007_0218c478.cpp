@@ -38,11 +38,11 @@ static struct Ov007_0218c478StaticInit {
         DINO_POOL_WORD(data_ov007_02191120, 0x14) = 93;
         DINO_POOL_WORD(data_ov007_02191120, 0x18) = 100;
         DINO_POOL_WORD(data_ov007_02191120, 0x1c) = 93;
-        DINO_POOL_WORD(data_ov007_02191120, 0x20) = 177;
-        DINO_POOL_WORD(data_ov007_02191120, 0x24) = 93;
         DINO_POOL_WORD(data_ov007_02191120, 0x28) = 27;
-        DINO_POOL_WORD(data_ov007_02191120, 0x2c) = 66;
+        DINO_POOL_WORD(data_ov007_02191120, 0x24) = 93;
         DINO_POOL_WORD(data_ov007_02191150, 0x0) = 95;
+        DINO_POOL_WORD(data_ov007_02191120, 0x2c) = 66;
+        DINO_POOL_WORD(data_ov007_02191120, 0x20) = 177;
         DINO_POOL_WORD(data_ov007_02191150, 0x4) = 66;
         DINO_POOL_WORD(data_ov007_02191158, 0x0) = 164;
         DINO_POOL_WORD(data_ov007_02191158, 0x4) = 66;
