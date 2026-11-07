@@ -826,11 +826,13 @@ s32 ParseInt(char **p);
 void SkipWhitespace(char **p);
 }
 
-// NONMATCHING (99.8%): the game keeps the (unused) line counter in an ordinary stack slot; ours drops it unless it is
-// volatile, which moves it to the top of the frame.
+// NONMATCHING (99.97%): the game keeps the (unused) line counter in an ordinary stack slot; ours drops it unless it is
+// volatile, which moves it to the top of the frame. With the counter kept as a plain variable (probe: pass it to an
+// empty out-of-line function) every other slot and instruction matches.
 // Reads the scene script: after its "script" line, sections that each make an object (a model, emitter, trail,
 // camera target or sound) followed by lines of keys for it ("wait" moves the key frame on).
 void MPolygonChar::Load(const char *script, const char *model) {
+    char *text;
     MProcessPause pause(this, &mMutex, &mPauseCount);
     MFile file;
     char *path = new char[0x200];
@@ -845,7 +847,7 @@ void MPolygonChar::Load(const char *script, const char *model) {
     dir[slash + 1] = 0;
     Reset();
     if (file.Open(std::string(script))) {
-        char *text = new char[file.GetLength() + 1];
+        text = new char[file.GetLength() + 1];
         text[file.GetLength()] = 0;
         file.Read(text, file.GetLength());
         file.Close();
@@ -858,7 +860,8 @@ void MPolygonChar::Load(const char *script, const char *model) {
         int frame;
         MAnmKey key;
         for (char *line = ReadLine(&cursor); line != NULL; line = ReadLine(&cursor)) {
-            for (int i = 0; i < 16; i++) {
+            int i;
+            for (i = 0; i < 16; i++) {
                 mFieldPresent[i] = mFieldNumeric[i] = 0;
             }
             int n = 0;
@@ -867,7 +870,7 @@ void MPolygonChar::Load(const char *script, const char *model) {
                 mFieldPresent[n] = 1;
                 n++;
             } while (n < 16 && SkipComma(&line));
-            for (int i = 0; i < 16; i++) {
+            for (i = 0; i < 16; i++) {
                 if (mFieldPresent[i]) {
                     char *field = mFields[i];
                     mFieldValues[i] = ParseFx32(&field);
@@ -913,8 +916,11 @@ void MPolygonChar::Load(const char *script, const char *model) {
                             }
                         }
                     }
-                    anm->mStartFrame = mFieldNumeric[2] == 1 ? mFieldValues[2] >> 8 : 0;
-                    anm->mEndFrame = 0x40000000;
+                    if (mFieldNumeric[2] == 1) {
+                        anm->SetFrames(mFieldValues[2] >> 8, 0x40000000);
+                    } else {
+                        anm->SetFrames(0, 0x40000000);
+                    }
                     anm->unk100 = count++;
                     mParallel.AddHead(anm);
                     if (mUnk74 == NULL) {
@@ -1068,7 +1074,7 @@ void MPolygonChar::Load(const char *script, const char *model) {
                             if (mFieldNumeric[1] == 1) {
                                 key.mFrame = mFieldValues[1] >> 8;
                                 key.mUnkC = 0;
-                                for (int i = 0; i < 9; i++) {
+                                for (i = 0; i < 9; i++) {
                                     if (mFieldNumeric[2 + i] == 1) {
                                         key.mMin = mFieldValues[2 + i];
                                         key.mMax = mFieldValues[2 + i];
