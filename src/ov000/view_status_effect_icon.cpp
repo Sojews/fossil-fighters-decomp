@@ -201,7 +201,7 @@ void DinoBattleViewStatusEffectIcon::SetEffects(int count, const u8 *effects) {
             slot = 0;
             break;
         }
-        u32 bit = 1 << e;
+        u32 bit = 1 << (u32)e;
         int num = 0;
         BOOL flag = FALSE;
         u32 has = bit & present;
