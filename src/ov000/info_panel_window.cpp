@@ -293,9 +293,9 @@ static inline void DinoInfoChanges(DinoBattleViewCreatureInfo *info, int *change
 
 // Shows a creature's page (the stats with their changes, its text and resistances, or two of its attacks); the
 // numbers show as question marks for a creature not yet known.
-// NONMATCHING: in the two stat loops the text buffer's address is set up before the induction variables (the
-// game sets it up after them).
-#pragma opt_loop_invariants off
+// The text pointers are set in each branch (one set at the loop top would be hoisted above the induction variables),
+// `(int) page * 2 + i` is strength-reduced into the game's late index, and the special attack's (u32) casts are
+// hoisted into its late copy, so both take the game's lowest spill slots.
 void DinoBattleViewCreatureInfo::Update(BOOL show, DinoBattleViewCreature *creature, u32 kind, u8 arrows, u32 page) {
     mUnk128 = 0;
     if (!show) {
@@ -334,10 +334,11 @@ void DinoBattleViewCreatureInfo::Update(BOOL show, DinoBattleViewCreature *creat
         }
         DinoInfoStatMap map = data_ov000_0218fff8;
         mUnk12C = 0;
+        char buf[8];
+        char *text;
         for (int i = 0; i < 6; i++) {
-            char buf[8];
-            char *text = buf;
             if (known) {
+                text = buf;
                 if (i == 1) {
                     OS_SPrintf(text, data_ov000_02194ff0, stats[i]);
                 } else if (map.index[i] != -1) {
@@ -357,32 +358,37 @@ void DinoBattleViewCreatureInfo::Update(BOOL show, DinoBattleViewCreature *creat
                 } else {
                     OS_SPrintf(text, data_ov000_02194ff4, stats[i]);
                 }
-            } else if (i == 1) {
-                DINO_INFO_COPY(text, data_ov000_02194ffc);
             } else {
-                int slot = map.index[i];
-                if (slot != -1) {
-                    DINO_INFO_COPY(text, data_ov000_02195000);
-                    int change = changes[slot];
-                    if (change != 0) {
-                        func_ov000_0217d220(this, text, change < 0 ? 1 : 2);
-                    }
+                text = buf;
+                if (i == 1) {
+                    DINO_INFO_COPY(text, data_ov000_02194ffc);
                 } else {
-                    DINO_INFO_COPY(text, data_ov000_02195004);
+                    int slot = map.index[i];
+                    if (slot != -1) {
+                        DINO_INFO_COPY(text, data_ov000_02195000);
+                        int change = changes[slot];
+                        if (change != 0) {
+                            func_ov000_0217d220(this, text, change < 0 ? 1 : 2);
+                        }
+                    } else {
+                        DINO_INFO_COPY(text, data_ov000_02195004);
+                    }
                 }
             }
             mUnk88[i]->SetText(std::string(text));
         }
         for (int i = 0; i < 5; i++) {
             char buf2[8];
-            char *text = buf2;
+            char *text;
             if (i == 0) {
+                text = buf2;
                 if (known) {
                     OS_SPrintf(text, data_ov000_02195008, mCreature->GetUnkF4());
                 } else {
                     DINO_INFO_COPY(text, data_ov000_02195010);
                 }
             } else {
+                text = buf2;
                 int change = changes[i];
                 if (change != 0 && known) {
                     OS_SPrintf(text, data_ov000_02195018, change < 0 ? -change : change);
@@ -397,14 +403,15 @@ void DinoBattleViewCreatureInfo::Update(BOOL show, DinoBattleViewCreature *creat
     }
     case 2: {
         gDinoResource->GetCreatureDef(mCreature->GetUnkA8());
-        u32 count = mCreature->CountAttacks();
-        u32 special = mCreature->GetSpecialAttack();
+        int count = mCreature->CountAttacks();
+        int special = mCreature->GetSpecialAttack();
         if (special != 0) {
             count++;
         }
-        for (int i = 0, index = page * 2; i < 2; index++, i++) {
-            if (index < (int) count) {
-                u32 attack = (u32) index < mCreature->CountAttacks() ? mCreature->GetAttack(index) : special;
+        for (int i = 0; i < 2; i++) {
+            int index = (int) page * 2 + i;
+            if (index < count) {
+                u32 attack = (u32) index < mCreature->CountAttacks() ? mCreature->GetAttack(index) : (u32) special;
                 mUnk88[i]->SetText(std::string(known ? gDinoResource->GetAttackName(attack) : data_ov000_02195020));
                 const DinoAttackDef *def = gDinoResource->GetAttackDef(attack);
                 char text[16];
@@ -426,7 +433,7 @@ void DinoBattleViewCreatureInfo::Update(BOOL show, DinoBattleViewCreature *creat
                 } else {
                     bonusText->SetText(std::string(data_ov000_02195004.c));
                 }
-                if (attack == special) {
+                if (attack == (u32) special) {
                     mUnkB4[i]->Play(3, 0);
                 } else {
                     mUnkB4[i]->Play(func_ov000_02179aa0(attack) ? 2 : 1, 0);
@@ -497,7 +504,6 @@ void DinoBattleViewCreatureInfo::Update(BOOL show, DinoBattleViewCreature *creat
     }
     }
 }
-#pragma opt_loop_invariants reset
 
 void DinoBattleViewCreatureInfo::Show() {
     mWindow->mPicture->Show();
