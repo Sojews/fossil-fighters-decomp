@@ -569,12 +569,15 @@ MTask *DinoTalkWindow::CreateCloseTask() {
         if (mNamePanel != NULL) {
             set->AddTail(MTaskExitTransfer::Create(mNamePanel));
         }
-        MSerialTaskSet *slide = new MSerialTaskSet(TRUE);
-        slide->AddTail(mFrame->CreateCoordTransfer(-0x300, mOffset.y + 0x70), new MTimer(3),
-                       mFrame->CreateCoordTransfer(-0x200, mOffset.y + 0x70), new MTimer(3),
-                       mFrame->CreateCoordTransfer(-0x100, mOffset.y + 0x70), new MTimer(3),
-                       mFrame->CreateCoordTransfer(0, mOffset.y + 0x70), new MTimer(3));
-        set->AddTail(slide);
+        set->AddTail((new MSerialTaskSet(TRUE))
+                         ->Add(mFrame->CreateCoordTransfer(-0x300, mOffset.y + 0x70))
+                         ->Add(new MTimer(3))
+                         ->Add(mFrame->CreateCoordTransfer(-0x200, mOffset.y + 0x70))
+                         ->Add(new MTimer(3))
+                         ->Add(mFrame->CreateCoordTransfer(-0x100, mOffset.y + 0x70))
+                         ->Add(new MTimer(3))
+                         ->Add(mFrame->CreateCoordTransfer(0, mOffset.y + 0x70))
+                         ->Add(new MTimer(3)));
     }
     return set;
 }
