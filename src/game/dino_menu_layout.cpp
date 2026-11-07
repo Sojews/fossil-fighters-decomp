@@ -2,8 +2,10 @@
 // positions used by the overlays' menus) at data_020b5814 onward (see dino_static_init.h).
 // The pool's words past 0x7c are written through the first anchor with offsets >= 0x80 (mwcc then makes the second
 // anchor, data_020b5894, itself); each other rect or point goes through one reassigned pointer.
-// NONMATCHING: register allocation: the game keeps the anchors in r5/r6 and the rect pointer in r4 (ours r4/r5 and
-// r6), which also moves three stores.
+// The rect at data_020b5914 is written through its own symbol (that, and the anchors above, give the game's register
+// allocation).
+// NONMATCHING: scheduling: after an anchor-relative object, the game stores its last word before loading the next
+// object's first value (ours one instruction earlier, four times).
 
 #include "game/dino_static_init.h"
 
@@ -78,11 +80,10 @@ static struct DinoMenuLayoutStaticInit {
         p = (volatile s32 *) data_020b58a8;
         p[0] = 113;
         p[1] = 175;
-        p = (volatile s32 *) data_020b5914;
-        p[3] = 27;
-        p[4] = 3;
-        p[5] = 67;
-        p[6] = 18;
+        DINO_POOL_WORD(data_020b5914, 0xc) = 27;
+        DINO_POOL_WORD(data_020b5914, 0x10) = 3;
+        DINO_POOL_WORD(data_020b5914, 0x14) = 67;
+        DINO_POOL_WORD(data_020b5914, 0x18) = 18;
         p = (volatile s32 *) data_020b5930;
         p[0] = 68;
         p[1] = 3;
