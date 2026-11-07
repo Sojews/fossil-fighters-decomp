@@ -321,7 +321,8 @@ inline DinoCleaningSampleMenuKasekiRockIdItem::DinoCleaningSampleMenuKasekiRockI
                                                                                       MPoint pos)
     : mValue(value), mDefs(std::string(data_020bcc24.mKasekiDefsPath_04)) {
     mView = new MIndicator(new MSmartObjCanvas(oam, MPoint(0x50, 0x10), gDinoResource->GetUnkTable(), TRUE), font, 0);
-    mView->SetPosition(pos - mView->GetSize() / 2);
+    MPoint half = mView->GetSize() / 2;
+    mView->SetPosition(MPoint(pos.x - half.x, pos.y - half.y));
     mView->Show();
     mParallel.AddTail(mView);
     mBuffer = new u32[mDefs.Get()->count];
@@ -345,7 +346,8 @@ inline DinoCleaningSampleKasekiTypeItem::DinoCleaningSampleKasekiTypeItem(MMenu 
                                                                           u32 *type, MPoint pos) {
     mType = type;
     mView = new MIndicator(new MSmartObjCanvas(oam, MPoint(0x50, 0x10), gDinoResource->GetUnkTable(), TRUE), font, 0);
-    mView->SetPosition(pos - mView->GetSize() / 2);
+    MPoint half = mView->GetSize() / 2;
+    mView->SetPosition(MPoint(pos.x - half.x, pos.y - half.y));
     mView->Show();
     mParallel.AddTail(mView);
     mKeyItemA = new DinoCleaningSampleMenuDecItem((int *)mType, 0, 1, oam, font, MPoint(pos.x - 0x40, pos.y));
@@ -375,8 +377,7 @@ inline DinoCleaningSampleMenuRandomItem::DinoCleaningSampleMenuRandomItem(MSmart
     mUnk94 = unk94;
     SetKeys(0x100);
     mView = new DinoCommonLabel(oam, font, gDinoResource->GetUnkTable(), data_0208a3f8, MPoint(0, 0));
-    MPoint half = mView->GetSize() / 2;
-    mView->SetPosition(MPoint(pos.x - half.x, pos.y - half.y));
+    mView->SetPosition(pos - mView->GetSize() / 2);
     mView->Show();
     mParallel.AddTail(mView);
 }
@@ -384,16 +385,17 @@ inline DinoCleaningSampleMenuRandomItem::DinoCleaningSampleMenuRandomItem(MSmart
 inline DinoCleaningSampleMenuStartItem::DinoCleaningSampleMenuStartItem(MSmartOam *oam, MFont *font, MPoint pos) {
     SetKeys(8);
     mView = new DinoCommonLabel(oam, font, gDinoResource->GetUnkTable(), data_0208a3fc, MPoint(0, 0));
-    MPoint half = mView->GetSize() / 2;
-    mView->SetPosition(MPoint(pos.x - half.x, pos.y - half.y));
+    mView->SetPosition(pos - mView->GetSize() / 2);
     mView->Show();
     mParallel.AddTail(mView);
 }
 
 // The debug cleaning menu: the rock (by id), its type and the chips' type, a random pick, and start.
-// NONMATCHING (95.5%): the game inlines the items' constructors with their own inline calls (MPoint, the resource,
-// the key items' constructors), which takes this file's `#pragma ipa file`; the inlined temporaries still take other
-// stack slots (and the game keeps the rock item's pos.y in a spill slot).
+// NONMATCHING (99.99%): the game inlines the items' constructors with their own inline calls (MPoint, the resource,
+// the key items' constructors), which takes this file's `#pragma ipa file`. The rock, rock type and chips items center
+// their view through a named half size and the random and start items through MPoint::operator- (that decides the
+// frame, the spills and the pos.y the rock item keeps); only those three centerings' two MPoint temporaries (the
+// size and the position) swap slots.
 void DinoCleaningSampleMenu::OnStart() {
     mOam = new MSmartOam(0x50, 0, 1);
     GetInput()->SetRepeat(0x1030, 0x14, 2);
