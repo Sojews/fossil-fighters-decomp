@@ -218,8 +218,8 @@ namespace std {
         iterator end_fields() {
             T *p = data_ + (cap() != 0 ? (start_ + size_) % cap() : 0);
             T *b = data_;
-            T *e = b + cap();
             T *f = b + start_;
+            T *e = b + cap();
             iterator r;
             r.ptr_ = p;
             r.beg_ = b;
