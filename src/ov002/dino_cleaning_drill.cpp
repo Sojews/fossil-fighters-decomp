@@ -261,7 +261,7 @@ void DinoCleaningDrill::Unk20() {
             mUnk878 = 1;
             DinoSoundFunc_0201feec(0x2F);
         }
-        if (cell.x == mPrevCell.x && cell.y == mPrevCell.y) {
+        if (cell == mPrevCell) {
             MI_CpuFill8(mPrevMarks, 0, sizeof(mPrevMarks));
             MI_CpuFill8(mMarks, 0, sizeof(mMarks));
             MarkCell(cell.x, cell.y);
