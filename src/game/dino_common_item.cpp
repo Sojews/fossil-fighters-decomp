@@ -108,7 +108,9 @@ extern "C" u32 data_020ba764[];
 extern "C" u32 data_020ba7e0[];
 extern "C" u32 data_020ba7f0[];
 extern "C" u32 data_020ba800[];
-// NONMATCHING: scheduling (mwcc hoists the second rect's address load above the first rect's last stores).
+// NONMATCHING: scheduling. The game computes the second rect's -8 (16 - 0x18) right after loading its address and
+// before storing its left; that only happens when the -8 store comes first, so ours stores top before left (a
+// volatile left-first order instead hoists the address load above the first rect's last two stores).
 static struct DinoCommonItemStaticInit {
     DinoCommonItemStaticInit() {
         volatile s32 *p = (volatile s32 *) data_020ba764;
@@ -116,12 +118,12 @@ static struct DinoCommonItemStaticInit {
         p[0x70 / 4] = -16;
         p[0x74 / 4] = 32;
         p[0x78 / 4] = 16;
-        volatile s32 *q = (volatile s32 *) data_020ba7e0;
-        q[0] = -32;
-        q[1] = -8;
-        q[2] = 32;
-        q[3] = 8;
-        q = (volatile s32 *) data_020ba7f0;
+        s32 *r = (s32 *) data_020ba7e0;
+        r[1] = -8;
+        r[0] = -32;
+        r[2] = 32;
+        r[3] = 8;
+        volatile s32 *q = (volatile s32 *) data_020ba7f0;
         q[0] = -8;
         q[1] = -8;
         q[2] = 8;
