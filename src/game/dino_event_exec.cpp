@@ -3054,14 +3054,9 @@ struct DinoWarpDefs {
     MFx32 unk24;
 };
 
-// The walk's time: the 2 and the 10 as by-value parameters give the game's temporaries (copy and parameter); returning
-// the MFx32 (converted by the caller) moves the product's temporary up beside them.
-static inline MFx32 WarpWalkFrames(const MFx32Point &offset, MFx32 two, MFx32 ten) {
-    return offset.Length() / two * ten;
-}
-
-// NONMATCHING: the game spills two of the tasks in swapped stack slots, and keeps the length and the quotient beside
-// the 2 and the 10 (ours puts them in the low copies area).
+// The serial's four tasks are one AddTail expression (evaluated right to left: wait, move, timer, turn; the set is
+// made last): as temporaries the wait and move tasks take the game's spill slots, and the walk time's 2 and 10 are
+// made before the square root.
 void DinoEventExecAutoWarp::StateArrive() {
     if ((mNewBgm != 0 && mScene != mNewScene) || mBgm != mNewBgm) {
         DinoSoundLoadScene(mNewScene);
@@ -3089,13 +3084,13 @@ void DinoEventExecAutoWarp::StateArrive() {
         do {
             offset += step;
         } while (((DinoFieldMapArea *)mEvent->GetField()->GetMap()->GetArea(pos + offset))->id == area->id);
-        MTask *wait = mEvent->GetField()->CreateCharaWaitMoveTask(mEvent->GetField()->GetCamera()->GetFocus());
-        MTask *move = mEvent->GetField()->CreateCharaMoveOffsetTask(mEvent->GetField()->GetCamera()->GetFocus(), offset,
-            MFx32ToInt(WarpWalkFrames(offset, MFx32(2), MFx32(10))), 0, 0);
-        MTimer *timer = new MTimer(10);
-        MTask *turn = mEvent->GetField()->CreateCharaAngleTask(mEvent->GetField()->GetCamera()->GetFocus(), angle, 1, 0);
-        MSerialTaskSet *serial = new MSerialTaskSet(TRUE);
-        serial->AddTail(turn, timer, move, wait);
+        MSerialTaskSet *serial;
+        (serial = new MSerialTaskSet(TRUE))->AddTail(
+            mEvent->GetField()->CreateCharaAngleTask(mEvent->GetField()->GetCamera()->GetFocus(), angle, 1, 0),
+            new MTimer(10),
+            mEvent->GetField()->CreateCharaMoveOffsetTask(mEvent->GetField()->GetCamera()->GetFocus(), offset,
+                MFx32ToInt(offset.Length() / MFx32(2) * MFx32(10)), 0, 0),
+            mEvent->GetField()->CreateCharaWaitMoveTask(mEvent->GetField()->GetCamera()->GetFocus()));
         tasks->AddTail(serial);
         for (int i = 0; i < 100u; i++) {
             DinoFieldChara *chara = mEvent->GetField()->GetCharaSlot(i);
