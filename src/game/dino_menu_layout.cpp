@@ -1,9 +1,9 @@
 // A file whose only code is its static initialization: the shared menu layout points and rects (screen
 // positions used by the overlays' menus) at data_020b5814 onward (see dino_static_init.h).
-// The pool's first 0x80 bytes and the rest go through two named anchor pointers (the second at pool + 0x80), declared
-// in that order; each other rect or point goes through one reassigned pointer.
-// NONMATCHING: register allocation: the game keeps pool80 in r6 and the rect pointer in r4 (ours r4 and r6), which
-// also moves three stores.
+// The pool's words past 0x7c are written through the first anchor with offsets >= 0x80 (mwcc then makes the second
+// anchor, data_020b5894, itself); each other rect or point goes through one reassigned pointer.
+// NONMATCHING: register allocation: the game keeps the anchors in r5/r6 and the rect pointer in r4 (ours r4/r5 and
+// r6), which also moves three stores.
 
 #include "game/dino_static_init.h"
 
@@ -47,13 +47,11 @@ extern "C" u32 data_020b5a70[];
 extern "C" u32 data_020b5a80[];
 static struct DinoMenuLayoutStaticInit {
     DinoMenuLayoutStaticInit() {
-        volatile s32 *pool = (volatile s32 *) data_020b5814;
-        volatile s32 *pool80 = (volatile s32 *) data_020b5894;
         volatile s32 *p;
-        pool80[19] = 6;
-        pool80[20] = 176;
-        pool80[21] = 35;
-        pool80[22] = 191;
+        DINO_POOL_WORD(data_020b5814, 0xcc) = 6;
+        DINO_POOL_WORD(data_020b5814, 0xd0) = 176;
+        DINO_POOL_WORD(data_020b5814, 0xd4) = 35;
+        DINO_POOL_WORD(data_020b5814, 0xd8) = 191;
         p = (volatile s32 *) data_020b58f0;
         p[0] = 37;
         p[1] = 176;
@@ -69,8 +67,8 @@ static struct DinoMenuLayoutStaticInit {
         p[1] = 176;
         p[2] = 128;
         p[3] = 191;
-        pool[31] = 20;
-        pool80[0] = 175;
+        DINO_POOL_WORD(data_020b5814, 0x7c) = 20;
+        DINO_POOL_WORD(data_020b5814, 0x80) = 175;
         p = (volatile s32 *) data_020b5898;
         p[0] = 51;
         p[1] = 175;
@@ -195,10 +193,10 @@ static struct DinoMenuLayoutStaticInit {
         p[1] = 22;
         p[2] = 162;
         p[3] = 109;
-        pool80[7] = 12;
-        pool80[8] = 176;
-        pool80[9] = 42;
-        pool80[10] = 191;
+        DINO_POOL_WORD(data_020b5814, 0x9c) = 12;
+        DINO_POOL_WORD(data_020b5814, 0xa0) = 176;
+        DINO_POOL_WORD(data_020b5814, 0xa4) = 42;
+        DINO_POOL_WORD(data_020b5814, 0xa8) = 191;
         p = (volatile s32 *) data_020b58c0;
         p[0] = 46;
         p[1] = 176;
@@ -209,31 +207,31 @@ static struct DinoMenuLayoutStaticInit {
         p[1] = 176;
         p[2] = 110;
         p[3] = 191;
-        pool[17] = 26;
-        pool[18] = 175;
+        DINO_POOL_WORD(data_020b5814, 0x44) = 26;
+        DINO_POOL_WORD(data_020b5814, 0x48) = 175;
         p = (volatile s32 *) data_020b5860;
         p[0] = 60;
         p[1] = 175;
         p = (volatile s32 *) data_020b5868;
         p[0] = 94;
         p[1] = 175;
-        pool[1] = 160;
-        pool[2] = 180;
-        pool[3] = 156;
-        pool[4] = 144;
-        pool[5] = 113;
-        pool[6] = 173;
-        pool[7] = 19;
-        pool[8] = 173;
-        pool[9] = 104;
-        pool[10] = 164;
-        pool[11] = 197;
-        pool[12] = 187;
-        pool[13] = 10;
-        pool[14] = 164;
-        pool[15] = 103;
-        pool[16] = 187;
-        pool[0] = 8192;
+        DINO_POOL_WORD(data_020b5814, 0x4) = 160;
+        DINO_POOL_WORD(data_020b5814, 0x8) = 180;
+        DINO_POOL_WORD(data_020b5814, 0xc) = 156;
+        DINO_POOL_WORD(data_020b5814, 0x10) = 144;
+        DINO_POOL_WORD(data_020b5814, 0x14) = 113;
+        DINO_POOL_WORD(data_020b5814, 0x18) = 173;
+        DINO_POOL_WORD(data_020b5814, 0x1c) = 19;
+        DINO_POOL_WORD(data_020b5814, 0x20) = 173;
+        DINO_POOL_WORD(data_020b5814, 0x24) = 104;
+        DINO_POOL_WORD(data_020b5814, 0x28) = 164;
+        DINO_POOL_WORD(data_020b5814, 0x2c) = 197;
+        DINO_POOL_WORD(data_020b5814, 0x30) = 187;
+        DINO_POOL_WORD(data_020b5814, 0x34) = 10;
+        DINO_POOL_WORD(data_020b5814, 0x38) = 164;
+        DINO_POOL_WORD(data_020b5814, 0x3c) = 103;
+        DINO_POOL_WORD(data_020b5814, 0x40) = 187;
+        DINO_POOL_WORD(data_020b5814, 0x0) = 8192;
         DINO_POOL_U16(data_020b5854, 0x1e) = 41235;
         DINO_POOL_U16(data_020b5854, 0x20) = 53055;
         DINO_POOL_U16(data_020b5854, 0x22) = 38065;
