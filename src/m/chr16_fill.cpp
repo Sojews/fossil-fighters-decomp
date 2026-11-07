@@ -59,22 +59,23 @@ void MChr16Fill::Transfer() {
         first = 0;
     }
     u32 last;
-    int overX = x + w - tilesX * 8;
+    int overX = w + x - tilesX * 8;
     if (overX > 0) {
         last = cols - ((overX + 7) >> 3);
     } else {
         last = cols;
     }
     if (rows != 0) {
+        u32 lastCol = cols - 1;
         u32 mask = leftMask & rightMask;
         do {
             for (u32 c = 0; c < (u32) cols; c++) {
                 if (c >= first && c < last) {
-                    if (c == 0 && c == cols - 1) {
+                    if (c == 0 && c == lastCol) {
                         *p = (*p & ~mask) | (fill & mask);
                     } else if (c == 0) {
                         *p = (*p & ~leftMask) | (leftMask & fill);
-                    } else if (c == cols - 1) {
+                    } else if (c == lastCol) {
                         *p = (*p & ~rightMask) | (fill & rightMask);
                     } else {
                         *p = fill;
