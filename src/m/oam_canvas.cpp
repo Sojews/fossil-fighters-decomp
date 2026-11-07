@@ -334,6 +334,13 @@ void MOamCanvas<MSmartOam, MSmartOamUnit>::Alloc(BOOL fromEnd) {
     }
 }
 
+// GetPixel's left/px registers only come out with CSE off.
+#pragma push
+#pragma opt_common_subs off
+template int MOamCanvas<MOam, MOamUnit>::GetPixel(int x, int y);
+template int MOamCanvas<MSmartOam, MSmartOamUnit>::GetPixel(int x, int y);
+#pragma pop
+
 template class MOamCanvas<MOam, MOamUnit>;
 template class MOamCanvas<MSmartOam, MSmartOamUnit>;
 
