@@ -1,6 +1,9 @@
 // MArchive and MArchivePtr.
 
 #pragma ipa file
+// (The string destructor's body in view lets ipa see that ~MArchive leaves Release's mutex lock alone, so the lock
+// stays in a register across it as in the game.)
+#define MSL_STRING_BASICS
 
 #include <map>
 #include "m/archive.h"
