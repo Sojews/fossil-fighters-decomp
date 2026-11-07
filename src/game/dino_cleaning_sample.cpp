@@ -1,6 +1,9 @@
 // DinoCleaningSample, DinoCleaningSampleMenuDecItem, DinoCleaningSampleMenuIncItem, DinoCleaningSampleKasekiTypeItem, DinoCleaningSampleChipsTypeItem, DinoCleaningSampleMenuStartItem, DinoCleaningSampleMenuRandomItem.
 // Only the destructors are decompiled so far.
 
+#pragma ipa file
+// The menu links' tree destructor is called out of line (the game has it in the menu unit).
+#define MSL_TREE_DTOR_ELSEWHERE
 // Derived destructors have their bases' destructor bodies inlined; auto-inlining the ones defined above does that.
 #pragma auto_inline on
 
@@ -171,6 +174,11 @@ static inline u32 DinoExcavateTableEntry(MResource<DinoExcavateDefs> &defs, u32 
     return ((const u32 *)(data + *(const u32 *)(data + offset + 4)))[i];
 }
 
+// Lists a rock id (pushed through a reference, which gives the game's order for push_back's byte temps under ipa).
+static inline void DinoCleaningSamplePushId(std::vector<void *> &v, const u32 &id) {
+    v.push_back((void *const &)id);
+}
+
 // Picks a fossil (and how it is cleaned) at random.
 void DinoCleaningSampleMenuRandomItem::OnDecide() {
     MResource<DinoKasekiDefs> kaseki = gDinoResource->LoadKasekiDefs();
@@ -179,7 +187,7 @@ void DinoCleaningSampleMenuRandomItem::OnDecide() {
     std::vector<void *> ids;   // (u32 ids)
     for (u32 id = 0; id < kaseki.Get()->count; id++) {
         if (*(const u8 *)kaseki.Get()->GetDef(id) != 0 && id >= 1 && id <= 400) {
-            ids.push_back(*(void **)&id);
+            DinoCleaningSamplePushId(ids, id);
         }
     }
     if ((int)random->Next(100) <= (int)DinoExcavateWord(excavate, 0x20)) {
@@ -383,10 +391,9 @@ inline DinoCleaningSampleMenuStartItem::DinoCleaningSampleMenuStartItem(MSmartOa
 }
 
 // The debug cleaning menu: the rock (by id), its type and the chips' type, a random pick, and start.
-// NONMATCHING (94%): the game inlines the items' constructors with their own inline calls (MPoint, the resource, the
-// key items' constructors); always_inline gets that, but the inlined temporaries take other stack slots. (Under
-// `#pragma ipa file`, which breaks this file's destructors, only each centering's two MPoint temporaries swap.)
-#pragma always_inline on
+// NONMATCHING (95.5%): the game inlines the items' constructors with their own inline calls (MPoint, the resource,
+// the key items' constructors), which takes this file's `#pragma ipa file`; the inlined temporaries still take other
+// stack slots (and the game keeps the rock item's pos.y in a spill slot).
 void DinoCleaningSampleMenu::OnStart() {
     mOam = new MSmartOam(0x50, 0, 1);
     GetInput()->SetRepeat(0x1030, 0x14, 2);
@@ -402,7 +409,6 @@ void DinoCleaningSampleMenu::OnStart() {
     GetParallel()->AddTail(mTasks, mCursor, mOam);
     FocusNearestItem(MPoint(0, 0));
 }
-#pragma always_inline reset
 
 
 DinoCleaningSample::DinoCleaningSample() : MProcess(NULL) {
@@ -429,19 +435,11 @@ void DinoCleaningSample::StateMenu() {
 
 // The file's static initialization (see dino_static_init.h): the common layout header.
 // NONMATCHING: the game stores the screen rect's zero half before the screen size.
-// (The menu links' tree destructor is instantiated first, so that always_inline doesn't reach it.)
-typedef std::__red_black_tree<MMenuItem *, std::pair<MMenuItem *const, std::pair<int, MMenuItem *> >,
-                              std::__select_first<std::pair<MMenuItem *const, std::pair<int, MMenuItem *> > >,
-                              std::less<MMenuItem *>, std::allocator<std::pair<MMenuItem *const, std::pair<int, MMenuItem *> > > >
-    DinoCleaningSampleLinkTree;
-template DinoCleaningSampleLinkTree::~__red_black_tree();
-template void DinoCleaningSampleLinkTree::destroy(DinoCleaningSampleLinkTree::node_base *);
-// (So are the random item's vector members, which the game calls out of line.)
+// (The random item's vector members are instantiated first: the game calls them out of line.)
 #pragma auto_inline off
 template class std::__vec_deleter<void *, std::allocator<void *> &>;
 template class std::__vec_deleter<void *, std::allocator<void *> >;
 #pragma auto_inline reset
-#pragma always_inline on
 
 extern "C" u32 data_020bcd24[];
 static struct DinoCleaningSampleStaticInit {
