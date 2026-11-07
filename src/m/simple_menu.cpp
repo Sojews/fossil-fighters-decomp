@@ -1,5 +1,4 @@
 // MSimpleMenu.
-// NONMATCHING: Layout (register allocation and scheduling).
 
 #pragma ipa file
 
@@ -73,16 +72,23 @@ void MSimpleMenu::AddItem(int id, std::string text) {
     AddEntry(id, item);
 }
 
-// Centers the items across the area, spread evenly down it.
+// Centers the items across the area, spread evenly down it. The byte offset is a named counter (a strength-reduced
+// index loses its register to `top`), set up inside the guard, and the count is taken as size + 1.
 void MSimpleMenu::Layout() {
-    for (int i = 0; i < mEntries.size(); i++) {
-        MView *view = mEntries[i].view;
-        u32 count = mEntries.size();
-        int top = sArea.top;
-        int width = view->GetWidth();
-        int height = view->GetHeight();
-        view->SetPosition((sArea.left + sArea.right) / 2 - width / 2,
-                          top + (sArea.bottom - top) * (i + 1) / (count + 1) - height / 2);
+    u32 i = 0;
+    if (i < mEntries.size()) {
+        u32 off = 0;
+        do {
+            MView *view = ((Entry *)((u8 *)&mEntries[0] + off))->view;
+            u32 count = mEntries.size() + 1;
+            int top = sArea.top;
+            int width = view->GetWidth();
+            int height = view->GetHeight();
+            view->SetPosition((sArea.left + sArea.right) / 2 - width / 2,
+                              top + (sArea.bottom - top) * (i + 1) / count - height / 2);
+            i++;
+            off += sizeof(Entry);
+        } while (i < mEntries.size());
     }
 }
 
