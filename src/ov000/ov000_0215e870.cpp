@@ -85,13 +85,13 @@ void DinoBattleViewTutorialMotion::Hide(int index) {
         for (int i = 0; i < 3; i++) {
             if (mArrows[i] != NULL) {
                 mArrows[i]->Exit();
+                mArrows[i] = NULL;
             }
-            mArrows[i] = NULL;
         }
         if (mRect != NULL) {
             mRect->Exit();
+            mRect = NULL;
         }
-        mRect = NULL;
     } else if (mArrows[index] != NULL) {
         mArrows[index]->Exit();
         mArrows[index] = NULL;
