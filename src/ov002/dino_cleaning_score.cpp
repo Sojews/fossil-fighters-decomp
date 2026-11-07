@@ -225,6 +225,7 @@ extern "C" struct DinoScoreLiterals {
     int mTopLimit;              // 0x20: 66
     u8 unk24[0x4C - 0x24];
     int mBottomLimit;           // 0x4C: 126
+    u8 unk50[0x80 - 0x50];
 };
 extern "C" DinoScoreLiterals data_ov002_02164a58;
 extern "C" const int data_ov002_02164a78, data_ov002_02164aa4;
@@ -322,23 +323,30 @@ void DinoCleaningScore::Idle() {
 
 // The file's static initialization (see dino_static_init.h): the common layout, the gradients' colours, the windows'
 // digit positions and the help rect.
-// NONMATCHING: 70%, the game builds the two rects from the sizes' known values (ours reads them back from the pool),
-// and schedules the stores differently.
+// Everything goes through the game's three pool anchors (0x00-0x7f via the literal block, 0x80-0xff via
+// data_ov002_02164ad8, past 0x100 also via ad8 so the literal is shared); the literal block's struct must be 0x80
+// bytes, or mwcc reloads the screen size's x it just stored (an access past the end of the declared object).
+// NONMATCHING: 92%, the game hoists the screen rect's first zero (and loads data_ov002_02164ad8 first) above the
+// screen size's stores, and the digit points' anchor and value registers swap.
 extern "C" u32 data_ov002_02164b58[], data_ov002_02164b94[], data_ov002_02164b9c[], data_ov002_02164bac[],
     data_ov002_02164bb4[];
+#define SCORE_POOL(T, off) \
+    (*(T *)((off) < 0x80 ? (u8 *)&data_ov002_02164a58 + (off) \
+            : (off) < 0x100 ? (u8 *)&data_ov002_02164ad8 + ((off) - 0x80) : (u8 *)&data_ov002_02164ad8 + ((off) - 0x80)))
 #pragma always_inline on
 static struct DinoCleaningScoreStaticInit {
     DinoCleaningScoreStaticInit() {
-        MPoint &screen = DINO_POOL_NV(MPoint, data_ov002_02164a58, 0x64);
-        screen = MPoint(256, 192);
-        DINO_POOL_NV(MRect, data_ov002_02164a58, 0xF4) = DinoSizeRect(screen);
+        DINO_POOL_NV(MPoint, data_ov002_02164a58, 0x64) = MPoint(256, 192);
+        SCORE_POOL(MRect, 0xF4) = DinoSizeRect(DINO_POOL_NV(MPoint, data_ov002_02164a58, 0x64));
         DINO_POOL_NV(MPoint, data_ov002_02164a58, 0x6C) = MPoint(2, 2);
-        MPoint &icon = DINO_POOL_NV(MPoint, data_ov002_02164a58, 0x74);
-        icon = MPoint(36, 28);
-        DINO_POOL_NV(MRect, data_ov002_02164a58, 0x104) = DinoSizeRect(icon);
-        DINO_POOL_NV(MPoint, data_ov002_02164a58, 0x114) = MPoint(0, 24);
-        DINO_POOL_NV(MPoint, data_ov002_02164a58, 0x11C) = MPoint(256, 192);
-        DINO_POOL_NV(MRect, data_ov002_02164a58, 0x124) = MRect(0, 0, 256, 24);
+        DINO_POOL_NV(MPoint, data_ov002_02164a58, 0x74) = MPoint(36, 28);
+        SCORE_POOL(MRect, 0x104) = DinoSizeRect(DINO_POOL_NV(MPoint, data_ov002_02164a58, 0x74));
+        SCORE_POOL(MPoint, 0x114) = MPoint(0, 24);
+        SCORE_POOL(MPoint, 0x11C) = MPoint(256, 192);
+        SCORE_POOL(MRect, 0x124) = MRect(0, 0, 256, 24);
+        SCORE_DATA.mColors[4].r = 0xA1;
+        SCORE_DATA.mColors[4].g = 0;
+        SCORE_DATA.mColors[4].b = 0xC;
         SCORE_DATA.mColors[0].r = 0x43;
         SCORE_DATA.mColors[0].g = 0;
         SCORE_DATA.mColors[0].b = 0;
@@ -351,16 +359,13 @@ static struct DinoCleaningScoreStaticInit {
         SCORE_DATA.mColors[3].r = 0x62;
         SCORE_DATA.mColors[3].g = 0x62;
         SCORE_DATA.mColors[3].b = 0x62;
-        SCORE_DATA.mColors[4].r = 0xA1;
-        SCORE_DATA.mColors[4].g = 0;
-        SCORE_DATA.mColors[4].b = 0xC;
         SCORE_DATA.mColors[5].r = 0x1A;
         SCORE_DATA.mColors[5].g = 0x1A;
         SCORE_DATA.mColors[5].b = 0x1A;
-        DINO_POOL(MPoint, data_ov002_02164b58, 0x34) = MPoint(72, -3);
+        SCORE_POOL(MPoint, 0x134) = MPoint(72, -3);
         DINO_POOL(MPoint, data_ov002_02164b94, 0) = MPoint(56, -3);
         DINO_POOL(MPoint, data_ov002_02164b9c, 0) = MPoint(40, -3);
-        DINO_POOL(MPoint, data_ov002_02164b58, 0x4C) = MPoint(-34, 3);
+        SCORE_POOL(MPoint, 0x14C) = MPoint(-34, 3);
         DINO_POOL(MPoint, data_ov002_02164bac, 0) = MPoint(-50, 3);
         DINO_POOL(MPoint, data_ov002_02164bb4, 0) = MPoint(-66, 3);
         SCORE_DATA.mHelpRect = MRect(37, 37, 220, 157);
