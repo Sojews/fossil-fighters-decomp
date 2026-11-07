@@ -42,11 +42,7 @@ public:
 class CreateCreatureMotionTask : public MTask {
 public:
     CreateCreatureMotionTask(CreatureMotion **slot, DinoBattleViewCreature *view, const char *path, MSmartOam *oam, int arg)
-        : mPath(path) {
-        mSlot = slot;
-        mView = view;
-        mOam = oam;
-        mArg = arg;
+        : mSlot(slot), mView(view), mPath(path), mOam(oam), mArg(arg) {
     }
     virtual ~CreateCreatureMotionTask();
     virtual void Execute();
