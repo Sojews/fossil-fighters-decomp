@@ -598,18 +598,6 @@ void DinoEventLoop::Talk(u32 id) {
     }
 }
 
-// The text of the talk message, or "".
-std::string DinoEventLoop::GetTalkText(u32 id) {
-    mMessages = gDinoResource->LoadMessage(gDinoResource->GetTalkMessageMatch(id));
-    for (u32 i = 0; i < ((const u32 *)mMessages.Get())[1]; i++) {
-        if (id == *(const u32 *)DinoEventBlock((const u8 *)mMessages.Get(), 2, i)) {
-            const u8 *entry = DinoEventBlock((const u8 *)mMessages.Get(), 2, i);
-            return std::string((const char *)entry + ((const u32 *)entry)[1]);
-        }
-    }
-    return std::string("");
-}
-
 // Opens the episode's file (looking it up the first time) and keeps it.
 void DinoEventLoop::AddEpisode(u32 id) {
     if (mEpisodes[id].arc == NULL) {
@@ -697,13 +685,28 @@ static inline const std::vector<u32> &DinoEventRouteOf(const std::vector<void *>
     return *(const std::vector<u32> *)&v;
 }
 
+// The serial set through a non-member inline: the flag-set loops' hoisted copy then takes the lowest spill slot.
+static inline MTaskSet *DinoEventSerialOf(DinoEventLoop *loop) { return &loop->mSerial; }
+
+// Not in the game. RunCommand's cleanups use the route's and the UI task's inline destructors (and the vector's);
+// referencing them here first emits those weak copies ahead of RunCommand, so GetTalkText follows it as in the game
+// (its call into the next symbol then docks).
+#pragma dont_inline on
+void DinoEventRunCommandAnchor(DinoEventRoute *route) {
+    route->~DinoEventRoute();
+    ((std::vector<void *> *)route)->~vector();
+}
+#pragma dont_inline reset
+MTask *DinoEventRunCommandAnchor2(DinoEventLoop *event) {
+    return new DinoEventMuseum(event);
+}
+
 // Degrees as an angle (0x10000 a turn).
 static inline s32 DinoEventDegree(u32 degrees) {
     return (s32)(degrees << 16) / 360;
 }
 
 // Runs one command: almost all of them queue the matching task on the serial set, from the command's arguments.
-// NONMATCHING
 void DinoEventLoop::RunCommand(const u8 *command) {
     const DinoEventCondition *cmd = (const DinoEventCondition *)command;
     MFx32Point pos7;
@@ -828,13 +831,13 @@ void DinoEventLoop::RunCommand(const u8 *command) {
         break;
     case 0x5:
         for (u32 i = 0; i < cmd->count; i++) {
-            MTaskSet *serial = &mSerial;
+            MTaskSet *serial = DinoEventSerialOf(this);
             serial->AddTail(new DinoEventExecFlagSet((u32)this, DinoEventVarArg(DinoEventArg(command, i)), 1));
         }
         break;
     case 0x6:
         for (u32 i = 0; i < cmd->count; i++) {
-            MTaskSet *serial = &mSerial;
+            MTaskSet *serial = DinoEventSerialOf(this);
             serial->AddTail(new DinoEventExecFlagSet((u32)this, DinoEventVarArg(DinoEventArg(command, i)), 0));
         }
         break;
@@ -1321,4 +1324,16 @@ void DinoEventLoop::RunCommand(const u8 *command) {
     case 0x0:
         break;
     }
+}
+
+// The text of the talk message, or "".
+std::string DinoEventLoop::GetTalkText(u32 id) {
+    mMessages = gDinoResource->LoadMessage(gDinoResource->GetTalkMessageMatch(id));
+    for (u32 i = 0; i < ((const u32 *)mMessages.Get())[1]; i++) {
+        if (id == *(const u32 *)DinoEventBlock((const u8 *)mMessages.Get(), 2, i)) {
+            const u8 *entry = DinoEventBlock((const u8 *)mMessages.Get(), 2, i);
+            return std::string((const char *)entry + ((const u32 *)entry)[1]);
+        }
+    }
+    return std::string("");
 }
