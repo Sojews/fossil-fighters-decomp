@@ -369,7 +369,8 @@ basic_string<C, Traits, Alloc>::~basic_string() {
 // Replaces [pos, pos + n) with [first, last), growing onto the heap when it no longer fits. (A range from inside
 // the string itself is copied out first.)
 // NONMATCHING (both instances, ~99%): the in-place path's copy constructor loop gets other registers, and the
-// wchar_t one computes p + pos + n2 in another register order. (The heap path ends through __terminate so its
+// wchar_t one still loads n2 before p + pos in its overlap check (written p + n2 + pos there, which gets closer than
+// p + pos + n2). (The heap path ends through __terminate so its
 // terminator constant is made after the in-place path's, which puts the two in the game's pool order.)
 template <class C, class Traits, class Alloc>
 basic_string<C, Traits, Alloc> &basic_string<C, Traits, Alloc>::__replace(size_type pos, size_type n, const C *first,
@@ -433,7 +434,7 @@ basic_string<C, Traits, Alloc> &basic_string<C, Traits, Alloc>::__replace(size_t
         mLong.capacity = cap;
     } else {
         basic_string copy(__zero);
-        if (tail != 0 && p + pos + n2 < last && last <= p + size) {
+        if (tail != 0 && (sizeof(C) == 1 ? p + pos + n2 : p + n2 + pos) < last && last <= p + size) {
             copy.assign(first, last);
             const basic_string &c = copy;
             first = c.data();
