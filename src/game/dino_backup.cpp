@@ -364,8 +364,8 @@ void DinoBackup::ApplyVolume() {
 }
 
 // A new game: the game data cleared, the creatures numbered, the first team named and the player's settings.
-// NONMATCHING: the game spills applyVolume before loading the mutex's address.
-void DinoBackup::Reset(BOOL applyVolume) {
+// (applyVolume is a bool: its entry definition puts the spill before the mutex's address load.)
+void DinoBackup::Reset(bool applyVolume) {
     MScopedLock lock(&sBackupMutex.mutex, TRUE);
     mLoaded = FALSE;
     u8 *buf = new u8[mSerializer->GetSize()];

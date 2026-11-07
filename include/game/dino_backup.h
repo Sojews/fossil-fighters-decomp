@@ -307,7 +307,7 @@ public:
     void SetUnk180(s32 value);
     s32 GetUnk180();
     void ApplyVolume();
-    void Reset(BOOL applyVolume);
+    void Reset(bool applyVolume);
     void WriteHeader();
     void WriteSlotRaw();
     void Save();
