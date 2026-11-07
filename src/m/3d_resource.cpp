@@ -44,13 +44,38 @@ struct M3DTexHeader {
 typedef std::map<MArchiveFile, M3DCacheEntry> M3DCache;
 typedef std::map<MArchiveFile, M3DTexEntry> M3DTexCache;
 
+// The caches' destructors, which __sinit registers.
+extern "C" inline M3DCache *_ZNSt3mapI12MArchiveFile13M3DCacheEntrySt4lessIS0_ESaISt4pairIKS0_S1_EEED1Ev(
+    M3DCache *self) {
+    self->~M3DCache();
+    return self;
+}
+extern "C" inline M3DTexCache *_ZNSt3mapI12MArchiveFile11M3DTexEntrySt4lessIS0_ESaISt4pairIKS0_S1_EEED1Ev(
+    M3DTexCache *self) {
+    self->~M3DTexCache();
+    return self;
+}
+extern "C" void *__register_global_object(void *object, void *destructor, void *link);
+
+// The game constructs the model cache, the anim cache, the texture cache, then the mutex, but lays .bss out as
+// the texture cache, the model cache, then the anim cache. No declaration order of ordinary statics gives both, so
+// the caches and the mutex have no constructors and are set up by sStaticInit (at the end of the file). This
+// declaration order gives the game's layout (the anim, model, then texture cache's destructor-chain link).
+// static_order: begin
 static MHeap *sHeap;
-// NONMATCHING (__sinit): the game constructs the model cache, the anim cache, then the texture cache (in this layout).
-// (In this order, the file's ipa pools them where the game has them.)
-static M3DCache sAnimCache;
-static M3DTexCache sTexCache;
-static M3DCache sModelCache;
-static MMutex sMutex;
+static struct { u32 w[3]; } sModelLink;
+static struct { u32 w[3]; } sAnimLink;
+static struct { u32 w[3]; } sTexLink;
+static struct { u32 w[4]; } sTexStore;
+static struct { u32 w[4]; } sModelStore;
+static struct { u32 w[4]; } sAnimStore;
+static struct { OSMutex mutex; } sMutex;
+// static_order: end
+#define sModelCache (*(M3DCache *) &sModelStore)
+#define sAnimCache (*(M3DCache *) &sAnimStore)
+#define sTexCache (*(M3DTexCache *) &sTexStore)
+// A cache's end(), from its header's own address (through the cast the compiler adds 4 to the cache's address).
+#define M3D_CACHE_END(type, store) type::iterator((std::__red_black_tree_common<true>::node_base *) &store.w[1])
 
 // Holds the caches' mutex for the rest of the scope.
 class M3DLock {
@@ -566,7 +591,7 @@ inline bool operator<(const MArchiveFile &a, const MArchiveFile &b) {
 void *M3DLoadModel(MArchiveFile file) {
     MScopedLock lock(&sMutex.mutex, TRUE);
     M3DCache::iterator it = sModelCache.find(file);
-    if (it != sModelCache.end()) {
+    if (it != M3D_CACHE_END(M3DCache, sModelStore)) {
         it->second.mRefs++;
         return it->second.mData;
     }
@@ -590,7 +615,7 @@ void M3DReleaseModel(MArchiveFile file) {
 void *M3DLoadAnim(MArchiveFile file) {
     MScopedLock lock(&sMutex.mutex, TRUE);
     M3DCache::iterator it = sAnimCache.find(file);
-    if (it != sAnimCache.end()) {
+    if (it != M3D_CACHE_END(M3DCache, sAnimStore)) {
         it->second.mRefs++;
         return it->second.mData;
     }
@@ -614,7 +639,7 @@ void M3DReleaseAnim(MArchiveFile file) {
 void *M3DLoadTex(MArchiveFile file) {
     MScopedLock lock(&sMutex.mutex, TRUE);
     M3DTexCache::iterator it = sTexCache.find(file);
-    if (it != sTexCache.end()) {
+    if (it != M3D_CACHE_END(M3DTexCache, sTexStore)) {
         it->second.mRefs++;
         return it->second.mData;
     }
@@ -801,3 +826,29 @@ void M3DModelResource::GetPalette(u32 *plttKey, u8 **palette, u32 *size) {
 #pragma auto_inline off
 template class std::__vec_deleter<u16, std::allocator<u16> >;
 template class std::__vec_deleter<M3DVec16, std::allocator<M3DVec16> >;
+
+// Constructs the caches (empty trees: no root, no size, the header linked to itself) and the mutex, in the game's
+// order (see sModelLink).
+static struct M3DStaticInit {
+    M3DStaticInit() {
+        sModelStore.w[0] = 0;
+        sModelStore.w[1] = 0;
+        sModelStore.w[3] = (u32) &sModelStore.w[1];
+        __register_global_object(
+            &sModelStore, (void *) _ZNSt3mapI12MArchiveFile13M3DCacheEntrySt4lessIS0_ESaISt4pairIKS0_S1_EEED1Ev,
+            &sModelLink);
+        sAnimStore.w[0] = 0;
+        sAnimStore.w[1] = 0;
+        sAnimStore.w[3] = (u32) &sAnimStore.w[1];
+        __register_global_object(
+            &sAnimStore, (void *) _ZNSt3mapI12MArchiveFile13M3DCacheEntrySt4lessIS0_ESaISt4pairIKS0_S1_EEED1Ev,
+            &sAnimLink);
+        sTexStore.w[0] = 0;
+        sTexStore.w[1] = 0;
+        sTexStore.w[3] = (u32) &sTexStore.w[1];
+        __register_global_object(
+            &sTexStore, (void *) _ZNSt3mapI12MArchiveFile11M3DTexEntrySt4lessIS0_ESaISt4pairIKS0_S1_EEED1Ev,
+            &sTexLink);
+        OS_InitMutex(&sMutex.mutex);
+    }
+} sStaticInit;
