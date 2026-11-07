@@ -1079,18 +1079,19 @@ s32 DinoBackup::FindFreeEntry(DinoBackupEntry *entries, u32 count) {
 }
 
 // The order the entries are sorted into: used ones first, then active ones (by type). (The game emits the whole
-// stable_sort machinery after CompactEntries. NONMATCHING: stable_sort, get_temporary_buffer, __stable_sort,
-// __merge_backward and two of the __merges, as for the creature lists' sorts.)
+// stable_sort machinery after CompactEntries. a.id read once into a local: it gives the two temp-buffer __merges
+// their register order.)
 namespace std {
 template <> pair<DinoBackupEntry *, ptrdiff_t> get_temporary_buffer<DinoBackupEntry>(ptrdiff_t len);
 }
 
 struct DinoBackupEntryOrder {
     bool operator()(const DinoBackupEntry &a, const DinoBackupEntry &b) const {
-        if (a.id != 0 && b.id == 0) {
+        u32 aid = a.id;
+        if (aid != 0 && b.id == 0) {
             return true;
         }
-        if (b.id != 0 && a.id == 0) {
+        if (b.id != 0 && aid == 0) {
             return false;
         }
         if (a.active < b.active) {

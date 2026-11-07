@@ -298,16 +298,19 @@ namespace std {
     ForwardIterator __upper_bound(ForwardIterator first, ForwardIterator last, const T &value, Compare &comp) {
         typedef typename iterator_traits<ForwardIterator>::difference_type difference_type;
         difference_type len = distance(first, last);
-        while (len > 0) {
-            ForwardIterator i = first;
-            difference_type half = len / 2;
-            advance(i, half);
-            if (!comp(value, *i)) {
-                first = ++i;
-                len -= half + 1;
-            } else {
-                len = half;
-            }
+        // A guard and a do-while: invariant comparator reads (DinoBackupEntryOrder's aid) hoist after the guard.
+        if (len > 0) {
+            do {
+                ForwardIterator i = first;
+                difference_type half = len / 2;
+                advance(i, half);
+                if (!comp(value, *i)) {
+                    first = ++i;
+                    len -= half + 1;
+                } else {
+                    len = half;
+                }
+            } while (len > 0);
         }
         return first;
     }
