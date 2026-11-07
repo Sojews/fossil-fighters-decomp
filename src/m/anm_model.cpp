@@ -162,7 +162,7 @@ void MAnmModelBase::Unk0C() {
 
 // A track's value at a frame: random between the keys' bounds, interpolated between the keys around the frame
 // (the last key's bounds after the last key, the first key's before the first).
-// NONMATCHING: 96.7%, register choices differ (search loop temps, the interpolation keys).
+// NONMATCHING: 99.5%, register choices differ (search loop temps, the key base pointer).
 #pragma opt_common_subs off
 int MAnmModelBase::GetValue(int track, int frame) {
     u32 count = mTracks[track].size();
@@ -184,8 +184,8 @@ int MAnmModelBase::GetValue(int track, int frame) {
         return key->mMin + mRandom.Next(key->mMax - key->mMin);
     }
     MAnmKey *a = &mTracks[track][i - 1];
-    MAnmKey *b = &mTracks[track][i];
     s64 aFrame = a->mFrame;
+    MAnmKey *b = &mTracks[track][i];
     s64 aMin = a->mMin;
     s64 bMin = b->mMin;
     s64 aMax = a->mMax;
