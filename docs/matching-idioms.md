@@ -371,6 +371,12 @@ Macros in `include/game/dino_static_init.h`.
   the size stores, store the rect field-wise from a local `MRect r(...)`: top-left through the anchor at pool+0x80,
   size half through the pool's own symbol (revive field suspend sinit 79 -> 100).
 - A static-init struct object takes 1 byte of .bss: place it after the TU's other .bss statics.
+- **Construction order conflicts with .bss layout** (no declaration order gives both): make the objects POD storage
+  (`static struct { u32 w[4]; } sStore;` + a `#define` cast back to the real type), declare their destructor-chain
+  links yourself (`static struct { u32 w[3]; } sLink;`), and construct them by hand in an EOF static-init struct's
+  ctor in the game's order, registering each with `__register_global_object(&store, (void *) <dtor>, &link)` where
+  the dtor is an `extern "C" inline` function named with the mangled `D1Ev` that calls `self->~T()`. A map's `end()`
+  through the cast costs an extra `add #4`: build it from `&store.w[1]` (m/file.cpp, m/3d_resource.cpp).
 - **.bss layout:** our pool puts 4-byte statics first and orders same-size objects by declaration (ours = declaration
   order rotated left by one, the game rotated right; dtor records after each object in ours, before in the game).
   `tools/static_order.py` finds a declaration order for a wanted layout when one exists.
@@ -529,7 +535,8 @@ Proven unreproducible with the configured compiler; don't spend time without a g
   MCreateBgCallTask<KasekiPictCache>): explicit instantiation before/after, auto_inline off, dont_inline all fail.
 - MArchive::Release (lock promoted across calls), MMessageSubject::RemoveObserver (frame +8), MMenu::AddLink
   make_pair temp forms, deque `__cdeque_copy_in` mid copy, vector<char>::insert byte temp,
-  MOamCanvas::GetPixel, text_codec/file.cpp/3d_resource .bss layouts.
+  MOamCanvas::GetPixel, text_codec .bss layout (file.cpp and 3d_resource were solved by the static-init struct
+  below).
 - Two-slot swaps in 99.9x functions that use-count, declaration order, and per-loop counters didn't fix:
   ModelField/StatusEffectIcon Idle, EffectTelop StateWin, SelectAllMenu::OnStart.
 - Things that are canonicalized (no effect): `==`/`<` operand swaps (but `u32 next = m84; if (m80 != next)` did fix
