@@ -45,13 +45,11 @@ public:
     int mBoundary;      // 0x48: tiles per tile number step
 };
 
-// Adds a 16-color palette's offset to each nonzero pixel of 256-color tiles.
-inline void MAddPaletteOffset(const u16 *src, u16 *dest, u32 size, int palette) {
+// Adds a 16-color palette's offset (palette * 16) to each nonzero pixel of 256-color tiles.
+inline void MAddPaletteOffset(const u16 *src, u16 *dest, u32 size, u16 lo) {
     u32 n;
     u16 px;
-    u16 hi;
-    u16 lo = palette << 4;
-    hi = lo << 8;
+    u16 hi = lo << 8;
     for (n = size >> 1; n != 0; n--) {
         px = *src++;
         if ((u8)px != 0) {
@@ -60,7 +58,8 @@ inline void MAddPaletteOffset(const u16 *src, u16 *dest, u32 size, int palette) 
         if (px & 0xFF00) {
             px += hi;
         }
-        *dest++ = px;
+        *dest = px;
+        dest++;
     }
 }
 

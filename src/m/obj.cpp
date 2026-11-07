@@ -129,7 +129,7 @@ void MChr::FreeShared(MChrBlock *block) {
 }
 
 void MChr256Filter::Filter(const void *src, void *dest, u32 size) {
-    MAddPaletteOffset((const u16 *)src, (u16 *)dest, size, mPalette);
+    MAddPaletteOffset((const u16 *)src, (u16 *)dest, size, mPalette << 4);
 }
 
 void MOamCell::SetPalette(MPalUnit *pal) {
