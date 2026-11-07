@@ -105,7 +105,7 @@ static inline u32 Distance(const MPoint &a, const MPoint &b) {
 
 // The unit vector at the angle.
 static inline MFx32Point AngleVector(u16 angle) {
-    return MFx32Point(MFx32::FromRaw(FX_CosIdx(angle)), MFx32::FromRaw(FX_SinIdx(angle)));
+    return MFx32Point(MFx32::FromRaw(FX_CosIdx(angle)), MFx32::FromRaw(FX_SinIdx((u32) angle)));
 }
 
 static inline MFx32 SquareSum(const MFx32Point &d) {
@@ -123,6 +123,7 @@ static inline bool IsOnChara(DinoFieldChara *chara, MFx32Point p) {
 
 // The character following the player.
 static inline DinoFieldChara *FindFollower(DinoField *field, DinoFieldChara *player) {
+    DinoFieldChara *chara;
     DinoFieldChara *follower = NULL;
     for (u32 i = 0; i < 100; i++) {
         DinoFieldChara *chara = field->mCharas[i];
@@ -136,12 +137,16 @@ static inline DinoFieldChara *FindFollower(DinoField *field, DinoFieldChara *pla
 
 // NONMATCHING: written from the game's code; the stack temporaries are laid out differently.
 void DinoFieldPlayerControl::Idle() {
+    DinoFieldChara *follower;
+    MFx32 speed;
     DinoFieldChara *player;
+    fx32 ground;
+    void *area;
     u32 focus = mField->GetCamera()->GetFocus();
     if (focus == 0 || (player = mField->GetChara(focus)) == NULL) {
         return;
     }
-    DinoFieldChara *follower = FindFollower(mField, player);
+    follower = FindFollower(mField, player);
     u32 map = mField->GetMap()->GetInfo()->id;
     if (map != mMap) {
         mArea = *(u32 *) mField->mMap->GetArea(player->GetModel()->pos);
@@ -153,9 +158,11 @@ void DinoFieldPlayerControl::Idle() {
         }
     }
 
+    BOOL decide;
+    BOOL tapped;
     const DinoPlayerMoveDefs *defs = (const DinoPlayerMoveDefs *) gDinoResource->GetExcavate78();
-    BOOL decide = FALSE;
-    BOOL tapped = FALSE;
+    decide = FALSE;
+    tapped = FALSE;
 
     if (mInput->GetPressed() & 0x300) {
         DinoFieldRadar *radar = mField->mRadar->mRadar;
@@ -179,23 +186,24 @@ void DinoFieldPlayerControl::Idle() {
     }
     // A touch near the player starts a turn.
     if (mInput->GetPressed() & 0x1000) {
+        int dist;
         int radius = MFx32ToInt(MFx32(96) / mField->GetCamera()->GetUnk148());
         MPoint screen;
         DinoFieldCharaGetScreenPos(&screen, player);
         MPoint touch = mInput->GetTouchPos();
-        int dist = Distance(screen, touch);
+        dist = Distance(screen, touch);
         if (MFx32(dist) <= MFx32(radius) * (player->GetHeight() + data_020b5ac0)) {
             mTouching = 1;
             mTouchStart = mInput->GetTouchPos();
             mTouchFrames = 0;
             MPoint pos;
-            DinoFieldCharaGetScreenPos(&pos, player);
             MPoint d = mTouchStart - pos;
+            DinoFieldCharaGetScreenPos(&pos, player);
             mTouchAngle = MFx32PointAngle(MFx32Point(MFx32(d.x), MFx32(d.y)));
         }
     }
     if ((mInput->mButtons & 0x1000) && mTouching) {
-        mTouchFrames++;
+        ++mTouchFrames;
         if (mTouchFrames >= 20 || (int) Distance(mTouchStart, mInput->GetTouchPos()) >= 8) {
             mTouching = 0;
         }
@@ -213,9 +221,9 @@ void DinoFieldPlayerControl::Idle() {
         mAngle = mTouchAngle;
     }
 
-    {
-        void *area = mField->mMap->GetArea(player->GetModel()->pos);
-        u32 old = mArea;
+        area = mField->mMap->GetArea(player->GetModel()->pos);
+        u32 old;
+        old = mArea;
         mArea = *(u32 *) area;
         if (old != mArea && (mExitAreas->mBytes[mArea >> 3] & (1 << (mArea & 7)))) {
             mUnk78[0] = 2;
@@ -225,7 +233,6 @@ void DinoFieldPlayerControl::Idle() {
             GetSerial()->AddTail(MTaskExitTransfer::Create(this));
             goto walk;
         }
-    }
 
     if (mInput->GetPressed() & 1) {
         decide = TRUE;
@@ -236,7 +243,7 @@ void DinoFieldPlayerControl::Idle() {
 
         // A kaseki rock in front of the player.
         if (mMap == mExcavateDefs.Get()->kasekiRockMap) {
-            for (u32 i = 0; i < 20; i++) {
+            for (u32 i = 0; i < 20; ++i) {
                 DinoBackupEntry28 rock;
                 gDinoBackup->GetUnk138(i, &rock);
                 if (rock.used && (rock.pos - front).Length() < MFx32(2)) {
@@ -249,9 +256,11 @@ void DinoFieldPlayerControl::Idle() {
                         mField->mKasekiRocks[i]->Exit();
                         GetSerial()->AddTail(MTaskExitTransfer::Create(this));
                     } else {
-                        mUnk78[0] = 9;
-                        mUnk78[1] = i;
-                        GetSerial()->AddTail(MTaskExitTransfer::Create(this));
+                        {
+                            mUnk78[0] = 9;
+                            mUnk78[1] = (s32) i;
+                            GetSerial()->AddTail(MTaskExitTransfer::Create(this));
+                        }
                     }
                     return;
                 }
@@ -259,16 +268,17 @@ void DinoFieldPlayerControl::Idle() {
         }
 
         // A character in front of the player.
-        for (u32 i = 0; i < 100; i++) {
-            DinoFieldChara *chara = mField->mCharas[i];
+        for (s32 i = 0; i < 100; ++i) {
+            DinoFieldChara *chara = mField->mCharas[(u32) i];
             if (chara == player || chara->GetModel()->id == 0) {
                 continue;
             }
             MFx32Point target = front;
+            BOOL hit;
             if (tapped) {
                 target.y += chara->GetUnk50();
             }
-            BOOL hit = FALSE;
+            hit = FALSE;
             if (chara->GetUnk2D()) {
                 if (IsOnChara(chara, target)) {
                     hit = TRUE;
@@ -333,7 +343,7 @@ void DinoFieldPlayerControl::Idle() {
                 GetSerial()->AddTail(MTaskExitTransfer::Create(this));
                 return;
             }
-            fx32 ground = mField->GetMaxGroundHeight(front);
+            ground = mField->GetMaxGroundHeight(front);
             if (ground == (fx32) 0x80000000) {
                 player->ClearUnk2E0();
                 GetSerial()->AddTail(player->CreateChangeMotionTask(5, 0, MFx32(1)), new MTimer(30),
@@ -357,7 +367,7 @@ void DinoFieldPlayerControl::Idle() {
         return;
     }
     // A character the player walks into.
-    for (u32 i = 0; i < 100; i++) {
+    for (u32 i = 0; i < 100; ++i) {
         DinoFieldChara *chara = mField->mCharas[i];
         if (chara == player || chara->GetModel()->id == 0) {
             continue;
@@ -427,11 +437,11 @@ void DinoFieldPlayerControl::Idle() {
     }
 
 walk : {
-    MFx32 speed = 0;
+    speed = 0;
     MFx32 walkSpeed = mField->GetMap()->GetWalkSpeed();
     mField->WalkInWater((u32) player, (u32) follower);
-    MPoint touch = mInput->GetTouchPos();
     MPoint screen;
+    MPoint touch = mInput->GetTouchPos();
     DinoFieldCharaGetScreenPos(&screen, player);
     int dist = Distance(screen, touch);
     bool onPlayer = dist <= MFx32ToInt(MFx32(96) / mField->GetCamera()->GetUnk148());
@@ -443,15 +453,15 @@ walk : {
         MPoint d = mInput->GetTouchPos() - pos;
         MFx32Point v(MFx32(d.x), MFx32(d.y));
         angle = MFx32PointAngle(v);
-        speed = std::min(defs->runSpeed * walkSpeed, defs->runSpeed * walkSpeed * v.Length() * defs->unk14 / MFx32(96));
+        speed = std::min(walkSpeed * defs->runSpeed, defs->runSpeed * walkSpeed * v.Length() * defs->unk14 / MFx32(96));
     } else {
         int dir = mInput->GetDirection();
         if (dir != -1) {
             angle = dir << 13;
             if (!(mInput->mButtons & 2)) {
-                speed = defs->walkSpeed * walkSpeed;
+                speed = walkSpeed * defs->walkSpeed;
             } else {
-                speed = defs->runSpeed * walkSpeed;
+                speed = walkSpeed * defs->runSpeed;
             }
         } else {
             angle = player->GetModel()->angle;
@@ -478,14 +488,16 @@ walk : {
         player->SetUnk2D8(MFx32Point(MFx32(0), MFx32(0)), 1, walkSpeed);
         return;
     }
-    if (mSpeed <= defs->slowSpeed * walkSpeed) {
+    if (mSpeed <= walkSpeed * defs->slowSpeed) {
         player->SetUnk2D8(AngleVector(mAngle) * mSpeed, 1, walkSpeed);
         return;
     }
     if (mSpeed <= defs->stepSpeed * walkSpeed) {
         player->mUnk310 = player->mMoveSe;
         mField->WalkOnLand0((u32) player, (u32) follower);
-        player->SetUnk2D8(AngleVector(mAngle) * mSpeed, 2, walkSpeed);
+        {
+            player->SetUnk2D8(AngleVector(mAngle) * mSpeed, 2, walkSpeed);
+        }
         return;
     }
     player->mUnk310 = player->mMoveSe2;
