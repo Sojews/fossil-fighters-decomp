@@ -926,9 +926,7 @@ void DinoBattleViewCreature::OnMessage(MMessage *msg) {
         MPoint from = func_ov000_0216f320(mUnkB0, req->mUnk18, unk134);
         MPoint to = func_ov000_0216f320(mUnkB0, req->mUnk1C, unk134);
         MTask *move = func_ov000_0216ff18(this, from, to, 30, 0, req->mUnk20, (int)this);
-        MTask *iconAway = MCreateCallTask(mStatusIcons, data_ov000_0219305c, MPoint(1000, 0));
-        MTask *se = DinoSoundCreatePlaySeTask(0x49, 0);
-        mSerial.AddTail(mMotion->CreatePlayTransfer(req->mUnk1C == 3 ? 10 : 9, 0), se, iconAway, move, iconAt, barCoord, show);
+        mSerial.AddTail(mMotion->CreatePlayTransfer(req->mUnk1C == 3 ? 10 : 9, 0), DinoSoundCreatePlaySeTask(0x49, 0), MCreateCallTask(mStatusIcons, data_ov000_0219305c, MPoint(1000, 0)), move, iconAt, barCoord, show);
         mSerial.AddTail(mMotion->CreatePlayTransfer(func_ov000_0216f698(req->mUnk1C, unk134, mUnk159), 0));
         mSerial.AddTail(((MMessageObserver *)req->mUnk0C)->CreatePostTask(new DinoBattleViewCreatureMoveResult(req->mUnk1C)));
         break;
