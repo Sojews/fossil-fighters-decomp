@@ -184,7 +184,9 @@ void DinoCleaningToolMenu::OnStart() {
 // The file's static initialization (see dino_static_init.h).
 // The pool's words past 0x7c go through the game's second anchor (data_ov002_02165498, the pool + 0x80); the icon
 // rect straddles it, so its first word goes through the first anchor and the rest through the second.
-// NONMATCHING: scheduling. The icon rect's words, now separate stores, are scheduled up among the earlier stores.
+// The rects' words are volatile stores in the game's order (the icon rect then stays after the icon size's stores).
+// NONMATCHING: scheduling. The screen size's x store goes one slot early (between the screen rect's left and top), and
+// no volatile/non-volatile mix of the six front stores, or pragma, moves it (all plateau at 91.83).
 extern "C" u32 data_ov002_02165498[];
 #pragma always_inline on
 static struct DinoCleaningDummyItemStaticInit {
