@@ -285,10 +285,14 @@ inline DinoCleaningNewDust::DinoCleaningNewDust(MSmartOam *oam, DinoCleaningImag
     mParallel.AddTail(mMotion);
 }
 
-// The view's random numbers (a linear congruential generator).
+// The view's random numbers (a linear congruential generator). (Returning from a scope that holds an object changes
+// how 0215a7b4 schedules the result, as in the game.)
 static inline u32 DinoCleaningRand(u32 *seed) {
-    *seed = *seed * 0x41C64E6D + 0x3039;
-    return *seed;
+    {
+        *seed = *seed * 0x41C64E6D + 0x3039;
+        MFx32 r = MFx32::FromRaw(*seed);
+        return r.v;
+    }
 }
 
 // The unit vector at angle.
@@ -363,7 +367,7 @@ inline DinoCleaningLastDust::DinoCleaningLastDust(MSmartOam *oam, DinoCleaningIm
 }
 
 // Takes up to 20 random bits of dirt off (a cell keeps mMinDirt), the first 6 flying off away from the dirt's centre.
-// NONMATCHING: 95.2%, stack slots and some registers differ.
+// NONMATCHING: 95.8%, stack slots and some registers differ.
 extern "C" void func_ov002_0215a7b4(DinoCleaningImageView *view) {
     std::vector<DinoCleaningStatusEntry>::iterator it;
     DinoCleaningStatusEntry cell;
@@ -414,9 +418,8 @@ extern "C" void func_ov002_0215a7b4(DinoCleaningImageView *view) {
             MPoint e = DinoPointSub(*(const MPoint *)&cell, data_ov002_021646e4.mCellOrigin);
             from = DinoToFx(MPoint(e.x * 8 + (e.y & 1) * 4, e.y * 8));
             away = from - centre;
-            u32 spread = DinoCleaningRand(view->mSeed) & 0x3FFF;
-            int angle = FX_Atan2Idx(away.y.v, away.x.v);
-            to = from + DinoDirection(angle + spread - 0x2000) * MFx32(50);
+            u16 spread = DinoCleaningRand(view->mSeed) & 0x3FFF;
+            to = from + DinoDirection(FX_Atan2Idx(away.y.v, away.x.v) + spread - 0x2000) * MFx32(50);
             view->mOamTasks->AddHead(new DinoCleaningLastDust(view->mOam, view, from, to));
         }
     }
