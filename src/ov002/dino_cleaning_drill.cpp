@@ -43,7 +43,9 @@ extern "C" struct {
     // stores through the first anchor, but hoists the rect's zero half above the screen size as the game does.)
     u8 unk30[0x1C];
 } data_ov002_02165278;
-extern "C" u32 data_ov002_021651f8[];
+// (Sized to end at 0x50, splitting the icon margin: mwcc then keeps the margin's second word, past the end, behind
+// the stores before it, which orders the static init's stores more like the game's.)
+extern "C" u32 data_ov002_021651f8[0x14];
 #define sDrillPool (*(DinoCleaningDrillPool *)data_ov002_021651f8)
 
 void DinoCleaningDrill::LoadGuides() {
