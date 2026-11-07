@@ -39,8 +39,8 @@ public:
             db = bottom[2] - b;
             mTables[t] = new u16[M_RASTER_LINES];
             line = mTables[t];
-            ab = ar = ag = 0;
-            for (int y = 0; y < M_RASTER_LINES; y++) {
+            int y;
+            for (ab = ag = ar = y = 0; y < M_RASTER_LINES; y++) {
                 dst = line;
                 line++;
                 *dst = (((b + ab / 191) >> 3) << 10) | ((((g + ag / 191) >> 3) << 5) | (0x8000 | ((r + ar / 191) >> 3)));
