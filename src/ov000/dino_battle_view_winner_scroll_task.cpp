@@ -1,5 +1,4 @@
 // DinoBattleViewWinnerScrollTask, DinoBattleViewBackdrop.
-// NONMATCHING: DinoBattleViewBackdrop::Execute (the spilled top/bottom values and the loop state swap stack slots).
 
 // Derived destructors have their bases' destructor bodies inlined; auto-inlining the ones defined above does that.
 #pragma auto_inline on
@@ -168,23 +167,27 @@ void DinoBattleViewBackdrop::Execute() {
     const DinoRgb &topTo = GetBackdropTop(mTo);
     const DinoRgb &bottomFrom = GetBackdropBottom(mFrom);
     const DinoRgb &bottomTo = GetBackdropBottom(mTo);
-    int r = topFrom.r + (topTo.r - topFrom.r) * mFrame / mDuration;
-    int g = topFrom.g + (topTo.g - topFrom.g) * mFrame / mDuration;
-    int b = topFrom.b + (topTo.b - topFrom.b) * mFrame / mDuration;
-    int dr = bottomFrom.r + (bottomTo.r - bottomFrom.r) * mFrame / mDuration - r;
-    int dg = bottomFrom.g + (bottomTo.g - bottomFrom.g) * mFrame / mDuration - g;
-    int db = bottomFrom.b + (bottomTo.b - bottomFrom.b) * mFrame / mDuration - b;
+    // (Blue-first arrays, not scalars: that is what puts the colors below the other spills on the stack.)
+    int col[3];
+    int delta[3];
+    col[2] = topFrom.r + (topTo.r - topFrom.r) * mFrame / mDuration;
+    col[1] = topFrom.g + (topTo.g - topFrom.g) * mFrame / mDuration;
+    col[0] = topFrom.b + (topTo.b - topFrom.b) * mFrame / mDuration;
+    delta[2] = bottomFrom.r + (bottomTo.r - bottomFrom.r) * mFrame / mDuration - col[2];
+    delta[1] = bottomFrom.g + (bottomTo.g - bottomFrom.g) * mFrame / mDuration - col[1];
+    delta[0] = bottomFrom.b + (bottomTo.b - bottomFrom.b) * mFrame / mDuration - col[0];
     int ar = 0;
     u16 *line = mFadeLines;
+    int i = 0;
     int ag = 0;
     int ab = 0;
-    for (int i = 0; i < M_RASTER_LINES; i++) {
+    for (; i < M_RASTER_LINES; i++) {
         // (Grouped from the blue end: the game works out blue, then green, then red.)
-        *line++ = ((u32)(b + ab / (M_RASTER_LINES - 1)) >> 3 << 10) |
-                  (((u32)(g + ag / (M_RASTER_LINES - 1)) >> 3 << 5) | (((u32)(r + ar / (M_RASTER_LINES - 1)) >> 3) | 0x8000));
-        ar += dr;
-        ag += dg;
-        ab += db;
+        *line++ = ((u32)(col[0] + ab / (M_RASTER_LINES - 1)) >> 3 << 10) |
+                  (((u32)(col[1] + ag / (M_RASTER_LINES - 1)) >> 3 << 5) | (((u32)(col[2] + ar / (M_RASTER_LINES - 1)) >> 3) | 0x8000));
+        ar += delta[2];
+        ag += delta[1];
+        ab += delta[0];
     }
 }
 
