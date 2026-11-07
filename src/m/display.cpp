@@ -207,6 +207,11 @@ static inline bool IsFound(MThreadDisplayMap::iterator it) {
     return it != sThreadDisplays->end();
 }
 
+// (One more by-value hop: the first test's dead copy goes below the second's.)
+static inline bool IsFoundOuter(MThreadDisplayMap::iterator it) {
+    return IsFound(it);
+}
+
 // (An unused word-sized object with a destructor: it reserves the frame's extra word, which the game seems to keep
 // for a lock object whose flag lives in a register.)
 struct MFrameWord {
@@ -215,7 +220,8 @@ struct MFrameWord {
 };
 
 // Keeps gCurrentDisplay per thread. (The explicit iterator conversions keep find's result in its own slot.)
-// NONMATCHING: stack slots only (the game has the first test's copy in the top word and leaves the bottom one unused).
+// NONMATCHING: stack slots only (the game has the first test's copy in the top word and leaves the bottom one unused;
+// ours has them the other way round).
 static void SwitchThreadDisplay(u32 from, u32 to) {
     if (sPrevSwitchThreadCallback != NULL) {
         sPrevSwitchThreadCallback((OSThread *) from, (OSThread *) to);
@@ -226,7 +232,7 @@ static void SwitchThreadDisplay(u32 from, u32 to) {
     REG_IME = 0;
     bool enabled = prev;
     MThreadDisplayMap::iterator it = MThreadDisplayMap::iterator(sThreadDisplays->find(from));
-    if (IsFound(it)) {
+    if (IsFoundOuter(it)) {
         it->second = gCurrentDisplay;
     }
     MThreadDisplayMap::iterator it2 = MThreadDisplayMap::iterator(sThreadDisplays->find(to));
