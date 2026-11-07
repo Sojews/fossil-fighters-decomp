@@ -178,10 +178,10 @@ static inline MFx32 DinoScoreFloor(MFx32 x) {
 // second mode scores the two rocks' dirt) and shows both on the commentary; the first non-zero score moves on.
 // The rock's ratio read inside lost's expression and the floor applied to the second mode's quotient (its own temp
 // and copy) give the game's frame.
-// NONMATCHING: 97.6%, the std::max operator< copies: the game (-ipa file) keeps them beside the other copies with
+// NONMATCHING: 97.7%, the std::max operator< copies: the game (-ipa file) keeps them beside the other copies with
 // left and masked as temps, ours keeps them in the lowest slots (needs left and masked named, or a copy is dropped);
 // with `#pragma ipa file` and temps this reaches 97.8 but the ctor drops 97.9 -> 94.5. The second max also selects the
-// other way round (`mov r3, r0` after `blt`).
+// other way round (both addresses in registers, `mov r3, r0` after `blt`; max(masked, 0) gets the compare right).
 extern "C" void func_ov002_0215bce8(DinoCleaningScore *score) {
     if (score->mCleaning->GetKasekiRock()) {
         if (!score->mFlag) {
@@ -189,7 +189,7 @@ extern "C" void func_ov002_0215bce8(DinoCleaningScore *score) {
             MFx32 left = MFx32(100) - lost * MFx32(2);
             score->mUnk84 = MFx32(100 - MFx32ToInt(std::max(MFx32(0), left)));
             MFx32 masked = DinoScoreFloor(score->mCleaning->GetKasekiRock()->GetRatio() - score->mUnk84);
-            score->mUnk80 = std::max(MFx32(0), masked);
+            score->mUnk80 = std::max(masked, MFx32(0));
         } else {
             score->mUnk84 = MFx32(0);
             score->mUnk80 =
