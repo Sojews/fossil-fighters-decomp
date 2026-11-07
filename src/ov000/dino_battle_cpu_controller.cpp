@@ -1333,10 +1333,8 @@ extern "C" u32 func_ov000_0216d2cc(DinoBattleModelCreature *creature, BOOL check
 extern "C" MTask *func_ov000_0218ec8c(u32 tutorial, int kind, BOOL *proceed);
 extern "C" const u32 data_0208a1a0, data_0208a1a4;  // the CPU's wait before its first move, and before the others
 
-// NONMATCHING (99.94%): one `score` serves every candidate (mwcc gives the first web the named slot and each later
-// web a slot of its own below the inline temps, as the game has). Left: the game's `--last` iterator temps sit lower
-// (0x78/0x64, ours 0xb8/0x9c, which shifts the call temps above them by 8) and it loads pick.attack before
-// pick.creature.
+// One `score` serves every candidate: mwcc gives its first web the named slot and each later web a slot of its own
+// below the inline temps, as the game has. The top-score lookups decrement a temporary end().
 void DinoBattleCpuController::DecideAction(u32 first) {
     mSerial.AddTail(new MTimer(first ? data_0208a1a0 : data_0208a1a4));
     DinoBattleModel *model = (DinoBattleModel *)mUnkAC;
@@ -1393,10 +1391,8 @@ void DinoBattleCpuController::DecideAction(u32 first) {
         mSerial.AddTail(((DinoBattleModel *)mUnkAC)->CreatePostTask(new DinoBattleModelTurnChangeSignal()));
         return;
     }
-    DinoBattleCpuCandidates::iterator last = candidates.end();
-    --last;
     std::pair<DinoBattleCpuCandidates::iterator, DinoBattleCpuCandidates::iterator> range =
-        candidates.equal_range(last->first);
+        candidates.equal_range((--candidates.end())->first);
     std::vector<DinoBattleCpuEntry> best;
     for (DinoBattleCpuCandidates::iterator it = range.first; it != range.second; ++it) {
         best.push_back(it->second);
@@ -1429,8 +1425,8 @@ void DinoBattleCpuController::DecideAction(u32 first) {
         return;
     }
     case 0: {
-        DinoBattleModelCreature *attacker = pick.creature;
         u32 attack = pick.attack;
+        DinoBattleModelCreature *attacker = pick.creature;
         CollectTargets(player, attacker, attack);
         candidates.clear();
         for (u32 t = 0; t < mTargets.size(); t++) {
@@ -1455,9 +1451,7 @@ void DinoBattleCpuController::DecideAction(u32 first) {
             candidate.target = mTargets[t];
             candidates.insert(DinoBattleCpuCandidates::value_type(score, candidate));
         }
-        DinoBattleCpuCandidates::iterator top = candidates.end();
-        --top;
-        range = candidates.equal_range(top->first);
+        range = candidates.equal_range((--candidates.end())->first);
         best.clear();
         for (DinoBattleCpuCandidates::iterator it = range.first; it != range.second; ++it) {
             best.push_back(it->second);
