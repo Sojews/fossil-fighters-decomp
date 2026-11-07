@@ -105,19 +105,24 @@ void DinoHelpDriver::AddItem(DinoHelpItem *item) {
     mItems.push_back(item);
 }
 
+// (The erase's copy, made in an inline helper, takes the lowest slot; rebuilt from the node, it reuses the loop's
+// register for the iterator instead of reloading it.)
+template <typename M, typename It> static inline void HelpErase(M &m, const It &it) {
+    m.erase(It(it.node_));
+}
+
+// (The lock is an MMutexLock: ipa promotes it, but its slot stays at the top of the frame.)
 void DinoHelpDriver::RemoveItem(DinoHelpItem *item) {
-    OS_LockMutex(&sHelpMutex.mutex);
+    MMutexLock lock(&sHelpMutex.mutex);
     mItems.erase(std::find(mItems.begin(), mItems.end(), item));
     // Drop the entries linking to or from the item.
 again:
     for (std::multimap<u32, std::pair<u32, u32> >::iterator it = mEntries.begin(); it != mEntries.end(); ++it) {
-        if (it->first == (u32) item || it->second.second == (u32) item) {
-            std::multimap<u32, std::pair<u32, u32> >::iterator e = it;
-            mEntries.erase(e);
+        if ((DinoHelpItem *) it->first == item || (DinoHelpItem *) it->second.second == item) {
+            HelpErase(mEntries, it);
             goto again;
         }
     }
-    OS_UnlockMutex(&sHelpMutex.mutex);
 }
 
 void DinoHelpDriver::AddHook(DinoHelpHook *hook) {
@@ -186,17 +191,15 @@ void DinoHelpDriver::AddEntry(u32 a, u32 b, u32 c) {
 }
 #pragma optimization_level reset
 
+// (The key is compared as a pointer, as RemoveItem compares it with the item: that gives the game's cmp order.)
 void DinoHelpDriver::RemoveEntry(u32 a, u32 b) {
-    OS_LockMutex(&sHelpMutex.mutex);
+    MMutexLock lock(&sHelpMutex.mutex);
     for (std::multimap<u32, std::pair<u32, u32> >::iterator it = mEntries.begin(); it != mEntries.end(); ++it) {
-        if (a == it->first && b == it->second.first) {
-            std::multimap<u32, std::pair<u32, u32> >::iterator e = it;
-            mEntries.erase(e);
-            OS_UnlockMutex(&sHelpMutex.mutex);
+        if ((void *) it->first == (void *) a && it->second.first == b) {
+            HelpErase(mEntries, it);
             return;
         }
     }
-    OS_UnlockMutex(&sHelpMutex.mutex);
 }
 
 void DinoHelpDriver::Enable() {
