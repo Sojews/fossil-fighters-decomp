@@ -64,6 +64,6 @@ void DinoFieldBattleStartEffect::StateClose() {
     }
     int radius = 160 - mFrame * 160 / 90;
     radius -= MFx32ToInt(MFx32(30) * MFx32::FromRaw(FX_SinCosTable_[(((u16) ((mFrame * 3 << 16) / 90)) >> 4) * 2]));
-    radius = std::max(data_ov001_0216aad4.mMinRadius, radius);
+    radius = std::max((int)data_ov001_0216aad4.mMinRadius, radius);
     mWindow->SetCircle(MPoint(128, 96), radius);
 }
