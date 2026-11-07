@@ -298,12 +298,13 @@ void DinoFieldCamera::UnkV14() {
 
 // The point in fixed point.
 static inline MFx32Point ToFx32Point(MPoint p) {
-    return MFx32Point(MFx32(p.x), MFx32(p.y));
+    MFx32Point perm45(MFx32(p.x), MFx32(p.y));
+    return perm45;
 }
 
 // The camera setting a circle of the map has, if any.
 static inline DinoFieldMapCamera *GetCircleCamera(DinoFieldMapCircle *circle) {
-    if (circle->unk00 == 0) {
+    if (0 == circle->unk00) {
         return NULL;
     }
     return (DinoFieldMapCamera *) ((u8 *) circle + circle->unk00);
@@ -311,52 +312,64 @@ static inline DinoFieldMapCamera *GetCircleCamera(DinoFieldMapCircle *circle) {
 
 // Without tracking: the map's default camera setting, or the setting of the circle the focus is in, blended out to the
 // default between the circle's inner and outer radius.
-// NONMATCHING: the game's frame has 32 more bytes of temporaries, and reads the first distance after the radius.
+// NONMATCHING: stack slots still (the game's frame keeps a few more temporaries than ours; the first distance read
+// now matches — radius as a comparison operand after the sqrt).
 void DinoFieldCamera::IdleUnk0() {
+    DinoFieldMapCamera camera;
     DinoFieldMapCamera *first = mField->GetMap()->GetCamera(0);
     DinoFieldMapCamera def;
+    DinoFieldMapCircle *circle;
+    MFx32 inner;
     def.x = first->x;
     def.y = first->y;
     def.z = first->z;
-    def.scale = first->scale;
     MFx32 outer;
-    MFx32 inner;
-    MFx32Point center;
-    DinoFieldMapCamera camera;
     MFx32 len;
-    if (mUnkFC != 0) {
+    def.scale = first->scale;
+    if (0 != mUnkFC) {
         DinoFieldMapCircle *circle = mField->GetMap()->GetCircle(mUnkFC);
         MFx32Point c = ToFx32Point(MPoint(circle->x, circle->y));
-        MFx32 d = (mFocusPos - c).Length();
+        const MFx32 d = (mFocusPos - c).Length();
         if (MFx32(circle->radius).v < d.v) {
             mUnkFC = mField->GetMap()->FindCircle(mFocusPos);
         }
     } else {
         mUnkFC = mField->GetMap()->FindCircle(mFocusPos);
     }
-    if (mUnkFC == 0) {
+    if (0 == mUnkFC) {
+        int perm141 = def.z;
         mUnk100 = def.x;
         mUnk102 = def.y;
-        mUnk104 = def.z;
+        const int perm192 = (int) perm141;
+        mUnk104 = perm192;
         mUnk108 = def.scale;
         return;
     }
-    DinoFieldMapCircle *circle = mField->GetMap()->GetCircle(mUnkFC);
+    circle = mField->GetMap()->GetCircle(mUnkFC);
+    MFx32Point center;
     camera.x = GetCircleCamera(circle)->x;
     camera.y = GetCircleCamera(circle)->y;
     camera.z = GetCircleCamera(circle)->z;
     camera.scale = GetCircleCamera(circle)->scale;
-    center = ToFx32Point(MPoint(circle->x, circle->y));
-    inner = MFx32((int) circle->unk0C);
-    outer = MFx32(circle->radius);
+    MPoint perm437(circle->x, circle->y);
+    center = ToFx32Point(perm437);
+    MFx32 perm676((int) circle->unk0C);
+    inner = perm676;
+    MFx32 s;
+    u32 perm337 = circle->radius;
+    MFx32 perm791(perm337);
+    outer = perm791;
     len = (mFocusPos - center).Length();
     if (len <= inner) {
-        mUnk100 = camera.x;
+        u32 perm578 = camera.x;
+        mUnk100 = perm578;
         mUnk102 = camera.y;
-        mUnk104 = camera.z;
+        s32 perm439 = camera.z;
+        mUnk104 = perm439;
         mUnk108 = camera.scale;
         return;
     }
+    const int perm729 = camera.z;
     if (len > outer) {
         mUnk100 = def.x;
         mUnk102 = def.y;
@@ -364,12 +377,18 @@ void DinoFieldCamera::IdleUnk0() {
         mUnk108 = def.scale;
         return;
     }
-    MFx32 s = MFx32(1) - (len - inner) / (outer - inner);
+    s = MFx32(1) - (len - inner) / (outer - inner);
     MFx32 t = MFx32(1) - s * s;
-    mUnk100 = LerpAngle(def.x, camera.x, t);
-    mUnk102 = LerpAngle(def.y, camera.y, t);
-    mUnk104 = LerpAngle(def.z, camera.z, t);
-    mUnk108 = camera.scale * (MFx32(1) - t) + def.scale * t;
+    int perm271 = def.x;
+    int perm957 = camera.x;
+    mUnk100 = LerpAngle(perm271, perm957, t);
+    int perm731 = camera.y;
+    mUnk102 = LerpAngle(def.y, perm731, t);
+    int perm890 = def.z;
+    int perm490 = LerpAngle(perm890, perm729, t);
+    mUnk104 = perm490;
+    MFx32 perm953(1);
+    mUnk108 = camera.scale * (perm953 - t) + def.scale * t;
 }
 
 // After a map change: puts the camera on the ground under the focus, and sets the map's rotation and scale for where
