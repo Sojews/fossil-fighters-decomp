@@ -4026,9 +4026,11 @@ extern "C" const u32 data_0208a148;            // frames to wait after each targ
 
 // A team attack: the creature attacks each of the opponent's creatures in the fight area at once (the 3D view
 // shows it when enabled), then the damage, counters and status wake-ups follow per target.
-// NONMATCHING
+// NONMATCHING: 99.95%, attacker is spilled to a low slot (the game gives it the highest) and the AddTail temps
+// between are permuted. (ability as s32 makes the game's conversion temp in the lowest slot; text declared up front.)
 extern "C" void func_ov000_0216831c(DinoBattleModelPlayer *player, MMessageObserver *reply, u32 side, u32 id,
                                     u32 index, u32 attack, u8 showName) {
+    int text;
     player->SetUnk124(player->GetUnk124() | 1);
     player->mReply = reply;
     DinoBattleModelCreature *attacker = player->FindCreatureByB4(id);
@@ -4046,7 +4048,7 @@ extern "C" void func_ov000_0216831c(DinoBattleModelPlayer *player, MMessageObser
         player->mSerial.AddTail(
             player->mUnkF4->CreatePostTask(new DinoBattleViewShowAttackNameBarRequest(0, attack, special, 1)));
     }
-    const u32 ability = attack;
+    const s32 ability = attack;
     const DinoAttackDef *def = gDinoResource->GetAttackDef(ability);
     const u16 *cost = DinoOffsetPtr<u16>(def, def->cost);
     if (attacker->GetStatus()->flags & 0x40) {
@@ -4178,7 +4180,7 @@ extern "C" void func_ov000_0216831c(DinoBattleModelPlayer *player, MMessageObser
                 player->mSerial.AddTail(new ExecCreatureEndTask(player->mOpponent, targets[i]->GetUnkB4()));
             } else if (targets[i]->GetStatus()->flags & 8) {
                 // Woken by the hit.
-                u32 text = (targets[i]->mPlayer->mUnkB4 == 0 ? data_0208a280 : data_0208a27c) + 1;
+                text = (targets[i]->mPlayer->mUnkB4 == 0 ? data_0208a280 : data_0208a27c) + 1;
                 MParallelTaskSet *wake = new MParallelTaskSet(TRUE);
                 DinoSignalWait *wakeWait = new DinoSignalWait(0x10047, NULL, NULL, 1);
                 MTask *icon =
