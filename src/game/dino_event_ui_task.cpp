@@ -290,19 +290,16 @@ void DinoEventSaveOption::Idle() {
     }
 }
 
-// NONMATCHING: register allocation only (the game keeps this in r5).
 MTask *DinoEventReviveEffectCaller::CreateUi() {
     DinoCreatureState revived;
     MI_CpuFill8(&revived, 0, sizeof(revived));
     revived.index = mCreature;
     DinoCreatureState creature;
     gDinoBackup->GetCreature(mCreature, &creature);
-    MTask *loop = new DinoUiReviveStatusLoop(mCreature, 0);
-    MTask *effect = new DinoUiReviveEffect(revived, creature, &mResult, 0);
-    MSerialTaskSet *tasks = new MSerialTaskSet(TRUE);
-    tasks->AddTail(effect);
-    tasks->AddTail(loop);
-    return tasks;
+    // (A chain evaluates its arguments last to first: the loop, the effect, then the set.)
+    return (new MSerialTaskSet(TRUE))
+        ->Add(new DinoUiReviveEffect(revived, creature, &mResult, 0))
+        ->Add(new DinoUiReviveStatusLoop(mCreature, 0));
 }
 
 // (Taking its address emits the vector's reallocating copy the game emits in this file.)
