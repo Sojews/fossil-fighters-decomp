@@ -179,6 +179,7 @@ Levers:
 |---|---|
 | game slot *above* a named local | name it and declare it earlier: `MPoint dest(368, y);` instead of a temp arg; `MPoint from;` declared before `to` (AbilityMenu::OnDecide) |
 | a temp must sit *lower* | build it inside a non-member `static inline` helper (`DinoBgOffsetY(bg)`; ImageView copy ctor/CreateScreen; Org CreateRevertTasks `CreateFlyInTask(DinoOrgSlotPos(index % 15))`) |
+| game spills a strength-reduced `i*size` offset (`ldr/adds #8/str [sp]`) but ours keeps it in a register and spills a plain local | write the offset as a named counter (`u32 off = 0; ... ((Entry *)((u8 *)&v[0] + off))->x; off += sizeof(Entry);`), declared inside an `if (i < size) do {} while` guard so its init lands after the guard; fold a `+ 1` into a spilled local (`count = size() + 1`) to flip its slot (MSimpleMenu::Layout) |
 | two spill slots swapped | change relative use counts: re-read the global/member at one use instead of going through the local (AbilityMenu::Close) |
 | hoisted `&mParallel` must be in the LOWEST slot | non-member `static inline MTaskSet *P(Menu *m) { return &m->mParallel; }` called inside the loop (`P(this)->AddTail(x)`); param must be the concrete class (RootSelect, Medal, Museum OnStart) |
 | loop-top cached member address | `MTaskSet *parallel = SomeNonMemberInline(this);` as the loop body's first statement (DinoFieldDance::Start, KasekiButton::Setup) |
