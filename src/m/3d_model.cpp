@@ -168,8 +168,6 @@ static inline void M3DResetTexMtx() {
 
 // Draws the model: culled by its box when asked, then either its display list (patched for the frame and sent by
 // DMA) or its command list run here.
-// NONMATCHING (99.97%): the spill slots of the command-list locals come out in a different order (the game gives
-// alpha the lowest slot and the shininess pointer one below the vertices).
 void M3DModel::Draw(u32 lights) {
     if ((mFlags & 3) != 3) {
         return;
@@ -264,6 +262,8 @@ void M3DModel::Draw(u32 lights) {
         M3DResetTexMtx();
         M3DMaterialColorDiffAmb(mColors[0], mColors[1], mUnk2C ? TRUE : FALSE);
         M3DMaterialColorSpecEmi(mColors[2], mColors[3], mUnk2C ? TRUE : FALSE);
+        const u32 *texWords;
+        const s16 *verts;
         if (mUnk2C) {
             u8 table[128];
             u8 *p = table;
@@ -276,7 +276,6 @@ void M3DModel::Draw(u32 lights) {
             G3_Shininess((const u32 *)table);
         }
         const u32 *res = (const u32 *)mModelRes;
-        const u32 *texWords;
         if (res[5] & 0xC) {
             const u8 *anim = (const u8 *)mAnimRes;
             texWords = (const u32 *)(anim + (((const u32 *)anim)[1] + ((const u32 *)anim)[2])) +
@@ -286,7 +285,7 @@ void M3DModel::Draw(u32 lights) {
             texWords = (const u32 *)(anim + (((const u32 *)anim)[1] + ((const u32 *)anim)[2]));
         }
         M3DScale(FX32_ONE << res[7]);
-        const s16 *verts = M3DModelGetMorphVertices(this);
+        verts = M3DModelGetMorphVertices(this);
         G3_Color(mUnk2F4);
         if (cmds[i] != 0xFFF) {
             int frameOffset = frame * 0x30;
@@ -340,9 +339,7 @@ void M3DModel::Draw(u32 lights) {
                         alpha = 0x1F;
                         t &= ~0xC0;
                     }
-                    if (alpha > 0x1F) {
-                        alpha = 0x1F;
-                    }
+                    alpha = alpha > 0x1F ? 0x1F : alpha;
                     G3_TexImageParam((M3D_TEX_IMAGE_PARAM((const M3DTexEntry *)mUnkDC + tex) | ((t << 28) >> 12)) +
                                      (mTexKey >> 3));
                     const M3DTexEntry *entries = (const M3DTexEntry *)mUnkDC;
