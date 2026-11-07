@@ -457,7 +457,7 @@ void MChr16BinFontTransfer::Transfer() {
     int rows = mGlyphSize.y;
     int width = mSize.x;
     u32 *dst = (u32 *) ((u8 *) mDest + ((mPos.x >> 3) + (mPos.y >> 3) * width) * 32 + (mPos.y & 7) * 4);
-    int shift = mPos.x & 7;
+    u32 shift = mPos.x & 7;
     u32 mask = (1 << mGlyphSize.x) - 1;
     int overX = mPos.x + mGlyphSize.x - width * 8;
     if (overX > 0) {
