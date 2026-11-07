@@ -1,4 +1,5 @@
 // DinoCleaningRock.
+#pragma ipa file
 
 #include "game/dino_cleaning_rock.h"
 #include "game/dino_cleaning_image.h"
@@ -60,8 +61,7 @@ u8 DinoCleaningRock::GetCell(int row, int col) {
 }
 
 
-// Hit's MFx32 temporaries take stack slots by inline depth (shallower = higher), so the operations sit at the depths
-// that give the game's slot order: the refresh one level down, the compare/subtractions two or more.
+// (Under ipa, the refresh one inline level down gives the game's order for its FromRaw and * copies.)
 static inline void RefreshCell(DinoCleaningRock *rock, int row, int col) {
     if (rock->mImage->mGrid[row][col] != 0) {
         rock->mHardness[row][col] =
@@ -71,14 +71,8 @@ static inline void RefreshCell(DinoCleaningRock *rock, int row, int col) {
     }
 }
 
-static inline void SubFrom(MFx32 &p, const MFx32 &h) { p -= h; }
-static inline void SubFrom2(MFx32 &p, MFx32 h) { SubFrom(p, h); }
-static inline void SubFrom3(MFx32 &p, const MFx32 &h) { SubFrom2(p, h); }
-static inline bool Gt(const MFx32 &a, const MFx32 &b) { return a > b; }
-static inline void Sub1(MFx32 &h, const MFx32 &p) { h -= p; }
 
-// NONMATCHING: 99.8%, the refresh's FromRaw copy and the * operator's b copy swap stack slots, and the hardness
-// subtraction swaps r1/r2.
+// NONMATCHING: 99.8%, the hardness subtraction swaps r1/r2 (power and the cell address).
 MFx32 DinoCleaningRock::Hit(int row, int col, MFx32 power) {
     if (IsCellClear(row, col)) {
         return power;
@@ -91,13 +85,13 @@ MFx32 DinoCleaningRock::Hit(int row, int col, MFx32 power) {
                 if (mHardness[row][col] == MFx32(0)) {
                     RefreshCell(this, row, col);
                 }
-                if (Gt(mHardness[row][col], power)) {
+                if (mHardness[row][col] > power) {
                     mImage->SetCellLayer(row, col, layer);
                     MFx32 &hardness = mHardness[row][col];
-                    Sub1(hardness, power);
+                    hardness -= power;
                     return MFx32(0);
                 }
-                SubFrom3(power, mHardness[row][col]);
+                power -= mHardness[row][col];
                 mHardness[row][col] = MFx32(0);
             }
         } while (--layer != 0);
@@ -107,11 +101,25 @@ MFx32 DinoCleaningRock::Hit(int row, int col, MFx32 power) {
     return power;
 }
 
-// The file's static initialization (see dino_static_init.h).
+// The file's static initialization (see dino_static_init.h): under ipa, the layout inits one inline level down with
+// the rects built from MPoint(0, 0) and the pool size give the game's temp slots.
 extern "C" u32 data_ov002_02165730[];
 #pragma always_inline on
+#define S data_ov002_02165730
+static inline void DinoCleaningRockInitLayout() {
+    DINO_POOL(MPoint, S, 0x0) = MPoint(256, 192);
+    DINO_POOL(MRect, S, 0x38) = MRect(MPoint(0, 0), DINO_POOL(MPoint, S, 0x0));
+    DINO_POOL(MPoint, S, 0x18) = MPoint(2, 2);
+    DINO_POOL(MPoint, S, 0x10) = MPoint(36, 28);
+    DINO_POOL(MRect, S, 0x48) = MRect(MPoint(0, 0), DINO_POOL(MPoint, S, 0x10));
+    DINO_POOL(MPoint, S, 0x58) = MPoint(0, 24);
+    DINO_POOL(MPoint, S, 0x60) = MPoint(256, 192);
+    DINO_POOL(MRect, S, 0x68) = MRect(0, 0, 256, 24);
+}
+#undef S
+
 static struct DinoCleaningRockStaticInit {
     DinoCleaningRockStaticInit() {
-        DINO_COMMON_LAYOUT_INIT(data_ov002_02165730, 0x0, 0x38, 0x18, 0x10, 0x48, 0x58, 0x60, 0x68);
+        DinoCleaningRockInitLayout();
     }
 } sDinoCleaningRockStaticInit;
