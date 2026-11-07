@@ -673,13 +673,21 @@ MPoint DinoBattleViewUiRootMenuItem::GetCursorPos() {
     return mPos;
 }
 
-// NONMATCHING: the game loads the frame before the offset and adds in another order.
+// The frame moved by p, read through a pointer to it (the game keeps one to the returned temporary).
+static inline MRect MovedFrame(const MRect *self, MPoint p) {
+    int right = p.x + self->right;
+    int top = p.y + self->top;
+    int bottom = self->bottom + p.y;
+    return MRect(p.x + self->left, top, right, bottom);
+}
+
+// NONMATCHING: the game loads all four frame words before the offset's x, and allocates registers differently.
 MRect DinoBattleViewUiRootMenuItem::GetFrame() {
     DinoBattleViewCreature *creature = ((DinoBattleViewUiSelectAreaCommon *)mOwner)->GetItemCreature(this);
     if (creature != NULL) {
         MSmartOam *oam = creature->mMotion->mOam;
         MPoint offset(-oam->mOffset.x, -oam->mOffset.y);
-        return creature->mMotion->GetFrame() + offset;
+        return MovedFrame(&creature->mMotion->GetFrame(), offset);
     }
     return MRect(0, 0, 0, 0);
 }
