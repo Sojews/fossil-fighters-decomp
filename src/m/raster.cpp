@@ -312,7 +312,6 @@ template <class Op> inline void MRasterWindow::ForEachCircleLine(Op op, MPoint c
     if (!OnScreen(rect)) {
         return;
     }
-    int below = center.y;
     int err = radius;
     int y = radius;
     for (int x = 0; y >= x; x++) {
@@ -322,7 +321,7 @@ template <class Op> inline void MRasterWindow::ForEachCircleLine(Op op, MPoint c
         if (line >= 0 && line < M_RASTER_LINES) {
             op(right, left, line);
         }
-        line = below - 1;
+        line = center.y + x - 1;
         if (line >= 0 && line < M_RASTER_LINES) {
             op(right, left, line);
         }
@@ -342,21 +341,16 @@ template <class Op> inline void MRasterWindow::ForEachCircleLine(Op op, MPoint c
             y--;
             bottom--;
         }
-        below++;
     }
 }
 
 // NONMATCHING: stack slots, registers in the inlined span adds, and the literal-0 pool offsets (ipa data layout).
-#pragma opt_common_subs off
 void MRasterWindow::SetCircle(MPoint center, int radius) {
     ForEachCircleLine(AddSpanOp(this), center, radius);
 }
-#pragma opt_common_subs reset
 
-// NONMATCHING: the spill slots of center.y and the lower-half line counter are swapped, and the literal-0 pool
-// offsets differ (the game's ipa .data layout interleaves SetCircle's and SubtractCircle's zeros).
-#pragma opt_common_subs off
+// NONMATCHING: the spill slots of the bottom edge and the lower-half line counter are swapped, and the literal-0
+// pool offsets differ (the game's ipa .data layout interleaves SetCircle's and SubtractCircle's zeros).
 void MRasterWindow::SubtractCircle(MPoint center, int radius) {
     ForEachCircleLine(SubtractSpanOp(this), center, radius);
 }
-#pragma opt_common_subs reset
