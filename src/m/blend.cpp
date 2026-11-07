@@ -100,7 +100,7 @@ MTask *MBlend::CreateFadeRatioAnime(int from, int to, u32 duration, int ease) {
 }
 
 MTask *MBlend::CreateAlphaRatioAnime(int evaFrom, int evaTo, int evbFrom, int evbTo, u32 duration, int ease) {
-    return new MBlendAlphaRatioAnime(this, MPoint(evaFrom, evbFrom), MPoint(evaTo, evbTo), duration, ease);
+    return new MBlendAlphaRatioAnime(this, evaFrom, evaTo, evbFrom, evbTo, duration, ease);
 }
 
 MTask *MBlend::CreateCrossFadeInTask(int planes, u32 duration, int ease) {
