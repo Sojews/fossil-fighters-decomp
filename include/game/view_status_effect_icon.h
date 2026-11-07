@@ -75,7 +75,7 @@ public:
     u32 mSide;                      // 0xBC
     int mTimer;                     // 0xC0
     MPoint mOffsets[2];             // 0xC4
-    MSerialTaskSet *mQueue;         // 0xD4
+    MParallelTaskSet *mQueue;       // 0xD4
 };
 
 class ViewStatusEffectIcon : public MProcess {

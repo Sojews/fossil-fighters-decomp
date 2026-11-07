@@ -97,7 +97,7 @@ DinoBattleViewStatusEffectIcon::DinoBattleViewStatusEffectIcon(MSmartOam *oam, u
         mIcons->AddTail(mSlots[i].mIcon);
     }
     mParallel.AddTail(mIcons);
-    mQueue = new MSerialTaskSet();
+    mQueue = new MParallelTaskSet();
     mParallel.AddTail(mQueue);
 }
 
