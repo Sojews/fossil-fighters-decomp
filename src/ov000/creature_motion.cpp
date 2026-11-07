@@ -408,7 +408,7 @@ extern "C" MTask *func_ov000_0216ff18(DinoBattleViewCreature *creature, MPoint f
                                        BOOL shuffle, int arg);
 
 extern "C" const u32 data_0208a2b0;    // the action bar's pinch text
-extern "C" const u32 data_0208a2b8[];  // (word 2) its leaving-the-pinch text
+extern "C" const u32 data_0208a2c0;    // (data_0208a2b8[2], reached by its own address) its leaving-the-pinch text
 // The TU's pooled pinch mark path (word 1).
 extern "C" const char *const data_ov000_02193030[];
 
@@ -425,8 +425,8 @@ static inline MTask *DinoCreatePinchTextTask(DinoBattleView *view, u32 text, con
     return view->CreatePostTask(new DinoBattleViewActionInfoBarUpdateRequest(text + (c->mUnkB0 == 1 ? 1 : 0)));
 }
 
-// NONMATCHING (99%): the game selects the text's address and loads it once after the join, yet still keeps it in a
-// register; the value ternary here keeps the register but loads in each arm. Some spill slots differ.
+// NONMATCHING (99.97%): four spill slots differ (enable/wait/string-flag/tasks). The shared load after the join is the
+// value ternary over two scalar symbols (the late tail merge folds the identical `ldr [r0]`s).
 void DinoBattleViewCreature::SetLife(int life) {
     if (mUnkF8 == 0 || life == 0) {
         mUnkF8 = life;
@@ -437,7 +437,7 @@ void DinoBattleViewCreature::SetLife(int life) {
     if (GetDefUnk61() != 5 || pinch == IsInPinch()) {
         return;
     }
-    u32 text = pinch ? data_0208a2b0 : data_0208a2b8[2];
+    u32 text = pinch ? data_0208a2b0 : data_0208a2c0;
     MSerialTaskSet *set = new MSerialTaskSet(TRUE);
     ((DinoBattleViewPlayer *)mUnkDC)->mView->IncUnk13C();
     MTask *enable = ((DinoBattleViewPlayer *)mUnkDC)->mView->CreateEnableRootSelectTask();
