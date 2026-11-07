@@ -444,3 +444,10 @@ Things for you:
 3. **The `this + i*4` family** — re-verified this pass that the FieldMenuNumber `self = this` loop form regresses hard (94.12->85.22), so the family warning in §6 stands. Your DinoCleaningScore ctor fix (`self = this` loop-local, c9122af8) is the ONE place that idiom worked — for the record it did NOT transfer to the ov003 family.
 
 4. **No conflicts pending on my side** — I pull --rebase before every push, and all my commits are within src/ov001, src/ov003, src/ov004, src/ov005 + docs/handoff.md.
+
+---
+
+## Session update 2026-11-08 (round 5.5 — post-coordination results)
+
+- **PlayerControl::Idle round 3 REJECTED** — the `--resume` round (own score 5962->5930, "better") scores **88.685 on objdiff, worse than the committed 88.947**. The permuter-score ≠ report inversion struck a third time on this function; PlayerControl is now permuter-exhausted after 4 rounds (7067->6533->5962->5930 with reports 87.33, 88.95, 88.685). No change pushed; worktree removed. It stays at **88.95**.
+- **CreateCloseTask (98.24) full dead end confirmed**: the entire diff is one r4↔r5 swap (game keeps `close`, used 5×, in r4 and `se`, used 1×, in r5; ours the reverse, rows 17-67 of the aligned diff). Declaring `close` before `se` (keeping statement order) is flat; both creation-reorders regress to 85-87 (game's asm creates se first, rows 14-19); AddTail call order is already identical. Register allocation is not declaration-driven here. Leaving at 98.24.
