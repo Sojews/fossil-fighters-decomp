@@ -212,14 +212,26 @@ void DinoSoundMainTask::OnVSync() {
 }
 
 // NONMATCHING: the game's frame has the unused word below the std::min temporaries (the up one is a slot higher).
+// The game's frame here is an 8-byte lock, then the two differences top-down, then an unused word at the bottom
+// (an object with a destructor keeps its slot even though nothing touches it).
+struct DinoSoundUnusedWord {
+    DinoSoundUnusedWord() {}
+    ~DinoSoundUnusedWord() {}
+    u32 mUnk00;
+};
+
 void DinoSoundMainTask::OnPostLoop() {
-    DinoSoundLock lock(&sMutex.mutex, TRUE);
+    MScopedLock lock(&sMutex.mutex, TRUE);
+    u32 up;
+    u32 down;
+    DinoSoundUnusedWord unused;
     if (sVolume != sTargetVolume) {
         if (sVolume < sTargetVolume) {
-            sVolume += std::min(sFadeUpStep, sTargetVolume - sVolume);
+            up = sTargetVolume - sVolume;
+            sVolume += std::min(sFadeUpStep, up);
         } else {
-            u32 diff = sVolume - sTargetVolume;
-            sVolume -= std::min(sFadeDownStep, diff);
+            down = sVolume - sTargetVolume;
+            sVolume -= std::min(sFadeDownStep, down);
         }
         func_02003234(sVolume);
     }
