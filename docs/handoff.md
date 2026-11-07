@@ -373,3 +373,17 @@ for i in range(max(len(l),len(r))):
     k=a.get('diff_kind') or b.get('diff_kind')
     if k and k!='DIFF_NONE': print(i,k,a.get('instruction',{}).get('formatted'),'|',b.get('instruction',{}).get('formatted'))
 ```
+
+---
+
+## Session update 2026-11-08 (a second agent pass; same four-overlay area)
+
+State at origin/main **acb44c50** (report: 11633/11787 fuzzy-100). Changes this pass, all committed and pushed, no report regressions:
+
+- **DinoUiDebugFlagMenuItem::GetFrame 79.00 -> 88.17** (`MPoint pos = mPos;` before building the MRect — the local copy fixes the schedule: 16 lands in r1 instead of a 4th saved reg, right/bottom adds emit before the edge stores). Tested and rejected: folded 4-edge ctor (69.7), MPoint-pair ctor (44.2), ref-to-member (79.0), direct-mPos ctor (64.4). Remaining 9 rows: y-before-x load order, one extra spill slot. A 600s permuter round produced nothing (base 54 = best 54).
+- **DinoFieldCamera::UnkV14 90.61 -> 90.94**: orbit yaw/pitch params widened u16 -> int, with `(u16)pitch` on the first clamp compare and `(u32)pitch` on the second + both else-if compares. The (u32)s are identity-in-code but unsigned (blo/bhs like the game) and AST-distinct so they don't merge with the (u16) cast. Blanket (u16) everywhere regresses (90.45); the game's second unmerged trunc pair (lsl/lsr, lsl/lsr at the clamp) is still 2 instructions off.
+- **DinoFieldBattleStartEffect::StateClose 95.28 -> 96.60**: `std::max((int)data_ov001_0216aad4.mMinRadius, radius)` — the (int) cast makes mwcc fresh-reload the pool member on the max's result path instead of reusing the cached register. Explicit-if and ternary forms regress (~84-87); `std::max(radius, min)` slightly worse (95.15). One spill slot (sp+0x14) still differs from the game's pool re-load.
+
+Dead ends confirmed this pass (files restored): Decide permuter best-383 scores 78.8 vs 79.5 (permuter score ≠ report again); WalkOnLand0/1 literal-0 collapses to 56.7, `water != 0` to 92.2 — the game's `movs r2,#0` is allocator-order, permuter-dead too (best 12 = base 12 after 408 compiles); DinoUiExchange::StateSave pair-temp / mac-local shapes don't produce the game's two zeroed temps (all ~95.1); DinoUiEnding::StateStart DinoEndingStrip folded-ctor and pos-first variants regress (95.6 / 97.5) — the "loads strip position before rect constants" scheduling stands, and sp offsets shift by ~0x10 in the mid-function.
+
+Still open in these overlays (unchanged): DinoFieldRadar::Idle 66.18, DinoFieldPlayerControl::Idle 86.12, DinoFieldCamera::IdleUnk0 90.52 (game's frame is 40 bytes BIGGER — needs extra temps, not fewer), DinoUiDebugKasekiRockGetMenu::OnStart 92.23, DinoUiEnding::StateStart 98.75, the `this+i*4` family, and the 99.x slot puzzles. Frontier order stands: low-% large-byte rewrites first (Radar, PlayerControl, IdleUnk0), then small surgical (saved for permuter runs).
