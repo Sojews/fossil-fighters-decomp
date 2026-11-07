@@ -47,17 +47,8 @@ extern "C" const u32 data_0208ad34;  // the help text over the score
 extern "C" void func_ov002_0215bce8(DinoCleaningScore *score);
 
 #define SCORE_DATA data_ov002_02164ad8
-// The channels' 0xFF clamps (std::min on a pooled literal): the value read through the TU's literal block, the
-// literal returned by its own symbol.
-extern "C" const u32 data_ov002_02164a5c, data_ov002_02164a60, data_ov002_02164a64, data_ov002_02164a68,
-    data_ov002_02164a6c, data_ov002_02164a70, data_ov002_02164a74, data_ov002_02164a80, data_ov002_02164a84,
-    data_ov002_02164a88, data_ov002_02164a8c, data_ov002_02164a90, data_ov002_02164a98, data_ov002_02164a9c,
-    data_ov002_02164aa0, data_ov002_02164aac, data_ov002_02164ab4, data_ov002_02164ab8;
-extern "C" struct DinoScoreLiterals data_ov002_02164a58;
-static inline const u32 &DinoScoreClamp(const u32 &a, const u32 &named, const u32 &b) {
-    return b < a ? b : named;
-}
-#define SCORE_FF(off, named, x) DinoScoreClamp(((const u32 *)&data_ov002_02164a58)[(off) / 4], named, x)
+// A channel clamped to 0xFF (std::min against a literal: the game's 18 pooled 0xFF words in the TU's literal block).
+#define SCORE_FF(x) std::min((u32)0xFF, (u32)(x))
 
 // t percent of the way from one channel to the other.
 #define LERP(from, to, t) (((from) * (100 - (t)) + (to) * (t)) / 100)
@@ -65,9 +56,8 @@ static inline const u32 &DinoScoreClamp(const u32 &a, const u32 &named, const u3
 
 // Builds the backdrop gradients (grey, blue and red, each in a normal and a brighter version, every channel
 // clamped to 0xFF), the backdrop's raster, the success and failure windows with their score digits, and the arrow.
-// NONMATCHING: 94.5%, the game keeps the digit loops' counters on the stack and this + i * 4 in a register across
+// NONMATCHING: 97.8%, the game keeps the digit loops' counters on the stack and this + i * 4 in a register across
 // the path string's destructor (its frame is 8 bytes bigger): the known "this+i*4 across a string dtor" loop family.
-// Under the file's ipa some of the clamps also load the pooled limit before the colour (97.9% without ipa).
 DinoCleaningScore::DinoCleaningScore(DinoCleaning *cleaning, MSmartOam *oam, u32 score, u8 flag) : MProcess(NULL) {
     mCleaning = cleaning;
     mScore = score;
@@ -77,26 +67,26 @@ DinoCleaningScore::DinoCleaningScore(DinoCleaning *cleaning, MSmartOam *oam, u32
     mUnk9CC = 0;
     for (u32 k = 0; k < 2; k++) {
         for (u32 j = 0; j < 100; j++) {
-            u32 r = LERP(SCORE_FF(0x0C, data_ov002_02164a64, SCORE_DATA.mColors[5].r + k * 4),
-                         SCORE_FF(0x04, data_ov002_02164a5c, SCORE_DATA.mColors[3].r + k * 4), j);
-            u32 g = LERP(SCORE_FF(0x60, data_ov002_02164ab8, SCORE_DATA.mColors[5].g + k * 4),
-                         SCORE_FF(0x44, data_ov002_02164a9c, SCORE_DATA.mColors[3].g + k * 4), j);
-            u32 b = LERP(SCORE_FF(0x48, data_ov002_02164aa0, SCORE_DATA.mColors[5].b + k * 4),
-                         SCORE_FF(0x14, data_ov002_02164a6c, SCORE_DATA.mColors[3].b + k * 4), j);
+            u32 r = LERP(SCORE_FF(SCORE_DATA.mColors[5].r + k * 4),
+                         SCORE_FF(SCORE_DATA.mColors[3].r + k * 4), j);
+            u32 g = LERP(SCORE_FF(SCORE_DATA.mColors[5].g + k * 4),
+                         SCORE_FF(SCORE_DATA.mColors[3].g + k * 4), j);
+            u32 b = LERP(SCORE_FF(SCORE_DATA.mColors[5].b + k * 4),
+                         SCORE_FF(SCORE_DATA.mColors[3].b + k * 4), j);
             mGradients[0][k][j] = SCORE_RGB(r, g, b);
-            r = LERP(SCORE_FF(0x54, data_ov002_02164aac, SCORE_DATA.mColors[1].r + k * 4),
-                     SCORE_FF(0x18, data_ov002_02164a70, SCORE_DATA.mColors[2].r + k * 4), j);
-            g = LERP(SCORE_FF(0x5C, data_ov002_02164ab4, SCORE_DATA.mColors[1].g + k * 4),
-                     SCORE_FF(0x30, data_ov002_02164a88, SCORE_DATA.mColors[2].g + k * 4), j);
-            b = LERP(SCORE_FF(0x34, data_ov002_02164a8c, SCORE_DATA.mColors[1].b + k * 4),
-                     SCORE_FF(0x40, data_ov002_02164a98, SCORE_DATA.mColors[2].b + k * 4), j);
+            r = LERP(SCORE_FF(SCORE_DATA.mColors[1].r + k * 4),
+                     SCORE_FF(SCORE_DATA.mColors[2].r + k * 4), j);
+            g = LERP(SCORE_FF(SCORE_DATA.mColors[1].g + k * 4),
+                     SCORE_FF(SCORE_DATA.mColors[2].g + k * 4), j);
+            b = LERP(SCORE_FF(SCORE_DATA.mColors[1].b + k * 4),
+                     SCORE_FF(SCORE_DATA.mColors[2].b + k * 4), j);
             mGradients[1][k][j] = SCORE_RGB(r, g, b);
-            r = LERP(SCORE_FF(0x38, data_ov002_02164a90, SCORE_DATA.mColors[4].r + k * 4),
-                     SCORE_FF(0x10, data_ov002_02164a68, SCORE_DATA.mColors[0].r + k * 4), j);
-            g = LERP(SCORE_FF(0x08, data_ov002_02164a60, SCORE_DATA.mColors[4].g + k * 4),
-                     SCORE_FF(0x28, data_ov002_02164a80, SCORE_DATA.mColors[0].g + k * 4), j);
-            b = LERP(SCORE_FF(0x2C, data_ov002_02164a84, SCORE_DATA.mColors[4].b + k * 4),
-                     SCORE_FF(0x1C, data_ov002_02164a74, SCORE_DATA.mColors[0].b + k * 4), j);
+            r = LERP(SCORE_FF(SCORE_DATA.mColors[4].r + k * 4),
+                     SCORE_FF(SCORE_DATA.mColors[0].r + k * 4), j);
+            g = LERP(SCORE_FF(SCORE_DATA.mColors[4].g + k * 4),
+                     SCORE_FF(SCORE_DATA.mColors[0].g + k * 4), j);
+            b = LERP(SCORE_FF(SCORE_DATA.mColors[4].b + k * 4),
+                     SCORE_FF(SCORE_DATA.mColors[0].b + k * 4), j);
             mGradients[2][k][j] = SCORE_RGB(r, g, b);
         }
     }
