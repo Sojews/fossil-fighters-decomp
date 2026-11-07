@@ -402,14 +402,20 @@ namespace std {
         Metrowerks::int2type<true> unk_;
     };
 
-    // (insert constructs through the buffer's allocator; the tag is made one level down, and the element is
-    // copied into a temporary bound to a reference: the game keeps that temporary in memory.)
-    template <class A, class T> inline void __cdeque_construct(A &a, T *p, const T &x, Metrowerks::int2type<true>) {
-        const T &y = T(x);
-        a.construct(p, y);
+    // An element copy with a destructor: insert keeps one for its whole body, so the game holds it in a register
+    // through the construct loop and stores it to its frame slot once after the loop.
+    template <class T> struct __cdeque_elem {
+        ~__cdeque_elem() {}
+        T v;
+    };
+    // (insert constructs through the buffer's allocator, with the tag made one level down.)
+    template <class A, class T> inline void __cdeque_construct(A &a, T *p, const T &x, __cdeque_elem<T> &e,
+                                                               Metrowerks::int2type<true>) {
+        e.v = x;
+        a.construct(p, e.v);
     }
-    template <class A, class T> inline void __cdeque_construct(A &a, T *p, const T &x) {
-        __cdeque_construct(a, p, x, Metrowerks::int2type<true>());
+    template <class A, class T> inline void __cdeque_construct(A &a, T *p, const T &x, __cdeque_elem<T> &e) {
+        __cdeque_construct(a, p, x, e, Metrowerks::int2type<true>());
     }
     template <class T> inline void __cdeque_assign(T &d, const T &s, Metrowerks::int2type<true>) {
         d = s;
@@ -716,8 +722,9 @@ namespace std {
         tmp.start_ = pi;
         T *p = tmp.data_ + pi;
         // (do-while under a guard: a plain for loop tests n twice)
+        __cdeque_elem<T> e;
         if (n != 0) do {
-            __cdeque_construct(tmp.alloc(), p, *first);
+            __cdeque_construct(tmp.alloc(), p, *first, e);
             ++tmp.size_;
             --n, ++p, ++first;
         } while (n != 0);
