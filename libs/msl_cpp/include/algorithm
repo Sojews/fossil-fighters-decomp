@@ -368,12 +368,16 @@ namespace std {
     template <class T> inline T *__iter_ptr(T *x) {
         return x;
     }
+    // (Built through this, last2 takes the game's lowest stack slot.)
+    template <class T> inline __vec_iterator<T> __vec_it(T *x) {
+        return __vec_iterator<T>(x);
+    }
 
     template <class BidirectionalIterator, class OutputIterator, class Compare>
     OutputIterator __insertion_sort_move(BidirectionalIterator first, BidirectionalIterator last,
                                          OutputIterator result, Compare &comp) {
         typedef typename iterator_traits<OutputIterator>::value_type value_type;
-        __vec_iterator<value_type> last2(result.base());
+        __vec_iterator<value_type> last2 = __vec_it(result.base());
         // (A copy built from the pointer, not from first itself, stays apart from the parameter: the game copies
         // first right after last2 and reads the first element through the parameter.)
         BidirectionalIterator f(__iter_ptr(first));
