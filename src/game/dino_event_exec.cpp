@@ -2900,6 +2900,12 @@ static inline MFx32Point DinoUniform(const MFx32 &s) {
     return p;
 }
 
+// The task itself. Passing the level-up's sound task through it gives the task an extra copy, which changes the order
+// in which the compiler spills it beside the second scale anime (the game's slots).
+static inline MTask *DinoIdTask(MTask *t) {
+    return t;
+}
+
 // Adds a and b to a new parallel set (one that exits when both have). The set comes in as an argument (evaluated after
 // the tasks): the game's spill slots for the level-up's tasks follow from it.
 static inline MTask *DinoParallel(MParallelTaskSet *set, MTask *a, MTask *b) {
@@ -2907,7 +2913,6 @@ static inline MTask *DinoParallel(MParallelTaskSet *set, MTask *a, MTask *b) {
     return set;
 }
 
-// NONMATCHING: the second scale anime and the sound task take each other's spill slots.
 void DinoEventExecBattle::StateLevelUp() {
     if (mUnk198.size() == 0) {
         mState = data_020be144.StateOpenField_18;
@@ -2931,7 +2936,7 @@ void DinoEventExecBattle::StateLevelUp() {
                      gLcd->GetBottomDisplay()->mBright->CreateFadeInFromWhite(data_0208a1f0, data_0208a1ec),
                      picture->GetScreen()->CreateScaleAnime(DinoUniform(data_020b5ab4), MFx32Point(MFx32(1), MFx32(1)),
                                                             data_0208a1f0, data_0208a1ec)),
-        new MTimer(data_0208a1f8), DinoSoundCreatePlaySeTask(0x458, 0),
+        new MTimer(data_0208a1f8), DinoIdTask(DinoSoundCreatePlaySeTask(0x458, 0)),
         new DinoCommonWindowMessageBox(gLcd->GetBottomDisplay(), MPoint(0x80, 0x60), std::string(buf), 4),
         DinoParallel(new MParallelTaskSet(TRUE),
                      gLcd->GetBottomDisplay()->mBright->CreateFadeOutToWhite(data_0208a1e4, data_0208a1e8),
