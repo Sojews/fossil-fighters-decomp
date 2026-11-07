@@ -248,6 +248,7 @@ static inline MFx32 DinoRadarDot(MFx32Point a, DinoRadarVec b) {
 // Whether the sweep passes the point (and it is in range): its mark flashes and the radar beeps.
 static inline BOOL DinoRadarSwept(DinoFieldRadar *radar, const DinoRadarSweep &sweep, const MFx32Point &p, MMotion *mark) {
     BOOL ahead = FALSE;
+    MFx32Point d;
     if (radar->mSignalling && mark != NULL) {
         if ((p.x - sweep.origin.x) * sweep.n1.x + (p.y - sweep.origin.y) * sweep.n1.y > MFx32(0)) {
             ahead = TRUE;
@@ -261,7 +262,7 @@ static inline BOOL DinoRadarSwept(DinoFieldRadar *radar, const DinoRadarSweep &s
     }
     BOOL inRange = FALSE;
     if (inside) {
-        MFx32Point d = p - radar->mPlayerPos;
+        d = p - radar->mPlayerPos;
         if (d.x * d.x + d.y * d.y <= radar->mRangeSq) {
             inRange = TRUE;
         }
@@ -286,14 +287,16 @@ static inline BOOL DinoRadarBetween(MFx32Point d, DinoRadarVec n1, DinoRadarVec 
 // NONMATCHING: same calls in order, but the inline math leaves ~20 more temporaries on the stack than the game's
 // (0x660 against 0x5DC), which moves much of it past sp+0x3FC.
 void DinoFieldRadar::Idle() {
+    BOOL side;
+    DinoBackupEntry entry;
     DinoRadarSweep sweep;
     sweep.n2.x = 0;
     sweep.n2.y = 0;
+    MtxFx22 mtx;
     sweep.n1.x = 0;
     sweep.n1.y = 0;
     sweep.origin.x = 0;
     sweep.origin.y = 0;
-    MtxFx22 mtx;
     u16 rot = mPlayerAngle + 0x4000;
     MTX_Rot22_(&mtx, FX_SinIdx(rot), FX_CosIdx(rot));
     GXOamAffine *affine = (GXOamAffine *)mAffine->addr;
@@ -303,7 +306,7 @@ void DinoFieldRadar::Idle() {
     affine->PD = mtx._11 >> 4;
     mEntries.clear();
     if (mSignalling) {
-        mSignalTime++;
+        ++mSignalTime;
         if (mSignalTime >= 0x40) {
             mSignalling = FALSE;
         }
@@ -330,10 +333,10 @@ void DinoFieldRadar::Idle() {
         mUnkA4->AddTail(mContainerGauge->CreateCoordAnime(mContainerGauge->GetPosition(), mGaugePos, 30, -2));
     }
     for (u32 i = 0; i < 200; i++) {
+        MFx32Point p = *(MFx32Point *)&entry;
         if (mRocks[i] == NULL) {
             continue;
         }
-        DinoBackupEntry entry;
         gDinoBackup->GetUnk134(i, &entry);
         if (entry.map == 0) {
             mRocks[i]->Exit();
@@ -342,7 +345,6 @@ void DinoFieldRadar::Idle() {
         if (mRocks[i] != NULL) {
             mEntries.push_back(*(DinoFieldRadarEntry *)&entry);
         }
-        MFx32Point p = *(MFx32Point *)&entry;
         if (DinoRadarSwept(this, sweep, p, mRocks[i])) {
             mRocks[i]->Play(3, 1);
             DinoSoundPlaySe(0x88, 0);
@@ -350,10 +352,10 @@ void DinoFieldRadar::Idle() {
     }
     for (u32 i = 0; i < 100; i++) {
         DinoFieldCharaModel *model = mField->mCharas[i]->GetModel();
-        if (mUnk3D8[i] == NULL) {
+        if (NULL == mUnk3D8[i]) {
             if (model->id != 0 && model->unk05[1] != 0) {
                 MMotion *mark = (MMotion *)(mUnk3D8[i] = (u32)new MMotion(
-                    std::string(mField->mCharas[i]->mData.Get()->unk28 == 0 ? sRadarPool.redMarkPath : sRadarPool.rockPath),
+                    std::string(0 == mField->mCharas[i]->mData.Get()->unk28 ? sRadarPool.redMarkPath : sRadarPool.rockPath),
                     mOam, 0, 1));
                 mark->GetUnit()->SetMode(1);
                 mark->SetPosition(DinoRadarToPoint(model->pos * mScale));
@@ -361,13 +363,13 @@ void DinoFieldRadar::Idle() {
                 mark->Show();
                 mRockTasks->AddTail(mark);
             }
-        } else if (model->id == 0 || model->unk05[1] == 0) {
+        } else if (0 == model->id || model->unk05[1] == 0) {
             ((MMotion *)mUnk3D8[i])->Exit();
             mUnk3D8[i] = 0;
         } else {
             ((MMotion *)mUnk3D8[i])->SetPosition(DinoRadarToPoint(model->pos * mScale));
         }
-        if (mUnk3D8[i] != 0) {
+        if (0 != mUnk3D8[i]) {
             mEntries.push_back(*(DinoFieldRadarEntry *)&model->pos);
         }
         if (DinoRadarSwept(this, sweep, model->pos, (MMotion *)mUnk3D8[i])) {
@@ -382,12 +384,14 @@ void DinoFieldRadar::Idle() {
         return;
     }
     u32 distance = 0;
-    u32 direction = 0;
+    u32 direction;
+    direction = 0;
+    DinoRadarVec near1;
     BOOL dig = FALSE;
     MFx32Point front = mPlayerPos + MFx32Point(MFx32::FromRaw(FX_CosIdx(mPlayerAngle)),
                                                MFx32::FromRaw(FX_SinIdx(mPlayerAngle))) * (mPlayerHeight + MFx32(1));
-    u16 angle = mPlayerAngle;
-    DinoRadarVec near1 = DinoRadarNormal(angle + ((u32)mUnk580 >> 1));
+    int angle = mPlayerAngle;
+    near1 = DinoRadarNormal(angle + ((u32)mUnk580 >> 1));
     DinoRadarVec near2 = DinoRadarNormal(angle - ((u32)mUnk580 >> 1));
     DinoRadarVec far1 = DinoRadarNormal(angle + ((u32)mUnk582 >> 1));
     DinoRadarVec far2 = DinoRadarNormal(angle - ((u32)mUnk582 >> 1));
@@ -395,7 +399,8 @@ void DinoFieldRadar::Idle() {
         MFx32Point e = *(MFx32Point *)&mEntries[j];
         MFx32Point d = e - mPlayerPos;
         MFx32 dist = d.x * d.x + d.y * d.y;
-        BOOL atFront = FALSE;
+        BOOL atFront;
+        atFront = FALSE;
         if (!dig) {
             MFx32Point f = e - front;
             if (f.x * f.x + f.y * f.y <= MFx32(4)) {
@@ -411,11 +416,11 @@ void DinoFieldRadar::Idle() {
             distance = std::max(distance, data_ov001_02169e84);
         }
         if (dist <= mUnk57C) {
-            BOOL ahead = (direction < 2 && DinoRadarBetween(d, near2, near1));
+            const BOOL ahead = (direction < 2 && DinoRadarBetween(d, near2, near1));
             if (ahead) {
                 direction = 2;
             } else {
-                BOOL side = (direction < 1 && DinoRadarBetween(d, far2, far1));
+                side = (direction < 1 && DinoRadarBetween(d, far2, far1));
                 if (side) {
                     direction = 1;
                 }
