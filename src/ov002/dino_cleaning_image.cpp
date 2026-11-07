@@ -276,7 +276,9 @@ void DinoCleaningImage::LoadPalettes(MPalUnit *block, u32 start) {
 static inline u8 DinoLayerHard(const DinoCleaningImageLayer *layer, int row, int col) { return layer->mHard[row][col]; }
 static inline u8 DinoLayerCells(const DinoCleaningImageLayer *layer, int row, int col) { return layer->mCells410[row][col]; }
 
-// NONMATCHING: 99.7%, the first mask loop's iterator and end take each other's registers (`end() != it` fixed the mask pointer).
+// NONMATCHING: 99.8%, the first mask loop's iterator and end take each other's registers (`end() != it` fixed the mask
+// pointer; the loop written as a guarded do-while puts the compare's operands in the game's order). A separate iterator
+// for that loop puts end in r5 like the game but rotates the mask pointer, offset and iterator through r1-r3.
 // A layer counts toward the grid when its cell is breakable; only the uncovered ones count as left.
 void DinoCleaningImage::Build(u32 arg, u32 start) {
     mUnk08 = TRUE;
@@ -290,11 +292,15 @@ void DinoCleaningImage::Build(u32 arg, u32 start) {
     for (u32 col = 0; col < 28; col++) {
         for (u32 row = 0; row < 36; row++) {
             mMask[row][col] = TRUE;
-            for (it = mLayers.begin(); mLayers.end() != it; ++it) {
-                if (DinoLayerHard(*it, row, col) == 0) {
-                    mMask[row][col] = FALSE;
-                    break;
-                }
+            it = mLayers.begin();
+            if (mLayers.end() != it) {
+                do {
+                    if (DinoLayerHard(*it, row, col) == 0) {
+                        mMask[row][col] = FALSE;
+                        break;
+                    }
+                    ++it;
+                } while (mLayers.end() != it);
             }
         }
     }
@@ -319,7 +325,6 @@ void DinoCleaningImage::Build(u32 arg, u32 start) {
     }
     mUnk1400 = mUnk13FC;
 }
-
 
 void DinoCleaningImage::PlayLayerSounds() {
     for (std::vector<DinoCleaningImageLayer *>::iterator it = mLayers.begin(); it != mLayers.end(); ++it) {
