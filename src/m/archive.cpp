@@ -164,6 +164,7 @@ void MArchive::Read(u32 index, u32 offset, void *dest, u32 size, MArchiveFilter 
     file.Read(&header, sizeof(header));
     u32 *chunks = new u32[header.chunkCount + 1];
     file.Read(chunks, (header.chunkCount + 1) * sizeof(u32));
+    u8 *buffer2;
     BOOL shared;
     {
         MIrqLock irq;
@@ -175,7 +176,6 @@ void MArchive::Read(u32 index, u32 offset, void *dest, u32 size, MArchiveFilter 
         }
     }
     u8 *buffer;
-    u8 *buffer2;
     if (shared) {
         buffer = sReadBuffer;
         buffer2 = sReadBuffer2;
@@ -204,7 +204,7 @@ void MArchive::Read(u32 index, u32 offset, void *dest, u32 size, MArchiveFilter 
             skip = 0;
         }
         u32 length;
-        if (c == last) {
+        if (last == c) {
             length = ((offset + size - 1) & (header.chunkSize - 1)) + 1;
             if (c == header.chunkCount - 1) {
                 partial = (partial | (header.size != offset + size)) ? TRUE : FALSE;
