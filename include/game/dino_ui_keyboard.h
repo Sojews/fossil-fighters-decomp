@@ -104,6 +104,7 @@ public:
             mFrame.right = mPos.x + 0x40;
             mFrame.bottom = mPos.y + 0xC;
         }
+        SetNoFocus(TRUE);
     }
     virtual ~DinoUiKeyboardHideMenuItem();
     virtual void OnFocusChanged(BOOL focused);

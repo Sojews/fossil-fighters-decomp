@@ -911,7 +911,6 @@ extern "C" void func_ov007_02182020(DinoUiKeyboardMenu *menu) {
     for (int i = 0; i < menu->mMaxLength; i++) {
         DinoUiKeyboardHideMenuItem *place = new DinoUiKeyboardHideMenuItem(
             menu->mMode == 2 ? 0xF0 : 0xF1, i, data_ov007_021911f0[menu->mMode][i], menu);
-        place->SetNoFocus(TRUE);
         menu->AddItem(place);
     }
     menu->AddEntry((u32)menu->mHelp, 4, 0);
