@@ -364,6 +364,11 @@ Macros in `include/game/dino_static_init.h`.
   (`MRect(MPoint(0, 0), DINO_POOL_NV(MPoint, sym, off))`), not a local copy; a by-value arg costs temp + copy, a
   pool lvalue only the copy. A named offset local computed before the rect's store fixes the slot order and delays
   the rect's stores (dino_main_layout 94.6 -> 100).
+- **Common-layout sinit in an `#pragma ipa file` TU** (dead stack temps in the mirrored slot order): move the body into
+  a `static inline void Init()` the struct ctor calls and write the rects as `MRect(MPoint(0, 0), pool size)` (not
+  `DinoSizeRect`): the extra inline level gives the game's slots. If the game hoists only the rect's zero half above
+  the size stores, store the rect field-wise from a local `MRect r(...)`: top-left through the anchor at pool+0x80,
+  size half through the pool's own symbol (revive field suspend sinit 79 -> 100).
 - A static-init struct object takes 1 byte of .bss: place it after the TU's other .bss statics.
 - **.bss layout:** our pool puts 4-byte statics first and orders same-size objects by declaration (ours = declaration
   order rotated left by one, the game rotated right; dtor records after each object in ours, before in the game).
@@ -511,7 +516,7 @@ Proven unreproducible with the configured compiler; don't spend time without a g
 - **Switch layouts that break the table rule** (View3D::OnMessage dispatch and hit-sound switch,
   UserController::OnMessage): case order, empty cases, value types, versions, `switch_tables` all fail.
 - **ViewField::OnMessage `this` spill** (game spills an 83-use `this`): no level, flag or volatile reproduces it.
-- **`DINO_COMMON_LAYOUT_INIT` sinits:** NV/volatile mixes change nothing (single-anchor aliasing blocks the reorder).
+- **`DINO_COMMON_LAYOUT_INIT` sinits:** NV/volatile mixes change nothing (single-anchor aliasing blocks the reorder). (For ipa TUs see the Static init recipe.)
 - **Function-local statics whose bss/data offset depends on data the TU doesn't emit** (LoadSlideInPict/SlideOutPict
   `sDirs`).
 - **push_back of a non-trivial class T** (init_copy vs sub_push_back tag slots; View3D ctor, backup AddFile): header
