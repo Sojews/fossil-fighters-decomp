@@ -541,7 +541,14 @@ DinoTalkWindowNamePanel::DinoTalkWindowNamePanel(DinoTalkWindow *owner, std::wst
     GetSerial()->AddTail(new MTimer(1), mName->CreateShowTransfer());
 }
 
-// NONMATCHING: this and the zero swap registers (r5/r6), and the position temporaries' stack slots.
+// Slides the name panel and its name down off the screen.
+static inline MTask *DinoTalkCloseNamePanel(DinoTalkWindowNamePanel *panel) {
+    return (new MParallelTaskSet(TRUE))
+        ->Add(panel->mPanel->CreateCoordAnime(panel->mPos, panel->mPos.Offset(0, 0x60), 0x14, 2))
+        ->Add(panel->mName->CreateCoordAnime(panel->mPos + panel->mNameOffset,
+                                             (panel->mPos + panel->mNameOffset).Offset(0, 0x60), 0x14, 2));
+}
+
 MTask *DinoTalkWindow::CreateCloseTask() {
     mUnkF4 = FALSE;
     mUnkAC = 0;
@@ -557,12 +564,7 @@ MTask *DinoTalkWindow::CreateCloseTask() {
                      mConsole->CreateCoordAnime(mConsole->GetPosition(), mConsole->GetPosition().Offset(0, 0x60), 0x14, 2));
         DinoTalkWindowNamePanel *panel = mNamePanel;
         if (panel != NULL) {
-            MPoint name = panel->mPos + panel->mNameOffset;
-            MTask *nameAnime = panel->mName->CreateCoordAnime(name, name.Offset(0, 0x60), 0x14, 2);
-            MTask *panelAnime = panel->mPanel->CreateCoordAnime(panel->mPos, panel->mPos.Offset(0, 0x60), 0x14, 2);
-            MParallelTaskSet *anims = new MParallelTaskSet(TRUE);
-            anims->AddTail(panelAnime, nameAnime);
-            set->AddTail(anims);
+            set->AddTail(DinoTalkCloseNamePanel(panel));
         }
     } else {
         mConsole->Hide();
