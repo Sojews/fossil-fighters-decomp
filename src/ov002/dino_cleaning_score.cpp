@@ -26,14 +26,6 @@ struct DinoCleaningScoreRgb {
 
 struct DinoScoreLiterals;
 extern "C" DinoScoreLiterals data_ov002_02164a58;
-// The motions' paths, kept in the TU's literal block (data_ov002_02164a58) among the clamps:
-// +0x24 "/motion/cleaning/score_digit.bin", +0x3C "/motion/cleaning/yajirusi.bin",
-// +0x50 "/motion/cleaning/failure_window.bin", +0x58 "/motion/cleaning/success_window.bin".
-#define SCORE_PATH(off) (((const char *const *)&data_ov002_02164a58)[(off) / 4])
-#define sDigitPath SCORE_PATH(0x24)
-#define sArrowPath SCORE_PATH(0x3C)
-#define sFailurePath SCORE_PATH(0x50)
-#define sSuccessPath SCORE_PATH(0x58)
 
 // The statics this TU's __sinit builds.
 extern "C" struct {
@@ -47,8 +39,40 @@ extern "C" const u32 data_0208ad34;  // the help text over the score
 extern "C" void func_ov002_0215bce8(DinoCleaningScore *score);
 
 #define SCORE_DATA data_ov002_02164ad8
-// A channel clamped to 0xFF (std::min against a literal: the game's 18 pooled 0xFF words in the TU's literal block).
-#define SCORE_FF(x) std::min((u32)0xFF, (u32)(x))
+// The TU's literal block (data_ov002_02164a58, 0x00-0x63): under ipa its 4-byte objects are laid out by mwcc's
+// heapsort of the objects in reverse creation order (the strings and the class typeinfos/vtable take part), and this
+// declaration order puts each one at the game's offset (+0x24 digit path, +0x3C arrow, +0x50 failure, +0x58 success,
+// +0x20/+0x4C Idle's limits, the rest the channels' 0xFF clamps; the 0xFF words are the game's std::min literals,
+// written as statics named after their game symbols so their order can be chosen).
+// sScorePad stands for the game's word at +0x00 (a 0, probably a dead literal temporary): a 4-byte object created
+// here that Show keeps alive without code ((void)sScorePad). Its value is not the game's (= 0 would go to .bss).
+static u32 data_ov002_02164a6c = 0xFF;
+static const char *sDigitPath = "/motion/cleaning/score_digit.bin";
+static u32 data_ov002_02164a80 = 0xFF;
+static u32 data_ov002_02164a68 = 0xFF;
+static u32 data_ov002_02164a74 = 0xFF;
+static u32 data_ov002_02164a5c = 0xFF;
+static u32 data_ov002_02164a60 = 0xFF;
+static u32 data_ov002_02164a64 = 0xFF;
+static int sScorePad = 1;
+static u32 data_ov002_02164ab8 = 0xFF;
+static const char *sSuccessPath = "/motion/cleaning/success_window.bin";
+static const char *sFailurePath = "/motion/cleaning/failure_window.bin";
+static int data_ov002_02164aa4 = 126;
+static u32 data_ov002_02164aa0 = 0xFF;
+static u32 data_ov002_02164a9c = 0xFF;
+static u32 data_ov002_02164a98 = 0xFF;
+static u32 data_ov002_02164a70 = 0xFF;
+static u32 data_ov002_02164a90 = 0xFF;
+static u32 data_ov002_02164a8c = 0xFF;
+static u32 data_ov002_02164a88 = 0xFF;
+static u32 data_ov002_02164a84 = 0xFF;
+static u32 data_ov002_02164ab4 = 0xFF;
+static u32 data_ov002_02164aac = 0xFF;
+static int data_ov002_02164a78 = 66;
+static const char *sArrowPath = "/motion/cleaning/yajirusi.bin";
+// A channel clamped to 0xFF.
+#define SCORE_FF(lim, x) std::min(lim, (u32)(x))
 
 // t percent of the way from one channel to the other.
 #define LERP(from, to, t) (((from) * (100 - (t)) + (to) * (t)) / 100)
@@ -56,7 +80,7 @@ extern "C" void func_ov002_0215bce8(DinoCleaningScore *score);
 
 // Builds the backdrop gradients (grey, blue and red, each in a normal and a brighter version, every channel
 // clamped to 0xFF), the backdrop's raster, the success and failure windows with their score digits, and the arrow.
-// NONMATCHING: 97.8%, the game keeps the digit loops' counters on the stack and this + i * 4 in a register across
+// NONMATCHING: 97.9%, the game keeps the digit loops' counters on the stack and this + i * 4 in a register across
 // the path string's destructor (its frame is 8 bytes bigger): the known "this+i*4 across a string dtor" loop family.
 DinoCleaningScore::DinoCleaningScore(DinoCleaning *cleaning, MSmartOam *oam, u32 score, u8 flag) : MProcess(NULL) {
     mCleaning = cleaning;
@@ -67,26 +91,26 @@ DinoCleaningScore::DinoCleaningScore(DinoCleaning *cleaning, MSmartOam *oam, u32
     mUnk9CC = 0;
     for (u32 k = 0; k < 2; k++) {
         for (u32 j = 0; j < 100; j++) {
-            u32 r = LERP(SCORE_FF(SCORE_DATA.mColors[5].r + k * 4),
-                         SCORE_FF(SCORE_DATA.mColors[3].r + k * 4), j);
-            u32 g = LERP(SCORE_FF(SCORE_DATA.mColors[5].g + k * 4),
-                         SCORE_FF(SCORE_DATA.mColors[3].g + k * 4), j);
-            u32 b = LERP(SCORE_FF(SCORE_DATA.mColors[5].b + k * 4),
-                         SCORE_FF(SCORE_DATA.mColors[3].b + k * 4), j);
+            u32 r = LERP(SCORE_FF(data_ov002_02164a64, SCORE_DATA.mColors[5].r + k * 4),
+                         SCORE_FF(data_ov002_02164a5c, SCORE_DATA.mColors[3].r + k * 4), j);
+            u32 g = LERP(SCORE_FF(data_ov002_02164ab8, SCORE_DATA.mColors[5].g + k * 4),
+                         SCORE_FF(data_ov002_02164a9c, SCORE_DATA.mColors[3].g + k * 4), j);
+            u32 b = LERP(SCORE_FF(data_ov002_02164aa0, SCORE_DATA.mColors[5].b + k * 4),
+                         SCORE_FF(data_ov002_02164a6c, SCORE_DATA.mColors[3].b + k * 4), j);
             mGradients[0][k][j] = SCORE_RGB(r, g, b);
-            r = LERP(SCORE_FF(SCORE_DATA.mColors[1].r + k * 4),
-                     SCORE_FF(SCORE_DATA.mColors[2].r + k * 4), j);
-            g = LERP(SCORE_FF(SCORE_DATA.mColors[1].g + k * 4),
-                     SCORE_FF(SCORE_DATA.mColors[2].g + k * 4), j);
-            b = LERP(SCORE_FF(SCORE_DATA.mColors[1].b + k * 4),
-                     SCORE_FF(SCORE_DATA.mColors[2].b + k * 4), j);
+            r = LERP(SCORE_FF(data_ov002_02164aac, SCORE_DATA.mColors[1].r + k * 4),
+                     SCORE_FF(data_ov002_02164a70, SCORE_DATA.mColors[2].r + k * 4), j);
+            g = LERP(SCORE_FF(data_ov002_02164ab4, SCORE_DATA.mColors[1].g + k * 4),
+                     SCORE_FF(data_ov002_02164a88, SCORE_DATA.mColors[2].g + k * 4), j);
+            b = LERP(SCORE_FF(data_ov002_02164a8c, SCORE_DATA.mColors[1].b + k * 4),
+                     SCORE_FF(data_ov002_02164a98, SCORE_DATA.mColors[2].b + k * 4), j);
             mGradients[1][k][j] = SCORE_RGB(r, g, b);
-            r = LERP(SCORE_FF(SCORE_DATA.mColors[4].r + k * 4),
-                     SCORE_FF(SCORE_DATA.mColors[0].r + k * 4), j);
-            g = LERP(SCORE_FF(SCORE_DATA.mColors[4].g + k * 4),
-                     SCORE_FF(SCORE_DATA.mColors[0].g + k * 4), j);
-            b = LERP(SCORE_FF(SCORE_DATA.mColors[4].b + k * 4),
-                     SCORE_FF(SCORE_DATA.mColors[0].b + k * 4), j);
+            r = LERP(SCORE_FF(data_ov002_02164a90, SCORE_DATA.mColors[4].r + k * 4),
+                     SCORE_FF(data_ov002_02164a68, SCORE_DATA.mColors[0].r + k * 4), j);
+            g = LERP(SCORE_FF(data_ov002_02164a60, SCORE_DATA.mColors[4].g + k * 4),
+                     SCORE_FF(data_ov002_02164a80, SCORE_DATA.mColors[0].g + k * 4), j);
+            b = LERP(SCORE_FF(data_ov002_02164a84, SCORE_DATA.mColors[4].b + k * 4),
+                     SCORE_FF(data_ov002_02164a74, SCORE_DATA.mColors[0].b + k * 4), j);
             mGradients[2][k][j] = SCORE_RGB(r, g, b);
         }
     }
@@ -159,6 +183,7 @@ void DinoCleaningScore::SetUnk9CC() {
 
 // Shows the score's gauge, rising to the score.
 void DinoCleaningScore::Show() {
+    (void)sScorePad; // keeps the literal block's +0x00 word (see the statics above)
     mArrow->Play(1, 0);
     mArrow->Show();
     mSerial.AddTail(mArrow->CreateCoordAnime(MPoint(0x80, 0x92), MPoint(0x80, (100 - mScore) * 100 / 100 + 0x2E), 90, -1));
@@ -222,24 +247,10 @@ extern "C" void func_ov002_0215bce8(DinoCleaningScore *score) {
     }
 }
 
-// The TU's pooled literals (std::min/std::max operands): the value read through the pool, the operand returned by its own
-// symbol.
+// The literal block's type: sized 0x80 so the static init's stores through it stay in bounds (see the sinit).
 extern "C" struct DinoScoreLiterals {
-    u8 unk00[0x20];
-    int mTopLimit;              // 0x20: 66
-    u8 unk24[0x4C - 0x24];
-    int mBottomLimit;           // 0x4C: 126
-    u8 unk50[0x80 - 0x50];
+    u8 unk00[0x80];
 };
-extern "C" DinoScoreLiterals data_ov002_02164a58;
-extern "C" const int data_ov002_02164a78, data_ov002_02164aa4;
-
-static inline const int &DinoScoreMin(const int &a, const int &named, const int &b) {
-    return b < a ? b : named;
-}
-static inline const int &DinoScoreMax(const int &a, const int &named, const int &b) {
-    return a < b ? b : named;
-}
 
 extern "C" u8 data_0208a22c;                    // shows the windows' numbers
 extern "C" MPoint data_ov002_02164ba4[3];       // the success window's digits, from its corner
@@ -272,8 +283,8 @@ void DinoCleaningScore::Idle() {
     }
     int top = MFx32ToInt(MFx32(46) + MFx32(100) * mUnk84 / MFx32(100));
     int bottom = MFx32ToInt(MFx32(146) - MFx32(100) * mUnk80 / MFx32(100));
-    mFailureWindow->SetPosition(0x80, DinoScoreMin(data_ov002_02164a58.mTopLimit, data_ov002_02164a78, top));
-    mSuccessWindow->SetPosition(0x80, DinoScoreMax(data_ov002_02164a58.mBottomLimit, data_ov002_02164aa4, bottom));
+    mFailureWindow->SetPosition(0x80, std::min(data_ov002_02164a78, top));
+    mSuccessWindow->SetPosition(0x80, std::max(data_ov002_02164aa4, bottom));
     if (data_0208a22c) {
         u32 n = MFx32ToInt(mUnk80);
         if (n != 0) {
