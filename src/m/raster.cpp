@@ -314,33 +314,41 @@ template <class Op> inline void MRasterWindow::ForEachCircleLine(Op op, MPoint c
     }
     int err = radius;
     int y = radius;
-    for (int x = 0; y >= x; x++) {
-        int left = std::min(sRasterWidth, std::max(0, center.x - y));
-        int right = std::min(sRasterWidth, std::max(0, center.x + y));
-        int line = center.y - x;
-        if (line >= 0 && line < M_RASTER_LINES) {
-            op(right, left, line);
-        }
-        line = center.y + x - 1;
-        if (line >= 0 && line < M_RASTER_LINES) {
-            op(right, left, line);
-        }
-        left = std::min(sRasterWidth, std::max(0, center.x - x));
-        right = std::min(sRasterWidth, std::max(0, center.x + x));
-        line = center.y - y;
-        if (line >= 0 && line < M_RASTER_LINES) {
-            op(right, left, line);
-        }
-        line = bottom - 1;
-        if (line >= 0 && line < M_RASTER_LINES) {
-            op(right, left, line);
-        }
-        err -= 2 * x - 1;
-        if (err < 0) {
-            err += (y - 1) * 2;
-            y--;
-            bottom--;
-        }
+    int below;
+    int x = 0;
+    // The loop guard is tested once up front; the lower-half line counter starts after it.
+    if (y >= x) {
+        below = center.y;
+        do {
+            int left = std::min(sRasterWidth, std::max(0, center.x - y));
+            int right = std::min(sRasterWidth, std::max(0, center.x + y));
+            int line = center.y - x;
+            if (line >= 0 && line < M_RASTER_LINES) {
+                op(right, left, line);
+            }
+            line = below - 1;
+            if (line >= 0 && line < M_RASTER_LINES) {
+                op(right, left, line);
+            }
+            left = std::min(sRasterWidth, std::max(0, center.x - x));
+            right = std::min(sRasterWidth, std::max(0, center.x + x));
+            line = center.y - y;
+            if (line >= 0 && line < M_RASTER_LINES) {
+                op(right, left, line);
+            }
+            line = bottom - 1;
+            if (line >= 0 && line < M_RASTER_LINES) {
+                op(right, left, line);
+            }
+            err -= 2 * x - 1;
+            if (err < 0) {
+                err += (y - 1) * 2;
+                y--;
+                bottom--;
+            }
+            below++;
+            x++;
+        } while (y >= x);
     }
 }
 
@@ -349,8 +357,8 @@ void MRasterWindow::SetCircle(MPoint center, int radius) {
     ForEachCircleLine(AddSpanOp(this), center, radius);
 }
 
-// NONMATCHING: the spill slots of the bottom edge and the lower-half line counter are swapped, and the literal-0
-// pool offsets differ (the game's ipa .data layout interleaves SetCircle's and SubtractCircle's zeros).
+// NONMATCHING: only the literal-0 pool offsets differ (the game's ipa .data layout interleaves SetCircle's and
+// SubtractCircle's zeros; dead std::max(0, 0) literals only shift a fixed rank-to-slot order that can't give it).
 void MRasterWindow::SubtractCircle(MPoint center, int radius) {
     ForEachCircleLine(SubtractSpanOp(this), center, radius);
 }
