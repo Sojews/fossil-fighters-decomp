@@ -672,13 +672,13 @@ namespace std {
 
     template <typename T, typename Allocator>
     void __vec_deleter<T, Allocator>::init_copy(const T *first, const T *last, Metrowerks::int2type<true>) {
-        size_t n = last - first;
+        ptrdiff_t n = last - first;
         if (n != 0) {
             allocate(n, Metrowerks::int2type<true>());
             UnkMSLStruct1 unk = UnkMSLStruct1();
             if (is_scalar<T>::value) {
-                // (Scalars are moved in one go.)
-                copy_trivial(first, last, data_ + size_);
+                // (Scalars are moved in one go, through the iterator copy: the game recomputes the count.)
+                __copy_trivial(const_cast<T *>(first), const_cast<T *>(last), data_ + size_);
                 size_ += last - first;
                 return;
             }
