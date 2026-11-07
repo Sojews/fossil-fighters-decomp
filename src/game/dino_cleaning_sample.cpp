@@ -442,15 +442,16 @@ template class std::__vec_deleter<void *, std::allocator<void *> >;
 #pragma auto_inline reset
 
 extern "C" u32 data_020bcd24[];
+// The stores are one argument expression of an empty constructor, so that they (and their dead stack temporaries) are
+// __sinit's own code like the game's file-scope initializers: from inside an inlined constructor, ipa lays the
+// temporaries out in the reverse order.
 static struct DinoCleaningSampleStaticInit {
-    DinoCleaningSampleStaticInit() {
-        DINO_POOL(MPoint, data_020bcc24, 0x10) = MPoint(256, 192);
-        DINO_POOL(MRect, data_020bcd24, 0x34) = DinoSizeRect(DINO_POOL(MPoint, data_020bcc24, 0x10));
-        DINO_POOL(MPoint, data_020bcc24, 0x20) = MPoint(2, 2);
-        DINO_POOL(MPoint, data_020bcc24, 0x18) = MPoint(36, 28);
-        DINO_POOL(MRect, data_020bcd24, 0x44) = DinoSizeRect(DINO_POOL(MPoint, data_020bcc24, 0x18));
-        DINO_POOL(MPoint, data_020bcd24, 0x24) = MPoint(0, 24);
-        DINO_POOL(MPoint, data_020bcd24, 0x2c) = MPoint(256, 192);
-        DINO_POOL(MRect, data_020bcd24, 0x14) = MRect(0, 0, 256, 24);
-    }
-} sDinoCleaningSampleStaticInit;
+    DinoCleaningSampleStaticInit(int) {}
+} sDinoCleaningSampleStaticInit((DINO_POOL(MPoint, data_020bcc24, 0x10) = MPoint(256, 192),
+    DINO_POOL(MRect, data_020bcd24, 0x34) = MRect(MPoint(0, 0), DINO_POOL(MPoint, data_020bcc24, 0x10)),
+    DINO_POOL(MPoint, data_020bcc24, 0x20) = MPoint(2, 2),
+    DINO_POOL(MPoint, data_020bcc24, 0x18) = MPoint(36, 28),
+    DINO_POOL(MRect, data_020bcd24, 0x44) = MRect(MPoint(0, 0), DINO_POOL(MPoint, data_020bcc24, 0x18)),
+    DINO_POOL(MPoint, data_020bcd24, 0x24) = MPoint(0, 24),
+    DINO_POOL(MPoint, data_020bcd24, 0x2c) = MPoint(256, 192),
+    DINO_POOL(MRect, data_020bcd24, 0x14) = MRect(0, 0, 256, 24), 0));
