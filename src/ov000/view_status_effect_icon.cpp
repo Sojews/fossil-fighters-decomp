@@ -258,8 +258,7 @@ void DinoBattleViewStatusEffectIcon::SetEffects(int count, const u8 *effects) {
                     queue->AddTail(new ViewStatusEffectIconWaitStop(mSlots[slot].mIcon));
                     if (mSlots[slot].mEntries.size() != 0) {
                         if (change->mEffects == 0) {
-                            StatusEffectEntry *first = &mSlots[slot].mEntries[0];
-                            queue->AddTail(new ViewStatusEffectIconLoadMotionTask(mSlots[slot].mIcon, first, first->GetAnime()));
+                            queue->AddTail(new ViewStatusEffectIconLoadMotionTask(mSlots[slot].mIcon, &mSlots[slot].mEntries[0], mSlots[slot].mEntries[0].GetAnime()));
                         } else {
                             for (int next = e + 1; next < 12; next++) {
                                 for (u32 j = 0; j < mSlots[slot].mEntries.size(); j++) {
