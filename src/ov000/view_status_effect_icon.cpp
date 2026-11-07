@@ -172,7 +172,11 @@ void DinoBattleViewStatusEffectIcon::SetEffects(int count, const u8 *effects) {
                     change->mEffects = bit;
                 }
             } else if (change->mKind <= 1) {
-                change->mEffects = change->mKind == 1 ? bit | change->mEffects : bit;
+                if (change->mKind == 1) {
+                    change->mEffects = bit | change->mEffects;
+                } else {
+                    change->mEffects = bit;
+                }
                 change->mKind = 1;
             }
         } else if (bit & shown[slot]) {
