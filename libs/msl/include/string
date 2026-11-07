@@ -67,17 +67,6 @@ public:
             *words++ = 0;
         }
     }
-    // (__replace's in-place copy: the same zeroing with the pointer step after the store, which gets closer to the
-    // game's registers there than the default constructor's.)
-    enum __zero_t { __zero };
-    basic_string(__zero_t) {
-        unsigned long i = 0;
-        unsigned long *words = mWords;
-        for (; i < 3; i++) {
-            *words = 0;
-            words++;
-        }
-    }
     basic_string(const C *s);
     basic_string(const C *s, size_type n);
     basic_string(const basic_string &other);
@@ -368,10 +357,13 @@ basic_string<C, Traits, Alloc>::~basic_string() {
 #ifdef MSL_STRING_REPLACE_DEFINITION
 // Replaces [pos, pos + n) with [first, last), growing onto the heap when it no longer fits. (A range from inside
 // the string itself is copied out first.)
-// NONMATCHING (both instances, ~99%): the in-place path's copy constructor loop gets other registers, and the
-// wchar_t one still loads n2 before p + pos in its overlap check (written p + n2 + pos there, which gets closer than
-// p + pos + n2). (The heap path ends through __terminate so its
-// terminator constant is made after the in-place path's, which puts the two in the game's pool order.)
+// (The heap path ends through __terminate so its terminator constant is made after the in-place path's, which puts
+// the two in the game's pool order.)
+// The in-place copy's assign call passes a fourth argument, 0, that assign never reads: the game leaves the copy's
+// zeroing value in r3 for it (which is what gives that loop the game's registers). The game's assign takes only
+// (first, last), so the call goes through C declarations of the two instances' own symbols.
+extern "C" void _ZNSs6assignEPKcS0_(void *s, const void *first, const void *last, int);
+extern "C" void _ZNSbIwSt11char_traitsIwESaIwEE6assignEPKwS3_(void *s, const void *first, const void *last, int);
 template <class C, class Traits, class Alloc>
 basic_string<C, Traits, Alloc> &basic_string<C, Traits, Alloc>::__replace(size_type pos, size_type n, const C *first,
                                                                           const C *last, random_access_iterator_tag) {
@@ -433,9 +425,13 @@ basic_string<C, Traits, Alloc> &basic_string<C, Traits, Alloc>::__replace(size_t
         mLong.size = newSize;
         mLong.capacity = cap;
     } else {
-        basic_string copy(__zero);
-        if (tail != 0 && (sizeof(C) == 1 ? p + pos + n2 : p + n2 + pos) < last && last <= p + size) {
-            copy.assign(first, last);
+        basic_string copy;
+        if (tail != 0 && p + pos + n2 < last && last <= p + size) {
+            if (sizeof(C) == 1) {
+                _ZNSs6assignEPKcS0_(&copy, first, last, 0);
+            } else {
+                _ZNSbIwSt11char_traitsIwESaIwEE6assignEPKwS3_(&copy, first, last, 0);
+            }
             const basic_string &c = copy;
             first = c.data();
         }
