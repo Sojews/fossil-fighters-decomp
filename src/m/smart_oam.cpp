@@ -261,7 +261,7 @@ void MSmartOamOffsetTransfer::Transfer() {
 
 // Places the entries into the real OAM block every frame: sorted first if asked (by anchor, depth and/or link),
 // offset, clipped to the screen; the block's remaining entries are hidden.
-// NONMATCHING: register allocation (the game keeps the sort mask in r5 and the cell loop's counters in r9/lr).
+// The locals are declared in register order (left, used, dst, top, right, bottom, i) and assigned in load order.
 #pragma section ITCM begin
 #pragma thumb off
 void MSmartOam::Execute() {
@@ -293,12 +293,18 @@ void MSmartOam::Execute() {
         }
     }
     int left = mUnk3C;
-    int top = mUnk40;
-    int right = mClipWidth;
-    int bottom = mClipHeight;
-    MOamCell *dst = mOamBlock->GetEntries();
-    u32 i = 1;
-    u32 used = 0;
+    u32 used;
+    MOamCell *dst;
+    int top;
+    int right;
+    int bottom;
+    u32 i;
+    top = mUnk40;
+    right = mClipWidth;
+    bottom = mClipHeight;
+    dst = mOamBlock->GetEntries();
+    i = 1;
+    used = 0;
     for (; i <= mCount && used < mOamCount; i++) {
         MSmartOamCell *cell = &mEntries[mOrder[i]];
         if (cell->objMode == 2) {
