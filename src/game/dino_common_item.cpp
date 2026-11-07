@@ -104,35 +104,36 @@ DinoCommonItem::DinoCommonItem(u32 type, MSmartOam *oam, MPoint pos, u32 priorit
 }
 
 // The file's static initialization (see dino_static_init.h).
-extern "C" u32 data_020ba764[];
-extern "C" u32 data_020ba7e0[];
-extern "C" u32 data_020ba7f0[];
-extern "C" u32 data_020ba800[];
-// NONMATCHING: scheduling. The game computes the second rect's -8 (16 - 0x18) right after loading its address and
-// before storing its left; that only happens when the -8 store comes first, so ours stores top before left (a
-// volatile left-first order instead hoists the address load above the first rect's last two stores).
+// The game's frame table is a pooled `static const MRect[4]` built element by element: the first element sits within
+// reach of the pool's anchor (0x6c bytes before the table, which the trailing copies also use), the others through
+// their own addresses. Every pointer below is derived from the table itself so mwcc sees one object: the table
+// stores keep the address load of each later element below the previous element's stores (separate anchor externs
+// let it hoist), and the second element's top is read back from the first's bottom so its -8 (16 - 0x18) is
+// computed before the left store.
 static struct DinoCommonItemStaticInit {
     DinoCommonItemStaticInit() {
-        volatile s32 *p = (volatile s32 *) data_020ba764;
-        p[0x6c / 4] = -32;
-        p[0x70 / 4] = -16;
-        p[0x74 / 4] = 32;
-        p[0x78 / 4] = 16;
-        s32 *r = (s32 *) data_020ba7e0;
-        r[1] = -8;
+        s32 *pool = (s32 *) &data_020ba7d0[-7].top;
+        pool[0x6c / 4] = -32;
+        pool[0x70 / 4] = -16;
+        pool[0x74 / 4] = 32;
+        pool[0x78 / 4] = 16;
+        s32 *r = (s32 *) &data_020ba7d0[1];
+        s32 small = pool[0x78 / 4] - 0x18;
         r[0] = -32;
+        r[1] = small;
         r[2] = 32;
         r[3] = 8;
-        volatile s32 *q = (volatile s32 *) data_020ba7f0;
-        q[0] = -8;
-        q[1] = -8;
+        volatile s32 *q = (volatile s32 *) &data_020ba7d0[2];
+        q[0] = small;
+        q[1] = small;
         q[2] = 8;
         q[3] = 8;
-        q = (volatile s32 *) data_020ba800;
-        q[0] = -8;
-        q[1] = -8;
+        q = (volatile s32 *) &data_020ba7d0[3];
+        q[0] = small;
+        q[1] = small;
         q[2] = 8;
         q[3] = 8;
+        volatile s32 *p = (volatile s32 *) pool;
         p[0x3c / 4] = p[0x10 / 4];
         p[0x40 / 4] = p[0x0c / 4];
         p[0x44 / 4] = p[0x08 / 4];
