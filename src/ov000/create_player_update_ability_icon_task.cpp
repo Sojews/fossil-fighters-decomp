@@ -157,7 +157,7 @@ void SetLifePointTask::Execute() {
 }
 
 extern "C" MTask *func_ov000_0216dec4(DinoBattleModelCreature *creature);
-extern "C" void func_ov000_0216c90c(DinoBattleModelCreature *creature, u32 id, BOOL resetStatus, BOOL fullLife);
+extern "C" void func_ov000_0216c90c(DinoBattleModelCreature *creature, u32 id, BOOL resetStatus, bool fullLife);
 extern "C" MTask *func_ov000_0216d4b0(DinoBattleModelCreature *creature, u32 a, u32 d, u32 e, u8 g);
 extern "C" MParallelTaskSet *func_ov000_0215bf44(DinoBattleModelField *field, u32 sides);
 extern "C" const u32 data_0208a0c8, data_0208a0e0, data_0208a0e4;   // timer frames
@@ -918,7 +918,7 @@ extern "C" void func_ov000_02169404(DinoBattleModelPlayer *player, DinoBattleMod
     }
 }
 
-extern "C" void func_ov000_0216c90c(DinoBattleModelCreature *creature, u32 id, BOOL resetStatus, BOOL fullLife);
+extern "C" void func_ov000_0216c90c(DinoBattleModelCreature *creature, u32 id, BOOL resetStatus, bool fullLife);
 
 DinoBattleModelCreature::DinoBattleModelCreature(MMessageObserver *view, DinoBattleModelPlayer *player, u32 id,
                                                  u32 unkB4, u32 unkB8, DinoBattleCreatureStats stats, s32 unkFC,
@@ -944,8 +944,7 @@ extern "C" void func_02030f38(DinoCreatureStats *out, const DinoCreatureStatsInp
 
 // Sets the creature up as creature id: its definition, the sides its support effects touch, its attacks' element
 // masks and its stats (with full life, or the life its rank's experience gives).
-// NONMATCHING (99.3%): the game spills fullLife at the very start of the entry block.
-extern "C" void func_ov000_0216c90c(DinoBattleModelCreature *creature, u32 id, BOOL resetStatus, BOOL fullLife) {
+extern "C" void func_ov000_0216c90c(DinoBattleModelCreature *creature, u32 id, BOOL resetStatus, bool fullLife) {
     creature->mUnkB0 = id;
     creature->mDef = (DinoBattleCreatureDef *)gDinoResource->GetCreatureDef(id);
     if (resetStatus) {
