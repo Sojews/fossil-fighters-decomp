@@ -190,14 +190,19 @@ extern "C" u32 data_ov002_02165498[];
 static struct DinoCleaningDummyItemStaticInit {
     DinoCleaningDummyItemStaticInit() {
         DINO_POOL(MPoint, data_ov002_02165418, 0x18) = MPoint(256, 192);
-        DINO_POOL(MRect, data_ov002_02165498, 0xc) = DinoSizeRect(DINO_POOL(MPoint, data_ov002_02165418, 0x18));
-        DINO_POOL(MPoint, data_ov002_02165418, 0x38) = MPoint(2, 2);
+        MRect screen = DinoSizeRect(DINO_POOL(MPoint, data_ov002_02165418, 0x18));
+        DINO_POOL_WORD(data_ov002_02165498, 0xc) = screen.left;
+        DINO_POOL_WORD(data_ov002_02165498, 0x10) = screen.top;
+        DINO_POOL_WORD(data_ov002_02165498, 0x14) = screen.right;
+        DINO_POOL_WORD(data_ov002_02165498, 0x18) = screen.bottom;
+        DINO_POOL_WORD(data_ov002_02165418, 0x38) = 2;
+        DINO_POOL_WORD(data_ov002_02165418, 0x3c) = 2;
         DINO_POOL(MPoint, data_ov002_02165418, 0x30) = MPoint(36, 28);
         MRect icon = DinoSizeRect(DINO_POOL(MPoint, data_ov002_02165418, 0x30));
-        DINO_POOL_NV(s32, data_ov002_02165418, 0x7c) = icon.left;
-        DINO_POOL_NV(s32, data_ov002_02165498, 0x0) = icon.top;
-        DINO_POOL_NV(s32, data_ov002_02165498, 0x4) = icon.right;
-        DINO_POOL_NV(s32, data_ov002_02165498, 0x8) = icon.bottom;
+        DINO_POOL_WORD(data_ov002_02165418, 0x7c) = icon.left;
+        DINO_POOL_WORD(data_ov002_02165498, 0x0) = icon.top;
+        DINO_POOL_WORD(data_ov002_02165498, 0x4) = icon.right;
+        DINO_POOL_WORD(data_ov002_02165498, 0x8) = icon.bottom;
         DINO_POOL(MPoint, data_ov002_02165498, 0x1c) = MPoint(0, 24);
         DINO_POOL(MPoint, data_ov002_02165498, 0x24) = MPoint(256, 192);
         DINO_POOL(MRect, data_ov002_02165498, 0x2c) = MRect(0, 0, 256, 24);
