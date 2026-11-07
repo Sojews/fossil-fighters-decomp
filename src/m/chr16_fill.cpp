@@ -16,7 +16,8 @@ MChr16Fill::~MChr16Fill() {
 }
 
 // Fills the rect (clipped to the tiles) with the color, a row of 4-bit pixels at a time.
-// NONMATCHING: register allocation (the game spills tilesX, tx and w and keeps rightMask and first in registers).
+// NONMATCHING: register allocation from the tile-address setup on (the game keeps x in r4, rightMask in r5 and
+// nextRow in lr, and gives the spilled tilesX and w the lowest slots after x >> 3; ours gives them to the hoisted masks).
 void MChr16Fill::Transfer() {
     if (mPattern == (u32) -1 || mSize.x <= 0 || mSize.y <= 0) {
         return;
@@ -67,7 +68,7 @@ void MChr16Fill::Transfer() {
     }
     if (rows != 0) {
         u32 lastCol = cols - 1;
-        u32 mask = leftMask & rightMask;
+        u32 mask = rightMask & leftMask;
         do {
             for (u32 c = 0; c < (u32) cols; c++) {
                 if (c >= first && c < last) {
