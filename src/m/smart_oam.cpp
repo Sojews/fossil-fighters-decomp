@@ -304,8 +304,14 @@ void MSmartOam::Execute() {
         if (cell->objMode == 2) {
             continue;
         }
-        MPoint pos = MPoint(cell->posX - cell->unk08, cell->posY - cell->unk0C) - mOffset;
-        if (pos.x + cell->width < left || pos.x >= right || pos.y + cell->height < top || pos.y >= bottom) {
+        int ax = cell->posX - cell->unk08;
+        int ay = cell->posY - cell->unk0C;
+        MPoint pos;
+        pos.y = ay - mOffset.y;
+        pos.x = ax - mOffset.x;
+        int w = cell->width;
+        int h = cell->height;
+        if (pos.x + w < left || pos.x >= right || pos.y + h < top || pos.y >= bottom) {
             continue;
         }
         dst->attr01 = cell->attr01;
