@@ -512,7 +512,6 @@ static inline u32 CountRevivedParts(const DinoCreatureState &creature) {
 extern "C" const char data_ov007_021922f8[], data_ov007_021922fc[];
 extern const u32 data_0208a4b0, data_0208a4b4, data_0208a4b8;
 
-// NONMATCHING: register allocation and one stack slot (the game keeps the attack's level in r7 and spills i * 4).
 // What the creature stats are worked out from, and the stats (main's func_02030f38).
 struct DinoReviveStatsInput {
     u32 id;         // 0x00
@@ -609,15 +608,17 @@ static inline u32 DinoAttackIdAt_rs(const DinoCreatureDef *def, u32 i) {
     return ((const u32 *)((const u8 *)def + def->attackIds))[i];
 }
 
+// The game's build had this function at optimization level 3 (the attack's level stays in r7 and i * 4 is spilled).
+#pragma push
+#pragma optimization_level 3
 void DinoUiReviveStatusMenu::ShowLearnedAttacks() {
     if (CountRevivedParts(mCreature2) <= CountRevivedParts(mCreature)) {
         return;
     }
     const DinoCreatureDef *def = gDinoResource->GetCreatureDef(mCreature.index);
-    int count;
     std::string names;
+    int count = 0;
     u32 learned = 0;
-    count = 0;
     s32 known = 0;
     for (int i = 0; i < def->attackCount; i++) {
         if (DinoAttackLevelAt_rs(def, i) <= CountRevivedParts(mCreature)) {
@@ -651,6 +652,7 @@ void DinoUiReviveStatusMenu::ShowLearnedAttacks() {
         mSerial.AddTail(new DinoCommonWindowMessageBox(MPoint(0x80, 0x60), std::string(text), 4));
     }
 }
+#pragma pop
 
 // Turns to the tab after a frame, and keys the tabs either side of it to L and R.
 void DinoUiReviveStatusMenu::SetTab(u8 tab) {
