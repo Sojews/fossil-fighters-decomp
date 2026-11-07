@@ -348,7 +348,6 @@ extern "C" void func_ov000_0216fd74(DinoBattleViewCreature *creature) {
 
 
 // Moves the creature (shuffling over, or sliding) and its advantage mark from one coordinate to another.
-// NONMATCHING: 96%, the game keeps to.y in a register for the new coordinate.
 extern "C" MTask *func_ov000_0216ff18(DinoBattleViewCreature *creature, MPoint from, MPoint to, int frames, int ease,
                                        BOOL shuffle, int arg) {
     MParallelTaskSet *set = new MParallelTaskSet(TRUE);
@@ -358,9 +357,11 @@ extern "C" MTask *func_ov000_0216ff18(DinoBattleViewCreature *creature, MPoint f
         set->AddTail(creature->mMotion->CreateCoordAnime(from + creature->mCoordOffset, to + creature->mCoordOffset,
                                                          frames, ease));
     }
-    const MPoint &markOffset = data_ov000_02193030.markOffset;
-    set->AddTail(creature->mMotion140->CreateCoordAnime(markOffset + from, markOffset + to, frames, ease));
-    creature->mCoord = to;
+    int toY = to.y;
+    set->AddTail(creature->mMotion140->CreateCoordAnime(from + data_ov000_02193030.markOffset,
+                                                        MPoint(to.x, toY) + data_ov000_02193030.markOffset, frames, ease));
+    creature->mCoord.x = to.x;
+    creature->mCoord.y = toY;
     return set;
 }
 
