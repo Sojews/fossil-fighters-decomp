@@ -192,6 +192,7 @@ Levers:
 | a value the game keeps on the stack | `T *volatile self = this;`; for a byte temp, a `volatile` by-value param (`__msl_assign(T &d, volatile T s, ...)`) |
 | entry copy of a stack-passed param to its home slot | read it through a volatile into a local (ParseScript) |
 | `a = b = -1` | reversing declarations flips two slots (ParseScript) |
+| two spilled locals: the game stores A first but gives B (stored second) the higher slot | ours gives the higher slot to whichever is defined first, so give B a dead first initialization above A and assign it again after A: `B f(x); A last2(y); f = B(x);` (MSL __insertion_sort_move x6) |
 | dead counter the game stores | survived DCE; `#pragma optimization_level 3` or `opt_dead_assignments off` keeps dead struct-temp stores (AddLink) |
 | a loop's helper temps vs caller temps | write the helper's loop in place instead of in an inline (State02161f9c, CreateAttackTask) |
 | list-iterator-heavy function keeps several iterator copies on the stack | `#pragma optimization_level 3` (HasBase 55 -> 91); by-value iterator inline `IsFound(it)` (SwitchThreadDisplay) |
