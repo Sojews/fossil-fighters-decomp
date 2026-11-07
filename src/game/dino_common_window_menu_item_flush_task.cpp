@@ -76,6 +76,12 @@ extern "C" struct {
 } data_020bbd44;
 
 // The excavation settings' section at offset7C (the input repeat is at 0x1C and 0x20).
+// (&mParallel fetched through a non-member inline: the entry loop's hoisted pointer then takes the game's lowest
+// spill slot.)
+static inline MTaskSet *DinoCommonWindowMenuParallel(DinoCommonWindowMenu *menu) {
+    return &menu->mParallel;
+}
+
 static inline const int *GetExcavate7C(const MResource<DinoExcavateDefs> &defs) {
     const DinoExcavateDefs *d = ((MResource<DinoExcavateDefs> &)defs).Get();
     if (d->offset7C == 0) {
@@ -89,8 +95,7 @@ static inline const int *GetExcavate7C(const MResource<DinoExcavateDefs> &defs) 
 // just exits.
 // (int indices with strength reduction on: only the item's y, i * 0x12 + 8, becomes an induction variable, as in the
 // game; the loop entry is tested twice: `if (i < size) for (; i < size; ...)`.)
-// NONMATCHING: one spill slot (the entry loop's &mParallel sits below the shows set's in the game) and the item ctor's
-// bl, which the report scores as next-function docking.
+// (The item ctor bl differs only by its relocation name, which the report ignores.)
 #pragma auto_inline off
 template MTask *MCreateCallTask(DinoCommonWindowMenu *obj, void (DinoHelpBase::*func)());
 void DinoCommonWindowMenu::OnStart() {
@@ -188,7 +193,7 @@ void DinoCommonWindowMenu::OnStart() {
     for (u32 j = 0; j < mEntries.size(); j++) {
         DinoCommonWindowMenuEntry *entry = &mEntries[j];
         DinoHelpDummyItem *help = new DinoHelpDummyItem((MDisplay *)entry->id, entry->rect, std::string(entry->text));
-        MTaskSet *parallel = &mParallel;
+        MTaskSet *parallel = DinoCommonWindowMenuParallel(this);
         parallel->AddTail(help);
         if (prev != NULL) {
             DinoHelpBase::AddEntry((u32)prev, 2, (u32)help);
