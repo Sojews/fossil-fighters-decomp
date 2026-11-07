@@ -71,7 +71,7 @@ ViewStatusEffectIconShowTask::~ViewStatusEffectIconShowTask() {
 
 #pragma auto_inline off
 
-// NONMATCHING: spill slots of dx/dy/-dx and the loop counters are permuted
+// NONMATCHING: dx and dy swap spill slots (s32 locals needed for the rest).
 DinoBattleViewStatusEffectIcon::DinoBattleViewStatusEffectIcon(MSmartOam *oam, u32 side, u32 unk74)
     : MProcess(NULL), mUnk74(unk74), mOam(oam) {
     mSide = side;
@@ -120,8 +120,8 @@ extern "C" u32 func_ov000_0217e298(const u32 *effect);
 
 // Effects 8-11 go on the first icon, the rest on the second; each icon cycles through its effects. Added effects show
 // at once, removed ones queue the erase anime and the next effect, kept ones replay when their flag or count changes.
-// NONMATCHING: same control flow and calls; register and stack-slot allocation differ (the game keeps the slot's
-// offset in r7 throughout, and its frame is 8 bytes smaller).
+// NONMATCHING: same instructions; four spill slots differ (the game puts num/bit low and slot/e high in the second
+// loop, ours the reverse) and the next-effect loop swaps two registers.
 void DinoBattleViewStatusEffectIcon::SetEffects(int count, const u8 *effects) {
     u32 slot;
     u32 present = 0;
