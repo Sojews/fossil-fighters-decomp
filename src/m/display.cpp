@@ -207,12 +207,20 @@ static inline bool IsFound(MThreadDisplayMap::iterator it) {
     return it != sThreadDisplays->end();
 }
 
+// (An unused word-sized object with a destructor: it reserves the frame's extra word, which the game seems to keep
+// for a lock object whose flag lives in a register.)
+struct MFrameWord {
+    u32 unused;
+    ~MFrameWord() {}
+};
+
 // Keeps gCurrentDisplay per thread. (The explicit iterator conversions keep find's result in its own slot.)
-// NONMATCHING: stack slots only (the game has the first test's copy above the iterators, and one more word).
+// NONMATCHING: stack slots only (the game has the first test's copy in the top word and leaves the bottom one unused).
 static void SwitchThreadDisplay(u32 from, u32 to) {
     if (sPrevSwitchThreadCallback != NULL) {
         sPrevSwitchThreadCallback((OSThread *) from, (OSThread *) to);
     }
+    MFrameWord frameWord;
     // (MIrqLock's steps written out: the game keeps the flag in a register, not in a lock object.)
     u16 prev = REG_IME;
     REG_IME = 0;
