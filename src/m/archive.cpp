@@ -143,7 +143,7 @@ static inline BOOL MArchiveIsVram(const void *p) {
     return vram;
 }
 
-// NONMATCHING: ours hoists `dest + done` out of the filter loop into r7 (the game recomputes it), so `partial` spills.
+// NONMATCHING (99.9%): the spilled locals get other stack slots.
 void MArchive::Read(u32 index, u32 offset, void *dest, u32 size, MArchiveFilter *filter) {
     Entry &entry = mEntries[index];
     {
@@ -188,8 +188,7 @@ void MArchive::Read(u32 index, u32 offset, void *dest, u32 size, MArchiveFilter 
         filters++;
     }
     u32 first = offset / header.chunkSize;
-    u32 end = offset + size;
-    u32 last = (end - 1) / header.chunkSize;
+    u32 last = (offset + size - 1) / header.chunkSize;
     u32 done = 0;
     u32 *chunk = &chunks[first];
     file.Seek(entry.offset + chunks[first], FS_SEEK_SET);
@@ -206,9 +205,9 @@ void MArchive::Read(u32 index, u32 offset, void *dest, u32 size, MArchiveFilter 
         }
         u32 length;
         if (c == last) {
-            length = ((end - 1) & (header.chunkSize - 1)) + 1;
+            length = ((offset + size - 1) & (header.chunkSize - 1)) + 1;
             if (c == header.chunkCount - 1) {
-                partial = (partial | (header.size != end)) ? TRUE : FALSE;
+                partial = (partial | (header.size != offset + size)) ? TRUE : FALSE;
             } else {
                 partial = (partial | (length != header.chunkSize)) ? TRUE : FALSE;
             }
@@ -225,46 +224,47 @@ void MArchive::Read(u32 index, u32 offset, void *dest, u32 size, MArchiveFilter 
         }
         file.Read(buffer2, chunk[1] - chunk[0]);
         for (u32 i = 0; i < steps; i++) {
-            u8 *src = buffer2;
-            buffer2 = buffer;
-            buffer = src;
+            u8 *tmp = buffer;
+            buffer = buffer2;
+            buffer2 = tmp;
             u8 *out;
             if (i == steps - 1) {
                 if (partial || filters == 0) {
                     if (filter != NULL) {
-                        filter->Filter(src + skip, (u8 *) dest + done, length);
+                        filter->Filter(buffer + skip, (u8 *) dest + done, length);
                     } else {
-                        MCopy(src + skip, (u8 *) dest + done, length);
+                        u8 *from = buffer + skip;
+                        MCopy(from, (u8 *) dest + done, length);
                     }
                     break;
                 }
-                out = (u8 *) dest + done;
+                out = (u8 *) ((u32) dest + done);
             } else {
                 out = buffer2;
             }
             switch (header.filters[i]) {
             case 1:
                 if (MArchiveIsVram(out)) {
-                    MI_UncompressRL16(src, out);
+                    MI_UncompressRL16(buffer, out);
                 } else {
-                    MI_UncompressRL8(src, out);
+                    MI_UncompressRL8(buffer, out);
                 }
                 break;
             case 2:
                 if (MArchiveIsVram(out)) {
-                    MI_UncompressLZ16(src, out);
+                    MI_UncompressLZ16(buffer, out);
                 } else {
-                    MI_UncompressLZ8(src, out);
+                    MI_UncompressLZ8(buffer, out);
                 }
                 break;
             case 3:
-                MI_UncompressHuffman(src, out);
+                MI_UncompressHuffman(buffer, out);
                 break;
             case 4:
                 if (MArchiveIsVram(out)) {
-                    MI_UnfilterDiff16(src, out);
+                    MI_UnfilterDiff16(buffer, out);
                 } else {
-                    MI_UnfilterDiff8(src, out);
+                    MI_UnfilterDiff8(buffer, out);
                 }
                 break;
             }
