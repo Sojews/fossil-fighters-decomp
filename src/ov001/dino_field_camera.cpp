@@ -198,23 +198,23 @@ static inline fx32 DinoCameraDamp(fx32 d, fx32 damping) {
 }
 
 // The camera's place: distance from the target (at least 1) at the pitch (kept off straight down and up) and yaw.
-static inline void DinoCameraOrbit(VecFx32 *pos, const VecFx32 &target, u16 yaw, u16 pitch, fx32 distance) {
+static inline void DinoCameraOrbit(VecFx32 *pos, const VecFx32 &target, int yaw, int pitch, fx32 distance) {
     if (distance < FX32_ONE) {
         distance = FX32_ONE;
     }
-    if (pitch <= 0xC0FF && pitch > 0x8000) {
+    if ((u16)pitch <= 0xC0FF && (u32)pitch > 0x8000) {
         pitch = 0xC0FF;
-    } else if (pitch >= 0x3F00 && pitch < 0x8000) {
+    } else if ((u32)pitch >= 0x3F00 && (u32)pitch < 0x8000) {
         pitch = 0x3F00;
     }
-    fx32 h = (FX_CosIdx(pitch) * distance) >> FX32_SHIFT;
-    fx32 y = (FX_SinIdx(pitch) * distance) >> FX32_SHIFT;
+    fx32 h = (FX_CosIdx((u16)pitch) * distance) >> FX32_SHIFT;
+    fx32 y = (FX_SinIdx((u16)pitch) * distance) >> FX32_SHIFT;
     pos->x = h;
     pos->y = y;
     pos->z = h;
-    pos->x = target.x + ((FX_SinIdx(yaw) * h) >> FX32_SHIFT);
+    pos->x = target.x + ((FX_SinIdx((u16)yaw) * h) >> FX32_SHIFT);
     pos->y = y + target.y;
-    pos->z = target.z + ((FX_CosIdx(yaw) * h) >> FX32_SHIFT);
+    pos->z = target.z + ((FX_CosIdx((u16)yaw) * h) >> FX32_SHIFT);
 }
 
 // Moves the camera: the focus height follows the ground; the target follows the focus (dragged along within reach while
