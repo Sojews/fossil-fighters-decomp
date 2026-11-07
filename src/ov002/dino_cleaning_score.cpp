@@ -80,8 +80,8 @@ static const char *sArrowPath = "/motion/cleaning/yajirusi.bin";
 
 // Builds the backdrop gradients (grey, blue and red, each in a normal and a brighter version, every channel
 // clamped to 0xFF), the backdrop's raster, the success and failure windows with their score digits, and the arrow.
-// NONMATCHING: 97.9%, the game keeps the digit loops' counters on the stack and this + i * 4 in a register across
-// the path string's destructor (its frame is 8 bytes bigger): the known "this+i*4 across a string dtor" loop family.
+// The digit loops' loop-local `self = this` (used for the store and the next call) makes mwcc keep this + i * 4 in a
+// register across the path string's destructor and spill the counter instead, as the game does.
 DinoCleaningScore::DinoCleaningScore(DinoCleaning *cleaning, MSmartOam *oam, u32 score, u8 flag) : MProcess(NULL) {
     mCleaning = cleaning;
     mScore = score;
@@ -128,8 +128,9 @@ DinoCleaningScore::DinoCleaningScore(DinoCleaning *cleaning, MSmartOam *oam, u32
     mSuccessWindow->SetAnchor(2);
     mParallel.AddTail(mSuccessWindow);
     for (u32 i = 0; i < 3; i++) {
-        mDigits[i] = new MMotion(std::string(sDigitPath), oam, 0, 1);
-        mDigits[i]->SetPriority(2);
+        DinoCleaningScore *self = this;
+        self->mDigits[i] = new MMotion(std::string(sDigitPath), oam, 0, 1);
+        self->mDigits[i]->SetPriority(2);
         mDigits[i]->SetAnchor(1);
         mParallel.AddTail(mDigits[i]);
     }
@@ -142,8 +143,9 @@ DinoCleaningScore::DinoCleaningScore(DinoCleaning *cleaning, MSmartOam *oam, u32
     mFailureWindow->SetAnchor(2);
     mParallel.AddTail(mFailureWindow);
     for (u32 i = 0; i < 3; i++) {
-        mDigits2[i] = new MMotion(std::string(sDigitPath), oam, 0, 1);
-        mDigits2[i]->SetPriority(2);
+        DinoCleaningScore *self = this;
+        self->mDigits2[i] = new MMotion(std::string(sDigitPath), oam, 0, 1);
+        self->mDigits2[i]->SetPriority(2);
         mDigits2[i]->SetAnchor(1);
         mParallel.AddTail(mDigits2[i]);
     }
