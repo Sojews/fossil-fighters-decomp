@@ -1764,7 +1764,6 @@ template void std::__vec_deleter<MMotionFile, std::allocator<MMotionFile> >::sub
 template void std::__vec_deleter<u32, std::allocator<u32> >::assign<u32 *>(u32 *first, u32 *last, Metrowerks::int2type<true>);
 
 // The list's sorts (the game emits the whole stable_sort machinery here, after SetSort's caller).
-// NONMATCHING: std::__inplace_merge and std::__insertion_sort_move, as in ov006_02178b80.cpp.
 namespace std {
 template <> pair<u32 *, ptrdiff_t> get_temporary_buffer<u32>(ptrdiff_t len) {
     pair<u32 *, ptrdiff_t> result(0, *(const long *)((const u8 *)data_ov007_0218e9ec + 0x54));
