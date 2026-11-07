@@ -478,7 +478,17 @@ void Dino3DLoadCsv::SetParent(Dino3DLoadCsv *parent) {
         return;
     }
     Dino3DLoadCsv *p;
-    if (mUnk464 != NULL && mUnk464->GetPauseCount() != 0) {
+    // Two separate `paused = FALSE` defs are not folded into the test: the game keeps `movs r0, #0; bne`.
+    BOOL paused;
+    if (mUnk464 != NULL) {
+        paused = FALSE;
+        if (mUnk464->GetPauseCount() != 0) {
+            return;
+        }
+    } else {
+        paused = FALSE;
+    }
+    if (paused) {
         return;
     }
     p = mUnk464;
