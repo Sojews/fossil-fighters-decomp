@@ -40,7 +40,7 @@ void MChr16Fill::Transfer() {
     u32 first;
     int x = mOrigin.x;
     int y = mOrigin.y;
-    u32 *p = (u32 *) (mBase + ((x >> 3) + (y >> 3) * tilesX) * 32 + (y & 7) * 4);
+    u32 *p = (u32 *) (mBase + ((x >> 3) + tilesX * (y >> 3)) * 32 + (y & 7) * 4);
     int left = x & 7;
     leftMask = ~((1 << (left * 4)) - 1);
     int w = mSize.x;
