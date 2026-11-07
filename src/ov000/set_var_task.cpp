@@ -261,7 +261,6 @@ static inline MFx32 DinoBattleReadRate(MConsole *console) {
 
 // $x closes, $d/$o names a creature (or the player) of the side talking or the other, $l/$r a face, $e/$f clears,
 // $t waits, $w sets the rate, $n the font, $c the shadow color and $p a player's name.
-// NONMATCHING: for $d/$o the game loads the field's side before testing the command (ours after).
 BOOL DinoBattleLiveConsoleFilter::Filter(MConsole *console, int c) {
     if (c != '$') {
         return FALSE;
@@ -276,7 +275,15 @@ BOOL DinoBattleLiveConsoleFilter::Filter(MConsole *console, int c) {
         break;
     case 'd':
     case 'o': {
-        int side = ((DinoBattleView *)mView)->mUnkE0->unkA8 ^ (c == 'd');
+        int field = ((DinoBattleView *)mView)->mUnkE0->unkA8;
+        // (A statement, not a ternary: the game loads the field's side before testing the command.)
+        int other;
+        if (c == 'd') {
+            other = 1;
+        } else {
+            other = 0;
+        }
+        int side = field ^ other;
         DinoBattleViewPlayer *player = ((DinoBattleView *)mView)->GetUnkE4(side);
         int number = DinoBattleReadNumber(console);
         std::string name;
