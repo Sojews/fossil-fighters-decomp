@@ -397,8 +397,7 @@ namespace std {
         }
         __cdeque_move_iter operator+(typename It::difference_type n) const {
             __cdeque_move_iter tmp(*this);
-            tmp += n;
-            return tmp;
+            return tmp += n;
         }
         Metrowerks::int2type<true> unk_;
     };
@@ -493,6 +492,11 @@ namespace std {
         return result;
     }
 
+    // (copy_in moves its source iterator on as a block of the four pointers, then the extra byte.)
+    struct __cdeque_iter_words {
+        void *w[4];
+    };
+
     // Copies [first, last) (any forward iterators) over result's elements, one run of result at a time.
     template <class It, class Iterator> Iterator __cdeque_copy_in(It &first, It &last, Iterator &result) {
         if (first != last) {
@@ -507,7 +511,8 @@ namespace std {
                 if (n == 0) {
                     break;
                 }
-                first = mid;
+                *(__cdeque_iter_words *) &first = *(__cdeque_iter_words *) &mid;
+                *((unsigned char *) &first + 16) = *((unsigned char *) &mid + 16);
             }
         }
         return result;
