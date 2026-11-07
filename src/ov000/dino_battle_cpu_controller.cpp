@@ -1333,11 +1333,10 @@ extern "C" u32 func_ov000_0216d2cc(DinoBattleModelCreature *creature, BOOL check
 extern "C" MTask *func_ov000_0218ec8c(u32 tutorial, int kind, BOOL *proceed);
 extern "C" const u32 data_0208a1a0, data_0208a1a4;  // the CPU's wait before its first move, and before the others
 
-// NONMATCHING (99.0%): the game's swap/attack/score MFx32s are register variables it spills (slots 0x40/0x44/0x48)
-// while `end` lives in memory (0xc0); ours keeps swap/attack in memory (address taken by the assignment and the
-// pair's const& binding) and the score in a register, so the frame is a word short. The game also compares `set`
-// (reloaded) rather than `attack` with CountAttacks, and initialises case 1's `b` directly (both lose % until the
-// spills match). The named candidate locals give the game's top-of-frame order (tree, then the three candidates).
+// NONMATCHING (99.94%): one `score` serves every candidate (mwcc gives the first web the named slot and each later
+// web a slot of its own below the inline temps, as the game has). Left: the game's `--last` iterator temps sit lower
+// (0x78/0x64, ours 0xb8/0x9c, which shifts the call temps above them by 8) and it loads pick.attack before
+// pick.creature.
 void DinoBattleCpuController::DecideAction(u32 first) {
     mSerial.AddTail(new MTimer(first ? data_0208a1a0 : data_0208a1a4));
     DinoBattleModel *model = (DinoBattleModel *)mUnkAC;
@@ -1355,20 +1354,19 @@ void DinoBattleCpuController::DecideAction(u32 first) {
     if (player->GetOpponent()->FindCreature(0) == NULL) {
         return;
     }
+    MFx32 score;
     for (u32 i = 0; i < player->GetCreatureCount(); i++) {
         DinoBattleModelCreature *creature = player->GetCreature(i);
         DinoBattleFileGroup &group = mAi.mGroups[creature->GetUnkBC()];
-        MFx32 end;
-        end = ScoreEscape(player, creature, group.mDataA);
-        if (end != MFx32(0)) {
+        score = ScoreEscape(player, creature, group.mDataA);
+        if (score != MFx32(0)) {
             DinoBattleCpuCandidate c(1);
-            candidates.insert(DinoBattleCpuCandidates::value_type(end, c));
+            candidates.insert(DinoBattleCpuCandidates::value_type(score, c));
         }
-        MFx32 swap;
-        swap = ScoreCreatureConditions(player, creature, group.mDataB);
-        if (swap != MFx32(0)) {
+        score = ScoreCreatureConditions(player, creature, group.mDataB);
+        if (score != MFx32(0)) {
             DinoBattleCpuCandidate c(2);
-            candidates.insert(DinoBattleCpuCandidates::value_type(swap, c));
+            candidates.insert(DinoBattleCpuCandidates::value_type(score, c));
         }
         u32 usable = func_ov000_0216d2cc(creature, TRUE);
         u32 count = creature->CountAttacks();
@@ -1382,12 +1380,11 @@ void DinoBattleCpuController::DecideAction(u32 first) {
             } else {
                 creature->GetAttack(a, &set);
             }
-            MFx32 attack;
-            attack = ScoreAttack(player, creature, group.mSets[set], a);
-            if (attack != MFx32(0)) {
+            score = ScoreAttack(player, creature, group.mSets[set], a);
+            if (score != MFx32(0)) {
                 if (a < count || player->AllCreaturesShareDefFlag()) {
                     DinoBattleCpuCandidate c(0, creature, a);
-                    candidates.insert(DinoBattleCpuCandidates::value_type(attack, c));
+                    candidates.insert(DinoBattleCpuCandidates::value_type(score, c));
                 }
             }
         }
@@ -1418,8 +1415,7 @@ void DinoBattleCpuController::DecideAction(u32 first) {
             support = other;
         } else {
             MFx32 a = ScoreConditions(player, support, other, mAi.mFiles[0]);
-            MFx32 b;
-            b = ScoreConditions(player, other, support, mAi.mFiles[1]);
+            MFx32 b = ScoreConditions(player, other, support, mAi.mFiles[1]);
             if (a > b) {
             } else if (a < b) {
                 support = other;
@@ -1439,7 +1435,6 @@ void DinoBattleCpuController::DecideAction(u32 first) {
         candidates.clear();
         for (u32 t = 0; t < mTargets.size(); t++) {
             DinoBattleModelCreature *target = mTargets[t];
-            MFx32 score;
             if (target->GetUnkB8() == 3) {
                 score = MFx32(0);
             } else {
@@ -1449,7 +1444,7 @@ void DinoBattleCpuController::DecideAction(u32 first) {
                 }
                 DinoBattleFileGroup &group = mAi.mGroups[attacker->GetUnkBC()];
                 int set = attack;
-                if (attack >= attacker->CountAttacks()) {
+                if (set >= attacker->CountAttacks()) {
                     set = 4;
                 } else {
                     attacker->GetAttack(attack, &set);
