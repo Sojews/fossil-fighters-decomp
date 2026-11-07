@@ -602,6 +602,13 @@ void DinoUiReviveStatusMenu::ShowStatChanges() {
     }
 }
 
+static inline u32 DinoAttackLevelAt_rs(const DinoCreatureDef *def, u32 i) {
+    return ((const u32 *)((const u8 *)def + def->attackLevels))[i];
+}
+static inline u32 DinoAttackIdAt_rs(const DinoCreatureDef *def, u32 i) {
+    return ((const u32 *)((const u8 *)def + def->attackIds))[i];
+}
+
 void DinoUiReviveStatusMenu::ShowLearnedAttacks() {
     if (CountRevivedParts(mCreature2) <= CountRevivedParts(mCreature)) {
         return;
@@ -612,11 +619,11 @@ void DinoUiReviveStatusMenu::ShowLearnedAttacks() {
     u32 learned = 0;
     count = 0;
     s32 known = 0;
-    for (u32 i = 0; i < def->attackCount; i++) {
-        if (((const u32 *)((const u8 *)def + def->attackLevels))[i] <= CountRevivedParts(mCreature)) {
+    for (int i = 0; i < def->attackCount; i++) {
+        if (DinoAttackLevelAt_rs(def, i) <= CountRevivedParts(mCreature)) {
             known++;
         }
-        if (((const u32 *)((const u8 *)def + def->attackLevels))[i] <= CountRevivedParts(mCreature2)) {
+        if (DinoAttackLevelAt_rs(def, i) <= CountRevivedParts(mCreature2)) {
             learned++;
         }
         if (learned > known + count) {
@@ -624,7 +631,7 @@ void DinoUiReviveStatusMenu::ShowLearnedAttacks() {
                 names += data_ov007_021922fc;
             }
             count++;
-            names += gDinoResource->GetAttackName(((const u32 *)((const u8 *)def + def->attackIds))[i]);
+            names += gDinoResource->GetAttackName(DinoAttackIdAt_rs(def, i));
         }
     }
     if (known == learned) {
