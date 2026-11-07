@@ -130,7 +130,7 @@ void DinoBattleViewStatusEffectIcon::SetEffects(int count, const u8 *effects) {
     }
     u32 shown[2] = {0, 0};
     for (int s = 0; s < 2; s++) {
-        for (StatusEffectEntry *it = &*mSlots[s].mEntries.begin(); it != &*mSlots[s].mEntries.end(); it++) {
+        for (std::vector<StatusEffectEntry>::iterator it = mSlots[s].mEntries.begin(); it != mSlots[s].mEntries.end(); it++) {
             shown[s] |= 1 << it->mId;
         }
     }
