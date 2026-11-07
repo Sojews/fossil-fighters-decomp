@@ -1,5 +1,4 @@
 // DinoCommonCursor.
-// NONMATCHING: the constructor (the game keeps &mCorners[i] in a stack slot across the path string's destructor).
 
 #include "game/dino_common_cursor.h"
 #include "m/motion.h"
@@ -15,8 +14,10 @@ extern "C" const int data_0208ae20[4];
 DinoCommonCursor::DinoCommonCursor(MSmartOam *oam) {
     mFrame = MRect(0, 0, 0, 0);
     for (u32 i = 0; i < 4; i++) {
-        mCorners[i] = new MMotion(std::string(data_020bb288.mPath), oam, 0, 1);
-        mCorners[i]->Play(data_0208ae20[i], 0);
+        // A loop-local `self` makes the game's this+i*4 CSE (kept in a stack slot across the string's dtor).
+        DinoCommonCursor *self = this;
+        self->mCorners[i] = new MMotion(std::string(data_020bb288.mPath), oam, 0, 1);
+        self->mCorners[i]->Play(data_0208ae20[i], 0);
         mCorners[i]->SetAnchor(2);
         mTasks.AddTail(mCorners[i]);
     }
