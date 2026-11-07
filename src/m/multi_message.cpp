@@ -209,9 +209,15 @@ void MMessageSubject::AddObserver(MMessageObserver *observer) {
     MPush(observer->mSubjects, (MMessageSubject *)this);
 }
 
-// NONMATCHING: the game's stack frame is 8 bytes bigger (unused space, as if for a lock object kept in a
-// register).
+// (An unused two-word object with a destructor: it reserves the 8 bytes the game keeps at the top of the frame,
+// as if for a lock object whose fields live in registers.)
+struct MLockSlot {
+    u32 unused[2];
+    ~MLockSlot() {}
+};
+
 void MMessageSubject::RemoveObserver(MMessageObserver *observer) {
+    MLockSlot slot;
     OSMutex *mutex = &mMutex;
     OS_LockMutex(mutex);
     std::vector<MMessageObserver *>::iterator it = std::find(mObservers.begin(), mObservers.end(), observer);
