@@ -108,12 +108,14 @@ void MFx32ValueAnime::Apply(int step) {
     }
 }
 
+// labs through an inline wrapper (like MSL std::abs(long)): its result is a register value copied into
+// std::max's temps, not a temp of its own.
+static inline long LAbs(long n) { return labs(n); }
+
 MPointAnime::MPointAnime(MPoint from, MPoint to) {
     mFrom = from;
     mTo = to;
-    long dy = labs(from.y - to.y);
-    int dx = labs(from.x - to.x);
-    mSteps = std::max<int>(dx, dy) + 1;
+    mSteps = std::max<long>(LAbs(from.x - to.x), LAbs(from.y - to.y)) + 1;
     mDeltaX = ((to.x - from.x) << 16) / (mSteps - 1);
     mDeltaY = ((to.y - from.y) << 16) / (mSteps - 1);
 }
@@ -146,10 +148,8 @@ void MFx32PointAnime::Apply(int step) {
 MRectAnime::MRectAnime(MRect from, MRect to) {
     mFrom = from;
     mTo = to;
-    long b = labs(from.bottom - to.bottom);
-    const int &m1 = std::max<int>(labs(from.right - to.right), b);
-    long t = labs(from.top - to.top);
-    mSteps = std::max(std::max<int>(labs(from.left - to.left), t), m1) + 1;
+    mSteps = std::max(std::max<long>(LAbs(from.left - to.left), LAbs(from.top - to.top)),
+                      std::max<long>(LAbs(from.right - to.right), LAbs(from.bottom - to.bottom))) + 1;
     mDelta[0] = ((to.left - from.left) << 16) / (mSteps - 1);
     mDelta[1] = ((to.top - from.top) << 16) / (mSteps - 1);
     mDelta[2] = ((to.right - from.right) << 16) / (mSteps - 1);
