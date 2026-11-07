@@ -388,7 +388,7 @@ namespace std {
     // (The block map is handed to insert through this: the buffer's iterator and one more byte.)
     template <class It> struct __cdeque_move_iter : public It {
         __cdeque_move_iter(It i) : It(i) {}
-        typename It::value_type operator*() const {
+        typename It::value_type &operator*() const {
             return *this->ptr_;
         }
         __cdeque_move_iter &operator+=(typename It::difference_type n) {
@@ -402,9 +402,14 @@ namespace std {
         Metrowerks::int2type<true> unk_;
     };
 
-    template <class T> inline void __cdeque_construct(T *p, const T &x, Metrowerks::int2type<true>) {
-        const T &y = x;   // (through a reference: the game keeps the element temporary in memory)
-        allocator<T>().construct(p, y);
+    // (insert constructs through the buffer's allocator; the tag is made one level down, and the element is
+    // copied into a temporary bound to a reference: the game keeps that temporary in memory.)
+    template <class A, class T> inline void __cdeque_construct(A &a, T *p, const T &x, Metrowerks::int2type<true>) {
+        const T &y = T(x);
+        a.construct(p, y);
+    }
+    template <class A, class T> inline void __cdeque_construct(A &a, T *p, const T &x) {
+        __cdeque_construct(a, p, x, Metrowerks::int2type<true>());
     }
     template <class T> inline void __cdeque_assign(T &d, const T &s, Metrowerks::int2type<true>) {
         d = s;
@@ -712,7 +717,7 @@ namespace std {
         T *p = tmp.data_ + pi;
         // (do-while under a guard: a plain for loop tests n twice)
         if (n != 0) do {
-            __cdeque_construct(p, *first, Metrowerks::int2type<true>());
+            __cdeque_construct(tmp.alloc(), p, *first);
             ++tmp.size_;
             --n, ++p, ++first;
         } while (n != 0);
