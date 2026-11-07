@@ -408,3 +408,13 @@ On top of the pass above. Committed and pushed, no report regressions:
 - **DinoFieldRadar::Idle 66.17 -> 66.75** (2d5360de): permuter round (own score 10115->9339, report +0.58). Winning shape: `entry`/`side`/`mtx` hoisted to the function top, `p` computed before the NULL check, `direction`/`near1`/`angle` split from their init (`int angle = mPlayerAngle` + separate `near1 =`), shared `d` + assigned `side` in the range loop, `MFx32Point d` hoisted out of DinoRadarSwept's block. Most `perm` locals were removable for free; the tail468/angle-near1 pair is load-bearing (removing it alone drops to 66.61).
 
 Dead ends this stretch: DinoUiDebugReviverMenu::OnIdle shared-`state` hoist regresses (99.735->99.707, item's r6/r7 allocation untouched); OnFocus combined-expr/y-first flat or slightly worse (99.52, still permuter-dead); CreateCloseTask se-first/set-first reorders regress hard (87.1/85.3); DinoUiTopMenu ctor's only mismatch is a `.word` vtable data constant (99.815).
+
+---
+
+## Session update 2026-11-08 (third pass, round 2)
+
+All four permuter targets landed, committed and pushed, no report regressions:
+
+- **DinoFieldPlayerControl::Idle 86.10 -> 87.33** (0521e743): permuter round (own score 7067->6533, report +1.22). Winning shape: `follower`/`speed`/`ground`/`area`/`decide`/`tapped`/`dist` hoisted to the function top, `speed = walkSpeed * defs->runSpeed` (product order), `u32 dir -> int dir` reverted by cleanup, and the notable find: the game computes `MPoint d = mTouchStart - pos;` BEFORE `DinoFieldCharaGetScreenPos(&pos, player)` (uses the uninitialized pos — the schedule reads it before the call). Removing that order swap costs -0.05. All dead `perm` locals from the candidate were free to remove (the 10-replacement clean held 87.328 exactly).
+
+PlayerControl still open at 87.33 (follower loop + 20 extra frame temps; the resumed permuter continues from best-6533 in ff-decomp-pc). Remaining in these overlays: DinoFieldRadar::Idle 66.75, OnStart 92.23, StateClose 96.44, Fraction4 97.81 (this+i*4), CreateCloseTask 98.24, and the 99.x slot puzzles.
