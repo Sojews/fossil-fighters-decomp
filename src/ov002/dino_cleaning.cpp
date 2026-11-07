@@ -46,9 +46,13 @@
 
 #pragma auto_inline off
 
-// Minus half of d (to centre something d bigger than the screen).
-static inline MPoint DinoHalfBack(const MPoint &d) {
-    return MPoint(-d.x / 2, -d.y / 2);
+// Minus half of how much bigger than the screen size is (to centre it). (The volatile reads keep the game's load
+// order, y before x; the plain `MPoint(-d.x / 2, -d.y / 2)` of `size - MPoint(256, 192)` matches only under ipa.)
+static inline MPoint DinoCentreBack(const MPoint &size) {
+    const volatile int *p = &size.x;
+    int h = p[1];
+    int w = p[0];
+    return MPoint(-(w - 256) / 2, -(h - 192) / 2);
 }
 
 // (In the kaseki rock's file.)
@@ -276,7 +280,6 @@ static inline MParallelTaskSet *DinoCleaningPar(MTask *a, MTask *b) {
 }
 
 // Sets the cleaning up: its fossil's numbers, the screens, the input, the live, the tools and the menus.
-// NONMATCHING: 99.7%, the game loads the title size's y before its x when centring it (scheduling).
 void DinoCleaning::State02160638() {
     DinoSoundLoadScene(0xD);
     DinoHelpBase::Disable();
@@ -366,7 +369,7 @@ void DinoCleaning::State02160638() {
     mParallel.AddTail(mUnk10C);
     mUnk120 = (u32) new MTextPicture(
         std::string(mMode == 0 ? data_ov002_021659ec.mTitlePath : data_ov002_021659ec.mTitlePath2), 1, true);
-    ((MTextPicture *)mUnk120)->SetPosition(DinoHalfBack(((MTextPicture *)mUnk120)->GetSize() - MPoint(256, 192)));
+    ((MTextPicture *)mUnk120)->SetPosition(DinoCentreBack(((MTextPicture *)mUnk120)->GetSize()));
     ((MTextPicture *)mUnk120)->SetPriority(3);
     ((MTextPicture *)mUnk120)->Show();
     mKasekiRock = NULL;
