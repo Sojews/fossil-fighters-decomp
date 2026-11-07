@@ -940,11 +940,11 @@ struct DinoCreatureStats {
     int hp;         // 0x00
     int stats[5];   // 0x04
 };
-extern "C" DinoCreatureStats func_02030f38(const DinoCreatureStatsInput *info, BOOL fixed, fx32 fraction);
+extern "C" void func_02030f38(DinoCreatureStats *out, const DinoCreatureStatsInput *info, BOOL fixed, fx32 fraction);
 
 // Sets the creature up as creature id: its definition, the sides its support effects touch, its attacks' element
 // masks and its stats (with full life, or the life its rank's experience gives).
-// NONMATCHING (96%): the game loads all the stats before storing them, and spills fullLife on entry.
+// NONMATCHING (99.3%): the game spills fullLife at the very start of the entry block.
 extern "C" void func_ov000_0216c90c(DinoBattleModelCreature *creature, u32 id, BOOL resetStatus, BOOL fullLife) {
     creature->mUnkB0 = id;
     creature->mDef = (DinoBattleCreatureDef *)gDinoResource->GetCreatureDef(id);
@@ -993,13 +993,19 @@ extern "C" void func_ov000_0216c90c(DinoBattleModelCreature *creature, u32 id, B
         info.bonus[i] = body->parts[i].unk12;
         info.levels[i] = body->parts[i].level;
     }
-    const DinoCreatureStats &stats = func_02030f38(&info, creature->mPlayer->IsCpu(), creature->mUnk178);
+    DinoCreatureStats stats;
+    func_02030f38(&stats, &info, creature->mPlayer->IsCpu(), creature->mUnk178);
     int life = stats.hp;
-    creature->mUnkEC = stats.stats[0];
-    creature->mUnkF0 = stats.stats[1];
-    creature->mUnkF4 = stats.stats[2];
-    creature->mUnkF8 = stats.stats[3];
-    creature->unk104 = stats.stats[4];
+    int s0 = stats.stats[0];
+    int s1 = stats.stats[1];
+    int s2 = stats.stats[2];
+    int s3 = stats.stats[3];
+    int s4 = stats.stats[4];
+    creature->mUnkEC = s0;
+    creature->mUnkF0 = s1;
+    creature->mUnkF4 = s2;
+    creature->mUnkF8 = s3;
+    creature->unk104 = s4;
     if (fullLife) {
         life = ((const DinoCreatureDef *)creature->mDef)->GetHpTable()[(u32)(creature->mUnkFC - 1)];
     }
