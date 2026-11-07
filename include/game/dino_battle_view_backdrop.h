@@ -19,23 +19,31 @@ public:
         mTable = 0;
         mFrame = 0;
         mFading = FALSE;
-        for (int t = 0; t < 5; t++) {
+        // Declared up front in the game's spill-slot order.
+        int db, dg, dr;
+        u32 b, g, r;
+        u16 *dst;
+        int t;
+        u16 *line;
+        int ab, ag, ar;
+        for (t = 0; t < 5; t++) {
             const DinoBattleAdjustDefs *defs = gDinoResource->GetBattleAdjustDefs();
             const u8 *top = DinoBackdropColor(defs, defs->backdropTop, t);
             const DinoBattleAdjustDefs *defs2 = gDinoResource->GetBattleAdjustDefs();
-            u32 r = top[0];
-            u32 g = top[1];
-            u32 b = top[2];
             const u8 *bottom = DinoBackdropColor(defs2, defs2->backdropBottom, t);
-            int dr = bottom[0] - r;
-            int dg = bottom[1] - g;
-            int db = bottom[2] - b;
-            u16 *line = mTables[t] = new u16[M_RASTER_LINES];
-            int ar = 0;
-            int ag = 0;
-            int ab = 0;
+            r = top[0];
+            g = top[1];
+            b = top[2];
+            dr = bottom[0] - r;
+            dg = bottom[1] - g;
+            db = bottom[2] - b;
+            mTables[t] = new u16[M_RASTER_LINES];
+            line = mTables[t];
+            ab = ar = ag = 0;
             for (int y = 0; y < M_RASTER_LINES; y++) {
-                *line++ = (((b + ab / 191) >> 3) << 10) | ((((g + ag / 191) >> 3) << 5) | (0x8000 | ((r + ar / 191) >> 3)));
+                dst = line;
+                line++;
+                *dst = (((b + ab / 191) >> 3) << 10) | ((((g + ag / 191) >> 3) << 5) | (0x8000 | ((r + ar / 191) >> 3)));
                 ar += dr;
                 ag += dg;
                 ab += db;
