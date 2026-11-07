@@ -6,7 +6,7 @@
 
 void MChr256Transfer::Transfer() {
     if (mPalette != 0) {
-        MAddPaletteOffset((const u16 *)mSrc, (u16 *)mDest, mSize, mPalette << 4);
+        MAddPaletteOffset(mSrc, mDest, mSize, mPalette);
     } else {
         MCopy(mSrc, mDest, mSize);
     }
