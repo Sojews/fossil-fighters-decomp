@@ -66,10 +66,12 @@ struct DinoCommonLiveCondition {
     const u32 *GetArgs() const { return (const u32 *)((const u8 *)this + offset); }
 };
 
-// NONMATCHING: the flag loops step a pointer through the operands (the game indexes them), and the flag test is
-// materialized rather than kept as TRUE-then-cleared.
-// (The game reloads the flag vectors and the argument list on every pass of the flag loops.)
+// NONMATCHING: in the flag test the game shifts the flag down (flag >> 3) after loading the first vector; ours
+// shifts it first, into another register.
+// (The game indexes the operands from a base taken after the loop guard, reloads the count on every pass, and
+// reloads the flag vectors.)
 #pragma opt_loop_invariants off
+#pragma opt_strength_reduction off
 BOOL DinoCommonLive::CheckCondition(const DinoCommonLiveCondition *cond) {
     switch (cond->kind) {
     default:
@@ -99,44 +101,61 @@ BOOL DinoCommonLive::CheckCondition(const DinoCommonLiveCondition *cond) {
     case 15:
         return (int)mUnkB8[cond->GetArgs()[0]] >= (int)cond->GetArgs()[1] ? TRUE : FALSE;
     case 0:
-        for (u32 i = 0; i < cond->count; i++) {
-            u32 flag = cond->GetArgs()[i];
-            BOOL set = IsFlagSet(flag);
-            if (!set) {
-                return FALSE;
-            }
-        }
+        {u32 i = 0;
+        if (i < cond->count) {
+            const u32 *args = cond->GetArgs();
+            do {
+                u32 flag = args[i];
+                BOOL set = IsFlagSet(flag);
+                if (!set) {
+                    return FALSE;
+                }
+            } while (++i < *(volatile const u32 *)&cond->count);
+        }}
         return TRUE;
     case 1:
-        for (u32 i = 0; i < cond->count; i++) {
-            u32 flag = cond->GetArgs()[i];
-            BOOL set = IsFlagSet(flag);
-            if (set) {
-                return TRUE;
-            }
-        }
+        {u32 i = 0;
+        if (i < cond->count) {
+            const u32 *args = cond->GetArgs();
+            do {
+                u32 flag = args[i];
+                BOOL set = IsFlagSet(flag);
+                if (set) {
+                    return TRUE;
+                }
+            } while (++i < *(volatile const u32 *)&cond->count);
+        }}
         return FALSE;
     case 2:
-        for (u32 i = 0; i < cond->count; i++) {
-            u32 flag = cond->GetArgs()[i];
-            BOOL set = IsFlagSet(flag);
-            if (set) {
-                return FALSE;
-            }
-        }
+        {u32 i = 0;
+        if (i < cond->count) {
+            const u32 *args = cond->GetArgs();
+            do {
+                u32 flag = args[i];
+                BOOL set = IsFlagSet(flag);
+                if (set) {
+                    return FALSE;
+                }
+            } while (++i < *(volatile const u32 *)&cond->count);
+        }}
         return TRUE;
     case 3:
-        for (u32 i = 0; i < cond->count; i++) {
-            u32 flag = cond->GetArgs()[i];
-            BOOL set = IsFlagSet(flag);
-            if (!set) {
-                return TRUE;
-            }
-        }
+        {u32 i = 0;
+        if (i < cond->count) {
+            const u32 *args = cond->GetArgs();
+            do {
+                u32 flag = args[i];
+                BOOL set = IsFlagSet(flag);
+                if (!set) {
+                    return TRUE;
+                }
+            } while (++i < *(volatile const u32 *)&cond->count);
+        }}
         return FALSE;
     }
 }
 #pragma opt_loop_invariants reset
+#pragma opt_strength_reduction reset
 
 // The data's line (a table of offsets after the header).
 static inline u8 *DinoLiveLine(MResource<DinoCommonLiveData> &res, u32 i) {
