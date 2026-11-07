@@ -143,7 +143,6 @@ static inline BOOL MArchiveIsVram(const void *p) {
     return vram;
 }
 
-// NONMATCHING (99.9%): the spilled locals get other stack slots.
 void MArchive::Read(u32 index, u32 offset, void *dest, u32 size, MArchiveFilter *filter) {
     Entry &entry = mEntries[index];
     {
@@ -187,14 +186,16 @@ void MArchive::Read(u32 index, u32 offset, void *dest, u32 size, MArchiveFilter 
     while (header.filters[filters] != 0) {
         filters++;
     }
+    u32 steps;
+    u32 c;
     u32 first = offset / header.chunkSize;
     u32 last = (offset + size - 1) / header.chunkSize;
+    u32 skip;
     u32 done = 0;
-    u32 *chunk = &chunks[first];
+    u32 length;
     file.Seek(entry.offset + chunks[first], FS_SEEK_SET);
-    for (u32 c = first; c <= last; c++) {
+    for (c = first; c <= last; c++) {
         BOOL partial = FALSE;
-        u32 skip;
         if (c == first) {
             skip = offset & (header.chunkSize - 1);
             if (skip != 0) {
@@ -203,8 +204,7 @@ void MArchive::Read(u32 index, u32 offset, void *dest, u32 size, MArchiveFilter 
         } else {
             skip = 0;
         }
-        u32 length;
-        if (last == c) {
+        if (c == last) {
             length = ((offset + size - 1) & (header.chunkSize - 1)) + 1;
             if (c == header.chunkCount - 1) {
                 partial = (partial | (header.size != offset + size)) ? TRUE : FALSE;
@@ -218,11 +218,11 @@ void MArchive::Read(u32 index, u32 offset, void *dest, u32 size, MArchiveFilter 
         if (filter != NULL) {
             partial = TRUE;
         }
-        u32 steps = filters;
+        steps = filters;
         if (partial || filters == 0) {
             steps++;
         }
-        file.Read(buffer2, chunk[1] - chunk[0]);
+        file.Read(buffer2, chunks[c + 1] - chunks[c]);
         for (u32 i = 0; i < steps; i++) {
             u8 *tmp = buffer;
             buffer = buffer2;
@@ -270,7 +270,6 @@ void MArchive::Read(u32 index, u32 offset, void *dest, u32 size, MArchiveFilter 
             }
         }
         done += length;
-        chunk++;
     }
     delete[] chunks;
     if (shared) {
