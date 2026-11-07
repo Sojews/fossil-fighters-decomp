@@ -418,3 +418,9 @@ All four permuter targets landed, committed and pushed, no report regressions:
 - **DinoFieldPlayerControl::Idle 86.10 -> 87.33** (0521e743): permuter round (own score 7067->6533, report +1.22). Winning shape: `follower`/`speed`/`ground`/`area`/`decide`/`tapped`/`dist` hoisted to the function top, `speed = walkSpeed * defs->runSpeed` (product order), `u32 dir -> int dir` reverted by cleanup, and the notable find: the game computes `MPoint d = mTouchStart - pos;` BEFORE `DinoFieldCharaGetScreenPos(&pos, player)` (uses the uninitialized pos — the schedule reads it before the call). Removing that order swap costs -0.05. All dead `perm` locals from the candidate were free to remove (the 10-replacement clean held 87.328 exactly).
 
 PlayerControl still open at 87.33 (follower loop + 20 extra frame temps; the resumed permuter continues from best-6533 in ff-decomp-pc). Remaining in these overlays: DinoFieldRadar::Idle 66.75, OnStart 92.23, StateClose 96.44, Fraction4 97.81 (this+i*4), CreateCloseTask 98.24, and the 99.x slot puzzles.
+
+---
+
+## Session update 2026-11-08 (third pass, round 3 — PlayerControl finished)
+
+- **DinoFieldPlayerControl::Idle 87.33 -> 88.95** (43639f80): the `--resume` round (own score 6533->5962, report +1.62). Additional shape: FindFollower loop as `for (u32 i = 0; i < 100; ++i)` with `chara = field->mCharas[(int) i]` and the chara hoisted out — the game's non-strength-reduced index form is reached through the cast, not a pragma (all three pragmas regress, see above); AngleVector's sin kept in a `const s32 perm266` local; `mTouchFrames = 0` and `tapped = TRUE` materialized through temp copies. Every `perm` local left in the candidate was removable for free (13-replacement clean held 88.947 exactly; only `const s32 perm266` remains, and removing it loses the match).
