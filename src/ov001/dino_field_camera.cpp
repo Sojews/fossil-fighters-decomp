@@ -188,6 +188,9 @@ struct DinoFieldCameraSettings {
 
 // d less the part damping takes, rounded away from zero (0 stays 0).
 static inline fx32 DinoCameraDamp(fx32 d, fx32 damping) {
+    MFx32 perm83;
+    {
+    }
     if (d > 0) {
         return d - FX_Mul(d, damping) - 1;
     }
@@ -199,35 +202,40 @@ static inline fx32 DinoCameraDamp(fx32 d, fx32 damping) {
 
 // The camera's place: distance from the target (at least 1) at the pitch (kept off straight down and up) and yaw.
 static inline void DinoCameraOrbit(VecFx32 *pos, const VecFx32 &target, int yaw, int pitch, fx32 distance) {
+    int perm692;
     if (distance < FX32_ONE) {
         distance = FX32_ONE;
     }
+    perm692 = (u16)yaw;
     if ((u16)pitch <= 0xC0FF && (u32)pitch > 0x8000) {
         pitch = 0xC0FF;
     } else if ((u32)pitch >= 0x3F00 && (u32)pitch < 0x8000) {
         pitch = 0x3F00;
     }
-    fx32 h = (FX_CosIdx((u16)pitch) * distance) >> FX32_SHIFT;
-    fx32 y = (FX_SinIdx((u16)pitch) * distance) >> FX32_SHIFT;
+    const fx32 h = (FX_CosIdx((u16)pitch) * distance) >> FX32_SHIFT;
+    u32 perm156;
+    const fx32 y = (FX_SinIdx((u16)pitch) * distance) >> FX32_SHIFT;
     pos->x = h;
     pos->y = y;
     pos->z = h;
-    pos->x = target.x + ((FX_SinIdx((u16)yaw) * h) >> FX32_SHIFT);
-    pos->y = y + target.y;
+    pos->x = target.x + ((FX_SinIdx(perm692) * h) >> FX32_SHIFT);
+    pos->y = target.y + y;
     pos->z = target.z + ((FX_CosIdx((u16)yaw) * h) >> FX32_SHIFT);
 }
 
 // Moves the camera: the focus height follows the ground; the target follows the focus (dragged along within reach while
 // tracking, else easing in), and the camera sits at the target's distance and angles from it.
-// NONMATCHING: 90%, the game truncates the yaw and pitch to u16 twice more around the orbit (more inline levels?), and
+// NONMATCHING: 91.9%, the game truncates the yaw and pitch to u16 twice more around the orbit (more inline levels?), and
 // the drag's length and angle temporaries are scheduled differently.
 void DinoFieldCamera::UnkV14() {
+    MFx32 over;
+    fx32 dz;
     const DinoFieldCameraSettings *settings = (const DinoFieldCameraSettings *)gDinoResource->GetExcavate78();
     if ((!mField->IsUnk258() && mTracking) || !mHeightSet) {
         fx32 height = mField->GetGroundHeight(mUnk94, mUnk9C);
         if (height != (fx32)0x80000000) {
             height += mUnkD0;
-            fx32 eased = ((s32)mUnk98 * 30 + height * 2) >> 5;
+            const fx32 eased = ((s32)mUnk98 * 30 + height * 2) >> 5;
             if ((s32)mUnk98 != eased) {
                 mUnk98 = eased;
             } else {
@@ -242,42 +250,44 @@ void DinoFieldCamera::UnkV14() {
         MFx32Point d(MFx32::FromRaw(mUnk94 - mUnkAC.x), MFx32::FromRaw(mUnk9C - mUnkAC.z));
         MFx32 length = d.Length();
         if (length > reach) {
-            u16 angle = MFx32PointAngle(d);
-            MFx32 over = length - reach;
+            int angle = MFx32PointAngle(d);
+            over = length - reach;
             mUnkAC.x += (MFx32::FromRaw(FX_CosIdx(angle)) * over).v;
             mUnkAC.z += (MFx32::FromRaw(FX_SinIdx(angle)) * over).v;
         }
         mUnkAC.y = mUnk98;
-    } else if (mHeightSet) {
+    } else if (mHeightSet != 0) {
         mUnkAC.x = mUnk94;
         mUnkAC.y = mUnk98;
-        mUnkAC.z = mUnk9C;
+        mUnkAC.z = (int) mUnk9C;
     } else {
         mUnkAC.x += FX_Mul(mUnkC4, settings->ease);
         mUnkAC.y += FX_Mul(mUnkC8, settings->ease);
         mUnkAC.z += FX_Mul(mUnkCC, settings->ease);
         mUnkC4 = mUnkC8 = mUnkCC = 0;
-        mUnkAC.x = mUnk94 + DinoCameraDamp(mUnkAC.x - mUnk94, settings->damping);
-        mUnkAC.y = mUnk98 + DinoCameraDamp(mUnkAC.y - mUnk98, settings->damping);
-        mUnkAC.z = mUnk9C + DinoCameraDamp(mUnkAC.z - mUnk9C, settings->damping);
+        mUnkAC.x = DinoCameraDamp(mUnkAC.x - mUnk94, settings->damping) + mUnk94;
+        mUnkAC.y = DinoCameraDamp(mUnkAC.y - mUnk98, settings->damping) + mUnk98;
+        mUnkAC.z = DinoCameraDamp(mUnkAC.z - mUnk9C, settings->damping) + mUnk9C;
         if (labs(mUnkAC.x - mUnk94) < 40 && labs(mUnkAC.y - mUnk98) < 40 && labs(mUnkAC.z - mUnk9C) < 40) {
             mHeightSet = TRUE;
         }
     }
     if (!mField->IsUnk258() && mTracking) {
         fx32 dx = mUnkAC.x - mUnkA0.x;
+        fx32 vx;
         fx32 dy = mUnkAC.y - mUnkA0.y;
-        fx32 dz = mUnkAC.z - mUnkA0.z;
+        dz = mUnkAC.z - mUnkA0.z;
         mUnkA0.x = mUnkAC.x;
         mUnkA0.y = mUnkAC.y;
         mUnkA0.z = mUnkAC.z;
         fx32 k = (MFx32::FromRaw(settings->spring) / reach).v;
-        fx32 vx = DinoCameraDamp(mUnkC4 + dx, k);
+        vx = DinoCameraDamp(mUnkC4 + dx, k);
         fx32 vy = DinoCameraDamp(mUnkC8 + dy, k);
         fx32 vz = DinoCameraDamp(mUnkCC + dz, k);
         mUnkAC.x += FX_Mul(mUnkC4, settings->ease) - FX_Mul(vx, settings->ease);
         mUnkAC.y += FX_Mul(mUnkC8, settings->ease) - FX_Mul(vy, settings->ease);
-        mUnkAC.z += FX_Mul(mUnkCC, settings->ease) - FX_Mul(vz, settings->ease);
+        int perm297 = settings->ease;
+        mUnkAC.z += FX_Mul(mUnkCC, perm297) - FX_Mul(vz, settings->ease);
         mUnkC4 = vx;
         mUnkC8 = vy;
         mUnkCC = vz;
@@ -288,9 +298,9 @@ void DinoFieldCamera::UnkV14() {
     }
     mUnkB8.x = mUnkAC.x + FX_Mul(mUnkC4, settings->ease);
     mUnkB8.y = mUnkAC.y + FX_Mul(mUnkC8, settings->ease);
-    mUnkB8.z = mUnkAC.z + FX_Mul(mUnkCC, settings->ease);
-    ((M3DScene *)mUnk90)->SetCameraTarget(&mUnkB8);
+    mUnkB8.z = FX_Mul(mUnkCC, settings->ease) + mUnkAC.z;
     VecFx32 pos;
+    ((M3DScene *)mUnk90)->SetCameraTarget(&mUnkB8);
     DinoCameraOrbit(&pos, mUnkB8, mUnkD8, mUnkD6, mUnkDC.v);
     ((M3DScene *)mUnk90)->SetCameraPos(&pos);
     ((M3DScene *)mUnk90)->SetFov(mUnkD4);
