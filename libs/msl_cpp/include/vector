@@ -289,14 +289,14 @@ namespace std {
         void init_copy(const T *first, const T *last, Metrowerks::int2type<true>);
         // Fills an empty vector from [first, last) (out of line; the range constructor's work).
         template <class It> void init(It first, It last, Metrowerks::int2type<false>);
-        // (last comes first: the game copies it first and gives it the lower stack slot.)
-        template <class It> static void move_range(It last, It first, pointer p) {
+        // (One by-value hop: last taken by reference, then both passed on by value, so the game copies last before
+        // first and still gives it the lower stack slot.)
+        template <class It> static void move_range(const It &last, It first, pointer p) {
+            move_range_copy(first, last, p);
+        }
+        template <class It> static void move_range_copy(It first, It last, pointer p) {
             for (; first != last; ++first, ++p) {
-                // (__msl_assign by hand: the tag temporary first, then the element in a volatile local, so the tag
-                // takes the lower byte as in the game.)
-                Metrowerks::int2type<true>();
-                volatile T c = *first;
-                *p = c;
+                __msl_assign<T>(*p, *first, Metrowerks::int2type<true>());
             }
         }
         template <class It> void move_range_at_end(const It &first, const It &last) {
