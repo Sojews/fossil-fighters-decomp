@@ -359,6 +359,10 @@ Macros in `include/game/dino_static_init.h`.
   `dino_static_init.h` include alone shifted 24 functions in one TU: define the macro locally then.
 - `std::string arr[3] = {paths[5], paths[9], paths[6]};` constructs and registers elements one by one, matching three
   `__register_global_object` calls (disp_blower).
+- One stack copy too many for a rect built from a just-stored size: pass the pool point itself
+  (`MRect(MPoint(0, 0), DINO_POOL_NV(MPoint, sym, off))`), not a local copy; a by-value arg costs temp + copy, a
+  pool lvalue only the copy. A named offset local computed before the rect's store fixes the slot order and delays
+  the rect's stores (dino_main_layout 94.6 -> 100).
 - A static-init struct object takes 1 byte of .bss: place it after the TU's other .bss statics.
 - **.bss layout:** our pool puts 4-byte statics first and orders same-size objects by declaration (ours = declaration
   order rotated left by one, the game rotated right; dtor records after each object in ours, before in the game).
