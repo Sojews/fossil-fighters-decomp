@@ -260,7 +260,7 @@ void DinoBattleViewStatusEffectIcon::SetEffects(int count, const u8 *effects) {
                         if (change->mEffects == 0) {
                             queue->AddTail(new ViewStatusEffectIconLoadMotionTask(mSlots[slot].mIcon, &mSlots[slot].mEntries[0], mSlots[slot].mEntries[0].GetAnime()));
                         } else {
-                            for (int next = e + 1; next < 12; next++) {
+                            for (u32 next = e + 1; (int)next < 12; next++) {
                                 for (u32 j = 0; j < mSlots[slot].mEntries.size(); j++) {
                                     if (next == mSlots[slot].mEntries[j].mId && (change->mEffects & (1 << next))) {
                                         queue->AddTail(new ViewStatusEffectIconLoadMotionTask(
