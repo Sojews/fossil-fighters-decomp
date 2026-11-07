@@ -816,7 +816,8 @@ struct DinoRecordByUnk78Unk79Time {
 };
 
 // Keeps a profile met in multiplayer (unless it's kept already) over the least important record, and sorts them.
-// NONMATCHING: register allocation (the game keeps the records in a register through the search and `this` on the stack).
+// (No strength reduction: the search walks a record pointer, a byte offset from the records and the counter.)
+#pragma opt_strength_reduction off
 void DinoBackup::AddProfile(const DinoPlayerProfile *profile, int arg) {
     DinoPlayerProfile record = *profile;
     record.unk7A = 0;
@@ -825,9 +826,11 @@ void DinoBackup::AddProfile(const DinoPlayerProfile *profile, int arg) {
         record.unk7C = mPlayFrames;
     }
     DinoBackupRecord *records = mRecords;
-    DinoBackupRecord *r = records;
-    for (u32 i = 0; i < 42; i++, r++) {
-        if (r->unk78 && memcmp(&records[i], &record, 0x65) == 0) {
+    DinoBackupRecord *r;
+    u32 i;
+    u32 off;
+    for (r = records, i = 0, off = 0; i < 42; r++, off += sizeof(DinoBackupRecord), i++) {
+        if (r->unk78 && memcmp((u8 *)records + off, &record, 0x65) == 0) {
             return;
         }
     }
@@ -840,6 +843,7 @@ void DinoBackup::AddProfile(const DinoPlayerProfile *profile, int arg) {
     mRecords[0] = *(DinoBackupRecord *)&record;
     DinoSortImpl<DinoBackupRecord *, DinoRecordByUnk78Time, 0>(mRecords, mRecords + 42, DinoRecordByUnk78Time());
 }
+#pragma opt_strength_reduction reset
 
 void DinoBackup::SetTeam(u32 index, const DinoTeam *team) {
     mTeams[index] = *team;
