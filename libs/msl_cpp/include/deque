@@ -806,7 +806,7 @@ namespace std {
         if (!b.empty()) {
             buf_type::iterator e = b.end_fields();
             buf_type::iterator i = e;
-            i.ptr_ = i.first_;
+            i.ptr_ = i.beg_ + b.start_;   // (recomputed, not first_: the game re-reads start_ and cap with CSE off)
             for (; i != e; ++i) {
                 if (*i != 0) {
                     ::operator delete(*i);
