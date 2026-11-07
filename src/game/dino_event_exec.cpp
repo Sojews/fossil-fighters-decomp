@@ -3041,6 +3041,9 @@ void DinoEventExecAutoWarp::StateWarp() {
 
 // An area of a field map (DinoFieldMap::GetArea).
 struct DinoFieldMapArea {
+    // (Both sides of the arrival loop's compare read it through this: the new area's id is loaded first.)
+    u32 GetId() const { return id; }
+
     u32 id;         // 0x00
     u8 unk04[0xC - 0x4];
     u32 exitAngle;  // 0x0C: the way out of a warp (-1: none)
@@ -3083,7 +3086,7 @@ void DinoEventExecAutoWarp::StateArrive() {
         MFx32Point offset = step * MFx32(8);
         do {
             offset += step;
-        } while (((DinoFieldMapArea *)mEvent->GetField()->GetMap()->GetArea(pos + offset))->id == area->id);
+        } while (((DinoFieldMapArea *)mEvent->GetField()->GetMap()->GetArea(pos + offset))->GetId() == area->GetId());
         MSerialTaskSet *serial;
         (serial = new MSerialTaskSet(TRUE))->AddTail(
             mEvent->GetField()->CreateCharaAngleTask(mEvent->GetField()->GetCamera()->GetFocus(), angle, 1, 0),
