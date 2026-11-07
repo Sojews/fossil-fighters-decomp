@@ -786,40 +786,41 @@ inline DinoKBBackButton::DinoKBBackButton(DinoUiKeyboardMenu *menu, MSmartOam *o
     DinoHelpItem::Enable();
 }
 
-#define DINO_KB_ARROW_MOTIONS()                                                                                  \
-    if (mIndex >= 4) {                                                                                           \
-        switch (mIndex) {                                                                                        \
-        case 4:                                                                                                  \
-            mMotion = new MMotion(std::string(data_ov007_02190fa0.mPaths[4]),   \
-                                  ((DinoUiKeyboardMenu *)unk98)->GetOam(), 2, 1);                                  \
-            mMotion->Play(1, 0);                                                                                 \
-            mMotion->SetPosition(mPos);                                                                          \
-            mMotion->SetPriority(2);                                                                             \
-            mMotion->Show();                                                                                     \
-            mFrame = mMotion->GetFrame();                                                                        \
-            mParallel.AddTail(mMotion);                                                                          \
-            mTasks = new MSerialTaskSet(FALSE);                                                                  \
-            mParallel.AddTail(mTasks);                                                                           \
-            break;                                                                                               \
-        case 5:                                                                                                  \
-            mMotion = new MMotion(std::string(data_ov007_02190fa0.mPaths[7]),   \
-                                  ((DinoUiKeyboardMenu *)unk98)->GetOam(), 2, 1);                                  \
-            mMotion->Play(1, 0);                                                                                 \
-            mMotion->SetPosition(mPos);                                                                          \
-            mMotion->SetPriority(2);                                                                             \
-            mMotion->Show();                                                                                     \
-            mFrame = mMotion->GetFrame();                                                                        \
-            mParallel.AddTail(mMotion);                                                                          \
-            mTasks = new MSerialTaskSet(FALSE);                                                                  \
-            mParallel.AddTail(mTasks);                                                                           \
-            break;                                                                                               \
-        }                                                                                                        \
-    }                                                                                                            \
-    if (mIndex == 1 || mIndex == 2 || mIndex == 3 || mIndex == 6) {                                             \
-        DinoHelpItem::Enable();                                                                                  \
-    } else {                                                                                                     \
-        DinoHelpItem::Disable();                                                                                 \
+static inline void DinoKBArrowMotions(DinoUiKeyboardMenuItem *item) {
+    if (item->mIndex >= 4) {
+        switch (item->mIndex) {
+        case 4:
+            item->mMotion = new MMotion(std::string(data_ov007_02190fa0.mPaths[4]),
+                                  ((DinoUiKeyboardMenu *)item->unk98)->GetOam(), 2, 1);
+            item->mMotion->Play(1, 0);
+            item->mMotion->SetPosition(item->mPos);
+            item->mMotion->SetPriority(2);
+            item->mMotion->Show();
+            item->mFrame = item->mMotion->GetFrame();
+            item->mParallel.AddTail(item->mMotion);
+            item->mTasks = new MSerialTaskSet(FALSE);
+            item->mParallel.AddTail(item->mTasks);
+            break;
+        case 5:
+            item->mMotion = new MMotion(std::string(data_ov007_02190fa0.mPaths[7]),
+                                  ((DinoUiKeyboardMenu *)item->unk98)->GetOam(), 2, 1);
+            item->mMotion->Play(1, 0);
+            item->mMotion->SetPosition(item->mPos);
+            item->mMotion->SetPriority(2);
+            item->mMotion->Show();
+            item->mFrame = item->mMotion->GetFrame();
+            item->mParallel.AddTail(item->mMotion);
+            item->mTasks = new MSerialTaskSet(FALSE);
+            item->mParallel.AddTail(item->mTasks);
+            break;
+        }
     }
+    if (item->mIndex == 1 || item->mIndex == 2 || item->mIndex == 3 || item->mIndex == 6) {
+        item->DinoHelpItem::Enable();
+    } else {
+        item->DinoHelpItem::Disable();
+    }
+}
 
 inline DinoUiKeyboardMenuItem::DinoUiKeyboardMenuItem(u32 index, u32 arg, MPoint pos, DinoUiKeyboardMenu *menu)
     : KeyboardMenuItem(index, arg, pos, menu) {
@@ -829,7 +830,7 @@ inline DinoUiKeyboardMenuItem::DinoUiKeyboardMenuItem(u32 index, u32 arg, MPoint
     mFrame.right = mPos.x + 6;
     mFrame.bottom = mPos.y + 6;
     mMotion = NULL;
-    DINO_KB_ARROW_MOTIONS()
+    DinoKBArrowMotions(this);
 }
 
 inline DinoUiKeyboardMenuItem::DinoUiKeyboardMenuItem(u32 index, u32 arg, MPoint pos, DinoUiKeyboardMenu *menu,
@@ -841,7 +842,7 @@ inline DinoUiKeyboardMenuItem::DinoUiKeyboardMenuItem(u32 index, u32 arg, MPoint
     mFrame.right = mPos.x + halfSize.x;
     mFrame.bottom = mPos.y + halfSize.y;
     mMotion = NULL;
-    DINO_KB_ARROW_MOTIONS()
+    DinoKBArrowMotions(this);
 }
 
 // Rebuilds the keyboard's menu items: the back button (for the mode), the character keys (three groups of 6 rows
