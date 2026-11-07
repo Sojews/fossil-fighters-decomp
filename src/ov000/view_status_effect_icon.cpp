@@ -77,8 +77,8 @@ DinoBattleViewStatusEffectIcon::DinoBattleViewStatusEffectIcon(MSmartOam *oam, u
     mSide = side;
     mTimer = 0;
     const DinoBattleAdjustDefs *defs = gDinoResource->GetBattleAdjustDefs();
-    int dx = defs->statusIconX;
-    int dy = defs->statusIconY;
+    s32 dx = defs->statusIconX;
+    s32 dy = defs->statusIconY;
     for (int i = 0; i < 2; i++) {
         mSlots[i].mUnk10 = -1;
     }
@@ -241,8 +241,8 @@ void DinoBattleViewStatusEffectIcon::SetEffects(int count, const u8 *effects) {
                         break;
                     }
                 }
-                StatusEffectChange *change = &changes.mSlots[slot];
-                if (change->mEffects & bit) {
+                if (changes.mSlots[slot].mEffects & bit) {
+                    StatusEffectChange *change = &changes.mSlots[slot];
                     ViewStatusEffectIcon *icon = mSlots[slot].mIcon;
                     if (icon != NULL) {
                         MTask *erase = new ViewStatusEffectIcon::PlayEraseMotionTask(icon);
