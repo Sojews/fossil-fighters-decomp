@@ -4,14 +4,14 @@
 // anchor, data_020b5894, itself); each other rect or point goes through one reassigned pointer.
 // The rect at data_020b5914 is written through its own symbol (that, and the anchors above, give the game's register
 // allocation).
-// NONMATCHING: scheduling: after an anchor-relative object, the game stores its last word before loading the next
-// object's first value (ours one instruction earlier, four times).
+// The first anchor is declared with its real size (0x40 bytes, the u16s at data_020b5854 follow it): with an unsized
+// array mwcc schedules the next object's first constant ahead of an anchor object's last store.
 
 #include "game/dino_static_init.h"
 
 #define DINO_POOL_U16(sym, off) (((volatile u16 *) &(sym))[(off) / 2])
 #define DINO_POOL_U8(sym, off) (((volatile u8 *) &(sym))[(off)])
-extern "C" u32 data_020b5814[];
+extern "C" u32 data_020b5814[0x10];
 extern "C" u32 data_020b5854[];
 extern "C" u32 data_020b5860[];
 extern "C" u32 data_020b5868[];
