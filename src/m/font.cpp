@@ -341,9 +341,10 @@ static inline u32 MReadGlyphWord(const u32 *src) {
 
 // Draws a 4-bit glyph into 4-bit tiles at a pixel position, clipped to the destination; with its own colors, the
 // glyph's zero pixels are transparent.
-// NONMATCHING (99.6): the instructions match; the game's stack slots for width, the glyph width, firstMask and the
-// own-colors loop's word are permuted from ours (and i/mask swap r3/r4 in that loop). The no-op (int) casts on width
-// and the signed firstMask are permuter finds that move some of them.
+// NONMATCHING (99.96): the instructions and registers match; the game's stack slots for width, the plain loop's
+// lastMask & firstMask, firstMask and the own-colors loop's word are rotated from ours (the game gives the word the
+// lowest). The no-op (int) casts on width and the signed firstMask are permuter finds that move some of them; mask
+// declared outside the own-colors loop fixes that loop's registers.
 void MChr16FontTransfer::Transfer() {
     const u32 *src = (const u32 *) mSrc;
     int srcWords = (mGlyphSize.x + 7) >> 3;
@@ -403,8 +404,8 @@ void MChr16FontTransfer::Transfer() {
     } else {
         while (rows != 0) {
             u32 carry = 0;
+            u32 mask;
             for (u32 i = 0; i < words; i++) {
-                u32 mask;
                 u32 word = MReadGlyphWord(src);
                 u32 out = (word << shift) | (carry >> (32 - shift));
                 // A nibble mask of the nonzero pixels.
