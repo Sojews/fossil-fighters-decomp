@@ -85,7 +85,7 @@ DinoBattleViewStatusEffectIcon::DinoBattleViewStatusEffectIcon(MSmartOam *oam, u
     mIcons = new MParallelTaskSet();
     for (int i = 0; i < 2; i++) {
         mSlots[i].mIcon = new ViewStatusEffectIcon(mOam);
-        mOffsets[i].x = i != mSide ? -11 : -10;
+        mOffsets[i].x = i != mSide ? 10 : -10;
         mOffsets[i].y = 0;
         if (mSide == 1) {
             mOffsets[i].x += (int)-dx;
