@@ -547,10 +547,6 @@ namespace std {
             pi += d.cap();
         }
     }
-    // (insert reads its first element's address through this: a non-member inline moves the value's spill slot down.)
-    template <class T, class A> inline T *__cdeque_first_ptr(const __cdeque_deleter<T, A> &d) {
-        return d.data_ + d.start_;
-    }
 
     template <class T, class Allocator> __cdeque_deleter<T, Allocator>::~__cdeque_deleter() {
         if (data_ != nullptr) {
@@ -691,7 +687,8 @@ namespace std {
         if (n == 0) {
             return;
         }
-        T *b = __cdeque_first_ptr(*this);
+        // (the first element's address read out of a whole begin() iterator: that gives it the game's lowest spill slot)
+        T *b = begin().ptr_;
         size_t pi;
         __cdeque_index(pi, pos.ptr_, b, *this);
         size_t c = capacity();
