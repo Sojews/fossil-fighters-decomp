@@ -168,8 +168,8 @@ static inline void M3DResetTexMtx() {
 
 // Draws the model: culled by its box when asked, then either its display list (patched for the frame and sent by
 // DMA) or its command list run here.
-// NONMATCHING (99.45%): the command list's `identity = FALSE` store is scheduled before the frame load, and the
-// spill slots of the command-list locals come out in a different order.
+// NONMATCHING (99.97%): the spill slots of the command-list locals come out in a different order (the game gives
+// alpha the lowest slot and the shininess pointer one below the vertices).
 void M3DModel::Draw(u32 lights) {
     if ((mFlags & 3) != 3) {
         return;
@@ -257,7 +257,7 @@ void M3DModel::Draw(u32 lights) {
         MI_SendGXCommand(GXi_DmaId, mModelData, mUnk300);
     } else {
         u32 i = 0;
-        BOOL identity = FALSE;
+        bool identity = false;
         u32 frame = mFrame >> 4;
         DC_StoreAll();
         const u16 *cmds = (const u16 *)((const u8 *)mModelRes + 0x28);
@@ -289,7 +289,7 @@ void M3DModel::Draw(u32 lights) {
         const s16 *verts = M3DModelGetMorphVertices(this);
         G3_Color(mUnk2F4);
         if (cmds[i] != 0xFFF) {
-            u32 frameOffset = frame * 0x30;
+            int frameOffset = frame * 0x30;
             do {
                 switch (cmds[i++]) {
                 case 0:
@@ -356,14 +356,14 @@ void M3DModel::Draw(u32 lights) {
                             REG_G3_MTX_MODE = 3;
                             G3_LoadTexMtxTexCoord(&mtx);
                             REG_G3_MTX_MODE = 2;
-                            identity = FALSE;
+                            identity = false;
                         } else {
                             M3DResetTexMtx();
-                            identity = TRUE;
+                            identity = true;
                         }
                     } else if (!identity) {
                         M3DResetTexMtx();
-                        identity = TRUE;
+                        identity = true;
                     }
                     break;
                 }
