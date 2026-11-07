@@ -181,6 +181,13 @@ struct DinoDrillLineMarker {
         }
     }
 
+    // (A member that tests the clip and makes the point: the game pairs each call site's point with op's copy of it.)
+    void Plot(const MRect &clip, int x, int y) {
+        if (clip.left <= x && x < clip.right && clip.top <= y && y < clip.bottom) {
+            (*this)(MPoint(x, y));
+        }
+    }
+
     u8 mDone[36][28];
     DinoCleaningDrill *mDrill;
     u8 unk3F4[0x400 - 0x3F4];
@@ -198,9 +205,7 @@ template <class Op> static inline void DinoDrawLine(Op op, MRect clip, MPoint fr
     int ax;
     ax = labs(dx * 2);
     ay = labs(dy * 2);
-    if (clip.left <= x && x < clip.right && clip.top <= y && y < clip.bottom) {
-        op(MPoint(x, y));
-    }
+    op.Plot(clip, x, y);
     if (ax > ay) {
         int d = ay - ax / 2;
         while (x != to.x) {
@@ -210,9 +215,7 @@ template <class Op> static inline void DinoDrawLine(Op op, MRect clip, MPoint fr
             }
             x += sx;
             d += ay;
-            if (clip.left <= x && x < clip.right && clip.top <= y && y < clip.bottom) {
-                op(MPoint(x, y));
-            }
+            op.Plot(clip, x, y);
         }
     } else {
         int d = ax - ay / 2;
@@ -223,17 +226,15 @@ template <class Op> static inline void DinoDrawLine(Op op, MRect clip, MPoint fr
             }
             y += sy;
             d += ax;
-            if (clip.left <= x && x < clip.right && clip.top <= y && y < clip.bottom) {
-                op(MPoint(x, y));
-            }
+            op.Plot(clip, x, y);
         }
     }
 }
 
 // Drills while the stylus is down: the cells along the stroke since last frame (and their neighbours, see MarkCell),
 // hitting each newly marked cell.
-// NONMATCHING: 99.4%, stack slots: the line's per-point temporaries pair up per call site in the game (ours group by
-// depth), the line's |dx|*2 and sy spill slots swap, and the distance clamp's temporaries order differently.
+// NONMATCHING: 99.5%, stack slots: the line's |dx|*2 and sy spill slots swap, and the distance clamp's temporaries
+// order differently.
 void DinoCleaningDrill::Unk20() {
     MInput *input = GetCleaning()->GetUnkDC();
     if ((input->mButtons & 0x1000) && data_ov002_02165278.mArea.Contains(input->GetTouchPos())) {
