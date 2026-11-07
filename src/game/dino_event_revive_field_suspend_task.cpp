@@ -747,24 +747,28 @@ MTask *DinoEventRevive::CreateMessage(u32 message, const std::string &extra) {
 }
 
 // The file's static initialization (see dino_static_init.h): the common layout header.
-// NONMATCHING: the game stores the screen size before the screen rect's size half (and the icon size before the icon
-// rect), ours runs the rect stores first.
-// The pool is one object from data_020bd6a8: the screen and icon rects at +0xf8/+0x108 go through the anchor
-// data_020bd728 (+0x80) as the game's do. The body sits in a static inline helper so (under ipa) its temporaries take
-// the game's stack slots: the two rects' MPoint(0, 0) temps highest, then each MRect ctor's argument copies.
+// The pool is one object from data_020bd6a8 (+0x80 = data_020bd728, +0x100 = data_020bd7a8). The game reached the
+// screen rect's top-left (+0xf8) through the data_020bd728 anchor, so its scheduler hoisted those two zero stores
+// above the screen size's; the rest goes through data_020bd6a8. The body sits in a static inline helper so (under ipa)
+// its temporaries take the game's stack slots: the rects' MPoint(0, 0) temps highest, then each MRect ctor's
+// argument copies.
 extern "C" u8 data_020bd6a8[];
 extern "C" u8 data_020bd728[];
 #pragma always_inline on
 
 static inline void DinoEventReviveInitLayout() {
     DINO_POOL_NV(MPoint, data_020bd6a8, 0x2c) = MPoint(256, 192);
-    DINO_POOL_NV(MRect, data_020bd728, 0x78) = MRect(MPoint(0, 0), DINO_POOL_NV(MPoint, data_020bd6a8, 0x2c));
+    MRect screenRect(MPoint(0, 0), DINO_POOL_NV(MPoint, data_020bd6a8, 0x2c));
+    DINO_POOL_NV(s32, data_020bd728, 0x78) = screenRect.left;
+    DINO_POOL_NV(s32, data_020bd728, 0x7c) = screenRect.top;
+    DINO_POOL_NV(s32, data_020bd6a8, 0x100) = screenRect.right;
+    DINO_POOL_NV(s32, data_020bd6a8, 0x104) = screenRect.bottom;
     DINO_POOL_NV(MPoint, data_020bd6a8, 0x54) = MPoint(2, 2);
     DINO_POOL_NV(MPoint, data_020bd6a8, 0x44) = MPoint(36, 28);
-    DINO_POOL_NV(MRect, data_020bd728, 0x88) = MRect(MPoint(0, 0), DINO_POOL_NV(MPoint, data_020bd6a8, 0x44));
-    DINO_POOL_NV(MPoint, data_020bd728, 0x98) = MPoint(0, 24);
-    DINO_POOL_NV(MPoint, data_020bd728, 0xa0) = MPoint(256, 192);
-    DINO_POOL_NV(MRect, data_020bd728, 0xa8) = MRect(0, 0, 256, 24);
+    DINO_POOL_NV(MRect, data_020bd6a8, 0x108) = MRect(MPoint(0, 0), DINO_POOL_NV(MPoint, data_020bd6a8, 0x44));
+    DINO_POOL_NV(MPoint, data_020bd6a8, 0x118) = MPoint(0, 24);
+    DINO_POOL_NV(MPoint, data_020bd6a8, 0x120) = MPoint(256, 192);
+    DINO_POOL_NV(MRect, data_020bd6a8, 0x128) = MRect(0, 0, 256, 24);
 }
 
 static struct DinoEventReviveStaticInit {
