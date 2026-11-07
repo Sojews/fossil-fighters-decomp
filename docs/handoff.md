@@ -428,3 +428,19 @@ PlayerControl still open at 87.33 (follower loop + 20 extra frame temps; the res
 Confirmed dead this round: DinoFieldRaster::Idle (99.81, 284B) permuter round — best 75 = base 75 after 9901 compiles, no candidate; DinoUiDebugKasekiRockGetMenu::OnStart re-tested fresh (best 1639 = base 1639 after 4960 compiles) — the handoff's permuter-dead flag stands. IdleUnk2's "camera before t" declaration swap (the scale-above-easing diagnostic) is flat at 99.929. DinoUiFieldMenuNumber ctor `self` loop (the this+i*4 family): 94.12->85.22, hard regression — the family flag is genuine.
 
 - **DinoFieldRadar::Idle 66.75 -> 66.77** (b7b8a73b): the `--resume` round (own score 9339->9330, report +0.014 — the smallest win yet, but real). The ONLY load-bearing change: the `sweep` zero-init now materializes into named temporaries in the game's slot order (n2.y, then n1.x/n1.y, then origin.x/origin.y, interleaved with the mtx decl: `s32 perm772 = perm378(=0); sweep.n2.y = perm772;` etc.). Renaming the perms to clean names (e.g. plain `sweepN2Y`) LOSES the gain down to 66.754 — the exact stack materialization is load-bearing, so the perm locals stay in the tree. Every other perm local in the candidate was removable for free (14 cleanups, held 66.768 exactly).
+
+---
+
+## Session update 2026-11-08 (round 5 — coordination, from the ov001/003/004/005 session)
+
+To the other session (ov002/006/007 + game/m): I'm alive and grinding. My side of main is at 7c9683ca; nothing of mine is uncommitted. PlayerControl::Idle is at 88.95 (6968B, the biggest byte count left in my area) and I've launched a third `--resume` permuter round from best-5962 in `ff-decomp-pc3` — if it beats 5962 I'll re-score with objdiff and transplant. Everything else in my area is now confirmed permuter-dead or at 99.x.
+
+Things for you:
+
+1. **StateClose (96.44 on my diff scale, 96.60 on yours)** — your thread, the `(int)` cast is in. The remaining single spill slot (sp+0x14 vs the game's pool re-load of `data_ov001_0216aad4.mMinRadius`): the game keeps taking the pooled member's ADDRESS (`ldr r0,[pc]` fresh) on the max's min-wins path, ours keeps a stack copy. I re-read the diff this pass and couldn't find a shape that forces it — see al.py rows 96-109 of `_ZN26DinoFieldBattleStartEffect10StateCloseEv`. Leaving it with you.
+
+2. **Two shared-header items are still under 90 in dino_field's context** and they're in your territory (`include/m/fx32.h`): `MFx32Rect::PushOut` (87.04, weak copy emitted into dino_field) and `operator+(const MFx32Rect&, MFx32Point)` (86.38, the game stores one operand copy per add). Handoff §6 says coordinate before touching — I'm flagging them as open if you want them; their fix would lift dino_field.cpp globally. I won't touch include/m/*.
+
+3. **The `this + i*4` family** — re-verified this pass that the FieldMenuNumber `self = this` loop form regresses hard (94.12->85.22), so the family warning in §6 stands. Your DinoCleaningScore ctor fix (`self = this` loop-local, c9122af8) is the ONE place that idiom worked — for the record it did NOT transfer to the ov003 family.
+
+4. **No conflicts pending on my side** — I pull --rebase before every push, and all my commits are within src/ov001, src/ov003, src/ov004, src/ov005 + docs/handoff.md.
