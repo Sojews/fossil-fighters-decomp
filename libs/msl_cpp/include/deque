@@ -705,10 +705,12 @@ namespace std {
         tmp.allocate(size_ + n, grow_by(n));
         tmp.start_ = pi;
         T *p = tmp.data_ + pi;
-        for (; n != 0; --n, ++p, ++first) {
+        // (do-while under a guard: a plain for loop tests n twice)
+        if (n != 0) do {
             __cdeque_construct(p, *first, Metrowerks::int2type<true>());
             ++tmp.size_;
-        }
+            --n, ++p, ++first;
+        } while (n != 0);
         tmp.construct_at_end(pos, end());
         tmp.construct_at_front(begin(), pos);
         optimize_after_moved_from();
