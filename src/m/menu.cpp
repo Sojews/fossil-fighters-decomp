@@ -1,6 +1,5 @@
 // MMenuItem, MMenu and the focus transfers.
-// NONMATCHING: Init (where it works out &mSerial); FindLinkedItem (the game keeps a copy of the range on the stack);
-// FindItemInDirection (the order the rect's words are loaded); the tree's insert_node_at (two stores swapped).
+// NONMATCHING: Init (where it works out &mSerial); FindItemInDirection (the order the rect's words are loaded); the tree's insert_node_at (two stores swapped).
 
 #pragma ipa file
 
@@ -333,10 +332,12 @@ MMenuItem *MMenu::FindNearestItem(MPoint pos) {
 // The item linked from `from` in the direction (1 right, 2 down, 3 left, 4 up). Without links from it, or when
 // they miss the direction and the menu falls back, the nearest item that way.
 #pragma opt_common_subs off
+#pragma optimization_level 3
 MMenuItem *MMenu::FindLinkedItem(MMenuItem *from, int dir) {
+    MMenuLinks::const_iterator it;
     std::pair<MMenuLinks::const_iterator, MMenuLinks::const_iterator> range = mLinks.equal_range(from);
     if (range.first != range.second) {
-        for (MMenuLinks::const_iterator it = range.first; it != range.second; ++it) {
+        for (it = range.first; it != range.second; ++it) {
             if (dir == it->second.first) {
                 MMenuItem *to = it->second.second;
                 if (to != NULL && to->mEnabled && !to->mNoFocus) {
@@ -351,7 +352,11 @@ MMenuItem *MMenu::FindLinkedItem(MMenuItem *from, int dir) {
     }
     return FindItemInDirection(from->GetFrame(), dir);
 }
+#pragma optimization_level reset
 #pragma opt_common_subs reset
+
+// (Explicitly instantiated here: the game emits the range lookups right after their caller.)
+template std::pair<MMenuLinks::iterator, MMenuLinks::iterator> MMenuLinks::_Tree::equal_range(MMenuItem *const &k);
 
 // The nearest item in the direction: inside the 90 degree wedge from the frame's center that way.
 // (The unused locals only reproduce the game's order of loading the frame's sides.)

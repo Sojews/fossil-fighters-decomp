@@ -398,7 +398,7 @@ namespace std {
             node_base *node_;
         };
 
-        // (An iterator converts with an empty tag argument, which leaves a zeroed byte on the stack.)
+        // (An iterator converts through a constructor with an empty local, which leaves a zeroed byte on the stack.)
         struct __const_tag {};
         class const_iterator {
         public:
@@ -410,7 +410,9 @@ namespace std {
 
             const_iterator() {}
             explicit const_iterator(node_base *n) : node_(n) {}
-            const_iterator(const iterator &i, __const_tag = __const_tag()) : node_(i.node_) {}
+            const_iterator(const iterator &i) : node_(i.node_) {
+                __const_tag t = __const_tag();
+            }
             const Value &operator*() const {
                 return static_cast<node *>(node_)->data_;
             }
