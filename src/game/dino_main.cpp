@@ -1,7 +1,5 @@
 // DinoMain, DinoMainLoop.
 
-#pragma ipa file
-
 #include "game/dino_static_init.h"
 #include "game/dino_main.h"
 #include "game/dino_main_loop.h"
@@ -778,8 +776,8 @@ DinoMain::~DinoMain() {
 }
 
 // The file's static initialization (see dino_static_init.h): five points of its own and the common layout header.
-// NONMATCHING (97%): the screen and icon rects' dead temporaries take each other's stack slots, and the first point's y is
-// stored later.
+// NONMATCHING (97%): the first point's y is stored later. The file is built without ipa: under `#pragma ipa file` the screen
+// and icon rects' dead temporaries took each other's stack slots.
 #pragma always_inline on
 
 static struct DinoMainStaticInit {
