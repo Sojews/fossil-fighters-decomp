@@ -240,9 +240,9 @@ extern "C" MPoint func_ov000_0216f4c0(int side, u32 kind, BOOL own);
 extern "C" void func_ov000_0216fcb8(DinoBattleViewCreature *creature, u32 id);
 
 // Sets up the creature's motions (the creature, its advantage mark), status icons, life bar and appearance.
-// NONMATCHING (97%): the game keeps a copy of unkB0 on the stack for the status icons (its frame is 8 bytes bigger).
-DinoBattleViewCreature::DinoBattleViewCreature(u8 id, DinoBattleViewPlayer *player, u32 unkAC, u32 unkB0, u32 unkB4,
-                                               DinoBattleSide::Creature entry, u32 level, MSmartOam *oam)
+// unkB0 is a const parameter: mwcc then reuses its first load (kept in a stack slot) for the status icons.
+DinoBattleViewCreature::DinoBattleViewCreature(u8 id, DinoBattleViewPlayer *player, u32 unkAC, const u32 unkB0,
+                                               u32 unkB4, DinoBattleSide::Creature entry, u32 level, MSmartOam *oam)
     : MProcess(NULL), mUnkA8(id), mUnkAC(unkAC), mUnkB0(unkB0), mUnkB4(unkB4), mEntry(entry), mUnkD8((u32)oam),
       mUnkDC((u32)player), mUnkF8(0), mLevel(level) {
     mCoordOffset.x = 0;
