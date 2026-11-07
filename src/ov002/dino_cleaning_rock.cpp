@@ -14,22 +14,23 @@ DinoCleaningRock::DinoCleaningRock(u32 arg0, DinoCleaningImage *image, u32 arg2,
     mScale.v = scale;
 }
 
-// NONMATCHING: the column offset and the output row pointer swap registers (the game keeps the offset on the
-// stack). The game doesn't strength-reduce the row index.
-#pragma opt_strength_reduction off
+// One cell's hardness from its layer (an inline: under ipa its FromRaw and * copies take the game's slots).
+static inline void RefreshCell(DinoCleaningRock *rock, int row, int col) {
+    if (rock->mImage->mGrid[row][col] != 0) {
+        rock->mHardness[row][col] =
+            rock->mScale * MFx32::FromRaw(rock->mImage->GetLayer(rock->mImage->mGrid[row][col])->mGrid[row][col]);
+    } else {
+        rock->mHardness[row][col] = MFx32(0);
+    }
+}
+
 void DinoCleaningRock::RefreshHardness() {
     for (u32 col = 0; col < 28; col++) {
         for (u32 row = 0; row < 36; row++) {
-            if (mImage->mGrid[row][col] != 0) {
-                mHardness[row][col] =
-                    mScale * MFx32::FromRaw(mImage->GetLayer(mImage->mGrid[row][col])->mGrid[row][col]);
-            } else {
-                mHardness[row][col] = MFx32(0);
-            }
+            RefreshCell(this, row, col);
         }
     }
 }
-#pragma opt_strength_reduction reset
 
 DinoCleaningRock::~DinoCleaningRock() {
 }
@@ -58,17 +59,6 @@ s32 DinoCleaningRock::GetCellLayer(int row, int col) {
 
 u8 DinoCleaningRock::GetCell(int row, int col) {
     return mImage->GetCell(row, col);
-}
-
-
-// (Under ipa, the refresh one inline level down gives the game's order for its FromRaw and * copies.)
-static inline void RefreshCell(DinoCleaningRock *rock, int row, int col) {
-    if (rock->mImage->mGrid[row][col] != 0) {
-        rock->mHardness[row][col] =
-            rock->mScale * MFx32::FromRaw(rock->mImage->GetLayer(rock->mImage->mGrid[row][col])->mGrid[row][col]);
-    } else {
-        rock->mHardness[row][col] = MFx32(0);
-    }
 }
 
 
