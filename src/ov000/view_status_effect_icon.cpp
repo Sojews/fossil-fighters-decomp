@@ -71,14 +71,14 @@ ViewStatusEffectIconShowTask::~ViewStatusEffectIconShowTask() {
 
 #pragma auto_inline off
 
-// NONMATCHING: dx and dy swap spill slots (s32 locals needed for the rest).
+// dx is a long and dy an int, with a no-op (int) cast on the second y add: both decide the three locals' spill slots.
 DinoBattleViewStatusEffectIcon::DinoBattleViewStatusEffectIcon(MSmartOam *oam, u32 side, u32 unk74)
     : MProcess(NULL), mUnk74(unk74), mOam(oam) {
     mSide = side;
     mTimer = 0;
     const DinoBattleAdjustDefs *defs = gDinoResource->GetBattleAdjustDefs();
     s32 dx = defs->statusIconX;
-    s32 dy = defs->statusIconY;
+    int dy = defs->statusIconY;
     for (int i = 0; i < 2; i++) {
         mSlots[i].mUnk10 = -1;
     }
@@ -92,7 +92,7 @@ DinoBattleViewStatusEffectIcon::DinoBattleViewStatusEffectIcon(MSmartOam *oam, u
             mOffsets[i].y += dy;
         } else {
             mOffsets[i].x += dx;
-            mOffsets[i].y += dy;
+            mOffsets[i].y += (int)dy;
         }
         mIcons->AddTail(mSlots[i].mIcon);
     }
