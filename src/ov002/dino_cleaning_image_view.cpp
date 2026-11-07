@@ -268,8 +268,8 @@ DinoCleaningImageView::DinoCleaningImageView(const DinoCleaningImageView &other)
     ((MIndexBitmap *)mScreen)->Fill(MRect(0, 0, 256, 256), 0);
 }
 
-inline DinoCleaningNewDust::DinoCleaningNewDust(DinoCleaningImageView *view, MFx32Point from, MFx32Point to,
-                                                MFx32 height, MSmartOam *oam)
+inline DinoCleaningNewDust::DinoCleaningNewDust(MSmartOam *oam, DinoCleaningImageView *view, MFx32Point from,
+                                                MFx32Point to, MFx32 height)
     : MProcess(NULL) {
     mView = view;
     mFrom = from;
@@ -302,13 +302,13 @@ static inline MFx32Point DinoToFx(MPoint p) {
 }
 
 // Brushes a bit of dust off at pos, flying a random distance in a random direction.
-// NONMATCHING: 92.7%, the game keeps the height in a register and adds the end point's y before its x.
+// (The dust's ctor takes the oam first, which puts its load between the end point's y and x, as in the game.)
 extern "C" void func_ov002_0215a4fc(DinoCleaningImageView *view, MPoint pos) {
     u16 angle = (int)(u16)DinoCleaningRand(view->mSeed);  // (truncated twice, as the game does)
     MFx32Point move = MFx32Point(MFx32::FromRaw(FX_CosIdx(angle)), MFx32::FromRaw(FX_SinIdx(angle))) *
                       MFx32((int)((DinoCleaningRand(view->mSeed) & 0x7FFFFFFF) % 40));
     MFx32 height = MFx32((int)((DinoCleaningRand(view->mSeed) & 0x7FFFFFFF) % 10));
-    view->mOamTasks->AddHead(new DinoCleaningNewDust(view, DinoToFx(pos), DinoToFx(pos) + move, height, view->mOam));
+    view->mOamTasks->AddHead(new DinoCleaningNewDust(view->mOam, view, DinoToFx(pos), DinoToFx(pos) + move, height));
 }
 
 // a - b. (Taking a by value and returning it keeps both points on the stack, as the game's code does.)

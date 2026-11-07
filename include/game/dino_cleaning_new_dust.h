@@ -11,8 +11,8 @@ class MSmartOam;
 // A bit of dust brushed off, flying from where it was in an arc and landing as dirt.
 class DinoCleaningNewDust : public MProcess {
 public:
-    inline DinoCleaningNewDust(DinoCleaningImageView *view, MFx32Point from, MFx32Point to, MFx32 height,
-                               MSmartOam *oam);
+    inline DinoCleaningNewDust(MSmartOam *oam, DinoCleaningImageView *view, MFx32Point from, MFx32Point to,
+                               MFx32 height);
     virtual ~DinoCleaningNewDust();
     virtual void Idle();
 
