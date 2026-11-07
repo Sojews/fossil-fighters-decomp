@@ -367,7 +367,9 @@ inline DinoCleaningLastDust::DinoCleaningLastDust(MSmartOam *oam, DinoCleaningIm
 }
 
 // Takes up to 20 random bits of dirt off (a cell keeps mMinDirt), the first 6 flying off away from the dirt's centre.
-// NONMATCHING: 95.8%, stack slots and some registers differ.
+// NONMATCHING: 95.8%: the game keeps the picked column in r5 (the row re-read from cell) where ours spills it, and
+// it stores away to its slot (8 bytes more frame); sharing one col variable with the first loop gives the game's
+// low spill slots once that spill is gone.
 extern "C" void func_ov002_0215a7b4(DinoCleaningImageView *view) {
     std::vector<DinoCleaningStatusEntry>::iterator it;
     DinoCleaningStatusEntry cell;
