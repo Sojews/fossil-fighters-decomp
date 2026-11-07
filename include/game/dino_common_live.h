@@ -46,8 +46,9 @@ public:
     // Whether either flag vector has the flag.
     BOOL IsFlagSet(u32 flag) {
         BOOL set = TRUE;
-        if (!(mUnkA0.mBytes[flag >> 3] & (1 << (flag & 7)))) {
-            if (!(mUnkAC.mBytes[flag >> 3] & (1 << (flag & 7)))) {
+        u32 mask = 1 << (flag & 7);
+        if (!(mUnkA0.mBytes[flag >> 3] & mask)) {
+            if (!(mUnkAC.mBytes[flag >> 3] & mask)) {
                 set = FALSE;
             }
         }

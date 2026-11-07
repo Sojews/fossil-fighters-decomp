@@ -66,40 +66,65 @@ struct DinoCommonLiveCondition {
     const u32 *GetArgs() const { return (const u32 *)((const u8 *)this + offset); }
 };
 
-// NONMATCHING: in the flag test the game shifts the flag down (flag >> 3) after loading the first vector; ours
-// shifts it first, into another register.
+// CSE is off: with it on, mwcc shifts the flag down (flag >> 3) before the mask, into another register; the
+// comparisons then need their first variable as a named local to keep the game's order.
 // (The game indexes the operands from a base taken after the loop guard, reloads the count on every pass, and
-// reloads the flag vectors.)
+// reloads the flag vectors; with CSE off a plain cond->count reloads.)
 #pragma opt_loop_invariants off
 #pragma opt_strength_reduction off
+#pragma opt_common_subs off
 BOOL DinoCommonLive::CheckCondition(const DinoCommonLiveCondition *cond) {
     switch (cond->kind) {
     default:
         return FALSE;
     case 4:
-        return mUnkB8[cond->GetArgs()[0]] == mUnkB8[cond->GetArgs()[1]] ? TRUE : FALSE;
+        {const u32 *args = cond->GetArgs();
+        u32 a = mUnkB8[args[0]];
+        return a == mUnkB8[args[1]] ? TRUE : FALSE;}
     case 5:
-        return mUnkB8[cond->GetArgs()[0]] != mUnkB8[cond->GetArgs()[1]] ? TRUE : FALSE;
+        {const u32 *args = cond->GetArgs();
+        u32 a = mUnkB8[args[0]];
+        return a != mUnkB8[args[1]] ? TRUE : FALSE;}
     case 6:
-        return (int)mUnkB8[cond->GetArgs()[0]] < (int)mUnkB8[cond->GetArgs()[1]] ? TRUE : FALSE;
+        {const u32 *args = cond->GetArgs();
+        u32 a = mUnkB8[args[0]];
+        return (int)a < (int)mUnkB8[args[1]] ? TRUE : FALSE;}
     case 7:
-        return (int)mUnkB8[cond->GetArgs()[0]] <= (int)mUnkB8[cond->GetArgs()[1]] ? TRUE : FALSE;
+        {const u32 *args = cond->GetArgs();
+        u32 a = mUnkB8[args[0]];
+        return (int)a <= (int)mUnkB8[args[1]] ? TRUE : FALSE;}
     case 8:
-        return (int)mUnkB8[cond->GetArgs()[0]] > (int)mUnkB8[cond->GetArgs()[1]] ? TRUE : FALSE;
+        {const u32 *args = cond->GetArgs();
+        u32 a = mUnkB8[args[0]];
+        return (int)a > (int)mUnkB8[args[1]] ? TRUE : FALSE;}
     case 9:
-        return (int)mUnkB8[cond->GetArgs()[0]] >= (int)mUnkB8[cond->GetArgs()[1]] ? TRUE : FALSE;
+        {const u32 *args = cond->GetArgs();
+        u32 a = mUnkB8[args[0]];
+        return (int)a >= (int)mUnkB8[args[1]] ? TRUE : FALSE;}
     case 10:
-        return mUnkB8[cond->GetArgs()[0]] == cond->GetArgs()[1] ? TRUE : FALSE;
+        {const u32 *args = cond->GetArgs();
+        u32 a = mUnkB8[args[0]];
+        return a == args[1] ? TRUE : FALSE;}
     case 11:
-        return mUnkB8[cond->GetArgs()[0]] != cond->GetArgs()[1] ? TRUE : FALSE;
+        {const u32 *args = cond->GetArgs();
+        u32 a = mUnkB8[args[0]];
+        return a != args[1] ? TRUE : FALSE;}
     case 12:
-        return (int)mUnkB8[cond->GetArgs()[0]] < (int)cond->GetArgs()[1] ? TRUE : FALSE;
+        {const u32 *args = cond->GetArgs();
+        u32 a = mUnkB8[args[0]];
+        return (int)a < (int)args[1] ? TRUE : FALSE;}
     case 13:
-        return (int)mUnkB8[cond->GetArgs()[0]] <= (int)cond->GetArgs()[1] ? TRUE : FALSE;
+        {const u32 *args = cond->GetArgs();
+        u32 a = mUnkB8[args[0]];
+        return (int)a <= (int)args[1] ? TRUE : FALSE;}
     case 14:
-        return (int)mUnkB8[cond->GetArgs()[0]] > (int)cond->GetArgs()[1] ? TRUE : FALSE;
+        {const u32 *args = cond->GetArgs();
+        u32 a = mUnkB8[args[0]];
+        return (int)a > (int)args[1] ? TRUE : FALSE;}
     case 15:
-        return (int)mUnkB8[cond->GetArgs()[0]] >= (int)cond->GetArgs()[1] ? TRUE : FALSE;
+        {const u32 *args = cond->GetArgs();
+        u32 a = mUnkB8[args[0]];
+        return (int)a >= (int)args[1] ? TRUE : FALSE;}
     case 0:
         {u32 i = 0;
         if (i < cond->count) {
@@ -110,7 +135,7 @@ BOOL DinoCommonLive::CheckCondition(const DinoCommonLiveCondition *cond) {
                 if (!set) {
                     return FALSE;
                 }
-            } while (++i < *(volatile const u32 *)&cond->count);
+            } while (++i < cond->count);
         }}
         return TRUE;
     case 1:
@@ -123,7 +148,7 @@ BOOL DinoCommonLive::CheckCondition(const DinoCommonLiveCondition *cond) {
                 if (set) {
                     return TRUE;
                 }
-            } while (++i < *(volatile const u32 *)&cond->count);
+            } while (++i < cond->count);
         }}
         return FALSE;
     case 2:
@@ -136,7 +161,7 @@ BOOL DinoCommonLive::CheckCondition(const DinoCommonLiveCondition *cond) {
                 if (set) {
                     return FALSE;
                 }
-            } while (++i < *(volatile const u32 *)&cond->count);
+            } while (++i < cond->count);
         }}
         return TRUE;
     case 3:
@@ -149,13 +174,14 @@ BOOL DinoCommonLive::CheckCondition(const DinoCommonLiveCondition *cond) {
                 if (!set) {
                     return TRUE;
                 }
-            } while (++i < *(volatile const u32 *)&cond->count);
+            } while (++i < cond->count);
         }}
         return FALSE;
     }
 }
 #pragma opt_loop_invariants reset
 #pragma opt_strength_reduction reset
+#pragma opt_common_subs reset
 
 // The data's line (a table of offsets after the header).
 static inline u8 *DinoLiveLine(MResource<DinoCommonLiveData> &res, u32 i) {
