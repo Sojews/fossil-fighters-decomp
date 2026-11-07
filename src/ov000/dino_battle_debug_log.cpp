@@ -37,8 +37,9 @@ DinoBattleDebugLog::DinoBattleDebugLog(MDisplay *display) : MProcess(display) {
 }
 
 // The file's static initialization (see dino_static_init.h): the battle help areas' rects and texts.
-// NONMATCHING: 97.7%, scheduling only (the game sets up the next constant after the truncated colour's first store).
-extern "C" u32 data_ov000_0219569c[], data_ov000_0219581c[], data_ov000_0219589c[], data_ov000_021958dc[], data_ov000_0219591c[], data_ov000_0219595c[], data_ov000_0219599c[];
+// The colours' 0x40 blocks are stored through the block before them (0219589c + 0x6a, 0219591c + 0x4e): one object,
+// so the game addresses them from a pooled base + offset rather than a separate anchor.
+extern "C" u32 data_ov000_0219569c[], data_ov000_0219581c[], data_ov000_0219589c[], data_ov000_0219591c[], data_ov000_0219599c[];
 extern "C" const u32 data_0208a370, data_0208a378, data_0208a37c, data_0208a380, data_0208a384, data_0208a38c, data_0208a390, data_0208a394, data_0208a3b8, data_0208a3bc, data_0208a3c0, data_0208a3c4;
 static struct DinoBattleDebugLogStaticInit {
     DinoBattleDebugLogStaticInit() {
@@ -65,17 +66,17 @@ static struct DinoBattleDebugLogStaticInit {
         DINO_POOL_WORD(data_ov000_0219581c, 0x28) = 36;
         DINO_POOL_WORD(data_ov000_0219581c, 0x2c) = 0;
         DINO_POOL_WORD(data_ov000_0219581c, 0x30) = data_0208a3b8;
-        ((volatile u16 *)data_ov000_021958dc)[0x16 / 2] = data_0208a394;
+        ((volatile u16 *)data_ov000_0219589c)[0x56 / 2] = data_0208a394;
         DINO_POOL_WORD(data_ov000_0219589c, 0x58) = 65;
         DINO_POOL_WORD(data_ov000_0219589c, 0x5c) = 76;
         DINO_POOL_WORD(data_ov000_0219589c, 0x60) = 100;
         DINO_POOL_WORD(data_ov000_0219589c, 0x64) = 111;
-        ((volatile u16 *)data_ov000_021958dc)[0x2a / 2] = (u16)data_0208a390;
+        ((volatile u16 *)data_ov000_0219589c)[0x6a / 2] = (u16)data_0208a390;
         DINO_POOL_WORD(data_ov000_0219589c, 0x6c) = 35;
         DINO_POOL_WORD(data_ov000_0219589c, 0x70) = 38;
         DINO_POOL_WORD(data_ov000_0219589c, 0x74) = 70;
         DINO_POOL_WORD(data_ov000_0219589c, 0x78) = 73;
-        ((volatile u16 *)data_ov000_021958dc)[0x3e / 2] = (u16)data_0208a390;
+        ((volatile u16 *)data_ov000_0219589c)[0x7e / 2] = (u16)data_0208a390;
         DINO_POOL_WORD(data_ov000_0219591c, 0x0) = 30;
         DINO_POOL_WORD(data_ov000_0219591c, 0x4) = 116;
         DINO_POOL_WORD(data_ov000_0219591c, 0x8) = 65;
@@ -95,17 +96,17 @@ static struct DinoBattleDebugLogStaticInit {
         DINO_POOL_WORD(data_ov000_0219591c, 0x40) = 76;
         DINO_POOL_WORD(data_ov000_0219591c, 0x44) = 190;
         DINO_POOL_WORD(data_ov000_0219591c, 0x48) = 111;
-        ((volatile u16 *)data_ov000_0219595c)[0xe / 2] = (u16)data_0208a37c;
+        ((volatile u16 *)data_ov000_0219591c)[0x4e / 2] = (u16)data_0208a37c;
         DINO_POOL_WORD(data_ov000_0219591c, 0x50) = 185;
         DINO_POOL_WORD(data_ov000_0219591c, 0x54) = 38;
         DINO_POOL_WORD(data_ov000_0219591c, 0x58) = 220;
         DINO_POOL_WORD(data_ov000_0219591c, 0x5c) = 73;
-        ((volatile u16 *)data_ov000_0219595c)[0x22 / 2] = (u16)data_0208a37c;
+        ((volatile u16 *)data_ov000_0219591c)[0x62 / 2] = (u16)data_0208a37c;
         DINO_POOL_WORD(data_ov000_0219591c, 0x64) = 190;
         DINO_POOL_WORD(data_ov000_0219591c, 0x68) = 116;
         DINO_POOL_WORD(data_ov000_0219591c, 0x6c) = 225;
         DINO_POOL_WORD(data_ov000_0219591c, 0x70) = 151;
-        ((volatile u16 *)data_ov000_0219595c)[0x36 / 2] = data_0208a378;
+        ((volatile u16 *)data_ov000_0219591c)[0x76 / 2] = data_0208a378;
         DINO_POOL_WORD(data_ov000_0219591c, 0x78) = 220;
         DINO_POOL_WORD(data_ov000_0219591c, 0x7c) = 77;
         DINO_POOL_WORD(data_ov000_0219599c, 0x0) = 255;
