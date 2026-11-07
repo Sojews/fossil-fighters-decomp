@@ -358,7 +358,7 @@ void MChr16FontTransfer::Transfer() {
     }
     int rows = mGlyphSize.y;
     int width = mSize.x;
-    u32 *dst = (u32 *) ((u8 *) mDest + ((mPos.x >> 3) + (mPos.y >> 3) * (int) width) * 32 + (mPos.y & 7) * 4);
+    u32 *dst = (u32 *) ((u8 *) mDest + ((mPos.x >> 3) + (mPos.y >> 3) * (int) mSize.x) * 32 + (mPos.y & 7) * 4);
     int shift = mPos.x & 7;
     int firstMask = ~((1 << (shift * 4)) - 1);
     int end = shift + mGlyphSize.x;
