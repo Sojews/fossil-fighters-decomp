@@ -191,7 +191,7 @@ void DinoBattleViewStatusEffectIcon::SetEffects(int count, const u8 *effects) {
     }
 
     MSerialTaskSet *queue = new MSerialTaskSet(TRUE);
-    for (int e = 1; e < 12; e++) {
+    for (u32 e = 1; (int)e < 12; e++) {
         slot = 1;
         switch (e) {
         case 8:
@@ -203,7 +203,7 @@ void DinoBattleViewStatusEffectIcon::SetEffects(int count, const u8 *effects) {
         }
         int num = 0;
         BOOL flag = FALSE;
-        u32 bit = 1 << (u32)e;
+        int bit = 1 << (u32)e;
         u32 has = present & bit;
         if (has) {
             for (int i = 0; i < count; i++) {
