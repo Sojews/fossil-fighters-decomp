@@ -4,6 +4,8 @@
 #pragma ipa file
 // The menu links' tree destructor is called out of line (the game has it in the menu unit).
 #define MSL_TREE_DTOR_ELSEWHERE
+// So is the rock item's MResource<DinoKasekiDefs> constructor.
+#define M_RESOURCE_CTOR_ELSEWHERE
 // Derived destructors have their bases' destructor bodies inlined; auto-inlining the ones defined above does that.
 #pragma auto_inline on
 
@@ -316,13 +318,17 @@ inline DinoCleaningSampleMenuIncItem::DinoCleaningSampleMenuIncItem(int *value, 
     mParallel.AddTail(mView);
 }
 
+// A view's position centred on (x, y), given half its size.
+static inline MPoint DinoCleaningSampleCenter(int x, int y, const MPoint &half) {
+    return MPoint(x - half.x, y - half.y);
+}
+
 inline DinoCleaningSampleMenuKasekiRockIdItem::DinoCleaningSampleMenuKasekiRockIdItem(MMenu *menu, MSmartOam *oam,
                                                                                       MFont *font, u32 *value,
                                                                                       MPoint pos)
     : mValue(value), mDefs(std::string(data_020bcc24.mKasekiDefsPath_04)) {
     mView = new MIndicator(new MSmartObjCanvas(oam, MPoint(0x50, 0x10), gDinoResource->GetUnkTable(), TRUE), font, 0);
-    MPoint half = mView->GetSize() / 2;
-    mView->SetPosition(MPoint(pos.x - half.x, pos.y - half.y));
+    mView->SetPosition(DinoCleaningSampleCenter(pos.x, pos.y, mView->GetSize() / 2));
     mView->Show();
     mParallel.AddTail(mView);
     mBuffer = new u32[mDefs.Get()->count];
@@ -346,8 +352,7 @@ inline DinoCleaningSampleKasekiTypeItem::DinoCleaningSampleKasekiTypeItem(MMenu 
                                                                           u32 *type, MPoint pos) {
     mType = type;
     mView = new MIndicator(new MSmartObjCanvas(oam, MPoint(0x50, 0x10), gDinoResource->GetUnkTable(), TRUE), font, 0);
-    MPoint half = mView->GetSize() / 2;
-    mView->SetPosition(MPoint(pos.x - half.x, pos.y - half.y));
+    mView->SetPosition(DinoCleaningSampleCenter(pos.x, pos.y, mView->GetSize() / 2));
     mView->Show();
     mParallel.AddTail(mView);
     mKeyItemA = new DinoCleaningSampleMenuDecItem((int *)mType, 0, 1, oam, font, MPoint(pos.x - 0x40, pos.y));
@@ -360,8 +365,7 @@ inline DinoCleaningSampleChipsTypeItem::DinoCleaningSampleChipsTypeItem(MMenu *m
                                                                         u32 *type, MPoint pos) {
     mType = type;
     mView = new MIndicator(new MSmartObjCanvas(oam, MPoint(0x50, 0x10), gDinoResource->GetUnkTable(), TRUE), font, 0);
-    MPoint half = mView->GetSize() / 2;
-    mView->SetPosition(MPoint(pos.x - half.x, pos.y - half.y));
+    mView->SetPosition(DinoCleaningSampleCenter(pos.x, pos.y, mView->GetSize() / 2));
     mView->Show();
     mParallel.AddTail(mView);
     mKeyItemA = new DinoCleaningSampleMenuDecItem((int *)mType, 0, 6, oam, font, MPoint(pos.x - 0x40, pos.y));
@@ -391,11 +395,10 @@ inline DinoCleaningSampleMenuStartItem::DinoCleaningSampleMenuStartItem(MSmartOa
 }
 
 // The debug cleaning menu: the rock (by id), its type and the chips' type, a random pick, and start.
-// NONMATCHING (99.99%): the game inlines the items' constructors with their own inline calls (MPoint, the resource,
-// the key items' constructors), which takes this file's `#pragma ipa file`. The rock, rock type and chips items center
-// their view through a named half size and the random and start items through MPoint::operator- (that decides the
-// frame, the spills and the pos.y the rock item keeps); only those three centerings' two MPoint temporaries (the
-// size and the position) swap slots.
+// The game inlines the items' constructors with their own inline calls (MPoint, the resource, the key items'
+// constructors), which takes this file's `#pragma ipa file`. The rock, rock type and chips items center their view
+// through DinoCleaningSampleCenter (pos read at the call: the rock item's pos.y stays in a register, and the size and
+// position temporaries take the game's slots); the random and start items through MPoint::operator-.
 void DinoCleaningSampleMenu::OnStart() {
     mOam = new MSmartOam(0x50, 0, 1);
     GetInput()->SetRepeat(0x1030, 0x14, 2);
