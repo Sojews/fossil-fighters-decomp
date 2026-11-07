@@ -235,8 +235,7 @@ void M3DGrid::Load(const void *data) {
                     vertex = TRUE;
                     x = (s16)((s32)(*p << 22) >> 16);
                     y = (s16)((s32)(*p << 12) >> 16);
-                    z = (s16)((s32)(*p << 2) >> 16);
-                    p += 1;
+                    z = (s16)((s32)(*p++ << 2) >> 16);
                     break;
                 case 0x25:
                     vertex = TRUE;
