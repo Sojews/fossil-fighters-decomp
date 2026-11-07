@@ -11,7 +11,7 @@ class DinoCleaningImageView;
 // The last bit of dust, flying from where it was to its place.
 class DinoCleaningLastDust : public MProcess {
 public:
-    inline DinoCleaningLastDust(DinoCleaningImageView *view, MFx32Point from, MFx32Point to, MSmartOam *oam);
+    inline DinoCleaningLastDust(MSmartOam *oam, DinoCleaningImageView *view, MFx32Point from, MFx32Point to);
     virtual ~DinoCleaningLastDust();
     virtual void Idle();
 

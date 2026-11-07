@@ -346,8 +346,8 @@ static inline const int &DinoMaxPooled(const int &a, const int &aNamed, const in
     return a < b ? b : aNamed;
 }
 
-inline DinoCleaningLastDust::DinoCleaningLastDust(DinoCleaningImageView *view, MFx32Point from, MFx32Point to,
-                                                  MSmartOam *oam)
+inline DinoCleaningLastDust::DinoCleaningLastDust(MSmartOam *oam, DinoCleaningImageView *view, MFx32Point from,
+                                                  MFx32Point to)
     : MProcess(NULL) {
     unk74 = (u32)view;
     mFrom = from;
@@ -363,7 +363,7 @@ inline DinoCleaningLastDust::DinoCleaningLastDust(DinoCleaningImageView *view, M
 }
 
 // Takes up to 20 random bits of dirt off (a cell keeps mMinDirt), the first 6 flying off away from the dirt's centre.
-// NONMATCHING: 87.9%, the frame is 16 bytes smaller (the game keeps more temporaries) and registers differ.
+// NONMATCHING: 90.4%, the frame is 12 bytes smaller (the game keeps more temporaries) and registers differ.
 extern "C" void func_ov002_0215a7b4(DinoCleaningImageView *view) {
     std::vector<DinoCleaningStatusEntry>::iterator it;
     DinoCleaningStatusEntry cell;
@@ -387,10 +387,11 @@ extern "C" void func_ov002_0215a7b4(DinoCleaningImageView *view) {
         }
     }
     for (u32 n = 0; n < 20; n++) {
-        if (view->mUnkDA04.empty()) {
+        u32 size = view->mUnkDA04.size();
+        if (size == 0) {
             return;
         }
-        it = view->mUnkDA04.begin() + (DinoCleaningRand(view->mSeed) & 0x7FFFFFFF) % view->mUnkDA04.size();
+        it = view->mUnkDA04.begin() + (DinoCleaningRand(view->mSeed) & 0x7FFFFFFF) % size;
         cell = *it;
         centre = DinoToFx(view->mDirtSum / (int)view->mUnkD9E0);
         MPoint d = DinoPointSub(*(const MPoint *)&cell, data_ov002_021646e4.mCellOrigin);
@@ -413,7 +414,7 @@ extern "C" void func_ov002_0215a7b4(DinoCleaningImageView *view) {
             away = from - centre;
             u16 spread = DinoCleaningRand(view->mSeed) & 0x3FFF;
             to = from + DinoDirection(FX_Atan2Idx(away.y.v, away.x.v) + spread - 0x2000) * MFx32(50);
-            view->mOamTasks->AddHead(new DinoCleaningLastDust(view, from, to, view->mOam));
+            view->mOamTasks->AddHead(new DinoCleaningLastDust(view->mOam, view, from, to));
         }
     }
 }
