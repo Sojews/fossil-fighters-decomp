@@ -1095,18 +1095,22 @@ void DinoField::SlideOutPict(MDisplay *display, MExtAffinePicture **pict, u32 di
 // NONMATCHING: the scale points' build order and a cached ease (like ZoomOutPict), and LoadFadeInPict's stack slots.
 void DinoField::LoadZoomInPict(MDisplay *display, MView *old, MExtAffinePicture **pict, u32 id, MPoint pos, MFx32 scale,
                                u32 frames, long ease) {
+    MParallelTaskSet *both;
     MResource<DinoExcavateDefs> defs = gDinoResource->GetExcavateDefs();
     *pict = new MExtAffinePicture(display, std::string("/image/") + GetPictName(defs.Get(), id), TRUE, false);
     (*pict)->SetPosition(pos);
     (*pict)->GetScreen()->SetCenter(128, 96);
     (*pict)->SetPriority(1);
+    MFx32 perm24;
+    MTask *fade;
+    int perm853;
     mParallel.AddTail(*pict);
     MTask *priority = (*pict)->CreatePriorityTransfer(2);
     MTask *zoom = (*pict)->GetScreen()->CreateScaleAnime(MFx32Point(scale, scale), MFx32Point(MFx32(1), MFx32(1)),
                                                          frames, ease);
     MBlend *blend = display->mBlend;
-    MTask *fade = blend->CreateCrossFadeInTask((*pict)->GetPlaneMask(), frames, ease);
-    MParallelTaskSet *both = new MParallelTaskSet(TRUE);
+        fade = blend->CreateCrossFadeInTask((*pict)->GetPlaneMask(), frames, (u32) ease);
+        both = new MParallelTaskSet(TRUE);
     both->AddTail(fade);
     both->AddTail(zoom);
     MTask *show = (*pict)->CreateShowTransfer();
