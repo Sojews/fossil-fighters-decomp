@@ -1234,11 +1234,11 @@ static inline void DinoEndingAddTail(MTaskSet *set, MTask *a, MTask *b, MTask *c
     self->AddTail(b);
     self->AddTail(c);
     self->AddTail(d);
-    self->AddTail(e);
     self->AddTail(f);
+    self->AddTail(e);
     self->AddTail(g);
-    self->AddTail(h);
     self->AddTail(i);
+    self->AddTail(h);
     self->AddTail(j);
     self->AddTail(k);
 }
@@ -1247,6 +1247,10 @@ static inline void DinoEndingAddTail(MTaskSet *set, MTask *a, MTask *b, MTask *c
 // the closing picture cross-fades in, the logo plays with its sound and everything fades out.
 // NONMATCHING: scheduling only (the game loads the strip's position before storing the rect's constants).
 void DinoUiEnding::StateStart() {
+    MDisplay *display;
+    MPoint pos;
+    int scroll;
+    MTextPicture *closing;
     mPicture = MPictureFile(std::string(gDinoBackup->GetSystemFlag(0x1A) ? data_ov004_02172f58 : data_ov004_02172f68), 7);
     gLcd->mMain->ResetHooks();
     gLcd->mSub->ResetHooks();
@@ -1256,11 +1260,12 @@ void DinoUiEnding::StateStart() {
     gLcd->mSub->mBg->SetMode(5);
     gLcd->SetTopDisplay(gLcd->mMain);
     gLcd->VSyncNow();
-    int scroll = mPicture.GetHeight() - 0x180;
+    MSmartOam *oam;
+    scroll = mPicture.GetHeight() - 0x180;
     MParallelTaskSet *scrolls = new MParallelTaskSet(TRUE);
     for (u32 i = 0; i < 2; i++) {
-        MDisplay *display = i == 0 ? gLcd->mMain : gLcd->mSub;
-        MPoint pos = i == 0 ? MPoint(0, 0) : MPoint(0, mPicture.GetHeight() - 0x200);
+        display = 0 == i ? gLcd->mMain : gLcd->mSub;
+        pos = i == 0 ? MPoint(0, 0) : MPoint(0, mPicture.GetHeight() - 0x200);
         MPoint to = i == 0 ? MPoint(0, 0) : MPoint(-pos.x, 0xC0 - pos.y);
         mScreens[i].palette = DinoEndingPal(display)->Alloc(mPicture.GetPaletteSize(), mPicture.GetPalette(), 1);
         mScreens[i].bitmap = display->mBg->CreateIndexBitmap(1, 1);
@@ -1279,10 +1284,11 @@ void DinoUiEnding::StateStart() {
         scrolls->AddTail(
             mScreens[i].bitmap2->CreateOffsetAnime(mScreens[i].bitmap2->GetOffset(), MPoint(to.x, to.y - 0x100), 480, 0));
     }
-    MTextPicture *closing = new MTextPicture(gLcd->GetTopDisplay(), data_ov004_02172eb8.mPicturePath, TRUE, false);
+    closing = new MTextPicture(gLcd->GetTopDisplay(), data_ov004_02172eb8.mPicturePath, TRUE, false);
     mParallel.AddTail(closing);
-    MSmartOam *oam = new MSmartOam(gLcd->GetTopDisplay(), 10, 0, TRUE);
-    MMotion *logo = new MMotion(data_ov004_02172eb8.mLogoPath, oam, 0, 1);
+    oam = new MSmartOam(gLcd->GetTopDisplay(), 10, 0, TRUE);
+    MMotion *logo;
+    logo = new MMotion(data_ov004_02172eb8.mLogoPath, oam, 0, 1);
     logo->SetPosition(0x80, 0x60);
     logo->SetPriority(1);
     logo->Show();
