@@ -1670,11 +1670,14 @@ static inline bool IsWithin(const MFx32Point &a, const MFx32Point &b, MFx32 rang
     return SquareSum(a - b) <= range;
 }
 
-// NONMATCHING: 89%, the game hoists the hole position's address and both halves of pos out of the loop.
+#pragma opt_loop_invariants off
+// NONMATCHING: 91%, the game hoists the hole position's address and both halves of pos (opt_loop_invariants
+// off keeps the loop's iteration carries; the remaining gap is the diff rows 11-13/21-23 hoists)
 DinoFieldHole *DinoField::FindRockHole(MFx32Point pos) {
+    bool near = false;
     for (DinoFieldHole *hole = (DinoFieldHole *)mRockHoles->mHead; hole != NULL;
          hole = (DinoFieldHole *)hole->mNext) {
-        bool near = false;
+        near = false;
         if (hole->GetUnk110()) {
             MFx32 range;
             range.v = 0x2400;
@@ -1689,6 +1692,7 @@ DinoFieldHole *DinoField::FindRockHole(MFx32Point pos) {
     }
     return NULL;
 }
+#pragma opt_loop_invariants reset
 
 MTask *DinoField::CreatePictWaitTask() {
     return MTaskSetWaitEmptyTask::Create(mPictTasks);
