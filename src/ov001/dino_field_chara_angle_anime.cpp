@@ -713,18 +713,21 @@ static inline MFx32 DinoLength(const MFx32Point &p) {
 
 // Watching (mTask.unk28): turns to the camera's focus when it comes within range (w[0] around its height),
 // follows it at w[2] per second until it strays w[1] from home, waits w[4] frames, then walks home at w[3].
-// NONMATCHING: 95.6, the frame is 32 bytes smaller (the game keeps more copies of the products) and registers differ.
+// NONMATCHING: 98.0, the game keeps more copies of the products (frame is bigger).
 // Whether d is shorter than limit.
 static inline bool DinoWithin(const MFx32Point &d, MFx32 limit) {
     return d.x * d.x + d.y * d.y < limit * limit;
 }
 
 BOOL DinoFieldChara::Unk02162154() {
+    MFx32Point d;
+    MFx32 height;
+    MFx32 range;
     if (!mTask.unk28.active) {
         return FALSE;
     }
-    u32 focus = mField->GetCamera()->GetFocus();
-    if (focus == 0) {
+    int focus = mField->GetCamera()->GetFocus();
+    if (0 == focus) {
         return FALSE;
     }
     DinoFieldChara *chara = mField->GetChara(focus);
@@ -734,23 +737,26 @@ BOOL DinoFieldChara::Unk02162154() {
     switch (mModel.unk10) {
     case 0: {
         MFx32Point d = chara->GetModel()->pos - mModel.pos;
-        MFx32 range;
         range.v = mTask.unk28.w[0];
-        MFx32 height = chara->GetHeight();
+        height = chara->GetHeight();
         MFx32 limit = height + range;
-        if (DinoWithin(d, limit)) {
+        if (0 != DinoWithin(d, limit)) {
             mModel.unk10 = 1;
         } else {
             return FALSE;
+        MFx32 range;
         }
         break;
     }
     case 1: {
-        MFx32Point d = chara->GetModel()->pos - mModel.pos;
-        MFx32 speed = MFx32::FromRaw((s32)mTask.unk28.w[2] / 60);
+        MFx32 speed;
+        MFx32Point away;
+        d = chara->GetModel()->pos - mModel.pos;
+        speed = MFx32::FromRaw((s32)mTask.unk28.w[2] / 60);
         SetUnk2D8(d / d.Length() * speed, 2, MFx32(1));
-        MFx32Point away = mModel.pos - mHome;
-        MFx32 limit = MFx32::FromRaw(mTask.unk28.w[1]);
+        away = mModel.pos - mHome;
+        MFx32 limit;
+        limit = MFx32::FromRaw(mTask.unk28.w[1]);
         if (away.x * away.x + away.y * away.y > limit * limit) {
             mModel.unk10 = 2;
             *(u16 *) mModel.unk14 = 0;
@@ -759,24 +765,26 @@ BOOL DinoFieldChara::Unk02162154() {
     }
     case 2: {
         if (++*(u16 *) mModel.unk14 >= mTask.unk28.w[4]) {
+            MFx32 limit;
             MFx32Point d = chara->GetModel()->pos - mModel.pos;
-            MFx32 range;
             range.v = mTask.unk28.w[0];
             MFx32 height = chara->GetHeight();
-            MFx32 limit = height + range;
+            limit = height + range;
             if (DinoWithin(d, limit)) {
                 mModel.unk10 = 1;
                 break;
             }
         }
-        MFx32Point d = mHome - mModel.pos;
+        const MFx32Point d = mHome - mModel.pos;
         MFx32 speed = MFx32::FromRaw((s32)mTask.unk28.w[3] / 60);
         MFx32 len = d.Length();
         if (len <= speed.Times(MFx32(10))) {
-            SetMotion(1, 1, MFx32(1));
+            MFx32 perm745(1);
+            SetMotion(1, 1, perm745);
             mModel.unk10 = 0;
         } else {
-            SetUnk2D8(d / len * speed, 2, MFx32(1));
+            MFx32 perm107(1);
+            SetUnk2D8(d / len * speed, 2, perm107);
         }
         break;
     }
