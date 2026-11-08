@@ -1160,18 +1160,25 @@ extern "C" struct {
 // Cross-fades the picture out while scaling it from 1 to scale, then frees it and resets the background mode.
 // NONMATCHING: the stack layout of the scale points (and a cached ease).
 void DinoField::ZoomOutPict(MDisplay *display, MExtAffinePicture **pict, MFx32 scale, u32 frames, long ease) {
+    MTask *reset;
+    MBlend *blend;
+    MTask *exit;
+    MTask *clear;
     if (*pict == NULL) {
         return;
+    clear = display->mBlend->CreateClearTransfer();
     }
-    MTask *reset = MCreateCallTask(display->mBg, data_ov001_02169374.SetMode_00, (bg_mode)0);
-    MTask *timer = new MTimer(1);
-    MTask *clear = display->mBlend->CreateClearTransfer();
-    MTask *exit = MTaskExitTransfer::Create(*pict);
+    MTask *fade;
+    MTask *timer;
+    reset = MCreateCallTask(display->mBg, data_ov001_02169374.SetMode_00, (bg_mode)0);
+    timer = new MTimer(1);
+    exit = MTaskExitTransfer::Create(*pict);
     MTask *zoom = (*pict)->GetScreen()->CreateScaleAnime(MFx32Point(MFx32(1), MFx32(1)), MFx32Point(scale, scale),
                                                          frames, ease);
-    MBlend *blend = display->mBlend;
-    MTask *fade = blend->CreateCrossFadeOutTask((*pict)->GetPlaneMask(), frames, ease);
-    MParallelTaskSet *both = new MParallelTaskSet(TRUE);
+    blend = display->mBlend;
+    MParallelTaskSet *both;
+    fade = blend->CreateCrossFadeOutTask((*pict)->GetPlaneMask(), frames, ease);
+    both = new MParallelTaskSet(TRUE);
     both->AddTail(fade);
     both->AddTail(zoom);
     mPictTasks->AddTail(both, exit, clear, timer, reset);
