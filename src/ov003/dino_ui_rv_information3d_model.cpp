@@ -443,7 +443,7 @@ BOOL DinoUiRvAttackFlag(u32 id);
 static inline u32 DinoCountLevelledParts(const DinoCreatureBody *body) {
     u32 n = 0;
     for (u32 j = 0; j < 4; j++) {
-        if (body->parts[j].level != 0) {
+        if (0 != body->parts[j].level) {
             n++;
         }
     }
@@ -468,36 +468,38 @@ void DinoUiRvInformation::ShowAttackPage() {
         }
         return;
     }
+    u32 specialAttack;
     const DinoCreatureDef *def = gDinoResource->GetCreatureDef(mInfo.state.index);
     const DinoCreatureBody *body = (const DinoCreatureBody *)&mInfo.unk00[1];
     u32 count = 0;
     for (u32 i = 0; i < def->attackCount; i++) {
         if (((const u32 *)((const u8 *)def + def->attackLevels))[i] <= DinoCountLevelledParts(body)) {
-            count++;
+            ++count;
         }
     }
     BOOL special = FALSE;
-    u32 specialAttack = def->specialAttack;
-    if ((mUnk1AC == 0 && gDinoBackup->GetSystemFlag(0x28)) || mUnk1AC == 1 || mUnk1AC == 3) {
-        if (specialAttack != 0 && def->specialAttackLevel <= DinoCountLevelledParts(body)) {
+    specialAttack = def->specialAttack;
+    if ((0 == mUnk1AC && gDinoBackup->GetSystemFlag(0x28)) || mUnk1AC == 1 || mUnk1AC == 3) {
+        if (0 != specialAttack && def->specialAttackLevel <= DinoCountLevelledParts(body)) {
             count++;
-            special = TRUE;
+                special = TRUE;
         }
     }
     for (int row = 0; row < 3; row++) {
-        u32 n = (mPage - 1) * 3 + row;
+        s32 n = (mPage - 1) * 3 + row;
         if (n < count) {
             mViewsF0[row]->Show();
             mViews104[row]->Show();
             mViews118[row]->Show();
             mNumbers12C[row]->Show();
             mNumbers140[row]->Show();
-            u32 attack;
+            int attack;
             if (special && n == count - 1) {
                 attack = specialAttack;
             } else {
+                s32 attacks;
                 attack = 0;
-                u32 attacks = def->attackCount;
+                attacks = def->attackCount;
                 for (u32 i = 0; i < attacks; i++) {
                     if (((const u32 *)((const u8 *)def + def->attackLevels))[i] <= DinoCountLevelledParts(body)) {
                         if (n-- == 0) {
