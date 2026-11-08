@@ -1754,7 +1754,9 @@ void DinoField::Step(u32 dir, DinoFieldStep *step, int a, int frames, int c) {
         anm->mUnk11B = TRUE;
     }
     int angle = (u16) (0x4000 - chara->GetModel()->angle);
-    e->SetRotation(0, angle * 360 / 16, 0);
+    e->mRot.y = angle * 360 / 16;
+    e->mRot.x = 0;
+    e->mRot.z = 0;
     for (MAnmModelBase *anm = (MAnmModelBase *) e->mParallel.mHead; anm != NULL; anm = (MAnmModelBase *) anm->mNext) {
         anm->mRotRef = &e->mRot;
         anm->mUnk11B = TRUE;
