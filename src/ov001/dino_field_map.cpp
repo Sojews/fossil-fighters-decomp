@@ -230,13 +230,13 @@ extern "C" void func_ov001_0215f900(DinoFieldMap *map) {
     MRandom *random = gDinoResource->GetRandom();
     MResource<DinoExcavateDefs> defs = gDinoResource->GetExcavateDefs();
     DinoWeightedRandom kinds(random);
+    int id;
     kinds.Add(defs.Get()->GetRockKindWeights()[2]);
     kinds.Add(defs.Get()->GetRockKindWeights()[0]);
     kinds.Add(defs.Get()->GetRockKindWeights()[1]);
-    u32 id;
     u32 count = 0;
-    for (id = 1; id < gDinoResource->GetMapCount(); id++) {
-        if (map->mUnk90 != gDinoResource->GetMapExcavateMatch(id)) {
+    for (id = 1; id < gDinoResource->GetMapCount(); id += 1) {
+        if (gDinoResource->GetMapExcavateMatch(id) != map->mUnk90) {
             continue;
         }
         DinoPlayerData player;
@@ -244,25 +244,29 @@ extern "C" void func_ov001_0215f900(DinoFieldMap *map) {
         MResource<DinoMapMData> m = gDinoResource->LoadMapM(id);
         MResource<struct DinoMapData> e = gDinoResource->LoadMapE(id);
         std::vector<void *> cells;
-        for (u32 a = 1; a < m.Get()->digAreaCount; a++) {
+        for (u32 a = 1; a < m.Get()->digAreaCount; ++a) {
             const DinoMapDigArea *area = m.Get()->GetDigArea(a);
-            if (area->flag != 0 && !gDinoBackup->GetFlag(area->flag)) {
+            if (0 != area->flag && !gDinoBackup->GetFlag(area->flag)) {
                 continue;
             }
             cells.clear();
-            for (u32 i = 0; i < e.Get()->cellCount; i++) {
+            for (u32 i = 0; i < e.Get()->cellCount; ++i) {
                 if (e.Get()->GetCell(i) == area->cellArea) {
                     DinoPushCell(cells, *(void **)&i);
                 }
             }
             DinoWeightedRandom fossils(random);
-            for (u32 j = 0; j < area->fossilCount; j++) {
+            for (u32 j = 0; j < area->fossilCount; j += 1) {
                 fossils.Add(((const int *)area->GetFossil(j))[1]);
             }
             for (u32 k = 0; k < area->rockCount; k++) {
+                s32 kind;
+                u32 empty;
                 u32 fossil = 0;
-                u32 kind = 0;
-                u32 empty = 0;
+                kind = 0;
+                {
+                    empty = 0;
+                }
                 switch (player.license) {
                 case 0:
                     break;
@@ -279,14 +283,14 @@ extern "C" void func_ov001_0215f900(DinoFieldMap *map) {
                     break;
                 }
                 u32 type;
-                if (kind == 1) {
+                if (1 == kind) {
                     type = kinds.Pick();
-                    if (type == 0) {
+                    if (0 == type) {
                         empty = 1;
                     }
                 } else {
                     type = 0;
-                    u32 chance = defs.Get()->emptyChance;
+                    int chance = defs.Get()->emptyChance;
                     if (random->Next() <= chance) {
                         empty = 1;
                     }
@@ -294,21 +298,21 @@ extern "C" void func_ov001_0215f900(DinoFieldMap *map) {
                 switch (type) {
                 case 0:
                     fossil = fossils.Pick();
-                    if (kind == 2) {
+                    if (2 == kind) {
                         kind = gDinoResource->GetCreatureUnk0D(*area->GetFossil(fossil));
                     }
                     break;
                 case 1:
+                    {
+                    }
                     {
                     u32 idx = random->Next(defs.Get()->rockSet1Count);
                     fossil = defs.Get()->GetRockSet1()[idx];
                 }
                     break;
                 case 2:
-                    {
                     u32 idx = random->Next(defs.Get()->rockSet2Count);
                     fossil = defs.Get()->GetRockSet2()[idx];
-                }
                     break;
                 }
                 DinoBackupEntry entry;
