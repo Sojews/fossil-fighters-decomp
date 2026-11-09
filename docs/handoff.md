@@ -1,4 +1,12 @@
-# Handoff: ov001 / ov003 / ov004 / ov005
+# Handoff: Fossil Fighters decomp
+
+**IMPORTANT — single-session correction (2026-11-09):** there is no second session. All
+commits attributed to "the other session" (game/, m/, ov000/002/006/007 work, radar finds)
+were made by this same effort in earlier context windows — duplicate hashes in the old
+worktrees confirm it. Nothing is off-limits; the entire repo is this session's. The old
+worktrees (ff-decomp-*) are stale snapshots; all their content is already on origin/main
+(verified by content diff for b/n1-n9). docs/handoff.md and docs/matching-idioms.md are
+history/playbook, not territory maps.
 
 Snapshot taken 2026-11-02 at `origin/main` **0c602c57** (your HEAD). On that commit a fresh build plus
 `objdiff-cli report generate` gives:
@@ -7,12 +15,9 @@ Snapshot taken 2026-11-02 at `origin/main` **0c602c57** (your HEAD). On that com
 - **81.60%** code matched, fuzzy 98.81%
 - `build/ff_usa.nds: OK`
 
-## 0. Who owns what
+## 0. Scope
 
-Two Claude sessions shared this repo. This document covers mine: **src/ov001, src/ov003, src/ov004 and src/ov005**.
-The other session ("jonny-d6") owns src/game, src/m, ov000, ov002, ov006 and ov007. I don't know what it has in
-flight. Before you edit those directories, or the shared headers `include/m/*`, `include/game/*` and
-`libs/msl_cpp/include/*`, ask the user whether that session is still running.
+The full repo: src/game, src/m, src/ov000-ov007, include/, tools/.
 
 Unmatched functions per area (from the report at 0c602c57):
 
