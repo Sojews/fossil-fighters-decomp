@@ -47,11 +47,10 @@ DinoUiDebugFlagMenuItem::~DinoUiDebugFlagMenuItem() {
     mFont->Release();
 }
 
-// NONMATCHING: the game computes the right and bottom edges before storing any edge (and keeps 16 in r1).
+// Moving a copy avoids the extra point temporary and matches the game's stack layout.
 MRect DinoUiDebugFlagMenuItem::GetFrame() {
-    MPoint pos = mPos;
     MRect frame(0, 0, 16, 16);
-    frame.MoveTo(pos);
+    frame = frame.MovedTo(mPos);
     frame.Shift(-5, -2);
     return frame.Inflate(2);
 }
