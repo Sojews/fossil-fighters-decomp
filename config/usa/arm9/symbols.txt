@@ -11427,9 +11427,8 @@ _ZTV19DinoCommonYesNoMenu kind:data(any) addr:0x020bc508
 data_020bc540 kind:data(any) addr:0x020bc540
 _ZTV23DinoCommonYesNoMenuItem kind:data(any) addr:0x020bc548
 data_020bc578 kind:data(any) addr:0x020bc578
-data_020bc59c kind:data(any) addr:0x020bc59c
-data_020bc5b4 kind:data(any) addr:0x020bc5b4
-data_020bc61c kind:data(any) addr:0x020bc61c
+gDinoCreatureStatsPool kind:data(any) addr:0x020bc59c
+data_020bc638 kind:data(any) addr:0x020bc638
 _ZTI10MSleepHook kind:data(any) addr:0x020bc644
 _ZTI18MLooperPreLoopHook kind:data(any) addr:0x020bc64c
 _ZTI11DinoBlower2 kind:data(any) addr:0x020bc654

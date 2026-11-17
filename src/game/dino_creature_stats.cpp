@@ -7,8 +7,17 @@
 #include "game/dino_resource.h"
 #include "game/dino_static_init.h"
 
-// How far towards the high value a stat is at each rank, along each curve (by curve, then rank).
-extern "C" const MFx32 data_020bc5b4[4][8];
+// The stat calculation reads its curves at offset 0x18. The initializer writes three layout
+// points starting at 0x04, then the curve values starting at 0x1c. The last point's y
+// coordinate thus occupies the first lookup slot. Keep both views at their original offsets.
+extern "C" {
+struct DinoCreatureStatsPool {
+    int experienceCap;
+    int layoutCoordinates[5];
+    MFx32 curves[4][8];
+    fx32 finalCurveValue;
+} gDinoCreatureStatsPool = {600};
+}
 
 extern const u32 kCreatureLevelLimits[2];
 
@@ -57,7 +66,7 @@ extern "C" int func_02030e7c(int rank, int low, int high, int max, int curve, in
         return high;
     }
     if (rank < 8) {
-        value = fLow + (fHigh - fLow) * data_020bc5b4[curve][rank];
+        value = fLow + (fHigh - fLow) * gDinoCreatureStatsPool.curves[curve][rank];
     } else {
         value = fHigh + (fMax - fHigh) * MFx32(rank - 8) / MFx32(4);
     }
@@ -75,7 +84,7 @@ static inline int GetStat(const DinoCreatureStatsInput *info, const DinoCreature
 // The parts' experience, up to the most the hit points count.
 static inline int GetTotal(const DinoCreatureStatsInput *info) {
     int total = info->levels[0] + info->levels[1] + info->levels[2] + info->levels[3] + info->levels[4];
-    return std::min(600, total);
+    return std::min(gDinoCreatureStatsPool.experienceCap, total);
 }
 
 // The stats: the hit points go from one rank's to the next by how much experience the parts have past the rank's
@@ -128,46 +137,43 @@ extern "C" u32 func_02031104(const DinoCreatureState *creature) {
     return func_02030f38(&info, false, MFx32::FromRaw(0)).hp;
 }
 
-// The file's static initialization (see dino_static_init.h): three points, and the curves (in sevenths, as fx32).
-extern "C" u8 data_020bc59c[];
-extern "C" u8 data_020bc61c[];
-
+// The three layout points followed by the four eight-value growth curves.
 static struct DinoCreatureStatsStaticInit {
     DinoCreatureStatsStaticInit() {
-        DINO_POOL(MPoint, data_020bc59c, 0x14) = MPoint(128, 176);
-        DINO_POOL(MPoint, data_020bc59c, 0xc) = MPoint(8, 150);
-        DINO_POOL(MPoint, data_020bc59c, 4) = MPoint(64, 112);
-        DINO_POOL_WORD(data_020bc59c, 0x1c) = 0x0;
-        DINO_POOL_WORD(data_020bc59c, 0x20) = 0x249;
-        DINO_POOL_WORD(data_020bc59c, 0x24) = 0x492;
-        DINO_POOL_WORD(data_020bc59c, 0x28) = 0x6db;
-        DINO_POOL_WORD(data_020bc59c, 0x2c) = 0x925;
-        DINO_POOL_WORD(data_020bc59c, 0x30) = 0xb6e;
-        DINO_POOL_WORD(data_020bc59c, 0x34) = 0xdb7;
-        DINO_POOL_WORD(data_020bc59c, 0x38) = 0x1000;
-        DINO_POOL_WORD(data_020bc59c, 0x3c) = 0x0;
-        DINO_POOL_WORD(data_020bc59c, 0x40) = 0x43f;
-        DINO_POOL_WORD(data_020bc59c, 0x44) = 0x7d6;
-        DINO_POOL_WORD(data_020bc59c, 0x48) = 0xac7;
-        DINO_POOL_WORD(data_020bc59c, 0x4c) = 0xd10;
-        DINO_POOL_WORD(data_020bc59c, 0x50) = 0xeb2;
-        DINO_POOL_WORD(data_020bc59c, 0x54) = 0xfac;
-        DINO_POOL_WORD(data_020bc59c, 0x58) = 0x1000;
-        DINO_POOL_WORD(data_020bc59c, 0x5c) = 0x0;
-        DINO_POOL_WORD(data_020bc59c, 0x60) = 0x54;
-        DINO_POOL_WORD(data_020bc59c, 0x64) = 0x14e;
-        DINO_POOL_WORD(data_020bc59c, 0x68) = 0x2f0;
-        DINO_POOL_WORD(data_020bc59c, 0x6c) = 0x539;
-        DINO_POOL_WORD(data_020bc59c, 0x70) = 0x82a;
-        DINO_POOL_WORD(data_020bc59c, 0x74) = 0xbc1;
-        DINO_POOL_WORD(data_020bc59c, 0x78) = 0x1000;
-        DINO_POOL_WORD(data_020bc59c, 0x7c) = 0x0;
-        DINO_POOL_WORD(data_020bc61c, 0x0) = 0x249;
-        DINO_POOL_WORD(data_020bc61c, 0x4) = 0x249;
-        DINO_POOL_WORD(data_020bc61c, 0x8) = 0x6db;
-        DINO_POOL_WORD(data_020bc61c, 0xc) = 0x6db;
-        DINO_POOL_WORD(data_020bc61c, 0x10) = 0xb6e;
-        DINO_POOL_WORD(data_020bc61c, 0x14) = 0xb6e;
-        DINO_POOL_WORD(data_020bc61c, 0x18) = 0x1000;
+        DINO_POOL(MPoint, gDinoCreatureStatsPool, 0x14) = MPoint(128, 176);
+        DINO_POOL(MPoint, gDinoCreatureStatsPool, 0xc) = MPoint(8, 150);
+        DINO_POOL(MPoint, gDinoCreatureStatsPool, 4) = MPoint(64, 112);
+        DINO_POOL_WORD(gDinoCreatureStatsPool, 0x1c) = 0x0;
+        DINO_POOL_WORD(gDinoCreatureStatsPool, 0x20) = 0x249;
+        DINO_POOL_WORD(gDinoCreatureStatsPool, 0x24) = 0x492;
+        DINO_POOL_WORD(gDinoCreatureStatsPool, 0x28) = 0x6db;
+        DINO_POOL_WORD(gDinoCreatureStatsPool, 0x2c) = 0x925;
+        DINO_POOL_WORD(gDinoCreatureStatsPool, 0x30) = 0xb6e;
+        DINO_POOL_WORD(gDinoCreatureStatsPool, 0x34) = 0xdb7;
+        DINO_POOL_WORD(gDinoCreatureStatsPool, 0x38) = 0x1000;
+        DINO_POOL_WORD(gDinoCreatureStatsPool, 0x3c) = 0x0;
+        DINO_POOL_WORD(gDinoCreatureStatsPool, 0x40) = 0x43f;
+        DINO_POOL_WORD(gDinoCreatureStatsPool, 0x44) = 0x7d6;
+        DINO_POOL_WORD(gDinoCreatureStatsPool, 0x48) = 0xac7;
+        DINO_POOL_WORD(gDinoCreatureStatsPool, 0x4c) = 0xd10;
+        DINO_POOL_WORD(gDinoCreatureStatsPool, 0x50) = 0xeb2;
+        DINO_POOL_WORD(gDinoCreatureStatsPool, 0x54) = 0xfac;
+        DINO_POOL_WORD(gDinoCreatureStatsPool, 0x58) = 0x1000;
+        DINO_POOL_WORD(gDinoCreatureStatsPool, 0x5c) = 0x0;
+        DINO_POOL_WORD(gDinoCreatureStatsPool, 0x60) = 0x54;
+        DINO_POOL_WORD(gDinoCreatureStatsPool, 0x64) = 0x14e;
+        DINO_POOL_WORD(gDinoCreatureStatsPool, 0x68) = 0x2f0;
+        DINO_POOL_WORD(gDinoCreatureStatsPool, 0x6c) = 0x539;
+        DINO_POOL_WORD(gDinoCreatureStatsPool, 0x70) = 0x82a;
+        DINO_POOL_WORD(gDinoCreatureStatsPool, 0x74) = 0xbc1;
+        DINO_POOL_WORD(gDinoCreatureStatsPool, 0x78) = 0x1000;
+        DINO_POOL_WORD(gDinoCreatureStatsPool, 0x7c) = 0x0;
+        DINO_POOL_WORD(gDinoCreatureStatsPool, 0x80) = 0x249;
+        DINO_POOL_WORD(gDinoCreatureStatsPool, 0x84) = 0x249;
+        DINO_POOL_WORD(gDinoCreatureStatsPool, 0x88) = 0x6db;
+        DINO_POOL_WORD(gDinoCreatureStatsPool, 0x8c) = 0x6db;
+        DINO_POOL_WORD(gDinoCreatureStatsPool, 0x90) = 0xb6e;
+        DINO_POOL_WORD(gDinoCreatureStatsPool, 0x94) = 0xb6e;
+        DINO_POOL_WORD(gDinoCreatureStatsPool, 0x98) = 0x1000;
     }
 } sDinoCreatureStatsStaticInit;
