@@ -437,8 +437,11 @@ src/game/dino_common_yes_no_menu_item.cpp:
     .text       start:0x0203047c end:0x02030e7c
 
 src/game/dino_creature_stats.cpp:
+    complete
     .text       start:0x02030e7c end:0x020311b0
     .init       start:0x0208915c end:0x02089218
+    .ctor       start:0x02092ff4 end:0x02092ff8
+    .data       start:0x020bc59c end:0x020bc638
 
 src/game/dino_blower.cpp:
     .text       start:0x020311b0 end:0x02031760
