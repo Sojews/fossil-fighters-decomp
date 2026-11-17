@@ -161,6 +161,7 @@ u32 OS_EnableIrqMask(u32 mask);
 u32 OS_DisableIrqMask(u32 mask);
 u32 OS_ResetRequestIrqMask(u32 mask);
 void OS_WaitIrq(BOOL clear, u32 irqFlags);
+void OS_WaitVBlankIntr(void);
 void OS_SleepThread(OSThreadQueue *queue);
 void OS_SpinWait(u32 cycles);
 BOOL OS_IsRunOnEmulator(void);
