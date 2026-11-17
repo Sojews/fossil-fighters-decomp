@@ -4,12 +4,6 @@
 
 #define REG_VCOUNT (*(volatile u16 *)0x04000006)
 
-extern "C" {
-void func_020508fc(int a, MTask *task);
-void func_02050934(int a, MTask *task);
-void func_02075054(void);
-}
-
 MLooper *gLooper;
 OSThread *gLooperThread;
 
@@ -205,7 +199,7 @@ void MLooper::Run(MTask *root) {
     u32 prio;
 
     mFramesLeft = mFramesPerLoop;
-    func_020508fc(0, mClock);
+    MAddIntrTask(0, mClock);
     do {
         if (!mSkipFrame) {
             if (mPreLoopTasks.mState == MTask::STATE_RUN) {
@@ -240,7 +234,7 @@ void MLooper::Run(MTask *root) {
             OS_SetThreadPriority(mThread, 3);
         }
         do {
-            func_02075054();
+            OS_WaitVBlankIntr();
         } while (mFramesLeft > 0);
         mWaiting = FALSE;
         mFramesLeft = mFramesPerLoop;
@@ -253,5 +247,5 @@ void MLooper::Run(MTask *root) {
             OS_SetThreadPriority(mThread, prio);
         }
     } while (root != NULL && root->mState == MTask::STATE_RUN);
-    func_02050934(0, mClock);
+    MRemoveIntrTask(0, mClock);
 }
