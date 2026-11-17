@@ -1559,21 +1559,21 @@ void DinoField::Idle() {
     }
 }
 
-// NONMATCHING (and WalkOnLand1): the run argument is the tested water byte (the game's run test reuses the
-// byte's compare flags), but the game re-materializes it as `movs r2, #0` where ours keeps the loaded register.
+#pragma opt_propagation off
 void DinoField::WalkOnLand0(u32 dir, u32 run) {
-    u8 water = mMap->GetMapData()[0x68];
-    if (water == 0) {
-        Walk(dir, water, &mSteps[0], 3, 10, 6, 5, 1);
+    if (mMap->GetMapData()[0x68] == 0) {
+        run = 0;
+        Walk(dir, run, &mSteps[0], 3, 10, 6, 5, 1);
     }
 }
 
 void DinoField::WalkOnLand1(u32 dir, u32 run) {
-    u8 water = mMap->GetMapData()[0x68];
-    if (water == 0) {
-        Walk(dir, water, &mSteps[1], 3, 7, 6, 3, 2);
+    if (mMap->GetMapData()[0x68] == 0) {
+        run = 0;
+        Walk(dir, run, &mSteps[1], 3, 7, 6, 3, 2);
     }
 }
+#pragma opt_propagation reset
 
 void DinoField::WalkInWater(u32 dir, u32 run) {
     if (mMap->GetMapData()[0x68] != 0) {
