@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Gives the compiler's anonymous data symbols the names the game's objects use, so objdiff can compare them.
 
-Usage: python3 tools/anon_names.py OURS.o TARGET.o
+Usage: python3 tools/anon_names.py OURS.o TARGET.o [WEAK_SYMBOL ...]
 
 mwcc names the constants it makes up itself (string literals, pointer-to-member constants, the templates of
 aggregate initializers) @1, @2, ... dsd names the same data after its address (data_020c46c4). objdiff compares
@@ -21,6 +21,8 @@ import re
 import struct
 import sys
 
+STB_MW_MERGE = 13
+STB_MW_WEAK = 14
 SHT_SYMTAB = 2
 SHT_RELA = 4
 STT_FUNC = 2
@@ -164,7 +166,14 @@ def main():
                         new_symbols.append(key)
                     index = len(ours.symbols) + new_symbols.index(key)
                 retargets[a[4]] = (index, b[3])
-    if renames or new_symbols or retargets:
+    # mwld rejects a mergeable inline/RTTI definition alongside a strong delinked one.
+    # Mark the specified compiler copies weak so references use the owning object's definition.
+    weak_symbols = set(sys.argv[3:])
+    if weak_symbols:
+        for sym in ours.symbols:
+            if sym["name"] in weak_symbols and sym["info"] >> 4 == STB_MW_MERGE:
+                ours.data[sym["offset"] + 12] = (STB_MW_WEAK << 4) | sym["type"]
+    if renames or new_symbols or retargets or weak_symbols:
         ours.rewrite(renames, new_symbols, retargets)
 
 

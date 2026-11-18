@@ -1,5 +1,7 @@
 // DinoFieldBattleStartEffect.
 
+#pragma ipa file
+
 #include <algorithm>
 #include "game/dino_field_battle_start_effect.h"
 #include "game/dino_sound.h"
@@ -9,22 +11,12 @@
 #include "m/raster.h"
 #include "m/fx32.h"
 
-DinoFieldBattleStartEffect::~DinoFieldBattleStartEffect() {
+DinoFieldBattleStartEffect::DinoFieldBattleStartEffect(DinoField *field) : MProcess(NULL), mField(field) {
+    mState = &DinoFieldBattleStartEffect::Start;
 }
 
 void DinoFieldBattleStartEffect::Idle() {
     (this->*mState)();
-}
-
-// The TU's pooled pointer-to-member constants (see menu.cpp).
-extern "C" struct {
-    int mMinRadius;     // 0x00
-    void (DinoFieldBattleStartEffect::*StateClose_04)();
-    void (DinoFieldBattleStartEffect::*Start_0C)();
-} data_ov001_0216aad4;
-
-DinoFieldBattleStartEffect::DinoFieldBattleStartEffect(DinoField *field) : MProcess(NULL), mField(field) {
-    mState = data_ov001_0216aad4.Start_0C;
 }
 
 // Whitens the top screen and opens a window over the whole bottom one, its sprites blended.
@@ -44,10 +36,9 @@ void DinoFieldBattleStartEffect::Start() {
     mFrame = 0;
     mParallel.AddTail(gLcd->GetTopDisplay()->mBright->CreateFadeOutToWhite(0x59, 0));
     DinoSoundPlayBgm(0x75, 0);
-    mState = data_ov001_0216aad4.StateClose_04;
+    mState = &DinoFieldBattleStartEffect::StateClose;
 }
 
-// NONMATCHING: the game takes the minimum radius's address afresh for std::max's result (ours keeps it).
 void DinoFieldBattleStartEffect::StateClose() {
     if (++mFrame > 90) {
         gLcd->GetBottomDisplay()->mBright->SetMode(1);
@@ -64,6 +55,9 @@ void DinoFieldBattleStartEffect::StateClose() {
     }
     int radius = 160 - mFrame * 160 / 90;
     radius -= MFx32ToInt(MFx32(30) * MFx32::FromRaw(FX_SinCosTable_[(((u16) ((mFrame * 3 << 16) / 90)) >> 4) * 2]));
-    radius = std::max((int)data_ov001_0216aad4.mMinRadius, radius);
+    radius = std::max(0, radius);
     mWindow->SetCircle(MPoint(128, 96), radius);
+}
+
+DinoFieldBattleStartEffect::~DinoFieldBattleStartEffect() {
 }
