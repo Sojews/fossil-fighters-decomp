@@ -103,7 +103,7 @@ w(f"rule cc\n  command = {wine} $cc {CC_FLAGS} $extra_cflags -gccinc -i include 
   "  depfile = $out.d\n  deps = gcc\n  description = CC $in")
 # objdiff compares data references by symbol name: give the compiler's anonymous data symbols, and the data it
 # addresses through sections, the game's names (tools/anon_names.py; the linked code doesn't change).
-w(f"rule cc_named\n  command = {wine} $cc {CC_FLAGS} $extra_cflags -gccinc -i include -i libs/msl/include -i libs/msl_cpp/include -MD -c $in -o $outdir && {PY} tools/fix_dep.py $outdir/$stem.d $out.d && {PY} tools/anon_names.py $out $target\n"
+w(f"rule cc_named\n  command = {wine} $cc {CC_FLAGS} $extra_cflags -gccinc -i include -i libs/msl/include -i libs/msl_cpp/include -MD -c $in -o $outdir && {PY} tools/fix_dep.py $outdir/$stem.d $out.d && {PY} tools/anon_names.py $out $target $weak_symbols\n"
   "  depfile = $out.d\n  deps = gcc\n  description = CC $in")
 w(f"rule ld\n  command = {wine} {LD} {LD_FLAGS} @$objects $lcf -o $out\n  description = LINK $out")
 w(f"rule check\n  command = {DSD} check modules --config-path {arm9_config} --fail && touch $out")
@@ -145,6 +145,10 @@ for f in info["files"]:
         if obj in partial or f["name"].startswith("src/"):
             w(f"build {obj}: cc_named {f['name']} | {f['delink_file']} tools/anon_names.py\n  outdir = {Path(obj).parent}\n"
               f"  stem = {Path(obj).stem}\n  extra_cflags = {extra}\n  target = {f['delink_file']}")
+            if f["name"] == "src/ov001/dino_field_battle_start_effect.cpp":
+                # The ARM9 objects supply these shared C++ definitions.
+                w("  weak_symbols = _ZTI5MTask _ZTS5MTask _ZTV5MTask _ZN5MTaskD0Ev _ZN5MTaskD1Ev"
+                  " _ZTI8MProcess _ZTS8MProcess")
         else:
             w(f"build {obj}: cc {f['name']}\n  outdir = {Path(obj).parent}\n  stem = {Path(obj).stem}\n  extra_cflags = {extra}")
 
