@@ -503,3 +503,44 @@ Capped 3-round permuter batch (600s/-j 3 each, fresh worktrees r1radar/r2view/r3
 - **DinoBattleViewField::OnMessage**: best-3082 (base 3084) scored 86.996->87.000 (+0.004), no sibling regressions — negligible, not committed. Stays 87.00.
 
 **New lesson (added to skill): when a permuter round's score drops FAR below base, the objdiff-best can be an EARLY candidate, not the mtime-newest/final best. Score ALL landed best-*.cpp (sorted by score) with objdiff, not just the final one — harvesting only the final best by mtime would have missed the font win and adopted a -12.9 regression.**
+
+---
+
+## Session update 2026-11-19 (round 11 — second batch + func_0208714c groundwork)
+
+Second capped 3-round batch (q1model/q2view3d/q3font, 600s/-j 3). **No new adoptable win** — but a critical correctness catch and full groundwork on the biggest gap:
+
+- **q1 DinoBattleModelPlayer::OnMessage (95.74/8100B)**: base 513 = best 513, no candidate (321 compiles). Permuter-dead this round.
+- **q2 DinoBattleView3D::OnMessage (96.24/8100B)**: best-2292 scored 96.238->96.242 (+0.004), no sibling regressions — negligible, not committed.
+- **q3 font Transfer resume**: best-1666 scored **90.118 (+5.5 over committed 84.619)** with zero sibling regressions — BUT REJECTED as a **FUNCTIONAL BUG**. The candidate moved `keep = ~mask;` from unconditional into `case 1` of the srcBytes switch, leaving `keep` uninitialized for srcBytes 2/3. The game computes `keep=~mask` UNCONDITIONALLY at the top of the loop body (game instr 112-119, before the srcBytes switch at 121+). Verified: restoring keep to loop-top scores 84.371, after-switch 84.532 — both BELOW committed 84.619. The +5.5 was driven entirely by the bug coincidentally aligning the mvn instruction index. Font stays at the correct committed 84.619. All 6 materialization perms (perm76/53/571/500/166/96/761) were removable for free at 90.118, but moot once the keep bug is rejected.
+
+**New lesson (added to skill): a permuter candidate can raise objdiff % by introducing a FUNCTIONAL BUG — e.g. moving an unconditional assignment into one switch case (changes reachability). objdiff score is necessary but NOT sufficient: verify the candidate preserves functional equivalence/reachability against the game's actual control flow before adopting. The game's keep=~mask is unconditional at loop top; a case-1-only placement matches instructions better but is wrong.**
+
+### func_0208714c groundwork (the 0%/1550B biggest gap — Metrowerks __unwind)
+
+Assessed fully; safe to write (exception_handler.cpp is a PARTIAL unit, no `complete` marker — a NONMATCHING version can't break the ROM). It is the Metrowerks C++ unwind loop: runs cleanup/destructor actions from the throw point up to a target catch action. 730 Thumb instructions, frame `push {r3-r7,lr}; sub sp,#0xc8`. r4=context, r5=info, [sp]=target, [sp+4]=full action byte.
+
+Loop head: `ap = info->action_pointer; if (ap==NULL) { func_02086e60(func_020881bc(context,info), info); if (info->exception_record==NULL) std::terminate(); func_02088204(context,info); ap=info->action_pointer; if (ap==NULL) continue; } switch (*ap & 0x1f)`.
+
+Jump table DECODED (table_base 0x208719c, jump_pc 0x208719e; type -> case instr index in the 730-instr listing):
+- 0,14 -> 719 (std::terminate)
+- 1 -> 56 (skip: off=func_02086d6c(ap+1); ap += off)
+- 2 -> 64 (dtor complete: off=func_02086d6c(ap+1); dtor=ReadU32(p); obj=frame+off; dtor(obj,-1); ap=p+4)
+- 3 -> 90 (dtor, 0x40 flag: byte 'is-constructed' check at off1, dtor(obj,-1) at off2)
+- 4 -> 134 (dtor, 0x20 flag: register-saved obj = context->regs.r[off])
+- 5 -> 169 (array dtor: count/stride/dtor loop, dtor(elem,-1))
+- 6 -> 211 (dtor 0x20, two offsets, r1=0)
+- 7 -> 249 (dtor 0x20, two offsets, r1=-1)
+- 8 -> 288 (dtor 0x20+0x40, short 'is-constructed' check)
+- 9 -> 345 (array dtor 0x20)
+- 10 -> 403 (dtor 0x20, single offset, r1=0)
+- 11 -> 435 (dtor 0x20+0x40, byte check, r1=0)
+- 12 -> 485 (catch: if ap==target return; else advance past catch payload)
+- 13 -> 495 (caught-object dtor: reads frame object {location,dtor}, matches context->location, dtor(obj,-1))
+- 15 -> 516 (if ap==target return; else advance)
+- 16 -> 532 (advance: ap = func_02086d6c(...)+count*4)
+- 17 -> 587 (dtor 0x20, two dtor pointers/offsets)
+- 18 -> 646 (array dtor with _u32_div_f count/stride)
+- 19 -> 714 (skip: ap = func_02086d6c(ap+1))
+
+Key idioms: 0x20 flag => object pointer is in a saved register (`context->regs.r[off]`, regs at context+0x1c); else `context->frame + off` (frame at context+0x18). 0x40 flag => read an 'is-constructed' byte/short at off1 and skip the dtor if zero. The 4-byte dtor pointer is read UNALIGNED byte-by-byte (ldrb/orr) — a `ReadU32(p){return p[0]|(p[1]<<8)|(p[2]<<16)|(p[3]<<24);}` helper compiles to that naturally. The per-action byte layout is ALREADY documented in the repo's func_02086f04 (ActionIterator step) cases 13/15/16/17/18/19 — use it as the parsing guide. Loop tail checks `action & 0x80`. Target reached (type 12/15 with ap==target) => return. Plan: write a functional first version (all 20 cases), compile, score, then permuter/manual-match. Full 730-instr listing was at /tmp/ff_unwind_asm.txt (regenerate via objdiff-cli diff on func_0208714c, left side).
