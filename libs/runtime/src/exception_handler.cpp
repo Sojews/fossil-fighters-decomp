@@ -310,6 +310,239 @@ char *func_0208775c(ThrowContext *context, ExceptionInfo *info) {
     }
 }
 
+// Reads an unaligned 32-bit destructor pointer from the action stream (the game emits ldrb/orr for this).
+static u32 UnwindReadU32(const u8 *p) {
+    return p[0] | (p[1] << 8) | (p[2] << 16) | (p[3] << 24);
+}
+typedef void (*UnwindDtor)(void *, s32);
+
+// Unwinds the stack running cleanup actions (object/array destructors) from the throw point up to the target
+// catch action. NONMATCHING: first functional reconstruction of the Metrowerks __unwind switch (20 action types).
+void func_0208714c(ThrowContext *context, ExceptionInfo *info, u8 *target) {
+    u8 *ap;
+    u8 action;
+    for (;;) {
+        ap = info->action_pointer;
+        if (ap == NULL) {
+            func_02086e60(func_020881bc(context, info), info);
+            if (info->exception_record == NULL) {
+                std::terminate();
+            }
+            func_02088204(context, info);
+            ap = info->action_pointer;
+            if (ap == NULL) {
+                continue;
+            }
+        }
+        action = *ap;
+        switch (action & 0x1F) {
+        case 0:
+        case 14:
+            std::terminate();
+            break;
+        case 1: {
+            s32 off;
+            func_02086d6c((char *)ap + 1, &off);
+            info->action_pointer = ap + off;
+            break;
+        }
+        case 2: {
+            s32 off;
+            u8 *p = (u8 *)func_02086d6c((char *)ap + 1, &off);
+            UnwindDtor dtor = (UnwindDtor)UnwindReadU32(p);
+            dtor(context->frame + off, -1);
+            info->action_pointer = p + 4;
+            break;
+        }
+        case 3: {
+            s32 off1, off2;
+            u8 *p = (u8 *)func_02086d6c(func_02086d6c((char *)ap + 1, &off1), &off2);
+            UnwindDtor dtor = (UnwindDtor)UnwindReadU32(p);
+            u8 flag = (action & 0x40) ? (u8)context->regs.r[off1] : (u8)context->frame[off1];
+            if (flag != 0) {
+                dtor(context->frame + off2, -1);
+            }
+            info->action_pointer = p + 4;
+            break;
+        }
+        case 4: {
+            s32 off;
+            u8 *p = (u8 *)func_02086d6c((char *)ap + 1, &off);
+            UnwindDtor dtor = (UnwindDtor)UnwindReadU32(p);
+            void *obj = (action & 0x20) ? (void *)context->regs.r[off] : *(void **)(context->frame + off);
+            dtor(obj, -1);
+            info->action_pointer = p + 4;
+            break;
+        }
+        case 5: {
+            s32 off;
+            u32 count, stride;
+            u8 *p = (u8 *)func_02086dcc(func_02086dcc(func_02086d6c((char *)ap + 1, &off), &count), &stride);
+            UnwindDtor dtor = (UnwindDtor)UnwindReadU32(p);
+            char *elem = context->frame + off + stride * count;
+            while (count != 0) {
+                elem -= stride;
+                dtor(elem, -1);
+                count--;
+            }
+            info->action_pointer = p + 4;
+            break;
+        }
+        case 6: {
+            s32 off1, off2;
+            u8 *p = (u8 *)func_02086d6c(func_02086d6c((char *)ap + 1, &off1), &off2);
+            UnwindDtor dtor = (UnwindDtor)UnwindReadU32(p);
+            char *base = (action & 0x20) ? (char *)context->regs.r[off1] : *(char **)(context->frame + off1);
+            dtor(base + off2, 0);
+            info->action_pointer = p + 4;
+            break;
+        }
+        case 7: {
+            s32 off1, off2;
+            u8 *p = (u8 *)func_02086d6c(func_02086d6c((char *)ap + 1, &off1), &off2);
+            UnwindDtor dtor = (UnwindDtor)UnwindReadU32(p);
+            char *base = (action & 0x20) ? (char *)context->regs.r[off1] : *(char **)(context->frame + off1);
+            dtor(base + off2, -1);
+            info->action_pointer = p + 4;
+            break;
+        }
+        case 8: {
+            s32 off1, off2, off3;
+            u8 *p = (u8 *)func_02086d6c(func_02086d6c(func_02086d6c((char *)ap + 1, &off1), &off2), &off3);
+            UnwindDtor dtor = (UnwindDtor)UnwindReadU32(p);
+            s16 flag = (action & 0x40) ? (s16)context->regs.r[off1] : *(s16 *)(context->frame + off1);
+            if (flag != 0) {
+                char *base = (action & 0x20) ? (char *)context->regs.r[off2] : *(char **)(context->frame + off2);
+                dtor(base + off3, -1);
+            }
+            info->action_pointer = p + 4;
+            break;
+        }
+        case 9: {
+            s32 off1, off2;
+            u32 count, stride;
+            u8 *p = (u8 *)func_02086dcc(func_02086dcc(func_02086d6c(func_02086d6c((char *)ap + 1, &off1), &off2), &count), &stride);
+            UnwindDtor dtor = (UnwindDtor)UnwindReadU32(p);
+            char *base = (action & 0x20) ? (char *)context->regs.r[off1] : *(char **)(context->frame + off1);
+            char *elem = base + off2 + stride * count;
+            while (count != 0) {
+                elem -= stride;
+                dtor(elem, -1);
+                count--;
+            }
+            info->action_pointer = p + 4;
+            break;
+        }
+        case 10: {
+            s32 off;
+            u8 *p = (u8 *)func_02086d6c((char *)ap + 1, &off);
+            UnwindDtor dtor = (UnwindDtor)UnwindReadU32(p);
+            void *obj = (action & 0x20) ? (void *)context->regs.r[off] : *(void **)(context->frame + off);
+            dtor(obj, 0);
+            info->action_pointer = p + 4;
+            break;
+        }
+        case 11: {
+            s32 off1, off2;
+            u8 *p = (u8 *)func_02086d6c(func_02086d6c((char *)ap + 1, &off1), &off2);
+            UnwindDtor dtor = (UnwindDtor)UnwindReadU32(p);
+            u8 flag = (action & 0x40) ? (u8)context->regs.r[off1] : (u8)context->frame[off1];
+            if (flag != 0) {
+                void *obj = (action & 0x20) ? (void *)context->regs.r[off2] : *(void **)(context->frame + off2);
+                dtor(obj, 0);
+            }
+            info->action_pointer = p + 4;
+            break;
+        }
+        case 12: {
+            if (ap == target) {
+                return;
+            }
+            u32 off1;
+            s32 off2;
+            info->action_pointer = (u8 *)func_02086d6c(func_02086dcc((char *)ap + 5, &off1), &off2);
+            break;
+        }
+        case 13: {
+            s32 off;
+            u8 *p = (u8 *)func_02086d6c((char *)ap + 1, &off);
+            char *obj = context->frame + off;
+            u32 dtor = *(u32 *)(obj + 8);
+            if (dtor != 0) {
+                if (context->location == *(void **)obj) {
+                    context->dtor = (void (*)(void *, s16))dtor;
+                } else {
+                    ((UnwindDtor)dtor)(*(void **)obj, -1);
+                }
+            }
+            info->action_pointer = p;
+            break;
+        }
+        case 15: {
+            if (ap == target) {
+                return;
+            }
+            u32 count, b;
+            s32 c;
+            info->action_pointer = (u8 *)func_02086d6c(func_02086dcc(func_02086dcc((char *)ap + 1, &count), &b), &c) + count * 4;
+            break;
+        }
+        case 16: {
+            s32 off1, off2, off3;
+            u8 *p = (u8 *)func_02086d6c(func_02086d6c((char *)ap + 1, &off1), &off2);
+            u32 dtor1 = UnwindReadU32(p);
+            u8 *p2 = (u8 *)func_02086d6c((char *)p + 4, &off3);
+            UnwindDtor dtor2 = (UnwindDtor)UnwindReadU32(p2);
+            char *base = (action & 0x20) ? (char *)context->regs.r[off1] : *(char **)(context->frame + off1);
+            dtor2(base + off2, (s32)(dtor1 + off3));
+            info->action_pointer = p2 + 4;
+            break;
+        }
+        case 17: {
+            s32 off1, off2, off3, off4;
+            u8 *p = (u8 *)func_02086d6c(func_02086d6c((char *)ap + 1, &off1), &off2);
+            u8 flag2 = *p & 0x20;
+            p = (u8 *)func_02086d6c(func_02086d6c((char *)p + 1, &off3), &off4);
+            UnwindDtor dtor = (UnwindDtor)UnwindReadU32(p);
+            char *obj1 = (action & 0x20) ? (char *)context->regs.r[off1] : *(char **)(context->frame + off1);
+            char *base2 = flag2 ? (char *)context->regs.r[off3] : *(char **)(context->frame + off3);
+            dtor(obj1 + off2, (s32)(base2 + off4));
+            info->action_pointer = p + 4;
+            break;
+        }
+        case 18: {
+            s32 off1, off2;
+            u32 stride;
+            u8 *p = (u8 *)func_02086d6c((char *)ap + 1, &off1);
+            u8 flag2 = *p & 0x20;
+            p = (u8 *)func_02086dcc(func_02086d6c((char *)p + 1, &off2), &stride);
+            UnwindDtor dtor = (UnwindDtor)UnwindReadU32(p);
+            char *base = (action & 0x20) ? (char *)context->regs.r[off1] : *(char **)(context->frame + off1);
+            u32 count_reg = flag2 ? context->regs.r[off2] : *(u32 *)(context->frame + off2);
+            u32 count = count_reg / stride;
+            char *elem = base + count_reg;
+            while (count != 0) {
+                elem -= stride;
+                dtor(elem, -1);
+                count--;
+            }
+            info->action_pointer = p + 4;
+            break;
+        }
+        case 19: {
+            s32 off;
+            info->action_pointer = (u8 *)func_02086d6c((char *)ap + 1, &off);
+            break;
+        }
+        default:
+            if (action & 0x80) {
+                info->action_pointer = NULL;
+            }
+            break;
+        }
+    }
+}
+
 // Whether the thrown type is one of the types an exception specification allows.
 int func_02087818(char *throw_type, ExceptionSpecification *spec) {
     u8 *p;
