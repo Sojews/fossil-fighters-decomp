@@ -49,7 +49,11 @@ def compile_command(src: Path) -> list:
     cc = re.search(r"^cc = (.*)$", ninja, re.M)
     own = re.search(rf"build \S+: cc(?:_partial|_named)? {rel}(?: \|[^\n]*)?\n(?:  .*\n)*?  cc = (.*)\n", ninja)
     cmd = cmd.replace("$cc", own.group(1) if own else cc.group(1) if cc else "$cc")
-    return shlex.split(cmd)
+    out = shlex.split(cmd)
+    # Candidates compile from a temp dir, so quoted includes of headers sitting next to the source
+    # (e.g. exception_internal.h) need the source's own directory on the include path.
+    out += ["-i", str(src.parent.relative_to(ROOT))]
+    return out
 
 
 def target(src: Path, symbol: str):
