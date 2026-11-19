@@ -443,6 +443,8 @@ extern "C" const u32 data_0208cccc[256];    // each byte's bits spread to nibble
 // pixel mask where ours spills the glyph's pixels, and keeps a 1 in a register in the setup), as in the 4-bit
 // transfer.
 void MChr16BinFontTransfer::Transfer() {
+    u32 glyph;
+    int rows;
     const u8 *src = mSrc;
     const u32 *spread;
     int srcBytes = (mGlyphSize.x + 7) >> 3;
@@ -455,7 +457,7 @@ void MChr16BinFontTransfer::Transfer() {
     if (over > 0) {
         mGlyphSize.y -= over;
     }
-    int rows = mGlyphSize.y;
+    rows = mGlyphSize.y;
     int width = mSize.x;
     u32 *dst = (u32 *) ((u8 *) mDest + ((mPos.x >> 3) + (mPos.y >> 3) * width) * 32 + (mPos.y & 7) * 4);
     u32 shift = mPos.x & 7;
@@ -468,12 +470,12 @@ void MChr16BinFontTransfer::Transfer() {
     if (mPos.x < 0) {
         mask &= (1 << ((mPos.x >> 3) + 4) * 8) - 1;
     }
-    u32 words = (shift + mGlyphSize.x + 7) >> 3;
-    int nextRow = -words * 8 + 1;
+    u32 words = (shift + (mGlyphSize.x + 7)) >> 3;
+    const int nextRow = -words * 8 + 1;
     int nextTileRow = nextRow + (width - 1) * 8;
     spread = data_0208cccc;
     if (mColor == mBackColor) {
-        while (rows != 0) {
+        while (rows) {
             u32 bits = 0;
             switch (srcBytes) {
             case 3:
@@ -489,7 +491,7 @@ void MChr16BinFontTransfer::Transfer() {
                 src += 1;
                 break;
             }
-            u32 glyph = mask & ((bits >> shift) << mUnk3C);
+            glyph = mask & ((bits >> shift) << mUnk3C);
             u32 fill = mask & ~glyph;
             u32 keep = ~mask;
             if (mColor == -1) {
@@ -556,8 +558,8 @@ void MChr16BinFontTransfer::Transfer() {
             shadow = row >> 1;
             u32 glyph = mask & row;
             u32 drop = prev & (mask & ~glyph);
-            u32 fill = mask & ~(glyph | drop);
             u32 keep = ~mask;
+            u32 fill = mask & ~(glyph | drop);
             if (mColor == -1) {
                 keep |= fill;
                 fill = 0;
